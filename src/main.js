@@ -30,6 +30,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const React = require("devtools/client/shared/vendor/react");
+const ReactDOM = require("devtools/client/shared/vendor/react-dom");
+const WebReplayPlayer = require("timeline/WebReplayPlayer");
+
 const url = new URL(window.location.href);
 
 const recordingId = url.searchParams.get("id");
@@ -50,6 +54,9 @@ async function initialize() {
     drawGraphics(description.lastScreen);
   }
 }
+
+//const timeline = React.createElement(WebReplayPlayer, {});
+//ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
 
 /////////////////////////
 // Graphics
