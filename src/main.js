@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const React = require("devtools/client/shared/vendor/react");
 const ReactDOM = require("devtools/client/shared/vendor/react-dom");
 const WebReplayPlayer = require("timeline/WebReplayPlayer");
+const { sendMessage } = require("protocol/socket");
+const { ThreadFront } = require("protocol/thread");
 
 const url = new URL(window.location.href);
 
@@ -57,7 +59,13 @@ async function initialize() {
   const { sessionId } = await sendMessage("Recording.createSession", { recordingId });
 }
 
-const gToolbox = {};
+const gToolbox = {
+  getPanelWhenReady(panel) {
+    return new Promise(resolve => {});
+  },
+
+  threadFront: ThreadFront,
+};
 
 const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
 ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
@@ -110,90 +118,3 @@ function refreshGraphics() {
 }
 
 window.onresize = refreshGraphics;
-
-/////////////////////////
-// Socket
-/////////////////////////
-
-const socket = new WebSocket(dispatch || "https://dispatch.webreplay.io");
-let gSocketOpen = false;
-
-socket.onopen = makeInfallible(onSocketOpen);
-socket.onclose = makeInfallible(onSocketClose);
-socket.onerror = makeInfallible(onSocketError);
-socket.onmessage = makeInfallible(onSocketMessage);
-
-let gPendingMessages = [];
-let gNextMessageId = 1;
-
-const gMessageWaiters = new Map();
-
-function sendMessage(method, params) {
-  const id = gNextMessageId++;
-  const msg = { id, method, params };
-
-  if (gSocketOpen) {
-    doSend(msg);
-  } else {
-    gPendingMessages.push(msg);
-  }
-
-  const { promise, resolve, reject } = defer();
-  gMessageWaiters.set(id, { resolve, reject });
-
-  return promise;
-}
-
-const doSend = makeInfallible(msg => {
-  console.log("SendMessage", msg);
-  socket.send(JSON.stringify(msg));
-});
-
-function onSocketOpen() {
-  console.log("Socket Open");
-  gPendingMessages.forEach(msg => doSend(msg));
-  gPendingMessages.length = 0;
-  gSocketOpen = true;
-}
-
-function onSocketMessage(evt) {
-  const msg = JSON.parse(evt.data);
-  if (msg.id) {
-    const { resolve, reject } = gMessageWaiters.get(msg.id);
-    if (msg.error) {
-      console.warn("Message failed", msg.error);
-      reject(msg.error);
-    } else {
-      resolve(msg.result);
-    }
-  } else {
-    console.error("Received message with no ID", msg);
-  }
-}
-
-function onSocketClose() {
-  console.log("Socket Closed");
-}
-
-function onSocketError() {
-  console.log("Socket Error");
-}
-
-function makeInfallible(fn, thisv) {
-  return (...args) => {
-    try {
-      fn.apply(thisv, args);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-}
-
-function defer() {
-  let resolve, reject;
-  const promise = new Promise((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
-}

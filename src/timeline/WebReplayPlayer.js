@@ -237,14 +237,12 @@ class WebReplayPlayer extends Component {
 
   componentDidMount() {
     this.overlayWidth = this.updateOverlayWidth();
-    this.threadFront.on("paused", this.onPaused.bind(this));
-    this.threadFront.on("resumed", this.onResumed.bind(this));
-    this.threadFront.on("replayStatusUpdate", this.onStatusUpdate.bind(this));
-    this.threadFront.on("replayPaintFinished", this.replayPaintFinished.bind(this));
-
-    // Status updates normally only include deltas from the last status.
-    // This will cause an update to be emitted with the full status.
-    this.threadFront.replayFetchStatus();
+    this.threadFront.ensureProcessed(
+      this.onMissingRegions.bind(this),
+      this.onUnprocessedRegions.bind(this)
+    );
+    this.threadFront.findPaints(this.onPaints.bind(this));
+    this.threadFront.findMouseEvents(this.onMouseEvents.bind(this));
 
     this.toolbox.getPanelWhenReady("webconsole").then(panel => {
       const consoleFrame = panel.hud.ui;
@@ -350,71 +348,20 @@ class WebReplayPlayer extends Component {
     this.setState({ paused: false, closestMessage: null, pausedMessage: null });
   }
 
-  onStatusUpdate({ status }) {
-    const {
-      recording,
-      checkpoints,
-      executionPoint,
-      unscannedRegions,
-      widgetEvents,
-    } = status;
+  onMissingRegions(regions) {
+    console.log("MissingRegions", regions);
+  }
 
-    const newState = {};
+  onUnprocessedRegions(regions) {
+    console.log("UnprocessedRegions", regions);
+  }
 
-    if (recording !== undefined && recording != this.state.recording) {
-      newState.recording = recording;
-    }
+  onPaints(paints) {
+    console.log("PlayerPaints", paints);
+  }
 
-    if (checkpoints !== undefined && checkpoints.length) {
-      for (const { point, time = 0 } of checkpoints) {
-        gCheckpoints[point.checkpoint] = { point, time, widgetEvents: [] };
-      }
-
-      const recordingEndpoint = checkpoints[checkpoints.length - 1].point;
-      if (!similarPoints(recordingEndpoint, this.state.recordingEndpoint)) {
-        newState.recordingEndpoint = recordingEndpoint;
-        newState.zoomStartpoint = FirstCheckpointExecutionPoint;
-        newState.zoomEndpoint = recordingEndpoint;
-      }
-    }
-
-    if (widgetEvents !== undefined) {
-      for (const event of widgetEvents) {
-        checkpointInfo(event.point.checkpoint).widgetEvents.push(event);
-      }
-    }
-
-    if (executionPoint !== undefined) {
-      newState.executionPoint = executionPoint;
-    }
-
-    if (unscannedRegions !== undefined) {
-      let similar = unscannedRegions.length == this.state.unscannedRegions.length;
-      if (similar) {
-        for (let i = 0; i < unscannedRegions.length; i++) {
-          const newRegion = unscannedRegions[i];
-          const oldRegion = this.state.unscannedRegions[i];
-          if (
-            !similarPoints(newRegion.start, oldRegion.start) ||
-            !similarPoints(newRegion.end, oldRegion.end) ||
-            newRegion.traversed != oldRegion.traversed
-          ) {
-            similar = false;
-            break;
-          }
-        }
-      }
-
-      if (!similar) {
-        newState.unscannedRegions = unscannedRegions;
-      }
-    }
-
-    if (recording) {
-      newState.shouldAnimate = true;
-    }
-
-    this.setState(newState);
+  onMouseEvents(events) {
+    console.log("OnMouseEvents", events);
   }
 
   onConsoleUpdate(consoleState) {
