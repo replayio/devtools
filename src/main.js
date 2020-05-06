@@ -53,6 +53,8 @@ async function initialize() {
   if (description.lastScreen) {
     drawGraphics(description.lastScreen);
   }
+
+  const { sessionId } = await sendMessage("Recording.createSession", { recordingId });
 }
 
 //const timeline = React.createElement(WebReplayPlayer, {});
