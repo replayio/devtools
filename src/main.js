@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const React = require("devtools/client/shared/vendor/react");
 const ReactDOM = require("devtools/client/shared/vendor/react-dom");
 const WebReplayPlayer = require("timeline/WebReplayPlayer");
-const { sendMessage } = require("protocol/socket");
+const { initSocket, sendMessage } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 
 const url = new URL(window.location.href);
@@ -41,6 +41,7 @@ const url = new URL(window.location.href);
 const recordingId = url.searchParams.get("id");
 const dispatch = url.searchParams.get("dispatch");
 
+initSocket(dispatch);
 setTimeout(initialize, 0);
 
 async function initialize() {

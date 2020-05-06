@@ -30,18 +30,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const socket = new WebSocket(dispatch || "https://dispatch.webreplay.io");
+let socket;
 let gSocketOpen = false;
-
-socket.onopen = makeInfallible(onSocketOpen);
-socket.onclose = makeInfallible(onSocketClose);
-socket.onerror = makeInfallible(onSocketError);
-socket.onmessage = makeInfallible(onSocketMessage);
 
 let gPendingMessages = [];
 let gNextMessageId = 1;
 
 const gMessageWaiters = new Map();
+
+function initSocket(address) {
+  socket = new WebSocket(address || "https://dispatch.webreplay.io");
+
+  socket.onopen = makeInfallible(onSocketOpen);
+  socket.onclose = makeInfallible(onSocketClose);
+  socket.onerror = makeInfallible(onSocketError);
+  socket.onmessage = makeInfallible(onSocketMessage);
+}
 
 function sendMessage(method, params) {
   const id = gNextMessageId++;
@@ -114,5 +118,6 @@ function defer() {
 }
 
 module.exports = {
+  initSocket,
   sendMessage,
 };
