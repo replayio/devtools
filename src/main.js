@@ -58,6 +58,7 @@ async function initialize() {
   }
 
   const { sessionId } = await sendMessage("Recording.createSession", { recordingId });
+  ThreadFront.setSessionId(sessionId);
 }
 
 const gToolbox = {

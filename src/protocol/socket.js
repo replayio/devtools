@@ -30,6 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const { defer, makeInfallible } = require("./utils");
+
 let socket;
 let gSocketOpen = false;
 
@@ -47,9 +49,9 @@ function initSocket(address) {
   socket.onmessage = makeInfallible(onSocketMessage);
 }
 
-function sendMessage(method, params) {
+function sendMessage(method, params, sessionId) {
   const id = gNextMessageId++;
-  const msg = { id, method, params };
+  const msg = { id, sessionId, method, params };
 
   if (gSocketOpen) {
     doSend(msg);
@@ -96,25 +98,6 @@ function onSocketClose() {
 
 function onSocketError() {
   console.log("Socket Error");
-}
-
-function makeInfallible(fn, thisv) {
-  return (...args) => {
-    try {
-      fn.apply(thisv, args);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-}
-
-function defer() {
-  let resolve, reject;
-  const promise = new Promise((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
 }
 
 module.exports = {

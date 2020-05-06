@@ -30,51 +30,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// ThreadFront is the main interface used to interact with the singleton
-// WRP session. This name is used to match up with the corresponding object
-// the Firefox devtools use to connect to debuggee tabs.
+function makeInfallible(fn, thisv) {
+  return (...args) => {
+    try {
+      fn.apply(thisv, args);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+}
 
-const { sendMessage } = require("./socket");
-const { defer, assert } = require("./utils");
+function defer() {
+  let resolve, reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
 
-const ThreadFront = {
-  sessionId: null,
-  sessionWaiter: defer(),
+function assert(v) {
+  if (!v) {
+    throw new Error("Assertion failed!");
+  }
+}
 
-  setSessionId(sessionId) {
-    this.sessionId = sessionId;
-    this.sessionWaiter.resolve();
-  },
-
-  async ensureProcessed(onMissingRegions, onUnprocessedRegions) {
-    await this.sessionWaiter.promise;
-
-    assert(!this.onMissingRegions);
-    assert(!this.onUnprocessedRegions);
-
-    this.onMissingRegions = onMissingRegions;
-    this.onUnprocessedRegions = onUnprocessedRegions;
-
-    sendMessage("Session.ensureProcessed", {}, this.sessionId);
-  },
-
-  async findPaints(onPaints) {
-    await this.sessionWaiter.promise;
-
-    assert(!this.onPaints);
-    this.onPaints = onPaints;
-
-    sendMessage("Session.findPaints", {}, this.sessionId);
-  },
-
-  async findMouseEvents(onMouseEvents) {
-    await this.sessionWaiter.promise;
-
-    assert(!this.onMouseEvents);
-    this.onMouseEvents = onMouseEvents;
-
-    sendMessage("Session.findMouseEvents", {}, this.sessionId);
-  },
-};
-
-module.exports = { ThreadFront };
+module.exports = { makeInfallible, defer, assert };
