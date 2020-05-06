@@ -57,8 +57,8 @@ async function initialize() {
   const { sessionId } = await sendMessage("Recording.createSession", { recordingId });
 }
 
-//const timeline = React.createElement(WebReplayPlayer, {});
-//ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
+const timeline = React.createElement(WebReplayPlayer, {});
+ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
 
 /////////////////////////
 // Graphics
