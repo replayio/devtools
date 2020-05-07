@@ -12,7 +12,8 @@
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
 })(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_6__, __WEBPACK_EXTERNAL_MODULE_37__, __WEBPACK_EXTERNAL_MODULE_103__, __WEBPACK_EXTERNAL_MODULE_112__, __WEBPACK_EXTERNAL_MODULE_417__, __WEBPACK_EXTERNAL_MODULE_490__, __WEBPACK_EXTERNAL_MODULE_491__) {
-return /******/ (function(modules) { // webpackBootstrap
+
+  return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -2666,9 +2667,11 @@ function createPopup(doc) {
   return popup;
 }
 
+/*
 if (!inToolbox()) {
   Menu.prototype.createPopup = createPopup;
 }
+*/
 
 function onShown(menu, popup) {
   popup.childNodes.forEach((menuItemNode, i) => {

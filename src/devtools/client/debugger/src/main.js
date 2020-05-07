@@ -14,7 +14,7 @@ function unmountRoot() {
   ReactDOM.unmountComponentAtNode(mount);
 }
 
-module.exports = {
+export default {
   bootstrap: ({ targetList, devToolsClient, workers, panel }: any) =>
     onConnect(
       {

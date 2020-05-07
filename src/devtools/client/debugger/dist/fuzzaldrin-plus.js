@@ -1,2 +1,2 @@
-const { vendors } = require("./vendors");
-module.exports = vendors["fuzzaldrin-plus"];
+const { vendored } = require("./vendors");
+module.exports = vendored["fuzzaldrin-plus"];

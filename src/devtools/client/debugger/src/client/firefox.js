@@ -25,11 +25,13 @@ export async function onConnect(connection: any, _actions: Object, panel) {
 
   setupCommands({ devToolsClient });
   setupEvents({ actions, devToolsClient, panel });
+  /*
   await targetList.watchTargets(
     targetList.ALL_TYPES,
     onTargetAvailable,
     onTargetDestroyed
   );
+  */
 }
 
 async function onTargetAvailable({

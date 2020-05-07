@@ -320,4 +320,4 @@ class ObjectInspectorItem extends Component<Props> {
   }
 }
 
-module.exports = ObjectInspectorItem;
+export default ObjectInspectorItem;

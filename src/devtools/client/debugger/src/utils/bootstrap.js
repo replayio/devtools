@@ -67,7 +67,7 @@ export function bootstrapStore(
   panel: Panel,
   initialState: Object
 ) {
-  const debugJsModules = AppConstants.AppConstants.DEBUG_JS_MODULES == "1";
+  const debugJsModules = false; // AppConstants.AppConstants.DEBUG_JS_MODULES == "1";
   const createStore = configureStore({
     log: prefs.logging || isTesting(),
     timing: debugJsModules || isDevelopment(),
@@ -120,15 +120,13 @@ export function teardownWorkers() {
 }
 
 export function bootstrapApp(store: any, panel: Panel) {
-  if (isFirefoxPanel()) {
-    renderPanel(App, store, panel);
-  } else {
-    throw new Error("Not firefox panel");
-    /*
-    const { renderRoot } = require("devtools-launchpad");
-    renderRoot(React, ReactDOM, App, store);
-    */
-  }
+  const iframe = document.getElementById("debugger-iframe");
+  const iframeDocument = iframe.contentWindow.document;
+  const elem = iframeDocument.createElement("div");
+  iframeDocument.body.appendChild(elem);
+
+  const app = React.createElement(App, { store });
+  ReactDOM.render(app, elem);
 }
 
 let currentPendingBreakpoints;

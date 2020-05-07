@@ -1,2 +1,2 @@
-const { vendors } = require("../vendors");
-module.exports = vendors["react-transition-group/Transition"];
+const { vendored } = require("../vendors");
+module.exports = vendored["react-transition-group/Transition"];

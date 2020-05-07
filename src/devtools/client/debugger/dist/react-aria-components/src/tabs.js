@@ -1,2 +1,2 @@
-const { vendors } = require("../../vendors");
-module.exports = vendors["react-aria-components/src/tabs"];
+const { vendored } = require("../../vendors");
+module.exports = vendored["react-aria-components/src/tabs"];

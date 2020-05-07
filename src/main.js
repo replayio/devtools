@@ -78,12 +78,12 @@ const contents = document.getElementById("toolbox-contents");
 
 const iframe = document.createElement("iframe");
 iframe.className = "content-iframe";
+iframe.id = "debugger-iframe";
 contents.appendChild(iframe);
 
 setTimeout(() => {
   const debuggerPanel = new DebuggerPanel(iframe, toolbox);
   debuggerPanel.open();
-  //iframe.src = "data:text/html;charset=utf8-8,<body>HELLO</body>";
 }, 0);
 
 /////////////////////////

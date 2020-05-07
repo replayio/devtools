@@ -336,7 +336,7 @@ const OI = connect(
   actions
 )(ObjectInspector);
 
-module.exports = (props: Props) => {
+export default (props: Props) => {
   const { roots } = props;
 
   if (roots.length == 0) {

@@ -56,6 +56,7 @@ export {
   getFramePositions,
 } from "./pause";
 
+/*
 // eslint-disable-next-line import/named
 import { objectInspector } from "devtools-reps";
 
@@ -65,8 +66,9 @@ Object.keys(reducer).forEach(function(key) {
   if (key === "default" || key === "__esModule") {
     return;
   }
-  Object.defineProperty(exports, key, {
+  Object.defineProperty(module.exports, key, {
     enumerable: true,
     get: reducer[key],
   });
 });
+*/

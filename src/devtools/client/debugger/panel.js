@@ -33,7 +33,7 @@ function registerStoreObserver(store, subscriber) {
 function DebuggerPanel(iframeWindow, toolbox) {
   this.panelWin = iframeWindow;
   this.panelWin.L10N = L10N;
-  this.panelWin.Debugger = require("./src/main");
+  this.panelWin.Debugger = require("./src/main").default;
 
   this.toolbox = toolbox;
 }
@@ -56,12 +56,14 @@ DebuggerPanel.prototype = {
       selectors,
       client,
     } = await this.panelWin.Debugger.bootstrap({
+      /*
       targetList: this.toolbox.targetList,
       devToolsClient: this.toolbox.target.client,
       workers: {
         sourceMaps: this.toolbox.sourceMapService,
         evaluationsParser: this.toolbox.parserService,
       },
+      */
       panel: this,
     });
 
