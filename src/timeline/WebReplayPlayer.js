@@ -3,25 +3,18 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const { Component } = require("devtools/client/shared/vendor/react");
-const ReactDOM = require("devtools/client/shared/vendor/react-dom");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const { sortBy, range } = require("devtools/client/shared/vendor/lodash");
-const { pointEquals, pointPrecedes } = require("devtools/shared/execution-point-utils.js");
+const { Component } = require("react");
+const ReactDOM = require("react-dom");
+const dom = require("react-dom-factories");
+const PropTypes = require("react-prop-types");
+const { sortBy, range } = require("lodash");
+const { pointEquals, pointPrecedes } = require("protocol/execution-point-utils.js");
 const { SVG } = require("image/svg");
 
-/*
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const L10N = new LocalizationHelper(
   "devtools/client/locales/toolbox.properties"
 );
-*/
-
-const L10N = {
-  getFormatStr: str => str,
-  getStr: str => str,
-};
 
 const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
 

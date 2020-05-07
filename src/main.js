@@ -35,6 +35,7 @@ const ReactDOM = require("devtools/client/shared/vendor/react-dom");
 const WebReplayPlayer = require("timeline/WebReplayPlayer");
 const { initSocket, sendMessage } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
+const { DebuggerPanel } = require("devtools/client/debugger/panel");
 
 const url = new URL(window.location.href);
 
@@ -72,6 +73,18 @@ const gToolbox = {
 
 const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
 ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
+
+const contents = document.getElementById("toolbox-contents");
+
+const iframe = document.createElement("iframe");
+iframe.className = "content-iframe";
+contents.appendChild(iframe);
+
+setTimeout(() => {
+  const debuggerPanel = new DebuggerPanel(iframe, toolbox);
+  debuggerPanel.open();
+  //iframe.src = "data:text/html;charset=utf8-8,<body>HELLO</body>";
+}, 0);
 
 /////////////////////////
 // Graphics
