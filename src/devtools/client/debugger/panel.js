@@ -30,8 +30,8 @@ function registerStoreObserver(store, subscriber) {
   });
 }
 
-function DebuggerPanel(iframeWindow, toolbox) {
-  this.panelWin = iframeWindow;
+function DebuggerPanel(toolbox) {
+  this.panelWin = window;
   this.panelWin.L10N = L10N;
   this.panelWin.Debugger = require("./src/main").default;
 

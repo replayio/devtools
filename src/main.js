@@ -74,15 +74,8 @@ const gToolbox = {
 const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
 ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
 
-const contents = document.getElementById("toolbox-contents");
-
-const iframe = document.createElement("iframe");
-iframe.className = "content-iframe";
-iframe.id = "debugger-iframe";
-contents.appendChild(iframe);
-
 setTimeout(() => {
-  const debuggerPanel = new DebuggerPanel(iframe, toolbox);
+  const debuggerPanel = new DebuggerPanel(toolbox);
   debuggerPanel.open();
 }, 0);
 

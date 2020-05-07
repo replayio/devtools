@@ -120,11 +120,7 @@ export function teardownWorkers() {
 }
 
 export function bootstrapApp(store: any, panel: Panel) {
-  const iframe = document.getElementById("debugger-iframe");
-  const iframeDocument = iframe.contentWindow.document;
-  const root = iframeDocument.createElement("div");
-  iframeDocument.body.appendChild(root);
-
+  const root = document.getElementById("toolbox-content-debugger");
   ReactDOM.render(
     React.createElement(
       Provider,
