@@ -41,20 +41,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     top: 60%;
     left: 0px;
     width: 100%;
-    height: calc(40% - 40px);
+    height: calc(40% - 50px);
 }
 
 #toolbox-timeline {
-    background-color: blue;
-    height: 20px;
+    height: 25px;
+    border: solid 1px;
+    margin-top: -5px;
 }
 
 #toolbox-toolbar {
-    background-color: green;
-    height: 20px;
+    height: 25px;
+    border: solid 1px;
+    border-top: 0px;
 }
 
 #toolbox-contents {
     background-color: yellow;
     height: 100%;
+}
+
+.command-button {
+    float: left;
+}
+
+.command-button img {
+    height: 20px;
+    width: 20px;
+}
+
+.toolbar-panel-button {
+    float: left;
+    height: 22px;
+    padding: 3px 10px 0px 10px;
+    cursor: default;
+}
+
+.toolbar-panel-button:hover {
+    background-color: green;
 }

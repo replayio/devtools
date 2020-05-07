@@ -41,7 +41,6 @@ const url = new URL(window.location.href);
 const recordingId = url.searchParams.get("id");
 const dispatch = url.searchParams.get("dispatch");
 
-initSocket(dispatch);
 setTimeout(initialize, 0);
 
 async function initialize() {
@@ -49,6 +48,8 @@ async function initialize() {
     drawMessage("Recording ID not specified");
     return;
   }
+
+  initSocket(dispatch);
 
   drawMessage("Loading…");
   const description = await sendMessage("Recording.getDescription", { recordingId });

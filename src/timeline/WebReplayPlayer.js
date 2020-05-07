@@ -9,6 +9,7 @@ const dom = require("devtools/client/shared/vendor/react-dom-factories");
 const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
 const { sortBy, range } = require("devtools/client/shared/vendor/lodash");
 const { pointEquals, pointPrecedes } = require("devtools/shared/execution-point-utils.js");
+const { SVG } = require("image/svg");
 
 /*
 const { LocalizationHelper } = require("devtools/shared/l10n");
@@ -27,8 +28,7 @@ const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
 const { div } = dom;
 
 const markerWidth = 7;
-const imgResource = "resource://devtools/client/debugger/images";
-const imgChrome = "chrome://devtools/skin/images";
+const imgDir = "devtools/skin/images";
 const shouldLog = false;
 
 function classname(name, bools) {
@@ -53,15 +53,13 @@ function isError(message) {
 
 function CommandButton({ img, className, onClick, active }) {
   const images = {
-    next: "next",
-    previous: "next",
-    pause: "replay-pause",
-    play: "replay-resume",
-    zoomout: "zoom-out",
+    next: SVG.NextButton,
+    previous: SVG.NextButton,
+    pause: SVG.ReplayPause,
+    play: SVG.ReplayResume,
+    zoomout: SVG.ZoomOut,
   };
 
-  const filename = images[img];
-  const path = filename == "next" ? imgChrome : imgResource;
   const attrs = {
     className: classname(`command-button ${className}`, { active }),
     onClick,
@@ -69,12 +67,14 @@ function CommandButton({ img, className, onClick, active }) {
 
   attrs.title = L10N.getStr(`toolbox.replay.${img}`);
 
+  const base64 = btoa(images[img]);
+
   return dom.div(
     attrs,
     dom.img({
       className: `btn ${img} ${className}`,
       style: {
-        maskImage: `url("${path}/${filename}.svg")`,
+        backgroundImage: `url("data:image/svg+xml;base64,${base64}")`
       },
     })
   );

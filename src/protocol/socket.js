@@ -41,7 +41,7 @@ let gNextMessageId = 1;
 const gMessageWaiters = new Map();
 
 function initSocket(address) {
-  socket = new WebSocket(address || "https://dispatch.webreplay.io");
+  socket = new WebSocket(address || "wss://dispatch.webreplay.io");
 
   socket.onopen = makeInfallible(onSocketOpen);
   socket.onclose = makeInfallible(onSocketClose);
