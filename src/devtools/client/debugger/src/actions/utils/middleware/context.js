@@ -39,7 +39,7 @@ function logAction(action) {
   } else {
     const data = actionLogData(action);
     const status = action.status ? ` [${action.status}]` : "";
-    ChromeUtils.recordReplayLog(`Debugger ${action.type}${data}${status}`);
+    //ChromeUtils.recordReplayLog(`Debugger ${action.type}${data}${status}`);
   }
 }
 

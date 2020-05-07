@@ -28,6 +28,9 @@ type Props = {
   toggleShortcutsModal: () => void,
 };
 
+const { LocalizationHelper } = require("devtools/shared/l10n");
+const L10N = new LocalizationHelper();
+
 export class WelcomeBox extends Component<Props> {
   render() {
     const searchSourcesShortcut = formatKeyShortcut(

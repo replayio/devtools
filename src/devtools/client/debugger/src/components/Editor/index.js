@@ -96,6 +96,9 @@ import type {
   HighlightedCalls as highlightedCallsType,
 } from "../../types";
 
+const { LocalizationHelper } = require("devtools/shared/l10n");
+const L10N = new LocalizationHelper();
+
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
 };

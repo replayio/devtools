@@ -73,6 +73,7 @@ DebuggerPanel.prototype = {
     this._client = client;
     this.isReady = true;
 
+    /*
     this.panelWin.document.addEventListener(
       "drag:start",
       this.toolbox.toggleDragging
@@ -81,6 +82,7 @@ DebuggerPanel.prototype = {
       "drag:end",
       this.toolbox.toggleDragging
     );
+    */
 
     registerStoreObserver(this._store, this._onDebuggerStateChange.bind(this));
 

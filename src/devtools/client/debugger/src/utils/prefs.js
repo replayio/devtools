@@ -14,6 +14,7 @@ function verifyPrefSchema() {
 
 const prefs = {
   expressions: [],
+  projectDirectoryRoot: "",
 };
 
 const features = {

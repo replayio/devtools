@@ -122,11 +122,17 @@ export function teardownWorkers() {
 export function bootstrapApp(store: any, panel: Panel) {
   const iframe = document.getElementById("debugger-iframe");
   const iframeDocument = iframe.contentWindow.document;
-  const elem = iframeDocument.createElement("div");
-  iframeDocument.body.appendChild(elem);
+  const root = iframeDocument.createElement("div");
+  iframeDocument.body.appendChild(root);
 
-  const app = React.createElement(App, { store });
-  ReactDOM.render(app, elem);
+  ReactDOM.render(
+    React.createElement(
+      Provider,
+      { store },
+      React.createElement(App)
+    ),
+    root
+  );
 }
 
 let currentPendingBreakpoints;

@@ -35,6 +35,9 @@ import { PluralForm } from "devtools-modules";
 
 import "./ProjectSearch.css";
 
+const { LocalizationHelper } = require("devtools/shared/l10n");
+const L10N = new LocalizationHelper();
+
 export type Match = {
   type: "MATCH",
   sourceId: string,
