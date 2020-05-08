@@ -37,9 +37,7 @@ function renderApp({ app, store, toolbox, root }) {
     createElement(
       Provider,
       { store },
-      toolbox
-        ? createElement(ToolboxProvider, { store: toolbox.store }, app)
-        : app
+      app
     ),
     root
   );
@@ -78,8 +76,6 @@ class WebConsoleWrapper {
   async init() {
     const { webConsoleUI } = this;
 
-    const webConsoleFront = await this.hud.currentTarget.getFront("console");
-
     return new Promise(resolve => {
       store = configureStore(this.webConsoleUI, {
         // We may not have access to the toolbox (e.g. in the browser console).
@@ -99,11 +95,13 @@ class WebConsoleWrapper {
         webConsoleWrapper: this,
       });
 
+      /*
       if (this.toolbox) {
         this.toolbox.threadFront.on("paused", this.dispatchPaused);
         this.toolbox.threadFront.on("instantWarp", this.dispatchPaused);
         this.toolbox.threadFront.on("progress", this.dispatchProgress);
       }
+      */
 
       const app = App({
         serviceContainer,

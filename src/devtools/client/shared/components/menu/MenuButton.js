@@ -77,6 +77,8 @@ class MenuButton extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.props.toolboxDoc = window.document;
+
     this.showMenu = this.showMenu.bind(this);
     this.hideMenu = this.hideMenu.bind(this);
     this.toggleMenu = this.toggleMenu.bind(this);
@@ -155,8 +157,10 @@ class MenuButton extends PureComponent {
       tooltipProps.id = this.props.menuId;
     }
 
+    /*
     this.tooltip = new HTMLTooltip(this.props.toolboxDoc, tooltipProps);
     this.tooltip.on("hidden", this.onHidden);
+    */
   }
 
   async resetTooltip() {

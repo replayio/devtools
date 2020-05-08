@@ -72,6 +72,10 @@ const gToolbox = {
   threadFront: ThreadFront,
 
   on() {},
+
+  getHighlighter() {
+    return {};
+  },
 };
 
 const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });

@@ -335,3 +335,5 @@ module.exports = EventEmitter;
 
 const isEventHandler = listener =>
   listener && handler in listener && typeof listener[handler] === "function";
+
+function logEvent() {}

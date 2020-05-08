@@ -73,9 +73,11 @@ class ConfirmDialog extends Component {
     const tooltipDoc = toolbox ? toolbox.doc : doc;
     // The popup will be attached to the toolbox document or HUD document in the case
     // such as the browser console which doesn't have a toolbox.
+    /*
     this.tooltip = new HTMLTooltip(tooltipDoc, {
       className: "invoke-confirm",
     });
+    */
   }
 
   componentDidUpdate() {

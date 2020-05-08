@@ -8,14 +8,12 @@ const Services = require("Services");
 const { debounce } = require("devtools/shared/debounce");
 const isMacOS = Services.appinfo.OS === "Darwin";
 
+const EventEmitter = require("devtools/shared/event-emitter");
+
+const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
+
 /*
 loader.lazyRequireGetter(this, "Debugger", "Debugger");
-loader.lazyRequireGetter(this, "EventEmitter", "devtools/shared/event-emitter");
-loader.lazyRequireGetter(
-  this,
-  "AutocompletePopup",
-  "devtools/client/shared/autocomplete-popup"
-);
 
 loader.lazyRequireGetter(
   this,
@@ -28,25 +26,20 @@ loader.lazyRequireGetter(
   "devtools/client/shared/keycodes",
   true
 );
-loader.lazyRequireGetter(
-  this,
-  "Editor",
-  "devtools/client/shared/sourceeditor/editor"
-);
+*/
+
+const Editor = require("devtools/client/shared/sourceeditor/editor");
+
+/*
 loader.lazyRequireGetter(
   this,
   "getFocusableElements",
   "devtools/client/shared/focus",
   true
 );
-loader.lazyRequireGetter(
-  this,
-  "l10n",
-  "devtools/client/webconsole/utils/messages",
-  true
-);
-loader.lazyRequireGetter(this, "saveAs", "devtools/shared/DevToolsUtils", true);
 */
+
+const { l10n } = require("devtools/client/webconsole/utils/messages");
 
 // React & Redux
 const {
@@ -499,9 +492,12 @@ class JSTerm extends Component {
       this.editor.on("changes", this._onEditorChanges);
       this.editor.on("beforeChange", this._onEditorBeforeChange);
       this.editor.appendToLocalElement(this.node);
+
+      /*
       const cm = this.editor.codeMirror;
       cm.on("paste", (_, event) => this.props.onPaste(event));
       cm.on("drop", (_, event) => this.props.onPaste(event));
+      */
 
       this.node.addEventListener("keydown", event => {
         if (event.keyCode === KeyCodes.DOM_VK_ESCAPE) {
@@ -523,7 +519,8 @@ class JSTerm extends Component {
       });
 
       // Update the character width needed for the popup offset calculations.
-      this._inputCharWidth = this._getInputCharWidth();
+      // FIXME
+      //this._inputCharWidth = this._getInputCharWidth();
       this.lastInputValue && this._setValue(this.lastInputValue);
     }
   }

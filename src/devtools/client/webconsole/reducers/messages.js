@@ -164,10 +164,10 @@ function addMessage(newMessage, state, filtersState, prefsState, uiState) {
     const key = `${newMessage.logpointId}:${pointToString(newMessage.executionPoint)}`;
     const existingMessage = state.logpointMessages.get(key);
     if (existingMessage) {
-      ChromeUtils.recordReplayLog(`LogpointFinish ${JSON.stringify(newMessage.executionPoint)}`);
+      //ChromeUtils.recordReplayLog(`LogpointFinish ${JSON.stringify(newMessage.executionPoint)}`);
       removedIds.push(existingMessage.id);
     } else {
-      ChromeUtils.recordReplayLog(`LogpointStart ${JSON.stringify(newMessage.executionPoint)}`);
+      //ChromeUtils.recordReplayLog(`LogpointStart ${JSON.stringify(newMessage.executionPoint)}`);
     }
     state.logpointMessages.set(key, newMessage);
   }
@@ -336,7 +336,7 @@ function messages(
 
   const { logLimit } = prefsState;
 
-  ChromeUtils.recordReplayLog(`WebConsole ${action.type}`);
+  //ChromeUtils.recordReplayLog(`WebConsole ${action.type}`);
 
   let newState;
   switch (action.type) {
@@ -1532,7 +1532,7 @@ function maybeSortVisibleMessages(
   // messages with execution points, as either we aren't replaying or haven't
   // seen any messages yet.
   if (state.hasExecutionPoints) {
-    ChromeUtils.recordReplayLog(`SortVisibleMessagesStart ${state.visibleMessages.length}`);
+    //ChromeUtils.recordReplayLog(`SortVisibleMessagesStart ${state.visibleMessages.length}`);
     state.visibleMessages.sort((a, b) => {
       const pointA = messageExecutionPoint(state, a);
       const pointB = messageExecutionPoint(state, b);
@@ -1549,7 +1549,7 @@ function maybeSortVisibleMessages(
       let countB = messageCountSinceLastExecutionPoint(state, b);
       return countA > countB;
     });
-    ChromeUtils.recordReplayLog(`SortVisibleMessagesEnd`);
+    //ChromeUtils.recordReplayLog(`SortVisibleMessagesEnd`);
   }
 
   if (state.warningGroupsById.size > 0 && sortWarningGroupMessage) {
