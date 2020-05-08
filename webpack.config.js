@@ -15,7 +15,9 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
+        exclude: (request) => {
+          return request.includes("node_modules") || ["fs"].includes(request);
+        },
         use: {
           loader: "babel-loader",
           options: {
@@ -30,6 +32,10 @@ module.exports = {
       {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.properties$/,
+        loader: "raw-loader",
       },
     ],
   },

@@ -1,11 +1,2 @@
-
-
-function LocalizationHelper() {
-}
-
-LocalizationHelper.prototype = {
-  getStr: str => str,
-  getFormatStr: str => str,
-};
-
-exports.LocalizationHelper = LocalizationHelper;
+import { LocalizationHelper } from "shims/l10n";
+export { LocalizationHelper };

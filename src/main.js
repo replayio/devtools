@@ -38,6 +38,12 @@ const { ThreadFront } = require("protocol/thread");
 const { DebuggerPanel } = require("devtools/client/debugger/panel");
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 
+const { LocalizationHelper } = require("shims/l10n");
+
+window.l10n = new LocalizationHelper(
+  "devtools/client/locales/debugger.properties"
+);
+
 const url = new URL(window.location.href);
 
 const recordingId = url.searchParams.get("id");
@@ -54,7 +60,9 @@ async function initialize() {
   initSocket(dispatch);
 
   drawMessage("Loading…");
-  const description = await sendMessage("Recording.getDescription", { recordingId });
+  const description = await sendMessage("Recording.getDescription", {
+    recordingId,
+  });
   const { duration, lastScreen } = description;
 
   if (lastScreen) {
@@ -63,13 +71,15 @@ async function initialize() {
 
   gToolbox.webReplayPlayer.setRecordingDuration(duration);
 
-  const { sessionId } = await sendMessage("Recording.createSession", { recordingId });
+  const { sessionId } = await sendMessage("Recording.createSession", {
+    recordingId,
+  });
   ThreadFront.setSessionId(sessionId);
 }
 
 const gToolbox = {
   getPanelWhenReady(panel) {
-    return new Promise(resolve => {});
+    return new Promise((resolve) => {});
   },
 
   threadFront: ThreadFront,
@@ -139,7 +149,11 @@ function refreshGraphics() {
   } else if (gDrawMessage) {
     cx.font = `${25 * window.devicePixelRatio}px sans-serif`;
     const messageWidth = cx.measureText(gDrawMessage).width;
-    cx.fillText(gDrawMessage, (canvas.width - messageWidth) / 2, canvas.height / 2);
+    cx.fillText(
+      gDrawMessage,
+      (canvas.width - messageWidth) / 2,
+      canvas.height / 2
+    );
   }
 }
 

@@ -269,7 +269,7 @@ class Frame extends Component {
     if (isLinkable) {
       sourceEl = dom.a(
         {
-          onClick: e => {
+          onClick: (e) => {
             e.preventDefault();
             e.stopPropagation();
             onClick(this.getSourceForClick({ ...frame, source, sourceId }));

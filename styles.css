@@ -31,58 +31,60 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #graphics {
-    position: absolute;
-    top: 0px;
-    left: 0px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
 
 #toolbox {
-    position: absolute;
-    top: 60%;
-    left: 0px;
-    width: 100%;
-    height: calc(40% - 50px);
+  position: absolute;
+  top: 60%;
+  left: 0px;
+  width: 100%;
+  height: calc(40% - 50px);
+  font-family: sans-serif;
+
+  --toolbox-background: #f9f9fa;
 }
 
 #toolbox-timeline {
-    height: 25px;
-    border: solid 1px;
-    margin-top: -5px;
+  height: 25px;
+  margin-top: -5px;
+  background: var(--toolbox-background);
 }
 
 #toolbox-toolbar {
-    height: 25px;
-    border: solid 1px;
-    border-top: 0px;
+  height: 25px;
+  border-top: 0px;
 }
 
 #toolbox-contents {
-    height: 100%;
+  height: 100%;
 }
 
 .command-button {
-    float: left;
+  float: left;
 }
 
 .command-button img {
-    height: 20px;
-    width: 20px;
+  height: 20px;
+  width: 20px;
 }
 
 .toolbar-panel-button {
-    float: left;
-    height: 22px;
-    padding: 3px 10px 0px 10px;
-    cursor: default;
+  float: left;
+  height: 22px;
+  padding: 3px 10px 0px 10px;
+  cursor: default;
 }
 
 .toolbar-panel-button:hover {
-    background-color: green;
+  background-color: green;
 }
 
 .content-iframe {
-    border: none;
-    width: 100%;
-    height: 100%;
-    padding-top: 2px;
+  border: none;
+  width: 100%;
+  height: 100%;
+  padding-top: 2px;
 }

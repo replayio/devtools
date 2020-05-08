@@ -80,6 +80,8 @@ const ThreadFront = {
     sendMessage("Session.findMouseEvents", {}, this.sessionId);
     addEventListener("Session.onMouseEvents", onMouseEvents);
   },
+
+  async paint() {},
 };
 
 module.exports = { ThreadFront };
