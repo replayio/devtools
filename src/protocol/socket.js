@@ -77,8 +77,23 @@ function onSocketOpen() {
   gSocketOpen = true;
 }
 
+const gEventListeners = new Map();
+
+function addEventListener(method, handler) {
+  if (gEventListeners.has(method)) {
+    throw new Error("Duplicate event listener", method);
+  }
+  gEventListeners.set(method, handler);
+}
+
+function removeEventListener(method) {
+  gEventListeners.delete(method);
+}
+
 function onSocketMessage(evt) {
   const msg = JSON.parse(evt.data);
+  console.log("OnMessage", msg);
+
   if (msg.id) {
     const { resolve, reject } = gMessageWaiters.get(msg.id);
     if (msg.error) {
@@ -87,8 +102,11 @@ function onSocketMessage(evt) {
     } else {
       resolve(msg.result);
     }
+  } else if (gEventListeners.has(msg.method)) {
+    const handler = gEventListeners.get(msg.method);
+    handler(msg.params);
   } else {
-    console.error("Received message with no ID", msg);
+    console.error("Received unknown message", msg);
   }
 }
 
@@ -103,4 +121,6 @@ function onSocketError() {
 module.exports = {
   initSocket,
   sendMessage,
+  addEventListener,
+  removeEventListener,
 };

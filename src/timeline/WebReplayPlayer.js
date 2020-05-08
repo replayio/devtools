@@ -217,6 +217,7 @@ class WebReplayPlayer extends Component {
       shouldAnimate: true,
       zoomStartpoint: FirstCheckpointExecutionPoint,
       zoomEndpoint: FirstCheckpointExecutionPoint,
+      recordingDuration: 0,
     };
 
     this.hoveredMessage = null;
@@ -252,6 +253,10 @@ class WebReplayPlayer extends Component {
     if (prevState.closestMessage != this.state.closestMessage) {
       this.scrollToMessage(this.state.closestMessage);
     }
+  }
+
+  setRecordingDuration(duration) {
+    this.setState({ recordingDuration: duration });
   }
 
   get toolbox() {

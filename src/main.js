@@ -55,10 +55,13 @@ async function initialize() {
 
   drawMessage("Loading…");
   const description = await sendMessage("Recording.getDescription", { recordingId });
+  const { duration, lastScreen } = description;
 
-  if (description.lastScreen) {
+  if (lastScreen) {
     drawGraphics(description.lastScreen);
   }
+
+  gToolbox.webReplayPlayer.setRecordingDuration(duration);
 
   const { sessionId } = await sendMessage("Recording.createSession", { recordingId });
   ThreadFront.setSessionId(sessionId);

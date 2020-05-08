@@ -34,7 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // WRP session. This name is used to match up with the corresponding object
 // the Firefox devtools use to connect to debuggee tabs.
 
-const { sendMessage } = require("./socket");
+const {
+  sendMessage,
+  addEventListener,
+  removeEventListener,
+} = require("./socket");
 const { defer, assert } = require("./utils");
 
 const ThreadFront = {
@@ -49,31 +53,32 @@ const ThreadFront = {
   async ensureProcessed(onMissingRegions, onUnprocessedRegions) {
     await this.sessionWaiter.promise;
 
-    assert(!this.onMissingRegions);
-    assert(!this.onUnprocessedRegions);
-
-    this.onMissingRegions = onMissingRegions;
-    this.onUnprocessedRegions = onUnprocessedRegions;
+    assert(!this.hasEnsureProcessed);
+    this.hasEnsureProcessed = true;
 
     sendMessage("Session.ensureProcessed", {}, this.sessionId);
+    addEventListener("Session.missingRegions", onMissingRegions);
+    addEventListener("Session.unprocessedRegions", onUnprocessedRegions);
   },
 
   async findPaints(onPaints) {
     await this.sessionWaiter.promise;
 
-    assert(!this.onPaints);
-    this.onPaints = onPaints;
+    assert(!this.hasFindPaints);
+    this.hasFindPaints = true;
 
-    sendMessage("Session.findPaints", {}, this.sessionId);
+    sendMessage("Graphics.findPaints", {}, this.sessionId);
+    addEventListener("Graphics.paintPoints", onPaints);
   },
 
   async findMouseEvents(onMouseEvents) {
     await this.sessionWaiter.promise;
 
-    assert(!this.onMouseEvents);
-    this.onMouseEvents = onMouseEvents;
+    assert(!this.hasFindMouseEvents);
+    this.hasFindMouseEvents = true;
 
     sendMessage("Session.findMouseEvents", {}, this.sessionId);
+    addEventListener("Session.onMouseEvents", onMouseEvents);
   },
 };
 
