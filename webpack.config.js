@@ -16,7 +16,11 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: (request) => {
-          return request.includes("node_modules") || ["fs"].includes(request);
+          return (
+            request.includes("node_modules") ||
+            request.includes("src/devtools/client/shared/vendor") ||
+            ["fs"].includes(request)
+          );
         },
         use: {
           loader: "babel-loader",
@@ -31,7 +35,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        use: ["style-loader", "css-loader", "postcss-loader"],
       },
       {
         test: /\.properties$/,
