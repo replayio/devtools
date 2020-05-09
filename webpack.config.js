@@ -43,4 +43,12 @@ module.exports = {
       },
     ],
   },
+  externals: [
+    function (context, request, callback) {
+      if (/^fs$/.test(request)) {
+        return callback(null, "{}");
+      }
+      callback();
+    },
+  ],
 };
