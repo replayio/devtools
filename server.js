@@ -19,5 +19,12 @@ server.listen(port);
 console.log(`Listening at http://localhost:${port}`);
 
 function getContentType(url) {
-  return url.endsWith(".js") ? "text/javascript" : "";
+  // return url.endsWith(".js") ? "text/javascript" : "";
+  if (url.endsWith(".svg")) {
+    return "image/svg+xml";
+  }
+  if (url.endsWith(".js")) {
+    return "text/javascript";
+  }
+  return "";
 }

@@ -612,7 +612,7 @@
   width: 14px;
   height: 14px;
   mask-size: 14px;
-  background: var(--theme-icon-color);
+  /* background: var(--theme-icon-color); */
   align-self: center;
   margin: 0 auto;
 }
