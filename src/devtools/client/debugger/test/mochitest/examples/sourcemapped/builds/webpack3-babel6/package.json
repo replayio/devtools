@@ -6,7 +6,7 @@
     "babel-loader": "^7.1.5",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-preset-env": "^1.7.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.13",
     "webpack": "3"
   }
 }
