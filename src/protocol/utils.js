@@ -55,4 +55,22 @@ function assert(v) {
   }
 }
 
-module.exports = { makeInfallible, defer, assert };
+function binarySearch(start, end, callback) {
+  while (start + 1 < end) {
+    const mid = ((start + end) / 2) | 0;
+    const rv = callback(mid);
+    if (rv < 0) {
+      end = mid;
+    } else {
+      start = mid;
+    }
+  }
+  return start;
+}
+
+module.exports = {
+  makeInfallible,
+  defer,
+  assert,
+  binarySearch,
+};

@@ -10,6 +10,11 @@ const PropTypes = require("react-prop-types");
 const { sortBy, range } = require("lodash");
 const { SVG } = require("image/svg");
 const { log } = require("protocol/socket");
+const { closestPaintOrMouseEvent } = require("protocol/graphics");
+const {
+  pointEquals,
+  pointPrecedes,
+} = require("protocol/execution-point-utils.js");
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const L10N = new LocalizationHelper(
@@ -101,19 +106,6 @@ function getMessageLocation(message) {
   return { sourceUrl: source, line, column };
 }
 
-function binarySearch(start, end, callback) {
-  while (start + 1 < end) {
-    const mid = ((start + end) / 2) | 0;
-    const rv = callback(mid);
-    if (rv < 0) {
-      end = mid;
-    } else {
-      start = mid;
-    }
-  }
-  return start;
-}
-
 class WebReplayPlayer extends Component {
   static get propTypes() {
     return {
@@ -154,8 +146,6 @@ class WebReplayPlayer extends Component {
       this.onMissingRegions.bind(this),
       this.onUnprocessedRegions.bind(this)
     );
-    this.threadFront.findPaints(this.onPaints.bind(this));
-    this.threadFront.findMouseEvents(this.onMouseEvents.bind(this));
 
     this.toolbox.getPanelWhenReady("webconsole").then((panel) => {
       const consoleFrame = panel.hud.ui;
@@ -256,14 +246,6 @@ class WebReplayPlayer extends Component {
   onUnprocessedRegions({ regions }) {
     log(`UnprocessedRegions ${JSON.stringify(regions)}`);
     this.setState({ unprocessedRegions: regions });
-  }
-
-  onPaints(paints) {
-    log(`PlayerPaints ${JSON.stringify(paints)}`);
-  }
-
-  onMouseEvents(events) {
-    log(`OnMouseEvents ${JSON.stringify(events)}`);
   }
 
   onConsoleUpdate(consoleState) {

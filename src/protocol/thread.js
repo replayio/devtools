@@ -31,54 +31,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 // ThreadFront is the main interface used to interact with the singleton
-// WRP session. This name is used to match up with the corresponding object
-// the Firefox devtools use to connect to debuggee tabs.
+// WRP session. This interface is based on the one normally used when the
+// devtools interact with a thread: at any time the thread is either paused
+// at a particular point, or resuming on its way to pause at another point.
+//
+// This model is different from the one used in the WRP, where queries are
+// performed on the state at different points in the recording. This layer
+// helps with adapting the devtools to the WRP.
 
 const {
   sendMessage,
   addEventListener,
-  removeEventListener,
 } = require("./socket");
 const { defer, assert } = require("./utils");
 
 const ThreadFront = {
-  sessionId: null,
   sessionWaiter: defer(),
 
   setSessionId(sessionId) {
-    this.sessionId = sessionId;
-    this.sessionWaiter.resolve();
+    this.sessionWaiter.resolve(sessionId);
   },
 
   async ensureProcessed(onMissingRegions, onUnprocessedRegions) {
-    await this.sessionWaiter.promise;
+    const sessionId = await this.sessionWaiter.promise;
 
     assert(!this.hasEnsureProcessed);
     this.hasEnsureProcessed = true;
 
-    sendMessage("Session.ensureProcessed", {}, this.sessionId);
+    sendMessage("Session.ensureProcessed", {}, sessionId);
     addEventListener("Session.missingRegions", onMissingRegions);
     addEventListener("Session.unprocessedRegions", onUnprocessedRegions);
-  },
-
-  async findPaints(onPaints) {
-    await this.sessionWaiter.promise;
-
-    assert(!this.hasFindPaints);
-    this.hasFindPaints = true;
-
-    sendMessage("Graphics.findPaints", {}, this.sessionId);
-    addEventListener("Graphics.paintPoints", onPaints);
-  },
-
-  async findMouseEvents(onMouseEvents) {
-    await this.sessionWaiter.promise;
-
-    assert(!this.hasFindMouseEvents);
-    this.hasFindMouseEvents = true;
-
-    sendMessage("Session.findMouseEvents", {}, this.sessionId);
-    addEventListener("Session.onMouseEvents", onMouseEvents);
   },
 
   async paint() {},
