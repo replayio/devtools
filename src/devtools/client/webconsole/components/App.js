@@ -40,26 +40,25 @@ const EagerEvaluation = createFactory(
 );
 
 // And lazy load the ones that may not be used.
-const SideBar = createFactory(require("devtools/client/webconsole/components/SideBar"));
+const SideBar = createFactory(
+  require("devtools/client/webconsole/components/SideBar")
+);
 
-const EditorToolbar =
-  createFactory(
-    require("devtools/client/webconsole/components/Input/EditorToolbar")
-  );
+const EditorToolbar = createFactory(
+  require("devtools/client/webconsole/components/Input/EditorToolbar")
+);
 
-const NotificationBox =
-  createFactory(
-    require("devtools/client/shared/components/NotificationBox").NotificationBox
-  )
+const NotificationBox = createFactory(
+  require("devtools/client/shared/components/NotificationBox").NotificationBox
+);
 const {
   getNotificationWithValue,
   PriorityLevels,
 } = require("devtools/client/shared/components/NotificationBox");
 
-const GridElementWidthResizer =
-  createFactory(
-    require("devtools/client/shared/components/splitter/GridElementWidthResizer")
-  );
+const GridElementWidthResizer = createFactory(
+  require("devtools/client/shared/components/splitter/GridElementWidthResizer")
+);
 
 const l10n = require("devtools/client/webconsole/utils/l10n");
 const { Utils: WebConsoleUtils } = require("devtools/client/webconsole/utils");
@@ -218,7 +217,7 @@ class App extends Component {
     const input = event.target;
 
     // Cleanup function if notification is closed by the user.
-    const removeCallback = eventType => {
+    const removeCallback = (eventType) => {
       if (eventType == "removed") {
         input.removeEventListener("keyup", pasteKeyUpHandler);
         dispatch(actions.removeNotification("selfxss-notification"));
@@ -238,7 +237,7 @@ class App extends Component {
     );
 
     // Remove notification automatically when the user types "allow pasting".
-    const pasteKeyUpHandler = e => {
+    const pasteKeyUpHandler = (e) => {
       const value = e.target.value;
       if (value.includes(SELF_XSS_OK)) {
         dispatch(actions.removeNotification("selfxss-notification"));
@@ -401,7 +400,7 @@ class App extends Component {
         className: classNames.join(" "),
         onKeyDown: this.onKeyDown,
         onClick: this.onClick,
-        ref: node => {
+        ref: (node) => {
           this.node = node;
         },
       },
@@ -411,7 +410,7 @@ class App extends Component {
 
   render() {
     const { webConsoleUI, editorMode, dispatch } = this.props;
-
+    console.log(`>>> YO`);
     const filterBar = this.renderFilterBar();
     const editorToolbar = this.renderEditorToolbar();
     const consoleOutput = this.renderConsoleOutput();
@@ -439,7 +438,7 @@ class App extends Component {
             position: "end",
             className: "editor-resizer",
             getControlledElementNode: () => webConsoleUI.jsterm.node,
-            onResizeEnd: width => dispatch(actions.setEditorWidth(width)),
+            onResizeEnd: (width) => dispatch(actions.setEditorWidth(width)),
           })
         : null,
       reverseSearch,
@@ -449,7 +448,7 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   notifications: getAllNotifications(state),
   reverseSearchInputVisible: state.ui.reverseSearchInputVisible,
   reverseSearchInitialValue: state.ui.reverseSearchInitialValue,
@@ -462,11 +461,8 @@ const mapStateToProps = state => ({
   showEvaluationSelector: state.ui.showEvaluationSelector,
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   dispatch,
 });
 
-module.exports = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App);
+module.exports = connect(mapStateToProps, mapDispatchToProps)(App);

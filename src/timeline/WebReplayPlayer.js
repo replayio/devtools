@@ -8,7 +8,10 @@ const ReactDOM = require("react-dom");
 const dom = require("react-dom-factories");
 const PropTypes = require("react-prop-types");
 const { sortBy, range } = require("lodash");
-const { pointEquals, pointPrecedes } = require("protocol/execution-point-utils.js");
+const {
+  pointEquals,
+  pointPrecedes,
+} = require("protocol/execution-point-utils.js");
 const { SVG } = require("image/svg");
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
@@ -64,10 +67,10 @@ function CommandButton({ img, className, onClick, active }) {
 
   return dom.div(
     attrs,
-    dom.img({
+    dom.div({
       className: `btn ${img} ${className}`,
       style: {
-        backgroundImage: `url("data:image/svg+xml;base64,${base64}")`
+        backgroundImage: `url("data:image/svg+xml;base64,${base64}")`,
       },
     })
   );
@@ -84,7 +87,7 @@ function getProgress(executionPoint) {
 function getClosestMessage(messages, executionPoint) {
   const progress = getProgress(executionPoint);
 
-  return sortBy(messages, message =>
+  return sortBy(messages, (message) =>
     Math.abs(progress - getMessageProgress(message))
   )[0];
 }
@@ -109,7 +112,10 @@ function getMessageLocation(message) {
 }
 
 const FirstCheckpointId = 1;
-const FirstCheckpointExecutionPoint = { checkpoint: FirstCheckpointId, progress: 0 };
+const FirstCheckpointExecutionPoint = {
+  checkpoint: FirstCheckpointId,
+  progress: 0,
+};
 
 // Information about the progress and time at each checkpoint. This only grows,
 // and is not part of the reducer store so we can update it without rerendering.
@@ -137,10 +143,16 @@ function executionPointTime(point) {
   let nextInfo = gCheckpoints[point.checkpoint + 1];
 
   function newPoint(info) {
-    if (pointPrecedes(previousInfo.point, info.point) && !pointPrecedes(point, info.point)) {
+    if (
+      pointPrecedes(previousInfo.point, info.point) &&
+      !pointPrecedes(point, info.point)
+    ) {
       previousInfo = info;
     }
-    if (pointPrecedes(info.point, nextInfo.point) && pointPrecedes(point, info.point)) {
+    if (
+      pointPrecedes(info.point, nextInfo.point) &&
+      pointPrecedes(point, info.point)
+    ) {
       nextInfo = info;
     }
   }
@@ -153,7 +165,8 @@ function executionPointTime(point) {
 
   const previousProgress = previousInfo.progress;
   const nextProgress = nextInfo.progress;
-  const fraction = (point.progress - previousProgress) / (nextProgress - previousProgress);
+  const fraction =
+    (point.progress - previousProgress) / (nextProgress - previousProgress);
   if (Number.isNaN(fraction)) {
     return previousInfo.time;
   }
@@ -238,7 +251,7 @@ class WebReplayPlayer extends Component {
     this.threadFront.findPaints(this.onPaints.bind(this));
     this.threadFront.findMouseEvents(this.onMouseEvents.bind(this));
 
-    this.toolbox.getPanelWhenReady("webconsole").then(panel => {
+    this.toolbox.getPanelWhenReady("webconsole").then((panel) => {
       const consoleFrame = panel.hud.ui;
       consoleFrame.on("message-hover", this.onConsoleMessageHover.bind(this));
       consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate.bind(this));
@@ -325,8 +338,10 @@ class WebReplayPlayer extends Component {
       let pausedMessage;
       if (executionPoint) {
         pausedMessage = this.state.messages
-          .filter(message => message.executionPoint)
-          .find(message => pointEquals(message.executionPoint, executionPoint));
+          .filter((message) => message.executionPoint)
+          .find((message) =>
+            pointEquals(message.executionPoint, executionPoint)
+          );
       } else {
         executionPoint = this.state.executionPoint;
       }
@@ -369,10 +384,12 @@ class WebReplayPlayer extends Component {
 
     if (visibleMessages != this.state.visibleMessages) {
       let messages = visibleMessages
-        .map(id => messagesById.get(id))
-        .filter(message => message.source == "console-api" || isError(message));
+        .map((id) => messagesById.get(id))
+        .filter(
+          (message) => message.source == "console-api" || isError(message)
+        );
 
-      messages = sortBy(messages, message => getMessageProgress(message));
+      messages = sortBy(messages, (message) => getMessageProgress(message));
 
       this.setState({ messages, visibleMessages, shouldAnimate: false });
     }
@@ -476,7 +493,7 @@ class WebReplayPlayer extends Component {
     const { hoverPoint } = this.state;
     const time = this.getMouseTime(e);
 
-    let checkpoint = binarySearch(1, gCheckpoints.length, checkpoint => {
+    let checkpoint = binarySearch(1, gCheckpoints.length, (checkpoint) => {
       return time - checkpointInfo(checkpoint).time;
     });
 
@@ -666,12 +683,16 @@ class WebReplayPlayer extends Component {
 
   renderCommands() {
     const paused = this.isPaused();
-    const { playback, zoomStartpoint, zoomEndpoint, recordingEndpoint } = this.state;
+    const {
+      playback,
+      zoomStartpoint,
+      zoomEndpoint,
+      recordingEndpoint,
+    } = this.state;
 
-    const zoomed = (
+    const zoomed =
       !pointEquals(zoomStartpoint, FirstCheckpointExecutionPoint) ||
-      !pointEquals(zoomEndpoint, recordingEndpoint)
-    );
+      !pointEquals(zoomEndpoint, recordingEndpoint);
 
     return [
       CommandButton({
@@ -685,7 +706,7 @@ class WebReplayPlayer extends Component {
         className: "primary",
         active: paused,
         img: playback ? "pause" : "play",
-        onClick: () => playback ? this.stopPlayback() : this.startPlayback(),
+        onClick: () => (playback ? this.stopPlayback() : this.startPlayback()),
       }),
 
       CommandButton({
@@ -801,7 +822,7 @@ class WebReplayPlayer extends Component {
         zIndex: `${index + 100}`,
       },
       title: getFormatStr("jumpMessage2", frameLocation),
-      onClick: e => {
+      onClick: (e) => {
         e.preventDefault();
         e.stopPropagation();
         this.seek(message.executionPoint);
@@ -822,13 +843,15 @@ class WebReplayPlayer extends Component {
       return [];
     }
     const offset = this.getPixelOffset(hoverPoint);
-    return [dom.span({
-      className: "hoverPoint",
-      style: {
-        left: `${Math.max(offset - markerWidth / 2, 0)}px`,
-        zIndex: 1000,
-      },
-    })];
+    return [
+      dom.span({
+        className: "hoverPoint",
+        style: {
+          left: `${Math.max(offset - markerWidth / 2, 0)}px`,
+          zIndex: 1000,
+        },
+      }),
+    ];
   }
 
   renderTicks() {
@@ -917,13 +940,17 @@ class WebReplayPlayer extends Component {
 
   renderZoomBoundary(start) {
     const point = start ? this.state.zoomStartpoint : this.state.zoomEndpoint;
-    const base = start ? FirstCheckpointExecutionPoint : this.state.recordingEndpoint;
+    const base = start
+      ? FirstCheckpointExecutionPoint
+      : this.state.recordingEndpoint;
     if (pointEquals(point, base)) {
       return [];
     }
-    const title = L10N.getStr(`toolbox.replay.zoomBoundary${start ? "Start" : "End"}`);
+    const title = L10N.getStr(
+      `toolbox.replay.zoomBoundary${start ? "Start" : "End"}`
+    );
     const time = executionPointTime(point);
-    const percent = (time / recordingEndTime() * 100) | 0;
+    const percent = ((time / recordingEndTime()) * 100) | 0;
     return [dom.span({ className: "zoomboundary", title }, `${percent}%`)];
   }
 
@@ -951,7 +978,7 @@ class WebReplayPlayer extends Component {
             }),
           },
           div({ className: "commands" }, ...this.renderCommands()),
-          this.renderZoomBoundary(true),
+          // this.renderZoomBoundary(true),
           div(
             {
               className: "progressBar",
@@ -976,9 +1003,9 @@ class WebReplayPlayer extends Component {
             ...this.renderHoverPoint(),
             ...this.renderTicks(),
             ...this.renderUnscannedRegions(),
-            ...this.renderZoomedRegion(),
-          ),
-          this.renderZoomBoundary(false)
+            ...this.renderZoomedRegion()
+          )
+          // this.renderZoomBoundary(false)
         )
       )
     );
