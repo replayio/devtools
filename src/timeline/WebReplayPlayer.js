@@ -8,11 +8,8 @@ const ReactDOM = require("react-dom");
 const dom = require("react-dom-factories");
 const PropTypes = require("react-prop-types");
 const { sortBy, range } = require("lodash");
-const {
-  pointEquals,
-  pointPrecedes,
-} = require("protocol/execution-point-utils.js");
 const { SVG } = require("image/svg");
+const { log } = require("protocol/socket");
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const L10N = new LocalizationHelper(
@@ -25,7 +22,6 @@ const { div } = dom;
 
 const markerWidth = 7;
 const imgDir = "devtools/skin/images";
-const shouldLog = false;
 
 function classname(name, bools) {
   for (const key in bools) {
@@ -35,12 +31,6 @@ function classname(name, bools) {
   }
 
   return name;
-}
-
-function log(message) {
-  if (shouldLog) {
-    console.log(message);
-  }
 }
 
 function isError(message) {
@@ -111,78 +101,6 @@ function getMessageLocation(message) {
   return { sourceUrl: source, line, column };
 }
 
-const FirstCheckpointId = 1;
-const FirstCheckpointExecutionPoint = {
-  checkpoint: FirstCheckpointId,
-  progress: 0,
-};
-
-// Information about the progress and time at each checkpoint. This only grows,
-// and is not part of the reducer store so we can update it without rerendering.
-const gCheckpoints = [
-  null,
-  { point: FirstCheckpointExecutionPoint, time: 0, widgetEvents: [] },
-];
-
-function checkpointInfo(checkpoint) {
-  if (!gCheckpoints[checkpoint]) {
-    console.error(`WebReplayPlayer missing checkpoint ${checkpoint}`);
-  }
-  return gCheckpoints[checkpoint];
-}
-
-function executionPointTime(point) {
-  let previousInfo = gCheckpoints[point.checkpoint];
-  if (!previousInfo) {
-    // We might pause at a checkpoint before we've received its information.
-    return recordingEndTime();
-  }
-  if (!gCheckpoints[point.checkpoint + 1]) {
-    return previousInfo.time;
-  }
-  let nextInfo = gCheckpoints[point.checkpoint + 1];
-
-  function newPoint(info) {
-    if (
-      pointPrecedes(previousInfo.point, info.point) &&
-      !pointPrecedes(point, info.point)
-    ) {
-      previousInfo = info;
-    }
-    if (
-      pointPrecedes(info.point, nextInfo.point) &&
-      pointPrecedes(point, info.point)
-    ) {
-      nextInfo = info;
-    }
-  }
-
-  gCheckpoints[point.checkpoint].widgetEvents.forEach(newPoint);
-
-  if (pointEquals(point, previousInfo.point)) {
-    return previousInfo.time;
-  }
-
-  const previousProgress = previousInfo.progress;
-  const nextProgress = nextInfo.progress;
-  const fraction =
-    (point.progress - previousProgress) / (nextProgress - previousProgress);
-  if (Number.isNaN(fraction)) {
-    return previousInfo.time;
-  }
-  return previousInfo.time + fraction * (nextInfo.time - previousInfo.time);
-}
-
-function recordingEndTime() {
-  return gCheckpoints[gCheckpoints.length - 1].time;
-}
-
-function similarPoints(p1, p2) {
-  const time1 = executionPointTime(p1);
-  const time2 = executionPointTime(p2);
-  return Math.abs(time1 - time2) / recordingEndTime() < 0.001;
-}
-
 function binarySearch(start, end, callback) {
   while (start + 1 < end) {
     const mid = ((start + end) / 2) | 0;
@@ -196,15 +114,6 @@ function binarySearch(start, end, callback) {
   return start;
 }
 
-/*
- *
- * The player has 4 valid states
- * - Paused:       (paused, !recording, !seeking)
- * - Playing:      (!paused, !recording, !seeking)
- * - Seeking:      (!paused, !recording, seeking)
- * - Recording:    (!paused, recording, !seeking)
- *
- */
 class WebReplayPlayer extends Component {
   static get propTypes() {
     return {
@@ -215,21 +124,18 @@ class WebReplayPlayer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      executionPoint: FirstCheckpointExecutionPoint,
-      recordingEndpoint: FirstCheckpointExecutionPoint,
+      currentTime: 0,
       hoverPoint: null,
-      startDragPoint: null,
-      seeking: false,
-      recording: true,
-      paused: false,
+      hoverTime: null,
+      startDragTime: null,
       playback: null,
       messages: [],
       highlightedMessage: null,
       hoveredMessageOffset: null,
-      unscannedRegions: [],
+      unprocessedRegions: [],
       shouldAnimate: true,
-      zoomStartpoint: FirstCheckpointExecutionPoint,
-      zoomEndpoint: FirstCheckpointExecutionPoint,
+      zoomStartTime: 0,
+      zoomEndTime: 0,
       recordingDuration: 0,
     };
 
@@ -268,8 +174,8 @@ class WebReplayPlayer extends Component {
     }
   }
 
-  setRecordingDuration(duration) {
-    this.setState({ recordingDuration: duration });
+  setRecordingDuration(recordingDuration) {
+    this.setState({ recordingDuration });
   }
 
   get toolbox() {
@@ -284,22 +190,8 @@ class WebReplayPlayer extends Component {
     return this.toolbox.threadFront;
   }
 
-  isRecording() {
-    return !this.isPaused() && this.state.recording;
-  }
-
-  isPaused() {
-    return this.state.paused;
-  }
-
-  isSeeking() {
-    return this.state.seeking;
-  }
-
   getTickSize() {
-    const { zoomStartpoint, zoomEndpoint } = this.state;
-    const zoomStartTime = executionPointTime(zoomStartpoint);
-    const zoomEndTime = executionPointTime(zoomEndpoint);
+    const { zoomStartTime, zoomEndTime, recordingDuration } = this.state;
 
     const minSize = 10;
 
@@ -308,7 +200,7 @@ class WebReplayPlayer extends Component {
     }
 
     const maxSize = this.overlayWidth / 10;
-    const ratio = (zoomEndTime - zoomStartTime) / recordingEndTime();
+    const ratio = (zoomEndTime - zoomStartTime) / recordingDuration;
     return (1 - ratio) * maxSize + minSize;
   }
 
@@ -318,10 +210,7 @@ class WebReplayPlayer extends Component {
 
   // Get the time for a mouse event within the recording.
   getMouseTime(e) {
-    const { zoomStartpoint, zoomEndpoint } = this.state;
-
-    const zoomStartTime = executionPointTime(zoomStartpoint);
-    const zoomEndTime = executionPointTime(zoomEndpoint);
+    const { zoomStartTime, zoomEndTime } = this.state;
 
     const { left, width } = e.currentTarget.getBoundingClientRect();
     const clickLeft = e.clientX;
@@ -331,6 +220,7 @@ class WebReplayPlayer extends Component {
   }
 
   onPaused(packet) {
+    throw new Error("NYI");
     if (packet) {
       let { executionPoint } = packet;
       const closestMessage = this.getClosestMessage(executionPoint);
@@ -348,9 +238,6 @@ class WebReplayPlayer extends Component {
 
       this.setState({
         executionPoint,
-        paused: true,
-        seeking: false,
-        recording: false,
         closestMessage,
         pausedMessage,
       });
@@ -358,23 +245,25 @@ class WebReplayPlayer extends Component {
   }
 
   onResumed(packet) {
+    throw new Error("NYI");
     this.setState({ paused: false, closestMessage: null, pausedMessage: null });
   }
 
   onMissingRegions(regions) {
-    console.log("MissingRegions", regions);
+    log(`MissingRegions ${JSON.stringify(regions)}`);
   }
 
-  onUnprocessedRegions(regions) {
-    console.log("UnprocessedRegions", regions);
+  onUnprocessedRegions({ regions }) {
+    log(`UnprocessedRegions ${JSON.stringify(regions)}`);
+    this.setState({ unprocessedRegions: regions });
   }
 
   onPaints(paints) {
-    console.log("PlayerPaints", paints);
+    log(`PlayerPaints ${JSON.stringify(paints)}`);
   }
 
   onMouseEvents(events) {
-    console.log("OnMouseEvents", events);
+    log(`OnMouseEvents ${JSON.stringify(events)}`);
   }
 
   onConsoleUpdate(consoleState) {
@@ -407,8 +296,8 @@ class WebReplayPlayer extends Component {
     return null;
   }
 
-  setTimelinePosition({ point, direction }) {
-    this.setState({ [direction]: point });
+  setTimelineBoundary({ time, which }) {
+    this.setState({ [which]: time });
   }
 
   findMessage(message) {
@@ -486,36 +375,14 @@ class WebReplayPlayer extends Component {
   }
 
   onProgressBarMouseMove(e) {
-    if (gCheckpoints.length == 1) {
+    const { hoverTime, recordingDuration } = this.state;
+    if (!recordingDuration) {
       return;
     }
 
-    const { hoverPoint } = this.state;
     const time = this.getMouseTime(e);
 
-    let checkpoint = binarySearch(1, gCheckpoints.length, (checkpoint) => {
-      return time - checkpointInfo(checkpoint).time;
-    });
-
-    let closestPoint = checkpointInfo(checkpoint).point;
-    let closestTime = checkpointInfo(checkpoint).time;
-
-    function newPoint(info) {
-      if (Math.abs(time - info.time) < Math.abs(time - closestTime)) {
-        closestPoint = info.point;
-        closestTime = info.time;
-      }
-    }
-
-    checkpointInfo(checkpoint).widgetEvents.forEach(newPoint);
-    if (checkpoint + 1 < gCheckpoints.length) {
-      newPoint(checkpointInfo(checkpoint + 1));
-    }
-
-    if (!hoverPoint || !pointEquals(closestPoint, hoverPoint)) {
-      this.threadFront.paint(closestPoint);
-      this.setState({ hoverPoint: closestPoint });
-    }
+    throw new Error("FIXME");
   }
 
   onPlayerMouseLeave() {
@@ -523,66 +390,59 @@ class WebReplayPlayer extends Component {
     this.clearPreviewLocation();
     this.threadFront.paintCurrentPoint();
 
-    this.setState({ hoverPoint: null, startDragPoint: null });
+    this.setState({ hoverTime: null, startDragTime: null });
   }
 
   onPlayerMouseDown() {
-    const { hoverPoint } = this.state;
-    if (hoverPoint) {
-      this.setState({ startDragPoint: hoverPoint });
+    const { hoverTime } = this.state;
+    if (hoverTime) {
+      this.setState({ startDragTime: hoverTime });
     }
   }
 
   zoomedRegion() {
-    const { startDragPoint, hoverPoint } = this.state;
-    if (!startDragPoint || !hoverPoint) {
+    const { startDragTime, hoverTime } = this.state;
+    if (!startDragTime || !hoverTime) {
       return null;
     }
-    const dragPos = this.getVisiblePosition(startDragPoint);
-    const hoverPos = this.getVisiblePosition(hoverPoint);
+    const dragPos = this.getVisiblePosition(startDragTime);
+    const hoverPos = this.getVisiblePosition(hoverTime);
     if (Math.abs(dragPos - hoverPos) < 0.02) {
       return null;
     }
     if (dragPos < hoverPos) {
-      return { zoomStartpoint: startDragPoint, zoomEndpoint: hoverPoint };
+      return { zoomStartTime: startDragTime, zoomEndTime: hoverTime };
     }
-    return { zoomStartpoint: hoverPoint, zoomEndpoint: startDragPoint };
+    return { zoomStartTime: hoverTime, zoomEndTime: startDragTime };
   }
 
   onPlayerMouseUp(e) {
-    const { hoverPoint, startDragPoint, executionPoint } = this.state;
-    this.setState({ startDragPoint: null });
+    const { hoverTime, hoverPoint, startDragTime, currentTime } = this.state;
+    this.setState({ startDragTime: null });
 
     const zoomInfo = this.zoomedRegion();
     if (zoomInfo) {
-      const { zoomStartpoint, zoomEndpoint } = zoomInfo;
-      this.setState({ zoomStartpoint, zoomEndpoint });
-
-      if (pointPrecedes(executionPoint, zoomStartpoint)) {
-        this.seek(zoomStartpoint);
-      } else if (pointPrecedes(zoomEndpoint, executionPoint)) {
-        this.seek(zoomEndpoint);
-      }
+      const { zoomStartTime, zoomEndTime } = zoomInfo;
+      this.setState({ zoomStartTime, zoomEndTime });
     } else if (e.altKey) {
-      const direction = e.shiftKey ? "zoomEndpoint" : "zoomStartpoint";
-      this.setTimelinePosition({ point: hoverPoint, direction });
-    } else if (startDragPoint && hoverPoint) {
-      this.setState({ seeking: true });
-      this.threadFront.timeWarp(hoverPoint);
+      const which = e.shiftKey ? "zoomEndTime" : "zoomStartTime";
+      this.setTimelineBoundary({ time: hoverTime, which });
+    } else if (startDragTime && hoverTime) {
+      this.seek(hoverPoint, hoverTime);
     }
   }
 
-  seek(executionPoint) {
-    if (!executionPoint) {
+  seek(point, time) {
+    if (!point) {
       return null;
     }
 
-    // set seeking to the current execution point to avoid a progress bar jump
-    this.setState({ seeking: true });
-    return this.threadFront.timeWarp(executionPoint);
+    this.setState({ currentTime: time });
+    return this.threadFront.timeWarp(point);
   }
 
   doPrevious() {
+    throw new Error("FIXME");
     const point = this.state.executionPoint;
 
     let checkpoint = point.checkpoint;
@@ -602,6 +462,7 @@ class WebReplayPlayer extends Component {
   }
 
   doNext() {
+    throw new Error("FIXME");
     const point = this.state.executionPoint;
     if (pointEquals(point, this.state.zoomEndpoint)) {
       return;
@@ -616,6 +477,7 @@ class WebReplayPlayer extends Component {
   }
 
   nextPlaybackPoint(point) {
+    throw new Error("FIXME");
     if (pointEquals(point, this.state.zoomEndpoint)) {
       return null;
     }
@@ -639,14 +501,15 @@ class WebReplayPlayer extends Component {
   }
 
   replayPaintFinished({ point }) {
+    throw new Error("FIXME");
     if (this.state.playback && pointEquals(point, this.state.playback.point)) {
       const next = this.nextPlaybackPoint(point);
       if (next) {
-        ChromeUtils.recordReplayLog(`WebReplayPlayer PlaybackNext`);
+        log(`WebReplayPlayer PlaybackNext`);
         this.threadFront.paint(next);
         this.setState({ playback: { point: next }, executionPoint: next });
       } else {
-        ChromeUtils.recordReplayLog(`WebReplayPlayer StopPlayback`);
+        log(`WebReplayPlayer StopPlayback`);
         this.seek(point);
         this.setState({ playback: null });
       }
@@ -654,7 +517,8 @@ class WebReplayPlayer extends Component {
   }
 
   startPlayback() {
-    ChromeUtils.recordReplayLog(`WebReplayPlayer StartPlayback`);
+    throw new Error("FIXME");
+    log(`WebReplayPlayer StartPlayback`);
 
     let point = this.nextPlaybackPoint(this.state.executionPoint);
     if (!point) {
@@ -666,7 +530,8 @@ class WebReplayPlayer extends Component {
   }
 
   stopPlayback() {
-    ChromeUtils.recordReplayLog(`WebReplayPlayer StopPlayback`);
+    throw new Error("FIXME");
+    log(`WebReplayPlayer StopPlayback`);
 
     if (this.state.playback && this.state.playback.point) {
       this.seek(this.state.playback.point);
@@ -676,42 +541,39 @@ class WebReplayPlayer extends Component {
 
   doZoomOut() {
     this.setState({
-      zoomStartpoint: FirstCheckpointExecutionPoint,
-      zoomEndpoint: this.state.recordingEndpoint,
+      zoomStartTime: 0,
+      zoomEndTime: this.state.recordingDuration,
     });
   }
 
   renderCommands() {
-    const paused = this.isPaused();
     const {
       playback,
-      zoomStartpoint,
-      zoomEndpoint,
-      recordingEndpoint,
+      zoomStartTime,
+      zoomEndTime,
+      recordingDuration,
     } = this.state;
 
-    const zoomed =
-      !pointEquals(zoomStartpoint, FirstCheckpointExecutionPoint) ||
-      !pointEquals(zoomEndpoint, recordingEndpoint);
+    const zoomed = zoomStartTime != 0 || zoomEndTime != recordingDuration;
 
     return [
       CommandButton({
         className: "",
-        active: paused && !playback,
+        active: !playback,
         img: "previous",
         onClick: () => this.doPrevious(),
       }),
 
       CommandButton({
         className: "primary",
-        active: paused,
+        active: true,
         img: playback ? "pause" : "play",
         onClick: () => (playback ? this.stopPlayback() : this.startPlayback()),
       }),
 
       CommandButton({
         className: "",
-        active: paused && !playback,
+        active: !playback,
         img: "next",
         onClick: () => this.doNext(),
       }),
@@ -730,7 +592,7 @@ class WebReplayPlayer extends Component {
     return el ? el.clientWidth : 1;
   }
 
-  // calculate pixel distance from two points
+  // calculate pixel distance from two times
   getPixelDistance(to, from) {
     const toPos = this.getVisiblePosition(to);
     const fromPos = this.getVisiblePosition(from);
@@ -738,20 +600,12 @@ class WebReplayPlayer extends Component {
     return (toPos - fromPos) * this.overlayWidth;
   }
 
-  // Get the position of an execution point on the visible part of the timeline,
+  // Get the position of a time on the visible part of the timeline,
   // in the range [0, 1].
-  getVisiblePosition(executionPoint) {
-    const { zoomStartpoint, zoomEndpoint } = this.state;
+  getVisiblePosition(time) {
+    const { zoomStartTime, zoomEndTime } = this.state;
 
-    if (!executionPoint) {
-      return 0;
-    }
-
-    const zoomStartTime = executionPointTime(zoomStartpoint);
-    const zoomEndTime = executionPointTime(zoomEndpoint);
-    const time = executionPointTime(executionPoint);
-
-    if (time < zoomStartTime) {
+    if (time <= zoomStartTime) {
       return 0;
     }
 
@@ -762,12 +616,13 @@ class WebReplayPlayer extends Component {
     return (time - zoomStartTime) / (zoomEndTime - zoomStartTime);
   }
 
-  // Get the pixel offset for an execution point.
-  getPixelOffset(point) {
-    return this.getVisiblePosition(point) * this.overlayWidth;
+  // Get the pixel offset for a time.
+  getPixelOffset(time) {
+    return this.getVisiblePosition(time) * this.overlayWidth;
   }
 
   renderMessage(message, index) {
+    throw new Error("FIXME");
     const {
       messages,
       executionPoint,
@@ -838,11 +693,11 @@ class WebReplayPlayer extends Component {
   }
 
   renderHoverPoint() {
-    const { hoverPoint, hoveredMessageOffset } = this.state;
-    if (!hoverPoint || hoveredMessageOffset) {
+    const { hoverTime, hoveredMessageOffset } = this.state;
+    if (!hoverTime || hoveredMessageOffset) {
       return [];
     }
-    const offset = this.getPixelOffset(hoverPoint);
+    const offset = this.getPixelOffset(hoverTime);
     return [
       dom.span({
         className: "hoverPoint",
@@ -861,9 +716,9 @@ class WebReplayPlayer extends Component {
   }
 
   renderTick(index) {
-    const { executionPoint, hoveredMessageOffset } = this.state;
+    const { currentTime, hoveredMessageOffset } = this.state;
     const tickSize = this.getTickSize();
-    const offset = Math.round(this.getPixelOffset(executionPoint));
+    const offset = Math.round(this.getPixelOffset(currentTime));
     const position = index * tickSize;
     const isFuture = position > offset;
     const shouldHighlight = hoveredMessageOffset > position;
@@ -880,14 +735,14 @@ class WebReplayPlayer extends Component {
     });
   }
 
-  renderUnscannedRegions() {
-    return this.state.unscannedRegions.map(
-      this.renderUnscannedRegion.bind(this)
+  renderUnprocessedRegions() {
+    return this.state.unprocessedRegions.map(
+      this.renderUnprocessedRegion.bind(this)
     );
   }
 
-  renderUnscannedRegion({ start, end, traversed }) {
-    let startOffset = this.getPixelOffset(start);
+  renderUnprocessedRegion({ begin, end }) {
+    let startOffset = this.getPixelOffset(begin);
     let endOffset = this.getPixelOffset(end);
 
     if (startOffset >= this.overlayWidth || endOffset <= 0) {
@@ -903,7 +758,7 @@ class WebReplayPlayer extends Component {
     }
 
     return dom.span({
-      className: traversed ? "unscanned" : "untraversed",
+      className: "unscanned",
       style: {
         left: `${startOffset}px`,
         width: `${endOffset - startOffset}px`,
@@ -917,8 +772,8 @@ class WebReplayPlayer extends Component {
       return [];
     }
 
-    let startOffset = this.getPixelOffset(info.zoomStartpoint);
-    let endOffset = this.getPixelOffset(info.zoomEndpoint);
+    let startOffset = this.getPixelOffset(info.zoomStartTime);
+    let endOffset = this.getPixelOffset(info.zoomEndTime);
 
     return [
       dom.span({
@@ -938,26 +793,9 @@ class WebReplayPlayer extends Component {
     ];
   }
 
-  renderZoomBoundary(start) {
-    const point = start ? this.state.zoomStartpoint : this.state.zoomEndpoint;
-    const base = start
-      ? FirstCheckpointExecutionPoint
-      : this.state.recordingEndpoint;
-    if (pointEquals(point, base)) {
-      return [];
-    }
-    const title = L10N.getStr(
-      `toolbox.replay.zoomBoundary${start ? "Start" : "End"}`
-    );
-    const time = executionPointTime(point);
-    const percent = ((time / recordingEndTime()) * 100) | 0;
-    return [dom.span({ className: "zoomboundary", title }, `${percent}%`)];
-  }
-
   render() {
-    const percent = this.getVisiblePosition(this.state.executionPoint) * 100;
+    const percent = this.getVisiblePosition(this.state.currentTime) * 100;
 
-    const recording = this.isRecording();
     const { shouldAnimate } = this.state;
     return div(
       {
@@ -966,10 +804,7 @@ class WebReplayPlayer extends Component {
       div(
         {
           id: "overlay",
-          className: classname("", {
-            recording: recording,
-            paused: !recording,
-          }),
+          className: classname("", { paused: true }),
         },
         div(
           {
@@ -978,7 +813,6 @@ class WebReplayPlayer extends Component {
             }),
           },
           div({ className: "commands" }, ...this.renderCommands()),
-          // this.renderZoomBoundary(true),
           div(
             {
               className: "progressBar",
@@ -1002,10 +836,9 @@ class WebReplayPlayer extends Component {
             ...this.renderMessages(),
             ...this.renderHoverPoint(),
             ...this.renderTicks(),
-            ...this.renderUnscannedRegions(),
+            ...this.renderUnprocessedRegions(),
             ...this.renderZoomedRegion()
           )
-          // this.renderZoomBoundary(false)
         )
       )
     );

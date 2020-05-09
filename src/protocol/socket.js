@@ -118,9 +118,14 @@ function onSocketError() {
   console.log("Socket Error");
 }
 
+function log(text) {
+  console.log(text);
+}
+
 module.exports = {
   initSocket,
   sendMessage,
   addEventListener,
   removeEventListener,
+  log,
 };
