@@ -1,0 +1,45 @@
+{
+  "name": "webreplay-devtools",
+  "version": "1.0.0",
+  "description": "Web app with developer tools built on the Web Replay Protocol",
+  "main": "postcss.config.js",
+  "dependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-transform-flow-strip-types": "^7.9.0",
+    "@babel/preset-react": "^7.9.4",
+    "autoprefixer": "^9.7.6",
+    "babel-loader": "^8.1.0",
+    "classnames": "^2.2.6",
+    "css-loader": "^3.5.3",
+    "debug": "^4.1.1",
+    "devtools-sprintf-js": "^1.0.3",
+    "extract-loader": "^5.0.1",
+    "postcss-loader": "^3.0.0",
+    "postcss-url-mapper": "^1.2.0",
+    "prop-types": "^15.7.2",
+    "properties-parser": "^0.3.1",
+    "raw-loader": "^4.0.1",
+    "style-loader": "^1.2.1",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "browserslist": [
+    "defaults"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebReplay/webreplay-devtools.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WebReplay/webreplay-devtools/issues"
+  },
+  "homepage": "https://github.com/WebReplay/webreplay-devtools#readme"
+}

@@ -41,6 +41,12 @@ const verticalLayoutBreakpoint = window.matchMedia(
 import "./variables.css";
 import "./App.css";
 
+import "devtools/client/themes/toolbox.css";
+import "devtools/client/themes/variables.css";
+import "devtools/client/themes/webconsole.css";
+import "devtools/client/themes/common.css";
+
+
 // $FlowIgnore
 //import "devtools-launchpad/src/components/Root.css";
 

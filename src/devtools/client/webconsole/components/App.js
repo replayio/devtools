@@ -410,7 +410,6 @@ class App extends Component {
 
   render() {
     const { webConsoleUI, editorMode, dispatch } = this.props;
-    console.log(`>>> YO`);
     const filterBar = this.renderFilterBar();
     const editorToolbar = this.renderEditorToolbar();
     const consoleOutput = this.renderConsoleOutput();
