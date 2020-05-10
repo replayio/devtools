@@ -37,6 +37,7 @@ const ReactDOM = require("devtools/client/shared/vendor/react-dom");
 const WebReplayPlayer = require("timeline/WebReplayPlayer");
 const { initSocket, sendMessage } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
+const { paintGraphics, paintMessage } = require("protocol/graphics");
 const { DebuggerPanel } = require("devtools/client/debugger/panel");
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 
@@ -55,20 +56,20 @@ setTimeout(initialize, 0);
 
 async function initialize() {
   if (!recordingId) {
-    drawMessage("Recording ID not specified");
+    paintMessage("Recording ID not specified");
     return;
   }
 
   initSocket(dispatch);
 
-  drawMessage("Loading…");
+  paintMessage("Loading…");
   const description = await sendMessage("Recording.getDescription", {
     recordingId,
   });
   const { duration, lastScreen } = description;
 
   if (lastScreen) {
-    drawGraphics(description.lastScreen);
+    paintGraphics(description.lastScreen);
   }
 
   gToolbox.webReplayPlayer.setRecordingDuration(duration);
@@ -107,56 +108,3 @@ setTimeout(() => {
   const consolePanel = new WebConsolePanel(gToolbox);
   consolePanel.open();
 }, 0);
-
-/////////////////////////
-// Graphics
-/////////////////////////
-
-// Image to draw, if any.
-let gDrawImage;
-
-// Text message to draw, if any.
-let gDrawMessage;
-
-function drawGraphics({ mimeType, data }) {
-  gDrawImage = new Image();
-  gDrawImage.onload = refreshGraphics;
-  gDrawImage.src = `data:${mimeType};base64,${data}`;
-  refreshGraphics();
-}
-
-function drawMessage(message) {
-  gDrawImage = null;
-  gDrawMessage = message;
-  refreshGraphics();
-}
-
-function refreshGraphics() {
-  const canvas = document.getElementById("graphics");
-  const cx = canvas.getContext("2d");
-
-  const scale = window.devicePixelRatio;
-  canvas.width = window.innerWidth * scale;
-  canvas.height = window.innerHeight * scale;
-
-  if (scale != 1) {
-    canvas.style.transform = `
-      scale(${1 / scale})
-      translate(-${canvas.width / scale}px, -${canvas.height / scale}px)
-    `;
-  }
-
-  if (gDrawImage) {
-    cx.drawImage(gDrawImage, 0, 0);
-  } else if (gDrawMessage) {
-    cx.font = `${25 * window.devicePixelRatio}px sans-serif`;
-    const messageWidth = cx.measureText(gDrawMessage).width;
-    cx.fillText(
-      gDrawMessage,
-      (canvas.width - messageWidth) / 2,
-      canvas.height / 2
-    );
-  }
-}
-
-window.onresize = refreshGraphics;

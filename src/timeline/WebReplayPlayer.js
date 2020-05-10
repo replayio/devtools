@@ -10,7 +10,10 @@ const PropTypes = require("react-prop-types");
 const { sortBy, range } = require("lodash");
 const { SVG } = require("image/svg");
 const { log } = require("protocol/socket");
-const { closestPaintOrMouseEvent } = require("protocol/graphics");
+const {
+  closestPaintOrMouseEvent,
+  paintGraphicsAtTime,
+} = require("protocol/graphics");
 const {
   pointEquals,
   pointPrecedes,
@@ -164,8 +167,8 @@ class WebReplayPlayer extends Component {
     }
   }
 
-  setRecordingDuration(recordingDuration) {
-    this.setState({ recordingDuration });
+  setRecordingDuration(duration) {
+    this.setState({ recordingDuration: duration, zoomEndTime: duration });
   }
 
   get toolbox() {
@@ -357,14 +360,18 @@ class WebReplayPlayer extends Component {
   }
 
   onProgressBarMouseMove(e) {
-    const { hoverTime, recordingDuration } = this.state;
+    const { hoverPoint, recordingDuration } = this.state;
     if (!recordingDuration) {
       return;
     }
 
-    const time = this.getMouseTime(e);
+    const mouseTime = this.getMouseTime(e);
+    const { point, time } = closestPaintOrMouseEvent(mouseTime);
 
-    throw new Error("FIXME");
+    if (!hoverPoint || hoverPoint != point) {
+      this.setState({ hoverPoint: point, hoverTime: time });
+      paintGraphicsAtTime(time);
+    }
   }
 
   onPlayerMouseLeave() {

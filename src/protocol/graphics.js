@@ -34,27 +34,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const { ThreadFront } = require("./thread");
 const { sendMessage, addEventListener, log } = require("./socket");
+const { assert, binarySearch } = require("./utils");
+
+//////////////////////////////
+// Paint / Mouse Event Points
+//////////////////////////////
 
 // All paints that have occurred in the recording, in order. Include the
 // beginning point of the recording as well, which is not painted and has
 // a known point and time.
-const gPaintPoints = [
-  { point: "0", time: 0, mouseEvents: [] },
-];
+const gPaintPoints = [ new PaintPoint("0", 0) ];
+
+// Information about a point where a paint occurred.
+function PaintPoint(point, time) {
+  // Associated execution point and time for this paint.
+  this.point = point;
+  this.time = time;
+
+  // Any mouse events that occurred between this paint and the following one.
+  this.mouseEvents = [];
+
+  // If the paint data at this point has been fetched, the associated hash.
+  this.paintHash = null;
+}
 
 function mostRecentPaintPointIndex(time) {
   const index = binarySearch(0, gPaintPoints.length, index => {
     return time - gPaintPoints[index].time;
   });
-  if (gPaintPoints[index].time > time ||
-      (index + 1 < gPaintPoints.length && gPaintPoints[index + 1].time > time)) {
-    throw new Error("Binary search failed");
+  assert(gPaintPoints[index].time <= time);
+  if (index + 1 < gPaintPoints.length) {
+    assert(gPaintPoints[index + 1].time >= time);
   }
   return index;
 }
 
 function addPaintPoint({ point, time }) {
-  const entry = { point, time, mouseEvents: [] };
+  const entry = new PaintPoint(point, time);
 
   if (gPaintPoints[gPaintPoints.length - 1].time <= time) {
     gPaintPoints.push(entry);
@@ -66,6 +82,24 @@ function addPaintPoint({ point, time }) {
 }
 
 function closestPaintOrMouseEvent(time) {
+  const index = mostRecentPaintPointIndex(time);
+
+  let closestPoint = gPaintPoints[index].point;
+  let closestTime = gPaintPoints[index].time;
+
+  function newPoint(info) {
+    if (Math.abs(time - info.time) < Math.abs(time - closestTime)) {
+      closestPoint = info.point;
+      closestTime = info.time;
+    }
+  }
+
+  gPaintPoints[index].mouseEvents.forEach(newPoint);
+  if (index + 1 < gPaintPoints.length) {
+    newPoint(gPaintPoints[index + 1]);
+  }
+
+  return { point: closestPoint, time: closestTime };
 }
 
 function onPaints({ paints }) {
@@ -85,6 +119,98 @@ ThreadFront.sessionWaiter.promise.then(sessionId => {
   addEventListener("Session.onMouseEvents", onMouseEvents);
 });
 
+//////////////////////////////
+// Paint Data Management
+//////////////////////////////
+
+// Map paint hashes to the associated screenshot.
+const gScreenShots = new Map();
+
+function addScreenShot(screenShot) {
+  // We shouldn't ever see the same paint hash twice.
+  if (!gScreenShots.has(screenShot.hash)) {
+    gScreenShots.set(screenShot.hash, screenShot);
+  }
+}
+
+async function paintGraphicsAtTime(time) {
+  const index = mostRecentPaintPointIndex(time);
+  const { point, paintHash } = gPaintPoints[index];
+
+  const existing = gScreenShots.get(paintHash);
+
+  if (existing) {
+    paintGraphics(existing);
+    return;
+  }
+
+  const { screen } = await sendMessage(
+    "Graphics.getPaintContents",
+    { point, mimeType: "image/jpeg" },
+    ThreadFront.sessionId
+  );
+
+  addScreenShot(screen);
+  paintGraphics(screen);
+}
+
+//////////////////////////////
+// Rendering State
+//////////////////////////////
+
+// Image to draw, if any.
+let gDrawImage;
+
+// Text message to draw, if any.
+let gDrawMessage;
+
+function paintGraphics(screenShot) {
+  addScreenShot(screenShot);
+  gDrawImage = new Image();
+  gDrawImage.onload = refreshGraphics;
+  gDrawImage.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
+  refreshGraphics();
+}
+
+function paintMessage(message) {
+  gDrawImage = null;
+  gDrawMessage = message;
+  refreshGraphics();
+}
+
+function refreshGraphics() {
+  const canvas = document.getElementById("graphics");
+  const cx = canvas.getContext("2d");
+
+  const scale = window.devicePixelRatio;
+  canvas.width = window.innerWidth * scale;
+  canvas.height = window.innerHeight * scale;
+
+  if (scale != 1) {
+    canvas.style.transform = `
+      scale(${1 / scale})
+      translate(-${canvas.width / scale}px, -${canvas.height / scale}px)
+    `;
+  }
+
+  if (gDrawImage) {
+    cx.drawImage(gDrawImage, 0, 0);
+  } else if (gDrawMessage) {
+    cx.font = `${25 * window.devicePixelRatio}px sans-serif`;
+    const messageWidth = cx.measureText(gDrawMessage).width;
+    cx.fillText(
+      gDrawMessage,
+      (canvas.width - messageWidth) / 2,
+      canvas.height / 2
+    );
+  }
+}
+
+window.onresize = refreshGraphics;
+
 module.exports = {
   closestPaintOrMouseEvent,
+  paintGraphics,
+  paintGraphicsAtTime,
+  paintMessage,
 };

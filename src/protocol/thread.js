@@ -46,9 +46,11 @@ const {
 const { defer, assert } = require("./utils");
 
 const ThreadFront = {
+  sessionId: null,
   sessionWaiter: defer(),
 
   setSessionId(sessionId) {
+    this.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
   },
 
@@ -62,8 +64,6 @@ const ThreadFront = {
     addEventListener("Session.missingRegions", onMissingRegions);
     addEventListener("Session.unprocessedRegions", onUnprocessedRegions);
   },
-
-  async paint() {},
 };
 
 module.exports = { ThreadFront };
