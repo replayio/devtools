@@ -89,17 +89,17 @@ export function bootstrapStore(
 
 export function bootstrapWorkers(panelWorkers: Workers) {
   const workerPath = isDevelopment()
-    ? "assets/build"
+    ? "src/devtools/client/debugger/dist"
     : "resource://devtools/client/debugger/dist";
 
-  if (isDevelopment()) {
+  // if (isDevelopment()) {
     // When used in Firefox, the toolbox manages the source map worker.
     startSourceMapWorker(
-      `${workerPath}/source-map-worker.js`,
+      `src/devtools/shared/source-map/worker.js`,
       // This is relative to the worker itself.
       "./source-map-worker-assets/"
     );
-  }
+  // }
 
   prettyPrint.start(`${workerPath}/pretty-print-worker.js`);
   parser = new ParserDispatcher();
