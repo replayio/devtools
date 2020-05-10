@@ -1,7 +1,11 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 "use strict";
+
+// The WebReplayPlayer is the React component which renders the devtools
+// timeline. It also manages which graphics are currently being rendered.
 
 const { Component } = require("react");
 const ReactDOM = require("react-dom");
@@ -13,6 +17,7 @@ const { log } = require("protocol/socket");
 const {
   closestPaintOrMouseEvent,
   paintGraphicsAtTime,
+  paintGraphics,
 } = require("protocol/graphics");
 const {
   pointEquals,
@@ -109,6 +114,10 @@ function getMessageLocation(message) {
   return { sourceUrl: source, line, column };
 }
 
+// Graphics for the place where the thread is currently paused.
+let gCurrentScreenShot;
+let gCurrentMouse;
+
 class WebReplayPlayer extends Component {
   static get propTypes() {
     return {
@@ -167,8 +176,10 @@ class WebReplayPlayer extends Component {
     }
   }
 
-  setRecordingDuration(duration) {
+  setRecordingDescription({ duration, lastScreen }) {
     this.setState({ recordingDuration: duration, zoomEndTime: duration });
+    gCurrentScreenShot = lastScreen;
+    paintGraphics(gCurrentScreenShot);
   }
 
   get toolbox() {
@@ -377,7 +388,9 @@ class WebReplayPlayer extends Component {
   onPlayerMouseLeave() {
     this.unhighlightConsoleMessage();
     this.clearPreviewLocation();
-    this.threadFront.paintCurrentPoint();
+
+    // Restore the normal graphics.
+    paintGraphics(gCurrentScreenShot, gCurrentMouse);
 
     this.setState({ hoverTime: null, startDragTime: null });
   }

@@ -37,7 +37,7 @@ const ReactDOM = require("devtools/client/shared/vendor/react-dom");
 const WebReplayPlayer = require("timeline/WebReplayPlayer");
 const { initSocket, sendMessage } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
-const { paintGraphics, paintMessage } = require("protocol/graphics");
+const { paintMessage } = require("protocol/graphics");
 const { DebuggerPanel } = require("devtools/client/debugger/panel");
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 
@@ -66,13 +66,8 @@ async function initialize() {
   const description = await sendMessage("Recording.getDescription", {
     recordingId,
   });
-  const { duration, lastScreen } = description;
 
-  if (lastScreen) {
-    paintGraphics(description.lastScreen);
-  }
-
-  gToolbox.webReplayPlayer.setRecordingDuration(duration);
+  gToolbox.webReplayPlayer.setRecordingDescription(description);
 
   const { sessionId } = await sendMessage("Recording.createSession", {
     recordingId,
@@ -91,6 +86,10 @@ const gToolbox = {
 
   getHighlighter() {
     return {};
+  },
+
+  loadTool(name) {
+    return new Promise(resolve => {});
   },
 };
 
