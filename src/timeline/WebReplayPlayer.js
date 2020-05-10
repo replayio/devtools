@@ -16,6 +16,9 @@ const { SVG } = require("image/svg");
 const { log } = require("protocol/socket");
 const {
   closestPaintOrMouseEvent,
+  nextPaintOrMouseEvent,
+  nextPaintEvent,
+  previousPaintEvent,
   paintGraphicsAtTime,
   paintGraphics,
 } = require("protocol/graphics");
@@ -129,7 +132,6 @@ class WebReplayPlayer extends Component {
     super(props);
     this.state = {
       currentTime: 0,
-      hoverPoint: null,
       hoverTime: null,
       startDragTime: null,
       playback: null,
@@ -371,7 +373,7 @@ class WebReplayPlayer extends Component {
   }
 
   onProgressBarMouseMove(e) {
-    const { hoverPoint, recordingDuration } = this.state;
+    const { hoverTime, recordingDuration } = this.state;
     if (!recordingDuration) {
       return;
     }
@@ -379,8 +381,8 @@ class WebReplayPlayer extends Component {
     const mouseTime = this.getMouseTime(e);
     const { point, time } = closestPaintOrMouseEvent(mouseTime);
 
-    if (!hoverPoint || hoverPoint != point) {
-      this.setState({ hoverPoint: point, hoverTime: time });
+    if (hoverTime != time) {
+      this.setState({ hoverTime: time });
       paintGraphicsAtTime(time);
     }
   }
@@ -397,14 +399,14 @@ class WebReplayPlayer extends Component {
 
   onPlayerMouseDown() {
     const { hoverTime } = this.state;
-    if (hoverTime) {
+    if (hoverTime != null) {
       this.setState({ startDragTime: hoverTime });
     }
   }
 
   zoomedRegion() {
     const { startDragTime, hoverTime } = this.state;
-    if (!startDragTime || !hoverTime) {
+    if (startDragTime == null || hoverTime == null) {
       return null;
     }
     const dragPos = this.getVisiblePosition(startDragTime);
@@ -419,124 +421,123 @@ class WebReplayPlayer extends Component {
   }
 
   onPlayerMouseUp(e) {
-    const { hoverTime, hoverPoint, startDragTime, currentTime } = this.state;
+    const { hoverTime, startDragTime, currentTime } = this.state;
     this.setState({ startDragTime: null });
 
     const zoomInfo = this.zoomedRegion();
     if (zoomInfo) {
       const { zoomStartTime, zoomEndTime } = zoomInfo;
       this.setState({ zoomStartTime, zoomEndTime });
+
+      if (currentTime < zoomStartTime) {
+        this.seekTime(zoomStartTime);
+      } else if (zoomEndTime < currentTime) {
+        this.seekTime(zoomEndTime);
+      }
     } else if (e.altKey) {
       const which = e.shiftKey ? "zoomEndTime" : "zoomStartTime";
       this.setTimelineBoundary({ time: hoverTime, which });
-    } else if (startDragTime && hoverTime) {
-      this.seek(hoverPoint, hoverTime);
+    } else if (startDragTime != null && hoverTime != null) {
+      this.seekTime(hoverTime);
     }
   }
 
-  seek(point, time) {
+  seek(point) {
     if (!point) {
       return null;
     }
 
-    this.setState({ currentTime: time });
     return this.threadFront.timeWarp(point);
   }
 
-  doPrevious() {
-    throw new Error("FIXME");
-    const point = this.state.executionPoint;
-
-    let checkpoint = point.checkpoint;
-    if (pointEquals(checkpoint, point)) {
-      if (checkpoint == FirstCheckpointId) {
-        return;
-      }
-      checkpoint--;
-    }
-
-    let newPoint = checkpointInfo(checkpoint).point;
-    if (pointPrecedes(newPoint, this.state.zoomStartpoint)) {
-      newPoint = this.state.zoomStartpoint;
-    }
-
-    this.seek(newPoint);
-  }
-
-  doNext() {
-    throw new Error("FIXME");
-    const point = this.state.executionPoint;
-    if (pointEquals(point, this.state.zoomEndpoint)) {
-      return;
-    }
-
-    let nextPoint = checkpointInfo(point.checkpoint + 1).point;
-    if (pointPrecedes(this.state.zoomEndpoint, nextPoint)) {
-      nextPoint = this.state.zoomEndpoint;
-    }
-
-    this.seek(nextPoint);
-  }
-
-  nextPlaybackPoint(point) {
-    throw new Error("FIXME");
-    if (pointEquals(point, this.state.zoomEndpoint)) {
+  seekTime(time) {
+    if (time == null) {
       return null;
     }
 
-    const time = executionPointTime(point);
-    let nextPoint = checkpointInfo(point.checkpoint + 1).point;
-
-    const { widgetEvents } = checkpointInfo(point.checkpoint);
-    for (const event of widgetEvents) {
-      if (pointPrecedes(point, event.point) && event.time >= time + 100) {
-        nextPoint = event.point;
-        break;
-      }
-    }
-
-    if (pointPrecedes(this.state.zoomEndpoint, nextPoint)) {
-      nextPoint = this.state.zoomEndpoint;
-    }
-
-    return nextPoint;
+    const { point } = closestPaintOrMouseEvent(time);
+    this.seek(point);
   }
 
-  replayPaintFinished({ point }) {
-    throw new Error("FIXME");
-    if (this.state.playback && pointEquals(point, this.state.playback.point)) {
-      const next = this.nextPlaybackPoint(point);
+  doPrevious() {
+    const { currentTime } = this.state;
+    if (currentTime == this.state.zoomStartTime) {
+      return;
+    }
+
+    const previous = previousPaintEvent(currentTime);
+    if (!previous) {
+      return;
+    }
+
+    this.seekTime(Math.max(previous.time, this.state.zoomStartTime));
+  }
+
+  doNext() {
+    const { currentTime } = this.state;
+    if (currentTime == this.state.zoomEndTime) {
+      return;
+    }
+
+    const next = nextPaintEvent(currentTime);
+    if (!next) {
+      return;
+    }
+
+    this.seekTime(Math.min(next.time, this.state.zoomEndTime));
+  }
+
+  nextPlaybackTime(time) {
+    if (time == this.state.zoomEndTime) {
+      return null;
+    }
+
+    let nextEvent = nextPaintOrMouseEvent(time);
+
+    // Skip over mouse events that are too close to the current time.
+    while (nextEvent && nextEvent.clientX && nextEvent.time < time + 100) {
+      nextEvent = nextPaintOrMouseEvent(nextEvent.time);
+    }
+
+    if (nextEvent && nextEvent.time < this.state.zoomEndTime) {
+      return nextEvent.time;
+    }
+
+    return this.state.zoomEndTime;
+  }
+
+  playbackPaintFinished(time) {
+    if (this.state.playback && time == this.state.playback.time) {
+      const next = this.nextPlaybackTime(time);
       if (next) {
         log(`WebReplayPlayer PlaybackNext`);
-        this.threadFront.paint(next);
-        this.setState({ playback: { point: next }, executionPoint: next });
+        paintGraphicsAtTime(next).then(() => this.playbackPaintFinished(next));
+        this.setState({ playback: { time: next }, currentTime: next });
       } else {
         log(`WebReplayPlayer StopPlayback`);
-        this.seek(point);
+        this.seekTime(time);
         this.setState({ playback: null });
       }
     }
   }
 
   startPlayback() {
-    throw new Error("FIXME");
     log(`WebReplayPlayer StartPlayback`);
 
-    let point = this.nextPlaybackPoint(this.state.executionPoint);
-    if (!point) {
-      point = this.state.zoomStartpoint;
+    let time = this.nextPlaybackTime(this.state.currentTime);
+    if (!time) {
+      time = this.state.zoomStartTime;
     }
-    this.threadFront.paint(point);
+    paintGraphicsAtTime(time).then(() => this.playbackPaintFinished(time));
 
-    this.setState({ playback: { point }, executionPoint: point });
+    this.setState({ playback: { time }, currentTime: time });
   }
 
   stopPlayback() {
-    throw new Error("FIXME");
     log(`WebReplayPlayer StopPlayback`);
 
-    if (this.state.playback && this.state.playback.point) {
-      this.seek(this.state.playback.point);
+    if (this.state.playback) {
+      this.seekTime(this.state.playback.time);
     }
     this.setState({ playback: null });
   }
@@ -696,7 +697,7 @@ class WebReplayPlayer extends Component {
 
   renderHoverPoint() {
     const { hoverTime, hoveredMessageOffset } = this.state;
-    if (!hoverTime || hoveredMessageOffset) {
+    if (hoverTime == null || hoveredMessageOffset) {
       return [];
     }
     const offset = this.getPixelOffset(hoverTime);

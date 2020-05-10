@@ -60,13 +60,13 @@ function sendMessage(method, params, sessionId) {
   }
 
   const { promise, resolve, reject } = defer();
-  gMessageWaiters.set(id, { resolve, reject });
+  gMessageWaiters.set(id, { method, resolve, reject });
 
   return promise;
 }
 
 const doSend = makeInfallible(msg => {
-  console.log("SendMessage", msg);
+  //console.log("SendMessage", msg);
   socket.send(JSON.stringify(msg));
 });
 
@@ -92,12 +92,12 @@ function removeEventListener(method) {
 
 function onSocketMessage(evt) {
   const msg = JSON.parse(evt.data);
-  console.log("OnMessage", msg);
+  //console.log("OnMessage", msg);
 
   if (msg.id) {
-    const { resolve, reject } = gMessageWaiters.get(msg.id);
+    const { method, resolve, reject } = gMessageWaiters.get(msg.id);
     if (msg.error) {
-      console.warn("Message failed", msg.error);
+      console.warn("Message failed", method, msg.error);
       reject(msg.error);
     } else {
       resolve(msg.result);

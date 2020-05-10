@@ -57,6 +57,14 @@ function mostRecentEntry(array, time) {
   return (index !== undefined) ? array[index] : null;
 }
 
+function nextEntry(array, time) {
+  const index = mostRecentIndex(array, time);
+  if (index === undefined) {
+    return array.length ? array[0] : null;
+  }
+  return (index + 1 < array.length) ? array[index + 1] : null;
+}
+
 // Add an entry with a "time" property to an array that is sorted by time.
 function insertEntrySorted(array, entry) {
   if (!array.length || array[array.length - 1].time <= entry.time) {
@@ -71,23 +79,24 @@ function insertEntrySorted(array, entry) {
   }
 }
 
-function distance(time1, time2) {
-  return Math.abs(time1 - time2);
+function closerEntry(time, entry1, entry2) {
+  if (!entry1) {
+    return entry2;
+  }
+  if (!entry2) {
+    return entry1;
+  }
+  if (Math.abs(time - entry1.time) < Math.abs(time - entry2.time)) {
+    return entry1;
+  }
+  return entry2;
 }
 
 // Find the entry in an array which is closest to time (preceding or following).
 function closestEntry(array, time) {
-  const index = mostRecentIndex(array, time);
-
-  if (index === undefined) {
-    return array.length ? array[0] : null;
-  }
-
-  if (index + 1 < array.length &&
-      distance(time, array[index + 1].time) < distance(time, array[index].time)) {
-    return array[index + 1];
-  }
-  return array[index];
+  const recent = mostRecentEntry(array, time);
+  const next = nextEntry(array, time);
+  return closerEntry(time, recent, next);
 }
 
 //////////////////////////////
@@ -129,17 +138,25 @@ ThreadFront.sessionWaiter.promise.then(sessionId => {
 function closestPaintOrMouseEvent(time) {
   const paintEntry = closestEntry(gPaintPoints, time);
   const mouseEntry = closestEntry(gMouseEvents, time);
+  return closerEntry(time, paintEntry, mouseEntry);
+}
 
-  if (!paintEntry) {
-    return mouseEntry;
+function nextPaintOrMouseEvent(time) {
+  const paintEntry = nextEntry(gPaintPoints, time);
+  const mouseEntry = nextEntry(gMouseEvents, time);
+  return closerEntry(time, paintEntry, mouseEntry);
+}
+
+function nextPaintEvent(time) {
+  return nextEntry(gPaintPoints, time);
+}
+
+function previousPaintEvent(time) {
+  const entry = mostRecentEntry(gPaintPoints, time);
+  if (entry.time == time) {
+    return mostRecentEntry(gPaintPoints, time - 1);
   }
-  if (!mouseEntry) {
-    return paintEntry;
-  }
-  if (distance(time, paintEntry.time) < distance(time, mouseEntry.time)) {
-    return paintEntry;
-  }
-  return mouseEntry;
+  return entry;
 }
 
 //////////////////////////////
@@ -161,6 +178,12 @@ const ClickThresholdMs = 200;
 
 async function paintGraphicsAtTime(time) {
   const { point, paintHash } = mostRecentEntry(gPaintPoints, time);
+
+  if (point == "0") {
+    // There are no graphics at the beginning of the recording.
+    clearGraphics();
+    return;
+  }
 
   const existing = gScreenShots.get(paintHash);
 
@@ -210,6 +233,13 @@ function paintGraphics(screenShot, mouse) {
   gDrawImage.onload = refreshGraphics;
   gDrawImage.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
   gDrawMouse = mouse;
+  refreshGraphics();
+}
+
+function clearGraphics() {
+  gDrawImage = null;
+  gDrawMouse = null;
+  gDrawMessage = null;
   refreshGraphics();
 }
 
@@ -272,14 +302,18 @@ function refreshGraphics() {
         drawClick(cx, x, y);
       }
     }
-  } else if (gDrawMessage) {
-    cx.font = `${25 * window.devicePixelRatio}px sans-serif`;
-    const messageWidth = cx.measureText(gDrawMessage).width;
-    cx.fillText(
-      gDrawMessage,
-      (canvas.width - messageWidth) / 2,
-      canvas.height / 2
-    );
+  } else {
+    cx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (gDrawMessage) {
+      cx.font = `${25 * window.devicePixelRatio}px sans-serif`;
+      const messageWidth = cx.measureText(gDrawMessage).width;
+      cx.fillText(
+        gDrawMessage,
+        (canvas.width - messageWidth) / 2,
+        canvas.height / 2
+      );
+    }
   }
 }
 
@@ -287,6 +321,9 @@ window.onresize = refreshGraphics;
 
 module.exports = {
   closestPaintOrMouseEvent,
+  nextPaintOrMouseEvent,
+  nextPaintEvent,
+  previousPaintEvent,
   paintGraphics,
   paintGraphicsAtTime,
   paintMessage,

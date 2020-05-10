@@ -64,6 +64,8 @@ const ThreadFront = {
     addEventListener("Session.missingRegions", onMissingRegions);
     addEventListener("Session.unprocessedRegions", onUnprocessedRegions);
   },
+
+  timeWarp(point) {},
 };
 
 module.exports = { ThreadFront };
