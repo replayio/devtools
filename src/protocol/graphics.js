@@ -36,6 +36,60 @@ const { ThreadFront } = require("./thread");
 const { sendMessage, addEventListener, log } = require("./socket");
 const { assert, binarySearch } = require("./utils");
 
+// Given a sorted array of items with "time" properties, find the index of
+// the most recent item at or preceding a given time.
+function mostRecentIndex(array, time) {
+  if (!array.length || time < array[0].time) {
+    return undefined;
+  }
+  const index = binarySearch(0, array.length, index => {
+    return time - array[index].time;
+  });
+  assert(array[index].time <= time);
+  if (index + 1 < array.length) {
+    assert(array[index + 1].time >= time);
+  }
+  return index;
+}
+
+function mostRecentEntry(array, time) {
+  const index = mostRecentIndex(array, time);
+  return (index !== undefined) ? array[index] : null;
+}
+
+// Add an entry with a "time" property to an array that is sorted by time.
+function insertEntrySorted(array, entry) {
+  if (!array.length || array[array.length - 1].time <= entry.time) {
+    array.push(entry);
+  } else {
+    const index = mostRecentIndex(gPaintPoints, entry.time);
+    if (index !== undefined) {
+      array.splice(index + 1, 0, entry);
+    } else {
+      array.unshift(entry);
+    }
+  }
+}
+
+function distance(time1, time2) {
+  return Math.abs(time1 - time2);
+}
+
+// Find the entry in an array which is closest to time (preceding or following).
+function closestEntry(array, time) {
+  const index = mostRecentIndex(array, time);
+
+  if (index === undefined) {
+    return array.length ? array[0] : null;
+  }
+
+  if (index + 1 < array.length &&
+      distance(time, array[index + 1].time) < distance(time, array[index].time)) {
+    return array[index + 1];
+  }
+  return array[index];
+}
+
 //////////////////////////////
 // Paint / Mouse Event Points
 //////////////////////////////
@@ -43,72 +97,25 @@ const { assert, binarySearch } = require("./utils");
 // All paints that have occurred in the recording, in order. Include the
 // beginning point of the recording as well, which is not painted and has
 // a known point and time.
-const gPaintPoints = [ new PaintPoint("0", 0) ];
+const gPaintPoints = [ { point: "0", time: 0 } ];
 
-// Information about a point where a paint occurred.
-function PaintPoint(point, time) {
-  // Associated execution point and time for this paint.
-  this.point = point;
-  this.time = time;
+// All mouse events that have occurred in the recording, in order.
+const gMouseEvents = [];
 
-  // Any mouse events that occurred between this paint and the following one.
-  this.mouseEvents = [];
-
-  // If the paint data at this point has been fetched, the associated hash.
-  this.paintHash = null;
-}
-
-function mostRecentPaintPointIndex(time) {
-  const index = binarySearch(0, gPaintPoints.length, index => {
-    return time - gPaintPoints[index].time;
-  });
-  assert(gPaintPoints[index].time <= time);
-  if (index + 1 < gPaintPoints.length) {
-    assert(gPaintPoints[index + 1].time >= time);
-  }
-  return index;
-}
-
-function addPaintPoint({ point, time }) {
-  const entry = new PaintPoint(point, time);
-
-  if (gPaintPoints[gPaintPoints.length - 1].time <= time) {
-    gPaintPoints.push(entry);
-    return;
-  }
-
-  const index = mostRecentPaintPointIndex(time);
-  gPaintPoints.splice(index, 0, entry);
-}
-
-function closestPaintOrMouseEvent(time) {
-  const index = mostRecentPaintPointIndex(time);
-
-  let closestPoint = gPaintPoints[index].point;
-  let closestTime = gPaintPoints[index].time;
-
-  function newPoint(info) {
-    if (Math.abs(time - info.time) < Math.abs(time - closestTime)) {
-      closestPoint = info.point;
-      closestTime = info.time;
-    }
-  }
-
-  gPaintPoints[index].mouseEvents.forEach(newPoint);
-  if (index + 1 < gPaintPoints.length) {
-    newPoint(gPaintPoints[index + 1]);
-  }
-
-  return { point: closestPoint, time: closestTime };
-}
+// All mouse click events that have occurred in the recording, in order.
+const gMouseClickEvents = [];
 
 function onPaints({ paints }) {
-  log(`PlayerPaints ${JSON.stringify(paints)}`);
-  paints.forEach(addPaintPoint);
+  paints.forEach(entry => insertEntrySorted(gPaintPoints, entry));
 }
 
-function onMouseEvents(events) {
-  log(`OnMouseEvents ${JSON.stringify(events)}`);
+function onMouseEvents({ events }) {
+  events.forEach(entry => {
+    insertEntrySorted(gMouseEvents, entry);
+    if (entry.kind == "mousedown") {
+      insertEntrySorted(gMouseClickEvents, entry);
+    }
+  });
 }
 
 ThreadFront.sessionWaiter.promise.then(sessionId => {
@@ -116,8 +123,24 @@ ThreadFront.sessionWaiter.promise.then(sessionId => {
   addEventListener("Graphics.paintPoints", onPaints);
 
   sendMessage("Session.findMouseEvents", {}, sessionId);
-  addEventListener("Session.onMouseEvents", onMouseEvents);
+  addEventListener("Session.mouseEvents", onMouseEvents);
 });
+
+function closestPaintOrMouseEvent(time) {
+  const paintEntry = closestEntry(gPaintPoints, time);
+  const mouseEntry = closestEntry(gMouseEvents, time);
+
+  if (!paintEntry) {
+    return mouseEntry;
+  }
+  if (!mouseEntry) {
+    return paintEntry;
+  }
+  if (distance(time, paintEntry.time) < distance(time, mouseEntry.time)) {
+    return paintEntry;
+  }
+  return mouseEntry;
+}
 
 //////////////////////////////
 // Paint Data Management
@@ -133,9 +156,11 @@ function addScreenShot(screenShot) {
   }
 }
 
+// How recently a click must have occurred for it to be drawn.
+const ClickThresholdMs = 200;
+
 async function paintGraphicsAtTime(time) {
-  const index = mostRecentPaintPointIndex(time);
-  const { point, paintHash } = gPaintPoints[index];
+  const { point, paintHash } = mostRecentEntry(gPaintPoints, time);
 
   const existing = gScreenShots.get(paintHash);
 
@@ -151,7 +176,19 @@ async function paintGraphicsAtTime(time) {
   );
 
   addScreenShot(screen);
-  paintGraphics(screen);
+
+  let mouse;
+  const mouseEvent = mostRecentEntry(gMouseEvents, time);
+  if (mouseEvent) {
+    mouse = { x: mouseEvent.clientX, y: mouseEvent.clientY };
+    const clickEvent = mostRecentEntry(gMouseClickEvents, time);
+    if (clickEvent && clickEvent.time + ClickThresholdMs >= time) {
+      mouse.clickX = clickEvent.clientX;
+      mouse.clickY = clickEvent.clientY;
+    }
+  }
+
+  paintGraphics(screen, mouse);
 }
 
 //////////////////////////////
@@ -161,21 +198,53 @@ async function paintGraphicsAtTime(time) {
 // Image to draw, if any.
 let gDrawImage;
 
+// Mouse information to draw.
+let gDrawMouse;
+
 // Text message to draw, if any.
 let gDrawMessage;
 
-function paintGraphics(screenShot) {
+function paintGraphics(screenShot, mouse) {
   addScreenShot(screenShot);
   gDrawImage = new Image();
   gDrawImage.onload = refreshGraphics;
   gDrawImage.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
+  gDrawMouse = mouse;
   refreshGraphics();
 }
 
 function paintMessage(message) {
   gDrawImage = null;
+  gDrawMouse = null;
   gDrawMessage = message;
   refreshGraphics();
+}
+
+function drawCursor(cx, x, y) {
+  const scale = 3;
+  const path = new Path2D(`
+M ${x} ${y}
+V ${y+10*scale}
+L ${x+2*scale} ${y+8*scale}
+L ${x+4*scale} ${y+13*scale}
+L ${x+5.5*scale} ${y+12.6*scale}
+L ${x+3.5*scale} ${y+7.6*scale}
+L ${x+6.5*scale} ${y+7.8*scale}
+Z
+`);
+  cx.fillStyle = "black";
+  cx.fill(path);
+  cx.strokeStyle = "white";
+  cx.lineWidth = 1;
+  cx.stroke(path);
+}
+
+function drawClick(cx, x, y) {
+  cx.strokeStyle = "black";
+  cx.lineWidth = 3;
+  cx.beginPath();
+  cx.arc(x, y, 50, 0, 2 * Math.PI);
+  cx.stroke();
 }
 
 function refreshGraphics() {
@@ -195,6 +264,14 @@ function refreshGraphics() {
 
   if (gDrawImage) {
     cx.drawImage(gDrawImage, 0, 0);
+
+    if (gDrawMouse) {
+      const { x, y, clickX, clickY } = gDrawMouse;
+      drawCursor(cx, x, y);
+      if (clickX !== undefined) {
+        drawClick(cx, x, y);
+      }
+    }
   } else if (gDrawMessage) {
     cx.font = `${25 * window.devicePixelRatio}px sans-serif`;
     const messageWidth = cx.measureText(gDrawMessage).width;
