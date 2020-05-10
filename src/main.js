@@ -96,12 +96,10 @@ const gToolbox = {
 const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
 ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
 
-/*
 setTimeout(() => {
   const debuggerPanel = new DebuggerPanel(gToolbox);
   debuggerPanel.open();
 }, 0);
-*/
 
 setTimeout(() => {
   const consolePanel = new WebConsolePanel(gToolbox);

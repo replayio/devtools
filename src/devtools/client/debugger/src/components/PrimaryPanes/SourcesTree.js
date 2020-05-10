@@ -85,7 +85,7 @@ type State = {
 type SetExpanded = (item: TreeNode, expanded: boolean, altKey: boolean) => void;
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper();
+const L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
 function shouldAutoExpand(depth, item, debuggeeUrl, projectRoot) {
   if (projectRoot != "" || depth !== 1) {

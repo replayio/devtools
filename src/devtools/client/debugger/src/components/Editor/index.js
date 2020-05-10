@@ -97,7 +97,7 @@ import type {
 } from "../../types";
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper();
+const L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",

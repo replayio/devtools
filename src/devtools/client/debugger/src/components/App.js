@@ -89,7 +89,7 @@ type State = {
 };
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper();
+const L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
 class App extends Component<Props, State> {
   onLayoutChange: Function;

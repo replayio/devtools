@@ -12,7 +12,7 @@ import Services from "devtools-services";
 const { appinfo } = Services;
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper();
+const L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
 const isMacOS = appinfo.OS === "Darwin";
 
