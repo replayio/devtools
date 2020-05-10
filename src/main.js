@@ -76,8 +76,12 @@ async function initialize() {
 }
 
 const gToolbox = {
-  getPanelWhenReady(panel) {
-    return new Promise((resolve) => {});
+  currentTool: null,
+
+  _panels: {},
+
+  getPanelWhenReady(id) {
+    return new Promise(resolve => {});
   },
 
   threadFront: ThreadFront,
@@ -88,8 +92,25 @@ const gToolbox = {
     return {};
   },
 
+  addTool(name, panel) {
+    this._panels[name] = panel;
+    const button = document.getElementById(`toolbox-toolbar-${name}`);
+    button.addEventListener("click", () => this.selectTool(name));
+  },
+
   loadTool(name) {
     return new Promise(resolve => {});
+  },
+
+  selectTool(name) {
+    if (name == this.currentTool) {
+      return;
+    }
+    this.currentTool = name;
+    for (const panelName of Object.keys(this._panels)) {
+      const container = document.getElementById(`toolbox-content-${panelName}`);
+      container.style.visibility = (panelName == name) ? "visible" : "hidden";
+    }
   },
 };
 
@@ -98,10 +119,12 @@ ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
 
 setTimeout(() => {
   const debuggerPanel = new DebuggerPanel(gToolbox);
+  gToolbox.addTool("jsdebugger", debuggerPanel);
   debuggerPanel.open();
-}, 0);
 
-setTimeout(() => {
   const consolePanel = new WebConsolePanel(gToolbox);
+  gToolbox.addTool("webconsole", consolePanel);
   consolePanel.open();
+
+  gToolbox.selectTool("jsdebugger");
 }, 0);
