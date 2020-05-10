@@ -27,19 +27,11 @@ import type {
 } from "../../types";
 
 import type {
-  Target,
-  DevToolsClient,
-  Grip,
-  ThreadFront,
-  ObjectFront,
-  ExpressionResult,
-  SourcesPacket,
-} from "./types";
-
-import type {
   EventListenerCategoryList,
   EventListenerActiveList,
 } from "../../actions/types";
+
+const { ThreadFront } = require("protocol/thread");
 
 let targets: { [string]: Target };
 let currentThreadFront: ThreadFront;
@@ -183,10 +175,8 @@ async function sourceContents({
   actor,
   thread,
 }: SourceActor): Promise<{| source: any, contentType: ?string |}> {
-  const sourceThreadFront = lookupThreadFront(thread);
-  const sourceFront = sourceThreadFront.source({ actor });
-  const { source, contentType } = await sourceFront.source();
-  return { source, contentType };
+  const { scriptSource, contentType } = await ThreadFront.getScriptSource(actor);
+  return { source: scriptSource, contentType };
 }
 
 function setXHRBreakpoint(path: string, method: string) {

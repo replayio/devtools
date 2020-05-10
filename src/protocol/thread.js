@@ -73,7 +73,16 @@ const ThreadFront = {
 
     sendMessage("Debugger.findScripts", {}, sessionId);
     addEventListener("Debugger.scriptParsed", onScript);
-  }
+  },
+
+  async getScriptSource(scriptId) {
+    const { scriptSource, contentType } = await sendMessage(
+      "Debugger.getScriptSource",
+      { scriptId },
+      this.sessionId
+    );
+    return { scriptSource, contentType };
+  },
 };
 
 module.exports = { ThreadFront };
