@@ -493,13 +493,11 @@ class JSTerm extends Component {
       this.editor.on("beforeChange", this._onEditorBeforeChange);
       this.editor.appendToLocalElement(this.node);
 
-      /*
       const cm = this.editor.codeMirror;
       cm.on("paste", (_, event) => this.props.onPaste(event));
       cm.on("drop", (_, event) => this.props.onPaste(event));
-      */
 
-      this.node.addEventListener("keydown", event => {
+      this.node.addEventListener("keydown", (event) => {
         if (event.keyCode === KeyCodes.DOM_VK_ESCAPE) {
           if (this.autocompletePopup.isOpen) {
             this.clearCompletion();
@@ -600,7 +598,7 @@ class JSTerm extends Component {
   focusPreviousElement() {
     const inputField = this.editor.codeMirror.getInputField();
 
-    const findPreviousFocusableElement = el => {
+    const findPreviousFocusableElement = (el) => {
       if (!el || !el.querySelectorAll) {
         return null;
       }
@@ -681,8 +679,7 @@ class JSTerm extends Component {
    */
   _getValue() {
     // FIXME
-    return "";
-    //return this.editor ? this.editor.getText() || "" : "";
+    return this.editor ? this.editor.getText() || "" : "";
   }
 
   /**
@@ -704,17 +701,17 @@ class JSTerm extends Component {
     );
 
     function readFile(file) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         const { OS } = Cu.import("resource://gre/modules/osfile.jsm");
-        OS.File.read(file.path).then(data => {
+        OS.File.read(file.path).then((data) => {
           const decoder = new TextDecoder();
           resolve(decoder.decode(data));
         });
       });
     }
 
-    const content = await new Promise(resolve => {
-      fp.open(rv => {
+    const content = await new Promise((resolve) => {
+      fp.open((rv) => {
         if (rv == Ci.nsIFilePicker.returnOK) {
           const file = Cc["@mozilla.org/file/local;1"].createInstance(
             Ci.nsIFile
@@ -788,7 +785,7 @@ class JSTerm extends Component {
       this.pendingCompletionText = completionText.substring(text.length);
       // And we update the preLabel of the matching autocomplete items that may be used
       // in the acceptProposedAutocompletion function.
-      this.autocompletePopup.items.forEach(item => {
+      this.autocompletePopup.items.forEach((item) => {
         if (item.label.startsWith(item.preLabel + addedText)) {
           item.preLabel += addedText;
         }
@@ -958,7 +955,7 @@ class JSTerm extends Component {
 
     const inputUntilCursor = this.getInputValueBeforeCursor();
 
-    const items = matches.map(label => {
+    const items = matches.map((label) => {
       let preLabel = label.substring(0, matchProp.length);
       // If the user is performing an element access, and if they did not typed a quote,
       // then we need to adjust the preLabel to match the quote from the label + what
@@ -1375,7 +1372,7 @@ class JSTerm extends Component {
         "aria-live": "off",
         tabIndex: -1,
         onContextMenu: this.onContextMenu,
-        ref: node => {
+        ref: (node) => {
           this.node = node;
         },
       },
@@ -1394,7 +1391,7 @@ class JSTerm extends Component {
 function mapStateToProps(state) {
   return {
     history: getHistory(state),
-    getValueFromHistory: direction => getHistoryValue(state, direction),
+    getValueFromHistory: (direction) => getHistoryValue(state, direction),
     autocompleteData: getAutocompleteState(state),
     showEditorOnboarding: state.ui.showEditorOnboarding,
     showEvaluationSelector: state.ui.showEvaluationSelector,
@@ -1409,16 +1406,13 @@ function mapDispatchToProps(dispatch) {
     autocompleteUpdate: (force, getterPath, expressionVars) =>
       dispatch(actions.autocompleteUpdate(force, getterPath, expressionVars)),
     autocompleteClear: () => dispatch(actions.autocompleteClear()),
-    evaluateExpression: expression =>
+    evaluateExpression: (expression) =>
       dispatch(actions.evaluateExpression(expression)),
     editorToggle: () => dispatch(actions.editorToggle()),
     editorOnboardingDismiss: () => dispatch(actions.editorOnboardingDismiss()),
-    terminalInputChanged: value =>
+    terminalInputChanged: (value) =>
       dispatch(actions.terminalInputChanged(value)),
   };
 }
 
-module.exports = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(JSTerm);
+module.exports = connect(mapStateToProps, mapDispatchToProps)(JSTerm);

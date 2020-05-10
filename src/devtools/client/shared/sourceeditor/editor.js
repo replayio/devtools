@@ -116,9 +116,9 @@ Editor.modes = {
  * CodeMirror docs: http://codemirror.net/doc/manual.html
  */
 function Editor(config) {
-  const tabSize = 2;//Services.prefs.getIntPref(TAB_SIZE);
-  const useTabs = false;//!Services.prefs.getBoolPref(EXPAND_TAB);
-  const useAutoClose = true;//Services.prefs.getBoolPref(AUTO_CLOSE);
+  const tabSize = 2; //Services.prefs.getIntPref(TAB_SIZE);
+  const useTabs = false; //!Services.prefs.getBoolPref(EXPAND_TAB);
+  const useAutoClose = true; //Services.prefs.getBoolPref(AUTO_CLOSE);
 
   this.version = null;
   this.config = {
@@ -169,7 +169,7 @@ function Editor(config) {
   this.config.extraKeys["Alt-F"] = false;
 
   // Overwrite default config with user-provided, if needed.
-  Object.keys(config).forEach(k => {
+  Object.keys(config).forEach((k) => {
     if (k != "extraKeys") {
       this.config[k] = config[k];
       return;
@@ -179,7 +179,7 @@ function Editor(config) {
       return;
     }
 
-    Object.keys(config.extraKeys).forEach(key => {
+    Object.keys(config.extraKeys).forEach((key) => {
       this.config.extraKeys[key] = config.extraKeys[key];
     });
   });
@@ -201,7 +201,7 @@ function Editor(config) {
   // indent those lines. If nothing is selected and we're
   // indenting with tabs, insert one tab. Otherwise insert N
   // whitespaces where N == indentUnit option.
-  this.config.extraKeys.Tab = cm => {
+  this.config.extraKeys.Tab = (cm) => {
     if (config.extraKeys && config.extraKeys.Tab) {
       // If a consumer registers its own extraKeys.Tab, we execute it before doing
       // anything else. If it returns false, that mean that all the key handling work is
@@ -282,8 +282,8 @@ Editor.prototype = {
    *
    * This method is asynchronous and returns a promise.
    */
-  appendTo: function(el, env) {
-    return new Promise(resolve => {
+  appendTo: function (el, env) {
+    return new Promise((resolve) => {
       const cm = editors.get(this);
 
       if (!env) {
@@ -305,10 +305,10 @@ Editor.prototype = {
           win.document.documentElement.setAttribute("force-theme", "light");
         }
 
-        Services.scriptloader.loadSubScript(
-          "chrome://devtools/content/shared/theme-switching.js",
-          win
-        );
+        // Services.scriptloader.loadSubScript(
+        //   "chrome://devtools/content/shared/theme-switching.js",
+        //   win
+        // );
         this.container = env;
         this._setup(win.document.body, el.ownerDocument);
         env.removeEventListener("load", onLoad, true);
@@ -324,7 +324,7 @@ Editor.prototype = {
     });
   },
 
-  appendToLocalElement: function(el) {
+  appendToLocalElement: function (el) {
     this._setup(el);
   },
 
@@ -333,14 +333,11 @@ Editor.prototype = {
    * used by both append functions above, and does all the hard work to
    * configure CodeMirror with all the right options/modes/etc.
    */
-  _setup: function(el, doc) {
+  _setup: function (el, doc) {
     doc = doc || el.ownerDocument;
     const win = el.ownerDocument.defaultView;
 
-    // FIXME
-    return;
-
-    Services.scriptloader.loadSubScript(CM_BUNDLE, win);
+    // Services.scriptloader.loadSubScript(CM_BUNDLE, win);
 
     if (this.config.cssProperties) {
       // Replace the propertyKeywords, colorKeywords and valueKeywords
@@ -375,7 +372,7 @@ Editor.prototype = {
     // Disable APZ for source editors. It currently causes the line numbers to
     // "tear off" and swim around on top of the content. Bug 1160601 tracks
     // finding a solution that allows APZ to work with CodeMirror.
-    cm.getScrollerElement().addEventListener("wheel", ev => {
+    cm.getScrollerElement().addEventListener("wheel", (ev) => {
       // By handling the wheel events ourselves, we force the platform to
       // scroll synchronously, like it did before APZ. However, we lose smooth
       // scrolling for users with mouse wheels. This seems acceptible vs.
@@ -395,7 +392,7 @@ Editor.prototype = {
       cm.getScrollerElement().scrollBy(deltaX, deltaY);
     });
 
-    cm.getWrapperElement().addEventListener("contextmenu", ev => {
+    cm.getWrapperElement().addEventListener("contextmenu", (ev) => {
       if (!this.config.contextMenu) {
         return;
       }
@@ -436,7 +433,7 @@ Editor.prototype = {
       this.emit("gutterClick", lineOrOffset, ev.button);
     });
 
-    win.CodeMirror.defineExtension("l10n", name => {
+    win.CodeMirror.defineExtension("l10n", (name) => {
       return L10N.getStr(name);
     });
 
@@ -462,7 +459,7 @@ Editor.prototype = {
     this.reloadPreferences = this.reloadPreferences.bind(this);
     this.setKeyMap = this.setKeyMap.bind(this, win);
 
-    this._prefObserver = new PrefObserver("devtools.editor.");
+    this._prefObserver = new win.PrefObserver("devtools.editor.");
     this._prefObserver.on(TAB_SIZE, this.reloadPreferences);
     this._prefObserver.on(EXPAND_TAB, this.reloadPreferences);
     this._prefObserver.on(AUTO_CLOSE, this.reloadPreferences);
@@ -486,7 +483,7 @@ Editor.prototype = {
    * Returns a boolean indicating whether the editor is ready to
    * use. Use appendTo(el).then(() => {}) for most cases
    */
-  isAppended: function() {
+  isAppended: function () {
     return editors.has(this);
   },
 
@@ -494,14 +491,14 @@ Editor.prototype = {
    * Returns the currently active highlighting mode.
    * See Editor.modes for the list of all suppoert modes.
    */
-  getMode: function() {
+  getMode: function () {
     return this.getOption("mode");
   },
 
   /**
    * Loads a script into editor's containing window.
    */
-  loadScript: function(url) {
+  loadScript: function (url) {
     if (!this.container) {
       throw new Error("Can't load a script until the editor is loaded.");
     }
@@ -513,14 +510,14 @@ Editor.prototype = {
    * Creates a CodeMirror Document
    * @returns CodeMirror.Doc
    */
-  createDocument: function() {
+  createDocument: function () {
     return new this.Doc("");
   },
 
   /**
    * Replaces the current document with a new source document
    */
-  replaceDocument: function(doc) {
+  replaceDocument: function (doc) {
     const cm = editors.get(this);
     cm.swapDoc(doc);
   },
@@ -529,7 +526,7 @@ Editor.prototype = {
    * Changes the value of a currently used highlighting mode.
    * See Editor.modes for the list of all supported modes.
    */
-  setMode: function(value) {
+  setMode: function (value) {
     this.setOption("mode", value);
 
     // If autocomplete was set up and the mode is changing, then
@@ -544,7 +541,7 @@ Editor.prototype = {
    * The source editor can expose several commands linked from system and context menus.
    * Kept for backward compatibility with styleeditor.
    */
-  insertCommandsController: function() {
+  insertCommandsController: function () {
     const {
       insertCommandsController,
     } = require("devtools/client/shared/sourceeditor/editor-commands-controller");
@@ -555,7 +552,7 @@ Editor.prototype = {
    * Returns text from the text area. If line argument is provided
    * the method returns only that line.
    */
-  getText: function(line) {
+  getText: function (line) {
     const cm = editors.get(this);
 
     if (line == null) {
@@ -566,7 +563,7 @@ Editor.prototype = {
     return info ? info.text : "";
   },
 
-  getDoc: function() {
+  getDoc: function () {
     const cm = editors.get(this);
     return cm.getDoc();
   },
@@ -575,22 +572,22 @@ Editor.prototype = {
     return wasm.isWasm(this.getDoc());
   },
 
-  wasmOffsetToLine: function(offset) {
+  wasmOffsetToLine: function (offset) {
     return wasm.wasmOffsetToLine(this.getDoc(), offset);
   },
 
-  lineToWasmOffset: function(number) {
+  lineToWasmOffset: function (number) {
     return wasm.lineToWasmOffset(this.getDoc(), number);
   },
 
-  toLineIfWasmOffset: function(maybeOffset) {
+  toLineIfWasmOffset: function (maybeOffset) {
     if (typeof maybeOffset !== "number" || !this.isWasm) {
       return maybeOffset;
     }
     return this.wasmOffsetToLine(maybeOffset);
   },
 
-  lineInfo: function(lineOrOffset) {
+  lineInfo: function (lineOrOffset) {
     const line = this.toLineIfWasmOffset(lineOrOffset);
     if (line == undefined) {
       return null;
@@ -599,7 +596,7 @@ Editor.prototype = {
     return cm.lineInfo(line);
   },
 
-  getLineOrOffset: function(line) {
+  getLineOrOffset: function (line) {
     return this.isWasm ? this.lineToWasmOffset(line) : line;
   },
 
@@ -607,7 +604,7 @@ Editor.prototype = {
    * Replaces whatever is in the text area with the contents of
    * the 'value' argument.
    */
-  setText: function(value) {
+  setText: function (value) {
     const cm = editors.get(this);
 
     if (typeof value !== "string" && "binary" in value) {
@@ -641,7 +638,7 @@ Editor.prototype = {
    * This is called automatically when any of the relevant preferences
    * change.
    */
-  reloadPreferences: function() {
+  reloadPreferences: function () {
     // Restore the saved autoCloseBrackets value if it is preffed on.
     const useAutoClose = Services.prefs.getBoolPref(AUTO_CLOSE);
     this.setOption(
@@ -683,11 +680,11 @@ Editor.prototype = {
    * Sets the editor's indentation based on the current prefs and
    * re-detect indentation if we should.
    */
-  resetIndentUnit: function() {
+  resetIndentUnit: function () {
     const cm = editors.get(this);
 
-    const iterFn = function(start, end, callback) {
-      cm.eachLine(start, end, line => {
+    const iterFn = function (start, end, callback) {
+      cm.eachLine(start, end, (line) => {
         return callback(line.text);
       });
     };
@@ -705,7 +702,7 @@ Editor.prototype = {
    * exactly like setText. If only `from` object is provided, inserts
    * text at that point, *overwriting* as many characters as needed.
    */
-  replaceText: function(value, from, to) {
+  replaceText: function (value, from, to) {
     const cm = editors.get(this);
 
     if (!from) {
@@ -726,7 +723,7 @@ Editor.prototype = {
    * Inserts text at the specified {line, ch} position, shifting existing
    * contents as necessary.
    */
-  insertText: function(value, at) {
+  insertText: function (value, at) {
     const cm = editors.get(this);
     cm.replaceRange(value, at, at);
   },
@@ -734,7 +731,7 @@ Editor.prototype = {
   /**
    * Deselects contents of the text area.
    */
-  dropSelection: function() {
+  dropSelection: function () {
     if (!this.somethingSelected()) {
       return;
     }
@@ -745,7 +742,7 @@ Editor.prototype = {
   /**
    * Returns true if there is more than one selection in the editor.
    */
-  hasMultipleSelections: function() {
+  hasMultipleSelections: function () {
     const cm = editors.get(this);
     return cm.listSelections().length > 1;
   },
@@ -753,7 +750,7 @@ Editor.prototype = {
   /**
    * Gets the first visible line number in the editor.
    */
-  getFirstVisibleLine: function() {
+  getFirstVisibleLine: function () {
     const cm = editors.get(this);
     return cm.lineAtHeight(0, "local");
   },
@@ -761,7 +758,7 @@ Editor.prototype = {
   /**
    * Scrolls the view such that the given line number is the first visible line.
    */
-  setFirstVisibleLine: function(line) {
+  setFirstVisibleLine: function (line) {
     const cm = editors.get(this);
     const { top } = cm.charCoords({ line: line, ch: 0 }, "local");
     cm.scrollTo(0, top);
@@ -772,7 +769,7 @@ Editor.prototype = {
    * option to align the line at the "top", "center" or "bottom" of the editor
    * with "top" being default value.
    */
-  setCursor: function({ line, ch }, align) {
+  setCursor: function ({ line, ch }, align) {
     const cm = editors.get(this);
     this.alignLine(line, align);
     cm.setCursor({ line: line, ch: ch });
@@ -784,7 +781,7 @@ Editor.prototype = {
    * editor view with a maximum margin of MAX_VERTICAL_OFFSET lines from top or
    * bottom.
    */
-  alignLine: function(line, align) {
+  alignLine: function (line, align) {
     const cm = editors.get(this);
     const from = cm.lineAtHeight(0, "page");
     const to = cm.lineAtHeight(cm.getWrapperElement().clientHeight, "page");
@@ -816,7 +813,7 @@ Editor.prototype = {
   /**
    * Returns whether a marker of a specified class exists in a line's gutter.
    */
-  hasMarker: function(line, gutterName, markerClass) {
+  hasMarker: function (line, gutterName, markerClass) {
     const marker = this.getMarker(line, gutterName);
     if (!marker) {
       return false;
@@ -829,7 +826,7 @@ Editor.prototype = {
    * Adds a marker with a specified class to a line's gutter. If another marker
    * exists on that line, the new marker class is added to its class list.
    */
-  addMarker: function(line, gutterName, markerClass) {
+  addMarker: function (line, gutterName, markerClass) {
     const cm = editors.get(this);
     const info = this.lineInfo(line);
     if (!info) {
@@ -855,7 +852,7 @@ Editor.prototype = {
    * The reverse of addMarker. Removes a marker of a specified class from a
    * line's gutter.
    */
-  removeMarker: function(line, gutterName, markerClass) {
+  removeMarker: function (line, gutterName, markerClass) {
     if (!this.hasMarker(line, gutterName, markerClass)) {
       return;
     }
@@ -868,7 +865,7 @@ Editor.prototype = {
    * gutter. If another marker exists on that line, it is overwritten by a new
    * marker.
    */
-  addContentMarker: function(line, gutterName, markerClass, content) {
+  addContentMarker: function (line, gutterName, markerClass, content) {
     const cm = editors.get(this);
     const info = this.lineInfo(line);
     if (!info) {
@@ -886,7 +883,7 @@ Editor.prototype = {
    * The reverse of addContentMarker. Removes any line's markers in the
    * specified gutter.
    */
-  removeContentMarker: function(line, gutterName) {
+  removeContentMarker: function (line, gutterName) {
     const cm = editors.get(this);
     const info = this.lineInfo(line);
     if (!info) {
@@ -896,7 +893,7 @@ Editor.prototype = {
     cm.setGutterMarker(info.line, gutterName, null);
   },
 
-  getMarker: function(line, gutterName) {
+  getMarker: function (line, gutterName) {
     const info = this.lineInfo(line);
     if (!info) {
       return null;
@@ -913,7 +910,7 @@ Editor.prototype = {
   /**
    * Removes all gutter markers in the gutter with the given name.
    */
-  removeAllMarkers: function(gutterName) {
+  removeAllMarkers: function (gutterName) {
     const cm = editors.get(this);
     cm.clearGutter(gutterName);
   },
@@ -927,7 +924,13 @@ Editor.prototype = {
    * You don't need to worry about removing these event listeners.
    * They're automatically orphaned when clearing markers.
    */
-  setMarkerListeners: function(line, gutterName, markerClass, eventsArg, data) {
+  setMarkerListeners: function (
+    line,
+    gutterName,
+    markerClass,
+    eventsArg,
+    data
+  ) {
     if (!this.hasMarker(line, gutterName, markerClass)) {
       return;
     }
@@ -944,7 +947,7 @@ Editor.prototype = {
   /**
    * Returns whether a line is decorated using the specified class name.
    */
-  hasLineClass: function(line, className) {
+  hasLineClass: function (line, className) {
     const info = this.lineInfo(line);
 
     if (!info || !info.wrapClass) {
@@ -957,7 +960,7 @@ Editor.prototype = {
   /**
    * Sets a CSS class name for the given line, including the text and gutter.
    */
-  addLineClass: function(lineOrOffset, className) {
+  addLineClass: function (lineOrOffset, className) {
     const cm = editors.get(this);
     const line = this.toLineIfWasmOffset(lineOrOffset);
     cm.addLineClass(line, "wrap", className);
@@ -966,7 +969,7 @@ Editor.prototype = {
   /**
    * The reverse of addLineClass.
    */
-  removeLineClass: function(lineOrOffset, className) {
+  removeLineClass: function (lineOrOffset, className) {
     const cm = editors.get(this);
     const line = this.toLineIfWasmOffset(lineOrOffset);
     cm.removeLineClass(line, "wrap", className);
@@ -977,7 +980,7 @@ Editor.prototype = {
    * be modified, for example, when typing text, this method returns a function
    * that can be used to remove the mark.
    */
-  markText: function(from, to, className = "marked-text") {
+  markText: function (from, to, className = "marked-text") {
     const cm = editors.get(this);
     const text = cm.getRange(from, to);
     const span = cm.getWrapperElement().ownerDocument.createElement("span");
@@ -999,9 +1002,9 @@ Editor.prototype = {
    * If only one argument is given, this method returns a single
    * {line,ch} object. Otherwise it returns an array.
    */
-  getPosition: function(...args) {
+  getPosition: function (...args) {
     const cm = editors.get(this);
-    const res = args.map(ind => cm.posFromIndex(ind));
+    const res = args.map((ind) => cm.posFromIndex(ind));
     return args.length === 1 ? res[0] : res;
   },
 
@@ -1010,9 +1013,9 @@ Editor.prototype = {
    * method returns a single value if only one argument was given
    * and an array otherwise.
    */
-  getOffset: function(...args) {
+  getOffset: function (...args) {
     const cm = editors.get(this);
-    const res = args.map(pos => cm.indexFromPos(pos));
+    const res = args.map((pos) => cm.indexFromPos(pos));
     return args.length > 1 ? res : res[0];
   },
 
@@ -1020,7 +1023,7 @@ Editor.prototype = {
    * Returns a {line, ch} object that corresponds to the
    * left, top coordinates.
    */
-  getPositionFromCoords: function({ left, top }) {
+  getPositionFromCoords: function ({ left, top }) {
     const cm = editors.get(this);
     return cm.coordsChar({ left: left, top: top });
   },
@@ -1029,7 +1032,7 @@ Editor.prototype = {
    * The reverse of getPositionFromCoords. Similarly, returns a {left, top}
    * object that corresponds to the specified line and character number.
    */
-  getCoordsFromPosition: function({ line, ch }) {
+  getCoordsFromPosition: function ({ line, ch }) {
     const cm = editors.get(this);
     return cm.charCoords({ line: ~~line, ch: ~~ch });
   },
@@ -1037,7 +1040,7 @@ Editor.prototype = {
   /**
    * Returns true if there's something to undo and false otherwise.
    */
-  canUndo: function() {
+  canUndo: function () {
     const cm = editors.get(this);
     return cm.historySize().undo > 0;
   },
@@ -1045,7 +1048,7 @@ Editor.prototype = {
   /**
    * Returns true if there's something to redo and false otherwise.
    */
-  canRedo: function() {
+  canRedo: function () {
     const cm = editors.get(this);
     return cm.historySize().redo > 0;
   },
@@ -1054,7 +1057,7 @@ Editor.prototype = {
    * Marks the contents as clean and returns the current
    * version number.
    */
-  setClean: function() {
+  setClean: function () {
     const cm = editors.get(this);
     this.version = cm.changeGeneration();
     this._lastDirty = false;
@@ -1066,7 +1069,7 @@ Editor.prototype = {
    * Returns true if contents of the text area are
    * clean i.e. no changes were made since the last version.
    */
-  isClean: function() {
+  isClean: function () {
     const cm = editors.get(this);
     return cm.isClean(this.version);
   },
@@ -1075,7 +1078,7 @@ Editor.prototype = {
    * This method opens an in-editor dialog asking for a line to
    * jump to. Once given, it changes cursor to that line.
    */
-  jumpToLine: function() {
+  jumpToLine: function () {
     const doc = editors.get(this).getWrapperElement().ownerDocument;
     const div = doc.createElement("div");
     const inp = doc.createElement("input");
@@ -1088,7 +1091,7 @@ Editor.prototype = {
     div.appendChild(txt);
     div.appendChild(inp);
 
-    this.openDialog(div, line => {
+    this.openDialog(div, (line) => {
       // Handle LINE:COLUMN as well as LINE
       const match = line.toString().match(RE_JUMP_TO_LINE);
       if (match) {
@@ -1101,7 +1104,7 @@ Editor.prototype = {
   /**
    * Moves the content of the current line or the lines selected up a line.
    */
-  moveLineUp: function() {
+  moveLineUp: function () {
     const cm = editors.get(this);
     const start = cm.getCursor("start");
     const end = cm.getCursor("end");
@@ -1140,7 +1143,7 @@ Editor.prototype = {
   /**
    * Moves the content of the current line or the lines selected down a line.
    */
-  moveLineDown: function() {
+  moveLineDown: function () {
     const cm = editors.get(this);
     const start = cm.getCursor("start");
     const end = cm.getCursor("end");
@@ -1177,7 +1180,7 @@ Editor.prototype = {
   /**
    * Intercept CodeMirror's Find and replace key shortcut to select the search input
    */
-  findOrReplace: function(node, isReplaceAll) {
+  findOrReplace: function (node, isReplaceAll) {
     const cm = editors.get(this);
     const isInput = node.tagName === "INPUT";
     const isSearchInput = isInput && node.type === "search";
@@ -1206,7 +1209,7 @@ Editor.prototype = {
    * Intercept CodeMirror's findNext and findPrev key shortcut to allow
    * immediately search for next occurance after typing a word to search.
    */
-  findNextOrPrev: function(node, isFindPrev) {
+  findNextOrPrev: function (node, isFindPrev) {
     const cm = editors.get(this);
     const isInput = node.tagName === "INPUT";
     const isSearchInput = isInput && node.type === "search";
@@ -1237,7 +1240,7 @@ Editor.prototype = {
   /**
    * Returns current font size for the editor area, in pixels.
    */
-  getFontSize: function() {
+  getFontSize: function () {
     const cm = editors.get(this);
     const el = cm.getWrapperElement();
     const win = el.ownerDocument.defaultView;
@@ -1248,7 +1251,7 @@ Editor.prototype = {
   /**
    * Sets font size for the editor area.
    */
-  setFontSize: function(size) {
+  setFontSize: function (size) {
     const cm = editors.get(this);
     cm.getWrapperElement().style.fontSize = parseInt(size, 10) + "px";
     cm.refresh();
@@ -1259,7 +1262,7 @@ Editor.prototype = {
    * CodeMirror.setOption, but certain ones are maintained within the editor
    * instance.
    */
-  setOption: function(o, v) {
+  setOption: function (o, v) {
     const cm = editors.get(this);
 
     // Save the state of a valid autoCloseBrackets string, so we can reset
@@ -1288,7 +1291,7 @@ Editor.prototype = {
    * CodeMirror.getOption, but certain ones are maintained within the editor
    * instance.
    */
-  getOption: function(o) {
+  getOption: function (o) {
     const cm = editors.get(this);
     if (o === "autocomplete") {
       return this.config.autocomplete;
@@ -1305,7 +1308,7 @@ Editor.prototype = {
    * it just because it is preffed on (it still needs to be requested by the
    * editor), but we do want to always disable it if it is preffed off.
    */
-  setupAutoCompletion: function() {
+  setupAutoCompletion: function () {
     if (!this.config.autocomplete && !this.initializeAutoCompletion) {
       // Do nothing since there is no autocomplete config and no autocompletion have
       // been initialized.
@@ -1328,7 +1331,7 @@ Editor.prototype = {
     const cm = editors.get(this);
     const mark = cm
       .getAllMarks()
-      .find(m => m.className === AUTOCOMPLETE_MARK_CLASSNAME);
+      .find((m) => m.className === AUTOCOMPLETE_MARK_CLASSNAME);
     if (!mark) {
       return "";
     }
@@ -1336,13 +1339,13 @@ Editor.prototype = {
     return mark.title || "";
   },
 
-  setAutoCompletionText: function(text) {
+  setAutoCompletionText: function (text) {
     const cursor = this.getCursor();
     const cm = editors.get(this);
     const className = AUTOCOMPLETE_MARK_CLASSNAME;
 
     cm.operation(() => {
-      cm.getAllMarks().forEach(mark => {
+      cm.getAllMarks().forEach((mark) => {
         if (mark.className === className) {
           mark.clear();
         }
@@ -1374,8 +1377,8 @@ Editor.prototype = {
    * editor.extend({ hello: hello });
    * editor.hello('Mozilla');
    */
-  extend: function(funcs) {
-    Object.keys(funcs).forEach(name => {
+  extend: function (funcs) {
+    Object.keys(funcs).forEach((name) => {
       const cm = editors.get(this);
       const ctx = { ed: this, cm: cm, Editor: Editor };
 
@@ -1388,11 +1391,11 @@ Editor.prototype = {
     });
   },
 
-  isDestroyed: function() {
+  isDestroyed: function () {
     return !editors.get(this);
   },
 
-  destroy: function() {
+  destroy: function () {
     this.container = null;
     this.config = null;
     this.version = null;
@@ -1417,7 +1420,7 @@ Editor.prototype = {
     this.emit("destroy");
   },
 
-  updateCodeFoldingGutter: function() {
+  updateCodeFoldingGutter: function () {
     let shouldFoldGutter = this.config.enableCodeFolding;
     const foldGutterIndex = this.config.gutters.indexOf(
       "CodeMirror-foldgutter"
@@ -1457,7 +1460,7 @@ Editor.prototype = {
   /**
    * Register all key shortcuts.
    */
-  _initSearchShortcuts: function(win) {
+  _initSearchShortcuts: function (win) {
     const shortcuts = new KeyShortcuts({
       window: win,
     });
@@ -1470,15 +1473,15 @@ Editor.prototype = {
       keys.push("replaceAll.key");
     }
     // Process generic keys:
-    keys.forEach(name => {
+    keys.forEach((name) => {
       const key = L10N.getStr(name);
-      shortcuts.on(key, event => this._onSearchShortcut(name, event));
+      shortcuts.on(key, (event) => this._onSearchShortcut(name, event));
     });
   },
   /**
    * Key shortcut listener.
    */
-  _onSearchShortcut: function(name, event) {
+  _onSearchShortcut: function (name, event) {
     if (!this._isInputOrTextarea(event.target)) {
       return;
     }
@@ -1515,7 +1518,7 @@ Editor.prototype = {
   /**
    * Check if a node is an input or textarea
    */
-  _isInputOrTextarea: function(element) {
+  _isInputOrTextarea: function (element) {
     const name = element.tagName.toLowerCase();
     return name === "input" || name === "textarea";
   },
@@ -1524,8 +1527,8 @@ Editor.prototype = {
 // Since Editor is a thin layer over CodeMirror some methods
 // are mapped directly—without any changes.
 
-CM_MAPPING.forEach(name => {
-  Editor.prototype[name] = function(...args) {
+CM_MAPPING.forEach((name) => {
+  Editor.prototype[name] = function (...args) {
     const cm = editors.get(this);
     return cm[name].apply(cm, args);
   };
@@ -1541,7 +1544,7 @@ CM_MAPPING.forEach(name => {
  * CodeMirror defines all keys with modifiers in the following
  * order: Shift - Ctrl/Cmd - Alt - Key
  */
-Editor.accel = function(key, modifiers = {}) {
+Editor.accel = function (key, modifiers = {}) {
   return (
     (modifiers.shift ? "Shift-" : "") +
     (Services.appinfo.OS == "Darwin" ? "Cmd-" : "Ctrl-") +
@@ -1556,7 +1559,7 @@ Editor.accel = function(key, modifiers = {}) {
  * platforms unless noaccel is specified in the options. Useful when overwriting
  * or disabling default shortcuts.
  */
-Editor.keyFor = function(cmd, opts = { noaccel: false }) {
+Editor.keyFor = function (cmd, opts = { noaccel: false }) {
   const key = L10N.getStr(cmd + ".commandkey");
   return opts.noaccel ? key : Editor.accel(key);
 };
@@ -1581,13 +1584,13 @@ function getCSSKeywords(cssProperties) {
   const colorKeywords = {};
   const valueKeywords = {};
 
-  propertyKeywords.forEach(property => {
+  propertyKeywords.forEach((property) => {
     if (property.includes("color")) {
-      cssProperties.getValues(property).forEach(value => {
+      cssProperties.getValues(property).forEach((value) => {
         colorKeywords[value] = true;
       });
     } else {
-      cssProperties.getValues(property).forEach(value => {
+      cssProperties.getValues(property).forEach((value) => {
         valueKeywords[value] = true;
       });
     }

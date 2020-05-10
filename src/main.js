@@ -47,6 +47,12 @@ window.l10n = new LocalizationHelper(
   "devtools/client/locales/debugger.properties"
 );
 
+window.PrefObserver = function () {};
+window.PrefObserver.prototype = {
+  on: () => {},
+  off: () => {},
+};
+
 const url = new URL(window.location.href);
 
 const recordingId = url.searchParams.get("id");
@@ -81,7 +87,7 @@ const gToolbox = {
   _panels: {},
 
   getPanelWhenReady(id) {
-    return new Promise(resolve => {});
+    return new Promise((resolve) => {});
   },
 
   threadFront: ThreadFront,
@@ -99,7 +105,7 @@ const gToolbox = {
   },
 
   loadTool(name) {
-    return new Promise(resolve => {});
+    return new Promise((resolve) => {});
   },
 
   selectTool(name) {
@@ -109,7 +115,7 @@ const gToolbox = {
     this.currentTool = name;
     for (const panelName of Object.keys(this._panels)) {
       const container = document.getElementById(`toolbox-content-${panelName}`);
-      container.style.visibility = (panelName == name) ? "visible" : "hidden";
+      container.style.visibility = panelName == name ? "visible" : "hidden";
     }
   },
 };

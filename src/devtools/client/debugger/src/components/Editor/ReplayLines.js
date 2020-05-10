@@ -23,7 +23,7 @@ type Props = {
 };
 
 const jumpButton = document.createElement("img");
-jumpButton.src = "chrome://devtools/skin/images/next-circle.svg";
+jumpButton.src = "/src/devtools/client/debugger/images/next-circle.svg";
 
 function getEditorLine(location, generatedLocation, sourceId) {
   const loc = location.sourceId == sourceId ? location : generatedLocation;
