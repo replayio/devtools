@@ -11,6 +11,8 @@ import {
 
 import type { ThunkArgs } from "../../types";
 
+const { log } = require("protocol/socket");
+
 function validateActionContext(getState, action) {
   if (action.type == "COMMAND" && action.status == "done") {
     // The thread will have resumed execution since the action was initiated,
@@ -39,7 +41,7 @@ function logAction(action) {
   } else {
     const data = actionLogData(action);
     const status = action.status ? ` [${action.status}]` : "";
-    //ChromeUtils.recordReplayLog(`Debugger ${action.type}${data}${status}`);
+    log(`Debugger ${action.type}${data}${status}`);
   }
 }
 

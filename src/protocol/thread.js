@@ -46,6 +46,10 @@ const {
 const { defer, assert } = require("./utils");
 
 const ThreadFront = {
+  // When replaying there is only a single thread currently. Use this thread ID
+  // everywhere needed throughout the devtools client.
+  id: "MainThreadId",
+
   sessionId: null,
   sessionWaiter: defer(),
 
@@ -57,15 +61,19 @@ const ThreadFront = {
   async ensureProcessed(onMissingRegions, onUnprocessedRegions) {
     const sessionId = await this.sessionWaiter.promise;
 
-    assert(!this.hasEnsureProcessed);
-    this.hasEnsureProcessed = true;
-
     sendMessage("Session.ensureProcessed", {}, sessionId);
     addEventListener("Session.missingRegions", onMissingRegions);
     addEventListener("Session.unprocessedRegions", onUnprocessedRegions);
   },
 
   timeWarp(point) {},
+
+  async findScripts(onScript) {
+    const sessionId = await this.sessionWaiter.promise;
+
+    sendMessage("Debugger.findScripts", {}, sessionId);
+    addEventListener("Debugger.scriptParsed", onScript);
+  }
 };
 
 module.exports = { ThreadFront };

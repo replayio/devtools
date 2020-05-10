@@ -680,7 +680,9 @@ class JSTerm extends Component {
    * @returns string
    */
   _getValue() {
-    return this.editor ? this.editor.getText() || "" : "";
+    // FIXME
+    return "";
+    //return this.editor ? this.editor.getText() || "" : "";
   }
 
   /**

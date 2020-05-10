@@ -17,6 +17,8 @@ import {
 } from "./firefox/events";
 import { features, prefs } from "../utils/prefs";
 
+const { ThreadFront } = require("protocol/thread");
+
 let actions;
 
 export async function onConnect(connection: any, _actions: Object, panel) {
@@ -25,13 +27,20 @@ export async function onConnect(connection: any, _actions: Object, panel) {
 
   setupCommands({ devToolsClient });
   setupEvents({ actions, devToolsClient, panel });
-  /*
-  await targetList.watchTargets(
-    targetList.ALL_TYPES,
-    onTargetAvailable,
-    onTargetDestroyed
-  );
-  */
+
+  actions.connect("", ThreadFront.id, {}, false);
+
+  ThreadFront.findScripts(({ scriptId, url, sourceMapURL }) => {
+    const packet = {
+      thread: ThreadFront.id,
+      source: {
+        actor: scriptId,
+        url,
+        sourceMapURL,
+      },
+    };
+    actions.newGeneratedSources([packet]);
+  });
 }
 
 async function onTargetAvailable({
@@ -99,14 +108,6 @@ async function onTargetAvailable({
     await actions.newGeneratedSources(sources);
 
     await clientCommands.checkIfAlreadyPaused();
-  }
-}
-
-function onTargetDestroyed({ targetFront, isTopLevel }) {
-  if (isTopLevel) {
-    targetFront.off("will-navigate", actions.willNavigate);
-    targetFront.off("navigate", actions.navigated);
-    removeEventsTopTarget(targetFront);
   }
 }
 
