@@ -88,9 +88,12 @@ type State = {
   endPanelSize: number,
 };
 
+<<<<<<< HEAD
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
+=======
+>>>>>>> 6187ddf... Remove debugger l1on shims
 class App extends Component<Props, State> {
   onLayoutChange: Function;
   getChildContext: Function;

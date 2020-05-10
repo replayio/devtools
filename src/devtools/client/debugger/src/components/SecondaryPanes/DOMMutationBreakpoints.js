@@ -35,9 +35,6 @@ type Props = {
   setSkipPausing: typeof actions.setSkipPausing,
 };
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
-
 const localizationTerms = {
   subtree: L10N.getStr("domMutationTypes.subtree"),
   attribute: L10N.getStr("domMutationTypes.attribute"),

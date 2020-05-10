@@ -33,9 +33,6 @@ const isMacOS = appinfo.OS === "Darwin";
 const COMMANDS = ["resume", "stepOver", "stepIn", "stepOut"];
 type CommandActionType = "resume" | "stepOver" | "stepIn" | "stepOut";
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
-
 const KEYS = {
   WINNT: {
     resume: "F8",

@@ -9,9 +9,6 @@ import AccessibleImage from "../AccessibleImage";
 import { CommandBarButton } from "./";
 import "./styles/PaneToggleButton.css";
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
-
 type Position = "start" | "end";
 
 type Props = {
