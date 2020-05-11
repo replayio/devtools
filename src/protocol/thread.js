@@ -53,6 +53,8 @@ const ThreadFront = {
   sessionId: null,
   sessionWaiter: defer(),
 
+  skipPausing: false,
+
   setSessionId(sessionId) {
     this.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
@@ -93,6 +95,10 @@ const ThreadFront = {
       this.sessionId
     );
     return linePositions;
+  },
+
+  setSkipPausing(skip) {
+    this.skipPausing = skip;
   },
 };
 

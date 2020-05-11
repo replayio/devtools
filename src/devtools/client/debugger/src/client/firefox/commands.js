@@ -110,19 +110,7 @@ function listThreadFronts() {
 }
 
 function forEachThread(iteratee) {
-  // We have to be careful here to atomically initiate the operation on every
-  // thread, with no intervening await. Otherwise, other code could run and
-  // trigger additional thread operations. Requests on server threads will
-  // resolve in FIFO order, and this could result in client and server state
-  // going out of sync.
-
-  const promises = [currentThreadFront, ...listThreadFronts()].map(
-    // If a thread shuts down while sending the message then it will
-    // throw. Ignore these exceptions.
-    t => iteratee(t).catch(e => console.log(e))
-  );
-
-  return Promise.all(promises);
+  return iteratee(ThreadFront);
 }
 
 function resume(thread: string): Promise<*> {
@@ -353,7 +341,7 @@ async function blackBox(
 }
 
 function setSkipPausing(shouldSkip: boolean) {
-  return forEachThread(thread => thread.skipBreakpoints(shouldSkip));
+  return forEachThread(thread => thread.setSkipPausing(shouldSkip));
 }
 
 function interrupt(thread: string): Promise<*> {
@@ -480,7 +468,10 @@ async function getSourceActorBreakpointPositions(
   { thread, actor }: SourceActor,
   range: Range
 ): Promise<{ [number]: number[] }> {
-  return ThreadFront.getBreakpointPositionsCompressed(actor, range);
+  const linePositions = await ThreadFront.getBreakpointPositionsCompressed(actor, range);
+  const rv = {};
+  linePositions.forEach(({ line, columns }) => (rv[line] = columns));
+  return rv;
 }
 
 async function getSourceActorBreakableLines({
@@ -488,7 +479,7 @@ async function getSourceActorBreakableLines({
   actor,
 }: SourceActor): Promise<Array<number>> {
   const positions = await ThreadFront.getBreakpointPositionsCompressed(actor);
-  return Object.keys(pos).map(line => Number(line));
+  return positions.map(({ line }) => line);
 }
 
 function getFrontByID(actorID: String) {

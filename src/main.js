@@ -118,6 +118,11 @@ const gToolbox = {
       container.style.visibility = panelName == name ? "visible" : "hidden";
     }
   },
+
+  sourceMapService: {
+    getOriginalLocations: locations => locations,
+  },
+  parserService: {},
 };
 
 const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
