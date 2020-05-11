@@ -104,24 +104,6 @@ function getTargetsMap(): { string: Target } {
   return Object.assign({}, targets);
 }
 
-function lookupTarget(thread: string) {
-  if (thread == currentThreadFront.actor) {
-    return currentTarget;
-  }
-
-  const targetsMap = getTargetsMap();
-  if (!targetsMap[thread]) {
-    throw new Error(`Unknown thread front: ${thread}`);
-  }
-
-  return targetsMap[thread];
-}
-
-function lookupThreadFront(thread: string) {
-  const target = lookupTarget(thread);
-  return target.threadFront;
-}
-
 function listThreadFronts() {
   const targetList = (Object.values(getTargetsMap()): any);
   return targetList.map(target => target.threadFront).filter(t => !!t);
@@ -498,36 +480,15 @@ async function getSourceActorBreakpointPositions(
   { thread, actor }: SourceActor,
   range: Range
 ): Promise<{ [number]: number[] }> {
-  const sourceThreadFront = lookupThreadFront(thread);
-  const sourceFront = sourceThreadFront.source({ actor });
-  return sourceFront.getBreakpointPositionsCompressed(range);
+  return ThreadFront.getBreakpointPositionsCompressed(actor, range);
 }
 
 async function getSourceActorBreakableLines({
   thread,
   actor,
 }: SourceActor): Promise<Array<number>> {
-  let sourceFront;
-  let actorLines = [];
-  try {
-    const sourceThreadFront = lookupThreadFront(thread);
-    sourceFront = sourceThreadFront.source({ actor });
-    actorLines = await sourceFront.getBreakableLines();
-  } catch (e) {
-    // Handle backward compatibility
-    if (
-      e.message &&
-      e.message.match(/does not recognize the packet type getBreakableLines/)
-    ) {
-      const pos = await (sourceFront: any).getBreakpointPositionsCompressed();
-      actorLines = Object.keys(pos).map(line => Number(line));
-    } else {
-      // Other exceptions could be due to the target thread being shut down.
-      console.warn(`getSourceActorBreakableLines failed: ${e}`);
-    }
-  }
-
-  return actorLines;
+  const positions = await ThreadFront.getBreakpointPositionsCompressed(actor);
+  return Object.keys(pos).map(line => Number(line));
 }
 
 function getFrontByID(actorID: String) {
@@ -597,7 +558,6 @@ const clientCommands = {
   setSkipPausing,
   setEventListenerBreakpoints,
   getEventListenerBreakpointTypes,
-  lookupTarget,
   getFrontByID,
   timeWarp,
   instantWarp,

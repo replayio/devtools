@@ -83,6 +83,17 @@ const ThreadFront = {
     );
     return { scriptSource, contentType };
   },
+
+  async getBreakpointPositionsCompressed(scriptId, range) {
+    const begin = range ? range.start : undefined;
+    const end = range ? range.end : undefined;
+    const { linePositions } = await sendMessage(
+      "Debugger.getPossibleBreakpoints",
+      { scriptId, begin, end },
+      this.sessionId
+    );
+    return linePositions;
+  },
 };
 
 module.exports = { ThreadFront };

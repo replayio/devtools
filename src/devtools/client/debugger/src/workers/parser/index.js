@@ -12,12 +12,14 @@ import type { SourceLocation, SourceId, SourceContent } from "../../types";
 import type { SourceScope } from "./getScopes/visitor";
 import type { SymbolDeclarations } from "./getSymbols";
 
+const { log } = require("protocol/socket");
+
 export class ParserDispatcher extends WorkerDispatcher {
   async findOutOfScopeLocations(
     sourceId: string,
     position: AstPosition
   ): Promise<AstLocation[]> {
-    ChromeUtils.recordReplayLog(`WorkerDispatch Parser findOutOfScopeLocations`);
+    log(`WorkerDispatch Parser findOutOfScopeLocations`);
     return this.invoke("findOutOfScopeLocations", sourceId, position);
   }
 
@@ -25,22 +27,22 @@ export class ParserDispatcher extends WorkerDispatcher {
     sourceId: SourceId,
     pausedPosition: AstPosition
   ): Promise<?SourceLocation> {
-    ChromeUtils.recordReplayLog(`WorkerDispatch Parser getNextStep`);
+    log(`WorkerDispatch Parser getNextStep`);
     return this.invoke("getNextStep", sourceId, pausedPosition);
   }
 
   async clearState(): Promise<void> {
-    ChromeUtils.recordReplayLog(`WorkerDispatch Parser clearState`);
+    log(`WorkerDispatch Parser clearState`);
     return this.invoke("clearState");
   }
 
   async getScopes(location: SourceLocation): Promise<SourceScope[]> {
-    ChromeUtils.recordReplayLog(`WorkerDispatch Parser getScopes`);
+    log(`WorkerDispatch Parser getScopes`);
     return this.invoke("getScopes", location);
   }
 
   async getSymbols(sourceId: string): Promise<SymbolDeclarations> {
-    ChromeUtils.recordReplayLog(`WorkerDispatch Parser getSymbols`);
+    log(`WorkerDispatch Parser getSymbols`);
     return this.invoke("getSymbols", sourceId);
   }
 
@@ -52,12 +54,12 @@ export class ParserDispatcher extends WorkerDispatcher {
       isWasm: content.type === "wasm",
     };
 
-    ChromeUtils.recordReplayLog(`WorkerDispatch Parser setSource`);
+    log(`WorkerDispatch Parser setSource`);
     return this.invoke("setSource", astSource);
   }
 
   async hasSyntaxError(input: string): Promise<string | false> {
-    ChromeUtils.recordReplayLog(`WorkerDispatch Parser hasSyntaxError`);
+    log(`WorkerDispatch Parser hasSyntaxError`);
     return this.invoke("hasSyntaxError", input);
   }
 
@@ -70,7 +72,7 @@ export class ParserDispatcher extends WorkerDispatcher {
     shouldMapBindings?: boolean,
     shouldMapAwait?: boolean
   ): Promise<{ expression: string }> {
-    ChromeUtils.recordReplayLog(`WorkerDispatch Parser mapExpression`);
+    log(`WorkerDispatch Parser mapExpression`);
     return this.invoke(
       "mapExpression",
       expression,

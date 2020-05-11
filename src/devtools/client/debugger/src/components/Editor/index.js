@@ -160,7 +160,7 @@ class Editor extends PureComponent<Props, State> {
   componentWillReceiveProps(nextProps: Props) {
     let editor = this.state.editor;
 
-    if (true || !this.state.editor && nextProps.selectedSource) {
+    if (!this.state.editor && nextProps.selectedSource) {
       editor = this.setupEditor();
     }
 

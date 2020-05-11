@@ -392,7 +392,9 @@ class WebReplayPlayer extends Component {
     this.clearPreviewLocation();
 
     // Restore the normal graphics.
-    paintGraphics(gCurrentScreenShot, gCurrentMouse);
+    if (gCurrentScreenShot) {
+      paintGraphics(gCurrentScreenShot, gCurrentMouse);
+    }
 
     this.setState({ hoverTime: null, startDragTime: null });
   }
