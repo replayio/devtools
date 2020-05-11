@@ -69,16 +69,14 @@ async function initialize() {
   initSocket(dispatch);
 
   paintMessage("Loading…");
-  const description = await sendMessage("Recording.getDescription", {
-    recordingId,
+
+  sendMessage("Recording.getDescription", { recordingId }).then(description => {
+    gToolbox.webReplayPlayer.setRecordingDescription(description);
   });
 
-  gToolbox.webReplayPlayer.setRecordingDescription(description);
-
-  const { sessionId } = await sendMessage("Recording.createSession", {
-    recordingId,
+  sendMessage("Recording.createSession", { recordingId }).then(({ sessionId }) => {
+    ThreadFront.setSessionId(sessionId);
   });
-  ThreadFront.setSessionId(sessionId);
 }
 
 const gToolbox = {

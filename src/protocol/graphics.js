@@ -115,7 +115,10 @@ const gMouseEvents = [];
 const gMouseClickEvents = [];
 
 function onPaints({ paints }) {
-  paints.forEach(entry => insertEntrySorted(gPaintPoints, entry));
+  paints.forEach(({ point, time, screenShots }) => {
+    const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg").hash;
+    insertEntrySorted(gPaintPoints, { point, time, paintHash });
+  });
 }
 
 function onMouseEvents({ events }) {
@@ -134,6 +137,11 @@ ThreadFront.sessionWaiter.promise.then(sessionId => {
   sendMessage("Session.findMouseEvents", {}, sessionId);
   addEventListener("Session.mouseEvents", onMouseEvents);
 });
+
+function addLastScreen(screen, point, time) {
+  insertEntrySorted(gPaintPoints, { point, time, paintHash: screen.hash });
+  addScreenShot(screen);
+}
 
 function closestPaintOrMouseEvent(time) {
   const paintEntry = closestEntry(gPaintPoints, time);
@@ -176,29 +184,25 @@ function addScreenShot(screenShot) {
 // How recently a click must have occurred for it to be drawn.
 const ClickThresholdMs = 200;
 
-async function paintGraphicsAtTime(time) {
+async function getGraphicsAtTime(time) {
   const { point, paintHash } = mostRecentEntry(gPaintPoints, time);
 
   if (point == "0") {
     // There are no graphics at the beginning of the recording.
     clearGraphics();
-    return;
+    return {};
   }
 
-  const existing = gScreenShots.get(paintHash);
+  let screen = gScreenShots.get(paintHash);
 
-  if (existing) {
-    paintGraphics(existing);
-    return;
+  if (!screen) {
+    screen = (await sendMessage(
+      "Graphics.getPaintContents",
+      { point, mimeType: "image/jpeg" },
+      ThreadFront.sessionId
+    )).screen;
+    addScreenShot(screen);
   }
-
-  const { screen } = await sendMessage(
-    "Graphics.getPaintContents",
-    { point, mimeType: "image/jpeg" },
-    ThreadFront.sessionId
-  );
-
-  addScreenShot(screen);
 
   let mouse;
   const mouseEvent = mostRecentEntry(gMouseEvents, time);
@@ -211,7 +215,7 @@ async function paintGraphicsAtTime(time) {
     }
   }
 
-  paintGraphics(screen, mouse);
+  return { screen, mouse };
 }
 
 //////////////////////////////
@@ -228,6 +232,11 @@ let gDrawMouse;
 let gDrawMessage;
 
 function paintGraphics(screenShot, mouse) {
+  if (!screenShot) {
+    clearGraphics();
+    return;
+  }
+  assert(screenShot.data);
   addScreenShot(screenShot);
   gDrawImage = new Image();
   gDrawImage.onload = refreshGraphics;
@@ -320,11 +329,12 @@ function refreshGraphics() {
 window.onresize = refreshGraphics;
 
 module.exports = {
+  addLastScreen,
   closestPaintOrMouseEvent,
   nextPaintOrMouseEvent,
   nextPaintEvent,
   previousPaintEvent,
   paintGraphics,
-  paintGraphicsAtTime,
+  getGraphicsAtTime,
   paintMessage,
 };

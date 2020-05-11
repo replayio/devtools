@@ -50,6 +50,8 @@ const ThreadFront = {
   // everywhere needed throughout the devtools client.
   id: "MainThreadId",
 
+  currentPoint: "0",
+
   sessionId: null,
   sessionWaiter: defer(),
 
@@ -64,9 +66,20 @@ const ThreadFront = {
   // Map breakpointId to information about the breakpoint, for all installed breakpoints.
   breakpoints: new Map(),
 
-  setSessionId(sessionId) {
+  setOnEndpoint(onEndpoint) {
+    assert(!this.onEndpoint);
+    this.onEndpoint = onEndpoint;
+  },
+
+  async setSessionId(sessionId) {
     this.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
+
+    const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
+    if (this.onEndpoint) {
+      this.onEndpoint(endpoint);
+    }
+    this.timeWarp(endpoint.point, endpoint.time);
   },
 
   async ensureProcessed(onMissingRegions, onUnprocessedRegions) {
@@ -77,7 +90,18 @@ const ThreadFront = {
     addEventListener("Session.unprocessedRegions", onUnprocessedRegions);
   },
 
-  timeWarp(point) {},
+  setOnTimeWarp(onTimeWarp) {
+    assert(!this.onTimeWarp);
+    this.onTimeWarp = onTimeWarp;
+    onTimeWarp(this.currentPoint);
+  },
+
+  timeWarp(point, time) {
+    this.currentPoint = point;
+    if (this.onTimeWarp) {
+      this.onTimeWarp(time);
+    }
+  },
 
   async findScripts(onScript) {
     const sessionId = await this.sessionWaiter.promise;

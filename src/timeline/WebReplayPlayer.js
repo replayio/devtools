@@ -19,8 +19,9 @@ const {
   nextPaintOrMouseEvent,
   nextPaintEvent,
   previousPaintEvent,
-  paintGraphicsAtTime,
+  getGraphicsAtTime,
   paintGraphics,
+  addLastScreen,
 } = require("protocol/graphics");
 const {
   pointEquals,
@@ -168,6 +169,8 @@ class WebReplayPlayer extends Component {
     });
 
     this.toolbox.webReplayPlayer = this;
+    this.threadFront.setOnTimeWarp(this.onTimeWarp.bind(this));
+    this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -179,9 +182,22 @@ class WebReplayPlayer extends Component {
   }
 
   setRecordingDescription({ duration, lastScreen }) {
-    this.setState({ recordingDuration: duration, zoomEndTime: duration });
+    this.setState({
+      recordingDuration: duration,
+      zoomEndTime: duration,
+      currentTime: duration,
+    });
+
+    // Paint the last screen to get it up quickly, even though we don't know yet
+    // which execution point this is and have warped here.
     gCurrentScreenShot = lastScreen;
-    paintGraphics(gCurrentScreenShot);
+    paintGraphics(lastScreen);
+  }
+
+  onEndpoint({ point, time }) {
+    if (gCurrentScreenShot) {
+      addLastScreen(gCurrentScreenShot, point, time);
+    }
   }
 
   get toolbox() {
@@ -372,7 +388,7 @@ class WebReplayPlayer extends Component {
     dbg.clearPreviewPausedLocation();
   }
 
-  onProgressBarMouseMove(e) {
+  async onProgressBarMouseMove(e) {
     const { hoverTime, recordingDuration } = this.state;
     if (!recordingDuration) {
       return;
@@ -383,7 +399,10 @@ class WebReplayPlayer extends Component {
 
     if (hoverTime != time) {
       this.setState({ hoverTime: time });
-      paintGraphicsAtTime(time);
+      const { screen, mouse } = await getGraphicsAtTime(time);
+      if (time == this.state.hoverTime) {
+        paintGraphics(screen, mouse);
+      }
     }
   }
 
@@ -392,9 +411,7 @@ class WebReplayPlayer extends Component {
     this.clearPreviewLocation();
 
     // Restore the normal graphics.
-    if (gCurrentScreenShot) {
-      paintGraphics(gCurrentScreenShot, gCurrentMouse);
-    }
+    paintGraphics(gCurrentScreenShot, gCurrentMouse);
 
     this.setState({ hoverTime: null, startDragTime: null });
   }
@@ -444,21 +461,32 @@ class WebReplayPlayer extends Component {
     }
   }
 
-  seek(point) {
+  seek(point, time) {
     if (!point) {
       return null;
     }
 
-    return this.threadFront.timeWarp(point);
+    return this.threadFront.timeWarp(point, time);
   }
 
-  seekTime(time) {
-    if (time == null) {
+  seekTime(targetTime) {
+    if (targetTime == null) {
       return null;
     }
 
-    const { point } = closestPaintOrMouseEvent(time);
-    this.seek(point);
+    const { point, time } = closestPaintOrMouseEvent(targetTime);
+    this.seek(point, time);
+  }
+
+  async onTimeWarp(time) {
+    this.setState({ currentTime: time });
+
+    const { screen, mouse } = await getGraphicsAtTime(time);
+    if (this.state.currentTime == time) {
+      gCurrentScreenShot = screen;
+      gCurrentMouse = mouse;
+      paintGraphics(screen, mouse);
+    }
   }
 
   doPrevious() {
@@ -508,12 +536,15 @@ class WebReplayPlayer extends Component {
     return this.state.zoomEndTime;
   }
 
-  playbackPaintFinished(time) {
+  playbackPaintFinished(time, screen, mouse) {
     if (this.state.playback && time == this.state.playback.time) {
+      paintGraphics(screen, mouse);
       const next = this.nextPlaybackTime(time);
       if (next) {
         log(`WebReplayPlayer PlaybackNext`);
-        paintGraphicsAtTime(next).then(() => this.playbackPaintFinished(next));
+        getGraphicsAtTime(next).then(({ screen, mouse }) => {
+          this.playbackPaintFinished(next, screen, mouse);
+        });
         this.setState({ playback: { time: next }, currentTime: next });
       } else {
         log(`WebReplayPlayer StopPlayback`);
@@ -530,7 +561,9 @@ class WebReplayPlayer extends Component {
     if (!time) {
       time = this.state.zoomStartTime;
     }
-    paintGraphicsAtTime(time).then(() => this.playbackPaintFinished(time));
+    getGraphicsAtTime(time).then(({ screen, mouse }) => {
+      this.playbackPaintFinished(time, screen, mouse);
+    });
 
     this.setState({ playback: { time }, currentTime: time });
   }
