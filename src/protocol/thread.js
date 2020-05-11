@@ -53,7 +53,16 @@ const ThreadFront = {
   sessionId: null,
   sessionWaiter: defer(),
 
+  // Map scriptId to URL.
+  scriptURLs: new Map(),
+
+  // Map URL to scriptId[].
+  urlScripts: new Map(),
+
   skipPausing: false,
+
+  // Map breakpointId to information about the breakpoint, for all installed breakpoints.
+  breakpoints: new Map(),
 
   setSessionId(sessionId) {
     this.sessionId = sessionId;
@@ -74,7 +83,18 @@ const ThreadFront = {
     const sessionId = await this.sessionWaiter.promise;
 
     sendMessage("Debugger.findScripts", {}, sessionId);
-    addEventListener("Debugger.scriptParsed", onScript);
+    addEventListener("Debugger.scriptParsed", script => {
+      const { scriptId, url } = script;
+      if (url) {
+        this.scriptURLs.set(scriptId, url);
+        if (this.urlScripts.has(url)) {
+          this.urlScripts.get(url).push(scriptId);
+        } else {
+          this.urlScripts.set(url, [scriptId]);
+        }
+      }
+      onScript(script);
+    });
   },
 
   async getScriptSource(scriptId) {
@@ -89,16 +109,56 @@ const ThreadFront = {
   async getBreakpointPositionsCompressed(scriptId, range) {
     const begin = range ? range.start : undefined;
     const end = range ? range.end : undefined;
-    const { linePositions } = await sendMessage(
+    const { lineLocations } = await sendMessage(
       "Debugger.getPossibleBreakpoints",
       { scriptId, begin, end },
       this.sessionId
     );
-    return linePositions;
+    return lineLocations;
   },
 
   setSkipPausing(skip) {
     this.skipPausing = skip;
+  },
+
+  async setBreakpoint(scriptId, line, column, condition) {
+    const location = { scriptId, line, column };
+    try {
+      const { breakpointId } = await sendMessage(
+        "Debugger.setBreakpoint",
+        { location, condition },
+        this.sessionId
+      );
+      if (breakpointId) {
+        this.breakpoints.set(breakpointId, { location });
+      }
+    } catch (e) {
+      // An error will be generated if the breakpoint location is not valid for
+      // this script. We don't keep precise track of which locations are valid
+      // for which inline scripts in an HTML file (which share the same URL),
+      // so ignore these errors.
+    }
+  },
+
+  setBreakpointByURL(url, line, column, condition) {
+    return Promise.all(this.urlScripts.get(url).map(scriptId => {
+      return this.setBreakpoint(scriptId, line, column, condition);
+    }));
+  },
+
+  async removeBreakpoint(scriptId, line, column) {
+    for (const [breakpointId, { location }] of this.breakpoints.entries()) {
+      if (location.scriptId == scriptId && location.line == line && location.column == column) {
+        this.breakpoints.delete(breakpointId);
+        await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
+      }
+    }
+  },
+
+  removeBreakpointByURL(url, line, column) {
+    return Promise.all(this.urlScripts.get(url).map(scriptId => {
+      return this.removeBreakpoint(scriptId, line, column);
+    }));
   },
 };
 

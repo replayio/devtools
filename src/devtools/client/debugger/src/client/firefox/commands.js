@@ -216,14 +216,27 @@ function setBreakpoint(
   options = maybeGenerateLogGroupId(options);
   breakpoints[locationKey(location)] = { location, options };
 
-  return forEachThread(thread => thread.setBreakpoint(location, options));
+  const { condition, logValue } = options;
+  if (logValue) {
+    throw new Error("NYI");
+  }
+
+  const { line, column, sourceUrl, sourceId } = location;
+  if (sourceId) {
+    return forEachThread(thread => thread.setBreakpoint(sourceId, line, column, condition));
+  }
+  return forEachThread(thread => thread.setBreakpointByURL(sourceUrl, line, column, condition));
 }
 
 function removeBreakpoint(location: PendingLocation) {
   maybeClearLogpoint((location: any));
   delete breakpoints[locationKey((location: any))];
 
-  return forEachThread(thread => thread.removeBreakpoint(location));
+  const { line, column, sourceUrl, sourceId } = location;
+  if (sourceId) {
+    return forEachThread(thread => thread.removeBreakpoint(sourceId, line, column));
+  }
+  return forEachThread(thread => thread.removeBreakpointByURL(sourceUrl, line, column));
 }
 
 function evaluateInFrame(
@@ -379,7 +392,7 @@ function pauseGrip(thread: string, func: Function): ObjectFront {
   return lookupThreadFront(thread).pauseGrip(func);
 }
 
-function registerSourceActor(sourceActorId: string, sourceId: SourceId) {
+function registerSourceActor(sourceActorId: string, sourceId: SourceId, url) {
   sourceActors[sourceActorId] = sourceId;
   eventMethods.onSourceActorRegister(sourceActorId);
 }
