@@ -57,6 +57,7 @@ const url = new URL(window.location.href);
 
 const recordingId = url.searchParams.get("id");
 const dispatch = url.searchParams.get("dispatch");
+const test = url.searchParams.get("test");
 
 setTimeout(initialize, 0);
 
@@ -76,6 +77,10 @@ async function initialize() {
 
   sendMessage("Recording.createSession", { recordingId }).then(({ sessionId }) => {
     ThreadFront.setSessionId(sessionId);
+    if (test) {
+      window.Test = require("./test/harness");
+      ThreadFront.setTest(test);
+    }
   });
 }
 
@@ -122,6 +127,8 @@ const gToolbox = {
   },
   parserService: {},
 };
+
+window.gToolbox = gToolbox;
 
 const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
 ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));

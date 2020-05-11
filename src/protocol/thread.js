@@ -82,12 +82,22 @@ const ThreadFront = {
     this.timeWarp(endpoint.point, endpoint.time);
   },
 
+  setTest(test) {
+    this.testName = test;
+  },
+
   async ensureProcessed(onMissingRegions, onUnprocessedRegions) {
     const sessionId = await this.sessionWaiter.promise;
 
-    sendMessage("Session.ensureProcessed", {}, sessionId);
     addEventListener("Session.missingRegions", onMissingRegions);
     addEventListener("Session.unprocessedRegions", onUnprocessedRegions);
+
+    await sendMessage("Session.ensureProcessed", {}, sessionId);
+    if (this.testName) {
+      const script = document.createElement("script");
+      script.src = `/test?${this.testName}`;
+      document.head.appendChild(script);
+    }
   },
 
   setOnTimeWarp(onTimeWarp) {
