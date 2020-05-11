@@ -60,9 +60,6 @@ const GridElementWidthResizer = createFactory(
   require("devtools/client/shared/components/splitter/GridElementWidthResizer")
 );
 
-const l10n = require("devtools/client/webconsole/utils/l10n");
-const { Utils: WebConsoleUtils } = require("devtools/client/webconsole/utils");
-
 const SELF_XSS_OK = l10n.getStr("selfxss.okstring");
 const SELF_XSS_MSG = l10n.getFormatStr("selfxss.msg", [SELF_XSS_OK]);
 
