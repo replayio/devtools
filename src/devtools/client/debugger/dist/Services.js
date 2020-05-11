@@ -1,1 +1,8 @@
-module.exports = { appinfo: {} };
+module.exports = {
+  appinfo: {},
+  prefs: {
+    getBoolPref: () => {},
+    getIntPref: () => {},
+    getCharPref: () => {}
+  }
+};
