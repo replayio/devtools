@@ -29,19 +29,21 @@ import type { ThunkArgs } from "../types";
  * @memberof actions/pause
  * @static
  */
-export function paused(pauseInfo: Pause) {
+export function paused(pauseInfo) {
   return async function({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
-    const { thread, frame, why, executionPoint } = pauseInfo;
+    const { thread, executionPoint } = pauseInfo;
 
-    dispatch({ type: "PAUSED", thread, why, executionPoint, frame });
+    dispatch({ type: "PAUSED", thread, executionPoint });
 
     // Get a context capturing the newly paused and selected thread.
     const cx = getThreadContext(getState());
     assert(cx.thread == thread, "Thread mismatch");
 
+    /*
     if (frame) {
       dispatch(selectLocation(cx, frame.location, { remap: true }));
     }
+    */
 
     await dispatch(markEvaluatedExpressionsAsLoading(cx));
 
@@ -63,10 +65,7 @@ export function paused(pauseInfo: Pause) {
 
       // Run after fetching scoping data so that it may make use of the sourcemap
       // expression mappings for local variables.
-      const atException = why.type == "exception";
-      if (!atException || !isEvaluatingExpression(getState(), thread)) {
-        await dispatch(evaluateExpressions(cx));
-      }
+      await dispatch(evaluateExpressions(cx));
     })());
 
     await Promise.all(promises);

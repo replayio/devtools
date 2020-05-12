@@ -54,9 +54,9 @@ function setupCommands(dependencies: Dependencies) {
   breakpoints = {};
 }
 
-function setupCommandsTopTarget(targetFront: Target) {
-  currentTarget = targetFront;
-  currentThreadFront = targetFront.threadFront;
+function lookupThreadFront(thread) {
+  // There is only a single thread possible currently.
+  return ThreadFront;
 }
 
 function createObjectFront(grip: Grip): ObjectFront {
@@ -145,7 +145,8 @@ async function sourceContents({
   actor,
   thread,
 }: SourceActor): Promise<{| source: any, contentType: ?string |}> {
-  const { scriptSource, contentType } = await ThreadFront.getScriptSource(actor);
+  const threadFront = lookupThreadFront(thread);
+  const { scriptSource, contentType } = await threadFront.getScriptSource(actor);
   return { source: scriptSource, contentType };
 }
 
@@ -315,9 +316,8 @@ function getProperties(thread: string, grip: Grip): Promise<*> {
 }
 
 async function getFrames(thread: string) {
-  const threadFront = lookupThreadFront(thread);
-  const response = await threadFront.getFrames(0, CALL_STACK_PAGE_SIZE);
-  return response.frames.map<?Frame>((frame, i) =>
+  const frames = await lookupThreadFront(thread).getFrames(0, CALL_STACK_PAGE_SIZE);
+  return frames.map<?Frame>((frame, i) =>
     createFrame(thread, frame, i)
   );
 }
@@ -570,4 +570,4 @@ const clientCommands = {
   eventMethods,
 };
 
-export { setupCommands, setupCommandsTopTarget, clientCommands };
+export { setupCommands, clientCommands };

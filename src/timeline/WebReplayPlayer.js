@@ -169,7 +169,7 @@ class WebReplayPlayer extends Component {
     });
 
     this.toolbox.webReplayPlayer = this;
-    this.threadFront.setOnTimeWarp(this.onTimeWarp.bind(this));
+    this.threadFront.on("paused", this.onPaused.bind(this));
     this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
   }
 
@@ -478,7 +478,7 @@ class WebReplayPlayer extends Component {
     this.seek(point, time);
   }
 
-  async onTimeWarp(time) {
+  async onPaused({ time }) {
     this.setState({ currentTime: time });
 
     const { screen, mouse } = await getGraphicsAtTime(time);

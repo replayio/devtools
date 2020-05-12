@@ -34,6 +34,8 @@ import type {
 import type { ThunkArgs } from "../types";
 import type { Command } from "../../reducers/types";
 
+const { log } = require("protocol/socket");
+
 export function selectThread(cx: Context, thread: ThreadId) {
   return async ({ dispatch, getState, client }: ThunkArgs) => {
     await dispatch({ cx, type: "SELECT_THREAD", thread });
@@ -65,7 +67,7 @@ export function selectThread(cx: Context, thread: ThreadId) {
 export function command(cx: ThreadContext, type: Command) {
   return async (thunkArgs: ThunkArgs) => {
     const { dispatch, getState, client } = thunkArgs;
-    ChromeUtils.recordReplayLog(`Debugger CommandStart ${type}`);
+    log(`Debugger CommandStart ${type}`);
 
     const thread = getCurrentThread(getState());
     const point = getThreadExecutionPoint(getState(), thread);

@@ -48,9 +48,10 @@ const { defer, assert } = require("./utils");
 const ThreadFront = {
   // When replaying there is only a single thread currently. Use this thread ID
   // everywhere needed throughout the devtools client.
-  id: "MainThreadId",
+  actor: "MainThreadId",
 
   currentPoint: "0",
+  currentPointHasFrames: false,
 
   sessionId: null,
   sessionWaiter: defer(),
@@ -62,6 +63,20 @@ const ThreadFront = {
   urlScripts: new Map(),
 
   skipPausing: false,
+
+  eventListeners: new Map(),
+
+  on(name, handler) {
+    if (this.eventListeners.has(name)) {
+      this.eventListeners.get(name).push(handler);
+    } else {
+      this.eventListeners.set(name, [handler]);
+    }
+  },
+
+  emit(name, value) {
+    (this.eventListeners.get(name) || []).forEach(handler => handler(value));
+  },
 
   // Map breakpointId to information about the breakpoint, for all installed breakpoints.
   breakpoints: new Map(),
@@ -100,17 +115,10 @@ const ThreadFront = {
     }
   },
 
-  setOnTimeWarp(onTimeWarp) {
-    assert(!this.onTimeWarp);
-    this.onTimeWarp = onTimeWarp;
-    onTimeWarp(this.currentPoint);
-  },
-
-  timeWarp(point, time) {
+  timeWarp(point, time, hasFrames) {
     this.currentPoint = point;
-    if (this.onTimeWarp) {
-      this.onTimeWarp(time);
-    }
+    this.currentPointHasFrames = hasFrames;
+    this.emit("paused", { point, time });
   },
 
   async findScripts(onScript) {
@@ -193,6 +201,16 @@ const ThreadFront = {
     return Promise.all(this.urlScripts.get(url).map(scriptId => {
       return this.removeBreakpoint(scriptId, line, column);
     }));
+  },
+
+  getFrames(start, limit) {
+    assert(!this.currentPointHasFrames);
+    return [];
+  },
+
+  rewind() {
+    setTimeout(() => this.emit("resumed"), 0);
+    return new Promise(resolve => {});
   },
 };
 
