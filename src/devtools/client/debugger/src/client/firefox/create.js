@@ -20,18 +20,16 @@ export function prepareSourcePayload(
   threadFront: ThreadFront,
   source: SourcePayload
 ): GeneratedSourceData {
-  const { isServiceWorker } = threadFront.parentFront;
-
   // We populate the set of sources as soon as we hear about them. Note that
   // this means that we have seen an actor, but it might still be in the
   // debounced queue for creation, so the Redux store itself might not have
   // a source actor with this ID yet.
   clientCommands.registerSourceActor(
     source.actor,
-    makeSourceId(source, isServiceWorker)
+    makeSourceId(source, false)
   );
 
-  return { thread: threadFront.actor, isServiceWorker, source };
+  return { thread: threadFront.actor, source };
 }
 
 export function createFrame(
@@ -44,15 +42,17 @@ export function createFrame(
   }
 
   const location = {
-    sourceId: clientCommands.getSourceForActor(frame.where.actor),
-    line: frame.where.line,
-    column: frame.where.column,
+    sourceId: clientCommands.getSourceForActor(frame.location.scriptId),
+    line: frame.location.line,
+    column: frame.location.column,
   };
 
+  const displayName = frame.functionName || `(${frame.type})`;
+
   return {
-    id: frame.actor,
+    id: frame.frameId,
     thread,
-    displayName: frame.displayName,
+    displayName,
     location,
     generatedLocation: location,
     this: frame.this,

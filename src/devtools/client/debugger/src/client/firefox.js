@@ -28,15 +28,12 @@ export async function onConnect(connection: any, _actions: Object, panel) {
   actions.connect("", ThreadFront.actor, {}, false);
 
   ThreadFront.findScripts(({ scriptId, url, sourceMapURL }) => {
-    const packet = {
-      thread: ThreadFront.id,
-      source: {
-        actor: scriptId,
-        url,
-        sourceMapURL,
-      },
+    const source = {
+      actor: scriptId,
+      url,
+      sourceMapURL,
     };
-    actions.newGeneratedSources([packet]);
+    clientEvents.newSource(ThreadFront, { source });
   });
 }
 

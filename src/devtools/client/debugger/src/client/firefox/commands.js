@@ -41,8 +41,6 @@ let sourceActors: { [ActorId]: SourceId };
 let breakpoints: { [string]: Object };
 let eventBreakpoints: ?EventListenerActiveList;
 
-const CALL_STACK_PAGE_SIZE = 1000;
-
 type Dependencies = {
   devToolsClient: DevToolsClient,
 };
@@ -316,7 +314,7 @@ function getProperties(thread: string, grip: Grip): Promise<*> {
 }
 
 async function getFrames(thread: string) {
-  const frames = await lookupThreadFront(thread).getFrames(0, CALL_STACK_PAGE_SIZE);
+  const frames = await lookupThreadFront(thread).getFrames();
   return frames.map<?Frame>((frame, i) =>
     createFrame(thread, frame, i)
   );

@@ -45,6 +45,33 @@ const {
 } = require("./socket");
 const { defer, assert } = require("./utils");
 
+// Information about a protocol pause.
+function Pause(sessionId, point) {
+  this.frames = new Map();
+  this.scopes = new Map();
+  this.objects = new Map();
+
+  this.waiter = sendMessage("Session.createPause", { point }, sessionId).then(
+    ({ pauseId, stack, data }) => {
+      this.addData(data);
+      this.stack = stack.map(id => this.frames.get(id));
+    }
+  );
+}
+
+Pause.prototype = {
+  addData({ frames, scopes, objects }) {
+    (frames || []).forEach(f => this.frames.set(f.frameId, f));
+    (scopes || []).forEach(s => this.scopes.set(s.scopeId, s));
+    (objects || []).forEach(o => this.objects.set(o.objectId, o));
+  },
+
+  async getFrames() {
+    await this.waiter;
+    return this.stack;
+  },
+};
+
 const ThreadFront = {
   // When replaying there is only a single thread currently. Use this thread ID
   // everywhere needed throughout the devtools client.
@@ -53,8 +80,8 @@ const ThreadFront = {
   currentPoint: "0",
   currentPointHasFrames: false,
 
-  // Resolves with pause data for the current point.
-  pauseWaiter: null,
+  // Any pause for the current point.
+  currentPause: null,
 
   sessionId: null,
   sessionWaiter: defer(),
@@ -121,7 +148,7 @@ const ThreadFront = {
   timeWarp(point, time, hasFrames) {
     this.currentPoint = point;
     this.currentPointHasFrames = hasFrames;
-    this.pauseWaiter = null;
+    this.currentPause = null;
     this.emit("paused", { point, time });
   },
 
@@ -207,20 +234,19 @@ const ThreadFront = {
     }));
   },
 
-  async getFrames(start, limit) {
+  ensurePause() {
+    if (!this.currentPause) {
+      this.currentPause = new Pause(this.sessionId, this.currentPoint);
+    }
+  },
+
+  getFrames() {
     if (!this.currentPointHasFrames) {
       return [];
     }
 
-    if (!this.pauseWaiter) {
-      this.pauseWaiter = sendMessage(
-        "Session.createPause",
-        { point: this.currentPoint },
-        this.sessionId
-      );
-    }
-
-    const { pauseId, stack, data } = await this.pauseWaiter;
+    this.ensurePause();
+    return this.currentPause.getFrames();
   },
 
   rewind() {
