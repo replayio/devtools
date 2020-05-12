@@ -49,9 +49,9 @@ function initSocket(address) {
   socket.onmessage = makeInfallible(onSocketMessage);
 }
 
-function sendMessage(method, params, sessionId) {
+function sendMessage(method, params, sessionId, pauseId) {
   const id = gNextMessageId++;
-  const msg = { id, sessionId, method, params };
+  const msg = { id, sessionId, pauseId, method, params };
 
   if (gSocketOpen) {
     doSend(msg);

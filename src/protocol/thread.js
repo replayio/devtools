@@ -53,6 +53,9 @@ const ThreadFront = {
   currentPoint: "0",
   currentPointHasFrames: false,
 
+  // Resolves with pause data for the current point.
+  pauseWaiter: null,
+
   sessionId: null,
   sessionWaiter: defer(),
 
@@ -118,6 +121,7 @@ const ThreadFront = {
   timeWarp(point, time, hasFrames) {
     this.currentPoint = point;
     this.currentPointHasFrames = hasFrames;
+    this.pauseWaiter = null;
     this.emit("paused", { point, time });
   },
 
@@ -203,9 +207,20 @@ const ThreadFront = {
     }));
   },
 
-  getFrames(start, limit) {
-    assert(!this.currentPointHasFrames);
-    return [];
+  async getFrames(start, limit) {
+    if (!this.currentPointHasFrames) {
+      return [];
+    }
+
+    if (!this.pauseWaiter) {
+      this.pauseWaiter = sendMessage(
+        "Session.createPause",
+        { point: this.currentPoint },
+        this.sessionId
+      );
+    }
+
+    const { pauseId, stack, data } = await this.pauseWaiter;
   },
 
   rewind() {

@@ -334,7 +334,6 @@ class WebConsoleUI {
     this.document = window.document;
     this.rootElement = this.document.documentElement;
 
-    debugger;
     this.outputNode = this.document.getElementById(
       "toolbox-content-webconsole"
     );
