@@ -12,13 +12,13 @@ const {
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 
-const {
-  getAdHocFrontOrPrimitiveGrip,
-} = require("protocol/object");
+const { getAdHocFrontOrPrimitiveGrip } = require("protocol/object");
 
 const { constants } = require("devtools/client/webconsole/constants");
 
-const { START_IGNORE_ACTION } = require("devtools/client/shared/redux/middleware/ignore");
+const {
+  START_IGNORE_ACTION,
+} = require("devtools/client/shared/redux/middleware/ignore");
 const ConsoleCommands = require("devtools/client/webconsole/commands.js");
 
 const ZoomKeys = require("devtools/client/shared/zoom-keys");
@@ -95,7 +95,7 @@ class WebConsoleUI {
 
     // Ignore Fronts that are already destroyed
     if (filterDisconnectedProxies) {
-      proxies = proxies.filter(proxy => {
+      proxies = proxies.filter((proxy) => {
         return (
           proxy && proxy.webConsoleFront && !!proxy.webConsoleFront.actorID
         );
@@ -334,7 +334,10 @@ class WebConsoleUI {
     this.document = window.document;
     this.rootElement = this.document.documentElement;
 
-    this.outputNode = this.document.getElementById("toolbox-content-webconsole");
+    debugger;
+    this.outputNode = this.document.getElementById(
+      "toolbox-content-webconsole"
+    );
 
     const toolbox = this.hud.toolbox;
 
@@ -360,7 +363,7 @@ class WebConsoleUI {
   _initOutputSyntaxHighlighting() {
     // Given a DOM node, we syntax highlight identically to how the input field
     // looks. See https://codemirror.net/demo/runmode.html;
-    const syntaxHighlightNode = node => {
+    const syntaxHighlightNode = (node) => {
       const editor = this.jsterm && this.jsterm.editor;
       if (node && editor) {
         node.classList.add("cm-s-mozilla");
@@ -396,7 +399,7 @@ class WebConsoleUI {
     let clearShortcut;
     clearShortcut = l10n.getStr("webconsole.clear.key");
 
-    shortcuts.on(clearShortcut, event => this.clearOutput(true, event));
+    shortcuts.on(clearShortcut, (event) => this.clearOutput(true, event));
   }
 
   getLongString(grip) {

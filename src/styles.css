@@ -93,3 +93,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
 @import url("devtools/client/themes/common.css");
+@import url("devtools/client/debugger/src/debugger.css");
+@import url("devtools/client/debugger/dist/vendors.css");
+@import url("devtools/client/themes/splitters.css");

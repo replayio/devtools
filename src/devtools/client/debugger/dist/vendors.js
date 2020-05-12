@@ -8,10 +8,23 @@
 	else if(typeof define === 'function' && define.amd)
 		define(["devtools/client/shared/vendor/react-prop-types", "devtools/client/shared/vendor/react-dom-factories", "devtools/client/shared/vendor/react", "Services", "devtools/shared/flags", "devtools/client/shared/vendor/react-dom", "devtools/client/shared/vendor/lodash", "devtools/client/framework/menu", "devtools/client/framework/menu-item"], factory);
 	else {
-		var a = typeof exports === 'object' ? factory(require("devtools/client/shared/vendor/react-prop-types"), require("devtools/client/shared/vendor/react-dom-factories"), require("devtools/client/shared/vendor/react"), require("devtools/shared/flags"), require("devtools/client/shared/vendor/react-dom"), require("devtools/client/shared/vendor/lodash"), require("devtools/client/framework/menu"), require("devtools/client/framework/menu-item")) : factory(root["devtools/client/shared/vendor/react-prop-types"], root["devtools/client/shared/vendor/react-dom-factories"], root["devtools/client/shared/vendor/react"], root["Services"], root["devtools/shared/flags"], root["devtools/client/shared/vendor/react-dom"], root["devtools/client/shared/vendor/lodash"], root["devtools/client/framework/menu"], root["devtools/client/framework/menu-item"]);
+		var a = typeof exports === 'object' ? factory(
+      require("devtools/client/shared/vendor/react-prop-types"),
+      require("devtools/client/shared/vendor/react-dom-factories"),
+      require("devtools/client/shared/vendor/react"),
+      require("devtools/shared/flags"),
+      require("devtools/client/shared/vendor/react-dom"),
+      require("devtools/client/shared/vendor/lodash"),
+      require("devtools/client/framework/menu"), require("devtools/client/framework/menu-item")) : factory(root["devtools/client/shared/vendor/react-prop-types"], root["devtools/client/shared/vendor/react-dom-factories"], root["devtools/client/shared/vendor/react"], root["Services"], root["devtools/shared/flags"], root["devtools/client/shared/vendor/react-dom"], root["devtools/client/shared/vendor/lodash"], root["devtools/client/framework/menu"], root["devtools/client/framework/menu-item"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_6__, __WEBPACK_EXTERNAL_MODULE_37__, __WEBPACK_EXTERNAL_MODULE_103__, __WEBPACK_EXTERNAL_MODULE_112__, __WEBPACK_EXTERNAL_MODULE_417__, __WEBPACK_EXTERNAL_MODULE_490__, __WEBPACK_EXTERNAL_MODULE_491__) {
+})(typeof self !== 'undefined' ? self : this, function(
+  __WEBPACK_EXTERNAL_MODULE_0__,
+  __WEBPACK_EXTERNAL_MODULE_1__,
+  __WEBPACK_EXTERNAL_MODULE_6__,
+  __WEBPACK_EXTERNAL_MODULE_37__,
+  __WEBPACK_EXTERNAL_MODULE_103__,
+  __WEBPACK_EXTERNAL_MODULE_112__, __WEBPACK_EXTERNAL_MODULE_417__, __WEBPACK_EXTERNAL_MODULE_490__, __WEBPACK_EXTERNAL_MODULE_491__) {
 
   return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -5721,7 +5734,7 @@ module.exports = SplitBox;
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 const React = __webpack_require__(6);
 
-const ReactDOM = __webpack_require__(112);
+const ReactDOM = __webpack_require__(103);
 
 const Draggable = React.createFactory(__webpack_require__(447));
 const {
@@ -5989,7 +6002,7 @@ module.exports = SplitBox;
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 const React = __webpack_require__(6);
 
-const ReactDOM = __webpack_require__(112);
+const ReactDOM = __webpack_require__(103);
 
 const {
   Component
