@@ -71,17 +71,21 @@ async function initialize() {
 
   paintMessage("Loading…");
 
-  sendMessage("Recording.getDescription", { recordingId }).then(description => {
-    gToolbox.webReplayPlayer.setRecordingDescription(description);
-  });
-
-  sendMessage("Recording.createSession", { recordingId }).then(({ sessionId }) => {
-    ThreadFront.setSessionId(sessionId);
-    if (test) {
-      window.Test = require("./test/harness");
-      ThreadFront.setTest(test);
+  sendMessage("Recording.getDescription", { recordingId }).then(
+    (description) => {
+      gToolbox.webReplayPlayer.setRecordingDescription(description);
     }
-  });
+  );
+
+  sendMessage("Recording.createSession", { recordingId }).then(
+    ({ sessionId }) => {
+      ThreadFront.setSessionId(sessionId);
+      if (test) {
+        window.Test = require("./test/harness");
+        ThreadFront.setTest(test);
+      }
+    }
+  );
 }
 
 const gToolbox = {
@@ -123,7 +127,7 @@ const gToolbox = {
   },
 
   sourceMapService: {
-    getOriginalLocations: locations => locations,
+    getOriginalLocations: (locations) => locations,
   },
   parserService: {},
 };
