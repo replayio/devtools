@@ -51,6 +51,7 @@ function defer() {
 
 function assert(v) {
   if (!v) {
+    console.error("Assertion failed!");
     throw new Error("Assertion failed!");
   }
 }

@@ -210,7 +210,14 @@ const ThreadFront = {
 
   rewind() {
     setTimeout(() => this.emit("resumed"), 0);
-    return new Promise(resolve => {});
+    sendMessage(
+      "Debugger.findRewindTarget",
+      { point: this.currentPoint },
+      this.sessionId
+    ).then(({ target }) => {
+      const { point, time, frame } = target;
+      this.timeWarp(point, time, !!frame);
+    });
   },
 };
 
