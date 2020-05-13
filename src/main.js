@@ -126,6 +126,7 @@ const gToolbox = {
 
   sourceMapService: {
     getOriginalLocations: (locations) => locations,
+    getOriginalLocation: location => location,
   },
   parserService: {},
 };

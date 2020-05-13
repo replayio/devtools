@@ -4,12 +4,9 @@
 
 "use strict";
 
+const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+
 /*
-loader.lazyRequireGetter(
-  this,
-  "PropTypes",
-  "devtools/client/shared/vendor/react-prop-types"
-);
 loader.lazyRequireGetter(
   this,
   "HTMLTooltip",

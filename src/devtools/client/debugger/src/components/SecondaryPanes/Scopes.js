@@ -22,15 +22,14 @@ import {
 import { getScopes } from "../../utils/pause/scopes";
 import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 
-// eslint-disable-next-line import/named
-import { objectInspector } from "devtools-reps";
+const { objectInspector } = require("devtools-reps");
 
 import type { ThreadContext, Why } from "../../types";
 import type { NamedValue } from "../../utils/pause/scopes/types";
 
 import "./Scopes.css";
 
-const { ObjectInspector } = objectInspector;
+const ObjectInspector = objectInspector.ObjectInspector.default;
 
 type OwnProps = {||};
 type Props = {

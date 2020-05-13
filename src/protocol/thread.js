@@ -70,6 +70,11 @@ Pause.prototype = {
     await this.waiter;
     return this.stack;
   },
+
+  async getScopes(frameId) {
+    const frame = this.frames.get(frameId);
+    return frame.scopeChain.map(id => this.scopes.get(id));
+  },
 };
 
 const ThreadFront = {
@@ -247,6 +252,10 @@ const ThreadFront = {
 
     this.ensurePause();
     return this.currentPause.getFrames();
+  },
+
+  getScopes(frameId) {
+    return this.currentPause.getScopes(frameId);
   },
 
   rewind() {

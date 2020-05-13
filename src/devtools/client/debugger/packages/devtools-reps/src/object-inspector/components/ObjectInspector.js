@@ -14,7 +14,7 @@ import Components from "devtools-components";
 const Tree = createFactory(Components.Tree);
 require("./ObjectInspector.css");
 
-const ObjectInspectorItem = createFactory(require("./ObjectInspectorItem"));
+const ObjectInspectorItem = createFactory(require("./ObjectInspectorItem").default);
 
 const classnames = require("classnames");
 

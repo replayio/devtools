@@ -39,15 +39,14 @@ export function paused(pauseInfo) {
     const cx = getThreadContext(getState());
     assert(cx.thread == thread, "Thread mismatch");
 
-    /*
-    if (frame) {
-      dispatch(selectLocation(cx, frame.location, { remap: true }));
-    }
-    */
-
     await dispatch(markEvaluatedExpressionsAsLoading(cx));
 
     await dispatch(fetchFrames(cx));
+
+    const frame = getSelectedFrame(getState(), thread);
+    if (frame) {
+      dispatch(selectLocation(cx, frame.location, { remap: true }));
+    }
 
     const hiddenBreakpoint = getHiddenBreakpoint(getState());
     if (hiddenBreakpoint) {

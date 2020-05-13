@@ -14,7 +14,12 @@ function verifyPrefSchema() {
 
 const prefs = {
   expressions: [],
-  projectDirectoryRoot: "",
+  projectDirectoryRoot: "http://example.com",
+  startPanelSize: 300,
+  endPanelSize: 300,
+  scopesVisible: true,
+  callStackVisible: true,
+  breakpointsVisible: true,
 };
 
 const features = {

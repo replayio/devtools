@@ -20,7 +20,7 @@ export function getScopes(
   selectedFrame: Frame,
   frameScopes: ?RenderableScope
 ): ?(NamedValue[]) {
-  if (!why || !selectedFrame) {
+  if (!selectedFrame) {
     return null;
   }
 

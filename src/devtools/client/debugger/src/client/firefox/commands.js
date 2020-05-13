@@ -320,8 +320,41 @@ async function getFrames(thread: string) {
   );
 }
 
+function convertScope(protocolScope) {
+  const {
+    scopeId,
+    type,
+    functionLexical,
+    object,
+    bindings: protocolBindings,
+  } = protocolScope;
+
+  let bindings;
+  if (protocolBindings) {
+    const variables = {};
+    for (const value of protocolBindings) {
+      variables[value.name] = value;
+    }
+    bindings = { arguments: [], variables };
+  }
+
+  return {
+    actor: scopeId,
+    parent: null,
+    bindings,
+    object,
+    type,
+    scopeKind: functionLexical ? "function lexical" : "",
+  };
+}
+
 async function getFrameScopes(frame: Frame): Promise<*> {
-  return lookupThreadFront(frame.thread).getEnvironment(frame.id);
+  const scopes = await lookupThreadFront(frame.thread).getScopes(frame.id);
+  const converted = scopes.map(convertScope);
+  for (let i = 0; i + 1 < converted.length; i++) {
+    converted[i].parent = converted[i + 1];
+  }
+  return converted[0];
 }
 
 function pauseOnExceptions(
@@ -507,7 +540,8 @@ function instantWarp(point: ExecutionPoint) {
 }
 
 function fetchAncestorFramePositions(index: number) {
-  return currentThreadFront.fetchAncestorFramePositions(index);
+  return new Promise(resolve => {});
+  //return currentThreadFront.fetchAncestorFramePositions(index);
 }
 
 function pickExecutionPoints(count: number, options) {

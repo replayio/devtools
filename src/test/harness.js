@@ -36,7 +36,7 @@ function getThreadContext(dbg) {
   return dbgSelectors.getThreadContext();
 }
 
-function findSource(url, { silent } = { silent: false }) {
+function findSource(url) {
   if (typeof url !== "string") {
     // Support passing in a source object itelf all APIs that use this
     // function support both styles
@@ -44,14 +44,16 @@ function findSource(url, { silent } = { silent: false }) {
     return source;
   }
 
-  return waitUntil(() => {
-    const sources = dbgSelectors.getSourceList();
-    return sources.find(s => (s.url || "").includes(url));
-  });
+  const sources = dbgSelectors.getSourceList();
+  return sources.find(s => (s.url || "").includes(url));
+}
+
+function waitForSource(url) {
+  return waitUntil(() => findSource(url));
 }
 
 async function addBreakpoint(url, line, column, options) {
-  const source = await findSource(url);
+  const source = await waitForSource(url);
   const sourceId = source.id;
   const bpCount = dbgSelectors.getBreakpointCount();
   await dbg.actions.addBreakpoint(
@@ -66,6 +68,39 @@ async function addBreakpoint(url, line, column, options) {
 
 function isPaused() {
   return dbgSelectors.getIsPaused(dbgSelectors.getCurrentThread());
+}
+
+async function waitForLoadedScopes(dbg) {
+  const scopes = await waitUntil(() => document.querySelector(".scopes-list"));
+  // Since scopes auto-expand, we can assume they are loaded when there is a tree node
+  // with the aria-level attribute equal to "2".
+  await waitUntil(() => scopes.querySelector('.tree-node[aria-level="2"]'));
+}
+
+function waitForSelectedSource(url) {
+  const {
+    getSelectedSourceWithContent,
+    hasSymbols,
+    getBreakableLines,
+  } = dbgSelectors;
+
+  return waitUntil(() => {
+    const source = getSelectedSourceWithContent() || {};
+    if (!source.content) {
+      return false;
+    }
+
+    if (!url) {
+      return true;
+    }
+
+    const newSource = findSource(url);
+    if (newSource.id != source.id) {
+      return false;
+    }
+
+    return hasSymbols(source) && getBreakableLines(source.id);
+  });
 }
 
 async function waitForPaused(url) {
@@ -84,6 +119,11 @@ async function waitForPaused(url) {
   await waitForSelectedSource(url);
 }
 
+function getVisibleSelectedFrameLine() {
+  const frame = dbgSelectors.getVisibleSelectedFrame();
+  return frame && frame.location.line;
+}
+
 function resumeThenPauseAtLineFunctionFactory(method) {
   return async function(lineno, waitForLine) {
     await dbg.actions[method](getThreadContext());
@@ -96,7 +136,7 @@ function resumeThenPauseAtLineFunctionFactory(method) {
       await waitUntil(() => lineno == getVisibleSelectedFrameLine());
     } else {
       const pauseLine = getVisibleSelectedFrameLine();
-      ok(pauseLine == lineno, `Paused at line ${pauseLine} expected ${lineno}`);
+      assert(pauseLine == lineno);
     }
   };
 }

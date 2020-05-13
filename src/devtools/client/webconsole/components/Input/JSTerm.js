@@ -11,15 +11,11 @@ const isMacOS = Services.appinfo.OS === "Darwin";
 const EventEmitter = require("devtools/shared/event-emitter");
 
 const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
+const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
 
 /*
 loader.lazyRequireGetter(this, "Debugger", "Debugger");
 
-loader.lazyRequireGetter(
-  this,
-  "PropTypes",
-  "devtools/client/shared/vendor/react-prop-types"
-);
 loader.lazyRequireGetter(
   this,
   "KeyCodes",
