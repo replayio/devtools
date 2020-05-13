@@ -287,6 +287,18 @@ const ThreadFront = {
       this.timeWarp(point, time, !!frame);
     });
   },
+
+  resume() {
+    setTimeout(() => this.emit("resumed"), 0);
+    sendMessage(
+      "Debugger.findResumeTarget",
+      { point: this.currentPoint },
+      this.sessionId
+    ).then(({ target }) => {
+      const { point, time, frame } = target;
+      this.timeWarp(point, time, !!frame);
+    });
+  },
 };
 
 module.exports = { ThreadFront };
