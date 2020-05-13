@@ -120,10 +120,8 @@ const gToolbox = {
       return;
     }
     this.currentTool = name;
-    for (const panelName of Object.keys(this._panels)) {
-      const container = document.getElementById(`toolbox-content-${panelName}`);
-      container.style.visibility = panelName == name ? "visible" : "hidden";
-    }
+    const toolbox = document.getElementById(`toolbox`);
+    toolbox.classList = name;
   },
 
   sourceMapService: {
