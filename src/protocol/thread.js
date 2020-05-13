@@ -47,12 +47,15 @@ const { defer, assert } = require("./utils");
 
 // Information about a protocol pause.
 function Pause(sessionId, point) {
+  this.sessionId = sessionId;
+
   this.frames = new Map();
   this.scopes = new Map();
   this.objects = new Map();
 
   this.waiter = sendMessage("Session.createPause", { point }, sessionId).then(
     ({ pauseId, stack, data }) => {
+      this.pauseId = pauseId;
       this.addData(data);
       this.stack = stack.map(id => this.frames.get(id));
     }
@@ -74,6 +77,17 @@ Pause.prototype = {
   async getScopes(frameId) {
     const frame = this.frames.get(frameId);
     return frame.scopeChain.map(id => this.scopes.get(id));
+  },
+
+  async evaluateInFrame(frameId, expression) {
+    const { result, exception, data } = await sendMessage(
+      "Pause.evaluateInFrame",
+      { frameId, expression },
+      this.sessionId,
+      this.pauseId
+    );
+    this.addData(data);
+    return { result, exception };
   },
 };
 
@@ -256,6 +270,10 @@ const ThreadFront = {
 
   getScopes(frameId) {
     return this.currentPause.getScopes(frameId);
+  },
+
+  evaluateInFrame(frameId, text) {
+    return this.currentPause.evaluateInFrame(frameId, text);
   },
 
   rewind() {

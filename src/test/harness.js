@@ -5,6 +5,7 @@
 // Harness for use by automated tests. Adapted from various test devtools
 // test harnesses.
 
+const { ThreadFront } = require("protocol/thread");
 const { assert } = require("protocol/utils");
 
 const dbg = gToolbox._panels.jsdebugger.getVarsForTests();
@@ -152,6 +153,20 @@ const stepOverToLine = resumeThenPauseAtLineFunctionFactory("stepOver");
 const stepInToLine = resumeThenPauseAtLineFunctionFactory("stepIn");
 const stepOutToLine = resumeThenPauseAtLineFunctionFactory("stepOut");
 
+async function evaluateInTopFrame(text) {
+  const frames = await ThreadFront.getFrames();
+  const { frameId } = frames[0];
+  const { result } = await ThreadFront.evaluateInFrame(frameId, text);
+  assert(!("unserializable" in result));
+  assert(!("object" in result));
+  return result.value;
+}
+
+async function checkEvaluateInTopFrame(text, expected) {
+  const rval = await evaluateInTopFrame(text);
+  assert(rval == expected);
+}
+
 module.exports = {
   dbg,
   addBreakpoint,
@@ -161,4 +176,5 @@ module.exports = {
   stepOverToLine,
   stepInToLine,
   stepOutToLine,
+  checkEvaluateInTopFrame,
 };
