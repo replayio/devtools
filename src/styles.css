@@ -41,25 +41,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   top: 60%;
   left: 0px;
   width: 100%;
-  height: calc(40% - 50px);
   font-family: sans-serif;
-
+  height: calc(40%);
+  display: flex;
+  flex-direction: column;
   --toolbox-background: #f9f9fa;
 }
 
 #toolbox-timeline {
-  height: 25px;
+  height: 35px;
   margin-top: -5px;
   background: var(--toolbox-background);
+  border-top: 1px solid var(--theme-splitter-color);
 }
 
 #toolbox-toolbar {
-  height: 25px;
+  height: 35px;
   border-top: 0px;
+  padding-left: 18px;
+  background: var(--toolbox-background);
+  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 #toolbox-contents {
   height: 100%;
+  position: relative;
 }
 
 .command-button {
@@ -73,13 +79,65 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 .toolbar-panel-button {
   float: left;
-  height: 22px;
-  padding: 3px 10px 0px 10px;
+  display: flex;
+  margin-left: 10px;
   cursor: default;
+  line-height: 35px;
+  font-size: 1.1rem;
+  color: var(--theme-toolbar-color);
+  align-items: center;
+  padding: 0 5px;
 }
 
 .toolbar-panel-button:hover {
-  background-color: green;
+  background-color: var(--toolbarbutton-focus-background);
+}
+
+.toolbar-panel-icon {
+  width: 16px;
+  height: 17px;
+  margin-right: 5px;
+}
+
+#toolbox-toolbar-webconsole .toolbar-panel-icon {
+  mask-image: url(/src/devtools/client/themes/images/tool-webconsole.svg);
+  background: var(--theme-toolbar-color);
+}
+
+#toolbox-toolbar-jsdebugger .toolbar-panel-icon {
+  mask-image: url(/src/devtools/client/themes/images/tool-debugger.svg);
+  background: var(--theme-toolbar-color);
+}
+
+.toolbar-panel-content {
+  position: absolute;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#toolbox.webconsole #toolbox-content-webconsole {
+  z-index: 10;
+}
+
+#toolbox.jsdebugger #toolbox-content-jsdebugger {
+  z-index: 10;
+}
+
+#toolbox.jsdebugger #toolbox-toolbar-jsdebugger {
+  color: var(--toolbarbutton-checked-background);
+}
+
+#toolbox.jsdebugger #toolbox-toolbar-jsdebugger .toolbar-panel-icon {
+  background: var(--toolbarbutton-checked-background);
+}
+
+#toolbox.webconsole #toolbox-toolbar-webconsole {
+  color: var(--toolbarbutton-checked-background);
+}
+
+#toolbox.webconsole #toolbox-toolbar-webconsole .toolbar-panel-icon {
+  background: var(--toolbarbutton-checked-background);
 }
 
 .content-iframe {
