@@ -13,18 +13,13 @@ const EventEmitter = require("devtools/shared/event-emitter");
 const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
 const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
 
+const { KeyCodes } = require("devtools/client/shared/keycodes");
+const Editor = require("devtools/client/shared/sourceeditor/editor");
+
 /*
 loader.lazyRequireGetter(this, "Debugger", "Debugger");
 
-loader.lazyRequireGetter(
-  this,
-  "KeyCodes",
-  "devtools/client/shared/keycodes",
-  true
-);
-*/
 
-const Editor = require("devtools/client/shared/sourceeditor/editor");
 
 /*
 loader.lazyRequireGetter(

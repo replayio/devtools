@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   left: 0px;
   width: 100%;
   font-family: sans-serif;
-  height: 60%;
+  height: 40%;
   display: flex;
   flex-direction: column;
   --toolbox-background: #f9f9fa;
@@ -147,6 +147,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   padding-top: 2px;
 }
 
+.jsdebugger .CodeMirror {
+  height: 100%;
+}
+
 @import url("devtools/client/themes/toolbox.css");
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
@@ -157,3 +161,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @import url("devtools/client/shared/sourceeditor/codemirror/lib/codemirror.css");
 @import url("devtools/client/themes/dark-theme.css");
 @import url("devtools/client/themes/light-theme.css");
+
+@import url("/devtools/client/shared/components/reps/reps.css");
