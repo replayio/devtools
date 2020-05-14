@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @import url("./components/variables.css");
-@import url("resource://devtools/client/shared/components/reps/reps.css");
 
 @import url("./components/A11yIntention.css");
 @import url("./components/App.css");

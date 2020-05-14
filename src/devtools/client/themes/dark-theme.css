@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-@import url(resource://devtools/client/themes/variables.css);
-@import url(resource://devtools/client/themes/common.css);
-@import url(resource://devtools/client/themes/toolbars.css);
-@import url(chrome://devtools/skin/tooltips.css);
+@import url(/devtools/client/themes/variables.css);
+@import url(/devtools/client/themes/common.css);
+@import url(/devtools/client/themes/toolbars.css);
+@import url(/devtools/skin/tooltips.css);
 
 body {
   margin: 0;
@@ -69,7 +69,7 @@ body {
 .variable-or-property .token-number,
 .variable-or-property[return] > .title > .name,
 .variable-or-property[scope] > .title > .name {
-  color: #709AFF;
+  color: #709aff;
 }
 
 .CodeMirror-Tern-completion-number:before {
@@ -122,7 +122,7 @@ body {
 .cm-s-mozilla .cm-string-2,
 .variable-or-property .token-string,
 .CodeMirror-Tern-farg {
-  color: #709AFF;
+  color: #709aff;
 }
 
 .CodeMirror-Tern-completion-string:before,
@@ -151,7 +151,8 @@ body {
 .devtools-toolbar,
 .devtools-sidebar-tabs tabs,
 .devtools-sidebar-alltabs,
-.cm-s-mozilla .CodeMirror-dialog { /* General toolbar styling */
+.cm-s-mozilla .CodeMirror-dialog {
+  /* General toolbar styling */
   color: var(--theme-body-color);
   background-color: var(--theme-toolbar-background);
   border-color: var(--theme-splitter-color);
@@ -174,15 +175,16 @@ body {
  * Best effort to match the existing theme, some of the colors
  * are duplicated here to prevent weirdness in the main theme. */
 
-.CodeMirror.cm-s-mozilla  { /* Inherit platform specific font sizing and styles */
+.CodeMirror.cm-s-mozilla {
+  /* Inherit platform specific font sizing and styles */
   font-family: inherit;
   font-size: inherit;
   background: transparent;
 }
 
-.CodeMirror.cm-s-mozilla  pre,
-.CodeMirror.cm-s-mozilla  pre.CodeMirror-line,
-.CodeMirror.cm-s-mozilla  pre.CodeMirror-line-like {
+.CodeMirror.cm-s-mozilla pre,
+.CodeMirror.cm-s-mozilla pre.CodeMirror-line,
+.CodeMirror.cm-s-mozilla pre.CodeMirror-line-like {
   color: var(--theme-text-color-strong);
 }
 
@@ -199,32 +201,36 @@ body {
   border-left: solid 1px #fff;
 }
 
-.cm-s-mozilla.CodeMirror-focused .CodeMirror-selected { /* selected text (focused) */
+.cm-s-mozilla.CodeMirror-focused .CodeMirror-selected {
+  /* selected text (focused) */
   background: var(--theme-selection-background-hover);
 }
 
-.cm-s-mozilla .CodeMirror-selected { /* selected text (unfocused) */
+.cm-s-mozilla .CodeMirror-selected {
+  /* selected text (unfocused) */
   background: var(--theme-selection-background-hover);
 }
 
-.cm-s-mozilla .CodeMirror-activeline-background { /* selected color with alpha */
-  background: rgba(185, 215, 253, .15);
+.cm-s-mozilla .CodeMirror-activeline-background {
+  /* selected color with alpha */
+  background: rgba(185, 215, 253, 0.15);
 }
 
-div.cm-s-mozilla span.CodeMirror-matchingbracket { /* highlight brackets */
-  outline: solid 1px rgba(255, 255, 255, .25);
+div.cm-s-mozilla span.CodeMirror-matchingbracket {
+  /* highlight brackets */
+  outline: solid 1px rgba(255, 255, 255, 0.25);
   color: white;
 }
 
 /* Highlight for a line that contains an error. */
 div.CodeMirror div.error-line {
-  background: rgba(255,0,0,0.2);
+  background: rgba(255, 0, 0, 0.2);
 }
 
 /* Generic highlighted text */
 div.CodeMirror span.marked-text {
-  background: rgba(255,255,0,0.2);
-  border: 1px dashed rgba(192,192,0,0.6);
+  background: rgba(255, 255, 0, 0.2);
+  border: 1px dashed rgba(192, 192, 0, 0.6);
   margin-inline-start: -1px;
   margin-inline-end: -1px;
 }
@@ -234,11 +240,13 @@ div.CodeMirror span.eval-text {
   background-color: #556;
 }
 
-.cm-s-mozilla .CodeMirror-linenumber { /* line number text */
+.cm-s-mozilla .CodeMirror-linenumber {
+  /* line number text */
   color: var(--grey-40);
 }
 
-.cm-s-mozilla .CodeMirror-gutters { /* vertical line next to line numbers */
+.cm-s-mozilla .CodeMirror-gutters {
+  /* vertical line next to line numbers */
   border-right-color: var(--theme-toolbar-background);
   background-color: var(--theme-sidebar-background);
 }
@@ -249,7 +257,7 @@ div.CodeMirror span.eval-text {
 
 .CodeMirror-hints,
 .CodeMirror-Tern-tooltip {
-  box-shadow: 0 0 4px rgba(255, 255, 255, .3);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
   background-color: #0f171f;
   color: var(--theme-body-color);
 }
