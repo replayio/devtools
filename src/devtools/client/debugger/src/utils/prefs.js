@@ -14,7 +14,7 @@ function verifyPrefSchema() {
 
 const prefs = {
   expressions: [],
-  projectDirectoryRoot: "http://example.com",
+  projectDirectoryRoot: "",
   startPanelSize: 300,
   endPanelSize: 300,
   scopesVisible: true,
