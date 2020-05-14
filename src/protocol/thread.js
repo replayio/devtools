@@ -139,6 +139,8 @@ const ThreadFront = {
     this.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
 
+    console.log(`GotSessionId ${sessionId}`);
+
     const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
     if (this.onEndpoint) {
       this.onEndpoint(endpoint);

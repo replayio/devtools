@@ -1,5 +1,3 @@
-/* Copyright 2020 Brian Hackett */
-
 const fs = require("fs");
 const http = require("http");
 const port = 7997;
