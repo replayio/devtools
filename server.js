@@ -6,7 +6,11 @@ const port = 7997;
 
 const server = http.createServer((request, response) => {
   try {
-    const url = request.url.substring(1) || "index.html";
+    let url = request.url.substring(1) || "index.html";
+    const index = url.indexOf("?");
+    if (index != -1) {
+      url = url.substring(0, index);
+    }
     const content = fs.readFileSync(url);
     response.writeHead(200, { "Content-Type": getContentType(request.url) });
     response.end(content);
