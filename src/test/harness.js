@@ -120,6 +120,10 @@ async function waitForPaused(url) {
   await waitForSelectedSource(url);
 }
 
+async function waitForPausedNoSource() {
+  await waitUntil(() => isPaused());
+}
+
 function getVisibleSelectedFrameLine() {
   const frame = dbgSelectors.getVisibleSelectedFrame();
   return frame && frame.location.line;
