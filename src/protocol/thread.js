@@ -278,10 +278,10 @@ const ThreadFront = {
     return this.currentPause.evaluateInFrame(frameId, text);
   },
 
-  rewind() {
+  _resumeOperation(command) {
     setTimeout(() => this.emit("resumed"), 0);
     sendMessage(
-      "Debugger.findRewindTarget",
+      command,
       { point: this.currentPoint },
       this.sessionId
     ).then(({ target }) => {
@@ -290,17 +290,12 @@ const ThreadFront = {
     });
   },
 
-  resume() {
-    setTimeout(() => this.emit("resumed"), 0);
-    sendMessage(
-      "Debugger.findResumeTarget",
-      { point: this.currentPoint },
-      this.sessionId
-    ).then(({ target }) => {
-      const { point, time, frame } = target;
-      this.timeWarp(point, time, !!frame);
-    });
-  },
+  rewind() { this._resumeOperation("Debugger.findRewindTarget"); },
+  resume() { this._resumeOperation("Debugger.findResumeTarget"); },
+  reverseStepOver() { this._resumeOperation("Debugger.findReverseStepOverTarget"); },
+  stepOver() { this._resumeOperation("Debugger.findStepOverTarget"); },
+  stepIn() { this._resumeOperation("Debugger.findStepInTarget"); },
+  stepOut() { this._resumeOperation("Debugger.findStepOutTarget"); },
 };
 
 module.exports = { ThreadFront };
