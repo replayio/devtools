@@ -97,7 +97,7 @@ function onSocketMessage(evt) {
   if (msg.id) {
     const { method, resolve, reject } = gMessageWaiters.get(msg.id);
     if (msg.error) {
-      console.warn("Message failed", method, msg.error);
+      console.warn("Message failed", method, msg.error, msg.data);
       reject(msg.error);
     } else {
       resolve(msg.result);

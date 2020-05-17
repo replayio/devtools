@@ -387,11 +387,12 @@ async function blackBox(
   isBlackBoxed: boolean,
   range?: Range
 ): Promise<*> {
-  const sourceFront = currentThreadFront.source({ actor: sourceActor.actor });
+  const begin = range ? range.start : undefined;
+  const end = range ? range.end : undefined;
   if (isBlackBoxed) {
-    await sourceFront.unblackBox(range);
+    await ThreadFront.unblackbox(sourceActor.actor, begin, end);
   } else {
-    await sourceFront.blackBox(range);
+    await ThreadFront.blackbox(sourceActor.actor, begin, end);
   }
 }
 

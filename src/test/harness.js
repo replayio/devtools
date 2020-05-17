@@ -61,6 +61,16 @@ function waitForSource(url) {
   return waitUntil(() => findSource(url));
 }
 
+async function selectSource(url) {
+  const source = findSource(url);
+  await dbg.actions.selectLocation(
+    getContext(),
+    { sourceId: source.id },
+    { keepContext: false }
+  );
+  return waitForSelectedSource(url);
+}
+
 async function addBreakpoint(url, line, column, options) {
   const source = await waitForSource(url);
   const sourceId = source.id;
@@ -143,6 +153,7 @@ function getVisibleSelectedFrameLine() {
 
 function resumeThenPauseAtLineFunctionFactory(method) {
   return async function(lineno, waitForLine) {
+    console.log(`Starting ${method} to ${lineno}...`);
     await dbg.actions[method](getThreadContext());
     if (lineno !== undefined) {
       await waitForPaused();
@@ -155,6 +166,7 @@ function resumeThenPauseAtLineFunctionFactory(method) {
       const pauseLine = getVisibleSelectedFrameLine();
       assert(pauseLine == lineno);
     }
+    console.log(`Finished ${method} to ${lineno}!`);
   };
 }
 
@@ -194,9 +206,18 @@ async function waitForScopeValue(name, value) {
   });
 }
 
+async function toggleBlackboxSelectedSource() {
+  const { getSelectedSource } = dbgSelectors;
+  const blackboxed = getSelectedSource().isBlackBoxed;
+  document.querySelector(".black-box").click();
+  await waitUntil(() => getSelectedSource().isBlackBoxed != blackboxed);
+}
+
 module.exports = {
   dbg,
+  assert,
   finish,
+  selectSource,
   addBreakpoint,
   removeAllBreakpoints,
   rewindToLine,
@@ -207,4 +228,5 @@ module.exports = {
   stepOutToLine,
   checkEvaluateInTopFrame,
   waitForScopeValue,
+  toggleBlackboxSelectedSource,
 };

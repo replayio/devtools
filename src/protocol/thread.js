@@ -312,6 +312,22 @@ const ThreadFront = {
   stepOver() { this._resumeOperation("Debugger.findStepOverTarget"); },
   stepIn() { this._resumeOperation("Debugger.findStepInTarget"); },
   stepOut() { this._resumeOperation("Debugger.findStepOutTarget"); },
+
+  blackbox(scriptId, begin, end) {
+    return sendMessage(
+      "Debugger.blackboxScript",
+      { scriptId, begin, end },
+      this.sessionId
+    );
+  },
+
+  unblackbox(scriptId, begin, end) {
+    return sendMessage(
+      "Debugger.unblackboxScript",
+      { scriptId, begin, end },
+      this.sessionId
+    );
+  },
 };
 
 module.exports = { ThreadFront };
