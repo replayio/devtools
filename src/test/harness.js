@@ -187,6 +187,13 @@ async function checkEvaluateInTopFrame(text, expected) {
   await dbg.actions.deleteExpression({ input: text });
 }
 
+async function waitForScopeValue(name, value) {
+  return waitUntil(() => {
+    const nodes = document.querySelectorAll(".scopes-pane .object-node");
+    return [...nodes].some(node => node.innerText == `${name}\n: \n${value}`);
+  });
+}
+
 module.exports = {
   dbg,
   finish,
@@ -199,4 +206,5 @@ module.exports = {
   stepInToLine,
   stepOutToLine,
   checkEvaluateInTopFrame,
+  waitForScopeValue,
 };

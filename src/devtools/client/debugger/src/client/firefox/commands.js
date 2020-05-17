@@ -249,9 +249,10 @@ async function evaluateExpressions(scripts: Script[], options: EvaluateParam) {
   return Promise.all(scripts.map(script => evaluate(script, options)));
 }
 
-function valueToExpressionResult({ value, unserializableNumber, bigint, object }) {
+function convertProtocolValue({ value, unserializableNumber, bigint, object }) {
   if (object) {
-    throw new Error("NYI");
+    // NYI
+    return undefined;
   }
   if (unserializableNumber) {
     return Number(unserializableNumber);
@@ -274,9 +275,9 @@ async function evaluate(
     return { exception: "Evaluation failed" };
   }
   if (result) {
-    return { result: valueToExpressionResult(result) };
+    return { result: convertProtocolValue(result) };
   }
-  return { exception: valueToExpressionResult(exception) };
+  return { exception: convertProtocolValue(exception) };
 }
 
 async function autocomplete(
@@ -343,7 +344,7 @@ function convertScope(protocolScope) {
   if (protocolBindings) {
     const variables = {};
     for (const value of protocolBindings) {
-      variables[value.name] = value;
+      variables[value.name] = { value: convertProtocolValue(value) };
     }
     bindings = { arguments: [], variables };
   }
