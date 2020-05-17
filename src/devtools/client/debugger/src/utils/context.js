@@ -55,11 +55,6 @@ export type Context = NavigateContext | ThreadContext;
 export class ContextError extends Error {}
 
 export function validateNavigateContext(state: State, cx: Context) {
-  const newcx = getThreadContext(state);
-
-  if (newcx.navigateCounter != cx.navigateCounter) {
-    throw new ContextError("Page has navigated");
-  }
 }
 
 export function validateThreadContext(state: State, cx: ThreadContext) {

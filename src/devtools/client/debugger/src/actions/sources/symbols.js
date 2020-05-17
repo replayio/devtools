@@ -22,11 +22,10 @@ import type { Symbols } from "../../reducers/types";
 async function doSetSymbols(cx, source, { dispatch, getState, parser }) {
   const sourceId = source.id;
 
-  await dispatch(loadSourceText({ cx, source }));
+  await dispatch(loadSourceText({ source }));
 
   await dispatch({
     type: "SET_SYMBOLS",
-    cx,
     sourceId,
     [PROMISE]: parser.getSymbols(sourceId),
   });

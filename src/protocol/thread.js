@@ -279,14 +279,30 @@ const ThreadFront = {
   },
 
   _resumeOperation(command) {
-    setTimeout(() => this.emit("resumed"), 0);
+    let resumeEmitted = false;
+    let resumeTarget = null;
+
+    const warpToTarget = () => {
+      const { point, time, frame } = resumeTarget;
+      this.timeWarp(point, time, !!frame);
+    };
+
+    setTimeout(() => {
+      resumeEmitted = true;
+      this.emit("resumed");
+      if (resumeTarget) {
+        setTimeout(warpToTarget, 0);
+      }
+    }, 0);
     sendMessage(
       command,
       { point: this.currentPoint },
       this.sessionId
     ).then(({ target }) => {
-      const { point, time, frame } = target;
-      this.timeWarp(point, time, !!frame);
+      resumeTarget = target;
+      if (resumeEmitted) {
+        warpToTarget();
+      }
     });
   },
 

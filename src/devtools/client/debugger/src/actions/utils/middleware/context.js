@@ -21,8 +21,21 @@ function validateActionContext(getState, action) {
     return;
   }
 
-  // Validate using all available information in the context.
-  validateContext(getState(), action.cx);
+  // Watch for other actions which are unaffected by thread changes.
+  switch (action.type) {
+    case "SET_BREAKPOINT":
+    case "SET_SYMBOLS":
+      validateNavigateContext(getState(), action.cx);
+      break;
+    default:
+      try {
+        // Validate using all available information in the context.
+        validateContext(getState(), action.cx);
+      } catch (e) {
+        console.log(`ActionContextFailure ${action.type}`);
+        throw e;
+      }
+  }
 }
 
 function actionLogData(action) {
