@@ -249,24 +249,34 @@ async function evaluateExpressions(scripts: Script[], options: EvaluateParam) {
   return Promise.all(scripts.map(script => evaluate(script, options)));
 }
 
+function valueToExpressionResult({ value, unserializableNumber, bigint, object }) {
+  if (object) {
+    throw new Error("NYI");
+  }
+  if (unserializableNumber) {
+    return Number(unserializableNumber);
+  }
+  if (bigint) {
+    return bigint;
+  }
+  return value;
+}
+
 type EvaluateParam = { thread: string, frameId: ?FrameId };
 
 async function evaluate(
   script: ?Script,
   { thread, frameId }: EvaluateParam = {}
 ): Promise<{ result: ExpressionResult }> {
-  const params = { thread, frameActor: frameId };
-  if (!currentTarget || !script) {
-    return { result: null };
+  const threadFront = lookupThreadFront(thread);
+  const { result, exception, failed } = await threadFront.evaluateInFrame(frameId, script);
+  if (failed) {
+    return { exception: "Evaluation failed" };
   }
-
-  const target = thread ? lookupTarget(thread) : currentTarget;
-  const consoleFront = await target.getFront("console");
-  if (!consoleFront) {
-    return { result: null };
+  if (result) {
+    return { result: valueToExpressionResult(result) };
   }
-
-  return consoleFront.evaluateJSAsync(script, params);
+  return { exception: valueToExpressionResult(exception) };
 }
 
 async function autocomplete(

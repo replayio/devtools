@@ -153,18 +153,22 @@ const stepOverToLine = resumeThenPauseAtLineFunctionFactory("stepOver");
 const stepInToLine = resumeThenPauseAtLineFunctionFactory("stepIn");
 const stepOutToLine = resumeThenPauseAtLineFunctionFactory("stepOut");
 
-async function evaluateInTopFrame(text) {
-  const frames = await ThreadFront.getFrames();
-  const { frameId } = frames[0];
-  const { result } = await ThreadFront.evaluateInFrame(frameId, text);
-  assert(!("unserializable" in result));
-  assert(!("object" in result));
-  return result.value;
+async function ensureWatchpointsExpanded() {
+  const header = document.querySelector(".watch-expressions-pane ._header");
+  if (!header.querySelector(".expanded")) {
+    header.click();
+    await waitUntil(() => header.querySelector(".expanded"));
+  }
 }
 
 async function checkEvaluateInTopFrame(text, expected) {
-  const rval = await evaluateInTopFrame(text);
-  assert(rval == expected);
+  await ensureWatchpointsExpanded();
+  await dbg.actions.addExpression(getThreadContext(), text);
+  await waitUntil(() => {
+    const node = document.querySelector(".watch-expressions-pane .object-node");
+    return node && node.innerText == `${text}: ${expected}`;
+  });
+  await dbg.actions.deleteExpression({ input: text });
 }
 
 module.exports = {

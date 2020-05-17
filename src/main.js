@@ -128,7 +128,9 @@ const gToolbox = {
     getOriginalLocations: (locations) => locations,
     getOriginalLocation: location => location,
   },
-  parserService: {},
+  parserService: {
+    hasSyntaxError: text => false,
+  },
 };
 
 window.gToolbox = gToolbox;

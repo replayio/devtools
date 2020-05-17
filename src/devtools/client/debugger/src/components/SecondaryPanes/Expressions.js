@@ -29,7 +29,7 @@ import type { Expression, ThreadContext } from "../../types";
 
 import "./Expressions.css";
 
-const { ObjectInspector } = objectInspector;
+const ObjectInspector = objectInspector.ObjectInspector.default;
 
 type State = {
   editing: boolean,

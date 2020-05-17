@@ -89,7 +89,7 @@ function shouldAutoExpand(depth, item, debuggeeUrl, projectRoot) {
     return false;
   }
 
-  const { host } = parse(debuggeeUrl);
+  const { host } = debuggeeUrl.length ? parse(debuggeeUrl) : { host: "" };
   return item.name === host;
 }
 
