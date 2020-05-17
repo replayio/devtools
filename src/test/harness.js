@@ -29,11 +29,19 @@ async function waitUntil(fn) {
   }
 }
 
-function getContext(dbg) {
+function finish() {
+  console.log("TestFinished");
+
+  // This is pretty goofy but this is recognized during automated tests and sent
+  // to the UI process to indicate the test has finished.
+  dump(`WebReplaySendAsyncMessage TestFinished`);
+}
+
+function getContext() {
   return dbgSelectors.getContext();
 }
 
-function getThreadContext(dbg) {
+function getThreadContext() {
   return dbgSelectors.getThreadContext();
 }
 
@@ -58,13 +66,17 @@ async function addBreakpoint(url, line, column, options) {
   const sourceId = source.id;
   const bpCount = dbgSelectors.getBreakpointCount();
   await dbg.actions.addBreakpoint(
-    getContext(dbg),
+    getContext(),
     { sourceId, line, column },
     options
   );
   await waitUntil(() => {
     return dbgSelectors.getBreakpointCount() == bpCount + 1;
   });
+}
+
+function removeAllBreakpoints() {
+  return dbg.actions.removeAllBreakpoints(getContext());
 }
 
 function isPaused() {
@@ -177,7 +189,9 @@ async function checkEvaluateInTopFrame(text, expected) {
 
 module.exports = {
   dbg,
+  finish,
   addBreakpoint,
+  removeAllBreakpoints,
   rewindToLine,
   resumeToLine,
   reverseStepOverToLine,
