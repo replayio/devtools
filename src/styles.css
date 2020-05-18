@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #toolbox {
   position: absolute;
+  overflow: hidden;
   top: 60%;
   left: 0px;
   width: 100%;
@@ -50,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #toolbox-timeline {
   height: 35px;
-  margin-top: -5px;
   background: var(--theme-toolbar-background);
   border-top: 1px solid var(--theme-splitter-color);
 }
@@ -58,7 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #toolbox-toolbar {
   height: 35px;
   border-top: 0px;
-  padding-left: 18px;
   background: var(--theme-toolbar-background);
   border-bottom: 1px solid var(--theme-splitter-color);
 }
@@ -86,7 +85,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   font-size: 1.1rem;
   color: var(--theme-toolbar-color);
   align-items: center;
-  padding: 0 5px;
 }
 
 .toolbar-panel-button:hover {

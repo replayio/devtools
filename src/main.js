@@ -126,10 +126,10 @@ const gToolbox = {
 
   sourceMapService: {
     getOriginalLocations: (locations) => locations,
-    getOriginalLocation: location => location,
+    getOriginalLocation: (location) => location,
   },
   parserService: {
-    hasSyntaxError: text => false,
+    hasSyntaxError: (text) => false,
   },
 };
 
