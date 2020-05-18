@@ -26,6 +26,7 @@ const {
   pointEquals,
   pointToString,
 } = require("protocol/execution-point-utils.js");
+const { log } = require("protocol/socket");
 
 const MessageState = overrides =>
   Object.freeze(
@@ -336,7 +337,7 @@ function messages(
 
   const { logLimit } = prefsState;
 
-  //ChromeUtils.recordReplayLog(`WebConsole ${action.type}`);
+  log(`WebConsole ${action.type}`);
 
   let newState;
   switch (action.type) {

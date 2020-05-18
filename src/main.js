@@ -131,6 +131,11 @@ const gToolbox = {
   parserService: {
     hasSyntaxError: (text) => false,
   },
+
+  // Helpers for debugging.
+  webconsoleState() {
+    gToolbox.webconsoleHud.ui.wrapper.getStore().getState();
+  },
 };
 
 window.gToolbox = gToolbox;

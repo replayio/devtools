@@ -15,6 +15,10 @@
 // packages/devtools-modules/src/unicode-url.js at
 // https://github.com/firefox-devtools/devtools-core
 
+const idnService = {
+  convertToDisplayIDN(name) { return name; }
+};
+
 /**
  * Gets a readble Unicode hostname from a hostname.
  *

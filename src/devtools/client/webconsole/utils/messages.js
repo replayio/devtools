@@ -97,7 +97,7 @@ function transformPacket(packet) {
     packet = convertCachedPacket(packet);
   }
 
-  switch (packet.type) {
+  switch (packet.category) {
     case "consoleAPICall": {
       return transformConsoleAPICallPacket(packet);
     }
@@ -110,7 +110,7 @@ function transformPacket(packet) {
       return transformLogMessagePacket(packet);
     }
 
-    case "pageError": {
+    case "PageError": {
       return transformPageErrorPacket(packet);
     }
 
@@ -302,10 +302,9 @@ function transformLogMessagePacket(packet) {
   });
 }
 
-function transformPageErrorPacket(packet) {
-  const { pageError } = packet;
+function transformPageErrorPacket(pageError) {
   let level = MESSAGE_LEVEL.ERROR;
-  if (pageError.warning || pageError.strict) {
+  if (pageError.warning) {
     level = MESSAGE_LEVEL.WARN;
   } else if (pageError.info) {
     level = MESSAGE_LEVEL.INFO;

@@ -217,6 +217,8 @@ module.exports = {
   dbg,
   assert,
   finish,
+  waitForTime,
+  waitUntil,
   selectSource,
   addBreakpoint,
   removeAllBreakpoints,

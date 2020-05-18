@@ -45,13 +45,13 @@ function configureStore(webConsoleUI, options = {}) {
   const prefsService = getPrefsService(webConsoleUI);
   const { getBoolPref, getIntPref } = prefsService;
 
-  const logLimit =
-    options.logLimit || Math.max(getIntPref("devtools.hud.loglimit"), 1);
-  const sidebarToggle = getBoolPref(PREFS.FEATURES.SIDEBAR_TOGGLE);
-  const autocomplete = getBoolPref(PREFS.FEATURES.AUTOCOMPLETE);
-  const eagerEvaluation = getBoolPref(PREFS.FEATURES.EAGER_EVALUATION);
-  const groupWarnings = getBoolPref(PREFS.FEATURES.GROUP_WARNINGS);
-  const historyCount = getIntPref(PREFS.UI.INPUT_HISTORY_COUNT);
+  const logLimit = 1000;
+  //options.logLimit || Math.max(getIntPref("devtools.hud.loglimit"), 1);
+  const sidebarToggle = false; // getBoolPref(PREFS.FEATURES.SIDEBAR_TOGGLE);
+  const autocomplete = true; // getBoolPref(PREFS.FEATURES.AUTOCOMPLETE);
+  const eagerEvaluation = true; // getBoolPref(PREFS.FEATURES.EAGER_EVALUATION);
+  const groupWarnings = false; // getBoolPref(PREFS.FEATURES.GROUP_WARNINGS);
+  const historyCount = 300; // getIntPref(PREFS.UI.INPUT_HISTORY_COUNT);
 
   const initialState = {
     prefs: PrefState({

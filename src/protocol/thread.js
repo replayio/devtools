@@ -191,6 +191,10 @@ const ThreadFront = {
     });
   },
 
+  getScriptURL(scriptId) {
+    return this.scriptURLs.get(scriptId);
+  },
+
   async getScriptSource(scriptId) {
     const { scriptSource, contentType } = await sendMessage(
       "Debugger.getScriptSource",
@@ -327,6 +331,13 @@ const ThreadFront = {
       { scriptId, begin, end },
       this.sessionId
     );
+  },
+
+  async findConsoleMessages(onConsoleMessage) {
+    const sessionId = await this.sessionWaiter.promise;
+
+    sendMessage("Console.findMessages", {}, sessionId);
+    addEventListener("Console.newMessage", ({ message }) => onConsoleMessage(message));
   },
 };
 

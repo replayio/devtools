@@ -47,10 +47,11 @@ class WebConsoleUI {
     this._onChangeSplitConsoleState = this._onChangeSplitConsoleState.bind(
       this
     );
-    this._onTargetAvailable = this._onTargetAvailable.bind(this);
     this._onTargetDestroyed = this._onTargetDestroyed.bind(this);
 
     EventEmitter.decorate(this);
+
+    this.proxy = new WebConsoleConnectionProxy(this);
   }
 
   /**
@@ -270,47 +271,6 @@ class WebConsoleUI {
    */
   async _attachTargets() {
     this.additionalProxies = new Map();
-  }
-
-  /**
-   * Called any time a new target is available.
-   * i.e. it was already existing or has just been created.
-   *
-   * @private
-   * @param string type
-   *        One of the string of TargetList.TYPES to describe which
-   *        type of target is available.
-   * @param Front targetFront
-   *        The Front of the target that is available.
-   *        This Front inherits from TargetMixin and is typically
-   *        composed of a BrowsingContextTargetFront or ContentProcessTargetFront.
-   * @param boolean isTopLevel
-   *        If true, means that this is the top level target.
-   *        This typically happens on startup, providing the current
-   *        top level target. But also on navigation, when we navigate
-   *        to an URL which has to be loaded in a distinct process.
-   *        A new top level target is created.
-   */
-  async _onTargetAvailable({ type, targetFront, isTopLevel }) {
-    const dispatchTargetAvailable = () => {
-      const store = this.wrapper && this.wrapper.getStore();
-      if (store) {
-        this.wrapper.getStore().dispatch({
-          type: constants.TARGET_AVAILABLE,
-          targetType: type,
-        });
-      }
-    };
-
-    /*
-      this.proxy = new WebConsoleConnectionProxy(
-      this,
-      targetFront,
-      needContentProcessMessagesListener
-      );
-      await this.proxy.connect();
-    */
-    dispatchTargetAvailable();
   }
 
   /**
