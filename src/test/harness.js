@@ -93,6 +93,23 @@ async function addBreakpoint(url, line, column, options) {
   });
 }
 
+async function setBreakpointOptions(url, line, column, options) {
+  const source = await waitForSource(url);
+  const sourceId = source.id;
+  column = column || getFirstBreakpointColumn(line, sourceId);
+  await dbg.actions.addBreakpoint(
+    getContext(),
+    { sourceId, line, column },
+    options
+  );
+}
+
+function getFirstBreakpointColumn(line, sourceId) {
+  const source = dbgSelectors.getSource(sourceId);
+  const position = dbgSelectors.getFirstBreakpointPosition({ line, sourceId });
+  return position.column;
+}
+
 function removeAllBreakpoints() {
   return dbg.actions.removeAllBreakpoints(getContext());
 }
@@ -257,6 +274,7 @@ module.exports = {
   waitUntil,
   selectSource,
   addBreakpoint,
+  setBreakpointOptions,
   removeAllBreakpoints,
   rewindToLine,
   resumeToLine,

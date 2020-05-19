@@ -33,6 +33,12 @@ import type {
 
 const { ThreadFront } = require("protocol/thread");
 const { convertProtocolValue } = require("protocol/convert");
+const {
+  setLogpoint,
+  setLogpointByURL,
+  removeLogpoint,
+} = require("protocol/logpoint");
+const { assert } = require("protocol/utils");
 
 let targets: { [string]: Target };
 let currentThreadFront: ThreadFront;
@@ -186,11 +192,7 @@ function locationKey(location: BreakpointLocation) {
 }
 
 function maybeGenerateLogGroupId(options) {
-  if (
-    options.logValue &&
-    currentTarget.traits &&
-    currentTarget.traits.canRewind
-  ) {
+  if (options.logValue) {
     return { ...options, logGroupId: `logGroup-${Math.random()}` };
   }
   return options;
@@ -198,9 +200,8 @@ function maybeGenerateLogGroupId(options) {
 
 async function maybeClearLogpoint(location: BreakpointLocation) {
   const bp = breakpoints[locationKey(location)];
-  if (bp && bp.options.logGroupId && currentTarget) {
-    const consoleFront = await currentTarget.getFront("console");
-    consoleFront.emit("clearLogpointMessages", bp.options.logGroupId);
+  if (bp && bp.options.logGroupId) {
+    removeLogpoint(bp.options.logGroupId);
   }
 }
 
@@ -216,16 +217,18 @@ function setBreakpoint(
   options = maybeGenerateLogGroupId(options);
   breakpoints[locationKey(location)] = { location, options };
 
-  const { condition, logValue } = options;
-  if (logValue) {
-    throw new Error("NYI");
-  }
-
+  const { condition, logValue, logGroupId } = options;
   const { line, column, sourceUrl, sourceId } = location;
-  if (sourceId) {
-    return forEachThread(thread => thread.setBreakpoint(sourceId, line, column, condition));
+  if (logValue) {
+    if (sourceId) {
+      return setLogpoint(logGroupId, sourceId, line, column, logValue);
+    }
+    return setLogpointByURL(logGroupId, sourceUrl, line, column, logValue);
   }
-  return forEachThread(thread => thread.setBreakpointByURL(sourceUrl, line, column, condition));
+  if (sourceId) {
+    return ThreadFront.setBreakpoint(sourceId, line, column, condition);
+  }
+  return ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition);
 }
 
 function removeBreakpoint(location: PendingLocation) {
@@ -234,9 +237,9 @@ function removeBreakpoint(location: PendingLocation) {
 
   const { line, column, sourceUrl, sourceId } = location;
   if (sourceId) {
-    return forEachThread(thread => thread.removeBreakpoint(sourceId, line, column));
+    return ThreadFront.removeBreakpoint(sourceId, line, column);
   }
-  return forEachThread(thread => thread.removeBreakpointByURL(sourceUrl, line, column));
+  return ThreadFront.removeBreakpointByURL(sourceUrl, line, column);
 }
 
 function evaluateInFrame(
