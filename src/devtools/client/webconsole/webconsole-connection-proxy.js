@@ -28,16 +28,39 @@ function convertStack(stack, { frames }) {
   });
 }
 
+// See also commands.js :/
+function convertProtocolValue({ value, unserializableNumber, bigint, object }) {
+  if (object) {
+    // NYI
+    return undefined;
+  }
+  if (unserializableNumber) {
+    return Number(unserializableNumber);
+  }
+  if (bigint) {
+    return bigint;
+  }
+  return value;
+}
+
 WebConsoleConnectionProxy.prototype = {
   onConsoleMessage(msg) {
     //console.log("ConsoleMessage", msg);
 
     const stacktrace = convertStack(msg.stack, msg.data);
 
+    let argumentValues;
+    if (msg.argumentValues) {
+      argumentValues = msg.argumentValues.map(convertProtocolValue);
+    }
+
+    const sourceId = stacktrace ? stacktrace[0].sourceId : undefined;
+
     const packet = {
       errorMessage: msg.text,
       errorMessageName: "ErrorMessageName",
       sourceName: msg.url,
+      sourceId,
       lineNumber: msg.line,
       columnNumber: msg.column,
       category: msg.source,
@@ -45,6 +68,7 @@ WebConsoleConnectionProxy.prototype = {
       error: msg.level == "error",
       info: msg.level == "info",
       stacktrace,
+      argumentValues,
       executionPoint: msg.point.point,
       executionPointTime: msg.point.time,
       executionPointHasFrames: !!stacktrace,

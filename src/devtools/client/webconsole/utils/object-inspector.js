@@ -97,9 +97,13 @@ function getObjectInspector(
 }
 
 function createRoots(frontOrPrimitiveGrip, pathPrefix = "") {
+  // FIXME
+  /*
   const isFront =
     frontOrPrimitiveGrip instanceof ObjectFront ||
     frontOrPrimitiveGrip instanceof LongStringFront;
+  */
+  const isFront = false;
   const grip = isFront ? frontOrPrimitiveGrip.getGrip() : frontOrPrimitiveGrip;
 
   return [

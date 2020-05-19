@@ -98,7 +98,7 @@ function transformPacket(packet) {
   }
 
   switch (packet.category) {
-    case "consoleAPICall": {
+    case "ConsoleAPI": {
       return transformConsoleAPICallPacket(packet);
     }
 
@@ -126,145 +126,31 @@ function transformPacket(packet) {
 }
 
 // eslint-disable-next-line complexity
-function transformConsoleAPICallPacket(packet) {
-  const { message } = packet;
+function transformConsoleAPICallPacket(message) {
+  const parameters = message.argumentValues;
 
-  let parameters = message.arguments;
-  let type = message.level;
-  let level = getLevelFromType(type);
-  let messageText = null;
-  const timer = message.timer;
-
-  // Special per-type conversion.
-  switch (type) {
-    case "clear":
-      // We show a message to users when calls console.clear() is called.
-      parameters = [l10n.getStr("consoleCleared")];
-      break;
-    case "count":
-    case "countReset":
-      // Chrome RDP doesn't have a special type for count.
-      type = MESSAGE_TYPE.LOG;
-      const { counter } = message;
-
-      if (!counter) {
-        // We don't show anything if we don't have counter data.
-        type = MESSAGE_TYPE.NULL_MESSAGE;
-      } else if (counter.error) {
-        messageText = l10n.getFormatStr(counter.error, [counter.label]);
-        level = MESSAGE_LEVEL.WARN;
-        parameters = null;
-      } else {
-        const label = counter.label
-          ? counter.label
-          : l10n.getStr("noCounterLabel");
-        messageText = `${label}: ${counter.count}`;
-        parameters = null;
-      }
-      break;
-    case "timeStamp":
-      type = MESSAGE_TYPE.NULL_MESSAGE;
-      break;
-    case "time":
-      parameters = null;
-      if (timer && timer.error) {
-        messageText = l10n.getFormatStr(timer.error, [timer.name]);
-        level = MESSAGE_LEVEL.WARN;
-      } else {
-        // We don't show anything for console.time calls to match Chrome's behaviour.
-        type = MESSAGE_TYPE.NULL_MESSAGE;
-      }
-      break;
-    case "timeLog":
-    case "timeEnd":
-      if (timer && timer.error) {
-        parameters = null;
-        messageText = l10n.getFormatStr(timer.error, [timer.name]);
-        level = MESSAGE_LEVEL.WARN;
-      } else if (timer) {
-        // We show the duration to users when calls console.timeLog/timeEnd is called,
-        // if corresponding console.time() was called before.
-        const duration = Math.round(timer.duration * 100) / 100;
-        if (type === "timeEnd") {
-          messageText = l10n.getFormatStr("console.timeEnd", [
-            timer.name,
-            duration,
-          ]);
-          parameters = null;
-        } else if (type === "timeLog") {
-          const [, ...rest] = parameters;
-          parameters = [
-            l10n.getFormatStr("timeLog", [timer.name, duration]),
-            ...rest,
-          ];
-        }
-      } else {
-        // If the `timer` property does not exists, we don't output anything.
-        type = MESSAGE_TYPE.NULL_MESSAGE;
-      }
-      break;
-    case "table":
-      const supportedClasses = [
-        "Object",
-        "Map",
-        "Set",
-        "WeakMap",
-        "WeakSet",
-      ].concat(getArrayTypeNames());
-
-      if (
-        !Array.isArray(parameters) ||
-        parameters.length === 0 ||
-        !parameters[0] ||
-        !parameters[0].getGrip ||
-        !supportedClasses.includes(parameters[0].getGrip().class)
-      ) {
-        // If the class of the first parameter is not supported,
-        // we handle the call as a simple console.log
-        type = "log";
-      }
-      break;
-    case "group":
-      type = MESSAGE_TYPE.START_GROUP;
-      if (parameters.length === 0) {
-        parameters = [l10n.getStr("noGroupLabel")];
-      }
-      break;
-    case "groupCollapsed":
-      type = MESSAGE_TYPE.START_GROUP_COLLAPSED;
-      if (parameters.length === 0) {
-        parameters = [l10n.getStr("noGroupLabel")];
-      }
-      break;
-    case "groupEnd":
-      type = MESSAGE_TYPE.END_GROUP;
-      parameters = null;
-      break;
-    case "dirxml":
-      // Handle console.dirxml calls as simple console.log
-      type = "log";
-      break;
-  }
-
-  const frame = message.filename
+  const frame = message.sourceName
     ? {
-        source: message.filename,
+        source: message.sourceName,
         sourceId: message.sourceId,
         line: message.lineNumber,
         column: message.columnNumber,
       }
     : null;
 
-  if (frame && (type === "logPointError" || type === "logPoint")) {
-    frame.options = { logPoint: true };
+  let level = "log";
+  if (message.warning) {
+    level = "warning";
+  } else if (message.error) {
+    level = "error";
   }
 
   return new ConsoleMessage({
     source: MESSAGE_SOURCE.CONSOLE_API,
-    type,
+    type: MESSAGE_TYPE.LOG,
     level,
     parameters,
-    messageText,
+    messageText: message.errorMessage,
     stacktrace: message.stacktrace ? message.stacktrace : null,
     frame,
     timeStamp: message.timeStamp,
@@ -272,6 +158,8 @@ function transformConsoleAPICallPacket(packet) {
     prefix: message.prefix,
     private: message.private,
     executionPoint: message.executionPoint,
+    executionPointTime: message.executionPointTime,
+    executionPointHasFrames: message.executionPointHasFrames,
     logpointId: message.logpointId,
     chromeContext: message.chromeContext,
   });

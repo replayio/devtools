@@ -249,6 +249,7 @@ async function evaluateExpressions(scripts: Script[], options: EvaluateParam) {
   return Promise.all(scripts.map(script => evaluate(script, options)));
 }
 
+// See also webconsole-connection-proxy.js :/
 function convertProtocolValue({ value, unserializableNumber, bigint, object }) {
   if (object) {
     // NYI

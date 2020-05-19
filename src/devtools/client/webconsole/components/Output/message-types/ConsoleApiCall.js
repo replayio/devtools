@@ -52,6 +52,8 @@ function ConsoleApiCall(props) {
   const {
     id: messageId,
     executionPoint,
+    executionPointTime,
+    executionPointHasFrames,
     indent,
     source,
     type,
@@ -141,6 +143,8 @@ function ConsoleApiCall(props) {
   return Message({
     messageId,
     executionPoint,
+    executionPointTime,
+    executionPointHasFrames,
     pausedExecutionPoint,
     isPaused,
     open,
