@@ -134,7 +134,7 @@ const gToolbox = {
 
   // Helpers for debugging.
   webconsoleState() {
-    gToolbox.webconsoleHud.ui.wrapper.getStore().getState();
+    return gToolbox.webconsoleHud.ui.wrapper.getStore().getState();
   },
 };
 
