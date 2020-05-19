@@ -100,8 +100,7 @@ class WebConsole {
   }
 
   canRewind() {
-    const traits = this.currentTarget && this.currentTarget.traits;
-    return traits && traits.canRewind;
+    return true;
   }
 
   /**

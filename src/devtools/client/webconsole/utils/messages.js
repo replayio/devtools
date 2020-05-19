@@ -338,6 +338,8 @@ function transformPageErrorPacket(pageError) {
     notes: pageError.notes,
     private: pageError.private,
     executionPoint: pageError.executionPoint,
+    executionPointTime: pageError.executionPointTime,
+    executionPointHasFrames: pageError.executionPointHasFrames,
     chromeContext: pageError.chromeContext,
     // Backward compatibility: cssSelectors might not be available when debugging
     // Firefox 67 or older.

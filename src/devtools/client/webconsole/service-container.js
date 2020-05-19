@@ -59,8 +59,8 @@ function setupServiceContainer({
       sourceMapService: toolbox.sourceMapURLService,
       highlightDomElement: highlight,
       unHighlightDomElement: unhighlight,
-      jumpToExecutionPoint: executionPoint =>
-        toolbox.threadFront.timeWarp(executionPoint),
+      jumpToExecutionPoint: (point, time, hasFrames) =>
+        toolbox.threadFront.timeWarp(point, time, hasFrames),
       onViewSourceInDebugger: frame => hud.onViewSourceInDebugger(frame),
       onViewSourceInStyleEditor: frame => hud.onViewSourceInStyleEditor(frame),
     });

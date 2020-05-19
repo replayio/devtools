@@ -37,6 +37,14 @@ function finish() {
   dump(`WebReplaySendAsyncMessage TestFinished`);
 }
 
+function selectConsole() {
+  gToolbox.selectTool("webconsole");
+}
+
+function selectDebugger() {
+  gToolbox.selectTool("jsdebugger");
+}
+
 function getContext() {
   return dbgSelectors.getContext();
 }
@@ -213,7 +221,27 @@ async function toggleBlackboxSelectedSource() {
   await waitUntil(() => getSelectedSource().isBlackBoxed != blackboxed);
 }
 
+function findMessage(text) {
+  return waitUntil(() => {
+    const messages = document.querySelectorAll(".message");
+    for (const msg of messages) {
+      if (msg.innerText.includes(text)) {
+        return msg;
+      }
+    }
+  });
+}
+
+async function warpToMessage(text) {
+  const msg = await findMessage(text);
+  const warpButton = msg.querySelector(".rewindable");
+  warpButton.click();
+  await waitForPaused();
+}
+
 module.exports = {
+  selectConsole,
+  selectDebugger,
   dbg,
   assert,
   finish,
@@ -231,4 +259,5 @@ module.exports = {
   checkEvaluateInTopFrame,
   waitForScopeValue,
   toggleBlackboxSelectedSource,
+  warpToMessage,
 };

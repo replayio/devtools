@@ -53,6 +53,8 @@ class Message extends Component {
       stacktrace: PropTypes.any,
       messageId: PropTypes.string,
       executionPoint: PropTypes.object,
+      executionPointTime: PropTypes.any,
+      executionPointHasFrames: PropTypes.any,
       pausedExecutionPoint: PropTypes.object,
       scrollToMessage: PropTypes.bool,
       exceptionDocURL: PropTypes.string,
@@ -184,6 +186,8 @@ class Message extends Component {
       level,
       messageId,
       executionPoint,
+      executionPointTime,
+      executionPointHasFrames,
       serviceContainer,
       inWarningGroup,
       type,
@@ -193,13 +197,20 @@ class Message extends Component {
       return undefined;
     }
 
+    let onRewindClick = null;
+    if (executionPoint) {
+      onRewindClick = () => {
+        serviceContainer.jumpToExecutionPoint(
+          executionPoint,
+          executionPointTime,
+          executionPointHasFrames
+        );
+      };
+    }
+
     return MessageIcon({
       level,
-      onRewindClick:
-        serviceContainer.canRewind() && executionPoint
-          ? () =>
-              serviceContainer.jumpToExecutionPoint(executionPoint, messageId)
-          : null,
+      onRewindClick,
       type,
     });
   }

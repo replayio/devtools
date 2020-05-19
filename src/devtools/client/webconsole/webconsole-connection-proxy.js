@@ -46,6 +46,8 @@ WebConsoleConnectionProxy.prototype = {
       info: msg.level == "info",
       stacktrace,
       executionPoint: msg.point.point,
+      executionPointTime: msg.point.time,
+      executionPointHasFrames: !!stacktrace,
     };
 
     this.ui.wrapper.dispatchMessageAdd(packet);

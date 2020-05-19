@@ -44,6 +44,8 @@ function PageError(props) {
   const {
     id: messageId,
     executionPoint,
+    executionPointTime,
+    executionPointHasFrames,
     source,
     type,
     level,
@@ -68,6 +70,8 @@ function PageError(props) {
     dispatch,
     messageId,
     executionPoint,
+    executionPointTime,
+    executionPointHasFrames,
     isPaused,
     open,
     collapsible: Array.isArray(stacktrace),
