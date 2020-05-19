@@ -32,6 +32,7 @@ import type {
 } from "../../actions/types";
 
 const { ThreadFront } = require("protocol/thread");
+const { convertProtocolValue } = require("protocol/convert");
 
 let targets: { [string]: Target };
 let currentThreadFront: ThreadFront;
@@ -247,21 +248,6 @@ function evaluateInFrame(
 
 async function evaluateExpressions(scripts: Script[], options: EvaluateParam) {
   return Promise.all(scripts.map(script => evaluate(script, options)));
-}
-
-// See also webconsole-connection-proxy.js :/
-function convertProtocolValue({ value, unserializableNumber, bigint, object }) {
-  if (object) {
-    // NYI
-    return undefined;
-  }
-  if (unserializableNumber) {
-    return Number(unserializableNumber);
-  }
-  if (bigint) {
-    return bigint;
-  }
-  return value;
 }
 
 type EvaluateParam = { thread: string, frameId: ?FrameId };

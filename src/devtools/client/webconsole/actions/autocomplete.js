@@ -22,9 +22,8 @@ const {
  */
 function autocompleteUpdate(force, getterPath, expressionVars) {
   return async ({ dispatch, getState, webConsoleUI, hud }) => {
-    if (hud.currentTarget.isReplayEnabled()) {
-      return;
-    }
+    // FIXME autocomplete is disabled
+    return;
 
     if (hud.inputHasSelection()) {
       return dispatch(autocompleteClear());

@@ -64,7 +64,6 @@ class WebConsoleWrapper {
 
     this.init = this.init.bind(this);
     this.dispatchPaused = this.dispatchPaused.bind(this);
-    this.dispatchProgress = this.dispatchProgress.bind(this);
 
     this.queuedMessageAdds = [];
     this.queuedMessageUpdates = [];
@@ -95,13 +94,10 @@ class WebConsoleWrapper {
         webConsoleWrapper: this,
       });
 
-      /*
       if (this.toolbox) {
         this.toolbox.threadFront.on("paused", this.dispatchPaused);
         this.toolbox.threadFront.on("instantWarp", this.dispatchPaused);
-        this.toolbox.threadFront.on("progress", this.dispatchProgress);
       }
-      */
 
       const app = App({
         serviceContainer,
@@ -200,15 +196,7 @@ class WebConsoleWrapper {
     store.dispatch(actions.privateMessagesClear());
   }
 
-  dispatchPaused(packet) {
-    if (packet.executionPoint) {
-      store.dispatch(actions.setPauseExecutionPoint(packet.executionPoint));
-    }
-  }
-
-  dispatchProgress(packet) {
-    const { executionPoint, recording } = packet;
-    const point = recording ? null : executionPoint;
+  dispatchPaused({ point }) {
     store.dispatch(actions.setPauseExecutionPoint(point));
   }
 

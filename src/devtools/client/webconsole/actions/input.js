@@ -61,7 +61,6 @@ function evaluateExpression(expression) {
     ({ expression, mapped } = await getMappedExpression(hud, expression));
 
     const frameActor = await webConsoleUI.getFrameActor();
-    const selectedThreadFront = toolbox && toolbox.getSelectedThreadFront();
 
     // Even if the evaluation fails,
     // we still need to pass the error response to onExpressionEvaluated.
@@ -69,9 +68,7 @@ function evaluateExpression(expression) {
 
     const response = await client
       .evaluateJSAsync(expression, {
-        selectedThreadFront,
         frameActor,
-        selectedNodeFront: webConsoleUI.getSelectedNodeFront(),
         mapped,
         forConsoleMessage: true,
       })
@@ -192,10 +189,8 @@ function terminalInputChanged(expression) {
       return;
     }
 
-    // The server does not support eager evaluation when replaying.
-    if (hud.currentTarget.isReplayEnabled()) {
-      return;
-    }
+    // FIXME Eager evaluation is NYI
+    return;
 
     const { terminalInput = "" } = getState().history;
     // Only re-evaluate if the expression did change.

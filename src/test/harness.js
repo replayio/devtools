@@ -221,9 +221,9 @@ async function toggleBlackboxSelectedSource() {
   await waitUntil(() => getSelectedSource().isBlackBoxed != blackboxed);
 }
 
-function findMessage(text) {
+function findMessage(text, extraSelector = "") {
   return waitUntil(() => {
-    const messages = document.querySelectorAll(".message");
+    const messages = document.querySelectorAll(`.message${extraSelector}`);
     for (const msg of messages) {
       if (msg.innerText.includes(text)) {
         return msg;
@@ -237,6 +237,14 @@ async function warpToMessage(text) {
   const warpButton = msg.querySelector(".rewindable");
   warpButton.click();
   await waitForPaused();
+}
+
+function checkPausedMessage(text) {
+  return findMessage(text, ".paused");
+}
+
+async function executeInConsole(text) {
+  gToolbox._panels.webconsole.hud.evaluateInput(text);
 }
 
 module.exports = {
@@ -260,4 +268,6 @@ module.exports = {
   waitForScopeValue,
   toggleBlackboxSelectedSource,
   warpToMessage,
+  checkPausedMessage,
+  executeInConsole,
 };

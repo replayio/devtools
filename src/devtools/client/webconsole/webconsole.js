@@ -140,6 +140,11 @@ class WebConsole {
     this.jsterm._setValue(newValue);
   }
 
+  evaluateInput(value) {
+    this.jsterm._setValue(value);
+    this.jsterm._execute();
+  }
+
   focusInput() {
     return this.jsterm && this.jsterm.focus();
   }

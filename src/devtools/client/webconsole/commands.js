@@ -4,6 +4,8 @@
 
 "use strict";
 
+const { convertProtocolValue } = require("protocol/convert");
+
 class ConsoleCommands {
   constructor({ devToolsClient, hud, threadFront }) {
     this.devToolsClient = devToolsClient;
@@ -16,44 +18,23 @@ class ConsoleCommands {
   }
 
   async evaluateJSAsync(expression, options = {}) {
-    const {
-      selectedNodeFront,
-      selectedThreadFront,
-      frameActor,
-      selectedObjectActor,
-    } = options;
-    let front = await this.hud.currentTarget.getFront("console");
+    const { frameActor } = options;
+    const rv = await this.threadFront.evaluateInFrame(frameActor, expression);
+    const { result, exception, failed } = rv;
 
-    // Defer to the selected paused thread front
-    if (frameActor) {
-      const frameFront = this.getFrontByID(frameActor);
-      if (frameFront) {
-        front = await frameFront.targetFront.getFront("console");
-      }
+    let v;
+    if (failed) {
+      v = "Error: Evaluation failed";
+    } else if (result) {
+      v = convertProtocolValue(result);
+    } else {
+      v = convertProtocolValue(exception);
     }
 
-    // NOTE: once we handle the other tasks in console evaluation,
-    // all of the implicit actions like pausing, selecting a frame in the inspector,
-    // etc will update the selected thread and we will no longer need to support these other
-    // cases.
-    if (selectedThreadFront) {
-      front = await selectedThreadFront.targetFront.getFront("console");
-
-      // If there's a selectedObjectActor option, this means the user intend to do a
-      // given action on a specific object, so it should take precedence over selected
-      // node front.
-    } else if (selectedObjectActor) {
-      const objectFront = this.getFrontByID(selectedObjectActor);
-      if (objectFront) {
-        front = await objectFront.targetFront.getFront("console");
-      }
-    } else if (selectedNodeFront) {
-      // Defer to the selected node's thread console front
-      front = await selectedNodeFront.targetFront.getFront("console");
-      options.selectedNodeActor = selectedNodeFront.actorID;
-    }
-
-    return front.evaluateJSAsync(expression, options);
+    return {
+      type: "evaluationResult",
+      result: v,
+    };
   }
 
   timeWarp(executionPoint) {

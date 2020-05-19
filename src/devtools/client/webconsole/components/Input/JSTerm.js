@@ -17,11 +17,6 @@ const { KeyCodes } = require("devtools/client/shared/keycodes");
 const Editor = require("devtools/client/shared/sourceeditor/editor");
 
 /*
-loader.lazyRequireGetter(this, "Debugger", "Debugger");
-
-
-
-/*
 loader.lazyRequireGetter(
   this,
   "getFocusableElements",
@@ -250,6 +245,9 @@ class JSTerm extends Component {
             // No need to handle shift + Enter as it's natively handled by CodeMirror.
 
             const hasSuggestion = this.hasAutocompletionSuggestion();
+
+            // FIXME implement isCompilableUnit.
+            /*
             if (
               !hasSuggestion &&
               !Debugger.isCompilableUnit(this._getValue())
@@ -257,6 +255,7 @@ class JSTerm extends Component {
               // incomplete statement
               return "CodeMirror.Pass";
             }
+            */
 
             if (hasSuggestion) {
               return this.acceptProposedCompletion();

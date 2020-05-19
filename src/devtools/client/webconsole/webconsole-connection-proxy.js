@@ -5,6 +5,7 @@
 "use strict";
 
 const { ThreadFront } = require("protocol/thread");
+const { convertProtocolValue } = require("protocol/convert");
 
 function WebConsoleConnectionProxy(ui) {
   this.ui = ui;
@@ -26,21 +27,6 @@ function convertStack(stack, { frames }) {
       functionName: frame.functionName,
     };
   });
-}
-
-// See also commands.js :/
-function convertProtocolValue({ value, unserializableNumber, bigint, object }) {
-  if (object) {
-    // NYI
-    return undefined;
-  }
-  if (unserializableNumber) {
-    return Number(unserializableNumber);
-  }
-  if (bigint) {
-    return bigint;
-  }
-  return value;
 }
 
 WebConsoleConnectionProxy.prototype = {

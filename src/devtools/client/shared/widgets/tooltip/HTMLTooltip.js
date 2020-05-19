@@ -13,9 +13,6 @@ const {
 } = require("devtools/client/shared/widgets/tooltip/TooltipToggle");
 const { listenOnce } = require("devtools/shared/async-utils");
 
-const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-const XHTML_NS = "http://www.w3.org/1999/xhtml";
-
 const POSITION = {
   TOP: "top",
   BOTTOM: "bottom",
@@ -367,7 +364,7 @@ function HTMLTooltip(
     //   <div> <!-- div wrapper used to isolate the tooltip container -->
     //     <div> <! the actual tooltip.container element -->
     this.xulPanelWrapper = this._createXulPanelWrapper();
-    const inner = this.doc.createElement(XHTML_NS, "div");
+    const inner = this.doc.createElement("div");
     inner.classList.add("tooltip-xul-wrapper-inner");
 
     this.doc.documentElement.appendChild(this.xulPanelWrapper);
@@ -830,7 +827,7 @@ HTMLTooltip.prototype = {
   },
 
   _createContainer: function () {
-    const container = this.doc.createElement(XHTML_NS, "div");
+    const container = this.doc.createElement("div");
     container.setAttribute("type", this.type);
 
     if (this.id) {
@@ -842,16 +839,16 @@ HTMLTooltip.prototype = {
       container.classList.add(...this.className.split(" "));
     }
 
-    const filler = this.doc.createElement(XHTML_NS, "div");
+    const filler = this.doc.createElement("div");
     filler.classList.add("tooltip-filler");
     container.appendChild(filler);
 
-    const panel = this.doc.createElement(XHTML_NS, "div");
+    const panel = this.doc.createElement("div");
     panel.classList.add("tooltip-panel");
     container.appendChild(panel);
 
     if (this.type === TYPE.ARROW || this.type === TYPE.DOORHANGER) {
-      const arrow = this.doc.createElement(XHTML_NS, "div");
+      const arrow = this.doc.createElement("div");
       arrow.classList.add("tooltip-arrow");
       container.appendChild(arrow);
     }
@@ -953,7 +950,6 @@ HTMLTooltip.prototype = {
    */
   _isXUL: function () {
     return false;
-    //this.doc.documentElement.namespaceURI === XUL_NS;
   },
 
   _createXulPanelWrapper: function () {

@@ -15,7 +15,6 @@ const {
   HTMLTooltip,
 } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 
-const HTML_NS = "http://www.w3.org/1999/xhtml";
 let itemIdCounter = 0;
 
 /**
@@ -66,7 +65,7 @@ AutocompletePopup.prototype = {
       return this._list;
     }
 
-    this._list = this._document.createElement(HTML_NS, "ul");
+    this._list = this._document.createElement("ul");
     this._list.setAttribute("flex", "1");
 
     // The list clone will be inserted in the same document as the anchor, and will be a
@@ -450,7 +449,7 @@ AutocompletePopup.prototype = {
   },
 
   createListItem: function (item, index, selected) {
-    const listItem = this._document.createElement(HTML_NS, "li");
+    const listItem = this._document.createElement("li");
     // Items must have an id for accessibility.
     listItem.setAttribute("id", "autocomplete-item-" + itemIdCounter++);
     listItem.classList.add("autocomplete-item");
@@ -463,12 +462,12 @@ AutocompletePopup.prototype = {
       listItem.setAttribute("dir", this.direction);
     }
 
-    const label = this._document.createElement(HTML_NS, "span");
+    const label = this._document.createElement("span");
     label.textContent = item.label;
     label.className = "autocomplete-value";
 
     if (item.preLabel) {
-      const preDesc = this._document.createElement(HTML_NS, "span");
+      const preDesc = this._document.createElement("span");
       preDesc.textContent = item.preLabel;
       preDesc.className = "initial-value";
       listItem.appendChild(preDesc);
@@ -478,12 +477,12 @@ AutocompletePopup.prototype = {
     listItem.appendChild(label);
 
     if (item.postLabel) {
-      const postDesc = this._document.createElement(HTML_NS, "span");
+      const postDesc = this._document.createElement("span");
       postDesc.className = "autocomplete-postlabel";
       postDesc.textContent = item.postLabel;
       // Determines if the postlabel is a valid colour or other value
       if (this._isValidColor(item.postLabel)) {
-        const colorSwatch = this._document.createElement(HTML_NS, "span");
+        const colorSwatch = this._document.createElement("span");
         colorSwatch.className = "autocomplete-swatch autocomplete-colorswatch";
         colorSwatch.style.cssText = "background-color: " + item.postLabel;
         postDesc.insertBefore(colorSwatch, postDesc.childNodes[0]);
@@ -492,7 +491,7 @@ AutocompletePopup.prototype = {
     }
 
     if (item.count && item.count > 1) {
-      const countDesc = this._document.createElement(HTML_NS, "span");
+      const countDesc = this._document.createElement("span");
       countDesc.textContent = item.count;
       countDesc.setAttribute("flex", "1");
       countDesc.className = "autocomplete-count";

@@ -93,6 +93,10 @@ const gToolbox = {
 
   _panels: {},
 
+  getPanel(id) {
+    return this._panels[id];
+  },
+
   getPanelWhenReady(id) {
     return new Promise((resolve) => {});
   },
