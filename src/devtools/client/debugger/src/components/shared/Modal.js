@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import type { Node as ReactNode } from "react";
 import classnames from "classnames";
-import Transition from "react-transition-group/Transition";
+import { Transition } from "react-transition-group";
 import "./Modal.css";
 
 type TransitionStatus = "entering" | "exiting" | "entered" | "exited";

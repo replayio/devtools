@@ -27,7 +27,7 @@ import type { Source } from "../types";
 
 import { KeyShortcuts } from "devtools-modules";
 import Services from "devtools-services";
-const shortcuts = new KeyShortcuts({ window });
+const shortcuts = new KeyShortcuts({ window, target: document });
 
 const { appinfo } = Services;
 
@@ -115,6 +115,10 @@ class App extends Component<Props, State> {
     verticalLayoutBreakpoint.addListener(this.onLayoutChange);
     this.setOrientation();
 
+    shortcuts.on(L10N.getStr("symbolSearch.search.key1"), (_, e) =>
+      this.toggleQuickOpenModal(_, e)
+    );
+
     shortcuts.on(L10N.getStr("symbolSearch.search.key2"), (_, e) =>
       this.toggleQuickOpenModal(_, e, "@")
     );
@@ -136,6 +140,9 @@ class App extends Component<Props, State> {
   componentWillUnmount() {
     horizontalLayoutBreakpoint.removeListener(this.onLayoutChange);
     verticalLayoutBreakpoint.removeListener(this.onLayoutChange);
+
+    shortcuts.off(L10N.getStr("symbolSearch.search.key1"), this.toggleQuickOpenModal);
+
     shortcuts.off(
       L10N.getStr("symbolSearch.search.key2"),
       this.toggleQuickOpenModal
