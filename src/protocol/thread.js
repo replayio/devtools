@@ -239,7 +239,8 @@ const ThreadFront = {
   },
 
   setBreakpointByURL(url, line, column, condition) {
-    return Promise.all(this.urlScripts.get(url).map(scriptId => {
+    const scriptIds = this.urlScripts.get(url);
+    return Promise.all((scriptIds || []).map(scriptId => {
       return this.setBreakpoint(scriptId, line, column, condition);
     }));
   },

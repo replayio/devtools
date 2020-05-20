@@ -3,6 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
+const { defer, assert } = require("protocol/utils");
+
 /*
 loader.lazyRequireGetter(
   this,
@@ -36,6 +38,7 @@ function DebuggerPanel(toolbox) {
   this.panelWin.Debugger = require("./src/main").default;
 
   this.toolbox = toolbox;
+  this.readyWaiter = defer();
 }
 
 async function getNodeFront(gripOrFront, toolbox) {
@@ -68,6 +71,7 @@ DebuggerPanel.prototype = {
     this._selectors = selectors;
     this._client = client;
     this.isReady = true;
+    this.readyWaiter.resolve();
 
     /*
     this.panelWin.document.addEventListener(
@@ -94,6 +98,7 @@ DebuggerPanel.prototype = {
   },
 
   getVarsForTests() {
+    assert(this.isReady);
     return {
       store: this._store,
       selectors: this._selectors,

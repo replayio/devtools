@@ -52,30 +52,44 @@ const gAnalysisLogGroupIDs = new Map();
 const LogpointHandlers = {};
 
 addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
-  console.log("AnalysisResult", analysisId, results);
+  console.log("AnalysisResults", results);
+
+  const logGroupId = gAnalysisLogGroupIDs.get(analysisId);
+  if (!gLogpoints.has(logGroupId)) {
+    return;
+  }
+
+  if (LogpointHandlers.onResult) {
+    results.forEach(({ key, value: { time, location, rv } }) => {
+      LogpointHandlers.onResult(logGroupId, key, time, location, rv);
+    });
+  }
 });
 
 addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
-  // Ignore points for obsolete logpoint groups.
+  console.log("AnalysisPoints", points);
+
   const logGroupId = gAnalysisLogGroupIDs.get(analysisId);
   if (!gLogpoints.has(logGroupId)) {
     return;
   }
 
   if (LogpointHandlers.onPointLoading) {
-    points.forEach(LogpointHandlers.onPointLoading);
+    points.forEach(({ point, time, frame }) => {
+      LogpointHandlers.onPointLoading(logGroupId, point, time, frame);
+    });
   }
 });
 
 async function setLogpoint(logGroupId, scriptId, line, column, text) {
   const mapper = `
     const { point, time, pauseId } = input;
-    const { frame: { frameId } } = sendCommand("Pause.getTopFrame");
+    const { frame: { frameId, location } } = sendCommand("Pause.getTopFrame");
     const rv = sendCommand(
       "Pause.evaluateInFrame",
       { frameId, expression: ${JSON.stringify(text)} }
     );
-    return [{ key: point, value: { time, pauseId, rv } }];
+    return [{ key: point, value: { time, pauseId, location, rv } }];
   `;
 
   const waiter = sendMessage("Analysis.createAnalysis", { mapper, effectful: true });
@@ -106,6 +120,9 @@ function setLogpointByURL(logGroupId, scriptUrl, line, column, text) {
 
 function removeLogpoint(logGroupId) {
   const waiters = gLogpoints.get(logGroupId);
+  if (!waiters) {
+    return;
+  }
   gLogpoints.delete(logGroupId);
   waiters.forEach(async waiter => {
     const { analysisId } = await waiter;

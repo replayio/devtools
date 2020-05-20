@@ -80,6 +80,12 @@ if (isDevelopment()) {
   pref("javascript.enabled", true);
 }
 
+pref("devtools.editor.autoclosebrackets", true);
+pref("devtools.editor.detectindentation", true);
+pref("devtools.editor.expandtab", true);
+pref("devtools.editor.keymap", "default");
+pref("ui.caretBlinkTime", 530);
+
 export const prefs = new PrefsHelper("devtools", {
   fission: ["Bool", "browsertoolbox.fission"],
   logging: ["Bool", "debugger.logging"],

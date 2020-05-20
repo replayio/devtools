@@ -266,11 +266,6 @@ class WebReplayPlayer extends Component {
     }
   }
 
-  onResumed(packet) {
-    throw new Error("NYI");
-    this.setState({ paused: false, closestMessage: null, pausedMessage: null });
-  }
-
   onMissingRegions(regions) {
     log(`MissingRegions ${JSON.stringify(regions)}`);
   }
@@ -660,15 +655,14 @@ class WebReplayPlayer extends Component {
   }
 
   renderMessage(message, index) {
-    throw new Error("FIXME");
     const {
       messages,
-      executionPoint,
+      currentTime,
       pausedMessage,
       highlightedMessage,
     } = this.state;
 
-    const offset = this.getPixelOffset(message.executionPoint);
+    const offset = this.getPixelOffset(message.executionPointTime);
     const previousMessage = messages[index - 1];
 
     if (offset < 0) {
@@ -679,13 +673,13 @@ class WebReplayPlayer extends Component {
     const isOverlayed =
       previousMessage &&
       this.getPixelDistance(
-        message.executionPoint,
-        previousMessage.executionPoint
+        message.executionPointTime,
+        previousMessage.executionPointTime
       ) < markerWidth;
 
     // Check to see if a message appears after the current execution point
     const isFuture =
-      this.getPixelDistance(message.executionPoint, executionPoint) >
+      this.getPixelDistance(message.executionPointTime, currentTime) >
       markerWidth / 2;
 
     const isHighlighted = highlightedMessage == message.id;

@@ -6,6 +6,7 @@
 
 const WebConsole = require("./webconsole");
 const EventEmitter = require("devtools/shared/event-emitter");
+const { defer } = require("protocol/utils");
 
 /**
  * A DevToolPanel that controls the Web Console.
@@ -14,6 +15,8 @@ function WebConsolePanel(toolbox) {
   this._frameWindow = window;
   this._toolbox = toolbox;
   EventEmitter.decorate(this);
+
+  this.readyWaiter = defer();
 }
 
 exports.WebConsolePanel = WebConsolePanel;
@@ -43,6 +46,7 @@ WebConsolePanel.prototype = {
       await this.hud.init();
 
       this._isReady = true;
+      this.readyWaiter.resolve();
       this.emit("ready");
     } catch (e) {
       const msg = "WebConsolePanel open failed. " + e.error + ": " + e.message;

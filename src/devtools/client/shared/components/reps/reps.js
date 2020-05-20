@@ -8232,7 +8232,7 @@ const dom = __webpack_require__(1);
 
 const {
   appinfo
-} = _devtoolsServices.default;
+} = _devtoolsServices;
 const isMacOS = appinfo.OS === "Darwin";
 
 const classnames = __webpack_require__(67);

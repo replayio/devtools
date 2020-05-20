@@ -59,6 +59,10 @@ const recordingId = url.searchParams.get("id");
 const dispatch = url.searchParams.get("dispatch");
 const test = url.searchParams.get("test");
 
+if (test) {
+  require("devtools-modules").asyncStorage.clear();
+}
+
 setTimeout(initialize, 0);
 
 async function initialize() {
@@ -78,9 +82,10 @@ async function initialize() {
   );
 
   sendMessage("Recording.createSession", { recordingId }).then(
-    ({ sessionId }) => {
+    async ({ sessionId }) => {
       ThreadFront.setSessionId(sessionId);
       if (test) {
+        await gToolbox.loadTool("jsdebugger");
         window.Test = require("./test/harness");
         ThreadFront.setTest(test);
       }
@@ -93,12 +98,14 @@ const gToolbox = {
 
   _panels: {},
 
-  getPanel(id) {
-    return this._panels[id];
+  getPanel(name) {
+    return this._panels[name];
   },
 
-  getPanelWhenReady(id) {
-    return new Promise((resolve) => {});
+  async getPanelWhenReady(name) {
+    const panel = this.getPanel(name);
+    await panel.readyWaiter.promise;
+    return panel;
   },
 
   threadFront: ThreadFront,
@@ -116,7 +123,7 @@ const gToolbox = {
   },
 
   loadTool(name) {
-    return new Promise((resolve) => {});
+    return this.getPanelWhenReady(name);
   },
 
   selectTool(name) {
@@ -144,16 +151,17 @@ const gToolbox = {
 
 window.gToolbox = gToolbox;
 
-const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
-ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
-
 setTimeout(() => {
   const debuggerPanel = new DebuggerPanel(gToolbox);
   gToolbox.addTool("jsdebugger", debuggerPanel);
-  debuggerPanel.open();
 
   const consolePanel = new WebConsolePanel(gToolbox);
   gToolbox.addTool("webconsole", consolePanel);
+
+  const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
+  ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
+
+  debuggerPanel.open();
   consolePanel.open();
 
   gToolbox.selectTool("jsdebugger");

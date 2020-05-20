@@ -14,6 +14,7 @@ function WebConsoleConnectionProxy(ui) {
   ThreadFront.findConsoleMessages(msg => this.onConsoleMessage(msg));
 
   LogpointHandlers.onPointLoading = this.onLogpointLoading.bind(this);
+  LogpointHandlers.onResult = this.onLogpointResult.bind(this);
 }
 
 function convertStack(stack, { frames }) {
@@ -66,7 +67,7 @@ WebConsoleConnectionProxy.prototype = {
     this.ui.wrapper.dispatchMessageAdd(packet);
   },
 
-  onLogpointLoading({ point, time, frame: { scriptId, line, column } }) {
+  onLogpointLoading(logGroupId, point, time, { scriptId, line, column }) {
     const packet = {
       errorMessage: "Loading...",
       sourceName: ThreadFront.getScriptURL(scriptId),
@@ -78,6 +79,28 @@ WebConsoleConnectionProxy.prototype = {
       executionPoint: point,
       executionPointTime: time,
       executionPointHasFrames: true,
+      logGroupId,
+    };
+
+    this.ui.wrapper.dispatchMessageAdd(packet);
+  },
+
+  onLogpointResult(logGroupId, point, time, { scriptId, line, column }, rv) {
+    const value = convertProtocolValue(rv.result || rv.exception);
+
+    const packet = {
+      errorMessage: "",
+      sourceName: ThreadFront.getScriptURL(scriptId),
+      sourceId: scriptId,
+      lineNumber: line,
+      columnNumber: column,
+      category: "ConsoleAPI",
+      info: true,
+      argumentValues: [value],
+      executionPoint: point,
+      executionPointTime: time,
+      executionPointHasFrames: true,
+      logGroupId,
     };
 
     this.ui.wrapper.dispatchMessageAdd(packet);

@@ -13,6 +13,7 @@
     "classnames": "^2.2.6",
     "css-loader": "^3.5.3",
     "debug": "^4.1.1",
+    "devtools-services": "0.0.3",
     "devtools-sprintf-js": "^1.0.3",
     "extract-loader": "^5.0.1",
     "mini-css-extract-plugin": "^0.9.0",
