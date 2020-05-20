@@ -5,12 +5,15 @@
 "use strict";
 
 const { ThreadFront } = require("protocol/thread");
+const { LogpointHandlers } = require("protocol/logpoint");
 const { convertProtocolValue } = require("protocol/convert");
 
 function WebConsoleConnectionProxy(ui) {
   this.ui = ui;
 
   ThreadFront.findConsoleMessages(msg => this.onConsoleMessage(msg));
+
+  LogpointHandlers.onPointLoading = this.onLogpointLoading.bind(this);
 }
 
 function convertStack(stack, { frames }) {
@@ -58,6 +61,23 @@ WebConsoleConnectionProxy.prototype = {
       executionPoint: msg.point.point,
       executionPointTime: msg.point.time,
       executionPointHasFrames: !!stacktrace,
+    };
+
+    this.ui.wrapper.dispatchMessageAdd(packet);
+  },
+
+  onLogpointLoading({ point, time, frame: { scriptId, line, column } }) {
+    const packet = {
+      errorMessage: "Loading...",
+      sourceName: ThreadFront.getScriptURL(scriptId),
+      sourceId: scriptId,
+      lineNumber: line,
+      columnNumber: column,
+      category: "ConsoleAPI",
+      info: true,
+      executionPoint: point,
+      executionPointTime: time,
+      executionPointHasFrames: true,
     };
 
     this.ui.wrapper.dispatchMessageAdd(packet);

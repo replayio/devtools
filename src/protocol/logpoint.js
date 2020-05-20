@@ -45,20 +45,37 @@ const { ThreadFront } = require("./thread");
 // Map log group ID to information about the logpoint.
 const gLogpoints = new Map();
 
+// Map analysis ID to log group ID.
+const gAnalysisLogGroupIDs = new Map();
+
+// Hooks for adding messages to the console.
+const LogpointHandlers = {};
+
 addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
   console.log("AnalysisResult", analysisId, results);
 });
 
 addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
-  console.log("AnalysisPoints", analysisId, points);
+  // Ignore points for obsolete logpoint groups.
+  const logGroupId = gAnalysisLogGroupIDs.get(analysisId);
+  if (!gLogpoints.has(logGroupId)) {
+    return;
+  }
+
+  if (LogpointHandlers.onPointLoading) {
+    points.forEach(LogpointHandlers.onPointLoading);
+  }
 });
 
 async function setLogpoint(logGroupId, scriptId, line, column, text) {
   const mapper = `
     const { point, time, pauseId } = input;
-    const { frameId } = sendCommand("Pause.getTopFrame");
-    const rv = sendCommand("Pause.evaluateInFrame", { frameId, expression: ${text} });
-    return [{ key: point, value: { time, pauseId, ...rv } }];
+    const { frame: { frameId } } = sendCommand("Pause.getTopFrame");
+    const rv = sendCommand(
+      "Pause.evaluateInFrame",
+      { frameId, expression: ${JSON.stringify(text)} }
+    );
+    return [{ key: point, value: { time, pauseId, rv } }];
   `;
 
   const waiter = sendMessage("Analysis.createAnalysis", { mapper, effectful: true });
@@ -69,14 +86,15 @@ async function setLogpoint(logGroupId, scriptId, line, column, text) {
   }
 
   const { analysisId } = await waiter;
+  gAnalysisLogGroupIDs.set(analysisId, logGroupId);
 
   sendMessage("Analysis.addLocation", {
     analysisId,
     sessionId: ThreadFront.sessionId,
     location: { scriptId, line, column },
   });
-  sendMessage("Analysis.findAnalysisPoints", { analysisId });
   sendMessage("Analysis.runAnalysis", { analysisId });
+  sendMessage("Analysis.findAnalysisPoints", { analysisId });
 }
 
 function setLogpointByURL(logGroupId, scriptUrl, line, column, text) {
@@ -88,9 +106,10 @@ function setLogpointByURL(logGroupId, scriptUrl, line, column, text) {
 
 function removeLogpoint(logGroupId) {
   const waiters = gLogpoints.get(logGroupId);
+  gLogpoints.delete(logGroupId);
   waiters.forEach(async waiter => {
     const { analysisId } = await waiter;
-    sendMessage("Analysis.cancelAnalysis", { analysisId });
+    sendMessage("Analysis.releaseAnalysis", { analysisId });
   });
 }
 
@@ -98,4 +117,5 @@ module.exports = {
   setLogpoint,
   setLogpointByURL,
   removeLogpoint,
+  LogpointHandlers,
 };
