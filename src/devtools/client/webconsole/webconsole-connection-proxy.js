@@ -85,8 +85,8 @@ WebConsoleConnectionProxy.prototype = {
     this.ui.wrapper.dispatchMessageAdd(packet);
   },
 
-  onLogpointResult(logGroupId, point, time, { scriptId, line, column }, rv) {
-    const value = convertProtocolValue(rv.result || rv.exception);
+  onLogpointResult(logGroupId, point, time, { scriptId, line, column }, values) {
+    const argumentValues = values.map(convertProtocolValue);
 
     const packet = {
       errorMessage: "",
@@ -96,7 +96,7 @@ WebConsoleConnectionProxy.prototype = {
       columnNumber: column,
       category: "ConsoleAPI",
       info: true,
-      argumentValues: [value],
+      argumentValues,
       executionPoint: point,
       executionPointTime: time,
       executionPointHasFrames: true,

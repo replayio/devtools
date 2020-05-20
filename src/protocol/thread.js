@@ -80,14 +80,15 @@ Pause.prototype = {
   },
 
   async evaluateInFrame(frameId, expression) {
-    const { result, exception, failed, data } = await sendMessage(
+    const { result } = await sendMessage(
       "Pause.evaluateInFrame",
       { frameId, expression },
       this.sessionId,
       this.pauseId
     );
+    const { returned, exception, failed, data } = result;
     this.addData(data);
-    return { result, exception, failed };
+    return { returned, exception, failed };
   },
 };
 

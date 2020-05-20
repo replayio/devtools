@@ -104,6 +104,15 @@ async function setBreakpointOptions(url, line, column, options) {
   );
 }
 
+async function disableBreakpoint(url, line, column) {
+  const source = await waitForSource(url);
+  const sourceId = source.id;
+  column = column || getFirstBreakpointColumn(line, sourceId);
+  const location = { sourceId, sourceUrl: source.url, line, column };
+  const bp = dbgSelectors.getBreakpointForLocation(location);
+  await dbg.actions.disableBreakpoint(getContext(), bp);
+}
+
 function getFirstBreakpointColumn(line, sourceId) {
   const source = dbgSelectors.getSource(sourceId);
   const position = dbgSelectors.getFirstBreakpointPosition({ line, sourceId });
@@ -283,6 +292,7 @@ module.exports = {
   selectSource,
   addBreakpoint,
   setBreakpointOptions,
+  disableBreakpoint,
   removeAllBreakpoints,
   rewindToLine,
   resumeToLine,

@@ -60,8 +60,8 @@ addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
   }
 
   if (LogpointHandlers.onResult) {
-    results.forEach(({ key, value: { time, location, rv } }) => {
-      LogpointHandlers.onResult(logGroupId, key, time, location, rv);
+    results.forEach(({ key, value: { time, location, values } }) => {
+      LogpointHandlers.onResult(logGroupId, key, time, location, values);
     });
   }
 });
@@ -84,12 +84,34 @@ addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
 async function setLogpoint(logGroupId, scriptId, line, column, text) {
   const mapper = `
     const { point, time, pauseId } = input;
-    const { frame: { frameId, location } } = sendCommand("Pause.getTopFrame");
-    const rv = sendCommand(
+    const { frame } = sendCommand("Pause.getTopFrame");
+    const { frameId, functionName, location } = frame;
+    const bindings = [
+      { name: "displayName", value: functionName || "" }
+    ];
+    const { result } = sendCommand(
       "Pause.evaluateInFrame",
-      { frameId, expression: ${JSON.stringify(text)} }
+      { frameId, bindings, expression: "[" + ${JSON.stringify(text)} + "]" }
     );
-    return [{ key: point, value: { time, pauseId, location, rv } }];
+    const values = [];
+    if (result.exception) {
+      values.push(result.exception);
+    } else {
+      const { object } = result.returned;
+      const { result: lengthResult } = sendCommand(
+        "Pause.getObjectProperty",
+        { object, name: "length" }
+      );
+      const length = lengthResult.returned.value;
+      for (let i = 0; i < length; i++) {
+        const { result: elementResult } = sendCommand(
+          "Pause.getObjectProperty",
+          { object, name: i.toString() }
+        );
+        values.push(elementResult.returned);
+      }
+    }
+    return [{ key: point, value: { time, pauseId, location, values } }];
   `;
 
   const waiter = sendMessage("Analysis.createAnalysis", { mapper, effectful: true });

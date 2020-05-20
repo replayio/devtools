@@ -269,12 +269,12 @@ async function evaluate(
   { thread, frameId }: EvaluateParam = {}
 ): Promise<{ result: ExpressionResult }> {
   const threadFront = lookupThreadFront(thread);
-  const { result, exception, failed } = await threadFront.evaluateInFrame(frameId, script);
+  const { returned, exception, failed } = await threadFront.evaluateInFrame(frameId, script);
   if (failed) {
     return { exception: "Evaluation failed" };
   }
-  if (result) {
-    return { result: convertProtocolValue(result) };
+  if (returned) {
+    return { result: convertProtocolValue(returned) };
   }
   return { exception: convertProtocolValue(exception) };
 }

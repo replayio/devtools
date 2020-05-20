@@ -20,13 +20,13 @@ class ConsoleCommands {
   async evaluateJSAsync(expression, options = {}) {
     const { frameActor } = options;
     const rv = await this.threadFront.evaluateInFrame(frameActor, expression);
-    const { result, exception, failed } = rv;
+    const { returned, exception, failed } = rv;
 
     let v;
     if (failed) {
       v = "Error: Evaluation failed";
-    } else if (result) {
-      v = convertProtocolValue(result);
+    } else if (returned) {
+      v = convertProtocolValue(returned);
     } else {
       v = convertProtocolValue(exception);
     }
