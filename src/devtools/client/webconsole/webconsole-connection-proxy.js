@@ -79,7 +79,7 @@ WebConsoleConnectionProxy.prototype = {
       executionPoint: point,
       executionPointTime: time,
       executionPointHasFrames: true,
-      logGroupId,
+      logpointId: logGroupId,
     };
 
     this.ui.wrapper.dispatchMessageAdd(packet);
@@ -100,7 +100,7 @@ WebConsoleConnectionProxy.prototype = {
       executionPoint: point,
       executionPointTime: time,
       executionPointHasFrames: true,
-      logGroupId,
+      logpointId: logGroupId,
     };
 
     this.ui.wrapper.dispatchMessageAdd(packet);

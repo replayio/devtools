@@ -238,26 +238,34 @@ async function toggleBlackboxSelectedSource() {
   await waitUntil(() => getSelectedSource().isBlackBoxed != blackboxed);
 }
 
-function findMessage(text, extraSelector = "") {
+function findMessages(text, extraSelector = "") {
+  const messages = document.querySelectorAll(`.message${extraSelector}`);
+  return [...messages].filter(msg => msg.innerText.includes(text));
+}
+
+function waitForMessage(text, extraSelector) {
   return waitUntil(() => {
-    const messages = document.querySelectorAll(`.message${extraSelector}`);
-    for (const msg of messages) {
-      if (msg.innerText.includes(text)) {
-        return msg;
-      }
-    }
+    const messages = findMessages(text, extraSelector);
+    return messages.length ? messages[0] : null;
   });
 }
 
 async function warpToMessage(text) {
-  const msg = await findMessage(text);
+  const msg = await waitForMessage(text);
   const warpButton = msg.querySelector(".rewindable");
   warpButton.click();
   await waitForPaused();
 }
 
 function checkPausedMessage(text) {
-  return findMessage(text, ".paused");
+  return waitForMessage(text, ".paused");
+}
+
+function waitForMessageCount(text, count) {
+  return waitUntil(() => {
+    const messages = findMessages(text);
+    return messages.length == count ? messages : null;
+  });
 }
 
 async function executeInConsole(text) {
@@ -285,7 +293,9 @@ module.exports = {
   checkEvaluateInTopFrame,
   waitForScopeValue,
   toggleBlackboxSelectedSource,
+  findMessages,
   warpToMessage,
   checkPausedMessage,
+  waitForMessageCount,
   executeInConsole,
 };

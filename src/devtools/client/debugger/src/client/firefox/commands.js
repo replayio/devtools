@@ -220,10 +220,19 @@ function setBreakpoint(
   const { condition, logValue, logGroupId } = options;
   const { line, column, sourceUrl, sourceId } = location;
   if (logValue) {
+    const promises = [];
     if (sourceId) {
-      return setLogpoint(logGroupId, sourceId, line, column, logValue);
+      promises.push(
+        ThreadFront.removeBreakpoint(sourceId, line, column),
+        setLogpoint(logGroupId, sourceId, line, column, logValue)
+      );
+    } else {
+      promises.push(
+        ThreadFront.removeBreakpointByURL(sourceUrl, line, column),
+        setLogpointByURL(logGroupId, sourceUrl, line, column, logValue)
+      );
     }
-    return setLogpointByURL(logGroupId, sourceUrl, line, column, logValue);
+    return Promise.all(promises);
   }
   if (sourceId) {
     return ThreadFront.setBreakpoint(sourceId, line, column, condition);

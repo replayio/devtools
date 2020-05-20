@@ -24,7 +24,6 @@ const {
 const {
   pointPrecedes,
   pointEquals,
-  pointToString,
 } = require("protocol/execution-point-utils.js");
 const { log } = require("protocol/socket");
 
@@ -162,13 +161,13 @@ function addMessage(newMessage, state, filtersState, prefsState, uiState) {
   // removed.
   const removedIds = [];
   if (newMessage.logpointId) {
-    const key = `${newMessage.logpointId}:${pointToString(newMessage.executionPoint)}`;
+    const key = `${newMessage.logpointId}:${newMessage.executionPoint}`;
     const existingMessage = state.logpointMessages.get(key);
     if (existingMessage) {
-      //ChromeUtils.recordReplayLog(`LogpointFinish ${JSON.stringify(newMessage.executionPoint)}`);
+      log(`LogpointFinish ${newMessage.executionPoint}`);
       removedIds.push(existingMessage.id);
     } else {
-      //ChromeUtils.recordReplayLog(`LogpointStart ${JSON.stringify(newMessage.executionPoint)}`);
+      log(`LogpointStart ${newMessage.executionPoint}`);
     }
     state.logpointMessages.set(key, newMessage);
   }
