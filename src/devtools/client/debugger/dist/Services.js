@@ -1,8 +1,1 @@
-module.exports = {
-  appinfo: {},
-  prefs: {
-    getBoolPref: () => {},
-    getIntPref: () => {},
-    getCharPref: () => {}
-  }
-};
+export * from "devtools-services"
