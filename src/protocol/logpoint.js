@@ -81,11 +81,34 @@ addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
   }
 });
 
-async function setLogpoint(logGroupId, scriptId, line, column, text) {
+async function setLogpoint(logGroupId, scriptId, line, column, text, condition) {
+  let conditionSection = "";
+  if (condition) {
+    // When there is a condition, don't add a message if it returns undefined
+    // or a falsy primitive.
+    conditionSection = `
+      const { result: conditionResult } = sendCommand(
+        "Pause.evaluateInFrame",
+        { frameId, expression: ${JSON.stringify(condition)} }
+      );
+      if (conditionResult.returned) {
+        const { returned } = conditionResult;
+        if ("value" in returned && !returned.value) {
+          return [];
+        }
+        if (!Object.keys(returned).length) {
+          // Undefined.
+          return [];
+        }
+      }
+    `;
+  }
+
   const mapper = `
     const { point, time, pauseId } = input;
     const { frame } = sendCommand("Pause.getTopFrame");
     const { frameId, functionName, location } = frame;
+    ${conditionSection}
     const bindings = [
       { name: "displayName", value: functionName || "" }
     ];
@@ -130,13 +153,18 @@ async function setLogpoint(logGroupId, scriptId, line, column, text) {
     location: { scriptId, line, column },
   });
   sendMessage("Analysis.runAnalysis", { analysisId });
-  sendMessage("Analysis.findAnalysisPoints", { analysisId });
+
+  // Don't add loading messages for conditional logpoints, as we don't know if
+  // analysis points will actually generate a message.
+  if (!condition) {
+    sendMessage("Analysis.findAnalysisPoints", { analysisId });
+  }
 }
 
-function setLogpointByURL(logGroupId, scriptUrl, line, column, text) {
+function setLogpointByURL(logGroupId, scriptUrl, line, column, text, condition) {
   const scriptIds = ThreadFront.urlScripts.get(scriptUrl);
   (scriptIds || []).forEach(scriptId => {
-    setLogpoint(logGroupId, scriptId, line, column, text);
+    setLogpoint(logGroupId, scriptId, line, column, text, condition);
   });
 }
 
@@ -144,6 +172,9 @@ function removeLogpoint(logGroupId) {
   const waiters = gLogpoints.get(logGroupId);
   if (!waiters) {
     return;
+  }
+  if (LogpointHandlers.clearLogpoint) {
+    LogpointHandlers.clearLogpoint(logGroupId);
   }
   gLogpoints.delete(logGroupId);
   waiters.forEach(async waiter => {

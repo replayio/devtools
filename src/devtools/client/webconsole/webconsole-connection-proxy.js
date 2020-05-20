@@ -15,6 +15,7 @@ function WebConsoleConnectionProxy(ui) {
 
   LogpointHandlers.onPointLoading = this.onLogpointLoading.bind(this);
   LogpointHandlers.onResult = this.onLogpointResult.bind(this);
+  LogpointHandlers.clearLogpoint = this.clearLogpoint.bind(this);
 }
 
 function convertStack(stack, { frames }) {
@@ -104,6 +105,10 @@ WebConsoleConnectionProxy.prototype = {
     };
 
     this.ui.wrapper.dispatchMessageAdd(packet);
+  },
+
+  clearLogpoint(logGroupId) {
+    this.ui.wrapper.dispatchClearLogpointMessages(logGroupId);
   },
 };
 

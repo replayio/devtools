@@ -224,12 +224,12 @@ function setBreakpoint(
     if (sourceId) {
       promises.push(
         ThreadFront.removeBreakpoint(sourceId, line, column),
-        setLogpoint(logGroupId, sourceId, line, column, logValue)
+        setLogpoint(logGroupId, sourceId, line, column, logValue, condition)
       );
     } else {
       promises.push(
         ThreadFront.removeBreakpointByURL(sourceUrl, line, column),
-        setLogpointByURL(logGroupId, sourceUrl, line, column, logValue)
+        setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition)
       );
     }
     return Promise.all(promises);
