@@ -20,7 +20,6 @@ const {
   getAllNetworkMessagesUpdateById,
   getVisibleMessages,
   getPausedExecutionPoint,
-  getAllRepeatById,
   getAllWarningGroupsById,
   isMessageInWarningGroup,
 } = require("devtools/client/webconsole/selectors/messages");
@@ -79,7 +78,6 @@ class ConsoleOutput extends Component {
       dispatch: PropTypes.func.isRequired,
       timestampsVisible: PropTypes.bool,
       messagesPayload: PropTypes.object.isRequired,
-      messagesRepeat: PropTypes.object.isRequired,
       warningGroups: PropTypes.object.isRequired,
       networkMessagesUpdate: PropTypes.object.isRequired,
       visibleMessages: PropTypes.array.isRequired,
@@ -187,7 +185,6 @@ class ConsoleOutput extends Component {
       messages,
       messagesUi,
       messagesPayload,
-      messagesRepeat,
       warningGroups,
       networkMessagesUpdate,
       networkMessageActiveTabId,
@@ -223,7 +220,6 @@ class ConsoleOutput extends Component {
         open: messagesUi.includes(messageId),
         payload: messagesPayload.get(messageId),
         timestampsVisible,
-        repeat: messagesRepeat[messageId],
         badge: warningGroups.has(messageId)
           ? warningGroups.get(messageId).length
           : null,
@@ -276,7 +272,6 @@ function mapStateToProps(state, props) {
     visibleMessages: getVisibleMessages(state),
     messagesUi: getAllMessagesUiById(state),
     messagesPayload: getAllMessagesPayloadById(state),
-    messagesRepeat: getAllRepeatById(state),
     warningGroups: getAllWarningGroupsById(state),
     networkMessagesUpdate: getAllNetworkMessagesUpdateById(state),
     timestampsVisible: state.ui.timestampsVisible,

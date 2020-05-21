@@ -46,23 +46,39 @@ const {
 const { defer, assert } = require("./utils");
 
 // Information about a protocol pause.
-function Pause(sessionId, point) {
+function Pause(sessionId) {
   this.sessionId = sessionId;
+  this.pauseID = null;
+
+  this.createWaiter = null;
 
   this.frames = new Map();
   this.scopes = new Map();
   this.objects = new Map();
 
-  this.waiter = sendMessage("Session.createPause", { point }, sessionId).then(
-    ({ pauseId, stack, data }) => {
-      this.pauseId = pauseId;
-      this.addData(data);
-      this.stack = stack.map(id => this.frames.get(id));
-    }
-  );
+  this.objectFronts = new Map();
 }
 
 Pause.prototype = {
+  create(point) {
+    assert(!this.createWaiter);
+    assert(!this.pauseId);
+    this.createWaiter = sendMessage("Session.createPause", { point }, sessionId).then(
+      ({ pauseId, stack, data }) => {
+        this.pauseId = pauseId;
+        this.addData(data);
+        this.stack = stack.map(id => this.frames.get(id));
+      }
+    );
+  },
+
+  instantiate(pauseId, data) {
+    assert(!this.createWaiter);
+    assert(!this.pauseId);
+    this.pauseId = pauseId;
+    this.addData(data);
+  },
+
   addData({ frames, scopes, objects }) {
     (frames || []).forEach(f => this.frames.set(f.frameId, f));
     (scopes || []).forEach(s => this.scopes.set(s.scopeId, s));
@@ -70,7 +86,8 @@ Pause.prototype = {
   },
 
   async getFrames() {
-    await this.waiter;
+    assert(this.createWaiter);
+    await this.createWaiter;
     return this.stack;
   },
 
@@ -90,7 +107,55 @@ Pause.prototype = {
     this.addData(data);
     return { returned, exception, failed };
   },
+
+  getObjectFront(objectId) {
+    if (this.objectFronts.has(objectId)) {
+      return this.objectFronts.get(objectId);
+    }
+    const objectData = this.objects.get(objectId);
+    assert(objectData);
+    const front = new ObjectFront(this, objectId, objectData);
+    this.objectFronts.set(objectId, front);
+    return front;
+  },
 };
+
+function ObjectFront(pause, objectId, data) {
+  this._pause = pause;
+  this._objectId = objectId;
+  this._data = data;
+}
+
+ObjectFront.prototype = {
+  type: "object",
+  getGrip: undefined,
+
+  get class() {
+    return this._data.className;
+  },
+};
+
+function NotAllowed() {
+  console.error("Not allowed");
+}
+
+const DisallowEverythingProxyHandler = {
+  getPrototypeOf() { NotAllowed(); },
+  has() { NotAllowed(); },
+  get(_, name) { NotAllowed(); },
+  //set() { NotAllowed(); },
+  apply() { NotAllowed(); },
+  construct() { NotAllowed(); },
+  getOwnPropertyDescriptor() { NotAllowed(); },
+  ownKeys() { NotAllowed(); },
+  isExtensible() { NotAllowed(); },
+  setPrototypeOf() { NotAllowed(); },
+  preventExtensions() { NotAllowed(); },
+  defineProperty() { NotAllowed(); },
+  deleteProperty() { NotAllowed(); },
+};
+
+Object.setPrototypeOf(ObjectFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 const ThreadFront = {
   // When replaying there is only a single thread currently. Use this thread ID
@@ -263,7 +328,8 @@ const ThreadFront = {
 
   ensurePause() {
     if (!this.currentPause) {
-      this.currentPause = new Pause(this.sessionId, this.currentPoint);
+      this.currentPause = new Pause(this.sessionId);
+      this.currentPause.create(this.currentPoint);
     }
   },
 
@@ -339,8 +405,15 @@ const ThreadFront = {
     const sessionId = await this.sessionWaiter.promise;
 
     sendMessage("Console.findMessages", {}, sessionId);
-    addEventListener("Console.newMessage", ({ message }) => onConsoleMessage(message));
+    addEventListener("Console.newMessage", ({ message }) => {
+      const pause = new Pause(this.sessionId);
+      pause.instantiate(message.pauseId, message.data);
+      onConsoleMessage(pause, message);
+    });
   },
 };
 
-module.exports = { ThreadFront };
+module.exports = {
+  ThreadFront,
+  ValueFront,
+};

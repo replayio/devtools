@@ -11,7 +11,7 @@ const { convertProtocolValue } = require("protocol/convert");
 function WebConsoleConnectionProxy(ui) {
   this.ui = ui;
 
-  ThreadFront.findConsoleMessages(msg => this.onConsoleMessage(msg));
+  ThreadFront.findConsoleMessages(this.onConsoleMessage.bind(this));
 
   LogpointHandlers.onPointLoading = this.onLogpointLoading.bind(this);
   LogpointHandlers.onResult = this.onLogpointResult.bind(this);
@@ -35,14 +35,14 @@ function convertStack(stack, { frames }) {
 }
 
 WebConsoleConnectionProxy.prototype = {
-  onConsoleMessage(msg) {
+  onConsoleMessage(pause, msg) {
     //console.log("ConsoleMessage", msg);
 
     const stacktrace = convertStack(msg.stack, msg.data);
 
     let argumentValues;
     if (msg.argumentValues) {
-      argumentValues = msg.argumentValues.map(convertProtocolValue);
+      argumentValues = msg.argumentValues.map(v => convertProtocolValue(pause, v));
     }
 
     const sourceId = stacktrace ? stacktrace[0].sourceId : undefined;
@@ -86,8 +86,8 @@ WebConsoleConnectionProxy.prototype = {
     this.ui.wrapper.dispatchMessageAdd(packet);
   },
 
-  onLogpointResult(logGroupId, point, time, { scriptId, line, column }, values) {
-    const argumentValues = values.map(convertProtocolValue);
+  onLogpointResult(logGroupId, point, time, { scriptId, line, column }, pause, values) {
+    const argumentValues = values.map(v => convertProtocolValue(pause, v));
 
     const packet = {
       errorMessage: "",

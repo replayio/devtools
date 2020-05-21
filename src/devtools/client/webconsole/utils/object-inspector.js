@@ -15,6 +15,7 @@ const { REPS, MODE } = reps;
 const ObjectInspector = createFactory(reps.objectInspector.ObjectInspector);
 
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
+const { ObjectFront } = require("protocol/thread");
 
 /**
  * Create and return an ObjectInspector for the given front.
@@ -97,20 +98,14 @@ function getObjectInspector(
 }
 
 function createRoots(frontOrPrimitiveGrip, pathPrefix = "") {
-  // FIXME
-  /*
-  const isFront =
-    frontOrPrimitiveGrip instanceof ObjectFront ||
-    frontOrPrimitiveGrip instanceof LongStringFront;
-  */
-  const isFront = false;
-  const grip = isFront ? frontOrPrimitiveGrip.getGrip() : frontOrPrimitiveGrip;
+  const isFront = frontOrPrimitiveGrip instanceof ObjectFront;
+  const grip = isFront ? { "objectFront": true } : frontOrPrimitiveGrip;
 
   return [
     {
       path: `${pathPrefix}${
         frontOrPrimitiveGrip
-          ? frontOrPrimitiveGrip.actorID || frontOrPrimitiveGrip.actor
+          ? frontOrPrimitiveGrip.objectId
           : null
       }`,
       contents: { value: grip, front: isFront ? frontOrPrimitiveGrip : null },

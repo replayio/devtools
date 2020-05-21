@@ -82,9 +82,6 @@ function prepareMessage(packet, idGenerator) {
     packet = transformPacket(packet);
   }
 
-  if (packet.allowRepeating) {
-    packet.repeatId = getRepeatId(packet);
-  }
   packet.id = idGenerator.getNextId(packet);
   return packet;
 }
@@ -306,37 +303,6 @@ function transformEvaluationResultPacket(packet) {
     private: packet.private,
     allowRepeating: false,
   });
-}
-
-// Helpers
-function getRepeatId(message) {
-  return JSON.stringify(
-    {
-      frame: message.frame,
-      groupId: message.groupId,
-      indent: message.indent,
-      level: message.level,
-      messageText: message.messageText,
-      parameters: message.parameters,
-      source: message.source,
-      type: message.type,
-      userProvidedStyles: message.userProvidedStyles,
-      private: message.private,
-      stacktrace: message.stacktrace,
-      executionPoint: message.executionPoint,
-    },
-    function(_, value) {
-      if (typeof value === "bigint") {
-        return value.toString() + "n";
-      }
-
-      if (value && value._grip) {
-        return value._grip;
-      }
-
-      return value;
-    }
-  );
 }
 
 function convertCachedPacket(packet) {
@@ -625,6 +591,4 @@ module.exports = {
   isWarningGroup,
   l10n,
   prepareMessage,
-  // Export for use in testing.
-  getRepeatId,
 };

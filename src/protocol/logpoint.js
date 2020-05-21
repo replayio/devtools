@@ -61,7 +61,8 @@ addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
 
   if (LogpointHandlers.onResult) {
     results.forEach(({ key, value: { time, location, values } }) => {
-      LogpointHandlers.onResult(logGroupId, key, time, location, values);
+      const pause = null; // FIXME
+      LogpointHandlers.onResult(logGroupId, key, time, location, pause, values);
     });
   }
 });

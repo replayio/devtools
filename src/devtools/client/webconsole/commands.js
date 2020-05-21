@@ -26,9 +26,9 @@ class ConsoleCommands {
     if (failed) {
       v = "Error: Evaluation failed";
     } else if (returned) {
-      v = convertProtocolValue(returned);
+      v = convertProtocolValue(this.threadFront.currentPause, returned);
     } else {
-      v = convertProtocolValue(exception);
+      v = convertProtocolValue(this.threadFront.currentPause, exception);
     }
 
     return {

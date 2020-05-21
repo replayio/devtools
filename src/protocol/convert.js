@@ -33,10 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Helpers for interconverting between protocol values and values used by the
 // Firefox devtools client.
 
-function convertProtocolValue({ value, unserializableNumber, bigint, object }) {
+function convertProtocolValue(pause, v) {
+  const { value, unserializableNumber, bigint, object } = v;
+
   if (object) {
-    // NYI
-    return undefined;
+    return pause.getObjectFront(object);
   }
   if (unserializableNumber) {
     return Number(unserializableNumber);
@@ -47,6 +48,35 @@ function convertProtocolValue({ value, unserializableNumber, bigint, object }) {
   return value;
 }
 
+function convertProtocolScope(pause, protocolScope) {
+  const {
+    scopeId,
+    type,
+    functionLexical,
+    object,
+    bindings: protocolBindings,
+  } = protocolScope;
+
+  let bindings;
+  if (protocolBindings) {
+    const variables = {};
+    for (const value of protocolBindings) {
+      variables[value.name] = { value: convertProtocolValue(pause, value) };
+    }
+    bindings = { arguments: [], variables };
+  }
+
+  return {
+    actor: scopeId,
+    parent: null,
+    bindings,
+    object,
+    type,
+    scopeKind: functionLexical ? "function lexical" : "",
+  };
+}
+
 module.exports = {
   convertProtocolValue,
+  convertProtocolScope,
 };

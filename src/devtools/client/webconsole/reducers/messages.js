@@ -53,8 +53,6 @@ const MessageState = overrides =>
         // Array of fronts to release (i.e. fronts logged in removed messages).
         // This array *should not* be consumed by any UI component.
         frontsToRelease: [],
-        // Map of the form {messageId : numberOfRepeat}
-        repeatById: {},
         // Map logpointId:pointString to messages.
         logpointMessages: new Map(),
         // Set of logpoint IDs that have been removed
@@ -83,7 +81,6 @@ function cloneState(state) {
     groupsById: new Map(state.groupsById),
     currentGroup: state.currentGroup,
     frontsToRelease: [...state.frontsToRelease],
-    repeatById: { ...state.repeatById },
     networkMessagesUpdateById: { ...state.networkMessagesUpdateById },
     logpointMessages: new Map(state.logpointMessages),
     removedLogpointIds: new Set(state.removedLogpointIds),
@@ -106,7 +103,7 @@ function cloneState(state) {
  */
 // eslint-disable-next-line complexity
 function addMessage(newMessage, state, filtersState, prefsState, uiState) {
-  const { messagesById, groupsById, currentGroup, repeatById } = state;
+  const { messagesById, groupsById, currentGroup } = state;
 
   if (newMessage.type === constants.MESSAGE_TYPE.NULL_MESSAGE) {
     // When the message has a NULL type, we don't add it.
@@ -127,17 +124,6 @@ function addMessage(newMessage, state, filtersState, prefsState, uiState) {
     // Compute the new current group.
     state.currentGroup = getNewCurrentGroup(currentGroup, groupsById);
     return state;
-  }
-
-  const lastMessage = messagesById.get(state.lastMessageId);
-  if (lastMessage && newMessage.allowRepeating && messagesById.size > 0) {
-    if (
-      lastMessage.repeatId === newMessage.repeatId &&
-      lastMessage.groupId === currentGroup
-    ) {
-      state.repeatById[lastMessage.id] = (repeatById[lastMessage.id] || 1) + 1;
-      return state;
-    }
   }
 
   // Store the id of the message as being the last one being added.
@@ -353,7 +339,6 @@ function messages(
       // Preemptively remove messages that will never be rendered
       const list = [];
       let prunableCount = 0;
-      let lastMessageRepeatId = -1;
       for (let i = action.messages.length - 1; i >= 0; i--) {
         const message = action.messages[i];
         if (
@@ -361,15 +346,9 @@ function messages(
           !isGroupType(message.type) &&
           message.type !== MESSAGE_TYPE.END_GROUP
         ) {
-          if (message.repeatId !== lastMessageRepeatId) {
-            prunableCount++;
-          }
+          prunableCount++;
           // Once we've added the max number of messages that can be added, stop.
-          // Except for repeated messages, where we keep adding over the limit.
-          if (
-            prunableCount <= logLimit ||
-            message.repeatId == lastMessageRepeatId
-          ) {
+          if (prunableCount <= logLimit) {
             list.unshift(action.messages[i]);
           } else {
             break;
@@ -377,7 +356,6 @@ function messages(
         } else {
           list.unshift(message);
         }
-        lastMessageRepeatId = message.repeatId;
       }
 
       newState = cloneState(state);
@@ -876,10 +854,6 @@ function removeMessagesFromState(state, removedMessagesIds) {
   }
   if (mapHasRemovedIdKey(state.groupsById)) {
     state.groupsById = cleanUpMap(state.groupsById);
-  }
-
-  if (objectHasRemovedIdKey(state.repeatById)) {
-    state.repeatById = cleanUpObject(state.repeatById);
   }
 
   if (objectHasRemovedIdKey(state.networkMessagesUpdateById)) {
