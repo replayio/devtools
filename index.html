@@ -1,32 +1,28 @@
 <html class="theme-light">
-  <meta charset="utf-8" />
-  <body>
-    <canvas id="graphics"></canvas>
-    <div id="toolbox">
-      <div id="toolbox-timeline"></div>
-      <div id="toolbox-toolbar">
-        <div class="toolbar-panel-button" id="toolbox-toolbar-jsdebugger">
-          <div class="toolbar-panel-icon"></div>
-          Debugger
-        </div>
-        <div class="toolbar-panel-button" id="toolbox-toolbar-webconsole">
-          <div class="toolbar-panel-icon"></div>
-          Console
-        </div>
+<meta charset="utf-8" />
+
+<body>
+  <canvas id="graphics"></canvas>
+  <div id="toolbox">
+    <div id="toolbox-timeline"></div>
+    <div id="toolbox-toolbar">
+      <div class="toolbar-panel-button" id="toolbox-toolbar-jsdebugger">
+        <div class="toolbar-panel-icon"></div>
+        Debugger
       </div>
-      <div id="toolbox-contents">
-        <div
-          class="toolbar-panel-content"
-          id="toolbox-content-jsdebugger"
-        ></div>
-        <div
-          class="toolbar-panel-content"
-          id="toolbox-content-webconsole"
-        ></div>
+      <div class="toolbar-panel-button" id="toolbox-toolbar-webconsole">
+        <div class="toolbar-panel-icon"></div>
+        Console
       </div>
     </div>
-  </body>
+    <div id="toolbox-contents">
+      <div class="toolbar-panel-content" id="toolbox-content-jsdebugger"></div>
+      <div class="toolbar-panel-content" id="toolbox-content-webconsole"></div>
+    </div>
+  </div>
+</body>
 
-  <script src="src/devtools/client/shared/sourceeditor/codemirror/codemirror.bundle.js"></script>
-  <script src="dist/main.js"></script>
+<script src="src/devtools/client/shared/sourceeditor/codemirror/codemirror.bundle.js"></script>
+<script src="dist/main.js"></script>
+
 </html>

@@ -3,14 +3,8 @@ Web app with developer tools built on the Web Replay Protocol
 Setup instructions:
 
 ```
-npm install webpack webpack-cli --global
+npm install 
+npm start
 ```
 
-Build instructions;
-
-```
-webpack
-node server
-```
-
-Then open http://localhost:7997 in a web browser.
+Then open http://localhost:8080 in a web browser.
