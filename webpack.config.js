@@ -4,6 +4,13 @@ module.exports = {
   mode: "development",
   entry: "./src/main",
   devtool: "source-map",
+  output: {
+    publicPath: 'dist',
+  },
+  devServer: {
+    contentBase: '.',
+    index: 'index.html'
+  },
   plugins: [new MiniCssExtractPlugin()],
   resolve: {
     modules: [
