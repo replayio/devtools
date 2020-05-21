@@ -3350,7 +3350,7 @@ function GripArray(props) {
   if (mode === MODE.TINY) {
     const isEmpty = getLength(object) === 0; // Omit bracketed ellipsis for non-empty non-Array arraylikes (f.e: Sets).
 
-    if (!isEmpty && object.class !== "Array") {
+    if (!isEmpty && object.className() !== "Array") {
       return span(config, title);
     }
 
@@ -3505,7 +3505,8 @@ function getEmptySlotsElement(number) {
 }
 
 function supportsObject(grip) {
-  return grip.className() == "Array";
+  // FIXME rm dup
+  return false;
 }
 
 const maxLengthMap = new Map();
@@ -4709,7 +4710,7 @@ const Grip = __webpack_require__(113); // List of all registered template.
 // or modify an existing rep.
 
 
-const reps = [RegExp, StyleSheet, Event, DateTime, CommentNode, Accessible, ElementNode, TextNode, Attribute, Func, PromiseRep, ArrayRep, Document, DocumentType, Window, ObjectWithText, ObjectWithURL, ErrorRep, GripArray, GripMap, GripMapEntry, Grip, Undefined, Null, StringRep, Number, BigInt, SymbolRep, InfinityRep, NaNRep, Accessor, Obj];
+const reps = [RegExp, StyleSheet, Event, DateTime, CommentNode, Accessible, ElementNode, TextNode, Attribute, Func, PromiseRep, ArrayRep, Document, DocumentType, Window, ObjectWithText, ObjectWithURL, ErrorRep, GripArray, GripMap, GripMapEntry, Undefined, Null, StringRep, Number, BigInt, SymbolRep, InfinityRep, NaNRep, Accessor, Obj, Grip];
 /**
  * Generic rep that is used for rendering native JS types or an object.
  * The right template used for rendering is picked automatically according
@@ -5211,7 +5212,9 @@ function ArrayRep(props) {
   };
 
   if (mode === MODE.TINY) {
-    const isEmpty = object.length === 0;
+    const length = getArrayLikeLength(array);
+
+    const isEmpty = length === 0;
 
     if (isEmpty) {
       items = [];
@@ -5230,18 +5233,35 @@ function ArrayRep(props) {
 
   return span({
     className: "objectBox objectBox-array"
-  }, span({
+  }, getTitle(props, object), span({
     className: "arrayLeftBracket"
   }, brackets.left), ...items, span({
     className: "arrayRightBracket"
   }, brackets.right));
 }
 
+function getArrayLikeLength(object) {
+  if (["Set", "WeakSet"].includes(object.className())) {
+    return object.containerEntryCount();
+  }
+  const propertyValues = object.previewValueMap();
+  return propertyValues.length.primitive();
+}
+
+function getTitle(props, object) {
+  const name = object.className();
+  const length = getArrayLikeLength(object);
+
+  return span({
+    className: "objectTitle"
+  }, name, "(", length, ") ");
+}
+
 function arrayIterator(props, array, max) {
   const items = [];
+  const length = getArrayLikeLength(array);
 
   const propertyValues = array.previewValueMap();
-  const length = propertyValues.length.primitive();
 
   for (let i = 0; i < length && i < max; i++) {
     const config = {
@@ -5301,7 +5321,24 @@ function getLength(object) {
 }
 
 function supportsObject(object) {
-  return ["Array", "Arguments"].includes(object.className());
+  const classNames = [
+    "Array",
+    "Arguments",
+    "Set",
+    "WeakSet",
+    "Int8Array",
+    "Uint8Array",
+    "Uint8ClampedArray",
+    "Int16Array",
+    "Uint16Array",
+    "Int32Array",
+    "Uint32Array",
+    "Float32Array",
+    "Float64Array",
+    "BigInt64Array",
+    "BigUint64Array",
+  ];
+  return classNames.includes(object.className());
 }
 
 const maxLengthMap = new Map();
@@ -5590,8 +5627,8 @@ function Number(props) {
 }
 
 function stringify(object) {
-  const isNegativeZero = Object.is(object, -0) || object.type && object.type == "-0";
-  return isNegativeZero ? "-0" : String(object);
+  const v = object.primitive();
+  return Object.is(v, -0) ? "-0" : String(v);
 }
 
 function supportsObject(object) {

@@ -304,6 +304,7 @@ module.exports = {
   waitForScopeValue,
   toggleBlackboxSelectedSource,
   findMessages,
+  waitForMessage,
   warpToMessage,
   checkPausedMessage,
   waitForMessageCount,
