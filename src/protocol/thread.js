@@ -111,8 +111,8 @@ Pause.prototype = {
         const newEntries = [];
         for (const { key, value } of containerEntries || []) {
           newEntries.push({
-            key: new ValueFront(this, key),
-            value: value ? new ValueFront(this, value) : undefined,
+            key: key ? new ValueFront(this, key) : undefined,
+            value: new ValueFront(this, value),
           });
         }
         object.preview.containerEntries = newEntries;
@@ -227,6 +227,9 @@ ValueFront.prototype = {
   },
 
   previewContainerEntries() {
+    if (this.hasPreview()) {
+      return this._object.preview.containerEntries;
+    }
     return [];
   },
 

@@ -5263,15 +5263,26 @@ function arrayIterator(props, array, max) {
 
   const propertyValues = array.previewValueMap();
 
+  let containerEntries;
+  if (["Set", "WeakSet"].includes(array.className())) {
+    containerEntries = array.previewContainerEntries();
+  }
+
   for (let i = 0; i < length && i < max; i++) {
     const config = {
       mode: MODE.TINY,
       delim: i == length - 1 ? "" : ", "
     };
 
-    const elem = propertyValues[i]
-      ? propertyValues[i]
-      : array.getPause().newPrimitiveValue(null);
+    let elem;
+    if (containerEntries && i < containerEntries.length) {
+      elem = containerEntries[i].value;
+    } else {
+      elem = propertyValues[i];
+    }
+    if (!elem) {
+      elem = array.getPause().newPrimitiveValue(null);
+    }
     const item = ItemRep({ ...props,
       ...config,
       object: elem
