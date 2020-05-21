@@ -1279,7 +1279,7 @@ function GripRep(props) {
     object
   } = props;
   const config = {
-    "data-link-actor-id": object.actor,
+    "data-link-actor-id": object.maybeObjectId(),
     className: "objectBox objectBox-object"
   };
 
@@ -1322,20 +1322,6 @@ function getTitle(props, object) {
   return props.title || object.class || DEFAULT_TITLE;
 }
 
-function getPropertiesLength(object) {
-  let propertiesLength = object.preview && object.preview.ownPropertiesLength ? object.preview.ownPropertiesLength : object.ownPropertyLength;
-
-  if (object.preview && object.preview.safeGetterValues) {
-    propertiesLength += Object.keys(object.preview.safeGetterValues).length;
-  }
-
-  if (object.preview && object.preview.ownSymbols) {
-    propertiesLength += object.preview.ownSymbolsLength;
-  }
-
-  return propertiesLength;
-}
-
 function safePropIterator(props, object, max) {
   max = typeof max === "undefined" ? maxLengthMap.get(MODE.SHORT) : max;
 
@@ -1349,6 +1335,7 @@ function safePropIterator(props, object, max) {
 }
 
 function propIterator(props, object, max) {
+  /*
   if (object.preview && Object.keys(object.preview).includes("wrappedValue")) {
     const {
       Rep
@@ -1360,19 +1347,15 @@ function propIterator(props, object, max) {
       defaultRep: Grip
     })];
   } // Property filter. Show only interesting properties to the user.
-
+  */
 
   const isInterestingProp = props.isInterestingProp || ((type, value) => {
     return type == "boolean" || type == "number" || type == "string" && value.length != 0;
   });
 
-  let properties = object.preview ? object.preview.ownProperties || {} : {};
-  const propertiesLength = getPropertiesLength(object);
-
-  if (object.preview && object.preview.safeGetterValues) {
-    properties = { ...properties,
-      ...object.preview.safeGetterValues
-    };
+  const properties = {};
+  for (const { name, value } of object.previewValues()) {
+    properties[name] = value;
   }
 
   let indexes = getPropIndexes(properties, max, isInterestingProp);
@@ -1392,6 +1375,7 @@ function propIterator(props, object, max) {
   const suppressQuotes = object.class === "Proxy";
   const propsArray = getProps(props, properties, indexes, suppressQuotes); // Show symbols.
 
+  /*
   if (object.preview && object.preview.ownSymbols) {
     const {
       ownSymbols
@@ -1412,10 +1396,9 @@ function propIterator(props, object, max) {
     });
     propsArray.push(...symbolsProps);
   }
+  */
 
-  if (Object.keys(properties).length > max || propertiesLength > max || // When the object has non-enumerable properties, we don't have them in the
-  // packet, but we might want to show there's something in the object.
-  propertiesLength > propsArray.length) {
+  if (properties.length > propsArray.length || object.hasPreviewOverflow()) {
     // There are some undisplayed props. Then display "more...".
     propsArray.push(span({
       key: "more",
@@ -1446,7 +1429,7 @@ function getProps(componentProps, properties, indexes, suppressQuotes) {
   const propertiesKeys = Object.keys(properties);
   return indexes.map(i => {
     const name = propertiesKeys[i];
-    const value = getPropValue(properties[name]);
+    const value = properties[name];
     return PropRep({ ...componentProps,
       mode: MODE.TINY,
       name,
@@ -1481,8 +1464,8 @@ function getPropIndexes(properties, max, filter) {
       // values use typeof.
 
 
-      const value = getPropValue(properties[name]);
-      let type = value.class || typeof value;
+      const value = properties[name];
+      let type = value.isObject() ? value.className() : typeof value.primitive();
       type = type.toLowerCase();
 
       if (filter(type, value, name)) {
@@ -1497,41 +1480,12 @@ function getPropIndexes(properties, max, filter) {
 
   return indexes;
 }
-/**
- * Get the actual value of a property.
- *
- * @param {Object} property
- * @return {Object} Value of the property.
- */
 
-
-function getPropValue(property) {
-  let value = property;
-
-  if (typeof property === "object") {
-    const keys = Object.keys(property);
-
-    if (keys.includes("value")) {
-      value = property.value;
-    } else if (keys.includes("getterValue")) {
-      value = property.getterValue;
-    }
-  }
-
-  return value;
-} // Registration
+// Registration
 
 
 function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  if (object.class === "DeadObject") {
-    return true;
-  }
-
-  return object.preview ? typeof object.preview.ownProperties !== "undefined" : typeof object.ownPropertyLength !== "undefined";
+  return true;
 }
 
 const maxLengthMap = new Map();
@@ -1663,7 +1617,7 @@ function nodeHasGetterValue(item) {
 
 function nodeIsObject(item) {
   const value = getValue(item);
-  return value && value.type === "object";
+  return value && value.isObject();
 }
 
 function nodeIsArrayLike(item) {
@@ -1673,38 +1627,41 @@ function nodeIsArrayLike(item) {
 
 function nodeIsFunction(item) {
   const value = getValue(item);
-  return value && value.class === "Function";
+  return value && value.className() === "Function";
 }
 
 function nodeIsOptimizedOut(item) {
   const value = getValue(item);
-  return !nodeHasChildren(item) && value && value.optimizedOut;
+  return !nodeHasChildren(item) && value && value.isUnavailable();
 }
 
 function nodeIsUninitializedBinding(item) {
   const value = getValue(item);
-  return value && value.uninitialized;
+  return value && value.isUninitialized();
 } // Used to check if an item represents a binding that exists in a sourcemap's
 // original file content, but does not match up with a binding found in the
 // generated code.
 
 
 function nodeIsUnmappedBinding(item) {
-  const value = getValue(item);
-  return value && value.unmapped;
+  return false;
+  //const value = getValue(item);
+  //return value && value.unmapped;
 } // Used to check if an item represents a binding that exists in the debugger's
 // parser result, but does not match up with a binding returned by the
 // devtools server.
 
 
 function nodeIsUnscopedBinding(item) {
-  const value = getValue(item);
-  return value && value.unscoped;
+  return false;
+  //const value = getValue(item);
+  //return value && value.unscoped;
 }
 
 function nodeIsMissingArguments(item) {
-  const value = getValue(item);
-  return !nodeHasChildren(item) && value && value.missingArguments;
+  return false;
+  //const value = getValue(item);
+  //return !nodeHasChildren(item) && value && value.missingArguments;
 }
 
 function nodeHasProperties(item) {
@@ -2806,8 +2763,8 @@ function BigInt(props) {
   }, `${text}n`);
 }
 
-function supportsObject(object, noGrip = false) {
-  return getGripType(object, noGrip) === "BigInt";
+function supportsObject(valueFront, noGrip = false) {
+  return valueFront.isPrimitive() && typeof valueFront.primitive() == "bigint";
 } // Exports from this module
 
 
@@ -3013,14 +2970,8 @@ function getParams(parameterNames) {
 } // Registration
 
 
-function supportsObject(grip, noGrip = false) {
-  const type = getGripType(grip, noGrip);
-
-  if (noGrip === true || !isGrip(grip)) {
-    return type == "function";
-  }
-
-  return type == "Function";
+function supportsObject(grip) {
+  return grip.className() == "Function";
 }
 
 async function getSourceLocation(location, sourceMapService) {
@@ -3319,13 +3270,19 @@ function parseStackString(stack) {
   return res;
 } // Registration
 
+function supportsObject(object) {
+  const errorClasses = [
+    "Error",
+    "EvalError",
+    "RangeError",
+    "ReferenceError",
+    "SyntaxError",
+    "TypeError",
+    "URIError",
+    "DOMException",
+  ];
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  return object.preview && getGripType(object, noGrip) === "Error" || object.class === "DOMException";
+  return object.hasPreview() && errorClasses.includes(object.className());
 } // Exports from this module
 
 
@@ -3565,12 +3522,8 @@ function getEmptySlotsElement(number) {
   return `<${number} empty slot${number > 1 ? "s" : ""}>`;
 }
 
-function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return grip.preview && (grip.preview.kind == "ArrayLike" || getGripType(grip, noGrip) === "DocumentFragment");
+function supportsObject(grip) {
+  return grip.className() == "Array";
 }
 
 const maxLengthMap = new Map();
@@ -3836,12 +3789,8 @@ function getLength(grip) {
   return grip.preview.size || 0;
 }
 
-function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return grip.preview && grip.preview.kind == "MapLike";
+function supportsObject(grip) {
+  return ["Map", "MapLike"].includes(grip.className());
 }
 
 const maxLengthMap = new Map();
@@ -3923,12 +3872,8 @@ function GripMapEntry(props) {
   }));
 }
 
-function supportsObject(grip, noGrip = false) {
-  if (noGrip === true) {
-    return false;
-  }
-
-  return grip && (grip.type === "mapEntry" || grip.type === "storageEntry") && grip.preview;
+function supportsObject(grip) {
+  return grip.isMapEntry();
 }
 
 function createGripMapEntry(key, value) {
@@ -5244,16 +5189,13 @@ function getCroppedString(text, offset = 0, startCropIndex, endCropIndex) {
 }
 
 function isLongString(object) {
-  const grip = object && object.getGrip ? object.getGrip() : object;
-  return grip && grip.type === "longString";
+  return false;
+  //const grip = object && object.getGrip ? object.getGrip() : object;
+  //return grip && grip.type === "longString";
 }
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === false && isGrip(object)) {
-    return isLongString(object);
-  }
-
-  return getGripType(object, noGrip) == "string";
+function supportsObject(object) {
+  return object.className() == "String";
 } // Exports from this module
 
 
@@ -5415,8 +5357,8 @@ function getLength(object) {
   return object.length;
 }
 
-function supportsObject(object, noGrip = false) {
-  return noGrip && (Array.isArray(object) || Object.prototype.toString.call(object) === "[object Arguments]");
+function supportsObject(object) {
+  return ["Array", "Arguments"].includes(object.className());
 }
 
 const maxLengthMap = new Map();
@@ -5622,12 +5564,8 @@ const Undefined = function () {
   }, "undefined");
 };
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true) {
-    return object === undefined;
-  }
-
-  return object && object.type && object.type == "undefined" || getGripType(object, noGrip) == "undefined";
+function supportsObject(object) {
+  return object.isPrimitive() && object.primitive() == undefined;
 } // Exports from this module
 
 
@@ -5663,16 +5601,8 @@ function Null(props) {
   }, "null");
 }
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true) {
-    return object === null;
-  }
-
-  if (object && object.type && object.type == "null") {
-    return true;
-  }
-
-  return object == null;
+function supportsObject(object) {
+  return object.isPrimitive() && object.primitive() == null;
 } // Exports from this module
 
 
@@ -5721,8 +5651,8 @@ function stringify(object) {
   return isNegativeZero ? "-0" : String(object);
 }
 
-function supportsObject(object, noGrip = false) {
-  return ["boolean", "number", "-0"].includes(getGripType(object, noGrip));
+function supportsObject(object) {
+  return object.isPrimitive() && ["boolean", "number"].includes(typeof object.primitive());
 } // Exports from this module
 
 
@@ -5907,8 +5837,8 @@ function isInterestingProp(value) {
   return type == "boolean" || type == "number" || type == "string" && value;
 }
 
-function supportsObject(object, noGrip = false) {
-  return noGrip;
+function supportsObject(object) {
+  return false;
 } // Exports from this module
 
 
@@ -5975,8 +5905,9 @@ function SymbolRep(props) {
   }, "Symbol(", symbolText, ")");
 }
 
-function supportsObject(object, noGrip = false) {
-  return getGripType(object, noGrip) == "symbol";
+function supportsObject(object) {
+  return false;
+  //return getGripType(object, noGrip) == "symbol";
 } // Exports from this module
 
 
@@ -6022,9 +5953,8 @@ function InfinityRep(props) {
   }, object.type);
 }
 
-function supportsObject(object, noGrip = false) {
-  const type = getGripType(object, noGrip);
-  return type == "Infinity" || type == "-Infinity";
+function supportsObject(object) {
+  return object.isPrimitive() && [Infinity, -Infinity].includes(object.primitive());
 } // Exports from this module
 
 
@@ -6061,8 +5991,8 @@ function NaNRep(props) {
   }, "NaN");
 }
 
-function supportsObject(object, noGrip = false) {
-  return getGripType(object, noGrip) == "NaN";
+function supportsObject(object) {
+  return object.isPrimitive() && object.primitive() === NaN;
 } // Exports from this module
 
 
@@ -6161,12 +6091,15 @@ function hasSetter(object) {
   return object && object.set && object.set.type !== "undefined";
 }
 
-function supportsObject(object, noGrip = false) {
+function supportsObject(object) {
+  return false;
+  /*
   if (noGrip !== true && (hasGetter(object) || hasSetter(object))) {
     return true;
   }
 
   return false;
+  */
 } // Exports from this module
 
 
@@ -6299,12 +6232,9 @@ function getElements(grip, nameMaxLength, roleFirst = false, separatorText = ": 
 } // Registration
 
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  return object.preview && object.typeName && object.typeName === "accessible";
+function supportsObject(object) {
+  return false;
+  //return object.preview && object.typeName && object.typeName === "accessible";
 } // Exports from this module
 
 
@@ -6371,12 +6301,9 @@ function getTitle(grip) {
 } // Registration
 
 
-function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return getGripType(grip, noGrip) == "Attr" && grip.preview;
+function supportsObject(grip) {
+  return false;
+  //return getGripType(grip, noGrip) == "Attr" && grip.preview;
 }
 
 module.exports = {
@@ -6445,12 +6372,8 @@ function getTitle(grip) {
 } // Registration
 
 
-function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return getGripType(grip, noGrip) == "Date" && grip.preview;
+function supportsObject(grip) {
+  return grip.className() == "Date";
 } // Exports from this module
 
 
@@ -6513,13 +6436,8 @@ function getTitle(grip) {
 } // Registration
 
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  const type = getGripType(object, noGrip);
-  return object.preview && type === "HTMLDocument";
+function supportsObject(object) {
+  return object.className() === "HTMLDocument";
 } // Exports from this module
 
 
@@ -6570,13 +6488,10 @@ function DocumentType(props) {
 } // Registration
 
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  const type = getGripType(object, noGrip);
-  return object.preview && type === "DocumentType";
+function supportsObject(object) {
+  return false;
+  //const type = getGripType(object, noGrip);
+  //return object.preview && type === "DocumentType";
 } // Exports from this module
 
 
@@ -6688,12 +6603,8 @@ function getTitle(props) {
 } // Registration
 
 
-function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return grip.preview && grip.preview.kind == "DOMEvent";
+function supportsObject(object) {
+  return object.className() == "DOMEvent";
 } // Exports from this module
 
 
@@ -6807,12 +6718,8 @@ function getProps(props, promiseState) {
 } // Registration
 
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  return getGripType(object, noGrip) == "Promise";
+function supportsObject(object) {
+  return object.className() == "Promise";
 } // Exports from this module
 
 
@@ -6866,12 +6773,8 @@ function getSource(grip) {
 } // Registration
 
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  return getGripType(object, noGrip) == "RegExp";
+function supportsObject(object) {
+  return object.className() == "RegExp";
 } // Exports from this module
 
 
@@ -6935,12 +6838,8 @@ function getLocation(grip) {
 } // Registration
 
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  return getGripType(object, noGrip) == "CSSStyleSheet";
+function supportsObject(object) {
+  return object.className() == "CSSStyleSheet";
 } // Exports from this module
 
 
@@ -7009,12 +6908,9 @@ function CommentNode(props) {
 } // Registration
 
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  return object.preview && object.preview.nodeType === nodeConstants.COMMENT_NODE;
+function supportsObject(object) {
+  return false;
+  //return object.preview && object.preview.nodeType === nodeConstants.COMMENT_NODE;
 } // Exports from this module
 
 
@@ -7214,12 +7110,9 @@ function getElements(grip, mode) {
 } // Registration
 
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  return object.preview && object.preview.nodeType === nodeConstants.ELEMENT_NODE;
+function supportsObject(object) {
+  return false;
+  //return object.preview && object.preview.nodeType === nodeConstants.ELEMENT_NODE;
 } // Exports from this module
 
 
@@ -7327,12 +7220,8 @@ function getTitle(grip) {
 } // Registration
 
 
-function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return grip.preview && grip.class == "Text";
+function supportsObject(grip) {
+  return grip.className() == "Text";
 } // Exports from this module
 
 
@@ -7414,12 +7303,8 @@ function getLocation(object) {
 } // Registration
 
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  return object.preview && getGripType(object, noGrip) == "Window";
+function supportsObject(object) {
+  return object.className() == "Window";
 } // Exports from this module
 
 
@@ -7478,12 +7363,9 @@ function getDescription(grip) {
 } // Registration
 
 
-function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return grip.preview && grip.preview.kind == "ObjectWithText";
+function supportsObject(grip) {
+  return false;
+  //return grip.preview && grip.preview.kind == "ObjectWithText";
 } // Exports from this module
 
 
@@ -7547,12 +7429,9 @@ function getDescription(grip) {
 } // Registration
 
 
-function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return grip.preview && grip.preview.kind == "ObjectWithURL";
+function supportsObject(grip) {
+  return false;
+  //return grip.preview && grip.preview.kind == "ObjectWithURL";
 } // Exports from this module
 
 

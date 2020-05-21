@@ -32,7 +32,6 @@ import type {
 } from "../../actions/types";
 
 const { ThreadFront } = require("protocol/thread");
-const { convertProtocolValue, convertProtocolScope } = require("protocol/convert");
 const {
   setLogpoint,
   setLogpointByURL,
@@ -274,9 +273,9 @@ async function evaluate(
     return { exception: "Evaluation failed" };
   }
   if (returned) {
-    return { result: convertProtocolValue(threadFront.currentPause, returned) };
+    return { result: returned };
   }
-  return { exception: convertProtocolValue(threadFront.currentPause, exception) };
+  return { exception: exception };
 }
 
 async function autocomplete(
@@ -330,10 +329,38 @@ async function getFrames(thread: string) {
   );
 }
 
+function convertScope(protocolScope) {
+  const {
+    scopeId,
+    type,
+    functionLexical,
+    object,
+    bindings: protocolBindings,
+  } = protocolScope;
+
+  let bindings;
+  if (protocolBindings) {
+    const variables = {};
+    for (const { name, value } of protocolBindings) {
+      variables[name] = { value };
+    }
+    bindings = { arguments: [], variables };
+  }
+
+  return {
+    actor: scopeId,
+    parent: null,
+    bindings,
+    object,
+    type,
+    scopeKind: functionLexical ? "function lexical" : "",
+  };
+}
+
 async function getFrameScopes(frame: Frame): Promise<*> {
   const threadFront = lookupThreadFront(frame.thread);
   const scopes = await threadFront.getScopes(frame.id);
-  const converted = scopes.map(s => convertProtocolScope(threadFront, s));
+  const converted = scopes.map(s => convertScope(threadFront, s));
   for (let i = 0; i + 1 < converted.length; i++) {
     converted[i].parent = converted[i + 1];
   }

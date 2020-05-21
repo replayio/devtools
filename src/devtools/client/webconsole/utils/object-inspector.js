@@ -97,18 +97,13 @@ function getObjectInspector(
   return ObjectInspector({ ...objectInspectorProps, ...override });
 }
 
-function createRoots(frontOrPrimitiveGrip, pathPrefix = "") {
-  const isFront = frontOrPrimitiveGrip instanceof ObjectFront;
-  const grip = isFront ? { "objectFront": true } : frontOrPrimitiveGrip;
+function createRoots(valueFront, pathPrefix = "") {
+  const id = valueFront.maybeObjectId();
 
   return [
     {
-      path: `${pathPrefix}${
-        frontOrPrimitiveGrip
-          ? frontOrPrimitiveGrip.objectId
-          : null
-      }`,
-      contents: { value: grip, front: isFront ? frontOrPrimitiveGrip : null },
+      path: `${pathPrefix}${id}`,
+      contents: { value: valueFront },
     },
   ];
 }

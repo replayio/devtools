@@ -74,11 +74,7 @@ function GripMessageBody(props) {
     },
   };
 
-  if (
-    typeof grip === "string" ||
-    (grip && grip.type === "longString") ||
-    (grip && grip.getGrip && grip.getGrip().type === "longString")
-  ) {
+  if (grip.isString()) {
     Object.assign(objectInspectorProps, {
       useQuotes,
       transformEmptyString: true,

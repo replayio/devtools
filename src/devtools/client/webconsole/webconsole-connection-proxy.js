@@ -6,7 +6,6 @@
 
 const { ThreadFront } = require("protocol/thread");
 const { LogpointHandlers } = require("protocol/logpoint");
-const { convertProtocolValue } = require("protocol/convert");
 
 function WebConsoleConnectionProxy(ui) {
   this.ui = ui;
@@ -39,12 +38,6 @@ WebConsoleConnectionProxy.prototype = {
     //console.log("ConsoleMessage", msg);
 
     const stacktrace = convertStack(msg.stack, msg.data);
-
-    let argumentValues;
-    if (msg.argumentValues) {
-      argumentValues = msg.argumentValues.map(v => convertProtocolValue(pause, v));
-    }
-
     const sourceId = stacktrace ? stacktrace[0].sourceId : undefined;
 
     const packet = {
@@ -59,7 +52,7 @@ WebConsoleConnectionProxy.prototype = {
       error: msg.level == "error",
       info: msg.level == "info",
       stacktrace,
-      argumentValues,
+      argumentValues: msg.argumentValues,
       executionPoint: msg.point.point,
       executionPointTime: msg.point.time,
       executionPointHasFrames: !!stacktrace,

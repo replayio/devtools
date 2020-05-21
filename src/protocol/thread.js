@@ -55,8 +55,6 @@ function Pause(sessionId) {
   this.frames = new Map();
   this.scopes = new Map();
   this.objects = new Map();
-
-  this.objectFronts = new Map();
 }
 
 Pause.prototype = {
@@ -81,8 +79,52 @@ Pause.prototype = {
 
   addData({ frames, scopes, objects }) {
     (frames || []).forEach(f => this.frames.set(f.frameId, f));
-    (scopes || []).forEach(s => this.scopes.set(s.scopeId, s));
-    (objects || []).forEach(o => this.objects.set(o.objectId, o));
+    (scopes || []).forEach(scope => {
+      if (scope.bindings) {
+        const newBindings = [];
+        for (const v of scope.bindings) {
+          newBindings.push({ name: v.name, value: new ValueFront(this, v) });
+        }
+        scope.bindings = newBindings;
+      }
+      this.scopes.set(scope.scopeId, scope);
+    });
+    (objects || []).forEach(object => {
+      if (object.preview) {
+        const { properties, containerEntries, getterValues } = object.preview;
+
+        const newProperties = [];
+        for (const p of properties || []) {
+          const flags = "flags" in p ? p.flags : 7;
+          newProperties.push({
+            name: p.name,
+            value: new ValueFront(this, p),
+            writable: flags & 1,
+            configurable: flags & 2,
+            enumerable: flags & 4,
+            get: p.get ? new ValueFront(this, { object: p.get }) : undefined,
+            set: p.set ? new ValueFront(this, { object: p.set }) : undefined,
+          });
+        }
+        object.preview.properties = newProperties;
+
+        const newEntries = [];
+        for (const { key, value } of containerEntries || []) {
+          newEntries.push({
+            key: new ValueFront(this, key),
+            value: value ? new ValueFront(this, value) : undefined,
+          });
+        }
+        object.preview.containerEntries = newEntries;
+
+        const newGetterValues = [];
+        for (const v of getterValues || []) {
+          newGetterValues.push({ name: v.name, value: new ValueFront(this, v) });
+        }
+        object.preview.getterValues = newGetterValues;
+      }
+      this.objects.set(object.objectId, object);
+    });
   },
 
   async getFrames() {
@@ -107,31 +149,97 @@ Pause.prototype = {
     this.addData(data);
     return { returned, exception, failed };
   },
-
-  getObjectFront(objectId) {
-    if (this.objectFronts.has(objectId)) {
-      return this.objectFronts.get(objectId);
-    }
-    const objectData = this.objects.get(objectId);
-    assert(objectData);
-    const front = new ObjectFront(this, objectId, objectData);
-    this.objectFronts.set(objectId, front);
-    return front;
-  },
 };
 
-function ObjectFront(pause, objectId, data) {
+function ValueFront(pause, protocolValue) {
   this._pause = pause;
-  this._objectId = objectId;
-  this._data = data;
+  this._hasPrimitive = false;
+  this._primitive = undefined;
+  this._object = null;
+  this._uninitialized = false;
+  this._unavailable = false;
+
+  if ("value" in protocolValue) {
+    this._hasPrimitive = true;
+    this._primitive = protocolValue.value;
+  } else if ("object" in protocolValue) {
+    const data = pause.objects.get(protocolValue.object);
+    this._object = data ? data : { objectId: protocolValue.object };
+  } else if ("unserializableNumber" in protocolValue) {
+    this._hasPrimitive = true;
+    this._primitive = Number(protocolValue.unserializableNumber);
+  } else if ("bigint" in protocolValue) {
+    this._hasPrimitive = true;
+    this._primitive = BigInt(protocolValue.bigint);
+  } else if ("uninitialized" in protocolValue) {
+    this._uninitialized = true;
+  } else if ("unavailable" in protocolValue) {
+    this._unavailable = true;
+  } else {
+    // When there are no keys the value is undefined.
+    this._hasPrimitive = true;
+  }
 }
 
-ObjectFront.prototype = {
-  type: "object",
-  getGrip: undefined,
+ValueFront.prototype = {
+  maybeObjectId() {
+    return this._object ? this._object.objectId : "";
+  },
 
-  get class() {
-    return this._data.className;
+  isObject() {
+    return !!this._object;
+  },
+
+  hasPreview() {
+    return this._object && this._object.preview;
+  },
+
+  hasPreviewOverflow() {
+    return !this.hasPreview() || this._object.preview.overflow;
+  },
+
+  previewValues() {
+    const rv = [];
+    if (this.hasPreview()) {
+      for (const { name, value, get, set } of this._object.properties) {
+        // For now, ignore getter/setter properties.
+        if (!get && !set) {
+          rv.push({ name, value });
+        }
+      }
+      rv.push(...this._object.preview.getterValues);
+    }
+    return rv;
+  },
+
+  className() {
+    assert(this._object.className);
+    return this._object.className;
+  },
+
+  isString() {
+    return this.isPrimitive() && typeof(this.primitive()) == "string";
+  },
+
+  isPrimitive() {
+    return this._hasPrimitive;
+  },
+
+  primitive() {
+    assert(this._hasPrimitive);
+    return this._primitive;
+  },
+
+  isMapEntry() {
+    return false;
+  },
+
+  isUninitialized() {
+    return this._uninitialized;
+  },
+
+  isUnavailable() {
+    return this._unavailable;
   },
 };
 
@@ -155,7 +263,7 @@ const DisallowEverythingProxyHandler = {
   deleteProperty() { NotAllowed(); },
 };
 
-Object.setPrototypeOf(ObjectFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+Object.setPrototypeOf(ValueFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 const ThreadFront = {
   // When replaying there is only a single thread currently. Use this thread ID
@@ -347,7 +455,13 @@ const ThreadFront = {
   },
 
   evaluateInFrame(frameId, text) {
-    return this.currentPause.evaluateInFrame(frameId, text);
+    const rv = this.currentPause.evaluateInFrame(frameId, text);
+    if (rv.returned) {
+      rv.returned = new ValueFront(this.currentPause, rv.returned);
+    } else if (rv.exception) {
+      rv.exception = new ValueFront(this.currentPause, rv.exception);
+    }
+    return rv;
   },
 
   _resumeOperation(command) {
@@ -408,6 +522,11 @@ const ThreadFront = {
     addEventListener("Console.newMessage", ({ message }) => {
       const pause = new Pause(this.sessionId);
       pause.instantiate(message.pauseId, message.data);
+      if (message.argumentValues) {
+        message.argumentValues = message.argumentValues.map(
+          v => new ValueFront(pause, v)
+        );
+      }
       onConsoleMessage(pause, message);
     });
   },

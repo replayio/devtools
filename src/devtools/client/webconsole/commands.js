@@ -4,8 +4,6 @@
 
 "use strict";
 
-const { convertProtocolValue } = require("protocol/convert");
-
 class ConsoleCommands {
   constructor({ devToolsClient, hud, threadFront }) {
     this.devToolsClient = devToolsClient;
@@ -26,9 +24,9 @@ class ConsoleCommands {
     if (failed) {
       v = "Error: Evaluation failed";
     } else if (returned) {
-      v = convertProtocolValue(this.threadFront.currentPause, returned);
+      v = returned;
     } else {
-      v = convertProtocolValue(this.threadFront.currentPause, exception);
+      v = exception;
     }
 
     return {
