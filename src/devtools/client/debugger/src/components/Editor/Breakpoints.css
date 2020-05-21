@@ -109,7 +109,7 @@
   cursor: pointer;
   height: 13px;
   width: 11px;
-  vertical-align: top;
+  vertical-align: text-bottom;
   fill: var(--breakpoint-fill);
   stroke: var(--breakpoint-stroke);
   fill-opacity: var(--breakpoint-inactive-opacity);
