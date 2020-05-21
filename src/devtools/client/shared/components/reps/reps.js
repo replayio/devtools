@@ -1284,7 +1284,7 @@ function GripRep(props) {
   };
 
   if (mode === MODE.TINY) {
-    const propertiesLength = getPropertiesLength(object);
+    const hasProperties = object.previewValueCount() != 0;
     const tinyModeItems = [];
 
     if (getTitle(props, object) !== DEFAULT_TITLE) {
@@ -1292,7 +1292,7 @@ function GripRep(props) {
     } else {
       tinyModeItems.push(span({
         className: "objectLeftBrace"
-      }, "{"), propertiesLength > 0 ? span({
+      }, "{"), hasProperties ? span({
         key: "more",
         className: "more-ellipsis",
         title: "more…"
@@ -1319,7 +1319,7 @@ function getTitleElement(props, object) {
 }
 
 function getTitle(props, object) {
-  return props.title || object.class || DEFAULT_TITLE;
+  return props.title || object.className() || DEFAULT_TITLE;
 }
 
 function safePropIterator(props, object, max) {
@@ -1353,10 +1353,8 @@ function propIterator(props, object, max) {
     return type == "boolean" || type == "number" || type == "string" && value.length != 0;
   });
 
-  const properties = {};
-  for (const { name, value } of object.previewValues()) {
-    properties[name] = value;
-  }
+  const properties = object.previewValueMap();
+  const propertiesLength = object.previewValueCount();
 
   let indexes = getPropIndexes(properties, max, isInterestingProp);
 
@@ -1372,7 +1370,7 @@ function propIterator(props, object, max) {
   // unquoted.
 
 
-  const suppressQuotes = object.class === "Proxy";
+  const suppressQuotes = object.className() === "Proxy";
   const propsArray = getProps(props, properties, indexes, suppressQuotes); // Show symbols.
 
   /*
@@ -1398,7 +1396,7 @@ function propIterator(props, object, max) {
   }
   */
 
-  if (properties.length > propsArray.length || object.hasPreviewOverflow()) {
+  if (propertiesLength > propsArray.length || object.hasPreviewOverflow()) {
     // There are some undisplayed props. Then display "more...".
     propsArray.push(span({
       key: "more",
@@ -2821,7 +2819,9 @@ function FunctionRep(props) {
   } = props;
   let jumpToDefinitionButton;
 
-  if (onViewSourceInDebugger && grip.location && grip.location.url && !IGNORED_SOURCE_URLS.includes(grip.location.url)) {
+  const location = grip.functionLocation();
+  const url = grip.functionLocationURL();
+  if (onViewSourceInDebugger && url && !IGNORED_SOURCE_URLS.includes(url)) {
     jumpToDefinitionButton = button({
       className: "jump-definition",
       draggable: false,
@@ -2835,24 +2835,26 @@ function FunctionRep(props) {
           recordTelemetryEvent("jump_to_definition");
         }
 
-        const sourceLocation = await getSourceLocation(grip.location, sourceMapService);
+        const sourceLocation = await getSourceLocation(location, sourceMapService);
         onViewSourceInDebugger(sourceLocation);
       }
     });
   }
 
   const elProps = {
-    "data-link-actor-id": grip.actor,
+    "data-link-actor-id": grip.maybeObjectId(),
     className: "objectBox objectBox-function",
     // Set dir="ltr" to prevent parentheses from
     // appearing in the wrong direction
     dir: "ltr"
   };
-  const parameterNames = (grip.parameterNames || []).filter(param => param);
+  const parameterNames = (grip.functionParameterNames() || []).filter(param => param);
 
+  /*
   if (grip.isClassConstructor) {
     return span(elProps, getClassTitle(grip, props), getFunctionName(grip, props), ...getClassBody(parameterNames, props), jumpToDefinitionButton);
   }
+  */
 
   return span(elProps, getFunctionTitle(grip, props), getFunctionName(grip, props), "(", ...getParams(parameterNames), ")", jumpToDefinitionButton);
 }
@@ -2874,6 +2876,7 @@ function getFunctionTitle(grip, props) {
 
   let title = mode === MODE.TINY ? "" : "function ";
 
+  /*
   if (grip.isGenerator) {
     title = mode === MODE.TINY ? "* " : "function* ";
   }
@@ -2881,6 +2884,7 @@ function getFunctionTitle(grip, props) {
   if (grip.isAsync) {
     title = `${"async" + " "}${title}`;
   }
+  */
 
   return span({
     className: "objectTitle"
@@ -2895,22 +2899,7 @@ function getFunctionTitle(grip, props) {
 
 
 function getFunctionName(grip, props = {}) {
-  let {
-    functionName
-  } = props;
-  let name;
-
-  if (functionName) {
-    const end = functionName.length - 1;
-    functionName = functionName.startsWith('"') && functionName.endsWith('"') ? functionName.substring(1, end) : functionName;
-  }
-
-  if (grip.displayName != undefined && functionName != undefined && grip.displayName != functionName) {
-    name = `${functionName}:${grip.displayName}`;
-  } else {
-    name = cleanFunctionName(grip.userDisplayName || grip.displayName || grip.name || props.functionName || "");
-  }
-
+  const name = grip.functionName();
   return cropString(name, 100);
 }
 
@@ -3087,42 +3076,35 @@ ErrorRep.propTypes = {
 
 function ErrorRep(props) {
   const object = props.object;
-  const preview = object.preview;
   const mode = props.mode;
   let name;
 
-  if (preview && preview.name && typeof preview.name === "string" && preview.kind) {
-    switch (preview.kind) {
-      case "Error":
-        name = preview.name;
-        break;
+  const preview = object.previewValueMap();
 
-      case "DOMException":
-        name = preview.kind;
-        break;
-
-      default:
-        throw new Error("Unknown preview kind for the Error rep.");
-    }
-  } else {
-    name = "Error";
+  switch (object.className()) {
+    case "DOMException":
+      name = "DOMException";
+      break;
+    default:
+      name = preview.name.primitive();
+      break;
   }
 
   const content = [];
 
-  if (mode === MODE.TINY || typeof preview.message !== "string") {
+  if (mode === MODE.TINY) {
     content.push(name);
   } else {
-    content.push(`${name}: "${preview.message}"`);
+    content.push(`${name}: "${preview.message.primitive()}"`);
   }
 
   if (preview.stack && mode !== MODE.TINY && mode !== MODE.SHORT) {
-    const stacktrace = props.renderStacktrace ? props.renderStacktrace(parseStackString(preview.stack)) : getStacktraceElements(props, preview);
+    const stacktrace = props.renderStacktrace ? props.renderStacktrace(parseStackString(preview.stack.primitive())) : getStacktraceElements(props, preview);
     content.push(stacktrace);
   }
 
   return span({
-    "data-link-actor-id": object.actor,
+    "data-link-actor-id": object.maybeObjectId(),
     className: "objectBox-stackTrace"
   }, content);
 }
@@ -3151,7 +3133,7 @@ function getStacktraceElements(props, preview) {
     return stack;
   }
 
-  parseStackString(preview.stack).forEach((frame, index, frames) => {
+  parseStackString(preview.stack.primitive()).forEach((frame, index, frames) => {
     let onLocationClick;
     const {
       filename,
@@ -3656,7 +3638,7 @@ function GripMap(props) {
     object
   } = props;
   const config = {
-    "data-link-actor-id": object.actor,
+    "data-link-actor-id": object.maybeObjectId(),
     className: "objectBox objectBox-object"
   };
   const title = getTitle(props, object);
@@ -3675,7 +3657,7 @@ function GripMap(props) {
 }
 
 function getTitle(props, object) {
-  const title = props.title || (object && object.class ? object.class : "Map");
+  const title = props.title || (object && object.className() ? object.className() : "Map");
   return span({
     className: "objectTitle"
   }, title, lengthBubble({
@@ -3700,22 +3682,8 @@ function safeEntriesIterator(props, object, max) {
 }
 
 function entriesIterator(props, object, max) {
-  // Entry filter. Show only interesting entries to the user.
-  const isInterestingEntry = props.isInterestingEntry || ((type, value) => {
-    return type == "boolean" || type == "number" || type == "string" && value.length != 0;
-  });
-
-  const mapEntries = object.preview && object.preview.entries ? object.preview.entries : [];
-  let indexes = getEntriesIndexes(mapEntries, max, isInterestingEntry);
-
-  if (indexes.length < max && indexes.length < mapEntries.length) {
-    // There are not enough entries yet, so we add uninteresting entries.
-    indexes = indexes.concat(getEntriesIndexes(mapEntries, max - indexes.length, (t, value, name) => {
-      return !isInterestingEntry(t, value, name);
-    }));
-  }
-
-  const entries = getEntries(props, mapEntries, indexes);
+  const mapEntries = object.previewContainerEntries();
+  const entries = getEntries(props, mapEntries);
 
   if (entries.length < getLength(object)) {
     // There are some undisplayed entries. Then display "…".
@@ -3734,12 +3702,15 @@ function entriesIterator(props, object, max) {
  */
 
 
-function getEntries(props, entries, indexes) {
+function getEntries(props, entries) {
   const {
     onDOMNodeMouseOver,
     onDOMNodeMouseOut,
     onInspectIconClick
   } = props; // Make indexes ordered by ascending.
+
+  // FIXME
+  return [];
 
   indexes.sort(function (a, b) {
     return a - b;
@@ -3748,9 +3719,9 @@ function getEntries(props, entries, indexes) {
     const [key, entryValue] = entries[index];
     const value = entryValue.value !== undefined ? entryValue.value : entryValue;
     return PropRep({
-      name: key && key.getGrip ? key.getGrip() : key,
+      name: key,
       equal: " \u2192 ",
-      object: value && value.getGrip ? value.getGrip() : value,
+      object: value,
       mode: MODE.TINY,
       onDOMNodeMouseOver,
       onDOMNodeMouseOut,
@@ -3758,35 +3729,9 @@ function getEntries(props, entries, indexes) {
     });
   });
 }
-/**
- * Get the indexes of entries in the map.
- *
- * @param {Array} entries Entries array.
- * @param {Number} max The maximum length of indexes array.
- * @param {Function} filter Filter the entry you want.
- * @return {Array} Indexes of filtered entries in the map.
- */
-
-
-function getEntriesIndexes(entries, max, filter) {
-  return entries.reduce((indexes, [key, entry], i) => {
-    if (indexes.length < max) {
-      const value = entry && entry.value !== undefined ? entry.value : entry; // Type is specified in grip's "class" field and for primitive
-      // values use typeof.
-
-      const type = (value && value.class ? value.class : typeof value).toLowerCase();
-
-      if (filter(type, value, key)) {
-        indexes.push(i);
-      }
-    }
-
-    return indexes;
-  }, []);
-}
 
 function getLength(grip) {
-  return grip.preview.size || 0;
+  return grip.containerEntryCount();
 }
 
 function supportsObject(grip) {
@@ -5295,29 +5240,27 @@ function ArrayRep(props) {
 function arrayIterator(props, array, max) {
   const items = [];
 
-  for (let i = 0; i < array.length && i < max; i++) {
+  const propertyValues = array.previewValueMap();
+  const length = propertyValues.length.primitive();
+
+  for (let i = 0; i < length && i < max; i++) {
     const config = {
       mode: MODE.TINY,
-      delim: i == array.length - 1 ? "" : ", "
+      delim: i == length - 1 ? "" : ", "
     };
-    let item;
 
-    try {
-      item = ItemRep({ ...props,
-        ...config,
-        object: array[i]
-      });
-    } catch (exc) {
-      item = ItemRep({ ...props,
-        ...config,
-        object: exc
-      });
-    }
+    const elem = propertyValues[i]
+      ? propertyValues[i]
+      : array.getPause().newPrimitiveValue(null);
+    const item = ItemRep({ ...props,
+      ...config,
+      object: elem
+    });
 
     items.push(item);
   }
 
-  if (array.length > max) {
+  if (length > max) {
     items.push(span({
       className: "more-ellipsis",
       title: "more…"
@@ -6346,12 +6289,12 @@ function DateTime(props) {
   let date;
 
   try {
-    const dateObject = new Date(grip.preview.timestamp); // Calling `toISOString` will throw if the date is invalid,
+    const dateObject = new Date(grip.dateTime()); // Calling `toISOString` will throw if the date is invalid,
     // so we can render an `Invalid Date` element.
 
     dateObject.toISOString();
     date = span({
-      "data-link-actor-id": grip.actor,
+      "data-link-actor-id": grip.maybeObjectId(),
       className: "objectBox"
     }, getTitle(grip), span({
       className: "Date"
@@ -6368,7 +6311,7 @@ function DateTime(props) {
 function getTitle(grip) {
   return span({
     className: "objectTitle"
-  }, `${grip.class} `);
+  }, `${grip.className()} `);
 } // Registration
 
 
@@ -6763,13 +6706,13 @@ function RegExp(props) {
     object
   } = props;
   return span({
-    "data-link-actor-id": object.actor,
+    "data-link-actor-id": object.maybeObjectId(),
     className: "objectBox objectBox-regexp regexpSource"
   }, getSource(object));
 }
 
 function getSource(grip) {
-  return grip.displayString;
+  return grip.regexpString();
 } // Registration
 
 

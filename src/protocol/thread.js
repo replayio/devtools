@@ -149,6 +149,10 @@ Pause.prototype = {
     this.addData(data);
     return { returned, exception, failed };
   },
+
+  newPrimitiveValue(value) {
+    return new ValueFront(this, { value });
+  },
 };
 
 function ValueFront(pause, protocolValue) {
@@ -182,6 +186,10 @@ function ValueFront(pause, protocolValue) {
 }
 
 ValueFront.prototype = {
+  getPause() {
+    return this._pause;
+  },
+
   maybeObjectId() {
     return this._object ? this._object.objectId : "";
   },
@@ -198,23 +206,66 @@ ValueFront.prototype = {
     return !this.hasPreview() || this._object.preview.overflow;
   },
 
-  previewValues() {
-    const rv = [];
+  previewValueMap() {
+    const rv = Object.create(null);
     if (this.hasPreview()) {
-      for (const { name, value, get, set } of this._object.properties) {
+      for (const { name, value, get, set } of this._object.preview.properties) {
         // For now, ignore getter/setter properties.
         if (!get && !set) {
-          rv.push({ name, value });
+          rv[name] = value;
         }
       }
-      rv.push(...this._object.preview.getterValues);
+      for (const { name, value } of this._object.preview.getterValues) {
+        rv[name] = value;
+      }
     }
     return rv;
   },
 
+  previewValueCount() {
+    return Object.keys(this.previewValueMap()).length;
+  },
+
+  previewContainerEntries() {
+    return [];
+  },
+
   className() {
-    assert(this._object.className);
-    return this._object.className;
+    if (this._object) {
+      assert(this._object.className);
+      return this._object.className;
+    }
+  },
+
+  containerEntryCount() {
+    return this._object.preview.containerEntryCount;
+  },
+
+  regexpString() {
+    return this._object.preview.regexpString;
+  },
+
+  dateTime() {
+    return this._object.preview.dateTime;
+  },
+
+  functionName() {
+    return this._object.preview.functionName;
+  },
+
+  functionParameterNames() {
+    return this._object.preview.functionParameterNames;
+  },
+
+  functionLocation() {
+    return this._object.preview.functionLocation;
+  },
+
+  functionLocationURL() {
+    const location = this.functionLocation();
+    if (location) {
+      return ThreadFront.getScriptURL(location.scriptId);
+    }
   },
 
   isString() {
