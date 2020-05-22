@@ -106,7 +106,7 @@ function closestEntry(array, time) {
 // All paints that have occurred in the recording, in order. Include the
 // beginning point of the recording as well, which is not painted and has
 // a known point and time.
-const gPaintPoints = [ { point: "0", time: 0 } ];
+const gPaintPoints = [{ point: "0", time: 0 }];
 
 // All mouse events that have occurred in the recording, in order.
 const gMouseEvents = [];
@@ -263,12 +263,12 @@ function drawCursor(cx, x, y) {
   const scale = 3;
   const path = new Path2D(`
 M ${x} ${y}
-V ${y+10*scale}
-L ${x+2*scale} ${y+8*scale}
-L ${x+4*scale} ${y+13*scale}
-L ${x+5.5*scale} ${y+12.6*scale}
-L ${x+3.5*scale} ${y+7.6*scale}
-L ${x+6.5*scale} ${y+7.8*scale}
+V ${y + 10 * scale}
+L ${x + 2 * scale} ${y + 8 * scale}
+L ${x + 4 * scale} ${y + 13 * scale}
+L ${x + 5.5 * scale} ${y + 12.6 * scale}
+L ${x + 3.5 * scale} ${y + 7.6 * scale}
+L ${x + 6.5 * scale} ${y + 7.8 * scale}
 Z
 `);
   cx.fillStyle = "black";
@@ -286,23 +286,27 @@ function drawClick(cx, x, y) {
   cx.stroke();
 }
 
+
 function refreshGraphics() {
   const canvas = document.getElementById("graphics");
   const cx = canvas.getContext("2d");
 
+  const viewportHeight = 0.6;
   const scale = window.devicePixelRatio;
   canvas.width = window.innerWidth * scale;
-  canvas.height = window.innerHeight * scale;
-
+  canvas.height = (window.innerHeight * scale * viewportHeight);
   if (scale != 1) {
     canvas.style.transform = `
       scale(${1 / scale})
-      translate(-${canvas.width / scale}px, -${canvas.height / scale}px)
+      translate(-${canvas.width / scale}px, -${(canvas.height / scale)}px)
     `;
   }
 
   if (gDrawImage) {
-    cx.drawImage(gDrawImage, 0, 0);
+    const offsetLeft = (canvas.width - gDrawImage.width) / 2;
+    const offsetTop = (canvas.height - gDrawImage.height) / 2;
+
+    cx.drawImage(gDrawImage, offsetLeft, offsetTop);
 
     if (gDrawMouse) {
       const { x, y, clickX, clickY } = gDrawMouse;
