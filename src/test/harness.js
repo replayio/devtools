@@ -277,6 +277,35 @@ function waitForMessageCount(text, count) {
   });
 }
 
+async function checkMessageStack(text, expectedFrameLines, expand) {
+  const msgNode = await waitForMessage(text);
+  assert(!msgNode.classList.contains("open"));
+
+  if (expand) {
+    const button = await waitUntil(
+      () => msgNode.querySelector(".collapse-button")
+    );
+    button.click();
+  }
+
+  const framesNode = await waitUntil(
+    () => msgNode.querySelector(".frames")
+  );
+  const frameNodes = Array.from(framesNode.querySelectorAll(".frame"));
+  assert(frameNodes.length == expectedFrameLines.length);
+
+  for (let i = 0; i < frameNodes.length; i++) {
+    const frameNode = frameNodes[i];
+    const line = frameNode.querySelector(".line").textContent;
+    assert(line == expectedFrameLines[i].toString());
+  }
+}
+
+function checkJumpIcon(msg) {
+  const jumpIcon = msg.querySelector(".jump-definition");
+  assert(jumpIcon);
+}
+
 async function executeInConsole(text) {
   gToolbox._panels.webconsole.hud.evaluateInput(text);
 }
@@ -308,5 +337,7 @@ module.exports = {
   warpToMessage,
   checkPausedMessage,
   waitForMessageCount,
+  checkMessageStack,
+  checkJumpIcon,
   executeInConsole,
 };

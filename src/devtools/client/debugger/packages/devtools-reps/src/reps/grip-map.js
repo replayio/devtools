@@ -138,7 +138,7 @@ function getLength(grip) {
 }
 
 function supportsObject(grip) {
-  return ["Map", "MapLike"].includes(grip.className());
+  return ["Map", "WeakMap"].includes(grip.className());
 }
 
 const maxLengthMap = new Map();

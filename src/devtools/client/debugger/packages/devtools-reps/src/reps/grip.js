@@ -39,7 +39,7 @@ function GripRep(props) {
   };
 
   if (mode === MODE.TINY) {
-    const hasProperties = object.previewValueCount() != 0;
+    const hasProperties = !object.hasPreview() || object.previewValueCount() != 0;
 
     const tinyModeItems = [];
     if (getTitle(props, object) !== DEFAULT_TITLE) {
@@ -201,8 +201,9 @@ function propIterator(props, object, max) {
         "…"
       )
     );
-    return propsArray;
   }
+
+  return propsArray;
 }
 
 

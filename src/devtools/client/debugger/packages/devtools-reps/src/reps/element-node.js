@@ -14,6 +14,7 @@ const { isGrip, wrapRender } = require("./rep-utils");
 const { rep: StringRep, isLongString } = require("./string");
 const { MODE } = require("./constants");
 const nodeConstants = require("devtools/shared/dom-node-constants");
+const { createPrimitiveValueFront } = require("protocol/thread");
 
 const MAX_ATTRIBUTE_LENGTH = 50;
 
@@ -43,10 +44,10 @@ function ElementNode(props) {
   } = props;
   const elements = getElements(object, mode);
 
-  const isInTree = object.preview && object.preview.isConnected === true;
+  const isInTree = object.isNodeConnected() === true;
 
   const baseConfig = {
-    "data-link-actor-id": object.actor,
+    "data-link-actor-id": object.maybeObjectId(),
     className: "objectBox objectBox-node",
   };
   let inspectIcon;
@@ -90,13 +91,10 @@ function ElementNode(props) {
 }
 
 function getElements(grip, mode) {
-  const {
-    attributes,
-    nodeName,
-    isAfterPseudoElement,
-    isBeforePseudoElement,
-    isMarkerPseudoElement,
-  } = grip.preview;
+  const attributes = grip.nodeAttributeMap();
+  const nodeName = grip.nodeName().toLowerCase();
+  const pseudoNodeName = grip.nodePseudoType();
+
   const nodeNameElement = span(
     {
       className: "tag-name",
@@ -104,14 +102,6 @@ function getElements(grip, mode) {
     nodeName
   );
 
-  let pseudoNodeName;
-  if (isAfterPseudoElement) {
-    pseudoNodeName = "after";
-  } else if (isBeforePseudoElement) {
-    pseudoNodeName = "before";
-  } else if (isMarkerPseudoElement) {
-    pseudoNodeName = "marker";
-  }
   if (pseudoNodeName) {
     return [span({ className: "attrName" }, `::${pseudoNodeName}`)];
   }
@@ -159,7 +149,7 @@ function getElements(grip, mode) {
       span({ className: "attrEqual" }, "="),
       StringRep({
         className: "attrValue",
-        object: value,
+        object: createPrimitiveValueFront(value),
         cropLimit: MAX_ATTRIBUTE_LENGTH,
         title,
       })
@@ -178,8 +168,8 @@ function getElements(grip, mode) {
 
 // Registration
 function supportsObject(object) {
-  return false;
-  //return object.preview && object.preview.nodeType === nodeConstants.ELEMENT_NODE;
+  return object.hasPreview() && object.isNode() &&
+    object.nodeType() == nodeConstants.ELEMENT_NODE;
 }
 
 // Exports from this module

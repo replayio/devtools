@@ -61,13 +61,14 @@ Pause.prototype = {
   create(point) {
     assert(!this.createWaiter);
     assert(!this.pauseId);
-    this.createWaiter = sendMessage("Session.createPause", { point }, sessionId).then(
-      ({ pauseId, stack, data }) => {
-        this.pauseId = pauseId;
-        this.addData(data);
-        this.stack = stack.map(id => this.frames.get(id));
-      }
-    );
+    this.createWaiter =
+      sendMessage("Session.createPause", { point }, this.sessionId).then(
+        ({ pauseId, stack, data }) => {
+          this.pauseId = pauseId;
+          this.addData(data);
+          this.stack = stack.map(id => this.frames.get(id));
+        }
+      );
   },
 
   instantiate(pauseId, data) {
@@ -164,7 +165,8 @@ function ValueFront(pause, protocolValue) {
     this._primitive = protocolValue.value;
   } else if ("object" in protocolValue) {
     const data = pause.objects.get(protocolValue.object);
-    this._object = data ? data : { objectId: protocolValue.object };
+    assert(data);
+    this._object = data;
   } else if ("unserializableNumber" in protocolValue) {
     this._hasPrimitive = true;
     this._primitive = Number(protocolValue.unserializableNumber);
@@ -231,7 +233,6 @@ ValueFront.prototype = {
 
   className() {
     if (this._object) {
-      assert(this._object.className);
       return this._object.className;
     }
   },
@@ -290,6 +291,35 @@ ValueFront.prototype = {
 
   isUnavailable() {
     return this._unavailable;
+  },
+
+  isNode() {
+    return !!this._object.preview.node;
+  },
+
+  nodeType() {
+    return this._object.preview.node.nodeType;
+  },
+
+  nodeName() {
+    return this._object.preview.node.nodeName;
+  },
+
+  isNodeConnected() {
+    return this._object.preview.node.isConnected;
+  },
+
+  nodeAttributeMap() {
+    const rv = Object.create(null);
+    const { attributes } = this._object.preview.node;
+    for (const { name, value } of attributes || []) {
+      rv[name] = value;
+    }
+    return rv;
+  },
+
+  nodePseudoType() {
+    return this._object.preview.node.pseudoType;
   },
 };
 
