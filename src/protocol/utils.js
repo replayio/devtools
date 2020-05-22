@@ -69,9 +69,30 @@ function binarySearch(start, end, callback) {
   return start;
 }
 
+function NotAllowed() {
+  console.error("Not allowed");
+}
+
+const DisallowEverythingProxyHandler = {
+  getPrototypeOf() { NotAllowed(); },
+  has() { NotAllowed(); },
+  get(_, name) { NotAllowed(); },
+  //set() { NotAllowed(); },
+  apply() { NotAllowed(); },
+  construct() { NotAllowed(); },
+  getOwnPropertyDescriptor() { NotAllowed(); },
+  ownKeys() { NotAllowed(); },
+  isExtensible() { NotAllowed(); },
+  setPrototypeOf() { NotAllowed(); },
+  preventExtensions() { NotAllowed(); },
+  defineProperty() { NotAllowed(); },
+  deleteProperty() { NotAllowed(); },
+};
+
 module.exports = {
   makeInfallible,
   defer,
   assert,
   binarySearch,
+  DisallowEverythingProxyHandler,
 };

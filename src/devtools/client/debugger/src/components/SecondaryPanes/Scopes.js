@@ -19,7 +19,7 @@ import {
   getThreadContext,
   getLastExpandedScopes,
 } from "../../selectors";
-import { getScopes } from "../../utils/pause/scopes";
+import { getScopes, ScopeFront } from "../../utils/pause/scopes";
 import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 
 const { objectInspector } = require("devtools-reps");
@@ -174,6 +174,8 @@ class Scopes extends PureComponent<Props, State> {
   };
 
   renderWatchpointButton = (item: Node) => {
+    return null;
+
     const { removeWatchpoint } = this.props;
 
     if (
@@ -217,10 +219,13 @@ class Scopes extends PureComponent<Props, State> {
     }
 
     if (scopes && scopes.length > 0 && !isLoading) {
+      const roots = scopes.map(
+        (s, i) => ({ path: `scope${i}`, contents: new ScopeFront(s) })
+      );
       return (
         <div className="pane scopes-list">
           <ObjectInspector
-            roots={scopes}
+            roots={roots}
             autoExpandAll={false}
             autoExpandDepth={1}
             disableWrap={true}

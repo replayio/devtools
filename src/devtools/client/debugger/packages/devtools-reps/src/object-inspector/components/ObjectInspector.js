@@ -21,9 +21,8 @@ const classnames = require("classnames");
 const Utils = require("../utils");
 const { renderRep, shouldRenderRootsInReps } = Utils;
 const {
-  getChildrenWithEvaluations,
+  getChildren,
   getActor,
-  getEvaluatedItem,
   getParent,
   getValue,
   nodeIsPrimitive,
@@ -116,24 +115,13 @@ class ObjectInspector extends Component<Props> {
         this.cachedNodes.delete(path);
       }
     }
-
-    // If there are new evaluations, we want to remove the existing cached
-    // nodes from the cache.
-    if (nextProps.evaluations > this.props.evaluations) {
-      for (const key of nextProps.evaluations.keys()) {
-        if (!this.props.evaluations.has(key)) {
-          this.cachedNodes.delete(key);
-        }
-      }
-    }
   }
 
   shouldComponentUpdate(nextProps: Props) {
-    const { expandedPaths, loadedProperties, evaluations } = this.props;
+    const { expandedPaths, loadedProperties } = this.props;
 
     // We should update if:
     // - there are new loaded properties
-    // - OR there are new evaluations
     // - OR the expanded paths number changed, and all of them have properties
     //      loaded
     // - OR the expanded paths number did not changed, but old and new sets
@@ -143,7 +131,6 @@ class ObjectInspector extends Component<Props> {
     return (
       loadedProperties !== nextProps.loadedProperties ||
       loadedProperties.size !== nextProps.loadedProperties.size ||
-      evaluations.size !== nextProps.evaluations.size ||
       (expandedPaths.size !== nextProps.expandedPaths.size &&
         [...nextProps.expandedPaths].every(path =>
           nextProps.loadedProperties.has(path)
@@ -164,11 +151,10 @@ class ObjectInspector extends Component<Props> {
   cachedNodes: CachedNodes;
 
   getItemChildren(item: Node): Array<Node> | NodeContents | null {
-    const { loadedProperties, evaluations } = this.props;
+    const { loadedProperties } = this.props;
     const { cachedNodes } = this;
 
-    return getChildrenWithEvaluations({
-      evaluations,
+    return getChildren({
       loadedProperties,
       cachedNodes,
       item,
@@ -176,21 +162,7 @@ class ObjectInspector extends Component<Props> {
   }
 
   getRoots(): Array<Node> {
-    const {
-      evaluations,
-      roots
-    } = this.props;
-    const length = roots.length;
-
-    for (let i = 0; i < length; i++) {
-      let rootItem = roots[i];
-
-      if (evaluations.has(rootItem.path)) {
-        roots[i] = getEvaluatedItem(rootItem, evaluations);
-      }
-    }
-
-    return roots;
+    return this.props.roots;
   }
 
   getNodeKey(item: Node): string {
@@ -266,10 +238,7 @@ class ObjectInspector extends Component<Props> {
   }
 
   shouldItemUpdate(prevItem: Node, nextItem: Node) {
-    const value = getValue(nextItem);
-    // Long string should always update because fullText loading will not
-    // trigger item re-render.
-    return value && value.type === "longString";
+    return false;
   }
 
   render() {
@@ -327,7 +296,6 @@ function mapStateToProps(state, props) {
   return {
     expandedPaths: selectors.getExpandedPaths(state),
     loadedProperties: selectors.getLoadedProperties(state),
-    evaluations: selectors.getEvaluations(state),
   };
 }
 

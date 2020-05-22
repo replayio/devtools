@@ -53,19 +53,7 @@ function getType(item: Node): Symbol {
 }
 
 function getValue(item: Node): RdpGrip | ObjectInspectorItemContentsValue {
-  if (nodeHasValue(item)) {
-    return item.contents.value;
-  }
-
-  if (nodeHasGetterValue(item)) {
-    return item.contents.getterValue;
-  }
-
-  if (nodeHasAccessors(item)) {
-    return item.contents;
-  }
-
-  return undefined;
+  return item.contents;
 }
 
 function getFront(item: Node): Object {
@@ -86,7 +74,7 @@ function isNodeRoot(item: Node, roots) {
     value &&
     roots.some(root => {
       const rootValue = getValue(root);
-      return rootValue && rootValue.actor === value.actor;
+      return rootValue && rootValue.maybeObjectId() === value.maybeObjectId();
     })
   );
 }
@@ -104,7 +92,7 @@ function nodeIsMapEntry(item: Node): boolean {
 }
 
 function nodeHasChildren(item: Node): boolean {
-  return Array.isArray(item.contents);
+  return getValue(item).hasChildren();
 }
 
 function nodeHasValue(item: Node): boolean {
@@ -195,7 +183,7 @@ function nodeIsPromise(item: Node): boolean {
     return false;
   }
 
-  return value.class == "Promise";
+  return value.className() == "Promise";
 }
 
 function nodeIsProxy(item: Node): boolean {
@@ -204,7 +192,7 @@ function nodeIsProxy(item: Node): boolean {
     return false;
   }
 
-  return value.class == "Proxy";
+  return value.className() == "Proxy";
 }
 
 function nodeIsPrototype(item: Node): boolean {
@@ -217,7 +205,7 @@ function nodeIsWindow(item: Node): boolean {
     return false;
   }
 
-  return value.class == "Window";
+  return value.className() == "Window";
 }
 
 function nodeIsGetter(item: Node): boolean {
@@ -229,7 +217,8 @@ function nodeIsSetter(item: Node): boolean {
 }
 
 function nodeIsBlock(item: Node) {
-  return getType(item) === NODE_TYPES.BLOCK;
+  return getValue(item).isScope();
+  //return getType(item) === NODE_TYPES.BLOCK;
 }
 
 function nodeIsError(item: Node): boolean {
@@ -418,11 +407,13 @@ function makeNodesForMapEntry(item: Node): Array<Node> {
 }
 
 function getNodeGetter(item: Node): ?Object {
-  return item && item.contents ? item.contents.get : undefined;
+  return undefined;
+  //return item && item.contents ? item.contents.get : undefined;
 }
 
 function getNodeSetter(item: Node): ?Object {
-  return item && item.contents ? item.contents.set : undefined;
+  return undefined;
+  //return item && item.contents ? item.contents.set : undefined;
 }
 
 function sortProperties(properties: Array<any>): Array<any> {
@@ -760,53 +751,6 @@ function setNodeChildren(node: Node, children: Array<Node>): Node {
   return node;
 }
 
-function getEvaluatedItem(item: Node, evaluations: Evaluations): Node {
-  if (!evaluations.has(item.path)) {
-    return item;
-  }
-
-  const evaluation = evaluations.get(item.path);
-  const isFront =
-    evaluation && evaluation.getterValue && evaluation.getterValue.getGrip;
-
-  const contents = isFront
-    ? {
-      getterValue: evaluation.getterValue.getGrip(),
-      front: evaluation.getterValue,
-    }
-    : evaluations.get(item.path);
-
-  return {
-    ...item,
-    contents,
-  };
-}
-
-function getChildrenWithEvaluations(options: {
-  cachedNodes: CachedNodes,
-  loadedProperties: LoadedProperties,
-  item: Node,
-  evaluations: Evaluations,
-}): Array<Node> {
-  const { item, loadedProperties, cachedNodes, evaluations } = options;
-
-  const children = getChildren({
-    loadedProperties,
-    cachedNodes,
-    item,
-  });
-
-  if (Array.isArray(children)) {
-    return children.map(i => getEvaluatedItem(i, evaluations));
-  }
-
-  if (children) {
-    return getEvaluatedItem(children, evaluations);
-  }
-
-  return [];
-}
-
 function getChildren(options: {
   cachedNodes: CachedNodes,
   loadedProperties: LoadedProperties,
@@ -819,61 +763,15 @@ function getChildren(options: {
     return cachedNodes.get(key);
   }
 
-  const loadedProps = loadedProperties.get(key);
-  const hasLoadedProps = loadedProperties.has(key);
+  const children = getValue(item).getChildren().map(({ name, contents }) => {
+    return { name, contents, path: `${item.path}/${name}` };
+  });
 
-  // Because we are dynamically creating the tree as the user
-  // expands it (not precalculated tree structure), we cache child
-  // arrays. This not only helps performance, but is necessary
-  // because the expanded state depends on instances of nodes
-  // being the same across renders. If we didn't do this, each
-  // node would be a new instance every render.
-  // If the node needs properties, we only add children to
-  // the cache if the properties are loaded.
-  const addToCache = (children: Array<Node>) => {
-    if (cachedNodes) {
-      cachedNodes.set(item.path, children);
-    }
-    return children;
-  };
-
-  // Nodes can either have children already, or be an object with
-  // properties that we need to go and fetch.
-  if (nodeHasChildren(item)) {
-    return addToCache(item.contents);
+  if (cachedNodes) {
+    cachedNodes.set(key, children);
   }
 
-  if (nodeIsMapEntry(item)) {
-    return addToCache(makeNodesForMapEntry(item));
-  }
-
-  if (nodeIsProxy(item) && hasLoadedProps) {
-    return addToCache(makeNodesForProxyProperties(loadedProps, item));
-  }
-
-  if (nodeIsLongString(item) && hasLoadedProps) {
-    // Set longString object's fullText to fetched one.
-    return addToCache(setNodeFullText(loadedProps, item));
-  }
-
-  if (nodeNeedsNumericalBuckets(item) && hasLoadedProps) {
-    // Even if we have numerical buckets, we should have loaded non indexed
-    // properties.
-    const bucketNodes = makeNumericalBuckets(item);
-    return addToCache(
-      bucketNodes.concat(makeNodesForProperties(loadedProps, item))
-    );
-  }
-
-  if (!nodeIsEntries(item) && !nodeIsBucket(item) && !nodeHasProperties(item)) {
-    return [];
-  }
-
-  if (!hasLoadedProps) {
-    return [];
-  }
-
-  return addToCache(makeNodesForProperties(loadedProps, item));
+  return children;
 }
 
 // Builds an expression that resolves to the value of the item in question
@@ -999,10 +897,8 @@ module.exports = {
   createSetterNode,
   getActor,
   getChildren,
-  getChildrenWithEvaluations,
   getClosestGripNode,
   getClosestNonBucketNode,
-  getEvaluatedItem,
   getFront,
   getPathExpression,
   getParent,

@@ -29,7 +29,7 @@ function WindowRep(props) {
   const { mode, object } = props;
 
   const config = {
-    "data-link-actor-id": object.actor,
+    "data-link-actor-id": object.maybeObjectId(),
     className: "objectBox objectBox-Window",
   };
 
@@ -45,7 +45,7 @@ function WindowRep(props) {
 }
 
 function getTitle(object, trailingSpace) {
-  let title = object.displayClass || object.class || "Window";
+  let title = object.className() || "Window";
   if (trailingSpace === true) {
     title = `${title} `;
   }
@@ -53,7 +53,9 @@ function getTitle(object, trailingSpace) {
 }
 
 function getLocation(object) {
-  return getURLDisplayString(object.preview.url);
+  // FIXME
+  return undefined;
+  //return getURLDisplayString(object.preview.url);
 }
 
 // Registration

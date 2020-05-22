@@ -34,22 +34,15 @@ function ArrayRep(props) {
   };
 
   if (mode === MODE.TINY) {
-    const length = getArrayLikeLength(array)
-    const isEmpty = length === 0;
-
-    if (isEmpty) {
-      items = [];
-    } else {
-      items = [
-        span(
-          {
-            className: "more-ellipsis",
-            title: "more…",
-          },
-          "…"
-        ),
-      ];
-    }
+    items = [
+      span(
+        {
+          className: "more-ellipsis",
+          title: "more…",
+        },
+        "…"
+      ),
+    ];
     brackets = needSpace(false);
   } else {
     items = arrayIterator(props, object, maxLengthMap.get(mode));

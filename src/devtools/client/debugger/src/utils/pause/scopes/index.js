@@ -8,6 +8,8 @@ import { getScope, mergeScopes, type RenderableScope } from "./getScope";
 
 import type { Frame, Why, BindingContents } from "../../../types";
 
+const { DisallowEverythingProxyHandler } = require("protocol/utils");
+
 export type NamedValue = {
   name: string,
   generatedName?: string,
@@ -61,3 +63,33 @@ export function getScopes(
 
   return scopes;
 }
+
+export function ScopeFront(scope) {
+  this._scope = scope;
+}
+
+ScopeFront.prototype = {
+  isPrimitive() { return false; },
+  isObject() { return false; },
+  isMapEntry() { return false; },
+  isUnavailable() { return false; },
+  isUninitialized() { return false; },
+  className() { return undefined; },
+  hasPreview() { return false; },
+  isString() { return false; },
+  maybeObjectId() { return this._scope.path; },
+
+  isScope() { return true; },
+  hasChildren() { return true; },
+
+  getChildren() {
+    const { contents } = this._scope;
+    return contents.map(({ contents, name }) => ({ contents: contents.value, name }));
+  },
+
+  async loadChildren() {
+    return this.getChildren();
+  },
+};
+
+Object.setPrototypeOf(ScopeFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));

@@ -126,20 +126,6 @@ class ObjectInspectorItem extends Component<Props> {
       };
     }
 
-    const itemValue = getValue(item);
-    const unavailable =
-      isPrimitive &&
-      itemValue &&
-      itemValue.hasOwnProperty &&
-      itemValue.hasOwnProperty("unavailable");
-
-    if (nodeIsMissingArguments(item) || unavailable) {
-      return {
-        label,
-        value: dom.span({ className: "unavailable" }, "(unavailable)"),
-      };
-    }
-
     if (
       nodeIsFunction(item) &&
       !nodeIsGetter(item) &&

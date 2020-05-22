@@ -43,7 +43,11 @@ const {
   sendMessage,
   addEventListener,
 } = require("./socket");
-const { defer, assert } = require("./utils");
+const {
+  defer,
+  assert,
+  DisallowEverythingProxyHandler
+} = require("./utils");
 
 // Information about a protocol pause.
 function Pause(sessionId) {
@@ -82,6 +86,10 @@ Pause.prototype = {
     (frames || []).forEach(f => this.frames.set(f.frameId, f));
     (scopes || []).forEach(s => this.scopes.set(s.scopeId, s));
     (objects || []).forEach(o => this.objects.set(o.objectId, o));
+
+    (frames || []).forEach(frame => {
+      frame.this = new ValueFront(this, frame.this);
+    });
 
     (scopes || []).forEach(scope => {
       if (scope.bindings) {
@@ -323,26 +331,15 @@ ValueFront.prototype = {
   nodePseudoType() {
     return this._object.preview.node.pseudoType;
   },
-};
 
-function NotAllowed() {
-  console.error("Not allowed");
-}
+  isScope() {
+    return false;
+  },
 
-const DisallowEverythingProxyHandler = {
-  getPrototypeOf() { NotAllowed(); },
-  has() { NotAllowed(); },
-  get(_, name) { NotAllowed(); },
-  //set() { NotAllowed(); },
-  apply() { NotAllowed(); },
-  construct() { NotAllowed(); },
-  getOwnPropertyDescriptor() { NotAllowed(); },
-  ownKeys() { NotAllowed(); },
-  isExtensible() { NotAllowed(); },
-  setPrototypeOf() { NotAllowed(); },
-  preventExtensions() { NotAllowed(); },
-  defineProperty() { NotAllowed(); },
-  deleteProperty() { NotAllowed(); },
+  hasChildren() {
+    // FIXME
+    return false;
+  },
 };
 
 Object.setPrototypeOf(ValueFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
