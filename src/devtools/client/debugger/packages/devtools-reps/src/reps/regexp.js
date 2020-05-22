@@ -29,7 +29,7 @@ function RegExp(props) {
 }
 
 function getSource(grip) {
-  return grip.regexpString;
+  return grip.regexpString();
 }
 
 // Registration

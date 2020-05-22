@@ -97,7 +97,7 @@ function safeEntriesIterator(props, object, max) {
 
 function entriesIterator(props, object, max) {
   const mapEntries = object.previewContainerEntries();
-  const entries = getEntries(props, mapEntries);
+  const entries = getEntries(props, mapEntries, max);
   if (entries.length < getLength(object)) {
     // There are some undisplayed entries. Then display "…".
     entries.push(ellipsisElement);
@@ -114,23 +114,13 @@ function entriesIterator(props, object, max) {
  * @param {Array} indexes Indexes of entries.
  * @return {Array} Array of PropRep.
  */
-function getEntries(props, entries) {
+function getEntries(props, entries, max) {
   const { onDOMNodeMouseOver, onDOMNodeMouseOut, onInspectIconClick } = props;
 
-  // fixme
-  return [];
-
-  // Make indexes ordered by ascending.
-  indexes.sort(function (a, b) {
-    return a - b;
-  });
-
-  return indexes.map((index, i) => {
-    const [key, entryValue] = entries[index];
-    const value =
-      entryValue.value !== undefined ? entryValue.value : entryValue;
-
-    return PropRep({
+  const rv = [];
+  for (let i = 0; i < entries.length && i < max; i++) {
+    const { key, value } = entries[i];
+    rv.push(PropRep({
       name: key,
       equal: " \u2192 ",
       object: value,
@@ -138,8 +128,9 @@ function getEntries(props, entries) {
       onDOMNodeMouseOver,
       onDOMNodeMouseOut,
       onInspectIconClick,
-    });
-  });
+    }));
+  }
+  return rv;
 }
 
 function getLength(grip) {
