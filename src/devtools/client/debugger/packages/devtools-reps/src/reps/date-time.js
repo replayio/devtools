@@ -20,14 +20,13 @@ function DateTime(props) {
   const grip = props.object;
   let date;
   try {
-    const dateObject = new Date(grip.preview.timestamp);
-    // Calling `toISOString` will throw if the date is invalid,
+    const dateObject = new Date(grip.dateTime()); // Calling `toISOString` will throw if the date is invalid,
     // so we can render an `Invalid Date` element.
     dateObject.toISOString();
 
     date = span(
       {
-        "data-link-actor-id": grip.actor,
+        "data-link-actor-id": grip.grip.maybeObjectId,
         className: "objectBox",
       },
       getTitle(grip),
@@ -45,17 +44,13 @@ function getTitle(grip) {
     {
       className: "objectTitle",
     },
-    `${grip.class} `
+    `${grip.grip.className} `
   );
 }
 
 // Registration
 function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return getGripType(grip, noGrip) == "Date" && grip.preview;
+  return grip.className() == "Date";
 }
 
 // Exports from this module

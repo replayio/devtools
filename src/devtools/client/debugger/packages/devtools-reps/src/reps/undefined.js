@@ -10,19 +10,12 @@ const { getGripType, wrapRender } = require("./rep-utils");
 /**
  * Renders undefined value
  */
-const Undefined = function() {
+const Undefined = function () {
   return span({ className: "objectBox objectBox-undefined" }, "undefined");
 };
 
 function supportsObject(object, noGrip = false) {
-  if (noGrip === true) {
-    return object === undefined;
-  }
-
-  return (
-    (object && object.type && object.type == "undefined") ||
-    getGripType(object, noGrip) == "undefined"
-  );
+  return object.isPrimitive() && object.primitive() == undefined;
 }
 
 // Exports from this module

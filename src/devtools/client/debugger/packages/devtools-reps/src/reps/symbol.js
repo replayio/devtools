@@ -45,7 +45,8 @@ function SymbolRep(props) {
 }
 
 function supportsObject(object, noGrip = false) {
-  return getGripType(object, noGrip) == "symbol";
+  return false;
+  // return getGripType(object, noGrip) == "symbol";
 }
 
 // Exports from this module

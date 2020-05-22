@@ -36,7 +36,7 @@ function GripMap(props) {
   const { mode, object } = props;
 
   const config = {
-    "data-link-actor-id": object.actor,
+    "data-link-actor-id": object.maybeObjectId(),
     className: "objectBox objectBox-object",
   };
 
@@ -69,7 +69,7 @@ function GripMap(props) {
 }
 
 function getTitle(props, object) {
-  const title = props.title || (object && object.class ? object.class : "Map");
+  const title = props.title || (object && object.object.className() ? object.className() : "Map");
   return span(
     {
       className: "objectTitle",
@@ -96,31 +96,8 @@ function safeEntriesIterator(props, object, max) {
 }
 
 function entriesIterator(props, object, max) {
-  // Entry filter. Show only interesting entries to the user.
-  const isInterestingEntry =
-    props.isInterestingEntry ||
-    ((type, value) => {
-      return (
-        type == "boolean" ||
-        type == "number" ||
-        (type == "string" && value.length != 0)
-      );
-    });
-
-  const mapEntries =
-    object.preview && object.preview.entries ? object.preview.entries : [];
-
-  let indexes = getEntriesIndexes(mapEntries, max, isInterestingEntry);
-  if (indexes.length < max && indexes.length < mapEntries.length) {
-    // There are not enough entries yet, so we add uninteresting entries.
-    indexes = indexes.concat(
-      getEntriesIndexes(mapEntries, max - indexes.length, (t, value, name) => {
-        return !isInterestingEntry(t, value, name);
-      })
-    );
-  }
-
-  const entries = getEntries(props, mapEntries, indexes);
+  const mapEntries = object.previewContainerEntries();
+  const entries = getEntries(props, mapEntries);
   if (entries.length < getLength(object)) {
     // There are some undisplayed entries. Then display "…".
     entries.push(ellipsisElement);
@@ -137,11 +114,14 @@ function entriesIterator(props, object, max) {
  * @param {Array} indexes Indexes of entries.
  * @return {Array} Array of PropRep.
  */
-function getEntries(props, entries, indexes) {
+function getEntries(props, entries) {
   const { onDOMNodeMouseOver, onDOMNodeMouseOut, onInspectIconClick } = props;
 
+  // fixme
+  return [];
+
   // Make indexes ordered by ascending.
-  indexes.sort(function(a, b) {
+  indexes.sort(function (a, b) {
     return a - b;
   });
 
@@ -151,9 +131,9 @@ function getEntries(props, entries, indexes) {
       entryValue.value !== undefined ? entryValue.value : entryValue;
 
     return PropRep({
-      name: key && key.getGrip ? key.getGrip() : key,
+      name: key,
       equal: " \u2192 ",
-      object: value && value.getGrip ? value.getGrip() : value,
+      object: value,
       mode: MODE.TINY,
       onDOMNodeMouseOver,
       onDOMNodeMouseOut,
@@ -162,43 +142,12 @@ function getEntries(props, entries, indexes) {
   });
 }
 
-/**
- * Get the indexes of entries in the map.
- *
- * @param {Array} entries Entries array.
- * @param {Number} max The maximum length of indexes array.
- * @param {Function} filter Filter the entry you want.
- * @return {Array} Indexes of filtered entries in the map.
- */
-function getEntriesIndexes(entries, max, filter) {
-  return entries.reduce((indexes, [key, entry], i) => {
-    if (indexes.length < max) {
-      const value = entry && entry.value !== undefined ? entry.value : entry;
-      // Type is specified in grip's "class" field and for primitive
-      // values use typeof.
-      const type = (value && value.class
-        ? value.class
-        : typeof value
-      ).toLowerCase();
-
-      if (filter(type, value, key)) {
-        indexes.push(i);
-      }
-    }
-
-    return indexes;
-  }, []);
-}
-
 function getLength(grip) {
-  return grip.preview.size || 0;
+  return grip.grip.containerEntryCount();
 }
 
 function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-  return grip.preview && grip.preview.kind == "MapLike";
+  return ["Map", "MapLike"].includes(grip.className());
 }
 
 const maxLengthMap = new Map();

@@ -49,14 +49,7 @@ function GripMapEntry(props) {
 }
 
 function supportsObject(grip, noGrip = false) {
-  if (noGrip === true) {
-    return false;
-  }
-  return (
-    grip &&
-    (grip.type === "mapEntry" || grip.type === "storageEntry") &&
-    grip.preview
-  );
+  return grip.isMapEntry();
 }
 
 function createGripMapEntry(key, value) {

@@ -39,7 +39,7 @@ function GripRep(props) {
   };
 
   if (mode === MODE.TINY) {
-    const propertiesLength = getPropertiesLength(object);
+    const hasProperties = object.previewValueCount() != 0;
 
     const tinyModeItems = [];
     if (getTitle(props, object) !== DEFAULT_TITLE) {
@@ -49,19 +49,15 @@ function GripRep(props) {
         span(
           {
             className: "objectLeftBrace",
-          },
-          "{"
-        ),
-        propertiesLength > 0
-          ? span(
-              {
-                key: "more",
-                className: "more-ellipsis",
-                title: "more…",
-              },
-              "…"
-            )
-          : null,
+          }, "{"), hasProperties ? span(
+            {
+              key: "more",
+              className: "more-ellipsis",
+              title: "more…",
+            },
+            "…"
+          )
+        : null,
         span(
           {
             className: "objectRightBrace",
@@ -105,24 +101,7 @@ function getTitleElement(props, object) {
 }
 
 function getTitle(props, object) {
-  return props.title || object.class || DEFAULT_TITLE;
-}
-
-function getPropertiesLength(object) {
-  let propertiesLength =
-    object.preview && object.preview.ownPropertiesLength
-      ? object.preview.ownPropertiesLength
-      : object.ownPropertyLength;
-
-  if (object.preview && object.preview.safeGetterValues) {
-    propertiesLength += Object.keys(object.preview.safeGetterValues).length;
-  }
-
-  if (object.preview && object.preview.ownSymbols) {
-    propertiesLength += object.preview.ownSymbolsLength;
-  }
-
-  return propertiesLength;
+  return props.title || object.className() || DEFAULT_TITLE;
 }
 
 function safePropIterator(props, object, max) {
@@ -136,6 +115,7 @@ function safePropIterator(props, object, max) {
 }
 
 function propIterator(props, object, max) {
+  /*
   if (object.preview && Object.keys(object.preview).includes("wrappedValue")) {
     const { Rep } = require("./rep");
 
@@ -149,6 +129,7 @@ function propIterator(props, object, max) {
   }
 
   // Property filter. Show only interesting properties to the user.
+  */
   const isInterestingProp =
     props.isInterestingProp ||
     ((type, value) => {
@@ -159,14 +140,8 @@ function propIterator(props, object, max) {
       );
     });
 
-  let properties = object.preview ? object.preview.ownProperties || {} : {};
-
-  const propertiesLength = getPropertiesLength(object);
-
-  if (object.preview && object.preview.safeGetterValues) {
-    properties = { ...properties, ...object.preview.safeGetterValues };
-  }
-
+  const properties = object.previewValueMap();
+  const propertiesLength = object.previewValueCount();
   let indexes = getPropIndexes(properties, max, isInterestingProp);
   if (indexes.length < max && indexes.length < propertiesLength) {
     // There are not enough props yet.
@@ -182,21 +157,22 @@ function propIterator(props, object, max) {
   // <target> and <handler>; we don't want to quote these because,
   // as synthetic properties, they appear more natural when
   // unquoted.
-  const suppressQuotes = object.class === "Proxy";
+  const suppressQuotes = object.className() === "Proxy";
   const propsArray = getProps(props, properties, indexes, suppressQuotes);
 
   // Show symbols.
+  /*
   if (object.preview && object.preview.ownSymbols) {
     const { ownSymbols } = object.preview;
     const length = max - indexes.length;
-
+  
     const symbolsProps = ownSymbols.slice(0, length).map(symbolItem => {
       const symbolValue = symbolItem.descriptor.value;
       const symbolGrip =
         symbolValue && symbolValue.getGrip
           ? symbolValue.getGrip()
           : symbolValue;
-
+  
       return PropRep({
         ...props,
         mode: MODE.TINY,
@@ -208,17 +184,12 @@ function propIterator(props, object, max) {
         suppressQuotes,
       });
     });
-
+  
     propsArray.push(...symbolsProps);
   }
+    */
 
-  if (
-    Object.keys(properties).length > max ||
-    propertiesLength > max ||
-    // When the object has non-enumerable properties, we don't have them in the
-    // packet, but we might want to show there's something in the object.
-    propertiesLength > propsArray.length
-  ) {
+  if (propertiesLength > propsArray.length || object.hasPreviewOverflow()) {
     // There are some undisplayed props. Then display "more...".
     propsArray.push(
       span(
@@ -230,10 +201,10 @@ function propIterator(props, object, max) {
         "…"
       )
     );
+    return propsArray;
   }
-
-  return propsArray;
 }
+
 
 /**
  * Get props ordered by index.
@@ -247,14 +218,14 @@ function propIterator(props, object, max) {
  */
 function getProps(componentProps, properties, indexes, suppressQuotes) {
   // Make indexes ordered by ascending.
-  indexes.sort(function(a, b) {
+  indexes.sort(function (a, b) {
     return a - b;
   });
 
   const propertiesKeys = Object.keys(properties);
   return indexes.map(i => {
     const name = propertiesKeys[i];
-    const value = getPropValue(properties[name]);
+    const value = properties[name];
 
     return PropRep({
       ...componentProps,
@@ -289,9 +260,8 @@ function getPropIndexes(properties, max, filter) {
 
       // Type is specified in grip's "class" field and for primitive
       // values use typeof.
-      const value = getPropValue(properties[name]);
-      let type = value.class || typeof value;
-      type = type.toLowerCase();
+      const value = properties[name];
+      let type = value.isObject() ? value.className() : typeof value.primitive(); type = type.toLowerCase();
 
       if (filter(type, value, name)) {
         indexes.push(i);
@@ -304,38 +274,9 @@ function getPropIndexes(properties, max, filter) {
   return indexes;
 }
 
-/**
- * Get the actual value of a property.
- *
- * @param {Object} property
- * @return {Object} Value of the property.
- */
-function getPropValue(property) {
-  let value = property;
-  if (typeof property === "object") {
-    const keys = Object.keys(property);
-    if (keys.includes("value")) {
-      value = property.value;
-    } else if (keys.includes("getterValue")) {
-      value = property.getterValue;
-    }
-  }
-  return value;
-}
-
 // Registration
 function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  if (object.class === "DeadObject") {
-    return true;
-  }
-
-  return object.preview
-    ? typeof object.preview.ownProperties !== "undefined"
-    : typeof object.ownPropertyLength !== "undefined";
+  return true
 }
 
 const maxLengthMap = new Map();

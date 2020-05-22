@@ -27,12 +27,14 @@ function ArrayRep(props) {
 
   let items;
   let brackets;
-  const needSpace = function(space) {
+  const needSpace = function (space) {
     return space ? { left: "[ ", right: " ]" } : { left: "[", right: "]" };
   };
 
   if (mode === MODE.TINY) {
-    const isEmpty = object.length === 0;
+    const length = getArrayLikeLength(array)
+    const isEmpty = length === 0;
+
     if (isEmpty) {
       items = [];
     } else {
@@ -56,6 +58,7 @@ function ArrayRep(props) {
     {
       className: "objectBox objectBox-array",
     },
+    getTitle(props, object),
     span(
       {
         className: "arrayLeftBracket",
@@ -72,33 +75,58 @@ function ArrayRep(props) {
   );
 }
 
+function getArrayLikeLength(object) {
+  if (["Set", "WeakSet"].includes(object.className())) {
+    return object.containerEntryCount();
+  }
+  const propertyValues = object.previewValueMap();
+  return propertyValues.length.primitive();
+}
+
+function getTitle(props, object) {
+  const name = object.className();
+  const length = getArrayLikeLength(object);
+
+  return span({
+    className: "objectTitle"
+  }, name, "(", length, ") ");
+}
+
+
 function arrayIterator(props, array, max) {
   const items = [];
+  const length = getArrayLikeLength(array);
+  const propertyValues = array.previewValueMap();
 
-  for (let i = 0; i < array.length && i < max; i++) {
+  let containerEntries;
+  if (["Set", "WeakSet"].includes(array.className())) {
+    containerEntries = array.previewContainerEntries();
+  }
+
+  for (let i = 0; i < length && i < max; i++) {
+
     const config = {
       mode: MODE.TINY,
-      delim: i == array.length - 1 ? "" : ", ",
+      delim: i == length - 1 ? "" : ", "
     };
-    let item;
-
-    try {
-      item = ItemRep({
-        ...props,
-        ...config,
-        object: array[i],
-      });
-    } catch (exc) {
-      item = ItemRep({
-        ...props,
-        ...config,
-        object: exc,
-      });
+    let elem;
+    if (containerEntries && i < containerEntries.length) {
+      elem = containerEntries[i].value;
+    } else {
+      elem = propertyValues[i];
     }
+    if (!elem) {
+      elem = array.getPause().newPrimitiveValue(null);
+    }
+    const item = ItemRep({
+      ...props,
+      ...config,
+      object: elem
+    });
     items.push(item);
   }
 
-  if (array.length > max) {
+  if (length > max) {
     items.push(
       span(
         {
@@ -142,11 +170,24 @@ function getLength(object) {
 }
 
 function supportsObject(object, noGrip = false) {
-  return (
-    noGrip &&
-    (Array.isArray(object) ||
-      Object.prototype.toString.call(object) === "[object Arguments]")
-  );
+  const classNames = [
+    "Array",
+    "Arguments",
+    "Set",
+    "WeakSet",
+    "Int8Array",
+    "Uint8Array",
+    "Uint8ClampedArray",
+    "Int16Array",
+    "Uint16Array",
+    "Int32Array",
+    "Uint32Array",
+    "Float32Array",
+    "Float64Array",
+    "BigInt64Array",
+    "BigUint64Array",
+  ];
+  return classNames.includes(object.className());
 }
 
 const maxLengthMap = new Map();

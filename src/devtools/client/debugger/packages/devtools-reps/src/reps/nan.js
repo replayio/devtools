@@ -15,7 +15,7 @@ function NaNRep(props) {
 }
 
 function supportsObject(object, noGrip = false) {
-  return getGripType(object, noGrip) == "NaN";
+  return object.isPrimitive() && object.primitive() === NaN;
 }
 
 // Exports from this module

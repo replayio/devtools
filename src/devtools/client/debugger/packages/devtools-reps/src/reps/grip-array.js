@@ -37,7 +37,7 @@ function GripArray(props) {
   const { object, mode = MODE.SHORT } = props;
 
   let brackets;
-  const needSpace = function(space) {
+  const needSpace = function (space) {
     return space ? { left: "[ ", right: " ]" } : { left: "[", right: "]" };
   };
 
@@ -52,7 +52,7 @@ function GripArray(props) {
     const isEmpty = getLength(object) === 0;
 
     // Omit bracketed ellipsis for non-empty non-Array arraylikes (f.e: Sets).
-    if (!isEmpty && object.class !== "Array") {
+    if (!isEmpty && object.className() !== "Array") {
       return span(config, title);
     }
 
@@ -229,15 +229,8 @@ function getEmptySlotsElement(number) {
 }
 
 function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return (
-    grip.preview &&
-    (grip.preview.kind == "ArrayLike" ||
-      getGripType(grip, noGrip) === "DocumentFragment")
-  );
+  // FIXME rm dup
+  return false;
 }
 
 const maxLengthMap = new Map();

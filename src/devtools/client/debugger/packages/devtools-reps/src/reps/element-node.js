@@ -177,13 +177,9 @@ function getElements(grip, mode) {
 }
 
 // Registration
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-  return (
-    object.preview && object.preview.nodeType === nodeConstants.ELEMENT_NODE
-  );
+function supportsObject(object) {
+  return false;
+  //return object.preview && object.preview.nodeType === nodeConstants.ELEMENT_NODE;
 }
 
 // Exports from this module

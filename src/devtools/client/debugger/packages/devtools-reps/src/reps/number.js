@@ -26,14 +26,12 @@ function Number(props) {
 }
 
 function stringify(object) {
-  const isNegativeZero =
-    Object.is(object, -0) || (object.type && object.type == "-0");
-
-  return isNegativeZero ? "-0" : String(object);
+  const v = object.primitive();
+  return Object.is(v, -0) ? "-0" : String(v);
 }
 
 function supportsObject(object, noGrip = false) {
-  return ["boolean", "number", "-0"].includes(getGripType(object, noGrip));
+  return false
 }
 
 // Exports from this module

@@ -20,7 +20,7 @@ function ObjectWithURL(props) {
   const grip = props.object;
   return span(
     {
-      "data-link-actor-id": grip.actor,
+      "data-link-actor-id": object.maybeObjectId(),
       className: `objectBox objectBox-${getType(grip)}`,
     },
     getTitle(grip),
@@ -42,11 +42,8 @@ function getDescription(grip) {
 
 // Registration
 function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return grip.preview && grip.preview.kind == "ObjectWithURL";
+  return false;
+  //return grip.preview && grip.preview.kind == "ObjectWithURL";
 }
 
 // Exports from this module

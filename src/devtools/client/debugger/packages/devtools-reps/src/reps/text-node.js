@@ -88,11 +88,7 @@ function getTitle(grip) {
 
 // Registration
 function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return grip.preview && grip.class == "Text";
+  return grip.className() == "Text";
 }
 
 // Exports from this module

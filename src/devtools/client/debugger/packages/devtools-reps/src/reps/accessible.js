@@ -111,11 +111,8 @@ function getElements(
 
 // Registration
 function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  return object.preview && object.typeName && object.typeName === "accessible";
+  return false;
+  // return object.preview && object.typeName && object.typeName === "accessible";
 }
 
 // Exports from this module

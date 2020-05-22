@@ -96,12 +96,8 @@ function getTitle(props) {
 }
 
 // Registration
-function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return grip.preview && grip.preview.kind == "DOMEvent";
+function supportsObject(grip, ) {
+  return object.className() == "DOMEvent";
 }
 
 // Exports from this module

@@ -43,13 +43,9 @@ function CommentNode(props) {
 }
 
 // Registration
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-  return (
-    object.preview && object.preview.nodeType === nodeConstants.COMMENT_NODE
-  );
+function supportsObject(object, ) {
+  return false;
+  // return object.preview && object.preview.nodeType === nodeConstants.COMMENT_NODE
 }
 
 // Exports from this module
