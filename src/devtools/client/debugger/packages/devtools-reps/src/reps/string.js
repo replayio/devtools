@@ -55,11 +55,11 @@ function StringRep(props) {
     transformEmptyString = false,
   } = props;
 
-  let text = object;
+  let text = object.primitive();
   const config = getElementConfig({
     className,
     style,
-    actor: object.actor,
+    actor: object.maybeObjectId(),
     title,
   });
 
@@ -345,8 +345,8 @@ function isLongString(object) {
   // return grip && grip.type === "longString";
 }
 
-function supportsObject(object, noGrip = false) {
-  return object.className() == "String";
+function supportsObject(object) {
+  return object.isString();
 }
 
 // Exports from this module

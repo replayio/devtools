@@ -149,10 +149,6 @@ Pause.prototype = {
     this.addData(data);
     return { returned, exception, failed };
   },
-
-  newPrimitiveValue(value) {
-    return new ValueFront(this, { value });
-  },
 };
 
 function ValueFront(pause, protocolValue) {
@@ -318,6 +314,10 @@ const DisallowEverythingProxyHandler = {
 };
 
 Object.setPrototypeOf(ValueFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+
+function createPrimitiveValueFront(value) {
+  return new ValueFront(null, { value });
+}
 
 const ThreadFront = {
   // When replaying there is only a single thread currently. Use this thread ID
@@ -589,4 +589,5 @@ const ThreadFront = {
 module.exports = {
   ThreadFront,
   ValueFront,
+  createPrimitiveValueFront,
 };

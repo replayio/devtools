@@ -30,8 +30,9 @@ function stringify(object) {
   return Object.is(v, -0) ? "-0" : String(v);
 }
 
-function supportsObject(object, noGrip = false) {
-  return false
+function supportsObject(object) {
+  return object.isPrimitive() &&
+    ["number", "boolean"].includes(typeof object.primitive());
 }
 
 // Exports from this module

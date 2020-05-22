@@ -11,6 +11,8 @@ const Message = createFactory(
   require("devtools/client/webconsole/components/Output/Message")
 );
 
+const { createPrimitiveValueFront } = require("protocol/thread");
+
 const { REPS, MODE } = require("devtools/client/debugger/packages/devtools-reps/src");
 
 PageError.displayName = "PageError";
@@ -58,7 +60,7 @@ function PageError(props) {
   } = message;
 
   const messageBody = REPS.StringRep.rep({
-    object: messageText,
+    object: createPrimitiveValueFront(messageText),
     mode: MODE.LONG,
     useQuotes: false,
     escapeWhitespace: false,

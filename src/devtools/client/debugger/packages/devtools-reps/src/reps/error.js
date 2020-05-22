@@ -45,7 +45,7 @@ function ErrorRep(props) {
   if (mode === MODE.TINY) {
     content.push(name);
   } else {
-    content.push(`${name}: "${preview.message.primitive}"`);
+    content.push(`${name}: "${preview.message.primitive()}"`);
   }
 
   if (preview.stack && (mode !== MODE.TINY && mode !== MODE.SHORT)) {

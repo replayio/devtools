@@ -14,7 +14,7 @@ function Null(props) {
 }
 
 function supportsObject(object) {
-  return object.isPrimitive() && object.primitive() == null;
+  return object.isPrimitive() && object.primitive() === null;
 }
 
 // Exports from this module

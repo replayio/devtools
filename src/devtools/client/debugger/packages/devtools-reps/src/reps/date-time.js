@@ -26,7 +26,7 @@ function DateTime(props) {
 
     date = span(
       {
-        "data-link-actor-id": grip.grip.maybeObjectId,
+        "data-link-actor-id": grip.maybeObjectId(),
         className: "objectBox",
       },
       getTitle(grip),
@@ -44,7 +44,7 @@ function getTitle(grip) {
     {
       className: "objectTitle",
     },
-    `${grip.grip.className} `
+    `${grip.className()} `
   );
 }
 

@@ -8,6 +8,8 @@ const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
 const { wrapRender } = require("./rep-utils");
 const { MODE } = require("./constants");
 
+const { createPrimitiveValueFront } = require("protocol/thread");
+
 const ModePropType = PropTypes.oneOf(
   // @TODO Change this to Object.values when supported in Node's version of V8
   Object.keys(MODE).map(key => MODE[key])
@@ -116,7 +118,7 @@ function arrayIterator(props, array, max) {
       elem = propertyValues[i];
     }
     if (!elem) {
-      elem = array.getPause().newPrimitiveValue(null);
+      elem = createPrimitiveValueFront(null);
     }
     const item = ItemRep({
       ...props,

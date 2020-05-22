@@ -96,7 +96,7 @@ function getTitle(props) {
 }
 
 // Registration
-function supportsObject(grip, ) {
+function supportsObject(object) {
   return object.className() == "DOMEvent";
 }
 

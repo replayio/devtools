@@ -15,7 +15,7 @@ const Undefined = function () {
 };
 
 function supportsObject(object, noGrip = false) {
-  return object.isPrimitive() && object.primitive() == undefined;
+  return object.isPrimitive() && object.primitive() === undefined;
 }
 
 // Exports from this module

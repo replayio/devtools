@@ -58,7 +58,7 @@ function FunctionRep(props) {
   }
 
   const elProps = {
-    "data-link-actor-id": grip.grip.maybeObjectId(),
+    "data-link-actor-id": grip.maybeObjectId(),
     className: "objectBox objectBox-function",
     // Set dir="ltr" to prevent parentheses from
     // appearing in the wrong direction

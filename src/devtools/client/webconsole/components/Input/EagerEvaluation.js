@@ -21,12 +21,9 @@ loader.lazyGetter(this, "REPS", function() {
 loader.lazyGetter(this, "MODE", function() {
   return require("devtools/client/debugger/packages/devtools-reps/src").MODE;
 });
-loader.lazyRequireGetter(
-  this,
-  "PropTypes",
-  "devtools/client/shared/vendor/react-prop-types"
-);
 */
+
+const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
 
 /**
  * Show the results of evaluating the current terminal text, if possible.

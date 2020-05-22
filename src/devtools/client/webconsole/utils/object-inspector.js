@@ -12,7 +12,7 @@ const {
 const reps = require("devtools/client/debugger/packages/devtools-reps/src");
 const { REPS, MODE } = reps;
 
-const ObjectInspector = createFactory(reps.objectInspector.ObjectInspector);
+const ObjectInspector = createFactory(reps.objectInspector.ObjectInspector.default);
 
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
 const { ObjectFront } = require("protocol/thread");

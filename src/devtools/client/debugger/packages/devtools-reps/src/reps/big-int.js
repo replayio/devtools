@@ -20,8 +20,7 @@ BigInt.propTypes = {
 };
 
 function BigInt(props) {
-  const { text } = props.object;
-
+  const text = props.object.primitive().toString();
   return span({ className: "objectBox objectBox-number" }, `${text}n`);
 }
 

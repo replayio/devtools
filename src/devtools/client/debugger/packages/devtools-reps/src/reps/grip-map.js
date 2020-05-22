@@ -69,7 +69,7 @@ function GripMap(props) {
 }
 
 function getTitle(props, object) {
-  const title = props.title || (object && object.object.className() ? object.className() : "Map");
+  const title = props.title || (object && object.className() ? object.className() : "Map");
   return span(
     {
       className: "objectTitle",
@@ -143,10 +143,10 @@ function getEntries(props, entries) {
 }
 
 function getLength(grip) {
-  return grip.grip.containerEntryCount();
+  return grip.containerEntryCount();
 }
 
-function supportsObject(grip, noGrip = false) {
+function supportsObject(grip) {
   return ["Map", "MapLike"].includes(grip.className());
 }
 
