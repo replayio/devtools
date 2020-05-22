@@ -360,7 +360,7 @@ function convertScope(protocolScope) {
 async function getFrameScopes(frame: Frame): Promise<*> {
   const threadFront = lookupThreadFront(frame.thread);
   const scopes = await threadFront.getScopes(frame.id);
-  const converted = scopes.map(s => convertScope(threadFront, s));
+  const converted = scopes.map(convertScope);
   for (let i = 0; i + 1 < converted.length; i++) {
     converted[i].parent = converted[i + 1];
   }

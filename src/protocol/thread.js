@@ -80,6 +80,9 @@ Pause.prototype = {
 
   addData({ frames, scopes, objects }) {
     (frames || []).forEach(f => this.frames.set(f.frameId, f));
+    (scopes || []).forEach(s => this.scopes.set(s.scopeId, s));
+    (objects || []).forEach(o => this.objects.set(o.objectId, o));
+
     (scopes || []).forEach(scope => {
       if (scope.bindings) {
         const newBindings = [];
@@ -88,8 +91,8 @@ Pause.prototype = {
         }
         scope.bindings = newBindings;
       }
-      this.scopes.set(scope.scopeId, scope);
     });
+
     (objects || []).forEach(object => {
       if (object.preview) {
         const { properties, containerEntries, getterValues } = object.preview;
@@ -124,7 +127,6 @@ Pause.prototype = {
         }
         object.preview.getterValues = newGetterValues;
       }
-      this.objects.set(object.objectId, object);
     });
   },
 
