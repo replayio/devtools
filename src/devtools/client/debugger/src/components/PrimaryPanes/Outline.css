@@ -11,6 +11,14 @@
   position: relative;
 }
 
+.outline-filter form {
+  align-items: center;
+  display: flex;
+  padding: 0;
+  margin: 0;
+  height: 28px;
+}
+
 .outline-pane-info {
   padding: 0.5em;
   width: 100%;
@@ -24,8 +32,6 @@
 .outline-list {
   margin: 0;
   padding: 0 0 4px 0;
-  position: absolute;
-  top: 22px;
   bottom: 25px;
   left: 0;
   right: 0;
