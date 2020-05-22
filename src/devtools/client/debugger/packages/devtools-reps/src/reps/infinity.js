@@ -22,8 +22,7 @@ function InfinityRep(props) {
 }
 
 function supportsObject(object, noGrip = false) {
-  const type = getGripType(object, noGrip);
-  return type == "Infinity" || type == "-Infinity";
+  return object.isPrimitive() && [Infinity, -Infinity].includes(object.primitive());
 }
 
 // Exports from this module

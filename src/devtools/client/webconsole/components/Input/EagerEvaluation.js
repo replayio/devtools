@@ -16,10 +16,10 @@ const actions = require("devtools/client/webconsole/actions/index");
 
 /*
 loader.lazyGetter(this, "REPS", function() {
-  return require("devtools/client/shared/components/reps/reps").REPS;
+  return require("devtools/client/debugger/packages/devtools-reps/src").REPS;
 });
 loader.lazyGetter(this, "MODE", function() {
-  return require("devtools/client/shared/components/reps/reps").MODE;
+  return require("devtools/client/debugger/packages/devtools-reps/src").MODE;
 });
 loader.lazyRequireGetter(
   this,
@@ -87,16 +87,16 @@ class EagerEvaluation extends Component {
       { className: "eager-evaluation-result", key: "eager-evaluation-result" },
       hasResult
         ? dom.span(
-            { className: "eager-evaluation-result__row" },
-            dom.span({
-              className: "eager-evaluation-result__icon",
-              key: "icon",
-            }),
-            dom.span(
-              { className: "eager-evaluation-result__text", key: "text" },
-              this.renderRepsResult()
-            )
+          { className: "eager-evaluation-result__row" },
+          dom.span({
+            className: "eager-evaluation-result__icon",
+            key: "icon",
+          }),
+          dom.span(
+            { className: "eager-evaluation-result__text", key: "text" },
+            this.renderRepsResult()
           )
+        )
         : null
     );
   }

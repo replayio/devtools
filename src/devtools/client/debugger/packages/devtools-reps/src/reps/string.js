@@ -266,9 +266,9 @@ function getLinkifiedElements({
             target: "_blank",
             onClick: openLink
               ? e => {
-                  e.preventDefault();
-                  openLink(useUrl, e);
-                }
+                e.preventDefault();
+                openLink(useUrl, e);
+              }
               : null,
           },
           linkText
@@ -340,16 +340,13 @@ function getCroppedString(text, offset = 0, startCropIndex, endCropIndex) {
 }
 
 function isLongString(object) {
-  const grip = object && object.getGrip ? object.getGrip() : object;
-  return grip && grip.type === "longString";
+  return false;
+  // const grip = object && object.getGrip ? object.getGrip() : object;
+  // return grip && grip.type === "longString";
 }
 
 function supportsObject(object, noGrip = false) {
-  if (noGrip === false && isGrip(object)) {
-    return isLongString(object);
-  }
-
-  return getGripType(object, noGrip) == "string";
+  return object.className() == "String";
 }
 
 // Exports from this module

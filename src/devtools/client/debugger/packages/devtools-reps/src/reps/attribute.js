@@ -38,11 +38,8 @@ function getTitle(grip) {
 
 // Registration
 function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return getGripType(grip, noGrip) == "Attr" && grip.preview;
+  return false;
+  // return getGripType(grip, noGrip) == "Attr" && grip.preview;
 }
 
 module.exports = {

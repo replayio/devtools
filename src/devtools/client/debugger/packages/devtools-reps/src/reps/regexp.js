@@ -21,7 +21,7 @@ function RegExp(props) {
 
   return span(
     {
-      "data-link-actor-id": object.actor,
+      "data-link-actor-id": object.maybeObjectId(),
       className: "objectBox objectBox-regexp regexpSource",
     },
     getSource(object)
@@ -29,16 +29,12 @@ function RegExp(props) {
 }
 
 function getSource(grip) {
-  return grip.displayString;
+  return grip.regexpString;
 }
 
 // Registration
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  return getGripType(object, noGrip) == "RegExp";
+function supportsObject(object) {
+  return gobject.className() == "RegExp";
 }
 
 // Exports from this module

@@ -27,48 +27,34 @@ ErrorRep.propTypes = {
 
 function ErrorRep(props) {
   const object = props.object;
-  const preview = object.preview;
   const mode = props.mode;
 
   let name;
-  if (
-    preview &&
-    preview.name &&
-    typeof preview.name === "string" &&
-    preview.kind
-  ) {
-    switch (preview.kind) {
-      case "Error":
-        name = preview.name;
-        break;
-      case "DOMException":
-        name = preview.kind;
-        break;
-      default:
-        throw new Error("Unknown preview kind for the Error rep.");
-    }
-  } else {
-    name = "Error";
-  }
+  const preview = object.previewValueMap();
 
+  switch (object.className()) {
+    case "DOMException":
+      name = "DOMException";
+      break;
+    default:
+      name = preview.name.primitive();
+      break;
+  }
   const content = [];
 
-  if (mode === MODE.TINY || typeof preview.message !== "string") {
+  if (mode === MODE.TINY) {
     content.push(name);
   } else {
-    content.push(`${name}: "${preview.message}"`);
+    content.push(`${name}: "${preview.message.primitive}"`);
   }
 
   if (preview.stack && (mode !== MODE.TINY && mode !== MODE.SHORT)) {
-    const stacktrace = props.renderStacktrace
-      ? props.renderStacktrace(parseStackString(preview.stack))
-      : getStacktraceElements(props, preview);
-    content.push(stacktrace);
+    const stacktrace = props.renderStacktrace ? props.renderStacktrace(parseStackString(preview.stack.primitive())) : getStacktraceElements(props, preview); content.push(stacktrace);
   }
 
   return span(
     {
-      "data-link-actor-id": object.actor,
+      "data-link-actor-id": object.maybeObjectId(),
       className: "objectBox-stackTrace",
     },
     content
@@ -97,7 +83,7 @@ function getStacktraceElements(props, preview) {
     return stack;
   }
 
-  parseStackString(preview.stack).forEach((frame, index, frames) => {
+  parseStackString(preview.stack.primitive()).forEach((frame, index, frames) => {
     let onLocationClick;
     const {
       filename,
@@ -242,13 +228,18 @@ function parseStackString(stack) {
 
 // Registration
 function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-  return (
-    (object.preview && getGripType(object, noGrip) === "Error") ||
-    object.class === "DOMException"
-  );
+  const errorClasses = [
+    "Error",
+    "EvalError",
+    "RangeError",
+    "ReferenceError",
+    "SyntaxError",
+    "TypeError",
+    "URIError",
+    "DOMException",
+  ];
+
+  return object.hasPreview() && errorClasses.includes(object.className());
 }
 
 // Exports from this module

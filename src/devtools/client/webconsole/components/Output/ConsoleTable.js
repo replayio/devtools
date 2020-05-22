@@ -14,7 +14,7 @@ const {
   getDescriptorValue,
 } = require("devtools/client/webconsole/utils/messages");
 
-const { MODE } = require("devtools/client/shared/components/reps/reps");
+const { MODE } = require("devtools/client/debugger/packages/devtools-reps/src");
 
 const GripMessageBody = createFactory(
   require("devtools/client/webconsole/components/Output/GripMessageBody")
@@ -73,12 +73,12 @@ class ConsoleTable extends Component {
           typeof cellValue === "undefined"
             ? ""
             : GripMessageBody({
-                grip: cellValue,
-                mode: MODE.SHORT,
-                useQuotes: false,
-                serviceContainer,
-                dispatch,
-              });
+              grip: cellValue,
+              mode: MODE.SHORT,
+              useQuotes: false,
+              serviceContainer,
+              dispatch,
+            });
 
         cells.push(
           dom.div(
@@ -182,14 +182,14 @@ function getTableItems(data = {}, type, headers = null) {
   let columns = new Map();
   const items = [];
 
-  const addItem = function(item) {
+  const addItem = function (item) {
     items.push(item);
     Object.keys(item).forEach(key => addColumn(key));
   };
 
   const validCustomHeaders = hasValidCustomHeaders(headers);
 
-  const addColumn = function(columnIndex) {
+  const addColumn = function (columnIndex) {
     const columnExists = columns.has(columnIndex);
     const hasMaxColumns = columns.size == TABLE_COLUMN_MAX_ITEMS;
 

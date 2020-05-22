@@ -43,40 +43,7 @@ const Grip = require("./grip");
 // List of all registered template.
 // XXX there should be a way for extensions to register a new
 // or modify an existing rep.
-const reps = [
-  RegExp,
-  StyleSheet,
-  Event,
-  DateTime,
-  CommentNode,
-  Accessible,
-  ElementNode,
-  TextNode,
-  Attribute,
-  Func,
-  PromiseRep,
-  ArrayRep,
-  Document,
-  DocumentType,
-  Window,
-  ObjectWithText,
-  ObjectWithURL,
-  ErrorRep,
-  GripArray,
-  GripMap,
-  GripMapEntry,
-  Grip,
-  Undefined,
-  Null,
-  StringRep,
-  Number,
-  BigInt,
-  SymbolRep,
-  InfinityRep,
-  NaNRep,
-  Accessor,
-  Obj,
-];
+const reps = [RegExp, StyleSheet, Event, DateTime, CommentNode, Accessible, ElementNode, TextNode, Attribute, Func, PromiseRep, ArrayRep, Document, DocumentType, Window, ObjectWithText, ObjectWithURL, ErrorRep, GripArray, GripMap, GripMapEntry, Undefined, Null, StringRep, Number, BigInt, SymbolRep, InfinityRep, NaNRep, Accessor, Obj, Grip];
 
 /**
  * Generic rep that is used for rendering native JS types or an object.
@@ -84,7 +51,7 @@ const reps = [
  * to the current value type. The value must be passed in as the 'object'
  * property.
  */
-const Rep = function(props) {
+const Rep = function (props) {
   const { object, defaultRep } = props;
   const rep = getRep(object, defaultRep, props.noGrip);
   return rep(props);

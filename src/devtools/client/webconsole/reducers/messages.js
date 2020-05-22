@@ -11,7 +11,7 @@ const {
 const constants = require("devtools/client/webconsole/constants");
 const { DEFAULT_FILTERS, FILTERS, MESSAGE_TYPE, MESSAGE_SOURCE } = constants;
 
-const { getGripPreviewItems } = require("devtools/client/shared/components/reps/reps");
+const { getGripPreviewItems } = require("devtools/client/debugger/packages/devtools-reps/src");
 const { getUnicodeUrlPath } = require("devtools/client/shared/unicode-url");
 const { getSourceNames } = require("devtools/client/shared/source-utils");
 const {
@@ -1047,13 +1047,13 @@ function getMessageVisibility(
   const parentVisibility =
     parentWarningGroupMessage && checkParentWarningGroupVisibility
       ? getMessageVisibility(parentWarningGroupMessage, {
-          messagesState,
-          filtersState,
-          prefsState,
-          uiState,
-          checkGroup,
-          checkParentWarningGroupVisibility,
-        })
+        messagesState,
+        filtersState,
+        prefsState,
+        uiState,
+        checkGroup,
+        checkParentWarningGroupVisibility,
+      })
       : null;
   if (
     parentVisibility &&
@@ -1228,7 +1228,7 @@ function passSearchFilters(message, filters) {
   if (term.startsWith("/") && term.endsWith("/") && term.length > 2) {
     try {
       regex = new RegExp(term.slice(1, -1), "im");
-    } catch (e) {}
+    } catch (e) { }
   }
   const matchStr = regex
     ? str => regex.test(str)
@@ -1272,7 +1272,7 @@ function isTextInFrame(matchStr, frame) {
 
   const str = `${
     functionName ? functionName + " " : ""
-  }${unicodeShort}:${line}:${column}`;
+    }${unicodeShort}:${line}:${column}`;
   return matchStr(str);
 }
 
@@ -1459,7 +1459,7 @@ function ensureExecutionPoint(state, newMessage) {
 function getLastMessageWithPoint(state, point) {
   // Find all of the messageIds with no real execution point and the same progress
   // value as the given point.
-  const filteredMessageId = state.visibleMessages.filter(function(p) {
+  const filteredMessageId = state.visibleMessages.filter(function (p) {
     const currentMessage = state.messagesById.get(p);
     if (currentMessage.executionPoint) {
       return false;

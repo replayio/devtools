@@ -42,11 +42,8 @@ function getDescription(grip) {
 
 // Registration
 function supportsObject(grip, noGrip = false) {
-  if (noGrip === true || !isGrip(grip)) {
-    return false;
-  }
-
-  return grip.preview && grip.preview.kind == "ObjectWithText";
+  return false;
+  //return grip.preview && grip.preview.kind == "ObjectWithText";
 }
 
 // Exports from this module

@@ -11,7 +11,7 @@ const Message = createFactory(
   require("devtools/client/webconsole/components/Output/Message")
 );
 
-const { REPS, MODE } = require("devtools/client/shared/components/reps/reps");
+const { REPS, MODE } = require("devtools/client/debugger/packages/devtools-reps/src");
 
 PageError.displayName = "PageError";
 

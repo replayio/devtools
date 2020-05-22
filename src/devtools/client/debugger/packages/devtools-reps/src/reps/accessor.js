@@ -72,11 +72,13 @@ function hasSetter(object) {
   return object && object.set && object.set.type !== "undefined";
 }
 
-function supportsObject(object, noGrip = false) {
+function supportsObject(object, ) {
+  /*
   if (noGrip !== true && (hasGetter(object) || hasSetter(object))) {
     return true;
   }
 
+  */
   return false;
 }
 

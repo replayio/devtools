@@ -33,12 +33,9 @@ function DocumentType(props) {
 
 // Registration
 function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-
-  const type = getGripType(object, noGrip);
-  return object.preview && type === "DocumentType";
+  return false;
+  //const type = getGripType(object, noGrip);
+  //return object.preview && type === "DocumentType";
 }
 
 // Exports from this module

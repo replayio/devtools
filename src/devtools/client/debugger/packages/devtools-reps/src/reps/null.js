@@ -13,16 +13,8 @@ function Null(props) {
   return span({ className: "objectBox objectBox-null" }, "null");
 }
 
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true) {
-    return object === null;
-  }
-
-  if (object && object.type && object.type == "null") {
-    return true;
-  }
-
-  return object == null;
+function supportsObject(object) {
+  return object.isPrimitive() && object.primitive() == null;
 }
 
 // Exports from this module

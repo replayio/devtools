@@ -9,7 +9,7 @@ const {
   createElement,
 } = require("devtools/client/shared/vendor/react");
 
-const reps = require("devtools/client/shared/components/reps/reps");
+const reps = require("devtools/client/debugger/packages/devtools-reps/src");
 const { REPS, MODE } = reps;
 
 const ObjectInspector = createFactory(reps.objectInspector.ObjectInspector);
@@ -48,10 +48,10 @@ function getObjectInspector(
       : null;
     onInspectIconClick = serviceContainer.openNodeInInspector
       ? (object, e) => {
-          // Stop the event propagation so we don't trigger ObjectInspector expand/collapse.
-          e.stopPropagation();
-          serviceContainer.openNodeInInspector(object);
-        }
+        // Stop the event propagation so we don't trigger ObjectInspector expand/collapse.
+        e.stopPropagation();
+        serviceContainer.openNodeInInspector(object);
+      }
       : null;
   }
 
@@ -71,7 +71,7 @@ function getObjectInspector(
         stacktrace,
         onViewSourceInDebugger: serviceContainer
           ? serviceContainer.onViewSourceInDebugger ||
-            serviceContainer.onViewSource
+          serviceContainer.onViewSource
           : null,
         onViewSource: serviceContainer.onViewSource,
         onReady: override.maybeScrollToBottom,

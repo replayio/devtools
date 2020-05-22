@@ -117,7 +117,7 @@ function nodeHasGetterValue(item: Node): boolean {
 
 function nodeIsObject(item: Node): boolean {
   const value = getValue(item);
-  return value && value.type === "object";
+  return value && value.isObject();
 }
 
 function nodeIsArrayLike(item: Node): boolean {
@@ -127,38 +127,41 @@ function nodeIsArrayLike(item: Node): boolean {
 
 function nodeIsFunction(item: Node): boolean {
   const value = getValue(item);
-  return value && value.class === "Function";
+  return value && value.className() === "Function";
 }
 
 function nodeIsOptimizedOut(item: Node): boolean {
   const value = getValue(item);
-  return !nodeHasChildren(item) && value && value.optimizedOut;
+  return !nodeHasChildren(item) && value && value.isUnavailable();
 }
 
 function nodeIsUninitializedBinding(item: Node): boolean {
   const value = getValue(item);
-  return value && value.uninitialized;
+  return value && value.isUninitialized();
 }
 
 // Used to check if an item represents a binding that exists in a sourcemap's
 // original file content, but does not match up with a binding found in the
 // generated code.
 function nodeIsUnmappedBinding(item: Node): boolean {
-  const value = getValue(item);
-  return value && value.unmapped;
+  return false;
+  //const value = getValue(item);
+  //return value && value.unmapped;
 }
 
 // Used to check if an item represents a binding that exists in the debugger's
 // parser result, but does not match up with a binding returned by the
 // devtools server.
 function nodeIsUnscopedBinding(item: Node): boolean {
-  const value = getValue(item);
-  return value && value.unscoped;
+  return false;
+  //const value = getValue(item);
+  //return value && value.unscoped;
 }
 
 function nodeIsMissingArguments(item: Node): boolean {
-  const value = getValue(item);
-  return !nodeHasChildren(item) && value && value.missingArguments;
+  return false;
+  //const value = getValue(item);
+  //return !nodeHasChildren(item) && value && value.missingArguments;
 }
 
 function nodeHasProperties(item: Node): boolean {
@@ -590,9 +593,9 @@ function makeNodesForProperties(
           path: `symbol-${index}`,
           contents: symbolGrip
             ? {
-                value: symbolGrip,
-                front: symbolFront,
-              }
+              value: symbolGrip,
+              front: symbolFront,
+            }
             : null,
         })
       );
@@ -768,9 +771,9 @@ function getEvaluatedItem(item: Node, evaluations: Evaluations): Node {
 
   const contents = isFront
     ? {
-        getterValue: evaluation.getterValue.getGrip(),
-        front: evaluation.getterValue,
-      }
+      getterValue: evaluation.getterValue.getGrip(),
+      front: evaluation.getterValue,
+    }
     : evaluations.get(item.path);
 
   return {

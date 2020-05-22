@@ -33,12 +33,9 @@ function FunctionRep(props) {
   } = props;
 
   let jumpToDefinitionButton;
-  if (
-    onViewSourceInDebugger &&
-    grip.location &&
-    grip.location.url &&
-    !IGNORED_SOURCE_URLS.includes(grip.location.url)
-  ) {
+  const location = grip.functionLocation();
+  const url = grip.functionLocationURL();
+  if (onViewSourceInDebugger && url && !IGNORED_SOURCE_URLS.includes(url)) {
     jumpToDefinitionButton = button({
       className: "jump-definition",
       draggable: false,
@@ -52,7 +49,7 @@ function FunctionRep(props) {
         }
 
         const sourceLocation = await getSourceLocation(
-          grip.location,
+          location,
           sourceMapService
         );
         onViewSourceInDebugger(sourceLocation);
@@ -61,15 +58,16 @@ function FunctionRep(props) {
   }
 
   const elProps = {
-    "data-link-actor-id": grip.actor,
+    "data-link-actor-id": grip.grip.maybeObjectId(),
     className: "objectBox objectBox-function",
     // Set dir="ltr" to prevent parentheses from
     // appearing in the wrong direction
     dir: "ltr",
   };
 
-  const parameterNames = (grip.parameterNames || []).filter(param => param);
+  const parameterNames = (grip.functionParameterNames() || []).filter(param => param);
 
+  /*
   if (grip.isClassConstructor) {
     return span(
       elProps,
@@ -79,6 +77,7 @@ function FunctionRep(props) {
       jumpToDefinitionButton
     );
   }
+  */
 
   return span(
     elProps,
@@ -109,6 +108,7 @@ function getFunctionTitle(grip, props) {
 
   let title = mode === MODE.TINY ? "" : "function ";
 
+  /*
   if (grip.isGenerator) {
     title = mode === MODE.TINY ? "* " : "function* ";
   }
@@ -116,6 +116,7 @@ function getFunctionTitle(grip, props) {
   if (grip.isAsync) {
     title = `${"async" + " "}${title}`;
   }
+  */
 
   return span(
     {
@@ -132,33 +133,7 @@ function getFunctionTitle(grip, props) {
  * @param {Object} props: Function rep props
  */
 function getFunctionName(grip, props = {}) {
-  let { functionName } = props;
-  let name;
-
-  if (functionName) {
-    const end = functionName.length - 1;
-    functionName =
-      functionName.startsWith('"') && functionName.endsWith('"')
-        ? functionName.substring(1, end)
-        : functionName;
-  }
-
-  if (
-    grip.displayName != undefined &&
-    functionName != undefined &&
-    grip.displayName != functionName
-  ) {
-    name = `${functionName}:${grip.displayName}`;
-  } else {
-    name = cleanFunctionName(
-      grip.userDisplayName ||
-        grip.displayName ||
-        grip.name ||
-        props.functionName ||
-        ""
-    );
-  }
-
+  const name = grip.functionName();
   return cropString(name, 100);
 }
 
@@ -220,12 +195,7 @@ function getParams(parameterNames) {
 
 // Registration
 function supportsObject(grip, noGrip = false) {
-  const type = getGripType(grip, noGrip);
-  if (noGrip === true || !isGrip(grip)) {
-    return type == "function";
-  }
-
-  return type == "Function";
+  return grip.className() == "Function";
 }
 
 async function getSourceLocation(location, sourceMapService) {
@@ -242,7 +212,7 @@ async function getSourceLocation(location, sourceMapService) {
       const { sourceUrl, line, column } = originalLocation;
       return { url: sourceUrl, line, column };
     }
-  } catch (e) {}
+  } catch (e) { }
   return location;
 }
 

@@ -113,11 +113,8 @@ function getProps(props, promiseState) {
 }
 
 // Registration
-function supportsObject(object, noGrip = false) {
-  if (noGrip === true || !isGrip(object)) {
-    return false;
-  }
-  return getGripType(object, noGrip) == "Promise";
+function supportsObject(object, ) {
+  return object.className() == "Promise";
 }
 
 // Exports from this module

@@ -25,8 +25,8 @@ function BigInt(props) {
   return span({ className: "objectBox objectBox-number" }, `${text}n`);
 }
 
-function supportsObject(object, noGrip = false) {
-  return getGripType(object, noGrip) === "BigInt";
+function supportsObject(valueFront, noGrip = false) {
+  return valueFront.isPrimitive() && typeof valueFront.primitive() == "bigint";
 }
 
 // Exports from this module

@@ -159,5 +159,3 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @import url("devtools/client/shared/sourceeditor/codemirror/lib/codemirror.css");
 @import url("devtools/client/themes/dark-theme.css");
 @import url("devtools/client/themes/light-theme.css");
-
-@import url("/devtools/client/shared/components/reps/reps.css");
