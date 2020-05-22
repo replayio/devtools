@@ -8,13 +8,12 @@
 }
 
 .outline-filter-input {
-  padding-top: 2px;
-  padding-bottom: 2px;
   width: 100%;
   background-color: var(--theme-sidebar-background);
   color: var(--theme-body-color);
   font-size: inherit;
   user-select: text;
+  height: 100%;
 }
 
 .outline-filter-input.focused {
