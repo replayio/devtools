@@ -104,6 +104,8 @@
 .sources-list .tree .label {
   display: inline-block;
   line-height: 16px;
+  color: var(--theme-body-color);
+
 }
 
 .no-sources-message {

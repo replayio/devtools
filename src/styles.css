@@ -124,19 +124,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
 
 #toolbox.jsdebugger #toolbox-toolbar-jsdebugger {
-  color: var(--toolbarbutton-checked-background);
+  color: var(--theme-toolbar-selected-color);
 }
 
 #toolbox.jsdebugger #toolbox-toolbar-jsdebugger .toolbar-panel-icon {
-  background: var(--toolbarbutton-checked-background);
+  background: var(--theme-toolbar-selected-color);
 }
 
 #toolbox.webconsole #toolbox-toolbar-webconsole {
-  color: var(--toolbarbutton-checked-background);
+  color: var(--theme-toolbar-selected-color);
 }
 
 #toolbox.webconsole #toolbox-toolbar-webconsole .toolbar-panel-icon {
-  background: var(--toolbarbutton-checked-background);
+  background: var(--theme-toolbar-selected-color);
 }
 
 .content-iframe {
