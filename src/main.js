@@ -34,23 +34,21 @@ require("./styles.css");
 
 const React = require("devtools/client/shared/vendor/react");
 const ReactDOM = require("devtools/client/shared/vendor/react-dom");
-const WebReplayPlayer = require("timeline/WebReplayPlayer");
 const { initSocket, sendMessage } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const { paintMessage } = require("protocol/graphics");
-const { DebuggerPanel } = require("devtools/client/debugger/panel");
-const { WebConsolePanel } = require("devtools/client/webconsole/panel");
+const Toolbox = require("toolbox/components/Toolbox");
 
 const { LocalizationHelper } = require("shims/l10n");
-
+let gToolbox;
 window.l10n = new LocalizationHelper(
   "devtools/client/locales/debugger.properties"
 );
 
-window.PrefObserver = function () {};
+window.PrefObserver = function () { };
 window.PrefObserver.prototype = {
-  on: () => {},
-  off: () => {},
+  on: () => { },
+  off: () => { },
 };
 
 const url = new URL(window.location.href);
@@ -93,76 +91,14 @@ async function initialize() {
   );
 }
 
-const gToolbox = {
-  currentTool: null,
-
-  _panels: {},
-
-  getPanel(name) {
-    return this._panels[name];
-  },
-
-  async getPanelWhenReady(name) {
-    const panel = this.getPanel(name);
-    await panel.readyWaiter.promise;
-    return panel;
-  },
-
-  threadFront: ThreadFront,
-
-  on() {},
-
-  getHighlighter() {
-    return {};
-  },
-
-  addTool(name, panel) {
-    this._panels[name] = panel;
-    const button = document.getElementById(`toolbox-toolbar-${name}`);
-    button.addEventListener("click", () => this.selectTool(name));
-  },
-
-  loadTool(name) {
-    return this.getPanelWhenReady(name);
-  },
-
-  selectTool(name) {
-    if (name == this.currentTool) {
-      return;
-    }
-    this.currentTool = name;
-    const toolbox = document.getElementById(`toolbox`);
-    toolbox.classList = name;
-  },
-
-  sourceMapService: {
-    getOriginalLocations: (locations) => locations,
-    getOriginalLocation: (location) => location,
-  },
-  parserService: {
-    hasSyntaxError: (text) => false,
-  },
-
-  // Helpers for debugging.
-  webconsoleState() {
-    return gToolbox.webconsoleHud.ui.wrapper.getStore().getState();
-  },
-};
-
-window.gToolbox = gToolbox;
-
 setTimeout(() => {
-  const debuggerPanel = new DebuggerPanel(gToolbox);
-  gToolbox.addTool("jsdebugger", debuggerPanel);
-
-  const consolePanel = new WebConsolePanel(gToolbox);
-  gToolbox.addTool("webconsole", consolePanel);
-
-  const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
-  ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
-
-  debuggerPanel.open();
-  consolePanel.open();
-
-  gToolbox.selectTool("jsdebugger");
-}, 0);
+  const root = document.getElementById("toolbox");
+  gToolbox = ReactDOM.render(
+    React.createElement(
+      root,
+      React.createElement(Toolbox)
+    ),
+    root
+  );
+  debugger
+}, 0)

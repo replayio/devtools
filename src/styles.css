@@ -139,6 +139,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   background: var(--toolbarbutton-checked-background);
 }
 
+.source-outline-tabs .tab::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--tab-line-color, transparent);
+  transition: transform 250ms var(--animation-curve),
+    opacity 250ms var(--animation-curve);
+  opacity: 0;
+  transform: scaleX(0);
+}
+
 .content-iframe {
   border: none;
   width: 100%;
