@@ -98,12 +98,12 @@ function getObjectInspector(
 }
 
 function createRoots(valueFront, pathPrefix = "") {
-  const id = valueFront.maybeObjectId();
+  const id = valueFront.id();
 
   return [
     {
       path: `${pathPrefix}${id}`,
-      contents: { value: valueFront },
+      contents: valueFront,
     },
   ];
 }

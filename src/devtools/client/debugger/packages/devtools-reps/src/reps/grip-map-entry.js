@@ -24,14 +24,7 @@ GripMapEntry.propTypes = {
 
 function GripMapEntry(props) {
   const { object } = props;
-
-  let { key, value } = object.preview;
-  if (key && key.getGrip) {
-    key = key.getGrip();
-  }
-  if (value && value.getGrip) {
-    value = value.getGrip();
-  }
+  const { key, value } = object.isMapEntry();
 
   return span(
     {

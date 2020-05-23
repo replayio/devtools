@@ -21,7 +21,7 @@ function RegExp(props) {
 
   return span(
     {
-      "data-link-actor-id": object.maybeObjectId(),
+      "data-link-actor-id": object.id(),
       className: "objectBox objectBox-regexp regexpSource",
     },
     getSource(object)

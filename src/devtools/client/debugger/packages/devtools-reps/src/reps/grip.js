@@ -34,7 +34,7 @@ function GripRep(props) {
   const { mode = MODE.SHORT, object } = props;
 
   const config = {
-    "data-link-actor-id": object.maybeObjectId(),
+    "data-link-actor-id": object.id(),
     className: "objectBox objectBox-object",
   };
 

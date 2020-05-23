@@ -59,7 +59,7 @@ function StringRep(props) {
   const config = getElementConfig({
     className,
     style,
-    actor: object.maybeObjectId(),
+    actor: object.id(),
     title,
   });
 

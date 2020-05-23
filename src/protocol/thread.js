@@ -162,15 +162,28 @@ Pause.prototype = {
   },
 };
 
-function ValueFront(pause, protocolValue) {
+// Manages interaction with a value from a pause.
+function ValueFront(pause, protocolValue, pseudoElements) {
   this._pause = pause;
+
+  // For primitive values.
   this._hasPrimitive = false;
   this._primitive = undefined;
+
+  // For objects.
   this._object = null;
+
+  // For other kinds of values.
   this._uninitialized = false;
   this._unavailable = false;
 
-  if ("value" in protocolValue) {
+  // For pseudo-values constructed by the devtools.
+  this._pseudoElements = null;
+  this._isMapEntry = null;
+
+  if (pseudoElements) {
+    this._pseudoElements = pseudoElements;
+  } else if ("value" in protocolValue) {
     this._hasPrimitive = true;
     this._primitive = protocolValue.value;
   } else if ("object" in protocolValue) {
@@ -198,8 +211,23 @@ ValueFront.prototype = {
     return this._pause;
   },
 
-  maybeObjectId() {
-    return this._object ? this._object.objectId : "";
+  id() {
+    if (this._object) {
+      return this._object.objectId;
+    }
+    if (this._hasPrimitive) {
+      return String(this._primitive);
+    }
+    if (this._uninitialized) {
+      return "uninitialized";
+    }
+    if (this._unavailable) {
+      return "unavailable";
+    }
+    if (this._pseudoElements) {
+      return "pseudoElements";
+    }
+    throw new Error("bad contents");
   },
 
   isObject() {
@@ -292,7 +320,7 @@ ValueFront.prototype = {
   },
 
   isMapEntry() {
-    return false;
+    return this._isMapEntry;
   },
 
   isUninitialized() {
@@ -337,8 +365,40 @@ ValueFront.prototype = {
   },
 
   hasChildren() {
-    // FIXME
     return false;
+    //return this.isObject();
+  },
+
+  getChildren() {
+    if (this._pseudoElements) {
+      return this._pseudoElements;
+    }
+    assert(this.hasPreview() && !this._object.preview.overflow);
+    const previewValues = this.previewValueMap();
+    const rv = Object.entries(previewValues).map(
+      ([name, contents]) => ({ name, contents })
+    );
+    if (["Set", "WeakSet", "Map", "WeakMap"].includes(this.className())) {
+      const elements = this.previewContainerEntries().map(({ key, value }, i) => {
+        if (key) {
+          const entryElements = [
+            { name: "<key>", contents: key },
+            { name: "<value>", contents: value },
+          ];
+          const entry = createPseudoValueFront(entryElements);
+          entry._isMapEntry = { key, value };
+          return { name: i.toString(), contents: entry };
+        } else {
+          return { name: i.toString(), contents: value };
+        }
+      });
+      rv.unshift({ name: "<entries>", contents: createPseudoValueFront(elements) });
+    }
+    return rv;
+  },
+
+  async loadChildren() {
+    return this.getChildren();
   },
 };
 
@@ -346,6 +406,10 @@ Object.setPrototypeOf(ValueFront.prototype, new Proxy({}, DisallowEverythingProx
 
 function createPrimitiveValueFront(value) {
   return new ValueFront(null, { value });
+}
+
+function createPseudoValueFront(elements) {
+  return new ValueFront(null, undefined, elements);
 }
 
 const ThreadFront = {
@@ -537,8 +601,8 @@ const ThreadFront = {
     return this.currentPause.getScopes(frameId);
   },
 
-  evaluateInFrame(frameId, text) {
-    const rv = this.currentPause.evaluateInFrame(frameId, text);
+  async evaluateInFrame(frameId, text) {
+    const rv = await this.currentPause.evaluateInFrame(frameId, text);
     if (rv.returned) {
       rv.returned = new ValueFront(this.currentPause, rv.returned);
     } else if (rv.exception) {

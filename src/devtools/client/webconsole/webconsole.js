@@ -40,10 +40,6 @@ class WebConsole {
   }
 
   recordEvent(event, extra = {}) {
-    this.telemetry.recordEvent(event, "webconsole", null, {
-      session_id: (this.toolbox && this.toolbox.sessionId) || -1,
-      ...extra,
-    });
   }
 
   get currentTarget() {

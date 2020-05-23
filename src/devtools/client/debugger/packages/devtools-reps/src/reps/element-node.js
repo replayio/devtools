@@ -47,7 +47,7 @@ function ElementNode(props) {
   const isInTree = object.isNodeConnected() === true;
 
   const baseConfig = {
-    "data-link-actor-id": object.maybeObjectId(),
+    "data-link-actor-id": object.id(),
     className: "objectBox objectBox-node",
   };
   let inspectIcon;

@@ -58,7 +58,7 @@ function FunctionRep(props) {
   }
 
   const elProps = {
-    "data-link-actor-id": grip.maybeObjectId(),
+    "data-link-actor-id": grip.id(),
     className: "objectBox objectBox-function",
     // Set dir="ltr" to prevent parentheses from
     // appearing in the wrong direction
@@ -102,7 +102,7 @@ function getClassTitle(grip) {
 function getFunctionTitle(grip, props) {
   const { mode } = props;
 
-  if (mode === MODE.TINY && !grip.isGenerator && !grip.isAsync) {
+  if (mode === MODE.TINY/* && !grip.isGenerator && !grip.isAsync*/) {
     return null;
   }
 

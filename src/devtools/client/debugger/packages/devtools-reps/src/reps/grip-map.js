@@ -36,7 +36,7 @@ function GripMap(props) {
   const { mode, object } = props;
 
   const config = {
-    "data-link-actor-id": object.maybeObjectId(),
+    "data-link-actor-id": object.id(),
     className: "objectBox objectBox-object",
   };
 

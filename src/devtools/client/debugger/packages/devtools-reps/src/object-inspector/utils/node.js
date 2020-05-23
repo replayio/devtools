@@ -74,7 +74,7 @@ function isNodeRoot(item: Node, roots) {
     value &&
     roots.some(root => {
       const rootValue = getValue(root);
-      return rootValue && rootValue.maybeObjectId() === value.maybeObjectId();
+      return rootValue && rootValue.id() === value.id();
     })
   );
 }
@@ -157,16 +157,8 @@ function nodeHasProperties(item: Node): boolean {
 }
 
 function nodeIsPrimitive(item: Node): boolean {
-  return (
-    nodeIsBigInt(item) ||
-    (!nodeHasChildren(item) &&
-      !nodeHasProperties(item) &&
-      !nodeIsEntries(item) &&
-      !nodeIsMapEntry(item) &&
-      !nodeHasAccessors(item) &&
-      !nodeIsBucket(item) &&
-      !nodeIsLongString(item))
-  );
+  const v = getValue(item);
+  return v.isPrimitive() || v.isUninitialized() || v.isUnavailable();
 }
 
 function nodeIsDefaultProperties(item: Node): boolean {

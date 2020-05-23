@@ -77,7 +77,8 @@ ScopeFront.prototype = {
   className() { return undefined; },
   hasPreview() { return false; },
   isString() { return false; },
-  maybeObjectId() { return this._scope.path; },
+
+  id() { return this._scope.path; },
 
   isScope() { return true; },
   hasChildren() { return true; },

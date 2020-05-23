@@ -80,8 +80,6 @@ WebConsoleConnectionProxy.prototype = {
   },
 
   onLogpointResult(logGroupId, point, time, { scriptId, line, column }, pause, values) {
-    const argumentValues = values.map(v => convertProtocolValue(pause, v));
-
     const packet = {
       errorMessage: "",
       sourceName: ThreadFront.getScriptURL(scriptId),
@@ -90,7 +88,7 @@ WebConsoleConnectionProxy.prototype = {
       columnNumber: column,
       category: "ConsoleAPI",
       info: true,
-      argumentValues,
+      argumentValues: values,
       executionPoint: point,
       executionPointTime: time,
       executionPointHasFrames: true,

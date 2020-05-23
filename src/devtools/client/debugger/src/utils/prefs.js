@@ -80,11 +80,13 @@ if (isDevelopment()) {
   pref("javascript.enabled", true);
 }
 
+// Assorted preferences accessed elsewhere in the devtools.
 pref("devtools.editor.autoclosebrackets", true);
 pref("devtools.editor.detectindentation", true);
 pref("devtools.editor.expandtab", true);
 pref("devtools.editor.keymap", "default");
 pref("ui.caretBlinkTime", 530);
+pref("devtools.popup.disable_autohide", false);
 
 export const prefs = new PrefsHelper("devtools", {
   fission: ["Bool", "browsertoolbox.fission"],

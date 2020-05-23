@@ -306,6 +306,47 @@ function checkJumpIcon(msg) {
   assert(jumpIcon);
 }
 
+function findObjectInspectorNode(oi, nodeLabel) {
+  return [...oi.querySelectorAll(".tree-node")].find(node => {
+    const label = node.querySelector(".object-label");
+    if (!label) {
+      return false;
+    }
+    return label.textContent === nodeLabel;
+  });
+}
+
+function expandObjectInspectorNode(node) {
+  const arrow = node.querySelector(".arrow");
+  if (!arrow) {
+    ok(false, "Node can't be expanded");
+    return;
+  }
+  arrow.click();
+}
+
+async function checkMessageObjectContents(msg, expected, expandList = []) {
+  const oi = msg.querySelector(".tree");
+  const node = oi.querySelector(".tree-node");
+  expandObjectInspectorNode(node);
+
+  for (const label of expandList) {
+    const labelNode = await waitUntil(() =>
+      findObjectInspectorNode(oi, label)
+    );
+    expandObjectInspectorNode(labelNode);
+  }
+
+  await waitUntil(() => {
+    const nodes = oi.querySelectorAll(".tree-node");
+    if (nodes && nodes.length > 1) {
+      const properties = [...nodes].map(n => n.textContent);
+      return expected.every(s => properties.find(v => v.includes(s)));
+    }
+    return null;
+  });
+}
+
 async function executeInConsole(text) {
   gToolbox._panels.webconsole.hud.evaluateInput(text);
 }
@@ -339,5 +380,6 @@ module.exports = {
   waitForMessageCount,
   checkMessageStack,
   checkJumpIcon,
+  checkMessageObjectContents,
   executeInConsole,
 };

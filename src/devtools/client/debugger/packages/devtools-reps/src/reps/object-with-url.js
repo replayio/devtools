@@ -20,7 +20,7 @@ function ObjectWithURL(props) {
   const grip = props.object;
   return span(
     {
-      "data-link-actor-id": object.maybeObjectId(),
+      "data-link-actor-id": object.id(),
       className: `objectBox objectBox-${getType(grip)}`,
     },
     getTitle(grip),

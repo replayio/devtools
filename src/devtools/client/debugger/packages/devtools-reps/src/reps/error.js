@@ -54,7 +54,7 @@ function ErrorRep(props) {
 
   return span(
     {
-      "data-link-actor-id": object.maybeObjectId(),
+      "data-link-actor-id": object.id(),
       className: "objectBox-stackTrace",
     },
     content
