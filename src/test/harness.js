@@ -316,7 +316,7 @@ function findObjectInspectorNode(oi, nodeLabel) {
   });
 }
 
-function expandObjectInspectorNode(node) {
+function toggleObjectInspectorNode(node) {
   const arrow = node.querySelector(".arrow");
   if (!arrow) {
     ok(false, "Node can't be expanded");
@@ -328,13 +328,13 @@ function expandObjectInspectorNode(node) {
 async function checkMessageObjectContents(msg, expected, expandList = []) {
   const oi = msg.querySelector(".tree");
   const node = oi.querySelector(".tree-node");
-  expandObjectInspectorNode(node);
+  toggleObjectInspectorNode(node);
 
   for (const label of expandList) {
     const labelNode = await waitUntil(() =>
       findObjectInspectorNode(oi, label)
     );
-    expandObjectInspectorNode(labelNode);
+    toggleObjectInspectorNode(labelNode);
   }
 
   await waitUntil(() => {
@@ -345,6 +345,18 @@ async function checkMessageObjectContents(msg, expected, expandList = []) {
     }
     return null;
   });
+}
+
+function findScopeNode(text) {
+  return waitUntil(() => {
+    const nodes = document.querySelectorAll(".scopes-list .node");
+    return [...nodes].find(node => node.innerText.includes(text));
+  });
+}
+
+async function toggleScopeNode(text) {
+  const node = await findScopeNode(text);
+  return toggleObjectInspectorNode(node);
 }
 
 async function executeInConsole(text) {
@@ -381,5 +393,7 @@ module.exports = {
   checkMessageStack,
   checkJumpIcon,
   checkMessageObjectContents,
+  findScopeNode,
+  toggleScopeNode,
   executeInConsole,
 };

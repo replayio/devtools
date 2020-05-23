@@ -164,7 +164,10 @@ function getLength(object) {
   return object.length;
 }
 
-function supportsObject(object, noGrip = false) {
+function supportsObject(object) {
+  if (!object.hasPreview()) {
+    return false;
+  }
   const classNames = [
     "Array",
     "Arguments",

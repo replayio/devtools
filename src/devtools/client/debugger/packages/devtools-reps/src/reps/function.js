@@ -133,7 +133,7 @@ function getFunctionTitle(grip, props) {
  * @param {Object} props: Function rep props
  */
 function getFunctionName(grip, props = {}) {
-  const name = grip.functionName();
+  const name = props.functionName || grip.functionName() || "function";
   return cropString(name, 100);
 }
 
@@ -195,7 +195,7 @@ function getParams(parameterNames) {
 
 // Registration
 function supportsObject(grip, noGrip = false) {
-  return grip.className() == "Function";
+  return grip.hasPreview() && grip.className() == "Function";
 }
 
 async function getSourceLocation(location, sourceMapService) {

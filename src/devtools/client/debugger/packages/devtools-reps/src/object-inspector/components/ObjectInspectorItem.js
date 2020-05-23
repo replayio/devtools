@@ -99,10 +99,11 @@ class ObjectInspectorItem extends Component<Props> {
     const isPrimitive = nodeIsPrimitive(item);
 
     if (nodeIsOptimizedOut(item)) {
-      return {
-        label,
-        value: dom.span({ className: "unavailable" }, "(optimized away)"),
-      };
+      // See getChildren() in protocol/thread.js
+      const value = label == "Loading…"
+        ? undefined
+        : dom.span({ className: "unavailable" }, "(optimized away)");
+      return { label, value };
     }
 
     if (nodeIsUninitializedBinding(item)) {

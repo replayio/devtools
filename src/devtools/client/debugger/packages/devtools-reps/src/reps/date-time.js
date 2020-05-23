@@ -49,8 +49,8 @@ function getTitle(grip) {
 }
 
 // Registration
-function supportsObject(grip, noGrip = false) {
-  return grip.className() == "Date";
+function supportsObject(grip) {
+  return grip.hasPreview() && grip.className() == "Date";
 }
 
 // Exports from this module

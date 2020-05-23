@@ -138,6 +138,9 @@ function getLength(grip) {
 }
 
 function supportsObject(grip) {
+  if (!grip.hasPreview()) {
+    return false;
+  }
   return ["Map", "WeakMap"].includes(grip.className());
 }
 

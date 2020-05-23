@@ -34,7 +34,7 @@ function getSource(grip) {
 
 // Registration
 function supportsObject(object) {
-  return object.className() == "RegExp";
+  return object.hasPreview() && object.className() == "RegExp";
 }
 
 // Exports from this module

@@ -83,9 +83,21 @@ Pause.prototype = {
   },
 
   addData({ frames, scopes, objects }) {
-    (frames || []).forEach(f => this.frames.set(f.frameId, f));
-    (scopes || []).forEach(s => this.scopes.set(s.scopeId, s));
-    (objects || []).forEach(o => this.objects.set(o.objectId, o));
+    (frames || []).forEach(f => {
+      if (!this.frames.has(f.frameId)) {
+        this.frames.set(f.frameId, f);
+      }
+    });
+    (scopes || []).forEach(s => {
+      if (!this.scopes.has(s.scopeId)) {
+        this.scopes.set(s.scopeId, s);
+      }
+    });
+    (objects || []).forEach(o => {
+      if (!this.objects.has(o.objectId)) {
+        this.objects.set(o.objectId, o);
+      }
+    });
 
     (frames || []).forEach(frame => {
       frame.this = new ValueFront(this, frame.this);
@@ -135,6 +147,8 @@ Pause.prototype = {
         }
         object.preview.getterValues = newGetterValues;
       }
+
+      this.objects.get(object.objectId).preview = object.preview;
     });
   },
 
@@ -373,7 +387,13 @@ ValueFront.prototype = {
     if (this._pseudoElements) {
       return this._pseudoElements;
     }
-    assert(this.hasPreview() && !this._object.preview.overflow);
+    if (this.hasPreviewOverflow()) {
+      // See ObjectInspectorItem.js
+      return [{
+        name: "Loading…",
+        contents: new ValueFront(null, { unavailable: true }),
+      }];
+    }
     const previewValues = this.previewValueMap();
     const rv = Object.entries(previewValues).map(
       ([name, contents]) => ({ name, contents })
@@ -398,6 +418,16 @@ ValueFront.prototype = {
   },
 
   async loadChildren() {
+    if (this.isObject() && this.hasPreviewOverflow()) {
+      const { data } = await sendMessage(
+        "Pause.getObjectPreview",
+        { object: this._object.objectId },
+        this.getPause().sessionId,
+        this.getPause().pauseId
+      );
+      this.getPause().addData(data);
+      assert(!this.hasPreviewOverflow());
+    }
     return this.getChildren();
   },
 };
