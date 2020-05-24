@@ -167,6 +167,7 @@ TextPropertyEditor.prototype = {
       "aria-labelledby": this.prop.id,
       tabindex: "-1",
     });
+    this.enable.style.visibility = "hidden";
 
     this.nameContainer = createChild(this.container, "span", {
       class: "ruleview-namecontainer",
@@ -738,6 +739,7 @@ TextPropertyEditor.prototype = {
    * indicator and the filter property, as well as the overridden state of the property.
    */
   updatePropertyState: function() {
+    /*
     if (this.prop.enabled) {
       this.enable.style.removeProperty("visibility");
       this.enable.setAttribute("checked", "");
@@ -745,6 +747,7 @@ TextPropertyEditor.prototype = {
       this.enable.style.visibility = "visible";
       this.enable.removeAttribute("checked");
     }
+    */
 
     this.warning.title = !this.isNameValid()
       ? l10n("rule.warningName.title")

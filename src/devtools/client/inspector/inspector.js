@@ -182,6 +182,9 @@ function Inspector(toolbox) {
   this.onSidebarSelect = this.onSidebarSelect.bind(this);
   this.onSidebarShown = this.onSidebarShown.bind(this);
   this.onSidebarToggle = this.onSidebarToggle.bind(this);
+  this.handleThreadPaused = this.handleThreadPaused.bind(this);
+  this.handleThreadResumed = this.handleThreadResumed.bind(this);
+  this.handleToolSelected = this.handleToolSelected.bind(this);
   this.onReflowInSelection = this.onReflowInSelection.bind(this);
 }
 
@@ -194,6 +197,21 @@ Inspector.prototype = {
   async init() {
     // Localize all the nodes containing a data-localization attribute.
     localizeMarkup(this.panelDoc);
+
+    // When replaying, we need to listen to changes in the target's pause state.
+    if (this.currentTarget.isReplayEnabled()) {
+      const dbg = await this._getDebugger();
+      this._replayResumed = !dbg.isPaused();
+    }
+
+    // When replaying, we need to listen to changes in the target's pause state.
+    if (this.currentTarget.isReplayEnabled()) {
+      let dbg = this._toolbox.getPanel("jsdebugger");
+      if (!dbg) {
+        dbg = await this._toolbox.loadTool("jsdebugger");
+      }
+      this._replayResumed = !dbg.isPaused();
+    }
 
     await this.toolbox.targetList.watchTargets(
       [this.toolbox.targetList.TYPES.FRAME],
@@ -209,6 +227,11 @@ Inspector.prototype = {
     this._markupBox = this.panelDoc.getElementById("markup-box");
 
     return this._deferredOpen();
+  },
+
+  _getDebugger() {
+    const dbg = this._toolbox.getPanel("jsdebugger");
+    return dbg || this._toolbox.loadTool("jsdebugger");
   },
 
   async _onTargetAvailable({ type, targetFront, isTopLevel }) {
@@ -239,6 +262,8 @@ Inspector.prototype = {
     // Then move the rest to onNewRoot and always call onNewRoot from here.
     if (this.isReady) {
       this.onNewRoot();
+    } else {
+      this.once("ready", this.onNewRoot);
     }
   },
 
@@ -396,8 +421,12 @@ Inspector.prototype = {
 
     this.walker.on("new-root", this.onNewRoot);
     this.toolbox.on("host-changed", this.onHostChanged);
+    this.toolbox.on("select", this.handleToolSelected);
     this.selection.on("new-node-front", this.onNewSelection);
     this.selection.on("detached-front", this.onDetached);
+    this.currentTarget.threadFront.on("paused", this.handleThreadPaused);
+    this.currentTarget.threadFront.on("instantWarp", this.handleThreadPaused);
+    this.currentTarget.threadFront.on("resumed", this.handleThreadResumed);
 
     // Log the 3 pane inspector setting on inspector open. The question we want to answer
     // is:
@@ -453,14 +482,28 @@ Inspector.prototype = {
 
     // A helper to tell if the target has or is about to navigate.
     // this._pendingSelection changes on "will-navigate" and "new-root" events.
+    // When replaying, if the target is unpaused then we consider it to be
+    // navigating so that its tree will not be constructed.
     const hasNavigated = () => {
-      return pendingSelection !== this._pendingSelection;
+      return pendingSelection !== this._pendingSelection || this._replayResumed;
     };
+
+    if (hasNavigated()) {
+      return promise.reject("navigated");
+    }
+
+    this._showMarkupLoading();
 
     // If available, set either the previously selected node or the body
     // as default selected, else set documentElement
     return walker
-      .getRootNode()
+      .ensureDOMLoaded()
+      .then(() => {
+        if (hasNavigated()) {
+          return promise.reject("navigated");
+        }
+        return walker.getRootNode();
+      })
       .then(node => {
         if (hasNavigated()) {
           return promise.reject(
@@ -1084,6 +1127,7 @@ Inspector.prototype = {
         id: "computedview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.computedViewTitle"),
       },
+      /*
       {
         id: "changesview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.changesViewTitle"),
@@ -1098,6 +1142,7 @@ Inspector.prototype = {
           "inspector.sidebar.animationInspectorTitle"
         ),
       },
+      */
     ];
 
     if (
@@ -1322,14 +1367,28 @@ Inspector.prototype = {
    * Reset the inspector on new root mutation.
    */
   onNewRoot: function() {
+    // Don't reload the inspector when not selected.
+    if (this.toolbox && this.toolbox.currentToolId != "inspector") {
+      this._hasNewRoot = true;
+      return;
+    }
+    this._hasNewRoot = false;
+
     // Record new-root timing for telemetry
     this._newRootStart = this.panelWin.performance.now();
 
     this._defaultNode = null;
     this.selection.setNodeFront(null);
     this._destroyMarkup();
+    if (this.walker) {
+      this.walker.reloadRoot();
+    }
 
-    const onNodeSelected = defaultNode => {
+    const onNodeSelected = async defaultNode => {
+      while (this._markupLoading) {
+        await this._waitForMarkupNotLoading();
+      }
+
       // Cancel this promise resolution as a new one had
       // been queued up.
       if (this._pendingSelection != onNodeSelected) {
@@ -1345,10 +1404,63 @@ Inspector.prototype = {
       this.setupToolbar();
     };
     this._pendingSelection = onNodeSelected;
+
+    const onNoSelectedNode = async () => {
+      while (this._markupLoading) {
+        await this._waitForMarkupNotLoading();
+      }
+
+      if (this._pendingSelection != onNodeSelected) {
+        return;
+      }
+      this._pendingSelection = null;
+
+      this.once("markuploaded", this.onNoMarkup);
+      this._initMarkup();
+    };
+
     this._getDefaultNodeForSelection().then(
       onNodeSelected,
-      this._handleRejectionIfNotDestroyed
+      onNoSelectedNode,
     );
+  },
+
+  /**
+   * When replaying, reset the inspector whenever the target pauses.
+   */
+  handleThreadPaused() {
+    this._replayResumed = false;
+    this.onNewRoot();
+  },
+
+  /**
+   * When replaying, reset the inspector whenever the target resumes.
+   */
+  handleThreadResumed() {
+    this._replayResumed = true;
+    this.onNewRoot();
+  },
+
+  handleToolSelected(id) {
+    if (id == "inspector" && this._hasNewRoot) {
+      this.onNewRoot();
+    }
+  },
+
+  /**
+   * When replaying, reset the inspector whenever the target pauses.
+   */
+  handleThreadPaused() {
+    this._replayResumed = false;
+    this.onNewRoot();
+  },
+
+  /**
+   * When replaying, reset the inspector whenever the target resumes.
+   */
+  handleThreadResumed() {
+    this._replayResumed = true;
+    this.onNewRoot();
   },
 
   /**
@@ -1357,6 +1469,13 @@ Inspector.prototype = {
    * highlighter state.
    */
   async onMarkupLoaded() {
+    const button = this._markupFrame.contentDocument.getElementById("pause-button");
+    button.hidden = true;
+
+    const loading = this._markupFrame.contentDocument.getElementById("loading");
+    loading.hidden = true;
+    ChromeUtils.recordReplayLog(`Inspector HideMarkupLoading`);
+
     if (!this.markup) {
       return;
     }
@@ -1391,6 +1510,35 @@ Inspector.prototype = {
         histogram.add(delay);
       }
       delete this._newRootStart;
+    }
+  },
+
+  async onNoMarkup() {
+    const loading = this._markupFrame.contentDocument.getElementById("loading");
+    loading.hidden = true;
+    ChromeUtils.recordReplayLog(`Inspector HideMarkupLoading`);
+
+    if (this.currentTarget.isReplayEnabled()) {
+      const dbg = await this._getDebugger();
+
+      const button = this._markupFrame.contentDocument.getElementById("pause-button");
+      button.hidden = false;
+      button.addEventListener("click", () => dbg.interrupt());
+    }
+  },
+
+  _showMarkupLoading() {
+    if (this.currentTarget.isReplayEnabled()) {
+      try {
+        const loading = this._markupFrame.contentDocument.getElementById("loading");
+        loading.hidden = false;
+        ChromeUtils.recordReplayLog(`Inspector ShowMarkupLoading`);
+
+        const button = this._markupFrame.contentDocument.getElementById("pause-button");
+        button.hidden = true;
+      } catch (e) {
+        // The markup frame might still be loading.
+      }
     }
   },
 
@@ -1607,6 +1755,8 @@ Inspector.prototype = {
 
           self._updateProgress = null;
           self.emit("inspector-updated", name);
+
+          ChromeUtils.recordReplayLog(`Inspector Updated`);
         },
       };
     }
@@ -1724,9 +1874,27 @@ Inspector.prototype = {
     this.sidebar = null;
     this.store = null;
     this.telemetry = null;
+    this._pendingSelection = null;
+  },
+
+  async _waitForMarkupNotLoading() {
+    if (!this._markupWaiters) {
+      this._markupWaiters = [];
+    }
+    let resolve;
+    const promise = new Promise(r => (resolve = r));
+    this._markupWaiters.push(resolve);
+    return promise;
   },
 
   _initMarkup: function() {
+    ChromeUtils.recordReplayLog(`Inspector InitMarkup ${Error().stack}`);
+
+    if (this._markupLoading) {
+      throw new Error("initMarkup duplicate\n");
+    }
+    this._markupLoading = true;
+
     if (!this._markupFrame) {
       this._markupFrame = this.panelDoc.createElement("iframe");
       this._markupFrame.setAttribute(
@@ -1757,6 +1925,11 @@ Inspector.prototype = {
     this._markupBox.style.visibility = "visible";
     this.markup = new MarkupView(this, this._markupFrame, this._toolbox.win);
     this.emit("markuploaded");
+    this._markupLoading = false;
+    if (this._markupWaiters && this._markupWaiters.length) {
+      this._markupWaiters.shift()();
+    }
+    ChromeUtils.recordReplayLog(`Inspector MarkupLoaded`);
   },
 
   _destroyMarkup: function() {
@@ -1769,7 +1942,8 @@ Inspector.prototype = {
       destroyPromise = promise.resolve();
     }
 
-    this._markupBox.style.visibility = "hidden";
+    // Allow showing loading message.
+    //this._markupBox.style.visibility = "hidden";
 
     return destroyPromise;
   },

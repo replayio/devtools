@@ -21,6 +21,7 @@ const MarkupReadOnlyContainer = require("devtools/client/inspector/markup/views/
 const MarkupTextContainer = require("devtools/client/inspector/markup/views/text-container");
 const RootContainer = require("devtools/client/inspector/markup/views/root-container");
 const WalkerEventListener = require("devtools/client/inspector/shared/walker-event-listener");
+const ChromeUtils = require("ChromeUtils");
 
 loader.lazyRequireGetter(
   this,
@@ -1566,7 +1567,11 @@ MarkupView.prototype = {
       })
       .then(() => {
         const container = this.getContainer(node, slotted);
-        scrollIntoViewIfNeeded(container.editor.elt, centered, smoothScroll);
+        if (container.editor) {
+          scrollIntoViewIfNeeded(container.editor.elt, centered, smoothScroll);
+        } else {
+          console.error(`Error: Missing container editor ${node.tagName}`);
+        }
       }, this._handleRejectionIfNotDestroyed);
   },
 
@@ -2221,12 +2226,14 @@ MarkupView.prototype = {
     return elt;
   },
 
-  _waitForChildren: function() {
+  _waitForChildren: async function() {
     if (!this._queuedChildUpdates) {
       return promise.resolve(undefined);
     }
 
-    return promise.all([...this._queuedChildUpdates.values()]);
+    ChromeUtils.recordReplayLog(`Markup WaitForChildren Start ${Error().stack}`);
+    await promise.all([...this._queuedChildUpdates.values()]);
+    ChromeUtils.recordReplayLog(`Markup WaitForChildren End`);
   },
 
   /**
