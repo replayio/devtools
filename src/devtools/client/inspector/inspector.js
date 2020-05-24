@@ -400,10 +400,13 @@ Inspector.prototype = {
   /**
    * Return a promise that will resolve to the default node for selection.
    */
-  _getDefaultNodeForSelection: function() {
+  _getDefaultNodeForSelection: async function() {
     if (this._defaultNode) {
       return this._defaultNode;
     }
+
+    console.log("Inspector getDefaultNodeForSelection Start");
+
     let rootNode = null;
     const pendingSelection = this._pendingSelection;
 
@@ -416,65 +419,60 @@ Inspector.prototype = {
     };
 
     if (hasNavigated()) {
-      return Promise.reject("navigated");
+      throw new Error("navigated");
     }
 
     this._showMarkupLoading();
 
     // If available, set either the previously selected node or the body
     // as default selected, else set documentElement
-    return ThreadFront.getRootDOMNode()
-      .then(node => {
-        if (hasNavigated()) {
-          return Promise.reject(
-            "navigated; resolution of _defaultNode aborted"
-          );
-        }
+    rootNode = (await ThreadFront.getRootDOMNode()).node;
 
-        if (!node) {
-          return Promise.reject("No root node");
-        }
+    console.log("Inspector getDefaultNodeForSelection HasRoot");
 
-        rootNode = node;
-        console.log("Inspector RootNode", node);
-        if (this.selectionCssSelectors.length) {
-          return walker.findNodeFront(this.selectionCssSelectors);
-        }
-        return null;
-      })
-      .then(front => {
-        if (hasNavigated()) {
-          return Promise.reject(
-            "navigated; resolution of _defaultNode aborted"
-          );
-        }
+    if (hasNavigated()) {
+      throw new Error("navigated");
+    }
 
-        if (front) {
-          return front;
-        }
-        return ThreadFront.querySelector(rootNode, "body");
-      })
-      .then(front => {
-        if (hasNavigated()) {
-          return Promise.reject(
-            "navigated; resolution of _defaultNode aborted"
-          );
-        }
+    if (!rootNode) {
+      throw new Error("No root node");
+    }
 
-        if (front) {
-          return front;
-        }
-        return this.walker.documentElement();
-      })
-      .then(node => {
+    let selectedNode;
+    if (this.selectionCssSelectors.length) {
+      selectedNode = await walker.findNodeFront(this.selectionCssSelectors);
+
+      console.log("Inspector getDefaultNodeForSelection FoundSelection");
+    }
+
+    if (hasNavigated()) {
+      throw new Error("navigated");
+    }
+
+    if (!selectedNode) {
+      selectedNode = await ThreadFront.querySelector(rootNode, "body");
+
+      console.log("Inspector getDefaultNodeForSelection GotBody");
+
+      if (hasNavigated()) {
+        throw new Error("navigated");
+      }
+
+      if (!selectedNode) {
+        selectedNode = await this.walker.documentElement();
+
+        console.log("Inspector getDefaultNodeForSelection GotDocument");
+
         if (hasNavigated()) {
-          return Promise.reject(
-            "navigated; resolution of _defaultNode aborted"
-          );
+          throw new Error("navigated");
         }
-        this._defaultNode = node;
-        return node;
-      });
+      }
+    }
+
+    console.log("Inspector getDefaultNodeForSelection Finished", selectedNode);
+
+    this._defaultNode = selectedNode;
+    return selectedNode;
   },
 
   /**
@@ -1310,10 +1308,13 @@ Inspector.prototype = {
     };
     this._pendingSelection = onNodeSelected;
 
-    const onNoSelectedNode = async () => {
+    const onNoSelectedNode = async err => {
       if (this._pendingSelection != onNodeSelected) {
         return;
       }
+
+      console.error("NoSelectedNode", err);
+
       this._pendingSelection = null;
 
       this.onMarkupLoaded();
@@ -1335,6 +1336,7 @@ Inspector.prototype = {
    * When replaying, reset the inspector whenever the target pauses.
    */
   handleThreadPaused() {
+    console.log("Inspector HandleThreadPaused");
     this._replayResumed = false;
     this.onNewRoot();
   },

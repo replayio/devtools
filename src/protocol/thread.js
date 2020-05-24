@@ -748,7 +748,10 @@ const ThreadFront = {
     if (pause != this.currentPause) {
       return null;
     }
-    return new NodeFront(pause, document);
+    // Workaround not being able to call "then" on NodeFront objects,
+    // and getting unexpected control flow when adding an empty then()
+    // method to NodeFront.prototype...
+    return { node: new NodeFront(pause, document) };
   },
 };
 
