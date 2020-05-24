@@ -40,6 +40,7 @@ const { ThreadFront } = require("protocol/thread");
 const { paintMessage } = require("protocol/graphics");
 const { DebuggerPanel } = require("devtools/client/debugger/panel");
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
+const { InspectorPanel } = require("devtools/client/inspector/panel");
 
 const { LocalizationHelper } = require("shims/l10n");
 
@@ -158,11 +159,16 @@ setTimeout(() => {
   const consolePanel = new WebConsolePanel(gToolbox);
   gToolbox.addTool("webconsole", consolePanel);
 
+  const inspectorPanel = new InspectorPanel(gToolbox);
+  gToolbox.addTool("inspector", inspectorPanel);
+
   const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
   ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
 
   debuggerPanel.open();
   consolePanel.open();
+  inspectorPanel.open();
 
-  gToolbox.selectTool("jsdebugger");
+  //gToolbox.selectTool("jsdebugger");
+  gToolbox.selectTool("inspector");
 }, 0);

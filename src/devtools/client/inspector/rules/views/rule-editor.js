@@ -6,7 +6,7 @@
 
 const { l10n } = require("devtools/shared/inspector/css-logic");
 const { PSEUDO_CLASSES } = require("devtools/shared/css/constants");
-const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
+//const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
 const Rule = require("devtools/client/inspector/rules/models/rule");
 const {
   InplaceEditor,
@@ -26,7 +26,6 @@ const {
   SELECTOR_ELEMENT,
   SELECTOR_PSEUDO_CLASS,
 } = require("devtools/shared/css/parsing-utils");
-const promise = require("promise");
 const Services = require("Services");
 const EventEmitter = require("devtools/shared/event-emitter");
 const CssLogic = require("devtools/shared/inspector/css-logic");

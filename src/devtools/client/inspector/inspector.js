@@ -5,16 +5,10 @@
 "use strict";
 
 const Services = require("Services");
-const promise = require("promise");
 const EventEmitter = require("devtools/shared/event-emitter");
 const { executeSoon } = require("devtools/shared/DevToolsUtils");
-const { Toolbox } = require("devtools/client/framework/toolbox");
 const createStore = require("devtools/client/inspector/store");
 const InspectorStyleChangeTracker = require("devtools/client/inspector/shared/style-change-tracker");
-
-// Use privileged promise in panel documents to prevent having them to freeze
-// during toolbox destruction. See bug 1402779.
-const Promise = require("Promise");
 
 loader.lazyRequireGetter(
   this,

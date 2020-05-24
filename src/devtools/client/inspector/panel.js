@@ -4,8 +4,10 @@
 
 "use strict";
 
-function InspectorPanel(iframeWindow, toolbox) {
-  this._inspector = new iframeWindow.Inspector(toolbox);
+const { Inspector } = require("./inspector");
+
+function InspectorPanel(toolbox) {
+  this._inspector = new Inspector(toolbox);
 }
 InspectorPanel.prototype = {
   open() {

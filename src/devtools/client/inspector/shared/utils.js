@@ -4,8 +4,6 @@
 
 "use strict";
 
-const promise = require("promise");
-
 loader.lazyRequireGetter(
   this,
   "KeyCodes",
