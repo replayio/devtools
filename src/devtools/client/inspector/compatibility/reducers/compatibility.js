@@ -4,11 +4,13 @@
 
 "use strict";
 
+/*
 loader.lazyGetter(this, "mdnCompatibility", () => {
   const MDNCompatibility = require("devtools/client/inspector/compatibility/lib/MDNCompatibility");
   const cssPropertiesCompatData = require("devtools/client/inspector/compatibility/lib/dataset/css-properties.json");
   return new MDNCompatibility(cssPropertiesCompatData);
 });
+*/
 
 const {
   COMPATIBILITY_UPDATE_SELECTED_NODE_SUCCESS,

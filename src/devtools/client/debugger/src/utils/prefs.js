@@ -87,6 +87,16 @@ pref("devtools.editor.expandtab", true);
 pref("devtools.editor.keymap", "default");
 pref("ui.caretBlinkTime", 530);
 pref("devtools.popup.disable_autohide", false);
+pref("devtools.styleeditor.enabled", true);
+pref("devtools.gridinspector.showGridAreas", false);
+pref("devtools.gridinspector.showGridLineNumbers", false);
+pref("devtools.gridinspector.showInfiniteLines", false);
+pref("devtools.toolsidebar-width.inspector", 700);
+pref("devtools.toolsidebar-height.inspector", 350);
+pref("devtools.toolsidebar-width.inspector.splitsidebar", 350);
+pref("devtools.inspector.three-pane-enabled", true);
+pref("devtools.inspector.activeSidebar", "layoutview");
+pref("layout.css.backdrop-filter.enabled", false);
 
 export const prefs = new PrefsHelper("devtools", {
   fission: ["Bool", "browsertoolbox.fission"],

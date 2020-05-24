@@ -9,6 +9,7 @@ const CssLogic = require("devtools/shared/inspector/css-logic");
 const TextProperty = require("devtools/client/inspector/rules/models/text-property");
 const Services = require("Services");
 
+/*
 loader.lazyRequireGetter(
   this,
   "updateSourceLink",
@@ -27,6 +28,7 @@ loader.lazyRequireGetter(
   "devtools/shared/css/parsing-utils",
   true
 );
+*/
 
 const STYLE_INSPECTOR_PROPERTIES =
   "devtools/shared/locales/styleinspector.properties";

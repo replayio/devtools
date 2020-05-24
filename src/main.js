@@ -112,6 +112,7 @@ const gToolbox = {
   threadFront: ThreadFront,
 
   on() {},
+  emit() {},
 
   getHighlighter() {
     return {};
@@ -151,6 +152,10 @@ const gToolbox = {
 };
 
 window.gToolbox = gToolbox;
+
+window.loader = {
+  lazyRequireGetter() {},
+};
 
 setTimeout(() => {
   const debuggerPanel = new DebuggerPanel(gToolbox);

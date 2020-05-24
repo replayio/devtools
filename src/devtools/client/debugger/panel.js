@@ -194,6 +194,7 @@ DebuggerPanel.prototype = {
   },
 
   isPaused() {
+    console.log("WHOZIT", this.isReady, this._selectors);
     const thread = this._selectors.getCurrentThread(this._getState());
     return this._selectors.getIsPaused(this._getState(), thread);
   },

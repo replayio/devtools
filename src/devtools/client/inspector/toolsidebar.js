@@ -5,6 +5,7 @@
 "use strict";
 
 const EventEmitter = require("devtools/shared/event-emitter");
+const ReactDOM = require("react-dom");
 
 function ToolSidebar(tabbox, panel, uid, options = {}) {
   EventEmitter.decorate(this);
@@ -67,7 +68,7 @@ ToolSidebar.prototype = {
       onSelect: this.handleSelectionChange.bind(this),
     });
 
-    this._tabbar = this.ReactDOM.render(sidebar, this._tabbox);
+    this._tabbar = ReactDOM.render(sidebar, this._tabbox);
   },
 
   /**

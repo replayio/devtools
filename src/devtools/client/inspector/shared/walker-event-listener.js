@@ -52,11 +52,6 @@ class WalkerEventListener {
   }
 
   _init() {
-    this._inspector.toolbox.targetList.watchTargets(
-      [this._inspector.toolbox.targetList.TYPES.FRAME],
-      this._onTargetAvailable,
-      this._onTargetDestroyed
-    );
   }
 
   async _onTargetAvailable({ type, targetFront, isTopLevel }) {

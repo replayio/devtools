@@ -29,12 +29,14 @@ const {
   findMostRelevantCssPropertyIndex,
 } = require("devtools/client/shared/suggestion-picker");
 
+/*
 loader.lazyRequireGetter(
   this,
   "AppConstants",
   "resource://gre/modules/AppConstants.jsm",
   true
 );
+*/
 
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 const CONTENT_TYPES = {

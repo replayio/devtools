@@ -9,6 +9,7 @@ const Rule = require("devtools/client/inspector/rules/models/rule");
 const UserProperties = require("devtools/client/inspector/rules/models/user-properties");
 //const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
 
+/*
 loader.lazyRequireGetter(
   this,
   "promiseWarn",
@@ -39,6 +40,7 @@ loader.lazyRequireGetter(
   "devtools/shared/fronts/css-properties",
   true
 );
+*/
 
 const PREF_INACTIVE_CSS_ENABLED = "devtools.inspector.inactive.css.enabled";
 

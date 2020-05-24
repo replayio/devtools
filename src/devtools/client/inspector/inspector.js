@@ -9,13 +9,33 @@ const EventEmitter = require("devtools/shared/event-emitter");
 const { executeSoon } = require("devtools/shared/DevToolsUtils");
 const createStore = require("devtools/client/inspector/store");
 const InspectorStyleChangeTracker = require("devtools/client/inspector/shared/style-change-tracker");
+const { log } = require("protocol/socket");
+const { ThreadFront } = require("protocol/thread");
+const React = require("react");
+const ReactDOM = require("react-dom");
 
-loader.lazyRequireGetter(
-  this,
-  "initCssProperties",
-  "devtools/shared/fronts/css-properties",
-  true
-);
+/*
+require("devtools/skin/breadcrumbs.css");
+require("devtools/skin/inspector.css");
+require("devtools/skin/badge.css");
+require("devtools/skin/rules.css");
+require("devtools/skin/compatibility.css");
+require("devtools/skin/computed.css");
+require("devtools/skin/changes.css");
+require("devtools/skin/fonts.css");
+require("devtools/skin/boxmodel.css");
+require("devtools/skin/layout.css");
+require("devtools/skin/animation.css");
+require("devtools/client/shared/components/tabs/Tabs.css");
+require("devtools/client/shared/components/SidebarToggle.css");
+require("devtools/client/inspector/components/InspectorTabPanel.css");
+require("devtools/client/shared/components/splitter/SplitBox.css");
+require("devtools/client/shared/components/Accordion.css");
+require("devtools/client/shared/components/reps/reps.css");
+require("devtools/client/shared/components/tree/TreeView.css");
+*/
+
+/*
 loader.lazyRequireGetter(
   this,
   "HTMLBreadcrumbs",
@@ -33,12 +53,11 @@ loader.lazyRequireGetter(
   "devtools/client/inspector/inspector-search",
   true
 );
-loader.lazyRequireGetter(
-  this,
-  "ToolSidebar",
-  "devtools/client/inspector/toolsidebar",
-  true
-);
+*/
+
+const { ToolSidebar } = require("devtools/client/inspector/toolsidebar");
+
+/*
 loader.lazyRequireGetter(
   this,
   "MarkupView",
@@ -73,6 +92,7 @@ loader.lazyImporter(
   "DeferredTask",
   "resource://gre/modules/DeferredTask.jsm"
 );
+*/
 
 const { LocalizationHelper, localizeMarkup } = require("devtools/shared/l10n");
 const INSPECTOR_L10N = new LocalizationHelper(
@@ -190,32 +210,14 @@ Inspector.prototype = {
    */
   async init() {
     // Localize all the nodes containing a data-localization attribute.
-    localizeMarkup(this.panelDoc);
+    //localizeMarkup(this.panelDoc);
 
-    // When replaying, we need to listen to changes in the target's pause state.
-    if (this.currentTarget.isReplayEnabled()) {
-      const dbg = await this._getDebugger();
-      this._replayResumed = !dbg.isPaused();
-    }
+    await this._onTargetAvailable();
 
-    // When replaying, we need to listen to changes in the target's pause state.
-    if (this.currentTarget.isReplayEnabled()) {
-      let dbg = this._toolbox.getPanel("jsdebugger");
-      if (!dbg) {
-        dbg = await this._toolbox.loadTool("jsdebugger");
-      }
-      this._replayResumed = !dbg.isPaused();
-    }
+    // We need to listen to changes in the target's pause state.
+    const dbg = await this._toolbox.loadTool("jsdebugger");
+    this._replayResumed = !dbg.isPaused();
 
-    await this.toolbox.targetList.watchTargets(
-      [this.toolbox.targetList.TYPES.FRAME],
-      this._onTargetAvailable,
-      this._onTargetDestroyed
-    );
-
-    // Store the URL of the target page prior to navigation in order to ensure
-    // telemetry counts in the Grid Inspector are not double counted on reload.
-    this.previousURL = this.currentTarget.url;
     this.styleChangeTracker = new InspectorStyleChangeTracker(this);
 
     this._markupBox = this.panelDoc.getElementById("markup-box");
@@ -228,20 +230,9 @@ Inspector.prototype = {
     return dbg || this._toolbox.loadTool("jsdebugger");
   },
 
-  async _onTargetAvailable({ type, targetFront, isTopLevel }) {
-    // Ignore all targets but the top level one
-    if (!isTopLevel) {
-      return;
-    }
-
-    await this.initInspectorFront(targetFront);
-
-    targetFront.on("will-navigate", this._onBeforeNavigate);
-
+  async _onTargetAvailable() {
     await Promise.all([
-      this._getCssProperties(),
       this._getDefaultSelection(),
-      this._getAccessibilityFront(),
     ]);
 
     // When we navigate to another process and switch to a new
@@ -270,12 +261,6 @@ Inspector.prototype = {
 
     this._defaultNode = null;
     this.selection.setNodeFront(null);
-  },
-
-  async initInspectorFront(targetFront) {
-    this.inspectorFront = await targetFront.getFront("inspector");
-    this.highlighter = this.inspectorFront.highlighter;
-    this.walker = this.inspectorFront.walker;
   },
 
   get toolbox() {
@@ -309,16 +294,6 @@ Inspector.prototype = {
   },
 
   get is3PaneModeEnabled() {
-    if (this.currentTarget.chrome) {
-      if (!this._is3PaneModeChromeEnabled) {
-        this._is3PaneModeChromeEnabled = Services.prefs.getBoolPref(
-          THREE_PANE_CHROME_ENABLED_PREF
-        );
-      }
-
-      return this._is3PaneModeChromeEnabled;
-    }
-
     if (!this._is3PaneModeEnabled) {
       this._is3PaneModeEnabled = Services.prefs.getBoolPref(
         THREE_PANE_ENABLED_PREF
@@ -442,19 +417,6 @@ Inspector.prototype = {
     this._pendingSelection = null;
   },
 
-  _getCssProperties: function() {
-    return initCssProperties(this.toolbox).then(cssProperties => {
-      this._cssProperties = cssProperties;
-    }, this._handleRejectionIfNotDestroyed);
-  },
-
-  _getAccessibilityFront: async function() {
-    this.accessibilityFront = await this.currentTarget.getFront(
-      "accessibility"
-    );
-    return this.accessibilityFront;
-  },
-
   _getDefaultSelection: function() {
     // This may throw if the document is still loading and we are
     // refering to a dead about:blank document
@@ -470,7 +432,6 @@ Inspector.prototype = {
     if (this._defaultNode) {
       return this._defaultNode;
     }
-    const walker = this.walker;
     let rootNode = null;
     const pendingSelection = this._pendingSelection;
 
@@ -490,14 +451,7 @@ Inspector.prototype = {
 
     // If available, set either the previously selected node or the body
     // as default selected, else set documentElement
-    return walker
-      .ensureDOMLoaded()
-      .then(() => {
-        if (hasNavigated()) {
-          return promise.reject("navigated");
-        }
-        return walker.getRootNode();
-      })
+    return ThreadFront.getRootDOMNode()
       .then(node => {
         if (hasNavigated()) {
           return promise.reject(
@@ -544,13 +498,6 @@ Inspector.prototype = {
         this._defaultNode = node;
         return node;
       });
-  },
-
-  /**
-   * Top level target front getter.
-   */
-  get currentTarget() {
-    return this.toolbox.targetList.targetFront;
   },
 
   /**
@@ -650,14 +597,10 @@ Inspector.prototype = {
     return this._toolbox.ReactRedux;
   },
 
-  get browserRequire() {
-    return this._toolbox.browserRequire;
-  },
-
   get InspectorTabPanel() {
     if (!this._InspectorTabPanel) {
-      this._InspectorTabPanel = this.React.createFactory(
-        this.browserRequire(
+      this._InspectorTabPanel = React.createFactory(
+        require(
           "devtools/client/inspector/components/InspectorTabPanel"
         )
       );
@@ -667,8 +610,8 @@ Inspector.prototype = {
 
   get InspectorSplitBox() {
     if (!this._InspectorSplitBox) {
-      this._InspectorSplitBox = this.React.createFactory(
-        this.browserRequire(
+      this._InspectorSplitBox = React.createFactory(
+        require(
           "devtools/client/shared/components/splitter/SplitBox"
         )
       );
@@ -678,8 +621,8 @@ Inspector.prototype = {
 
   get TabBar() {
     if (!this._TabBar) {
-      this._TabBar = this.React.createFactory(
-        this.browserRequire("devtools/client/shared/components/tabs/TabBar")
+      this._TabBar = React.createFactory(
+        require("devtools/client/shared/components/tabs/TabBar")
       );
     }
     return this._TabBar;
@@ -691,6 +634,8 @@ Inspector.prototype = {
    * @return {Boolean} true if the inspector should be in landscape mode.
    */
   useLandscapeMode: function() {
+    return true;
+    /*
     if (!this.panelDoc) {
       return true;
     }
@@ -703,6 +648,7 @@ Inspector.prototype = {
         this.toolbox.hostType == Toolbox.HostType.RIGHT)
       ? width > SIDE_PORTAIT_MODE_WIDTH_THRESHOLD
       : width > PORTRAIT_MODE_WIDTH_THRESHOLD;
+    */
   },
 
   /**
@@ -712,7 +658,7 @@ Inspector.prototype = {
   setupSplitter: function() {
     const { width, height, splitSidebarWidth } = this.getSidebarSize();
 
-    this.sidebarSplitBoxRef = this.React.createRef();
+    this.sidebarSplitBoxRef = React.createRef();
 
     const splitter = this.InspectorSplitBox({
       className: "inspector-sidebar-splitter",
@@ -743,7 +689,7 @@ Inspector.prototype = {
       onControlledPanelResized: this.onSidebarResized,
     });
 
-    this.splitBox = this.ReactDOM.render(
+    this.splitBox = ReactDOM.render(
       splitter,
       this.panelDoc.getElementById("inspector-splitter-box")
     );
@@ -1009,7 +955,7 @@ Inspector.prototype = {
     let panel;
     switch (id) {
       case "animationinspector":
-        const AnimationInspector = this.browserRequire(
+        const AnimationInspector = require(
           "devtools/client/inspector/animation/animation"
         );
         panel = new AnimationInspector(this, this.panelWin);
@@ -1021,37 +967,37 @@ Inspector.prototype = {
         panel = new BoxModel(this, this.panelWin);
         break;
       case "changesview":
-        const ChangesView = this.browserRequire(
+        const ChangesView = require(
           "devtools/client/inspector/changes/ChangesView"
         );
         panel = new ChangesView(this, this.panelWin);
         break;
       case "compatibilityview":
-        const CompatibilityView = this.browserRequire(
+        const CompatibilityView = require(
           "devtools/client/inspector/compatibility/CompatibilityView"
         );
         panel = new CompatibilityView(this, this.panelWin);
         break;
       case "computedview":
-        const { ComputedViewTool } = this.browserRequire(
+        const { ComputedViewTool } = require(
           "devtools/client/inspector/computed/computed"
         );
         panel = new ComputedViewTool(this, this.panelWin);
         break;
       case "fontinspector":
-        const FontInspector = this.browserRequire(
+        const FontInspector = require(
           "devtools/client/inspector/fonts/fonts"
         );
         panel = new FontInspector(this, this.panelWin);
         break;
       case "layoutview":
-        const LayoutView = this.browserRequire(
+        const LayoutView = require(
           "devtools/client/inspector/layout/layout"
         );
         panel = new LayoutView(this, this.panelWin);
         break;
       case "newruleview":
-        const RulesView = this.browserRequire(
+        const RulesView = require(
           "devtools/client/inspector/rules/new-rules"
         );
         panel = new RulesView(this, this.panelWin);
@@ -1468,7 +1414,7 @@ Inspector.prototype = {
 
     const loading = this._markupFrame.contentDocument.getElementById("loading");
     loading.hidden = true;
-    ChromeUtils.recordReplayLog(`Inspector HideMarkupLoading`);
+    log(`Inspector HideMarkupLoading`);
 
     if (!this.markup) {
       return;
@@ -1510,7 +1456,7 @@ Inspector.prototype = {
   async onNoMarkup() {
     const loading = this._markupFrame.contentDocument.getElementById("loading");
     loading.hidden = true;
-    ChromeUtils.recordReplayLog(`Inspector HideMarkupLoading`);
+    log(`Inspector HideMarkupLoading`);
 
     if (this.currentTarget.isReplayEnabled()) {
       const dbg = await this._getDebugger();
@@ -1522,17 +1468,15 @@ Inspector.prototype = {
   },
 
   _showMarkupLoading() {
-    if (this.currentTarget.isReplayEnabled()) {
-      try {
-        const loading = this._markupFrame.contentDocument.getElementById("loading");
-        loading.hidden = false;
-        ChromeUtils.recordReplayLog(`Inspector ShowMarkupLoading`);
+    try {
+      const loading = this._markupFrame.contentDocument.getElementById("loading");
+      loading.hidden = false;
+      log(`Inspector ShowMarkupLoading`);
 
-        const button = this._markupFrame.contentDocument.getElementById("pause-button");
-        button.hidden = true;
-      } catch (e) {
-        // The markup frame might still be loading.
-      }
+      const button = this._markupFrame.contentDocument.getElementById("pause-button");
+      button.hidden = true;
+    } catch (e) {
+      // The markup frame might still be loading.
     }
   },
 
@@ -1750,7 +1694,7 @@ Inspector.prototype = {
           self._updateProgress = null;
           self.emit("inspector-updated", name);
 
-          ChromeUtils.recordReplayLog(`Inspector Updated`);
+          log(`Inspector Updated`);
         },
       };
     }
@@ -1846,12 +1790,6 @@ Inspector.prototype = {
     this.styleChangeTracker.destroy();
     this.searchboxShortcuts.destroy();
 
-    this.toolbox.targetList.unwatchTargets(
-      [this.toolbox.targetList.TYPES.FRAME],
-      this._onTargetAvailable,
-      this._onTargetDestroyed
-    );
-
     this._is3PaneModeChromeEnabled = null;
     this._is3PaneModeEnabled = null;
     this._markupBox = null;
@@ -1882,7 +1820,7 @@ Inspector.prototype = {
   },
 
   _initMarkup: function() {
-    ChromeUtils.recordReplayLog(`Inspector InitMarkup ${Error().stack}`);
+    log(`Inspector InitMarkup ${Error().stack}`);
 
     if (this._markupLoading) {
       throw new Error("initMarkup duplicate\n");
@@ -1923,7 +1861,7 @@ Inspector.prototype = {
     if (this._markupWaiters && this._markupWaiters.length) {
       this._markupWaiters.shift()();
     }
-    ChromeUtils.recordReplayLog(`Inspector MarkupLoaded`);
+    log(`Inspector MarkupLoaded`);
   },
 
   _destroyMarkup: function() {

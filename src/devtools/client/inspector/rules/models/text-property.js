@@ -6,6 +6,7 @@
 
 const { generateUUID } = require("devtools/shared/generate-uuid");
 
+/*
 loader.lazyRequireGetter(
   this,
   "escapeCSSComment",
@@ -19,6 +20,7 @@ loader.lazyRequireGetter(
   "devtools/client/inspector/rules/utils/utils",
   true
 );
+*/
 
 /**
  * TextProperty is responsible for the following:

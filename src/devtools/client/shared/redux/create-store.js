@@ -19,6 +19,7 @@ const { task } = require("devtools/client/shared/redux/middleware/task");
 const { promise } = require("devtools/client/shared/redux/middleware/promise");
 const flags = require("devtools/shared/flags");
 
+/*
 loader.lazyRequireGetter(
   this,
   "history",
@@ -31,6 +32,7 @@ loader.lazyRequireGetter(
   "devtools/client/shared/redux/middleware/log",
   true
 );
+*/
 
 /**
  * This creates a dispatcher with all the standard middleware in place

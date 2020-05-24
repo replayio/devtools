@@ -4,6 +4,7 @@
 
 "use strict";
 
+/*
 loader.lazyRequireGetter(
   this,
   "KeyCodes",
@@ -22,6 +23,7 @@ loader.lazyRequireGetter(
   "devtools/shared/css/parsing-utils",
   true
 );
+*/
 
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 

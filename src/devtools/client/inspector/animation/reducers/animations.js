@@ -14,11 +14,13 @@ const {
   UPDATE_SIDEBAR_SIZE,
 } = require("devtools/client/inspector/animation/actions/index");
 
+/*
 loader.lazyRequireGetter(
   this,
   "TimeScale",
   "devtools/client/inspector/animation/utils/timescale"
 );
+*/
 
 const INITIAL_STATE = {
   animations: [],

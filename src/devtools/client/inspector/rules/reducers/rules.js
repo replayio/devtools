@@ -27,9 +27,9 @@ const INITIAL_RULES = {
   isPrintSimulationHidden: false,
   // Whether or not the source links are enabled. This is determined by
   // whether or not the style editor is registered.
-  isSourceLinkEnabled: Services.prefs.getBoolPref(
+  isSourceLinkEnabled: true /*Services.prefs.getBoolPref(
     "devtools.styleeditor.enabled"
-  ),
+  )*/,
   // Array of CSS rules.
   rules: [],
 };

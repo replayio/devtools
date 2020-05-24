@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
+/*
 loader.lazyRequireGetter(
   this,
   "generateUUID",
@@ -27,6 +28,7 @@ loader.lazyRequireGetter(
   "devtools/shared/DevToolsUtils",
   true
 );
+*/
 
 const PROMISE = (exports.PROMISE = "@@dispatch/promise");
 

@@ -17,6 +17,7 @@ const {
   blurOnMultipleProperties,
 } = require("devtools/client/inspector/shared/utils");
 
+/*
 loader.lazyRequireGetter(
   this,
   "openContentLink",
@@ -41,6 +42,7 @@ loader.lazyRequireGetter(
   "devtools/shared/inspector/css-logic",
   true
 );
+*/
 
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 

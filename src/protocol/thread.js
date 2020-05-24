@@ -707,6 +707,10 @@ const ThreadFront = {
       onConsoleMessage(pause, message);
     });
   },
+
+  getRootDOMNode() {
+    return new Promise(resolve => {});
+  },
 };
 
 module.exports = {

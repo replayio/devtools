@@ -17,12 +17,14 @@ const Sidebar = createFactory(
   require("devtools/client/shared/components/Sidebar")
 );
 
+/*
 loader.lazyRequireGetter(this, "Menu", "devtools/client/framework/menu");
 loader.lazyRequireGetter(
   this,
   "MenuItem",
   "devtools/client/framework/menu-item"
 );
+*/
 
 // Shortcuts
 const { div } = dom;
