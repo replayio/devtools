@@ -42,25 +42,9 @@ require("devtools/client/shared/components/Accordion.css");
 //require("devtools/content/shared/widgets/filter-widget.css");
 //require("devtools/content/shared/widgets/spectrum.css");
 
-/*
-loader.lazyRequireGetter(
-  this,
-  "HTMLBreadcrumbs",
-  "devtools/client/inspector/breadcrumbs",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "KeyShortcuts",
-  "devtools/client/shared/key-shortcuts"
-);
-loader.lazyRequireGetter(
-  this,
-  "InspectorSearch",
-  "devtools/client/inspector/inspector-search",
-  true
-);
-*/
+const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
+const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
+const { InspectorSearch } = require("devtools/client/inspector/inspector-search");
 
 const { ToolSidebar } = require("devtools/client/inspector/toolsidebar");
 const MarkupView = require("devtools/client/inspector/markup/markup");
@@ -133,8 +117,6 @@ const TELEMETRY_SCALAR_NODE_SELECTION_COUNT =
  *      Fired after a new root (navigation to a new page) event was fired by
  *      the walker, and taken into account by the inspector (after the markup
  *      view has been reloaded)
- * - markuploaded
- *      Fired when the markup-view frame has loaded
  * - breadcrumbs-updated
  *      Fired when the breadcrumb widget updates to a new node
  * - boxmodel-view-updated
@@ -182,7 +164,6 @@ function Inspector(toolbox) {
 
   this.onDetached = this.onDetached.bind(this);
   this.onHostChanged = this.onHostChanged.bind(this);
-  this.onMarkupLoaded = this.onMarkupLoaded.bind(this);
   this.onNewSelection = this.onNewSelection.bind(this);
   this.onNewRoot = this.onNewRoot.bind(this);
   this.onPanelWindowResize = this.onPanelWindowResize.bind(this);
@@ -353,8 +334,6 @@ Inspector.prototype = {
   },
 
   _deferredOpen: async function() {
-    const onMarkupLoaded = this.once("markuploaded");
-    this._initMarkup();
     this.isReady = false;
 
     // Set the node front so that the markup and sidebar panels will have the selected
@@ -377,7 +356,8 @@ Inspector.prototype = {
     // Setup the sidebar panels.
     this.setupSidebar();
 
-    await onMarkupLoaded;
+    this.onMarkupLoaded();
+
     this.isReady = true;
 
     // All the components are initialized. Take care of the remaining initialization
@@ -389,23 +369,14 @@ Inspector.prototype = {
 
     this.onNewSelection();
 
-    this.walker.on("new-root", this.onNewRoot);
     this.toolbox.on("host-changed", this.onHostChanged);
     this.toolbox.on("select", this.handleToolSelected);
     this.selection.on("new-node-front", this.onNewSelection);
     this.selection.on("detached-front", this.onDetached);
-    this.currentTarget.threadFront.on("paused", this.handleThreadPaused);
-    this.currentTarget.threadFront.on("instantWarp", this.handleThreadPaused);
-    this.currentTarget.threadFront.on("resumed", this.handleThreadResumed);
-
-    // Log the 3 pane inspector setting on inspector open. The question we want to answer
-    // is:
-    // "What proportion of users use the 3 pane vs 2 pane inspector on inspector open?"
-    this.telemetry.keyedScalarAdd(
-      THREE_PANE_ENABLED_SCALAR,
-      this.is3PaneModeEnabled,
-      1
-    );
+    console.log("ListenForPaused");
+    ThreadFront.on("paused", this.handleThreadPaused);
+    ThreadFront.on("instantWarp", this.handleThreadPaused);
+    ThreadFront.on("resumed", this.handleThreadResumed);
 
     this.emit("ready");
     return this;
@@ -465,6 +436,7 @@ Inspector.prototype = {
         }
 
         rootNode = node;
+        console.log("Inspector RootNode", node);
         if (this.selectionCssSelectors.length) {
           return walker.findNodeFront(this.selectionCssSelectors);
         }
@@ -538,7 +510,7 @@ Inspector.prototype = {
       // The inspector search shortcuts need to be available from everywhere in the
       // inspector, and the inspector uses iframes (markupview, sidepanel webextensions).
       // Use the chromeEventHandler as the target to catch events from all frames.
-      target: this.toolbox.getChromeEventHandler(),
+      //target: this.toolbox.getChromeEventHandler(),
     });
     const key = INSPECTOR_L10N.getStr("inspector.searchHTML.key");
     this.searchboxShortcuts.on(key, event => {
@@ -717,10 +689,11 @@ Inspector.prototype = {
    * to `horizontal` to support portrait view.
    */
   onPanelWindowResize: function() {
-    if (this.toolbox.currentToolId !== "inspector") {
+    if (this.toolbox.currentTool !== "inspector") {
       return;
     }
 
+    /*
     if (!this._lazyResizeHandler) {
       this._lazyResizeHandler = new DeferredTask(
         this._onLazyPanelResize.bind(this),
@@ -729,6 +702,7 @@ Inspector.prototype = {
       );
     }
     this._lazyResizeHandler.arm();
+    */
   },
 
   getSidebarSize: function() {
@@ -1152,10 +1126,12 @@ Inspector.prototype = {
    * has been created for the first time.
    */
   setupExtensionSidebars() {
+    /*
     for (const [sidebarId, { title }] of this.toolbox
       .inspectorExtensionSidebars) {
       this.addExtensionSidebar(sidebarId, { title });
     }
+    */
   },
 
   /**
@@ -1237,12 +1213,7 @@ Inspector.prototype = {
    *         document.
    */
   async supportsEyeDropper() {
-    try {
-      return await this.inspectorFront.supportsHighlighters();
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
+    return true;
   },
 
   async setupToolbar() {
@@ -1313,21 +1284,15 @@ Inspector.prototype = {
    */
   onNewRoot: function() {
     // Don't reload the inspector when not selected.
-    if (this.toolbox && this.toolbox.currentToolId != "inspector") {
+    if (this.toolbox && this.toolbox.currentTool != "inspector") {
       this._hasNewRoot = true;
       return;
     }
     this._hasNewRoot = false;
 
-    // Record new-root timing for telemetry
-    this._newRootStart = this.panelWin.performance.now();
-
     this._defaultNode = null;
     this.selection.setNodeFront(null);
     this._destroyMarkup();
-    if (this.walker) {
-      this.walker.reloadRoot();
-    }
 
     const onNodeSelected = async defaultNode => {
       // Cancel this promise resolution as a new one had
@@ -1338,8 +1303,7 @@ Inspector.prototype = {
       this._pendingSelection = null;
       this.selection.setNodeFront(defaultNode, { reason: "navigateaway" });
 
-      this.once("markuploaded", this.onMarkupLoaded);
-      this._initMarkup();
+      this.onMarkupLoaded();
 
       // Setup the toolbar again, since its content may depend on the current document.
       this.setupToolbar();
@@ -1352,30 +1316,13 @@ Inspector.prototype = {
       }
       this._pendingSelection = null;
 
-      this.once("markuploaded", this.onNoMarkup);
-      this._initMarkup();
+      this.onMarkupLoaded();
     };
 
     this._getDefaultNodeForSelection().then(
       onNodeSelected,
       onNoSelectedNode,
     );
-  },
-
-  /**
-   * When replaying, reset the inspector whenever the target pauses.
-   */
-  handleThreadPaused() {
-    this._replayResumed = false;
-    this.onNewRoot();
-  },
-
-  /**
-   * When replaying, reset the inspector whenever the target resumes.
-   */
-  handleThreadResumed() {
-    this._replayResumed = true;
-    this.onNewRoot();
   },
 
   handleToolSelected(id) {
@@ -1406,10 +1353,9 @@ Inspector.prototype = {
    * highlighter state.
    */
   async onMarkupLoaded() {
-    const button = this._markupFrame.contentDocument.getElementById("pause-button");
-    button.hidden = true;
+    this.markup = new MarkupView(this);
 
-    const loading = this._markupFrame.contentDocument.getElementById("loading");
+    const loading = document.getElementById("markup-loading");
     loading.hidden = true;
     log(`Inspector HideMarkupLoading`);
 
@@ -1417,7 +1363,9 @@ Inspector.prototype = {
       return;
     }
 
-    const onExpand = this.markup.expandNode(this.selection.nodeFront);
+    if (this.selection.nodeFront) {
+      this.markup.expandNode(this.selection.nodeFront);
+    }
 
     // Restore the highlighter states prior to emitting "new-root".
     if (this._highlighters) {
@@ -1428,26 +1376,6 @@ Inspector.prototype = {
     }
 
     this.emit("new-root");
-
-    // Wait for full expand of the selected node in order to ensure
-    // the markup view is fully emitted before firing 'reloaded'.
-    // 'reloaded' is used to know when the panel is fully updated
-    // after a page reload.
-    await onExpand;
-
-    this.emit("reloaded");
-
-    // Record the time between new-root event and inspector fully loaded.
-    if (this._newRootStart) {
-      // Only log the timing when inspector is not destroyed and is in foreground.
-      if (this.toolbox && this.toolbox.currentToolId == "inspector") {
-        const delay = this.panelWin.performance.now() - this._newRootStart;
-        const telemetryKey = "DEVTOOLS_INSPECTOR_NEW_ROOT_TO_RELOAD_DELAY_MS";
-        const histogram = this.telemetry.getHistogramById(telemetryKey);
-        histogram.add(delay);
-      }
-      delete this._newRootStart;
-    }
   },
 
   async onNoMarkup() {
@@ -1607,14 +1535,13 @@ Inspector.prototype = {
     this.trackReflowsInSelection();
 
     const selfUpdate = this.updating("inspector-panel");
-    executeSoon(() => {
+    setTimeout(() => {
       try {
         selfUpdate(this.selection.nodeFront);
-        this.telemetry.scalarAdd(TELEMETRY_SCALAR_NODE_SELECTION_COUNT, 1);
       } catch (ex) {
         console.error(ex);
       }
-    });
+    }, 0);
   },
 
   /**
@@ -1796,10 +1723,6 @@ Inspector.prototype = {
     this.store = null;
     this.telemetry = null;
     this._pendingSelection = null;
-  },
-
-  _initMarkup: function() {
-    this.markup = new MarkupView(this);
   },
 
   _destroyMarkup: function() {

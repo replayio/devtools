@@ -121,7 +121,7 @@ const gToolbox = {
   emit() {},
 
   selection: new Selection(),
-  nodePicker: { on() {} },
+  nodePicker: { on() {}, off() {} },
 
   getHighlighter() {
     return {};

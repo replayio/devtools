@@ -4,7 +4,7 @@
 
 "use strict";
 
-const promise = require("promise");
+const promise = Promise;
 const flags = require("devtools/shared/flags");
 const { ELLIPSIS } = require("devtools/shared/l10n");
 const EventEmitter = require("devtools/shared/event-emitter");

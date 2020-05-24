@@ -70,7 +70,9 @@ Pause.prototype = {
         ({ pauseId, stack, data }) => {
           this.pauseId = pauseId;
           this.addData(data);
-          this.stack = stack.map(id => this.frames.get(id));
+          if (stack) {
+            this.stack = stack.map(id => this.frames.get(id));
+          }
         }
       );
   },
@@ -545,6 +547,7 @@ const ThreadFront = {
   },
 
   timeWarp(point, time, hasFrames) {
+    console.log(`TimeWarp ${point}`);
     this.currentPoint = point;
     this.currentPointHasFrames = hasFrames;
     this.currentPause = null;
@@ -736,10 +739,11 @@ const ThreadFront = {
   },
 
   async getRootDOMNode() {
-    const pause = this.currentPause;
-    if (!pause) {
+    if (!this.sessionId) {
       return null;
     }
+    this.ensurePause();
+    const pause = this.currentPause;
     const document = await this.currentPause.getDocument();
     if (pause != this.currentPause) {
       return null;

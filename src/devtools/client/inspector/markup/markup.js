@@ -19,7 +19,6 @@ const MarkupElementContainer = require("devtools/client/inspector/markup/views/e
 const MarkupReadOnlyContainer = require("devtools/client/inspector/markup/views/read-only-container");
 const MarkupTextContainer = require("devtools/client/inspector/markup/views/text-container");
 const RootContainer = require("devtools/client/inspector/markup/views/root-container");
-const WalkerEventListener = require("devtools/client/inspector/shared/walker-event-listener");
 
 /*
 loader.lazyRequireGetter(
@@ -258,7 +257,7 @@ function MarkupView(inspector) {
   this.walker = this.inspector.walker;
   this.win = window;
   this.doc = document;
-  this._elt = this.doc.getElementById("root");
+  this._elt = this.doc.getElementById("markup-root");
   this.telemetry = this.inspector.telemetry;
 
   this.maxChildren = Services.prefs.getIntPref(
@@ -354,12 +353,6 @@ function MarkupView(inspector) {
   );
 
   this._initShortcuts();
-
-  this._walkerEventListener = new WalkerEventListener(this.inspector, {
-    "display-change": this._onWalkerNodeStatesChanged,
-    "scrollable-change": this._onWalkerNodeStatesChanged,
-    mutations: this._onWalkerMutations,
-  });
 }
 
 MarkupView.prototype = {
@@ -2321,9 +2314,6 @@ MarkupView.prototype = {
     );
     this.win.removeEventListener("copy", this._onCopy);
     this.win.removeEventListener("mouseup", this._onMouseUp);
-
-    this._walkerEventListener.destroy();
-    this._walkerEventListener = null;
 
     this._prefObserver.off(
       ATTR_COLLAPSE_ENABLED_PREF,
