@@ -62,14 +62,11 @@ loader.lazyRequireGetter(
 );
 loader.lazyRequireGetter(
   this,
-  "KeyShortcuts",
-  "devtools/client/shared/key-shortcuts"
-);
-loader.lazyRequireGetter(
-  this,
   "clipboardHelper",
   "devtools/shared/platform/clipboard"
 );
+
+const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
 
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
@@ -299,10 +296,6 @@ CssRuleView.prototype = {
     return this._elementStyle ? this._elementStyle.rules : [];
   },
 
-  get currentTarget() {
-    return this.inspector.toolbox.target;
-  },
-
   /**
    * Get an instance of SelectorHighlighter (used to highlight nodes that match
    * selectors in the rule-view). A new instance is only created the first time
@@ -397,35 +390,7 @@ CssRuleView.prototype = {
    * if they are supported in the current target.
    */
   async _initSimulationFeatures() {
-    // In order to query if the content-viewer actor's print and color simulation methods are
-    // supported, we have to call the content-viewer front so that the actor is lazily loaded.
-    // This allows us to use `actorHasMethod`. Please see `getActorDescription` for more
-    // information.
-    try {
-      this.contentViewerFront = await this.currentTarget.getFront(
-        "contentViewer"
-      );
-    } catch (e) {
-      console.error(e);
-    }
-
-    // Bug 1606852: For backwards compatibility, we need to get the emulation actor. The ContentViewer
-    // actor is only available in Firefox 73 or newer. We can remove this call when Firefox 73
-    // is on release.
-    if (!this.contentViewerFront) {
-      this.contentViewerFront = await this.currentTarget.getFront("emulation");
-    }
-
     /*
-    if (!this.currentTarget.chrome) {
-      this.printSimulationButton.removeAttribute("hidden");
-      this.printSimulationButton.addEventListener(
-        "click",
-        this._onTogglePrintSimulation
-      );
-    }
-    */
-
     // Show the color scheme simulation toggle button if:
     // - The feature pref is enabled.
     // - Color scheme simulation is supported for the current target.
@@ -452,6 +417,7 @@ CssRuleView.prototype = {
         this._onToggleColorSchemeSimulation
       );
     }
+    */
   },
 
   /**
@@ -545,7 +511,7 @@ CssRuleView.prototype = {
     // request to complete, and then focus the new rule's selector.
     const eventPromise = this.once("ruleview-refreshed");
     const newRulePromise = this.pageStyle.addNewRule(element, pseudoClasses);
-    promise.all([eventPromise, newRulePromise]).then(values => {
+    Promise.all([eventPromise, newRulePromise]).then(values => {
       const options = values[1];
       // Be sure the reference the correct |rules| here.
       for (const rule of this._elementStyle.rules) {
@@ -817,7 +783,7 @@ CssRuleView.prototype = {
   selectElement: function(element, allowRefresh = false) {
     const refresh = this._viewedElement === element;
     if (refresh && !allowRefresh) {
-      return promise.resolve(undefined);
+      return Promise.resolve(undefined);
     }
 
     if (this._popup && this.popup.isOpen) {
@@ -839,7 +805,7 @@ CssRuleView.prototype = {
         this.pageStyle.off("stylesheet-updated", this.refreshPanel);
         this.pageStyle = null;
       }
-      return promise.resolve(undefined);
+      return Promise.resolve(undefined);
     }
 
     this.pageStyle = element.inspectorFront.pageStyle;
@@ -848,7 +814,7 @@ CssRuleView.prototype = {
     // To figure out how shorthand properties are interpreted by the
     // engine, we will set properties on a dummy element and observe
     // how their .style attribute reflects them as computed values.
-    const dummyElementPromise = promise
+    const dummyElementPromise = Promise
       .resolve(this.styleDocument)
       .then(document => {
         // ::before and ::after do not have a namespaceURI
@@ -905,7 +871,7 @@ CssRuleView.prototype = {
   refreshPanel: function() {
     // Ignore refreshes when the panel is hidden, or during editing or when no element is selected.
     if (!this.isPanelVisible() || this.isEditing || !this._elementStyle) {
-      return promise.resolve(undefined);
+      return Promise.resolve(undefined);
     }
 
     // Repopulate the element style once the current modifications are done.
@@ -916,7 +882,7 @@ CssRuleView.prototype = {
       }
     }
 
-    return promise.all(promises).then(() => {
+    return Promise.all(promises).then(() => {
       return this._populate();
     });
   },
@@ -1195,7 +1161,7 @@ CssRuleView.prototype = {
     let container = null;
 
     if (!this._elementStyle.rules) {
-      return promise.resolve();
+      return Promise.resolve();
     }
 
     const editorReadyPromises = [];
@@ -1264,7 +1230,7 @@ CssRuleView.prototype = {
       this.searchValue && !seenSearchTerm
     );
 
-    return promise.all(editorReadyPromises);
+    return Promise.all(editorReadyPromises);
   },
 
   /**
@@ -1863,7 +1829,6 @@ function RuleViewTool(inspector, window) {
   this.inspector.selection.on("detached-front", this.onDetachedFront);
   this.inspector.selection.on("new-node-front", this.onSelected);
   this.inspector.selection.on("pseudoclass", this.refresh);
-  this.inspector.currentTarget.on("navigate", this.clearUserProperties);
   this.inspector.ruleViewSideBar.on("ruleview-selected", this.onPanelSelected);
   this.inspector.sidebar.on("ruleview-selected", this.onPanelSelected);
   this.inspector.styleChangeTracker.on("style-changed", this.refresh);
@@ -1943,7 +1908,6 @@ RuleViewTool.prototype = {
     this.inspector.selection.off("detached-front", this.onDetachedFront);
     this.inspector.selection.off("pseudoclass", this.refresh);
     this.inspector.selection.off("new-node-front", this.onSelected);
-    this.inspector.currentTarget.off("navigate", this.clearUserProperties);
     this.inspector.sidebar.off("ruleview-selected", this.onPanelSelected);
 
     this.view.off("ruleview-refreshed", this.onViewRefreshed);

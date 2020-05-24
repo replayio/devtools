@@ -30,6 +30,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+window.loader = {
+  lazyRequireGetter() {},
+  lazyGetter() {},
+};
+
 require("./styles.css");
 
 const React = require("devtools/client/shared/vendor/react");
@@ -41,6 +46,7 @@ const { paintMessage } = require("protocol/graphics");
 const { DebuggerPanel } = require("devtools/client/debugger/panel");
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 const { InspectorPanel } = require("devtools/client/inspector/panel");
+const Selection = require("devtools/client/framework/selection");
 
 const { LocalizationHelper } = require("shims/l10n");
 
@@ -114,6 +120,9 @@ const gToolbox = {
   on() {},
   emit() {},
 
+  selection: new Selection(),
+  nodePicker: { on() {} },
+
   getHighlighter() {
     return {};
   },
@@ -152,10 +161,6 @@ const gToolbox = {
 };
 
 window.gToolbox = gToolbox;
-
-window.loader = {
-  lazyRequireGetter() {},
-};
 
 setTimeout(() => {
   const debuggerPanel = new DebuggerPanel(gToolbox);

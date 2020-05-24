@@ -10,12 +10,14 @@ const {
   flashElementOff,
 } = require("devtools/client/inspector/markup/utils");
 
+/*
 loader.lazyRequireGetter(
   this,
   "wrapMoveFocus",
   "devtools/client/shared/focus",
   true
 );
+*/
 
 const DRAG_DROP_MIN_INITIAL_DISTANCE = 10;
 const TYPES = {

@@ -174,6 +174,19 @@ Pause.prototype = {
     this.addData(data);
     return { returned, exception, failed };
   },
+
+  async getDocument() {
+    assert(this.createWaiter);
+    await this.createWaiter;
+    const { document, data } = await sendMessage(
+      "DOM.getDocument",
+      {},
+      this.sessionId,
+      this.pauseId
+    );
+    this.addData(data);
+    return document;
+  },
 };
 
 // Manages interaction with a value from a pause.
@@ -442,6 +455,20 @@ function createPseudoValueFront(elements) {
   return new ValueFront(null, undefined, elements);
 }
 
+// Manages interaction with a DOM node.
+function NodeFront(pause, objectId) {
+  this._pause = pause;
+
+  const data = pause.objects.get(objectId);
+  assert(data);
+  this._object = data;
+}
+
+NodeFront.prototype = {
+};
+
+Object.setPrototypeOf(NodeFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+
 const ThreadFront = {
   // When replaying there is only a single thread currently. Use this thread ID
   // everywhere needed throughout the devtools client.
@@ -708,8 +735,16 @@ const ThreadFront = {
     });
   },
 
-  getRootDOMNode() {
-    return new Promise(resolve => {});
+  async getRootDOMNode() {
+    const pause = this.currentPause;
+    if (!pause) {
+      return null;
+    }
+    const document = await this.currentPause.getDocument();
+    if (pause != this.currentPause) {
+      return null;
+    }
+    return new NodeFront(pause, document);
   },
 };
 

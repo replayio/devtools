@@ -4,7 +4,6 @@
 
 "use strict";
 
-const promise = require("promise");
 const Services = require("Services");
 const MarkupContainer = require("devtools/client/inspector/markup/views/markup-container");
 const ElementEditor = require("devtools/client/inspector/markup/views/element-editor");

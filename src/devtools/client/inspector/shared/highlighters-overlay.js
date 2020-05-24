@@ -105,11 +105,6 @@ class HighlightersOverlay {
     this.onShapesHighlighterShown = this.onShapesHighlighterShown.bind(this);
     this.onShapesHighlighterHidden = this.onShapesHighlighterHidden.bind(this);
 
-    // Add inspector events, not specific to a given view.
-    this.inspector.on("markupmutation", this.onMarkupMutation);
-    this.target.on("will-navigate", this.onWillNavigate);
-    this.walker.on("display-change", this.onDisplayChange);
-
     EventEmitter.decorate(this);
   }
 

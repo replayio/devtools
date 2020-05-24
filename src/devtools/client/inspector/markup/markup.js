@@ -4,25 +4,24 @@
 
 "use strict";
 
-const promise = require("promise");
 const Services = require("Services");
 const flags = require("devtools/shared/flags");
 const nodeConstants = require("devtools/shared/dom-node-constants");
-const nodeFilterConstants = require("devtools/shared/dom-node-filter-constants");
+//const nodeFilterConstants = require("devtools/shared/dom-node-filter-constants");
 const EventEmitter = require("devtools/shared/event-emitter");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { PluralForm } = require("devtools/shared/plural-form");
 const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
-const { scrollIntoViewIfNeeded } = require("devtools/client/shared/scroll");
+//const { scrollIntoViewIfNeeded } = require("devtools/client/shared/scroll");
 const { PrefObserver } = require("devtools/client/shared/prefs");
 const MarkupElementContainer = require("devtools/client/inspector/markup/views/element-container");
 const MarkupReadOnlyContainer = require("devtools/client/inspector/markup/views/read-only-container");
 const MarkupTextContainer = require("devtools/client/inspector/markup/views/text-container");
 const RootContainer = require("devtools/client/inspector/markup/views/root-container");
 const WalkerEventListener = require("devtools/client/inspector/shared/walker-event-listener");
-const ChromeUtils = require("ChromeUtils");
 
+/*
 loader.lazyRequireGetter(
   this,
   "createDOMMutationBreakpoint",
@@ -85,6 +84,7 @@ loader.lazyRequireGetter(
   "devtools/shared/indentation",
   true
 );
+*/
 
 const INSPECTOR_L10N = new LocalizationHelper(
   "devtools/client/locales/inspector.properties"
@@ -248,19 +248,16 @@ const shortcutHandlers = {
  *
  * @param  {Inspector} inspector
  *         The inspector we're watching.
- * @param  {iframe} frame
- *         An iframe in which the caller has kindly loaded markup.xhtml.
  */
-function MarkupView(inspector, frame, controllerWindow) {
+function MarkupView(inspector) {
   EventEmitter.decorate(this);
 
-  this.controllerWindow = controllerWindow;
+  this.controllerWindow = window;
   this.inspector = inspector;
   this.highlighters = inspector.highlighters;
   this.walker = this.inspector.walker;
-  this._frame = frame;
-  this.win = this._frame.contentWindow;
-  this.doc = this._frame.contentDocument;
+  this.win = window;
+  this.doc = document;
   this._elt = this.doc.getElementById("root");
   this.telemetry = this.inspector.telemetry;
 
@@ -315,7 +312,7 @@ function MarkupView(inspector, frame, controllerWindow) {
   this._elt.addEventListener("contextmenu", this._onContextMenu);
   this._elt.addEventListener("mousemove", this._onMouseMove);
   this._elt.addEventListener("mouseout", this._onMouseOut);
-  this._frame.addEventListener("focus", this._onFocus);
+  //this._frame.addEventListener("focus", this._onFocus);
   this.inspector.selection.on("new-node-front", this._onNewSelection);
   this.win.addEventListener("copy", this._onCopy);
   this.win.addEventListener("mouseup", this._onMouseUp);
@@ -2316,7 +2313,7 @@ MarkupView.prototype = {
     this._elt.removeEventListener("contextmenu", this._onContextMenu);
     this._elt.removeEventListener("mousemove", this._onMouseMove);
     this._elt.removeEventListener("mouseout", this._onMouseOut);
-    this._frame.removeEventListener("focus", this._onFocus);
+    //this._frame.removeEventListener("focus", this._onFocus);
     this.inspector.selection.off("new-node-front", this._onNewSelection);
     this.inspector.toolbox.nodePicker.off(
       "picker-node-hovered",

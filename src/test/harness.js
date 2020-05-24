@@ -38,11 +38,15 @@ function finish() {
 }
 
 function selectConsole() {
-  gToolbox.selectTool("webconsole");
+  return gToolbox.selectTool("webconsole");
 }
 
 function selectDebugger() {
-  gToolbox.selectTool("jsdebugger");
+  return gToolbox.selectTool("jsdebugger");
+}
+
+function selectInspector() {
+  return gToolbox.selectTool("inspector");
 }
 
 function getContext() {
@@ -366,6 +370,7 @@ async function executeInConsole(text) {
 module.exports = {
   selectConsole,
   selectDebugger,
+  selectInspector,
   dbg,
   assert,
   finish,

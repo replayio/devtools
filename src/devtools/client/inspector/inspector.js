@@ -63,18 +63,10 @@ loader.lazyRequireGetter(
 */
 
 const { ToolSidebar } = require("devtools/client/inspector/toolsidebar");
+const MarkupView = require("devtools/client/inspector/markup/markup");
+const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");
 
 /*
-loader.lazyRequireGetter(
-  this,
-  "MarkupView",
-  "devtools/client/inspector/markup/markup"
-);
-loader.lazyRequireGetter(
-  this,
-  "HighlightersOverlay",
-  "devtools/client/inspector/shared/highlighters-overlay"
-);
 loader.lazyRequireGetter(
   this,
   "ExtensionSidebar",
@@ -186,7 +178,6 @@ function Inspector(toolbox) {
   this._onTargetAvailable = this._onTargetAvailable.bind(this);
   this._onTargetDestroyed = this._onTargetDestroyed.bind(this);
   this._onBeforeNavigate = this._onBeforeNavigate.bind(this);
-  this._onMarkupFrameLoad = this._onMarkupFrameLoad.bind(this);
   this._updateSearchResultsLabel = this._updateSearchResultsLabel.bind(this);
 
   this.onDetached = this.onDetached.bind(this);
@@ -343,7 +334,10 @@ Inspector.prototype = {
   },
 
   get cssProperties() {
-    return this._cssProperties.cssProperties;
+    return {
+      supportsType: () => true,
+      supportsCssColor4ColorFunction: () => true,
+    };
   },
 
   /**
@@ -451,7 +445,7 @@ Inspector.prototype = {
     };
 
     if (hasNavigated()) {
-      return promise.reject("navigated");
+      return Promise.reject("navigated");
     }
 
     this._showMarkupLoading();
@@ -461,9 +455,13 @@ Inspector.prototype = {
     return ThreadFront.getRootDOMNode()
       .then(node => {
         if (hasNavigated()) {
-          return promise.reject(
+          return Promise.reject(
             "navigated; resolution of _defaultNode aborted"
           );
+        }
+
+        if (!node) {
+          return Promise.reject("No root node");
         }
 
         rootNode = node;
@@ -474,7 +472,7 @@ Inspector.prototype = {
       })
       .then(front => {
         if (hasNavigated()) {
-          return promise.reject(
+          return Promise.reject(
             "navigated; resolution of _defaultNode aborted"
           );
         }
@@ -482,11 +480,11 @@ Inspector.prototype = {
         if (front) {
           return front;
         }
-        return walker.querySelector(rootNode, "body");
+        return ThreadFront.querySelector(rootNode, "body");
       })
       .then(front => {
         if (hasNavigated()) {
-          return promise.reject(
+          return Promise.reject(
             "navigated; resolution of _defaultNode aborted"
           );
         }
@@ -498,7 +496,7 @@ Inspector.prototype = {
       })
       .then(node => {
         if (hasNavigated()) {
-          return promise.reject(
+          return Promise.reject(
             "navigated; resolution of _defaultNode aborted"
           );
         }
@@ -1332,10 +1330,6 @@ Inspector.prototype = {
     }
 
     const onNodeSelected = async defaultNode => {
-      while (this._markupLoading) {
-        await this._waitForMarkupNotLoading();
-      }
-
       // Cancel this promise resolution as a new one had
       // been queued up.
       if (this._pendingSelection != onNodeSelected) {
@@ -1353,10 +1347,6 @@ Inspector.prototype = {
     this._pendingSelection = onNodeSelected;
 
     const onNoSelectedNode = async () => {
-      while (this._markupLoading) {
-        await this._waitForMarkupNotLoading();
-      }
-
       if (this._pendingSelection != onNodeSelected) {
         return;
       }
@@ -1772,14 +1762,6 @@ Inspector.prototype = {
       this._highlighters = null;
     }
 
-    if (this._markupFrame) {
-      this._markupFrame.removeEventListener(
-        "load",
-        this._onMarkupFrameLoad,
-        true
-      );
-    }
-
     if (this._search) {
       this._search.destroy();
       this._search = null;
@@ -1816,59 +1798,8 @@ Inspector.prototype = {
     this._pendingSelection = null;
   },
 
-  async _waitForMarkupNotLoading() {
-    if (!this._markupWaiters) {
-      this._markupWaiters = [];
-    }
-    let resolve;
-    const promise = new Promise(r => (resolve = r));
-    this._markupWaiters.push(resolve);
-    return promise;
-  },
-
   _initMarkup: function() {
-    log(`Inspector InitMarkup ${Error().stack}`);
-
-    if (this._markupLoading) {
-      throw new Error("initMarkup duplicate\n");
-    }
-    this._markupLoading = true;
-
-    if (!this._markupFrame) {
-      this._markupFrame = this.panelDoc.createElement("iframe");
-      this._markupFrame.setAttribute(
-        "aria-label",
-        INSPECTOR_L10N.getStr("inspector.panelLabel.markupView")
-      );
-      this._markupFrame.setAttribute("flex", "1");
-      // This is needed to enable tooltips inside the iframe document.
-      this._markupFrame.setAttribute("tooltip", "aHTMLTooltip");
-
-      this._markupBox.style.visibility = "hidden";
-      this._markupBox.appendChild(this._markupFrame);
-
-      this._markupFrame.addEventListener("load", this._onMarkupFrameLoad, true);
-      this._markupFrame.setAttribute("src", "markup/markup.xhtml");
-    } else {
-      this._onMarkupFrameLoad();
-    }
-  },
-
-  _onMarkupFrameLoad: function() {
-    this._markupFrame.removeEventListener(
-      "load",
-      this._onMarkupFrameLoad,
-      true
-    );
-    this._markupFrame.contentWindow.focus();
-    this._markupBox.style.visibility = "visible";
-    this.markup = new MarkupView(this, this._markupFrame, this._toolbox.win);
-    this.emit("markuploaded");
-    this._markupLoading = false;
-    if (this._markupWaiters && this._markupWaiters.length) {
-      this._markupWaiters.shift()();
-    }
-    log(`Inspector MarkupLoaded`);
+    this.markup = new MarkupView(this);
   },
 
   _destroyMarkup: function() {
@@ -1878,7 +1809,7 @@ Inspector.prototype = {
       destroyPromise = this.markup.destroy();
       this.markup = null;
     } else {
-      destroyPromise = promise.resolve();
+      destroyPromise = Promise.resolve();
     }
 
     // Allow showing loading message.

@@ -30,6 +30,15 @@ const bundles = {
   "devtools/client/locales/inspector.properties": parse(
     require("devtools/client/locales/en-US/inspector.properties").default
   ),
+  "devtools/client/locales/layout.properties": parse(
+    require("devtools/client/locales/en-US/layout.properties").default
+  ),
+  "devtools/client/locales/boxmodel.properties": parse(
+    require("devtools/client/locales/en-US/boxmodel.properties").default
+  ),
+  "devtools/client/locales/shared.properties": parse(
+    require("devtools/client/locales/en-US/shared.properties").default
+  ),
 };
 
 const defaultStrings = { ...bundles["intl.properties"] };
