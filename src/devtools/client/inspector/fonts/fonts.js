@@ -4,15 +4,14 @@
 
 "use strict";
 
-const { gDevTools } = require("devtools/client/framework/devtools");
-const { getColor } = require("devtools/client/shared/theme");
+//const { getColor } = require("devtools/client/shared/theme");
 const {
   createFactory,
   createElement,
 } = require("devtools/client/shared/vendor/react");
 const { Provider } = require("devtools/client/shared/vendor/react-redux");
 const { debounce } = require("devtools/shared/debounce");
-const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
+//const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
 
 const FontsApp = createFactory(
   require("devtools/client/inspector/fonts/components/FontsApp")

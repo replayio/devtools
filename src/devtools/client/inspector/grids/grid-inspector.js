@@ -6,7 +6,7 @@
 
 const Services = require("Services");
 const flags = require("devtools/shared/flags");
-const { throttle } = require("devtools/shared/throttle");
+//const { throttle } = require("devtools/shared/throttle");
 
 const {
   updateGridColor,
@@ -77,7 +77,7 @@ class GridInspector {
     this.onHighlighterShown = this.onHighlighterShown.bind(this);
     this.onHighlighterHidden = this.onHighlighterHidden.bind(this);
     this.onNavigate = this.onNavigate.bind(this);
-    this.onReflow = throttle(this.onReflow, 500, this);
+    //this.onReflow = throttle(this.onReflow, 500, this);
     this.onSetGridOverlayColor = this.onSetGridOverlayColor.bind(this);
     this.onShowGridOutlineHighlight = this.onShowGridOutlineHighlight.bind(
       this

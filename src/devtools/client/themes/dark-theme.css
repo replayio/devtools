@@ -2,11 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-@import url(/devtools/client/themes/variables.css);
-@import url(/devtools/client/themes/common.css);
-@import url(/devtools/client/themes/toolbars.css);
-@import url(/devtools/skin/tooltips.css);
-
 body {
   margin: 0;
 }

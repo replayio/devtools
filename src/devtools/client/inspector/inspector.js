@@ -14,26 +14,33 @@ const { ThreadFront } = require("protocol/thread");
 const React = require("react");
 const ReactDOM = require("react-dom");
 
-/*
-require("devtools/skin/breadcrumbs.css");
-require("devtools/skin/inspector.css");
-require("devtools/skin/badge.css");
-require("devtools/skin/rules.css");
-require("devtools/skin/compatibility.css");
-require("devtools/skin/computed.css");
-require("devtools/skin/changes.css");
-require("devtools/skin/fonts.css");
-require("devtools/skin/boxmodel.css");
-require("devtools/skin/layout.css");
-require("devtools/skin/animation.css");
+require("devtools/client/themes/breadcrumbs.css");
+require("devtools/client/themes/inspector.css");
+require("devtools/client/themes/badge.css");
+require("devtools/client/themes/rules.css");
+require("devtools/client/themes/compatibility.css");
+require("devtools/client/themes/computed.css");
+require("devtools/client/themes/changes.css");
+require("devtools/client/themes/fonts.css");
+require("devtools/client/themes/boxmodel.css");
+require("devtools/client/themes/layout.css");
+require("devtools/client/themes/animation.css");
+require("devtools/client/themes/splitters.css");
+require("devtools/client/themes/variables.css");
+require("devtools/client/themes/common.css");
+require("devtools/client/themes/toolbars.css");
+require("devtools/client/themes/tooltips.css");
+require("devtools/client/themes/accessibility-color-contrast.css");
 require("devtools/client/shared/components/tabs/Tabs.css");
 require("devtools/client/shared/components/SidebarToggle.css");
 require("devtools/client/inspector/components/InspectorTabPanel.css");
 require("devtools/client/shared/components/splitter/SplitBox.css");
 require("devtools/client/shared/components/Accordion.css");
-require("devtools/client/shared/components/reps/reps.css");
-require("devtools/client/shared/components/tree/TreeView.css");
-*/
+//require("devtools/client/shared/components/reps/reps.css");
+//require("devtools/client/shared/components/tree/TreeView.css");
+//require("devtools/content/shared/widgets/cubic-bezier.css");
+//require("devtools/content/shared/widgets/filter-widget.css");
+//require("devtools/content/shared/widgets/spectrum.css");
 
 /*
 loader.lazyRequireGetter(

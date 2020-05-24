@@ -4,15 +4,12 @@
 
 "use strict";
 
-const promise = require("promise");
 const flags = require("devtools/shared/flags");
-const ToolDefinitions = require("devtools/client/definitions").Tools;
 const CssLogic = require("devtools/shared/inspector/css-logic");
-const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
+//const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
 const OutputParser = require("devtools/client/shared/output-parser");
 const { PrefObserver } = require("devtools/client/shared/prefs");
 const { createChild } = require("devtools/client/inspector/shared/utils");
-const { gDevTools } = require("devtools/client/framework/devtools");
 const {
   VIEW_NODE_SELECTOR_TYPE,
   VIEW_NODE_PROPERTY_TYPE,

@@ -9,10 +9,12 @@ const { PureComponent } = require("devtools/client/shared/vendor/react");
 const dom = require("devtools/client/shared/vendor/react-dom-factories");
 const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
 const { getStr } = require("devtools/client/inspector/layout/utils/l10n");
+/*
 const {
   getWritingModeMatrix,
   getCSSMatrixTransform,
 } = require("devtools/shared/layout/dom-matrix-2d");
+*/
 
 const Types = require("devtools/client/inspector/grids/types");
 

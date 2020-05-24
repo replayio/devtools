@@ -13,12 +13,14 @@ const {
 const dom = require("devtools/client/shared/vendor/react-dom-factories");
 const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
 
+/*
 loader.lazyGetter(this, "Rep", function() {
   return require("devtools/client/shared/components/reps/reps").REPS.Rep;
 });
 loader.lazyGetter(this, "MODE", function() {
   return require("devtools/client/shared/components/reps/reps").MODE;
 });
+*/
 
 loader.lazyRequireGetter(
   this,

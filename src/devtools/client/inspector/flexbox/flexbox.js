@@ -5,7 +5,7 @@
 "use strict";
 
 const flags = require("devtools/shared/flags");
-const { throttle } = require("devtools/shared/throttle");
+//const { throttle } = require("devtools/shared/throttle");
 
 const {
   clearFlexbox,
@@ -34,7 +34,7 @@ class FlexboxInspector {
     this.onHighlighterShown = this.onHighlighterShown.bind(this);
     this.onHighlighterHidden = this.onHighlighterHidden.bind(this);
     this.onNavigate = this.onNavigate.bind(this);
-    this.onReflow = throttle(this.onReflow, 500, this);
+    //this.onReflow = throttle(this.onReflow, 500, this);
     this.onSetFlexboxOverlayColor = this.onSetFlexboxOverlayColor.bind(this);
     this.onSidebarSelect = this.onSidebarSelect.bind(this);
     this.onToggleFlexboxHighlighter = this.onToggleFlexboxHighlighter.bind(
