@@ -434,12 +434,8 @@ HTMLBreadcrumbs.prototype = {
    */
   prettyPrintNodeAsText: function(node) {
     let text = node.isShadowRoot ? SHADOW_ROOT_TAGNAME : node.displayName;
-    if (node.isMarkerPseudoElement) {
-      text = "::marker";
-    } else if (node.isBeforePseudoElement) {
-      text = "::before";
-    } else if (node.isAfterPseudoElement) {
-      text = "::after";
+    if (node.pseudoType) {
+      text = "::" + node.pseudoType;
     }
 
     if (node.id) {
@@ -482,12 +478,8 @@ HTMLBreadcrumbs.prototype = {
     pseudosLabel.className = "breadcrumbs-widget-item-pseudo-classes plain";
 
     let tagText = node.isShadowRoot ? SHADOW_ROOT_TAGNAME : node.displayName;
-    if (node.isMarkerPseudoElement) {
-      tagText = "::marker";
-    } else if (node.isBeforePseudoElement) {
-      tagText = "::before";
-    } else if (node.isAfterPseudoElement) {
-      tagText = "::after";
+    if (node.pseudoType) {
+      tagText = "::" + node.pseudoType;
     }
     let idText = node.id ? "#" + node.id : "";
     let classesText = "";

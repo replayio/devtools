@@ -6,11 +6,9 @@
 
 const EventEmitter = require("devtools/shared/event-emitter");
 
-loader.lazyRequireGetter(
-  this,
-  "nodeConstants",
-  "devtools/shared/dom-node-constants"
-);
+const nodeConstants = require("devtools/shared/dom-node-constants");
+
+const { assert } = require("protocol/utils");
 
 /**
  * Selection is a singleton belonging to the Toolbox that manages the current selected
@@ -58,8 +56,6 @@ loader.lazyRequireGetter(
 function Selection() {
   EventEmitter.decorate(this);
 
-  // The WalkerFront is dynamic and is always set to the selected NodeFront's WalkerFront.
-  this._walker = null;
   // A single node front can be represented twice on the client when the node is a slotted
   // element. It will be displayed once as a direct child of the host element, and once as
   // a child of a slot in the "shadow DOM". The latter is called the slotted version.
@@ -106,17 +102,6 @@ Selection.prototype = {
   },
 
   destroy: function() {
-    this.setWalker();
-  },
-
-  setWalker: function(walker = null) {
-    if (this._walker) {
-      this._walker.off("mutations", this._onMutations);
-    }
-    this._walker = walker;
-    if (this._walker) {
-      this._walker.on("mutations", this._onMutations);
-    }
   },
 
   /**
@@ -134,13 +119,16 @@ Selection.prototype = {
     nodeFront,
     { reason = "unknown", isSlotted = false } = {}
   ) {
+    assert(!nodeFront || nodeFront.isLoaded());
     this.reason = reason;
 
     // If an inlineTextChild text node is being set, then set it's parent instead.
+    /*
     const parentNode = nodeFront && nodeFront.parentNode();
     if (nodeFront && parentNode && parentNode.inlineTextChild === nodeFront) {
       nodeFront = parentNode;
     }
+    */
 
     if (this._nodeFront == null && nodeFront == null) {
       // Avoid to notify multiple "unselected" events with a null/undefined nodeFront
@@ -151,12 +139,6 @@ Selection.prototype = {
 
     this._isSlotted = isSlotted;
     this._nodeFront = nodeFront;
-
-    if (nodeFront) {
-      this.setWalker(nodeFront.walkerFront);
-    } else {
-      this.setWalker();
-    }
 
     this.emit("new-node-front", nodeFront, this.reason);
   },
@@ -177,22 +159,11 @@ Selection.prototype = {
 
   isConnected: function() {
     let node = this._nodeFront;
-    if (!node || !node.actorID) {
-      return false;
-    }
-
-    while (node) {
-      if (node === this._walker.rootNode) {
-        return true;
-      }
-      node = node.parentOrHost();
-    }
-    return false;
+    return node && node.isConnected;
   },
 
   isHTMLNode: function() {
-    const xhtmlNs = "http://www.w3.org/1999/xhtml";
-    return this.isNode() && this.nodeFront.namespaceURI == xhtmlNs;
+    return this.isNode();
   },
 
   // Node type
@@ -204,11 +175,12 @@ Selection.prototype = {
   },
 
   isPseudoElementNode: function() {
-    return this.isNode() && this.nodeFront.isPseudoElement;
+    return this.isNode() && !this.nodeFront.pseudoType;
   },
 
   isAnonymousNode: function() {
-    return this.isNode() && this.nodeFront.isAnonymous;
+    return false;
+    //return this.isNode() && this.nodeFront.isAnonymous;
   },
 
   isAttributeNode: function() {

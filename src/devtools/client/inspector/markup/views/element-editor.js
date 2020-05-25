@@ -126,6 +126,7 @@ function ElementEditor(container, node) {
 
   // Make the tag name editable (unless this is a remote node or
   // a document element)
+  /*
   if (!node.isDocumentElement) {
     // Make the tag optionally tabbable but not by default.
     this.tag.setAttribute("tabindex", "-1");
@@ -139,6 +140,7 @@ function ElementEditor(container, node) {
       cssProperties: this._cssProperties,
     });
   }
+  */
 
   // Make the new attribute space editable.
   this.newAttr.editMode = editableField({
@@ -174,7 +176,7 @@ function ElementEditor(container, node) {
   this.closeTag.textContent = displayName;
 
   const isVoidElement = HTML_VOID_ELEMENTS.includes(displayName);
-  if (node.isInHTMLDocument && isVoidElement) {
+  if (isVoidElement) {
     this.elt.classList.add("void-element");
   }
 

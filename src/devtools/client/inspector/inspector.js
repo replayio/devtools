@@ -178,7 +178,6 @@ function Inspector(toolbox) {
   this.handleThreadPaused = this.handleThreadPaused.bind(this);
   this.handleThreadResumed = this.handleThreadResumed.bind(this);
   this.handleToolSelected = this.handleToolSelected.bind(this);
-  this.onReflowInSelection = this.onReflowInSelection.bind(this);
 }
 
 Inspector.prototype = {
@@ -426,7 +425,7 @@ Inspector.prototype = {
 
     // If available, set either the previously selected node or the body
     // as default selected, else set documentElement
-    rootNode = (await ThreadFront.getRootDOMNode()).node;
+    rootNode = await ThreadFront.getRootDOMNode();
 
     console.log("Inspector getDefaultNodeForSelection HasRoot");
 
@@ -450,7 +449,7 @@ Inspector.prototype = {
     }
 
     if (!selectedNode) {
-      selectedNode = await ThreadFront.querySelector(rootNode, "body");
+      selectedNode = await rootNode.querySelector("body");
 
       console.log("Inspector getDefaultNodeForSelection GotBody");
 
@@ -1293,11 +1292,14 @@ Inspector.prototype = {
     this._destroyMarkup();
 
     const onNodeSelected = async defaultNode => {
+      await defaultNode.ensureParentsLoaded();
+
       // Cancel this promise resolution as a new one had
       // been queued up.
       if (this._pendingSelection != onNodeSelected) {
         return;
       }
+
       this._pendingSelection = null;
       this.selection.setNodeFront(defaultNode, { reason: "navigateaway" });
 
@@ -1461,11 +1463,13 @@ Inspector.prototype = {
    * of the selected node so it can be restored after reload of the same page
    */
   updateSelectionCssSelectors() {
+    /*
     if (this.selection.isElementNode()) {
       this.selection.nodeFront.getAllSelectors().then(selectors => {
         this.selectionCssSelectors = selectors;
       }, this._handleRejectionIfNotDestroyed);
     }
+    */
   },
 
   /**
@@ -1534,7 +1538,6 @@ Inspector.prototype = {
 
     this.updateAddElementButton();
     this.updateSelectionCssSelectors();
-    this.trackReflowsInSelection();
 
     const selfUpdate = this.updating("inspector-panel");
     setTimeout(() => {
@@ -1544,43 +1547,6 @@ Inspector.prototype = {
         console.error(ex);
       }
     }, 0);
-  },
-
-  /**
-   * Starts listening for reflows in the targetFront of the currently selected nodeFront.
-   */
-  async trackReflowsInSelection() {
-    this.untrackReflowsInSelection();
-    if (!this.selection.nodeFront) {
-      return;
-    }
-
-    const { targetFront } = this.selection.nodeFront;
-    this.reflowFront = await targetFront.getFront("reflow");
-    this.reflowFront.on("reflows", this.onReflowInSelection);
-    this.reflowFront.start();
-  },
-
-  /**
-   * Stops listening for reflows.
-   */
-  untrackReflowsInSelection() {
-    // Check the actorID because the reflowFront is a target scoped actor and
-    // might have been destroyed after switching targets.
-    if (!this.reflowFront || !this.reflowFront.actorID) {
-      return;
-    }
-
-    this.reflowFront.off("reflows", this.onReflowInSelection);
-    this.reflowFront.stop();
-    this.reflowFront = null;
-  },
-
-  onReflowInSelection() {
-    // This event will be fired whenever a reflow is detected in the target front of the
-    // selected node front (so when a reflow is detected inside any of the windows that
-    // belong to the BrowsingContext when the currently selected node lives).
-    this.emit("reflow-in-selected-target");
   },
 
   /**

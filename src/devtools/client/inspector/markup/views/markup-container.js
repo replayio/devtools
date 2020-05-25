@@ -10,6 +10,8 @@ const {
   flashElementOff,
 } = require("devtools/client/inspector/markup/utils");
 
+const { ThreadFront } = require("protocol/thread");
+
 /*
 loader.lazyRequireGetter(
   this,
@@ -68,7 +70,7 @@ MarkupContainer.prototype = {
     this.markup = markupView;
     this.node = node;
     this.type = type;
-    this.win = this.markup._frame.contentWindow;
+    this.win = window;
     this.id = "treeitem-" + markupContainerID++;
     this.htmlElt = this.win.document.documentElement;
 
@@ -153,13 +155,13 @@ MarkupContainer.prototype = {
 
   /**
    * Show whether the element is displayed or not
-   * If an element has the attribute `display: none` or has been hidden with
-   * the H key, it is not displayed (faded in markup view).
+   * If an element has the attribute `display: none`, it is not displayed
+   * (faded in markup view).
    * Otherwise, it is displayed.
    */
   updateIsDisplayed: function() {
     this.elt.classList.remove("not-displayed");
-    if (!this.node.isDisplayed || this.node.hidden) {
+    if (!this.node.isDisplayed) {
       this.elt.classList.add("not-displayed");
     }
   },
@@ -251,7 +253,7 @@ MarkupContainer.prototype = {
    * True if this is the root <html> element and can't be collapsed.
    */
   get mustExpand() {
-    return this.node._parent === this.markup.walker.rootNode;
+    return this.node.parentNode() === ThreadFront.getKnownRootDOMNode();
   },
 
   /**
@@ -430,7 +432,7 @@ MarkupContainer.prototype = {
   get level() {
     let level = 1;
     let parent = this.node.parentNode();
-    while (parent && parent !== this.markup.walker.rootNode) {
+    while (parent && parent !== ThreadFront.getKnownRootDOMNode()) {
       level++;
       parent = parent.parentNode();
     }

@@ -801,15 +801,8 @@ CssRuleView.prototype = {
       this._clearRules();
       this._showEmpty();
       this.refreshPseudoClassPanel();
-      if (this.pageStyle) {
-        this.pageStyle.off("stylesheet-updated", this.refreshPanel);
-        this.pageStyle = null;
-      }
       return Promise.resolve(undefined);
     }
-
-    this.pageStyle = element.inspectorFront.pageStyle;
-    this.pageStyle.on("stylesheet-updated", this.refreshPanel);
 
     // To figure out how shorthand properties are interpreted by the
     // engine, we will set properties on a dummy element and observe
@@ -1002,11 +995,6 @@ CssRuleView.prototype = {
     if (this._elementStyle) {
       this._elementStyle.destroy();
       this._elementStyle = null;
-    }
-
-    if (this.pageStyle) {
-      this.pageStyle.off("stylesheet-updated", this.refreshPanel);
-      this.pageStyle = null;
     }
   },
 

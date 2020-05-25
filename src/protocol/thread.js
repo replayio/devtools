@@ -59,6 +59,9 @@ function Pause(sessionId) {
   this.frames = new Map();
   this.scopes = new Map();
   this.objects = new Map();
+
+  this.documentNode = undefined;
+  this.nodeFronts = new Map();
 }
 
 Pause.prototype = {
@@ -165,29 +168,47 @@ Pause.prototype = {
     return frame.scopeChain.map(id => this.scopes.get(id));
   },
 
+  sendMessage(method, params) {
+    return sendMessage(method, params, this.sessionId, this.pauseId);
+  },
+
+  async getObjectPreview(object) {
+    const { data } = await this.sendMessage("Pause.getObjectPreview", { object });
+    this.addData(data);
+  },
+
   async evaluateInFrame(frameId, expression) {
-    const { result } = await sendMessage(
+    const { result } = await this.sendMessage(
       "Pause.evaluateInFrame",
-      { frameId, expression },
-      this.sessionId,
-      this.pauseId
+      { frameId, expression }
     );
     const { returned, exception, failed, data } = result;
     this.addData(data);
     return { returned, exception, failed };
   },
 
-  async getDocument() {
+  getNodeFront(objectId) {
+    // Make sure we don't create multiple node fronts for the same object.
+    if (!objectId) {
+      return null;
+    }
+    if (this.nodeFronts.has(objectId)) {
+      return this.nodeFronts.get(objectId);
+    }
+    const front = new NodeFront(this, objectId);
+    this.nodeFronts.set(objectId, front);
+    return front;
+  },
+
+  async loadDocument() {
+    if (this.documentNode) {
+      return;
+    }
     assert(this.createWaiter);
     await this.createWaiter;
-    const { document, data } = await sendMessage(
-      "DOM.getDocument",
-      {},
-      this.sessionId,
-      this.pauseId
-    );
+    const { document, data } = await this.sendMessage("DOM.getDocument");
     this.addData(data);
-    return document;
+    this.documentNode = this.getNodeFront(document);
   },
 };
 
@@ -434,13 +455,7 @@ ValueFront.prototype = {
 
   async loadChildren() {
     if (this.isObject() && this.hasPreviewOverflow()) {
-      const { data } = await sendMessage(
-        "Pause.getObjectPreview",
-        { object: this._object.objectId },
-        this.getPause().sessionId,
-        this.getPause().pauseId
-      );
-      this.getPause().addData(data);
+      await this.getPause().getObjectPreview(this._object.objectId);
       assert(!this.hasPreviewOverflow());
     }
     return this.getChildren();
@@ -461,12 +476,194 @@ function createPseudoValueFront(elements) {
 function NodeFront(pause, objectId) {
   this._pause = pause;
 
+  // The contents of the Node must already be available.
   const data = pause.objects.get(objectId);
-  assert(data);
+  assert(data && data.preview && data.preview.node);
   this._object = data;
+  this._node = data.preview.node;
+
+  // Additional data that can be loaded for the node.
+  this._loadWaiter = null;
+  this._loaded = false;
+  this._computedStyle = null;
+  this._listeners = null;
 }
 
 NodeFront.prototype = {
+  then: undefined,
+
+  get isConnected() {
+    return this._node.isConnected;
+  },
+
+  get nodeType() {
+    return this._node.nodeType;
+  },
+
+  get nodeName() {
+    return this._node.nodeName;
+  },
+
+  get displayName() {
+    return this.nodeName.toLowerCase();
+  },
+
+  get tagName() {
+    if (this.nodeType == Node.ELEMENT_NODE) {
+      return this._node.nodeName;
+    }
+  },
+
+  get pseudoType() {
+    return this._node.pseudoType;
+  },
+
+  get pseudoClassLocks() {
+    // NYI
+    return [];
+  },
+
+  get attributes() {
+    return this._node.attributes;
+  },
+
+  getAttribute(name) {
+    const attr = this.attributes.find(a => a.name == name);
+    return attr ? attr.value : undefined;
+  },
+
+  get id() {
+    return this.getAttribute("id");
+  },
+
+  get className() {
+    return this.getAttribute("class") || "";
+  },
+
+  parentNode() {
+    return this._pause.getNodeFront(this._node.parentNode);
+  },
+
+  parentOrHost() {
+    // NYI
+    return this.parentNode();
+  },
+
+  get hasChildren() {
+    return this._node.children && this._node.children.length != 0;
+  },
+
+  async children() {
+    if (!this._node.children) {
+      return [];
+    }
+    const missingPreviews = this._node.children.filter(id => {
+      const data = this._pause.objects.get(id);
+      return !data || !data.preview;
+    });
+    await Promise.all(missingPreviews.map(id => this._pause.getObjectPreview(id)));
+    const children = this._node.children.map(id => this._pause.getNodeFront(id));
+    await Promise.all(children.map(node => node.ensureLoaded()));
+    return children;
+  },
+
+  get isShadowRoot() {
+    // NYI
+    return false;
+  },
+
+  get isShadowHost() {
+    // NYI
+    return false;
+  },
+
+  get isDirectShadowHostChild() {
+    // NYI
+    return false;
+  },
+
+  async querySelector(selector) {
+    const { result, data } = await this._pause.sendMessage(
+      "DOM.querySelector",
+      { node: this._object.objectId, selector }
+    );
+    this._pause.addData(data);
+    return this._pause.getNodeFront(result);
+  },
+
+  isLoaded() {
+    return this._loaded;
+  },
+
+  // Load all data for this node that is needed to select it in the inspector.
+  async ensureLoaded() {
+    if (this._loadWaiter) {
+      return this._loadWaiter.promise;
+    }
+    this._loadWaiter = defer();
+
+    await Promise.all([
+      this._pause.sendMessage(
+        "CSS.getComputedStyle",
+        { node: this._object.objectId }
+      ).then(({ computedStyle }) => {
+        this._computedStyle = new Map();
+        for (const { name, value } of computedStyle) {
+          this._computedStyle.set(name, value);
+        }
+      }),
+      this._pause.sendMessage(
+        "DOM.getEventListeners",
+        { node: this._object.objectId }
+      ).then(({ listeners, data }) => {
+        this._listeners = listeners;
+        this._pause.addData(data);
+      }),
+    ]);
+
+    this._loaded = true;
+    this._loadWaiter.resolve();
+  },
+
+  // Ensure that this node and its transitive parents are fully loaded.
+  async ensureParentsLoaded() {
+    const promises = [];
+    let node = this;
+    while (node) {
+      promises.push(node.ensureLoaded());
+      node = node.parentNode();
+    }
+    return Promise.all(promises);
+  },
+
+  get isDisplayed() {
+    return this.displayType != "none";
+  },
+
+  get displayType() {
+    assert(this._loaded);
+    return this._computedStyle.get("display");
+  },
+
+  get hasEventListeners() {
+    assert(this._loaded);
+    return this._listeners.length != 0;
+  },
+
+  get customElementLocation() {
+    // NYI
+    return undefined;
+  },
+
+  get isScrollable() {
+    // NYI
+    return false;
+  },
+
+  get inlineTextChild() {
+    // NYI
+    return null;
+  },
 };
 
 Object.setPrototypeOf(NodeFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
@@ -744,14 +941,13 @@ const ThreadFront = {
     }
     this.ensurePause();
     const pause = this.currentPause;
-    const document = await this.currentPause.getDocument();
-    if (pause != this.currentPause) {
-      return null;
-    }
-    // Workaround not being able to call "then" on NodeFront objects,
-    // and getting unexpected control flow when adding an empty then()
-    // method to NodeFront.prototype...
-    return { node: new NodeFront(pause, document) };
+    await this.currentPause.loadDocument();
+    return pause == this.currentPause ? this.getKnownRootDOMNode() : null;
+  },
+
+  getKnownRootDOMNode() {
+    assert(this.currentPause.documentNode !== undefined);
+    return this.currentPause.documentNode;
   },
 };
 
