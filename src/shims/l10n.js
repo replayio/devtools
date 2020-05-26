@@ -39,6 +39,9 @@ const bundles = {
   "devtools/client/locales/shared.properties": parse(
     require("devtools/client/locales/en-US/shared.properties").default
   ),
+  "devtools/shared/locales/styleinspector.properties": parse(
+    require("devtools/shared/locales/en-US/styleinspector.properties").default
+  ),
 };
 
 const defaultStrings = { ...bundles["intl.properties"] };

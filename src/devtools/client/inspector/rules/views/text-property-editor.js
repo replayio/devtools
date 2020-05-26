@@ -439,8 +439,9 @@ TextPropertyEditor.prototype = {
    */
   get sheetHref() {
     const domRule = this.rule.domRule;
-    if (domRule) {
-      return domRule.href || domRule.nodeHref;
+    const sheet = domRule && domRule.parentStyleSheet;
+    if (sheet) {
+      return sheet.href || sheet.nodeHref;
     }
     return undefined;
   },

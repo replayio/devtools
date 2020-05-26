@@ -6,7 +6,6 @@
 
 const { l10n } = require("devtools/shared/inspector/css-logic");
 const { PSEUDO_CLASSES } = require("devtools/shared/css/constants");
-//const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
 const Rule = require("devtools/client/inspector/rules/models/rule");
 const {
   InplaceEditor,
@@ -71,13 +70,11 @@ function RuleEditor(ruleView, rule) {
   this._onNewProperty = this._onNewProperty.bind(this);
   this._newPropertyDestroy = this._newPropertyDestroy.bind(this);
   this._onSelectorDone = this._onSelectorDone.bind(this);
-  this._locationChanged = this._locationChanged.bind(this);
   this.updateSourceLink = this.updateSourceLink.bind(this);
   this._onToolChanged = this._onToolChanged.bind(this);
   this._updateLocation = this._updateLocation.bind(this);
   this._onSourceClick = this._onSourceClick.bind(this);
 
-  this.rule.domRule.on("location-changed", this._locationChanged);
   this.toolbox.on("tool-registered", this._onToolChanged);
   this.toolbox.on("tool-unregistered", this._onToolChanged);
 
@@ -86,7 +83,6 @@ function RuleEditor(ruleView, rule) {
 
 RuleEditor.prototype = {
   destroy: function() {
-    this.rule.domRule.off("location-changed");
     this.toolbox.off("tool-registered", this._onToolChanged);
     this.toolbox.off("tool-unregistered", this._onToolChanged);
 
@@ -97,7 +93,7 @@ RuleEditor.prototype = {
     if (
       url &&
       !this.rule.isSystem &&
-      this.rule.domRule.type !== ELEMENT_STYLE
+      this.rule.domRule.isRule()
     ) {
       // Only get the original source link if the rule isn't a system
       // rule and if it isn't an inline rule.
@@ -127,7 +123,7 @@ RuleEditor.prototype = {
   get isSelectorEditable() {
     const trait =
       this.isEditable &&
-      this.rule.domRule.type !== ELEMENT_STYLE &&
+      this.rule.domRule.isRule() &&
       this.rule.domRule.type !== CSSRule.KEYFRAME_RULE;
 
     // Do not allow editing anonymousselectors until we can
@@ -138,7 +134,7 @@ RuleEditor.prototype = {
   _create: function() {
     this.element = this.doc.createElement("div");
     this.element.className = "ruleview-rule devtools-monospace";
-    this.element.dataset.ruleId = this.rule.domRule.actorID;
+    this.element.dataset.ruleId = this.rule.domRule.objectId();
     this.element.setAttribute("uneditable", !this.isEditable);
     this.element.setAttribute("unmatched", this.rule.isUnmatched);
     this.element._ruleEditor = this;
@@ -283,19 +279,11 @@ RuleEditor.prototype = {
     // filter those out first.
     if (this.source.getAttribute("unselectable") === "permanent") {
       // Nothing.
-    } else if (this.toolbox.isToolRegistered("styleeditor")) {
+    } else if (false/*this.toolbox.isToolRegistered("styleeditor")*/) {
       this.source.removeAttribute("unselectable");
     } else {
       this.source.setAttribute("unselectable", "true");
     }
-  },
-
-  /**
-   * Event handler called when a property changes on the
-   * StyleRuleActor.
-   */
-  _locationChanged: function() {
-    this.updateSourceLink();
   },
 
   _onSourceClick: function() {
@@ -404,28 +392,30 @@ RuleEditor.prototype = {
     if (
       url &&
       !this.rule.isSystem &&
-      this.rule.domRule.type !== ELEMENT_STYLE
+      this.rule.domRule.isRule()
     ) {
       // Only get the original source link if the rule isn't a system
       // rule and if it isn't an inline rule.
       const sourceLine = this.rule.ruleLine;
       const sourceColumn = this.rule.ruleColumn;
+      /*
       this.sourceMapURLService.subscribe(
         url,
         sourceLine,
         sourceColumn,
         this._updateLocation
       );
+      */
       // Set "unselectable" appropriately.
       this._onToolChanged();
-    } else if (this.rule.domRule.type === ELEMENT_STYLE) {
+    } else if (!this.rule.domRule.isRule()) {
       this.source.setAttribute("unselectable", "permanent");
     } else {
       // Set "unselectable" appropriately.
       this._onToolChanged();
     }
 
-    promise.resolve().then(() => {
+    Promise.resolve().then(() => {
       this.emit("source-link-updated");
     });
   },
@@ -445,7 +435,7 @@ RuleEditor.prototype = {
     // If selector text comes from a css rule, highlight selectors that
     // actually match.  For custom selector text (such as for the 'element'
     // style, just show the text directly.
-    if (this.rule.domRule.type === ELEMENT_STYLE) {
+    if (!this.rule.domRule.isRule()) {
       this.selectorText.textContent = this.rule.selectorText;
     } else if (this.rule.domRule.type === CSSRule.KEYFRAME_RULE) {
       this.selectorText.textContent = this.rule.domRule.keyText;

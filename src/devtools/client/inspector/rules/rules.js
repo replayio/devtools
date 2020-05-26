@@ -55,11 +55,9 @@ loader.lazyRequireGetter(
   "StyleInspectorMenu",
   "devtools/client/inspector/shared/style-inspector-menu"
 );
-loader.lazyRequireGetter(
-  this,
-  "AutocompletePopup",
-  "devtools/client/shared/autocomplete-popup"
-);
+
+const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
+
 loader.lazyRequireGetter(
   this,
   "clipboardHelper",
@@ -1154,10 +1152,6 @@ CssRuleView.prototype = {
 
     const editorReadyPromises = [];
     for (const rule of this._elementStyle.rules) {
-      if (rule.domRule.system) {
-        continue;
-      }
-
       // Initialize rule editor
       if (!rule.editor) {
         rule.editor = new RuleEditor(this, rule);

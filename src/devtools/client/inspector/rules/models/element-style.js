@@ -7,15 +7,9 @@
 const Services = require("Services");
 const Rule = require("devtools/client/inspector/rules/models/rule");
 const UserProperties = require("devtools/client/inspector/rules/models/user-properties");
-//const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
 
+const { promiseWarn } = require("devtools/client/inspector/shared/utils");
 /*
-loader.lazyRequireGetter(
-  this,
-  "promiseWarn",
-  "devtools/client/inspector/shared/utils",
-  true
-);
 loader.lazyRequireGetter(
   this,
   "parseDeclarations",
@@ -152,12 +146,7 @@ class ElementStyle {
    * ready.
    */
   populate() {
-    const populated = this.pageStyle
-      .getApplied(this.element, {
-        inherited: true,
-        matchedSelectors: true,
-        filter: this.showUserAgentStyles ? "ua" : undefined,
-      })
+    const populated = this.element.getAppliedRules()
       .then(entries => {
         if (this.destroyed || this.populated !== populated) {
           return promise.resolve(undefined);
@@ -257,47 +246,15 @@ class ElementStyle {
    * Add a rule if it's one we care about. Filters out duplicates and
    * inherited styles with no inherited properties.
    *
-   * @param  {Object} options
-   *         Options for creating the Rule, see the Rule constructor.
+   * @param  {Object} ruleFront
+   *         Rule to add.
    * @param  {Array} existingRules
    *         Rules to reuse if possible. If a rule is reused, then it
    *         it will be deleted from this array.
    * @return {Boolean} true if we added the rule.
    */
-  _maybeAddRule(options, existingRules) {
-    // If we've already included this domRule (for example, when a
-    // common selector is inherited), ignore it.
-    if (
-      options.system ||
-      (options.rule && this.rules.some(rule => rule.domRule === options.rule))
-    ) {
-      return false;
-    }
-
-    let rule = null;
-
-    // If we're refreshing and the rule previously existed, reuse the
-    // Rule object.
-    if (existingRules) {
-      const ruleIndex = existingRules.findIndex(r => r.matches(options));
-      if (ruleIndex >= 0) {
-        rule = existingRules[ruleIndex];
-        rule.refresh(options);
-        existingRules.splice(ruleIndex, 1);
-      }
-    }
-
-    // If this is a new rule, create its Rule object.
-    if (!rule) {
-      rule = new Rule(this, options);
-    }
-
-    // Ignore inherited rules with no visible properties.
-    if (options.inherited && !rule.hasAnyVisibleProperties()) {
-      return false;
-    }
-
-    this.rules.push(rule);
+  _maybeAddRule(ruleFront, existingRules) {
+    this.rules.push(new Rule(this, { rule: ruleFront }));
     return true;
   }
 
@@ -500,7 +457,7 @@ class ElementStyle {
       const isPseudoElementRule =
         rule.pseudoElement !== "" && rule.pseudoElement === pseudo;
 
-      const isElementStyle = rule.domRule.type === ELEMENT_STYLE;
+      const isElementStyle = !rule.domRule.isRule();
 
       const filterCondition =
         pseudo === "" ? isStyleRule || isElementStyle : isPseudoElementRule;

@@ -6,16 +6,14 @@
 
 const Services = require("Services");
 const TextEditor = require("devtools/client/inspector/markup/views/text-editor");
-//const { truncateString } = require("devtools/shared/inspector/utils");
+const { truncateString } = require("devtools/shared/inspector/utils");
 const {
   editableField,
   InplaceEditor,
 } = require("devtools/client/shared/inplace-editor");
-/*
 const {
   parseAttribute,
 } = require("devtools/client/shared/node-attribute-parser");
-*/
 
 loader.lazyRequireGetter(
   this,

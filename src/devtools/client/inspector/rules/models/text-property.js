@@ -232,6 +232,8 @@ class TextProperty {
    * @return {Boolean} true if the whole CSS declaration is valid, false otherwise.
    */
   isValid() {
+    return true;
+    /*
     const selfIndex = this.rule.textProps.indexOf(this);
 
     // When adding a new property in the rule-view, the TextProperty object is
@@ -243,9 +245,12 @@ class TextProperty {
     }
 
     return this.rule.domRule.declarations[selfIndex].isValid;
+    */
   }
 
   isUsed() {
+    return true;
+    /*
     const selfIndex = this.rule.textProps.indexOf(this);
     const declarations = this.rule.domRule.declarations;
 
@@ -260,6 +265,7 @@ class TextProperty {
     }
 
     return declarations[selfIndex].isUsed;
+    */
   }
 
   /**
@@ -268,6 +274,8 @@ class TextProperty {
    * @return {Boolean} true if the property name is valid, false otherwise.
    */
   isNameValid() {
+    return true;
+    /*
     const selfIndex = this.rule.textProps.indexOf(this);
 
     // When adding a new property in the rule-view, the TextProperty object is
@@ -279,6 +287,7 @@ class TextProperty {
     }
 
     return this.rule.domRule.declarations[selfIndex].isNameValid;
+    */
   }
 
   /**

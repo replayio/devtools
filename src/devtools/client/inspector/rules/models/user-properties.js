@@ -74,7 +74,7 @@ class UserProperties {
   }
 
   getKey(style, name) {
-    return style.actorID + ":" + name;
+    return style.objectId() + ":" + name;
   }
 
   clear() {

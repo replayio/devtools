@@ -61,7 +61,7 @@ function Pause(sessionId) {
   this.objects = new Map();
 
   this.documentNode = undefined;
-  this.nodeFronts = new Map();
+  this.domFronts = new Map();
 }
 
 Pause.prototype = {
@@ -187,16 +187,29 @@ Pause.prototype = {
     return { returned, exception, failed };
   },
 
-  getNodeFront(objectId) {
+  getDOMFront(objectId) {
     // Make sure we don't create multiple node fronts for the same object.
     if (!objectId) {
       return null;
     }
-    if (this.nodeFronts.has(objectId)) {
-      return this.nodeFronts.get(objectId);
+    if (this.domFronts.has(objectId)) {
+      return this.domFronts.get(objectId);
     }
-    const front = new NodeFront(this, objectId);
-    this.nodeFronts.set(objectId, front);
+    const data = this.objects.get(objectId);
+    assert(data && data.preview && data.preview);
+    let front;
+    if (data.preview.node) {
+      front = new NodeFront(this, data);
+    } else if (data.preview.rule) {
+      front = new RuleFront(this, data);
+    } else if (data.preview.style) {
+      front = new StyleFront(this, data);
+    } else if (data.preview.styleSheet) {
+      front = new StyleSheetFront(this, data);
+    } else {
+      throw new Error("Unexpected DOM front");
+    }
+    this.domFronts.set(objectId, front);
     return front;
   },
 
@@ -208,7 +221,7 @@ Pause.prototype = {
     await this.createWaiter;
     const { document, data } = await this.sendMessage("DOM.getDocument");
     this.addData(data);
-    this.documentNode = this.getNodeFront(document);
+    this.documentNode = this.getDOMFront(document);
   },
 };
 
@@ -473,11 +486,10 @@ function createPseudoValueFront(elements) {
 }
 
 // Manages interaction with a DOM node.
-function NodeFront(pause, objectId) {
+function NodeFront(pause, data) {
   this._pause = pause;
 
   // The contents of the Node must already be available.
-  const data = pause.objects.get(objectId);
   assert(data && data.preview && data.preview.node);
   this._object = data;
   this._node = data.preview.node;
@@ -486,6 +498,7 @@ function NodeFront(pause, objectId) {
   this._loadWaiter = null;
   this._loaded = false;
   this._computedStyle = null;
+  this._rules = null;
   this._listeners = null;
 }
 
@@ -523,6 +536,11 @@ NodeFront.prototype = {
     return [];
   },
 
+  get namespaceURI() {
+    // NYI
+    return undefined;
+  },
+
   get attributes() {
     return this._node.attributes;
   },
@@ -541,7 +559,7 @@ NodeFront.prototype = {
   },
 
   parentNode() {
-    return this._pause.getNodeFront(this._node.parentNode);
+    return this._pause.getDOMFront(this._node.parentNode);
   },
 
   parentOrHost() {
@@ -562,7 +580,7 @@ NodeFront.prototype = {
       return !data || !data.preview;
     });
     await Promise.all(missingPreviews.map(id => this._pause.getObjectPreview(id)));
-    const children = this._node.children.map(id => this._pause.getNodeFront(id));
+    const children = this._node.children.map(id => this._pause.getDOMFront(id));
     await Promise.all(children.map(node => node.ensureLoaded()));
     return children;
   },
@@ -588,7 +606,7 @@ NodeFront.prototype = {
       { node: this._object.objectId, selector }
     );
     this._pause.addData(data);
-    return this._pause.getNodeFront(result);
+    return this._pause.getDOMFront(result);
   },
 
   isLoaded() {
@@ -611,6 +629,13 @@ NodeFront.prototype = {
         for (const { name, value } of computedStyle) {
           this._computedStyle.set(name, value);
         }
+      }),
+      this._pause.sendMessage(
+        "CSS.getAppliedRules",
+        { node: this._object.objectId }
+      ).then(({ rules, data }) => {
+        this._rules = rules;
+        this._pause.addData(data);
       }),
       this._pause.sendMessage(
         "DOM.getEventListeners",
@@ -650,6 +675,11 @@ NodeFront.prototype = {
     return this._listeners.length != 0;
   },
 
+  async getAppliedRules() {
+    assert(this._loaded);
+    return this._rules.map(r => this._pause.getDOMFront(r));
+  },
+
   get customElementLocation() {
     // NYI
     return undefined;
@@ -667,6 +697,108 @@ NodeFront.prototype = {
 };
 
 Object.setPrototypeOf(NodeFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+
+// Manages interaction with a CSSRule.
+function RuleFront(pause, data) {
+  this._pause = pause;
+
+  assert(data && data.preview && data.preview.rule);
+  this._object = data;
+  this._rule = data.preview.rule;
+}
+
+RuleFront.prototype = {
+  objectId() {
+    return this._object.objectId;
+  },
+
+  isRule() {
+    return true;
+  },
+
+  get type() {
+    return this._rule.type;
+  },
+
+  get cssText() {
+    return this._rule.cssText;
+  },
+
+  get selectorText() {
+    return this._rule.selectorText;
+  },
+
+  get selectors() {
+    return this._rule.selectorText.split(",").map(s => s.trim());
+  },
+
+  get style() {
+    if (this._rule.style) {
+      return this._pause.getDOMFront(this._rule.style);
+    }
+    return null;
+  },
+
+  get parentStyleSheet() {
+    if (this._rule.parentStyleSheet) {
+      return this._pause.getDOMFront(this._rule.parentStyleSheet);
+    }
+    return null;
+  },
+
+  get line() {
+    return this._rule.startLine;
+  },
+
+  get column() {
+    return this._rule.startColumn;
+  },
+
+  get mediaText() {
+    // NYI
+    return undefined;
+  },
+};
+
+Object.setPrototypeOf(RuleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+
+// Manages interaction with a CSSStyleDeclaration.
+function StyleFront(pause, data) {
+  this._pause = pause;
+
+  assert(data && data.preview && data.preview.style);
+  this._object = data;
+  this._style = data.preview.style;
+}
+
+StyleFront.prototype = {
+  get properties() {
+    return this._style.properties;
+  },
+};
+
+Object.setPrototypeOf(StyleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+
+// Manages interaction with a StyleSheet.
+function StyleSheetFront(pause, data) {
+  this._pause = pause;
+
+  assert(data && data.preview && data.preview.styleSheet);
+  this._object = data;
+  this._styleSheet = data.preview.styleSheet;
+}
+
+StyleSheetFront.prototype = {
+  get href() {
+    return this._styleSheet.href;
+  },
+
+  get nodeHref() {
+    return this.href;
+  },
+};
+
+Object.setPrototypeOf(StyleSheetFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 const ThreadFront = {
   // When replaying there is only a single thread currently. Use this thread ID

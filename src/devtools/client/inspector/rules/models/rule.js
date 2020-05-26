@@ -5,7 +5,6 @@
 "use strict";
 
 const CssLogic = require("devtools/shared/inspector/css-logic");
-//const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
 const TextProperty = require("devtools/client/inspector/rules/models/text-property");
 const Services = require("Services");
 
@@ -80,29 +79,12 @@ class Rule {
     this.onLocationChanged = this.onLocationChanged.bind(this);
     this.onStyleRuleFrontUpdated = this.onStyleRuleFrontUpdated.bind(this);
     this.updateSourceLocation = this.updateSourceLocation.bind(this);
-
-    // Added in Firefox 72 for backwards compatibility of initial fix for Bug 1557689.
-    // See follow-up fix in Bug 1593944.
-    if (this.domRule.traits.emitsRuleUpdatedEvent) {
-      this.domRule.on("rule-updated", this.onStyleRuleFrontUpdated);
-    } else {
-      this.domRule.on("declarations-updated", this.onDeclarationsUpdated);
-    }
   }
 
   destroy() {
     if (this.unsubscribeSourceMap) {
       this.unsubscribeSourceMap();
     }
-
-    // Added in Firefox 72
-    if (this.domRule.traits.emitsRuleUpdatedEvent) {
-      this.domRule.off("rule-updated", this.onStyleRuleFrontUpdated);
-    } else {
-      this.domRule.off("declarations-updated", this.onDeclarationsUpdated);
-    }
-
-    this.domRule.off("location-changed", this.onLocationChanged);
   }
 
   get declarations() {
@@ -160,7 +142,7 @@ class Rule {
 
   get title() {
     let title = CssLogic.shortSource(this.sheet);
-    if (this.domRule.type !== ELEMENT_STYLE && this.ruleLine > 0) {
+    if (this.domRule.isRule() && this.ruleLine > 0) {
       title += ":" + this.ruleLine;
     }
 
@@ -614,20 +596,7 @@ class Rule {
     const textProps = [];
     const store = this.elementStyle.store;
 
-    // Starting with FF49, StyleRuleActors provide parsed declarations.
-    let props = this.domRule.declarations;
-    if (!props.length) {
-      // If the authored text has an invalid property, it will show up
-      // as nameless.  Skip these as we don't currently have a good
-      // way to display them.
-      props = parseNamedDeclarations(
-        this.cssProperties.isKnown,
-        this.domRule.authoredText,
-        true
-      );
-    }
-
-    for (const prop of props) {
+    for (const prop of this.domRule.style.properties) {
       const name = prop.name;
       // In an inherited rule, we only show inherited properties.
       // However, we must keep all properties in order for rule
@@ -694,7 +663,7 @@ class Rule {
     // properties might have been removed, etc. And we don't need to mark anything as
     // disabled here. The element style rule should always reflect the content of the
     // style attribute.
-    if (this.domRule.type === ELEMENT_STYLE) {
+    if (!this.domRule.isRule()) {
       this.textProps = newTextProps;
 
       if (this.editor) {
@@ -935,7 +904,7 @@ class Rule {
   subscribeToLocationChange() {
     const { url, line, column } = this.sourceLocation;
 
-    if (url && !this.isSystem && this.domRule.type !== ELEMENT_STYLE) {
+    if (url && !this.isSystem && this.domRule.isRule()) {
       // Subscribe returns an unsubscribe function that can be called on destroy.
       this.unsubscribeSourceMap = this.sourceMapURLService.subscribe(
         url,
