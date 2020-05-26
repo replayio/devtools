@@ -15,30 +15,12 @@ const {
   parseAttribute,
 } = require("devtools/client/shared/node-attribute-parser");
 
-loader.lazyRequireGetter(
-  this,
-  "flashElementOn",
-  "devtools/client/inspector/markup/utils",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "flashElementOff",
-  "devtools/client/inspector/markup/utils",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "getAutocompleteMaxWidth",
-  "devtools/client/inspector/markup/utils",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "parseAttributeValues",
-  "devtools/client/inspector/markup/utils",
-  true
-);
+const {
+  flashElementOn,
+  flashElementOff,
+  getAutocompleteMaxWidth,
+  parseAttributeValues,
+} = require("devtools/client/inspector/markup/utils");
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const INSPECTOR_L10N = new LocalizationHelper(

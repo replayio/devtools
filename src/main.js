@@ -118,6 +118,7 @@ const gToolbox = {
   threadFront: ThreadFront,
 
   on() {},
+  off() {},
   emit() {},
 
   selection: new Selection(),

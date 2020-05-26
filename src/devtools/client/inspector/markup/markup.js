@@ -712,7 +712,7 @@ MarkupView.prototype = {
    *         hidden, taking into account that there could already be highlighter
    *         requests queued up
    */
-  _hideBoxModel: function(forceHide) {
+  _hideBoxModel: async function(forceHide) {
     if (!this._highlightedNodeFront) {
       return Promise.resolve();
     }
@@ -908,19 +908,6 @@ MarkupView.prototype = {
    */
   _onNewSelection: function(nodeFront, reason) {
     const selection = this.inspector.selection;
-    // this will probably leak.
-    // TODO: use resource api listeners?
-    if (nodeFront) {
-      nodeFront.walkerFront.on(
-        "display-change",
-        this._onWalkerNodeStatesChanged
-      );
-      nodeFront.walkerFront.on(
-        "scrollable-change",
-        this._onWalkerNodeStatesChanged
-      );
-      nodeFront.walkerFront.on("mutations", this._onWalkerMutations);
-    }
 
     if (this.htmlEditor) {
       this.htmlEditor.hide();

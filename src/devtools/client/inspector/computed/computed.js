@@ -4,6 +4,7 @@
 
 "use strict";
 
+const promise = Promise;
 const flags = require("devtools/shared/flags");
 const CssLogic = require("devtools/shared/inspector/css-logic");
 //const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
@@ -24,11 +25,9 @@ loader.lazyRequireGetter(
   "StyleInspectorMenu",
   "devtools/client/inspector/shared/style-inspector-menu"
 );
-loader.lazyRequireGetter(
-  this,
-  "KeyShortcuts",
-  "devtools/client/shared/key-shortcuts"
-);
+
+const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
+
 loader.lazyRequireGetter(
   this,
   "clipboardHelper",

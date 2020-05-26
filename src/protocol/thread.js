@@ -543,7 +543,7 @@ NodeFront.prototype = {
   },
 
   get attributes() {
-    return this._node.attributes;
+    return this._node.attributes || [];
   },
 
   getAttribute(name) {
