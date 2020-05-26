@@ -500,6 +500,7 @@ function NodeFront(pause, data) {
   this._computedStyle = null;
   this._rules = null;
   this._listeners = null;
+  this._quads = null;
 }
 
 NodeFront.prototype = {
@@ -556,6 +557,10 @@ NodeFront.prototype = {
 
   get className() {
     return this.getAttribute("class") || "";
+  },
+
+  get classList() {
+    return this.className.split(" ").filter(s => !!s);
   },
 
   parentNode() {
@@ -648,6 +653,12 @@ NodeFront.prototype = {
         this._listeners = listeners;
         this._pause.addData(data);
       }),
+      this._pause.sendMessage(
+        "DOM.getBoxModel",
+        { node: this._object.objectId }
+      ).then(({ model }) => {
+        this._quads = model;
+      }),
     ]);
 
     this._loaded = true;
@@ -684,6 +695,11 @@ NodeFront.prototype = {
     return this._rules.map(r => this._pause.getDOMFront(r));
   },
 
+  getBoxQuads(box) {
+    assert(this._loaded);
+    return buildBoxQuads(this._quads[box]);
+  },
+
   get customElementLocation() {
     // NYI
     return undefined;
@@ -698,9 +714,39 @@ NodeFront.prototype = {
     // NYI
     return null;
   },
+
+  get getGridFragments() {
+    // NYI
+    return null;
+  },
+
+  get getAsFlexContainer() {
+    // NYI
+    return null;
+  },
+
+  get parentFlexElement() {
+    // NYI
+    return null;
+  },
 };
 
 Object.setPrototypeOf(NodeFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+
+function buildBoxQuads(array) {
+  assert(array.length % 8 == 0);
+  const rv = [];
+  while (array.length) {
+    const [x1, y1, x2, y2, x3, y3, x4, y4] = array.splice(0, 8);
+    rv.push(DOMQuad.fromQuad({
+      p1: { x: x1, y: y1 },
+      p2: { x: x2, y: y2 },
+      p3: { x: x3, y: y3 },
+      p4: { x: x4, y: y4 },
+    }));
+  }
+  return rv;
+}
 
 // Manages interaction with a CSSRule.
 function RuleFront(pause, data) {

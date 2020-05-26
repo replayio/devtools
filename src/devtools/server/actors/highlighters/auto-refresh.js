@@ -77,8 +77,8 @@ function AutoRefreshHighlighter(highlighterEnv) {
   this.currentNode = null;
   this.currentQuads = {};
 
-  this._winDimensions = getWindowDimensions(this.win);
-  this._scroll = { x: this.win.pageXOffset, y: this.win.pageYOffset };
+  //this._winDimensions = getWindowDimensions(this.win);
+  //this._scroll = { x: this.win.pageXOffset, y: this.win.pageYOffset };
 
   this.update = this.update.bind(this);
 }
@@ -93,10 +93,7 @@ AutoRefreshHighlighter.prototype = {
    * from the window containing the target content.
    */
   get win() {
-    if (!this.highlighterEnv) {
-      return null;
-    }
-    return this.highlighterEnv.window;
+    return window;
   },
 
   /* Window containing the target content. */
@@ -120,10 +117,8 @@ AutoRefreshHighlighter.prototype = {
 
     this.options = options;
 
-    this._stopRefreshLoop();
     this.currentNode = node;
     this._updateAdjustedQuads();
-    this._startRefreshLoop();
 
     const shown = this._show();
     if (shown) {
@@ -136,12 +131,11 @@ AutoRefreshHighlighter.prototype = {
    * Hide the highlighter
    */
   hide: function() {
-    if (!this.currentNode || !this.highlighterEnv.window) {
+    if (!this.currentNode) {
       return;
     }
 
     this._hide();
-    this._stopRefreshLoop();
     this.currentNode = null;
     this.currentQuads = {};
     this.options = null;
@@ -213,53 +207,10 @@ AutoRefreshHighlighter.prototype = {
   },
 
   /**
-   * Update the knowledge we have of the current window's scrolling offset, both
-   * horizontal and vertical, and return `true` if they have changed since.
-   * @return {Boolean}
-   */
-  _hasWindowScrolled: function() {
-    if (!this.win) {
-      return false;
-    }
-
-    const { pageXOffset, pageYOffset } = this.win;
-    const hasChanged =
-      this._scroll.x !== pageXOffset || this._scroll.y !== pageYOffset;
-
-    this._scroll = { x: pageXOffset, y: pageYOffset };
-
-    return hasChanged;
-  },
-
-  /**
-   * Update the knowledge we have of the current window's dimensions and return `true`
-   * if they have changed since.
-   * @return {Boolean}
-   */
-  _haveWindowDimensionsChanged: function() {
-    const { width, height } = getWindowDimensions(this.win);
-    const haveChanged =
-      this._winDimensions.width !== width ||
-      this._winDimensions.height !== height;
-
-    this._winDimensions = { width, height };
-    return haveChanged;
-  },
-
-  /**
    * Update the highlighter if the node has moved since the last update.
    */
   update: function() {
-    if (
-      !this._isNodeValid(this.currentNode) ||
-      (!this._hasMoved() && !this._haveWindowDimensionsChanged())
-    ) {
-      // At this point we're not calling the `_update` method. However, if the window has
-      // scrolled, we want to invoke `_scrollUpdate`.
-      if (this._hasWindowScrolled()) {
-        this._scrollUpdate();
-      }
-
+    if (!this._isNodeValid(this.currentNode)) {
       return;
     }
 
@@ -293,20 +244,6 @@ AutoRefreshHighlighter.prototype = {
     // To be implemented by sub classes
     // When called, sub classes should actually hide the highlighter
     throw new Error("Custom highlighter class had to implement _hide method");
-  },
-
-  _startRefreshLoop: function() {
-    const win = this.currentNode.ownerGlobal;
-    this.rafID = win.requestAnimationFrame(this._startRefreshLoop.bind(this));
-    this.rafWin = win;
-    this.update();
-  },
-
-  _stopRefreshLoop: function() {
-    if (this.rafID && !Cu.isDeadWrapper(this.rafWin)) {
-      this.rafWin.cancelAnimationFrame(this.rafID);
-    }
-    this.rafID = this.rafWin = null;
   },
 
   destroy: function() {

@@ -208,7 +208,7 @@ class ElementStyle {
    */
   getRule(id) {
     return id
-      ? this.rules.find(rule => rule.domRule.actorID === id)
+      ? this.rules.find(rule => rule.domRule.objectId() === id)
       : undefined;
   }
 

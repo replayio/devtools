@@ -18,32 +18,6 @@ const SHEET_TYPE = {
   author: "AUTHOR_SHEET",
 };
 
-// eslint-disable-next-line no-unused-vars
-loader.lazyRequireGetter(
-  this,
-  "setIgnoreLayoutChanges",
-  "devtools/server/actors/reflow",
-  true
-);
-exports.setIgnoreLayoutChanges = (...args) =>
-  this.setIgnoreLayoutChanges(...args);
-
-/**
- * Returns the `DOMWindowUtils` for the window given.
- *
- * @param {DOMWindow} win
- * @returns {DOMWindowUtils}
- */
-const utilsCache = new WeakMap();
-function utilsFor(win) {
-  // XXXbz Given that we now have a direct getter for the DOMWindowUtils, is
-  // this weakmap cache path any faster than just calling the getter?
-  if (!utilsCache.has(win)) {
-    utilsCache.set(win, win.windowUtils);
-  }
-  return utilsCache.get(win);
-}
-
 /**
  * Check a window is part of the boundary window given.
  *
@@ -161,11 +135,7 @@ function getAdjustedQuads(
     return [];
   }
 
-  const quads = node.getBoxQuads({
-    box: region,
-    relativeTo: boundaryWindow.document,
-    createFramesForSuppressedWhitespace: false,
-  });
+  const quads = node.getBoxQuads(region);
 
   if (!quads.length) {
     return [];
@@ -559,13 +529,7 @@ exports.isAfterPseudoElement = isAfterPseudoElement;
  * @return {Number}
  */
 function getCurrentZoom(node) {
-  const win = getWindowFor(node);
-
-  if (!win) {
-    throw new Error("Unable to get the zoom from the given argument.");
-  }
-
-  return utilsFor(win).fullZoom;
+  return 1;
 }
 exports.getCurrentZoom = getCurrentZoom;
 
@@ -620,16 +584,8 @@ exports.getWindowDimensions = getWindowDimensions;
  * number of pixels for the viewport's size.
  */
 function getViewportDimensions(window) {
-  const windowUtils = utilsFor(window);
-
-  const scrollbarHeight = {};
-  const scrollbarWidth = {};
-  windowUtils.getScrollbarSize(false, scrollbarWidth, scrollbarHeight);
-
-  const width = window.innerWidth - scrollbarWidth.value;
-  const height = window.innerHeight - scrollbarHeight.value;
-
-  return { width, height };
+  const canvas = document.getElementById("graphics");
+  return { width: canvas.width, height: canvas.height };
 }
 exports.getViewportDimensions = getViewportDimensions;
 

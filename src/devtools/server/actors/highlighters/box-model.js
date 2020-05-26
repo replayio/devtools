@@ -19,7 +19,6 @@ const {
 const { PSEUDO_CLASSES } = require("devtools/shared/css/constants");
 const {
   getCurrentZoom,
-  setIgnoreLayoutChanges,
 } = require("devtools/shared/layout/utils");
 const {
   getNodeDisplayName,
@@ -113,14 +112,6 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
      * regionFill property: `highlighter.regionFill.margin = "red";
      */
     this.regionFill = {};
-
-    this.onPageHide = this.onPageHide.bind(this);
-    this.onWillNavigate = this.onWillNavigate.bind(this);
-
-    this.highlighterEnv.on("will-navigate", this.onWillNavigate);
-
-    const { pageListenerTarget } = highlighterEnv;
-    pageListenerTarget.addEventListener("pagehide", this.onPageHide);
   }
 
   _buildMarkup() {
@@ -335,27 +326,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
     }
 
     const shown = this._update();
-    this._trackMutations();
     return shown;
-  }
-
-  /**
-   * Track the current node markup mutations so that the node info bar can be
-   * updated to reflects the node's attributes
-   */
-  _trackMutations() {
-    if (isNodeValid(this.currentNode)) {
-      const win = this.currentNode.ownerGlobal;
-      this.currentNodeObserver = new win.MutationObserver(this.update);
-      this.currentNodeObserver.observe(this.currentNode, { attributes: true });
-    }
-  }
-
-  _untrackMutations() {
-    if (isNodeValid(this.currentNode) && this.currentNodeObserver) {
-      this.currentNodeObserver.disconnect();
-      this.currentNodeObserver = null;
-    }
   }
 
   /**
@@ -366,15 +337,14 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
   _update() {
     const node = this.currentNode;
     let shown = false;
-    setIgnoreLayoutChanges(true);
 
     if (this._updateBoxModel()) {
       // Show the infobar only if configured to do so and the node is an element or a text
       // node.
       if (
         !this.options.hideInfoBar &&
-        (node.nodeType === node.ELEMENT_NODE ||
-          node.nodeType === node.TEXT_NODE)
+        (node.nodeType === Node.ELEMENT_NODE ||
+          node.nodeType === Node.TEXT_NODE)
       ) {
         this._showInfobar();
       } else {
@@ -387,11 +357,6 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
       this._hide();
     }
 
-    setIgnoreLayoutChanges(
-      false,
-      this.highlighterEnv.window.document.documentElement
-    );
-
     return shown;
   }
 
@@ -403,16 +368,8 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
    * Hide the highlighter, the outline and the infobar.
    */
   _hide() {
-    setIgnoreLayoutChanges(true);
-
-    this._untrackMutations();
     this._hideBoxModel();
     this._hideInfobar();
-
-    setIgnoreLayoutChanges(
-      false,
-      this.highlighterEnv.window.document.documentElement
-    );
   }
 
   /**
@@ -559,7 +516,6 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
 
     // Un-zoom the root wrapper if the page was zoomed.
     const rootId = this.ID_CLASS_PREFIX + "elements";
-    this.markup.scaleRootElement(this.currentNode, rootId);
 
     return true;
   }
@@ -844,12 +800,15 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
   }
 
   _getPseudoClasses(node) {
+    return [];
+    /*
     if (node.nodeType !== nodeConstants.ELEMENT_NODE) {
       // hasPseudoClassLock can only be used on Elements.
       return [];
     }
 
     return PSEUDO_CLASSES.filter(pseudo => hasPseudoClassLock(node, pseudo));
+    */
   }
 
   /**

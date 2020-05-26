@@ -12,14 +12,12 @@ const {
 } = require("devtools/shared/layout/utils");
 const EventEmitter = require("devtools/shared/event-emitter");
 
-const lazyContainer = {};
+const lazyContainer = {
+  get CssLogic() {
+    return require("devtools/server/actors/inspector/css-logic").CssLogic;
+  },
+};
 
-loader.lazyRequireGetter(
-  lazyContainer,
-  "CssLogic",
-  "devtools/server/actors/inspector/css-logic",
-  true
-);
 exports.getComputedStyle = node =>
   lazyContainer.CssLogic.getComputedStyle(node);
 
@@ -29,8 +27,8 @@ exports.getBindingElementAndPseudo = node =>
 const SVG_NS = "http://www.w3.org/2000/svg";
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
 const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-const STYLESHEET_URI =
-  "resource://devtools/server/actors/" + "highlighters.css";
+
+require("devtools/server/actors/highlighters.css");
 
 const _tokens = Symbol("classList/tokens");
 
@@ -119,18 +117,12 @@ exports.isXUL = isXUL;
  */
 function isNodeValid(node, nodeType = Node.ELEMENT_NODE) {
   // Is it still alive?
-  if (!node || Cu.isDeadWrapper(node)) {
+  if (!node) {
     return false;
   }
 
   // Is it of the right type?
   if (node.nodeType !== nodeType) {
-    return false;
-  }
-
-  // Is its document accessible?
-  const doc = node.ownerDocument;
-  if (!doc || !doc.defaultView) {
     return false;
   }
 
@@ -225,24 +217,12 @@ exports.createNode = createNode;
 function CanvasFrameAnonymousContentHelper(highlighterEnv, nodeBuilder) {
   this.highlighterEnv = highlighterEnv;
   this.nodeBuilder = nodeBuilder;
-  this.anonymousContentDocument = this.highlighterEnv.document;
-  // XXX the next line is a wallpaper for bug 1123362.
-  this.anonymousContentGlobal = Cu.getGlobalForObject(
-    this.anonymousContentDocument
-  );
-
-  // Only try to create the highlighter when the document is loaded,
-  // otherwise, wait for the window-ready event to fire.
-  const doc = this.highlighterEnv.document;
-  if (doc.documentElement && doc.readyState != "uninitialized") {
-    this._insert();
-  }
-
-  this._onWindowReady = this._onWindowReady.bind(this);
-  this.highlighterEnv.on("window-ready", this._onWindowReady);
+  this.anonymousContentDocument = document;
 
   this.listeners = new Map();
   this.elements = new Map();
+
+  this._onWindowReady();
 }
 
 CanvasFrameAnonymousContentHelper.prototype = {
@@ -258,66 +238,16 @@ CanvasFrameAnonymousContentHelper.prototype = {
   },
 
   _insert() {
-    const doc = this.highlighterEnv.document;
-    // Wait for DOMContentLoaded before injecting the anonymous content.
-    if (doc.readyState != "interactive" && doc.readyState != "complete") {
-      doc.addEventListener("DOMContentLoaded", this._insert.bind(this), {
-        once: true,
-      });
-      return;
-    }
-    // Reject XUL documents. Check that after DOMContentLoaded as we query
-    // documentElement which is only available after this event.
-    if (isXUL(this.highlighterEnv.window)) {
-      return;
-    }
-
-    // For now highlighters.css is injected in content as a ua sheet because
-    // we no longer support scoped style sheets (see bug 1345702).
-    // If it did, highlighters.css would be injected as an anonymous content
-    // node using CanvasFrameAnonymousContentHelper instead.
-    loadSheet(this.highlighterEnv.window, STYLESHEET_URI);
-
     const node = this.nodeBuilder();
 
-    // It was stated that hidden documents don't accept
-    // `insertAnonymousContent` calls yet. That doesn't seems the case anymore,
-    // at least on desktop. Therefore, removing the code that was dealing with
-    // that scenario, fixes when we're adding anonymous content in a tab that
-    // is not the active one (see bug 1260043 and bug 1260044)
-    try {
-      this._content = doc.insertAnonymousContent(node);
-    } catch (e) {
-      // If the `insertAnonymousContent` fails throwing a `NS_ERROR_UNEXPECTED`, it means
-      // we don't have access to a `CustomContentContainer` yet (see bug 1365075).
-      // At this point, it could only happen on document's interactive state, and we
-      // need to wait until the `complete` state before inserting the anonymous content
-      // again.
-      if (
-        e.result === Cr.NS_ERROR_UNEXPECTED &&
-        doc.readyState === "interactive"
-      ) {
-        // The next state change will be "complete" since the current is "interactive"
-        doc.addEventListener(
-          "readystatechange",
-          () => {
-            this._content = doc.insertAnonymousContent(node);
-          },
-          { once: true }
-        );
-      } else {
-        throw e;
-      }
-    }
+    const container = document.getElementById("highlighter-root");
+    container.appendChild(node);
   },
 
   _remove() {
-    try {
-      const doc = this.anonymousContentDocument;
-      doc.removeAnonymousContent(this._content);
-    } catch (e) {
-      // If the current window isn't the one the content was inserted into, this
-      // will fail, but that's fine.
+    const container = document.getElementById("highlighter-root");
+    if (container.firstChild) {
+      container.removeChild(container.firstChild);
     }
   },
 
@@ -328,13 +258,11 @@ CanvasFrameAnonymousContentHelper.prototype = {
    *   - when first attaching to a page
    *   - when swapping frame loaders (moving tabs, toggling RDM)
    */
-  _onWindowReady({ isTopLevel }) {
-    if (isTopLevel) {
-      this._removeAllListeners();
-      this.elements.clear();
-      this._insert();
-      this.anonymousContentDocument = this.highlighterEnv.document;
-    }
+  _onWindowReady() {
+    this._removeAllListeners();
+    this.elements.clear();
+    this._insert();
+    this.anonymousContentDocument = document;
   },
 
   getComputedStylePropertyValue(id, property) {
@@ -541,49 +469,6 @@ CanvasFrameAnonymousContentHelper.prototype = {
       return null;
     }
     return this._content;
-  },
-
-  /**
-   * The canvasFrame anonymous content container gets zoomed in/out with the
-   * page. If this is unwanted, i.e. if you want the inserted element to remain
-   * unzoomed, then this method can be used.
-   *
-   * Consumers of the CanvasFrameAnonymousContentHelper should call this method,
-   * it isn't executed automatically. Typically, AutoRefreshHighlighter can call
-   * it when _update is executed.
-   *
-   * The matching element will be scaled down or up by 1/zoomLevel (using css
-   * transform) to cancel the current zoom. The element's width and height
-   * styles will also be set according to the scale. Finally, the element's
-   * position will be set as absolute.
-   *
-   * Note that if the matching element already has an inline style attribute, it
-   * *won't* be preserved.
-   *
-   * @param {DOMNode} node This node is used to determine which container window
-   * should be used to read the current zoom value.
-   * @param {String} id The ID of the root element inserted with this API.
-   */
-  scaleRootElement(node, id) {
-    const boundaryWindow = this.highlighterEnv.window;
-    const zoom = getCurrentZoom(node);
-    // Hide the root element and force the reflow in order to get the proper window's
-    // dimensions without increasing them.
-    this.setAttributeForElement(id, "style", "display: none");
-    node.offsetWidth;
-
-    let { width, height } = getWindowDimensions(boundaryWindow);
-    let value = "";
-
-    if (zoom !== 1) {
-      value = `transform-origin:top left; transform:scale(${1 / zoom}); `;
-      width *= zoom;
-      height *= zoom;
-    }
-
-    value += `position:absolute; width:${width}px;height:${height}px; overflow:hidden`;
-
-    this.setAttributeForElement(id, "style", value);
   },
 };
 exports.CanvasFrameAnonymousContentHelper = CanvasFrameAnonymousContentHelper;

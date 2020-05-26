@@ -58,12 +58,11 @@ loader.lazyRequireGetter(
   "devtools/client/shared/link",
   true
 );
-loader.lazyRequireGetter(
-  this,
-  "HTMLTooltip",
-  "devtools/client/shared/widgets/tooltip/HTMLTooltip",
-  true
-);
+*/
+
+const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+
+/*
 loader.lazyRequireGetter(
   this,
   "UndoStack",
@@ -701,9 +700,7 @@ MarkupView.prototype = {
     // Hold onto a reference to the highlighted NodeFront so that we can get the correct
     // HighlighterFront when calling _hideBoxModel.
     this._highlightedNodeFront = nodeFront;
-    return Highlighter
-      .highlight(nodeFront)
-      .catch(this._handleRejectionIfNotDestroyed);
+    return Highlighter.highlight(nodeFront);
   },
 
   /**
@@ -720,9 +717,7 @@ MarkupView.prototype = {
       return Promise.resolve();
     }
 
-    return Highlighter
-      .unhighlight(forceHide)
-      .catch(this._handleRejectionIfNotDestroyed);
+    return Highlighter.unhighlight(forceHide);
   },
 
   _briefBoxModelTimer: null,

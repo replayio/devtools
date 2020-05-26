@@ -141,7 +141,7 @@ MarkupContainer.prototype = {
   },
 
   isPreviewable: function() {
-    if (this.node.tagName && !this.node.isPseudoElement) {
+    if (this.node.tagName && !this.node.pseudoType) {
       const tagName = this.node.tagName.toLowerCase();
       const srcAttr = this.editor.getAttributeElement("src");
       const isImage = tagName === "img" && srcAttr;
@@ -469,6 +469,8 @@ MarkupContainer.prototype = {
    * Check if element is draggable.
    */
   isDraggable: function() {
+    return false;
+    /*
     const tagName = this.node.tagName && this.node.tagName.toLowerCase();
 
     return (
@@ -481,6 +483,7 @@ MarkupContainer.prototype = {
       this.node.parentNode() &&
       this.node.parentNode().tagName !== null
     );
+    */
   },
 
   isSlotted: function() {
