@@ -568,21 +568,25 @@ NodeFront.prototype = {
   },
 
   get hasChildren() {
-    return this._node.children && this._node.children.length != 0;
+    return this._node.childNodes && this._node.childNodes.length != 0;
   },
 
-  async children() {
-    if (!this._node.children) {
+  async childNodes() {
+    if (!this._node.childNodes) {
       return [];
     }
-    const missingPreviews = this._node.children.filter(id => {
+    const missingPreviews = this._node.childNodes.filter(id => {
       const data = this._pause.objects.get(id);
       return !data || !data.preview;
     });
     await Promise.all(missingPreviews.map(id => this._pause.getObjectPreview(id)));
-    const children = this._node.children.map(id => this._pause.getDOMFront(id));
-    await Promise.all(children.map(node => node.ensureLoaded()));
-    return children;
+    const childNodes = this._node.childNodes.map(id => this._pause.getDOMFront(id));
+    await Promise.all(childNodes.map(node => node.ensureLoaded()));
+    return childNodes;
+  },
+
+  getNodeValue() {
+    return this._node.nodeValue;
   },
 
   get isShadowRoot() {

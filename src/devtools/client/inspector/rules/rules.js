@@ -38,12 +38,9 @@ loader.lazyRequireGetter(
   "ClassListPreviewer",
   "devtools/client/inspector/rules/views/class-list-previewer"
 );
-loader.lazyRequireGetter(
-  this,
-  "getNodeInfo",
-  "devtools/client/inspector/rules/utils/utils",
-  true
-);
+
+const { getNodeInfo } = require("devtools/client/inspector/rules/utils/utils");
+
 loader.lazyRequireGetter(
   this,
   "COLOR_SCHEMES",

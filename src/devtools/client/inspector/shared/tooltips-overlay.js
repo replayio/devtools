@@ -25,12 +25,9 @@ loader.lazyRequireGetter(
   "devtools/client/shared/theme",
   true
 );
-loader.lazyRequireGetter(
-  this,
-  "HTMLTooltip",
-  "devtools/client/shared/widgets/tooltip/HTMLTooltip",
-  true
-);
+
+const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+
 loader.lazyRequireGetter(
   this,
   "getImageDimensions",

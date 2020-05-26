@@ -5,23 +5,17 @@
 "use strict";
 
 const { createFactory } = require("devtools/client/shared/vendor/react");
+const ReactDOM = require("react-dom");
 
 const TextNode = createFactory(
   require("devtools/client/inspector/markup/components/TextNode")
 );
 
-loader.lazyRequireGetter(
-  this,
-  "getAutocompleteMaxWidth",
-  "devtools/client/inspector/markup/utils",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "getLongString",
-  "devtools/client/inspector/shared/utils",
-  true
-);
+const {
+  getAutocompleteMaxWidth,
+  getLongString,
+} = require("devtools/client/inspector/shared/utils");
+
 loader.lazyRequireGetter(
   this,
   "InplaceEditor",
@@ -52,28 +46,21 @@ function TextEditor(container, node, type) {
 }
 
 TextEditor.prototype = {
-  buildMarkup: function(type) {
+  buildMarkup: async function(type) {
     const doc = this.markup.doc;
 
     this.elt = doc.createElement("span");
     this.elt.classList.add("editor", type);
 
-    getLongString(this.node.getNodeValue()).then(value => {
-      this.textNode = this.ReactDOM.render(
-        TextNode({
-          showTextEditor: this.showTextEditor,
-          type,
-          value,
-        }),
-        this.elt
-      );
-    });
-  },
-
-  get ReactDOM() {
-    // Reuse the toolbox's ReactDOM to avoid loading react-dom.js again in the
-    // Inspector's BrowserLoader.
-    return this.container.markup.inspector.ReactDOM;
+    const value = await this.node.getNodeValue();
+    this.textNode = ReactDOM.render(
+      TextNode({
+        showTextEditor: this.showTextEditor,
+        type,
+        value,
+      }),
+      this.elt
+    );
   },
 
   get selected() {
@@ -127,7 +114,7 @@ TextEditor.prototype = {
   },
 
   destroy: function() {
-    this.ReactDOM.unmountComponentAtNode(this.elt);
+    ReactDOM.unmountComponentAtNode(this.elt);
   },
 
   /**

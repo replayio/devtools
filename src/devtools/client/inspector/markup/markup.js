@@ -21,6 +21,7 @@ const MarkupTextContainer = require("devtools/client/inspector/markup/views/text
 const RootContainer = require("devtools/client/inspector/markup/views/root-container");
 const { ThreadFront } = require("protocol/thread");
 const { log } = require("protocol/socket");
+const Highlighter = require("highlighter/highlighter.js");
 
 /*
 loader.lazyRequireGetter(
@@ -700,7 +701,7 @@ MarkupView.prototype = {
     // Hold onto a reference to the highlighted NodeFront so that we can get the correct
     // HighlighterFront when calling _hideBoxModel.
     this._highlightedNodeFront = nodeFront;
-    return nodeFront.highlighterFront
+    return Highlighter
       .highlight(nodeFront)
       .catch(this._handleRejectionIfNotDestroyed);
   },
@@ -719,7 +720,7 @@ MarkupView.prototype = {
       return Promise.resolve();
     }
 
-    return this._highlightedNodeFront.highlighterFront
+    return Highlighter
       .unhighlight(forceHide)
       .catch(this._handleRejectionIfNotDestroyed);
   },
@@ -2161,6 +2162,11 @@ MarkupView.prototype = {
         const fragment = this.doc.createDocumentFragment();
 
         for (const child of children.nodes) {
+          // Ignore text nodes which only contain whitespace.
+          if (child.nodeType == Node.TEXT_NODE &&
+              child.getNodeValue().trim() == "") {
+            continue;
+          }
           const slotted = !isShadowHost && child.isDirectShadowHostChild;
           const childContainer = this.importNode(child, flash, slotted);
           fragment.appendChild(childContainer.elt);
@@ -2236,7 +2242,7 @@ MarkupView.prototype = {
     }
 
     // For now, always fetch all children.
-    const children = await container.node.children(container.node);
+    const children = await container.node.childNodes();
     return { nodes: children, hasFirst: true, hasLast: true };
   },
 
