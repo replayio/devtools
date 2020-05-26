@@ -4,14 +4,25 @@
 
 // Adapter for using server-side highlighter code.
 
+const { BoxModelHighlighter } = require("devtools/server/actors/highlighters/box-model");
+
+let gBoxModelHighlighter;
+
 const Highlighter = {
   highlight(node) {
     if (!node) {
       return;
     }
+    if (!gBoxModelHighlighter) {
+      gBoxModelHighlighter = new BoxModelHighlighter();
+    }
+    gBoxModelHighlighter.show(node);
   },
 
   unhighlight() {
+    if (gBoxModelHighlighter) {
+      gBoxModelHighlighter.hide();
+    }
   },
 };
 
