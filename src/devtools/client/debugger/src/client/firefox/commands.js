@@ -38,6 +38,7 @@ const {
   removeLogpoint,
 } = require("protocol/logpoint");
 const { assert } = require("protocol/utils");
+const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
 
 let targets: { [string]: Target };
 let currentThreadFront: ThreadFront;
@@ -411,23 +412,7 @@ function setEventListenerBreakpoints(ids: string[]) {
 
 // eslint-disable-next-line
 async function getEventListenerBreakpointTypes(): Promise<EventListenerCategoryList> {
-  let categories;
-  try {
-    categories = await currentThreadFront.getAvailableEventBreakpoints();
-
-    if (!Array.isArray(categories)) {
-      // When connecting to older browser that had our placeholder
-      // implementation of the 'getAvailableEventBreakpoints' endpoint, we
-      // actually get back an object with a 'value' property containing
-      // the categories. Since that endpoint wasn't actually backed with a
-      // functional implementation, we just bail here instead of storing the
-      // 'value' property into the categories.
-      categories = null;
-    }
-  } catch (err) {
-    // Event bps aren't supported on this firefox version.
-  }
-  return categories || [];
+  return getAvailableEventBreakpoints();
 }
 
 function pauseGrip(thread: string, func: Function): ObjectFront {
