@@ -63,6 +63,12 @@ module.exports = {
         test: /\.properties$/,
         loader: "raw-loader",
       },
+      {
+        test: /\.svg$/,
+        use: [{
+          loader: "url-loader",
+        }],
+      },
     ],
   },
   externals: [

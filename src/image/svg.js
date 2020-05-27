@@ -6,6 +6,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // Embed the various SVGs used in the devtools here so that we don't need
 // to deal with loading them in webpack.
+//
+// FIXME remove this and integrate with image.js
 
 exports.SVG = {
   NextButton: `

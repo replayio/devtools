@@ -49,6 +49,7 @@ const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 const { InspectorPanel } = require("devtools/client/inspector/panel");
 const Selection = require("devtools/client/framework/selection");
 const SourceMapService = require("devtools/shared/source-map/index");
+const loadImages = require("image/image");
 
 const { LocalizationHelper } = require("shims/l10n");
 
@@ -102,6 +103,7 @@ async function initialize() {
     }
   );
 
+  loadImages();
   setupToolboxResizeEventHandlers();
 }
 
