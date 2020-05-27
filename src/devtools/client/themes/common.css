@@ -31,16 +31,8 @@
   --searchbox-no-match-stroke-color: var(--red-50);
 }
 
-:root[platform="mac"] {
-  --monospace-font-family: Menlo, monospace;
-}
-
-:root[platform="win"] {
-  --monospace-font-family: Consolas, monospace;
-}
-
-:root[platform="linux"] {
-  --monospace-font-family: monospace;
+:root {
+  --monospace-font-family: Menlo, Consolas, monospace;
 }
 
 /**
