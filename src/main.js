@@ -47,6 +47,7 @@ const { DebuggerPanel } = require("devtools/client/debugger/panel");
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 const { InspectorPanel } = require("devtools/client/inspector/panel");
 const Selection = require("devtools/client/framework/selection");
+const SourceMapService = require("devtools/shared/source-map/index");
 
 const { LocalizationHelper } = require("shims/l10n");
 
@@ -91,6 +92,7 @@ async function initialize() {
   sendMessage("Recording.createSession", { recordingId }).then(
     async ({ sessionId }) => {
       ThreadFront.setSessionId(sessionId);
+      ThreadFront.downloadResources(recordingId);
       if (test) {
         await gToolbox.loadTool("jsdebugger");
         window.Test = require("./test/harness");
@@ -147,10 +149,18 @@ const gToolbox = {
     toolbox.classList = name;
   },
 
-  sourceMapService: {
-    getOriginalLocations: (locations) => locations,
-    getOriginalLocation: (location) => location,
+  get sourceMapService() {
+    if (!this._sourceMapService) {
+      this._sourceMapService = SourceMapService;
+      this._sourceMapService.startSourceMapWorker(
+        "src/devtools/shared/source-map/worker.js",
+        // This is relative to the worker itself.
+        "./source-map-worker-assets/"
+      );
+    }
+    return this._sourceMapService;
   },
+
   parserService: {
     hasSyntaxError: (text) => false,
   },
@@ -180,6 +190,6 @@ setTimeout(() => {
   consolePanel.open();
   inspectorPanel.open();
 
-  //gToolbox.selectTool("jsdebugger");
-  gToolbox.selectTool("inspector");
+  gToolbox.selectTool("jsdebugger");
+  //gToolbox.selectTool("inspector");
 }, 0);

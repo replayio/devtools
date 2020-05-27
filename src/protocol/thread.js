@@ -925,6 +925,21 @@ const ThreadFront = {
     }
   },
 
+  async downloadResources(recordingId) {
+    // For now, we have to download source maps in order to use them in the debugger.
+    const { resources } = await sendMessage(
+      "Internal.listRecordingResources",
+      { recordingId }
+    );
+    for (const resource of resources) {
+      sendMessage("Internal.getRecordingResource", { recordingId, resource }).then(
+        ({ contents }) => {
+          gToolbox.sourceMapService.addResource(resource.url, contents);
+        }
+      );
+    }
+  },
+
   timeWarp(point, time, hasFrames) {
     console.log(`TimeWarp ${point}`);
     this.currentPoint = point;

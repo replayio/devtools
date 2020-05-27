@@ -690,6 +690,10 @@ const clearSourceMaps = async () => dispatcher.invoke("clearSourceMaps");
 
 exports.clearSourceMaps = clearSourceMaps;
 
+const addResource = (url, contents) => dispatcher.invoke("addResource", url, contents);
+
+exports.addResource = addResource;
+
 const getOriginalStackFrames = async generatedLocation => dispatcher.invoke("getOriginalStackFrames", generatedLocation);
 
 exports.getOriginalStackFrames = getOriginalStackFrames;

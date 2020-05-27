@@ -482,28 +482,27 @@
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-        function networkRequest(url, opts) {
-          return fetch(url, {
-            cache: opts.loadFromCache ? "default" : "no-cache",
-          }).then((res) => {
-            if (res.status >= 200 && res.status < 300) {
-              if (res.headers.get("Content-Type") === "application/wasm") {
-                return res.arrayBuffer().then((buffer) => ({
-                  content: buffer,
-                  isDwarf: true,
-                }));
-              }
 
-              return res.text().then((text) => ({
-                content: text,
-              }));
-            }
+        const gResources = new Map();
 
-            return Promise.reject(`request failed with status ${res.status}`);
-          });
+        function networkRequest(url) {
+          if (!gResources.has(url)) {
+            let resolve;
+            const promise = new Promise(r => resolve = r);
+            gResources.set(url, { promise, resolve });
+          }
+          return gResources.get(url).promise;
         }
 
-        module.exports = networkRequest;
+        function addResource(url, contents) {
+          if (gResources.has(url)) {
+            gResources.get(url).resolve(contents);
+          } else {
+            gResources.set(url, { promise: contents });
+          }
+        }
+
+        module.exports = { networkRequest, addResource };
 
         /***/
       },
@@ -1344,21 +1343,9 @@
         let mappingsWasm = null;
 
         module.exports = function readWasm() {
-          if (typeof mappingsWasm === "string") {
-            return fetch(mappingsWasm).then((response) =>
+          return fetch("./assets/source-map-mappings.wasm").then((response) =>
               response.arrayBuffer()
             );
-          }
-          if (mappingsWasm instanceof ArrayBuffer) {
-            return Promise.resolve(mappingsWasm);
-          }
-
-          throw new Error(
-            "You must provide the string URL or ArrayBuffer contents " +
-              "of lib/mappings.wasm by calling " +
-              "SourceMapConsumer.initialize({ 'lib/mappings.wasm': ... }) " +
-              "before using SourceMapConsumer"
-          );
         };
 
         module.exports.initialize = (input) => {
@@ -1451,6 +1438,7 @@
           getFileGeneratedRange,
           clearSourceMaps,
           applySourceMap,
+          addResource,
         } = __webpack_require__(391);
 
         const { getOriginalStackFrames } = __webpack_require__(411);
@@ -1478,6 +1466,7 @@
           getFileGeneratedRange,
           applySourceMap,
           clearSourceMaps,
+          addResource,
         });
 
         /***/
@@ -1492,7 +1481,7 @@
          * Source Map Worker
          * @module utils/source-map-worker
          */
-        const { networkRequest } = __webpack_require__(7);
+        const { networkRequest, addResource } = __webpack_require__(7);
 
         const { SourceMapConsumer, SourceMapGenerator } = __webpack_require__(
           60
@@ -1809,17 +1798,7 @@
           let text = map.sourceContentFor(url, true);
 
           if (!text) {
-            try {
-              const response = await networkRequest(url, {
-                loadFromCache: false,
-              });
-              text = response.content;
-            } catch (err) {
-              // Wrapper logic renders a notification about the specific URL that
-              // failed to load, so we include it in the error metadata.
-              err.metadata = { ...err.metadata, url };
-              throw err;
-            }
+            text = await networkRequest(url);
           }
 
           return {
@@ -2032,6 +2011,7 @@
           getFileGeneratedRange,
           applySourceMap,
           clearSourceMaps,
+          addResource,
         };
 
         /***/
@@ -4050,7 +4030,7 @@
 
         function _resolveSourceMapURL(source) {
           let { sourceMapBaseURL, sourceMapURL } = source;
-          sourceMapBaseURL = sourceMapBaseURL || "";
+          sourceMapBaseURL = sourceMapBaseURL || source.url || "";
           sourceMapURL = sourceMapURL || "";
 
           if (!sourceMapBaseURL) {
@@ -4093,23 +4073,19 @@
             generatedSource
           );
 
-          let fetched = await networkRequest(sourceMapURL, {
+          const content = await networkRequest(sourceMapURL, {
             loadFromCache: false,
           });
 
-          if (fetched.isDwarf) {
-            fetched = {
-              content: await convertToJSON(fetched.content),
-            };
-          } // Create the source map and fix it up.
+          // Create the source map and fix it up.
 
-          let map = await createConsumer(fetched.content, baseURL);
+          let map = await createConsumer(content, baseURL);
 
           if (generatedSource.isWasm) {
             map = new WasmRemap(map); // Check if experimental scope info exists.
 
-            if (fetched.content.includes("x-scopes")) {
-              const parsedJSON = JSON.parse(fetched.content);
+            if (content.includes("x-scopes")) {
+              const parsedJSON = JSON.parse(content);
               map.xScopes = parsedJSON["x-scopes"];
             }
           }
@@ -5660,12 +5636,13 @@
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-        const networkRequest = __webpack_require__(13);
+        const { networkRequest, addResource } = __webpack_require__(13);
 
         const workerUtils = __webpack_require__(14);
 
         module.exports = {
           networkRequest,
+          addResource,
           workerUtils,
         };
 
