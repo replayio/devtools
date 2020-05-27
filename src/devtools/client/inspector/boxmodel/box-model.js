@@ -27,6 +27,8 @@ loader.lazyRequireGetter(
   "devtools/client/shared/widgets/tooltip/RulePreviewTooltip"
 );
 
+const Highlighter = require("highlighter/highlighter");
+
 const NUMERIC = /^-?[\d\.]+$/;
 
 /**
@@ -396,9 +398,8 @@ BoxModel.prototype = {
       return;
     }
 
-    const { highlighter } = this.getCurrentInspectorFront();
     const { nodeFront } = this.inspector.selection;
-    highlighter.highlight(nodeFront, options);
+    Highlighter.highlight(nodeFront, options);
   },
 
   /**
@@ -454,13 +455,6 @@ BoxModel.prototype = {
       markup.off("leave", this.onMarkupViewLeave);
       markup.off("node-hover", this.onMarkupViewNodeHover);
     }
-  },
-
-  getCurrentInspectorFront() {
-    if (!this.inspector.selection.nodeFront) {
-      throw new Error(`getCurrentInspectorFront missing nodeFront ${Error().stack}`);
-    }
-    return this.inspector.selection.nodeFront.inspectorFront;
   },
 };
 

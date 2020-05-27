@@ -71,6 +71,8 @@ const {
 const { div } = dom;
 const isMacOS = Services.appinfo.OS === "Darwin";
 
+require("./App.css");
+
 /**
  * Console root Application component.
  */

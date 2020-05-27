@@ -27,7 +27,7 @@ body {
   --object-inspector-hover-background: transparent;
   --attachment-margin-block-end: 3px;
   --primary-toolbar-height: 29px;
-  display: grid;
+  /*display: grid;*/
   /*
     * Here's the design we want in in-line mode
     * +----------------------------------------------+
@@ -58,15 +58,15 @@ body {
      * - Elements inside brackets may not be visible, so we set
      *   rows/columns to "auto" to make them collapse when the element
      *   they contain is hidden.
-    */
+     */
+  /*
   grid-template-areas: "filter-toolbar           sidebar"
                        "filter-toolbar-secondary sidebar"
                        "output-input             sidebar"
                        "reverse-search           sidebar";
   grid-template-rows: var(--primary-toolbar-height) auto 1fr auto;
   grid-template-columns: minmax(200px, 1fr) minmax(0, auto);
-  max-height: 100vh !important;
-  height: 100vh !important;
+  */
   width: 100vw;
   overflow: hidden;
   color: var(--console-output-color);
@@ -89,17 +89,13 @@ body {
 }
 
 .flexible-output-input {
-  display: flex;
-  flex-direction: column;
-  grid-area: output-input;
-  /* Don't take more height than the grid allows to */
-  max-height: 100%;
-  overflow: hidden;
+  position: relative;
+  height: 100%;
 }
 
 .flexible-output-input .webconsole-output {
-  flex-shrink: 100000;
-  overflow-x: hidden;
+  height: calc(100% - 55px);
+  overflow: hidden auto;
 }
 
 .flexible-output-input > .webconsole-output:not(:empty) {
@@ -117,8 +113,8 @@ body {
 }
 
 .webconsole-app .jsterm-input-container {
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
+  height: 20px;
   /* We display the open editor button at the end of the input */
   display: grid;
   grid-template-columns: 1fr auto;

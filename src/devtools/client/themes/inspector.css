@@ -17,7 +17,7 @@ window {
 
 /* The main Inspector panel container. */
 .inspector-responsive-container {
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -38,9 +38,8 @@ window {
 /* Inspector Panel Splitter */
 
 #inspector-splitter-box {
-  height: 100vh;
+  height: 100%;
   width: 100vw;
-  position: fixed;
 }
 
 /* Minimum dimensions for the Inspector splitter areas. */

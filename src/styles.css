@@ -121,12 +121,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   height: 100%;
 }
 
-#toolbox.webconsole #toolbox-content-webconsole {
-  z-index: 10;
+#toolbox.jsdebugger #toolbox-content-webconsole,
+#toolbox.jsdebugger #toolbox-content-inspector {
+  display: none;
 }
 
-#toolbox.jsdebugger #toolbox-content-jsdebugger {
-  z-index: 10;
+#toolbox.webconsole #toolbox-content-jsdebugger,
+#toolbox.webconsole #toolbox-content-inspector {
+  display: none;
+}
+
+#toolbox.inspector #toolbox-content-jsdebugger,
+#toolbox.inspector #toolbox-content-webconsole {
+  display: none;
 }
 
 #toolbox.jsdebugger #toolbox-toolbar-jsdebugger {
