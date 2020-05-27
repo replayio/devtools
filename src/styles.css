@@ -104,13 +104,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   margin-right: 5px;
 }
 
-#toolbox-toolbar-webconsole .toolbar-panel-icon {
-  mask-image: url(/src/devtools/client/themes/images/tool-webconsole.svg);
-  background: var(--theme-toolbar-color);
-}
-
-#toolbox-toolbar-jsdebugger .toolbar-panel-icon {
-  mask-image: url(/src/devtools/client/themes/images/tool-debugger.svg);
+#toolbox-toolbar-webconsole .toolbar-panel-icon,
+#toolbox-toolbar-jsdebugger .toolbar-panel-icon,
+#toolbox-toolbar-inspector .toolbar-panel-icon {
   background: var(--theme-toolbar-color);
 }
 
@@ -122,33 +118,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
 
 #toolbox.jsdebugger #toolbox-content-webconsole,
-#toolbox.jsdebugger #toolbox-content-inspector {
-  display: none;
-}
-
+#toolbox.jsdebugger #toolbox-content-inspector,
 #toolbox.webconsole #toolbox-content-jsdebugger,
-#toolbox.webconsole #toolbox-content-inspector {
-  display: none;
-}
-
+#toolbox.webconsole #toolbox-content-inspector,
 #toolbox.inspector #toolbox-content-jsdebugger,
 #toolbox.inspector #toolbox-content-webconsole {
   display: none;
 }
 
-#toolbox.jsdebugger #toolbox-toolbar-jsdebugger {
+#toolbox.jsdebugger #toolbox-toolbar-jsdebugger,
+#toolbox.webconsole #toolbox-toolbar-webconsole,
+#toolbox.inspector #toolbox-toolbar-inspector {
   color: var(--theme-toolbar-selected-color);
 }
 
-#toolbox.jsdebugger #toolbox-toolbar-jsdebugger .toolbar-panel-icon {
-  background: var(--theme-toolbar-selected-color);
-}
-
-#toolbox.webconsole #toolbox-toolbar-webconsole {
-  color: var(--theme-toolbar-selected-color);
-}
-
-#toolbox.webconsole #toolbox-toolbar-webconsole .toolbar-panel-icon {
+#toolbox.jsdebugger #toolbox-toolbar-jsdebugger .toolbar-panel-icon,
+#toolbox.webconsole #toolbox-toolbar-webconsole .toolbar-panel-icon,
+#toolbox.inspector #toolbox-toolbar-inspector .toolbar-panel-icon {
   background: var(--theme-toolbar-selected-color);
 }
 

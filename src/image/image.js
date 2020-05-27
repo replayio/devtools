@@ -111,6 +111,9 @@ const gMaskImages = {
   ".img.tab": require("devtools/client/debugger/images/tab.svg"),
   ".img.whole-word-match": require("devtools/client/debugger/images/whole-word-match.svg"),
   ".img.worker": require("devtools/client/debugger/images/worker.svg"),
+  "#toolbox-toolbar-webconsole .toolbar-panel-icon": require("devtools/client/themes/images/tool-webconsole.svg"),
+  "#toolbox-toolbar-jsdebugger .toolbar-panel-icon": require("devtools/client/themes/images/tool-debugger.svg"),
+  "#toolbox-toolbar-inspector .toolbar-panel-icon": require("devtools/client/themes/images/tool-inspector.svg"),
 };
 
 const gContentImages = {
