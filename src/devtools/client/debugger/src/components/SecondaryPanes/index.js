@@ -28,7 +28,6 @@ import {
   getSourceFromId,
   getSkipPausing,
   shouldLogEventBreakpoints,
-  getCanRewind,
   getFramesLoading,
 } from "../../selectors";
 
@@ -107,7 +106,6 @@ type Props = {
   workers: ThreadList,
   skipPausing: boolean,
   logEventBreakpoints: boolean,
-  canRewind: boolean,
   source: ?Source,
   toggleAllBreakpoints: typeof actions.toggleAllBreakpoints,
   toggleMapScopes: typeof actions.toggleMapScopes,
@@ -286,27 +284,6 @@ class SecondaryPanes extends Component<Props, State> {
     ];
   }
 
-  getEventButtons() {
-    const { logEventBreakpoints } = this.props;
-    return [
-      <div key="events-buttons">
-        <label
-          className="events-header"
-          title={L10N.getStr("eventlisteners.log.label")}
-          onClick={e => e.stopPropagation()}
-        >
-          <input
-            type="checkbox"
-            checked={logEventBreakpoints ? "checked" : ""}
-            onChange={e => this.props.toggleEventLogging()}
-            onKeyDown={e => e.stopPropagation()}
-          />
-          {L10N.getStr("eventlisteners.log")}
-        </label>
-      </div>,
-    ];
-  }
-
   getWatchItem(): AccordionPaneItem {
     return {
       header: L10N.getStr("watchExpressions.header"),
@@ -396,7 +373,6 @@ class SecondaryPanes extends Component<Props, State> {
     return {
       header: L10N.getStr("eventListenersHeader1"),
       className: "event-listeners-pane",
-      buttons: this.getEventButtons(),
       component: <EventListeners />,
       opened: prefs.eventListenersVisible,
       onToggle: opened => {
@@ -420,7 +396,7 @@ class SecondaryPanes extends Component<Props, State> {
 
   getStartItems(): AccordionPaneItem[] {
     const items: AccordionPaneItem[] = [];
-    const { horizontal, hasFrames, framesLoading, canRewind } = this.props;
+    const { horizontal, hasFrames, framesLoading } = this.props;
 
     if (horizontal) {
       if (features.workers && this.props.workers.length > 0) {
@@ -441,17 +417,21 @@ class SecondaryPanes extends Component<Props, State> {
       items.push(this.getCallStackItem());
     }
 
-    if (features.xhrBreakpoints && !canRewind) {
+    /*
+    if (features.xhrBreakpoints) {
       items.push(this.getXHRItem());
     }
+    */
 
-    if (features.eventListenersBreakpoints && !canRewind) {
+    if (features.eventListenersBreakpoints) {
       items.push(this.getEventListenersItem());
     }
 
-    if (features.domMutationBreakpoints && !canRewind) {
+    /*
+    if (features.domMutationBreakpoints) {
       items.push(this.getDOMMutationsItem());
     }
+    */
 
     return items;
   }
@@ -563,7 +543,6 @@ const mapStateToProps = state => {
     logEventBreakpoints: shouldLogEventBreakpoints(state),
     source:
       selectedFrame && getSourceFromId(state, selectedFrame.location.sourceId),
-    canRewind: getCanRewind(state),
   };
 };
 

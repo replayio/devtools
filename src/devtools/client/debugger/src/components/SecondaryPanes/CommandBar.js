@@ -12,7 +12,6 @@ import classnames from "classnames";
 import { features } from "../../utils/prefs";
 import {
   getIsWaitingOnBreak,
-  getCanRewind,
   getSkipPausing,
   getCurrentThread,
   getThreadContext,
@@ -82,7 +81,6 @@ type Props = {
   cx: ThreadContext,
   isWaitingOnBreak: boolean,
   horizontal: boolean,
-  canRewind: boolean,
   skipPausing: boolean,
   resume: typeof actions.resume,
   stepIn: typeof actions.stepIn,
@@ -133,37 +131,6 @@ class CommandBar extends Component<Props> {
     } else {
       this.props[action](cx);
     }
-  }
-
-  renderStepButtons() {
-    const { cx } = this.props;
-    const className = cx.isPaused ? "active" : "disabled";
-    const isDisabled = !cx.isPaused;
-
-    return [
-      this.renderPauseButton(),
-      debugBtn(
-        () => this.props.stepOver(cx),
-        "stepOver",
-        className,
-        L10N.getFormatStr("stepOverTooltip", formatKey("stepOver")),
-        isDisabled
-      ),
-      debugBtn(
-        () => this.props.stepIn(cx),
-        "stepIn",
-        className,
-        L10N.getFormatStr("stepInTooltip", formatKey("stepIn")),
-        isDisabled
-      ),
-      debugBtn(
-        () => this.props.stepOut(cx),
-        "stepOut",
-        className,
-        L10N.getFormatStr("stepOutTooltip", formatKey("stepOut")),
-        isDisabled
-      ),
-    ];
   }
 
   resume() {
@@ -297,9 +264,7 @@ class CommandBar extends Component<Props> {
           vertical: !this.props.horizontal,
         })}
       >
-        {this.props.canRewind
-          ? this.renderReplayButtons()
-          : this.renderStepButtons()}
+        {this.renderReplayButtons()}
         <div className="filler" />
         {this.renderSkipPausingButton()}
       </div>
@@ -314,7 +279,6 @@ CommandBar.contextTypes = {
 const mapStateToProps = state => ({
   cx: getThreadContext(state),
   isWaitingOnBreak: getIsWaitingOnBreak(state, getCurrentThread(state)),
-  canRewind: getCanRewind(state),
   skipPausing: getSkipPausing(state),
 });
 
