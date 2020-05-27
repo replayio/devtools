@@ -193,6 +193,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   margin: 3px 0px;
 }
 
+.webconsole-app {
+  height: 100%;
+  background-color: white;
+}
+
 @import url("devtools/client/themes/toolbox.css");
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");

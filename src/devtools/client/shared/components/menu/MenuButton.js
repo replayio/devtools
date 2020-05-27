@@ -19,7 +19,7 @@ const { button } = dom;
 
 const isMacOS = Services.appinfo.OS === "Darwin";
 
-//const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const { focusableSelector } = require("devtools/client/shared/focus");
 const { createPortal } = require("devtools/client/shared/vendor/react-dom");
 
@@ -149,10 +149,8 @@ class MenuButton extends PureComponent {
       tooltipProps.id = this.props.menuId;
     }
 
-    /*
     this.tooltip = new HTMLTooltip(window.document, tooltipProps);
     this.tooltip.on("hidden", this.onHidden);
-    */
   }
 
   async resetTooltip() {

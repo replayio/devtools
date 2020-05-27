@@ -116,10 +116,6 @@ body {
   margin: 0;
 }
 
-.webconsole-console-settings-menu-button::before {
-  background-image: url("chrome://devtools/skin/images/settings.svg");
-}
-
 .webconsole-app .jsterm-input-container {
   overflow-y: auto;
   overflow-x: hidden;
@@ -183,10 +179,6 @@ body {
   transform: scaleX(-1);
 }
 
-.webconsole-input-openEditorButton::before {
-  background-image: url("chrome://devtools/skin/images/webconsole/editor.svg");
-}
-
 .webconsole-app .reverse-search {
   grid-area: reverse-search;
   /* Those 2 next lines make it so the element isn't impacting the grid column size, but
@@ -233,10 +225,6 @@ body {
 
 .webconsole-sidebar-toolbar .sidebar-close-button {
   margin: 0;
-}
-
-.sidebar-close-button::before {
-  background-image: url("chrome://devtools/skin/images/close.svg");
 }
 
 .sidebar-contents .object-inspector {
@@ -325,7 +313,6 @@ body {
 
 
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-executeButton::before {
-  content: url("chrome://devtools/skin/images/webconsole/run.svg");
   height: 16px;
   width: 16px;
   -moz-context-properties: fill;
@@ -362,22 +349,15 @@ body {
 }
 
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-history-prevExpressionButton::before {
-  background-image: url("chrome://devtools/skin/images/arrowhead-up.svg");
   background-size: 16px;
 }
 
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-history-nextExpressionButton::before {
-  background-image: url("chrome://devtools/skin/images/arrowhead-down.svg");
   background-size: 16px;
 }
 
 .jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-reverseSearchButton::before {
-  background-image: url("chrome://devtools/skin/images/webconsole/reverse-search.svg");
   background-size: 14px;
-}
-
-.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-closeButton::before {
-  background-image: url("chrome://devtools/skin/images/close.svg");
 }
 
 .jsterm-editor .webconsole-input-openEditorButton {

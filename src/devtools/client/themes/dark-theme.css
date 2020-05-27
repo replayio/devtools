@@ -174,7 +174,8 @@ body {
   /* Inherit platform specific font sizing and styles */
   font-family: inherit;
   font-size: inherit;
-  background: transparent;
+  /* disabled to show the icon for typing into the terminal. */
+  /*background: transparent;*/
 }
 
 .CodeMirror.cm-s-mozilla pre,

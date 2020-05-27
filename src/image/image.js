@@ -11,7 +11,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // There is a webpack loader that is supposed to do this, but getting it to
 // actually work turned out to be more difficult than reimplementing it.
 
-
 const gBackgroundImages = {
   ".img.webpack": require("devtools/client/debugger/images/sources/webpack.svg"),
   ".img.vue": require("devtools/client/debugger/images/sources/vuejs.svg"),
@@ -30,6 +29,35 @@ const gBackgroundImages = {
   ".img.pug": require("devtools/client/debugger/images/sources/pug.svg"),
   ".img.rxjs": require("devtools/client/debugger/images/sources/rxjs.svg"),
   ".img.sencha-extjs": require("devtools/client/debugger/images/sources/sencha-extjs.svg"),
+  ".webconsole-console-settings-menu-button::before": require("devtools/client/themes/images/settings.svg"),
+  ".webconsole-input-openEditorButton::before": require("devtools/client/themes/images/webconsole/editor.svg"),
+  ".sidebar-close-button::before": require("devtools/client/themes/images/close.svg"),
+  ".jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-history-prevExpressionButton::before": require("devtools/client/themes/images/arrowhead-up.svg"),
+  ".jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-history-nextExpressionButton::before": require("devtools/client/themes/images/arrowhead-down.svg"),
+  ".jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-reverseSearchButton::before": require("devtools/client/themes/images/webconsole/reverse-search.svg"),
+  ".jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-closeButton::before": require("devtools/client/themes/images/close.svg"),
+  ".devtools-button.devtools-clear-icon::before": require("devtools/client/themes/images/clear.svg"),
+  ".devtools-searchinput": require("devtools/client/themes/images/search.svg"),
+  ".devtools-filterinput": require("devtools/client/themes/images/filter-small.svg"),
+  ".devtools-searchinput-clear": require("devtools/client/themes/images/search-clear.svg"),
+  ".theme-twisty": require("devtools/client/themes/images/arrow.svg"),
+  ".all-tabs-menu": require("devtools/client/themes/images/dropmarker.svg"),
+  ".message.command > .icon": require("devtools/client/themes/images/webconsole/input.svg"),
+  ".message.result > .icon": require("devtools/client/themes/images/webconsole/return.svg"),
+  ".message.info > .icon": require("devtools/client/themes/images/info-small.svg"),
+  ".message.error > .icon": require("devtools/client/themes/images/error-small.svg"),
+  ".message.warn > .icon": require("devtools/client/themes/images/alert-small.svg"),
+  ".message.navigationMarker > .icon": require("devtools/client/themes/images/webconsole/navigation.svg"),
+  ".message > .icon.logpoint": require("devtools/client/debugger/images/webconsole-logpoint.svg"),
+  //".jsterm-input-container > .CodeMirror": require("devtools/client/themes/images/webconsole/input.svg"),
+  "#split-console-close-button::before": require("devtools/client/themes/images/close.svg"),
+  ".message.network > .collapse-button::before, .message.startGroup > .indent[data-indent='0'] ~ .collapse-button::before, .message.startGroupCollapsed > .indent[data-indent='0'] ~ .collapse-button::before": require("devtools/client/themes/images/arrow-big.svg"),
+};
+
+const gBackgroundNoRepeatImages = {
+  ".collapse-button::before": require("devtools/client/themes/images/arrow.svg"),
+  ".webconsole-app .tree .arrow, .webconsole-app .object-inspector .tree-node .arrow":
+    require("devtools/client/themes/images/arrow.svg"),
 };
 
 const gMaskImages = {
@@ -85,6 +113,16 @@ const gMaskImages = {
   ".img.worker": require("devtools/client/debugger/images/worker.svg"),
 };
 
+const gContentImages = {
+  ".jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-executeButton::before": require("devtools/client/themes/images/webconsole/run.svg"),
+  ".devtools-button.devtools-feature-callout::after": require("devtools/client/themes/images/badge-blue.svg"),
+};
+
+const gListStyleImages = {
+  ".devtools-toolbarbutton.devtools-clear-icon": require("devtools/client/themes/images/clear.svg"),
+  ".devtools-option-toolbarbutton": require("devtools/client/themes/images/settings.svg"),
+};
+
 function loadImages() {
   const style = document.createElement("style");
   document.head.appendChild(style);
@@ -94,10 +132,21 @@ function loadImages() {
     sheet.insertRule(`${selector} { background-image: url(${url.default}) }`);
   }
 
+  for (const [ selector, url ] of Object.entries(gBackgroundNoRepeatImages)) {
+    sheet.insertRule(`${selector} { background: url(${url.default}) no-repeat center }`);
+  }
+
   for (const [ selector, url ] of Object.entries(gMaskImages)) {
-    //sheet.insertRule(`${selector} { background-image: url(${url.default}) }`);
-    sheet.insertRule(`${selector} { -webkit-mask-image: url(${url.default}) }`);
     sheet.insertRule(`${selector} { mask-image: url(${url.default}) }`);
+    sheet.insertRule(`${selector} { -webkit-mask-image: url(${url.default}) }`);
+  }
+
+  for (const [ selector, url ] of Object.entries(gContentImages)) {
+    sheet.insertRule(`${selector} { content: url(${url.default}) }`);
+  }
+
+  for (const [ selector, url ] of Object.entries(gListStyleImages)) {
+    sheet.insertRule(`${selector} { list-style-image: url(${url.default}) }`);
   }
 }
 

@@ -1366,11 +1366,13 @@ class JSTerm extends Component {
           this.node = node;
         },
       },
+      /*
       dom.div(
         { className: "webconsole-input-buttons" },
         this.renderEvaluationSelector(),
         this.renderOpenEditorButton()
       ),
+      */
       this.renderEditorOnboarding()
     );
   }
