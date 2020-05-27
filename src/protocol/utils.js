@@ -49,6 +49,25 @@ function defer() {
   return { promise, resolve, reject };
 }
 
+function throttle(callback, time) {
+  let scheduled = false;
+  return () => {
+    if (scheduled) {
+      return;
+    }
+    scheduled = true;
+    setTimeout(() => {
+      scheduled = false;
+      callback();
+    }, time);
+  };
+}
+
+function clamp(value, min, max) {
+  assert(min < max);
+  return Math.max(min, Math.min(max, value));
+}
+
 function assert(v) {
   if (!v) {
     console.error("Assertion failed!");
@@ -92,6 +111,8 @@ const DisallowEverythingProxyHandler = {
 module.exports = {
   makeInfallible,
   defer,
+  throttle,
+  clamp,
   assert,
   binarySearch,
   DisallowEverythingProxyHandler,

@@ -43,6 +43,7 @@ const WebReplayPlayer = require("timeline/WebReplayPlayer");
 const { initSocket, sendMessage } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const { paintMessage } = require("protocol/graphics");
+const { throttle, clamp } = require("protocol/utils");
 const { DebuggerPanel } = require("devtools/client/debugger/panel");
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 const { InspectorPanel } = require("devtools/client/inspector/panel");
@@ -100,6 +101,8 @@ async function initialize() {
       }
     }
   );
+
+  setupToolboxResizeEventHandlers();
 }
 
 const gToolbox = {
@@ -193,3 +196,46 @@ setTimeout(() => {
   gToolbox.selectTool("jsdebugger");
   //gToolbox.selectTool("inspector");
 }, 0);
+
+function setupToolboxResizeEventHandlers() {
+  const toolbox = document.getElementById("toolbox");
+
+  let clientY;
+  const updateToolbox = throttle(() => {
+    const percent = 100 * clientY / window.innerHeight;
+    toolbox.style.top = `${percent}%`;
+    toolbox.style.height = `${100-percent}%`;
+  }, 100);
+
+  let dragging = false;
+
+  const border = document.getElementById("toolbox-border");
+  const minimumHeight = 40;
+
+  border.addEventListener("mousedown", () => {
+    if (dragging) {
+      return;
+    }
+    dragging = true;
+
+    function onMouseMove(e) {
+      clientY = clamp(e.clientY, 0, window.innerHeight - minimumHeight);
+      updateToolbox();
+    }
+
+    function onMouseUp(e) {
+      clientY = clamp(e.clientY, 0, window.innerHeight - minimumHeight);
+      updateToolbox();
+
+      dragging = false;
+
+      document.body.style.cursor = "default";
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    }
+
+    document.body.style.cursor = "row-resize";
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  });
+}

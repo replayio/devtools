@@ -50,6 +50,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   --toolbox-background: #f9f9fa;
 }
 
+#toolbox-border {
+  height: 5px;
+  background: var(--theme-toolbar-background);
+  cursor: row-resize;
+}
+
 #toolbox-timeline {
   height: 35px;
   background: var(--theme-toolbar-background);
