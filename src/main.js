@@ -105,6 +105,8 @@ async function initialize() {
 
   loadImages();
   setupToolboxResizeEventHandlers();
+
+  document.body.addEventListener("contextmenu", e => e.preventDefault());
 }
 
 const gToolbox = {

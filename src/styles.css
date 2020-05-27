@@ -156,6 +156,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   height: 100%;
 }
 
+.context-menu {
+  background: var(--theme-toolbar-background);
+  box-shadow: 3px 3px 5px gray;
+  border: solid 1px gray;
+  border-radius: 5px;
+  z-index: 100;
+}
+
+.context-menu-item {
+  font-size: small;
+  padding: 1px 10px 1px 10px;
+  cursor: default;
+}
+
+.context-menu-item:first-child {
+  margin-top: 4px;
+}
+
+.context-menu-item:last-child {
+  margin-bottom: 4px;
+}
+
+.context-menu-item.disabled {
+  color: lightgray;
+}
+
+.context-menu-item:not(.disabled):hover {
+  background-color: #0a84ff;
+  color: white;
+}
+
+.context-menu-separator {
+  height: 1px;
+  background-color: gray;
+  margin: 3px 0px;
+}
+
 @import url("devtools/client/themes/toolbox.css");
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
