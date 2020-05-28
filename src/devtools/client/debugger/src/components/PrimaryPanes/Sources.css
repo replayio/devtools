@@ -77,8 +77,7 @@
   margin-inline-end: 4px;
 }
 
-.sources-list .tree .focused .img,
-.sources-list .tree .focused .label {
+.sources-list .tree .focused .img {
   background-color: #ffffff;
 }
 
