@@ -115,6 +115,7 @@ const gMaskImages = {
   "#toolbox-toolbar-webconsole .toolbar-panel-icon": require("devtools/client/themes/images/tool-webconsole.svg"),
   "#toolbox-toolbar-jsdebugger .toolbar-panel-icon": require("devtools/client/themes/images/tool-debugger.svg"),
   "#toolbox-toolbar-inspector .toolbar-panel-icon": require("devtools/client/themes/images/tool-inspector.svg"),
+  ".tree-node button.arrow": require("devtools/client/debugger/images/arrow.svg"),
 };
 
 const gContentImages = {
