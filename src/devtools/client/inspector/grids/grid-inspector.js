@@ -111,15 +111,6 @@ class GridInspector {
       return;
     }
 
-    try {
-      // TODO: Call this again whenever targets are added or removed.
-      this.layoutFronts = await this.getLayoutFronts();
-    } catch (e) {
-      // This call might fail if called asynchrously after the toolbox is finished
-      // closing.
-      return;
-    }
-
     if (flags.testing) {
       // In tests, we start listening immediately to avoid having to simulate a mousemove.
       this.highlighters.on("grid-highlighter-hidden", this.onHighlighterHidden);
@@ -145,23 +136,6 @@ class GridInspector {
     this.inspector.on("new-root", this.onNavigate);
 
     this.onSidebarSelect();
-  }
-
-  /**
-   * Get the LayoutActor fronts for all interesting targets where we have inspectors.
-   *
-   * @return {Array} The list of LayoutActor fronts
-   */
-  async getLayoutFronts() {
-    const inspectorFronts = await this.inspector.getAllInspectorFronts();
-
-    const layoutFronts = [];
-    for (const { walker } of inspectorFronts) {
-      const layoutFront = await walker.getLayoutInspector();
-      layoutFronts.push(layoutFront);
-    }
-
-    return layoutFronts;
   }
 
   /**

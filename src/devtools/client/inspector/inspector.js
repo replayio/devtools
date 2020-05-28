@@ -247,20 +247,6 @@ Inspector.prototype = {
     return this._toolbox;
   },
 
-  /**
-   * Get the list of InspectorFront instances that correspond to all of the inspectable
-   * targets in remote frames nested within the document inspected here, as well as the
-   * current InspectorFront instance.
-   *
-   * @return {Array} The list of InspectorFront instances.
-   */
-  async getAllInspectorFronts() {
-    return this.toolbox.targetList.getAllFronts(
-      this.toolbox.targetList.TYPES.FRAME,
-      "inspector"
-    );
-  },
-
   get highlighters() {
     if (!this._highlighters) {
       this._highlighters = new HighlightersOverlay(this);
@@ -425,7 +411,7 @@ Inspector.prototype = {
     };
 
     if (hasNavigated()) {
-      throw new Error("navigated");
+      return null;
     }
 
     this._showMarkupLoading();
@@ -437,11 +423,11 @@ Inspector.prototype = {
     console.log("Inspector getDefaultNodeForSelection HasRoot");
 
     if (hasNavigated()) {
-      throw new Error("navigated");
+      return null;
     }
 
     if (!rootNode) {
-      throw new Error("No root node");
+      return null;
     }
 
     let selectedNode;
@@ -452,7 +438,7 @@ Inspector.prototype = {
     }
 
     if (hasNavigated()) {
-      throw new Error("navigated");
+      return null;
     }
 
     if (!selectedNode) {
@@ -461,7 +447,7 @@ Inspector.prototype = {
       console.log("Inspector getDefaultNodeForSelection GotBody");
 
       if (hasNavigated()) {
-        throw new Error("navigated");
+        return null;
       }
 
       if (!selectedNode) {
@@ -470,7 +456,7 @@ Inspector.prototype = {
         console.log("Inspector getDefaultNodeForSelection GotDocument");
 
         if (hasNavigated()) {
-          throw new Error("navigated");
+          return null;
         }
       }
     }
@@ -1286,7 +1272,7 @@ Inspector.prototype = {
   /**
    * Reset the inspector on new root mutation.
    */
-  onNewRoot: function() {
+  async onNewRoot() {
     // Don't reload the inspector when not selected.
     if (this.toolbox && this.toolbox.currentTool != "inspector") {
       this._hasNewRoot = true;
@@ -1298,41 +1284,27 @@ Inspector.prototype = {
     this.selection.setNodeFront(null);
     this._destroyMarkup();
 
-    const onNodeSelected = async defaultNode => {
+    const selectionId = Math.random();
+    this._pendingSelection = selectionId;
+
+    const defaultNode = await this._getDefaultNodeForSelection();
+
+    // Cancel this promise resolution as a new one had
+    // been queued up.
+    if (this._pendingSelection != selectionId) {
+      return;
+    }
+
+    if (defaultNode) {
       await defaultNode.ensureParentsLoaded();
-
-      // Cancel this promise resolution as a new one had
-      // been queued up.
-      if (this._pendingSelection != onNodeSelected) {
+      if (this._pendingSelection != selectionId) {
         return;
       }
-
-      this._pendingSelection = null;
       this.selection.setNodeFront(defaultNode, { reason: "navigateaway" });
+    }
 
-      this.onMarkupLoaded();
-
-      // Setup the toolbar again, since its content may depend on the current document.
-      this.setupToolbar();
-    };
-    this._pendingSelection = onNodeSelected;
-
-    const onNoSelectedNode = async err => {
-      if (this._pendingSelection != onNodeSelected) {
-        return;
-      }
-
-      console.error("NoSelectedNode", err);
-
-      this._pendingSelection = null;
-
-      this.onMarkupLoaded();
-    };
-
-    this._getDefaultNodeForSelection().then(
-      onNodeSelected,
-      onNoSelectedNode,
-    );
+    this._pendingSelection = null;
+    this.onMarkupLoaded();
   },
 
   handleToolSelected(id) {
@@ -1389,31 +1361,10 @@ Inspector.prototype = {
     this.emit("new-root");
   },
 
-  async onNoMarkup() {
-    const loading = this._markupFrame.contentDocument.getElementById("loading");
-    loading.hidden = true;
-    log(`Inspector HideMarkupLoading`);
-
-    if (this.currentTarget.isReplayEnabled()) {
-      const dbg = await this._getDebugger();
-
-      const button = this._markupFrame.contentDocument.getElementById("pause-button");
-      button.hidden = false;
-      button.addEventListener("click", () => dbg.interrupt());
-    }
-  },
-
   _showMarkupLoading() {
-    try {
-      const loading = this._markupFrame.contentDocument.getElementById("loading");
-      loading.hidden = false;
-      log(`Inspector ShowMarkupLoading`);
-
-      const button = this._markupFrame.contentDocument.getElementById("pause-button");
-      button.hidden = true;
-    } catch (e) {
-      // The markup frame might still be loading.
-    }
+    const loading = document.getElementById("markup-loading");
+    loading.hidden = false;
+    log(`Inspector ShowMarkupLoading`);
   },
 
   _selectionCssSelectors: null,
@@ -1684,7 +1635,6 @@ Inspector.prototype = {
     this._is3PaneModeChromeEnabled = null;
     this._is3PaneModeEnabled = null;
     this._markupBox = null;
-    this._markupFrame = null;
     this._target = null;
     this._toolbox = null;
     this.breadcrumbs = null;
