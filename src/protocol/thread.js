@@ -440,7 +440,7 @@ ValueFront.prototype = {
       // See ObjectInspectorItem.js
       return [{
         name: "Loading…",
-        contents: new ValueFront(null, { unavailable: true }),
+        contents: createUnavailableValueFront(),
       }];
     }
     const previewValues = this.previewValueMap();
@@ -483,6 +483,10 @@ function createPrimitiveValueFront(value) {
 
 function createPseudoValueFront(elements) {
   return new ValueFront(null, undefined, elements);
+}
+
+function createUnavailableValueFront() {
+  return new ValueFront(null, { unavailable: true });
 }
 
 // Manages interaction with a DOM node.
@@ -874,6 +878,15 @@ const ThreadFront = {
 
   eventListeners: new Map(),
 
+  // Points which will be reached when stepping in various directions from a point.
+  resumeTargets: new Map(),
+
+  // Epoch which invalidates step targets when advanced.
+  resumeTargetEpoch: 0,
+
+  // Pauses for each point we have stopped or might stop at.
+  allPauses: new Map(),
+
   on(name, handler) {
     if (this.eventListeners.has(name)) {
       this.eventListeners.get(name).push(handler);
@@ -946,6 +959,8 @@ const ThreadFront = {
     this.currentPointHasFrames = hasFrames;
     this.currentPause = null;
     this.emit("paused", { point, time });
+
+    this._precacheResumeTargets();
   },
 
   async findScripts(onScript) {
@@ -997,11 +1012,13 @@ const ThreadFront = {
   async setBreakpoint(scriptId, line, column, condition) {
     const location = { scriptId, line, column };
     try {
-      const { breakpointId } = await sendMessage(
+      const promise = sendMessage(
         "Debugger.setBreakpoint",
         { location, condition },
         this.sessionId
       );
+      this._invalidateResumeTargets();
+      const { breakpointId } = await promise;
       if (breakpointId) {
         this.breakpoints.set(breakpointId, { location });
       }
@@ -1024,7 +1041,8 @@ const ThreadFront = {
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
       if (location.scriptId == scriptId && location.line == line && location.column == column) {
         this.breakpoints.delete(breakpointId);
-        await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
+        sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
+        this._invalidateResumeTargets();
       }
     }
   },
@@ -1035,10 +1053,20 @@ const ThreadFront = {
     }) || []);
   },
 
-  ensurePause() {
+  ensurePause(point) {
+    let pause = this.allPauses.get(point);
+    if (pause) {
+      return pause;
+    }
+    pause = new Pause(this.sessionId);
+    pause.create(point);
+    this.allPauses.set(point, pause);
+    return pause;
+  },
+
+  ensureCurrentPause() {
     if (!this.currentPause) {
-      this.currentPause = new Pause(this.sessionId);
-      this.currentPause.create(this.currentPoint);
+      this.currentPause = this.ensurePause(this.currentPoint);
     }
   },
 
@@ -1047,7 +1075,7 @@ const ThreadFront = {
       return [];
     }
 
-    this.ensurePause();
+    this.ensureCurrentPause();
     return this.currentPause.getFrames();
   },
 
@@ -1056,6 +1084,7 @@ const ThreadFront = {
   },
 
   async evaluateInFrame(frameId, text) {
+    this.ensureCurrentPause();
     const rv = await this.currentPause.evaluateInFrame(frameId, text);
     if (rv.returned) {
       rv.returned = new ValueFront(this.currentPause, rv.returned);
@@ -1065,7 +1094,90 @@ const ThreadFront = {
     return rv;
   },
 
-  _resumeOperation(command) {
+  // Preload step target information and pause data for nearby points.
+  async _precacheResumeTargets() {
+    if (!this.currentPointHasFrames) {
+      return;
+    }
+
+    const point = this.currentPoint;
+    const epoch = this.resumeTargetEpoch;
+
+    // Each step command, and the transitive steps to queue up after that step is known.
+    const stepCommands = [
+      {
+        command: "Debugger.findReverseStepOverTarget",
+        transitive: [ "Debugger.findReverseStepOverTarget", "Debugger.findStepInTarget" ],
+      },
+      {
+        command: "Debugger.findStepOverTarget",
+        transitive: [ "Debugger.findStepOverTarget", "Debugger.findStepInTarget" ],
+      },
+      {
+        command: "Debugger.findStepInTarget",
+        transitive: [ "Debugger.findStepOutTarget", "Debugger.findStepInTarget" ],
+      },
+      {
+        command: "Debugger.findStepOutTarget",
+        transitive: [
+          "Debugger.findReverseStepOverTarget",
+          "Debugger.findStepOverTarget",
+          "Debugger.findStepInTarget",
+          "Debugger.findStepOutTarget",
+        ],
+      },
+    ];
+
+    stepCommands.forEach(async ({ command, transitive }) => {
+      const target = await this._findResumeTarget(point, command);
+      if (epoch != this.resumeTargetEpoch) {
+        // Breakpoints / blackboxing / etc. has changed and this step target is
+        // no longer valid.
+        return;
+      }
+
+      // Precache pause data for the point.
+      this.ensurePause(target.point);
+
+      // If the current point hasn't changed, look for transitive resume targets.
+      if (point != this.currentPoint) {
+        return;
+      }
+
+      transitive.forEach(async command => {
+        const transitiveTarget = await this._findResumeTarget(target.point, command);
+        if (epoch != this.resumeTargetEpoch || point != this.currentPoint) {
+          return;
+        }
+        this.ensurePause(transitiveTarget.point);
+      });
+    });
+  },
+
+  _invalidateResumeTargets() {
+    this.resumeTargets.clear();
+    this.resumeTargetEpoch++;
+    this._precacheResumeTargets();
+  },
+
+  async _findResumeTarget(point, command) {
+    // Check already-known resume targets.
+    const key = `${point}:${command}`;
+    const knownTarget = this.resumeTargets.get(key);
+    if (knownTarget) {
+      return knownTarget;
+    }
+
+    const epoch = this.resumeTargetEpoch;
+    const { target } = await sendMessage(command, { point }, this.sessionId);
+    if (epoch == this.resumeTargetEpoch) {
+      this.resumeTargets.set(key, target);
+    }
+
+    return target;
+  },
+
+  async _resumeOperation(command) {
     let resumeEmitted = false;
     let resumeTarget = null;
 
@@ -1081,16 +1193,11 @@ const ThreadFront = {
         setTimeout(warpToTarget, 0);
       }
     }, 0);
-    sendMessage(
-      command,
-      { point: this.currentPoint },
-      this.sessionId
-    ).then(({ target }) => {
-      resumeTarget = target;
-      if (resumeEmitted) {
-        warpToTarget();
-      }
-    });
+    const target = await this._findResumeTarget(this.currentPoint, command);
+    resumeTarget = target;
+    if (resumeEmitted) {
+      warpToTarget();
+    }
   },
 
   rewind() { this._resumeOperation("Debugger.findRewindTarget"); },
@@ -1101,19 +1208,21 @@ const ThreadFront = {
   stepOut() { this._resumeOperation("Debugger.findStepOutTarget"); },
 
   blackbox(scriptId, begin, end) {
-    return sendMessage(
+    sendMessage(
       "Debugger.blackboxScript",
       { scriptId, begin, end },
       this.sessionId
     );
+    this._invalidateResumeTargets();
   },
 
   unblackbox(scriptId, begin, end) {
-    return sendMessage(
+    sendMessage(
       "Debugger.unblackboxScript",
       { scriptId, begin, end },
       this.sessionId
     );
+    this._invalidateResumeTargets();
   },
 
   async findConsoleMessages(onConsoleMessage) {
@@ -1136,7 +1245,7 @@ const ThreadFront = {
     if (!this.sessionId) {
       return null;
     }
-    this.ensurePause();
+    this.ensureCurrentPause();
     const pause = this.currentPause;
     await this.currentPause.loadDocument();
     return pause == this.currentPause ? this.getKnownRootDOMNode() : null;
@@ -1152,4 +1261,5 @@ module.exports = {
   ThreadFront,
   ValueFront,
   createPrimitiveValueFront,
+  createUnavailableValueFront,
 };
