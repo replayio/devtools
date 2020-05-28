@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const { addEventListener, sendMessage } = require("./socket");
 const { assert } = require("./utils");
-const { ThreadFront } = require("./thread");
+const { ThreadFront, ValueFront, Pause } = require("./thread");
 
 // Map log group ID to information about the logpoint.
 const gLogpoints = new Map();
@@ -60,9 +60,12 @@ addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
   }
 
   if (LogpointHandlers.onResult) {
-    results.forEach(({ key, value: { time, location, values } }) => {
-      const pause = null; // FIXME
-      LogpointHandlers.onResult(logGroupId, key, time, location, pause, values);
+    results.forEach(({ key, value: { time, pauseId, location, values, datas } }) => {
+      const pause = new Pause(ThreadFront.sessionId);
+      pause.instantiate(pauseId);
+      datas.forEach(d => pause.addData(d));
+      const valueFronts = values.map(v => new ValueFront(pause, v));
+      LogpointHandlers.onResult(logGroupId, key, time, location, pause, valueFronts);
     });
   }
 });
@@ -118,6 +121,7 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
       { frameId, bindings, expression: "[" + ${JSON.stringify(text)} + "]" }
     );
     const values = [];
+    const datas = [result.data];
     if (result.exception) {
       values.push(result.exception);
     } else {
@@ -126,6 +130,7 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
         "Pause.getObjectProperty",
         { object, name: "length" }
       );
+      datas.push(lengthResult.data);
       const length = lengthResult.returned.value;
       for (let i = 0; i < length; i++) {
         const { result: elementResult } = sendCommand(
@@ -133,9 +138,10 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
           { object, name: i.toString() }
         );
         values.push(elementResult.returned);
+        datas.push(elementResult.data);
       }
     }
-    return [{ key: point, value: { time, pauseId, location, values } }];
+    return [{ key: point, value: { time, pauseId, location, values, datas } }];
   `;
 
   const waiter = sendMessage("Analysis.createAnalysis", { mapper, effectful: true });

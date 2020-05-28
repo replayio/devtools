@@ -168,7 +168,7 @@ class ObjectInspector extends Component<Props> {
   getNodeKey(item: Node): string {
     return item.path && typeof item.path.toString === "function"
       ? item.path.toString()
-      : JSON.stringify(item);
+      : item.contents.id();
   }
 
   isNodeExpandable(item: Node): boolean {

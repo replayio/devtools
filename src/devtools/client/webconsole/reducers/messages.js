@@ -50,9 +50,6 @@ const MessageState = overrides =>
         currentGroup: null,
         // This group handles "warning groups" (Content Blocking, CORS, CSP, …)
         warningGroupsById: new Map(),
-        // Array of fronts to release (i.e. fronts logged in removed messages).
-        // This array *should not* be consumed by any UI component.
-        frontsToRelease: [],
         // Map logpointId:pointString to messages.
         logpointMessages: new Map(),
         // Set of logpoint IDs that have been removed
@@ -80,7 +77,6 @@ function cloneState(state) {
     messagesPayloadById: new Map(state.messagesPayloadById),
     groupsById: new Map(state.groupsById),
     currentGroup: state.currentGroup,
-    frontsToRelease: [...state.frontsToRelease],
     networkMessagesUpdateById: { ...state.networkMessagesUpdateById },
     logpointMessages: new Map(state.logpointMessages),
     removedLogpointIds: new Set(state.removedLogpointIds),
@@ -373,12 +369,6 @@ function messages(
 
     case constants.MESSAGES_CLEAR:
       return MessageState({
-        // Store all actors from removed messages. This array is used by
-        // `releaseActorsEnhancer` to release all of those backend actors.
-        frontsToRelease: [...state.messagesById.values()].reduce((res, msg) => {
-          res.push(...getAllFrontsInMessage(msg));
-          return res;
-        }, []),
       });
 
     case constants.PRIVATE_MESSAGES_CLEAR: {
@@ -553,12 +543,6 @@ function messages(
       };
     }
     */
-
-    case constants.FRONTS_TO_RELEASE_CLEAR:
-      return {
-        ...state,
-        frontsToRelease: [],
-      };
 
     case constants.WARNING_GROUPS_TOGGLE:
       // There's no warningGroups, and the pref was set to false,
@@ -793,23 +777,16 @@ function removeMessagesFromState(state, removedMessagesIds) {
     return state;
   }
 
-  const frontsToRelease = [];
   const visibleMessages = [...state.visibleMessages];
   removedMessagesIds.forEach(id => {
     const index = visibleMessages.indexOf(id);
     if (index > -1) {
       visibleMessages.splice(index, 1);
     }
-
-    frontsToRelease.push(...getAllFrontsInMessage(state.messagesById.get(id)));
   });
 
   if (state.visibleMessages.length > visibleMessages.length) {
     state.visibleMessages = visibleMessages;
-  }
-
-  if (frontsToRelease.length > 0) {
-    state.frontsToRelease = state.frontsToRelease.concat(frontsToRelease);
   }
 
   const isInRemovedId = id => removedMessagesIds.includes(id);
@@ -863,34 +840,6 @@ function removeMessagesFromState(state, removedMessagesIds) {
   }
 
   return state;
-}
-
-/**
- * Get an array of all the fronts logged in a specific message.
- *
- * @param {Message} message: The message to get actors from.
- * @return {Array<ObjectFront|LongStringFront>} An array containing all the fronts logged
- *                                              in a message.
- */
-function getAllFrontsInMessage(message) {
-  const { parameters, messageText } = message;
-
-  const fronts = [];
-  const isFront = p => p && typeof p.release === "function";
-
-  if (Array.isArray(parameters)) {
-    message.parameters.forEach(parameter => {
-      if (isFront(parameter)) {
-        fronts.push(parameter);
-      }
-    });
-  }
-
-  if (isFront(messageText)) {
-    fronts.push(messageText);
-  }
-
-  return fronts;
 }
 
 /**

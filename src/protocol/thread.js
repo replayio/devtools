@@ -52,7 +52,7 @@ const {
 // Information about a protocol pause.
 function Pause(sessionId) {
   this.sessionId = sessionId;
-  this.pauseID = null;
+  this.pauseId = null;
 
   this.createWaiter = null;
 
@@ -80,7 +80,7 @@ Pause.prototype = {
       );
   },
 
-  instantiate(pauseId, data) {
+  instantiate(pauseId, data = {}) {
     assert(!this.createWaiter);
     assert(!this.pauseId);
     this.pauseId = pauseId;
@@ -1260,6 +1260,7 @@ const ThreadFront = {
 module.exports = {
   ThreadFront,
   ValueFront,
+  Pause,
   createPrimitiveValueFront,
   createUnavailableValueFront,
 };

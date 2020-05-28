@@ -31,7 +31,7 @@ import type {
   EventListenerActiveList,
 } from "../../actions/types";
 
-const { ThreadFront } = require("protocol/thread");
+const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const {
   setLogpoint,
   setLogpointByURL,
@@ -271,12 +271,12 @@ async function evaluate(
   const threadFront = lookupThreadFront(thread);
   const { returned, exception, failed } = await threadFront.evaluateInFrame(frameId, script);
   if (failed) {
-    return { exception: "Evaluation failed" };
+    return { exception: createPrimitiveValueFront("Evaluation failed") };
   }
   if (returned) {
     return { result: returned };
   }
-  return { exception: exception };
+  return { exception };
 }
 
 async function autocomplete(

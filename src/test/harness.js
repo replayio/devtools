@@ -252,7 +252,7 @@ async function toggleBlackboxSelectedSource() {
 }
 
 function findMessages(text, extraSelector = "") {
-  const messages = document.querySelectorAll(`.message${extraSelector}`);
+  const messages = document.querySelectorAll(`.webconsole-output .message${extraSelector}`);
   return [...messages].filter(msg => msg.innerText.includes(text));
 }
 
