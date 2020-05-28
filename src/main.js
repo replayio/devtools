@@ -63,8 +63,6 @@ window.PrefObserver.prototype = {
   off: () => { },
 };
 
-window.dump = (msg) => console.log(msg)
-
 const url = new URL(window.location.href);
 
 const recordingId = url.searchParams.get("id");
@@ -72,6 +70,7 @@ const dispatch = url.searchParams.get("dispatch");
 const test = url.searchParams.get("test");
 
 if (test) {
+  localStorage.clear();
   require("devtools-modules").asyncStorage.clear();
 }
 
