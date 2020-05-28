@@ -19,7 +19,6 @@ import {
   getThreadContext,
 } from "../../selectors";
 import { getValue } from "../../utils/expressions";
-import { getGrip, getFront } from "../../utils/evaluation-result";
 
 import { CloseButton } from "../shared/Button";
 import { debounce } from "lodash";
@@ -247,19 +246,11 @@ class Expressions extends Component<Props, State> {
     }
 
     let value = getValue(expression);
-    let front = null;
-    if (value && value.unavailable !== true) {
-      value = getGrip(value);
-      front = getFront(value);
-    }
 
     const root = {
       name: expression.input,
       path: input,
-      contents: {
-        value,
-        front,
-      },
+      contents: value,
     };
 
     return (

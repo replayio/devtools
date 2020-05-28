@@ -7,8 +7,9 @@
 import { correctIndentation } from "./indentation";
 import { getGrip } from "./evaluation-result";
 import type { Expression } from "../types";
+const { createUnavailableValueFront } = require("protocol/thread");
 
-const UNAVAILABLE_GRIP = { unavailable: true };
+const UNAVAILABLE_GRIP = createUnavailableValueFront();
 
 /*
  * wrap the expression input in a try/catch so that it can be safely
@@ -52,20 +53,5 @@ export function getValue(expression: Expression) {
     return exception;
   }
 
-  const valueGrip = getGrip(value.exception || value.result);
-
-  if (
-    valueGrip &&
-    typeof valueGrip === "object" &&
-    valueGrip.class == "Error"
-  ) {
-    if (isUnavailable(valueGrip)) {
-      return UNAVAILABLE_GRIP;
-    }
-
-    const { name, message } = valueGrip.preview;
-    return `${name}: ${message}`;
-  }
-
-  return valueGrip;
+  return value.exception || value.result;
 }
