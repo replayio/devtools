@@ -14,7 +14,8 @@ const {
   objectInspector,
 } = Reps;
 
-const { ObjectInspector, utils } = objectInspector;
+const { utils } = objectInspector;
+const ObjectInspector = objectInspector.ObjectInspector.default;
 
 const {
   node: { nodeIsPrimitive, nodeIsFunction, nodeIsObject },

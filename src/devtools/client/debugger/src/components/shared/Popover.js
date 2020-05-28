@@ -82,7 +82,8 @@ class Popover extends Component<Props, State> {
 
   onTimeout = () => {
     const isHoveredOnGap = this.$gap && window.elementIsHovered(this.$gap);
-    const isHoveredOnPopover = this.$popover && window.elementIsHovered(this.$popover);
+    const isHoveredOnPopover =
+      this.$popoverPreview && window.elementIsHovered(this.$popoverPreview);
     const isHoveredOnTooltip = this.$tooltip && window.elementIsHovered(this.$tooltip);
     const isHoveredOnTarget = window.elementIsHovered(this.props.target);
 
@@ -302,7 +303,10 @@ class Popover extends Component<Props, State> {
           up: orientation === "up",
         })}
         style={{ top, left }}
-        ref={c => (this.$popover = c)}
+        ref={c => {
+          this.$popover = c;
+          this.$popoverPreview = c && c.querySelector(".preview-popup");
+        }}
       >
         {arrow}
         {this.getChildren()}
