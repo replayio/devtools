@@ -82,6 +82,10 @@
   background-color: #ffffff;
 }
 
+.sources-list .tree .focused .label {
+  color: #fff;
+}
+
 /* Use the same width as .img.arrow */
 .sources-list .tree .img.no-arrow {
   width: 10px;
@@ -106,7 +110,6 @@
   display: inline-block;
   line-height: 16px;
   color: var(--theme-body-color);
-
 }
 
 .no-sources-message {
