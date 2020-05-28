@@ -367,6 +367,17 @@ async function executeInConsole(text) {
   gToolbox._panels.webconsole.hud.evaluateInput(text);
 }
 
+async function checkInlinePreview(name, text) {
+  await waitUntil(() => {
+    const previews = document.querySelectorAll(".inline-preview-outer");
+    return [...previews].some(p => {
+      const label = p.querySelector(".inline-preview-label");
+      const value = p.querySelector(".inline-preview-value");
+      return label.innerText.includes(name) && value.innerText.includes(text);
+    });
+  });
+}
+
 module.exports = {
   selectConsole,
   selectDebugger,
@@ -401,4 +412,5 @@ module.exports = {
   findScopeNode,
   toggleScopeNode,
   executeInConsole,
+  checkInlinePreview,
 };

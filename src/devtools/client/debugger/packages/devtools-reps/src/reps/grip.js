@@ -136,7 +136,7 @@ function propIterator(props, object, max) {
       return (
         type == "boolean" ||
         type == "number" ||
-        (type == "string" && value.length != 0)
+        (type == "string" && value.primitive().length != 0)
       );
     });
 

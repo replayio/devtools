@@ -39,9 +39,6 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
       return;
     }
 
-    // FIXME disabled for now.
-    return;
-
     const { thread } = cx;
 
     // Avoid regenerating inline previews when we already have preview data
@@ -118,11 +115,11 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
         // function calls on other data types like someArr.forEach etc..
         let properties = null;
         const objectFront = bindings[name].value;
-        if (objectFront.actorID && objectFront.class === "Object") {
+        if (objectFront.className() === "Object") {
           properties = await client.loadObjectProperties({
             name,
             path: name,
-            contents: { value: objectFront },
+            contents: objectFront,
           });
         }
 
