@@ -91,7 +91,7 @@
  *   - z-index: 2 = Errors and warnings
  *   - z-index: 1 = Other (console.log, console.info, requests, etc.)
  */
-.message {
+.webconsole-app .message {
   position: relative;
   z-index: 1;
   display: flex;
@@ -117,13 +117,13 @@
 }
 
 @media (min-width: 1000px) {
-  .message {
+.webconsole-app .message {
     padding-inline-end: 12px;
   }
 }
 
 /* Always hide the border of the first message, but keep its spacing */
-.message:first-child {
+.webconsole-app .message:first-child {
   border-top-color: transparent !important;
 }
 
@@ -140,54 +140,54 @@
  * We exclude network messages as it may cause issues in the network detail panel.
  * This makes console reflows faster (See Bug 1487457).
  */
-.message:not(.network) * {
+.webconsole-app .message:not(.network) * {
   overflow: hidden;
 }
 
-.message.error {
+.webconsole-app .message.error {
   z-index: 2;
   color: var(--console-error-color);
   border-color: var(--console-error-border);
   background-color: var(--console-error-background);
 }
 
-.message.warn {
+.webconsole-app .message.warn {
   z-index: 2;
   color: var(--console-warning-color);
   border-color: var(--console-warning-border);
   background-color: var(--console-warning-background);
 }
 
-.message.navigationMarker {
+.webconsole-app .message.navigationMarker {
   z-index: 3;
   color: var(--console-navigation-color);
   border-color: var(--console-navigation-border);
 }
 
-.message.startGroup,
-.message.startGroupCollapsed {
+.webconsole-app .message.startGroup,
+.webconsole-app .message.startGroupCollapsed {
   --console-indent-border-color: transparent;
 }
 
 /* Hide border between a command and its result */
-.message.command + .result.log {
+.webconsole-app .message.command + .result.log {
   border-top-width: 0;
 }
 
-.message > .prefix,
-.message > .timestamp {
+.webconsole-app .message > .prefix,
+.webconsole-app .message > .timestamp {
   flex: none;
   color: var(--theme-comment);
   margin: var(--console-output-vertical-padding) 4px;
 }
 
 @media (max-width: 500px) {
-  .message > .timestamp {
+.webconsole-app .message > .timestamp {
     display: none;
   }
 }
 
-.message > .indent {
+.webconsole-app .message > .indent {
   flex: none;
   display: inline-block;
   /* Display indent borders above the message's top and bottom border.
@@ -197,21 +197,21 @@
   border-inline-end: solid 1px var(--console-indent-border-color);
 }
 
-.message > .indent.warning-indent {
+.webconsole-app .message > .indent.warning-indent {
   border-inline-end-color: var(--console-warning-color);
 }
 
-.message > .indent[data-indent="0"] {
+.webconsole-app .message > .indent[data-indent="0"] {
   display: none;
 }
 
 /* Center first level indent within the left gutter */
-.message:not(.startGroup):not(.startGroupCollapsed) > .indent[data-indent="1"] {
+.webconsole-app .message:not(.startGroup):not(.startGroupCollapsed) > .indent[data-indent="1"] {
   margin-inline-start: calc(1px + var(--console-icon-horizontal-offset));
   margin-inline-end: calc(11px - var(--console-icon-horizontal-offset));
 }
 
-.message > .icon {
+.webconsole-app .message > .icon {
   flex: none;
   align-self: flex-start;
   /* Width and height must be a multiples of 2px to avoid blurry images.
@@ -228,57 +228,57 @@
 }
 
 /* Icon on unindented row should be centered within the left gutter */
-.message > .indent[data-indent="0"] + .icon {
+.webconsole-app .message > .indent[data-indent="0"] + .icon {
   width: 24px;
   margin-inline-start: var(--console-icon-horizontal-offset);
   margin-inline-end: calc(4px - var(--console-icon-horizontal-offset));
 }
 
-.message.command > .icon {
+.webconsole-app .message.command > .icon {
   color: var(--theme-icon-color);
 }
 
-.message.result > .icon {
+.webconsole-app .message.result > .icon {
   color: var(--theme-icon-dimmed-color);
 }
 
-.message.info > .icon {
+.webconsole-app .message.info > .icon {
   color: var(--theme-icon-color);
 }
 
-.message.error > .icon {
+.webconsole-app .message.error > .icon {
   color: var(--theme-icon-error-color);
 }
 
-.message.warn > .icon {
+.webconsole-app .message.warn > .icon {
   color: var(--theme-icon-warning-color);
 }
 
-.message.navigationMarker > .icon {
+.webconsole-app .message.navigationMarker > .icon {
   color: var(--console-navigation-color);
 }
 
-.message > .icon.logpoint {
+.webconsole-app .message > .icon.logpoint {
   color: var(--theme-graphs-purple);
 }
 
-.message > .message-body-wrapper {
+.webconsole-app .message > .message-body-wrapper {
   flex: auto;
   min-width: 0px;
   margin: var(--console-output-vertical-padding) 0;
 }
 
-.message-body-wrapper .table-widget-body {
+.webconsole-app .message-body-wrapper .table-widget-body {
   overflow: visible;
 }
 
-.message-body-wrapper .elements-label {
+.webconsole-app .message-body-wrapper .elements-label {
   color: var(--location-color);
   margin: calc(var(--console-output-vertical-padding) * 2) 0;
 }
 
 /* The bubble that shows the number of times a message is repeated */
-.message-repeats,
+.webconsole-app .message-repeats,
 .warning-group-badge {
   flex-shrink: 0;
   margin: 2px 5px 0 5px;
@@ -290,13 +290,13 @@
   font-weight: normal;
 }
 
-.message-repeats {
+.webconsole-app .message-repeats {
   display: inline-block;
   color: white;
   background-color: var(--console-repeat-bubble-background);
 }
 
-.message-repeats[value="1"] {
+.webconsole-app .message-repeats[value="1"] {
   display: none;
 }
 
@@ -306,7 +306,7 @@
   background-color: var(--console-warning-color);
 }
 
-.message-location {
+.webconsole-app .message-location {
   max-width: 40vw;
   flex-shrink: 0;
   color: var(--frame-link-source);
@@ -319,26 +319,26 @@
   text-align: end;
 }
 
-.message-location:empty {
+.webconsole-app .message-location:empty {
   display: none;
 }
 
-.message-location .frame-link-source-inner {
+.webconsole-app .message-location .frame-link-source-inner {
   /* Enforce LTR direction for the file name - fixes bug 1290056 */
   direction: ltr;
   unicode-bidi: embed;
 }
 
-.message-flex-body {
+.webconsole-app .message-flex-body {
   display: flex;
 }
 
-.message-body {
+.webconsole-app .message-body {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
-.message-flex-body > .message-body {
+.webconsole-app .message-flex-body > .message-body {
   display: block;
   flex: 1;
 }
@@ -356,16 +356,16 @@
   color: #f5f7fa !important; /* Selection Text Color */
 }
 
-.message.network > .message-body {
+.webconsole-app .message.network > .message-body {
   display: flex;
   flex-wrap: wrap;
 }
 
-.message.network .method {
+.webconsole-app .message.network .method {
   flex: none;
 }
 
-.message.network .url {
+.webconsole-app .message.network .url {
   flex: 1 1 auto;
   /* Make sure the URL is very small initially, let flex change width as needed. */
   width: 100px;
@@ -376,25 +376,25 @@
   cursor: default;
 }
 
-.message.network .status {
+.webconsole-app .message.network .status {
   flex: none;
   cursor: default;
   margin-left: 1ch;
   cursor: default;
 }
 
-.message.network.mixed-content .url {
+.webconsole-app .message.network.mixed-content .url {
   color: var(--theme-highlight-red);
   cursor: default;
 }
 
-.message .learn-more-link {
+.webconsole-app .message .learn-more-link {
   user-select: none;
   color: var(--theme-highlight-blue);
   margin: 0 1ch;
 }
 
-.message.network .xhr {
+.webconsole-app .message.network .xhr {
   background-color: var(--theme-text-color-alt);
   color: var(--theme-body-background);
   border-radius: 3px;
@@ -474,7 +474,7 @@ html #webconsole-notificationbox {
   padding-inline-start: 16px;
 }
 
-.message.open .stacktrace:not(:empty) {
+.webconsole-app .message.open .stacktrace:not(:empty) {
   display: block;
 }
 
@@ -641,9 +641,9 @@ a.learn-more-link.webconsole-learn-more-link {
 
 /* Special casing String reps, and warning/error string colors
  * so they are legible */
-.message .message-body > .objectBox-string,
-.message.error .objectBox-string,
-.message.warn .objectBox-string {
+.webconsole-app .message .message-body > .objectBox-string,
+.webconsole-app .message.error .objectBox-string,
+.webconsole-app .message.warn .objectBox-string {
   color: inherit;
 }
 
@@ -676,8 +676,8 @@ a.learn-more-link.webconsole-learn-more-link {
   vertical-align: top;
 }
 
-.message.startGroup .message-body > .objectBox-string,
-.message.startGroupCollapsed .message-body > .objectBox-string {
+.webconsole-app .message.startGroup .message-body > .objectBox-string,
+.webconsole-app .message.startGroupCollapsed .message-body > .objectBox-string {
   color: var(--theme-body-color);
   font-weight: bold;
 }
@@ -765,7 +765,7 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 /* console.table() */
-.message .new-consoletable {
+.webconsole-app .message .new-consoletable {
   width: 100%;
   --consoletable-border: var(--theme-splitter-color);
   margin-block-end: var(--attachment-margin-block-end);
@@ -862,25 +862,25 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 /* Hide the icon, so that we can use the collapse-button in its place */
-.message.network > .icon,
-.message.startGroup > .icon,
-.message.startGroupCollapsed > .icon {
+.webconsole-app .message.network > .icon,
+.webconsole-app .message.startGroup > .icon,
+.webconsole-app .message.startGroupCollapsed > .icon {
   display: none;
 }
 
 /* Center the collapse button in the left gutter (first-level only) */
-.message.network > .collapse-button,
-.message.startGroup > .indent[data-indent="0"] ~ .collapse-button,
-.message.startGroupCollapsed > .indent[data-indent="0"] ~ .collapse-button {
+.webconsole-app .message.network > .collapse-button,
+.webconsole-app .message.startGroup > .indent[data-indent="0"] ~ .collapse-button,
+.webconsole-app .message.startGroupCollapsed > .indent[data-indent="0"] ~ .collapse-button {
   width: 24px;
   margin-inline-start: var(--console-icon-horizontal-offset);
   margin-inline-end: calc(4px - var(--console-icon-horizontal-offset));
 }
 
 /* Use a bigger arrow that is visually similar to other icons (10px) */
-.message.network > .collapse-button::before,
-.message.startGroup > .indent[data-indent="0"] ~ .collapse-button::before,
-.message.startGroupCollapsed
+.webconsole-app .message.network > .collapse-button::before,
+.webconsole-app .message.startGroup > .indent[data-indent="0"] ~ .collapse-button::before,
+.webconsole-app .message.startGroupCollapsed
   > .indent[data-indent="0"]
   ~ .collapse-button::before {
   width: 100%;
