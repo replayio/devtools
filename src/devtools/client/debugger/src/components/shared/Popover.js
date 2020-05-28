@@ -92,7 +92,8 @@ class Popover extends Component<Props, State> {
         this.timerId = setTimeout(this.onTimeout, 200);
         return;
       }
-      return this.props.mouseout();
+      this.props.mouseout();
+      return;
     }
 
     // Don't clear the current preview if mouse is hovered on

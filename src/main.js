@@ -172,6 +172,24 @@ const gToolbox = {
     toolbox.classList = name;
   },
 
+  async viewSourceInDebugger(url, line, column, id) {
+    try {
+      const original = await this.sourceMapURLService.originalPositionFor(url, line, column);
+      if (original) {
+        url = original.sourceUrl;
+        line = original.line;
+        column = original.column;
+      }
+    } catch (e) {}
+
+    const dbg = this.getPanel("jsdebugger");
+    const source = id ? dbg.getSourceByActorId(id) : dbg.getSourceByURL(url);
+    if (source) {
+      this.selectTool("jsdebugger");
+      dbg.selectSource(source.id, line, column);
+    }
+  },
+
   get sourceMapService() {
     if (!this._sourceMapService) {
       this._sourceMapService = SourceMapService;

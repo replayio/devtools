@@ -337,7 +337,7 @@ class WebConsole {
         frame.url,
         frame.line,
         frame.column,
-        frame.sourceId
+        frame.scriptId
       );
 
       this.recordEvent("jump_to_source");

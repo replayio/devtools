@@ -246,8 +246,6 @@
 
 button.open-accessibility-inspector,
 button.open-inspector {
-  mask: url("resource://devtools/client/shared/components/reps/images/open-inspector.svg")
-    no-repeat;
   display: inline-block;
   vertical-align: top;
   height: 15px;
@@ -275,9 +273,6 @@ button.jump-definition {
   height: 16px;
   margin-left: 0.25em;
   vertical-align: middle;
-  background: 0% 50%
-    url("resource://devtools/client/shared/components/reps/images/jump-definition.svg")
-    no-repeat;
   border-color: transparent;
   stroke: var(--theme-icon-color);
   -moz-context-properties: stroke;
@@ -296,8 +291,6 @@ button.jump-definition {
 /* Invoke getter button */
 
 button.invoke-getter {
-  mask: url(resource://devtools/client/shared/components/reps/images/input.svg)
-    no-repeat;
   display: inline-block;
   background-color: var(--theme-icon-color);
   height: 10px;

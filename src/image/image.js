@@ -53,12 +53,7 @@ const gBackgroundImages = {
   "#split-console-close-button::before": require("devtools/client/themes/images/close.svg"),
   ".message.network > .collapse-button::before, .message.startGroup > .indent[data-indent='0'] ~ .collapse-button::before, .message.startGroupCollapsed > .indent[data-indent='0'] ~ .collapse-button::before": require("devtools/client/themes/images/arrow-big.svg"),
   ".message:hover > .icon.rewindable": require("devtools/client/debugger/images/next-circle.svg"),
-};
-
-const gBackgroundNoRepeatImages = {
-  ".collapse-button::before": require("devtools/client/themes/images/arrow.svg"),
-  ".webconsole-app .tree .arrow, .webconsole-app .object-inspector .tree-node .arrow":
-    require("devtools/client/themes/images/arrow.svg"),
+  "button.jump-definition": require("devtools/client/shared/components/reps/images/input.svg"),
 };
 
 const gMaskImages = {
@@ -128,6 +123,30 @@ const gListStyleImages = {
   ".devtools-option-toolbarbutton": require("devtools/client/themes/images/settings.svg"),
 };
 
+// Images with additional data in the CSS rule.
+const gOtherImages = {
+  ".collapse-button::before": {
+    style: "background",
+    url: require("devtools/client/themes/images/arrow.svg"),
+    after: "no-repeat center",
+  },
+  ".webconsole-app .tree .arrow, .webconsole-app .object-inspector .tree-node .arrow": {
+    style: "background",
+    url: require("devtools/client/themes/images/arrow.svg"),
+    after: "no-repeat center",
+  },
+  "button.open-accessibility-inspector, button.open-inspector": {
+    style: "mask",
+    url: require("devtools/client/shared/components/reps/images/open-inspector.svg"),
+    after: "no-repeat",
+  },
+  "button.invoke-getter": {
+    style: "mask",
+    url: require("devtools/client/shared/components/reps/images/input.svg"),
+    after: "no-repeat",
+  },
+};
+
 function loadImages() {
   const style = document.createElement("style");
   document.head.appendChild(style);
@@ -135,10 +154,6 @@ function loadImages() {
 
   for (const [ selector, url ] of Object.entries(gBackgroundImages)) {
     sheet.insertRule(`${selector} { background-image: url(${url.default}) }`);
-  }
-
-  for (const [ selector, url ] of Object.entries(gBackgroundNoRepeatImages)) {
-    sheet.insertRule(`${selector} { background: url(${url.default}) no-repeat center }`);
   }
 
   for (const [ selector, url ] of Object.entries(gMaskImages)) {
@@ -152,6 +167,11 @@ function loadImages() {
 
   for (const [ selector, url ] of Object.entries(gListStyleImages)) {
     sheet.insertRule(`${selector} { list-style-image: url(${url.default}) }`);
+  }
+
+  for (const [ selector, info ] of Object.entries(gOtherImages)) {
+    const { style, url, before = "", after = "" } = info;
+    sheet.insertRule(`${selector} { ${style}: ${before} url(${url.default}) ${after} }`);
   }
 }
 

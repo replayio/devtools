@@ -276,7 +276,7 @@ ValueFront.prototype = {
 
   id() {
     if (this._object) {
-      return this._object.objectId;
+      return `${this._pause.pauseId}:${this._object.objectId}`;
     }
     if (this._hasPrimitive) {
       return String(this._primitive);
