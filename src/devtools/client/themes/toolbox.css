@@ -545,7 +545,9 @@
 
 .webreplay-player .message.overlayed {
   border: 1px solid var(--progress-playing-background);
-  top: 5.5px;
+  top: 7.5px;
+  height: 9px;
+  width: 9px;
 }
 
 .webreplay-player .message.overlayed.future {
