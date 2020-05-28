@@ -1012,15 +1012,14 @@ const ThreadFront = {
   async setBreakpoint(scriptId, line, column, condition) {
     const location = { scriptId, line, column };
     try {
-      const promise = sendMessage(
+      const { breakpointId } = await sendMessage(
         "Debugger.setBreakpoint",
         { location, condition },
         this.sessionId
       );
-      this._invalidateResumeTargets();
-      const { breakpointId } = await promise;
       if (breakpointId) {
         this.breakpoints.set(breakpointId, { location });
+        this._invalidateResumeTargets();
       }
     } catch (e) {
       // An error will be generated if the breakpoint location is not valid for
@@ -1041,7 +1040,7 @@ const ThreadFront = {
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
       if (location.scriptId == scriptId && location.line == line && location.column == column) {
         this.breakpoints.delete(breakpointId);
-        sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
+        await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
         this._invalidateResumeTargets();
       }
     }
@@ -1130,23 +1129,23 @@ const ThreadFront = {
 
     stepCommands.forEach(async ({ command, transitive }) => {
       const target = await this._findResumeTarget(point, command);
-      if (epoch != this.resumeTargetEpoch) {
-        // Breakpoints / blackboxing / etc. has changed and this step target is
-        // no longer valid.
+      if (epoch != this.resumeTargetEpoch || !target.frame) {
         return;
       }
 
       // Precache pause data for the point.
       this.ensurePause(target.point);
 
-      // If the current point hasn't changed, look for transitive resume targets.
       if (point != this.currentPoint) {
         return;
       }
 
+      // Look for transitive resume targets.
       transitive.forEach(async command => {
         const transitiveTarget = await this._findResumeTarget(target.point, command);
-        if (epoch != this.resumeTargetEpoch || point != this.currentPoint) {
+        if (epoch != this.resumeTargetEpoch ||
+            point != this.currentPoint ||
+            !transitiveTarget.frame) {
           return;
         }
         this.ensurePause(transitiveTarget.point);
@@ -1207,8 +1206,8 @@ const ThreadFront = {
   stepIn() { this._resumeOperation("Debugger.findStepInTarget"); },
   stepOut() { this._resumeOperation("Debugger.findStepOutTarget"); },
 
-  blackbox(scriptId, begin, end) {
-    sendMessage(
+  async blackbox(scriptId, begin, end) {
+    await sendMessage(
       "Debugger.blackboxScript",
       { scriptId, begin, end },
       this.sessionId
@@ -1216,8 +1215,8 @@ const ThreadFront = {
     this._invalidateResumeTargets();
   },
 
-  unblackbox(scriptId, begin, end) {
-    sendMessage(
+  async unblackbox(scriptId, begin, end) {
+    await sendMessage(
       "Debugger.unblackboxScript",
       { scriptId, begin, end },
       this.sessionId
