@@ -434,6 +434,7 @@ html #webconsole-notificationbox {
   position: relative;
   z-index: 0; /* Keep below column resizers */
   /* input icon */
+  /* embed this svg's data directly so that the other background-* styles work. */
   background-image: url(data:image/svg+xml;base64,PCEtLSBUaGlzIFNvdXJjZSBDb2RlIEZvcm0gaXMgc3ViamVjdCB0byB0aGUgdGVybXMgb2YgdGhlIE1vemlsbGEgUHVibGljCiAgIC0gTGljZW5zZSwgdi4gMi4wLiBJZiBhIGNvcHkgb2YgdGhlIE1QTCB3YXMgbm90IGRpc3RyaWJ1dGVkIHdpdGggdGhpcwogICAtIGZpbGUsIFlvdSBjYW4gb2J0YWluIG9uZSBhdCBodHRwOi8vbW96aWxsYS5vcmcvTVBMLzIuMC8uIC0tPgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEyIDEyIiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiPgogIDxwYXRoIGZpbGw9ImNvbnRleHQtZmlsbCIgZD0iTTEuMDcgMS4zMmMuMy0uMy43Ny0uMyAxLjA2IDBsNC4xNSA0LjE1YS43NS43NSAwIDAgMSAwIDEuMDZsLTQuMTUgNC4xNWEuNzUuNzUgMCAxIDEtMS4wNi0xLjA2TDQuNjkgNiAxLjA3IDIuMzhhLjc1Ljc1IDAgMCAxIDAtMS4wNnptNSAwYy4zLS4zLjc3LS4zIDEuMDYgMGw0LjE1IDQuMTVhLjc1Ljc1IDAgMCAxIDAgMS4wNmwtNC4xNSA0LjE1YS43NS43NSAwIDEgMS0xLjA2LTEuMDZMOS42OSA2IDYuMDcgMi4zOGEuNzUuNzUgMCAwIDEgMC0xLjA2eiIvPgo8L3N2Zz4K);
   background-position-x: calc(10px + var(--console-icon-horizontal-offset));
   background-position-y: 4px;
@@ -916,6 +917,56 @@ a.learn-more-link.webconsole-learn-more-link {
 .webconsole-app .tree.focused .arrow,
 .webconsole-app .object-inspector .tree-node.focused .arrow {
   fill: currentColor;
+}
+
+.webconsole-app .message.paused.paused-before {
+  border-top: 1px solid var(--purple-50);
+  margin-top: 0px;
+}
+
+.webconsole-app .message.paused:not(.paused-before) {
+  border-top-color: var(--purple-50);
+  /* always show the border, even for the last child */
+  border-top-width: 1px;
+}
+
+.webconsole-app .message.paused ~ .message .message-body-wrapper,
+.webconsole-app .message.paused.paused-before .message-body-wrapper {
+  opacity: 0.5;
+}
+
+.webconsole-app .message.paused.paused-before .message-body-wrapper,
+.webconsole-app .message.paused.paused-before > .icon {
+  margin-top: calc(var(--console-output-vertical-padding) - 1px);
+}
+
+.webconsole-app .message:hover > .icon.rewindable {
+  cursor: pointer;
+  transform: rotate(180deg);
+}
+
+/*
+ * we flip the next.svg icon by default because when we're
+ * not paused, we would jump back. We remove the transform here
+ * because we want to jump forward.
+ */
+.webconsole-app .message.paused ~ .message:hover .icon.rewindable {
+  transform: none;
+}
+
+.webconsole-output .paused ~ .message:last-of-type,
+.webconsole-output .paused:last-of-type {
+  border-bottom-width: 0;
+}
+
+.webconsole-app .message.paused {
+  z-index: 3;
+  border-bottom: 1px solid var(--purple-50);
+  margin-bottom: 0px;
+}
+
+.webconsole-app .message.paused ~ .message .message-body-wrapper {
+  opacity: 0.5;
 }
 
 /** Utils **/

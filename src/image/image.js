@@ -52,6 +52,7 @@ const gBackgroundImages = {
   //".jsterm-input-container > .CodeMirror": require("devtools/client/themes/images/webconsole/input.svg"),
   "#split-console-close-button::before": require("devtools/client/themes/images/close.svg"),
   ".message.network > .collapse-button::before, .message.startGroup > .indent[data-indent='0'] ~ .collapse-button::before, .message.startGroupCollapsed > .indent[data-indent='0'] ~ .collapse-button::before": require("devtools/client/themes/images/arrow-big.svg"),
+  ".message:hover > .icon.rewindable": require("devtools/client/debugger/images/next-circle.svg"),
 };
 
 const gBackgroundNoRepeatImages = {
