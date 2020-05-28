@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 window.loader = {
-  lazyRequireGetter() {},
-  lazyGetter() {},
+  lazyRequireGetter() { },
+  lazyGetter() { },
 };
 
 require("./styles.css");
@@ -57,11 +57,13 @@ window.l10n = new LocalizationHelper(
   "devtools/client/locales/debugger.properties"
 );
 
-window.PrefObserver = function () {};
+window.PrefObserver = function () { };
 window.PrefObserver.prototype = {
-  on: () => {},
-  off: () => {},
+  on: () => { },
+  off: () => { },
 };
+
+window.dump = (msg) => console.log(msg)
 
 const url = new URL(window.location.href);
 
@@ -126,12 +128,12 @@ const gToolbox = {
 
   threadFront: ThreadFront,
 
-  on() {},
-  off() {},
-  emit() {},
+  on() { },
+  off() { },
+  emit() { },
 
   selection: new Selection(),
-  nodePicker: { on() {}, off() {} },
+  nodePicker: { on() { }, off() { } },
 
   getHighlighter() {
     return {};
@@ -208,7 +210,7 @@ function setupToolboxResizeEventHandlers() {
   const updateToolbox = throttle(() => {
     const percent = 100 * clientY / window.innerHeight;
     toolbox.style.top = `${percent}%`;
-    toolbox.style.height = `${100-percent}%`;
+    toolbox.style.height = `${100 - percent}%`;
   }, 100);
 
   let dragging = false;

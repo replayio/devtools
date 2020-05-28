@@ -370,7 +370,7 @@ ValueFront.prototype = {
   },
 
   isString() {
-    return this.isPrimitive() && typeof(this.primitive()) == "string";
+    return this.isPrimitive() && typeof (this.primitive()) == "string";
   },
 
   isPrimitive() {
@@ -1030,9 +1030,9 @@ const ThreadFront = {
   },
 
   removeBreakpointByURL(url, line, column) {
-    return Promise.all(this.urlScripts.get(url).map(scriptId => {
+    return Promise.all(this.urlScripts.get(url)?.map(scriptId => {
       return this.removeBreakpoint(scriptId, line, column);
-    }));
+    }) || []);
   },
 
   ensurePause() {
