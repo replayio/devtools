@@ -195,7 +195,7 @@ export class ConditionalPanel extends PureComponent<Props> {
 
     this.input = input;
     this.codeMirror = codeMirror;
-    codeMirror.focus();
+    setTimeout(() => codeMirror.focus(), 0);
     codeMirror.setCursor(codeMirror.lineCount(), 0);
   };
 
