@@ -108,14 +108,15 @@ export class Popup extends Component<Props> {
       return null;
     }
 
-    const { location } = resultGrip;
+    const location = resultGrip.functionLocation();
+    const locationURL = resultGrip.functionLocationURL();
 
     return (
       <div
         className="preview-popup"
         onClick={() =>
           location &&
-          selectSourceURL(cx, location.url, {
+          selectSourceURL(cx, locationURL, {
             line: location.line,
           })
         }
@@ -225,10 +226,7 @@ export class Popup extends Component<Props> {
       editorRef,
     } = this.props;
 
-    if (
-      typeof resultGrip == "undefined" ||
-      (resultGrip && resultGrip.optimizedOut)
-    ) {
+    if (resultGrip.isUnavailable()) {
       return null;
     }
 

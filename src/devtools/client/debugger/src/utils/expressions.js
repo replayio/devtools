@@ -5,7 +5,6 @@
 // @flow
 
 import { correctIndentation } from "./indentation";
-import { getGrip } from "./evaluation-result";
 import type { Expression } from "../types";
 const { createUnavailableValueFront } = require("protocol/thread");
 

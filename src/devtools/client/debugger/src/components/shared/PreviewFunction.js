@@ -9,8 +9,6 @@ import PropTypes from "prop-types";
 
 import { times, zip, flatten } from "lodash";
 
-import { formatDisplayName } from "../../utils/pause/frames";
-
 import "./PreviewFunction.css";
 
 type FunctionType = {
@@ -32,12 +30,12 @@ const IGNORED_SOURCE_URLS = ["debugger eval code"];
 export default class PreviewFunction extends Component<Props> {
   renderFunctionName(func: FunctionType) {
     const { l10n } = this.context;
-    const name = formatDisplayName((func: any), undefined, l10n);
+    const name = func.functionName() || l10n.getStr("anonymousFunction");
     return <span className="function-name">{name}</span>;
   }
 
   renderParams(func: FunctionType) {
-    const { parameterNames = [] } = func;
+    const parameterNames = func.functionParameterNames() || [];
     const params = parameterNames
       .filter(i => i)
       .map(param => (
@@ -57,20 +55,21 @@ export default class PreviewFunction extends Component<Props> {
   }
 
   jumpToDefinitionButton(func: FunctionType) {
-    const { location } = func;
+    const location = func.functionLocation();
+    const locationURL = func.functionLocationURL();
 
     if (
       location &&
-      location.url &&
-      !IGNORED_SOURCE_URLS.includes(location.url)
+      locationURL &&
+      !IGNORED_SOURCE_URLS.includes(locationURL)
     ) {
-      const lastIndex = location.url.lastIndexOf("/");
+      const lastIndex = locationURL.lastIndexOf("/");
 
       return (
         <button
           className="jump-definition"
           draggable="false"
-          title={`${location.url.slice(lastIndex + 1)}:${location.line}`}
+          title={`${locationURL.slice(lastIndex + 1)}:${location.line}`}
         />
       );
     }

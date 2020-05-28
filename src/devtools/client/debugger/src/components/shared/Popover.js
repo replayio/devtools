@@ -81,10 +81,10 @@ class Popover extends Component<Props, State> {
   }
 
   onTimeout = () => {
-    const isHoveredOnGap = this.$gap && this.$gap.matches(":hover");
-    const isHoveredOnPopover = this.$popover && this.$popover.matches(":hover");
-    const isHoveredOnTooltip = this.$tooltip && this.$tooltip.matches(":hover");
-    const isHoveredOnTarget = this.props.target.matches(":hover");
+    const isHoveredOnGap = this.$gap && window.elementIsHovered(this.$gap);
+    const isHoveredOnPopover = this.$popover && window.elementIsHovered(this.$popover);
+    const isHoveredOnTooltip = this.$tooltip && window.elementIsHovered(this.$tooltip);
+    const isHoveredOnTarget = window.elementIsHovered(this.props.target);
 
     if (isHoveredOnGap) {
       if (!this.wasOnGap) {

@@ -6,7 +6,6 @@
 
 import { isConsole } from "../utils/preview";
 import { findBestMatchExpression } from "../utils/ast";
-import { getGrip, getFront } from "../utils/evaluation-result";
 import { getExpressionFromCoords } from "../utils/editor/get-expression";
 import { isOriginal } from "../utils/source";
 import { isTesting } from "devtools-environment";
@@ -115,41 +114,17 @@ export function setPreview(
       thread,
     });
 
-    const resultGrip = getGrip(result);
-
-    // Error case occurs for a token that follows an errored evaluation
-    // https://github.com/firefox-devtools/debugger/pull/8056
-    // Accommodating for null allows us to show preview for falsy values
-    // line "", false, null, Nan, and more
-    if (resultGrip === null) {
-      return;
-    }
-
-    // Handle cases where the result is invisible to the debugger
-    // and not possible to preview. Bug 1548256
-    if (
-      resultGrip &&
-      resultGrip.class &&
-      typeof resultGrip.class === "string" &&
-      resultGrip.class.includes("InvisibleToDebugger")
-    ) {
-      return;
-    }
-
     const root = {
       name: expression,
       path: expression,
-      contents: {
-        value: resultGrip,
-        front: getFront(result),
-      },
+      contents: result,
     };
     const properties = await client.loadObjectProperties(root);
 
     // The first time a popup is rendered, the mouse should be hovered
     // on the token. If it happens to be hovered on whitespace, it should
     // not render anything
-    if (!target.matches(":hover") && !isTesting()) {
+    if (!window.elementIsHovered(target)) {
       return;
     }
 
@@ -163,7 +138,7 @@ export function setPreview(
       cx,
       value: {
         expression,
-        resultGrip,
+        resultGrip: result,
         properties,
         root,
         location,
