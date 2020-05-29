@@ -151,16 +151,10 @@ async function doInstantStep({ dispatch, getState, client }, instantInfo) {
   await dispatch(evaluateExpressions(cx));
 }
 
-export function seekToPosition(position: ExecutionPoint) {
+export function seekToPosition(point: ExecutionPoint, time) {
   return ({ dispatch, getState, client }: ThunkArgs) => {
     const cx = getThreadContext(getState());
-    client.timeWarp(position);
-    dispatch({
-      type: "COMMAND",
-      command: "timeWarp",
-      status: "start",
-      thread: cx.thread,
-    });
+    client.timeWarp(point, time);
   };
 }
 

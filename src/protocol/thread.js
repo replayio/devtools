@@ -60,6 +60,8 @@ function Pause(sessionId) {
   this.scopes = new Map();
   this.objects = new Map();
 
+  this.frameSteps = new Map();
+
   this.documentNode = undefined;
   this.domFronts = new Map();
 }
@@ -230,6 +232,16 @@ Pause.prototype = {
     const { document, data } = await this.sendMessage("DOM.getDocument");
     this.addData(data);
     this.documentNode = this.getDOMFront(document);
+  },
+
+  async getFrameStepsAtIndex(index) {
+    const frames = await this.getFrames();
+    const { frameId } = frames[index];
+    if (!this.frameSteps.has(frameId)) {
+      const { steps } = await this.sendMessage("Pause.getFrameSteps", { frameId });
+      this.frameSteps.set(frameId, steps);
+    }
+    return this.frameSteps.get(frameId);
   },
 };
 
@@ -1261,6 +1273,10 @@ const ThreadFront = {
   getKnownRootDOMNode() {
     assert(this.currentPause.documentNode !== undefined);
     return this.currentPause.documentNode;
+  },
+
+  getFrameStepsAtIndex(index) {
+    return this.currentPause.getFrameStepsAtIndex(index);
   },
 };
 

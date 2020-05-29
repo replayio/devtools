@@ -136,7 +136,7 @@ class FrameTimeline extends Component<Props, State> {
     this.setState({ scrubbing: false });
 
     if (position) {
-      seekToPosition(position.point);
+      seekToPosition(position.point, position.time);
     }
   };
 
@@ -162,11 +162,7 @@ class FrameTimeline extends Component<Props, State> {
     let index = 0;
     for (let i = 0; i < framePositions.positions.length; i++) {
       const { location, generatedLocation, point } = framePositions.positions[i];
-      if (
-        executionPoint.progress < point.progress ||
-        (executionPoint.progress == point.progress &&
-         executionPoint.position.frameIndex < point.position.frameIndex)
-      ) {
+      if (BigInt(executionPoint) < BigInt(point)) {
         break;
       }
       if (isSameLocation(location, selectedLocation) ||

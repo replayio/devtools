@@ -379,13 +379,10 @@ async function checkInlinePreview(name, text) {
 }
 
 function waitForFrameTimeline(width) {
-  // FIXME
-  /*
   return waitUntil(() => {
     const elem = document.querySelector(".frame-timeline-progress");
-    return elem.style.width == width;
+    return elem && elem.style.width == width;
   });
-  */
 }
 
 function checkFrames(count) {

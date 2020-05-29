@@ -18,26 +18,29 @@ export function setFramePositions() {
       return;
     }
 
-    const { positions, unexecuted } = await client.fetchAncestorFramePositions(frame.index);
+    const positions = await client.fetchAncestorFramePositions(frame.index);
 
     if (frame != getSelectedFrame(getState(), thread)) {
       return;
     }
 
-    const sourceId = getSourceByActorId(getState(), positions[0].location.actor).id;
+    const sourceId = getSourceByActorId(getState(), positions[0].frame.scriptId).id;
 
-    const executionPoints = positions.map(({ point }) => point);
-    const generatedLocations = positions.map(({ location }) => {
-      const { line, column } = location;
+    const generatedLocations = positions.map(({ frame: { line, column } }) => {
       return { line, column, sourceId };
     });
     const originalLocations = await sourceMaps.getOriginalLocations(
       generatedLocations
     );
 
-    const combinedPositions = zip(executionPoints, originalLocations, generatedLocations).map(
-      ([point, location, generatedLocation]) => ({ point, location, generatedLocation })
+    const combinedPositions = zip(positions, originalLocations, generatedLocations).map(
+      ([{ point, time }, location, generatedLocation]) => {
+        return { point, time, location, generatedLocation };
+      }
     );
+
+    // FIXME
+    const unexecuted = [];
 
     const generatedUnexecuted = unexecuted.map(({ line, column }) => {
       return { line, column, sourceId };

@@ -526,8 +526,8 @@ function getFrontByID(actorID: String) {
   return devToolsClient.getFrontByID(actorID);
 }
 
-function timeWarp(position: ExecutionPoint) {
-  currentThreadFront.timeWarp(position);
+function timeWarp(point, time) {
+  ThreadFront.timeWarp(point, time, /* hasFrames */ true);
 }
 
 function instantWarp(point: ExecutionPoint) {
@@ -536,8 +536,7 @@ function instantWarp(point: ExecutionPoint) {
 }
 
 function fetchAncestorFramePositions(index: number) {
-  return new Promise(resolve => {});
-  //return currentThreadFront.fetchAncestorFramePositions(index);
+  return ThreadFront.getFrameStepsAtIndex(index);
 }
 
 function pickExecutionPoints(count: number, options) {

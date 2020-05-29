@@ -23,7 +23,7 @@ type Props = {
 };
 
 const jumpButton = document.createElement("img");
-jumpButton.src = "/src/devtools/client/debugger/images/next-circle.svg";
+jumpButton.src = require("devtools/client/debugger/images/next-circle.svg").default;
 
 function getEditorLine(location, generatedLocation, sourceId) {
   const loc = location.sourceId == sourceId ? location : generatedLocation;
@@ -72,7 +72,7 @@ export class ReplayLines extends PureComponent<Props> {
     const seenLines = new Set();
 
     // Place jump buttons on each line that is executed by the frame.
-    for (const { point, location, generatedLocation } of positions) {
+    for (const { point, time, location, generatedLocation } of positions) {
       const line = getEditorLine(location, generatedLocation, sourceId);
       if (line === undefined || seenLines.has(line)) {
         continue;
@@ -81,7 +81,7 @@ export class ReplayLines extends PureComponent<Props> {
 
       const widget = jumpButton.cloneNode(true);
       widget.className = "line-jump";
-      widget.onclick = () => { this.props.seekToPosition(point) };
+      widget.onclick = () => { this.props.seekToPosition(point, time) };
 
       const jump = doc.setBookmark({ line, ch: 0 }, { widget });
       this.jumps.push({ jump, line });
