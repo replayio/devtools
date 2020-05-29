@@ -430,3 +430,17 @@ ul.children + .tag-line::before {
 .doctype {
   font-style: italic;
 }
+
+/* Add relative positioning so the markup-loading text renders in the right place. */
+#markup-box {
+  position: relative;
+}
+
+#markup-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  font-size: large;
+  color: var(--theme-contrast-color);
+}
