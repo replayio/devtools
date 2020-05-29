@@ -10,7 +10,6 @@ const L10N = new LocalizationHelper(
 );
 
 const Editor = require("devtools/client/shared/sourceeditor/editor");
-const beautify = require("devtools/shared/jsbeautify/beautify");
 
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
 const CONTAINER_WIDTH = 500;
@@ -124,6 +123,7 @@ EventTooltip.prototype = {
             }
           };
 
+          /*
           sourceMapService.subscribe(
             location.url,
             location.line,
@@ -136,6 +136,7 @@ EventTooltip.prototype = {
             column: location.column,
             callback,
           });
+          */
         }
       }
 
@@ -198,7 +199,7 @@ EventTooltip.prototype = {
         editor: editor,
         handler: listener.handler,
         uri: listener.origin,
-        sourceActor: listener.sourceActor,
+        sourceActor: listener.scriptId,
         dom0: listener.DOM0,
         native: listener.native,
         appended: false,
@@ -264,8 +265,10 @@ EventTooltip.prototype = {
       iframe.classList.add("event-tooltip-editor-frame");
 
       editor.appendTo(content, iframe).then(() => {
+        /*
         const tidied = beautify.js(handler, { indent_size: 2 });
         editor.setText(tidied);
+        */
 
         eventEditor.appended = true;
 

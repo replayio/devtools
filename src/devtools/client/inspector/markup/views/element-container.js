@@ -10,24 +10,10 @@ const ElementEditor = require("devtools/client/inspector/markup/views/element-ed
 const { ELEMENT_NODE } = require("devtools/shared/dom-node-constants");
 const { extend } = require("devtools/shared/extend");
 
-loader.lazyRequireGetter(
-  this,
-  "setEventTooltip",
-  "devtools/client/shared/widgets/tooltip/EventTooltipHelper",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "setImageTooltip",
-  "devtools/client/shared/widgets/tooltip/ImageTooltipHelper",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "setBrokenImageTooltip",
-  "devtools/client/shared/widgets/tooltip/ImageTooltipHelper",
-  true
-);
+const { setEventTooltip } = require("devtools/client/shared/widgets/tooltip/EventTooltipHelper");
+const { setImageTooltip } = require("devtools/client/shared/widgets/tooltip/ImageTooltipHelper");
+const { setBrokenImageTooltip } = require("devtools/client/shared/widgets/tooltip/ImageTooltipHelper");
+
 loader.lazyRequireGetter(
   this,
   "clipboardHelper",
@@ -76,7 +62,41 @@ MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
     const tooltip = this.markup.eventDetailsTooltip;
     await tooltip.hide();
 
-    const listenerInfo = await this.node.getEventListenerInfo();
+    const listenerRaw = await this.node.getEventListeners();
+    const listenerInfo = listenerRaw.map(listener => {
+      const {
+        handler,
+        type,
+        capture,
+      } = listener;
+      const location = handler.functionLocation();
+      const url = handler.functionLocationURL();
+      let origin, line, column;
+      if (location && url) {
+        line = location.line;
+        column = location.column;
+        origin = `${url}:${line}:${column}`;
+      } else {
+        // We end up here for DOM0 handlers...
+        origin = "[native code]";
+      }
+      return {
+        capturing: capture,
+        DOM0: false,
+        type,
+        origin,
+        url,
+        line,
+        column,
+        tags: "",
+        handler,
+        scriptId: url ? location.scriptId : undefined,
+        native: !url,
+        hide: {
+          debugger: !url,
+        },
+      };
+    });
 
     const toolbox = this.markup.toolbox;
 

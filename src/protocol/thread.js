@@ -695,8 +695,12 @@ NodeFront.prototype = {
         "DOM.getEventListeners",
         { node: this._object.objectId }
       ).then(({ listeners, data }) => {
-        this._listeners = listeners;
         this._pause.addData(data);
+        this._listeners = listeners.map(listener => ({
+          ...listener,
+          handler: new ValueFront(this._pause, { object: listener.handler }),
+          node: this._pause.getDOMFront(listener.node),
+        }));
       }),
       this._pause.sendMessage(
         "DOM.getBoxModel",
@@ -733,6 +737,11 @@ NodeFront.prototype = {
   get hasEventListeners() {
     assert(this._loaded);
     return this._listeners.length != 0;
+  },
+
+  getEventListeners() {
+    assert(this._loaded);
+    return this._listeners;
   },
 
   async getAppliedRules() {

@@ -226,6 +226,9 @@ class WebConsoleWrapper {
   }
 
   dispatchSplitConsoleCloseButtonToggle() {
+    if (!store) {
+      return;
+    }
     store.dispatch(
       actions.splitConsoleCloseButtonToggle(
         this.toolbox && this.toolbox.currentToolId !== "webconsole"
