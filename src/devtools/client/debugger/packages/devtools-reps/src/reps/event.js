@@ -4,12 +4,14 @@
 
 // ReactJS
 const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const { span } = require("devtools/client/shared/vendor/react-dom-factories");
 
 // Reps
 const { isGrip, wrapRender } = require("./rep-utils");
 
 const { MODE } = require("./constants");
 const { rep } = require("./grip");
+const PropRep = require("./prop-rep");
 
 /**
  * Renders DOM event objects.
@@ -24,80 +26,108 @@ Event.propTypes = {
 };
 
 function Event(props) {
-  const gripProps = {
-    ...props,
-    title: getTitle(props),
-    object: {
-      ...props.object,
-      preview: {
-        ...props.object.preview,
-        ownProperties: {},
-      },
-    },
-  };
+  const propsArray = getProperties(props);
 
-  if (gripProps.object.preview.target) {
-    Object.assign(gripProps.object.preview.ownProperties, {
-      target: gripProps.object.preview.target,
-    });
+  if (props.mode === MODE.TINY) {
+    const tinyModeItems = [];
+    tinyModeItems.push(getTitleElement(props));
+    return span({ className: "objectBox objectBox-object" }, ...tinyModeItems);
   }
-  Object.assign(
-    gripProps.object.preview.ownProperties,
-    gripProps.object.preview.properties
+
+  return span(
+    { className: "objectBox objectBox-object" },
+    getTitleElement(props),
+    span(
+      {
+        className: "objectLeftBrace",
+      },
+      " { "
+    ),
+    ...propsArray,
+    span(
+      {
+        className: "objectRightBrace",
+      },
+      " }"
+    )
   );
+}
 
-  delete gripProps.object.preview.properties;
-  gripProps.object.ownPropertyLength = Object.keys(
-    gripProps.object.preview.ownProperties
-  ).length;
-
-  switch (gripProps.object.class) {
+function getProperties(props) {
+  let propertyNames;
+  switch (props.object.className()) {
     case "MouseEvent":
-      gripProps.isInterestingProp = (type, value, name) => {
-        return ["target", "clientX", "clientY", "layerX", "layerY"].includes(
-          name
-        );
-      };
+      propertyNames = ["target", "clientX", "clientY", "layerX", "layerY"];
       break;
     case "KeyboardEvent":
-      gripProps.isInterestingProp = (type, value, name) => {
-        return ["target", "key", "charCode", "keyCode"].includes(name);
-      };
+      propertyNames = ["target", "key", "charCode", "keyCode"];
       break;
     case "MessageEvent":
-      gripProps.isInterestingProp = (type, value, name) => {
-        return ["target", "isTrusted", "data"].includes(name);
-      };
-      break;
-    default:
-      gripProps.isInterestingProp = (type, value, name) => {
-        // We want to show the properties in the order they are declared.
-        return Object.keys(gripProps.object.preview.ownProperties).includes(
-          name
-        );
-      };
+      propertyNames = ["target", "isTrusted", "data"];
   }
 
-  return rep(gripProps);
+  const elements = [];
+  const preview = props.object.previewValueMap();
+
+  propertyNames.forEach((name, i) => {
+    if (preview[name]) {
+      elements.push(
+        PropRep({
+          ...props,
+          key: name,
+          mode: MODE.TINY,
+          name,
+          object: preview[name],
+          equal: ": ",
+        })
+      );
+    }
+
+    if (i + 1 < propertyNames.length) {
+      elements.push(", ");
+    }
+  });
+
+  return elements;
+}
+
+function getKeyboardEventModifiers(preview) {
+  const keysToModifiersMap = {
+    altKey: "Alt",
+    ctrlKey: "Control",
+    metaKey: "Meta",
+    shiftKey: "Shift",
+  };
+
+  const modifiers = [];
+  for (const [property, name] of Object.entries(keysToModifiersMap)) {
+    if (preview[property]) {
+      modifiers.push(name);
+    }
+  }
+  return modifiers;
 }
 
 function getTitle(props) {
-  const preview = props.object.preview;
-  let title = preview.type;
+  const preview = props.object.previewValueMap();
+  let title = preview.type.primitive();
 
-  if (
-    preview.eventKind == "key" &&
-    preview.modifiers &&
-    preview.modifiers.length
-  ) {
-    title = `${title} ${preview.modifiers.join("-")}`;
+  if (props.object.className() == "KeyboardEvent") {
+    const modifiers = getKeyboardEventModifiers(preview);
+    if (modifiers.length) {
+      title = `${title} ${preview.modifiers.join("-")}`;
+    }
   }
   return title;
 }
 
+function getTitleElement(props) {
+  return span({ className: "objectTitle" }, getTitle(props));
+}
+
 // Registration
 function supportsObject(object) {
-  return object.className() == "DOMEvent";
+  return ["MouseEvent", "KeyboardEvent", "MessageEvent"].includes(object.className());
 }
 
 // Exports from this module
