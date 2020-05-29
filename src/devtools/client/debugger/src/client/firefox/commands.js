@@ -251,13 +251,6 @@ function removeBreakpoint(location: PendingLocation) {
   return ThreadFront.removeBreakpointByURL(sourceUrl, line, column);
 }
 
-function evaluateInFrame(
-  script: Script,
-  options: EvaluateParam
-): Promise<{ result: ExpressionResult }> {
-  return evaluate(script, options);
-}
-
 async function evaluateExpressions(scripts: Script[], options: EvaluateParam) {
   return Promise.all(scripts.map(script => evaluate(script, options)));
 }
@@ -269,7 +262,7 @@ async function evaluate(
   { thread, frameId }: EvaluateParam = {}
 ): Promise<{ result: ExpressionResult }> {
   const threadFront = lookupThreadFront(thread);
-  const { returned, exception, failed } = await threadFront.evaluateInFrame(frameId, script);
+  const { returned, exception, failed } = await threadFront.evaluate(frameId, script);
   if (failed) {
     return { exception: createPrimitiveValueFront("Evaluation failed") };
   }
@@ -570,7 +563,6 @@ const clientCommands = {
   removeWatchpoint,
   removeBreakpoint,
   evaluate,
-  evaluateInFrame,
   evaluateExpressions,
   navigate,
   reload,

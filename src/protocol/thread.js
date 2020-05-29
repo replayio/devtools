@@ -187,11 +187,12 @@ Pause.prototype = {
     this.addData(data);
   },
 
-  async evaluateInFrame(frameId, expression) {
-    const { result } = await this.sendMessage(
-      "Pause.evaluateInFrame",
-      { frameId, expression }
-    );
+  async evaluate(frameId, expression) {
+    assert(this.createWaiter);
+    await this.createWaiter;
+    const { result } = frameId
+      ? await this.sendMessage("Pause.evaluateInFrame", { frameId, expression })
+      : await this.sendMessage("Pause.evaluateInGlobal", { expression });
     const { returned, exception, failed, data } = result;
     this.addData(data);
     return { returned, exception, failed };
@@ -1102,9 +1103,9 @@ const ThreadFront = {
     return this.currentPause.getScopes(frameId);
   },
 
-  async evaluateInFrame(frameId, text) {
+  async evaluate(frameId, text) {
     this.ensureCurrentPause();
-    const rv = await this.currentPause.evaluateInFrame(frameId, text);
+    const rv = await this.currentPause.evaluate(frameId, text);
     if (rv.returned) {
       rv.returned = new ValueFront(this.currentPause, rv.returned);
     } else if (rv.exception) {
