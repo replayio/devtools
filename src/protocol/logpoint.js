@@ -85,6 +85,19 @@ addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
   }
 });
 
+async function createLogpointAnalysis(logGroupId, mapper) {
+  const waiter = sendMessage("Analysis.createAnalysis", { mapper, effectful: true });
+  if (gLogpoints.has(logGroupId)) {
+    gLogpoints.get(logGroupId).push(waiter);
+  } else {
+    gLogpoints.set(logGroupId, [waiter]);
+  }
+
+  const { analysisId } = await waiter;
+  gAnalysisLogGroupIDs.set(analysisId, logGroupId);
+  return analysisId;
+}
+
 async function setLogpoint(logGroupId, scriptId, line, column, text, condition) {
   let conditionSection = "";
   if (condition) {
@@ -144,15 +157,7 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
     return [{ key: point, value: { time, pauseId, location, values, datas } }];
   `;
 
-  const waiter = sendMessage("Analysis.createAnalysis", { mapper, effectful: true });
-  if (gLogpoints.has(logGroupId)) {
-    gLogpoints.get(logGroupId).push(waiter);
-  } else {
-    gLogpoints.set(logGroupId, [waiter]);
-  }
-
-  const { analysisId } = await waiter;
-  gAnalysisLogGroupIDs.set(analysisId, logGroupId);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper);
 
   sendMessage("Analysis.addLocation", {
     analysisId,
@@ -175,6 +180,39 @@ function setLogpointByURL(logGroupId, scriptUrl, line, column, text, condition) 
   });
 }
 
+async function setEventLogpoint(logGroupId, eventTypes) {
+  const mapper = `
+    const { point, time, pauseId } = input;
+    const { frame } = sendCommand("Pause.getTopFrame");
+    const { frameId, location } = frame;
+    const { result } = sendCommand(
+      "Pause.evaluateInFrame",
+      { frameId, expression: "arguments[0]" }
+    );
+    const values = [];
+    const datas = [result.data];
+    if (result.exception) {
+      values.push(result.exception);
+    } else {
+      values.push(result.returned);
+    }
+    return [{ key: point, value: { time, pauseId, location, values, datas } }];
+  `;
+
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper);
+
+  for (const eventType of eventTypes) {
+    sendMessage("Analysis.addEventHandlerEntryPoints", {
+      analysisId,
+      sessionId: ThreadFront.sessionId,
+      eventType,
+    });
+  }
+
+  sendMessage("Analysis.runAnalysis", { analysisId });
+  sendMessage("Analysis.findAnalysisPoints", { analysisId });
+}
+
 function removeLogpoint(logGroupId) {
   const waiters = gLogpoints.get(logGroupId);
   if (!waiters) {
@@ -193,6 +231,7 @@ function removeLogpoint(logGroupId) {
 module.exports = {
   setLogpoint,
   setLogpointByURL,
+  setEventLogpoint,
   removeLogpoint,
   LogpointHandlers,
 };

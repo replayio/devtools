@@ -393,6 +393,15 @@ async function selectFrame(index) {
   await dbg.actions.selectFrame(getThreadContext(), frames[index]);
 }
 
+function togglePrettyPrint() {
+  const sourceId = dbgSelectors.getSelectedSourceId();
+  return dbg.actions.togglePrettyPrint(getContext(), sourceId);
+}
+
+function addEventListenerLogpoints(logpoints) {
+  return dbg.actions.addEventListenerBreakpoints(logpoints);
+}
+
 module.exports = {
   selectConsole,
   selectDebugger,
@@ -431,4 +440,6 @@ module.exports = {
   waitForFrameTimeline,
   checkFrames,
   selectFrame,
+  togglePrettyPrint,
+  addEventListenerLogpoints,
 };

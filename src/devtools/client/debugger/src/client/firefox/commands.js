@@ -35,6 +35,7 @@ const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const {
   setLogpoint,
   setLogpointByURL,
+  setEventLogpoint,
   removeLogpoint,
 } = require("protocol/logpoint");
 const { assert } = require("protocol/utils");
@@ -191,9 +192,13 @@ function locationKey(location: BreakpointLocation) {
   return `${sourceUrl}:${sourceId}:${line}:${column}`;
 }
 
+function newLogGroupId() {
+  return `logGroup-${Math.random()}`;
+}
+
 function maybeGenerateLogGroupId(options) {
   if (options.logValue) {
-    return { ...options, logGroupId: `logGroup-${Math.random()}` };
+    return { ...options, logGroupId: newLogGroupId() };
   }
   return options;
 }
@@ -397,10 +402,18 @@ function interrupt(thread: string): Promise<*> {
   return lookupThreadFront(thread).interrupt();
 }
 
-function setEventListenerBreakpoints(ids: string[]) {
-  eventBreakpoints = ids;
+let gEventLogpointGroupId;
 
-  return forEachThread(thread => thread.setActiveEventBreakpoints(ids));
+function setEventListenerBreakpoints(ids: string[]) {
+  if (gEventLogpointGroupId) {
+    removeLogpoint(gEventLogpointGroupId);
+  }
+  if (ids.length) {
+    gEventLogpointGroupId = newLogGroupId();
+    setEventLogpoint(gEventLogpointGroupId, ids);
+  } else {
+    gEventLogpointGroupId = null;
+  }
 }
 
 // eslint-disable-next-line
