@@ -46,7 +46,8 @@ const {
 const {
   defer,
   assert,
-  DisallowEverythingProxyHandler
+  DisallowEverythingProxyHandler,
+  EventEmitter,
 } = require("./utils");
 
 // Information about a protocol pause.
@@ -916,8 +917,6 @@ const ThreadFront = {
 
   skipPausing: false,
 
-  eventListeners: new Map(),
-
   // Points which will be reached when stepping in various directions from a point.
   resumeTargets: new Map(),
 
@@ -926,18 +925,6 @@ const ThreadFront = {
 
   // Pauses for each point we have stopped or might stop at.
   allPauses: new Map(),
-
-  on(name, handler) {
-    if (this.eventListeners.has(name)) {
-      this.eventListeners.get(name).push(handler);
-    } else {
-      this.eventListeners.set(name, [handler]);
-    }
-  },
-
-  emit(name, value) {
-    (this.eventListeners.get(name) || []).forEach(handler => handler(value));
-  },
 
   // Map breakpointId to information about the breakpoint, for all installed breakpoints.
   breakpoints: new Map(),
@@ -1299,6 +1286,8 @@ const ThreadFront = {
     return this.currentPause.getFrameStepsAtIndex(index);
   },
 };
+
+EventEmitter.decorate(ThreadFront);
 
 module.exports = {
   ThreadFront,

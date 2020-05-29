@@ -40,10 +40,10 @@ require("./styles.css");
 const React = require("devtools/client/shared/vendor/react");
 const ReactDOM = require("devtools/client/shared/vendor/react-dom");
 const WebReplayPlayer = require("timeline/WebReplayPlayer");
-const { initSocket, sendMessage } = require("protocol/socket");
+const { initSocket, sendMessage, log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const { paintMessage } = require("protocol/graphics");
-const { throttle, clamp } = require("protocol/utils");
+const { throttle, clamp, EventEmitter } = require("protocol/utils");
 const { DebuggerPanel } = require("devtools/client/debugger/panel");
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 const { InspectorPanel } = require("devtools/client/inspector/panel");
@@ -142,10 +142,6 @@ const gToolbox = {
 
   threadFront: ThreadFront,
 
-  on() { },
-  off() { },
-  emit() { },
-
   selection: new Selection(),
   nodePicker: { on() { }, off() { } },
 
@@ -167,9 +163,11 @@ const gToolbox = {
     if (name == this.currentTool) {
       return;
     }
+    log(`Toolbox SelectTool ${name}`);
     this.currentTool = name;
     const toolbox = document.getElementById(`toolbox`);
     toolbox.classList = name;
+    this.emit("select", name);
   },
 
   async viewSourceInDebugger(url, line, column, id) {
@@ -212,6 +210,8 @@ const gToolbox = {
   },
 };
 
+EventEmitter.decorate(gToolbox);
+
 window.gToolbox = gToolbox;
 
 setTimeout(() => {
@@ -232,7 +232,6 @@ setTimeout(() => {
   inspectorPanel.open();
 
   gToolbox.selectTool("jsdebugger");
-  //gToolbox.selectTool("inspector");
 }, 0);
 
 function setupToolboxResizeEventHandlers() {

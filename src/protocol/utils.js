@@ -108,6 +108,31 @@ const DisallowEverythingProxyHandler = {
   deleteProperty() { NotAllowed(); },
 };
 
+const EventEmitter = {
+  decorate(obj) {
+    obj.eventListeners = new Map();
+
+    obj.on = (name, handler) => {
+      if (obj.eventListeners.has(name)) {
+        obj.eventListeners.get(name).push(handler);
+      } else {
+        obj.eventListeners.set(name, [handler]);
+      }
+    };
+
+    obj.off = (name, handler) => {
+      obj.eventListeners.set(
+        name,
+        (obj.eventListeners.get(name) || []).filter(h => h != handler)
+      );
+    };
+
+    obj.emit = (name, value) => {
+      (obj.eventListeners.get(name) || []).forEach(handler => handler(value));
+    };
+  },
+};
+
 module.exports = {
   makeInfallible,
   defer,
@@ -116,4 +141,5 @@ module.exports = {
   assert,
   binarySearch,
   DisallowEverythingProxyHandler,
+  EventEmitter,
 };
