@@ -431,9 +431,12 @@ ul.children + .tag-line::before {
   font-style: italic;
 }
 
-/* Add relative positioning so the markup-loading text renders in the right place. */
 #markup-box {
+  /* Add relative positioning so the markup-loading text renders in the right place. */
   position: relative;
+
+  overflow: auto;
+  height: 100%;
 }
 
 #markup-loading {
