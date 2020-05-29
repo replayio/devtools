@@ -169,8 +169,8 @@ class LayoutApp extends PureComponent {
     const { flexContainer, flexItemContainer } = this.props.flexbox;
 
     const items = [
-      this.getFlexSection(flexContainer),
-      this.getGridSection(),
+      //this.getFlexSection(flexContainer),
+      //this.getGridSection(),
       this.getBoxModelSection(),
     ];
 

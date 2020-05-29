@@ -74,8 +74,6 @@ BoxModel.prototype = {
       this._tooltip.destroy();
     }
 
-    this.untrackReflows();
-
     this._highlighters = null;
     this._tooltip = null;
     this.document = null;
@@ -120,7 +118,7 @@ BoxModel.prototype = {
     return (
       this.inspector.toolbox &&
       this.inspector.sidebar &&
-      this.inspector.toolbox.currentToolId === "inspector" &&
+      this.inspector.toolbox.currentTool === "inspector" &&
       this.inspector.sidebar.getCurrentTabID() === "layoutview"
     );
   },
@@ -135,20 +133,6 @@ BoxModel.prototype = {
       this.inspector.selection.isConnected() &&
       this.inspector.selection.isElementNode()
     );
-  },
-
-  /**
-   * Starts listening to reflows in the current tab.
-   */
-  trackReflows() {
-    this.inspector.on("reflow-in-selected-target", this.updateBoxModel);
-  },
-
-  /**
-   * Stops listening to reflows in the current tab.
-   */
-  untrackReflows() {
-    this.inspector.off("reflow-in-selected-target", this.updateBoxModel);
   },
 
   /**
@@ -174,32 +158,49 @@ BoxModel.prototype = {
       }
 
       const { nodeFront } = this.inspector.selection;
-      const inspectorFront = this.getCurrentInspectorFront();
-      const { pageStyle } = inspectorFront;
+      const bounds = await nodeFront.getBoundingClientRect();
+      const style = await nodeFront.getComputedStyle();
 
-      let layout = await pageStyle.getLayout(nodeFront, {
-        autoMargins: true,
-      });
+      const layout = {
+        width: parseFloat(bounds.width.toPrecision(6)),
+        height: parseFloat(bounds.height.toPrecision(6)),
+        autoMargins: {},
+      };
 
-      const styleEntries = await pageStyle.getApplied(nodeFront, {
-        // We don't need styles applied to pseudo elements of the current node.
-        skipPseudo: true,
-      });
-      this.elementRules = styleEntries.map(e => e.rule);
+      for (const prop of [
+        "position",
+        "top",
+        "right",
+        "bottom",
+        "left",
+        "margin-top",
+        "margin-right",
+        "margin-bottom",
+        "margin-left",
+        "padding-top",
+        "padding-right",
+        "padding-bottom",
+        "padding-left",
+        "border-top-width",
+        "border-right-width",
+        "border-bottom-width",
+        "border-left-width",
+        "z-index",
+        "box-sizing",
+        "display",
+        "float",
+        "line-height",
+      ]) {
+        layout[prop] = style.get(prop);
+      }
 
-      // Update the layout properties with whether or not the element's position is
-      // editable with the geometry editor.
-      const isPositionEditable = await pageStyle.isPositionEditable(nodeFront);
-
-      layout = Object.assign({}, layout, {
-        isPositionEditable,
-      });
-
+      /*
       // Update the redux store with the latest offset parent DOM node
       const offsetParent = await inspectorFront.walker.getOffsetParent(
         nodeFront
       );
       this.store.dispatch(updateOffsetParent(offsetParent));
+      */
 
       // Update the redux store with the latest layout properties and update the box
       // model view.
@@ -232,8 +233,7 @@ BoxModel.prototype = {
    * Hides the box-model highlighter on the currently selected element.
    */
   onHideBoxModelHighlighter() {
-    const { highlighter } = this.getCurrentInspectorFront();
-    highlighter.unhighlight();
+    Highlighter.unhighlight();
   },
 
   /**
@@ -286,13 +286,6 @@ BoxModel.prototype = {
   onNewSelection() {
     if (!this.isPanelVisibleAndNodeValid()) {
       return;
-    }
-
-    if (
-      this.inspector.selection.isConnected() &&
-      this.inspector.selection.isElementNode()
-    ) {
-      this.trackReflows();
     }
 
     this.updateBoxModel("new-selection");
@@ -409,15 +402,7 @@ BoxModel.prototype = {
    */
   onSidebarSelect() {
     if (!this.isPanelVisible()) {
-      this.untrackReflows();
       return;
-    }
-
-    if (
-      this.inspector.selection.isConnected() &&
-      this.inspector.selection.isElementNode()
-    ) {
-      this.trackReflows();
     }
 
     this.updateBoxModel();

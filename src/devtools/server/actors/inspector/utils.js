@@ -400,6 +400,9 @@ function getClosestBackgroundImage(node) {
  *         The parent grid if found, null otherwise.
  */
 function findGridParentContainerForNode(node) {
+  // NYI
+  return null;
+
   try {
     while ((node = node.parentNode)) {
       const display = node.ownerGlobal.getComputedStyle(node).display;

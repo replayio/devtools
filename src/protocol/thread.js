@@ -546,6 +546,7 @@ function NodeFront(pause, data) {
   this._rules = null;
   this._listeners = null;
   this._quads = null;
+  this._bounds = null;
 }
 
 NodeFront.prototype = {
@@ -708,6 +709,12 @@ NodeFront.prototype = {
       ).then(({ model }) => {
         this._quads = model;
       }),
+      this._pause.sendMessage(
+        "DOM.getBoundingClientRect",
+        { node: this._object.objectId }
+      ).then(({ rect }) => {
+        this._bounds = rect;
+      }),
     ]);
 
     this._loaded = true;
@@ -734,6 +741,11 @@ NodeFront.prototype = {
     return this._computedStyle.get("display");
   },
 
+  getComputedStyle() {
+    assert(this._loaded);
+    return this._computedStyle;
+  },
+
   get hasEventListeners() {
     assert(this._loaded);
     return this._listeners.length != 0;
@@ -752,6 +764,12 @@ NodeFront.prototype = {
   getBoxQuads(box) {
     assert(this._loaded);
     return buildBoxQuads(this._quads[box]);
+  },
+
+  getBoundingClientRect() {
+    assert(this._loaded);
+    const [left, top, right, bottom] = this._bounds;
+    return new DOMRect(left, top, right - left, bottom - top);
   },
 
   get customElementLocation() {

@@ -143,7 +143,7 @@ const gToolbox = {
   threadFront: ThreadFront,
 
   selection: new Selection(),
-  nodePicker: { on() { }, off() { } },
+  nodePicker: {},
 
   getHighlighter() {
     return {};
@@ -211,6 +211,7 @@ const gToolbox = {
 };
 
 EventEmitter.decorate(gToolbox);
+EventEmitter.decorate(gToolbox.nodePicker);
 
 window.gToolbox = gToolbox;
 
