@@ -130,9 +130,9 @@ Pause.prototype = {
           newProperties.push({
             name: p.name,
             value: new ValueFront(this, p),
-            writable: flags & 1,
-            configurable: flags & 2,
-            enumerable: flags & 4,
+            writable: !!(flags & 1),
+            configurable: !!(flags & 2),
+            enumerable: !!(flags & 4),
             get: p.get ? new ValueFront(this, { object: p.get }) : undefined,
             set: p.set ? new ValueFront(this, { object: p.set }) : undefined,
           });
@@ -488,11 +488,30 @@ ValueFront.prototype = {
   },
 
   async loadChildren() {
+    // Make sure we know all this node's children.
     if (this.isObject() && this.hasPreviewOverflow()) {
       await this.getPause().getObjectPreview(this._object.objectId);
       assert(!this.hasPreviewOverflow());
     }
-    return this.getChildren();
+
+    const children = this.getChildren();
+
+    // Make sure we have previews for all of this node's object children.
+    const promises = [];
+    for (const { contents } of children) {
+      if (contents.isObject() && !contents.hasPreview()) {
+        promises.push(this.getPause().getObjectPreview(contents._object.objectId));
+      }
+    }
+    await Promise.all(promises);
+
+    for (const { contents } of children) {
+      if (contents.isObject()) {
+        assert(contents.hasPreview());
+      }
+    }
+
+    return children;
   },
 };
 
