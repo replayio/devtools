@@ -312,33 +312,31 @@ function checkJumpIcon(msg) {
 
 function findObjectInspectorNode(oi, nodeLabel) {
   return [...oi.querySelectorAll(".tree-node")].find(node => {
-    const label = node.querySelector(".object-label");
-    if (!label) {
-      return false;
-    }
-    return label.textContent === nodeLabel;
+    return node.innerText.includes(nodeLabel);
   });
 }
 
-function toggleObjectInspectorNode(node) {
-  const arrow = node.querySelector(".arrow");
-  if (!arrow) {
-    ok(false, "Node can't be expanded");
-    return;
-  }
+async function findMessageExpandableObjectInspector(msg) {
+  return waitUntil(() => {
+    const inspectors = msg.querySelectorAll(".object-inspector");
+    return [...inspectors].find(oi => oi.querySelector(".arrow"));
+  });
+}
+
+async function toggleObjectInspectorNode(node) {
+  const arrow = await waitUntil(() => node.querySelector(".arrow"));
   arrow.click();
 }
 
 async function checkMessageObjectContents(msg, expected, expandList = []) {
-  const oi = msg.querySelector(".tree");
-  const node = oi.querySelector(".tree-node");
-  toggleObjectInspectorNode(node);
+  const oi = await findMessageExpandableObjectInspector(msg);
+  await toggleObjectInspectorNode(oi);
 
   for (const label of expandList) {
     const labelNode = await waitUntil(() =>
       findObjectInspectorNode(oi, label)
     );
-    toggleObjectInspectorNode(labelNode);
+    await toggleObjectInspectorNode(labelNode);
   }
 
   await waitUntil(() => {
