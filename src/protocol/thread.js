@@ -165,7 +165,15 @@ Pause.prototype = {
 
   async getScopes(frameId) {
     const frame = this.frames.get(frameId);
-    return frame.scopeChain.map(id => this.scopes.get(id));
+    return Promise.all(frame.scopeChain.map(async id => {
+      if (!this.scopes.has(id)) {
+        const { data } = await this.sendMessage("Pause.getScope", { scope: id });
+        this.addData(data);
+      }
+      const scope = this.scopes.get(id);
+      assert(scope);
+      return scope;
+    }));
   },
 
   sendMessage(method, params) {

@@ -378,6 +378,26 @@ async function checkInlinePreview(name, text) {
   });
 }
 
+function waitForFrameTimeline(width) {
+  // FIXME
+  /*
+  return waitUntil(() => {
+    const elem = document.querySelector(".frame-timeline-progress");
+    return elem.style.width == width;
+  });
+  */
+}
+
+function checkFrames(count) {
+  const frames = dbgSelectors.getFrames(dbgSelectors.getCurrentThread());
+  assert(frames.length == count);
+}
+
+async function selectFrame(index) {
+  const frames = dbgSelectors.getFrames(dbgSelectors.getCurrentThread());
+  await dbg.actions.selectFrame(getThreadContext(), frames[index]);
+}
+
 module.exports = {
   selectConsole,
   selectDebugger,
@@ -413,4 +433,7 @@ module.exports = {
   toggleScopeNode,
   executeInConsole,
   checkInlinePreview,
+  waitForFrameTimeline,
+  checkFrames,
+  selectFrame,
 };

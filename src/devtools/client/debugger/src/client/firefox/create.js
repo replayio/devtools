@@ -59,7 +59,7 @@ export function createFrame(
     source: null,
     index,
     asyncCause: frame.asyncCause,
-    state: frame.state,
+    state: "on-stack",
   };
 }
 
