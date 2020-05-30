@@ -28,13 +28,20 @@ loader.lazyRequireGetter(
   "devtools/shared/css/parsing-utils",
   true
 );
-loader.lazyRequireGetter(
-  this,
-  "isCssVariable",
-  "devtools/shared/fronts/css-properties",
-  true
-);
 */
+
+var NON_ASCII = "[^\\x00-\\x7F]";
+var ESCAPE = "\\\\[^\n\r]";
+var FIRST_CHAR = ["[_a-z]", NON_ASCII, ESCAPE].join("|");
+var TRAILING_CHAR = ["[_a-z0-9-]", NON_ASCII, ESCAPE].join("|");
+var IS_VARIABLE_TOKEN = new RegExp(
+  `^--(${FIRST_CHAR})(${TRAILING_CHAR})*$`,
+  "i"
+);
+
+function isCssVariable(input) {
+  return !!input.match(IS_VARIABLE_TOKEN);
+}
 
 const PREF_INACTIVE_CSS_ENABLED = "devtools.inspector.inactive.css.enabled";
 
@@ -146,7 +153,13 @@ class ElementStyle {
    * ready.
    */
   populate() {
-    const entries = this.element.getAppliedRules()
+    const applied = this.element.getAppliedRules();
+    const inline = this.element.getInlineStyle();
+
+    const entries = [...applied];
+    if (inline) {
+      entries.push(inline);
+    }
 
     // Store the current list of rules (if any) during the population
     // process. They will be reused if possible.

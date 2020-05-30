@@ -761,6 +761,13 @@ NodeFront.prototype = {
     return this._rules.map(r => this._pause.getDOMFront(r));
   },
 
+  getInlineStyle() {
+    if (this._node.style) {
+      return this._pause.getDOMFront(this._node.style);
+    }
+    return null;
+  },
+
   getBoxQuads(box) {
     assert(this._loaded);
     return buildBoxQuads(this._quads[box]);
@@ -894,8 +901,20 @@ function StyleFront(pause, data) {
 }
 
 StyleFront.prototype = {
+  objectId() {
+    return this._object.objectId;
+  },
+
+  isRule() {
+    return false;
+  },
+
   get properties() {
     return this._style.properties;
+  },
+
+  get style() {
+    return this;
   },
 };
 
