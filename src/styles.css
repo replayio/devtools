@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   top: 0px;
   left: 0px;
   background-color: #747882;
+  z-index: -1; /* Draw canvas behind the highlighter overlay. */
 }
 
 #toolbox {

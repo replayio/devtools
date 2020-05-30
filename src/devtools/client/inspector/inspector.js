@@ -52,6 +52,8 @@ const HighlightersOverlay = require("devtools/client/inspector/shared/highlighte
 
 //const CSSProperties = require("./css-properties");
 
+const Highlighter = require("highlighter/highlighter");
+
 /*
 loader.lazyRequireGetter(
   this,
@@ -180,6 +182,8 @@ function Inspector(toolbox) {
   this.handleThreadPaused = this.handleThreadPaused.bind(this);
   this.handleThreadResumed = this.handleThreadResumed.bind(this);
   this.handleToolSelected = this.handleToolSelected.bind(this);
+
+  this.highlighter = Highlighter;
 }
 
 Inspector.prototype = {

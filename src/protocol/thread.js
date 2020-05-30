@@ -814,6 +814,7 @@ Object.setPrototypeOf(NodeFront.prototype, new Proxy({}, DisallowEverythingProxy
 
 function buildBoxQuads(array) {
   assert(array.length % 8 == 0);
+  array = [...array];
   const rv = [];
   while (array.length) {
     const [x1, y1, x2, y2, x3, y3, x4, y4] = array.splice(0, 8);
@@ -875,6 +876,10 @@ RuleFront.prototype = {
     return null;
   },
 
+  get href() {
+    return this.parentStyleSheet && this.parentStyleSheet.href;
+  },
+
   get line() {
     return this._rule.startLine;
   },
@@ -913,9 +918,15 @@ StyleFront.prototype = {
     return this._style.properties;
   },
 
-  get style() {
-    return this;
-  },
+  // This stuff is here to allow code to operate on both rules and inline styles.
+  get style() { return this; },
+  parentStyleSheet: null,
+  mediaText: undefined,
+  line: undefined,
+  column: undefined,
+  type: undefined,
+  selectors: undefined,
+  href: undefined,
 };
 
 Object.setPrototypeOf(StyleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));

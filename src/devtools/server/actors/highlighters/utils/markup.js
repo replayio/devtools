@@ -242,6 +242,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
 
     const container = document.getElementById("highlighter-root");
     container.appendChild(node);
+    this._content = node;
   },
 
   _remove() {
@@ -249,6 +250,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
     if (container.firstChild) {
       container.removeChild(container.firstChild);
     }
+    this._content = null;
   },
 
   /**
@@ -266,34 +268,46 @@ CanvasFrameAnonymousContentHelper.prototype = {
   },
 
   getComputedStylePropertyValue(id, property) {
-    return (
-      this.content && this.content.getComputedStylePropertyValue(id, property)
-    );
+    if (this.content) {
+      const node = this.content.querySelector(`#${id}`);
+      const computed = window.getComputedStyle(node);
+      return computed.getPropertyValue(property);
+    }
   },
 
   getTextContentForElement(id) {
-    return this.content && this.content.getTextContentForElement(id);
+    if (this.content) {
+      const node = this.content.querySelector(`#${id}`);
+      return node.innerText;
+    }
   },
 
   setTextContentForElement(id, text) {
     if (this.content) {
-      this.content.setTextContentForElement(id, text);
+      const node = this.content.querySelector(`#${id}`);
+      node.innerText = text;
     }
   },
 
   setAttributeForElement(id, name, value) {
     if (this.content) {
-      this.content.setAttributeForElement(id, name, value);
+      const node = this.content.querySelector(`#${id}`);
+      node.setAttribute(name, value);
     }
   },
 
   getAttributeForElement(id, name) {
-    return this.content && this.content.getAttributeForElement(id, name);
+    if (this.content) {
+      const node = this.content.querySelector(`#${id}`);
+      return node.getAttribute(name);
+    }
+    return "";
   },
 
   removeAttributeForElement(id, name) {
     if (this.content) {
-      this.content.removeAttributeForElement(id, name);
+      const node = this.content.querySelector(`#${id}`);
+      node.removeAttribute(name);
     }
   },
 
@@ -465,9 +479,6 @@ CanvasFrameAnonymousContentHelper.prototype = {
   },
 
   get content() {
-    if (!this._content || Cu.isDeadWrapper(this._content)) {
-      return null;
-    }
     return this._content;
   },
 };
