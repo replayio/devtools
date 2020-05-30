@@ -308,6 +308,13 @@ function refreshGraphics() {
 
     cx.drawImage(gDrawImage, offsetLeft, offsetTop);
 
+    // Make sure highlighters are rendered with the same offsets.
+    const highlighterContainer = document.querySelector(".highlighter-container");
+    if (highlighterContainer) {
+      highlighterContainer.style.left = `${offsetLeft / window.devicePixelRatio}px`;
+      highlighterContainer.style.top = `${offsetTop / window.devicePixelRatio}px`;
+    }
+
     if (gDrawMouse) {
       const { x, y, clickX, clickY } = gDrawMouse;
       drawCursor(cx, x, y);

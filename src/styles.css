@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   display: flex;
   flex-direction: column;
   --toolbox-background: #f9f9fa;
+  z-index: 1; /* Draw toolbox in front of the highlighter overlay. */
 }
 
 #toolbox-border {
