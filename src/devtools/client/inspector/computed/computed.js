@@ -244,8 +244,6 @@ function CssComputedView(inspector, document) {
 
   // The element that we're inspecting, and the document that it comes from.
   this._viewedElement = null;
-  // The PageStyle front related to the currently selected element
-  this.viewedElementPageStyle = null;
 
   this.createStyleViews();
 
@@ -330,13 +328,6 @@ CssComputedView.prototype = {
    */
   selectElement: async function(element) {
     if (!element) {
-      if (this.viewedElementPageStyle) {
-        this.viewedElementPageStyle.off(
-          "stylesheet-updated",
-          this.refreshPanel
-        );
-        this.viewedElementPageStyle = null;
-      }
       this._viewedElement = null;
       this.noResults.hidden = false;
 
@@ -353,12 +344,6 @@ CssComputedView.prototype = {
     if (element === this._viewedElement) {
       return promise.resolve(undefined);
     }
-
-    if (this.viewedElementPageStyle) {
-      this.viewedElementPageStyle.off("stylesheet-updated", this.refreshPanel);
-    }
-    this.viewedElementPageStyle = element.inspectorFront.pageStyle;
-    this.viewedElementPageStyle.on("stylesheet-updated", this.refreshPanel);
 
     this._viewedElement = element;
 
@@ -544,7 +529,7 @@ CssComputedView.prototype = {
     return (
       this.inspector.toolbox &&
       this.inspector.sidebar &&
-      this.inspector.toolbox.currentToolId === "inspector" &&
+      this.inspector.toolbox.currentTool === "inspector" &&
       this.inspector.sidebar.getCurrentTabID() == "computedview"
     );
   },
@@ -553,80 +538,74 @@ CssComputedView.prototype = {
    * Refresh the panel content. This could be called by a "ruleview-changed" event, but
    * we avoid the extra processing unless the panel is visible.
    */
-  refreshPanel: function() {
+  refreshPanel: async function() {
     if (!this._viewedElement || !this.isPanelVisible()) {
-      return promise.resolve();
+      return;
     }
 
     // Capture the current viewed element to return from the promise handler
     // early if it changed
     const viewedElement = this._viewedElement;
 
-    return promise
-      .all([
-        this._createPropertyViews(),
-        this.viewedElementPageStyle.getComputed(this._viewedElement, {
-          filter: this._sourceFilter,
-          onlyMatched: !this.includeBrowserStyles,
-          markMatched: true,
-        }),
-      ])
-      .then(([, computed]) => {
-        if (viewedElement !== this._viewedElement) {
-          return promise.resolve();
+    await this._createPropertyViews();
+
+    if (viewedElement !== this._viewedElement) {
+      return;
+    }
+
+    const computed = this._viewedElement.getComputedStyle();
+
+    this._matchedProperties = new Set([...computed.keys()]);
+    /*
+    for (const name in computed) {
+      if (computed[name].matched) {
+        this._matchedProperties.add(name);
+      }
+    }
+    */
+    this._computed = computed;
+
+    if (this._refreshProcess) {
+      this._refreshProcess.cancel();
+    }
+
+    this.noResults.hidden = true;
+
+    // Reset visible property count
+    this.numVisibleProperties = 0;
+
+    // Reset zebra striping.
+    this._darkStripe = true;
+
+    return new Promise((resolve, reject) => {
+      this._refreshProcess = new UpdateProcess(
+        this.styleWindow,
+        this.propertyViews,
+        {
+          onItem: propView => {
+            propView.refresh();
+          },
+          onCancel: () => {
+            reject("_refreshProcess of computed view cancelled");
+          },
+          onDone: () => {
+            this._refreshProcess = null;
+            this.noResults.hidden = this.numVisibleProperties > 0;
+
+            const searchBox = this.searchField.parentNode;
+            searchBox.classList.toggle(
+              "devtools-searchbox-no-match",
+              this.searchField.value.length > 0 &&
+                !this.numVisibleProperties
+            );
+
+            this.inspector.emit("computed-view-refreshed");
+            resolve(undefined);
+          },
         }
-
-        this._matchedProperties = new Set();
-        for (const name in computed) {
-          if (computed[name].matched) {
-            this._matchedProperties.add(name);
-          }
-        }
-        this._computed = computed;
-
-        if (this._refreshProcess) {
-          this._refreshProcess.cancel();
-        }
-
-        this.noResults.hidden = true;
-
-        // Reset visible property count
-        this.numVisibleProperties = 0;
-
-        // Reset zebra striping.
-        this._darkStripe = true;
-
-        return new Promise((resolve, reject) => {
-          this._refreshProcess = new UpdateProcess(
-            this.styleWindow,
-            this.propertyViews,
-            {
-              onItem: propView => {
-                propView.refresh();
-              },
-              onCancel: () => {
-                reject("_refreshProcess of computed view cancelled");
-              },
-              onDone: () => {
-                this._refreshProcess = null;
-                this.noResults.hidden = this.numVisibleProperties > 0;
-
-                const searchBox = this.searchField.parentNode;
-                searchBox.classList.toggle(
-                  "devtools-searchbox-no-match",
-                  this.searchField.value.length > 0 &&
-                    !this.numVisibleProperties
-                );
-
-                this.inspector.emit("computed-view-refreshed");
-                resolve(undefined);
-              },
-            }
-          );
-          this._refreshProcess.schedule();
-        });
-      })
-      .catch(console.error);
+      );
+      this._refreshProcess.schedule();
+    });
   },
 
   /**
@@ -837,10 +816,6 @@ CssComputedView.prototype = {
    */
   destroy: function() {
     this._viewedElement = null;
-    if (this.viewedElementPageStyle) {
-      this.viewedElementPageStyle.off("stylesheet-updated", this.refreshPanel);
-      this.viewedElementPageStyle = null;
-    }
     this._outputParser = null;
 
     this._prefObserver.off("devtools.defaultColorUnit", this._handlePrefChange);
@@ -910,7 +885,7 @@ function PropertyInfo(tree, name) {
 PropertyInfo.prototype = {
   get value() {
     if (this.tree._computed) {
-      const value = this.tree._computed[this.name].value;
+      const value = this.tree._computed.get(this.name);
       return value;
     }
     return null;

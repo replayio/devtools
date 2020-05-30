@@ -934,24 +934,16 @@ CssRuleView.prototype = {
   },
 
   _populate: function() {
-    const elementStyle = this._elementStyle;
-    return this._elementStyle
-      .populate()
-      .then(() => {
-        if (this._elementStyle !== elementStyle || this.isDestroyed) {
-          return null;
-        }
+    this._elementStyle.populate();
 
-        this._clearRules();
-        const onEditorsReady = this._createEditors();
-        this.refreshPseudoClassPanel();
+    this._clearRules();
+    const onEditorsReady = this._createEditors();
+    this.refreshPseudoClassPanel();
 
-        // Notify anyone that cares that we refreshed.
-        return onEditorsReady.then(() => {
-          this.emit("ruleview-refreshed");
-        }, console.error);
-      })
-      .catch(promiseWarn);
+    // Notify anyone that cares that we refreshed.
+    return onEditorsReady.then(() => {
+      this.emit("ruleview-refreshed");
+    }, console.error);
   },
 
   /**

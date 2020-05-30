@@ -756,7 +756,7 @@ NodeFront.prototype = {
     return this._listeners;
   },
 
-  async getAppliedRules() {
+  getAppliedRules() {
     assert(this._loaded);
     return this._rules.map(r => this._pause.getDOMFront(r));
   },

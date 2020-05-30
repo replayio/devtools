@@ -146,57 +146,40 @@ class ElementStyle {
    * ready.
    */
   populate() {
-    const populated = this.element.getAppliedRules()
-      .then(entries => {
-        if (this.destroyed || this.populated !== populated) {
-          return promise.resolve(undefined);
-        }
+    const entries = this.element.getAppliedRules()
 
-        // Store the current list of rules (if any) during the population
-        // process. They will be reused if possible.
-        const existingRules = this.rules;
+    // Store the current list of rules (if any) during the population
+    // process. They will be reused if possible.
+    const existingRules = this.rules;
 
-        this.rules = [];
+    this.rules = [];
 
-        for (const entry of entries) {
-          this._maybeAddRule(entry, existingRules);
-        }
+    for (const entry of entries) {
+      this._maybeAddRule(entry, existingRules);
+    }
 
-        // Store a list of all pseudo-element types found in the matching rules.
-        this.pseudoElements = this.rules
-          .filter(r => r.pseudoElement)
-          .map(r => r.pseudoElement);
+    // Store a list of all pseudo-element types found in the matching rules.
+    this.pseudoElements = this.rules
+      .filter(r => r.pseudoElement)
+      .map(r => r.pseudoElement);
 
-        // Mark overridden computed styles.
-        this.onRuleUpdated();
+    // Mark overridden computed styles.
+    this.onRuleUpdated();
 
-        this._sortRulesForPseudoElement();
+    this._sortRulesForPseudoElement();
 
-        if (this.ruleView.isNewRulesView) {
-          this.subscribeRulesToLocationChange();
-        }
+    if (this.ruleView.isNewRulesView) {
+      this.subscribeRulesToLocationChange();
+    }
 
-        // We're done with the previous list of rules.
-        for (const r of existingRules) {
-          if (r && r.editor) {
-            r.editor.destroy();
-          }
+    // We're done with the previous list of rules.
+    for (const r of existingRules) {
+      if (r && r.editor) {
+        r.editor.destroy();
+      }
 
-          r.destroy();
-        }
-
-        return undefined;
-      })
-      .catch(e => {
-        // populate is often called after a setTimeout,
-        // the connection may already be closed.
-        if (this.destroyed) {
-          return promise.resolve(undefined);
-        }
-        return promiseWarn(e);
-      });
-    this.populated = populated;
-    return this.populated;
+      r.destroy();
+    }
   }
 
   /**
