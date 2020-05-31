@@ -77,7 +77,7 @@ function CommandButton({ img, className, onClick, active }) {
     dom.div({
       className: `btn ${img} ${className}`,
       style: {
-        webkitMaskImage: `url("data:image/svg+xml;base64,${base64}")`,
+        //webkitMaskImage: `url("data:image/svg+xml;base64,${base64}")`,
         maskImage: `url("data:image/svg+xml;base64,${base64}")`,
       },
     })
