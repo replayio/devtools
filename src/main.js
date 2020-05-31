@@ -39,7 +39,9 @@ require("./styles.css");
 
 const React = require("react");
 const ReactDOM = require("react-dom");
-const WebReplayPlayer = require("timeline/WebReplayPlayer");
+const WebReplayPlayer = require("ui/components/WebReplayPlayer");
+import App from "ui/components/App";
+
 const { initSocket, sendMessage, log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const { paintMessage } = require("protocol/graphics");
@@ -77,7 +79,6 @@ if (test) {
   require("devtools-modules").asyncStorage.clear();
 }
 
-setTimeout(initialize, 0);
 
 async function initialize() {
   if (!recordingId) {
@@ -219,6 +220,9 @@ EventEmitter.decorate(gToolbox.nodePicker);
 window.gToolbox = gToolbox;
 
 setTimeout(() => {
+
+  ReactDOM.render(React.createElement(App, { initialize }), document.body);
+
   const debuggerPanel = new DebuggerPanel(gToolbox);
   gToolbox.addTool("jsdebugger", debuggerPanel);
 
