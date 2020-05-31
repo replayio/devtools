@@ -8,10 +8,10 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
+} = require("react");
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+const PropTypes = require("prop-types");
+const { connect } = require("react-redux");
 
 const actions = require("devtools/client/framework/actions/index");
 const { l10n } = require("devtools/client/webconsole/utils/messages");

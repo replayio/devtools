@@ -4,9 +4,9 @@
 
 "use strict";
 
-const { Component } = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+const { Component } = require("react");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const l10n = new LocalizationHelper(

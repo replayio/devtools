@@ -7,15 +7,15 @@
 const {
   Component,
   createElement,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const PropTypes = require("prop-types");
 const {
   ul,
   li,
   h2,
   div,
   span,
-} = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react-dom-factories");
 
 class Accordion extends Component {
   static get propTypes() {
@@ -176,13 +176,13 @@ class Accordion extends Component {
           header
         ),
         buttons &&
-          span(
-            {
-              className: "accordion-header-buttons",
-              role: "presentation",
-            },
-            buttons
-          )
+        span(
+          {
+            className: "accordion-header-buttons",
+            role: "presentation",
+          },
+          buttons
+        )
       ),
       div(
         {

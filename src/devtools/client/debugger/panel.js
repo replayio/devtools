@@ -52,7 +52,7 @@ async function getNodeFront(gripOrFront, toolbox) {
 }
 
 DebuggerPanel.prototype = {
-  open: async function() {
+  open: async function () {
     const {
       actions,
       store,
@@ -107,28 +107,28 @@ DebuggerPanel.prototype = {
     };
   },
 
-  _getState: function() {
+  _getState: function () {
     return this._store.getState();
   },
 
-  getToolboxStore: function() {
+  getToolboxStore: function () {
     return this.toolbox.store;
   },
 
-  openLink: function(url) {
+  openLink: function (url) {
     openContentLink(url);
   },
 
-  openConsoleAndEvaluate: async function(input) {
+  openConsoleAndEvaluate: async function (input) {
     const { hud } = await this.toolbox.selectTool("webconsole");
     hud.ui.wrapper.dispatchEvaluateExpression(input);
   },
 
-  openInspector: async function() {
+  openInspector: async function () {
     this.toolbox.selectTool("inspector");
   },
 
-  openElementInInspector: async function(gripOrFront) {
+  openElementInInspector: async function (gripOrFront) {
     const onSelectInspector = this.toolbox.selectTool("inspector");
     const onGripNodeToFront = getNodeFront(gripOrFront, this.toolbox);
 
@@ -145,7 +145,7 @@ DebuggerPanel.prototype = {
     return Promise.all([onNodeFrontSet, onInspectorUpdated]);
   },
 
-  highlightDomElement: async function(gripOrFront) {
+  highlightDomElement: async function (gripOrFront) {
     if (!this._highlight) {
       const { highlight, unhighlight } = this.toolbox.getHighlighter();
       this._highlight = highlight;
@@ -155,7 +155,7 @@ DebuggerPanel.prototype = {
     return this._highlight(gripOrFront);
   },
 
-  unHighlightDomElement: function() {
+  unHighlightDomElement: function () {
     if (!this._unhighlight) {
       return;
     }
@@ -164,7 +164,7 @@ DebuggerPanel.prototype = {
     return this._unhighlight(forceUnHighlightInTest);
   },
 
-  getFrames: function() {
+  getFrames: function () {
     const thread = this._selectors.getCurrentThread(this._getState());
     const frames = this._selectors.getFrames(this._getState(), thread);
 
@@ -265,7 +265,7 @@ DebuggerPanel.prototype = {
     return this._selectors.getSourceByURL(this._getState(), sourceURL);
   },
 
-  destroy: function() {
+  destroy: function () {
     this.panelWin.Debugger.destroy();
     this.emit("destroyed");
   },

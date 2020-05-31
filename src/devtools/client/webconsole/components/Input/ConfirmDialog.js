@@ -4,7 +4,7 @@
 
 "use strict";
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const PropTypes = require("prop-types");
 
 /*
 loader.lazyRequireGetter(
@@ -16,15 +16,15 @@ loader.lazyRequireGetter(
 loader.lazyRequireGetter(
   this,
   "createPortal",
-  "devtools/client/shared/vendor/react-dom",
+  "react-dom",
   true
 );
 */
 
 // React & Redux
-const { Component } = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+const { Component } = require("react");
+const dom = require("react-dom-factories");
+const { connect } = require("react-redux");
 
 const {
   getAutocompleteState,

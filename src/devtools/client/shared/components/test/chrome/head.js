@@ -27,18 +27,18 @@ var { require: browserRequire } = BrowserLoader({
   window,
 });
 
-const React = browserRequire("devtools/client/shared/vendor/react");
-const ReactDOM = browserRequire("devtools/client/shared/vendor/react-dom");
-const dom = browserRequire("devtools/client/shared/vendor/react-dom-factories");
+const React = browserRequire("react");
+const ReactDOM = browserRequire("react-dom");
+const dom = browserRequire("react-dom-factories");
 const TestUtils = browserRequire(
-  "devtools/client/shared/vendor/react-dom-test-utils"
+  "react-dom-test-utils"
 );
 
 const ShallowRenderer = browserRequire(
-  "devtools/client/shared/vendor/react-test-renderer-shallow"
+  "react-test-renderer-shallow"
 );
 const TestRenderer = browserRequire(
-  "devtools/client/shared/vendor/react-test-renderer"
+  "react-test-renderer"
 );
 
 var EXAMPLE_URL = "http://example.com/browser/browser/devtools/shared/test/";

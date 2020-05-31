@@ -4,9 +4,9 @@
 
 "use strict";
 
-const { createRef, Component } = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+const { createRef, Component } = require("react");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 
 class Draggable extends Component {
   static get propTypes() {

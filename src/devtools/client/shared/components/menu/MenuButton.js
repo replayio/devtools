@@ -12,16 +12,16 @@ const flags = require("devtools/shared/flags");
 const {
   createRef,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 const { button } = dom;
 
 const isMacOS = Services.appinfo.OS === "Darwin";
 
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const { focusableSelector } = require("devtools/client/shared/focus");
-const { createPortal } = require("devtools/client/shared/vendor/react-dom");
+const { createPortal } = require("react-dom");
 
 // Return a copy of |obj| minus |fields|.
 const omit = (obj, fields) => {

@@ -4,9 +4,9 @@
 
 "use strict";
 
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const { PureComponent } = require("devtools/client/shared/vendor/react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
+const { PureComponent } = require("react");
 
 /**
  * This class provides the shape of indication bar such as scrubber and progress bar.

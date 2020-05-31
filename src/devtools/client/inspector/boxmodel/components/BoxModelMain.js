@@ -7,9 +7,9 @@
 const {
   createFactory,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 const { KeyCodes } = require("devtools/client/shared/keycodes");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
@@ -435,37 +435,37 @@ class BoxModelMain extends PureComponent {
     const contentBox =
       layout["box-sizing"] == "content-box"
         ? dom.div(
-            { className: "boxmodel-size" },
-            BoxModelEditable({
-              box: "content",
-              focusable,
-              level,
-              property: "width",
-              ref: editable => {
-                this.contentEditable = editable;
-              },
-              textContent: width,
-              onShowBoxModelEditor,
-              onShowRulePreviewTooltip,
-            }),
-            dom.span({}, "\u00D7"),
-            BoxModelEditable({
-              box: "content",
-              focusable,
-              level,
-              property: "height",
-              textContent: height,
-              onShowBoxModelEditor,
-              onShowRulePreviewTooltip,
-            })
-          )
+          { className: "boxmodel-size" },
+          BoxModelEditable({
+            box: "content",
+            focusable,
+            level,
+            property: "width",
+            ref: editable => {
+              this.contentEditable = editable;
+            },
+            textContent: width,
+            onShowBoxModelEditor,
+            onShowRulePreviewTooltip,
+          }),
+          dom.span({}, "\u00D7"),
+          BoxModelEditable({
+            box: "content",
+            focusable,
+            level,
+            property: "height",
+            textContent: height,
+            onShowBoxModelEditor,
+            onShowRulePreviewTooltip,
+          })
+        )
         : dom.p(
-            { className: "boxmodel-size" },
-            dom.span(
-              { title: "content" },
-              SHARED_L10N.getFormatStr("dimensions", width, height)
-            )
-          );
+          { className: "boxmodel-size" },
+          dom.span(
+            { title: "content" },
+            SHARED_L10N.getFormatStr("dimensions", width, height)
+          )
+        );
 
     return dom.div(
       {
@@ -481,13 +481,13 @@ class BoxModelMain extends PureComponent {
       },
       displayPosition
         ? dom.span(
-            {
-              className: "boxmodel-legend",
-              "data-box": "position",
-              title: "position",
-            },
-            "position"
-          )
+          {
+            className: "boxmodel-legend",
+            "data-box": "position",
+            title: "position",
+          },
+          "position"
+        )
         : null,
       dom.div(
         { className: "boxmodel-box" },
@@ -556,54 +556,54 @@ class BoxModelMain extends PureComponent {
       ),
       displayPosition
         ? BoxModelEditable({
-            box: "position",
-            direction: "top",
-            focusable,
-            level,
-            property: "position-top",
-            ref: editable => {
-              this.positionEditable = editable;
-            },
-            textContent: positionTop,
-            onShowBoxModelEditor,
-            onShowRulePreviewTooltip,
-          })
+          box: "position",
+          direction: "top",
+          focusable,
+          level,
+          property: "position-top",
+          ref: editable => {
+            this.positionEditable = editable;
+          },
+          textContent: positionTop,
+          onShowBoxModelEditor,
+          onShowRulePreviewTooltip,
+        })
         : null,
       displayPosition
         ? BoxModelEditable({
-            box: "position",
-            direction: "right",
-            focusable,
-            level,
-            property: "position-right",
-            textContent: positionRight,
-            onShowBoxModelEditor,
-            onShowRulePreviewTooltip,
-          })
+          box: "position",
+          direction: "right",
+          focusable,
+          level,
+          property: "position-right",
+          textContent: positionRight,
+          onShowBoxModelEditor,
+          onShowRulePreviewTooltip,
+        })
         : null,
       displayPosition
         ? BoxModelEditable({
-            box: "position",
-            direction: "bottom",
-            focusable,
-            level,
-            property: "position-bottom",
-            textContent: positionBottom,
-            onShowBoxModelEditor,
-            onShowRulePreviewTooltip,
-          })
+          box: "position",
+          direction: "bottom",
+          focusable,
+          level,
+          property: "position-bottom",
+          textContent: positionBottom,
+          onShowBoxModelEditor,
+          onShowRulePreviewTooltip,
+        })
         : null,
       displayPosition
         ? BoxModelEditable({
-            box: "position",
-            direction: "left",
-            focusable,
-            level,
-            property: "position-left",
-            textContent: positionLeft,
-            onShowBoxModelEditor,
-            onShowRulePreviewTooltip,
-          })
+          box: "position",
+          direction: "left",
+          focusable,
+          level,
+          property: "position-left",
+          textContent: positionLeft,
+          onShowBoxModelEditor,
+          onShowRulePreviewTooltip,
+        })
         : null,
       BoxModelEditable({
         box: "margin",

@@ -4,16 +4,16 @@
 "use strict";
 
 // Make this available to both AMD and CJS environments
-define(function(require, exports, module) {
+define(function (require, exports, module) {
   const {
     cloneElement,
     Component,
     createFactory,
     createRef,
-  } = require("devtools/client/shared/vendor/react");
-  const { findDOMNode } = require("devtools/client/shared/vendor/react-dom");
-  const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-  const dom = require("devtools/client/shared/vendor/react-dom-factories");
+  } = require("react");
+  const { findDOMNode } = require("react-dom");
+  const PropTypes = require("prop-types");
+  const dom = require("react-dom-factories");
 
   // Reps
   const {

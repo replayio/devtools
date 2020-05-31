@@ -11,7 +11,7 @@ const isMacOS = Services.appinfo.OS === "Darwin";
 const EventEmitter = require("devtools/shared/event-emitter");
 
 const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const PropTypes = require("prop-types");
 
 const { KeyCodes } = require("devtools/client/shared/keycodes");
 const Editor = require("devtools/client/shared/sourceeditor/editor");
@@ -31,9 +31,9 @@ const { l10n } = require("devtools/client/webconsole/utils/messages");
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const dom = require("react-dom-factories");
+const { connect } = require("react-redux");
 
 // History Modules
 const {
@@ -555,7 +555,7 @@ class JSTerm extends Component {
 
     if (
       nextProps.autocompletePopupPosition !==
-        this.props.autocompletePopupPosition &&
+      this.props.autocompletePopupPosition &&
       this.autocompletePopup
     ) {
       this.autocompletePopup.position = nextProps.autocompletePopupPosition;
@@ -913,7 +913,7 @@ class JSTerm extends Component {
     return (
       (!multiline && ch === 0) ||
       this.editor.getDoc().getRange({ line: 0, ch: 0 }, { line, ch }).length ===
-        inputValue.length
+      inputValue.length
     );
   }
 
@@ -1147,7 +1147,7 @@ class JSTerm extends Component {
       inputBeforeCursor.substring(
         0,
         inputBeforeCursor.length -
-          (numberOfCharsToReplaceCharsBeforeCursor || 0)
+        (numberOfCharsToReplaceCharsBeforeCursor || 0)
       ) +
       completionText +
       inputAfterCursor;
@@ -1162,8 +1162,8 @@ class JSTerm extends Component {
   getInputValueBeforeCursor() {
     return this.editor
       ? this.editor
-          .getDoc()
-          .getRange({ line: 0, ch: 0 }, this.editor.getCursor())
+        .getDoc()
+        .getRange({ line: 0, ch: 0 }, this.editor.getCursor())
       : null;
   }
 

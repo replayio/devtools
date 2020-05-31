@@ -4,9 +4,9 @@
 
 "use strict";
 
-const { PureComponent } = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+const { PureComponent } = require("react");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 
 /**
  * This component is intended to show the tick line as the background.

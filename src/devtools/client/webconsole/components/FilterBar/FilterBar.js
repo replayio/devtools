@@ -7,9 +7,9 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react");
+const { connect } = require("react-redux");
+const dom = require("react-dom-factories");
 
 // Actions
 const actions = require("devtools/client/webconsole/actions/index");
@@ -43,7 +43,7 @@ const SearchBox = createFactory(
   require("devtools/client/shared/components/SearchBox")
 );
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const PropTypes = require("prop-types");
 
 const disabledCssFilterButtonTitle = l10n.getStr(
   "webconsole.cssFilterButton.inactive.tooltip"

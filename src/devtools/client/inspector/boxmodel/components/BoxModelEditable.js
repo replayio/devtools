@@ -5,9 +5,9 @@
 "use strict";
 
 const Services = require("Services");
-const { PureComponent } = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const { PureComponent } = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 const { editableItem } = require("devtools/client/shared/inplace-editor");
 
 const LONG_TEXT_ROTATE_LIMIT = 3;
@@ -78,10 +78,10 @@ class BoxModelEditable extends PureComponent {
       {
         className: `boxmodel-${box}
                       ${
-                        direction
-                          ? " boxmodel-" + direction
-                          : "boxmodel-" + property
-                      }
+          direction
+            ? " boxmodel-" + direction
+            : "boxmodel-" + property
+          }
                       ${rotate ? " boxmodel-rotate" : ""}`,
       },
       dom.span(

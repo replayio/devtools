@@ -4,7 +4,7 @@
 
 "use strict";
 
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+const dom = require("react-dom-factories");
 
 const { colorUtils } = require("devtools/shared/css/color.js");
 

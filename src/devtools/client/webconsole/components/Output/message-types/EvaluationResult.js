@@ -5,8 +5,8 @@
 "use strict";
 
 // React & Redux
-const { createFactory } = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const { createFactory } = require("react");
+const PropTypes = require("prop-types");
 const Message = createFactory(
   require("devtools/client/webconsole/components/Output/Message")
 );

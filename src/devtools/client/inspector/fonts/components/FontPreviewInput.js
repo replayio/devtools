@@ -7,9 +7,9 @@
 const {
   createRef,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 const Types = require("devtools/client/inspector/fonts/types");
 const { getStr } = require("devtools/client/inspector/fonts/utils/l10n");

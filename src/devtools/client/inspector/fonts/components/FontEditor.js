@@ -7,9 +7,9 @@
 const {
   createFactory,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 const FontAxis = createFactory(
   require("devtools/client/inspector/fonts/components/FontAxis")
@@ -114,20 +114,20 @@ class FontEditor extends PureComponent {
     const moreFonts = !moreFontsList.length
       ? null
       : dom.details(
+        {},
+        dom.summary(
           {},
-          dom.summary(
-            {},
-            dom.span(
-              { className: "label-open" },
-              getStr("fontinspector.showMore")
-            ),
-            dom.span(
-              { className: "label-close" },
-              getStr("fontinspector.showLess")
-            )
+          dom.span(
+            { className: "label-open" },
+            getStr("fontinspector.showMore")
           ),
-          moreFontsList
-        );
+          dom.span(
+            { className: "label-close" },
+            getStr("fontinspector.showLess")
+          )
+        ),
+        moreFontsList
+      );
 
     return dom.label(
       {
@@ -340,7 +340,7 @@ class FontEditor extends PureComponent {
       this.renderUsedFonts(fonts),
       // Render UI for font variation instances if they are defined.
       hasFontInstances &&
-        this.renderInstances(font.variationInstances, instance),
+      this.renderInstances(font.variationInstances, instance),
       // Always render UI for font size.
       this.renderFontSize(properties["font-size"]),
       // Always render UI for line height.

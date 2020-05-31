@@ -3,8 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // Dependencies
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const { span } = require("devtools/client/shared/vendor/react-dom-factories");
+const PropTypes = require("prop-types");
+const { span } = require("react-dom-factories");
 
 const { lengthBubble } = require("../shared/grip-length-bubble");
 const {

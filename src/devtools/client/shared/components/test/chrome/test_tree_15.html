@@ -34,10 +34,10 @@ Test scroll position when focusing items in traversal but not rendered.
 
 window.onload = async function () {
   try {
-    const ReactDOM = browserRequire("devtools/client/shared/vendor/react-dom");
-    const { createFactory } = browserRequire("devtools/client/shared/vendor/react");
+    const ReactDOM = browserRequire("react-dom");
+    const { createFactory } = browserRequire("react");
     const { Simulate } =
-      browserRequire("devtools/client/shared/vendor/react-dom-test-utils");
+      browserRequire("react-dom-test-utils");
     const Tree =
       createFactory(browserRequire("devtools/client/shared/components/VirtualizedTree"));
 

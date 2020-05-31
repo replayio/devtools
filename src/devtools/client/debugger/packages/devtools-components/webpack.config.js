@@ -21,11 +21,7 @@ const webpackConfig = {
   },
   resolve: {
     alias: {
-      "devtools/client/shared/vendor/react": "react",
-      "devtools/client/shared/vendor/react-dom": "react-dom",
-      "devtools/client/shared/vendor/react-dom-factories":
-        "react-dom-factories",
-      "devtools/client/shared/vendor/react-prop-types": "prop-types",
+
       Services: path.join(
         __dirname,
         "node_modules/devtools-modules/client/shared/shim/Services"
@@ -40,10 +36,6 @@ const extra = {
 webpackConfig.plugins = [];
 if (!isDevelopment()) {
   extra.excludeMap = {
-    react: "devtools/client/shared/vendor/react",
-    "react-dom": "devtools/client/shared/vendor/react-dom",
-    "react-dom-factories": "devtools/client/shared/vendor/react-dom-factories",
-    "prop-types": "devtools/client/shared/vendor/react-prop-types",
     lodash: "devtools/client/shared/vendor/lodash",
   };
 }

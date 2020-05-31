@@ -8,8 +8,8 @@
 const {
   createFactory,
   createElement,
-} = require("devtools/client/shared/vendor/react");
-const { Provider } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const { Provider } = require("react-redux");
 const { debounce } = require("devtools/shared/debounce");
 //const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
 
@@ -859,7 +859,7 @@ class FontInspector {
         // When connecting to an older server or when debugging a XUL document, the
         // FontsHighlighter won't be available. Silently fail here and prevent any future
         // calls to the function.
-        this.onToggleFontHighlight = () => {};
+        this.onToggleFontHighlight = () => { };
         return;
       }
     }

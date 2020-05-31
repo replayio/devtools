@@ -23,15 +23,15 @@ Test that List renders correctly.
 
 window.onload = async function() {
   try {
-    const { div } = require("devtools/client/shared/vendor/react-dom-factories");
-    const React = browserRequire("devtools/client/shared/vendor/react");
+    const { div } = require("react-dom-factories");
+    const React = browserRequire("react");
     const {
       Simulate,
       renderIntoDocument,
       findRenderedDOMComponentWithClass,
       scryRenderedDOMComponentsWithTag,
       scryRenderedComponentsWithType,
-    } = browserRequire("devtools/client/shared/vendor/react-dom-test-utils");
+    } = browserRequire("react-dom-test-utils");
     const { List, ListItem } =
       browserRequire("devtools/client/shared/components/List");
 

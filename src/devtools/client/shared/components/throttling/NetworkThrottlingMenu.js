@@ -4,9 +4,9 @@
 
 "use strict";
 
-const { PureComponent } = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const { PureComponent } = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 const throttlingProfiles = require("devtools/client/shared/components/throttling/profiles");
 const Types = require("devtools/client/shared/components/throttling/types");

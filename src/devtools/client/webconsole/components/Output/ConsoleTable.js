@@ -6,8 +6,8 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react");
+const dom = require("react-dom-factories");
 const {
   l10n,
   getArrayTypeNames,
@@ -20,7 +20,7 @@ const GripMessageBody = createFactory(
   require("devtools/client/webconsole/components/Output/GripMessageBody")
 );
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const PropTypes = require("prop-types");
 
 const TABLE_ROW_MAX_ITEMS = 1000;
 // Match Chrome max column number.

@@ -11,11 +11,11 @@ const CONTENT_TEXT = "Hello World!";
  * Verify InspectorPanel.addSidebarTab() API that can be consumed
  * by DevTools extensions as well as DevTools code base.
  */
-add_task(async function() {
+add_task(async function () {
   const { inspector } = await openInspectorForURL(TEST_URI);
 
   const { Component, createFactory } = inspector.React;
-  const dom = require("devtools/client/shared/vendor/react-dom-factories");
+  const dom = require("react-dom-factories");
   const { div } = dom;
 
   info("Adding custom panel.");

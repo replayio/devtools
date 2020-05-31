@@ -7,9 +7,9 @@
 const {
   createFactory,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 const FontName = createFactory(
   require("devtools/client/inspector/fonts/components/FontName")
@@ -85,9 +85,9 @@ class Font extends PureComponent {
       isFontFaceRuleExpanded
         ? body
         : dom.span({
-            className: "font-css-code-expander",
-            onClick: this.onFontFaceRuleToggle,
-          }),
+          className: "font-css-code-expander",
+          onClick: this.onFontFaceRuleToggle,
+        }),
       trailing
     );
   }

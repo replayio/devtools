@@ -8,9 +8,9 @@ const {
   createFactory,
   createRef,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 const { editableItem } = require("devtools/client/shared/inplace-editor");
 
 const Declarations = createFactory(
@@ -130,9 +130,9 @@ class Rule extends PureComponent {
           }),
           type !== CSSRule.KEYFRAME_RULE
             ? SelectorHighlighter({
-                onToggleSelectorHighlighter,
-                selector,
-              })
+              onToggleSelectorHighlighter,
+              selector,
+            })
             : null,
           dom.span({ className: "ruleview-ruleopen" }, " {")
         ),

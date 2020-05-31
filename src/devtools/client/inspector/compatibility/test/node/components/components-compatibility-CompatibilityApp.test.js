@@ -8,7 +8,7 @@
  */
 
 const { shallow } = require("enzyme");
-const { createFactory } = require("devtools/client/shared/vendor/react");
+const { createFactory } = require("react");
 const { thunk } = require("devtools/client/shared/redux/middleware/thunk.js");
 const configureStore = require("redux-mock-store").default;
 

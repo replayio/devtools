@@ -5,7 +5,7 @@
 const expect = require("expect");
 const { render } = require("enzyme");
 
-const { createFactory } = require("devtools/client/shared/vendor/react");
+const { createFactory } = require("react");
 
 const FilterCheckbox = createFactory(
   require("devtools/client/webconsole/components/FilterBar/FilterCheckbox")
@@ -16,7 +16,7 @@ describe("FilterCheckbox component:", () => {
     label: "test label",
     title: "test title",
     checked: true,
-    onChange: () => {},
+    onChange: () => { },
   };
 
   it("displays as checked", () => {

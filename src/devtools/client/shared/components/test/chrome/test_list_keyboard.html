@@ -24,14 +24,14 @@ Test that List component has working keyboard interactions.
 window.onload = function() {
   try {
     const { a, button, div } =
-      require("devtools/client/shared/vendor/react-dom-factories");
-    const React = browserRequire("devtools/client/shared/vendor/react");
+      require("react-dom-factories");
+    const React = browserRequire("react");
     const {
       Simulate,
       findRenderedDOMComponentWithClass,
       findRenderedDOMComponentWithTag,
       scryRenderedDOMComponentsWithTag,
-    } = browserRequire("devtools/client/shared/vendor/react-dom-test-utils");
+    } = browserRequire("react-dom-test-utils");
     const { List } =
       browserRequire("devtools/client/shared/components/List");
 

@@ -10,9 +10,9 @@ const {
   createFactory,
   createRef,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 
 /*
 loader.lazyGetter(this, "SearchBoxAutocompletePopup", function() {
@@ -219,18 +219,18 @@ class SearchBox extends PureComponent {
         type: "search",
       }),
       showLearnMoreLink &&
-        MDNLink({
-          title: learnMoreTitle,
-          url: learnMoreUrl,
-        }),
+      MDNLink({
+        title: learnMoreTitle,
+        url: learnMoreUrl,
+      }),
       summary
         ? dom.span(
-            {
-              className: "devtools-searchinput-summary",
-              title: summaryTooltip || "",
-            },
-            summary
-          )
+          {
+            className: "devtools-searchinput-summary",
+            title: summaryTooltip || "",
+          },
+          summary
+        )
         : null,
       dom.button({
         className: "devtools-searchinput-clear",
@@ -238,12 +238,12 @@ class SearchBox extends PureComponent {
         onClick: this.onClearButtonClick,
       }),
       showAutocomplete &&
-        SearchBoxAutocompletePopup({
-          autocompleteProvider,
-          filter: value,
-          onItemSelected: itemValue => this.onChange(itemValue),
-          ref: this.autocompleteRef,
-        })
+      SearchBoxAutocompletePopup({
+        autocompleteProvider,
+        filter: value,
+        onItemSelected: itemValue => this.onChange(itemValue),
+        ref: this.autocompleteRef,
+      })
     );
   }
 }

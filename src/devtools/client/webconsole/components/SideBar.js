@@ -6,8 +6,8 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const { connect } = require("react-redux");
 
 const GridElementWidthResizer = createFactory(
   require("devtools/client/shared/components/splitter/GridElementWidthResizer")
@@ -17,7 +17,7 @@ const GridElementWidthResizer = createFactory(
 loader.lazyRequireGetter(
   this,
   "dom",
-  "devtools/client/shared/vendor/react-dom-factories"
+  "react-dom-factories"
 );
 loader.lazyRequireGetter(
   this,
@@ -33,7 +33,7 @@ loader.lazyRequireGetter(
 loader.lazyRequireGetter(
   this,
   "PropTypes",
-  "devtools/client/shared/vendor/react-prop-types"
+  "prop-types"
 );
 loader.lazyRequireGetter(
   this,

@@ -6,7 +6,7 @@
 const expect = require("expect");
 const { mount } = require("enzyme");
 const sinon = require("sinon");
-const { createFactory } = require("devtools/client/shared/vendor/react");
+const { createFactory } = require("react");
 const serviceContainer = require("devtools/client/webconsole/test/node/fixtures/serviceContainer");
 
 let {

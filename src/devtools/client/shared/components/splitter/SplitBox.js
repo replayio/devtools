@@ -7,9 +7,9 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 
 const Draggable = createFactory(
   require("devtools/client/shared/components/splitter/Draggable")
@@ -238,7 +238,7 @@ class SplitBox extends Component {
         // panels.
         "--split-box-controlled-panel-size": `${
           vert ? this.state.width : this.state.height
-        }`,
+          }`,
       },
       this.props.style
     );
@@ -293,41 +293,41 @@ class SplitBox extends Component {
       },
       startPanel
         ? dom.div(
-            {
-              className: endPanelControl ? "uncontrolled" : "controlled",
-              style: leftPanelStyle,
-              role: "presentation",
-              ref: div => {
-                this.startPanelContainer = div;
-                if (onSelectContainerElement) {
-                  onSelectContainerElement(div);
-                }
-              },
+          {
+            className: endPanelControl ? "uncontrolled" : "controlled",
+            style: leftPanelStyle,
+            role: "presentation",
+            ref: div => {
+              this.startPanelContainer = div;
+              if (onSelectContainerElement) {
+                onSelectContainerElement(div);
+              }
             },
-            startPanel
-          )
+          },
+          startPanel
+        )
         : null,
       splitterSize > 0
         ? Draggable({
-            className: "splitter",
-            style: splitterStyle,
-            onStart: this.onStartMove,
-            onStop: this.onStopMove,
-            onMove: this.onMove,
-          })
+          className: "splitter",
+          style: splitterStyle,
+          onStart: this.onStartMove,
+          onStop: this.onStopMove,
+          onMove: this.onMove,
+        })
         : null,
       endPanel
         ? dom.div(
-            {
-              className: endPanelControl ? "controlled" : "uncontrolled",
-              style: rightPanelStyle,
-              role: "presentation",
-              ref: div => {
-                this.endPanelContainer = div;
-              },
+          {
+            className: endPanelControl ? "controlled" : "uncontrolled",
+            style: rightPanelStyle,
+            role: "presentation",
+            ref: div => {
+              this.endPanelContainer = div;
             },
-            endPanel
-          )
+          },
+          endPanel
+        )
         : null
     );
   }

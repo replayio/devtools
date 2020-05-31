@@ -9,9 +9,9 @@ const {
   createRef,
   Fragment,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 const { editableItem } = require("devtools/client/shared/inplace-editor");
 
 const {
@@ -70,12 +70,12 @@ class TextNode extends PureComponent {
           tabIndex: -1,
           title: isWhiteSpace
             ? getFormatStr(
-                "markupView.whitespaceOnly",
-                value
-                  .replace(/\n/g, "⏎")
-                  .replace(/\t/g, "⇥")
-                  .replace(/ /g, "◦")
-              )
+              "markupView.whitespaceOnly",
+              value
+                .replace(/\n/g, "⏎")
+                .replace(/\t/g, "⇥")
+                .replace(/ /g, "◦")
+            )
             : "",
           "data-label": getStr("markupView.whitespaceOnly.label"),
         },

@@ -4,11 +4,11 @@
 
 "use strict";
 
-const {
+import {
   createElement,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const { Provider } = require("devtools/client/shared/vendor/react-redux");
+} from "react";
+import { Provider } from "react-redux";
 
 const EventEmitter = require("devtools/shared/event-emitter");
 
@@ -728,8 +728,8 @@ class AnimationInspector {
     const animations =
       selection.isConnected() && selection.isElementNode()
         ? await this.animationsFront.getAnimationPlayersForNode(
-            selection.nodeFront
-          )
+          selection.nodeFront
+        )
         : [];
     this.fireUpdateAction(animations);
     this.setAnimationStateChangedListenerEnabled(true);

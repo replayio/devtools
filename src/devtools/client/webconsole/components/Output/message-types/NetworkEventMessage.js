@@ -8,9 +8,9 @@
 const {
   createFactory,
   createElement,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 const Message = createFactory(
   require("devtools/client/webconsole/components/Output/Message")
 );
@@ -153,11 +153,11 @@ function NetworkEventMessage({
     getLongString: grip => {
       return serviceContainer.getLongString(grip);
     },
-    getTabTarget: () => {},
-    getNetworkRequest: () => {},
-    sendHTTPRequest: () => {},
-    setPreferences: () => {},
-    triggerActivity: () => {},
+    getTabTarget: () => { },
+    getNetworkRequest: () => { },
+    sendHTTPRequest: () => { },
+    setPreferences: () => { },
+    triggerActivity: () => { },
     requestData: (requestId, dataType) => {
       return serviceContainer.requestData(requestId, dataType);
     },

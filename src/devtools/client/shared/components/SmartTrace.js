@@ -7,8 +7,8 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const PropTypes = require("prop-types");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const l10n = new LocalizationHelper(

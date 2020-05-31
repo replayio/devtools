@@ -4,8 +4,8 @@
 
 "use strict";
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 const { a } = dom;
 
 loader.lazyRequireGetter(

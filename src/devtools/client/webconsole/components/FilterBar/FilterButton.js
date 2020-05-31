@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 const actions = require("devtools/client/webconsole/actions/index");
 
 FilterButton.displayName = "FilterButton";

@@ -9,27 +9,27 @@ const {
   createFactory,
   Fragment,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 const { getStr } = require("devtools/client/inspector/layout/utils/l10n");
 
-loader.lazyGetter(this, "FlexItemList", function() {
+loader.lazyGetter(this, "FlexItemList", function () {
   return createFactory(
     require("devtools/client/inspector/flexbox/components/FlexItemList")
   );
 });
-loader.lazyGetter(this, "FlexItemSizingOutline", function() {
+loader.lazyGetter(this, "FlexItemSizingOutline", function () {
   return createFactory(
     require("devtools/client/inspector/flexbox/components/FlexItemSizingOutline")
   );
 });
-loader.lazyGetter(this, "FlexItemSizingProperties", function() {
+loader.lazyGetter(this, "FlexItemSizingProperties", function () {
   return createFactory(
     require("devtools/client/inspector/flexbox/components/FlexItemSizingProperties")
   );
 });
-loader.lazyGetter(this, "Header", function() {
+loader.lazyGetter(this, "Header", function () {
   return createFactory(
     require("devtools/client/inspector/flexbox/components/Header")
   );

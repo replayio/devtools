@@ -7,8 +7,8 @@
 const {
   createFactory,
   createElement,
-} = require("devtools/client/shared/vendor/react");
-const { Provider } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const { Provider } = require("react-redux");
 const FlexboxInspector = require("devtools/client/inspector/flexbox/flexbox");
 const GridInspector = require("devtools/client/inspector/grids/grid-inspector");
 

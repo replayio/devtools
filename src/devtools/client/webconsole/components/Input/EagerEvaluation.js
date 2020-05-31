@@ -4,9 +4,9 @@
 
 "use strict";
 
-const { Component } = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+const { Component } = require("react");
+const dom = require("react-dom-factories");
+const { connect } = require("react-redux");
 
 const {
   getTerminalEagerResult,
@@ -23,7 +23,7 @@ loader.lazyGetter(this, "MODE", function() {
 });
 */
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const PropTypes = require("prop-types");
 
 /**
  * Show the results of evaluating the current terminal text, if possible.

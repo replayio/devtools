@@ -5,8 +5,8 @@
 "use strict";
 
 // React & Redux
-const { Component } = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const { Component } = require("react");
+const PropTypes = require("prop-types");
 const { isWarningGroup } = require("devtools/client/webconsole/utils/messages");
 
 const {

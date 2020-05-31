@@ -9,10 +9,10 @@ const {
   createFactory,
   Fragment,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
+const { connect } = require("react-redux");
 const { getStr } = require("devtools/client/inspector/layout/utils/l10n");
 
 const FlexContainer = createFactory(
@@ -121,12 +121,12 @@ class Header extends PureComponent {
       { className: "flex-header devtools-monospace" },
       flexItemShown
         ? dom.button({
-            className: "flex-header-button-prev devtools-button",
-            onClick: e => {
-              e.stopPropagation();
-              setSelectedNode(nodeFront);
-            },
-          })
+          className: "flex-header-button-prev devtools-button",
+          onClick: e => {
+            e.stopPropagation();
+            setSelectedNode(nodeFront);
+          },
+        })
         : null,
       dom.div(
         {

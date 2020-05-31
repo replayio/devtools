@@ -7,9 +7,9 @@
 const {
   createFactory,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 const AnimationName = createFactory(
   require("devtools/client/inspector/animation/components/graph/AnimationName")
@@ -190,20 +190,20 @@ class SummaryGraph extends PureComponent {
       }),
       delay
         ? DelaySign({
-            animation,
-            timeScale,
-          })
+          animation,
+          timeScale,
+        })
         : null,
       iterationCount && endDelay
         ? EndDelaySign({
-            animation,
-            timeScale,
-          })
+          animation,
+          timeScale,
+        })
         : null,
       animation.state.name
         ? AnimationName({
-            animation,
-          })
+          animation,
+        })
         : null
     );
   }

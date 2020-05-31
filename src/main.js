@@ -37,8 +37,8 @@ window.loader = {
 
 require("./styles.css");
 
-const React = require("devtools/client/shared/vendor/react");
-const ReactDOM = require("devtools/client/shared/vendor/react-dom");
+const React = require("react");
+const ReactDOM = require("react-dom");
 const WebReplayPlayer = require("timeline/WebReplayPlayer");
 const { initSocket, sendMessage, log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
@@ -178,7 +178,7 @@ const gToolbox = {
         line = original.line;
         column = original.column;
       }
-    } catch (e) {}
+    } catch (e) { }
 
     const dbg = this.getPanel("jsdebugger");
     const source = id ? dbg.getSourceByActorId(id) : dbg.getSourceByURL(url);

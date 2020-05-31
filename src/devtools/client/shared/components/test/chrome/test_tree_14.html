@@ -23,13 +23,13 @@ Test that Tree component has working keyboard interactions.
 window.onload = async function() {
   try {
     const { a, button, div } =
-      require("devtools/client/shared/vendor/react-dom-factories");
-    const { createFactory } = browserRequire("devtools/client/shared/vendor/react");
+      require("react-dom-factories");
+    const { createFactory } = browserRequire("react");
     const {
       Simulate,
       findRenderedDOMComponentWithClass,
       findRenderedDOMComponentWithTag,
-    } = browserRequire("devtools/client/shared/vendor/react-dom-test-utils");
+    } = browserRequire("react-dom-test-utils");
     const Tree = createFactory(
       browserRequire("devtools/client/shared/components/VirtualizedTree"));
 

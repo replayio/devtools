@@ -6,9 +6,9 @@
 const {
   createElement,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const ReactDOM = require("devtools/client/shared/vendor/react-dom");
-const { Provider } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const ReactDOM = require("react-dom");
+const { Provider } = require("react-redux");
 const ToolboxProvider = require("devtools/client/framework/store-provider");
 
 const actions = require("devtools/client/webconsole/actions/index");

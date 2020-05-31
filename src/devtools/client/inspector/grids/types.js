@@ -4,7 +4,7 @@
 
 "use strict";
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const PropTypes = require("prop-types");
 
 /**
  * A single grid container in the document.

@@ -7,10 +7,10 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
+const { connect } = require("react-redux");
 
 const AnimationDetailContainer = createFactory(
   require("devtools/client/inspector/animation/components/AnimationDetailContainer")
@@ -101,56 +101,56 @@ class App extends Component {
       },
       animations.length
         ? [
-            AnimationToolbar({
+          AnimationToolbar({
+            addAnimationsCurrentTimeListener,
+            animations,
+            removeAnimationsCurrentTimeListener,
+            rewindAnimationsCurrentTime,
+            setAnimationsPlaybackRate,
+            setAnimationsPlayState,
+            timeScale,
+          }),
+          SplitBox({
+            className: "animation-container-splitter",
+            endPanel: AnimationDetailContainer({
               addAnimationsCurrentTimeListener,
-              animations,
+              emitEventForTest,
+              getAnimatedPropertyMap,
+              getAnimationsCurrentTime,
+              getComputedStyle,
               removeAnimationsCurrentTimeListener,
-              rewindAnimationsCurrentTime,
-              setAnimationsPlaybackRate,
-              setAnimationsPlayState,
+              setDetailVisibility,
+              simulateAnimation,
+              simulateAnimationForKeyframesProgressBar,
               timeScale,
             }),
-            SplitBox({
-              className: "animation-container-splitter",
-              endPanel: AnimationDetailContainer({
-                addAnimationsCurrentTimeListener,
-                emitEventForTest,
-                getAnimatedPropertyMap,
-                getAnimationsCurrentTime,
-                getComputedStyle,
-                removeAnimationsCurrentTimeListener,
-                setDetailVisibility,
-                simulateAnimation,
-                simulateAnimationForKeyframesProgressBar,
-                timeScale,
-              }),
-              endPanelControl: true,
-              initialHeight: "50%",
-              splitterSize: 1,
-              minSize: "30px",
-              startPanel: AnimationListContainer({
-                addAnimationsCurrentTimeListener,
-                animations,
-                direction,
-                emitEventForTest,
-                getAnimatedPropertyMap,
-                getNodeFromActor,
-                onHideBoxModelHighlighter,
-                onShowBoxModelHighlighterForNode,
-                removeAnimationsCurrentTimeListener,
-                selectAnimation,
-                setAnimationsCurrentTime,
-                setHighlightedNode,
-                setSelectedNode,
-                simulateAnimation,
-                timeScale,
-              }),
-              vert: false,
+            endPanelControl: true,
+            initialHeight: "50%",
+            splitterSize: 1,
+            minSize: "30px",
+            startPanel: AnimationListContainer({
+              addAnimationsCurrentTimeListener,
+              animations,
+              direction,
+              emitEventForTest,
+              getAnimatedPropertyMap,
+              getNodeFromActor,
+              onHideBoxModelHighlighter,
+              onShowBoxModelHighlighterForNode,
+              removeAnimationsCurrentTimeListener,
+              selectAnimation,
+              setAnimationsCurrentTime,
+              setHighlightedNode,
+              setSelectedNode,
+              simulateAnimation,
+              timeScale,
             }),
-          ]
+            vert: false,
+          }),
+        ]
         : NoAnimationPanel({
-            toggleElementPicker,
-          })
+          toggleElementPicker,
+        })
     );
   }
 }
