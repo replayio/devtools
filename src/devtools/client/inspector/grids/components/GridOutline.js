@@ -5,9 +5,9 @@
 "use strict";
 
 const Services = require("Services");
-const { PureComponent } = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const { PureComponent } = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 const { getStr } = require("devtools/client/inspector/layout/utils/l10n");
 /*
 const {
@@ -343,14 +343,14 @@ class GridOutline extends PureComponent {
 
     return showOutline
       ? dom.svg(
-          {
-            id: "grid-outline",
-            width: "100%",
-            height: this.getHeight(),
-            viewBox: `${TRANSLATE_X} ${TRANSLATE_Y} ${width} ${height}`,
-          },
-          this.renderGridOutline(selectedGrid)
-        )
+        {
+          id: "grid-outline",
+          width: "100%",
+          height: this.getHeight(),
+          viewBox: `${TRANSLATE_X} ${TRANSLATE_Y} ${width} ${height}`,
+        },
+        this.renderGridOutline(selectedGrid)
+      )
       : this.renderCannotShowOutlineText();
   }
 
@@ -374,12 +374,12 @@ class GridOutline extends PureComponent {
 
     return selectedGrid && selectedGrid.gridFragments.length
       ? dom.div(
-          {
-            id: "grid-outline-container",
-            className: "grid-outline-container",
-          },
-          this.renderOutline()
-        )
+        {
+          id: "grid-outline-container",
+          className: "grid-outline-container",
+        },
+        this.renderOutline()
+      )
       : null;
   }
 }

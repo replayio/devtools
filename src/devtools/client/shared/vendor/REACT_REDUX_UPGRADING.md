@@ -17,7 +17,7 @@ git checkout v5.0.7 # checkout the right version tag
 ```bash
 npm install
 npm run build:umd
-cp dist/react-redux.js <gecko-dev>/devtools/client/shared/vendor/react-redux.js
+cp dist/react-redux.js <gecko-dev>/react-redux.js
 ```
 
 We no longer need the react-redux repo so feel free to delete it.
@@ -31,6 +31,6 @@ We no longer need the react-redux repo so feel free to delete it.
    * react-redux v5.0.7
    */
   ```
-- Replace all instances of `'react'` with `'devtools/client/shared/vendor/react'` (including the quotes).
+- Replace all instances of `'react'` with `'react'` (including the quotes).
 - Replace all instances of `'redux'` with `'devtools/client/shared/vendor/redux'` (including the quotes).
 - Replace all instances of `Function('return this')()` with `globalThis`. See Bug 1473549.

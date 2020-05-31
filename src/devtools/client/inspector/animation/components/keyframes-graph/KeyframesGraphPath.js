@@ -7,10 +7,10 @@
 const {
   createFactory,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const ReactDOM = require("devtools/client/shared/vendor/react-dom");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
+const ReactDOM = require("react-dom");
 
 const ColorPath = createFactory(
   require("devtools/client/inspector/animation/components/keyframes-graph/ColorPath")

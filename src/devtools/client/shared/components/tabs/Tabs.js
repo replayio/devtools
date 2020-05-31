@@ -4,13 +4,13 @@
 
 "use strict";
 
-define(function(require, exports, module) {
+define(function (require, exports, module) {
   const {
     Component,
     createRef,
-  } = require("devtools/client/shared/vendor/react");
-  const dom = require("devtools/client/shared/vendor/react-dom-factories");
-  const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+  } = require("react");
+  const dom = require("react-dom-factories");
+  const PropTypes = require("prop-types");
 
   /**
    * Renders simple 'tab' widget.
@@ -343,9 +343,9 @@ define(function(require, exports, module) {
       // space for all tabs (and overflow happened).
       const allTabsMenu = this.state.overflow
         ? dom.button({
-            className: "all-tabs-menu",
-            onClick: this.props.onAllTabsMenuClick,
-          })
+          className: "all-tabs-menu",
+          onClick: this.props.onAllTabsMenuClick,
+        })
         : null;
 
       // Get the sidebar toggle button if a renderSidebarToggle function is provided.

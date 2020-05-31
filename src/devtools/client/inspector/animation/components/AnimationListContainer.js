@@ -7,11 +7,11 @@
 const {
   createFactory,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const ReactDOM = require("devtools/client/shared/vendor/react-dom");
+} = require("react");
+const { connect } = require("react-redux");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
+const ReactDOM = require("react-dom");
 
 const AnimationList = createFactory(
   require("devtools/client/inspector/animation/components/AnimationList")

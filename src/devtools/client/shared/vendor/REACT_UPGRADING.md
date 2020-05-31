@@ -8,9 +8,9 @@ This Source Code Form is subject to the terms of the Mozilla Public License, v. 
 
 We use a version of React that has a few minor tweaks. We want to use an un-minified production version anyway so you need to build React yourself.
 
-## First, Upgrade react-prop-types.js
+## First, Upgrade prop-types.js
 
-You should start by upgrading our prop-types library to match the latest version of React. Please follow the instructions in `devtools/client/shared/vendor/REACT_PROP_TYPES_UPGRADING.md` before continuing.
+You should start by upgrading our prop-types library to match the latest version of React. Please follow the instructions in `react_PROP_TYPES_UPGRADING.md` before continuing.
 
 ## Getting the Source
 
@@ -42,11 +42,11 @@ We need to disable minification and tree shaking as they overcomplicate the upgr
     transformBundle(source) {
       return (
         source.replace(/['"]react['"]/g,
-                        "'devtools/client/shared/vendor/react'")
+                        "'react'")
               .replace(/createElementNS\(['"]http:\/\/www\.w3\.org\/1999\/xhtml['"], ['"]devtools\/client\/shared\/vendor\/react['"]\)/g,
                         "createElementNS('http://www.w3.org/1999/xhtml', 'react'")
               .replace(/['"]react-dom['"]/g,
-                        "'devtools/client/shared/vendor/react-dom'")
+                        "'react-dom'")
               .replace(/rendererPackageName:\s['"]devtools\/client\/shared\/vendor\/react-dom['"]/g,
                         "rendererPackageName: 'react-dom'")
               .replace(/ocument\.createElement\(/g,
@@ -72,16 +72,16 @@ yarn build
 
 ```bash
 cd <react repo root>
-cp build/dist/react.production.min.js <gecko-dev>/devtools/client/shared/vendor/react.js
-cp build/dist/react-dom.production.min.js <gecko-dev>/devtools/client/shared/vendor/react-dom.js
-cp build/dist/react-dom-server.browser.production.min.js <gecko-dev>/devtools/client/shared/vendor/react-dom-server.js
-cp build/dist/react-dom-test-utils.production.min.js <gecko-dev>/devtools/client/shared/vendor/react-dom-test-utils.js
-cp build/dist/react.development.js <gecko-dev>/devtools/client/shared/vendor/react-dev.js
-cp build/dist/react-dom.development.js <gecko-dev>/devtools/client/shared/vendor/react-dom-dev.js
-cp build/dist/react-dom-server.browser.development.js <gecko-dev>/devtools/client/shared/vendor/react-dom-server-dev.js
-cp build/dist/react-dom-test-utils.development.js <gecko-dev>/devtools/client/shared/vendor/react-dom-test-utils-dev.js
-cp build/dist/react-test-renderer-shallow.production.min.js <gecko-dev>/devtools/client/shared/vendor/react-test-renderer-shallow.js
-cp build/dist/react-test-renderer.production.min.js <gecko-dev>/devtools/client/shared/vendor/react-test-renderer.js
+cp build/dist/react.production.min.js <gecko-dev>/react.js
+cp build/dist/react-dom.production.min.js <gecko-dev>/react-dom.js
+cp build/dist/react-dom-server.browser.production.min.js <gecko-dev>/react-dom-server.js
+cp build/dist/react-dom-test-utils.production.min.js <gecko-dev>/react-dom-test-utils.js
+cp build/dist/react.development.js <gecko-dev>/react-dev.js
+cp build/dist/react-dom.development.js <gecko-dev>/react-dom-dev.js
+cp build/dist/react-dom-server.browser.development.js <gecko-dev>/react-dom-server-dev.js
+cp build/dist/react-dom-test-utils.development.js <gecko-dev>/react-dom-test-utils-dev.js
+cp build/dist/react-test-renderer-shallow.production.min.js <gecko-dev>/react-test-renderer-shallow.js
+cp build/dist/react-test-renderer.production.min.js <gecko-dev>/react-test-renderer.js
 ```
 
 From this point we will no longer need your react repository so feel free to delete it.

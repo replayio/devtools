@@ -6,8 +6,8 @@
 const {
   Component,
   createElement,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react");
+const dom = require("react-dom-factories");
 const {
   connect,
 } = require("devtools/client/shared/redux/visibility-handler-connect");
@@ -24,7 +24,7 @@ const {
   isMessageInWarningGroup,
 } = require("devtools/client/webconsole/selectors/messages");
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const PropTypes = require("prop-types");
 const { MessageContainer } = require(
   "devtools/client/webconsole/components/Output/MessageContainer"
 );
@@ -138,7 +138,7 @@ class ConsoleOutput extends Component {
     const isNewMessageEvaluationResult =
       messagesDelta > 0 &&
       [...nextProps.messages.values()][nextProps.messages.size - 1].type ===
-        MESSAGE_TYPE.RESULT;
+      MESSAGE_TYPE.RESULT;
 
     const messagesUiDelta =
       nextProps.messagesUi.length - this.props.messagesUi.length;

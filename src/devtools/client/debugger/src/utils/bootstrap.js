@@ -7,7 +7,7 @@
 import React from "react";
 import { bindActionCreators, combineReducers } from "redux";
 import ReactDOM from "react-dom";
-const { Provider } = require("react-redux");
+import { Provider } from "react-redux";
 
 import ToolboxProvider from "devtools/client/framework/store-provider";
 import { isFirefoxPanel, isDevelopment, isTesting } from "devtools-environment";

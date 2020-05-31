@@ -10,10 +10,10 @@ const {
   createFactory,
   Fragment,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
+const { connect } = require("react-redux");
 
 const Accordion = createFactory(
   require("devtools/client/shared/components/Accordion")
@@ -238,17 +238,17 @@ class RulesApp extends PureComponent {
           },
           rules.length > 0
             ? createElement(
-                Fragment,
-                null,
-                this.renderPseudoElementRules(pseudoElementRules),
-                this.renderStyleRules(styleRules),
-                this.renderInheritedRules(inheritedRules),
-                this.renderKeyframesRules(keyframesRules)
-              )
+              Fragment,
+              null,
+              this.renderPseudoElementRules(pseudoElementRules),
+              this.renderStyleRules(styleRules),
+              this.renderInheritedRules(inheritedRules),
+              this.renderKeyframesRules(keyframesRules)
+            )
             : dom.div(
-                { className: "devtools-sidepanel-no-result" },
-                getStr("rule.empty")
-              )
+              { className: "devtools-sidepanel-no-result" },
+              getStr("rule.empty")
+            )
         )
       )
     );

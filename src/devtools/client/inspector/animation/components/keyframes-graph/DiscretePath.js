@@ -4,8 +4,8 @@
 
 "use strict";
 
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 const ComputedStylePath = require("devtools/client/inspector/animation/components/keyframes-graph/ComputedStylePath");
 

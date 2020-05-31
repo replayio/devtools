@@ -7,22 +7,22 @@
 const {
   createFactory,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
+const { connect } = require("react-redux");
 const { COLOR_SCHEMES } = require("devtools/client/inspector/rules/constants");
 
 const SearchBox = createFactory(
   require("devtools/client/inspector/rules/components/SearchBox")
 );
 
-loader.lazyGetter(this, "ClassListPanel", function() {
+loader.lazyGetter(this, "ClassListPanel", function () {
   return createFactory(
     require("devtools/client/inspector/rules/components/ClassListPanel")
   );
 });
-loader.lazyGetter(this, "PseudoClassPanel", function() {
+loader.lazyGetter(this, "PseudoClassPanel", function () {
   return createFactory(
     require("devtools/client/inspector/rules/components/PseudoClassPanel")
   );
@@ -163,35 +163,35 @@ class Toolbar extends PureComponent {
           }),
           isColorSchemeSimulationHidden
             ? dom.button({
-                id: "color-scheme-simulation-toggle",
-                className: "devtools-button",
-                onClick: this.onColorSchemeSimulationClick,
-                state: COLOR_SCHEMES[this.state.currentColorScheme],
-                title: getStr("rule.colorSchemeSimulation.tooltip"),
-              })
+              id: "color-scheme-simulation-toggle",
+              className: "devtools-button",
+              onClick: this.onColorSchemeSimulationClick,
+              state: COLOR_SCHEMES[this.state.currentColorScheme],
+              title: getStr("rule.colorSchemeSimulation.tooltip"),
+            })
             : null,
           !isPrintSimulationHidden
             ? dom.button({
-                id: "print-simulation-toggle",
-                className:
-                  "devtools-button" +
-                  (isPrintSimulationEnabled ? " checked" : ""),
-                onClick: this.onPrintSimulationToggle,
-                title: getStr("rule.printSimulation.tooltip"),
-              })
+              id: "print-simulation-toggle",
+              className:
+                "devtools-button" +
+                (isPrintSimulationEnabled ? " checked" : ""),
+              onClick: this.onPrintSimulationToggle,
+              title: getStr("rule.printSimulation.tooltip"),
+            })
             : null
         )
       ),
       isClassPanelExpanded
         ? ClassListPanel({
-            onAddClass: this.props.onAddClass,
-            onSetClassState: this.props.onSetClassState,
-          })
+          onAddClass: this.props.onAddClass,
+          onSetClassState: this.props.onSetClassState,
+        })
         : null,
       isPseudoClassPanelExpanded
         ? PseudoClassPanel({
-            onTogglePseudoClass: this.props.onTogglePseudoClass,
-          })
+          onTogglePseudoClass: this.props.onTogglePseudoClass,
+        })
         : null
     );
   }

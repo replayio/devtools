@@ -7,10 +7,10 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const ReactDOM = require("devtools/client/shared/vendor/react-dom");
+} = require("react");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
+const ReactDOM = require("react-dom");
 
 const ComputedTimingPath = createFactory(
   require("devtools/client/inspector/animation/components/graph/ComputedTimingPath")
@@ -252,36 +252,36 @@ class SummaryGraphPath extends Component {
       ),
       animation.state.easing !== "linear"
         ? EffectTimingPath({
-            animation,
-            durationPerPixel,
-            offset,
-            simulateAnimation,
-            totalDuration,
-          })
+          animation,
+          durationPerPixel,
+          offset,
+          simulateAnimation,
+          totalDuration,
+        })
         : null,
       animation.state.delay < 0
         ? keyframesList.map(keyframes => {
-            return NegativeDelayPath({
-              animation,
-              durationPerPixel,
-              keyframes,
-              offset,
-              simulateAnimation,
-              totalDuration,
-            });
-          })
+          return NegativeDelayPath({
+            animation,
+            durationPerPixel,
+            keyframes,
+            offset,
+            simulateAnimation,
+            totalDuration,
+          });
+        })
         : null,
       animation.state.iterationCount && animation.state.endDelay < 0
         ? keyframesList.map(keyframes => {
-            return NegativeEndDelayPath({
-              animation,
-              durationPerPixel,
-              keyframes,
-              offset,
-              simulateAnimation,
-              totalDuration,
-            });
-          })
+          return NegativeEndDelayPath({
+            animation,
+            durationPerPixel,
+            keyframes,
+            offset,
+            simulateAnimation,
+            totalDuration,
+          });
+        })
         : null
     );
   }

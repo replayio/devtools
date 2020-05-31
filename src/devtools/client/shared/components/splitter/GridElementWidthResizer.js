@@ -7,8 +7,8 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const PropTypes = require("prop-types");
 const Draggable = createFactory(
   require("devtools/client/shared/components/splitter/Draggable")
 );
@@ -109,7 +109,7 @@ class GridElementWidthResizer extends Component {
 
     const size =
       (isRTLElement && position === "end") ||
-      (!isRTLElement && position === "start")
+        (!isRTLElement && position === "start")
         ? nodeBounds.width + (nodeBounds.left - x)
         : x - nodeBounds.left;
 

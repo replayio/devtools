@@ -4,7 +4,7 @@
 
 "use strict";
 
-const { createFactory } = require("devtools/client/shared/vendor/react");
+const { createFactory } = require("react");
 const ReactDOM = require("react-dom");
 
 const TextNode = createFactory(
@@ -46,7 +46,7 @@ function TextEditor(container, node, type) {
 }
 
 TextEditor.prototype = {
-  buildMarkup: async function(type) {
+  buildMarkup: async function (type) {
     const doc = this.markup.doc;
 
     this.elt = doc.createElement("span");
@@ -75,7 +75,7 @@ TextEditor.prototype = {
     this.update();
   },
 
-  showTextEditor: function(element) {
+  showTextEditor: function (element) {
     new InplaceEditor({
       cssProperties: this.markup.inspector.cssProperties,
       done: (val, commit) => {
@@ -101,7 +101,7 @@ TextEditor.prototype = {
     });
   },
 
-  update: async function() {
+  update: async function () {
     try {
       const value = await getLongString(this.node.getNodeValue());
 
@@ -113,14 +113,14 @@ TextEditor.prototype = {
     }
   },
 
-  destroy: function() {
+  destroy: function () {
     ReactDOM.unmountComponentAtNode(this.elt);
   },
 
   /**
    * Stub method for consistency with ElementEditor.
    */
-  getInfoAtNode: function() {
+  getInfoAtNode: function () {
     return null;
   },
 };

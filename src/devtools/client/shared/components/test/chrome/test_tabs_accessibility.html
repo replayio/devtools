@@ -21,8 +21,8 @@ Test tabs accessibility.
 
 window.onload = async function () {
   try {
-    const ReactDOM = browserRequire("devtools/client/shared/vendor/react-dom");
-    const { createFactory } = browserRequire("devtools/client/shared/vendor/react");
+    const ReactDOM = browserRequire("react-dom");
+    const { createFactory } = browserRequire("react");
     const InspectorTabPanel = createFactory(browserRequire("devtools/client/inspector/components/InspectorTabPanel"));
     const Tabbar =
       createFactory(browserRequire("devtools/client/shared/components/tabs/TabBar"));

@@ -7,10 +7,10 @@
 const {
   createRef,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
+const { connect } = require("react-redux");
 const { KeyCodes } = require("devtools/client/shared/keycodes");
 
 const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
@@ -78,24 +78,24 @@ class ClassListPanel extends PureComponent {
         { className: "classes" },
         this.props.classes.length
           ? this.props.classes.map(({ name, isApplied }) => {
-              return dom.label(
-                {
-                  key: name,
-                  title: name,
-                },
-                dom.input({
-                  checked: isApplied,
-                  onChange: this.onToggleChange,
-                  type: "checkbox",
-                  value: name,
-                }),
-                dom.span({}, name)
-              );
-            })
+            return dom.label(
+              {
+                key: name,
+                title: name,
+              },
+              dom.input({
+                checked: isApplied,
+                onChange: this.onToggleChange,
+                type: "checkbox",
+                value: name,
+              }),
+              dom.span({}, name)
+            );
+          })
           : dom.p(
-              { className: "no-classes" },
-              getStr("rule.classPanel.noClasses")
-            )
+            { className: "no-classes" },
+            getStr("rule.classPanel.noClasses")
+          )
       )
     );
   }

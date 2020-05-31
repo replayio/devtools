@@ -7,7 +7,7 @@
 const {
   createFactory,
   createElement,
-} = require("devtools/client/shared/vendor/react");
+} = require("react");
 
 const reps = require("devtools/client/debugger/packages/devtools-reps/src");
 const { REPS, MODE } = reps;

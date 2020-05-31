@@ -13,8 +13,8 @@
  * See devtools/client/framework/toolbox.js:setIframeVisible().
  */
 
-const { Component } = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const { Component } = require("react");
+const PropTypes = require("prop-types");
 
 class VisibilityHandler extends Component {
   static get propTypes() {

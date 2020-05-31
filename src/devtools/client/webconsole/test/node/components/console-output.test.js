@@ -2,7 +2,7 @@
    http://creativecommons.org/publicdomain/zero/1.0/ */
 "use strict";
 
-const { createFactory } = require("devtools/client/shared/vendor/react");
+const { createFactory } = require("react");
 // Test utils.
 const expect = require("expect");
 const { render } = require("enzyme");

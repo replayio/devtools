@@ -7,9 +7,9 @@
 const {
   createElement,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
+} = require("react");
 const EventEmitter = require("devtools/shared/event-emitter");
-const { Provider } = require("devtools/client/shared/vendor/react-redux");
+const { Provider } = require("react-redux");
 const ExtensionSidebarComponent = createFactory(
   require("devtools/client/inspector/extensions/components/ExtensionSidebar")
 );

@@ -20,10 +20,10 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+function _interopDefault(ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-const react = require('devtools/client/shared/vendor/react');
-const PropTypes = _interopDefault(require('devtools/client/shared/vendor/react-prop-types'));
+const react = require('react');
+const PropTypes = _interopDefault(require('prop-types'));
 
 /*
  * Synchronously map an identifier or an array of identifiers to the best
@@ -74,21 +74,21 @@ function getBundleForId(iterable, id) {
  * Base CachedIterable class.
  */
 class CachedIterable extends Array {
-    /**
-     * Create a `CachedIterable` instance from an iterable or, if another
-     * instance of `CachedIterable` is passed, return it without any
-     * modifications.
-     *
-     * @param {Iterable} iterable
-     * @returns {CachedIterable}
-     */
-    static from(iterable) {
-        if (iterable instanceof this) {
-            return iterable;
-        }
-
-        return new this(iterable);
+  /**
+   * Create a `CachedIterable` instance from an iterable or, if another
+   * instance of `CachedIterable` is passed, return it without any
+   * modifications.
+   *
+   * @param {Iterable} iterable
+   * @returns {CachedIterable}
+   */
+  static from(iterable) {
+    if (iterable instanceof this) {
+      return iterable;
     }
+
+    return new this(iterable);
+  }
 }
 
 /*
@@ -98,55 +98,55 @@ class CachedIterable extends Array {
  * iterable.
  */
 class CachedSyncIterable extends CachedIterable {
-    /**
-     * Create an `CachedSyncIterable` instance.
-     *
-     * @param {Iterable} iterable
-     * @returns {CachedSyncIterable}
-     */
-    constructor(iterable) {
-        super();
+  /**
+   * Create an `CachedSyncIterable` instance.
+   *
+   * @param {Iterable} iterable
+   * @returns {CachedSyncIterable}
+   */
+  constructor(iterable) {
+    super();
 
-        if (Symbol.iterator in Object(iterable)) {
-            this.iterator = iterable[Symbol.iterator]();
-        } else {
-            throw new TypeError("Argument must implement the iteration protocol.");
+    if (Symbol.iterator in Object(iterable)) {
+      this.iterator = iterable[Symbol.iterator]();
+    } else {
+      throw new TypeError("Argument must implement the iteration protocol.");
+    }
+  }
+
+  [Symbol.iterator]() {
+    const cached = this;
+    let cur = 0;
+
+    return {
+      next() {
+        if (cached.length <= cur) {
+          cached.push(cached.iterator.next());
         }
-    }
+        return cached[cur++];
+      }
+    };
+  }
 
-    [Symbol.iterator]() {
-        const cached = this;
-        let cur = 0;
-
-        return {
-            next() {
-                if (cached.length <= cur) {
-                    cached.push(cached.iterator.next());
-                }
-                return cached[cur++];
-            }
-        };
+  /**
+   * This method allows user to consume the next element from the iterator
+   * into the cache.
+   *
+   * @param {number} count - number of elements to consume
+   */
+  touchNext(count = 1) {
+    let idx = 0;
+    while (idx++ < count) {
+      const last = this[this.length - 1];
+      if (last && last.done) {
+        break;
+      }
+      this.push(this.iterator.next());
     }
-
-    /**
-     * This method allows user to consume the next element from the iterator
-     * into the cache.
-     *
-     * @param {number} count - number of elements to consume
-     */
-    touchNext(count = 1) {
-        let idx = 0;
-        while (idx++ < count) {
-            const last = this[this.length - 1];
-            if (last && last.done) {
-                break;
-            }
-            this.push(this.iterator.next());
-        }
-        // Return the last cached {value, done} object to allow the calling
-        // code to decide if it needs to call touchNext again.
-        return this[this.length - 1];
-    }
+    // Return the last cached {value, done} object to allow the calling
+    // code to decide if it needs to call touchNext again.
+    return this[this.length - 1];
+  }
 }
 
 /*
@@ -248,7 +248,7 @@ let cachedParseMarkup;
 // it's first mounted which reduces the risk of this error making it to the
 // runtime without developers noticing it in development.
 function createParseMarkup() {
-  if (typeof(document) === "undefined") {
+  if (typeof (document) === "undefined") {
     // We can't use <template> to sanitize translations.
     throw new Error(
       "`document` is undefined. Without it, translations cannot " +
@@ -289,7 +289,7 @@ function createParseMarkup() {
 class LocalizationProvider extends react.Component {
   constructor(props) {
     super(props);
-    const {bundles, parseMarkup} = props;
+    const { bundles, parseMarkup } = props;
 
     if (bundles === undefined) {
       throw new Error("LocalizationProvider must receive the bundles prop.");

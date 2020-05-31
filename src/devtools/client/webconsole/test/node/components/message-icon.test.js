@@ -6,7 +6,7 @@ const { MESSAGE_LEVEL } = require("devtools/client/webconsole/constants");
 
 const expect = require("expect");
 const { render } = require("enzyme");
-const { createFactory } = require("devtools/client/shared/vendor/react");
+const { createFactory } = require("react");
 const MessageIcon = createFactory(
   require("devtools/client/webconsole/components/Output/MessageIcon")
 );

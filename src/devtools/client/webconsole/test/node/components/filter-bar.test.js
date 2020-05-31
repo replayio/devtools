@@ -6,8 +6,8 @@ const expect = require("expect");
 const sinon = require("sinon");
 const { render, mount, shallow } = require("enzyme");
 
-const { createFactory } = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+const { createFactory } = require("react");
+const dom = require("react-dom-factories");
 const Provider = createFactory(require("react-redux").Provider);
 
 const actions = require("devtools/client/webconsole/actions/index");
@@ -33,7 +33,7 @@ function getFilterBar(overrides = {}) {
   return FilterBar({
     serviceContainer,
     hidePersistLogsCheckbox: false,
-    attachRefToWebConsoleUI: () => {},
+    attachRefToWebConsoleUI: () => { },
     webConsoleUI: {
       document,
       wrapper: {},

@@ -5,7 +5,7 @@
 // Test utils.
 const expect = require("expect");
 const { render } = require("enzyme");
-const { createFactory } = require("devtools/client/shared/vendor/react");
+const { createFactory } = require("react");
 
 // Components under test.
 const ConsoleApiCall = createFactory(

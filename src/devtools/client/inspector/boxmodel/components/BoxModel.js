@@ -7,9 +7,9 @@
 const {
   createFactory,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 const BoxModelInfo = createFactory(
   require("devtools/client/inspector/boxmodel/components/BoxModelInfo")
@@ -90,11 +90,11 @@ class BoxModel extends PureComponent {
       }),
       showBoxModelProperties
         ? BoxModelProperties({
-            boxModel,
-            setSelectedNode,
-            onHideBoxModelHighlighter,
-            onShowBoxModelHighlighterForNode,
-          })
+          boxModel,
+          setSelectedNode,
+          onHideBoxModelHighlighter,
+          onShowBoxModelHighlighterForNode,
+        })
         : null
     );
   }

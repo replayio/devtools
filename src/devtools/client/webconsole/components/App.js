@@ -7,9 +7,9 @@ const Services = require("Services");
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 const {
   connect,
 } = require("devtools/client/shared/redux/visibility-handler-connect");
@@ -281,14 +281,14 @@ class App extends Component {
 
     return editorMode
       ? EditorToolbar({
-          key: "editor-toolbar",
-          editorMode,
-          dispatch,
-          reverseSearchInputVisible,
-          serviceContainer,
-          showEvaluationSelector,
-          webConsoleUI,
-        })
+        key: "editor-toolbar",
+        editorMode,
+        dispatch,
+        reverseSearchInputVisible,
+        serviceContainer,
+        showEvaluationSelector,
+        webConsoleUI,
+      })
       : null;
   }
 
@@ -346,10 +346,10 @@ class App extends Component {
     const { serviceContainer, sidebarVisible } = this.props;
     return sidebarVisible
       ? SideBar({
-          key: "sidebar",
-          serviceContainer,
-          visible: sidebarVisible,
-        })
+        key: "sidebar",
+        serviceContainer,
+        visible: sidebarVisible,
+      })
       : null;
   }
 
@@ -358,13 +358,13 @@ class App extends Component {
 
     return notifications && notifications.size > 0
       ? NotificationBox({
-          id: "webconsole-notificationbox",
-          key: "notification-box",
-          displayBorderTop: !editorMode,
-          displayBorderBottom: editorMode,
-          wrapping: true,
-          notifications,
-        })
+        id: "webconsole-notificationbox",
+        key: "notification-box",
+        displayBorderTop: !editorMode,
+        displayBorderBottom: editorMode,
+        wrapping: true,
+        notifications,
+      })
       : null;
   }
 
@@ -433,13 +433,13 @@ class App extends Component {
       ),
       editorMode
         ? GridElementWidthResizer({
-            key: "editor-resizer",
-            enabled: editorMode,
-            position: "end",
-            className: "editor-resizer",
-            getControlledElementNode: () => webConsoleUI.jsterm.node,
-            onResizeEnd: (width) => dispatch(actions.setEditorWidth(width)),
-          })
+          key: "editor-resizer",
+          enabled: editorMode,
+          position: "end",
+          className: "editor-resizer",
+          getControlledElementNode: () => webConsoleUI.jsterm.node,
+          onResizeEnd: (width) => dispatch(actions.setEditorWidth(width)),
+        })
         : null,
       reverseSearch,
       sidebar,

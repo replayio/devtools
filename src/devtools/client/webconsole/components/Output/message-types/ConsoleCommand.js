@@ -8,8 +8,8 @@
 const {
   createElement,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const PropTypes = require("prop-types");
 const Message = createFactory(
   require("devtools/client/webconsole/components/Output/Message")
 );

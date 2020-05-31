@@ -5,9 +5,9 @@
 "use strict";
 
 // React & Redux
-const { Component } = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const { connect } = require("devtools/client/shared/vendor/react-redux");
+const { Component } = require("react");
+const dom = require("react-dom-factories");
+const { connect } = require("react-redux");
 
 const {
   getReverseSearchTotalResults,
@@ -15,7 +15,7 @@ const {
   getReverseSearchResult,
 } = require("devtools/client/webconsole/selectors/history");
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const PropTypes = require("prop-types");
 const actions = require("devtools/client/webconsole/actions/index");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const { PluralForm } = require("devtools/shared/plural-form");

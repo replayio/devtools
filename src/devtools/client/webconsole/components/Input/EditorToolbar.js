@@ -8,9 +8,9 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 const EvaluationSelector = createFactory(
   require("devtools/client/webconsole/components/Input/EvaluationSelector")
@@ -125,16 +125,16 @@ class EditorToolbar extends Component {
       dom.button({
         className: `devtools-button webconsole-editor-toolbar-reverseSearchButton ${
           reverseSearchInputVisible ? "checked" : ""
-        }`,
+          }`,
         title: reverseSearchInputVisible
           ? l10n.getFormatStr(
-              "webconsole.editor.toolbar.reverseSearchButton.closeReverseSearch.tooltip",
-              ["Esc" + (isMacOS ? " | Ctrl + C" : "")]
-            )
+            "webconsole.editor.toolbar.reverseSearchButton.closeReverseSearch.tooltip",
+            ["Esc" + (isMacOS ? " | Ctrl + C" : "")]
+          )
           : l10n.getFormatStr(
-              "webconsole.editor.toolbar.reverseSearchButton.openReverseSearch.tooltip",
-              [isMacOS ? "Ctrl + R" : "F9"]
-            ),
+            "webconsole.editor.toolbar.reverseSearchButton.openReverseSearch.tooltip",
+            [isMacOS ? "Ctrl + R" : "F9"]
+          ),
         onClick: this.onReverseSearchButtonClick,
       }),
       dom.div({

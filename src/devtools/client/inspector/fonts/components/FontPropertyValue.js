@@ -8,9 +8,9 @@ const {
   createElement,
   Fragment,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 const { toFixed } = require("devtools/client/inspector/fonts/utils/font-utils");
 
@@ -334,12 +334,12 @@ class FontPropertyValue extends PureComponent {
     // Show the `name` prop value as an additional label if the `nameLabel` prop is true.
     const detailEl = nameLabel
       ? dom.span(
-          {
-            className: "font-control-label-detail",
-            id: `detail-${name}`,
-          },
-          this.getPropLabel("name")
-        )
+        {
+          className: "font-control-label-detail",
+          id: `detail-${name}`,
+        },
+        this.getPropLabel("name")
+      )
       : null;
 
     return createElement(Fragment, null, labelEl, detailEl);

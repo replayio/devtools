@@ -8,8 +8,8 @@ const Services = require("Services");
 const {
   createFactory,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react");
+const dom = require("react-dom-factories");
 
 loader.lazyRequireGetter(
   this,
@@ -80,9 +80,9 @@ class IssueItem extends PureComponent {
 
     return causes.length
       ? dom.span(
-          { className: "compatibility-issue-item__causes" },
-          `(${causes.join(",")})`
-        )
+        { className: "compatibility-issue-item__causes" },
+        `(${causes.join(",")})`
+      )
       : null;
   }
 

@@ -62,7 +62,7 @@ const urlRegex = /(^|[\s(,;'"`“])((?:https?:\/(\/)?|www\d{0,3}[.][a-z0-9.\-]{2
 const uneatLastUrlCharsRegex = /(?:[),;.!?`'"]|[.!?]\)|\)[.!?])$/;
 
 const ELLIPSIS = "\u2026";
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+const dom = require("react-dom-factories");
 const { span } = dom;
 
 /**
@@ -100,25 +100,25 @@ const escapeMap = {
 // the replacement function; see |escapeString|.
 const escapeRegexp = new RegExp(
   "[" +
-    // Quote and backslash.
-    '"\\\\' +
-    // Controls.
-    "\x00-\x1f" +
-    // More controls.
-    "\x7f-\x9f" +
-    // BOM
-    "\ufeff" +
-    // Specials, except for the replacement character.
-    "\ufff0-\ufffc\ufffe\uffff" +
-    // Surrogates.
-    "\ud800-\udfff" +
-    // Mathematical invisibles.
-    "\u2061-\u2064" +
-    // Line and paragraph separators.
-    "\u2028-\u2029" +
-    // Private use area.
-    "\ue000-\uf8ff" +
-    "]",
+  // Quote and backslash.
+  '"\\\\' +
+  // Controls.
+  "\x00-\x1f" +
+  // More controls.
+  "\x7f-\x9f" +
+  // BOM
+  "\ufeff" +
+  // Specials, except for the replacement character.
+  "\ufff0-\ufffc\ufffe\uffff" +
+  // Surrogates.
+  "\ud800-\udfff" +
+  // Mathematical invisibles.
+  "\u2061-\u2064" +
+  // Line and paragraph separators.
+  "\u2028-\u2029" +
+  // Private use area.
+  "\ue000-\uf8ff" +
+  "]",
   "g"
 );
 
@@ -309,7 +309,7 @@ function splitURLTrue(url) {
  * render a fallback rep if the render fails.
  */
 function wrapRender(renderMethod) {
-  const wrappedFunction = function(props) {
+  const wrappedFunction = function (props) {
     try {
       return renderMethod.call(this, props);
     } catch (e) {

@@ -7,7 +7,7 @@ const expect = require("expect");
 const { render } = require("enzyme");
 
 // React
-const { createFactory } = require("devtools/client/shared/vendor/react");
+const { createFactory } = require("react");
 const { setupStore } = require("devtools/client/webconsole/test/node/helpers");
 const Provider = createFactory(require("react-redux").Provider);
 

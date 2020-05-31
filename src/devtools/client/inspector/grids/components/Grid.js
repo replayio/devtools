@@ -7,25 +7,25 @@
 const {
   createFactory,
   PureComponent,
-} = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 const { getStr } = require("devtools/client/inspector/layout/utils/l10n");
 
 // Normally, we would only lazy load GridOutline, but we also lazy load
 // GridDisplaySettings and GridList because we assume the CSS grid usage is low
 // and usually will not appear on the page.
-loader.lazyGetter(this, "GridDisplaySettings", function() {
+loader.lazyGetter(this, "GridDisplaySettings", function () {
   return createFactory(
     require("devtools/client/inspector/grids/components/GridDisplaySettings")
   );
 });
-loader.lazyGetter(this, "GridList", function() {
+loader.lazyGetter(this, "GridList", function () {
   return createFactory(
     require("devtools/client/inspector/grids/components/GridList")
   );
 });
-loader.lazyGetter(this, "GridOutline", function() {
+loader.lazyGetter(this, "GridOutline", function () {
   return createFactory(
     require("devtools/client/inspector/grids/components/GridOutline")
   );
@@ -98,9 +98,9 @@ class Grid extends PureComponent {
       ),
       highlightedGrids.length === 1
         ? GridOutline({
-            grids,
-            onShowGridOutlineHighlight,
-          })
+          grids,
+          onShowGridOutlineHighlight,
+        })
         : null
     );
   }

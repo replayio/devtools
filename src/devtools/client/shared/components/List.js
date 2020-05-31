@@ -9,13 +9,13 @@ const {
   createRef,
   Component,
   cloneElement,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react");
+const PropTypes = require("prop-types");
 const {
   ul,
   li,
   div,
-} = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react-dom-factories");
 
 const { scrollIntoView } = require("devtools/client/shared/scroll");
 const {
@@ -117,7 +117,7 @@ class ListItemClass extends Component {
       {
         className: `${className}${current ? " current" : ""}${
           active ? " active" : ""
-        }`,
+          }`,
         id: item.key,
         onClick,
         onKeyDownCapture: active && this._onKeyDown,

@@ -34,11 +34,11 @@ pref("devtools.webconsole.input.editorOnboarding", true);
 pref("devtools.webconsole.input.context", false);
 
 global.loader = {
-  lazyServiceGetter: () => {},
+  lazyServiceGetter: () => { },
   lazyGetter: (context, name, fn) => {
     try {
       global[name] = fn();
-    } catch (_) {}
+    } catch (_) { }
   },
   lazyRequireGetter: (context, name, path, destruct) => {
     if (path === "devtools/shared/async-storage") {
@@ -76,35 +76,35 @@ if (!global.URLSearchParams) {
 
 if (!global.ResizeObserver) {
   global.ResizeObserver = class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
+    observe() { }
+    unobserve() { }
+    disconnect() { }
   };
 }
 
 // Mock ChromeUtils.
 global.ChromeUtils = {
-  import: () => {},
-  defineModuleGetter: () => {},
+  import: () => { },
+  defineModuleGetter: () => { },
 };
 
-global.define = function() {};
+global.define = function () { };
 
 // Point to vendored-in files and mocks when needed.
 const requireHacker = require("require-hacker");
 requireHacker.global_hook("default", (path, module) => {
   const paths = {
     // For Enzyme
-    "react-dom": () => getModule("devtools/client/shared/vendor/react-dom"),
+    "react-dom": () => getModule("react-dom"),
     "react-dom/server": () =>
-      getModule("devtools/client/shared/vendor/react-dom-server"),
+      getModule("react-dom-server"),
     "react-dom/test-utils": () =>
-      getModule("devtools/client/shared/vendor/react-dom-test-utils-dev"),
-    "react-redux": () => getModule("devtools/client/shared/vendor/react-redux"),
+      getModule("react-dom-test-utils-dev"),
+    "react-redux": () => getModule("react-redux"),
     // Use react-dev. This would be handled by browserLoader in Firefox.
-    react: () => getModule("devtools/client/shared/vendor/react-dev"),
-    "devtools/client/shared/vendor/react": () =>
-      getModule("devtools/client/shared/vendor/react-dev"),
+    react: () => getModule("react-dev"),
+    "react": () =>
+      getModule("react-dev"),
     "chrome://mochitests/content/browser/devtools/client/webconsole/test/browser/stub-generator-helpers": () =>
       getModule(
         "devtools/client/webconsole/test/browser/stub-generator-helpers"

@@ -9,8 +9,8 @@ const ElementStyle = require("devtools/client/inspector/rules/models/element-sty
 const {
   createFactory,
   createElement,
-} = require("devtools/client/shared/vendor/react");
-const { Provider } = require("devtools/client/shared/vendor/react-redux");
+} = require("react");
+const { Provider } = require("react-redux");
 const EventEmitter = require("devtools/shared/event-emitter");
 
 const {

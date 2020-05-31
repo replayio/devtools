@@ -4,9 +4,9 @@
 
 "use strict";
 
-const { PureComponent } = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const { PureComponent } = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 const { getStr } = require("devtools/client/inspector/fonts/utils/l10n");
 

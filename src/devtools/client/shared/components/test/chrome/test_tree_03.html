@@ -21,8 +21,8 @@ Test Tree's autoExpandDepth.
 
 window.onload = async function () {
   try {
-    const ReactDOM = browserRequire("devtools/client/shared/vendor/react-dom");
-    const React = browserRequire("devtools/client/shared/vendor/react");
+    const ReactDOM = browserRequire("react-dom");
+    const React = browserRequire("react");
     const Tree = React.createFactory(browserRequire("devtools/client/shared/components/VirtualizedTree"));
 
     const tree = ReactDOM.render(Tree(Object.assign({}, TEST_TREE_INTERFACE, {

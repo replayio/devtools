@@ -10,7 +10,7 @@
 const { Component } = require("react");
 const ReactDOM = require("react-dom");
 const dom = require("react-dom-factories");
-const PropTypes = require("react-prop-types");
+const PropTypes = require("prop-types");
 const { sortBy, range } = require("lodash");
 const { SVG } = require("image/svg");
 const { log } = require("protocol/socket");

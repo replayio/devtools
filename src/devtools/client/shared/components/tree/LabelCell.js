@@ -4,10 +4,10 @@
 "use strict";
 
 // Make this available to both AMD and CJS environments
-define(function(require, exports, module) {
-  const { Component } = require("devtools/client/shared/vendor/react");
-  const dom = require("devtools/client/shared/vendor/react-dom-factories");
-  const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+define(function (require, exports, module) {
+  const { Component } = require("react");
+  const dom = require("react-dom-factories");
+  const PropTypes = require("prop-types");
 
   /**
    * Render the default cell used for toggle buttons

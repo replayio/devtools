@@ -4,8 +4,8 @@
 
 "use strict";
 
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 const { PluralForm } = require("devtools/shared/plural-form");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const messageRepeatsTooltip = l10n.getStr("messageRepeats.tooltip2");

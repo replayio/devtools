@@ -4,9 +4,9 @@
 
 "use strict";
 
-const { PureComponent } = require("devtools/client/shared/vendor/react");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+const { PureComponent } = require("react");
+const dom = require("react-dom-factories");
+const PropTypes = require("prop-types");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const Types = require("devtools/client/inspector/boxmodel/types");
@@ -54,10 +54,10 @@ class BoxModelInfo extends PureComponent {
         { className: "boxmodel-position-group" },
         isPositionEditable
           ? dom.button({
-              className: buttonClass,
-              title: BOXMODEL_L10N.getStr("boxmodel.geometryButton.tooltip"),
-              onClick: this.onToggleGeometryEditor,
-            })
+            className: buttonClass,
+            title: BOXMODEL_L10N.getStr("boxmodel.geometryButton.tooltip"),
+            onClick: this.onToggleGeometryEditor,
+          })
           : null,
         dom.span({ className: "boxmodel-element-position" }, position)
       )

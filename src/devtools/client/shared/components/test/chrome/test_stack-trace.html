@@ -18,8 +18,8 @@ Test the rendering of a stack trace
 "use strict";
 
 window.onload = function() {
-  const ReactDOM = browserRequire("devtools/client/shared/vendor/react-dom");
-  const React = browserRequire("devtools/client/shared/vendor/react");
+  const ReactDOM = browserRequire("react-dom");
+  const React = browserRequire("react");
   const StackTrace = React.createFactory(
     browserRequire("devtools/client/shared/components/StackTrace")
   );

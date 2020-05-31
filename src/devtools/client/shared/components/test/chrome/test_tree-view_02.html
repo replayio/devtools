@@ -29,12 +29,12 @@ Test that TreeView component filtering works with keyboard.
 
 window.onload = function() {
   try {
-    const React = browserRequire("devtools/client/shared/vendor/react");
+    const React = browserRequire("react");
     const {
       Simulate,
       findRenderedDOMComponentWithClass,
       scryRenderedDOMComponentsWithClass,
-    } = browserRequire("devtools/client/shared/vendor/react-dom-test-utils");
+    } = browserRequire("react-dom-test-utils");
     const TreeView =
       browserRequire("devtools/client/shared/components/tree/TreeView");
 

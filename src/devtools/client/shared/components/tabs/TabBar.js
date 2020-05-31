@@ -9,9 +9,9 @@
 const {
   Component,
   createFactory,
-} = require("devtools/client/shared/vendor/react");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
-const dom = require("devtools/client/shared/vendor/react-dom-factories");
+} = require("react");
+const PropTypes = require("prop-types");
+const dom = require("react-dom-factories");
 
 const Sidebar = createFactory(
   require("devtools/client/shared/components/Sidebar")

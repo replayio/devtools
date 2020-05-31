@@ -8,7 +8,7 @@ const { render, mount } = require("enzyme");
 const sinon = require("sinon");
 
 // React
-const { createFactory } = require("devtools/client/shared/vendor/react");
+const { createFactory } = require("react");
 const Provider = createFactory(require("react-redux").Provider);
 const { setupStore } = require("devtools/client/webconsole/test/node/helpers");
 const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
@@ -161,7 +161,7 @@ describe("PageError component:", () => {
         PageError({
           message,
           serviceContainer,
-          dispatch: () => {},
+          dispatch: () => { },
         })
       )
     );

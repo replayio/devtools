@@ -5,7 +5,7 @@
 const expect = require("expect");
 const { render } = require("enzyme");
 
-const { createFactory } = require("devtools/client/shared/vendor/react");
+const { createFactory } = require("react");
 
 const FilterButton = createFactory(
   require("devtools/client/webconsole/components/FilterBar/FilterButton")

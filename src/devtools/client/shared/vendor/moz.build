@@ -13,7 +13,7 @@ DevToolsModules(
     'react-dom-server.js',
     'react-dom-test-utils.js',
     'react-dom.js',
-    'react-prop-types.js',
+    'prop-types.js',
     'react-redux.js',
     'react-router-dom.js',
     'react-test-renderer-shallow.js',
@@ -34,5 +34,5 @@ if CONFIG['DEBUG_JS_MODULES']:
         'react-dom-dev.js',
         'react-dom-server-dev.js',
         'react-dom-test-utils-dev.js',
-        'react-prop-types-dev.js',
+        'prop-types-dev.js',
     )

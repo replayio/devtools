@@ -35,8 +35,8 @@ function aboutEq(a, b) {
 
 window.onload = async function () {
   try {
-    const React = browserRequire("devtools/client/shared/vendor/react");
-    const ReactDOM = browserRequire("devtools/client/shared/vendor/react-dom");
+    const React = browserRequire("react");
+    const ReactDOM = browserRequire("react-dom");
 
     const HSplitBox = React.createFactory(browserRequire("devtools/client/shared/components/HSplitBox"));
     ok(HSplitBox, "Should get HSplitBox");

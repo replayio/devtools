@@ -22,8 +22,8 @@ Test for Notification Box. The test is checking:
 
 window.onload = async function () {
   try {
-    const ReactDOM = browserRequire("devtools/client/shared/vendor/react-dom");
-    const React = browserRequire("devtools/client/shared/vendor/react");
+    const ReactDOM = browserRequire("react-dom");
+    const React = browserRequire("react");
     const { NotificationBox, PriorityLevels } = browserRequire("devtools/client/shared/components/NotificationBox");
 
     // Test rendering

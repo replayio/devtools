@@ -6,8 +6,8 @@
 const {
   button,
   span,
-} = require("devtools/client/shared/vendor/react-dom-factories");
-const PropTypes = require("devtools/client/shared/vendor/react-prop-types");
+} = require("react-dom-factories");
+const PropTypes = require("prop-types");
 
 // Utils
 const { isGrip, wrapRender } = require("./rep-utils");
