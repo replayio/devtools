@@ -112,6 +112,7 @@ const gMaskImages = {
   "#toolbox-toolbar-jsdebugger .toolbar-panel-icon": require("devtools/client/themes/images/tool-debugger.svg"),
   "#toolbox-toolbar-inspector .toolbar-panel-icon": require("devtools/client/themes/images/tool-inspector.svg"),
   ".tree-node button.arrow": require("devtools/client/debugger/images/arrow.svg"),
+  "#header .logo": require("./images/logo.svg"),
 };
 
 const gContentImages = {
@@ -153,24 +154,24 @@ function loadImages() {
   document.head.appendChild(style);
   const sheet = style.sheet;
 
-  for (const [ selector, url ] of Object.entries(gBackgroundImages)) {
+  for (const [selector, url] of Object.entries(gBackgroundImages)) {
     sheet.insertRule(`${selector} { background-image: url(${url.default}) }`);
   }
 
-  for (const [ selector, url ] of Object.entries(gMaskImages)) {
+  for (const [selector, url] of Object.entries(gMaskImages)) {
     sheet.insertRule(`${selector} { mask-image: url(${url.default}) }`);
     sheet.insertRule(`${selector} { -webkit-mask-image: url(${url.default}) }`);
   }
 
-  for (const [ selector, url ] of Object.entries(gContentImages)) {
+  for (const [selector, url] of Object.entries(gContentImages)) {
     sheet.insertRule(`${selector} { content: url(${url.default}) }`);
   }
 
-  for (const [ selector, url ] of Object.entries(gListStyleImages)) {
+  for (const [selector, url] of Object.entries(gListStyleImages)) {
     sheet.insertRule(`${selector} { list-style-image: url(${url.default}) }`);
   }
 
-  for (const [ selector, info ] of Object.entries(gOtherImages)) {
+  for (const [selector, info] of Object.entries(gOtherImages)) {
     const { style, url, before = "", after = "" } = info;
     sheet.insertRule(`${selector} { ${style}: ${before} url(${url.default}) ${after} }`);
   }

@@ -39,6 +39,9 @@ export default class App extends React.Component {
     render() {
         const { initialize } = this.props
         return <>
+            <div id="header">
+                <div className="logo"></div>
+            </div>
             <canvas id="graphics"></canvas>
             <div id="highlighter-root"></div>
             <Toolbox initialize={initialize} />

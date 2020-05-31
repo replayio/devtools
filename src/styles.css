@@ -32,10 +32,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #graphics {
   position: absolute;
-  top: 0px;
+  top: 28px;
   left: 0px;
-  background-color: #747882;
+  background-color: #ececec;
   z-index: -1; /* Draw canvas behind the highlighter overlay. */
+}
+
+#header {
+  background-color: white;
+  height: 28px;
+  display: flex;
+  align-items: center;
+}
+
+#header .logo {
+  /* mask: url("/src/images/logo.svg"); */
+  background: var(--theme-toolbar-selected-color);
+  height: 14px;
+  width: 124px;
+  margin-left: 5px;
 }
 
 #toolbox {

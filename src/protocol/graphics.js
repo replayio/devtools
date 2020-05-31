@@ -303,6 +303,7 @@ function refreshGraphics() {
   }
 
   if (gDrawImage) {
+
     const offsetLeft = Math.max((canvas.width - gDrawImage.width) / 2, 0);
     const offsetTop = Math.max((canvas.height - gDrawImage.height) / 2, 0);
 

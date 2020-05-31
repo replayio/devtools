@@ -9,7 +9,8 @@ module.exports = {
   },
   devServer: {
     contentBase: '.',
-    index: 'index.html'
+    index: 'index.html',
+    liveReload: false
   },
   plugins: [new MiniCssExtractPlugin()],
   resolve: {
