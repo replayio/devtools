@@ -54,6 +54,7 @@ const gBackgroundImages = {
   ".message.network > .collapse-button::before, .message.startGroup > .indent[data-indent='0'] ~ .collapse-button::before, .message.startGroupCollapsed > .indent[data-indent='0'] ~ .collapse-button::before": require("devtools/client/themes/images/arrow-big.svg"),
   ".message:hover > .icon.rewindable": require("devtools/client/debugger/images/next-circle.svg"),
   "button.jump-definition": require("devtools/client/shared/components/reps/images/input.svg"),
+  ".img.column-marker": require("devtools/client/debugger/images/column-marker.svg"),
 };
 
 const gMaskImages = {

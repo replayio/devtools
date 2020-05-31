@@ -49,7 +49,8 @@
   bottom: 0;
   height: 15px;
   background-color: var(--gutter-hover-background-color);
-  mask: url(resource://devtools/client/debugger/images/breakpoint.svg)
+  /* embedding breakpoint.svg */
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAxNSIgd2lkdGg9IjYwIiBoZWlnaHQ9IjE1IiBzdHJva2U9ImN1cnJlbnRDb2xvciI+PHBhdGggZD0iTTUzLjA3LjVIMS41Yy0uNTQgMC0xIC40Ni0xIDF2MTJjMCAuNTQuNDYgMSAxIDFoNTEuNTdjLjU4IDAgMS4xNS0uMjYgMS41My0uN2w0LjctNi4zLTQuNy02LjNjLS4zOC0uNDQtLjk1LS43LTEuNTMtLjd6Ii8+PC9zdmc+)
     no-repeat;
   mask-size: auto 15px;
   mask-position: right;
@@ -145,8 +146,4 @@
 
 .editor-wrapper.skip-pausing .column-breakpoint svg {
   fill-opacity: var(--breakpoint-skipped-opacity);
-}
-
-.img.column-marker {
-  background-image: url(resource://devtools/client/debugger/images/column-marker.svg);
 }
