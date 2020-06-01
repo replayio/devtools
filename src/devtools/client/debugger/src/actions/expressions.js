@@ -172,7 +172,7 @@ function evaluateExpression(cx: ThreadContext, expression: Expression) {
       cx,
       thread: cx.thread,
       input: expression.input,
-      [PROMISE]: client.evaluateInFrame(wrapExpression(input), {
+      [PROMISE]: client.evaluate(wrapExpression(input), {
         frameId,
         thread: cx.thread,
       }),

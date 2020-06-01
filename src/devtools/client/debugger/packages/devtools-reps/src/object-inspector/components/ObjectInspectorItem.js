@@ -152,7 +152,7 @@ class ObjectInspectorItem extends Component<Props> {
       if (depth > 0) {
         repProps.mode = mode === MODE.LONG ? MODE.SHORT : MODE.TINY;
       }
-      if (expanded) {
+      if (expanded || label == "<prototype>") {
         repProps.mode = MODE.TINY;
       }
 

@@ -188,7 +188,7 @@ function nodeIsProxy(item: Node): boolean {
 }
 
 function nodeIsPrototype(item: Node): boolean {
-  return getType(item) === NODE_TYPES.PROTOTYPE;
+  return item.name == "<prototype>";
 }
 
 function nodeIsWindow(item: Node): boolean {

@@ -154,6 +154,12 @@ Pause.prototype = {
           newGetterValues.push({ name: v.name, value: new ValueFront(this, v) });
         }
         object.preview.getterValues = newGetterValues;
+
+        const { prototypeId } = object.preview;
+        object.preview.prototypeValue = new ValueFront(
+          this,
+          prototypeId ? { object: prototypeId } : { value: null }
+        );
       }
 
       this.objects.get(object.objectId).preview = object.preview;
@@ -485,6 +491,7 @@ ValueFront.prototype = {
       });
       rv.unshift({ name: "<entries>", contents: createPseudoValueFront(elements) });
     }
+    rv.push({ name: "<prototype>", contents: this._object.preview.prototypeValue });
     return rv;
   },
 
