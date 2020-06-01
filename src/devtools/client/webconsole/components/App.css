@@ -91,10 +91,12 @@ body {
 .flexible-output-input {
   position: relative;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .flexible-output-input .webconsole-output {
-  height: calc(100% - 55px);
+  /* height: calc(100% - 55px); */
   overflow: hidden auto;
 }
 
@@ -142,7 +144,8 @@ body {
   padding-bottom: var(--jsterm-padding-bottom);
   border-top-color: var(--theme-splitter-color);
   border-top-width: var(--jsterm-border-width);
-  border-top-style: solid;
+  border-top-style: solid; 
+  flex-grow: 100;
 }
 
 .webconsole-app .webconsole-output:not(:empty) ~ .jsterm-input-container {

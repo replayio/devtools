@@ -88,6 +88,10 @@ html[dir="rtl"] .editor-mount {
   line-height: var(--theme-code-line-height);
 }
 
+.jsdebugger .CodeMirror {
+  background-color: var(--theme-body-background);
+}
+
 /* set the linenumber white when there is a breakpoint */
 .editor-wrapper:not(.skip-pausing)
   .new-breakpoint

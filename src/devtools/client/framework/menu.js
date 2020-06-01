@@ -36,14 +36,14 @@ function Menu({ id = null } = {}) {
  *
  * @param {MenuItem} menuItem
  */
-Menu.prototype.append = function(menuItem) {
+Menu.prototype.append = function (menuItem) {
   this.menuitems.push(menuItem);
 };
 
 /**
  * Remove all items from the Menu
  */
-Menu.prototype.clear = function() {
+Menu.prototype.clear = function () {
   this.menuitems = [];
 };
 
@@ -53,7 +53,7 @@ Menu.prototype.clear = function() {
  * @param {int} pos
  * @param {MenuItem} menuItem
  */
-Menu.prototype.insert = function(pos, menuItem) {
+Menu.prototype.insert = function (pos, menuItem) {
   throw Error("Not implemented");
 };
 
@@ -65,7 +65,7 @@ Menu.prototype.insert = function(pos, menuItem) {
  * @param {Document} doc
  *        The document that should own the popup.
  */
-Menu.prototype.popupAtTarget = function(target, doc) {
+Menu.prototype.popupAtTarget = function (target, doc) {
   const zoom = getCurrentZoom(doc);
 
   const rect = target.getBoundingClientRect();
@@ -89,7 +89,7 @@ let gMenuPopup;
  * @param {int} screenX
  * @param {int} screenY
  */
-Menu.prototype.popup = function(screenX, screenY) {
+Menu.prototype.popup = function (screenX, screenY) {
   // The context-menu will be created in the topmost window to preserve keyboard
   // navigation (see Bug 1543940).
   // Keep a reference on the window owning the menu to hide the popup on unload.
@@ -113,6 +113,7 @@ Menu.prototype.popup = function(screenX, screenY) {
 
   // Remove the menu from the DOM once it's hidden.
   popup.addEventListener("popuphidden", e => {
+
     if (e.target === popup) {
       win.removeEventListener("unload", onWindowUnload);
       popup.remove();
@@ -129,7 +130,7 @@ Menu.prototype.popup = function(screenX, screenY) {
   if (gMenuPopup) {
     try {
       document.body.removeChild(gMenuPopup);
-    } catch (e) {}
+    } catch (e) { }
   }
   gMenuPopup = popup;
 
@@ -143,6 +144,7 @@ Menu.prototype.popup = function(screenX, screenY) {
   popup.style.left = `${left}px`;
 
   const listener = () => {
+    return
     gMenuPopup = null;
     document.body.removeChild(popup);
     document.removeEventListener("mousedown", listener);
@@ -153,7 +155,7 @@ Menu.prototype.popup = function(screenX, screenY) {
   document.body.addEventListener("contextmenu", listener);
 };
 
-Menu.prototype._createMenuItems = function(parent) {
+Menu.prototype._createMenuItems = function (parent) {
   const doc = parent.ownerDocument;
   this.menuitems.forEach(item => {
     if (!item.visible) {
@@ -188,7 +190,7 @@ Menu.prototype._createMenuItems = function(parent) {
   });
 };
 
-Menu.getMenuElementById = function(id, doc) {
+Menu.getMenuElementById = function (id, doc) {
   const menuDoc = DevToolsUtils.getTopWindow(doc.defaultView).document;
   return menuDoc.getElementById(id);
 };
