@@ -49,7 +49,7 @@ function configureStore(webConsoleUI, options = {}) {
   //options.logLimit || Math.max(getIntPref("devtools.hud.loglimit"), 1);
   const sidebarToggle = false; // getBoolPref(PREFS.FEATURES.SIDEBAR_TOGGLE);
   const autocomplete = true; // getBoolPref(PREFS.FEATURES.AUTOCOMPLETE);
-  const eagerEvaluation = true; // getBoolPref(PREFS.FEATURES.EAGER_EVALUATION);
+  const eagerEvaluation = false; // getBoolPref(PREFS.FEATURES.EAGER_EVALUATION);
   const groupWarnings = false; // getBoolPref(PREFS.FEATURES.GROUP_WARNINGS);
   const historyCount = 300; // getIntPref(PREFS.UI.INPUT_HISTORY_COUNT);
 

@@ -44,18 +44,18 @@ export default class Toolbox extends React.Component {
             <div id="toolbox-border"></div>
             <div id="toolbox-timeline"></div>
             <div id="toolbox-toolbar">
-                <div className="toolbar-panel-button" id="toolbox-toolbar-jsdebugger">
-                    <div className="toolbar-panel-icon"></div>
-          Debugger
-        </div>
-                <div className="toolbar-panel-button" id="toolbox-toolbar-webconsole">
-                    <div className="toolbar-panel-icon"></div>
-          Console
-        </div>
                 <div className="toolbar-panel-button" id="toolbox-toolbar-inspector">
                     <div className="toolbar-panel-icon"></div>
-          Inspector
-        </div>
+                    Inspector
+                </div>
+                <div className="toolbar-panel-button" id="toolbox-toolbar-jsdebugger">
+                    <div className="toolbar-panel-icon"></div>
+                    Debugger
+                </div>
+                <div className="toolbar-panel-button" id="toolbox-toolbar-webconsole">
+                    <div className="toolbar-panel-icon"></div>
+                    Console
+                </div>
             </div>
             <div id="toolbox-contents">
                 <div className="toolbar-panel-content" id="toolbox-content-jsdebugger"></div>

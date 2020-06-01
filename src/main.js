@@ -88,7 +88,7 @@ async function initialize() {
 
   initSocket(dispatch);
 
-  paintMessage("Loading…");
+  paintMessage("");
 
   sendMessage("Recording.getDescription", { recordingId }).then(
     (description) => {
