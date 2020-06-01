@@ -219,7 +219,11 @@ EventEmitter.decorate(gToolbox.nodePicker);
 
 window.gToolbox = gToolbox;
 
-setTimeout(() => {
+setTimeout(async () => {
+  // Wait for CodeMirror to load asynchronously.
+  while (!window.CodeMirror) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
 
   ReactDOM.render(React.createElement(App, { initialize }), document.body);
 

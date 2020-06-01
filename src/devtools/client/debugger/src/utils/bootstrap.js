@@ -88,9 +88,7 @@ export function bootstrapStore(
 }
 
 export function bootstrapWorkers(panelWorkers: Workers) {
-  const workerPath = isDevelopment()
-    ? "src/devtools/client/debugger/dist"
-    : "resource://devtools/client/debugger/dist";
+  const workerPath = "src/devtools/client/debugger/dist";
 
   prettyPrint.start(`${workerPath}/pretty-print-worker.js`);
   parser = new ParserDispatcher();
