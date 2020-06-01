@@ -109,7 +109,7 @@ export function setPreview(
       return;
     }
 
-    const { result } = await client.evaluateInFrame(expression, {
+    const { result } = await client.evaluate(expression, {
       frameId: selectedFrame.id,
       thread,
     });
