@@ -108,7 +108,7 @@ class Breakpoint extends PureComponent<Props> {
     const { cx, breakpoint, selectedSource, breakpointActions } = this.props;
     event.stopPropagation();
     event.preventDefault();
-    const selectedLocation = getSelectedLocation(breakpoint, selectedSource);
+    const selectedLocation = breakpoint.location;
 
     showMenu(
       event,
@@ -118,7 +118,7 @@ class Breakpoint extends PureComponent<Props> {
 
   addBreakpoint(props: Props) {
     const { breakpoint, editor, selectedSource } = props;
-    const selectedLocation = getSelectedLocation(breakpoint, selectedSource);
+    const selectedLocation = breakpoint.location;
 
     // Hidden Breakpoints are never rendered on the client
     if (breakpoint.options.hidden) {
@@ -164,7 +164,7 @@ class Breakpoint extends PureComponent<Props> {
       return;
     }
 
-    const selectedLocation = getSelectedLocation(breakpoint, selectedSource);
+    const selectedLocation = breakpoint.location;
     const line = toEditorLine(sourceId, selectedLocation.line);
 
     doc.setGutterMarker(line, "breakpoints", null);

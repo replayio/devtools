@@ -47,8 +47,7 @@ export function sortSelectedLocations<T: MappedLocation>(
     // Priority: line number, undefined column, column number
     location => location.line,
     location => {
-      const selectedLocation = getSelectedLocation(location, selectedSource);
-      return selectedLocation.column === undefined || selectedLocation.column;
+      return location.column === undefined || location.column;
     },
   ]);
 }

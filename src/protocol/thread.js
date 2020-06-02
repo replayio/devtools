@@ -1334,6 +1334,11 @@ const ThreadFront = {
   getFrameStepsAtIndex(index) {
     return this.currentPause.getFrameStepsAtIndex(index);
   },
+
+  getPreferredLocation(location) {
+    // For now, always prefer original sources.
+    return location[location.length - 1];
+  },
 };
 
 EventEmitter.decorate(ThreadFront);

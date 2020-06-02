@@ -10,8 +10,10 @@ import type { ThunkArgs } from "../types";
 import { getSourceByActorId, getCurrentThread, getSelectedFrame } from "../../selectors";
 import { zip } from "lodash";
 
+const { ThreadFront } = require("protocol/thread");
+
 export function setFramePositions() {
-  return async ({ dispatch, getState, sourceMaps, client }: ThunkArgs) => {
+  return async ({ dispatch, getState, client }: ThunkArgs) => {
     const thread = getCurrentThread(getState());
     const frame = getSelectedFrame(getState(), thread);
     if (!frame) {
@@ -24,43 +26,24 @@ export function setFramePositions() {
       return;
     }
 
-    const sourceId = getSourceByActorId(getState(), positions[0].frame.scriptId).id;
+    const { scriptId } = ThreadFront.getPreferredLocation(positions[0].frame);
+    const sourceId = getSourceByActorId(getState(), scriptId).id;
 
-    const generatedLocations = positions.map(({ frame: { line, column } }) => {
+    const locations = positions.map(({ frame }) => {
+      const { line, column } = ThreadFront.getPreferredLocation(frame);
       return { line, column, sourceId };
     });
-    const originalLocations = await sourceMaps.getOriginalLocations(
-      generatedLocations
-    );
 
-    const combinedPositions = zip(positions, originalLocations, generatedLocations).map(
-      ([{ point, time }, location, generatedLocation]) => {
-        return { point, time, location, generatedLocation };
+    const combinedPositions = zip(positions, locations).map(
+      ([{ point, time }, location]) => {
+        return { point, time, location };
       }
     );
-
-    // FIXME
-    const unexecuted = [];
-
-    const generatedUnexecuted = unexecuted.map(({ line, column }) => {
-      return { line, column, sourceId };
-    });
-    const originalUnexecuted = await sourceMaps.getOriginalLocations(
-      generatedUnexecuted
-    );
-
-    const combinedUnexecuted = zip(originalUnexecuted, generatedUnexecuted).map(
-      ([location, generatedLocation]) => ({ location, generatedLocation })
-    );
-
-    if (frame != getSelectedFrame(getState(), thread)) {
-      return;
-    }
 
     dispatch({
       type: "SET_FRAME_POSITIONS",
       positions: combinedPositions,
-      unexecuted: combinedUnexecuted,
+      unexecuted: [],
     });
   };
 }

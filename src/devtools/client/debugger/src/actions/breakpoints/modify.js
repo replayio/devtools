@@ -65,7 +65,7 @@ import type {
 function clientSetBreakpoint(client, state, breakpoint: Breakpoint) {
   const breakpointLocation = makeBreakpointLocation(
     state,
-    breakpoint.generatedLocation
+    breakpoint.location
   );
   return client.setBreakpoint(breakpointLocation, breakpoint.options);
 }
@@ -73,9 +73,9 @@ function clientSetBreakpoint(client, state, breakpoint: Breakpoint) {
 function clientRemoveBreakpoint(
   client,
   state,
-  generatedLocation: SourceLocation
+  location: SourceLocation
 ) {
-  const breakpointLocation = makeBreakpointLocation(state, generatedLocation);
+  const breakpointLocation = makeBreakpointLocation(state, location);
   return client.removeBreakpoint(breakpointLocation);
 }
 
@@ -110,20 +110,16 @@ export function addBreakpoint(
 
     await dispatch(setBreakpointPositions({ cx, sourceId, line }));
 
-    const position: ?BreakpointPosition = column
+    const location: ?BreakpointPosition = column
       ? getBreakpointPositionsForLocation(getState(), initialLocation)
       : getFirstBreakpointPosition(getState(), initialLocation);
 
-    if (!position) {
+    if (!location) {
       return;
     }
 
-    const { location, generatedLocation } = position;
-
     const source = getSource(getState(), location.sourceId);
-    const generatedSource = getSource(getState(), generatedLocation.sourceId);
-
-    if (!source || !generatedSource) {
+    if (!source) {
       return;
     }
 
@@ -137,11 +133,11 @@ export function addBreakpoint(
       location
     );
 
-    const content = getSourceContent(getState(), generatedSource.id);
+    const content = getSourceContent(getState(), source.id);
     const text = getTextAtPosition(
-      generatedSource.id,
+      source.id,
       content,
-      generatedLocation
+      location
     );
 
     const id = makeBreakpointId(location);
@@ -151,7 +147,6 @@ export function addBreakpoint(
       options,
       location,
       astLocation,
-      generatedLocation,
       text,
       originalText,
     };
@@ -168,7 +163,7 @@ export function addBreakpoint(
       // If we just clobbered an enabled breakpoint with a disabled one, we need
       // to remove any installed breakpoint in the server.
       [PROMISE]: disabled
-        ? clientRemoveBreakpoint(client, getState(), generatedLocation)
+        ? clientRemoveBreakpoint(client, getState(), location)
         : clientSetBreakpoint(client, getState(), breakpoint),
     });
   };
@@ -200,7 +195,7 @@ export function removeBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
         : clientRemoveBreakpoint(
             client,
             getState(),
-            breakpoint.generatedLocation
+            breakpoint.location
           ),
     });
   };
@@ -226,10 +221,10 @@ export function removeBreakpointAtGeneratedLocation(
     );
     // Remove any breakpoints matching the generated location.
     const breakpoints = getBreakpointsList(getState());
-    for (const { location, generatedLocation } of breakpoints) {
+    for (const { location } of breakpoints) {
       if (
-        generatedLocation.sourceId == target.sourceId &&
-        comparePosition(generatedLocation, target)
+        location.sourceId == target.sourceId &&
+        comparePosition(location, target)
       ) {
         dispatch({
           type: "REMOVE_BREAKPOINT",
@@ -242,10 +237,10 @@ export function removeBreakpointAtGeneratedLocation(
 
     // Remove any remaining pending breakpoints matching the generated location.
     const pending = getPendingBreakpointList(getState());
-    for (const { location, generatedLocation } of pending) {
+    for (const { location } of pending) {
       if (
-        generatedLocation.sourceUrl == target.sourceUrl &&
-        comparePosition(generatedLocation, target)
+        location.sourceUrl == target.sourceUrl &&
+        comparePosition(location, target)
       ) {
         dispatch({
           type: "REMOVE_PENDING_BREAKPOINT",
@@ -279,7 +274,7 @@ export function disableBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
       [PROMISE]: clientRemoveBreakpoint(
         client,
         getState(),
-        breakpoint.generatedLocation
+        breakpoint.location
       ),
     });
   };

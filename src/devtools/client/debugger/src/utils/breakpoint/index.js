@@ -106,12 +106,10 @@ export function makeBreakpointActorId(location: SourceActorLocation) {
 
 export function assertBreakpoint(breakpoint: Breakpoint) {
   assertLocation(breakpoint.location);
-  assertLocation(breakpoint.generatedLocation);
 }
 
 export function assertPendingBreakpoint(pendingBreakpoint: PendingBreakpoint) {
   assertPendingLocation(pendingBreakpoint.location);
-  assertPendingLocation(pendingBreakpoint.generatedLocation);
 }
 
 export function assertLocation(location: SourceLocation) {
@@ -183,7 +181,6 @@ function createPendingLocation(location: PendingLocation) {
 
 export function createPendingBreakpoint(bp: Breakpoint) {
   const pendingLocation = createPendingLocation(bp.location);
-  const pendingGeneratedLocation = createPendingLocation(bp.generatedLocation);
 
   assertPendingLocation(pendingLocation);
 
@@ -192,7 +189,6 @@ export function createPendingBreakpoint(bp: Breakpoint) {
     disabled: bp.disabled,
     location: pendingLocation,
     astLocation: bp.astLocation,
-    generatedLocation: pendingGeneratedLocation,
   };
 }
 

@@ -10,14 +10,15 @@ import type {
   PausedPacket,
   FrameFront,
   SourcePayload,
-  ThreadFront,
   Target,
 } from "./types";
 
 import { clientCommands } from "./commands";
 
+const { ThreadFront } = require("protocol/thread");
+
 export function prepareSourcePayload(
-  threadFront: ThreadFront,
+  threadFront,
   source: SourcePayload
 ): GeneratedSourceData {
   // We populate the set of sources as soon as we hear about them. Note that
@@ -41,10 +42,11 @@ export function createFrame(
     return null;
   }
 
+  const { scriptId, line, column } = ThreadFront.getPreferredLocation(frame.location);
   const location = {
-    sourceId: clientCommands.getSourceForActor(frame.location.scriptId),
-    line: frame.location.line,
-    column: frame.location.column,
+    sourceId: clientCommands.getSourceForActor(scriptId),
+    line,
+    column,
   };
 
   const displayName = frame.functionName || `(${frame.type})`;

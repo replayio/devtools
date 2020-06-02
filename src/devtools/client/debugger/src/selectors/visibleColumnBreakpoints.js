@@ -79,8 +79,7 @@ function findBreakpoint(location, breakpointMap) {
 function filterByLineCount(positions, selectedSource) {
   const lineCount = {};
 
-  for (const breakpoint of positions) {
-    const { line } = breakpoint.location;
+  for (const { line } of positions) {
     if (!lineCount[line]) {
       lineCount[line] = 0;
     }
@@ -88,36 +87,31 @@ function filterByLineCount(positions, selectedSource) {
     lineCount[line] = lineCount[line] + 1;
   }
 
-  return positions.filter(
-    breakpoint => lineCount[breakpoint.location.line] > 1
-  );
+  return positions.filter(({ line }) => lineCount[line] > 1);
 }
 
 function filterVisible(positions, selectedSource, viewport) {
-  return positions.filter(columnBreakpoint => {
-    const location = columnBreakpoint.location;
-
+  return positions.filter(location => {
     return viewport && contains(location, viewport);
   });
 }
 
 function filterByBreakpoints(positions, selectedSource, breakpointMap) {
   return positions.filter(position => {
-    return breakpointMap[position.location.line];
+    return breakpointMap[position.line];
   });
 }
 
 // Filters out breakpoints to the right of the line. (bug 1552039)
 function filterInLine(positions, selectedSource, selectedContent) {
   return positions.filter(position => {
-    const location = position.location;
     const lineText = getLineText(
       selectedSource.id,
       selectedContent,
-      location.line
+      position.line
     );
 
-    return lineText.length >= (location.column || 0);
+    return lineText.length >= (position.column || 0);
   });
 }
 
@@ -126,8 +120,7 @@ function formatPositions(
   selectedSource,
   breakpointMap
 ) {
-  return (positions: any).map((position: BreakpointPosition) => {
-    const location = position.location;
+  return (positions: any).map(location => {
     return {
       location,
       breakpoint: findBreakpoint(location, breakpointMap),
@@ -202,6 +195,6 @@ export function getFirstBreakpointPosition(
   }
 
   return sortSelectedLocations(convertToList(positions), source).find(
-    position => position.location.line == line
+    location => location.line == line
   );
 }
