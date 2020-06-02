@@ -19,7 +19,6 @@ import {
   getSelectedText,
   makeBreakpointId,
 } from "../../../utils/breakpoint";
-import { getSelectedLocation } from "../../../utils/selected-location";
 import { features } from "../../../utils/prefs";
 
 import type {
@@ -76,8 +75,8 @@ class Breakpoint extends PureComponent<Props> {
   };
 
   get selectedLocation() {
-    const { breakpoint, selectedSource } = this.props;
-    return getSelectedLocation(breakpoint, selectedSource);
+    const { breakpoint } = this.props;
+    return breakpoint.location;
   }
 
   onDoubleClick = () => {
@@ -212,7 +211,7 @@ const getFormattedFrame = createSelector(
 
     return {
       ...frame,
-      selectedLocation: getSelectedLocation(frame, selectedSource),
+      selectedLocation: frame.location,
     };
   }
 );

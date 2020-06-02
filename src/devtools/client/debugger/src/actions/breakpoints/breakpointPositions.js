@@ -31,7 +31,7 @@ import type { ThunkArgs } from "../../actions/types";
 import { loadSourceActorBreakpointColumns } from "../source-actors";
 
 function filterByUniqLocation(positions: MappedLocation[]) {
-  return uniqBy(positions, ({ location }) => makeBreakpointId(location));
+  return uniqBy(positions, makeBreakpointId);
 }
 
 function convertToList(results, source) {
@@ -61,13 +61,11 @@ function groupByLine(results, sourceId, line) {
   }
 
   for (const result of results) {
-    const location = result.location;
-
-    if (!positions[location.line]) {
-      positions[location.line] = [];
+    if (!positions[result.line]) {
+      positions[result.line] = [];
     }
 
-    positions[location.line].push(result);
+    positions[result.line].push(result);
   }
 
   return positions;

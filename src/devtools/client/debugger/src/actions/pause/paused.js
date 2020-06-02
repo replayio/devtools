@@ -53,8 +53,6 @@ export function paused(pauseInfo) {
       dispatch(removeBreakpoint(cx, hiddenBreakpoint));
     }
 
-    await dispatch(mapFrames(cx));
-
     const promises = [];
     promises.push((async () => {
       dispatch(setFramePositions());

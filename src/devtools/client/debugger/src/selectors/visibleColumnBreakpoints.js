@@ -15,7 +15,6 @@ import {
   getBreakpointPositionsForSource,
 } from "../selectors";
 import { getVisibleBreakpoints } from "./visibleBreakpoints";
-import { getSelectedLocation } from "../utils/selected-location";
 import { sortSelectedLocations } from "../utils/location";
 import { getLineText } from "../utils/source";
 
@@ -55,13 +54,13 @@ function groupBreakpoints(breakpoints, selectedSource) {
 
   const map: any = groupBy(
     breakpoints.filter(breakpoint => !breakpoint.options.hidden),
-    breakpoint => getSelectedLocation(breakpoint, selectedSource).line
+    breakpoint => breakpoint.location.line
   );
 
   for (const line in map) {
     map[line] = groupBy(
       map[line],
-      breakpoint => getSelectedLocation(breakpoint, selectedSource).column
+      breakpoint => breakpoint.location.column
     );
   }
 
@@ -81,7 +80,7 @@ function filterByLineCount(positions, selectedSource) {
   const lineCount = {};
 
   for (const breakpoint of positions) {
-    const { line } = getSelectedLocation(breakpoint, selectedSource);
+    const { line } = breakpoint.location;
     if (!lineCount[line]) {
       lineCount[line] = 0;
     }
@@ -90,14 +89,13 @@ function filterByLineCount(positions, selectedSource) {
   }
 
   return positions.filter(
-    breakpoint =>
-      lineCount[getSelectedLocation(breakpoint, selectedSource).line] > 1
+    breakpoint => lineCount[breakpoint.location.line] > 1
   );
 }
 
 function filterVisible(positions, selectedSource, viewport) {
   return positions.filter(columnBreakpoint => {
-    const location = getSelectedLocation(columnBreakpoint, selectedSource);
+    const location = columnBreakpoint.location;
 
     return viewport && contains(location, viewport);
   });
@@ -105,15 +103,14 @@ function filterVisible(positions, selectedSource, viewport) {
 
 function filterByBreakpoints(positions, selectedSource, breakpointMap) {
   return positions.filter(position => {
-    const location = getSelectedLocation(position, selectedSource);
-    return breakpointMap[location.line];
+    return breakpointMap[position.location.line];
   });
 }
 
 // Filters out breakpoints to the right of the line. (bug 1552039)
 function filterInLine(positions, selectedSource, selectedContent) {
   return positions.filter(position => {
-    const location = getSelectedLocation(position, selectedSource);
+    const location = position.location;
     const lineText = getLineText(
       selectedSource.id,
       selectedContent,
@@ -130,7 +127,7 @@ function formatPositions(
   breakpointMap
 ) {
   return (positions: any).map((position: BreakpointPosition) => {
-    const location = getSelectedLocation(position, selectedSource);
+    const location = position.location;
     return {
       location,
       breakpoint: findBreakpoint(location, breakpointMap),
@@ -205,6 +202,6 @@ export function getFirstBreakpointPosition(
   }
 
   return sortSelectedLocations(convertToList(positions), source).find(
-    position => getSelectedLocation(position, source).line == line
+    position => position.location.line == line
   );
 }

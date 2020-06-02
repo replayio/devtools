@@ -4,7 +4,6 @@
 
 // @flow
 import { sortBy } from "lodash";
-import { getSelectedLocation } from "./selected-location";
 
 import type {
   MappedLocation,
@@ -46,7 +45,7 @@ export function sortSelectedLocations<T: MappedLocation>(
 ): Array<T> {
   return sortBy(locations, [
     // Priority: line number, undefined column, column number
-    location => getSelectedLocation(location, selectedSource).line,
+    location => location.line,
     location => {
       const selectedLocation = getSelectedLocation(location, selectedSource);
       return selectedLocation.column === undefined || selectedLocation.column;

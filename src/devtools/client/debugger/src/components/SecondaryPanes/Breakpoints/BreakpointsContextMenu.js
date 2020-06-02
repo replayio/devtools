@@ -5,7 +5,6 @@
 // @flow
 
 import { buildMenu, showMenu } from "devtools-contextmenu";
-import { getSelectedLocation } from "../../../utils/selected-location";
 import actions from "../../../actions";
 import { features } from "../../../utils/prefs";
 import { formatKeyShortcut } from "../../../utils/text";
@@ -107,7 +106,7 @@ export default function showContextMenu(props: Props) {
     "breakpointMenuItem.addCondition2.accesskey"
   );
 
-  const selectedLocation = getSelectedLocation(breakpoint, selectedSource);
+  const selectedLocation = breakpoint.location;
   const otherBreakpoints = breakpoints.filter(b => b.id !== breakpoint.id);
   const enabledBreakpoints = breakpoints.filter(b => !b.disabled);
   const disabledBreakpoints = breakpoints.filter(b => b.disabled);

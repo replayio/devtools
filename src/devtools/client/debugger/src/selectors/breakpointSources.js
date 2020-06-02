@@ -13,7 +13,6 @@ import {
   resourceAsSourceBase,
 } from "../selectors";
 import { getFilename } from "../utils/source";
-import { getSelectedLocation } from "../utils/selected-location";
 import { makeShallowQuery } from "../utils/resource";
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
 
@@ -37,7 +36,7 @@ function getBreakpointsForSource(
         (bp.text || bp.originalText || bp.options.condition || bp.disabled)
     )
     .filter(
-      bp => getSelectedLocation(bp, selectedSource).sourceId == source.id
+      bp => bp.location.sourceId == source.id
     );
 }
 
@@ -50,9 +49,7 @@ export const findBreakpointSources = (state: State) => {
 
 const queryBreakpointSources = makeShallowQuery({
   filter: (_, { breakpoints, selectedSource }) =>
-    uniq(
-      breakpoints.map(bp => getSelectedLocation(bp, selectedSource).sourceId)
-    ),
+    uniq(breakpoints.map(bp => bp.location.sourceId)),
   map: resourceAsSourceBase,
   reduce: (sources): Array<SourceBase> => {
     const filtered = sources.filter(source => source && !source.isBlackBoxed);

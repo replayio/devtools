@@ -8,7 +8,6 @@ import { PureComponent } from "react";
 import classnames from "classnames";
 
 import { getDocument, toEditorLine } from "../../utils/editor";
-import { getSelectedLocation } from "../../utils/selected-location";
 import { features } from "../../utils/prefs";
 import { showMenu } from "devtools-contextmenu";
 import { breakpointItems } from "./menus/breakpoints";
@@ -81,7 +80,7 @@ class Breakpoint extends PureComponent<Props> {
     event.stopPropagation();
     event.preventDefault();
 
-    const selectedLocation = getSelectedLocation(breakpoint, selectedSource);
+    const selectedLocation = breakpoint.location;
     if (event.metaKey) {
       return editorActions.continueToHere(cx, selectedLocation.line);
     }

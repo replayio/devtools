@@ -11,7 +11,6 @@ import { getBreakpointsList } from "../reducers/breakpoints";
 import { getSelectedSource } from "../reducers/sources";
 
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
-import { getSelectedLocation } from "../utils/selected-location";
 
 import type { Breakpoint, Source } from "../types";
 import type { Selector } from "../reducers/types";
@@ -30,7 +29,7 @@ export const getVisibleBreakpoints: Selector<?(Breakpoint[])> = createSelector(
     return breakpoints.filter(
       bp =>
         selectedSource &&
-        getSelectedLocation(bp, selectedSource).sourceId === selectedSource.id
+        bp.location.sourceId === selectedSource.id
     );
   }
 );
@@ -50,7 +49,7 @@ export const getFirstVisibleBreakpoints: Selector<
 
     return (uniqBy(
       sortSelectedBreakpoints(breakpoints, selectedSource),
-      bp => getSelectedLocation(bp, selectedSource).line
+      bp => bp.location.line
     ): any);
   }
 );

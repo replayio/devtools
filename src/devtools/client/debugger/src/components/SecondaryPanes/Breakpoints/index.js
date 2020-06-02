@@ -14,7 +14,6 @@ import Breakpoint from "./Breakpoint";
 import BreakpointHeading from "./BreakpointHeading";
 
 import actions from "../../../actions";
-import { getSelectedLocation } from "../../../utils/selected-location";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 
 import {
@@ -135,9 +134,7 @@ class Breakpoints extends Component<Props> {
                 source={source}
                 selectedSource={selectedSource}
                 editor={this.getEditor()}
-                key={makeBreakpointId(
-                  getSelectedLocation(breakpoint, selectedSource)
-                )}
+                key={makeBreakpointId(breakpoint.location)}
               />
             )),
           ];

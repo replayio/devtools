@@ -9,7 +9,6 @@ import { showMenu } from "devtools-contextmenu";
 
 import { getDocument } from "../../utils/editor";
 import { breakpointItems, createBreakpointItems } from "./menus/breakpoints";
-import { getSelectedLocation } from "../../utils/selected-location";
 
 // eslint-disable-next-line max-len
 import type { ColumnBreakpoint as ColumnBreakpointType } from "../../selectors/visibleColumnBreakpoints";
@@ -116,7 +115,7 @@ export default class ColumnBreakpoint extends PureComponent<Props> {
     let items = createBreakpointItems(cx, location, breakpointActions);
 
     if (breakpoint) {
-      const selectedLocation = getSelectedLocation(breakpoint, source);
+      const selectedLocation = breakpoint.location;
 
       items = breakpointItems(
         cx,
