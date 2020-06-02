@@ -9,7 +9,6 @@ import {
   getSource,
   getSourceActorsForSource,
 } from "../../selectors";
-import { isGenerated } from "../source";
 import { sortSelectedLocations } from "../location";
 import assert from "../assert";
 import { features } from "../prefs";
@@ -201,9 +200,7 @@ export function getSelectedText(
   breakpoint: Breakpoint,
   selectedSource: ?Source
 ) {
-  return selectedSource && isGenerated(selectedSource)
-    ? breakpoint.text
-    : breakpoint.originalText;
+  return breakpoint.text;
 }
 
 export function sortSelectedBreakpoints(

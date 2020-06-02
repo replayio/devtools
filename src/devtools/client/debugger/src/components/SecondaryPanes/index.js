@@ -6,7 +6,6 @@
 
 import React, { Component } from "react";
 import classnames from "classnames";
-import { isGeneratedId } from "devtools-source-map";
 import { connect } from "../../utils/connect";
 import { List } from "immutable";
 
@@ -239,49 +238,10 @@ class SecondaryPanes extends Component<Props, State> {
       className: "scopes-pane",
       component: <Scopes />,
       opened: prefs.scopesVisible,
-      buttons: this.getScopesButtons(),
       onToggle: opened => {
         prefs.scopesVisible = opened;
       },
     };
-  }
-
-  getScopesButtons() {
-    const { selectedFrame, mapScopesEnabled, source } = this.props;
-
-    if (
-      !selectedFrame ||
-      isGeneratedId(selectedFrame.location.sourceId) ||
-      (source && source.isPrettyPrinted)
-    ) {
-      return null;
-    }
-
-    return [
-      <div key="scopes-buttons">
-        <label
-          className="map-scopes-header"
-          title={L10N.getStr("scopes.mapping.label")}
-          onClick={e => e.stopPropagation()}
-        >
-          <input
-            type="checkbox"
-            checked={mapScopesEnabled ? "checked" : ""}
-            onChange={e => this.props.toggleMapScopes()}
-          />
-          {L10N.getStr("scopes.map.label")}
-        </label>
-        <a
-          className="mdn"
-          target="_blank"
-          href={mdnLink}
-          onClick={e => e.stopPropagation()}
-          title={L10N.getStr("scopes.helpTooltip.label")}
-        >
-          <AccessibleImage className="shortcuts" />
-        </a>
-      </div>,
-    ];
   }
 
   getWatchItem(): AccordionPaneItem {

@@ -50,7 +50,6 @@ const { DebuggerPanel } = require("devtools/client/debugger/panel");
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 const { InspectorPanel } = require("devtools/client/inspector/panel");
 const Selection = require("devtools/client/framework/selection");
-const SourceMapService = require("devtools/shared/source-map/index");
 const loadImages = require("image/image");
 
 const { LocalizationHelper } = require("shims/l10n");
@@ -99,7 +98,6 @@ async function initialize() {
   sendMessage("Recording.createSession", { recordingId }).then(
     async ({ sessionId }) => {
       ThreadFront.setSessionId(sessionId);
-      ThreadFront.downloadResources(recordingId);
       if (test) {
         await gToolbox.loadTool("jsdebugger");
         window.Test = require("./test/harness");
@@ -175,33 +173,12 @@ const gToolbox = {
   },
 
   async viewSourceInDebugger(url, line, column, id) {
-    try {
-      const original = await this.sourceMapURLService.originalPositionFor(url, line, column);
-      if (original) {
-        url = original.sourceUrl;
-        line = original.line;
-        column = original.column;
-      }
-    } catch (e) { }
-
     const dbg = this.getPanel("jsdebugger");
     const source = id ? dbg.getSourceByActorId(id) : dbg.getSourceByURL(url);
     if (source) {
       this.selectTool("jsdebugger");
       dbg.selectSource(source.id, line, column);
     }
-  },
-
-  get sourceMapService() {
-    if (!this._sourceMapService) {
-      this._sourceMapService = SourceMapService;
-      this._sourceMapService.startSourceMapWorker(
-        "src/devtools/shared/source-map/worker.js",
-        // This is relative to the worker itself.
-        "./source-map-worker-assets/"
-      );
-    }
-    return this._sourceMapService;
   },
 
   parserService: {

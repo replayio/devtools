@@ -5,7 +5,6 @@
 // @flow
 
 import { getSelectedFrame, getGeneratedFrameScope } from "../../selectors";
-import { mapScopes } from "./mapScopes";
 import { generateInlinePreview } from "./inlinePreview";
 import { PROMISE } from "../utils/middleware/promise";
 import type { ThreadContext } from "../../types";
@@ -29,6 +28,5 @@ export function fetchScopes(cx: ThreadContext) {
     scopes.then(() => {
       dispatch(generateInlinePreview(cx, frame.id, frame.location));
     });
-    await dispatch(mapScopes(cx, scopes, frame));
   };
 }

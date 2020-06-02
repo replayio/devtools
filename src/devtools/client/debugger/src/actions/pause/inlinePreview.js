@@ -5,7 +5,6 @@
 // @flow
 import { sortBy } from "lodash";
 import {
-  getOriginalFrameScope,
   getGeneratedFrameScope,
   getInlinePreviews,
   getSource,
@@ -48,13 +47,6 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
 
     log(`GenerateInlinePreview Start`);
 
-    const originalFrameScopes = getOriginalFrameScope(
-      getState(),
-      thread,
-      location.sourceId,
-      frameId
-    );
-
     const generatedFrameScopes = getGeneratedFrameScope(
       getState(),
       thread,
@@ -62,7 +54,6 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
     );
 
     let scopes: ?OriginalScope | Scope | null =
-      (originalFrameScopes && originalFrameScopes.scope) ||
       (generatedFrameScopes && generatedFrameScopes.scope);
 
     if (!scopes || !scopes.bindings) {

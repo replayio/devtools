@@ -4,7 +4,6 @@
 
 // @flow
 
-import { isOriginalId } from "devtools-source-map";
 import { getSourceActorsForSource, getBreakableLines } from "../../selectors";
 import { setBreakpointPositions } from "../breakpoints/breakpointPositions";
 import { union } from "lodash";
@@ -26,31 +25,12 @@ function calculateBreakableLines(positions) {
 export function setBreakableLines(cx: Context, sourceId: string) {
   return async ({ getState, dispatch, client }: ThunkArgs) => {
     let breakableLines;
-    if (isOriginalId(sourceId)) {
-      const positions = await dispatch(
-        setBreakpointPositions({ cx, sourceId })
-      );
-      breakableLines = calculateBreakableLines(positions);
+    const actors = getSourceActorsForSource(getState(), sourceId);
 
-      const existingBreakableLines = getBreakableLines(getState(), sourceId);
-      if (existingBreakableLines) {
-        breakableLines = union(existingBreakableLines, breakableLines);
-      }
-
-      dispatch({
-        type: "SET_ORIGINAL_BREAKABLE_LINES",
-        cx,
-        sourceId,
-        breakableLines,
-      });
-    } else {
-      const actors = getSourceActorsForSource(getState(), sourceId);
-
-      await Promise.all(
-        actors.map(actor =>
-          dispatch(loadSourceActorBreakableLines({ id: actor.id, cx }))
-        )
-      );
-    }
+    await Promise.all(
+      actors.map(actor =>
+        dispatch(loadSourceActorBreakableLines({ id: actor.id, cx }))
+      )
+    );
   };
 }

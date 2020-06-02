@@ -4,17 +4,8 @@
 
 // @flow
 
-import { originalToGeneratedId, isOriginalId } from "devtools-source-map";
 import { getSelectedFrame, getSelectedLocation, getCurrentThread } from ".";
 import type { State } from "../reducers/types";
-
-function getGeneratedId(sourceId) {
-  if (isOriginalId(sourceId)) {
-    return originalToGeneratedId(sourceId);
-  }
-
-  return sourceId;
-}
 
 /*
  * Checks to if the selected frame's source is currently
@@ -29,12 +20,5 @@ export function isSelectedFrameVisible(state: State) {
     return false;
   }
 
-  if (isOriginalId(selectedLocation.sourceId)) {
-    return selectedLocation.sourceId === selectedFrame.location.sourceId;
-  }
-
-  return (
-    selectedLocation.sourceId ===
-    getGeneratedId(selectedFrame.location.sourceId)
-  );
+  return selectedLocation.sourceId === selectedFrame.location.sourceId;
 }

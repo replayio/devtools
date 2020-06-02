@@ -9,8 +9,6 @@
  * @module actions/sources
  */
 
-import { isOriginalId } from "devtools-source-map";
-
 import { getSourceFromId, getSourceWithContent } from "../../reducers/sources";
 import { tabExists } from "../../reducers/tabs";
 import { setSymbols } from "./symbols";
@@ -24,7 +22,6 @@ import { setBreakableLines } from ".";
 import { prefs } from "../../utils/prefs";
 import { isMinified } from "../../utils/source";
 import { createLocation } from "../../utils/location";
-import { mapLocation } from "../../utils/source-maps";
 
 import {
   getSource,
@@ -88,7 +85,7 @@ export function selectSourceURL(
   url: string,
   options?: PartialPosition
 ) {
-  return async ({ dispatch, getState, sourceMaps }: ThunkArgs) => {
+  return async ({ dispatch, getState }: ThunkArgs) => {
     const source = getSourceByURL(getState(), url);
     if (!source) {
       return dispatch(setPendingSelectedLocation(cx, url, options));
@@ -122,9 +119,9 @@ export function selectSource(
 export function selectLocation(
   cx: Context,
   location: SourceLocation,
-  { keepContext = true, remap = false }: Object = {}
+  { keepContext = true }: Object = {}
 ) {
-  return async ({ dispatch, getState, sourceMaps, client }: ThunkArgs) => {
+  return async ({ dispatch, getState, client }: ThunkArgs) => {
     const currentSource = getSelectedSource(getState());
 
     if (!client) {
@@ -142,11 +139,6 @@ export function selectLocation(
     const activeSearch = getActiveSearch(getState());
     if (activeSearch && activeSearch !== "file") {
       dispatch(closeActiveSearch());
-    }
-
-    if (remap) {
-      location = await mapLocation(getState(), sourceMaps, location);
-      source = getSourceFromId(getState(), location.sourceId);
     }
 
     if (tabExists(getState(), source.id)) {
@@ -194,31 +186,4 @@ export function selectLocation(
  */
 export function selectSpecificLocation(cx: Context, location: SourceLocation) {
   return selectLocation(cx, location, { keepContext: false });
-}
-
-/**
- * @memberof actions/sources
- * @static
- */
-export function jumpToMappedLocation(cx: Context, location: SourceLocation) {
-  return async function({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
-    if (!client) {
-      return;
-    }
-
-    const pairedLocation = await mapLocation(getState(), sourceMaps, location);
-
-    return dispatch(selectSpecificLocation(cx, { ...pairedLocation }));
-  };
-}
-
-export function jumpToMappedSelectedLocation(cx: Context) {
-  return async function({ dispatch, getState }: ThunkArgs) {
-    const location = getSelectedLocation(getState());
-    if (!location) {
-      return;
-    }
-
-    await dispatch(jumpToMappedLocation(cx, location));
-  };
 }

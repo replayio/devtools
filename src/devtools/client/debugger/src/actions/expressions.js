@@ -20,7 +20,6 @@ import {
 import { PROMISE } from "./utils/middleware/promise";
 import { wrapExpression } from "../utils/expressions";
 import { features } from "../utils/prefs";
-import { isOriginal } from "../utils/source";
 
 import type { Expression, ThreadContext } from "../types";
 import type { ThunkArgs } from "./types";
@@ -149,22 +148,6 @@ function evaluateExpression(cx: ThreadContext, expression: Expression) {
     }
 
     let input = expression.input;
-    const frame = getSelectedFrame(getState(), cx.thread);
-
-    if (frame) {
-      const { location } = frame;
-      const source = getSourceFromId(getState(), location.sourceId);
-
-      const selectedSource = getSelectedSource(getState());
-
-      if (selectedSource && isOriginal(source) && isOriginal(selectedSource)) {
-        const mapResult = await dispatch(getMappedExpression(input));
-        if (mapResult) {
-          input = mapResult.expression;
-        }
-      }
-    }
-
     const frameId = getSelectedFrameId(getState(), cx.thread);
 
     return dispatch({

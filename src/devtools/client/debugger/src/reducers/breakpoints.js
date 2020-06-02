@@ -9,7 +9,6 @@
  * @module reducers/breakpoints
  */
 
-import { isGeneratedId } from "devtools-source-map";
 import { isEqual } from "lodash";
 
 import { makeBreakpointId } from "../utils/breakpoint";
@@ -206,10 +205,9 @@ export function getBreakpointsForSource(
     return [];
   }
 
-  const isGeneratedSource = isGeneratedId(sourceId);
   const breakpoints = getBreakpointsList(state);
   return breakpoints.filter(bp => {
-    const location = isGeneratedSource ? bp.generatedLocation : bp.location;
+    const location = bp.location;
     return location.sourceId === sourceId && (!line || line == location.line);
   });
 }
@@ -222,9 +220,8 @@ export function getBreakpointForLocation(
     return undefined;
   }
 
-  const isGeneratedSource = isGeneratedId(location.sourceId);
   return getBreakpointsList(state).find(bp => {
-    const loc = isGeneratedSource ? bp.generatedLocation : bp.location;
+    const loc = bp.location;
     return isMatchingLocation(loc, location);
   });
 }

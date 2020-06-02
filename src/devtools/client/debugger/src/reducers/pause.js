@@ -10,7 +10,6 @@
  * @module reducers/pause
  */
 
-import { isGeneratedId } from "devtools-source-map";
 import { prefs } from "../utils/prefs";
 import { getSelectedSourceId } from "./sources";
 import { getSelectedFrame } from "../selectors/pause";
@@ -569,31 +568,6 @@ export function getGeneratedFrameScope(
   return getFrameScopes(state, thread).generated[getGeneratedFrameId(frameId)];
 }
 
-export function getOriginalFrameScope(
-  state: State,
-  thread: ThreadId,
-  sourceId: ?SourceId,
-  frameId: ?string
-): ?{
-  pending: boolean,
-  +scope: OriginalScope | Scope,
-} {
-  if (!frameId || !sourceId) {
-    return null;
-  }
-
-  const isGenerated = isGeneratedId(sourceId);
-  const original = getFrameScopes(state, thread).original[
-    getGeneratedFrameId(frameId)
-  ];
-
-  if (!isGenerated && original && (original.pending || original.scope)) {
-    return original;
-  }
-
-  return null;
-}
-
 export function getFrameScopes(state: State, thread: ThreadId) {
   return getThreadPauseState(state.pause, thread).frameScopes;
 }
@@ -638,10 +612,7 @@ export function getFrameScope(
   pending: boolean,
   +scope: OriginalScope | Scope,
 } {
-  return (
-    getOriginalFrameScope(state, thread, sourceId, frameId) ||
-    getGeneratedFrameScope(state, thread, frameId)
-  );
+  return getGeneratedFrameScope(state, thread, frameId);
 }
 
 export function getSelectedScope(state: State, thread: ThreadId) {
@@ -657,9 +628,8 @@ export function getSelectedScope(state: State, thread: ThreadId) {
 }
 
 export function getSelectedOriginalScope(state: State, thread: ThreadId) {
-  const sourceId = getSelectedSourceId(state);
   const frameId = getSelectedFrameId(state, thread);
-  return getOriginalFrameScope(state, thread, sourceId, frameId);
+  return getGeneratedFrameScope(state, thread, frameId);
 }
 
 export function getSelectedGeneratedScope(state: State, thread: ThreadId) {

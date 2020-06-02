@@ -17,7 +17,6 @@ import {
 import {
   isPretty,
   getFilename,
-  isOriginal,
   shouldBlackbox,
 } from "../../utils/source";
 import {
@@ -193,6 +192,9 @@ class SourceFooter extends PureComponent<Props, State> {
   }
 
   renderSourceSummary() {
+    // NYI
+    return null;
+    /*
     const {
       cx,
       mappedSource,
@@ -224,6 +226,7 @@ class SourceFooter extends PureComponent<Props, State> {
         <span>{title}</span>
       </button>
     );
+    */
   }
 
   onCursorChange = (event: any) => {

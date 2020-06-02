@@ -14,8 +14,6 @@ import {
   getPrettySourceURL,
   underRoot,
   getRelativeUrl,
-  isGenerated,
-  isOriginal as isOriginalSource,
   getPlainUrl,
   isPretty,
   isJavaScript,
@@ -48,7 +46,6 @@ import {
 } from "../utils/async-value";
 
 import type { AsyncValue, SettledValue } from "../utils/async-value";
-import { originalToGeneratedId } from "devtools-source-map";
 import { prefs } from "../utils/prefs";
 
 import {
@@ -598,26 +595,23 @@ export function getSourceByURL(state: OuterState, url: string): ?Source {
 export function getSpecificSourceByURLInSources(
   sources: SourceResourceState,
   urls: UrlsMap,
-  url: string,
-  isOriginal: boolean
+  url: string
 ): ?Source {
   const foundSources = getSourcesByURLInSources(sources, urls, url);
   if (foundSources) {
-    return foundSources.find(source => isOriginalSource(source) == isOriginal);
+    return foundSources[0];
   }
   return null;
 }
 
 export function getSpecificSourceByURL(
   state: OuterState,
-  url: string,
-  isOriginal: boolean
+  url: string
 ): ?Source {
   return getSpecificSourceByURLInSources(
     getSources(state),
     getUrls(state),
-    url,
-    isOriginal
+    url
   );
 }
 
@@ -625,14 +619,14 @@ export function getOriginalSourceByURL(
   state: OuterState,
   url: string
 ): ?Source {
-  return getSpecificSourceByURL(state, url, true);
+  return getSpecificSourceByURL(state, url);
 }
 
 export function getGeneratedSourceByURL(
   state: OuterState,
   url: string
 ): ?Source {
-  return getSpecificSourceByURL(state, url, false);
+  return getSpecificSourceByURL(state, url);
 }
 
 export function getGeneratedSource(
@@ -643,19 +637,14 @@ export function getGeneratedSource(
     return null;
   }
 
-  if (isGenerated(source)) {
-    return source;
-  }
-
-  return getSourceFromId(state, originalToGeneratedId(source.id));
+  return source;
 }
 
 export function getGeneratedSourceById(
   state: OuterState,
   sourceId: string
 ): Source {
-  const generatedSourceId = originalToGeneratedId(sourceId);
-  return getSourceFromId(state, generatedSourceId);
+  return getSourceFromId(state, sourceId);
 }
 
 export function getPendingSelectedLocation(state: OuterState) {
@@ -872,7 +861,6 @@ const getDisplayedSourceIDs: GetDisplayedSourceIDsSelector = createSelector(
     for (const sourceId of displayedSources) {
       const threads =
         threadsBySource[sourceId] ||
-        threadsBySource[originalToGeneratedId(sourceId)] ||
         [];
 
       for (const thread of threads) {
@@ -931,10 +919,6 @@ export function canLoadSource(
     return false;
   }
 
-  if (isOriginalSource(source)) {
-    return true;
-  }
-
   const actors = getSourceActorsForSource(state, sourceId);
   return actors.length != 0;
 }
@@ -953,12 +937,7 @@ export function canPrettyPrintSource(
   id: SourceId
 ): boolean {
   const source: SourceWithContent = getSourceWithContent(state, id);
-  if (
-    !source ||
-    isPretty(source) ||
-    isOriginalSource(source) ||
-    (prefs.clientSourceMapsEnabled && isSourceWithMap(state, id))
-  ) {
+  if (!source || isPretty(source)) {
     return false;
   }
 
@@ -1029,10 +1008,6 @@ export function getBreakableLines(
   const source = getSource(state, sourceId);
   if (!source) {
     return null;
-  }
-
-  if (isOriginalSource(source)) {
-    return state.sources.breakableLines[sourceId];
   }
 
   // We pull generated file breakable lines directly from the source actors

@@ -19,9 +19,7 @@ import { fetchFrames } from "./fetchFrames";
 import { recordEvent } from "../../utils/telemetry";
 import assert from "../../utils/assert";
 
-import { mapFrames } from ".";
 import { generateInlinePreview } from "./inlinePreview";
-import { mapScopes } from "./mapScopes";
 import { setFramePositions } from "./setFramePositions";
 
 import type {
@@ -118,36 +116,22 @@ async function doInstantStep({ dispatch, getState, client }, instantInfo) {
     value: environment,
   });
 
-  let mappedLocation = client.eventMethods.maybeMappedLocation(frame.location);
-
-  if (mappedLocation) {
-    const source = getSource(getState(), mappedLocation.sourceId);
-    if (source) {
-      updates.push({
-        type: "SET_SELECTED_LOCATION",
-        source,
-        location: mappedLocation,
-      });
-    }
+  const source = getSource(getState(), frame.location.sourceId);
+  if (source) {
+    updates.push({
+      type: "SET_SELECTED_LOCATION",
+      source,
+      location: frame.location,
+    });
   }
 
   dispatch(batch);
 
   const cx = getThreadContext(getState());
 
-  if (mappedLocation) {
-    dispatch(mapFrames(cx)).then(() => dispatch(setFramePositions()));
-  } else {
-    ChromeUtils.recordReplayLog(`Debugger InstantStep WaitingForMapFrames`);
-    await dispatch(mapFrames(cx));
-    dispatch(setFramePositions());
-    mappedLocation = getSelectedFrame(getState(), thread).location;
-  }
+  dispatch(setFramePositions());
 
-  dispatch(selectLocation(cx, mappedLocation));
-
-  dispatch(generateInlinePreview(cx, frame.id, mappedLocation));
-  await dispatch(mapScopes(cx, environment, frame));
+  dispatch(generateInlinePreview(cx, frame.id, frame.location));
   await dispatch(evaluateExpressions(cx));
 }
 

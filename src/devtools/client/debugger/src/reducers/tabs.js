@@ -10,7 +10,6 @@
  */
 
 import { createSelector } from "reselect";
-import { isOriginalId } from "devtools-source-map";
 import move from "lodash-move";
 
 import { isSimilarTab, persistTabs } from "../utils/tabs";
@@ -30,7 +29,6 @@ import type { SourceBase } from "./sources";
 export type PersistedTab = {|
   url: string,
   framework?: string | null,
-  isOriginal: boolean,
   sourceId: null,
 |};
 
@@ -119,9 +117,7 @@ export function getNewSelectedSourceId(state: State, tabList: TabList): string {
     return "";
   }
 
-  const matchingTab = availableTabs.find(tab =>
-    isSimilarTab(tab, selectedTab.url, isOriginalId(selectedLocation.sourceId))
-  );
+  const matchingTab = availableTabs.find(tab => isSimilarTab(tab, selectedTab.url));
 
   if (matchingTab) {
     const sources = state.sources.sources;
@@ -131,8 +127,7 @@ export function getNewSelectedSourceId(state: State, tabList: TabList): string {
 
     const selectedSource = getSpecificSourceByURL(
       state,
-      selectedTab.url,
-      selectedTab.isOriginal
+      selectedTab.url
     );
 
     if (selectedSource) {
@@ -151,8 +146,7 @@ export function getNewSelectedSourceId(state: State, tabList: TabList): string {
   if (availableTab) {
     const tabSource = getSpecificSourceByURL(
       state,
-      availableTab.url,
-      availableTab.isOriginal
+      availableTab.url
     );
 
     if (tabSource) {
@@ -168,7 +162,7 @@ function matchesSource(tab: VisibleTab, source) {
 }
 
 function matchesUrl(tab: Tab, source) {
-  return tab.url === source.url && tab.isOriginal == isOriginalId(source.id);
+  return tab.url === source.url;
 }
 
 function addSelectedSource(state: TabsState, source) {
@@ -181,10 +175,8 @@ function addSelectedSource(state: TabsState, source) {
     return state;
   }
 
-  const isOriginal = isOriginalId(source.id);
   return updateTabList(state, {
     url: source.url,
-    isOriginal,
     framework: null,
     sourceId: source.id,
   });
@@ -233,21 +225,20 @@ function removeSourcesFromTabList(state: TabsState, { sources }) {
  */
 function updateTabList(
   state: TabsState,
-  { url, framework = null, sourceId, isOriginal = false }
+  { url, framework = null, sourceId }
 ) {
   let { tabs } = state;
   // Set currentIndex to -1 for URL-less tabs so that they aren't
   // filtered by isSimilarTab
   const currentIndex = url
-    ? tabs.findIndex(tab => isSimilarTab(tab, url, isOriginal))
+    ? tabs.findIndex(tab => isSimilarTab(tab, url))
     : -1;
 
   if (currentIndex === -1) {
     const newTab = {
       url,
       framework,
-      sourceId,
-      isOriginal,
+      sourceId
     };
     tabs = [newTab, ...tabs];
   } else if (framework) {

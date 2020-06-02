@@ -25,7 +25,6 @@ import {
 import actions from "../../actions";
 
 import {
-  isOriginal as isOriginalSource,
   getSourceQueryString,
   isUrlExtension,
   isExtensionDirectoryPath,
@@ -373,7 +372,7 @@ class SourceTreeItem extends Component<Props, State> {
 }
 
 function getHasMatchingGeneratedSource(state, source: ?Source) {
-  if (!source || !isOriginalSource(source)) {
+  if (!source) {
     return false;
   }
 

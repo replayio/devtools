@@ -13,10 +13,6 @@ import ToolboxProvider from "devtools/client/framework/store-provider";
 import { isFirefoxPanel, isDevelopment, isTesting } from "devtools-environment";
 import { AppConstants } from "devtools-modules";
 
-import SourceMaps, {
-  startSourceMapWorker,
-  stopSourceMapWorker,
-} from "devtools-source-map";
 import * as search from "../workers/search";
 import * as prettyPrint from "../workers/pretty-print";
 import { ParserDispatcher } from "../workers/parser";
@@ -57,7 +53,6 @@ function renderPanel(component, store, panel: Panel) {
 }
 
 type Workers = {
-  sourceMaps: typeof SourceMaps,
   evaluationsParser: typeof ParserDispatcher,
 };
 
@@ -99,10 +94,6 @@ export function bootstrapWorkers(panelWorkers: Workers) {
 }
 
 export function teardownWorkers() {
-  if (!isFirefoxPanel()) {
-    // When used in Firefox, the toolbox manages the source map worker.
-    stopSourceMapWorker();
-  }
   prettyPrint.stop();
   parser.stop();
   search.stop();

@@ -2,9 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
-import SourceMaps, { generatedToOriginalId } from "devtools-source-map";
-
 import assert from "../../utils/assert";
 import { recordEvent } from "../../utils/telemetry";
 import { remapBreakpoints } from "../breakpoints";
@@ -17,7 +14,6 @@ import {
   isJavaScript,
 } from "../../utils/source";
 import { loadSourceText } from "./loadSourceText";
-import { mapFrames } from "../pause";
 import { selectSpecificLocation } from "../sources";
 
 import {
@@ -39,42 +35,12 @@ import type {
 } from "../../types";
 
 export async function prettyPrintSource(
-  sourceMaps: typeof SourceMaps,
   client,
   generatedSource: Source,
   content: SourceContent,
   actors: Array<SourceActor>
 ) {
-  if (!isJavaScript(generatedSource, content) || content.type !== "text") {
-    throw new Error("Can't prettify non-javascript files.");
-  }
-
-  try {
-    const url = getPrettySourceURL(generatedSource.url);
-    const { code, mappings } = await prettyPrint({
-      text: content.value,
-      url,
-    });
-    client.eventMethods.sourceRemapStart(generatedSource.id);
-    await sourceMaps.applySourceMap(generatedSource.id, url, code, mappings);
-    client.eventMethods.sourceRemapEnd(generatedSource.id);
-
-    // The source map URL service used by other devtools listens to changes to
-    // sources based on their actor IDs, so apply the mapping there too.
-    for (const { actor } of actors) {
-      await sourceMaps.applySourceMap(actor, url, code, mappings);
-    }
-    return {
-      text: code,
-      contentType: "text/javascript",
-    };
-  } catch (e) {
-    // Use the generated source if pretty printing fails.
-    return {
-      text: content.value,
-      contentType: "text/javascript",
-    };
-  }
+  throw new Error("NYI");
 }
 
 function toNavigateContext(cx) {
@@ -83,6 +49,8 @@ function toNavigateContext(cx) {
 
 export function createPrettySource(cx: Context, sourceId: string) {
   return async ({ dispatch, getState, sourceMaps }: ThunkArgs) => {
+    throw new Error("NYI");
+    /*
     cx = toNavigateContext(cx);
 
     const source = getSourceFromId(getState(), sourceId);
@@ -108,6 +76,7 @@ export function createPrettySource(cx: Context, sourceId: string) {
     await dispatch(selectSource(cx, id));
 
     return prettySource;
+    */
   };
 }
 
@@ -116,7 +85,9 @@ function selectPrettyLocation(
   prettySource: Source,
   generatedLocation: ?SourceLocation
 ) {
-  return async ({ dispatch, sourceMaps, getState }: ThunkArgs) => {
+  return async ({ dispatch, getState }: ThunkArgs) => {
+    throw new Error("NYI");
+    /*
     let location = generatedLocation
       ? generatedLocation
       : getSelectedLocation(getState());
@@ -130,6 +101,7 @@ function selectPrettyLocation(
     }
 
     return dispatch(selectSource(cx, prettySource.id));
+    */
   };
 }
 
@@ -147,6 +119,8 @@ function selectPrettyLocation(
  */
 export function togglePrettyPrint(cx: Context, sourceId: string) {
   return async ({ dispatch, getState, client, sourceMaps }: ThunkArgs) => {
+    throw new Error("NYI");
+    /*
     const source = getSource(getState(), sourceId);
     if (!source) {
       return {};
@@ -181,5 +155,6 @@ export function togglePrettyPrint(cx: Context, sourceId: string) {
     await dispatch(remapBreakpoints(cx, sourceId));
 
     return newPrettySource;
+    */
   };
 }

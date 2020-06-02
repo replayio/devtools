@@ -9,7 +9,6 @@
  * @module actions/sources
  */
 
-import { isOriginalId, originalToGeneratedId } from "devtools-source-map";
 import { recordEvent } from "../../utils/telemetry";
 import { features } from "../../utils/prefs";
 import { getSourceActorsForSource } from "../../selectors";
@@ -34,14 +33,6 @@ export function toggleBlackBox(cx: Context, source: Source) {
       recordEvent("blackbox");
     }
 
-    let sourceId, range;
-    if (features.originalBlackbox && isOriginalId(source.id)) {
-      range = await sourceMaps.getFileGeneratedRange(source.id);
-      sourceId = originalToGeneratedId(source.id);
-    } else {
-      sourceId = source.id;
-    }
-
     return dispatch({
       type: "BLACKBOX",
       cx,
@@ -49,9 +40,8 @@ export function toggleBlackBox(cx: Context, source: Source) {
       [PROMISE]: blackboxActors(
         getState(),
         client,
-        sourceId,
-        isBlackBoxed,
-        range
+        source.id,
+        isBlackBoxed
       ),
     });
   };

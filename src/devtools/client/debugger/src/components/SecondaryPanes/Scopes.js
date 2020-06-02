@@ -13,7 +13,6 @@ import {
   getSelectedSource,
   getSelectedFrame,
   getGeneratedFrameScope,
-  getOriginalFrameScope,
   getPauseReason,
   isMapScopesEnabled,
   getThreadContext,
@@ -271,16 +270,6 @@ const mapStateToProps = state => {
   const selectedSource = getSelectedSource(state);
 
   const {
-    scope: originalFrameScopes,
-    pending: originalPending,
-  } = getOriginalFrameScope(
-    state,
-    cx.thread,
-    selectedSource && selectedSource.id,
-    selectedFrame && selectedFrame.id
-  ) || { scope: null, pending: false };
-
-  const {
     scope: generatedFrameScopes,
     pending: generatedPending,
   } = getGeneratedFrameScope(
@@ -296,9 +285,8 @@ const mapStateToProps = state => {
     cx,
     selectedFrame,
     mapScopesEnabled: isMapScopesEnabled(state),
-    isLoading: generatedPending || originalPending,
+    isLoading: generatedPending,
     why: getPauseReason(state, cx.thread),
-    originalFrameScopes,
     generatedFrameScopes,
     expandedScopes: getLastExpandedScopes(state, cx.thread),
   };

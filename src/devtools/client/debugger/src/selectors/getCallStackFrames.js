@@ -11,24 +11,20 @@ import {
 } from "../reducers/sources";
 import { getCurrentThreadFrames } from "../reducers/pause";
 import { annotateFrames } from "../utils/pause/frames";
-import { isOriginal } from "../utils/source";
 import { get } from "lodash";
 import type { State, SourceResourceState } from "../reducers/types";
 import type { Frame, Source } from "../types";
 import { createSelector } from "reselect";
 
-function getLocation(frame, isGeneratedSource) {
-  return isGeneratedSource
-    ? frame.generatedLocation || frame.location
-    : frame.location;
+function getLocation(frame) {
+  return frame.location;
 }
 
 function getSourceForFrame(
   sources: SourceResourceState,
-  frame: Frame,
-  isGeneratedSource
+  frame: Frame
 ) {
-  const sourceId = getLocation(frame, isGeneratedSource).sourceId;
+  const sourceId = getLocation(frame).sourceId;
   return getSourceInSources(sources, sourceId);
 }
 
@@ -37,11 +33,10 @@ function appendSource(
   frame: Frame,
   selectedSource: ?Source
 ): Frame {
-  const isGeneratedSource = selectedSource && !isOriginal(selectedSource);
   return {
     ...frame,
-    location: getLocation(frame, isGeneratedSource),
-    source: getSourceForFrame(sources, frame, isGeneratedSource),
+    location: getLocation(frame),
+    source: getSourceForFrame(sources, frame),
   };
 }
 

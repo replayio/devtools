@@ -10,7 +10,7 @@ import {
   getThreadContext,
 } from "../../selectors";
 
-import { mapFrames, fetchFrames } from ".";
+import { fetchFrames } from ".";
 import { removeBreakpoint } from "../breakpoints";
 import { evaluateExpressions, markEvaluatedExpressionsAsLoading } from "../expressions";
 import { selectLocation } from "../sources";

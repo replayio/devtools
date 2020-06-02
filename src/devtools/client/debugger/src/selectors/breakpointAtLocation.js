@@ -9,23 +9,16 @@ import {
   getBreakpointPositionsForLine,
 } from "../reducers/sources";
 import { getBreakpointsList } from "../reducers/breakpoints";
-import { isGenerated } from "../utils/source";
 
 import type { Breakpoint, BreakpointPosition, PartialPosition } from "../types";
 import type { State } from "../reducers/types";
 
 function getColumn(column, selectedSource) {
-  if (column) {
-    return column;
-  }
-
-  return isGenerated(selectedSource) ? undefined : 0;
+  return column;
 }
 
 function getLocation(bp, selectedSource) {
-  return isGenerated(selectedSource)
-    ? bp.generatedLocation || bp.location
-    : bp.location;
+  return bp.location;
 }
 
 function getBreakpointsForSource(state: State, selectedSource): Breakpoint[] {

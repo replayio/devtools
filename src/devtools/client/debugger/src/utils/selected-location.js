@@ -4,20 +4,11 @@
 
 // @flow
 
-import { isOriginalId } from "devtools-source-map";
 import type { SourceLocation, MappedLocation, Source } from "../types";
 
 export function getSelectedLocation(
   mappedLocation: MappedLocation,
   context: ?(Source | SourceLocation)
 ): SourceLocation {
-  if (!context) {
-    return mappedLocation.location;
-  }
-
-  // $FlowIgnore
-  const sourceId = context.sourceId || context.id;
-  return isOriginalId(sourceId)
-    ? mappedLocation.location
-    : mappedLocation.generatedLocation;
+  return mappedLocation.location;
 }

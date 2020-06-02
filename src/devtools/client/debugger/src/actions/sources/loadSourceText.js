@@ -20,7 +20,7 @@ import { addBreakpoint } from "../breakpoints";
 import { prettyPrintSource } from "./prettyPrint";
 import { isFulfilled, fulfilled } from "../../utils/async-value";
 
-import { isOriginal, isPretty } from "../../utils/source";
+import { isPretty } from "../../utils/source";
 import {
   memoizeableAction,
   type MemoizedAction,
@@ -43,7 +43,7 @@ async function loadSource(
   text: string,
   contentType: string,
 }> {
-  if (isPretty(source) && isOriginal(source)) {
+  if (isPretty(source)) {
     const generatedSource = getGeneratedSource(state, source);
     if (!generatedSource) {
       throw new Error("Unable to find minified original.");
@@ -60,18 +60,6 @@ async function loadSource(
       content.value,
       getSourceActorsForSource(state, generatedSource.id)
     );
-  }
-
-  if (isOriginal(source)) {
-    const result = await sourceMaps.getOriginalSourceText(source.id);
-    if (!result) {
-      // The way we currently try to load and select a pending
-      // selected location, it is possible that we will try to fetch the
-      // original source text right after the source map has been cleared
-      // after a navigation event.
-      throw new Error("Original source text unavailable");
-    }
-    return result;
   }
 
   // We only need the source text from one actor, but messages sent to retrieve

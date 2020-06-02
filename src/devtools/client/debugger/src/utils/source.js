@@ -11,7 +11,6 @@
 
 import { getUnicodeUrl } from "devtools-modules";
 
-import { isOriginalSource } from "../utils/source-maps";
 import { endTruncateStr } from "./utils";
 import { truncateMiddleText } from "../utils/text";
 import { parse as parseURL } from "../utils/url";
@@ -69,10 +68,6 @@ export function shouldBlackbox(source: ?Source) {
   }
 
   if (!source.url) {
-    return false;
-  }
-
-  if (!features.originalBlackbox && isOriginalSource(source)) {
     return false;
   }
 
@@ -506,16 +501,6 @@ export function underRoot(
   }
 
   return source.url && source.url.includes(root);
-}
-
-export function isOriginal(source: Source) {
-  // Pretty-printed sources are given original IDs, so no need
-  // for any additional check
-  return isOriginalSource(source);
-}
-
-export function isGenerated(source: Source) {
-  return !isOriginal(source);
 }
 
 export function getSourceQueryString(source: ?Source) {
