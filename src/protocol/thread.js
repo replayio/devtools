@@ -387,7 +387,10 @@ ValueFront.prototype = {
   },
 
   functionLocation() {
-    return this._object.preview.functionLocation;
+    const location = this._object.preview.functionLocation;
+    if (location) {
+      return ThreadFront.getPreferredLocation(location);
+    }
   },
 
   functionLocationURL() {

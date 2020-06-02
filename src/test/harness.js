@@ -120,7 +120,7 @@ async function disableBreakpoint(url, line, column) {
 function getFirstBreakpointColumn(line, sourceId) {
   const source = dbgSelectors.getSource(sourceId);
   const position = dbgSelectors.getFirstBreakpointPosition({ line, sourceId });
-  return position.generatedLocation.column;
+  return position.column;
 }
 
 function removeAllBreakpoints() {
