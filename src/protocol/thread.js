@@ -389,7 +389,11 @@ ValueFront.prototype = {
   functionLocation() {
     const location = this._object.preview.functionLocation;
     if (location) {
-      return ThreadFront.getPreferredLocation(location);
+      // Don't fetch a pretty printed location for the function if we don't
+      // know it, so that this function runs synchronously. Callers should
+      // check for this situation during e.g. location selection and pick
+      // the pretty printed location instead.
+      return ThreadFront.getPreferredLocationRaw(location);
     }
   },
 
@@ -982,6 +986,15 @@ const ThreadFront = {
   // Map URL to scriptId[].
   urlScripts: new Map(),
 
+  // Map original script id to generated script id.
+  originalScripts: new Map(),
+
+  // Map pretty script id to generated script id.
+  prettyPrintedScripts: new Map(),
+
+  // Map generated script id to pretty script id.
+  generatedPrettyPrintedScripts: new Map(),
+
   skipPausing: false,
 
   // Points which will be reached when stepping in various directions from a point.
@@ -1044,10 +1057,11 @@ const ThreadFront = {
 
   async findScripts(onScript) {
     const sessionId = await this.sessionWaiter.promise;
+    this.onScript = onScript;
 
     sendMessage("Debugger.findScripts", {}, sessionId);
     addEventListener("Debugger.scriptParsed", script => {
-      const { scriptId, url } = script;
+      const { scriptId, url, generatedScriptId } = script;
       if (url) {
         this.scriptURLs.set(scriptId, url);
         if (this.urlScripts.has(url)) {
@@ -1056,8 +1070,32 @@ const ThreadFront = {
           this.urlScripts.set(url, [scriptId]);
         }
       }
+      if (generatedScriptId) {
+        this.originalScripts.set(scriptId, generatedScriptId);
+      }
       onScript(script);
     });
+  },
+
+  async prettyPrintScript(scriptId) {
+    const { prettyScriptId } = await sendMessage(
+      "Debugger.prettyPrintScript",
+      { scriptId },
+      this.sessionId
+    );
+    this.prettyPrintedScripts.set(prettyScriptId, scriptId);
+    this.generatedPrettyPrintedScripts.set(scriptId, prettyScriptId);
+    if (this.onScript) {
+      this.onScript({ scriptId: prettyScriptId });
+    }
+  },
+
+  isOriginalScript(scriptId) {
+    return this.originalScripts.has(scriptId);
+  },
+
+  isPrettyPrintedScript(scriptId) {
+    return this.prettyPrintedScripts.has(scriptId);
   },
 
   getScriptURL(scriptId) {
@@ -1338,9 +1376,38 @@ const ThreadFront = {
     return this.currentPause.getFrameStepsAtIndex(index);
   },
 
-  getPreferredLocation(location) {
+  getPreferredLocationRaw(location) {
     // For now, always prefer original sources.
     return location[location.length - 1];
+  },
+
+  // Choose the location to use from a MappedLocation list of equivalent
+  // locations in different generated vs. original vs. pretty printed scripts.
+  async getPreferredLocation(location) {
+    // After pretty printing a script, we need the location in the pretty
+    // printed script, which might not be in a set of locations if it
+    // originated from before the pretty print. If we detect this, fetch
+    // the mapping to get a full set of mapped locations.
+    let preferred = this.getPreferredLocationRaw(location);
+    const prettyId = this.generatedPrettyPrintedScripts.get(preferred.scriptId);
+    if (prettyId) {
+      const newLocation = await sendMessage(
+        "Debugger.getMappedLocation",
+        { location: location[0] },
+        this.sessionId
+      );
+      preferred = this.getPreferredLocationRaw(newLocation);
+      assert(preferred.scriptId == prettyId);
+    }
+    return preferred;
+  },
+
+  getPreferredScriptId(scriptId) {
+    const prettyId = this.generatedPrettyPrintedScripts.get(scriptId);
+    if (prettyId) {
+      return prettyId;
+    }
+    return scriptId;
   },
 };
 

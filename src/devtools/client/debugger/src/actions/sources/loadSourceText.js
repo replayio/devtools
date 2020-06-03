@@ -17,7 +17,6 @@ import {
 } from "../../selectors";
 import { addBreakpoint } from "../breakpoints";
 
-import { prettyPrintSource } from "./prettyPrint";
 import { isFulfilled, fulfilled } from "../../utils/async-value";
 
 import { isPretty } from "../../utils/source";
@@ -43,25 +42,6 @@ async function loadSource(
   text: string,
   contentType: string,
 }> {
-  if (isPretty(source)) {
-    const generatedSource = getGeneratedSource(state, source);
-    if (!generatedSource) {
-      throw new Error("Unable to find minified original.");
-    }
-    const content = getSourceContent(state, generatedSource.id);
-    if (!content || !isFulfilled(content)) {
-      throw new Error("Cannot pretty-print a file that has not loaded");
-    }
-
-    return prettyPrintSource(
-      sourceMaps,
-      client,
-      generatedSource,
-      content.value,
-      getSourceActorsForSource(state, generatedSource.id)
-    );
-  }
-
   // We only need the source text from one actor, but messages sent to retrieve
   // the source might fail if the actor has or is about to shut down. Keep
   // trying with different actors until one request succeeds.

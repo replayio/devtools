@@ -56,99 +56,8 @@ import type {
 } from "../../types";
 import type { Action, ThunkArgs } from "../types";
 
-function loadSourceMaps(cx: Context, sources: SourceActor[]) {
-  return async function({
-    dispatch,
-    sourceMaps,
-  }: ThunkArgs): Promise<?(Promise<Source>[])> {
-    try {
-      const sourceList = await Promise.all(
-        sources.map(async sourceActor => {
-          const originalSources = await dispatch(
-            loadSourceMap(cx, sourceActor)
-          );
-          sourceQueue.queueSources(
-            originalSources.map(data => ({
-              type: "original",
-              data,
-            }))
-          );
-          return originalSources;
-        })
-      );
-
-      await sourceQueue.flush();
-
-      return flatten(sourceList);
-    } catch (error) {
-      if (!(error instanceof ContextError)) {
-        throw error;
-      }
-    }
-  };
-}
-
-/**
- * @memberof actions/sources
- * @static
- */
-function loadSourceMap(cx: Context, sourceActor: SourceActor) {
-  return async function({
-    dispatch,
-    getState,
-    sourceMaps,
-  }: ThunkArgs): Promise<OriginalSourceData[]> {
-    if (!prefs.clientSourceMapsEnabled || !sourceActor.sourceMapURL) {
-      return [];
-    }
-
-    let data = null;
-    try {
-      // Unable to correctly type the result of a spread on a union type.
-      // See https://github.com/facebook/flow/pull/7298
-      let url = sourceActor.url || "";
-      if (!sourceActor.url && typeof sourceActor.introductionUrl === "string") {
-        // If the source was dynamically generated (via eval, dynamically
-        // created script elements, and so forth), it won't have a URL, so that
-        // it is not collapsed into other sources from the same place. The
-        // introduction URL will include the point it was constructed at,
-        // however, so use that for resolving any source maps in the source.
-        url = sourceActor.introductionUrl;
-      }
-
-      // Ignore sourceMapURL on scripts that are part of HTML files, since
-      // we currently treat sourcemaps as Source-wide, not SourceActor-specific.
-      const source = getSourceByActorId(getState(), sourceActor.id);
-      if (source) {
-        data = await sourceMaps.getOriginalURLs({
-          // Using source ID here is historical and eventually we'll want to
-          // switch to all of this being per-source-actor.
-          id: source.id,
-          url,
-          sourceMapURL: sourceActor.sourceMapURL || "",
-          isWasm: sourceActor.introductionType === "wasm",
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-
-    if (!data) {
-      // If this source doesn't have a sourcemap, enable it for pretty printing
-      dispatch(
-        ({
-          type: "CLEAR_SOURCE_ACTOR_MAP_URL",
-          cx,
-          id: sourceActor.id,
-        }: Action)
-      );
-      return [];
-    }
-
-    validateNavigateContext(getState(), cx);
-    return data;
-  };
-}
+import { ThreadFront } from "protocol/thread";
+import { reloadLocations } from "./reloadLocations";
 
 // If a request has been made to show this source, go ahead and
 // select it.
@@ -316,15 +225,24 @@ export function newGeneratedSources(sourceInfo: Array<GeneratedSourceData>) {
     const newSourcesObj = {};
     const newSourceActors: Array<SourceActor> = [];
 
+    let reload = false;
+
     for (const { thread, isServiceWorker, source, id } of sourceInfo) {
       const newId = id || makeSourceId(source, isServiceWorker);
+
+      const isPrettyPrinted = ThreadFront.isPrettyPrintedScript(source.actor);
+      const isOriginal = ThreadFront.isOriginalScript(source.actor);
+
+      if (isPrettyPrinted) {
+        reload = true;
+      }
 
       if (!getSource(getState(), newId) && !newSourcesObj[newId]) {
         newSourcesObj[newId] = {
           id: newId,
-          url: source.url,
-          relativeUrl: source.url,
-          isPrettyPrinted: false,
+          url: isPrettyPrinted ? "formatted" : source.url,
+          relativeUrl: isPrettyPrinted ? "formatted" : source.url,
+          isPrettyPrinted,
           extensionName: source.extensionName,
           introductionUrl: source.introductionUrl,
           introductionType: source.introductionType,
@@ -332,7 +250,7 @@ export function newGeneratedSources(sourceInfo: Array<GeneratedSourceData>) {
           isWasm:
             !!supportsWasm(getState()) && source.introductionType === "wasm",
           isExtension: (source.url && isUrlExtension(source.url)) || false,
-          isOriginal: false,
+          isOriginal,
         };
       }
 
@@ -379,16 +297,13 @@ export function newGeneratedSources(sourceInfo: Array<GeneratedSourceData>) {
     }
     await dispatch(checkNewSources(cx, newSources));
 
-    (async () => {
-      await dispatch(loadSourceMaps(cx, newSourceActors));
+    for (const { source } of newSourceActors) {
+      dispatch(checkPendingBreakpoints(cx, source));
+    }
 
-      // We would like to sync breakpoints after we are done
-      // loading source maps as sometimes generated and original
-      // files share the same paths.
-      for (const { source } of newSourceActors) {
-        dispatch(checkPendingBreakpoints(cx, source));
-      }
-    })();
+    if (reload) {
+      dispatch(reloadLocations());
+    }
 
     return resultIds.map(id => getSourceFromId(getState(), id));
   };

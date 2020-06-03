@@ -323,9 +323,9 @@ function getProperties(thread: string, grip: Grip): Promise<*> {
 
 async function getFrames(thread: string) {
   const frames = await lookupThreadFront(thread).getFrames();
-  return frames.map<?Frame>((frame, i) =>
+  return Promise.all(frames.map<?Frame>((frame, i) =>
     createFrame(thread, frame, i)
-  );
+  ));
 }
 
 function convertScope(protocolScope) {

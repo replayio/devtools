@@ -324,6 +324,7 @@ function instantWarpPacket(threadFront, { packet }) {
 }
 
 function canInstantStep(point, limit) {
+  /*
   if (!point) {
     return null;
   }
@@ -342,6 +343,7 @@ function canInstantStep(point, limit) {
       environment,
     };
   }
+  */
   return null;
 }
 

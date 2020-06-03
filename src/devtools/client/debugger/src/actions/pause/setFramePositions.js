@@ -21,24 +21,23 @@ export function setFramePositions() {
     }
 
     const positions = await client.fetchAncestorFramePositions(frame.index);
-
-    if (frame != getSelectedFrame(getState(), thread)) {
-      return;
-    }
-
-    const { scriptId } = ThreadFront.getPreferredLocation(positions[0].frame);
+    const { scriptId } = await ThreadFront.getPreferredLocation(positions[0].frame);
     const sourceId = getSourceByActorId(getState(), scriptId).id;
 
-    const locations = positions.map(({ frame }) => {
-      const { line, column } = ThreadFront.getPreferredLocation(frame);
+    const locations = await Promise.all(positions.map(async ({ frame }) => {
+      const { line, column } = await ThreadFront.getPreferredLocation(frame);
       return { line, column, sourceId };
-    });
+    }));
 
     const combinedPositions = zip(positions, locations).map(
       ([{ point, time }, location]) => {
         return { point, time, location };
       }
     );
+
+    if (frame != getSelectedFrame(getState(), thread)) {
+      return;
+    }
 
     dispatch({
       type: "SET_FRAME_POSITIONS",

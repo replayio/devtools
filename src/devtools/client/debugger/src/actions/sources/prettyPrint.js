@@ -22,6 +22,7 @@ import {
   getSourceByURL,
   getSelectedLocation,
   getThreadContext,
+  getSourceActorsForSource,
 } from "../../selectors";
 
 import type { Action, ThunkArgs } from "../types";
@@ -34,76 +35,7 @@ import type {
   SourceLocation,
 } from "../../types";
 
-export async function prettyPrintSource(
-  client,
-  generatedSource: Source,
-  content: SourceContent,
-  actors: Array<SourceActor>
-) {
-  throw new Error("NYI");
-}
-
-function toNavigateContext(cx) {
-  return { navigateCounter: cx.navigateCounter };
-}
-
-export function createPrettySource(cx: Context, sourceId: string) {
-  return async ({ dispatch, getState, sourceMaps }: ThunkArgs) => {
-    throw new Error("NYI");
-    /*
-    cx = toNavigateContext(cx);
-
-    const source = getSourceFromId(getState(), sourceId);
-    const url = getPrettySourceURL(source.url || source.id);
-    const id = generatedToOriginalId(sourceId, url);
-
-    const prettySource = {
-      id,
-      url,
-      relativeUrl: url,
-      isBlackBoxed: false,
-      isPrettyPrinted: true,
-      isWasm: false,
-      introductionUrl: null,
-      introductionType: undefined,
-      isExtension: false,
-      extensionName: null,
-      isOriginal: true,
-    };
-
-    dispatch(({ type: "ADD_SOURCE", cx, source: prettySource }: Action));
-
-    await dispatch(selectSource(cx, id));
-
-    return prettySource;
-    */
-  };
-}
-
-function selectPrettyLocation(
-  cx: Context,
-  prettySource: Source,
-  generatedLocation: ?SourceLocation
-) {
-  return async ({ dispatch, getState }: ThunkArgs) => {
-    throw new Error("NYI");
-    /*
-    let location = generatedLocation
-      ? generatedLocation
-      : getSelectedLocation(getState());
-
-    if (location && location.line >= 1) {
-      location = await sourceMaps.getOriginalLocation(location);
-
-      return dispatch(
-        selectSpecificLocation(cx, { ...location, sourceId: prettySource.id })
-      );
-    }
-
-    return dispatch(selectSource(cx, prettySource.id));
-    */
-  };
-}
+const { ThreadFront } = require("protocol/thread");
 
 /**
  * Toggle the pretty printing of a source's text. All subsequent calls to
@@ -119,42 +51,20 @@ function selectPrettyLocation(
  */
 export function togglePrettyPrint(cx: Context, sourceId: string) {
   return async ({ dispatch, getState, client, sourceMaps }: ThunkArgs) => {
-    throw new Error("NYI");
-    /*
     const source = getSource(getState(), sourceId);
     if (!source) {
       return {};
     }
 
-    if (!source.isPrettyPrinted) {
-      recordEvent("pretty_print");
-    }
-
-    await dispatch(loadSourceText({ cx, source }));
-    assert(
-      isGenerated(source),
-      "Pretty-printing only allowed on generated sources"
-    );
-
     const url = getPrettySourceURL(source.url);
     const prettySource = getSourceByURL(getState(), url);
 
     if (prettySource) {
-      return dispatch(selectPrettyLocation(cx, prettySource));
+      return prettySource;
     }
 
-    const selectedLocation = getSelectedLocation(getState());
-    const newPrettySource = await dispatch(createPrettySource(cx, sourceId));
-    dispatch(selectPrettyLocation(cx, newPrettySource, selectedLocation));
+    const actors = getSourceActorsForSource(getState(), source.id);
 
-    const threadcx = getThreadContext(getState());
-    await dispatch(mapFrames(threadcx));
-
-    await dispatch(setSymbols({ cx, source: newPrettySource }));
-
-    await dispatch(remapBreakpoints(cx, sourceId));
-
-    return newPrettySource;
-    */
+    await Promise.all(actors.map(({ id }) => ThreadFront.prettyPrintScript(id)));
   };
 }

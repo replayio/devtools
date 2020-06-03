@@ -33,7 +33,7 @@ export function prepareSourcePayload(
   return { thread: threadFront.actor, source };
 }
 
-export function createFrame(
+export async function createFrame(
   thread: ThreadId,
   frame: Object,
   index: number = 0
@@ -42,7 +42,7 @@ export function createFrame(
     return null;
   }
 
-  const { scriptId, line, column } = ThreadFront.getPreferredLocation(frame.location);
+  const { scriptId, line, column } = await ThreadFront.getPreferredLocation(frame.location);
   const location = {
     sourceId: clientCommands.getSourceForActor(scriptId),
     line,
