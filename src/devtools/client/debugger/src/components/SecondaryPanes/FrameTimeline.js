@@ -166,7 +166,7 @@ class FrameTimeline extends Component<Props, State> {
         break;
       }
       if (isSameLocation(location, selectedLocation) ||
-          isSameLocation(generatedLocation, selectedLocation)) {
+        isSameLocation(generatedLocation, selectedLocation)) {
         index = i;
       }
     }
@@ -192,10 +192,7 @@ class FrameTimeline extends Component<Props, State> {
     return (
       <div
         className="frame-timeline-progress"
-        style={{
-          width: `${progress}%`,
-          "max-width": maxWidth,
-        }}
+        style={{ width: `${progress}%`, maxWidth }}
       />
     );
   }
