@@ -1102,6 +1102,10 @@ const ThreadFront = {
     return this.scriptURLs.get(scriptId);
   },
 
+  getScriptIdsForURL(url) {
+    return [...this.scriptURLs.entries()].filter(e => e[1] == url).map(e => e[0]);
+  },
+
   async getScriptSource(scriptId) {
     const { scriptSource, contentType } = await sendMessage(
       "Debugger.getScriptSource",
@@ -1391,12 +1395,7 @@ const ThreadFront = {
     let preferred = this.getPreferredLocationRaw(location);
     const prettyId = this.generatedPrettyPrintedScripts.get(preferred.scriptId);
     if (prettyId) {
-      const newLocation = await sendMessage(
-        "Debugger.getMappedLocation",
-        { location: location[0] },
-        this.sessionId
-      );
-      preferred = this.getPreferredLocationRaw(newLocation);
+      preferred = await this.getPreferredMappedLocation(locations[0]);
       assert(preferred.scriptId == prettyId);
     }
     return preferred;
@@ -1408,6 +1407,16 @@ const ThreadFront = {
       return prettyId;
     }
     return scriptId;
+  },
+
+  // Get the location to use for a generated location without alternatives.
+  async getPreferredMappedLocation(location) {
+    const { mappedLocation } = await sendMessage(
+      "Debugger.getMappedLocation",
+      { location },
+      this.sessionId
+    );
+    return this.getPreferredLocationRaw(mappedLocation);
   },
 };
 

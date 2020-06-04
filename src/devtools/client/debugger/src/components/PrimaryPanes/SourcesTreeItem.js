@@ -338,9 +338,9 @@ class SourceTreeItem extends Component<Props, State> {
       hasSiblingOfSameName,
     } = this.props;
 
-    const suffix = hasMatchingGeneratedSource ? (
+    const suffix = /*hasMatchingGeneratedSource ? (
       <span className="suffix">{L10N.getStr("sourceFooter.mappedSuffix")}</span>
-    ) : null;
+    ) :*/ null;
 
     let querystring;
     if (hasSiblingOfSameName) {

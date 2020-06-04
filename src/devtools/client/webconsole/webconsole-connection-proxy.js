@@ -23,30 +23,60 @@ function convertStack(stack, { frames }) {
   }
   return stack.map(frameId => {
     const frame = frames.find(f => f.frameId == frameId);
+    const location = ThreadFront.getPreferredLocationRaw(frame.location);
     return {
-      filename: ThreadFront.getScriptURL(frame.location.sourceId),
-      sourceId: frame.location.scriptId,
-      lineNumber: frame.location.line,
-      columnNumber: frame.location.column,
+      filename: ThreadFront.getScriptURL(location.sourceId),
+      sourceId: location.scriptId,
+      lineNumber: location.line,
+      columnNumber: location.column,
       functionName: frame.functionName,
     };
   });
 }
 
 WebConsoleConnectionProxy.prototype = {
-  onConsoleMessage(pause, msg) {
+  async onConsoleMessage(pause, msg) {
     //console.log("ConsoleMessage", msg);
 
     const stacktrace = convertStack(msg.stack, msg.data);
     const sourceId = stacktrace ? stacktrace[0].sourceId : undefined;
 
+    let { url, scriptId, line, column } = msg;
+
+    if (msg.point.frame) {
+      // If the execution point has a location, use any mappings in that location.
+      // The message properties do not reflect any source mapping.
+      const location = await ThreadFront.getPreferredLocation(msg.point.frame);
+      url = ThreadFront.getScriptURL(location.scriptId);
+      line = location.line;
+      column = location.column;
+    } else {
+      if (!scriptId) {
+        const ids = ThreadFront.getScriptIdsForURL(url);
+        if (ids.length == 1) {
+          scriptId = ids[0];
+        }
+      }
+      if (scriptId) {
+        // Ask the ThreadFront to map the location we got manually.
+        const location = await ThreadFront.getPreferredMappedLocation({
+          scriptId,
+          line,
+          column,
+        });
+        url = ThreadFront.getScriptURL(location.scriptId);
+        line = location.line;
+        column = location.column;
+      }
+    }
+
     const packet = {
       errorMessage: msg.text,
       errorMessageName: "ErrorMessageName",
-      sourceName: msg.url,
+      sourceName: url,
       sourceId,
-      lineNumber: msg.line,
-      columnNumber: msg.column,
+      lineNumber: line,
+      columnNumber: column,
       category: msg.source,
       warning: msg.level == "warning",
       error: msg.level == "error",

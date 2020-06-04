@@ -96,6 +96,7 @@ function onSocketMessage(evt) {
 
   if (msg.id) {
     const { method, resolve, reject } = gMessageWaiters.get(msg.id);
+    gMessageWaiters.delete(msg.id);
     if (msg.error) {
       console.warn("Message failed", method, msg.error, msg.data);
       reject(msg.error);
@@ -121,6 +122,11 @@ function onSocketError() {
 function log(text) {
   console.log(text);
 }
+
+// For debugging.
+window.getOutstandingProtocolMessages = () => {
+  return [...gMessageWaiters.values()].map(({ method }) => method);
+};
 
 module.exports = {
   initSocket,
