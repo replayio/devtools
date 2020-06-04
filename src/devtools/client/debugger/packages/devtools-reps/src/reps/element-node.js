@@ -168,7 +168,7 @@ function getElements(grip, mode) {
 
 // Registration
 function supportsObject(object) {
-  return object.hasPreview() && object.isNode() &&
+  return object?.hasPreview() && object.isNode() &&
     object.nodeType() == nodeConstants.ELEMENT_NODE;
 }
 
