@@ -84,10 +84,8 @@ export function getPendingBreakpointsForSource(
   source: Source
 ): PendingBreakpoint[] {
   return getPendingBreakpointList(state).filter(pendingBreakpoint => {
-    return (
-      pendingBreakpoint.location.sourceUrl === source.url ||
-      pendingBreakpoint.generatedLocation.sourceUrl == source.url
-    );
+    return pendingBreakpoint.location.sourceUrl === source.url
+
   });
 }
 

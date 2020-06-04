@@ -22,9 +22,9 @@ import type { Panel } from "./firefox/types";
 async function syncBreakpoints() {
   const breakpoints = await asyncStore.pendingBreakpoints;
   const breakpointValues = (Object.values(breakpoints): any);
-  breakpointValues.forEach(({ disabled, options, generatedLocation }) => {
+  breakpointValues.forEach(({ disabled, options, location }) => {
     if (!disabled) {
-      firefox.clientCommands.setBreakpoint(generatedLocation, options);
+      firefox.clientCommands.setBreakpoint(location, options);
     }
   });
 }
