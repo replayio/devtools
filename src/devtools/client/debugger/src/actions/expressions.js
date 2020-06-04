@@ -15,7 +15,6 @@ import {
   getSelectedFrameBindings,
   getCurrentThread,
   getIsPaused,
-  isMapScopesEnabled,
 } from "../selectors";
 import { PROMISE } from "./utils/middleware/promise";
 import { wrapExpression } from "../utils/expressions";
@@ -119,7 +118,7 @@ export function deleteExpression(expression: Expression) {
  * @static
  */
 export function evaluateExpressions(cx: ThreadContext) {
-  return async function({ dispatch, getState, client }: ThunkArgs) {
+  return async function ({ dispatch, getState, client }: ThunkArgs) {
     const expressions = getExpressions(getState());
     const inputs = expressions.map(({ input }) => input);
     const frameId = getSelectedFrameId(getState(), cx.thread);
@@ -132,7 +131,7 @@ export function evaluateExpressions(cx: ThreadContext) {
 }
 
 export function markEvaluatedExpressionsAsLoading(cx: ThreadContext) {
-  return async function({ dispatch, getState, client }: ThunkArgs) {
+  return async function ({ dispatch, getState, client }: ThunkArgs) {
     const expressions = getExpressions(getState());
     const inputs = expressions.map(({ input }) => input);
     const results = inputs.map(() => null);
@@ -141,7 +140,7 @@ export function markEvaluatedExpressionsAsLoading(cx: ThreadContext) {
 }
 
 function evaluateExpression(cx: ThreadContext, expression: Expression) {
-  return async function({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
+  return async function ({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
     if (!expression.input) {
       console.warn("Expressions should not be empty");
       return;
@@ -160,43 +159,5 @@ function evaluateExpression(cx: ThreadContext, expression: Expression) {
         thread: cx.thread,
       }),
     });
-  };
-}
-
-/**
- * Gets information about original variable names from the source map
- * and replaces all posible generated names.
- */
-export function getMappedExpression(expression: string) {
-  return async function({
-    dispatch,
-    getState,
-    client,
-    sourceMaps,
-    evaluationsParser,
-  }: ThunkArgs) {
-    const thread = getCurrentThread(getState());
-    const mappings = getSelectedScopeMappings(getState(), thread);
-    const bindings = getSelectedFrameBindings(getState(), thread);
-
-    // We bail early if we do not need to map the expression. This is important
-    // because mapping an expression can be slow if the evaluationsParser
-    // worker is busy doing other work.
-    //
-    // 1. there are no mappings - we do not need to map original expressions
-    // 2. does not contain `await` - we do not need to map top level awaits
-    // 3. does not contain `=` - we do not need to map assignments
-    const shouldMapScopes = isMapScopesEnabled(getState()) && mappings;
-    if (!shouldMapScopes && !expression.match(/(await|=)/)) {
-      return null;
-    }
-
-    return evaluationsParser.mapExpression(
-      expression,
-      mappings,
-      bindings || [],
-      features.mapExpressionBindings && getIsPaused(getState(), thread),
-      features.mapAwaitExpression
-    );
   };
 }

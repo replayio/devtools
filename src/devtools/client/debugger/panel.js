@@ -189,10 +189,6 @@ DebuggerPanel.prototype = {
     return { frames, selected };
   },
 
-  getMappedExpression(expression) {
-    return this._actions.getMappedExpression(expression);
-  },
-
   isPaused() {
     const thread = this._selectors.getCurrentThread(this._getState());
     return this._selectors.getIsPaused(this._getState(), thread);

@@ -14,7 +14,6 @@ import { prefs } from "../utils/prefs";
 import { getSelectedSourceId } from "./sources";
 import { getSelectedFrame } from "../selectors/pause";
 
-import type { OriginalScope } from "../utils/pause/mapScopes";
 import type { Action } from "../actions/types";
 import type { State } from "./types";
 import type {
@@ -100,7 +99,6 @@ export type PauseState = {
   threadcx: ThreadContext,
   threads: { [ThreadId]: ThreadPauseState },
   skipPausing: boolean,
-  mapScopes: boolean,
   shouldPauseOnExceptions: boolean,
   shouldPauseOnCaughtExceptions: boolean,
   previewLocation: ?SourceLocation,
@@ -125,7 +123,6 @@ function createPauseState(thread: ThreadId = "UnknownThread") {
     highlightedCalls: null,
     threads: {},
     skipPausing: prefs.skipPausing,
-    mapScopes: prefs.mapScopes,
     shouldPauseOnExceptions: prefs.pauseOnExceptions,
     shouldPauseOnCaughtExceptions: prefs.pauseOnCaughtExceptions,
   };
@@ -406,11 +403,6 @@ function update(
       return { ...state, skipPausing };
     }
 
-    case "TOGGLE_MAP_SCOPES": {
-      const { mapScopes } = action;
-      prefs.mapScopes = mapScopes;
-      return { ...state, mapScopes };
-    }
 
     case "SET_EXPANDED_SCOPE": {
       const { path, expanded } = action;
@@ -670,10 +662,6 @@ export function getSkipPausing(state: State) {
 
 export function getHighlightedCalls(state: State, thread: ThreadId) {
   return getThreadPauseState(state.pause, thread).highlightedCalls;
-}
-
-export function isMapScopesEnabled(state: State) {
-  return state.pause.mapScopes;
 }
 
 export function getInlinePreviews(

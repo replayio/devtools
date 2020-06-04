@@ -13,7 +13,6 @@ import { features } from "../../utils/prefs";
 import { validateThreadContext } from "../../utils/context";
 import { loadSourceText } from "../sources/loadSourceText";
 
-import type { OriginalScope } from "../../utils/pause/mapScopes";
 import type { ThreadContext, Frame, Scope, Preview } from "../../types";
 import type { ThunkArgs } from "../types";
 
@@ -33,7 +32,7 @@ function getLocalScopeLevels(originalAstScopes): number {
 }
 
 export function generateInlinePreview(cx: ThreadContext, frameId, location) {
-  return async function({ dispatch, getState, parser, client }: ThunkArgs) {
+  return async function ({ dispatch, getState, parser, client }: ThunkArgs) {
     if (!features.inlinePreview) {
       return;
     }
@@ -53,7 +52,7 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
       frameId
     );
 
-    let scopes: ?OriginalScope | Scope | null =
+    let scopes: Scope | null =
       (generatedFrameScopes && generatedFrameScopes.scope);
 
     if (!scopes || !scopes.bindings) {
