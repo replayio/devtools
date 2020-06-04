@@ -14,7 +14,6 @@ import {
   getSelectedFrame,
   getGeneratedFrameScope,
   getPauseReason,
-  isMapScopesEnabled,
   getThreadContext,
   getLastExpandedScopes,
 } from "../../selectors";
@@ -38,12 +37,10 @@ type Props = {
   originalFrameScopes: Object | null,
   isLoading: boolean,
   why: ?Why,
-  mapScopesEnabled: boolean,
   openLink: typeof actions.openLink,
   openElementInInspector: typeof actions.openElementInInspectorCommand,
   highlightDomElement: typeof actions.highlightDomElement,
   unHighlightDomElement: typeof actions.unHighlightDomElement,
-  toggleMapScopes: typeof actions.toggleMapScopes,
   setExpandedScope: typeof actions.setExpandedScope,
   addWatchpoint: typeof actions.addWatchpoint,
   removeWatchpoint: typeof actions.removeWatchpoint,
@@ -117,9 +114,7 @@ class Scopes extends PureComponent<Props, State> {
     }
   }
 
-  onToggleMapScopes = () => {
-    this.props.toggleMapScopes();
-  };
+
 
   onContextMenu = (event: any, item: any) => {
     const { addWatchpoint, removeWatchpoint } = this.props;
@@ -204,14 +199,12 @@ class Scopes extends PureComponent<Props, State> {
       openElementInInspector,
       highlightDomElement,
       unHighlightDomElement,
-      mapScopesEnabled,
       setExpandedScope,
       expandedScopes,
     } = this.props;
     const { originalScopes, generatedScopes, showOriginal } = this.state;
 
-    const scopes =
-      (showOriginal && mapScopesEnabled && originalScopes) || generatedScopes;
+    const scopes = generatedScopes;
 
     function initiallyExpanded(item) {
       return expandedScopes.some(path => path == getScopeItemPath(item));
@@ -277,14 +270,13 @@ const mapStateToProps = state => {
     cx.thread,
     selectedFrame && selectedFrame.id
   ) || {
-    scope: null,
-    pending: false,
-  };
+      scope: null,
+      pending: false,
+    };
 
   return {
     cx,
     selectedFrame,
-    mapScopesEnabled: isMapScopesEnabled(state),
     isLoading: generatedPending,
     why: getPauseReason(state, cx.thread),
     generatedFrameScopes,
@@ -299,7 +291,6 @@ export default connect<Props, OwnProps, _, _, _, _>(
     openElementInInspector: actions.openElementInInspectorCommand,
     highlightDomElement: actions.highlightDomElement,
     unHighlightDomElement: actions.unHighlightDomElement,
-    toggleMapScopes: actions.toggleMapScopes,
     setExpandedScope: actions.setExpandedScope,
     addWatchpoint: actions.addWatchpoint,
     removeWatchpoint: actions.removeWatchpoint,

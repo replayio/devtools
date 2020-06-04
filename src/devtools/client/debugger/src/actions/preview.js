@@ -20,7 +20,6 @@ import {
   getPreviewCount,
 } from "../selectors";
 
-import { getMappedExpression } from "./expressions";
 
 import type { Action, ThunkArgs } from "./types";
 import type { Position, Context } from "../types";
