@@ -56,7 +56,7 @@ class MessageContainer extends Component {
       open: PropTypes.bool.isRequired,
       serviceContainer: PropTypes.object.isRequired,
       payload: PropTypes.object,
-      timestampsVisible: PropTypes.bool.isRequired,
+      timestampsVisible: PropTypes.bool,
       repeat: PropTypes.number,
       badge: PropTypes.number,
       indent: PropTypes.number,
