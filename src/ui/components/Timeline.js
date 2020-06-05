@@ -167,9 +167,11 @@ class WebReplayPlayer extends Component {
       this.onUnprocessedRegions.bind(this)
     );
 
-    const consoleFrame = this.console.hud.ui;
-    consoleFrame.on("message-hover", this.onConsoleMessageHover.bind(this));
-    consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate.bind(this));
+    this.console.on("ready", () => {
+      const consoleFrame = this.console.hud.ui;
+      consoleFrame.on("message-hover", this.onConsoleMessageHover);
+      consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate);
+    });
 
     this.threadFront.on("paused", this.onPaused.bind(this));
     this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
@@ -282,7 +284,7 @@ class WebReplayPlayer extends Component {
     this.setState({ unprocessedRegions: regions });
   }
 
-  onConsoleUpdate(consoleState) {
+  onConsoleUpdate = consoleState => {
     const {
       messages: { visibleMessages, messagesById },
     } = consoleState;
@@ -296,9 +298,9 @@ class WebReplayPlayer extends Component {
 
       this.setState({ messages, visibleMessages, shouldAnimate: false });
     }
-  }
+  };
 
-  onConsoleMessageHover(type, message) {
+  onConsoleMessageHover = (type, message) => {
     if (type == "mouseleave") {
       return this.setState({ highlightedMessage: null });
     }
@@ -308,7 +310,7 @@ class WebReplayPlayer extends Component {
     }
 
     return null;
-  }
+  };
 
   setTimelineBoundary({ time, which }) {
     this.setState({ [which]: time });

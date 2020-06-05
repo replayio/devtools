@@ -52,10 +52,10 @@ import "./Toolbox.css";
 
 export default class Toolbox extends React.Component {
   panels = {};
-  state = { currentTool: "debugger" };
+  state = { currentTool: "debugger", panels: {} };
 
   parserService = {
-    hasSyntaxError: (text) => false,
+    hasSyntaxError: text => false,
   };
 
   threadFront = ThreadFront;
@@ -70,22 +70,18 @@ export default class Toolbox extends React.Component {
   }
 
   async componentDidMount() {
-    this.panels["debugger"] = new DebuggerPanel(this);
-    this.panels["console"] = new WebConsolePanel(this);
-    this.panels["inspector"] = new InspectorPanel(this);
-
     this.props.initialize();
 
-    await this.getPanel("debugger").open();
-    await this.getPanel("console").open();
-    await this.getPanel("inspector").open();
+    const panels = {
+      debugger: new DebuggerPanel(this),
+      console: new WebConsolePanel(this),
+      inspector: new InspectorPanel(this),
+    };
+    this.setState({ panels });
 
-    ReactDOM.render(
-      React.createElement(Timeline, {
-        toolbox: this,
-      }),
-      document.getElementById("toolbox-timeline")
-    );
+    await panels["debugger"].open();
+    await panels["console"].open();
+    panels["inspector"].open();
   }
 
   selectTool(tool) {
@@ -109,11 +105,19 @@ export default class Toolbox extends React.Component {
   }
 
   getPanel(name) {
-    return this.panels[name];
+    return this.state.panels[name];
   }
 
   getHighlighter() {
     return {};
+  }
+
+  renderTimeline() {
+    if (!this.getPanel("console")) {
+      return null;
+    }
+
+    return <Timeline toolbox={this} />;
   }
 
   renderInspector() {
@@ -332,7 +336,7 @@ export default class Toolbox extends React.Component {
     return (
       <div id="toolbox" className={`${currentTool}`}>
         <div id="toolbox-border"></div>
-        <div id="toolbox-timeline"></div>
+        <div id="toolbox-timeline">{this.renderTimeline()}</div>
         <div id="toolbox-toolbar">
           <div
             className="toolbar-panel-button"
