@@ -32,14 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const React = require("react");
 const ReactDOM = require("react-dom");
-window.loader = {
-  lazyRequireGetter() {},
-  lazyGetter() {},
-};
 
 const { EventEmitter } = require("protocol/utils");
 
-const { DebuggerPanel } = require("devtools/client/debugger/panel");
+import { DebuggerPanel } from "devtools/client/debugger/panel";
+
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 const { InspectorPanel } = require("devtools/client/inspector/panel");
 const Selection = require("devtools/client/framework/selection");
@@ -52,8 +49,7 @@ const { ThreadFront } = require("protocol/thread");
 import "./Toolbox.css";
 
 export default class Toolbox extends React.Component {
-  panels = {};
-  state = { currentTool: "debugger", panels: {} };
+  state = { selectedPanel: "", panels: {} };
 
   parserService = {
     hasSyntaxError: text => false,
@@ -74,29 +70,39 @@ export default class Toolbox extends React.Component {
   async componentDidMount() {
     this.props.initialize();
 
-    const panels = {
-      debugger: new DebuggerPanel(this),
-      console: new WebConsolePanel(this),
-      inspector: new InspectorPanel(this),
-    };
-    this.setState({ panels });
+    // Open the console so that the timeline gets events
+    this.startPanel("console");
 
-    await panels["debugger"].open();
-    await panels["console"].open();
-    panels["inspector"].open();
-
+    this.selectTool("debugger");
     this.ensureMounted.resolve();
   }
 
-  selectTool(tool) {
-    if (tool == this.state.currentTool) {
+  async startPanel(name) {
+    const panels = {
+      debugger: DebuggerPanel,
+      console: WebConsolePanel,
+      inspector: InspectorPanel,
+    };
+
+    const panel = new panels[name](this);
+    await panel.open();
+
+    this.setState({ panels: { ...this.state.panels, [name]: panel } });
+  }
+
+  async selectTool(panel) {
+    if (panel == this.state.selectedPanel) {
       return;
     }
 
-    log(`Toolbox SelectTool ${tool}`);
-    this.setState({ currentTool: tool });
+    if (!this.state.panels[panel]) {
+      await this.startPanel(panel);
+    }
 
-    // this.emit("select", tool);
+    log(`Toolbox SelectTool ${panel}`);
+    this.setState({ selectedPanel: panel });
+
+    // this.emit("select", panel);
   }
 
   async viewSourceInDebugger(url, line, column, id) {
@@ -122,6 +128,15 @@ export default class Toolbox extends React.Component {
     }
 
     return <Timeline toolbox={this} />;
+  }
+
+  renderDebugger() {
+    const { panels } = this.state;
+    if (!panels.debugger) {
+      return null;
+    }
+
+    return panels.debugger.renderApp();
   }
 
   renderInspector() {
@@ -336,9 +351,9 @@ export default class Toolbox extends React.Component {
   }
 
   render() {
-    const { currentTool } = this.state;
+    const { selectedPanel } = this.state;
     return (
-      <div id="toolbox" className={`${currentTool}`}>
+      <div id="toolbox" className={`${selectedPanel}`}>
         <div id="toolbox-border"></div>
         <div id="toolbox-timeline">{this.renderTimeline()}</div>
         <div id="toolbox-toolbar">
@@ -372,7 +387,9 @@ export default class Toolbox extends React.Component {
             <div
               className="toolbar-panel-content"
               id="toolbox-content-debugger"
-            ></div>
+            >
+              {this.renderDebugger()}
+            </div>
             <div
               className="toolbar-panel-content theme-body"
               id="toolbox-content-inspector"

@@ -35,12 +35,6 @@ type Props = {
   setSkipPausing: typeof actions.setSkipPausing,
 };
 
-const localizationTerms = {
-  subtree: L10N.getStr("domMutationTypes.subtree"),
-  attribute: L10N.getStr("domMutationTypes.attribute"),
-  removal: L10N.getStr("domMutationTypes.removal"),
-};
-
 class DOMMutationBreakpointsContents extends Component<Props> {
   handleBreakpoint(breakpointId, shouldEnable) {
     const { toggleBreakpoint, setSkipPausing } = this.props;
@@ -61,6 +55,11 @@ class DOMMutationBreakpointsContents extends Component<Props> {
       deleteBreakpoint,
     } = this.props;
     const { enabled, id: breakpointId, nodeFront, mutationType } = breakpoint;
+    const localizationTerms = {
+      subtree: L10N.getStr("domMutationTypes.subtree"),
+      attribute: L10N.getStr("domMutationTypes.attribute"),
+      removal: L10N.getStr("domMutationTypes.removal"),
+    };
 
     return (
       <li key={breakpoint.id}>
@@ -152,15 +151,12 @@ class DomMutationBreakpoints extends Component<Props> {
   }
 }
 
-export default connect(
-  undefined,
-  {
-    // the debugger-specific action bound to the debugger store
-    // since there is no `storeKey`
-    openElementInInspector: actions.openElementInInspectorCommand,
-    highlightDomElement: actions.highlightDomElement,
-    unHighlightDomElement: actions.unHighlightDomElement,
-    setSkipPausing: actions.setSkipPausing,
-    openInspector: actions.openInspector,
-  }
-)(DomMutationBreakpoints);
+export default connect(undefined, {
+  // the debugger-specific action bound to the debugger store
+  // since there is no `storeKey`
+  openElementInInspector: actions.openElementInInspectorCommand,
+  highlightDomElement: actions.highlightDomElement,
+  unHighlightDomElement: actions.unHighlightDomElement,
+  setSkipPausing: actions.setSkipPausing,
+  openInspector: actions.openInspector,
+})(DomMutationBreakpoints);

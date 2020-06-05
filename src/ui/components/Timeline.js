@@ -167,11 +167,9 @@ class WebReplayPlayer extends Component {
       this.onUnprocessedRegions.bind(this)
     );
 
-    this.console.on("ready", () => {
-      const consoleFrame = this.console.hud.ui;
-      consoleFrame.on("message-hover", this.onConsoleMessageHover);
-      consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate);
-    });
+    const consoleFrame = this.console.hud.ui;
+    consoleFrame.on("message-hover", this.onConsoleMessageHover);
+    consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate);
 
     this.threadFront.on("paused", this.onPaused.bind(this));
     this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
@@ -382,12 +380,12 @@ class WebReplayPlayer extends Component {
   async previewLocation(closestMessage) {
     const location = getMessageLocation(closestMessage);
     if (location) {
-      this.debugger.previewPausedLocation(location);
+      this.debugger?.previewPausedLocation(location);
     }
   }
 
   async clearPreviewLocation() {
-    this.debugger.clearPreviewPausedLocation();
+    this.debugger?.clearPreviewPausedLocation();
   }
 
   async onProgressBarMouseMove(e) {
