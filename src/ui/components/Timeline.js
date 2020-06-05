@@ -176,7 +176,7 @@ class WebReplayPlayer extends Component {
     this.threadFront.on("paused", this.onPaused.bind(this));
     this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
 
-    const description = await this.threadFront.getDescription();
+    const description = await this.threadFront.getDescription(recordingId);
     this.setRecordingDescription(description);
   }
 
