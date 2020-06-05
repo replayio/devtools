@@ -53,43 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   margin-left: 5px;
 }
 
-#toolbox {
-  position: absolute;
-  overflow: hidden;
-  top: 60%;
-  left: 0px;
-  width: 100%;
-  font-family: sans-serif;
-  height: 40%;
-  display: flex;
-  flex-direction: column;
-  --toolbox-background: #f9f9fa;
-  z-index: 1; /* Draw toolbox in front of the highlighter overlay. */
-}
-
-#toolbox-border {
-  height: 5px;
-  background: var(--theme-toolbar-background);
-  cursor: row-resize;
-}
-
-#toolbox-timeline {
-  height: 35px;
-  background: var(--theme-toolbar-background);
-  border-top: 1px solid var(--theme-splitter-color);
-}
-
-#toolbox-toolbar {
-  height: 35px;
-  border-top: 0px;
-  background: var(--theme-toolbar-background);
-  border-bottom: 1px solid var(--theme-splitter-color);
-}
-
-#toolbox-contents {
-  height: 100%;
-  position: relative;
-}
 
 .command-button {
   float: left;
@@ -98,61 +61,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .command-button img {
   height: 20px;
   width: 20px;
-}
-
-.toolbar-panel-button {
-  float: left;
-  display: flex;
-  margin-left: 10px;
-  cursor: default;
-  line-height: 35px;
-  font-size: 1.1rem;
-  color: var(--theme-toolbar-color);
-  align-items: center;
-}
-
-.toolbar-panel-button:hover {
-  background-color: var(--toolbarbutton-focus-background);
-}
-
-.toolbar-panel-icon {
-  width: 16px;
-  height: 17px;
-  margin-right: 5px;
-}
-
-#toolbox-toolbar-webconsole .toolbar-panel-icon,
-#toolbox-toolbar-jsdebugger .toolbar-panel-icon,
-#toolbox-toolbar-inspector .toolbar-panel-icon {
-  background: var(--theme-toolbar-color);
-}
-
-.toolbar-panel-content {
-  position: absolute;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-}
-
-#toolbox.jsdebugger #toolbox-content-webconsole,
-#toolbox.jsdebugger #toolbox-content-inspector,
-#toolbox.webconsole #toolbox-content-jsdebugger,
-#toolbox.webconsole #toolbox-content-inspector,
-#toolbox.inspector #toolbox-content-jsdebugger,
-#toolbox.inspector #toolbox-content-webconsole {
-  display: none;
-}
-
-#toolbox.jsdebugger #toolbox-toolbar-jsdebugger,
-#toolbox.webconsole #toolbox-toolbar-webconsole,
-#toolbox.inspector #toolbox-toolbar-inspector {
-  color: var(--theme-toolbar-selected-color);
-}
-
-#toolbox.jsdebugger #toolbox-toolbar-jsdebugger .toolbar-panel-icon,
-#toolbox.webconsole #toolbox-toolbar-webconsole .toolbar-panel-icon,
-#toolbox.inspector #toolbox-toolbar-inspector .toolbar-panel-icon {
-  background: var(--theme-toolbar-selected-color);
 }
 
 .content-iframe {
