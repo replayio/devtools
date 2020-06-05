@@ -88,7 +88,7 @@ html[dir="rtl"] .editor-mount {
   line-height: var(--theme-code-line-height);
 }
 
-.jsdebugger .CodeMirror {
+.debugger .CodeMirror {
   background-color: var(--theme-body-background);
 }
 

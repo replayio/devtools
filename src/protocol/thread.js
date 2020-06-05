@@ -39,10 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // performed on the state at different points in the recording. This layer
 // helps with adapting the devtools to the WRP.
 
-const {
-  sendMessage,
-  addEventListener,
-} = require("./socket");
+const { sendMessage, addEventListener } = require("./socket");
 const {
   defer,
   assert,
@@ -71,16 +68,17 @@ Pause.prototype = {
   create(point) {
     assert(!this.createWaiter);
     assert(!this.pauseId);
-    this.createWaiter =
-      sendMessage("Session.createPause", { point }, this.sessionId).then(
-        ({ pauseId, stack, data }) => {
-          this.pauseId = pauseId;
-          this.addData(data);
-          if (stack) {
-            this.stack = stack.map(id => this.frames.get(id));
-          }
-        }
-      );
+    this.createWaiter = sendMessage(
+      "Session.createPause",
+      { point },
+      this.sessionId
+    ).then(({ pauseId, stack, data }) => {
+      this.pauseId = pauseId;
+      this.addData(data);
+      if (stack) {
+        this.stack = stack.map(id => this.frames.get(id));
+      }
+    });
   },
 
   instantiate(pauseId, data = {}) {
@@ -151,7 +149,10 @@ Pause.prototype = {
 
         const newGetterValues = [];
         for (const v of getterValues || []) {
-          newGetterValues.push({ name: v.name, value: new ValueFront(this, v) });
+          newGetterValues.push({
+            name: v.name,
+            value: new ValueFront(this, v),
+          });
         }
         object.preview.getterValues = newGetterValues;
 
@@ -174,15 +175,19 @@ Pause.prototype = {
 
   async getScopes(frameId) {
     const frame = this.frames.get(frameId);
-    return Promise.all(frame.scopeChain.map(async id => {
-      if (!this.scopes.has(id)) {
-        const { data } = await this.sendMessage("Pause.getScope", { scope: id });
-        this.addData(data);
-      }
-      const scope = this.scopes.get(id);
-      assert(scope);
-      return scope;
-    }));
+    return Promise.all(
+      frame.scopeChain.map(async id => {
+        if (!this.scopes.has(id)) {
+          const { data } = await this.sendMessage("Pause.getScope", {
+            scope: id,
+          });
+          this.addData(data);
+        }
+        const scope = this.scopes.get(id);
+        assert(scope);
+        return scope;
+      })
+    );
   },
 
   sendMessage(method, params) {
@@ -190,7 +195,9 @@ Pause.prototype = {
   },
 
   async getObjectPreview(object) {
-    const { data } = await this.sendMessage("Pause.getObjectPreview", { object });
+    const { data } = await this.sendMessage("Pause.getObjectPreview", {
+      object,
+    });
     this.addData(data);
   },
 
@@ -246,7 +253,9 @@ Pause.prototype = {
     const frames = await this.getFrames();
     const { frameId } = frames[index];
     if (!this.frameSteps.has(frameId)) {
-      const { steps } = await this.sendMessage("Pause.getFrameSteps", { frameId });
+      const { steps } = await this.sendMessage("Pause.getFrameSteps", {
+        frameId,
+      });
       this.frameSteps.set(frameId, steps);
     }
     return this.frameSteps.get(frameId);
@@ -405,7 +414,7 @@ ValueFront.prototype = {
   },
 
   isString() {
-    return this.isPrimitive() && typeof (this.primitive()) == "string";
+    return this.isPrimitive() && typeof this.primitive() == "string";
   },
 
   isPrimitive() {
@@ -473,32 +482,43 @@ ValueFront.prototype = {
     }
     if (this.hasPreviewOverflow()) {
       // See ObjectInspectorItem.js
-      return [{
-        name: "Loading…",
-        contents: createUnavailableValueFront(),
-      }];
+      return [
+        {
+          name: "Loading…",
+          contents: createUnavailableValueFront(),
+        },
+      ];
     }
     const previewValues = this.previewValueMap();
-    const rv = Object.entries(previewValues).map(
-      ([name, contents]) => ({ name, contents })
-    );
+    const rv = Object.entries(previewValues).map(([name, contents]) => ({
+      name,
+      contents,
+    }));
     if (["Set", "WeakSet", "Map", "WeakMap"].includes(this.className())) {
-      const elements = this.previewContainerEntries().map(({ key, value }, i) => {
-        if (key) {
-          const entryElements = [
-            { name: "<key>", contents: key },
-            { name: "<value>", contents: value },
-          ];
-          const entry = createPseudoValueFront(entryElements);
-          entry._isMapEntry = { key, value };
-          return { name: i.toString(), contents: entry };
-        } else {
-          return { name: i.toString(), contents: value };
+      const elements = this.previewContainerEntries().map(
+        ({ key, value }, i) => {
+          if (key) {
+            const entryElements = [
+              { name: "<key>", contents: key },
+              { name: "<value>", contents: value },
+            ];
+            const entry = createPseudoValueFront(entryElements);
+            entry._isMapEntry = { key, value };
+            return { name: i.toString(), contents: entry };
+          } else {
+            return { name: i.toString(), contents: value };
+          }
         }
+      );
+      rv.unshift({
+        name: "<entries>",
+        contents: createPseudoValueFront(elements),
       });
-      rv.unshift({ name: "<entries>", contents: createPseudoValueFront(elements) });
     }
-    rv.push({ name: "<prototype>", contents: this._object.preview.prototypeValue });
+    rv.push({
+      name: "<prototype>",
+      contents: this._object.preview.prototypeValue,
+    });
     return rv;
   },
 
@@ -515,7 +535,9 @@ ValueFront.prototype = {
     const promises = [];
     for (const { contents } of children) {
       if (contents.isObject() && !contents.hasPreview()) {
-        promises.push(this.getPause().getObjectPreview(contents._object.objectId));
+        promises.push(
+          this.getPause().getObjectPreview(contents._object.objectId)
+        );
       }
     }
     await Promise.all(promises);
@@ -530,7 +552,10 @@ ValueFront.prototype = {
   },
 };
 
-Object.setPrototypeOf(ValueFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+Object.setPrototypeOf(
+  ValueFront.prototype,
+  new Proxy({}, DisallowEverythingProxyHandler)
+);
 
 function createPrimitiveValueFront(value) {
   return new ValueFront(null, { value });
@@ -644,8 +669,12 @@ NodeFront.prototype = {
       const data = this._pause.objects.get(id);
       return !data || !data.preview;
     });
-    await Promise.all(missingPreviews.map(id => this._pause.getObjectPreview(id)));
-    const childNodes = this._node.childNodes.map(id => this._pause.getDOMFront(id));
+    await Promise.all(
+      missingPreviews.map(id => this._pause.getObjectPreview(id))
+    );
+    const childNodes = this._node.childNodes.map(id =>
+      this._pause.getDOMFront(id)
+    );
     await Promise.all(childNodes.map(node => node.ensureLoaded()));
     return childNodes;
   },
@@ -690,45 +719,42 @@ NodeFront.prototype = {
     this._loadWaiter = defer();
 
     await Promise.all([
-      this._pause.sendMessage(
-        "CSS.getComputedStyle",
-        { node: this._object.objectId }
-      ).then(({ computedStyle }) => {
-        this._computedStyle = new Map();
-        for (const { name, value } of computedStyle) {
-          this._computedStyle.set(name, value);
-        }
-      }),
-      this._pause.sendMessage(
-        "CSS.getAppliedRules",
-        { node: this._object.objectId }
-      ).then(({ rules, data }) => {
-        this._rules = rules;
-        this._pause.addData(data);
-      }),
-      this._pause.sendMessage(
-        "DOM.getEventListeners",
-        { node: this._object.objectId }
-      ).then(({ listeners, data }) => {
-        this._pause.addData(data);
-        this._listeners = listeners.map(listener => ({
-          ...listener,
-          handler: new ValueFront(this._pause, { object: listener.handler }),
-          node: this._pause.getDOMFront(listener.node),
-        }));
-      }),
-      this._pause.sendMessage(
-        "DOM.getBoxModel",
-        { node: this._object.objectId }
-      ).then(({ model }) => {
-        this._quads = model;
-      }),
-      this._pause.sendMessage(
-        "DOM.getBoundingClientRect",
-        { node: this._object.objectId }
-      ).then(({ rect }) => {
-        this._bounds = rect;
-      }),
+      this._pause
+        .sendMessage("CSS.getComputedStyle", { node: this._object.objectId })
+        .then(({ computedStyle }) => {
+          this._computedStyle = new Map();
+          for (const { name, value } of computedStyle) {
+            this._computedStyle.set(name, value);
+          }
+        }),
+      this._pause
+        .sendMessage("CSS.getAppliedRules", { node: this._object.objectId })
+        .then(({ rules, data }) => {
+          this._rules = rules;
+          this._pause.addData(data);
+        }),
+      this._pause
+        .sendMessage("DOM.getEventListeners", { node: this._object.objectId })
+        .then(({ listeners, data }) => {
+          this._pause.addData(data);
+          this._listeners = listeners.map(listener => ({
+            ...listener,
+            handler: new ValueFront(this._pause, { object: listener.handler }),
+            node: this._pause.getDOMFront(listener.node),
+          }));
+        }),
+      this._pause
+        .sendMessage("DOM.getBoxModel", { node: this._object.objectId })
+        .then(({ model }) => {
+          this._quads = model;
+        }),
+      this._pause
+        .sendMessage("DOM.getBoundingClientRect", {
+          node: this._object.objectId,
+        })
+        .then(({ rect }) => {
+          this._bounds = rect;
+        }),
     ]);
 
     this._loaded = true;
@@ -824,7 +850,10 @@ NodeFront.prototype = {
   },
 };
 
-Object.setPrototypeOf(NodeFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+Object.setPrototypeOf(
+  NodeFront.prototype,
+  new Proxy({}, DisallowEverythingProxyHandler)
+);
 
 function buildBoxQuads(array) {
   assert(array.length % 8 == 0);
@@ -832,12 +861,14 @@ function buildBoxQuads(array) {
   const rv = [];
   while (array.length) {
     const [x1, y1, x2, y2, x3, y3, x4, y4] = array.splice(0, 8);
-    rv.push(DOMQuad.fromQuad({
-      p1: { x: x1, y: y1 },
-      p2: { x: x2, y: y2 },
-      p3: { x: x3, y: y3 },
-      p4: { x: x4, y: y4 },
-    }));
+    rv.push(
+      DOMQuad.fromQuad({
+        p1: { x: x1, y: y1 },
+        p2: { x: x2, y: y2 },
+        p3: { x: x3, y: y3 },
+        p4: { x: x4, y: y4 },
+      })
+    );
   }
   return rv;
 }
@@ -908,7 +939,10 @@ RuleFront.prototype = {
   },
 };
 
-Object.setPrototypeOf(RuleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+Object.setPrototypeOf(
+  RuleFront.prototype,
+  new Proxy({}, DisallowEverythingProxyHandler)
+);
 
 // Manages interaction with a CSSStyleDeclaration.
 function StyleFront(pause, data) {
@@ -933,7 +967,9 @@ StyleFront.prototype = {
   },
 
   // This stuff is here to allow code to operate on both rules and inline styles.
-  get style() { return this; },
+  get style() {
+    return this;
+  },
   parentStyleSheet: null,
   mediaText: undefined,
   line: undefined,
@@ -943,7 +979,10 @@ StyleFront.prototype = {
   href: undefined,
 };
 
-Object.setPrototypeOf(StyleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+Object.setPrototypeOf(
+  StyleFront.prototype,
+  new Proxy({}, DisallowEverythingProxyHandler)
+);
 
 // Manages interaction with a StyleSheet.
 function StyleSheetFront(pause, data) {
@@ -964,7 +1003,10 @@ StyleSheetFront.prototype = {
   },
 };
 
-Object.setPrototypeOf(StyleSheetFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
+Object.setPrototypeOf(
+  StyleSheetFront.prototype,
+  new Proxy({}, DisallowEverythingProxyHandler)
+);
 
 const ThreadFront = {
   // When replaying there is only a single thread currently. Use this thread ID
@@ -1020,7 +1062,11 @@ const ThreadFront = {
 
     console.log(`GotSessionId ${sessionId}`);
 
-    const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
+    const { endpoint } = await sendMessage(
+      "Session.getEndpoint",
+      {},
+      sessionId
+    );
     if (this.onEndpoint) {
       this.onEndpoint(endpoint);
     }
@@ -1103,7 +1149,9 @@ const ThreadFront = {
   },
 
   getScriptIdsForURL(url) {
-    return [...this.scriptURLs.entries()].filter(e => e[1] == url).map(e => e[0]);
+    return [...this.scriptURLs.entries()]
+      .filter(e => e[1] == url)
+      .map(e => e[0]);
   },
 
   async getScriptSource(scriptId) {
@@ -1152,25 +1200,37 @@ const ThreadFront = {
 
   setBreakpointByURL(url, line, column, condition) {
     const scriptIds = this.urlScripts.get(url);
-    return Promise.all((scriptIds || []).map(scriptId => {
-      return this.setBreakpoint(scriptId, line, column, condition);
-    }));
+    return Promise.all(
+      (scriptIds || []).map(scriptId => {
+        return this.setBreakpoint(scriptId, line, column, condition);
+      })
+    );
   },
 
   async removeBreakpoint(scriptId, line, column) {
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
-      if (location.scriptId == scriptId && location.line == line && location.column == column) {
+      if (
+        location.scriptId == scriptId &&
+        location.line == line &&
+        location.column == column
+      ) {
         this.breakpoints.delete(breakpointId);
-        await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
+        await sendMessage(
+          "Debugger.removeBreakpoint",
+          { breakpointId },
+          this.sessionId
+        );
         this._invalidateResumeTargets();
       }
     }
   },
 
   removeBreakpointByURL(url, line, column) {
-    return Promise.all(this.urlScripts.get(url)?.map(scriptId => {
-      return this.removeBreakpoint(scriptId, line, column);
-    }) || []);
+    return Promise.all(
+      this.urlScripts.get(url)?.map(scriptId => {
+        return this.removeBreakpoint(scriptId, line, column);
+      }) || []
+    );
   },
 
   ensurePause(point) {
@@ -1227,15 +1287,21 @@ const ThreadFront = {
     const stepCommands = [
       {
         command: "Debugger.findReverseStepOverTarget",
-        transitive: [ "Debugger.findReverseStepOverTarget", "Debugger.findStepInTarget" ],
+        transitive: [
+          "Debugger.findReverseStepOverTarget",
+          "Debugger.findStepInTarget",
+        ],
       },
       {
         command: "Debugger.findStepOverTarget",
-        transitive: [ "Debugger.findStepOverTarget", "Debugger.findStepInTarget" ],
+        transitive: [
+          "Debugger.findStepOverTarget",
+          "Debugger.findStepInTarget",
+        ],
       },
       {
         command: "Debugger.findStepInTarget",
-        transitive: [ "Debugger.findStepOutTarget", "Debugger.findStepInTarget" ],
+        transitive: ["Debugger.findStepOutTarget", "Debugger.findStepInTarget"],
       },
       {
         command: "Debugger.findStepOutTarget",
@@ -1263,10 +1329,15 @@ const ThreadFront = {
 
       // Look for transitive resume targets.
       transitive.forEach(async command => {
-        const transitiveTarget = await this._findResumeTarget(target.point, command);
-        if (epoch != this.resumeTargetEpoch ||
-            point != this.currentPoint ||
-            !transitiveTarget.frame) {
+        const transitiveTarget = await this._findResumeTarget(
+          target.point,
+          command
+        );
+        if (
+          epoch != this.resumeTargetEpoch ||
+          point != this.currentPoint ||
+          !transitiveTarget.frame
+        ) {
           return;
         }
         this.ensurePause(transitiveTarget.point);
@@ -1320,12 +1391,24 @@ const ThreadFront = {
     }
   },
 
-  rewind() { this._resumeOperation("Debugger.findRewindTarget"); },
-  resume() { this._resumeOperation("Debugger.findResumeTarget"); },
-  reverseStepOver() { this._resumeOperation("Debugger.findReverseStepOverTarget"); },
-  stepOver() { this._resumeOperation("Debugger.findStepOverTarget"); },
-  stepIn() { this._resumeOperation("Debugger.findStepInTarget"); },
-  stepOut() { this._resumeOperation("Debugger.findStepOutTarget"); },
+  rewind() {
+    this._resumeOperation("Debugger.findRewindTarget");
+  },
+  resume() {
+    this._resumeOperation("Debugger.findResumeTarget");
+  },
+  reverseStepOver() {
+    this._resumeOperation("Debugger.findReverseStepOverTarget");
+  },
+  stepOver() {
+    this._resumeOperation("Debugger.findStepOverTarget");
+  },
+  stepIn() {
+    this._resumeOperation("Debugger.findStepInTarget");
+  },
+  stepOut() {
+    this._resumeOperation("Debugger.findStepOutTarget");
+  },
 
   async blackbox(scriptId, begin, end) {
     await sendMessage(
@@ -1417,6 +1500,27 @@ const ThreadFront = {
       this.sessionId
     );
     return this.getPreferredLocationRaw(mappedLocation);
+  },
+
+  async getDescription() {
+    let description;
+    try {
+      description = await sendMessage("Recording.getDescription", {
+        recordingId,
+      });
+    } catch (e) {
+      // Getting the description will fail if it was never set. For now we don't
+      // set the last screen in this case.
+      const sessionId = await this.sessionWaiter.promise;
+      const { endpoint } = await sendMessage(
+        "Session.getEndpoint",
+        {},
+        sessionId
+      );
+      description = { duration: endpoint.time };
+    }
+
+    return description;
   },
 };
 

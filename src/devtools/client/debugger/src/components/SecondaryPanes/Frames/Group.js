@@ -52,7 +52,7 @@ type Props = {
   displayFullUrl: boolean,
   getFrameTitle?: string => string,
   disableContextMenu: boolean,
-  panel: "debugger" | "webconsole",
+  panel: "debugger" | "console",
 };
 
 type State = {
@@ -68,7 +68,7 @@ export default class Group extends Component<Props, State> {
   }
 
   get isSelectable() {
-    return this.props.panel == "webconsole";
+    return this.props.panel == "console";
   }
 
   onContextMenu(event: SyntheticMouseEvent<HTMLElement>) {

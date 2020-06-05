@@ -240,7 +240,7 @@ class WebConsole {
     if (!toolbox) {
       return null;
     }
-    const panel = toolbox.getPanel("jsdebugger");
+    const panel = toolbox.getPanel("debugger");
 
     if (!panel) {
       return null;
@@ -270,7 +270,7 @@ class WebConsole {
     // We need to check if the debugger is open, since it may perform a variable name
     // substitution for sourcemapped script (i.e. evaluated `myVar.trim()` might need to
     // be transformed into `a.trim()`).
-    const panel = toolbox && toolbox.getPanel("jsdebugger");
+    const panel = toolbox && toolbox.getPanel("debugger");
     if (panel) {
       return panel.getMappedExpression(expression);
     }

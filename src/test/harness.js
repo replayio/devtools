@@ -8,7 +8,7 @@
 const { ThreadFront } = require("protocol/thread");
 const { assert } = require("protocol/utils");
 
-const dbg = gToolbox._panels.jsdebugger.getVarsForTests();
+const dbg = gToolbox.getPanel("debugger").getVarsForTests();
 
 const dbgSelectors = {};
 for (const [name, method] of Object.entries(dbg.selectors)) {
@@ -16,7 +16,7 @@ for (const [name, method] of Object.entries(dbg.selectors)) {
 }
 
 function waitForTime(ms) {
-  return new Promise(r => setTimeout(r, ms));
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 async function waitUntil(fn) {
@@ -38,11 +38,11 @@ function finish() {
 }
 
 function selectConsole() {
-  return gToolbox.selectTool("webconsole");
+  return gToolbox.selectTool("console");
 }
 
 function selectDebugger() {
-  return gToolbox.selectTool("jsdebugger");
+  return gToolbox.selectTool("debugger");
 }
 
 function selectInspector() {
@@ -66,7 +66,7 @@ function findSource(url) {
   }
 
   const sources = dbgSelectors.getSourceList();
-  return sources.find(s => (s.url || "").includes(url));
+  return sources.find((s) => (s.url || "").includes(url));
 }
 
 function waitForSource(url) {
@@ -190,7 +190,7 @@ function getVisibleSelectedFrameLine() {
 }
 
 function resumeThenPauseAtLineFunctionFactory(method) {
-  return async function(lineno, waitForLine) {
+  return async function (lineno, waitForLine) {
     console.log(`Starting ${method} to ${lineno}...`);
     await dbg.actions[method](getThreadContext());
     if (lineno !== undefined) {
@@ -240,7 +240,7 @@ async function checkEvaluateInTopFrame(text, expected) {
 async function waitForScopeValue(name, value) {
   return waitUntil(() => {
     const nodes = document.querySelectorAll(".scopes-pane .object-node");
-    return [...nodes].some(node => node.innerText == `${name}\n: \n${value}`);
+    return [...nodes].some((node) => node.innerText == `${name}\n: \n${value}`);
   });
 }
 
@@ -252,8 +252,10 @@ async function toggleBlackboxSelectedSource() {
 }
 
 function findMessages(text, extraSelector = "") {
-  const messages = document.querySelectorAll(`.webconsole-output .message${extraSelector}`);
-  return [...messages].filter(msg => msg.innerText.includes(text));
+  const messages = document.querySelectorAll(
+    `.webconsole-output .message${extraSelector}`
+  );
+  return [...messages].filter((msg) => msg.innerText.includes(text));
 }
 
 function waitForMessage(text, extraSelector) {
@@ -286,15 +288,13 @@ async function checkMessageStack(text, expectedFrameLines, expand) {
   assert(!msgNode.classList.contains("open"));
 
   if (expand) {
-    const button = await waitUntil(
-      () => msgNode.querySelector(".collapse-button")
+    const button = await waitUntil(() =>
+      msgNode.querySelector(".collapse-button")
     );
     button.click();
   }
 
-  const framesNode = await waitUntil(
-    () => msgNode.querySelector(".frames")
-  );
+  const framesNode = await waitUntil(() => msgNode.querySelector(".frames"));
   const frameNodes = Array.from(framesNode.querySelectorAll(".frame"));
   assert(frameNodes.length == expectedFrameLines.length);
 
@@ -311,7 +311,7 @@ function checkJumpIcon(msg) {
 }
 
 function findObjectInspectorNode(oi, nodeLabel) {
-  return [...oi.querySelectorAll(".tree-node")].find(node => {
+  return [...oi.querySelectorAll(".tree-node")].find((node) => {
     return node.innerText.includes(nodeLabel);
   });
 }
@@ -319,7 +319,7 @@ function findObjectInspectorNode(oi, nodeLabel) {
 async function findMessageExpandableObjectInspector(msg) {
   return waitUntil(() => {
     const inspectors = msg.querySelectorAll(".object-inspector");
-    return [...inspectors].find(oi => oi.querySelector(".arrow"));
+    return [...inspectors].find((oi) => oi.querySelector(".arrow"));
   });
 }
 
@@ -333,17 +333,15 @@ async function checkMessageObjectContents(msg, expected, expandList = []) {
   await toggleObjectInspectorNode(oi);
 
   for (const label of expandList) {
-    const labelNode = await waitUntil(() =>
-      findObjectInspectorNode(oi, label)
-    );
+    const labelNode = await waitUntil(() => findObjectInspectorNode(oi, label));
     await toggleObjectInspectorNode(labelNode);
   }
 
   await waitUntil(() => {
     const nodes = oi.querySelectorAll(".tree-node");
     if (nodes && nodes.length > 1) {
-      const properties = [...nodes].map(n => n.textContent);
-      return expected.every(s => properties.find(v => v.includes(s)));
+      const properties = [...nodes].map((n) => n.textContent);
+      return expected.every((s) => properties.find((v) => v.includes(s)));
     }
     return null;
   });
@@ -352,7 +350,7 @@ async function checkMessageObjectContents(msg, expected, expandList = []) {
 function findScopeNode(text) {
   return waitUntil(() => {
     const nodes = document.querySelectorAll(".scopes-list .node");
-    return [...nodes].find(node => node.innerText.includes(text));
+    return [...nodes].find((node) => node.innerText.includes(text));
   });
 }
 
@@ -368,7 +366,7 @@ async function executeInConsole(text) {
 async function checkInlinePreview(name, text) {
   await waitUntil(() => {
     const previews = document.querySelectorAll(".inline-preview-outer");
-    return [...previews].some(p => {
+    return [...previews].some((p) => {
       const label = p.querySelector(".inline-preview-label");
       const value = p.querySelector(".inline-preview-value");
       return label.innerText.includes(name) && value.innerText.includes(text);

@@ -31,25 +31,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 window.loader = {
-  lazyRequireGetter() { },
-  lazyGetter() { },
+  lazyRequireGetter() {},
+  lazyGetter() {},
 };
 
 require("./styles.css");
 
 const React = require("react");
 const ReactDOM = require("react-dom");
-const WebReplayPlayer = require("ui/components/WebReplayPlayer");
 import App from "ui/components/App";
 
 const { initSocket, sendMessage, log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const { paintMessage } = require("protocol/graphics");
 const { throttle, clamp, EventEmitter } = require("protocol/utils");
-const { DebuggerPanel } = require("devtools/client/debugger/panel");
-const { WebConsolePanel } = require("devtools/client/webconsole/panel");
-const { InspectorPanel } = require("devtools/client/inspector/panel");
-const Selection = require("devtools/client/framework/selection");
 const loadImages = require("image/image");
 
 const { LocalizationHelper } = require("shims/l10n");
@@ -61,10 +56,10 @@ window.l10n = new LocalizationHelper(
   "devtools/client/locales/debugger.properties"
 );
 
-window.PrefObserver = function () { };
+window.PrefObserver = function () {};
 window.PrefObserver.prototype = {
-  on: () => { },
-  off: () => { },
+  on: () => {},
+  off: () => {},
 };
 
 const url = new URL(window.location.href);
@@ -78,25 +73,11 @@ if (test) {
   require("devtools-modules").asyncStorage.clear();
 }
 
-// Get a recording description and load it into the timeline.
-async function getDescription() {
-  let description;
-  try {
-    description = await sendMessage("Recording.getDescription", { recordingId });
-  } catch (e) {
-    // Getting the description will fail if it was never set. For now we don't
-    // set the last screen in this case.
-    const sessionId = await ThreadFront.sessionWaiter.promise;
-    const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
-    description = { duration: endpoint.time };
-  }
-
-  gToolbox.webReplayPlayer.setRecordingDescription(description);
-}
-
 // Create a session to use while debugging.
 async function createSession() {
-  const { sessionId } = await sendMessage("Recording.createSession", { recordingId });
+  const { sessionId } = await sendMessage("Recording.createSession", {
+    recordingId,
+  });
   window.sessionId = sessionId;
   ThreadFront.setSessionId(sessionId);
   if (test) {
@@ -116,124 +97,38 @@ async function initialize() {
 
   paintMessage("");
 
-  getDescription();
   createSession();
 
   loadImages();
   setupToolboxResizeEventHandlers();
 
-  document.body.addEventListener("contextmenu", e => e.preventDefault());
+  document.body.addEventListener("contextmenu", (e) => e.preventDefault());
 
   // Set the current mouse position on the window. This is used in places where
   // testing element.matches(":hover") does not work right for some reason.
-  document.body.addEventListener("mousemove", e => {
+  document.body.addEventListener("mousemove", (e) => {
     window.mouseClientX = e.clientX;
     window.mouseClientY = e.clientY;
   });
-  window.elementIsHovered = elem => {
+  window.elementIsHovered = (elem) => {
     const { left, top, right, bottom } = elem.getBoundingClientRect();
     const { mouseClientX, mouseClientY } = window;
-    return left <= mouseClientX &&
+    return (
+      left <= mouseClientX &&
       mouseClientX <= right &&
       top <= mouseClientY &&
-      mouseClientY <= bottom;
+      mouseClientY <= bottom
+    );
   };
 }
-
-const gToolbox = {
-  currentTool: null,
-
-  _panels: {},
-
-  getPanel(name) {
-    return this._panels[name];
-  },
-
-  async getPanelWhenReady(name) {
-    const panel = this.getPanel(name);
-    await panel.readyWaiter.promise;
-    return panel;
-  },
-
-  threadFront: ThreadFront,
-
-  selection: new Selection(),
-  nodePicker: {},
-
-  getHighlighter() {
-    return {};
-  },
-
-  addTool(name, panel) {
-    this._panels[name] = panel;
-    const button = document.getElementById(`toolbox-toolbar-${name}`);
-    button.addEventListener("click", () => this.selectTool(name));
-  },
-
-  loadTool(name) {
-    return this.getPanelWhenReady(name);
-  },
-
-  selectTool(name) {
-    if (name == this.currentTool) {
-      return;
-    }
-    log(`Toolbox SelectTool ${name}`);
-    this.currentTool = name;
-    const toolbox = document.getElementById(`toolbox`);
-    toolbox.classList = name;
-    this.emit("select", name);
-  },
-
-  async viewSourceInDebugger(url, line, column, id) {
-    const dbg = this.getPanel("jsdebugger");
-    const source = id ? dbg.getSourceByActorId(id) : dbg.getSourceByURL(url);
-    if (source) {
-      this.selectTool("jsdebugger");
-      dbg.selectSource(source.id, line, column);
-    }
-  },
-
-  parserService: {
-    hasSyntaxError: (text) => false,
-  },
-
-  // Helpers for debugging.
-  webconsoleState() {
-    return gToolbox.webconsoleHud.ui.wrapper.getStore().getState();
-  },
-};
-
-EventEmitter.decorate(gToolbox);
-EventEmitter.decorate(gToolbox.nodePicker);
-
-window.gToolbox = gToolbox;
 
 setTimeout(async () => {
   // Wait for CodeMirror to load asynchronously.
   while (!window.CodeMirror) {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
   ReactDOM.render(React.createElement(App, { initialize }), document.body);
-
-  const debuggerPanel = new DebuggerPanel(gToolbox);
-  gToolbox.addTool("jsdebugger", debuggerPanel);
-
-  const consolePanel = new WebConsolePanel(gToolbox);
-  gToolbox.addTool("webconsole", consolePanel);
-
-  const inspectorPanel = new InspectorPanel(gToolbox);
-  gToolbox.addTool("inspector", inspectorPanel);
-
-  const timeline = React.createElement(WebReplayPlayer, { toolbox: gToolbox });
-  ReactDOM.render(timeline, document.getElementById("toolbox-timeline"));
-
-  debuggerPanel.open();
-  consolePanel.open();
-  inspectorPanel.open();
-
-  gToolbox.selectTool("jsdebugger");
 }, 0);
 
 function setupToolboxResizeEventHandlers() {
@@ -241,7 +136,7 @@ function setupToolboxResizeEventHandlers() {
 
   let clientY;
   const updateToolbox = throttle(() => {
-    const percent = 100 * clientY / window.innerHeight;
+    const percent = (100 * clientY) / window.innerHeight;
     toolbox.style.top = `${percent}%`;
     toolbox.style.height = `${100 - percent}%`;
   }, 100);

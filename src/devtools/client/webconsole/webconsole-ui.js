@@ -294,9 +294,7 @@ class WebConsoleUI {
     this.document = window.document;
     this.rootElement = this.document.documentElement;
 
-    this.outputNode = this.document.getElementById(
-      "toolbox-content-webconsole"
-    );
+    this.outputNode = this.document.getElementById("toolbox-content-console");
 
     const toolbox = this.hud.toolbox;
 
