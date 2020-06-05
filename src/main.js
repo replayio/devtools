@@ -78,6 +78,33 @@ if (test) {
   require("devtools-modules").asyncStorage.clear();
 }
 
+// Get a recording description and load it into the timeline.
+async function getDescription() {
+  let description;
+  try {
+    description = await sendMessage("Recording.getDescription", { recordingId });
+  } catch (e) {
+    // Getting the description will fail if it was never set. For now we don't
+    // set the last screen in this case.
+    const sessionId = await ThreadFront.sessionWaiter.promise;
+    const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
+    description = { duration: endpoint.time };
+  }
+
+  gToolbox.webReplayPlayer.setRecordingDescription(description);
+}
+
+// Create a session to use while debugging.
+async function createSession() {
+  const { sessionId } = await sendMessage("Recording.createSession", { recordingId });
+  window.sessionId = sessionId;
+  ThreadFront.setSessionId(sessionId);
+  if (test) {
+    await gToolbox.loadTool("jsdebugger");
+    window.Test = require("./test/harness");
+    ThreadFront.setTest(test);
+  }
+}
 
 async function initialize() {
   if (!recordingId) {
@@ -89,23 +116,8 @@ async function initialize() {
 
   paintMessage("");
 
-  sendMessage("Recording.getDescription", { recordingId }).then(
-    (description) => {
-      gToolbox.webReplayPlayer.setRecordingDescription(description);
-    }
-  );
-
-  sendMessage("Recording.createSession", { recordingId }).then(
-    async ({ sessionId }) => {
-      window.sessionId = sessionId;
-      ThreadFront.setSessionId(sessionId);
-      if (test) {
-        await gToolbox.loadTool("jsdebugger");
-        window.Test = require("./test/harness");
-        ThreadFront.setTest(test);
-      }
-    }
-  );
+  getDescription();
+  createSession();
 
   loadImages();
   setupToolboxResizeEventHandlers();
