@@ -360,7 +360,7 @@ export default class Toolbox extends React.Component {
           </div>
         </div>
         <div id="toolbox-contents">
-          <div class="toolbox-deck">
+          <div class="toolbox-top-panels">
             <div
               className="toolbar-panel-content"
               id="toolbox-content-debugger"
