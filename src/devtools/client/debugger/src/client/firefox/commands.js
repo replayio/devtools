@@ -36,6 +36,7 @@ const {
   setLogpoint,
   setLogpointByURL,
   setEventLogpoint,
+  setExceptionLogpoint,
   removeLogpoint,
 } = require("protocol/logpoint");
 const { assert } = require("protocol/utils");
@@ -366,20 +367,6 @@ async function getFrameScopes(frame: Frame): Promise<*> {
   return converted[0];
 }
 
-function pauseOnExceptions(
-  shouldPauseOnExceptions: boolean,
-  shouldPauseOnCaughtExceptions: boolean
-): Promise<*> {
-  return forEachThread(thread =>
-    thread.pauseOnExceptions(
-      shouldPauseOnExceptions,
-      // Providing opposite value because server
-      // uses "shouldIgnoreCaughtExceptions"
-      !shouldPauseOnCaughtExceptions
-    )
-  );
-}
-
 async function blackBox(
   sourceActor: SourceActor,
   isBlackBoxed: boolean,
@@ -419,6 +406,20 @@ function setEventListenerBreakpoints(ids: string[]) {
 // eslint-disable-next-line
 async function getEventListenerBreakpointTypes(): Promise<EventListenerCategoryList> {
   return getAvailableEventBreakpoints();
+}
+
+let gExceptionLogpointGroupId;
+
+function logExceptions(shouldLog: boolean) {
+  if (gExceptionLogpointGroupId) {
+    removeLogpoint(gExceptionLogpointGroupId);
+  }
+  if (shouldLog) {
+    gExceptionLogpointGroupId = newLogGroupId();
+    setExceptionLogpoint(gExceptionLogpointGroupId);
+  } else {
+    gExceptionLogpointGroupId = null;
+  }
 }
 
 function pauseGrip(thread: string, func: Function): ObjectFront {
@@ -582,7 +583,7 @@ const clientCommands = {
   getProperties,
   getFrameScopes,
   getFrames,
-  pauseOnExceptions,
+  logExceptions,
   toggleEventLogging,
   fetchSources,
   fetchThreadSources,

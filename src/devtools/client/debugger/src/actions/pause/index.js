@@ -25,7 +25,6 @@ export { paused } from "./paused";
 export { resumed } from "./resumed";
 export { continueToHere } from "./continueToHere";
 export { breakOnNext } from "./breakOnNext";
-export { pauseOnExceptions } from "./pauseOnExceptions";
 export { selectFrame } from "./selectFrame";
 export { toggleSkipPausing, setSkipPausing } from "./skipPausing";
 export { setExpandedScope } from "./expandScopes";

@@ -8,6 +8,7 @@ import * as ast from "./ast";
 import * as breakpoints from "./breakpoints";
 import * as expressions from "./expressions";
 import * as eventListeners from "./event-listeners";
+import * as logExceptions from "./logExceptions";
 import * as pause from "./pause";
 import * as navigation from "./navigation";
 import * as ui from "./ui";
@@ -31,6 +32,7 @@ export default {
   ...breakpoints,
   ...expressions,
   ...eventListeners,
+  ...logExceptions,
   ...sources,
   ...sourcesActors,
   ...tabs,

@@ -18,8 +18,7 @@ import {
   getIsWaitingOnBreak,
   getPauseCommand,
   getSelectedFrame,
-  getShouldPauseOnExceptions,
-  getShouldPauseOnCaughtExceptions,
+  getShouldLogExceptions,
   getThreads,
   getCurrentThread,
   getThreadContext,
@@ -98,15 +97,14 @@ type Props = {
   breakpointsDisabled: boolean,
   isWaitingOnBreak: boolean,
   renderWhyPauseDelay: number,
-  shouldPauseOnExceptions: boolean,
-  shouldPauseOnCaughtExceptions: boolean,
+  shouldLogExceptions: boolean,
   workers: ThreadList,
   skipPausing: boolean,
   logEventBreakpoints: boolean,
   source: ?Source,
   toggleAllBreakpoints: typeof actions.toggleAllBreakpoints,
   evaluateExpressions: typeof actions.evaluateExpressions,
-  pauseOnExceptions: typeof actions.pauseOnExceptions,
+  logExceptions: typeof actions.logExceptions,
   breakOnNext: typeof actions.breakOnNext,
   toggleEventLogging: typeof actions.toggleEventLogging,
 };
@@ -303,9 +301,8 @@ class SecondaryPanes extends Component<Props, State> {
 
   getBreakpointsItem(): AccordionPaneItem {
     const {
-      shouldPauseOnExceptions,
-      shouldPauseOnCaughtExceptions,
-      pauseOnExceptions,
+      shouldLogExceptions,
+      logExceptions,
     } = this.props;
 
     return {
@@ -314,9 +311,8 @@ class SecondaryPanes extends Component<Props, State> {
       buttons: [this.renderBreakpointsToggle()],
       component: (
         <Breakpoints
-          shouldPauseOnExceptions={shouldPauseOnExceptions}
-          shouldPauseOnCaughtExceptions={shouldPauseOnCaughtExceptions}
-          pauseOnExceptions={pauseOnExceptions}
+          shouldLogExceptions={shouldLogExceptions}
+          logExceptions={logExceptions}
         />
       ),
       opened: prefs.breakpointsVisible,
@@ -492,8 +488,7 @@ const mapStateToProps = state => {
     isWaitingOnBreak: getIsWaitingOnBreak(state, thread),
     renderWhyPauseDelay: getRenderWhyPauseDelay(state, thread),
     selectedFrame,
-    shouldPauseOnExceptions: getShouldPauseOnExceptions(state),
-    shouldPauseOnCaughtExceptions: getShouldPauseOnCaughtExceptions(state),
+    shouldLogExceptions: getShouldLogExceptions(state),
     workers: getThreads(state),
     skipPausing: getSkipPausing(state),
     logEventBreakpoints: shouldLogEventBreakpoints(state),
@@ -507,7 +502,7 @@ export default connect<Props, OwnProps, _, _, _, _>(
   {
     toggleAllBreakpoints: actions.toggleAllBreakpoints,
     evaluateExpressions: actions.evaluateExpressions,
-    pauseOnExceptions: actions.pauseOnExceptions,
+    logExceptions: actions.logExceptions,
     breakOnNext: actions.breakOnNext,
     toggleEventLogging: actions.toggleEventLogging,
   }

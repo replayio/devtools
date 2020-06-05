@@ -202,7 +202,7 @@ function resumeThenPauseAtLineFunctionFactory(method) {
       await waitUntil(() => lineno == getVisibleSelectedFrameLine());
     } else {
       const pauseLine = getVisibleSelectedFrameLine();
-      assert(pauseLine == lineno);
+      assert(pauseLine == lineno, `Expected line ${lineno} got ${pauseLine}`);
     }
     console.log(`Finished ${method} to ${lineno}!`);
   };
@@ -360,7 +360,7 @@ async function toggleScopeNode(text) {
 }
 
 async function executeInConsole(text) {
-  gToolbox._panels.webconsole.hud.evaluateInput(text);
+  gToolbox.getPanel("console").hud.evaluateInput(text);
 }
 
 async function checkInlinePreview(name, text) {
@@ -398,6 +398,11 @@ function togglePrettyPrint() {
 
 function addEventListenerLogpoints(logpoints) {
   return dbg.actions.addEventListenerBreakpoints(logpoints);
+}
+
+async function toggleExceptionLogging() {
+  const elem = await waitUntil(() => document.querySelector(".breakpoints-exceptions input"));
+  elem.click();
 }
 
 module.exports = {
@@ -440,4 +445,5 @@ module.exports = {
   selectFrame,
   togglePrettyPrint,
   addEventListenerLogpoints,
+  toggleExceptionLogging,
 };

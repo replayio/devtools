@@ -68,10 +68,10 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-function assert(v) {
+function assert(v, msg = "Assertion failed!") {
   if (!v) {
-    console.error("Assertion failed!");
-    throw new Error("Assertion failed!");
+    console.error(msg);
+    throw new Error(msg);
   }
 }
 

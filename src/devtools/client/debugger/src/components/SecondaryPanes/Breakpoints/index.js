@@ -30,16 +30,14 @@ import type SourceEditor from "../../../utils/editor/source-editor";
 import "./Breakpoints.css";
 
 type OwnProps = {|
-  shouldPauseOnExceptions: boolean,
-  shouldPauseOnCaughtExceptions: boolean,
-  pauseOnExceptions: Function,
+  shouldLogExceptions: boolean,
+  logExceptions: Function,
 |};
 type Props = {
   breakpointSources: BreakpointSources,
   selectedSource: ?Source,
-  shouldPauseOnExceptions: boolean,
-  shouldPauseOnCaughtExceptions: boolean,
-  pauseOnExceptions: Function,
+  shouldLogExceptions: boolean,
+  logExceptions: Function,
 };
 
 class Breakpoints extends Component<Props> {
@@ -65,13 +63,10 @@ class Breakpoints extends Component<Props> {
   }
 
   renderExceptionsOptions() {
-    return null;
-    /*
     const {
       breakpointSources,
-      shouldPauseOnExceptions,
-      shouldPauseOnCaughtExceptions,
-      pauseOnExceptions,
+      shouldLogExceptions,
+      logExceptions,
     } = this.props;
 
     const isEmpty = breakpointSources.length == 0;
@@ -84,24 +79,12 @@ class Breakpoints extends Component<Props> {
       >
         <ExceptionOption
           className="breakpoints-exceptions"
-          label={L10N.getStr("pauseOnExceptionsItem2")}
-          isChecked={shouldPauseOnExceptions}
-          onChange={() => pauseOnExceptions(!shouldPauseOnExceptions, false)}
+          label={L10N.getStr("logExceptionsItem")}
+          isChecked={shouldLogExceptions}
+          onChange={() => logExceptions(!shouldLogExceptions)}
         />
-
-        {shouldPauseOnExceptions && (
-          <ExceptionOption
-            className="breakpoints-exceptions-caught"
-            label={L10N.getStr("pauseOnCaughtExceptionsItem")}
-            isChecked={shouldPauseOnCaughtExceptions}
-            onChange={() =>
-              pauseOnExceptions(true, !shouldPauseOnCaughtExceptions)
-            }
-          />
-        )}
       </div>
     );
-    */
   }
 
   renderBreakpoints() {
@@ -161,6 +144,6 @@ const mapStateToProps = state => ({
 export default connect<Props, OwnProps, _, _, _, _>(
   mapStateToProps,
   {
-    pauseOnExceptions: actions.pauseOnExceptions,
+    logExceptions: actions.logExceptions,
   }
 )(Breakpoints);

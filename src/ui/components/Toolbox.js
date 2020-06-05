@@ -44,6 +44,7 @@ const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 const { InspectorPanel } = require("devtools/client/inspector/panel");
 const Selection = require("devtools/client/framework/selection");
 const { log } = require("protocol/socket");
+const { defer } = require("protocol/utils");
 
 const Timeline = require("./Timeline");
 const { ThreadFront } = require("protocol/thread");
@@ -61,6 +62,7 @@ export default class Toolbox extends React.Component {
   threadFront = ThreadFront;
   selection = new Selection();
   nodePicker = {};
+  ensureMounted = defer();
 
   constructor(props) {
     super(props);
@@ -82,6 +84,8 @@ export default class Toolbox extends React.Component {
     await panels["debugger"].open();
     await panels["console"].open();
     panels["inspector"].open();
+
+    this.ensureMounted.resolve();
   }
 
   selectTool(tool) {

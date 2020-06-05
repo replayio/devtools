@@ -17,21 +17,6 @@ const historyActions = require("devtools/client/webconsole/actions/history");
 const { ConsoleCommand } = require("devtools/client/webconsole/types");
 const HELP_URL = "https://developer.mozilla.org/docs/Tools/Web_Console/Helpers";
 
-async function getMappedExpression(hud, expression) {
-  let mapResult;
-  try {
-    mapResult = await hud.getMappedExpression(expression);
-  } catch (e) {
-    console.warn("Error when calling getMappedExpression", e);
-  }
-
-  let mapped = null;
-  if (mapResult) {
-    ({ expression, mapped } = mapResult);
-  }
-  return { expression, mapped };
-}
-
 function evaluateExpression(expression) {
   return async ({ dispatch, toolbox, webConsoleUI, hud, client }) => {
     if (!expression) {
@@ -57,9 +42,6 @@ function evaluateExpression(expression) {
 
     WebConsoleUtils.usageCount++;
 
-    let mapped;
-    ({ expression, mapped } = await getMappedExpression(hud, expression));
-
     const frameActor = await webConsoleUI.getFrameActor();
 
     // Even if the evaluation fails,
@@ -69,7 +51,6 @@ function evaluateExpression(expression) {
     const response = await client
       .evaluateJSAsync(expression, {
         frameActor,
-        mapped,
         forConsoleMessage: true,
       })
       .then(onSettled, onSettled);
@@ -191,7 +172,7 @@ function terminalInputChanged(expression) {
 
     // FIXME Eager evaluation is NYI
     return;
-
+    /*
     const { terminalInput = "" } = getState().history;
     // Only re-evaluate if the expression did change.
     if (
@@ -237,6 +218,7 @@ function terminalInputChanged(expression) {
       type: SET_TERMINAL_EAGER_RESULT,
       result: getEagerEvaluationResult(response),
     });
+    */
   };
 }
 

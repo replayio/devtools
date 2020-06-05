@@ -99,8 +99,7 @@ export type PauseState = {
   threadcx: ThreadContext,
   threads: { [ThreadId]: ThreadPauseState },
   skipPausing: boolean,
-  shouldPauseOnExceptions: boolean,
-  shouldPauseOnCaughtExceptions: boolean,
+  shouldLogExceptions: boolean,
   previewLocation: ?SourceLocation,
   replayFramePositions: {
     positions: any,
@@ -123,8 +122,7 @@ function createPauseState(thread: ThreadId = "UnknownThread") {
     highlightedCalls: null,
     threads: {},
     skipPausing: prefs.skipPausing,
-    shouldPauseOnExceptions: prefs.pauseOnExceptions,
-    shouldPauseOnCaughtExceptions: prefs.pauseOnCaughtExceptions,
+    shouldLogExceptions: prefs.logExceptions,
   };
 }
 
@@ -315,19 +313,14 @@ function update(
         ...createPauseState(action.mainThread.actor),
       };
 
-    case "PAUSE_ON_EXCEPTIONS": {
-      const { shouldPauseOnExceptions, shouldPauseOnCaughtExceptions } = action;
+    case "LOG_EXCEPTIONS": {
+      const { shouldLogExceptions } = action;
 
-      prefs.pauseOnExceptions = shouldPauseOnExceptions;
-      prefs.pauseOnCaughtExceptions = shouldPauseOnCaughtExceptions;
-
-      // Preserving for the old debugger
-      prefs.ignoreCaughtExceptions = !shouldPauseOnCaughtExceptions;
+      prefs.logExceptions = shouldLogExceptions;
 
       return {
         ...state,
-        shouldPauseOnExceptions,
-        shouldPauseOnCaughtExceptions,
+        shouldLogExceptions,
       };
     }
 
@@ -514,12 +507,8 @@ export function getIsWaitingOnBreak(state: State, thread: ThreadId) {
   return getThreadPauseState(state.pause, thread).isWaitingOnBreak;
 }
 
-export function getShouldPauseOnExceptions(state: State) {
-  return state.pause.shouldPauseOnExceptions;
-}
-
-export function getShouldPauseOnCaughtExceptions(state: State) {
-  return state.pause.shouldPauseOnCaughtExceptions;
+export function getShouldLogExceptions(state: State) {
+  return state.pause.shouldLogExceptions;
 }
 
 export function getFrames(state: State, thread: ThreadId) {

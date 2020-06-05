@@ -213,6 +213,28 @@ async function setEventLogpoint(logGroupId, eventTypes) {
   sendMessage("Analysis.findAnalysisPoints", { analysisId });
 }
 
+async function setExceptionLogpoint(logGroupId) {
+  const mapper = `
+    const { point, time, pauseId } = input;
+    const { frame } = sendCommand("Pause.getTopFrame");
+    const { location } = frame;
+    const { exception, data } = sendCommand("Pause.getExceptionValue");
+    const values = [{ value: "Exception" }, exception];
+    const datas = [data];
+    return [{ key: point, value: { time, pauseId, location, values, datas } }];
+  `;
+
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper);
+
+  sendMessage("Analysis.addExceptionPoints", {
+    analysisId,
+    sessionId: ThreadFront.sessionId,
+  });
+
+  sendMessage("Analysis.runAnalysis", { analysisId });
+  sendMessage("Analysis.findAnalysisPoints", { analysisId });
+}
+
 function removeLogpoint(logGroupId) {
   const waiters = gLogpoints.get(logGroupId);
   if (!waiters) {
@@ -232,6 +254,7 @@ module.exports = {
   setLogpoint,
   setLogpointByURL,
   setEventLogpoint,
+  setExceptionLogpoint,
   removeLogpoint,
   LogpointHandlers,
 };

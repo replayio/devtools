@@ -249,48 +249,6 @@ class WebConsole {
     return panel.getFrames();
   }
 
-  /**
-   * Given an expression, returns an object containing a new expression, mapped by the
-   * parser worker to provide additional feature for the user (top-level await,
-   * original languages mapping, …).
-   *
-   * @param {String} expression: The input to maybe map.
-   * @returns {Object|null}
-   *          Returns null if the input can't be mapped.
-   *          If it can, returns an object containing the following:
-   *            - {String} expression: The mapped expression
-   *            - {Object} mapped: An object containing the different mapping that could
-   *                               be done and if they were applied on the input.
-   *                               At the moment, contains `await`, `bindings` and
-   *                               `originalExpression`.
-   */
-  getMappedExpression(expression) {
-    const toolbox = this.toolbox;
-
-    // We need to check if the debugger is open, since it may perform a variable name
-    // substitution for sourcemapped script (i.e. evaluated `myVar.trim()` might need to
-    // be transformed into `a.trim()`).
-    const panel = toolbox && toolbox.getPanel("debugger");
-    if (panel) {
-      return panel.getMappedExpression(expression);
-    }
-
-    if (this.parserService && expression.includes("await ")) {
-      const shouldMapBindings = false;
-      const shouldMapAwait = true;
-      const res = this.parserService.mapExpression(
-        expression,
-        null,
-        null,
-        shouldMapBindings,
-        shouldMapAwait
-      );
-      return res;
-    }
-
-    return null;
-  }
-
   get parserService() {
     if (this._parserService) {
       return this._parserService;

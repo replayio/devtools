@@ -160,14 +160,10 @@ class FrameTimeline extends Component<Props, State> {
     }
 
     let index = 0;
-    for (let i = 0; i < framePositions.positions.length; i++) {
-      const { location, generatedLocation, point } = framePositions.positions[i];
-      if (BigInt(executionPoint) < BigInt(point)) {
+    for (let i = 0; i < framePositions.positions.length; i++, index++) {
+      const { location, point } = framePositions.positions[i];
+      if (BigInt(executionPoint) <= BigInt(point)) {
         break;
-      }
-      if (isSameLocation(location, selectedLocation) ||
-        isSameLocation(generatedLocation, selectedLocation)) {
-        index = i;
       }
     }
 
