@@ -97,6 +97,7 @@ async function initialize() {
 
   sendMessage("Recording.createSession", { recordingId }).then(
     async ({ sessionId }) => {
+      window.sessionId = sessionId;
       ThreadFront.setSessionId(sessionId);
       if (test) {
         await gToolbox.loadTool("jsdebugger");
