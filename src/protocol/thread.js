@@ -1502,7 +1502,7 @@ const ThreadFront = {
     return this.getPreferredLocationRaw(mappedLocation);
   },
 
-  async getDescription() {
+  async getDescription(recordingId) {
     let description;
     try {
       description = await sendMessage("Recording.getDescription", {

@@ -102,15 +102,15 @@ async function initialize() {
   loadImages();
   setupToolboxResizeEventHandlers();
 
-  document.body.addEventListener("contextmenu", (e) => e.preventDefault());
+  document.body.addEventListener("contextmenu", e => e.preventDefault());
 
   // Set the current mouse position on the window. This is used in places where
   // testing element.matches(":hover") does not work right for some reason.
-  document.body.addEventListener("mousemove", (e) => {
+  document.body.addEventListener("mousemove", e => {
     window.mouseClientX = e.clientX;
     window.mouseClientY = e.clientY;
   });
-  window.elementIsHovered = (elem) => {
+  window.elementIsHovered = elem => {
     const { left, top, right, bottom } = elem.getBoundingClientRect();
     const { mouseClientX, mouseClientY } = window;
     return (
@@ -125,7 +125,7 @@ async function initialize() {
 setTimeout(async () => {
   // Wait for CodeMirror to load asynchronously.
   while (!window.CodeMirror) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
 
   ReactDOM.render(React.createElement(App, { initialize }), document.body);

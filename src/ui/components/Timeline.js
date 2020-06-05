@@ -98,7 +98,7 @@ function getProgress(executionPoint) {
 function getClosestMessage(messages, executionPoint) {
   const progress = getProgress(executionPoint);
 
-  return sortBy(messages, (message) =>
+  return sortBy(messages, message =>
     Math.abs(progress - getMessageProgress(message))
   )[0];
 }
@@ -174,7 +174,7 @@ class WebReplayPlayer extends Component {
     this.threadFront.on("paused", this.onPaused.bind(this));
     this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
 
-    const description = await this.threadFront.getDescription();
+    const description = await this.threadFront.getDescription(recordingId);
     this.setRecordingDescription(description);
   }
 
@@ -259,10 +259,8 @@ class WebReplayPlayer extends Component {
       let pausedMessage;
       if (executionPoint) {
         pausedMessage = this.state.messages
-          .filter((message) => message.executionPoint)
-          .find((message) =>
-            pointEquals(message.executionPoint, executionPoint)
-          );
+          .filter(message => message.executionPoint)
+          .find(message => pointEquals(message.executionPoint, executionPoint));
       } else {
         executionPoint = this.state.executionPoint;
       }
@@ -291,12 +289,10 @@ class WebReplayPlayer extends Component {
 
     if (visibleMessages != this.state.visibleMessages) {
       let messages = visibleMessages
-        .map((id) => messagesById.get(id))
-        .filter(
-          (message) => message.source == "console-api" || isError(message)
-        );
+        .map(id => messagesById.get(id))
+        .filter(message => message.source == "console-api" || isError(message));
 
-      messages = sortBy(messages, (message) => getMessageProgress(message));
+      messages = sortBy(messages, message => getMessageProgress(message));
 
       this.setState({ messages, visibleMessages, shouldAnimate: false });
     }
@@ -716,7 +712,7 @@ class WebReplayPlayer extends Component {
         zIndex: `${index + 100}`,
       },
       title: getFormatStr("jumpMessage2", frameLocation),
-      onClick: (e) => {
+      onClick: e => {
         e.preventDefault();
         e.stopPropagation();
         this.seek(message.executionPoint);
