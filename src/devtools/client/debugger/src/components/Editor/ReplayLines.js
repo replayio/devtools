@@ -25,12 +25,11 @@ type Props = {
 const jumpButton = document.createElement("img");
 jumpButton.src = require("devtools/client/debugger/images/next-circle.svg").default;
 
-function getEditorLine(location, generatedLocation, sourceId) {
-  const loc = location.sourceId == sourceId ? location : generatedLocation;
-  if (loc.sourceId != sourceId) {
+function getEditorLine(location, sourceId) {
+  if (location.sourceId != sourceId) {
     return undefined;
   }
-  return toEditorPosition(loc).line;
+  return toEditorPosition(location).line;
 }
 
 export class ReplayLines extends PureComponent<Props> {
@@ -57,23 +56,19 @@ export class ReplayLines extends PureComponent<Props> {
       return;
     }
 
-    // Figure out which document to apply these locations to, based on which
-    // documents are currently loaded.
-    let sourceId = positions[0].location.sourceId;
-    if (!hasDocument(sourceId)) {
-      sourceId = positions[0].generatedLocation.sourceId;
-      if (!hasDocument(sourceId)) {
-        return;
-      }
-    }
+    const sourceId = positions[0].location.sourceId;
 
     this.sourceId = sourceId;
     const doc = getDocument(sourceId);
+    if (!doc) {
+      return;
+    }
+
     const seenLines = new Set();
 
     // Place jump buttons on each line that is executed by the frame.
-    for (const { point, time, location, generatedLocation } of positions) {
-      const line = getEditorLine(location, generatedLocation, sourceId);
+    for (const { point, time, location } of positions) {
+      const line = getEditorLine(location, sourceId);
       if (line === undefined || seenLines.has(line)) {
         continue;
       }
