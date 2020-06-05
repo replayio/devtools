@@ -100,7 +100,7 @@ export function teardownWorkers() {
 }
 
 export function bootstrapApp(store: any, panel: Panel) {
-  const root = document.getElementById("toolbox-content-jsdebugger");
+  const root = document.getElementById("toolbox-content-debugger");
   ReactDOM.render(
     React.createElement(
       Provider,

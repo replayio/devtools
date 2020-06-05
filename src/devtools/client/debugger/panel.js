@@ -73,17 +73,6 @@ DebuggerPanel.prototype = {
     this.isReady = true;
     this.readyWaiter.resolve();
 
-    /*
-    this.panelWin.document.addEventListener(
-      "drag:start",
-      this.toolbox.toggleDragging
-    );
-    this.panelWin.document.addEventListener(
-      "drag:end",
-      this.toolbox.toggleDragging
-    );
-    */
-
     registerStoreObserver(this._store, this._onDebuggerStateChange.bind(this));
 
     return this;
@@ -120,7 +109,7 @@ DebuggerPanel.prototype = {
   },
 
   openConsoleAndEvaluate: async function (input) {
-    const { hud } = await this.toolbox.selectTool("webconsole");
+    const { hud } = await this.toolbox.selectTool("console");
     hud.ui.wrapper.dispatchEvaluateExpression(input);
   },
 

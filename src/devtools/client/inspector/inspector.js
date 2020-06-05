@@ -44,7 +44,9 @@ require("devtools/client/shared/components/Accordion.css");
 
 const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
-const { InspectorSearch } = require("devtools/client/inspector/inspector-search");
+const {
+  InspectorSearch,
+} = require("devtools/client/inspector/inspector-search");
 
 const { ToolSidebar } = require("devtools/client/inspector/toolsidebar");
 const MarkupView = require("devtools/client/inspector/markup/markup");
@@ -199,7 +201,7 @@ Inspector.prototype = {
     await this._onTargetAvailable();
 
     // We need to listen to changes in the target's pause state.
-    const dbg = await this._toolbox.loadTool("jsdebugger");
+    const dbg = this._getDebugger();
     this._replayResumed = !dbg.isPaused();
 
     this.styleChangeTracker = new InspectorStyleChangeTracker(this);
@@ -210,14 +212,11 @@ Inspector.prototype = {
   },
 
   _getDebugger() {
-    const dbg = this._toolbox.getPanel("jsdebugger");
-    return dbg || this._toolbox.loadTool("jsdebugger");
+    return this._toolbox.getPanel("debugger");
   },
 
   async _onTargetAvailable() {
-    await Promise.all([
-      this._getDefaultSelection(),
-    ]);
+    await Promise.all([this._getDefaultSelection()]);
 
     // When we navigate to another process and switch to a new
     // target and the inspector is already ready, we want to
@@ -323,13 +322,13 @@ Inspector.prototype = {
    * This is useful to silence useless errors that happen when the inspector is closed
    * while still initializing (and making protocol requests).
    */
-  _handleRejectionIfNotDestroyed: function(e) {
+  _handleRejectionIfNotDestroyed: function (e) {
     if (!this._destroyed) {
       console.error(e);
     }
   },
 
-  _deferredOpen: async function() {
+  _deferredOpen: async function () {
     this.isReady = false;
 
     // Set the node front so that the markup and sidebar panels will have the selected
@@ -378,14 +377,14 @@ Inspector.prototype = {
     return this;
   },
 
-  _onBeforeNavigate: function() {
+  _onBeforeNavigate: function () {
     this._defaultNode = null;
     this.selection.setNodeFront(null);
     this._destroyMarkup();
     this._pendingSelection = null;
   },
 
-  _getDefaultSelection: function() {
+  _getDefaultSelection: function () {
     // This may throw if the document is still loading and we are
     // refering to a dead about:blank document
     return this._getDefaultNodeForSelection().catch(
@@ -396,7 +395,7 @@ Inspector.prototype = {
   /**
    * Return a promise that will resolve to the default node for selection.
    */
-  _getDefaultNodeForSelection: async function() {
+  _getDefaultNodeForSelection: async function () {
     if (this._defaultNode) {
       return this._defaultNode;
     }
@@ -474,7 +473,7 @@ Inspector.prototype = {
   /**
    * Hooks the searchbar to show result and auto completion suggestions.
    */
-  setupSearchBox: function() {
+  setupSearchBox: function () {
     this.searchBox = this.panelDoc.getElementById("inspector-searchbox");
     this.searchClearButton = this.panelDoc.getElementById(
       "inspector-searchinput-clear"
@@ -507,7 +506,7 @@ Inspector.prototype = {
       //target: this.toolbox.getChromeEventHandler(),
     });
     const key = INSPECTOR_L10N.getStr("inspector.searchHTML.key");
-    this.searchboxShortcuts.on(key, event => {
+    this.searchboxShortcuts.on(key, (event) => {
       // Prevent overriding same shortcut from the computed/rule views
       if (
         event.originalTarget.closest("#sidebar-panel-ruleview") ||
@@ -531,11 +530,11 @@ Inspector.prototype = {
     return this.search.autocompleter;
   },
 
-  _clearSearchResultsLabel: function(result) {
+  _clearSearchResultsLabel: function (result) {
     return this._updateSearchResultsLabel(result, true);
   },
 
-  _updateSearchResultsLabel: function(result, clear = false) {
+  _updateSearchResultsLabel: function (result, clear = false) {
     let str = "";
     if (!clear) {
       if (result) {
@@ -571,9 +570,7 @@ Inspector.prototype = {
   get InspectorTabPanel() {
     if (!this._InspectorTabPanel) {
       this._InspectorTabPanel = React.createFactory(
-        require(
-          "devtools/client/inspector/components/InspectorTabPanel"
-        )
+        require("devtools/client/inspector/components/InspectorTabPanel")
       );
     }
     return this._InspectorTabPanel;
@@ -582,9 +579,7 @@ Inspector.prototype = {
   get InspectorSplitBox() {
     if (!this._InspectorSplitBox) {
       this._InspectorSplitBox = React.createFactory(
-        require(
-          "devtools/client/shared/components/splitter/SplitBox"
-        )
+        require("devtools/client/shared/components/splitter/SplitBox")
       );
     }
     return this._InspectorSplitBox;
@@ -604,7 +599,7 @@ Inspector.prototype = {
    *
    * @return {Boolean} true if the inspector should be in landscape mode.
    */
-  useLandscapeMode: function() {
+  useLandscapeMode: function () {
     return true;
     /*
     if (!this.panelDoc) {
@@ -626,7 +621,7 @@ Inspector.prototype = {
    * Build Splitter located between the main and side area of
    * the Inspector panel.
    */
-  setupSplitter: function() {
+  setupSplitter: function () {
     const { width, height, splitSidebarWidth } = this.getSidebarSize();
 
     this.sidebarSplitBoxRef = React.createRef();
@@ -668,7 +663,7 @@ Inspector.prototype = {
     this.panelWin.addEventListener("resize", this.onPanelWindowResize, true);
   },
 
-  _onLazyPanelResize: async function() {
+  _onLazyPanelResize: async function () {
     // We can be called on a closed window because of the deferred task.
     if (window.closed) {
       return;
@@ -682,7 +677,7 @@ Inspector.prototype = {
    * If Toolbox width is less than 600 px, the splitter changes its mode
    * to `horizontal` to support portrait view.
    */
-  onPanelWindowResize: function() {
+  onPanelWindowResize: function () {
     if (this.toolbox.currentTool !== "inspector") {
       return;
     }
@@ -699,7 +694,7 @@ Inspector.prototype = {
     */
   },
 
-  getSidebarSize: function() {
+  getSidebarSize: function () {
     let width;
     let height;
     let splitSidebarWidth;
@@ -728,7 +723,7 @@ Inspector.prototype = {
     return { width, height, splitSidebarWidth };
   },
 
-  onSidebarHidden: function() {
+  onSidebarHidden: function () {
     // Store the current splitter size to preferences.
     const state = this.splitBox.state;
     Services.prefs.setIntPref(
@@ -745,11 +740,11 @@ Inspector.prototype = {
     );
   },
 
-  onSidebarResized: function(width, height) {
+  onSidebarResized: function (width, height) {
     this.toolbox.emit("inspector-sidebar-resized", { width, height });
   },
 
-  onSidebarSelect: function(toolId) {
+  onSidebarSelect: function (toolId) {
     // Save the currently selected sidebar panel
     Services.prefs.setCharPref("devtools.inspector.activeSidebar", toolId);
 
@@ -760,7 +755,7 @@ Inspector.prototype = {
     this.toolbox.emit("inspector-sidebar-select", toolId);
   },
 
-  onSidebarShown: function() {
+  onSidebarShown: function () {
     const { width, height, splitSidebarWidth } = this.getSidebarSize();
     this.splitBox.setState({ width, height });
     this.sidebarSplitBoxRef.current.setState({ width: splitSidebarWidth });
@@ -913,14 +908,14 @@ Inspector.prototype = {
   /**
    * Returns a boolean indicating whether a sidebar panel instance exists.
    */
-  hasPanel: function(id) {
+  hasPanel: function (id) {
     return this._panels.has(id);
   },
 
   /**
    * Lazily get and create panel instances displayed in the sidebar
    */
-  getPanel: function(id) {
+  getPanel: function (id) {
     if (this._panels.has(id)) {
       return this._panels.get(id);
     }
@@ -928,9 +923,7 @@ Inspector.prototype = {
     let panel;
     switch (id) {
       case "animationinspector":
-        const AnimationInspector = require(
-          "devtools/client/inspector/animation/animation"
-        );
+        const AnimationInspector = require("devtools/client/inspector/animation/animation");
         panel = new AnimationInspector(this, this.panelWin);
         break;
       case "boxmodel":
@@ -940,39 +933,29 @@ Inspector.prototype = {
         panel = new BoxModel(this, this.panelWin);
         break;
       case "changesview":
-        const ChangesView = require(
-          "devtools/client/inspector/changes/ChangesView"
-        );
+        const ChangesView = require("devtools/client/inspector/changes/ChangesView");
         panel = new ChangesView(this, this.panelWin);
         break;
       case "compatibilityview":
-        const CompatibilityView = require(
-          "devtools/client/inspector/compatibility/CompatibilityView"
-        );
+        const CompatibilityView = require("devtools/client/inspector/compatibility/CompatibilityView");
         panel = new CompatibilityView(this, this.panelWin);
         break;
       case "computedview":
-        const { ComputedViewTool } = require(
-          "devtools/client/inspector/computed/computed"
-        );
+        const {
+          ComputedViewTool,
+        } = require("devtools/client/inspector/computed/computed");
         panel = new ComputedViewTool(this, this.panelWin);
         break;
       case "fontinspector":
-        const FontInspector = require(
-          "devtools/client/inspector/fonts/fonts"
-        );
+        const FontInspector = require("devtools/client/inspector/fonts/fonts");
         panel = new FontInspector(this, this.panelWin);
         break;
       case "layoutview":
-        const LayoutView = require(
-          "devtools/client/inspector/layout/layout"
-        );
+        const LayoutView = require("devtools/client/inspector/layout/layout");
         panel = new LayoutView(this, this.panelWin);
         break;
       case "newruleview":
-        const RulesView = require(
-          "devtools/client/inspector/rules/new-rules"
-        );
+        const RulesView = require("devtools/client/inspector/rules/new-rules");
         panel = new RulesView(this, this.panelWin);
         break;
       case "ruleview":
@@ -1138,7 +1121,7 @@ Inspector.prototype = {
    * @param {String} options.title
    *        The tab title
    */
-  addExtensionSidebar: function(id, { title }) {
+  addExtensionSidebar: function (id, { title }) {
     if (this._panels.has(id)) {
       throw new Error(
         `Cannot create an extension sidebar for the existent id: ${id}`
@@ -1167,7 +1150,7 @@ Inspector.prototype = {
    * @param {String} id
    *        The id of the sidebar tab to destroy.
    */
-  removeExtensionSidebar: function(id) {
+  removeExtensionSidebar: function (id) {
     if (!this._panels.has(id)) {
       throw new Error(`Unable to find a sidebar panel with id "${id}"`);
     }
@@ -1195,7 +1178,7 @@ Inspector.prototype = {
    * @param {React.Component} panel component. See `InspectorPanelTab` as an example.
    * @param {boolean} selected true if the panel should be selected
    */
-  addSidebarTab: function(id, title, panel, selected) {
+  addSidebarTab: function (id, title, panel, selected) {
     this.sidebar.addTab(id, title, panel, selected);
   },
 
@@ -1258,7 +1241,7 @@ Inspector.prototype = {
     this.emit("inspector-toolbar-updated");
   },
 
-  teardownToolbar: function() {
+  teardownToolbar: function () {
     if (this.addNodeButton) {
       this.addNodeButton.removeEventListener("click", this.addNode);
       this.addNodeButton = null;
@@ -1438,7 +1421,7 @@ Inspector.prototype = {
    * Can a new HTML element be inserted into the currently selected element?
    * @return {Boolean}
    */
-  canAddHTMLChild: function() {
+  canAddHTMLChild: function () {
     const selection = this.selection;
 
     // Don't allow to insert an element into these elements. This should only
@@ -1493,7 +1476,7 @@ Inspector.prototype = {
   /**
    * When a new node is selected.
    */
-  onNewSelection: function(value, reason) {
+  onNewSelection: function (value, reason) {
     if (reason === "selection-destroy") {
       return;
     }
@@ -1517,7 +1500,7 @@ Inspector.prototype = {
    * invoked when the tool is done updating with the node
    * that the tool is viewing.
    */
-  updating: function(name) {
+  updating: function (name) {
     if (
       this._updateProgress &&
       this._updateProgress.node != this.selection.nodeFront
@@ -1531,7 +1514,7 @@ Inspector.prototype = {
       this._updateProgress = {
         node: this.selection.nodeFront,
         outstanding: new Set(),
-        checkDone: function() {
+        checkDone: function () {
           if (this !== self._updateProgress) {
             return;
           }
@@ -1554,7 +1537,7 @@ Inspector.prototype = {
     }
 
     const progress = this._updateProgress;
-    const done = function() {
+    const done = function () {
       progress.outstanding.delete(done);
       progress.checkDone();
     };
@@ -1565,7 +1548,7 @@ Inspector.prototype = {
   /**
    * Cancel notification of inspector updates.
    */
-  cancelUpdate: function() {
+  cancelUpdate: function () {
     this._updateProgress = null;
   },
 
@@ -1574,7 +1557,7 @@ Inspector.prototype = {
    * parent is found (may happen when deleting an iframe inside which the
    * node was selected).
    */
-  onDetached: function(parentNode) {
+  onDetached: function (parentNode) {
     this.breadcrumbs.cutAfter(this.breadcrumbs.indexOf(parentNode));
     const nodeFront = parentNode ? parentNode : this._defaultNode;
     this.selection.setNodeFront(nodeFront, { reason: "detached" });
@@ -1583,7 +1566,7 @@ Inspector.prototype = {
   /**
    * Destroy the inspector.
    */
-  destroy: function() {
+  destroy: function () {
     if (this._destroyed) {
       return;
     }
@@ -1654,7 +1637,7 @@ Inspector.prototype = {
     this._pendingSelection = null;
   },
 
-  _destroyMarkup: function() {
+  _destroyMarkup: function () {
     let destroyPromise;
 
     if (this.markup) {
@@ -1670,27 +1653,27 @@ Inspector.prototype = {
     return destroyPromise;
   },
 
-  onEyeDropperButtonClicked: function() {
+  onEyeDropperButtonClicked: function () {
     this.eyeDropperButton.classList.contains("checked")
       ? this.hideEyeDropper()
       : this.showEyeDropper();
   },
 
-  startEyeDropperListeners: function() {
+  startEyeDropperListeners: function () {
     this.toolbox.tellRDMAboutPickerState(true, PICKER_TYPES.EYEDROPPER);
     this.inspectorFront.once("color-pick-canceled", this.onEyeDropperDone);
     this.inspectorFront.once("color-picked", this.onEyeDropperDone);
     this.walker.once("new-root", this.onEyeDropperDone);
   },
 
-  stopEyeDropperListeners: function() {
+  stopEyeDropperListeners: function () {
     this.toolbox.tellRDMAboutPickerState(false, PICKER_TYPES.EYEDROPPER);
     this.inspectorFront.off("color-pick-canceled", this.onEyeDropperDone);
     this.inspectorFront.off("color-picked", this.onEyeDropperDone);
     this.walker.off("new-root", this.onEyeDropperDone);
   },
 
-  onEyeDropperDone: function() {
+  onEyeDropperDone: function () {
     this.eyeDropperButton.classList.remove("checked");
     this.stopEyeDropperListeners();
   },
@@ -1699,7 +1682,7 @@ Inspector.prototype = {
    * Show the eyedropper on the page.
    * @return {Promise} resolves when the eyedropper is visible.
    */
-  showEyeDropper: function() {
+  showEyeDropper: function () {
     // The eyedropper button doesn't exist, most probably because the actor doesn't
     // support the pickColorFromPage, or because the page isn't HTML.
     if (!this.eyeDropperButton) {
@@ -1719,7 +1702,7 @@ Inspector.prototype = {
    * Hide the eyedropper.
    * @return {Promise} resolves when the eyedropper is hidden.
    */
-  hideEyeDropper: function() {
+  hideEyeDropper: function () {
     // The eyedropper button doesn't exist, most probably  because the page isn't HTML.
     if (!this.eyeDropperButton) {
       return null;
@@ -1764,7 +1747,7 @@ Inspector.prototype = {
   /**
    * Toggle a pseudo class.
    */
-  togglePseudoClass: function(pseudo) {
+  togglePseudoClass: function (pseudo) {
     if (this.selection.isElementNode()) {
       const node = this.selection.nodeFront;
       if (node.hasPseudoClassLock(pseudo)) {

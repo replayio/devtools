@@ -108,8 +108,8 @@ const gMaskImages = {
   ".img.tab": require("devtools/client/debugger/images/tab.svg"),
   ".img.whole-word-match": require("devtools/client/debugger/images/whole-word-match.svg"),
   ".img.worker": require("devtools/client/debugger/images/worker.svg"),
-  "#toolbox-toolbar-webconsole .toolbar-panel-icon": require("devtools/client/themes/images/tool-webconsole.svg"),
-  "#toolbox-toolbar-jsdebugger .toolbar-panel-icon": require("devtools/client/themes/images/tool-debugger.svg"),
+  "#toolbox-toolbar-console .toolbar-panel-icon": require("devtools/client/themes/images/tool-webconsole.svg"),
+  "#toolbox-toolbar-debugger .toolbar-panel-icon": require("devtools/client/themes/images/tool-debugger.svg"),
   "#toolbox-toolbar-inspector .toolbar-panel-icon": require("devtools/client/themes/images/tool-inspector.svg"),
   ".tree-node button.arrow": require("devtools/client/debugger/images/arrow.svg"),
   "#header .logo": require("./images/logo.svg"),
@@ -173,7 +173,9 @@ function loadImages() {
 
   for (const [selector, info] of Object.entries(gOtherImages)) {
     const { style, url, before = "", after = "" } = info;
-    sheet.insertRule(`${selector} { ${style}: ${before} url(${url.default}) ${after} }`);
+    sheet.insertRule(
+      `${selector} { ${style}: ${before} url(${url.default}) ${after} }`
+    );
   }
 }
 

@@ -65,14 +65,14 @@ function sendMessage(method, params, sessionId, pauseId) {
   return promise;
 }
 
-const doSend = makeInfallible(msg => {
+const doSend = makeInfallible((msg) => {
   //console.log("SendMessage", msg);
   socket.send(JSON.stringify(msg));
 });
 
 function onSocketOpen() {
   console.log("Socket Open");
-  gPendingMessages.forEach(msg => doSend(msg));
+  gPendingMessages.forEach((msg) => doSend(msg));
   gPendingMessages.length = 0;
   gSocketOpen = true;
 }
@@ -120,6 +120,7 @@ function onSocketError() {
 }
 
 function log(text) {
+  return;
   console.log(text);
 }
 

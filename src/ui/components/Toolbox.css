@@ -57,32 +57,32 @@
   margin-right: 5px;
 }
 
-#toolbox-toolbar-webconsole .toolbar-panel-icon,
-#toolbox-toolbar-jsdebugger .toolbar-panel-icon,
+#toolbox-toolbar-console .toolbar-panel-icon,
+#toolbox-toolbar-debugger .toolbar-panel-icon,
 #toolbox-toolbar-inspector .toolbar-panel-icon {
   background: var(--theme-toolbar-color);
 }
 
-#toolbox.jsdebugger #toolbox-content-inspector,
-#toolbox.webconsole #toolbox-content-jsdebugger,
-#toolbox.webconsole #toolbox-content-inspector,
-#toolbox.inspector #toolbox-content-jsdebugger {
+#toolbox.debugger #toolbox-content-inspector,
+#toolbox.console #toolbox-content-debugger,
+#toolbox.console #toolbox-content-inspector,
+#toolbox.inspector #toolbox-content-debugger {
   display: none;
 }
 
-#toolbox.jsdebugger #toolbox-toolbar-jsdebugger,
-#toolbox.webconsole #toolbox-toolbar-webconsole,
+#toolbox.debugger #toolbox-toolbar-debugger,
+#toolbox.console #toolbox-toolbar-console,
 #toolbox.inspector #toolbox-toolbar-inspector {
   color: var(--theme-toolbar-selected-color);
 }
 
-#toolbox.jsdebugger #toolbox-toolbar-jsdebugger .toolbar-panel-icon,
-#toolbox.webconsole #toolbox-toolbar-webconsole .toolbar-panel-icon,
+#toolbox.debugger #toolbox-toolbar-debugger .toolbar-panel-icon,
+#toolbox.console #toolbox-toolbar-console .toolbar-panel-icon,
 #toolbox.inspector #toolbox-toolbar-inspector .toolbar-panel-icon {
   background: var(--theme-toolbar-selected-color);
 }
 
-#toolbox.jsdebugger .toolbox-deck,
+#toolbox.debugger .toolbox-deck,
 #toolbox.inspector .toolbox-deck {
   display: flex;
   height: 50%;

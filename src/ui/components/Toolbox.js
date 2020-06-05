@@ -32,12 +32,88 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const React = require("react");
 const ReactDOM = require("react-dom");
+window.loader = {
+  lazyRequireGetter() {},
+  lazyGetter() {},
+};
+
+const { EventEmitter } = require("protocol/utils");
+
+const { DebuggerPanel } = require("devtools/client/debugger/panel");
+const { WebConsolePanel } = require("devtools/client/webconsole/panel");
+const { InspectorPanel } = require("devtools/client/inspector/panel");
+const Selection = require("devtools/client/framework/selection");
+const { log } = require("protocol/socket");
+
+const Timeline = require("./Timeline");
+const { ThreadFront } = require("protocol/thread");
 
 import "./Toolbox.css";
 
 export default class Toolbox extends React.Component {
-  componentDidMount() {
+  panels = {};
+  state = { currentTool: "debugger" };
+
+  parserService = {
+    hasSyntaxError: (text) => false,
+  };
+
+  threadFront = ThreadFront;
+  selection = new Selection();
+  nodePicker = {};
+
+  constructor(props) {
+    super(props);
+    EventEmitter.decorate(this);
+    EventEmitter.decorate(this.nodePicker);
+    window.gToolbox = this;
+  }
+
+  async componentDidMount() {
+    this.panels["debugger"] = new DebuggerPanel(this);
+    this.panels["console"] = new WebConsolePanel(this);
+    this.panels["inspector"] = new InspectorPanel(this);
+
     this.props.initialize();
+
+    await this.getPanel("debugger").open();
+    await this.getPanel("console").open();
+    await this.getPanel("inspector").open();
+
+    ReactDOM.render(
+      React.createElement(Timeline, {
+        toolbox: this,
+      }),
+      document.getElementById("toolbox-timeline")
+    );
+  }
+
+  selectTool(tool) {
+    if (tool == this.state.currentTool) {
+      return;
+    }
+
+    log(`Toolbox SelectTool ${tool}`);
+    this.setState({ currentTool: tool });
+
+    // this.emit("select", tool);
+  }
+
+  async viewSourceInDebugger(url, line, column, id) {
+    const dbg = this.getPanel("debugger");
+    const source = id ? dbg.getSourceByActorId(id) : dbg.getSourceByURL(url);
+    if (source) {
+      this.selectTool("debugger");
+      dbg.selectSource(source.id, line, column);
+    }
+  }
+
+  getPanel(name) {
+    return this.panels[name];
+  }
+
+  getHighlighter() {
+    return {};
   }
 
   renderInspector() {
@@ -252,20 +328,33 @@ export default class Toolbox extends React.Component {
   }
 
   render() {
+    const { currentTool } = this.state;
     return (
-      <div id="toolbox">
+      <div id="toolbox" className={`${currentTool}`}>
         <div id="toolbox-border"></div>
         <div id="toolbox-timeline"></div>
         <div id="toolbox-toolbar">
-          <div className="toolbar-panel-button" id="toolbox-toolbar-inspector">
+          <div
+            className="toolbar-panel-button"
+            id="toolbox-toolbar-inspector"
+            onClick={() => this.selectTool("inspector")}
+          >
             <div className="toolbar-panel-icon"></div>
             Inspector
           </div>
-          <div className="toolbar-panel-button" id="toolbox-toolbar-jsdebugger">
+          <div
+            className="toolbar-panel-button"
+            id="toolbox-toolbar-debugger"
+            onClick={() => this.selectTool("debugger")}
+          >
             <div className="toolbar-panel-icon"></div>
             Debugger
           </div>
-          <div className="toolbar-panel-button" id="toolbox-toolbar-webconsole">
+          <div
+            className="toolbar-panel-button"
+            id="toolbox-toolbar-console"
+            onClick={() => this.selectTool("console")}
+          >
             <div className="toolbar-panel-icon"></div>
             Console
           </div>
@@ -274,7 +363,7 @@ export default class Toolbox extends React.Component {
           <div class="toolbox-deck">
             <div
               className="toolbar-panel-content"
-              id="toolbox-content-jsdebugger"
+              id="toolbox-content-debugger"
             ></div>
             <div
               className="toolbar-panel-content theme-body"
@@ -286,7 +375,7 @@ export default class Toolbox extends React.Component {
           <div className="toolbox-splitter"></div>
           <div
             className="toolbar-panel-content"
-            id="toolbox-content-webconsole"
+            id="toolbox-content-console"
           ></div>
         </div>
       </div>

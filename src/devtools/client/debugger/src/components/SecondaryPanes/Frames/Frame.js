@@ -76,7 +76,7 @@ type FrameComponentProps = {
   displayFullUrl: boolean,
   getFrameTitle?: string => string,
   disableContextMenu: boolean,
-  panel: "debugger" | "webconsole",
+  panel: "debugger" | "console",
 };
 
 export default class FrameComponent extends Component<FrameComponentProps> {
@@ -87,7 +87,7 @@ export default class FrameComponent extends Component<FrameComponentProps> {
   };
 
   get isSelectable() {
-    return this.props.panel == "webconsole";
+    return this.props.panel == "console";
   }
 
   get isDebugger() {
