@@ -35,6 +35,8 @@
   height: 100%;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .toolbar-panel-button {
@@ -92,4 +94,9 @@
 .toolbox-splitter {
   height: 2px;
   background: var(--theme-toolbar-background);
+}
+
+.toolbar-panel-content {
+  display: flex;
+  overflow: hidden;
 }

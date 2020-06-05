@@ -324,8 +324,6 @@ class WebReplayPlayer extends Component {
   }
 
   scrollToMessage(message) {
-    // This will be safe to fix when we correct console scrolling
-    return;
     if (!message) {
       return;
     }
