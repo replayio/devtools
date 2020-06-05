@@ -2,26 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const { defer, assert } = require("protocol/utils");
-
-/*
-loader.lazyRequireGetter(
-  this,
-  "openContentLink",
-  "devtools/client/shared/link",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "features",
-  "devtools/client/debugger/src/utils/prefs",
-  true
-);
-*/
-
+import { LocalizationHelper } from "devtools/shared/l10n";
+import { defer, assert } from "protocol/utils";
 const DBG_STRINGS_URI = "devtools/client/locales/debugger.properties";
 const L10N = new LocalizationHelper(DBG_STRINGS_URI);
+
+import { bootstrapApp } from "devtools/client/debugger/src/utils/bootstrap";
 
 function registerStoreObserver(store, subscriber) {
   let oldState = store.getState();
@@ -30,15 +16,6 @@ function registerStoreObserver(store, subscriber) {
     subscriber(state, oldState);
     oldState = state;
   });
-}
-
-function DebuggerPanel(toolbox) {
-  this.panelWin = window;
-  this.panelWin.L10N = L10N;
-  this.panelWin.Debugger = require("./src/main").default;
-
-  this.toolbox = toolbox;
-  this.readyWaiter = defer();
 }
 
 async function getNodeFront(gripOrFront, toolbox) {
@@ -51,8 +28,17 @@ async function getNodeFront(gripOrFront, toolbox) {
   return inspectorFront.getNodeFrontFromNodeGrip(gripOrFront);
 }
 
-DebuggerPanel.prototype = {
-  open: async function () {
+export class DebuggerPanel {
+  constructor(toolbox) {
+    this.panelWin = window;
+    this.panelWin.L10N = L10N;
+    this.panelWin.Debugger = require("./src/main").default;
+
+    this.toolbox = toolbox;
+    this.readyWaiter = defer();
+  }
+
+  async open() {
     const {
       actions,
       store,
@@ -76,7 +62,7 @@ DebuggerPanel.prototype = {
     registerStoreObserver(this._store, this._onDebuggerStateChange.bind(this));
 
     return this;
-  },
+  }
 
   _onDebuggerStateChange(state, oldState) {
     const { getCurrentThread } = this._selectors;
@@ -84,7 +70,11 @@ DebuggerPanel.prototype = {
     if (getCurrentThread(state) !== getCurrentThread(oldState)) {
       this.toolbox.selectThread(getCurrentThread(state));
     }
-  },
+  }
+
+  renderApp() {
+    return bootstrapApp(this._store);
+  }
 
   getVarsForTests() {
     assert(this.isReady);
@@ -94,30 +84,30 @@ DebuggerPanel.prototype = {
       actions: this._actions,
       client: this._client,
     };
-  },
+  }
 
-  _getState: function () {
+  _getState() {
     return this._store.getState();
-  },
+  }
 
-  getToolboxStore: function () {
+  getToolboxStore() {
     return this.toolbox.store;
-  },
+  }
 
-  openLink: function (url) {
+  openLink(url) {
     openContentLink(url);
-  },
+  }
 
-  openConsoleAndEvaluate: async function (input) {
+  async openConsoleAndEvaluate(input) {
     const { hud } = await this.toolbox.selectTool("console");
     hud.ui.wrapper.dispatchEvaluateExpression(input);
-  },
+  }
 
-  openInspector: async function () {
+  async openInspector() {
     this.toolbox.selectTool("inspector");
-  },
+  }
 
-  openElementInInspector: async function (gripOrFront) {
+  async openElementInInspector(gripOrFront) {
     const onSelectInspector = this.toolbox.selectTool("inspector");
     const onGripNodeToFront = getNodeFront(gripOrFront, this.toolbox);
 
@@ -132,9 +122,9 @@ DebuggerPanel.prototype = {
     });
 
     return Promise.all([onNodeFrontSet, onInspectorUpdated]);
-  },
+  }
 
-  highlightDomElement: async function (gripOrFront) {
+  async highlightDomElement(gripOrFront) {
     if (!this._highlight) {
       const { highlight, unhighlight } = this.toolbox.getHighlighter();
       this._highlight = highlight;
@@ -142,18 +132,18 @@ DebuggerPanel.prototype = {
     }
 
     return this._highlight(gripOrFront);
-  },
+  }
 
-  unHighlightDomElement: function () {
+  unHighlightDomElement() {
     if (!this._unhighlight) {
       return;
     }
 
     const forceUnHighlightInTest = true;
     return this._unhighlight(forceUnHighlightInTest);
-  },
+  }
 
-  getFrames: function () {
+  getFrames() {
     const thread = this._selectors.getCurrentThread(this._getState());
     const frames = this._selectors.getFrames(this._getState(), thread);
 
@@ -176,22 +166,22 @@ DebuggerPanel.prototype = {
     });
 
     return { frames, selected };
-  },
+  }
 
   isPaused() {
     const thread = this._selectors.getCurrentThread(this._getState());
     return this._selectors.getIsPaused(this._getState(), thread);
-  },
+  }
 
   interrupt() {
     const cx = this._selectors.getThreadContext(this._getState());
     this._actions.breakOnNext(cx);
-  },
+  }
 
   selectSourceURL(url, line, column) {
     const cx = this._selectors.getContext(this._getState());
     return this._actions.selectSourceURL(cx, url, { line, column });
-  },
+  }
 
   async selectWorker(workerTargetFront) {
     const threadId = workerTargetFront.threadFront.actorID;
@@ -218,15 +208,15 @@ DebuggerPanel.prototype = {
     // select worker's source
     const source = this.getSourceByURL(workerTargetFront._url);
     await this.selectSource(source.id, 1, 1);
-  },
+  }
 
   previewPausedLocation(location) {
     return this._actions.previewPausedLocation(location);
-  },
+  }
 
   clearPreviewPausedLocation() {
     return this._actions.clearPreviewPausedLocation();
-  },
+  }
 
   async selectSource(sourceId, line, column) {
     const cx = this._selectors.getContext(this._getState());
@@ -236,24 +226,22 @@ DebuggerPanel.prototype = {
     if (this._selectors.hasLogpoint(this._getState(), location)) {
       this._actions.openConditionalPanel(location, true);
     }
-  },
+  }
 
   canLoadSource(sourceId) {
     return this._selectors.canLoadSource(this._getState(), sourceId);
-  },
+  }
 
   getSourceByActorId(sourceId) {
     return this._selectors.getSourceByActorId(this._getState(), sourceId);
-  },
+  }
 
   getSourceByURL(sourceURL) {
     return this._selectors.getSourceByURL(this._getState(), sourceURL);
-  },
+  }
 
-  destroy: function () {
+  destroy() {
     this.panelWin.Debugger.destroy();
     this.emit("destroyed");
-  },
-};
-
-exports.DebuggerPanel = DebuggerPanel;
+  }
+}

@@ -1,11 +1,17 @@
 <html class="theme-light">
-<meta charset="utf-8" />
+  <meta charset="utf-8" />
 
-<body>
+  <body></body>
 
-</body>
-
-<script async src="src/devtools/client/shared/sourceeditor/codemirror/codemirror.bundle.js"></script>
-<script async src="dist/main.js"></script>
-
+  <script>
+    window.loader = {
+      lazyRequireGetter() {},
+      lazyGetter() {},
+    };
+  </script>
+  <script
+    async
+    src="src/devtools/client/shared/sourceeditor/codemirror/codemirror.bundle.js"
+  ></script>
+  <script async src="dist/main.js"></script>
 </html>

@@ -99,15 +99,11 @@ export function teardownWorkers() {
   search.stop();
 }
 
-export function bootstrapApp(store: any, panel: Panel) {
-  const root = document.getElementById("toolbox-content-debugger");
-  ReactDOM.render(
-    React.createElement(
-      Provider,
-      { store },
-      React.createElement(App)
-    ),
-    root
+export function bootstrapApp(store: any) {
+  return (
+    <Provider store={store}>
+      <App />
+    </Provider>
   );
 }
 
