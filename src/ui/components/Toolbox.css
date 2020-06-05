@@ -34,6 +34,7 @@
 #toolbox-contents {
   height: 100%;
   position: relative;
+  overflow: hidden;
 }
 
 .toolbar-panel-button {
@@ -82,8 +83,8 @@
   background: var(--theme-toolbar-selected-color);
 }
 
-#toolbox.debugger .toolbox-deck,
-#toolbox.inspector .toolbox-deck {
+#toolbox.debugger .toolbox-top-panels,
+#toolbox.inspector .toolbox-top-panels {
   display: flex;
   height: 50%;
 }

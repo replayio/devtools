@@ -98,7 +98,7 @@ function getProgress(executionPoint) {
 function getClosestMessage(messages, executionPoint) {
   const progress = getProgress(executionPoint);
 
-  return sortBy(messages, (message) =>
+  return sortBy(messages, message =>
     Math.abs(progress - getMessageProgress(message))
   )[0];
 }
@@ -167,9 +167,11 @@ class WebReplayPlayer extends Component {
       this.onUnprocessedRegions.bind(this)
     );
 
-    const consoleFrame = this.console.hud.ui;
-    consoleFrame.on("message-hover", this.onConsoleMessageHover.bind(this));
-    consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate.bind(this));
+    this.console.on("ready", () => {
+      const consoleFrame = this.console.hud.ui;
+      consoleFrame.on("message-hover", this.onConsoleMessageHover);
+      consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate);
+    });
 
     this.threadFront.on("paused", this.onPaused.bind(this));
     this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
@@ -259,10 +261,8 @@ class WebReplayPlayer extends Component {
       let pausedMessage;
       if (executionPoint) {
         pausedMessage = this.state.messages
-          .filter((message) => message.executionPoint)
-          .find((message) =>
-            pointEquals(message.executionPoint, executionPoint)
-          );
+          .filter(message => message.executionPoint)
+          .find(message => pointEquals(message.executionPoint, executionPoint));
       } else {
         executionPoint = this.state.executionPoint;
       }
@@ -284,25 +284,23 @@ class WebReplayPlayer extends Component {
     this.setState({ unprocessedRegions: regions });
   }
 
-  onConsoleUpdate(consoleState) {
+  onConsoleUpdate = consoleState => {
     const {
       messages: { visibleMessages, messagesById },
     } = consoleState;
 
     if (visibleMessages != this.state.visibleMessages) {
       let messages = visibleMessages
-        .map((id) => messagesById.get(id))
-        .filter(
-          (message) => message.source == "console-api" || isError(message)
-        );
+        .map(id => messagesById.get(id))
+        .filter(message => message.source == "console-api" || isError(message));
 
-      messages = sortBy(messages, (message) => getMessageProgress(message));
+      messages = sortBy(messages, message => getMessageProgress(message));
 
       this.setState({ messages, visibleMessages, shouldAnimate: false });
     }
-  }
+  };
 
-  onConsoleMessageHover(type, message) {
+  onConsoleMessageHover = (type, message) => {
     if (type == "mouseleave") {
       return this.setState({ highlightedMessage: null });
     }
@@ -312,7 +310,7 @@ class WebReplayPlayer extends Component {
     }
 
     return null;
-  }
+  };
 
   setTimelineBoundary({ time, which }) {
     this.setState({ [which]: time });
@@ -326,6 +324,8 @@ class WebReplayPlayer extends Component {
   }
 
   scrollToMessage(message) {
+    // This will be safe to fix when we correct console scrolling
+    return;
     if (!message) {
       return;
     }
@@ -716,7 +716,7 @@ class WebReplayPlayer extends Component {
         zIndex: `${index + 100}`,
       },
       title: getFormatStr("jumpMessage2", frameLocation),
-      onClick: (e) => {
+      onClick: e => {
         e.preventDefault();
         e.stopPropagation();
         this.seek(message.executionPoint);
