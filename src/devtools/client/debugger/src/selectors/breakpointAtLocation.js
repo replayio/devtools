@@ -60,8 +60,8 @@ function findClosestBreakpoint(breakpoints, column) {
 
   const firstBreakpoint = breakpoints[0];
   return breakpoints.reduce((closestBp, currentBp) => {
-    const currentColumn = currentBp.generatedLocation.column;
-    const closestColumn = closestBp.generatedLocation.column;
+    const currentColumn = currentBp.location.column;
+    const closestColumn = closestBp.location.column;
     // check that breakpoint has a column.
     if (column && currentColumn && closestColumn) {
       const currentDistance = Math.abs(currentColumn - column);
