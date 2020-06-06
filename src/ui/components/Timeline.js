@@ -37,6 +37,8 @@ const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
 
 const { div } = dom;
 
+import "./Timeline.css";
+
 const markerWidth = 7;
 const imgDir = "devtools/skin/images";
 
@@ -126,7 +128,7 @@ function getMessageLocation(message) {
 let gCurrentScreenShot;
 let gCurrentMouse;
 
-class WebReplayPlayer extends Component {
+export default class Timeline extends Component {
   static get propTypes() {
     return {
       toolbox: PropTypes.object,
@@ -896,5 +898,3 @@ class WebReplayPlayer extends Component {
     );
   }
 }
-
-module.exports = WebReplayPlayer;

@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Each logpoint has an associated log group ID, used to manipulate all the
 // messages associated with the logpoint atomically.
 
-const { addEventListener, sendMessage } = require("./socket");
+const { addEventListener, sendMessage, log } = require("./socket");
 const { assert } = require("./utils");
 const { ThreadFront, ValueFront, Pause } = require("./thread");
 
@@ -52,7 +52,7 @@ const gAnalysisLogGroupIDs = new Map();
 const LogpointHandlers = {};
 
 addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
-  console.log("AnalysisResults", results);
+  log("AnalysisResults", results);
 
   const logGroupId = gAnalysisLogGroupIDs.get(analysisId);
   if (!gLogpoints.has(logGroupId)) {
@@ -60,18 +60,27 @@ addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
   }
 
   if (LogpointHandlers.onResult) {
-    results.forEach(({ key, value: { time, pauseId, location, values, datas } }) => {
-      const pause = new Pause(ThreadFront.sessionId);
-      pause.instantiate(pauseId);
-      datas.forEach(d => pause.addData(d));
-      const valueFronts = values.map(v => new ValueFront(pause, v));
-      LogpointHandlers.onResult(logGroupId, key, time, location, pause, valueFronts);
-    });
+    results.forEach(
+      ({ key, value: { time, pauseId, location, values, datas } }) => {
+        const pause = new Pause(ThreadFront.sessionId);
+        pause.instantiate(pauseId);
+        datas.forEach(d => pause.addData(d));
+        const valueFronts = values.map(v => new ValueFront(pause, v));
+        LogpointHandlers.onResult(
+          logGroupId,
+          key,
+          time,
+          location,
+          pause,
+          valueFronts
+        );
+      }
+    );
   }
 });
 
 addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
-  console.log("AnalysisPoints", points);
+  log("AnalysisPoints", points);
 
   const logGroupId = gAnalysisLogGroupIDs.get(analysisId);
   if (!gLogpoints.has(logGroupId)) {
@@ -86,7 +95,10 @@ addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
 });
 
 async function createLogpointAnalysis(logGroupId, mapper) {
-  const waiter = sendMessage("Analysis.createAnalysis", { mapper, effectful: true });
+  const waiter = sendMessage("Analysis.createAnalysis", {
+    mapper,
+    effectful: true,
+  });
   if (gLogpoints.has(logGroupId)) {
     gLogpoints.get(logGroupId).push(waiter);
   } else {
@@ -98,7 +110,14 @@ async function createLogpointAnalysis(logGroupId, mapper) {
   return analysisId;
 }
 
-async function setLogpoint(logGroupId, scriptId, line, column, text, condition) {
+async function setLogpoint(
+  logGroupId,
+  scriptId,
+  line,
+  column,
+  text,
+  condition
+) {
   let conditionSection = "";
   if (condition) {
     // When there is a condition, don't add a message if it returns undefined
@@ -173,7 +192,14 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
   }
 }
 
-function setLogpointByURL(logGroupId, scriptUrl, line, column, text, condition) {
+function setLogpointByURL(
+  logGroupId,
+  scriptUrl,
+  line,
+  column,
+  text,
+  condition
+) {
   const scriptIds = ThreadFront.urlScripts.get(scriptUrl);
   (scriptIds || []).forEach(scriptId => {
     setLogpoint(logGroupId, scriptId, line, column, text, condition);
