@@ -5,11 +5,7 @@
 "use strict";
 
 // React & Redux
-const {
-  Component,
-  createFactory,
-  createElement,
-} = require("react");
+const { Component, createFactory, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const actions = require("devtools/client/webconsole/actions/index");
@@ -29,9 +25,7 @@ const CollapseButton = require("devtools/client/webconsole/components/Output/Col
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
 const PropTypes = require("prop-types");
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
-const {
-  pointPrecedes,
-} = require("protocol/execution-point-utils");
+const { pointPrecedes } = require("protocol/execution-point-utils");
 
 class Message extends Component {
   static get propTypes() {
@@ -52,7 +46,7 @@ class Message extends Component {
       attachment: PropTypes.any,
       stacktrace: PropTypes.any,
       messageId: PropTypes.string,
-      executionPoint: PropTypes.object,
+      executionPoint: PropTypes.string,
       executionPointTime: PropTypes.any,
       executionPointHasFrames: PropTypes.any,
       pausedExecutionPoint: PropTypes.string,
@@ -365,16 +359,16 @@ class Message extends Component {
             { className: "message-location devtools-monospace" },
             note.frame
               ? FrameView({
-                frame: note.frame,
-                onClick: serviceContainer
-                  ? serviceContainer.onViewSourceInDebugger ||
-                  serviceContainer.onViewSource
-                  : undefined,
-                showEmptyPathAsHost: true,
-                sourceMapService: serviceContainer
-                  ? serviceContainer.sourceMapService
-                  : undefined,
-              })
+                  frame: note.frame,
+                  onClick: serviceContainer
+                    ? serviceContainer.onViewSourceInDebugger ||
+                      serviceContainer.onViewSource
+                    : undefined,
+                  showEmptyPathAsHost: true,
+                  sourceMapService: serviceContainer
+                    ? serviceContainer.sourceMapService
+                    : undefined,
+                })
               : null
           )
         )
@@ -408,14 +402,14 @@ class Message extends Component {
       { className: "message-location devtools-monospace" },
       frame
         ? FrameView({
-          frame,
-          onClick: onFrameClick,
-          showEmptyPathAsHost: true,
-          sourceMapService: serviceContainer
-            ? serviceContainer.sourceMapService
-            : undefined,
-          messageSource: source,
-        })
+            frame,
+            onClick: onFrameClick,
+            showEmptyPathAsHost: true,
+            sourceMapService: serviceContainer
+              ? serviceContainer.sourceMapService
+              : undefined,
+            messageSource: source,
+          })
         : null
     );
 

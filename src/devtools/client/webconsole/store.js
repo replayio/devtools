@@ -16,8 +16,10 @@ const {
 } = require("devtools/client/shared/vendor/redux");
 
 // Prefs
-const { PREFS } = require("devtools/client/webconsole/constants");
-const { getPrefsService } = require("devtools/client/webconsole/utils/prefs");
+const {
+  prefs,
+  getPrefsService,
+} = require("devtools/client/webconsole/utils/prefs");
 
 // Reducers
 const { reducers } = require("devtools/client/webconsole/reducers/index");
@@ -47,11 +49,11 @@ function configureStore(webConsoleUI, options = {}) {
 
   const logLimit = 1000;
   //options.logLimit || Math.max(getIntPref("devtools.hud.loglimit"), 1);
-  const sidebarToggle = false; // getBoolPref(PREFS.FEATURES.SIDEBAR_TOGGLE);
-  const autocomplete = true; // getBoolPref(PREFS.FEATURES.AUTOCOMPLETE);
-  const eagerEvaluation = false; // getBoolPref(PREFS.FEATURES.EAGER_EVALUATION);
-  const groupWarnings = false; // getBoolPref(PREFS.FEATURES.GROUP_WARNINGS);
-  const historyCount = 300; // getIntPref(PREFS.UI.INPUT_HISTORY_COUNT);
+  const sidebarToggle = prefs.sidebarToggle;
+  const autocomplete = prefs.inputAutocomplete;
+  const eagerEvaluation = prefs.inputEagerEvaluation;
+  const groupWarnings = prefs.groupWarningMessages;
+  const historyCount = prefs.historyCount;
 
   const initialState = {
     prefs: PrefState({
@@ -63,27 +65,27 @@ function configureStore(webConsoleUI, options = {}) {
       groupWarnings,
     }),
     filters: FilterState({
-      error: true, //getBoolPref(PREFS.FILTER.ERROR),
-      warn: true, //getBoolPref(PREFS.FILTER.WARN),
-      info: true, //getBoolPref(PREFS.FILTER.INFO),
-      debug: true, //getBoolPref(PREFS.FILTER.DEBUG),
-      log: true, //getBoolPref(PREFS.FILTER.LOG),
-      css: false, //getBoolPref(PREFS.FILTER.CSS),
-      net: false, //getBoolPref(PREFS.FILTER.NET),
-      netxhr: false, //getBoolPref(PREFS.FILTER.NETXHR),
+      error: prefs.filterError,
+      warn: prefs.filterWarn,
+      info: prefs.filterInfo,
+      debug: prefs.filterDebug,
+      log: prefs.filterLog,
+      css: prefs.filterCss,
+      net: prefs.filterNet,
+      netxhr: prefs.filterNetxhr,
     }),
     ui: UiState({
       networkMessageActiveTabId: "headers",
-      persistLogs: getBoolPref(PREFS.UI.PERSIST),
+      persistLogs: prefs.persistLogs,
       showContentMessages:
         webConsoleUI.isBrowserConsole || webConsoleUI.isBrowserToolboxConsole
-          ? getBoolPref(PREFS.UI.CONTENT_MESSAGES)
+          ? prefs.showContentMessages
           : true,
-      editor: getBoolPref(PREFS.UI.EDITOR),
-      editorWidth: getIntPref(PREFS.UI.EDITOR_WIDTH),
-      showEditorOnboarding: getBoolPref(PREFS.UI.EDITOR_ONBOARDING),
-      timestampsVisible: getBoolPref(PREFS.UI.MESSAGE_TIMESTAMP),
-      showEvaluationSelector: getBoolPref(PREFS.UI.CONTEXT_SELECTOR),
+      editor: prefs.editor,
+      editorWidth: prefs.editorWidth,
+      showEditorOnboarding: prefs.showEditorOnboarding,
+      timestampsVisible: prefs.timestampsVisible,
+      showEvaluationSelector: prefs.showEvaluationSelector,
     }),
   };
 

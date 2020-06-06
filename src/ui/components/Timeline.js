@@ -80,7 +80,7 @@ function CommandButton({ img, className, onClick, active }) {
     dom.div({
       className: `btn ${img} ${className}`,
       style: {
-        webkitMaskImage: `url("data:image/svg+xml;base64,${base64}")`,
+        WebkitMaskImage: `url("data:image/svg+xml;base64,${base64}")`,
         maskImage: `url("data:image/svg+xml;base64,${base64}")`,
       },
     })
@@ -577,7 +577,10 @@ class WebReplayPlayer extends Component {
       this.playbackPaintFinished(time, screen, mouse);
     });
 
-    this.setState({ playback: { time, startTime, startDate }, currentTime: time });
+    this.setState({
+      playback: { time, startTime, startDate },
+      currentTime: time,
+    });
   }
 
   stopPlayback() {
