@@ -60,40 +60,40 @@
   margin-right: 5px;
 }
 
-#toolbox-toolbar-console .toolbar-panel-icon,
-#toolbox-toolbar-debugger .toolbar-panel-icon,
-#toolbox-toolbar-inspector .toolbar-panel-icon {
-  background: var(--theme-toolbar-color);
-}
-
-#toolbox.debugger #toolbox-content-inspector,
-#toolbox.console #toolbox-content-debugger,
-#toolbox.console #toolbox-content-inspector,
-#toolbox.inspector #toolbox-content-debugger {
+.toolbar-panel-content {
   display: none;
 }
 
-#toolbox.debugger #toolbox-toolbar-debugger,
-#toolbox.console #toolbox-toolbar-console,
-#toolbox.inspector #toolbox-toolbar-inspector {
+.toolbar-panel-content.active {
+  display: flex;
+  flex-grow: 1;
+}
+
+.toolbar-panel-button.active {
   color: var(--theme-toolbar-selected-color);
 }
 
-#toolbox.debugger #toolbox-toolbar-debugger .toolbar-panel-icon,
-#toolbox.console #toolbox-toolbar-console .toolbar-panel-icon,
-#toolbox.inspector #toolbox-toolbar-inspector .toolbar-panel-icon {
+.toolbar-panel-icon {
+  background: var(--theme-toolbar-color);
+}
+
+.toolbar-panel-button.active .toolbar-panel-icon {
   background: var(--theme-toolbar-selected-color);
 }
 
-#toolbox.debugger .toolbox-top-panels,
-#toolbox.inspector .toolbox-top-panels {
-  display: flex;
-  height: 50%;
+.toolbox-splitter {
+  height: 1px;
+  background: var(--theme-splitter-color);
+  flex-shrink: 0;
 }
 
-.toolbox-splitter {
-  height: 2px;
-  background: var(--theme-toolbar-background);
+.toolbox-top-panels {
+  display: flex;
+}
+
+#toolbox:not(.console) .toolbox-top-panels {
+  display: flex;
+  flex-grow: 1;
 }
 
 .toolbar-panel-content {
