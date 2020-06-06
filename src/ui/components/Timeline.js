@@ -202,9 +202,7 @@ class WebReplayPlayer extends Component {
   }
 
   onEndpoint({ point, time }) {
-    if (gCurrentScreenShot) {
-      addLastScreen(gCurrentScreenShot, point, time);
-    }
+    addLastScreen(gCurrentScreenShot, point, time);
   }
 
   get toolbox() {

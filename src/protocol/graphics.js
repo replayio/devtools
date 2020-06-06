@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const { ThreadFront } = require("./thread");
 const { sendMessage, addEventListener, log } = require("./socket");
-const { assert, binarySearch } = require("./utils");
+const { assert, binarySearch, defer } = require("./utils");
 
 // Given a sorted array of items with "time" properties, find the index of
 // the most recent item at or preceding a given time.
@@ -139,8 +139,12 @@ ThreadFront.sessionWaiter.promise.then(sessionId => {
 });
 
 function addLastScreen(screen, point, time) {
-  insertEntrySorted(gPaintPoints, { point, time, paintHash: screen.hash });
-  addScreenShot(screen);
+  let paintHash;
+  if (screen) {
+    addScreenShot(screen);
+    paintHash = screen.hash;
+  }
+  insertEntrySorted(gPaintPoints, { point, time, paintHash });
 }
 
 function closestPaintOrMouseEvent(time) {
@@ -171,38 +175,53 @@ function previousPaintEvent(time) {
 // Paint Data Management
 //////////////////////////////
 
-// Map paint hashes to the associated screenshot.
+// Map paint hashes to a promise that resolves with the associated screenshot.
 const gScreenShots = new Map();
 
 function addScreenShot(screenShot) {
-  // We shouldn't ever see the same paint hash twice.
-  if (!gScreenShots.has(screenShot.hash)) {
-    gScreenShots.set(screenShot.hash, screenShot);
+  gScreenShots.set(screenShot.hash, screenShot);
+}
+
+async function ensureScreenShotAtPoint(point, paintHash) {
+  const existing = gScreenShots.get(paintHash);
+  if (existing) {
+    return existing;
   }
+
+  const { promise, resolve } = defer();
+  gScreenShots.set(paintHash, promise);
+
+  const screen = (await sendMessage(
+    "Graphics.getPaintContents",
+    { point, mimeType: "image/jpeg" },
+    ThreadFront.sessionId
+  )).screen;
+  resolve(screen);
+  return screen;
 }
 
 // How recently a click must have occurred for it to be drawn.
 const ClickThresholdMs = 200;
 
 async function getGraphicsAtTime(time) {
-  const { point, paintHash } = mostRecentEntry(gPaintPoints, time);
+  const paintIndex = mostRecentIndex(gPaintPoints, time);
+  const { point, paintHash } = gPaintPoints[paintIndex];
 
-  if (point == "0") {
-    // There are no graphics at the beginning of the recording.
+  if (paintHash === undefined) {
+    // There are no graphics to paint here.
     clearGraphics();
     return {};
   }
 
-  let screen = gScreenShots.get(paintHash);
+  const screenPromise = ensureScreenShotAtPoint(point, paintHash);
 
-  if (!screen) {
-    screen = (await sendMessage(
-      "Graphics.getPaintContents",
-      { point, mimeType: "image/jpeg" },
-      ThreadFront.sessionId
-    )).screen;
-    addScreenShot(screen);
+  // Start loading graphics at nearby points.
+  for (let i = paintIndex; i < paintIndex + 5 && i < gPaintPoints.length; i++) {
+    const { point, paintHash } = gPaintPoints[i];
+    ensureScreenShotAtPoint(point, paintHash);
   }
+
+  const screen = await screenPromise;
 
   let mouse;
   const mouseEvent = mostRecentEntry(gMouseEvents, time);
