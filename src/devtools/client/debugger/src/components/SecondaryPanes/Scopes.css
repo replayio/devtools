@@ -29,15 +29,15 @@
   background: var(--theme-comment);
 }
 
-.object-node.default-property {
+.scopes-content .object-node.default-property {
   opacity: 0.6;
 }
 
-.object-node {
+.scopes-content .object-node {
   padding-inline-start: 20px;
 }
 
-html[dir="rtl"] .object-node {
+html[dir="rtl"] .scopes-content .object-node {
   padding-right: 4px;
 }
 
@@ -45,18 +45,18 @@ html[dir="rtl"] .object-node {
   color: var(--theme-highlight-blue);
 }
 
-.objectBox-object,
-.objectBox-string,
-.objectBox-text,
-.objectBox-table,
-.objectLink-textNode,
-.objectLink-event,
-.objectLink-eventLog,
-.objectLink-regexp,
-.objectLink-object,
-.objectLink-Date,
-.theme-dark .objectBox-object,
-.theme-light .objectBox-object {
+.scopes-content .objectBox-object,
+.scopes-content .objectBox-string,
+.scopes-content .objectBox-text,
+.scopes-content .objectBox-table,
+.scopes-content .objectLink-textNode,
+.scopes-content .objectLink-event,
+.scopes-content .objectLink-eventLog,
+.scopes-content .objectLink-regexp,
+.scopes-content .objectLink-object,
+.scopes-content .objectLink-Date,
+.theme-dark .scopes-content .objectBox-object,
+.theme-light .scopes-content .objectBox-object {
   white-space: nowrap;
 }
 

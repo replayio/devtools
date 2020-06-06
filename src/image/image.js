@@ -133,11 +133,7 @@ const gOtherImages = {
     url: require("devtools/client/themes/images/arrow.svg"),
     after: "no-repeat center",
   },
-  ".webconsole-app .tree .arrow, .webconsole-app .object-inspector .tree-node .arrow": {
-    style: "background",
-    url: require("devtools/client/themes/images/arrow.svg"),
-    after: "no-repeat center",
-  },
+
   "button.open-accessibility-inspector, button.open-inspector": {
     style: "mask",
     url: require("devtools/client/shared/components/reps/images/open-inspector.svg"),
