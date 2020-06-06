@@ -123,7 +123,10 @@ setTimeout(async () => {
     await new Promise(resolve => setTimeout(resolve, 500));
   }
 
-  ReactDOM.render(React.createElement(App, { initialize }), document.body);
+  ReactDOM.render(
+    React.createElement(App, { initialize }),
+    document.querySelector("#viewer")
+  );
 }, 0);
 
 function setupToolboxResizeEventHandlers() {

@@ -24,7 +24,7 @@ pref("console.filter.net", true);
 pref("console.filter.netxhr", true);
 
 // Persist is only used by the webconsole.
-pref("console.persistlog", true);
+pref("console.persistLogs", false);
 // Max number of entries in history list.
 pref("console.inputHistoryCount", true);
 // Is editor mode enabled.
@@ -33,6 +33,8 @@ pref("console.input.editor", false);
 pref("console.contentMessages", true);
 // Display timestamp in messages.
 pref("console.timestampMessages", true);
+
+pref("console.timestampsVisible", false);
 // Store the editor width.
 pref("console.input.editorWidth", true);
 // Show the Editor onboarding UI
@@ -56,11 +58,12 @@ export const prefs = new PrefsHelper("console", {
   filterCss: ["Bool", "filter.css"],
   filterNet: ["Bool", "filter.net"],
   filterNetxhr: ["Bool", "filter.netxhr"],
-  persistlog: ["Bool", "console.persistlog"],
+  persistLogs: ["Bool", "persistLogs"],
   inputHistoryCount: ["Bool", "inputHistoryCount"],
   editor: ["Bool", "input.editor"],
   contentMessages: ["Bool", "contentMessages"],
   timestampMessages: ["Bool", "timestampMessages"],
+  timestampsVisible: ["Bool", "timestampsVisible"],
   aeditorWidth: ["Bool", "input.editorWidth"],
   editorOnboarding: ["Bool", "input.editorOnboarding"],
   inputContext: ["Bool", "input.context"],
