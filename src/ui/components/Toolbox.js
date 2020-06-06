@@ -87,6 +87,10 @@ export default class Toolbox extends React.Component {
     shortcuts.on("Esc", this.onEscape);
   }
 
+  get currentTool() {
+    return this.state.selectedPanel;
+  }
+
   async startPanel(name) {
     if (this.panelWaiters[name]) {
       return this.panelWaiters[name];

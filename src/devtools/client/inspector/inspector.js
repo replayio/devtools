@@ -334,6 +334,7 @@ Inspector.prototype = {
     // Set the node front so that the markup and sidebar panels will have the selected
     // nodeFront ready when they're initialized.
     if (this._defaultNode) {
+      await this._defaultNode.ensureLoaded();
       this.selection.setNodeFront(this._defaultNode, {
         reason: "inspector-open",
       });
@@ -506,7 +507,7 @@ Inspector.prototype = {
       //target: this.toolbox.getChromeEventHandler(),
     });
     const key = INSPECTOR_L10N.getStr("inspector.searchHTML.key");
-    this.searchboxShortcuts.on(key, (event) => {
+    this.searchboxShortcuts.on(key, event => {
       // Prevent overriding same shortcut from the computed/rule views
       if (
         event.originalTarget.closest("#sidebar-panel-ruleview") ||
