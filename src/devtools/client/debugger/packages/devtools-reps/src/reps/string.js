@@ -3,10 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // Dependencies
-const {
-  a,
-  span,
-} = require("react-dom-factories");
+const { a, span } = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
 const {
@@ -266,9 +263,9 @@ function getLinkifiedElements({
             target: "_blank",
             onClick: openLink
               ? e => {
-                e.preventDefault();
-                openLink(useUrl, e);
-              }
+                  e.preventDefault();
+                  openLink(useUrl, e);
+                }
               : null,
           },
           linkText

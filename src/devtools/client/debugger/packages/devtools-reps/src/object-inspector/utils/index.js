@@ -15,8 +15,6 @@ const {
 import type { Node, Props } from "../types";
 
 function shouldRenderRootsInReps(roots: Array<Node>): boolean {
-  return false;
-  /*
   if (roots.length !== 1) {
     return false;
   }
@@ -27,7 +25,6 @@ function shouldRenderRootsInReps(roots: Array<Node>): boolean {
     (name === null || typeof name === "undefined") &&
     (nodeIsPrimitive(root) || nodeIsError(root))
   );
-  */
 }
 
 function renderRep(item: Node, props: Props) {

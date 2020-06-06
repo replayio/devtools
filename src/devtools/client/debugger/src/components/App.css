@@ -29,7 +29,7 @@ button:focus {
   height: 100%;
 }
 
-.debugger .tree-indent {
+#toolbox-content-debugger .tree-indent {
   width: 16px;
   margin-inline-start: 0;
   border-inline-start: 0;
