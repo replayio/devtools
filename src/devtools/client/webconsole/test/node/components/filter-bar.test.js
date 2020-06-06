@@ -32,8 +32,7 @@ const serviceContainer = require("devtools/client/webconsole/test/node/fixtures/
 function getFilterBar(overrides = {}) {
   return FilterBar({
     serviceContainer,
-    hidePersistLogsCheckbox: false,
-    attachRefToWebConsoleUI: () => { },
+    attachRefToWebConsoleUI: () => {},
     webConsoleUI: {
       document,
       wrapper: {},
@@ -63,12 +62,7 @@ describe("FilterBar component:", () => {
     expect(clearButton.attr("title")).toBe("Clear the Web Console output");
 
     // Separator
-    expect(
-      toolbar
-        .children()
-        .eq(1)
-        .attr("class")
-    ).toBe("devtools-separator");
+    expect(toolbar.children().eq(1).attr("class")).toBe("devtools-separator");
 
     // Text filter
     const textInput = toolbar.children().eq(2);

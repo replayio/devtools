@@ -7,10 +7,7 @@
 
 // A command in a menu.
 
-const {
-  createRef,
-  PureComponent,
-} = require("react");
+const { createRef, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { button, li, span } = dom;
@@ -80,21 +77,21 @@ class MenuItem extends PureComponent {
     }
 
     // Pre-fetch any backgrounds specified for the item.
-    const win = this.labelRef.current.ownerDocument.defaultView;
-    this.preloadCallback = win.requestIdleCallback(() => {
-      this.preloadCallback = null;
-      if (!this.labelRef.current) {
-        return;
-      }
+    // const win = this.labelRef.current.ownerDocument.defaultView;
+    // this.preloadCallback = win.requestIdleCallback(() => {
+    //   this.preloadCallback = null;
+    //   if (!this.labelRef.current) {
+    //     return;
+    //   }
 
-      const backgrounds = win
-        .getComputedStyle(this.labelRef.current, ":before")
-        .getCSSImageURLs("background-image");
-      for (const background of backgrounds) {
-        const image = new Image();
-        image.src = background;
-      }
-    });
+    // const backgrounds = win
+    //   .getComputedStyle(this.labelRef.current, ":before")
+    //   .getCSSImageURLs("background-image");
+    // for (const background of backgrounds) {
+    //   const image = new Image();
+    //   image.src = background;
+    // }
+    // });
   }
 
   componentWillUnmount() {

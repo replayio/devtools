@@ -51,6 +51,7 @@ const gBackgroundImages = {
   ".message > .icon.logpoint": require("devtools/client/debugger/images/webconsole-logpoint.svg"),
   //".jsterm-input-container > .CodeMirror": require("devtools/client/themes/images/webconsole/input.svg"),
   "#split-console-close-button::before": require("devtools/client/themes/images/close.svg"),
+  '.menuitem > .command[aria-checked="true"]': require("devtools/client/themes/images/check.svg"),
   ".message.network > .collapse-button::before, .message.startGroup > .indent[data-indent='0'] ~ .collapse-button::before, .message.startGroupCollapsed > .indent[data-indent='0'] ~ .collapse-button::before": require("devtools/client/themes/images/arrow-big.svg"),
   ".message:hover > .icon.rewindable": require("devtools/client/debugger/images/next-circle.svg"),
   "button.jump-definition": require("devtools/client/shared/components/reps/images/input.svg"),

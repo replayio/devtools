@@ -19,10 +19,10 @@
   --theme-arrowpanel-background: var(--theme-popup-background);
   --theme-arrowpanel-color: var(--theme-popup-color);
   --theme-arrowpanel-border-color: var(--theme-popup-border-color);
-  --theme-arrowpanel-separator: rgba(249,249,250,.1);
+  --theme-arrowpanel-separator: rgba(249, 249, 250, 0.1);
   --theme-arrowpanel-dimmed: var(--theme-popup-dimmed);
-  --theme-arrowpanel-dimmed-further: rgba(249,249,250,.15);
-  --theme-arrowpanel-disabled-color: rgba(249,249,250,.5);
+  --theme-arrowpanel-dimmed-further: rgba(249, 249, 250, 0.15);
+  --theme-arrowpanel-disabled-color: rgba(249, 249, 250, 0.5);
 }
 
 .theme-light {
@@ -42,7 +42,7 @@
   --theme-arrowpanel-border-color: var(--theme-popup-border-color);
   --theme-arrowpanel-separator: ThreeDShadow;
   --theme-arrowpanel-dimmed: var(--theme-popup-dimmed);
-  --theme-arrowpanel-dimmed-further: hsla(0,0%,80%,.45);
+  --theme-arrowpanel-dimmed-further: hsla(0, 0%, 80%, 0.45);
   --theme-arrowpanel-disabled-color: GrayText;
 }
 
@@ -54,7 +54,7 @@
 }
 
 :root[platform="mac"].theme-light {
-  --theme-arrowpanel-separator: hsla(210,4%,10%,.14);
+  --theme-arrowpanel-separator: hsla(210, 4%, 10%, 0.14);
 }
 
 strong {
@@ -102,8 +102,22 @@ strong {
 
 .devtools-tooltip-tiles {
   background-color: #eee;
-  background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc),
-    linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
+  background-image: linear-gradient(
+      45deg,
+      #ccc 25%,
+      transparent 25%,
+      transparent 75%,
+      #ccc 75%,
+      #ccc
+    ),
+    linear-gradient(
+      45deg,
+      #ccc 25%,
+      transparent 25%,
+      transparent 75%,
+      #ccc 75%,
+      #ccc
+    );
   background-size: 20px 20px;
   background-position: 0 0, 10px 10px;
 }
@@ -137,7 +151,7 @@ strong {
   flex-direction: column-reverse;
 }
 
-.tooltip-panel{
+.tooltip-panel {
   background-color: var(--theme-tooltip-background);
   pointer-events: all;
   flex-grow: 1;
@@ -248,8 +262,11 @@ strong {
   width: 21px;
   height: 21px;
   margin-left: 4px;
-  background: linear-gradient(-45deg,
-    var(--theme-tooltip-background) 50%, transparent 50%);
+  background: linear-gradient(
+    -45deg,
+    var(--theme-tooltip-background) 50%,
+    transparent 50%
+  );
   border: 0 none;
   pointer-events: all;
 }
@@ -266,7 +283,8 @@ strong {
 
 /* XUL panels have a default border, but pure HTML tooltips don't have one. */
 .tooltip-container[type="arrow"]:not(.tooltip-container-xul) > .tooltip-panel,
-.tooltip-container[type="arrow"]:not(.tooltip-container-xul) > .tooltip-arrow::before {
+.tooltip-container[type="arrow"]:not(.tooltip-container-xul)
+  > .tooltip-arrow::before {
   border: 1px solid var(--theme-arrowpanel-border-color);
 }
 
@@ -284,11 +302,13 @@ strong {
   background: var(--theme-arrowpanel-background);
   border: 1px solid var(--theme-arrowpanel-border-color);
   border-radius: var(--theme-arrowpanel-border-radius);
-  box-shadow: 0 0 4px hsla(210,4%,10%,.2);
+  box-shadow: 0 0 4px hsla(210, 4%, 10%, 0.2);
 }
 
 :root[platform="mac"] .tooltip-container[type="doorhanger"] > .tooltip-panel,
-:root[platform="mac"] .tooltip-container[type="doorhanger"] > .tooltip-arrow::before {
+:root[platform="mac"]
+  .tooltip-container[type="doorhanger"]
+  > .tooltip-arrow::before {
   box-shadow: none;
   /*
    * The above should be:
@@ -300,8 +320,12 @@ strong {
    */
 }
 
-:root[platform="mac"].theme-light .tooltip-container[type="doorhanger"] > .tooltip-panel,
-:root[platform="mac"].theme-light .tooltip-container[type="doorhanger"] > .tooltip-arrow::before {
+:root[platform="mac"].theme-light
+  .tooltip-container[type="doorhanger"]
+  > .tooltip-panel,
+:root[platform="mac"].theme-light
+  .tooltip-container[type="doorhanger"]
+  > .tooltip-arrow::before {
   border: none;
 }
 
@@ -404,7 +428,9 @@ strong {
   margin-inline-end: 15px;
 }
 
-.tooltip-container[type="doorhanger"] .menuitem > button.command:-moz-any([role="menuitem"],[role="menuitemcheckbox"],[role="link"]) {
+.tooltip-container[type="doorhanger"]
+  .menuitem
+  > button.command:-moz-any([role="menuitem"], [role="menuitemcheckbox"], [role="link"]) {
   -moz-appearance: none;
   border: none;
   color: var(--theme-arrowpanel-color);
@@ -413,30 +439,42 @@ strong {
   width: 100%;
 }
 
-.tooltip-container[type="doorhanger"] .menuitem > .command:not(:-moz-any([disabled],[open],:active)):-moz-any(:hover,:focus) {
+.tooltip-container[type="doorhanger"]
+  .menuitem
+  > .command:not(:-moz-any([disabled], [open], :active)):-moz-any(:hover, :focus) {
   background-color: var(--theme-arrowpanel-dimmed);
 }
 
-.tooltip-container[type="doorhanger"] .menuitem > .command:-moz-focusring::-moz-focus-inner {
+.tooltip-container[type="doorhanger"]
+  .menuitem
+  > .command:-moz-focusring::-moz-focus-inner {
   border-color: transparent;
 }
 
-.tooltip-container[type="doorhanger"] .menuitem > .command:not([disabled]):-moz-any([open],:hover:active) {
+.tooltip-container[type="doorhanger"]
+  .menuitem
+  > .command:not([disabled]):-moz-any([open], :hover:active) {
   background-color: var(--theme-arrowpanel-dimmed-further);
-  box-shadow: 0 1px 0 hsla(210,4%,10%,.03) inset;
+  box-shadow: 0 1px 0 hsla(210, 4%, 10%, 0.03) inset;
 }
 
-.tooltip-container[type="doorhanger"] .menuitem > .command[aria-checked="true"] {
+.tooltip-container[type="doorhanger"]
+  .menuitem
+  > .command[aria-checked="true"] {
   list-style-image: none;
   -moz-context-properties: fill;
   fill: currentColor;
-  background: url(chrome://global/skin/icons/check.svg) no-repeat transparent;
+  background-repeat: no-repeat;
   background-size: 11px 11px;
   background-position: center left 7px;
 }
 
-.tooltip-container[type="doorhanger"] .menuitem > .command[aria-checked="true"]:-moz-locale-dir(rtl),
-.tooltip-container[type="doorhanger"] .menuitem > .command[aria-checked="true"]:dir(rtl) {
+.tooltip-container[type="doorhanger"]
+  .menuitem
+  > .command[aria-checked="true"]:-moz-locale-dir(rtl),
+.tooltip-container[type="doorhanger"]
+  .menuitem
+  > .command[aria-checked="true"]:dir(rtl) {
   background-position-x: right 7px;
 }
 
@@ -446,12 +484,19 @@ strong {
   white-space: nowrap;
 }
 
-.tooltip-container[type="doorhanger"] .checkbox-container .menuitem > .command > .label {
+.tooltip-container[type="doorhanger"]
+  .checkbox-container
+  .menuitem
+  > .command
+  > .label {
   padding-inline-start: 16px;
 }
 
 .menu-button--iconic::before,
-.tooltip-container[type="doorhanger"] .menuitem > .command.iconic > .label::before {
+.tooltip-container[type="doorhanger"]
+  .menuitem
+  > .command.iconic
+  > .label::before {
   content: " ";
   display: inline-block;
   margin-inline-end: 8px;
@@ -688,7 +733,7 @@ strong {
   flex: 1;
   padding: var(--image-tooltip-image-padding);
   justify-content: center;
-  min-height: 1px
+  min-height: 1px;
 }
 
 .devtools-tooltip-image {
@@ -710,7 +755,7 @@ strong {
 
 .invoke-confirm {
   color: var(--theme-popup-color);
-  border: 1px solid rgba(0,0,0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   max-width: 212px;
 }
 
