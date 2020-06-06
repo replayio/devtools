@@ -113,7 +113,6 @@ Menu.prototype.popup = function (screenX, screenY) {
 
   // Remove the menu from the DOM once it's hidden.
   popup.addEventListener("popuphidden", e => {
-
     if (e.target === popup) {
       win.removeEventListener("unload", onWindowUnload);
       popup.remove();
@@ -130,7 +129,7 @@ Menu.prototype.popup = function (screenX, screenY) {
   if (gMenuPopup) {
     try {
       document.body.removeChild(gMenuPopup);
-    } catch (e) { }
+    } catch (e) {}
   }
   gMenuPopup = popup;
 
@@ -144,7 +143,6 @@ Menu.prototype.popup = function (screenX, screenY) {
   popup.style.left = `${left}px`;
 
   const listener = () => {
-    return
     gMenuPopup = null;
     document.body.removeChild(popup);
     document.removeEventListener("mousedown", listener);

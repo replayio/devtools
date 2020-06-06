@@ -3,10 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const {
-  createElement,
-  createFactory,
-} = require("react");
+const { createElement, createFactory } = require("react");
 const ReactDOM = require("react-dom");
 const { Provider } = require("react-redux");
 const ToolboxProvider = require("devtools/client/framework/store-provider");
@@ -33,14 +30,7 @@ const {
 const Constants = require("devtools/client/webconsole/constants");
 
 function renderApp({ app, store, toolbox, root }) {
-  return ReactDOM.render(
-    createElement(
-      Provider,
-      { store },
-      app
-    ),
-    root
-  );
+  return ReactDOM.render(createElement(Provider, { store }, app), root);
 }
 
 let store = null;
@@ -103,7 +93,7 @@ class WebConsoleWrapper {
         serviceContainer,
         webConsoleUI,
         onFirstMeaningfulPaint: resolve,
-        closeSplitConsole: this.closeSplitConsole.bind(this),
+        closeSplitConsole: this.closeSplitConsole,
         hidePersistLogsCheckbox:
           webConsoleUI.isBrowserConsole || webConsoleUI.isBrowserToolboxConsole,
         hideShowContentMessagesCheckbox:
@@ -375,9 +365,9 @@ class WebConsoleWrapper {
   }
 
   // Called by pushing close button.
-  closeSplitConsole() {
-    this.toolbox.closeSplitConsole();
-  }
+  closeSplitConsole = () => {
+    this.toolbox.toggleSplitConsole(false);
+  };
 }
 
 // Exports from this module

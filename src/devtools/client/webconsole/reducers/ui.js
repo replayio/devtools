@@ -31,7 +31,7 @@ const UiState = overrides =>
         sidebarVisible: false,
         timestampsVisible: true,
         frontInSidebar: null,
-        closeButtonVisible: false,
+        closeButtonVisible: true,
         reverseSearchInputVisible: false,
         reverseSearchInitialValue: "",
         editor: false,
