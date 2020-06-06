@@ -58,7 +58,8 @@ export default class Toolbox extends React.Component {
   threadFront = ThreadFront;
   selection = new Selection();
   nodePicker = {};
-  ensureMounted = defer();
+
+  panelWaiters = {};
 
   constructor(props) {
     super(props);
@@ -74,10 +75,16 @@ export default class Toolbox extends React.Component {
     this.startPanel("console");
 
     this.selectTool("debugger");
-    this.ensureMounted.resolve();
   }
 
   async startPanel(name) {
+    if (this.panelWaiters[name]) {
+      return this.panelWaiters[name];
+    }
+
+    const { promise, resolve } = defer();
+    this.panelWaiters[name] = promise;
+
     const panels = {
       debugger: DebuggerPanel,
       console: WebConsolePanel,
@@ -88,6 +95,7 @@ export default class Toolbox extends React.Component {
     await panel.open();
 
     this.setState({ panels: { ...this.state.panels, [name]: panel } });
+    resolve();
   }
 
   async selectTool(panel) {

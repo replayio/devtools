@@ -126,7 +126,7 @@ function log(text) {
 
 // For debugging.
 window.getOutstandingProtocolMessages = () => {
-  return [...gMessageWaiters.values()].map(({ method }) => method);
+  return [...gMessageWaiters.entries()].map(([id, { method }]) => ({ id, method }));
 };
 
 module.exports = {
