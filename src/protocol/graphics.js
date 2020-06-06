@@ -225,6 +225,10 @@ async function getGraphicsAtTime(time) {
 // Image to draw, if any.
 let gDrawImage;
 
+// Last image we were drawing, if any. This continues to be painted until the
+// current image loads.
+let gLastImage;
+
 // Mouse information to draw.
 let gDrawMouse;
 
@@ -238,6 +242,9 @@ function paintGraphics(screenShot, mouse) {
   }
   assert(screenShot.data);
   addScreenShot(screenShot);
+  if (gDrawImage && gDrawImage.width && gDrawImage.height) {
+    gLastImage = gDrawImage;
+  }
   gDrawImage = new Image();
   gDrawImage.onload = refreshGraphics;
   gDrawImage.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
@@ -247,6 +254,7 @@ function paintGraphics(screenShot, mouse) {
 
 function clearGraphics() {
   gDrawImage = null;
+  gLastImage = null;
   gDrawMouse = null;
   gDrawMessage = null;
   refreshGraphics();
@@ -303,11 +311,16 @@ function refreshGraphics() {
   }
 
   if (gDrawImage) {
+    let image = gDrawImage;
+    if ((!image.width || !image.height) && gLastImage) {
+      // The current image hasn't loaded yet.
+      image = gLastImage;
+    }
 
-    const offsetLeft = Math.max((canvas.width - gDrawImage.width) / 2, 0);
-    const offsetTop = Math.max((canvas.height - gDrawImage.height) / 2, 0);
+    const offsetLeft = Math.max((canvas.width - image.width) / 2, 0);
+    const offsetTop = Math.max((canvas.height - image.height) / 2, 0);
 
-    cx.drawImage(gDrawImage, offsetLeft, offsetTop);
+    cx.drawImage(image, offsetLeft, offsetTop);
 
     // Make sure highlighters are rendered with the same offsets.
     const highlighterContainer = document.querySelector(".highlighter-container");

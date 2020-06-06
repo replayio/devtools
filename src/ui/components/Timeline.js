@@ -158,6 +158,8 @@ class WebReplayPlayer extends Component {
     this.onPlayerMouseLeave = this.onPlayerMouseLeave.bind(this);
     this.onPlayerMouseDown = this.onPlayerMouseDown.bind(this);
     this.onPlayerMouseUp = this.onPlayerMouseUp.bind(this);
+
+    gToolbox.timeline = this;
   }
 
   async componentDidMount() {
@@ -536,14 +538,25 @@ class WebReplayPlayer extends Component {
 
   playbackPaintFinished(time, screen, mouse) {
     if (this.state.playback && time == this.state.playback.time) {
+      const { startTime, startDate } = this.state.playback;
       paintGraphics(screen, mouse);
       const next = this.nextPlaybackTime(time);
       if (next) {
         log(`WebReplayPlayer PlaybackNext`);
+
+        // For now we play back at 1x (or slower, while screens load).
+        const paintTime = startDate + next - startTime;
+
         getGraphicsAtTime(next).then(({ screen, mouse }) => {
-          this.playbackPaintFinished(next, screen, mouse);
+          const now = Date.now();
+          setTimeout(() => {
+            this.playbackPaintFinished(next, screen, mouse);
+          }, Math.max(0, paintTime - now));
         });
-        this.setState({ playback: { time: next }, currentTime: next });
+        this.setState({
+          playback: { time: next, startTime, startDate },
+          currentTime: next,
+        });
       } else {
         log(`WebReplayPlayer StopPlayback`);
         this.seekTime(time);
@@ -555,6 +568,9 @@ class WebReplayPlayer extends Component {
   startPlayback() {
     log(`WebReplayPlayer StartPlayback`);
 
+    const startTime = this.state.currentTime;
+    const startDate = Date.now();
+
     let time = this.nextPlaybackTime(this.state.currentTime);
     if (!time) {
       time = this.state.zoomStartTime;
@@ -563,7 +579,7 @@ class WebReplayPlayer extends Component {
       this.playbackPaintFinished(time, screen, mouse);
     });
 
-    this.setState({ playback: { time }, currentTime: time });
+    this.setState({ playback: { time, startTime, startDate }, currentTime: time });
   }
 
   stopPlayback() {
