@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // performed on the state at different points in the recording. This layer
 // helps with adapting the devtools to the WRP.
 
-const { sendMessage, addEventListener } = require("./socket");
+const { sendMessage, addEventListener, log } = require("./socket");
 const {
   defer,
   assert,
@@ -1060,7 +1060,7 @@ const ThreadFront = {
     this.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
 
-    console.log(`GotSessionId ${sessionId}`);
+    log(`GotSessionId ${sessionId}`);
 
     const { endpoint } = await sendMessage(
       "Session.getEndpoint",
@@ -1092,7 +1092,7 @@ const ThreadFront = {
   },
 
   timeWarp(point, time, hasFrames) {
-    console.log(`TimeWarp ${point}`);
+    log(`TimeWarp ${point}`);
     this.currentPoint = point;
     this.currentPointHasFrames = hasFrames;
     this.currentPause = null;

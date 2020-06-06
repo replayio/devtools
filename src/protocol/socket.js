@@ -65,14 +65,14 @@ function sendMessage(method, params, sessionId, pauseId) {
   return promise;
 }
 
-const doSend = makeInfallible((msg) => {
+const doSend = makeInfallible(msg => {
   //console.log("SendMessage", msg);
   socket.send(JSON.stringify(msg));
 });
 
 function onSocketOpen() {
   console.log("Socket Open");
-  gPendingMessages.forEach((msg) => doSend(msg));
+  gPendingMessages.forEach(msg => doSend(msg));
   gPendingMessages.length = 0;
   gSocketOpen = true;
 }
@@ -112,11 +112,11 @@ function onSocketMessage(evt) {
 }
 
 function onSocketClose() {
-  console.log("Socket Closed");
+  log("Socket Closed");
 }
 
 function onSocketError() {
-  console.log("Socket Error");
+  log("Socket Error");
 }
 
 function log(text) {
@@ -126,7 +126,10 @@ function log(text) {
 
 // For debugging.
 window.getOutstandingProtocolMessages = () => {
-  return [...gMessageWaiters.entries()].map(([id, { method }]) => ({ id, method }));
+  return [...gMessageWaiters.entries()].map(([id, { method }]) => ({
+    id,
+    method,
+  }));
 };
 
 module.exports = {

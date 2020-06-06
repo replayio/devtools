@@ -94,11 +94,6 @@ class WebConsoleWrapper {
         webConsoleUI,
         onFirstMeaningfulPaint: resolve,
         closeSplitConsole: this.closeSplitConsole,
-        hidePersistLogsCheckbox:
-          webConsoleUI.isBrowserConsole || webConsoleUI.isBrowserToolboxConsole,
-        hideShowContentMessagesCheckbox:
-          !webConsoleUI.isBrowserConsole &&
-          !webConsoleUI.isBrowserToolboxConsole,
       });
 
       // Render the root Application component.

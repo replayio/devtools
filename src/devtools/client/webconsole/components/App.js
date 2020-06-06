@@ -4,10 +4,7 @@
 "use strict";
 
 const Services = require("Services");
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const {
@@ -91,8 +88,6 @@ class App extends Component {
       reverseSearchInitialValue: PropTypes.string,
       editorMode: PropTypes.bool,
       editorWidth: PropTypes.number,
-      hidePersistLogsCheckbox: PropTypes.bool,
-      hideShowContentMessagesCheckbox: PropTypes.bool,
       sidebarVisible: PropTypes.bool.isRequired,
       eagerEvaluationEnabled: PropTypes.bool.isRequired,
       filterBarDisplayMode: PropTypes.oneOf([
@@ -218,7 +213,7 @@ class App extends Component {
     const input = event.target;
 
     // Cleanup function if notification is closed by the user.
-    const removeCallback = (eventType) => {
+    const removeCallback = eventType => {
       if (eventType == "removed") {
         input.removeEventListener("keyup", pasteKeyUpHandler);
         dispatch(actions.removeNotification("selfxss-notification"));
@@ -238,7 +233,7 @@ class App extends Component {
     );
 
     // Remove notification automatically when the user types "allow pasting".
-    const pasteKeyUpHandler = (e) => {
+    const pasteKeyUpHandler = e => {
       const value = e.target.value;
       if (value.includes(SELF_XSS_OK)) {
         dispatch(actions.removeNotification("selfxss-notification"));
@@ -254,15 +249,11 @@ class App extends Component {
     const {
       closeSplitConsole,
       filterBarDisplayMode,
-      hidePersistLogsCheckbox,
-      hideShowContentMessagesCheckbox,
       webConsoleUI,
     } = this.props;
 
     return FilterBar({
       key: "filterbar",
-      hidePersistLogsCheckbox,
-      hideShowContentMessagesCheckbox,
       closeSplitConsole,
       displayMode: filterBarDisplayMode,
       webConsoleUI,
@@ -281,14 +272,14 @@ class App extends Component {
 
     return editorMode
       ? EditorToolbar({
-        key: "editor-toolbar",
-        editorMode,
-        dispatch,
-        reverseSearchInputVisible,
-        serviceContainer,
-        showEvaluationSelector,
-        webConsoleUI,
-      })
+          key: "editor-toolbar",
+          editorMode,
+          dispatch,
+          reverseSearchInputVisible,
+          serviceContainer,
+          showEvaluationSelector,
+          webConsoleUI,
+        })
       : null;
   }
 
@@ -346,10 +337,10 @@ class App extends Component {
     const { serviceContainer, sidebarVisible } = this.props;
     return sidebarVisible
       ? SideBar({
-        key: "sidebar",
-        serviceContainer,
-        visible: sidebarVisible,
-      })
+          key: "sidebar",
+          serviceContainer,
+          visible: sidebarVisible,
+        })
       : null;
   }
 
@@ -358,13 +349,13 @@ class App extends Component {
 
     return notifications && notifications.size > 0
       ? NotificationBox({
-        id: "webconsole-notificationbox",
-        key: "notification-box",
-        displayBorderTop: !editorMode,
-        displayBorderBottom: editorMode,
-        wrapping: true,
-        notifications,
-      })
+          id: "webconsole-notificationbox",
+          key: "notification-box",
+          displayBorderTop: !editorMode,
+          displayBorderBottom: editorMode,
+          wrapping: true,
+          notifications,
+        })
       : null;
   }
 
@@ -401,7 +392,7 @@ class App extends Component {
         className: classNames.join(" "),
         onKeyDown: this.onKeyDown,
         onClick: this.onClick,
-        ref: (node) => {
+        ref: node => {
           this.node = node;
         },
       },
@@ -433,13 +424,13 @@ class App extends Component {
       ),
       editorMode
         ? GridElementWidthResizer({
-          key: "editor-resizer",
-          enabled: editorMode,
-          position: "end",
-          className: "editor-resizer",
-          getControlledElementNode: () => webConsoleUI.jsterm.node,
-          onResizeEnd: (width) => dispatch(actions.setEditorWidth(width)),
-        })
+            key: "editor-resizer",
+            enabled: editorMode,
+            position: "end",
+            className: "editor-resizer",
+            getControlledElementNode: () => webConsoleUI.jsterm.node,
+            onResizeEnd: width => dispatch(actions.setEditorWidth(width)),
+          })
         : null,
       reverseSearch,
       sidebar,
@@ -448,7 +439,7 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   notifications: getAllNotifications(state),
   reverseSearchInputVisible: state.ui.reverseSearchInputVisible,
   reverseSearchInitialValue: state.ui.reverseSearchInitialValue,
@@ -461,7 +452,7 @@ const mapStateToProps = (state) => ({
   showEvaluationSelector: state.ui.showEvaluationSelector,
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   dispatch,
 });
 

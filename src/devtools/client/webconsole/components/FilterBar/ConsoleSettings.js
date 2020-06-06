@@ -30,10 +30,7 @@ class ConsoleSettings extends Component {
       dispatch: PropTypes.func.isRequired,
       eagerEvaluation: PropTypes.bool.isRequired,
       groupWarnings: PropTypes.bool.isRequired,
-      hidePersistLogsCheckbox: PropTypes.bool.isRequired,
-      hideShowContentMessagesCheckbox: PropTypes.bool.isRequired,
       persistLogs: PropTypes.bool.isRequired,
-      showContentMessages: PropTypes.bool.isRequired,
       timestampsVisible: PropTypes.bool.isRequired,
       webConsoleUI: PropTypes.object.isRequired,
       autocomplete: PropTypes.bool.isRequired,
@@ -41,55 +38,26 @@ class ConsoleSettings extends Component {
   }
 
   renderMenuItems() {
-    const {
-      dispatch,
-      eagerEvaluation,
-      groupWarnings,
-      hidePersistLogsCheckbox,
-      hideShowContentMessagesCheckbox,
-      persistLogs,
-      showContentMessages,
-      timestampsVisible,
-      autocomplete,
-    } = this.props;
+    const { dispatch, groupWarnings, timestampsVisible } = this.props;
 
     const items = [];
 
     // Persist Logs
-    if (!hidePersistLogsCheckbox) {
-      items.push(
-        MenuItem({
-          key: "webconsole-console-settings-menu-item-persistent-logs",
-          checked: persistLogs,
-          className:
-            "menu-item webconsole-console-settings-menu-item-persistentLogs",
-          label: l10n.getStr(
-            "webconsole.console.settings.menu.item.enablePersistentLogs.label"
-          ),
-          tooltip: l10n.getStr(
-            "webconsole.console.settings.menu.item.enablePersistentLogs.tooltip"
-          ),
-          onClick: () => dispatch(actions.persistToggle()),
-        })
-      );
-    }
-
-    // Show Content Messages
-    if (!hideShowContentMessagesCheckbox) {
-      items.push(
-        MenuItem({
-          key: "webconsole-console-settings-menu-item-content-messages",
-          checked: showContentMessages,
-          className:
-            "menu-item webconsole-console-settings-menu-item-contentMessages",
-          label: l10n.getStr("browserconsole.contentMessagesCheckbox.label"),
-          tooltip: l10n.getStr(
-            "browserconsole.contentMessagesCheckbox.tooltip"
-          ),
-          onClick: () => dispatch(actions.contentMessagesToggle()),
-        })
-      );
-    }
+    // items.push(
+    //   MenuItem({
+    //     key: "webconsole-console-settings-menu-item-persistent-logs",
+    //     checked: persistLogs,
+    //     className:
+    //       "menu-item webconsole-console-settings-menu-item-persistentLogs",
+    //     label: l10n.getStr(
+    //       "webconsole.console.settings.menu.item.enablePersistentLogs.label"
+    //     ),
+    //     tooltip: l10n.getStr(
+    //       "webconsole.console.settings.menu.item.enablePersistentLogs.tooltip"
+    //     ),
+    //     onClick: () => dispatch(actions.persistToggle()),
+    //   })
+    // );
 
     // Timestamps
     items.push(
@@ -125,38 +93,38 @@ class ConsoleSettings extends Component {
     );
 
     // autocomplete
-    items.push(
-      MenuItem({
-        key: "webconsole-console-settings-menu-item-autocomplete",
-        checked: autocomplete,
-        className:
-          "menu-item webconsole-console-settings-menu-item-autocomplete",
-        label: l10n.getStr(
-          "webconsole.console.settings.menu.item.autocomplete.label"
-        ),
-        tooltip: l10n.getStr(
-          "webconsole.console.settings.menu.item.autocomplete.tooltip"
-        ),
-        onClick: () => dispatch(actions.autocompleteToggle()),
-      })
-    );
+    // items.push(
+    //   MenuItem({
+    //     key: "webconsole-console-settings-menu-item-autocomplete",
+    //     checked: autocomplete,
+    //     className:
+    //       "menu-item webconsole-console-settings-menu-item-autocomplete",
+    //     label: l10n.getStr(
+    //       "webconsole.console.settings.menu.item.autocomplete.label"
+    //     ),
+    //     tooltip: l10n.getStr(
+    //       "webconsole.console.settings.menu.item.autocomplete.tooltip"
+    //     ),
+    //     onClick: () => dispatch(actions.autocompleteToggle()),
+    //   })
+    // );
 
     // Eager Evaluation
-    items.push(
-      MenuItem({
-        key: "webconsole-console-settings-menu-item-eager-evaluation",
-        checked: eagerEvaluation,
-        className:
-          "menu-item webconsole-console-settings-menu-item-eager-evaluation",
-        label: l10n.getStr(
-          "webconsole.console.settings.menu.item.instantEvaluation.label"
-        ),
-        tooltip: l10n.getStr(
-          "webconsole.console.settings.menu.item.instantEvaluation.tooltip"
-        ),
-        onClick: () => dispatch(actions.eagerEvaluationToggle()),
-      })
-    );
+    // items.push(
+    //   MenuItem({
+    //     key: "webconsole-console-settings-menu-item-eager-evaluation",
+    //     checked: eagerEvaluation,
+    //     className:
+    //       "menu-item webconsole-console-settings-menu-item-eager-evaluation",
+    //     label: l10n.getStr(
+    //       "webconsole.console.settings.menu.item.instantEvaluation.label"
+    //     ),
+    //     tooltip: l10n.getStr(
+    //       "webconsole.console.settings.menu.item.instantEvaluation.tooltip"
+    //     ),
+    //     onClick: () => dispatch(actions.eagerEvaluationToggle()),
+    //   })
+    // );
 
     return MenuList({ id: "webconsole-console-settings-menu-list" }, items);
   }
