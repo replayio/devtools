@@ -131,21 +131,19 @@ class Tabs extends PureComponent<Props, State> {
 
   componentDidMount() {
     window.requestIdleCallback(this.updateHiddenTabs);
-    window.addEventListener("resize", this.onResize);
-    /*
-    window.document
+    document.addEventListener("resize", this.onResize);
+
+    document
       .querySelector(".editor-pane")
       .addEventListener("resizeend", this.onResize);
-    */
   }
 
   componentWillUnmount() {
-    window.removeEventListener("resize", this.onResize);
-    /*
-    window.document
+    document.removeEventListener("resize", this.onResize);
+
+    document
       .querySelector(".editor-pane")
       .removeEventListener("resizeend", this.onResize);
-    */
   }
 
   /*
@@ -347,14 +345,11 @@ const mapStateToProps = state => ({
   isPaused: getIsPaused(state, getCurrentThread(state)),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    selectSource: actions.selectSource,
-    moveTab: actions.moveTab,
-    moveTabBySourceId: actions.moveTabBySourceId,
-    closeTab: actions.closeTab,
-    togglePaneCollapse: actions.togglePaneCollapse,
-    showSource: actions.showSource,
-  }
-)(Tabs);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  selectSource: actions.selectSource,
+  moveTab: actions.moveTab,
+  moveTabBySourceId: actions.moveTabBySourceId,
+  closeTab: actions.closeTab,
+  togglePaneCollapse: actions.togglePaneCollapse,
+  showSource: actions.showSource,
+})(Tabs);

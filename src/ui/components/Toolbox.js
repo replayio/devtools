@@ -44,16 +44,21 @@ const Selection = require("devtools/client/framework/selection");
 const { log } = require("protocol/socket");
 const { defer } = require("protocol/utils");
 
-const Timeline = require("./Timeline");
+import Timeline from "./Timeline";
 const { ThreadFront } = require("protocol/thread");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
+import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 
 import "./Toolbox.css";
 
 const shortcuts = new KeyShortcuts({ window, target: document });
 
 export default class Toolbox extends React.Component {
-  state = { selectedPanel: "", panels: {}, splitConsoleOpen: true };
+  state = {
+    selectedPanel: "",
+    panels: {},
+    splitConsoleOpen: true,
+  };
 
   parserService = {
     hasSyntaxError: text => false,
@@ -371,75 +376,125 @@ export default class Toolbox extends React.Component {
     );
   }
 
+  renderToolbar() {
+    const { selectedPanel } = this.state;
+
+    return (
+      <div id="toolbox-toolbar">
+        <div
+          className={classnames("toolbar-panel-button", {
+            active: selectedPanel == "inspector",
+          })}
+          id="toolbox-toolbar-inspector"
+          onClick={() => this.selectTool("inspector")}
+        >
+          <div className="toolbar-panel-icon"></div>
+          Inspector
+        </div>
+        <div
+          className={classnames("toolbar-panel-button", {
+            active: selectedPanel == "debugger",
+          })}
+          id="toolbox-toolbar-debugger"
+          onClick={() => this.selectTool("debugger")}
+        >
+          <div className="toolbar-panel-icon"></div>
+          Debugger
+        </div>
+        <div
+          className={classnames("toolbar-panel-button", {
+            active: selectedPanel == "console",
+          })}
+          id="toolbox-toolbar-console"
+          onClick={() => this.selectTool("console")}
+        >
+          <div className="toolbar-panel-icon"></div>
+          Console
+        </div>
+      </div>
+    );
+  }
+
+  getSplitBoxDimensions() {
+    const { selectedPanel, splitConsoleOpen } = this.state;
+
+    if (selectedPanel == "console") {
+      return {
+        initialSize: "0%",
+        minSize: 0,
+        maxSize: 0,
+      };
+    }
+
+    if (splitConsoleOpen) {
+      return {
+        initialSize: "50%",
+        minSize: "0%",
+        maxSize: "100%",
+      };
+    }
+
+    return {
+      initialSize: "50%",
+      minSize: "100%",
+      maxSize: "100%",
+    };
+  }
+
   render() {
     const { selectedPanel, splitConsoleOpen } = this.state;
     return (
       <div id="toolbox" className={`${selectedPanel}`}>
         <div id="toolbox-border"></div>
         <div id="toolbox-timeline">{this.renderTimeline()}</div>
-        <div id="toolbox-toolbar">
-          <div
-            className={classnames("toolbar-panel-button", {
-              active: selectedPanel == "inspector",
-            })}
-            id="toolbox-toolbar-inspector"
-            onClick={() => this.selectTool("inspector")}
-          >
-            <div className="toolbar-panel-icon"></div>
-            Inspector
-          </div>
-          <div
-            className={classnames("toolbar-panel-button", {
-              active: selectedPanel == "debugger",
-            })}
-            id="toolbox-toolbar-debugger"
-            onClick={() => this.selectTool("debugger")}
-          >
-            <div className="toolbar-panel-icon"></div>
-            Debugger
-          </div>
-          <div
-            className={classnames("toolbar-panel-button", {
-              active: selectedPanel == "console",
-            })}
-            id="toolbox-toolbar-console"
-            onClick={() => this.selectTool("console")}
-          >
-            <div className="toolbar-panel-icon"></div>
-            Console
-          </div>
-        </div>
+        {this.renderToolbar()}
         <div
           id="toolbox-contents"
           className={classnames("", {
-            ["split-console"]: selectedPanel != "console" && splitConsoleOpen,
+            splitConsole: selectedPanel != "console" && splitConsoleOpen,
           })}
         >
-          <div className="toolbox-top-panels">
-            <div
-              className={classnames("toolbar-panel-content", {
-                active: selectedPanel == "debugger",
-              })}
-              id="toolbox-content-debugger"
-            >
-              {this.renderDebugger()}
-            </div>
-            <div
-              className={classnames("toolbar-panel-content theme-body", {
-                active: selectedPanel == "inspector",
-              })}
-              id="toolbox-content-inspector"
-            >
-              {this.renderInspector()}
-            </div>
-          </div>
-          <div className="toolbox-splitter"></div>
-          <div
-            className={classnames("toolbar-panel-content", {
-              active: selectedPanel == "console" || splitConsoleOpen,
-            })}
-            id="toolbox-content-console"
-          ></div>
+          <SplitBox
+            style={{ width: "100vw", overflow: "hidden" }}
+            {...this.getSplitBoxDimensions()}
+            splitterSize={1}
+            vert={false}
+            onResizeEnd={num => {}}
+            startPanel={
+              <div className="toolbox-top-panels">
+                <div
+                  className={classnames("toolbox-panel", {
+                    active: selectedPanel == "debugger",
+                  })}
+                  id="toolbox-content-debugger"
+                >
+                  {this.renderDebugger()}
+                </div>
+                <div
+                  className={classnames("toolbox-panel theme-body", {
+                    active: selectedPanel == "inspector",
+                  })}
+                  id="toolbox-content-inspector"
+                >
+                  {this.renderInspector()}
+                </div>
+              </div>
+            }
+            endPanelControl={false}
+            endPanel={
+              <div
+                className="toolbox-bottom-panels"
+                style={{ overflow: "hidden" }}
+              >
+                <div
+                  className={classnames("toolbox-panel", {
+                    active: selectedPanel == "console" || splitConsoleOpen,
+                  })}
+                  id="toolbox-content-console"
+                />
+              </div>
+            }
+          />
         </div>
       </div>
     );
