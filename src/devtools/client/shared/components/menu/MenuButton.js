@@ -9,17 +9,16 @@
 
 const Services = require("Services");
 const flags = require("devtools/shared/flags");
-const {
-  createRef,
-  PureComponent,
-} = require("react");
+const { createRef, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { button } = dom;
 
 const isMacOS = Services.appinfo.OS === "Darwin";
 
-const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+const {
+  HTMLTooltip,
+} = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const { focusableSelector } = require("devtools/client/shared/focus");
 const { createPortal } = require("react-dom");
 
@@ -36,7 +35,7 @@ class MenuButton extends PureComponent {
   static get propTypes() {
     return {
       // The toolbox document that will be used for rendering the menu popup.
-      toolboxDoc: PropTypes.object.isRequired,
+      toolboxDoc: PropTypes.object,
 
       // A text content for the button.
       label: PropTypes.string,
