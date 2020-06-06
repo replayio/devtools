@@ -188,11 +188,11 @@ export default class Toolbox extends React.Component {
               <button
                 id="inspector-searchinput-clear"
                 className="devtools-searchinput-clear"
-                hidden="true"
-                tabindex="-1"
+                hidden={true}
+                tabIndex="-1"
               ></button>
             </div>
-            <div id="inspector-searchlabel-container" hidden="true">
+            <div id="inspector-searchlabel-container" hidden={true}>
               <div className="devtools-separator"></div>
               <span id="inspector-searchlabel"></span>
             </div>
@@ -201,7 +201,7 @@ export default class Toolbox extends React.Component {
               id="inspector-element-add-button"
               className="devtools-button"
               data-localization="title=inspectorAddNode.label"
-              hidden="true"
+              hidden={true}
             ></button>
             <button
               id="inspector-eyedropper-toggle"
@@ -222,7 +222,7 @@ export default class Toolbox extends React.Component {
               className="breadcrumbs-widget-container"
               role="toolbar"
               data-localization="aria-label=inspector.breadcrumbs.label"
-              tabindex="0"
+              tabIndex="0"
             ></div>
           </div>
         </div>
@@ -232,12 +232,12 @@ export default class Toolbox extends React.Component {
 
         {/* <!-- Split Sidebar Container --> */}
         <div id="inspector-rules-container">
-          <div id="inspector-rules-sidebar" hidden="true"></div>
+          <div id="inspector-rules-sidebar" hidden={true}></div>
         </div>
 
         {/* <!-- Sidebar Container --> */}
         <div id="inspector-sidebar-container">
-          <div id="inspector-sidebar" hidden="true"></div>
+          <div id="inspector-sidebar" hidden={true}></div>
         </div>
 
         {/* <!-- Sidebar Panel Definitions --> */}
@@ -269,50 +269,50 @@ export default class Toolbox extends React.Component {
                     id="pseudo-class-panel-toggle"
                     data-localization="title=inspector.togglePseudo.tooltip"
                     className="devtools-button"
-                    hidden="true"
+                    hidden={true}
                   ></button>
                   <button
                     id="class-panel-toggle"
                     data-localization="title=inspector.classPanel.toggleClass.tooltip"
                     className="devtools-button"
-                    hidden="true"
+                    hidden={true}
                   ></button>
                   <button
                     id="ruleview-add-rule-button"
                     data-localization="title=inspector.addRule.tooltip"
                     className="devtools-button"
-                    hidden="true"
+                    hidden={true}
                   ></button>
                   <button
                     id="color-scheme-simulation-toggle"
                     data-localization="title=inspector.colorSchemeSimulation.tooltip"
                     className="devtools-button"
-                    hidden="true"
+                    hidden={true}
                   ></button>
                   <button
                     id="print-simulation-toggle"
                     data-localization="title=inspector.printSimulation.tooltip"
                     className="devtools-button"
-                    hidden="true"
+                    hidden={true}
                   ></button>
                 </div>
               </div>
               <div
                 id="pseudo-class-panel"
                 className="theme-toolbar ruleview-reveal-panel"
-                hidden="true"
+                hidden={true}
               >
                 {/* <!-- Populated with checkbox inputs once the Rules view is instantiated --> */}
               </div>
               <div
                 id="ruleview-class-panel"
                 className="theme-toolbar ruleview-reveal-panel"
-                hidden="true"
+                hidden={true}
               ></div>
             </div>
 
             <div id="ruleview-container" className="ruleview">
-              <div id="ruleview-container-focusable" tabindex="-1"></div>
+              <div id="ruleview-container-focusable" tabIndex="-1"></div>
             </div>
           </div>
 
@@ -344,17 +344,17 @@ export default class Toolbox extends React.Component {
               />
               <label
                 id="browser-style-checkbox-label"
-                for="browser-style-checkbox"
+                htmlFor="browser-style-checkbox"
                 data-localization="content=inspector.browserStyles.label"
               ></label>
             </div>
 
             <div id="computed-container">
-              <div id="computed-container-focusable" tabindex="-1">
+              <div id="computed-container-focusable" tabIndex="-1">
                 <div
                   id="computed-property-container"
                   className="devtools-monospace"
-                  tabindex="0"
+                  tabIndex="0"
                   dir="ltr"
                 ></div>
                 <div
@@ -415,7 +415,7 @@ export default class Toolbox extends React.Component {
             ["split-console"]: selectedPanel != "console" && splitConsoleOpen,
           })}
         >
-          <div class="toolbox-top-panels">
+          <div className="toolbox-top-panels">
             <div
               className={classnames("toolbar-panel-content", {
                 active: selectedPanel == "debugger",
