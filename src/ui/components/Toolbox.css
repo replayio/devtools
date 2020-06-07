@@ -1,11 +1,7 @@
 #toolbox {
-  position: absolute;
   overflow: hidden;
-  top: 60%;
-  left: 0px;
   width: 100%;
   font-family: sans-serif;
-  height: 40%;
   display: flex;
   flex-direction: column;
   --toolbox-background: #f9f9fa;
@@ -29,6 +25,8 @@
   border-top: 0px;
   background: var(--theme-toolbar-background);
   border-bottom: 1px solid var(--theme-splitter-color);
+  display: flex;
+  justify-content: space-between;
 }
 
 #toolbox-contents {
@@ -81,4 +79,71 @@
 
 .toolbar-panel-button.active .toolbar-panel-icon {
   background: var(--theme-toolbar-selected-color);
+}
+
+.settings-button {
+  width: 16px;
+  height: 16px;
+}
+
+.toolbox-settings-button {
+  align-self: center;
+}
+
+.toolbar-end-buttons {
+  display: flex;
+}
+
+.settings-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 300px;
+  height: 100%;
+  z-index: 100;
+  background: white;
+  padding: 2rem;
+  box-shadow: -2px 4px 8px #bbb;
+  font-size: 1.125rem;
+  color: var(--theme-body-color);
+}
+
+.settings-panel .radio {
+  margin-left: 11px;
+}
+
+.settings-panel .radio input {
+  margin-right: 10px;
+}
+
+.settings-panel h3 {
+  font-weight: 300;
+  font-size: 1.25rem;
+}
+
+.settings-panel h2 {
+  font-weight: 300;
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+.settings-panel .setting-section {
+  margin-top: 2rem;
+}
+
+.settings-panel .setting-option {
+  margin-top: 1rem;
+  display: flex;
+  line-height: 1.5rem;
+}
+
+.settings-panel form {
+  display: flex;
+}
+
+.settings-panel input {
+  margin-right: 10px;
+}
+
+.settings-panel .checkbox {
+  margin-top: 1rem;
 }

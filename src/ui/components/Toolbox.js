@@ -127,6 +127,10 @@ export default class Toolbox extends React.Component {
     // this.emit("select", panel);
   }
 
+  toggleSettings = () => {
+    this.setState({ settingsOpen: !this.state.settingsOpen });
+  };
+
   async viewSourceInDebugger(url, line, column, id) {
     const dbg = this.getPanel("debugger");
     const source = id ? dbg.getSourceByActorId(id) : dbg.getSourceByURL(url);
@@ -385,35 +389,118 @@ export default class Toolbox extends React.Component {
 
     return (
       <div id="toolbox-toolbar">
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPanel == "inspector",
-          })}
-          id="toolbox-toolbar-inspector"
-          onClick={() => this.selectTool("inspector")}
-        >
-          <div className="toolbar-panel-icon"></div>
-          Inspector
+        <div className="toolbar-panels">
+          <div
+            className={classnames("toolbar-panel-button", {
+              active: selectedPanel == "inspector",
+            })}
+            id="toolbox-toolbar-inspector"
+            onClick={() => this.selectTool("inspector")}
+          >
+            <div className="toolbar-panel-icon"></div>
+            Inspector
+          </div>
+          <div
+            className={classnames("toolbar-panel-button", {
+              active: selectedPanel == "debugger",
+            })}
+            id="toolbox-toolbar-debugger"
+            onClick={() => this.selectTool("debugger")}
+          >
+            <div className="toolbar-panel-icon"></div>
+            Debugger
+          </div>
+          <div
+            className={classnames("toolbar-panel-button", {
+              active: selectedPanel == "console",
+            })}
+            id="toolbox-toolbar-console"
+            onClick={() => this.selectTool("console")}
+          >
+            <div className="toolbar-panel-icon"></div>
+            Console
+          </div>
         </div>
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPanel == "debugger",
-          })}
-          id="toolbox-toolbar-debugger"
-          onClick={() => this.selectTool("debugger")}
-        >
-          <div className="toolbar-panel-icon"></div>
-          Debugger
+        <div className="toolbar-end-buttons">
+          <div
+            onClick={this.toggleSettings}
+            className="toolbox-settings-button settings-button"
+          ></div>
         </div>
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPanel == "console",
-          })}
-          id="toolbox-toolbar-console"
-          onClick={() => this.selectTool("console")}
-        >
-          <div className="toolbar-panel-icon"></div>
-          Console
+      </div>
+    );
+  }
+
+  renderSettings() {
+    if (!this.state.settingsOpen) {
+      return null;
+    }
+
+    return (
+      <div className="settings-panel">
+        <div className="settings-section">
+          <h2>Appearance</h2>
+
+          <div className="setting-option">
+            <h3>Theme</h3>
+            <form>
+              <div className="radio">
+                <label>
+                  <input
+                    type="radio"
+                    value="light"
+                    checked={true}
+                    onChange={() => {}}
+                  />
+                  Light
+                </label>
+              </div>
+              <div className="radio">
+                <label>
+                  <input type="radio" value="dark" onChange={() => {}} />
+                  Dark
+                </label>
+              </div>
+            </form>
+          </div>
+          <div className="setting-option">
+            <h3>Orientation</h3>
+            <form>
+              <div className="radio">
+                <label>
+                  <input
+                    type="radio"
+                    value="bottom"
+                    checked={true}
+                    onChange={() => {}}
+                  />
+                  Bottom
+                </label>
+              </div>
+              <div className="radio">
+                <label>
+                  <input type="radio" value="right" onChange={() => {}} />
+                  Right
+                </label>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div className="setting-section">
+          <h2>Experimental</h2>
+          <form className="multi-select">
+            <div className="checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  value="Inspector"
+                  checked={true}
+                  onChange={() => {}}
+                />
+                Inspector
+              </label>
+            </div>
+          </form>
         </div>
       </div>
     );
@@ -458,6 +545,7 @@ export default class Toolbox extends React.Component {
             splitConsole: selectedPanel != "console" && splitConsoleOpen,
           })}
         >
+          {this.renderSettings()}
           <SplitBox
             style={{ width: "100vw", overflow: "hidden" }}
             {...this.getSplitBoxDimensions()}

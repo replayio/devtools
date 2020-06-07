@@ -30,6 +30,7 @@ const gBackgroundImages = {
   ".img.rxjs": require("devtools/client/debugger/images/sources/rxjs.svg"),
   ".img.sencha-extjs": require("devtools/client/debugger/images/sources/sencha-extjs.svg"),
   ".webconsole-console-settings-menu-button::before": require("devtools/client/themes/images/settings.svg"),
+  ".settings-button": require("devtools/client/themes/images/settings.svg"),
   ".webconsole-input-openEditorButton::before": require("devtools/client/themes/images/webconsole/editor.svg"),
   ".sidebar-close-button::before": require("devtools/client/themes/images/close.svg"),
   ".jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-history-prevExpressionButton::before": require("devtools/client/themes/images/arrowhead-up.svg"),

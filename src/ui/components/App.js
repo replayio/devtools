@@ -33,18 +33,60 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const React = require("react");
 const ReactDOM = require("react-dom");
 import Toolbox from "./Toolbox";
-
+import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 
 export default class App extends React.Component {
-    render() {
-        const { initialize } = this.props
-        return <>
-            <div id="header">
-                <div className="logo"></div>
-            </div>
-            <canvas id="graphics"></canvas>
-            <div id="highlighter-root"></div>
-            <Toolbox initialize={initialize} />
-        </>
+  state = {
+    orientation: "bottom",
+  };
+
+  componentDidMount() {
+    // for testing `app.setState({orientation: "left"})`
+    window.app = this;
+  }
+
+  render() {
+    const { initialize } = this.props;
+    const { orientation } = this.state;
+
+    const graphics = (
+      <>
+        <canvas id="graphics"></canvas>
+        <div id="highlighter-root"></div>
+      </>
+    );
+    const toolbox = <Toolbox initialize={initialize} />;
+
+    let startPanel, endPanel;
+    if (orientation == "bottom" || orientation == "right") {
+      startPanel = graphics;
+      endPanel = toolbox;
+    } else {
+      startPanel = toolbox;
+      endPanel = graphics;
     }
-};
+
+    const vert = orientation != "bottom";
+
+    return (
+      <>
+        <div id="header">
+          <div className="logo"></div>
+        </div>
+
+        <SplitBox
+          style={{ width: "100vw", overflow: "hidden" }}
+          splitterSize={1}
+          initialSize="50%"
+          minSize="20%"
+          maxSize="80%"
+          vert={vert}
+          onResizeEnd={num => {}}
+          startPanel={startPanel}
+          endPanelControl={false}
+          endPanel={endPanel}
+        />
+      </>
+    );
+  }
+}
