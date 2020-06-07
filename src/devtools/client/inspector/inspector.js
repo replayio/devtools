@@ -334,7 +334,7 @@ Inspector.prototype = {
     // Set the node front so that the markup and sidebar panels will have the selected
     // nodeFront ready when they're initialized.
     if (this._defaultNode) {
-      await this._defaultNode.ensureLoaded();
+      await this._defaultNode.ensureParentsLoaded();
       this.selection.setNodeFront(this._defaultNode, {
         reason: "inspector-open",
       });
