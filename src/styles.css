@@ -30,10 +30,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 #graphics {
-  position: absolute;
-  top: 28px;
-  left: 0px;
+  width: 100%;
+  height: 100%;
   background-color: #ececec;
   z-index: -1; /* Draw canvas behind the highlighter overlay. */
 }

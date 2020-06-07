@@ -45,7 +45,6 @@ import "devtools/client/themes/variables.css";
 import "devtools/client/themes/webconsole.css";
 import "devtools/client/themes/common.css";
 
-
 // $FlowIgnore
 //import "devtools-launchpad/src/components/Root.css";
 
@@ -140,7 +139,10 @@ class App extends Component<Props, State> {
     horizontalLayoutBreakpoint.removeListener(this.onLayoutChange);
     verticalLayoutBreakpoint.removeListener(this.onLayoutChange);
 
-    shortcuts.off(L10N.getStr("symbolSearch.search.key1"), this.toggleQuickOpenModal);
+    shortcuts.off(
+      L10N.getStr("symbolSearch.search.key1"),
+      this.toggleQuickOpenModal
+    );
 
     shortcuts.off(
       L10N.getStr("symbolSearch.search.key2"),
@@ -359,14 +361,11 @@ const mapStateToProps = state => ({
   orientation: getOrientation(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    setActiveSearch: actions.setActiveSearch,
-    closeActiveSearch: actions.closeActiveSearch,
-    closeProjectSearch: actions.closeProjectSearch,
-    openQuickOpen: actions.openQuickOpen,
-    closeQuickOpen: actions.closeQuickOpen,
-    setOrientation: actions.setOrientation,
-  }
-)(App);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  setActiveSearch: actions.setActiveSearch,
+  closeActiveSearch: actions.closeActiveSearch,
+  closeProjectSearch: actions.closeProjectSearch,
+  openQuickOpen: actions.openQuickOpen,
+  closeQuickOpen: actions.closeQuickOpen,
+  setOrientation: actions.setOrientation,
+})(App);
