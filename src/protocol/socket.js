@@ -125,7 +125,7 @@ function log(text) {
 }
 
 // For debugging.
-window.getOutstandingProtocolMessages = () => {
+window.outstanding = () => {
   return [...gMessageWaiters.entries()].map(([id, { method }]) => ({
     id,
     method,
