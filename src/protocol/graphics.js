@@ -320,16 +320,11 @@ function refreshGraphics() {
   const canvas = document.getElementById("graphics");
   const cx = canvas.getContext("2d");
 
-  const viewportHeight = 0.6;
+  const bounds = canvas.getBoundingClientRect();
+
   const scale = window.devicePixelRatio;
-  canvas.width = window.innerWidth * scale;
-  canvas.height = window.innerHeight * scale * viewportHeight;
-  // if (scale != 1) {
-  //   canvas.style.transform = `
-  //     scale(${1 / scale})
-  //     translate(-${canvas.width / scale}px, -${(canvas.height / scale)}px)
-  //   `;
-  // }
+  canvas.width = bounds.width * scale;
+  canvas.height = bounds.height * scale;
 
   if (gDrawImage) {
     let image = gDrawImage;
@@ -349,10 +344,10 @@ function refreshGraphics() {
     );
     if (highlighterContainer) {
       highlighterContainer.style.left = `${
-        offsetLeft / window.devicePixelRatio
+        bounds.left + offsetLeft / window.devicePixelRatio
       }px`;
       highlighterContainer.style.top = `${
-        offsetTop / window.devicePixelRatio
+        bounds.top + offsetTop / window.devicePixelRatio
       }px`;
     }
 
@@ -378,7 +373,17 @@ function refreshGraphics() {
   }
 }
 
-window.onresize = refreshGraphics;
+// Install an observer to refresh graphics whenever the content canvas is resized.
+function installObserver() {
+  const canvas = document.getElementById("graphics");
+  if (canvas) {
+    const observer = new ResizeObserver(refreshGraphics);
+    observer.observe(canvas);
+  } else {
+    setTimeout(installObserver, 100);
+  }
+}
+installObserver();
 
 module.exports = {
   addLastScreen,
