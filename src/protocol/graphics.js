@@ -54,7 +54,7 @@ function mostRecentIndex(array, time) {
 
 function mostRecentEntry(array, time) {
   const index = mostRecentIndex(array, time);
-  return (index !== undefined) ? array[index] : null;
+  return index !== undefined ? array[index] : null;
 }
 
 function nextEntry(array, time) {
@@ -62,7 +62,7 @@ function nextEntry(array, time) {
   if (index === undefined) {
     return array.length ? array[0] : null;
   }
-  return (index + 1 < array.length) ? array[index + 1] : null;
+  return index + 1 < array.length ? array[index + 1] : null;
 }
 
 // Add an entry with a "time" property to an array that is sorted by time.
@@ -116,7 +116,8 @@ const gMouseClickEvents = [];
 
 function onPaints({ paints }) {
   paints.forEach(({ point, time, screenShots }) => {
-    const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg").hash;
+    const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")
+      .hash;
     insertEntrySorted(gPaintPoints, { point, time, paintHash });
   });
 }
@@ -191,11 +192,13 @@ async function ensureScreenShotAtPoint(point, paintHash) {
   const { promise, resolve } = defer();
   gScreenShots.set(paintHash, promise);
 
-  const screen = (await sendMessage(
-    "Graphics.getPaintContents",
-    { point, mimeType: "image/jpeg" },
-    ThreadFront.sessionId
-  )).screen;
+  const screen = (
+    await sendMessage(
+      "Graphics.getPaintContents",
+      { point, mimeType: "image/jpeg" },
+      ThreadFront.sessionId
+    )
+  ).screen;
   resolve(screen);
   return screen;
 }
@@ -313,7 +316,6 @@ function drawClick(cx, x, y) {
   cx.stroke();
 }
 
-
 function refreshGraphics() {
   const canvas = document.getElementById("graphics");
   const cx = canvas.getContext("2d");
@@ -321,13 +323,13 @@ function refreshGraphics() {
   const viewportHeight = 0.6;
   const scale = window.devicePixelRatio;
   canvas.width = window.innerWidth * scale;
-  canvas.height = (window.innerHeight * scale * viewportHeight);
-  if (scale != 1) {
-    canvas.style.transform = `
-      scale(${1 / scale})
-      translate(-${canvas.width / scale}px, -${(canvas.height / scale)}px)
-    `;
-  }
+  canvas.height = window.innerHeight * scale * viewportHeight;
+  // if (scale != 1) {
+  //   canvas.style.transform = `
+  //     scale(${1 / scale})
+  //     translate(-${canvas.width / scale}px, -${(canvas.height / scale)}px)
+  //   `;
+  // }
 
   if (gDrawImage) {
     let image = gDrawImage;
@@ -342,10 +344,16 @@ function refreshGraphics() {
     cx.drawImage(image, offsetLeft, offsetTop);
 
     // Make sure highlighters are rendered with the same offsets.
-    const highlighterContainer = document.querySelector(".highlighter-container");
+    const highlighterContainer = document.querySelector(
+      ".highlighter-container"
+    );
     if (highlighterContainer) {
-      highlighterContainer.style.left = `${offsetLeft / window.devicePixelRatio}px`;
-      highlighterContainer.style.top = `${offsetTop / window.devicePixelRatio}px`;
+      highlighterContainer.style.left = `${
+        offsetLeft / window.devicePixelRatio
+      }px`;
+      highlighterContainer.style.top = `${
+        offsetTop / window.devicePixelRatio
+      }px`;
     }
 
     if (gDrawMouse) {
