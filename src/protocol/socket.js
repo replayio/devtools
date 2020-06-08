@@ -124,18 +124,23 @@ function log(text) {
   console.log(text);
 }
 
-// For debugging.
-window.outstanding = () => {
-  return [...gMessageWaiters.entries()].map(([id, { method }]) => ({
-    id,
-    method,
-  }));
-};
-
 module.exports = {
   initSocket,
   sendMessage,
   addEventListener,
   removeEventListener,
   log,
+};
+
+// Debugging methods.
+
+window.disconnect = () => {
+  socket.close();
+};
+
+window.outstanding = () => {
+  return [...gMessageWaiters.entries()].map(([id, { method }]) => ({
+    id,
+    method,
+  }));
 };
