@@ -228,12 +228,22 @@ function resumeThenPauseAtLineFunctionFactory(method) {
 // pauses at a specified line.
 const rewindToLine = resumeThenPauseAtLineFunctionFactory("rewind");
 const resumeToLine = resumeThenPauseAtLineFunctionFactory("resume");
-const reverseStepOverToLine = resumeThenPauseAtLineFunctionFactory(
-  "reverseStepOver"
-);
+const reverseStepOverToLine = resumeThenPauseAtLineFunctionFactory("reverseStepOver");
 const stepOverToLine = resumeThenPauseAtLineFunctionFactory("stepOver");
 const stepInToLine = resumeThenPauseAtLineFunctionFactory("stepIn");
 const stepOutToLine = resumeThenPauseAtLineFunctionFactory("stepOut");
+
+function resumeAndPauseFunctionFactory(method) {
+  return async function (lineno, waitForLine) {
+    await dbg.actions[method](getThreadContext());
+    await waitForPausedNoSource();
+  };
+}
+
+const reverseStepOverAndPause = resumeAndPauseFunctionFactory("reverseStepOver");
+const stepOverAndPause = resumeAndPauseFunctionFactory("stepOver");
+const stepInAndPause = resumeAndPauseFunctionFactory("stepIn");
+const stepOutAndPause = resumeAndPauseFunctionFactory("stepOut");
 
 async function ensureWatchpointsExpanded() {
   const header = document.querySelector(".watch-expressions-pane ._header");
@@ -429,7 +439,7 @@ async function playbackRecording() {
 
 async function randomLog(numLogs) {
   const messages = await setRandomLogpoint(numLogs);
-  await Promise.all(messages.map(waitForMessage));
+  await Promise.all(messages.map(text => waitForMessage(text)));
   return messages;
 }
 
@@ -454,6 +464,10 @@ module.exports = {
   stepOverToLine,
   stepInToLine,
   stepOutToLine,
+  reverseStepOverAndPause,
+  stepOverAndPause,
+  stepInAndPause,
+  stepOutAndPause,
   hasFrames,
   waitForLoadedScopes,
   waitForInlinePreviews,

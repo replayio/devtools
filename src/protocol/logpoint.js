@@ -277,7 +277,7 @@ async function setRandomLogpoint(numLogs) {
     const { frameId, location } = frame;
     const { result } = sendCommand(
       "Pause.evaluateInFrame",
-      { frameId, bindings, expression: "String([...arguments]).substring(0, 200)" }
+      { frameId, expression: "String([...arguments]).substring(0, 200)" }
     );
     const v = result.returned ? String(result.returned.value) : "";
     const values = [{ value: point + ": " + v }];
@@ -288,7 +288,7 @@ async function setRandomLogpoint(numLogs) {
   const logGroupId = Math.random().toString();
   const analysisId = await createLogpointAnalysis(logGroupId, mapper);
 
-  sendMessage("Analysis.addRandomFunctionEntryPoints", {
+  sendMessage("Analysis.addRandomPoints", {
     analysisId,
     sessionId: ThreadFront.sessionId,
     numPoints: numLogs,
