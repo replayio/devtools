@@ -6,6 +6,7 @@
 // test harnesses.
 
 const { ThreadFront } = require("protocol/thread");
+const { setRandomLogpoint } = require("protocol/logpoint");
 const { assert } = require("protocol/utils");
 
 const dbg = gToolbox.getPanel("debugger").getVarsForTests();
@@ -17,6 +18,13 @@ for (const [name, method] of Object.entries(dbg.selectors)) {
 
 function waitForTime(ms) {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+function waitForElapsedTime(time, ms) {
+  const wait = time + ms - Date.now();
+  if (wait > 0) {
+    return waitForTime(wait);
+  }
 }
 
 async function waitUntil(fn) {
@@ -131,11 +139,15 @@ function isPaused() {
   return dbgSelectors.getIsPaused(dbgSelectors.getCurrentThread());
 }
 
-async function waitForLoadedScopes(dbg) {
+async function waitForLoadedScopes() {
   const scopes = await waitUntil(() => document.querySelector(".scopes-list"));
   // Since scopes auto-expand, we can assume they are loaded when there is a tree node
   // with the aria-level attribute equal to "2".
   await waitUntil(() => scopes.querySelector('.tree-node[aria-level="2"]'));
+}
+
+async function waitForInlinePreviews() {
+  await waitUntil(() => dbgSelectors.getSelectedInlinePreviews());
 }
 
 function waitForSelectedSource(url) {
@@ -182,6 +194,10 @@ async function waitForPaused(url) {
 
 async function waitForPausedNoSource() {
   await waitUntil(() => isPaused());
+}
+
+function hasFrames() {
+  return !!dbgSelectors.getCurrentThreadFrames();
 }
 
 function getVisibleSelectedFrameLine() {
@@ -405,6 +421,18 @@ async function toggleExceptionLogging() {
   elem.click();
 }
 
+async function playbackRecording() {
+  const timeline = await waitUntil(() => gToolbox.timeline);
+  timeline.startPlayback();
+  await waitUntil(() => !timeline.state.playback);
+}
+
+async function randomLog(numLogs) {
+  const messages = await setRandomLogpoint(numLogs);
+  await Promise.all(messages.map(waitForMessage));
+  return messages;
+}
+
 module.exports = {
   selectConsole,
   selectDebugger,
@@ -413,6 +441,7 @@ module.exports = {
   assert,
   finish,
   waitForTime,
+  waitForElapsedTime,
   waitUntil,
   selectSource,
   addBreakpoint,
@@ -425,6 +454,9 @@ module.exports = {
   stepOverToLine,
   stepInToLine,
   stepOutToLine,
+  hasFrames,
+  waitForLoadedScopes,
+  waitForInlinePreviews,
   checkEvaluateInTopFrame,
   waitForScopeValue,
   toggleBlackboxSelectedSource,
@@ -436,6 +468,7 @@ module.exports = {
   checkMessageStack,
   checkJumpIcon,
   checkMessageObjectContents,
+  toggleObjectInspectorNode,
   findScopeNode,
   toggleScopeNode,
   executeInConsole,
@@ -446,4 +479,6 @@ module.exports = {
   togglePrettyPrint,
   addEventListenerLogpoints,
   toggleExceptionLogging,
+  playbackRecording,
+  randomLog,
 };

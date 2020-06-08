@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // messages associated with the logpoint atomically.
 
 const { addEventListener, sendMessage, log } = require("./socket");
-const { assert } = require("./utils");
+const { assert, defer } = require("./utils");
 const { ThreadFront, ValueFront, Pause } = require("./thread");
 
 // Map log group ID to information about the logpoint.
@@ -83,8 +83,14 @@ addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
   log("AnalysisPoints", points);
 
   const logGroupId = gAnalysisLogGroupIDs.get(analysisId);
-  if (!gLogpoints.has(logGroupId)) {
+  const info = gLogpoints.get(logGroupId);
+  if (!info) {
     return;
+  }
+
+  info.points.push(...points);
+  if (info.pointsWaiter) {
+    info.pointsWaiter();
   }
 
   if (LogpointHandlers.onPointLoading) {
@@ -95,15 +101,15 @@ addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
 });
 
 async function createLogpointAnalysis(logGroupId, mapper) {
+  if (!gLogpoints.has(logGroupId)) {
+    gLogpoints.set(logGroupId, { analysisWaiters: [], points: [] });
+  }
+
   const waiter = sendMessage("Analysis.createAnalysis", {
     mapper,
     effectful: true,
   });
-  if (gLogpoints.has(logGroupId)) {
-    gLogpoints.get(logGroupId).push(waiter);
-  } else {
-    gLogpoints.set(logGroupId, [waiter]);
-  }
+  gLogpoints.get(logGroupId).analysisWaiters.push(waiter);
 
   const { analysisId } = await waiter;
   gAnalysisLogGroupIDs.set(analysisId, logGroupId);
@@ -261,16 +267,56 @@ async function setExceptionLogpoint(logGroupId) {
   sendMessage("Analysis.findAnalysisPoints", { analysisId });
 }
 
+// Add logpoint messages at random function entry points, and returns text
+// patterns that will appear in the resulting messages. This is used by
+// automated tests.
+async function setRandomLogpoint(numLogs) {
+  const mapper = `
+    const { point, time, pauseId} = input;
+    const { frame } = sendCommand("Pause.getTopFrame");
+    const { frameId, location } = frame;
+    const { result } = sendCommand(
+      "Pause.evaluateInFrame",
+      { frameId, bindings, expression: "String([...arguments]).substring(0, 200)" }
+    );
+    const v = result.returned ? String(result.returned.value) : "";
+    const values = [{ value: point + ": " + v }];
+    const datas = [];
+    return [{ key: point, value: { time, pauseId, location, values, datas } }];
+  `;
+
+  const logGroupId = Math.random().toString();
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper);
+
+  sendMessage("Analysis.addRandomFunctionEntryPoints", {
+    analysisId,
+    sessionId: ThreadFront.sessionId,
+    numPoints: numLogs,
+  });
+
+  sendMessage("Analysis.runAnalysis", { analysisId });
+  sendMessage("Analysis.findAnalysisPoints", { analysisId });
+
+  const info = gLogpoints.get(logGroupId);
+  while (info.points.length < numLogs) {
+    const { promise, resolve } = defer();
+    info.pointsWaiter = resolve;
+    await promise;
+  }
+
+  return info.points.map(p => p.point);
+}
+
 function removeLogpoint(logGroupId) {
-  const waiters = gLogpoints.get(logGroupId);
-  if (!waiters) {
+  const info = gLogpoints.get(logGroupId);
+  if (!info) {
     return;
   }
   if (LogpointHandlers.clearLogpoint) {
     LogpointHandlers.clearLogpoint(logGroupId);
   }
   gLogpoints.delete(logGroupId);
-  waiters.forEach(async waiter => {
+  info.analysisWaiters.forEach(async waiter => {
     const { analysisId } = await waiter;
     sendMessage("Analysis.releaseAnalysis", { analysisId });
   });
@@ -281,6 +327,7 @@ module.exports = {
   setLogpointByURL,
   setEventLogpoint,
   setExceptionLogpoint,
+  setRandomLogpoint,
   removeLogpoint,
   LogpointHandlers,
 };
