@@ -232,7 +232,7 @@ function getExpressionNameAndValue(
         const property: Object = properties.find(
           prop => prop.name === meta.property
         );
-        displayValue = property && property.contents.primitive();
+        displayValue = property && property.contents;
         displayName += `.${meta.property}`;
       } else if (
         displayValue &&
