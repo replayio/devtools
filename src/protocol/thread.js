@@ -568,6 +568,7 @@ function createPrimitiveValueFront(value) {
 }
 
 function createPseudoValueFront(elements) {
+  elements.forEach(({ contents }) => contents.isObject());
   return new ValueFront(null, undefined, elements);
 }
 
@@ -1538,4 +1539,5 @@ module.exports = {
   Pause,
   createPrimitiveValueFront,
   createUnavailableValueFront,
+  createPseudoValueFront,
 };

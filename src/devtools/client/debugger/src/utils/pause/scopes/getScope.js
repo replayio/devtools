@@ -13,6 +13,8 @@ import type { Frame, Why, Scope } from "../../../types";
 
 import type { NamedValue } from "./types";
 
+import { createPseudoValueFront } from "protocol/thread";
+
 export type RenderableScope = {
   type: $ElementType<Scope, "type">,
   scopeKind: $ElementType<Scope, "scopeKind">,
@@ -90,21 +92,23 @@ export function getScope(
       return {
         name: title,
         path: key,
-        contents: vars,
+        contents: createPseudoValueFront(vars),
         type: NODE_TYPES.BLOCK,
       };
     }
-  } else if (type === "object" && scope.object) {
+  } else if (scope.object) {
     let value = scope.object;
     // If this is the global window scope, mark it as such so that it will
     // preview Window: Global instead of Window: Window
-    if (value.class === "Window") {
+    /*
+    if (value.className() === "Window") {
       value = { ...scope.object, displayClass: "Global" };
     }
+    */
     return {
-      name: scope.object.class,
+      name: value.className(),
       path: key,
-      contents: { value },
+      contents: value,
     };
   }
 
@@ -118,13 +122,13 @@ export function mergeScopes(
   parentItem: NamedValue
 ) {
   if (scope.scopeKind == "function lexical" && parentScope.type == "function") {
-    const contents = (item.contents: any).concat(parentItem.contents);
+    const contents = item.contents.getChildren().concat(parentItem.contents.getChildren());
     contents.sort((a, b) => a.name.localeCompare(b.name));
 
     return {
       name: parentItem.name,
       path: parentItem.path,
-      contents,
+      contents: createPseudoValueFront(contents),
       type: NODE_TYPES.BLOCK,
     };
   }
