@@ -212,7 +212,7 @@ class Scopes extends PureComponent<Props, State> {
 
     if (scopes && scopes.length > 0 && !isLoading) {
       const roots = scopes.map(
-        (s, i) => ({ path: `scope${i}`, contents: new ScopeFront(s) })
+        (s, i) => ({ path: `scope${i}`, name: s.name, contents: new ScopeFront(s) })
       );
       return (
         <div className="pane scopes-list">

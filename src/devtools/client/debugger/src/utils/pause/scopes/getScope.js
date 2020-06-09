@@ -39,9 +39,9 @@ function getScopeTitle(type, scope: RenderableScope) {
     return scope.block.displayName;
   }
 
-  if (type === "function" && scope.function) {
-    return scope.function.displayName
-      ? simplifyDisplayName(scope.function.displayName)
+  if (type === "function" && scope.callee) {
+    return scope.callee.functionName()
+      ? simplifyDisplayName(scope.callee.functionName())
       : L10N.getStr("anonymousFunction");
   }
   return L10N.getStr("scopes.block");

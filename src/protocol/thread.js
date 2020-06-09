@@ -117,6 +117,12 @@ Pause.prototype = {
         }
         scope.bindings = newBindings;
       }
+      if (scope.object) {
+        scope.object = new ValueFront(this, { object: scope.object });
+      }
+      if (scope.callee) {
+        scope.callee = new ValueFront(this, { object: scope.callee });
+      }
     });
 
     (objects || []).forEach(object => {

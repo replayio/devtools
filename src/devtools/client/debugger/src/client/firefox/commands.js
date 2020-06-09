@@ -335,6 +335,7 @@ function convertScope(protocolScope) {
     type,
     functionLexical,
     object,
+    callee,
     bindings: protocolBindings,
   } = protocolScope;
 
@@ -352,6 +353,7 @@ function convertScope(protocolScope) {
     parent: null,
     bindings,
     object,
+    callee,
     type,
     scopeKind: functionLexical ? "function lexical" : "",
   };
