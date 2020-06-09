@@ -542,7 +542,7 @@ ValueFront.prototype = {
     for (const { contents } of children) {
       if (contents.isObject() && !contents.hasPreview()) {
         promises.push(
-          this.getPause().getObjectPreview(contents._object.objectId)
+          contents.getPause().getObjectPreview(contents._object.objectId)
         );
       }
     }
