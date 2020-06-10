@@ -39,7 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // performed on the state at different points in the recording. This layer
 // helps with adapting the devtools to the WRP.
 
-const { sendMessage, addEventListener, log } = require("./socket");
+const {
+  sendMessage,
+  addEventListener,
+  log,
+  enableLogging,
+} = require("./socket");
 const {
   defer,
   assert,
@@ -1077,11 +1082,18 @@ const ThreadFront = {
     if (this.onEndpoint) {
       this.onEndpoint(endpoint);
     }
+
+    // Make sure the debugger has added a pause listener before warping to the endpoint.
+    await gToolbox.startPanel("debugger");
+
     this.timeWarp(endpoint.point, endpoint.time);
   },
 
   setTest(test) {
     this.testName = test;
+    if (test) {
+      enableLogging();
+    }
   },
 
   async ensureProcessed(onMissingRegions, onUnprocessedRegions) {
@@ -1092,6 +1104,8 @@ const ThreadFront = {
 
     await sendMessage("Session.ensureProcessed", {}, sessionId);
     if (this.testName) {
+      await gToolbox.selectTool("debugger");
+      window.Test = require("test/harness");
       const script = document.createElement("script");
       script.src = `/test?${this.testName}`;
       document.head.appendChild(script);

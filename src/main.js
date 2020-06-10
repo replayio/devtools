@@ -75,11 +75,7 @@ async function createSession() {
   });
   window.sessionId = sessionId;
   ThreadFront.setSessionId(sessionId);
-  if (test) {
-    await gToolbox.selectTool("debugger");
-    window.Test = require("./test/harness");
-    ThreadFront.setTest(test);
-  }
+  ThreadFront.setTest(test);
 }
 
 async function initialize() {

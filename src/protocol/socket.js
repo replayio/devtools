@@ -119,9 +119,16 @@ function onSocketError() {
   log("Socket Error");
 }
 
+let gLogsEnabled = false;
+
+function enableLogging() {
+  gLogsEnabled = true;
+}
+
 function log(text) {
-  return;
-  console.log(text);
+  if (gLogsEnabled) {
+    console.log(text);
+  }
 }
 
 module.exports = {
@@ -130,6 +137,7 @@ module.exports = {
   addEventListener,
   removeEventListener,
   log,
+  enableLogging,
 };
 
 // Debugging methods.
