@@ -17,6 +17,7 @@ import type { ThreadContext, Frame, Scope, Preview } from "../../types";
 import type { ThunkArgs } from "../types";
 
 const { log } = require("protocol/socket");
+const { createPrimitiveValueFront } = require("protocol/thread");
 
 // We need to display all variables in the current functional scope so
 // include all data for block scopes until the first functional scope
@@ -232,7 +233,7 @@ function getExpressionNameAndValue(
         const property: Object = properties.find(
           prop => prop.name === meta.property
         );
-        displayValue = property && property.contents;
+        displayValue = property ? property.contents : createPrimitiveValueFront(undefined);
         displayName += `.${meta.property}`;
       } else if (
         displayValue &&
