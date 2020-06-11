@@ -30,11 +30,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const url = new URL(window.location.href);
+
+const recordingId = url.searchParams.get("id");
+const dispatch = url.searchParams.get("dispatch");
+const test = url.searchParams.get("test");
+
+// During testing, make sure we clear local storage before importing
+// any code that might instantiate preferences from local storage.
+if (test) {
+  localStorage.clear();
+  require("devtools-modules").asyncStorage.clear();
+}
+
 require("./styles.css");
 
 const React = require("react");
 const ReactDOM = require("react-dom");
-import App from "ui/components/App";
+const App = require("ui/components/App").default;
 
 const { initSocket, sendMessage, log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
@@ -56,17 +69,6 @@ window.PrefObserver.prototype = {
   on: () => {},
   off: () => {},
 };
-
-const url = new URL(window.location.href);
-
-const recordingId = url.searchParams.get("id");
-const dispatch = url.searchParams.get("dispatch");
-const test = url.searchParams.get("test");
-
-if (test) {
-  localStorage.clear();
-  require("devtools-modules").asyncStorage.clear();
-}
 
 // Create a session to use while debugging.
 async function createSession() {
