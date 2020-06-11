@@ -197,7 +197,8 @@ async function waitForPausedNoSource() {
 }
 
 function hasFrames() {
-  return !!dbgSelectors.getCurrentThreadFrames();
+  const frames = dbgSelectors.getCurrentThreadFrames();
+  return frames.length > 0;
 }
 
 function getVisibleSelectedFrameLine() {
