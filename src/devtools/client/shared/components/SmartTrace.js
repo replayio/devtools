@@ -25,16 +25,14 @@ const {
   annotateFrames,
 } = require("devtools/client/debugger/src/utils/pause/frames/annotateFrames");
 
+const { ThreadFront } = require("protocol/thread");
+
 class SmartTrace extends Component {
   static get propTypes() {
     return {
       stacktrace: PropTypes.array.isRequired,
       onViewSource: PropTypes.func.isRequired,
       onViewSourceInDebugger: PropTypes.func.isRequired,
-      // Service to enable the source map feature.
-      sourceMapService: PropTypes.object,
-      initialRenderDelay: PropTypes.number,
-      onSourceMapResultDebounceDelay: PropTypes.number,
       // Function that will be called when the SmartTrace is ready, i.e. once it was
       // rendered.
       onReady: PropTypes.func,
@@ -42,20 +40,13 @@ class SmartTrace extends Component {
   }
 
   static get defaultProps() {
-    return {
-      initialRenderDelay: 100,
-      onSourceMapResultDebounceDelay: 200,
-    };
+    return {};
   }
 
   constructor(props) {
     super(props);
     this.state = {
       hasError: false,
-      // If a sourcemap service is passed, we want to introduce a small delay in rendering
-      // so we can have the results from the sourcemap service, or render if they're not
-      // available yet.
-      ready: !props.sourceMapService,
       frozen: false,
     };
   }
@@ -65,92 +56,38 @@ class SmartTrace extends Component {
   }
 
   componentWillMount() {
-    if (this.props.sourceMapService) {
-      this.sourceMapServiceUnsubscriptions = [];
-      const subscriptions = this.props.stacktrace.map(
-        (frame, index) =>
-          new Promise(resolve => {
-            const { lineNumber, columnNumber, filename } = frame;
-            const source = filename.split(" -> ").pop();
-            const subscribeCallback = (isSourceMapped, url, line, column) => {
-              this.onSourceMapServiceChange(
-                isSourceMapped,
-                url,
-                line,
-                column,
-                index
-              );
-              resolve();
-            };
-            const unsubscribe = this.props.sourceMapService.subscribe(
-              source,
-              lineNumber,
-              columnNumber,
-              subscribeCallback
-            );
-            this.sourceMapServiceUnsubscriptions.push(unsubscribe);
-          })
-      );
+    const mappedStack = this.props.stacktrace.map(async frame => {
+      const { lineNumber, columnNumber, filename } = frame;
+      const scriptIds = ThreadFront.getScriptIdsForURL(filename);
+      if (scriptIds.length != 1) {
+        return frame;
+      }
+      const location = {
+        scriptId: scriptIds[0],
+        line: lineNumber,
+        column: columnNumber,
+      };
+      const mapped = await ThreadFront.getPreferredMappedLocation(location);
+      return {
+        ...frame,
+        lineNumber: mapped.line,
+        columnNumber: mapped.column,
+        filename: ThreadFront.getScriptURL(mapped.scriptId),
+      };
+    });
 
-      const delay = new Promise(res => {
-        this.initialRenderDelayTimeoutId = setTimeout(
-          res,
-          this.props.initialRenderDelay
-        );
+    Promise.all(mappedStack).then(stacktrace => {
+      this.setState({
+        isSourceMapped: true,
+        frozen: true,
+        stacktrace,
       });
-
-      const sourceMapInit = Promise.all(subscriptions);
-
-      // We wait either for the delay to be other or the sourcemapService results to
-      // be available before setting the state as initialized.
-      Promise.race([delay, sourceMapInit]).then(() => {
-        if (this.initialRenderDelayTimeoutId) {
-          clearTimeout(this.initialRenderDelayTimeoutId);
-        }
-        this.setState(state => ({ ...state, ready: true }));
-      });
-    }
+    });
   }
 
   componentDidMount() {
-    if (this.props.onReady && this.state.ready) {
+    if (this.props.onReady) {
       this.props.onReady();
-    }
-  }
-
-  shouldComponentUpdate(_, nextState) {
-    if (this.state.ready === false && nextState.ready === true) {
-      return true;
-    }
-
-    if (this.state.ready && this.state.frozen && !nextState.frozen) {
-      return true;
-    }
-
-    return false;
-  }
-
-  componentDidUpdate(_, previousState) {
-    if (this.props.onReady && !previousState.ready && this.state.ready) {
-      this.props.onReady();
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.initialRenderDelayTimeoutId) {
-      clearTimeout(this.initialRenderDelayTimeoutId);
-    }
-
-    if (this.onFrameLocationChangedTimeoutId) {
-      clearTimeout(this.initialRenderDelayTimeoutId);
-    }
-
-    if (this.sourceMapServiceUnsubscriptions) {
-      this.sourceMapServiceUnsubscriptions.forEach(unsubscribe => {
-        if (typeof unsubscribe === "function") {
-          unsubscribe();
-        }
-      });
     }
   }
 
@@ -165,58 +102,8 @@ class SmartTrace extends Component {
     this.setState({ hasError: true });
   }
 
-  onSourceMapServiceChange(
-    isSourceMapped,
-    filename,
-    lineNumber,
-    columnNumber,
-    index
-  ) {
-    if (isSourceMapped) {
-      if (this.onFrameLocationChangedTimeoutId) {
-        clearTimeout(this.onFrameLocationChangedTimeoutId);
-      }
-
-      this.setState(state => {
-        const stacktrace = (state && state.stacktrace) || this.props.stacktrace;
-        const frame = { ...stacktrace[index] };
-        // Remove any sourceId that might confuse the viewSource util.
-        delete frame.sourceId;
-
-        const newStacktrace = stacktrace
-          .slice(0, index)
-          .concat({
-            ...frame,
-            filename,
-            lineNumber,
-            columnNumber,
-          })
-          .concat(stacktrace.slice(index + 1));
-
-        return {
-          isSourceMapped: true,
-          frozen: true,
-          stacktrace: newStacktrace,
-        };
-      });
-
-      // We only want to have a pending timeout if the component is ready.
-      if (this.state.ready === true) {
-        this.onFrameLocationChangedTimeoutId = setTimeout(() => {
-          this.setState(state => ({
-            ...state,
-            frozen: false,
-          }));
-        }, this.props.onSourceMapResultDebounceDelay);
-      }
-    }
-  }
-
   render() {
-    if (
-      this.state.hasError ||
-      (Number.isFinite(this.props.initialRenderDelay) && !this.state.ready)
-    ) {
+    if (this.state.hasError) {
       return null;
     }
 
