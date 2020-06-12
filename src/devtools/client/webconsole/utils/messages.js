@@ -142,9 +142,14 @@ function transformConsoleAPICallPacket(message) {
     level = "error";
   }
 
+  let type = MESSAGE_TYPE.LOG;
+  if (message.trace) {
+    type = MESSAGE_TYPE.TRACE;
+  }
+
   return new ConsoleMessage({
     source: MESSAGE_SOURCE.CONSOLE_API,
-    type: MESSAGE_TYPE.LOG,
+    type,
     level,
     parameters,
     messageText: message.errorMessage,
