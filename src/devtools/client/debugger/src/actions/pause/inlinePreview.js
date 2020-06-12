@@ -188,12 +188,16 @@ function getBindingValues(
       continue;
     }
 
-    const { displayName, displayValue } = getExpressionNameAndValue(
+    const info = getExpressionNameAndValue(
       name,
       value,
       ref,
       properties
     );
+    if (!info) {
+      continue;
+    }
+    const { displayName, displayValue } = info;
 
     // Variable with same name exists, display value of current or
     // closest to the current scope's variable
@@ -233,6 +237,12 @@ function getExpressionNameAndValue(
         const property: Object = properties.find(
           prop => prop.name === meta.property
         );
+        if (!property) {
+          // If we don't find the property, it might be on the prototype.
+          // Until we're sure we're showing the right thing, don't show
+          // anything at all.
+          return null;
+        }
         displayValue = property ? property.contents : createPrimitiveValueFront(undefined);
         displayName += `.${meta.property}`;
       } else if (
