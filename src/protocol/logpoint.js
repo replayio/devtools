@@ -143,13 +143,15 @@ async function setLogpoint(
           return [];
         }
       }
+      datas.push(conditionResult.data);
     `;
   }
 
   const mapper = `
     const { point, time, pauseId } = input;
-    const { frame } = sendCommand("Pause.getTopFrame");
+    const { frame, data: frameData } = sendCommand("Pause.getTopFrame");
     const { frameId, functionName, location } = frame;
+    const datas = [frameData];
     ${conditionSection}
     const bindings = [
       { name: "displayName", value: functionName || "" }
@@ -159,7 +161,7 @@ async function setLogpoint(
       { frameId, bindings, expression: "[" + ${JSON.stringify(text)} + "]" }
     );
     const values = [];
-    const datas = [result.data];
+    datas.push(result.data);
     if (result.exception) {
       values.push(result.exception);
     } else {
