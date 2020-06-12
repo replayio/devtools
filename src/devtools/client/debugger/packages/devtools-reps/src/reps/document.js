@@ -35,7 +35,7 @@ function Document(props) {
 }
 
 function getLocation(grip) {
-  const location = grip.preview.location;
+  const location = grip.documentURL();
   return location ? getURLDisplayString(location) : null;
 }
 

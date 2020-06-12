@@ -478,6 +478,10 @@ ValueFront.prototype = {
     return this._object.preview.node.pseudoType;
   },
 
+  documentURL() {
+    return this._object.preview.node.documentURL;
+  },
+
   isScope() {
     return false;
   },
