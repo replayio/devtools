@@ -145,6 +145,8 @@ function transformConsoleAPICallPacket(message) {
   let type = MESSAGE_TYPE.LOG;
   if (message.trace) {
     type = MESSAGE_TYPE.TRACE;
+  } else if (message.error) {
+    type = "error";
   }
 
   return new ConsoleMessage({
