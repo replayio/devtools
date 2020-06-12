@@ -61,16 +61,17 @@ addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
 
   if (LogpointHandlers.onResult) {
     results.forEach(
-      ({ key, value: { time, pauseId, location, values, datas } }) => {
+      async ({ key, value: { time, pauseId, location, values, datas } }) => {
         const pause = new Pause(ThreadFront.sessionId);
         pause.instantiate(pauseId);
         datas.forEach(d => pause.addData(d));
         const valueFronts = values.map(v => new ValueFront(pause, v));
+        const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
         LogpointHandlers.onResult(
           logGroupId,
           key,
           time,
-          location,
+          mappedLocation,
           pause,
           valueFronts
         );
