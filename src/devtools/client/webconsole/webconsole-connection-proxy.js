@@ -82,6 +82,7 @@ WebConsoleConnectionProxy.prototype = {
       error: msg.level == "error",
       info: msg.level == "info",
       trace: msg.level == "trace",
+      assert: msg.level == "assert",
       stacktrace,
       argumentValues: msg.argumentValues,
       executionPoint: msg.point.point,

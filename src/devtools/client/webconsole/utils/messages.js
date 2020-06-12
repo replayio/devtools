@@ -137,8 +137,8 @@ function transformConsoleAPICallPacket(message) {
 
   let level = "log";
   if (message.warning) {
-    level = "warning";
-  } else if (message.error) {
+    level = "warn";
+  } else if (message.error || message.assert) {
     level = "error";
   }
 
@@ -147,6 +147,8 @@ function transformConsoleAPICallPacket(message) {
     type = MESSAGE_TYPE.TRACE;
   } else if (message.error) {
     type = "error";
+  } else if (message.assert) {
+    type = "assert";
   }
 
   return new ConsoleMessage({
