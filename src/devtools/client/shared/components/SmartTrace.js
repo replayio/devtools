@@ -72,7 +72,7 @@ class SmartTrace extends Component {
         ...frame,
         lineNumber: mapped.line,
         columnNumber: mapped.column,
-        filename: ThreadFront.getScriptURL(mapped.scriptId),
+        filename: await ThreadFront.getScriptURL(mapped.scriptId),
       };
     });
 

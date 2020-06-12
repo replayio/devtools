@@ -21,24 +21,24 @@ function convertStack(stack, { frames }) {
   if (!stack) {
     return null;
   }
-  return stack.map(frameId => {
+  return Promise.all(stack.map(async frameId => {
     const frame = frames.find(f => f.frameId == frameId);
     const location = ThreadFront.getPreferredLocationRaw(frame.location);
     return {
-      filename: ThreadFront.getScriptURL(location.sourceId),
+      filename: await ThreadFront.getScriptURL(location.scriptId),
       sourceId: location.scriptId,
       lineNumber: location.line,
       columnNumber: location.column,
       functionName: frame.functionName,
     };
-  });
+  }));
 }
 
 WebConsoleConnectionProxy.prototype = {
   async onConsoleMessage(pause, msg) {
     //console.log("ConsoleMessage", msg);
 
-    const stacktrace = convertStack(msg.stack, msg.data);
+    const stacktrace = await convertStack(msg.stack, msg.data);
     const sourceId = stacktrace ? stacktrace[0].sourceId : undefined;
 
     let { url, scriptId, line, column } = msg;
@@ -47,7 +47,7 @@ WebConsoleConnectionProxy.prototype = {
       // If the execution point has a location, use any mappings in that location.
       // The message properties do not reflect any source mapping.
       const location = await ThreadFront.getPreferredLocation(msg.point.frame);
-      url = ThreadFront.getScriptURL(location.scriptId);
+      url = await ThreadFront.getScriptURL(location.scriptId);
       line = location.line;
       column = location.column;
     } else {
@@ -64,7 +64,7 @@ WebConsoleConnectionProxy.prototype = {
           line,
           column,
         });
-        url = ThreadFront.getScriptURL(location.scriptId);
+        url = await ThreadFront.getScriptURL(location.scriptId);
         line = location.line;
         column = location.column;
       }
@@ -92,10 +92,10 @@ WebConsoleConnectionProxy.prototype = {
     this.ui.wrapper.dispatchMessageAdd(packet);
   },
 
-  onLogpointLoading(logGroupId, point, time, { scriptId, line, column }) {
+  async onLogpointLoading(logGroupId, point, time, { scriptId, line, column }) {
     const packet = {
       errorMessage: "Loading...",
-      sourceName: ThreadFront.getScriptURL(scriptId),
+      sourceName: await ThreadFront.getScriptURL(scriptId),
       sourceId: scriptId,
       lineNumber: line,
       columnNumber: column,
@@ -110,10 +110,10 @@ WebConsoleConnectionProxy.prototype = {
     this.ui.wrapper.dispatchMessageAdd(packet);
   },
 
-  onLogpointResult(logGroupId, point, time, { scriptId, line, column }, pause, values) {
+  async onLogpointResult(logGroupId, point, time, { scriptId, line, column }, pause, values) {
     const packet = {
       errorMessage: "",
-      sourceName: ThreadFront.getScriptURL(scriptId),
+      sourceName: await ThreadFront.getScriptURL(scriptId),
       sourceId: scriptId,
       lineNumber: line,
       columnNumber: column,

@@ -50,6 +50,7 @@ const {
   assert,
   DisallowEverythingProxyHandler,
   EventEmitter,
+  ArrayMap,
 } = require("./utils");
 
 // Information about a protocol pause.
@@ -420,7 +421,7 @@ ValueFront.prototype = {
   functionLocationURL() {
     const location = this.functionLocation();
     if (location) {
-      return ThreadFront.getScriptURL(location.scriptId);
+      return ThreadFront.getScriptURLRaw(location.scriptId);
     }
   },
 
@@ -1041,6 +1042,9 @@ const ThreadFront = {
   // Map scriptId to URL.
   scriptURLs: new Map(),
 
+  // Resolve hooks for promises waiting on a script ID to be known.
+  scriptURLWaiters: new ArrayMap(),
+
   // Map URL to scriptId[].
   urlScripts: new Map(),
 
@@ -1144,6 +1148,9 @@ const ThreadFront = {
       if (generatedScriptId) {
         this.originalScripts.set(scriptId, generatedScriptId);
       }
+      const waiters = this.scriptURLWaiters.map.get(scriptId);
+      (waiters || []).forEach(resolve => resolve());
+      this.scriptURLWaiters.map.delete(scriptId);
       onScript(script);
     });
   },
@@ -1169,7 +1176,16 @@ const ThreadFront = {
     return this.prettyPrintedScripts.has(scriptId);
   },
 
-  getScriptURL(scriptId) {
+  getScriptURLRaw(scriptId) {
+    return this.scriptURLs.get(scriptId);
+  },
+
+  async getScriptURL(scriptId) {
+    if (!this.scriptURLs.has(scriptId)) {
+      const { promise, resolve } = defer();
+      this.scriptURLWaiters.add(scriptId, resolve);
+      await promise;
+    }
     return this.scriptURLs.get(scriptId);
   },
 

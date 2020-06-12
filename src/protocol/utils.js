@@ -133,6 +133,21 @@ const EventEmitter = {
   },
 };
 
+// Map from keys to arrays of values.
+function ArrayMap() {
+  this.map = new Map();
+}
+
+ArrayMap.prototype = {
+  add(key, value) {
+    if (this.map.has(key)) {
+      this.map.get(key).push(value);
+    } else {
+      this.map.set(key, [value]);
+    }
+  },
+};
+
 module.exports = {
   makeInfallible,
   defer,
@@ -142,4 +157,5 @@ module.exports = {
   binarySearch,
   DisallowEverythingProxyHandler,
   EventEmitter,
+  ArrayMap,
 };
