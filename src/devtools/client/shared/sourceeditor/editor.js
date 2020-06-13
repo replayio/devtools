@@ -10,6 +10,7 @@ const {
   DETECT_INDENT,
   getIndentationFromIteration,
 } = require("devtools/shared/indentation");
+const { PrefObserver } = require("devtools/client/shared/prefs");
 
 const ENABLE_CODE_FOLDING = "devtools.editor.enableCodeFolding";
 const KEYMAP_PREF = "devtools.editor.keymap";
@@ -169,7 +170,7 @@ function Editor(config) {
   this.config.extraKeys["Alt-F"] = false;
 
   // Overwrite default config with user-provided, if needed.
-  Object.keys(config).forEach((k) => {
+  Object.keys(config).forEach(k => {
     if (k != "extraKeys") {
       this.config[k] = config[k];
       return;
@@ -179,7 +180,7 @@ function Editor(config) {
       return;
     }
 
-    Object.keys(config.extraKeys).forEach((key) => {
+    Object.keys(config.extraKeys).forEach(key => {
       this.config.extraKeys[key] = config.extraKeys[key];
     });
   });
@@ -201,7 +202,7 @@ function Editor(config) {
   // indent those lines. If nothing is selected and we're
   // indenting with tabs, insert one tab. Otherwise insert N
   // whitespaces where N == indentUnit option.
-  this.config.extraKeys.Tab = (cm) => {
+  this.config.extraKeys.Tab = cm => {
     if (config.extraKeys && config.extraKeys.Tab) {
       // If a consumer registers its own extraKeys.Tab, we execute it before doing
       // anything else. If it returns false, that mean that all the key handling work is
@@ -283,7 +284,7 @@ Editor.prototype = {
    * This method is asynchronous and returns a promise.
    */
   appendTo: function (el, env) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const cm = editors.get(this);
 
       if (!env) {
@@ -372,7 +373,7 @@ Editor.prototype = {
     // Disable APZ for source editors. It currently causes the line numbers to
     // "tear off" and swim around on top of the content. Bug 1160601 tracks
     // finding a solution that allows APZ to work with CodeMirror.
-    cm.getScrollerElement().addEventListener("wheel", (ev) => {
+    cm.getScrollerElement().addEventListener("wheel", ev => {
       // By handling the wheel events ourselves, we force the platform to
       // scroll synchronously, like it did before APZ. However, we lose smooth
       // scrolling for users with mouse wheels. This seems acceptible vs.
@@ -392,7 +393,7 @@ Editor.prototype = {
       cm.getScrollerElement().scrollBy(deltaX, deltaY);
     });
 
-    cm.getWrapperElement().addEventListener("contextmenu", (ev) => {
+    cm.getWrapperElement().addEventListener("contextmenu", ev => {
       if (!this.config.contextMenu) {
         return;
       }
@@ -433,7 +434,7 @@ Editor.prototype = {
       this.emit("gutterClick", lineOrOffset, ev.button);
     });
 
-    win.CodeMirror.defineExtension("l10n", (name) => {
+    win.CodeMirror.defineExtension("l10n", name => {
       return L10N.getStr(name);
     });
 
@@ -459,7 +460,7 @@ Editor.prototype = {
     this.reloadPreferences = this.reloadPreferences.bind(this);
     this.setKeyMap = this.setKeyMap.bind(this, win);
 
-    this._prefObserver = new win.PrefObserver("devtools.editor.");
+    this._prefObserver = new PrefObserver("devtools.editor.");
     this._prefObserver.on(TAB_SIZE, this.reloadPreferences);
     this._prefObserver.on(EXPAND_TAB, this.reloadPreferences);
     this._prefObserver.on(AUTO_CLOSE, this.reloadPreferences);
@@ -684,7 +685,7 @@ Editor.prototype = {
     const cm = editors.get(this);
 
     const iterFn = function (start, end, callback) {
-      cm.eachLine(start, end, (line) => {
+      cm.eachLine(start, end, line => {
         return callback(line.text);
       });
     };
@@ -1004,7 +1005,7 @@ Editor.prototype = {
    */
   getPosition: function (...args) {
     const cm = editors.get(this);
-    const res = args.map((ind) => cm.posFromIndex(ind));
+    const res = args.map(ind => cm.posFromIndex(ind));
     return args.length === 1 ? res[0] : res;
   },
 
@@ -1015,7 +1016,7 @@ Editor.prototype = {
    */
   getOffset: function (...args) {
     const cm = editors.get(this);
-    const res = args.map((pos) => cm.indexFromPos(pos));
+    const res = args.map(pos => cm.indexFromPos(pos));
     return args.length > 1 ? res : res[0];
   },
 
@@ -1091,7 +1092,7 @@ Editor.prototype = {
     div.appendChild(txt);
     div.appendChild(inp);
 
-    this.openDialog(div, (line) => {
+    this.openDialog(div, line => {
       // Handle LINE:COLUMN as well as LINE
       const match = line.toString().match(RE_JUMP_TO_LINE);
       if (match) {
@@ -1331,7 +1332,7 @@ Editor.prototype = {
     const cm = editors.get(this);
     const mark = cm
       .getAllMarks()
-      .find((m) => m.className === AUTOCOMPLETE_MARK_CLASSNAME);
+      .find(m => m.className === AUTOCOMPLETE_MARK_CLASSNAME);
     if (!mark) {
       return "";
     }
@@ -1345,7 +1346,7 @@ Editor.prototype = {
     const className = AUTOCOMPLETE_MARK_CLASSNAME;
 
     cm.operation(() => {
-      cm.getAllMarks().forEach((mark) => {
+      cm.getAllMarks().forEach(mark => {
         if (mark.className === className) {
           mark.clear();
         }
@@ -1378,7 +1379,7 @@ Editor.prototype = {
    * editor.hello('Mozilla');
    */
   extend: function (funcs) {
-    Object.keys(funcs).forEach((name) => {
+    Object.keys(funcs).forEach(name => {
       const cm = editors.get(this);
       const ctx = { ed: this, cm: cm, Editor: Editor };
 
@@ -1473,9 +1474,9 @@ Editor.prototype = {
       keys.push("replaceAll.key");
     }
     // Process generic keys:
-    keys.forEach((name) => {
+    keys.forEach(name => {
       const key = L10N.getStr(name);
-      shortcuts.on(key, (event) => this._onSearchShortcut(name, event));
+      shortcuts.on(key, event => this._onSearchShortcut(name, event));
     });
   },
   /**
@@ -1527,7 +1528,7 @@ Editor.prototype = {
 // Since Editor is a thin layer over CodeMirror some methods
 // are mapped directly—without any changes.
 
-CM_MAPPING.forEach((name) => {
+CM_MAPPING.forEach(name => {
   Editor.prototype[name] = function (...args) {
     const cm = editors.get(this);
     return cm[name].apply(cm, args);
@@ -1584,13 +1585,13 @@ function getCSSKeywords(cssProperties) {
   const colorKeywords = {};
   const valueKeywords = {};
 
-  propertyKeywords.forEach((property) => {
+  propertyKeywords.forEach(property => {
     if (property.includes("color")) {
-      cssProperties.getValues(property).forEach((value) => {
+      cssProperties.getValues(property).forEach(value => {
         colorKeywords[value] = true;
       });
     } else {
-      cssProperties.getValues(property).forEach((value) => {
+      cssProperties.getValues(property).forEach(value => {
         valueKeywords[value] = true;
       });
     }

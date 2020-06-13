@@ -53,12 +53,6 @@ const loadImages = require("image/image");
 
 import { bootstrapApp } from "ui/utils/bootstrap";
 
-window.PrefObserver = function () {};
-window.PrefObserver.prototype = {
-  on: () => {},
-  off: () => {},
-};
-
 // Create a session to use while debugging.
 async function createSession() {
   const { sessionId } = await sendMessage("Recording.createSession", {
