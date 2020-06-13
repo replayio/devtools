@@ -4,9 +4,6 @@
 
 import { LocalizationHelper } from "devtools/shared/l10n";
 import { defer, assert } from "protocol/utils";
-const DBG_STRINGS_URI = "devtools/client/locales/debugger.properties";
-const L10N = new LocalizationHelper(DBG_STRINGS_URI);
-
 import { bootstrapApp } from "devtools/client/debugger/src/utils/bootstrap";
 
 function registerStoreObserver(store, subscriber) {
@@ -31,7 +28,9 @@ async function getNodeFront(gripOrFront, toolbox) {
 export class DebuggerPanel {
   constructor(toolbox) {
     this.panelWin = window;
-    this.panelWin.L10N = L10N;
+    this.panelWin.L10N = new LocalizationHelper(
+      "devtools/client/locales/debugger.properties"
+    );
     this.panelWin.Debugger = require("./src/main").default;
 
     this.toolbox = toolbox;
