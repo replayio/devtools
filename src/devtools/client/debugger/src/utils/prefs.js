@@ -16,6 +16,7 @@ const { pref } = Services;
 // Debugger prefs.
 pref("devtools.browsertoolbox.fission", false);
 pref("devtools.debugger.logging", false);
+pref("devtools.debugger.timing", false);
 pref("devtools.debugger.alphabetize-outline", false);
 pref("devtools.debugger.auto-pretty-print", false);
 pref("devtools.source-map.client-service.enabled", true);
@@ -110,6 +111,7 @@ pref("devtools.defaultColorUnit", "authored");
 export const prefs = new PrefsHelper("devtools", {
   fission: ["Bool", "browsertoolbox.fission"],
   logging: ["Bool", "debugger.logging"],
+  timing: ["Bool", "debugger.timing"],
   editorWrapping: ["Bool", "debugger.ui.editor-wrapping"],
   alphabetizeOutline: ["Bool", "debugger.alphabetize-outline"],
   autoPrettyPrint: ["Bool", "debugger.auto-pretty-print"],

@@ -45,15 +45,13 @@ if (test) {
 
 require("./styles.css");
 
-const React = require("react");
-const ReactDOM = require("react-dom");
-const App = require("ui/components/App").default;
-
 const { initSocket, sendMessage, log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const { paintMessage } = require("protocol/graphics");
 const { throttle, clamp, EventEmitter } = require("protocol/utils");
 const loadImages = require("image/image");
+
+import { bootstrapApp } from "ui/utils/bootstrap";
 
 window.PrefObserver = function () {};
 window.PrefObserver.prototype = {
@@ -111,8 +109,5 @@ setTimeout(async () => {
     await new Promise(resolve => setTimeout(resolve, 500));
   }
 
-  ReactDOM.render(
-    React.createElement(App, { initialize }),
-    document.querySelector("#viewer")
-  );
+  bootstrapApp({ initialize });
 }, 0);
