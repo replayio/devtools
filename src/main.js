@@ -55,15 +55,6 @@ const { paintMessage } = require("protocol/graphics");
 const { throttle, clamp, EventEmitter } = require("protocol/utils");
 const loadImages = require("image/image");
 
-const { LocalizationHelper } = require("shims/l10n");
-
-// Instantiate preferences early on from this rather obscure file...
-require("devtools/client/debugger/src/utils/prefs");
-
-window.l10n = new LocalizationHelper(
-  "devtools/client/locales/debugger.properties"
-);
-
 window.PrefObserver = function () {};
 window.PrefObserver.prototype = {
   on: () => {},
