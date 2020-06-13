@@ -10,7 +10,7 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
 import ToolboxProvider from "devtools/client/framework/store-provider";
-import { isFirefoxPanel, isDevelopment, isTesting } from "devtools-environment";
+import { isDevelopment } from "devtools-environment";
 import { AppConstants } from "devtools-modules";
 
 import * as search from "../workers/search";
@@ -62,10 +62,9 @@ export function bootstrapStore(
   panel: Panel,
   initialState: Object
 ) {
-  const debugJsModules = false; // AppConstants.AppConstants.DEBUG_JS_MODULES == "1";
   const createStore = configureStore({
-    log: prefs.logging || isTesting(),
-    timing: debugJsModules || isDevelopment(),
+    log: prefs.logging,
+    timing: prefs.timing,
     makeThunkArgs: (args, state) => {
       return { ...args, client, ...workers, panel };
     },
