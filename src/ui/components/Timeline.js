@@ -398,7 +398,7 @@ export default class Timeline extends Component {
     const { point, time } = closestPaintOrMouseEvent(mouseTime);
 
     if (hoverTime != time) {
-      this.setState({ hoverTime: time });
+      this.setState({ hoverTime: mouseTime });
       const { screen, mouse } = await getGraphicsAtTime(time);
       if (time == this.state.hoverTime) {
         paintGraphics(screen, mouse);
@@ -441,6 +441,7 @@ export default class Timeline extends Component {
 
   onPlayerMouseUp(e) {
     const { hoverTime, startDragTime, currentTime } = this.state;
+    const mouseTime = this.getMouseTime(e);
     this.setState({ startDragTime: null });
 
     const zoomInfo = this.zoomedRegion();
@@ -457,7 +458,8 @@ export default class Timeline extends Component {
       const which = e.shiftKey ? "zoomEndTime" : "zoomStartTime";
       this.setTimelineBoundary({ time: hoverTime, which });
     } else if (startDragTime != null && hoverTime != null) {
-      this.seekTime(hoverTime);
+      const { point } = closestPaintOrMouseEvent(mouseTime);
+      this.seek(point, mouseTime);
     }
   }
 
@@ -747,7 +749,7 @@ export default class Timeline extends Component {
   }
 
   renderHoverPoint() {
-    const { hoverTime, hoveredMessageOffset } = this.state;
+    const { hoverTime, hoveredMessageOffset, screen } = this.state;
     if (hoverTime == null || hoveredMessageOffset) {
       return [];
     }
@@ -764,9 +766,10 @@ export default class Timeline extends Component {
   }
 
   renderTicks() {
-    const tickSize = this.getTickSize();
-    const ticks = Math.round(this.overlayWidth / tickSize);
-    return range(ticks).map((value, index) => this.renderTick(index));
+    // const tickSize = this.getTickSize();
+    // const ticks = Math.round(this.overlayWidth / tickSize);
+    // return range(ticks).map((value, index) => this.renderTick(index));
+    return [];
   }
 
   renderTick(index) {
