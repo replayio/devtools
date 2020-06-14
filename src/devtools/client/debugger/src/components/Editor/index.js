@@ -231,6 +231,8 @@ class Editor extends PureComponent<Props, State> {
     codeMirror.on("scroll", this.onEditorScroll);
     this.onEditorScroll();
     this.setState({ editor });
+
+    gToolbox.getPanel("debugger").editor = this;
     return editor;
   }
 

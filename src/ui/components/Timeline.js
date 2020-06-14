@@ -425,8 +425,8 @@ export class Timeline extends Component {
   onPlayerMouseUp(e) {
     const { hoverTime, startDragTime, currentTime } = this.state;
     const mouseTime = this.getMouseTime(e);
+
     this.setState({ startDragTime: null });
-    const mouseTime = this.getMouseTime(e);
 
     const zoomInfo = this.zoomedRegion();
     if (zoomInfo) {

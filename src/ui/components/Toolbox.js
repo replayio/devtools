@@ -112,19 +112,24 @@ export default class Toolbox extends React.Component {
     resolve();
   }
 
-  async selectTool(panel) {
-    if (panel == this.state.selectedPanel) {
+  async selectTool(name) {
+    if (name == this.state.selectedPanel) {
       return;
     }
 
-    if (!this.state.panels[panel]) {
-      await this.startPanel(panel);
+    if (!this.state.panels[name]) {
+      await this.startPanel(name);
     }
 
-    log(`Toolbox SelectTool ${panel}`);
-    this.setState({ selectedPanel: panel });
+    log(`Toolbox SelectTool ${name}`);
+    this.setState({ selectedPanel: name });
 
-    // this.emit("select", panel);
+    const panel = this.state.panels[name];
+    if (panel.refresh) {
+      panel.refresh();
+    }
+
+    // this.emit("select", name);
   }
 
   async viewSourceInDebugger(url, line, column, id) {

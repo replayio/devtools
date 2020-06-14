@@ -145,6 +145,7 @@ export function initialSourcesState(): SourcesState {
     epoch: 1,
     selectedLocation: undefined,
     pendingSelectedLocation: prefs.pendingSelectedLocation,
+    selectedLocationHasScrolled: false,
     projectDirectoryRoot: prefs.projectDirectoryRoot,
     chromeAndExtensionsEnabled: prefs.chromeAndExtensionsEnabled,
     focusedItem: null,
@@ -187,7 +188,20 @@ function update(
           ...action.location,
         },
         pendingSelectedLocation: location,
+        selectedLocationHasScrolled: false,
       };
+
+    case "SET_VIEWPORT":
+      // Interacting with the viewport while the debugger is selected is
+      // a scroll action. Ignore viewport events when the debugger is not
+      // selected, as CodeMirror will not update properly.
+      if (gToolbox.currentTool == "debugger") {
+        return {
+          ...state,
+          selectedLocationHasScrolled: true,
+        };
+      }
+      return state;
 
     case "CLEAR_SELECTED_LOCATION":
       location = { url: "" };
@@ -1029,6 +1043,10 @@ export const getSelectedBreakableLines: Selector<Set<number>> = createSelector(
 export function isSourceLoadingOrLoaded(state: OuterState, sourceId: string) {
   const { content } = getResource(state.sources.sources, sourceId);
   return content !== null;
+}
+
+export function selectedLocationHasScrolled(state: OuterState) {
+  return state.sources.selectedLocationHasScrolled;
 }
 
 export default update;

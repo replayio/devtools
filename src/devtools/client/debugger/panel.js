@@ -63,6 +63,39 @@ export class DebuggerPanel {
     return this;
   }
 
+  refresh() {
+    if (!this.editor) {
+      return;
+    }
+
+    // CodeMirror does not update properly when it is hidden. This method has
+    // a few workarounds to get the editor to behave as expected when switching
+    // to the debugger from another panel and the selected location has changed.
+    const { codeMirror } = this.editor.state.editor;
+
+    // Update CodeMirror by dispatching a resize event to the window. CodeMirror
+    // also has a refresh() method but it did not work as expected when testing.
+    window.dispatchEvent(new Event("resize"));
+
+    // After CodeMirror refreshes, scroll it to the selected location, unless
+    // the user explicitly scrolled the editor since the location was selected.
+    // In this case the editor will already be in the correct state, and we
+    // don't want to undo the scrolling which the user did.
+    const handler = () => {
+      codeMirror.off("refresh", handler);
+      setTimeout(() => {
+        if (!this._selectors.selectedLocationHasScrolled(this._getState())) {
+          const location = this._selectors.getSelectedLocation(this._getState());
+          if (location) {
+            const cx = this._selectors.getContext(this._getState());
+            this._actions.selectLocation(cx, location);
+          }
+        }
+      }, 0);
+    };
+    codeMirror.on("refresh", handler);
+  }
+
   _onDebuggerStateChange(state, oldState) {
     const { getCurrentThread } = this._selectors;
 
