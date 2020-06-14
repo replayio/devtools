@@ -96,7 +96,7 @@ class WebConsoleUI {
 
     // Ignore Fronts that are already destroyed
     if (filterDisconnectedProxies) {
-      proxies = proxies.filter((proxy) => {
+      proxies = proxies.filter(proxy => {
         return (
           proxy && proxy.webConsoleFront && !!proxy.webConsoleFront.actorID
         );
@@ -320,7 +320,7 @@ class WebConsoleUI {
   _initOutputSyntaxHighlighting() {
     // Given a DOM node, we syntax highlight identically to how the input field
     // looks. See https://codemirror.net/demo/runmode.html;
-    const syntaxHighlightNode = (node) => {
+    const syntaxHighlightNode = node => {
       const editor = this.jsterm && this.jsterm.editor;
       if (node && editor) {
         node.classList.add("cm-s-mozilla");
@@ -356,7 +356,7 @@ class WebConsoleUI {
     let clearShortcut;
     clearShortcut = l10n.getStr("webconsole.clear.key");
 
-    shortcuts.on(clearShortcut, (event) => this.clearOutput(true, event));
+    shortcuts.on(clearShortcut, event => this.clearOutput(true, event));
   }
 
   getLongString(grip) {
