@@ -9,9 +9,10 @@ import sourceQueue from "../utils/source-queue";
 
 import { updateThreads } from "./threads";
 import { evaluateExpressions } from "./expressions";
+import { logExceptions } from "./logExceptions";
 
 import { clearWasmStates } from "../utils/wasm";
-import { getMainThread, getThreadContext } from "../selectors";
+import { getMainThread, getThreadContext, getShouldLogExceptions } from "../selectors";
 import type { Action, ThunkArgs } from "./types";
 
 /**
@@ -69,6 +70,7 @@ export function connect(
 
     const cx = getThreadContext(getState());
     dispatch(evaluateExpressions(cx));
+    dispatch(logExceptions(getShouldLogExceptions(getState())));
   };
 }
 
