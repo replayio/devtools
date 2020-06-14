@@ -104,10 +104,10 @@
 }
 
 .webreplay-player .message.overlayed {
-  border: 1px solid var(--progress-playing-background);
-  top: 7.5px;
-  height: 9px;
-  width: 9px;
+  border: 0.5px solid var(--progress-playing-background);
+  top: calc(50% - 3.75px);
+  height: 7.5px;
+  width: 7.5px;
 }
 
 .webreplay-player .message.overlayed.future {
@@ -164,6 +164,7 @@
 .webreplay-player .command-button {
   display: flex;
   min-width: 20px;
+  opacity: 0.4;
 }
 
 .webreplay-player .command-button.primary {

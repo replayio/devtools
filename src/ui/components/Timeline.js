@@ -438,9 +438,6 @@ export class Timeline extends Component {
       } else if (zoomEndTime < currentTime) {
         this.seekTime(zoomEndTime);
       }
-    } else if (e.altKey) {
-      const which = e.shiftKey ? "zoomEndTime" : "zoomStartTime";
-      this.setTimelineBoundary({ time: hoverTime, which });
     } else if (startDragTime != null && hoverTime != null) {
       const { point } = closestPaintOrMouseEvent(mouseTime);
       this.seek(point, mouseTime);
@@ -587,15 +584,20 @@ export class Timeline extends Component {
     });
   }
 
-  renderCommands() {
-    const {
-      playback,
-      zoomStartTime,
-      zoomEndTime,
-      recordingDuration,
-    } = this.state;
-
+  renderZoom() {
+    const { zoomStartTime, zoomEndTime, recordingDuration } = this.state;
     const zoomed = zoomStartTime != 0 || zoomEndTime != recordingDuration;
+
+    return CommandButton({
+      className: "",
+      active: zoomed,
+      img: "zoomout",
+      onClick: () => this.doZoomOut(),
+    });
+  }
+
+  renderCommands() {
+    const { playback } = this.state;
 
     return [
       CommandButton({
@@ -617,13 +619,6 @@ export class Timeline extends Component {
         active: !playback,
         img: "next",
         onClick: () => this.doNext(),
-      }),
-
-      CommandButton({
-        className: "",
-        active: zoomed,
-        img: "zoomout",
-        onClick: () => this.doZoomOut(),
       }),
     ];
   }
@@ -876,7 +871,8 @@ export class Timeline extends Component {
             ...this.renderTicks(),
             ...this.renderUnprocessedRegions(),
             ...this.renderZoomedRegion()
-          )
+          ),
+          this.renderZoom()
         )
       )
     );
