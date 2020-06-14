@@ -19,7 +19,7 @@
   --replaying-marker-location-background: var(--blue-50);
   --recording-marker-background-hover: hsl(14.9, 100%, 47%);
   --replaying-marker-background-hover: var(--blue-60);
-  --hover-point: #222222;
+  --hover-point: var(--blue-50);
   --progress-recording-line: #d0021b;
   --progressbar-background: #fff;
   --progressbar-line-color: var(--blue-40);
@@ -41,7 +41,7 @@
   --replaying-marker-highlighted-background: #3084d0;
   --replaying-marker-location-background: #3084d0;
   --replaying-marker-background-hover: #3a8edb;
-  --hover-point: #222222;
+  --hover-point: var(--blue-50);
   --progressbar-background: #0c0c0d;
   --proggressbar-border-color: var(--theme-splitter-color);
   --progressbar-line-color: #0a4786;
@@ -62,6 +62,7 @@
   background: var(--progressbar-background);
   border: 1px solid var(--proggressbar-border-color);
   overflow: hidden;
+  margin: 2px 5px 2px 0;
 }
 
 .webreplay-player .progress {
@@ -151,7 +152,7 @@
 .webreplay-player .hoverPoint {
   position: absolute;
   height: 100%;
-  width: 3px;
+  width: 2px;
   background: var(--hover-point);
 }
 

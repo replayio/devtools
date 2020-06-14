@@ -44,6 +44,6 @@ export function bootstrapApp(props) {
 
   ReactDOM.render(
     React.createElement(Provider, { store }, React.createElement(App, props)),
-    document.querySelector("#viewer")
+    document.querySelector("#app")
   );
 }
