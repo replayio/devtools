@@ -9,7 +9,6 @@
 }
 
 .frames [role="list"] [role="listitem"] {
-  padding-bottom: 2px;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
@@ -19,6 +18,7 @@
   margin: 0;
   max-width: 100%;
   flex-wrap: wrap;
+  line-height: 2rem;
 }
 
 .frames [role="list"] [role="listitem"] * {
@@ -156,7 +156,7 @@
   height: 30px;
   top: 50%;
   width: 100%;
-  border-top: 1px solid var(--theme-tab-toolbar-background);;
+  border-top: 1px solid var(--theme-tab-toolbar-background);
 }
 
 .call-stack-pane .async-label {

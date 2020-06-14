@@ -279,10 +279,10 @@ class EventListeners extends Component<Props, State> {
 
     return (
       <div className="event-listeners">
-        <div className="event-search-container">
+        {/* <div className="event-search-container">
           {this.renderSearchInput()}
           {this.renderClearSearchButton()}
-        </div>
+        </div> */}
         <div className="event-listeners-content">
           {searchText
             ? this.renderSearchResultsList()
@@ -299,12 +299,9 @@ const mapStateToProps = state => ({
   expandedCategories: getEventListenerExpanded(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    addEventListeners: actions.addEventListenerBreakpoints,
-    removeEventListeners: actions.removeEventListenerBreakpoints,
-    addEventListenerExpanded: actions.addEventListenerExpanded,
-    removeEventListenerExpanded: actions.removeEventListenerExpanded,
-  }
-)(EventListeners);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  addEventListeners: actions.addEventListenerBreakpoints,
+  removeEventListeners: actions.removeEventListenerBreakpoints,
+  addEventListenerExpanded: actions.addEventListenerExpanded,
+  removeEventListenerExpanded: actions.removeEventListenerExpanded,
+})(EventListeners);

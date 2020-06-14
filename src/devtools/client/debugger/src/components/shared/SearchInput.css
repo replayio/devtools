@@ -13,6 +13,7 @@
 }
 
 .search-field {
+  padding-left: 10px;
   position: relative;
   display: flex;
   align-items: center;
@@ -71,7 +72,7 @@
   height: 40px;
   padding-top: 10px;
   padding-bottom: 10px;
-  padding-inline-start: 40px;
+  padding-inline-start: 30px;
   font-size: 14px;
   line-height: 20px;
 }
