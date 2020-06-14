@@ -35,8 +35,7 @@ function getIconElement(level, onRewindClick, type) {
     classnames.push("rewindable");
   }
 
-  if (type && type === "logPoint") {
-    title = l10n.getStr("logpoint.title");
+  if (type === "logPoint") {
     classnames.push("logpoint");
   }
 

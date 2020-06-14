@@ -149,6 +149,8 @@ function transformConsoleAPICallPacket(message) {
     type = "error";
   } else if (message.assert) {
     type = "assert";
+  } else if (message.logpointId) {
+    type = "logPoint";
   }
 
   return new ConsoleMessage({
