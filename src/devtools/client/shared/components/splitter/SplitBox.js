@@ -7,6 +7,7 @@
 const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
+const { debounce } = require("devtools/shared/debounce");
 
 const Draggable = createFactory(
   require("devtools/client/shared/components/splitter/Draggable")
@@ -190,7 +191,13 @@ class SplitBox extends Component {
         height: this.getConstrainedSizeInPx(size, nodeBounds.height),
       });
     }
+
+    // Fire resize events at the window occasionally so that any visible
+    // CodeMirror instance can respond to the update.
+    this.dispatchResize();
   }
+
+  dispatchResize = debounce(() => window.dispatchEvent(new Event("resize")), 50);
 
   /**
    * Calculates the constrained size taking into account the minimum width or
