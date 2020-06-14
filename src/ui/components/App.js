@@ -45,6 +45,7 @@ function setTheme(theme) {
 class App extends React.Component {
   state = {
     orientation: "bottom",
+    tooltip: null,
   };
 
   componentDidMount() {
@@ -59,25 +60,45 @@ class App extends React.Component {
     }
   }
 
+  renderTooltip(tooltip) {
+    if (!tooltip?.screen) {
+      return null;
+    }
+
+    return (
+      <div className="timeline-tooltip" style={{ left: tooltip.left }}>
+        <img
+          style={{ height: "100%" }}
+          src={`data:${tooltip.screen.mimeType};base64,${tooltip.screen.data}`}
+        />
+      </div>
+    );
+  }
+
+  renderGraphics() {
+    const { tooltip } = this.props;
+    return (
+      <div id="viewer">
+        <canvas id="graphics"></canvas>
+        <div id="highlighter-root"></div>
+        {this.renderTooltip(tooltip)}
+      </div>
+    );
+  }
+
   render() {
     const { initialize } = this.props;
     const { orientation } = this.state;
 
-    const graphics = (
-      <>
-        <canvas id="graphics"></canvas>
-        <div id="highlighter-root"></div>
-      </>
-    );
     const toolbox = <Toolbox initialize={initialize} />;
 
     let startPanel, endPanel;
     if (orientation == "bottom" || orientation == "right") {
-      startPanel = graphics;
+      startPanel = this.renderGraphics();
       endPanel = toolbox;
     } else {
       startPanel = toolbox;
-      endPanel = graphics;
+      endPanel = this.renderGraphics();
     }
 
     const vert = orientation != "bottom";
@@ -108,6 +129,7 @@ class App extends React.Component {
 export default connect(
   state => ({
     theme: selectors.getTheme(state),
+    tooltip: selectors.getTooltip(state),
   }),
   {
     updateTheme: actions.updateTheme,

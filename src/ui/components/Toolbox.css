@@ -9,7 +9,7 @@
 }
 
 #toolbox-border {
-  height: 5px;
+  height: 0px;
   background: var(--theme-toolbar-background);
 }
 
@@ -76,4 +76,18 @@
 
 .toolbar-panel-button.active .toolbar-panel-icon {
   background: var(--theme-toolbar-selected-color);
+}
+
+.timeline-tooltip {
+  display: flex;
+  position: absolute;
+  width: 300px;
+  height: 180px;
+  border: 1px solid rgb(204, 204, 204);
+  box-shadow: 2px 1px 1px rgb(227, 227, 227);
+  bottom: 10px;
+  border-radius: 4px;
+  background: #ececec;
+  align-items: center;
+  justify-content: center;
 }

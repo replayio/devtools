@@ -7,13 +7,15 @@
 // The WebReplayPlayer is the React component which renders the devtools
 // timeline. It also manages which graphics are currently being rendered.
 
-const { Component } = require("react");
-const ReactDOM = require("react-dom");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const { sortBy, range } = require("lodash");
-const { SVG } = require("image/svg");
-const { sendMessage, log } = require("protocol/socket");
+import { connect } from "react-redux";
+import { Component } from "react";
+import ReactDOM from "react-dom";
+import dom from "react-dom-factories";
+import PropTypes from "prop-types";
+import { sortBy, range } from "lodash";
+
+import { SVG } from "image/svg";
+import { sendMessage, log } from "protocol/socket";
 const {
   closestPaintOrMouseEvent,
   nextPaintOrMouseEvent,
@@ -28,7 +30,10 @@ const {
   pointPrecedes,
 } = require("protocol/execution-point-utils.js");
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
+import { actions } from "../actions";
+import { selectors } from "../reducers";
+
+import { LocalizationHelper } from "devtools/shared/l10n";
 const L10N = new LocalizationHelper(
   "devtools/client/locales/toolbox.properties"
 );
@@ -128,7 +133,7 @@ function getMessageLocation(message) {
 let gCurrentScreenShot;
 let gCurrentMouse;
 
-export default class Timeline extends Component {
+export class Timeline extends Component {
   static get propTypes() {
     return {
       toolbox: PropTypes.object,
@@ -252,29 +257,6 @@ export default class Timeline extends Component {
     return zoomStartTime + (zoomEndTime - zoomStartTime) * clickPosition;
   }
 
-  onPaused(packet) {
-    throw new Error("NYI");
-    if (packet) {
-      let { executionPoint } = packet;
-      const closestMessage = this.getClosestMessage(executionPoint);
-
-      let pausedMessage;
-      if (executionPoint) {
-        pausedMessage = this.state.messages
-          .filter(message => message.executionPoint)
-          .find(message => pointEquals(message.executionPoint, executionPoint));
-      } else {
-        executionPoint = this.state.executionPoint;
-      }
-
-      this.setState({
-        executionPoint,
-        closestMessage,
-        pausedMessage,
-      });
-    }
-  }
-
   onMissingRegions(regions) {
     log(`MissingRegions ${JSON.stringify(regions)}`);
   }
@@ -390,6 +372,7 @@ export default class Timeline extends Component {
 
   async onProgressBarMouseMove(e) {
     const { hoverTime, recordingDuration } = this.state;
+    const { updateTooltip } = this.props;
     if (!recordingDuration) {
       return;
     }
@@ -400,19 +383,19 @@ export default class Timeline extends Component {
     if (hoverTime != time) {
       this.setState({ hoverTime: mouseTime });
       const { screen, mouse } = await getGraphicsAtTime(time);
-      if (time == this.state.hoverTime) {
-        paintGraphics(screen, mouse);
-      }
+      updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
     }
   }
 
   onPlayerMouseLeave() {
+    const { updateTooltip } = this.props;
+
     this.unhighlightConsoleMessage();
     this.clearPreviewLocation();
 
     // Restore the normal graphics.
-    paintGraphics(gCurrentScreenShot, gCurrentMouse);
 
+    updateTooltip(null);
     this.setState({ hoverTime: null, startDragTime: null });
   }
 
@@ -443,6 +426,7 @@ export default class Timeline extends Component {
     const { hoverTime, startDragTime, currentTime } = this.state;
     const mouseTime = this.getMouseTime(e);
     this.setState({ startDragTime: null });
+    const mouseTime = this.getMouseTime(e);
 
     const zoomInfo = this.zoomedRegion();
     if (zoomInfo) {
@@ -766,9 +750,6 @@ export default class Timeline extends Component {
   }
 
   renderTicks() {
-    // const tickSize = this.getTickSize();
-    // const ticks = Math.round(this.overlayWidth / tickSize);
-    // return range(ticks).map((value, index) => this.renderTick(index));
     return [];
   }
 
@@ -901,3 +882,7 @@ export default class Timeline extends Component {
     );
   }
 }
+
+export default connect(state => ({}), {
+  updateTooltip: actions.updateTooltip,
+})(Timeline);

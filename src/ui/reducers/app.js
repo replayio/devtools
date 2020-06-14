@@ -1,6 +1,7 @@
 function initialAppState() {
   return {
     theme: "theme-light",
+    tooltip: null,
   };
 }
 
@@ -9,6 +10,10 @@ export default function update(state = initialAppState(), action) {
     case "update_theme": {
       return { ...state, theme: action.theme };
     }
+    case "update_tooltip": {
+      return { ...state, tooltip: action.tooltip };
+    }
+
     default: {
       return state;
     }
@@ -17,4 +22,8 @@ export default function update(state = initialAppState(), action) {
 
 export function getTheme(state) {
   return state.app.theme;
+}
+
+export function getTooltip(state) {
+  return state.app.tooltip;
 }
