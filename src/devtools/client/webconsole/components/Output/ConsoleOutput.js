@@ -91,6 +91,7 @@ class ConsoleOutput extends Component {
     super(props);
     this.onContextMenu = this.onContextMenu.bind(this);
     this.maybeScrollToBottom = this.maybeScrollToBottom.bind(this);
+    gToolbox.consoleOutput = this;
   }
 
   componentDidMount() {
@@ -128,17 +129,11 @@ class ConsoleOutput extends Component {
     // - we are reacting to "initialize" action, and we are already scrolled to the bottom
     // - the number of messages displayed changed and we are already scrolled to the
     //   bottom, but not if we are reacting to a group opening.
-    // - the number of messages in the store changed and the new message is an evaluation
-    //   result.
 
     const lastChild = outputNode.lastChild;
     const visibleMessagesDelta =
       nextProps.visibleMessages.length - this.props.visibleMessages.length;
     const messagesDelta = nextProps.messages.size - this.props.messages.size;
-    const isNewMessageEvaluationResult =
-      messagesDelta > 0 &&
-      [...nextProps.messages.values()][nextProps.messages.size - 1].type ===
-      MESSAGE_TYPE.RESULT;
 
     const messagesUiDelta =
       nextProps.messagesUi.length - this.props.messagesUi.length;
@@ -156,14 +151,28 @@ class ConsoleOutput extends Component {
       (!this.props.initialized &&
         nextProps.initialized &&
         isScrolledToBottom(lastChild, outputNode)) ||
-      isNewMessageEvaluationResult ||
       (isScrolledToBottom(lastChild, outputNode) &&
         visibleMessagesDelta > 0 &&
         !isOpeningGroup);
+
+    // When evaluation results are added, scroll to them.
+    this.shouldScrollMessageId = null;
+    this.shouldScrollMessageNode = null;
+    if (messagesDelta > 0) {
+      const lastMessage = [...nextProps.messages.values()][nextProps.messages.size - 1];
+      if (lastMessage.type == MESSAGE_TYPE.RESULT) {
+        this.shouldScrollMessageId = lastMessage.id;
+      }
+    }
   }
 
   componentDidUpdate() {
     this.maybeScrollToBottom();
+
+    if (this.shouldScrollMessageNode) {
+      this.shouldScrollMessageNode.previousSibling.scrollIntoView();
+      this.shouldScrollMessageNode = null;
+    }
   }
 
   maybeScrollToBottom() {
@@ -232,7 +241,6 @@ class ConsoleOutput extends Component {
         pausedExecutionPoint,
         getMessage: () => messages.get(messageId),
         isPaused: !!pausedMessage && pausedMessage.id == messageId,
-        maybeScrollToBottom: this.maybeScrollToBottom,
       })
     );
 
