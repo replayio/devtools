@@ -189,7 +189,7 @@ async function setLogpoint(
 
   sendMessage("Analysis.addLocation", {
     analysisId,
-    sessionId: ThreadFront.sessionId,
+    sessionId: await ThreadFront.waitForSession(),
     location: { scriptId, line, column },
   });
   sendMessage("Analysis.runAnalysis", { analysisId });
@@ -239,7 +239,7 @@ async function setEventLogpoint(logGroupId, eventTypes) {
   for (const eventType of eventTypes) {
     sendMessage("Analysis.addEventHandlerEntryPoints", {
       analysisId,
-      sessionId: ThreadFront.sessionId,
+      sessionId: await ThreadFront.waitForSession(),
       eventType,
     });
   }
@@ -263,7 +263,7 @@ async function setExceptionLogpoint(logGroupId) {
 
   sendMessage("Analysis.addExceptionPoints", {
     analysisId,
-    sessionId: ThreadFront.sessionId,
+    sessionId: await ThreadFront.waitForSession(),
   });
 
   sendMessage("Analysis.runAnalysis", { analysisId });
@@ -293,7 +293,7 @@ async function setRandomLogpoint(numLogs) {
 
   sendMessage("Analysis.addRandomPoints", {
     analysisId,
-    sessionId: ThreadFront.sessionId,
+    sessionId: await ThreadFront.waitForSession(),
     numPoints: numLogs,
   });
 

@@ -1104,8 +1104,12 @@ const ThreadFront = {
     }
   },
 
+  waitForSession() {
+    return this.sessionWaiter.promise;
+  },
+
   async ensureProcessed(onMissingRegions, onUnprocessedRegions) {
-    const sessionId = await this.sessionWaiter.promise;
+    const sessionId = await this.waitForSession();
 
     addEventListener("Session.missingRegions", onMissingRegions);
     addEventListener("Session.unprocessedRegions", onUnprocessedRegions);
@@ -1131,7 +1135,7 @@ const ThreadFront = {
   },
 
   async findScripts(onScript) {
-    const sessionId = await this.sessionWaiter.promise;
+    const sessionId = await this.waitForSession();
     this.onScript = onScript;
 
     sendMessage("Debugger.findScripts", {}, sessionId);
@@ -1470,7 +1474,7 @@ const ThreadFront = {
   },
 
   async findConsoleMessages(onConsoleMessage) {
-    const sessionId = await this.sessionWaiter.promise;
+    const sessionId = await this.waitForSession();
 
     sendMessage("Console.findMessages", {}, sessionId);
     addEventListener("Console.newMessage", ({ message }) => {
@@ -1552,7 +1556,7 @@ const ThreadFront = {
     } catch (e) {
       // Getting the description will fail if it was never set. For now we don't
       // set the last screen in this case.
-      const sessionId = await this.sessionWaiter.promise;
+      const sessionId = await this.waitForSession();
       const { endpoint } = await sendMessage(
         "Session.getEndpoint",
         {},
