@@ -371,7 +371,6 @@ function refreshGraphics() {
     const highlighterContainer = document.querySelector(
       ".highlighter-container"
     );
-    console.log(`REFRESH_GRAPHICS ${highlighterContainer}`);
     if (highlighterContainer) {
       highlighterContainer.style.transform = `scale(${scale * window.devicePixelRatio})`;
       highlighterContainer.style.left = offsetLeft;
