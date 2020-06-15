@@ -27,6 +27,7 @@ const {
   pointPrecedes,
   pointEquals,
 } = require("protocol/execution-point-utils.js");
+const { sortBy } = require("lodash");
 const { log } = require("protocol/socket");
 
 const MessageState = overrides =>
@@ -1456,23 +1457,11 @@ function maybeSortVisibleMessages(
   // messages with execution points, as either we aren't replaying or haven't
   // seen any messages yet.
   if (state.hasExecutionPoints) {
-    //ChromeUtils.recordReplayLog(`SortVisibleMessagesStart ${state.visibleMessages.length}`);
-    state.visibleMessages.sort((a, b) => {
-      const pointA = messageExecutionPoint(state, a);
-      const pointB = messageExecutionPoint(state, b);
-      if (pointPrecedes(pointB, pointA)) {
-        return true;
-      } else if (pointPrecedes(pointA, pointB)) {
-        return false;
-      }
-
-      // When messages have the same execution point, they can still be
-      // distinguished by the number of messages since the last one which did
-      // have an execution point.
-      let countA = messageCountSinceLastExecutionPoint(state, a);
-      let countB = messageCountSinceLastExecutionPoint(state, b);
-      return countA > countB;
-    });
+    state.visibleMessages = sortBy(
+      state.visibleMessages,
+      message => BigInt(messageExecutionPoint(state, message)),
+      message => messageCountSinceLastExecutionPoint(state, message)
+    );
   }
 
   if (state.warningGroupsById.size > 0 && sortWarningGroupMessage) {
