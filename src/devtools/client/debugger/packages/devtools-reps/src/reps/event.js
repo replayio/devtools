@@ -101,7 +101,7 @@ function getKeyboardEventModifiers(preview) {
 
   const modifiers = [];
   for (const [property, name] of Object.entries(keysToModifiersMap)) {
-    if (preview[property]) {
+    if (preview[property].primitive()) {
       modifiers.push(name);
     }
   }
@@ -115,7 +115,7 @@ function getTitle(props) {
   if (props.object.className() == "KeyboardEvent") {
     const modifiers = getKeyboardEventModifiers(preview);
     if (modifiers.length) {
-      title = `${title} ${preview.modifiers.join("-")}`;
+      title = `${title} ${modifiers.join("-")}`;
     }
   }
   return title;
