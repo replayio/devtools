@@ -49,14 +49,6 @@ export function removeEventListenerBreakpoints(eventsToRemove: string[]) {
   };
 }
 
-export function toggleEventLogging() {
-  return async ({ dispatch, getState, client }: ThunkArgs) => {
-    const logEventBreakpoints = !shouldLogEventBreakpoints(getState());
-    await client.toggleEventLogging(logEventBreakpoints);
-    dispatch({ type: "TOGGLE_EVENT_LISTENERS", logEventBreakpoints });
-  };
-}
-
 export function addEventListenerExpanded(category: string) {
   return async ({ dispatch, getState }: ThunkArgs) => {
     const expanded = await getEventListenerExpanded(getState());

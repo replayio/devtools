@@ -441,12 +441,6 @@ async function getSources(
   return sources.map(source => prepareSourcePayload(client, source));
 }
 
-async function toggleEventLogging(logEventBreakpoints: boolean) {
-  return forEachThread(thread =>
-    thread.toggleEventLogging(logEventBreakpoints)
-  );
-}
-
 function getAllThreadFronts() {
   const fronts = [currentThreadFront];
   for (const { threadFront } of (Object.values(targets): any)) {
@@ -586,7 +580,6 @@ const clientCommands = {
   getFrameScopes,
   getFrames,
   logExceptions,
-  toggleEventLogging,
   fetchSources,
   fetchThreadSources,
   checkIfAlreadyPaused,
