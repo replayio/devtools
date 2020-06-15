@@ -150,7 +150,7 @@ export class Timeline extends Component {
       playback: null,
       messages: [],
       highlightedMessage: null,
-      hoveredMessageOffset: null,
+      hoveredMessage: null,
       unprocessedRegions: [],
       shouldAnimate: true,
       zoomStartTime: 0,
@@ -348,14 +348,14 @@ export class Timeline extends Component {
     this.scrollToMessage(message);
   }
 
-  onMessageMouseEnter(message, offset) {
-    this.setState({ hoveredMessageOffset: offset });
+  onMessageMouseEnter(message) {
+    this.setState({ hoveredMessage: message });
     this.previewLocation(message);
     this.showMessage(message);
   }
 
   onMessageMouseLeave() {
-    this.setState({ hoveredMessageOffset: null });
+    this.setState({ hoveredMessage: null });
     this.clearPreviewLocation();
   }
 
@@ -423,7 +423,7 @@ export class Timeline extends Component {
   }
 
   onPlayerMouseUp(e) {
-    const { hoverTime, startDragTime, currentTime } = this.state;
+    const { hoverTime, startDragTime, currentTime, hoveredMessage } = this.state;
     const mouseTime = this.getMouseTime(e);
 
     this.setState({ startDragTime: null });
@@ -438,18 +438,18 @@ export class Timeline extends Component {
       } else if (zoomEndTime < currentTime) {
         this.seekTime(zoomEndTime);
       }
-    } else if (startDragTime != null && hoverTime != null) {
+    } else if (startDragTime != null && hoverTime != null && !hoveredMessage) {
       const { point } = closestPaintOrMouseEvent(mouseTime);
       this.seek(point, mouseTime);
     }
   }
 
-  seek(point, time) {
+  seek(point, time, hasFrames) {
     if (!point) {
       return null;
     }
 
-    return this.threadFront.timeWarp(point, time);
+    return this.threadFront.timeWarp(point, time, hasFrames);
   }
 
   seekTime(targetTime) {
@@ -715,9 +715,14 @@ export class Timeline extends Component {
       onClick: e => {
         e.preventDefault();
         e.stopPropagation();
-        this.seek(message.executionPoint);
+        const {
+          executionPoint,
+          executionPointTime,
+          executionPointHasFrames,
+        } = message;
+        this.seek(executionPoint, executionPointTime, executionPointHasFrames);
       },
-      onMouseEnter: () => this.onMessageMouseEnter(message, offset),
+      onMouseEnter: () => this.onMessageMouseEnter(message),
       onMouseLeave: () => this.onMessageMouseLeave(),
     });
   }
@@ -728,8 +733,8 @@ export class Timeline extends Component {
   }
 
   renderHoverPoint() {
-    const { hoverTime, hoveredMessageOffset, screen } = this.state;
-    if (hoverTime == null || hoveredMessageOffset) {
+    const { hoverTime, hoveredMessage, screen } = this.state;
+    if (hoverTime == null || hoveredMessage) {
       return [];
     }
     const offset = this.getPixelOffset(hoverTime);
@@ -749,17 +754,16 @@ export class Timeline extends Component {
   }
 
   renderTick(index) {
-    const { currentTime, hoveredMessageOffset } = this.state;
+    const { currentTime } = this.state;
     const tickSize = this.getTickSize();
     const offset = Math.round(this.getPixelOffset(currentTime));
     const position = index * tickSize;
     const isFuture = position > offset;
-    const shouldHighlight = hoveredMessageOffset > position;
 
     return dom.span({
       className: classname("tick", {
         future: isFuture,
-        highlight: shouldHighlight,
+        highlight: true,
       }),
       style: {
         left: `${position}px`,
