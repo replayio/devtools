@@ -212,7 +212,6 @@ async function getGraphicsAtTime(time) {
 
   if (paintHash === undefined) {
     // There are no graphics to paint here.
-    clearGraphics();
     return {};
   }
 
@@ -317,39 +316,48 @@ function drawClick(cx, x, y) {
 }
 
 function refreshGraphics() {
+  const viewer = document.getElementById("viewer");
+  const bounds = viewer.getBoundingClientRect();
+
   const canvas = document.getElementById("graphics");
-  const cx = canvas.getContext("2d");
+  const textElem = document.getElementById("viewer-text");
 
-  const bounds = canvas.getBoundingClientRect();
-
-  const scale = window.devicePixelRatio;
-  canvas.width = bounds.width * scale;
-  canvas.height = bounds.height * scale;
-
+  // Find an image to draw.
+  let image;
   if (gDrawImage) {
-    let image = gDrawImage;
-    if ((!image.width || !image.height) && gLastImage) {
+    image = gDrawImage;
+    if (!image.width || !image.height) {
       // The current image hasn't loaded yet.
       image = gLastImage;
     }
+  }
 
-    const offsetLeft = Math.max((canvas.width - image.width) / 2, 0);
-    const offsetTop = Math.max((canvas.height - image.height) / 2, 0);
+  if (image) {
+    canvas.style.visibility = "visible";
+    textElem.style.visibility = "hidden";
 
-    cx.drawImage(image, offsetLeft, offsetTop);
-
-    // Make sure highlighters are rendered with the same offsets.
-    const highlighterContainer = document.querySelector(
-      ".highlighter-container"
+    const scale = Math.min(
+      bounds.width / image.width,
+      bounds.height / image.height,
+      1
     );
-    if (highlighterContainer) {
-      highlighterContainer.style.left = `${
-        bounds.left + offsetLeft / window.devicePixelRatio
-      }px`;
-      highlighterContainer.style.top = `${
-        bounds.top + offsetTop / window.devicePixelRatio
-      }px`;
-    }
+
+    canvas.width = image.width;
+    canvas.height = image.height;
+    canvas.style.transform = `scale(${scale})`;
+
+    const drawWidth = image.width * scale;
+    const drawHeight = image.height * scale;
+    assert(drawWidth <= bounds.width && drawHeight <= bounds.height);
+
+    const offsetLeft = (bounds.width - drawWidth) / 2;
+    const offsetTop = (bounds.height - drawHeight) / 2;
+
+    canvas.style.left = offsetLeft;
+    canvas.style.top = offsetTop;
+
+    const cx = canvas.getContext("2d");
+    cx.drawImage(image, 0, 0);
 
     if (gDrawMouse) {
       const { x, y, clickX, clickY } = gDrawMouse;
@@ -358,24 +366,38 @@ function refreshGraphics() {
         drawClick(cx, x, y);
       }
     }
-  } else {
-    cx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (gDrawMessage) {
-      cx.font = `${25 * window.devicePixelRatio}px sans-serif`;
-      const messageWidth = cx.measureText(gDrawMessage).width;
-      cx.fillText(
-        gDrawMessage,
-        (canvas.width - messageWidth) / 2,
-        canvas.height / 2
-      );
+    // Apply the same transforms to any displayed highlighter.
+    const highlighterContainer = document.querySelector(
+      ".highlighter-container"
+    );
+    console.log(`REFRESH_GRAPHICS ${highlighterContainer}`);
+    if (highlighterContainer) {
+      highlighterContainer.style.transform = `scale(${scale * window.devicePixelRatio})`;
+      highlighterContainer.style.left = offsetLeft;
+      highlighterContainer.style.top = offsetTop;
+      highlighterContainer.style.width = image.width;
+      highlighterContainer.style.height = image.height;
     }
+  } else {
+    canvas.style.visibility = "hidden";
+    textElem.style.visibility = "visible";
+
+    textElem.innerText = gDrawMessage || "";
+
+    // It would be better to avoid computing this position manually.
+    const textBounds = textElem.getBoundingClientRect();
+
+    const offsetLeft = Math.max(0, (bounds.width - textBounds.width) / 2);
+    const offsetTop = Math.max(0, (bounds.height - textBounds.height) / 2);
+    textElem.style.left = offsetLeft;
+    textElem.style.top = offsetTop;
   }
 }
 
 // Install an observer to refresh graphics whenever the content canvas is resized.
 function installObserver() {
-  const canvas = document.getElementById("graphics");
+  const canvas = document.getElementById("viewer");
   if (canvas) {
     const observer = new ResizeObserver(refreshGraphics);
     observer.observe(canvas);
@@ -394,4 +416,5 @@ module.exports = {
   paintGraphics,
   getGraphicsAtTime,
   paintMessage,
+  refreshGraphics,
 };

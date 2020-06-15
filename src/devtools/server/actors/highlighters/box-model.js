@@ -28,6 +28,7 @@ const nodeConstants = require("devtools/shared/dom-node-constants");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const STRINGS_URI = "devtools/shared/locales/highlighters.properties";
 const L10N = new LocalizationHelper(STRINGS_URI);
+const { refreshGraphics } = require("protocol/graphics");
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.
@@ -281,6 +282,9 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
       },
       prefix: this.ID_CLASS_PREFIX,
     });
+
+    // Apply transforms to the highlighter container.
+    setTimeout(refreshGraphics, 0);
 
     return highlighterContainer;
   }

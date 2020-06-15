@@ -80,6 +80,7 @@ class App extends React.Component {
     return (
       <div id="viewer">
         <canvas id="graphics"></canvas>
+        <div id="viewer-text"></div>
         <div id="highlighter-root"></div>
         {this.renderTooltip(tooltip)}
       </div>

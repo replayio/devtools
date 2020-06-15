@@ -39,13 +39,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #viewer {
   position: relative;
   overflow: hidden;
-}
-
-#graphics {
   width: 100%;
   height: 100%;
   background-color: #ececec;
+  z-index: -2; /* Draw background behind the canvas */
+}
+
+#graphics {
+  position: relative;
+  transform-origin: top left;
   z-index: -1; /* Draw canvas behind the highlighter overlay. */
+}
+
+#viewer-text {
+  position: absolute;
+  font-size: x-large;
 }
 
 #header {
