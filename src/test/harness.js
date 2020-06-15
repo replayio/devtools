@@ -444,6 +444,37 @@ async function randomLog(numLogs) {
   return messages;
 }
 
+async function findMarkupNode(text) {
+  return waitUntil(() => {
+    const nodes = document.querySelectorAll("#markup-box .editor");
+    return [...nodes].find(n => n.innerText.includes(text));
+  });
+}
+
+async function toggleMarkupNode(node) {
+  const parent = node.closest(".expandable");
+  const expander = parent.querySelector(".expander");
+  expander.click();
+}
+
+async function searchMarkup(text) {
+  const box = document.getElementById("inspector-searchbox");
+  box.dispatchEvent(new FocusEvent("focus"));
+  if (text !== undefined) {
+    // Undefined is used to continue the previous search.
+    box.value = text;
+  }
+  box.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+}
+
+async function waitForSelectedMarkupNode(text) {
+  return waitUntil(() => {
+    const node = document.querySelector(".theme-selected");
+    const editor = node.parentNode.querySelector(".editor");
+    return editor.innerText.includes(text);
+  });
+}
+
 module.exports = {
   selectConsole,
   selectDebugger,
@@ -496,4 +527,8 @@ module.exports = {
   toggleExceptionLogging,
   playbackRecording,
   randomLog,
+  findMarkupNode,
+  toggleMarkupNode,
+  searchMarkup,
+  waitForSelectedMarkupNode,
 };

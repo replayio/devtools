@@ -10,6 +10,7 @@ const { KeyCodes } = require("devtools/client/shared/keycodes");
 const EventEmitter = require("devtools/shared/event-emitter");
 const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
 const Services = require("Services");
+const { ThreadFront } = require("protocol/thread");
 
 // Maximum number of selector suggestions shown in the panel.
 const MAX_SUGGESTIONS = 15;
@@ -35,6 +36,7 @@ function InspectorSearch(inspector, input, clearBtn) {
   this.searchBox = input;
   this.searchClearButton = clearBtn;
   this._lastSearched = null;
+  this._lastSearchedResults = null;
 
   this._onKeyDown = this._onKeyDown.bind(this);
   this._onInput = this._onInput.bind(this);
@@ -55,10 +57,6 @@ function InspectorSearch(inspector, input, clearBtn) {
 exports.InspectorSearch = InspectorSearch;
 
 InspectorSearch.prototype = {
-  get walker() {
-    return this.inspector.walker;
-  },
-
   destroy: function() {
     this.searchBox.removeEventListener("keydown", this._onKeyDown, true);
     this.searchBox.removeEventListener("input", this._onInput, true);
@@ -76,6 +74,10 @@ InspectorSearch.prototype = {
     const lastSearched = this._lastSearched;
     this._lastSearched = query;
 
+    if (lastSearched != query) {
+      this._lastSearchedResult = null;
+    }
+
     const searchContainer = this.searchBox.parentNode;
 
     if (query.length === 0) {
@@ -86,21 +88,42 @@ InspectorSearch.prototype = {
       return;
     }
 
-    const res = await this.walker.search(query, { reverse });
+    if (!this._lastSearchedResult) {
+      this._lastSearchedResult = ThreadFront.searchDOM(query);
+    }
+    const lastSearchedResult = this._lastSearchedResult;
+    const nodes = await lastSearchedResult;
 
     // Value has changed since we started this request, we're done.
-    if (query !== this.searchBox.value) {
+    if (lastSearchedResult !== this._lastSearchedResult) {
       return;
     }
 
-    if (res) {
-      this.inspector.selection.setNodeFront(res.node, {
+    if (nodes.length) {
+      const currentNode = this.inspector.selection.nodeFront;
+      const currentIndex = currentNode ? nodes.indexOf(currentNode) : -1;
+      let index;
+      if (currentIndex == -1) {
+        index = 0;
+      } else if (reverse) {
+        index = currentIndex ? currentIndex - 1 : nodes.length - 1;
+      } else {
+        index = (currentIndex != nodes.length - 1) ? currentIndex + 1 : 0;
+      }
+
+      const node = nodes[index];
+      await node.ensureParentsLoaded();
+
+      if (lastSearchedResult !== this._lastSearchedResult) {
+        return;
+      }
+
+      this.inspector.selection.setNodeFront(node, {
         reason: "inspectorsearch",
       });
       searchContainer.classList.remove("devtools-searchbox-no-match");
 
-      res.query = query;
-      this.emit("search-result", res);
+      this.emit("search-result", { query, resultsIndex: index, resultsLength: nodes.length });
     } else {
       searchContainer.classList.add("devtools-searchbox-no-match");
       this.emit("search-result");
@@ -117,13 +140,13 @@ InspectorSearch.prototype = {
   },
 
   _onKeyDown: function(event) {
-    if (event.keyCode === KeyCodes.DOM_VK_RETURN) {
+    if (event.key == "Enter") {
       this._onSearch(event.shiftKey);
     }
 
     const modifierKey =
       Services.appinfo.OS === "Darwin" ? event.metaKey : event.ctrlKey;
-    if (event.keyCode === KeyCodes.DOM_VK_G && modifierKey) {
+    if (event.key === "g" && modifierKey) {
       this._onSearch(event.shiftKey);
       event.preventDefault();
     }
@@ -401,6 +424,7 @@ SelectorAutocompleter.prototype = {
   _onMarkupMutation: function() {
     this._searchResults = null;
     this._lastSearched = null;
+    this._lastSearchedResult = null;
   },
 
   /**
@@ -481,84 +505,7 @@ SelectorAutocompleter.prototype = {
    * searchbox.
    */
   showSuggestions: async function() {
-    let query = this.searchBox.value;
-    const state = this.state;
-    let firstPart = "";
-
-    if (query.endsWith("*") || state === this.States.ATTRIBUTE) {
-      // Hide the popup if the query ends with * (because we don't want to
-      // suggest all nodes) or if it is an attribute selector (because
-      // it would give a lot of useless results).
-      this.hidePopup();
-      return;
-    }
-
-    if (state === this.States.TAG) {
-      // gets the tag that is being completed. For ex. 'div.foo > s' returns
-      // 's', 'di' returns 'di' and likewise.
-      firstPart = (query.match(/[\s>+]?([a-zA-Z]*)$/) || ["", query])[1];
-      query = query.slice(0, query.length - firstPart.length);
-    } else if (state === this.States.CLASS) {
-      // gets the class that is being completed. For ex. '.foo.b' returns 'b'
-      firstPart = query.match(/\.([^\.]*)$/)[1];
-      query = query.slice(0, query.length - firstPart.length - 1);
-    } else if (state === this.States.ID) {
-      // gets the id that is being completed. For ex. '.foo#b' returns 'b'
-      firstPart = query.match(/#([^#]*)$/)[1];
-      query = query.slice(0, query.length - firstPart.length - 1);
-    }
-    // TODO: implement some caching so that over the wire request is not made
-    // everytime.
-    if (/[\s+>~]$/.test(query)) {
-      query += "*";
-    }
-
-    this._lastQuery = this.inspector
-      // Get all inspectors where we want suggestions from.
-      .getAllInspectorFronts()
-      .then(inspectors => {
-        // Get all of the suggestions.
-        return Promise.all(
-          inspectors.map(async ({ walker }) => {
-            return walker.getSuggestionsForQuery(query, firstPart, state);
-          })
-        );
-      })
-      .then(suggestions => {
-        // Merge all the results
-        const result = { query: "", suggestions: [] };
-        for (const r of suggestions) {
-          result.query = r.query;
-          result.suggestions = result.suggestions.concat(r.suggestions);
-        }
-        return result;
-      })
-      .then(result => {
-        this.emit("processing-done");
-        if (result.query !== query) {
-          // This means that this response is for a previous request and the user
-          // as since typed something extra leading to a new request.
-          return promise.resolve(null);
-        }
-
-        if (state === this.States.CLASS) {
-          firstPart = "." + firstPart;
-        } else if (state === this.States.ID) {
-          firstPart = "#" + firstPart;
-        }
-
-        // If there is a single tag match and it's what the user typed, then
-        // don't need to show a popup.
-        if (
-          result.suggestions.length === 1 &&
-          result.suggestions[0][0] === firstPart
-        ) {
-          result.suggestions = [];
-        }
-
-        // Wait for the autocomplete-popup to fire its popup-opened event, to make sure
-        // the autoSelect item has been selected.
-        return this._showPopup(result.suggestions, state);
-      });
+    // NYI
+    this.hidePopup();
   },
 };

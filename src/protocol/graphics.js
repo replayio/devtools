@@ -348,8 +348,6 @@ function refreshGraphics() {
 
     const drawWidth = image.width * scale;
     const drawHeight = image.height * scale;
-    assert(drawWidth <= bounds.width && drawHeight <= bounds.height);
-
     const offsetLeft = (bounds.width - drawWidth) / 2;
     const offsetTop = (bounds.height - drawHeight) / 2;
 

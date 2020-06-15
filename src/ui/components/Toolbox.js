@@ -210,7 +210,7 @@ export default class Toolbox extends React.Component {
               <div className="devtools-separator"></div>
               <span id="inspector-searchlabel"></span>
             </div>
-            <div className="devtools-separator"></div>
+            <div className="devtools-separator" hidden={true}></div>
             <button
               id="inspector-element-add-button"
               className="devtools-button"
@@ -220,6 +220,7 @@ export default class Toolbox extends React.Component {
             <button
               id="inspector-eyedropper-toggle"
               className="devtools-button"
+              hidden={true}
             ></button>
           </div>
 

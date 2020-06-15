@@ -261,6 +261,12 @@ Pause.prototype = {
     this.documentNode = this.getDOMFront(document);
   },
 
+  async searchDOM(query) {
+    const { nodes, data } = await this.sendMessage("DOM.performSearch", { query });
+    this.addData(data);
+    return nodes.map(node => this.getDOMFront(node));
+  },
+
   async getFrameStepsAtIndex(index) {
     const frames = await this.getFrames();
     const { frameId } = frames[index];
@@ -1502,6 +1508,16 @@ const ThreadFront = {
   getKnownRootDOMNode() {
     assert(this.currentPause.documentNode !== undefined);
     return this.currentPause.documentNode;
+  },
+
+  async searchDOM(query) {
+    if (!this.sessionId) {
+      return [];
+    }
+    this.ensureCurrentPause();
+    const pause = this.currentPause;
+    const nodes = await this.currentPause.searchDOM(query);
+    return pause == this.currentPause ? nodes : null;
   },
 
   getFrameStepsAtIndex(index) {
