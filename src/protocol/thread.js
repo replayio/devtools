@@ -267,6 +267,16 @@ Pause.prototype = {
     return nodes.map(node => this.getDOMFront(node));
   },
 
+  async loadMouseTargets() {
+    if (this.loadMouseTargetsWaiter) {
+      return this.loadMouseTargetsWaiter.promise;
+    }
+    this.loadMouseTargetsWaiter = defer();
+    const { elements } = await this.sendMessage("DOM.getAllBoundingClientRects");
+    this.mouseTargets = elements;
+    this.loadMouseTargetsWaiter.resolve();
+  },
+
   async getFrameStepsAtIndex(index) {
     const frames = await this.getFrames();
     const { frameId } = frames[index];
@@ -1518,6 +1528,16 @@ const ThreadFront = {
     const pause = this.currentPause;
     const nodes = await this.currentPause.searchDOM(query);
     return pause == this.currentPause ? nodes : null;
+  },
+
+  async loadMouseTargets() {
+    if (!this.sessionId) {
+      return;
+    }
+    const pause = this.currentPause;
+    this.ensureCurrentPause();
+    await this.currentPause.loadMouseTargets();
+    return pause == this.currentPause;
   },
 
   getFrameStepsAtIndex(index) {

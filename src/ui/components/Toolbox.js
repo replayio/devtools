@@ -175,6 +175,7 @@ export default class Toolbox extends React.Component {
   }
 
   renderInspector() {
+    const { nodePickerActive } = this.state;
     return (
       <div
         className="inspector-responsive-container theme-body inspector"
@@ -192,6 +193,11 @@ export default class Toolbox extends React.Component {
             className="devtools-toolbar devtools-input-toolbar"
             nowindowdrag="true"
           >
+            <button
+              id="command-button-pick"
+              className={classnames("devtools-button", { active: nodePickerActive })}
+              onClick={() => this.toggleNodePicker()}
+            ></button>
             <div id="inspector-search" className="devtools-searchbox">
               <input
                 id="inspector-searchbox"
@@ -384,6 +390,16 @@ export default class Toolbox extends React.Component {
         </div>
       </div>
     );
+  }
+
+  toggleNodePicker() {
+    const { nodePickerActive } = this.state;
+    const active = !nodePickerActive;
+    this.setState({ nodePickerActive: active });
+
+    if (active) {
+      this.threadFront.loadMouseTargets();
+    }
   }
 
   renderToolbar() {

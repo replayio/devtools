@@ -96,6 +96,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   background-color: var(--theme-body-background);
 }
 
+#command-button-pick::before {
+  background: var(--theme-icon-color);
+}
+
+#command-button-pick.active::before {
+  background-color: var(--theme-toolbar-selected-color);
+}
+
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
 @import url("devtools/client/themes/markup.css");
