@@ -11,7 +11,9 @@ const {
 const constants = require("devtools/client/webconsole/constants");
 const { DEFAULT_FILTERS, FILTERS, MESSAGE_TYPE, MESSAGE_SOURCE } = constants;
 
-const { getGripPreviewItems } = require("devtools/client/debugger/packages/devtools-reps/src");
+const {
+  getGripPreviewItems,
+} = require("devtools/client/debugger/packages/devtools-reps/src");
 const { getUnicodeUrlPath } = require("devtools/client/shared/unicode-url");
 const { getSourceNames } = require("devtools/client/shared/source-utils");
 const {
@@ -368,8 +370,7 @@ function messages(
       return limitTopLevelMessageCount(newState, logLimit);
 
     case constants.MESSAGES_CLEAR:
-      return MessageState({
-      });
+      return MessageState({});
 
     case constants.PRIVATE_MESSAGES_CLEAR: {
       const removedIds = [];
@@ -996,13 +997,13 @@ function getMessageVisibility(
   const parentVisibility =
     parentWarningGroupMessage && checkParentWarningGroupVisibility
       ? getMessageVisibility(parentWarningGroupMessage, {
-        messagesState,
-        filtersState,
-        prefsState,
-        uiState,
-        checkGroup,
-        checkParentWarningGroupVisibility,
-      })
+          messagesState,
+          filtersState,
+          prefsState,
+          uiState,
+          checkGroup,
+          checkParentWarningGroupVisibility,
+        })
       : null;
   if (
     parentVisibility &&
@@ -1177,7 +1178,7 @@ function passSearchFilters(message, filters) {
   if (term.startsWith("/") && term.endsWith("/") && term.length > 2) {
     try {
       regex = new RegExp(term.slice(1, -1), "im");
-    } catch (e) { }
+    } catch (e) {}
   }
   const matchStr = regex
     ? str => regex.test(str)
@@ -1221,7 +1222,7 @@ function isTextInFrame(matchStr, frame) {
 
   const str = `${
     functionName ? functionName + " " : ""
-    }${unicodeShort}:${line}:${column}`;
+  }${unicodeShort}:${line}:${column}`;
   return matchStr(str);
 }
 
@@ -1472,7 +1473,6 @@ function maybeSortVisibleMessages(
       let countB = messageCountSinceLastExecutionPoint(state, b);
       return countA > countB;
     });
-    //ChromeUtils.recordReplayLog(`SortVisibleMessagesEnd`);
   }
 
   if (state.warningGroupsById.size > 0 && sortWarningGroupMessage) {

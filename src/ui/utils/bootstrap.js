@@ -11,6 +11,22 @@ import App from "ui/components/App";
 
 const initialState = {};
 
+function setupAppHelper(store) {
+  window.app = {
+    store,
+    actions: bindActionCreators(actions, store.dispatch),
+    selectors: bindSelectors({ store, selectors }),
+  };
+}
+
+export function setupConsoleHelper({ store, selectors, actions }) {
+  window.app.console = {
+    store,
+    actions: bindActionCreators(actions, store.dispatch),
+    selectors: bindSelectors({ store, selectors }),
+  };
+}
+
 function bindSelectors(obj) {
   return Object.keys(obj.selectors).reduce((bound, selector) => {
     bound[selector] = (a, b, c) =>
@@ -29,12 +45,7 @@ function bootstrapStore() {
   });
 
   const store = createStore(combineReducers(reducers), initialState);
-
-  window.app = {
-    store,
-    actions: bindActionCreators(actions, store.dispatch),
-    selectors: bindSelectors({ store, selectors }),
-  };
+  setupAppHelper(store);
 
   return store;
 }

@@ -9,15 +9,13 @@ const { Provider } = require("react-redux");
 const ToolboxProvider = require("devtools/client/framework/store-provider");
 
 const actions = require("devtools/client/webconsole/actions/index");
+const selectors = require("devtools/client/webconsole/selectors/index");
 const { configureStore } = require("devtools/client/webconsole/store");
-
+const { setupConsoleHelper } = require("ui/utils/bootstrap");
 const {
   isPacketPrivate,
 } = require("devtools/client/webconsole/utils/messages");
-const {
-  getAllMessagesById,
-  getMessage,
-} = require("devtools/client/webconsole/selectors/messages");
+
 const Telemetry = require("devtools/client/shared/telemetry");
 
 const EventEmitter = require("devtools/shared/event-emitter");
@@ -104,6 +102,8 @@ class WebConsoleWrapper {
           root: this.parentNode,
           toolbox: this.toolbox,
         });
+
+        setupConsoleHelper({ store, selectors, actions });
       } else {
         // If there's no parentNode, we are in a test. So we can resolve immediately.
         resolve();
