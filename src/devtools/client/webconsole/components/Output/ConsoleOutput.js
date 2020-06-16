@@ -170,7 +170,10 @@ class ConsoleOutput extends Component {
     this.maybeScrollToBottom();
 
     if (this.shouldScrollMessageNode) {
-      this.shouldScrollMessageNode.previousSibling.scrollIntoView();
+      // Scroll to the previous message node if it exists. It should be the
+      // input which triggered the evaluation result we're scrolling to.
+      const previous = this.shouldScrollMessageNode.previousSibling;
+      (previous || this.shouldScrollMessageNode).scrollIntoView();
       this.shouldScrollMessageNode = null;
     }
   }
