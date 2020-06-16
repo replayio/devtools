@@ -161,11 +161,6 @@ export class Timeline extends Component {
     this.hoveredMessage = null;
     this.overlayWidth = 1;
 
-    this.onProgressBarMouseMove = this.onProgressBarMouseMove.bind(this);
-    this.onPlayerMouseLeave = this.onPlayerMouseLeave.bind(this);
-    this.onPlayerMouseDown = this.onPlayerMouseDown.bind(this);
-    this.onPlayerMouseUp = this.onPlayerMouseUp.bind(this);
-
     gToolbox.timeline = this;
   }
 
@@ -370,7 +365,20 @@ export class Timeline extends Component {
     this.debugger?.clearPreviewPausedLocation();
   }
 
-  async onProgressBarMouseMove(e) {
+  hoverTimer = () => {
+    const { updateTooltip } = this.props;
+    const isHovered = window.elementIsHovered(this.$progressBar);
+    if (!isHovered) {
+      clearInterval(this.hoverInterval);
+      updateTooltip(null);
+    }
+  };
+
+  onPlayerMouseEnter = async e => {
+    this.hoverInterval = setInterval(this.hoverTimer, 100);
+  };
+
+  onPlayerMouseMove = async e => {
     const { hoverTime, recordingDuration } = this.state;
     const { updateTooltip } = this.props;
     if (!recordingDuration) {
@@ -385,10 +393,11 @@ export class Timeline extends Component {
       const { screen, mouse } = await getGraphicsAtTime(time);
       updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
     }
-  }
+  };
 
-  onPlayerMouseLeave() {
+  onPlayerMouseLeave = () => {
     const { updateTooltip } = this.props;
+    clearInterval(this.hoverInterval);
 
     this.unhighlightConsoleMessage();
     this.clearPreviewLocation();
@@ -397,14 +406,14 @@ export class Timeline extends Component {
 
     updateTooltip(null);
     this.setState({ hoverTime: null, startDragTime: null });
-  }
+  };
 
-  onPlayerMouseDown() {
+  onPlayerMouseDown = () => {
     const { hoverTime } = this.state;
     if (hoverTime != null) {
       this.setState({ startDragTime: hoverTime });
     }
-  }
+  };
 
   zoomedRegion() {
     const { startDragTime, hoverTime } = this.state;
@@ -422,8 +431,13 @@ export class Timeline extends Component {
     return { zoomStartTime: hoverTime, zoomEndTime: startDragTime };
   }
 
-  onPlayerMouseUp(e) {
-    const { hoverTime, startDragTime, currentTime, hoveredMessage } = this.state;
+  onPlayerMouseUp = e => {
+    const {
+      hoverTime,
+      startDragTime,
+      currentTime,
+      hoveredMessage,
+    } = this.state;
     const mouseTime = this.getMouseTime(e);
 
     this.setState({ startDragTime: null });
@@ -442,7 +456,7 @@ export class Timeline extends Component {
       const { point } = closestPaintOrMouseEvent(mouseTime);
       this.seek(point, mouseTime);
     }
-  }
+  };
 
   seek(point, time, hasFrames) {
     if (!point) {
@@ -853,7 +867,9 @@ export class Timeline extends Component {
           div(
             {
               className: "progressBar",
-              onMouseMove: this.onProgressBarMouseMove,
+              ref: a => (this.$progressBar = a),
+              onMouseEnter: this.onPlayerMouseEnter,
+              onMouseMove: this.onPlayerMouseMove,
               onMouseLeave: this.onPlayerMouseLeave,
               onMouseDown: this.onPlayerMouseDown,
               onMouseUp: this.onPlayerMouseUp,
