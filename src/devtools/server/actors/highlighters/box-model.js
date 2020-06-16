@@ -347,6 +347,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
       // node.
       if (
         !this.options.hideInfoBar &&
+        !node.isNodeBoundsFront() &&
         (node.nodeType === Node.ELEMENT_NODE ||
           node.nodeType === Node.TEXT_NODE)
       ) {

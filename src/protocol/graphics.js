@@ -114,6 +114,9 @@ const gMouseEvents = [];
 // All mouse click events that have occurred in the recording, in order.
 const gMouseClickEvents = [];
 
+// Device pixel ratio used by recording screen shots.
+let gDevicePixelRatio;
+
 function onPaints({ paints }) {
   paints.forEach(({ point, time, screenShots }) => {
     const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")
@@ -137,6 +140,10 @@ ThreadFront.sessionWaiter.promise.then(sessionId => {
 
   sendMessage("Session.findMouseEvents", {}, sessionId);
   addEventListener("Session.mouseEvents", onMouseEvents);
+
+  sendMessage("Graphics.getDevicePixelRatio", {}, sessionId).then(({ ratio }) => {
+    gDevicePixelRatio = ratio;
+  });
 });
 
 function addLastScreen(screen, point, time) {
@@ -170,6 +177,10 @@ function previousPaintEvent(time) {
     return mostRecentEntry(gPaintPoints, time - 1);
   }
   return entry;
+}
+
+function getDevicePixelRatio() {
+  return gDevicePixelRatio;
 }
 
 //////////////////////////////
@@ -369,8 +380,8 @@ function refreshGraphics() {
     const highlighterContainer = document.querySelector(
       ".highlighter-container"
     );
-    if (highlighterContainer) {
-      highlighterContainer.style.transform = `scale(${scale * window.devicePixelRatio})`;
+    if (highlighterContainer && gDevicePixelRatio) {
+      highlighterContainer.style.transform = `scale(${scale * gDevicePixelRatio})`;
       highlighterContainer.style.left = offsetLeft;
       highlighterContainer.style.top = offsetTop;
       highlighterContainer.style.width = image.width;
@@ -414,4 +425,5 @@ module.exports = {
   getGraphicsAtTime,
   paintMessage,
   refreshGraphics,
+  getDevicePixelRatio,
 };

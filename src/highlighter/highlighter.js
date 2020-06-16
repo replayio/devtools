@@ -9,6 +9,8 @@ const { BoxModelHighlighter } = require("devtools/server/actors/highlighters/box
 let gBoxModelHighlighter;
 
 const Highlighter = {
+  currentNode: null,
+
   highlight(node) {
     if (!node) {
       return;
@@ -17,12 +19,14 @@ const Highlighter = {
       gBoxModelHighlighter = new BoxModelHighlighter();
     }
     gBoxModelHighlighter.show(node);
+    this.currentNode = node;
   },
 
   unhighlight() {
     if (gBoxModelHighlighter) {
       gBoxModelHighlighter.hide();
     }
+    this.currentNode = null;
   },
 };
 

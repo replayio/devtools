@@ -224,6 +224,7 @@ Pause.prototype = {
     return { returned, exception, failed };
   },
 
+  // Synchronously get a DOM front for an object whose preview is known.
   getDOMFront(objectId) {
     // Make sure we don't create multiple node fronts for the same object.
     if (!objectId) {
@@ -233,7 +234,7 @@ Pause.prototype = {
       return this.domFronts.get(objectId);
     }
     const data = this.objects.get(objectId);
-    assert(data && data.preview && data.preview);
+    assert(data && data.preview);
     let front;
     if (data.preview.node) {
       front = new NodeFront(this, data);
@@ -248,6 +249,21 @@ Pause.prototype = {
     }
     this.domFronts.set(objectId, front);
     return front;
+  },
+
+  // Asynchronously get a DOM front for an object which might not have a preview.
+  async ensureDOMFrontAndParents(nodeId) {
+    let parentId = nodeId;
+    while (parentId) {
+      const data = this.objects.get(parentId);
+      if (!data || !data.preview) {
+        const { data } = await this.sendMessage("DOM.getParentNodes", { node: parentId });
+        this.addData(data);
+        break;
+      }
+      parentId = data.preview.node.parentNode;
+    }
+    return this.getDOMFront(nodeId);
   },
 
   async loadDocument() {
@@ -275,6 +291,17 @@ Pause.prototype = {
     const { elements } = await this.sendMessage("DOM.getAllBoundingClientRects");
     this.mouseTargets = elements;
     this.loadMouseTargetsWaiter.resolve();
+  },
+
+  async getMouseTarget(x, y) {
+    await this.loadMouseTargets();
+    for (const { node, rect } of this.mouseTargets) {
+      const [left, top, right, bottom] = rect;
+      if (x >= left && x <= right && y >= top && y <= bottom) {
+        return new NodeBoundsFront(this, node, rect);
+      }
+    }
+    return null;
   },
 
   async getFrameStepsAtIndex(index) {
@@ -624,6 +651,8 @@ function NodeFront(pause, data) {
 NodeFront.prototype = {
   then: undefined,
 
+  isNodeBoundsFront() { return false; },
+
   get isConnected() {
     return this._node.isConnected;
   },
@@ -906,6 +935,17 @@ function buildBoxQuads(array) {
   return rv;
 }
 
+function buildBoxQuadsFromRect([left, top, right, bottom]) {
+  return [
+    DOMQuad.fromQuad({
+      p1: { x: left, y: top },
+      p2: { x: right, y: top },
+      p3: { x: right, y: bottom },
+      p4: { x: left, y: bottom },
+    })
+  ];
+}
+
 // Manages interaction with a CSSRule.
 function RuleFront(pause, data) {
   this._pause = pause;
@@ -1014,6 +1054,30 @@ StyleFront.prototype = {
 
 Object.setPrototypeOf(
   StyleFront.prototype,
+  new Proxy({}, DisallowEverythingProxyHandler)
+);
+
+// Used by the highlighter when showing the bounding client rect of a node
+// that might not be loaded yet, for the node picker.
+function NodeBoundsFront(pause, nodeId, rect) {
+  this._pause = pause;
+  this._rect = rect;
+
+  this.nodeId = nodeId;
+}
+
+NodeBoundsFront.prototype = {
+  then: undefined,
+
+  isNodeBoundsFront() { return true; },
+
+  getBoxQuads(box) {
+    return buildBoxQuadsFromRect(this._rect);
+  },
+};
+
+Object.setPrototypeOf(
+  NodeBoundsFront.prototype,
   new Proxy({}, DisallowEverythingProxyHandler)
 );
 
@@ -1538,6 +1602,26 @@ const ThreadFront = {
     this.ensureCurrentPause();
     await this.currentPause.loadMouseTargets();
     return pause == this.currentPause;
+  },
+
+  async getMouseTarget(x, y) {
+    if (!this.sessionId) {
+      return null;
+    }
+    const pause = this.currentPause;
+    this.ensureCurrentPause();
+    const nodeBounds = await this.currentPause.getMouseTarget(x, y);
+    return pause == this.currentPause ? nodeBounds : null;
+  },
+
+  async ensureNodeLoaded(objectId) {
+    const pause = this.currentPause;
+    const node = await pause.ensureDOMFrontAndParents(objectId);
+    if (pause != this.currentPause) {
+      return null;
+    }
+    await node.ensureParentsLoaded();
+    return pause == this.currentPause ? node : null;
   },
 
   getFrameStepsAtIndex(index) {
