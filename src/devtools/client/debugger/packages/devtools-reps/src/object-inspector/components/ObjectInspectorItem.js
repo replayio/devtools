@@ -100,9 +100,10 @@ class ObjectInspectorItem extends Component<Props> {
 
     if (nodeIsOptimizedOut(item)) {
       // See getChildren() in protocol/thread.js
-      const value = label == "Loading…"
-        ? undefined
-        : dom.span({ className: "unavailable" }, "(optimized away)");
+      const value =
+        label == "Loading…"
+          ? undefined
+          : dom.span({ className: "unavailable" }, "(optimized away)");
       return { label, value };
     }
 
@@ -196,6 +197,7 @@ class ObjectInspectorItem extends Component<Props> {
     } = this.props;
 
     const parentElementProps: Object = {
+      key: item.path,
       className: classnames("node object-node", {
         focused,
         lessen:
