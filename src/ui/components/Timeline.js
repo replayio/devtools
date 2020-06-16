@@ -17,7 +17,7 @@ import { sortBy, range } from "lodash";
 import { SVG } from "image/svg";
 import { sendMessage, log } from "protocol/socket";
 const {
-  closestPaintOrMouseEvent,
+  mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
   nextPaintEvent,
   previousPaintEvent,
@@ -386,7 +386,7 @@ export class Timeline extends Component {
     }
 
     const mouseTime = this.getMouseTime(e);
-    const { point, time } = closestPaintOrMouseEvent(mouseTime);
+    const { point, time } = mostRecentPaintOrMouseEvent(mouseTime);
 
     if (hoverTime != time) {
       this.setState({ hoverTime: mouseTime });
@@ -453,7 +453,7 @@ export class Timeline extends Component {
         this.seekTime(zoomEndTime);
       }
     } else if (startDragTime != null && hoverTime != null && !hoveredMessage) {
-      const { point } = closestPaintOrMouseEvent(mouseTime);
+      const { point, time } = mostRecentPaintOrMouseEvent(mouseTime);
       this.seek(point, mouseTime);
     }
   };
@@ -471,7 +471,7 @@ export class Timeline extends Component {
       return null;
     }
 
-    const { point, time } = closestPaintOrMouseEvent(targetTime);
+    const { point, time } = mostRecentPaintOrMouseEvent(targetTime);
     this.seek(point, time);
   }
 

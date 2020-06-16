@@ -92,13 +92,6 @@ function closerEntry(time, entry1, entry2) {
   return entry2;
 }
 
-// Find the entry in an array which is closest to time (preceding or following).
-function closestEntry(array, time) {
-  const recent = mostRecentEntry(array, time);
-  const next = nextEntry(array, time);
-  return closerEntry(time, recent, next);
-}
-
 //////////////////////////////
 // Paint / Mouse Event Points
 //////////////////////////////
@@ -155,9 +148,9 @@ function addLastScreen(screen, point, time) {
   insertEntrySorted(gPaintPoints, { point, time, paintHash });
 }
 
-function closestPaintOrMouseEvent(time) {
-  const paintEntry = closestEntry(gPaintPoints, time);
-  const mouseEntry = closestEntry(gMouseEvents, time);
+function mostRecentPaintOrMouseEvent(time) {
+  const paintEntry = mostRecentEntry(gPaintPoints, time);
+  const mouseEntry = mostRecentEntry(gMouseEvents, time);
   return closerEntry(time, paintEntry, mouseEntry);
 }
 
@@ -417,7 +410,7 @@ installObserver();
 
 module.exports = {
   addLastScreen,
-  closestPaintOrMouseEvent,
+  mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
   nextPaintEvent,
   previousPaintEvent,
