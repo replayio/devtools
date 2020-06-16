@@ -88,7 +88,7 @@ html[dir="rtl"] .editor-mount {
   line-height: var(--theme-code-line-height);
 }
 
-.debugger .CodeMirror {
+.editor-mount > .CodeMirror {
   background-color: var(--theme-body-background);
 }
 
@@ -126,7 +126,7 @@ html[dir="rtl"] .editor-mount {
   top: -2px;
   left: 0px;
   width: 100%;
- }
+}
 
 .debug-expression::after {
   content: "";
@@ -136,7 +136,7 @@ html[dir="rtl"] .editor-mount {
   bottom: -2px;
   left: 0px;
   width: 100%;
- }
+}
 
 .to-line-end ~ .CodeMirror-widget {
   background-color: var(--debug-expression-background);
