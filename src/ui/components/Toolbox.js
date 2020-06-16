@@ -464,12 +464,16 @@ export default class Toolbox extends React.Component {
     }
   }
 
-  async nodePickerMouseClick(e) {
+  nodePickerMouseClick(e) {
+    this.nodePickerMouseClickInCanvas(this.mouseEventCanvasPosition(e));
+  }
+
+  // This is exposed separately for use in testing.
+  async nodePickerMouseClickInCanvas(pos) {
     this.setState({ nodePickerActive: false });
     this.removeNodePickerListeners();
     this.nodePickerRemoveTime = Date.now();
 
-    const pos = this.mouseEventCanvasPosition(e);
     const nodeBounds = pos && await ThreadFront.getMouseTarget(pos.x, pos.y);
     if (nodeBounds) {
       this.getHighlighter().highlight(nodeBounds);

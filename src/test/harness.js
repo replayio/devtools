@@ -470,9 +470,27 @@ async function searchMarkup(text) {
 async function waitForSelectedMarkupNode(text) {
   return waitUntil(() => {
     const node = document.querySelector(".theme-selected");
+    if (!node) {
+      return false;
+    }
     const editor = node.parentNode.querySelector(".editor");
     return editor.innerText.includes(text);
   });
+}
+
+async function getMarkupCanvasCoordinate(text) {
+  const node = (await ThreadFront.searchDOM(text))[0];
+  await node.ensureLoaded();
+  const bounds = node.getBoundingClientRect();
+  return {
+    x: (bounds.left + bounds.right) / 2,
+    y: (bounds.top + bounds.bottom) / 2,
+  };
+}
+
+async function pickNode(x, y) {
+  gToolbox.clickNodePickerButton();
+  gToolbox.nodePickerMouseClickInCanvas({ x, y });
 }
 
 module.exports = {
@@ -531,4 +549,6 @@ module.exports = {
   toggleMarkupNode,
   searchMarkup,
   waitForSelectedMarkupNode,
+  getMarkupCanvasCoordinate,
+  pickNode,
 };
