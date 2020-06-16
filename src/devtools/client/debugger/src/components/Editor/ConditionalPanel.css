@@ -32,3 +32,7 @@
 .conditional-breakpoint-panel .CodeMirror {
   margin: 6px 10px;
 }
+
+.conditional-breakpoint-panel .CodeMirror {
+  background: var(--theme-toolbar-background);
+}
