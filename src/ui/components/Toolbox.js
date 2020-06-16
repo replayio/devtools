@@ -134,7 +134,7 @@ export default class Toolbox extends React.Component {
       panel.refresh();
     }
 
-    // this.emit("select", name);
+    this.emit("select", name);
   }
 
   async viewSourceInDebugger(url, line, column, id) {

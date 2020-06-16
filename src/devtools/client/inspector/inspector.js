@@ -1260,9 +1260,9 @@ Inspector.prototype = {
   /**
    * Reset the inspector on new root mutation.
    */
-  async onNewRoot() {
+  async onNewRoot(force) {
     // Don't reload the inspector when not selected.
-    if (this.toolbox && this.toolbox.currentTool != "inspector") {
+    if (this.toolbox && this.toolbox.currentTool != "inspector" && !force) {
       this._hasNewRoot = true;
       return;
     }
@@ -1297,7 +1297,7 @@ Inspector.prototype = {
 
   handleToolSelected(id) {
     if (id == "inspector" && this._hasNewRoot) {
-      this.onNewRoot();
+      this.onNewRoot(/* force */ true);
     }
   },
 
