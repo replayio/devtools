@@ -478,19 +478,43 @@ async function waitForSelectedMarkupNode(text) {
   });
 }
 
-async function getMarkupCanvasCoordinate(text) {
-  const node = (await ThreadFront.searchDOM(text))[0];
-  await node.ensureLoaded();
-  const bounds = node.getBoundingClientRect();
+function boundsCenter(bounds) {
   return {
     x: (bounds.left + bounds.right) / 2,
     y: (bounds.top + bounds.bottom) / 2,
   };
 }
 
+async function getMarkupCanvasCoordinate(text) {
+  const node = (await ThreadFront.searchDOM(text))[0];
+  await node.ensureLoaded();
+  return boundsCenter(node.getBoundingClientRect());
+}
+
 async function pickNode(x, y) {
   gToolbox.clickNodePickerButton();
   gToolbox.nodePickerMouseClickInCanvas({ x, y });
+}
+
+async function selectMarkupNode(node) {
+  const container = node.closest(".child");
+  const { x, y } = boundsCenter(container.getBoundingClientRect());
+  const event = new MouseEvent("mousedown", { clientX: x, clientY: y });
+  container.dispatchEvent(event);
+}
+
+async function checkComputedStyle(style, value) {
+  document.getElementById("computedview-tab").click();
+  await waitUntil(() => {
+    const names = document.querySelectorAll(".computed-property-name");
+    const propertyName = [...names].find(n => n.textContent.includes(style));
+    if (!propertyName) {
+      return false;
+    }
+    const container = propertyName.closest(".computed-property-view");
+    const propertyValue = container.querySelector(".computed-property-value");
+    return propertyValue.textContent.includes(value);
+  });
 }
 
 module.exports = {
@@ -551,4 +575,6 @@ module.exports = {
   waitForSelectedMarkupNode,
   getMarkupCanvasCoordinate,
   pickNode,
+  selectMarkupNode,
+  checkComputedStyle,
 };
