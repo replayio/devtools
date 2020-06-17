@@ -52,7 +52,7 @@ const gAnalysisLogGroupIDs = new Map();
 const LogpointHandlers = {};
 
 addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
-  log("AnalysisResults", results);
+  log(`AnalysisResults ${results.length}`);
 
   const logGroupId = gAnalysisLogGroupIDs.get(analysisId);
   if (!gLogpoints.has(logGroupId)) {
@@ -81,7 +81,7 @@ addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
 });
 
 addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
-  log("AnalysisPoints", points);
+  log(`AnalysisPoints ${points.length}`);
 
   const logGroupId = gAnalysisLogGroupIDs.get(analysisId);
   const info = gLogpoints.get(logGroupId);
