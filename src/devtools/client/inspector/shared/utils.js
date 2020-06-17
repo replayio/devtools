@@ -25,6 +25,8 @@ loader.lazyRequireGetter(
 );
 */
 
+const { assert } = require("protocol/utils");
+
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 /**
@@ -130,14 +132,8 @@ function createChild(parent, tagName, attributes = {}) {
  * @return {Promise} promise resolving with the retrieved string as argument
  */
 function getLongString(longStringActorPromise) {
-  return longStringActorPromise
-    .then(longStringActor => {
-      return longStringActor.string().then(string => {
-        longStringActor.release().catch(console.error);
-        return string;
-      });
-    })
-    .catch(console.error);
+  assert(typeof longStringActorPromise == "string");
+  return longStringActorPromise;
 }
 
 /**
