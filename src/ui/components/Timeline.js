@@ -476,7 +476,7 @@ export class Timeline extends Component {
   }
 
   async onPaused({ time }) {
-    this.setState({ currentTime: time });
+    this.setState({ currentTime: time, playback: null });
 
     const { screen, mouse } = await getGraphicsAtTime(time);
     if (this.state.currentTime == time) {
