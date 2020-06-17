@@ -708,6 +708,9 @@ HTMLBreadcrumbs.prototype = {
       const toRemove = this.nodeHierarchy.pop();
       this.container.removeChild(toRemove.button);
     }
+    if (this.currentIndex >= this.nodeHierarchy.length) {
+      this.currentIndex = this.nodeHierarchy.length - 1;
+    }
   },
 
   /**
@@ -788,7 +791,7 @@ HTMLBreadcrumbs.prototype = {
    */
   scroll: function() {
     // FIXME bug 684352: make sure its immediate neighbors are visible too.
-    if (!this.isDestroyed) {
+    if (!this.isDestroyed && this.currentIndex >= 0) {
       const element = this.nodeHierarchy[this.currentIndex].button;
       this.arrowScrollBox.scrollToElement(element, "end");
     }
