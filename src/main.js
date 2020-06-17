@@ -43,6 +43,15 @@ if (test) {
   require("devtools-modules").asyncStorage.clear();
 }
 
+// *** WARNING ***
+//
+// Do not use "import" in this file. The import will run before we clear
+// the local storage above, and existing local storage contents may be used
+// when running automated tests, which we don't want to happen. It would
+// be good if this was less fragile...
+//
+// *** WARNING ***
+
 require("./styles.css");
 
 const { initSocket, sendMessage, log } = require("protocol/socket");
@@ -50,8 +59,7 @@ const { ThreadFront } = require("protocol/thread");
 const { paintMessage } = require("protocol/graphics");
 const { throttle, clamp, EventEmitter } = require("protocol/utils");
 const loadImages = require("image/image");
-
-import { bootstrapApp } from "ui/utils/bootstrap";
+const { bootstrapApp } = require("ui/utils/bootstrap");
 
 // Create a session to use while debugging.
 async function createSession() {
