@@ -512,6 +512,9 @@ async function checkComputedStyle(style, value) {
       return false;
     }
     const container = propertyName.closest(".computed-property-view");
+    if (!container) {
+      return false;
+    }
     const propertyValue = container.querySelector(".computed-property-value");
     return propertyValue.textContent.includes(value);
   });
