@@ -26,7 +26,7 @@ function Document(props) {
   const location = getLocation(grip);
   return span(
     {
-      "data-link-actor-id": grip.actor,
+      "data-link-actor-id": grip.id(),
       className: "objectBox objectBox-document",
     },
     getTitle(grip),
@@ -44,7 +44,7 @@ function getTitle(grip) {
     {
       className: "objectTitle",
     },
-    grip.class
+    grip.className()
   );
 }
 
