@@ -25,7 +25,11 @@ class Accordion extends Component {
         PropTypes.shape({
           buttons: PropTypes.arrayOf(PropTypes.object),
           className: PropTypes.string,
-          component: PropTypes.object,
+          // Note: This used to only be PropTypes.object, but functions appear
+          // as well when the component is a factory, e.g. BoxModel in
+          // LayoutApp.js. So, this is relaxed, but maybe that's not the right
+          // thing to do. This react stuff is all rather mysterious.
+          component: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
           componentProps: PropTypes.object,
           contentClassName: PropTypes.string,
           header: PropTypes.string.isRequired,
