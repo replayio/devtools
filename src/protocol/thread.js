@@ -1119,23 +1119,14 @@ const ThreadFront = {
   sessionId: null,
   sessionWaiter: defer(),
 
-  // Map scriptId to URL.
-  scriptURLs: new Map(),
+  // Map scriptId to info about the script.
+  scripts: new Map(),
 
   // Resolve hooks for promises waiting on a script ID to be known.
-  scriptURLWaiters: new ArrayMap(),
+  scriptWaiters: new ArrayMap(),
 
   // Map URL to scriptId[].
-  urlScripts: new Map(),
-
-  // Map original script id to generated script id.
-  originalScripts: new Map(),
-
-  // Map pretty script id to generated script id.
-  prettyPrintedScripts: new Map(),
-
-  // Map generated script id to pretty script id.
-  generatedPrettyPrintedScripts: new Map(),
+  urlScripts: new ArrayMap(),
 
   skipPausing: false,
 
@@ -1220,63 +1211,38 @@ const ThreadFront = {
 
     sendMessage("Debugger.findScripts", {}, sessionId);
     addEventListener("Debugger.scriptParsed", script => {
-      const { scriptId, url, generatedScriptId } = script;
+      let { scriptId, kind, url } = script;
+      this.scripts.set(scriptId, { kind, url });
       if (url) {
-        this.scriptURLs.set(scriptId, url);
-        if (this.urlScripts.has(url)) {
-          this.urlScripts.get(url).push(scriptId);
-        } else {
-          this.urlScripts.set(url, [scriptId]);
-        }
+        this.urlScripts.add(url, scriptId);
       }
-      if (generatedScriptId) {
-        this.originalScripts.set(scriptId, generatedScriptId);
-      }
-      const waiters = this.scriptURLWaiters.map.get(scriptId);
+      const waiters = this.scriptWaiters.map.get(scriptId);
       (waiters || []).forEach(resolve => resolve());
-      this.scriptURLWaiters.map.delete(scriptId);
+      this.scriptWaiters.map.delete(scriptId);
       onScript(script);
     });
   },
 
-  async prettyPrintScript(scriptId) {
-    const { prettyScriptId } = await sendMessage(
-      "Debugger.prettyPrintScript",
-      { scriptId },
-      this.sessionId
-    );
-    this.prettyPrintedScripts.set(prettyScriptId, scriptId);
-    this.generatedPrettyPrintedScripts.set(scriptId, prettyScriptId);
-    if (this.onScript) {
-      this.onScript({ scriptId: prettyScriptId });
-    }
-  },
-
-  isOriginalScript(scriptId) {
-    return this.originalScripts.has(scriptId);
-  },
-
-  isPrettyPrintedScript(scriptId) {
-    return this.prettyPrintedScripts.has(scriptId);
+  getScriptKind(scriptId) {
+    return this.scripts.get(scriptId).kind;
   },
 
   getScriptURLRaw(scriptId) {
-    return this.scriptURLs.get(scriptId);
+    const info = this.scripts.get(scriptId);
+    return info && info.url;
   },
 
   async getScriptURL(scriptId) {
-    if (!this.scriptURLs.has(scriptId)) {
+    if (!this.scripts.has(scriptId)) {
       const { promise, resolve } = defer();
-      this.scriptURLWaiters.add(scriptId, resolve);
+      this.scriptWaiters.add(scriptId, resolve);
       await promise;
     }
-    return this.scriptURLs.get(scriptId);
+    return this.getScriptURLRaw(scriptId);
   },
 
   getScriptIdsForURL(url) {
-    return [...this.scriptURLs.entries()]
-      .filter(e => e[1] == url)
-      .map(e => e[0]);
+    return this.urlScripts.map.get(url) || [];
   },
 
   async getScriptSource(scriptId) {
@@ -1324,7 +1290,7 @@ const ThreadFront = {
   },
 
   setBreakpointByURL(url, line, column, condition) {
-    const scriptIds = this.urlScripts.get(url);
+    const scriptIds = this.urlScripts.map.get(url);
     return Promise.all(
       (scriptIds || []).map(scriptId => {
         return this.setBreakpoint(scriptId, line, column, condition);
@@ -1352,7 +1318,7 @@ const ThreadFront = {
 
   removeBreakpointByURL(url, line, column) {
     return Promise.all(
-      this.urlScripts.get(url)?.map(scriptId => {
+      this.urlScripts.map.get(url)?.map(scriptId => {
         return this.removeBreakpoint(scriptId, line, column);
       }) || []
     );
@@ -1628,32 +1594,12 @@ const ThreadFront = {
     return this.currentPause.getFrameStepsAtIndex(index);
   },
 
-  getPreferredLocationRaw(location) {
+  getPreferredLocation(location) {
     // For now, always prefer original sources.
     return location[location.length - 1];
   },
 
-  // Choose the location to use from a MappedLocation list of equivalent
-  // locations in different generated vs. original vs. pretty printed scripts.
-  async getPreferredLocation(location) {
-    // After pretty printing a script, we need the location in the pretty
-    // printed script, which might not be in a set of locations if it
-    // originated from before the pretty print. If we detect this, fetch
-    // the mapping to get a full set of mapped locations.
-    let preferred = this.getPreferredLocationRaw(location);
-    const prettyId = this.generatedPrettyPrintedScripts.get(preferred.scriptId);
-    if (prettyId) {
-      preferred = await this.getPreferredMappedLocation(locations[0]);
-      assert(preferred.scriptId == prettyId);
-    }
-    return preferred;
-  },
-
   getPreferredScriptId(scriptId) {
-    const prettyId = this.generatedPrettyPrintedScripts.get(scriptId);
-    if (prettyId) {
-      return prettyId;
-    }
     return scriptId;
   },
 

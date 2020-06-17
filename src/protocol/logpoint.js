@@ -96,7 +96,7 @@ addEventListener("Analysis.analysisPoints", ({ analysisId, points }) => {
 
   if (LogpointHandlers.onPointLoading) {
     points.forEach(({ point, time, frame }) => {
-      const location = ThreadFront.getPreferredLocationRaw(frame);
+      const location = ThreadFront.getPreferredLocation(frame);
       LogpointHandlers.onPointLoading(logGroupId, point, time, location);
     });
   }

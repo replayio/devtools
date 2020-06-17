@@ -15,6 +15,8 @@ import {
 
 import { ThreadFront } from "protocol/thread";
 
+// This is used to update the debugger and other panel state when we've decided
+// to show one source instead of another. Currently this isn't used...
 export function reloadLocations() {
   return async ({ dispatch, getState }) => {
     const cx = getContext(getState());

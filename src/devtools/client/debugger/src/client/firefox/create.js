@@ -66,14 +66,7 @@ export async function createFrame(
 }
 
 export function makeSourceId(source: SourcePayload, isServiceWorker: boolean) {
-  // Source actors with the same URL will be given the same source ID and
-  // grouped together under the same source in the client. There is an exception
-  // for sources from service workers, where there may be multiple service
-  // worker threads running at the same time which use different versions of the
-  // same URL.
-  return source.url && !isServiceWorker
-    ? `sourceURL-${source.url}`
-    : `source-${source.actor}`;
+  return `source-${source.actor}`;
 }
 
 export function createPause(thread: string, packet: PausedPacket): any {

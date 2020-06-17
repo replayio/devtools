@@ -57,7 +57,6 @@ import type {
 import type { Action, ThunkArgs } from "../types";
 
 import { ThreadFront } from "protocol/thread";
-import { reloadLocations } from "./reloadLocations";
 
 // If a request has been made to show this source, go ahead and
 // select it.
@@ -225,23 +224,25 @@ export function newGeneratedSources(sourceInfo: Array<GeneratedSourceData>) {
     const newSourcesObj = {};
     const newSourceActors: Array<SourceActor> = [];
 
-    let reload = false;
-
     for (const { thread, isServiceWorker, source, id } of sourceInfo) {
       const newId = id || makeSourceId(source, isServiceWorker);
 
-      const isPrettyPrinted = ThreadFront.isPrettyPrintedScript(source.actor);
-      const isOriginal = ThreadFront.isOriginalScript(source.actor);
+      const kind = ThreadFront.getScriptKind(source.actor);
+      const isPrettyPrinted = kind == "prettyPrinted";
+      const isOriginal = kind == "sourceMapped";
 
-      if (isPrettyPrinted) {
-        reload = true;
+      let url = source.url;
+      if (kind == "inlineScript") {
+        // Ignore inline scripts. We should see an HTML page script that includes
+        // these plus the rest of the HTML.
+        url = undefined;
       }
 
       if (!getSource(getState(), newId) && !newSourcesObj[newId]) {
         newSourcesObj[newId] = {
           id: newId,
-          url: isPrettyPrinted ? "formatted" : source.url,
-          relativeUrl: isPrettyPrinted ? "formatted" : source.url,
+          url: isPrettyPrinted ? "formatted" : url,
+          relativeUrl: isPrettyPrinted ? "formatted" : url,
           isPrettyPrinted,
           extensionName: source.extensionName,
           introductionUrl: source.introductionUrl,
@@ -249,7 +250,7 @@ export function newGeneratedSources(sourceInfo: Array<GeneratedSourceData>) {
           isBlackBoxed: false,
           isWasm:
             !!supportsWasm(getState()) && source.introductionType === "wasm",
-          isExtension: (source.url && isUrlExtension(source.url)) || false,
+          isExtension: false,
           isOriginal,
         };
       }
@@ -299,10 +300,6 @@ export function newGeneratedSources(sourceInfo: Array<GeneratedSourceData>) {
 
     for (const { source } of newSourceActors) {
       dispatch(checkPendingBreakpoints(cx, source));
-    }
-
-    if (reload) {
-      dispatch(reloadLocations());
     }
 
     return resultIds.map(id => getSourceFromId(getState(), id));
