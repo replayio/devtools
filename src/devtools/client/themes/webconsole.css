@@ -117,7 +117,7 @@
 }
 
 @media (min-width: 1000px) {
-.webconsole-app .message {
+  .webconsole-app .message {
     padding-inline-end: 12px;
   }
 }
@@ -182,7 +182,7 @@
 }
 
 @media (max-width: 500px) {
-.webconsole-app .message > .timestamp {
+  .webconsole-app .message > .timestamp {
     display: none;
   }
 }
@@ -206,7 +206,9 @@
 }
 
 /* Center first level indent within the left gutter */
-.webconsole-app .message:not(.startGroup):not(.startGroupCollapsed) > .indent[data-indent="1"] {
+.webconsole-app
+  .message:not(.startGroup):not(.startGroupCollapsed)
+  > .indent[data-indent="1"] {
   margin-inline-start: calc(1px + var(--console-icon-horizontal-offset));
   margin-inline-end: calc(11px - var(--console-icon-horizontal-offset));
 }
@@ -878,8 +880,14 @@ a.learn-more-link.webconsole-learn-more-link {
 
 /* Center the collapse button in the left gutter (first-level only) */
 .webconsole-app .message.network > .collapse-button,
-.webconsole-app .message.startGroup > .indent[data-indent="0"] ~ .collapse-button,
-.webconsole-app .message.startGroupCollapsed > .indent[data-indent="0"] ~ .collapse-button {
+.webconsole-app
+  .message.startGroup
+  > .indent[data-indent="0"]
+  ~ .collapse-button,
+.webconsole-app
+  .message.startGroupCollapsed
+  > .indent[data-indent="0"]
+  ~ .collapse-button {
   width: 24px;
   margin-inline-start: var(--console-icon-horizontal-offset);
   margin-inline-end: calc(4px - var(--console-icon-horizontal-offset));
@@ -887,8 +895,12 @@ a.learn-more-link.webconsole-learn-more-link {
 
 /* Use a bigger arrow that is visually similar to other icons (10px) */
 .webconsole-app .message.network > .collapse-button::before,
-.webconsole-app .message.startGroup > .indent[data-indent="0"] ~ .collapse-button::before,
-.webconsole-app .message.startGroupCollapsed
+.webconsole-app
+  .message.startGroup
+  > .indent[data-indent="0"]
+  ~ .collapse-button::before,
+.webconsole-app
+  .message.startGroupCollapsed
   > .indent[data-indent="0"]
   ~ .collapse-button::before {
   width: 100%;
@@ -968,7 +980,6 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-app .message.paused {
   z-index: 3;
-  border-bottom: 1px solid var(--purple-50);
   margin-bottom: 0px;
 }
 
