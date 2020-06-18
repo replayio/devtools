@@ -1,16 +1,15 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-  mode: "development",
   entry: "./src/main",
   devtool: "source-map",
   output: {
-    publicPath: 'dist',
+    publicPath: "dist",
   },
   devServer: {
-    contentBase: '.',
-    index: 'index.html',
-    liveReload: false
+    contentBase: ".",
+    index: "index.html",
+    liveReload: false,
   },
   plugins: [new MiniCssExtractPlugin()],
   resolve: {
@@ -41,7 +40,7 @@ module.exports = {
             plugins: [
               "@babel/plugin-transform-flow-strip-types",
               "@babel/plugin-proposal-class-properties",
-              "@babel/plugin-proposal-optional-chaining"
+              "@babel/plugin-proposal-optional-chaining",
             ],
           },
         },
@@ -67,9 +66,11 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        use: [{
-          loader: "url-loader",
-        }],
+        use: [
+          {
+            loader: "url-loader",
+          },
+        ],
       },
     ],
   },
