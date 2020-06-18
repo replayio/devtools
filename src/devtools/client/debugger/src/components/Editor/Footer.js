@@ -88,6 +88,8 @@ class SourceFooter extends PureComponent<Props, State> {
   }
 
   prettyPrintButton() {
+    return;
+    /*
     const {
       cx,
       selectedSource,
@@ -129,6 +131,7 @@ class SourceFooter extends PureComponent<Props, State> {
         <AccessibleImage className={type} />
       </button>
     );
+    */
   }
 
   blackBoxButton() {

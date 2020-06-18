@@ -163,6 +163,7 @@ class Tab extends PureComponent<Props> {
           click: () => toggleBlackBox(cx, source),
         },
       },
+      /*
       {
         item: {
           ...tabMenuItems.prettyPrint,
@@ -170,6 +171,7 @@ class Tab extends PureComponent<Props> {
           disabled: isPretty(sourceTab),
         },
       },
+      */
     ];
 
     showMenu(e, buildMenu(items));

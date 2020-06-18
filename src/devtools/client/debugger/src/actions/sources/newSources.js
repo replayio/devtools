@@ -238,11 +238,16 @@ export function newGeneratedSources(sourceInfo: Array<GeneratedSourceData>) {
         url = undefined;
       }
 
+      if (ThreadFront.minifiedScripts.has(source.actor)) {
+        // Ignore minified scripts which have a pretty printed version.
+        url = undefined;
+      }
+
       if (!getSource(getState(), newId) && !newSourcesObj[newId]) {
         newSourcesObj[newId] = {
           id: newId,
-          url: isPrettyPrinted ? "formatted" : url,
-          relativeUrl: isPrettyPrinted ? "formatted" : url,
+          url,
+          relativeUrl: url,
           isPrettyPrinted,
           extensionName: source.extensionName,
           introductionUrl: source.introductionUrl,

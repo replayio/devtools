@@ -457,7 +457,7 @@ ValueFront.prototype = {
       // know it, so that this function runs synchronously. Callers should
       // check for this situation during e.g. location selection and pick
       // the pretty printed location instead.
-      return ThreadFront.getPreferredLocationRaw(location);
+      return ThreadFront.getPreferredLocation(location);
     }
   },
 
@@ -1128,6 +1128,9 @@ const ThreadFront = {
   // Map URL to scriptId[].
   urlScripts: new ArrayMap(),
 
+  // Script IDs which have a pretty printed alternative.
+  minifiedScripts: new Set(),
+
   skipPausing: false,
 
   // Points which will be reached when stepping in various directions from a point.
@@ -1211,10 +1214,13 @@ const ThreadFront = {
 
     sendMessage("Debugger.findScripts", {}, sessionId);
     addEventListener("Debugger.scriptParsed", script => {
-      let { scriptId, kind, url } = script;
+      let { scriptId, kind, url, generatedScriptIds } = script;
       this.scripts.set(scriptId, { kind, url });
       if (url) {
         this.urlScripts.add(url, scriptId);
+      }
+      if (kind == "prettyPrinted") {
+        this.minifiedScripts.add(generatedScriptIds[0]);
       }
       const waiters = this.scriptWaiters.map.get(scriptId);
       (waiters || []).forEach(resolve => resolve());
@@ -1610,7 +1616,7 @@ const ThreadFront = {
       { location },
       this.sessionId
     );
-    return this.getPreferredLocationRaw(mappedLocation);
+    return this.getPreferredLocation(mappedLocation);
   },
 
   async getDescription(recordingId) {

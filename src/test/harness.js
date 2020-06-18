@@ -82,7 +82,7 @@ function waitForSource(url) {
 }
 
 async function selectSource(url) {
-  const source = findSource(url);
+  const source = await waitForSource(url);
   await dbg.actions.selectLocation(
     getContext(),
     { sourceId: source.id },
@@ -418,11 +418,6 @@ async function selectFrame(index) {
   await dbg.actions.selectFrame(getThreadContext(), frames[index]);
 }
 
-function togglePrettyPrint() {
-  const sourceId = dbgSelectors.getSelectedSourceId();
-  return dbg.actions.togglePrettyPrint(getContext(), sourceId);
-}
-
 function addEventListenerLogpoints(logpoints) {
   return dbg.actions.addEventListenerBreakpoints(logpoints);
 }
@@ -567,7 +562,6 @@ module.exports = {
   waitForFrameTimeline,
   checkFrames,
   selectFrame,
-  togglePrettyPrint,
   addEventListenerLogpoints,
   toggleExceptionLogging,
   playbackRecording,
