@@ -453,11 +453,7 @@ ValueFront.prototype = {
   functionLocation() {
     const location = this._object.preview.functionLocation;
     if (location) {
-      // Don't fetch a pretty printed location for the function if we don't
-      // know it, so that this function runs synchronously. Callers should
-      // check for this situation during e.g. location selection and pick
-      // the pretty printed location instead.
-      return ThreadFront.getPreferredLocation(location);
+      return ThreadFront.getPreferredLocationRaw(location);
     }
   },
 
@@ -1233,18 +1229,23 @@ const ThreadFront = {
     return this.scripts.get(scriptId).kind;
   },
 
+  async ensureScript(scriptId) {
+    if (!this.scripts.has(scriptId)) {
+      const { promise, resolve } = defer();
+      this.scriptWaiters.add(scriptId, resolve);
+      await promise;
+    }
+    return this.scripts.get(scriptId);
+  },
+
   getScriptURLRaw(scriptId) {
     const info = this.scripts.get(scriptId);
     return info && info.url;
   },
 
   async getScriptURL(scriptId) {
-    if (!this.scripts.has(scriptId)) {
-      const { promise, resolve } = defer();
-      this.scriptWaiters.add(scriptId, resolve);
-      await promise;
-    }
-    return this.getScriptURLRaw(scriptId);
+    const info = await this.ensureScript(scriptId);
+    return info.url;
   },
 
   getScriptIdsForURL(url) {
@@ -1296,7 +1297,11 @@ const ThreadFront = {
   },
 
   setBreakpointByURL(url, line, column, condition) {
-    const scriptId = this.getPreferredScriptId(this.urlScripts.map.get(url));
+    const scripts = this.urlScripts.map.get(url);
+    if (!scripts) {
+      return;
+    }
+    const scriptId = this.getPreferredScriptId(scripts);
     return this.setBreakpoint(scriptId, line, column, condition);
   },
 
@@ -1319,7 +1324,11 @@ const ThreadFront = {
   },
 
   removeBreakpointByURL(url, line, column) {
-    const scriptId = this.getPreferredScriptId(this.urlScripts.map.get(url));
+    const scripts = this.urlScripts.map.get(url);
+    if (!scripts) {
+      return;
+    }
+    const scriptId = this.getPreferredScriptId(scripts);
     return this.removeBreakpoint(scriptId, line, column);
   },
 
@@ -1593,13 +1602,23 @@ const ThreadFront = {
     return this.currentPause.getFrameStepsAtIndex(index);
   },
 
-  getPreferredLocation(locations) {
+  getPreferredLocationRaw(locations) {
     const scriptId = this.getPreferredScriptId(locations.map(l => l.scriptId));
     return locations.find(l => l.scriptId == scriptId);
   },
 
+  async getPreferredLocation(locations) {
+    await Promise.all(locations.map(({ scriptId }) => this.ensureScript(scriptId)));
+    return this.getPreferredLocationRaw(locations);
+  },
+
   getScriptIdScore(scriptId) {
-    const { generatedScriptIds, kind } = this.scripts.get(scriptId);
+    const info = this.scripts.get(scriptId);
+    if (!info) {
+      // Ideally this would never happen, but scripts might still be loading...
+      return 0;
+    }
+    const { generatedScriptIds, kind } = info;
 
     let score = 1;
 

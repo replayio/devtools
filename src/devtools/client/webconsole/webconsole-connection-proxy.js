@@ -23,7 +23,7 @@ function convertStack(stack, { frames }) {
   }
   return Promise.all(stack.map(async frameId => {
     const frame = frames.find(f => f.frameId == frameId);
-    const location = ThreadFront.getPreferredLocation(frame.location);
+    const location = await ThreadFront.getPreferredLocation(frame.location);
     return {
       filename: await ThreadFront.getScriptURL(location.scriptId),
       sourceId: location.scriptId,
