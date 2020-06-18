@@ -210,7 +210,7 @@ function setLogpointByURL(
   text,
   condition
 ) {
-  const scriptIds = ThreadFront.urlScripts.get(scriptUrl);
+  const scriptIds = ThreadFront.urlScripts.map.get(scriptUrl);
   (scriptIds || []).forEach(scriptId => {
     setLogpoint(logGroupId, scriptId, line, column, text, condition);
   });
