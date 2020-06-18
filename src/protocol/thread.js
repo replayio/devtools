@@ -1215,7 +1215,7 @@ const ThreadFront = {
     sendMessage("Debugger.findScripts", {}, sessionId);
     addEventListener("Debugger.scriptParsed", script => {
       let { scriptId, kind, url, generatedScriptIds } = script;
-      this.scripts.set(scriptId, { kind, url });
+      this.scripts.set(scriptId, { kind, url, generatedScriptIds });
       if (url) {
         this.urlScripts.add(url, scriptId);
       }
@@ -1296,12 +1296,8 @@ const ThreadFront = {
   },
 
   setBreakpointByURL(url, line, column, condition) {
-    const scriptIds = this.urlScripts.map.get(url);
-    return Promise.all(
-      (scriptIds || []).map(scriptId => {
-        return this.setBreakpoint(scriptId, line, column, condition);
-      })
-    );
+    const scriptId = this.getPreferredScriptId(this.urlScripts.map.get(url));
+    return this.setBreakpoint(scriptId, line, column, condition);
   },
 
   async removeBreakpoint(scriptId, line, column) {
@@ -1323,11 +1319,8 @@ const ThreadFront = {
   },
 
   removeBreakpointByURL(url, line, column) {
-    return Promise.all(
-      this.urlScripts.map.get(url)?.map(scriptId => {
-        return this.removeBreakpoint(scriptId, line, column);
-      }) || []
-    );
+    const scriptId = this.getPreferredScriptId(this.urlScripts.map.get(url));
+    return this.removeBreakpoint(scriptId, line, column);
   },
 
   ensurePause(point) {
@@ -1600,13 +1593,32 @@ const ThreadFront = {
     return this.currentPause.getFrameStepsAtIndex(index);
   },
 
-  getPreferredLocation(location) {
-    // For now, always prefer original sources.
-    return location[location.length - 1];
+  getPreferredLocation(locations) {
+    const scriptId = this.getPreferredScriptId(locations.map(l => l.scriptId));
+    return locations.find(l => l.scriptId == scriptId);
   },
 
-  getPreferredScriptId(scriptId) {
-    return scriptId;
+  getScriptIdScore(scriptId) {
+    const { generatedScriptIds, kind } = this.scripts.get(scriptId);
+
+    let score = 1;
+
+    // Score more-original scripts higher than less-original scripts.
+    if (generatedScriptIds) {
+      score += this.getScriptIdScore(generatedScriptIds[0]);
+    }
+
+    // Score source mapped scripts higher than pretty-printed scripts.
+    if (kind == "sourceMapped") {
+      score++;
+    }
+
+    return score;
+  },
+
+  getPreferredScriptId(scriptIds) {
+    scriptIds.sort((a, b) => this.getScriptIdScore(a) - this.getScriptIdScore(b));
+    return scriptIds[scriptIds.length - 1];
   },
 
   // Get the location to use for a generated location without alternatives.
