@@ -61,16 +61,18 @@ class App extends React.Component {
   }
 
   renderTooltip(tooltip) {
-    if (!tooltip?.screen) {
+    if (!tooltip) {
       return null;
     }
 
     return (
       <div className="timeline-tooltip" style={{ left: tooltip.left }}>
-        <img
-          style={{ height: "100%" }}
-          src={`data:${tooltip.screen.mimeType};base64,${tooltip.screen.data}`}
-        />
+        {tooltip.screen && (
+          <img
+            className="timeline-tooltip-image"
+            src={`data:${tooltip.screen.mimeType};base64,${tooltip.screen.data}`}
+          />
+        )}
       </div>
     );
   }
