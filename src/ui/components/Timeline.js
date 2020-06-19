@@ -241,6 +241,12 @@ export class Timeline extends Component {
     return getClosestMessage(this.state.messages, point);
   }
 
+  getMessageFromPoint(point) {
+    return this.state.messages.find(
+      message => message.executionPoint === point
+    );
+  }
+
   // Get the time for a mouse event within the recording.
   getMouseTime(e) {
     const { zoomStartTime, zoomEndTime } = this.state;
@@ -351,17 +357,15 @@ export class Timeline extends Component {
   showMessage(message) {
     this.highlightConsoleMessage(message);
     this.scrollToMessage(message);
+    this.previewLocation(message);
   }
 
   onMessageMouseEnter(message) {
     this.setState({ hoveredMessage: message });
-    this.previewLocation(message);
-    this.showMessage(message);
   }
 
   onMessageMouseLeave() {
     this.setState({ hoveredMessage: null });
-    this.clearPreviewLocation();
   }
 
   async previewLocation(closestMessage) {
@@ -477,6 +481,13 @@ export class Timeline extends Component {
       return null;
     }
 
+    const message = this.getMessageFromPoint(point);
+    if (message) {
+      this.showMessage(message);
+    } else {
+      const closestMessage = this.getClosestMessage(point);
+      this.setState({ hoveredMessage: closestMessage });
+    }
     return this.threadFront.timeWarp(point, time, hasFrames);
   }
 
