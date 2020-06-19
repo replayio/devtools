@@ -277,13 +277,23 @@ export class Timeline extends Component {
     }
   };
 
-  onConsoleMessageHover = (type, message) => {
+  onConsoleMessageHover = async (type, message) => {
+    const { updateTooltip } = this.props;
     if (type == "mouseleave") {
+      updateTooltip(null);
       return this.setState({ highlightedMessage: null });
     }
 
     if (type == "mouseenter") {
-      return this.setState({ highlightedMessage: message.id });
+      const time = message.executionPointTime;
+      const offset = this.getPixelOffset(time);
+      updateTooltip({ left: offset });
+      this.setState({ highlightedMessage: message.id });
+      const { screen, mouse } = await getGraphicsAtTime(time);
+
+      if (this.state.highlightedMessage === message.id) {
+        updateTooltip({ screen, left: offset });
+      }
     }
 
     return null;
@@ -390,8 +400,12 @@ export class Timeline extends Component {
 
     if (hoverTime != time) {
       this.setState({ hoverTime: mouseTime });
+      updateTooltip({ left: this.getPixelOffset(hoverTime) });
+
       const { screen, mouse } = await getGraphicsAtTime(time);
-      updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
+      if (this.state.hoverTime === mouseTime) {
+        updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
+      }
     }
   };
 
@@ -899,6 +913,6 @@ export class Timeline extends Component {
   }
 }
 
-export default connect(state => ({}), {
+export default connect(null, {
   updateTooltip: actions.updateTooltip,
 })(Timeline);

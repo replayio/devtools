@@ -91,3 +91,7 @@
   align-items: center;
   justify-content: center;
 }
+
+.timeline-tooltip-image {
+  height: 100%;
+}
