@@ -10,10 +10,6 @@ import { features, prefs } from "../prefs";
 export function createEditor() {
   const gutters = ["breakpoints", "hit-markers", "CodeMirror-linenumbers"];
 
-  if (features.codeFolding) {
-    gutters.push("CodeMirror-foldgutter");
-  }
-
   return new SourceEditor({
     mode: "javascript",
     foldGutter: features.codeFolding,

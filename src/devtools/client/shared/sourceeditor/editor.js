@@ -647,8 +647,6 @@ Editor.prototype = {
       useAutoClose ? this.config.autoCloseBracketsSaved : false
     );
 
-    this.updateCodeFoldingGutter();
-
     this.resetIndentUnit();
     this.setupAutoCompletion();
   },
@@ -1279,12 +1277,6 @@ Editor.prototype = {
       cm.setOption(o, v);
       this.config[o] = v;
     }
-
-    if (o === "enableCodeFolding") {
-      // The new value maybe explicitly force foldGUtter on or off, ignoring
-      // the prefs service.
-      this.updateCodeFoldingGutter();
-    }
   },
 
   /**
@@ -1419,43 +1411,6 @@ Editor.prototype = {
     }
 
     this.emit("destroy");
-  },
-
-  updateCodeFoldingGutter: function () {
-    let shouldFoldGutter = this.config.enableCodeFolding;
-    const foldGutterIndex = this.config.gutters.indexOf(
-      "CodeMirror-foldgutter"
-    );
-    const cm = editors.get(this);
-
-    if (shouldFoldGutter === undefined) {
-      shouldFoldGutter = Services.prefs.getBoolPref(ENABLE_CODE_FOLDING);
-    }
-
-    if (shouldFoldGutter) {
-      // Add the gutter before enabling foldGutter
-      if (foldGutterIndex === -1) {
-        const gutters = this.config.gutters.slice();
-        gutters.push("CodeMirror-foldgutter");
-        this.setOption("gutters", gutters);
-      }
-
-      this.setOption("foldGutter", true);
-    } else {
-      // No code should remain folded when folding is off.
-      if (cm) {
-        cm.execCommand("unfoldAll");
-      }
-
-      // Remove the gutter so it doesn't take up space
-      if (foldGutterIndex !== -1) {
-        const gutters = this.config.gutters.slice();
-        gutters.splice(foldGutterIndex, 1);
-        this.setOption("gutters", gutters);
-      }
-
-      this.setOption("foldGutter", false);
-    }
   },
 
   /**

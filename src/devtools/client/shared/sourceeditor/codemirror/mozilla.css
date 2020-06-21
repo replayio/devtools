@@ -139,28 +139,6 @@
   cursor: pointer;
 }
 
-.CodeMirror-foldgutter {
-  width: 16px; /* Same as breakpoints gutter above */
-}
-
-.CodeMirror-foldgutter-open,
-.CodeMirror-foldgutter-folded {
-  height: 14px;
-  margin-top: 1px;
-  background-image: url("chrome://devtools/skin/images/arrow.svg");
-  background-position: center;
-  background-repeat: no-repeat;
-  -moz-context-properties: fill;
-  fill: var(--theme-icon-dimmed-color);
-  /* make the icons smaller than regular twistys (10->8px) */
-  background-size: 8px;
-  cursor: pointer;
-}
-
-.CodeMirror-foldgutter-folded {
-  transform: rotate(-90deg);
-}
-
 .CodeMirror-hints {
   position: absolute;
   z-index: 10;
