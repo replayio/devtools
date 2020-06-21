@@ -36,7 +36,6 @@ module.exports = (env, argv) => {
       "./codemirror/addon/fold/brace-fold.js",
       "./codemirror/addon/fold/comment-fold.js",
       "./codemirror/addon/fold/xml-fold.js",
-      "./codemirror/addon/fold/foldgutter.js",
       "./codemirror/addon/runmode/runmode.js",
       "./codemirror/lib/codemirror.js",
     ],

@@ -42,24 +42,6 @@ export function clearDocuments() {
   sourceDocs = {};
 }
 
-function resetLineNumberFormat(editor: SourceEditor) {
-  const cm = editor.codeMirror;
-  cm.setOption("lineNumberFormatter", number => number);
-  resizeBreakpointGutter(cm);
-  resizeToggleButton(cm);
-}
-
-export function updateLineNumberFormat(editor: SourceEditor, sourceId: string) {
-  if (!isWasm(sourceId)) {
-    return resetLineNumberFormat(editor);
-  }
-  const cm = editor.codeMirror;
-  const lineNumberFormatter = getWasmLineNumberFormatter(sourceId);
-  cm.setOption("lineNumberFormatter", lineNumberFormatter);
-  resizeBreakpointGutter(cm);
-  resizeToggleButton(cm);
-}
-
 export function updateDocument(editor: SourceEditor, source: Source) {
   if (!source) {
     return;
@@ -68,8 +50,6 @@ export function updateDocument(editor: SourceEditor, source: Source) {
   const sourceId = source.id;
   const doc = getDocument(sourceId) || editor.createDocument();
   editor.replaceDocument(doc);
-
-  updateLineNumberFormat(editor, sourceId);
 }
 
 export function clearEditor(editor: SourceEditor) {
@@ -119,12 +99,15 @@ function setEditorText(
     const wasmText = { split: () => wasmLines, match: () => false };
     editor.setText(wasmText);
   } else {
-    const contents = content.value.split(/\r\n?|\n|\u2028|\u2029/).map(line => {
-      if (line.length >= 1000) {
-        return line.substring(0, 1000) + "…";
-      }
-      return line;
-    }).join("\n");
+    const contents = content.value
+      .split(/\r\n?|\n|\u2028|\u2029/)
+      .map(line => {
+        if (line.length >= 1000) {
+          return line.substring(0, 1000) + "…";
+        }
+        return line;
+      })
+      .join("\n");
     editor.setText(contents);
   }
 }
@@ -169,7 +152,6 @@ export function showSourceText(
     }
 
     editor.replaceDocument(doc);
-    updateLineNumberFormat(editor, source.id);
     setMode(editor, source, content, symbols);
     return doc;
   }
@@ -180,5 +162,4 @@ export function showSourceText(
 
   setEditorText(editor, source.id, content);
   setMode(editor, source, content, symbols);
-  updateLineNumberFormat(editor, source.id);
 }

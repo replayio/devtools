@@ -188,30 +188,11 @@ class Editor extends PureComponent<Props, State> {
 
     codeMirror.on("gutterClick", this.onGutterClick);
 
-    if (features.commandClick) {
-      document.addEventListener("keydown", this.commandKeyDown);
-      document.addEventListener("keyup", this.commandKeyUp);
-    }
-
     // Set code editor wrapper to be focusable
     codeMirrorWrapper.tabIndex = 0;
     codeMirrorWrapper.addEventListener("keydown", e => this.onKeyDown(e));
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
     codeMirrorWrapper.addEventListener("mouseover", onMouseOver(codeMirror));
-
-    const toggleFoldMarkerVisibility = e => {
-      if (node instanceof HTMLElement) {
-        node
-          .querySelectorAll(".CodeMirror-guttermarker-subtle")
-          .forEach(elem => {
-            elem.classList.toggle("visible");
-          });
-      }
-    };
-
-    const codeMirrorGutter = codeMirror.getGutterElement();
-    codeMirrorGutter.addEventListener("mouseleave", toggleFoldMarkerVisibility);
-    codeMirrorGutter.addEventListener("mouseenter", toggleFoldMarkerVisibility);
 
     if (!isFirefox()) {
       codeMirror.on("gutterContextMenu", (cm, line, eventName, event) =>
@@ -458,10 +439,6 @@ class Editor extends PureComponent<Props, State> {
       return closeConditionalPanel();
     }
 
-    if (gutter === "CodeMirror-foldgutter") {
-      return;
-    }
-
     const sourceLine = toSourceLine(selectedSource.id, line);
     if (typeof sourceLine !== "number") {
       return;
@@ -648,9 +625,9 @@ class Editor extends PureComponent<Props, State> {
           />
         }
         {conditionalPanelLocation ? <ConditionalPanel editor={editor} /> : null}
-        {features.columnBreakpoints ? (
-          <ColumnBreakpoints editor={editor} />
-        ) : null}
+
+        <ColumnBreakpoints editor={editor} />
+
         {isPaused && inlinePreviewEnabled ? (
           <InlinePreviews editor={editor} selectedSource={selectedSource} />
         ) : null}
