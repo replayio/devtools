@@ -58,7 +58,6 @@ import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
 import ConditionalPanel from "./ConditionalPanel";
 import InlinePreviews from "./InlinePreviews";
-import HighlightCalls from "./HighlightCalls";
 
 import {
   showSourceText,
@@ -95,7 +94,6 @@ import type {
   Frame,
   HighlightedCalls as highlightedCallsType,
 } from "../../types";
-
 
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
@@ -134,8 +132,6 @@ export type Props = {
   breakpointActions: BreakpointItemActions,
   editorActions: EditorItemActions,
   toggleBlackBox: typeof actions.toggleBlackBox,
-  highlightCalls: typeof actions.highlightCalls,
-  unhighlightCalls: typeof actions.unhighlightCalls,
 };
 
 type State = {
@@ -338,22 +334,6 @@ class Editor extends PureComponent<Props, State> {
   };
 
   onEditorScroll = debounce(this.props.updateViewport, 75);
-
-  commandKeyDown = (e: KeyboardEvent) => {
-    const { key } = e;
-    if (this.props.isPaused && key === "Meta") {
-      const { cx, selectedFrame, highlightCalls } = this.props;
-      highlightCalls(cx, selectedFrame);
-    }
-  };
-
-  commandKeyUp = (e: KeyboardEvent) => {
-    const { key } = e;
-    if (key === "Meta") {
-      const { cx, unhighlightCalls } = this.props;
-      unhighlightCalls(cx);
-    }
-  };
 
   onKeyDown(e: KeyboardEvent) {
     const { codeMirror } = this.state.editor;
@@ -652,7 +632,6 @@ class Editor extends PureComponent<Props, State> {
 
     return (
       <div>
-        <HighlightCalls editor={editor} selectedSource={selectedSource} />
         <DebugLine />
         <HighlightLine />
         <ReplayLines />
@@ -746,8 +725,6 @@ const mapDispatchToProps = dispatch => ({
       updateCursorPosition: actions.updateCursorPosition,
       closeTab: actions.closeTab,
       toggleBlackBox: actions.toggleBlackBox,
-      highlightCalls: actions.highlightCalls,
-      unhighlightCalls: actions.unhighlightCalls,
     },
     dispatch
   ),

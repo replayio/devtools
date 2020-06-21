@@ -29,6 +29,5 @@ export { selectFrame } from "./selectFrame";
 export { toggleSkipPausing, setSkipPausing } from "./skipPausing";
 export { setExpandedScope } from "./expandScopes";
 export { generateInlinePreview } from "./inlinePreview";
-export { highlightCalls, unhighlightCalls } from "./highlightCalls";
 export * from "./previewPausedLocation";
 export { setFramePositions } from "./setFramePositions";
