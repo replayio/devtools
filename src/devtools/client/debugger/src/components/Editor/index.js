@@ -28,7 +28,7 @@ import type { EditorItemActions } from "./menus/editor";
 import {
   getActiveSearch,
   getSelectedLocation,
-  getSelectedSourceWithContent,
+  getSelectedSourceWithContent
   getConditionalPanelLocation,
   getSymbols,
   getIsPaused,
