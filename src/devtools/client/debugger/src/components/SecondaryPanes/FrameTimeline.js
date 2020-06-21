@@ -149,7 +149,12 @@ class FrameTimeline extends Component<Props, State> {
 
   getVisibleProgress() {
     const { scrubbing, scrubbingProgress } = this.state;
-    const { framePositions, selectedLocation, selectedFrame, executionPoint } = this.props;
+    const {
+      framePositions,
+      selectedLocation,
+      selectedFrame,
+      executionPoint,
+    } = this.props;
 
     if (!framePositions) {
       return 0;
@@ -178,17 +183,11 @@ class FrameTimeline extends Component<Props, State> {
 
   renderProgress() {
     const progress = this.getVisibleProgress();
-    let maxWidth = "100%";
-    if (this._timeline && this._marker) {
-      const timelineWidth = getBoundingClientRect(this._timeline).width;
-      const markerWidth = getBoundingClientRect(this._timeline).width;
-      maxWidth = timelineWidth - markerWidth - 2;
-    }
 
     return (
       <div
         className="frame-timeline-progress"
-        style={{ width: `${progress}%`, maxWidth }}
+        style={{ width: `${progress}%`, maxWidth: "calc(100% - 2px)" }}
       />
     );
   }
@@ -235,10 +234,7 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    seekToPosition: actions.seekToPosition,
-    previewLocation: actions.previewPausedLocationBySourceId,
-  }
-)(FrameTimeline);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  seekToPosition: actions.seekToPosition,
+  previewLocation: actions.previewPausedLocationBySourceId,
+})(FrameTimeline);
