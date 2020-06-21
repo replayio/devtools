@@ -5,9 +5,7 @@
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
-const l10n = new LocalizationHelper(
-  "devtools/client/locales/components.properties"
-);
+const l10n = new LocalizationHelper("devtools/client/locales/components.properties");
 const UNKNOWN_SOURCE_STRING = l10n.getStr("frame.unknownSource");
 
 // Character codes used in various parsing helper functions.
@@ -231,10 +229,7 @@ function isContentScheme(location, i = 0) {
 
     // "app://"
     case CHAR_CODE_A:
-      if (
-        location.charCodeAt(++i) == CHAR_CODE_P &&
-        location.charCodeAt(++i) == CHAR_CODE_P
-      ) {
+      if (location.charCodeAt(++i) == CHAR_CODE_P && location.charCodeAt(++i) == CHAR_CODE_P) {
         return isColonSlashSlash(location, i);
       }
       return false;
@@ -304,9 +299,7 @@ function isJarFileString(location, i = 0) {
 
 function isChromeScheme(location, i = 0) {
   return (
-    isChromeString(location, i) ||
-    isResourceString(location, i) ||
-    isJarFileString(location, i)
+    isChromeString(location, i) || isResourceString(location, i) || isJarFileString(location, i)
   );
 }
 

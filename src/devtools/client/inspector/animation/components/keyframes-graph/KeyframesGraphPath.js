@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const ReactDOM = require("react-dom");
@@ -72,13 +69,7 @@ class KeyframesGraphPath extends PureComponent {
   }
 
   render() {
-    const {
-      getComputedStyle,
-      keyframes,
-      name,
-      simulateAnimation,
-      type,
-    } = this.props;
+    const { getComputedStyle, keyframes, name, simulateAnimation, type } = this.props;
     const { componentHeight, componentWidth } = this.state;
 
     if (!componentWidth) {
@@ -87,8 +78,7 @@ class KeyframesGraphPath extends PureComponent {
 
     const pathComponent = this.getPathComponent(type);
     const strokeWidthInViewBox =
-      (DEFAULT_EASING_HINT_STROKE_WIDTH / 2 / componentHeight) *
-      DEFAULT_GRAPH_HEIGHT;
+      (DEFAULT_EASING_HINT_STROKE_WIDTH / 2 / componentHeight) * DEFAULT_GRAPH_HEIGHT;
 
     return dom.svg(
       {

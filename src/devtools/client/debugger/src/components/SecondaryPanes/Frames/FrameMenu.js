@@ -36,25 +36,16 @@ function copyStackTraceElement(copyStackTrace) {
   return formatMenuElement("copyStackTrace", () => copyStackTrace());
 }
 
-function toggleFrameworkGroupingElement(
-  toggleFrameworkGrouping,
-  frameworkGroupingOn
-) {
-  const actionType = frameworkGroupingOn
-    ? "framework.disableGrouping"
-    : "framework.enableGrouping";
+function toggleFrameworkGroupingElement(toggleFrameworkGrouping, frameworkGroupingOn) {
+  const actionType = frameworkGroupingOn ? "framework.disableGrouping" : "framework.enableGrouping";
 
   return formatMenuElement(actionType, () => toggleFrameworkGrouping());
 }
 
 function blackBoxSource(cx, source, toggleBlackBox) {
-  const toggleBlackBoxString = source.isBlackBoxed
-    ? unblackboxString
-    : blackboxString;
+  const toggleBlackBoxString = source.isBlackBoxed ? unblackboxString : blackboxString;
 
-  return formatMenuElement(toggleBlackBoxString, () =>
-    toggleBlackBox(cx, source)
-  );
+  return formatMenuElement(toggleBlackBoxString, () => toggleBlackBox(cx, source));
 }
 
 export default function FrameMenu(

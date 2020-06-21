@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  createElement,
-} = require("react");
+const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 
 loader.lazyRequireGetter(
@@ -15,22 +12,13 @@ loader.lazyRequireGetter(
   "ChangesContextMenu",
   "devtools/client/inspector/changes/ChangesContextMenu"
 );
-loader.lazyRequireGetter(
-  this,
-  "clipboardHelper",
-  "devtools/shared/platform/clipboard"
-);
+loader.lazyRequireGetter(this, "clipboardHelper", "devtools/shared/platform/clipboard");
 
 const ChangesApp = createFactory(
   require("devtools/client/inspector/changes/components/ChangesApp")
 );
-const {
-  getChangesStylesheet,
-} = require("devtools/client/inspector/changes/selectors/changes");
-const {
-  resetChanges,
-  trackChange,
-} = require("devtools/client/inspector/changes/actions/changes");
+const { getChangesStylesheet } = require("devtools/client/inspector/changes/selectors/changes");
+const { resetChanges, trackChange } = require("devtools/client/inspector/changes/actions/changes");
 
 class ChangesView {
   constructor(inspector, window) {
@@ -123,11 +111,7 @@ class ChangesView {
   }
 
   async onTargetAvailable({ type, targetFront, isTopLevel }) {
-    targetFront.watchFronts(
-      "changes",
-      this.onChangesFrontAvailable,
-      this.onChangesFrontDestroyed
-    );
+    targetFront.watchFronts("changes", this.onChangesFrontAvailable, this.onChangesFrontDestroyed);
 
     if (isTopLevel) {
       targetFront.on("will-navigate", this.onClearChanges);
@@ -194,10 +178,8 @@ class ChangesView {
    *        Host element of a CSS declaration rendered the Changes panel.
    */
   copyDeclaration(element) {
-    const name = element.querySelector(".changes__declaration-name")
-      .textContent;
-    const value = element.querySelector(".changes__declaration-value")
-      .textContent;
+    const name = element.querySelector(".changes__declaration-name").textContent;
+    const value = element.querySelector(".changes__declaration-value").textContent;
     const isRemoved = element.classList.contains("diff-remove");
     const text = isRemoved ? `/* ${name}: ${value}; */` : `${name}: ${value};`;
     clipboardHelper.copyString(text);
@@ -247,9 +229,7 @@ class ChangesView {
    */
   onSelectAll() {
     const selection = this.window.getSelection();
-    selection.selectAllChildren(
-      this.document.getElementById("sidebar-panel-changes")
-    );
+    selection.selectAllChildren(this.document.getElementById("sidebar-panel-changes"));
   }
 
   /**

@@ -6,10 +6,7 @@
 
 import { createSelector } from "reselect";
 
-import type {
-  BreakpointsState,
-  XHRBreakpointsList,
-} from "../reducers/breakpoints";
+import type { BreakpointsState, XHRBreakpointsList } from "../reducers/breakpoints";
 import type { Selector } from "../reducers/types";
 import type { Breakpoint } from "../types";
 

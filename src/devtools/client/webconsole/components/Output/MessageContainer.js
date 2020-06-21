@@ -9,10 +9,7 @@ const { Component } = require("react");
 const PropTypes = require("prop-types");
 const { isWarningGroup } = require("devtools/client/webconsole/utils/messages");
 
-const {
-  MESSAGE_SOURCE,
-  MESSAGE_TYPE,
-} = require("devtools/client/webconsole/constants");
+const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 
 const componentMap = new Map([
   [
@@ -23,10 +20,7 @@ const componentMap = new Map([
     "ConsoleCommand",
     require("devtools/client/webconsole/components/Output/message-types/ConsoleCommand"),
   ],
-  [
-    "CSSWarning",
-    require("devtools/client/webconsole/components/Output/message-types/CSSWarning"),
-  ],
+  ["CSSWarning", require("devtools/client/webconsole/components/Output/message-types/CSSWarning")],
   [
     "DefaultRenderer",
     require("devtools/client/webconsole/components/Output/message-types/DefaultRenderer"),
@@ -39,10 +33,7 @@ const componentMap = new Map([
     "NetworkEventMessage",
     require("devtools/client/webconsole/components/Output/message-types/NetworkEventMessage"),
   ],
-  [
-    "PageError",
-    require("devtools/client/webconsole/components/Output/message-types/PageError"),
-  ],
+  ["PageError", require("devtools/client/webconsole/components/Output/message-types/PageError")],
   [
     "WarningGroup",
     require("devtools/client/webconsole/components/Output/message-types/WarningGroup"),
@@ -87,9 +78,7 @@ class MessageContainer extends Component {
       "inWarningGroup",
     ];
 
-    return triggeringUpdateProps.some(
-      prop => this.props[prop] !== nextProps[prop]
-    );
+    return triggeringUpdateProps.some(prop => this.props[prop] !== nextProps[prop]);
   }
 
   render() {

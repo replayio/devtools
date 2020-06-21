@@ -12,9 +12,7 @@ import type { ThunkArgs } from "./types";
  * @memberof actions/pause
  * @static
  */
-export function logExceptions(
-  shouldLogExceptions: boolean,
-) {
+export function logExceptions(shouldLogExceptions: boolean) {
   return ({ dispatch, getState, client }: ThunkArgs) => {
     return dispatch({
       type: "LOG_EXCEPTIONS",

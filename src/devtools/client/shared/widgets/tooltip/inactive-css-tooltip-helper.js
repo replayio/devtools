@@ -4,12 +4,7 @@
 
 "use strict";
 
-loader.lazyRequireGetter(
-  this,
-  "openDocLink",
-  "devtools/client/shared/link",
-  true
-);
+loader.lazyRequireGetter(this, "openDocLink", "devtools/client/shared/link", true);
 
 class InactiveCssTooltipHelper {
   constructor() {
@@ -82,8 +77,7 @@ class InactiveCssTooltipHelper {
     const { fixId, msgId, numFixProps, property, display, learnMoreURL } = data;
     const { doc } = tooltip;
 
-    const documentURL =
-      learnMoreURL || `https://developer.mozilla.org/docs/Web/CSS/${property}`;
+    const documentURL = learnMoreURL || `https://developer.mozilla.org/docs/Web/CSS/${property}`;
     this._currentTooltip = tooltip;
     this._currentUrl = `${documentURL}?utm_source=devtools&utm_medium=inspector-inactive-css`;
 

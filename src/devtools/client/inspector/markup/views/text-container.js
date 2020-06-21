@@ -21,12 +21,7 @@ const { extend } = require("devtools/shared/extend");
  *         The inspector tool container the markup-view
  */
 function MarkupTextContainer(markupView, node) {
-  MarkupContainer.prototype.initialize.call(
-    this,
-    markupView,
-    node,
-    "textcontainer"
-  );
+  MarkupContainer.prototype.initialize.call(this, markupView, node, "textcontainer");
 
   if (node.nodeType == nodeConstants.TEXT_NODE) {
     this.editor = new TextEditor(this, node, "text");

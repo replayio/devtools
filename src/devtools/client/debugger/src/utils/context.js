@@ -54,8 +54,7 @@ export type Context = NavigateContext | ThreadContext;
 
 export class ContextError extends Error {}
 
-export function validateNavigateContext(state: State, cx: Context) {
-}
+export function validateNavigateContext(state: State, cx: Context) {}
 
 export function validateThreadContext(state: State, cx: ThreadContext) {
   const newcx = getThreadContext(state);

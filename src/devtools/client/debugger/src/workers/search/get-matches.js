@@ -37,10 +37,7 @@ export default function getMatches(
       // change resulting in an infinite loop so we need to check for this and
       // increment it manually in that case.  See issue #7023
       if (singleMatch[0] === "") {
-        assert(
-          !regexQuery.unicode,
-          "lastIndex++ can cause issues in unicode mode"
-        );
+        assert(!regexQuery.unicode, "lastIndex++ can cause issues in unicode mode");
         regexQuery.lastIndex++;
       }
     }

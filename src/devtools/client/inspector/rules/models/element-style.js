@@ -34,10 +34,7 @@ var NON_ASCII = "[^\\x00-\\x7F]";
 var ESCAPE = "\\\\[^\n\r]";
 var FIRST_CHAR = ["[_a-z]", NON_ASCII, ESCAPE].join("|");
 var TRAILING_CHAR = ["[_a-z0-9-]", NON_ASCII, ESCAPE].join("|");
-var IS_VARIABLE_TOKEN = new RegExp(
-  `^--(${FIRST_CHAR})(${TRAILING_CHAR})*$`,
-  "i"
-);
+var IS_VARIABLE_TOKEN = new RegExp(`^--(${FIRST_CHAR})(${TRAILING_CHAR})*$`, "i");
 
 function isCssVariable(input) {
   return !!input.match(IS_VARIABLE_TOKEN);
@@ -91,20 +88,14 @@ class ElementStyle {
 
     if (this.ruleView.isNewRulesView) {
       this.pageStyle.on("stylesheet-updated", this.onRefresh);
-      this.ruleView.inspector.styleChangeTracker.on(
-        "style-changed",
-        this.onRefresh
-      );
+      this.ruleView.inspector.styleChangeTracker.on("style-changed", this.onRefresh);
       this.ruleView.selection.on("pseudoclass", this.onRefresh);
     }
   }
 
   get unusedCssEnabled() {
     if (!this._unusedCssEnabled) {
-      this._unusedCssEnabled = Services.prefs.getBoolPref(
-        PREF_INACTIVE_CSS_ENABLED,
-        false
-      );
+      this._unusedCssEnabled = Services.prefs.getBoolPref(PREF_INACTIVE_CSS_ENABLED, false);
     }
     return this._unusedCssEnabled;
   }
@@ -127,10 +118,7 @@ class ElementStyle {
 
     if (this.ruleView.isNewRulesView) {
       this.pageStyle.off("stylesheet-updated", this.onRefresh);
-      this.ruleView.inspector.styleChangeTracker.off(
-        "style-changed",
-        this.onRefresh
-      );
+      this.ruleView.inspector.styleChangeTracker.off("style-changed", this.onRefresh);
       this.ruleView.selection.off("pseudoclass", this.onRefresh);
     }
   }
@@ -172,9 +160,7 @@ class ElementStyle {
     }
 
     // Store a list of all pseudo-element types found in the matching rules.
-    this.pseudoElements = this.rules
-      .filter(r => r.pseudoElement)
-      .map(r => r.pseudoElement);
+    this.pseudoElements = this.rules.filter(r => r.pseudoElement).map(r => r.pseudoElement);
 
     // Mark overridden computed styles.
     this.onRuleUpdated();
@@ -203,9 +189,7 @@ class ElementStyle {
    * @return {Rule|undefined} of the given rule id or undefined if it cannot be found.
    */
   getRule(id) {
-    return id
-      ? this.rules.find(rule => rule.domRule.objectId() === id)
-      : undefined;
+    return id ? this.rules.find(rule => rule.domRule.objectId() === id) : undefined;
   }
 
   /**
@@ -329,8 +313,7 @@ class ElementStyle {
         earlier &&
         computedProp.priority === "important" &&
         earlier.priority !== "important" &&
-        (earlier.textProp.rule.inherited ||
-          !computedProp.textProp.rule.inherited)
+        (earlier.textProp.rule.inherited || !computedProp.textProp.rule.inherited)
       ) {
         // New property is higher priority. Mark the earlier property
         // overridden (which will reverse its dirty state).
@@ -440,8 +423,7 @@ class ElementStyle {
       // When renaming a selector, the unmatched rule lingers in the Rule view, but it no
       // longer matches the node. This strict check avoids accidentally causing
       // declarations to be overridden in the remaining matching rules.
-      const isStyleRule =
-        rule.pseudoElement === "" && rule.matchedSelectors.length > 0;
+      const isStyleRule = rule.pseudoElement === "" && rule.matchedSelectors.length > 0;
 
       // Style rules for pseudo-elements must always be considered, regardless if their
       // selector matches the node. As a convenience, declarations in rules for
@@ -450,13 +432,11 @@ class ElementStyle {
       // impossible, for example with ::selection or ::first-line).
       // Loosening the strict check on matched selectors ensures these declarations
       // participate in the algorithm below to mark them as overridden.
-      const isPseudoElementRule =
-        rule.pseudoElement !== "" && rule.pseudoElement === pseudo;
+      const isPseudoElementRule = rule.pseudoElement !== "" && rule.pseudoElement === pseudo;
 
       const isElementStyle = !rule.domRule.isRule();
 
-      const filterCondition =
-        pseudo === "" ? isStyleRule || isElementStyle : isPseudoElementRule;
+      const filterCondition = pseudo === "" ? isStyleRule || isElementStyle : isPseudoElementRule;
 
       // Collect all relevant CSS declarations (aka TextProperty instances).
       if (filterCondition) {
@@ -485,11 +465,7 @@ class ElementStyle {
       return;
     }
 
-    const declarationsToAdd = parseNamedDeclarations(
-      this.cssProperties.isKnown,
-      value,
-      true
-    );
+    const declarationsToAdd = parseNamedDeclarations(this.cssProperties.isKnown, value, true);
     if (!declarationsToAdd.length) {
       return;
     }
@@ -503,10 +479,7 @@ class ElementStyle {
    * the stylesheet.
    */
   async addNewRule() {
-    await this.pageStyle.addNewRule(
-      this.element,
-      this.element.pseudoClassLocks
-    );
+    await this.pageStyle.addNewRule(this.element, this.element.pseudoClassLocks);
   }
 
   /**
@@ -560,13 +533,7 @@ class ElementStyle {
     for (const { commentOffsets, name, value, priority } of declarationsToAdd) {
       const isCommented = Boolean(commentOffsets);
       const enabled = !isCommented;
-      siblingDeclaration = rule.createProperty(
-        name,
-        value,
-        priority,
-        enabled,
-        siblingDeclaration
-      );
+      siblingDeclaration = rule.createProperty(name, value, priority, enabled, siblingDeclaration);
     }
   }
 
@@ -639,13 +606,8 @@ class ElementStyle {
       return;
     }
 
-    const { declarationsToAdd, firstValue } = this._getValueAndExtraProperties(
-      value
-    );
-    const parsedValue = parseSingleValue(
-      this.cssProperties.isKnown,
-      firstValue
-    );
+    const { declarationsToAdd, firstValue } = this._getValueAndExtraProperties(value);
+    const parsedValue = parseSingleValue(this.cssProperties.isKnown, firstValue);
 
     if (
       !declarationsToAdd.length &&
@@ -680,10 +642,7 @@ class ElementStyle {
         return;
       }
 
-      const response = await rule.domRule.modifySelector(
-        this.element,
-        selector
-      );
+      const response = await rule.domRule.modifySelector(this.element, selector);
       const { ruleProps, isMatching } = response;
 
       if (!ruleProps) {

@@ -44,8 +44,6 @@ describe("isAbsolute()", () => {
 
 describe("join()", () => {
   it("concatenates a base path and a directory name", () => {
-    expect(join(absoluteTestPath, aTestName)).toBe(
-      "/some/absolute/path/to/resource/name"
-    );
+    expect(join(absoluteTestPath, aTestName)).toBe("/some/absolute/path/to/resource/name");
   });
 });

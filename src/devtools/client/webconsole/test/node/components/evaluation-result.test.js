@@ -16,9 +16,7 @@ const { setupStore } = require("devtools/client/webconsole/test/node/helpers");
 const EvaluationResult = createFactory(
   require("devtools/client/webconsole/components/Output/message-types/EvaluationResult")
 );
-const {
-  INDENT_WIDTH,
-} = require("devtools/client/webconsole/components/Output/MessageIndent");
+const { INDENT_WIDTH } = require("devtools/client/webconsole/components/Output/MessageIndent");
 
 // Test fakes.
 const {
@@ -32,15 +30,10 @@ describe("EvaluationResult component:", () => {
     // We need to wrap the ConsoleApiElement in a Provider in order for the
     // ObjectInspector to work.
     const wrapper = render(
-      Provider(
-        { store: setupStore() },
-        EvaluationResult({ message, serviceContainer })
-      )
+      Provider({ store: setupStore() }, EvaluationResult({ message, serviceContainer }))
     );
 
-    expect(wrapper.find(".message-body").text()).toBe(
-      "Date 1970-01-01T00:00:00.000Z"
-    );
+    expect(wrapper.find(".message-body").text()).toBe("Date 1970-01-01T00:00:00.000Z");
 
     expect(wrapper.hasClass("message")).toBe(true);
     expect(wrapper.hasClass("log")).toBe(true);
@@ -89,10 +82,7 @@ describe("EvaluationResult component:", () => {
     // We need to wrap the ConsoleApiElement in a Provider in order for the
     // ObjectInspector to work.
     const wrapper = render(
-      Provider(
-        { store: setupStore() },
-        EvaluationResult({ message, serviceContainer })
-      )
+      Provider({ store: setupStore() }, EvaluationResult({ message, serviceContainer }))
     );
 
     expect(wrapper.find(".message-body").text()).toBe("Object { a: 1 }");
@@ -119,13 +109,12 @@ describe("EvaluationResult component:", () => {
         EvaluationResult({
           message,
           serviceContainer,
-          dispatch: () => { },
+          dispatch: () => {},
         })
       )
     );
 
-    const url =
-      "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Errors/Not_defined";
+    const url = "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Errors/Not_defined";
     const learnMore = wrapper.find(".learn-more-link");
     expect(learnMore.length).toBe(1);
     expect(learnMore.prop("title")).toBe(url);
@@ -155,10 +144,7 @@ describe("EvaluationResult component:", () => {
     expect(indentEl.prop("data-indent")).toBe(`${indent}`);
 
     wrapper = render(
-      Provider(
-        { store: setupStore() },
-        EvaluationResult({ message, serviceContainer })
-      )
+      Provider({ store: setupStore() }, EvaluationResult({ message, serviceContainer }))
     );
     indentEl = wrapper.find(".indent");
     expect(indentEl.prop("style").width).toBe(`0`);
@@ -188,13 +174,9 @@ describe("EvaluationResult component:", () => {
         })
       )
     );
-    const {
-      timestampString,
-    } = require("devtools/client/webconsole/utils/l10n");
+    const { timestampString } = require("devtools/client/webconsole/utils/l10n");
 
-    expect(wrapper.find(".timestamp").text()).toBe(
-      timestampString(message.timeStamp)
-    );
+    expect(wrapper.find(".timestamp").text()).toBe(timestampString(message.timeStamp));
   });
 
   it("does not have a timestamp when timestampsVisible prop is falsy", () => {

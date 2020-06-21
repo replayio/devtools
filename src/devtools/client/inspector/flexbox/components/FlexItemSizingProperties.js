@@ -30,12 +30,7 @@ const getFlexibilityReasons = ({
   if (!computedFlexGrow && !grew && !shrank && lineGrowthState === "growing") {
     reasons.push(getStr("flexbox.itemSizing.notSetToGrow"));
   }
-  if (
-    !computedFlexShrink &&
-    !grew &&
-    !shrank &&
-    lineGrowthState === "shrinking"
-  ) {
+  if (!computedFlexShrink && !grew && !shrank && lineGrowthState === "shrinking") {
     reasons.push(getStr("flexbox.itemSizing.notSetToShrink"));
   }
 
@@ -72,11 +67,7 @@ class FlexItemSizingProperties extends PureComponent {
       value = "+" + value;
     }
 
-    return dom.span(
-      { className: "value" },
-      value,
-      dom.span({ className: "unit" }, "px")
-    );
+    return dom.span({ className: "value" }, value, dom.span({ className: "unit" }, "px"));
   }
 
   /**
@@ -138,12 +129,7 @@ class FlexItemSizingProperties extends PureComponent {
     );
   }
 
-  renderFlexibilitySection(
-    flexItemSizing,
-    mainFinalSize,
-    properties,
-    computedStyle
-  ) {
+  renderFlexibilitySection(flexItemSizing, mainFinalSize, properties, computedStyle) {
     const { mainDeltaSize, mainBaseSize, lineGrowthState } = flexItemSizing;
 
     // Don't display anything if all interesting sizes are 0.
@@ -181,11 +167,7 @@ class FlexItemSizingProperties extends PureComponent {
       property = this.renderCssProperty("flex-shrink", definedFlexShrink);
     } else if (shrank && computedFlexShrink) {
       // Or also because it's default value is 1 anyway.
-      property = this.renderCssProperty(
-        "flex-shrink",
-        computedFlexShrink,
-        true
-      );
+      property = this.renderCssProperty("flex-shrink", computedFlexShrink, true);
     }
 
     // Don't display the section at all if there's nothing useful to show users.
@@ -273,10 +255,7 @@ class FlexItemSizingProperties extends PureComponent {
   renderFinalSizeSection(mainFinalSize) {
     return dom.li(
       { className: "section final no-property" },
-      dom.span(
-        { className: "name" },
-        getStr("flexbox.itemSizing.finalSizeSectionHeader")
-      ),
+      dom.span({ className: "name" }, getStr("flexbox.itemSizing.finalSizeSectionHeader")),
       this.renderSize(mainFinalSize)
     );
   }
@@ -291,27 +270,17 @@ class FlexItemSizingProperties extends PureComponent {
       mainMaxSize,
       mainMinSize,
     } = flexItemSizing;
-    const dimension = mainAxisDirection.startsWith("horizontal")
-      ? "width"
-      : "height";
+    const dimension = mainAxisDirection.startsWith("horizontal") ? "width" : "height";
 
     // Calculate the final size. This is base + delta, then clamped by min or max.
     let mainFinalSize = mainBaseSize + mainDeltaSize;
     mainFinalSize = Math.max(mainFinalSize, mainMinSize);
-    mainFinalSize =
-      mainMaxSize === null
-        ? mainFinalSize
-        : Math.min(mainFinalSize, mainMaxSize);
+    mainFinalSize = mainMaxSize === null ? mainFinalSize : Math.min(mainFinalSize, mainMaxSize);
 
     return dom.ul(
       { className: "flex-item-sizing" },
       this.renderBaseSizeSection(flexItemSizing, properties, dimension),
-      this.renderFlexibilitySection(
-        flexItemSizing,
-        mainFinalSize,
-        properties,
-        computedStyle
-      ),
+      this.renderFlexibilitySection(flexItemSizing, mainFinalSize, properties, computedStyle),
       this.renderMinimumSizeSection(flexItemSizing, properties, dimension),
       this.renderMaximumSizeSection(flexItemSizing, properties, dimension),
       this.renderFinalSizeSection(mainFinalSize)

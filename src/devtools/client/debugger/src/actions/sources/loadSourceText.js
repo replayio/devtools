@@ -20,10 +20,7 @@ import { addBreakpoint } from "../breakpoints";
 import { isFulfilled, fulfilled } from "../../utils/async-value";
 
 import { isPretty } from "../../utils/source";
-import {
-  memoizeableAction,
-  type MemoizedAction,
-} from "../../utils/memoizableAction";
+import { memoizeableAction, type MemoizedAction } from "../../utils/memoizableAction";
 
 import { Telemetry } from "devtools-modules";
 
@@ -94,9 +91,7 @@ async function loadSourceTextPromise(
   if (!newSource.isWasm && content) {
     parser.setSource(
       newSource.id,
-      isFulfilled(content)
-        ? content.value
-        : { type: "text", value: "", contentType: undefined }
+      isFulfilled(content) ? content.value : { type: "text", value: "", contentType: undefined }
     );
 
     client.eventMethods.sourceLoaded(newSource.id);
@@ -140,6 +135,5 @@ export const loadSourceText: MemoizedAction<
     const epoch = getSourcesEpoch(getState());
     return `${epoch}:${source.id}`;
   },
-  action: ({ cx, source }, thunkArgs) =>
-    loadSourceTextPromise(cx, source, thunkArgs),
+  action: ({ cx, source }, thunkArgs) => loadSourceTextPromise(cx, source, thunkArgs),
 });

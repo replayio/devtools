@@ -4,28 +4,19 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
 const { COLOR_SCHEMES } = require("devtools/client/inspector/rules/constants");
 
-const SearchBox = createFactory(
-  require("devtools/client/inspector/rules/components/SearchBox")
-);
+const SearchBox = createFactory(require("devtools/client/inspector/rules/components/SearchBox"));
 
 loader.lazyGetter(this, "ClassListPanel", function () {
-  return createFactory(
-    require("devtools/client/inspector/rules/components/ClassListPanel")
-  );
+  return createFactory(require("devtools/client/inspector/rules/components/ClassListPanel"));
 });
 loader.lazyGetter(this, "PseudoClassPanel", function () {
-  return createFactory(
-    require("devtools/client/inspector/rules/components/PseudoClassPanel")
-  );
+  return createFactory(require("devtools/client/inspector/rules/components/PseudoClassPanel"));
 });
 
 const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
@@ -61,9 +52,7 @@ class Toolbar extends PureComponent {
 
     this.onAddRuleClick = this.onAddRuleClick.bind(this);
     this.onClassPanelToggle = this.onClassPanelToggle.bind(this);
-    this.onColorSchemeSimulationClick = this.onColorSchemeSimulationClick.bind(
-      this
-    );
+    this.onColorSchemeSimulationClick = this.onColorSchemeSimulationClick.bind(this);
     this.onPrintSimulationToggle = this.onPrintSimulationToggle.bind(this);
     this.onPseudoClassPanelToggle = this.onPseudoClassPanelToggle.bind(this);
   }
@@ -92,8 +81,7 @@ class Toolbar extends PureComponent {
 
     this.props.onToggleColorSchemeSimulation();
     this.setState(prevState => ({
-      currentColorScheme:
-        (prevState.currentColorScheme + 1) % COLOR_SCHEMES.length,
+      currentColorScheme: (prevState.currentColorScheme + 1) % COLOR_SCHEMES.length,
     }));
   }
 
@@ -141,16 +129,13 @@ class Toolbar extends PureComponent {
           { id: "ruleview-command-toolbar" },
           dom.button({
             id: "pseudo-class-panel-toggle",
-            className:
-              "devtools-button" +
-              (isPseudoClassPanelExpanded ? " checked" : ""),
+            className: "devtools-button" + (isPseudoClassPanelExpanded ? " checked" : ""),
             onClick: this.onPseudoClassPanelToggle,
             title: getStr("rule.togglePseudo.tooltip"),
           }),
           dom.button({
             id: "class-panel-toggle",
-            className:
-              "devtools-button" + (isClassPanelExpanded ? " checked" : ""),
+            className: "devtools-button" + (isClassPanelExpanded ? " checked" : ""),
             onClick: this.onClassPanelToggle,
             title: getStr("rule.classPanel.toggleClass.tooltip"),
           }),
@@ -163,35 +148,33 @@ class Toolbar extends PureComponent {
           }),
           isColorSchemeSimulationHidden
             ? dom.button({
-              id: "color-scheme-simulation-toggle",
-              className: "devtools-button",
-              onClick: this.onColorSchemeSimulationClick,
-              state: COLOR_SCHEMES[this.state.currentColorScheme],
-              title: getStr("rule.colorSchemeSimulation.tooltip"),
-            })
+                id: "color-scheme-simulation-toggle",
+                className: "devtools-button",
+                onClick: this.onColorSchemeSimulationClick,
+                state: COLOR_SCHEMES[this.state.currentColorScheme],
+                title: getStr("rule.colorSchemeSimulation.tooltip"),
+              })
             : null,
           !isPrintSimulationHidden
             ? dom.button({
-              id: "print-simulation-toggle",
-              className:
-                "devtools-button" +
-                (isPrintSimulationEnabled ? " checked" : ""),
-              onClick: this.onPrintSimulationToggle,
-              title: getStr("rule.printSimulation.tooltip"),
-            })
+                id: "print-simulation-toggle",
+                className: "devtools-button" + (isPrintSimulationEnabled ? " checked" : ""),
+                onClick: this.onPrintSimulationToggle,
+                title: getStr("rule.printSimulation.tooltip"),
+              })
             : null
         )
       ),
       isClassPanelExpanded
         ? ClassListPanel({
-          onAddClass: this.props.onAddClass,
-          onSetClassState: this.props.onSetClassState,
-        })
+            onAddClass: this.props.onAddClass,
+            onSetClassState: this.props.onSetClassState,
+          })
         : null,
       isPseudoClassPanelExpanded
         ? PseudoClassPanel({
-          onTogglePseudoClass: this.props.onTogglePseudoClass,
-        })
+            onTogglePseudoClass: this.props.onTogglePseudoClass,
+          })
         : null
     );
   }

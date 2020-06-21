@@ -46,7 +46,7 @@ const actions = {
   _sources: [],
   connect: () => {},
   setWorkers: () => {},
-  newSources: function(sources) {
+  newSources: function (sources) {
     return new Promise(resolve => {
       setTimeout(() => {
         this._sources = sources;

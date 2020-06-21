@@ -62,7 +62,7 @@ function searchOverlay(query, modifiers) {
   });
 
   return {
-    token: function(stream, state) {
+    token: function (stream, state) {
       // set the last index to be the current stream position
       // this acts as an offset
       regexQuery.lastIndex = stream.pos;
@@ -104,11 +104,7 @@ function updateCursor(cm, state, keepSelection) {
   }
 }
 
-export function getMatchIndex(
-  count: number,
-  currentIndex: number,
-  rev: boolean
-) {
+export function getMatchIndex(count: number, currentIndex: number, rev: boolean) {
   if (!rev) {
     if (currentIndex == count - 1) {
       return 0;
@@ -146,7 +142,7 @@ function doSearch(
   }
   const defaultIndex = { line: -1, ch: -1 };
 
-  return cm.operation(function() {
+  return cm.operation(function () {
     if (!query || isWhitespace(query)) {
       clearSearch(cm, query);
       return;
@@ -185,7 +181,7 @@ export function searchSourceForHighlight(
     return;
   }
 
-  return cm.operation(function() {
+  return cm.operation(function () {
     const state = getSearchState(cm, query);
     const isNewQuery = state.query !== query;
     state.query = query;
@@ -213,7 +209,7 @@ function getCursorPos(newQuery, rev, state) {
 function searchNext(ctx, rev, query, newQuery, modifiers) {
   const { cm } = ctx;
   let nextMatch;
-  cm.operation(function() {
+  cm.operation(function () {
     const state = getSearchState(cm, query);
     const pos = getCursorPos(newQuery, rev, state);
 
@@ -223,9 +219,7 @@ function searchNext(ctx, rev, query, newQuery, modifiers) {
 
     let cursor = getSearchCursor(cm, state.query, pos, modifiers);
 
-    const location = rev
-      ? { line: cm.lastLine(), ch: null }
-      : { line: cm.firstLine(), ch: 0 };
+    const location = rev ? { line: cm.lastLine(), ch: null } : { line: cm.firstLine(), ch: 0 };
 
     if (!cursor.find(rev) && state.query) {
       cursor = getSearchCursor(cm, state.query, location, modifiers);
@@ -242,7 +236,7 @@ function searchNext(ctx, rev, query, newQuery, modifiers) {
 
 function findNextOnLine(ctx, rev, query, newQuery, modifiers, line, ch) {
   const { cm, ed } = ctx;
-  cm.operation(function() {
+  cm.operation(function () {
     const pos = { line: line - 1, ch };
     let cursor = getSearchCursor(cm, query, pos, modifiers);
 
@@ -307,14 +301,7 @@ export function find(
   focusFirstResult?: boolean
 ) {
   clearSearch(ctx.cm, query);
-  return doSearch(
-    ctx,
-    false,
-    query,
-    keepSelection,
-    modifiers,
-    focusFirstResult
-  );
+  return doSearch(ctx, false, query, keepSelection, modifiers, focusFirstResult);
 }
 
 /**

@@ -218,12 +218,7 @@ type ConsoleFront = {
     func: Function,
     params?: { frameActor: ?FrameId }
   ) => Promise<{ result: ExpressionResult }>,
-  autocomplete: (
-    input: string,
-    cursor: number,
-    func: Function,
-    frameId: ?string
-  ) => void,
+  autocomplete: (input: string, cursor: number, func: Function, frameId: ?string) => void,
   emit: (string, any) => void,
 };
 
@@ -337,11 +332,7 @@ export type ObjectFront = {
   getGrip: () => Grip,
   getPrototypeAndProperties: () => any,
   getProperty: string => { descriptor: any },
-  addWatchpoint: (
-    property: string,
-    label: string,
-    watchpointType: string
-  ) => {},
+  addWatchpoint: (property: string, label: string, watchpointType: string) => {},
   removeWatchpoint: (property: string) => {},
   release: () => Promise<*>,
 };
@@ -352,13 +343,7 @@ export type LongStringFront = {
   release: () => Promise<*>,
 };
 
-export type ExpressionResult =
-  | ObjectFront
-  | LongStringFront
-  | Grip
-  | string
-  | number
-  | null;
+export type ExpressionResult = ObjectFront | LongStringFront | Grip | string | number | null;
 
 /**
  * ThreadFront

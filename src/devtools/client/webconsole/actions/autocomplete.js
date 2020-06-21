@@ -39,10 +39,7 @@ function autocompleteUpdate(force, getterPath, expressionVars) {
 
     const state = getState().autocomplete;
     const { cache } = state;
-    if (
-      !force &&
-      (!inputValue || /^[a-zA-Z0-9_$]/.test(inputValue.substring(cursor)))
-    ) {
+    if (!force && (!inputValue || /^[a-zA-Z0-9_$]/.test(inputValue.substring(cursor)))) {
       return dispatch(autocompleteClear());
     }
 
@@ -60,8 +57,7 @@ function autocompleteUpdate(force, getterPath, expressionVars) {
     }
 
     let authorizedEvaluations =
-      Array.isArray(state.authorizedEvaluations) &&
-      state.authorizedEvaluations.length > 0
+      Array.isArray(state.authorizedEvaluations) && state.authorizedEvaluations.length > 0
         ? state.authorizedEvaluations
         : [];
 
@@ -190,14 +186,7 @@ function autocompleteDataFetch({
  *                   Example: [["x", "myGetter"], ["x", "myGetter", "y", "glitter"]]
  *                  to retrieve properties of `x.myGetter.` and `x.myGetter.y.glitter`.
  */
-function autocompleteDataReceive({
-  id,
-  input,
-  frameActorId,
-  force,
-  data,
-  authorizedEvaluations,
-}) {
+function autocompleteDataReceive({ id, input, frameActorId, force, data, authorizedEvaluations }) {
   return {
     type: AUTOCOMPLETE_DATA_RECEIVE,
     id,

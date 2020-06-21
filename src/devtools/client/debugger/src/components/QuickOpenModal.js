@@ -34,10 +34,7 @@ import Modal from "./shared/Modal";
 import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
 
-import type {
-  FormattedSymbolDeclarations,
-  QuickOpenResult,
-} from "../utils/quick-open";
+import type { FormattedSymbolDeclarations, QuickOpenResult } from "../utils/quick-open";
 
 import type { Source, Context } from "../types";
 import type { QuickOpenType } from "../reducers/quick-open";
@@ -149,8 +146,7 @@ export class QuickOpenModal extends Component<Props, State> {
     const { displayedSources, tabs } = this.props;
 
     const sources = this.formatSources(displayedSources, tabs);
-    const results =
-      query == "" ? sources : filter(sources, this.dropGoto(query));
+    const results = query == "" ? sources : filter(sources, this.dropGoto(query));
     return this.setResults(results);
   };
 
@@ -185,9 +181,7 @@ export class QuickOpenModal extends Component<Props, State> {
     if (tabs.length > 0) {
       this.setResults(
         formatSources(
-          displayedSources.filter(
-            source => !!source.url && tabUrls.has(source.url)
-          ),
+          displayedSources.filter(source => !!source.url && tabUrls.has(source.url)),
           tabUrls
         )
       );
@@ -222,10 +216,7 @@ export class QuickOpenModal extends Component<Props, State> {
     }
   };
 
-  selectResultItem = (
-    e: SyntheticEvent<HTMLElement>,
-    item: ?QuickOpenResult
-  ) => {
+  selectResultItem = (e: SyntheticEvent<HTMLElement>, item: ?QuickOpenResult) => {
     if (item == null) {
       return;
     }
@@ -241,8 +232,7 @@ export class QuickOpenModal extends Component<Props, State> {
 
     if (this.isSymbolSearch()) {
       return this.gotoLocation({
-        line:
-          item.location && item.location.start ? item.location.start.line : 0,
+        line: item.location && item.location.start ? item.location.start.line : 0,
       });
     }
 
@@ -295,11 +285,7 @@ export class QuickOpenModal extends Component<Props, State> {
   };
 
   onChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    const {
-      selectedSource,
-      selectedContentLoaded,
-      setQuickOpenQuery,
-    } = this.props;
+    const { selectedSource, selectedContentLoaded, setQuickOpenQuery } = this.props;
     setQuickOpenQuery(e.target.value);
     const noSource = !selectedSource || !selectedContentLoaded;
     if ((noSource && this.isSymbolSearch()) || this.isGotoQuery()) {
@@ -369,10 +355,7 @@ export class QuickOpenModal extends Component<Props, State> {
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
   }
 
-  highlightMatching = (
-    query: string,
-    results: QuickOpenResult[]
-  ): QuickOpenResult[] => {
+  highlightMatching = (query: string, results: QuickOpenResult[]): QuickOpenResult[] => {
     let newQuery = query;
     if (newQuery === "") {
       return results;
@@ -383,11 +366,7 @@ export class QuickOpenModal extends Component<Props, State> {
       if (typeof result.title == "string") {
         return {
           ...result,
-          title: this.renderHighlight(
-            result.title,
-            basename(newQuery),
-            "title"
-          ),
+          title: this.renderHighlight(result.title, basename(newQuery), "title"),
         };
       }
       return result;
@@ -437,9 +416,7 @@ export class QuickOpenModal extends Component<Props, State> {
           handleClose={this.closeModal}
           expanded={expanded}
           showClose={false}
-          selectedItemId={
-            expanded && items[selectedIndex] ? items[selectedIndex].id : ""
-          }
+          selectedItemId={expanded && items[selectedIndex] ? items[selectedIndex].id : ""}
           {...(this.isSourceSearch() ? SIZE_BIG : SIZE_DEFAULT)}
         />
         {results && (
@@ -481,12 +458,9 @@ function mapStateToProps(state) {
 }
 
 /* istanbul ignore next: ignoring testing of redux connection stuff */
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    selectSpecificLocation: actions.selectSpecificLocation,
-    setQuickOpenQuery: actions.setQuickOpenQuery,
-    highlightLineRange: actions.highlightLineRange,
-    closeQuickOpen: actions.closeQuickOpen,
-  }
-)(QuickOpenModal);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  selectSpecificLocation: actions.selectSpecificLocation,
+  setQuickOpenQuery: actions.setQuickOpenQuery,
+  highlightLineRange: actions.highlightLineRange,
+  closeQuickOpen: actions.closeQuickOpen,
+})(QuickOpenModal);

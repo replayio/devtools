@@ -4,10 +4,7 @@
 
 // @flow
 
-import {
-  validateNavigateContext,
-  validateContext,
-} from "../../../utils/context";
+import { validateNavigateContext, validateContext } from "../../../utils/context";
 
 import type { ThunkArgs } from "../../types";
 

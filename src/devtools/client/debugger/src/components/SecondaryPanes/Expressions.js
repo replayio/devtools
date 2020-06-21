@@ -8,7 +8,6 @@ import { connect } from "../../utils/connect";
 import classnames from "classnames";
 import { features } from "../../utils/prefs";
 
-// eslint-disable-next-line import/named
 import { objectInspector } from "devtools-reps";
 
 import actions from "../../actions";
@@ -62,10 +61,7 @@ type Props = {
 
 class Expressions extends Component<Props, State> {
   _input: ?HTMLInputElement;
-  renderExpression: (
-    expression: Expression,
-    index: number
-  ) => React$Element<"li">;
+  renderExpression: (expression: Expression, index: number) => React$Element<"li">;
 
   constructor(props: Props) {
     super(props);
@@ -103,12 +99,7 @@ class Expressions extends Component<Props, State> {
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     const { editing, inputValue, focused } = this.state;
-    const {
-      expressions,
-      expressionError,
-      showInput,
-      autocompleteMatches,
-    } = this.props;
+    const { expressions, expressionError, showInput, autocompleteMatches } = this.props;
 
     return (
       autocompleteMatches !== nextProps.autocompleteMatches ||
@@ -144,10 +135,7 @@ class Expressions extends Component<Props, State> {
     });
   }
 
-  deleteExpression(
-    e: SyntheticMouseEvent<HTMLDivElement>,
-    expression: Expression
-  ) {
+  deleteExpression(e: SyntheticMouseEvent<HTMLDivElement>, expression: Expression) {
     e.stopPropagation();
     const { deleteExpression } = this.props;
     deleteExpression(expression);
@@ -161,13 +149,10 @@ class Expressions extends Component<Props, State> {
     this.setState({ inputValue: target.value });
   };
 
-  findAutocompleteMatches = debounce(
-    (value: string, selectionStart: number) => {
-      const { autocomplete } = this.props;
-      autocomplete(this.props.cx, value, selectionStart);
-    },
-    250
-  );
+  findAutocompleteMatches = debounce((value: string, selectionStart: number) => {
+    const { autocomplete } = this.props;
+    autocomplete(this.props.cx, value, selectionStart);
+  }, 250);
 
   handleKeyDown = (e: SyntheticKeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
@@ -190,18 +175,11 @@ class Expressions extends Component<Props, State> {
     this.hideInput();
   }
 
-  handleExistingSubmit = async (
-    e: SyntheticEvent<HTMLFormElement>,
-    expression: Expression
-  ) => {
+  handleExistingSubmit = async (e: SyntheticEvent<HTMLFormElement>, expression: Expression) => {
     e.preventDefault();
     e.stopPropagation();
 
-    this.props.updateExpression(
-      this.props.cx,
-      this.state.inputValue,
-      expression
-    );
+    this.props.updateExpression(this.props.cx, this.state.inputValue, expression);
     this.hideInput();
   };
 
@@ -308,9 +286,7 @@ class Expressions extends Component<Props, State> {
       : L10N.getStr("expressions.placeholder");
 
     return (
-      <li
-        className={classnames("expression-input-container", { focused, error })}
-      >
+      <li className={classnames("expression-input-container", { focused, error })}>
         <form className="expression-input-form" onSubmit={this.handleNewSubmit}>
           <input
             className="input-expression"
@@ -388,18 +364,15 @@ const mapStateToProps = state => ({
   expressionError: getExpressionError(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    autocomplete: actions.autocomplete,
-    clearAutocomplete: actions.clearAutocomplete,
-    addExpression: actions.addExpression,
-    clearExpressionError: actions.clearExpressionError,
-    updateExpression: actions.updateExpression,
-    deleteExpression: actions.deleteExpression,
-    openLink: actions.openLink,
-    openElementInInspector: actions.openElementInInspectorCommand,
-    highlightDomElement: actions.highlightDomElement,
-    unHighlightDomElement: actions.unHighlightDomElement,
-  }
-)(Expressions);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  autocomplete: actions.autocomplete,
+  clearAutocomplete: actions.clearAutocomplete,
+  addExpression: actions.addExpression,
+  clearExpressionError: actions.clearExpressionError,
+  updateExpression: actions.updateExpression,
+  deleteExpression: actions.deleteExpression,
+  openLink: actions.openLink,
+  openElementInInspector: actions.openElementInInspectorCommand,
+  highlightDomElement: actions.highlightDomElement,
+  unHighlightDomElement: actions.unHighlightDomElement,
+})(Expressions);

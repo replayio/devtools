@@ -45,8 +45,7 @@ function createStore(client: any, initialState: any = {}, sourceMapsMock: any) {
   })(combineReducers(reducers), initialState);
   sourceQueue.clear();
   sourceQueue.initialize({
-    newQueuedSources: sources =>
-      store.dispatch(actions.newQueuedSources(sources)),
+    newQueuedSources: sources => store.dispatch(actions.newQueuedSources(sources)),
   });
 
   store.thunkArgs = () => ({
@@ -127,7 +126,7 @@ function createMakeSource(): (
 ) => GeneratedSourceData {
   const indicies = {};
 
-  return function(name, props = {}) {
+  return function (name, props = {}) {
     const index = (indicies[name] | 0) + 1;
     indicies[name] = index;
 
@@ -188,12 +187,7 @@ function makeFuncLocation(startLine, endLine) {
   };
 }
 
-function makeSymbolDeclaration(
-  name: string,
-  start: number,
-  end: ?number,
-  klass: ?string
-) {
+function makeSymbolDeclaration(name: string, start: number, end: ?number, klass: ?string) {
   return {
     id: `${name}:${start}`,
     name,
@@ -226,7 +220,7 @@ function waitForState(store: any, predicate: any): Promise<void> {
 
 function watchForState(store: any, predicate: any): () => boolean {
   let sawState = false;
-  const checkState = function() {
+  const checkState = function () {
     if (!sawState && predicate(store.getState())) {
       sawState = true;
     }

@@ -59,8 +59,7 @@ class Popover extends Component<Props, State> {
     const { type } = this.props;
     // $FlowIgnore
     this.gapHeight = this.$gap.getBoundingClientRect().height;
-    const coords =
-      type == "popover" ? this.getPopoverCoords() : this.getTooltipCoords();
+    const coords = type == "popover" ? this.getPopoverCoords() : this.getTooltipCoords();
 
     if (coords) {
       this.setState({ coords });
@@ -146,11 +145,7 @@ class Popover extends Component<Props, State> {
     return editor.top - target.height;
   };
 
-  calculateOrientation(
-    target: ClientRect,
-    editor: ClientRect,
-    popover: ClientRect
-  ) {
+  calculateOrientation(target: ClientRect, editor: ClientRect, popover: ClientRect) {
     const estimatedBottom = target.bottom + popover.height;
     if (editor.bottom > estimatedBottom) {
       return "down";
@@ -189,23 +184,9 @@ class Popover extends Component<Props, State> {
     const popoverRect = popover.getBoundingClientRect();
     const editorRect = editor.getBoundingClientRect();
     const targetRect = this.props.targetPosition;
-    const orientation = this.calculateOrientation(
-      targetRect,
-      editorRect,
-      popoverRect
-    );
-    const top = this.calculateTop(
-      targetRect,
-      editorRect,
-      popoverRect,
-      orientation
-    );
-    const popoverLeft = this.calculateLeft(
-      targetRect,
-      editorRect,
-      popoverRect,
-      orientation
-    );
+    const orientation = this.calculateOrientation(targetRect, editorRect, popoverRect);
+    const top = this.calculateTop(targetRect, editorRect, popoverRect, orientation);
+    const popoverLeft = this.calculateLeft(targetRect, editorRect, popoverRect, orientation);
     let targetMid;
     if (orientation === "right") {
       targetMid = {
@@ -237,11 +218,8 @@ class Popover extends Component<Props, State> {
     const editorRect = editor.getBoundingClientRect();
     const targetRect = this.props.targetPosition;
     const left = this.calculateLeft(targetRect, editorRect, tooltipRect);
-    const enoughRoomForTooltipAbove =
-      targetRect.top - editorRect.top > tooltipRect.height;
-    const top = enoughRoomForTooltipAbove
-      ? targetRect.top - tooltipRect.height
-      : targetRect.bottom;
+    const enoughRoomForTooltipAbove = targetRect.top - editorRect.top > tooltipRect.height;
+    const top = enoughRoomForTooltipAbove ? targetRect.top - tooltipRect.height : targetRect.bottom;
 
     return {
       left,

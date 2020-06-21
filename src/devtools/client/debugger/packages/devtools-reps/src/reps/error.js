@@ -48,8 +48,11 @@ function ErrorRep(props) {
     content.push(`${name}: "${preview.message.primitive()}"`);
   }
 
-  if (preview.stack && (mode !== MODE.TINY && mode !== MODE.SHORT)) {
-    const stacktrace = props.renderStacktrace ? props.renderStacktrace(parseStackString(preview.stack.primitive())) : getStacktraceElements(props, preview); content.push(stacktrace);
+  if (preview.stack && mode !== MODE.TINY && mode !== MODE.SHORT) {
+    const stacktrace = props.renderStacktrace
+      ? props.renderStacktrace(parseStackString(preview.stack.primitive()))
+      : getStacktraceElements(props, preview);
+    content.push(stacktrace);
   }
 
   return span(
@@ -85,18 +88,9 @@ function getStacktraceElements(props, preview) {
 
   parseStackString(preview.stack.primitive()).forEach((frame, index, frames) => {
     let onLocationClick;
-    const {
-      filename,
-      lineNumber,
-      columnNumber,
-      functionName,
-      location,
-    } = frame;
+    const { filename, lineNumber, columnNumber, functionName, location } = frame;
 
-    if (
-      props.onViewSourceInDebugger &&
-      !IGNORED_SOURCE_URLS.includes(filename)
-    ) {
+    if (props.onViewSourceInDebugger && !IGNORED_SOURCE_URLS.includes(filename)) {
       onLocationClick = e => {
         // Don't trigger ObjectInspector expand/collapse.
         e.stopPropagation();
@@ -123,9 +117,7 @@ function getStacktraceElements(props, preview) {
           key: `location${index}`,
           className: "objectBox-stackTrace-location",
           onClick: onLocationClick,
-          title: onLocationClick
-            ? `View source in debugger → ${location}`
-            : undefined,
+          title: onLocationClick ? `View source in debugger → ${location}` : undefined,
         },
         location
       ),
@@ -207,9 +199,7 @@ function parseStackString(stack) {
     // Given the input: "scriptLocation:2:100"
     // Result:
     // ["scriptLocation:2:100", "scriptLocation", "2", "100"]
-    const locationParts = location
-      ? location.match(/^(.*):(\d+):(\d+)$/)
-      : null;
+    const locationParts = location ? location.match(/^(.*):(\d+):(\d+)$/) : null;
 
     if (location && locationParts) {
       const [, filename, line, column] = locationParts;

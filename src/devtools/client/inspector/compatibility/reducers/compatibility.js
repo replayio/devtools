@@ -29,9 +29,7 @@ const reducers = {
     return updateSelectedNodeIssues(state, data);
   },
   [COMPATIBILITY_UPDATE_SELECTED_NODE_FAILURE](state, { error }) {
-    console.error(
-      `[COMPATIBILITY_UPDATE_SELECTED_NODE_FAILURE] ${error.message}`
-    );
+    console.error(`[COMPATIBILITY_UPDATE_SELECTED_NODE_FAILURE] ${error.message}`);
     console.error(error.stack);
     return state;
   },
@@ -47,17 +45,14 @@ function updateSelectedNodeIssues(state, data) {
   const selectedNodeIssues = [];
   for (const declarationBlock of declarationBlocks) {
     selectedNodeIssues.push(
-      ...mdnCompatibility.getCSSDeclarationBlockIssues(
-        declarationBlock,
-        targetBrowsers
-      )
+      ...mdnCompatibility.getCSSDeclarationBlockIssues(declarationBlock, targetBrowsers)
     );
   }
 
   return { selectedNodeIssues, declarationBlocks, targetBrowsers };
 }
 
-module.exports = function(state = INITIAL_STATE, action) {
+module.exports = function (state = INITIAL_STATE, action) {
   const reducer = reducers[action.type];
   return reducer ? reducer(state, action) : state;
 };

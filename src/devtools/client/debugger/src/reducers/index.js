@@ -27,7 +27,6 @@ import sourceTree from "./source-tree";
 import threads from "./threads";
 import eventListenerBreakpoints from "./event-listeners";
 
-// eslint-disable-next-line import/named
 import { objectInspector } from "devtools-reps";
 
 export default {

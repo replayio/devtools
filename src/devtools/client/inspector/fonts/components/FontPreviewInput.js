@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createRef,
-  PureComponent,
-} = require("react");
+const { createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 

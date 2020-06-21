@@ -12,9 +12,7 @@ const {
   getAllMessagesById,
   getVisibleMessages,
 } = require("devtools/client/webconsole/selectors/messages");
-const {
-  ensureExecutionPoint,
-} = require("devtools/client/webconsole/reducers/messages");
+const { ensureExecutionPoint } = require("devtools/client/webconsole/reducers/messages");
 
 const {
   clonePacket,
@@ -101,8 +99,7 @@ describe("Message reducer:", () => {
     });
 
     it("increments repeat on a repeating css message", () => {
-      const key1 =
-        "Unknown property ‘such-unknown-property’.  Declaration dropped.";
+      const key1 = "Unknown property ‘such-unknown-property’.  Declaration dropped.";
       const { dispatch, getState } = setupStore([key1, key1]);
 
       const packet = clonePacket(stubPackets.get(key1));
@@ -122,8 +119,7 @@ describe("Message reducer:", () => {
     });
 
     it("doesn't increment repeat on same css message with different locations", () => {
-      const key1 =
-        "Unknown property ‘such-unknown-property’.  Declaration dropped.";
+      const key1 = "Unknown property ‘such-unknown-property’.  Declaration dropped.";
       const { dispatch, getState } = setupStore();
 
       const packet = clonePacket(stubPackets.get(key1));
@@ -262,9 +258,7 @@ describe("Message reducer:", () => {
       const messages = getAllMessagesById(getState());
 
       expect(messages.size).toBe(1);
-      expect(getFirstMessage(getState()).parameters[0]).toBe(
-        "Console was cleared."
-      );
+      expect(getFirstMessage(getState()).parameters[0]).toBe("Console was cleared.");
     });
 
     it("clears the messages list in response to MESSAGES_CLEAR action", () => {
@@ -346,9 +340,7 @@ describe("Message reducer:", () => {
       const messages = getAllMessagesById(getState());
       expect(messages.size).toBe(logLimit);
       expect(getFirstMessage(getState()).parameters[0]).toBe(`message num 3`);
-      expect(getLastMessage(getState()).parameters[0]).toBe(
-        `message num ${logLimit + 2}`
-      );
+      expect(getLastMessage(getState()).parameters[0]).toBe(`message num ${logLimit + 2}`);
     });
 
     it("properly limits number of messages when there are nested groups", () => {
@@ -428,12 +420,8 @@ describe("Message reducer:", () => {
       const groups = getGroupsById(getState());
       expect(groups.size).toBe(logLimit);
 
-      expect(messages.get(visibleMessages[1]).parameters[0]).toBe(
-        `message-2-a`
-      );
-      expect(getLastMessage(getState()).parameters[0]).toBe(
-        `message-${logLimit + 1}-b`
-      );
+      expect(messages.get(visibleMessages[1]).parameters[0]).toBe(`message-2-a`);
+      expect(getLastMessage(getState()).parameters[0]).toBe(`message-${logLimit + 1}-b`);
     });
 
     it("properly limits number of collapsed groups", () => {
@@ -443,9 +431,7 @@ describe("Message reducer:", () => {
       });
 
       const packet = clonePacket(stubPackets.get("console.log(undefined)"));
-      const packetGroupCollapsed = clonePacket(
-        stubPackets.get("console.groupCollapsed('foo')")
-      );
+      const packetGroupCollapsed = clonePacket(stubPackets.get("console.groupCollapsed('foo')"));
       const packetGroupEnd = clonePacket(stubPackets.get("console.groupEnd()"));
 
       for (let i = 0; i < logLimit + 2; i++) {
@@ -467,16 +453,12 @@ describe("Message reducer:", () => {
       expect(groups.size).toBe(logLimit);
 
       expect(getFirstMessage(getState()).parameters[0]).toBe(`group-2`);
-      expect(getLastMessage(getState()).parameters[0]).toBe(
-        `message-${logLimit + 1}-b`
-      );
+      expect(getLastMessage(getState()).parameters[0]).toBe(`message-${logLimit + 1}-b`);
 
       const visibleMessages = getVisibleMessages(getState());
       expect(visibleMessages.length).toBe(logLimit);
       const lastVisibleMessageId = visibleMessages[visibleMessages.length - 1];
-      expect(messages.get(lastVisibleMessageId).parameters[0]).toBe(
-        `group-${logLimit + 1}`
-      );
+      expect(messages.get(lastVisibleMessageId).parameters[0]).toBe(`group-${logLimit + 1}`);
     });
 
     it("does not add null messages to the store", () => {
@@ -562,9 +544,7 @@ describe("Message reducer:", () => {
 
       const messages = getAllMessagesById(getState());
       expect(messages.size).toBe(2);
-      expect(getLastMessage(getState()).groupId).toBe(
-        getFirstMessage(getState()).id
-      );
+      expect(getLastMessage(getState()).groupId).toBe(getFirstMessage(getState()).id);
     });
 
     it("does not display console.groupEnd messages to the store", () => {
@@ -720,9 +700,7 @@ describe("Message reducer:", () => {
     });
 
     it("reacts to messageClose/messageOpen actions on exception", () => {
-      const { dispatch, getState } = setupStore([
-        "ReferenceError: asdf is not defined",
-      ]);
+      const { dispatch, getState } = setupStore(["ReferenceError: asdf is not defined"]);
       const firstMessageId = getFirstMessage(getState()).id;
 
       let expanded = getAllMessagesUiById(getState());
@@ -891,13 +869,7 @@ describe("Message reducer:", () => {
       packet.actor = "message1";
       updatePacket.networkInfo.actor = "message1";
       dispatch(actions.messagesAdd([packet]));
-      dispatch(
-        actions.networkMessageUpdate(
-          updatePacket.networkInfo,
-          null,
-          updatePacket
-        )
-      );
+      dispatch(actions.networkMessageUpdate(updatePacket.networkInfo, null, updatePacket));
 
       let networkUpdates = getAllNetworkMessagesUpdateById(getState());
       expect(Object.keys(networkUpdates)).toEqual(["message1"]);
@@ -907,13 +879,7 @@ describe("Message reducer:", () => {
       packet.actor = "message2";
       updatePacket.networkInfo.actor = "message2";
       dispatch(actions.messagesAdd([packet]));
-      dispatch(
-        actions.networkMessageUpdate(
-          updatePacket.networkInfo,
-          null,
-          updatePacket
-        )
-      );
+      dispatch(actions.networkMessageUpdate(updatePacket.networkInfo, null, updatePacket));
 
       networkUpdates = getAllNetworkMessagesUpdateById(getState());
       expect(Object.keys(networkUpdates)).toEqual(["message1", "message2"]);
@@ -923,13 +889,7 @@ describe("Message reducer:", () => {
       const { dispatch, getState } = setupStore(["XHR GET request"]);
 
       const updatePacket = stubPackets.get("XHR GET request update");
-      dispatch(
-        actions.networkMessageUpdate(
-          updatePacket.networkInfo,
-          null,
-          updatePacket
-        )
-      );
+      dispatch(actions.networkMessageUpdate(updatePacket.networkInfo, null, updatePacket));
 
       let networkUpdates = getAllNetworkMessagesUpdateById(getState());
       expect(Object.keys(networkUpdates).length > 0).toBe(true);
@@ -949,49 +909,27 @@ describe("Message reducer:", () => {
 
       // Add 3 network messages and their updates
       let packet = clonePacket(stubPackets.get("XHR GET request"));
-      const updatePacket = clonePacket(
-        stubPackets.get("XHR GET request update")
-      );
+      const updatePacket = clonePacket(stubPackets.get("XHR GET request update"));
       packet.actor = "message1";
       updatePacket.networkInfo.actor = "message1";
       dispatch(actions.messagesAdd([packet]));
-      dispatch(
-        actions.networkMessageUpdate(
-          updatePacket.networkInfo,
-          null,
-          updatePacket
-        )
-      );
+      dispatch(actions.networkMessageUpdate(updatePacket.networkInfo, null, updatePacket));
 
       packet.actor = "message2";
       updatePacket.networkInfo.actor = "message2";
       dispatch(actions.messagesAdd([packet]));
-      dispatch(
-        actions.networkMessageUpdate(
-          updatePacket.networkInfo,
-          null,
-          updatePacket
-        )
-      );
+      dispatch(actions.networkMessageUpdate(updatePacket.networkInfo, null, updatePacket));
 
       packet.actor = "message3";
       updatePacket.networkInfo.actor = "message3";
       dispatch(actions.messagesAdd([packet]));
-      dispatch(
-        actions.networkMessageUpdate(
-          updatePacket.networkInfo,
-          null,
-          updatePacket
-        )
-      );
+      dispatch(actions.networkMessageUpdate(updatePacket.networkInfo, null, updatePacket));
 
       // Check that we have the expected data.
       const messages = getAllMessagesById(getState());
-      const [
-        firstNetworkMessageId,
-        secondNetworkMessageId,
-        thirdNetworkMessageId,
-      ] = [...messages.keys()];
+      const [firstNetworkMessageId, secondNetworkMessageId, thirdNetworkMessageId] = [
+        ...messages.keys(),
+      ];
 
       let networkUpdates = getAllNetworkMessagesUpdateById(getState());
       expect(Object.keys(networkUpdates)).toEqual([
@@ -1005,10 +943,7 @@ describe("Message reducer:", () => {
       dispatch(actions.messagesAdd([packet]));
 
       networkUpdates = getAllNetworkMessagesUpdateById(getState());
-      expect(Object.keys(networkUpdates)).toEqual([
-        secondNetworkMessageId,
-        thirdNetworkMessageId,
-      ]);
+      expect(Object.keys(networkUpdates)).toEqual([secondNetworkMessageId, thirdNetworkMessageId]);
 
       // This addition will remove the second network message.
       packet = stubPackets.get("console.log('foobar', 'test')");
@@ -1029,14 +964,10 @@ describe("Message reducer:", () => {
 
   describe("messagesPayloadById", () => {
     it("resets messagesPayloadById in response to MESSAGES_CLEAR action", () => {
-      const { dispatch, getState } = setupStore([
-        "console.table(['a', 'b', 'c'])",
-      ]);
+      const { dispatch, getState } = setupStore(["console.table(['a', 'b', 'c'])"]);
 
       const data = Symbol("tableData");
-      dispatch(
-        actions.messageUpdatePayload(getFirstMessage(getState()).id, data)
-      );
+      dispatch(actions.messageUpdatePayload(getFirstMessage(getState()).id, data));
       const table = getAllMessagesPayloadById(getState());
       expect(table.size).toBe(1);
       expect(table.get(getFirstMessage(getState()).id)).toBe(data);
@@ -1054,14 +985,8 @@ describe("Message reducer:", () => {
       });
 
       // Add 2 table message and their data.
-      dispatch(
-        actions.messagesAdd([stubPackets.get("console.table(['a', 'b', 'c'])")])
-      );
-      dispatch(
-        actions.messagesAdd([
-          stubPackets.get("console.table(['red', 'green', 'blue']);"),
-        ])
-      );
+      dispatch(actions.messagesAdd([stubPackets.get("console.table(['a', 'b', 'c'])")]));
+      dispatch(actions.messagesAdd([stubPackets.get("console.table(['red', 'green', 'blue']);")]));
 
       const messages = getAllMessagesById(getState());
 
@@ -1075,18 +1000,14 @@ describe("Message reducer:", () => {
       expect(table.size).toBe(2);
 
       // This addition will remove the first table message.
-      dispatch(
-        actions.messagesAdd([stubPackets.get("console.log(undefined)")])
-      );
+      dispatch(actions.messagesAdd([stubPackets.get("console.log(undefined)")]));
 
       table = getAllMessagesPayloadById(getState());
       expect(table.size).toBe(1);
       expect(table.get(id2)).toBe(tableData2);
 
       // This addition will remove the second table message.
-      dispatch(
-        actions.messagesAdd([stubPackets.get("console.log('foobar', 'test')")])
-      );
+      dispatch(actions.messagesAdd([stubPackets.get("console.log('foobar', 'test')")]));
 
       expect(getAllMessagesPayloadById(getState()).size).toBe(0);
     });

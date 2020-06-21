@@ -158,10 +158,7 @@ describe("Outline", () => {
 
       const { component, props } = render({ symbols });
 
-      await component
-        .find(".outline-footer")
-        .find("button")
-        .simulate("click", {});
+      await component.find(".outline-footer").find("button").simulate("click", {});
 
       expect(props.onAlphabetizeClick).toHaveBeenCalled();
     });
@@ -236,9 +233,7 @@ describe("Outline", () => {
 
       const { component, instance } = render({ symbols });
       instance.onContextMenu = jest.fn(() => {});
-      await component
-        .find(".outline-list__element")
-        .simulate("contextmenu", event);
+      await component.find(".outline-list__element").simulate("contextmenu", event);
 
       expect(instance.onContextMenu).toHaveBeenCalledWith(event, fn);
     });
@@ -260,11 +255,7 @@ describe("Outline", () => {
     it("shows menu to copy func, copies to clipboard on click", async () => {
       const startLine = 12;
       const endLine = 21;
-      const func = makeSymbolDeclaration(
-        "my_example_function",
-        startLine,
-        endLine
-      );
+      const func = makeSymbolDeclaration("my_example_function", startLine, endLine);
       const symbols = {
         functions: [func],
       };

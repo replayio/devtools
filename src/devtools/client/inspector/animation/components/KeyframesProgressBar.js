@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -67,8 +64,7 @@ class KeyframesProgressBar extends PureComponent {
   updateOffset(currentTime, animation, timeScale) {
     const { createdTime, playbackRate } = animation.state;
 
-    const time =
-      (timeScale.minStartTime + currentTime - createdTime) * playbackRate;
+    const time = (timeScale.minStartTime + currentTime - createdTime) * playbackRate;
 
     if (isNaN(time)) {
       // Setting an invalid currentTime will throw so bail out if time is not a number for
@@ -77,8 +73,7 @@ class KeyframesProgressBar extends PureComponent {
     }
 
     this.simulatedAnimation.currentTime = time;
-    const position = this.simulatedAnimation.effect.getComputedTiming()
-      .progress;
+    const position = this.simulatedAnimation.effect.getComputedTiming().progress;
 
     this.setState({ position });
   }

@@ -167,8 +167,7 @@ class ObjectInspectorItem extends Component<Props> {
         const receiverGrip = getNonPrototypeParentGripValue(item);
         if (receiverGrip) {
           Object.assign(repProps, {
-            onInvokeGetterButtonClick: () =>
-              this.props.invokeGetter(item, receiverGrip.actor),
+            onInvokeGetterButtonClick: () => this.props.invokeGetter(item, receiverGrip.actor),
           });
         }
       }
@@ -210,10 +209,7 @@ class ObjectInspectorItem extends Component<Props> {
         block: nodeIsBlock(item),
       }),
       onClick: e => {
-        if (
-          onCmdCtrlClick &&
-          ((isMacOS && e.metaKey) || (!isMacOS && e.ctrlKey))
-        ) {
+        if (onCmdCtrlClick && ((isMacOS && e.metaKey) || (!isMacOS && e.ctrlKey))) {
           onCmdCtrlClick(item, {
             depth,
             event: e,
@@ -269,9 +265,7 @@ class ObjectInspectorItem extends Component<Props> {
               event.stopPropagation();
 
               // If the user selected text, bail out.
-              if (
-                Utils.selection.documentHasSelection(event.target.ownerDocument)
-              ) {
+              if (Utils.selection.documentHasSelection(event.target.ownerDocument)) {
                 return;
               }
 
@@ -294,9 +288,7 @@ class ObjectInspectorItem extends Component<Props> {
     const { label, value } = this.getLabelAndValue();
     const labelElement = this.renderLabel(label);
     const delimiter =
-      value && labelElement
-        ? dom.span({ className: "object-delimiter" }, ": ")
-        : null;
+      value && labelElement ? dom.span({ className: "object-delimiter" }, ": ") : null;
 
     return dom.div(
       this.getTreeItemProps(),

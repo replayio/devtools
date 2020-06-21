@@ -5,11 +5,7 @@
 "use strict";
 
 const Services = require("Services");
-const {
-  createFactory,
-  createRef,
-  PureComponent,
-} = require("react");
+const { createFactory, createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
@@ -19,18 +15,10 @@ const {
 } = require("devtools/client/inspector/shared/utils");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
-const Accordion = createFactory(
-  require("devtools/client/shared/components/Accordion")
-);
-const BoxModel = createFactory(
-  require("devtools/client/inspector/boxmodel/components/BoxModel")
-);
-const Flexbox = createFactory(
-  require("devtools/client/inspector/flexbox/components/Flexbox")
-);
-const Grid = createFactory(
-  require("devtools/client/inspector/grids/components/Grid")
-);
+const Accordion = createFactory(require("devtools/client/shared/components/Accordion"));
+const BoxModel = createFactory(require("devtools/client/inspector/boxmodel/components/BoxModel"));
+const Flexbox = createFactory(require("devtools/client/inspector/flexbox/components/Flexbox"));
+const Grid = createFactory(require("devtools/client/inspector/grids/components/Grid"));
 
 const BoxModelTypes = require("devtools/client/inspector/boxmodel/types");
 const FlexboxTypes = require("devtools/client/inspector/flexbox/types");
@@ -55,8 +43,7 @@ class LayoutApp extends PureComponent {
       flexbox: PropTypes.shape(FlexboxTypes.flexbox).isRequired,
       getSwatchColorPickerTooltip: PropTypes.func.isRequired,
       grids: PropTypes.arrayOf(PropTypes.shape(GridTypes.grid)).isRequired,
-      highlighterSettings: PropTypes.shape(GridTypes.highlighterSettings)
-        .isRequired,
+      highlighterSettings: PropTypes.shape(GridTypes.highlighterSettings).isRequired,
       onHideBoxModelHighlighter: PropTypes.func.isRequired,
       onSetFlexboxOverlayColor: PropTypes.func.isRequired,
       onSetGridOverlayColor: PropTypes.func.isRequired,
@@ -190,10 +177,7 @@ class LayoutApp extends PureComponent {
       );
     }
 
-    return dom.div(
-      { className: "layout-container", ref: this.containerRef },
-      Accordion({ items })
-    );
+    return dom.div({ className: "layout-container", ref: this.containerRef }, Accordion({ items }));
   }
 }
 

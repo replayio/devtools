@@ -66,10 +66,7 @@ type Props = {
 };
 
 class Tab extends PureComponent<Props> {
-  onTabContextMenu = (
-    event: SyntheticClipboardEvent<HTMLDivElement>,
-    tab: string
-  ) => {
+  onTabContextMenu = (event: SyntheticClipboardEvent<HTMLDivElement>, tab: string) => {
     event.preventDefault();
     this.showContextMenu(event, tab);
   };
@@ -118,11 +115,12 @@ class Tab extends PureComponent<Props> {
           ...tabMenuItems.closeTabsToEnd,
           click: () => {
             const tabIndex = tabSources.findIndex(t => t.id == tab);
-            closeTabs(cx, tabURLs.filter((t, i) => i > tabIndex));
+            closeTabs(
+              cx,
+              tabURLs.filter((t, i) => i > tabIndex)
+            );
           },
-          disabled:
-            tabCount === 1 ||
-            tabSources.some((t, i) => t === tab && tabCount - 1 === i),
+          disabled: tabCount === 1 || tabSources.some((t, i) => t === tab && tabCount - 1 === i),
         },
       },
       {
@@ -202,7 +200,8 @@ class Tab extends PureComponent<Props> {
     const active =
       selectedSource &&
       sourceId == selectedSource.id &&
-      (!this.isProjectSearchEnabled() && !this.isSourceSearchEnabled());
+      !this.isProjectSearchEnabled() &&
+      !this.isSourceSearchEnabled();
     const isPrettyCode = isPretty(source);
 
     function onClickClose(e) {
@@ -238,10 +237,7 @@ class Tab extends PureComponent<Props> {
         onContextMenu={e => this.onTabContextMenu(e, sourceId)}
         title={getFileURL(source, false)}
       >
-        <SourceIcon
-          source={source}
-          shouldHide={icon => ["file", "javascript"].includes(icon)}
-        />
+        <SourceIcon source={source} shouldHide={icon => ["file", "javascript"].includes(icon)} />
         <div className="filename">
           {getTruncatedFileName(source, query)}
           {path && <span>{`../${path}/..`}</span>}

@@ -10,9 +10,7 @@ const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
-const L10N = new LocalizationHelper(
-  "devtools/client/locales/animationinspector.properties"
-);
+const L10N = new LocalizationHelper("devtools/client/locales/animationinspector.properties");
 
 class NoAnimationPanel extends Component {
   static get propTypes() {
@@ -36,8 +34,7 @@ class NoAnimationPanel extends Component {
       dom.p(null, L10N.getStr("panel.noAnimation")),
       dom.button({
         className:
-          "animation-element-picker devtools-button" +
-          (elementPickerEnabled ? " checked" : ""),
+          "animation-element-picker devtools-button" + (elementPickerEnabled ? " checked" : ""),
         "data-standalone": true,
         onClick: event => {
           event.stopPropagation();

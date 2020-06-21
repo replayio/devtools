@@ -268,15 +268,9 @@ export default class Toolbox extends React.Component {
 
         {/* <!-- Sidebar Panel Definitions --> */}
         <div id="tabpanels" style={{ visibility: "collapse" }}>
-          <div
-            id="sidebar-panel-ruleview"
-            className="theme-sidebar inspector-tabpanel"
-          >
+          <div id="sidebar-panel-ruleview" className="theme-sidebar inspector-tabpanel">
             <div id="ruleview-toolbar-container">
-              <div
-                id="ruleview-toolbar"
-                className="devtools-toolbar devtools-input-toolbar"
-              >
+              <div id="ruleview-toolbar" className="devtools-toolbar devtools-input-toolbar">
                 <div className="devtools-searchbox">
                   <input
                     id="ruleview-searchbox"
@@ -342,14 +336,8 @@ export default class Toolbox extends React.Component {
             </div>
           </div>
 
-          <div
-            id="sidebar-panel-computedview"
-            className="theme-sidebar inspector-tabpanel"
-          >
-            <div
-              id="computed-toolbar"
-              className="devtools-toolbar devtools-input-toolbar"
-            >
+          <div id="sidebar-panel-computedview" className="theme-sidebar inspector-tabpanel">
+            <div id="computed-toolbar" className="devtools-toolbar devtools-input-toolbar">
               <div className="devtools-searchbox">
                 <input
                   id="computed-searchbox"
@@ -363,11 +351,7 @@ export default class Toolbox extends React.Component {
                 ></button>
               </div>
               <div className="devtools-separator"></div>
-              <input
-                id="browser-style-checkbox"
-                type="checkbox"
-                className="includebrowserstyles"
-              />
+              <input id="browser-style-checkbox" type="checkbox" className="includebrowserstyles" />
               <label
                 id="browser-style-checkbox-label"
                 htmlFor="browser-style-checkbox"
@@ -431,10 +415,12 @@ export default class Toolbox extends React.Component {
   mouseEventCanvasPosition(e) {
     const canvas = document.getElementById("graphics");
     const bounds = canvas.getBoundingClientRect();
-    if (e.clientX < bounds.left ||
-        e.clientX > bounds.right ||
-        e.clientY < bounds.top ||
-        e.clientY > bounds.bottom) {
+    if (
+      e.clientX < bounds.left ||
+      e.clientX > bounds.right ||
+      e.clientY < bounds.top ||
+      e.clientY > bounds.bottom
+    ) {
       // Not in the canvas.
       return null;
     }
@@ -456,7 +442,7 @@ export default class Toolbox extends React.Component {
   async nodePickerMouseMove(e) {
     const pos = this.mouseEventCanvasPosition(e);
     this.lastPickerPosition = pos;
-    const nodeBounds = pos && await ThreadFront.getMouseTarget(pos.x, pos.y);
+    const nodeBounds = pos && (await ThreadFront.getMouseTarget(pos.x, pos.y));
     if (this.lastPickerPosition == pos && nodeBounds) {
       this.getHighlighter().highlight(nodeBounds);
     } else {
@@ -474,7 +460,7 @@ export default class Toolbox extends React.Component {
     this.removeNodePickerListeners();
     this.nodePickerRemoveTime = Date.now();
 
-    const nodeBounds = pos && await ThreadFront.getMouseTarget(pos.x, pos.y);
+    const nodeBounds = pos && (await ThreadFront.getMouseTarget(pos.x, pos.y));
     if (nodeBounds) {
       this.getHighlighter().highlight(nodeBounds);
       const node = await ThreadFront.ensureNodeLoaded(nodeBounds.nodeId);
@@ -592,10 +578,7 @@ export default class Toolbox extends React.Component {
             }
             endPanelControl={false}
             endPanel={
-              <div
-                className="toolbox-bottom-panels"
-                style={{ overflow: "hidden" }}
-              >
+              <div className="toolbox-bottom-panels" style={{ overflow: "hidden" }}>
                 <div
                   className={classnames("toolbox-panel", {
                     active: selectedPanel == "console" || splitConsoleOpen,

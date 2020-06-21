@@ -4,22 +4,14 @@
 
 // @flow
 import { endTruncateStr } from "./utils";
-import {
-  isPretty,
-  getFilename,
-  getSourceClassnames,
-  getSourceQueryString,
-} from "./source";
+import { isPretty, getFilename, getSourceClassnames, getSourceQueryString } from "./source";
 
 import type { Location as BabelLocation } from "@babel/types";
 import type { Symbols } from "../reducers/ast";
 import type { QuickOpenType } from "../reducers/quick-open";
 import type { Tab } from "../reducers/tabs";
 import type { Source } from "../types";
-import type {
-  SymbolDeclaration,
-  IdentifierDeclaration,
-} from "../workers/parser";
+import type { SymbolDeclaration, IdentifierDeclaration } from "../workers/parser";
 
 export const MODIFIERS = {
   "@": "functions",
@@ -30,10 +22,7 @@ export const MODIFIERS = {
 
 export function parseQuickOpenQuery(query: string): QuickOpenType {
   const startsWithModifier =
-    query[0] === "@" ||
-    query[0] === "#" ||
-    query[0] === ":" ||
-    query[0] === "?";
+    query[0] === "@" || query[0] === "#" || query[0] === ":" || query[0] === "?";
 
   if (startsWithModifier) {
     const modifier = query[0];
@@ -61,14 +50,9 @@ export function parseLineColumn(query: string) {
   }
 }
 
-export function formatSourcesForList(
-  source: Source,
-  tabUrls: Set<$PropertyType<Tab, "url">>
-) {
+export function formatSourcesForList(source: Source, tabUrls: Set<$PropertyType<Tab, "url">>) {
   const title = getFilename(source);
-  const relativeUrlWithQuery = `${source.relativeUrl}${getSourceQueryString(
-    source
-  ) || ""}`;
+  const relativeUrlWithQuery = `${source.relativeUrl}${getSourceQueryString(source) || ""}`;
   const subtitle = endTruncateStr(relativeUrlWithQuery, 100);
   const value = relativeUrlWithQuery;
   return {
@@ -97,9 +81,7 @@ export type FormattedSymbolDeclarations = {|
   functions: Array<QuickOpenResult>,
 |};
 
-export function formatSymbol(
-  symbol: SymbolDeclaration | IdentifierDeclaration
-): QuickOpenResult {
+export function formatSymbol(symbol: SymbolDeclaration | IdentifierDeclaration): QuickOpenResult {
   return {
     id: `${symbol.name}:${symbol.location.start.line}`,
     title: symbol.name,

@@ -45,10 +45,9 @@ function promiseMiddleware({ dispatch, getState }) {
 
       // Create a new action that doesn't have the promise field and has
       // the `seqId` field that represents the sequence id
-      action = Object.assign(
-        toObject(entries(action).filter(pair => pair[0] !== PROMISE)),
-        { seqId }
-      );
+      action = Object.assign(toObject(entries(action).filter(pair => pair[0] !== PROMISE)), {
+        seqId,
+      });
 
       dispatch(Object.assign({}, action, { status: "start" }));
 

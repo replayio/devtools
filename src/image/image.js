@@ -171,9 +171,7 @@ function loadImages() {
 
   for (const [selector, info] of Object.entries(gOtherImages)) {
     const { style, url, before = "", after = "" } = info;
-    sheet.insertRule(
-      `${selector} { ${style}: ${before} url(${url.default}) ${after} }`
-    );
+    sheet.insertRule(`${selector} { ${style}: ${before} url(${url.default}) ${after} }`);
   }
 }
 

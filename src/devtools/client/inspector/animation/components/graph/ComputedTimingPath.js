@@ -77,10 +77,7 @@ class ComputedTimingPath extends TimingPath {
       return win.getComputedStyle(simulatedElement).opacity;
     };
 
-    const toPathStringFunc = createSummaryGraphPathStringFunction(
-      endTime,
-      state.playbackRate
-    );
+    const toPathStringFunc = createSummaryGraphPathStringFunction(endTime, state.playbackRate);
     const helper = new SummaryGraphHelper(
       state,
       keyframes,

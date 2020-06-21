@@ -55,11 +55,7 @@ function nodeLoadProperties(node: Node, actor) {
     }
 
     try {
-      const properties = await loadItemProperties(
-        node,
-        client,
-        loadedProperties
-      );
+      const properties = await loadItemProperties(node, client, loadedProperties);
 
       // If the client does not have a releaseActor function, it means the actors are
       // handled directly by the consumer, so we don't need to track them.
@@ -74,11 +70,7 @@ function nodeLoadProperties(node: Node, actor) {
   };
 }
 
-function nodePropertiesLoaded(
-  node: Node,
-  actor?: string,
-  properties: GripProperties
-) {
+function nodePropertiesLoaded(node: Node, actor?: string, properties: GripProperties) {
   return {
     type: "NODE_PROPERTIES_LOADED",
     data: { node, actor, properties },
@@ -89,7 +81,7 @@ function nodePropertiesLoaded(
  * This action adds a property watchpoint to an object
  */
 function addWatchpoint(item, watchpoint: string) {
-  return async function({ dispatch, client }: ThunkArgs) {
+  return async function ({ dispatch, client }: ThunkArgs) {
     const { parent, name } = item;
     let object = getValue(parent);
 
@@ -119,7 +111,7 @@ function addWatchpoint(item, watchpoint: string) {
  * This action removes a property watchpoint from an object
  */
 function removeWatchpoint(item) {
-  return async function({ dispatch, client }: ThunkArgs) {
+  return async function ({ dispatch, client }: ThunkArgs) {
     const { parent, name } = item;
     let object = getValue(parent);
 
@@ -141,8 +133,7 @@ function removeWatchpoint(item) {
 }
 
 function closeObjectInspector() {
-  return ({ dispatch, getState, client }: ThunkArg) =>
-    releaseActors(getState(), client, dispatch);
+  return ({ dispatch, getState, client }: ThunkArg) => releaseActors(getState(), client, dispatch);
 }
 
 /*
@@ -186,8 +177,7 @@ function invokeGetter(node: Node, receiverId: string | null) {
   return async ({ dispatch, client, getState }: ThunkArg) => {
     try {
       const objectFront =
-        getParentFront(node) ||
-        client.createObjectFront(getParentGripValue(node));
+        getParentFront(node) || client.createObjectFront(getParentGripValue(node));
       const getterName = node.propertyName || node.name;
 
       const result = await objectFront.getPropertyValue(getterName, receiverId);

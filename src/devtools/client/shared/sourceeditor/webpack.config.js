@@ -40,11 +40,7 @@ module.exports = (env, argv) => {
       "./codemirror/lib/codemirror.js",
     ],
     optimization: {
-      minimize: !(
-        argv &&
-        argv.optimization &&
-        argv.optimization.minimizer === "false"
-      ),
+      minimize: !(argv && argv.optimization && argv.optimization.minimizer === "false"),
     },
     output: {
       path: path.resolve(__dirname, "./codemirror/"),

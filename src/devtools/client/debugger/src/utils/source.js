@@ -130,9 +130,7 @@ export function getPrettySourceURL(url: ?string): string {
  * @static
  */
 export function getRawSourceURL(url: string): string {
-  return url && url.endsWith(":formatted")
-    ? url.slice(0, -":formatted".length)
-    : url;
+  return url && url.endsWith(":formatted") ? url.slice(0, -":formatted".length) : url;
 }
 
 function resolveFileURL(
@@ -161,10 +159,7 @@ export function getFormattedSourceId(id: string) {
  * @memberof utils/source
  * @static
  */
-export function getFilename(
-  source: Source,
-  rawSourceURL: string = getRawSourceURL(source.url)
-) {
+export function getFilename(source: Source, rawSourceURL: string = getRawSourceURL(source.url)) {
   const { id } = source;
   if (!rawSourceURL) {
     return getFormattedSourceId(id);
@@ -195,10 +190,7 @@ export function getTruncatedFileName(
  * @static
  */
 
-export function getDisplayPath(
-  mySource: Source,
-  sources: Source[] | TabsSources
-) {
+export function getDisplayPath(mySource: Source, sources: Source[] | TabsSources) {
   const rawSourceURL = getRawSourceURL(mySource.url);
   const filename = getFilename(mySource, rawSourceURL);
 
@@ -206,9 +198,7 @@ export function getDisplayPath(
   // as the original source
   const similarSources = sources.filter(source => {
     const rawSource = getRawSourceURL(source.url);
-    return (
-      rawSourceURL != rawSource && filename == getFilename(source, rawSource)
-    );
+    return rawSourceURL != rawSource && filename == getFilename(source, rawSource);
   });
 
   if (similarSources.length == 0) {
@@ -412,11 +402,7 @@ export function isInlineScript(source: SourceActor): boolean {
 }
 
 export const getLineText = memoizeLast(
-  (
-    sourceId: SourceId,
-    asyncContent: AsyncValue<SourceContent> | null,
-    line: number
-  ) => {
+  (sourceId: SourceId, asyncContent: AsyncValue<SourceContent> | null, line: number) => {
     if (!asyncContent || !isFulfilled(asyncContent)) {
       return "";
     }
@@ -483,11 +469,7 @@ export function getRelativeUrl(source: Source, root: string) {
   return url.slice(url.indexOf(root) + root.length + 1);
 }
 
-export function underRoot(
-  source: Source,
-  root: string,
-  threadActors: Array<ThreadId>
-) {
+export function underRoot(source: Source, root: string, threadActors: Array<ThreadId>) {
   // source.url doesn't include thread actor ID, so remove the thread actor ID from the root
   threadActors.forEach(threadActor => {
     if (root.includes(threadActor)) {

@@ -51,8 +51,7 @@ class CurrentTimeTimer {
       return;
     }
 
-    const currentTime =
-      this.baseCurrentTime + this.win.performance.now() - this.timerStartTime;
+    const currentTime = this.baseCurrentTime + this.win.performance.now() - this.timerStartTime;
 
     if (this.endTime < currentTime && this.shouldStopAfterEndTime) {
       this.onUpdated(this.endTime, true);

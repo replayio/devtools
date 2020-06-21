@@ -13,23 +13,11 @@ function getTestContent() {
   const testTree = {
     a: {
       value: "FOO",
-      children: [
-        { value: 1 },
-        { value: 2 },
-        { value: 3 },
-        { value: 4 },
-        { value: 5 },
-      ],
+      children: [{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }],
     },
     b: {
       value: "BAR",
-      children: [
-        { value: "A" },
-        { value: "B" },
-        { value: "C" },
-        { value: "D" },
-        { value: "E" },
-      ],
+      children: [{ value: "A" }, { value: "B" }, { value: "C" }, { value: "D" }, { value: "E" }],
     },
     c: { value: "BAZ" },
   };
@@ -67,9 +55,7 @@ function getTestContent() {
 
 describe("ManagedTree", () => {
   it("render", () =>
-    expect(
-      shallow(<ManagedTree {...getTestContent().props} />)
-    ).toMatchSnapshot());
+    expect(shallow(<ManagedTree {...getTestContent().props} />)).toMatchSnapshot());
   it("expands list items", () => {
     const { props, testTree } = getTestContent();
     const wrapper = shallow(<ManagedTree {...props} />);
@@ -92,10 +78,7 @@ describe("ManagedTree", () => {
     const wrapper = mount(<ManagedTree {...props} />);
     expect(wrapper).toMatchSnapshot();
     // We auto-expanded the first layer, so unexpand first node.
-    wrapper
-      .find("TreeNode")
-      .first()
-      .simulate("click");
+    wrapper.find("TreeNode").first().simulate("click");
     expect(wrapper).toMatchSnapshot();
     expect(props.onExpand).toHaveBeenCalledWith(
       "c",
@@ -105,10 +88,7 @@ describe("ManagedTree", () => {
           .map(k => `${k}-$`)
       )
     );
-    wrapper
-      .find("TreeNode")
-      .first()
-      .simulate("click");
+    wrapper.find("TreeNode").first().simulate("click");
     expect(props.onExpand).toHaveBeenCalledWith(
       "c",
       new Set(Object.keys(testTree).map(k => `${k}-$`))

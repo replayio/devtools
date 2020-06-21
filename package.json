@@ -21,6 +21,7 @@
     "mini-css-extract-plugin": "^0.9.0",
     "postcss-loader": "^3.0.0",
     "postcss-url-mapper": "^1.2.0",
+    "prettier": "^2.0.5",
     "prop-types": "^15.7.2",
     "properties-parser": "^0.3.1",
     "raw-loader": "^4.0.1",
@@ -35,11 +36,21 @@
     "webpack-cli": "^3.3.11"
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.3.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react-hooks": "^4.0.4",
+    "eslint-plugin-react": "^7.20.0",
     "webpack-dev-server": "^3.11.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --open"
+    "start": "webpack-dev-server --open",
+    "lint": "eslint --fix src"
   },
   "browserslist": [
     "defaults"

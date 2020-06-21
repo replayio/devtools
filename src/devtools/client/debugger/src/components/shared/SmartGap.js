@@ -93,12 +93,7 @@ function getSmartGapDimensions(
 ) {
   if (orientation === "up") {
     return {
-      height:
-        tokenRect.top +
-        tokenRect.height -
-        coords.top -
-        previewRect.height +
-        gapHeight,
+      height: tokenRect.top + tokenRect.height - coords.top - previewRect.height + gapHeight,
       width: Math.max(previewRect.width, tokenRect.width) + offset,
     };
   }
@@ -114,14 +109,7 @@ function getSmartGapDimensions(
   };
 }
 
-export default function SmartGap({
-  token,
-  preview,
-  type,
-  gapHeight,
-  coords,
-  offset,
-}: Props) {
+export default function SmartGap({ token, preview, type, gapHeight, coords, offset }: Props) {
   const tokenRect = token.getBoundingClientRect();
   // $FlowIgnore
   const previewRect = preview.getBoundingClientRect();

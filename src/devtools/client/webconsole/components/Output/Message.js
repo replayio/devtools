@@ -9,17 +9,10 @@ const { Component, createFactory, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const actions = require("devtools/client/webconsole/actions/index");
-const {
-  MESSAGE_SOURCE,
-  MESSAGE_TYPE,
-} = require("devtools/client/webconsole/constants");
-const {
-  MessageIndent,
-} = require("devtools/client/webconsole/components/Output/MessageIndent");
+const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
+const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const MessageIcon = require("devtools/client/webconsole/components/Output/MessageIcon");
-const FrameView = createFactory(
-  require("devtools/client/shared/components/Frame")
-);
+const FrameView = createFactory(require("devtools/client/shared/components/Frame"));
 
 const CollapseButton = require("devtools/client/webconsole/components/Output/CollapseButton");
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
@@ -113,10 +106,7 @@ class Message extends Component {
   // did not emit for them.
   emitNewMessage(node) {
     const { serviceContainer, messageId, timeStamp } = this.props;
-    serviceContainer.emitForTests(
-      "new-messages",
-      new Set([{ node, messageId, timeStamp }])
-    );
+    serviceContainer.emitForTests("new-messages", new Set([{ node, messageId, timeStamp }]));
   }
 
   onLearnMoreClick(e) {
@@ -150,13 +140,7 @@ class Message extends Component {
   }
 
   onContextMenu(e) {
-    const {
-      serviceContainer,
-      source,
-      request,
-      messageId,
-      executionPoint,
-    } = this.props;
+    const { serviceContainer, source, request, messageId, executionPoint } = this.props;
     const messageInfo = {
       source,
       request,
@@ -243,9 +227,7 @@ class Message extends Component {
           timestampEl ? " " : null,
           dom.span(
             { className: "message-body devtools-monospace" },
-            l10n.getFormatStr("webconsole.message.componentDidCatch.label", [
-              newBugUrl,
-            ]),
+            l10n.getFormatStr("webconsole.message.componentDidCatch.label", [newBugUrl]),
             dom.button(
               {
                 className: "devtools-button",
@@ -264,9 +246,7 @@ class Message extends Component {
                     )
                   ),
               },
-              l10n.getStr(
-                "webconsole.message.componentDidCatch.copyButton.label"
-              )
+              l10n.getStr("webconsole.message.componentDidCatch.copyButton.label")
             )
           )
         )
@@ -327,8 +307,7 @@ class Message extends Component {
         createElement(SmartTrace, {
           stacktrace,
           onViewSourceInDebugger:
-            serviceContainer.onViewSourceInDebugger ||
-            serviceContainer.onViewSource,
+            serviceContainer.onViewSourceInDebugger || serviceContainer.onViewSource,
           onViewSource: serviceContainer.onViewSource,
           onReady: this.props.maybeScrollToBottom,
           sourceMapService: serviceContainer.sourceMapService,
@@ -351,18 +330,14 @@ class Message extends Component {
       notesNodes = notes.map(note =>
         dom.span(
           { className: "message-flex-body error-note" },
-          dom.span(
-            { className: "message-body devtools-monospace" },
-            "note: " + note.messageBody
-          ),
+          dom.span({ className: "message-body devtools-monospace" }, "note: " + note.messageBody),
           dom.span(
             { className: "message-location devtools-monospace" },
             note.frame
               ? FrameView({
                   frame: note.frame,
                   onClick: serviceContainer
-                    ? serviceContainer.onViewSourceInDebugger ||
-                      serviceContainer.onViewSource
+                    ? serviceContainer.onViewSourceInDebugger || serviceContainer.onViewSource
                     : undefined,
                   showEmptyPathAsHost: true,
                   sourceMapService: serviceContainer
@@ -385,15 +360,11 @@ class Message extends Component {
     let onFrameClick;
     if (serviceContainer && frame) {
       if (source === MESSAGE_SOURCE.CSS) {
-        onFrameClick =
-          serviceContainer.onViewSourceInStyleEditor ||
-          serviceContainer.onViewSource;
+        onFrameClick = serviceContainer.onViewSourceInStyleEditor || serviceContainer.onViewSource;
       } else {
         // Point everything else to debugger, if source not available,
         // it will fall back to view-source.
-        onFrameClick =
-          serviceContainer.onViewSourceInDebugger ||
-          serviceContainer.onViewSource;
+        onFrameClick = serviceContainer.onViewSourceInDebugger || serviceContainer.onViewSource;
       }
     }
 
@@ -405,9 +376,7 @@ class Message extends Component {
             frame,
             onClick: onFrameClick,
             showEmptyPathAsHost: true,
-            sourceMapService: serviceContainer
-              ? serviceContainer.sourceMapService
-              : undefined,
+            sourceMapService: serviceContainer ? serviceContainer.sourceMapService : undefined,
             messageSource: source,
           })
         : null
@@ -426,9 +395,7 @@ class Message extends Component {
       );
     }
 
-    const bodyElements = Array.isArray(messageBody)
-      ? messageBody
-      : [messageBody];
+    const bodyElements = Array.isArray(messageBody) ? messageBody : [messageBody];
 
     const mouseEvents =
       serviceContainer.canRewind() && executionPoint
@@ -465,11 +432,7 @@ class Message extends Component {
           },
           // Add whitespaces for formatting when copying to the clipboard.
           timestampEl ? " " : null,
-          dom.span(
-            { className: "message-body devtools-monospace" },
-            ...bodyElements,
-            learnMore
-          ),
+          dom.span({ className: "message-body devtools-monospace" }, ...bodyElements, learnMore),
           repeat ? " " : null,
           repeat,
           " ",

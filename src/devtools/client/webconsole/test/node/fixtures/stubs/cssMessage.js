@@ -12,64 +12,62 @@ const {
   parsePacketsWithFronts,
 } = require("chrome://mochitests/content/browser/devtools/client/webconsole/test/browser/stub-generator-helpers");
 const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
-const {
-  ConsoleMessage,
-  NetworkEventMessage,
-} = require("devtools/client/webconsole/types");
+const { ConsoleMessage, NetworkEventMessage } = require("devtools/client/webconsole/types");
 
 const rawPackets = new Map();
 rawPackets.set(`Unknown property ‘such-unknown-property’.  Declaration dropped.`, {
-  "pageError": {
-    "errorMessage": "Unknown property ‘such-unknown-property’.  Declaration dropped.",
-    "errorMessageName": "",
-    "sourceName": "http://example.com/browser/devtools/client/webconsole/test/browser/stub-generators/test-css-message.html",
-    "sourceId": null,
-    "lineText": "",
-    "lineNumber": 3,
-    "columnNumber": 27,
-    "category": "CSS Parser",
-    "innerWindowID": 8589934593,
-    "timeStamp": 1572867894874,
-    "warning": true,
-    "error": false,
-    "exception": false,
-    "strict": false,
-    "info": false,
-    "private": false,
-    "stacktrace": null,
-    "notes": null,
-    "chromeContext": false,
-    "cssSelectors": "p"
+  pageError: {
+    errorMessage: "Unknown property ‘such-unknown-property’.  Declaration dropped.",
+    errorMessageName: "",
+    sourceName:
+      "http://example.com/browser/devtools/client/webconsole/test/browser/stub-generators/test-css-message.html",
+    sourceId: null,
+    lineText: "",
+    lineNumber: 3,
+    columnNumber: 27,
+    category: "CSS Parser",
+    innerWindowID: 8589934593,
+    timeStamp: 1572867894874,
+    warning: true,
+    error: false,
+    exception: false,
+    strict: false,
+    info: false,
+    private: false,
+    stacktrace: null,
+    notes: null,
+    chromeContext: false,
+    cssSelectors: "p",
   },
-  "type": "pageError"
+  type: "pageError",
 });
 
 rawPackets.set(`Error in parsing value for ‘padding-top’.  Declaration dropped.`, {
-  "pageError": {
-    "errorMessage": "Error in parsing value for ‘padding-top’.  Declaration dropped.",
-    "errorMessageName": "",
-    "sourceName": "http://example.com/browser/devtools/client/webconsole/test/browser/stub-generators/test-css-message.html",
-    "sourceId": null,
-    "lineText": "",
-    "lineNumber": 3,
-    "columnNumber": 18,
-    "category": "CSS Parser",
-    "innerWindowID": 8589934593,
-    "timeStamp": 1572867895090,
-    "warning": true,
-    "error": false,
-    "exception": false,
-    "strict": false,
-    "info": false,
-    "private": false,
-    "stacktrace": null,
-    "notes": null,
-    "chromeContext": false,
-    "cssSelectors": "p"
+  pageError: {
+    errorMessage: "Error in parsing value for ‘padding-top’.  Declaration dropped.",
+    errorMessageName: "",
+    sourceName:
+      "http://example.com/browser/devtools/client/webconsole/test/browser/stub-generators/test-css-message.html",
+    sourceId: null,
+    lineText: "",
+    lineNumber: 3,
+    columnNumber: 18,
+    category: "CSS Parser",
+    innerWindowID: 8589934593,
+    timeStamp: 1572867895090,
+    warning: true,
+    error: false,
+    exception: false,
+    strict: false,
+    info: false,
+    private: false,
+    stacktrace: null,
+    notes: null,
+    chromeContext: false,
+    cssSelectors: "p",
   },
-  "type": "pageError"
+  type: "pageError",
 });
-
 
 const stubPackets = parsePacketsWithFronts(rawPackets);
 

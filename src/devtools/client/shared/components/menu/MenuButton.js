@@ -16,9 +16,7 @@ const { button } = dom;
 
 const isMacOS = Services.appinfo.OS === "Darwin";
 
-const {
-  HTMLTooltip,
-} = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const { focusableSelector } = require("devtools/client/shared/focus");
 const { createPortal } = require("react-dom");
 
@@ -326,11 +324,7 @@ class MenuButton extends PureComponent {
       //
       // We check for the defaultPrevented state, however, so that menu items can
       // turn this behavior off (e.g. a menu item with an embedded button).
-    } else if (
-      this.state.expanded &&
-      !e.defaultPrevented &&
-      e.target.matches(focusableSelector)
-    ) {
+    } else if (this.state.expanded && !e.defaultPrevented && e.target.matches(focusableSelector)) {
       this.hideMenu();
     }
   }
@@ -340,8 +334,7 @@ class MenuButton extends PureComponent {
       return;
     }
 
-    const isButtonFocussed =
-      window.document.activeElement === this.buttonRef.current;
+    const isButtonFocussed = window.document.activeElement === this.buttonRef.current;
 
     switch (e.key) {
       case "Escape":
@@ -409,9 +402,7 @@ class MenuButton extends PureComponent {
 
     if (this.state.isMenuInitialized) {
       const menu = createPortal(
-        typeof this.props.children === "function"
-          ? this.props.children()
-          : this.props.children,
+        typeof this.props.children === "function" ? this.props.children() : this.props.children,
         this.tooltip.panel
       );
 

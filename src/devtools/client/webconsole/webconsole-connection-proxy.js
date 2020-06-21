@@ -21,17 +21,19 @@ function convertStack(stack, { frames }) {
   if (!stack) {
     return null;
   }
-  return Promise.all(stack.map(async frameId => {
-    const frame = frames.find(f => f.frameId == frameId);
-    const location = await ThreadFront.getPreferredLocation(frame.location);
-    return {
-      filename: await ThreadFront.getScriptURL(location.scriptId),
-      sourceId: location.scriptId,
-      lineNumber: location.line,
-      columnNumber: location.column,
-      functionName: frame.functionName,
-    };
-  }));
+  return Promise.all(
+    stack.map(async frameId => {
+      const frame = frames.find(f => f.frameId == frameId);
+      const location = await ThreadFront.getPreferredLocation(frame.location);
+      return {
+        filename: await ThreadFront.getScriptURL(location.scriptId),
+        sourceId: location.scriptId,
+        lineNumber: location.line,
+        columnNumber: location.column,
+        functionName: frame.functionName,
+      };
+    })
+  );
 }
 
 WebConsoleConnectionProxy.prototype = {

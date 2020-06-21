@@ -54,9 +54,7 @@ describe("expressions", () => {
     });
 
     it("Errors messages should be shown", () => {
-      expect(getValue(createError({ name: "Foo", message: "YO" }))).toEqual(
-        "Foo: YO"
-      );
+      expect(getValue(createError({ name: "Foo", message: "YO" }))).toEqual("Foo: YO");
     });
   });
 });

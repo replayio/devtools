@@ -14,10 +14,7 @@ const { setupStore } = require("devtools/client/webconsole/test/node/helpers");
 
 // Components under test.
 const CSSWarning = require("devtools/client/webconsole/components/Output/message-types/CSSWarning");
-const {
-  MESSAGE_OPEN,
-  MESSAGE_CLOSE,
-} = require("devtools/client/webconsole/constants");
+const { MESSAGE_OPEN, MESSAGE_CLOSE } = require("devtools/client/webconsole/constants");
 
 // Test fakes.
 const {
@@ -37,13 +34,9 @@ describe("CSSWarning component:", () => {
         timestampsVisible: true,
       })
     );
-    const {
-      timestampString,
-    } = require("devtools/client/webconsole/utils/l10n");
+    const { timestampString } = require("devtools/client/webconsole/utils/l10n");
 
-    expect(wrapper.find(".timestamp").text()).toBe(
-      timestampString(message.timeStamp)
-    );
+    expect(wrapper.find(".timestamp").text()).toBe(timestampString(message.timeStamp));
 
     expect(wrapper.find(".message-body").text()).toBe(
       "Unknown property ‘such-unknown-property’.  Declaration dropped."

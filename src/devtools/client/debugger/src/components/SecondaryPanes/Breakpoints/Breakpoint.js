@@ -130,9 +130,7 @@ class Breakpoint extends PureComponent<Props> {
 
     const isWasm = source && source.isWasm;
     const columnVal = features.columnBreakpoints && column ? `:${column}` : "";
-    const bpLocation = isWasm
-      ? `0x${line.toString(16).toUpperCase()}`
-      : `${line}${columnVal}`;
+    const bpLocation = isWasm ? `0x${line.toString(16).toUpperCase()}` : `${line}${columnVal}`;
 
     return bpLocation;
   }
@@ -188,9 +186,7 @@ class Breakpoint extends PureComponent<Props> {
           <span dangerouslySetInnerHTML={this.highlightText(text, editor)} />
         </span>
         <div className="breakpoint-line-close">
-          <div className="breakpoint-line devtools-monospace">
-            {this.getBreakpointLocation()}
-          </div>
+          <div className="breakpoint-line devtools-monospace">{this.getBreakpointLocation()}</div>
           <CloseButton
             handleClick={e => this.removeBreakpoint(e)}
             tooltip={L10N.getStr("breakpoints.removeBreakpointTooltip")}
@@ -222,19 +218,16 @@ const mapStateToProps = (state, p: OwnProps) => ({
   frame: getFormattedFrame(state, getCurrentThread(state)),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    enableBreakpoint: actions.enableBreakpoint,
-    removeBreakpoint: actions.removeBreakpoint,
-    removeBreakpoints: actions.removeBreakpoints,
-    removeAllBreakpoints: actions.removeAllBreakpoints,
-    disableBreakpoint: actions.disableBreakpoint,
-    selectSpecificLocation: actions.selectSpecificLocation,
-    setBreakpointOptions: actions.setBreakpointOptions,
-    toggleAllBreakpoints: actions.toggleAllBreakpoints,
-    toggleBreakpoints: actions.toggleBreakpoints,
-    toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
-    openConditionalPanel: actions.openConditionalPanel,
-  }
-)(Breakpoint);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  enableBreakpoint: actions.enableBreakpoint,
+  removeBreakpoint: actions.removeBreakpoint,
+  removeBreakpoints: actions.removeBreakpoints,
+  removeAllBreakpoints: actions.removeAllBreakpoints,
+  disableBreakpoint: actions.disableBreakpoint,
+  selectSpecificLocation: actions.selectSpecificLocation,
+  setBreakpointOptions: actions.setBreakpointOptions,
+  toggleAllBreakpoints: actions.toggleAllBreakpoints,
+  toggleBreakpoints: actions.toggleBreakpoints,
+  toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
+  openConditionalPanel: actions.openConditionalPanel,
+})(Breakpoint);

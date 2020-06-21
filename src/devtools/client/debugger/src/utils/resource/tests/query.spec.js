@@ -49,26 +49,15 @@ type MockedFn<InputFn, OutputFn> = OutputFn & {
 // this utility to do that and at the same time preserve typechecking.
 const mockFn = (f: any) => Object.assign((jest.fn(f): any), f);
 
-const mockFilter = <Args, F: QueryFilter<TestResource, Args>>(
-  callback: F
-): MockedFn<F, F> => mockFn(callback);
+const mockFilter = <Args, F: QueryFilter<TestResource, Args>>(callback: F): MockedFn<F, F> =>
+  mockFn(callback);
 const mockMapNoArgs = <Mapped, F: (TestResource, ResourceIdentity) => Mapped>(
   callback: F
 ): MockedFn<F, QueryMapNoArgs<TestResource, Mapped>> => mockFn(callback);
-const mockMapWithArgs = <
-  Args,
-  Mapped,
-  F: (TestResource, ResourceIdentity, Args) => Mapped
->(
+const mockMapWithArgs = <Args, Mapped, F: (TestResource, ResourceIdentity, Args) => Mapped>(
   callback: F
-): MockedFn<F, QueryMapWithArgs<TestResource, Args, Mapped>> =>
-  mockFn(makeMapWithArgs(callback));
-const mockReduce = <
-  Args,
-  Mapped,
-  Reduced,
-  F: QueryReduce<TestResource, Args, Mapped, Reduced>
->(
+): MockedFn<F, QueryMapWithArgs<TestResource, Args, Mapped>> => mockFn(makeMapWithArgs(callback));
+const mockReduce = <Args, Mapped, Reduced, F: QueryReduce<TestResource, Args, Mapped, Reduced>>(
   callback: F
 ): MockedFn<F, F> => mockFn(callback);
 
@@ -90,15 +79,10 @@ describe("resource query operations", () => {
     initialState = insertResources(initialState, [r1, r2, r3]);
 
     mapNoArgs = mockMapNoArgs(
-      (resource: TestResource, ident: ResourceIdentity): TestResource =>
-        resource
+      (resource: TestResource, ident: ResourceIdentity): TestResource => resource
     );
     mapWithArgs = mockMapWithArgs(
-      (
-        resource: TestResource,
-        ident: ResourceIdentity,
-        args: mixed
-      ): TestResource => resource
+      (resource: TestResource, ident: ResourceIdentity, args: mixed): TestResource => resource
     );
     reduce = mockReduce(
       (
@@ -349,7 +333,10 @@ describe("resource query operations", () => {
 
       it("should return same with updated other state and same args 2", () => {
         // eslint-disable-next-line max-nested-callbacks
-        mapWithArgs.mockImplementation(resource => ({ ...resource, name: "" }));
+        mapWithArgs.mockImplementation(resource => ({
+          ...resource,
+          name: "",
+        }));
 
         const args = [r1.id, r2.id];
         const result1 = query(initialState, args);
@@ -460,10 +447,7 @@ describe("resource query operations", () => {
     beforeEach(() => {
       filter = mockFilter(
         // eslint-disable-next-line max-nested-callbacks
-        (
-          values: ResourceValues<TestResource>,
-          { ids }: { ids: TestArgs }
-        ): TestArgs => ids
+        (values: ResourceValues<TestResource>, { ids }: { ids: TestArgs }): TestArgs => ids
       );
     });
 
@@ -662,7 +646,10 @@ describe("resource query operations", () => {
 
       it("should return last with updated other state and same args 2", () => {
         // eslint-disable-next-line max-nested-callbacks
-        mapWithArgs.mockImplementation(resource => ({ ...resource, name: "" }));
+        mapWithArgs.mockImplementation(resource => ({
+          ...resource,
+          name: "",
+        }));
 
         const ids = [r1.id, r2.id];
         const result1 = query(initialState, { ids });
@@ -758,8 +745,7 @@ describe("resource query operations", () => {
     beforeEach(() => {
       filter = mockFilter(
         // eslint-disable-next-line max-nested-callbacks
-        (values: ResourceValues<TestResource>, ids: Array<string>): TestArgs =>
-          ids
+        (values: ResourceValues<TestResource>, ids: Array<string>): TestArgs => ids
       );
     });
 
@@ -980,7 +966,10 @@ describe("resource query operations", () => {
 
       it("should return same with updated other state and same args 2", () => {
         // eslint-disable-next-line max-nested-callbacks
-        mapWithArgs.mockImplementation(resource => ({ ...resource, name: "" }));
+        mapWithArgs.mockImplementation(resource => ({
+          ...resource,
+          name: "",
+        }));
 
         const args = [r1.id, r2.id];
         const result1 = query(initialState, args);

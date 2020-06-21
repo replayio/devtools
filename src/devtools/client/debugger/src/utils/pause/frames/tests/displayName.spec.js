@@ -4,11 +4,7 @@
 
 // @flow
 
-import {
-  formatCopyName,
-  formatDisplayName,
-  simplifyDisplayName,
-} from "../displayName";
+import { formatCopyName, formatDisplayName, simplifyDisplayName } from "../displayName";
 
 import { makeMockFrame, makeMockSource } from "../../../test-mockup";
 
@@ -34,13 +30,7 @@ describe("formatting display names", () => {
 
   it("shortens an anonymous function", () => {
     const source = makeMockSource("assets/bar.js");
-    const frame = makeMockFrame(
-      undefined,
-      source,
-      undefined,
-      undefined,
-      "extend/child/bar/baz"
-    );
+    const frame = makeMockFrame(undefined, source, undefined, undefined, "extend/child/bar/baz");
 
     expect(formatDisplayName(frame, undefined, L10N)).toEqual("baz");
   });
@@ -122,8 +112,7 @@ describe("simplifying display names", () => {
 
   Object.keys(cases).forEach(type => {
     cases[type].forEach(([kase, expected]) => {
-      it(`${type} - ${kase}`, () =>
-        expect(simplifyDisplayName(kase)).toEqual(expected));
+      it(`${type} - ${kase}`, () => expect(simplifyDisplayName(kase)).toEqual(expected));
     });
   });
 });

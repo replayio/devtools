@@ -13,18 +13,10 @@ let utf8Decoder;
 function convertDwarf(wasm, instance) {
   const { memory, alloc_mem, free_mem, convert_dwarf } = instance.exports;
   const wasmPtr = alloc_mem(wasm.byteLength);
-  new Uint8Array(memory.buffer, wasmPtr, wasm.byteLength).set(
-    new Uint8Array(wasm)
-  );
+  new Uint8Array(memory.buffer, wasmPtr, wasm.byteLength).set(new Uint8Array(wasm));
   const resultPtr = alloc_mem(12);
   const enableXScopes = true;
-  const success = convert_dwarf(
-    wasmPtr,
-    wasm.byteLength,
-    resultPtr,
-    resultPtr + 4,
-    enableXScopes
-  );
+  const success = convert_dwarf(wasmPtr, wasm.byteLength, resultPtr, resultPtr + 4, enableXScopes);
   free_mem(wasmPtr);
   const resultView = new DataView(memory.buffer, resultPtr, 12);
   const outputPtr = resultView.getUint32(0, true),
@@ -36,9 +28,7 @@ function convertDwarf(wasm, instance) {
   if (!utf8Decoder) {
     utf8Decoder = new TextDecoder("utf-8");
   }
-  const output = utf8Decoder.decode(
-    new Uint8Array(memory.buffer, outputPtr, outputLen)
-  );
+  const output = utf8Decoder.decode(new Uint8Array(memory.buffer, outputPtr, outputLen));
   free_mem(outputPtr);
   return output;
 }

@@ -3,10 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const { connect } = require("react-redux");
 
 const GridElementWidthResizer = createFactory(

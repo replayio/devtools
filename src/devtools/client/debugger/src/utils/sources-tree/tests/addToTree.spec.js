@@ -41,9 +41,7 @@ describe("sources-tree", () => {
     it("should provide node API", () => {
       const source = makeMockSource("http://example.com/a/b/c.js", "actor1");
 
-      const root = createDirectoryNode("root", "", [
-        createSourceNode("foo", "/foo", source),
-      ]);
+      const root = createDirectoryNode("root", "", [createSourceNode("foo", "/foo", source)]);
 
       expect(root.name).toBe("root");
       expect(nodeHasChildren(root)).toBe(true);
@@ -57,10 +55,7 @@ describe("sources-tree", () => {
     });
 
     it("builds a path-based tree", () => {
-      const source1 = makeMockSource(
-        "http://example.com/foo/source1.js",
-        "actor1"
-      );
+      const source1 = makeMockSource("http://example.com/foo/source1.js", "actor1");
       const tree = createDirectoryNode("root", "", []);
 
       addToTree(tree, source1, "http://example.com/", "FakeThread");
@@ -98,10 +93,7 @@ describe("sources-tree", () => {
     });
 
     it("builds a path-based tree for webpack URLs with absolute path", () => {
-      const source1 = makeMockSource(
-        "webpack:////Users/foo/source1.js",
-        "actor1"
-      );
+      const source1 = makeMockSource("webpack:////Users/foo/source1.js", "actor1");
       const tree = createDirectoryNode("root", "", []);
 
       addToTree(tree, source1, "http://example.com/", "");
@@ -127,7 +119,7 @@ describe("sources-tree", () => {
       expect(source1Node.name).toBe("source1.js");
     });
 
-    it("handles url with no filename", function() {
+    it("handles url with no filename", function () {
       const source1 = makeMockSource("http://example.com/", "actor1");
       const tree = createDirectoryNode("root", "", []);
 
@@ -146,10 +138,7 @@ describe("sources-tree", () => {
       const sourceName = // eslint-disable-next-line max-len
         "B9724220.131821496;dc_ver=42.111;sz=468x60;u_sd=2;dc_adk=2020465299;ord=a53rpc;dc_rfl=1,https%3A%2F%2Fdavidwalsh.name%2F$0;xdt=1";
 
-      const source1 = makeMockSource(
-        `https://example.com/foo/${sourceName}`,
-        "actor1"
-      );
+      const source1 = makeMockSource(`https://example.com/foo/${sourceName}`, "actor1");
 
       const tree = createDirectoryNode("root", "", []);
 
@@ -162,10 +151,7 @@ describe("sources-tree", () => {
     it("name does not include query params", () => {
       const sourceName = "name.js?bar=3";
 
-      const source1 = makeMockSource(
-        `https://example.com/foo/${sourceName}`,
-        "actor1"
-      );
+      const source1 = makeMockSource(`https://example.com/foo/${sourceName}`, "actor1");
 
       const tree = createDirectoryNode("root", "", []);
 
@@ -274,10 +260,7 @@ describe("sources-tree", () => {
     });
 
     it("excludes javascript: URLs from the tree", () => {
-      const source1 = makeMockSource(
-        "javascript:alert('Hello World')",
-        "actor1"
-      );
+      const source1 = makeMockSource("javascript:alert('Hello World')", "actor1");
       const source2 = makeMockSource("http://example.com/source1.js", "actor2");
       const source3 = makeMockSource(
         "javascript:let i = 10; while (i > 0) i--; console.log(i);",
@@ -331,9 +314,7 @@ describe("sources-tree", () => {
 
       const sources = createSourcesList(testData);
       const tree = createDirectoryNode("root", "", []);
-      sources.forEach(source =>
-        addToTree(tree, source, "https://unpkg.com/", "FakeThread")
-      );
+      sources.forEach(source => addToTree(tree, source, "https://unpkg.com/", "FakeThread"));
       expect(formatTree(tree)).toMatchSnapshot();
     });
 
@@ -352,9 +333,7 @@ describe("sources-tree", () => {
 
       const sources = createSourcesList(testData);
       const tree = createDirectoryNode("root", "", []);
-      sources.forEach(source =>
-        addToTree(tree, source, "https://unpkg.com/", "FakeThread")
-      );
+      sources.forEach(source => addToTree(tree, source, "https://unpkg.com/", "FakeThread"));
       expect(formatTree(tree)).toMatchSnapshot();
     });
   });

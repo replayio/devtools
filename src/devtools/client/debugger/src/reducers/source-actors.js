@@ -6,11 +6,7 @@
 
 import type { Action } from "../actions/types";
 import type { SourceId, ThreadId } from "../types";
-import {
-  asSettled,
-  type AsyncValue,
-  type SettledValue,
-} from "../utils/async-value";
+import { asSettled, type AsyncValue, type SettledValue } from "../utils/async-value";
 import {
   createInitial,
   insertResources,
@@ -118,10 +114,7 @@ export default function update(
   return state;
 }
 
-function clearSourceActorMapURL(
-  state: SourceActorsState,
-  id: SourceActorId
-): SourceActorsState {
+function clearSourceActorMapURL(state: SourceActorsState, id: SourceActorId): SourceActorsState {
   if (!hasResource(state, id)) {
     return state;
   }
@@ -145,9 +138,7 @@ function updateBreakpointColumns(
     return state;
   }
 
-  const breakpointPositions = new Map(
-    getResource(state, sourceId).breakpointPositions
-  );
+  const breakpointPositions = new Map(getResource(state, sourceId).breakpointPositions);
   breakpointPositions.set(line, value);
 
   return updateResources(state, [{ id: sourceId, breakpointPositions }]);
@@ -183,17 +174,11 @@ export function stringToSourceActorId(s: string): SourceActorId {
   return s;
 }
 
-export function hasSourceActor(
-  state: SourceActorOuterState,
-  id: SourceActorId
-): boolean {
+export function hasSourceActor(state: SourceActorOuterState, id: SourceActorId): boolean {
   return hasResource(state.sourceActors, id);
 }
 
-export function getSourceActor(
-  state: SourceActorOuterState,
-  id: SourceActorId
-): SourceActor {
+export function getSourceActor(state: SourceActorOuterState, id: SourceActorId): SourceActor {
   return getMappedResource(state.sourceActors, id, resourceAsSourceActor);
 }
 
@@ -201,10 +186,9 @@ export function getSourceActor(
  * Get all of the source actors for a set of IDs. Caches based on the identity
  * of "ids" when possible.
  */
-const querySourceActorsById: IdQuery<
-  SourceActorResource,
-  SourceActor
-> = makeIdQuery(resourceAsSourceActor);
+const querySourceActorsById: IdQuery<SourceActorResource, SourceActor> = makeIdQuery(
+  resourceAsSourceActor
+);
 
 export function getSourceActors(
   state: SourceActorOuterState,

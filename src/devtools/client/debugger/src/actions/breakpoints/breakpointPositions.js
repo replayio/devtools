@@ -22,10 +22,7 @@ import type {
 } from "../../types";
 
 import { makeBreakpointId } from "../../utils/breakpoint";
-import {
-  memoizeableAction,
-  type MemoizedAction,
-} from "../../utils/memoizableAction";
+import { memoizeableAction, type MemoizedAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
 import type { ThunkArgs } from "../../actions/types";
 import { loadSourceActorBreakpointColumns } from "../source-actors";
@@ -113,11 +110,7 @@ async function _setBreakpointPositions(cx, sourceId, line, thunkArgs) {
 
 function generatedSourceActorKey(state, sourceId) {
   const source = getSource(state, sourceId);
-  const actors = source
-    ? getSourceActorsForSource(state, source.id).map(
-        ({ actor }) => actor
-      )
-    : [];
+  const actors = source ? getSourceActorsForSource(state, source.id).map(({ actor }) => actor) : [];
   return [sourceId, ...actors].join(":");
 }
 

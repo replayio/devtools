@@ -4,11 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  createRef,
-  PureComponent,
-} = require("react");
+const { createFactory, createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { editableItem } = require("devtools/client/shared/inplace-editor");
@@ -16,15 +12,11 @@ const { editableItem } = require("devtools/client/shared/inplace-editor");
 const Declarations = createFactory(
   require("devtools/client/inspector/rules/components/Declarations")
 );
-const Selector = createFactory(
-  require("devtools/client/inspector/rules/components/Selector")
-);
+const Selector = createFactory(require("devtools/client/inspector/rules/components/Selector"));
 const SelectorHighlighter = createFactory(
   require("devtools/client/inspector/rules/components/SelectorHighlighter")
 );
-const SourceLink = createFactory(
-  require("devtools/client/inspector/rules/components/SourceLink")
-);
+const SourceLink = createFactory(require("devtools/client/inspector/rules/components/SourceLink"));
 
 const Types = require("devtools/client/inspector/rules/types");
 
@@ -92,15 +84,7 @@ class Rule extends PureComponent {
       showDeclarationValueEditor,
       showSelectorEditor,
     } = this.props;
-    const {
-      declarations,
-      id,
-      isUnmatched,
-      isUserAgentStyle,
-      selector,
-      sourceLink,
-      type,
-    } = rule;
+    const { declarations, id, isUnmatched, isUserAgentStyle, selector, sourceLink, type } = rule;
 
     return dom.div(
       {
@@ -130,9 +114,9 @@ class Rule extends PureComponent {
           }),
           type !== CSSRule.KEYFRAME_RULE
             ? SelectorHighlighter({
-              onToggleSelectorHighlighter,
-              selector,
-            })
+                onToggleSelectorHighlighter,
+                selector,
+              })
             : null,
           dom.span({ className: "ruleview-ruleopen" }, " {")
         ),
@@ -147,9 +131,7 @@ class Rule extends PureComponent {
           {
             className: "ruleview-property ruleview-newproperty",
             style: {
-              display: this.state.isNewDeclarationEditorVisible
-                ? "block"
-                : "none",
+              display: this.state.isNewDeclarationEditorVisible ? "block" : "none",
             },
           },
           dom.span({
@@ -161,10 +143,7 @@ class Rule extends PureComponent {
           {
             className: "ruleview-ruleclose",
             ref: this.closeBraceSpan,
-            tabIndex:
-              !isUserAgentStyle && !this.state.isNewDeclarationEditorVisible
-                ? 0
-                : -1,
+            tabIndex: !isUserAgentStyle && !this.state.isNewDeclarationEditorVisible ? 0 : -1,
           },
           "}"
         )

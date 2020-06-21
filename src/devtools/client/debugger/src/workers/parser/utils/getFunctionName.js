@@ -14,10 +14,7 @@ export default function getFunctionName(node: Node, parent: Node): string {
     return node.id.name;
   }
 
-  if (
-    t.isObjectMethod(node, { computed: false }) ||
-    t.isClassMethod(node, { computed: false })
-  ) {
+  if (t.isObjectMethod(node, { computed: false }) || t.isClassMethod(node, { computed: false })) {
     const key = node.key;
 
     if (t.isIdentifier(key)) {
@@ -63,17 +60,11 @@ export default function getFunctionName(node: Node, parent: Node): string {
     }
   }
 
-  if (
-    t.isAssignmentPattern(parent, { right: node }) &&
-    t.isIdentifier(parent.left)
-  ) {
+  if (t.isAssignmentPattern(parent, { right: node }) && t.isIdentifier(parent.left)) {
     return parent.left.name;
   }
 
-  if (
-    t.isVariableDeclarator(parent, { init: node }) &&
-    t.isIdentifier(parent.id)
-  ) {
+  if (t.isVariableDeclarator(parent, { init: node }) && t.isIdentifier(parent.id)) {
     return parent.id.name;
   }
 

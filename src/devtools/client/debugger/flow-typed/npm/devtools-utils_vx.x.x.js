@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'devtools-utils' {
+declare module "devtools-utils" {
   declare module.exports: any;
 }
 
@@ -22,45 +22,45 @@ declare module 'devtools-utils' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'devtools-utils/src/network-request' {
+declare module "devtools-utils/src/network-request" {
   declare module.exports: any;
 }
 
-declare module 'devtools-utils/src/privileged-network-request' {
+declare module "devtools-utils/src/privileged-network-request" {
   declare module.exports: any;
 }
 
-declare module 'devtools-utils/src/tests/network-request' {
+declare module "devtools-utils/src/tests/network-request" {
   declare module.exports: any;
 }
 
-declare module 'devtools-utils/src/tests/worker-utils' {
+declare module "devtools-utils/src/tests/worker-utils" {
   declare module.exports: any;
 }
 
-declare module 'devtools-utils/src/worker-utils' {
+declare module "devtools-utils/src/worker-utils" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'devtools-utils/index' {
-  declare module.exports: $Exports<'devtools-utils'>;
+declare module "devtools-utils/index" {
+  declare module.exports: $Exports<"devtools-utils">;
 }
-declare module 'devtools-utils/index.js' {
-  declare module.exports: $Exports<'devtools-utils'>;
+declare module "devtools-utils/index.js" {
+  declare module.exports: $Exports<"devtools-utils">;
 }
-declare module 'devtools-utils/src/network-request.js' {
-  declare module.exports: $Exports<'devtools-utils/src/network-request'>;
+declare module "devtools-utils/src/network-request.js" {
+  declare module.exports: $Exports<"devtools-utils/src/network-request">;
 }
-declare module 'devtools-utils/src/privileged-network-request.js' {
-  declare module.exports: $Exports<'devtools-utils/src/privileged-network-request'>;
+declare module "devtools-utils/src/privileged-network-request.js" {
+  declare module.exports: $Exports<"devtools-utils/src/privileged-network-request">;
 }
-declare module 'devtools-utils/src/tests/network-request.js' {
-  declare module.exports: $Exports<'devtools-utils/src/tests/network-request'>;
+declare module "devtools-utils/src/tests/network-request.js" {
+  declare module.exports: $Exports<"devtools-utils/src/tests/network-request">;
 }
-declare module 'devtools-utils/src/tests/worker-utils.js' {
-  declare module.exports: $Exports<'devtools-utils/src/tests/worker-utils'>;
+declare module "devtools-utils/src/tests/worker-utils.js" {
+  declare module.exports: $Exports<"devtools-utils/src/tests/worker-utils">;
 }
-declare module 'devtools-utils/src/worker-utils.js' {
-  declare module.exports: $Exports<'devtools-utils/src/worker-utils'>;
+declare module "devtools-utils/src/worker-utils.js" {
+  declare module.exports: $Exports<"devtools-utils/src/worker-utils">;
 }

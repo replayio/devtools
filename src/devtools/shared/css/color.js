@@ -20,13 +20,7 @@ loader.lazyRequireGetter(
 
 const COLOR_UNIT_PREF = "devtools.defaultColorUnit";
 
-const SPECIALVALUES = new Set([
-  "currentcolor",
-  "initial",
-  "inherit",
-  "transparent",
-  "unset",
-]);
+const SPECIALVALUES = new Set(["currentcolor", "initial", "inherit", "transparent", "unset"]);
 
 /**
  * This module is used to convert between various color types.
@@ -111,12 +105,11 @@ CssColor.prototype = {
   // Whether the value should be parsed using css-color-4 rules.
   cssColor4: false,
 
-  _setColorUnitUppercase: function(color) {
+  _setColorUnitUppercase: function (color) {
     // Specifically exclude the case where the color is
     // case-insensitive.  This makes it so that "#000" isn't
     // considered "upper case" for the purposes of color cycling.
-    this._colorUnitUppercase =
-      color === color.toUpperCase() && color !== color.toLowerCase();
+    this._colorUnitUppercase = color === color.toUpperCase() && color !== color.toLowerCase();
   },
 
   get colorUnit() {
@@ -139,11 +132,8 @@ CssColor.prototype = {
    *
    * @param {String} color The color to use
    */
-  setAuthoredUnitFromColor: function(color) {
-    if (
-      Services.prefs.getCharPref(COLOR_UNIT_PREF) ===
-      CssColor.COLORUNIT.authored
-    ) {
+  setAuthoredUnitFromColor: function (color) {
+    if (Services.prefs.getCharPref(COLOR_UNIT_PREF) === CssColor.COLORUNIT.authored) {
       this._colorUnit = classifyColor(color);
       this._setColorUnitUppercase(color);
     }
@@ -244,11 +234,7 @@ CssColor.prototype = {
       alphaHex.charAt(7) == alphaHex.charAt(8)
     ) {
       alphaHex =
-        "#" +
-        alphaHex.charAt(1) +
-        alphaHex.charAt(3) +
-        alphaHex.charAt(5) +
-        alphaHex.charAt(7);
+        "#" + alphaHex.charAt(1) + alphaHex.charAt(3) + alphaHex.charAt(5) + alphaHex.charAt(7);
     }
     return alphaHex;
   },
@@ -264,10 +250,7 @@ CssColor.prototype = {
 
     const tuple = this.getRGBATuple();
     return (
-      "#" +
-      ((1 << 24) + (tuple.r << 16) + (tuple.g << 8) + (tuple.b << 0))
-        .toString(16)
-        .substr(-6)
+      "#" + ((1 << 24) + (tuple.r << 16) + (tuple.g << 8) + (tuple.b << 0)).toString(16).substr(-6)
     );
   },
 
@@ -281,12 +264,8 @@ CssColor.prototype = {
 
     return (
       "#" +
-      ((1 << 24) + (tuple.r << 16) + (tuple.g << 8) + (tuple.b << 0))
-        .toString(16)
-        .substr(-6) +
-      Math.round(tuple.a)
-        .toString(16)
-        .padStart(2, "0")
+      ((1 << 24) + (tuple.r << 16) + (tuple.g << 8) + (tuple.b << 0)).toString(16).substr(-6) +
+      Math.round(tuple.a).toString(16).padStart(2, "0")
     );
   },
 
@@ -317,15 +296,7 @@ CssColor.prototype = {
     }
     const components = this.getRGBATuple();
     return (
-      "rgba(" +
-      components.r +
-      ", " +
-      components.g +
-      ", " +
-      components.b +
-      ", " +
-      components.a +
-      ")"
+      "rgba(" + components.r + ", " + components.g + ", " + components.b + ", " + components.a + ")"
     );
   },
 
@@ -371,7 +342,7 @@ CssColor.prototype = {
    *         - If the color is a regular color e.g. #F06 so we return false
    *           to indicate that the color is neither invalid or special.
    */
-  _getInvalidOrSpecialValue: function() {
+  _getInvalidOrSpecialValue: function () {
     if (this.specialValue) {
       return this.specialValue;
     }
@@ -387,7 +358,7 @@ CssColor.prototype = {
    * @param  {String} color
    *         Any valid color string
    */
-  newColor: function(color) {
+  newColor: function (color) {
     // Store a lower-cased version of the color to help with format
     // testing.  The original text is kept as well so it can be
     // returned when needed.
@@ -397,7 +368,7 @@ CssColor.prototype = {
     return this;
   },
 
-  nextColorUnit: function() {
+  nextColorUnit: function () {
     // Reorder the formats array to have the current format at the
     // front so we can cycle through.
     let formats = ["hex", "hsl", "rgb", "name"];
@@ -420,7 +391,7 @@ CssColor.prototype = {
   /**
    * Return a string representing a color of type defined in COLOR_UNIT_PREF.
    */
-  toString: function() {
+  toString: function () {
     let color;
 
     switch (this.colorUnit) {
@@ -443,10 +414,7 @@ CssColor.prototype = {
         color = this.rgb;
     }
 
-    if (
-      this._colorUnitUppercase &&
-      this.colorUnit != CssColor.COLORUNIT.authored
-    ) {
+    if (this._colorUnitUppercase && this.colorUnit != CssColor.COLORUNIT.authored) {
       color = color.toUpperCase();
     }
 
@@ -457,7 +425,7 @@ CssColor.prototype = {
    * Returns a RGBA 4-Tuple representation of a color or transparent as
    * appropriate.
    */
-  getRGBATuple: function() {
+  getRGBATuple: function () {
     const tuple = colorToRGBA(this.authored, this.cssColor4);
 
     tuple.a = parseFloat(tuple.a.toFixed(2));
@@ -469,7 +437,7 @@ CssColor.prototype = {
    * Returns a HSLA 4-Tuple representation of a color or transparent as
    * appropriate.
    */
-  _getHSLATuple: function() {
+  _getHSLATuple: function () {
     const { r, g, b, a } = colorToRGBA(this.authored, this.cssColor4);
 
     const [h, s, l] = rgbToHsl([r, g, b]);
@@ -482,7 +450,7 @@ CssColor.prototype = {
     };
   },
 
-  _hsl: function(maybeAlpha) {
+  _hsl: function (maybeAlpha) {
     if (this.lowerCased.startsWith("hsl(") && maybeAlpha === undefined) {
       // We can use it as-is.
       return this.authored;
@@ -499,7 +467,7 @@ CssColor.prototype = {
   /**
    * This method allows comparison of CssColor objects using ===.
    */
-  valueOf: function() {
+  valueOf: function () {
     return this.rgba;
   },
 
@@ -508,7 +476,7 @@ CssColor.prototype = {
    *
    * @return {Boolean} True if the color is transparent and valid.
    */
-  isTransparent: function() {
+  isTransparent: function () {
     return this.getRGBATuple().a === 0;
   },
 };
@@ -613,9 +581,7 @@ function rgbToLab([r, g, b]) {
  *         DeltaE value between the two colors
  */
 function calculateDeltaE([l1, a1, b1], [l2, a2, b2]) {
-  return Math.sqrt(
-    Math.pow(l1 - l2, 2) + Math.pow(a1 - a2, 2) + Math.pow(b1 - b2, 2)
-  );
+  return Math.sqrt(Math.pow(l1 - l2, 2) + Math.pow(a1 - a2, 2) + Math.pow(b1 - b2, 2));
 }
 
 function roundTo(number, digits) {
@@ -823,10 +789,7 @@ function getToken(lexer) {
 
   while (true) {
     const token = lexer.nextToken();
-    if (
-      !token ||
-      (token.tokenType !== "comment" && token.tokenType !== "whitespace")
-    ) {
+    if (!token || (token.tokenType !== "comment" && token.tokenType !== "whitespace")) {
       lexer._currentToken = token;
       return token;
     }
@@ -1090,29 +1053,14 @@ function parseOldStyleHsl(lexer, hasAlpha) {
   // version of parseColorComponent function for them. The opacity is <number>
   if (hasAlpha) {
     if (
-      parseColorComponent(
-        lexer,
-        COLOR_COMPONENT_TYPE.percentage,
-        commaSeparator,
-        hsl
-      ) &&
-      parseColorComponent(
-        lexer,
-        COLOR_COMPONENT_TYPE.percentage,
-        commaSeparator,
-        hsl
-      ) &&
+      parseColorComponent(lexer, COLOR_COMPONENT_TYPE.percentage, commaSeparator, hsl) &&
+      parseColorComponent(lexer, COLOR_COMPONENT_TYPE.percentage, commaSeparator, hsl) &&
       parseColorComponent(lexer, COLOR_COMPONENT_TYPE.number, closeParen, a)
     ) {
       return [...hslToRGB(hsl), ...a];
     }
   } else if (
-    parseColorComponent(
-      lexer,
-      COLOR_COMPONENT_TYPE.percentage,
-      commaSeparator,
-      hsl
-    ) &&
+    parseColorComponent(lexer, COLOR_COMPONENT_TYPE.percentage, commaSeparator, hsl) &&
     parseColorComponent(lexer, COLOR_COMPONENT_TYPE.percentage, closeParen, hsl)
   ) {
     return [...hslToRGB(hsl), 1];
@@ -1196,10 +1144,7 @@ function parseOldStyleRgb(lexer, hasAlpha) {
   const rgba = [];
 
   const token = getToken(lexer);
-  if (
-    token.tokenType !== "percentage" &&
-    (token.tokenType !== "number" || !token.isInteger)
-  ) {
+  if (token.tokenType !== "percentage" && (token.tokenType !== "number" || !token.isInteger)) {
     return null;
   }
   unGetToken(lexer);
@@ -1280,11 +1225,7 @@ function colorToRGBA(name, useCssColor4ColorFunction = false, toArray = false) {
   }
 
   const expectedFunctions = ["rgba", "rgb", "hsla", "hsl"];
-  if (
-    !func ||
-    func.tokenType !== "function" ||
-    !expectedFunctions.includes(func.text)
-  ) {
+  if (!func || func.tokenType !== "function" || !expectedFunctions.includes(func.text)) {
     return null;
   }
 
@@ -1293,9 +1234,7 @@ function colorToRGBA(name, useCssColor4ColorFunction = false, toArray = false) {
   let vals;
   if (!useCssColor4ColorFunction) {
     const hasAlpha = func.text === "rgba" || func.text === "hsla";
-    vals = hsl
-      ? parseOldStyleHsl(lexer, hasAlpha)
-      : parseOldStyleRgb(lexer, hasAlpha);
+    vals = hsl ? parseOldStyleHsl(lexer, hasAlpha) : parseOldStyleRgb(lexer, hasAlpha);
   } else {
     vals = hsl ? parseHsl(lexer) : parseRgb(lexer);
   }
@@ -1331,10 +1270,7 @@ function isValidCSSColor(name, useCssColor4ColorFunction = false) {
 function calculateLuminance(rgba) {
   for (let i = 0; i < 3; i++) {
     rgba[i] /= 255;
-    rgba[i] =
-      rgba[i] < 0.03928
-        ? rgba[i] / 12.92
-        : Math.pow((rgba[i] + 0.055) / 1.055, 2.4);
+    rgba[i] = rgba[i] < 0.03928 ? rgba[i] / 12.92 : Math.pow((rgba[i] + 0.055) / 1.055, 2.4);
   }
   return 0.2126 * rgba[0] + 0.7152 * rgba[1] + 0.0722 * rgba[2];
 }

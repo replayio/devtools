@@ -37,21 +37,15 @@ function historyPersistenceMiddleware(store) {
   return next => action => {
     const res = next(action);
 
-    const triggerStoreActions = [
-      APPEND_TO_HISTORY,
-      CLEAR_HISTORY,
-      EVALUATE_EXPRESSION,
-    ];
+    const triggerStoreActions = [APPEND_TO_HISTORY, CLEAR_HISTORY, EVALUATE_EXPRESSION];
 
     // Save the current history entries when modified, but wait till
     // entries from the previous session are loaded.
     if (historyLoaded && triggerStoreActions.includes(action.type)) {
       const state = store.getState();
-      asyncStorage
-        .setItem("webConsoleHistory", state.history.entries)
-        .catch(e => {
-          console.error("Error when saving WebConsole input history", e);
-        });
+      asyncStorage.setItem("webConsoleHistory", state.history.entries).catch(e => {
+        console.error("Error when saving WebConsole input history", e);
+      });
     }
 
     return res;

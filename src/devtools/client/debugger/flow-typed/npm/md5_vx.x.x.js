@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'md5' {
+declare module "md5" {
   declare module.exports: any;
 }
 
@@ -22,18 +22,18 @@ declare module 'md5' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'md5/md5' {
+declare module "md5/md5" {
   declare module.exports: any;
 }
 
-declare module 'md5/test' {
+declare module "md5/test" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'md5/md5.js' {
-  declare module.exports: $Exports<'md5/md5'>;
+declare module "md5/md5.js" {
+  declare module.exports: $Exports<"md5/md5">;
 }
-declare module 'md5/test.js' {
-  declare module.exports: $Exports<'md5/test'>;
+declare module "md5/test.js" {
+  declare module.exports: $Exports<"md5/test">;
 }

@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 
 const FontPropertyValue = createFactory(
@@ -62,9 +59,7 @@ class FontSize extends PureComponent {
     // Ensure we store the max value ever reached for this unit type. This will be the
     // max value of the input and slider. Without this memoization, the value and slider
     // thumb get clamped at the upper bound while decrementing an out-of-bounds value.
-    this.historicMax[unit] = this.historicMax[unit]
-      ? Math.max(this.historicMax[unit], max)
-      : max;
+    this.historicMax[unit] = this.historicMax[unit] ? Math.max(this.historicMax[unit], max) : max;
 
     return FontPropertyValue({
       allowOverflow: true,

@@ -157,10 +157,7 @@ function getThreadPauseState(state: PauseState, thread: ThreadId) {
   return state.threads[thread] || createInitialPauseState();
 }
 
-function update(
-  state: PauseState = createPauseState(),
-  action: Action
-): PauseState {
+function update(state: PauseState = createPauseState(), action: Action): PauseState {
   // Actions need to specify any thread they are operating on. These helpers
   // manage updating the pause state for that thread.
   const threadState = () => {
@@ -223,7 +220,11 @@ function update(
     case "FETCHED_FRAMES": {
       const { frames } = action;
       const selectedFrameId = frames.length ? frames[0].id : undefined;
-      return updateThreadState({ frames, selectedFrameId, framesLoading: false });
+      return updateThreadState({
+        frames,
+        selectedFrameId,
+        framesLoading: false,
+      });
     }
 
     case "PREVIEW_PAUSED_LOCATION": {
@@ -396,7 +397,6 @@ function update(
       return { ...state, skipPausing };
     }
 
-
     case "SET_EXPANDED_SCOPE": {
       const { path, expanded } = action;
       const expandedScopes = new Set(threadState().expandedScopes);
@@ -482,9 +482,7 @@ export function wasStepping(state: State, thread: ThreadId): boolean {
 }
 
 export function isStepping(state: State, thread: ThreadId) {
-  return ["stepIn", "stepOver", "stepOut"].includes(
-    getPauseCommand(state, thread)
-  );
+  return ["stepIn", "stepOver", "stepOut"].includes(getPauseCommand(state, thread));
 }
 
 export function getCurrentThread(state: State) {
@@ -517,10 +515,7 @@ export function getFrames(state: State, thread: ThreadId) {
 }
 
 export function getCurrentThreadFrames(state: State) {
-  const { frames, framesLoading } = getThreadPauseState(
-    state.pause,
-    getCurrentThread(state)
-  );
+  const { frames, framesLoading } = getThreadPauseState(state.pause, getCurrentThread(state));
   return framesLoading ? null : frames;
 }
 
@@ -537,11 +532,7 @@ function getGeneratedFrameId(frameId: string): string {
   return frameId;
 }
 
-export function getGeneratedFrameScope(
-  state: State,
-  thread: ThreadId,
-  frameId: ?string
-) {
+export function getGeneratedFrameScope(state: State, thread: ThreadId, frameId: ?string) {
   if (!frameId) {
     return null;
   }
@@ -571,9 +562,7 @@ export function getSelectedFrameBindings(state: State, thread: ThreadId) {
     if (currentScope.bindings) {
       const bindings = Object.keys(currentScope.bindings.variables);
       const args = [].concat(
-        ...currentScope.bindings.arguments.map(argument =>
-          Object.keys(argument)
-        )
+        ...currentScope.bindings.arguments.map(argument => Object.keys(argument))
       );
 
       frameBindings = [...frameBindings, ...bindings, ...args];
@@ -653,14 +642,8 @@ export function getHighlightedCalls(state: State, thread: ThreadId) {
   return getThreadPauseState(state.pause, thread).highlightedCalls;
 }
 
-export function getInlinePreviews(
-  state: State,
-  thread: ThreadId,
-  frameId: string
-): Previews {
-  return getThreadPauseState(state.pause, thread).inlinePreview[
-    getGeneratedFrameId(frameId)
-  ];
+export function getInlinePreviews(state: State, thread: ThreadId, frameId: string): Previews {
+  return getThreadPauseState(state.pause, thread).inlinePreview[getGeneratedFrameId(frameId)];
 }
 
 export function getSelectedInlinePreviews(state: State) {

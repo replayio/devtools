@@ -42,8 +42,7 @@ function contains(location: PartialPosition, range: Range) {
     location.line >= range.start.line &&
     location.line <= range.end.line &&
     (!location.column ||
-      (location.column >= range.start.column &&
-        location.column <= range.end.column))
+      (location.column >= range.start.column && location.column <= range.end.column))
   );
 }
 
@@ -58,10 +57,7 @@ function groupBreakpoints(breakpoints, selectedSource) {
   );
 
   for (const line in map) {
-    map[line] = groupBy(
-      map[line],
-      breakpoint => breakpoint.location.column
-    );
+    map[line] = groupBy(map[line], breakpoint => breakpoint.location.column);
   }
 
   return map;
@@ -105,21 +101,13 @@ function filterByBreakpoints(positions, selectedSource, breakpointMap) {
 // Filters out breakpoints to the right of the line. (bug 1552039)
 function filterInLine(positions, selectedSource, selectedContent) {
   return positions.filter(position => {
-    const lineText = getLineText(
-      selectedSource.id,
-      selectedContent,
-      position.line
-    );
+    const lineText = getLineText(selectedSource.id, selectedContent, position.line);
 
     return lineText.length >= (position.column || 0);
   });
 }
 
-function formatPositions(
-  positions: BreakpointPosition[],
-  selectedSource,
-  breakpointMap
-) {
+function formatPositions(positions: BreakpointPosition[], selectedSource, breakpointMap) {
   return (positions: any).map(location => {
     return {
       location,
@@ -128,9 +116,7 @@ function formatPositions(
   });
 }
 
-function convertToList(
-  breakpointPositions: BreakpointPositions
-): BreakpointPosition[] {
+function convertToList(breakpointPositions: BreakpointPositions): BreakpointPosition[] {
   return ([].concat(...Object.values(breakpointPositions)): any);
 }
 

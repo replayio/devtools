@@ -108,27 +108,14 @@ function traverseTree(
 
     const debuggeeHostIfRoot = index === 1 ? debuggeeHost : null;
 
-    return findOrCreateNode(
-      parts,
-      subTree,
-      path,
-      part,
-      index,
-      url,
-      debuggeeHostIfRoot,
-      source
-    );
+    return findOrCreateNode(parts, subTree, path, part, index, url, debuggeeHostIfRoot, source);
   }, tree);
 }
 
 /*
  * Add a source file to a directory node in the tree
  */
-function addSourceToNode(
-  node: TreeDirectory,
-  url: ParsedURL,
-  source: Source
-): Source | TreeNode[] {
+function addSourceToNode(node: TreeDirectory, url: ParsedURL, source: Source): Source | TreeNode[] {
   const isFile = !isPathDirectory(url.path);
 
   if (node.type == "source" && !isFile) {

@@ -6,32 +6,15 @@
 
 var Services = require("Services");
 const ChromeUtils = require("ChromeUtils");
-const { DevToolsLoader } = ChromeUtils.import(
-  "resource://devtools/shared/Loader.jsm"
-);
+const { DevToolsLoader } = ChromeUtils.import("resource://devtools/shared/Loader.jsm");
 
 loader.lazyRequireGetter(this, "Tools", "devtools/client/definitions", true);
-loader.lazyRequireGetter(
-  this,
-  "DevToolsClient",
-  "devtools/shared/client/devtools-client",
-  true
-);
+loader.lazyRequireGetter(this, "DevToolsClient", "devtools/shared/client/devtools-client", true);
 loader.lazyRequireGetter(this, "l10n", "devtools/client/webconsole/utils/l10n");
-loader.lazyRequireGetter(
-  this,
-  "BrowserConsole",
-  "devtools/client/webconsole/browser-console"
-);
-loader.lazyRequireGetter(
-  this,
-  "PREFS",
-  "devtools/client/webconsole/constants",
-  true
-);
+loader.lazyRequireGetter(this, "BrowserConsole", "devtools/client/webconsole/browser-console");
+loader.lazyRequireGetter(this, "PREFS", "devtools/client/webconsole/constants", true);
 
-const BC_WINDOW_FEATURES =
-  "chrome,titlebar,toolbar,centerscreen,resizable,dialog=no";
+const BC_WINDOW_FEATURES = "chrome,titlebar,toolbar,centerscreen,resizable,dialog=no";
 
 class BrowserConsoleManager {
   constructor() {
@@ -121,9 +104,7 @@ class BrowserConsoleManager {
     const loader = new DevToolsLoader({
       freshCompartment: true,
     });
-    const { DevToolsServer } = loader.require(
-      "devtools/server/devtools-server"
-    );
+    const { DevToolsServer } = loader.require("devtools/server/devtools-server");
 
     DevToolsServer.init();
 
@@ -160,9 +141,7 @@ class BrowserConsoleManager {
       once: true,
     });
 
-    const fissionSupport = Services.prefs.getBoolPref(
-      PREFS.FEATURES.BROWSER_TOOLBOX_FISSION
-    );
+    const fissionSupport = Services.prefs.getBoolPref(PREFS.FEATURES.BROWSER_TOOLBOX_FISSION);
     const title = fissionSupport
       ? l10n.getStr("multiProcessBrowserConsole.title")
       : l10n.getStr("browserConsole.title");

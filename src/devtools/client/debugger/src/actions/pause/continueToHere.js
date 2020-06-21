@@ -20,7 +20,7 @@ import type { ThunkArgs } from "../types";
 import type { ThreadContext, SourceLocation } from "../../types";
 
 export function continueToHere(cx: ThreadContext, location: SourceLocation) {
-  return async function({ dispatch, getState }: ThunkArgs) {
+  return async function ({ dispatch, getState }: ThunkArgs) {
     const { line, column, sourceId } = location;
     const selectedSource = getSelectedSource(getState());
     const selectedFrame = getSelectedFrame(getState(), cx.thread);
@@ -50,8 +50,7 @@ export function continueToHere(cx: ThreadContext, location: SourceLocation) {
     // If we're replaying and the user selects a line above the currently
     // paused line, lets rewind to it. NOTE: this ignores a couple important
     // cases like loops, and wanting to play forward to the next function call.
-    const action =
-      getCanRewind(getState()) && line < debugLine ? rewind : resume;
+    const action = getCanRewind(getState()) && line < debugLine ? rewind : resume;
 
     // Set a hidden breakpoint if we do not already have a breakpoint
     // at the closest position

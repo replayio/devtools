@@ -176,7 +176,7 @@ const reducers = {
   },
 };
 
-module.exports = function(rules = INITIAL_RULES, action) {
+module.exports = function (rules = INITIAL_RULES, action) {
   const reducer = reducers[action.type];
   if (!reducer) {
     return rules;

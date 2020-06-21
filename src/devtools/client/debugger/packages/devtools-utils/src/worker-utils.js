@@ -34,10 +34,7 @@ WorkerDispatcher.prototype = {
     this.worker = null;
   },
 
-  task(
-    method: string,
-    { queue = false } = {}
-  ): (...args: any[]) => Promise<any> {
+  task(method: string, { queue = false } = {}): (...args: any[]) => Promise<any> {
     const calls = [];
     const push = (args: Array<any>) => {
       return new Promise((resolve, reject) => {
@@ -104,7 +101,7 @@ WorkerDispatcher.prototype = {
 };
 
 function workerHandler(publicInterface: Object) {
-  return function(msg: Message) {
+  return function (msg: Message) {
     const { id, method, calls } = (msg.data: any);
 
     Promise.all(

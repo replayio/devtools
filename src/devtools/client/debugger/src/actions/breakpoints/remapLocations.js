@@ -13,17 +13,13 @@ export default function remapLocations(
   sourceId: string,
   sourceMaps: SourceMaps
 ) {
-  const sourceBreakpoints: Promise<Breakpoint>[] = breakpoints.map(
-    async breakpoint => {
-      if (breakpoint.location.sourceId !== sourceId) {
-        return breakpoint;
-      }
-      const location = await sourceMaps.getOriginalLocation(
-        breakpoint.location
-      );
-      return { ...breakpoint, location };
+  const sourceBreakpoints: Promise<Breakpoint>[] = breakpoints.map(async breakpoint => {
+    if (breakpoint.location.sourceId !== sourceId) {
+      return breakpoint;
     }
-  );
+    const location = await sourceMaps.getOriginalLocation(breakpoint.location);
+    return { ...breakpoint, location };
+  });
 
   return Promise.all(sourceBreakpoints);
 }

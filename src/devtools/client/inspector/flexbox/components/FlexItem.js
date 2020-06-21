@@ -8,11 +8,7 @@ const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
-loader.lazyRequireGetter(
-  this,
-  "getNodeRep",
-  "devtools/client/inspector/shared/node-reps"
-);
+loader.lazyRequireGetter(this, "getNodeRep", "devtools/client/inspector/shared/node-reps");
 
 const Types = require("devtools/client/inspector/flexbox/types");
 

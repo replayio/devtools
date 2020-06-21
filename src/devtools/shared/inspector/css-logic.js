@@ -98,7 +98,7 @@ exports.l10n = name => styleInspectorL10N.getStr(name);
  * @return {boolean} true if the given stylesheet is an author stylesheet,
  * false otherwise.
  */
-exports.isAuthorStylesheet = function(sheet) {
+exports.isAuthorStylesheet = function (sheet) {
   return sheet.parsingMode === "author";
 };
 
@@ -109,7 +109,7 @@ exports.isAuthorStylesheet = function(sheet) {
  * @return {boolean} true if the given stylesheet is a user stylesheet,
  * false otherwise.
  */
-exports.isUserStylesheet = function(sheet) {
+exports.isUserStylesheet = function (sheet) {
   return sheet.parsingMode === "user";
 };
 
@@ -120,7 +120,7 @@ exports.isUserStylesheet = function(sheet) {
  * @return {boolean} true if the given stylesheet is a agent stylesheet,
  * false otherwise.
  */
-exports.isAgentStylesheet = function(sheet) {
+exports.isAgentStylesheet = function (sheet) {
   return sheet.parsingMode === "agent";
 };
 
@@ -129,7 +129,7 @@ exports.isAgentStylesheet = function(sheet) {
  *
  * @param {CSSStyleSheet} sheet the DOM object for the style sheet.
  */
-exports.shortSource = function(sheet) {
+exports.shortSource = function (sheet) {
   // Use a string like "inline" if there is no source href
   if (!sheet || !sheet.href) {
     return exports.l10n("rule.sourceInline");
@@ -217,10 +217,7 @@ function prettifyCSS(text, ruleCount) {
   // before and after). Remove those first. Don't do anything there aren't any.
   const trimmed = text.trim();
   if (trimmed.startsWith("<!--")) {
-    text = trimmed
-      .replace(/^<!--/, "")
-      .replace(/-->$/, "")
-      .trim();
+    text = trimmed.replace(/^<!--/, "").replace(/-->$/, "").trim();
   }
 
   const originalText = text;
@@ -583,7 +580,7 @@ function findNodeAndContainer(node) {
  *   - ele.containingDocOrShadow.querySelector(reply) === ele
  *   - ele.containingDocOrShadow.querySelectorAll(reply).length === 1
  */
-const findCssSelector = function(ele) {
+const findCssSelector = function (ele) {
   const { node, containingDocOrShadow } = findNodeAndContainer(ele);
   ele = node;
 
@@ -595,10 +592,7 @@ const findCssSelector = function(ele) {
   const cssEscape = ele.ownerGlobal.CSS.escape;
 
   // document.querySelectorAll("#id") returns multiple if elements share an ID
-  if (
-    ele.id &&
-    containingDocOrShadow.querySelectorAll("#" + cssEscape(ele.id)).length === 1
-  ) {
+  if (ele.id && containingDocOrShadow.querySelectorAll("#" + cssEscape(ele.id)).length === 1) {
     return "#" + cssEscape(ele.id);
   }
 
@@ -682,7 +676,7 @@ function getSelectorParent(node) {
  *         document. The selectors are ordered starting with the root document and
  *         ending with the deepest nested frame or shadow root.
  */
-const findAllCssSelectors = function(node) {
+const findAllCssSelectors = function (node) {
   const selectors = [];
   while (node) {
     selectors.unshift(findCssSelector(node));
@@ -780,10 +774,7 @@ function getXPath(ele) {
     let sibling = ele.previousSibling;
     while (sibling) {
       // Ignore document type declaration.
-      if (
-        sibling.nodeType !== nodeGlobal.DOCUMENT_TYPE_NODE &&
-        sibling.nodeName == ele.nodeName
-      ) {
+      if (sibling.nodeType !== nodeGlobal.DOCUMENT_TYPE_NODE && sibling.nodeName == ele.nodeName) {
         nbOfPreviousSiblings++;
       }
 
@@ -801,10 +792,7 @@ function getXPath(ele) {
     }
 
     const prefix = ele.prefix ? ele.prefix + ":" : "";
-    const nth =
-      nbOfPreviousSiblings || hasNextSiblings
-        ? `[${nbOfPreviousSiblings + 1}]`
-        : "";
+    const nth = nbOfPreviousSiblings || hasNextSiblings ? `[${nbOfPreviousSiblings + 1}]` : "";
 
     parts.push(prefix + ele.localName + nth);
 

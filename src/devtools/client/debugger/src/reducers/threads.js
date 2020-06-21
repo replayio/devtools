@@ -102,10 +102,7 @@ export function getDebuggeeUrl(state: OuterState): string {
 export const getAllThreads: Selector<Thread[]> = createSelector(
   getMainThread,
   getThreads,
-  (mainThread, threads) => [
-    mainThread,
-    ...sortBy(threads, thread => thread.name),
-  ]
+  (mainThread, threads) => [mainThread, ...sortBy(threads, thread => thread.name)]
 );
 
 export function getCanRewind(state: State) {

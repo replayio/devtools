@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'babel-plugin-transform-imports' {
+declare module "babel-plugin-transform-imports" {
   declare module.exports: any;
 }
 
@@ -22,31 +22,31 @@ declare module 'babel-plugin-transform-imports' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'babel-plugin-transform-imports/test/invalidTransform' {
+declare module "babel-plugin-transform-imports/test/invalidTransform" {
   declare module.exports: any;
 }
 
-declare module 'babel-plugin-transform-imports/test/tests' {
+declare module "babel-plugin-transform-imports/test/tests" {
   declare module.exports: any;
 }
 
-declare module 'babel-plugin-transform-imports/test/transform' {
+declare module "babel-plugin-transform-imports/test/transform" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'babel-plugin-transform-imports/index' {
-  declare module.exports: $Exports<'babel-plugin-transform-imports'>;
+declare module "babel-plugin-transform-imports/index" {
+  declare module.exports: $Exports<"babel-plugin-transform-imports">;
 }
-declare module 'babel-plugin-transform-imports/index.js' {
-  declare module.exports: $Exports<'babel-plugin-transform-imports'>;
+declare module "babel-plugin-transform-imports/index.js" {
+  declare module.exports: $Exports<"babel-plugin-transform-imports">;
 }
-declare module 'babel-plugin-transform-imports/test/invalidTransform.js' {
-  declare module.exports: $Exports<'babel-plugin-transform-imports/test/invalidTransform'>;
+declare module "babel-plugin-transform-imports/test/invalidTransform.js" {
+  declare module.exports: $Exports<"babel-plugin-transform-imports/test/invalidTransform">;
 }
-declare module 'babel-plugin-transform-imports/test/tests.js' {
-  declare module.exports: $Exports<'babel-plugin-transform-imports/test/tests'>;
+declare module "babel-plugin-transform-imports/test/tests.js" {
+  declare module.exports: $Exports<"babel-plugin-transform-imports/test/tests">;
 }
-declare module 'babel-plugin-transform-imports/test/transform.js' {
-  declare module.exports: $Exports<'babel-plugin-transform-imports/test/transform'>;
+declare module "babel-plugin-transform-imports/test/transform.js" {
+  declare module.exports: $Exports<"babel-plugin-transform-imports/test/transform">;
 }

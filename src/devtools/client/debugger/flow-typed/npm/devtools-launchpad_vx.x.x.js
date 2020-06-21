@@ -271,9 +271,7 @@ declare module "devtools-launchpad/src/client/chrome.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/client/chrome">;
 }
 declare module "devtools-launchpad/src/client/firefox-types.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/client/firefox-types"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/client/firefox-types">;
 }
 declare module "devtools-launchpad/src/client/firefox.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/client/firefox">;
@@ -285,22 +283,16 @@ declare module "devtools-launchpad/src/client/types.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/client/types">;
 }
 declare module "devtools-launchpad/src/components/LandingPage.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/components/LandingPage"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/components/LandingPage">;
 }
 declare module "devtools-launchpad/src/components/LaunchpadApp.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/components/LaunchpadApp"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/components/LaunchpadApp">;
 }
 declare module "devtools-launchpad/src/components/Root.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/components/Root">;
 }
 declare module "devtools-launchpad/src/components/Settings.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/components/Settings"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/components/Settings">;
 }
 declare module "devtools-launchpad/src/components/Sidebar.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/components/Sidebar">;
@@ -339,37 +331,25 @@ declare module "devtools-launchpad/src/server/launch.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/server/launch">;
 }
 declare module "devtools-launchpad/src/server/utils/firefox.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/server/utils/firefox"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/server/utils/firefox">;
 }
 declare module "devtools-launchpad/src/tools/index.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/tools/index">;
 }
 declare module "devtools-launchpad/src/tools/mc/make-bundle.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/tools/mc/make-bundle"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/tools/mc/make-bundle">;
 }
 declare module "devtools-launchpad/src/tools/mc/symlink-tests.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/tools/mc/symlink-tests"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/tools/mc/symlink-tests">;
 }
 declare module "devtools-launchpad/src/tools/tests/webpack.config.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/tools/tests/webpack.config"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/tools/tests/webpack.config">;
 }
 declare module "devtools-launchpad/src/tools/utils/copy-file.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/tools/utils/copy-file"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/tools/utils/copy-file">;
 }
 declare module "devtools-launchpad/src/tools/utils/process-handler.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/tools/utils/process-handler"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/tools/utils/process-handler">;
 }
 declare module "devtools-launchpad/src/utils/assert.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/utils/assert">;
@@ -384,14 +364,10 @@ declare module "devtools-launchpad/src/utils/defer.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/utils/defer">;
 }
 declare module "devtools-launchpad/src/utils/DevToolsUtils.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/utils/DevToolsUtils"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/utils/DevToolsUtils">;
 }
 declare module "devtools-launchpad/src/utils/event-emitter.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/utils/event-emitter"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/utils/event-emitter">;
 }
 declare module "devtools-launchpad/src/utils/fromJS.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/utils/fromJS">;
@@ -400,37 +376,25 @@ declare module "devtools-launchpad/src/utils/L10N.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/utils/L10N">;
 }
 declare module "devtools-launchpad/src/utils/redux/middleware/history.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/utils/redux/middleware/history"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/utils/redux/middleware/history">;
 }
 declare module "devtools-launchpad/src/utils/redux/middleware/log.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/utils/redux/middleware/log"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/utils/redux/middleware/log">;
 }
 declare module "devtools-launchpad/src/utils/redux/middleware/promise.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/utils/redux/middleware/promise"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/utils/redux/middleware/promise">;
 }
 declare module "devtools-launchpad/src/utils/redux/middleware/thunk.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/utils/redux/middleware/thunk"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/utils/redux/middleware/thunk">;
 }
 declare module "devtools-launchpad/src/utils/redux/middleware/wait-service.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/src/utils/redux/middleware/wait-service"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/src/utils/redux/middleware/wait-service">;
 }
 declare module "devtools-launchpad/src/utils/utils.js" {
   declare module.exports: $Exports<"devtools-launchpad/src/utils/utils">;
 }
 declare module "devtools-launchpad/webpack.config.devtools.js" {
-  declare module.exports: $Exports<
-    "devtools-launchpad/webpack.config.devtools"
-  >;
+  declare module.exports: $Exports<"devtools-launchpad/webpack.config.devtools">;
 }
 declare module "devtools-launchpad/webpack.config.js" {
   declare module.exports: $Exports<"devtools-launchpad/webpack.config">;

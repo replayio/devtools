@@ -11,12 +11,7 @@
 
 import { isFulfilled } from "../utils/async-value";
 import { findSourceMatches } from "../workers/search";
-import {
-  getSource,
-  hasPrettySource,
-  getSourceList,
-  getSourceContent,
-} from "../selectors";
+import { getSource, hasPrettySource, getSourceList, getSourceContent } from "../selectors";
 import { isThirdParty } from "../utils/source";
 import { loadSourceText } from "./sources/loadSourceText";
 import {
@@ -27,19 +22,13 @@ import {
 
 import type { Action, ThunkArgs } from "./types";
 import type { Context } from "../types";
-import type {
-  SearchOperation,
-  StatusType,
-} from "../reducers/project-text-search";
+import type { SearchOperation, StatusType } from "../reducers/project-text-search";
 
 export function addSearchQuery(cx: Context, query: string): Action {
   return { type: "ADD_QUERY", cx, query };
 }
 
-export function addOngoingSearch(
-  cx: Context,
-  ongoingSearch: SearchOperation
-): Action {
+export function addOngoingSearch(cx: Context, ongoingSearch: SearchOperation): Action {
   return { type: "ADD_ONGOING_SEARCH", cx, ongoingSearch };
 }
 

@@ -39,8 +39,7 @@ class WebConsole {
     EventEmitter.decorate(this);
   }
 
-  recordEvent(event, extra = {}) {
-  }
+  recordEvent(event, extra = {}) {}
 
   get currentTarget() {
     return this.toolbox.target;
@@ -254,9 +253,7 @@ class WebConsole {
       return this._parserService;
     }
 
-    const {
-      ParserDispatcher,
-    } = require("devtools/client/debugger/src/workers/parser/index");
+    const { ParserDispatcher } = require("devtools/client/debugger/src/workers/parser/index");
 
     this._parserService = new ParserDispatcher();
     this._parserService.start(
@@ -291,12 +288,7 @@ class WebConsole {
 
   async onViewSourceInDebugger(frame) {
     if (this.toolbox) {
-      await this.toolbox.viewSourceInDebugger(
-        frame.url,
-        frame.line,
-        frame.column,
-        frame.scriptId
-      );
+      await this.toolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.scriptId);
 
       this.recordEvent("jump_to_source");
       this.emitForTests("source-in-debugger-opened");
@@ -307,11 +299,7 @@ class WebConsole {
     if (!this.toolbox) {
       return;
     }
-    await this.toolbox.viewSourceInStyleEditor(
-      frame.url,
-      frame.line,
-      frame.column
-    );
+    await this.toolbox.viewSourceInStyleEditor(frame.url, frame.line, frame.column);
     this.recordEvent("jump_to_source");
   }
 
@@ -350,19 +338,13 @@ class WebConsole {
       return;
     }
 
-    const onSelectInspector = this.toolbox.selectTool(
-      "inspector",
-      "inspect_dom"
-    );
+    const onSelectInspector = this.toolbox.selectTool("inspector", "inspect_dom");
 
     const onNodeFront = this.toolbox.target
       .getFront("inspector")
       .then(inspectorFront => inspectorFront.getNodeFrontFromNodeGrip(grip));
 
-    const [nodeFront, inspectorPanel] = await Promise.all([
-      onNodeFront,
-      onSelectInspector,
-    ]);
+    const [nodeFront, inspectorPanel] = await Promise.all([onNodeFront, onSelectInspector]);
 
     const onInspectorUpdated = inspectorPanel.once("inspector-updated");
     const onNodeFrontSet = this.toolbox.selection.setNodeFront(nodeFront, {

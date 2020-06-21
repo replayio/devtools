@@ -93,19 +93,43 @@ function NotAllowed() {
 }
 
 const DisallowEverythingProxyHandler = {
-  getPrototypeOf() { NotAllowed(); },
-  has() { NotAllowed(); },
-  get(_, name) { NotAllowed(); },
+  getPrototypeOf() {
+    NotAllowed();
+  },
+  has() {
+    NotAllowed();
+  },
+  get(_, name) {
+    NotAllowed();
+  },
   //set() { NotAllowed(); },
-  apply() { NotAllowed(); },
-  construct() { NotAllowed(); },
-  getOwnPropertyDescriptor() { NotAllowed(); },
-  ownKeys() { NotAllowed(); },
-  isExtensible() { NotAllowed(); },
-  setPrototypeOf() { NotAllowed(); },
-  preventExtensions() { NotAllowed(); },
-  defineProperty() { NotAllowed(); },
-  deleteProperty() { NotAllowed(); },
+  apply() {
+    NotAllowed();
+  },
+  construct() {
+    NotAllowed();
+  },
+  getOwnPropertyDescriptor() {
+    NotAllowed();
+  },
+  ownKeys() {
+    NotAllowed();
+  },
+  isExtensible() {
+    NotAllowed();
+  },
+  setPrototypeOf() {
+    NotAllowed();
+  },
+  preventExtensions() {
+    NotAllowed();
+  },
+  defineProperty() {
+    NotAllowed();
+  },
+  deleteProperty() {
+    NotAllowed();
+  },
 };
 
 const EventEmitter = {

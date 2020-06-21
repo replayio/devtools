@@ -20,12 +20,7 @@ const { extend } = require("devtools/shared/extend");
  *         The node to display.
  */
 function MarkupReadOnlyContainer(markupView, node) {
-  MarkupContainer.prototype.initialize.call(
-    this,
-    markupView,
-    node,
-    "readonlycontainer"
-  );
+  MarkupContainer.prototype.initialize.call(this, markupView, node, "readonlycontainer");
 
   this.editor = new ReadOnlyEditor(this, node);
   this.tagLine.appendChild(this.editor.elt);

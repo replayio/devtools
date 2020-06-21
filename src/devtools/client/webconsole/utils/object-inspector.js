@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  createElement,
-} = require("react");
+const { createFactory, createElement } = require("react");
 
 const reps = require("devtools/client/debugger/packages/devtools-reps/src");
 const { REPS, MODE } = reps;
@@ -30,11 +27,7 @@ const { ObjectFront } = require("protocol/thread");
  * @returns {ObjectInspector}
  *        An ObjectInspector for the given grip.
  */
-function getObjectInspector(
-  frontOrPrimitiveGrip,
-  serviceContainer,
-  override = {}
-) {
+function getObjectInspector(frontOrPrimitiveGrip, serviceContainer, override = {}) {
   let onDOMNodeMouseOver;
   let onDOMNodeMouseOut;
   let onInspectIconClick;
@@ -48,10 +41,10 @@ function getObjectInspector(
       : null;
     onInspectIconClick = serviceContainer.openNodeInInspector
       ? (object, e) => {
-        // Stop the event propagation so we don't trigger ObjectInspector expand/collapse.
-        e.stopPropagation();
-        serviceContainer.openNodeInInspector(object);
-      }
+          // Stop the event propagation so we don't trigger ObjectInspector expand/collapse.
+          e.stopPropagation();
+          serviceContainer.openNodeInInspector(object);
+        }
       : null;
   }
 
@@ -70,14 +63,11 @@ function getObjectInspector(
         key: "stacktrace",
         stacktrace,
         onViewSourceInDebugger: serviceContainer
-          ? serviceContainer.onViewSourceInDebugger ||
-          serviceContainer.onViewSource
+          ? serviceContainer.onViewSourceInDebugger || serviceContainer.onViewSource
           : null,
         onViewSource: serviceContainer.onViewSource,
         onReady: override.maybeScrollToBottom,
-        sourceMapService: serviceContainer
-          ? serviceContainer.sourceMapService
-          : null,
+        sourceMapService: serviceContainer ? serviceContainer.sourceMapService : null,
       }),
   };
 

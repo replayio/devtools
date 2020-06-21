@@ -5,14 +5,9 @@
 "use strict";
 
 // React & Redux
-const {
-  createElement,
-  createFactory,
-} = require("react");
+const { createElement, createFactory } = require("react");
 const PropTypes = require("prop-types");
-const Message = createFactory(
-  require("devtools/client/webconsole/components/Output/Message")
-);
+const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
 
 ConsoleCommand.displayName = "ConsoleCommand";
 
@@ -27,13 +22,7 @@ ConsoleCommand.propTypes = {
  * Displays input from the console.
  */
 function ConsoleCommand(props) {
-  const {
-    message,
-    timestampsVisible,
-    serviceContainer,
-    maybeScrollToBottom,
-    isPaused,
-  } = props;
+  const { message, timestampsVisible, serviceContainer, maybeScrollToBottom, isPaused } = props;
 
   const { indent, source, type, level, timeStamp } = message;
   const messageText = trimCode(message.messageText);

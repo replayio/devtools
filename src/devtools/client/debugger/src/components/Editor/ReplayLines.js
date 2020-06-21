@@ -4,11 +4,7 @@
 
 // @flow
 import { PureComponent } from "react";
-import {
-  toEditorPosition,
-  getDocument,
-  hasDocument,
-} from "../../utils/editor";
+import { toEditorPosition, getDocument, hasDocument } from "../../utils/editor";
 import { connect } from "../../utils/connect";
 import { getFramePositions } from "../../selectors";
 import actions from "../../actions";
@@ -76,7 +72,9 @@ export class ReplayLines extends PureComponent<Props> {
 
       const widget = jumpButton.cloneNode(true);
       widget.className = "line-jump";
-      widget.onclick = () => { this.props.seekToPosition(point, time) };
+      widget.onclick = () => {
+        this.props.seekToPosition(point, time);
+      };
 
       const jump = doc.setBookmark({ line, ch: 0 }, { widget });
       this.jumps.push({ jump, line });
@@ -131,13 +129,13 @@ export class ReplayLines extends PureComponent<Props> {
 }
 
 const mapStateToProps = state => {
-  const { positions, unexecuted } = getFramePositions(state) || { positions: [], unexecuted: [] };
+  const { positions, unexecuted } = getFramePositions(state) || {
+    positions: [],
+    unexecuted: [],
+  };
   return { positions, unexecuted };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    seekToPosition: actions.seekToPosition,
-  }
-)(ReplayLines);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  seekToPosition: actions.seekToPosition,
+})(ReplayLines);

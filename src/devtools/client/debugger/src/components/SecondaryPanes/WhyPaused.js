@@ -15,11 +15,7 @@ const {
 } = Reps;
 
 import { getPauseReason } from "../../utils/pause";
-import {
-  getCurrentThread,
-  getPaneCollapse,
-  getPauseReason as getWhy,
-} from "../../selectors";
+import { getCurrentThread, getPaneCollapse, getPauseReason as getWhy } from "../../selectors";
 import type { Grip, Why } from "../../types";
 
 import "./WhyPaused.css";
@@ -83,11 +79,7 @@ class WhyPaused extends PureComponent<Props, State> {
 
     if (type === "mutationBreakpoint" && why.nodeGrip) {
       const { nodeGrip, ancestorGrip, action } = why;
-      const {
-        openElementInInspector,
-        highlightDomElement,
-        unHighlightDomElement,
-      } = this.props;
+      const { openElementInInspector, highlightDomElement, unHighlightDomElement } = this.props;
 
       const targetRep = Rep({
         object: nodeGrip,
@@ -165,11 +157,8 @@ const mapStateToProps = state => ({
   why: getWhy(state, getCurrentThread(state)),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    openElementInInspector: actions.openElementInInspectorCommand,
-    highlightDomElement: actions.highlightDomElement,
-    unHighlightDomElement: actions.unHighlightDomElement,
-  }
-)(WhyPaused);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  openElementInInspector: actions.openElementInInspectorCommand,
+  highlightDomElement: actions.highlightDomElement,
+  unHighlightDomElement: actions.unHighlightDomElement,
+})(WhyPaused);

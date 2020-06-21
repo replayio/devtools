@@ -58,11 +58,7 @@ class ReverseSearchInput extends Component {
       focusInput();
     }
 
-    if (
-      prevProps.visible === false &&
-      this.props.visible === true &&
-      this.props.initialValue
-    ) {
+    if (prevProps.visible === false && this.props.visible === true && this.props.initialValue) {
       this.inputNode.value = this.props.initialValue;
     }
   }
@@ -110,28 +106,18 @@ class ReverseSearchInput extends Component {
     const lowerCaseKey = key.toLowerCase();
 
     // On Escape (and Ctrl + c on OSX), we close the reverse search input.
-    if (
-      keyCode === KeyCodes.DOM_VK_ESCAPE ||
-      (isMacOS && ctrlKey && lowerCaseKey === "c")
-    ) {
+    if (keyCode === KeyCodes.DOM_VK_ESCAPE || (isMacOS && ctrlKey && lowerCaseKey === "c")) {
       return this.onEscapeKeyboardShortcut(event);
     }
 
     const canNavigate =
-      Number.isInteger(reverseSearchTotalResults) &&
-      reverseSearchTotalResults > 1;
+      Number.isInteger(reverseSearchTotalResults) && reverseSearchTotalResults > 1;
 
-    if (
-      (!isMacOS && key === "F9" && !shiftKey) ||
-      (isMacOS && ctrlKey && lowerCaseKey === "r")
-    ) {
+    if ((!isMacOS && key === "F9" && !shiftKey) || (isMacOS && ctrlKey && lowerCaseKey === "r")) {
       return this.onBackwardNavigationKeyBoardShortcut(event, canNavigate);
     }
 
-    if (
-      (!isMacOS && key === "F9" && shiftKey) ||
-      (isMacOS && ctrlKey && lowerCaseKey === "s")
-    ) {
+    if ((!isMacOS && key === "F9" && shiftKey) || (isMacOS && ctrlKey && lowerCaseKey === "s")) {
       return this.onForwardNavigationKeyBoardShortcut(event, canNavigate);
     }
 
@@ -139,10 +125,7 @@ class ReverseSearchInput extends Component {
   }
 
   renderSearchInformation() {
-    const {
-      reverseSearchTotalResults,
-      reverseSearchResultPosition,
-    } = this.props;
+    const { reverseSearchTotalResults, reverseSearchResultPosition } = this.props;
 
     if (!Number.isInteger(reverseSearchTotalResults)) {
       return null;
@@ -164,10 +147,7 @@ class ReverseSearchInput extends Component {
   renderNavigationButtons() {
     const { dispatch, reverseSearchTotalResults } = this.props;
 
-    if (
-      !Number.isInteger(reverseSearchTotalResults) ||
-      reverseSearchTotalResults <= 1
-    ) {
+    if (!Number.isInteger(reverseSearchTotalResults) || reverseSearchTotalResults <= 1) {
       return null;
     }
 
@@ -175,10 +155,9 @@ class ReverseSearchInput extends Component {
       dom.button({
         key: "search-result-button-prev",
         className: "devtools-button search-result-button-prev",
-        title: l10n.getFormatStr(
-          "webconsole.reverseSearch.result.previousButton.tooltip",
-          [isMacOS ? "Ctrl + R" : "F9"]
-        ),
+        title: l10n.getFormatStr("webconsole.reverseSearch.result.previousButton.tooltip", [
+          isMacOS ? "Ctrl + R" : "F9",
+        ]),
         onClick: () => {
           dispatch(actions.showReverseSearchBack());
           this.inputNode.focus();
@@ -187,10 +166,9 @@ class ReverseSearchInput extends Component {
       dom.button({
         key: "search-result-button-next",
         className: "devtools-button search-result-button-next",
-        title: l10n.getFormatStr(
-          "webconsole.reverseSearch.result.nextButton.tooltip",
-          [isMacOS ? "Ctrl + S" : "Shift + F9"]
-        ),
+        title: l10n.getFormatStr("webconsole.reverseSearch.result.nextButton.tooltip", [
+          isMacOS ? "Ctrl + S" : "Shift + F9",
+        ]),
         onClick: () => {
           dispatch(actions.showReverseSearchNext());
           this.inputNode.focus();
@@ -222,8 +200,7 @@ class ReverseSearchInput extends Component {
         placeholder: l10n.getStr("webconsole.reverseSearch.input.placeHolder"),
         className: "reverse-search-input devtools-monospace",
         onKeyDown: this.onInputKeyDown,
-        onInput: ({ target }) =>
-          dispatch(actions.reverseSearchInputChange(target.value)),
+        onInput: ({ target }) => dispatch(actions.reverseSearchInputChange(target.value)),
       }),
       dom.div(
         {
@@ -233,10 +210,9 @@ class ReverseSearchInput extends Component {
         this.renderNavigationButtons(),
         dom.button({
           className: "devtools-button reverse-search-close-button",
-          title: l10n.getFormatStr(
-            "webconsole.reverseSearch.closeButton.tooltip",
-            ["Esc" + (isMacOS ? " | Ctrl + C" : "")]
-          ),
+          title: l10n.getFormatStr("webconsole.reverseSearch.closeButton.tooltip", [
+            "Esc" + (isMacOS ? " | Ctrl + C" : ""),
+          ]),
           onClick: () => {
             dispatch(actions.reverseSearchInputToggle());
           },
@@ -255,7 +231,4 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({ dispatch });
 
-module.exports = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ReverseSearchInput);
+module.exports = connect(mapStateToProps, mapDispatchToProps)(ReverseSearchInput);

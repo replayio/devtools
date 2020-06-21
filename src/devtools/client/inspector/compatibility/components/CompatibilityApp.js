@@ -5,10 +5,7 @@
 "use strict";
 
 const { connect } = require("react-redux");
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -21,16 +18,12 @@ const IssueList = createFactory(
 class CompatibilityApp extends PureComponent {
   static get propTypes() {
     return {
-      selectedNodeIssues: PropTypes.arrayOf(PropTypes.shape(Types.issue))
-        .isRequired,
+      selectedNodeIssues: PropTypes.arrayOf(PropTypes.shape(Types.issue)).isRequired,
     };
   }
 
   _renderNoIssues() {
-    return dom.div(
-      { className: "devtools-sidepanel-no-result" },
-      "No compatibility issues found."
-    );
+    return dom.div({ className: "devtools-sidepanel-no-result" }, "No compatibility issues found.");
   }
 
   render() {
@@ -40,9 +33,7 @@ class CompatibilityApp extends PureComponent {
       {
         className: "compatibility-app theme-sidebar inspector-tabpanel",
       },
-      selectedNodeIssues.length
-        ? IssueList({ issues: selectedNodeIssues })
-        : this._renderNoIssues()
+      selectedNodeIssues.length ? IssueList({ issues: selectedNodeIssues }) : this._renderNoIssues()
     );
   }
 }

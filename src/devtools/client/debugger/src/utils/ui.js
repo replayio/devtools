@@ -40,9 +40,7 @@ export function resizeBreakpointGutter(editor: Object) {
  * as the line numbers gutter.
  */
 export function resizeToggleButton(editor: Object) {
-  const toggleButton = document.querySelector(
-    ".source-header .toggle-button-start"
-  );
+  const toggleButton = document.querySelector(".source-header .toggle-button-start");
   if (toggleButton) {
     toggleButton.style.width = `${getLineNumberWidth(editor)}px`;
   }

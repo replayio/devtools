@@ -4,29 +4,14 @@
 /* eslint-env browser */
 "use strict";
 
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { scrollIntoView } = require("devtools/client/shared/scroll");
-const {
-  preventDefaultAndStopPropagation,
-} = require("devtools/client/shared/events");
+const { preventDefaultAndStopPropagation } = require("devtools/client/shared/events");
 
-loader.lazyRequireGetter(
-  this,
-  "wrapMoveFocus",
-  "devtools/client/shared/focus",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "getFocusableElements",
-  "devtools/client/shared/focus",
-  true
-);
+loader.lazyRequireGetter(this, "wrapMoveFocus", "devtools/client/shared/focus", true);
+loader.lazyRequireGetter(this, "getFocusableElements", "devtools/client/shared/focus", true);
 
 const AUTO_EXPAND_DEPTH = 0;
 const NUMBER_OF_OFFSCREEN_ITEMS = 1;
@@ -277,12 +262,8 @@ class Tree extends Component {
     this._onScroll = oncePerAnimationFrame(this._onScroll).bind(this);
     this._focusPrevNode = oncePerAnimationFrame(this._focusPrevNode).bind(this);
     this._focusNextNode = oncePerAnimationFrame(this._focusNextNode).bind(this);
-    this._focusParentNode = oncePerAnimationFrame(this._focusParentNode).bind(
-      this
-    );
-    this._focusFirstNode = oncePerAnimationFrame(this._focusFirstNode).bind(
-      this
-    );
+    this._focusParentNode = oncePerAnimationFrame(this._focusParentNode).bind(this);
+    this._focusFirstNode = oncePerAnimationFrame(this._focusFirstNode).bind(this);
     this._focusLastNode = oncePerAnimationFrame(this._focusLastNode).bind(this);
 
     this._autoExpand = this._autoExpand.bind(this);
@@ -345,10 +326,7 @@ class Tree extends Component {
     // not use the usual DFS infrastructure because we don't want to ignore
     // collapsed nodes.
     const autoExpand = (item, currentDepth) => {
-      if (
-        currentDepth >= this.props.autoExpandDepth ||
-        this.state.seen.has(item)
-      ) {
+      if (currentDepth >= this.props.autoExpandDepth || this.state.seen.has(item)) {
         return;
       }
 
@@ -756,12 +734,8 @@ class Tree extends Component {
     // gaps when scrolling quickly.
     const { itemHeight, active, focused } = this.props;
     const { scroll, height } = this.state;
-    const begin = Math.max(
-      ((scroll / itemHeight) | 0) - NUMBER_OF_OFFSCREEN_ITEMS,
-      0
-    );
-    const end =
-      Math.ceil((scroll + height) / itemHeight) + NUMBER_OF_OFFSCREEN_ITEMS;
+    const begin = Math.max(((scroll / itemHeight) | 0) - NUMBER_OF_OFFSCREEN_ITEMS, 0);
+    const end = Math.ceil((scroll + height) / itemHeight) + NUMBER_OF_OFFSCREEN_ITEMS;
     const toRender = traversal.slice(begin, end);
     const topSpacerHeight = begin * itemHeight;
     const bottomSpacerHeight = Math.max(traversal.length - end, 0) * itemHeight;
@@ -805,8 +779,7 @@ class Tree extends Component {
           onCollapse: this._onCollapse,
           // Since the user just clicked the node, there's no need to check if
           // it should be scrolled into view.
-          onClick: () =>
-            this._focus(begin + i, item, { preventAutoScroll: true }),
+          onClick: () => this._focus(begin + i, item, { preventAutoScroll: true }),
         })
       );
     }
@@ -970,11 +943,7 @@ class TreeNodeClass extends Component {
       return;
     }
 
-    const focusMoved = !!wrapMoveFocus(
-      getFocusableElements(this.refs.treenode),
-      target,
-      shiftKey
-    );
+    const focusMoved = !!wrapMoveFocus(getFocusableElements(this.refs.treenode), target, shiftKey);
     if (focusMoved) {
       // Focus was moved to the begining/end of the list, so we need to prevent the
       // default focus change that would happen here.

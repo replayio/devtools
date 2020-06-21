@@ -9,7 +9,7 @@ import type { ThunkArgs } from "../types";
 import { isValidThreadContext } from "../../utils/context";
 
 export function fetchFrames(cx: ThreadContext) {
-  return async function({ dispatch, client, getState }: ThunkArgs) {
+  return async function ({ dispatch, client, getState }: ThunkArgs) {
     const { thread } = cx;
     let frames;
     try {

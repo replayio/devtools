@@ -4,15 +4,10 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 
-const Accordion = createFactory(
-  require("devtools/client/shared/components/Accordion")
-);
+const Accordion = createFactory(require("devtools/client/shared/components/Accordion"));
 
 const Types = require("devtools/client/inspector/extensions/types");
 
@@ -22,19 +17,9 @@ const {
   objectInspector: { ObjectInspector: ObjectInspectorClass },
 } = require("devtools/client/shared/components/reps/reps");
 
-loader.lazyRequireGetter(
-  this,
-  "LongStringFront",
-  "devtools/shared/fronts/string",
-  true
-);
+loader.lazyRequireGetter(this, "LongStringFront", "devtools/shared/fronts/string", true);
 
-loader.lazyRequireGetter(
-  this,
-  "ObjectFront",
-  "devtools/shared/fronts/object",
-  true
-);
+loader.lazyRequireGetter(this, "ObjectFront", "devtools/shared/fronts/object", true);
 
 const ObjectInspector = createFactory(ObjectInspectorClass);
 
@@ -42,11 +27,8 @@ class ObjectValueGripView extends PureComponent {
   static get propTypes() {
     return {
       rootTitle: PropTypes.string,
-      expressionResult: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number,
-        PropTypes.object,
-      ]).isRequired,
+      expressionResult: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object])
+        .isRequired,
       // Helpers injected as props by extension-sidebar.js.
       serviceContainer: PropTypes.shape(Types.serviceContainer).isRequired,
     };
@@ -56,8 +38,7 @@ class ObjectValueGripView extends PureComponent {
     const { expressionResult, serviceContainer, rootTitle } = this.props;
 
     const isFront =
-      expressionResult instanceof ObjectFront ||
-      expressionResult instanceof LongStringFront;
+      expressionResult instanceof ObjectFront || expressionResult instanceof LongStringFront;
     const grip = isFront ? expressionResult.getGrip() : expressionResult;
 
     const objectInspectorProps = {
@@ -68,9 +49,7 @@ class ObjectValueGripView extends PureComponent {
       disabledFocus: true,
       roots: [
         {
-          path:
-            (expressionResult && expressionResult.actorID) ||
-            JSON.stringify(expressionResult),
+          path: (expressionResult && expressionResult.actorID) || JSON.stringify(expressionResult),
           contents: { value: grip, front: isFront ? expressionResult : null },
         },
       ],

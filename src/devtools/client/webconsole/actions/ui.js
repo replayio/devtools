@@ -50,10 +50,7 @@ function contentMessagesToggle() {
       type: SHOW_CONTENT_MESSAGES_TOGGLE,
     });
     const uiState = getAllUi(getState());
-    prefsService.setBoolPref(
-      PREFS.UI.CONTENT_MESSAGES,
-      uiState.showContentMessages
-    );
+    prefsService.setBoolPref(PREFS.UI.CONTENT_MESSAGES, uiState.showContentMessages);
   };
 }
 
@@ -63,10 +60,7 @@ function timestampsToggle() {
       type: TIMESTAMPS_TOGGLE,
     });
     const uiState = getAllUi(getState());
-    prefsService.setBoolPref(
-      PREFS.UI.MESSAGE_TIMESTAMP,
-      uiState.timestampsVisible
-    );
+    prefsService.setBoolPref(PREFS.UI.MESSAGE_TIMESTAMP, uiState.timestampsVisible);
   };
 }
 
@@ -76,10 +70,7 @@ function autocompleteToggle() {
       type: AUTOCOMPLETE_TOGGLE,
     });
     const prefsState = getAllPrefs(getState());
-    prefsService.setBoolPref(
-      PREFS.FEATURES.AUTOCOMPLETE,
-      prefsState.autocomplete
-    );
+    prefsService.setBoolPref(PREFS.FEATURES.AUTOCOMPLETE, prefsState.autocomplete);
   };
 }
 
@@ -89,10 +80,7 @@ function warningGroupsToggle() {
       type: WARNING_GROUPS_TOGGLE,
     });
     const prefsState = getAllPrefs(getState());
-    prefsService.setBoolPref(
-      PREFS.FEATURES.GROUP_WARNINGS,
-      prefsState.groupWarnings
-    );
+    prefsService.setBoolPref(PREFS.FEATURES.GROUP_WARNINGS, prefsState.groupWarnings);
   };
 }
 
@@ -102,10 +90,7 @@ function eagerEvaluationToggle() {
       type: EAGER_EVALUATION_TOGGLE,
     });
     const prefsState = getAllPrefs(getState());
-    prefsService.setBoolPref(
-      PREFS.FEATURES.EAGER_EVALUATION,
-      prefsState.eagerEvaluation
-    );
+    prefsService.setBoolPref(PREFS.FEATURES.EAGER_EVALUATION, prefsState.eagerEvaluation);
   };
 }
 

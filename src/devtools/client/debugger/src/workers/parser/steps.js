@@ -11,10 +11,7 @@ import type { AstPosition } from "./types";
 import { getClosestPath } from "./utils/closest";
 import { isAwaitExpression, isYieldExpression } from "./utils/helpers";
 
-export function getNextStep(
-  sourceId: SourceId,
-  pausedPosition: AstPosition
-): ?SourceLocation {
+export function getNextStep(sourceId: SourceId, pausedPosition: AstPosition): ?SourceLocation {
   const currentExpression = getSteppableExpression(sourceId, pausedPosition);
   if (!currentExpression) {
     return null;
@@ -25,18 +22,13 @@ export function getNextStep(
   });
 
   if (!currentStatement) {
-    throw new Error(
-      "Assertion failure - this should always find at least Program"
-    );
+    throw new Error("Assertion failure - this should always find at least Program");
   }
 
   return _getNextStep(currentStatement, sourceId, pausedPosition);
 }
 
-function getSteppableExpression(
-  sourceId: SourceId,
-  pausedPosition: AstPosition
-) {
+function getSteppableExpression(sourceId: SourceId, pausedPosition: AstPosition) {
   const closestPath = getClosestPath(sourceId, pausedPosition);
 
   if (!closestPath) {
@@ -47,9 +39,7 @@ function getSteppableExpression(
     return closestPath;
   }
 
-  return closestPath.find(
-    p => t.isAwaitExpression(p.node) || t.isYieldExpression(p.node)
-  );
+  return closestPath.find(p => t.isAwaitExpression(p.node) || t.isYieldExpression(p.node));
 }
 
 function _getNextStep(

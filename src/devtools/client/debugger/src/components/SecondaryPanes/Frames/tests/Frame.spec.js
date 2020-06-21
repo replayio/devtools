@@ -7,11 +7,7 @@
 import React from "react";
 import { shallow, mount } from "enzyme";
 import Frame from "../Frame.js";
-import {
-  makeMockFrame,
-  makeMockSource,
-  mockthreadcx,
-} from "../../../../utils/test-mockup";
+import { makeMockFrame, makeMockSource, mockthreadcx } from "../../../../utils/test-mockup";
 
 import FrameMenu from "../FrameMenu";
 jest.mock("../FrameMenu", () => jest.fn());
@@ -69,9 +65,7 @@ describe("Frame", () => {
   });
 
   it("filename only", () => {
-    const source = makeMockSource(
-      "https://firefox.com/assets/src/js/foo-view.js"
-    );
+    const source = makeMockSource("https://firefox.com/assets/src/js/foo-view.js");
     const frame = makeMockFrame("1", source, undefined, 10, "renderFoo");
 
     const props = frameProperties(frame, null);
@@ -97,9 +91,7 @@ describe("Frame", () => {
 
     const props = frameProperties(frame);
     const component = mount(<Frame {...props} />, { context: { l10n: L10N } });
-    expect(component.find(".location-async-cause").text()).toBe(
-      `    (Async: setTimeout handler)`
-    );
+    expect(component.find(".location-async-cause").text()).toBe(`    (Async: setTimeout handler)`);
   });
 
   it("getFrameTitle", () => {
@@ -129,12 +121,7 @@ describe("Frame", () => {
 
     it("calls FrameMenu on right click", () => {
       const { component, props } = render();
-      const {
-        copyStackTrace,
-        toggleFrameworkGrouping,
-        toggleBlackBox,
-        cx,
-      } = props;
+      const { copyStackTrace, toggleFrameworkGrouping, toggleBlackBox, cx } = props;
       const mockEvent = "mockEvent";
       component.simulate("contextmenu", mockEvent);
 

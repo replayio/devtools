@@ -5,10 +5,7 @@
 "use strict";
 
 // React & Redux
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -22,10 +19,7 @@ const Services = require("Services");
 const isMacOS = Services.appinfo.OS === "Darwin";
 
 // Constants used for defining the direction of JSTerm input history navigation.
-const {
-  HISTORY_BACK,
-  HISTORY_FORWARD,
-} = require("devtools/client/webconsole/constants");
+const { HISTORY_BACK, HISTORY_FORWARD } = require("devtools/client/webconsole/constants");
 
 class EditorToolbar extends Component {
   static get propTypes() {
@@ -42,9 +36,7 @@ class EditorToolbar extends Component {
   constructor(props) {
     super(props);
 
-    this.onReverseSearchButtonClick = this.onReverseSearchButtonClick.bind(
-      this
-    );
+    this.onReverseSearchButtonClick = this.onReverseSearchButtonClick.bind(this);
   }
 
   onReverseSearchButtonClick(event) {
@@ -59,10 +51,7 @@ class EditorToolbar extends Component {
   }
 
   renderEvaluationSelector() {
-    if (
-      !this.props.webConsoleUI.wrapper.toolbox ||
-      !this.props.showEvaluationSelector
-    ) {
+    if (!this.props.webConsoleUI.wrapper.toolbox || !this.props.showEvaluationSelector) {
       return null;
     }
 
@@ -72,12 +61,7 @@ class EditorToolbar extends Component {
   }
 
   render() {
-    const {
-      editorMode,
-      dispatch,
-      reverseSearchInputVisible,
-      webConsoleUI,
-    } = this.props;
+    const { editorMode, dispatch, reverseSearchInputVisible, webConsoleUI } = this.props;
 
     if (!editorMode) {
       return null;
@@ -87,37 +71,29 @@ class EditorToolbar extends Component {
 
     return dom.div(
       {
-        className:
-          "devtools-toolbar devtools-input-toolbar webconsole-editor-toolbar",
+        className: "devtools-toolbar devtools-input-toolbar webconsole-editor-toolbar",
       },
       dom.button(
         {
           className: "devtools-button webconsole-editor-toolbar-executeButton",
-          title: l10n.getFormatStr(
-            "webconsole.editor.toolbar.executeButton.tooltip",
-            [isMacOS ? `Cmd + ${enterStr}` : `Ctrl + ${enterStr}`]
-          ),
+          title: l10n.getFormatStr("webconsole.editor.toolbar.executeButton.tooltip", [
+            isMacOS ? `Cmd + ${enterStr}` : `Ctrl + ${enterStr}`,
+          ]),
           onClick: () => dispatch(actions.evaluateExpression()),
         },
         l10n.getStr("webconsole.editor.toolbar.executeButton.label")
       ),
       this.renderEvaluationSelector(),
       dom.button({
-        className:
-          "devtools-button webconsole-editor-toolbar-history-prevExpressionButton",
-        title: l10n.getStr(
-          "webconsole.editor.toolbar.history.prevExpressionButton.tooltip"
-        ),
+        className: "devtools-button webconsole-editor-toolbar-history-prevExpressionButton",
+        title: l10n.getStr("webconsole.editor.toolbar.history.prevExpressionButton.tooltip"),
         onClick: () => {
           webConsoleUI.jsterm.historyPeruse(HISTORY_BACK);
         },
       }),
       dom.button({
-        className:
-          "devtools-button webconsole-editor-toolbar-history-nextExpressionButton",
-        title: l10n.getStr(
-          "webconsole.editor.toolbar.history.nextExpressionButton.tooltip"
-        ),
+        className: "devtools-button webconsole-editor-toolbar-history-nextExpressionButton",
+        title: l10n.getStr("webconsole.editor.toolbar.history.nextExpressionButton.tooltip"),
         onClick: () => {
           webConsoleUI.jsterm.historyPeruse(HISTORY_FORWARD);
         },
@@ -125,28 +101,26 @@ class EditorToolbar extends Component {
       dom.button({
         className: `devtools-button webconsole-editor-toolbar-reverseSearchButton ${
           reverseSearchInputVisible ? "checked" : ""
-          }`,
+        }`,
         title: reverseSearchInputVisible
           ? l10n.getFormatStr(
-            "webconsole.editor.toolbar.reverseSearchButton.closeReverseSearch.tooltip",
-            ["Esc" + (isMacOS ? " | Ctrl + C" : "")]
-          )
+              "webconsole.editor.toolbar.reverseSearchButton.closeReverseSearch.tooltip",
+              ["Esc" + (isMacOS ? " | Ctrl + C" : "")]
+            )
           : l10n.getFormatStr(
-            "webconsole.editor.toolbar.reverseSearchButton.openReverseSearch.tooltip",
-            [isMacOS ? "Ctrl + R" : "F9"]
-          ),
+              "webconsole.editor.toolbar.reverseSearchButton.openReverseSearch.tooltip",
+              [isMacOS ? "Ctrl + R" : "F9"]
+            ),
         onClick: this.onReverseSearchButtonClick,
       }),
       dom.div({
-        className:
-          "devtools-separator webconsole-editor-toolbar-historyNavSeparator",
+        className: "devtools-separator webconsole-editor-toolbar-historyNavSeparator",
       }),
       dom.button({
         className: "devtools-button webconsole-editor-toolbar-closeButton",
-        title: l10n.getFormatStr(
-          "webconsole.editor.toolbar.closeButton.tooltip2",
-          [isMacOS ? "Cmd + B" : "Ctrl + B"]
-        ),
+        title: l10n.getFormatStr("webconsole.editor.toolbar.closeButton.tooltip2", [
+          isMacOS ? "Cmd + B" : "Ctrl + B",
+        ]),
         onClick: () => dispatch(actions.editorToggle()),
       })
     );

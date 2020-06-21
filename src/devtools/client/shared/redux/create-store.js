@@ -9,12 +9,8 @@ const {
   applyMiddleware,
 } = require("devtools/client/shared/vendor/redux");
 const { thunk } = require("devtools/client/shared/redux/middleware/thunk");
-const {
-  thunkWithOptions,
-} = require("devtools/client/shared/redux/middleware/thunk-with-options");
-const {
-  waitUntilService,
-} = require("devtools/client/shared/redux/middleware/wait-service");
+const { thunkWithOptions } = require("devtools/client/shared/redux/middleware/thunk-with-options");
+const { waitUntilService } = require("devtools/client/shared/redux/middleware/wait-service");
 const { task } = require("devtools/client/shared/redux/middleware/task");
 const { promise } = require("devtools/client/shared/redux/middleware/promise");
 const flags = require("devtools/shared/flags");
@@ -81,15 +77,9 @@ const createStoreWithMiddleware = (opts = {}) => {
 
 module.exports = (
   reducers,
-  {
-    shouldLog = false,
-    initialState = undefined,
-    thunkOptions,
-    enableTaskMiddleware = false,
-  } = {}
+  { shouldLog = false, initialState = undefined, thunkOptions, enableTaskMiddleware = false } = {}
 ) => {
-  const reducer =
-    typeof reducers === "function" ? reducers : combineReducers(reducers);
+  const reducer = typeof reducers === "function" ? reducers : combineReducers(reducers);
 
   let historyEntries;
 

@@ -21,9 +21,7 @@ const {
   setupActions,
   setupStore,
 } = require("devtools/client/webconsole/test/node/helpers");
-const {
-  stubPackets,
-} = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
+const { stubPackets } = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
 
 const expect = require("expect");
 
@@ -60,10 +58,7 @@ describe("private messages", () => {
     const { dispatch, getState } = setupStore();
 
     dispatch(
-      actions.messagesAdd([
-        getPrivatePacket("console.trace()"),
-        stubPackets.get("console.trace()"),
-      ])
+      actions.messagesAdd([getPrivatePacket("console.trace()"), stubPackets.get("console.trace()")])
     );
 
     let state = getState();
@@ -114,18 +109,8 @@ describe("private messages", () => {
 
     const privateTableData = Symbol("privateTableData");
     const publicTableData = Symbol("publicTableData");
-    dispatch(
-      actions.messageUpdatePayload(
-        getFirstMessage(getState()).id,
-        privateTableData
-      )
-    );
-    dispatch(
-      actions.messageUpdatePayload(
-        getLastMessage(getState()).id,
-        publicTableData
-      )
-    );
+    dispatch(actions.messageUpdatePayload(getFirstMessage(getState()).id, privateTableData));
+    dispatch(actions.messageUpdatePayload(getLastMessage(getState()).id, publicTableData));
 
     let state = getState();
     expect(getAllMessagesPayloadById(state).size).toBe(2);
@@ -134,18 +119,15 @@ describe("private messages", () => {
 
     state = getState();
     expect(getAllMessagesPayloadById(state).size).toBe(1);
-    expect(
-      getAllMessagesPayloadById(state).get(getFirstMessage(getState()).id)
-    ).toBe(publicTableData);
+    expect(getAllMessagesPayloadById(state).get(getFirstMessage(getState()).id)).toBe(
+      publicTableData
+    );
   });
 
   it("cleans group properties on PRIVATE_MESSAGES_CLEAR action", () => {
     const { dispatch, getState } = setupStore();
     dispatch(
-      actions.messagesAdd([
-        stubPackets.get("console.group()"),
-        getPrivatePacket("console.group()"),
-      ])
+      actions.messagesAdd([stubPackets.get("console.group()"), getPrivatePacket("console.group()")])
     );
 
     let state = getState();
@@ -190,13 +172,11 @@ describe("private messages", () => {
   it("releases private backend actors on PRIVATE_MESSAGES_CLEAR action", () => {
     const releasedActors = [];
     const { dispatch, getState } = setupStore([]);
-    const mockFrontRelease = function() {
+    const mockFrontRelease = function () {
       releasedActors.push(this.actorID);
     };
 
-    const publicPacket = stubPackets.get(
-      "console.log('myarray', ['red', 'green', 'blue'])"
-    );
+    const publicPacket = stubPackets.get("console.log('myarray', ['red', 'green', 'blue'])");
     const privatePacket = getPrivatePacket("console.log('mymap')");
 
     publicPacket.message.arguments[1].release = mockFrontRelease;

@@ -33,10 +33,7 @@ export const createExpressionState = () => ({
   currentAutocompleteInput: null,
 });
 
-function update(
-  state: ExpressionState = createExpressionState(),
-  action: Action
-): ExpressionState {
+function update(state: ExpressionState = createExpressionState(), action: Action): ExpressionState {
   switch (action.type) {
     case "ADD_EXPRESSION":
       if (action.expressionError) {
@@ -127,11 +124,7 @@ function appendExpressionToList(state: ExpressionState, value: any) {
   return newState;
 }
 
-function updateExpressionInList(
-  state: ExpressionState,
-  key: string,
-  value: any
-) {
+function updateExpressionInList(state: ExpressionState, key: string, value: any) {
   const list = [...state.expressions];
   const index = list.findIndex(e => e.input == key);
   list[index] = value;

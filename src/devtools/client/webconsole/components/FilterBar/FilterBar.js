@@ -12,12 +12,8 @@ const dom = require("react-dom-factories");
 const actions = require("devtools/client/webconsole/actions/index");
 
 // Selectors
-const {
-  getAllFilters,
-} = require("devtools/client/webconsole/selectors/filters");
-const {
-  getFilteredMessagesCount,
-} = require("devtools/client/webconsole/selectors/messages");
+const { getAllFilters } = require("devtools/client/webconsole/selectors/filters");
+const { getFilteredMessagesCount } = require("devtools/client/webconsole/selectors/messages");
 const { getAllPrefs } = require("devtools/client/webconsole/selectors/prefs");
 const { getAllUi } = require("devtools/client/webconsole/selectors/ui");
 
@@ -26,25 +22,18 @@ const { l10n } = require("devtools/client/webconsole/utils/messages");
 const { PluralForm } = require("devtools/shared/plural-form");
 
 // Constants
-const {
-  FILTERS,
-  FILTERBAR_DISPLAY_MODES,
-} = require("devtools/client/webconsole/constants");
+const { FILTERS, FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
 
 // Additional Components
 const FilterButton = require("devtools/client/webconsole/components/FilterBar/FilterButton");
 const ConsoleSettings = createFactory(
   require("devtools/client/webconsole/components/FilterBar/ConsoleSettings")
 );
-const SearchBox = createFactory(
-  require("devtools/client/shared/components/SearchBox")
-);
+const SearchBox = createFactory(require("devtools/client/shared/components/SearchBox"));
 
 const PropTypes = require("prop-types");
 
-const disabledCssFilterButtonTitle = l10n.getStr(
-  "webconsole.cssFilterButton.inactive.tooltip"
-);
+const disabledCssFilterButtonTitle = l10n.getStr("webconsole.cssFilterButton.inactive.tooltip");
 
 class FilterBar extends Component {
   static get propTypes() {
@@ -52,8 +41,7 @@ class FilterBar extends Component {
       closeButtonVisible: PropTypes.bool,
       closeSplitConsole: PropTypes.func,
       dispatch: PropTypes.func.isRequired,
-      displayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)])
-        .isRequired,
+      displayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)]).isRequired,
       filter: PropTypes.object.isRequired,
       filteredMessagesCount: PropTypes.object.isRequired,
       groupWarnings: PropTypes.bool.isRequired,
@@ -118,10 +106,7 @@ class FilterBar extends Component {
       return true;
     }
 
-    if (
-      JSON.stringify(nextProps.filteredMessagesCount) !==
-      JSON.stringify(filteredMessagesCount)
-    ) {
+    if (JSON.stringify(nextProps.filteredMessagesCount) !== JSON.stringify(filteredMessagesCount)) {
       return true;
     }
 
@@ -152,9 +137,7 @@ class FilterBar extends Component {
 
     if (displayMode === FILTERBAR_DISPLAY_MODES.WIDE) {
       if (filterInputWidth <= this.filterInputMinWidth) {
-        dispatch(
-          actions.filterBarDisplayModeSet(FILTERBAR_DISPLAY_MODES.NARROW)
-        );
+        dispatch(actions.filterBarDisplayModeSet(FILTERBAR_DISPLAY_MODES.NARROW));
       }
 
       return;
@@ -166,17 +149,12 @@ class FilterBar extends Component {
       );
 
       const buttonMargin = 5;
-      const filterButtonsToolbarWidth = Array.from(
-        filterButtonsToolbar.children
-      ).reduce(
+      const filterButtonsToolbarWidth = Array.from(filterButtonsToolbar.children).reduce(
         (width, el) => width + el.getBoundingClientRect().width + buttonMargin,
         0
       );
 
-      if (
-        filterInputWidth - this.filterInputMinWidth >
-        filterButtonsToolbarWidth
-      ) {
+      if (filterInputWidth - this.filterInputMinWidth > filterButtonsToolbarWidth) {
         dispatch(actions.filterBarDisplayModeSet(FILTERBAR_DISPLAY_MODES.WIDE));
       }
     }
@@ -214,46 +192,31 @@ class FilterBar extends Component {
       },
       FilterButton({
         active: filter[FILTERS.ERROR],
-        label: getLabel(
-          l10n.getStr("webconsole.errorsFilterButton.label"),
-          FILTERS.ERROR
-        ),
+        label: getLabel(l10n.getStr("webconsole.errorsFilterButton.label"), FILTERS.ERROR),
         filterKey: FILTERS.ERROR,
         dispatch,
       }),
       FilterButton({
         active: filter[FILTERS.WARN],
-        label: getLabel(
-          l10n.getStr("webconsole.warningsFilterButton.label"),
-          FILTERS.WARN
-        ),
+        label: getLabel(l10n.getStr("webconsole.warningsFilterButton.label"), FILTERS.WARN),
         filterKey: FILTERS.WARN,
         dispatch,
       }),
       FilterButton({
         active: filter[FILTERS.LOG],
-        label: getLabel(
-          l10n.getStr("webconsole.logsFilterButton.label"),
-          FILTERS.LOG
-        ),
+        label: getLabel(l10n.getStr("webconsole.logsFilterButton.label"), FILTERS.LOG),
         filterKey: FILTERS.LOG,
         dispatch,
       }),
       FilterButton({
         active: filter[FILTERS.INFO],
-        label: getLabel(
-          l10n.getStr("webconsole.infoFilterButton.label"),
-          FILTERS.INFO
-        ),
+        label: getLabel(l10n.getStr("webconsole.infoFilterButton.label"), FILTERS.INFO),
         filterKey: FILTERS.INFO,
         dispatch,
       }),
       FilterButton({
         active: filter[FILTERS.DEBUG],
-        label: getLabel(
-          l10n.getStr("webconsole.debugFilterButton.label"),
-          FILTERS.DEBUG
-        ),
+        label: getLabel(l10n.getStr("webconsole.debugFilterButton.label"), FILTERS.DEBUG),
         filterKey: FILTERS.DEBUG,
         dispatch,
       }),
@@ -289,14 +252,12 @@ class FilterBar extends Component {
     let searchBoxSummaryTooltip;
     if (filteredMessagesCount.text > 0) {
       searchBoxSummary = l10n.getStr("webconsole.filteredMessagesByText.label");
-      searchBoxSummary = PluralForm.get(
-        filteredMessagesCount.text,
-        searchBoxSummary
-      ).replace("#1", filteredMessagesCount.text);
-
-      searchBoxSummaryTooltip = l10n.getStr(
-        "webconsole.filteredMessagesByText.tooltip"
+      searchBoxSummary = PluralForm.get(filteredMessagesCount.text, searchBoxSummary).replace(
+        "#1",
+        filteredMessagesCount.text
       );
+
+      searchBoxSummaryTooltip = l10n.getStr("webconsole.filteredMessagesByText.tooltip");
       searchBoxSummaryTooltip = PluralForm.get(
         filteredMessagesCount.text,
         searchBoxSummaryTooltip
@@ -372,8 +333,7 @@ class FilterBar extends Component {
     const children = [
       dom.div(
         {
-          className:
-            "devtools-toolbar devtools-input-toolbar webconsole-filterbar-primary",
+          className: "devtools-toolbar devtools-input-toolbar webconsole-filterbar-primary",
           key: "primary-bar",
         },
         clearButton,

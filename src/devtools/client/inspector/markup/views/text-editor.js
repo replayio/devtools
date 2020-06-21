@@ -7,21 +7,14 @@
 const { createFactory } = require("react");
 const ReactDOM = require("react-dom");
 
-const TextNode = createFactory(
-  require("devtools/client/inspector/markup/components/TextNode")
-);
+const TextNode = createFactory(require("devtools/client/inspector/markup/components/TextNode"));
 
 const {
   getAutocompleteMaxWidth,
   getLongString,
 } = require("devtools/client/inspector/shared/utils");
 
-loader.lazyRequireGetter(
-  this,
-  "InplaceEditor",
-  "devtools/client/shared/inplace-editor",
-  true
-);
+loader.lazyRequireGetter(this, "InplaceEditor", "devtools/client/shared/inplace-editor", true);
 
 /**
  * Creates a simple text editor node, used for TEXT and COMMENT

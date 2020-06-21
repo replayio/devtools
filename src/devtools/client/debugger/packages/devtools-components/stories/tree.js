@@ -122,9 +122,7 @@ storiesOf("Tree", module)
     return renderTree(
       {
         getRoots: () => nodes,
-        expanded: new Set(
-          Array.from({ length: 2000 }).map((_, i) => `item-${i + 1}`)
-        ),
+        expanded: new Set(Array.from({ length: 2000 }).map((_, i) => `item-${i + 1}`)),
       },
       {
         children: Array.from({ length: 2000 }).reduce((res, _, i) => {
@@ -234,8 +232,7 @@ function createTreeElement(props, context, tree) {
     Object.assign(
       {
         getParent: x => tree.parent && tree.parent[x],
-        getChildren: x =>
-          tree.children && tree.children[x] ? tree.children[x] : [],
+        getChildren: x => (tree.children && tree.children[x] ? tree.children[x] : []),
         renderItem: (x, depth, focused, arrow, expanded) => [arrow, x],
         getRoots: () => ["A"],
         getKey: x => `key-${x}`,

@@ -4,15 +4,10 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 
-const Rule = createFactory(
-  require("devtools/client/inspector/rules/components/Rule")
-);
+const Rule = createFactory(require("devtools/client/inspector/rules/components/Rule"));
 
 const Types = require("devtools/client/inspector/rules/types");
 

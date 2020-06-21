@@ -3,14 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const {
-  Component,
-  createElement,
-} = require("react");
+const { Component, createElement } = require("react");
 const dom = require("react-dom-factories");
-const {
-  connect,
-} = require("devtools/client/shared/redux/visibility-handler-connect");
+const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
 const { initialize } = require("devtools/client/webconsole/actions/ui");
 
 const {
@@ -25,12 +20,10 @@ const {
 } = require("devtools/client/webconsole/selectors/messages");
 
 const PropTypes = require("prop-types");
-const { MessageContainer } = require(
-  "devtools/client/webconsole/components/Output/MessageContainer"
-);
 const {
-  pointPrecedes,
-} = require("protocol/execution-point-utils.js");
+  MessageContainer,
+} = require("devtools/client/webconsole/components/Output/MessageContainer");
+const { pointPrecedes } = require("protocol/execution-point-utils.js");
 
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const {
@@ -135,8 +128,7 @@ class ConsoleOutput extends Component {
       nextProps.visibleMessages.length - this.props.visibleMessages.length;
     const messagesDelta = nextProps.messages.size - this.props.messages.size;
 
-    const messagesUiDelta =
-      nextProps.messagesUi.length - this.props.messagesUi.length;
+    const messagesUiDelta = nextProps.messagesUi.length - this.props.messagesUi.length;
     const isOpeningGroup =
       messagesUiDelta > 0 &&
       nextProps.messagesUi.some(
@@ -151,9 +143,7 @@ class ConsoleOutput extends Component {
       (!this.props.initialized &&
         nextProps.initialized &&
         isScrolledToBottom(lastChild, outputNode)) ||
-      (isScrolledToBottom(lastChild, outputNode) &&
-        visibleMessagesDelta > 0 &&
-        !isOpeningGroup);
+      (isScrolledToBottom(lastChild, outputNode) && visibleMessagesDelta > 0 && !isOpeningGroup);
 
     // When evaluation results are added, scroll to them.
     this.shouldScrollMessageId = null;
@@ -207,21 +197,13 @@ class ConsoleOutput extends Component {
     } = this.props;
 
     if (!initialized) {
-      const numberMessagesFitViewport = getInitialMessageCountForViewport(
-        window
-      );
+      const numberMessagesFitViewport = getInitialMessageCountForViewport(window);
       if (numberMessagesFitViewport < visibleMessages.length) {
-        visibleMessages = visibleMessages.slice(
-          visibleMessages.length - numberMessagesFitViewport
-        );
+        visibleMessages = visibleMessages.slice(visibleMessages.length - numberMessagesFitViewport);
       }
     }
 
-    const pausedMessage = getClosestMessage(
-      visibleMessages,
-      messages,
-      pausedExecutionPoint
-    );
+    const pausedMessage = getClosestMessage(visibleMessages, messages, pausedExecutionPoint);
 
     const messageNodes = visibleMessages.map(messageId =>
       createElement(MessageContainer, {
@@ -232,9 +214,7 @@ class ConsoleOutput extends Component {
         open: messagesUi.includes(messageId),
         payload: messagesPayload.get(messageId),
         timestampsVisible,
-        badge: warningGroups.has(messageId)
-          ? warningGroups.get(messageId).length
-          : null,
+        badge: warningGroups.has(messageId) ? warningGroups.get(messageId).length : null,
         inWarningGroup:
           warningGroups && warningGroups.size > 0
             ? isMessageInWarningGroup(messages.get(messageId), visibleMessages)
@@ -270,8 +250,7 @@ function scrollToBottom(node) {
 function isScrolledToBottom(lastNode, scrollNode) {
   const lastNodeHeight = lastNode ? lastNode.clientHeight : 0;
   return (
-    scrollNode.scrollTop + scrollNode.clientHeight >=
-    scrollNode.scrollHeight - lastNodeHeight / 2
+    scrollNode.scrollTop + scrollNode.clientHeight >= scrollNode.scrollHeight - lastNodeHeight / 2
   );
 }
 

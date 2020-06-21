@@ -17,29 +17,21 @@ describe("Modal", () => {
 
   it("handles close modal click", () => {
     const handleCloseSpy = jest.fn();
-    const wrapper = shallow(
-      <Modal handleClose={handleCloseSpy} status="entering" />
-    );
+    const wrapper = shallow(<Modal handleClose={handleCloseSpy} status="entering" />);
     wrapper.find(".modal-wrapper").simulate("click");
     expect(handleCloseSpy).toHaveBeenCalled();
   });
 
   it("renders children", () => {
     const children = <div className="aChild" />;
-    const wrapper = shallow(
-      <Modal children={children} handleClose={() => {}} status="entering" />
-    );
+    const wrapper = shallow(<Modal children={children} handleClose={() => {}} status="entering" />);
     expect(wrapper.find(".aChild")).toHaveLength(1);
   });
 
   it("passes additionalClass to child div class", () => {
     const additionalClass = "testAddon";
     const wrapper = shallow(
-      <Modal
-        additionalClass={additionalClass}
-        handleClose={() => {}}
-        status="entering"
-      />
+      <Modal additionalClass={additionalClass} handleClose={() => {}} status="entering" />
     );
     expect(wrapper.find(`.modal-wrapper .${additionalClass}`)).toHaveLength(1);
   });

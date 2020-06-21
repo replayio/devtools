@@ -4,7 +4,6 @@
 
 "use strict";
 
-var WebConsoleUtils = {
-};
+var WebConsoleUtils = {};
 
 exports.Utils = WebConsoleUtils;

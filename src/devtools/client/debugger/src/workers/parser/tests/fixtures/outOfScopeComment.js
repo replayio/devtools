@@ -1,4 +1,4 @@
 // Some comment
-(function() {
+(function () {
   const x = 1;
 })();

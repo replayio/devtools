@@ -63,14 +63,7 @@ function render(
   logValue: ?string,
   overrides = {}
 ) {
-  const defaults = generateDefaults(
-    overrides,
-    log,
-    line,
-    column,
-    condition,
-    logValue
-  );
+  const defaults = generateDefaults(overrides, log, line, column, condition, logValue);
   const props = { ...defaults, ...overrides };
   const wrapper = mount(<ConditionalPanel {...props} />);
   return { wrapper, props };

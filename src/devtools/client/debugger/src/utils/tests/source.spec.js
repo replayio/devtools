@@ -51,42 +51,26 @@ describe("sources", () => {
 
   describe("getFilename", () => {
     it("should give us a default of (index)", () => {
-      expect(
-        getFilename(makeMockSource("http://localhost.com:7999/increment/"))
-      ).toBe("(index)");
+      expect(getFilename(makeMockSource("http://localhost.com:7999/increment/"))).toBe("(index)");
     });
     it("should give us the filename", () => {
-      expect(
-        getFilename(
-          makeMockSource("http://localhost.com:7999/increment/hello.html")
-        )
-      ).toBe("hello.html");
+      expect(getFilename(makeMockSource("http://localhost.com:7999/increment/hello.html"))).toBe(
+        "hello.html"
+      );
     });
     it("should give us the readable Unicode filename if encoded", () => {
       expect(
-        getFilename(
-          makeMockSource(
-            `http://localhost.com:7999/increment/${encodedUnicode}.html`
-          )
-        )
+        getFilename(makeMockSource(`http://localhost.com:7999/increment/${encodedUnicode}.html`))
       ).toBe(`${unicode}.html`);
     });
     it("should give us the filename excluding the query strings", () => {
       expect(
-        getFilename(
-          makeMockSource(
-            "http://localhost.com:7999/increment/hello.html?query_strings"
-          )
-        )
+        getFilename(makeMockSource("http://localhost.com:7999/increment/hello.html?query_strings"))
       ).toBe("hello.html");
     });
     it("should give us the proper filename for pretty files", () => {
       expect(
-        getFilename(
-          makeMockSource(
-            "http://localhost.com:7999/increment/hello.html:formatted"
-          )
-        )
+        getFilename(makeMockSource("http://localhost.com:7999/increment/hello.html:formatted"))
       ).toBe("hello.html");
     });
   });
@@ -95,9 +79,7 @@ describe("sources", () => {
     it("should truncate the file name when it is more than 30 chars", () => {
       expect(
         getTruncatedFileName(
-          makeMockSource(
-            "really-really-really-really-really-really-long-name.html"
-          ),
+          makeMockSource("really-really-really-really-really-really-long-name.html"),
           "",
           30
         )
@@ -105,11 +87,7 @@ describe("sources", () => {
     });
     it("should first decode the filename and then truncate it", () => {
       expect(
-        getTruncatedFileName(
-          makeMockSource(`${encodedUnicode.repeat(30)}.html`),
-          "",
-          30
-        )
+        getTruncatedFileName(makeMockSource(`${encodedUnicode.repeat(30)}.html`), "", 30)
       ).toBe("測測測測測測測測測測測測測…測測測測測測測測測.html");
     });
   });
@@ -132,19 +110,13 @@ describe("sources", () => {
     it(`should give us the path for files with same name
       in directories with same name`, () => {
       const sources: Source[] = [
-        makeMockSource(
-          "http://localhost.com:7999/increment/xyz/web/hello.html"
-        ),
-        makeMockSource(
-          "http://localhost.com:7999/increment/abc/web/hello.html"
-        ),
+        makeMockSource("http://localhost.com:7999/increment/xyz/web/hello.html"),
+        makeMockSource("http://localhost.com:7999/increment/abc/web/hello.html"),
         makeMockSource("http://localhost.com:7999/increment/hello.html"),
       ];
       expect(
         getDisplayPath(
-          makeMockSource(
-            "http://localhost.com:7999/increment/abc/web/hello.html"
-          ),
+          makeMockSource("http://localhost.com:7999/increment/abc/web/hello.html"),
           sources
         )
       ).toBe("abc/web");
@@ -157,27 +129,18 @@ describe("sources", () => {
         makeMockSource("http://localhost.com:7999/increment/hello.html"),
       ];
       expect(
-        getDisplayPath(
-          makeMockSource("http://localhost.com:7999/increment/abc/web.html"),
-          sources
-        )
+        getDisplayPath(makeMockSource("http://localhost.com:7999/increment/abc/web.html"), sources)
       ).toBe(undefined);
     });
     it("should not show display path for pretty file", () => {
       const sources: Source[] = [
         makeMockSource("http://localhost.com:7999/increment/abc/web/hell.html"),
-        makeMockSource(
-          "http://localhost.com:7999/increment/abc/web/hello.html"
-        ),
-        makeMockSource(
-          "http://localhost.com:7999/increment/xyz.html:formatted"
-        ),
+        makeMockSource("http://localhost.com:7999/increment/abc/web/hello.html"),
+        makeMockSource("http://localhost.com:7999/increment/xyz.html:formatted"),
       ];
       expect(
         getDisplayPath(
-          makeMockSource(
-            "http://localhost.com:7999/increment/abc/web/hello.html:formatted"
-          ),
+          makeMockSource("http://localhost.com:7999/increment/abc/web/hello.html:formatted"),
           sources
         )
       ).toBe(undefined);
@@ -185,21 +148,13 @@ describe("sources", () => {
     it(`should give us the path for files with same name when both
       are pretty and different path`, () => {
       const sources: Source[] = [
-        makeMockSource(
-          "http://localhost.com:7999/increment/xyz/web/hello.html:formatted"
-        ),
-        makeMockSource(
-          "http://localhost.com:7999/increment/abc/web/hello.html:formatted"
-        ),
-        makeMockSource(
-          "http://localhost.com:7999/increment/hello.html:formatted"
-        ),
+        makeMockSource("http://localhost.com:7999/increment/xyz/web/hello.html:formatted"),
+        makeMockSource("http://localhost.com:7999/increment/abc/web/hello.html:formatted"),
+        makeMockSource("http://localhost.com:7999/increment/hello.html:formatted"),
       ];
       expect(
         getDisplayPath(
-          makeMockSource(
-            "http://localhost.com:7999/increment/abc/web/hello.html:formatted"
-          ),
+          makeMockSource("http://localhost.com:7999/increment/abc/web/hello.html:formatted"),
           sources
         )
       ).toBe("abc/web");
@@ -208,32 +163,26 @@ describe("sources", () => {
 
   describe("getFileURL", () => {
     it("should give us the file url", () => {
-      expect(
-        getFileURL(
-          makeMockSource("http://localhost.com:7999/increment/hello.html")
-        )
-      ).toBe("http://localhost.com:7999/increment/hello.html");
+      expect(getFileURL(makeMockSource("http://localhost.com:7999/increment/hello.html"))).toBe(
+        "http://localhost.com:7999/increment/hello.html"
+      );
     });
     it("should give us the readable Unicode file URL if encoded", () => {
       expect(
         getFileURL(
-          makeMockSource(
-            `http://${punycode}.${punycode}:7999/increment/${encodedUnicode}.html`
-          )
+          makeMockSource(`http://${punycode}.${punycode}:7999/increment/${encodedUnicode}.html`)
         )
       ).toBe(`http://${unicode}.${unicode}:7999/increment/${unicode}.html`);
     });
     it("should truncate the file url when it is more than 50 chars", () => {
       expect(
-        getFileURL(
-          makeMockSource("http://localhost-long.com:7999/increment/hello.html")
-        )
+        getFileURL(makeMockSource("http://localhost-long.com:7999/increment/hello.html"))
       ).toBe("…ttp://localhost-long.com:7999/increment/hello.html");
     });
     it("should first decode the file URL and then truncate it", () => {
-      expect(
-        getFileURL(makeMockSource(`http://${encodedUnicode.repeat(39)}.html`))
-      ).toBe(`…ttp://${unicode.repeat(39)}.html`);
+      expect(getFileURL(makeMockSource(`http://${encodedUnicode.repeat(39)}.html`))).toBe(
+        `…ttp://${unicode.repeat(39)}.html`
+      );
     });
   });
 
@@ -244,11 +193,7 @@ describe("sources", () => {
         expect(isJavaScript(source, source.content)).toBe(false);
       }
       {
-        const source = makeMockSourceAndContent(
-          undefined,
-          undefined,
-          "text/html"
-        );
+        const source = makeMockSourceAndContent(undefined, undefined, "text/html");
         expect(isJavaScript(source, source.content)).toBe(false);
       }
     });
@@ -263,19 +208,11 @@ describe("sources", () => {
         expect(isJavaScript(source, source.content)).toBe(true);
       }
       {
-        const source = makeMockSourceAndContent(
-          undefined,
-          undefined,
-          "text/javascript"
-        );
+        const source = makeMockSourceAndContent(undefined, undefined, "text/javascript");
         expect(isJavaScript(source, source.content)).toBe(true);
       }
       {
-        const source = makeMockSourceAndContent(
-          undefined,
-          undefined,
-          "application/javascript"
-        );
+        const source = makeMockSourceAndContent(undefined, undefined, "application/javascript");
         expect(isJavaScript(source, source.content)).toBe(true);
       }
     });
@@ -287,9 +224,7 @@ describe("sources", () => {
     });
 
     it("bower_components", () => {
-      expect(isThirdParty(makeMockSource("/bower_components/foo.js"))).toBe(
-        true
-      );
+      expect(isThirdParty(makeMockSource("/bower_components/foo.js"))).toBe(true);
     });
 
     it("not third party", () => {
@@ -299,12 +234,7 @@ describe("sources", () => {
 
   describe("getMode", () => {
     it("//@flow", () => {
-      const source = makeMockSourceAndContent(
-        undefined,
-        undefined,
-        "text/javascript",
-        "// @flow"
-      );
+      const source = makeMockSourceAndContent(undefined, undefined, "text/javascript", "// @flow");
       expect(getMode(source, source.content)).toEqual({
         name: "javascript",
         typescript: true,
@@ -325,12 +255,7 @@ describe("sources", () => {
     });
 
     it("mixed html", () => {
-      const source = makeMockSourceAndContent(
-        undefined,
-        undefined,
-        "",
-        " <html"
-      );
+      const source = makeMockSourceAndContent(undefined, undefined, "", " <html");
       expect(getMode(source, source.content)).toEqual({ name: "htmlmixed" });
     });
 
@@ -345,22 +270,12 @@ describe("sources", () => {
     });
 
     it("returns jsx if contentType jsx is given", () => {
-      const source = makeMockSourceAndContent(
-        undefined,
-        undefined,
-        "text/jsx",
-        "<h1></h1>"
-      );
+      const source = makeMockSourceAndContent(undefined, undefined, "text/jsx", "<h1></h1>");
       expect(getMode(source, source.content)).toEqual({ name: "jsx" });
     });
 
     it("returns jsx if sourceMetaData says it's a react component", () => {
-      const source = makeMockSourceAndContent(
-        undefined,
-        undefined,
-        "",
-        "<h1></h1>"
-      );
+      const source = makeMockSourceAndContent(undefined, undefined, "", "<h1></h1>");
       expect(
         getMode(source, source.content, {
           ...defaultSymbolDeclarations,
@@ -370,22 +285,12 @@ describe("sources", () => {
     });
 
     it("returns jsx if the fileExtension is .jsx", () => {
-      const source = makeMockSourceAndContent(
-        "myComponent.jsx",
-        undefined,
-        "",
-        "<h1></h1>"
-      );
+      const source = makeMockSourceAndContent("myComponent.jsx", undefined, "", "<h1></h1>");
       expect(getMode(source, source.content)).toEqual({ name: "jsx" });
     });
 
     it("returns text/x-haxe if the file extension is .hx", () => {
-      const source = makeMockSourceAndContent(
-        "myComponent.hx",
-        undefined,
-        "",
-        "function foo(){}"
-      );
+      const source = makeMockSourceAndContent("myComponent.hx", undefined, "", "function foo(){}");
       expect(getMode(source, source.content)).toEqual({ name: "text/x-haxe" });
     });
 
@@ -511,28 +416,18 @@ describe("sources", () => {
     const threadActors = ["server0.conn1.child1/thread19"];
 
     it("should detect normal source urls", () => {
-      const source = makeMockSource(
-        "resource://activity-stream/vendor/react.js"
-      );
-      expect(
-        underRoot(source, "resource://activity-stream", threadActors)
-      ).toBe(true);
+      const source = makeMockSource("resource://activity-stream/vendor/react.js");
+      expect(underRoot(source, "resource://activity-stream", threadActors)).toBe(true);
     });
 
     it("should detect source urls under chrome:// as root", () => {
-      const source = makeMockSource(
-        "chrome://browser/content/contentSearchUI.js"
-      );
+      const source = makeMockSource("chrome://browser/content/contentSearchUI.js");
       expect(underRoot(source, "chrome://", threadActors)).toBe(true);
     });
 
     it("should detect source urls if root is a thread actor Id", () => {
-      const source = makeMockSource(
-        "resource://activity-stream/vendor/react-dom.js"
-      );
-      expect(
-        underRoot(source, "server0.conn1.child1/thread19", threadActors)
-      ).toBe(true);
+      const source = makeMockSource("resource://activity-stream/vendor/react-dom.js");
+      expect(underRoot(source, "server0.conn1.child1/thread19", threadActors)).toBe(true);
     });
   });
 
@@ -556,9 +451,7 @@ describe("sources", () => {
       expect(isExtensionDirectoryPath("chrome-extension://id")).toBe(true);
     });
     it("should return false for child file within the extension directory", () => {
-      expect(isExtensionDirectoryPath("moz-extension://id/js/content.js")).toBe(
-        false
-      );
+      expect(isExtensionDirectoryPath("moz-extension://id/js/content.js")).toBe(false);
     });
   });
 });

@@ -26,9 +26,4 @@ module.exports = {
   objectInspector,
 };
 
-export type {
-  RdpGrip,
-  GripProperties,
-  Node,
-  Grip,
-} from "./object-inspector/types";
+export type { RdpGrip, GripProperties, Node, Grip } from "./object-inspector/types";

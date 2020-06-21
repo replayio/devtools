@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { getStr } = require("devtools/client/inspector/layout/utils/l10n");
@@ -16,19 +13,13 @@ const { getStr } = require("devtools/client/inspector/layout/utils/l10n");
 // GridDisplaySettings and GridList because we assume the CSS grid usage is low
 // and usually will not appear on the page.
 loader.lazyGetter(this, "GridDisplaySettings", function () {
-  return createFactory(
-    require("devtools/client/inspector/grids/components/GridDisplaySettings")
-  );
+  return createFactory(require("devtools/client/inspector/grids/components/GridDisplaySettings"));
 });
 loader.lazyGetter(this, "GridList", function () {
-  return createFactory(
-    require("devtools/client/inspector/grids/components/GridList")
-  );
+  return createFactory(require("devtools/client/inspector/grids/components/GridList"));
 });
 loader.lazyGetter(this, "GridOutline", function () {
-  return createFactory(
-    require("devtools/client/inspector/grids/components/GridOutline")
-  );
+  return createFactory(require("devtools/client/inspector/grids/components/GridOutline"));
 });
 
 const Types = require("devtools/client/inspector/grids/types");
@@ -38,8 +29,7 @@ class Grid extends PureComponent {
     return {
       getSwatchColorPickerTooltip: PropTypes.func.isRequired,
       grids: PropTypes.arrayOf(PropTypes.shape(Types.grid)).isRequired,
-      highlighterSettings: PropTypes.shape(Types.highlighterSettings)
-        .isRequired,
+      highlighterSettings: PropTypes.shape(Types.highlighterSettings).isRequired,
       onHideBoxModelHighlighter: PropTypes.func.isRequired,
       onSetGridOverlayColor: PropTypes.func.isRequired,
       onShowBoxModelHighlighterForNode: PropTypes.func.isRequired,
@@ -98,9 +88,9 @@ class Grid extends PureComponent {
       ),
       highlightedGrids.length === 1
         ? GridOutline({
-          grids,
-          onShowGridOutlineHighlight,
-        })
+            grids,
+            onShowGridOutlineHighlight,
+          })
         : null
     );
   }

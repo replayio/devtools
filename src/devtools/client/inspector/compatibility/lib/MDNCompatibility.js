@@ -62,10 +62,10 @@ class MDNCompatibility {
     }
 
     // Classify to aliases summaries and normal summaries.
-    const {
-      aliasSummaries,
-      normalSummaries,
-    } = this._classifyCSSCompatSummaries(summaries, browsers);
+    const { aliasSummaries, normalSummaries } = this._classifyCSSCompatSummaries(
+      summaries,
+      browsers
+    );
 
     // Finally, convert to CSS issues.
     return this._toCSSIssues(normalSummaries.concat(aliasSummaries));
@@ -126,8 +126,8 @@ class MDNCompatibility {
       if (!aliasSummary.aliases.includes(terminal)) {
         aliasSummary.aliases.push(terminal);
       }
-      aliasSummary.unsupportedBrowsers = aliasSummary.unsupportedBrowsers.filter(
-        b => unsupportedBrowsers.includes(b)
+      aliasSummary.unsupportedBrowsers = aliasSummary.unsupportedBrowsers.filter(b =>
+        unsupportedBrowsers.includes(b)
       );
       return false;
     });
@@ -140,9 +140,7 @@ class MDNCompatibility {
 
     for (const browser in compatTable.support) {
       let supportStates = compatTable.support[browser] || [];
-      supportStates = Array.isArray(supportStates)
-        ? supportStates
-        : [supportStates];
+      supportStates = Array.isArray(supportStates) ? supportStates : [supportStates];
 
       for (const { alternative_name: name, prefix } of supportStates) {
         if (!prefix && !name) {
@@ -312,11 +310,7 @@ class MDNCompatibility {
    * @return {Object} compatibility summary
    */
   _getCSSPropertyCompatSummary(browsers, property) {
-    const summary = this._getCompatSummary(
-      browsers,
-      this._cssPropertiesCompatData,
-      property
-    );
+    const summary = this._getCompatSummary(browsers, this._cssPropertiesCompatData, property);
     return Object.assign(summary, { property });
   }
 
@@ -353,12 +347,8 @@ class MDNCompatibility {
     for (const support of supportList) {
       if ((!support.prefix && !prefix) || support.prefix === prefix) {
         const { version_added: added, version_removed: removed } = support;
-        const addedVersion = this._asFloatVersion(
-          added === null ? true : added
-        );
-        const removedVersion = this._asFloatVersion(
-          removed === null ? false : removed
-        );
+        const addedVersion = this._asFloatVersion(added === null ? true : added);
+        const removedVersion = this._asFloatVersion(removed === null ? false : removed);
 
         if (addedVersion <= version && version < removedVersion) {
           return _SUPPORT_STATE.SUPPORTED;
@@ -376,9 +366,7 @@ class MDNCompatibility {
 
   _hasIssue({ unsupportedBrowsers, deprecated, experimental, invalid }) {
     // Don't apply as issue the invalid term which was not in the database.
-    return (
-      !invalid && (unsupportedBrowsers.length || deprecated || experimental)
-    );
+    return !invalid && (unsupportedBrowsers.length || deprecated || experimental);
   }
 
   _hasTerm(compatNode, ...terms) {
@@ -400,9 +388,7 @@ class MDNCompatibility {
         continue;
       }
 
-      const type = summary.aliases
-        ? _ISSUE_TYPE.CSS_PROPERTY_ALIASES
-        : _ISSUE_TYPE.CSS_PROPERTY;
+      const type = summary.aliases ? _ISSUE_TYPE.CSS_PROPERTY_ALIASES : _ISSUE_TYPE.CSS_PROPERTY;
       issues.push(this._toIssue(summary, type));
     }
 

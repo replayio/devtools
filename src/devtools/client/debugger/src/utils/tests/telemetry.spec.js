@@ -22,15 +22,10 @@ describe("telemetry.recordEvent()", () => {
   it("Receives the correct telemetry information", () => {
     recordEvent("foo", { bar: 1 });
 
-    expect(telemetry.recordEvent).toHaveBeenCalledWith(
-      "foo",
-      "debugger",
-      null,
-      {
-        // eslint-disable-next-line camelcase
-        session_id: -1,
-        bar: 1,
-      }
-    );
+    expect(telemetry.recordEvent).toHaveBeenCalledWith("foo", "debugger", null, {
+      // eslint-disable-next-line camelcase
+      session_id: -1,
+      bar: 1,
+    });
   });
 });

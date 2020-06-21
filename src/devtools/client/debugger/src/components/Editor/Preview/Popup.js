@@ -145,10 +145,7 @@ export class Popup extends Component<Props> {
     }
 
     return (
-      <div
-        className="preview-popup"
-        style={{ maxHeight: this.calculateMaxHeight() }}
-      >
+      <div className="preview-popup" style={{ maxHeight: this.calculateMaxHeight() }}>
         <ObjectInspector
           roots={properties}
           autoExpandDepth={0}
@@ -256,11 +253,7 @@ export function addHighlightToTargetSiblings(target: Element, props: Object) {
   const tokenType = target.classList.item(0);
   const previewExpression = props.preview.expression;
 
-  if (
-    tokenType &&
-    previewExpression &&
-    target.innerHTML !== previewExpression
-  ) {
+  if (tokenType && previewExpression && target.innerHTML !== previewExpression) {
     let nextSibling = target.nextSibling;
     let nextElementSibling = target.nextElementSibling;
     // Note: Declaring previous/next ELEMENT siblings as well because
@@ -309,10 +302,7 @@ export function removeHighlightForTargetSiblings(target: Element) {
     nextSibling = nextSibling.nextElementSibling;
   }
   let previousSibling = target.previousElementSibling;
-  while (
-    previousSibling &&
-    previousSibling.className.includes("preview-token")
-  ) {
+  while (previousSibling && previousSibling.className.includes("preview-token")) {
     previousSibling.classList.remove("preview-token");
     previousSibling = previousSibling.previousElementSibling;
   }
@@ -342,7 +332,4 @@ const mapDispatchToProps = {
   clearPreview,
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  mapDispatchToProps
-)(Popup);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, mapDispatchToProps)(Popup);

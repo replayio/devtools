@@ -32,16 +32,10 @@ export function getASTLocation(
   return { name: undefined, offset: location, index: 0 };
 }
 
-export function findFunctionByName(
-  symbols: Symbols,
-  name: ?string,
-  index: number
-) {
+export function findFunctionByName(symbols: Symbols, name: ?string, index: number) {
   if (symbols.loading) {
     return null;
   }
 
-  return symbols.functions.find(
-    node => node.name === name && node.index === index
-  );
+  return symbols.functions.find(node => node.name === name && node.index === index);
 }

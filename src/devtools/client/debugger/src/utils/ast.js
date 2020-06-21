@@ -7,11 +7,7 @@
 import type { SourceLocation, Position, PartialPosition } from "../types";
 import type { Symbols } from "../reducers/ast";
 
-import type {
-  AstLocation,
-  FunctionDeclaration,
-  ClassDeclaration,
-} from "../workers/parser";
+import type { AstLocation, FunctionDeclaration, ClassDeclaration } from "../workers/parser";
 
 export function findBestMatchExpression(symbols: Symbols, tokenPos: Position) {
   if (symbols.loading) {
@@ -22,20 +18,18 @@ export function findBestMatchExpression(symbols: Symbols, tokenPos: Position) {
   const { memberExpressions, identifiers, literals } = symbols;
   const members = memberExpressions.filter(({ computed }) => !computed);
 
-  return []
-    .concat(identifiers, members, literals)
-    .reduce((found, expression) => {
-      const overlaps =
-        expression.location.start.line == line &&
-        expression.location.start.column <= column &&
-        expression.location.end.column >= column;
+  return [].concat(identifiers, members, literals).reduce((found, expression) => {
+    const overlaps =
+      expression.location.start.line == line &&
+      expression.location.start.column <= column &&
+      expression.location.end.column >= column;
 
-      if (overlaps) {
-        return expression;
-      }
+    if (overlaps) {
+      return expression;
+    }
 
-      return found;
-    }, null);
+    return found;
+  }, null);
 }
 
 // Check whether location A starts after location B
@@ -49,10 +43,8 @@ export function positionAfter(a: AstLocation, b: AstLocation) {
 export function containsPosition(a: AstLocation, b: PartialPosition) {
   const bColumn = b.column || 0;
   const startsBefore =
-    a.start.line < b.line ||
-    (a.start.line === b.line && a.start.column <= bColumn);
-  const endsAfter =
-    a.end.line > b.line || (a.end.line === b.line && a.end.column >= bColumn);
+    a.start.line < b.line || (a.start.line === b.line && a.start.column <= bColumn);
+  const endsAfter = a.end.line > b.line || (a.end.line === b.line && a.end.column >= bColumn);
 
   return startsBefore && endsAfter;
 }

@@ -4,10 +4,7 @@
 
 // ReactJS
 const PropTypes = require("prop-types");
-const {
-  button,
-  span,
-} = require("react-dom-factories");
+const { button, span } = require("react-dom-factories");
 
 // Reps
 const { getGripType, isGrip, cropString, wrapRender } = require("./rep-utils");
@@ -24,11 +21,7 @@ FunctionRep.propTypes = {
 };
 
 function FunctionRep(props) {
-  const {
-    object: grip,
-    onViewSourceInDebugger,
-    recordTelemetryEvent,
-  } = props;
+  const { object: grip, onViewSourceInDebugger, recordTelemetryEvent } = props;
 
   let jumpToDefinitionButton;
   const location = grip.functionLocation();
@@ -46,10 +39,7 @@ function FunctionRep(props) {
           recordTelemetryEvent("jump_to_definition");
         }
 
-        const sourceLocation = await getSourceLocation(
-          location,
-          sourceMapService
-        );
+        const sourceLocation = await getSourceLocation(location, sourceMapService);
         onViewSourceInDebugger(sourceLocation);
       },
     });
@@ -100,7 +90,7 @@ function getClassTitle(grip) {
 function getFunctionTitle(grip, props) {
   const { mode } = props;
 
-  if (mode === MODE.TINY/* && !grip.isGenerator && !grip.isAsync*/) {
+  if (mode === MODE.TINY /* && !grip.isGenerator && !grip.isAsync*/) {
     return null;
   }
 
@@ -149,12 +139,7 @@ const annonymousProperty = /([\w\d]+)\(\^\)$/;
  * @returns String
  */
 function cleanFunctionName(name) {
-  for (const reg of [
-    objectProperty,
-    arrayProperty,
-    functionProperty,
-    annonymousProperty,
-  ]) {
+  for (const reg of [objectProperty, arrayProperty, functionProperty, annonymousProperty]) {
     const match = reg.exec(name);
     if (match) {
       return match[1];

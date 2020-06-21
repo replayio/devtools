@@ -4,10 +4,7 @@
 
 // @flow
 
-import {
-  getSelectedSource,
-  getBreakpointPositionsForLine,
-} from "../reducers/sources";
+import { getSelectedSource, getBreakpointPositionsForLine } from "../reducers/sources";
 import { getBreakpointsList } from "../reducers/breakpoints";
 
 import type { Breakpoint, BreakpointPosition, PartialPosition } from "../types";
@@ -32,11 +29,7 @@ function getBreakpointsForSource(state: State, selectedSource): Breakpoint[] {
 
 type LineColumn = { line: number, column: ?number };
 
-function findBreakpointAtLocation(
-  breakpoints,
-  selectedSource,
-  { line, column }: LineColumn
-) {
+function findBreakpointAtLocation(breakpoints, selectedSource, { line, column }: LineColumn) {
   return breakpoints.find(breakpoint => {
     const location = getLocation(breakpoint, selectedSource);
     const sameLine = location.line === line;
@@ -97,15 +90,10 @@ export function getBreakpointsAtLine(state: State, line: number): Breakpoint[] {
   }
   const breakpoints = getBreakpointsForSource(state, selectedSource);
 
-  return breakpoints.filter(
-    breakpoint => getLocation(breakpoint, selectedSource).line === line
-  );
+  return breakpoints.filter(breakpoint => getLocation(breakpoint, selectedSource).line === line);
 }
 
-export function getClosestBreakpoint(
-  state: State,
-  position: PartialPosition
-): ?Breakpoint {
+export function getClosestBreakpoint(state: State, position: PartialPosition): ?Breakpoint {
   const columnBreakpoints = getBreakpointsAtLine(state, position.line);
 
   const breakpoint = findClosestBreakpoint(columnBreakpoints, position.column);
@@ -121,11 +109,7 @@ export function getClosestBreakpointPosition(
     throw new Error("no selectedSource");
   }
 
-  const columnBreakpoints = getBreakpointPositionsForLine(
-    state,
-    selectedSource.id,
-    position.line
-  );
+  const columnBreakpoints = getBreakpointPositionsForLine(state, selectedSource.id, position.line);
 
   return findClosestBreakpoint(columnBreakpoints, position.column);
 }

@@ -4,11 +4,7 @@
 
 // @flow
 
-import {
-  makeBreakpointLocation,
-  makeBreakpointId,
-  getASTLocation,
-} from "../../utils/breakpoint";
+import { makeBreakpointLocation, makeBreakpointId, getASTLocation } from "../../utils/breakpoint";
 
 import {
   getBreakpoint,
@@ -63,18 +59,11 @@ import type {
 // See syncBreakpoint.js for more.
 
 function clientSetBreakpoint(client, state, breakpoint: Breakpoint) {
-  const breakpointLocation = makeBreakpointLocation(
-    state,
-    breakpoint.location
-  );
+  const breakpointLocation = makeBreakpointLocation(state, breakpoint.location);
   return client.setBreakpoint(breakpointLocation, breakpoint.options);
 }
 
-function clientRemoveBreakpoint(
-  client,
-  state,
-  location: SourceLocation
-) {
+function clientRemoveBreakpoint(client, state, location: SourceLocation) {
   const breakpointLocation = makeBreakpointLocation(state, location);
   return client.removeBreakpoint(breakpointLocation);
 }
@@ -127,18 +116,10 @@ export function addBreakpoint(
     const astLocation = getASTLocation(source, symbols, location);
 
     const originalContent = getSourceContent(getState(), source.id);
-    const originalText = getTextAtPosition(
-      source.id,
-      originalContent,
-      location
-    );
+    const originalText = getTextAtPosition(source.id, originalContent, location);
 
     const content = getSourceContent(getState(), source.id);
-    const text = getTextAtPosition(
-      source.id,
-      content,
-      location
-    );
+    const text = getTextAtPosition(source.id, content, location);
 
     const id = makeBreakpointId(location);
     const breakpoint = {
@@ -192,11 +173,7 @@ export function removeBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
       // If the breakpoint is disabled then it is not installed in the server.
       [PROMISE]: breakpoint.disabled
         ? Promise.resolve()
-        : clientRemoveBreakpoint(
-            client,
-            getState(),
-            breakpoint.location
-          ),
+        : clientRemoveBreakpoint(client, getState(), breakpoint.location),
     });
   };
 }
@@ -208,24 +185,14 @@ export function removeBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
  * @memberof actions/breakpoints
  * @static
  */
-export function removeBreakpointAtGeneratedLocation(
-  cx: Context,
-  target: SourceLocation
-) {
+export function removeBreakpointAtGeneratedLocation(cx: Context, target: SourceLocation) {
   return ({ dispatch, getState, client }: ThunkArgs) => {
     // remove breakpoint from the server
-    const onBreakpointRemoved = clientRemoveBreakpoint(
-      client,
-      getState(),
-      target
-    );
+    const onBreakpointRemoved = clientRemoveBreakpoint(client, getState(), target);
     // Remove any breakpoints matching the generated location.
     const breakpoints = getBreakpointsList(getState());
     for (const { location } of breakpoints) {
-      if (
-        location.sourceId == target.sourceId &&
-        comparePosition(location, target)
-      ) {
+      if (location.sourceId == target.sourceId && comparePosition(location, target)) {
         dispatch({
           type: "REMOVE_BREAKPOINT",
           cx,
@@ -238,10 +205,7 @@ export function removeBreakpointAtGeneratedLocation(
     // Remove any remaining pending breakpoints matching the generated location.
     const pending = getPendingBreakpointList(getState());
     for (const { location } of pending) {
-      if (
-        location.sourceUrl == target.sourceUrl &&
-        comparePosition(location, target)
-      ) {
+      if (location.sourceUrl == target.sourceUrl && comparePosition(location, target)) {
         dispatch({
           type: "REMOVE_PENDING_BREAKPOINT",
           cx,
@@ -271,11 +235,7 @@ export function disableBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
       type: "SET_BREAKPOINT",
       cx,
       breakpoint: { ...breakpoint, disabled: true },
-      [PROMISE]: clientRemoveBreakpoint(
-        client,
-        getState(),
-        breakpoint.location
-      ),
+      [PROMISE]: clientRemoveBreakpoint(client, getState(), breakpoint.location),
     });
   };
 }

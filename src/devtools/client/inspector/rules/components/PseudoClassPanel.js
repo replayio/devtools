@@ -36,24 +36,22 @@ class PseudoClassPanel extends PureComponent {
         id: "pseudo-class-panel",
         className: "theme-toolbar ruleview-reveal-panel",
       },
-      Object.entries(pseudoClasses).map(
-        ([value, { isChecked, isDisabled }]) => {
-          return dom.label(
-            {},
-            dom.input({
-              key: value,
-              id: `pseudo-${value.slice(1)}-toggle`,
-              checked: isChecked,
-              disabled: isDisabled,
-              onChange: this.onInputChange,
-              tabIndex: 0,
-              type: "checkbox",
-              value,
-            }),
-            value
-          );
-        }
-      )
+      Object.entries(pseudoClasses).map(([value, { isChecked, isDisabled }]) => {
+        return dom.label(
+          {},
+          dom.input({
+            key: value,
+            id: `pseudo-${value.slice(1)}-toggle`,
+            checked: isChecked,
+            disabled: isDisabled,
+            onChange: this.onInputChange,
+            tabIndex: 0,
+            type: "checkbox",
+            value,
+          }),
+          value
+        );
+      })
     );
   }
 }

@@ -5,9 +5,7 @@
 "use strict";
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper(
-  "devtools/client/locales/inspector.properties"
-);
+const L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
 const Editor = require("devtools/client/shared/sourceeditor/editor");
 
@@ -47,7 +45,7 @@ function EventTooltip(tooltip, eventListenerInfos, toolbox) {
 }
 
 EventTooltip.prototype = {
-  init: function() {
+  init: function () {
     const config = {
       mode: Editor.modes.js,
       lineNumbers: false,
@@ -217,11 +215,11 @@ EventTooltip.prototype = {
     this._tooltip.on("hidden", this.destroy);
   },
 
-  _addContentListeners: function(header) {
+  _addContentListeners: function (header) {
     header.addEventListener("click", this._headerClicked);
   },
 
-  _headerClicked: function(event) {
+  _headerClicked: function (event) {
     if (event.target.classList.contains("event-tooltip-debugger-icon")) {
       this._debugClicked(event);
       event.stopPropagation();
@@ -237,12 +235,8 @@ EventTooltip.prototype = {
       content.removeAttribute("open");
     } else {
       // Close other open events first
-      const openHeaders = doc.querySelectorAll(
-        ".event-header.content-expanded"
-      );
-      const openContent = doc.querySelectorAll(
-        ".event-tooltip-content-box[open]"
-      );
+      const openHeaders = doc.querySelectorAll(".event-header.content-expanded");
+      const openContent = doc.querySelectorAll(".event-tooltip-content-box[open]");
       for (const node of openHeaders) {
         node.classList.remove("content-expanded");
       }
@@ -284,7 +278,7 @@ EventTooltip.prototype = {
     }
   },
 
-  _debugClicked: function(event) {
+  _debugClicked: function (event) {
     const header = event.currentTarget;
     const content = header.nextElementSibling;
 
@@ -296,19 +290,14 @@ EventTooltip.prototype = {
 
       this._tooltip.hide();
 
-      toolbox.viewSourceInDebugger(
-        location.url,
-        location.line,
-        location.column,
-        sourceActor
-      );
+      toolbox.viewSourceInDebugger(location.url, location.line, location.column, sourceActor);
     }
   },
 
   /**
    * Parse URI and return {url, line, column}; or return null if it can't be parsed.
    */
-  _parseLocation: function(uri) {
+  _parseLocation: function (uri) {
     if (uri && uri !== "?") {
       uri = uri.replace(/"/g, "");
 
@@ -332,13 +321,11 @@ EventTooltip.prototype = {
     return null;
   },
 
-  destroy: function() {
+  destroy: function () {
     if (this._tooltip) {
       this._tooltip.off("hidden", this.destroy);
 
-      const boxes = this.container.querySelectorAll(
-        ".event-tooltip-content-box"
-      );
+      const boxes = this.container.querySelectorAll(".event-tooltip-content-box");
 
       for (const box of boxes) {
         const { editor } = this._eventEditors.get(box);
@@ -355,9 +342,7 @@ EventTooltip.prototype = {
       node.removeEventListener("click", this._headerClicked);
     }
 
-    const sourceNodes = this.container.querySelectorAll(
-      ".event-tooltip-debugger-icon"
-    );
+    const sourceNodes = this.container.querySelectorAll(".event-tooltip-debugger-icon");
     for (const node of sourceNodes) {
       node.removeEventListener("click", this._debugClicked);
     }

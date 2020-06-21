@@ -22,10 +22,7 @@ export function isExactUrlMatch(pathPart: string, debuggeeUrl: string) {
   if (!host) {
     return false;
   }
-  return (
-    host === pathPart ||
-    host.replace(/^www\./, "") === pathPart.replace(/^www\./, "")
-  );
+  return host === pathPart || host.replace(/^www\./, "") === pathPart.replace(/^www\./, "");
 }
 
 export function isPathDirectory(path: string) {
@@ -61,10 +58,7 @@ export function isPathDirectory(path: string) {
 }
 
 export function isDirectory(item: TreeNode) {
-  return (
-    (item.type === "directory" || isPathDirectory(item.path)) &&
-    item.name != "(index)"
-  );
+  return (item.type === "directory" || isPathDirectory(item.path)) && item.name != "(index)";
 }
 
 export function getSourceFromNode(item: TreeNode): ?Source {
@@ -120,11 +114,7 @@ export function createDirectoryNode(
   };
 }
 
-export function createSourceNode(
-  name: string,
-  path: string,
-  contents: Source
-): TreeSource {
+export function createSourceNode(name: string, path: string, contents: Source): TreeSource {
   return {
     type: "source",
     name,

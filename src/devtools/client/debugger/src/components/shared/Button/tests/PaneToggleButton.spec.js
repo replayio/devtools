@@ -11,11 +11,7 @@ import { PaneToggleButton } from "../";
 describe("PaneToggleButton", () => {
   const handleClickSpy = jest.fn();
   const wrapper = shallow(
-    <PaneToggleButton
-      handleClick={handleClickSpy}
-      collapsed={false}
-      position="start"
-    />
+    <PaneToggleButton handleClick={handleClickSpy} collapsed={false} position="start" />
   );
 
   it("renders default", () => {

@@ -56,11 +56,7 @@ export default function mapOriginalExpression(
     const { refs } = scopes[0].bindings[name];
     const mapping = mappings[name];
 
-    if (
-      !refs.every(ref => ref.type === "ref") ||
-      !mapping ||
-      mapping === name
-    ) {
+    if (!refs.every(ref => ref.type === "ref") || !mapping || mapping === name) {
       continue;
     }
 

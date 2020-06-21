@@ -3,16 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const {
-  autocomplete,
-} = require("devtools/client/webconsole/reducers/autocomplete");
+const { autocomplete } = require("devtools/client/webconsole/reducers/autocomplete");
 const { filters } = require("devtools/client/webconsole/reducers/filters");
 const { messages } = require("devtools/client/webconsole/reducers/messages");
 const { prefs } = require("devtools/client/webconsole/reducers/prefs");
 const { ui } = require("devtools/client/webconsole/reducers/ui");
-const {
-  notifications,
-} = require("devtools/client/webconsole/reducers/notifications");
+const { notifications } = require("devtools/client/webconsole/reducers/notifications");
 const { history } = require("devtools/client/webconsole/reducers/history");
 const {
   default: objectInspector,

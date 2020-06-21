@@ -4,13 +4,8 @@
 
 "use strict";
 
-const {
-  cssTokenizer,
-  cssTokenizerWithLineColumn,
-} = require("devtools/shared/css/parsing-utils");
-const {
-  getClientCssProperties,
-} = require("devtools/shared/fronts/css-properties");
+const { cssTokenizer, cssTokenizerWithLineColumn } = require("devtools/shared/css/parsing-utils");
+const { getClientCssProperties } = require("devtools/shared/fronts/css-properties");
 
 /**
  * Here is what this file (+ css-parsing-utils.js) do.
@@ -111,7 +106,7 @@ CSSCompleter.prototype = {
    *          - label {String} Full keyword for the suggestion
    *          - preLabel {String} Already entered part of the label
    */
-  complete: function(source, caret) {
+  complete: function (source, caret) {
     // Getting the context from the caret position.
     if (!this.resolveState(source, caret)) {
       // We couldn't resolve the context, we won't be able to complete.
@@ -166,7 +161,7 @@ CSSCompleter.prototype = {
    *          One of CSS_STATE enum or null if the state cannot be resolved.
    */
   // eslint-disable-next-line complexity
-  resolveState: function(source, { line, ch }) {
+  resolveState: function (source, { line, ch }) {
     // Function to return the last element of an array
     const peek = arr => arr[arr.length - 1];
     // _state can be one of CSS_STATES;
@@ -198,8 +193,7 @@ CSSCompleter.prototype = {
     if (
       tokIndex >= 0 &&
       (tokens[tokIndex].loc.end.line < line ||
-        (tokens[tokIndex].loc.end.line === line &&
-          tokens[tokIndex].loc.end.column < ch))
+        (tokens[tokIndex].loc.end.line === line && tokens[tokIndex].loc.end.column < ch))
     ) {
       // If the last token ends before the cursor location, we didn't
       // tokenize it correctly.  This special case can happen if the
@@ -304,10 +298,7 @@ CSSCompleter.prototype = {
                   if (token.text == ".") {
                     selectorState = SELECTOR_STATES.class;
                     selector += ".";
-                    if (
-                      cursor <= tokIndex &&
-                      tokens[cursor].tokenType == "ident"
-                    ) {
+                    if (cursor <= tokIndex && tokens[cursor].tokenType == "ident") {
                       token = tokens[cursor++];
                       selector += token.text;
                     }
@@ -388,10 +379,7 @@ CSSCompleter.prototype = {
                   if (token.text == ".") {
                     selectorState = SELECTOR_STATES.class;
                     selector += ".";
-                    if (
-                      cursor <= tokIndex &&
-                      tokens[cursor].tokenType == "ident"
-                    ) {
+                    if (cursor <= tokIndex && tokens[cursor].tokenType == "ident") {
                       token = tokens[cursor++];
                       selector += token.text;
                     }
@@ -629,9 +617,7 @@ CSSCompleter.prototype = {
               break;
 
             case "at":
-              _state = token.text.startsWith("m")
-                ? CSS_STATES.media
-                : CSS_STATES.keyframes;
+              _state = token.text.startsWith("m") ? CSS_STATES.media : CSS_STATES.keyframes;
               break;
           }
           break;
@@ -674,11 +660,7 @@ CSSCompleter.prototype = {
       }
       if (_state == CSS_STATES.null) {
         if (this.nullStates.length == 0) {
-          this.nullStates.push([
-            token.loc.end.line,
-            token.loc.end.column,
-            [...scopeStack],
-          ]);
+          this.nullStates.push([token.loc.end.line, token.loc.end.column, [...scopeStack]]);
           continue;
         }
         let tokenLine = token.loc.end.line;
@@ -695,8 +677,7 @@ CSSCompleter.prototype = {
     this.state = _state;
     this.propertyName = _state == CSS_STATES.value ? propertyName : null;
     this.selectorState = _state == CSS_STATES.selector ? selectorState : null;
-    this.selectorBeforeNot =
-      selectorBeforeNot == null ? null : selectorBeforeNot;
+    this.selectorBeforeNot = selectorBeforeNot == null ? null : selectorBeforeNot;
     if (token) {
       selector = selector.slice(0, selector.length + token.loc.end.column - ch);
       this.selector = selector;
@@ -712,9 +693,7 @@ CSSCompleter.prototype = {
       } else {
         text = token.text;
       }
-      this.completing = text
-        .slice(0, ch - token.loc.start.column)
-        .replace(/^[.#]$/, "");
+      this.completing = text.slice(0, ch - token.loc.start.column).replace(/^[.#]$/, "");
     } else {
       this.completing = "";
     }
@@ -740,7 +719,7 @@ CSSCompleter.prototype = {
    * Queries the DOM Walker actor for suggestions regarding the selector being
    * completed
    */
-  suggestSelectors: function() {
+  suggestSelectors: function () {
     const walker = this.walker;
     if (!walker) {
       return Promise.resolve([]);
@@ -792,7 +771,7 @@ CSSCompleter.prototype = {
   /**
    * Prepares the selector suggestions returned by the walker actor.
    */
-  prepareSelectorResults: function(result) {
+  prepareSelectorResults: function (result) {
     if (this._currentQuery != result.query) {
       return [];
     }
@@ -806,11 +785,9 @@ CSSCompleter.prototype = {
         case SELECTOR_STATES.class:
         case SELECTOR_STATES.pseudo:
           if (/^[.:#]$/.test(this.completing)) {
-            value =
-              query.slice(0, query.length - this.completing.length) + value;
+            value = query.slice(0, query.length - this.completing.length) + value;
           } else {
-            value =
-              query.slice(0, query.length - this.completing.length - 1) + value;
+            value = query.slice(0, query.length - this.completing.length - 1) + value;
           }
           break;
 
@@ -835,16 +812,10 @@ CSSCompleter.prototype = {
 
       // In case the query's state is tag and the item's state is id or class
       // adjust the preLabel
-      if (
-        this.selectorState === SELECTOR_STATES.tag &&
-        state === SELECTOR_STATES.class
-      ) {
+      if (this.selectorState === SELECTOR_STATES.tag && state === SELECTOR_STATES.class) {
         item.preLabel = "." + item.preLabel;
       }
-      if (
-        this.selectorState === SELECTOR_STATES.tag &&
-        state === SELECTOR_STATES.id
-      ) {
+      if (this.selectorState === SELECTOR_STATES.tag && state === SELECTOR_STATES.id) {
         item.preLabel = "#" + item.preLabel;
       }
 
@@ -862,7 +833,7 @@ CSSCompleter.prototype = {
    *
    * @param startProp {String} Initial part of the property being completed.
    */
-  completeProperties: function(startProp) {
+  completeProperties: function (startProp) {
     const finalList = [];
     if (!startProp) {
       return Promise.resolve(finalList);
@@ -895,7 +866,7 @@ CSSCompleter.prototype = {
    *        belongs.
    * @param startValue {String} Initial part of the value being completed.
    */
-  completeValues: function(propName, startValue) {
+  completeValues: function (propName, startValue) {
     const finalList = [];
     const list = ["!important;", ...this.cssProperties.getValues(propName)];
     // If there is no character being completed, we are showing an initial list
@@ -935,7 +906,7 @@ CSSCompleter.prototype = {
    * of the CSS source. This speeds up the tokenizing and the state machine a
    * lot while using autocompletion at high line numbers in a CSS source.
    */
-  findNearestNullState: function(line) {
+  findNearestNullState: function (line) {
     const arr = this.nullStates;
     let high = arr.length - 1;
     let low = 0;
@@ -959,9 +930,7 @@ CSSCompleter.prototype = {
         return high - 1;
       }
 
-      target =
-        (((line - arr[low][0]) / (arr[high][0] - arr[low][0])) * (high - low)) |
-        0;
+      target = (((line - arr[low][0]) / (arr[high][0] - arr[low][0])) * (high - low)) | 0;
 
       if (arr[target][0] <= line && arr[target + 1][0] > line) {
         return target;
@@ -980,7 +949,7 @@ CSSCompleter.prototype = {
   /**
    * Invalidates the state cache for and above the line.
    */
-  invalidateCache: function(line) {
+  invalidateCache: function (line) {
     this.nullStates.length = this.findNearestNullState(line) + 1;
   },
 
@@ -1010,7 +979,7 @@ CSSCompleter.prototype = {
    *                 caret position of the whole selector, value or property.
    *                  - { start: {line, ch}, end: {line, ch}}
    */
-  getInfoAt: function(source, caret) {
+  getInfoAt: function (source, caret) {
     // Limits the input source till the {line, ch} caret position
     function limit(sourceArg, { line, ch }) {
       line++;
@@ -1021,9 +990,7 @@ CSSCompleter.prototype = {
       if (line == 1) {
         return list[0].slice(0, ch);
       }
-      return [...list.slice(0, line - 1), list[line - 1].slice(0, ch)].join(
-        "\n"
-      );
+      return [...list.slice(0, line - 1), list[line - 1].slice(0, ch)].join("\n");
     }
 
     // Get the state at the given line, ch
@@ -1180,10 +1147,7 @@ CSSCompleter.prototype = {
 
       // Since we have start and end positions, figure out the whole selector.
       let selector = source.split("\n").slice(start.line, end.line + 1);
-      selector[selector.length - 1] = selector[selector.length - 1].substring(
-        0,
-        end.ch
-      );
+      selector[selector.length - 1] = selector[selector.length - 1].substring(0, end.ch);
       selector[0] = selector[0].substring(start.ch);
       selector = selector.join("\n");
       return {
@@ -1221,10 +1185,7 @@ CSSCompleter.prototype = {
     } else if (state == CSS_STATES.value) {
       // CSS value can be multiline too, so we go forward and backwards to
       // determine the bounds of the value at caret
-      const start = traverseBackwards(
-        backState => backState != CSS_STATES.value,
-        true
-      );
+      const start = traverseBackwards(backState => backState != CSS_STATES.value, true);
 
       line = caret.line;
       limitedSource = limit(source, caret);

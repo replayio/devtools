@@ -63,11 +63,7 @@ class ManagedTree extends Component<Props, State> {
     }
   }
 
-  setExpanded = (
-    item: Item,
-    isExpanded: boolean,
-    shouldIncludeChildren: boolean
-  ) => {
+  setExpanded = (item: Item, isExpanded: boolean, shouldIncludeChildren: boolean) => {
     const expandItem = i => {
       const path = this.props.getPath(i);
       if (isExpanded) {
@@ -120,10 +116,7 @@ class ManagedTree extends Component<Props, State> {
       // closed folder and highlights this folder
       const index = highlightItems
         .reverse()
-        .findIndex(
-          item =>
-            !expanded.has(this.props.getPath(item)) && item.name !== "root"
-        );
+        .findIndex(item => !expanded.has(this.props.getPath(item)) && item.name !== "root");
 
       if (highlightItems[index]) {
         this.props.onFocus(highlightItems[index]);

@@ -8,9 +8,7 @@ const Services = require("Services");
 const EventEmitter = require("devtools/shared/event-emitter");
 
 const { focusableSelector } = require("devtools/client/shared/focus");
-const {
-  TooltipToggle,
-} = require("devtools/client/shared/widgets/tooltip/TooltipToggle");
+const { TooltipToggle } = require("devtools/client/shared/widgets/tooltip/TooltipToggle");
 const { listenOnce } = require("devtools/shared/async-utils");
 
 const POSITION = {
@@ -82,13 +80,7 @@ const EXTRA_BORDER = {
  *         - {String} computedPosition: Can differ from the preferred position depending
  *           on the available height). "top" or "bottom"
  */
-const calculateVerticalPosition = (
-  anchorRect,
-  viewportRect,
-  height,
-  pos,
-  offset
-) => {
+const calculateVerticalPosition = (anchorRect, viewportRect, height, pos, offset) => {
   const { TOP, BOTTOM } = POSITION;
 
   let { top: anchorTop, height: anchorHeight } = anchorRect;
@@ -117,10 +109,7 @@ const calculateVerticalPosition = (
   height = Math.floor(height);
 
   // Calculate TOP.
-  let top =
-    pos === TOP
-      ? anchorTop - height - offset
-      : anchorTop + anchorHeight + offset;
+  let top = pos === TOP ? anchorTop - height - offset : anchorTop + anchorHeight + offset;
 
   // Translate back to absolute coordinates by re-including viewport top margin.
   top += viewportRect.top;
@@ -244,10 +233,7 @@ const calculateHorizontalPosition = (
     hangDirection === "right"
       ? viewportRect.left + tooltipStart
       : viewportRect.right - tooltipStart - tooltipWidth;
-  const arrowLeft =
-    hangDirection === "right"
-      ? arrowStart
-      : tooltipWidth - arrowWidth - arrowStart;
+  const arrowLeft = hangDirection === "right" ? arrowStart : tooltipWidth - arrowWidth - arrowStart;
 
   return { left, width: tooltipWidth, arrowLeft };
 };
@@ -489,7 +475,7 @@ HTMLTooltip.prototype = {
       // on the window right away would trigger the callbacks; which means the tooltip
       // would be instantly hidden. To prevent such thing, the event listeners are set
       // on the next tick.
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         this.attachEventsTimer = this.doc.defaultView.setTimeout(() => {
           // Update the top window reference each time in case the host changes.
           this.topWindow = this._getTopWindow();
@@ -531,10 +517,7 @@ HTMLTooltip.prototype = {
       if (this.preferredHeight === "auto") {
         this.container.style.height = "auto";
       }
-      ({
-        width: preferredWidth,
-        height: measuredHeight,
-      } = this._measureContainerSize());
+      ({ width: preferredWidth, height: measuredHeight } = this._measureContainerSize());
     } else {
       const themeWidth = 2 * EXTRA_BORDER[this.type];
       preferredWidth = this.preferredWidth + themeWidth;
@@ -546,9 +529,7 @@ HTMLTooltip.prototype = {
 
     let borderRadius = 0;
     if (this.type === TYPE.DOORHANGER) {
-      borderRadius = parseFloat(
-        anchorCS.getPropertyValue("--theme-arrowpanel-border-radius")
-      );
+      borderRadius = parseFloat(anchorCS.getPropertyValue("--theme-arrowpanel-border-radius"));
       if (Number.isNaN(borderRadius)) {
         borderRadius = 0;
       }
@@ -587,8 +568,7 @@ HTMLTooltip.prototype = {
     const panelWindow = this.panel.ownerDocument.defaultView;
     const panelComputedStyle = panelWindow.getComputedStyle(this.panel);
     const verticalMargin =
-      parseFloat(panelComputedStyle.marginTop) +
-      parseFloat(panelComputedStyle.marginBottom);
+      parseFloat(panelComputedStyle.marginTop) + parseFloat(panelComputedStyle.marginBottom);
 
     // Calculate the vertical position and height
     let preferredHeight;
@@ -602,8 +582,7 @@ HTMLTooltip.prototype = {
       }
       preferredHeight += verticalMargin;
     } else {
-      const themeHeight =
-        EXTRA_HEIGHT[this.type] + verticalMargin + 2 * EXTRA_BORDER[this.type];
+      const themeHeight = EXTRA_HEIGHT[this.type] + verticalMargin + 2 * EXTRA_BORDER[this.type];
       preferredHeight = this.preferredHeight + themeHeight;
     }
 
@@ -622,10 +601,7 @@ HTMLTooltip.prototype = {
 
     // If the preferred height is set to Infinity, the tooltip container should grow based
     // on its content's height and use as much height as possible.
-    this.container.classList.toggle(
-      "tooltip-flexible-height",
-      this.preferredHeight === Infinity
-    );
+    this.container.classList.toggle("tooltip-flexible-height", this.preferredHeight === Infinity);
 
     this.container.style.height = height + "px";
 
@@ -673,12 +649,7 @@ HTMLTooltip.prototype = {
       // etc...)
       // availWidth/Height are the dimensions available to applications
       // excluding all the OS reserved space
-      const {
-        availLeft,
-        availTop,
-        availHeight,
-        availWidth,
-      } = this.doc.defaultView.screen;
+      const { availLeft, availTop, availHeight, availWidth } = this.doc.defaultView.screen;
       viewportRect = {
         top: availTop,
         right: availLeft + availWidth,
@@ -688,12 +659,7 @@ HTMLTooltip.prototype = {
         height: availHeight,
       };
 
-      const {
-        screenX,
-        screenY,
-        outerWidth,
-        outerHeight,
-      } = this.doc.defaultView;
+      const { screenX, screenY, outerWidth, outerHeight } = this.doc.defaultView;
       windowRect = {
         top: screenY,
         right: screenX + outerWidth,
@@ -777,7 +743,7 @@ HTMLTooltip.prototype = {
     // If the tooltip is hidden from a mouseup event, wait for a potential click event
     // to be consumed before removing event listeners.
     if (fromMouseup) {
-      await new Promise((resolve) => this.topWindow.setTimeout(resolve, 0));
+      await new Promise(resolve => this.topWindow.setTimeout(resolve, 0));
     }
 
     this.removeEventListeners();
@@ -977,10 +943,7 @@ HTMLTooltip.prototype = {
 
   _showXulWrapperAt: function (left, top) {
     return;
-    this.xulPanelWrapper.addEventListener(
-      "popuphidden",
-      this._onXulPanelHidden
-    );
+    this.xulPanelWrapper.addEventListener("popuphidden", this._onXulPanelHidden);
     const onPanelShown = listenOnce(this.xulPanelWrapper, "popupshown");
     const zoom = getCurrentZoom(this.xulPanelWrapper);
     this.xulPanelWrapper.openPopupAtScreen(left * zoom, top * zoom, false);
@@ -993,10 +956,7 @@ HTMLTooltip.prototype = {
   },
 
   _hideXulWrapper: function () {
-    this.xulPanelWrapper.removeEventListener(
-      "popuphidden",
-      this._onXulPanelHidden
-    );
+    this.xulPanelWrapper.removeEventListener("popuphidden", this._onXulPanelHidden);
 
     if (this.xulPanelWrapper.state === "closed") {
       // XUL panel is already closed, resolve immediately.

@@ -66,8 +66,7 @@ function getKeyForOS(os, action) {
 function formatKey(action) {
   const key = getKey(`${action}Display`) || getKey(action);
   if (isMacOS) {
-    const winKey =
-      getKeyForOS("WINNT", `${action}Display`) || getKeyForOS("WINNT", action);
+    const winKey = getKeyForOS("WINNT", `${action}Display`) || getKeyForOS("WINNT", action);
     // display both Windows type and Mac specific keys
     return formatKeyShortcut([key, winKey].join(" "));
   }
@@ -105,17 +104,13 @@ class CommandBar extends Component<Props> {
   componentDidMount() {
     const shortcuts = this.context.shortcuts;
 
-    COMMANDS.forEach(action =>
-      shortcuts.on(getKey(action), (_, e) => this.handleEvent(e, action))
-    );
+    COMMANDS.forEach(action => shortcuts.on(getKey(action), (_, e) => this.handleEvent(e, action)));
 
     if (isMacOS) {
       // The Mac supports both the Windows Function keys
       // as well as the Mac non-Function keys
       COMMANDS.forEach(action =>
-        shortcuts.on(getKeyForOS("WINNT", action), (_, e) =>
-          this.handleEvent(e, action)
-        )
+        shortcuts.on(getKeyForOS("WINNT", action), (_, e) => this.handleEvent(e, action))
       );
     }
   }
@@ -125,9 +120,7 @@ class CommandBar extends Component<Props> {
     e.preventDefault();
     e.stopPropagation();
     if (action === "resume") {
-      this.props.cx.isPaused
-        ? this.props.resume(cx)
-        : this.props.breakOnNext(cx);
+      this.props.cx.isPaused ? this.props.resume(cx) : this.props.breakOnNext(cx);
     } else {
       this.props[action](cx);
     }
@@ -150,13 +143,7 @@ class CommandBar extends Component<Props> {
     }
 
     if (isWaitingOnBreak) {
-      return debugBtn(
-        null,
-        "pause",
-        "disabled",
-        L10N.getStr("pausePendingButtonTooltip"),
-        true
-      );
+      return debugBtn(null, "pause", "disabled", L10N.getStr("pausePendingButtonTooltip"), true);
     }
 
     return debugBtn(
@@ -181,13 +168,7 @@ class CommandBar extends Component<Props> {
         cx.isPaused
       ),
       <div key="divider-1" className="divider" />,
-      debugBtn(
-        () => this.props.rewind(cx),
-        "rewind",
-        className,
-        "Rewind Execution",
-        !cx.isPaused
-      ),
+      debugBtn(() => this.props.rewind(cx), "rewind", className, "Rewind Execution", !cx.isPaused),
       debugBtn(
         () => this.props.resume(cx),
         "resume",
@@ -238,13 +219,9 @@ class CommandBar extends Component<Props> {
 
     return (
       <button
-        className={classnames(
-          "command-bar-button",
-          "command-bar-skip-pausing",
-          {
-            active: skipPausing,
-          }
-        )}
+        className={classnames("command-bar-button", "command-bar-skip-pausing", {
+          active: skipPausing,
+        })}
         title={
           skipPausing
             ? L10N.getStr("undoSkipPausingTooltip.label")
@@ -282,17 +259,14 @@ const mapStateToProps = state => ({
   skipPausing: getSkipPausing(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    resume: actions.resume,
-    stepIn: actions.stepIn,
-    stepOut: actions.stepOut,
-    stepOver: actions.stepOver,
-    breakOnNext: actions.breakOnNext,
-    rewind: actions.rewind,
-    reverseStepOver: actions.reverseStepOver,
-    pauseOnExceptions: actions.pauseOnExceptions,
-    toggleSkipPausing: actions.toggleSkipPausing,
-  }
-)(CommandBar);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  resume: actions.resume,
+  stepIn: actions.stepIn,
+  stepOut: actions.stepOut,
+  stepOver: actions.stepOver,
+  breakOnNext: actions.breakOnNext,
+  rewind: actions.rewind,
+  reverseStepOver: actions.reverseStepOver,
+  pauseOnExceptions: actions.pauseOnExceptions,
+  toggleSkipPausing: actions.toggleSkipPausing,
+})(CommandBar);

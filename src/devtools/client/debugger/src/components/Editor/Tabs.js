@@ -59,10 +59,7 @@ type State = {
   hiddenTabs: TabsSources,
 };
 
-function haveTabSourcesChanged(
-  tabSources: TabsSources,
-  prevTabSources: TabsSources
-): boolean {
+function haveTabSourcesChanged(tabSources: TabsSources, prevTabSources: TabsSources): boolean {
   if (tabSources.length !== prevTabSources.length) {
     return true;
   }
@@ -103,9 +100,7 @@ class Tabs extends PureComponent<Props, State> {
   }
 
   get draggedSource() {
-    return this._draggedSource == null
-      ? { url: null, id: null }
-      : this._draggedSource;
+    return this._draggedSource == null ? { url: null, id: null } : this._draggedSource;
   }
 
   set draggedSource(source: ?Source) {
@@ -133,17 +128,13 @@ class Tabs extends PureComponent<Props, State> {
     window.requestIdleCallback(this.updateHiddenTabs);
     document.addEventListener("resize", this.onResize);
 
-    document
-      .querySelector(".editor-pane")
-      .addEventListener("resizeend", this.onResize);
+    document.querySelector(".editor-pane").addEventListener("resizeend", this.onResize);
   }
 
   componentWillUnmount() {
     document.removeEventListener("resize", this.onResize);
 
-    document
-      .querySelector(".editor-pane")
-      .removeEventListener("resizeend", this.onResize);
+    document.querySelector(".editor-pane").removeEventListener("resizeend", this.onResize);
   }
 
   /*
@@ -158,11 +149,7 @@ class Tabs extends PureComponent<Props, State> {
     const sourceTabEls = this.refs.sourceTabs.children;
     const hiddenTabs = getHiddenTabs(tabSources, sourceTabEls);
 
-    if (
-      selectedSource &&
-      isVisible() &&
-      hiddenTabs.find(tab => tab.id == selectedSource.id)
-    ) {
+    if (selectedSource && isVisible() && hiddenTabs.find(tab => tab.id == selectedSource.id)) {
       return moveTab(selectedSource.url, 0);
     }
 
@@ -192,9 +179,7 @@ class Tabs extends PureComponent<Props, State> {
     const onClick = () => selectSource(cx, source.id);
     return (
       <li key={source.id} onClick={onClick} title={getFileURL(source, false)}>
-        <AccessibleImage
-          className={`dropdown-icon ${this.getIconClass(source)}`}
-        />
+        <AccessibleImage className={`dropdown-icon ${this.getIconClass(source)}`} />
         <span className="dropdown-label">{filename}</span>
       </li>
     );
@@ -216,9 +201,7 @@ class Tabs extends PureComponent<Props, State> {
       return;
     }
 
-    const tabDOM = ReactDOM.findDOMNode(
-      this.refs[`tab_${source.id}`].getWrappedInstance()
-    );
+    const tabDOM = ReactDOM.findDOMNode(this.refs[`tab_${source.id}`].getWrappedInstance());
 
     /* $FlowIgnore: tabDOM.nodeType will always be of Node.ELEMENT_NODE since it comes from a ref;
       however; the return type of findDOMNode is null | Element | Text */
@@ -231,9 +214,7 @@ class Tabs extends PureComponent<Props, State> {
     ) {
       // The current tab goes to the left of the target tab
       const targetTab =
-        hoveredTabIndex > this.draggedSourceIndex
-          ? hoveredTabIndex - 1
-          : hoveredTabIndex;
+        hoveredTabIndex > this.draggedSourceIndex ? hoveredTabIndex - 1 : hoveredTabIndex;
       moveTabBySourceId(this.draggedSource.id, targetTab);
       this.draggedSourceIndex = targetTab;
     } else if (
@@ -243,9 +224,7 @@ class Tabs extends PureComponent<Props, State> {
     ) {
       // The current tab goes to the right of the target tab
       const targetTab =
-        hoveredTabIndex < this.draggedSourceIndex
-          ? hoveredTabIndex + 1
-          : hoveredTabIndex;
+        hoveredTabIndex < this.draggedSourceIndex ? hoveredTabIndex + 1 : hoveredTabIndex;
       moveTabBySourceId(this.draggedSource.id, targetTab);
       this.draggedSourceIndex = targetTab;
     }

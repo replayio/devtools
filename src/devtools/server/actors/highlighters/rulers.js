@@ -5,10 +5,7 @@
 "use strict";
 
 const EventEmitter = require("devtools/shared/event-emitter");
-const {
-  getCurrentZoom,
-  setIgnoreLayoutChanges,
-} = require("devtools/shared/layout/utils");
+const { getCurrentZoom, setIgnoreLayoutChanges } = require("devtools/shared/layout/utils");
 const {
   CanvasFrameAnonymousContentHelper,
   createSVGNode,
@@ -32,10 +29,7 @@ const RULERS_TEXT_STEP = 100;
  */
 function RulersHighlighter(highlighterEnv) {
   this.env = highlighterEnv;
-  this.markup = new CanvasFrameAnonymousContentHelper(
-    highlighterEnv,
-    this._buildMarkup.bind(this)
-  );
+  this.markup = new CanvasFrameAnonymousContentHelper(highlighterEnv, this._buildMarkup.bind(this));
 
   const { pageListenerTarget } = highlighterEnv;
   pageListenerTarget.addEventListener("scroll", this);
@@ -47,7 +41,7 @@ RulersHighlighter.prototype = {
 
   ID_CLASS_PREFIX: "rulers-highlighter-",
 
-  _buildMarkup: function() {
+  _buildMarkup: function () {
     const { window } = this.env;
     const prefix = this.ID_CLASS_PREFIX;
 
@@ -63,9 +57,7 @@ RulersHighlighter.prototype = {
         height = size;
         isHorizontal = false;
       } else {
-        throw new Error(
-          `Invalid type of axis given; expected "x" or "y" but got "${axis}"`
-        );
+        throw new Error(`Invalid type of axis given; expected "x" or "y" but got "${axis}"`);
       }
 
       const g = createSVGNode(window, {
@@ -212,7 +204,7 @@ RulersHighlighter.prototype = {
     return container;
   },
 
-  handleEvent: function(event) {
+  handleEvent: function (event) {
     switch (event.type) {
       case "scroll":
         this._onScroll(event);
@@ -227,7 +219,7 @@ RulersHighlighter.prototype = {
     }
   },
 
-  _onScroll: function(event) {
+  _onScroll: function (event) {
     const prefix = this.ID_CLASS_PREFIX;
     const { scrollX, scrollY } = event.view;
 
@@ -245,7 +237,7 @@ RulersHighlighter.prototype = {
       .setAttribute("transform", `translate(0, ${-scrollY})`);
   },
 
-  _update: function() {
+  _update: function () {
     const { window } = this.env;
 
     setIgnoreLayoutChanges(true);
@@ -265,13 +257,13 @@ RulersHighlighter.prototype = {
     this._rafID = window.requestAnimationFrame(() => this._update());
   },
 
-  _cancelUpdate: function() {
+  _cancelUpdate: function () {
     if (this._rafID) {
       this.env.window.cancelAnimationFrame(this._rafID);
       this._rafID = 0;
     }
   },
-  updateViewport: function() {
+  updateViewport: function () {
     const { devicePixelRatio } = this.env.window;
 
     // Because `devicePixelRatio` is affected by zoom (see bug 809788),
@@ -289,7 +281,7 @@ RulersHighlighter.prototype = {
       .setAttribute("style", `stroke-width:${strokeWidth};`);
   },
 
-  updateViewportInfobar: function() {
+  updateViewportInfobar: function () {
     const { window } = this.env;
     const { innerHeight, innerWidth } = window;
     const infobarId = this.ID_CLASS_PREFIX + "viewport-infobar-container";
@@ -297,7 +289,7 @@ RulersHighlighter.prototype = {
     this.markup.getElement(infobarId).setTextContent(textContent);
   },
 
-  destroy: function() {
+  destroy: function () {
     this.hide();
 
     const { pageListenerTarget } = this.env;
@@ -312,11 +304,8 @@ RulersHighlighter.prototype = {
     EventEmitter.emit(this, "destroy");
   },
 
-  show: function() {
-    this.markup.removeAttributeForElement(
-      this.ID_CLASS_PREFIX + "elements",
-      "hidden"
-    );
+  show: function () {
+    this.markup.removeAttributeForElement(this.ID_CLASS_PREFIX + "elements", "hidden");
     this.markup.removeAttributeForElement(
       this.ID_CLASS_PREFIX + "viewport-infobar-container",
       "hidden"
@@ -327,12 +316,8 @@ RulersHighlighter.prototype = {
     return true;
   },
 
-  hide: function() {
-    this.markup.setAttributeForElement(
-      this.ID_CLASS_PREFIX + "elements",
-      "hidden",
-      "true"
-    );
+  hide: function () {
+    this.markup.setAttributeForElement(this.ID_CLASS_PREFIX + "elements", "hidden", "true");
     this.markup.setAttributeForElement(
       this.ID_CLASS_PREFIX + "viewport-infobar-container",
       "hidden",

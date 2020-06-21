@@ -9,11 +9,7 @@ import { kebabCase } from "lodash";
 
 import { showMenu } from "devtools-contextmenu";
 import { copyToTheClipboard } from "../../../../utils/clipboard";
-import {
-  makeMockFrame,
-  makeMockSource,
-  mockthreadcx,
-} from "../../../../utils/test-mockup";
+import { makeMockFrame, makeMockSource, mockthreadcx } from "../../../../utils/test-mockup";
 
 jest.mock("devtools-contextmenu", () => ({ showMenu: jest.fn() }));
 jest.mock("../../../../utils/clipboard", () => ({
@@ -57,36 +53,19 @@ describe("FrameMenu", () => {
     const frameworkGroupingId = generateMockId("framework.enableGrouping");
     const blackBoxId = generateMockId("sourceFooter.blackbox");
 
-    FrameMenu(
-      mockFrame,
-      frameworkGroupingOn,
-      callbacks,
-      mockEvent,
-      mockthreadcx
-    );
+    FrameMenu(mockFrame, frameworkGroupingOn, callbacks, mockEvent, mockthreadcx);
 
     const receivedArray = showMenu.mock.calls[0][1];
     expect(showMenu).toHaveBeenCalledWith(mockEvent, receivedArray);
     const receivedArrayIds = receivedArray.map(item => item.id);
-    expect(receivedArrayIds).toEqual([
-      frameworkGroupingId,
-      sourceId,
-      blackBoxId,
-      stacktraceId,
-    ]);
+    expect(receivedArrayIds).toEqual([frameworkGroupingId, sourceId, blackBoxId, stacktraceId]);
   });
 
   it("sends one element in menuOpts without source", () => {
     const stacktraceId = generateMockId("copyStackTrace");
     const frameworkGrouping = generateMockId("framework.enableGrouping");
 
-    FrameMenu(
-      emptyFrame,
-      frameworkGroupingOn,
-      callbacks,
-      mockEvent,
-      mockthreadcx
-    );
+    FrameMenu(emptyFrame, frameworkGroupingOn, callbacks, mockEvent, mockthreadcx);
 
     const receivedArray = showMenu.mock.calls[0][1];
     expect(showMenu).toHaveBeenCalledWith(mockEvent, receivedArray);

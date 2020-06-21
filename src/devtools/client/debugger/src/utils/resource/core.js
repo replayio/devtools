@@ -50,9 +50,7 @@ export function insertResources<R: ResourceBound>(
       throw new Error(`Resource "${id}" already exists, cannot insert ${Error().stack}`);
     }
     if (state.values[id]) {
-      throw new Error(
-        `Resource state corrupt: ${id} has value but no identity`
-      );
+      throw new Error(`Resource state corrupt: ${id} has value but no identity`);
     }
 
     state.identity[resource.id] = makeIdentity();
@@ -83,9 +81,7 @@ export function removeResources<R: ResourceBound>(
       throw new Error(`Resource "${id}" does not exists, cannot remove`);
     }
     if (!state.values[id]) {
-      throw new Error(
-        `Resource state corrupt: ${id} has identity but no value`
-      );
+      throw new Error(`Resource state corrupt: ${id} has identity but no value`);
     }
 
     delete state.identity[id];
@@ -111,9 +107,7 @@ export function updateResources<R: ResourceBound>(
       throw new Error(`Resource "${id}" does not exists, cannot update`);
     }
     if (!state.values[id]) {
-      throw new Error(
-        `Resource state corrupt: ${id} has identity but no value`
-      );
+      throw new Error(`Resource state corrupt: ${id} has identity but no value`);
     }
 
     const existing = state.values[id];
@@ -161,16 +155,12 @@ export function getValidatedResource<R: ResourceBound>(
   const value = state.values[id];
   const identity = state.identity[id];
   if ((value && !identity) || (!value && identity)) {
-    throw new Error(
-      `Resource state corrupt: ${id} has mismatched value and identity`
-    );
+    throw new Error(`Resource state corrupt: ${id} has mismatched value and identity`);
   }
 
   return value ? (state: any) : null;
 }
 
-export function getResourceValues<R: ResourceBound>(
-  state: ResourceState<R>
-): ResourceValues<R> {
+export function getResourceValues<R: ResourceBound>(state: ResourceState<R>): ResourceValues<R> {
   return state.values;
 }

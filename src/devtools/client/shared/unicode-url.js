@@ -16,7 +16,9 @@
 // https://github.com/firefox-devtools/devtools-core
 
 const idnService = {
-  convertToDisplayIDN(name) { return name; }
+  convertToDisplayIDN(name) {
+    return name;
+  },
 };
 
 /**

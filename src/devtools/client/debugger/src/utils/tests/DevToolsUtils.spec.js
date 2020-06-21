@@ -24,9 +24,7 @@ describe("DevToolsUtils", () => {
 
       reportException(who, [exception]);
 
-      expect(console.error).toHaveBeenCalledWith(`${who}${msgTxt}`, [
-        exception,
-      ]);
+      expect(console.error).toHaveBeenCalledWith(`${who}${msgTxt}`, [exception]);
     });
   });
 

@@ -137,22 +137,15 @@ export class ConditionalPanel extends PureComponent<Props> {
     const { location, editor } = props;
 
     const editorLine = toEditorLine(location.sourceId, location.line || 0);
-    this.cbPanel = editor.codeMirror.addLineWidget(
-      editorLine,
-      this.renderConditionalPanel(props),
-      {
-        coverGutter: true,
-        noHScroll: true,
-      }
-    );
+    this.cbPanel = editor.codeMirror.addLineWidget(editorLine, this.renderConditionalPanel(props), {
+      coverGutter: true,
+      noHScroll: true,
+    });
 
     if (this.input) {
       let parent: ?Node = this.input.parentNode;
       while (parent) {
-        if (
-          parent instanceof HTMLElement &&
-          parent.classList.contains("CodeMirror-scroll")
-        ) {
+        if (parent instanceof HTMLElement && parent.classList.contains("CodeMirror-scroll")) {
           this.scrollParent = parent;
           break;
         }
@@ -219,10 +212,7 @@ export class ConditionalPanel extends PureComponent<Props> {
         ref={node => (this.panelNode = node)}
       >
         <div className="prompt">»</div>
-        <textarea
-          defaultValue={defaultValue}
-          ref={input => this.createEditor(input)}
-        />
+        <textarea defaultValue={defaultValue} ref={input => this.createEditor(input)} />
       </div>,
       panel
     );
@@ -251,11 +241,7 @@ const mapStateToProps = state => {
   };
 };
 
-const {
-  setBreakpointOptions,
-  openConditionalPanel,
-  closeConditionalPanel,
-} = actions;
+const { setBreakpointOptions, openConditionalPanel, closeConditionalPanel } = actions;
 
 const mapDispatchToProps = {
   setBreakpointOptions,

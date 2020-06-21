@@ -14,7 +14,7 @@ switch (foo) {
 
 switch (foo) {
   case "":
-    function two(){}
+    function two() {}
 }
 switch (foo) {
   case "":

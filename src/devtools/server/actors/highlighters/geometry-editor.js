@@ -4,19 +4,14 @@
 
 "use strict";
 
-const {
-  AutoRefreshHighlighter,
-} = require("devtools/server/actors/highlighters/auto-refresh");
+const { AutoRefreshHighlighter } = require("devtools/server/actors/highlighters/auto-refresh");
 const {
   CanvasFrameAnonymousContentHelper,
   getComputedStyle,
   createSVGNode,
   createNode,
 } = require("devtools/server/actors/highlighters/utils/markup");
-const {
-  setIgnoreLayoutChanges,
-  getAdjustedQuads,
-} = require("devtools/shared/layout/utils");
+const { setIgnoreLayoutChanges, getAdjustedQuads } = require("devtools/shared/layout/utils");
 const { getCSSStyleRules } = require("devtools/shared/inspector/css-logic");
 
 const GEOMETRY_LABEL_SIZE = 6;
@@ -35,55 +30,55 @@ var GeoProp = {
   SIDES: ["top", "right", "bottom", "left"],
   SIZES: ["width", "height"],
 
-  allProps: function() {
+  allProps: function () {
     return [...this.SIDES, ...this.SIZES];
   },
 
-  isSide: function(name) {
+  isSide: function (name) {
     return this.SIDES.includes(name);
   },
 
-  isSize: function(name) {
+  isSize: function (name) {
     return this.SIZES.includes(name);
   },
 
-  containsSide: function(names) {
+  containsSide: function (names) {
     return names.some(name => this.SIDES.includes(name));
   },
 
-  containsSize: function(names) {
+  containsSize: function (names) {
     return names.some(name => this.SIZES.includes(name));
   },
 
-  isHorizontal: function(name) {
+  isHorizontal: function (name) {
     return name === "left" || name === "right" || name === "width";
   },
 
-  isInverted: function(name) {
+  isInverted: function (name) {
     return name === "right" || name === "bottom";
   },
 
-  mainAxisStart: function(name) {
+  mainAxisStart: function (name) {
     return this.isHorizontal(name) ? "left" : "top";
   },
 
-  crossAxisStart: function(name) {
+  crossAxisStart: function (name) {
     return this.isHorizontal(name) ? "top" : "left";
   },
 
-  mainAxisSize: function(name) {
+  mainAxisSize: function (name) {
     return this.isHorizontal(name) ? "width" : "height";
   },
 
-  crossAxisSize: function(name) {
+  crossAxisSize: function (name) {
     return this.isHorizontal(name) ? "height" : "width";
   },
 
-  axis: function(name) {
+  axis: function (name) {
     return this.isHorizontal(name) ? "x" : "y";
   },
 
-  crossAxis: function(name) {
+  crossAxis: function (name) {
     return this.isHorizontal(name) ? "y" : "x";
   },
 };
@@ -234,10 +229,7 @@ class GeometryEditorHighlighter extends AutoRefreshHighlighter {
     const onMouseDown = this.handleEvent.bind(this);
 
     for (const side of GeoProp.SIDES) {
-      this.getElement("handler-" + side).addEventListener(
-        "mousedown",
-        onMouseDown
-      );
+      this.getElement("handler-" + side).addEventListener("mousedown", onMouseDown);
     }
 
     this.onWillNavigate = this.onWillNavigate.bind(this);
@@ -339,9 +331,7 @@ class GeometryEditorHighlighter extends AutoRefreshHighlighter {
         nodeType: "g",
         parent: labelG,
         attributes: {
-          transform: GeoProp.isHorizontal(name)
-            ? "translate(-30 -30)"
-            : "translate(5 -10)",
+          transform: GeoProp.isHorizontal(name) ? "translate(-30 -30)" : "translate(5 -10)",
         },
       });
 
@@ -383,9 +373,7 @@ class GeometryEditorHighlighter extends AutoRefreshHighlighter {
     const { pageListenerTarget } = this.highlighterEnv;
 
     if (pageListenerTarget) {
-      DOM_EVENTS.forEach(type =>
-        pageListenerTarget.removeEventListener(type, this)
-      );
+      DOM_EVENTS.forEach(type => pageListenerTarget.removeEventListener(type, this));
     }
 
     AutoRefreshHighlighter.prototype.destroy.call(this);
@@ -419,9 +407,7 @@ class GeometryEditorHighlighter extends AutoRefreshHighlighter {
           return;
         }
 
-        const handlerSide = this.markup
-          .getElement(id)
-          .getAttribute("data-side");
+        const handlerSide = this.markup.getElement(id).getAttribute("data-side");
 
         if (handlerSide) {
           const side = handlerSide;
@@ -477,19 +463,14 @@ class GeometryEditorHighlighter extends AutoRefreshHighlighter {
           return;
         }
 
-        const delta =
-          (GeoProp.isHorizontal(side) ? pageX - x : pageY - y) * inc;
+        const delta = (GeoProp.isHorizontal(side) ? pageX - x : pageY - y) * inc;
 
         // The inline style has usually the priority over any other CSS rule
         // set in stylesheets. However, if a rule has `!important` keyword,
         // it will override the inline style too. To ensure Geometry Editor
         // will always update the element, we have to add `!important` as
         // well.
-        this.currentNode.style.setProperty(
-          side,
-          value + delta + unit,
-          "important"
-        );
+        this.currentNode.style.setProperty(side, value + delta + unit, "important");
 
         break;
     }
@@ -560,17 +541,12 @@ class GeometryEditorHighlighter extends AutoRefreshHighlighter {
     // Get the offsetParent, if any.
     this.offsetParent = getOffsetParent(this.currentNode);
     // And the offsetParent quads.
-    this.parentQuads = getAdjustedQuads(
-      this.win,
-      this.offsetParent.element,
-      "padding"
-    );
+    this.parentQuads = getAdjustedQuads(this.win, this.offsetParent.element, "padding");
 
     const el = this.getElement("offset-parent");
 
     const isPositioned =
-      this.computedStyle.position === "absolute" ||
-      this.computedStyle.position === "fixed";
+      this.computedStyle.position === "absolute" || this.computedStyle.position === "fixed";
     const isRelative = this.computedStyle.position === "relative";
     let isHighlighted = false;
 
@@ -711,12 +687,7 @@ class GeometryEditorHighlighter extends AutoRefreshHighlighter {
       if (GeoProp.isInverted(side)) {
         return this.offsetParent.dimension[GeoProp.mainAxisSize(side)];
       }
-      return (
-        -1 *
-        this.currentNode.ownerGlobal[
-          "scroll" + GeoProp.axis(side).toUpperCase()
-        ]
-      );
+      return -1 * this.currentNode.ownerGlobal["scroll" + GeoProp.axis(side).toUpperCase()];
     };
 
     for (const side of GeoProp.SIDES) {
@@ -728,8 +699,7 @@ class GeometryEditorHighlighter extends AutoRefreshHighlighter {
       const mainAxisStartPos = getSideArrowStartPos(side);
       const mainAxisEndPos = marginBox[side];
       const crossAxisPos =
-        marginBox[GeoProp.crossAxisStart(side)] +
-        marginBox[GeoProp.crossAxisSize(side)] / 2;
+        marginBox[GeoProp.crossAxisStart(side)] + marginBox[GeoProp.crossAxisSize(side)] / 2;
 
       this.updateArrow(
         side,
@@ -763,10 +733,7 @@ class GeometryEditorHighlighter extends AutoRefreshHighlighter {
     const capitalize = str => str[0].toUpperCase() + str.substring(1);
     const winMain = this.win["inner" + capitalize(GeoProp.mainAxisSize(side))];
     let labelMain = mainStart + (mainEnd - mainStart) / 2;
-    if (
-      (mainStart > 0 && mainStart < winMain) ||
-      (mainEnd > 0 && mainEnd < winMain)
-    ) {
+    if ((mainStart > 0 && mainStart < winMain) || (mainEnd > 0 && mainEnd < winMain)) {
       if (labelMain < GEOMETRY_LABEL_SIZE) {
         labelMain = GEOMETRY_LABEL_SIZE;
       } else if (labelMain > winMain - GEOMETRY_LABEL_SIZE) {

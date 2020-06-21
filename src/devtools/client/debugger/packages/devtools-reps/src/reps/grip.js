@@ -49,15 +49,19 @@ function GripRep(props) {
         span(
           {
             className: "objectLeftBrace",
-          }, "{"), hasProperties ? span(
-            {
-              key: "more",
-              className: "more-ellipsis",
-              title: "more…",
-            },
-            "…"
-          )
-        : null,
+          },
+          "{"
+        ),
+        hasProperties
+          ? span(
+              {
+                key: "more",
+                className: "more-ellipsis",
+                title: "more…",
+              },
+              "…"
+            )
+          : null,
         span(
           {
             className: "objectRightBrace",
@@ -134,9 +138,7 @@ function propIterator(props, object, max) {
     props.isInterestingProp ||
     ((type, value) => {
       return (
-        type == "boolean" ||
-        type == "number" ||
-        (type == "string" && value.primitive().length != 0)
+        type == "boolean" || type == "number" || (type == "string" && value.primitive().length != 0)
       );
     });
 
@@ -206,7 +208,6 @@ function propIterator(props, object, max) {
   return propsArray;
 }
 
-
 /**
  * Get props ordered by index.
  *
@@ -262,7 +263,8 @@ function getPropIndexes(properties, max, filter) {
       // Type is specified in grip's "class" field and for primitive
       // values use typeof.
       const value = properties[name];
-      let type = value.isObject() ? value.className() : typeof value.primitive(); type = type.toLowerCase();
+      let type = value.isObject() ? value.className() : typeof value.primitive();
+      type = type.toLowerCase();
 
       if (filter(type, value, name)) {
         indexes.push(i);
@@ -277,7 +279,7 @@ function getPropIndexes(properties, max, filter) {
 
 // Registration
 function supportsObject(object, noGrip = false) {
-  return true
+  return true;
 }
 
 const maxLengthMap = new Map();

@@ -49,9 +49,7 @@ function removeInnerLocations(locations: AstLocation[], position: AstPosition) {
   // First, let's find the nearest position-enclosing function location,
   // which is to find the last location enclosing the position.
   const newLocs = locations.slice();
-  const parentIndex = findLastIndex(newLocs, loc =>
-    containsPosition(loc, position)
-  );
+  const parentIndex = findLastIndex(newLocs, loc => containsPosition(loc, position));
   if (parentIndex < 0) {
     return newLocs;
   }
@@ -66,8 +64,7 @@ function removeInnerLocations(locations: AstLocation[], position: AstPosition) {
     loc => !containsLocation(parentLoc, loc),
     innerStartIndex
   );
-  const innerBoundaryIndex =
-    outerBoundaryIndex < 0 ? newLocs.length - 1 : outerBoundaryIndex - 1;
+  const innerBoundaryIndex = outerBoundaryIndex < 0 ? newLocs.length - 1 : outerBoundaryIndex - 1;
 
   // Third, remove those inner functions
   newLocs.splice(innerStartIndex, innerBoundaryIndex - parentIndex);
@@ -114,16 +111,10 @@ function sortByStart(a: AstLocation, b: AstLocation) {
  * Returns an array of locations that are considered out of scope for the given
  * location.
  */
-function findOutOfScopeLocations(
-  sourceId: string,
-  position: AstPosition
-): AstLocation[] {
+function findOutOfScopeLocations(sourceId: string, position: AstPosition): AstLocation[] {
   const { functions, comments } = findSymbols(sourceId);
   const commentLocations = comments.map(c => c.location);
-  let locations = functions
-    .map(getLocation)
-    .concat(commentLocations)
-    .sort(sortByStart);
+  let locations = functions.map(getLocation).concat(commentLocations).sort(sortByStart);
   // Must remove inner locations then filter, otherwise,
   // we will mis-judge in-scope inner locations as out of scope.
   locations = removeInnerLocations(locations, position).filter(

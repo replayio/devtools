@@ -9,7 +9,7 @@ const {
   MESSAGE_LEVEL,
 } = require("devtools/client/webconsole/constants");
 
-exports.ConsoleCommand = function(props) {
+exports.ConsoleCommand = function (props) {
   return Object.assign(
     {
       id: null,
@@ -27,7 +27,7 @@ exports.ConsoleCommand = function(props) {
   );
 };
 
-exports.ConsoleMessage = function(props) {
+exports.ConsoleMessage = function (props) {
   return Object.assign(
     {
       id: null,
@@ -61,7 +61,7 @@ exports.ConsoleMessage = function(props) {
   );
 };
 
-exports.NetworkEventMessage = function(props) {
+exports.NetworkEventMessage = function (props) {
   return Object.assign(
     {
       id: null,

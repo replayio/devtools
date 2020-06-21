@@ -3,10 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // ReactJS
-const {
-  button,
-  span,
-} = require("react-dom-factories");
+const { button, span } = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
 // Utils
@@ -168,8 +165,7 @@ function getElements(grip, mode) {
 
 // Registration
 function supportsObject(object) {
-  return object?.hasPreview() && object.isNode() &&
-    object.nodeType() == nodeConstants.ELEMENT_NODE;
+  return object?.hasPreview() && object.isNode() && object.nodeType() == nodeConstants.ELEMENT_NODE;
 }
 
 // Exports from this module

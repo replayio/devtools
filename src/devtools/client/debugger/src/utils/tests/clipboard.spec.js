@@ -24,10 +24,7 @@ describe("copyToTheClipboard()", () => {
   it("listens for 'copy' event", () => {
     copyToTheClipboard(clipboardTestCopyString);
 
-    expect(document.addEventListener).toHaveBeenCalledWith(
-      expectedCopyEvent,
-      expect.anything()
-    );
+    expect(document.addEventListener).toHaveBeenCalledWith(expectedCopyEvent, expect.anything());
   });
 
   it("calls document.execCommand() with 'copy' command", () => {
@@ -39,9 +36,6 @@ describe("copyToTheClipboard()", () => {
   it("removes event listener for 'copy' event", () => {
     copyToTheClipboard(clipboardTestCopyString);
 
-    expect(document.removeEventListener).toHaveBeenCalledWith(
-      expectedCopyEvent,
-      expect.anything()
-    );
+    expect(document.removeEventListener).toHaveBeenCalledWith(expectedCopyEvent, expect.anything());
   });
 });

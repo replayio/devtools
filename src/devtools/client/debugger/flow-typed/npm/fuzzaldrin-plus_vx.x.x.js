@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'fuzzaldrin-plus' {
+declare module "fuzzaldrin-plus" {
   declare module.exports: any;
 }
 
@@ -22,60 +22,60 @@ declare module 'fuzzaldrin-plus' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'fuzzaldrin-plus/dist-browser/fuzzaldrin-plus' {
+declare module "fuzzaldrin-plus/dist-browser/fuzzaldrin-plus" {
   declare module.exports: any;
 }
 
-declare module 'fuzzaldrin-plus/dist-browser/fuzzaldrin-plus.min' {
+declare module "fuzzaldrin-plus/dist-browser/fuzzaldrin-plus.min" {
   declare module.exports: any;
 }
 
-declare module 'fuzzaldrin-plus/lib/filter' {
+declare module "fuzzaldrin-plus/lib/filter" {
   declare module.exports: any;
 }
 
-declare module 'fuzzaldrin-plus/lib/fuzzaldrin' {
+declare module "fuzzaldrin-plus/lib/fuzzaldrin" {
   declare module.exports: any;
 }
 
-declare module 'fuzzaldrin-plus/lib/matcher' {
+declare module "fuzzaldrin-plus/lib/matcher" {
   declare module.exports: any;
 }
 
-declare module 'fuzzaldrin-plus/lib/pathScorer' {
+declare module "fuzzaldrin-plus/lib/pathScorer" {
   declare module.exports: any;
 }
 
-declare module 'fuzzaldrin-plus/lib/query' {
+declare module "fuzzaldrin-plus/lib/query" {
   declare module.exports: any;
 }
 
-declare module 'fuzzaldrin-plus/lib/scorer' {
+declare module "fuzzaldrin-plus/lib/scorer" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'fuzzaldrin-plus/dist-browser/fuzzaldrin-plus.js' {
-  declare module.exports: $Exports<'fuzzaldrin-plus/dist-browser/fuzzaldrin-plus'>;
+declare module "fuzzaldrin-plus/dist-browser/fuzzaldrin-plus.js" {
+  declare module.exports: $Exports<"fuzzaldrin-plus/dist-browser/fuzzaldrin-plus">;
 }
-declare module 'fuzzaldrin-plus/dist-browser/fuzzaldrin-plus.min.js' {
-  declare module.exports: $Exports<'fuzzaldrin-plus/dist-browser/fuzzaldrin-plus.min'>;
+declare module "fuzzaldrin-plus/dist-browser/fuzzaldrin-plus.min.js" {
+  declare module.exports: $Exports<"fuzzaldrin-plus/dist-browser/fuzzaldrin-plus.min">;
 }
-declare module 'fuzzaldrin-plus/lib/filter.js' {
-  declare module.exports: $Exports<'fuzzaldrin-plus/lib/filter'>;
+declare module "fuzzaldrin-plus/lib/filter.js" {
+  declare module.exports: $Exports<"fuzzaldrin-plus/lib/filter">;
 }
-declare module 'fuzzaldrin-plus/lib/fuzzaldrin.js' {
-  declare module.exports: $Exports<'fuzzaldrin-plus/lib/fuzzaldrin'>;
+declare module "fuzzaldrin-plus/lib/fuzzaldrin.js" {
+  declare module.exports: $Exports<"fuzzaldrin-plus/lib/fuzzaldrin">;
 }
-declare module 'fuzzaldrin-plus/lib/matcher.js' {
-  declare module.exports: $Exports<'fuzzaldrin-plus/lib/matcher'>;
+declare module "fuzzaldrin-plus/lib/matcher.js" {
+  declare module.exports: $Exports<"fuzzaldrin-plus/lib/matcher">;
 }
-declare module 'fuzzaldrin-plus/lib/pathScorer.js' {
-  declare module.exports: $Exports<'fuzzaldrin-plus/lib/pathScorer'>;
+declare module "fuzzaldrin-plus/lib/pathScorer.js" {
+  declare module.exports: $Exports<"fuzzaldrin-plus/lib/pathScorer">;
 }
-declare module 'fuzzaldrin-plus/lib/query.js' {
-  declare module.exports: $Exports<'fuzzaldrin-plus/lib/query'>;
+declare module "fuzzaldrin-plus/lib/query.js" {
+  declare module.exports: $Exports<"fuzzaldrin-plus/lib/query">;
 }
-declare module 'fuzzaldrin-plus/lib/scorer.js' {
-  declare module.exports: $Exports<'fuzzaldrin-plus/lib/scorer'>;
+declare module "fuzzaldrin-plus/lib/scorer.js" {
+  declare module.exports: $Exports<"fuzzaldrin-plus/lib/scorer">;
 }

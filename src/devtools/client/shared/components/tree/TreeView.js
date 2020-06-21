@@ -5,26 +5,15 @@
 
 // Make this available to both AMD and CJS environments
 define(function (require, exports, module) {
-  const {
-    cloneElement,
-    Component,
-    createFactory,
-    createRef,
-  } = require("react");
+  const { cloneElement, Component, createFactory, createRef } = require("react");
   const { findDOMNode } = require("react-dom");
   const PropTypes = require("prop-types");
   const dom = require("react-dom-factories");
 
   // Reps
-  const {
-    ObjectProvider,
-  } = require("devtools/client/shared/components/tree/ObjectProvider");
-  const TreeRow = createFactory(
-    require("devtools/client/shared/components/tree/TreeRow")
-  );
-  const TreeHeader = createFactory(
-    require("devtools/client/shared/components/tree/TreeHeader")
-  );
+  const { ObjectProvider } = require("devtools/client/shared/components/tree/ObjectProvider");
+  const TreeRow = createFactory(require("devtools/client/shared/components/tree/TreeRow"));
+  const TreeHeader = createFactory(require("devtools/client/shared/components/tree/TreeHeader"));
 
   const { scrollIntoView } = require("devtools/client/shared/scroll");
 
@@ -173,10 +162,7 @@ define(function (require, exports, module) {
            Sibling nodes will either be all expanded or none expanded.
      * }
      */
-    static getExpandedNodes(
-      rootObj,
-      { maxLevel = Infinity, maxNodes = Infinity } = {}
-    ) {
+    static getExpandedNodes(rootObj, { maxLevel = Infinity, maxNodes = Infinity } = {}) {
       const expandedNodes = new Set();
       const queue = [
         {
@@ -262,10 +248,9 @@ define(function (require, exports, module) {
         return;
       }
 
-      this.selectRow(
-        rows[Math.min(this.state.lastSelectedIndex, rows.length - 1)],
-        { alignTo: "top" }
-      );
+      this.selectRow(rows[Math.min(this.state.lastSelectedIndex, rows.length - 1)], {
+        alignTo: "top",
+      });
     }
 
     /**
@@ -396,10 +381,7 @@ define(function (require, exports, module) {
       const row = this.visibleRows.find(r => r.props.member.path === nodePath);
 
       // Call custom click handler and bail out if it returns true.
-      if (
-        onClickRow &&
-        onClickRow.call(this, nodePath, event, row.props.member)
-      ) {
+      if (onClickRow && onClickRow.call(this, nodePath, event, row.props.member)) {
         return;
       }
 
@@ -620,11 +602,7 @@ define(function (require, exports, module) {
 
         // If a child node is expanded render its rows too.
         if (member.hasChildren && member.open) {
-          const childRows = this.renderRows(
-            member.object,
-            level + 1,
-            member.path
-          );
+          const childRows = this.renderRows(member.object, level + 1, member.path);
 
           // If children needs to be asynchronously fetched first,
           // set 'loading' property to the parent row. Otherwise

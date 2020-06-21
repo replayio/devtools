@@ -34,17 +34,15 @@ pref("devtools.webconsole.input.editorOnboarding", true);
 pref("devtools.webconsole.input.context", false);
 
 global.loader = {
-  lazyServiceGetter: () => { },
+  lazyServiceGetter: () => {},
   lazyGetter: (context, name, fn) => {
     try {
       global[name] = fn();
-    } catch (_) { }
+    } catch (_) {}
   },
   lazyRequireGetter: (context, name, path, destruct) => {
     if (path === "devtools/shared/async-storage") {
-      global[
-        name
-      ] = require("devtools/client/webconsole/test/node/fixtures/async-storage");
+      global[name] = require("devtools/client/webconsole/test/node/fixtures/async-storage");
     }
     const excluded = [
       "Debugger",
@@ -76,19 +74,19 @@ if (!global.URLSearchParams) {
 
 if (!global.ResizeObserver) {
   global.ResizeObserver = class ResizeObserver {
-    observe() { }
-    unobserve() { }
-    disconnect() { }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
   };
 }
 
 // Mock ChromeUtils.
 global.ChromeUtils = {
-  import: () => { },
-  defineModuleGetter: () => { },
+  import: () => {},
+  defineModuleGetter: () => {},
 };
 
-global.define = function () { };
+global.define = function () {};
 
 // Point to vendored-in files and mocks when needed.
 const requireHacker = require("require-hacker");
@@ -96,34 +94,25 @@ requireHacker.global_hook("default", (path, module) => {
   const paths = {
     // For Enzyme
     "react-dom": () => getModule("react-dom"),
-    "react-dom/server": () =>
-      getModule("react-dom-server"),
-    "react-dom/test-utils": () =>
-      getModule("react-dom-test-utils-dev"),
+    "react-dom/server": () => getModule("react-dom-server"),
+    "react-dom/test-utils": () => getModule("react-dom-test-utils-dev"),
     "react-redux": () => getModule("react-redux"),
     // Use react-dev. This would be handled by browserLoader in Firefox.
     react: () => getModule("react-dev"),
-    "react": () =>
-      getModule("react-dev"),
+    react: () => getModule("react-dev"),
     "chrome://mochitests/content/browser/devtools/client/webconsole/test/browser/stub-generator-helpers": () =>
-      getModule(
-        "devtools/client/webconsole/test/browser/stub-generator-helpers"
-      ),
+      getModule("devtools/client/webconsole/test/browser/stub-generator-helpers"),
 
-    chrome: () =>
-      `module.exports = { Cc: {}, Ci: {}, Cu: {}, components: {stack: {caller: ""}} }`,
+    chrome: () => `module.exports = { Cc: {}, Ci: {}, Cu: {}, components: {stack: {caller: ""}} }`,
     ChromeUtils: () => `module.exports = { import: () => ({}) }`,
     // Some modules depend on Chrome APIs which don't work in mocha. When such a module
     // is required, replace it with a mock version.
     "devtools/shared/l10n": () =>
-      getModule(
-        "devtools/client/webconsole/test/node/fixtures/LocalizationHelper"
-      ),
+      getModule("devtools/client/webconsole/test/node/fixtures/LocalizationHelper"),
     "devtools/shared/plural-form": () =>
       getModule("devtools/client/webconsole/test/node/fixtures/PluralForm"),
     Services: () => `module.exports = require("devtools-services")`,
-    "devtools/server/devtools-server": () =>
-      `module.exports = {DevToolsServer: {}}`,
+    "devtools/server/devtools-server": () => `module.exports = {DevToolsServer: {}}`,
     "devtools/client/shared/components/SmartTrace": () => "{}",
     "devtools/client/netmonitor/src/components/TabboxPanel": () => "{}",
     "devtools/client/webconsole/utils/context-menu": () => "{}",

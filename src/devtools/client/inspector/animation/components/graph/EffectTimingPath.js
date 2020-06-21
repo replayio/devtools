@@ -25,13 +25,7 @@ class EffectTimingPath extends TimingPath {
   }
 
   render() {
-    const {
-      animation,
-      durationPerPixel,
-      offset,
-      simulateAnimation,
-      totalDuration,
-    } = this.props;
+    const { animation, durationPerPixel, offset, simulateAnimation, totalDuration } = this.props;
 
     const { state } = animation;
     const effectTiming = Object.assign({}, state, {
@@ -52,16 +46,10 @@ class EffectTimingPath extends TimingPath {
       }
 
       simulatedAnimation.currentTime = time < endTime ? time : endTime;
-      return Math.max(
-        simulatedAnimation.effect.getComputedTiming().progress,
-        0
-      );
+      return Math.max(simulatedAnimation.effect.getComputedTiming().progress, 0);
     };
 
-    const toPathStringFunc = createSummaryGraphPathStringFunction(
-      endTime,
-      state.playbackRate
-    );
+    const toPathStringFunc = createSummaryGraphPathStringFunction(endTime, state.playbackRate);
     const helper = new SummaryGraphHelper(
       state,
       null,

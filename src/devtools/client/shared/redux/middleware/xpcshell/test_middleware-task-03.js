@@ -4,14 +4,8 @@
 
 "use strict";
 
-const {
-  createStore,
-  applyMiddleware,
-} = require("devtools/client/shared/vendor/redux");
-const {
-  task,
-  ERROR_TYPE,
-} = require("devtools/client/shared/redux/middleware/task");
+const { createStore, applyMiddleware } = require("devtools/client/shared/vendor/redux");
+const { task, ERROR_TYPE } = require("devtools/client/shared/redux/middleware/task");
 
 /**
  * Tests that the middleware handles errors thrown in tasks, and rejected promises.
@@ -21,16 +15,12 @@ function run_test() {
   run_next_test();
 }
 
-add_task(async function() {
+add_task(async function () {
   const store = applyMiddleware(task)(createStore)(reducer);
 
   store.dispatch(generatorError());
   await waitUntilState(store, () => store.getState().length === 1);
-  equal(
-    store.getState()[0].type,
-    ERROR_TYPE,
-    "generator errors dispatch ERROR_TYPE actions"
-  );
+  equal(store.getState()[0].type, ERROR_TYPE, "generator errors dispatch ERROR_TYPE actions");
   equal(
     store.getState()[0].error,
     "task-middleware-error-generator",
@@ -39,7 +29,7 @@ add_task(async function() {
 });
 
 function generatorError() {
-  return function*(dispatch, getState) {
+  return function* (dispatch, getState) {
     const error = "task-middleware-error-generator";
     throw error;
   };

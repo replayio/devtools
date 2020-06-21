@@ -11,10 +11,7 @@
 
 import { flatten } from "lodash";
 
-import {
-  stringToSourceActorId,
-  type SourceActor,
-} from "../../reducers/source-actors";
+import { stringToSourceActorId, type SourceActor } from "../../reducers/source-actors";
 import { supportsWasm } from "../../reducers/threads";
 import { insertSourceActors } from "../../actions/source-actors";
 import { makeSourceId } from "../../client/firefox/create";
@@ -24,12 +21,7 @@ import { loadSourceText } from "./loadSourceText";
 import { togglePrettyPrint } from "./prettyPrint";
 import { selectLocation, setBreakableLines } from "../sources";
 
-import {
-  getRawSourceURL,
-  isPrettyURL,
-  isUrlExtension,
-  isInlineScript,
-} from "../../utils/source";
+import { getRawSourceURL, isPrettyURL, isUrlExtension, isInlineScript } from "../../utils/source";
 import {
   getBlackBoxList,
   getSource,
@@ -87,8 +79,7 @@ function checkSelectedSource(cx: Context, sourceId: string) {
       await dispatch(
         selectLocation(cx, {
           sourceId: source.id,
-          line:
-            typeof pendingLocation.line === "number" ? pendingLocation.line : 0,
+          line: typeof pendingLocation.line === "number" ? pendingLocation.line : 0,
           column: pendingLocation.column,
         })
       );
@@ -104,10 +95,7 @@ function checkPendingBreakpoints(cx: Context, sourceId: string) {
       return;
     }
 
-    const pendingBreakpoints = getPendingBreakpointsForSource(
-      getState(),
-      source
-    );
+    const pendingBreakpoints = getPendingBreakpointsForSource(getState(), source);
 
     if (pendingBreakpoints.length === 0) {
       return;
@@ -215,11 +203,7 @@ export function newGeneratedSource(sourceInfo: GeneratedSourceData) {
   };
 }
 export function newGeneratedSources(sourceInfo: Array<GeneratedSourceData>) {
-  return async ({
-    dispatch,
-    getState,
-    client,
-  }: ThunkArgs): Promise<Array<Source>> => {
+  return async ({ dispatch, getState, client }: ThunkArgs): Promise<Array<Source>> => {
     const resultIds = [];
     const newSourcesObj = {};
     const newSourceActors: Array<SourceActor> = [];
@@ -253,8 +237,7 @@ export function newGeneratedSources(sourceInfo: Array<GeneratedSourceData>) {
           introductionUrl: source.introductionUrl,
           introductionType: source.introductionType,
           isBlackBoxed: false,
-          isWasm:
-            !!supportsWasm(getState()) && source.introductionType === "wasm",
+          isWasm: !!supportsWasm(getState()) && source.introductionType === "wasm",
           isExtension: false,
           isOriginal,
         };
@@ -330,7 +313,7 @@ function checkNewSources(cx, sources: Source[]) {
 }
 
 export function ensureSourceActor(thread: string, sourceActor: SourceActorId) {
-  return async function({ dispatch, getState, client }: ThunkArgs) {
+  return async function ({ dispatch, getState, client }: ThunkArgs) {
     await sourceQueue.flush();
     if (hasSourceActor(getState(), sourceActor)) {
       return Promise.resolve();

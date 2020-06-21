@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'jest-in-case' {
+declare module "jest-in-case" {
   declare module.exports: any;
 }
 
@@ -23,11 +23,10 @@ declare module 'jest-in-case' {
  * needed.
  */
 
-
 // Filename aliases
-declare module 'jest-in-case/index' {
-  declare module.exports: $Exports<'jest-in-case'>;
+declare module "jest-in-case/index" {
+  declare module.exports: $Exports<"jest-in-case">;
 }
-declare module 'jest-in-case/index.js' {
-  declare module.exports: $Exports<'jest-in-case'>;
+declare module "jest-in-case/index.js" {
+  declare module.exports: $Exports<"jest-in-case">;
 }

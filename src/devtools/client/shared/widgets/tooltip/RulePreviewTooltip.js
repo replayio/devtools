@@ -5,14 +5,10 @@
 "use strict";
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const {
-  HTMLTooltip,
-} = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
-const L10N = new LocalizationHelper(
-  "devtools/client/locales/inspector.properties"
-);
+const L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
 /**
  * Tooltip displayed for when a CSS property is selected/highlighted.
@@ -36,9 +32,7 @@ class RulePreviewTooltip {
 
     this.message = doc.createElementNS(XHTML_NS, "span");
     this.message.className = "rule-preview-tooltip-message";
-    this.message.textContent = L10N.getStr(
-      "rulePreviewTooltip.noAssociatedRule"
-    );
+    this.message.textContent = L10N.getStr("rulePreviewTooltip.noAssociatedRule");
     this.container.appendChild(this.message);
 
     // TODO: Implement structure for showing the source CSS rule.

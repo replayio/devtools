@@ -4,11 +4,7 @@
 
 // @flow
 
-import {
-  containsPosition,
-  containsLocation,
-  nodeContainsPosition,
-} from "../utils/contains";
+import { containsPosition, containsLocation, nodeContainsPosition } from "../utils/contains";
 
 function getTestLoc() {
   return {
@@ -87,8 +83,7 @@ describe("containsPosition", () => {
     it(`should contain position on the same start line and
        within the start column`, () => testContains(startPos(0, 1), true));
 
-    it("should not contain position out of the end line", () =>
-      testContains(endPos(1, 0), false));
+    it("should not contain position out of the end line", () => testContains(endPos(1, 0), false));
 
     it("should not contain position out of the end column", () =>
       testContains(endPos(0, 1), false));
@@ -99,11 +94,9 @@ describe("containsPosition", () => {
   });
 
   describe("position without the column criterion", () => {
-    it("should contain position on the same start line", () =>
-      testContains(startLine(0), true));
+    it("should contain position on the same start line", () => testContains(startLine(0), true));
 
-    it("should contain position on the same end line", () =>
-      testContains(endLine(0), true));
+    it("should contain position on the same end line", () => testContains(endLine(0), true));
   });
 
   describe("location without the column criterion", () => {
@@ -274,12 +267,10 @@ describe("nodeContainsPosition", () => {
       testContainsPosition(endPos(0, 1), false));
 
     it(`should contain position on the same start line and
-        within the start column`, () =>
-      testContainsPosition(startPos(0, 1), true));
+        within the start column`, () => testContainsPosition(startPos(0, 1), true));
 
     it(`should contain position on the same end line and
-        within the end column`, () =>
-      testContainsPosition(endPos(0, -1), true));
+        within the end column`, () => testContainsPosition(endPos(0, -1), true));
   });
 
   describe("node without the column criterion", () => {
@@ -302,8 +293,7 @@ describe("nodeContainsPosition", () => {
     it("should contain position on the same start line", () =>
       testContainsPosition(startLine(), true));
 
-    it("should contain position on the same end line", () =>
-      testContainsPosition(endLine(), true));
+    it("should contain position on the same end line", () => testContainsPosition(endLine(), true));
   });
 
   describe("node and position both without the column criteria", () => {

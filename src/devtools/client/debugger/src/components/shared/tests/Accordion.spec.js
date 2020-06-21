@@ -37,6 +37,5 @@ describe("Accordion", () => {
   const wrapper = shallow(<Accordion items={testItems} />);
   it("basic render", () => expect(wrapper).toMatchSnapshot());
   wrapper.find(".accordion-item-1 ._header").simulate("click");
-  it("handleClick and onToggle", () =>
-    expect(testItems[0].onToggle).toHaveBeenCalledWith(true));
+  it("handleClick and onToggle", () => expect(testItems[0].onToggle).toHaveBeenCalledWith(true));
 });

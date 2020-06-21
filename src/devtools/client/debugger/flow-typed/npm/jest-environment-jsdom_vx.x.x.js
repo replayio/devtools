@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'jest-environment-jsdom' {
+declare module "jest-environment-jsdom" {
   declare module.exports: any;
 }
 
@@ -22,11 +22,11 @@ declare module 'jest-environment-jsdom' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'jest-environment-jsdom/build/index' {
+declare module "jest-environment-jsdom/build/index" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'jest-environment-jsdom/build/index.js' {
-  declare module.exports: $Exports<'jest-environment-jsdom/build/index'>;
+declare module "jest-environment-jsdom/build/index.js" {
+  declare module.exports: $Exports<"jest-environment-jsdom/build/index">;
 }

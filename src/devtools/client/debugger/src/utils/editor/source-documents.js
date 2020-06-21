@@ -88,11 +88,7 @@ export function showErrorMessage(editor: Object, msg: string) {
   resetLineNumberFormat(editor);
 }
 
-function setEditorText(
-  editor: Object,
-  sourceId: SourceId,
-  content: SourceContent
-) {
+function setEditorText(editor: Object, sourceId: SourceId, content: SourceContent) {
   if (content.type === "wasm") {
     const wasmLines = renderWasmText(sourceId, content);
     // cm will try to split into lines anyway, saving memory
@@ -112,18 +108,9 @@ function setEditorText(
   }
 }
 
-function setMode(
-  editor,
-  source: SourceWithContent,
-  content: SourceContent,
-  symbols
-) {
+function setMode(editor, source: SourceWithContent, content: SourceContent, symbols) {
   // Disable modes for minified files with 1+ million characters Bug 1569829
-  if (
-    content.type === "text" &&
-    isMinified(source) &&
-    content.value.length > 1000000
-  ) {
+  if (content.type === "text" && isMinified(source) && content.value.length > 1000000) {
     return;
   }
 

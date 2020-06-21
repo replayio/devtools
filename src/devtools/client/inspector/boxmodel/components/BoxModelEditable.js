@@ -25,8 +25,7 @@ class BoxModelEditable extends PureComponent {
       onShowBoxModelEditor: PropTypes.func.isRequired,
       onShowRulePreviewTooltip: PropTypes.func.isRequired,
       property: PropTypes.string.isRequired,
-      textContent: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-        .isRequired,
+      textContent: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     };
   }
 
@@ -59,14 +58,7 @@ class BoxModelEditable extends PureComponent {
   }
 
   render() {
-    const {
-      box,
-      direction,
-      focusable,
-      level,
-      property,
-      textContent,
-    } = this.props;
+    const { box, direction, focusable, level, property, textContent } = this.props;
 
     const rotate =
       direction &&
@@ -77,11 +69,7 @@ class BoxModelEditable extends PureComponent {
     return dom.p(
       {
         className: `boxmodel-${box}
-                      ${
-          direction
-            ? " boxmodel-" + direction
-            : "boxmodel-" + property
-          }
+                      ${direction ? " boxmodel-" + direction : "boxmodel-" + property}
                       ${rotate ? " boxmodel-rotate" : ""}`,
       },
       dom.span(

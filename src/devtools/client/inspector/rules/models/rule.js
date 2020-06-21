@@ -29,8 +29,7 @@ loader.lazyRequireGetter(
 );
 */
 
-const STYLE_INSPECTOR_PROPERTIES =
-  "devtools/shared/locales/styleinspector.properties";
+const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const STYLE_INSPECTOR_L10N = new LocalizationHelper(STYLE_INSPECTOR_PROPERTIES);
 
@@ -63,8 +62,7 @@ class Rule {
     this.inherited = options.inherited || null;
     this.keyframes = options.keyframes || null;
 
-    this.mediaText =
-      this.domRule && this.domRule.mediaText ? this.domRule.mediaText : "";
+    this.mediaText = this.domRule && this.domRule.mediaText ? this.domRule.mediaText : "";
     this.cssProperties = this.elementStyle.ruleView.cssProperties;
     this.inspector = this.elementStyle.ruleView.inspector;
     this.store = this.elementStyle.ruleView.store;
@@ -113,9 +111,7 @@ class Rule {
 
   get sourceLink() {
     return {
-      label: this.getSourceText(
-        CssLogic.shortSource({ href: this.sourceLocation.url })
-      ),
+      label: this.getSourceText(CssLogic.shortSource({ href: this.sourceLocation.url })),
       title: this.getSourceText(this.sourceLocation.url),
     };
   }
@@ -159,10 +155,7 @@ class Rule {
       if (this.inherited.id) {
         eltText += "#" + this.inherited.id;
       }
-      this._inheritedSource = STYLE_INSPECTOR_L10N.getFormatStr(
-        "rule.inheritedFrom",
-        eltText
-      );
+      this._inheritedSource = STYLE_INSPECTOR_L10N.getFormatStr("rule.inheritedFrom", eltText);
     }
     return this._inheritedSource;
   }
@@ -173,10 +166,7 @@ class Rule {
     }
     this._keyframesName = "";
     if (this.keyframes) {
-      this._keyframesName = STYLE_INSPECTOR_L10N.getFormatStr(
-        "rule.keyframe",
-        this.keyframes.name
-      );
+      this._keyframesName = STYLE_INSPECTOR_L10N.getFormatStr("rule.keyframe", this.keyframes.name);
     }
     return this._keyframesName;
   }
@@ -240,9 +230,7 @@ class Rule {
    */
   getSourceText(url) {
     if (this.isSystem) {
-      return `${STYLE_INSPECTOR_L10N.getStr("rule.userAgentStyles")} ${
-        this.title
-      }`;
+      return `${STYLE_INSPECTOR_L10N.getStr("rule.userAgentStyles")} ${this.title}`;
     }
 
     let sourceText = url;
@@ -438,9 +426,7 @@ class Rule {
     const resultPromise = promise
       .resolve(this._applyingModifications)
       .then(() => {
-        const modifications = this.domRule.startModifyingProperties(
-          this.cssProperties
-        );
+        const modifications = this.domRule.startModifyingProperties(this.cssProperties);
         modifier(modifications);
         if (this.domRule.canSetRuleText) {
           return this._applyPropertiesAuthored(modifications);
@@ -521,15 +507,8 @@ class Rule {
    **@return {Promise}
    */
   previewPropertyValue(property, value, priority) {
-    const modifications = this.domRule.startModifyingProperties(
-      this.cssProperties
-    );
-    modifications.setProperty(
-      this.textProps.indexOf(property),
-      property.name,
-      value,
-      priority
-    );
+    const modifications = this.domRule.startModifyingProperties(this.cssProperties);
+    modifications.setProperty(this.textProps.indexOf(property), property.name, value, priority);
     return modifications.apply().then(() => {
       // Ensure dispatching a ruleview-changed event
       // also for previews
@@ -603,11 +582,7 @@ class Rule {
       // rewriting to work properly.  So, compute the "invisible"
       // property here.
       const invisible = this.inherited && !this.cssProperties.isInherited(name);
-      const value = store.userProperties.getProperty(
-        this.domRule,
-        name,
-        prop.value
-      );
+      const value = store.userProperties.getProperty(this.domRule, name, prop.value);
       const textProp = new TextProperty(
         this,
         name,
@@ -637,11 +612,7 @@ class Rule {
     const textProps = [];
 
     for (const prop of disabledProps) {
-      const value = store.userProperties.getProperty(
-        this.domRule,
-        prop.name,
-        prop.value
-      );
+      const value = store.userProperties.getProperty(this.domRule, prop.name, prop.value);
       const textProp = new TextProperty(this, prop.name, value, prop.priority);
       textProp.enabled = false;
       textProps.push(textProp);
@@ -939,9 +910,7 @@ class Rule {
       line,
       url,
     };
-    this.store.dispatch(
-      updateSourceLink(this.domRule.actorID, this.sourceLink)
-    );
+    this.store.dispatch(updateSourceLink(this.domRule.actorID, this.sourceLink));
   }
 }
 

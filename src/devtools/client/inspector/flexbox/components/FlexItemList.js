@@ -4,17 +4,12 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { getStr } = require("devtools/client/inspector/layout/utils/l10n");
 
-const FlexItem = createFactory(
-  require("devtools/client/inspector/flexbox/components/FlexItem")
-);
+const FlexItem = createFactory(require("devtools/client/inspector/flexbox/components/FlexItem"));
 
 const Types = require("devtools/client/inspector/flexbox/types");
 
@@ -42,9 +37,7 @@ class FlexItemList extends PureComponent {
       { className: "flex-item-list" },
       dom.div(
         { className: "flex-item-list-header" },
-        !flexItems.length
-          ? getStr("flexbox.noFlexItems")
-          : getStr("flexbox.flexItems")
+        !flexItems.length ? getStr("flexbox.noFlexItems") : getStr("flexbox.flexItems")
       ),
       flexItems.map((flexItem, index) =>
         FlexItem({

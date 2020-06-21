@@ -10,7 +10,7 @@ Enzyme.configure({ adapter: new Adapter() });
 // Array#flatMap is only supported in Node 11+
 if (!Array.prototype.flatMap) {
   // eslint-disable-next-line no-extend-native
-  Array.prototype.flatMap = function(cb) {
+  Array.prototype.flatMap = function (cb) {
     return this.reduce((acc, x, i, arr) => {
       return acc.concat(cb(x, i, arr));
     }, []);

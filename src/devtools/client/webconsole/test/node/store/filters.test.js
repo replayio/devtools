@@ -8,20 +8,11 @@ const expect = require("expect");
 const actions = require("devtools/client/webconsole/actions/index");
 const { messagesAdd } = require("devtools/client/webconsole/actions/index");
 const { ConsoleCommand } = require("devtools/client/webconsole/types");
-const {
-  getVisibleMessages,
-} = require("devtools/client/webconsole/selectors/messages");
-const {
-  getAllFilters,
-} = require("devtools/client/webconsole/selectors/filters");
-const {
-  setupStore,
-  getFiltersPrefs,
-} = require("devtools/client/webconsole/test/node/helpers");
+const { getVisibleMessages } = require("devtools/client/webconsole/selectors/messages");
+const { getAllFilters } = require("devtools/client/webconsole/selectors/filters");
+const { setupStore, getFiltersPrefs } = require("devtools/client/webconsole/test/node/helpers");
 const { FILTERS, PREFS } = require("devtools/client/webconsole/constants");
-const {
-  stubPackets,
-} = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
+const { stubPackets } = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
 const {
   stubPreparedMessages,
 } = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
@@ -158,10 +149,7 @@ describe("Filtering", () => {
 
     it("matches locations", () => {
       // Add a message with a different filename.
-      const locationMsg = Object.assign(
-        {},
-        stubPackets.get("console.log('foobar', 'test')")
-      );
+      const locationMsg = Object.assign({}, stubPackets.get("console.log('foobar', 'test')"));
       locationMsg.message = Object.assign({}, locationMsg.message, {
         filename: "search-location-test.js",
       });
@@ -327,9 +315,7 @@ function prepareBaseStore() {
   ]);
 
   // Console Command - never filtered
-  store.dispatch(
-    messagesAdd([new ConsoleCommand({ messageText: `console.warn("x")` })])
-  );
+  store.dispatch(messagesAdd([new ConsoleCommand({ messageText: `console.warn("x")` })]));
 
   return store;
 }

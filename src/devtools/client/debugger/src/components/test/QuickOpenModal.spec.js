@@ -245,9 +245,7 @@ describe("QuickOpenModal", () => {
       },
       "mount"
     );
-    wrapper
-      .find("input")
-      .simulate("change", { target: { value: "somefil:33" } });
+    wrapper.find("input").simulate("change", { target: { value: "somefil:33" } });
     expect(filter).toHaveBeenCalledWith([], "somefil", {
       key: "value",
       maxResults: 100,
@@ -272,9 +270,7 @@ describe("QuickOpenModal", () => {
         "mount"
       );
 
-      wrapper
-        .find("input")
-        .simulate("change", { target: { value: "@someFunc" } });
+      wrapper.find("input").simulate("change", { target: { value: "@someFunc" } });
 
       expect(filter).toHaveBeenCalledWith([], "someFunc", {
         key: "value",
@@ -298,9 +294,7 @@ describe("QuickOpenModal", () => {
         },
         "mount"
       );
-      wrapper
-        .find("input")
-        .simulate("change", { target: { value: "@someFunc" } });
+      wrapper.find("input").simulate("change", { target: { value: "@someFunc" } });
       expect(filter).not.toHaveBeenCalled();
     });
   });
@@ -698,8 +692,7 @@ describe("QuickOpenModal", () => {
     });
 
     it(
-      "on ArrowDown, traverse down results, without " +
-        "taking action if no selectedSource",
+      "on ArrowDown, traverse down results, without " + "taking action if no selectedSource",
       () => {
         const { wrapper, props } = generateModal(
           {

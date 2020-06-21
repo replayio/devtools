@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'wasmparser' {
+declare module "wasmparser" {
   declare module.exports: any;
 }
 
@@ -22,81 +22,81 @@ declare module 'wasmparser' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'wasmparser/disassemble-wasm' {
+declare module "wasmparser/disassemble-wasm" {
   declare module.exports: any;
 }
 
-declare module 'wasmparser/dist/index' {
+declare module "wasmparser/dist/index" {
   declare module.exports: any;
 }
 
-declare module 'wasmparser/dist/WasmDis' {
+declare module "wasmparser/dist/WasmDis" {
   declare module.exports: any;
 }
 
-declare module 'wasmparser/dist/WasmEmitter' {
+declare module "wasmparser/dist/WasmEmitter" {
   declare module.exports: any;
 }
 
-declare module 'wasmparser/dist/WasmParser' {
+declare module "wasmparser/dist/WasmParser" {
   declare module.exports: any;
 }
 
-declare module 'wasmparser/dist/WasmParserTransform' {
+declare module "wasmparser/dist/WasmParserTransform" {
   declare module.exports: any;
 }
 
-declare module 'wasmparser/examples/disassemble-wasm-1' {
+declare module "wasmparser/examples/disassemble-wasm-1" {
   declare module.exports: any;
 }
 
-declare module 'wasmparser/examples/disassemble-wasm-2' {
+declare module "wasmparser/examples/disassemble-wasm-2" {
   declare module.exports: any;
 }
 
-declare module 'wasmparser/examples/dump-section' {
+declare module "wasmparser/examples/dump-section" {
   declare module.exports: any;
 }
 
-declare module 'wasmparser/examples/print_imports_exports' {
+declare module "wasmparser/examples/print_imports_exports" {
   declare module.exports: any;
 }
 
-declare module 'wasmparser/test' {
+declare module "wasmparser/test" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'wasmparser/disassemble-wasm.js' {
-  declare module.exports: $Exports<'wasmparser/disassemble-wasm'>;
+declare module "wasmparser/disassemble-wasm.js" {
+  declare module.exports: $Exports<"wasmparser/disassemble-wasm">;
 }
-declare module 'wasmparser/dist/index.js' {
-  declare module.exports: $Exports<'wasmparser/dist/index'>;
+declare module "wasmparser/dist/index.js" {
+  declare module.exports: $Exports<"wasmparser/dist/index">;
 }
-declare module 'wasmparser/dist/WasmDis.js' {
-  declare module.exports: $Exports<'wasmparser/dist/WasmDis'>;
+declare module "wasmparser/dist/WasmDis.js" {
+  declare module.exports: $Exports<"wasmparser/dist/WasmDis">;
 }
-declare module 'wasmparser/dist/WasmEmitter.js' {
-  declare module.exports: $Exports<'wasmparser/dist/WasmEmitter'>;
+declare module "wasmparser/dist/WasmEmitter.js" {
+  declare module.exports: $Exports<"wasmparser/dist/WasmEmitter">;
 }
-declare module 'wasmparser/dist/WasmParser.js' {
-  declare module.exports: $Exports<'wasmparser/dist/WasmParser'>;
+declare module "wasmparser/dist/WasmParser.js" {
+  declare module.exports: $Exports<"wasmparser/dist/WasmParser">;
 }
-declare module 'wasmparser/dist/WasmParserTransform.js' {
-  declare module.exports: $Exports<'wasmparser/dist/WasmParserTransform'>;
+declare module "wasmparser/dist/WasmParserTransform.js" {
+  declare module.exports: $Exports<"wasmparser/dist/WasmParserTransform">;
 }
-declare module 'wasmparser/examples/disassemble-wasm-1.js' {
-  declare module.exports: $Exports<'wasmparser/examples/disassemble-wasm-1'>;
+declare module "wasmparser/examples/disassemble-wasm-1.js" {
+  declare module.exports: $Exports<"wasmparser/examples/disassemble-wasm-1">;
 }
-declare module 'wasmparser/examples/disassemble-wasm-2.js' {
-  declare module.exports: $Exports<'wasmparser/examples/disassemble-wasm-2'>;
+declare module "wasmparser/examples/disassemble-wasm-2.js" {
+  declare module.exports: $Exports<"wasmparser/examples/disassemble-wasm-2">;
 }
-declare module 'wasmparser/examples/dump-section.js' {
-  declare module.exports: $Exports<'wasmparser/examples/dump-section'>;
+declare module "wasmparser/examples/dump-section.js" {
+  declare module.exports: $Exports<"wasmparser/examples/dump-section">;
 }
-declare module 'wasmparser/examples/print_imports_exports.js' {
-  declare module.exports: $Exports<'wasmparser/examples/print_imports_exports'>;
+declare module "wasmparser/examples/print_imports_exports.js" {
+  declare module.exports: $Exports<"wasmparser/examples/print_imports_exports">;
 }
-declare module 'wasmparser/test.js' {
-  declare module.exports: $Exports<'wasmparser/test'>;
+declare module "wasmparser/test.js" {
+  declare module.exports: $Exports<"wasmparser/test">;
 }

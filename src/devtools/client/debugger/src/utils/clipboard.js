@@ -10,7 +10,7 @@
 // @flow
 
 export function copyToTheClipboard(string: string) {
-  const doCopy = function(e: any) {
+  const doCopy = function (e: any) {
     e.clipboardData.setData("text/plain", string);
     e.preventDefault();
   };

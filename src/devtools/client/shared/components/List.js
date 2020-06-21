@@ -4,36 +4,15 @@
 
 "use strict";
 
-const {
-  createFactory,
-  createRef,
-  Component,
-  cloneElement,
-} = require("react");
+const { createFactory, createRef, Component, cloneElement } = require("react");
 const PropTypes = require("prop-types");
-const {
-  ul,
-  li,
-  div,
-} = require("react-dom-factories");
+const { ul, li, div } = require("react-dom-factories");
 
 const { scrollIntoView } = require("devtools/client/shared/scroll");
-const {
-  preventDefaultAndStopPropagation,
-} = require("devtools/client/shared/events");
+const { preventDefaultAndStopPropagation } = require("devtools/client/shared/events");
 
-loader.lazyRequireGetter(
-  this,
-  "wrapMoveFocus",
-  "devtools/client/shared/focus",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "getFocusableElements",
-  "devtools/client/shared/focus",
-  true
-);
+loader.lazyRequireGetter(this, "wrapMoveFocus", "devtools/client/shared/focus", true);
+loader.lazyRequireGetter(this, "getFocusableElements", "devtools/client/shared/focus", true);
 
 class ListItemClass extends Component {
   static get propTypes() {
@@ -115,9 +94,7 @@ class ListItemClass extends Component {
 
     return li(
       {
-        className: `${className}${current ? " current" : ""}${
-          active ? " active" : ""
-          }`,
+        className: `${className}${current ? " current" : ""}${active ? " active" : ""}`,
         id: item.key,
         onClick,
         onKeyDownCapture: active && this._onKeyDown,
@@ -254,8 +231,7 @@ class List extends Component {
         break;
 
       case "ArrowDown":
-        current < length - 1 &&
-          this._setCurrentItem(current + 1, { alignTo: "bottom" });
+        current < length - 1 && this._setCurrentItem(current + 1, { alignTo: "bottom" });
         break;
 
       case "Home":
@@ -342,8 +318,7 @@ class List extends Component {
           key: `${item.key}-${index === active ? "active" : "inactive"}`,
           // Since the user just clicked the item, there's no need to check if it should
           // be scrolled into view.
-          onClick: () =>
-            this._setCurrentItem(index, { preventAutoScroll: true }),
+          onClick: () => this._setCurrentItem(index, { preventAutoScroll: true }),
         });
       })
     );

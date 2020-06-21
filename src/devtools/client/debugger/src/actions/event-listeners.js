@@ -40,10 +40,7 @@ export function removeEventListenerBreakpoints(eventsToRemove: string[]) {
   return async ({ dispatch, client, getState }: ThunkArgs) => {
     const activeListenerBreakpoints = await getActiveEventListeners(getState());
 
-    const newEvents = remove(
-      activeListenerBreakpoints,
-      event => !eventsToRemove.includes(event)
-    );
+    const newEvents = remove(activeListenerBreakpoints, event => !eventsToRemove.includes(event));
 
     await updateBreakpoints(dispatch, client, newEvents);
   };

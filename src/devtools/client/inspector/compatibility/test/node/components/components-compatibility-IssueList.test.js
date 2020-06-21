@@ -23,8 +23,7 @@ describe("IssueList component", () => {
           {
             type: MDNCompatibility.ISSUE_TYPE.CSS_PROPERTY,
             property: "border-block-color",
-            url:
-              "https://developer.mozilla.org/docs/Web/CSS/border-block-color",
+            url: "https://developer.mozilla.org/docs/Web/CSS/border-block-color",
             deprecated: false,
             experimental: true,
             unsupportedBrowsers: [],

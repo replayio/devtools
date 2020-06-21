@@ -54,10 +54,10 @@ class BoxModelInfo extends PureComponent {
         { className: "boxmodel-position-group" },
         isPositionEditable
           ? dom.button({
-            className: buttonClass,
-            title: BOXMODEL_L10N.getStr("boxmodel.geometryButton.tooltip"),
-            onClick: this.onToggleGeometryEditor,
-          })
+              className: buttonClass,
+              title: BOXMODEL_L10N.getStr("boxmodel.geometryButton.tooltip"),
+              onClick: this.onToggleGeometryEditor,
+            })
           : null,
         dom.span({ className: "boxmodel-element-position" }, position)
       )

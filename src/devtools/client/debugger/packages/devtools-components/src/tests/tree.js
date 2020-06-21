@@ -35,13 +35,7 @@ function mountTree(overrides = {}) {
                 getParent: x => TEST_TREE.parent[x],
                 getChildren: x => TEST_TREE.children[x],
                 renderItem: (x, depth, focused, arrow) => {
-                  return dom.div(
-                    {},
-                    arrow,
-                    focused ? "[" : null,
-                    x,
-                    focused ? "]" : null
-                  );
+                  return dom.div({}, arrow, focused ? "[" : null, x, focused ? "]" : null);
                 },
                 getRoots: () => ["A", "M"],
                 getKey: x => `key-${x}`,
@@ -89,10 +83,7 @@ describe("Tree", () => {
   });
 
   it("Don't auto expand root with very large number of children", () => {
-    const children = Array.from(
-      { length: 51 },
-      (_, i) => `should-not-be-visible-${i + 1}`
-    );
+    const children = Array.from({ length: 51 }, (_, i) => `should-not-be-visible-${i + 1}`);
     // N has a lot of children, so it won't be automatically expanded
     const wrapper = mountTree({
       autoExpandDepth: 2,
@@ -175,18 +166,14 @@ describe("Tree", () => {
     const wrapper = mountTree({
       label: "testAriaLabel",
     });
-    expect(wrapper.getDOMNode().getAttribute("aria-label")).toBe(
-      "testAriaLabel"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-label")).toBe("testAriaLabel");
   });
 
   it("renders as expected when passed an aria-labelledby", () => {
     const wrapper = mountTree({
       labelledby: "testAriaLabelBy",
     });
-    expect(wrapper.getDOMNode().getAttribute("aria-labelledby")).toBe(
-      "testAriaLabelBy"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-labelledby")).toBe("testAriaLabelBy");
   });
 
   it("renders as expected with collapsed nodes", () => {
@@ -211,11 +198,7 @@ describe("Tree", () => {
     expect(formatTree(wrapper)).toMatchSnapshot();
     expect(shouldItemUpdate.mock.calls).toHaveLength(0);
 
-    wrapper
-      .find("Tree")
-      .first()
-      .instance()
-      .forceUpdate();
+    wrapper.find("Tree").first().instance().forceUpdate();
     expect(formatTree(wrapper)).toMatchSnapshot();
     expect(shouldItemUpdate.mock.calls).toHaveLength(2);
 
@@ -236,9 +219,7 @@ describe("Tree", () => {
     expect(formatTree(wrapper)).toMatchSnapshot();
     expect(wrapper.find(".active").prop("id")).toBe("key-G");
 
-    getTreeNodes(wrapper)
-      .first()
-      .simulate("click");
+    getTreeNodes(wrapper).first().simulate("click");
     expect(formatTree(wrapper)).toMatchSnapshot();
     expect(wrapper.find(".focused").prop("id")).toBe("key-A");
     expect(wrapper.find(".active").exists()).toBe(false);
@@ -283,15 +264,11 @@ describe("Tree", () => {
     simulateKeyDown(wrapper, "Enter");
     expect(wrapper.find(".active").prop("id")).toBe("key-L");
 
-    expect(wrapper.getDOMNode().ownerDocument.activeElement).toBe(
-      wrapper.getDOMNode()
-    );
+    expect(wrapper.getDOMNode().ownerDocument.activeElement).toBe(wrapper.getDOMNode());
 
     simulateKeyDown(wrapper, "Escape");
     expect(wrapper.find(".active").exists()).toBe(false);
-    expect(wrapper.getDOMNode().ownerDocument.activeElement).toBe(
-      wrapper.getDOMNode()
-    );
+    expect(wrapper.getDOMNode().ownerDocument.activeElement).toBe(wrapper.getDOMNode());
   });
 
   it("active item - renders as expected when using keyboard and Space", () => {
@@ -319,9 +296,7 @@ describe("Tree", () => {
     wrapper.getDOMNode().focus();
     expect(formatTree(wrapper)).toMatchSnapshot();
     expect(wrapper.find(".active").exists()).toBe(false);
-    expect(wrapper.getDOMNode().ownerDocument.activeElement).toBe(
-      wrapper.getDOMNode()
-    );
+    expect(wrapper.getDOMNode().ownerDocument.activeElement).toBe(wrapper.getDOMNode());
 
     simulateKeyDown(wrapper, "Enter");
     expect(wrapper.find(".active").prop("id")).toBe("key-L");
@@ -387,34 +362,22 @@ describe("Tree", () => {
       focused: "G",
     });
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-G"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-G");
     expect(wrapper.find(".focused").prop("id")).toBe("key-G");
 
-    getTreeNodes(wrapper)
-      .first()
-      .simulate("click");
+    getTreeNodes(wrapper).first().simulate("click");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-A"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-A");
     expect(wrapper.find(".focused").prop("id")).toBe("key-A");
 
-    getTreeNodes(wrapper)
-      .first()
-      .simulate("click");
+    getTreeNodes(wrapper).first().simulate("click");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-A"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-A");
     expect(wrapper.find(".focused").prop("id")).toBe("key-A");
 
     wrapper.simulate("blur");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().hasAttribute("aria-activedescendant")).toBe(
-      false
-    );
+    expect(wrapper.getDOMNode().hasAttribute("aria-activedescendant")).toBe(false);
     expect(wrapper.find(".focused").exists()).toBe(false);
   });
 
@@ -424,23 +387,17 @@ describe("Tree", () => {
       focused: "L",
     });
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-L"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-L");
     expect(wrapper.find(".focused").prop("id")).toBe("key-L");
 
     simulateKeyDown(wrapper, "ArrowUp");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-K"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-K");
     expect(wrapper.find(".focused").prop("id")).toBe("key-K");
 
     simulateKeyDown(wrapper, "ArrowUp");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-E"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-E");
     expect(wrapper.find(".focused").prop("id")).toBe("key-E");
   });
 
@@ -450,16 +407,12 @@ describe("Tree", () => {
       focused: "A",
     });
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-A"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-A");
     expect(wrapper.find(".focused").prop("id")).toBe("key-A");
 
     simulateKeyDown(wrapper, "ArrowUp");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-A"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-A");
     expect(wrapper.find(".focused").prop("id")).toBe("key-A");
   });
 
@@ -469,23 +422,17 @@ describe("Tree", () => {
       focused: "K",
     });
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-K"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-K");
     expect(wrapper.find(".focused").prop("id")).toBe("key-K");
 
     simulateKeyDown(wrapper, "ArrowDown");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-L"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-L");
     expect(wrapper.find(".focused").prop("id")).toBe("key-L");
 
     simulateKeyDown(wrapper, "ArrowDown");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-F"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-F");
     expect(wrapper.find(".focused").prop("id")).toBe("key-F");
   });
 
@@ -495,16 +442,12 @@ describe("Tree", () => {
       focused: "O",
     });
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-O"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-O");
     expect(wrapper.find(".focused").prop("id")).toBe("key-O");
 
     simulateKeyDown(wrapper, "ArrowDown");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-O"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-O");
     expect(wrapper.find(".focused").prop("id")).toBe("key-O");
   });
 
@@ -514,37 +457,27 @@ describe("Tree", () => {
       focused: "L",
     });
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-L"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-L");
     expect(wrapper.find(".focused").prop("id")).toBe("key-L");
 
     simulateKeyDown(wrapper, "ArrowLeft");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-E"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-E");
     expect(wrapper.find(".focused").prop("id")).toBe("key-E");
 
     simulateKeyDown(wrapper, "ArrowLeft");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-E"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-E");
     expect(wrapper.find(".focused").prop("id")).toBe("key-E");
 
     simulateKeyDown(wrapper, "ArrowRight");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-E"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-E");
     expect(wrapper.find(".focused").prop("id")).toBe("key-E");
 
     simulateKeyDown(wrapper, "ArrowRight");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-K"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-K");
     expect(wrapper.find(".focused").prop("id")).toBe("key-K");
   });
 
@@ -553,23 +486,17 @@ describe("Tree", () => {
       focused: "M",
     });
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-M"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-M");
     expect(wrapper.find(".focused").prop("id")).toBe("key-M");
 
     simulateKeyDown(wrapper, "ArrowLeft");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-A"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-A");
     expect(wrapper.find(".focused").prop("id")).toBe("key-A");
 
     simulateKeyDown(wrapper, "ArrowLeft");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-A"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-A");
     expect(wrapper.find(".focused").prop("id")).toBe("key-A");
   });
 
@@ -578,65 +505,47 @@ describe("Tree", () => {
       focused: "M",
     });
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-M"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-M");
     expect(wrapper.find(".focused").prop("id")).toBe("key-M");
 
     simulateKeyDown(wrapper, "Home");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-A"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-A");
     expect(wrapper.find(".focused").prop("id")).toBe("key-A");
 
     simulateKeyDown(wrapper, "Home");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-A"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-A");
     expect(wrapper.find(".focused").prop("id")).toBe("key-A");
 
     simulateKeyDown(wrapper, "End");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-M"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-M");
     expect(wrapper.find(".focused").prop("id")).toBe("key-M");
 
     simulateKeyDown(wrapper, "End");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-M"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-M");
     expect(wrapper.find(".focused").prop("id")).toBe("key-M");
 
     simulateKeyDown(wrapper, "ArrowRight");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-M"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-M");
     expect(wrapper.find(".focused").prop("id")).toBe("key-M");
 
     simulateKeyDown(wrapper, "End");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-N"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-N");
     expect(wrapper.find(".focused").prop("id")).toBe("key-N");
 
     simulateKeyDown(wrapper, "End");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-N"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-N");
     expect(wrapper.find(".focused").prop("id")).toBe("key-N");
 
     simulateKeyDown(wrapper, "Home");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-A"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-A");
     expect(wrapper.find(".focused").prop("id")).toBe("key-A");
   });
 
@@ -649,15 +558,11 @@ describe("Tree", () => {
 
     simulateKeyDown(wrapper, "ArrowRight");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-M"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-M");
 
     simulateKeyDown(wrapper, "ArrowLeft");
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-A"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-A");
   });
 
   it("calls onFocus when expected", () => {
@@ -695,15 +600,10 @@ describe("Tree", () => {
     const wrapper = mountTree({
       expanded: new Set("ABCDEFGHIJKLMNO".split("")),
     });
-    const treeRef = wrapper
-      .find("Tree")
-      .first()
-      .instance().treeRef.current;
+    const treeRef = wrapper.find("Tree").first().instance().treeRef.current;
     treeRef.focus = jest.fn();
 
-    getTreeNodes(wrapper)
-      .first()
-      .simulate("click");
+    getTreeNodes(wrapper).first().simulate("click");
     expect(treeRef.focus.mock.calls).toHaveLength(1);
   });
 
@@ -712,10 +612,7 @@ describe("Tree", () => {
       expanded: new Set("ABCDEFGHIJKLMNO".split("")),
       focused: "A",
     });
-    const treeRef = wrapper
-      .find("Tree")
-      .first()
-      .instance().treeRef.current;
+    const treeRef = wrapper.find("Tree").first().instance().treeRef.current;
     treeRef.focus = jest.fn();
     wrapper.simulate("blur");
     expect(treeRef.focus.mock.calls).toHaveLength(0);
@@ -727,9 +624,7 @@ describe("Tree", () => {
       focused: "L",
     });
     expect(formatTree(wrapper)).toMatchSnapshot();
-    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-      "key-L"
-    );
+    expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-L");
     expect(wrapper.find(".focused").prop("id")).toBe("key-L");
 
     const testKeys = [
@@ -738,20 +633,13 @@ describe("Tree", () => {
       { key: "ArrowLeft" },
       { key: "ArrowRight" },
     ];
-    const modifiers = [
-      { altKey: true },
-      { ctrlKey: true },
-      { metaKey: true },
-      { shiftKey: true },
-    ];
+    const modifiers = [{ altKey: true }, { ctrlKey: true }, { metaKey: true }, { shiftKey: true }];
 
     for (const key of testKeys) {
       for (const modifier of modifiers) {
         wrapper.simulate("keydown", Object.assign({}, key, modifier));
         expect(formatTree(wrapper)).toMatchSnapshot();
-        expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe(
-          "key-L"
-        );
+        expect(wrapper.getDOMNode().getAttribute("aria-activedescendant")).toBe("key-L");
       }
     }
   });

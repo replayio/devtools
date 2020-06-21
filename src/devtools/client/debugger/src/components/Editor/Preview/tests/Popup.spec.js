@@ -4,16 +4,13 @@
 
 // @flow
 
-import {
-  addHighlightToTargetSiblings,
-  removeHighlightForTargetSiblings,
-} from "../Popup";
+import { addHighlightToTargetSiblings, removeHighlightForTargetSiblings } from "../Popup";
 
 describe("addHighlightToTargetSiblings", () => {
   it("should add preview highlight class to related target siblings", async () => {
     const div = document.createElement("div");
     const divChildren = ["a", "divided", "token"];
-    divChildren.forEach(function(span) {
+    divChildren.forEach(function (span) {
       const child = document.createElement("span");
       const text = document.createTextNode(span);
       child.appendChild(text);
@@ -72,12 +69,8 @@ describe("addHighlightToTargetSiblings", () => {
     };
     addHighlightToTargetSiblings(target, props);
 
-    expect(elementBeforePeriod.className.includes("preview-token")).toEqual(
-      false
-    );
-    expect(elementAfterPeriod.className.includes("preview-token")).toEqual(
-      false
-    );
+    expect(elementBeforePeriod.className.includes("preview-token")).toEqual(false);
+    expect(elementAfterPeriod.className.includes("preview-token")).toEqual(false);
   });
 });
 
@@ -85,7 +78,7 @@ describe("removeHighlightForTargetSiblings", () => {
   it("should remove preview highlight class from target's related siblings", async () => {
     const div = document.createElement("div");
     const divChildren = ["a", "divided", "token"];
-    divChildren.forEach(function(span) {
+    divChildren.forEach(function (span) {
       const child = document.createElement("span");
       const text = document.createTextNode(span);
       child.appendChild(text);

@@ -16,7 +16,7 @@ describe("FilterCheckbox component:", () => {
     label: "test label",
     title: "test title",
     checked: true,
-    onChange: () => { },
+    onChange: () => {},
   };
 
   it("displays as checked", () => {

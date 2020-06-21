@@ -6,9 +6,7 @@
 
 const Services = require("Services");
 
-const {
-  HighlighterEnvironment,
-} = require("devtools/server/actors/highlighters");
+const { HighlighterEnvironment } = require("devtools/server/actors/highlighters");
 
 const {
   CanvasFrameAnonymousContentHelper,
@@ -72,9 +70,7 @@ class HighlighterRenderer {
       : browserContainer.querySelector(".browserStack");
 
     // Grab the host iframe if it was previously created by another highlighter.
-    const iframe = parent.querySelector(
-      `:scope > .devtools-highlighter-renderer`
-    );
+    const iframe = parent.querySelector(`:scope > .devtools-highlighter-renderer`);
 
     if (iframe) {
       this.iframe = iframe;
@@ -90,10 +86,7 @@ class HighlighterRenderer {
         parent.querySelector("browser").after(this.iframe);
       }
 
-      this.iframe.contentWindow.addEventListener(
-        "DOMContentLoaded",
-        this.setupMarkup.bind(this)
-      );
+      this.iframe.contentWindow.addEventListener("DOMContentLoaded", this.setupMarkup.bind(this));
     }
   }
 
@@ -102,9 +95,7 @@ class HighlighterRenderer {
    */
   setupMarkup() {
     if (!this.iframe || !this.iframe.contentWindow) {
-      throw Error(
-        "The highlighter renderer's host iframe is missing or not yet ready"
-      );
+      throw Error("The highlighter renderer's host iframe is missing or not yet ready");
     }
 
     this.highlighterEnv = new HighlighterEnvironment();
@@ -174,9 +165,7 @@ class HighlighterRenderer {
   render() {
     // When called, sub classes should update the highlighter.
     // To be implemented by sub classes.
-    throw new Error(
-      "Highlighter renderer class had to implement render method"
-    );
+    throw new Error("Highlighter renderer class had to implement render method");
   }
 
   destroy() {

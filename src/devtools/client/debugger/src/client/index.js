@@ -9,11 +9,7 @@ import * as firefox from "./firefox";
 import { asyncStore, verifyPrefSchema } from "../utils/prefs";
 import { setupHelper } from "../utils/dbg";
 
-import {
-  bootstrapApp,
-  bootstrapStore,
-  bootstrapWorkers,
-} from "../utils/bootstrap";
+import { bootstrapApp, bootstrapStore, bootstrapWorkers } from "../utils/bootstrap";
 
 import { initialBreakpointsState } from "../reducers/breakpoints";
 
@@ -58,11 +54,7 @@ function getClient(connection: any) {
   return firefox;
 }
 
-export async function onConnect(
-  connection: Object,
-  panelWorkers: Object,
-  panel: Panel
-) {
+export async function onConnect(connection: Object, panelWorkers: Object, panel: Panel) {
   // NOTE: the landing page does not connect to a JS process
   if (!connection) {
     return;
@@ -78,12 +70,7 @@ export async function onConnect(
 
   panel.parserDispatcher = workers.parser;
 
-  const { store, actions, selectors } = bootstrapStore(
-    commands,
-    workers,
-    panel,
-    initialState
-  );
+  const { store, actions, selectors } = bootstrapStore(commands, workers, panel, initialState);
 
   const connected = client.onConnect(connection, actions, panel);
 

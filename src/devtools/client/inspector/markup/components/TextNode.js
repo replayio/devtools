@@ -4,20 +4,12 @@
 
 "use strict";
 
-const {
-  createElement,
-  createRef,
-  Fragment,
-  PureComponent,
-} = require("react");
+const { createElement, createRef, Fragment, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { editableItem } = require("devtools/client/shared/inplace-editor");
 
-const {
-  getStr,
-  getFormatStr,
-} = require("devtools/client/inspector/markup/utils/l10n");
+const { getStr, getFormatStr } = require("devtools/client/inspector/markup/utils/l10n");
 
 class TextNode extends PureComponent {
   static get propTypes() {
@@ -70,12 +62,9 @@ class TextNode extends PureComponent {
           tabIndex: -1,
           title: isWhiteSpace
             ? getFormatStr(
-              "markupView.whitespaceOnly",
-              value
-                .replace(/\n/g, "⏎")
-                .replace(/\t/g, "⇥")
-                .replace(/ /g, "◦")
-            )
+                "markupView.whitespaceOnly",
+                value.replace(/\n/g, "⏎").replace(/\t/g, "⇥").replace(/ /g, "◦")
+              )
             : "",
           "data-label": getStr("markupView.whitespaceOnly.label"),
         },

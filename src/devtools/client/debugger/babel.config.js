@@ -36,7 +36,6 @@ module.exports = {
           "module-resolver",
           {
             alias: {
-
               // Map all require("devtools/...") to the real devtools root.
               "^devtools\\/(.*)": `${__dirname}/../../\\1`,
             },

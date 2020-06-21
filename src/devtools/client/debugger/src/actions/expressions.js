@@ -72,11 +72,7 @@ export function clearExpressionError() {
   return { type: "CLEAR_EXPRESSION_ERROR" };
 }
 
-export function updateExpression(
-  cx: ThreadContext,
-  input: string,
-  expression: Expression
-) {
+export function updateExpression(cx: ThreadContext, input: string, expression: Expression) {
   return async ({ dispatch, getState, parser }: ThunkArgs) => {
     if (!input) {
       return;

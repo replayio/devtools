@@ -110,16 +110,10 @@ class PrimaryPanes extends Component<Props, State> {
     const isOutline = this.props.selectedTab === "outline";
 
     return [
-      <Tab
-        className={classnames("tab sources-tab", { active: isSources })}
-        key="sources-tab"
-      >
+      <Tab className={classnames("tab sources-tab", { active: isSources })} key="sources-tab">
         {sources}
       </Tab>,
-      <Tab
-        className={classnames("tab outline-tab", { active: isOutline })}
-        key="outline-tab"
-      >
+      <Tab className={classnames("tab outline-tab", { active: isOutline })} key="outline-tab">
         {outline}
       </Tab>,
     ];
@@ -158,14 +152,8 @@ class PrimaryPanes extends Component<Props, State> {
     const activeIndex = selectedTab === "sources" ? 0 : 1;
 
     return (
-      <Tabs
-        activeIndex={activeIndex}
-        className="sources-panel"
-        onActivateTab={this.onActivateTab}
-      >
-        <TabList className="source-outline-tabs">
-          {this.renderOutlineTabs()}
-        </TabList>
+      <Tabs activeIndex={activeIndex} className="sources-panel" onActivateTab={this.onActivateTab}>
+        <TabList className="source-outline-tabs">{this.renderOutlineTabs()}</TabList>
         <TabPanels
           className={classnames("source-outline-panel", {
             "has-root": projectRoot,
@@ -196,20 +184,15 @@ const mapStateToProps = state => {
     sourceSearchOn: getActiveSearch(state) === "source",
     threads: getAllThreads(state),
     projectRoot: newProjectRoot,
-    rootExtensionName: extensionAsRoot
-      ? getExtensionNameBySourceUrl(state, newProjectRoot)
-      : null,
+    rootExtensionName: extensionAsRoot ? getExtensionNameBySourceUrl(state, newProjectRoot) : null,
   };
 };
 
-const connector = connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    setPrimaryPaneTab: actions.setPrimaryPaneTab,
-    setActiveSearch: actions.setActiveSearch,
-    closeActiveSearch: actions.closeActiveSearch,
-    clearProjectDirectoryRoot: actions.clearProjectDirectoryRoot,
-  }
-);
+const connector = connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  setPrimaryPaneTab: actions.setPrimaryPaneTab,
+  setActiveSearch: actions.setActiveSearch,
+  closeActiveSearch: actions.closeActiveSearch,
+  clearProjectDirectoryRoot: actions.clearProjectDirectoryRoot,
+});
 
 export default connector(PrimaryPanes);

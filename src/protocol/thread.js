@@ -39,12 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // performed on the state at different points in the recording. This layer
 // helps with adapting the devtools to the WRP.
 
-const {
-  sendMessage,
-  addEventListener,
-  log,
-  enableLogging,
-} = require("./socket");
+const { sendMessage, addEventListener, log, enableLogging } = require("./socket");
 const {
   defer,
   assert,
@@ -74,17 +69,15 @@ Pause.prototype = {
   create(point) {
     assert(!this.createWaiter);
     assert(!this.pauseId);
-    this.createWaiter = sendMessage(
-      "Session.createPause",
-      { point },
-      this.sessionId
-    ).then(({ pauseId, stack, data }) => {
-      this.pauseId = pauseId;
-      this.addData(data);
-      if (stack) {
-        this.stack = stack.map(id => this.frames.get(id));
+    this.createWaiter = sendMessage("Session.createPause", { point }, this.sessionId).then(
+      ({ pauseId, stack, data }) => {
+        this.pauseId = pauseId;
+        this.addData(data);
+        if (stack) {
+          this.stack = stack.map(id => this.frames.get(id));
+        }
       }
-    });
+    );
   },
 
   instantiate(pauseId, data = {}) {
@@ -550,21 +543,19 @@ ValueFront.prototype = {
       contents,
     }));
     if (["Set", "WeakSet", "Map", "WeakMap"].includes(this.className())) {
-      const elements = this.previewContainerEntries().map(
-        ({ key, value }, i) => {
-          if (key) {
-            const entryElements = [
-              { name: "<key>", contents: key },
-              { name: "<value>", contents: value },
-            ];
-            const entry = createPseudoValueFront(entryElements);
-            entry._isMapEntry = { key, value };
-            return { name: i.toString(), contents: entry };
-          } else {
-            return { name: i.toString(), contents: value };
-          }
+      const elements = this.previewContainerEntries().map(({ key, value }, i) => {
+        if (key) {
+          const entryElements = [
+            { name: "<key>", contents: key },
+            { name: "<value>", contents: value },
+          ];
+          const entry = createPseudoValueFront(entryElements);
+          entry._isMapEntry = { key, value };
+          return { name: i.toString(), contents: entry };
+        } else {
+          return { name: i.toString(), contents: value };
         }
-      );
+      });
       rv.unshift({
         name: "<entries>",
         contents: createPseudoValueFront(elements),
@@ -590,9 +581,7 @@ ValueFront.prototype = {
     const promises = [];
     for (const { contents } of children) {
       if (contents.isObject() && !contents.hasPreview()) {
-        promises.push(
-          contents.getPause().getObjectPreview(contents._object.objectId)
-        );
+        promises.push(contents.getPause().getObjectPreview(contents._object.objectId));
       }
     }
     await Promise.all(promises);
@@ -607,10 +596,7 @@ ValueFront.prototype = {
   },
 };
 
-Object.setPrototypeOf(
-  ValueFront.prototype,
-  new Proxy({}, DisallowEverythingProxyHandler)
-);
+Object.setPrototypeOf(ValueFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 function createPrimitiveValueFront(value) {
   return new ValueFront(null, { value });
@@ -647,7 +633,9 @@ function NodeFront(pause, data) {
 NodeFront.prototype = {
   then: undefined,
 
-  isNodeBoundsFront() { return false; },
+  isNodeBoundsFront() {
+    return false;
+  },
 
   get isConnected() {
     return this._node.isConnected;
@@ -727,12 +715,8 @@ NodeFront.prototype = {
       const data = this._pause.objects.get(id);
       return !data || !data.preview;
     });
-    await Promise.all(
-      missingPreviews.map(id => this._pause.getObjectPreview(id))
-    );
-    const childNodes = this._node.childNodes.map(id =>
-      this._pause.getDOMFront(id)
-    );
+    await Promise.all(missingPreviews.map(id => this._pause.getObjectPreview(id)));
+    const childNodes = this._node.childNodes.map(id => this._pause.getDOMFront(id));
     await Promise.all(childNodes.map(node => node.ensureLoaded()));
     return childNodes;
   },
@@ -757,10 +741,10 @@ NodeFront.prototype = {
   },
 
   async querySelector(selector) {
-    const { result, data } = await this._pause.sendMessage(
-      "DOM.querySelector",
-      { node: this._object.objectId, selector }
-    );
+    const { result, data } = await this._pause.sendMessage("DOM.querySelector", {
+      node: this._object.objectId,
+      selector,
+    });
     this._pause.addData(data);
     return this._pause.getDOMFront(result);
   },
@@ -908,10 +892,7 @@ NodeFront.prototype = {
   },
 };
 
-Object.setPrototypeOf(
-  NodeFront.prototype,
-  new Proxy({}, DisallowEverythingProxyHandler)
-);
+Object.setPrototypeOf(NodeFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 function buildBoxQuads(array) {
   assert(array.length % 8 == 0);
@@ -938,7 +919,7 @@ function buildBoxQuadsFromRect([left, top, right, bottom]) {
       p2: { x: right, y: top },
       p3: { x: right, y: bottom },
       p4: { x: left, y: bottom },
-    })
+    }),
   ];
 }
 
@@ -1008,10 +989,7 @@ RuleFront.prototype = {
   },
 };
 
-Object.setPrototypeOf(
-  RuleFront.prototype,
-  new Proxy({}, DisallowEverythingProxyHandler)
-);
+Object.setPrototypeOf(RuleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 // Manages interaction with a CSSStyleDeclaration.
 function StyleFront(pause, data) {
@@ -1048,10 +1026,7 @@ StyleFront.prototype = {
   href: undefined,
 };
 
-Object.setPrototypeOf(
-  StyleFront.prototype,
-  new Proxy({}, DisallowEverythingProxyHandler)
-);
+Object.setPrototypeOf(StyleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 // Used by the highlighter when showing the bounding client rect of a node
 // that might not be loaded yet, for the node picker.
@@ -1065,17 +1040,16 @@ function NodeBoundsFront(pause, nodeId, rect) {
 NodeBoundsFront.prototype = {
   then: undefined,
 
-  isNodeBoundsFront() { return true; },
+  isNodeBoundsFront() {
+    return true;
+  },
 
   getBoxQuads(box) {
     return buildBoxQuadsFromRect(this._rect);
   },
 };
 
-Object.setPrototypeOf(
-  NodeBoundsFront.prototype,
-  new Proxy({}, DisallowEverythingProxyHandler)
-);
+Object.setPrototypeOf(NodeBoundsFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 // Manages interaction with a StyleSheet.
 function StyleSheetFront(pause, data) {
@@ -1096,10 +1070,7 @@ StyleSheetFront.prototype = {
   },
 };
 
-Object.setPrototypeOf(
-  StyleSheetFront.prototype,
-  new Proxy({}, DisallowEverythingProxyHandler)
-);
+Object.setPrototypeOf(StyleSheetFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 const ThreadFront = {
   // When replaying there is only a single thread currently. Use this thread ID
@@ -1152,11 +1123,7 @@ const ThreadFront = {
 
     log(`GotSessionId ${sessionId}`);
 
-    const { endpoint } = await sendMessage(
-      "Session.getEndpoint",
-      {},
-      sessionId
-    );
+    const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
     if (this.onEndpoint) {
       this.onEndpoint(endpoint);
     }
@@ -1307,17 +1274,9 @@ const ThreadFront = {
 
   async removeBreakpoint(scriptId, line, column) {
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
-      if (
-        location.scriptId == scriptId &&
-        location.line == line &&
-        location.column == column
-      ) {
+      if (location.scriptId == scriptId && location.line == line && location.column == column) {
         this.breakpoints.delete(breakpointId);
-        await sendMessage(
-          "Debugger.removeBreakpoint",
-          { breakpointId },
-          this.sessionId
-        );
+        await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
         this._invalidateResumeTargets();
       }
     }
@@ -1386,17 +1345,11 @@ const ThreadFront = {
     const stepCommands = [
       {
         command: "Debugger.findReverseStepOverTarget",
-        transitive: [
-          "Debugger.findReverseStepOverTarget",
-          "Debugger.findStepInTarget",
-        ],
+        transitive: ["Debugger.findReverseStepOverTarget", "Debugger.findStepInTarget"],
       },
       {
         command: "Debugger.findStepOverTarget",
-        transitive: [
-          "Debugger.findStepOverTarget",
-          "Debugger.findStepInTarget",
-        ],
+        transitive: ["Debugger.findStepOverTarget", "Debugger.findStepInTarget"],
       },
       {
         command: "Debugger.findStepInTarget",
@@ -1428,10 +1381,7 @@ const ThreadFront = {
 
       // Look for transitive resume targets.
       transitive.forEach(async command => {
-        const transitiveTarget = await this._findResumeTarget(
-          target.point,
-          command
-        );
+        const transitiveTarget = await this._findResumeTarget(target.point, command);
         if (
           epoch != this.resumeTargetEpoch ||
           point != this.currentPoint ||
@@ -1510,20 +1460,12 @@ const ThreadFront = {
   },
 
   async blackbox(scriptId, begin, end) {
-    await sendMessage(
-      "Debugger.blackboxScript",
-      { scriptId, begin, end },
-      this.sessionId
-    );
+    await sendMessage("Debugger.blackboxScript", { scriptId, begin, end }, this.sessionId);
     this._invalidateResumeTargets();
   },
 
   async unblackbox(scriptId, begin, end) {
-    await sendMessage(
-      "Debugger.unblackboxScript",
-      { scriptId, begin, end },
-      this.sessionId
-    );
+    await sendMessage("Debugger.unblackboxScript", { scriptId, begin, end }, this.sessionId);
     this._invalidateResumeTargets();
   },
 
@@ -1535,9 +1477,7 @@ const ThreadFront = {
       const pause = new Pause(this.sessionId);
       pause.instantiate(message.pauseId, message.data);
       if (message.argumentValues) {
-        message.argumentValues = message.argumentValues.map(
-          v => new ValueFront(pause, v)
-        );
+        message.argumentValues = message.argumentValues.map(v => new ValueFront(pause, v));
       }
       onConsoleMessage(pause, message);
     });
@@ -1660,11 +1600,7 @@ const ThreadFront = {
       // Getting the description will fail if it was never set. For now we don't
       // set the last screen in this case.
       const sessionId = await this.waitForSession();
-      const { endpoint } = await sendMessage(
-        "Session.getEndpoint",
-        {},
-        sessionId
-      );
+      const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
       description = { duration: endpoint.time };
     }
 

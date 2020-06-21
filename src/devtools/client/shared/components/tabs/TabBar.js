@@ -6,16 +6,11 @@
 
 "use strict";
 
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 
-const Sidebar = createFactory(
-  require("devtools/client/shared/components/Sidebar")
-);
+const Sidebar = createFactory(require("devtools/client/shared/components/Sidebar"));
 
 /*
 loader.lazyRequireGetter(this, "Menu", "devtools/client/framework/menu");
@@ -99,10 +94,7 @@ class Tabbar extends Component {
     const tabs = this.createTabs(children);
     const activeTab = tabs.findIndex((tab, index) => tab.id === activeTabId);
 
-    if (
-      activeTab !== this.state.activeTab ||
-      children !== this.props.children
-    ) {
+    if (activeTab !== this.state.activeTab || children !== this.props.children) {
       this.setState({
         activeTab: activeTab === -1 ? 0 : activeTab,
         tabs,

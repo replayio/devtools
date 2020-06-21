@@ -6,10 +6,7 @@
 
 const Services = require("Services");
 const ElementStyle = require("devtools/client/inspector/rules/models/element-style");
-const {
-  createFactory,
-  createElement,
-} = require("react");
+const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 const EventEmitter = require("devtools/shared/event-emitter");
 
@@ -31,61 +28,24 @@ const {
   updateSourceLinkEnabled,
 } = require("devtools/client/inspector/rules/actions/rules");
 
-const RulesApp = createFactory(
-  require("devtools/client/inspector/rules/components/RulesApp")
-);
+const RulesApp = createFactory(require("devtools/client/inspector/rules/components/RulesApp"));
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const INSPECTOR_L10N = new LocalizationHelper(
-  "devtools/client/locales/inspector.properties"
-);
+const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
 loader.lazyRequireGetter(this, "Tools", "devtools/client/definitions", true);
-loader.lazyRequireGetter(
-  this,
-  "gDevTools",
-  "devtools/client/framework/devtools",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "ClassList",
-  "devtools/client/inspector/rules/models/class-list"
-);
-loader.lazyRequireGetter(
-  this,
-  "getNodeInfo",
-  "devtools/client/inspector/rules/utils/utils",
-  true
-);
+loader.lazyRequireGetter(this, "gDevTools", "devtools/client/framework/devtools", true);
+loader.lazyRequireGetter(this, "ClassList", "devtools/client/inspector/rules/models/class-list");
+loader.lazyRequireGetter(this, "getNodeInfo", "devtools/client/inspector/rules/utils/utils", true);
 loader.lazyRequireGetter(
   this,
   "StyleInspectorMenu",
   "devtools/client/inspector/shared/style-inspector-menu"
 );
-loader.lazyRequireGetter(
-  this,
-  "advanceValidate",
-  "devtools/client/inspector/shared/utils",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "AutocompletePopup",
-  "devtools/client/shared/autocomplete-popup"
-);
-loader.lazyRequireGetter(
-  this,
-  "InplaceEditor",
-  "devtools/client/shared/inplace-editor",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "COLOR_SCHEMES",
-  "devtools/client/inspector/rules/constants",
-  true
-);
+loader.lazyRequireGetter(this, "advanceValidate", "devtools/client/inspector/shared/utils", true);
+loader.lazyRequireGetter(this, "AutocompletePopup", "devtools/client/shared/autocomplete-popup");
+loader.lazyRequireGetter(this, "InplaceEditor", "devtools/client/shared/inplace-editor", true);
+loader.lazyRequireGetter(this, "COLOR_SCHEMES", "devtools/client/inspector/rules/constants", true);
 
 const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
 
@@ -107,24 +67,16 @@ class RulesView {
     this.onOpenSourceLink = this.onOpenSourceLink.bind(this);
     this.onSelection = this.onSelection.bind(this);
     this.onSetClassState = this.onSetClassState.bind(this);
-    this.onToggleClassPanelExpanded = this.onToggleClassPanelExpanded.bind(
-      this
-    );
+    this.onToggleClassPanelExpanded = this.onToggleClassPanelExpanded.bind(this);
     this.onToggleDeclaration = this.onToggleDeclaration.bind(this);
     this.onTogglePrintSimulation = this.onTogglePrintSimulation.bind(this);
-    this.onToggleColorSchemeSimulation = this.onToggleColorSchemeSimulation.bind(
-      this
-    );
+    this.onToggleColorSchemeSimulation = this.onToggleColorSchemeSimulation.bind(this);
     this.onTogglePseudoClass = this.onTogglePseudoClass.bind(this);
     this.onToolChanged = this.onToolChanged.bind(this);
-    this.onToggleSelectorHighlighter = this.onToggleSelectorHighlighter.bind(
-      this
-    );
+    this.onToggleSelectorHighlighter = this.onToggleSelectorHighlighter.bind(this);
     this.showContextMenu = this.showContextMenu.bind(this);
     this.showDeclarationNameEditor = this.showDeclarationNameEditor.bind(this);
-    this.showDeclarationValueEditor = this.showDeclarationValueEditor.bind(
-      this
-    );
+    this.showDeclarationValueEditor = this.showDeclarationValueEditor.bind(this);
     this.showNewDeclarationEditor = this.showNewDeclarationEditor.bind(this);
     this.showSelectorEditor = this.showSelectorEditor.bind(this);
     this.updateClassList = this.updateClassList.bind(this);
@@ -191,9 +143,7 @@ class RulesView {
     // This allows us to use `actorHasMethod`. Please see `getActorDescription` for more
     // information.
     try {
-      this.contentViewerFront = await this.currentTarget.getFront(
-        "contentViewer"
-      );
+      this.contentViewerFront = await this.currentTarget.getFront("contentViewer");
     } catch (e) {
       console.error(e);
     }
@@ -215,20 +165,12 @@ class RulesView {
     // - The feature pref is enabled.
     // - Color scheme simulation is supported for the current target.
     const isEmulateColorSchemeSupported =
-      (await this.currentTarget.actorHasMethod(
-        "contentViewer",
-        "getEmulatedColorScheme"
-      )) ||
+      (await this.currentTarget.actorHasMethod("contentViewer", "getEmulatedColorScheme")) ||
       // Bug 1606852: We can removed this check when Firefox 73 is on release.
-      (await this.currentTarget.actorHasMethod(
-        "emulation",
-        "getEmulatedColorScheme"
-      ));
+      (await this.currentTarget.actorHasMethod("emulation", "getEmulatedColorScheme"));
 
     if (
-      Services.prefs.getBoolPref(
-        "devtools.inspector.color-scheme-simulation.enabled"
-      ) &&
+      Services.prefs.getBoolPref("devtools.inspector.color-scheme-simulation.enabled") &&
       isEmulateColorSchemeSupported
     ) {
       this.store.dispatch(updateColorSchemeSimulationHidden(false));
@@ -370,9 +312,7 @@ class RulesView {
   async getGridlineNames() {
     const gridLineNames = { cols: [], rows: [] };
     const layoutInspector = await this.inspector.walker.getLayoutInspector();
-    const gridFront = await layoutInspector.getCurrentGrid(
-      this.selection.nodeFront
-    );
+    const gridFront = await layoutInspector.getCurrentGrid(this.selection.nodeFront);
 
     if (gridFront) {
       const gridFragments = gridFront.gridFragments;
@@ -426,9 +366,7 @@ class RulesView {
 
     try {
       const front = this.inspector.inspectorFront;
-      this._selectorHighlighter = await front.getHighlighterByType(
-        "SelectorHighlighter"
-      );
+      this._selectorHighlighter = await front.getHighlighterByType("SelectorHighlighter");
       return this._selectorHighlighter;
     } catch (e) {
       // The SelectorHighlighter type could not be created in the
@@ -480,10 +418,7 @@ class RulesView {
       return;
     }
 
-    const toolbox = await gDevTools.showToolbox(
-      this.currentTarget,
-      "styleeditor"
-    );
+    const toolbox = await gDevTools.showToolbox(this.currentTarget, "styleeditor");
     const styleEditor = toolbox.getCurrentPanel();
     if (!styleEditor) {
       return;
@@ -639,8 +574,7 @@ class RulesView {
    * Style Editor is registered because that's where source links point to.
    */
   onToolChanged() {
-    const prevIsSourceLinkEnabled = this.store.getState().rules
-      .isSourceLinkEnabled;
+    const prevIsSourceLinkEnabled = this.store.getState().rules.isSourceLinkEnabled;
     const isSourceLinkEnabled = this.toolbox.isToolRegistered("styleeditor");
 
     if (prevIsSourceLinkEnabled !== isSourceLinkEnabled) {
@@ -676,11 +610,7 @@ class RulesView {
           return;
         }
 
-        await this.elementStyle.modifyDeclarationName(
-          ruleId,
-          declarationId,
-          name
-        );
+        await this.elementStyle.modifyDeclarationName(ruleId, declarationId, name);
         this.telemetry.recordEvent("edit_rule", "ruleview", null, {
           session_id: this.toolbox.sessionId,
         });
@@ -716,19 +646,14 @@ class RulesView {
       advanceChars: advanceValidate,
       contentType: InplaceEditor.CONTENT_TYPES.CSS_VALUE,
       cssProperties: this.cssProperties,
-      cssVariables:
-        this.elementStyle.variablesMap.get(rule.pseudoElement) || [],
+      cssVariables: this.elementStyle.variablesMap.get(rule.pseudoElement) || [],
       defaultIncrement: declaration.name === "opacity" ? 0.1 : 1,
       done: async (value, commit) => {
         if (!commit || !value || !value.trim()) {
           return;
         }
 
-        await this.elementStyle.modifyDeclarationValue(
-          ruleId,
-          declarationId,
-          value
-        );
+        await this.elementStyle.modifyDeclarationValue(ruleId, declarationId, value);
         this.telemetry.recordEvent("edit_rule", "ruleview", null, {
           session_id: this.toolbox.sessionId,
         });
@@ -798,13 +723,9 @@ class RulesView {
 
         // Hide the selector highlighter if it matches the selector being edited.
         if (this.highlighters.selectorHighlighterShown) {
-          const selector = await this.elementStyle
-            .getRule(ruleId)
-            .getUniqueSelector();
+          const selector = await this.elementStyle.getRule(ruleId).getUniqueSelector();
           if (this.highlighters.selectorHighlighterShown === selector) {
-            this.onToggleSelectorHighlighter(
-              this.highlighters.selectorHighlighterShown
-            );
+            this.onToggleSelectorHighlighter(this.highlighters.selectorHighlighterShown);
           }
         }
 
@@ -862,12 +783,9 @@ class RulesView {
   async updateElementStyle() {
     await this.elementStyle.populate();
 
-    const isAddRuleEnabled =
-      this.selection.isElementNode() && !this.selection.isAnonymousNode();
+    const isAddRuleEnabled = this.selection.isElementNode() && !this.selection.isAnonymousNode();
     this.store.dispatch(updateAddRuleEnabled(isAddRuleEnabled));
-    this.store.dispatch(
-      setPseudoClassLocks(this.elementStyle.element.pseudoClassLocks)
-    );
+    this.store.dispatch(setPseudoClassLocks(this.elementStyle.element.pseudoClassLocks));
     this.updateClassList();
     this.updateRules();
   }

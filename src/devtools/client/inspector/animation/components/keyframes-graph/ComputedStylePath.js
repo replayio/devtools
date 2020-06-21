@@ -92,9 +92,7 @@ class ComputedStylePath extends PureComponent {
 
     const getSegment = time => {
       simulatedAnimation.currentTime = time;
-      const computedStyle = win
-        .getComputedStyle(simulatedElement)
-        .getPropertyValue(propertyName);
+      const computedStyle = win.getComputedStyle(simulatedElement).getPropertyValue(propertyName);
 
       return {
         computedStyle,
@@ -157,9 +155,7 @@ class ComputedStylePath extends PureComponent {
         },
         dom.title({}, startKeyframe.easing),
         dom.path({
-          d:
-            `M${hintSegments[0].x},${hintSegments[0].y} ` +
-            toPathString(hintSegments),
+          d: `M${hintSegments[0].x},${hintSegments[0].y} ` + toPathString(hintSegments),
           style: {
             "stroke-width": easingHintStrokeWidth,
           },
@@ -185,10 +181,7 @@ class ComputedStylePath extends PureComponent {
     for (let i = 0; i < keyframes.length - 1; i++) {
       const startKeyframe = keyframes[i];
       const endKeyframe = keyframes[i + 1];
-      const keyframesSegments = this.getPathSegments(
-        startKeyframe,
-        endKeyframe
-      );
+      const keyframesSegments = this.getPathSegments(startKeyframe, endKeyframe);
 
       if (!keyframesSegments) {
         return null;

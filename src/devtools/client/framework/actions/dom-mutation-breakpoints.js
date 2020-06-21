@@ -19,9 +19,7 @@ function handleWalkerMutations(mutations, store) {
   // the list of active DOM mutation breakpoints. We explicitly check these
   // cases because BP updates could also happen due to explicitly API
   // operations to add/remove bps.
-  const mutationItems = mutations.filter(
-    mutation => mutation.type === "mutationBreakpoint"
-  );
+  const mutationItems = mutations.filter(mutation => mutation.type === "mutationBreakpoint");
   if (mutationItems.length > 0) {
     store.dispatch(updateBreakpointsForMutations(mutationItems));
   }
@@ -32,7 +30,7 @@ function createDOMMutationBreakpoint(nodeFront, mutationType) {
   assert(typeof nodeFront === "object" && nodeFront);
   assert(typeof mutationType === "string");
 
-  return async function(dispatch) {
+  return async function (dispatch) {
     const walker = nodeFront.parent();
 
     dispatch({
@@ -52,7 +50,7 @@ function deleteDOMMutationBreakpoint(nodeFront, mutationType) {
   assert(typeof nodeFront === "object" && nodeFront);
   assert(typeof mutationType === "string");
 
-  return async function(dispatch) {
+  return async function (dispatch) {
     const walker = nodeFront.parent();
     await walker.setMutationBreakpoints(nodeFront, {
       [mutationType]: false,
@@ -67,7 +65,7 @@ function deleteDOMMutationBreakpoint(nodeFront, mutationType) {
 }
 
 function updateBreakpointsForMutations(mutationItems) {
-  return async function(dispatch, getState) {
+  return async function (dispatch, getState) {
     const removedNodeFronts = [];
     const changedNodeFronts = new Set();
 
@@ -77,11 +75,7 @@ function updateBreakpointsForMutations(mutationItems) {
           changedNodeFronts.add(nodeFront);
           break;
         default:
-          console.error(
-            "Unexpected mutation reason",
-            mutationReason,
-            ", removing"
-          );
+          console.error("Unexpected mutation reason", mutationReason, ", removing");
         // Fall Through
         case "detach":
         case "unload":
@@ -98,12 +92,9 @@ function updateBreakpointsForMutations(mutationItems) {
     }
     if (changedNodeFronts.size > 0) {
       const enabledStates = [];
-      for (const {
-        id,
-        nodeFront,
-        mutationType,
-        enabled,
-      } of getDOMMutationBreakpoints(getState())) {
+      for (const { id, nodeFront, mutationType, enabled } of getDOMMutationBreakpoints(
+        getState()
+      )) {
         if (changedNodeFronts.has(nodeFront)) {
           const bpEnabledOnFront = nodeFront.mutationBreakpoints[mutationType];
           if (bpEnabledOnFront !== enabled) {
@@ -126,7 +117,7 @@ function toggleDOMMutationBreakpointState(id, enabled) {
   assert(typeof id === "string");
   assert(typeof enabled === "boolean");
 
-  return async function(dispatch, getState) {
+  return async function (dispatch, getState) {
     const bp = getDOMMutationBreakpoint(getState(), id);
     if (!bp) {
       throw new Error(`No DOM mutation BP with ID ${id}`);

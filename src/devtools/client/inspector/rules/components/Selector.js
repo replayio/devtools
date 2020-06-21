@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createRef,
-  PureComponent,
-} = require("react");
+const { createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { editableItem } = require("devtools/client/shared/inplace-editor");
@@ -63,10 +60,7 @@ class Selector extends PureComponent {
   renderSelector() {
     // Show the text directly for custom selector text (such as the inline "element"
     // style and Keyframes rules).
-    if (
-      this.props.type === ELEMENT_STYLE ||
-      this.props.type === CSSRule.KEYFRAME_RULE
-    ) {
+    if (this.props.type === ELEMENT_STYLE || this.props.type === CSSRule.KEYFRAME_RULE) {
       return this.props.selector.selectorText;
     }
 
@@ -118,9 +112,7 @@ class Selector extends PureComponent {
 
       // Append a comma separator unless this is the last selector.
       if (i < selectors.length - 1) {
-        output.push(
-          dom.span({ className: "ruleview-selector-separator" }, ", ")
-        );
+        output.push(dom.span({ className: "ruleview-selector-separator" }, ", "));
       }
     }
 

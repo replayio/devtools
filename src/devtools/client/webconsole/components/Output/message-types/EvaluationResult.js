@@ -7,9 +7,7 @@
 // React & Redux
 const { createFactory } = require("react");
 const PropTypes = require("prop-types");
-const Message = createFactory(
-  require("devtools/client/webconsole/components/Output/Message")
-);
+const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
 const GripMessageBody = require("devtools/client/webconsole/components/Output/GripMessageBody");
 
 EvaluationResult.displayName = "EvaluationResult";
@@ -54,20 +52,14 @@ function EvaluationResult(props) {
   } = message;
 
   let messageBody;
-  if (
-    typeof message.messageText !== "undefined" &&
-    message.messageText !== null
-  ) {
+  if (typeof message.messageText !== "undefined" && message.messageText !== null) {
     const messageText =
       message.messageText && message.messageText.getGrip
         ? message.messageText.getGrip()
         : message.messageText;
     if (typeof messageText === "string") {
       messageBody = messageText;
-    } else if (
-      typeof messageText === "object" &&
-      messageText.type === "longString"
-    ) {
+    } else if (typeof messageText === "object" && messageText.type === "longString") {
       messageBody = `${messageText.initial}…`;
     }
   } else {

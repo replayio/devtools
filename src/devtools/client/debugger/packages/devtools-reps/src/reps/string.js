@@ -140,9 +140,7 @@ function maybeCropLongString(opts, object) {
 function formatText(opts, text) {
   const { useQuotes, escapeWhitespace } = opts;
 
-  return useQuotes
-    ? escapeString(text, escapeWhitespace)
-    : sanitizeString(text);
+  return useQuotes ? escapeString(text, escapeWhitespace) : sanitizeString(text);
 }
 
 function getElementConfig(opts) {
@@ -192,13 +190,7 @@ function maybeCropString(opts, text) {
  *                                              (e.g. in JSONViewer).
  * @returns {Array<String|ReactElement>}
  */
-function getLinkifiedElements({
-  text,
-  cropLimit,
-  urlCropLimit,
-  openLink,
-  isInContentPage,
-}) {
+function getLinkifiedElements({ text, cropLimit, urlCropLimit, openLink, isInContentPage }) {
   const halfLimit = Math.ceil((cropLimit - ELLIPSIS.length) / 2);
   const startCropIndex = cropLimit ? halfLimit : null;
   const endCropIndex = cropLimit ? text.length - halfLimit : null;
@@ -215,9 +207,7 @@ function getLinkifiedElements({
     contentStart = url.index + url[1].length;
     if (contentStart > 0) {
       const nonUrlText = text.substring(0, contentStart);
-      items.push(
-        getCroppedString(nonUrlText, currentIndex, startCropIndex, endCropIndex)
-      );
+      items.push(getCroppedString(nonUrlText, currentIndex, startCropIndex, endCropIndex));
     }
 
     // There are some final characters for a URL that are much more likely
@@ -230,22 +220,12 @@ function getLinkifiedElements({
     }
 
     currentIndex = currentIndex + contentStart;
-    let linkText = getCroppedString(
-      useUrl,
-      currentIndex,
-      startCropIndex,
-      endCropIndex
-    );
+    let linkText = getCroppedString(useUrl, currentIndex, startCropIndex, endCropIndex);
 
     if (linkText) {
       if (urlCropLimit && useUrl.length > urlCropLimit) {
         const urlCropHalf = Math.ceil((urlCropLimit - ELLIPSIS.length) / 2);
-        linkText = getCroppedString(
-          useUrl,
-          0,
-          urlCropHalf,
-          useUrl.length - urlCropHalf
-        );
+        linkText = getCroppedString(useUrl, 0, urlCropHalf, useUrl.length - urlCropHalf);
       }
 
       items.push(

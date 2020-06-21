@@ -13,16 +13,10 @@ const actions = require("devtools/client/webconsole/actions/index");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 
 // Additional Components
-const MenuButton = createFactory(
-  require("devtools/client/shared/components/menu/MenuButton")
-);
+const MenuButton = createFactory(require("devtools/client/shared/components/menu/MenuButton"));
 
-const MenuItem = createFactory(
-  require("devtools/client/shared/components/menu/MenuItem")
-);
-const MenuList = createFactory(
-  require("devtools/client/shared/components/menu/MenuList")
-);
+const MenuItem = createFactory(require("devtools/client/shared/components/menu/MenuItem"));
+const MenuList = createFactory(require("devtools/client/shared/components/menu/MenuList"));
 
 class ConsoleSettings extends Component {
   static get propTypes() {
@@ -65,12 +59,8 @@ class ConsoleSettings extends Component {
         key: "webconsole-console-settings-menu-item-timestamps",
         checked: timestampsVisible,
         className: "menu-item webconsole-console-settings-menu-item-timestamps",
-        label: l10n.getStr(
-          "webconsole.console.settings.menu.item.timestamps.label"
-        ),
-        tooltip: l10n.getStr(
-          "webconsole.console.settings.menu.item.timestamps.tooltip"
-        ),
+        label: l10n.getStr("webconsole.console.settings.menu.item.timestamps.label"),
+        tooltip: l10n.getStr("webconsole.console.settings.menu.item.timestamps.tooltip"),
         onClick: () => dispatch(actions.timestampsToggle()),
       })
     );
@@ -80,14 +70,9 @@ class ConsoleSettings extends Component {
       MenuItem({
         key: "webconsole-console-settings-menu-item-warning-groups",
         checked: groupWarnings,
-        className:
-          "menu-item webconsole-console-settings-menu-item-warning-groups",
-        label: l10n.getStr(
-          "webconsole.console.settings.menu.item.warningGroups.label"
-        ),
-        tooltip: l10n.getStr(
-          "webconsole.console.settings.menu.item.warningGroups.tooltip"
-        ),
+        className: "menu-item webconsole-console-settings-menu-item-warning-groups",
+        label: l10n.getStr("webconsole.console.settings.menu.item.warningGroups.label"),
+        tooltip: l10n.getStr("webconsole.console.settings.menu.item.warningGroups.tooltip"),
         onClick: () => dispatch(actions.warningGroupsToggle()),
       })
     );

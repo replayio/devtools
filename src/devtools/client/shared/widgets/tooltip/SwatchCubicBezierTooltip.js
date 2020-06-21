@@ -4,9 +4,7 @@
 
 "use strict";
 
-const {
-  CubicBezierWidget,
-} = require("devtools/client/shared/widgets/CubicBezierWidget");
+const { CubicBezierWidget } = require("devtools/client/shared/widgets/CubicBezierWidget");
 const SwatchBasedEditorTooltip = require("devtools/client/shared/widgets/tooltip/SwatchBasedEditorTooltip");
 
 const XHTML_NS = "http://www.w3.org/1999/xhtml";

@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
@@ -55,13 +52,8 @@ class ExtensionSidebar extends PureComponent {
       serviceContainer,
     } = this.props;
 
-    const {
-      iframeURL,
-      object,
-      expressionResult,
-      rootTitle,
-      viewMode = "empty-sidebar",
-    } = extensionsSidebar[id] || {};
+    const { iframeURL, object, expressionResult, rootTitle, viewMode = "empty-sidebar" } =
+      extensionsSidebar[id] || {};
 
     let sidebarContentEl;
 

@@ -29,10 +29,7 @@ import { uniq, sortBy } from "lodash";
 
 import type { Symbols } from "../../reducers/ast";
 
-import type {
-  SymbolDeclaration,
-  FunctionDeclaration,
-} from "../../workers/parser";
+import type { SymbolDeclaration, FunctionDeclaration } from "../../workers/parser";
 import type { Source, Context, SourceLocation } from "../../types";
 
 type OwnProps = {|
@@ -118,9 +115,7 @@ export class Outline extends Component<Props, State> {
 
     // Find items that enclose the selected location
     const enclosedItems = [...functions, ...classes].filter(
-      item =>
-        item.name != "anonymous" &&
-        containsPosition(item.location, cursorPosition)
+      item => item.name != "anonymous" && containsPosition(item.location, cursorPosition)
     );
 
     if (enclosedItems.length == 0) {
@@ -197,9 +192,7 @@ export class Outline extends Component<Props, State> {
   }
 
   renderLoading() {
-    return (
-      <div className="outline-pane-info">{L10N.getStr("loadingText")}</div>
-    );
+    return <div className="outline-pane-info">{L10N.getStr("loadingText")}</div>;
   }
 
   renderFunction(func: FunctionDeclaration) {
@@ -262,9 +255,7 @@ export class Outline extends Component<Props, State> {
           className={classnames("", { focused: isFocused })}
           onClick={() => this.selectItem(item)}
         >
-          {classFunc
-            ? this.renderFunction(classFunc)
-            : this.renderClassHeader(klass)}
+          {classFunc ? this.renderFunction(classFunc) : this.renderClassHeader(klass)}
         </h2>
         <ul className="outline-list__class-list">
           {classFunctions.map(func => this.renderFunction(func))}
@@ -277,10 +268,7 @@ export class Outline extends Component<Props, State> {
     const { filter } = this.state;
     let classes = uniq(functions.map(func => func.klass));
     let namedFunctions = functions.filter(
-      func =>
-        filterOutlineItem(func.name, filter) &&
-        !func.klass &&
-        !classes.includes(func.name)
+      func => filterOutlineItem(func.name, filter) && !func.klass && !classes.includes(func.name)
     );
 
     let classFunctions = functions.filter(
@@ -294,11 +282,7 @@ export class Outline extends Component<Props, State> {
     }
 
     return (
-      <ul
-        ref="outlineList"
-        className="outline-list devtools-monospace"
-        dir="ltr"
-      >
+      <ul ref="outlineList" className="outline-list devtools-monospace" dir="ltr">
         {namedFunctions.map(func => this.renderFunction(func))}
         {classes.map(klass => this.renderClassFunctions(klass, classFunctions))}
       </ul>
@@ -330,9 +314,7 @@ export class Outline extends Component<Props, State> {
       return this.renderLoading();
     }
 
-    const symbolsToDisplay = symbols.functions.filter(
-      func => func.name != "anonymous"
-    );
+    const symbolsToDisplay = symbols.functions.filter(func => func.name != "anonymous");
 
     if (symbolsToDisplay.length === 0) {
       return this.renderPlaceholder();
@@ -369,10 +351,7 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    selectLocation: actions.selectLocation,
-    flashLineRange: actions.flashLineRange,
-  }
-)(Outline);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  selectLocation: actions.selectLocation,
+  flashLineRange: actions.flashLineRange,
+})(Outline);

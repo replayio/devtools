@@ -12,7 +12,7 @@ export default function root() {
 
     var val;
 
-    function fn(){};
+    function fn() {}
   }
 
   callback();

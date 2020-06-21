@@ -17,10 +17,7 @@ import type { TabList, Tab, TabsSources } from "../reducers/types";
  * @returns Array
  */
 
-export function getHiddenTabs(
-  sourceTabs: TabsSources,
-  sourceTabEls: Array<any>
-): TabsSources {
+export function getHiddenTabs(sourceTabs: TabsSources, sourceTabEls: Array<any>): TabsSources {
   sourceTabEls = [].slice.call(sourceTabEls);
   function getTopOffset() {
     const topOffsets = sourceTabEls.map(t => t.getBoundingClientRect().top);

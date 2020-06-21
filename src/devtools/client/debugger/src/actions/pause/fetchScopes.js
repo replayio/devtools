@@ -11,7 +11,7 @@ import type { ThreadContext } from "../../types";
 import type { ThunkArgs } from "../types";
 
 export function fetchScopes(cx: ThreadContext) {
-  return async function({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
+  return async function ({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
     const frame = getSelectedFrame(getState(), cx.thread);
     if (!frame || getGeneratedFrameScope(getState(), frame.id)) {
       return;

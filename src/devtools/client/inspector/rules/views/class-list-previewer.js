@@ -7,9 +7,7 @@
 const ClassList = require("devtools/client/inspector/rules/models/class-list");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
-const L10N = new LocalizationHelper(
-  "devtools/client/locales/inspector.properties"
-);
+const L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
 /**
  * This UI widget shows a textfield and a series of checkboxes in the rule-view. It is
@@ -34,10 +32,7 @@ function ClassListPreviewer(inspector, containerEl) {
   this.addEl = this.doc.createElement("input");
   this.addEl.classList.add("devtools-textinput");
   this.addEl.classList.add("add-class");
-  this.addEl.setAttribute(
-    "placeholder",
-    L10N.getStr("inspector.classPanel.newClass.placeholder")
-  );
+  this.addEl.setAttribute("placeholder", L10N.getStr("inspector.classPanel.newClass.placeholder"));
   this.addEl.addEventListener("keypress", this.onKeyPress);
   this.containerEl.appendChild(this.addEl);
 

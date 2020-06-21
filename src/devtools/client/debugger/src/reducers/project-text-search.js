@@ -21,12 +21,7 @@ export type Search = {
 
 export type SearchOperation = Cancellable;
 
-export type StatusType =
-  | "INITIAL"
-  | "FETCHING"
-  | "CANCELLED"
-  | "DONE"
-  | "ERROR";
+export type StatusType = "INITIAL" | "FETCHING" | "CANCELLED" | "DONE" | "ERROR";
 export const statusType = {
   initial: "INITIAL",
   fetching: "FETCHING",
@@ -73,8 +68,7 @@ function update(
       return { ...state, results: [...state.results, result] };
 
     case "UPDATE_STATUS":
-      const ongoingSearch =
-        action.status == statusType.fetching ? state.ongoingSearch : null;
+      const ongoingSearch = action.status == statusType.fetching ? state.ongoingSearch : null;
       return { ...state, status: action.status, ongoingSearch };
 
     case "CLEAR_SEARCH_RESULTS":

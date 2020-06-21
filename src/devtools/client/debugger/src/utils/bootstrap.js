@@ -56,12 +56,7 @@ type Workers = {
   evaluationsParser: typeof ParserDispatcher,
 };
 
-export function bootstrapStore(
-  client: any,
-  workers: Workers,
-  panel: Panel,
-  initialState: Object
-) {
+export function bootstrapStore(client: any, workers: Workers, panel: Panel, initialState: Object) {
   const createStore = configureStore({
     log: prefs.logging,
     timing: prefs.timing,
@@ -73,10 +68,7 @@ export function bootstrapStore(
   const store = createStore(combineReducers(reducers), initialState);
   store.subscribe(() => updatePrefs(store.getState()));
 
-  const actions = bindActionCreators(
-    require("../actions").default,
-    store.dispatch
-  );
+  const actions = bindActionCreators(require("../actions").default, store.dispatch);
 
   return { store, actions, selectors };
 }
@@ -121,17 +113,11 @@ function updatePrefs(state: any) {
   currentEventBreakpoints = state.eventListenerBreakpoints;
   currentTabs = selectors.getTabs(state);
 
-  if (
-    previousPendingBreakpoints &&
-    currentPendingBreakpoints !== previousPendingBreakpoints
-  ) {
+  if (previousPendingBreakpoints && currentPendingBreakpoints !== previousPendingBreakpoints) {
     asyncStore.pendingBreakpoints = currentPendingBreakpoints;
   }
 
-  if (
-    previousEventBreakpoints &&
-    previousEventBreakpoints !== currentEventBreakpoints
-  ) {
+  if (previousEventBreakpoints && previousEventBreakpoints !== currentEventBreakpoints) {
     asyncStore.eventListenerBreakpoints = currentEventBreakpoints;
   }
 

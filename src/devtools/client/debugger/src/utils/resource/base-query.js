@@ -16,15 +16,9 @@ import {
 } from "./core";
 import { arrayShallowEqual } from "./compare";
 
-export type ResourceQuery<R: ResourceBound, Args, Reduced> = (
-  ResourceState<R>,
-  Args
-) => Reduced;
+export type ResourceQuery<R: ResourceBound, Args, Reduced> = (ResourceState<R>, Args) => Reduced;
 
-export type QueryFilter<R: ResourceBound, Args> = (
-  ResourceValues<R>,
-  Args
-) => Array<Id<R>>;
+export type QueryFilter<R: ResourceBound, Args> = (ResourceValues<R>, Args) => Array<Id<R>>;
 
 export type QueryMap<R: ResourceBound, Args, Mapped> =
   | QueryMapNoArgs<R, Mapped>
@@ -116,9 +110,7 @@ type ResourceLoader<R: ResourceBound, Args, Mapped> = (
 function makeResourceMapper<R: ResourceBound, Args, Mapped>(
   map: QueryMap<R, Args, Mapped>
 ): ResourceLoader<R, Args, Mapped> {
-  return map.needsArgs
-    ? makeResourceArgsMapper(map)
-    : makeResourceNoArgsMapper(map);
+  return map.needsArgs ? makeResourceArgsMapper(map) : makeResourceNoArgsMapper(map);
 }
 
 /**
@@ -146,11 +138,7 @@ function getCachedResource<R: ResourceBound, Args, Mapped>(
   state: ResourceState<R>,
   id: Id<R>,
   context: QueryContext<Args>,
-  map: (
-    value: R,
-    identity: ResourceIdentity,
-    context: QueryContext<Args>
-  ) => Mapped
+  map: (value: R, identity: ResourceIdentity, context: QueryContext<Args>) => Mapped
 ): Mapped {
   const validatedState = getValidatedResource(state, id);
   if (!validatedState) {

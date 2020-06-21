@@ -11,8 +11,7 @@ const { getCSSLexer } = require("devtools/shared/css/lexer");
 const EventEmitter = require("devtools/shared/event-emitter");
 const { appendText } = require("devtools/client/inspector/shared/utils");
 
-const STYLE_INSPECTOR_PROPERTIES =
-  "devtools/shared/locales/styleinspector.properties";
+const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const STYLE_INSPECTOR_L10N = new LocalizationHelper(STYLE_INSPECTOR_PROPERTIES);
 
@@ -33,13 +32,7 @@ const ANGLE_TAKING_FUNCTIONS = [
   "hue-rotate",
 ];
 // All cubic-bezier CSS timing-function names.
-const BEZIER_KEYWORDS = [
-  "linear",
-  "ease-in-out",
-  "ease-in",
-  "ease-out",
-  "ease",
-];
+const BEZIER_KEYWORDS = ["linear", "ease-in-out", "ease-in", "ease-out", "ease"];
 // Functions that accept a color argument.
 const COLOR_TAKING_FUNCTIONS = [
   "linear-gradient",
@@ -55,9 +48,7 @@ const COLOR_TAKING_FUNCTIONS = [
 // Functions that accept a shape argument.
 const BASIC_SHAPE_FUNCTIONS = ["polygon", "circle", "ellipse", "inset"];
 
-const BACKDROP_FILTER_ENABLED = Services.prefs.getBoolPref(
-  "layout.css.backdrop-filter.enabled"
-);
+const BACKDROP_FILTER_ENABLED = Services.prefs.getBoolPref("layout.css.backdrop-filter.enabled");
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 /**
@@ -88,10 +79,7 @@ const HTML_NS = "http://www.w3.org/1999/xhtml";
  *        - supportsCssColor4ColorFunction - A function for checking
  *          the supporting of css-color-4 color function.
  */
-function OutputParser(
-  document,
-  { supportsType, supportsCssColor4ColorFunction }
-) {
+function OutputParser(document, { supportsType, supportsCssColor4ColorFunction }) {
   this.parsed = [];
   this.doc = document;
   this.supportsType = supportsType;
@@ -117,14 +105,13 @@ OutputParser.prototype = {
    * @return {DocumentFragment}
    *         A document fragment containing color swatches etc.
    */
-  parseCssProperty: function(name, value, options = {}) {
+  parseCssProperty: function (name, value, options = {}) {
     options = this._mergeOptions(options);
 
     options.expectCubicBezier = this.supportsType(name, "timing-function");
     options.expectDisplay = name === "display";
     options.expectFilter =
-      name === "filter" ||
-      (BACKDROP_FILTER_ENABLED && name === "backdrop-filter");
+      name === "filter" || (BACKDROP_FILTER_ENABLED && name === "backdrop-filter");
     options.expectShape = name === "clip-path" || name === "shape-outside";
     options.expectFont = name === "font-family";
     options.supportsColor =
@@ -169,7 +156,7 @@ OutputParser.prototype = {
    *         |sawComma| is true if the stop was due to a comma, or false otherwise.
    *         |sawVariable| is true if a variable was seen while parsing the text.
    */
-  _parseMatchingParens: function(text, tokenStream, options, stopAtComma) {
+  _parseMatchingParens: function (text, tokenStream, options, stopAtComma) {
     let depth = 1;
     const functionData = [];
     const tokens = [];
@@ -201,22 +188,13 @@ OutputParser.prototype = {
         options.isVariableInUse
       ) {
         sawVariable = true;
-        const variableNode = this._parseVariable(
-          token,
-          text,
-          tokenStream,
-          options
-        );
+        const variableNode = this._parseVariable(token, text, tokenStream, options);
         functionData.push(variableNode);
       } else if (token.tokenType === "function") {
         ++depth;
       }
 
-      if (
-        token.tokenType !== "function" ||
-        token.text !== "var" ||
-        !options.isVariableInUse
-      ) {
+      if (token.tokenType !== "function" || token.text !== "var" || !options.isVariableInUse) {
         functionData.push(text.substring(token.startOffset, token.endOffset));
       }
 
@@ -247,21 +225,18 @@ OutputParser.prototype = {
    *         and a title for --var1 like "--var1 = 10" or
    *         "--var1 is not set".
    */
-  _parseVariable: function(initialToken, text, tokenStream, options) {
+  _parseVariable: function (initialToken, text, tokenStream, options) {
     // Handle the "var(".
-    const varText = text.substring(
-      initialToken.startOffset,
-      initialToken.endOffset
-    );
+    const varText = text.substring(initialToken.startOffset, initialToken.endOffset);
     const variableNode = this._createNode("span", {}, varText);
 
     // Parse the first variable name within the parens of var().
-    const {
-      tokens,
-      functionData,
-      sawComma,
-      sawVariable,
-    } = this._parseMatchingParens(text, tokenStream, options, true);
+    const { tokens, functionData, sawComma, sawVariable } = this._parseMatchingParens(
+      text,
+      tokenStream,
+      options,
+      true
+    );
 
     const result = sawVariable ? "" : functionData.join("");
 
@@ -292,10 +267,7 @@ OutputParser.prototype = {
     } else {
       // The variable name is not valid, mark it unmatched.
       firstOpts.class = options.unmatchedVariableClass;
-      firstOpts["data-variable"] = STYLE_INSPECTOR_L10N.getFormatStr(
-        "rule.variableUnset",
-        varName
-      );
+      firstOpts["data-variable"] = STYLE_INSPECTOR_L10N.getFormatStr("rule.variableUnset", varName);
     }
 
     variableNode.appendChild(this._createNode("span", firstOpts, result));
@@ -340,22 +312,20 @@ OutputParser.prototype = {
    *         A document fragment.
    */
   // eslint-disable-next-line complexity
-  _doParse: function(text, options, tokenStream, stopAtCloseParen) {
+  _doParse: function (text, options, tokenStream, stopAtCloseParen) {
     let parenDepth = stopAtCloseParen ? 1 : 0;
     let outerMostFunctionTakesColor = false;
     let fontFamilyNameParts = [];
     let previousWasBang = false;
 
-    const colorOK = function() {
+    const colorOK = function () {
       return (
         options.supportsColor ||
-        (options.expectFilter &&
-          parenDepth === 1 &&
-          outerMostFunctionTakesColor)
+        (options.expectFilter && parenDepth === 1 && outerMostFunctionTakesColor)
       );
     };
 
-    const angleOK = function(angle) {
+    const angleOK = function (angle) {
       return new angleUtils.CssAngle(angle).valid;
     };
 
@@ -387,22 +357,13 @@ OutputParser.prototype = {
             // it isn't special in some other way. So, we let it
             // through to the ordinary parsing loop so that the value
             // can be handled in a single place.
-            this._appendTextNode(
-              text.substring(token.startOffset, token.endOffset)
-            );
+            this._appendTextNode(text.substring(token.startOffset, token.endOffset));
             if (parenDepth === 0) {
-              outerMostFunctionTakesColor = COLOR_TAKING_FUNCTIONS.includes(
-                token.text
-              );
+              outerMostFunctionTakesColor = COLOR_TAKING_FUNCTIONS.includes(token.text);
             }
             ++parenDepth;
           } else if (token.text === "var" && options.isVariableInUse) {
-            const variableNode = this._parseVariable(
-              token,
-              text,
-              tokenStream,
-              options
-            );
+            const variableNode = this._parseVariable(token, text, tokenStream, options);
             this.parsed.push(variableNode);
           } else {
             const { functionData, sawVariable } = this._parseMatchingParens(
@@ -411,10 +372,7 @@ OutputParser.prototype = {
               options
             );
 
-            const functionName = text.substring(
-              token.startOffset,
-              token.endOffset
-            );
+            const functionName = text.substring(token.startOffset, token.endOffset);
 
             if (sawVariable) {
               // If function contains variable, we need to add both strings
@@ -435,15 +393,9 @@ OutputParser.prototype = {
 
               if (options.expectCubicBezier && token.text === "cubic-bezier") {
                 this._appendCubicBezier(functionText, options);
-              } else if (
-                colorOK() &&
-                colorUtils.isValidCSSColor(functionText, this.cssColor4)
-              ) {
+              } else if (colorOK() && colorUtils.isValidCSSColor(functionText, this.cssColor4)) {
                 this._appendColor(functionText, options);
-              } else if (
-                options.expectShape &&
-                BASIC_SHAPE_FUNCTIONS.includes(token.text)
-              ) {
+              } else if (options.expectShape && BASIC_SHAPE_FUNCTIONS.includes(token.text)) {
                 this._appendShape(functionText, options);
               } else {
                 this._appendTextNode(functionText);
@@ -454,19 +406,13 @@ OutputParser.prototype = {
         }
 
         case "ident":
-          if (
-            options.expectCubicBezier &&
-            BEZIER_KEYWORDS.includes(token.text)
-          ) {
+          if (options.expectCubicBezier && BEZIER_KEYWORDS.includes(token.text)) {
             this._appendCubicBezier(token.text, options);
           } else if (this._isDisplayFlex(text, token, options)) {
             this._appendHighlighterToggle(token.text, options.flexClass);
           } else if (this._isDisplayGrid(text, token, options)) {
             this._appendHighlighterToggle(token.text, options.gridClass);
-          } else if (
-            colorOK() &&
-            colorUtils.isValidCSSColor(token.text, this.cssColor4)
-          ) {
+          } else if (colorOK() && colorUtils.isValidCSSColor(token.text, this.cssColor4)) {
             this._appendColor(token.text, options);
           } else if (angleOK(token.text)) {
             this._appendAngle(token.text, options);
@@ -476,19 +422,14 @@ OutputParser.prototype = {
             // identifier to be equal to 'important'.
             fontFamilyNameParts.push(token.text);
           } else {
-            this._appendTextNode(
-              text.substring(token.startOffset, token.endOffset)
-            );
+            this._appendTextNode(text.substring(token.startOffset, token.endOffset));
           }
           break;
 
         case "id":
         case "hash": {
           const original = text.substring(token.startOffset, token.endOffset);
-          if (
-            colorOK() &&
-            colorUtils.isValidCSSColor(original, this.cssColor4)
-          ) {
+          if (colorOK() && colorUtils.isValidCSSColor(original, this.cssColor4)) {
             if (spaceNeeded) {
               // Insert a space to prevent token pasting when a #xxx
               // color is changed to something like rgb(...).
@@ -510,22 +451,14 @@ OutputParser.prototype = {
           break;
         case "url":
         case "bad_url":
-          this._appendURL(
-            text.substring(token.startOffset, token.endOffset),
-            token.text,
-            options
-          );
+          this._appendURL(text.substring(token.startOffset, token.endOffset), token.text, options);
           break;
 
         case "string":
           if (options.expectFont) {
-            fontFamilyNameParts.push(
-              text.substring(token.startOffset, token.endOffset)
-            );
+            fontFamilyNameParts.push(text.substring(token.startOffset, token.endOffset));
           } else {
-            this._appendTextNode(
-              text.substring(token.startOffset, token.endOffset)
-            );
+            this._appendTextNode(text.substring(token.startOffset, token.endOffset));
           }
           break;
 
@@ -533,9 +466,7 @@ OutputParser.prototype = {
           if (options.expectFont) {
             fontFamilyNameParts.push(" ");
           } else {
-            this._appendTextNode(
-              text.substring(token.startOffset, token.endOffset)
-            );
+            this._appendTextNode(text.substring(token.startOffset, token.endOffset));
           }
           break;
 
@@ -563,9 +494,7 @@ OutputParser.prototype = {
           }
         // falls through
         default:
-          this._appendTextNode(
-            text.substring(token.startOffset, token.endOffset)
-          );
+          this._appendTextNode(text.substring(token.startOffset, token.endOffset));
           break;
       }
 
@@ -603,7 +532,7 @@ OutputParser.prototype = {
    * @return {DocumentFragment}
    *         A document fragment.
    */
-  _parse: function(text, options = {}) {
+  _parse: function (text, options = {}) {
     text = text.trim();
     this.parsed.length = 0;
 
@@ -621,11 +550,8 @@ OutputParser.prototype = {
    * @param  {Object} options
    *         The options given to _parse.
    */
-  _isDisplayFlex: function(text, token, options) {
-    return (
-      options.expectDisplay &&
-      (token.text === "flex" || token.text === "inline-flex")
-    );
+  _isDisplayFlex: function (text, token, options) {
+    return options.expectDisplay && (token.text === "flex" || token.text === "inline-flex");
   },
 
   /**
@@ -638,11 +564,8 @@ OutputParser.prototype = {
    * @param  {Object} options
    *         The options given to _parse.
    */
-  _isDisplayGrid: function(text, token, options) {
-    return (
-      options.expectDisplay &&
-      (token.text === "grid" || token.text === "inline-grid")
-    );
+  _isDisplayGrid: function (text, token, options) {
+    return options.expectDisplay && (token.text === "grid" || token.text === "inline-grid");
   },
 
   /**
@@ -654,7 +577,7 @@ OutputParser.prototype = {
    *        Options object. For valid options and default values see
    *        _mergeOptions()
    */
-  _appendCubicBezier: function(bezier, options) {
+  _appendCubicBezier: function (bezier, options) {
     const container = this._createNode("span", {
       "data-bezier": bezier,
     });
@@ -689,7 +612,7 @@ OutputParser.prototype = {
    * @param {String} className
    *        The class name for the toggle span
    */
-  _appendHighlighterToggle: function(text, className) {
+  _appendHighlighterToggle: function (text, className) {
     const container = this._createNode("span", {});
 
     const toggle = this._createNode("span", {
@@ -714,7 +637,7 @@ OutputParser.prototype = {
    *        Options object. For valid options and default values see
    *        _mergeOptions()
    */
-  _appendShape: function(shape, options) {
+  _appendShape: function (shape, options) {
     const shapeTypes = [
       {
         prefix: "polygon(",
@@ -776,7 +699,7 @@ OutputParser.prototype = {
    * @returns {Node} The container to which spans have been added.
    */
   // eslint-disable-next-line complexity
-  _addPolygonPointNodes: function(coords, container) {
+  _addPolygonPointNodes: function (coords, container) {
     const tokenStream = getCSSLexer(coords);
     let token = tokenStream.nextToken();
     let coord = "";
@@ -815,10 +738,7 @@ OutputParser.prototype = {
           container.appendChild(coordNode);
           i++;
         }
-        appendText(
-          container,
-          coords.substring(token.startOffset, token.endOffset)
-        );
+        appendText(container, coords.substring(token.startOffset, token.endOffset));
         coord = "";
         depth = 0;
         isXCoord = true;
@@ -834,10 +754,7 @@ OutputParser.prototype = {
         coord += coords.substring(token.startOffset, token.endOffset);
       } else if (token.tokenType === "whitespace" && coord === "") {
         // Whitespace at beginning of coord; add to container
-        appendText(
-          container,
-          coords.substring(token.startOffset, token.endOffset)
-        );
+        appendText(container, coords.substring(token.startOffset, token.endOffset));
       } else if (token.tokenType === "whitespace" && depth === 0) {
         // Whitespace signifying end of coord
         const node = this._createNode(
@@ -850,10 +767,7 @@ OutputParser.prototype = {
           coord
         );
         coordNode.appendChild(node);
-        appendText(
-          coordNode,
-          coords.substring(token.startOffset, token.endOffset)
-        );
+        appendText(coordNode, coords.substring(token.startOffset, token.endOffset));
         coord = "";
         isXCoord = !isXCoord;
       } else if (
@@ -887,10 +801,7 @@ OutputParser.prototype = {
         (token.text === "nonzero" || token.text === "evenodd")
       ) {
         // A fill-rule (nonzero or evenodd).
-        appendText(
-          container,
-          coords.substring(token.startOffset, token.endOffset)
-        );
+        appendText(container, coords.substring(token.startOffset, token.endOffset));
         fillRule = true;
       } else {
         coord += coords.substring(token.startOffset, token.endOffset);
@@ -926,7 +837,7 @@ OutputParser.prototype = {
    * @returns {Node} The container to which the definition has been added.
    */
   // eslint-disable-next-line complexity
-  _addCirclePointNodes: function(coords, container) {
+  _addCirclePointNodes: function (coords, container) {
     const tokenStream = getCSSLexer(coords);
     let token = tokenStream.nextToken();
     let depth = 0;
@@ -945,15 +856,8 @@ OutputParser.prototype = {
         coord += coords.substring(token.startOffset, token.endOffset);
       } else if (token.tokenType === "whitespace" && coord === "") {
         // Whitespace at beginning of coord; add to container
-        appendText(
-          container,
-          coords.substring(token.startOffset, token.endOffset)
-        );
-      } else if (
-        token.tokenType === "whitespace" &&
-        point === "radius" &&
-        depth === 0
-      ) {
+        appendText(container, coords.substring(token.startOffset, token.endOffset));
+      } else if (token.tokenType === "whitespace" && point === "radius" && depth === 0) {
         // Whitespace signifying end of radius
         const node = this._createNode(
           "span",
@@ -964,10 +868,7 @@ OutputParser.prototype = {
           coord
         );
         container.appendChild(node);
-        appendText(
-          container,
-          coords.substring(token.startOffset, token.endOffset)
-        );
+        appendText(container, coords.substring(token.startOffset, token.endOffset));
         point = "cx";
         coord = "";
         depth = 0;
@@ -983,10 +884,7 @@ OutputParser.prototype = {
           coord
         );
         centerNode.appendChild(node);
-        appendText(
-          centerNode,
-          coords.substring(token.startOffset, token.endOffset)
-        );
+        appendText(centerNode, coords.substring(token.startOffset, token.endOffset));
         point = point === "cx" ? "cy" : "cx";
         coord = "";
         depth = 0;
@@ -1003,10 +901,7 @@ OutputParser.prototype = {
           );
           container.appendChild(node);
         }
-        appendText(
-          container,
-          coords.substring(token.startOffset, token.endOffset)
-        );
+        appendText(container, coords.substring(token.startOffset, token.endOffset));
         point = "cx";
         coord = "";
         depth = 0;
@@ -1087,7 +982,7 @@ OutputParser.prototype = {
    * @returns {Node} The container to which the definition has been added.
    */
   // eslint-disable-next-line complexity
-  _addEllipsePointNodes: function(coords, container) {
+  _addEllipsePointNodes: function (coords, container) {
     const tokenStream = getCSSLexer(coords);
     let token = tokenStream.nextToken();
     let depth = 0;
@@ -1106,10 +1001,7 @@ OutputParser.prototype = {
         coord += coords.substring(token.startOffset, token.endOffset);
       } else if (token.tokenType === "whitespace" && coord === "") {
         // Whitespace at beginning of coord; add to container
-        appendText(
-          container,
-          coords.substring(token.startOffset, token.endOffset)
-        );
+        appendText(container, coords.substring(token.startOffset, token.endOffset));
       } else if (token.tokenType === "whitespace" && depth === 0) {
         if (point === "rx" || point === "ry") {
           // Whitespace signifying end of rx/ry
@@ -1122,10 +1014,7 @@ OutputParser.prototype = {
             coord
           );
           container.appendChild(node);
-          appendText(
-            container,
-            coords.substring(token.startOffset, token.endOffset)
-          );
+          appendText(container, coords.substring(token.startOffset, token.endOffset));
           point = point === "rx" ? "ry" : "cx";
           coord = "";
           depth = 0;
@@ -1141,10 +1030,7 @@ OutputParser.prototype = {
             coord
           );
           centerNode.appendChild(node);
-          appendText(
-            centerNode,
-            coords.substring(token.startOffset, token.endOffset)
-          );
+          appendText(centerNode, coords.substring(token.startOffset, token.endOffset));
           point = point === "cx" ? "cy" : "cx";
           coord = "";
           depth = 0;
@@ -1162,10 +1048,7 @@ OutputParser.prototype = {
           );
           container.appendChild(node);
         }
-        appendText(
-          container,
-          coords.substring(token.startOffset, token.endOffset)
-        );
+        appendText(container, coords.substring(token.startOffset, token.endOffset));
         point = "cx";
         coord = "";
         depth = 0;
@@ -1257,7 +1140,7 @@ OutputParser.prototype = {
    * @returns {Node} The container to which the definition has been added.
    */
   // eslint-disable-next-line complexity
-  _addInsetPointNodes: function(coords, container) {
+  _addInsetPointNodes: function (coords, container) {
     const insetPoints = ["top", "right", "bottom", "left"];
     const tokenStream = getCSSLexer(coords);
     let token = tokenStream.nextToken();
@@ -1370,8 +1253,7 @@ OutputParser.prototype = {
     // case, it is nodes[1] that represents the left point rather than nodes[0].
     for (let j = 0; j < 4; j++) {
       const point = insetPoints[j];
-      const nodeIndex =
-        point === "left" && nodes.length === 3 ? 1 : j % nodes.length;
+      const nodeIndex = point === "left" && nodes.length === 3 ? 1 : j % nodes.length;
       nodes[nodeIndex].classList.add(point);
     }
 
@@ -1401,7 +1283,7 @@ OutputParser.prototype = {
    *        Options object. For valid options and default values see
    *        _mergeOptions()
    */
-  _appendAngle: function(angle, options) {
+  _appendAngle: function (angle, options) {
     const angleObj = new angleUtils.CssAngle(angle);
     const container = this._createNode("span", {
       "data-angle": angle,
@@ -1420,7 +1302,7 @@ OutputParser.prototype = {
       // in order to prevent the value input to be focused.
       // Bug 711942 will add a tooltip to edit angle values and we should
       // be able to move this listener to Tooltip.js when it'll be implemented.
-      swatch.addEventListener("click", function(event) {
+      swatch.addEventListener("click", function (event) {
         if (event.shiftKey) {
           event.stopPropagation();
         }
@@ -1449,7 +1331,7 @@ OutputParser.prototype = {
    * @param  {String} value
    *         CSS Property value to check
    */
-  _cssPropertySupportsValue: function(name, value) {
+  _cssPropertySupportsValue: function (name, value) {
     // Checking pair as a CSS declaration string to account for "!important" in value.
     const declaration = `${name}:${value}`;
     return this.doc.defaultView.CSS.supports(declaration);
@@ -1460,11 +1342,8 @@ OutputParser.prototype = {
    * Valid means it's really a color, not any of the CssColor SPECIAL_VALUES
    * except transparent
    */
-  _isValidColor: function(colorObj) {
-    return (
-      colorObj.valid &&
-      (!colorObj.specialValue || colorObj.specialValue === "transparent")
-    );
+  _isValidColor: function (colorObj) {
+    return colorObj.valid && (!colorObj.specialValue || colorObj.specialValue === "transparent");
   },
 
   /**
@@ -1476,7 +1355,7 @@ OutputParser.prototype = {
    *         Options object. For valid options and default values see
    *         _mergeOptions().
    */
-  _appendColor: function(color, options = {}) {
+  _appendColor: function (color, options = {}) {
     const colorObj = new colorUtils.CssColor(color, this.cssColor4);
 
     if (this._isValidColor(colorObj)) {
@@ -1544,7 +1423,7 @@ OutputParser.prototype = {
    * @returns {object}
    *        A new node that supplies a filter swatch and that wraps |nodes|.
    */
-  _wrapFilter: function(filters, options, nodes) {
+  _wrapFilter: function (filters, options, nodes) {
     const container = this._createNode("span", {
       "data-filters": filters,
     });
@@ -1567,7 +1446,7 @@ OutputParser.prototype = {
     return container;
   },
 
-  _onColorSwatchMouseDown: function(event) {
+  _onColorSwatchMouseDown: function (event) {
     if (!event.shiftKey) {
       return;
     }
@@ -1583,7 +1462,7 @@ OutputParser.prototype = {
     swatch.emit("unit-change", val);
   },
 
-  _onAngleSwatchMouseDown: function(event) {
+  _onAngleSwatchMouseDown: function (event) {
     if (!event.shiftKey) {
       return;
     }
@@ -1601,7 +1480,7 @@ OutputParser.prototype = {
   /**
    * A helper function that sanitizes a possibly-unterminated URL.
    */
-  _sanitizeURL: function(url) {
+  _sanitizeURL: function (url) {
     // Re-lex the URL and add any needed termination characters.
     const urlTokenizer = getCSSLexer(url);
     // Just read until EOF; there will only be a single token.
@@ -1623,7 +1502,7 @@ OutputParser.prototype = {
    *         Options object. For valid options and default values see
    *         _mergeOptions().
    */
-  _appendURL: function(match, url, options) {
+  _appendURL: function (match, url, options) {
     if (options.urlClass) {
       // Sanitize the URL.  Note that if we modify the URL, we just
       // leave the termination characters.  This isn't strictly
@@ -1635,9 +1514,7 @@ OutputParser.prototype = {
       // whitespace, and the ")" into |trailer|.  We considered adding
       // functionality for this to CSSLexer, in some way, but this
       // seemed simpler on the whole.
-      const urlParts = /^(url\([ \t\r\n\f]*(["']?))(.*?)(\2[ \t\r\n\f]*\))$/i.exec(
-        match
-      );
+      const urlParts = /^(url\([ \t\r\n\f]*(["']?))(.*?)(\2[ \t\r\n\f]*\))$/i.exec(match);
 
       // Bail out if that didn't match anything.
       if (!urlParts) {
@@ -1683,7 +1560,7 @@ OutputParser.prototype = {
    *         Options object. For valid options and default values see
    *         _mergeOptions().
    */
-  _appendFontFamily: function(fontFamily, options) {
+  _appendFontFamily: function (fontFamily, options) {
     let spanContents = fontFamily;
     let quoteChar = null;
     let trailingWhitespace = false;
@@ -1742,7 +1619,7 @@ OutputParser.prototype = {
    *         the tag. This is useful e.g. for span tags.
    * @return {Node} Newly created Node.
    */
-  _createNode: function(tagName, attributes, value = "") {
+  _createNode: function (tagName, attributes, value = "") {
     const node = this.doc.createElementNS(HTML_NS, tagName);
     const attrs = Object.getOwnPropertyNames(attributes);
 
@@ -1771,7 +1648,7 @@ OutputParser.prototype = {
    *         If a value is included it will be appended as a text node inside
    *         the tag. This is useful e.g. for span tags.
    */
-  _appendNode: function(tagName, attributes, value = "") {
+  _appendNode: function (tagName, attributes, value = "") {
     const node = this._createNode(tagName, attributes, value);
     this.parsed.push(node);
   },
@@ -1783,7 +1660,7 @@ OutputParser.prototype = {
    * @param  {String} text
    *         Text to append
    */
-  _appendTextNode: function(text) {
+  _appendTextNode: function (text) {
     const lastItem = this.parsed[this.parsed.length - 1];
     if (typeof lastItem === "string") {
       this.parsed[this.parsed.length - 1] = lastItem + text;
@@ -1798,7 +1675,7 @@ OutputParser.prototype = {
    * @return {DocumentFragment}
    *         Document Fragment
    */
-  _toDOM: function() {
+  _toDOM: function () {
     const frag = this.doc.createDocumentFragment();
 
     for (const item of this.parsed) {
@@ -1857,7 +1734,7 @@ OutputParser.prototype = {
    * @return {Object}
    *         Overridden options object
    */
-  _mergeOptions: function(overrides) {
+  _mergeOptions: function (overrides) {
     const defaults = {
       defaultColorType: true,
       angleClass: "",

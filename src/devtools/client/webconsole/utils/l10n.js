@@ -5,9 +5,7 @@
 "use strict";
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const helper = new LocalizationHelper(
-  "devtools/client/locales/webconsole.properties"
-);
+const helper = new LocalizationHelper("devtools/client/locales/webconsole.properties");
 
 const l10n = {
   /**

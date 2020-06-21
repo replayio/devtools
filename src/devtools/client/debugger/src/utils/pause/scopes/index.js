@@ -36,17 +36,10 @@ export function getScopes(
     prevItem = null;
 
   while (scope) {
-    let scopeItem = getScope(
-      scope,
-      selectedFrame,
-      frameScopes,
-      why,
-      scopeIndex
-    );
+    let scopeItem = getScope(scope, selectedFrame, frameScopes, why, scopeIndex);
 
     if (scopeItem) {
-      const mergedItem =
-        prev && prevItem ? mergeScopes(prev, scope, prevItem, scopeItem) : null;
+      const mergedItem = prev && prevItem ? mergeScopes(prev, scope, prevItem, scopeItem) : null;
       if (mergedItem) {
         scopeItem = mergedItem;
         scopes.pop();

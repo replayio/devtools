@@ -5,20 +5,11 @@
 // @flow
 
 import typeof SourceMaps from "devtools-source-map";
-import type {
-  ThreadList,
-  Thread,
-  Context,
-  ThreadId,
-  SourceLocation,
-} from "../../types";
+import type { ThreadList, Thread, Context, ThreadId, SourceLocation } from "../../types";
 import type { State } from "../../reducers/types";
 import type { MatchedLocations } from "../../reducers/file-search";
 import type { TreeNode } from "../../utils/sources-tree/types";
-import type {
-  SearchOperation,
-  StatusType,
-} from "../../reducers/project-text-search";
+import type { SearchOperation, StatusType } from "../../reducers/project-text-search";
 
 import type { BreakpointAction } from "./BreakpointAction";
 import type { SourceAction } from "./SourceAction";
@@ -111,10 +102,7 @@ export type ProjectTextSearchAction =
     |}
   | {| +type: "CLEAR_SEARCH", +cx: Context |};
 
-export type FileTextSearchModifier =
-  | "caseSensitive"
-  | "wholeWord"
-  | "regexMatch";
+export type FileTextSearchModifier = "caseSensitive" | "wholeWord" | "regexMatch";
 
 export type FileTextSearchAction =
   | {|

@@ -53,10 +53,7 @@ class ArrowExpander extends Component {
 }
 
 const treeIndent = dom.span({ className: "tree-indent" }, "\u200B");
-const treeLastIndent = dom.span(
-  { className: "tree-indent tree-last-indent" },
-  "\u200B"
-);
+const treeLastIndent = dom.span({ className: "tree-indent tree-last-indent" }, "\u200B");
 
 class TreeNode extends Component {
   static get propTypes() {
@@ -115,9 +112,7 @@ class TreeNode extends Component {
    */
   getFocusableElements() {
     return this.treeNodeRef.current
-      ? Array.from(
-          this.treeNodeRef.current.querySelectorAll(FOCUSABLE_SELECTOR)
-        )
+      ? Array.from(this.treeNodeRef.current.querySelectorAll(FOCUSABLE_SELECTOR))
       : [];
   }
 
@@ -169,16 +164,7 @@ class TreeNode extends Component {
   }
 
   render() {
-    const {
-      depth,
-      id,
-      item,
-      focused,
-      active,
-      expanded,
-      renderItem,
-      isExpandable,
-    } = this.props;
+    const { depth, id, item, focused, active, expanded, renderItem, isExpandable } = this.props;
 
     const arrow = isExpandable
       ? ArrowExpanderFactory({
@@ -202,16 +188,12 @@ class TreeNode extends Component {
       return treeIndent;
     });
 
-    const items = indents.concat(
-      renderItem(item, depth, focused, arrow, expanded)
-    );
+    const items = indents.concat(renderItem(item, depth, focused, arrow, expanded));
 
     return dom.div(
       {
         id,
-        className: `tree-node${focused ? " focused" : ""}${
-          active ? " active" : ""
-        }`,
+        className: `tree-node${focused ? " focused" : ""}${active ? " active" : ""}`,
         onClick: this.props.onClick,
         onKeyDownCapture: active ? this._onKeyDown : null,
         role: "treeitem",
@@ -241,7 +223,7 @@ const TreeNodeFactory = createFactory(TreeNode);
 function oncePerAnimationFrame(fn, { getDocument }) {
   let animationId = null;
   let argsToPass = null;
-  return function(...args) {
+  return function (...args) {
     argsToPass = args;
     if (animationId !== null) {
       return;
@@ -504,8 +486,7 @@ class Tree extends Component {
 
     const opaf = fn =>
       oncePerAnimationFrame(fn, {
-        getDocument: () =>
-          this.treeRef.current && this.treeRef.current.ownerDocument,
+        getDocument: () => this.treeRef.current && this.treeRef.current.ownerDocument,
       });
 
     this._onExpand = opaf(this._onExpand).bind(this);
@@ -547,11 +528,7 @@ class Tree extends Component {
   }
 
   _autoExpand() {
-    const {
-      autoExpandDepth,
-      autoExpandNodeChildrenLimit,
-      initiallyExpanded,
-    } = this.props;
+    const { autoExpandDepth, autoExpandNodeChildrenLimit, initiallyExpanded } = this.props;
 
     if (!autoExpandDepth && !initiallyExpanded) {
       return;
@@ -776,13 +753,9 @@ class Tree extends Component {
           return closestScrolledParent(node.parentNode);
         };
         const scrolledParent = closestScrolledParent(treeElement);
-        const scrolledParentRect = scrolledParent
-          ? scrolledParent.getBoundingClientRect()
-          : null;
+        const scrolledParentRect = scrolledParent ? scrolledParent.getBoundingClientRect() : null;
         const isVisible =
-          !scrolledParent ||
-          (top >= scrolledParentRect.top &&
-            bottom <= scrolledParentRect.bottom);
+          !scrolledParent || (top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom);
 
         if (!isVisible) {
           const { alignTo } = options;

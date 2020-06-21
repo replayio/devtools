@@ -72,9 +72,7 @@ class ClassList {
     if (!CLASSES.has(this.currentNode)) {
       // Use the proxy node to get a clean list of classes.
       this.classListProxyNode.className = this.currentNode.className;
-      const nodeClasses = [
-        ...new Set([...this.classListProxyNode.classList]),
-      ].map(name => {
+      const nodeClasses = [...new Set([...this.classListProxyNode.classList])].map(name => {
         return { name, isApplied: true };
       });
 

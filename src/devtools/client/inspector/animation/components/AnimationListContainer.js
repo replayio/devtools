@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const { connect } = require("react-redux");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
@@ -23,9 +20,7 @@ const ProgressInspectionPanel = createFactory(
   require("devtools/client/inspector/animation/components/ProgressInspectionPanel")
 );
 
-const {
-  findOptimalTimeInterval,
-} = require("devtools/client/inspector/animation/utils/utils");
+const { findOptimalTimeInterval } = require("devtools/client/inspector/animation/utils/utils");
 const { getStr } = require("devtools/client/inspector/animation/utils/l10n");
 
 // The minimum spacing between 2 time graduation headers in the timeline (px).
@@ -83,16 +78,14 @@ class AnimationListContainer extends PureComponent {
     const tickLinesEl = ReactDOM.findDOMNode(this).querySelector(".tick-lines");
     const width = tickLinesEl.offsetWidth;
     const animationDuration = timeScale.getDuration();
-    const minTimeInterval =
-      (TIME_GRADUATION_MIN_SPACING * animationDuration) / width;
+    const minTimeInterval = (TIME_GRADUATION_MIN_SPACING * animationDuration) / width;
     const intervalLength = findOptimalTimeInterval(minTimeInterval);
     const intervalWidth = (intervalLength * width) / animationDuration;
     const tickCount = parseInt(width / intervalWidth, 10);
     const isAllDurationInfinity = animations.every(
       animation => animation.state.duration === Infinity
     );
-    const zeroBasePosition =
-      width * (timeScale.zeroPositionTime / animationDuration);
+    const zeroBasePosition = width * (timeScale.zeroPositionTime / animationDuration);
     const shiftWidth = zeroBasePosition % intervalWidth;
     const needToShift = zeroBasePosition !== 0 && shiftWidth !== 0;
 
@@ -169,9 +162,7 @@ class AnimationListContainer extends PureComponent {
 
 const mapStateToProps = state => {
   return {
-    sidebarWidth: state.animations.sidebarSize
-      ? state.animations.sidebarSize.width
-      : 0,
+    sidebarWidth: state.animations.sidebarSize ? state.animations.sidebarSize.width : 0,
   };
 };
 

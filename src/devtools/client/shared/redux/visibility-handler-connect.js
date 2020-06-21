@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  createElement,
-} = require("react");
+const { createFactory, createElement } = require("react");
 const VisibilityHandler = createFactory(
   require("devtools/client/shared/components/VisibilityHandler")
 );

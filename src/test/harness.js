@@ -17,7 +17,7 @@ for (const [name, method] of Object.entries(dbg.selectors)) {
 }
 
 function waitForTime(ms) {
-  return new Promise((r) => setTimeout(r, ms));
+  return new Promise(r => setTimeout(r, ms));
 }
 
 function waitForElapsedTime(time, ms) {
@@ -74,7 +74,7 @@ function findSource(url) {
   }
 
   const sources = dbgSelectors.getSourceList();
-  return sources.find((s) => (s.url || "").includes(url));
+  return sources.find(s => (s.url || "").includes(url));
 }
 
 function waitForSource(url) {
@@ -83,11 +83,7 @@ function waitForSource(url) {
 
 async function selectSource(url) {
   const source = await waitForSource(url);
-  await dbg.actions.selectLocation(
-    getContext(),
-    { sourceId: source.id },
-    { keepContext: false }
-  );
+  await dbg.actions.selectLocation(getContext(), { sourceId: source.id }, { keepContext: false });
   return waitForSelectedSource(url);
 }
 
@@ -95,11 +91,7 @@ async function addBreakpoint(url, line, column, options) {
   const source = await waitForSource(url);
   const sourceId = source.id;
   const bpCount = dbgSelectors.getBreakpointCount();
-  await dbg.actions.addBreakpoint(
-    getContext(),
-    { sourceId, line, column },
-    options
-  );
+  await dbg.actions.addBreakpoint(getContext(), { sourceId, line, column }, options);
   await waitUntil(() => {
     return dbgSelectors.getBreakpointCount() == bpCount + 1;
   });
@@ -109,11 +101,7 @@ async function setBreakpointOptions(url, line, column, options) {
   const source = await waitForSource(url);
   const sourceId = source.id;
   column = column || getFirstBreakpointColumn(line, sourceId);
-  await dbg.actions.addBreakpoint(
-    getContext(),
-    { sourceId, line, column },
-    options
-  );
+  await dbg.actions.addBreakpoint(getContext(), { sourceId, line, column }, options);
 }
 
 async function disableBreakpoint(url, line, column) {
@@ -151,11 +139,7 @@ async function waitForInlinePreviews() {
 }
 
 function waitForSelectedSource(url) {
-  const {
-    getSelectedSourceWithContent,
-    hasSymbols,
-    getBreakableLines,
-  } = dbgSelectors;
+  const { getSelectedSourceWithContent, hasSymbols, getBreakableLines } = dbgSelectors;
 
   return waitUntil(() => {
     const source = getSelectedSourceWithContent() || {};
@@ -177,11 +161,7 @@ function waitForSelectedSource(url) {
 }
 
 async function waitForPaused(url) {
-  const {
-    getSelectedScope,
-    getCurrentThread,
-    getCurrentThreadFrames,
-  } = dbgSelectors;
+  const { getSelectedScope, getCurrentThread, getCurrentThreadFrames } = dbgSelectors;
 
   await waitUntil(() => {
     return isPaused() && !!getSelectedScope(getCurrentThread());
@@ -267,7 +247,7 @@ async function checkEvaluateInTopFrame(text, expected) {
 async function waitForScopeValue(name, value) {
   return waitUntil(() => {
     const nodes = document.querySelectorAll(".scopes-pane .object-node");
-    return [...nodes].some((node) => node.innerText == `${name}\n: \n${value}`);
+    return [...nodes].some(node => node.innerText == `${name}\n: \n${value}`);
   });
 }
 
@@ -279,10 +259,8 @@ async function toggleBlackboxSelectedSource() {
 }
 
 function findMessages(text, extraSelector = "") {
-  const messages = document.querySelectorAll(
-    `.webconsole-output .message${extraSelector}`
-  );
-  return [...messages].filter((msg) => msg.innerText.includes(text));
+  const messages = document.querySelectorAll(`.webconsole-output .message${extraSelector}`);
+  return [...messages].filter(msg => msg.innerText.includes(text));
 }
 
 function waitForMessage(text, extraSelector) {
@@ -315,9 +293,7 @@ async function checkMessageStack(text, expectedFrameLines, expand) {
   assert(!msgNode.classList.contains("open"));
 
   if (expand) {
-    const button = await waitUntil(() =>
-      msgNode.querySelector(".collapse-button")
-    );
+    const button = await waitUntil(() => msgNode.querySelector(".collapse-button"));
     button.click();
   }
 
@@ -338,7 +314,7 @@ function checkJumpIcon(msg) {
 }
 
 function findObjectInspectorNode(oi, nodeLabel) {
-  return [...oi.querySelectorAll(".tree-node")].find((node) => {
+  return [...oi.querySelectorAll(".tree-node")].find(node => {
     return node.innerText.includes(nodeLabel);
   });
 }
@@ -346,7 +322,7 @@ function findObjectInspectorNode(oi, nodeLabel) {
 async function findMessageExpandableObjectInspector(msg) {
   return waitUntil(() => {
     const inspectors = msg.querySelectorAll(".object-inspector");
-    return [...inspectors].find((oi) => oi.querySelector(".arrow"));
+    return [...inspectors].find(oi => oi.querySelector(".arrow"));
   });
 }
 
@@ -367,8 +343,8 @@ async function checkMessageObjectContents(msg, expected, expandList = []) {
   await waitUntil(() => {
     const nodes = oi.querySelectorAll(".tree-node");
     if (nodes && nodes.length > 1) {
-      const properties = [...nodes].map((n) => n.textContent);
-      return expected.every((s) => properties.find((v) => v.includes(s)));
+      const properties = [...nodes].map(n => n.textContent);
+      return expected.every(s => properties.find(v => v.includes(s)));
     }
     return null;
   });
@@ -377,7 +353,7 @@ async function checkMessageObjectContents(msg, expected, expandList = []) {
 function findScopeNode(text) {
   return waitUntil(() => {
     const nodes = document.querySelectorAll(".scopes-list .node");
-    return [...nodes].find((node) => node.innerText.includes(text));
+    return [...nodes].find(node => node.innerText.includes(text));
   });
 }
 
@@ -393,7 +369,7 @@ async function executeInConsole(text) {
 async function checkInlinePreview(name, text) {
   await waitUntil(() => {
     const previews = document.querySelectorAll(".inline-preview-outer");
-    return [...previews].some((p) => {
+    return [...previews].some(p => {
       const label = p.querySelector(".inline-preview-label");
       const value = p.querySelector(".inline-preview-value");
       return label.innerText.includes(name) && value.innerText.includes(text);

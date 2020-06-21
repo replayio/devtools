@@ -30,9 +30,7 @@ export function getBindingVariables(
     return [];
   }
 
-  const args: VarAndBindingsPairs = bindings.arguments.map(
-    arg => toPairs(arg)[0]
-  );
+  const args: VarAndBindingsPairs = bindings.arguments.map(arg => toPairs(arg)[0]);
 
   const variables: VarAndBindingsPairs = toPairs(bindings.variables);
 

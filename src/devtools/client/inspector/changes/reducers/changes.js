@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  RESET_CHANGES,
-  TRACK_CHANGE,
-} = require("devtools/client/inspector/changes/actions/index");
+const { RESET_CHANGES, TRACK_CHANGE } = require("devtools/client/inspector/changes/actions/index");
 
 /**
  * Return a deep clone of the given state object.
@@ -74,11 +71,7 @@ function createRule(ruleData, rules) {
         // Ensure each rule has a selector text.
         // For the purpose of displaying in the UI, we treat at-rules as selectors.
         if (!rule.selectors || !rule.selectors.length) {
-          rule.selectors = [
-            `${rule.typeName} ${rule.conditionText ||
-              rule.name ||
-              rule.keyText}`,
-          ];
+          rule.selectors = [`${rule.typeName} ${rule.conditionText || rule.name || rule.keyText}`];
         }
 
         return rule.id;
@@ -124,11 +117,9 @@ function removeRule(ruleId, rules) {
 
   // First, remove this rule's id from its parent's list of children
   if (rule.parent && rules[rule.parent]) {
-    rules[rule.parent].children = rules[rule.parent].children.filter(
-      childRuleId => {
-        return childRuleId !== ruleId;
-      }
-    );
+    rules[rule.parent].children = rules[rule.parent].children.filter(childRuleId => {
+      return childRuleId !== ruleId;
+    });
 
     // Remove the parent rule if it has no children left.
     if (!rules[rule.parent].children.length) {
@@ -225,10 +216,7 @@ const reducers = {
     // Reference or create object identifying the rule for this change.
     const rule = rules[ruleId]
       ? rules[ruleId]
-      : createRule(
-          { id: change.id, selectors: [selector], ancestors, ruleIndex },
-          rules
-        );
+      : createRule({ id: change.id, selectors: [selector], ancestors, ruleIndex }, rules);
 
     // Mark the rule if it was created at runtime as a result of an "Add Rule" action.
     if (change.type === "rule-add") {
@@ -322,9 +310,7 @@ const reducers = {
         // Find the position of any added declaration which matches the incoming
         // declaration to be added in case we need to replace it.
         const addIndex = rule.add.findIndex(addDecl => {
-          return (
-            addDecl.index === decl.index && addDecl.property === decl.property
-          );
+          return addDecl.index === decl.index && addDecl.property === decl.property;
         });
 
         if (rule.remove[removeIndex]) {
@@ -372,7 +358,7 @@ const reducers = {
   },
 };
 
-module.exports = function(state = INITIAL_STATE, action) {
+module.exports = function (state = INITIAL_STATE, action) {
   const reducer = reducers[action.type];
   if (!reducer) {
     return state;

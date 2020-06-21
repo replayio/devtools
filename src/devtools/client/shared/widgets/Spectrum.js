@@ -8,18 +8,8 @@ const EventEmitter = require("devtools/shared/event-emitter");
 const { MultiLocalizationHelper } = require("devtools/shared/l10n");
 
 loader.lazyRequireGetter(this, "colorUtils", "devtools/shared/css/color", true);
-loader.lazyRequireGetter(
-  this,
-  "labColors",
-  "devtools/shared/css/color-db",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "getTextProperties",
-  "devtools/shared/accessibility",
-  true
-);
+loader.lazyRequireGetter(this, "labColors", "devtools/shared/css/color-db", true);
+loader.lazyRequireGetter(this, "getTextProperties", "devtools/shared/accessibility", true);
 loader.lazyRequireGetter(
   this,
   "getContrastRatioAgainstBackground",
@@ -80,7 +70,7 @@ class Spectrum {
     this.parentEl = parentEl;
 
     this.element.className = "spectrum-container";
-    // eslint-disable-next-line no-unsanitized/property
+    // eslint-disable-next-line
     this.element.innerHTML = `
     <section class="spectrum-color-picker">
       <div class="spectrum-color spectrum-box"
@@ -140,24 +130,16 @@ class Spectrum {
     eyedropper.id = "eyedropper-button";
     eyedropper.className = "devtools-button";
     eyedropper.style.pointerEvents = "auto";
-    eyedropper.setAttribute(
-      "aria-label",
-      L10N.getStr("colorPickerTooltip.eyedropperTitle")
-    );
+    eyedropper.setAttribute("aria-label", L10N.getStr("colorPickerTooltip.eyedropperTitle"));
     this.controls.insertBefore(eyedropper, this.colorPreview);
 
     // Hue slider and alpha slider
     this.hueSlider = this.createSlider("hue", this.onHueSliderMove.bind(this));
     this.hueSlider.setAttribute("aria-describedby", this.dragHelper.id);
-    this.alphaSlider = this.createSlider(
-      "alpha",
-      this.onAlphaSliderMove.bind(this)
-    );
+    this.alphaSlider = this.createSlider("alpha", this.onAlphaSliderMove.bind(this));
 
     // Color contrast
-    this.spectrumContrast = this.element.querySelector(
-      ".spectrum-color-contrast"
-    );
+    this.spectrumContrast = this.element.querySelector(".spectrum-color-contrast");
     this.contrastLabel = this.element.querySelector(".contrast-ratio-label");
     [
       this.contrastValue,
@@ -170,9 +152,7 @@ class Spectrum {
     learnMore.id = "learn-more-button";
     learnMore.className = "learn-more";
     learnMore.title = L10N.getStr("accessibility.learnMore");
-    this.element
-      .querySelector(".contrast-ratio-header-and-single-ratio")
-      .appendChild(learnMore);
+    this.element.querySelector(".contrast-ratio-header-and-single-ratio").appendChild(learnMore);
 
     if (rgb) {
       this.rgb = rgb;
@@ -245,9 +225,7 @@ class Spectrum {
 
   get rgbCssString() {
     const rgb = this.rgb;
-    return (
-      "rgba(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ", " + rgb[3] + ")"
-    );
+    return "rgba(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ", " + rgb[3] + ")";
   }
 
   show() {
@@ -321,9 +299,7 @@ class Spectrum {
    */
   updateContrastLabel(isLargeText) {
     if (!isLargeText) {
-      this.contrastLabel.textContent = L10N.getStr(
-        "accessibility.contrast.ratio.label"
-      );
+      this.contrastLabel.textContent = L10N.getStr("accessibility.contrast.ratio.label");
       return;
     }
 
@@ -345,9 +321,7 @@ class Spectrum {
     const largeTextIndicator = this.document.createElementNS(XHTML_NS, "span");
     largeTextIndicator.className = "accessibility-color-contrast-large-text";
     largeTextIndicator.textContent = largeTextStr;
-    largeTextIndicator.title = L10N.getStr(
-      "accessibility.contrast.large.title"
-    );
+    largeTextIndicator.title = L10N.getStr("accessibility.contrast.large.title");
     contents.splice(1, 0, largeTextIndicator);
 
     // Append children to contrast label
@@ -373,19 +347,10 @@ class Spectrum {
     el.textContent = value.toFixed(2);
     el.title = L10N.getFormatStr(
       `accessibility.contrast.annotation.${score}`,
-      L10N.getFormatStr(
-        "colorPickerTooltip.contrastAgainstBgTitle",
-        `rgba(${backgroundColor})`
-      )
+      L10N.getFormatStr("colorPickerTooltip.contrastAgainstBgTitle", `rgba(${backgroundColor})`)
     );
-    el.parentElement.style.setProperty(
-      "--accessibility-contrast-color",
-      this.rgbCssString
-    );
-    el.parentElement.style.setProperty(
-      "--accessibility-contrast-bg",
-      `rgba(${backgroundColor})`
-    );
+    el.parentElement.style.setProperty("--accessibility-contrast-color", this.rgbCssString);
+    el.parentElement.style.setProperty("--accessibility-contrast-bg", `rgba(${backgroundColor})`);
   }
 
   updateAlphaSlider() {
@@ -394,8 +359,7 @@ class Spectrum {
 
     const rgbNoAlpha = "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")";
     const rgbAlpha0 = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ", 0)";
-    const alphaGradient =
-      "linear-gradient(to right, " + rgbAlpha0 + ", " + rgbNoAlpha + ")";
+    const alphaGradient = "linear-gradient(to right, " + rgbAlpha0 + ", " + rgbNoAlpha + ")";
     this.alphaSlider.style.background = alphaGradient;
   }
 
@@ -416,13 +380,7 @@ class Spectrum {
   updateDragger() {
     // Set dragger background color
     const flatColor =
-      "rgb(" +
-      this.rgbNoSatVal[0] +
-      ", " +
-      this.rgbNoSatVal[1] +
-      ", " +
-      this.rgbNoSatVal[2] +
-      ")";
+      "rgb(" + this.rgbNoSatVal[0] + ", " + this.rgbNoSatVal[1] + ", " + this.rgbNoSatVal[2] + ")";
     this.dragger.style.backgroundColor = flatColor;
 
     // Set dragger aria attributes
@@ -444,14 +402,8 @@ class Spectrum {
     let dragY = this.dragHeight - v * this.dragHeight;
     const helperDim = this.dragHelperHeight / 2;
 
-    dragX = Math.max(
-      -helperDim,
-      Math.min(this.dragWidth - helperDim, dragX - helperDim)
-    );
-    dragY = Math.max(
-      -helperDim,
-      Math.min(this.dragHeight - helperDim, dragY - helperDim)
-    );
+    dragX = Math.max(-helperDim, Math.min(this.dragWidth - helperDim, dragX - helperDim));
+    dragY = Math.max(-helperDim, Math.min(this.dragHeight - helperDim, dragY - helperDim));
 
     this.dragHelper.style.top = dragY + "px";
     this.dragHelper.style.left = dragX + "px";
@@ -519,41 +471,22 @@ class Spectrum {
 
       // If current background color is a range, show the error text in the contrast range
       // span. Otherwise, show it in the single contrast span.
-      const contrastValEl = isRange
-        ? this.contrastValueMin
-        : this.contrastValue;
+      const contrastValEl = isRange ? this.contrastValueMin : this.contrastValue;
       contrastValEl.textContent = L10N.getStr("accessibility.contrast.error");
-      contrastValEl.title = L10N.getStr(
-        "accessibility.contrast.annotation.transparent.error"
-      );
+      contrastValEl.title = L10N.getStr("accessibility.contrast.annotation.transparent.error");
 
       return;
     }
 
     this.updateContrastLabel(isLargeText);
     if (!isRange) {
-      this.updateContrastValueEl(
-        this.contrastValue,
-        score,
-        value,
-        backgroundColor
-      );
+      this.updateContrastValueEl(this.contrastValue, score, value, backgroundColor);
 
       return;
     }
 
-    this.updateContrastValueEl(
-      this.contrastValueMin,
-      scoreMin,
-      min,
-      backgroundColorMin
-    );
-    this.updateContrastValueEl(
-      this.contrastValueMax,
-      scoreMax,
-      max,
-      backgroundColorMax
-    );
+    this.updateContrastValueEl(this.contrastValueMin, scoreMin, min, backgroundColorMin);
+    this.updateContrastValueEl(this.contrastValueMax, scoreMax, max, backgroundColorMax);
   }
 
   updateUI() {
@@ -664,7 +597,7 @@ function rgbToHsv(r, g, b, a) {
 }
 
 function draggable(element, dragHelper, onmove) {
-  onmove = onmove || function() {};
+  onmove = onmove || function () {};
 
   const doc = element.ownerDocument;
   let dragging = false;

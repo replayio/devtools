@@ -47,9 +47,7 @@ describe("sources tree", () => {
       ];
 
       const tree = createDirectoryNode("root", "", []);
-      sources.forEach(source =>
-        addToTree(tree, source, "http://example.com/", "Main Thread")
-      );
+      sources.forEach(source => addToTree(tree, source, "http://example.com/", "Main Thread"));
       const [bFolderNode, aFileNode] = tree.contents[0].contents[0].contents;
       const [cFolderNode] = bFolderNode.contents;
       const [dFileNode] = cFolderNode.contents;
@@ -64,15 +62,9 @@ describe("sources tree", () => {
   describe("getRelativePath", () => {
     it("gets the relative path of the file", () => {
       const relPath = "path/to/file.html";
-      expect(getRelativePath("http://example.com/path/to/file.html")).toBe(
-        relPath
-      );
-      expect(getRelativePath("http://www.example.com/path/to/file.html")).toBe(
-        relPath
-      );
-      expect(getRelativePath("https://www.example.com/path/to/file.js")).toBe(
-        "path/to/file.js"
-      );
+      expect(getRelativePath("http://example.com/path/to/file.html")).toBe(relPath);
+      expect(getRelativePath("http://www.example.com/path/to/file.html")).toBe(relPath);
+      expect(getRelativePath("https://www.example.com/path/to/file.js")).toBe("path/to/file.js");
       expect(getRelativePath("webpack:///path/to/file.html")).toBe(relPath);
       expect(getRelativePath("file:///path/to/file.html")).toBe(relPath);
       expect(getRelativePath("file:///path/to/file.html?bla")).toBe(relPath);
@@ -110,9 +102,7 @@ describe("sources tree", () => {
     });
 
     it("main thread host", () => {
-      const path = getPathWithoutThread(
-        "server1.conn0.child1/context18/dbg-workers.glitch.me"
-      );
+      const path = getPathWithoutThread("server1.conn0.child1/context18/dbg-workers.glitch.me");
       expect(path).toBe("dbg-workers.glitch.me");
     });
 
@@ -124,9 +114,7 @@ describe("sources tree", () => {
     });
 
     it("worker thread", () => {
-      const path = getPathWithoutThread(
-        "server1.conn0.child1/workerTarget25/context1"
-      );
+      const path = getPathWithoutThread("server1.conn0.child1/workerTarget25/context1");
       expect(path).toBe("");
     });
 

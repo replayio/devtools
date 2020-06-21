@@ -37,9 +37,7 @@ type Props = {
 class SourceIcon extends PureComponent<Props> {
   render() {
     const { shouldHide, source, symbols, framework } = this.props;
-    const iconClass = framework
-      ? framework.toLowerCase()
-      : getSourceClassnames(source, symbols);
+    const iconClass = framework ? framework.toLowerCase() : getSourceClassnames(source, symbols);
 
     if (shouldHide && shouldHide(iconClass)) {
       return null;

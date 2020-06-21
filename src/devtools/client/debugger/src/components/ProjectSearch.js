@@ -35,7 +35,6 @@ import { PluralForm } from "devtools-modules";
 
 import "./ProjectSearch.css";
 
-
 export type Match = {
   type: "MATCH",
   sourceId: string,
@@ -101,19 +100,13 @@ export class ProjectSearch extends Component<Props, State> {
   componentDidMount() {
     const { shortcuts } = this.context;
 
-    shortcuts.on(
-      L10N.getStr("projectTextSearch.key"),
-      this.toggleProjectTextSearch
-    );
+    shortcuts.on(L10N.getStr("projectTextSearch.key"), this.toggleProjectTextSearch);
     shortcuts.on("Enter", this.onEnterPress);
   }
 
   componentWillUnmount() {
     const { shortcuts } = this.context;
-    shortcuts.off(
-      L10N.getStr("projectTextSearch.key"),
-      this.toggleProjectTextSearch
-    );
+    shortcuts.off(L10N.getStr("projectTextSearch.key"), this.toggleProjectTextSearch);
     shortcuts.off("Enter", this.onEnterPress);
   }
 
@@ -157,8 +150,7 @@ export class ProjectSearch extends Component<Props, State> {
     );
   };
 
-  getResultCount = () =>
-    this.props.results.reduce((count, file) => count + file.matches.length, 0);
+  getResultCount = () => this.props.results.reduce((count, file) => count + file.matches.length, 0);
 
   onKeyDown = (e: SyntheticKeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
@@ -182,11 +174,7 @@ export class ProjectSearch extends Component<Props, State> {
   };
 
   onEnterPress = () => {
-    if (
-      !this.isProjectSearchEnabled() ||
-      !this.state.focusedItem ||
-      this.state.inputFocused
-    ) {
+    if (!this.isProjectSearchEnabled() || !this.state.focusedItem || this.state.inputFocused) {
       return;
     }
     if (this.state.focusedItem.type === "MATCH") {
@@ -214,10 +202,7 @@ export class ProjectSearch extends Component<Props, State> {
     const matches = ` (${matchesLength} match${matchesLength > 1 ? "es" : ""})`;
 
     return (
-      <div
-        className={classnames("file-result", { focused })}
-        key={file.sourceId}
-      >
+      <div className={classnames("file-result", { focused })} key={file.sourceId}>
         <AccessibleImage className={classnames("arrow", { expanded })} />
         <AccessibleImage className="file" />
         <span className="file-path">{getRelativePath(file.filepath)}</span>
@@ -240,13 +225,7 @@ export class ProjectSearch extends Component<Props, State> {
     );
   };
 
-  renderItem = (
-    item: Item,
-    depth: number,
-    focused: boolean,
-    _: any,
-    expanded: boolean
-  ) => {
+  renderItem = (item: Item, depth: number, focused: boolean, _: any, expanded: boolean) => {
     if (item.type === "RESULT") {
       return this.renderFile(item, focused, expanded);
     }
@@ -344,14 +323,11 @@ const mapStateToProps = state => ({
   status: getTextSearchStatus(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    closeProjectSearch: actions.closeProjectSearch,
-    searchSources: actions.searchSources,
-    clearSearch: actions.clearSearch,
-    selectSpecificLocation: actions.selectSpecificLocation,
-    setActiveSearch: actions.setActiveSearch,
-    doSearchForHighlight: actions.doSearchForHighlight,
-  }
-)(ProjectSearch);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  closeProjectSearch: actions.closeProjectSearch,
+  searchSources: actions.searchSources,
+  clearSearch: actions.clearSearch,
+  selectSpecificLocation: actions.selectSpecificLocation,
+  setActiveSearch: actions.setActiveSearch,
+  doSearchForHighlight: actions.doSearchForHighlight,
+})(ProjectSearch);

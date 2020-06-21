@@ -26,20 +26,14 @@ export const getVisibleBreakpoints: Selector<?(Breakpoint[])> = createSelector(
       return null;
     }
 
-    return breakpoints.filter(
-      bp =>
-        selectedSource &&
-        bp.location.sourceId === selectedSource.id
-    );
+    return breakpoints.filter(bp => selectedSource && bp.location.sourceId === selectedSource.id);
   }
 );
 
 /*
  * Finds the first breakpoint per line, which appear in the selected source.
  */
-export const getFirstVisibleBreakpoints: Selector<
-  Breakpoint[]
-> = createSelector(
+export const getFirstVisibleBreakpoints: Selector<Breakpoint[]> = createSelector(
   getVisibleBreakpoints,
   getSelectedSource,
   (breakpoints, selectedSource) => {

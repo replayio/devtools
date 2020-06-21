@@ -9,9 +9,7 @@ const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
-const l10n = new LocalizationHelper(
-  "devtools/client/locales/components.properties"
-);
+const l10n = new LocalizationHelper("devtools/client/locales/components.properties");
 const { div, span, button } = dom;
 
 // Priority Levels
@@ -112,14 +110,7 @@ class NotificationBox extends Component {
    * already present with a higher priority, the new notification will be
    * added behind it. See `propTypes` for arguments description.
    */
-  appendNotification(
-    label,
-    value,
-    image,
-    priority,
-    buttons = [],
-    eventCallback
-  ) {
+  appendNotification(label, value, image, priority, buttons = [], eventCallback) {
     const newState = appendNotification(this.state, {
       label,
       value,
@@ -237,9 +228,7 @@ class NotificationBox extends Component {
           },
           notification.label
         ),
-        notification.buttons.map(props =>
-          this.renderButton(props, notification)
-        ),
+        notification.buttons.map(props => this.renderButton(props, notification)),
         div({
           className: "messageCloseButton",
           title: this.props.closeButtonTooltip,
@@ -353,10 +342,7 @@ function getHighestPriorityNotification(notifications) {
   let currentNotification = null;
   // High priorities must be on top.
   for (const [, notification] of notifications) {
-    if (
-      !currentNotification ||
-      notification.priority > currentNotification.priority
-    ) {
+    if (!currentNotification || notification.priority > currentNotification.priority) {
       currentNotification = notification;
     }
   }

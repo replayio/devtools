@@ -72,10 +72,7 @@ const {
   MESSAGE_TYPE,
   MESSAGE_LEVEL,
 } = require("devtools/client/webconsole/constants");
-const {
-  ConsoleMessage,
-  NetworkEventMessage,
-} = require("devtools/client/webconsole/types");
+const { ConsoleMessage, NetworkEventMessage } = require("devtools/client/webconsole/types");
 
 function prepareMessage(packet, idGenerator) {
   if (!packet.source) {
@@ -216,9 +213,7 @@ function transformPageErrorPacket(pageError) {
     : null;
 
   const matchesCSS = pageError.category == "CSS Parser";
-  const messageSource = matchesCSS
-    ? MESSAGE_SOURCE.CSS
-    : MESSAGE_SOURCE.JAVASCRIPT;
+  const messageSource = matchesCSS ? MESSAGE_SOURCE.CSS : MESSAGE_SOURCE.JAVASCRIPT;
   return new ConsoleMessage({
     innerWindowID: pageError.innerWindowID,
     source: messageSource,
@@ -279,8 +274,7 @@ function transformEvaluationResultPacket(packet) {
     notes,
   } = packet;
 
-  const parameter =
-    helperResult && helperResult.object ? helperResult.object : result;
+  const parameter = helperResult && helperResult.object ? helperResult.object : result;
 
   if (helperResult && helperResult.type === "error") {
     try {
@@ -379,10 +373,7 @@ function getLevelFromType(type) {
 }
 
 function isGroupType(type) {
-  return [
-    MESSAGE_TYPE.START_GROUP,
-    MESSAGE_TYPE.START_GROUP_COLLAPSED,
-  ].includes(type);
+  return [MESSAGE_TYPE.START_GROUP, MESSAGE_TYPE.START_GROUP_COLLAPSED].includes(type);
 }
 
 function getInitialMessageCountForViewport(win) {
@@ -425,10 +416,7 @@ function createWarningGroupMessage(id, type, firstMessage) {
  * @returns {String} The computed label
  */
 function getWarningGroupLabel(firstMessage) {
-  if (
-    isContentBlockingMessage(firstMessage) ||
-    isTrackingProtectionMessage(firstMessage)
-  ) {
+  if (isContentBlockingMessage(firstMessage) || isTrackingProtectionMessage(firstMessage)) {
     return replaceURL(firstMessage.messageText, "<URL>");
   }
 

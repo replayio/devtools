@@ -6,11 +6,7 @@
 import React, { Component } from "react";
 import InlinePreviewRow from "./InlinePreviewRow";
 import { connect } from "../../utils/connect";
-import {
-  getSelectedFrame,
-  getCurrentThread,
-  getInlinePreviews,
-} from "../../selectors";
+import { getSelectedFrame, getCurrentThread, getInlinePreviews } from "../../selectors";
 
 import type { Frame } from "../../types";
 
@@ -89,6 +85,4 @@ const mapStateToProps = (
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(
-  InlinePreviews
-);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(InlinePreviews);

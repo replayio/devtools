@@ -24,11 +24,7 @@ export function handleError(err: any) {
  * @memberof utils/utils
  * @static
  */
-export function promisify(
-  context: any,
-  method: any,
-  ...args: any
-): Promise<mixed> {
+export function promisify(context: any, method: any, ...args: any): Promise<mixed> {
   return new Promise((resolve, reject) => {
     args.push(response => {
       if (response.error) {

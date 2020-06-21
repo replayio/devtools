@@ -5,28 +5,13 @@
 "use strict";
 
 const DevToolsUtils = require("devtools/shared/DevToolsUtils");
-const {
-  getCurrentZoom,
-  getViewportDimensions,
-} = require("devtools/shared/layout/utils");
-const {
-  moveInfobar,
-  createNode,
-} = require("devtools/server/actors/highlighters/utils/markup");
+const { getCurrentZoom, getViewportDimensions } = require("devtools/shared/layout/utils");
+const { moveInfobar, createNode } = require("devtools/server/actors/highlighters/utils/markup");
 const { truncateString } = require("devtools/shared/inspector/utils");
 
 const STRINGS_URI = "devtools/shared/locales/accessibility.properties";
-loader.lazyRequireGetter(
-  this,
-  "LocalizationHelper",
-  "devtools/shared/l10n",
-  true
-);
-DevToolsUtils.defineLazyGetter(
-  this,
-  "L10N",
-  () => new LocalizationHelper(STRINGS_URI)
-);
+loader.lazyRequireGetter(this, "LocalizationHelper", "devtools/shared/l10n", true);
+DevToolsUtils.defineLazyGetter(this, "L10N", () => new LocalizationHelper(STRINGS_URI));
 
 const {
   accessibility: {
@@ -308,10 +293,7 @@ class XULWindowInfobar extends Infobar {
     container.style.left = `${boundsMidPoint}px`;
 
     const zoom = getCurrentZoom(this.win);
-    let {
-      width: viewportWidth,
-      height: viewportHeight,
-    } = getViewportDimensions(this.win);
+    let { width: viewportWidth, height: viewportHeight } = getViewportDimensions(this.win);
 
     const { width, height, left } = container.getBoundingClientRect();
 
@@ -340,9 +322,7 @@ class XULWindowInfobar extends Infobar {
       arrow.setAttribute("hidden", "true");
     } else if (isOffScreenOnRight) {
       const leftOffset = rightBoundary - boundsRight;
-      container.style.left = `${rightBoundary -
-        leftOffset -
-        containerHalfWidth}px`;
+      container.style.left = `${rightBoundary - leftOffset - containerHalfWidth}px`;
       arrow.setAttribute("hidden", "true");
     }
 
@@ -604,9 +584,7 @@ class ContrastRatio extends AuditReport {
     for (const key of ["label", "min", "max", "error", "separator"]) {
       const el = (els[key] = this.getElement(`contrast-ratio-${key}`));
       if (["min", "max"].includes(key)) {
-        Object.values(SCORES).forEach(className =>
-          el.classList.remove(className)
-        );
+        Object.values(SCORES).forEach(className => el.classList.remove(className));
         this.setTextContent(el, "");
       }
 
@@ -626,9 +604,7 @@ class ContrastRatio extends AuditReport {
     const { isLargeText, error } = contrastRatio;
     this.setTextContent(
       els.label,
-      L10N.getStr(
-        `accessibility.contrast.ratio.label${isLargeText ? ".large" : ""}`
-      )
+      L10N.getStr(`accessibility.contrast.ratio.label${isLargeText ? ".large" : ""}`)
     );
     els.label.removeAttribute("hidden");
     if (error) {
@@ -728,10 +704,7 @@ class Keyboard extends AuditReport {
     }
 
     const { issue, score } = keyboardAudit;
-    this.setTextContent(
-      el,
-      L10N.getStr(Keyboard.ISSUE_TO_INFOBAR_LABEL_MAP[issue])
-    );
+    this.setTextContent(el, L10N.getStr(Keyboard.ISSUE_TO_INFOBAR_LABEL_MAP[issue]));
     el.classList.add(score);
     el.removeAttribute("hidden");
 
@@ -755,12 +728,10 @@ class TextLabel extends AuditReport {
       [EMBED_NO_NAME]: "accessibility.text.label.issue.embed",
       [FIGURE_NO_NAME]: "accessibility.text.label.issue.figure",
       [FORM_FIELDSET_NO_NAME]: "accessibility.text.label.issue.fieldset",
-      [FORM_FIELDSET_NO_NAME_FROM_LEGEND]:
-        "accessibility.text.label.issue.fieldset.legend2",
+      [FORM_FIELDSET_NO_NAME_FROM_LEGEND]: "accessibility.text.label.issue.fieldset.legend2",
       [FORM_NO_NAME]: "accessibility.text.label.issue.form",
       [FORM_NO_VISIBLE_NAME]: "accessibility.text.label.issue.form.visible",
-      [FORM_OPTGROUP_NO_NAME_FROM_LABEL]:
-        "accessibility.text.label.issue.optgroup.label2",
+      [FORM_OPTGROUP_NO_NAME_FROM_LABEL]: "accessibility.text.label.issue.optgroup.label2",
       [FRAME_NO_NAME]: "accessibility.text.label.issue.frame",
       [HEADING_NO_CONTENT]: "accessibility.text.label.issue.heading.content",
       [HEADING_NO_NAME]: "accessibility.text.label.issue.heading",
@@ -807,10 +778,7 @@ class TextLabel extends AuditReport {
     }
 
     const { issue, score } = textLabelAudit;
-    this.setTextContent(
-      el,
-      L10N.getStr(TextLabel.ISSUE_TO_INFOBAR_LABEL_MAP[issue])
-    );
+    this.setTextContent(el, L10N.getStr(TextLabel.ISSUE_TO_INFOBAR_LABEL_MAP[issue]));
     el.classList.add(score);
     el.removeAttribute("hidden");
 

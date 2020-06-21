@@ -60,23 +60,14 @@ addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
   }
 
   if (LogpointHandlers.onResult) {
-    results.forEach(
-      async ({ key, value: { time, pauseId, location, values, datas } }) => {
-        const pause = new Pause(ThreadFront.sessionId);
-        pause.instantiate(pauseId);
-        datas.forEach(d => pause.addData(d));
-        const valueFronts = values.map(v => new ValueFront(pause, v));
-        const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
-        LogpointHandlers.onResult(
-          logGroupId,
-          key,
-          time,
-          mappedLocation,
-          pause,
-          valueFronts
-        );
-      }
-    );
+    results.forEach(async ({ key, value: { time, pauseId, location, values, datas } }) => {
+      const pause = new Pause(ThreadFront.sessionId);
+      pause.instantiate(pauseId);
+      datas.forEach(d => pause.addData(d));
+      const valueFronts = values.map(v => new ValueFront(pause, v));
+      const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
+      LogpointHandlers.onResult(logGroupId, key, time, mappedLocation, pause, valueFronts);
+    });
   }
 });
 
@@ -118,14 +109,7 @@ async function createLogpointAnalysis(logGroupId, mapper) {
   return analysisId;
 }
 
-async function setLogpoint(
-  logGroupId,
-  scriptId,
-  line,
-  column,
-  text,
-  condition
-) {
+async function setLogpoint(logGroupId, scriptId, line, column, text, condition) {
   let conditionSection = "";
   if (condition) {
     // When there is a condition, don't add a message if it returns undefined
@@ -202,14 +186,7 @@ async function setLogpoint(
   }
 }
 
-function setLogpointByURL(
-  logGroupId,
-  scriptUrl,
-  line,
-  column,
-  text,
-  condition
-) {
+function setLogpointByURL(logGroupId, scriptUrl, line, column, text, condition) {
   const scriptIds = ThreadFront.urlScripts.map.get(scriptUrl);
   (scriptIds || []).forEach(scriptId => {
     setLogpoint(logGroupId, scriptId, line, column, text, condition);

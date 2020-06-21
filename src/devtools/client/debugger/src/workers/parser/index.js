@@ -15,18 +15,12 @@ import type { SymbolDeclarations } from "./getSymbols";
 const { log } = require("protocol/socket");
 
 export class ParserDispatcher extends WorkerDispatcher {
-  async findOutOfScopeLocations(
-    sourceId: string,
-    position: AstPosition
-  ): Promise<AstLocation[]> {
+  async findOutOfScopeLocations(sourceId: string, position: AstPosition): Promise<AstLocation[]> {
     log(`WorkerDispatch Parser findOutOfScopeLocations`);
     return this.invoke("findOutOfScopeLocations", sourceId, position);
   }
 
-  async getNextStep(
-    sourceId: SourceId,
-    pausedPosition: AstPosition
-  ): Promise<?SourceLocation> {
+  async getNextStep(sourceId: SourceId, pausedPosition: AstPosition): Promise<?SourceLocation> {
     log(`WorkerDispatch Parser getNextStep`);
     return this.invoke("getNextStep", sourceId, pausedPosition);
   }

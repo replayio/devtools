@@ -4,19 +4,11 @@
 
 "use strict";
 
-const {
-  createElement,
-  createFactory,
-  createRef,
-  Fragment,
-  PureComponent,
-} = require("react");
+const { createElement, createFactory, createRef, Fragment, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
-const Font = createFactory(
-  require("devtools/client/inspector/fonts/components/Font")
-);
+const Font = createFactory(require("devtools/client/inspector/fonts/components/Font"));
 const FontPreviewInput = createFactory(
   require("devtools/client/inspector/fonts/components/FontPreviewInput")
 );
@@ -49,12 +41,7 @@ class FontList extends PureComponent {
   }
 
   render() {
-    const {
-      fonts,
-      fontOptions,
-      onPreviewTextChange,
-      onToggleFontHighlight,
-    } = this.props;
+    const { fonts, fontOptions, onPreviewTextChange, onToggleFontHighlight } = this.props;
 
     const { previewText } = fontOptions;
     const { onPreviewClick } = this;

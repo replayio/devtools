@@ -5,9 +5,7 @@ import * as namespace from "";
 
 function fn() {}
 class cls {
-  method(){
-
-  }
+  method() {}
 }
 
 var aVar;
@@ -20,5 +18,5 @@ const aConst = "";
 });
 
 {
-  function blockFn(){}
+  function blockFn() {}
 }

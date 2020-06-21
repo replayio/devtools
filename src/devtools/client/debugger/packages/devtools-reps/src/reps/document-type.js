@@ -19,9 +19,7 @@ DocumentType.propTypes = {
 function DocumentType(props) {
   const { object } = props;
   const name =
-    object && object.preview && object.preview.nodeName
-      ? ` ${object.preview.nodeName}`
-      : "";
+    object && object.preview && object.preview.nodeName ? ` ${object.preview.nodeName}` : "";
   return span(
     {
       "data-link-actor-id": props.object.actor,

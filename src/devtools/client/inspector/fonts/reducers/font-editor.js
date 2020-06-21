@@ -5,9 +5,7 @@
 "use strict";
 
 const { getStr } = require("devtools/client/inspector/fonts/utils/l10n");
-const {
-  parseFontVariationAxes,
-} = require("devtools/client/inspector/fonts/utils/font-utils");
+const { parseFontVariationAxes } = require("devtools/client/inspector/fonts/utils/font-utils");
 
 const {
   APPLY_FONT_VARIATION_INSTANCE,
@@ -91,10 +89,7 @@ const reducers = {
     // If not defined in font-variation-settings, setup "wght" axis with the value of
     // "font-weight" if it is numeric and not a keyword.
     const weight = properties["font-weight"];
-    if (
-      axes.wght === undefined &&
-      parseFloat(weight).toString() === weight.toString()
-    ) {
+    if (axes.wght === undefined && parseFloat(weight).toString() === weight.toString()) {
       axes.wght = parseFloat(weight);
     }
 
@@ -146,7 +141,7 @@ const reducers = {
   },
 };
 
-module.exports = function(state = INITIAL_STATE, action) {
+module.exports = function (state = INITIAL_STATE, action) {
   const reducer = reducers[action.type];
   if (!reducer) {
     return state;

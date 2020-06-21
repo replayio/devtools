@@ -5,10 +5,7 @@
 "use strict";
 
 const DevToolsUtils = require("devtools/shared/DevToolsUtils");
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const ReactDOM = require("react-dom");
@@ -104,8 +101,7 @@ class CurrentTimeScrubber extends PureComponent {
   updateAnimationsCurrentTime(pageX, needRefresh) {
     const { direction, setAnimationsCurrentTime, timeScale } = this.props;
 
-    let progressRate =
-      (pageX - this.controllerArea.x) / this.controllerArea.width;
+    let progressRate = (pageX - this.controllerArea.x) / this.controllerArea.width;
 
     if (progressRate < 0.0) {
       progressRate = 0.0;

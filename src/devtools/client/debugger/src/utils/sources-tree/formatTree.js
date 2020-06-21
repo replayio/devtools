@@ -6,11 +6,7 @@
 
 import type { TreeNode } from "./types";
 
-export function formatTree(
-  tree: TreeNode,
-  depth: number = 0,
-  str: string = ""
-) {
+export function formatTree(tree: TreeNode, depth: number = 0, str: string = "") {
   const whitespace = new Array(depth * 2).join(" ");
 
   if (tree.type === "directory") {

@@ -52,9 +52,7 @@ class InlinePreviewRow extends PureComponent<Props> {
     if (
       this.bookmark &&
       prevProps &&
-      (!props ||
-        prevProps.editor !== props.editor ||
-        prevProps.line !== props.line)
+      (!props || prevProps.editor !== props.editor || prevProps.line !== props.line)
     ) {
       this.bookmark.clear();
       this.bookmark = null;
@@ -62,10 +60,7 @@ class InlinePreviewRow extends PureComponent<Props> {
     }
 
     if (!props) {
-      return assert(
-        !this.bookmark,
-        "Inline Preview widget shouldn't be present."
-      );
+      return assert(!this.bookmark, "Inline Preview widget shouldn't be present.");
     }
 
     const {
@@ -113,11 +108,8 @@ class InlinePreviewRow extends PureComponent<Props> {
   }
 }
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  () => ({}),
-  {
-    openElementInInspector: actions.openElementInInspectorCommand,
-    highlightDomElement: actions.highlightDomElement,
-    unHighlightDomElement: actions.unHighlightDomElement,
-  }
-)(InlinePreviewRow);
+export default connect<Props, OwnProps, _, _, _, _>(() => ({}), {
+  openElementInInspector: actions.openElementInInspectorCommand,
+  highlightDomElement: actions.highlightDomElement,
+  unHighlightDomElement: actions.unHighlightDomElement,
+})(InlinePreviewRow);

@@ -26,9 +26,7 @@ class DelaySign extends PureComponent {
 
     return dom.div({
       className:
-        "animation-delay-sign" +
-        (delay < 0 ? " negative" : "") +
-        (isDelayFilled ? " fill" : ""),
+        "animation-delay-sign" + (delay < 0 ? " negative" : "") + (isDelayFilled ? " fill" : ""),
       style: {
         width: `${width}%`,
         marginInlineStart: `${offset}%`,

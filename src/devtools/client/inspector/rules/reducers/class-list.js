@@ -33,7 +33,7 @@ const reducers = {
   },
 };
 
-module.exports = function(classList = INITIAL_CLASS_LIST, action) {
+module.exports = function (classList = INITIAL_CLASS_LIST, action) {
   const reducer = reducers[action.type];
   if (!reducer) {
     return classList;

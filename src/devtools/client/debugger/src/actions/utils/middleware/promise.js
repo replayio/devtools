@@ -29,15 +29,8 @@ export type ErrorPromiseAction = {|
   +error: any,
 |};
 
-import {
-  pending,
-  rejected,
-  fulfilled,
-  type AsyncValue,
-} from "../../../utils/async-value";
-export function asyncActionAsValue<T>(
-  action: PromiseAction<mixed, T>
-): AsyncValue<T> {
+import { pending, rejected, fulfilled, type AsyncValue } from "../../../utils/async-value";
+export function asyncActionAsValue<T>(action: PromiseAction<mixed, T>): AsyncValue<T> {
   if (action.status === "start") {
     return pending();
   }
@@ -79,10 +72,7 @@ function filterAction(action: Object): Object {
   return fromPairs(toPairs(action).filter(pair => pair[0] !== PROMISE));
 }
 
-function promiseMiddleware({
-  dispatch,
-  getState,
-}: ThunkArgs): Function | Promise<mixed> {
+function promiseMiddleware({ dispatch, getState }: ThunkArgs): Function | Promise<mixed> {
   return (next: Function) => (action: Object) => {
     if (!(PROMISE in action)) {
       return next(action);

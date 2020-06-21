@@ -37,10 +37,7 @@ type TextClasses = {
   lineClass: string,
 };
 
-function isDocumentReady(
-  source: ?SourceWithContent,
-  location: ?SourceLocation
-) {
+function isDocumentReady(source: ?SourceWithContent, location: ?SourceLocation) {
   return location && source && source.content && hasDocument(location.sourceId);
 }
 
@@ -66,11 +63,7 @@ export class DebugLine extends PureComponent<Props> {
     endOperation();
   }
 
-  setDebugLine(
-    why: ?Why,
-    location: ?SourceLocation,
-    source: ?SourceWithContent
-  ) {
+  setDebugLine(why: ?Why, location: ?SourceLocation, source: ?SourceWithContent) {
     if (!location || !isDocumentReady(source, location)) {
       return;
     }
@@ -99,11 +92,7 @@ export class DebugLine extends PureComponent<Props> {
     );
   }
 
-  clearDebugLine(
-    why: ?Why,
-    location: ?SourceLocation,
-    source: ?SourceWithContent
-  ) {
+  clearDebugLine(why: ?Why, location: ?SourceLocation, source: ?SourceWithContent) {
     if (!location || !isDocumentReady(source, location)) {
       return;
     }

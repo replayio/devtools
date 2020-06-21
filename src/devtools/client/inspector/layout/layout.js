@@ -4,22 +4,15 @@
 
 "use strict";
 
-const {
-  createFactory,
-  createElement,
-} = require("react");
+const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 const FlexboxInspector = require("devtools/client/inspector/flexbox/flexbox");
 const GridInspector = require("devtools/client/inspector/grids/grid-inspector");
 
-const LayoutApp = createFactory(
-  require("devtools/client/inspector/layout/components/LayoutApp")
-);
+const LayoutApp = createFactory(require("devtools/client/inspector/layout/components/LayoutApp"));
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const INSPECTOR_L10N = new LocalizationHelper(
-  "devtools/client/locales/inspector.properties"
-);
+const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
 loader.lazyRequireGetter(
   this,
@@ -54,19 +47,13 @@ class LayoutView {
       onToggleGeometryEditor,
     } = this.inspector.getPanel("boxmodel").getComponentProps();
 
-    this.flexboxInspector = new FlexboxInspector(
-      this.inspector,
-      this.inspector.panelWin
-    );
+    this.flexboxInspector = new FlexboxInspector(this.inspector, this.inspector.panelWin);
     const {
       onSetFlexboxOverlayColor,
       onToggleFlexboxHighlighter,
     } = this.flexboxInspector.getComponentProps();
 
-    this.gridInspector = new GridInspector(
-      this.inspector,
-      this.inspector.panelWin
-    );
+    this.gridInspector = new GridInspector(this.inspector, this.inspector.panelWin);
     const {
       onSetGridOverlayColor,
       onShowGridOutlineHighlight,

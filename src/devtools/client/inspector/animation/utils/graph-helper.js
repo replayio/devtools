@@ -48,14 +48,7 @@ class SummaryGraphHelper {
    * @param {Function} toPathStringFunc
    *        Which returns a path string for 'd' attribute for <path> from given segments.
    */
-  constructor(
-    state,
-    keyframes,
-    totalDuration,
-    minSegmentDuration,
-    getValueFunc,
-    toPathStringFunc
-  ) {
+  constructor(state, keyframes, totalDuration, minSegmentDuration, getValueFunc, toPathStringFunc) {
     this.totalDuration = totalDuration;
     this.minSegmentDuration = minSegmentDuration;
     this.minProgressThreshold =
@@ -219,10 +212,7 @@ function getPreferredDurationResolution(keyframes) {
   for (const keyframe of keyframes) {
     if (previousOffset && previousOffset != keyframe.offset) {
       const interval = keyframe.offset - previousOffset;
-      durationResolution = Math.max(
-        durationResolution,
-        Math.ceil(1 / interval)
-      );
+      durationResolution = Math.max(durationResolution, Math.ceil(1 / interval));
     }
     previousOffset = keyframe.offset;
   }
@@ -248,10 +238,7 @@ function getPreferredProgressThreshold(state, keyframes) {
     return threshold;
   }
 
-  return Math.min(
-    threshold,
-    getPreferredProgressThresholdByKeyframes(keyframes)
-  );
+  return Math.min(threshold, getPreferredProgressThresholdByKeyframes(keyframes));
 }
 
 /**
@@ -276,10 +263,7 @@ function getPreferredProgressThresholdByKeyframes(keyframes) {
 
     if (steps) {
       const nextKeyframe = keyframes[i + 1];
-      threshold = Math.min(
-        threshold,
-        (1 / (steps + 1)) * (nextKeyframe.offset - keyframe.offset)
-      );
+      threshold = Math.min(threshold, (1 / (steps + 1)) * (nextKeyframe.offset - keyframe.offset));
     }
   }
 

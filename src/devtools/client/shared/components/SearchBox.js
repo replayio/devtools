@@ -6,11 +6,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  createRef,
-  PureComponent,
-} = require("react");
+const { createFactory, createRef, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 
@@ -199,8 +195,7 @@ class SearchBox extends PureComponent {
       type = "search",
     } = this.props;
     const { value } = this.state;
-    const showAutocomplete =
-      autocompleteProvider && this.state.focused && value !== "";
+    const showAutocomplete = autocompleteProvider && this.state.focused && value !== "";
     const showLearnMoreLink = learnMoreUrl && value === "";
 
     const inputClassList = [`devtools-${type}input`];
@@ -219,18 +214,18 @@ class SearchBox extends PureComponent {
         type: "search",
       }),
       showLearnMoreLink &&
-      MDNLink({
-        title: learnMoreTitle,
-        url: learnMoreUrl,
-      }),
+        MDNLink({
+          title: learnMoreTitle,
+          url: learnMoreUrl,
+        }),
       summary
         ? dom.span(
-          {
-            className: "devtools-searchinput-summary",
-            title: summaryTooltip || "",
-          },
-          summary
-        )
+            {
+              className: "devtools-searchinput-summary",
+              title: summaryTooltip || "",
+            },
+            summary
+          )
         : null,
       dom.button({
         className: "devtools-searchinput-clear",
@@ -238,12 +233,12 @@ class SearchBox extends PureComponent {
         onClick: this.onClearButtonClick,
       }),
       showAutocomplete &&
-      SearchBoxAutocompletePopup({
-        autocompleteProvider,
-        filter: value,
-        onItemSelected: itemValue => this.onChange(itemValue),
-        ref: this.autocompleteRef,
-      })
+        SearchBoxAutocompletePopup({
+          autocompleteProvider,
+          filter: value,
+          onItemSelected: itemValue => this.onChange(itemValue),
+          ref: this.autocompleteRef,
+        })
     );
   }
 }

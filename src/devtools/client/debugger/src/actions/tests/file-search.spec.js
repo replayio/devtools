@@ -6,11 +6,7 @@
 
 import { createStore, selectors, actions } from "../../utils/test-head";
 
-const {
-  getFileSearchQuery,
-  getFileSearchModifiers,
-  getFileSearchResults,
-} = selectors;
+const { getFileSearchQuery, getFileSearchModifiers, getFileSearchResults } = selectors;
 
 describe("file text search", () => {
   it("should update search results", () => {
@@ -22,7 +18,10 @@ describe("file text search", () => {
       count: 0,
     });
 
-    const matches = [{ line: 1, ch: 3 }, { line: 3, ch: 2 }];
+    const matches = [
+      { line: 1, ch: 3 },
+      { line: 3, ch: 2 },
+    ];
     dispatch(actions.updateSearchResults(cx, 2, 3, matches));
 
     expect(getFileSearchResults(getState())).toEqual({

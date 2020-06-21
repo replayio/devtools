@@ -48,13 +48,7 @@ import Scopes from "./Scopes";
 
 import "./SecondaryPanes.css";
 
-import type {
-  Expression,
-  Frame,
-  ThreadList,
-  ThreadContext,
-  Source,
-} from "../../types";
+import type { Expression, Frame, ThreadList, ThreadContext, Source } from "../../types";
 
 type AccordionPaneItem = {
   header: string,
@@ -67,12 +61,7 @@ type AccordionPaneItem = {
 
 function debugBtn(onClick, type, className, tooltip) {
   return (
-    <button
-      onClick={onClick}
-      className={`${type} ${className}`}
-      key={type}
-      title={tooltip}
-    >
+    <button onClick={onClick} className={`${type} ${className}`} key={type} title={tooltip}>
       <AccessibleImage className={type} title={tooltip} aria-label={tooltip} />
     </button>
   );
@@ -131,14 +120,8 @@ class SecondaryPanes extends Component<Props, State> {
   };
 
   renderBreakpointsToggle() {
-    const {
-      cx,
-      toggleAllBreakpoints,
-      breakpoints,
-      breakpointsDisabled,
-    } = this.props;
-    const isIndeterminate =
-      !breakpointsDisabled && breakpoints.some(x => x.disabled);
+    const { cx, toggleAllBreakpoints, breakpoints, breakpointsDisabled } = this.props;
+    const isIndeterminate = !breakpointsDisabled && breakpoints.some(x => x.disabled);
 
     if (features.skipPausing || breakpoints.length === 0) {
       return null;
@@ -263,10 +246,7 @@ class SecondaryPanes extends Component<Props, State> {
       className: "xhr-breakpoints-pane",
       buttons: this.xhrBreakpointsHeaderButtons(),
       component: (
-        <XHRBreakpoints
-          showInput={this.state.showXHRInput}
-          onXHRAdded={this.onXHRAdded}
-        />
+        <XHRBreakpoints showInput={this.state.showXHRInput} onXHRAdded={this.onXHRAdded} />
       ),
       opened: prefs.xhrBreakpointsVisible,
       onToggle: opened => {
@@ -300,20 +280,14 @@ class SecondaryPanes extends Component<Props, State> {
   }
 
   getBreakpointsItem(): AccordionPaneItem {
-    const {
-      shouldLogExceptions,
-      logExceptions,
-    } = this.props;
+    const { shouldLogExceptions, logExceptions } = this.props;
 
     return {
       header: L10N.getStr("breakpoints.header"),
       className: "breakpoints-pane",
       buttons: [this.renderBreakpointsToggle()],
       component: (
-        <Breakpoints
-          shouldLogExceptions={shouldLogExceptions}
-          logExceptions={logExceptions}
-        />
+        <Breakpoints shouldLogExceptions={shouldLogExceptions} logExceptions={logExceptions} />
       ),
       opened: prefs.breakpointsVisible,
       onToggle: opened => {
@@ -447,15 +421,8 @@ class SecondaryPanes extends Component<Props, State> {
       <div className="secondary-panes-wrapper">
         <CommandBar horizontal={this.props.horizontal} />
         <FrameTimeline />
-        <div
-          className={classnames(
-            "secondary-panes",
-            skipPausing && "skip-pausing"
-          )}
-        >
-          {this.props.horizontal
-            ? this.renderHorizontalLayout()
-            : this.renderVerticalLayout()}
+        <div className={classnames("secondary-panes", skipPausing && "skip-pausing")}>
+          {this.props.horizontal ? this.renderHorizontalLayout() : this.renderVerticalLayout()}
         </div>
       </div>
     );
@@ -492,18 +459,14 @@ const mapStateToProps = state => {
     workers: getThreads(state),
     skipPausing: getSkipPausing(state),
     logEventBreakpoints: shouldLogEventBreakpoints(state),
-    source:
-      selectedFrame && getSourceFromId(state, selectedFrame.location.sourceId),
+    source: selectedFrame && getSourceFromId(state, selectedFrame.location.sourceId),
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    toggleAllBreakpoints: actions.toggleAllBreakpoints,
-    evaluateExpressions: actions.evaluateExpressions,
-    logExceptions: actions.logExceptions,
-    breakOnNext: actions.breakOnNext,
-    toggleEventLogging: actions.toggleEventLogging,
-  }
-)(SecondaryPanes);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  toggleAllBreakpoints: actions.toggleAllBreakpoints,
+  evaluateExpressions: actions.evaluateExpressions,
+  logExceptions: actions.logExceptions,
+  breakOnNext: actions.breakOnNext,
+  toggleEventLogging: actions.toggleEventLogging,
+})(SecondaryPanes);

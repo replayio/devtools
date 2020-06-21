@@ -5,9 +5,7 @@
 "use strict";
 
 const { extend } = require("devtools/shared/extend");
-const {
-  AbstractCanvasGraph,
-} = require("devtools/client/shared/widgets/Graphs");
+const { AbstractCanvasGraph } = require("devtools/client/shared/widgets/Graphs");
 
 // Bar graph constants.
 
@@ -59,7 +57,7 @@ const GRAPH_REGION_STRIPES_COLOR = "rgba(237,38,85,0.2)";
  * @param Node parent
  *        The parent node holding the graph.
  */
-this.MountainGraphWidget = function(parent, ...args) {
+this.MountainGraphWidget = function (parent, ...args) {
   AbstractCanvasGraph.apply(this, [parent, "mountain-graph", ...args]);
 };
 
@@ -102,7 +100,7 @@ MountainGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
    * Renders the graph's background.
    * @see AbstractCanvasGraph.prototype.buildBackgroundImage
    */
-  buildBackgroundImage: function() {
+  buildBackgroundImage: function () {
     const { canvas, ctx } = this._getNamedCanvas("mountain-graph-background");
     const width = this._width;
     const height = this._height;
@@ -117,11 +115,9 @@ MountainGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
    * Renders the graph's data source.
    * @see AbstractCanvasGraph.prototype.buildGraphImage
    */
-  buildGraphImage: function() {
+  buildGraphImage: function () {
     if (!this.format || !this.format.length) {
-      throw new Error(
-        "The graph format traits are mandatory to style " + "the data source."
-      );
+      throw new Error("The graph format traits are mandatory to style " + "the data source.");
     }
     const { canvas, ctx } = this._getNamedCanvas("mountain-graph-data");
     const width = this._width;
@@ -133,8 +129,7 @@ MountainGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
     const lastTick = totalTicks ? this._data[totalTicks - 1].delta : 0;
 
     const duration = this.dataDuration || lastTick;
-    const dataScaleX = (this.dataScaleX =
-      width / (duration - this.dataOffsetX));
+    const dataScaleX = (this.dataScaleX = width / (duration - this.dataOffsetX));
     const dataScaleY = (this.dataScaleY = height * this.dampenValuesFactor);
 
     // Draw the graph.

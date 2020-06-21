@@ -4,31 +4,21 @@
 
 // @flow
 
-export {
-  createInitial,
-  insertResources,
-  removeResources,
-  updateResources,
-} from "./core";
+export { createInitial, insertResources, removeResources, updateResources } from "./core";
 export type {
   Id,
   Resource,
   ResourceBound,
   // Disabled pending eslint-plugin-import bug #1345
-  // eslint-disable-next-line import/named
+
   ResourceState,
   // Disabled pending eslint-plugin-import bug #1345
-  // eslint-disable-next-line import/named
+
   ResourceIdentity,
   ResourceValues,
 } from "./core";
 
-export {
-  hasResource,
-  getResourceIds,
-  getResource,
-  getMappedResource,
-} from "./selector";
+export { hasResource, getResourceIds, getResource, getMappedResource } from "./selector";
 export type { ResourceMap } from "./selector";
 
 export { makeResourceQuery, makeMapWithArgs } from "./base-query";
@@ -64,11 +54,7 @@ export type {
   ReduceAllQuery,
 } from "./query";
 
-export {
-  queryCacheWeak,
-  queryCacheShallow,
-  queryCacheStrict,
-} from "./query-cache";
+export { queryCacheWeak, queryCacheShallow, queryCacheStrict } from "./query-cache";
 export type { WeakArgsBound, ShallowArgsBound } from "./query-cache";
 
 export { memoizeResourceShallow } from "./memoize";

@@ -16,11 +16,7 @@ import {
   getCurrentThread,
 } from "../../selectors";
 
-import type {
-  SourceLocation,
-  SourceWithContent,
-  SourceDocuments,
-} from "../../types";
+import type { SourceLocation, SourceWithContent, SourceDocuments } from "../../types";
 import type { Command } from "../../reducers/types";
 
 type HighlightFrame = {
@@ -35,10 +31,7 @@ type Props = {
   selectedSource: ?SourceWithContent,
 };
 
-function isDebugLine(
-  selectedFrame: ?HighlightFrame,
-  selectedLocation: SourceLocation
-) {
+function isDebugLine(selectedFrame: ?HighlightFrame, selectedLocation: SourceLocation) {
   if (!selectedFrame) {
     return;
   }
@@ -75,10 +68,7 @@ export class HighlightLine extends Component<Props> {
     this.completeHighlightLine(null);
   }
 
-  shouldSetHighlightLine(
-    selectedLocation: SourceLocation,
-    selectedSource: ?SourceWithContent
-  ) {
+  shouldSetHighlightLine(selectedLocation: SourceLocation, selectedSource: ?SourceWithContent) {
     const { sourceId, line } = selectedLocation;
     const editorLine = toEditorLine(sourceId, line);
 
@@ -94,22 +84,14 @@ export class HighlightLine extends Component<Props> {
   }
 
   completeHighlightLine(prevProps: Props | null) {
-    const {
-      pauseCommand,
-      selectedLocation,
-      selectedFrame,
-      selectedSource,
-    } = this.props;
+    const { pauseCommand, selectedLocation, selectedFrame, selectedSource } = this.props;
     if (pauseCommand) {
       this.isStepping = true;
     }
 
     startOperation();
     if (prevProps) {
-      this.clearHighlightLine(
-        prevProps.selectedLocation,
-        prevProps.selectedSource
-      );
+      this.clearHighlightLine(prevProps.selectedLocation, prevProps.selectedSource);
     }
     this.setHighlightLine(selectedLocation, selectedFrame, selectedSource);
     endOperation();
@@ -139,31 +121,21 @@ export class HighlightLine extends Component<Props> {
   }
 
   resetHighlightLine(doc: SourceDocuments, editorLine: number) {
-    const editorWrapper: HTMLElement | null = document.querySelector(
-      ".editor-wrapper"
-    );
+    const editorWrapper: HTMLElement | null = document.querySelector(".editor-wrapper");
 
     if (editorWrapper === null) {
       return;
     }
 
     const duration = parseInt(
-      getComputedStyle(editorWrapper).getPropertyValue(
-        "--highlight-line-duration"
-      ),
+      getComputedStyle(editorWrapper).getPropertyValue("--highlight-line-duration"),
       10
     );
 
-    setTimeout(
-      () => doc && doc.removeLineClass(editorLine, "line", "highlight-line"),
-      duration
-    );
+    setTimeout(() => doc && doc.removeLineClass(editorLine, "line", "highlight-line"), duration);
   }
 
-  clearHighlightLine(
-    selectedLocation: SourceLocation,
-    selectedSource: ?SourceWithContent
-  ) {
+  clearHighlightLine(selectedLocation: SourceLocation, selectedSource: ?SourceWithContent) {
     if (!isDocumentReady(selectedSource, selectedLocation)) {
       return;
     }

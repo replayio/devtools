@@ -60,13 +60,8 @@ function reducer(state = initialState(), action = {}) {
 
   if (type === "NODE_PROPERTIES_LOADED") {
     return cloneState({
-      actors: data.actor
-        ? new Set(state.actors || []).add(data.actor)
-        : state.actors,
-      loadedProperties: new Map(state.loadedProperties).set(
-        data.node.path,
-        action.data.properties
-      ),
+      actors: data.actor ? new Set(state.actors || []).add(data.actor) : state.actors,
+      loadedProperties: new Map(state.loadedProperties).set(data.node.path, action.data.properties),
     });
   }
 
@@ -80,14 +75,10 @@ function reducer(state = initialState(), action = {}) {
 
   if (type === "GETTER_INVOKED") {
     return cloneState({
-      actors: data.actor
-        ? new Set(state.actors || []).add(data.result.from)
-        : state.actors,
+      actors: data.actor ? new Set(state.actors || []).add(data.result.from) : state.actors,
       evaluations: new Map(state.evaluations).set(data.node.path, {
         getterValue:
-          data.result &&
-          data.result.value &&
-          (data.result.value.throw || data.result.value.return),
+          data.result && data.result.value && (data.result.value.throw || data.result.value.return),
       }),
     });
   }

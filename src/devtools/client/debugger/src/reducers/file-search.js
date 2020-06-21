@@ -54,10 +54,7 @@ export const createFileSearchState = () => ({
   },
 });
 
-function update(
-  state: FileSearchState = createFileSearchState(),
-  action: Action
-): FileSearchState {
+function update(state: FileSearchState = createFileSearchState(), action: Action): FileSearchState {
   switch (action.type) {
     case "UPDATE_FILE_SEARCH_QUERY": {
       return { ...state, query: action.query };

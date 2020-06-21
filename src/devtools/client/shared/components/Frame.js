@@ -20,12 +20,8 @@ const {
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
 
-const l10n = new LocalizationHelper(
-  "devtools/client/locales/components.properties"
-);
-const webl10n = new LocalizationHelper(
-  "devtools/client/locales/webconsole.properties"
-);
+const l10n = new LocalizationHelper("devtools/client/locales/components.properties");
+const webl10n = new LocalizationHelper("devtools/client/locales/webconsole.properties");
 
 class Frame extends Component {
   static get propTypes() {
@@ -202,10 +198,7 @@ class Frame extends Component {
     let displaySource = showFullSourceUrl ? unicodeLong : unicodeShort;
     if (isSourceMapped) {
       displaySource = getSourceMappedFile(displaySource);
-    } else if (
-      showEmptyPathAsHost &&
-      (displaySource === "" || displaySource === "/")
-    ) {
+    } else if (showEmptyPathAsHost && (displaySource === "" || displaySource === "/")) {
       displaySource = host;
     }
 
@@ -247,10 +240,7 @@ class Frame extends Component {
     // ordering. See CSS styles for frame-link-source-[inner] and bug 1290056.
     let tooltipMessage;
     if (messageSource && messageSource === MESSAGE_SOURCE.CSS) {
-      tooltipMessage = l10n.getFormatStr(
-        "frame.viewsourceinstyleeditor",
-        tooltip
-      );
+      tooltipMessage = l10n.getFormatStr("frame.viewsourceinstyleeditor", tooltip);
     } else {
       tooltipMessage = l10n.getFormatStr("frame.viewsourceindebugger", tooltip);
     }
@@ -269,7 +259,7 @@ class Frame extends Component {
     if (isLinkable) {
       sourceEl = dom.a(
         {
-          onClick: (e) => {
+          onClick: e => {
             e.preventDefault();
             e.stopPropagation();
             onClick(this.getSourceForClick({ ...frame, source, sourceId }));

@@ -22,11 +22,7 @@ import { copyToTheClipboard } from "../utils/clipboard";
 import { isFulfilled } from "../utils/async-value";
 
 import type { SourceLocation, Context, Source } from "../types";
-import type {
-  ActiveSearchType,
-  OrientationType,
-  SelectedPrimaryPaneTabType,
-} from "../reducers/ui";
+import type { ActiveSearchType, OrientationType, SelectedPrimaryPaneTabType } from "../reducers/ui";
 
 export function setPrimaryPaneTab(tabName: SelectedPrimaryPaneTabType) {
   return { type: "SET_PRIMARY_PANE_TAB", tabName };
@@ -109,10 +105,7 @@ export function showSource(cx: Context, sourceId: string) {
   };
 }
 
-export function togglePaneCollapse(
-  position: panelPositionType,
-  paneCollapsed: boolean
-) {
+export function togglePaneCollapse(position: panelPositionType, paneCollapsed: boolean) {
   return ({ dispatch, getState }: ThunkArgs) => {
     const prevPaneCollapse = getPaneCollapse(getState(), position);
     if (prevPaneCollapse === paneCollapsed) {
@@ -131,22 +124,14 @@ export function togglePaneCollapse(
  * @memberof actions/sources
  * @static
  */
-export function highlightLineRange(location: {
-  start: number,
-  end: number,
-  sourceId: string,
-}) {
+export function highlightLineRange(location: { start: number, end: number, sourceId: string }) {
   return {
     type: "HIGHLIGHT_LINES",
     location,
   };
 }
 
-export function flashLineRange(location: {
-  start: number,
-  end: number,
-  sourceId: string,
-}) {
+export function flashLineRange(location: { start: number, end: number, sourceId: string }) {
   return ({ dispatch }: ThunkArgs) => {
     dispatch(highlightLineRange(location));
     setTimeout(() => dispatch(clearHighlightLineRange()), 200);
@@ -163,10 +148,7 @@ export function clearHighlightLineRange() {
   };
 }
 
-export function openConditionalPanel(
-  location: ?SourceLocation,
-  log: boolean = false
-) {
+export function openConditionalPanel(location: ?SourceLocation, log: boolean = false) {
   if (!location) {
     return;
   }
@@ -206,10 +188,7 @@ export function setProjectDirectoryRoot(cx: Context, newRoot: string) {
 
     if (newRoot && curRoot) {
       const newRootArr = newRoot.replace(/\/+/g, "/").split("/");
-      const curRootArr = curRoot
-        .replace(/^\//, "")
-        .replace(/\/+/g, "/")
-        .split("/");
+      const curRootArr = curRoot.replace(/^\//, "").replace(/\/+/g, "/").split("/");
       if (newRootArr[0] !== curRootArr[0]) {
         newRootArr.splice(0, 2);
         newRoot = `${curRoot}/${newRootArr.join("/")}`;

@@ -55,8 +55,7 @@ class SourceLink extends PureComponent {
     return dom.div(
       {
         className:
-          "ruleview-rule-source theme-link" +
-          (!this.isSourceLinkEnabled ? " disabled" : ""),
+          "ruleview-rule-source theme-link" + (!this.isSourceLinkEnabled ? " disabled" : ""),
         onClick: this.onSourceClick,
       },
       dom.span(

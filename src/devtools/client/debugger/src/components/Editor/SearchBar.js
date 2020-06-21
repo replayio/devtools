@@ -93,11 +93,7 @@ class SearchBar extends Component<Props, State> {
 
   componentWillUnmount() {
     const shortcuts = this.context.shortcuts;
-    const {
-      searchShortcut,
-      searchAgainShortcut,
-      shiftSearchAgainShortcut,
-    } = getShortcuts();
+    const { searchShortcut, searchAgainShortcut, shiftSearchAgainShortcut } = getShortcuts();
 
     shortcuts.off(searchShortcut);
     shortcuts.off("Escape");
@@ -110,18 +106,12 @@ class SearchBar extends Component<Props, State> {
     // reduce frequency of queries
     this.doSearch = debounce(this.doSearch, 100);
     const shortcuts = this.context.shortcuts;
-    const {
-      searchShortcut,
-      searchAgainShortcut,
-      shiftSearchAgainShortcut,
-    } = getShortcuts();
+    const { searchShortcut, searchAgainShortcut, shiftSearchAgainShortcut } = getShortcuts();
 
     shortcuts.on(searchShortcut, (_, e) => this.toggleSearch(e));
     shortcuts.on("Escape", (_, e) => this.onEscape(e));
 
-    shortcuts.on(shiftSearchAgainShortcut, (_, e) =>
-      this.traverseResults(e, true)
-    );
+    shortcuts.on(shiftSearchAgainShortcut, (_, e) => this.traverseResults(e, true));
 
     shortcuts.on(searchAgainShortcut, (_, e) => this.traverseResults(e, false));
   }
@@ -376,23 +366,18 @@ const mapStateToProps = (state, p: OwnProps) => {
     cx: getContext(state),
     searchOn: getActiveSearch(state) === "file",
     selectedSource,
-    selectedContentLoaded: selectedSource
-      ? !!getSourceContent(state, selectedSource.id)
-      : false,
+    selectedContentLoaded: selectedSource ? !!getSourceContent(state, selectedSource.id) : false,
     query: getFileSearchQuery(state),
     modifiers: getFileSearchModifiers(state),
     searchResults: getFileSearchResults(state),
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    toggleFileSearchModifier: actions.toggleFileSearchModifier,
-    setFileSearchQuery: actions.setFileSearchQuery,
-    setActiveSearch: actions.setActiveSearch,
-    closeFileSearch: actions.closeFileSearch,
-    doSearch: actions.doSearch,
-    traverseResults: actions.traverseResults,
-  }
-)(SearchBar);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  toggleFileSearchModifier: actions.toggleFileSearchModifier,
+  setFileSearchQuery: actions.setFileSearchQuery,
+  setActiveSearch: actions.setActiveSearch,
+  closeFileSearch: actions.closeFileSearch,
+  doSearch: actions.doSearch,
+  traverseResults: actions.traverseResults,
+})(SearchBar);

@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -86,9 +83,7 @@ class AnimatedPropertyList extends Component {
     const animatedProperties = propertyNames.map(name => {
       const keyframes = propertyMap.get(name);
       const type = types[name];
-      const isUnchanged = keyframes.every(
-        keyframe => keyframe.value === keyframes[0].value
-      );
+      const isUnchanged = keyframes.every(keyframe => keyframe.value === keyframes[0].value);
       return { isUnchanged, keyframes, name, type };
     });
 

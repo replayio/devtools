@@ -7,12 +7,7 @@ const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
 // Reps
-const {
-  getGripType,
-  isGrip,
-  getURLDisplayString,
-  wrapRender,
-} = require("./rep-utils");
+const { getGripType, isGrip, getURLDisplayString, wrapRender } = require("./rep-utils");
 
 /**
  * Renders DOM document object.

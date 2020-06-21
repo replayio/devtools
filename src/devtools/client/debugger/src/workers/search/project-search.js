@@ -45,10 +45,7 @@ export function findSourceMatches(
 const startRegex = /([ !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/g;
 // Similarly, find
 const endRegex = new RegExp(
-  [
-    "([ !@#$%^&*()_+-=[]{};':\"\\|,.<>/?])",
-    '[^ !@#$%^&*()_+-=[]{};\':"\\|,.<>/?]*$"/',
-  ].join("")
+  ["([ !@#$%^&*()_+-=[]{};':\"\\|,.<>/?])", '[^ !@#$%^&*()_+-=[]{};\':"\\|,.<>/?]*$"/'].join("")
 );
 
 function truncateLine(text: string, column: number) {

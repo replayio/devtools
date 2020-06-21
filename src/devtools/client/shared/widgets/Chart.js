@@ -93,10 +93,7 @@ function PieTableChart(node, pie, table) {
  *           - "mouseout", when the mouse leaves a slice or a row
  *           - "click", when the mouse enters a slice or a row
  */
-function createPieTableChart(
-  document,
-  { title, diameter, data, strings, totals, sorted, header }
-) {
+function createPieTableChart(document, { title, diameter, data, strings, totals, sorted, header }) {
   if (data && sorted) {
     data = data.slice().sort((a, b) => +(a.size < b.size));
   }
@@ -187,10 +184,7 @@ function createPieTableChart(
  *           - "mouseout", when the mouse leaves a slice
  *           - "click", when the mouse clicks a slice
  */
-function createPieChart(
-  document,
-  { data, width, height, centerX, centerY, radius }
-) {
+function createPieChart(document, { data, width, height, centerX, centerY, radius }) {
   height = height || width;
   centerX = centerX || width / 2;
   centerY = centerY || height / 2;
@@ -211,10 +205,7 @@ function createPieChart(
   }
 
   const container = document.createElementNS(SVG_NS, "svg");
-  container.setAttribute(
-    "class",
-    "generic-chart-container pie-chart-container"
-  );
+  container.setAttribute("class", "generic-chart-container pie-chart-container");
   container.setAttribute("pack", "center");
   container.setAttribute("flex", "1");
   container.setAttribute("width", width);
@@ -288,8 +279,7 @@ function createPieChart(
 
     const hoverX = translateDistance * Math.sin(midAngle);
     const hoverY = -translateDistance * Math.cos(midAngle);
-    const hoverTransform =
-      "transform: translate(" + hoverX + "px, " + hoverY + "px)";
+    const hoverTransform = "transform: translate(" + hoverX + "px, " + hoverY + "px)";
     pathNode.setAttribute("style", data.length > 1 ? hoverTransform : "");
 
     proxy.slices.set(sliceInfo, pathNode);

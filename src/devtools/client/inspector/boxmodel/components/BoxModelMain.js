@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { KeyCodes } = require("devtools/client/shared/keycodes");
@@ -105,9 +102,7 @@ class BoxModelMain extends PureComponent {
 
     if (!activeDescendant) {
       const displayPosition = this.getDisplayPosition();
-      const nextLayout = displayPosition
-        ? this.positionLayout
-        : this.marginLayout;
+      const nextLayout = displayPosition ? this.positionLayout : this.marginLayout;
       activeDescendant = nextLayout.getAttribute("data-box");
       this.setAriaActive(nextLayout);
     }
@@ -225,15 +220,11 @@ class BoxModelMain extends PureComponent {
    */
   moveFocus({ target, shiftKey }, level) {
     const editBoxes = [
-      ...this.positionLayout.querySelectorAll(
-        `[data-box="${level}"].boxmodel-editable`
-      ),
+      ...this.positionLayout.querySelectorAll(`[data-box="${level}"].boxmodel-editable`),
     ];
     const editingMode = target.tagName === "input";
     // target.nextSibling is input field
-    let position = editingMode
-      ? editBoxes.indexOf(target.nextSibling)
-      : editBoxes.indexOf(target);
+    let position = editingMode ? editBoxes.indexOf(target.nextSibling) : editBoxes.indexOf(target);
 
     if (position === editBoxes.length - 1 && !shiftKey) {
       position = 0;
@@ -388,9 +379,7 @@ class BoxModelMain extends PureComponent {
       return;
     }
 
-    const nextLayout = this.layouts[target.getAttribute("data-box")].get(
-      "click"
-    );
+    const nextLayout = this.layouts[target.getAttribute("data-box")].get("click");
     this.setAriaActive(nextLayout);
 
     if (target && target._editable) {
@@ -399,11 +388,7 @@ class BoxModelMain extends PureComponent {
   }
 
   render() {
-    const {
-      boxModel,
-      onShowBoxModelEditor,
-      onShowRulePreviewTooltip,
-    } = this.props;
+    const { boxModel, onShowBoxModelEditor, onShowRulePreviewTooltip } = this.props;
     const { layout } = boxModel;
     let { height, width } = layout;
     const { activeDescendant: level, focusable } = this.state;
@@ -435,37 +420,34 @@ class BoxModelMain extends PureComponent {
     const contentBox =
       layout["box-sizing"] == "content-box"
         ? dom.div(
-          { className: "boxmodel-size" },
-          BoxModelEditable({
-            box: "content",
-            focusable,
-            level,
-            property: "width",
-            ref: editable => {
-              this.contentEditable = editable;
-            },
-            textContent: width,
-            onShowBoxModelEditor,
-            onShowRulePreviewTooltip,
-          }),
-          dom.span({}, "\u00D7"),
-          BoxModelEditable({
-            box: "content",
-            focusable,
-            level,
-            property: "height",
-            textContent: height,
-            onShowBoxModelEditor,
-            onShowRulePreviewTooltip,
-          })
-        )
-        : dom.p(
-          { className: "boxmodel-size" },
-          dom.span(
-            { title: "content" },
-            SHARED_L10N.getFormatStr("dimensions", width, height)
+            { className: "boxmodel-size" },
+            BoxModelEditable({
+              box: "content",
+              focusable,
+              level,
+              property: "width",
+              ref: editable => {
+                this.contentEditable = editable;
+              },
+              textContent: width,
+              onShowBoxModelEditor,
+              onShowRulePreviewTooltip,
+            }),
+            dom.span({}, "\u00D7"),
+            BoxModelEditable({
+              box: "content",
+              focusable,
+              level,
+              property: "height",
+              textContent: height,
+              onShowBoxModelEditor,
+              onShowRulePreviewTooltip,
+            })
           )
-        );
+        : dom.p(
+            { className: "boxmodel-size" },
+            dom.span({ title: "content" }, SHARED_L10N.getFormatStr("dimensions", width, height))
+          );
 
     return dom.div(
       {
@@ -481,13 +463,13 @@ class BoxModelMain extends PureComponent {
       },
       displayPosition
         ? dom.span(
-          {
-            className: "boxmodel-legend",
-            "data-box": "position",
-            title: "position",
-          },
-          "position"
-        )
+            {
+              className: "boxmodel-legend",
+              "data-box": "position",
+              title: "position",
+            },
+            "position"
+          )
         : null,
       dom.div(
         { className: "boxmodel-box" },
@@ -556,54 +538,54 @@ class BoxModelMain extends PureComponent {
       ),
       displayPosition
         ? BoxModelEditable({
-          box: "position",
-          direction: "top",
-          focusable,
-          level,
-          property: "position-top",
-          ref: editable => {
-            this.positionEditable = editable;
-          },
-          textContent: positionTop,
-          onShowBoxModelEditor,
-          onShowRulePreviewTooltip,
-        })
+            box: "position",
+            direction: "top",
+            focusable,
+            level,
+            property: "position-top",
+            ref: editable => {
+              this.positionEditable = editable;
+            },
+            textContent: positionTop,
+            onShowBoxModelEditor,
+            onShowRulePreviewTooltip,
+          })
         : null,
       displayPosition
         ? BoxModelEditable({
-          box: "position",
-          direction: "right",
-          focusable,
-          level,
-          property: "position-right",
-          textContent: positionRight,
-          onShowBoxModelEditor,
-          onShowRulePreviewTooltip,
-        })
+            box: "position",
+            direction: "right",
+            focusable,
+            level,
+            property: "position-right",
+            textContent: positionRight,
+            onShowBoxModelEditor,
+            onShowRulePreviewTooltip,
+          })
         : null,
       displayPosition
         ? BoxModelEditable({
-          box: "position",
-          direction: "bottom",
-          focusable,
-          level,
-          property: "position-bottom",
-          textContent: positionBottom,
-          onShowBoxModelEditor,
-          onShowRulePreviewTooltip,
-        })
+            box: "position",
+            direction: "bottom",
+            focusable,
+            level,
+            property: "position-bottom",
+            textContent: positionBottom,
+            onShowBoxModelEditor,
+            onShowRulePreviewTooltip,
+          })
         : null,
       displayPosition
         ? BoxModelEditable({
-          box: "position",
-          direction: "left",
-          focusable,
-          level,
-          property: "position-left",
-          textContent: positionLeft,
-          onShowBoxModelEditor,
-          onShowRulePreviewTooltip,
-        })
+            box: "position",
+            direction: "left",
+            focusable,
+            level,
+            property: "position-left",
+            textContent: positionLeft,
+            onShowBoxModelEditor,
+            onShowRulePreviewTooltip,
+          })
         : null,
       BoxModelEditable({
         box: "margin",

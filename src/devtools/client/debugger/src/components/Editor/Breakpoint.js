@@ -14,11 +14,7 @@ import { breakpointItems } from "./menus/breakpoints";
 import type { BreakpointItemActions } from "./menus/breakpoints";
 import type { EditorItemActions } from "./menus/editor";
 
-import type {
-  Source,
-  Breakpoint as BreakpointType,
-  ThreadContext,
-} from "../../types";
+import type { Source, Breakpoint as BreakpointType, ThreadContext } from "../../types";
 
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =
@@ -64,13 +60,7 @@ class Breakpoint extends PureComponent<Props> {
   }
 
   onClick = (event: MouseEvent) => {
-    const {
-      cx,
-      breakpointActions,
-      editorActions,
-      breakpoint,
-      selectedSource,
-    } = this.props;
+    const { cx, breakpointActions, editorActions, breakpoint, selectedSource } = this.props;
 
     // ignore right clicks
     if ((event.ctrlKey && event.button === 0) || event.button === 2) {
@@ -110,10 +100,7 @@ class Breakpoint extends PureComponent<Props> {
     event.preventDefault();
     const selectedLocation = breakpoint.location;
 
-    showMenu(
-      event,
-      breakpointItems(cx, breakpoint, selectedLocation, breakpointActions)
-    );
+    showMenu(event, breakpointItems(cx, breakpoint, selectedLocation, breakpointActions));
   };
 
   addBreakpoint(props: Props) {

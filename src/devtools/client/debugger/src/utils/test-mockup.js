@@ -29,10 +29,7 @@ import type {
 import * as asyncValue from "./async-value";
 import type { SourceBase } from "../reducers/sources";
 
-function makeMockSource(
-  url: string = "url",
-  id: SourceId = "source"
-): SourceBase {
+function makeMockSource(url: string = "url", id: SourceId = "source"): SourceBase {
   return {
     id,
     url,
@@ -147,9 +144,7 @@ function makeMockBreakpoint(
   line: number = 1,
   column: ?number
 ): Breakpoint {
-  const location = column
-    ? { sourceId: source.id, line, column }
-    : { sourceId: source.id, line };
+  const location = column ? { sourceId: source.id, line, column } : { sourceId: source.id, line };
   return {
     id: "breakpoint",
     location,

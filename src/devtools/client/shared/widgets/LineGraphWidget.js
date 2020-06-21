@@ -5,16 +5,11 @@
 "use strict";
 
 const { extend } = require("devtools/shared/extend");
-const {
-  AbstractCanvasGraph,
-  CanvasGraphUtils,
-} = require("devtools/client/shared/widgets/Graphs");
+const { AbstractCanvasGraph, CanvasGraphUtils } = require("devtools/client/shared/widgets/Graphs");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const HTML_NS = "http://www.w3.org/1999/xhtml";
-const L10N = new LocalizationHelper(
-  "devtools/client/locales/graphs.properties"
-);
+const L10N = new LocalizationHelper("devtools/client/locales/graphs.properties");
 
 // Line graph constants.
 
@@ -69,7 +64,7 @@ const GRAPH_REGION_STRIPES_COLOR = "rgba(237,38,85,0.2)";
  *  `max`: Boolean whether to show the max tooltip/gutter/line (default: true)
  *  `avg`: Boolean whether to show the avg tooltip/gutter/line (default: true)
  */
-this.LineGraphWidget = function(parent, options = {}, ...args) {
+this.LineGraphWidget = function (parent, options = {}, ...args) {
   const { metric, min, max, avg } = options;
 
   this._showMin = min !== false;
@@ -164,14 +159,14 @@ LineGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
    *        The duration of the recording in milliseconds.
    */
   async setDataFromTimestamps(timestamps, interval, duration) {
-    const {
-      plottedData,
-      plottedMinMaxSum,
-    } = await CanvasGraphUtils._performTaskInWorker("plotTimestampsGraph", {
-      timestamps,
-      interval,
-      duration,
-    });
+    const { plottedData, plottedMinMaxSum } = await CanvasGraphUtils._performTaskInWorker(
+      "plotTimestampsGraph",
+      {
+        timestamps,
+        interval,
+        duration,
+      }
+    );
 
     this._tempMinMaxSum = plottedMinMaxSum;
     this.setData(plottedData);
@@ -181,7 +176,7 @@ LineGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
    * Renders the graph's data source.
    * @see AbstractCanvasGraph.prototype.buildGraphImage
    */
-  buildGraphImage: function() {
+  buildGraphImage: function () {
     const { canvas, ctx } = this._getNamedCanvas("line-graph-data");
     const width = this._width;
     const height = this._height;
@@ -208,10 +203,8 @@ LineGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
     }
 
     const duration = this.dataDuration || lastTick;
-    const dataScaleX = (this.dataScaleX =
-      width / (duration - this.dataOffsetX));
-    const dataScaleY = (this.dataScaleY =
-      (height / maxValue) * this.dampenValuesFactor);
+    const dataScaleX = (this.dataScaleX = width / (duration - this.dataOffsetX));
+    const dataScaleY = (this.dataScaleY = (height / maxValue) * this.dampenValuesFactor);
 
     // Draw the background.
 
@@ -263,7 +256,7 @@ LineGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
    * @param number avgValue
    * @param number dataScaleY
    */
-  _drawOverlays: function(ctx, minValue, maxValue, avgValue, dataScaleY) {
+  _drawOverlays: function (ctx, minValue, maxValue, avgValue, dataScaleY) {
     const width = this._width;
     const height = this._height;
     const totalTicks = this._data.length;
@@ -306,15 +299,18 @@ LineGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
 
     // Update the tooltips text and gutter lines.
 
-    this._maxTooltip.querySelector(
-      "[text=value]"
-    ).textContent = L10N.numberWithDecimals(maxValue, 2);
-    this._avgTooltip.querySelector(
-      "[text=value]"
-    ).textContent = L10N.numberWithDecimals(avgValue, 2);
-    this._minTooltip.querySelector(
-      "[text=value]"
-    ).textContent = L10N.numberWithDecimals(minValue, 2);
+    this._maxTooltip.querySelector("[text=value]").textContent = L10N.numberWithDecimals(
+      maxValue,
+      2
+    );
+    this._avgTooltip.querySelector("[text=value]").textContent = L10N.numberWithDecimals(
+      avgValue,
+      2
+    );
+    this._minTooltip.querySelector("[text=value]").textContent = L10N.numberWithDecimals(
+      minValue,
+      2
+    );
 
     const bottom = height / this._pixelRatio;
     const maxPosY = CanvasGraphUtils.map(
@@ -366,15 +362,11 @@ LineGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
 
     const distanceMinMax = Math.abs(maxTooltipTop - minTooltipTop);
     this._maxTooltip.hidden =
-      this._showMax === false ||
-      !totalTicks ||
-      distanceMinMax < GRAPH_MIN_MAX_TOOLTIP_DISTANCE;
+      this._showMax === false || !totalTicks || distanceMinMax < GRAPH_MIN_MAX_TOOLTIP_DISTANCE;
     this._avgTooltip.hidden = this._showAvg === false || !totalTicks;
     this._minTooltip.hidden = this._showMin === false || !totalTicks;
     this._gutter.hidden =
-      (this._showMin === false &&
-        this._showAvg === false &&
-        this._showMax === false) ||
+      (this._showMin === false && this._showAvg === false && this._showMax === false) ||
       !totalTicks;
 
     this._maxGutterLine.hidden = this._showMax === false;
@@ -386,7 +378,7 @@ LineGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
    * Creates the gutter node when constructing this graph.
    * @return Node
    */
-  _createGutter: function() {
+  _createGutter: function () {
     const gutter = this._document.createElementNS(HTML_NS, "div");
     gutter.className = "line-graph-widget-gutter";
     gutter.setAttribute("hidden", true);
@@ -399,7 +391,7 @@ LineGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
    * Creates the gutter line nodes when constructing this graph.
    * @return Node
    */
-  _createGutterLine: function(type) {
+  _createGutterLine: function (type) {
     const line = this._document.createElementNS(HTML_NS, "div");
     line.className = "line-graph-widget-gutter-line";
     line.setAttribute("type", type);
@@ -412,7 +404,7 @@ LineGraphWidget.prototype = extend(AbstractCanvasGraph.prototype, {
    * Creates the tooltip nodes when constructing this graph.
    * @return Node
    */
-  _createTooltip: function(type, arrow, info, metric) {
+  _createTooltip: function (type, arrow, info, metric) {
     const tooltip = this._document.createElementNS(HTML_NS, "div");
     tooltip.className = "line-graph-widget-tooltip";
     tooltip.setAttribute("type", type);

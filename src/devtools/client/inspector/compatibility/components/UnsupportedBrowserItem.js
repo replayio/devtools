@@ -69,9 +69,7 @@ class UnsupportedBrowserItem extends PureComponent {
       {
         className:
           "compatibility-unsupported-browser-item" +
-          (icon.isMobileIconNeeded
-            ? " compatibility-unsupported-browser-item--mobile"
-            : ""),
+          (icon.isMobileIconNeeded ? " compatibility-unsupported-browser-item--mobile" : ""),
       },
       dom.img({
         className: "compatibility-unsupported-browser-item__icon",

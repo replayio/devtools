@@ -26,9 +26,7 @@ function summarize(symbol) {
   }
 
   const loc = formatLocation(symbol.location);
-  const params = symbol.parameterNames
-    ? `(${symbol.parameterNames.join(", ")})`
-    : "";
+  const params = symbol.parameterNames ? `(${symbol.parameterNames.join(", ")})` : "";
   const expression = symbol.expression || "";
   const klass = symbol.klass || "";
   const name = symbol.name == undefined ? "" : symbol.name;

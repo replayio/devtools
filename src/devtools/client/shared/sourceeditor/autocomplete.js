@@ -6,12 +6,7 @@
 
 const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
 
-loader.lazyRequireGetter(
-  this,
-  "KeyCodes",
-  "devtools/client/shared/keycodes",
-  true
-);
+loader.lazyRequireGetter(this, "KeyCodes", "devtools/client/shared/keycodes", true);
 loader.lazyRequireGetter(
   this,
   "CSSCompleter",
@@ -33,8 +28,7 @@ function initializeAutoCompletion(ctx, options = {}) {
   const { CodeMirror } = win;
 
   let completer = null;
-  const autocompleteKey =
-    "Ctrl-" + Editor.keyFor("autocompletion", { noaccel: true });
+  const autocompleteKey = "Ctrl-" + Editor.keyFor("autocompletion", { noaccel: true });
   if (ed.config.mode == Editor.modes.css) {
     completer = new CSSCompleter({
       walker: options.walker,
@@ -71,7 +65,6 @@ function initializeAutoCompletion(ctx, options = {}) {
 
   const cycle = reverse => {
     if (popup && popup.isOpen) {
-      // eslint-disable-next-line mozilla/no-compare-against-boolean-literals
       cycleSuggestions(ed, reverse == true);
       return null;
     }
@@ -138,11 +131,7 @@ function destroyAutoCompletion(ctx) {
 function autoComplete({ ed, cm }) {
   const autocompleteOpts = autocompleteMap.get(ed);
   const { completer, popup } = autocompleteOpts;
-  if (
-    !completer ||
-    autocompleteOpts.insertingSuggestion ||
-    autocompleteOpts.doNotAutocomplete
-  ) {
+  if (!completer || autocompleteOpts.insertingSuggestion || autocompleteOpts.doNotAutocomplete) {
     autocompleteOpts.insertingSuggestion = false;
     return;
   }
@@ -150,11 +139,7 @@ function autoComplete({ ed, cm }) {
   completer
     .complete(cm.getRange({ line: 0, ch: 0 }, cur), cur)
     .then(suggestions => {
-      if (
-        !suggestions ||
-        !suggestions.length ||
-        suggestions[0].preLabel == null
-      ) {
+      if (!suggestions || !suggestions.length || suggestions[0].preLabel == null) {
         autocompleteOpts.suggestionInsertedOnce = false;
         popup.once("popup-closed", () => {
           // This event is used in tests.
@@ -168,9 +153,7 @@ function autoComplete({ ed, cm }) {
       // character "b". Thus we need to calculate the width of the entered part
       // of the token ("backgr" here).
 
-      const cursorElement = cm.display.cursorDiv.querySelector(
-        ".CodeMirror-cursor"
-      );
+      const cursorElement = cm.display.cursorDiv.querySelector(".CodeMirror-cursor");
       const left = suggestions[0].preLabel.length * cm.defaultCharWidth();
       popup.hidePopup();
       popup.setItems(suggestions);
@@ -193,14 +176,8 @@ function insertPopupItem(ed, popupItem) {
   const { preLabel, text } = popupItem;
   const cur = ed.getCursor();
   const textBeforeCursor = ed.getText(cur.line).substring(0, cur.ch);
-  const backwardsTextBeforeCursor = textBeforeCursor
-    .split("")
-    .reverse()
-    .join("");
-  const backwardsPreLabel = preLabel
-    .split("")
-    .reverse()
-    .join("");
+  const backwardsTextBeforeCursor = textBeforeCursor.split("").reverse().join("");
+  const backwardsPreLabel = preLabel.split("").reverse().join("");
 
   // If there is additional text in the preLabel vs the line, then
   // just insert the entire autocomplete text.  An example:
@@ -269,10 +246,7 @@ function onEditorKeypress({ ed, Editor }, cm, event) {
     return;
   }
 
-  if (
-    (event.ctrlKey || event.metaKey) &&
-    event.keyCode == KeyCodes.DOM_VK_SPACE
-  ) {
+  if ((event.ctrlKey || event.metaKey) && event.keyCode == KeyCodes.DOM_VK_SPACE) {
     // When Ctrl/Cmd + Space is pressed, two simultaneous keypresses are emitted
     // first one for just the Ctrl/Cmd and second one for combo. The first one
     // leave the autocompleteOpts.doNotAutocomplete as true, so we have to make

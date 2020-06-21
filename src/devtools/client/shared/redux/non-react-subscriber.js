@@ -141,9 +141,7 @@ function combineBroadcastingReducers(reducers, emitChange) {
     return newReducers;
   }
 
-  return combineReducers(
-    Object.keys(reducers).reduce(wrapReduce, Object.create(null))
-  );
+  return combineReducers(Object.keys(reducers).reduce(wrapReduce, Object.create(null)));
 }
 
 module.exports = {

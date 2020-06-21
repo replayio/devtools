@@ -4,11 +4,7 @@
 
 // @flow
 
-import {
-  getBreakpoint,
-  getSource,
-  getSourceActorsForSource,
-} from "../../selectors";
+import { getBreakpoint, getSource, getSourceActorsForSource } from "../../selectors";
 import { sortSelectedLocations } from "../location";
 import assert from "../assert";
 import { features } from "../prefs";
@@ -63,10 +59,7 @@ export function makePendingLocationId(location: AnySourceLocation) {
   return `${sourceUrlString}:${line}:${columnString}`;
 }
 
-export function makeBreakpointLocation(
-  state: State,
-  location: SourceLocation
-): BreakpointLocation {
+export function makeBreakpointLocation(state: State, location: SourceLocation): BreakpointLocation {
   const source = getSource(state, location.sourceId);
   if (!source) {
     throw new Error("no source");
@@ -78,18 +71,12 @@ export function makeBreakpointLocation(
   if (source.url) {
     breakpointLocation.sourceUrl = source.url;
   } else {
-    breakpointLocation.sourceId = getSourceActorsForSource(
-      state,
-      source.id
-    )[0].id;
+    breakpointLocation.sourceId = getSourceActorsForSource(state, source.id)[0].id;
   }
   return breakpointLocation;
 }
 
-export function makeSourceActorLocation(
-  sourceActor: SourceActor,
-  location: SourceLocation
-) {
+export function makeSourceActorLocation(sourceActor: SourceActor, location: SourceLocation) {
   return {
     sourceActor,
     line: location.line,
@@ -126,17 +113,11 @@ export function assertPendingLocation(location: PendingLocation) {
   // sourceUrl is null when the source does not have a url
   assert(sourceUrl !== undefined, "location must have a source url");
   assert(location.hasOwnProperty("line"), "location must have a line");
-  assert(
-    location.hasOwnProperty("column") != null,
-    "location must have a column"
-  );
+  assert(location.hasOwnProperty("column") != null, "location must have a column");
 }
 
 // syncing
-export function breakpointAtLocation(
-  breakpoints: Breakpoint[],
-  { line, column }: SourceLocation
-) {
+export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }: SourceLocation) {
   return breakpoints.find(breakpoint => {
     const sameLine = breakpoint.location.line === line;
     if (!sameLine) {
@@ -158,11 +139,7 @@ export function breakpointExists(state: State, location: SourceLocation) {
   return currentBp && !currentBp.disabled;
 }
 
-export function createXHRBreakpoint(
-  path: string,
-  method: string,
-  overrides?: Object = {}
-) {
+export function createXHRBreakpoint(path: string, method: string, overrides?: Object = {}) {
   const properties = {
     path,
     method,
@@ -192,10 +169,7 @@ export function createPendingBreakpoint(bp: Breakpoint) {
   };
 }
 
-export function getSelectedText(
-  breakpoint: Breakpoint,
-  selectedSource: ?Source
-) {
+export function getSelectedText(breakpoint: Breakpoint, selectedSource: ?Source) {
   return breakpoint.text;
 }
 

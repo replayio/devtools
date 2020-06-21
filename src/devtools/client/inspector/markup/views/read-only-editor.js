@@ -37,7 +37,7 @@ function ReadOnlyEditor(container, node) {
 }
 
 ReadOnlyEditor.prototype = {
-  buildMarkup: function() {
+  buildMarkup: function () {
     const doc = this.markup.doc;
 
     this.elt = doc.createElement("span");
@@ -48,7 +48,7 @@ ReadOnlyEditor.prototype = {
     this.elt.appendChild(this.tag);
   },
 
-  destroy: function() {
+  destroy: function () {
     // We might be already destroyed.
     if (!this.elt) {
       return;
@@ -62,7 +62,7 @@ ReadOnlyEditor.prototype = {
   /**
    * Stub method for consistency with ElementEditor.
    */
-  getInfoAtNode: function() {
+  getInfoAtNode: function () {
     return null;
   },
 };

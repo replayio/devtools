@@ -77,9 +77,7 @@ async function enumSymbols(
   }
 }
 
-async function getPrototype(
-  objectFront: ObjectFront
-): ?Promise<{ prototype?: Object }> {
+async function getPrototype(objectFront: ObjectFront): ?Promise<{ prototype?: Object }> {
   if (typeof objectFront.getPrototype !== "function") {
     console.error("objectFront.getPrototype is not a function");
     return Promise.resolve({});

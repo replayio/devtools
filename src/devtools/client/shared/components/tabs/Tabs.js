@@ -5,10 +5,7 @@
 "use strict";
 
 define(function (require, exports, module) {
-  const {
-    Component,
-    createRef,
-  } = require("react");
+  const { Component, createRef } = require("react");
   const dom = require("react-dom-factories");
   const PropTypes = require("prop-types");
 
@@ -35,17 +32,12 @@ define(function (require, exports, module) {
   class Tabs extends Component {
     static get propTypes() {
       return {
-        className: PropTypes.oneOfType([
-          PropTypes.array,
-          PropTypes.string,
-          PropTypes.object,
-        ]),
+        className: PropTypes.oneOfType([PropTypes.array, PropTypes.string, PropTypes.object]),
         activeTab: PropTypes.number,
         onMount: PropTypes.func,
         onBeforeChange: PropTypes.func,
         onAfterChange: PropTypes.func,
-        children: PropTypes.oneOfType([PropTypes.array, PropTypes.element])
-          .isRequired,
+        children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]).isRequired,
         showAllTabsMenu: PropTypes.bool,
         onAllTabsMenuClick: PropTypes.func,
 
@@ -290,22 +282,14 @@ define(function (require, exports, module) {
         .map(tab => (typeof tab === "function" ? tab() : tab))
         .filter(tab => tab)
         .map((tab, index) => {
-          const {
-            id,
-            className: tabClassName,
-            title,
-            badge,
-            showBadge,
-          } = tab.props;
+          const { id, className: tabClassName, title, badge, showBadge } = tab.props;
 
           const ref = "tab-menu-" + index;
           const isTabSelected = this.state.activeTab === index;
 
-          const className = [
-            "tabs-menu-item",
-            tabClassName,
-            isTabSelected ? "is-active" : "",
-          ].join(" ");
+          const className = ["tabs-menu-item", tabClassName, isTabSelected ? "is-active" : ""].join(
+            " "
+          );
 
           // Set tabindex to -1 (except the selected tab) so, it's focusable,
           // but not reachable via sequential tab-key navigation.
@@ -343,9 +327,9 @@ define(function (require, exports, module) {
       // space for all tabs (and overflow happened).
       const allTabsMenu = this.state.overflow
         ? dom.button({
-          className: "all-tabs-menu",
-          onClick: this.props.onAllTabsMenuClick,
-        })
+            className: "all-tabs-menu",
+            onClick: this.props.onAllTabsMenuClick,
+          })
         : null;
 
       // Get the sidebar toggle button if a renderSidebarToggle function is provided.
@@ -384,8 +368,7 @@ define(function (require, exports, module) {
           }
 
           const id = tab.props.id;
-          const isCreated =
-            this.state.created[index] && this.state.created[index].isCreated;
+          const isCreated = this.state.created[index] && this.state.created[index].isCreated;
 
           // Use 'visibility:hidden' + 'height:0' for hiding content of non-selected
           // tab. It's faster than 'display:none' because it avoids triggering frame
@@ -439,17 +422,13 @@ define(function (require, exports, module) {
         id: PropTypes.string.isRequired,
         className: PropTypes.string,
         title: PropTypes.string.isRequired,
-        children: PropTypes.oneOfType([PropTypes.array, PropTypes.element])
-          .isRequired,
+        children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]).isRequired,
       };
     }
 
     render() {
       const { className } = this.props;
-      return dom.div(
-        { className: `tab-panel ${className || ""}` },
-        this.props.children
-      );
+      return dom.div({ className: `tab-panel ${className || ""}` }, this.props.children);
     }
   }
 

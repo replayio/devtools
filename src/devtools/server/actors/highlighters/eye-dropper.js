@@ -15,22 +15,14 @@ const {
 } = require("devtools/server/actors/highlighters/utils/markup");
 const Services = require("Services");
 const EventEmitter = require("devtools/shared/event-emitter");
-const {
-  rgbToHsl,
-  rgbToColorName,
-} = require("devtools/shared/css/color").colorUtils;
-const {
-  getCurrentZoom,
-  getFrameOffsets,
-} = require("devtools/shared/layout/utils");
+const { rgbToHsl, rgbToColorName } = require("devtools/shared/css/color").colorUtils;
+const { getCurrentZoom, getFrameOffsets } = require("devtools/shared/layout/utils");
 
 loader.lazyGetter(this, "clipboardHelper", () =>
   Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper)
 );
 loader.lazyGetter(this, "l10n", () =>
-  Services.strings.createBundle(
-    "chrome://devtools-shared/locale/eyedropper.properties"
-  )
+  Services.strings.createBundle("chrome://devtools-shared/locale/eyedropper.properties")
 );
 
 const ZOOM_LEVEL_PREF = "devtools.eyedropper.zoom";
@@ -242,9 +234,7 @@ EyeDropper.prototype = {
   get cellsWide() {
     // Canvas will render whole "pixels" (cells) only, and an even number at that. Round
     // up to the nearest even number of pixels.
-    let cellsWide = Math.ceil(
-      this.magnifiedArea.width / this.eyeDropperZoomLevel
-    );
+    let cellsWide = Math.ceil(this.magnifiedArea.width / this.eyeDropperZoomLevel);
     cellsWide += cellsWide % 2;
 
     return cellsWide;
@@ -304,9 +294,7 @@ EyeDropper.prototype = {
       "style",
       `background-color:${toColorString(rgb, "rgb")};`
     );
-    this.getElement("color-value").setTextContent(
-      toColorString(rgb, this.format)
-    );
+    this.getElement("color-value").setTextContent(toColorString(rgb, this.format));
   },
 
   /**
@@ -340,12 +328,7 @@ EyeDropper.prototype = {
     this.ctx.lineWidth = 1;
     this.ctx.lineJoin = "miter";
     this.ctx.strokeStyle = "rgba(0, 0, 0, 1)";
-    this.ctx.strokeRect(
-      pos - 1.5,
-      pos - 1.5,
-      this.cellSize + 2,
-      this.cellSize + 2
-    );
+    this.ctx.strokeRect(pos - 1.5, pos - 1.5, this.cellSize + 2, this.cellSize + 2);
 
     this.ctx.strokeStyle = "rgba(255, 255, 255, 1)";
     this.ctx.strokeRect(pos - 0.5, pos - 0.5, this.cellSize, this.cellSize);
@@ -484,10 +467,7 @@ EyeDropper.prototype = {
 
       this.draw();
 
-      this.moveTo(
-        this.magnifiedArea.x / this.pageZoom,
-        this.magnifiedArea.y / this.pageZoom
-      );
+      this.moveTo(this.magnifiedArea.x / this.pageZoom, this.magnifiedArea.y / this.pageZoom);
 
       e.preventDefault();
     }
@@ -524,10 +504,7 @@ exports.EyeDropper = EyeDropper;
  * @return {ImageData} The image data for the window.
  */
 function getWindowAsImageData(win) {
-  const canvas = win.document.createElementNS(
-    "http://www.w3.org/1999/xhtml",
-    "canvas"
-  );
+  const canvas = win.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
   const scale = getCurrentZoom(win);
   const width = win.innerWidth;
   const height = win.innerHeight;

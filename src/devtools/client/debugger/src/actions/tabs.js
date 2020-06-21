@@ -12,11 +12,7 @@
 import { removeDocument } from "../utils/editor";
 import { selectSource } from "./sources";
 
-import {
-  getSourceByURL,
-  getSourceTabs,
-  getNewSelectedSourceId,
-} from "../selectors";
+import { getSourceByURL, getSourceTabs, getNewSelectedSourceId } from "../selectors";
 
 import type { Action, ThunkArgs } from "./types";
 import type { Source, Context } from "../types";
@@ -84,9 +80,7 @@ export function closeTab(cx: Context, source: Source) {
  */
 export function closeTabs(cx: Context, urls: string[]) {
   return ({ dispatch, getState, client }: ThunkArgs) => {
-    const sources = urls
-      .map(url => getSourceByURL(getState(), url))
-      .filter(Boolean);
+    const sources = urls.map(url => getSourceByURL(getState(), url)).filter(Boolean);
 
     const tabs = getSourceTabs(getState());
     sources.map(source => removeDocument(source.id));

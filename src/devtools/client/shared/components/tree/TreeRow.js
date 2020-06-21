@@ -5,28 +5,17 @@
 
 // Make this available to both AMD and CJS environments
 define(function (require, exports, module) {
-  const {
-    Component,
-    createFactory,
-    createRef,
-  } = require("react");
+  const { Component, createFactory, createRef } = require("react");
   const PropTypes = require("prop-types");
   const dom = require("react-dom-factories");
   const { findDOMNode } = require("react-dom");
   const { tr } = dom;
 
   // Tree
-  const TreeCell = createFactory(
-    require("devtools/client/shared/components/tree/TreeCell")
-  );
-  const LabelCell = createFactory(
-    require("devtools/client/shared/components/tree/LabelCell")
-  );
+  const TreeCell = createFactory(require("devtools/client/shared/components/tree/TreeCell"));
+  const LabelCell = createFactory(require("devtools/client/shared/components/tree/LabelCell"));
 
-  const {
-    wrapMoveFocus,
-    getFocusableElements,
-  } = require("devtools/client/shared/focus");
+  const { wrapMoveFocus, getFocusableElements } = require("devtools/client/shared/focus");
 
   const UPDATE_ON_PROPS = [
     "name",
@@ -251,8 +240,7 @@ define(function (require, exports, module) {
       let renderCell = this.props.renderCell || RenderCell;
       let renderLabelCell = this.props.renderLabelCell || RenderLabelCell;
       if (decorator && decorator.renderLabelCell) {
-        renderLabelCell =
-          decorator.renderLabelCell(member.object) || renderLabelCell;
+        renderLabelCell = decorator.renderLabelCell(member.object) || renderLabelCell;
       }
 
       // Render a cell for every column.

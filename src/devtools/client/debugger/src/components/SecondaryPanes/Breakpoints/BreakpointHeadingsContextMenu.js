@@ -32,24 +32,12 @@ export default function showContextMenu(props: Props) {
 
   contextMenuEvent.preventDefault();
 
-  const enableInSourceLabel = L10N.getStr(
-    "breakpointHeadingsMenuItem.enableInSource.label"
-  );
-  const disableInSourceLabel = L10N.getStr(
-    "breakpointHeadingsMenuItem.disableInSource.label"
-  );
-  const removeInSourceLabel = L10N.getStr(
-    "breakpointHeadingsMenuItem.removeInSource.label"
-  );
-  const enableInSourceKey = L10N.getStr(
-    "breakpointHeadingsMenuItem.enableInSource.accesskey"
-  );
-  const disableInSourceKey = L10N.getStr(
-    "breakpointHeadingsMenuItem.disableInSource.accesskey"
-  );
-  const removeInSourceKey = L10N.getStr(
-    "breakpointHeadingsMenuItem.removeInSource.accesskey"
-  );
+  const enableInSourceLabel = L10N.getStr("breakpointHeadingsMenuItem.enableInSource.label");
+  const disableInSourceLabel = L10N.getStr("breakpointHeadingsMenuItem.disableInSource.label");
+  const removeInSourceLabel = L10N.getStr("breakpointHeadingsMenuItem.removeInSource.label");
+  const enableInSourceKey = L10N.getStr("breakpointHeadingsMenuItem.enableInSource.accesskey");
+  const disableInSourceKey = L10N.getStr("breakpointHeadingsMenuItem.disableInSource.accesskey");
+  const removeInSourceKey = L10N.getStr("breakpointHeadingsMenuItem.removeInSource.accesskey");
 
   const disableInSourceItem = {
     id: "node-menu-disable-in-source",
@@ -75,12 +63,8 @@ export default function showContextMenu(props: Props) {
     click: () => removeBreakpointsInSource(cx, source),
   };
 
-  const hideDisableInSourceItem = breakpointsForSource.every(
-    breakpoint => breakpoint.disabled
-  );
-  const hideEnableInSourceItem = breakpointsForSource.every(
-    breakpoint => !breakpoint.disabled
-  );
+  const hideDisableInSourceItem = breakpointsForSource.every(breakpoint => breakpoint.disabled);
+  const hideEnableInSourceItem = breakpointsForSource.every(breakpoint => !breakpoint.disabled);
 
   const items = [
     { item: disableInSourceItem, hidden: () => hideDisableInSourceItem },

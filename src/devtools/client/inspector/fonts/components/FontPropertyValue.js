@@ -4,11 +4,7 @@
 
 "use strict";
 
-const {
-  createElement,
-  Fragment,
-  PureComponent,
-} = require("react");
+const { createElement, Fragment, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -142,10 +138,7 @@ class FontPropertyValue extends PureComponent {
     if (isValid) {
       value = this.state.value;
     } else if (this.state.value !== null) {
-      value = Math.max(
-        this.props.min,
-        Math.min(this.state.value, this.props.max)
-      );
+      value = Math.max(this.props.min, Math.min(this.state.value, this.props.max));
     } else {
       value = this.state.initialValue;
     }
@@ -174,9 +167,7 @@ class FontPropertyValue extends PureComponent {
     // numbers only if the min value is negative. Otherwise, expect positive numbers.
     // Whitespace and non-digit characters are invalid (aside from a single dot).
     const regex =
-      this.props.min && this.props.min < 0
-        ? /^-?[0-9]+(.[0-9]+)?$/
-        : /^[0-9]+(.[0-9]+)?$/;
+      this.props.min && this.props.min < 0 ? /^-?[0-9]+(.[0-9]+)?$/ : /^[0-9]+(.[0-9]+)?$/;
     let string = e.target.value.trim();
 
     if (e.target.validity.badInput) {
@@ -225,12 +216,7 @@ class FontPropertyValue extends PureComponent {
   }
 
   onUnitChange(e) {
-    this.props.onChange(
-      this.props.name,
-      this.props.value,
-      this.props.unit,
-      e.target.value
-    );
+    this.props.onChange(this.props.name, this.props.value, this.props.unit, e.target.value);
     // Reset internal state value and wait for converted value from props.
     this.setState(prevState => {
       return {
@@ -334,12 +320,12 @@ class FontPropertyValue extends PureComponent {
     // Show the `name` prop value as an additional label if the `nameLabel` prop is true.
     const detailEl = nameLabel
       ? dom.span(
-        {
-          className: "font-control-label-detail",
-          id: `detail-${name}`,
-        },
-        this.getPropLabel("name")
-      )
+          {
+            className: "font-control-label-detail",
+            id: `detail-${name}`,
+          },
+          this.getPropLabel("name")
+        )
       : null;
 
     return createElement(Fragment, null, labelEl, detailEl);
@@ -359,8 +345,7 @@ class FontPropertyValue extends PureComponent {
       return null;
     }
 
-    const propsValue =
-      this.props.value !== null ? this.props.value : this.props.defaultValue;
+    const propsValue = this.props.value !== null ? this.props.value : this.props.defaultValue;
 
     const defaults = {
       min: this.props.min,

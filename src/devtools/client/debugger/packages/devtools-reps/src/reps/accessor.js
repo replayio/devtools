@@ -3,10 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // Dependencies
-const {
-  button,
-  span,
-} = require("react-dom-factories");
+const { button, span } = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { wrapRender } = require("./rep-utils");
 const { MODE } = require("./constants");
@@ -58,10 +55,7 @@ function Accessor(props) {
     accessors.push("Setter");
   }
 
-  return span(
-    { className: "objectBox objectBox-accessor objectTitle" },
-    accessors.join(" & ")
-  );
+  return span({ className: "objectBox objectBox-accessor objectTitle" }, accessors.join(" & "));
 }
 
 function hasGetter(object) {
@@ -72,7 +66,7 @@ function hasSetter(object) {
   return object && object.set && object.set.type !== "undefined";
 }
 
-function supportsObject(object, ) {
+function supportsObject(object) {
   /*
   if (noGrip !== true && (hasGetter(object) || hasSetter(object))) {
     return true;

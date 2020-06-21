@@ -9,7 +9,7 @@ function setB(newB) {
   b = newB;
 }
 
-const plusAB = (function(x, y) {
+const plusAB = (function (x, y) {
   const obj = { x, y };
   function insideClosure(alpha, beta) {
     return alpha + beta + obj.x + obj.y;
@@ -25,7 +25,7 @@ function withMultipleScopes() {
     return inner;
   }
 
-  const fromIIFE = (function(toIIFE) {
+  const fromIIFE = (function (toIIFE) {
     return innerScope() + toIIFE;
   })(1);
 

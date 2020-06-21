@@ -13,28 +13,17 @@ import {
   type ResourceIdentity,
 } from "./core";
 
-export type ResourceMap<R: ResourceBound, Mapped> = (
-  R,
-  ResourceIdentity
-) => Mapped;
+export type ResourceMap<R: ResourceBound, Mapped> = (R, ResourceIdentity) => Mapped;
 
-export function hasResource<R: ResourceBound>(
-  state: ResourceState<R>,
-  id: Id<R>
-): boolean %checks {
+export function hasResource<R: ResourceBound>(state: ResourceState<R>, id: Id<R>): boolean %checks {
   return !!getValidatedResource(state, id);
 }
 
-export function getResourceIds<R: ResourceBound>(
-  state: ResourceState<R>
-): Array<Id<R>> {
+export function getResourceIds<R: ResourceBound>(state: ResourceState<R>): Array<Id<R>> {
   return Object.keys(getResourceValues(state));
 }
 
-export function getResource<R: ResourceBound>(
-  state: ResourceState<R>,
-  id: Id<R>
-): R {
+export function getResource<R: ResourceBound>(state: ResourceState<R>, id: Id<R>): R {
   const validatedState = getValidatedResource(state, id);
   if (!validatedState) {
     throw new Error(`Resource ${id} does not exist`);

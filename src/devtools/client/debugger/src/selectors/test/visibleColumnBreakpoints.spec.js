@@ -3,17 +3,9 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // @flow
-import {
-  actions,
-  selectors,
-  createStore,
-  makeSource,
-} from "../../utils/test-head";
+import { actions, selectors, createStore, makeSource } from "../../utils/test-head";
 
-import {
-  getColumnBreakpoints,
-  getFirstBreakpointPosition,
-} from "../visibleColumnBreakpoints";
+import { getColumnBreakpoints, getFirstBreakpointPosition } from "../visibleColumnBreakpoints";
 import {
   makeMockSource,
   makeMockSourceWithContent,
@@ -55,12 +47,7 @@ describe("visible column breakpoints", () => {
     const pausePoints = [pp(1, 1), pp(1, 5), pp(3, 1)];
     const breakpoints = [bp(1, 1), bp(4, 0), bp(4, 3)];
 
-    const columnBps = getColumnBreakpoints(
-      pausePoints,
-      breakpoints,
-      viewport,
-      source
-    );
+    const columnBps = getColumnBreakpoints(pausePoints, breakpoints, viewport, source);
     expect(columnBps).toMatchSnapshot();
   });
 
@@ -71,12 +58,7 @@ describe("visible column breakpoints", () => {
     };
     const pausePoints = [pp(1, 1), pp(1, 3), pp(2, 1)];
     const breakpoints = [bp(1, 1)];
-    const columnBps = getColumnBreakpoints(
-      pausePoints,
-      breakpoints,
-      viewport,
-      source
-    );
+    const columnBps = getColumnBreakpoints(pausePoints, breakpoints, viewport, source);
     expect(columnBps).toMatchSnapshot();
   });
 
@@ -88,12 +70,7 @@ describe("visible column breakpoints", () => {
     const pausePoints = [pp(1, 1), pp(1, 3), pp(20, 1)];
     const breakpoints = [bp(1, 1)];
 
-    const columnBps = getColumnBreakpoints(
-      pausePoints,
-      breakpoints,
-      viewport,
-      source
-    );
+    const columnBps = getColumnBreakpoints(pausePoints, breakpoints, viewport, source);
     expect(columnBps).toMatchSnapshot();
   });
 
@@ -105,12 +82,7 @@ describe("visible column breakpoints", () => {
     const pausePoints = [pp(1, 1), pp(1, 15), pp(20, 1)];
     const breakpoints = [bp(1, 1), bp(1, 15)];
 
-    const columnBps = getColumnBreakpoints(
-      pausePoints,
-      breakpoints,
-      viewport,
-      source
-    );
+    const columnBps = getColumnBreakpoints(pausePoints, breakpoints, viewport, source);
     expect(columnBps).toMatchSnapshot();
   });
 });

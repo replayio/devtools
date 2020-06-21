@@ -1,2 +1,2 @@
 var { prop: one } = {};
-var [ two ] = [];
+var [two] = [];

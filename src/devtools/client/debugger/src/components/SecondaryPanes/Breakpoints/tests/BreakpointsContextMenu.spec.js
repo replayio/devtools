@@ -10,11 +10,7 @@ import { shallow } from "enzyme";
 import BreakpointsContextMenu from "../BreakpointsContextMenu";
 import { buildMenu } from "devtools-contextmenu";
 
-import {
-  makeMockBreakpoint,
-  makeMockSource,
-  mockcx,
-} from "../../../../utils/test-mockup";
+import { makeMockBreakpoint, makeMockSource, mockcx } from "../../../../utils/test-mockup";
 
 jest.mock("devtools-contextmenu");
 
@@ -84,25 +80,19 @@ describe("BreakpointsContextMenu", () => {
     it("'remove others' calls removeBreakpoints with proper arguments", () => {
       const { props } = render();
       const menuItems = buildMenu.mock.calls[0][0];
-      const deleteOthers = menuItems.find(
-        item => item.item.id === "node-menu-delete-other"
-      );
+      const deleteOthers = menuItems.find(item => item.item.id === "node-menu-delete-other");
       deleteOthers.item.click();
 
       expect(props.removeBreakpoints).toHaveBeenCalled();
 
       const otherBreakpoints = [props.breakpoints[1], props.breakpoints[2]];
-      expect(props.removeBreakpoints.mock.calls[0][1]).toEqual(
-        otherBreakpoints
-      );
+      expect(props.removeBreakpoints.mock.calls[0][1]).toEqual(otherBreakpoints);
     });
 
     it("'enable others' calls toggleBreakpoints with proper arguments", () => {
       const { props } = render(true);
       const menuItems = buildMenu.mock.calls[0][0];
-      const enableOthers = menuItems.find(
-        item => item.item.id === "node-menu-enable-others"
-      );
+      const enableOthers = menuItems.find(item => item.item.id === "node-menu-enable-others");
       enableOthers.item.click();
 
       expect(props.toggleBreakpoints).toHaveBeenCalled();
@@ -110,26 +100,20 @@ describe("BreakpointsContextMenu", () => {
       expect(props.toggleBreakpoints.mock.calls[0][1]).toBe(false);
 
       const otherBreakpoints = [props.breakpoints[1], props.breakpoints[2]];
-      expect(props.toggleBreakpoints.mock.calls[0][2]).toEqual(
-        otherBreakpoints
-      );
+      expect(props.toggleBreakpoints.mock.calls[0][2]).toEqual(otherBreakpoints);
     });
 
     it("'disable others' calls toggleBreakpoints with proper arguments", () => {
       const { props } = render();
       const menuItems = buildMenu.mock.calls[0][0];
-      const disableOthers = menuItems.find(
-        item => item.item.id === "node-menu-disable-others"
-      );
+      const disableOthers = menuItems.find(item => item.item.id === "node-menu-disable-others");
       disableOthers.item.click();
 
       expect(props.toggleBreakpoints).toHaveBeenCalled();
       expect(props.toggleBreakpoints.mock.calls[0][1]).toBe(true);
 
       const otherBreakpoints = [props.breakpoints[1], props.breakpoints[2]];
-      expect(props.toggleBreakpoints.mock.calls[0][2]).toEqual(
-        otherBreakpoints
-      );
+      expect(props.toggleBreakpoints.mock.calls[0][2]).toEqual(otherBreakpoints);
     });
   });
 });

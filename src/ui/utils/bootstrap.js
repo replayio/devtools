@@ -29,8 +29,7 @@ export function setupConsoleHelper({ store, selectors, actions }) {
 
 function bindSelectors(obj) {
   return Object.keys(obj.selectors).reduce((bound, selector) => {
-    bound[selector] = (a, b, c) =>
-      obj.selectors[selector](obj.store.getState(), a, b, c);
+    bound[selector] = (a, b, c) => obj.selectors[selector](obj.store.getState(), a, b, c);
     return bound;
   }, {});
 }

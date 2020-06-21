@@ -5,29 +5,18 @@
 "use strict";
 
 //const { getColor } = require("devtools/client/shared/theme");
-const {
-  createFactory,
-  createElement,
-} = require("react");
+const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 const { debounce } = require("devtools/shared/debounce");
 //const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
 
-const FontsApp = createFactory(
-  require("devtools/client/inspector/fonts/components/FontsApp")
-);
+const FontsApp = createFactory(require("devtools/client/inspector/fonts/components/FontsApp"));
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const INSPECTOR_L10N = new LocalizationHelper(
-  "devtools/client/locales/inspector.properties"
-);
+const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
-const {
-  parseFontVariationAxes,
-} = require("devtools/client/inspector/fonts/utils/font-utils");
-const {
-  updateFonts,
-} = require("devtools/client/inspector/fonts/actions/fonts");
+const { parseFontVariationAxes } = require("devtools/client/inspector/fonts/utils/font-utils");
+const { updateFonts } = require("devtools/client/inspector/fonts/actions/fonts");
 const {
   applyInstance,
   resetFontEditor,
@@ -36,9 +25,7 @@ const {
   updateFontEditor,
   updateFontProperty,
 } = require("devtools/client/inspector/fonts/actions/font-editor");
-const {
-  updatePreviewText,
-} = require("devtools/client/inspector/fonts/actions/font-options");
+const { updatePreviewText } = require("devtools/client/inspector/fonts/actions/font-options");
 
 const FONT_PROPERTIES = [
   "font-family",
@@ -88,17 +75,11 @@ class FontInspector {
     this.onNewNode = this.onNewNode.bind(this);
     this.onPreviewTextChange = debounce(this.onPreviewTextChange, 100, this);
     this.onPropertyChange = this.onPropertyChange.bind(this);
-    this.onRulePropertyUpdated = debounce(
-      this.onRulePropertyUpdated,
-      300,
-      this
-    );
+    this.onRulePropertyUpdated = debounce(this.onRulePropertyUpdated, 300, this);
     this.onToggleFontHighlight = this.onToggleFontHighlight.bind(this);
     this.onThemeChanged = this.onThemeChanged.bind(this);
     this.update = this.update.bind(this);
-    this.updateFontVariationSettings = this.updateFontVariationSettings.bind(
-      this
-    );
+    this.updateFontVariationSettings = this.updateFontVariationSettings.bind(this);
 
     this.init();
   }
@@ -188,9 +169,7 @@ class FontInspector {
    */
   async convertUnits(property, value, fromUnit, toUnit) {
     if (value !== parseFloat(value)) {
-      throw TypeError(
-        `Invalid value for conversion. Expected Number, got ${value}`
-      );
+      throw TypeError(`Invalid value for conversion. Expected Number, got ${value}`);
     }
 
     const shouldReturn = () => {
@@ -199,8 +178,7 @@ class FontInspector {
       // - property is `line-height`
       // - `fromUnit` is `em` and `toUnit` is unitless
       const conversionNotRequired = fromUnit === toUnit || value === 0;
-      const forLineHeight =
-        property === "line-height" && fromUnit === "" && toUnit === "em";
+      const forLineHeight = property === "line-height" && fromUnit === "" && toUnit === "em";
       const isEmToUnitlessConversion = fromUnit === "em" && toUnit === "";
       return conversionNotRequired || forLineHeight || isEmToUnitlessConversion;
     };
@@ -232,15 +210,11 @@ class FontInspector {
       pc: () => (fromPx ? value * 0.0625 : value / 0.0625),
       "%": async () => {
         const fontSize = await this.getReferenceFontSize(property, unit);
-        return fromPx
-          ? (value * 100) / parseFloat(fontSize)
-          : (value / 100) * parseFloat(fontSize);
+        return fromPx ? (value * 100) / parseFloat(fontSize) : (value / 100) * parseFloat(fontSize);
       },
       rem: async () => {
         const fontSize = await this.getReferenceFontSize(property, unit);
-        return fromPx
-          ? value / parseFloat(fontSize)
-          : value * parseFloat(fontSize);
+        return fromPx ? value / parseFloat(fontSize) : value * parseFloat(fontSize);
       },
       vh: async () => {
         const { height } = await this.getReferenceBox(property, unit);
@@ -272,9 +246,7 @@ class FontInspector {
     // Special handling for unitless line-height.
     if (unit === "em" || (unit === "" && property === "line-height")) {
       const fontSize = await this.getReferenceFontSize(property, unit);
-      out = fromPx
-        ? value / parseFloat(fontSize)
-        : value * parseFloat(fontSize);
+      out = fromPx ? value / parseFloat(fontSize) : value * parseFloat(fontSize);
     }
 
     // Catch any NaN or Infinity as result of dividing by zero in any
@@ -363,9 +335,7 @@ class FontInspector {
       return [];
     }
 
-    const fonts = await this.pageStyle
-      .getUsedFontFaces(node, options)
-      .catch(console.error);
+    const fonts = await this.pageStyle.getUsedFontFaces(node, options).catch(console.error);
     if (!fonts) {
       return [];
     }
@@ -402,9 +372,7 @@ class FontInspector {
    */
   async getReferenceBox(property, unit) {
     const box = { width: 0, height: 0 };
-    const node = await this.getReferenceNode(property, unit).catch(
-      console.error
-    );
+    const node = await this.getReferenceNode(property, unit).catch(console.error);
 
     if (!node) {
       return box;
@@ -423,9 +391,7 @@ class FontInspector {
         break;
 
       case "%":
-        const style = await this.pageStyle
-          .getComputed(node)
-          .catch(console.error);
+        const style = await this.pageStyle.getComputed(node).catch(console.error);
         if (style) {
           box.width = style.width.value;
           box.height = style.height.value;
@@ -449,9 +415,7 @@ class FontInspector {
    *         was an error getting that value.
    */
   async getReferenceFontSize(property, unit) {
-    const node = await this.getReferenceNode(property, unit).catch(
-      console.error
-    );
+    const node = await this.getReferenceNode(property, unit).catch(console.error);
     if (!node) {
       return null;
     }
@@ -655,9 +619,7 @@ class FontInspector {
       return;
     }
 
-    const nbOfAxes = editedFont.variationAxes
-      ? editedFont.variationAxes.length
-      : 0;
+    const nbOfAxes = editedFont.variationAxes ? editedFont.variationAxes.length : 0;
     telemetry
       .getHistogramById(HISTOGRAM_FONT_TYPE_DISPLAYED)
       .add(!nbOfAxes ? "nonvariable" : "variable");
@@ -859,16 +821,14 @@ class FontInspector {
         // When connecting to an older server or when debugging a XUL document, the
         // FontsHighlighter won't be available. Silently fail here and prevent any future
         // calls to the function.
-        this.onToggleFontHighlight = () => { };
+        this.onToggleFontHighlight = () => {};
         return;
       }
     }
 
     try {
       if (show) {
-        const node = isForCurrentElement
-          ? this.node
-          : this.node.walkerFront.rootNode;
+        const node = isForCurrentElement ? this.node : this.node.walkerFront.rootNode;
 
         await this.fontsHighlighter.show(node, {
           CSSFamilyName: font.CSSFamilyName,
@@ -950,9 +910,7 @@ class FontInspector {
     }
 
     // Select the node's inline style as the rule where to write property value changes.
-    this.selectedRule = this.ruleView.rules.find(
-      rule => rule.domRule.type === ELEMENT_STYLE
-    );
+    this.selectedRule = this.ruleView.rules.find(rule => rule.domRule.type === ELEMENT_STYLE);
 
     const properties = await this.getFontProperties();
     // Assign writer methods to each axis defined in font-variation-settings.
@@ -1056,9 +1014,7 @@ class FontInspector {
     // Prevent reacting to changes we caused.
     this.ruleView.off("property-value-updated", this.onRulePropertyUpdated);
     // Live preview font property changes on the page.
-    textProperty.rule
-      .previewPropertyValue(textProperty, value, "")
-      .catch(console.error);
+    textProperty.rule.previewPropertyValue(textProperty, value, "").catch(console.error);
 
     // Sync Rule view with changes reflected on the page (debounced).
     this.syncChanges(name, value);

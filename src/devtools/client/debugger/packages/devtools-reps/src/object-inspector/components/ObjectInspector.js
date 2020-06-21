@@ -132,9 +132,7 @@ class ObjectInspector extends Component<Props> {
       loadedProperties !== nextProps.loadedProperties ||
       loadedProperties.size !== nextProps.loadedProperties.size ||
       (expandedPaths.size !== nextProps.expandedPaths.size &&
-        [...nextProps.expandedPaths].every(path =>
-          nextProps.loadedProperties.has(path)
-        )) ||
+        [...nextProps.expandedPaths].every(path => nextProps.loadedProperties.has(path))) ||
       (expandedPaths.size === nextProps.expandedPaths.size &&
         [...nextProps.expandedPaths].some(key => !expandedPaths.has(key))) ||
       this.focusedItem !== nextProps.focusedItem ||
@@ -188,13 +186,7 @@ class ObjectInspector extends Component<Props> {
       return;
     }
 
-    const {
-      nodeExpand,
-      nodeCollapse,
-      recordTelemetryEvent,
-      setExpanded,
-      roots,
-    } = this.props;
+    const { nodeExpand, nodeCollapse, recordTelemetryEvent, setExpanded, roots } = this.props;
 
     if (expand === true) {
       nodeExpand(item);
@@ -295,10 +287,7 @@ function mapStateToProps(state, props) {
   };
 }
 
-const OI = connect(
-  mapStateToProps,
-  actions
-)(ObjectInspector);
+const OI = connect(mapStateToProps, actions)(ObjectInspector);
 
 export default (props: Props) => {
   const { roots } = props;

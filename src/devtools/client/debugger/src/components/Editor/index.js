@@ -18,10 +18,7 @@ import { features } from "../../utils/prefs";
 import { getIndentation } from "../../utils/indentation";
 
 import { showMenu } from "devtools-contextmenu";
-import {
-  createBreakpointItems,
-  breakpointItemActions,
-} from "./menus/breakpoints";
+import { createBreakpointItems, breakpointItemActions } from "./menus/breakpoints";
 
 import { continueToHereItem, editorItemActions } from "./menus/editor";
 
@@ -200,9 +197,7 @@ class Editor extends PureComponent<Props, State> {
       );
       codeMirror.on("contextmenu", (cm, event) => this.openMenu(event));
     } else {
-      codeMirrorWrapper.addEventListener("contextmenu", event =>
-        this.openMenu(event)
-      );
+      codeMirrorWrapper.addEventListener("contextmenu", event => this.openMenu(event));
     }
 
     codeMirror.on("scroll", this.onEditorScroll);
@@ -217,14 +212,8 @@ class Editor extends PureComponent<Props, State> {
     const { shortcuts } = this.context;
 
     shortcuts.on(L10N.getStr("toggleBreakpoint.key"), this.onToggleBreakpoint);
-    shortcuts.on(
-      L10N.getStr("toggleCondPanel.breakpoint.key"),
-      this.onToggleConditionalPanel
-    );
-    shortcuts.on(
-      L10N.getStr("toggleCondPanel.logPoint.key"),
-      this.onToggleConditionalPanel
-    );
+    shortcuts.on(L10N.getStr("toggleCondPanel.breakpoint.key"), this.onToggleConditionalPanel);
+    shortcuts.on(L10N.getStr("toggleCondPanel.logPoint.key"), this.onToggleConditionalPanel);
     shortcuts.on(L10N.getStr("sourceTabs.closeTab.key"), this.onClosePress);
     shortcuts.on("Esc", this.onEscape);
   }
@@ -385,11 +374,7 @@ class Editor extends PureComponent<Props, State> {
     const location = { line, column: undefined, sourceId };
 
     if (target.classList.contains("CodeMirror-linenumber")) {
-      const lineText = getLineText(
-        sourceId,
-        selectedSource.content,
-        line
-      ).trim();
+      const lineText = getLineText(sourceId, selectedSource.content, line).trim();
 
       return showMenu(event, [
         ...createBreakpointItems(cx, location, breakpointActions, lineText),
@@ -409,12 +394,7 @@ class Editor extends PureComponent<Props, State> {
     this.setState({ contextMenu: null });
   };
 
-  onGutterClick = (
-    cm: Object,
-    line: number,
-    gutter: string,
-    ev: MouseEvent
-  ) => {
+  onGutterClick = (cm: Object, line: number, gutter: string, ev: MouseEvent) => {
     const {
       cx,
       selectedSource,
@@ -456,19 +436,10 @@ class Editor extends PureComponent<Props, State> {
   };
 
   onClick(e: MouseEvent) {
-    const {
-      cx,
-      selectedSource,
-      updateCursorPosition,
-      jumpToMappedLocation,
-    } = this.props;
+    const { cx, selectedSource, updateCursorPosition, jumpToMappedLocation } = this.props;
 
     if (selectedSource) {
-      const sourceLocation = getSourceLocationFromMouseEvent(
-        this.state.editor,
-        selectedSource,
-        e
-      );
+      const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, e);
 
       if (e.metaKey && e.altKey) {
         jumpToMappedLocation(cx, sourceLocation);
@@ -491,8 +462,7 @@ class Editor extends PureComponent<Props, State> {
     }
 
     const isFirstLoad =
-      (!selectedSource || !selectedSource.content) &&
-      nextProps.selectedSource.content;
+      (!selectedSource || !selectedSource.content) && nextProps.selectedSource.content;
     const locationChanged = selectedLocation !== nextProps.selectedLocation;
     const symbolsChanged = nextProps.symbols != this.props.symbols;
 
@@ -553,12 +523,7 @@ class Editor extends PureComponent<Props, State> {
       return this.showErrorMessage(value);
     }
 
-    return showSourceText(
-      editor,
-      selectedSource,
-      selectedSource.content.value,
-      symbols
-    );
+    return showSourceText(editor, selectedSource, selectedSource.content.value, symbols);
   }
 
   clearEditor() {
@@ -655,10 +620,7 @@ class Editor extends PureComponent<Props, State> {
         })}
         ref={c => (this.$editorWrapper = c)}
       >
-        <div
-          className="editor-mount devtools-monospace"
-          style={this.getInlineEditorStyles()}
-        />
+        <div className="editor-mount devtools-monospace" style={this.getInlineEditorStyles()} />
         {this.renderSearchBar()}
         {this.renderItems()}
       </div>
@@ -709,7 +671,4 @@ const mapDispatchToProps = dispatch => ({
   editorActions: editorItemActions(dispatch),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  mapDispatchToProps
-)(Editor);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, mapDispatchToProps)(Editor);

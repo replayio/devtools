@@ -38,10 +38,7 @@ type State = {
   scrubbingProgress: number, // [0, 100]
 };
 
-function isSameLocation(
-  frameLocation: SourceLocation,
-  selectedLocation: ?SourceLocation
-) {
+function isSameLocation(frameLocation: SourceLocation, selectedLocation: ?SourceLocation) {
   if (!frameLocation || !selectedLocation) {
     return;
   }
@@ -106,9 +103,7 @@ class FrameTimeline extends Component<Props, State> {
       return;
     }
 
-    const displayIndex = Math.floor(
-      (progress / 100) * framePositions.positions.length
-    );
+    const displayIndex = Math.floor((progress / 100) * framePositions.positions.length);
 
     return framePositions.positions[displayIndex];
   }
@@ -149,12 +144,7 @@ class FrameTimeline extends Component<Props, State> {
 
   getVisibleProgress() {
     const { scrubbing, scrubbingProgress } = this.state;
-    const {
-      framePositions,
-      selectedLocation,
-      selectedFrame,
-      executionPoint,
-    } = this.props;
+    const { framePositions, selectedLocation, selectedFrame, executionPoint } = this.props;
 
     if (!framePositions) {
       return 0;
@@ -176,9 +166,7 @@ class FrameTimeline extends Component<Props, State> {
   }
 
   renderMarker() {
-    return (
-      <div className="frame-timeline-marker" ref={r => (this._marker = r)} />
-    );
+    return <div className="frame-timeline-marker" ref={r => (this._marker = r)} />;
   }
 
   renderProgress() {

@@ -14,11 +14,7 @@ import { editorItemActions } from "./menus/editor";
 
 import type { BreakpointItemActions } from "./menus/breakpoints";
 import type { EditorItemActions } from "./menus/editor";
-import type {
-  Breakpoint as BreakpointType,
-  Source,
-  ThreadContext,
-} from "../../types";
+import type { Breakpoint as BreakpointType, Source, ThreadContext } from "../../types";
 
 type OwnProps = {|
   cx: ThreadContext,

@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createRef,
-  PureComponent,
-} = require("react");
+const { createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { editableItem } = require("devtools/client/shared/inplace-editor");
@@ -110,34 +107,24 @@ class Declaration extends PureComponent {
           display: "block",
         },
       },
-      this.props.declaration.computedProperties.map(
-        ({ name, value, isOverridden }) => {
-          return dom.li(
-            {
-              key: `${name}${value}`,
-              className:
-                "ruleview-computed" +
-                (isOverridden ? " ruleview-overridden" : ""),
-            },
-            dom.span(
-              { className: "ruleview-namecontainer" },
-              dom.span(
-                { className: "ruleview-propertyname theme-fg-color3" },
-                name
-              ),
-              ": "
-            ),
-            dom.span(
-              { className: "ruleview-propertyvaluecontainer" },
-              dom.span(
-                { className: "ruleview-propertyvalue theme-fg-color1" },
-                value
-              ),
-              ";"
-            )
-          );
-        }
-      )
+      this.props.declaration.computedProperties.map(({ name, value, isOverridden }) => {
+        return dom.li(
+          {
+            key: `${name}${value}`,
+            className: "ruleview-computed" + (isOverridden ? " ruleview-overridden" : ""),
+          },
+          dom.span(
+            { className: "ruleview-namecontainer" },
+            dom.span({ className: "ruleview-propertyname theme-fg-color3" }, name),
+            ": "
+          ),
+          dom.span(
+            { className: "ruleview-propertyvaluecontainer" },
+            dom.span({ className: "ruleview-propertyvalue theme-fg-color1" }, value),
+            ";"
+          )
+        );
+      })
     );
   }
 
@@ -181,18 +168,12 @@ class Declaration extends PureComponent {
           },
           dom.span(
             { className: "ruleview-namecontainer" },
-            dom.span(
-              { className: "ruleview-propertyname theme-fg-color3" },
-              name
-            ),
+            dom.span({ className: "ruleview-propertyname theme-fg-color3" }, name),
             ": "
           ),
           dom.span(
             { className: "ruleview-propertyvaluecontainer" },
-            dom.span(
-              { className: "ruleview-propertyvalue theme-fg-color1" },
-              value
-            ),
+            dom.span({ className: "ruleview-propertyvalue theme-fg-color1" }, value),
             ";"
           )
         );
@@ -201,10 +182,7 @@ class Declaration extends PureComponent {
   }
 
   renderWarning() {
-    if (
-      !this.props.declaration.isDeclarationValid ||
-      !this.props.declaration.isOverridden
-    ) {
+    if (!this.props.declaration.isDeclarationValid || !this.props.declaration.isOverridden) {
       return null;
     }
 
@@ -267,8 +245,7 @@ class Declaration extends PureComponent {
         ),
         dom.span({
           className:
-            "ruleview-expander theme-twisty" +
-            (this.state.isComputedListExpanded ? " open" : ""),
+            "ruleview-expander theme-twisty" + (this.state.isComputedListExpanded ? " open" : ""),
           onClick: this.onComputedExpanderClick,
           style: { display: this.hasComputed ? "inline-block" : "none" },
         }),

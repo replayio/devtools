@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'devtools-splitter' {
+declare module "devtools-splitter" {
   declare module.exports: any;
 }
 
@@ -22,31 +22,31 @@ declare module 'devtools-splitter' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'devtools-splitter/src/Draggable' {
+declare module "devtools-splitter/src/Draggable" {
   declare module.exports: any;
 }
 
-declare module 'devtools-splitter/src/SplitBox' {
+declare module "devtools-splitter/src/SplitBox" {
   declare module.exports: any;
 }
 
-declare module 'devtools-splitter/stories/index' {
+declare module "devtools-splitter/stories/index" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'devtools-splitter/index' {
-  declare module.exports: $Exports<'devtools-splitter'>;
+declare module "devtools-splitter/index" {
+  declare module.exports: $Exports<"devtools-splitter">;
 }
-declare module 'devtools-splitter/index.js' {
-  declare module.exports: $Exports<'devtools-splitter'>;
+declare module "devtools-splitter/index.js" {
+  declare module.exports: $Exports<"devtools-splitter">;
 }
-declare module 'devtools-splitter/src/Draggable.js' {
-  declare module.exports: $Exports<'devtools-splitter/src/Draggable'>;
+declare module "devtools-splitter/src/Draggable.js" {
+  declare module.exports: $Exports<"devtools-splitter/src/Draggable">;
 }
-declare module 'devtools-splitter/src/SplitBox.js' {
-  declare module.exports: $Exports<'devtools-splitter/src/SplitBox'>;
+declare module "devtools-splitter/src/SplitBox.js" {
+  declare module.exports: $Exports<"devtools-splitter/src/SplitBox">;
 }
-declare module 'devtools-splitter/stories/index.js' {
-  declare module.exports: $Exports<'devtools-splitter/stories/index'>;
+declare module "devtools-splitter/stories/index.js" {
+  declare module.exports: $Exports<"devtools-splitter/stories/index">;
 }

@@ -19,18 +19,9 @@ const AUTOCOMPLETE = "devtools.editor.autocomplete";
 const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
 const VALID_KEYMAPS = new Map([
-  [
-    "emacs",
-    "chrome://devtools/content/shared/sourceeditor/codemirror/keymap/emacs.js",
-  ],
-  [
-    "vim",
-    "chrome://devtools/content/shared/sourceeditor/codemirror/keymap/vim.js",
-  ],
-  [
-    "sublime",
-    "chrome://devtools/content/shared/sourceeditor/codemirror/keymap/sublime.js",
-  ],
+  ["emacs", "chrome://devtools/content/shared/sourceeditor/codemirror/keymap/emacs.js"],
+  ["vim", "chrome://devtools/content/shared/sourceeditor/codemirror/keymap/vim.js"],
+  ["sublime", "chrome://devtools/content/shared/sourceeditor/codemirror/keymap/sublime.js"],
 ]);
 
 // Maximum allowed margin (in number of lines) from top or bottom of the editor
@@ -45,20 +36,16 @@ const EventEmitter = require("devtools/shared/event-emitter");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper(
-  "devtools/client/locales/sourceeditor.properties"
-);
+const L10N = new LocalizationHelper("devtools/client/locales/sourceeditor.properties");
 
 const { OS } = Services.appinfo;
 
 // CM_BUNDLE and CM_IFRAME represent the HTML and JavaScript that is
 // injected into an iframe in order to initialize a CodeMirror instance.
 
-const CM_BUNDLE =
-  "chrome://devtools/content/shared/sourceeditor/codemirror/codemirror.bundle.js";
+const CM_BUNDLE = "chrome://devtools/content/shared/sourceeditor/codemirror/codemirror.bundle.js";
 
-const CM_IFRAME =
-  "chrome://devtools/content/shared/sourceeditor/codemirror/cmiframe.html";
+const CM_IFRAME = "chrome://devtools/content/shared/sourceeditor/codemirror/cmiframe.html";
 
 const CM_MAPPING = [
   "clearHistory",
@@ -152,11 +139,9 @@ function Editor(config) {
 
   // Additional shortcuts.
   this.config.extraKeys[Editor.keyFor("jumpToLine")] = () => this.jumpToLine();
-  this.config.extraKeys[Editor.keyFor("moveLineUp", { noaccel: true })] = () =>
-    this.moveLineUp();
-  this.config.extraKeys[
-    Editor.keyFor("moveLineDown", { noaccel: true })
-  ] = () => this.moveLineDown();
+  this.config.extraKeys[Editor.keyFor("moveLineUp", { noaccel: true })] = () => this.moveLineUp();
+  this.config.extraKeys[Editor.keyFor("moveLineDown", { noaccel: true })] = () =>
+    this.moveLineDown();
   this.config.extraKeys[Editor.keyFor("toggleComment")] = "toggleComment";
 
   // Disable ctrl-[ and ctrl-] because toolbox uses those shortcuts.
@@ -188,10 +173,7 @@ function Editor(config) {
   if (!this.config.gutters) {
     this.config.gutters = [];
   }
-  if (
-    this.config.lineNumbers &&
-    !this.config.gutters.includes("CodeMirror-linenumbers")
-  ) {
+  if (this.config.lineNumbers && !this.config.gutters.includes("CodeMirror-linenumbers")) {
     this.config.gutters.push("CodeMirror-linenumbers");
   }
 
@@ -261,8 +243,7 @@ Editor.prototype = {
   get codeMirror() {
     if (!editors.has(this)) {
       throw new Error(
-        "CodeMirror instance does not exist. You must wait " +
-          "for it to be appended to the DOM."
+        "CodeMirror instance does not exist. You must wait " + "for it to be appended to the DOM."
       );
     }
     return editors.get(this);
@@ -410,13 +391,7 @@ Editor.prototype = {
       popup.openPopupAtScreen(ev.screenX, ev.screenY, true);
     });
 
-    const pipedEvents = [
-      "beforeChange",
-      "changes",
-      "cursorActivity",
-      "focus",
-      "scroll",
-    ];
+    const pipedEvents = ["beforeChange", "changes", "cursorActivity", "focus", "scroll"];
     for (const eventName of pipedEvents) {
       cm.on(eventName, (...args) => this.emit(eventName, ...args));
     }
@@ -642,10 +617,7 @@ Editor.prototype = {
   reloadPreferences: function () {
     // Restore the saved autoCloseBrackets value if it is preffed on.
     const useAutoClose = Services.prefs.getBoolPref(AUTO_CLOSE);
-    this.setOption(
-      "autoCloseBrackets",
-      useAutoClose ? this.config.autoCloseBracketsSaved : false
-    );
+    this.setOption("autoCloseBrackets", useAutoClose ? this.config.autoCloseBracketsSaved : false);
 
     this.resetIndentUnit();
     this.setupAutoCompletion();
@@ -873,7 +845,6 @@ Editor.prototype = {
 
     const marker = cm.getWrapperElement().ownerDocument.createElement("div");
     marker.className = markerClass;
-    // eslint-disable-next-line no-unsanitized/property
     marker.innerHTML = content;
     cm.setGutterMarker(info.line, gutterName, marker);
   },
@@ -923,13 +894,7 @@ Editor.prototype = {
    * You don't need to worry about removing these event listeners.
    * They're automatically orphaned when clearing markers.
    */
-  setMarkerListeners: function (
-    line,
-    gutterName,
-    markerClass,
-    eventsArg,
-    data
-  ) {
+  setMarkerListeners: function (line, gutterName, markerClass, eventsArg, data) {
     if (!this.hasMarker(line, gutterName, markerClass)) {
       return;
     }
@@ -1133,10 +1098,7 @@ Editor.prototype = {
       { line: start.line - 1, ch: 0 },
       { line: end.line, ch: cm.getLine(end.line).length }
     );
-    cm.setSelection(
-      { line: start.line - 1, ch: start.ch },
-      { line: end.line - 1, ch: end.ch }
-    );
+    cm.setSelection({ line: start.line - 1, ch: start.ch }, { line: end.line - 1, ch: end.ch });
   },
 
   /**
@@ -1170,10 +1132,7 @@ Editor.prototype = {
       { line: start.line, ch: 0 },
       { line: end.line + 1, ch: cm.getLine(end.line + 1).length }
     );
-    cm.setSelection(
-      { line: start.line + 1, ch: start.ch },
-      { line: end.line + 1, ch: end.ch }
-    );
+    cm.setSelection({ line: start.line + 1, ch: start.ch }, { line: end.line + 1, ch: end.ch });
   },
 
   /**
@@ -1186,9 +1145,7 @@ Editor.prototype = {
     // replace box is a different input instance than search, and it is
     // located in a code mirror dialog
     const isDialogInput =
-      isInput &&
-      node.parentNode &&
-      node.parentNode.classList.contains("CodeMirror-dialog");
+      isInput && node.parentNode && node.parentNode.classList.contains("CodeMirror-dialog");
     if (!(isSearchInput || isDialogInput)) {
       return;
     }
@@ -1322,9 +1279,7 @@ Editor.prototype = {
 
   getAutoCompletionText() {
     const cm = editors.get(this);
-    const mark = cm
-      .getAllMarks()
-      .find(m => m.className === AUTOCOMPLETE_MARK_CLASSNAME);
+    const mark = cm.getAllMarks().find(m => m.className === AUTOCOMPLETE_MARK_CLASSNAME);
     if (!mark) {
       return "";
     }

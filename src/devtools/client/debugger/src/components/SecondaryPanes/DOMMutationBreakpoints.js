@@ -11,10 +11,7 @@ const {
 } = Reps;
 import { translateNodeFrontToGrip } from "inspector-shared-utils";
 
-import {
-  deleteDOMMutationBreakpoint,
-  toggleDOMMutationBreakpointState,
-} from "framework-actions";
+import { deleteDOMMutationBreakpoint, toggleDOMMutationBreakpointState } from "framework-actions";
 
 import actions from "../../actions";
 import { connect } from "../../utils/connect";
@@ -79,13 +76,9 @@ class DOMMutationBreakpointsContents extends Component<Props> {
               onDOMNodeMouseOut: () => unHighlightDomElement(),
             })}
           </div>
-          <div className="dom-mutation-type">
-            {localizationTerms[mutationType] || mutationType}
-          </div>
+          <div className="dom-mutation-type">{localizationTerms[mutationType] || mutationType}</div>
         </div>
-        <CloseButton
-          handleClick={() => deleteBreakpoint(nodeFront, mutationType)}
-        />
+        <CloseButton handleClick={() => deleteBreakpoint(nodeFront, mutationType)} />
       </li>
     );
   }
@@ -100,10 +93,7 @@ class DOMMutationBreakpointsContents extends Component<Props> {
 
     return (
       <div className="dom-mutation-empty">
-        <div
-          onClick={() => openInspector()}
-          dangerouslySetInnerHTML={{ __html: text }}
-        />
+        <div onClick={() => openInspector()} dangerouslySetInnerHTML={{ __html: text }} />
       </div>
     );
   }

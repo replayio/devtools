@@ -121,9 +121,7 @@ describe("Frames", () => {
           displayFullUrl={true}
         />
       );
-      expect(component.text()).toBe(
-        "renderFoo http://myfile.com/mahscripts.js:55"
-      );
+      expect(component.text()).toBe("renderFoo http://myfile.com/mahscripts.js:55");
     });
 
     it("passes the getFrameTitle prop to the Frame component", () => {
@@ -226,12 +224,7 @@ describe("Frames", () => {
 
   describe("Library Frames", () => {
     it("toggling framework frames", () => {
-      const frames = [
-        { id: 1 },
-        { id: 2, library: "back" },
-        { id: 3, library: "back" },
-        { id: 8 },
-      ];
+      const frames = [{ id: 1 }, { id: 2, library: "back" }, { id: 3, library: "back" }, { id: 8 }];
 
       const selectedFrame = frames[0];
       const frameworkGroupingOn = false;
@@ -274,12 +267,7 @@ describe("Frames", () => {
     });
 
     it("selectable framework frames", () => {
-      const frames = [
-        { id: 1 },
-        { id: 2, library: "back" },
-        { id: 3, library: "back" },
-        { id: 8 },
-      ];
+      const frames = [{ id: 1 }, { id: 2, library: "back" }, { id: 3, library: "back" }, { id: 8 }];
 
       const selectedFrame = frames[0];
 

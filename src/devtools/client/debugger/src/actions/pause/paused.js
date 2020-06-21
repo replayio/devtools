@@ -30,7 +30,7 @@ import type { ThunkArgs } from "../types";
  * @static
  */
 export function paused(pauseInfo) {
-  return async function({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
+  return async function ({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
     const { thread, executionPoint } = pauseInfo;
 
     dispatch({ type: "PAUSED", thread, executionPoint });
@@ -54,17 +54,21 @@ export function paused(pauseInfo) {
     }
 
     const promises = [];
-    promises.push((async () => {
-      dispatch(setFramePositions());
-    })());
+    promises.push(
+      (async () => {
+        dispatch(setFramePositions());
+      })()
+    );
 
-    promises.push((async () => {
-      await dispatch(fetchScopes(cx));
+    promises.push(
+      (async () => {
+        await dispatch(fetchScopes(cx));
 
-      // Run after fetching scoping data so that it may make use of the sourcemap
-      // expression mappings for local variables.
-      await dispatch(evaluateExpressions(cx));
-    })());
+        // Run after fetching scoping data so that it may make use of the sourcemap
+        // expression mappings for local variables.
+        await dispatch(evaluateExpressions(cx));
+      })()
+    );
 
     await Promise.all(promises);
   };

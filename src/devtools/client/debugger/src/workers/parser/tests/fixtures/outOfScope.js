@@ -9,19 +9,19 @@ function outer() {
     const x = 1;
   };
 
-  const declaration = function() {
+  const declaration = function () {
     const x = 1;
   };
 
-  assignment = (function() {
+  assignment = (function () {
     const x = 1;
   })();
 
-  const iifeDeclaration = (function() {
+  const iifeDeclaration = (function () {
     const x = 1;
   })();
 
-  return function() {
+  return function () {
     const x = 1;
   };
 }
@@ -36,15 +36,15 @@ const globalArrow = () => {
   const x = 1;
 };
 
-const globalDeclaration = function() {
+const globalDeclaration = function () {
   const x = 1;
 };
 
-globalAssignment = (function() {
+globalAssignment = (function () {
   const x = 1;
 })();
 
-const globalIifeDeclaration = (function() {
+const globalIifeDeclaration = (function () {
   const x = 1;
 })();
 
@@ -52,7 +52,7 @@ function parentFunc() {
   let MAX = 3;
   let nums = [0, 1, 2, 3];
   let x = 1;
-  let y = nums.find(function(n) {
+  let y = nums.find(function (n) {
     return n == x;
   });
   function innerFunc(a) {

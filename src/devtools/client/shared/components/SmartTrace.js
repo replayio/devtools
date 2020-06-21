@@ -4,22 +4,14 @@
 
 "use strict";
 
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
-const l10n = new LocalizationHelper(
-  "devtools/client/locales/components.properties"
-);
-const dbgL10n = new LocalizationHelper(
-  "devtools/client/locales/debugger.properties"
-);
+const l10n = new LocalizationHelper("devtools/client/locales/components.properties");
+const dbgL10n = new LocalizationHelper("devtools/client/locales/debugger.properties");
 const Frames = createFactory(
-  require("devtools/client/debugger/src/components/SecondaryPanes/Frames/index")
-    .Frames
+  require("devtools/client/debugger/src/components/SecondaryPanes/Frames/index").Frames
 );
 const {
   annotateFrames,
@@ -92,13 +84,7 @@ class SmartTrace extends Component {
   }
 
   componentDidCatch(error, info) {
-    console.error(
-      "Error while rendering stacktrace:",
-      error,
-      info,
-      "props:",
-      this.props
-    );
+    console.error("Error while rendering stacktrace:", error, info, "props:", this.props);
     this.setState({ hasError: true });
   }
 
@@ -109,9 +95,7 @@ class SmartTrace extends Component {
 
     const { onViewSourceInDebugger, onViewSource } = this.props;
 
-    const stacktrace = this.state.isSourceMapped
-      ? this.state.stacktrace
-      : this.props.stacktrace;
+    const stacktrace = this.state.isSourceMapped ? this.state.stacktrace : this.props.stacktrace;
 
     const frames = annotateFrames(
       stacktrace.map((f, i) => ({

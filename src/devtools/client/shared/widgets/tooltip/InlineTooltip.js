@@ -56,10 +56,7 @@ InlineTooltip.prototype = {
    * @return {Boolean} true if the tooltip is visible
    */
   isVisible() {
-    return (
-      typeof this.panel.parentNode !== "undefined" &&
-      this.panel.parentNode !== null
-    );
+    return typeof this.panel.parentNode !== "undefined" && this.panel.parentNode !== null;
   },
 
   /**
@@ -86,7 +83,7 @@ InlineTooltip.prototype = {
     return this.panel.firstChild;
   },
 
-  _getTopWindow: function() {
+  _getTopWindow: function () {
     return this.doc.defaultView;
   },
 

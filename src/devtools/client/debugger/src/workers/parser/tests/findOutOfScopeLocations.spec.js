@@ -11,10 +11,7 @@ import { populateSource } from "./helpers";
 
 function formatLines(actual) {
   return actual
-    .map(
-      ({ start, end }) =>
-        `(${start.line}, ${start.column}) -> (${end.line}, ${end.column})`
-    )
+    .map(({ start, end }) => `(${start.line}, ${start.column}) -> (${end.line}, ${end.column})`)
     .join("\n");
 }
 
@@ -56,9 +53,7 @@ describe("Parser.findOutOfScopeLocations", () => {
       column: 2,
     });
 
-    expect(actual).toEqual([
-      { end: { column: 15, line: 1 }, start: { column: 0, line: 1 } },
-    ]);
+    expect(actual).toEqual([{ end: { column: 15, line: 1 }, start: { column: 0, line: 1 } }]);
   });
 
   it("should not exclude in-scope inner locations", () => {

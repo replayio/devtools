@@ -11,5 +11,5 @@ function math(n) {
   return two * four;
 }
 
-var child = function() {};
-child2 = function() {};
+var child = function () {};
+child2 = function () {};

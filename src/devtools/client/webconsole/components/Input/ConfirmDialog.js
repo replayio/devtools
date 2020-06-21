@@ -26,9 +26,7 @@ const { Component } = require("react");
 const dom = require("react-dom-factories");
 const { connect } = require("react-redux");
 
-const {
-  getAutocompleteState,
-} = require("devtools/client/webconsole/selectors/autocomplete");
+const { getAutocompleteState } = require("devtools/client/webconsole/selectors/autocomplete");
 const autocompleteActions = require("devtools/client/webconsole/actions/autocomplete");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 
@@ -108,10 +106,7 @@ class ConfirmDialog extends Component {
   }
 
   render() {
-    if (
-      (this.state && this.state.hasError) ||
-      (!this.props || !this.props.getterPath)
-    ) {
+    if ((this.state && this.state.hasError) || !this.props || !this.props.getterPath) {
       return null;
     }
 
@@ -193,7 +188,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-module.exports = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ConfirmDialog);
+module.exports = connect(mapStateToProps, mapDispatchToProps)(ConfirmDialog);

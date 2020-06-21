@@ -33,19 +33,10 @@ import {
   canPrettyPrintSource,
 } from "../../selectors";
 
-import type {
-  SourceLocation,
-  PartialPosition,
-  Source,
-  Context,
-} from "../../types";
+import type { SourceLocation, PartialPosition, Source, Context } from "../../types";
 import type { ThunkArgs } from "../types";
 
-export const setSelectedLocation = (
-  cx: Context,
-  source: Source,
-  location: SourceLocation
-) => ({
+export const setSelectedLocation = (cx: Context, source: Source, location: SourceLocation) => ({
   type: "SET_SELECTED_LOCATION",
   cx,
   source,
@@ -80,11 +71,7 @@ export const clearSelectedLocation = (cx: Context) => ({
  * @memberof actions/sources
  * @static
  */
-export function selectSourceURL(
-  cx: Context,
-  url: string,
-  options?: PartialPosition
-) {
+export function selectSourceURL(cx: Context, url: string, options?: PartialPosition) {
   return async ({ dispatch, getState }: ThunkArgs) => {
     const source = getSourceByURL(getState(), url);
     if (!source) {
@@ -101,11 +88,7 @@ export function selectSourceURL(
  * @memberof actions/sources
  * @static
  */
-export function selectSource(
-  cx: Context,
-  sourceId: string,
-  options: PartialPosition = {}
-) {
+export function selectSource(cx: Context, sourceId: string, options: PartialPosition = {}) {
   return async ({ dispatch }: ThunkArgs) => {
     const location = createLocation({ ...options, sourceId });
     return dispatch(selectSpecificLocation(cx, location));

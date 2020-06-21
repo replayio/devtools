@@ -4,34 +4,19 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
-const FontAxis = createFactory(
-  require("devtools/client/inspector/fonts/components/FontAxis")
-);
-const FontName = createFactory(
-  require("devtools/client/inspector/fonts/components/FontName")
-);
-const FontSize = createFactory(
-  require("devtools/client/inspector/fonts/components/FontSize")
-);
-const FontStyle = createFactory(
-  require("devtools/client/inspector/fonts/components/FontStyle")
-);
-const FontWeight = createFactory(
-  require("devtools/client/inspector/fonts/components/FontWeight")
-);
+const FontAxis = createFactory(require("devtools/client/inspector/fonts/components/FontAxis"));
+const FontName = createFactory(require("devtools/client/inspector/fonts/components/FontName"));
+const FontSize = createFactory(require("devtools/client/inspector/fonts/components/FontSize"));
+const FontStyle = createFactory(require("devtools/client/inspector/fonts/components/FontStyle"));
+const FontWeight = createFactory(require("devtools/client/inspector/fonts/components/FontWeight"));
 const LetterSpacing = createFactory(
   require("devtools/client/inspector/fonts/components/LetterSpacing")
 );
-const LineHeight = createFactory(
-  require("devtools/client/inspector/fonts/components/LineHeight")
-);
+const LineHeight = createFactory(require("devtools/client/inspector/fonts/components/LineHeight"));
 
 const { getStr } = require("devtools/client/inspector/fonts/utils/l10n");
 const Types = require("devtools/client/inspector/fonts/types");
@@ -106,28 +91,19 @@ class FontEditor extends PureComponent {
     });
 
     const topFontsList = renderedFontGroups.slice(0, MAX_FONTS);
-    const moreFontsList = renderedFontGroups.slice(
-      MAX_FONTS,
-      renderedFontGroups.length
-    );
+    const moreFontsList = renderedFontGroups.slice(MAX_FONTS, renderedFontGroups.length);
 
     const moreFonts = !moreFontsList.length
       ? null
       : dom.details(
-        {},
-        dom.summary(
           {},
-          dom.span(
-            { className: "label-open" },
-            getStr("fontinspector.showMore")
+          dom.summary(
+            {},
+            dom.span({ className: "label-open" }, getStr("fontinspector.showMore")),
+            dom.span({ className: "label-close" }, getStr("fontinspector.showLess"))
           ),
-          dom.span(
-            { className: "label-close" },
-            getStr("fontinspector.showLess")
-          )
-        ),
-        moreFontsList
-      );
+          moreFontsList
+        );
 
     return dom.label(
       {
@@ -270,11 +246,8 @@ class FontEditor extends PureComponent {
         className: "font-control-input font-value-select",
         value: selectedInstance.name || customInstance.name,
         onChange: e => {
-          const instance = fontInstances.find(
-            inst => e.target.value === inst.name
-          );
-          instance &&
-            this.props.onInstanceChange(instance.name, instance.values);
+          const instance = fontInstances.find(inst => e.target.value === inst.name);
+          instance && this.props.onInstanceChange(instance.name, instance.values);
         },
       },
       instanceOptions
@@ -314,8 +287,7 @@ class FontEditor extends PureComponent {
     // Pick the first font to show editor controls regardless of how many fonts are used.
     const font = fonts[0];
     const hasFontAxes = font && font.variationAxes;
-    const hasFontInstances =
-      font && font.variationInstances && font.variationInstances.length > 0;
+    const hasFontInstances = font && font.variationInstances && font.variationInstances.length > 0;
     const hasSlantOrItalicAxis =
       hasFontAxes &&
       font.variationAxes.find(axis => {
@@ -339,8 +311,7 @@ class FontEditor extends PureComponent {
       // Always render UI for used fonts.
       this.renderUsedFonts(fonts),
       // Render UI for font variation instances if they are defined.
-      hasFontInstances &&
-      this.renderInstances(font.variationInstances, instance),
+      hasFontInstances && this.renderInstances(font.variationInstances, instance),
       // Always render UI for font size.
       this.renderFontSize(properties["font-size"]),
       // Always render UI for line height.

@@ -28,12 +28,8 @@ const reducers = {
   },
 
   [UPDATE_GRID_HIGHLIGHTED](grids, { nodeFront, highlighted }) {
-    const maxHighlighters = Services.prefs.getIntPref(
-      "devtools.gridinspector.maxHighlighters"
-    );
-    const highlightedNodeFronts = grids
-      .filter(g => g.highlighted)
-      .map(g => g.nodeFront);
+    const maxHighlighters = Services.prefs.getIntPref("devtools.gridinspector.maxHighlighters");
+    const highlightedNodeFronts = grids.filter(g => g.highlighted).map(g => g.nodeFront);
     let numHighlighted = highlightedNodeFronts.length;
 
     // Get the total number of highlighted grids including the one that will be
@@ -52,10 +48,7 @@ const reducers = {
         return Object.assign({}, g, {
           highlighted: g.nodeFront === nodeFront && highlighted,
         });
-      } else if (
-        numHighlighted === maxHighlighters &&
-        g.nodeFront !== nodeFront
-      ) {
+      } else if (numHighlighted === maxHighlighters && g.nodeFront !== nodeFront) {
         // The maximum number of highlighted grids have been reached. Disable all the
         // other non-highlighted grids.
         return Object.assign({}, g, {
@@ -80,7 +73,7 @@ const reducers = {
   },
 };
 
-module.exports = function(grids = INITIAL_GRIDS, action) {
+module.exports = function (grids = INITIAL_GRIDS, action) {
   const reducer = reducers[action.type];
   if (!reducer) {
     return grids;

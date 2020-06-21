@@ -37,12 +37,7 @@ export function toggleBlackBox(cx: Context, source: Source) {
       type: "BLACKBOX",
       cx,
       source,
-      [PROMISE]: blackboxActors(
-        getState(),
-        client,
-        source.id,
-        isBlackBoxed
-      ),
+      [PROMISE]: blackboxActors(getState(), client, source.id, isBlackBoxed),
     });
   };
 }

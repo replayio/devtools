@@ -4,24 +4,16 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 
-const SidebarToggle = createFactory(
-  require("devtools/client/shared/components/SidebarToggle")
-);
-const Tabs = createFactory(
-  require("devtools/client/shared/components/tabs/Tabs").Tabs
-);
+const SidebarToggle = createFactory(require("devtools/client/shared/components/SidebarToggle"));
+const Tabs = createFactory(require("devtools/client/shared/components/tabs/Tabs").Tabs);
 
 class Sidebar extends PureComponent {
   static get propTypes() {
     return {
-      children: PropTypes.oneOfType([PropTypes.array, PropTypes.element])
-        .isRequired,
+      children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]).isRequired,
       onAfterChange: PropTypes.func,
       onAllTabsMenuClick: PropTypes.func,
       renderOnlySelected: PropTypes.bool,
