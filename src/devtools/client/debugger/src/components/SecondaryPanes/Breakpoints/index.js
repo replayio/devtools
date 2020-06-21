@@ -16,10 +16,7 @@ import BreakpointHeading from "./BreakpointHeading";
 import actions from "../../../actions";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 
-import {
-  makeBreakpointId,
-  sortSelectedBreakpoints,
-} from "../../../utils/breakpoint";
+import { makeBreakpointId, sortSelectedBreakpoints } from "../../../utils/breakpoint";
 
 import { getSelectedSource, getBreakpointSources } from "../../../selectors";
 
@@ -63,11 +60,7 @@ class Breakpoints extends Component<Props> {
   }
 
   renderExceptionsOptions() {
-    const {
-      breakpointSources,
-      shouldLogExceptions,
-      logExceptions,
-    } = this.props;
+    const { breakpointSources, shouldLogExceptions, logExceptions } = this.props;
 
     const isEmpty = breakpointSources.length == 0;
 
@@ -93,24 +86,15 @@ class Breakpoints extends Component<Props> {
       return null;
     }
 
-    const sources = [
-      ...breakpointSources.map(({ source, breakpoints }) => source),
-    ];
+    const sources = [...breakpointSources.map(({ source, breakpoints }) => source)];
 
     return (
       <div className="pane breakpoints-list">
         {breakpointSources.map(({ source, breakpoints, i }) => {
-          const sortedBreakpoints = sortSelectedBreakpoints(
-            breakpoints,
-            selectedSource
-          );
+          const sortedBreakpoints = sortSelectedBreakpoints(breakpoints, selectedSource);
 
           return [
-            <BreakpointHeading
-              key={source.id}
-              source={source}
-              sources={sources}
-            />,
+            <BreakpointHeading key={source.id} source={source} sources={sources} />,
             ...sortedBreakpoints.map(breakpoint => (
               <Breakpoint
                 breakpoint={breakpoint}
@@ -141,9 +125,6 @@ const mapStateToProps = state => ({
   selectedSource: getSelectedSource(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    logExceptions: actions.logExceptions,
-  }
-)(Breakpoints);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  logExceptions: actions.logExceptions,
+})(Breakpoints);

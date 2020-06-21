@@ -5,28 +5,15 @@
 "use strict";
 
 const Services = require("Services");
-const {
-  createElement,
-  createFactory,
-  Fragment,
-  PureComponent,
-} = require("react");
+const { createElement, createFactory, Fragment, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
 
-const Accordion = createFactory(
-  require("devtools/client/shared/components/Accordion")
-);
-const Rule = createFactory(
-  require("devtools/client/inspector/rules/components/Rule")
-);
-const Rules = createFactory(
-  require("devtools/client/inspector/rules/components/Rules")
-);
-const Toolbar = createFactory(
-  require("devtools/client/inspector/rules/components/Toolbar")
-);
+const Accordion = createFactory(require("devtools/client/shared/components/Accordion"));
+const Rule = createFactory(require("devtools/client/inspector/rules/components/Rule"));
+const Rules = createFactory(require("devtools/client/inspector/rules/components/Rules"));
+const Toolbar = createFactory(require("devtools/client/inspector/rules/components/Toolbar"));
 
 const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
 const Types = require("devtools/client/inspector/rules/types");
@@ -99,12 +86,7 @@ class RulesApp extends PureComponent {
       if (rule.inheritance.inherited !== lastInherited) {
         lastInherited = rule.inheritance.inherited;
 
-        output.push(
-          dom.div(
-            { className: "ruleview-header" },
-            rule.inheritance.inheritedSource
-          )
-        );
+        output.push(dom.div({ className: "ruleview-header" }, rule.inheritance.inheritedSource));
       }
 
       output.push(
@@ -238,17 +220,14 @@ class RulesApp extends PureComponent {
           },
           rules.length > 0
             ? createElement(
-              Fragment,
-              null,
-              this.renderPseudoElementRules(pseudoElementRules),
-              this.renderStyleRules(styleRules),
-              this.renderInheritedRules(inheritedRules),
-              this.renderKeyframesRules(keyframesRules)
-            )
-            : dom.div(
-              { className: "devtools-sidepanel-no-result" },
-              getStr("rule.empty")
-            )
+                Fragment,
+                null,
+                this.renderPseudoElementRules(pseudoElementRules),
+                this.renderStyleRules(styleRules),
+                this.renderInheritedRules(inheritedRules),
+                this.renderKeyframesRules(keyframesRules)
+              )
+            : dom.div({ className: "devtools-sidepanel-no-result" }, getStr("rule.empty"))
         )
       )
     );

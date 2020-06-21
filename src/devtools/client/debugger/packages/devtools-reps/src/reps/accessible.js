@@ -4,10 +4,7 @@
 
 // ReactJS
 const PropTypes = require("prop-types");
-const {
-  button,
-  span,
-} = require("react-dom-factories");
+const { button, span } = require("react-dom-factories");
 
 // Utils
 const { isGrip, wrapRender } = require("./rep-utils");
@@ -86,12 +83,7 @@ function Accessible(props) {
   return span(baseConfig, ...elements, inspectIcon);
 }
 
-function getElements(
-  grip,
-  nameMaxLength,
-  roleFirst = false,
-  separatorText = ": "
-) {
+function getElements(grip, nameMaxLength, roleFirst = false, separatorText = ": ") {
   const { name, role } = grip.preview;
   const elements = [];
   if (name) {

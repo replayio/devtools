@@ -50,16 +50,7 @@ function getExplicitXHRBreakpoints(xhrBreakpoints) {
   return xhrBreakpoints.filter(bp => bp.path !== "");
 }
 
-const xhrMethods = [
-  "ANY",
-  "GET",
-  "POST",
-  "PUT",
-  "HEAD",
-  "DELETE",
-  "PATCH",
-  "OPTIONS",
-];
+const xhrMethods = ["ANY", "GET", "POST", "PUT", "HEAD", "DELETE", "PATCH", "OPTIONS"];
 
 class XHRBreakpoints extends Component<Props, State> {
   _input: ?HTMLInputElement;
@@ -106,11 +97,8 @@ class XHRBreakpoints extends Component<Props, State> {
     e.preventDefault();
     e.stopPropagation();
 
-    const setXHRBreakpoint = function() {
-      this.props.setXHRBreakpoint(
-        this.state.inputValue,
-        this.state.inputMethod
-      );
+    const setXHRBreakpoint = function () {
+      this.props.setXHRBreakpoint(this.state.inputValue, this.state.inputMethod);
       this.hideInput();
     };
 
@@ -209,10 +197,7 @@ class XHRBreakpoints extends Component<Props, State> {
     const placeholder = L10N.getStr("xhrBreakpoints.placeholder");
 
     return (
-      <li
-        className={classnames("xhr-input-container", { focused })}
-        key="xhr-input-container"
-      >
+      <li className={classnames("xhr-input-container", { focused })} key="xhr-input-container">
         <form className="xhr-input-form" onSubmit={onSubmit}>
           <input
             className="xhr-input-url"
@@ -233,11 +218,7 @@ class XHRBreakpoints extends Component<Props, State> {
   }
 
   handleCheckbox = (index: number) => {
-    const {
-      xhrBreakpoints,
-      enableXHRBreakpoint,
-      disableXHRBreakpoint,
-    } = this.props;
+    const { xhrBreakpoints, enableXHRBreakpoint, disableXHRBreakpoint } = this.props;
     const breakpoint = xhrBreakpoints[index];
     if (breakpoint.disabled) {
       enableXHRBreakpoint(index);
@@ -257,9 +238,7 @@ class XHRBreakpoints extends Component<Props, State> {
     }
 
     // Finds the xhrbreakpoint so as to not make assumptions about position
-    const index = xhrBreakpoints.findIndex(
-      bp => bp.path === path && bp.method === method
-    );
+    const index = xhrBreakpoints.findIndex(bp => bp.path === path && bp.method === method);
 
     if (index === editIndex) {
       return this.renderXHRInput(this.handleExistingSubmit);
@@ -366,14 +345,11 @@ const mapStateToProps = state => ({
   shouldPauseOnAny: shouldPauseOnAnyXHR(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    setXHRBreakpoint: actions.setXHRBreakpoint,
-    removeXHRBreakpoint: actions.removeXHRBreakpoint,
-    enableXHRBreakpoint: actions.enableXHRBreakpoint,
-    disableXHRBreakpoint: actions.disableXHRBreakpoint,
-    updateXHRBreakpoint: actions.updateXHRBreakpoint,
-    togglePauseOnAny: actions.togglePauseOnAny,
-  }
-)(XHRBreakpoints);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  setXHRBreakpoint: actions.setXHRBreakpoint,
+  removeXHRBreakpoint: actions.removeXHRBreakpoint,
+  enableXHRBreakpoint: actions.enableXHRBreakpoint,
+  disableXHRBreakpoint: actions.disableXHRBreakpoint,
+  updateXHRBreakpoint: actions.updateXHRBreakpoint,
+  togglePauseOnAny: actions.togglePauseOnAny,
+})(XHRBreakpoints);

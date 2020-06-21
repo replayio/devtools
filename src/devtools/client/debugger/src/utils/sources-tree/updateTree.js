@@ -41,11 +41,7 @@ type CreateTreeParams = {
   threads: Thread[],
 };
 
-export function createTree({
-  debuggeeUrl,
-  sources,
-  threads,
-}: CreateTreeParams) {
+export function createTree({ debuggeeUrl, sources, threads }: CreateTreeParams) {
   const uncollapsedTree = createDirectoryNode("root", "", []);
 
   return updateTree({

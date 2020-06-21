@@ -18,13 +18,10 @@ const l10nLevels = {
 
 // Store common icons so they can be used without recreating the element
 // during render.
-const CONSTANT_ICONS = Object.entries(l10nLevels).reduce(
-  (acc, [key, l10nLabel]) => {
-    acc[key] = getIconElement(l10nLabel);
-    return acc;
-  },
-  {}
-);
+const CONSTANT_ICONS = Object.entries(l10nLevels).reduce((acc, [key, l10nLabel]) => {
+  acc[key] = getIconElement(l10nLabel);
+  return acc;
+}, {});
 
 function getIconElement(level, onRewindClick, type) {
   let title = l10n.getStr(l10nLevels[level] || level);

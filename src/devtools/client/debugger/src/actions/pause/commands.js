@@ -22,12 +22,7 @@ import assert from "../../utils/assert";
 import { generateInlinePreview } from "./inlinePreview";
 import { setFramePositions } from "./setFramePositions";
 
-import type {
-  ThreadId,
-  Context,
-  ThreadContext,
-  ExecutionPoint,
-} from "../../types";
+import type { ThreadId, Context, ThreadContext, ExecutionPoint } from "../../types";
 
 import type { ThunkArgs } from "../types";
 import type { Command } from "../../reducers/types";

@@ -12,9 +12,7 @@
  */
 function thunkWithOptions(options = {}, { dispatch, getState }) {
   return next => action => {
-    return typeof action === "function"
-      ? action({ dispatch, getState, ...options })
-      : next(action);
+    return typeof action === "function" ? action({ dispatch, getState, ...options }) : next(action);
   };
 }
 exports.thunkWithOptions = thunkWithOptions;

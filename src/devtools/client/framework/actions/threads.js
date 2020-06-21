@@ -5,7 +5,7 @@
 
 exports.registerThread = registerThread;
 function registerThread(targetFront) {
-  return async function(dispatch) {
+  return async function (dispatch) {
     const threadFront = await targetFront.getFront("thread");
     const thread = {
       actor: threadFront.actor,
@@ -30,7 +30,7 @@ function clearThread(target) {
 
 exports.selectThread = selectThread;
 function selectThread(thread) {
-  return function(dispatch) {
+  return function (dispatch) {
     dispatch({ type: "SELECT_THREAD", thread });
   };
 }

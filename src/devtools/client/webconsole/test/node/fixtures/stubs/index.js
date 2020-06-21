@@ -5,13 +5,7 @@
 
 const maps = [];
 
-[
-  "consoleApi",
-  "cssMessage",
-  "evaluationResult",
-  "networkEvent",
-  "pageError",
-].forEach(filename => {
+["consoleApi", "cssMessage", "evaluationResult", "networkEvent", "pageError"].forEach(filename => {
   maps[filename] = require(`./${filename}`);
 });
 

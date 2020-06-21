@@ -115,9 +115,7 @@ describe("getLibraryFromUrl", () => {
       const frame = makeMockFrameWithURL("/node_modules/zone/zone.js");
       const callstack = [
         frame,
-        makeMockFrameWithURL(
-          "https://cdnjs.cloudflare.com/ajax/libs/angular/angular.js"
-        ),
+        makeMockFrameWithURL("https://cdnjs.cloudflare.com/ajax/libs/angular/angular.js"),
       ];
 
       expect(getLibraryFromUrl(frame, callstack)).toEqual("Angular");

@@ -26,33 +26,33 @@ class Punny extends Component {
 const TodoView = Backbone.View.extend({
   tagName: "li",
 
-  render: function() {
+  render: function () {
     console.log("yo");
-  }
+  },
 });
 
 const TodoClass = createClass({
   tagName: "li",
 
-  render: function() {
+  render: function () {
     console.log("yo");
-  }
+  },
 });
 
 TodoClass = createClass({
   tagName: "li",
 
-  render: function() {
+  render: function () {
     console.log("yo");
-  }
+  },
 });
 
 app.TodoClass = createClass({
   tagName: "li",
 
-  render: function() {
+  render: function () {
     console.log("yo");
-  }
+  },
 });
 
 /*
@@ -67,9 +67,9 @@ function Button() {
 
 Button.prototype = Object.create(Nanocomponent.prototype);
 
-var x = function() {};
+var x = function () {};
 
-Button.prototype.createElement = function(color) {
+Button.prototype.createElement = function (color) {
   this.color = color;
   return html`
     <button style="background-color: ${color}">
@@ -79,6 +79,6 @@ Button.prototype.createElement = function(color) {
 };
 
 // Implement conditional rendering
-Button.prototype.update = function(newColor) {
+Button.prototype.update = function (newColor) {
   return newColor !== this.color;
 };

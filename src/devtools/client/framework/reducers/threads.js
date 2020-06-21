@@ -12,9 +12,7 @@ exports.reducer = threadsReducer;
 function threadsReducer(state = initialReducerState, action) {
   switch (action.type) {
     case "SELECT_THREAD": {
-      const thread = state.threads.find(
-        thread => thread.actor === action.thread.actor
-      );
+      const thread = state.threads.find(thread => thread.actor === action.thread.actor);
 
       // It's possible that the threads reducer is missing a thread
       // e.g. workers, remote iframes, etc. (Bug 1594754)
@@ -31,9 +29,7 @@ function threadsReducer(state = initialReducerState, action) {
       };
     }
     case "CLEAR_THREAD": {
-      const threads = state.threads.filter(
-        thread => thread._targetFront !== action.target
-      );
+      const threads = state.threads.filter(thread => thread._targetFront !== action.target);
       return { ...state, threads };
     }
   }

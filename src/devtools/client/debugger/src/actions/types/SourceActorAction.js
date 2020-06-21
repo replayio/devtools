@@ -6,10 +6,7 @@
 
 import type { Context } from "../../types";
 import { type PromiseAction } from "../utils/middleware/promise";
-import type {
-  SourceActorId,
-  SourceActor,
-} from "../../reducers/source-actors.js";
+import type { SourceActorId, SourceActor } from "../../reducers/source-actors.js";
 
 export type SourceActorsInsertAction = {|
   type: "INSERT_SOURCE_ACTORS",

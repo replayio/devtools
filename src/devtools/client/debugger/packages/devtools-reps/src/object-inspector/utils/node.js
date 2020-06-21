@@ -248,9 +248,7 @@ function nodeSupportsNumericalBucketing(item: Node): boolean {
   // We exclude elements with entries since it's the <entries> node
   // itself that can have buckets.
   return (
-    (nodeIsArrayLike(item) && !nodeHasEntries(item)) ||
-    nodeIsEntries(item) ||
-    nodeIsBucket(item)
+    (nodeIsArrayLike(item) && !nodeHasEntries(item)) || nodeIsEntries(item) || nodeIsBucket(item)
   );
 }
 
@@ -322,22 +320,15 @@ function makeNodesForPromiseProperties(item: Node): Array<Node> {
   return properties;
 }
 
-function makeNodesForProxyProperties(
-  loadedProps: GripProperties,
-  item: Node
-): Array<Node> {
+function makeNodesForProxyProperties(loadedProps: GripProperties, item: Node): Array<Node> {
   const { proxyHandler, proxyTarget } = loadedProps;
 
   const isProxyHandlerFront = proxyHandler && proxyHandler.getGrip;
-  const proxyHandlerGrip = isProxyHandlerFront
-    ? proxyHandler.getGrip()
-    : proxyHandler;
+  const proxyHandlerGrip = isProxyHandlerFront ? proxyHandler.getGrip() : proxyHandler;
   const proxyHandlerFront = isProxyHandlerFront ? proxyHandler : null;
 
   const isProxyTargetFront = proxyTarget && proxyTarget.getGrip;
-  const proxyTargetGrip = isProxyTargetFront
-    ? proxyTarget.getGrip()
-    : proxyTarget;
+  const proxyTargetGrip = isProxyTargetFront ? proxyTarget.getGrip() : proxyTarget;
   const proxyTargetFront = isProxyTargetFront ? proxyTarget : null;
 
   return [
@@ -426,8 +417,7 @@ function makeNumericalBuckets(parent: Node): Array<Node> {
   const numProperties = getNumericalPropertiesCount(parent);
 
   // We want to have at most a hundred slices.
-  const bucketSize =
-    10 ** Math.max(2, Math.ceil(Math.log10(numProperties)) - 2);
+  const bucketSize = 10 ** Math.max(2, Math.ceil(Math.log10(numProperties)) - 2);
   const numBuckets = Math.ceil(numProperties / bucketSize);
 
   const buckets = [];
@@ -471,11 +461,7 @@ function makeDefaultPropsBucket(
     }
   });
 
-  const nodes = makeNodesForOwnProps(
-    userPropertiesNames,
-    parent,
-    ownProperties
-  );
+  const nodes = makeNodesForOwnProps(userPropertiesNames, parent, ownProperties);
 
   if (defaultProperties.length > 0) {
     const defaultPropertiesNode = createNode({
@@ -528,33 +514,21 @@ function makeNodesForOwnProps(
   });
 }
 
-function makeNodesForProperties(
-  objProps: GripProperties,
-  parent: Node
-): Array<Node> {
-  const {
-    ownProperties = {},
-    ownSymbols,
-    prototype,
-    safeGetterValues,
-  } = objProps;
+function makeNodesForProperties(objProps: GripProperties, parent: Node): Array<Node> {
+  const { ownProperties = {}, ownSymbols, prototype, safeGetterValues } = objProps;
 
   const parentValue = getValue(parent);
   const allProperties = { ...ownProperties, ...safeGetterValues };
 
   // Ignore properties that are neither non-concrete nor getters/setters.
-  const propertiesNames = sortProperties(Object.keys(allProperties)).filter(
-    name => {
-      if (!allProperties[name]) {
-        return false;
-      }
-
-      const properties = Object.getOwnPropertyNames(allProperties[name]);
-      return properties.some(property =>
-        ["value", "getterValue", "get", "set"].includes(property)
-      );
+  const propertiesNames = sortProperties(Object.keys(allProperties)).filter(name => {
+    if (!allProperties[name]) {
+      return false;
     }
-  );
+
+    const properties = Object.getOwnPropertyNames(allProperties[name]);
+    return properties.some(property => ["value", "getterValue", "get", "set"].includes(property));
+  });
 
   const isParentNodeWindow = parentValue && parentValue.class == "Window";
   const nodes = isParentNodeWindow
@@ -563,8 +537,7 @@ function makeNodesForProperties(
 
   if (Array.isArray(ownSymbols)) {
     ownSymbols.forEach((ownSymbol, index) => {
-      const descriptorValue =
-        ownSymbol && ownSymbol.descriptor && ownSymbol.descriptor.value;
+      const descriptorValue = ownSymbol && ownSymbol.descriptor && ownSymbol.descriptor.value;
       const isFront = descriptorValue && descriptorValue.getGrip;
       const symbolGrip = isFront ? descriptorValue.getGrip() : descriptorValue;
       const symbolFront = isFront ? ownSymbol.descriptor.value : null;
@@ -576,9 +549,9 @@ function makeNodesForProperties(
           path: `symbol-${index}`,
           contents: symbolGrip
             ? {
-              value: symbolGrip,
-              front: symbolFront,
-            }
+                value: symbolGrip,
+                front: symbolFront,
+              }
             : null,
         })
       );
@@ -601,14 +574,10 @@ function makeNodesForProperties(
   for (const name of propertiesNames) {
     const property = allProperties[name];
     const isDefaultProperty =
-      isParentNodeWindow &&
-      defaultPropertiesNode &&
-      isDefaultWindowProperty(name);
+      isParentNodeWindow && defaultPropertiesNode && isDefaultWindowProperty(name);
     const parentNode = isDefaultProperty ? defaultPropertiesNode : parent;
     const parentContentsArray =
-      isDefaultProperty && defaultPropertiesNode
-        ? defaultPropertiesNode.contents
-        : nodes;
+      isDefaultProperty && defaultPropertiesNode ? defaultPropertiesNode.contents : nodes;
 
     if (property.get && property.get.type !== "undefined") {
       parentContentsArray.push(
@@ -682,15 +651,7 @@ function createNode(options: {
   meta?: Object,
   propertyName?: string,
 }): ?Node {
-  const {
-    parent,
-    name,
-    propertyName,
-    path,
-    contents,
-    type = NODE_TYPES.GRIP,
-    meta,
-  } = options;
+  const { parent, name, propertyName, path, contents, type = NODE_TYPES.GRIP, meta } = options;
 
   if (contents === undefined) {
     return null;
@@ -755,9 +716,11 @@ function getChildren(options: {
     return cachedNodes.get(key);
   }
 
-  const children = getValue(item).getChildren().map(({ name, contents }) => {
-    return { name, contents, path: `${item.path}/${name}` };
-  });
+  const children = getValue(item)
+    .getChildren()
+    .map(({ name, contents }) => {
+      return { name, contents, path: `${item.path}/${name}` };
+    });
 
   if (cachedNodes) {
     cachedNodes.set(key, children);

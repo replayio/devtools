@@ -4,12 +4,7 @@
 
 // @flow
 
-import {
-  find,
-  searchSourceForHighlight,
-  getMatchIndex,
-  removeOverlay,
-} from "../source-search";
+import { find, searchSourceForHighlight, getMatchIndex, removeOverlay } from "../source-search";
 
 const getCursor = jest.fn(() => ({ line: 90, ch: 54 }));
 const cursor = {

@@ -112,8 +112,7 @@ let gDevicePixelRatio;
 
 function onPaints({ paints }) {
   paints.forEach(({ point, time, screenShots }) => {
-    const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")
-      .hash;
+    const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg").hash;
     insertEntrySorted(gPaintPoints, { point, time, paintHash });
   });
 }
@@ -340,11 +339,7 @@ function refreshGraphics() {
     canvas.style.visibility = "visible";
     textElem.style.visibility = "hidden";
 
-    const scale = Math.min(
-      bounds.width / image.width,
-      bounds.height / image.height,
-      1
-    );
+    const scale = Math.min(bounds.width / image.width, bounds.height / image.height, 1);
 
     canvas.width = image.width;
     canvas.height = image.height;
@@ -370,9 +365,7 @@ function refreshGraphics() {
     }
 
     // Apply the same transforms to any displayed highlighter.
-    const highlighterContainer = document.querySelector(
-      ".highlighter-container"
-    );
+    const highlighterContainer = document.querySelector(".highlighter-container");
     if (highlighterContainer && gDevicePixelRatio) {
       highlighterContainer.style.transform = `scale(${scale * gDevicePixelRatio})`;
       highlighterContainer.style.left = offsetLeft;

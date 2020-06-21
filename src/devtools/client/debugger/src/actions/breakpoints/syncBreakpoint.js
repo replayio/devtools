@@ -37,9 +37,7 @@ async function findNewLocation(
   source,
   thunkArgs
 ) {
-  const symbols: LoadedSymbols = await thunkArgs.dispatch(
-    setSymbols({ cx, source })
-  );
+  const symbols: LoadedSymbols = await thunkArgs.dispatch(setSymbols({ cx, source }));
   const func = symbols ? findFunctionByName(symbols, name, index) : null;
 
   // Fallback onto the location line, if we do not find a function.
@@ -79,21 +77,10 @@ export function syncBreakpoint(
 
     const previousLocation = { ...location, sourceId };
 
-    const newLocation = await findNewLocation(
-      cx,
-      astLocation,
-      previousLocation,
-      source,
-      thunkArgs
-    );
+    const newLocation = await findNewLocation(cx, astLocation, previousLocation, source, thunkArgs);
 
     return dispatch(
-      addBreakpoint(
-        cx,
-        newLocation,
-        pendingBreakpoint.options,
-        pendingBreakpoint.disabled
-      )
+      addBreakpoint(cx, newLocation, pendingBreakpoint.options, pendingBreakpoint.disabled)
     );
   };
 }

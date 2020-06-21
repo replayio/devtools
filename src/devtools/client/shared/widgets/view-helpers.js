@@ -64,7 +64,7 @@ exports.ViewHelpers = {
    *         True if the event was cancelled or a registered handler
    *         called preventDefault.
    */
-  dispatchEvent: function(target, type, detail) {
+  dispatchEvent: function (target, type, detail) {
     if (!(target instanceof Node)) {
       // Event cancelled.
       return true;
@@ -85,11 +85,10 @@ exports.ViewHelpers = {
    * @param Node node
    *        A node to delegate the methods to.
    */
-  delegateWidgetAttributeMethods: function(widget, node) {
+  delegateWidgetAttributeMethods: function (widget, node) {
     widget.getAttribute = widget.getAttribute || node.getAttribute.bind(node);
     widget.setAttribute = widget.setAttribute || node.setAttribute.bind(node);
-    widget.removeAttribute =
-      widget.removeAttribute || node.removeAttribute.bind(node);
+    widget.removeAttribute = widget.removeAttribute || node.removeAttribute.bind(node);
   },
 
   /**
@@ -100,11 +99,9 @@ exports.ViewHelpers = {
    * @param Node node
    *        A node to delegate the methods to.
    */
-  delegateWidgetEventMethods: function(widget, node) {
-    widget.addEventListener =
-      widget.addEventListener || node.addEventListener.bind(node);
-    widget.removeEventListener =
-      widget.removeEventListener || node.removeEventListener.bind(node);
+  delegateWidgetEventMethods: function (widget, node) {
+    widget.addEventListener = widget.addEventListener || node.addEventListener.bind(node);
+    widget.removeEventListener = widget.removeEventListener || node.removeEventListener.bind(node);
   },
 
   /**
@@ -114,7 +111,7 @@ exports.ViewHelpers = {
    * @return boolean
    *         True if it looks, walks and quacks like an event emitter.
    */
-  isEventEmitter: function(object) {
+  isEventEmitter: function (object) {
     return object && object.on && object.off && object.once && object.emit;
   },
 
@@ -124,7 +121,7 @@ exports.ViewHelpers = {
    * @return boolean
    *         True if it's a node, false otherwise.
    */
-  isNode: function(object) {
+  isNode: function (object) {
     return (
       object instanceof Node ||
       object instanceof Element ||
@@ -138,7 +135,7 @@ exports.ViewHelpers = {
    * @param Event e
    *        The event to be prevented.
    */
-  preventScrolling: function(e) {
+  preventScrolling: function (e) {
     switch (e.keyCode) {
       case KeyCodes.DOM_VK_UP:
       case KeyCodes.DOM_VK_DOWN:
@@ -159,11 +156,8 @@ exports.ViewHelpers = {
    * @param event event
    *        The event triggered by a keydown or keypress on an element
    */
-  isSpaceOrReturn: function(event) {
-    return (
-      event.keyCode === KeyCodes.DOM_VK_SPACE ||
-      event.keyCode === KeyCodes.DOM_VK_RETURN
-    );
+  isSpaceOrReturn: function (event) {
+    return event.keyCode === KeyCodes.DOM_VK_SPACE || event.keyCode === KeyCodes.DOM_VK_RETURN;
   },
 
   /**
@@ -179,7 +173,7 @@ exports.ViewHelpers = {
    * @param Node pane
    *        The element representing the pane to toggle.
    */
-  togglePane: function(flags, pane) {
+  togglePane: function (flags, pane) {
     // Make sure a pane is actually available first.
     if (!pane) {
       return;
@@ -267,10 +261,7 @@ exports.ViewHelpers = {
     // Sometimes it's useful delaying the toggle a few ticks to ensure
     // a smoother slide in-out animation.
     if (flags.delayed) {
-      pane.ownerDocument.defaultView.setTimeout(
-        doToggle,
-        PANE_APPEARANCE_DELAY
-      );
+      pane.ownerDocument.defaultView.setTimeout(doToggle, PANE_APPEARANCE_DELAY);
     } else {
       doToggle();
     }
@@ -330,7 +321,7 @@ Item.prototype = {
    * @return Item
    *         The item associated with the displayed element.
    */
-  append: function(element, options = {}) {
+  append: function (element, options = {}) {
     const item = new Item(this, element, "", options.attachment);
 
     // Entangle the item with the newly inserted child node.
@@ -356,7 +347,7 @@ Item.prototype = {
    * @param Item item
    *        The item associated with the element to remove.
    */
-  remove: function(item) {
+  remove: function (item) {
     if (!item) {
       return;
     }
@@ -372,7 +363,7 @@ Item.prototype = {
    * @param Node element
    *        The element displaying the item.
    */
-  _entangleItem: function(item, element) {
+  _entangleItem: function (item, element) {
     this._itemsByElement.set(element, item);
     item._target = element;
   },
@@ -383,7 +374,7 @@ Item.prototype = {
    * @param Item item
    *        The item describing a target element.
    */
-  _untangleItem: function(item) {
+  _untangleItem: function (item) {
     if (item.finalize) {
       item.finalize(item);
     }
@@ -401,7 +392,7 @@ Item.prototype = {
    * @param Item item
    *        The item describing a target element.
    */
-  _unlinkItem: function(item) {
+  _unlinkItem: function (item) {
     this._itemsByElement.delete(item._target);
   },
 
@@ -410,7 +401,7 @@ Item.prototype = {
    * Avoid using `toString` to avoid accidental JSONification.
    * @return string
    */
-  stringify: function() {
+  stringify: function () {
     return JSON.stringify(
       {
         value: this._value,

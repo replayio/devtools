@@ -43,9 +43,7 @@ const reducers = {
 
     if (
       !state.selectedAnimation ||
-      !animations.find(
-        animation => animation.actorID === selectedAnimation.actorID
-      )
+      !animations.find(animation => animation.actorID === selectedAnimation.actorID)
     ) {
       selectedAnimation = animations.length === 1 ? animations[0] : null;
       detailVisibility = !!selectedAnimation;
@@ -106,14 +104,10 @@ const reducers = {
 };
 
 function getPlaybackRates(basePlaybackRate, animations) {
-  return [
-    ...new Set(
-      animations.map(a => a.state.playbackRate).concat(basePlaybackRate)
-    ),
-  ];
+  return [...new Set(animations.map(a => a.state.playbackRate).concat(basePlaybackRate))];
 }
 
-module.exports = function(state = INITIAL_STATE, action) {
+module.exports = function (state = INITIAL_STATE, action) {
   const reducer = reducers[action.type];
   return reducer ? reducer(state, action) : state;
 };

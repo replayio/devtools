@@ -12,18 +12,14 @@ const actions = require("devtools/client/webconsole/actions/index");
 const selectors = require("devtools/client/webconsole/selectors/index");
 const { configureStore } = require("devtools/client/webconsole/store");
 const { setupConsoleHelper } = require("ui/utils/bootstrap");
-const {
-  isPacketPrivate,
-} = require("devtools/client/webconsole/utils/messages");
+const { isPacketPrivate } = require("devtools/client/webconsole/utils/messages");
 
 const Telemetry = require("devtools/client/shared/telemetry");
 
 const EventEmitter = require("devtools/shared/event-emitter");
 const App = createFactory(require("devtools/client/webconsole/components/App"));
 
-const {
-  setupServiceContainer,
-} = require("devtools/client/webconsole/service-container");
+const { setupServiceContainer } = require("devtools/client/webconsole/service-container");
 
 const Constants = require("devtools/client/webconsole/constants");
 
@@ -138,27 +134,21 @@ class WebConsoleWrapper {
     // For (network) message updates, we need to check both messages queue and the state
     // since we can receive updates even if the message isn't rendered yet.
     const messages = [...getAllMessagesById(store.getState()).values()];
-    this.queuedMessageUpdates = this.queuedMessageUpdates.filter(
-      ({ networkInfo }) => {
-        const { actor } = networkInfo;
+    this.queuedMessageUpdates = this.queuedMessageUpdates.filter(({ networkInfo }) => {
+      const { actor } = networkInfo;
 
-        const queuedNetworkMessage = this.queuedMessageAdds.find(
-          p => p.actor === actor
-        );
-        if (queuedNetworkMessage && isPacketPrivate(queuedNetworkMessage)) {
-          return false;
-        }
-
-        const requestMessage = messages.find(
-          message => actor === message.actor
-        );
-        if (requestMessage && requestMessage.private === true) {
-          return false;
-        }
-
-        return true;
+      const queuedNetworkMessage = this.queuedMessageAdds.find(p => p.actor === actor);
+      if (queuedNetworkMessage && isPacketPrivate(queuedNetworkMessage)) {
+        return false;
       }
-    );
+
+      const requestMessage = messages.find(message => actor === message.actor);
+      if (requestMessage && requestMessage.private === true) {
+        return false;
+      }
+
+      return true;
+    });
 
     // For (network) requests updates, we can check only the state, since there must be a
     // user interaction to get an update (i.e. the network message is displayed and thus
@@ -174,9 +164,7 @@ class WebConsoleWrapper {
 
     // Finally we clear the messages queue. This needs to be done here since we use it to
     // clean the other queues.
-    this.queuedMessageAdds = this.queuedMessageAdds.filter(
-      p => !isPacketPrivate(p)
-    );
+    this.queuedMessageAdds = this.queuedMessageAdds.filter(p => !isPacketPrivate(p));
 
     store.dispatch(actions.privateMessagesClear());
   }
@@ -319,9 +307,7 @@ class WebConsoleWrapper {
 
         if (this.queuedMessageUpdates.length > 0) {
           for (const { message, res } of this.queuedMessageUpdates) {
-            await store.dispatch(
-              actions.networkMessageUpdate(message, null, res)
-            );
+            await store.dispatch(actions.networkMessageUpdate(message, null, res));
             this.webConsoleUI.emitForTests("network-message-updated", res);
           }
           this.queuedMessageUpdates = [];

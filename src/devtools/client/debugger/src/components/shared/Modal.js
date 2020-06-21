@@ -32,10 +32,7 @@ export class Modal extends React.Component<ModalProps> {
 
     return (
       <div className="modal-wrapper" onClick={handleClose}>
-        <div
-          className={classnames("modal", additionalClass, status)}
-          onClick={this.onClick}
-        >
+        <div className={classnames("modal", additionalClass, status)} onClick={this.onClick}>
           {children}
         </div>
       </div>
@@ -54,20 +51,11 @@ type SlideProps = {
   handleClose: () => any,
 };
 
-export default function Slide({
-  in: inProp,
-  children,
-  additionalClass,
-  handleClose,
-}: SlideProps) {
+export default function Slide({ in: inProp, children, additionalClass, handleClose }: SlideProps) {
   return (
     <Transition in={inProp} timeout={transitionTimeout} appear>
       {(status: TransitionStatus) => (
-        <Modal
-          status={status}
-          additionalClass={additionalClass}
-          handleClose={handleClose}
-        >
+        <Modal status={status} additionalClass={additionalClass} handleClose={handleClose}>
           {children}
         </Modal>
       )}

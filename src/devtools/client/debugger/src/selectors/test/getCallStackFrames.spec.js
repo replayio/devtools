@@ -21,8 +21,7 @@ describe("getCallStackFrames selector", () => {
           { id: "source1", url: "webpack:///src/App.js" },
           {
             id: "source2",
-            url:
-              "webpack:///foo/node_modules/react-dom/lib/ReactCompositeComponent.js",
+            url: "webpack:///foo/node_modules/react-dom/lib/ReactCompositeComponent.js",
           },
         ]),
         selectedSource: {
@@ -157,35 +156,14 @@ describe("getCallStackFrames selector", () => {
         state.selectedSource
       );
 
-      const babelFrames = pullAt(frames, [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-      ]);
+      const babelFrames = pullAt(frames, [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17]);
       const otherFrames = frames;
 
       expect(babelFrames).toEqual(
-        Array(babelFrames.length).fill(
-          expect.objectContaining({ library: "Babel" })
-        )
+        Array(babelFrames.length).fill(expect.objectContaining({ library: "Babel" }))
       );
       expect(otherFrames).not.toEqual(
-        Array(babelFrames.length).fill(
-          expect.objectContaining({ library: "Babel" })
-        )
+        Array(babelFrames.length).fill(expect.objectContaining({ library: "Babel" }))
       );
     });
   });

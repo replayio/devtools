@@ -51,9 +51,7 @@ describe("sources", () => {
     );
 
     const cx = selectors.getThreadContext(getState());
-    await dispatch(
-      actions.selectLocation(cx, { sourceId: "foo1", line: 1, column: 5 })
-    );
+    await dispatch(actions.selectLocation(cx, { sourceId: "foo1", line: 1, column: 5 }));
 
     const selectedSource = getSelectedSource(getState());
     if (!selectedSource) {
@@ -71,9 +69,7 @@ describe("sources", () => {
   it("should select next tab on tab closed if no previous tab", async () => {
     const { dispatch, getState, cx } = createStore(mockCommandClient);
 
-    const fooSource = await dispatch(
-      actions.newGeneratedSource(makeSource("foo.js"))
-    );
+    const fooSource = await dispatch(actions.newGeneratedSource(makeSource("foo.js")));
     await dispatch(actions.newGeneratedSource(makeSource("bar.js")));
     await dispatch(actions.newGeneratedSource(makeSource("baz.js")));
 
@@ -112,9 +108,7 @@ describe("sources", () => {
     await dispatch(actions.newGeneratedSource(makeSource("foo.js")));
     await dispatch(actions.newGeneratedSource(makeSource("bar.js")));
 
-    const bazSource = await dispatch(
-      actions.newGeneratedSource(makeSource("baz.js"))
-    );
+    const bazSource = await dispatch(actions.newGeneratedSource(makeSource("baz.js")));
 
     await dispatch(actions.selectLocation(cx, initialLocation("foo.js")));
     await dispatch(actions.selectLocation(cx, initialLocation("bar.js")));
@@ -131,9 +125,7 @@ describe("sources", () => {
 
     await dispatch(actions.newGeneratedSource(makeSource("foo.js")));
     await dispatch(actions.newGeneratedSource(makeSource("bar.js")));
-    const bazSource = await dispatch(
-      actions.newGeneratedSource(makeSource("baz.js"))
-    );
+    const bazSource = await dispatch(actions.newGeneratedSource(makeSource("baz.js")));
 
     // 3rd tab
     await dispatch(actions.selectLocation(cx, initialLocation("foo.js")));
@@ -170,9 +162,7 @@ describe("sources", () => {
 
   it("sets and clears selected location correctly", async () => {
     const { dispatch, getState, cx } = createStore(mockCommandClient);
-    const source = await dispatch(
-      actions.newGeneratedSource(makeSource("testSource"))
-    );
+    const source = await dispatch(actions.newGeneratedSource(makeSource("testSource")));
     const location = ({ test: "testLocation" }: any);
 
     // set value
@@ -210,13 +200,9 @@ describe("sources", () => {
   it("should keep the generated the viewing context", async () => {
     const store = createStore(mockCommandClient);
     const { dispatch, getState, cx } = store;
-    const baseSource = await dispatch(
-      actions.newGeneratedSource(makeSource("base.js"))
-    );
+    const baseSource = await dispatch(actions.newGeneratedSource(makeSource("base.js")));
 
-    await dispatch(
-      actions.selectLocation(cx, { sourceId: baseSource.id, line: 1 })
-    );
+    await dispatch(actions.selectLocation(cx, { sourceId: baseSource.id, line: 1 }));
 
     const selected = getSelectedSource(getState());
     expect(selected && selected.id).toBe(baseSource.id);
@@ -236,9 +222,7 @@ describe("sources", () => {
       }
     );
 
-    const baseSource = await dispatch(
-      actions.newGeneratedSource(makeSource("base.js"))
-    );
+    const baseSource = await dispatch(actions.newGeneratedSource(makeSource("base.js")));
 
     const originalBaseSource = await dispatch(
       actions.newOriginalSource(makeOriginalSource(baseSource))
@@ -246,12 +230,8 @@ describe("sources", () => {
 
     await dispatch(actions.selectSource(cx, originalBaseSource.id));
 
-    const fooSource = await dispatch(
-      actions.newGeneratedSource(makeSource("foo.js"))
-    );
-    await dispatch(
-      actions.selectLocation(cx, { sourceId: fooSource.id, line: 1 })
-    );
+    const fooSource = await dispatch(actions.newGeneratedSource(makeSource("foo.js")));
+    await dispatch(actions.selectLocation(cx, { sourceId: fooSource.id, line: 1 }));
 
     const selected = getSelectedLocation(getState());
     expect(selected && selected.line).toBe(12);
@@ -269,13 +249,9 @@ describe("sources", () => {
       }
     );
 
-    const baseGenSource = await dispatch(
-      actions.newGeneratedSource(makeSource("base.js"))
-    );
+    const baseGenSource = await dispatch(actions.newGeneratedSource(makeSource("base.js")));
 
-    const baseSource = await dispatch(
-      actions.newOriginalSource(makeOriginalSource(baseGenSource))
-    );
+    const baseSource = await dispatch(actions.newOriginalSource(makeOriginalSource(baseGenSource)));
     await dispatch(actions.selectSource(cx, baseSource.id));
 
     await dispatch(
@@ -296,9 +272,7 @@ describe("sources", () => {
       await dispatch(actions.selectSourceURL(cx, baseSourceURL));
 
       expect(getSelectedSource(getState())).toBe(undefined);
-      const baseSource = await dispatch(
-        actions.newGeneratedSource(makeSource("base.js"))
-      );
+      const baseSource = await dispatch(actions.newGeneratedSource(makeSource("base.js")));
 
       const selected = getSelectedSource(getState());
       expect(selected && selected.url).toBe(baseSource.url);

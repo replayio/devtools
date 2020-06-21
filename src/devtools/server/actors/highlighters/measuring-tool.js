@@ -27,14 +27,7 @@ const LABEL_POS_HEIGHT = 34;
 
 // List of all DOM Events subscribed directly to the document from the
 // Measuring Tool highlighter
-const DOM_EVENTS = [
-  "mousedown",
-  "mousemove",
-  "mouseup",
-  "mouseleave",
-  "scroll",
-  "pagehide",
-];
+const DOM_EVENTS = ["mousedown", "mousemove", "mouseup", "mouseleave", "scroll", "pagehide"];
 
 const SIDES = ["top", "right", "bottom", "left"];
 const HANDLERS = [...SIDES, "topleft", "topright", "bottomleft", "bottomright"];
@@ -48,10 +41,7 @@ const HANDLER_SIZE = 6;
  */
 function MeasuringToolHighlighter(highlighterEnv) {
   this.env = highlighterEnv;
-  this.markup = new CanvasFrameAnonymousContentHelper(
-    highlighterEnv,
-    this._buildMarkup.bind(this)
-  );
+  this.markup = new CanvasFrameAnonymousContentHelper(highlighterEnv, this._buildMarkup.bind(this));
 
   this.coords = {
     x: 0,
@@ -235,9 +225,7 @@ MeasuringToolHighlighter.prototype = {
     const { pageListenerTarget } = this.env;
 
     if (pageListenerTarget) {
-      DOM_EVENTS.forEach(type =>
-        pageListenerTarget.removeEventListener(type, this)
-      );
+      DOM_EVENTS.forEach(type => pageListenerTarget.removeEventListener(type, this));
     }
 
     this.markup.destroy();
@@ -407,10 +395,7 @@ MeasuringToolHighlighter.prototype = {
       const style = labelSize.getAttribute("style");
 
       if (style) {
-        labelSize.setAttribute(
-          "style",
-          style.replace(/scale[^)]+\)/, `scale(${scale})`)
-        );
+        labelSize.setAttribute("style", style.replace(/scale[^)]+\)/, `scale(${scale})`));
       }
     }
   },
@@ -743,8 +728,7 @@ MeasuringToolHighlighter.prototype = {
     this.setCoords(x, y, w, h);
 
     // Changes the resizing cursors in case the measuring box is mirrored
-    const isMirrored =
-      (coords.w < 0 || coords.h < 0) && !(coords.w < 0 && coords.h < 0);
+    const isMirrored = (coords.w < 0 || coords.h < 0) && !(coords.w < 0 && coords.h < 0);
     this.getElement("tool").classList.toggle("mirrored", isMirrored);
 
     this.showLabel("size");

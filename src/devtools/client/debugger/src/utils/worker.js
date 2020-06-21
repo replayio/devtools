@@ -18,7 +18,7 @@ let msgId = 1;
  * @static
  */
 function workerTask(worker: any, method: string) {
-  return function(...args: any): Promise<any> {
+  return function (...args: any): Promise<any> {
     return new Promise((resolve, reject) => {
       const id = msgId++;
       worker.postMessage({ id, method, args });

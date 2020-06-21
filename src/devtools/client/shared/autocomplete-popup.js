@@ -11,9 +11,7 @@ const EventEmitter = require("devtools/shared/event-emitter");
 loader.lazyRequireGetter(this, "colorUtils", "devtools/shared/css/color", true);
 */
 
-const {
-  HTMLTooltip,
-} = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 
 let itemIdCounter = 0;
 
@@ -105,10 +103,7 @@ AutocompletePopup.prototype = {
       useXulWrapper: this.useXulWrapper,
     });
 
-    this._tooltip.panel.classList.add(
-      "devtools-autocomplete-popup",
-      "devtools-monospace"
-    );
+    this._tooltip.panel.classList.add("devtools-autocomplete-popup", "devtools-monospace");
     // Stop this appearing as an alert to accessibility.
     this._tooltip.panel.setAttribute("role", "presentation");
     this._tooltip.panel.appendChild(this.list);
@@ -216,12 +211,7 @@ AutocompletePopup.prototype = {
     }
     this.selectedIndex = index;
 
-    if (
-      this.isOpen &&
-      item &&
-      this.onSelectCallback &&
-      !preventSelectCallback
-    ) {
+    if (this.isOpen && item && this.onSelectCallback && !preventSelectCallback) {
       // Call the user-defined select callback if defined.
       this.onSelectCallback(item);
     }
@@ -419,10 +409,7 @@ AutocompletePopup.prototype = {
 
     // Make sure the list clone is in the same document as the anchor.
     const anchorDoc = this._activeElement.ownerDocument;
-    if (
-      !this._listClone.parentNode ||
-      this._listClone.ownerDocument !== anchorDoc
-    ) {
+    if (!this._listClone.parentNode || this._listClone.ownerDocument !== anchorDoc) {
       anchorDoc.documentElement.appendChild(this._listClone);
     }
 

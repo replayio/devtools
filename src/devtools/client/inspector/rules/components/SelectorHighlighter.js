@@ -63,9 +63,7 @@ class SelectorHighlighter extends PureComponent {
     return dom.span({
       className:
         "ruleview-selectorhighlighter" +
-        (highlightedSelector && highlightedSelector === uniqueSelector
-          ? " highlighted"
-          : ""),
+        (highlightedSelector && highlightedSelector === uniqueSelector ? " highlighted" : ""),
       onClick: this.onToggleHighlighterClick,
       title: getStr("rule.selectorHighlighter.tooltip"),
     });

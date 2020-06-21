@@ -90,10 +90,7 @@ class EventEmitter {
         // So we iterate all the listeners to check if any of them is a wrapper to
         // the `listener` given.
         for (const value of listenersForType.values()) {
-          if (
-            onceOriginalListener in value &&
-            value[onceOriginalListener] === listener
-          ) {
+          if (onceOriginalListener in value && value[onceOriginalListener] === listener) {
             listenersForType.delete(value);
             break;
           }
@@ -228,9 +225,7 @@ class EventEmitter {
               // Assert the name instead of `constructor != Promise` in order
               // to avoid cross compartment issues where Promise can be multiple.
               if (!promise || promise.constructor.name != "Promise") {
-                console.warn(
-                  `Listener for event '${type}' did not return a promise.`
-                );
+                console.warn(`Listener for event '${type}' did not return a promise.`);
               } else {
                 promises.push(promise);
               }
@@ -327,8 +322,7 @@ class EventEmitter {
     return EventEmitter.emitAsync(this, ...args);
   }
 
-  emitForTests(...args) {
-  }
+  emitForTests(...args) {}
 }
 
 module.exports = EventEmitter;

@@ -44,10 +44,7 @@ class InspectorStyleChangeTracker {
    * style change for the current node.
    */
   onMutations(mutations) {
-    const canMutationImpactCurrentStyles = ({
-      type,
-      target: mutationTarget,
-    }) => {
+    const canMutationImpactCurrentStyles = ({ type, target: mutationTarget }) => {
       // Only attributes mutations are interesting here.
       if (type !== "attributes") {
         return false;

@@ -12,10 +12,7 @@ import {
   makeOriginalSource,
   makeSource,
 } from "../../../utils/test-head";
-import {
-  createSource,
-  mockCommandClient,
-} from "../../tests/helpers/mockCommandClient";
+import { createSource, mockCommandClient } from "../../tests/helpers/mockCommandClient";
 import { getBreakpointsList } from "../../../selectors";
 import { isFulfilled, isRejected } from "../../../utils/async-value";
 
@@ -24,30 +21,22 @@ describe("loadSourceText", () => {
     const store = createStore(mockCommandClient);
     const { dispatch, getState, cx } = store;
 
-    const foo1Source = await dispatch(
-      actions.newGeneratedSource(makeSource("foo1"))
-    );
+    const foo1Source = await dispatch(actions.newGeneratedSource(makeSource("foo1")));
     await dispatch(actions.loadSourceText({ cx, source: foo1Source }));
 
     const foo1Content = selectors.getSourceContent(getState(), foo1Source.id);
     expect(
-      foo1Content &&
-        isFulfilled(foo1Content) &&
-        foo1Content.value.type === "text"
+      foo1Content && isFulfilled(foo1Content) && foo1Content.value.type === "text"
         ? foo1Content.value.value.indexOf("return foo1")
         : -1
     ).not.toBe(-1);
 
-    const foo2Source = await dispatch(
-      actions.newGeneratedSource(makeSource("foo2"))
-    );
+    const foo2Source = await dispatch(actions.newGeneratedSource(makeSource("foo2")));
     await dispatch(actions.loadSourceText({ cx, source: foo2Source }));
 
     const foo2Content = selectors.getSourceContent(getState(), foo2Source.id);
     expect(
-      foo2Content &&
-        isFulfilled(foo2Content) &&
-        foo2Content.value.type === "text"
+      foo2Content && isFulfilled(foo2Content) && foo2Content.value.type === "text"
         ? foo2Content.value.value.indexOf("return foo2")
         : -1
     ).not.toBe(-1);
@@ -72,10 +61,7 @@ describe("loadSourceText", () => {
         getOriginalLocations: async items =>
           items.map(item => ({
             ...item,
-            sourceId:
-              item.sourceId === fooGenSource1.id
-                ? fooOrigSource1.id
-                : fooOrigSource2.id,
+            sourceId: item.sourceId === fooGenSource1.id ? fooOrigSource1.id : fooOrigSource2.id,
           })),
         getOriginalSourceText: async s => ({
           text: fooOrigContent.source,
@@ -85,15 +71,11 @@ describe("loadSourceText", () => {
     );
     const { cx, dispatch, getState } = store;
 
-    const fooGenSource1 = await dispatch(
-      actions.newGeneratedSource(makeSource("fooGen1"))
-    );
+    const fooGenSource1 = await dispatch(actions.newGeneratedSource(makeSource("fooGen1")));
     const fooOrigSource1 = await dispatch(
       actions.newOriginalSource(makeOriginalSource(fooGenSource1))
     );
-    const fooGenSource2 = await dispatch(
-      actions.newGeneratedSource(makeSource("fooGen2"))
-    );
+    const fooGenSource2 = await dispatch(actions.newGeneratedSource(makeSource("fooGen2")));
     const fooOrigSource2 = await dispatch(
       actions.newOriginalSource(makeOriginalSource(fooGenSource2))
     );
@@ -178,10 +160,7 @@ describe("loadSourceText", () => {
 
     const content = selectors.getSourceContent(getState(), id);
     expect(
-      content &&
-        isFulfilled(content) &&
-        content.value.type === "text" &&
-        content.value.value
+      content && isFulfilled(content) && content.value.type === "text" && content.value.value
     ).toEqual("yay");
   });
 
@@ -215,19 +194,14 @@ describe("loadSourceText", () => {
 
     const content = selectors.getSourceContent(getState(), id);
     expect(
-      content &&
-        isFulfilled(content) &&
-        content.value.type === "text" &&
-        content.value.value
+      content && isFulfilled(content) && content.value.type === "text" && content.value.value
     ).toEqual("yay");
   });
 
   it("should cache subsequent source text loads", async () => {
     const { dispatch, getState, cx } = createStore(mockCommandClient);
 
-    const source = await dispatch(
-      actions.newGeneratedSource(makeSource("foo1"))
-    );
+    const source = await dispatch(actions.newGeneratedSource(makeSource("foo1")));
     await dispatch(actions.loadSourceText({ cx, source }));
     const prevSource = selectors.getSourceFromId(getState(), "foo1");
 
@@ -241,9 +215,7 @@ describe("loadSourceText", () => {
     const store = createStore(mockCommandClient);
     const { dispatch, cx } = store;
 
-    const source = await dispatch(
-      actions.newGeneratedSource(makeSource("foo2"))
-    );
+    const source = await dispatch(actions.newGeneratedSource(makeSource("foo2")));
 
     const wasLoading = watchForState(store, state => {
       return !selectors.getSourceContent(state, "foo2");
@@ -257,15 +229,11 @@ describe("loadSourceText", () => {
   it("should indicate an errored source text", async () => {
     const { dispatch, getState, cx } = createStore(mockCommandClient);
 
-    const source = await dispatch(
-      actions.newGeneratedSource(makeSource("bad-id"))
-    );
+    const source = await dispatch(actions.newGeneratedSource(makeSource("bad-id")));
     await dispatch(actions.loadSourceText({ cx, source }));
     const badSource = selectors.getSource(getState(), "bad-id");
 
-    const content = badSource
-      ? selectors.getSourceContent(getState(), badSource.id)
-      : null;
+    const content = badSource ? selectors.getSourceContent(getState(), badSource.id) : null;
     expect(
       content && isRejected(content) && typeof content.value === "string"
         ? content.value.indexOf("Unknown source")

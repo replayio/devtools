@@ -4,19 +4,14 @@
 
 "use strict";
 
-const {
-  createRef,
-  PureComponent,
-} = require("react");
+const { createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
 const { KeyCodes } = require("devtools/client/shared/keycodes");
 
 const { getStr } = require("devtools/client/inspector/animation/utils/l10n");
-const {
-  hasRunningAnimation,
-} = require("devtools/client/inspector/animation/utils/utils");
+const { hasRunningAnimation } = require("devtools/client/inspector/animation/utils/utils");
 
 class PauseResumeButton extends PureComponent {
   static get propTypes() {
@@ -87,8 +82,7 @@ class PauseResumeButton extends PureComponent {
     const { isRunning } = this.state;
 
     return dom.button({
-      className:
-        "pause-resume-button devtools-button" + (isRunning ? "" : " paused"),
+      className: "pause-resume-button devtools-button" + (isRunning ? "" : " paused"),
       onClick: this.onToggleAnimationsPlayState.bind(this),
       title: isRunning
         ? getStr("timeline.resumedButtonTooltip")

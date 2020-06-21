@@ -12,9 +12,9 @@ const Obj = {
   doThing() {
     console.log("hey");
   },
-  doOtherThing: function() {
+  doOtherThing: function () {
     return 42;
-  }
+  },
 };
 
 Obj.property = () => {};

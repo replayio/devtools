@@ -99,9 +99,7 @@ class Frames extends Component<Props, State> {
   }
 
   truncateFrames(frames: Array<Frame>): Array<Frame> {
-    const numFramesToShow = this.state.showAllFrames
-      ? frames.length
-      : NUM_FRAMES_SHOWN;
+    const numFramesToShow = this.state.showAllFrames ? frames.length : NUM_FRAMES_SHOWN;
 
     return frames.slice(0, numFramesToShow);
   }
@@ -208,7 +206,7 @@ class Frames extends Component<Props, State> {
       return (
         <div className="pane frames">
           <div className="pane-info empty">
-          {L10N.getStr(framesLoading ? "callStack.loading" : "callStack.notPaused")}
+            {L10N.getStr(framesLoading ? "callStack.loading" : "callStack.notPaused")}
           </div>
         </div>
       );
@@ -236,15 +234,12 @@ const mapStateToProps = state => ({
   displayFullUrl: false,
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    selectFrame: actions.selectFrame,
-    selectLocation: actions.selectLocation,
-    toggleBlackBox: actions.toggleBlackBox,
-    toggleFrameworkGrouping: actions.toggleFrameworkGrouping,
-  }
-)(Frames);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  selectFrame: actions.selectFrame,
+  selectLocation: actions.selectLocation,
+  toggleBlackBox: actions.toggleBlackBox,
+  toggleFrameworkGrouping: actions.toggleFrameworkGrouping,
+})(Frames);
 
 // Export the non-connected component in order to use it outside of the debugger
 // panel (e.g. console, netmonitor, …).

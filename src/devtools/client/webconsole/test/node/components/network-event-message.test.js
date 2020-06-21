@@ -13,9 +13,7 @@ const { createFactory } = require("react");
 const NetworkEventMessage = createFactory(
   require("devtools/client/webconsole/components/Output/message-types/NetworkEventMessage")
 );
-const {
-  INDENT_WIDTH,
-} = require("devtools/client/webconsole/components/Output/MessageIndent");
+const { INDENT_WIDTH } = require("devtools/client/webconsole/components/Output/MessageIndent");
 
 // Test fakes.
 const {
@@ -39,21 +37,15 @@ describe("NetworkEventMessage component:", () => {
           networkMessageUpdate: update,
         })
       );
-      const {
-        timestampString,
-      } = require("devtools/client/webconsole/utils/l10n");
+      const { timestampString } = require("devtools/client/webconsole/utils/l10n");
 
-      expect(wrapper.find(".timestamp").text()).toBe(
-        timestampString(message.timeStamp)
-      );
+      expect(wrapper.find(".timestamp").text()).toBe(timestampString(message.timeStamp));
       expect(wrapper.find(".message-body .method").text()).toBe("GET");
       expect(wrapper.find(".message-body .xhr").length).toBe(0);
       expect(wrapper.find(".message-body .url").length).toBe(1);
       expect(wrapper.find(".message-body .url").text()).toBe(EXPECTED_URL);
       expect(wrapper.find(".message-body .status").length).toBe(1);
-      expect(wrapper.find(".message-body .status").text()).toMatch(
-        EXPECTED_STATUS
-      );
+      expect(wrapper.find(".message-body .status").text()).toMatch(EXPECTED_STATUS);
     });
 
     it("does not have a timestamp when timestampsVisible prop is falsy", () => {
@@ -106,9 +98,7 @@ describe("NetworkEventMessage component:", () => {
       expect(wrapper.find(".message-body .xhr").length).toBe(1);
       expect(wrapper.find(".message-body .xhr").text()).toBe("XHR");
       expect(wrapper.find(".message-body .url").text()).toBe(EXPECTED_URL);
-      expect(wrapper.find(".message-body .status").text()).toMatch(
-        EXPECTED_STATUS
-      );
+      expect(wrapper.find(".message-body .status").text()).toMatch(EXPECTED_STATUS);
     });
   });
 
@@ -130,9 +120,7 @@ describe("NetworkEventMessage component:", () => {
       expect(wrapper.find(".message-body .url").length).toBe(1);
       expect(wrapper.find(".message-body .url").text()).toBe(EXPECTED_URL);
       expect(wrapper.find(".message-body .status").length).toBe(1);
-      expect(wrapper.find(".message-body .status").text()).toMatch(
-        EXPECTED_STATUS
-      );
+      expect(wrapper.find(".message-body .status").text()).toMatch(EXPECTED_STATUS);
     });
   });
 

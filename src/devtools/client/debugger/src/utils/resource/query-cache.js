@@ -5,32 +5,18 @@
 // @flow
 
 import type { ResourceBound, ResourceState } from "./core";
-import type {
-  ResourceQuery,
-  QueryCacheHandler,
-  QueryContext,
-  QueryResult,
-} from "./base-query";
+import type { ResourceQuery, QueryCacheHandler, QueryContext, QueryResult } from "./base-query";
 import { strictEqual, shallowEqual } from "./compare";
 
-export type WeakArgsBound =
-  | $ReadOnly<{ [string]: mixed }>
-  | $ReadOnlyArray<mixed>;
+export type WeakArgsBound = $ReadOnly<{ [string]: mixed }> | $ReadOnlyArray<mixed>;
 
-export type ShallowArgsBound =
-  | $ReadOnly<{ [string]: mixed }>
-  | $ReadOnlyArray<mixed>;
+export type ShallowArgsBound = $ReadOnly<{ [string]: mixed }> | $ReadOnlyArray<mixed>;
 
 /**
  * A query 'cache' function that uses the identity of the arguments object to
  * cache data for the query itself.
  */
-export function queryCacheWeak<
-  R: ResourceBound,
-  Args: WeakArgsBound,
-  Mapped,
-  Reduced
->(
+export function queryCacheWeak<R: ResourceBound, Args: WeakArgsBound, Mapped, Reduced>(
   handler: QueryCacheHandler<R, Args, Mapped, Reduced>
 ): ResourceQuery<R, Args, Reduced> {
   const cache = new WeakMap();
@@ -57,9 +43,7 @@ export function queryCacheShallow<
   Args: ShallowArgsBound,
   Mapped,
   Reduced
->(
-  handler: QueryCacheHandler<R, Args, Mapped, Reduced>
-): ResourceQuery<R, Args, Reduced> {
+>(handler: QueryCacheHandler<R, Args, Mapped, Reduced>): ResourceQuery<R, Args, Reduced> {
   let latestEntry = null;
   return makeCacheFunction({
     handler,

@@ -106,14 +106,10 @@ describe("Testing UI", () => {
 
       const newActorID = newMessage.parameters[0].actorID;
       const newMessageId = getLastMessage(store.getState()).id;
-      store.dispatch(
-        actions.showMessageObjectInSidebar(newActorID, newMessageId)
-      );
+      store.dispatch(actions.showMessageObjectInSidebar(newActorID, newMessageId));
 
       expect(store.getState().ui.sidebarVisible).toEqual(true);
-      expect(store.getState().ui.frontInSidebar).toEqual(
-        newMessage.parameters[0]
-      );
+      expect(store.getState().ui.frontInSidebar).toEqual(newMessage.parameters[0]);
     });
   });
 });

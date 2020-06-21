@@ -58,9 +58,7 @@ function dispatchSetPreview(dispatch, context, expression, target) {
 
 async function pause(store, client) {
   const { dispatch, cx } = store;
-  const base = await dispatch(
-    actions.newGeneratedSource(makeSource("base.js"))
-  );
+  const base = await dispatch(actions.newGeneratedSource(makeSource("base.js")));
 
   await dispatch(actions.selectSource(cx, base.id));
   await waitForState(store, state => selectors.hasSymbols(state, base));
@@ -83,9 +81,7 @@ describe("preview", () => {
   it("should generate previews", async () => {
     const store = createStore(mockThreadFront());
     const { dispatch, getState, cx } = store;
-    const base = await dispatch(
-      actions.newGeneratedSource(makeSource("base.js"))
-    );
+    const base = await dispatch(actions.newGeneratedSource(makeSource("base.js")));
 
     await dispatch(actions.selectSource(cx, base.id));
     await waitForState(store, state => selectors.hasSymbols(state, base));

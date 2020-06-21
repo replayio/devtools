@@ -43,16 +43,9 @@ import {
 import { parse } from "../../utils/url";
 import { getRawSourceURL } from "../../utils/source";
 
-import type {
-  TreeNode,
-  TreeDirectory,
-  ParentMap,
-} from "../../utils/sources-tree/types";
+import type { TreeNode, TreeDirectory, ParentMap } from "../../utils/sources-tree/types";
 import type { Source, Context, Thread } from "../../types";
-import type {
-  SourcesMapByThread,
-  State as AppState,
-} from "../../reducers/types";
+import type { SourcesMapByThread, State as AppState } from "../../reducers/types";
 import type { Item } from "../shared/ManagedTree";
 
 type OwnProps = {|
@@ -117,14 +110,7 @@ class SourcesTree extends Component<Props, State> {
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const {
-      projectRoot,
-      debuggeeUrl,
-      sources,
-      shownSource,
-      selectedSource,
-      threads,
-    } = this.props;
+    const { projectRoot, debuggeeUrl, sources, shownSource, selectedSource, threads } = this.props;
     const { uncollapsedTree, sourceTree } = this.state;
 
     if (
@@ -149,14 +135,8 @@ class SourcesTree extends Component<Props, State> {
       return this.setState({ listItems });
     }
 
-    if (
-      nextProps.selectedSource &&
-      nextProps.selectedSource != selectedSource
-    ) {
-      const highlightItems = getDirectories(
-        nextProps.selectedSource,
-        sourceTree
-      );
+    if (nextProps.selectedSource && nextProps.selectedSource != selectedSource) {
+      const highlightItems = getDirectories(nextProps.selectedSource, sourceTree);
       this.setState({ highlightItems });
     }
 
@@ -367,11 +347,8 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    selectSource: actions.selectSource,
-    setExpandedState: actions.setExpandedState,
-    focusItem: actions.focusItem,
-  }
-)(SourcesTree);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  selectSource: actions.selectSource,
+  setExpandedState: actions.setExpandedState,
+  focusItem: actions.focusItem,
+})(SourcesTree);

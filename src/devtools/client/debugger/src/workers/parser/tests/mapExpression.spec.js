@@ -106,9 +106,7 @@ describe("mapExpression", () => {
     {
       name: "await (destructuring)",
       expression: "const { a, c: y } = await b()",
-      newExpression: formatAwait(
-        "return ({ a: self.a, c: self.y } = await b())"
-      ),
+      newExpression: formatAwait("return ({ a: self.a, c: self.y } = await b())"),
       bindings: [],
       mappings: {},
       shouldMapBindings: true,
@@ -228,9 +226,7 @@ describe("mapExpression", () => {
     {
       name: "await (mixed destructuring with defaults, bindings)",
       expression: "const [{ c = 5 }, a = 5] = await b();",
-      newExpression: formatAwait(
-        "return ([ { c: self.c = 5 }, a = 5] = await b())"
-      ),
+      newExpression: formatAwait("return ([ { c: self.c = 5 }, a = 5] = await b())"),
       bindings: ["a"],
       mappings: {},
       shouldMapBindings: true,
@@ -277,8 +273,7 @@ describe("mapExpression", () => {
     },
     {
       name: "await (very nested destructuring with defaults)",
-      expression:
-        "const { a, c: { y: { z = 10, b } = { b: 5 } } } = await b();",
+      expression: "const { a, c: { y: { z = 10, b } = { b: 5 } } } = await b();",
       newExpression: formatAwait(`
         return ({
           a: self.a,
@@ -406,8 +401,7 @@ describe("mapExpression", () => {
       },
     },
     {
-      name:
-        "await (no bindings, object destructuring with renaming and default)",
+      name: "await (no bindings, object destructuring with renaming and default)",
       expression: "let {a: hello, b, c: world, d: $ = 4} = await x;",
       newExpression: `let hello, b, world, $;
 
@@ -422,8 +416,7 @@ describe("mapExpression", () => {
       },
     },
     {
-      name:
-        "await (no bindings, nested object destructuring + renaming + default)",
+      name: "await (no bindings, nested object destructuring + renaming + default)",
       expression: `let {
           a: hello, c: { y: { z = 10, b: bill, d: [e, f = 20] }}
         } = await x; z;`,
@@ -553,8 +546,7 @@ describe("mapExpression", () => {
     {
       name: "await (async function declaration with nullish coalesce operator)",
       expression: "async function coalesce(x) { await x; return x ?? false; }",
-      newExpression:
-        "async function coalesce(x) { await x; return x ?? false; }",
+      newExpression: "async function coalesce(x) { await x; return x ?? false; }",
       shouldMapBindings: false,
       expectedMapped: {
         await: false,
@@ -563,8 +555,7 @@ describe("mapExpression", () => {
       },
     },
     {
-      name:
-        "await (async function declaration with optional chaining operator)",
+      name: "await (async function declaration with optional chaining operator)",
       expression: "async function chain(x) { await x; return x?.y?.z; }",
       newExpression: "async function chain(x) { await x; return x?.y?.z; }",
       shouldMapBindings: false,

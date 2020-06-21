@@ -5,13 +5,8 @@
 
 // React
 const PropTypes = require("prop-types");
-const {
-  MESSAGE_TYPE,
-  JSTERM_COMMANDS,
-} = require("devtools/client/webconsole/constants");
-const {
-  getObjectInspector,
-} = require("devtools/client/webconsole/utils/object-inspector");
+const { MESSAGE_TYPE, JSTERM_COMMANDS } = require("devtools/client/webconsole/constants");
+const { getObjectInspector } = require("devtools/client/webconsole/utils/object-inspector");
 const actions = require("devtools/client/webconsole/actions/index");
 
 const reps = require("devtools/client/debugger/packages/devtools-reps/src");
@@ -20,11 +15,7 @@ const { objectInspector, MODE } = reps;
 GripMessageBody.displayName = "GripMessageBody";
 
 GripMessageBody.propTypes = {
-  grip: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-    PropTypes.object,
-  ]).isRequired,
+  grip: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]).isRequired,
   serviceContainer: PropTypes.shape({
     createElement: PropTypes.func.isRequired,
     onViewSourceInDebugger: PropTypes.func.isRequired,
@@ -55,10 +46,7 @@ function GripMessageBody(props) {
 
   let styleObject;
   if (userProvidedStyle && userProvidedStyle !== "") {
-    styleObject = cleanupStyle(
-      userProvidedStyle,
-      serviceContainer.createElement
-    );
+    styleObject = cleanupStyle(userProvidedStyle, serviceContainer.createElement);
   }
 
   const objectInspectorProps = {
@@ -88,8 +76,8 @@ function GripMessageBody(props) {
 // Regular expression that matches the allowed CSS property names.
 const allowedStylesRegex = new RegExp(
   "^(?:-moz-)?(?:background|border|box|clear|color|cursor|display|float|font|line|" +
-  "margin|padding|text|transition|outline|white-space|word|writing|" +
-  "(?:min-|max-)?width|(?:min-|max-)?height)"
+    "margin|padding|text|transition|outline|white-space|word|writing|" +
+    "(?:min-|max-)?width|(?:min-|max-)?height)"
 );
 
 // Regular expression that matches the forbidden CSS property values.

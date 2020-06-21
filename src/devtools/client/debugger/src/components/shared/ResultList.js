@@ -13,11 +13,7 @@ import "./ResultList.css";
 type Props = {
   items: Array<any>,
   selected: number,
-  selectItem: (
-    event: SyntheticKeyboardEvent<HTMLElement>,
-    item: any,
-    index: number
-  ) => void,
+  selectItem: (event: SyntheticKeyboardEvent<HTMLElement>, item: any, index: number) => void,
   size: string,
   role: string,
 };

@@ -12,11 +12,7 @@ const { getGripType, wrapRender } = require("./rep-utils");
  * Renders a number
  */
 Number.propTypes = {
-  object: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.number,
-    PropTypes.bool,
-  ]).isRequired,
+  object: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.bool]).isRequired,
 };
 
 function Number(props) {
@@ -31,8 +27,7 @@ function stringify(object) {
 }
 
 function supportsObject(object) {
-  return object.isPrimitive() &&
-    ["number", "boolean"].includes(typeof object.primitive());
+  return object.isPrimitive() && ["number", "boolean"].includes(typeof object.primitive());
 }
 
 // Exports from this module

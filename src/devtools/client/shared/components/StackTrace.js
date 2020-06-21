@@ -4,18 +4,13 @@
 
 "use strict";
 
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const Frame = createFactory(require("devtools/client/shared/components/Frame"));
 
-const l10n = new LocalizationHelper(
-  "devtools/client/locales/webconsole.properties"
-);
+const l10n = new LocalizationHelper("devtools/client/locales/webconsole.properties");
 
 class AsyncFrameClass extends Component {
   static get propTypes() {

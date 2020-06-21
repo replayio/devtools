@@ -4,12 +4,7 @@
 
 "use strict";
 
-const {
-  createElement,
-  createRef,
-  Fragment,
-  PureComponent,
-} = require("react");
+const { createElement, createRef, Fragment, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -64,10 +59,7 @@ class GridItem extends PureComponent {
       onCommit: this.setGridColor,
       onPreview: this.setGridColor,
       onRevert: () => {
-        this.props.onSetGridOverlayColor(
-          this.props.grid.nodeFront,
-          previousColor
-        );
+        this.props.onSetGridOverlayColor(this.props.grid.nodeFront, previousColor);
       },
       onShow: () => {
         previousColor = this.props.grid.color;
@@ -115,8 +107,7 @@ class GridItem extends PureComponent {
           grids,
           onHideBoxModelHighlighter: this.props.onHideBoxModelHighlighter,
           onSetGridOverlayColor: this.props.onSetGridOverlayColor,
-          onShowBoxModelHighlighterForNode: this.props
-            .onShowBoxModelHighlighterForNode,
+          onShowBoxModelHighlighterForNode: this.props.onShowBoxModelHighlighterForNode,
           onToggleGridHighlighter: this.props.onToggleGridHighlighter,
           setSelectedNode: this.props.setSelectedNode,
         });
@@ -125,11 +116,7 @@ class GridItem extends PureComponent {
   }
 
   render() {
-    const {
-      grid,
-      onHideBoxModelHighlighter,
-      onShowBoxModelHighlighterForNode,
-    } = this.props;
+    const { grid, onHideBoxModelHighlighter, onShowBoxModelHighlighterForNode } = this.props;
 
     return createElement(
       Fragment,
@@ -150,8 +137,7 @@ class GridItem extends PureComponent {
             mode: MODE.TINY,
             object: translateNodeFrontToGrip(grid.nodeFront),
             onDOMNodeMouseOut: () => onHideBoxModelHighlighter(),
-            onDOMNodeMouseOver: () =>
-              onShowBoxModelHighlighterForNode(grid.nodeFront),
+            onDOMNodeMouseOver: () => onShowBoxModelHighlighterForNode(grid.nodeFront),
             onInspectIconClick: (_, e) => {
               // Stoping click propagation to avoid firing onGridCheckboxClick()
               e.stopPropagation();

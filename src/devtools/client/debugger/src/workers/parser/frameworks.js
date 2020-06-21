@@ -33,16 +33,14 @@ function isReactComponent({ imports, classes, callExpressions, identifiers }) {
 function importsReact(imports) {
   return imports.some(
     importObj =>
-      importObj.source === "react" &&
-      importObj.specifiers.some(specifier => specifier === "React")
+      importObj.source === "react" && importObj.specifiers.some(specifier => specifier === "React")
   );
 }
 
 function requiresReact(callExpressions) {
   return callExpressions.some(
     callExpression =>
-      callExpression.name === "require" &&
-      callExpression.values.some(value => value === "react")
+      callExpression.name === "require" && callExpression.values.some(value => value === "react")
   );
 }
 
@@ -58,9 +56,7 @@ function extendsReactComponent(classes) {
 
 function isAngularComponent({ memberExpressions }) {
   return memberExpressions.some(
-    item =>
-      item.expression == "angular.controller" ||
-      item.expression == "angular.module"
+    item => item.expression == "angular.controller" || item.expression == "angular.module"
   );
 }
 

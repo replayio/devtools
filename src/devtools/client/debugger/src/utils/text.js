@@ -48,18 +48,13 @@ export function formatKeyShortcut(shortcut: string): string {
  * @memberof utils/text
  * @static
  */
-export function truncateMiddleText(
-  sourceText: string,
-  maxLength: number
-): string {
+export function truncateMiddleText(sourceText: string, maxLength: number): string {
   let truncatedText = sourceText;
   if (sourceText.length > maxLength) {
     truncatedText = `${sourceText.substring(
       0,
       Math.round(maxLength / 2) - 2
-    )}…${sourceText.substring(
-      sourceText.length - Math.round(maxLength / 2 - 1)
-    )}`;
+    )}…${sourceText.substring(sourceText.length - Math.round(maxLength / 2 - 1))}`;
   }
   return truncatedText;
 }

@@ -44,20 +44,14 @@ function annotateBabelAsyncFrames(frames: Frame[]) {
 // call stack groups.
 function getBabelFrameIndexes(frames) {
   const startIndexes = frames.reduce((accumulator, frame, index) => {
-    if (
-      getFrameUrl(frame).match(/regenerator-runtime/i) &&
-      frame.displayName === "tryCatch"
-    ) {
+    if (getFrameUrl(frame).match(/regenerator-runtime/i) && frame.displayName === "tryCatch") {
       return [...accumulator, index];
     }
     return accumulator;
   }, []);
 
   const endIndexes = frames.reduce((accumulator, frame, index) => {
-    if (
-      getFrameUrl(frame).match(/_microtask/i) &&
-      frame.displayName === "flush"
-    ) {
+    if (getFrameUrl(frame).match(/_microtask/i) && frame.displayName === "flush") {
       return [...accumulator, index];
     }
     if (frame.displayName === "_asyncToGenerator/<") {

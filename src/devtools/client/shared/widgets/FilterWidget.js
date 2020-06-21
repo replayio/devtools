@@ -149,7 +149,7 @@ function CSSFilterEditorWidget(el, value = "") {
 exports.CSSFilterEditorWidget = CSSFilterEditorWidget;
 
 CSSFilterEditorWidget.prototype = {
-  _initMarkup: function() {
+  _initMarkup: function () {
     // The following structure is created:
     //   <div class="filters-list">
     //     <div id="filters"></div>
@@ -189,9 +189,7 @@ CSSFilterEditorWidget.prototype = {
 
     const filterListPlaceholder = this.doc.createElementNS(XHTML_NS, "option");
     filterListPlaceholder.setAttribute("value", "");
-    filterListPlaceholder.textContent = L10N.getStr(
-      "filterListSelectPlaceholder"
-    );
+    filterListPlaceholder.textContent = L10N.getStr("filterListSelectPlaceholder");
     this.filterSelect.appendChild(filterListPlaceholder);
 
     const addFilter = this.doc.createElementNS(XHTML_NS, "button");
@@ -220,10 +218,7 @@ CSSFilterEditorWidget.prototype = {
     this.addPresetInput = this.doc.createElementNS(XHTML_NS, "input");
     this.addPresetInput.setAttribute("value", "");
     this.addPresetInput.classList.add("devtools-textinput");
-    this.addPresetInput.setAttribute(
-      "placeholder",
-      L10N.getStr("newPresetPlaceholder")
-    );
+    this.addPresetInput.setAttribute("placeholder", L10N.getStr("newPresetPlaceholder"));
     presetListFooter.appendChild(this.addPresetInput);
 
     this.addPresetButton = this.doc.createElementNS(XHTML_NS, "button");
@@ -236,7 +231,7 @@ CSSFilterEditorWidget.prototype = {
     this._populateFilterSelect();
   },
 
-  _destroyMarkup: function() {
+  _destroyMarkup: function () {
     this._filterItemMarkup.remove();
     this.el.remove();
     this.el = this.filterList = this._filterItemMarkup = null;
@@ -244,7 +239,7 @@ CSSFilterEditorWidget.prototype = {
     this.addPresetButton = null;
   },
 
-  destroy: function() {
+  destroy: function () {
     this._removeEventListeners();
     this._destroyMarkup();
   },
@@ -253,11 +248,11 @@ CSSFilterEditorWidget.prototype = {
    * Creates <option> elements for each filter definition
    * in filterList
    */
-  _populateFilterSelect: function() {
+  _populateFilterSelect: function () {
     const select = this.filterSelect;
     filterList.forEach(filter => {
       const option = this.doc.createElementNS(XHTML_NS, "option");
-      // eslint-disable-next-line no-unsanitized/property
+      // eslint-disable-next-line
       option.innerHTML = option.value = filter.name;
       select.appendChild(option);
     });
@@ -266,7 +261,7 @@ CSSFilterEditorWidget.prototype = {
   /**
    * Creates a template for filter elements which is cloned and used in render
    */
-  _buildFilterItemMarkup: function() {
+  _buildFilterItemMarkup: function () {
     const base = this.doc.createElementNS(XHTML_NS, "div");
     base.className = "filter";
 
@@ -301,7 +296,7 @@ CSSFilterEditorWidget.prototype = {
     this._filterItemMarkup = base;
   },
 
-  _buildPresetItemMarkup: function() {
+  _buildPresetItemMarkup: function () {
     const base = this.doc.createElementNS(XHTML_NS, "div");
     base.classList.add("preset");
 
@@ -319,7 +314,7 @@ CSSFilterEditorWidget.prototype = {
     this._presetItemMarkup = base;
   },
 
-  _addEventListeners: function() {
+  _addEventListeners: function () {
     this.addButton = this.el.querySelector("#add-filter");
     this.addButton.addEventListener("click", this._addButtonClick);
     this.filterList.addEventListener("click", this._removeButtonClick);
@@ -340,7 +335,7 @@ CSSFilterEditorWidget.prototype = {
     this.filterList.addEventListener("input", this._input);
   },
 
-  _removeEventListeners: function() {
+  _removeEventListeners: function () {
     this.addButton.removeEventListener("click", this._addButtonClick);
     this.filterList.removeEventListener("click", this._removeButtonClick);
     this.filterList.removeEventListener("mousedown", this._mouseDown);
@@ -359,15 +354,12 @@ CSSFilterEditorWidget.prototype = {
     this.filterList.removeEventListener("input", this._input);
   },
 
-  _getFilterElementIndex: function(el) {
+  _getFilterElementIndex: function (el) {
     return [...this.filterList.children].indexOf(el);
   },
 
-  _keyDown: function(e) {
-    if (
-      e.target.tagName.toLowerCase() !== "input" ||
-      (e.keyCode !== 40 && e.keyCode !== 38)
-    ) {
+  _keyDown: function (e) {
+    if (e.target.tagName.toLowerCase() !== "input" || (e.keyCode !== 40 && e.keyCode !== 38)) {
       return;
     }
     const input = e.target;
@@ -418,8 +410,7 @@ CSSFilterEditorWidget.prototype = {
       if (dotIndex > -1) {
         computed = computed.slice(0, -2);
 
-        selectionStart =
-          selectionStart > start + dotIndex ? start + dotIndex : selectionStart;
+        selectionStart = selectionStart > start + dotIndex ? start + dotIndex : selectionStart;
       }
       split.splice(start, end - start, computed);
 
@@ -431,7 +422,7 @@ CSSFilterEditorWidget.prototype = {
     e.preventDefault();
   },
 
-  _input: function(e) {
+  _input: function (e) {
     const filterEl = e.target.closest(".filter");
     const index = this._getFilterElementIndex(filterEl);
     const filter = this.filters[index];
@@ -443,7 +434,7 @@ CSSFilterEditorWidget.prototype = {
     this.updateValueAt(index, e.target.value);
   },
 
-  _mouseDown: function(e) {
+  _mouseDown: function (e) {
     const filterEl = e.target.closest(".filter");
 
     // re-ordering drag handle
@@ -470,7 +461,7 @@ CSSFilterEditorWidget.prototype = {
     }
   },
 
-  _addButtonClick: function() {
+  _addButtonClick: function () {
     const select = this.filterSelect;
     if (!select.value) {
       return;
@@ -482,7 +473,7 @@ CSSFilterEditorWidget.prototype = {
     this.render();
   },
 
-  _removeButtonClick: function(e) {
+  _removeButtonClick: function (e) {
     const isRemoveButton = e.target.classList.contains("remove-button");
     if (!isRemoveButton) {
       return;
@@ -493,7 +484,7 @@ CSSFilterEditorWidget.prototype = {
     this.removeAt(index);
   },
 
-  _mouseMove: function(e) {
+  _mouseMove: function (e) {
     if (this.isReorderingFilter) {
       this._dragFilterElement(e);
     } else if (this.isDraggingLabel) {
@@ -501,7 +492,7 @@ CSSFilterEditorWidget.prototype = {
     }
   },
 
-  _dragFilterElement: function(e) {
+  _dragFilterElement: function (e) {
     const rect = this.filterList.getBoundingClientRect();
     const top = e.pageY - LIST_PADDING;
     const bottom = e.pageY + LIST_PADDING;
@@ -537,8 +528,7 @@ CSSFilterEditorWidget.prototype = {
     swapArrayIndices(this.filters, index, destination);
 
     // Re-order the dragging element in markup
-    const target =
-      change > 0 ? children[destination + 1] : children[destination];
+    const target = change > 0 ? children[destination + 1] : children[destination];
     if (target) {
       this.filterList.insertBefore(filterEl, target);
     } else {
@@ -551,7 +541,7 @@ CSSFilterEditorWidget.prototype = {
     filterEl.startingY = e.pageY + currentPosition - delta;
   },
 
-  _dragLabel: function(e) {
+  _dragLabel: function (e) {
     const dragging = this._dragging;
 
     const input = dragging.input;
@@ -584,7 +574,7 @@ CSSFilterEditorWidget.prototype = {
     this.updateValueAt(dragging.index, value);
   },
 
-  _mouseUp: function() {
+  _mouseUp: function () {
     // Label-dragging is disabled on mouseup
     this._dragging = null;
     this.isDraggingLabel = false;
@@ -604,7 +594,7 @@ CSSFilterEditorWidget.prototype = {
     this.render();
   },
 
-  _presetClick: function(e) {
+  _presetClick: function (e) {
     const el = e.target;
     const preset = el.closest(".preset");
     if (!preset) {
@@ -628,12 +618,12 @@ CSSFilterEditorWidget.prototype = {
     }, console.error);
   },
 
-  _togglePresets: function() {
+  _togglePresets: function () {
     this.el.classList.toggle("show-presets");
     this.emit("render");
   },
 
-  _savePreset: function(e) {
+  _savePreset: function (e) {
     e.preventDefault();
 
     const name = this.addPresetInput.value;
@@ -661,7 +651,7 @@ CSSFilterEditorWidget.prototype = {
    * Workaround needed to reset the focus when using a HTML select inside a XUL panel.
    * See Bug 1294366.
    */
-  _resetFocus: function() {
+  _resetFocus: function () {
     this.filterSelect.ownerDocument.defaultView.focus();
   },
 
@@ -669,9 +659,9 @@ CSSFilterEditorWidget.prototype = {
    * Clears the list and renders filters, binding required events.
    * There are some delegated events bound in _addEventListeners method
    */
-  render: function() {
+  render: function () {
     if (!this.filters.length) {
-      // eslint-disable-next-line no-unsanitized/property
+      // eslint-disable-next-line
       this.filterList.innerHTML = `<p> ${L10N.getStr("emptyFilterList")} <br />
                                  ${L10N.getStr("addUsingList")} </p>`;
       this.emit("render");
@@ -731,9 +721,7 @@ CSSFilterEditorWidget.prototype = {
       this.filterList.appendChild(el);
     }
 
-    const lastInput = this.filterList.querySelector(
-      ".filter:last-of-type input"
-    );
+    const lastInput = this.filterList.querySelector(".filter:last-of-type input");
     if (lastInput) {
       lastInput.focus();
       if (lastInput.type === "text") {
@@ -746,7 +734,7 @@ CSSFilterEditorWidget.prototype = {
     this.emit("render");
   },
 
-  renderPresets: function() {
+  renderPresets: function () {
     this.getPresets().then(presets => {
       // getPresets is async and the widget may be destroyed in between.
       if (!this.presetList) {
@@ -754,7 +742,7 @@ CSSFilterEditorWidget.prototype = {
       }
 
       if (!presets || !presets.length) {
-        // eslint-disable-next-line no-unsanitized/property
+        // eslint-disable-next-line
         this.presetList.innerHTML = `<p>${L10N.getStr("emptyPresetList")}</p>`;
         this.emit("render");
         return;
@@ -788,7 +776,7 @@ CSSFilterEditorWidget.prototype = {
    * @return {Object}
    *        filter's definition
    */
-  _definition: function(name) {
+  _definition: function (name) {
     name = name.toLowerCase();
     return filterList.find(a => a.name === name);
   },
@@ -799,7 +787,7 @@ CSSFilterEditorWidget.prototype = {
    * @param {String} cssValue
    *        css value to be parsed
    */
-  setCssValue: function(cssValue) {
+  setCssValue: function (cssValue) {
     if (!cssValue) {
       throw new Error("Missing CSS filter value in setCssValue");
     }
@@ -847,7 +835,7 @@ CSSFilterEditorWidget.prototype = {
    *        you're calling add in a loop and wait to emit a single event after
    *        the loop yourself, set this parameter to true.
    */
-  add: function(name, value, quote, noEvent) {
+  add: function (name, value, quote, noEvent) {
     const def = this._definition(name);
     if (!def) {
       return false;
@@ -909,7 +897,7 @@ CSSFilterEditorWidget.prototype = {
    * @return {String}
    *        css value of filter
    */
-  getValueAt: function(index) {
+  getValueAt: function (index) {
     const filter = this.filters[index];
     if (!filter) {
       return null;
@@ -933,7 +921,7 @@ CSSFilterEditorWidget.prototype = {
     return filter.value.replace(/[\\ \t()"']/g, "\\$&");
   },
 
-  removeAt: function(index) {
+  removeAt: function (index) {
     if (!this.filters[index]) {
       return;
     }
@@ -949,7 +937,7 @@ CSSFilterEditorWidget.prototype = {
    * @return {String}
    *        css value of filters
    */
-  getCssValue: function() {
+  getCssValue: function () {
     return (
       this.filters
         .map((filter, i) => {
@@ -970,7 +958,7 @@ CSSFilterEditorWidget.prototype = {
    *        value to set, string for string-typed filters
    *        number for the rest (unit automatically determined)
    */
-  updateValueAt: function(index, value) {
+  updateValueAt: function (index, value) {
     const filter = this.filters[index];
     if (!filter) {
       return;
@@ -992,7 +980,7 @@ CSSFilterEditorWidget.prototype = {
     this.emit("updated", this.getCssValue());
   },
 
-  getPresets: function() {
+  getPresets: function () {
     return asyncStorage.getItem("cssFilterPresets").then(presets => {
       if (!presets) {
         return [];
@@ -1002,10 +990,8 @@ CSSFilterEditorWidget.prototype = {
     }, console.error);
   },
 
-  setPresets: function(presets) {
-    return asyncStorage
-      .setItem("cssFilterPresets", presets)
-      .catch(console.error);
+  setPresets: function (presets) {
+    return asyncStorage.setItem("cssFilterPresets", presets).catch(console.error);
   },
 };
 
@@ -1057,10 +1043,7 @@ function tokenizeFilterValue(css) {
           depth = 1;
         } else if (token.tokenType === "url" || token.tokenType === "bad_url") {
           // Extract the quoting style from the url.
-          const originalText = css.substring(
-            token.startOffset,
-            token.endOffset
-          );
+          const originalText = css.substring(token.startOffset, token.endOffset);
           const [, quote] = /^url\([ \t\r\n\f]*(["']?)/i.exec(originalText);
 
           filters.push({ name: "url", value: token.text.trim(), quote: quote });

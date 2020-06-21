@@ -9,9 +9,7 @@ import {
   getSourceByActorId,
 } from "../../selectors";
 
-import {
-  selectSource,
-} from "./select";
+import { selectSource } from "./select";
 
 import { ThreadFront } from "protocol/thread";
 

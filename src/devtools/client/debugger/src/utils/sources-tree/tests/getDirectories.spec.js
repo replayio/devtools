@@ -24,12 +24,8 @@ function createSources(urls) {
 }
 
 describe("getDirectories", () => {
-  it("gets a source's ancestor directories", function() {
-    const sources = createSources([
-      "http://a/b.js",
-      "http://a/c.js",
-      "http://b/c.js",
-    ]);
+  it("gets a source's ancestor directories", function () {
+    const sources = createSources(["http://a/b.js", "http://a/c.js", "http://b/c.js"]);
 
     const threads = [
       {

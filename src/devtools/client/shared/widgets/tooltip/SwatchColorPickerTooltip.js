@@ -8,34 +8,15 @@ const { colorUtils } = require("devtools/shared/css/color");
 const Spectrum = require("devtools/client/shared/widgets/Spectrum");
 const SwatchBasedEditorTooltip = require("devtools/client/shared/widgets/tooltip/SwatchBasedEditorTooltip");
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper(
-  "devtools/client/locales/inspector.properties"
-);
+const L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 const { openDocLink } = require("devtools/client/shared/link");
-const {
-  A11Y_CONTRAST_LEARN_MORE_LINK,
-} = require("devtools/client/accessibility/constants");
+const { A11Y_CONTRAST_LEARN_MORE_LINK } = require("devtools/client/accessibility/constants");
 
-loader.lazyRequireGetter(
-  this,
-  "wrapMoveFocus",
-  "devtools/client/shared/focus",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "getFocusableElements",
-  "devtools/client/shared/focus",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "PICKER_TYPES",
-  "devtools/shared/picker-constants"
-);
+loader.lazyRequireGetter(this, "wrapMoveFocus", "devtools/client/shared/focus", true);
+loader.lazyRequireGetter(this, "getFocusableElements", "devtools/client/shared/focus", true);
+loader.lazyRequireGetter(this, "PICKER_TYPES", "devtools/shared/picker-constants");
 
-const TELEMETRY_PICKER_EYEDROPPER_OPEN_COUNT =
-  "DEVTOOLS_PICKER_EYEDROPPER_OPENED_COUNT";
+const TELEMETRY_PICKER_EYEDROPPER_OPEN_COUNT = "DEVTOOLS_PICKER_EYEDROPPER_OPENED_COUNT";
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
 
 /**
@@ -113,16 +94,12 @@ class SwatchColorPickerTooltip extends SwatchBasedEditorTooltip {
 
     if (this.isContrastCompatible === undefined) {
       const target = this.inspector.currentTarget;
-      this.isContrastCompatible = await target.actorHasMethod(
-        "domnode",
-        "getBackgroundColor"
-      );
+      this.isContrastCompatible = await target.actorHasMethod("domnode", "getBackgroundColor");
     }
 
     // Only enable contrast and set text props and bg color if selected node is
     // contrast compatible and if the type of property is color.
-    this.spectrum.contrastEnabled =
-      name === "color" && this.isContrastCompatible;
+    this.spectrum.contrastEnabled = name === "color" && this.isContrastCompatible;
     if (this.spectrum.contrastEnabled) {
       const { nodeFront } = this.inspector.selection;
       const { pageStyle } = nodeFront.inspectorFront;
@@ -147,9 +124,7 @@ class SwatchColorPickerTooltip extends SwatchBasedEditorTooltip {
     // Call then parent class' show function
     await super.show();
 
-    const eyeButton = this.tooltip.container.querySelector(
-      "#eyedropper-button"
-    );
+    const eyeButton = this.tooltip.container.querySelector("#eyedropper-button");
     const canShowEyeDropper = await this.inspector.supportsEyeDropper();
     if (canShowEyeDropper) {
       eyeButton.disabled = false;
@@ -160,9 +135,7 @@ class SwatchColorPickerTooltip extends SwatchBasedEditorTooltip {
       eyeButton.title = L10N.getStr("eyedropper.disabled.title");
     }
 
-    const learnMoreButton = this.tooltip.container.querySelector(
-      "#learn-more-button"
-    );
+    const learnMoreButton = this.tooltip.container.querySelector("#learn-more-button");
     if (learnMoreButton) {
       learnMoreButton.addEventListener("click", this._openDocLink);
       learnMoreButton.addEventListener("keydown", e => e.stopPropagation());
@@ -171,11 +144,7 @@ class SwatchColorPickerTooltip extends SwatchBasedEditorTooltip {
     // Add focus to the first focusable element in the tooltip and attach keydown
     // event listener to tooltip
     this.focusableElements[0].focus();
-    this.tooltip.container.addEventListener(
-      "keydown",
-      this._onTooltipKeydown,
-      true
-    );
+    this.tooltip.container.addEventListener("keydown", this._onTooltipKeydown, true);
 
     this.emit("ready");
   }
@@ -187,11 +156,7 @@ class SwatchColorPickerTooltip extends SwatchBasedEditorTooltip {
       return;
     }
 
-    const focusMoved = !!wrapMoveFocus(
-      this.focusableElements,
-      target,
-      shiftKey
-    );
+    const focusMoved = !!wrapMoveFocus(this.focusableElements, target, shiftKey);
     if (focusMoved) {
       // Focus was moved to the begining/end of the tooltip, so we need to prevent the
       // default focus change that would happen here.
@@ -231,18 +196,13 @@ class SwatchColorPickerTooltip extends SwatchBasedEditorTooltip {
     }
 
     super.onTooltipHidden();
-    this.tooltip.container.removeEventListener(
-      "keydown",
-      this._onTooltipKeydown
-    );
+    this.tooltip.container.removeEventListener("keydown", this._onTooltipKeydown);
   }
 
   _openEyeDropper() {
     const { inspectorFront, toolbox, telemetry } = this.inspector;
 
-    telemetry
-      .getHistogramById(TELEMETRY_PICKER_EYEDROPPER_OPEN_COUNT)
-      .add(true);
+    telemetry.getHistogramById(TELEMETRY_PICKER_EYEDROPPER_OPEN_COUNT).add(true);
 
     // cancelling picker(if it is already selected) on opening eye-dropper
     toolbox.nodePicker.cancel();
@@ -280,10 +240,7 @@ class SwatchColorPickerTooltip extends SwatchBasedEditorTooltip {
 
   _onEyeDropperDone() {
     // enable simulating touch events if RDM is active
-    this.inspector.toolbox.tellRDMAboutPickerState(
-      false,
-      PICKER_TYPES.EYEDROPPER
-    );
+    this.inspector.toolbox.tellRDMAboutPickerState(false, PICKER_TYPES.EYEDROPPER);
 
     this.eyedropperOpen = false;
     this.activeSwatch = null;
@@ -310,9 +267,7 @@ class SwatchColorPickerTooltip extends SwatchBasedEditorTooltip {
   }
 
   get focusableElements() {
-    return getFocusableElements(this.tooltip.container).filter(
-      el => !!el.offsetParent
-    );
+    return getFocusableElements(this.tooltip.container).filter(el => !!el.offsetParent);
   }
 
   destroy() {

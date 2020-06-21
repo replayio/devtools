@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'svg-inline-react' {
+declare module "svg-inline-react" {
   declare module.exports: any;
 }
 
@@ -22,60 +22,60 @@ declare module 'svg-inline-react' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'svg-inline-react/dist/index' {
+declare module "svg-inline-react/dist/index" {
   declare module.exports: any;
 }
 
-declare module 'svg-inline-react/gulpfile' {
+declare module "svg-inline-react/gulpfile" {
   declare module.exports: any;
 }
 
-declare module 'svg-inline-react/karma.conf' {
+declare module "svg-inline-react/karma.conf" {
   declare module.exports: any;
 }
 
-declare module 'svg-inline-react/lib/index' {
+declare module "svg-inline-react/lib/index" {
   declare module.exports: any;
 }
 
-declare module 'svg-inline-react/lib/util' {
+declare module "svg-inline-react/lib/util" {
   declare module.exports: any;
 }
 
-declare module 'svg-inline-react/src/index' {
+declare module "svg-inline-react/src/index" {
   declare module.exports: any;
 }
 
-declare module 'svg-inline-react/src/util' {
+declare module "svg-inline-react/src/util" {
   declare module.exports: any;
 }
 
-declare module 'svg-inline-react/webpack.config' {
+declare module "svg-inline-react/webpack.config" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'svg-inline-react/dist/index.js' {
-  declare module.exports: $Exports<'svg-inline-react/dist/index'>;
+declare module "svg-inline-react/dist/index.js" {
+  declare module.exports: $Exports<"svg-inline-react/dist/index">;
 }
-declare module 'svg-inline-react/gulpfile.js' {
-  declare module.exports: $Exports<'svg-inline-react/gulpfile'>;
+declare module "svg-inline-react/gulpfile.js" {
+  declare module.exports: $Exports<"svg-inline-react/gulpfile">;
 }
-declare module 'svg-inline-react/karma.conf.js' {
-  declare module.exports: $Exports<'svg-inline-react/karma.conf'>;
+declare module "svg-inline-react/karma.conf.js" {
+  declare module.exports: $Exports<"svg-inline-react/karma.conf">;
 }
-declare module 'svg-inline-react/lib/index.js' {
-  declare module.exports: $Exports<'svg-inline-react/lib/index'>;
+declare module "svg-inline-react/lib/index.js" {
+  declare module.exports: $Exports<"svg-inline-react/lib/index">;
 }
-declare module 'svg-inline-react/lib/util.js' {
-  declare module.exports: $Exports<'svg-inline-react/lib/util'>;
+declare module "svg-inline-react/lib/util.js" {
+  declare module.exports: $Exports<"svg-inline-react/lib/util">;
 }
-declare module 'svg-inline-react/src/index.js' {
-  declare module.exports: $Exports<'svg-inline-react/src/index'>;
+declare module "svg-inline-react/src/index.js" {
+  declare module.exports: $Exports<"svg-inline-react/src/index">;
 }
-declare module 'svg-inline-react/src/util.js' {
-  declare module.exports: $Exports<'svg-inline-react/src/util'>;
+declare module "svg-inline-react/src/util.js" {
+  declare module.exports: $Exports<"svg-inline-react/src/util">;
 }
-declare module 'svg-inline-react/webpack.config.js' {
-  declare module.exports: $Exports<'svg-inline-react/webpack.config'>;
+declare module "svg-inline-react/webpack.config.js" {
+  declare module.exports: $Exports<"svg-inline-react/webpack.config">;
 }

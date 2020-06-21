@@ -7,27 +7,16 @@
 import fs from "fs";
 import path from "path";
 
-import type {
-  Source,
-  TextSourceContent,
-  SourceBase,
-  SourceWithContent,
-} from "../../../../types";
+import type { Source, TextSourceContent, SourceBase, SourceWithContent } from "../../../../types";
 import { makeMockSourceAndContent } from "../../../../utils/test-mockup";
 import { setSource } from "../../sources";
 import * as asyncValue from "../../../../utils/async-value";
 
 export function getFixture(name: string, type: string = "js") {
-  return fs.readFileSync(
-    path.join(__dirname, `../fixtures/${name}.${type}`),
-    "utf8"
-  );
+  return fs.readFileSync(path.join(__dirname, `../fixtures/${name}.${type}`), "utf8");
 }
 
-function getSourceContent(
-  name: string,
-  type: string = "js"
-): TextSourceContent {
+function getSourceContent(name: string, type: string = "js"): TextSourceContent {
   const text = getFixture(name, type);
   let contentType = "text/javascript";
   if (type === "html") {
@@ -84,18 +73,10 @@ export function getOriginalSourceWithContent(
 ): { ...SourceBase, content: TextSourceContent } {
   const { value: text, contentType } = getSourceContent(name, type);
 
-  return makeMockSourceAndContent(
-    undefined,
-    `${name}/originalSource-1`,
-    contentType,
-    text
-  );
+  return makeMockSourceAndContent(undefined, `${name}/originalSource-1`, contentType, text);
 }
 
-export function populateOriginalSource(
-  name: string,
-  type?: string
-): SourceWithContent {
+export function populateOriginalSource(name: string, type?: string): SourceWithContent {
   const { content, ...source } = getOriginalSourceWithContent(name, type);
   setSource({
     id: source.id,

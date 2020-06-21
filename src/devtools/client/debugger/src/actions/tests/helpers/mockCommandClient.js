@@ -33,7 +33,7 @@ const sources = [
 ];
 
 export const mockCommandClient = {
-  sourceContents: function({
+  sourceContents: function ({
     source,
   }: SourceActor): Promise<{| source: any, contentType: ?string |}> {
     return new Promise((resolve, reject) => {

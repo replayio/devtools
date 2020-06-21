@@ -100,9 +100,7 @@ export class ShortcutsModal extends Component<Props> {
 
   renderShortcutsContent() {
     return (
-      <div
-        className={classnames("shortcuts-content", this.props.additionalClass)}
-      >
+      <div className={classnames("shortcuts-content", this.props.additionalClass)}>
         <div className="shortcuts-section">
           <h2>{L10N.getStr("shortcuts.header.editor")}</h2>
           {this.renderEditorShortcuts()}
@@ -127,11 +125,7 @@ export class ShortcutsModal extends Component<Props> {
     }
 
     return (
-      <Modal
-        in={enabled}
-        additionalClass="shortcuts-modal"
-        handleClose={this.props.handleClose}
-      >
+      <Modal in={enabled} additionalClass="shortcuts-modal" handleClose={this.props.handleClose}>
         {this.renderShortcutsContent()}
       </Modal>
     );

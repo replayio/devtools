@@ -51,8 +51,7 @@ class WalkerEventListener {
     this._listenerMap = null;
   }
 
-  _init() {
-  }
+  _init() {}
 
   async _onTargetAvailable({ type, targetFront, isTopLevel }) {
     const inspectorFront = await targetFront.getFront("inspector");

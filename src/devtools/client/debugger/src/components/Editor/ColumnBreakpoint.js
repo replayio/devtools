@@ -117,12 +117,7 @@ export default class ColumnBreakpoint extends PureComponent<Props> {
     if (breakpoint) {
       const selectedLocation = breakpoint.location;
 
-      items = breakpointItems(
-        cx,
-        breakpoint,
-        selectedLocation,
-        breakpointActions
-      );
+      items = breakpointItems(cx, breakpoint, selectedLocation, breakpointActions);
     }
 
     showMenu(event, items);

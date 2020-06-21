@@ -4,17 +4,12 @@
 
 "use strict";
 
-import {
-  createElement,
-  createFactory,
-} from "react";
+import { createElement, createFactory } from "react";
 import { Provider } from "react-redux";
 
 const EventEmitter = require("devtools/shared/event-emitter");
 
-const App = createFactory(
-  require("devtools/client/inspector/animation/components/App")
-);
+const App = createFactory(require("devtools/client/inspector/animation/components/App"));
 const CurrentTimeTimer = require("devtools/client/inspector/animation/current-time-timer");
 
 const {
@@ -36,19 +31,13 @@ class AnimationInspector {
     this.inspector = inspector;
     this.win = win;
 
-    this.addAnimationsCurrentTimeListener = this.addAnimationsCurrentTimeListener.bind(
-      this
-    );
+    this.addAnimationsCurrentTimeListener = this.addAnimationsCurrentTimeListener.bind(this);
     this.getAnimatedPropertyMap = this.getAnimatedPropertyMap.bind(this);
     this.getAnimationsCurrentTime = this.getAnimationsCurrentTime.bind(this);
     this.getComputedStyle = this.getComputedStyle.bind(this);
     this.getNodeFromActor = this.getNodeFromActor.bind(this);
-    this.removeAnimationsCurrentTimeListener = this.removeAnimationsCurrentTimeListener.bind(
-      this
-    );
-    this.rewindAnimationsCurrentTime = this.rewindAnimationsCurrentTime.bind(
-      this
-    );
+    this.removeAnimationsCurrentTimeListener = this.removeAnimationsCurrentTimeListener.bind(this);
+    this.rewindAnimationsCurrentTime = this.rewindAnimationsCurrentTime.bind(this);
     this.selectAnimation = this.selectAnimation.bind(this);
     this.setAnimationsCurrentTime = this.setAnimationsCurrentTime.bind(this);
     this.setAnimationsPlaybackRate = this.setAnimationsPlaybackRate.bind(this);
@@ -63,9 +52,7 @@ class AnimationInspector {
     this.toggleElementPicker = this.toggleElementPicker.bind(this);
     this.update = this.update.bind(this);
     this.onAnimationStateChanged = this.onAnimationStateChanged.bind(this);
-    this.onAnimationsCurrentTimeUpdated = this.onAnimationsCurrentTimeUpdated.bind(
-      this
-    );
+    this.onAnimationsCurrentTimeUpdated = this.onAnimationsCurrentTimeUpdated.bind(this);
     this.onAnimationsMutation = this.onAnimationsMutation.bind(this);
     this.onCurrentTimeTimerUpdated = this.onCurrentTimeTimerUpdated.bind(this);
     this.onElementPickerStarted = this.onElementPickerStarted.bind(this);
@@ -83,13 +70,9 @@ class AnimationInspector {
   }
 
   initComponents() {
-    const {
-      onShowBoxModelHighlighterForNode,
-    } = this.inspector.getCommonComponentProps();
+    const { onShowBoxModelHighlighterForNode } = this.inspector.getCommonComponentProps();
 
-    const { onHideBoxModelHighlighter } = this.inspector
-      .getPanel("boxmodel")
-      .getComponentProps();
+    const { onHideBoxModelHighlighter } = this.inspector.getPanel("boxmodel").getComponentProps();
 
     const {
       addAnimationsCurrentTimeListener,
@@ -163,18 +146,9 @@ class AnimationInspector {
     this.inspector.selection.on("new-node-front", this.update);
     this.inspector.sidebar.on("select", this.onSidebarSelectionChanged);
     this.inspector.toolbox.on("select", this.onSidebarSelectionChanged);
-    this.inspector.toolbox.on(
-      "inspector-sidebar-resized",
-      this.onSidebarResized
-    );
-    this.inspector.toolbox.nodePicker.on(
-      "picker-started",
-      this.onElementPickerStarted
-    );
-    this.inspector.toolbox.nodePicker.on(
-      "picker-stopped",
-      this.onElementPickerStopped
-    );
+    this.inspector.toolbox.on("inspector-sidebar-resized", this.onSidebarResized);
+    this.inspector.toolbox.nodePicker.on("picker-started", this.onElementPickerStarted);
+    this.inspector.toolbox.nodePicker.on("picker-stopped", this.onElementPickerStopped);
   }
 
   destroy() {
@@ -182,18 +156,9 @@ class AnimationInspector {
     this.inspector.off("new-root", this.onNavigate);
     this.inspector.selection.off("new-node-front", this.update);
     this.inspector.sidebar.off("select", this.onSidebarSelectionChanged);
-    this.inspector.toolbox.off(
-      "inspector-sidebar-resized",
-      this.onSidebarResized
-    );
-    this.inspector.toolbox.nodePicker.off(
-      "picker-started",
-      this.onElementPickerStarted
-    );
-    this.inspector.toolbox.nodePicker.off(
-      "picker-stopped",
-      this.onElementPickerStopped
-    );
+    this.inspector.toolbox.off("inspector-sidebar-resized", this.onSidebarResized);
+    this.inspector.toolbox.nodePicker.off("picker-started", this.onElementPickerStarted);
+    this.inspector.toolbox.nodePicker.off("picker-stopped", this.onElementPickerStopped);
     this.inspector.toolbox.off("select", this.onSidebarSelectionChanged);
 
     if (this.animationsFront) {
@@ -263,12 +228,10 @@ class AnimationInspector {
     const animatedPropertyMap = new Map();
 
     for (const { name, values } of properties) {
-      const keyframes = values.map(
-        ({ value, offset, easing, distance = 0 }) => {
-          offset = parseFloat(offset.toFixed(3));
-          return { value, offset, easing, distance };
-        }
-      );
+      const keyframes = values.map(({ value, offset, easing, distance = 0 }) => {
+        offset = parseFloat(offset.toFixed(3));
+        return { value, offset, easing, distance };
+      });
 
       animatedPropertyMap.set(name, keyframes);
     }
@@ -295,15 +258,10 @@ class AnimationInspector {
     this.simulatedElement.style.cssText = "";
 
     for (const propertyName in styles) {
-      this.simulatedElement.style.setProperty(
-        propertyName,
-        styles[propertyName]
-      );
+      this.simulatedElement.style.setProperty(propertyName, styles[propertyName]);
     }
 
-    return this.win
-      .getComputedStyle(this.simulatedElement)
-      .getPropertyValue(property);
+    return this.win.getComputedStyle(this.simulatedElement).getPropertyValue(property);
   }
 
   getNodeFromActor(actorID) {
@@ -541,8 +499,7 @@ class AnimationInspector {
       if (
         doPlay &&
         animations.every(
-          animation =>
-            timeScale.getEndTime(animation) <= animation.state.currentTime
+          animation => timeScale.getEndTime(animation) <= animation.state.currentTime
         )
       ) {
         await this.doSetCurrentTimes(timeScale.zeroPositionTime);
@@ -657,11 +614,7 @@ class AnimationInspector {
       this.simulatedAnimation = new this.win.Animation();
     }
 
-    this.simulatedAnimation.effect = new this.win.KeyframeEffect(
-      targetEl,
-      keyframes,
-      effectTiming
-    );
+    this.simulatedAnimation.effect = new this.win.KeyframeEffect(targetEl, keyframes, effectTiming);
 
     return this.simulatedAnimation;
   }
@@ -699,9 +652,7 @@ class AnimationInspector {
 
   startAnimationsCurrentTimeTimer() {
     const timeScale = this.state.timeScale;
-    const shouldStopAfterEndTime = !hasAnimationIterationCountInfinite(
-      this.state.animations
-    );
+    const shouldStopAfterEndTime = !hasAnimationIterationCountInfinite(this.state.animations);
 
     const currentTimeTimer = new CurrentTimeTimer(
       timeScale,
@@ -727,9 +678,7 @@ class AnimationInspector {
     const selection = this.inspector.selection;
     const animations =
       selection.isConnected() && selection.isElementNode()
-        ? await this.animationsFront.getAnimationPlayersForNode(
-          selection.nodeFront
-        )
+        ? await this.animationsFront.getAnimationPlayersForNode(selection.nodeFront)
         : [];
     this.fireUpdateAction(animations);
     this.setAnimationStateChangedListenerEnabled(true);
@@ -779,9 +728,7 @@ class AnimationInspector {
     // adding special case code to represent this very rare case, we simply omit
     // such animations from the graph.
     animations = animations.filter(
-      anim =>
-        Math.abs(anim.state.delay) !== Infinity &&
-        Math.abs(anim.state.endDelay) !== Infinity
+      anim => Math.abs(anim.state.delay) !== Infinity && Math.abs(anim.state.endDelay) !== Infinity
     );
 
     this.inspector.store.dispatch(updateAnimations(animations));

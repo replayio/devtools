@@ -50,19 +50,13 @@ export { buildScopeList };
 /**
  * Searches all scopes and their bindings at the specific location.
  */
-function findScopes(
-  scopes: ParsedScope[],
-  location: SourceLocation
-): SourceScope[] {
+function findScopes(scopes: ParsedScope[], location: SourceLocation): SourceScope[] {
   // Find inner most in the tree structure.
   let searchInScopes: ?(ParsedScope[]) = scopes;
   const found = [];
   while (searchInScopes) {
     const foundOne = searchInScopes.some(s => {
-      if (
-        compareLocations(s.start, location) <= 0 &&
-        compareLocations(location, s.end) < 0
-      ) {
+      if (compareLocations(s.start, location) <= 0 && compareLocations(location, s.end) < 0) {
         // Found the next scope, trying to search recusevly in its children.
         found.unshift(s);
         searchInScopes = s.children;

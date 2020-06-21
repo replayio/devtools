@@ -57,10 +57,7 @@ export type FindNodeInContentsMatcher = (node: TreeNode) => number;
  * The matcher is a function that returns result of comparision of a node with
  * lookup value.
  */
-export function findNodeInContents(
-  tree: TreeNode,
-  matcher: FindNodeInContentsMatcher
-) {
+export function findNodeInContents(tree: TreeNode, matcher: FindNodeInContentsMatcher) {
   if (tree.type === "source" || tree.contents.length === 0) {
     return { found: false, index: 0 };
   }

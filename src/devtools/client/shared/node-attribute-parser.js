@@ -214,7 +214,7 @@ const ATTRIBUTE_TYPES = new Map([
 ]);
 
 var parsers = {
-  [TYPE_URI]: function(attributeValue) {
+  [TYPE_URI]: function (attributeValue) {
     return [
       {
         type: TYPE_URI,
@@ -222,7 +222,7 @@ var parsers = {
       },
     ];
   },
-  [TYPE_URI_LIST]: function(attributeValue) {
+  [TYPE_URI_LIST]: function (attributeValue) {
     const data = splitBy(attributeValue, " ");
     for (const token of data) {
       if (!token.type) {
@@ -231,7 +231,7 @@ var parsers = {
     }
     return data;
   },
-  [TYPE_JS_RESOURCE_URI]: function(attributeValue) {
+  [TYPE_JS_RESOURCE_URI]: function (attributeValue) {
     return [
       {
         type: TYPE_JS_RESOURCE_URI,
@@ -239,7 +239,7 @@ var parsers = {
       },
     ];
   },
-  [TYPE_CSS_RESOURCE_URI]: function(attributeValue) {
+  [TYPE_CSS_RESOURCE_URI]: function (attributeValue) {
     return [
       {
         type: TYPE_CSS_RESOURCE_URI,
@@ -247,7 +247,7 @@ var parsers = {
       },
     ];
   },
-  [TYPE_IDREF]: function(attributeValue) {
+  [TYPE_IDREF]: function (attributeValue) {
     return [
       {
         type: TYPE_IDREF,
@@ -255,7 +255,7 @@ var parsers = {
       },
     ];
   },
-  [TYPE_IDREF_LIST]: function(attributeValue) {
+  [TYPE_IDREF_LIST]: function (attributeValue) {
     const data = splitBy(attributeValue, " ");
     for (const token of data) {
       if (!token.type) {
@@ -284,13 +284,7 @@ var parsers = {
  *   {type: "uri", value: "uri1"}
  * ]
  */
-function parseAttribute(
-  namespaceURI,
-  tagName,
-  attributes,
-  attributeName,
-  attributeValue
-) {
+function parseAttribute(namespaceURI, tagName, attributes, attributeName, attributeValue) {
   const type = getType(namespaceURI, tagName, attributes, attributeName);
   if (!type) {
     return [
@@ -329,8 +323,7 @@ function getType(namespaceURI, tagName, attributes, attributeName) {
 
   if (Array.isArray(typeData)) {
     for (const data of typeData) {
-      const hasNamespace =
-        data.namespaceURI === WILDCARD || data.namespaceURI === namespaceURI;
+      const hasNamespace = data.namespaceURI === WILDCARD || data.namespaceURI === namespaceURI;
       const isValid = data.isValid ? data.isValid(attributes) : true;
 
       if (hasNamespace && isValid) {
@@ -339,10 +332,7 @@ function getType(namespaceURI, tagName, attributes, attributeName) {
     }
 
     return null;
-  } else if (
-    typeData.namespaceURI === WILDCARD ||
-    typeData.namespaceURI === namespaceURI
-  ) {
+  } else if (typeData.namespaceURI === WILDCARD || typeData.namespaceURI === namespaceURI) {
     return typeData.type;
   }
 

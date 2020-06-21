@@ -21,10 +21,7 @@ function MessageRepeat(props) {
   return dom.span(
     {
       className: "message-repeats",
-      title: PluralForm.get(repeat, messageRepeatsTooltip).replace(
-        "#1",
-        repeat
-      ),
+      title: PluralForm.get(repeat, messageRepeatsTooltip).replace("#1", repeat),
     },
     repeat
   );

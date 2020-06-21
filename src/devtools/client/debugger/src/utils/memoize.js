@@ -57,7 +57,7 @@ function setValue(keys: Key[], store: Store, value: Value) {
 export default function memoize(func: Function) {
   const store = new WeakMap();
 
-  return function(...keys: Key[]) {
+  return function (...keys: Key[]) {
     if (hasValue(keys, store)) {
       return getValue(keys, store);
     }

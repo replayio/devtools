@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -90,11 +87,11 @@ class BoxModel extends PureComponent {
       }),
       showBoxModelProperties
         ? BoxModelProperties({
-          boxModel,
-          setSelectedNode,
-          onHideBoxModelHighlighter,
-          onShowBoxModelHighlighterForNode,
-        })
+            boxModel,
+            setSelectedNode,
+            onHideBoxModelHighlighter,
+            onShowBoxModelHighlighterForNode,
+          })
         : null
     );
   }

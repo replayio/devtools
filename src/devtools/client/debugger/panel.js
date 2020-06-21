@@ -28,9 +28,7 @@ async function getNodeFront(gripOrFront, toolbox) {
 export class DebuggerPanel {
   constructor(toolbox) {
     this.panelWin = window;
-    this.panelWin.L10N = new LocalizationHelper(
-      "devtools/client/locales/debugger.properties"
-    );
+    this.panelWin.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
     this.panelWin.Debugger = require("./src/main").default;
 
     this.toolbox = toolbox;
@@ -38,12 +36,7 @@ export class DebuggerPanel {
   }
 
   async open() {
-    const {
-      actions,
-      store,
-      selectors,
-      client,
-    } = await this.panelWin.Debugger.bootstrap({
+    const { actions, store, selectors, client } = await this.panelWin.Debugger.bootstrap({
       workers: {
         sourceMaps: this.toolbox.sourceMapService,
         evaluationsParser: this.toolbox.parserService,
@@ -143,10 +136,7 @@ export class DebuggerPanel {
     const onSelectInspector = this.toolbox.selectTool("inspector");
     const onGripNodeToFront = getNodeFront(gripOrFront, this.toolbox);
 
-    const [front, inspector] = await Promise.all([
-      onGripNodeToFront,
-      onSelectInspector,
-    ]);
+    const [front, inspector] = await Promise.all([onGripNodeToFront, onSelectInspector]);
 
     const onInspectorUpdated = inspector.once("inspector-updated");
     const onNodeFrontSet = this.toolbox.selection.setNodeFront(front, {
@@ -187,10 +177,7 @@ export class DebuggerPanel {
       };
     }
 
-    const selectedFrame = this._selectors.getSelectedFrame(
-      this._getState(),
-      thread
-    );
+    const selectedFrame = this._selectors.getSelectedFrame(this._getState(), thread);
     const selected = frames.findIndex(frame => frame.id == selectedFrame.id);
 
     frames.forEach(frame => {

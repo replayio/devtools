@@ -4,11 +4,7 @@
 
 // @flow
 import { sortBy } from "lodash";
-import {
-  getGeneratedFrameScope,
-  getInlinePreviews,
-  getSource,
-} from "../../selectors";
+import { getGeneratedFrameScope, getInlinePreviews, getSource } from "../../selectors";
 import { features } from "../../utils/prefs";
 import { validateThreadContext } from "../../utils/context";
 import { loadSourceText } from "../sources/loadSourceText";
@@ -23,10 +19,7 @@ const { createPrimitiveValueFront } = require("protocol/thread");
 // include all data for block scopes until the first functional scope
 function getLocalScopeLevels(originalAstScopes): number {
   let levels = 0;
-  while (
-    originalAstScopes[levels] &&
-    originalAstScopes[levels].type === "block"
-  ) {
+  while (originalAstScopes[levels] && originalAstScopes[levels].type === "block") {
     levels++;
   }
   return levels;
@@ -47,14 +40,9 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
 
     log(`GenerateInlinePreview Start`);
 
-    const generatedFrameScopes = getGeneratedFrameScope(
-      getState(),
-      thread,
-      frameId
-    );
+    const generatedFrameScopes = getGeneratedFrameScope(getState(), thread, frameId);
 
-    let scopes: Scope | null =
-      (generatedFrameScopes && generatedFrameScopes.scope);
+    let scopes: Scope | null = generatedFrameScopes && generatedFrameScopes.scope;
 
     if (!scopes || !scopes.bindings) {
       log(`GenerateInlinePreview LoadSourceText NoFrameScopes`);
@@ -89,11 +77,7 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
     const pausedOnLine: number = location.line;
     const levels: number = getLocalScopeLevels(originalAstScopes);
 
-    for (
-      let curLevel = 0;
-      curLevel <= levels && scopes && scopes.bindings;
-      curLevel++
-    ) {
+    for (let curLevel = 0; curLevel <= levels && scopes && scopes.bindings; curLevel++) {
       const bindings = { ...scopes.bindings.variables };
       scopes.bindings.arguments.forEach(argument => {
         Object.keys(argument).forEach(key => {
@@ -166,8 +150,7 @@ function getBindingValues(
 ): Array<Preview> {
   const previews = [];
 
-  const binding =
-    originalAstScopes[curLevel] && originalAstScopes[curLevel].bindings[name];
+  const binding = originalAstScopes[curLevel] && originalAstScopes[curLevel].bindings[name];
   if (!binding) {
     return previews;
   }
@@ -188,12 +171,7 @@ function getBindingValues(
       continue;
     }
 
-    const info = getExpressionNameAndValue(
-      name,
-      value,
-      ref,
-      properties
-    );
+    const info = getExpressionNameAndValue(name, value, ref, properties);
     if (!info) {
       continue;
     }
@@ -234,9 +212,7 @@ function getExpressionNameAndValue(
     while (meta) {
       // Initially properties will be an array, after that it will be an object
       if (displayValue === value) {
-        const property: Object = properties.find(
-          prop => prop.name === meta.property
-        );
+        const property: Object = properties.find(prop => prop.name === meta.property);
         if (!property) {
           // If we don't find the property, it might be on the prototype.
           // Until we're sure we're showing the right thing, don't show
@@ -245,11 +221,7 @@ function getExpressionNameAndValue(
         }
         displayValue = property ? property.contents : createPrimitiveValueFront(undefined);
         displayName += `.${meta.property}`;
-      } else if (
-        displayValue &&
-        displayValue.preview &&
-        displayValue.preview.ownProperties
-      ) {
+      } else if (displayValue && displayValue.preview && displayValue.preview.ownProperties) {
         const { ownProperties } = displayValue.preview;
         Object.keys(ownProperties).forEach(prop => {
           if (prop === meta.property) {

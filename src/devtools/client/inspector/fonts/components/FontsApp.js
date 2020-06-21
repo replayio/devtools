@@ -4,17 +4,12 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
 
-const FontEditor = createFactory(
-  require("devtools/client/inspector/fonts/components/FontEditor")
-);
+const FontEditor = createFactory(require("devtools/client/inspector/fonts/components/FontEditor"));
 const FontOverview = createFactory(
   require("devtools/client/inspector/fonts/components/FontOverview")
 );

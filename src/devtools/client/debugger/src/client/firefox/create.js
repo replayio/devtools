@@ -6,38 +6,23 @@
 // This module converts Firefox specific types to the generic types
 
 import type { Frame, ThreadId, GeneratedSourceData, Thread } from "../../types";
-import type {
-  PausedPacket,
-  FrameFront,
-  SourcePayload,
-  Target,
-} from "./types";
+import type { PausedPacket, FrameFront, SourcePayload, Target } from "./types";
 
 import { clientCommands } from "./commands";
 
 const { ThreadFront } = require("protocol/thread");
 
-export function prepareSourcePayload(
-  threadFront,
-  source: SourcePayload
-): GeneratedSourceData {
+export function prepareSourcePayload(threadFront, source: SourcePayload): GeneratedSourceData {
   // We populate the set of sources as soon as we hear about them. Note that
   // this means that we have seen an actor, but it might still be in the
   // debounced queue for creation, so the Redux store itself might not have
   // a source actor with this ID yet.
-  clientCommands.registerSourceActor(
-    source.actor,
-    makeSourceId(source, false)
-  );
+  clientCommands.registerSourceActor(source.actor, makeSourceId(source, false));
 
   return { thread: threadFront.actor, source };
 }
 
-export async function createFrame(
-  thread: ThreadId,
-  frame: Object,
-  index: number = 0
-): ?Frame {
+export async function createFrame(thread: ThreadId, frame: Object, index: number = 0): ?Frame {
   if (!frame) {
     return null;
   }

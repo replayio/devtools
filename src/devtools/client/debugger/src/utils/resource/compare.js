@@ -11,9 +11,7 @@ export function strictEqual(value: mixed, other: mixed): boolean {
 export function shallowEqual(value: mixed, other: mixed): boolean {
   return (
     value === other ||
-    (Array.isArray(value) &&
-      Array.isArray(other) &&
-      arrayShallowEqual(value, other)) ||
+    (Array.isArray(value) && Array.isArray(other) && arrayShallowEqual(value, other)) ||
     (isObject(value) && isObject(other) && objectShallowEqual(value, other))
   );
 }
@@ -25,10 +23,7 @@ export function arrayShallowEqual(
   return value.length === other.length && value.every((k, i) => k === other[i]);
 }
 
-function objectShallowEqual(
-  value: { [string]: mixed },
-  other: { [string]: mixed }
-): boolean {
+function objectShallowEqual(value: { [string]: mixed }, other: { [string]: mixed }): boolean {
   const existingKeys = Object.keys(other);
   const keys = Object.keys(value);
 

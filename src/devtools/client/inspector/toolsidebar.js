@@ -60,7 +60,7 @@ ToolSidebar.prototype = {
 
   // Rendering
 
-  render: function() {
+  render: function () {
     const sidebar = this.TabBar({
       menuDocument: this._toolPanel._toolbox.doc,
       showAllTabsMenu: true,
@@ -74,7 +74,7 @@ ToolSidebar.prototype = {
   /**
    * Adds all the queued tabs.
    */
-  addAllQueuedTabs: function() {
+  addAllQueuedTabs: function () {
     this._tabbar.addAllQueuedTabs();
   },
 
@@ -87,7 +87,7 @@ ToolSidebar.prototype = {
    * @param {Boolean} selected true if the panel should be selected
    * @param {Number} index the position where the tab should be inserted
    */
-  addTab: function(id, title, panel, selected, index) {
+  addTab: function (id, title, panel, selected, index) {
     this._tabbar.addTab(id, title, selected, panel, null, index);
     this.emit("new-tab-registered", id);
   },
@@ -101,7 +101,7 @@ ToolSidebar.prototype = {
    * @param {Boolean} selected true if the panel should be selected
    * @param {Number} index the position where the tab should be inserted
    */
-  addExistingTab: function(id, title, selected, index) {
+  addExistingTab: function (id, title, selected, index) {
     const panel = this.InspectorTabPanel({
       id: id,
       idPrefix: this.TABPANEL_ID_PREFIX,
@@ -121,7 +121,7 @@ ToolSidebar.prototype = {
    * @param {Boolean} selected true if the panel should be selected
    * @param {Number} index the position where the tab should be inserted
    */
-  queueTab: function(id, title, panel, selected, index) {
+  queueTab: function (id, title, panel, selected, index) {
     this._tabbar.queueTab(id, title, selected, panel, null, index);
     this.emit("new-tab-registered", id);
   },
@@ -135,7 +135,7 @@ ToolSidebar.prototype = {
    * @param {Boolean} selected true if the panel should be selected
    * @param {Number} index the position where the tab should be inserted
    */
-  queueExistingTab: function(id, title, selected, index) {
+  queueExistingTab: function (id, title, selected, index) {
     const panel = this.InspectorTabPanel({
       id: id,
       idPrefix: this.TABPANEL_ID_PREFIX,
@@ -165,21 +165,21 @@ ToolSidebar.prototype = {
    * @param {Boolean} isVisible True to show the tab/tabpanel, False to hide it.
    * @param {String} id The ID of the tab to be hidden.
    */
-  toggleTab: function(isVisible, id) {
+  toggleTab: function (isVisible, id) {
     this._tabbar.toggleTab(id, isVisible);
   },
 
   /**
    * Select a specific tab.
    */
-  select: function(id) {
+  select: function (id) {
     this._tabbar.select(id);
   },
 
   /**
    * Return the id of the selected tab.
    */
-  getCurrentTabID: function() {
+  getCurrentTabID: function () {
     return this._currentTool;
   },
 
@@ -188,18 +188,16 @@ ToolSidebar.prototype = {
    * @param {String} id
    * @return {DOMNode}
    */
-  getTabPanel: function(id) {
+  getTabPanel: function (id) {
     // Search with and without the ID prefix as there might have been existing
     // tabpanels by the time the sidebar got created
-    return this._panelDoc.querySelector(
-      "#" + this.TABPANEL_ID_PREFIX + id + ", #" + id
-    );
+    return this._panelDoc.querySelector("#" + this.TABPANEL_ID_PREFIX + id + ", #" + id);
   },
 
   /**
    * Event handler.
    */
-  handleSelectionChange: function(id) {
+  handleSelectionChange: function (id) {
     if (this._destroyed) {
       return;
     }
@@ -224,7 +222,7 @@ ToolSidebar.prototype = {
    * @param  {String} previousToolId
    *         id of the previously selected tool.
    */
-  updateTelemetryOnChange: function(currentToolId, previousToolId) {
+  updateTelemetryOnChange: function (currentToolId, previousToolId) {
     if (currentToolId === previousToolId || !this._telemetry) {
       // Skip telemetry if the tool id did not change or telemetry is unavailable.
       return;
@@ -257,7 +255,7 @@ ToolSidebar.prototype = {
    * @param {String} id
    *        The panel id we would like to process.
    */
-  getTelemetryPanelNameOrOther: function(id) {
+  getTelemetryPanelNameOrOther: function (id) {
     if (!this._toolNames) {
       // Get all built in tool ids. We identify third party tool ids by checking
       // for a "-", which shows it originates from an addon.
@@ -281,7 +279,7 @@ ToolSidebar.prototype = {
    * @param  {String} id
    *         The sidebar tab id to select.
    */
-  show: function(id) {
+  show: function (id) {
     this._tabbox.removeAttribute("hidden");
 
     // If an id is given, select the corresponding sidebar tab.
@@ -295,7 +293,7 @@ ToolSidebar.prototype = {
   /**
    * Show the sidebar.
    */
-  hide: function() {
+  hide: function () {
     this._tabbox.setAttribute("hidden", "true");
 
     this.emit("hide");

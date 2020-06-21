@@ -5,10 +5,7 @@
 "use strict";
 
 const { KeyCodes } = require("devtools/client/shared/keycodes");
-const {
-  flashElementOn,
-  flashElementOff,
-} = require("devtools/client/inspector/markup/utils");
+const { flashElementOn, flashElementOff } = require("devtools/client/inspector/markup/utils");
 
 const { ThreadFront } = require("protocol/thread");
 
@@ -66,7 +63,7 @@ MarkupContainer.prototype = {
    *         The type of container to build. One of TYPES.TEXT_CONTAINER,
    *         TYPES.ELEMENT_CONTAINER, TYPES.READ_ONLY_CONTAINER
    */
-  initialize: function(markupView, node, type) {
+  initialize: function (markupView, node, type) {
     this.markup = markupView;
     this.node = node;
     this.type = type;
@@ -93,14 +90,11 @@ MarkupContainer.prototype = {
     this.updateIsDisplayed();
 
     if (node.isShadowRoot) {
-      this.markup.telemetry.scalarSet(
-        "devtools.shadowdom.shadow_root_displayed",
-        true
-      );
+      this.markup.telemetry.scalarSet("devtools.shadowdom.shadow_root_displayed", true);
     }
   },
 
-  buildMarkup: function() {
+  buildMarkup: function () {
     this.elt = this.win.document.createElement("li");
     this.elt.classList.add("child", "collapsed");
     this.elt.setAttribute("role", "presentation");
@@ -136,11 +130,11 @@ MarkupContainer.prototype = {
     this.elt.appendChild(this.children);
   },
 
-  toString: function() {
+  toString: function () {
     return "[MarkupContainer for " + this.node + "]";
   },
 
-  isPreviewable: function() {
+  isPreviewable: function () {
     if (this.node.tagName && !this.node.pseudoType) {
       const tagName = this.node.tagName.toLowerCase();
       const srcAttr = this.editor.getAttributeElement("src");
@@ -159,7 +153,7 @@ MarkupContainer.prototype = {
    * (faded in markup view).
    * Otherwise, it is displayed.
    */
-  updateIsDisplayed: function() {
+  updateIsDisplayed: function () {
     this.elt.classList.remove("not-displayed");
     if (!this.node.isDisplayed) {
       this.elt.classList.add("not-displayed");
@@ -219,7 +213,7 @@ MarkupContainer.prototype = {
    * If conatiner and its contents are focusable, exclude them from tab order,
    * and, if necessary, remove focus.
    */
-  clearFocus: function() {
+  clearFocus: function () {
     if (!this.canFocus) {
       return;
     }
@@ -263,7 +257,7 @@ MarkupContainer.prototype = {
     return this.canExpand && !this.mustExpand;
   },
 
-  updateExpander: function() {
+  updateExpander: function () {
     if (!this.expander) {
       return;
     }
@@ -286,17 +280,14 @@ MarkupContainer.prototype = {
    * If current node has no children, ignore them. Otherwise, consider them a
    * group from the accessibility point of view.
    */
-  setChildrenRole: function() {
-    this.children.setAttribute(
-      "role",
-      this.hasChildren ? "group" : "presentation"
-    );
+  setChildrenRole: function () {
+    this.children.setAttribute("role", this.hasChildren ? "group" : "presentation");
   },
 
   /**
    * Set an appropriate DOM tree depth level for a node and its subtree.
    */
-  updateLevel: function() {
+  updateLevel: function () {
     // ARIA level should already be set when the container markup is created.
     const currentLevel = this.tagLine.getAttribute("aria-level");
     const newLevel = this.level;
@@ -316,14 +307,12 @@ MarkupContainer.prototype = {
    * If the node has children, return the list of containers for all these
    * children.
    */
-  getChildContainers: function() {
+  getChildContainers: function () {
     if (!this.hasChildren) {
       return null;
     }
 
-    return [...this.children.children]
-      .filter(node => node.container)
-      .map(node => node.container);
+    return [...this.children.children].filter(node => node.container).map(node => node.container);
   },
 
   /**
@@ -333,7 +322,7 @@ MarkupContainer.prototype = {
     return !this.elt.classList.contains("collapsed");
   },
 
-  setExpanded: function(value) {
+  setExpanded: function (value) {
     if (!this.expander) {
       return;
     }
@@ -366,10 +355,7 @@ MarkupContainer.prototype = {
     }
 
     if (this.node.isShadowRoot) {
-      this.markup.telemetry.scalarSet(
-        "devtools.shadowdom.shadow_root_expanded",
-        true
-      );
+      this.markup.telemetry.scalarSet("devtools.shadowdom.shadow_root_expanded", true);
     }
   },
 
@@ -377,7 +363,7 @@ MarkupContainer.prototype = {
    * Expanding a node means cloning its "inline" closing tag into a new
    * tag-line that the user can interact with and showing the children.
    */
-  showCloseTagLine: function() {
+  showCloseTagLine: function () {
     // Only element containers display a closing tag line. #document has no closing line.
     if (this.type !== TYPES.ELEMENT_CONTAINER) {
       return;
@@ -412,7 +398,7 @@ MarkupContainer.prototype = {
    * Hide the closing tag-line element which should only be displayed when the container
    * is expanded.
    */
-  hideCloseTagLine: function() {
+  hideCloseTagLine: function () {
     if (!this.closeTagLine) {
       return;
     }
@@ -421,7 +407,7 @@ MarkupContainer.prototype = {
     this.closeTagLine = undefined;
   },
 
-  parentContainer: function() {
+  parentContainer: function () {
     return this.elt.parentNode ? this.elt.parentNode.container : null;
   },
 
@@ -468,7 +454,7 @@ MarkupContainer.prototype = {
   /**
    * Check if element is draggable.
    */
-  isDraggable: function() {
+  isDraggable: function () {
     return false;
     /*
     const tagName = this.node.tagName && this.node.tagName.toLowerCase();
@@ -486,11 +472,11 @@ MarkupContainer.prototype = {
     */
   },
 
-  isSlotted: function() {
+  isSlotted: function () {
     return false;
   },
 
-  _onKeyDown: function(event) {
+  _onKeyDown: function (event) {
     const { target, keyCode, shiftKey } = event;
     const isInput = this.markup._isInputOrTextarea(target);
 
@@ -505,11 +491,7 @@ MarkupContainer.prototype = {
         // Only handle 'Tab' if tabbable element is on the edge (first or last).
         if (isInput) {
           // Corresponding tabbable element is editor's next sibling.
-          const next = wrapMoveFocus(
-            this.focusableElms,
-            target.nextSibling,
-            shiftKey
-          );
+          const next = wrapMoveFocus(this.focusableElms, target.nextSibling, shiftKey);
           if (next) {
             event.preventDefault();
             // Keep the editing state if possible.
@@ -541,7 +523,7 @@ MarkupContainer.prototype = {
     event.stopPropagation();
   },
 
-  _onMouseDown: function(event) {
+  _onMouseDown: function (event) {
     const { target, button, metaKey, ctrlKey } = event;
     const isLeftClick = button === 0;
     const isMiddleClick = button === 1;
@@ -622,7 +604,7 @@ MarkupContainer.prototype = {
    * On mouse move, move the dragged element and indicate the drop target.
    * This handler is called from the markup view, to reduce number of listeners.
    */
-  onMouseMove: function(event) {
+  onMouseMove: function (event) {
     // If this is the first move after mousedown, only start dragging after the
     // mouse has travelled a few pixels and then indicate the start position.
     const initialDiff = Math.abs(event.pageY - this._dragStartY);
@@ -657,7 +639,7 @@ MarkupContainer.prototype = {
     }
   },
 
-  cancelDragging: function() {
+  cancelDragging: function () {
     if (!this.isDragging) {
       return;
     }
@@ -671,7 +653,7 @@ MarkupContainer.prototype = {
    * Temporarily flash the container to attract attention.
    * Used for markup mutations.
    */
-  flashMutation: function() {
+  flashMutation: function () {
     if (!this.selected) {
       flashElementOn(this.tagState, {
         foregroundElt: this.editor.elt,
@@ -704,16 +686,12 @@ MarkupContainer.prototype = {
         this.tagState.classList.add("tag-hover");
       }
       if (this.closeTagLine) {
-        this.closeTagLine
-          .querySelector(".tag-state")
-          .classList.add("tag-hover");
+        this.closeTagLine.querySelector(".tag-state").classList.add("tag-hover");
       }
     } else {
       this.tagState.classList.remove("tag-hover");
       if (this.closeTagLine) {
-        this.closeTagLine
-          .querySelector(".tag-state")
-          .classList.remove("tag-hover");
+        this.closeTagLine.querySelector(".tag-state").classList.remove("tag-hover");
       }
     }
   },
@@ -757,7 +735,7 @@ MarkupContainer.prototype = {
    * Update the container's editor to the current state of the
    * viewed node.
    */
-  update: function() {
+  update: function () {
     if (this.node.pseudoClassLocks.length) {
       this.elt.classList.add("pseudoclass-locked");
     } else {
@@ -765,9 +743,7 @@ MarkupContainer.prototype = {
     }
 
     // Show and hide icon for DOM Mutation Breakpoints
-    const hasMutationBreakpoint = Object.values(
-      this.node.mutationBreakpoints
-    ).some(Boolean);
+    const hasMutationBreakpoint = Object.values(this.node.mutationBreakpoints).some(Boolean);
     if (hasMutationBreakpoint) {
       this.mutationMarker.classList.add("has-mutations");
     } else {
@@ -784,7 +760,7 @@ MarkupContainer.prototype = {
   /**
    * Try to put keyboard focus on the current editor.
    */
-  focus: function() {
+  focus: function () {
     // Elements with tabindex of -1 are not focusable.
     const focusable = this.editor.elt.querySelector("[tabindex='0']");
     if (focusable) {
@@ -792,7 +768,7 @@ MarkupContainer.prototype = {
     }
   },
 
-  _onToggle: function(event) {
+  _onToggle: function (event) {
     event.stopPropagation();
 
     // Prevent the html tree from expanding when an event bubble or display node is
@@ -810,15 +786,11 @@ MarkupContainer.prototype = {
    * @param  {Boolean} applyToDescendants
    *         Whether all descendants should also be expanded/collapsed
    */
-  expandContainer: function(applyToDescendants) {
+  expandContainer: function (applyToDescendants) {
     this.markup.navigate(this);
 
     if (this.hasChildren) {
-      this.markup.setNodeExpanded(
-        this.node,
-        !this.expanded,
-        applyToDescendants
-      );
+      this.markup.setNodeExpanded(this.node, !this.expanded, applyToDescendants);
     }
   },
 
@@ -826,7 +798,7 @@ MarkupContainer.prototype = {
    * Get rid of event listeners and references, when the container is no longer
    * needed
    */
-  destroy: function() {
+  destroy: function () {
     // Remove event listeners
     this.elt.removeEventListener("mousedown", this._onMouseDown);
     this.elt.removeEventListener("dblclick", this._onToggle);

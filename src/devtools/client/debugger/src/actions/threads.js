@@ -9,15 +9,10 @@ import type { Action, ThunkArgs } from "./types";
 import { removeSourceActors } from "./source-actors";
 import { newGeneratedSources } from "./sources";
 
-import {
-  getContext,
-  getAllThreads,
-  getThreads,
-  getSourceActorsForThread,
-} from "../selectors";
+import { getContext, getAllThreads, getThreads, getSourceActorsForThread } from "../selectors";
 
 export function updateThreads() {
-  return async function({ dispatch, getState, client }: ThunkArgs) {
+  return async function ({ dispatch, getState, client }: ThunkArgs) {
     const cx = getContext(getState());
     const threads = await client.fetchThreads();
 
@@ -78,7 +73,7 @@ export function updateThreads() {
 }
 
 export function ensureHasThread(thread: string) {
-  return async function({ dispatch, getState, client }: ThunkArgs) {
+  return async function ({ dispatch, getState, client }: ThunkArgs) {
     const currentThreads = getAllThreads(getState());
     if (!currentThreads.some(t => t.actor == thread)) {
       await dispatch(updateThreads());

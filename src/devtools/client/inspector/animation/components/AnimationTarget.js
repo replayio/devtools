@@ -8,9 +8,7 @@ const { Component } = require("react");
 const { connect } = require("react-redux");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-const {
-  translateNodeFrontToGrip,
-} = require("devtools/client/inspector/shared/utils");
+const { translateNodeFrontToGrip } = require("devtools/client/inspector/shared/utils");
 
 /*
 const { REPS, MODE } = require("devtools/client/shared/components/reps/reps");
@@ -18,9 +16,7 @@ const { Rep } = REPS;
 const ElementNode = REPS.ElementNode;
 */
 
-const {
-  getInspectorStr,
-} = require("devtools/client/inspector/animation/utils/l10n");
+const { getInspectorStr } = require("devtools/client/inspector/animation/utils/l10n");
 
 class AnimationTarget extends Component {
   static get propTypes() {
@@ -138,9 +134,7 @@ class AnimationTarget extends Component {
       Rep({
         defaultRep: ElementNode,
         mode: MODE.TINY,
-        inspectIconTitle: getInspectorStr(
-          "inspector.nodePreview.highlightNodeLabel"
-        ),
+        inspectIconTitle: getInspectorStr("inspector.nodePreview.highlightNodeLabel"),
         object: translateNodeFrontToGrip(nodeFront),
         onDOMNodeClick: () => this.select(),
         onDOMNodeMouseOut: () => {

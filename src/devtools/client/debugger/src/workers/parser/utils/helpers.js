@@ -21,16 +21,14 @@ export function isFunction(node: Node) {
 export function isAwaitExpression(path: SimplePath) {
   const { node, parent } = path;
   return (
-    t.isAwaitExpression(node) ||
-    (t.isAwaitExpression(parent.init) || t.isAwaitExpression(parent))
+    t.isAwaitExpression(node) || t.isAwaitExpression(parent.init) || t.isAwaitExpression(parent)
   );
 }
 
 export function isYieldExpression(path: SimplePath) {
   const { node, parent } = path;
   return (
-    t.isYieldExpression(node) ||
-    (t.isYieldExpression(parent.init) || t.isYieldExpression(parent))
+    t.isYieldExpression(node) || t.isYieldExpression(parent.init) || t.isYieldExpression(parent)
   );
 }
 
@@ -154,7 +152,7 @@ export function getPatternIdentifiers(pattern: Node) {
 
 function getIdentifiers(items) {
   let ids = [];
-  items.forEach(function(item) {
+  items.forEach(function (item) {
     if (t.isObjectPattern(item) || t.isArrayPattern(item)) {
       ids = ids.concat(getPatternIdentifiers(item));
     } else if (t.isIdentifier(item)) {
@@ -188,30 +186,15 @@ export function getFunctionParameterNames(path: SimplePath): string[] {
       }
 
       // Parameter with default value
-      if (
-        param.left.type === "Identifier" &&
-        param.right.type === "Identifier"
-      ) {
+      if (param.left.type === "Identifier" && param.right.type === "Identifier") {
         return `${param.left.name} = ${param.right.name}`;
-      } else if (
-        param.left.type === "Identifier" &&
-        param.right.type === "StringLiteral"
-      ) {
+      } else if (param.left.type === "Identifier" && param.right.type === "StringLiteral") {
         return `${param.left.name} = ${param.right.value}`;
-      } else if (
-        param.left.type === "Identifier" &&
-        param.right.type === "ObjectExpression"
-      ) {
+      } else if (param.left.type === "Identifier" && param.right.type === "ObjectExpression") {
         return `${param.left.name} = {}`;
-      } else if (
-        param.left.type === "Identifier" &&
-        param.right.type === "ArrayExpression"
-      ) {
+      } else if (param.left.type === "Identifier" && param.right.type === "ArrayExpression") {
         return `${param.left.name} = []`;
-      } else if (
-        param.left.type === "Identifier" &&
-        param.right.type === "NullLiteral"
-      ) {
+      } else if (param.left.type === "Identifier" && param.right.type === "NullLiteral") {
         return `${param.left.name} = null`;
       }
     });

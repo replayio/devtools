@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'expect.js' {
+declare module "expect.js" {
   declare module.exports: any;
 }
 
@@ -23,11 +23,10 @@ declare module 'expect.js' {
  * needed.
  */
 
-
 // Filename aliases
-declare module 'expect.js/index' {
-  declare module.exports: $Exports<'expect.js'>;
+declare module "expect.js/index" {
+  declare module.exports: $Exports<"expect.js">;
 }
-declare module 'expect.js/index.js' {
-  declare module.exports: $Exports<'expect.js'>;
+declare module "expect.js/index.js" {
+  declare module.exports: $Exports<"expect.js">;
 }

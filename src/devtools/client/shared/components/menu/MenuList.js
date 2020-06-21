@@ -10,10 +10,7 @@
 // This component provides keyboard navigation amongst any focusable
 // children.
 
-const {
-  Children,
-  PureComponent,
-} = require("react");
+const { Children, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { div } = dom;
@@ -41,9 +38,7 @@ class MenuList extends PureComponent {
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onMouseOverOrFocus = this.onMouseOverOrFocus.bind(this);
     this.onMouseOutOrBlur = this.onMouseOutOrBlur.bind(this);
-    this.notifyHighlightedChildChange = this.notifyHighlightedChildChange.bind(
-      this
-    );
+    this.notifyHighlightedChildChange = this.notifyHighlightedChildChange.bind(this);
 
     this.setWrapperRef = element => {
       this.wrapperRef = element;
@@ -69,15 +64,11 @@ class MenuList extends PureComponent {
 
   onKeyDown(e) {
     // Check if the focus is in the list.
-    if (
-      !this.wrapperRef ||
-      !this.wrapperRef.contains(e.target.ownerDocument.activeElement)
-    ) {
+    if (!this.wrapperRef || !this.wrapperRef.contains(e.target.ownerDocument.activeElement)) {
       return;
     }
 
-    const getTabList = () =>
-      Array.from(this.wrapperRef.querySelectorAll(focusableSelector));
+    const getTabList = () => Array.from(this.wrapperRef.querySelectorAll(focusableSelector));
 
     switch (e.key) {
       case "Tab":
@@ -90,11 +81,9 @@ class MenuList extends PureComponent {
           if (currentIndex !== -1) {
             let nextIndex;
             if (e.key === "ArrowDown" || (e.key === "Tab" && !e.shiftKey)) {
-              nextIndex =
-                currentIndex === tabList.length - 1 ? 0 : currentIndex + 1;
+              nextIndex = currentIndex === tabList.length - 1 ? 0 : currentIndex + 1;
             } else {
-              nextIndex =
-                currentIndex === 0 ? tabList.length - 1 : currentIndex - 1;
+              nextIndex = currentIndex === 0 ? tabList.length - 1 : currentIndex - 1;
             }
             tabList[nextIndex].focus();
             e.preventDefault();

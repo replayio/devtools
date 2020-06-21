@@ -76,10 +76,7 @@ const mockCommandClient = {
 
 const mockFrameId = "1";
 
-function createPauseInfo(
-  frameLocation = { sourceId: "foo1", line: 2 },
-  frameOpts = {}
-) {
+function createPauseInfo(frameLocation = { sourceId: "foo1", line: 2 }, frameOpts = {}) {
   const frames = [
     makeFrame(
       { id: mockFrameId, sourceId: frameLocation.sourceId },
@@ -159,9 +156,7 @@ describe("pause", () => {
       const { frames } = mockPauseInfo;
       client.getFrames = async () => frames;
 
-      const source = await dispatch(
-        actions.newGeneratedSource(makeSource("foo"))
-      );
+      const source = await dispatch(actions.newGeneratedSource(makeSource("foo")));
       await dispatch(actions.newOriginalSource(makeOriginalSource(source)));
 
       await dispatch(actions.paused(mockPauseInfo));
@@ -197,9 +192,7 @@ describe("pause", () => {
         original: { "1": { pending: false, scope: null } },
       });
 
-      expect(
-        selectors.getSelectedFrameBindings(getState(), "FakeThread")
-      ).toEqual(["b", "a"]);
+      expect(selectors.getSelectedFrameBindings(getState(), "FakeThread")).toEqual(["b", "a"]);
     });
 
     it("maps frame locations and names to original source", async () => {
@@ -298,9 +291,7 @@ describe("pause", () => {
       client.getFrames = async () => frames;
 
       const source = await dispatch(
-        actions.newGeneratedSource(
-          makeSource("foo-wasm", { introductionType: "wasm" })
-        )
+        actions.newGeneratedSource(makeSource("foo-wasm", { introductionType: "wasm" }))
       );
       await dispatch(actions.newOriginalSource(makeOriginalSource(source)));
 

@@ -30,17 +30,11 @@ type Props = {
 
 export class WelcomeBox extends Component<Props> {
   render() {
-    const searchSourcesShortcut = formatKeyShortcut(
-      L10N.getStr("sources.search.key2")
-    );
+    const searchSourcesShortcut = formatKeyShortcut(L10N.getStr("sources.search.key2"));
 
-    const searchProjectShortcut = formatKeyShortcut(
-      L10N.getStr("projectTextSearch.key")
-    );
+    const searchProjectShortcut = formatKeyShortcut(L10N.getStr("projectTextSearch.key"));
 
-    const allShortcutsShortcut = formatKeyShortcut(
-      L10N.getStr("allShortcut.key")
-    );
+    const allShortcutsShortcut = formatKeyShortcut(L10N.getStr("allShortcut.key"));
 
     const allShortcutsLabel = L10N.getStr("welcome.allShortcuts");
     const searchSourcesLabel = L10N.getStr("welcome.search2").substring(2);
@@ -89,11 +83,8 @@ const mapStateToProps = state => ({
   endPanelCollapsed: getPaneCollapse(state, "end"),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    togglePaneCollapse: actions.togglePaneCollapse,
-    setActiveSearch: actions.setActiveSearch,
-    openQuickOpen: actions.openQuickOpen,
-  }
-)(WelcomeBox);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  togglePaneCollapse: actions.togglePaneCollapse,
+  setActiveSearch: actions.setActiveSearch,
+  openQuickOpen: actions.openQuickOpen,
+})(WelcomeBox);

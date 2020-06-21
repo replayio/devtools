@@ -8,12 +8,8 @@ import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 import type { ThunkArgs } from "../types";
 import type { ThreadContext } from "../../types";
 
-export function setExpandedScope(
-  cx: ThreadContext,
-  item: Object,
-  expanded: boolean
-) {
-  return function({ dispatch, getState }: ThunkArgs) {
+export function setExpandedScope(cx: ThreadContext, item: Object, expanded: boolean) {
+  return function ({ dispatch, getState }: ThunkArgs) {
     return dispatch({
       type: "SET_EXPANDED_SCOPE",
       cx,

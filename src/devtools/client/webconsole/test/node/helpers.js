@@ -5,15 +5,9 @@
 
 const reduxActions = require("devtools/client/webconsole/actions/index");
 const { configureStore } = require("devtools/client/webconsole/store");
-const {
-  IdGenerator,
-} = require("devtools/client/webconsole/utils/id-generator");
-const {
-  stubPackets,
-} = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
-const {
-  getAllMessagesById,
-} = require("devtools/client/webconsole/selectors/messages");
+const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
+const { stubPackets } = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
+const { getAllMessagesById } = require("devtools/client/webconsole/selectors/messages");
 const { getPrefsService } = require("devtools/client/webconsole/utils/prefs");
 const prefsService = getPrefsService({});
 const { PREFS } = require("devtools/client/webconsole/constants");
@@ -41,10 +35,7 @@ function setupActions() {
 /**
  * Prepare the store for use in testing.
  */
-function setupStore(
-  input = [],
-  { storeOptions = {}, actions, webConsoleUI } = {}
-) {
+function setupStore(input = [], { storeOptions = {}, actions, webConsoleUI } = {}) {
   if (!webConsoleUI) {
     webConsoleUI = getWebConsoleUiMock();
   }
@@ -109,11 +100,9 @@ function getFiltersPrefs() {
 }
 
 function clearPrefs() {
-  [
-    "devtools.hud.loglimit",
-    ...Object.values(PREFS.FILTER),
-    ...Object.values(PREFS.UI),
-  ].forEach(prefsService.clearUserPref);
+  ["devtools.hud.loglimit", ...Object.values(PREFS.FILTER), ...Object.values(PREFS.UI)].forEach(
+    prefsService.clearUserPref
+  );
 }
 
 function getPrivatePacket(key) {

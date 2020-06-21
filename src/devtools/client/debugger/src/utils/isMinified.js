@@ -18,11 +18,7 @@ export function isMinified(source: SourceWithContent) {
     return _minifiedCache.get(source.id);
   }
 
-  if (
-    !source.content ||
-    !isFulfilled(source.content) ||
-    source.content.value.type !== "text"
-  ) {
+  if (!source.content || !isFulfilled(source.content) || source.content.value.type !== "text") {
     return false;
   }
 
@@ -53,8 +49,7 @@ export function isMinified(source: SourceWithContent) {
     lineStartIndex = lineEndIndex + 1;
   }
 
-  const minified =
-    (indentCount / lines) * 100 < INDENT_COUNT_THRESHOLD || overCharLimit;
+  const minified = (indentCount / lines) * 100 < INDENT_COUNT_THRESHOLD || overCharLimit;
 
   _minifiedCache.set(source.id, minified);
   return minified;

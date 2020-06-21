@@ -16,12 +16,7 @@ import { makeBreakpointId } from "../utils/breakpoint";
 // eslint-disable-next-line max-len
 import { getBreakpointsList as getBreakpointsListSelector } from "../selectors/breakpoints";
 
-import type {
-  XHRBreakpoint,
-  Breakpoint,
-  BreakpointId,
-  SourceLocation,
-} from "../types";
+import type { XHRBreakpoint, Breakpoint, BreakpointId, SourceLocation } from "../types";
 import type { Action } from "../actions/types";
 
 export type BreakpointsMap = { [BreakpointId]: Breakpoint };
@@ -179,10 +174,7 @@ export function getBreakpointCount(state: OuterState): number {
   return getBreakpointsList(state).length;
 }
 
-export function getBreakpoint(
-  state: OuterState,
-  location: ?SourceLocation
-): ?Breakpoint {
+export function getBreakpoint(state: OuterState, location: ?SourceLocation): ?Breakpoint {
   if (!location) {
     return undefined;
   }
@@ -231,10 +223,7 @@ export function getHiddenBreakpoint(state: OuterState): ?Breakpoint {
   return breakpoints.find(bp => bp.options.hidden);
 }
 
-export function hasLogpoint(
-  state: OuterState,
-  location: ?SourceLocation
-): ?string {
+export function hasLogpoint(state: OuterState, location: ?SourceLocation): ?string {
   const breakpoint = getBreakpoint(state, location);
   return breakpoint && breakpoint.options.logValue;
 }

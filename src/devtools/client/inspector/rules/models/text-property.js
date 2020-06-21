@@ -167,9 +167,7 @@ class TextProperty {
       this.userProperties.setProperty(this.rule.domRule, this.name, value);
     }
 
-    return this.rule
-      .setPropertyValue(this, value, priority)
-      .then(() => this.updateEditor());
+    return this.rule.setPropertyValue(this, value, priority).then(() => this.updateEditor());
   }
 
   /**

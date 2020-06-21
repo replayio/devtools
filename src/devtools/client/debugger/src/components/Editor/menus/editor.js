@@ -7,11 +7,7 @@
 import { bindActionCreators } from "redux";
 
 import { copyToTheClipboard } from "../../../utils/clipboard";
-import {
-  getRawSourceURL,
-  getFilename,
-  shouldBlackbox,
-} from "../../../utils/source";
+import { getRawSourceURL, getFilename, shouldBlackbox } from "../../../utils/source";
 
 import { downloadFile } from "../../../utils/utils";
 import { features } from "../../../utils/prefs";
@@ -43,17 +39,12 @@ export const continueToHereItem = (
 
 // menu items
 
-const copyToClipboardItem = (
-  selectedContent: SourceContent,
-  editorActions: EditorItemActions
-) => ({
+const copyToClipboardItem = (selectedContent: SourceContent, editorActions: EditorItemActions) => ({
   id: "node-menu-copy-to-clipboard",
   label: L10N.getStr("copyToClipboard.label"),
   accesskey: L10N.getStr("copyToClipboard.accesskey"),
   disabled: false,
-  click: () =>
-    selectedContent.type === "text" &&
-    copyToTheClipboard(selectedContent.value),
+  click: () => selectedContent.type === "text" && copyToTheClipboard(selectedContent.value),
 });
 
 const copySourceItem = (
@@ -68,10 +59,7 @@ const copySourceItem = (
   click: () => copyToTheClipboard(selectionText),
 });
 
-const copySourceUri2Item = (
-  selectedSource: Source,
-  editorActions: EditorItemActions
-) => ({
+const copySourceUri2Item = (selectedSource: Source, editorActions: EditorItemActions) => ({
   id: "node-menu-copy-source-url",
   label: L10N.getStr("copySourceUri2"),
   accesskey: L10N.getStr("copySourceUri2.accesskey"),
@@ -89,9 +77,7 @@ const jumpToMappedLocationItem = (
   id: "node-menu-jump",
   label: L10N.getFormatStr(
     "editor.jumpToMappedLocation1",
-    selectedSource.isOriginal
-      ? L10N.getStr("generated")
-      : L10N.getStr("original")
+    selectedSource.isOriginal ? L10N.getStr("generated") : L10N.getStr("original")
   ),
   accesskey: L10N.getStr("editor.jumpToMappedLocation1.accesskey"),
   disabled: !hasMappedLocation,
@@ -194,13 +180,7 @@ export function editorMenuItems({
       : null;
 
   items.push(
-    jumpToMappedLocationItem(
-      cx,
-      selectedSource,
-      location,
-      hasMappedLocation,
-      editorActions
-    ),
+    jumpToMappedLocationItem(cx, selectedSource, location, hasMappedLocation, editorActions),
     continueToHereItem(cx, location, isPaused, editorActions),
     { type: "separator" },
     ...(content ? [copyToClipboardItem(content, editorActions)] : []),
@@ -210,9 +190,7 @@ export function editorMenuItems({
           copySourceUri2Item(selectedSource, editorActions),
         ]
       : []),
-    ...(content
-      ? [downloadFileItem(selectedSource, content, editorActions)]
-      : []),
+    ...(content ? [downloadFileItem(selectedSource, content, editorActions)] : []),
     { type: "separator" },
     showSourceMenuItem(cx, selectedSource, editorActions),
     blackBoxMenuItem(cx, selectedSource, editorActions)

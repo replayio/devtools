@@ -21,11 +21,7 @@ const webpackConfig = {
   },
   resolve: {
     alias: {
-
-      Services: path.join(
-        __dirname,
-        "node_modules/devtools-modules/client/shared/shim/Services"
-      ),
+      Services: path.join(__dirname, "node_modules/devtools-modules/client/shared/shim/Services"),
     },
   },
 };

@@ -9,17 +9,14 @@
  * additional sync and async actions.
  */
 
-const {
-  createStore,
-  applyMiddleware,
-} = require("devtools/client/shared/vendor/redux");
+const { createStore, applyMiddleware } = require("devtools/client/shared/vendor/redux");
 const { task } = require("devtools/client/shared/redux/middleware/task");
 
 function run_test() {
   run_next_test();
 }
 
-add_task(async function() {
+add_task(async function () {
   const store = applyMiddleware(task)(createStore)(reducer);
 
   store.dispatch(comboAction());
@@ -58,7 +55,7 @@ add_task(async function() {
 });
 
 function comboAction() {
-  return async function(dispatch, getState) {
+  return async function (dispatch, getState) {
     const data = {};
     data.async = await dispatch(fetchAsync("async"));
     data.sync = await dispatch(fetchSync("sync"));
@@ -71,7 +68,7 @@ function fetchSync(data) {
 }
 
 function fetchAsync(data) {
-  return async function(dispatch) {
+  return async function (dispatch) {
     dispatch({ type: "fetchAsync-start" });
     const val = await new Promise(resolve => resolve(data));
     dispatch({ type: "fetchAsync-end" });

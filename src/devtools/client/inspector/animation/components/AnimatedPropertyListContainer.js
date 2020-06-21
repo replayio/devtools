@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -21,9 +18,7 @@ const ProgressInspectionPanel = createFactory(
   require("devtools/client/inspector/animation/components/ProgressInspectionPanel")
 );
 
-const {
-  getFormatStr,
-} = require("devtools/client/inspector/animation/utils/l10n");
+const { getFormatStr } = require("devtools/client/inspector/animation/utils/l10n");
 
 class AnimatedPropertyListContainer extends PureComponent {
   static get propTypes() {
@@ -76,10 +71,7 @@ class AnimatedPropertyListContainer extends PureComponent {
           simulateAnimation,
         }),
         ticks: [0, 50, 100].map(position => {
-          const label = getFormatStr(
-            "detail.propertiesHeader.percentage",
-            position
-          );
+          const label = getFormatStr("detail.propertiesHeader.percentage", position);
           return { position, label };
         }),
       })

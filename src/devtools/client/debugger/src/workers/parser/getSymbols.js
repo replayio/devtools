@@ -138,9 +138,7 @@ function extractSymbol(path: SimplePath, symbols, state) {
       name: path.node.id.name,
       parent: superClass
         ? {
-            name: t.isMemberExpression(superClass)
-              ? getCode(superClass)
-              : superClass.name,
+            name: t.isMemberExpression(superClass) ? getCode(superClass) : superClass.name,
             location: superClass.loc,
           }
         : null,
@@ -316,11 +314,7 @@ function extendSnippet(
   const prevArray = t.isArrayExpression(prevPath);
   const array = t.isArrayExpression(path);
   const value =
-    (path &&
-      path.node.property &&
-      path.node.property.extra &&
-      path.node.property.extra.raw) ||
-    "";
+    (path && path.node.property && path.node.property.extra && path.node.property.extra.raw) || "";
 
   if (expression === "") {
     if (computed) {
@@ -350,10 +344,7 @@ function extendSnippet(
 function getMemberSnippet(node: Node, expression: string = "") {
   if (t.isMemberExpression(node)) {
     const name = node.property.name;
-    const snippet = getMemberSnippet(
-      node.object,
-      extendSnippet(name, expression, { node })
-    );
+    const snippet = getMemberSnippet(node.object, extendSnippet(name, expression, { node }));
     return snippet;
   }
 
@@ -375,11 +366,7 @@ function getMemberSnippet(node: Node, expression: string = "") {
   return expression;
 }
 
-function getObjectSnippet(
-  path: ?SimplePath,
-  prevPath?: SimplePath,
-  expression?: string = ""
-) {
+function getObjectSnippet(path: ?SimplePath, prevPath?: SimplePath, expression?: string = "") {
   if (!path) {
     return expression;
   }
@@ -394,11 +381,7 @@ function getObjectSnippet(
   return getSnippet(nextPath, nextPrevPath, extendedExpression);
 }
 
-function getArraySnippet(
-  path: SimplePath,
-  prevPath: SimplePath,
-  expression: string
-) {
+function getArraySnippet(path: SimplePath, prevPath: SimplePath, expression: string) {
   if (!prevPath.parentPath) {
     throw new Error("Assertion failure - path should exist");
   }
@@ -439,9 +422,7 @@ function getSnippet(
 
   if (t.isAssignmentExpression(path)) {
     const node = path.node.left;
-    const name = t.isMemberExpression(node)
-      ? getMemberSnippet(node)
-      : node.name;
+    const name = t.isMemberExpression(node) ? getMemberSnippet(node) : node.name;
 
     const prop = extendSnippet(name, expression, path, prevPath);
     return prop;

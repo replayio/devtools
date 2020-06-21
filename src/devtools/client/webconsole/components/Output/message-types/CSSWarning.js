@@ -4,18 +4,13 @@
 
 "use strict";
 
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const actions = require("devtools/client/webconsole/actions/index");
 
-const Message = createFactory(
-  require("devtools/client/webconsole/components/Output/Message")
-);
+const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
 
 const GripMessageBody = require("devtools/client/webconsole/components/Output/GripMessageBody");
 
@@ -110,10 +105,7 @@ class CSSWarning extends Component {
     let messageBody;
     if (typeof messageText === "string") {
       messageBody = messageText;
-    } else if (
-      typeof messageText === "object" &&
-      messageText.type === "longString"
-    ) {
+    } else if (typeof messageText === "object" && messageText.type === "longString") {
       messageBody = `${message.messageText.initial}…`;
     }
 
@@ -126,9 +118,7 @@ class CSSWarning extends Component {
         { className: "devtools-monospace" },
         dom.div(
           { className: "elements-label" },
-          l10n.getFormatStr("webconsole.cssWarningElements.label", [
-            cssSelectors,
-          ])
+          l10n.getFormatStr("webconsole.cssWarningElements.label", [cssSelectors])
         ),
         GripMessageBody({
           dispatch,

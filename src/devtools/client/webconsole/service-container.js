@@ -4,23 +4,13 @@
 
 "use strict";
 
-const {
-  createContextMenu,
-} = require("devtools/client/webconsole/utils/context-menu");
+const { createContextMenu } = require("devtools/client/webconsole/utils/context-menu");
 
-const {
-  createEditContextMenu,
-} = require("devtools/client/framework/toolbox-context-menu");
+const { createEditContextMenu } = require("devtools/client/framework/toolbox-context-menu");
 
-function setupServiceContainer({
-  webConsoleUI,
-  hud,
-  toolbox,
-  webConsoleWrapper,
-}) {
+function setupServiceContainer({ webConsoleUI, hud, toolbox, webConsoleWrapper }) {
   const serviceContainer = {
-    openContextMenu: (event, message) =>
-      createContextMenu(event, message, webConsoleWrapper),
+    openContextMenu: (event, message) => createContextMenu(event, message, webConsoleWrapper),
 
     openEditContextMenu: event => {
       const { screenX, screenY } = event;
@@ -42,8 +32,7 @@ function setupServiceContainer({
     focusInput: () => hud.focusInput(),
     setInputValue: value => hud.setInputValue(value),
     canRewind: () => hud.canRewind(),
-    onMessageHover: (type, message) =>
-      webConsoleUI.onMessageHover(type, message),
+    onMessageHover: (type, message) => webConsoleUI.onMessageHover(type, message),
     getLongString: grip => webConsoleUI.getLongString(grip),
     getJsTermTooltipAnchor: () => webConsoleUI.getJsTermTooltipAnchor(),
     emitForTests: (event, value) => webConsoleUI.emitForTests(event, value),

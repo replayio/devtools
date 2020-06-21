@@ -34,18 +34,9 @@ function getWasmText(subject, data) {
 function getWasmLineNumberFormatter(subject) {
   const codeOf0 = 48,
     codeOfA = 65;
-  const buffer = [
-    codeOf0,
-    codeOf0,
-    codeOf0,
-    codeOf0,
-    codeOf0,
-    codeOf0,
-    codeOf0,
-    codeOf0,
-  ];
+  const buffer = [codeOf0, codeOf0, codeOf0, codeOf0, codeOf0, codeOf0, codeOf0, codeOf0];
   let last0 = 7;
-  return function(number) {
+  return function (number) {
     const offset = lineToWasmOffset(subject, number - 1);
     if (offset === undefined) {
       return "";

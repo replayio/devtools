@@ -13,12 +13,7 @@
 
 const { getCSSLexer } = require("devtools/shared/css/lexer");
 
-loader.lazyRequireGetter(
-  this,
-  "CSS_ANGLEUNIT",
-  "devtools/shared/css/constants",
-  true
-);
+loader.lazyRequireGetter(this, "CSS_ANGLEUNIT", "devtools/shared/css/constants", true);
 
 const SELECTOR_ATTRIBUTE = (exports.SELECTOR_ATTRIBUTE = 1);
 const SELECTOR_ELEMENT = (exports.SELECTOR_ELEMENT = 2);
@@ -28,8 +23,7 @@ const CSS_BLOCKS = { "(": ")", "[": "]", "{": "}" };
 // When commenting out a declaration, we put this character into the
 // comment opener so that future parses of the commented text know to
 // bypass the property name validity heuristic.
-const COMMENT_PARSING_HEURISTIC_BYPASS_CHAR = (exports.COMMENT_PARSING_HEURISTIC_BYPASS_CHAR =
-  "!");
+const COMMENT_PARSING_HEURISTIC_BYPASS_CHAR = (exports.COMMENT_PARSING_HEURISTIC_BYPASS_CHAR = "!");
 
 /**
  * A generator function that lexes a CSS source string, yielding the
@@ -156,12 +150,7 @@ function unescapeCSSComment(inputString) {
  * @return {array} Array of declarations of the same form as returned
  *                 by parseDeclarations.
  */
-function parseCommentDeclarations(
-  isCssPropertyKnown,
-  commentText,
-  startOffset,
-  endOffset
-) {
+function parseCommentDeclarations(isCssPropertyKnown, commentText, startOffset, endOffset) {
   let commentOverride = false;
   if (commentText === "") {
     return [];
@@ -343,10 +332,7 @@ function parseDeclarationsInternal(
       importantWS = true;
     }
 
-    if (
-      token.tokenType === "symbol" &&
-      currentBlocks[currentBlocks.length - 1] === token.text
-    ) {
+    if (token.tokenType === "symbol" && currentBlocks[currentBlocks.length - 1] === token.text) {
       // Closing the last block that was opened.
       currentBlocks.pop();
       current += token.text;
@@ -371,11 +357,7 @@ function parseDeclarationsInternal(
 
         // When parsing a comment body, if the left-hand-side is not a
         // valid property name, then drop it and stop parsing.
-        if (
-          inComment &&
-          !commentOverride &&
-          !isCssPropertyKnown(lastProp.name)
-        ) {
+        if (inComment && !commentOverride && !isCssPropertyKnown(lastProp.name)) {
           lastProp.name = null;
           break;
         }
@@ -384,11 +366,7 @@ function parseDeclarationsInternal(
         // with colons)
         current += ":";
       }
-    } else if (
-      token.tokenType === "symbol" &&
-      token.text === ";" &&
-      !currentBlocks.length
-    ) {
+    } else if (token.tokenType === "symbol" && token.text === ";" && !currentBlocks.length) {
       lastProp.terminator = "";
       // When parsing a comment, if the name hasn't been set, then we
       // have probably just seen an ordinary semicolon used in text,
@@ -440,10 +418,7 @@ function parseDeclarationsInternal(
       }
     } else if (token.tokenType === "comment") {
       if (parseComments && !lastProp.name && !lastProp.value) {
-        const commentText = inputString.substring(
-          token.startOffset + 2,
-          token.endOffset - 2
-        );
+        const commentText = inputString.substring(token.startOffset + 2, token.endOffset - 2);
         const newDecls = parseCommentDeclarations(
           isCssPropertyKnown,
           commentText,
@@ -543,34 +518,18 @@ function parseDeclarationsInternal(
  *         on the object, which will hold the offsets of the start
  *         and end of the enclosing comment.
  */
-function parseDeclarations(
-  isCssPropertyKnown,
-  inputString,
-  parseComments = false
-) {
-  return parseDeclarationsInternal(
-    isCssPropertyKnown,
-    inputString,
-    parseComments,
-    false,
-    false
-  );
+function parseDeclarations(isCssPropertyKnown, inputString, parseComments = false) {
+  return parseDeclarationsInternal(isCssPropertyKnown, inputString, parseComments, false, false);
 }
 
 /**
  * Like @see parseDeclarations, but removes properties that do not
  * have a name.
  */
-function parseNamedDeclarations(
-  isCssPropertyKnown,
-  inputString,
-  parseComments = false
-) {
-  return parseDeclarations(
-    isCssPropertyKnown,
-    inputString,
-    parseComments
-  ).filter(item => !!item.name);
+function parseNamedDeclarations(isCssPropertyKnown, inputString, parseComments = false) {
+  return parseDeclarations(isCssPropertyKnown, inputString, parseComments).filter(
+    item => !!item.name
+  );
 }
 
 /**
@@ -691,10 +650,7 @@ function parsePseudoClassesAndAttributes(value) {
  * @return {Object} an object with 'value' and 'priority' properties.
  */
 function parseSingleValue(isCssPropertyKnown, value) {
-  const declaration = parseDeclarations(
-    isCssPropertyKnown,
-    "a: " + value + ";"
-  )[0];
+  const declaration = parseDeclarations(isCssPropertyKnown, "a: " + value + ";")[0];
   return {
     value: declaration ? declaration.value : "",
     priority: declaration ? declaration.priority : "",

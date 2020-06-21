@@ -31,13 +31,7 @@ import type { Action, ThunkArgs } from "./types";
  * @static
  */
 export function willNavigate(event: Object) {
-  return async function({
-    dispatch,
-    getState,
-    client,
-    sourceMaps,
-    parser,
-  }: ThunkArgs) {
+  return async function ({ dispatch, getState, client, sourceMaps, parser }: ThunkArgs) {
     sourceQueue.clear();
     sourceMaps.clearSourceMaps();
     clearWasmStates();
@@ -52,13 +46,8 @@ export function willNavigate(event: Object) {
   };
 }
 
-export function connect(
-  url: string,
-  actor: string,
-  traits: Object,
-  isWebExtension: boolean
-) {
-  return async function({ dispatch, getState }: ThunkArgs) {
+export function connect(url: string, actor: string, traits: Object, isWebExtension: boolean) {
+  return async function ({ dispatch, getState }: ThunkArgs) {
     await dispatch(updateThreads());
     await dispatch(
       ({
@@ -91,7 +80,7 @@ export function connect(
  * @static
  */
 export function navigated() {
-  return async function({ dispatch, panel }: ThunkArgs) {
+  return async function ({ dispatch, panel }: ThunkArgs) {
     await dispatch(updateThreads());
     panel.emit("reloaded");
   };

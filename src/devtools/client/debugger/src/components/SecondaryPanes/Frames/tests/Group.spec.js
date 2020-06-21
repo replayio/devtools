@@ -7,11 +7,7 @@
 import React from "react";
 import { shallow } from "enzyme";
 import Group from "../Group.js";
-import {
-  makeMockFrame,
-  makeMockSource,
-  mockthreadcx,
-} from "../../../../utils/test-mockup";
+import { makeMockFrame, makeMockSource, mockthreadcx } from "../../../../utils/test-mockup";
 
 import FrameMenu from "../FrameMenu";
 jest.mock("../FrameMenu", () => jest.fn());
@@ -114,12 +110,7 @@ describe("Group", () => {
 
     it("calls FrameMenu on right click", () => {
       const { component, props } = render();
-      const {
-        copyStackTrace,
-        toggleFrameworkGrouping,
-        toggleBlackBox,
-        cx,
-      } = props;
+      const { copyStackTrace, toggleFrameworkGrouping, toggleBlackBox, cx } = props;
       const mockEvent = "mockEvent";
       component.simulate("contextmenu", mockEvent);
 

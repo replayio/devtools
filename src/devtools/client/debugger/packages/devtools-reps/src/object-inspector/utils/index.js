@@ -22,8 +22,7 @@ function shouldRenderRootsInReps(roots: Array<Node>): boolean {
   const root = roots[0];
   const name = root && root.name;
   return (
-    (name === null || typeof name === "undefined") &&
-    (nodeIsPrimitive(root) || nodeIsError(root))
+    (name === null || typeof name === "undefined") && (nodeIsPrimitive(root) || nodeIsError(root))
   );
 }
 

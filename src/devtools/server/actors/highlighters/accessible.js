@@ -4,9 +4,7 @@
 
 "use strict";
 
-const {
-  AutoRefreshHighlighter,
-} = require("devtools/server/actors/highlighters/auto-refresh");
+const { AutoRefreshHighlighter } = require("devtools/server/actors/highlighters/auto-refresh");
 const {
   CanvasFrameAnonymousContentHelper,
   createNode,
@@ -229,10 +227,7 @@ class AccessibleHighlighter extends AutoRefreshHighlighter {
       this.hide();
     }
 
-    setIgnoreLayoutChanges(
-      false,
-      this.highlighterEnv.window.document.documentElement
-    );
+    setIgnoreLayoutChanges(false, this.highlighterEnv.window.document.documentElement);
 
     return shown;
   }
@@ -244,10 +239,7 @@ class AccessibleHighlighter extends AutoRefreshHighlighter {
     setIgnoreLayoutChanges(true);
     this._hideAccessibleBounds();
     this.accessibleInfobar.hide();
-    setIgnoreLayoutChanges(
-      false,
-      this.highlighterEnv.window.document.documentElement
-    );
+    setIgnoreLayoutChanges(false, this.highlighterEnv.window.document.documentElement);
   }
 
   /**
@@ -280,10 +272,7 @@ class AccessibleHighlighter extends AutoRefreshHighlighter {
     this._shouldRestoreBoundsVisibility = null;
     setIgnoreLayoutChanges(true);
     this.getElement("elements").setAttribute("hidden", "true");
-    setIgnoreLayoutChanges(
-      false,
-      this.highlighterEnv.window.document.documentElement
-    );
+    setIgnoreLayoutChanges(false, this.highlighterEnv.window.document.documentElement);
   }
 
   /**
@@ -297,10 +286,7 @@ class AccessibleHighlighter extends AutoRefreshHighlighter {
 
     setIgnoreLayoutChanges(true);
     this.getElement("elements").removeAttribute("hidden");
-    setIgnoreLayoutChanges(
-      false,
-      this.highlighterEnv.window.document.documentElement
-    );
+    setIgnoreLayoutChanges(false, this.highlighterEnv.window.document.documentElement);
   }
 
   /**

@@ -22,11 +22,7 @@ function getSearchState(cm) {
 
 function getSearchCursor(cm, query, pos) {
   // If the query string is all lowercase, do a case insensitive search.
-  return cm.getSearchCursor(
-    query,
-    pos,
-    typeof query == "string" && query == query.toLowerCase()
-  );
+  return cm.getSearchCursor(query, pos, typeof query == "string" && query == query.toLowerCase());
 }
 
 /**
@@ -43,7 +39,7 @@ function doSearch(ctx, rev, query) {
     return;
   }
 
-  cm.operation(function() {
+  cm.operation(function () {
     if (state.query) {
       return;
     }
@@ -59,21 +55,15 @@ function doSearch(ctx, rev, query) {
  */
 function searchNext(ctx, rev) {
   const { cm, ed } = ctx;
-  cm.operation(function() {
+  cm.operation(function () {
     const state = getSearchState(cm);
-    let cursor = getSearchCursor(
-      cm,
-      state.query,
-      rev ? state.posFrom : state.posTo
-    );
+    let cursor = getSearchCursor(cm, state.query, rev ? state.posFrom : state.posTo);
 
     if (!cursor.find(rev)) {
       cursor = getSearchCursor(
         cm,
         state.query,
-        rev
-          ? { line: cm.lastLine(), ch: null }
-          : { line: cm.firstLine(), ch: 0 }
+        rev ? { line: cm.lastLine(), ch: null } : { line: cm.firstLine(), ch: 0 }
       );
       if (!cursor.find(rev)) {
         return;

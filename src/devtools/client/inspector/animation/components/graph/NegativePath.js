@@ -73,10 +73,7 @@ class NegativePath extends PureComponent {
       return win.getComputedStyle(simulatedElement).opacity;
     };
 
-    const toPathStringFunc = createSummaryGraphPathStringFunction(
-      endTime,
-      state.playbackRate
-    );
+    const toPathStringFunc = createSummaryGraphPathStringFunction(endTime, state.playbackRate);
     const helper = new SummaryGraphHelper(
       state,
       keyframes,

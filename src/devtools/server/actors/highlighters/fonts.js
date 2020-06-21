@@ -5,18 +5,8 @@
 "use strict";
 
 const InspectorUtils = require("InspectorUtils");
-loader.lazyRequireGetter(
-  this,
-  "loadSheet",
-  "devtools/shared/layout/utils",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "removeSheet",
-  "devtools/shared/layout/utils",
-  true
-);
+loader.lazyRequireGetter(this, "loadSheet", "devtools/shared/layout/utils", true);
+loader.lazyRequireGetter(this, "removeSheet", "devtools/shared/layout/utils", true);
 
 // How many text runs are we highlighting at a time. There may be many text runs, and we
 // want to prevent performance problems.
@@ -29,9 +19,7 @@ const MAX_TEXT_RANGES = 100;
 // 0.6 here.
 const STYLESHEET_URI =
   "data:text/css," +
-  encodeURIComponent(
-    "::selection{background-color:hsl(197,71%,73%,.6)!important;}"
-  );
+  encodeURIComponent("::selection{background-color:hsl(197,71%,73%,.6)!important;}");
 
 /**
  * This highlighter highlights runs of text in the page that have been rendered given a

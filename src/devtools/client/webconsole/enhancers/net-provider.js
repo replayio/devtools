@@ -13,10 +13,7 @@ const {
   getAllMessagesUiById,
 } = require("devtools/client/webconsole/selectors/messages");
 
-const {
-  MESSAGE_OPEN,
-  NETWORK_MESSAGE_UPDATE,
-} = require("devtools/client/webconsole/constants");
+const { MESSAGE_OPEN, NETWORK_MESSAGE_UPDATE } = require("devtools/client/webconsole/constants");
 
 /**
  * This enhancer is responsible for fetching HTTP details data
@@ -30,9 +27,7 @@ function enableNetProvider(webConsoleUI) {
   return next => (reducer, initialState, enhancer) => {
     function netProviderEnhancer(state, action) {
       const dataProvider =
-        webConsoleUI &&
-        webConsoleUI.wrapper &&
-        webConsoleUI.wrapper.networkDataProvider;
+        webConsoleUI && webConsoleUI.wrapper && webConsoleUI.wrapper.networkDataProvider;
 
       if (!dataProvider) {
         return reducer(state, action);

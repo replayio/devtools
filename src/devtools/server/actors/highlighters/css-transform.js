@@ -4,19 +4,14 @@
 
 "use strict";
 
-const {
-  AutoRefreshHighlighter,
-} = require("devtools/server/actors/highlighters/auto-refresh");
+const { AutoRefreshHighlighter } = require("devtools/server/actors/highlighters/auto-refresh");
 const {
   CanvasFrameAnonymousContentHelper,
   getComputedStyle,
   createSVGNode,
   createNode,
 } = require("devtools/server/actors/highlighters/utils/markup");
-const {
-  setIgnoreLayoutChanges,
-  getNodeBounds,
-} = require("devtools/shared/layout/utils");
+const { setIgnoreLayoutChanges, getNodeBounds } = require("devtools/shared/layout/utils");
 
 // The minimum distance a line should be before it has an arrow marker-end
 const ARROW_LINE_MIN_DISTANCE = 10;
@@ -167,7 +162,7 @@ class CssTransformHighlighter extends AutoRefreshHighlighter {
    */
   _isTransformed(node) {
     const style = getComputedStyle(node);
-    return style && (style.transform !== "none" && style.display !== "inline");
+    return style && style.transform !== "none" && style.display !== "inline";
   }
 
   _setPolygonPoints(quad, id) {
@@ -203,11 +198,7 @@ class CssTransformHighlighter extends AutoRefreshHighlighter {
 
     // Getting the points for the transformed shape
     const quads = this.currentQuads.border;
-    if (
-      !quads.length ||
-      quads[0].bounds.width <= 0 ||
-      quads[0].bounds.height <= 0
-    ) {
+    if (!quads.length || quads[0].bounds.width <= 0 || quads[0].bounds.height <= 0) {
       this._hideShapes();
       return false;
     }
@@ -220,25 +211,15 @@ class CssTransformHighlighter extends AutoRefreshHighlighter {
     this._setPolygonPoints(quad, "transformed");
     this._setPolygonPoints(untransformedQuad, "untransformed");
     for (const nb of ["1", "2", "3", "4"]) {
-      this._setLinePoints(
-        untransformedQuad["p" + nb],
-        quad["p" + nb],
-        "line" + nb
-      );
+      this._setLinePoints(untransformedQuad["p" + nb], quad["p" + nb], "line" + nb);
     }
 
     // Adapt to the current zoom
-    this.markup.scaleRootElement(
-      this.currentNode,
-      this.ID_CLASS_PREFIX + "root"
-    );
+    this.markup.scaleRootElement(this.currentNode, this.ID_CLASS_PREFIX + "root");
 
     this._showShapes();
 
-    setIgnoreLayoutChanges(
-      false,
-      this.highlighterEnv.window.document.documentElement
-    );
+    setIgnoreLayoutChanges(false, this.highlighterEnv.window.document.documentElement);
     return true;
   }
 
@@ -248,10 +229,7 @@ class CssTransformHighlighter extends AutoRefreshHighlighter {
   _hide() {
     setIgnoreLayoutChanges(true);
     this._hideShapes();
-    setIgnoreLayoutChanges(
-      false,
-      this.highlighterEnv.window.document.documentElement
-    );
+    setIgnoreLayoutChanges(false, this.highlighterEnv.window.document.documentElement);
   }
 
   _hideShapes() {

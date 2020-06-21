@@ -26,10 +26,7 @@ import type {
   ExecutionPoint,
 } from "../../types";
 
-import type {
-  EventListenerCategoryList,
-  EventListenerActiveList,
-} from "../../actions/types";
+import type { EventListenerCategoryList, EventListenerActiveList } from "../../actions/types";
 
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const {
@@ -76,10 +73,7 @@ function createObjectFront(grip: Grip): ObjectFront {
 
 async function loadObjectProperties(root: Node) {
   const utils = Reps.objectInspector.utils;
-  const properties = await utils.loadProperties.loadItemProperties(
-    root,
-    devToolsClient
-  );
+  const properties = await utils.loadProperties.loadItemProperties(root, devToolsClient);
   return utils.node.getChildren({
     item: root,
     loadedProperties: new Map([[root.path, properties]]),
@@ -165,12 +159,7 @@ function removeXHRBreakpoint(path: string, method: string) {
   return currentThreadFront.removeXHRBreakpoint(path, method);
 }
 
-function addWatchpoint(
-  object: Grip,
-  property: string,
-  label: string,
-  watchpointType: string
-) {
+function addWatchpoint(object: Grip, property: string, label: string, watchpointType: string) {
   if (currentTarget.traits.watchpoints) {
     const objectFront = createObjectFront(object);
     return objectFront.addWatchpoint(property, label, watchpointType);
@@ -215,10 +204,7 @@ function hasBreakpoint(location: BreakpointLocation) {
   return !!breakpoints[locationKey(location)];
 }
 
-function setBreakpoint(
-  location: BreakpointLocation,
-  options: BreakpointOptions
-) {
+function setBreakpoint(location: BreakpointLocation, options: BreakpointOptions) {
   maybeClearLogpoint(location);
   options = maybeGenerateLogGroupId(options);
   breakpoints[locationKey(location)] = { location, options };
@@ -278,11 +264,7 @@ async function evaluate(
   return { exception };
 }
 
-async function autocomplete(
-  input: string,
-  cursor: number,
-  frameId: ?string
-): Promise<mixed> {
+async function autocomplete(input: string, cursor: number, frameId: ?string): Promise<mixed> {
   if (!currentTarget || !input) {
     return {};
   }
@@ -292,12 +274,7 @@ async function autocomplete(
   }
 
   return new Promise(resolve => {
-    consoleFront.autocomplete(
-      input,
-      cursor,
-      result => resolve(result),
-      frameId
-    );
+    consoleFront.autocomplete(input, cursor, result => resolve(result), frameId);
   });
 }
 
@@ -324,9 +301,9 @@ function getProperties(thread: string, grip: Grip): Promise<*> {
 
 async function getFrames(thread: string) {
   const frames = await lookupThreadFront(thread).getFrames();
-  return Promise.all(frames.map<?Frame>((frame, i) =>
-    createFrame(thread, frame, i)
-  ));
+  return Promise.all(
+    frames.map<?Frame>((frame, i) => createFrame(thread, frame, i))
+  );
 }
 
 function convertScope(protocolScope) {
@@ -433,9 +410,7 @@ function registerSourceActor(sourceActorId: string, sourceId: SourceId, url) {
   eventMethods.onSourceActorRegister(sourceActorId);
 }
 
-async function getSources(
-  client: ThreadFront
-): Promise<Array<GeneratedSourceData>> {
+async function getSources(client: ThreadFront): Promise<Array<GeneratedSourceData>> {
   const { sources }: SourcesPacket = await client.getSources();
 
   return sources.map(source => prepareSourcePayload(client, source));
@@ -458,9 +433,7 @@ async function fetchSources(): Promise<Array<GeneratedSourceData>> {
   return sources;
 }
 
-async function fetchThreadSources(
-  thread: string
-): Promise<Array<GeneratedSourceData>> {
+async function fetchThreadSources(thread: string): Promise<Array<GeneratedSourceData>> {
   return getSources(lookupThreadFront(thread));
 }
 

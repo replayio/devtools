@@ -10,15 +10,7 @@ import cases from "jest-in-case";
 
 import { makeMockSourceAndContent } from "../../../../utils/test-mockup";
 
-const astKeys = [
-  "type",
-  "start",
-  "end",
-  "loc",
-  "program",
-  "comments",
-  "tokens",
-];
+const astKeys = ["type", "start", "end", "loc", "program", "comments", "tokens"];
 
 cases(
   "ast.getAst",

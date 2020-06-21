@@ -9,10 +9,7 @@
  * @module reducers/pending-breakpoints
  */
 
-import {
-  createPendingBreakpoint,
-  makePendingLocationId,
-} from "../utils/breakpoint";
+import { createPendingBreakpoint, makePendingLocationId } from "../utils/breakpoint";
 
 import type { SourcesState } from "./sources";
 import type { PendingBreakpoint, Source } from "../types";
@@ -73,9 +70,7 @@ export function getPendingBreakpoints(state: OuterState) {
   return state.pendingBreakpoints;
 }
 
-export function getPendingBreakpointList(
-  state: OuterState
-): PendingBreakpoint[] {
+export function getPendingBreakpointList(state: OuterState): PendingBreakpoint[] {
   return (Object.values(getPendingBreakpoints(state)): any);
 }
 
@@ -84,8 +79,7 @@ export function getPendingBreakpointsForSource(
   source: Source
 ): PendingBreakpoint[] {
   return getPendingBreakpointList(state).filter(pendingBreakpoint => {
-    return pendingBreakpoint.location.sourceUrl === source.url
-
+    return pendingBreakpoint.location.sourceUrl === source.url;
   });
 }
 

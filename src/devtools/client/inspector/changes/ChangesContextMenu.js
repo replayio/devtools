@@ -5,11 +5,7 @@
 "use strict";
 
 const Menu = require("devtools/client/framework/menu");
-loader.lazyRequireGetter(
-  this,
-  "MenuItem",
-  "devtools/client/framework/menu-item"
-);
+loader.lazyRequireGetter(this, "MenuItem", "devtools/client/framework/menu-item");
 
 const { getStr } = require("devtools/client/inspector/changes/utils/l10n");
 

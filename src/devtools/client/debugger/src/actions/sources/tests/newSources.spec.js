@@ -13,12 +13,7 @@ import {
   makeOriginalSource,
   waitForState,
 } from "../../../utils/test-head";
-const {
-  getSource,
-  getSourceCount,
-  getSelectedSource,
-  getSourceByURL,
-} = selectors;
+const { getSource, getSourceCount, getSelectedSource, getSourceByURL } = selectors;
 import sourceQueue from "../../../utils/source-queue";
 import { generatedToOriginalId } from "devtools-source-map";
 
@@ -40,9 +35,7 @@ describe("sources - new sources", () => {
   it("should not add multiple identical generated sources", async () => {
     const { dispatch, getState } = createStore(mockCommandClient);
 
-    const generated = await dispatch(
-      actions.newGeneratedSource(makeSource("base.js"))
-    );
+    const generated = await dispatch(actions.newGeneratedSource(makeSource("base.js")));
 
     await dispatch(actions.newOriginalSource(makeOriginalSource(generated)));
     await dispatch(actions.newOriginalSource(makeOriginalSource(generated)));
@@ -65,9 +58,7 @@ describe("sources - new sources", () => {
     await dispatch(actions.selectSourceURL(cx, baseSourceURL));
 
     expect(getSelectedSource(getState())).toBe(undefined);
-    const baseSource = await dispatch(
-      actions.newGeneratedSource(makeSource("base.js"))
-    );
+    const baseSource = await dispatch(actions.newGeneratedSource(makeSource("base.js")));
 
     const selected = getSelectedSource(getState());
     expect(selected && selected.url).toBe(baseSource.url);
@@ -89,9 +80,7 @@ describe("sources - new sources", () => {
     );
 
     await dispatch(
-      actions.newGeneratedSource(
-        makeSource("base.js", { sourceMapURL: "base.js.map" })
-      )
+      actions.newGeneratedSource(makeSource("base.js", { sourceMapURL: "base.js.map" }))
     );
     const magic = getSourceByURL(getState(), "magic.js");
     expect(magic && magic.url).toEqual("magic.js");
@@ -124,9 +113,7 @@ describe("sources - new sources", () => {
       }
     );
     await dispatch(
-      actions.newGeneratedSource(
-        makeSource("base.js", { sourceMapURL: "base.js.map" })
-      )
+      actions.newGeneratedSource(makeSource("base.js", { sourceMapURL: "base.js.map" }))
     );
     expect(getSourceCount(getState())).toEqual(1);
     const base = getSource(getState(), "base.js");

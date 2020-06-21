@@ -82,11 +82,16 @@ function getTitle(props, object) {
   const name = object.className();
   const length = getArrayLikeLength(object);
 
-  return span({
-    className: "objectTitle"
-  }, name, "(", length, ") ");
+  return span(
+    {
+      className: "objectTitle",
+    },
+    name,
+    "(",
+    length,
+    ") "
+  );
 }
-
 
 function arrayIterator(props, array, max) {
   const items = [];
@@ -99,10 +104,9 @@ function arrayIterator(props, array, max) {
   }
 
   for (let i = 0; i < length && i < max; i++) {
-
     const config = {
       mode: MODE.TINY,
-      delim: i == length - 1 ? "" : ", "
+      delim: i == length - 1 ? "" : ", ",
     };
     let elem;
     if (containerEntries && i < containerEntries.length) {
@@ -116,7 +120,7 @@ function arrayIterator(props, array, max) {
     const item = ItemRep({
       ...props,
       ...config,
-      object: elem
+      object: elem,
     });
     items.push(item);
   }

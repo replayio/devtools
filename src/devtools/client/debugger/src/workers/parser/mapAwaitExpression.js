@@ -26,11 +26,7 @@ function translateDeclarationIntoAssignment(node: Object): Object[] {
     if (!declaration.init) {
       return acc;
     }
-    acc.push(
-      t.expressionStatement(
-        t.assignmentExpression("=", declaration.id, declaration.init)
-      )
-    );
+    acc.push(t.expressionStatement(t.assignmentExpression("=", declaration.id, declaration.init)));
     return acc;
   }, []);
 }
@@ -42,9 +38,7 @@ function translateDeclarationIntoAssignment(node: Object): Object[] {
 function addReturnNode(ast: Object): Object {
   const statements = ast.program.body;
   const lastStatement = statements[statements.length - 1];
-  return statements
-    .slice(0, -1)
-    .concat(t.returnStatement(lastStatement.expression));
+  return statements.slice(0, -1).concat(t.returnStatement(lastStatement.expression));
 }
 
 function getDeclarations(node: Object) {
@@ -57,10 +51,7 @@ function getDeclarations(node: Object) {
   // We can't declare const variables outside of the async iife because we
   // wouldn't be able to re-assign them. As a workaround, we transform them
   // to `let` which should be good enough for those case.
-  return t.variableDeclaration(
-    kind === "const" ? "let" : kind,
-    declaratorNodes
-  );
+  return t.variableDeclaration(kind === "const" ? "let" : kind, declaratorNodes);
 }
 
 function getVariableDeclarators(node: Object): Object[] | Object {
@@ -80,10 +71,7 @@ function getVariableDeclarators(node: Object): Object[] | Object {
   }
 
   if (t.isArrayPattern(node)) {
-    return node.elements.reduce(
-      (acc, element) => acc.concat(getVariableDeclarators(element)),
-      []
-    );
+    return node.elements.reduce((acc, element) => acc.concat(getVariableDeclarators(element)), []);
   }
   if (t.isObjectPattern(node)) {
     return node.properties.reduce(
@@ -162,10 +150,7 @@ function wrapExpressionFromAst(ast: Object): string {
 
   // Create the async iife.
   newAst = t.expressionStatement(
-    t.callExpression(
-      t.arrowFunctionExpression([], t.blockStatement(body), true),
-      []
-    )
+    t.callExpression(t.arrowFunctionExpression([], t.blockStatement(body), true), [])
   );
 
   // Now let's put all the variable declarations at the top of the async iife.
@@ -174,10 +159,7 @@ function wrapExpressionFromAst(ast: Object): string {
   return generate(newAst).code;
 }
 
-export default function mapTopLevelAwait(
-  expression: string,
-  ast?: Object
-): string {
+export default function mapTopLevelAwait(expression: string, ast?: Object): string {
   if (!ast) {
     // If there's no ast this means the expression is malformed. And if the
     // expression contains the await keyword, we still want to wrap it in an

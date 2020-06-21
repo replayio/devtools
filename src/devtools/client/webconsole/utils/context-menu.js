@@ -63,8 +63,7 @@ function createContextMenu(event, message, webConsoleWrapper) {
 
   // Retrieve closes actor id from the DOM.
   const actorEl =
-    target.closest("[data-link-actor-id]") ||
-    target.querySelector("[data-link-actor-id]");
+    target.closest("[data-link-actor-id]") || target.querySelector("[data-link-actor-id]");
   const actor = actorEl ? actorEl.dataset.linkActorId : null;
 
   const rootObjectInspector = target.closest(".object-inspector");
@@ -115,9 +114,7 @@ function createContextMenu(event, message, webConsoleWrapper) {
       new MenuItem({
         id: "console-menu-resend-network-request",
         label: l10n.getStr("webconsole.menu.resendNetworkRequest.label"),
-        accesskey: l10n.getStr(
-          "webconsole.menu.resendNetworkRequest.accesskey"
-        ),
+        accesskey: l10n.getStr("webconsole.menu.resendNetworkRequest.accesskey"),
         visible: source === MESSAGE_SOURCE.NETWORK,
         click: () => dispatch(actions.resendNetworkRequest(messageId)),
       })

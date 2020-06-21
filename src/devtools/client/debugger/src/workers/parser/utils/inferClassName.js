@@ -15,24 +15,18 @@ function fromCallExpression(callExpression: SimplePath) {
     return null;
   }
 
-  const name = t.isMemberExpression(callee)
-    ? callee.property.name
-    : callee.name;
+  const name = t.isMemberExpression(callee) ? callee.property.name : callee.name;
 
   if (!whitelist.includes(name)) {
     return null;
   }
 
-  const variable = callExpression.findParent(p =>
-    t.isVariableDeclarator(p.node)
-  );
+  const variable = callExpression.findParent(p => t.isVariableDeclarator(p.node));
   if (variable) {
     return variable.node.id.name;
   }
 
-  const assignment = callExpression.findParent(p =>
-    t.isAssignmentExpression(p.node)
-  );
+  const assignment = callExpression.findParent(p => t.isAssignmentExpression(p.node));
 
   if (!assignment) {
     return null;

@@ -37,16 +37,12 @@ function compareFragmentsGeometry(fragments1, fragments2) {
   // Compare the offset of lines.
   for (let i = 0; i < fragments1.length; i++) {
     for (let j = 0; j < fragments1[i].cols.lines.length; j++) {
-      if (
-        fragments1[i].cols.lines[j].start !== fragments2[i].cols.lines[j].start
-      ) {
+      if (fragments1[i].cols.lines[j].start !== fragments2[i].cols.lines[j].start) {
         return false;
       }
     }
     for (let j = 0; j < fragments1[i].rows.lines.length; j++) {
-      if (
-        fragments1[i].rows.lines[j].start !== fragments2[i].rows.lines[j].start
-      ) {
+      if (fragments1[i].rows.lines[j].start !== fragments2[i].rows.lines[j].start) {
         return false;
       }
     }

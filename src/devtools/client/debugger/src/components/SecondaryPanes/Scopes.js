@@ -63,12 +63,7 @@ type Node = {
 
 class Scopes extends PureComponent<Props, State> {
   constructor(props: Props) {
-    const {
-      why,
-      selectedFrame,
-      originalFrameScopes,
-      generatedFrameScopes,
-    } = props;
+    const { why, selectedFrame, originalFrameScopes, generatedFrameScopes } = props;
 
     super(props);
 
@@ -80,18 +75,11 @@ class Scopes extends PureComponent<Props, State> {
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const {
-      cx,
-      selectedFrame,
-      originalFrameScopes,
-      generatedFrameScopes,
-    } = this.props;
+    const { cx, selectedFrame, originalFrameScopes, generatedFrameScopes } = this.props;
     const isPausedChanged = cx.isPaused !== nextProps.cx.isPaused;
     const selectedFrameChanged = selectedFrame !== nextProps.selectedFrame;
-    const originalFrameScopesChanged =
-      originalFrameScopes !== nextProps.originalFrameScopes;
-    const generatedFrameScopesChanged =
-      generatedFrameScopes !== nextProps.generatedFrameScopes;
+    const originalFrameScopesChanged = originalFrameScopes !== nextProps.originalFrameScopes;
+    const generatedFrameScopesChanged = generatedFrameScopes !== nextProps.generatedFrameScopes;
 
     if (
       isPausedChanged ||
@@ -113,8 +101,6 @@ class Scopes extends PureComponent<Props, State> {
       });
     }
   }
-
-
 
   onContextMenu = (event: any, item: any) => {
     const { addWatchpoint, removeWatchpoint } = this.props;
@@ -172,12 +158,7 @@ class Scopes extends PureComponent<Props, State> {
 
     const { removeWatchpoint } = this.props;
 
-    if (
-      !item ||
-      !item.contents ||
-      !item.contents.watchpoint ||
-      typeof L10N === "undefined"
-    ) {
+    if (!item || !item.contents || !item.contents.watchpoint || typeof L10N === "undefined") {
       return null;
     }
 
@@ -211,9 +192,11 @@ class Scopes extends PureComponent<Props, State> {
     }
 
     if (scopes && scopes.length > 0 && !isLoading) {
-      const roots = scopes.map(
-        (s, i) => ({ path: `scope${i}`, name: s.name, contents: s.contents })
-      );
+      const roots = scopes.map((s, i) => ({
+        path: `scope${i}`,
+        name: s.name,
+        contents: s.contents,
+      }));
       return (
         <div className="pane scopes-list">
           <ObjectInspector
@@ -262,17 +245,14 @@ const mapStateToProps = state => {
   const selectedFrame = getSelectedFrame(state, cx.thread);
   const selectedSource = getSelectedSource(state);
 
-  const {
-    scope: generatedFrameScopes,
-    pending: generatedPending,
-  } = getGeneratedFrameScope(
+  const { scope: generatedFrameScopes, pending: generatedPending } = getGeneratedFrameScope(
     state,
     cx.thread,
     selectedFrame && selectedFrame.id
   ) || {
-      scope: null,
-      pending: false,
-    };
+    scope: null,
+    pending: false,
+  };
 
   return {
     cx,
@@ -284,15 +264,12 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    openLink: actions.openLink,
-    openElementInInspector: actions.openElementInInspectorCommand,
-    highlightDomElement: actions.highlightDomElement,
-    unHighlightDomElement: actions.unHighlightDomElement,
-    setExpandedScope: actions.setExpandedScope,
-    addWatchpoint: actions.addWatchpoint,
-    removeWatchpoint: actions.removeWatchpoint,
-  }
-)(Scopes);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  openLink: actions.openLink,
+  openElementInInspector: actions.openElementInInspectorCommand,
+  highlightDomElement: actions.highlightDomElement,
+  unHighlightDomElement: actions.unHighlightDomElement,
+  setExpandedScope: actions.setExpandedScope,
+  addWatchpoint: actions.addWatchpoint,
+  removeWatchpoint: actions.removeWatchpoint,
+})(Scopes);

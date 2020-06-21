@@ -10,10 +10,7 @@ import { PROMISE } from "../utils/middleware/promise";
 import { updateTab } from "../tabs";
 import { loadSourceText } from "./loadSourceText";
 
-import {
-  memoizeableAction,
-  type MemoizedAction,
-} from "../../utils/memoizableAction";
+import { memoizeableAction, type MemoizedAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
 
 import type { Source, Context } from "../../types";

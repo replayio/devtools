@@ -14,25 +14,16 @@ const {
 } = require("devtools/client/inspector/shared/node-types");
 
 loader.lazyRequireGetter(this, "Menu", "devtools/client/framework/menu");
-loader.lazyRequireGetter(
-  this,
-  "MenuItem",
-  "devtools/client/framework/menu-item"
-);
+loader.lazyRequireGetter(this, "MenuItem", "devtools/client/framework/menu-item");
 loader.lazyRequireGetter(
   this,
   "getRuleFromNode",
   "devtools/client/inspector/rules/utils/utils",
   true
 );
-loader.lazyRequireGetter(
-  this,
-  "clipboardHelper",
-  "devtools/shared/platform/clipboard"
-);
+loader.lazyRequireGetter(this, "clipboardHelper", "devtools/shared/platform/clipboard");
 
-const STYLE_INSPECTOR_PROPERTIES =
-  "devtools/shared/locales/styleinspector.properties";
+const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const STYLE_INSPECTOR_L10N = new LocalizationHelper(STYLE_INSPECTOR_PROPERTIES);
 
@@ -73,7 +64,7 @@ StyleInspectorMenu.prototype = {
   /**
    * Display the style inspector context menu
    */
-  show: function(event) {
+  show: function (event) {
     try {
       this._openMenu({
         target: event.target,
@@ -85,7 +76,7 @@ StyleInspectorMenu.prototype = {
     }
   },
 
-  _openMenu: function({ target, screenX = 0, screenY = 0 } = {}) {
+  _openMenu: function ({ target, screenX = 0, screenY = 0 } = {}) {
     this.currentTarget = target;
     this.styleWindow.focus();
 
@@ -93,18 +84,14 @@ StyleInspectorMenu.prototype = {
 
     const menuitemCopy = new MenuItem({
       label: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.copy"),
-      accesskey: STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.contextmenu.copy.accessKey"
-      ),
+      accesskey: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.copy.accessKey"),
       click: () => {
         this._onCopy();
       },
       disabled: !this._hasTextSelected(),
     });
     const menuitemCopyLocation = new MenuItem({
-      label: STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.contextmenu.copyLocation"
-      ),
+      label: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.copyLocation"),
       click: () => {
         this._onCopyLocation();
       },
@@ -119,9 +106,7 @@ StyleInspectorMenu.prototype = {
     });
     const copyColorAccessKey = "styleinspector.contextmenu.copyColor.accessKey";
     const menuitemCopyColor = new MenuItem({
-      label: STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.contextmenu.copyColor"
-      ),
+      label: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.copyColor"),
       accesskey: STYLE_INSPECTOR_L10N.getStr(copyColorAccessKey),
       click: () => {
         this._onCopyColor();
@@ -137,12 +122,9 @@ StyleInspectorMenu.prototype = {
       },
       visible: this._isImageUrl(),
     });
-    const copyImageAccessKey =
-      "styleinspector.contextmenu.copyImageDataUrl.accessKey";
+    const copyImageAccessKey = "styleinspector.contextmenu.copyImageDataUrl.accessKey";
     const menuitemCopyImageDataUrl = new MenuItem({
-      label: STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.contextmenu.copyImageDataUrl"
-      ),
+      label: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.copyImageDataUrl"),
       accesskey: STYLE_INSPECTOR_L10N.getStr(copyImageAccessKey),
       click: () => {
         this._onCopyImageDataUrl();
@@ -158,27 +140,21 @@ StyleInspectorMenu.prototype = {
       visible: false,
     });
     const menuitemCopyPropertyName = new MenuItem({
-      label: STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.contextmenu.copyPropertyName"
-      ),
+      label: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.copyPropertyName"),
       click: () => {
         this._onCopyPropertyName();
       },
       visible: false,
     });
     const menuitemCopyPropertyValue = new MenuItem({
-      label: STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.contextmenu.copyPropertyValue"
-      ),
+      label: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.copyPropertyValue"),
       click: () => {
         this._onCopyPropertyValue();
       },
       visible: false,
     });
     const menuitemCopySelector = new MenuItem({
-      label: STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.contextmenu.copySelector"
-      ),
+      label: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.copySelector"),
       click: () => {
         this._onCopySelector();
       },
@@ -225,9 +201,7 @@ StyleInspectorMenu.prototype = {
     // Select All
     const selectAllAccessKey = "styleinspector.contextmenu.selectAll.accessKey";
     const menuitemSelectAll = new MenuItem({
-      label: STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.contextmenu.selectAll"
-      ),
+      label: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.selectAll"),
       accesskey: STYLE_INSPECTOR_L10N.getStr(selectAllAccessKey),
       click: () => {
         this._onSelectAll();
@@ -244,9 +218,7 @@ StyleInspectorMenu.prototype = {
     // Add new rule
     const addRuleAccessKey = "styleinspector.contextmenu.addNewRule.accessKey";
     const menuitemAddRule = new MenuItem({
-      label: STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.contextmenu.addNewRule"
-      ),
+      label: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.addNewRule"),
       accesskey: STYLE_INSPECTOR_L10N.getStr(addRuleAccessKey),
       click: () => {
         this._onAddNewRule();
@@ -257,12 +229,9 @@ StyleInspectorMenu.prototype = {
     menu.append(menuitemAddRule);
 
     // Show Original Sources
-    const sourcesAccessKey =
-      "styleinspector.contextmenu.toggleOrigSources.accessKey";
+    const sourcesAccessKey = "styleinspector.contextmenu.toggleOrigSources.accessKey";
     const menuitemSources = new MenuItem({
-      label: STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.contextmenu.toggleOrigSources"
-      ),
+      label: STYLE_INSPECTOR_L10N.getStr("styleinspector.contextmenu.toggleOrigSources"),
       accesskey: STYLE_INSPECTOR_L10N.getStr(sourcesAccessKey),
       click: () => {
         this._onToggleOrigSources();
@@ -276,7 +245,7 @@ StyleInspectorMenu.prototype = {
     return menu;
   },
 
-  _hasTextSelected: function() {
+  _hasTextSelected: function () {
     let hasTextSelected;
     const selection = this.styleWindow.getSelection();
 
@@ -284,9 +253,7 @@ StyleInspectorMenu.prototype = {
     if (node.nodeName == "input" || node.nodeName == "textarea") {
       const { selectionStart, selectionEnd } = node;
       hasTextSelected =
-        isFinite(selectionStart) &&
-        isFinite(selectionEnd) &&
-        selectionStart !== selectionEnd;
+        isFinite(selectionStart) && isFinite(selectionEnd) && selectionStart !== selectionEnd;
     } else {
       hasTextSelected = selection.toString() && !selection.isCollapsed;
     }
@@ -297,7 +264,7 @@ StyleInspectorMenu.prototype = {
   /**
    * Get the type of the currently clicked node
    */
-  _getClickedNodeInfo: function() {
+  _getClickedNodeInfo: function () {
     const node = this._getClickedNode();
     return this.view.getNodeInfo(node);
   },
@@ -309,7 +276,7 @@ StyleInspectorMenu.prototype = {
    * @return {Boolean}
    *         true if click on color opened the popup, false otherwise.
    */
-  _isColorPopup: function() {
+  _isColorPopup: function () {
     this._colorToCopy = "";
 
     const container = this._getClickedNode();
@@ -331,7 +298,7 @@ StyleInspectorMenu.prototype = {
    *
    * @return {Boolean} true if the node is an image url
    */
-  _isImageUrl: function() {
+  _isImageUrl: function () {
     const nodeInfo = this._getClickedNodeInfo();
     if (!nodeInfo) {
       return false;
@@ -346,7 +313,7 @@ StyleInspectorMenu.prototype = {
    *
    * @return {DOMNode}
    */
-  _getClickedNode: function() {
+  _getClickedNode: function () {
     const node = this.currentTarget;
 
     if (!node) {
@@ -359,13 +326,11 @@ StyleInspectorMenu.prototype = {
   /**
    * Select all text.
    */
-  _onSelectAll: function() {
+  _onSelectAll: function () {
     const selection = this.styleWindow.getSelection();
 
     if (this.isRuleView) {
-      selection.selectAllChildren(
-        this.currentTarget.closest("#ruleview-container-focusable")
-      );
+      selection.selectAllChildren(this.currentTarget.closest("#ruleview-container-focusable"));
     } else {
       selection.selectAllChildren(this.view.element);
     }
@@ -374,21 +339,21 @@ StyleInspectorMenu.prototype = {
   /**
    * Copy the most recently selected color value to clipboard.
    */
-  _onCopy: function() {
+  _onCopy: function () {
     this.view.copySelection(this.currentTarget);
   },
 
   /**
    * Copy the most recently selected color value to clipboard.
    */
-  _onCopyColor: function() {
+  _onCopyColor: function () {
     clipboardHelper.copyString(this._colorToCopy);
   },
 
   /*
    * Retrieve the url for the selected image and copy it to the clipboard
    */
-  _onCopyUrl: function() {
+  _onCopyUrl: function () {
     if (!this._clickedNodeInfo) {
       return;
     }
@@ -412,9 +377,7 @@ StyleInspectorMenu.prototype = {
       const data = await inspectorFront.getImageDataFromURL(imageUrl);
       message = await data.data.string();
     } catch (e) {
-      message = STYLE_INSPECTOR_L10N.getStr(
-        "styleinspector.copyImageDataUrlError"
-      );
+      message = STYLE_INSPECTOR_L10N.getStr("styleinspector.copyImageDataUrlError");
     }
 
     clipboardHelper.copyString(message);
@@ -424,15 +387,13 @@ StyleInspectorMenu.prototype = {
    * Add a new rule to the current element.
    */
   async _onAddNewRule() {
-    this.view.isNewRulesView
-      ? await this.view.onAddRule()
-      : this.view._onAddRule();
+    this.view.isNewRulesView ? await this.view.onAddRule() : this.view._onAddRule();
   },
 
   /**
    * Copy the rule source location of the current clicked node.
    */
-  _onCopyLocation: function() {
+  _onCopyLocation: function () {
     if (!this._clickedNodeInfo) {
       return;
     }
@@ -443,7 +404,7 @@ StyleInspectorMenu.prototype = {
   /**
    * Copy the CSS declaration of the current clicked node.
    */
-  _onCopyDeclaration: function() {
+  _onCopyDeclaration: function () {
     if (!this._clickedNodeInfo) {
       return;
     }
@@ -455,7 +416,7 @@ StyleInspectorMenu.prototype = {
   /**
    * Copy the rule property name of the current clicked node.
    */
-  _onCopyPropertyName: function() {
+  _onCopyPropertyName: function () {
     if (!this._clickedNodeInfo) {
       return;
     }
@@ -466,7 +427,7 @@ StyleInspectorMenu.prototype = {
   /**
    * Copy the rule property value of the current clicked node.
    */
-  _onCopyPropertyValue: function() {
+  _onCopyPropertyValue: function () {
     if (!this._clickedNodeInfo) {
       return;
     }
@@ -477,7 +438,7 @@ StyleInspectorMenu.prototype = {
   /**
    * Copy the rule of the current clicked node.
    */
-  _onCopyRule: function() {
+  _onCopyRule: function () {
     const node = this._getClickedNode();
     const elementStyle = this.view.isNewRulesView
       ? this.view.elementStyle
@@ -489,7 +450,7 @@ StyleInspectorMenu.prototype = {
   /**
    * Copy the rule selector of the current clicked node.
    */
-  _onCopySelector: function() {
+  _onCopySelector: function () {
     if (!this._clickedNodeInfo) {
       return;
     }
@@ -500,12 +461,12 @@ StyleInspectorMenu.prototype = {
   /**
    * Toggle the original sources pref.
    */
-  _onToggleOrigSources: function() {
+  _onToggleOrigSources: function () {
     const isEnabled = Services.prefs.getBoolPref(PREF_ORIG_SOURCES);
     Services.prefs.setBoolPref(PREF_ORIG_SOURCES, !isEnabled);
   },
 
-  destroy: function() {
+  destroy: function () {
     this.currentTarget = null;
     this.view = null;
     this.inspector = null;

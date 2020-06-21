@@ -34,9 +34,7 @@ const { appinfo } = Services;
 const isMacOS = appinfo.OS === "Darwin";
 
 const horizontalLayoutBreakpoint = window.matchMedia("(min-width: 800px)");
-const verticalLayoutBreakpoint = window.matchMedia(
-  "(min-width: 10px) and (max-width: 799px)"
-);
+const verticalLayoutBreakpoint = window.matchMedia("(min-width: 10px) and (max-width: 799px)");
 
 import "./variables.css";
 import "./App.css";
@@ -121,15 +119,10 @@ class App extends Component<Props, State> {
       this.toggleQuickOpenModal(_, e, "@")
     );
 
-    const searchKeys = [
-      L10N.getStr("sources.search.key2"),
-      L10N.getStr("sources.search.alt.key"),
-    ];
+    const searchKeys = [L10N.getStr("sources.search.key2"), L10N.getStr("sources.search.alt.key")];
     searchKeys.forEach(key => shortcuts.on(key, this.toggleQuickOpenModal));
 
-    shortcuts.on(L10N.getStr("gotoLineModal.key3"), (_, e) =>
-      this.toggleQuickOpenModal(_, e, ":")
-    );
+    shortcuts.on(L10N.getStr("gotoLineModal.key3"), (_, e) => this.toggleQuickOpenModal(_, e, ":"));
 
     shortcuts.on("Escape", this.onEscape);
     shortcuts.on("Cmd+/", this.onCommandSlash);
@@ -139,20 +132,11 @@ class App extends Component<Props, State> {
     horizontalLayoutBreakpoint.removeListener(this.onLayoutChange);
     verticalLayoutBreakpoint.removeListener(this.onLayoutChange);
 
-    shortcuts.off(
-      L10N.getStr("symbolSearch.search.key1"),
-      this.toggleQuickOpenModal
-    );
+    shortcuts.off(L10N.getStr("symbolSearch.search.key1"), this.toggleQuickOpenModal);
 
-    shortcuts.off(
-      L10N.getStr("symbolSearch.search.key2"),
-      this.toggleQuickOpenModal
-    );
+    shortcuts.off(L10N.getStr("symbolSearch.search.key2"), this.toggleQuickOpenModal);
 
-    const searchKeys = [
-      L10N.getStr("sources.search.key2"),
-      L10N.getStr("sources.search.alt.key"),
-    ];
+    const searchKeys = [L10N.getStr("sources.search.key2"), L10N.getStr("sources.search.alt.key")];
     searchKeys.forEach(key => shortcuts.off(key, this.toggleQuickOpenModal));
 
     shortcuts.off(L10N.getStr("gotoLineModal.key3"), this.toggleQuickOpenModal);
@@ -161,12 +145,7 @@ class App extends Component<Props, State> {
   }
 
   onEscape = (_: mixed, e: KeyboardEvent) => {
-    const {
-      activeSearch,
-      closeActiveSearch,
-      closeQuickOpen,
-      quickOpenEnabled,
-    } = this.props;
+    const { activeSearch, closeActiveSearch, closeQuickOpen, quickOpenEnabled } = this.props;
     const { shortcutsModalEnabled } = this.state;
 
     if (activeSearch) {
@@ -193,11 +172,7 @@ class App extends Component<Props, State> {
     return this.props.orientation === "horizontal";
   }
 
-  toggleQuickOpenModal = (
-    _: mixed,
-    e: SyntheticEvent<HTMLElement>,
-    query?: string
-  ) => {
+  toggleQuickOpenModal = (_: mixed, e: SyntheticEvent<HTMLElement>, query?: string) => {
     const { quickOpenEnabled, openQuickOpen, closeQuickOpen } = this.props;
 
     e.preventDefault();

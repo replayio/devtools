@@ -4,9 +4,7 @@
 
 "use strict";
 
-const {
-  BATCH_ACTIONS,
-} = require("devtools/client/shared/redux/middleware/debounce");
+const { BATCH_ACTIONS } = require("devtools/client/shared/redux/middleware/debounce");
 
 /**
  * A enhancer for the store to handle batched actions.

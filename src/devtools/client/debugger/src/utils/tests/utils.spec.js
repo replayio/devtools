@@ -81,9 +81,6 @@ describe("waitForMs()", () => {
   it("calls setTimeout() on the resolve of the Promise", () => {
     testPromise = waitForMs(testMilliseconds);
 
-    expect(setTimeout).toHaveBeenCalledWith(
-      expect.anything(),
-      testMilliseconds
-    );
+    expect(setTimeout).toHaveBeenCalledWith(expect.anything(), testMilliseconds);
   });
 });

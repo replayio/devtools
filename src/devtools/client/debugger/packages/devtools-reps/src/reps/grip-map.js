@@ -7,12 +7,7 @@ const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
 
 const { lengthBubble } = require("../shared/grip-length-bubble");
-const {
-  interleave,
-  isGrip,
-  wrapRender,
-  ellipsisElement,
-} = require("./rep-utils");
+const { interleave, isGrip, wrapRender, ellipsisElement } = require("./rep-utils");
 const PropRep = require("./prop-rep");
 const { MODE } = require("./constants");
 const { ModePropType } = require("./array");
@@ -120,15 +115,17 @@ function getEntries(props, entries, max) {
   const rv = [];
   for (let i = 0; i < entries.length && i < max; i++) {
     const { key, value } = entries[i];
-    rv.push(PropRep({
-      name: key,
-      equal: " \u2192 ",
-      object: value,
-      mode: MODE.TINY,
-      onDOMNodeMouseOver,
-      onDOMNodeMouseOut,
-      onInspectIconClick,
-    }));
+    rv.push(
+      PropRep({
+        name: key,
+        equal: " \u2192 ",
+        object: value,
+        mode: MODE.TINY,
+        onDOMNodeMouseOver,
+        onDOMNodeMouseOut,
+        onInspectIconClick,
+      })
+    );
   }
   return rv;
 }

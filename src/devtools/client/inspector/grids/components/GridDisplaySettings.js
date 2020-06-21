@@ -14,8 +14,7 @@ const Types = require("devtools/client/inspector/grids/types");
 class GridDisplaySettings extends PureComponent {
   static get propTypes() {
     return {
-      highlighterSettings: PropTypes.shape(Types.highlighterSettings)
-        .isRequired,
+      highlighterSettings: PropTypes.shape(Types.highlighterSettings).isRequired,
       onToggleShowGridAreas: PropTypes.func.isRequired,
       onToggleShowGridLineNumbers: PropTypes.func.isRequired,
       onToggleShowInfiniteLines: PropTypes.func.isRequired,
@@ -25,15 +24,9 @@ class GridDisplaySettings extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.onShowGridAreasCheckboxClick = this.onShowGridAreasCheckboxClick.bind(
-      this
-    );
-    this.onShowGridLineNumbersCheckboxClick = this.onShowGridLineNumbersCheckboxClick.bind(
-      this
-    );
-    this.onShowInfiniteLinesCheckboxClick = this.onShowInfiniteLinesCheckboxClick.bind(
-      this
-    );
+    this.onShowGridAreasCheckboxClick = this.onShowGridAreasCheckboxClick.bind(this);
+    this.onShowGridLineNumbersCheckboxClick = this.onShowGridLineNumbersCheckboxClick.bind(this);
+    this.onShowInfiniteLinesCheckboxClick = this.onShowInfiniteLinesCheckboxClick.bind(this);
   }
 
   onShowGridAreasCheckboxClick() {

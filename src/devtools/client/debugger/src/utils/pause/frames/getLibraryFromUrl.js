@@ -120,9 +120,7 @@ export function getLibraryFromUrl(frame: Frame, callStack: Array<Frame> = []) {
   // pattern in the callStack (e.g. `zone.js` is used by Angular, but the name
   //  could be quite common and return false positive if evaluated alone. So we
   // only return Angular if there are other frames matching Angular).
-  match = libraryMap.find(
-    o => o.contextPattern && o.contextPattern.test(frameUrl)
-  );
+  match = libraryMap.find(o => o.contextPattern && o.contextPattern.test(frameUrl));
   if (match) {
     const contextMatch = callStack.some(f => {
       const url = getFrameUrl(f);

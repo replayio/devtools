@@ -229,13 +229,7 @@ class SourceTreeItem extends Component<Props, State> {
   }
 
   renderIcon(item: TreeNode, depth: number) {
-    const {
-      debuggeeUrl,
-      projectRoot,
-      source,
-      hasPrettySource,
-      threads,
-    } = this.props;
+    const { debuggeeUrl, projectRoot, source, hasPrettySource, threads } = this.props;
 
     if (item.name === "webpack://") {
       return <AccessibleImage className="webpack" />;
@@ -281,9 +275,7 @@ class SourceTreeItem extends Component<Props, State> {
     }
 
     if (source) {
-      return (
-        <SourceIcon source={source} shouldHide={icon => icon === "extension"} />
-      );
+      return <SourceIcon source={source} shouldHide={icon => icon === "extension"} />;
     }
 
     return null;
@@ -295,10 +287,7 @@ class SourceTreeItem extends Component<Props, State> {
     if (depth === 0) {
       const thread = threads.find(({ actor }) => actor == item.name);
       if (thread) {
-        return (
-          thread.name +
-          (thread.serviceWorkerStatus ? ` (${thread.serviceWorkerStatus})` : "")
-        );
+        return thread.name + (thread.serviceWorkerStatus ? ` (${thread.serviceWorkerStatus})` : "");
       }
     }
 
@@ -323,9 +312,7 @@ class SourceTreeItem extends Component<Props, State> {
       return item.name;
     }
 
-    return item.type === "source"
-      ? unescape(item.contents.url)
-      : getPathWithoutThread(item.path);
+    return item.type === "source" ? unescape(item.contents.url) : getPathWithoutThread(item.path);
   }
 
   render() {
@@ -348,9 +335,7 @@ class SourceTreeItem extends Component<Props, State> {
     }
 
     const query =
-      hasSiblingOfSameName && querystring ? (
-        <span className="query">{querystring}</span>
-      ) : null;
+      hasSiblingOfSameName && querystring ? <span className="query">{querystring}</span> : null;
 
     return (
       <div
@@ -398,18 +383,13 @@ const mapStateToProps = (state, props: OwnProps) => {
     hasPrettySource: source ? checkHasPrettySource(state, source.id) : false,
     sourceContent: source ? getSourceContentValue(state, source) : null,
     extensionName:
-      (isUrlExtension(item.name) &&
-        getExtensionNameBySourceUrl(state, item.name)) ||
-      null,
+      (isUrlExtension(item.name) && getExtensionNameBySourceUrl(state, item.name)) || null,
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    setProjectDirectoryRoot: actions.setProjectDirectoryRoot,
-    clearProjectDirectoryRoot: actions.clearProjectDirectoryRoot,
-    toggleBlackBox: actions.toggleBlackBox,
-    loadSourceText: actions.loadSourceText,
-  }
-)(SourceTreeItem);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  setProjectDirectoryRoot: actions.setProjectDirectoryRoot,
+  clearProjectDirectoryRoot: actions.clearProjectDirectoryRoot,
+  toggleBlackBox: actions.toggleBlackBox,
+  loadSourceText: actions.loadSourceText,
+})(SourceTreeItem);

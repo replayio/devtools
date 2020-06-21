@@ -62,10 +62,7 @@ class FlexItemSizingOutline extends PureComponent {
     // Calculate the final size. This is base + delta, then clamped by min or max.
     let mainFinalSize = mainBaseSize + mainDeltaSize;
     mainFinalSize = Math.max(mainFinalSize, mainMinSize);
-    mainFinalSize =
-      mainMaxSize === null
-        ? mainFinalSize
-        : Math.min(mainFinalSize, mainMaxSize);
+    mainFinalSize = mainMaxSize === null ? mainFinalSize : Math.min(mainFinalSize, mainMaxSize);
 
     // Just don't display anything if there isn't anything useful.
     if (!mainFinalSize && !mainBaseSize && !mainDeltaSize) {
@@ -111,10 +108,7 @@ class FlexItemSizingOutline extends PureComponent {
     // In some cases, the delta-start may be negative (when an item wanted to shrink more
     // than the item's base size). As a negative value would break the grid track template
     // offset all values so they're all positive.
-    const offsetBy = sizes.reduce(
-      (acc, curr) => (curr.size < acc ? curr.size : acc),
-      0
-    );
+    const offsetBy = sizes.reduce((acc, curr) => (curr.size < acc ? curr.size : acc), 0);
     sizes = sizes.map(entry => ({
       size: entry.size - offsetBy,
       name: entry.name,
@@ -138,9 +132,7 @@ class FlexItemSizingOutline extends PureComponent {
     // them into a single rendered point.
     const renderedBaseAndFinalPoints = [];
     if (mainFinalSize === mainBaseSize) {
-      renderedBaseAndFinalPoints.push(
-        this.renderPoint("basisfinal", "basis/final")
-      );
+      renderedBaseAndFinalPoints.push(this.renderPoint("basisfinal", "basis/final"));
     } else {
       renderedBaseAndFinalPoints.push(this.renderPoint("basis"));
       renderedBaseAndFinalPoints.push(this.renderPoint("final"));
@@ -151,8 +143,7 @@ class FlexItemSizingOutline extends PureComponent {
       dom.div(
         {
           className:
-            `flex-outline ${mainAxisDirection}` +
-            (mainDeltaSize > 0 ? " growing" : " shrinking"),
+            `flex-outline ${mainAxisDirection}` + (mainDeltaSize > 0 ? " growing" : " shrinking"),
           style: {
             gridTemplateColumns,
           },

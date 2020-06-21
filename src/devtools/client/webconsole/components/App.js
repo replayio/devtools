@@ -7,14 +7,10 @@ const Services = require("Services");
 const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-const {
-  connect,
-} = require("devtools/client/shared/redux/visibility-handler-connect");
+const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
 
 const actions = require("devtools/client/webconsole/actions/index");
-const {
-  FILTERBAR_DISPLAY_MODES,
-} = require("devtools/client/webconsole/constants");
+const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
 
 // We directly require Components that we know are going to be used right away
 const ConsoleOutput = createFactory(
@@ -26,9 +22,7 @@ const FilterBar = createFactory(
 const ReverseSearchInput = createFactory(
   require("devtools/client/webconsole/components/Input/ReverseSearchInput")
 );
-const JSTerm = createFactory(
-  require("devtools/client/webconsole/components/Input/JSTerm")
-);
+const JSTerm = createFactory(require("devtools/client/webconsole/components/Input/JSTerm"));
 const ConfirmDialog = createFactory(
   require("devtools/client/webconsole/components/Input/ConfirmDialog")
 );
@@ -37,9 +31,7 @@ const EagerEvaluation = createFactory(
 );
 
 // And lazy load the ones that may not be used.
-const SideBar = createFactory(
-  require("devtools/client/webconsole/components/SideBar")
-);
+const SideBar = createFactory(require("devtools/client/webconsole/components/SideBar"));
 
 const EditorToolbar = createFactory(
   require("devtools/client/webconsole/components/Input/EditorToolbar")
@@ -62,9 +54,7 @@ const l10n = require("devtools/client/webconsole/utils/l10n");
 const SELF_XSS_OK = l10n.getStr("selfxss.okstring");
 const SELF_XSS_MSG = l10n.getFormatStr("selfxss.msg", [SELF_XSS_OK]);
 
-const {
-  getAllNotifications,
-} = require("devtools/client/webconsole/selectors/notifications");
+const { getAllNotifications } = require("devtools/client/webconsole/selectors/notifications");
 const { div } = dom;
 const isMacOS = Services.appinfo.OS === "Darwin";
 
@@ -90,9 +80,7 @@ class App extends Component {
       editorWidth: PropTypes.number,
       sidebarVisible: PropTypes.bool.isRequired,
       eagerEvaluationEnabled: PropTypes.bool.isRequired,
-      filterBarDisplayMode: PropTypes.oneOf([
-        ...Object.values(FILTERBAR_DISPLAY_MODES),
-      ]).isRequired,
+      filterBarDisplayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)]).isRequired,
       showEvaluationSelector: PropTypes.bool,
     };
   }
@@ -121,8 +109,7 @@ class App extends Component {
       (!isMacOS && event.key === "F9") ||
       (isMacOS && event.key === "r" && event.ctrlKey === true)
     ) {
-      const initialValue =
-        webConsoleUI.jsterm && webConsoleUI.jsterm.getSelectedText();
+      const initialValue = webConsoleUI.jsterm && webConsoleUI.jsterm.getSelectedText();
       dispatch(actions.reverseSearchInputToggle({ initialValue }));
       event.stopPropagation();
     }
@@ -141,10 +128,7 @@ class App extends Component {
     const target = event.originalTarget || event.target;
     const { reverseSearchInputVisible, dispatch, webConsoleUI } = this.props;
 
-    if (
-      reverseSearchInputVisible === true &&
-      !target.closest(".reverse-search")
-    ) {
+    if (reverseSearchInputVisible === true && !target.closest(".reverse-search")) {
       event.preventDefault();
       event.stopPropagation();
       dispatch(actions.reverseSearchInputToggle());
@@ -194,10 +178,7 @@ class App extends Component {
     const { usageCount, CONSOLE_ENTRY_THRESHOLD } = WebConsoleUtils;
 
     // Bail out if self-xss notification is suppressed.
-    if (
-      webConsoleUI.isBrowserConsole ||
-      usageCount >= CONSOLE_ENTRY_THRESHOLD
-    ) {
+    if (webConsoleUI.isBrowserConsole || usageCount >= CONSOLE_ENTRY_THRESHOLD) {
       return;
     }
 
@@ -246,11 +227,7 @@ class App extends Component {
   }
 
   renderFilterBar() {
-    const {
-      closeSplitConsole,
-      filterBarDisplayMode,
-      webConsoleUI,
-    } = this.props;
+    const { closeSplitConsole, filterBarDisplayMode, webConsoleUI } = this.props;
 
     return FilterBar({
       key: "filterbar",
@@ -294,13 +271,7 @@ class App extends Component {
   }
 
   renderJsTerm() {
-    const {
-      webConsoleUI,
-      serviceContainer,
-      autocomplete,
-      editorMode,
-      editorWidth,
-    } = this.props;
+    const { webConsoleUI, serviceContainer, autocomplete, editorMode, editorWidth } = this.props;
 
     return JSTerm({
       key: "jsterm",

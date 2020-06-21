@@ -12,13 +12,11 @@ const { extend } = require("devtools/shared/extend");
 
 const { setEventTooltip } = require("devtools/client/shared/widgets/tooltip/EventTooltipHelper");
 const { setImageTooltip } = require("devtools/client/shared/widgets/tooltip/ImageTooltipHelper");
-const { setBrokenImageTooltip } = require("devtools/client/shared/widgets/tooltip/ImageTooltipHelper");
+const {
+  setBrokenImageTooltip,
+} = require("devtools/client/shared/widgets/tooltip/ImageTooltipHelper");
 
-loader.lazyRequireGetter(
-  this,
-  "clipboardHelper",
-  "devtools/shared/platform/clipboard"
-);
+loader.lazyRequireGetter(this, "clipboardHelper", "devtools/shared/platform/clipboard");
 
 const PREVIEW_MAX_DIM_PREF = "devtools.inspector.imagePreviewTooltipSize";
 
@@ -33,12 +31,7 @@ const PREVIEW_MAX_DIM_PREF = "devtools.inspector.imagePreviewTooltipSize";
  *         The node to display.
  */
 function MarkupElementContainer(markupView, node) {
-  MarkupContainer.prototype.initialize.call(
-    this,
-    markupView,
-    node,
-    "elementcontainer"
-  );
+  MarkupContainer.prototype.initialize.call(this, markupView, node, "elementcontainer");
 
   if (node.nodeType === ELEMENT_NODE) {
     this.editor = new ElementEditor(this, node);
@@ -50,7 +43,7 @@ function MarkupElementContainer(markupView, node) {
 }
 
 MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
-  onContainerClick: function(event) {
+  onContainerClick: function (event) {
     if (!event.target.hasAttribute("data-event")) {
       return;
     }
@@ -64,11 +57,7 @@ MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
 
     const listenerRaw = await this.node.getEventListeners();
     const listenerInfo = listenerRaw.map(listener => {
-      const {
-        handler,
-        type,
-        capture,
-      } = listener;
+      const { handler, type, capture } = listener;
       const location = handler.functionLocation();
       const url = handler.functionLocationURL();
       let origin, line, column;
@@ -136,7 +125,7 @@ MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
    * If this element is not previewable or the preview cannot be generated for
    * some reason, the Promise is rejected.
    */
-  _getPreview: function() {
+  _getPreview: function () {
     if (!this.isPreviewable()) {
       return promise.reject("_getPreview called on a non-previewable element.");
     }
@@ -147,7 +136,7 @@ MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
     }
 
     // Fetch the preview from the server.
-    this.tooltipDataPromise = async function() {
+    this.tooltipDataPromise = async function () {
       const maxDim = Services.prefs.getIntPref(PREVIEW_MAX_DIM_PREF);
       const preview = await this.node.getImageData(maxDim);
       const data = await preview.data.string();
@@ -202,7 +191,7 @@ MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
     return true;
   },
 
-  copyImageDataUri: function() {
+  copyImageDataUri: function () {
     // We need to send again a request to gettooltipData even if one was sent
     // for the tooltip, because we want the full-size image
     this.node.getImageData().then(data => {
@@ -212,12 +201,12 @@ MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
     });
   },
 
-  setInlineTextChild: function(inlineTextChild) {
+  setInlineTextChild: function (inlineTextChild) {
     this.inlineTextChild = inlineTextChild;
     this.editor.updateTextEditor();
   },
 
-  clearInlineTextChild: function() {
+  clearInlineTextChild: function () {
     this.inlineTextChild = undefined;
     this.editor.updateTextEditor();
   },
@@ -225,14 +214,14 @@ MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
   /**
    * Trigger new attribute field for input.
    */
-  addAttribute: function() {
+  addAttribute: function () {
     this.editor.newAttr.editMode();
   },
 
   /**
    * Trigger attribute field for editing.
    */
-  editAttribute: function(attrName) {
+  editAttribute: function (attrName) {
     this.editor.attrElements.get(attrName).editMode();
   },
 
@@ -240,7 +229,7 @@ MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
    * Remove attribute from container.
    * This is an undoable action.
    */
-  removeAttribute: function(attrName) {
+  removeAttribute: function (attrName) {
     const doMods = this.editor._startModifyingAttributes();
     const undoMods = this.editor._startModifyingAttributes();
     this.editor._saveAttribute(attrName, undoMods);

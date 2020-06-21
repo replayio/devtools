@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -55,8 +52,7 @@ class SummaryGraph extends PureComponent {
   }
 
   getTitleText(state) {
-    const getTime = time =>
-      getFormatStr("player.timeLabel", numberWithDecimals(time / 1000, 2));
+    const getTime = time => getFormatStr("player.timeLabel", numberWithDecimals(time / 1000, 2));
     const getTimeOrInfinity = time =>
       time === Infinity ? getStr("player.infiniteDurationText") : getTime(time);
 
@@ -88,8 +84,7 @@ class SummaryGraph extends PureComponent {
     // Adding the iteration count (the infinite symbol, or an integer).
     if (state.iterationCount !== 1) {
       text += getStr("player.animationIterationCountLabel") + " ";
-      text +=
-        state.iterationCount || getStr("player.infiniteIterationCountText");
+      text += state.iterationCount || getStr("player.infiniteIterationCountText");
       text += "\n";
     }
 
@@ -133,10 +128,7 @@ class SummaryGraph extends PureComponent {
 
     // Adding the animation-timing-function
     // if it is not "ease" which is default value for CSS Animations.
-    if (
-      state.animationTimingFunction &&
-      state.animationTimingFunction !== "ease"
-    ) {
+    if (state.animationTimingFunction && state.animationTimingFunction !== "ease") {
       text += getStr("player.animationTimingFunctionLabel") + " ";
       text += state.animationTimingFunction;
       text += "\n";
@@ -145,13 +137,9 @@ class SummaryGraph extends PureComponent {
     // Adding a note that the animation is running on the compositor thread if
     // needed.
     if (state.propertyState) {
-      if (
-        state.propertyState.every(propState => propState.runningOnCompositor)
-      ) {
+      if (state.propertyState.every(propState => propState.runningOnCompositor)) {
         text += getStr("player.allPropertiesOnCompositorTooltip");
-      } else if (
-        state.propertyState.some(propState => propState.runningOnCompositor)
-      ) {
+      } else if (state.propertyState.some(propState => propState.runningOnCompositor)) {
         text += getStr("player.somePropertiesOnCompositorTooltip");
       }
     } else if (state.isRunningOnCompositor) {
@@ -176,8 +164,7 @@ class SummaryGraph extends PureComponent {
     return dom.div(
       {
         className:
-          "animation-summary-graph" +
-          (animation.state.isRunningOnCompositor ? " compositor" : ""),
+          "animation-summary-graph" + (animation.state.isRunningOnCompositor ? " compositor" : ""),
         onClick: this.onClick,
         title: this.getTitleText(animation.state),
       },
@@ -190,20 +177,20 @@ class SummaryGraph extends PureComponent {
       }),
       delay
         ? DelaySign({
-          animation,
-          timeScale,
-        })
+            animation,
+            timeScale,
+          })
         : null,
       iterationCount && endDelay
         ? EndDelaySign({
-          animation,
-          timeScale,
-        })
+            animation,
+            timeScale,
+          })
         : null,
       animation.state.name
         ? AnimationName({
-          animation,
-        })
+            animation,
+          })
         : null
     );
   }

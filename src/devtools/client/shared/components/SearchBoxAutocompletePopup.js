@@ -104,10 +104,7 @@ class SearchBoxAutocompletePopup extends Component {
 
   onMouseDown(e) {
     e.preventDefault();
-    this.setState(
-      { selectedIndex: Number(e.target.dataset.index) },
-      this.select
-    );
+    this.setState({ selectedIndex: Number(e.target.dataset.index) }, this.select);
   }
 
   render() {

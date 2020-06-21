@@ -24,11 +24,7 @@ import {
   getFileSearchResults,
 } from "../selectors";
 
-import {
-  closeActiveSearch,
-  clearHighlightLineRange,
-  setActiveSearch,
-} from "./ui";
+import { closeActiveSearch, clearHighlightLineRange, setActiveSearch } from "./ui";
 import { isFulfilled } from "../utils/async-value";
 type Editor = Object;
 type Match = Object;
@@ -45,12 +41,7 @@ export function doSearch(cx: Context, query: string, editor: Editor) {
   };
 }
 
-export function doSearchForHighlight(
-  query: string,
-  editor: Editor,
-  line: number,
-  ch: number
-) {
+export function doSearchForHighlight(query: string, editor: Editor, line: number, ch: number) {
   return async ({ getState, dispatch }: ThunkArgs) => {
     const selectedSource = getSelectedSourceWithContent(getState());
     if (!selectedSource || !selectedSource.content) {
@@ -68,10 +59,7 @@ export function setFileSearchQuery(cx: Context, query: string): Action {
   };
 }
 
-export function toggleFileSearchModifier(
-  cx: Context,
-  modifier: FileTextSearchModifier
-): Action {
+export function toggleFileSearchModifier(cx: Context, modifier: FileTextSearchModifier): Action {
   return { type: "TOGGLE_FILE_SEARCH_MODIFIER", cx, modifier };
 }
 
@@ -81,9 +69,7 @@ export function updateSearchResults(
   line: number,
   matches: Match[]
 ): Action {
-  const matchIndex = matches.findIndex(
-    elm => elm.line === line && elm.ch === characterIndex
-  );
+  const matchIndex = matches.findIndex(elm => elm.line === line && elm.ch === characterIndex);
 
   return {
     type: "UPDATE_SEARCH_RESULTS",
@@ -155,13 +141,7 @@ export function searchContentsForHighlight(
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());
 
-    if (
-      !query ||
-      !editor ||
-      !selectedSource ||
-      !selectedSource.content ||
-      !modifiers
-    ) {
+    if (!query || !editor || !selectedSource || !selectedSource.content || !modifiers) {
       return;
     }
 

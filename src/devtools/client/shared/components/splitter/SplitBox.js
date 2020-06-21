@@ -9,9 +9,7 @@ const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { debounce } = require("devtools/shared/debounce");
 
-const Draggable = createFactory(
-  require("devtools/client/shared/components/splitter/Draggable")
-);
+const Draggable = createFactory(require("devtools/client/shared/components/splitter/Draggable"));
 
 /**
  * This component represents a Splitter. The splitter supports vertical
@@ -118,8 +116,7 @@ class SplitBox extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (
       this.props.onControlledPanelResized &&
-      (prevState.width !== this.state.width ||
-        prevState.height !== this.state.height)
+      (prevState.width !== this.state.width || prevState.height !== this.state.height)
     ) {
       this.props.onControlledPanelResized(this.state.width, this.state.height);
     }
@@ -135,9 +132,7 @@ class SplitBox extends Component {
   onStartMove() {
     const doc = this.splitBox.ownerDocument;
     const defaultCursor = doc.documentElement.style.cursor;
-    doc.documentElement.style.cursor = this.state.vert
-      ? "ew-resize"
-      : "ns-resize";
+    doc.documentElement.style.cursor = this.state.vert ? "ew-resize" : "ns-resize";
 
     this.splitBox.classList.add("dragging");
 
@@ -175,17 +170,13 @@ class SplitBox extends Component {
         endPanelControl = !endPanelControl;
       }
 
-      size = endPanelControl
-        ? nodeBounds.left + nodeBounds.width - x
-        : x - nodeBounds.left;
+      size = endPanelControl ? nodeBounds.left + nodeBounds.width - x : x - nodeBounds.left;
 
       this.setState({
         width: this.getConstrainedSizeInPx(size, nodeBounds.width),
       });
     } else {
-      size = endPanelControl
-        ? nodeBounds.top + nodeBounds.height - y
-        : y - nodeBounds.top;
+      size = endPanelControl ? nodeBounds.top + nodeBounds.height - y : y - nodeBounds.top;
 
       this.setState({
         height: this.getConstrainedSizeInPx(size, nodeBounds.height),
@@ -227,22 +218,14 @@ class SplitBox extends Component {
   // eslint-disable-next-line complexity
   render() {
     const { endPanelControl, splitterSize, vert } = this.state;
-    const {
-      startPanel,
-      endPanel,
-      minSize,
-      maxSize,
-      onSelectContainerElement,
-    } = this.props;
+    const { startPanel, endPanel, minSize, maxSize, onSelectContainerElement } = this.props;
 
     const style = Object.assign(
       {
         // Set the size of the controlled panel (height or width depending on the
         // current state). This can be used to help with styling of dependent
         // panels.
-        "--split-box-controlled-panel-size": `${
-          vert ? this.state.width : this.state.height
-        }`,
+        "--split-box-controlled-panel-size": `${vert ? this.state.width : this.state.height}`,
       },
       this.props.style
     );

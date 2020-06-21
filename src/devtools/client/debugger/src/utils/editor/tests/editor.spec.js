@@ -129,10 +129,7 @@ const editor = { codeMirror };
 describe("scrollToColumn", () => {
   it("calls codemirror APIs charCoords, getScrollerElement, scrollTo", () => {
     scrollToColumn(codeMirror, 60, 123);
-    expect(codeMirror.charCoords).toHaveBeenCalledWith(
-      { line: 60, ch: 123 },
-      "local"
-    );
+    expect(codeMirror.charCoords).toHaveBeenCalledWith({ line: 60, ch: 123 }, "local");
     expect(codeMirror.scrollTo).toHaveBeenCalledWith(0, 50);
   });
 });
@@ -190,11 +187,7 @@ describe("removeLineClass", () => {
     const line = 3;
     const className = "test-class";
     removeLineClass(codeMirror, line, className);
-    expect(codeMirror.removeLineClass).toHaveBeenCalledWith(
-      line,
-      "line",
-      className
-    );
+    expect(codeMirror.removeLineClass).toHaveBeenCalledWith(line, "line", className);
   });
 });
 
@@ -205,11 +198,7 @@ describe("clearLineClass", () => {
     codeMirror.removeLineClass.mockClear();
     clearLineClass(codeMirror, "test-class");
     expect(codeMirror.operation).toHaveBeenCalled();
-    expect(codeMirror.doc.iter).toHaveBeenCalledWith(
-      0,
-      100,
-      expect.any(Function)
-    );
+    expect(codeMirror.doc.iter).toHaveBeenCalledWith(0, 100, expect.any(Function));
     expect(codeMirror.removeLineClass).toHaveBeenCalled();
   });
 });

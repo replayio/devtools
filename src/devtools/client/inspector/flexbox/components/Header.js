@@ -4,12 +4,7 @@
 
 "use strict";
 
-const {
-  createElement,
-  createFactory,
-  Fragment,
-  PureComponent,
-} = require("react");
+const { createElement, createFactory, Fragment, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
@@ -98,9 +93,7 @@ class Header extends PureComponent {
 
     const { flexContainer, setSelectedNode } = this.props;
     const { flexItems, flexItemShown } = flexContainer;
-    const flexItem = flexItems.find(
-      item => item.nodeFront.actorID === flexItemShown
-    );
+    const flexItem = flexItems.find(item => item.nodeFront.actorID === flexItemShown);
 
     if (!flexItem) {
       return null;
@@ -121,17 +114,16 @@ class Header extends PureComponent {
       { className: "flex-header devtools-monospace" },
       flexItemShown
         ? dom.button({
-          className: "flex-header-button-prev devtools-button",
-          onClick: e => {
-            e.stopPropagation();
-            setSelectedNode(nodeFront);
-          },
-        })
+            className: "flex-header-button-prev devtools-button",
+            onClick: e => {
+              e.stopPropagation();
+              setSelectedNode(nodeFront);
+            },
+          })
         : null,
       dom.div(
         {
-          className:
-            "flex-header-content" + (flexItemShown ? " flex-item-shown" : ""),
+          className: "flex-header-content" + (flexItemShown ? " flex-item-shown" : ""),
         },
         this.renderFlexContainer(),
         this.renderFlexItemSelector()

@@ -5,10 +5,7 @@
 "use strict";
 
 // React & Redux
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
@@ -18,9 +15,7 @@ const { l10n } = require("devtools/client/webconsole/utils/messages");
 const threadSelectors = require("devtools/client/framework/reducers/threads");
 
 // Additional Components
-const MenuButton = createFactory(
-  require("devtools/client/shared/components/menu/MenuButton")
-);
+const MenuButton = createFactory(require("devtools/client/shared/components/menu/MenuButton"));
 
 /*
 loader.lazyGetter(this, "MenuItem", function() {
@@ -50,17 +45,13 @@ class EvaluationSelector extends Component {
     const { selectThread, selectedThread } = this.props;
 
     const label =
-      thread.type == "mainThread"
-        ? l10n.getStr("webconsole.input.selector.top")
-        : thread.name;
+      thread.type == "mainThread" ? l10n.getStr("webconsole.input.selector.top") : thread.name;
 
     return MenuItem({
       key: `webconsole-evaluation-selector-item-${i}`,
       className: "menu-item webconsole-evaluation-selector-item",
       type: "checkbox",
-      checked: selectedThread
-        ? selectedThread == thread
-        : thread.type == "mainThread",
+      checked: selectedThread ? selectedThread == thread : thread.type == "mainThread",
       label,
       tooltip: thread.url,
       onClick: () => selectThread(thread),
@@ -90,9 +81,7 @@ class EvaluationSelector extends Component {
       items = [
         ...items,
         MenuItem({ role: "menuseparator" }),
-        ...workers.map((thread, i) =>
-          this.renderMenuItem(thread, i + items.length)
-        ),
+        ...workers.map((thread, i) => this.renderMenuItem(thread, i + items.length)),
       ];
     }
 
@@ -123,8 +112,7 @@ class EvaluationSelector extends Component {
         menuId: "webconsole-input-evaluationsButton",
         toolboxDoc: toolbox ? toolbox.doc : doc,
         label: this.getLabel(),
-        className:
-          "webconsole-evaluation-selector-button devtools-button devtools-dropdown-button",
+        className: "webconsole-evaluation-selector-button devtools-button devtools-dropdown-button",
         title: l10n.getStr("webconsole.input.selector.tooltip"),
       },
       // We pass the children in a function so we don't require the MenuItem and MenuList

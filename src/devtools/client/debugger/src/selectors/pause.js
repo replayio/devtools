@@ -19,9 +19,7 @@ export const getSelectedFrames: Selector<{ [string]: ?Frame }> = createSelector(
       const pausedThread = threadPauseState[thread];
       const { selectedFrameId, frames } = pausedThread;
       if (frames) {
-        selectedFrames[thread] = frames.find(
-          frame => frame.id == selectedFrameId
-        );
+        selectedFrames[thread] = frames.find(frame => frame.id == selectedFrameId);
       }
     }
     return selectedFrames;

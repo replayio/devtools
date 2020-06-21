@@ -4,19 +4,12 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
-const Accordion = createFactory(
-  require("devtools/client/shared/components/Accordion")
-);
-const FontList = createFactory(
-  require("devtools/client/inspector/fonts/components/FontList")
-);
+const Accordion = createFactory(require("devtools/client/shared/components/Accordion"));
+const FontList = createFactory(require("devtools/client/inspector/fonts/components/FontList"));
 
 const { getStr } = require("devtools/client/inspector/fonts/utils/l10n");
 const Types = require("devtools/client/inspector/fonts/types");

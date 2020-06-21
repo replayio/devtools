@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  createElement,
-} = require("react");
+const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 
 loader.lazyRequireGetter(
@@ -75,9 +72,7 @@ class CompatibilityView {
   }
 
   async _initTargetBrowsers() {
-    this.inspector.store.dispatch(
-      updateTargetBrowsers(_getDefaultTargetBrowsers())
-    );
+    this.inspector.store.dispatch(updateTargetBrowsers(_getDefaultTargetBrowsers()));
   }
 
   _isAvailable() {
@@ -95,16 +90,11 @@ class CompatibilityView {
       return;
     }
 
-    this.inspector.store.dispatch(
-      updateSelectedNode(this.inspector.selection.nodeFront)
-    );
+    this.inspector.store.dispatch(updateSelectedNode(this.inspector.selection.nodeFront));
   }
 
   get _ruleView() {
-    return (
-      this.inspector.hasPanel("ruleview") &&
-      this.inspector.getPanel("ruleview").view
-    );
+    return this.inspector.hasPanel("ruleview") && this.inspector.getPanel("ruleview").view;
   }
 }
 

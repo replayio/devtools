@@ -4,18 +4,9 @@
 
 "use strict";
 
-const {
-  Component,
-  createElement,
-} = require("react");
+const { Component, createElement } = require("react");
 const PropTypes = require("prop-types");
-const {
-  ul,
-  li,
-  h2,
-  div,
-  span,
-} = require("react-dom-factories");
+const { ul, li, h2, div, span } = require("react-dom-factories");
 
 class Accordion extends Component {
   static get propTypes() {
@@ -46,9 +37,7 @@ class Accordion extends Component {
    * when receiving updated props.
    */
   static getDerivedStateFromProps(props, state) {
-    const newItems = props.items.filter(
-      ({ id }) => typeof state.opened[id] !== "boolean"
-    );
+    const newItems = props.items.filter(({ id }) => typeof state.opened[id] !== "boolean");
 
     if (newItems.length) {
       const everOpened = { ...state.everOpened };
@@ -180,13 +169,13 @@ class Accordion extends Component {
           header
         ),
         buttons &&
-        span(
-          {
-            className: "accordion-header-buttons",
-            role: "presentation",
-          },
-          buttons
-        )
+          span(
+            {
+              className: "accordion-header-buttons",
+              role: "presentation",
+            },
+            buttons
+          )
       ),
       div(
         {

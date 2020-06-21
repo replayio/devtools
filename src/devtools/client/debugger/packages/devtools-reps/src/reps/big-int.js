@@ -12,11 +12,7 @@ const { getGripType, wrapRender } = require("./rep-utils");
  * Renders a number
  */
 BigInt.propTypes = {
-  object: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.number,
-    PropTypes.bool,
-  ]).isRequired,
+  object: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.bool]).isRequired,
 };
 
 function BigInt(props) {

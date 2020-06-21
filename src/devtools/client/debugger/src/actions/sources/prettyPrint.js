@@ -8,11 +8,7 @@ import { remapBreakpoints } from "../breakpoints";
 
 import { setSymbols } from "./symbols";
 import { prettyPrint } from "../../workers/pretty-print";
-import {
-  getPrettySourceURL,
-  isGenerated,
-  isJavaScript,
-} from "../../utils/source";
+import { getPrettySourceURL, isGenerated, isJavaScript } from "../../utils/source";
 import { loadSourceText } from "./loadSourceText";
 import { selectSpecificLocation } from "../sources";
 
@@ -27,13 +23,7 @@ import {
 
 import type { Action, ThunkArgs } from "../types";
 import { selectSource } from "./select";
-import type {
-  Source,
-  SourceContent,
-  SourceActor,
-  Context,
-  SourceLocation,
-} from "../../types";
+import type { Source, SourceContent, SourceActor, Context, SourceLocation } from "../../types";
 
 const { ThreadFront } = require("protocol/thread");
 

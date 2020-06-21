@@ -127,10 +127,7 @@ export const prefs = new PrefsHelper("devtools", {
   expressionsVisible: ["Bool", "debugger.expressions-visible"],
   xhrBreakpointsVisible: ["Bool", "debugger.xhr-breakpoints-visible"],
   eventListenersVisible: ["Bool", "debugger.event-listeners-visible"],
-  domMutationBreakpointsVisible: [
-    "Bool",
-    "debugger.dom-mutation-breakpoints-visible",
-  ],
+  domMutationBreakpointsVisible: ["Bool", "debugger.dom-mutation-breakpoints-visible"],
   startPanelCollapsed: ["Bool", "debugger.start-panel-collapsed"],
   endPanelCollapsed: ["Bool", "debugger.end-panel-collapsed"],
   startPanelSize: ["Int", "debugger.start-panel-size"],

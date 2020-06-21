@@ -5,12 +5,7 @@
 // Dependencies
 const PropTypes = require("prop-types");
 const { span } = require("react-dom-factories");
-const {
-  isGrip,
-  cropString,
-  cropMultipleLines,
-  wrapRender,
-} = require("./rep-utils");
+const { isGrip, cropString, cropMultipleLines, wrapRender } = require("./rep-utils");
 const { MODE } = require("./constants");
 const nodeConstants = require("../shared/dom-node-constants");
 
@@ -43,7 +38,7 @@ function CommentNode(props) {
 }
 
 // Registration
-function supportsObject(object, ) {
+function supportsObject(object) {
   return false;
   // return object.preview && object.preview.nodeType === nodeConstants.COMMENT_NODE
 }

@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -30,13 +27,7 @@ class KeyframesGraph extends PureComponent {
   }
 
   render() {
-    const {
-      getComputedStyle,
-      keyframes,
-      name,
-      simulateAnimation,
-      type,
-    } = this.props;
+    const { getComputedStyle, keyframes, name, simulateAnimation, type } = this.props;
 
     return dom.div(
       {

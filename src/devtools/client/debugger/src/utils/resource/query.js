@@ -25,9 +25,7 @@ import {
 import { memoizeResourceShallow } from "./memoize";
 import { shallowEqual } from "./compare";
 
-export function filterAllIds<R: ResourceBound>(
-  values: ResourceValues<R>
-): Array<Id<R>> {
+export function filterAllIds<R: ResourceBound>(values: ResourceValues<R>): Array<Id<R>> {
   return Object.keys(values);
 }
 
@@ -35,17 +33,12 @@ export function filterAllIds<R: ResourceBound>(
  * Create a query function to take a list of IDs and map each Reduceding
  * resource object into a mapped form.
  */
-export type WeakQuery<
-  R: ResourceBound,
-  Args: WeakArgsBound,
+export type WeakQuery<R: ResourceBound, Args: WeakArgsBound, Reduced> = ResourceQuery<
+  R,
+  Args,
   Reduced
-> = ResourceQuery<R, Args, Reduced>;
-export function makeWeakQuery<
-  R: ResourceBound,
-  Args: WeakArgsBound,
-  Mapped,
-  Reduced
->({
+>;
+export function makeWeakQuery<R: ResourceBound, Args: WeakArgsBound, Mapped, Reduced>({
   filter,
   map,
   reduce,
@@ -67,17 +60,8 @@ export function makeWeakQuery<
  * Create a query function to take a list of IDs and map each Reduceding
  * resource object into a mapped form.
  */
-export type ShallowQuery<R: ResourceBound, Args, Reduced> = ResourceQuery<
-  R,
-  Args,
-  Reduced
->;
-export function makeShallowQuery<
-  R: ResourceBound,
-  Args: ShallowArgsBound,
-  Mapped,
-  Reduced
->({
+export type ShallowQuery<R: ResourceBound, Args, Reduced> = ResourceQuery<R, Args, Reduced>;
+export function makeShallowQuery<R: ResourceBound, Args: ShallowArgsBound, Mapped, Reduced>({
   filter,
   map,
   reduce,
@@ -99,11 +83,7 @@ export function makeShallowQuery<
  * Create a query function to take a list of IDs and map each Reduceding
  * resource object into a mapped form.
  */
-export type StrictQuery<R: ResourceBound, Args, Reduced> = ResourceQuery<
-  R,
-  Args,
-  Reduced
->;
+export type StrictQuery<R: ResourceBound, Args, Reduced> = ResourceQuery<R, Args, Reduced>;
 export function makeStrictQuery<R: ResourceBound, Args, Mapped, Reduced>({
   filter,
   map,
@@ -126,11 +106,7 @@ export function makeStrictQuery<R: ResourceBound, Args, Mapped, Reduced>({
  * Create a query function to take a list of IDs and map each Reduceding
  * resource object into a mapped form.
  */
-export type IdQuery<R: ResourceBound, Mapped> = WeakQuery<
-  R,
-  Array<Id<R>>,
-  Array<Mapped>
->;
+export type IdQuery<R: ResourceBound, Mapped> = WeakQuery<R, Array<Id<R>>, Array<Mapped>>;
 export function makeIdQuery<R: ResourceBound, Mapped>(
   map: QueryMap<R, void, Mapped>
 ): IdQuery<R, Mapped> {
@@ -164,11 +140,11 @@ export function makeLoadQuery<R: ResourceBound, Mapped>(
  * Create a query function that accepts an argument and can filter the
  * resource items to a subset before mapping each reduced resource.
  */
-export type FilterQuery<
-  R: ResourceBound,
-  Args: WeakArgsBound,
-  Mapped
-> = WeakQuery<R, Args, $ReadOnly<{ [Id<R>]: Mapped }>>;
+export type FilterQuery<R: ResourceBound, Args: WeakArgsBound, Mapped> = WeakQuery<
+  R,
+  Args,
+  $ReadOnly<{ [Id<R>]: Mapped }>
+>;
 export function makeFilterQuery<R: ResourceBound, Args: WeakArgsBound, Mapped>(
   filter: (R, Args) => boolean,
   map: QueryMap<R, Args, Mapped>
@@ -192,17 +168,12 @@ export function makeFilterQuery<R: ResourceBound, Args: WeakArgsBound, Mapped>(
  * Create a query function that accepts an argument and can filter the
  * resource items to a subset before mapping each resulting resource.
  */
-export type ReduceQuery<
-  R: ResourceBound,
-  Args: ShallowArgsBound,
+export type ReduceQuery<R: ResourceBound, Args: ShallowArgsBound, Reduced> = ShallowQuery<
+  R,
+  Args,
   Reduced
-> = ShallowQuery<R, Args, Reduced>;
-export function makeReduceQuery<
-  R: ResourceBound,
-  Args: ShallowArgsBound,
-  Mapped,
-  Reduced
->(
+>;
+export function makeReduceQuery<R: ResourceBound, Args: ShallowArgsBound, Mapped, Reduced>(
   map: QueryMap<R, Args, Mapped>,
   reduce: QueryReduce<R, Args, Mapped, Reduced>
 ): ReduceQuery<R, Args, Reduced> {
@@ -217,11 +188,7 @@ export function makeReduceQuery<
  * Create a query function that accepts an argument and can filter the
  * resource items to a subset before mapping each resulting resource.
  */
-export type ReduceAllQuery<R: ResourceBound, Reduced> = ShallowQuery<
-  R,
-  void,
-  Reduced
->;
+export type ReduceAllQuery<R: ResourceBound, Reduced> = ShallowQuery<R, void, Reduced>;
 export function makeReduceAllQuery<R: ResourceBound, Mapped, Reduced>(
   map: QueryMap<R, void, Mapped>,
   reduce: QueryReduce<R, void, Mapped, Reduced>

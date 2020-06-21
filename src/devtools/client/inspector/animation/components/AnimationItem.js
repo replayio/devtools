@@ -5,10 +5,7 @@
 "use strict";
 
 const { connect } = require("react-redux");
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -60,10 +57,7 @@ class AnimationItem extends Component {
   }
 
   isSelected(props) {
-    return (
-      props.selectedAnimation &&
-      props.animation.actorID === props.selectedAnimation.actorID
-    );
+    return props.selectedAnimation && props.animation.actorID === props.selectedAnimation.actorID;
   }
 
   render() {
@@ -84,9 +78,7 @@ class AnimationItem extends Component {
 
     return dom.li(
       {
-        className:
-          `animation-item ${animation.state.type} ` +
-          (isSelected ? "selected" : ""),
+        className: `animation-item ${animation.state.type} ` + (isSelected ? "selected" : ""),
       },
       AnimationTarget({
         animation,

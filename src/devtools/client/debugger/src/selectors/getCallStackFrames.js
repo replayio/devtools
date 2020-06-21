@@ -4,11 +4,7 @@
 
 // @flow
 
-import {
-  getSources,
-  getSelectedSource,
-  getSourceInSources,
-} from "../reducers/sources";
+import { getSources, getSelectedSource, getSourceInSources } from "../reducers/sources";
 import { getCurrentThreadFrames } from "../reducers/pause";
 import { annotateFrames } from "../utils/pause/frames";
 import { get } from "lodash";
@@ -20,19 +16,12 @@ function getLocation(frame) {
   return frame.location;
 }
 
-function getSourceForFrame(
-  sources: SourceResourceState,
-  frame: Frame
-) {
+function getSourceForFrame(sources: SourceResourceState, frame: Frame) {
   const sourceId = getLocation(frame).sourceId;
   return getSourceInSources(sources, sourceId);
 }
 
-function appendSource(
-  sources: SourceResourceState,
-  frame: Frame,
-  selectedSource: ?Source
-): Frame {
+function appendSource(sources: SourceResourceState, frame: Frame, selectedSource: ?Source): Frame {
   return {
     ...frame,
     location: getLocation(frame),

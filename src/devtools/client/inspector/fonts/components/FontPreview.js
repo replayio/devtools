@@ -20,7 +20,7 @@ class FontPreview extends PureComponent {
 
   static get defaultProps() {
     return {
-      onPreviewClick: () => { },
+      onPreviewClick: () => {},
     };
   }
 

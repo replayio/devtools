@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -20,8 +17,7 @@ const Types = require("devtools/client/inspector/rules/types");
 class Declarations extends PureComponent {
   static get propTypes() {
     return {
-      declarations: PropTypes.arrayOf(PropTypes.shape(Types.declaration))
-        .isRequired,
+      declarations: PropTypes.arrayOf(PropTypes.shape(Types.declaration)).isRequired,
       isUserAgentStyle: PropTypes.bool.isRequired,
       onToggleDeclaration: PropTypes.func.isRequired,
       showDeclarationNameEditor: PropTypes.func.isRequired,

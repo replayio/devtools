@@ -134,9 +134,7 @@ describe("Editor", () => {
         },
       });
 
-      expect(mockEditor.replaceDocument.mock.calls[0][0].getValue()).toBe(
-        "Loading…"
-      );
+      expect(mockEditor.replaceDocument.mock.calls[0][0].getValue()).toBe("Loading…");
       expect(mockEditor.codeMirror.scrollTo.mock.calls).toEqual([]);
     });
   });
@@ -174,9 +172,7 @@ describe("Editor", () => {
         selectedLocation: { sourceId: "bad-foo", line: 3, column: 1 },
       });
 
-      expect(mockEditor.setText.mock.calls).toEqual([
-        ["Error loading this URI: error text"],
-      ]);
+      expect(mockEditor.setText.mock.calls).toEqual([["Error loading this URI: error text"]]);
     });
 
     it("should show wasm error", async () => {
@@ -194,9 +190,7 @@ describe("Editor", () => {
         selectedLocation: { sourceId: "bad-foo", line: 3, column: 1 },
       });
 
-      expect(mockEditor.setText.mock.calls).toEqual([
-        ["Please refresh to debug this module"],
-      ]);
+      expect(mockEditor.setText.mock.calls).toEqual([["Please refresh to debug this module"]]);
     });
   });
 
@@ -223,9 +217,7 @@ describe("Editor", () => {
         selectedLocation: { sourceId: "bar", line: 1, column: 1 },
       });
 
-      expect(mockEditor.replaceDocument.mock.calls[1][0].getValue()).toBe(
-        "Loading…"
-      );
+      expect(mockEditor.replaceDocument.mock.calls[1][0].getValue()).toBe("Loading…");
 
       expect(mockEditor.setText.mock.calls).toEqual([["the text"]]);
 
@@ -251,10 +243,7 @@ describe("Editor", () => {
         symbols,
       });
 
-      expect(mockEditor.setMode.mock.calls).toEqual([
-        [{ name: "javascript" }],
-        [{ name: "jsx" }],
-      ]);
+      expect(mockEditor.setMode.mock.calls).toEqual([[{ name: "javascript" }], [{ name: "jsx" }]]);
     });
 
     it("should not re-set the mode when the location changes", async () => {
@@ -289,10 +278,7 @@ describe("Editor", () => {
         selectedLocation,
       });
 
-      expect(mockEditor.setMode.mock.calls).toEqual([
-        [{ name: "javascript" }],
-        [{ name: "jsx" }],
-      ]);
+      expect(mockEditor.setMode.mock.calls).toEqual([[{ name: "javascript" }], [{ name: "jsx" }]]);
     });
   });
 
@@ -318,9 +304,7 @@ describe("Editor", () => {
         selectedLocation: { sourceId: "foo", line: 1, column: 1 },
       });
 
-      expect(mockEditor.replaceDocument.mock.calls[0][0].getValue()).toBe(
-        "Loading…"
-      );
+      expect(mockEditor.replaceDocument.mock.calls[0][0].getValue()).toBe("Loading…");
 
       expect(mockEditor.setText.mock.calls).toEqual([["the text"]]);
 

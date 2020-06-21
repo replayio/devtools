@@ -15,13 +15,8 @@ const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
 
 // Components under test.
 const PageError = require("devtools/client/webconsole/components/Output/message-types/PageError");
-const {
-  MESSAGE_OPEN,
-  MESSAGE_CLOSE,
-} = require("devtools/client/webconsole/constants");
-const {
-  INDENT_WIDTH,
-} = require("devtools/client/webconsole/components/Output/MessageIndent");
+const { MESSAGE_OPEN, MESSAGE_CLOSE } = require("devtools/client/webconsole/constants");
+const { INDENT_WIDTH } = require("devtools/client/webconsole/components/Output/MessageIndent");
 
 // Test fakes.
 const {
@@ -32,9 +27,7 @@ const serviceContainer = require("devtools/client/webconsole/test/node/fixtures/
 
 describe("PageError component:", () => {
   it("renders", () => {
-    const message = stubPreparedMessages.get(
-      "ReferenceError: asdf is not defined"
-    );
+    const message = stubPreparedMessages.get("ReferenceError: asdf is not defined");
     const wrapper = render(
       PageError({
         message,
@@ -42,13 +35,9 @@ describe("PageError component:", () => {
         timestampsVisible: true,
       })
     );
-    const {
-      timestampString,
-    } = require("devtools/client/webconsole/utils/l10n");
+    const { timestampString } = require("devtools/client/webconsole/utils/l10n");
 
-    expect(wrapper.find(".timestamp").text()).toBe(
-      timestampString(message.timeStamp)
-    );
+    expect(wrapper.find(".timestamp").text()).toBe(timestampString(message.timeStamp));
 
     expect(wrapper.find(".message-body").text()).toBe(
       "ReferenceError: asdf is not defined[Learn More]"
@@ -66,9 +55,7 @@ describe("PageError component:", () => {
   });
 
   it("does not have a timestamp when timestampsVisible prop is falsy", () => {
-    const message = stubPreparedMessages.get(
-      "ReferenceError: asdf is not defined"
-    );
+    const message = stubPreparedMessages.get("ReferenceError: asdf is not defined");
     const wrapper = render(
       PageError({
         message,
@@ -132,9 +119,7 @@ describe("PageError component:", () => {
     const croppedbad = getCroppedUrl(badDomain);
 
     const text = wrapper.find(".message-body").text();
-    expect(text).toBe(
-      `“${croppedEvil}“ is evil and “${croppedbad}“ is not good either`
-    );
+    expect(text).toBe(`“${croppedEvil}“ is evil and “${croppedbad}“ is not good either`);
 
     // There should be 2 links.
     const links = wrapper.find(".message-body a");
@@ -150,9 +135,7 @@ describe("PageError component:", () => {
   it("displays a [Learn more] link", () => {
     const store = setupStore();
 
-    const message = stubPreparedMessages.get(
-      "ReferenceError: asdf is not defined"
-    );
+    const message = stubPreparedMessages.get("ReferenceError: asdf is not defined");
 
     serviceContainer.openLink = sinon.spy();
     const wrapper = mount(
@@ -161,14 +144,13 @@ describe("PageError component:", () => {
         PageError({
           message,
           serviceContainer,
-          dispatch: () => { },
+          dispatch: () => {},
         })
       )
     );
 
     // There should be a [Learn more] link.
-    const url =
-      "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Errors/Not_defined";
+    const url = "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Errors/Not_defined";
     const learnMore = wrapper.find(".learn-more-link");
     expect(learnMore.length).toBe(1);
     expect(learnMore.prop("title")).toBe(url);
@@ -180,12 +162,8 @@ describe("PageError component:", () => {
 
   // Unskip will happen in Bug 1529548.
   it.skip("has a stacktrace which can be opened", () => {
-    const message = stubPreparedMessages.get(
-      "ReferenceError: asdf is not defined"
-    );
-    const wrapper = render(
-      PageError({ message, serviceContainer, open: true })
-    );
+    const message = stubPreparedMessages.get("ReferenceError: asdf is not defined");
+    const wrapper = render(PageError({ message, serviceContainer, open: true }));
 
     // There should be a collapse button.
     expect(wrapper.find(".collapse-button[aria-expanded=true]").length).toBe(1);
@@ -199,9 +177,7 @@ describe("PageError component:", () => {
   it.skip("toggle the stacktrace when the collapse button is clicked", () => {
     const store = setupStore();
     store.dispatch = sinon.spy();
-    const message = stubPreparedMessages.get(
-      "ReferenceError: asdf is not defined"
-    );
+    const message = stubPreparedMessages.get("ReferenceError: asdf is not defined");
 
     let wrapper = mount(
       Provider(
@@ -242,9 +218,7 @@ describe("PageError component:", () => {
   });
 
   it("has the expected indent", () => {
-    const message = stubPreparedMessages.get(
-      "ReferenceError: asdf is not defined"
-    );
+    const message = stubPreparedMessages.get("ReferenceError: asdf is not defined");
     const indent = 10;
     let wrapper = render(
       PageError({
@@ -263,9 +237,7 @@ describe("PageError component:", () => {
   });
 
   it("has empty error notes", () => {
-    const message = stubPreparedMessages.get(
-      "ReferenceError: asdf is not defined"
-    );
+    const message = stubPreparedMessages.get("ReferenceError: asdf is not defined");
     const wrapper = render(PageError({ message, serviceContainer }));
 
     const notes = wrapper.find(".error-note");
@@ -274,9 +246,7 @@ describe("PageError component:", () => {
   });
 
   it("can show an error note", () => {
-    const origMessage = stubPreparedMessages.get(
-      "ReferenceError: asdf is not defined"
-    );
+    const origMessage = stubPreparedMessages.get("ReferenceError: asdf is not defined");
     const message = Object.assign({}, origMessage, {
       notes: [
         {
@@ -305,9 +275,7 @@ describe("PageError component:", () => {
   });
 
   it("can show multiple error notes", () => {
-    const origMessage = stubPreparedMessages.get(
-      "ReferenceError: asdf is not defined"
-    );
+    const origMessage = stubPreparedMessages.get("ReferenceError: asdf is not defined");
     const message = Object.assign({}, origMessage, {
       notes: [
         {
@@ -365,9 +333,7 @@ describe("PageError component:", () => {
   });
 
   it("displays error notes", () => {
-    const message = stubPreparedMessages.get(
-      "SyntaxError: redeclaration of let a"
-    );
+    const message = stubPreparedMessages.get("SyntaxError: redeclaration of let a");
 
     const wrapper = render(PageError({ message, serviceContainer }));
 
@@ -375,9 +341,7 @@ describe("PageError component:", () => {
     expect(notes.length).toBe(1);
 
     const note = notes.eq(0);
-    expect(note.find(".message-body").text()).toBe(
-      "note: Previously declared at line 2, column 6"
-    );
+    expect(note.find(".message-body").text()).toBe("note: Previously declared at line 2, column 6");
 
     // There should be the location.
     const locationLink = note.find(`.message-location`);

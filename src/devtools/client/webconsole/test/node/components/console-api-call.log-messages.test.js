@@ -53,10 +53,7 @@ describe("ConsoleAPICall component:", () => {
       // We need to wrap the ConsoleApiElement in a Provider in order for the
       // ObjectInspector to work.
       const wrapper = render(
-        Provider(
-          { store: setupStore() },
-          ConsoleApiCall({ message, serviceContainer })
-        )
+        Provider({ store: setupStore() }, ConsoleApiCall({ message, serviceContainer }))
       );
 
       expect(wrapper.find(".message-body").text()).toInclude(initialText);
@@ -79,9 +76,7 @@ const logMessageStubPacket = {
   timeStamp: 1519052480060,
 };
 
-const multilineFullText = `a\n${Array(20000)
-  .fill("a")
-  .join("")}`;
+const multilineFullText = `a\n${Array(20000).fill("a").join("")}`;
 const fullTextLength = multilineFullText.length;
 const initialText = multilineFullText.substring(0, 10000);
 const logMessageLongStringStubPacket = {

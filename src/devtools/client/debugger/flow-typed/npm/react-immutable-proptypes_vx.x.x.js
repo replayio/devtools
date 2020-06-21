@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'react-immutable-proptypes' {
+declare module "react-immutable-proptypes" {
   declare module.exports: any;
 }
 
@@ -22,18 +22,18 @@ declare module 'react-immutable-proptypes' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'react-immutable-proptypes/dist/ImmutablePropTypes' {
+declare module "react-immutable-proptypes/dist/ImmutablePropTypes" {
   declare module.exports: any;
 }
 
-declare module 'react-immutable-proptypes/src/ImmutablePropTypes' {
+declare module "react-immutable-proptypes/src/ImmutablePropTypes" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'react-immutable-proptypes/dist/ImmutablePropTypes.js' {
-  declare module.exports: $Exports<'react-immutable-proptypes/dist/ImmutablePropTypes'>;
+declare module "react-immutable-proptypes/dist/ImmutablePropTypes.js" {
+  declare module.exports: $Exports<"react-immutable-proptypes/dist/ImmutablePropTypes">;
 }
-declare module 'react-immutable-proptypes/src/ImmutablePropTypes.js' {
-  declare module.exports: $Exports<'react-immutable-proptypes/src/ImmutablePropTypes'>;
+declare module "react-immutable-proptypes/src/ImmutablePropTypes.js" {
+  declare module.exports: $Exports<"react-immutable-proptypes/src/ImmutablePropTypes">;
 }

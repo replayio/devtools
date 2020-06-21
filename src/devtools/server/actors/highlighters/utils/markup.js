@@ -18,8 +18,7 @@ const lazyContainer = {
   },
 };
 
-exports.getComputedStyle = node =>
-  lazyContainer.CssLogic.getComputedStyle(node);
+exports.getComputedStyle = node => lazyContainer.CssLogic.getComputedStyle(node);
 
 exports.getBindingElementAndPseudo = node =>
   lazyContainer.CssLogic.getBindingElementAndPseudo(node);
@@ -81,7 +80,7 @@ ClassList.prototype = {
   get length() {
     return this[_tokens].length;
   },
-  [Symbol.iterator]: function*() {
+  [Symbol.iterator]: function* () {
     for (let i = 0; i < this.tokens.length; i++) {
       yield this[_tokens][i];
     }
@@ -102,8 +101,7 @@ function isXUL(window) {
   // should be removed when bug 1594587 is fixed.
   return (
     window.document.documentElement.namespaceURI === XUL_NS ||
-    (window.isChromeWindow &&
-      window.document.documentElement.getAttribute("scrolling") === "false")
+    (window.isChromeWindow && window.document.documentElement.getAttribute("scrolling") === "false")
   );
 }
 exports.isXUL = isXUL;
@@ -363,9 +361,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
    */
   addEventListenerForElement(id, type, handler) {
     if (typeof id !== "string") {
-      throw new Error(
-        "Expected a string ID in addEventListenerForElement but" + " got: " + id
-      );
+      throw new Error("Expected a string ID in addEventListenerForElement but" + " got: " + id);
     }
 
     // If no one is listening for this type of event yet, add one listener.
@@ -473,8 +469,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
         return this.removeEventListenerForElement(id, type, handler);
       },
       computedStyle: {
-        getPropertyValue: property =>
-          this.getComputedStylePropertyValue(id, property),
+        getPropertyValue: property => this.getComputedStylePropertyValue(id, property),
       },
       classList,
     };
@@ -522,9 +517,7 @@ function moveInfobar(container, bounds, win, options = {}) {
   const { computedStyle } = container;
 
   const margin = 2;
-  const arrowSize = parseFloat(
-    computedStyle.getPropertyValue("--highlighter-bubble-arrow-size")
-  );
+  const arrowSize = parseFloat(computedStyle.getPropertyValue("--highlighter-bubble-arrow-size"));
   const containerHeight = parseFloat(computedStyle.getPropertyValue("height"));
   const containerWidth = parseFloat(computedStyle.getPropertyValue("width"));
   const containerHalfWidth = containerWidth / 2;
@@ -562,10 +555,7 @@ function moveInfobar(container, bounds, win, options = {}) {
   const forcedOnTop = options.position === "top";
   const forcedOnBottom = options.position === "bottom";
 
-  if (
-    (!canBePlacedOnTop && canBePlacedOnBottom && !forcedOnTop) ||
-    forcedOnBottom
-  ) {
+  if ((!canBePlacedOnTop && canBePlacedOnBottom && !forcedOnTop) || forcedOnBottom) {
     top = bottom;
     positionAttribute = "bottom";
   }

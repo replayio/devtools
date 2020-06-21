@@ -73,9 +73,7 @@ describe("SourcesTree", () => {
 
         await component.setProps({ ...props, sources });
 
-        expect(component.state("uncollapsedTree")).toEqual(
-          defaultState.uncollapsedTree
-        );
+        expect(component.state("uncollapsedTree")).toEqual(defaultState.uncollapsedTree);
       });
 
       it("updates tree with a new item", async () => {
@@ -96,9 +94,7 @@ describe("SourcesTree", () => {
           sources: newThreadSources,
         });
 
-        expect(
-          component.state("uncollapsedTree").contents[0].contents[0].contents
-        ).toHaveLength(5);
+        expect(component.state("uncollapsedTree").contents[0].contents[0].contents).toHaveLength(5);
       });
 
       it("updates sources if sources are emptied", async () => {
@@ -126,9 +122,7 @@ describe("SourcesTree", () => {
           },
         };
 
-        expect(
-          defaultState.uncollapsedTree.contents[0].contents[0].contents
-        ).toHaveLength(5);
+        expect(defaultState.uncollapsedTree.contents[0].contents[0].contents).toHaveLength(5);
 
         await component.setProps({
           ...props,
@@ -136,9 +130,7 @@ describe("SourcesTree", () => {
           projectRoot: "mozilla",
         });
 
-        expect(
-          component.state("uncollapsedTree").contents[0].contents
-        ).toHaveLength(1);
+        expect(component.state("uncollapsedTree").contents[0].contents).toHaveLength(1);
       });
 
       it("recreates tree if debuggeeUrl is changed", async () => {
@@ -153,9 +145,7 @@ describe("SourcesTree", () => {
           },
         };
 
-        expect(
-          defaultState.uncollapsedTree.contents[0].contents[0].contents
-        ).toHaveLength(5);
+        expect(defaultState.uncollapsedTree.contents[0].contents[0].contents).toHaveLength(5);
 
         await component.setProps({
           ...props,
@@ -163,9 +153,7 @@ describe("SourcesTree", () => {
           sources,
         });
 
-        expect(
-          component.state("uncollapsedTree").contents[0].contents
-        ).toHaveLength(1);
+        expect(component.state("uncollapsedTree").contents[0].contents).toHaveLength(1);
       });
     });
 
@@ -184,15 +172,9 @@ describe("SourcesTree", () => {
           },
         };
 
-        expect(component.state("uncollapsedTree").contents[0].name).toEqual(
-          "FakeThread"
-        );
-        expect(
-          component.state("uncollapsedTree").contents[0].contents[0].contents
-        ).toHaveLength(5);
-        expect(component.state("uncollapsedTree").contents[1]).toEqual(
-          undefined
-        );
+        expect(component.state("uncollapsedTree").contents[0].name).toEqual("FakeThread");
+        expect(component.state("uncollapsedTree").contents[0].contents[0].contents).toHaveLength(5);
+        expect(component.state("uncollapsedTree").contents[1]).toEqual(undefined);
 
         await component.setProps({
           ...props,
@@ -202,19 +184,11 @@ describe("SourcesTree", () => {
           },
         });
 
-        expect(component.state("uncollapsedTree").contents[0].name).toEqual(
-          "FakeThread"
-        );
-        expect(
-          component.state("uncollapsedTree").contents[0].contents[0].contents
-        ).toHaveLength(5);
+        expect(component.state("uncollapsedTree").contents[0].name).toEqual("FakeThread");
+        expect(component.state("uncollapsedTree").contents[0].contents[0].contents).toHaveLength(5);
 
-        expect(component.state("uncollapsedTree").contents[1].name).toEqual(
-          "FakeThread1"
-        );
-        expect(
-          component.state("uncollapsedTree").contents[1].contents[0].contents
-        ).toHaveLength(1);
+        expect(component.state("uncollapsedTree").contents[1].name).toEqual("FakeThread1");
+        expect(component.state("uncollapsedTree").contents[1].contents[0].contents).toHaveLength(1);
       });
     });
 
@@ -243,10 +217,7 @@ describe("SourcesTree", () => {
 
       instance.onActivate(item);
       expect(spy).toHaveBeenCalledWith(item);
-      expect(props.selectSource).toHaveBeenCalledWith(
-        mockcx,
-        "server1.conn13.child1/39"
-      );
+      expect(props.selectSource).toHaveBeenCalledWith(mockcx, "server1.conn13.child1/39");
     });
   });
 
@@ -254,10 +225,7 @@ describe("SourcesTree", () => {
     it("should select item with no children", async () => {
       const { instance, props } = render();
       instance.selectItem(createMockItem());
-      expect(props.selectSource).toHaveBeenCalledWith(
-        mockcx,
-        "server1.conn13.child1/39"
-      );
+      expect(props.selectSource).toHaveBeenCalledWith(mockcx, "server1.conn13.child1/39");
     });
 
     it("should not select item with children", async () => {
@@ -270,53 +238,35 @@ describe("SourcesTree", () => {
   describe("handles items", () => {
     it("getChildren from directory", async () => {
       const { component } = render();
-      const item = createMockDirectory("http://mdn.com/views", "views", [
-        "a",
-        "b",
-      ]);
-      const children = component
-        .find("ManagedTree")
-        .props()
-        .getChildren(item);
+      const item = createMockDirectory("http://mdn.com/views", "views", ["a", "b"]);
+      const children = component.find("ManagedTree").props().getChildren(item);
       expect(children).toEqual(["a", "b"]);
     });
 
     it("getChildren from non directory", async () => {
       const { component } = render();
-      const children = component
-        .find("ManagedTree")
-        .props()
-        .getChildren(createMockItem());
+      const children = component.find("ManagedTree").props().getChildren(createMockItem());
       expect(children).toEqual([]);
     });
 
     it("onExpand", async () => {
       const { component, props } = render();
       const expandedState = ["x", "y"];
-      await component
-        .find("ManagedTree")
-        .props()
-        .onExpand({}, expandedState);
+      await component.find("ManagedTree").props().onExpand({}, expandedState);
       expect(props.setExpandedState).toHaveBeenCalledWith(expandedState);
     });
 
     it("onCollapse", async () => {
       const { component, props } = render();
       const expandedState = ["y", "z"];
-      await component
-        .find("ManagedTree")
-        .props()
-        .onCollapse({}, expandedState);
+      await component.find("ManagedTree").props().onCollapse({}, expandedState);
       expect(props.setExpandedState).toHaveBeenCalledWith(expandedState);
     });
 
     it("getParent", async () => {
       const { component } = render();
       const item = component.state("sourceTree").contents[0].contents[0];
-      const parent = component
-        .find("ManagedTree")
-        .props()
-        .getParent(item);
+      const parent = component.find("ManagedTree").props().getParent(item);
 
       expect(parent.path).toEqual("FakeThread");
       expect(parent.contents[0].contents).toHaveLength(5);
@@ -346,9 +296,7 @@ describe("SourcesTree", () => {
           id: "server1.conn13.child1/42",
         })
       );
-      expect(pathGenerated).toEqual(
-        "http://mdn.com/four.js/server1.conn13.child1/42/"
-      );
+      expect(pathGenerated).toEqual("http://mdn.com/four.js/server1.conn13.child1/42/");
     });
   });
 });

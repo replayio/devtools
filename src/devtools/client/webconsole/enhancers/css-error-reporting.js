@@ -27,13 +27,8 @@ function ensureCSSErrorReportingEnabled(webConsoleUI) {
         return state;
       }
 
-      const cssFilterToggled =
-        action.type == FILTER_TOGGLE && action.filter == "css";
-      if (
-        cssFilterToggled ||
-        action.type == INITIALIZE ||
-        action.type == TARGET_AVAILABLE
-      ) {
+      const cssFilterToggled = action.type == FILTER_TOGGLE && action.filter == "css";
+      if (cssFilterToggled || action.type == INITIALIZE || action.type == TARGET_AVAILABLE) {
         for (const proxy of proxies) {
           if (proxy.target && proxy.target.ensureCSSErrorReportingEnabled) {
             proxy.target.ensureCSSErrorReportingEnabled();

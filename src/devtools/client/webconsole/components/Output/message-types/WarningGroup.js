@@ -9,15 +9,11 @@ const { createFactory } = require("react");
 const dom = require("react-dom-factories");
 
 const PropTypes = require("prop-types");
-const Message = createFactory(
-  require("devtools/client/webconsole/components/Output/Message")
-);
+const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
 
 const { PluralForm } = require("devtools/shared/plural-form");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
-const messageCountTooltip = l10n.getStr(
-  "webconsole.warningGroup.messageCount.tooltip"
-);
+const messageCountTooltip = l10n.getStr("webconsole.warningGroup.messageCount.tooltip");
 
 WarningGroup.displayName = "WarningGroup";
 
@@ -30,14 +26,7 @@ WarningGroup.propTypes = {
 };
 
 function WarningGroup(props) {
-  const {
-    dispatch,
-    message,
-    serviceContainer,
-    timestampsVisible,
-    badge,
-    open,
-  } = props;
+  const { dispatch, message, serviceContainer, timestampsVisible, badge, open } = props;
 
   const { source, type, level, id: messageId, indent, timeStamp } = message;
 

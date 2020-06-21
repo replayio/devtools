@@ -14,9 +14,7 @@ export function getAsyncTimes(name: string): number[] {
 }
 
 function getTimes(name) {
-  return window.performance
-    .getEntriesByName(name)
-    .map(time => +time.duration.toPrecision(2));
+  return window.performance.getEntriesByName(name).map(time => +time.duration.toPrecision(2));
 }
 
 function getStats(times) {

@@ -87,9 +87,7 @@ class GridOutline extends PureComponent {
     this.getGridAreaName = this.getGridAreaName.bind(this);
     this.getHeight = this.getHeight.bind(this);
     this.onHighlightCell = this.onHighlightCell.bind(this);
-    this.renderCannotShowOutlineText = this.renderCannotShowOutlineText.bind(
-      this
-    );
+    this.renderCannotShowOutlineText = this.renderCannotShowOutlineText.bind(this);
     this.renderGrid = this.renderGrid.bind(this);
     this.renderGridCell = this.renderGridCell.bind(this);
     this.renderGridOutline = this.renderGridOutline.bind(this);
@@ -138,7 +136,8 @@ class GridOutline extends PureComponent {
       area =>
         area.rowStart <= rowNumber &&
         area.rowEnd > rowNumber &&
-        (area.columnStart <= columnNumber && area.columnEnd > columnNumber)
+        area.columnStart <= columnNumber &&
+        area.columnEnd > columnNumber
     );
 
     if (!gridArea) {
@@ -202,23 +201,12 @@ class GridOutline extends PureComponent {
 
     // Draw the cells contained within the grid outline border.
     for (let rowNumber = 1; rowNumber <= numberOfRows; rowNumber++) {
-      height =
-        GRID_CELL_SCALE_FACTOR * (rows.tracks[rowNumber - 1].breadth / 100);
+      height = GRID_CELL_SCALE_FACTOR * (rows.tracks[rowNumber - 1].breadth / 100);
 
-      for (
-        let columnNumber = 1;
-        columnNumber <= numberOfColumns;
-        columnNumber++
-      ) {
-        width =
-          GRID_CELL_SCALE_FACTOR *
-          (cols.tracks[columnNumber - 1].breadth / 100);
+      for (let columnNumber = 1; columnNumber <= numberOfColumns; columnNumber++) {
+        width = GRID_CELL_SCALE_FACTOR * (cols.tracks[columnNumber - 1].breadth / 100);
 
-        const gridAreaName = this.getGridAreaName(
-          columnNumber,
-          rowNumber,
-          areas
-        );
+        const gridAreaName = this.getGridAreaName(columnNumber, rowNumber, areas);
         const gridCell = this.renderGridCell(
           id,
           gridFragmentIndex,
@@ -253,11 +241,7 @@ class GridOutline extends PureComponent {
     );
 
     // Draw a rectangle that acts as the grid outline border.
-    const border = this.renderGridOutlineBorder(
-      this.state.width,
-      this.state.height,
-      color
-    );
+    const border = this.renderGridOutlineBorder(this.state.width, this.state.height, color);
 
     return [border, cellGroup];
   }
@@ -343,14 +327,14 @@ class GridOutline extends PureComponent {
 
     return showOutline
       ? dom.svg(
-        {
-          id: "grid-outline",
-          width: "100%",
-          height: this.getHeight(),
-          viewBox: `${TRANSLATE_X} ${TRANSLATE_Y} ${width} ${height}`,
-        },
-        this.renderGridOutline(selectedGrid)
-      )
+          {
+            id: "grid-outline",
+            width: "100%",
+            height: this.getHeight(),
+            viewBox: `${TRANSLATE_X} ${TRANSLATE_Y} ${width} ${height}`,
+          },
+          this.renderGridOutline(selectedGrid)
+        )
       : this.renderCannotShowOutlineText();
   }
 
@@ -374,12 +358,12 @@ class GridOutline extends PureComponent {
 
     return selectedGrid && selectedGrid.gridFragments.length
       ? dom.div(
-        {
-          id: "grid-outline-container",
-          className: "grid-outline-container",
-        },
-        this.renderOutline()
-      )
+          {
+            id: "grid-outline-container",
+            className: "grid-outline-container",
+          },
+          this.renderOutline()
+        )
       : null;
   }
 }

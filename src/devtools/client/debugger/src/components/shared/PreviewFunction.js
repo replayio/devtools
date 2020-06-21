@@ -60,11 +60,7 @@ export default class PreviewFunction extends Component<Props> {
     const location = func.functionLocation();
     const locationURL = func.functionLocationURL();
 
-    if (
-      location &&
-      locationURL &&
-      !IGNORED_SOURCE_URLS.includes(locationURL)
-    ) {
+    if (location && locationURL && !IGNORED_SOURCE_URLS.includes(locationURL)) {
       const lastIndex = locationURL.lastIndexOf("/");
 
       return (

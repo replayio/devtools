@@ -36,23 +36,13 @@ describe("PreviewFunction", () => {
     it("should be a span", () => {
       const item = { name: "" };
       const returnedSpan = render({ func: item });
-      expect(
-        returnedSpan
-          .children()
-          .first()
-          .name()
-      ).toEqual("span");
+      expect(returnedSpan.children().first().name()).toEqual("span");
     });
 
     it('should have a "function-name" class', () => {
       const item = { name: "" };
       const returnedSpan = render({ func: item });
-      expect(
-        returnedSpan
-          .children()
-          .first()
-          .hasClass("function-name")
-      ).toBe(true);
+      expect(returnedSpan.children().first().hasClass("function-name")).toBe(true);
     });
 
     it("should be be set to userDisplayName if defined", () => {
@@ -62,13 +52,7 @@ describe("PreviewFunction", () => {
         displayName: "norris",
       };
       const returnedSpan = render({ func: item });
-      expect(
-        returnedSpan
-          .children()
-          .first()
-          .first()
-          .text()
-      ).toEqual("chuck");
+      expect(returnedSpan.children().first().first().text()).toEqual("chuck");
     });
 
     it('should use displayName if defined & no "userDisplayName" exist', () => {
@@ -77,13 +61,7 @@ describe("PreviewFunction", () => {
         name: "last",
       };
       const returnedSpan = render({ func: item });
-      expect(
-        returnedSpan
-          .children()
-          .first()
-          .first()
-          .text()
-      ).toEqual("norris");
+      expect(returnedSpan.children().first().first().text()).toEqual("norris");
     });
 
     it('should use to name if no "userDisplayName"/"displayName" exist', () => {
@@ -91,13 +69,7 @@ describe("PreviewFunction", () => {
         name: "last",
       };
       const returnedSpan = render({ func: item });
-      expect(
-        returnedSpan
-          .children()
-          .first()
-          .first()
-          .text()
-      ).toEqual("last");
+      expect(returnedSpan.children().first().first().text()).toEqual("last");
     });
   });
 

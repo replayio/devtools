@@ -6,9 +6,7 @@
 
 // Test utils.
 const expect = require("expect");
-const {
-  stubPackets,
-} = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
+const { stubPackets } = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
 const {
   getFirstMessage,
   getLastMessage,

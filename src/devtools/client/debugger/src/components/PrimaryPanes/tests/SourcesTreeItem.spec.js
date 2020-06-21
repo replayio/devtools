@@ -247,10 +247,7 @@ describe("SourceTreeItem", () => {
         stopPropagation: jest.fn(),
       };
 
-      await instance.onContextMenu(
-        mockEvent,
-        createMockDirectory("root/", "root")
-      );
+      await instance.onContextMenu(mockEvent, createMockDirectory("root/", "root"));
 
       expect(showMenu).toHaveBeenCalledWith(mockEvent, menuOptions);
 
@@ -295,9 +292,7 @@ describe("SourceTreeItem", () => {
         item,
         depth: 0,
         projectRoot: "server1.conn13.child1/thread19",
-        threads: [
-          { name: "Main Thread", actor: "server1.conn13.child1/thread19" },
-        ],
+        threads: [{ name: "Main Thread", actor: "server1.conn13.child1/thread19" }],
       });
       expect(node).toMatchSnapshot();
     });
@@ -308,9 +303,7 @@ describe("SourceTreeItem", () => {
         item,
         depth: 0,
         projectRoot: "server1.conn13.child1/thread19",
-        threads: [
-          { name: "Main Thread", actor: "server1.conn13.child1/thread19" },
-        ],
+        threads: [{ name: "Main Thread", actor: "server1.conn13.child1/thread19" }],
       });
       expect(node).toMatchSnapshot();
     });
@@ -466,10 +459,7 @@ describe("SourceTreeItem", () => {
 });
 
 function generateDefaults(overrides) {
-  const source = makeMockSource(
-    "http://mdn.com/one.js",
-    "server1.conn13.child1/39"
-  );
+  const source = makeMockSource("http://mdn.com/one.js", "server1.conn13.child1/39");
 
   const item = {
     name: "one.js",
@@ -504,11 +494,7 @@ function render(overrides = {}) {
   return { component, props, defaultState, instance };
 }
 
-function createMockDirectory(
-  path = "domain/subfolder",
-  name = "folder",
-  contents = []
-) {
+function createMockDirectory(path = "domain/subfolder", name = "folder", contents = []) {
   return {
     type: "directory",
     name,

@@ -37,13 +37,7 @@ import {
 } from "../utils/resource";
 
 import { findPosition } from "../utils/breakpoint/breakpointPositions";
-import {
-  pending,
-  fulfilled,
-  rejected,
-  asSettled,
-  isFulfilled,
-} from "../utils/async-value";
+import { pending, fulfilled, rejected, asSettled, isFulfilled } from "../utils/async-value";
 
 import type { AsyncValue, SettledValue } from "../utils/async-value";
 import { prefs } from "../utils/prefs";
@@ -152,10 +146,7 @@ export function initialSourcesState(): SourcesState {
   };
 }
 
-function update(
-  state: SourcesState = initialSourcesState(),
-  action: Action
-): SourcesState {
+function update(state: SourcesState = initialSourcesState(), action: Action): SourcesState {
   let location = null;
 
   switch (action.type) {
@@ -345,9 +336,7 @@ function insertSourceActors(state: SourcesState, action): SourcesState {
     ];
   }
 
-  const scriptActors = items.filter(
-    item => item.introductionType === "scriptElement"
-  );
+  const scriptActors = items.filter(item => item.introductionType === "scriptElement");
   if (scriptActors.length > 0) {
     const { ...breakpointPositions } = state.breakpointPositions;
 
@@ -422,8 +411,7 @@ function updateRootRelativeValues(
   };
 
   const relativeURLUpdates = wrappedIdsOrIds.map(wrappedIdOrId => {
-    const id =
-      typeof wrappedIdOrId === "string" ? wrappedIdOrId : wrappedIdOrId.id;
+    const id = typeof wrappedIdOrId === "string" ? wrappedIdOrId : wrappedIdOrId.id;
     const source = getResource(state.sources, id);
 
     return {
@@ -440,10 +428,7 @@ function updateRootRelativeValues(
 /*
  * Update a source's loaded text content.
  */
-function updateLoadedState(
-  state: SourcesState,
-  action: LoadSourceAction
-): SourcesState {
+function updateLoadedState(state: SourcesState, action: LoadSourceAction): SourcesState {
   const { sourceId } = action;
 
   // If there was a navigation between the time the action was started and
@@ -545,20 +530,11 @@ export function getSourceThreads(
   state: OuterState & SourceActorOuterState,
   source: Source
 ): ThreadId[] {
-  return uniq(
-    getSourceActors(state, state.sources.actors[source.id]).map(
-      actor => actor.thread
-    )
-  );
+  return uniq(getSourceActors(state, state.sources.actors[source.id]).map(actor => actor.thread));
 }
 
-export function getSourceInSources(
-  sources: SourceResourceState,
-  id: string
-): ?Source {
-  return hasResource(sources, id)
-    ? getMappedResource(sources, id, resourceAsSourceBase)
-    : null;
+export function getSourceInSources(sources: SourceResourceState, id: string): ?Source {
+  return hasResource(sources, id) ? getMappedResource(sources, id, resourceAsSourceBase) : null;
 }
 
 export function getSource(state: OuterState, id: SourceId): ?Source {
@@ -592,9 +568,7 @@ export function getSourcesByURLInSources(
   if (!url || !urls[url]) {
     return [];
   }
-  return urls[url].map(id =>
-    getMappedResource(sources, id, resourceAsSourceBase)
-  );
+  return urls[url].map(id => getMappedResource(sources, id, resourceAsSourceBase));
 }
 
 export function getSourcesByURL(state: OuterState, url: string): Source[] {
@@ -618,35 +592,19 @@ export function getSpecificSourceByURLInSources(
   return null;
 }
 
-export function getSpecificSourceByURL(
-  state: OuterState,
-  url: string
-): ?Source {
-  return getSpecificSourceByURLInSources(
-    getSources(state),
-    getUrls(state),
-    url
-  );
+export function getSpecificSourceByURL(state: OuterState, url: string): ?Source {
+  return getSpecificSourceByURLInSources(getSources(state), getUrls(state), url);
 }
 
-export function getOriginalSourceByURL(
-  state: OuterState,
-  url: string
-): ?Source {
+export function getOriginalSourceByURL(state: OuterState, url: string): ?Source {
   return getSpecificSourceByURL(state, url);
 }
 
-export function getGeneratedSourceByURL(
-  state: OuterState,
-  url: string
-): ?Source {
+export function getGeneratedSourceByURL(state: OuterState, url: string): ?Source {
   return getSpecificSourceByURL(state, url);
 }
 
-export function getGeneratedSource(
-  state: OuterState,
-  source: ?Source
-): ?Source {
+export function getGeneratedSource(state: OuterState, source: ?Source): ?Source {
   if (!source) {
     return null;
   }
@@ -654,10 +612,7 @@ export function getGeneratedSource(
   return source;
 }
 
-export function getGeneratedSourceById(
-  state: OuterState,
-  sourceId: string
-): Source {
+export function getGeneratedSourceById(state: OuterState, sourceId: string): Source {
   return getSourceFromId(state, sourceId);
 }
 
@@ -682,10 +637,7 @@ export function hasPrettySource(state: OuterState, id: string) {
   return !!getPrettySource(state, id);
 }
 
-export function getSourcesUrlsInSources(
-  state: OuterState,
-  url: ?string
-): string[] {
+export function getSourcesUrlsInSources(state: OuterState, url: ?string): string[] {
   if (!url) {
     return [];
   }
@@ -730,15 +682,11 @@ export function getSourceList(state: OuterState): Source[] {
 export function getDisplayedSourcesList(
   state: OuterState & SourceActorOuterState & ThreadsOuterState
 ): Source[] {
-  return ((Object.values(getDisplayedSources(state)): any).flatMap(
-    Object.values
-  ): any);
+  return ((Object.values(getDisplayedSources(state)): any).flatMap(Object.values): any);
 }
 
 export function getExtensionNameBySourceUrl(state: OuterState, url: string) {
-  const match = getSourceList(state).find(
-    source => source.url && source.url.startsWith(url)
-  );
+  const match = getSourceList(state).find(source => source.url && source.url.startsWith(url));
   if (match && match.extensionName) {
     return match.extensionName;
   }
@@ -756,10 +704,7 @@ export const getSelectedLocation: Selector<?SourceLocation> = createSelector(
 export const getSelectedSource: Selector<?Source> = createSelector(
   getSelectedLocation,
   getSources,
-  (
-    selectedLocation: ?SourceLocation,
-    sources: SourceResourceState
-  ): ?Source => {
+  (selectedLocation: ?SourceLocation, sources: SourceResourceState): ?Source => {
     if (!selectedLocation) {
       return;
     }
@@ -772,27 +717,13 @@ type GSSWC = Selector<?SourceWithContent>;
 export const getSelectedSourceWithContent: GSSWC = createSelector(
   getSelectedLocation,
   getSources,
-  (
-    selectedLocation: ?SourceLocation,
-    sources: SourceResourceState
-  ): SourceWithContent | null => {
-    const source =
-      selectedLocation &&
-      getSourceInSources(sources, selectedLocation.sourceId);
-    return source
-      ? getMappedResource(sources, source.id, resourceAsSourceWithContent)
-      : null;
+  (selectedLocation: ?SourceLocation, sources: SourceResourceState): SourceWithContent | null => {
+    const source = selectedLocation && getSourceInSources(sources, selectedLocation.sourceId);
+    return source ? getMappedResource(sources, source.id, resourceAsSourceWithContent) : null;
   }
 );
-export function getSourceWithContent(
-  state: OuterState,
-  id: SourceId
-): SourceWithContent {
-  return getMappedResource(
-    state.sources.sources,
-    id,
-    resourceAsSourceWithContent
-  );
+export function getSourceWithContent(state: OuterState, id: SourceId): SourceWithContent {
+  return getMappedResource(state.sources.sources, id, resourceAsSourceWithContent);
 }
 export function getSourceContent(
   state: OuterState,
@@ -825,19 +756,12 @@ const queryAllDisplayedSources: ReduceQuery<
     (
       resource,
       ident,
-      {
-        projectDirectoryRoot,
-        chromeAndExtensionsEnabled,
-        debuggeeIsWebExtension,
-        threadActors,
-      }
+      { projectDirectoryRoot, chromeAndExtensionsEnabled, debuggeeIsWebExtension, threadActors }
     ) => ({
       id: resource.id,
       displayed:
         underRoot(resource, projectDirectoryRoot, threadActors) &&
-        (!resource.isExtension ||
-          chromeAndExtensionsEnabled ||
-          debuggeeIsWebExtension),
+        (!resource.isExtension || chromeAndExtensionsEnabled || debuggeeIsWebExtension),
     })
   ),
   items =>
@@ -849,17 +773,12 @@ const queryAllDisplayedSources: ReduceQuery<
     }, [])
 );
 
-function getAllDisplayedSources(
-  state: OuterState & ThreadsOuterState
-): Array<SourceId> {
+function getAllDisplayedSources(state: OuterState & ThreadsOuterState): Array<SourceId> {
   return queryAllDisplayedSources(state.sources.sources, {
     projectDirectoryRoot: state.sources.projectDirectoryRoot,
     chromeAndExtensionsEnabled: state.sources.chromeAndExtensionsEnabled,
     debuggeeIsWebExtension: state.threads.isWebExtension,
-    threadActors: [
-      getMainThread(state).actor,
-      ...getThreads(state).map(t => t.actor),
-    ],
+    threadActors: [getMainThread(state).actor, ...getThreads(state).map(t => t.actor)],
   });
 }
 
@@ -873,9 +792,7 @@ const getDisplayedSourceIDs: GetDisplayedSourceIDsSelector = createSelector(
     const sourceIDsByThread = {};
 
     for (const sourceId of displayedSources) {
-      const threads =
-        threadsBySource[sourceId] ||
-        [];
+      const threads = threadsBySource[sourceId] || [];
 
       for (const thread of threads) {
         if (!sourceIDsByThread[thread]) {
@@ -922,10 +839,7 @@ export function getSourceActorsForSource(
   return getSourceActors(state, actors);
 }
 
-export function canLoadSource(
-  state: OuterState & SourceActorOuterState,
-  sourceId: string
-) {
+export function canLoadSource(state: OuterState & SourceActorOuterState, sourceId: string) {
   // Return false if we know that loadSourceText() will fail if called on this
   // source. This is used to avoid viewing such sources in the debugger.
   const source = getSource(state, sourceId);
@@ -937,13 +851,8 @@ export function canLoadSource(
   return actors.length != 0;
 }
 
-export function isSourceWithMap(
-  state: OuterState & SourceActorOuterState,
-  id: SourceId
-): boolean {
-  return getSourceActorsForSource(state, id).some(
-    soureActor => soureActor.sourceMapURL
-  );
+export function isSourceWithMap(state: OuterState & SourceActorOuterState, id: SourceId): boolean {
+  return getSourceActorsForSource(state, id).some(soureActor => soureActor.sourceMapURL);
 }
 
 export function canPrettyPrintSource(
@@ -955,8 +864,7 @@ export function canPrettyPrintSource(
     return false;
   }
 
-  const sourceContent =
-    source.content && isFulfilled(source.content) ? source.content.value : null;
+  const sourceContent = source.content && isFulfilled(source.content) ? source.content.value : null;
 
   if (!sourceContent || !isJavaScript(source, sourceContent)) {
     return false;
@@ -965,9 +873,7 @@ export function canPrettyPrintSource(
   return true;
 }
 
-export function getBreakpointPositions(
-  state: OuterState
-): BreakpointPositionsMap {
+export function getBreakpointPositions(state: OuterState): BreakpointPositionsMap {
   return state.sources.breakpointPositions;
 }
 
@@ -979,10 +885,7 @@ export function getBreakpointPositionsForSource(
   return positions && positions[sourceId];
 }
 
-export function hasBreakpointPositions(
-  state: OuterState,
-  sourceId: string
-): boolean {
+export function hasBreakpointPositions(state: OuterState, sourceId: string): boolean {
   return !!getBreakpointPositionsForSource(state, sourceId);
 }
 
@@ -1026,10 +929,7 @@ export function getBreakableLines(
 
   // We pull generated file breakable lines directly from the source actors
   // so that breakable lines can be added as new source actors on HTML loads.
-  return getBreakableLinesForSourceActors(
-    state.sourceActors,
-    state.sources.actors[sourceId]
-  );
+  return getBreakableLinesForSourceActors(state.sourceActors, state.sources.actors[sourceId]);
 }
 
 export const getSelectedBreakableLines: Selector<Set<number>> = createSelector(

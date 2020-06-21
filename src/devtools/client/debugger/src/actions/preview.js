@@ -20,7 +20,6 @@ import {
   getPreviewCount,
 } from "../selectors";
 
-
 import type { Action, ThunkArgs } from "./types";
 import type { Position, Context } from "../types";
 import type { AstLocation } from "../workers/parser";
@@ -42,19 +41,11 @@ function findExpressionMatch(state, codeMirror, tokenPos) {
   return match;
 }
 
-export function updatePreview(
-  cx: Context,
-  target: HTMLElement,
-  tokenPos: Object,
-  codeMirror: any
-) {
+export function updatePreview(cx: Context, target: HTMLElement, tokenPos: Object, codeMirror: any) {
   return ({ dispatch, getState, client, sourceMaps }: ThunkArgs) => {
     const cursorPos = target.getBoundingClientRect();
 
-    if (
-      !isSelectedFrameVisible(getState()) ||
-      !isLineInScope(getState(), tokenPos.line)
-    ) {
+    if (!isSelectedFrameVisible(getState()) || !isLineInScope(getState(), tokenPos.line)) {
       return;
     }
 

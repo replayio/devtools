@@ -156,8 +156,7 @@ class SearchInput extends Component<Props, State> {
     }
 
     if (e.key === "ArrowUp") {
-      const previous =
-        currentHistoryIndex > -1 ? currentHistoryIndex - 1 : history.length - 1;
+      const previous = currentHistoryIndex > -1 ? currentHistoryIndex - 1 : history.length - 1;
       const previousInHistory = history[previous];
       if (previousInHistory) {
         e.preventDefault();
@@ -204,13 +203,11 @@ class SearchInput extends Component<Props, State> {
 
   renderNav() {
     const { count, handleNext, handlePrev } = this.props;
-    if ((!handleNext && !handlePrev) || (!count || count == 1)) {
+    if ((!handleNext && !handlePrev) || !count || count == 1) {
       return;
     }
 
-    return (
-      <div className="search-nav-buttons">{this.renderArrowButtons()}</div>
-    );
+    return <div className="search-nav-buttons">{this.renderArrowButtons()}</div>;
   }
 
   render() {
@@ -238,8 +235,7 @@ class SearchInput extends Component<Props, State> {
       onBlur: e => this.onBlur(e),
       "aria-autocomplete": "list",
       "aria-controls": "result-list",
-      "aria-activedescendant":
-        expanded && selectedItemId ? `${selectedItemId}-title` : "",
+      "aria-activedescendant": expanded && selectedItemId ? `${selectedItemId}-title` : "",
       placeholder,
       value: query,
       spellCheck: false,
@@ -260,9 +256,7 @@ class SearchInput extends Component<Props, State> {
           {this.renderSpinner()}
           {this.renderSummaryMsg()}
           {this.renderNav()}
-          {showClose && (
-            <CloseButton handleClick={handleClose} buttonClass={size} />
-          )}
+          {showClose && <CloseButton handleClick={handleClose} buttonClass={size} />}
         </div>
       </div>
     );

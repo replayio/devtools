@@ -9,17 +9,10 @@ const { PrefState } = require("devtools/client/webconsole/reducers/prefs");
 const { UiState } = require("devtools/client/webconsole/reducers/ui");
 
 // Redux
-const {
-  applyMiddleware,
-  compose,
-  createStore,
-} = require("devtools/client/shared/vendor/redux");
+const { applyMiddleware, compose, createStore } = require("devtools/client/shared/vendor/redux");
 
 // Prefs
-const {
-  prefs,
-  getPrefsService,
-} = require("devtools/client/webconsole/utils/prefs");
+const { prefs, getPrefsService } = require("devtools/client/webconsole/utils/prefs");
 
 // Reducers
 const { reducers } = require("devtools/client/webconsole/reducers/index");
@@ -28,9 +21,7 @@ const { reducers } = require("devtools/client/webconsole/reducers/index");
 const { ignore } = require("devtools/client/shared/redux/middleware/ignore");
 const eventTelemetry = require("devtools/client/webconsole/middleware/event-telemetry");
 const historyPersistence = require("devtools/client/webconsole/middleware/history-persistence");
-const {
-  thunkWithOptions,
-} = require("devtools/client/shared/redux/middleware/thunk-with-options");
+const { thunkWithOptions } = require("devtools/client/shared/redux/middleware/thunk-with-options");
 
 // Enhancers
 const enableBatching = require("devtools/client/webconsole/enhancers/batching");

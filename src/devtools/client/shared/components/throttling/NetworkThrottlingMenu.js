@@ -13,17 +13,10 @@ const Types = require("devtools/client/shared/components/throttling/types");
 
 // Localization
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper(
-  "devtools/client/locales/network-throttling.properties"
-);
+const L10N = new LocalizationHelper("devtools/client/locales/network-throttling.properties");
 const NO_THROTTLING_LABEL = L10N.getStr("responsive.noThrottling");
 
-loader.lazyRequireGetter(
-  this,
-  "showMenu",
-  "devtools/client/shared/components/menu/utils",
-  true
-);
+loader.lazyRequireGetter(this, "showMenu", "devtools/client/shared/components/menu/utils", true);
 
 /**
  * This component represents selector button that can be used
@@ -49,8 +42,7 @@ class NetworkThrottlingMenu extends PureComponent {
       return {
         label: profile.id,
         type: "checkbox",
-        checked:
-          networkThrottling.enabled && profile.id == networkThrottling.profile,
+        checked: networkThrottling.enabled && profile.id == networkThrottling.profile,
         click: () => onChangeNetworkThrottling(true, profile.id),
       };
     });

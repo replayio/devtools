@@ -44,10 +44,7 @@ function indexLinkingNames(items: XScopeItem[]): XScopeItemsIndex {
   return result;
 }
 
-function getIndexedItem(
-  index: XScopeItemsIndex,
-  key: string | { uid: number }
-): XScopeItem {
+function getIndexedItem(index: XScopeItemsIndex, key: string | { uid: number }): XScopeItem {
   if (typeof key === "object" && key != null) {
     return index.get(key.uid);
   }
@@ -165,19 +162,13 @@ function filterScopes(
     switch (item.tag) {
       case "compile_unit":
         if (isInRange(item, pc)) {
-          result = [
-            ...result,
-            ...filterScopes(item.children, pc, lastItem, index),
-          ];
+          result = [...result, ...filterScopes(item.children, pc, lastItem, index)];
         }
         break;
       case "namespace":
       case "structure_type":
       case "union_type":
-        result = [
-          ...result,
-          ...filterScopes(item.children, pc, lastItem, index),
-        ];
+        result = [...result, ...filterScopes(item.children, pc, lastItem, index)];
         break;
       case "subprogram":
         if (isInRange(item, pc)) {
@@ -218,10 +209,7 @@ class XScope {
   xScope: XScopeData;
   sourceMapContext: XScopeSourceMapContext;
 
-  constructor(
-    xScopeData: XScopeData,
-    sourceMapContext: XScopeSourceMapContext
-  ) {
+  constructor(xScopeData: XScopeData, sourceMapContext: XScopeSourceMapContext) {
     this.xScope = xScopeData;
     this.sourceMapContext = sourceMapContext;
   }

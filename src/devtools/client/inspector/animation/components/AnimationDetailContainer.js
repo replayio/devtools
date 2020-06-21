@@ -5,10 +5,7 @@
 "use strict";
 
 const { connect } = require("react-redux");
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -57,23 +54,23 @@ class AnimationDetailContainer extends PureComponent {
       },
       animation
         ? AnimationDetailHeader({
-          animation,
-          setDetailVisibility,
-        })
+            animation,
+            setDetailVisibility,
+          })
         : null,
       animation
         ? AnimatedPropertyListContainer({
-          addAnimationsCurrentTimeListener,
-          animation,
-          emitEventForTest,
-          getAnimatedPropertyMap,
-          getAnimationsCurrentTime,
-          getComputedStyle,
-          removeAnimationsCurrentTimeListener,
-          simulateAnimation,
-          simulateAnimationForKeyframesProgressBar,
-          timeScale,
-        })
+            addAnimationsCurrentTimeListener,
+            animation,
+            emitEventForTest,
+            getAnimatedPropertyMap,
+            getAnimationsCurrentTime,
+            getComputedStyle,
+            removeAnimationsCurrentTimeListener,
+            simulateAnimation,
+            simulateAnimationForKeyframesProgressBar,
+            timeScale,
+          })
         : null
     );
   }

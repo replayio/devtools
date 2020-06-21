@@ -29,9 +29,7 @@ class PaneToggleButton extends PureComponent<Props> {
       case "start":
         return L10N.getStr(collapsed ? "expandSources" : "collapseSources");
       case "end":
-        return L10N.getStr(
-          collapsed ? "expandBreakpoints" : "collapseBreakpoints"
-        );
+        return L10N.getStr(collapsed ? "expandBreakpoints" : "collapseBreakpoints");
     }
   }
 
@@ -47,9 +45,7 @@ class PaneToggleButton extends PureComponent<Props> {
         onClick={() => handleClick(position, !collapsed)}
         title={this.label(position, collapsed)}
       >
-        <AccessibleImage
-          className={collapsed ? "pane-expand" : "pane-collapse"}
-        />
+        <AccessibleImage className={collapsed ? "pane-expand" : "pane-collapse"} />
       </CommandBarButton>
     );
   }

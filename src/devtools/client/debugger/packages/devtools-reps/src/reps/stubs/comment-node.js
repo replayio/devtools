@@ -15,8 +15,7 @@ stubs.set("Comment", {
     kind: "DOMNode",
     nodeType: 8,
     nodeName: "#comment",
-    textContent:
-      "test\nand test\nand test\nand test\nand test\nand test\nand test",
+    textContent: "test\nand test\nand test\nand test\nand test\nand test\nand test",
   },
 });
 

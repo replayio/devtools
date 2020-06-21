@@ -5,7 +5,7 @@ function outer() {
     const x = 1;
   }
 
-  const declaration = function() {
+  const declaration = function () {
     const x = 1;
   };
 }

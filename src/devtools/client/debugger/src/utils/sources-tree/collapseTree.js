@@ -26,9 +26,7 @@ function _collapseTree(node: TreeNode, depth: number): TreeNode {
       if (next.type === "directory") {
         if (!Array.isArray(next.contents)) {
           console.log(
-            `Expected array at: ${next.name} -- ${
-              node.name
-            } -- ${JSON.stringify(next.contents)}`
+            `Expected array at: ${next.name} -- ${node.name} -- ${JSON.stringify(next.contents)}`
           );
         }
         const name = `${node.name}/${next.name}`;

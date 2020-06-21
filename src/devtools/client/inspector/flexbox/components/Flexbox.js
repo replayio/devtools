@@ -4,20 +4,13 @@
 
 "use strict";
 
-const {
-  createElement,
-  createFactory,
-  Fragment,
-  PureComponent,
-} = require("react");
+const { createElement, createFactory, Fragment, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { getStr } = require("devtools/client/inspector/layout/utils/l10n");
 
 loader.lazyGetter(this, "FlexItemList", function () {
-  return createFactory(
-    require("devtools/client/inspector/flexbox/components/FlexItemList")
-  );
+  return createFactory(require("devtools/client/inspector/flexbox/components/FlexItemList"));
 });
 loader.lazyGetter(this, "FlexItemSizingOutline", function () {
   return createFactory(
@@ -30,9 +23,7 @@ loader.lazyGetter(this, "FlexItemSizingProperties", function () {
   );
 });
 loader.lazyGetter(this, "Header", function () {
-  return createFactory(
-    require("devtools/client/inspector/flexbox/components/Header")
-  );
+  return createFactory(require("devtools/client/inspector/flexbox/components/Header"));
 });
 
 const Types = require("devtools/client/inspector/flexbox/types");
@@ -73,9 +64,7 @@ class Flexbox extends PureComponent {
   renderFlexItemSizing() {
     const { flexItems, flexItemShown, properties } = this.props.flexContainer;
 
-    const flexItem = flexItems.find(
-      item => item.nodeFront.actorID === flexItemShown
-    );
+    const flexItem = flexItems.find(item => item.nodeFront.actorID === flexItemShown);
     if (!flexItem) {
       return null;
     }

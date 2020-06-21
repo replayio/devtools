@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createRef,
-  PureComponent,
-} = require("react");
+const { createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
@@ -78,24 +75,21 @@ class ClassListPanel extends PureComponent {
         { className: "classes" },
         this.props.classes.length
           ? this.props.classes.map(({ name, isApplied }) => {
-            return dom.label(
-              {
-                key: name,
-                title: name,
-              },
-              dom.input({
-                checked: isApplied,
-                onChange: this.onToggleChange,
-                type: "checkbox",
-                value: name,
-              }),
-              dom.span({}, name)
-            );
-          })
-          : dom.p(
-            { className: "no-classes" },
-            getStr("rule.classPanel.noClasses")
-          )
+              return dom.label(
+                {
+                  key: name,
+                  title: name,
+                },
+                dom.input({
+                  checked: isApplied,
+                  onChange: this.onToggleChange,
+                  type: "checkbox",
+                  value: name,
+                }),
+                dom.span({}, name)
+              );
+            })
+          : dom.p({ className: "no-classes" }, getStr("rule.classPanel.noClasses"))
       )
     );
   }

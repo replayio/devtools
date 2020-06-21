@@ -43,10 +43,7 @@ class EmptyLines extends Component<Props> {
 
     editor.codeMirror.operation(() => {
       editor.codeMirror.eachLine(lineHandle => {
-        const line = fromEditorLine(
-          selectedSource.id,
-          editor.codeMirror.getLineNumber(lineHandle)
-        );
+        const line = fromEditorLine(selectedSource.id, editor.codeMirror.getLineNumber(lineHandle));
 
         if (breakableLines.has(line)) {
           editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
@@ -75,6 +72,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(
-  EmptyLines
-);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(EmptyLines);

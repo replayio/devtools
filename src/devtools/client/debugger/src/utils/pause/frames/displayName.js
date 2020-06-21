@@ -22,12 +22,7 @@ export function simplifyDisplayName(displayName: string | void): string | void {
     return displayName;
   }
 
-  const scenarios = [
-    objectProperty,
-    arrayProperty,
-    functionProperty,
-    annonymousProperty,
-  ];
+  const scenarios = [objectProperty, arrayProperty, functionProperty, annonymousProperty];
 
   for (const reg of scenarios) {
     const match = reg.exec(displayName);
@@ -67,19 +62,11 @@ const displayNameMap = {
 
 function mapDisplayNames(frame, library) {
   const { displayName } = frame;
-  return (
-    (displayNameMap[library] && displayNameMap[library][displayName]) ||
-    displayName
-  );
+  return (displayNameMap[library] && displayNameMap[library][displayName]) || displayName;
 }
 
 function getFrameDisplayName(frame: Frame): string {
-  const {
-    displayName,
-    originalDisplayName,
-    userDisplayName,
-    name,
-  } = (frame: any);
+  const { displayName, originalDisplayName, userDisplayName, name } = (frame: any);
   return originalDisplayName || userDisplayName || displayName || name;
 }
 

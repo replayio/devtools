@@ -54,8 +54,7 @@ class ColorPath extends ComputedStylePath {
     }
 
     const maxDistance = maxObject.distance;
-    const baseValue =
-      maxObject.value1 < maxObject.value2 ? maxObject.value1 : maxObject.value2;
+    const baseValue = maxObject.value1 < maxObject.value2 ? maxObject.value1 : maxObject.value2;
 
     return { baseValue, maxDistance, name };
   }
@@ -70,12 +69,7 @@ class ColorPath extends ComputedStylePath {
    * Overide parent's method.
    */
   renderEasingHint() {
-    const {
-      easingHintStrokeWidth,
-      graphHeight,
-      keyframes,
-      totalDuration,
-    } = this.props;
+    const { easingHintStrokeWidth, graphHeight, keyframes, totalDuration } = this.props;
 
     const hints = [];
 
@@ -167,10 +161,7 @@ function getRGBA(propertyName, colorString) {
     }
     case "scrollbar-color": {
       // This property can specify "auto", "dark", "light" keywords and multiple colors.
-      if (
-        ["auto", "dark", "light"].includes(colorString) ||
-        colorString.indexOf(" ") > 0
-      ) {
+      if (["auto", "dark", "light"].includes(colorString) || colorString.indexOf(" ") > 0) {
         return DEFAULT_COLOR;
       }
       break;
@@ -204,9 +195,7 @@ function getRGBADistance(rgba1, rgba2) {
   const diffR = startR - endR;
   const diffG = startG - endG;
   const diffB = startB - endB;
-  return Math.sqrt(
-    diffA * diffA + diffR * diffR + diffG * diffG + diffB * diffB
-  );
+  return Math.sqrt(diffA * diffA + diffR * diffR + diffG * diffG + diffB * diffB);
 }
 
 module.exports = ColorPath;

@@ -4,11 +4,7 @@
 
 // @flow
 
-import {
-  hasInScopeLines,
-  getSourceWithContent,
-  getVisibleSelectedFrame,
-} from "../../selectors";
+import { hasInScopeLines, getSourceWithContent, getVisibleSelectedFrame } from "../../selectors";
 
 import { getSourceLineCount } from "../../utils/source";
 
@@ -25,9 +21,7 @@ function getOutOfScopeLines(outOfScopeLocations: ?(AstLocation[])) {
   }
 
   return uniq(
-    flatMap(outOfScopeLocations, location =>
-      range(location.start.line, location.end.line)
-    )
+    flatMap(outOfScopeLocations, location => range(location.start.line, location.end.line))
   );
 }
 
@@ -44,15 +38,11 @@ async function getInScopeLines(cx, location, { dispatch, getState, parser }) {
 
   const linesOutOfScope = getOutOfScopeLines(locations);
   const sourceNumLines =
-    !source.content || !isFulfilled(source.content)
-      ? 0
-      : getSourceLineCount(source.content.value);
+    !source.content || !isFulfilled(source.content) ? 0 : getSourceLineCount(source.content.value);
 
   const sourceLines = range(1, sourceNumLines + 1);
 
-  return !linesOutOfScope
-    ? sourceLines
-    : without(sourceLines, ...linesOutOfScope);
+  return !linesOutOfScope ? sourceLines : without(sourceLines, ...linesOutOfScope);
 }
 
 export function setInScopeLines(cx: Context) {

@@ -32,9 +32,8 @@ function flashElementOn(
   backgroundElt.classList.add(backgroundClass);
 
   foregroundElt.classList.add("theme-fg-contrast");
-  [].forEach.call(
-    foregroundElt.querySelectorAll("[class*=theme-fg-color]"),
-    span => span.classList.add("theme-fg-contrast")
+  [].forEach.call(foregroundElt.querySelectorAll("[class*=theme-fg-color]"), span =>
+    span.classList.add("theme-fg-contrast")
   );
 }
 
@@ -68,9 +67,8 @@ function flashElementOff(
   foregroundElt.classList.remove("theme-fg-contrast");
   // Make sure the foreground animation class is removed
   foregroundElt.classList.remove("flash-out");
-  [].forEach.call(
-    foregroundElt.querySelectorAll("[class*=theme-fg-color]"),
-    span => span.classList.remove("theme-fg-contrast")
+  [].forEach.call(foregroundElt.querySelectorAll("[class*=theme-fg-color]"), span =>
+    span.classList.remove("theme-fg-contrast")
   );
 }
 

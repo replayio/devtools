@@ -28,10 +28,4 @@ exports.CSS_TYPES = {
  * Supported pseudo-class locks in the order in which they appear in the pseudo-class
  * panel in the Rules sidebar panel of the Inspector.
  */
-exports.PSEUDO_CLASSES = [
-  ":hover",
-  ":active",
-  ":focus",
-  ":focus-within",
-  ":visited",
-];
+exports.PSEUDO_CLASSES = [":hover", ":active", ":focus", ":focus-within", ":visited"];

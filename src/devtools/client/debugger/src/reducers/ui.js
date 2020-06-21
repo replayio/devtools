@@ -147,9 +147,7 @@ function update(state: UIState = createUIState(), action: Action): UIState {
 // https://github.com/firefox-devtools/debugger/blob/master/src/reducers/sources.js#L179-L185
 type OuterState = { ui: UIState };
 
-export function getSelectedPrimaryPaneTab(
-  state: OuterState
-): SelectedPrimaryPaneTabType {
+export function getSelectedPrimaryPaneTab(state: OuterState): SelectedPrimaryPaneTabType {
   return state.ui.selectedPrimaryPaneTab;
 }
 
@@ -165,10 +163,7 @@ export function getShownSource(state: OuterState): ?Source {
   return state.ui.shownSource;
 }
 
-export function getPaneCollapse(
-  state: OuterState,
-  position: panelPositionType
-): boolean {
+export function getPaneCollapse(state: OuterState, position: panelPositionType): boolean {
   if (position == "start") {
     return state.ui.startPanelCollapsed;
   }
@@ -180,9 +175,7 @@ export function getHighlightedLineRange(state: OuterState) {
   return state.ui.highlightedLineRange;
 }
 
-export function getConditionalPanelLocation(
-  state: OuterState
-): null | SourceLocation {
+export function getConditionalPanelLocation(state: OuterState): null | SourceLocation {
   return state.ui.conditionalPanelLocation;
 }
 

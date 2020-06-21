@@ -11,10 +11,7 @@ import type { Context } from "./context";
 
 type ArgsWithContext = { cx: Context };
 
-export type MemoizedAction<
-  Args,
-  Result
-> = Args => ThunkArgs => Promise<Result | null>;
+export type MemoizedAction<Args, Result> = Args => ThunkArgs => Promise<Result | null>;
 
 type MemoizableActionParams<Args, Result> = {
   getValue: (args: Args, thunkArgs: ThunkArgs) => AsyncValue<Result> | null,

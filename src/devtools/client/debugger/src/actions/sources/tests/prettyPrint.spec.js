@@ -4,12 +4,7 @@
 
 // @flow
 
-import {
-  actions,
-  selectors,
-  createStore,
-  makeSource,
-} from "../../../utils/test-head";
+import { actions, selectors, createStore, makeSource } from "../../../utils/test-head";
 import { createPrettySource } from "../prettyPrint";
 import { mockCommandClient } from "../../tests/helpers/mockCommandClient";
 import { isFulfilled } from "../../../utils/async-value";
@@ -26,17 +21,12 @@ describe("sources - pretty print", () => {
 
     const prettyURL = `${source.url}:formatted`;
     const pretty = selectors.getSourceByURL(getState(), prettyURL);
-    const content = pretty
-      ? selectors.getSourceContent(getState(), pretty.id)
-      : null;
+    const content = pretty ? selectors.getSourceContent(getState(), pretty.id) : null;
     expect(pretty && pretty.url.includes(prettyURL)).toEqual(true);
     expect(pretty).toMatchSnapshot();
 
     expect(
-      content &&
-        isFulfilled(content) &&
-        content.value.type === "text" &&
-        content.value.contentType
+      content && isFulfilled(content) && content.value.type === "text" && content.value.contentType
     ).toEqual("text/javascript");
     expect(content).toMatchSnapshot();
   });
@@ -44,9 +34,7 @@ describe("sources - pretty print", () => {
   it("should create a source when first toggling pretty print", async () => {
     const { dispatch, getState, cx } = createStore(mockCommandClient);
 
-    const source = await dispatch(
-      actions.newGeneratedSource(makeSource("foobar.js"))
-    );
+    const source = await dispatch(actions.newGeneratedSource(makeSource("foobar.js")));
     await dispatch(actions.loadSourceText({ cx, source }));
 
     await dispatch(actions.togglePrettyPrint(cx, source.id));
@@ -56,9 +44,7 @@ describe("sources - pretty print", () => {
   it("should not make a second source when toggling pretty print", async () => {
     const { dispatch, getState, cx } = createStore(mockCommandClient);
 
-    const source = await dispatch(
-      actions.newGeneratedSource(makeSource("foobar.js"))
-    );
+    const source = await dispatch(actions.newGeneratedSource(makeSource("foobar.js")));
     await dispatch(actions.loadSourceText({ cx, source }));
 
     await dispatch(actions.togglePrettyPrint(cx, source.id));

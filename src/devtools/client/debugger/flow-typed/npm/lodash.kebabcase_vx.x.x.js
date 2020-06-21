@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'lodash.kebabcase' {
+declare module "lodash.kebabcase" {
   declare module.exports: any;
 }
 
@@ -23,11 +23,10 @@ declare module 'lodash.kebabcase' {
  * needed.
  */
 
-
 // Filename aliases
-declare module 'lodash.kebabcase/index' {
-  declare module.exports: $Exports<'lodash.kebabcase'>;
+declare module "lodash.kebabcase/index" {
+  declare module.exports: $Exports<"lodash.kebabcase">;
 }
-declare module 'lodash.kebabcase/index.js' {
-  declare module.exports: $Exports<'lodash.kebabcase'>;
+declare module "lodash.kebabcase/index.js" {
+  declare module.exports: $Exports<"lodash.kebabcase">;
 }

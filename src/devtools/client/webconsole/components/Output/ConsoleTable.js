@@ -3,10 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const dom = require("react-dom-factories");
 const {
   l10n,
@@ -73,12 +70,12 @@ class ConsoleTable extends Component {
           typeof cellValue === "undefined"
             ? ""
             : GripMessageBody({
-              grip: cellValue,
-              mode: MODE.SHORT,
-              useQuotes: false,
-              serviceContainer,
-              dispatch,
-            });
+                grip: cellValue,
+                mode: MODE.SHORT,
+                useQuotes: false,
+                serviceContainer,
+                dispatch,
+              });
 
         cells.push(
           dom.div(
@@ -99,8 +96,7 @@ class ConsoleTable extends Component {
     const { parameters } = this.props;
     const { valueGrip, headersGrip } = getValueAndHeadersGrip(parameters);
 
-    const headers =
-      headersGrip && headersGrip.preview ? headersGrip.preview.items : null;
+    const headers = headersGrip && headersGrip.preview ? headersGrip.preview.items : null;
 
     const data = valueGrip && valueGrip.ownProperties;
 
@@ -129,13 +125,9 @@ class ConsoleTable extends Component {
 function getValueAndHeadersGrip(parameters) {
   const [valueFront, headersFront] = parameters;
 
-  const headersGrip =
-    headersFront && headersFront.getGrip
-      ? headersFront.getGrip()
-      : headersFront;
+  const headersGrip = headersFront && headersFront.getGrip ? headersFront.getGrip() : headersFront;
 
-  const valueGrip =
-    valueFront && valueFront.getGrip ? valueFront.getGrip() : valueFront;
+  const valueGrip = valueFront && valueFront.getGrip ? valueFront.getGrip() : valueFront;
 
   return { valueGrip, headersGrip };
 }
@@ -157,9 +149,7 @@ const VALUE_NAME = "_value";
 
 function getNamedIndexes(type) {
   return {
-    [INDEX_NAME]: getArrayTypeNames()
-      .concat("Object")
-      .includes(type)
+    [INDEX_NAME]: getArrayTypeNames().concat("Object").includes(type)
       ? l10n.getStr("table.index")
       : l10n.getStr("table.iterationIndex"),
     [VALUE_NAME]: l10n.getStr("table.value"),
@@ -170,9 +160,7 @@ function getNamedIndexes(type) {
 function hasValidCustomHeaders(headers) {
   return (
     Array.isArray(headers) &&
-    headers.every(
-      header => typeof header === "string" || Number.isInteger(Number(header))
-    )
+    headers.every(header => typeof header === "string" || Number.isInteger(Number(header)))
   );
 }
 
@@ -196,9 +184,7 @@ function getTableItems(data = {}, type, headers = null) {
     if (
       !columnExists &&
       !hasMaxColumns &&
-      (!validCustomHeaders ||
-        headers.includes(columnIndex) ||
-        columnIndex === INDEX_NAME)
+      (!validCustomHeaders || headers.includes(columnIndex) || columnIndex === INDEX_NAME)
     ) {
       columns.set(columnIndex, namedIndexes[columnIndex] || columnIndex);
     }
@@ -215,9 +201,7 @@ function getTableItems(data = {}, type, headers = null) {
 
     const propertyValue = getDescriptorValue(property);
     const propertyValueGrip =
-      propertyValue && propertyValue.getGrip
-        ? propertyValue.getGrip()
-        : propertyValue;
+      propertyValue && propertyValue.getGrip ? propertyValue.getGrip() : propertyValue;
 
     if (propertyValueGrip && propertyValueGrip.ownProperties) {
       const entries = propertyValueGrip.ownProperties;

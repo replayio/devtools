@@ -138,12 +138,10 @@ function handleHelperResult(response) {
     }
 
     const hasErrorMessage =
-      response.exceptionMessage ||
-      (helperResult && helperResult.type === "error");
+      response.exceptionMessage || (helperResult && helperResult.type === "error");
 
     // Hide undefined results coming from helper functions.
-    const hasUndefinedResult =
-      result && typeof result == "object" && result.type == "undefined";
+    const hasUndefinedResult = result && typeof result == "object" && result.type == "undefined";
 
     if (hasErrorMessage || helperHasRawOutput || !hasUndefinedResult) {
       dispatch(messagesActions.messagesAdd([response]));
@@ -225,10 +223,7 @@ function terminalInputChanged(expression) {
 function getEagerEvaluationResult(response) {
   const result = response.exception || response.result;
   // Don't show syntax errors results to the user.
-  if (
-    (result && result.isSyntaxError) ||
-    (result && result.type == "undefined")
-  ) {
+  if ((result && result.isSyntaxError) || (result && result.type == "undefined")) {
     return null;
   }
 

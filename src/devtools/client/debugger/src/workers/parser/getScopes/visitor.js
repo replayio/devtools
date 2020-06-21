@@ -7,11 +7,7 @@
 import isEmpty from "lodash/isEmpty";
 import type { SourceId, SourceLocation } from "../../../types";
 import * as t from "@babel/types";
-import type {
-  Node,
-  TraversalAncestors,
-  Location as BabelLocation,
-} from "@babel/types";
+import type { Node, TraversalAncestors, Location as BabelLocation } from "@babel/types";
 
 import getFunctionName from "../utils/getFunctionName";
 import { getAst } from "../utils/ast";
@@ -36,13 +32,7 @@ import { getAst } from "../utils/ast";
  * "global"
  * Variables that reference undeclared global values.
  */
-export type BindingType =
-  | "implicit"
-  | "var"
-  | "const"
-  | "let"
-  | "import"
-  | "global";
+export type BindingType = "implicit" | "var" | "const" | "let" | "import" | "global";
 
 export type BindingLocationType = "ref" | BindingDeclarationType;
 export type BindingDeclarationType =
@@ -206,10 +196,7 @@ export function buildScopeList(ast: Node, sourceId: SourceId) {
   return toParsedScopes([global], sourceId) || [];
 }
 
-function toParsedScopes(
-  children: TempScope[],
-  sourceId: SourceId
-): ?(ParsedScope[]) {
+function toParsedScopes(children: TempScope[], sourceId: SourceId): ?(ParsedScope[]) {
   if (!children || children.length === 0) {
     return undefined;
   }
@@ -218,10 +205,7 @@ function toParsedScopes(
     // We also need to convert BabelLocation to the Location type.
     start: scope.loc.start,
     end: scope.loc.end,
-    type:
-      scope.type === "module" || scope.type === "function-body"
-        ? "block"
-        : scope.type,
+    type: scope.type === "module" || scope.type === "function-body" ? "block" : scope.type,
     scopeKind: "",
     displayName: scope.displayName,
     bindings: scope.bindings,
@@ -284,10 +268,7 @@ function getVarScope(scope: TempScope): TempScope {
   return s;
 }
 
-function fromBabelLocation(
-  location: BabelLocation,
-  sourceId: SourceId
-): SourceLocation {
+function fromBabelLocation(location: BabelLocation, sourceId: SourceId): SourceLocation {
   return {
     sourceId,
     line: location.line,
@@ -324,53 +305,18 @@ function parseDeclarator(
     });
   } else if (isNode(declaratorId, "ObjectPattern")) {
     declaratorId.properties.forEach(prop => {
-      parseDeclarator(
-        prop.value,
-        targetScope,
-        type,
-        locationType,
-        declaration,
-        state
-      );
+      parseDeclarator(prop.value, targetScope, type, locationType, declaration, state);
     });
   } else if (isNode(declaratorId, "ArrayPattern")) {
     declaratorId.elements.forEach(item => {
-      parseDeclarator(
-        item,
-        targetScope,
-        type,
-        locationType,
-        declaration,
-        state
-      );
+      parseDeclarator(item, targetScope, type, locationType, declaration, state);
     });
   } else if (isNode(declaratorId, "AssignmentPattern")) {
-    parseDeclarator(
-      declaratorId.left,
-      targetScope,
-      type,
-      locationType,
-      declaration,
-      state
-    );
+    parseDeclarator(declaratorId.left, targetScope, type, locationType, declaration, state);
   } else if (isNode(declaratorId, "RestElement")) {
-    parseDeclarator(
-      declaratorId.argument,
-      targetScope,
-      type,
-      locationType,
-      declaration,
-      state
-    );
+    parseDeclarator(declaratorId.argument, targetScope, type, locationType, declaration, state);
   } else if (t.isTSParameterProperty(declaratorId)) {
-    parseDeclarator(
-      declaratorId.parameter,
-      targetScope,
-      type,
-      locationType,
-      declaration,
-      state
-    );
+    parseDeclarator(declaratorId.parameter, targetScope, type, locationType, declaration, state);
   }
 }
 
@@ -420,15 +366,10 @@ function createGlobalScope(
 
 const scopeCollectionVisitor = {
   // eslint-disable-next-line complexity
-  enter(
-    node: Node,
-    ancestors: TraversalAncestors,
-    state: ScopeCollectionVisitorState
-  ) {
+  enter(node: Node, ancestors: TraversalAncestors, state: ScopeCollectionVisitorState) {
     state.scopeStack.push(state.scope);
 
-    const parentNode =
-      ancestors.length === 0 ? null : ancestors[ancestors.length - 1].node;
+    const parentNode = ancestors.length === 0 ? null : ancestors[ancestors.length - 1].node;
 
     if (state.inType) {
       return;
@@ -496,24 +437,17 @@ const scopeCollectionVisitor = {
         }
       }
 
-      scope = pushTempScope(
-        state,
-        "function",
-        getFunctionName(node, parentNode),
-        {
-          // Being at the start of a function doesn't count as
-          // being inside of it.
-          start: fromBabelLocation(
-            node.params[0] ? node.params[0].loc.start : node.loc.start,
-            state.sourceId
-          ),
-          end: fromBabelLocation(node.loc.end, state.sourceId),
-        }
-      );
+      scope = pushTempScope(state, "function", getFunctionName(node, parentNode), {
+        // Being at the start of a function doesn't count as
+        // being inside of it.
+        start: fromBabelLocation(
+          node.params[0] ? node.params[0].loc.start : node.loc.start,
+          state.sourceId
+        ),
+        end: fromBabelLocation(node.loc.end, state.sourceId),
+      });
 
-      node.params.forEach(param =>
-        parseDeclarator(param, scope, "var", "fn-param", node, state)
-      );
+      node.params.forEach(param => parseDeclarator(param, scope, "var", "fn-param", node, state));
 
       if (!t.isArrowFunctionExpression(node)) {
         scope.bindings.this = {
@@ -526,10 +460,7 @@ const scopeCollectionVisitor = {
         };
       }
 
-      if (
-        t.isBlockStatement(node.body) &&
-        hasLexicalDeclaration(node.body, node)
-      ) {
+      if (t.isBlockStatement(node.body) && hasLexicalDeclaration(node.body, node)) {
         scope = pushTempScope(state, "function-body", "Function Body", {
           start: fromBabelLocation(node.body.loc.start, state.sourceId),
           end: fromBabelLocation(node.body.loc.end, state.sourceId),
@@ -626,23 +557,11 @@ const scopeCollectionVisitor = {
         !t.isForXStatement(parentNode, { left: node }))
     ) {
       // Finds right lexical environment
-      const hoistAt = !isLetOrConst(node)
-        ? getVarScope(state.scope)
-        : state.scope;
+      const hoistAt = !isLetOrConst(node) ? getVarScope(state.scope) : state.scope;
       node.declarations.forEach(declarator => {
-        parseDeclarator(
-          declarator.id,
-          hoistAt,
-          node.kind,
-          node.kind,
-          node,
-          state
-        );
+        parseDeclarator(declarator.id, hoistAt, node.kind, node.kind, node, state);
       });
-    } else if (
-      t.isImportDeclaration(node) &&
-      (!node.importKind || node.importKind === "value")
-    ) {
+    } else if (t.isImportDeclaration(node) && (!node.importKind || node.importKind === "value")) {
       node.specifiers.forEach(spec => {
         if (spec.importKind && spec.importKind !== "value") {
           return;
@@ -677,9 +596,7 @@ const scopeCollectionVisitor = {
                 type: "import-decl",
                 start: fromBabelLocation(spec.local.loc.start, state.sourceId),
                 end: fromBabelLocation(spec.local.loc.end, state.sourceId),
-                importName: t.isImportDefaultSpecifier(spec)
-                  ? "default"
-                  : spec.imported.name,
+                importName: t.isImportDefaultSpecifier(spec) ? "default" : spec.imported.name,
                 declaration: {
                   start: fromBabelLocation(node.loc.start, state.sourceId),
                   end: fromBabelLocation(node.loc.end, state.sourceId),
@@ -789,10 +706,7 @@ const scopeCollectionVisitor = {
         type: "implicit",
         refs: [],
       };
-    } else if (
-      t.isSwitchStatement(node) &&
-      hasLexicalDeclaration(node, parentNode)
-    ) {
+    } else if (t.isSwitchStatement(node) && hasLexicalDeclaration(node, parentNode)) {
       pushTempScope(state, "block", "Switch", {
         start: fromBabelLocation(node.loc.start, state.sourceId),
         end: fromBabelLocation(node.loc.end, state.sourceId),
@@ -819,11 +733,7 @@ const scopeCollectionVisitor = {
       state.inType = node;
     }
   },
-  exit(
-    node: Node,
-    ancestors: TraversalAncestors,
-    state: ScopeCollectionVisitorState
-  ) {
+  exit(node: Node, ancestors: TraversalAncestors, state: ScopeCollectionVisitorState) {
     const currentScope = state.scope;
     const parentScope = state.scopeStack.pop();
     if (!parentScope) {
@@ -834,11 +744,7 @@ const scopeCollectionVisitor = {
     // It is possible, as in the case of function expressions, that a single
     // node has added multiple scopes, so we need to traverse upward here
     // rather than jumping stright to 'parentScope'.
-    for (
-      let scope = currentScope;
-      scope && scope !== parentScope;
-      scope = scope.parent
-    ) {
+    for (let scope = currentScope; scope && scope !== parentScope; scope = scope.parent) {
       const { freeVariables } = state;
       state.freeVariables = state.freeVariableStack.pop();
       const parentFreeVariables = state.freeVariables;
@@ -874,10 +780,7 @@ const scopeCollectionVisitor = {
   },
 };
 
-function isOpeningJSXIdentifier(
-  node: Node,
-  ancestors: TraversalAncestors
-): boolean {
+function isOpeningJSXIdentifier(node: Node, ancestors: TraversalAncestors): boolean {
   if (!t.isJSXIdentifier(node)) {
     return false;
   }
@@ -960,12 +863,7 @@ function buildMetaBindings(
           start: fromBabelLocation(parent.loc.start, sourceId),
           end: fromBabelLocation(parent.loc.end, sourceId),
           property: parent.property.value,
-          parent: buildMetaBindings(
-            sourceId,
-            parent,
-            ancestors,
-            parentIndex - 1
-          ),
+          parent: buildMetaBindings(sourceId, parent, ancestors, parentIndex - 1),
         };
       }
     } else {
@@ -978,10 +876,7 @@ function buildMetaBindings(
       };
     }
   }
-  if (
-    t.isCallExpression(parent, { callee: node }) &&
-    parent.arguments.length == 0
-  ) {
+  if (t.isCallExpression(parent, { callee: node }) && parent.arguments.length == 0) {
     return {
       type: "call",
       start: fromBabelLocation(parent.loc.start, sourceId),
@@ -994,8 +889,7 @@ function buildMetaBindings(
 }
 
 function looksLikeCommonJS(rootScope: TempScope): boolean {
-  const hasRefs = name =>
-    rootScope.bindings[name] && rootScope.bindings[name].refs.length > 0;
+  const hasRefs = name => rootScope.bindings[name] && rootScope.bindings[name].refs.length > 0;
 
   return (
     hasRefs("__dirname") ||

@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { LocalizationHelper } = require("devtools/shared/l10n");
@@ -87,20 +84,10 @@ class BoxModelProperties extends PureComponent {
     } = this.props;
     const { layout } = boxModel;
 
-    const layoutInfo = [
-      "box-sizing",
-      "display",
-      "float",
-      "line-height",
-      "position",
-      "z-index",
-    ];
+    const layoutInfo = ["box-sizing", "display", "float", "line-height", "position", "z-index"];
 
     const properties = layoutInfo.map(info => {
-      const {
-        referenceElement,
-        referenceElementType,
-      } = this.getReferenceElement(info);
+      const { referenceElement, referenceElementType } = this.getReferenceElement(info);
 
       return ComputedProperty({
         key: info,

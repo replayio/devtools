@@ -31,10 +31,7 @@ class SimplePath {
 
   _parentPath: SimplePath | null | void;
 
-  constructor(
-    ancestors: TraversalAncestors,
-    index: number = ancestors.length - 1
-  ) {
+  constructor(ancestors: TraversalAncestors, index: number = ancestors.length - 1) {
     if (index < 0 || index >= ancestors.length) {
       console.error(ancestors);
       throw new Error("Created invalid path");
@@ -80,8 +77,7 @@ class SimplePath {
   set node(replacement: Node): void {
     if (this.type !== "Identifier") {
       throw new Error(
-        "Replacing anything other than leaf nodes is undefined behavior " +
-          "in t.traverse()"
+        "Replacing anything other than leaf nodes is undefined behavior " + "in t.traverse()"
       );
     }
 

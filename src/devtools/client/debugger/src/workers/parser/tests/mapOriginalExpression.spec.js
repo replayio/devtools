@@ -67,13 +67,10 @@ describe("mapOriginalExpression", () => {
   });
 
   it("nested object destructuring", () => {
-    const generatedExpression = mapOriginalExpression(
-      "({ a: { b, c } } = { a: 4 })",
-      {
-        a: "_mod.foo",
-        b: "_mod.bar",
-      }
-    );
+    const generatedExpression = mapOriginalExpression("({ a: { b, c } } = { a: 4 })", {
+      a: "_mod.foo",
+      b: "_mod.bar",
+    });
 
     expect(formatOutput(generatedExpression)).toEqual(
       formatOutput("({ a: { b: _mod.bar, c } } = {\n a: 4 \n})")

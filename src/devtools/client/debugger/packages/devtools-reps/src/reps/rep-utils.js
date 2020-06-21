@@ -100,25 +100,25 @@ const escapeMap = {
 // the replacement function; see |escapeString|.
 const escapeRegexp = new RegExp(
   "[" +
-  // Quote and backslash.
-  '"\\\\' +
-  // Controls.
-  "\x00-\x1f" +
-  // More controls.
-  "\x7f-\x9f" +
-  // BOM
-  "\ufeff" +
-  // Specials, except for the replacement character.
-  "\ufff0-\ufffc\ufffe\uffff" +
-  // Surrogates.
-  "\ud800-\udfff" +
-  // Mathematical invisibles.
-  "\u2061-\u2064" +
-  // Line and paragraph separators.
-  "\u2028-\u2029" +
-  // Private use area.
-  "\ue000-\uf8ff" +
-  "]",
+    // Quote and backslash.
+    '"\\\\' +
+    // Controls.
+    "\x00-\x1f" +
+    // More controls.
+    "\x7f-\x9f" +
+    // BOM
+    "\ufeff" +
+    // Specials, except for the replacement character.
+    "\ufff0-\ufffc\ufffe\uffff" +
+    // Surrogates.
+    "\ud800-\udfff" +
+    // Mathematical invisibles.
+    "\u2061-\u2064" +
+    // Line and paragraph separators.
+    "\u2028-\u2029" +
+    // Private use area.
+    "\ue000-\uf8ff" +
+    "]",
   "g"
 );
 
@@ -318,8 +318,7 @@ function wrapRender(renderMethod) {
         {
           className: "objectBox objectBox-failure",
           title:
-            "This object could not be rendered, " +
-            "please file a bug on bugzilla.mozilla.org",
+            "This object could not be rendered, " + "please file a bug on bugzilla.mozilla.org",
         },
         /* Labels have to be hardcoded for reps, see Bug 1317038. */
         "Invalid object"

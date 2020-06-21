@@ -89,12 +89,12 @@ define(function (require, exports, module) {
             },
             visible
               ? div(
-                {
-                  className: "treeHeaderCellBox",
-                  role: "presentation",
-                },
-                col.title
-              )
+                  {
+                    className: "treeHeaderCellBox",
+                    role: "presentation",
+                  },
+                  col.title
+                )
               : null
           )
         );

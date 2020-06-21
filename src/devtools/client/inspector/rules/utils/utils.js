@@ -48,9 +48,7 @@ function getDeclarationFromNode(node, rule) {
   }
 
   const declarationEl = node.closest(".ruleview-property[data-declaration-id]");
-  const declarationId = declarationEl
-    ? declarationEl.dataset.declarationId
-    : null;
+  const declarationId = declarationEl ? declarationEl.dataset.declarationId : null;
   return rule ? rule.getDeclaration(declarationId) : null;
 }
 
@@ -104,10 +102,7 @@ function getNodeInfo(node, elementStyle) {
       textProperty: declaration,
     };
   } else if (declaration && classList.contains("ruleview-font-family")) {
-    const {
-      name: propertyName,
-      value: propertyValue,
-    } = getPropertyNameAndValue(node);
+    const { name: propertyName, value: propertyValue } = getPropertyNameAndValue(node);
     type = VIEW_NODE_FONT_TYPE;
     value = {
       property: propertyName,
@@ -143,8 +138,7 @@ function getNodeInfo(node, elementStyle) {
     };
   } else if (
     declaration &&
-    (classList.contains("ruleview-variable") ||
-      classList.contains("ruleview-unmatched-variable"))
+    (classList.contains("ruleview-variable") || classList.contains("ruleview-unmatched-variable"))
   ) {
     type = VIEW_NODE_VARIABLE_TYPE;
     value = {

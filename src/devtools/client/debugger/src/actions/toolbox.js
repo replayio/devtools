@@ -12,7 +12,7 @@ import type { Grip } from "../types";
  * @static
  */
 export function openLink(url: string) {
-  return async function({ panel }: ThunkArgs) {
+  return async function ({ panel }: ThunkArgs) {
     return panel.openLink(url);
   };
 }

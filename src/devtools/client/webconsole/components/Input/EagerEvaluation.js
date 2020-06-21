@@ -8,9 +8,7 @@ const { Component } = require("react");
 const dom = require("react-dom-factories");
 const { connect } = require("react-redux");
 
-const {
-  getTerminalEagerResult,
-} = require("devtools/client/webconsole/selectors/history");
+const { getTerminalEagerResult } = require("devtools/client/webconsole/selectors/history");
 
 const actions = require("devtools/client/webconsole/actions/index");
 
@@ -39,11 +37,7 @@ class EagerEvaluation extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const {
-      highlightDomElement,
-      unHighlightDomElement,
-      terminalEagerResult,
-    } = this.props;
+    const { highlightDomElement, unHighlightDomElement, terminalEagerResult } = this.props;
 
     if (canHighlightObject(prevProps.terminalEagerResult)) {
       unHighlightDomElement(prevProps.terminalEagerResult.getGrip());
@@ -84,16 +78,16 @@ class EagerEvaluation extends Component {
       { className: "eager-evaluation-result", key: "eager-evaluation-result" },
       hasResult
         ? dom.span(
-          { className: "eager-evaluation-result__row" },
-          dom.span({
-            className: "eager-evaluation-result__icon",
-            key: "icon",
-          }),
-          dom.span(
-            { className: "eager-evaluation-result__text", key: "text" },
-            this.renderRepsResult()
+            { className: "eager-evaluation-result__row" },
+            dom.span({
+              className: "eager-evaluation-result__icon",
+              key: "icon",
+            }),
+            dom.span(
+              { className: "eager-evaluation-result__text", key: "text" },
+              this.renderRepsResult()
+            )
           )
-        )
         : null
     );
   }
@@ -103,8 +97,7 @@ function canHighlightObject(obj) {
   const grip = obj && obj.getGrip && obj.getGrip();
   return (
     grip &&
-    (REPS.ElementNode.supportsObject(grip) ||
-      REPS.TextNode.supportsObject(grip)) &&
+    (REPS.ElementNode.supportsObject(grip) || REPS.TextNode.supportsObject(grip)) &&
     grip.preview.isConnected
   );
 }
@@ -118,11 +111,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     highlightDomElement: grip => dispatch(actions.highlightDomElement(grip)),
-    unHighlightDomElement: grip =>
-      dispatch(actions.unHighlightDomElement(grip)),
+    unHighlightDomElement: grip => dispatch(actions.unHighlightDomElement(grip)),
   };
 }
-module.exports = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(EagerEvaluation);
+module.exports = connect(mapStateToProps, mapDispatchToProps)(EagerEvaluation);

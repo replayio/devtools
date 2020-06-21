@@ -24,10 +24,7 @@ import {
 } from "../workers/pretty-print";
 
 import { ParserDispatcher } from "../workers/parser";
-import {
-  start as startSearchWorker,
-  stop as stopSearchWorker,
-} from "../workers/search";
+import { start as startSearchWorker, stop as stopSearchWorker } from "../workers/search";
 import { clearDocuments } from "../utils/editor";
 import { clearHistory } from "./utils/history";
 
@@ -67,13 +64,8 @@ export const parserWorker = new ParserDispatcher();
 export const evaluationsParser = new ParserDispatcher();
 
 beforeAll(() => {
-  startSourceMapWorker(
-    path.join(rootPath, "node_modules/devtools-source-map/src/worker.js"),
-    ""
-  );
-  startPrettyPrintWorker(
-    path.join(rootPath, "src/workers/pretty-print/worker.js")
-  );
+  startSourceMapWorker(path.join(rootPath, "node_modules/devtools-source-map/src/worker.js"), "");
+  startPrettyPrintWorker(path.join(rootPath, "src/workers/pretty-print/worker.js"));
   parserWorker.start(path.join(rootPath, "src/workers/parser/worker.js"));
   evaluationsParser.start(path.join(rootPath, "src/workers/parser/worker.js"));
   startSearchWorker(path.join(rootPath, "src/workers/search/worker.js"));
@@ -120,13 +112,13 @@ if (!global.Promise.prototype.finally) {
     const { constructor } = this;
 
     return this.then(
-      function(value) {
-        return constructor.resolve(callback()).then(function() {
+      function (value) {
+        return constructor.resolve(callback()).then(function () {
           return value;
         });
       },
-      function(reason) {
-        return constructor.resolve(callback()).then(function() {
+      function (reason) {
+        return constructor.resolve(callback()).then(function () {
           throw reason;
         });
       }

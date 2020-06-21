@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createStore,
-  applyMiddleware,
-} = require("devtools/client/shared/vendor/redux");
+const { createStore, applyMiddleware } = require("devtools/client/shared/vendor/redux");
 const { task } = require("devtools/client/shared/redux/middleware/task");
 
 /**
@@ -19,7 +16,7 @@ function run_test() {
   run_next_test();
 }
 
-add_task(async function() {
+add_task(async function () {
   const store = applyMiddleware(task)(createStore)(reducer);
 
   store.dispatch(fetch1("generator"));
@@ -32,20 +29,12 @@ add_task(async function() {
 
   store.dispatch(fetch2("sync"));
   await waitUntilState(store, () => store.getState().length === 2);
-  equal(
-    store.getState()[1].data,
-    "sync",
-    "task middleware sync dispatches an action via sync"
-  );
+  equal(store.getState()[1].data, "sync", "task middleware sync dispatches an action via sync");
 });
 
 function fetch1(data) {
-  return async function(dispatch, getState) {
-    equal(
-      getState().length,
-      0,
-      "`getState` is accessible in a generator action"
-    );
+  return async function (dispatch, getState) {
+    equal(getState().length, 0, "`getState` is accessible in a generator action");
     let moreData = await new Promise(resolve => resolve(data));
     // Ensure it handles more than one yield
     moreData = await new Promise(resolve => resolve(data));

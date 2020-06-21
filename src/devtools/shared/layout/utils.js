@@ -5,11 +5,7 @@
 "use strict";
 
 //const nodeFilterConstants = require("devtools/shared/dom-node-filter-constants");
-loader.lazyRequireGetter(
-  this,
-  "DevToolsUtils",
-  "devtools/shared/DevToolsUtils"
-);
+loader.lazyRequireGetter(this, "DevToolsUtils", "devtools/shared/DevToolsUtils");
 loader.lazyRequireGetter(this, "ChromeUtils");
 
 const SHEET_TYPE = {
@@ -125,12 +121,7 @@ exports.getFrameOffsets = getFrameOffsets;
  *        An array of objects that have the same structure as quads returned by
  *        getBoxQuads. An empty array if the node has no quads or is invalid.
  */
-function getAdjustedQuads(
-  boundaryWindow,
-  node,
-  region,
-  { ignoreZoom, ignoreScroll } = {}
-) {
+function getAdjustedQuads(boundaryWindow, node, region, { ignoreZoom, ignoreScroll } = {}) {
   if (!node || !node.getBoxQuads) {
     return [];
   }
@@ -142,9 +133,7 @@ function getAdjustedQuads(
   }
 
   const scale = ignoreZoom ? 1 : getCurrentZoom(node);
-  const { scrollX, scrollY } = ignoreScroll
-    ? { scrollX: 0, scrollY: 0 }
-    : boundaryWindow;
+  const { scrollX, scrollY } = ignoreScroll ? { scrollX: 0, scrollY: 0 } : boundaryWindow;
 
   const xOffset = scrollX * scale;
   const yOffset = scrollY * scale;
@@ -419,9 +408,7 @@ exports.isNativeAnonymous = isAnonymous;
  * @return {Boolean}
  */
 function isTemplateElement(node) {
-  return (
-    node.ownerGlobal && node instanceof node.ownerGlobal.HTMLTemplateElement
-  );
+  return node.ownerGlobal && node instanceof node.ownerGlobal.HTMLTemplateElement;
 }
 exports.isTemplateElement = isTemplateElement;
 

@@ -16,9 +16,7 @@ const { getAdHocFrontOrPrimitiveGrip } = require("protocol/object");
 
 const { constants } = require("devtools/client/webconsole/constants");
 
-const {
-  START_IGNORE_ACTION,
-} = require("devtools/client/shared/redux/middleware/ignore");
+const { START_IGNORE_ACTION } = require("devtools/client/shared/redux/middleware/ignore");
 const ConsoleCommands = require("devtools/client/webconsole/commands.js");
 
 const ZoomKeys = require("devtools/client/shared/zoom-keys");
@@ -44,9 +42,7 @@ class WebConsoleUI {
     this.isBrowserConsole = this.hud.isBrowserConsole;
 
     this._onPanelSelected = this._onPanelSelected.bind(this);
-    this._onChangeSplitConsoleState = this._onChangeSplitConsoleState.bind(
-      this
-    );
+    this._onChangeSplitConsoleState = this._onChangeSplitConsoleState.bind(this);
     this._onTargetDestroyed = this._onTargetDestroyed.bind(this);
 
     EventEmitter.decorate(this);
@@ -97,9 +93,7 @@ class WebConsoleUI {
     // Ignore Fronts that are already destroyed
     if (filterDisconnectedProxies) {
       proxies = proxies.filter(proxy => {
-        return (
-          proxy && proxy.webConsoleFront && !!proxy.webConsoleFront.actorID
-        );
+        return proxy && proxy.webConsoleFront && !!proxy.webConsoleFront.actorID;
       });
     }
 
@@ -300,12 +294,7 @@ class WebConsoleUI {
 
     const WebConsoleWrapper = require("devtools/client/webconsole/webconsole-wrapper");
 
-    this.wrapper = new WebConsoleWrapper(
-      this.outputNode,
-      this,
-      toolbox,
-      this.document
-    );
+    this.wrapper = new WebConsoleWrapper(this.outputNode, this, toolbox, this.document);
 
     this._initShortcuts();
     this._initOutputSyntaxHighlighting();
@@ -324,11 +313,7 @@ class WebConsoleUI {
       const editor = this.jsterm && this.jsterm.editor;
       if (node && editor) {
         node.classList.add("cm-s-mozilla");
-        editor.CodeMirror.runMode(
-          node.textContent,
-          "application/javascript",
-          node
-        );
+        editor.CodeMirror.runMode(node.textContent, "application/javascript", node);
       }
     };
 

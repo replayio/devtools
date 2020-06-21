@@ -4,12 +4,7 @@
 
 // @flow
 
-import {
-  actions,
-  selectors,
-  createStore,
-  makeSource,
-} from "../../utils/test-head";
+import { actions, selectors, createStore, makeSource } from "../../utils/test-head";
 
 import { makeMockFrame } from "../../utils/test-mockup";
 
@@ -180,7 +175,5 @@ async function createFrames(getState, dispatch) {
     })
   );
 
-  await dispatch(
-    actions.selectFrame(selectors.getThreadContext(getState()), frame)
-  );
+  await dispatch(actions.selectFrame(selectors.getThreadContext(getState()), frame));
 }

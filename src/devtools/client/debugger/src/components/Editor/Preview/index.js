@@ -104,13 +104,7 @@ class Preview extends PureComponent<Props, State> {
       return null;
     }
 
-    return (
-      <Popup
-        preview={preview}
-        editor={this.props.editor}
-        editorRef={this.props.editorRef}
-      />
-    );
+    return <Popup preview={preview} editor={this.props.editor} editorRef={this.props.editorRef} />;
   }
 }
 
@@ -123,11 +117,8 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    clearPreview: actions.clearPreview,
-    addExpression: actions.addExpression,
-    updatePreview: actions.updatePreview,
-  }
-)(Preview);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  clearPreview: actions.clearPreview,
+  addExpression: actions.addExpression,
+  updatePreview: actions.updatePreview,
+})(Preview);

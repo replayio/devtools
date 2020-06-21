@@ -32,10 +32,7 @@ export function initialPreviewState(): PreviewState {
   };
 }
 
-function update(
-  state: PreviewState = initialPreviewState(),
-  action: Action
-): PreviewState {
+function update(state: PreviewState = initialPreviewState(), action: Action): PreviewState {
   switch (action.type) {
     case "CLEAR_PREVIEW": {
       return { ...state, preview: null };

@@ -83,21 +83,9 @@ const AVAILABLE_BREAKPOINTS = [
   {
     name: "Animation",
     items: [
-      animationEvent(
-        "request",
-        "Request Animation Frame",
-        "requestAnimationFrame"
-      ),
-      animationEvent(
-        "cancel",
-        "Cancel Animation Frame",
-        "cancelAnimationFrame"
-      ),
-      animationEvent(
-        "fire",
-        "Animation Frame fired",
-        "requestAnimationFrameCallback"
-      ),
+      animationEvent("request", "Request Animation Frame", "requestAnimationFrame"),
+      animationEvent("cancel", "Cancel Animation Frame", "cancelAnimationFrame"),
+      animationEvent("fire", "Animation Frame fired", "requestAnimationFrameCallback"),
     ],
   },
   {
@@ -148,10 +136,7 @@ const AVAILABLE_BREAKPOINTS = [
   },
   {
     name: "Device",
-    items: [
-      globalEvent("device", "deviceorientation"),
-      globalEvent("device", "devicemotion"),
-    ],
+    items: [globalEvent("device", "deviceorientation"), globalEvent("device", "devicemotion")],
   },
   {
     name: "Drag and Drop",
@@ -168,8 +153,7 @@ const AVAILABLE_BREAKPOINTS = [
   {
     name: "Keyboard",
     items: [
-      Services.prefs &&
-      Services.prefs.getBoolPref("dom.input_events.beforeinput.enabled")
+      Services.prefs && Services.prefs.getBoolPref("dom.input_events.beforeinput.enabled")
         ? generalEvent("keyboard", "beforeinput")
         : null,
       generalEvent("keyboard", "input"),
@@ -259,12 +243,7 @@ const AVAILABLE_BREAKPOINTS = [
       timerEvent("timeout", "fire", "setTimeout fired", "setTimeoutCallback"),
       timerEvent("interval", "set", "setInterval", "setInterval"),
       timerEvent("interval", "clear", "clearInterval", "clearInterval"),
-      timerEvent(
-        "interval",
-        "fire",
-        "setInterval fired",
-        "setIntervalCallback"
-      ),
+      timerEvent("interval", "fire", "setInterval fired", "setIntervalCallback"),
     ],
   },
   {
@@ -404,16 +383,11 @@ function eventBreakpointForNotification(dbg, notification) {
 
       const nodeType = currentTarget.getProperty("nodeType").return;
       const namespaceURI = currentTarget.getProperty("namespaceURI").return;
-      if (
-        nodeType !== 1 /* ELEMENT_NODE */ ||
-        namespaceURI !== "http://www.w3.org/1999/xhtml"
-      ) {
+      if (nodeType !== 1 /* ELEMENT_NODE */ || namespaceURI !== "http://www.w3.org/1999/xhtml") {
         return null;
       }
 
-      const nodeName = currentTarget
-        .getProperty("nodeName")
-        .return.toLowerCase();
+      const nodeName = currentTarget.getProperty("nodeName").return.toLowerCase();
       if (nodeName !== "audio" && nodeName !== "video") {
         return null;
       }

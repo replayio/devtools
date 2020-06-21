@@ -98,10 +98,7 @@ export function toEditorPosition(location: SourceLocation): EditorPosition {
   };
 }
 
-export function toEditorRange(
-  sourceId: string,
-  location: AstLocation
-): EditorRange {
+export function toEditorRange(sourceId: string, location: AstLocation): EditorRange {
   const { start, end } = location;
   return {
     start: toEditorPosition({ ...start, sourceId }),
@@ -141,11 +138,7 @@ function isVisible(codeMirror: any, top: number, left: number) {
     scrollLeft + (scrollArea.clientWidth - 30) - charWidth
   );
 
-  const inYView = withinBounds(
-    top,
-    scrollTop,
-    scrollTop + scrollArea.clientHeight - fontHeight
-  );
+  const inYView = withinBounds(top, scrollTop, scrollTop + scrollArea.clientHeight - fontHeight);
 
   return inXView && inYView;
 }
@@ -168,17 +161,14 @@ export function getLocationsInViewport(
   const scrollArea = codeMirror.getScrollInfo();
   const { scrollLeft } = codeMirror.doc;
   const rect = codeMirror.getWrapperElement().getBoundingClientRect();
-  const topVisibleLine =
-    codeMirror.lineAtHeight(rect.top, "window") - offsetVerticalLines;
-  const bottomVisibleLine =
-    codeMirror.lineAtHeight(rect.bottom, "window") + offsetVerticalLines;
+  const topVisibleLine = codeMirror.lineAtHeight(rect.top, "window") - offsetVerticalLines;
+  const bottomVisibleLine = codeMirror.lineAtHeight(rect.bottom, "window") + offsetVerticalLines;
 
   const leftColumn = Math.floor(
     scrollLeft > 0 ? scrollLeft / charWidth - offsetHorizontalCharacters : 0
   );
   const rightPosition = scrollLeft + (scrollArea.clientWidth - 30);
-  const rightCharacter =
-    Math.floor(rightPosition / charWidth) + offsetHorizontalCharacters;
+  const rightCharacter = Math.floor(rightPosition / charWidth) + offsetHorizontalCharacters;
 
   return {
     start: {
@@ -192,11 +182,7 @@ export function getLocationsInViewport(
   };
 }
 
-export function markText(
-  { codeMirror }: Object,
-  className: string,
-  { start, end }: EditorRange
-) {
+export function markText({ codeMirror }: Object, className: string, { start, end }: EditorRange) {
   return codeMirror.markText(
     { ch: start.column, line: start.line },
     { ch: end.column, line: end.line },
@@ -204,11 +190,7 @@ export function markText(
   );
 }
 
-export function lineAtHeight(
-  { codeMirror }: Object,
-  sourceId: string,
-  event: MouseEvent
-) {
+export function lineAtHeight({ codeMirror }: Object, sourceId: string, event: MouseEvent) {
   const _editorLine = codeMirror.lineAtHeight(event.clientY);
   return toSourceLine(sourceId, _editorLine);
 }
@@ -237,11 +219,7 @@ export function forEachLine(codeMirror: Object, iter: Function) {
   });
 }
 
-export function removeLineClass(
-  codeMirror: Object,
-  line: number,
-  className: string
-) {
+export function removeLineClass(codeMirror: Object, line: number, className: string) {
   codeMirror.removeLineClass(line, "line", className);
 }
 

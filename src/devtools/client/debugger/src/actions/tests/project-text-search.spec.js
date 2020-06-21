@@ -4,19 +4,9 @@
 
 // @flow
 
-import {
-  actions,
-  createStore,
-  selectors,
-  makeSource,
-} from "../../utils/test-head";
+import { actions, createStore, selectors, makeSource } from "../../utils/test-head";
 
-const {
-  getSource,
-  getTextSearchQuery,
-  getTextSearchResults,
-  getTextSearchStatus,
-} = selectors;
+const { getSource, getTextSearchQuery, getTextSearchResults, getTextSearchStatus } = selectors;
 
 const sources = {
   foo1: {
@@ -80,9 +70,7 @@ describe("project text search", () => {
 
     const { dispatch, getState, cx } = createStore(threadFront, {}, mockMaps);
 
-    const source1 = await dispatch(
-      actions.newGeneratedSource(makeSource("bar"))
-    );
+    const source1 = await dispatch(actions.newGeneratedSource(makeSource("bar")));
     await dispatch(actions.loadSourceText({ cx, source: source1 }));
 
     await dispatch(actions.togglePrettyPrint(cx, source1.id));
@@ -96,9 +84,7 @@ describe("project text search", () => {
   it("should search a specific source", async () => {
     const { dispatch, getState, cx } = createStore(threadFront);
 
-    const source = await dispatch(
-      actions.newGeneratedSource(makeSource("bar"))
-    );
+    const source = await dispatch(actions.newGeneratedSource(makeSource("bar")));
     await dispatch(actions.loadSourceText({ cx, source }));
 
     dispatch(actions.addSearchQuery(cx, "bla"));

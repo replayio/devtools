@@ -48,9 +48,7 @@ describe("MessageContainer component:", () => {
       },
       {
         component: PageError,
-        message: stubPreparedMessages.get(
-          "ReferenceError: asdf is not defined"
-        ),
+        message: stubPreparedMessages.get("ReferenceError: asdf is not defined"),
       },
       {
         component: CSSWarning,

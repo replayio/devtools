@@ -5,18 +5,10 @@
 "use strict";
 
 const Services = require("Services");
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 
-loader.lazyRequireGetter(
-  this,
-  "openDocLink",
-  "devtools/client/shared/link",
-  true
-);
+loader.lazyRequireGetter(this, "openDocLink", "devtools/client/shared/link", true);
 
 const UnsupportedBrowserList = createFactory(
   require("devtools/client/inspector/compatibility/components/UnsupportedBrowserList")
@@ -79,10 +71,7 @@ class IssueItem extends PureComponent {
     }
 
     return causes.length
-      ? dom.span(
-        { className: "compatibility-issue-item__causes" },
-        `(${causes.join(",")})`
-      )
+      ? dom.span({ className: "compatibility-issue-item__causes" }, `(${causes.join(",")})`)
       : null;
   }
 
@@ -95,13 +84,7 @@ class IssueItem extends PureComponent {
   }
 
   render() {
-    const {
-      deprecated,
-      experimental,
-      property,
-      unsupportedBrowsers,
-      url,
-    } = this.props;
+    const { deprecated, experimental, property, unsupportedBrowsers, url } = this.props;
 
     const classes = ["compatibility-issue-item"];
 

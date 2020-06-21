@@ -33,11 +33,7 @@ export function mockPendingBreakpoint(overrides: Object = {}) {
   };
 }
 
-export function generateBreakpoint(
-  filename: string,
-  line: number = 5,
-  column: number = 0
-) {
+export function generateBreakpoint(filename: string, line: number = 5, column: number = 0) {
   return {
     id: "breakpoint",
     originalText: "",

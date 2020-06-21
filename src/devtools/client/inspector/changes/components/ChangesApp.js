@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
@@ -15,12 +12,8 @@ const { connect } = require("react-redux");
 const CSSDeclaration = createFactory(
   require("devtools/client/inspector/changes/components/CSSDeclaration")
 );
-const {
-  getChangesTree,
-} = require("devtools/client/inspector/changes/selectors/changes");
-const {
-  getSourceForDisplay,
-} = require("devtools/client/inspector/changes/utils/changes-utils");
+const { getChangesTree } = require("devtools/client/inspector/changes/selectors/changes");
+const { getSourceForDisplay } = require("devtools/client/inspector/changes/utils/changes-utils");
 const { getStr } = require("devtools/client/inspector/changes/utils/l10n");
 
 class ChangesApp extends PureComponent {

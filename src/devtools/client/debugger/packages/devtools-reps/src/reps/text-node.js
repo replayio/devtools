@@ -3,10 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // ReactJS
-const {
-  button,
-  span,
-} = require("react-dom-factories");
+const { button, span } = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
 // Reps

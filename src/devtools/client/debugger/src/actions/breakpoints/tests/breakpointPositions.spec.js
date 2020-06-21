@@ -24,20 +24,14 @@ describe("breakpointPositions", () => {
     });
 
     const { dispatch, getState, cx } = store;
-    const source = await dispatch(
-      actions.newGeneratedSource(makeSource("foo"))
-    );
+    const source = await dispatch(actions.newGeneratedSource(makeSource("foo")));
     await dispatch(actions.loadSourceById(cx, source.id));
 
     dispatch(actions.setBreakpointPositions({ cx, sourceId: "foo", line: 9 }));
 
-    await waitForState(store, state =>
-      selectors.hasBreakpointPositions(state, "foo")
-    );
+    await waitForState(store, state => selectors.hasBreakpointPositions(state, "foo"));
 
-    expect(
-      selectors.getBreakpointPositionsForSource(getState(), "foo")
-    ).toEqual({
+    expect(selectors.getBreakpointPositionsForSource(getState(), "foo")).toEqual({
       [9]: [
         {
           location: {
@@ -73,22 +67,16 @@ describe("breakpointPositions", () => {
     });
 
     const { dispatch, getState, cx } = store;
-    const source = await dispatch(
-      actions.newGeneratedSource(makeSource("foo"))
-    );
+    const source = await dispatch(actions.newGeneratedSource(makeSource("foo")));
     await dispatch(actions.loadSourceById(cx, source.id));
 
     dispatch(actions.setBreakpointPositions({ cx, sourceId: "foo", line: 9 }));
     dispatch(actions.setBreakpointPositions({ cx, sourceId: "foo", line: 9 }));
 
     resolve({ "9": [1] });
-    await waitForState(store, state =>
-      selectors.hasBreakpointPositions(state, "foo")
-    );
+    await waitForState(store, state => selectors.hasBreakpointPositions(state, "foo"));
 
-    expect(
-      selectors.getBreakpointPositionsForSource(getState(), "foo")
-    ).toEqual({
+    expect(selectors.getBreakpointPositionsForSource(getState(), "foo")).toEqual({
       [9]: [
         {
           location: {

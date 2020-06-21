@@ -40,8 +40,7 @@ function evaluate(dbg: Object, expression: any) {
 
 function bindSelectors(obj: Object): Object {
   return Object.keys(obj.selectors).reduce((bound, selector) => {
-    bound[selector] = (a, b, c) =>
-      obj.selectors[selector](obj.store.getState(), a, b, c);
+    bound[selector] = (a, b, c) => obj.selectors[selector](obj.store.getState(), a, b, c);
     return bound;
   }, {});
 }

@@ -6,12 +6,7 @@
 
 import { makeMockSource } from "../../../utils/test-mockup";
 
-import {
-  collapseTree,
-  formatTree,
-  addToTree,
-  createDirectoryNode,
-} from "../index";
+import { collapseTree, formatTree, addToTree, createDirectoryNode } from "../index";
 
 const abcSource = makeMockSource("http://example.com/a/b/c.js", "actor1");
 const abcdeSource = makeMockSource("http://example.com/a/b/c/d/e.js", "actor2");

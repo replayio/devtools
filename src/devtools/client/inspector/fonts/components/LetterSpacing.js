@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 
 const FontPropertyValue = createFactory(
@@ -70,12 +67,8 @@ class LetterSpacing extends PureComponent {
     min = Math.min(min, value);
     max = Math.max(max, value);
     // Allow lower and upper bounds to move to accomodate the incoming value.
-    this.historicMin[unit] = this.historicMin[unit]
-      ? Math.min(this.historicMin[unit], min)
-      : min;
-    this.historicMax[unit] = this.historicMax[unit]
-      ? Math.max(this.historicMax[unit], max)
-      : max;
+    this.historicMin[unit] = this.historicMin[unit] ? Math.min(this.historicMin[unit], min) : min;
+    this.historicMax[unit] = this.historicMax[unit] ? Math.max(this.historicMax[unit], max) : max;
 
     return FontPropertyValue({
       allowOverflow: true,

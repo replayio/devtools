@@ -29,10 +29,7 @@ function PausedDebuggerOverlay(highlighterEnv, options = {}) {
 
   this.lastTarget = null;
 
-  this.markup = new CanvasFrameAnonymousContentHelper(
-    highlighterEnv,
-    this._buildMarkup.bind(this)
-  );
+  this.markup = new CanvasFrameAnonymousContentHelper(highlighterEnv, this._buildMarkup.bind(this));
 }
 
 PausedDebuggerOverlay.prototype = {
@@ -160,14 +157,9 @@ PausedDebuggerOverlay.prototype = {
       return;
     }
 
-    if (
-      target.id.includes("step-button") ||
-      target.id.includes("resume-button")
-    ) {
+    if (target.id.includes("step-button") || target.id.includes("resume-button")) {
       // The hover should be applied to the wrapper (icon's parent node)
-      const newTarget = target.parentNode.id.includes("wrapper")
-        ? target.parentNode
-        : target;
+      const newTarget = target.parentNode.id.includes("wrapper") ? target.parentNode : target;
 
       // Remove the hover class if the user has changed buttons
       if (this.lastTarget && this.lastTarget != newTarget) {

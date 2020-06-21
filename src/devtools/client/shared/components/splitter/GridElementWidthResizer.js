@@ -4,14 +4,9 @@
 
 "use strict";
 
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
-const Draggable = createFactory(
-  require("devtools/client/shared/components/splitter/Draggable")
-);
+const Draggable = createFactory(require("devtools/client/shared/components/splitter/Draggable"));
 
 class GridElementWidthResizer extends Component {
   static get propTypes() {
@@ -68,9 +63,8 @@ class GridElementWidthResizer extends Component {
     this.setState({
       dragging: true,
       isRTLElement:
-        controlledElementNode.ownerDocument.defaultView.getComputedStyle(
-          controlledElementNode
-        ).direction === "rtl",
+        controlledElementNode.ownerDocument.defaultView.getComputedStyle(controlledElementNode)
+          .direction === "rtl",
       defaultCursor,
       defaultWidth,
     });
@@ -108,8 +102,7 @@ class GridElementWidthResizer extends Component {
     const { position } = this.props;
 
     const size =
-      (isRTLElement && position === "end") ||
-        (!isRTLElement && position === "start")
+      (isRTLElement && position === "end") || (!isRTLElement && position === "start")
         ? nodeBounds.width + (nodeBounds.left - x)
         : x - nodeBounds.left;
 

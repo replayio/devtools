@@ -8,11 +8,7 @@ import React, { Component } from "react";
 
 import ColumnBreakpoint from "./ColumnBreakpoint";
 
-import {
-  getSelectedSource,
-  visibleColumnBreakpoints,
-  getContext,
-} from "../../selectors";
+import { getSelectedSource, visibleColumnBreakpoints, getContext } from "../../selectors";
 import { connect } from "../../utils/connect";
 import { makeBreakpointId } from "../../utils/breakpoint";
 import { breakpointItemActions } from "./menus/breakpoints";
@@ -37,19 +33,9 @@ class ColumnBreakpoints extends Component<Props> {
   props: Props;
 
   render() {
-    const {
-      cx,
-      editor,
-      columnBreakpoints,
-      selectedSource,
-      breakpointActions,
-    } = this.props;
+    const { cx, editor, columnBreakpoints, selectedSource, breakpointActions } = this.props;
 
-    if (
-      !selectedSource ||
-      selectedSource.isBlackBoxed ||
-      columnBreakpoints.length === 0
-    ) {
+    if (!selectedSource || selectedSource.isBlackBoxed || columnBreakpoints.length === 0) {
       return null;
     }
 
@@ -76,7 +62,6 @@ const mapStateToProps = state => ({
   columnBreakpoints: visibleColumnBreakpoints(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  dispatch => ({ breakpointActions: breakpointItemActions(dispatch) })
-)(ColumnBreakpoints);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, dispatch => ({
+  breakpointActions: breakpointItemActions(dispatch),
+}))(ColumnBreakpoints);

@@ -59,15 +59,11 @@ export function getActiveEventListeners(state: State): EventListenerActiveList {
   return state.eventListenerBreakpoints.active;
 }
 
-export function getEventListenerBreakpointTypes(
-  state: State
-): EventListenerCategoryList {
+export function getEventListenerBreakpointTypes(state: State): EventListenerCategoryList {
   return state.eventListenerBreakpoints.categories;
 }
 
-export function getEventListenerExpanded(
-  state: State
-): EventListenerExpandedList {
+export function getEventListenerExpanded(state: State): EventListenerExpandedList {
   return state.eventListenerBreakpoints.expanded;
 }
 

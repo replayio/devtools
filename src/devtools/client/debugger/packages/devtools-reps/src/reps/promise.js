@@ -113,7 +113,7 @@ function getProps(props, promiseState) {
 }
 
 // Registration
-function supportsObject(object, ) {
+function supportsObject(object) {
   return object.className() == "Promise";
 }
 

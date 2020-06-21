@@ -15,18 +15,10 @@ const FilterButton = require("devtools/client/webconsole/components/FilterBar/Fi
 const FilterBar = createFactory(
   require("devtools/client/webconsole/components/FilterBar/FilterBar")
 );
-const {
-  FILTERBAR_DISPLAY_MODES,
-} = require("devtools/client/webconsole/constants");
-const {
-  MESSAGES_CLEAR,
-  FILTERS,
-} = require("devtools/client/webconsole/constants");
+const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
+const { MESSAGES_CLEAR, FILTERS } = require("devtools/client/webconsole/constants");
 
-const {
-  setupStore,
-  clearPrefs,
-} = require("devtools/client/webconsole/test/node/helpers");
+const { setupStore, clearPrefs } = require("devtools/client/webconsole/test/node/helpers");
 const serviceContainer = require("devtools/client/webconsole/test/node/fixtures/serviceContainer");
 
 function getFilterBar(overrides = {}) {
@@ -50,15 +42,11 @@ describe("FilterBar component:", () => {
     const store = setupStore();
 
     const wrapper = render(Provider({ store }, getFilterBar()));
-    const toolbar = wrapper.find(
-      ".devtools-toolbar.webconsole-filterbar-primary"
-    );
+    const toolbar = wrapper.find(".devtools-toolbar.webconsole-filterbar-primary");
 
     // Clear button
     const clearButton = toolbar.children().eq(0);
-    expect(clearButton.attr("class")).toBe(
-      "devtools-button devtools-clear-icon"
-    );
+    expect(clearButton.attr("class")).toBe("devtools-button devtools-clear-icon");
     expect(clearButton.attr("title")).toBe("Clear the Web Console output");
 
     // Separator
@@ -77,14 +65,10 @@ describe("FilterBar component:", () => {
 
     // Text filter input clear button
     const textFilterClearButton = textInput.children().eq(1);
-    expect(textFilterClearButton.attr("class")).toBe(
-      "devtools-searchinput-clear"
-    );
+    expect(textFilterClearButton.attr("class")).toBe("devtools-searchinput-clear");
 
     // Settings menu icon
-    expect(
-      wrapper.find(".webconsole-console-settings-menu-button").length
-    ).toBe(1);
+    expect(wrapper.find(".webconsole-console-settings-menu-button").length).toBe(1);
   });
 
   it("displays the number of hidden messages when a search hide messages", () => {
@@ -105,10 +89,7 @@ describe("FilterBar component:", () => {
   });
 
   it("displays the number of hidden messages when a search hide 1 message", () => {
-    const store = setupStore([
-      "console.log('foobar', 'test')",
-      "console.info('info message');",
-    ]);
+    const store = setupStore(["console.log('foobar', 'test')", "console.info('info message');"]);
     store.dispatch(actions.filterTextSet("foobar"));
 
     const wrapper = mount(Provider({ store }, getFilterBar()));

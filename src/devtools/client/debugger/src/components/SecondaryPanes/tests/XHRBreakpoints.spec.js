@@ -7,16 +7,7 @@ import React from "react";
 import { mount } from "enzyme";
 import XHRBreakpoints from "../XHRBreakpoints";
 
-const xhrMethods = [
-  "ANY",
-  "GET",
-  "POST",
-  "PUT",
-  "HEAD",
-  "DELETE",
-  "PATCH",
-  "OPTIONS",
-];
+const xhrMethods = ["ANY", "GET", "POST", "PUT", "HEAD", "DELETE", "PATCH", "OPTIONS"];
 
 // default state includes xhrBreakpoints[0] which is the checkbox that
 // enables breaking on any url during an XMLHTTPRequest
@@ -44,13 +35,13 @@ function renderXHRBreakpointsComponent(propsOverride) {
   return xhrBreakpointsComponent;
 }
 
-describe("XHR Breakpoints", function() {
-  it("should render with 0 expressions passed from props", function() {
+describe("XHR Breakpoints", function () {
+  it("should render with 0 expressions passed from props", function () {
     const xhrBreakpointsComponent = renderXHRBreakpointsComponent();
     expect(xhrBreakpointsComponent).toMatchSnapshot();
   });
 
-  it("should render with 8 expressions passed from props", function() {
+  it("should render with 8 expressions passed from props", function () {
     const allXHRBreakpointMethods = {
       xhrBreakpoints: [
         {
@@ -119,29 +110,25 @@ describe("XHR Breakpoints", function() {
       ],
     };
 
-    const xhrBreakpointsComponent = renderXHRBreakpointsComponent(
-      allXHRBreakpointMethods
-    );
+    const xhrBreakpointsComponent = renderXHRBreakpointsComponent(allXHRBreakpointMethods);
     expect(xhrBreakpointsComponent).toMatchSnapshot();
   });
 
-  it("should display xhr-input-method on click", function() {
+  it("should display xhr-input-method on click", function () {
     const xhrBreakpointsComponent = renderXHRBreakpointsComponent();
     xhrBreakpointsComponent.find(".xhr-input-url").simulate("focus");
 
-    const xhrInputContainer = xhrBreakpointsComponent.find(
-      ".xhr-input-container"
-    );
+    const xhrInputContainer = xhrBreakpointsComponent.find(".xhr-input-container");
     expect(xhrInputContainer.hasClass("focused")).toBeTruthy();
   });
 
-  it("should have focused and editing default to false", function() {
+  it("should have focused and editing default to false", function () {
     const xhrBreakpointsComponent = renderXHRBreakpointsComponent();
     expect(xhrBreakpointsComponent.state("focused")).toBe(false);
     expect(xhrBreakpointsComponent.state("editing")).toBe(false);
   });
 
-  it("should have state {..focused: true, editing: true} on focus", function() {
+  it("should have state {..focused: true, editing: true} on focus", function () {
     const xhrBreakpointsComponent = renderXHRBreakpointsComponent();
     xhrBreakpointsComponent.find(".xhr-input-url").simulate("focus");
     expect(xhrBreakpointsComponent.state("focused")).toBe(true);
@@ -150,23 +137,17 @@ describe("XHR Breakpoints", function() {
 
   // shifting focus from .xhr-input to any other element apart from
   // .xhr-input-method should unrender .xhr-input-method
-  it("shifting focus should unrender XHR methods", function() {
+  it("shifting focus should unrender XHR methods", function () {
     const propsOverride = {
       onXHRAdded: jest.fn,
       togglePauseOnAny: jest.fn,
     };
-    const xhrBreakpointsComponent = renderXHRBreakpointsComponent(
-      propsOverride
-    );
+    const xhrBreakpointsComponent = renderXHRBreakpointsComponent(propsOverride);
     xhrBreakpointsComponent.find(".xhr-input-url").simulate("focus");
-    let xhrInputContainer = xhrBreakpointsComponent.find(
-      ".xhr-input-container"
-    );
+    let xhrInputContainer = xhrBreakpointsComponent.find(".xhr-input-container");
     expect(xhrInputContainer.hasClass("focused")).toBeTruthy();
 
-    xhrBreakpointsComponent
-      .find(".breakpoints-exceptions-options")
-      .simulate("mousedown");
+    xhrBreakpointsComponent.find(".breakpoints-exceptions-options").simulate("mousedown");
     expect(xhrBreakpointsComponent.state("focused")).toBe(true);
     expect(xhrBreakpointsComponent.state("editing")).toBe(true);
     expect(xhrBreakpointsComponent.state("clickedOnFormElement")).toBe(false);
@@ -176,9 +157,7 @@ describe("XHR Breakpoints", function() {
     expect(xhrBreakpointsComponent.state("editing")).toBe(false);
     expect(xhrBreakpointsComponent.state("clickedOnFormElement")).toBe(false);
 
-    xhrBreakpointsComponent
-      .find(".breakpoints-exceptions-options")
-      .simulate("click");
+    xhrBreakpointsComponent.find(".breakpoints-exceptions-options").simulate("click");
 
     xhrInputContainer = xhrBreakpointsComponent.find(".xhr-input-container");
     expect(xhrInputContainer.hasClass("focused")).not.toBeTruthy();
@@ -186,7 +165,7 @@ describe("XHR Breakpoints", function() {
 
   // shifting focus from .xhr-input to .xhr-input-method
   // should not unrender .xhr-input-method
-  it("shifting focus to XHR methods should not unrender", function() {
+  it("shifting focus to XHR methods should not unrender", function () {
     const xhrBreakpointsComponent = renderXHRBreakpointsComponent();
     xhrBreakpointsComponent.find(".xhr-input-url").simulate("focus");
 
@@ -201,13 +180,11 @@ describe("XHR Breakpoints", function() {
     expect(xhrBreakpointsComponent.state("clickedOnFormElement")).toBe(false);
 
     xhrBreakpointsComponent.find(".xhr-input-method").simulate("click");
-    const xhrInputContainer = xhrBreakpointsComponent.find(
-      ".xhr-input-container"
-    );
+    const xhrInputContainer = xhrBreakpointsComponent.find(".xhr-input-container");
     expect(xhrInputContainer.hasClass("focused")).toBeTruthy();
   });
 
-  it("should have all 8 methods available as options", function() {
+  it("should have all 8 methods available as options", function () {
     const xhrBreakpointsComponent = renderXHRBreakpointsComponent();
     xhrBreakpointsComponent.find(".xhr-input-url").simulate("focus");
 
@@ -231,7 +208,7 @@ describe("XHR Breakpoints", function() {
     });
   });
 
-  it("should return focus to input box after selecting a method", function() {
+  it("should return focus to input box after selecting a method", function () {
     const xhrBreakpointsComponent = renderXHRBreakpointsComponent();
 
     // focus starts off at .xhr-input
@@ -242,9 +219,7 @@ describe("XHR Breakpoints", function() {
     xhrBreakpointsComponent.find(".xhr-input-method").simulate("mousedown");
     expect(xhrBreakpointsComponent.state("inputMethod")).toBe("ANY");
     expect(xhrBreakpointsComponent.state("editing")).toBe(false);
-    xhrBreakpointsComponent
-      .find(".xhr-input-method")
-      .simulate("change", methodEvent);
+    xhrBreakpointsComponent.find(".xhr-input-method").simulate("change", methodEvent);
 
     // if state.editing changes from false to true, infer that
     // this._input.focus() is called, which shifts focus back to input box
@@ -252,7 +227,7 @@ describe("XHR Breakpoints", function() {
     expect(xhrBreakpointsComponent.state("editing")).toBe(true);
   });
 
-  it("should submit the URL and method when adding a breakpoint", function() {
+  it("should submit the URL and method when adding a breakpoint", function () {
     const setXHRBreakpointCallback = jest.fn();
     const propsOverride = {
       setXHRBreakpoint: setXHRBreakpointCallback,
@@ -267,10 +242,8 @@ describe("XHR Breakpoints", function() {
 
     // check each of the available methods to see whether
     // adding them as a method to a new breakpoint works as expected
-    availableXHRMethods.forEach(function(method) {
-      const xhrBreakpointsComponent = renderXHRBreakpointsComponent(
-        propsOverride
-      );
+    availableXHRMethods.forEach(function (method) {
+      const xhrBreakpointsComponent = renderXHRBreakpointsComponent(propsOverride);
       xhrBreakpointsComponent.find(".xhr-input-url").simulate("focus");
       const urlValue = `${method.toLowerCase()}URLValue`;
 
@@ -287,7 +260,7 @@ describe("XHR Breakpoints", function() {
     });
   });
 
-  it("should submit the URL and method when editing a breakpoint", function() {
+  it("should submit the URL and method when editing a breakpoint", function () {
     const setXHRBreakpointCallback = jest.fn();
     const mockEvent = {
       preventDefault: jest.fn(),
@@ -313,14 +286,10 @@ describe("XHR Breakpoints", function() {
         },
       ],
     };
-    const xhrBreakpointsComponent = renderXHRBreakpointsComponent(
-      propsOverride
-    );
+    const xhrBreakpointsComponent = renderXHRBreakpointsComponent(propsOverride);
 
     // load xhrBreakpoints pane with one existing xhrBreakpoint
-    const existingXHRbreakpoint = xhrBreakpointsComponent.find(
-      ".xhr-container"
-    );
+    const existingXHRbreakpoint = xhrBreakpointsComponent.find(".xhr-container");
     expect(existingXHRbreakpoint).toHaveLength(1);
 
     // double click on existing breakpoint
@@ -333,10 +302,6 @@ describe("XHR Breakpoints", function() {
     xhrInput.simulate("change", { target: { value: "POSTURLValue" } });
     xhrInputMethod.simulate("change", { target: { value: "POST" } });
     xhrBreakpointsComponent.find("form").simulate("submit", mockEvent);
-    expect(setXHRBreakpointCallback).toHaveBeenCalledWith(
-      1,
-      "POSTURLValue",
-      "POST"
-    );
+    expect(setXHRBreakpointCallback).toHaveBeenCalledWith(1, "POSTURLValue", "POST");
   });
 });

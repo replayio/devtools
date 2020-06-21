@@ -14,9 +14,7 @@ describe("annotateFrames", () => {
         "https://stackblitz.io/turbo_modules/@angular/core@7.2.4/bundles/core.umd.js"
       ),
       makeMockFrameWithURL("/node_modules/zone/zone.js"),
-      makeMockFrameWithURL(
-        "https://cdnjs.cloudflare.com/ajax/libs/angular/angular.js"
-      ),
+      makeMockFrameWithURL("https://cdnjs.cloudflare.com/ajax/libs/angular/angular.js"),
     ];
     const frames = annotateFrames(callstack);
     expect(frames).toEqual(callstack.map(f => ({ ...f, library: "Angular" })));

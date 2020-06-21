@@ -4,9 +4,7 @@
 
 "use strict";
 
-const {
-  AutoRefreshHighlighter,
-} = require("devtools/server/actors/highlighters/auto-refresh");
+const { AutoRefreshHighlighter } = require("devtools/server/actors/highlighters/auto-refresh");
 const {
   CanvasFrameAnonymousContentHelper,
   createNode,
@@ -17,9 +15,7 @@ const {
   moveInfobar,
 } = require("devtools/server/actors/highlighters/utils/markup");
 const { PSEUDO_CLASSES } = require("devtools/shared/css/constants");
-const {
-  getCurrentZoom,
-} = require("devtools/shared/layout/utils");
+const { getCurrentZoom } = require("devtools/shared/layout/utils");
 const {
   getNodeDisplayName,
   getNodeGridFlexType,
@@ -316,9 +312,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
    * @return {Boolean}
    */
   _isNodeValid(node) {
-    return (
-      node && (isNodeValid(node) || isNodeValid(node, nodeConstants.TEXT_NODE))
-    );
+    return node && (isNodeValid(node) || isNodeValid(node, nodeConstants.TEXT_NODE));
   }
 
   /**
@@ -348,8 +342,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
       if (
         !this.options.hideInfoBar &&
         !node.isNodeBoundsFront() &&
-        (node.nodeType === Node.ELEMENT_NODE ||
-          node.nodeType === Node.TEXT_NODE)
+        (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.TEXT_NODE)
       ) {
         this._showInfobar();
       } else {
@@ -741,18 +734,14 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
       return;
     }
 
-    const { bindingElement: node, pseudo } = getBindingElementAndPseudo(
-      this.currentNode
-    );
+    const { bindingElement: node, pseudo } = getBindingElementAndPseudo(this.currentNode);
 
     // Update the tag, id, classes, pseudo-classes and dimensions
     const displayName = getNodeDisplayName(node);
 
     const id = node.id ? "#" + node.id : "";
 
-    const classList = (node.classList || []).length
-      ? "." + [...node.classList].join(".")
-      : "";
+    const classList = (node.classList || []).length ? "." + [...node.classList].join(".") : "";
 
     let pseudos = this._getPseudoClasses(node).join("");
     if (pseudo) {

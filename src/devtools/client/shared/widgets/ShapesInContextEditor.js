@@ -79,10 +79,7 @@ class ShapesInContextEditor {
    * turn off the shapes highlighter.
    */
   async onRuleViewChanged() {
-    if (
-      this.textProperty &&
-      (!this.textProperty.enabled || this.textProperty.overridden)
-    ) {
+    if (this.textProperty && (!this.textProperty.enabled || this.textProperty.overridden)) {
       await this.hide();
     }
   }
@@ -254,9 +251,7 @@ class ShapesInContextEditor {
 
     const pointSelector = ".ruleview-shape-point";
     // First, unmark all highlighted coordinate nodes from Rule view
-    for (const node of shapeValueEl.querySelectorAll(
-      `${pointSelector}.active`
-    )) {
+    for (const node of shapeValueEl.querySelectorAll(`${pointSelector}.active`)) {
       node.classList.remove("active");
     }
 
@@ -265,9 +260,7 @@ class ShapesInContextEditor {
       return;
     }
 
-    const point = data.point.includes(",")
-      ? data.point.split(",")[0]
-      : data.point;
+    const point = data.point.includes(",") ? data.point.split(",")[0] : data.point;
 
     /**
      * Build selector for coordinate nodes in shape value that must be highlighted.

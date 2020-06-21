@@ -14,15 +14,8 @@ import {
   getContext,
 } from "../../selectors";
 
-import {
-  isPretty,
-  getFilename,
-  shouldBlackbox,
-} from "../../utils/source";
-import {
-  getGeneratedSource,
-  canPrettyPrintSource,
-} from "../../reducers/sources";
+import { isPretty, getFilename, shouldBlackbox } from "../../utils/source";
+import { getGeneratedSource, canPrettyPrintSource } from "../../reducers/sources";
 
 import { PaneToggleButton } from "../shared/Button";
 import AccessibleImage from "../shared/AccessibleImage";
@@ -187,9 +180,7 @@ class SourceFooter extends PureComponent<Props, State> {
   }
 
   renderCommands() {
-    const commands = [this.blackBoxButton(), this.prettyPrintButton()].filter(
-      Boolean
-    );
+    const commands = [this.blackBoxButton(), this.prettyPrintButton()].filter(Boolean);
 
     return commands.length ? <div className="commands">{commands}</div> : null;
   }
@@ -244,11 +235,7 @@ class SourceFooter extends PureComponent<Props, State> {
 
     const { line, column } = this.state.cursorPosition;
 
-    const text = L10N.getFormatStr(
-      "sourceFooter.currentCursorPosition",
-      line + 1,
-      column + 1
-    );
+    const text = L10N.getFormatStr("sourceFooter.currentCursorPosition", line + 1, column + 1);
     const title = L10N.getFormatStr(
       "sourceFooter.currentCursorPosition.tooltip",
       line + 1,
@@ -282,23 +269,15 @@ const mapStateToProps = state => {
     cx: getContext(state),
     selectedSource,
     mappedSource: getGeneratedSource(state, selectedSource),
-    prettySource: getPrettySource(
-      state,
-      selectedSource ? selectedSource.id : null
-    ),
+    prettySource: getPrettySource(state, selectedSource ? selectedSource.id : null),
     endPanelCollapsed: getPaneCollapse(state, "end"),
-    canPrettyPrint: selectedSource
-      ? canPrettyPrintSource(state, selectedSource.id)
-      : false,
+    canPrettyPrint: selectedSource ? canPrettyPrintSource(state, selectedSource.id) : false,
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  {
-    togglePrettyPrint: actions.togglePrettyPrint,
-    toggleBlackBox: actions.toggleBlackBox,
-    jumpToMappedLocation: actions.jumpToMappedLocation,
-    togglePaneCollapse: actions.togglePaneCollapse,
-  }
-)(SourceFooter);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+  togglePrettyPrint: actions.togglePrettyPrint,
+  toggleBlackBox: actions.toggleBlackBox,
+  jumpToMappedLocation: actions.jumpToMappedLocation,
+  togglePaneCollapse: actions.togglePaneCollapse,
+})(SourceFooter);

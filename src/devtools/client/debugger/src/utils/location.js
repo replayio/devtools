@@ -5,13 +5,7 @@
 // @flow
 import { sortBy } from "lodash";
 
-import type {
-  MappedLocation,
-  PartialPosition,
-  SourceLocation,
-  SourceId,
-  Source,
-} from "../types";
+import type { MappedLocation, PartialPosition, SourceLocation, SourceId, Source } from "../types";
 
 type IncompleteLocation = {
   sourceId: SourceId,

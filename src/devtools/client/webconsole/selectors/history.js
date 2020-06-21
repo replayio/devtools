@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  HISTORY_BACK,
-  HISTORY_FORWARD,
-} = require("devtools/client/webconsole/constants");
+const { HISTORY_BACK, HISTORY_FORWARD } = require("devtools/client/webconsole/constants");
 
 function getHistory(state) {
   return state.history;
@@ -46,10 +43,7 @@ function getPreviousHistoryValue(state) {
 
 function getReverseSearchResult(state) {
   const { history } = state;
-  const {
-    currentReverseSearchResults,
-    currentReverseSearchResultsPosition,
-  } = history;
+  const { currentReverseSearchResults, currentReverseSearchResultsPosition } = history;
 
   if (
     !Array.isArray(currentReverseSearchResults) ||

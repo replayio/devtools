@@ -12,10 +12,7 @@ type Token = {
   type: string,
 };
 
-export function tokenAtTextPosition(
-  cm: any,
-  { line, column }: Position
-): Token | null {
+export function tokenAtTextPosition(cm: any, { line, column }: Position): Token | null {
   if (line < 0 || line >= cm.lineCount()) {
     return null;
   }

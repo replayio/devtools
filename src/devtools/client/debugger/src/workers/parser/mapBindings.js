@@ -44,9 +44,7 @@ function getAssignmentTarget(node, bindings) {
   }
 
   if (t.isIdentifier(node)) {
-    return bindings.includes(node.name)
-      ? node
-      : t.memberExpression(t.identifier("self"), node);
+    return bindings.includes(node.name) ? node : t.memberExpression(t.identifier("self"), node);
   }
 
   return node;

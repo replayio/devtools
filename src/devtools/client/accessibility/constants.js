@@ -113,14 +113,11 @@ exports.ACCESSIBLE_EVENTS = [
 ];
 
 // Telemetry name constants.
-exports.A11Y_SERVICE_DURATION =
-  "DEVTOOLS_ACCESSIBILITY_SERVICE_TIME_ACTIVE_SECONDS";
-exports.A11Y_SERVICE_ENABLED_COUNT =
-  "devtools.accessibility.service_enabled_count";
+exports.A11Y_SERVICE_DURATION = "DEVTOOLS_ACCESSIBILITY_SERVICE_TIME_ACTIVE_SECONDS";
+exports.A11Y_SERVICE_ENABLED_COUNT = "devtools.accessibility.service_enabled_count";
 
 // URL constants
-exports.A11Y_LEARN_MORE_LINK =
-  "https://developer.mozilla.org/docs/Tools/Accessibility_inspector";
+exports.A11Y_LEARN_MORE_LINK = "https://developer.mozilla.org/docs/Tools/Accessibility_inspector";
 exports.A11Y_CONTRAST_LEARN_MORE_LINK =
   "https://developer.mozilla.org/docs/Web/Accessibility/Understanding_WCAG/Perceivable/" +
   "Color_contrast?utm_source=devtools&utm_medium=a11y-panel-checks-color-contrast";
@@ -132,8 +129,7 @@ const A11Y_TEXT_LABEL_LINK_BASE =
   "?utm_source=devtools&utm_medium=a11y-panel-checks-text-label";
 
 const A11Y_TEXT_LABEL_LINK_IDS = {
-  [AREA_NO_NAME_FROM_ALT]:
-    "Use_alt_attribute_to_label_area_elements_that_have_the_href_attribute",
+  [AREA_NO_NAME_FROM_ALT]: "Use_alt_attribute_to_label_area_elements_that_have_the_href_attribute",
   [DIALOG_NO_NAME]: "Dialogs_should_be_labeled",
   [DOCUMENT_NO_TITLE]: "Documents_must_have_a_title",
   [EMBED_NO_NAME]: "Embedded_content_must_be_labeled",
@@ -142,8 +138,7 @@ const A11Y_TEXT_LABEL_LINK_IDS = {
   [FORM_FIELDSET_NO_NAME_FROM_LEGEND]: "Use_a_legend_to_label_a_fieldset",
   [FORM_NO_NAME]: "Form_elements_must_be_labeled",
   [FORM_NO_VISIBLE_NAME]: "Form_elements_should_have_a_visible_text_label",
-  [FORM_OPTGROUP_NO_NAME_FROM_LABEL]:
-    "Use_label_attribute_on_optgroup_elements",
+  [FORM_OPTGROUP_NO_NAME_FROM_LABEL]: "Use_label_attribute_on_optgroup_elements",
   [FRAME_NO_NAME]: "Frame_elements_must_be_labeled",
   [HEADING_NO_NAME]: "Headings_must_be_labeled",
   [HEADING_NO_CONTENT]: "Headings_should_have_visible_text_content",
@@ -151,15 +146,12 @@ const A11Y_TEXT_LABEL_LINK_IDS = {
   [IMAGE_NO_NAME]: "Content_with_images_must_be_labeled",
   [INTERACTIVE_NO_NAME]: "Interactive_elements_must_be_labeled",
   [MATHML_GLYPH_NO_NAME]: "Use_alt_attribute_to_label_mglyph_elements",
-  [TOOLBAR_NO_NAME]:
-    "Toolbars_must_be_labeled_when_there_is_more_than_one_toolbar",
+  [TOOLBAR_NO_NAME]: "Toolbars_must_be_labeled_when_there_is_more_than_one_toolbar",
 };
 
 const A11Y_TEXT_LABEL_LINKS = {};
 for (const key in A11Y_TEXT_LABEL_LINK_IDS) {
-  A11Y_TEXT_LABEL_LINKS[
-    key
-  ] = `${A11Y_TEXT_LABEL_LINK_BASE}#${A11Y_TEXT_LABEL_LINK_IDS[key]}`;
+  A11Y_TEXT_LABEL_LINKS[key] = `${A11Y_TEXT_LABEL_LINK_BASE}#${A11Y_TEXT_LABEL_LINK_IDS[key]}`;
 }
 exports.A11Y_TEXT_LABEL_LINKS = A11Y_TEXT_LABEL_LINKS;
 
@@ -168,12 +160,9 @@ const A11Y_KEYBOARD_LINK_BASE =
   "?utm_source=devtools&utm_medium=a11y-panel-checks-keyboard";
 
 const A11Y_KEYBOARD_LINK_IDS = {
-  [FOCUSABLE_NO_SEMANTICS]:
-    "Focusable_elements_should_have_interactive_semantics",
-  [FOCUSABLE_POSITIVE_TABINDEX]:
-    "Avoid_using_tabindex_attribute_greater_than_zero",
-  [INTERACTIVE_NO_ACTION]:
-    "Interactive_elements_must_be_able_to_be_activated_using_a_keyboard",
+  [FOCUSABLE_NO_SEMANTICS]: "Focusable_elements_should_have_interactive_semantics",
+  [FOCUSABLE_POSITIVE_TABINDEX]: "Avoid_using_tabindex_attribute_greater_than_zero",
+  [INTERACTIVE_NO_ACTION]: "Interactive_elements_must_be_able_to_be_activated_using_a_keyboard",
   [INTERACTIVE_NOT_FOCUSABLE]: "Interactive_elements_must_be_focusable",
   [MOUSE_INTERACTIVE_ONLY]:
     "Clickable_elements_must_be_focusable_and_should_have_interactive_semantics",
@@ -182,9 +171,7 @@ const A11Y_KEYBOARD_LINK_IDS = {
 
 const A11Y_KEYBOARD_LINKS = {};
 for (const key in A11Y_KEYBOARD_LINK_IDS) {
-  A11Y_KEYBOARD_LINKS[
-    key
-  ] = `${A11Y_KEYBOARD_LINK_BASE}#${A11Y_KEYBOARD_LINK_IDS[key]}`;
+  A11Y_KEYBOARD_LINKS[key] = `${A11Y_KEYBOARD_LINK_BASE}#${A11Y_KEYBOARD_LINK_IDS[key]}`;
 }
 exports.A11Y_KEYBOARD_LINKS = A11Y_KEYBOARD_LINKS;
 

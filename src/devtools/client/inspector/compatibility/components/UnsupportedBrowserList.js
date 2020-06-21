@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  createFactory,
-  PureComponent,
-} = require("react");
+const { createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
@@ -38,17 +35,14 @@ class UnsupportedBrowserList extends PureComponent {
     //       },
     //   ...
     // }
-    const browsersMap = browsers.reduce(
-      (map, { id, name, status: alias, version }) => {
-        if (!map.has(id)) {
-          map.set(id, { name, versions: [] });
-        }
-        map.get(id).versions.push({ alias, version });
+    const browsersMap = browsers.reduce((map, { id, name, status: alias, version }) => {
+      if (!map.has(id)) {
+        map.set(id, { name, versions: [] });
+      }
+      map.get(id).versions.push({ alias, version });
 
-        return map;
-      },
-      new Map()
-    );
+      return map;
+    }, new Map());
 
     return dom.ul(
       {

@@ -7,28 +7,10 @@
 loader.lazyRequireGetter(this, "colorUtils", "devtools/shared/css/color", true);
 loader.lazyRequireGetter(this, "AsyncUtils", "devtools/shared/async-utils");
 loader.lazyRequireGetter(this, "flags", "devtools/shared/flags");
-loader.lazyRequireGetter(
-  this,
-  "DevToolsUtils",
-  "devtools/shared/DevToolsUtils"
-);
-loader.lazyRequireGetter(
-  this,
-  "nodeFilterConstants",
-  "devtools/shared/dom-node-filter-constants"
-);
-loader.lazyRequireGetter(
-  this,
-  "isNativeAnonymous",
-  "devtools/shared/layout/utils",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "CssLogic",
-  "devtools/server/actors/inspector/css-logic",
-  true
-);
+loader.lazyRequireGetter(this, "DevToolsUtils", "devtools/shared/DevToolsUtils");
+loader.lazyRequireGetter(this, "nodeFilterConstants", "devtools/shared/dom-node-filter-constants");
+loader.lazyRequireGetter(this, "isNativeAnonymous", "devtools/shared/layout/utils", true);
+loader.lazyRequireGetter(this, "CssLogic", "devtools/server/actors/inspector/css-logic", true);
 loader.lazyRequireGetter(
   this,
   "getBackgroundFor",
@@ -47,18 +29,8 @@ loader.lazyRequireGetter(
   "devtools/server/actors/utils/accessibility",
   true
 );
-loader.lazyRequireGetter(
-  this,
-  "getAdjustedQuads",
-  "devtools/shared/layout/utils",
-  true
-);
-loader.lazyRequireGetter(
-  this,
-  "getTextProperties",
-  "devtools/shared/accessibility",
-  true
-);
+loader.lazyRequireGetter(this, "getAdjustedQuads", "devtools/shared/layout/utils", true);
+loader.lazyRequireGetter(this, "getTextProperties", "devtools/shared/accessibility", true);
 
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
 const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
@@ -73,7 +45,7 @@ const IMAGE_FETCHING_TIMEOUT = 500;
  * @return {String}
  *         Properly cased version of the node tag name
  */
-const getNodeDisplayName = function(rawNode) {
+const getNodeDisplayName = function (rawNode) {
   return rawNode.nodeName.toLowerCase();
 };
 
@@ -111,9 +83,7 @@ function nodeDocument(node) {
   if (Cu.isDeadWrapper(node)) {
     return null;
   }
-  return (
-    node.ownerDocument || (node.nodeType == Node.DOCUMENT_NODE ? node : null)
-  );
+  return node.ownerDocument || (node.nodeType == Node.DOCUMENT_NODE ? node : null);
 }
 
 function isNodeDead(node) {
@@ -122,9 +92,7 @@ function isNodeDead(node) {
 
 function isInXULDocument(el) {
   const doc = nodeDocument(el);
-  return (
-    doc && doc.documentElement && doc.documentElement.namespaceURI === XUL_NS
-  );
+  return doc && doc.documentElement && doc.documentElement.namespaceURI === XUL_NS;
 }
 
 /**
@@ -145,9 +113,7 @@ function standardTreeWalkerFilter(node) {
 
   // Ignore empty whitespace text nodes that do not impact the layout.
   if (isWhitespaceTextNode(node)) {
-    return nodeHasSize(node)
-      ? nodeFilterConstants.FILTER_ACCEPT
-      : nodeFilterConstants.FILTER_SKIP;
+    return nodeHasSize(node) ? nodeFilterConstants.FILTER_ACCEPT : nodeFilterConstants.FILTER_SKIP;
   }
 
   // Ignore all native anonymous content inside a non-XUL document.
@@ -167,9 +133,7 @@ function standardTreeWalkerFilter(node) {
 function allAnonymousContentTreeWalkerFilter(node) {
   // Ignore empty whitespace text nodes that do not impact the layout.
   if (isWhitespaceTextNode(node)) {
-    return nodeHasSize(node)
-      ? nodeFilterConstants.FILTER_ACCEPT
-      : nodeFilterConstants.FILTER_SKIP;
+    return nodeHasSize(node) ? nodeFilterConstants.FILTER_ACCEPT : nodeFilterConstants.FILTER_SKIP;
   }
   return nodeFilterConstants.FILTER_ACCEPT;
 }
@@ -279,7 +243,7 @@ function ensureImageLoaded(image, timeout) {
  *
  * If something goes wrong, the promise is rejected.
  */
-const imageToImageData = async function(node, maxDim) {
+const imageToImageData = async function (node, maxDim) {
   const { HTMLCanvasElement, HTMLImageElement } = node.ownerGlobal;
 
   const isImg = node instanceof HTMLImageElement;
@@ -377,9 +341,7 @@ function getClosestBackgroundImage(node) {
   while (current) {
     const computedStyle = CssLogic.getComputedStyle(current);
     if (computedStyle) {
-      const currentBackgroundImage = computedStyle.getPropertyValue(
-        "background-image"
-      );
+      const currentBackgroundImage = computedStyle.getPropertyValue("background-image");
       if (currentBackgroundImage !== "none") {
         return currentBackgroundImage;
       }
@@ -451,35 +413,19 @@ async function getBackgroundColor({ rawNode: node, walker }) {
   // - not element node
   // - more than one child
   // Avoid calculating bounds and creating doc walker by returning early.
-  if (
-    node.nodeType != Node.ELEMENT_NODE ||
-    node.childNodes.length > 1 ||
-    !node.firstChild
-  ) {
+  if (node.nodeType != Node.ELEMENT_NODE || node.childNodes.length > 1 || !node.firstChild) {
     return {
-      value: colorUtils.colorToRGBA(
-        getClosestBackgroundColor(node),
-        true,
-        true
-      ),
+      value: colorUtils.colorToRGBA(getClosestBackgroundColor(node), true, true),
     };
   }
 
-  const bounds = getAdjustedQuads(
-    node.ownerGlobal,
-    node.firstChild,
-    "content"
-  )[0].bounds;
+  const bounds = getAdjustedQuads(node.ownerGlobal, node.firstChild, "content")[0].bounds;
 
   // Fall back to calculating contrast against closest bg if there are no bounds for text node.
   // Avoid creating doc walker by returning early.
   if (!bounds) {
     return {
-      value: colorUtils.colorToRGBA(
-        getClosestBackgroundColor(node),
-        true,
-        true
-      ),
+      value: colorUtils.colorToRGBA(getClosestBackgroundColor(node), true, true),
     };
   }
 
@@ -489,17 +435,9 @@ async function getBackgroundColor({ rawNode: node, walker }) {
   // Fall back to calculating contrast against closest bg if:
   // - more than one child
   // - unique child is not a text node
-  if (
-    !firstChild ||
-    docWalker.nextSibling() ||
-    firstChild.nodeType !== Node.TEXT_NODE
-  ) {
+  if (!firstChild || docWalker.nextSibling() || firstChild.nodeType !== Node.TEXT_NODE) {
     return {
-      value: colorUtils.colorToRGBA(
-        getClosestBackgroundColor(node),
-        true,
-        true
-      ),
+      value: colorUtils.colorToRGBA(getClosestBackgroundColor(node), true, true),
     };
   }
 
@@ -512,11 +450,7 @@ async function getBackgroundColor({ rawNode: node, walker }) {
   // Fall back to calculating contrast against closest bg if there are no text props.
   if (!props) {
     return {
-      value: colorUtils.colorToRGBA(
-        getClosestBackgroundColor(node),
-        true,
-        true
-      ),
+      value: colorUtils.colorToRGBA(getClosestBackgroundColor(node), true, true),
     };
   }
 
@@ -531,11 +465,7 @@ async function getBackgroundColor({ rawNode: node, walker }) {
 
   return (
     bgColor || {
-      value: colorUtils.colorToRGBA(
-        getClosestBackgroundColor(node),
-        true,
-        true
-      ),
+      value: colorUtils.colorToRGBA(getClosestBackgroundColor(node), true, true),
     }
   );
 }

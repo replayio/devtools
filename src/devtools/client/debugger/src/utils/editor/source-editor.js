@@ -123,10 +123,7 @@ export default class SourceEditor {
     const editorClientRect = cm.getWrapperElement().getBoundingClientRect();
 
     const from = cm.lineAtHeight(editorClientRect.top, "page");
-    const to = cm.lineAtHeight(
-      editorClientRect.height + editorClientRect.top,
-      "page"
-    );
+    const to = cm.lineAtHeight(editorClientRect.height + editorClientRect.top, "page");
 
     const linesVisible = to - from;
     const halfVisible = Math.round(linesVisible / 2);

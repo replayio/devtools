@@ -10,10 +10,7 @@ import { nodeContainsPosition } from "./contains";
 
 import type { AstPosition } from "../types";
 
-export function getClosestPath(
-  sourceId: string,
-  location: AstPosition
-): SimplePath {
+export function getClosestPath(sourceId: string, location: AstPosition): SimplePath {
   let closestPath = null;
 
   traverseAst(sourceId, {

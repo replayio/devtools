@@ -4,10 +4,7 @@
 
 "use strict";
 
-const {
-  Component,
-  createFactory,
-} = require("react");
+const { Component, createFactory } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
@@ -24,9 +21,7 @@ const AnimationToolbar = createFactory(
 const NoAnimationPanel = createFactory(
   require("devtools/client/inspector/animation/components/NoAnimationPanel")
 );
-const SplitBox = createFactory(
-  require("devtools/client/shared/components/splitter/SplitBox")
-);
+const SplitBox = createFactory(require("devtools/client/shared/components/splitter/SplitBox"));
 
 class App extends Component {
   static get propTypes() {
@@ -60,9 +55,7 @@ class App extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (
-      this.props.animations.length !== 0 || nextProps.animations.length !== 0
-    );
+    return this.props.animations.length !== 0 || nextProps.animations.length !== 0;
   }
 
   render() {
@@ -101,56 +94,56 @@ class App extends Component {
       },
       animations.length
         ? [
-          AnimationToolbar({
-            addAnimationsCurrentTimeListener,
-            animations,
-            removeAnimationsCurrentTimeListener,
-            rewindAnimationsCurrentTime,
-            setAnimationsPlaybackRate,
-            setAnimationsPlayState,
-            timeScale,
-          }),
-          SplitBox({
-            className: "animation-container-splitter",
-            endPanel: AnimationDetailContainer({
-              addAnimationsCurrentTimeListener,
-              emitEventForTest,
-              getAnimatedPropertyMap,
-              getAnimationsCurrentTime,
-              getComputedStyle,
-              removeAnimationsCurrentTimeListener,
-              setDetailVisibility,
-              simulateAnimation,
-              simulateAnimationForKeyframesProgressBar,
-              timeScale,
-            }),
-            endPanelControl: true,
-            initialHeight: "50%",
-            splitterSize: 1,
-            minSize: "30px",
-            startPanel: AnimationListContainer({
+            AnimationToolbar({
               addAnimationsCurrentTimeListener,
               animations,
-              direction,
-              emitEventForTest,
-              getAnimatedPropertyMap,
-              getNodeFromActor,
-              onHideBoxModelHighlighter,
-              onShowBoxModelHighlighterForNode,
               removeAnimationsCurrentTimeListener,
-              selectAnimation,
-              setAnimationsCurrentTime,
-              setHighlightedNode,
-              setSelectedNode,
-              simulateAnimation,
+              rewindAnimationsCurrentTime,
+              setAnimationsPlaybackRate,
+              setAnimationsPlayState,
               timeScale,
             }),
-            vert: false,
-          }),
-        ]
+            SplitBox({
+              className: "animation-container-splitter",
+              endPanel: AnimationDetailContainer({
+                addAnimationsCurrentTimeListener,
+                emitEventForTest,
+                getAnimatedPropertyMap,
+                getAnimationsCurrentTime,
+                getComputedStyle,
+                removeAnimationsCurrentTimeListener,
+                setDetailVisibility,
+                simulateAnimation,
+                simulateAnimationForKeyframesProgressBar,
+                timeScale,
+              }),
+              endPanelControl: true,
+              initialHeight: "50%",
+              splitterSize: 1,
+              minSize: "30px",
+              startPanel: AnimationListContainer({
+                addAnimationsCurrentTimeListener,
+                animations,
+                direction,
+                emitEventForTest,
+                getAnimatedPropertyMap,
+                getNodeFromActor,
+                onHideBoxModelHighlighter,
+                onShowBoxModelHighlighterForNode,
+                removeAnimationsCurrentTimeListener,
+                selectAnimation,
+                setAnimationsCurrentTime,
+                setHighlightedNode,
+                setSelectedNode,
+                simulateAnimation,
+                timeScale,
+              }),
+              vert: false,
+            }),
+          ]
         : NoAnimationPanel({
-          toggleElementPicker,
-        })
+            toggleElementPicker,
+          })
     );
   }
 }

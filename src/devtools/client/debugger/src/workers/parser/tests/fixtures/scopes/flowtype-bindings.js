@@ -6,6 +6,4 @@ type Other = {
 
 const aConst = (window: Array<string>);
 
-export default function root() {
-
-}
+export default function root() {}

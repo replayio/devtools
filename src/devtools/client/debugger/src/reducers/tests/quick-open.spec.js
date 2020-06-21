@@ -13,11 +13,7 @@ import update, {
   getQuickOpenQuery,
   getQuickOpenType,
 } from "../quick-open";
-import {
-  setQuickOpenQuery,
-  openQuickOpen,
-  closeQuickOpen,
-} from "../../actions/quick-open";
+import { setQuickOpenQuery, openQuickOpen, closeQuickOpen } from "../../actions/quick-open";
 
 describe("quickOpen reducer", () => {
   test("initial state", () => {

@@ -1,7 +1,7 @@
 class Test {
   constructor() {
     this.foo = {
-      a: "foobar"
+      a: "foobar",
     };
   }
 

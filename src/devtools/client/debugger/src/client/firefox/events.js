@@ -4,12 +4,7 @@
 
 // @flow
 
-import type {
-  SourcePacket,
-  PausedPacket,
-  Target,
-  DevToolsClient,
-} from "./types";
+import type { SourcePacket, PausedPacket, Target, DevToolsClient } from "./types";
 
 import Actions from "../../actions";
 
@@ -102,9 +97,7 @@ function positionToString(pos) {
 
 function pointToString(point) {
   if (point.position) {
-    return `${point.checkpoint}:${point.progress}:${positionToString(
-      point.position
-    )}`;
+    return `${point.checkpoint}:${point.progress}:${positionToString(point.position)}`;
   }
   return `${point.checkpoint}:${point.progress}`;
 }
@@ -211,7 +204,12 @@ function replayPreloadedData(threadFront, entry) {
       break;
     case "StepTargets": {
       const { point, stepOver, stepIn, stepOut, reverseStepOver } = entry.data;
-      gStepTargets.set(pointToString(point), { stepOver, stepIn, stepOut, reverseStepOver });
+      gStepTargets.set(pointToString(point), {
+        stepOver,
+        stepIn,
+        stepOut,
+        reverseStepOver,
+      });
       break;
     }
     case "PauseData": {
@@ -241,11 +239,7 @@ function reportMismatch(a, b) {
 }
 
 function compareObjects(a, b) {
-  if (
-    !isNonNullObject(a) ||
-    !isNonNullObject(b) ||
-    Array.isArray(a) != Array.isArray(b)
-  ) {
+  if (!isNonNullObject(a) || !isNonNullObject(b) || Array.isArray(a) != Array.isArray(b)) {
     if (a !== b) {
       reportMismatch(a, b);
       return false;
@@ -497,10 +491,4 @@ const eventMethods = {
   sourceRemapEnd,
 };
 
-export {
-  removeEventsTopTarget,
-  setupEvents,
-  clientEvents,
-  addThreadEventListeners,
-  eventMethods,
-};
+export { removeEventsTopTarget, setupEvents, clientEvents, addThreadEventListeners, eventMethods };

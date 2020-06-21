@@ -88,7 +88,7 @@ CssLogic.prototype = {
   /**
    * Reset various properties
    */
-  reset: function() {
+  reset: function () {
     this._propertyInfos = {};
     this._ruleCount = 0;
     this._sheetIndex = 0;
@@ -105,7 +105,7 @@ CssLogic.prototype = {
    * @param {Element} aViewedElement the element the user has highlighted
    * in the Inspector.
    */
-  highlight: function(viewedElement) {
+  highlight: function (viewedElement) {
     if (!viewedElement) {
       this.viewedElement = null;
       this.viewedDocument = null;
@@ -167,7 +167,7 @@ CssLogic.prototype = {
     let ruleCount = 0;
 
     // Update the CssSheet objects.
-    this.forEachSheet(function(sheet) {
+    this.forEachSheet(function (sheet) {
       if (sheet.authorSheet && sheet.sheetAllowed) {
         ruleCount += sheet.ruleCount;
       }
@@ -200,7 +200,7 @@ CssLogic.prototype = {
    * @return {CssPropertyInfo} a CssPropertyInfo structure for the given
    * property.
    */
-  getPropertyInfo: function(property) {
+  getPropertyInfo: function (property) {
     if (!this.viewedElement) {
       return {};
     }
@@ -218,15 +218,12 @@ CssLogic.prototype = {
    * Cache all the stylesheets in the inspected document
    * @private
    */
-  _cacheSheets: function() {
+  _cacheSheets: function () {
     this._passId++;
     this.reset();
 
     // styleSheets isn't an array, but forEach can work on it anyway
-    const styleSheets = InspectorUtils.getAllStyleSheets(
-      this.viewedDocument,
-      true
-    );
+    const styleSheets = InspectorUtils.getAllStyleSheets(this.viewedDocument, true);
     Array.prototype.forEach.call(styleSheets, this._cacheSheet, this);
 
     this._sheetsCached = true;
@@ -241,7 +238,7 @@ CssLogic.prototype = {
    * @private
    * @param {CSSStyleSheet} domSheet the CSSStyleSheet object to cache.
    */
-  _cacheSheet: function(domSheet) {
+  _cacheSheet: function (domSheet) {
     if (domSheet.disabled) {
       return;
     }
@@ -282,7 +279,7 @@ CssLogic.prototype = {
     }
 
     const sheets = [];
-    this.forEachSheet(function(sheet) {
+    this.forEachSheet(function (sheet) {
       if (sheet.authorSheet) {
         sheets.push(sheet);
       }
@@ -313,7 +310,7 @@ CssLogic.prototype = {
    *
    * @return {CssSheet} the CssSheet object for the given CSSStyleSheet object.
    */
-  getSheet: function(domSheet, index) {
+  getSheet: function (domSheet, index) {
     let cacheId = "";
 
     if (domSheet.href) {
@@ -361,7 +358,7 @@ CssLogic.prototype = {
    * @param {object} scope the scope you want for the callback function. scope
    * will be the this object when callback executes.
    */
-  forEachSheet: function(callback, scope) {
+  forEachSheet: function (callback, scope) {
     for (const cacheId in this._sheets) {
       const sheets = this._sheets[cacheId];
       for (let i = 0; i < sheets.length; i++) {
@@ -417,11 +414,11 @@ CssLogic.prototype = {
    * @param {object} scope the scope you want for the callback function. scope
    * will be the this object when callback executes.
    */
-  processMatchedSelectors: function(callback, scope) {
+  processMatchedSelectors: function (callback, scope) {
     if (this._matchedSelectors) {
       if (callback) {
         this._passId++;
-        this._matchedSelectors.forEach(function(value) {
+        this._matchedSelectors.forEach(function (value) {
           callback.call(scope, value[0], value[1]);
           value[0].cssRule._passId = this._passId;
         }, this);
@@ -439,7 +436,7 @@ CssLogic.prototype = {
     for (const matchedRule of this._matchedRules) {
       const [rule, status, distance] = matchedRule;
 
-      rule.selectors.forEach(function(selector) {
+      rule.selectors.forEach(function (selector) {
         if (
           selector._matchId !== this._matchId &&
           (selector.inlineStyle ||
@@ -470,16 +467,13 @@ CssLogic.prototype = {
    *         true if the given selector matches the highlighted element or any
    *         of its parents, otherwise false is returned.
    */
-  selectorMatchesElement: function(domRule, idx) {
+  selectorMatchesElement: function (domRule, idx) {
     let element = this.viewedElement;
     do {
       if (InspectorUtils.selectorMatchesElement(element, domRule, idx)) {
         return true;
       }
-    } while (
-      (element = element.parentNode) &&
-      element.nodeType === nodeConstants.ELEMENT_NODE
-    );
+    } while ((element = element.parentNode) && element.nodeType === nodeConstants.ELEMENT_NODE);
 
     return false;
   },
@@ -492,14 +486,14 @@ CssLogic.prototype = {
    * @return {object} An object that tells for each property if it has matched
    * selectors or not. Object keys are property names and values are booleans.
    */
-  hasMatchedSelectors: function(properties) {
+  hasMatchedSelectors: function (properties) {
     if (!this._matchedRules) {
       this._buildMatchedRules();
     }
 
     const result = {};
 
-    this._matchedRules.some(function(value) {
+    this._matchedRules.some(function (value) {
       const rule = value[0];
       const status = value[1];
       properties = properties.filter(property => {
@@ -508,8 +502,7 @@ CssLogic.prototype = {
         if (
           rule.getPropertyValue(property) &&
           (status == STATUS.MATCHED ||
-            (status == STATUS.PARENT_MATCH &&
-              InspectorUtils.isInheritedProperty(property)))
+            (status == STATUS.PARENT_MATCH && InspectorUtils.isInheritedProperty(property)))
         ) {
           result[property] = true;
           return false;
@@ -529,7 +522,7 @@ CssLogic.prototype = {
    *
    * @private
    */
-  _buildMatchedRules: function() {
+  _buildMatchedRules: function () {
     let domRules;
     let element = this.viewedElement;
     const filter = this.sourceFilter;
@@ -551,8 +544,7 @@ CssLogic.prototype = {
     }
 
     do {
-      const status =
-        this.viewedElement === element ? STATUS.MATCHED : STATUS.PARENT_MATCH;
+      const status = this.viewedElement === element ? STATUS.MATCHED : STATUS.PARENT_MATCH;
 
       try {
         domRules = getCSSStyleRules(element);
@@ -596,10 +588,7 @@ CssLogic.prototype = {
       }
 
       distance--;
-    } while (
-      (element = element.parentNode) &&
-      element.nodeType === nodeConstants.ELEMENT_NODE
-    );
+    } while ((element = element.parentNode) && element.nodeType === nodeConstants.ELEMENT_NODE);
   },
 
   /**
@@ -609,12 +598,9 @@ CssLogic.prototype = {
    * @return {boolean} True if the DOM CSS object matches the current view
    * media, or false otherwise.
    */
-  mediaMatches: function(domObject) {
+  mediaMatches: function (domObject) {
     const mediaText = domObject.media.mediaText;
-    return (
-      !mediaText ||
-      this.viewedDocument.defaultView.matchMedia(mediaText).matches
-    );
+    return !mediaText || this.viewedDocument.defaultView.matchMedia(mediaText).matches;
   },
 };
 
@@ -628,7 +614,7 @@ CssLogic.prototype = {
  * @param {Element} element the element for which you want the short name.
  * @return {string} the string to be displayed for element.
  */
-CssLogic.getShortName = function(element) {
+CssLogic.getShortName = function (element) {
   if (!element) {
     return "null";
   }
@@ -651,7 +637,7 @@ CssLogic.getShortName = function(element) {
  * @return {Array}
  *         An array of string selectors.
  */
-CssLogic.getSelectors = function(domRule) {
+CssLogic.getSelectors = function (domRule) {
   if (domRule.type !== CSSRule.STYLE_RULE) {
     // Return empty array since InspectorUtils.getSelectorCount() assumes
     // only STYLE_RULE type.
@@ -688,7 +674,7 @@ CssLogic.getBindingElementAndPseudo = getBindingElementAndPseudo;
  * @param {Node}
  * @returns {CSSStyleDeclaration}
  */
-CssLogic.getComputedStyle = function(node) {
+CssLogic.getComputedStyle = function (node) {
   if (
     !node ||
     Cu.isDeadWrapper(node) ||
@@ -720,7 +706,7 @@ CssLogic.getComputedStyle = function(node) {
  * @param {CSSStyleSheet} sheet the DOM object for the style sheet.
  * @return {string} the address of the stylesheet.
  */
-CssLogic.href = function(sheet) {
+CssLogic.href = function (sheet) {
   let href = sheet.href;
   if (!href) {
     href = sheet.ownerNode.ownerDocument.location;
@@ -887,7 +873,7 @@ CssSheet.prototype = {
    *
    * @return {Array} array of css rules.
    **/
-  getCssRules: function() {
+  getCssRules: function () {
     try {
       return this.domSheet.cssRules;
     } catch (e) {
@@ -905,7 +891,7 @@ CssSheet.prototype = {
    * @return {CssRule} the cached CssRule object for the given CSSStyleRule
    * object.
    */
-  getRule: function(domRule) {
+  getRule: function (domRule) {
     const cacheId = domRule.type + domRule.selectorText;
 
     let rule = null;
@@ -932,7 +918,7 @@ CssSheet.prototype = {
     return rule;
   },
 
-  toString: function() {
+  toString: function () {
     return "CssSheet[" + this.shortSource + "]";
   },
 };
@@ -1020,7 +1006,7 @@ CssRule.prototype = {
    * value.
    * @return {string} the property value.
    */
-  getPropertyValue: function(property) {
+  getPropertyValue: function (property) {
     return this.domRule.style.getPropertyValue(property);
   },
 
@@ -1031,7 +1017,7 @@ CssRule.prototype = {
    * priority.
    * @return {string} the property priority.
    */
-  getPropertyPriority: function(property) {
+  getPropertyPriority: function (property) {
     return this.domRule.style.getPropertyPriority(property);
   },
 
@@ -1062,7 +1048,7 @@ CssRule.prototype = {
     return this._selectors;
   },
 
-  toString: function() {
+  toString: function () {
     return "[CssRule " + this.domRule.selectorText + "]";
   },
 };
@@ -1206,16 +1192,13 @@ CssSelector.prototype = {
     }
 
     if (typeof this._specificity !== "number") {
-      this._specificity = InspectorUtils.getSpecificity(
-        this.cssRule.domRule,
-        this.selectorIndex
-      );
+      this._specificity = InspectorUtils.getSpecificity(this.cssRule.domRule, this.selectorIndex);
     }
 
     return this._specificity;
   },
 
-  toString: function() {
+  toString: function () {
     return this.text;
   },
 };
@@ -1256,9 +1239,7 @@ CssPropertyInfo.prototype = {
   get value() {
     if (!this._value && this._cssLogic.computedStyle) {
       try {
-        this._value = this._cssLogic.computedStyle.getPropertyValue(
-          this.property
-        );
+        this._value = this._cssLogic.computedStyle.getPropertyValue(this.property);
       } catch (ex) {
         console.log("Error reading computed style for " + this.property);
         console.log(ex);
@@ -1292,22 +1273,19 @@ CssPropertyInfo.prototype = {
    * create CssSelectorInfo objects, which we then sort
    * @private
    */
-  _findMatchedSelectors: function() {
+  _findMatchedSelectors: function () {
     this._matchedSelectors = [];
     this.needRefilter = false;
 
     this._cssLogic.processMatchedSelectors(this._processMatchedSelector, this);
 
     // Sort the selectors by how well they match the given element.
-    this._matchedSelectors.sort(function(selectorInfo1, selectorInfo2) {
+    this._matchedSelectors.sort(function (selectorInfo1, selectorInfo2) {
       return selectorInfo1.compareTo(selectorInfo2);
     });
 
     // Now we know which of the matches is best, we can mark it BEST_MATCH.
-    if (
-      this._matchedSelectors.length > 0 &&
-      this._matchedSelectors[0].status > STATUS.UNMATCHED
-    ) {
+    if (this._matchedSelectors.length > 0 && this._matchedSelectors[0].status > STATUS.UNMATCHED) {
       this._matchedSelectors[0].status = STATUS.BEST;
     }
   },
@@ -1319,22 +1297,15 @@ CssPropertyInfo.prototype = {
    * @param {CssSelector} selector the matched CssSelector object.
    * @param {STATUS} status the CssSelector match status.
    */
-  _processMatchedSelector: function(selector, status, distance) {
+  _processMatchedSelector: function (selector, status, distance) {
     const cssRule = selector.cssRule;
     const value = cssRule.getPropertyValue(this.property);
     if (
       value &&
       (status == STATUS.MATCHED ||
-        (status == STATUS.PARENT_MATCH &&
-          InspectorUtils.isInheritedProperty(this.property)))
+        (status == STATUS.PARENT_MATCH && InspectorUtils.isInheritedProperty(this.property)))
     ) {
-      const selectorInfo = new CssSelectorInfo(
-        selector,
-        this.property,
-        value,
-        status,
-        distance
-      );
+      const selectorInfo = new CssSelectorInfo(selector, this.property, value, status, distance);
       this._matchedSelectors.push(selectorInfo);
     }
   },
@@ -1344,10 +1315,10 @@ CssPropertyInfo.prototype = {
    * changes. This allows for quick filter changes.
    * @private
    */
-  _refilterSelectors: function() {
+  _refilterSelectors: function () {
     const passId = ++this._cssLogic._passId;
 
-    const iterator = function(selectorInfo) {
+    const iterator = function (selectorInfo) {
       const cssRule = selectorInfo.selector.cssRule;
       if (cssRule._passId != passId) {
         cssRule._passId = passId;
@@ -1361,7 +1332,7 @@ CssPropertyInfo.prototype = {
     this.needRefilter = false;
   },
 
-  toString: function() {
+  toString: function () {
     return "CssPropertyInfo[" + this.property + "]";
   },
 };
@@ -1571,7 +1542,7 @@ CssSelectorInfo.prototype = {
    * @return {Number}
    *         -1, 0, 1 depending on how that compares with this.
    */
-  compareTo: function(that) {
+  compareTo: function (that) {
     let current = null;
 
     // Rules targetting the node must always win over rules targetting a node's
@@ -1607,12 +1578,7 @@ CssSelectorInfo.prototype = {
     // Sheet index
     // Rule line
     // Rule column
-    for (const propName of [
-      "specificity",
-      "sheetIndex",
-      "ruleLine",
-      "ruleColumn",
-    ]) {
+    for (const propName of ["specificity", "sheetIndex", "ruleLine", "ruleColumn"]) {
       current = this.compare(that, propName, COMPAREMODE.INTEGER);
       if (current) {
         return current;
@@ -1623,7 +1589,7 @@ CssSelectorInfo.prototype = {
     return 0;
   },
 
-  compare: function(that, propertyName, type) {
+  compare: function (that, propertyName, type) {
     switch (type) {
       case COMPAREMODE.BOOLEAN:
         if (this[propertyName] && !that[propertyName]) {
@@ -1645,7 +1611,7 @@ CssSelectorInfo.prototype = {
     return 0;
   },
 
-  toString: function() {
+  toString: function () {
     return this.selector + " -> " + this.value;
   },
 };

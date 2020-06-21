@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'devtools-environment' {
+declare module "devtools-environment" {
   declare module.exports: any;
 }
 
@@ -22,17 +22,17 @@ declare module 'devtools-environment' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'devtools-environment/test-flag' {
+declare module "devtools-environment/test-flag" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'devtools-environment/index' {
-  declare module.exports: $Exports<'devtools-environment'>;
+declare module "devtools-environment/index" {
+  declare module.exports: $Exports<"devtools-environment">;
 }
-declare module 'devtools-environment/index.js' {
-  declare module.exports: $Exports<'devtools-environment'>;
+declare module "devtools-environment/index.js" {
+  declare module.exports: $Exports<"devtools-environment">;
 }
-declare module 'devtools-environment/test-flag.js' {
-  declare module.exports: $Exports<'devtools-environment/test-flag'>;
+declare module "devtools-environment/test-flag.js" {
+  declare module.exports: $Exports<"devtools-environment/test-flag">;
 }

@@ -7,10 +7,7 @@
 import { comparePosition } from "../location";
 import type { BreakpointPositions, SourceLocation } from "../../types";
 
-export function findPosition(
-  positions: ?BreakpointPositions,
-  location: SourceLocation
-) {
+export function findPosition(positions: ?BreakpointPositions, location: SourceLocation) {
   if (!positions) {
     return null;
   }

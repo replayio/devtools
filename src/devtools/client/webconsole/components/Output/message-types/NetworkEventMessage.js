@@ -5,15 +5,10 @@
 "use strict";
 
 // React & Redux
-const {
-  createFactory,
-  createElement,
-} = require("react");
+const { createFactory, createElement } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-const Message = createFactory(
-  require("devtools/client/webconsole/components/Output/Message")
-);
+const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
 const actions = require("devtools/client/webconsole/actions/index");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 
@@ -66,16 +61,7 @@ function NetworkEventMessage({
   dispatch,
   open,
 }) {
-  const {
-    id,
-    indent,
-    source,
-    type,
-    level,
-    request,
-    isXHR,
-    timeStamp,
-  } = message;
+  const { id, indent, source, type, level, request, isXHR, timeStamp } = message;
 
   const { response = {}, totalTime } = networkMessageUpdate;
 
@@ -84,16 +70,8 @@ function NetworkEventMessage({
   const topLevelClasses = ["cm-s-mozilla"];
   let statusCode, statusInfo;
 
-  if (
-    httpVersion &&
-    status &&
-    statusText !== undefined &&
-    totalTime !== undefined
-  ) {
-    const statusCodeDocURL = getHTTPStatusCodeURL(
-      status.toString(),
-      "webconsole"
-    );
+  if (httpVersion && status && statusText !== undefined && totalTime !== undefined) {
+    const statusCodeDocURL = getHTTPStatusCodeURL(status.toString(), "webconsole");
     statusCode = dom.span(
       {
         className: "status-code",
@@ -129,16 +107,9 @@ function NetworkEventMessage({
 
   // Message body components.
   const method = dom.span({ className: "method" }, request.method);
-  const xhr = isXHR
-    ? dom.span({ className: "xhr" }, l10n.getStr("webConsoleXhrIndicator"))
-    : null;
-  const requestUrl = dom.span(
-    { className: "url", title: request.url },
-    request.url
-  );
-  const statusBody = statusInfo
-    ? dom.a({ className: "status" }, statusInfo)
-    : null;
+  const xhr = isXHR ? dom.span({ className: "xhr" }, l10n.getStr("webConsoleXhrIndicator")) : null;
+  const requestUrl = dom.span({ className: "url", title: request.url }, request.url);
+  const statusBody = statusInfo ? dom.a({ className: "status" }, statusInfo) : null;
 
   const messageBody = [xhr, method, requestUrl, statusBody];
 
@@ -153,11 +124,11 @@ function NetworkEventMessage({
     getLongString: grip => {
       return serviceContainer.getLongString(grip);
     },
-    getTabTarget: () => { },
-    getNetworkRequest: () => { },
-    sendHTTPRequest: () => { },
-    setPreferences: () => { },
-    triggerActivity: () => { },
+    getTabTarget: () => {},
+    getNetworkRequest: () => {},
+    sendHTTPRequest: () => {},
+    setPreferences: () => {},
+    triggerActivity: () => {},
     requestData: (requestId, dataType) => {
       return serviceContainer.requestData(requestId, dataType);
     },

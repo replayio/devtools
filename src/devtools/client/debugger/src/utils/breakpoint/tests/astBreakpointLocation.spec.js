@@ -5,10 +5,7 @@
 // @flow
 
 import { getASTLocation } from "../astBreakpointLocation.js";
-import {
-  populateSource,
-  populateOriginalSource,
-} from "../../../workers/parser/tests/helpers";
+import { populateSource, populateOriginalSource } from "../../../workers/parser/tests/helpers";
 import { getSymbols } from "../../../workers/parser/getSymbols";
 import cases from "jest-in-case";
 

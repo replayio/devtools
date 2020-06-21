@@ -61,9 +61,7 @@ class SidebarToggle extends Component {
   // Rendering
 
   render() {
-    const title = this.state.collapsed
-      ? this.props.expandPaneTitle
-      : this.props.collapsePaneTitle;
+    const title = this.state.collapsed ? this.props.expandPaneTitle : this.props.collapsePaneTitle;
 
     const classNames = ["devtools-button", "sidebar-toggle"];
     if (this.state.collapsed) {

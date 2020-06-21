@@ -12,20 +12,11 @@ const {
   translateNodeFrontToGrip,
 } = require("devtools/client/inspector/shared/utils");
 
-loader.lazyRequireGetter(
-  this,
-  "getNodeRep",
-  "devtools/client/inspector/shared/node-reps"
-);
+loader.lazyRequireGetter(this, "getNodeRep", "devtools/client/inspector/shared/node-reps");
 
 const Types = require("devtools/client/inspector/flexbox/types");
 
-loader.lazyRequireGetter(
-  this,
-  "showMenu",
-  "devtools/client/shared/components/menu/utils",
-  true
-);
+loader.lazyRequireGetter(this, "showMenu", "devtools/client/shared/components/menu/utils", true);
 
 class FlexItemSelector extends PureComponent {
   static get propTypes() {

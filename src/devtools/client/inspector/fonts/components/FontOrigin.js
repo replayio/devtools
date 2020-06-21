@@ -8,11 +8,7 @@ const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
-loader.lazyRequireGetter(
-  this,
-  "clipboardHelper",
-  "devtools/shared/platform/clipboard"
-);
+loader.lazyRequireGetter(this, "clipboardHelper", "devtools/shared/platform/clipboard");
 
 const { getStr } = require("devtools/client/inspector/fonts/utils/l10n");
 const Types = require("devtools/client/inspector/fonts/types");

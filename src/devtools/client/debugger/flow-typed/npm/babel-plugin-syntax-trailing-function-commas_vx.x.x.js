@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'babel-plugin-syntax-trailing-function-commas' {
+declare module "babel-plugin-syntax-trailing-function-commas" {
   declare module.exports: any;
 }
 
@@ -22,11 +22,11 @@ declare module 'babel-plugin-syntax-trailing-function-commas' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'babel-plugin-syntax-trailing-function-commas/lib/index' {
+declare module "babel-plugin-syntax-trailing-function-commas/lib/index" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'babel-plugin-syntax-trailing-function-commas/lib/index.js' {
-  declare module.exports: $Exports<'babel-plugin-syntax-trailing-function-commas/lib/index'>;
+declare module "babel-plugin-syntax-trailing-function-commas/lib/index.js" {
+  declare module.exports: $Exports<"babel-plugin-syntax-trailing-function-commas/lib/index">;
 }

@@ -10,8 +10,7 @@ import type { Node } from "@babel/types";
 function startsBefore(a: AstLocation, b: AstPosition) {
   let before = a.start.line < b.line;
   if (a.start.line === b.line) {
-    before =
-      a.start.column >= 0 && b.column >= 0 ? a.start.column <= b.column : true;
+    before = a.start.column >= 0 && b.column >= 0 ? a.start.column <= b.column : true;
   }
   return before;
 }
@@ -19,8 +18,7 @@ function startsBefore(a: AstLocation, b: AstPosition) {
 function endsAfter(a: AstLocation, b: AstPosition) {
   let after = a.end.line > b.line;
   if (a.end.line === b.line) {
-    after =
-      a.end.column >= 0 && b.column >= 0 ? a.end.column >= b.column : true;
+    after = a.end.column >= 0 && b.column >= 0 ? a.end.column >= b.column : true;
   }
   return after;
 }

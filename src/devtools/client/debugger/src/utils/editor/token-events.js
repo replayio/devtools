@@ -19,13 +19,11 @@ function isInvalidTarget(target: HTMLElement) {
   const invalidType = ["cm-atom", ""].includes(target.className);
 
   // exclude syntax where the expression would be a syntax error
-  const invalidToken =
-    tokenText === "" || tokenText.match(/^[(){}\|&%,.;=<>\+-/\*\s](?=)/);
+  const invalidToken = tokenText === "" || tokenText.match(/^[(){}\|&%,.;=<>\+-/\*\s](?=)/);
 
   // exclude codemirror elements that are not tokens
   const invalidTarget =
-    (target.parentElement &&
-      !target.parentElement.closest(".CodeMirror-line")) ||
+    (target.parentElement && !target.parentElement.closest(".CodeMirror-line")) ||
     cursorPos.top == 0;
 
   const invalidClasses = ["editor-mount"];

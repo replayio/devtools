@@ -4,12 +4,7 @@
 
 // @flow
 
-import {
-  createStore,
-  selectors,
-  actions,
-  makeSource,
-} from "../../utils/test-head";
+import { createStore, selectors, actions, makeSource } from "../../utils/test-head";
 
 const { getProjectDirectoryRoot, getDisplayedSources } = selectors;
 
@@ -52,13 +47,9 @@ describe("setProjectDirectoryRoot", () => {
     dispatch(actions.setProjectDirectoryRoot(cx, "localhost:8000/examples/js"));
 
     const filteredSourcesByThread = getDisplayedSources(getState());
-    const filteredSources = (Object.values(
-      filteredSourcesByThread.FakeThread
-    ): any)[0];
+    const filteredSources = (Object.values(filteredSourcesByThread.FakeThread): any)[0];
 
-    expect(filteredSources.url).toEqual(
-      "http://localhost:8000/examples/js/scopes.js"
-    );
+    expect(filteredSources.url).toEqual("http://localhost:8000/examples/js/scopes.js");
 
     expect(filteredSources.relativeUrl).toEqual("scopes.js");
   });

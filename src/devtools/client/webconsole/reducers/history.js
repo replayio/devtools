@@ -190,9 +190,7 @@ function reverseSearchInputChange(state, searchString) {
   // To do that, we need to reverse the matching entries array, provide it to a Set,
   // transform it back to an array and reverse it again.
   const uniqueEntries = new Set(matchingEntries.reverse());
-  const currentReverseSearchResults = Array.from(
-    new Set(uniqueEntries)
-  ).reverse();
+  const currentReverseSearchResults = Array.from(new Set(uniqueEntries)).reverse();
 
   return {
     ...state,

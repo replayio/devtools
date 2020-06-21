@@ -6,17 +6,10 @@
 
 const EventEmitter = require("devtools/shared/event-emitter");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
-const {
-  HTMLTooltip,
-} = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const InlineTooltip = require("devtools/client/shared/widgets/tooltip/InlineTooltip");
 
-loader.lazyRequireGetter(
-  this,
-  "KeyCodes",
-  "devtools/client/shared/keycodes",
-  true
-);
+loader.lazyRequireGetter(this, "KeyCodes", "devtools/client/shared/keycodes", true);
 
 const INLINE_TOOLTIP_CLASS = "inline-tooltip-container";
 
@@ -169,16 +162,16 @@ class SwatchBasedEditorTooltip {
    */
   addSwatch(swatchEl, callbacks = {}) {
     if (!callbacks.onShow) {
-      callbacks.onShow = function() {};
+      callbacks.onShow = function () {};
     }
     if (!callbacks.onPreview) {
-      callbacks.onPreview = function() {};
+      callbacks.onPreview = function () {};
     }
     if (!callbacks.onRevert) {
-      callbacks.onRevert = function() {};
+      callbacks.onRevert = function () {};
     }
     if (!callbacks.onCommit) {
-      callbacks.onCommit = function() {};
+      callbacks.onCommit = function () {};
     }
 
     this.swatches.set(swatchEl, {
@@ -201,10 +194,7 @@ class SwatchBasedEditorTooltip {
   }
 
   _onSwatchKeyDown(event) {
-    if (
-      event.keyCode === KeyCodes.DOM_VK_RETURN ||
-      event.keyCode === KeyCodes.DOM_VK_SPACE
-    ) {
+    if (event.keyCode === KeyCodes.DOM_VK_RETURN || event.keyCode === KeyCodes.DOM_VK_SPACE) {
       event.preventDefault();
       event.stopPropagation();
       this._onSwatchClick(event);
@@ -216,8 +206,7 @@ class SwatchBasedEditorTooltip {
 
     // If mouse coordinates are 0, the event listener could have been triggered
     // by a keybaord
-    this.swatchActivatedWithKeyboard =
-      event.key && clientX === 0 && clientY === 0;
+    this.swatchActivatedWithKeyboard = event.key && clientX === 0 && clientY === 0;
 
     if (shiftKey) {
       event.stopPropagation();

@@ -10,9 +10,7 @@ const {
   setupStore,
   clonePacket,
 } = require("devtools/client/webconsole/test/node/helpers");
-const {
-  stubPackets,
-} = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
+const { stubPackets } = require("devtools/client/webconsole/test/node/fixtures/stubs/index");
 
 const expect = require("expect");
 
@@ -37,9 +35,7 @@ describe("Network message reducer:", () => {
     packet.actor = "message1";
     updatePacket.networkInfo.actor = "message1";
     dispatch(actions.messagesAdd([packet]));
-    dispatch(
-      actions.networkMessageUpdate(updatePacket.networkInfo, null, updatePacket)
-    );
+    dispatch(actions.networkMessageUpdate(updatePacket.networkInfo, null, updatePacket));
   });
 
   describe("networkMessagesUpdateById", () => {

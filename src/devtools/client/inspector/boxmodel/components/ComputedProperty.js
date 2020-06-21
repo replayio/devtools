@@ -9,11 +9,7 @@ const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
-loader.lazyRequireGetter(
-  this,
-  "getNodeRep",
-  "devtools/client/inspector/shared/node-reps"
-);
+loader.lazyRequireGetter(this, "getNodeRep", "devtools/client/inspector/shared/node-reps");
 
 const BOXMODEL_STRINGS_URI = "devtools/client/locales/boxmodel.properties";
 const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
@@ -35,9 +31,7 @@ class ComputedProperty extends PureComponent {
     super(props);
 
     this.onFocus = this.onFocus.bind(this);
-    this.renderReferenceElementPreview = this.renderReferenceElementPreview.bind(
-      this
-    );
+    this.renderReferenceElementPreview = this.renderReferenceElementPreview.bind(this);
   }
 
   onFocus() {
@@ -67,10 +61,8 @@ class ComputedProperty extends PureComponent {
         referenceElementType
       ),
       getNodeRep(referenceElement, {
-        onInspectIconClick: () =>
-          setSelectedNode(referenceElement, { reason: "box-model" }),
-        onDOMNodeMouseOver: () =>
-          onShowBoxModelHighlighterForNode(referenceElement),
+        onInspectIconClick: () => setSelectedNode(referenceElement, { reason: "box-model" }),
+        onDOMNodeMouseOver: () => onShowBoxModelHighlighterForNode(referenceElement),
         onDOMNodeMouseOut: () => onHideBoxModelHighlighter(),
       })
     );

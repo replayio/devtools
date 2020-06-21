@@ -11,9 +11,7 @@ import type { Frame } from "../../../types";
 import { getFrameUrl } from "./getFrameUrl";
 
 function collapseLastFrames(frames) {
-  const index = findIndex(frames, frame =>
-    getFrameUrl(frame).match(/webpack\/bootstrap/i)
-  );
+  const index = findIndex(frames, frame => getFrameUrl(frame).match(/webpack\/bootstrap/i));
 
   if (index == -1) {
     return { newFrames: frames, lastGroup: [] };

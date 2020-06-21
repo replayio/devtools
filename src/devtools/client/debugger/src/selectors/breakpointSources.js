@@ -32,12 +32,9 @@ function getBreakpointsForSource(
   return sortSelectedBreakpoints(breakpoints, selectedSource)
     .filter(
       bp =>
-        !bp.options.hidden &&
-        (bp.text || bp.originalText || bp.options.condition || bp.disabled)
+        !bp.options.hidden && (bp.text || bp.originalText || bp.options.condition || bp.disabled)
     )
-    .filter(
-      bp => bp.location.sourceId == source.id
-    );
+    .filter(bp => bp.location.sourceId == source.id);
 }
 
 export const findBreakpointSources = (state: State) => {
@@ -48,8 +45,7 @@ export const findBreakpointSources = (state: State) => {
 };
 
 const queryBreakpointSources = makeShallowQuery({
-  filter: (_, { breakpoints, selectedSource }) =>
-    uniq(breakpoints.map(bp => bp.location.sourceId)),
+  filter: (_, { breakpoints, selectedSource }) => uniq(breakpoints.map(bp => bp.location.sourceId)),
   map: resourceAsSourceBase,
   reduce: (sources): Array<SourceBase> => {
     const filtered = sources.filter(source => source && !source.isBlackBoxed);
@@ -65,11 +61,7 @@ export const getBreakpointSources: Selector<BreakpointSources> = createSelector(
     return sources
       .map(source => ({
         source,
-        breakpoints: getBreakpointsForSource(
-          source,
-          selectedSource,
-          breakpoints
-        ),
+        breakpoints: getBreakpointsForSource(source, selectedSource, breakpoints),
       }))
       .filter(({ breakpoints: bpSources }) => bpSources.length > 0);
   }

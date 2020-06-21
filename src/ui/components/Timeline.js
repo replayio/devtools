@@ -25,18 +25,13 @@ const {
   paintGraphics,
   addLastScreen,
 } = require("protocol/graphics");
-const {
-  pointEquals,
-  pointPrecedes,
-} = require("protocol/execution-point-utils.js");
+const { pointEquals, pointPrecedes } = require("protocol/execution-point-utils.js");
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 
 import { LocalizationHelper } from "devtools/shared/l10n";
-const L10N = new LocalizationHelper(
-  "devtools/client/locales/toolbox.properties"
-);
+const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
 
 const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
 
@@ -105,18 +100,14 @@ function getProgress(executionPoint) {
 function getClosestMessage(messages, executionPoint) {
   const progress = getProgress(executionPoint);
 
-  return sortBy(messages, message =>
-    Math.abs(progress - getMessageProgress(message))
-  )[0];
+  return sortBy(messages, message => Math.abs(progress - getMessageProgress(message)))[0];
 }
 
 function sameLocation(m1, m2) {
   const f1 = m1.frame;
   const f2 = m2.frame;
 
-  return (
-    f1.source === f2.source && f1.line === f2.line && f1.column === f2.column
-  );
+  return f1.source === f2.source && f1.line === f2.line && f1.column === f2.column;
 }
 
 function getMessageLocation(message) {
@@ -242,9 +233,7 @@ export class Timeline extends Component {
   }
 
   getMessageFromPoint(point) {
-    return this.state.messages.find(
-      message => message.executionPoint === point
-    );
+    return this.state.messages.find(message => message.executionPoint === point);
   }
 
   // Get the time for a mouse event within the recording.
@@ -311,9 +300,7 @@ export class Timeline extends Component {
 
   findMessage(message) {
     const consoleOutput = this.console.hud.ui.outputNode;
-    return consoleOutput.querySelector(
-      `.message[data-message-id="${message.id}"]`
-    );
+    return consoleOutput.querySelector(`.message[data-message-id="${message.id}"]`);
   }
 
   scrollToMessage(message) {
@@ -450,12 +437,7 @@ export class Timeline extends Component {
   }
 
   onPlayerMouseUp = e => {
-    const {
-      hoverTime,
-      startDragTime,
-      currentTime,
-      hoveredMessage,
-    } = this.state;
+    const { hoverTime, startDragTime, currentTime, hoveredMessage } = this.state;
     const mouseTime = this.getMouseTime(e);
 
     this.setState({ startDragTime: null });
@@ -697,12 +679,7 @@ export class Timeline extends Component {
   }
 
   renderMessage(message, index) {
-    const {
-      messages,
-      currentTime,
-      pausedMessage,
-      highlightedMessage,
-    } = this.state;
+    const { messages, currentTime, pausedMessage, highlightedMessage } = this.state;
 
     const offset = this.getPixelOffset(message.executionPointTime);
     const previousMessage = messages[index - 1];
@@ -714,20 +691,16 @@ export class Timeline extends Component {
     // Check to see if two messages overlay each other on the timeline
     const isOverlayed =
       previousMessage &&
-      this.getPixelDistance(
-        message.executionPointTime,
-        previousMessage.executionPointTime
-      ) < markerWidth;
+      this.getPixelDistance(message.executionPointTime, previousMessage.executionPointTime) <
+        markerWidth;
 
     // Check to see if a message appears after the current execution point
     const isFuture =
-      this.getPixelDistance(message.executionPointTime, currentTime) >
-      markerWidth / 2;
+      this.getPixelDistance(message.executionPointTime, currentTime) > markerWidth / 2;
 
     const isHighlighted = highlightedMessage == message.id;
 
-    const atPausedLocation =
-      pausedMessage && sameLocation(pausedMessage, message);
+    const atPausedLocation = pausedMessage && sameLocation(pausedMessage, message);
 
     let frameLocation = "";
     if (message.frame) {
@@ -754,11 +727,7 @@ export class Timeline extends Component {
       onClick: e => {
         e.preventDefault();
         e.stopPropagation();
-        const {
-          executionPoint,
-          executionPointTime,
-          executionPointHasFrames,
-        } = message;
+        const { executionPoint, executionPointTime, executionPointHasFrames } = message;
         this.seek(executionPoint, executionPointTime, executionPointHasFrames);
       },
       onMouseEnter: () => this.onMessageMouseEnter(message),
@@ -812,9 +781,7 @@ export class Timeline extends Component {
   }
 
   renderUnprocessedRegions() {
-    return this.state.unprocessedRegions.map(
-      this.renderUnprocessedRegion.bind(this)
-    );
+    return this.state.unprocessedRegions.map(this.renderUnprocessedRegion.bind(this));
   }
 
   renderUnprocessedRegion({ begin, end }) {

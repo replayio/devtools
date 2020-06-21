@@ -26,11 +26,7 @@ export {
   getSourceActorsForThread,
 } from "../reducers/source-actors";
 
-export {
-  getQuickOpenEnabled,
-  getQuickOpenQuery,
-  getQuickOpenType,
-} from "../reducers/quick-open";
+export { getQuickOpenEnabled, getQuickOpenQuery, getQuickOpenType } from "../reducers/quick-open";
 
 export {
   getClosestBreakpoint,
@@ -38,10 +34,7 @@ export {
   getBreakpointsAtLine,
   getClosestBreakpointPosition,
 } from "./breakpointAtLocation";
-export {
-  getVisibleBreakpoints,
-  getFirstVisibleBreakpoints,
-} from "./visibleBreakpoints";
+export { getVisibleBreakpoints, getFirstVisibleBreakpoints } from "./visibleBreakpoints";
 export { inComponent } from "./inComponent";
 export { isSelectedFrameVisible } from "./isSelectedFrameVisible";
 export { getCallStackFrames } from "./getCallStackFrames";
@@ -57,7 +50,7 @@ export {
 } from "./pause";
 
 /*
-// eslint-disable-next-line import/named
+
 import { objectInspector } from "devtools-reps";
 
 const { reducer } = objectInspector;

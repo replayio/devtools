@@ -5,12 +5,8 @@
 "use strict";
 
 const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
-const {
-  IdGenerator,
-} = require("devtools/client/webconsole/utils/id-generator");
-const {
-  batchActions,
-} = require("devtools/client/shared/redux/middleware/debounce");
+const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
+const { batchActions } = require("devtools/client/shared/redux/middleware/debounce");
 
 const {
   MESSAGES_ADD,
@@ -106,9 +102,7 @@ function messageClose(id) {
 function messageGetMatchingElements(id, cssSelectors) {
   return async ({ dispatch, client }) => {
     try {
-      const response = await client.evaluateJSAsync(
-        `document.querySelectorAll('${cssSelectors}')`
-      );
+      const response = await client.evaluateJSAsync(`document.querySelectorAll('${cssSelectors}')`);
       dispatch(messageUpdatePayload(id, response.result));
     } catch (err) {
       console.error(err);

@@ -5,9 +5,7 @@
 "use strict";
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const INSPECTOR_L10N = new LocalizationHelper(
-  "devtools/client/locales/inspector.properties"
-);
+const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
 function SlottedNodeEditor(container, node) {
   this.container = container;
@@ -20,7 +18,7 @@ function SlottedNodeEditor(container, node) {
 }
 
 SlottedNodeEditor.prototype = {
-  buildMarkup: function() {
+  buildMarkup: function () {
     const doc = this.markup.doc;
 
     this.elt = doc.createElement("span");
@@ -33,14 +31,12 @@ SlottedNodeEditor.prototype = {
     this.revealLink = doc.createElement("span");
     this.revealLink.setAttribute("role", "link");
     this.revealLink.setAttribute("tabindex", -1);
-    this.revealLink.title = INSPECTOR_L10N.getStr(
-      "markupView.revealLink.tooltip"
-    );
+    this.revealLink.title = INSPECTOR_L10N.getStr("markupView.revealLink.tooltip");
     this.revealLink.classList.add("reveal-link");
     this.elt.appendChild(this.revealLink);
   },
 
-  destroy: function() {
+  destroy: function () {
     // We might be already destroyed.
     if (!this.elt) {
       return;
@@ -55,7 +51,7 @@ SlottedNodeEditor.prototype = {
   /**
    * Stub method for consistency with ElementEditor.
    */
-  getInfoAtNode: function() {
+  getInfoAtNode: function () {
     return null;
   },
 };

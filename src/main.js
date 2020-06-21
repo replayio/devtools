@@ -97,10 +97,7 @@ async function initialize() {
     const { left, top, right, bottom } = elem.getBoundingClientRect();
     const { mouseClientX, mouseClientY } = window;
     return (
-      left <= mouseClientX &&
-      mouseClientX <= right &&
-      top <= mouseClientY &&
-      mouseClientY <= bottom
+      left <= mouseClientX && mouseClientX <= right && top <= mouseClientY && mouseClientY <= bottom
     );
   };
 }

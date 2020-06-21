@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'babylon' {
+declare module "babylon" {
   declare module.exports: any;
 }
 
@@ -22,18 +22,18 @@ declare module 'babylon' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'babylon/bin/babylon' {
+declare module "babylon/bin/babylon" {
   declare module.exports: any;
 }
 
-declare module 'babylon/lib/index' {
+declare module "babylon/lib/index" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'babylon/bin/babylon.js' {
-  declare module.exports: $Exports<'babylon/bin/babylon'>;
+declare module "babylon/bin/babylon.js" {
+  declare module.exports: $Exports<"babylon/bin/babylon">;
 }
-declare module 'babylon/lib/index.js' {
-  declare module.exports: $Exports<'babylon/lib/index'>;
+declare module "babylon/lib/index.js" {
+  declare module.exports: $Exports<"babylon/lib/index">;
 }

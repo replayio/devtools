@@ -12,295 +12,295 @@ const {
   parsePacketsWithFronts,
 } = require("chrome://mochitests/content/browser/devtools/client/webconsole/test/browser/stub-generator-helpers");
 const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
-const {
-  ConsoleMessage,
-  NetworkEventMessage,
-} = require("devtools/client/webconsole/types");
+const { ConsoleMessage, NetworkEventMessage } = require("devtools/client/webconsole/types");
 
 const rawPackets = new Map();
 rawPackets.set(`new Date(0)`, {
-  "resultID": "1573832025018-0",
-  "input": "new Date(0)",
-  "result": {
-    "_grip": {
-      "type": "object",
-      "actor": "server0.conn0.child1/obj23",
-      "class": "Date",
-      "ownPropertyLength": 0,
-      "extensible": true,
-      "frozen": false,
-      "sealed": false,
-      "preview": {
-        "timestamp": 0
-      }
+  resultID: "1573832025018-0",
+  input: "new Date(0)",
+  result: {
+    _grip: {
+      type: "object",
+      actor: "server0.conn0.child1/obj23",
+      class: "Date",
+      ownPropertyLength: 0,
+      extensible: true,
+      frozen: false,
+      sealed: false,
+      preview: {
+        timestamp: 0,
+      },
     },
-    "actorID": "server0.conn0.child1/obj23"
+    actorID: "server0.conn0.child1/obj23",
   },
-  "timestamp": 1573832025019
+  timestamp: 1573832025019,
 });
 
 rawPackets.set(`asdf()`, {
-  "resultID": "1573832025112-1",
-  "errorMessageName": "JSMSG_NOT_DEFINED",
-  "exception": {
-    "_grip": {
-      "type": "object",
-      "actor": "server0.conn0.child1/obj25",
-      "class": "Error",
-      "ownPropertyLength": 4,
-      "extensible": true,
-      "frozen": false,
-      "sealed": false,
-      "preview": {
-        "kind": "Error",
-        "name": "ReferenceError",
-        "message": "asdf is not defined",
-        "stack": "@debugger eval code:1:1\n",
-        "fileName": "debugger eval code",
-        "lineNumber": 1,
-        "columnNumber": 1
-      }
+  resultID: "1573832025112-1",
+  errorMessageName: "JSMSG_NOT_DEFINED",
+  exception: {
+    _grip: {
+      type: "object",
+      actor: "server0.conn0.child1/obj25",
+      class: "Error",
+      ownPropertyLength: 4,
+      extensible: true,
+      frozen: false,
+      sealed: false,
+      preview: {
+        kind: "Error",
+        name: "ReferenceError",
+        message: "asdf is not defined",
+        stack: "@debugger eval code:1:1\n",
+        fileName: "debugger eval code",
+        lineNumber: 1,
+        columnNumber: 1,
+      },
     },
-    "actorID": "server0.conn0.child1/obj25"
+    actorID: "server0.conn0.child1/obj25",
   },
-  "exceptionMessage": "ReferenceError: asdf is not defined",
-  "exceptionDocURL": "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Errors/Not_defined?utm_source=mozilla&utm_medium=firefox-console-errors&utm_campaign=default",
-  "exceptionStack": [
+  exceptionMessage: "ReferenceError: asdf is not defined",
+  exceptionDocURL:
+    "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Errors/Not_defined?utm_source=mozilla&utm_medium=firefox-console-errors&utm_campaign=default",
+  exceptionStack: [
     {
-      "filename": "debugger eval code",
-      "sourceId": "server0.conn0.child1/source24",
-      "lineNumber": 1,
-      "columnNumber": 1,
-      "functionName": null
-    }
+      filename: "debugger eval code",
+      sourceId: "server0.conn0.child1/source24",
+      lineNumber: 1,
+      columnNumber: 1,
+      functionName: null,
+    },
   ],
-  "frame": {
-    "source": "debugger eval code",
-    "line": 1,
-    "column": 1
+  frame: {
+    source: "debugger eval code",
+    line: 1,
+    column: 1,
   },
-  "input": "asdf()",
-  "result": {
-    "type": "undefined"
+  input: "asdf()",
+  result: {
+    type: "undefined",
   },
-  "timestamp": 1573832025112
+  timestamp: 1573832025112,
 });
 
 rawPackets.set(`1 + @`, {
-  "resultID": "1573832025117-2",
-  "errorMessageName": "JSMSG_ILLEGAL_CHARACTER",
-  "exception": {
-    "_grip": {
-      "type": "object",
-      "actor": "server0.conn0.child1/obj26",
-      "class": "Error",
-      "ownPropertyLength": 4,
-      "extensible": true,
-      "frozen": false,
-      "sealed": false,
-      "preview": {
-        "kind": "Error",
-        "name": "SyntaxError",
-        "message": "illegal character",
-        "stack": "",
-        "fileName": "debugger eval code",
-        "lineNumber": 1,
-        "columnNumber": 4
-      }
+  resultID: "1573832025117-2",
+  errorMessageName: "JSMSG_ILLEGAL_CHARACTER",
+  exception: {
+    _grip: {
+      type: "object",
+      actor: "server0.conn0.child1/obj26",
+      class: "Error",
+      ownPropertyLength: 4,
+      extensible: true,
+      frozen: false,
+      sealed: false,
+      preview: {
+        kind: "Error",
+        name: "SyntaxError",
+        message: "illegal character",
+        stack: "",
+        fileName: "debugger eval code",
+        lineNumber: 1,
+        columnNumber: 4,
+      },
     },
-    "actorID": "server0.conn0.child1/obj26"
+    actorID: "server0.conn0.child1/obj26",
   },
-  "exceptionMessage": "SyntaxError: illegal character",
-  "exceptionDocURL": "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Errors/Illegal_character?utm_source=mozilla&utm_medium=firefox-console-errors&utm_campaign=default",
-  "frame": {
-    "source": "debugger eval code",
-    "line": 1,
-    "column": 4
+  exceptionMessage: "SyntaxError: illegal character",
+  exceptionDocURL:
+    "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Errors/Illegal_character?utm_source=mozilla&utm_medium=firefox-console-errors&utm_campaign=default",
+  frame: {
+    source: "debugger eval code",
+    line: 1,
+    column: 4,
   },
-  "input": "1 + @",
-  "result": {
-    "type": "undefined"
+  input: "1 + @",
+  result: {
+    type: "undefined",
   },
-  "timestamp": 1573832025117
+  timestamp: 1573832025117,
 });
 
 rawPackets.set(`inspect({a: 1})`, {
-  "resultID": "1573832025122-3",
-  "helperResult": {
-    "type": "inspectObject",
-    "input": "inspect({a: 1})",
-    "object": {
-      "_grip": {
-        "type": "object",
-        "actor": "server0.conn0.child1/obj28",
-        "class": "Object",
-        "ownPropertyLength": 1,
-        "extensible": true,
-        "frozen": false,
-        "sealed": false,
-        "preview": {
-          "kind": "Object",
-          "ownProperties": {
-            "a": {
-              "configurable": true,
-              "enumerable": true,
-              "writable": true,
-              "value": 1
-            }
+  resultID: "1573832025122-3",
+  helperResult: {
+    type: "inspectObject",
+    input: "inspect({a: 1})",
+    object: {
+      _grip: {
+        type: "object",
+        actor: "server0.conn0.child1/obj28",
+        class: "Object",
+        ownPropertyLength: 1,
+        extensible: true,
+        frozen: false,
+        sealed: false,
+        preview: {
+          kind: "Object",
+          ownProperties: {
+            a: {
+              configurable: true,
+              enumerable: true,
+              writable: true,
+              value: 1,
+            },
           },
-          "ownSymbols": [],
-          "ownPropertiesLength": 1,
-          "ownSymbolsLength": 0,
-          "safeGetterValues": {}
-        }
+          ownSymbols: [],
+          ownPropertiesLength: 1,
+          ownSymbolsLength: 0,
+          safeGetterValues: {},
+        },
       },
-      "actorID": "server0.conn0.child1/obj28"
+      actorID: "server0.conn0.child1/obj28",
     },
-    "forceExpandInConsole": false
+    forceExpandInConsole: false,
   },
-  "input": "inspect({a: 1})",
-  "result": {
-    "type": "undefined"
+  input: "inspect({a: 1})",
+  result: {
+    type: "undefined",
   },
-  "timestamp": 1573832025123
+  timestamp: 1573832025123,
 });
 
 rawPackets.set(`cd(document)`, {
-  "resultID": "1573832025125-4",
-  "helperResult": {
-    "type": "error",
-    "message": "cdFunctionInvalidArgument"
+  resultID: "1573832025125-4",
+  helperResult: {
+    type: "error",
+    message: "cdFunctionInvalidArgument",
   },
-  "input": "cd(document)",
-  "result": {
-    "type": "undefined"
+  input: "cd(document)",
+  result: {
+    type: "undefined",
   },
-  "timestamp": 1573832025126
+  timestamp: 1573832025126,
 });
 
 rawPackets.set(`undefined`, {
-  "resultID": "1573832025127-5",
-  "input": "undefined",
-  "result": {
-    "type": "undefined"
+  resultID: "1573832025127-5",
+  input: "undefined",
+  result: {
+    type: "undefined",
   },
-  "timestamp": 1573832025128
+  timestamp: 1573832025128,
 });
 
 rawPackets.set(`longString message Error`, {
-  "resultID": "1573832025130-6",
-  "exception": {
-    "_grip": {
-      "type": "object",
-      "actor": "server0.conn0.child1/obj32",
-      "class": "Error",
-      "ownPropertyLength": 4,
-      "extensible": true,
-      "frozen": false,
-      "sealed": false,
-      "preview": {
-        "kind": "Error",
-        "name": "Error",
-        "message": {
-          "_grip": {
-            "type": "longString",
-            "actor": "server0.conn0.child1/longstractor33",
-            "length": 110000,
-            "initial": "Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error"
+  resultID: "1573832025130-6",
+  exception: {
+    _grip: {
+      type: "object",
+      actor: "server0.conn0.child1/obj32",
+      class: "Error",
+      ownPropertyLength: 4,
+      extensible: true,
+      frozen: false,
+      sealed: false,
+      preview: {
+        kind: "Error",
+        name: "Error",
+        message: {
+          _grip: {
+            type: "longString",
+            actor: "server0.conn0.child1/longstractor33",
+            length: 110000,
+            initial:
+              "Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error",
           },
-          "actorID": "server0.conn0.child1/longstractor33"
+          actorID: "server0.conn0.child1/longstractor33",
         },
-        "stack": "@debugger eval code:1:7\n",
-        "fileName": "debugger eval code",
-        "lineNumber": 1,
-        "columnNumber": 7
-      }
+        stack: "@debugger eval code:1:7\n",
+        fileName: "debugger eval code",
+        lineNumber: 1,
+        columnNumber: 7,
+      },
     },
-    "actorID": "server0.conn0.child1/obj32"
+    actorID: "server0.conn0.child1/obj32",
   },
-  "exceptionMessage": {
-    "_grip": {
-      "type": "longString",
-      "actor": "server0.conn0.child1/longstractor34",
-      "length": 110007,
-      "initial": "Error: Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Lon"
+  exceptionMessage: {
+    _grip: {
+      type: "longString",
+      actor: "server0.conn0.child1/longstractor34",
+      length: 110007,
+      initial:
+        "Error: Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Long error Lon",
     },
-    "actorID": "server0.conn0.child1/longstractor34"
+    actorID: "server0.conn0.child1/longstractor34",
   },
-  "exceptionStack": [
+  exceptionStack: [
     {
-      "filename": "debugger eval code",
-      "sourceId": "server0.conn0.child1/source31",
-      "lineNumber": 1,
-      "columnNumber": 7,
-      "functionName": null
-    }
+      filename: "debugger eval code",
+      sourceId: "server0.conn0.child1/source31",
+      lineNumber: 1,
+      columnNumber: 7,
+      functionName: null,
+    },
   ],
-  "frame": {
-    "source": "debugger eval code",
-    "sourceId": "server0.conn0.child1/source31",
-    "line": 1,
-    "column": 7
+  frame: {
+    source: "debugger eval code",
+    sourceId: "server0.conn0.child1/source31",
+    line: 1,
+    column: 7,
   },
-  "input": "throw new Error(\"Long error \".repeat(10000))",
-  "result": {
-    "type": "undefined"
+  input: 'throw new Error("Long error ".repeat(10000))',
+  result: {
+    type: "undefined",
   },
-  "timestamp": 1573832025130
+  timestamp: 1573832025130,
 });
 
 rawPackets.set(`eval throw ""`, {
-  "resultID": "1573832025134-7",
-  "exception": "",
-  "exceptionMessage": "",
-  "exceptionStack": [
+  resultID: "1573832025134-7",
+  exception: "",
+  exceptionMessage: "",
+  exceptionStack: [
     {
-      "filename": "debugger eval code",
-      "sourceId": "server0.conn0.child1/source24",
-      "lineNumber": 1,
-      "columnNumber": 1,
-      "functionName": null
-    }
+      filename: "debugger eval code",
+      sourceId: "server0.conn0.child1/source24",
+      lineNumber: 1,
+      columnNumber: 1,
+      functionName: null,
+    },
   ],
-  "frame": {
-    "source": "debugger eval code",
-    "sourceId": "server0.conn0.child1/source24",
-    "line": 1,
-    "column": 1
+  frame: {
+    source: "debugger eval code",
+    sourceId: "server0.conn0.child1/source24",
+    line: 1,
+    column: 1,
   },
-  "input": "throw \"\"",
-  "result": {
-    "type": "undefined"
+  input: 'throw ""',
+  result: {
+    type: "undefined",
   },
-  "timestamp": 1573832025134
+  timestamp: 1573832025134,
 });
 
 rawPackets.set(`eval throw "tomato"`, {
-  "resultID": "1573832025137-8",
-  "exception": "tomato",
-  "exceptionMessage": "tomato",
-  "exceptionStack": [
+  resultID: "1573832025137-8",
+  exception: "tomato",
+  exceptionMessage: "tomato",
+  exceptionStack: [
     {
-      "filename": "debugger eval code",
-      "sourceId": "server0.conn0.child1/source24",
-      "lineNumber": 1,
-      "columnNumber": 1,
-      "functionName": null
-    }
+      filename: "debugger eval code",
+      sourceId: "server0.conn0.child1/source24",
+      lineNumber: 1,
+      columnNumber: 1,
+      functionName: null,
+    },
   ],
-  "frame": {
-    "source": "debugger eval code",
-    "sourceId": "server0.conn0.child1/source24",
-    "line": 1,
-    "column": 1
+  frame: {
+    source: "debugger eval code",
+    sourceId: "server0.conn0.child1/source24",
+    line: 1,
+    column: 1,
   },
-  "input": "throw \"tomato\"",
-  "result": {
-    "type": "undefined"
+  input: 'throw "tomato"',
+  result: {
+    type: "undefined",
   },
-  "timestamp": 1573832025138
+  timestamp: 1573832025138,
 });
-
 
 const stubPackets = parsePacketsWithFronts(rawPackets);
 

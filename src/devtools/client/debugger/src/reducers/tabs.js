@@ -15,12 +15,7 @@ import move from "lodash-move";
 import { isSimilarTab, persistTabs } from "../utils/tabs";
 import { makeShallowQuery } from "../utils/resource";
 
-import {
-  getSource,
-  getSpecificSourceByURL,
-  getSources,
-  resourceAsSourceBase,
-} from "./sources";
+import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
 
 import type { Action } from "../actions/types";
 import type { Selector, State } from "./types";
@@ -53,10 +48,7 @@ function resetTabState(state) {
   return { tabs };
 }
 
-function update(
-  state: TabsState = initialTabState(),
-  action: Action
-): TabsState {
+function update(state: TabsState = initialTabState(), action: Action): TabsState {
   switch (action.type) {
     case "ADD_TAB":
     case "UPDATE_TAB":
@@ -125,10 +117,7 @@ export function getNewSelectedSourceId(state: State, tabList: TabList): string {
       return "";
     }
 
-    const selectedSource = getSpecificSourceByURL(
-      state,
-      selectedTab.url
-    );
+    const selectedSource = getSpecificSourceByURL(state, selectedTab.url);
 
     if (selectedSource) {
       return selectedSource.id;
@@ -144,10 +133,7 @@ export function getNewSelectedSourceId(state: State, tabList: TabList): string {
   const availableTab = availableTabs[newSelectedTabIndex];
 
   if (availableTab) {
-    const tabSource = getSpecificSourceByURL(
-      state,
-      availableTab.url
-    );
+    const tabSource = getSpecificSourceByURL(state, availableTab.url);
 
     if (tabSource) {
       return tabSource.id;
@@ -223,22 +209,17 @@ function removeSourcesFromTabList(state: TabsState, { sources }) {
  * @memberof reducers/tabs
  * @static
  */
-function updateTabList(
-  state: TabsState,
-  { url, framework = null, sourceId }
-) {
+function updateTabList(state: TabsState, { url, framework = null, sourceId }) {
   let { tabs } = state;
   // Set currentIndex to -1 for URL-less tabs so that they aren't
   // filtered by isSimilarTab
-  const currentIndex = url
-    ? tabs.findIndex(tab => isSimilarTab(tab, url))
-    : -1;
+  const currentIndex = url ? tabs.findIndex(tab => isSimilarTab(tab, url)) : -1;
 
   if (currentIndex === -1) {
     const newTab = {
       url,
       framework,
-      sourceId
+      sourceId,
     };
     tabs = [newTab, ...tabs];
   } else if (framework) {
@@ -255,10 +236,7 @@ function moveTabInList(state: TabsState, { url, tabIndex: newIndex }) {
   return { tabs };
 }
 
-function moveTabInListBySourceId(
-  state: TabsState,
-  { sourceId, tabIndex: newIndex }
-) {
+function moveTabInListBySourceId(state: TabsState, { sourceId, tabIndex: newIndex }) {
   let { tabs } = state;
   const currentIndex = tabs.findIndex(tab => tab.sourceId == sourceId);
   tabs = move(tabs, currentIndex, newIndex);

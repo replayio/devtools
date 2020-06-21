@@ -8,12 +8,7 @@ const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { a } = dom;
 
-loader.lazyRequireGetter(
-  this,
-  "openDocLink",
-  "devtools/client/shared/link",
-  true
-);
+loader.lazyRequireGetter(this, "openDocLink", "devtools/client/shared/link", true);
 
 function MDNLink({ url, title }) {
   return a({

@@ -8,10 +8,7 @@ import React from "react";
 import { shallow } from "enzyme";
 
 import Breakpoint from "../Breakpoint";
-import {
-  createSourceObject,
-  createOriginalSourceObject,
-} from "../../../../utils/test-head";
+import { createSourceObject, createOriginalSourceObject } from "../../../../utils/test-head";
 
 describe("Breakpoint", () => {
   it("simple", () => {
@@ -89,7 +86,7 @@ function generateDefaults(overrides = {}, breakpointOverrides = {}) {
     frame: (null: any),
     editor: {
       CodeMirror: {
-        runMode: function() {
+        runMode: function () {
           return "";
         },
       },

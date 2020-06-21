@@ -175,12 +175,7 @@ export function breakpointItems(
   if (breakpoint.originalText.startsWith("debugger")) {
     items.push(
       { type: "separator" },
-      toggleDbgStatementItem(
-        cx,
-        selectedLocation,
-        breakpointActions,
-        breakpoint
-      )
+      toggleDbgStatementItem(cx, selectedLocation, breakpointActions, breakpoint)
     );
   }
 
@@ -193,9 +188,7 @@ export function breakpointItems(
     { type: "separator" }
   );
 
-  items.push(
-    conditionalBreakpointItem(breakpoint, selectedLocation, breakpointActions)
-  );
+  items.push(conditionalBreakpointItem(breakpoint, selectedLocation, breakpointActions));
   items.push(logPointItem(breakpoint, selectedLocation, breakpointActions));
 
   return items;
@@ -232,12 +225,7 @@ export const removeBreakpointsOnLineItem = (
   label: L10N.getStr("breakpointMenuItem.removeAllAtLine.label"),
   accesskey: L10N.getStr("breakpointMenuItem.removeAllAtLine.accesskey"),
   disabled: false,
-  click: () =>
-    breakpointActions.removeBreakpointsAtLine(
-      cx,
-      location.sourceId,
-      location.line
-    ),
+  click: () => breakpointActions.removeBreakpointsAtLine(cx, location.sourceId, location.line),
 });
 
 export const enableBreakpointsOnLineItem = (
@@ -249,12 +237,7 @@ export const enableBreakpointsOnLineItem = (
   label: L10N.getStr("breakpointMenuItem.enableAllAtLine.label"),
   accesskey: L10N.getStr("breakpointMenuItem.enableAllAtLine.accesskey"),
   disabled: false,
-  click: () =>
-    breakpointActions.enableBreakpointsAtLine(
-      cx,
-      location.sourceId,
-      location.line
-    ),
+  click: () => breakpointActions.enableBreakpointsAtLine(cx, location.sourceId, location.line),
 });
 
 export const disableBreakpointsOnLineItem = (
@@ -266,12 +249,7 @@ export const disableBreakpointsOnLineItem = (
   label: L10N.getStr("breakpointMenuItem.disableAllAtLine.label"),
   accesskey: L10N.getStr("breakpointMenuItem.disableAllAtLine.accesskey"),
   disabled: false,
-  click: () =>
-    breakpointActions.disableBreakpointsAtLine(
-      cx,
-      location.sourceId,
-      location.line
-    ),
+  click: () => breakpointActions.disableBreakpointsAtLine(cx, location.sourceId, location.line),
 });
 
 export type BreakpointItemActions = {

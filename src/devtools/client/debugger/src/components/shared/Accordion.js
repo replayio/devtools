@@ -36,10 +36,7 @@ class Accordion extends Component<Props> {
     this.forceUpdate();
   }
 
-  onHandleHeaderKeyDown(
-    e: SyntheticKeyboardEvent<HTMLHeadingElement>,
-    i: number
-  ) {
+  onHandleHeaderKeyDown(e: SyntheticKeyboardEvent<HTMLHeadingElement>, i: number) {
     if (e && (e.key === " " || e.key === "Enter")) {
       this.handleHeaderClick(i);
     }
@@ -65,19 +62,13 @@ class Accordion extends Component<Props> {
           ) : null}
         </h2>
         {opened && (
-          <div className="_content">
-            {cloneElement(item.component, item.componentProps || {})}
-          </div>
+          <div className="_content">{cloneElement(item.component, item.componentProps || {})}</div>
         )}
       </li>
     );
   };
   render() {
-    return (
-      <ul className="accordion">
-        {this.props.items.map(this.renderContainer)}
-      </ul>
-    );
+    return <ul className="accordion">{this.props.items.map(this.renderContainer)}</ul>;
   }
 }
 

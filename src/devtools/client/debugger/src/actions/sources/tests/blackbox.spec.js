@@ -4,12 +4,7 @@
 
 // @flow
 
-import {
-  actions,
-  selectors,
-  createStore,
-  makeSource,
-} from "../../../utils/test-head";
+import { actions, selectors, createStore, makeSource } from "../../../utils/test-head";
 
 describe("blackbox", () => {
   it("should blackbox a source", async () => {
@@ -19,9 +14,7 @@ describe("blackbox", () => {
     });
     const { dispatch, getState, cx } = store;
 
-    const foo1Source = await dispatch(
-      actions.newGeneratedSource(makeSource("foo1"))
-    );
+    const foo1Source = await dispatch(actions.newGeneratedSource(makeSource("foo1")));
     await dispatch(actions.toggleBlackBox(cx, foo1Source));
 
     const fooSource = selectors.getSource(getState(), "foo1");
@@ -31,9 +24,7 @@ describe("blackbox", () => {
     }
 
     const displayedSources = selectors.getDisplayedSources(getState());
-    expect(displayedSources.FakeThread[fooSource.id].isBlackBoxed).toEqual(
-      true
-    );
+    expect(displayedSources.FakeThread[fooSource.id].isBlackBoxed).toEqual(true);
     expect(fooSource.isBlackBoxed).toEqual(true);
   });
 });

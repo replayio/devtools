@@ -147,9 +147,9 @@ class NodePicker extends EventEmitter {
       ({ highlighter }) => highlighter !== data.node.highlighterFront
     );
 
-    Promise.all(
-      unmatchedInspectors.map(({ highlighter }) => highlighter.hideBoxModel())
-    ).catch(e => console.error);
+    Promise.all(unmatchedInspectors.map(({ highlighter }) => highlighter.hideBoxModel())).catch(
+      e => console.error
+    );
   }
 
   /**

@@ -13,7 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-declare module 'pretty-fast' {
+declare module "pretty-fast" {
   declare module.exports: any;
 }
 
@@ -22,18 +22,18 @@ declare module 'pretty-fast' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'pretty-fast/pretty-fast' {
+declare module "pretty-fast/pretty-fast" {
   declare module.exports: any;
 }
 
-declare module 'pretty-fast/test' {
+declare module "pretty-fast/test" {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module 'pretty-fast/pretty-fast.js' {
-  declare module.exports: $Exports<'pretty-fast/pretty-fast'>;
+declare module "pretty-fast/pretty-fast.js" {
+  declare module.exports: $Exports<"pretty-fast/pretty-fast">;
 }
-declare module 'pretty-fast/test.js' {
-  declare module.exports: $Exports<'pretty-fast/test'>;
+declare module "pretty-fast/test.js" {
+  declare module.exports: $Exports<"pretty-fast/test">;
 }

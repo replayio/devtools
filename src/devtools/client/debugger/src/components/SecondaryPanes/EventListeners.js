@@ -199,8 +199,7 @@ class EventListeners extends Component<Props, State> {
 
     const expanded = expandedCategories.includes(category.name);
     const checked = events.every(({ id }) => activeEventListeners.includes(id));
-    const indeterminate =
-      !checked && events.some(({ id }) => activeEventListeners.includes(id));
+    const indeterminate = !checked && events.some(({ id }) => activeEventListeners.includes(id));
 
     return (
       <div className="event-listener-header">
@@ -284,9 +283,7 @@ class EventListeners extends Component<Props, State> {
           {this.renderClearSearchButton()}
         </div> */}
         <div className="event-listeners-content">
-          {searchText
-            ? this.renderSearchResultsList()
-            : this.renderCategoriesList()}
+          {searchText ? this.renderSearchResultsList() : this.renderCategoriesList()}
         </div>
       </div>
     );

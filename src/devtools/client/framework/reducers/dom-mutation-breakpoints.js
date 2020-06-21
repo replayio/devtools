@@ -13,9 +13,7 @@ function domMutationBreakpointReducer(state = initialReducerState, action) {
   switch (action.type) {
     case "ADD_DOM_MUTATION_BREAKPOINT":
       const hasExistingBp = state.breakpoints.some(
-        bp =>
-          bp.nodeFront === action.nodeFront &&
-          bp.mutationType === action.mutationType
+        bp => bp.nodeFront === action.nodeFront && bp.mutationType === action.mutationType
       );
 
       if (hasExistingBp) {
@@ -38,10 +36,7 @@ function domMutationBreakpointReducer(state = initialReducerState, action) {
       break;
     case "REMOVE_DOM_MUTATION_BREAKPOINT":
       for (const [index, bp] of state.breakpoints.entries()) {
-        if (
-          bp.nodeFront === action.nodeFront &&
-          bp.mutationType === action.mutationType
-        ) {
+        if (bp.nodeFront === action.nodeFront && bp.mutationType === action.mutationType) {
           state = {
             ...state,
             breakpoints: [
@@ -57,9 +52,7 @@ function domMutationBreakpointReducer(state = initialReducerState, action) {
       const { nodeFronts } = action;
       const nodeFrontSet = new Set(nodeFronts);
 
-      const breakpoints = state.breakpoints.filter(
-        bp => !nodeFrontSet.has(bp.nodeFront)
-      );
+      const breakpoints = state.breakpoints.filter(bp => !nodeFrontSet.has(bp.nodeFront));
 
       // Since we might not have made any actual changes, we verify first
       // to avoid unnecessary changes in the state.
@@ -109,7 +102,5 @@ function getDOMMutationBreakpoints(state) {
 
 exports.getDOMMutationBreakpoint = getDOMMutationBreakpoint;
 function getDOMMutationBreakpoint(state, id) {
-  return (
-    state.domMutationBreakpoints.breakpoints.find(v => v.id === id) || null
-  );
+  return state.domMutationBreakpoints.breakpoints.find(v => v.id === id) || null;
 }
