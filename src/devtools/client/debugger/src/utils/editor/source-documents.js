@@ -57,7 +57,6 @@ export function clearEditor(editor: SourceEditor) {
   editor.replaceDocument(doc);
   editor.setText("");
   editor.setMode({ name: "text" });
-  resetLineNumberFormat(editor);
 }
 
 export function showLoading(editor: SourceEditor) {
@@ -85,7 +84,6 @@ export function showErrorMessage(editor: Object, msg: string) {
   editor.replaceDocument(doc);
   editor.setText(error);
   editor.setMode({ name: "text" });
-  resetLineNumberFormat(editor);
 }
 
 function setEditorText(editor: Object, sourceId: SourceId, content: SourceContent) {
