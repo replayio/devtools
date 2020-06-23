@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const React = require("react");
 const ReactDOM = require("react-dom");
 import Toolbox from "./Toolbox";
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
+import SplitBox from "gecko/devtools/client/shared/components/splitter/SplitBox";
 import { connect } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";

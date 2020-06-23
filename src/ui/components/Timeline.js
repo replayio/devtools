@@ -30,7 +30,7 @@ const { pointEquals, pointPrecedes } = require("protocol/execution-point-utils.j
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 
-import { LocalizationHelper } from "devtools/shared/l10n";
+import { LocalizationHelper } from "gecko/devtools/shared/l10n";
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
 
 const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);

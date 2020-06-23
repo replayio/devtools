@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { LocalizationHelper } from "devtools/shared/l10n";
+import { LocalizationHelper } from "gecko/devtools/shared/l10n";
 import { defer, assert } from "protocol/utils";
-import { bootstrapApp } from "devtools/client/debugger/src/utils/bootstrap";
+import { bootstrapApp } from "gecko/devtools/client/debugger/src/utils/bootstrap";
 
 function registerStoreObserver(store, subscriber) {
   let oldState = store.getState();

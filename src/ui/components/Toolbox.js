@@ -36,7 +36,7 @@ const ReactDOM = require("react-dom");
 const { EventEmitter } = require("protocol/utils");
 import classnames from "classnames";
 
-import { DebuggerPanel } from "devtools/client/debugger/panel";
+import { DebuggerPanel } from "gecko/devtools/client/debugger/panel";
 
 const { WebConsolePanel } = require("devtools/client/webconsole/panel");
 const { InspectorPanel } = require("devtools/client/inspector/panel");
@@ -49,7 +49,7 @@ const Highlighter = require("highlighter/highlighter");
 import Timeline from "./Timeline";
 const { ThreadFront } = require("protocol/thread");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
+import SplitBox from "gecko/devtools/client/shared/components/splitter/SplitBox";
 
 import "./Toolbox.css";
 

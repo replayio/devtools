@@ -2,8 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
-import { prefs } from "devtools/client/debugger/src/utils/prefs";
-import configureStore from "devtools/client/debugger/src/actions/utils/create-store";
+import { prefs } from "gecko/devtools/client/debugger/src/utils/prefs";
+import configureStore from "gecko/devtools/client/debugger/src/actions/utils/create-store";
 import { bindActionCreators, combineReducers } from "redux";
 import { reducers, selectors } from "../reducers";
 import { actions } from "../actions";

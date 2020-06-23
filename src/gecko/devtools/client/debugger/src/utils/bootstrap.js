@@ -9,7 +9,7 @@ import { bindActionCreators, combineReducers } from "redux";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
-import ToolboxProvider from "devtools/client/framework/store-provider";
+import ToolboxProvider from "gecko/devtools/client/framework/store-provider";
 import { isDevelopment } from "devtools-environment";
 import { AppConstants } from "devtools-modules";
 
