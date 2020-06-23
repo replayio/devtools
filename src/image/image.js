@@ -115,6 +115,7 @@ const gMaskImages = {
   ".tree-node button.arrow": require("devtools/client/debugger/images/arrow.svg"),
   "#header .logo": require("./images/logo.svg"),
   "#command-button-pick::before": require("devtools/client/themes/images/command-pick.svg"),
+  "button.open-inspector": require("devtools/client/themes/images/open-inspector.svg"),
 };
 
 const gContentImages = {
