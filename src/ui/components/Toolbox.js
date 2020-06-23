@@ -30,36 +30,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const React = require("react");
-const ReactDOM = require("react-dom");
+import React from "react";
+import ReactDOM from "react-dom";
 
-const { EventEmitter } = require("protocol/utils");
+import { EventEmitter } from "protocol/utils";
 import classnames from "classnames";
 
 import { DebuggerPanel } from "devtools/client/debugger/panel";
 
-const { WebConsolePanel } = require("devtools/client/webconsole/panel");
-const { InspectorPanel } = require("devtools/client/inspector/panel");
-const Selection = require("devtools/client/framework/selection");
-const { log } = require("protocol/socket");
-const { defer } = require("protocol/utils");
-const { getDevicePixelRatio } = require("protocol/graphics");
-const Highlighter = require("highlighter/highlighter");
+import { WebConsolePanel } from "devtools/client/webconsole/panel";
+import { InspectorPanel } from "devtools/client/inspector/panel";
+import Selection from "devtools/client/framework/selection";
+import { log } from "protocol/socket";
+import { defer } from "protocol/utils";
+import { getDevicePixelRatio } from "protocol/graphics";
+import Highlighter from "highlighter/highlighter";
 
 import Timeline from "./Timeline";
-const { ThreadFront } = require("protocol/thread");
-const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
+import { ThreadFront } from "protocol/thread";
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
+import { connect } from "react-redux";
+import { actions } from "../actions";
+import { selectors } from "../reducers";
 
 import "./Toolbox.css";
 
 const shortcuts = new KeyShortcuts({ window, target: document });
 
-export default class Toolbox extends React.Component {
+class Toolbox extends React.Component {
   state = {
     selectedPanel: "",
     panels: {},
-    splitConsoleOpen: true,
   };
 
   parserService = {
@@ -147,7 +149,7 @@ export default class Toolbox extends React.Component {
   }
 
   onEscape = () => {
-    this.toggleSplitConsole(!this.state.splitConsoleOpen);
+    this.toggleSplitConsole(!this.props.splitConsoleOpen);
   };
 
   getPanel(name) {
@@ -155,7 +157,7 @@ export default class Toolbox extends React.Component {
   }
 
   toggleSplitConsole(open) {
-    this.setState({ splitConsoleOpen: open });
+    this.props.setSplitConsole(open);
   }
 
   getHighlighter() {
@@ -512,7 +514,8 @@ export default class Toolbox extends React.Component {
   }
 
   getSplitBoxDimensions() {
-    const { selectedPanel, splitConsoleOpen } = this.state;
+    const { selectedPanel } = this.state;
+    const { splitConsoleOpen } = this.props;
 
     if (selectedPanel == "console") {
       return {
@@ -538,7 +541,8 @@ export default class Toolbox extends React.Component {
   }
 
   render() {
-    const { selectedPanel, splitConsoleOpen } = this.state;
+    const { selectedPanel } = this.state;
+    const { splitConsoleOpen } = this.props;
     return (
       <div id="toolbox" className={`${selectedPanel}`}>
         <div id="toolbox-border"></div>
@@ -593,3 +597,11 @@ export default class Toolbox extends React.Component {
     );
   }
 }
+export default connect(
+  state => ({
+    splitConsoleOpen: selectors.isSplitConsoleOpen(state),
+  }),
+  {
+    setSplitConsole: actions.setSplitConsole,
+  }
+)(Toolbox);
