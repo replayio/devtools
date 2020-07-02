@@ -384,9 +384,11 @@ function waitForFrameTimeline(width) {
   });
 }
 
-function checkFrames(count) {
-  const frames = dbgSelectors.getFrames(dbgSelectors.getCurrentThread());
-  assert(frames.length == count);
+async function checkFrames(count) {
+  return waitUntil(() => {
+    const frames = dbgSelectors.getFrames(dbgSelectors.getCurrentThread());
+    return frames.length == count;
+  });
 }
 
 async function selectFrame(index) {
