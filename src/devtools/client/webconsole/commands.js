@@ -17,7 +17,7 @@ class ConsoleCommands {
 
   async evaluateJSAsync(expression, options = {}) {
     const { frameActor } = options;
-    const rv = await this.threadFront.evaluate(frameActor, expression);
+    const rv = await this.threadFront.evaluate(/* asyncIndex */ 0, frameActor, expression);
     const { returned, exception, failed } = rv;
 
     let v;

@@ -36,7 +36,7 @@ export function selectFrame(cx: ThreadContext, frame: Frame) {
     });
 
     if (getCanRewind(getState())) {
-      client.fetchAncestorFramePositions(frame.index);
+      client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
     }
 
     dispatch(selectLocation(cx, frame.location));

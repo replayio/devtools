@@ -22,7 +22,7 @@ export function prepareSourcePayload(threadFront, source: SourcePayload): Genera
   return { thread: threadFront.actor, source };
 }
 
-export async function createFrame(thread: ThreadId, frame: Object, index: number = 0): ?Frame {
+export async function createFrame(thread: ThreadId, frame, index = 0, asyncIndex = 0): ?Frame {
   if (!frame) {
     return null;
   }
@@ -37,7 +37,9 @@ export async function createFrame(thread: ThreadId, frame: Object, index: number
   const displayName = frame.functionName || `(${frame.type})`;
 
   return {
-    id: frame.frameId,
+    id: `${asyncIndex}:${index}`,
+    protocolId: frame.frameId,
+    asyncIndex,
     thread,
     displayName,
     location,
@@ -45,7 +47,7 @@ export async function createFrame(thread: ThreadId, frame: Object, index: number
     this: frame.this,
     source: null,
     index,
-    asyncCause: frame.asyncCause,
+    asyncCause: (asyncIndex && index == 0) ? "async" : undefined,
     state: "on-stack",
   };
 }

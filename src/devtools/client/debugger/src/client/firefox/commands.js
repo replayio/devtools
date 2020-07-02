@@ -251,10 +251,10 @@ type EvaluateParam = { thread: string, frameId: ?FrameId };
 
 async function evaluate(
   script: ?Script,
-  { thread, frameId }: EvaluateParam = {}
+  { thread, asyncIndex, frameId }: EvaluateParam = {}
 ): Promise<{ result: ExpressionResult }> {
   const threadFront = lookupThreadFront(thread);
-  const { returned, exception, failed } = await threadFront.evaluate(frameId, script);
+  const { returned, exception, failed } = await threadFront.evaluate(asyncIndex, frameId, script);
   if (failed) {
     return { exception: createPrimitiveValueFront("Evaluation failed") };
   }
@@ -306,6 +306,13 @@ async function getFrames(thread: string) {
   );
 }
 
+async function loadAsyncParentFrames(thread: string, asyncIndex) {
+  const frames = await lookupThreadFront(thread).loadAsyncParentFrames();
+  return Promise.all(
+    frames.map((frame, i) => createFrame(thread, frame, i, asyncIndex))
+  );
+}
+
 function convertScope(protocolScope) {
   const {
     scopeId,
@@ -338,7 +345,7 @@ function convertScope(protocolScope) {
 
 async function getFrameScopes(frame: Frame): Promise<*> {
   const threadFront = lookupThreadFront(frame.thread);
-  const scopes = await threadFront.getScopes(frame.id);
+  const scopes = await threadFront.getScopes(frame.asyncIndex, frame.protocolId);
   const converted = scopes.map(convertScope);
   for (let i = 0; i + 1 < converted.length; i++) {
     converted[i].parent = converted[i + 1];
@@ -511,8 +518,8 @@ function instantWarp(point: ExecutionPoint) {
   currentThreadFront.emit("instantWarp", { executionPoint: point });
 }
 
-function fetchAncestorFramePositions(index: number) {
-  return ThreadFront.getFrameStepsAtIndex(index);
+function fetchAncestorFramePositions(asyncIndex, frameId) {
+  return ThreadFront.getFrameSteps(asyncIndex, frameId);
 }
 
 function pickExecutionPoints(count: number, options) {
@@ -552,6 +559,7 @@ const clientCommands = {
   getProperties,
   getFrameScopes,
   getFrames,
+  loadAsyncParentFrames,
   logExceptions,
   fetchSources,
   fetchThreadSources,

@@ -8,6 +8,9 @@ import type { ThreadContext } from "../../types";
 import type { ThunkArgs } from "../types";
 import { isValidThreadContext } from "../../utils/context";
 
+// How many times to fetch an async set of parent frames.
+const MaxAsyncFrames = 5;
+
 export function fetchFrames(cx: ThreadContext) {
   return async function ({ dispatch, client, getState }: ThunkArgs) {
     const { thread } = cx;
@@ -23,5 +26,21 @@ export function fetchFrames(cx: ThreadContext) {
       }
     }
     dispatch({ type: "FETCHED_FRAMES", thread, frames, cx });
+
+    for (let i = 0; i < MaxAsyncFrames; i++) {
+      let asyncFrames;
+      try {
+        asyncFrames = await client.loadAsyncParentFrames(thread, i + 1);
+      } catch (e) {
+        if (isValidThreadContext(getState(), cx)) {
+          throw e;
+        }
+        break;
+      }
+      if (!asyncFrames.length) {
+        break;
+      }
+      dispatch({ type: "ADD_ASYNC_FRAMES", thread, asyncFrames, cx });
+    }
   };
 }

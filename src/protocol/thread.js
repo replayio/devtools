@@ -297,9 +297,7 @@ Pause.prototype = {
     return null;
   },
 
-  async getFrameStepsAtIndex(index) {
-    const frames = await this.getFrames();
-    const { frameId } = frames[index];
+  async getFrameSteps(frameId) {
     if (!this.frameSteps.has(frameId)) {
       const { steps } = await this.sendMessage("Pause.getFrameSteps", {
         frameId,
@@ -1083,6 +1081,9 @@ const ThreadFront = {
   // Any pause for the current point.
   currentPause: null,
 
+  // Pauses created for async parent frames of the current point.
+  asyncPauses: [],
+
   sessionId: null,
   sessionWaiter: defer(),
 
@@ -1166,6 +1167,7 @@ const ThreadFront = {
     this.currentPoint = point;
     this.currentPointHasFrames = hasFrames;
     this.currentPause = null;
+    this.asyncPauses.length = 0;
     this.emit("paused", { point, time });
 
     this._precacheResumeTargets();
@@ -1317,17 +1319,48 @@ const ThreadFront = {
     return this.currentPause.getFrames();
   },
 
-  getScopes(frameId) {
-    return this.currentPause.getScopes(frameId);
+  lastAsyncPause() {
+    this.ensureCurrentPause();
+    return this.asyncPauses.length
+      ? this.asyncPauses[this.asyncPauses.length - 1]
+      : this.currentPause;
   },
 
-  async evaluate(frameId, text) {
+  async loadAsyncParentFrames() {
+    const basePause = this.lastAsyncPause();
+    const baseFrames = await basePause.getFrames();
+    if (!baseFrames) {
+      return [];
+    }
+    const steps = await basePause.getFrameSteps(baseFrames[baseFrames.length - 1].frameId);
+    if (basePause != this.lastAsyncPause()) {
+      return [];
+    }
+    const entryPause = this.ensurePause(steps[0].point);
+    this.asyncPauses.push(entryPause);
+    const frames = await entryPause.getFrames();
+    if (entryPause != this.lastAsyncPause()) {
+      return [];
+    }
+    return frames.slice(1);
+  },
+
+  pauseForAsyncIndex(asyncIndex) {
     this.ensureCurrentPause();
-    const rv = await this.currentPause.evaluate(frameId, text);
+    return asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.currentPause;
+  },
+
+  getScopes(asyncIndex, frameId) {
+    return this.pauseForAsyncIndex(asyncIndex).getScopes(frameId);
+  },
+
+  async evaluate(asyncIndex, frameId, text) {
+    const pause = this.pauseForAsyncIndex();
+    const rv = await pause.evaluate(frameId, text);
     if (rv.returned) {
-      rv.returned = new ValueFront(this.currentPause, rv.returned);
+      rv.returned = new ValueFront(pause, rv.returned);
     } else if (rv.exception) {
-      rv.exception = new ValueFront(this.currentPause, rv.exception);
+      rv.exception = new ValueFront(pause, rv.exception);
     }
     return rv;
   },
@@ -1538,8 +1571,8 @@ const ThreadFront = {
     return pause == this.currentPause ? node : null;
   },
 
-  getFrameStepsAtIndex(index) {
-    return this.currentPause.getFrameStepsAtIndex(index);
+  getFrameSteps(asyncIndex, frameId) {
+    return this.pauseForAsyncIndex(asyncIndex).getFrameSteps(frameId);
   },
 
   getPreferredLocationRaw(locations) {

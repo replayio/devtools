@@ -227,17 +227,19 @@ function update(state: PauseState = createPauseState(), action: Action): PauseSt
       });
     }
 
+    case "ADD_ASYNC_FRAMES": {
+      const { asyncFrames } = action;
+      return updateThreadState({
+        frames: [...threadState().frames, ...asyncFrames],
+      });
+    }
+
     case "PREVIEW_PAUSED_LOCATION": {
       return { ...state, previewLocation: action.location };
     }
 
     case "CLEAR_PREVIEW_PAUSED_LOCATION": {
       return { ...state, previewLocation: null };
-    }
-
-    case "MAP_FRAMES": {
-      const { selectedFrameId, frames } = action;
-      return updateThreadState({ frames, selectedFrameId });
     }
 
     case "ADD_SCOPES": {

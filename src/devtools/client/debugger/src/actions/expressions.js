@@ -9,6 +9,7 @@ import {
   getExpressions,
   getSelectedFrame,
   getSelectedFrameId,
+  getFrames,
   getSourceFromId,
   getSelectedSource,
   getSelectedScopeMappings,
@@ -144,6 +145,8 @@ function evaluateExpression(cx: ThreadContext, expression: Expression) {
 
     let input = expression.input;
     const frameId = getSelectedFrameId(getState(), cx.thread);
+    const frames = getFrames(getState(), cx.thread);
+    const frame = frames.find(f => f.id == frameId);
 
     return dispatch({
       type: "EVALUATE_EXPRESSION",
@@ -151,7 +154,8 @@ function evaluateExpression(cx: ThreadContext, expression: Expression) {
       thread: cx.thread,
       input: expression.input,
       [PROMISE]: client.evaluate(wrapExpression(input), {
-        frameId,
+        asyncIndex: frame.asyncIndex,
+        frameId: frame.protocolId,
         thread: cx.thread,
       }),
     });

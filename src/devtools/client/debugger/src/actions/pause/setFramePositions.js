@@ -20,7 +20,7 @@ export function setFramePositions() {
       return;
     }
 
-    const positions = await client.fetchAncestorFramePositions(frame.index);
+    const positions = await client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
     const { scriptId } = await ThreadFront.getPreferredLocation(positions[0].frame);
     const sourceId = getSourceByActorId(getState(), scriptId).id;
 
