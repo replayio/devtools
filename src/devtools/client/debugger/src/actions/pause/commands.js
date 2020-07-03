@@ -10,6 +10,8 @@ import {
   getThreadExecutionPoint,
   getCurrentThread,
   getSource,
+  getResumePoint,
+  getFramePositions,
 } from "../../selectors";
 import { PROMISE } from "../utils/middleware/promise";
 import { evaluateExpressions } from "../expressions";
@@ -57,7 +59,7 @@ export function selectThread(cx: Context, thread: ThreadId) {
  * @memberof actions/pause
  * @static
  */
-export function command(cx: ThreadContext, type: Command) {
+export function command(cx: ThreadContext, type: Command, executionPoint: ExecutionPoint) {
   return async (thunkArgs: ThunkArgs) => {
     const { dispatch, getState, client } = thunkArgs;
     log(`Debugger CommandStart ${type}`);
@@ -70,18 +72,23 @@ export function command(cx: ThreadContext, type: Command) {
       return doInstantStep(thunkArgs, instantInfo);
     }
 
-    if (type) {
-      if (type == "resume" || type == "rewind") {
-        dispatch({ type: "CLEAR_FRAME_POSITIONS" });
-      }
-      return dispatch({
-        type: "COMMAND",
-        command: type,
-        cx,
-        thread: cx.thread,
-        [PROMISE]: client[type](cx.thread),
-      });
+    if (!type) {
+      return;
     }
+    if (!getFramePositions(getState(), thread)) {
+      await dispatch(setFramePositions());
+    }
+    const nextPoint = getResumePoint(getState(), type);
+    if (type == "resume" || type == "rewind") {
+      dispatch({ type: "CLEAR_FRAME_POSITIONS" });
+    }
+    return dispatch({
+      type: "COMMAND",
+      command: type,
+      cx,
+      thread: cx.thread,
+      [PROMISE]: client[type](cx.thread, nextPoint),
+    });
   };
 }
 
