@@ -4,6 +4,8 @@
 
 "use strict";
 
+const { createPrimitiveValueFront } = require("protocol/thread");
+
 class ConsoleCommands {
   constructor({ devToolsClient, hud, threadFront }) {
     this.devToolsClient = devToolsClient;
@@ -22,7 +24,7 @@ class ConsoleCommands {
 
     let v;
     if (failed) {
-      v = "Error: Evaluation failed";
+      v = createPrimitiveValueFront("Error: Evaluation failed");
     } else if (returned) {
       v = returned;
     } else {
