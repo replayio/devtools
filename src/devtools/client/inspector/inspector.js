@@ -393,7 +393,7 @@ Inspector.prototype = {
       return null;
     }
 
-    this._showMarkupLoading();
+    // this._showMarkupLoading();
 
     // If available, set either the previously selected node or the body
     // as default selected, else set documentElement
@@ -1208,7 +1208,7 @@ Inspector.prototype = {
     }
 
     this._pendingSelection = null;
-    this.onMarkupLoaded();
+    // this.onMarkupLoaded();
   },
 
   handleToolSelected(id) {
