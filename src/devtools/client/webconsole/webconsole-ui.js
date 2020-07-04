@@ -413,7 +413,7 @@ class WebConsoleUI {
       return null;
     }
 
-    return frame.actor;
+    return frame.protocolId;
   }
 
   getWebconsoleFront({ frameActorId } = {}) {
