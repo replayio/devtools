@@ -7,7 +7,7 @@
 const Services = require("Services");
 const flags = require("devtools/shared/flags");
 const nodeConstants = require("devtools/shared/dom-node-constants");
-//const nodeFilterConstants = require("devtools/shared/dom-node-filter-constants");
+const nodeFilterConstants = require("devtools/shared/dom-node-filter-constants");
 const EventEmitter = require("devtools/shared/event-emitter");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { PluralForm } = require("devtools/shared/plural-form");

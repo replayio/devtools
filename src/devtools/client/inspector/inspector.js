@@ -358,7 +358,7 @@ Inspector.prototype = {
   _onBeforeNavigate: function () {
     this._defaultNode = null;
     this.selection.setNodeFront(null);
-    this._destroyMarkup();
+    // this._destroyMarkup();
     this._pendingSelection = null;
   },
 
@@ -1186,7 +1186,7 @@ Inspector.prototype = {
 
     this._defaultNode = null;
     this.selection.setNodeFront(null);
-    this._destroyMarkup();
+    // this._destroyMarkup();
 
     const selectionId = Math.random();
     this._pendingSelection = selectionId;
