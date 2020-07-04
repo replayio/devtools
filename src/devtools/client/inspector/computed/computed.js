@@ -7,7 +7,6 @@
 const promise = Promise;
 const flags = require("devtools/shared/flags");
 const CssLogic = require("devtools/shared/inspector/css-logic");
-//const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
 const OutputParser = require("devtools/client/shared/output-parser");
 const { PrefObserver } = require("devtools/client/shared/prefs");
 const { createChild } = require("devtools/client/inspector/shared/utils");
@@ -19,6 +18,7 @@ const {
   VIEW_NODE_FONT_TYPE,
 } = require("devtools/client/inspector/shared/node-types");
 const TooltipsOverlay = require("devtools/client/inspector/shared/tooltips-overlay");
+const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
 
 loader.lazyRequireGetter(
   this,
