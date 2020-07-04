@@ -12,7 +12,8 @@
 
 import { prefs } from "../utils/prefs";
 import { getSelectedSourceId } from "./sources";
-import { getSelectedFrame } from "../selectors/pause";
+import { getSelectedFrame, getFramePositions } from "../selectors/pause";
+import { findLast, find } from "lodash";
 
 import type { Action } from "../actions/types";
 import type { State } from "./types";
@@ -632,6 +633,12 @@ export function getTopFrame(state: State, thread: ThreadId) {
   return frames && frames[0];
 }
 
+export function isTopFrame(state: State, thread: ThreadId) {
+  const topFrame = getTopFrame(state, thread);
+  const selectedFrame = getSelectedFrame(state, thread);
+  return topFrame == selectedFrame;
+}
+
 export function getThreadExecutionPoint(state: State, thread: ThreadId) {
   return getThreadPauseState(state.pause, thread).executionPoint;
 }
@@ -683,6 +690,24 @@ export function getLastExpandedScopes(state: State, thread: ThreadId) {
 
 export function getPausePreviewLocation(state: State) {
   return state.pause.previewLocation;
+}
+
+export function getResumePoint(state, type) {
+  const thread = getCurrentThread(state);
+  const framePoints = getFramePositions(state, thread)?.positions.map(p => p.point);
+  const executionPoint = getThreadExecutionPoint(state, thread);
+
+  if (!framePoints || isTopFrame(state, thread)) {
+    return null;
+  }
+
+  if (type == "reverseStepOver" || type == "rewind") {
+    return findLast(framePoints, p => BigInt(p) < BigInt(executionPoint));
+  }
+
+  if (type == "stepOver" || type == "resume" || type == "stepIn" || type == "stepUp") {
+    return find(framePoints, p => BigInt(p) > BigInt(executionPoint));
+  }
 }
 
 export default update;
