@@ -358,7 +358,7 @@ Inspector.prototype = {
   _onBeforeNavigate: function () {
     this._defaultNode = null;
     this.selection.setNodeFront(null);
-    this._destroyMarkup();
+    // this._destroyMarkup();
     this._pendingSelection = null;
   },
 
@@ -393,7 +393,7 @@ Inspector.prototype = {
       return null;
     }
 
-    this._showMarkupLoading();
+    // this._showMarkupLoading();
 
     // If available, set either the previously selected node or the body
     // as default selected, else set documentElement
@@ -1186,7 +1186,7 @@ Inspector.prototype = {
 
     this._defaultNode = null;
     this.selection.setNodeFront(null);
-    this._destroyMarkup();
+    // this._destroyMarkup();
 
     const selectionId = Math.random();
     this._pendingSelection = selectionId;
@@ -1208,7 +1208,7 @@ Inspector.prototype = {
     }
 
     this._pendingSelection = null;
-    this.onMarkupLoaded();
+    // this.onMarkupLoaded();
   },
 
   handleToolSelected(id) {

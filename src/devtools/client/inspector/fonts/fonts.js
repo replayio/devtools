@@ -8,7 +8,7 @@
 const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 const { debounce } = require("devtools/shared/debounce");
-//const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
+const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
 
 const FontsApp = createFactory(require("devtools/client/inspector/fonts/components/FontsApp"));
 

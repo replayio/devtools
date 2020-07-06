@@ -114,28 +114,28 @@ function forEachThread(iteratee) {
   return iteratee(ThreadFront);
 }
 
-function resume(thread: string): Promise<*> {
-  return lookupThreadFront(thread).resume();
+function resume(thread: string, point: ExecutionPoint): Promise<*> {
+  return lookupThreadFront(thread).resume(point);
 }
 
-function stepIn(thread: string): Promise<*> {
-  return lookupThreadFront(thread).stepIn();
+function stepIn(thread: string, point: ExecutionPoint): Promise<*> {
+  return lookupThreadFront(thread).stepIn(point);
 }
 
-function stepOver(thread: string): Promise<*> {
-  return lookupThreadFront(thread).stepOver();
+function stepOver(thread: string, point: ExecutionPoint): Promise<*> {
+  return lookupThreadFront(thread).stepOver(point);
 }
 
-function stepOut(thread: string): Promise<*> {
-  return lookupThreadFront(thread).stepOut();
+function stepOut(thread: string, point: ExecutionPoint): Promise<*> {
+  return lookupThreadFront(thread).stepOut(point);
 }
 
-function rewind(thread: string): Promise<*> {
-  return lookupThreadFront(thread).rewind();
+function rewind(thread: string, point: ExecutionPoint): Promise<*> {
+  return lookupThreadFront(thread).rewind(point);
 }
 
-function reverseStepOver(thread: string): Promise<*> {
-  return lookupThreadFront(thread).reverseStepOver();
+function reverseStepOver(thread: string, point: ExecutionPoint): Promise<*> {
+  return lookupThreadFront(thread).reverseStepOver(point);
 }
 
 function breakOnNext(thread: string): Promise<*> {
@@ -308,9 +308,7 @@ async function getFrames(thread: string) {
 
 async function loadAsyncParentFrames(thread: string, asyncIndex) {
   const frames = await lookupThreadFront(thread).loadAsyncParentFrames();
-  return Promise.all(
-    frames.map((frame, i) => createFrame(thread, frame, i, asyncIndex))
-  );
+  return Promise.all(frames.map((frame, i) => createFrame(thread, frame, i, asyncIndex)));
 }
 
 function convertScope(protocolScope) {

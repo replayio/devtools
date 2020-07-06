@@ -1450,7 +1450,7 @@ const ThreadFront = {
     return target;
   },
 
-  async _resumeOperation(command) {
+  async _resumeOperation(command, selectedPoint) {
     let resumeEmitted = false;
     let resumeTarget = null;
 
@@ -1466,30 +1466,32 @@ const ThreadFront = {
         setTimeout(warpToTarget, 0);
       }
     }, 0);
-    const target = await this._findResumeTarget(this.currentPoint, command);
+
+    const point = selectedPoint || this.currentPoint;
+    const target = await this._findResumeTarget(point, command);
     resumeTarget = target;
     if (resumeEmitted) {
       warpToTarget();
     }
   },
 
-  rewind() {
-    this._resumeOperation("Debugger.findRewindTarget");
+  rewind(point) {
+    this._resumeOperation("Debugger.findRewindTarget", point);
   },
-  resume() {
-    this._resumeOperation("Debugger.findResumeTarget");
+  resume(point) {
+    this._resumeOperation("Debugger.findResumeTarget", point);
   },
-  reverseStepOver() {
-    this._resumeOperation("Debugger.findReverseStepOverTarget");
+  reverseStepOver(point) {
+    this._resumeOperation("Debugger.findReverseStepOverTarget", point);
   },
-  stepOver() {
-    this._resumeOperation("Debugger.findStepOverTarget");
+  stepOver(point) {
+    this._resumeOperation("Debugger.findStepOverTarget", point);
   },
-  stepIn() {
-    this._resumeOperation("Debugger.findStepInTarget");
+  stepIn(point) {
+    this._resumeOperation("Debugger.findStepInTarget", point);
   },
-  stepOut() {
-    this._resumeOperation("Debugger.findStepOutTarget");
+  stepOut(point) {
+    this._resumeOperation("Debugger.findStepOutTarget", point);
   },
 
   async blackbox(scriptId, begin, end) {

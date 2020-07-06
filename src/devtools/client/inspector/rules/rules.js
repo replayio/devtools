@@ -8,7 +8,7 @@ const Services = require("Services");
 const flags = require("devtools/shared/flags");
 const { l10n } = require("devtools/shared/inspector/css-logic");
 const { PSEUDO_CLASSES } = require("devtools/shared/css/constants");
-//const { ELEMENT_STYLE } = require("devtools/shared/specs/styles");
+
 const OutputParser = require("devtools/client/shared/output-parser");
 const { PrefObserver } = require("devtools/client/shared/prefs");
 const ElementStyle = require("devtools/client/inspector/rules/models/element-style");
@@ -17,6 +17,7 @@ const TooltipsOverlay = require("devtools/client/inspector/shared/tooltips-overl
 const { createChild, promiseWarn } = require("devtools/client/inspector/shared/utils");
 const { debounce } = require("devtools/shared/debounce");
 const EventEmitter = require("devtools/shared/event-emitter");
+const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
 
 loader.lazyRequireGetter(this, "flashElementOn", "devtools/client/inspector/markup/utils", true);
 loader.lazyRequireGetter(this, "flashElementOff", "devtools/client/inspector/markup/utils", true);
