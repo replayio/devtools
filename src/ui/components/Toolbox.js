@@ -596,6 +596,12 @@ class Toolbox extends React.Component {
       </div>
     );
   }
+
+  // These methods are helpful when debugging.
+
+  getDebuggerState() {
+    return this.getPanel("debugger")._getState();
+  }
 }
 export default connect(
   state => ({
