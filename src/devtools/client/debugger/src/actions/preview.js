@@ -92,7 +92,8 @@ export function setPreview(
     }
 
     const { result } = await client.evaluate(expression, {
-      frameId: selectedFrame.id,
+      asyncIndex: selectedFrame.asyncIndex,
+      frameId: selectedFrame.protocolId,
       thread,
     });
 
