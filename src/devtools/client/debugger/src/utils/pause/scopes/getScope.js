@@ -13,7 +13,7 @@ import type { Frame, Why, Scope } from "../../../types";
 
 import type { NamedValue } from "./types";
 
-import { createPseudoValueFront } from "protocol/thread";
+import { createElementsFront } from "protocol/thread";
 
 export type RenderableScope = {
   type: $ElementType<Scope, "type">,
@@ -92,7 +92,7 @@ export function getScope(
       return {
         name: title,
         path: key,
-        contents: createPseudoValueFront(vars),
+        contents: createElementsFront(vars),
         type: NODE_TYPES.BLOCK,
       };
     }
@@ -128,7 +128,7 @@ export function mergeScopes(
     return {
       name: parentItem.name,
       path: parentItem.path,
-      contents: createPseudoValueFront(contents),
+      contents: createElementsFront(contents),
       type: NODE_TYPES.BLOCK,
     };
   }

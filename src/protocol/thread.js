@@ -309,7 +309,7 @@ Pause.prototype = {
 };
 
 // Manages interaction with a value from a pause.
-function ValueFront(pause, protocolValue, pseudoElements) {
+function ValueFront(pause, protocolValue, elements) {
   this._pause = pause;
 
   // For primitive values.
@@ -323,12 +323,12 @@ function ValueFront(pause, protocolValue, pseudoElements) {
   this._uninitialized = false;
   this._unavailable = false;
 
-  // For pseudo-values constructed by the devtools.
-  this._pseudoElements = null;
+  // For arrays of values constructed by the devtools.
+  this._elements = null;
   this._isMapEntry = null;
 
-  if (pseudoElements) {
-    this._pseudoElements = pseudoElements;
+  if (elements) {
+    this._elements = elements;
   } else if ("value" in protocolValue) {
     this._hasPrimitive = true;
     this._primitive = protocolValue.value;
@@ -370,8 +370,8 @@ ValueFront.prototype = {
     if (this._unavailable) {
       return "unavailable";
     }
-    if (this._pseudoElements) {
-      return "pseudoElements";
+    if (this._elements) {
+      return "elements";
     }
     throw new Error("bad contents");
   },
@@ -523,8 +523,8 @@ ValueFront.prototype = {
   },
 
   getChildren() {
-    if (this._pseudoElements) {
-      return this._pseudoElements;
+    if (this._elements) {
+      return this._elements;
     }
     if (this.hasPreviewOverflow()) {
       // See ObjectInspectorItem.js
@@ -547,7 +547,7 @@ ValueFront.prototype = {
             { name: "<key>", contents: key },
             { name: "<value>", contents: value },
           ];
-          const entry = createPseudoValueFront(entryElements);
+          const entry = createElementsFront(entryElements);
           entry._isMapEntry = { key, value };
           return { name: i.toString(), contents: entry };
         } else {
@@ -556,7 +556,7 @@ ValueFront.prototype = {
       });
       rv.unshift({
         name: "<entries>",
-        contents: createPseudoValueFront(elements),
+        contents: createElementsFront(elements),
       });
     }
     rv.push({
@@ -600,7 +600,7 @@ function createPrimitiveValueFront(value) {
   return new ValueFront(null, { value });
 }
 
-function createPseudoValueFront(elements) {
+function createElementsFront(elements) {
   elements.forEach(({ contents }) => contents.isObject());
   return new ValueFront(null, undefined, elements);
 }
@@ -1652,5 +1652,5 @@ module.exports = {
   Pause,
   createPrimitiveValueFront,
   createUnavailableValueFront,
-  createPseudoValueFront,
+  createElementsFront,
 };
