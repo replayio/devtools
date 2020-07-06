@@ -1066,6 +1066,10 @@ StyleSheetFront.prototype = {
   get nodeHref() {
     return this.href;
   },
+
+  get isSystem() {
+    return this._styleSheet.isSystem;
+  },
 };
 
 Object.setPrototypeOf(StyleSheetFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
