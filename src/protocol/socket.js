@@ -119,16 +119,9 @@ function onSocketError() {
   log("Socket Error");
 }
 
-let gLogsEnabled = false;
-
-function enableLogging() {
-  gLogsEnabled = true;
-}
-
 function log(text) {
-  if (gLogsEnabled) {
-    console.log(text);
-  }
+  // Don't actually log anything. This is a convenient place to add a logpoint
+  // when reviewing recordings of the viewer.
 }
 
 module.exports = {
@@ -137,7 +130,6 @@ module.exports = {
   addEventListener,
   removeEventListener,
   log,
-  enableLogging,
 };
 
 // Debugging methods.
