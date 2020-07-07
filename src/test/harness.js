@@ -245,9 +245,10 @@ async function checkEvaluateInTopFrame(text, expected) {
 }
 
 async function waitForScopeValue(name, value) {
+  const expected = value !== undefined ? `${name}\n: \n${value}` : name;
   return waitUntil(() => {
     const nodes = document.querySelectorAll(".scopes-pane .object-node");
-    return [...nodes].some(node => node.innerText == `${name}\n: \n${value}`);
+    return [...nodes].some(node => node.innerText == expected);
   });
 }
 

@@ -24,23 +24,34 @@ type ScopeBindingsWrapper = {
 // for the bindings from a scope.
 export function getBindingVariables(
   bindings: ?ScopeBindingsWrapper,
-  parentName: string
+  parentName: string,
+  useOriginalNames: boolean
 ): NamedValue[] {
   if (!bindings) {
     return [];
   }
 
-  const args: VarAndBindingsPairs = bindings.arguments.map(arg => toPairs(arg)[0]);
-
-  const variables: VarAndBindingsPairs = toPairs(bindings.variables);
-
-  return args.concat(variables).map(binding => {
-    const name = binding[0];
-    const contents = binding[1];
-    return {
-      name,
-      path: `${parentName}/${name}`,
-      contents,
-    };
-  });
+  // See getScope.js for the rationale behind this logic.
+  const rv = [];
+  for (const { name, originalName, value } of bindings) {
+    let newName;
+    if (useOriginalNames) {
+      if (originalName) {
+        newName = originalName;
+      } else if (name == "arguments") {
+        // Show "arguments" even when it has no original name.
+        newName = name;
+      }
+    } else {
+      newName = name;
+    }
+    if (newName) {
+      rv.push({
+        name: newName,
+        path: `${parentName}/${name}`,
+        contents: value,
+      });
+    }
+  }
+  return rv;
 }

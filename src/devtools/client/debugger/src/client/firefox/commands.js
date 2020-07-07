@@ -318,17 +318,8 @@ function convertScope(protocolScope) {
     functionLexical,
     object,
     callee,
-    bindings: protocolBindings,
+    bindings,
   } = protocolScope;
-
-  let bindings;
-  if (protocolBindings) {
-    const variables = {};
-    for (const { name, originalName, value } of protocolBindings) {
-      variables[originalName || name] = value;
-    }
-    bindings = { arguments: [], variables };
-  }
 
   return {
     actor: scopeId,
