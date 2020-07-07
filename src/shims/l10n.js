@@ -40,15 +40,24 @@ const bundles = {
   "devtools/shared/locales/styleinspector.properties": parse(
     require("devtools/shared/locales/en-US/styleinspector.properties").default
   ),
+  "devtools/client/locales/accessibility.properties": parse(
+    require("devtools/client/locales/en-US/accessibility.properties").default
+  ),
+  "devtools/shared/locales/accessibility.properties": parse(
+    require("devtools/shared/locales/en-US/accessibility.properties").default
+  ),
 };
 
 const defaultStrings = { ...bundles["intl.properties"] };
 
 export class LocalizationHelper {
-  constructor(path) {
-    this.path = path;
+  constructor(...paths) {
+    this.paths = paths;
 
-    this.strings = { ...defaultStrings, ...bundles[path] };
+    this.strings = { ...defaultStrings };
+    for (const path of paths) {
+      Object.assign(this.strings, bundles[path]);
+    }
   }
 
   getStr(key: string) {

@@ -5,10 +5,10 @@
 "use strict";
 
 const EventEmitter = require("devtools/shared/event-emitter");
-const { MultiLocalizationHelper } = require("devtools/shared/l10n");
+const { LocalizationHelper } = require("devtools/shared/l10n");
 
-loader.lazyRequireGetter(this, "colorUtils", "devtools/shared/css/color", true);
-loader.lazyRequireGetter(this, "labColors", "devtools/shared/css/color-db", true);
+const { colorUtils } = require("devtools/shared/css/color");
+const { labColors } = require("devtools/shared/css/color-db");
 loader.lazyRequireGetter(this, "getTextProperties", "devtools/shared/accessibility", true);
 loader.lazyRequireGetter(
   this,
@@ -17,10 +17,10 @@ loader.lazyRequireGetter(
   true
 );
 
-const L10N = new MultiLocalizationHelper(
-  "devtools/shared/locales/en-US/accessibility.properties",
-  "devtools/client/locales/en-US/accessibility.properties",
-  "devtools/client/locales/en-US/inspector.properties"
+const L10N = new LocalizationHelper(
+  "devtools/shared/locales/accessibility.properties",
+  "devtools/client/locales/accessibility.properties",
+  "devtools/client/locales/inspector.properties"
 );
 const ARROW_KEYS = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
 const [ArrowUp, ArrowRight, ArrowDown, ArrowLeft] = ARROW_KEYS;

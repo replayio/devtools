@@ -56,7 +56,7 @@ function RuleEditor(ruleView, rule) {
   this.telemetry = this.toolbox.telemetry;
   this.rule = rule;
 
-  this.isEditable = false; //!rule.isSystem;
+  this.isEditable = !rule.domRule.isSystem;
   // Flag that blocks updates of the selector and properties when it is
   // being edited
   this.isEditing = false;
@@ -106,6 +106,8 @@ RuleEditor.prototype = {
   },
 
   get isSelectorEditable() {
+    return false;
+    /*
     const trait =
       this.isEditable &&
       this.rule.domRule.isRule() &&
@@ -114,6 +116,7 @@ RuleEditor.prototype = {
     // Do not allow editing anonymousselectors until we can
     // detect mutations on  pseudo elements in Bug 1034110.
     return trait && !this.rule.elementStyle.element.isAnonymous;
+    */
   },
 
   _create: function () {

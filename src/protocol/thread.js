@@ -977,6 +977,10 @@ RuleFront.prototype = {
     return this.parentStyleSheet && this.parentStyleSheet.href;
   },
 
+  get isSystem() {
+    return this.parentStyleSheet && this.parentStyleSheet.isSystem;
+  },
+
   get line() {
     return this._rule.startLine;
   },
@@ -1026,6 +1030,7 @@ StyleFront.prototype = {
   type: undefined,
   selectors: undefined,
   href: undefined,
+  isSystem: false,
 };
 
 Object.setPrototypeOf(StyleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
