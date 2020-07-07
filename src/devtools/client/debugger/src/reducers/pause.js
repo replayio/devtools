@@ -479,21 +479,13 @@ export function getFramesLoading(state: State, thread: ThreadId) {
   return frames && framesLoading;
 }
 
-function getGeneratedFrameId(frameId: string): string {
-  if (frameId.includes("-originalFrame")) {
-    // The mapFrames can add original stack frames -- get generated frameId.
-    return frameId.substr(0, frameId.lastIndexOf("-originalFrame"));
-  }
-  return frameId;
-}
-
 export function getFrameScope(state: State, thread: ThreadId, frameId: ?string) {
   if (!frameId) {
     return null;
   }
 
   const { frameScopes } = getThreadPauseState(state.pause, thread);
-  return frameScopes[getGeneratedFrameId(frameId)];
+  return frameScopes[frameId];
 }
 
 export function getSelectedScope(state: State, thread: ThreadId) {
@@ -530,7 +522,7 @@ export function getHighlightedCalls(state: State, thread: ThreadId) {
 }
 
 export function getInlinePreviews(state: State, thread: ThreadId, frameId: string): Previews {
-  return getThreadPauseState(state.pause, thread).inlinePreview[getGeneratedFrameId(frameId)];
+  return getThreadPauseState(state.pause, thread).inlinePreview[frameId];
 }
 
 export function getSelectedInlinePreviews(state: State) {
@@ -550,9 +542,7 @@ export function getInlinePreviewExpression(
   line: number,
   expression: string
 ) {
-  const previews = getThreadPauseState(state.pause, thread).inlinePreview[
-    getGeneratedFrameId(frameId)
-  ];
+  const previews = getThreadPauseState(state.pause, thread).inlinePreview[frameId];
   return previews && previews[line] && previews[line][expression];
 }
 
@@ -580,6 +570,26 @@ export function getResumePoint(state, type) {
   if (type == "stepOver" || type == "resume" || type == "stepIn" || type == "stepUp") {
     return find(framePoints, p => BigInt(p) > BigInt(executionPoint));
   }
+}
+
+// Get the ID of any alternate source that can be switched to from selectedSource.
+// This only works when the debugger is paused somewhere, and we have an
+// alternate location for the location of the selected frame.
+export function getAlternateSourceId(state, selectedSource) {
+  if (!selectedSource) {
+    return null;
+  }
+  const thread = getCurrentThread(state);
+  const frames = getFrames(state, thread);
+  if (!frames) {
+    return null;
+  }
+  const selectedFrameId = getSelectedFrameId(state, thread);
+  const selectedFrame = frames.find(f => f.id == selectedFrameId);
+  if (!selectedFrame || selectedFrame.location.sourceId != selectedSource.id) {
+    return null;
+  }
+  return selectedFrame.alternateLocation.sourceId;
 }
 
 export default update;

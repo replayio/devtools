@@ -12,15 +12,19 @@ import {
   getPrettySource,
   getPaneCollapse,
   getContext,
+  getAlternateSourceId,
+  getSource,
 } from "../../selectors";
 
 import { isPretty, getFilename, shouldBlackbox } from "../../utils/source";
-import { getGeneratedSource, canPrettyPrintSource } from "../../reducers/sources";
+import { canPrettyPrintSource, } from "../../reducers/sources";
 
 import { PaneToggleButton } from "../shared/Button";
 import AccessibleImage from "../shared/AccessibleImage";
 
 import type { SourceWithContent, Source, Context } from "../../types";
+
+import { ThreadFront } from "protocol/thread";
 
 import "./Footer.css";
 
@@ -35,13 +39,13 @@ type OwnProps = {|
 type Props = {
   cx: Context,
   selectedSource: ?SourceWithContent,
-  mappedSource: ?Source,
+  alternateSource: boolean,
   endPanelCollapsed: boolean,
   horizontal: boolean,
   canPrettyPrint: boolean,
   togglePrettyPrint: typeof actions.togglePrettyPrint,
   toggleBlackBox: typeof actions.toggleBlackBox,
-  jumpToMappedLocation: typeof actions.jumpToMappedLocation,
+  showAlternateSource: typeof actions.showAlternateSource,
   togglePaneCollapse: typeof actions.togglePaneCollapse,
 };
 
@@ -186,41 +190,37 @@ class SourceFooter extends PureComponent<Props, State> {
   }
 
   renderSourceSummary() {
-    // NYI
-    return null;
-    /*
     const {
-      cx,
-      mappedSource,
-      jumpToMappedLocation,
+      alternateSource,
       selectedSource,
+      showAlternateSource,
     } = this.props;
 
-    if (!mappedSource || !selectedSource || !isOriginal(selectedSource)) {
+    if (!alternateSource) {
       return null;
     }
 
-    const filename = getFilename(mappedSource);
+    const filename = getFilename(alternateSource);
+    const title = L10N.getFormatStr("sourceFooter.alternateSource", filename);
+
+    const original = ThreadFront.isSourceMappedScript(selectedSource.id);
+
     const tooltip = L10N.getFormatStr(
-      "sourceFooter.mappedSourceTooltip",
+      original
+        ? "sourceFooter.generatedSourceTooltip"
+        : "sourceFooter.originalSourceTooltip",
       filename
     );
-    const title = L10N.getFormatStr("sourceFooter.mappedSource", filename);
-    const mappedSourceLocation = {
-      sourceId: selectedSource.id,
-      line: 1,
-      column: 1,
-    };
+
     return (
       <button
         className="mapped-source"
-        onClick={() => jumpToMappedLocation(cx, mappedSourceLocation)}
+        onClick={() => showAlternateSource(selectedSource, alternateSource)}
         title={tooltip}
       >
         <span>{title}</span>
       </button>
     );
-    */
   }
 
   onCursorChange = (event: any) => {
@@ -264,11 +264,13 @@ class SourceFooter extends PureComponent<Props, State> {
 
 const mapStateToProps = state => {
   const selectedSource = getSelectedSourceWithContent(state);
+  const alternateSourceId = getAlternateSourceId(state, selectedSource);
+  const alternateSource = alternateSourceId ? getSource(state, alternateSourceId) : null;
 
   return {
     cx: getContext(state),
     selectedSource,
-    mappedSource: getGeneratedSource(state, selectedSource),
+    alternateSource,
     prettySource: getPrettySource(state, selectedSource ? selectedSource.id : null),
     endPanelCollapsed: getPaneCollapse(state, "end"),
     canPrettyPrint: selectedSource ? canPrettyPrintSource(state, selectedSource.id) : false,
@@ -278,6 +280,6 @@ const mapStateToProps = state => {
 export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
   togglePrettyPrint: actions.togglePrettyPrint,
   toggleBlackBox: actions.toggleBlackBox,
-  jumpToMappedLocation: actions.jumpToMappedLocation,
+  showAlternateSource: actions.showAlternateSource,
   togglePaneCollapse: actions.togglePaneCollapse,
 })(SourceFooter);

@@ -1104,8 +1104,12 @@ const ThreadFront = {
   // Map URL to scriptId[].
   urlScripts: new ArrayMap(),
 
-  // Script IDs which have a pretty printed alternative.
-  minifiedScripts: new Set(),
+  // Map scriptId to scriptId[], reversing the generatedScriptIds map.
+  originalScripts: new ArrayMap(),
+
+  // Script IDs for generated scripts which should be preferred over any
+  // original script.
+  preferredGeneratedScripts: new Set(),
 
   skipPausing: false,
 
@@ -1189,8 +1193,8 @@ const ThreadFront = {
       if (url) {
         this.urlScripts.add(url, scriptId);
       }
-      if (kind == "prettyPrinted") {
-        this.minifiedScripts.add(generatedScriptIds[0]);
+      for (const generatedId of generatedScriptIds || []) {
+        this.originalScripts.add(generatedId, scriptId);
       }
       const waiters = this.scriptWaiters.map.get(scriptId);
       (waiters || []).forEach(resolve => resolve());
@@ -1275,7 +1279,7 @@ const ThreadFront = {
     if (!scripts) {
       return;
     }
-    const scriptId = this.getPreferredScriptId(scripts);
+    const { scriptId } = this._chooseScriptId(scripts);
     return this.setBreakpoint(scriptId, line, column, condition);
   },
 
@@ -1294,7 +1298,7 @@ const ThreadFront = {
     if (!scripts) {
       return;
     }
-    const scriptId = this.getPreferredScriptId(scripts);
+    const { scriptId } = this._chooseScriptId(scripts);
     return this.removeBreakpoint(scriptId, line, column);
   },
 
@@ -1583,7 +1587,7 @@ const ThreadFront = {
   },
 
   getPreferredLocationRaw(locations) {
-    const scriptId = this.getPreferredScriptId(locations.map(l => l.scriptId));
+    const { scriptId } = this._chooseScriptId(locations.map(l => l.scriptId));
     return locations.find(l => l.scriptId == scriptId);
   },
 
@@ -1592,32 +1596,103 @@ const ThreadFront = {
     return this.getPreferredLocationRaw(locations);
   },
 
-  getScriptIdScore(scriptId) {
-    const info = this.scripts.get(scriptId);
-    if (!info) {
-      // Ideally this would never happen, but scripts might still be loading...
-      return 0;
+  async getAlternateLocation(locations) {
+    await Promise.all(locations.map(({ scriptId }) => this.ensureScript(scriptId)));
+    const { alternateId } = this._chooseScriptId(locations.map(l => l.scriptId));
+    if (alternateId) {
+      return locations.find(l => l.scriptId == alternateId);
     }
-    const { generatedScriptIds, kind } = info;
-
-    let score = 1;
-
-    // Score more-original scripts higher than less-original scripts.
-    if (generatedScriptIds) {
-      score += this.getScriptIdScore(generatedScriptIds[0]);
-    }
-
-    // Score source mapped scripts higher than pretty-printed scripts.
-    if (kind == "sourceMapped") {
-      score++;
-    }
-
-    return score;
+    return null;
   },
 
-  getPreferredScriptId(scriptIds) {
-    scriptIds.sort((a, b) => this.getScriptIdScore(a) - this.getScriptIdScore(b));
-    return scriptIds[scriptIds.length - 1];
+  // Get the script which should be used in the devtools from an array of
+  // scripts representing the same location. If the chosen script is an
+  // original or generated script and there is an alternative which users
+  // can switch to, also returns that alternative.
+  _chooseScriptId(scriptIds) {
+    // Always ignore minified scripts.
+    scriptIds = scriptIds.filter(id => !this.isMinifiedScript(id));
+
+    // Determine the base generated/original ID to use for the script.
+    let generatedId, originalId;
+    for (const id of scriptIds) {
+      const info = this.scripts.get(id);
+      if (!info) {
+        // Scripts haven't finished loading, bail out and return this one.
+        return { scriptId: id };
+      }
+      // Determine the kind of this script, or its minified version.
+      let kind = info.kind;
+      if (kind == "prettyPrinted") {
+        const minifiedInfo = this.scripts.get(info.generatedScriptIds[0]);
+        if (!minifiedInfo) {
+          return { scriptId: id };
+        }
+        kind = minifiedInfo.kind;
+        assert(kind != "prettyPrinted");
+      }
+      if (kind == "inlineScript") {
+        // Inline scripts should have an HTML version which we will always prefer.
+        continue;
+      }
+      if (kind == "sourceMapped") {
+        originalId = id;
+      } else {
+        assert(!generatedId);
+        generatedId = id;
+      }
+    }
+
+    if (!generatedId) {
+      assert(originalId);
+      return { scriptId: originalId };
+    }
+
+    if (!originalId) {
+      return { scriptId: generatedId };
+    }
+
+    // Prefer original scripts over generated scripts, except when overridden
+    // through user action.
+    if (this.preferredGeneratedScripts.has(generatedId)) {
+      return { scriptId: generatedId, alternateId: originalId };
+    }
+    return { scriptId: originalId, alternateId: generatedId };
+  },
+
+  // Return whether scriptId is minified and has a pretty printed alternate.
+  isMinifiedScript(scriptId) {
+    const originalIds = this.originalScripts.map.get(scriptId) || [];
+    return originalIds.some(id => {
+      const info = this.scripts.get(id);
+      return info && info.kind == "prettyPrinted";
+    });
+  },
+
+  isSourceMappedScript(scriptId) {
+    const info = this.scripts.get(scriptId);
+    if (!info) {
+      return false;
+    }
+    let kind = info.kind;
+    if (kind == "prettyPrinted") {
+      const minifiedInfo = this.scripts.get(info.generatedScriptIds[0]);
+      if (!minifiedInfo) {
+        return false;
+      }
+      kind = minifiedInfo.kind;
+      assert(kind != "prettyPrinted");
+    }
+    return kind == "sourceMapped";
+  },
+
+  preferScript(scriptId, value) {
+    assert(!this.isSourceMappedScript(scriptId));
+    if (value) {
+      this.preferredGeneratedScripts.add(scriptId);
+    } else {
+      this.preferredGeneratedScripts.delete(scriptId);
+    }
   },
 
   // Get the location to use for a generated location without alternatives.

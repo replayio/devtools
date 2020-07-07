@@ -34,6 +34,16 @@ export async function createFrame(thread: ThreadId, frame, index = 0, asyncIndex
     column,
   };
 
+  let alternateLocation;
+  const alternate = await ThreadFront.getAlternateLocation(frame.location);
+  if (alternate) {
+    alternateLocation = {
+      sourceId: clientCommands.getSourceForActor(alternate.scriptId),
+      line: alternate.line,
+      column: alternate.column,
+    };
+  }
+
   const displayName = frame.functionName || `(${frame.type})`;
 
   return {
@@ -43,7 +53,7 @@ export async function createFrame(thread: ThreadId, frame, index = 0, asyncIndex
     thread,
     displayName,
     location,
-    generatedLocation: location,
+    alternateLocation,
     this: frame.this,
     source: null,
     index,
@@ -53,7 +63,7 @@ export async function createFrame(thread: ThreadId, frame, index = 0, asyncIndex
 }
 
 export function makeSourceId(source: SourcePayload, isServiceWorker: boolean) {
-  return `source-${source.actor}`;
+  return source.actor;
 }
 
 export function createPause(thread: string, packet: PausedPacket): any {

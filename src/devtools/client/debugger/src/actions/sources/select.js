@@ -22,6 +22,9 @@ import { setBreakableLines } from ".";
 import { prefs } from "../../utils/prefs";
 import { isMinified } from "../../utils/source";
 import { createLocation } from "../../utils/location";
+import { paused } from "../pause/paused";
+
+import { ThreadFront } from "protocol/thread";
 
 import {
   getSource,
@@ -31,6 +34,8 @@ import {
   getSelectedLocation,
   getSelectedSource,
   canPrettyPrintSource,
+  getCurrentThread,
+  getThreadExecutionPoint,
 } from "../../selectors";
 
 import type { SourceLocation, PartialPosition, Source, Context } from "../../types";
@@ -169,4 +174,18 @@ export function selectLocation(
  */
 export function selectSpecificLocation(cx: Context, location: SourceLocation) {
   return selectLocation(cx, location, { keepContext: false });
+}
+
+export function showAlternateSource(oldSource, newSource) {
+  return async ({ dispatch, getState, client }: ThunkArgs) => {
+    if (ThreadFront.isSourceMappedScript(oldSource.id)) {
+      ThreadFront.preferScript(newSource.id, true);
+    } else {
+      ThreadFront.preferScript(oldSource.id, false);
+    }
+
+    const thread = getCurrentThread(getState());
+    const executionPoint = getThreadExecutionPoint(getState(), thread);
+    await dispatch(paused({ thread, executionPoint }));
+  };
 }

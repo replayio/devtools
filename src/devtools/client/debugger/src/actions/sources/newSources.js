@@ -222,7 +222,7 @@ export function newGeneratedSources(sourceInfo: Array<GeneratedSourceData>) {
         url = undefined;
       }
 
-      if (ThreadFront.minifiedScripts.has(source.actor)) {
+      if (ThreadFront.isMinifiedScript(source.actor)) {
         // Ignore minified scripts which have a pretty printed version.
         url = undefined;
       }
