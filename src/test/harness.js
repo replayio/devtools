@@ -186,6 +186,10 @@ function getVisibleSelectedFrameLine() {
   return frame && frame.location.line;
 }
 
+function waitForPausedLine(line) {
+  return waitUntil(() => line == getVisibleSelectedFrameLine());
+}
+
 function resumeThenPauseAtLineFunctionFactory(method) {
   return async function (lineno, waitForLine) {
     console.log(`Starting ${method} to ${lineno}...`);
@@ -196,7 +200,7 @@ function resumeThenPauseAtLineFunctionFactory(method) {
       await waitForPausedNoSource();
     }
     if (waitForLine) {
-      await waitUntil(() => lineno == getVisibleSelectedFrameLine());
+      await waitForPausedLine(lineno);
     } else {
       const pauseLine = getVisibleSelectedFrameLine();
       assert(pauseLine == lineno, `Expected line ${lineno} got ${pauseLine}`);
@@ -406,6 +410,11 @@ async function toggleExceptionLogging() {
   elem.click();
 }
 
+async function toggleMappedSources() {
+  const elem = await waitUntil(() => document.querySelector(".mapped-source"));
+  elem.click();
+}
+
 async function playbackRecording() {
   const timeline = await waitUntil(() => gToolbox.timeline);
   timeline.startPlayback();
@@ -509,6 +518,7 @@ module.exports = {
   setBreakpointOptions,
   disableBreakpoint,
   removeAllBreakpoints,
+  waitForPausedLine,
   rewindToLine,
   resumeToLine,
   reverseStepOverToLine,
@@ -543,6 +553,7 @@ module.exports = {
   selectFrame,
   addEventListenerLogpoints,
   toggleExceptionLogging,
+  toggleMappedSources,
   playbackRecording,
   randomLog,
   findMarkupNode,
