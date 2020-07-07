@@ -112,7 +112,11 @@ Pause.prototype = {
       if (scope.bindings) {
         const newBindings = [];
         for (const v of scope.bindings) {
-          newBindings.push({ name: v.name, value: new ValueFront(this, v) });
+          newBindings.push({
+            name: v.name,
+            originalName: v.originalName,
+            value: new ValueFront(this, v),
+          });
         }
         scope.bindings = newBindings;
       }

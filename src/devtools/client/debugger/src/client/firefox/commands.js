@@ -324,8 +324,8 @@ function convertScope(protocolScope) {
   let bindings;
   if (protocolBindings) {
     const variables = {};
-    for (const { name, value } of protocolBindings) {
-      variables[name] = value;
+    for (const { name, originalName, value } of protocolBindings) {
+      variables[originalName || name] = value;
     }
     bindings = { arguments: [], variables };
   }
