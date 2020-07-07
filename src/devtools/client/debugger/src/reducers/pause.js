@@ -52,22 +52,9 @@ type ThreadPauseState = {
     [FrameId]: Array<ExecutionPoint>,
   },
   frameScopes: {
-    generated: {
-      [FrameId]: {
-        pending: boolean,
-        scope: Scope,
-      },
-    },
-    original: {
-      [FrameId]: {
-        pending: boolean,
-        scope: OriginalScope,
-      },
-    },
-    mappings: {
-      [FrameId]: {
-        [string]: string | null,
-      },
+    [FrameId]: {
+      pending: boolean,
+      scope: Scope,
     },
   },
   selectedFrameId: ?string,
@@ -130,11 +117,7 @@ function createPauseState(thread: ThreadId = "UnknownThread") {
 const resumedPauseState = {
   frames: null,
   framesLoading: false,
-  frameScopes: {
-    generated: {},
-    original: {},
-    mappings: {},
-  },
+  frameScopes: {},
   selectedFrameId: null,
   executionPoint: null,
   why: null,
@@ -247,46 +230,15 @@ function update(state: PauseState = createPauseState(), action: Action): PauseSt
       const { frame, status, value } = action;
       const selectedFrameId = frame.id;
 
-      const generated = {
-        ...threadState().frameScopes.generated,
+      const frameScopes = {
+        ...threadState().frameScopes,
         [selectedFrameId]: {
           pending: status !== "done",
           scope: value,
         },
       };
 
-      return updateThreadState({
-        frameScopes: {
-          ...threadState().frameScopes,
-          generated,
-        },
-      });
-    }
-
-    case "MAP_SCOPES": {
-      const { frame, status, value } = action;
-      const selectedFrameId = frame.id;
-
-      const original = {
-        ...threadState().frameScopes.original,
-        [selectedFrameId]: {
-          pending: status !== "done",
-          scope: value && value.scope,
-        },
-      };
-
-      const mappings = {
-        ...threadState().frameScopes.mappings,
-        [selectedFrameId]: value && value.mappings,
-      };
-
-      return updateThreadState({
-        frameScopes: {
-          ...threadState().frameScopes,
-          original,
-          mappings,
-        },
-      });
+      return updateThreadState({ frameScopes });
     }
 
     case "SET_FRAME_POSITIONS": {
@@ -535,93 +487,19 @@ function getGeneratedFrameId(frameId: string): string {
   return frameId;
 }
 
-export function getGeneratedFrameScope(state: State, thread: ThreadId, frameId: ?string) {
+export function getFrameScope(state: State, thread: ThreadId, frameId: ?string) {
   if (!frameId) {
     return null;
   }
 
-  return getFrameScopes(state, thread).generated[getGeneratedFrameId(frameId)];
-}
-
-export function getFrameScopes(state: State, thread: ThreadId) {
-  return getThreadPauseState(state.pause, thread).frameScopes;
-}
-
-export function getSelectedFrameBindings(state: State, thread: ThreadId) {
-  const scopes = getFrameScopes(state, thread);
-  const selectedFrameId = getSelectedFrameId(state, thread);
-  if (!scopes || !selectedFrameId) {
-    return null;
-  }
-
-  const frameScope = scopes.generated[selectedFrameId];
-  if (!frameScope || frameScope.pending) {
-    return;
-  }
-
-  let currentScope = frameScope.scope;
-  let frameBindings = [];
-  while (currentScope && currentScope.type != "object") {
-    if (currentScope.bindings) {
-      const bindings = Object.keys(currentScope.bindings.variables);
-      const args = [].concat(
-        ...currentScope.bindings.arguments.map(argument => Object.keys(argument))
-      );
-
-      frameBindings = [...frameBindings, ...bindings, ...args];
-    }
-    currentScope = currentScope.parent;
-  }
-
-  return frameBindings;
-}
-
-export function getFrameScope(
-  state: State,
-  thread: ThreadId,
-  sourceId: ?SourceId,
-  frameId: ?string
-): ?{
-  pending: boolean,
-  +scope: OriginalScope | Scope,
-} {
-  return getGeneratedFrameScope(state, thread, frameId);
+  const { frameScopes } = getThreadPauseState(state.pause, thread);
+  return frameScopes[getGeneratedFrameId(frameId)];
 }
 
 export function getSelectedScope(state: State, thread: ThreadId) {
-  const sourceId = getSelectedSourceId(state);
   const frameId = getSelectedFrameId(state, thread);
-
-  const frameScope = getFrameScope(state, thread, sourceId, frameId);
-  if (!frameScope) {
-    return null;
-  }
-
-  return frameScope.scope || null;
-}
-
-export function getSelectedOriginalScope(state: State, thread: ThreadId) {
-  const frameId = getSelectedFrameId(state, thread);
-  return getGeneratedFrameScope(state, thread, frameId);
-}
-
-export function getSelectedGeneratedScope(state: State, thread: ThreadId) {
-  const frameId = getSelectedFrameId(state, thread);
-  return getGeneratedFrameScope(state, thread, frameId);
-}
-
-export function getSelectedScopeMappings(
-  state: State,
-  thread: ThreadId
-): {
-  [string]: string | null,
-} | null {
-  const frameId = getSelectedFrameId(state, thread);
-  if (!frameId) {
-    return null;
-  }
-
-  return getFrameScopes(state, thread).mappings[frameId];
+  const frameScopes = getFrameScope(state, thread, frameId);
+  return frameScopes && frameScopes.scope;
 }
 
 export function getSelectedFrameId(state: State, thread: ThreadId) {
@@ -676,12 +554,6 @@ export function getInlinePreviewExpression(
     getGeneratedFrameId(frameId)
   ];
   return previews && previews[line] && previews[line][expression];
-}
-
-// NOTE: currently only used for chrome
-export function getChromeScopes(state: State, thread: ThreadId) {
-  const frame: ?ChromeFrame = (getSelectedFrame(state, thread): any);
-  return frame ? frame.scopeChain : undefined;
 }
 
 export function getLastExpandedScopes(state: State, thread: ThreadId) {

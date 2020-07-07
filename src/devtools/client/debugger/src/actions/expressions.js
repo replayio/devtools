@@ -12,8 +12,6 @@ import {
   getFrames,
   getSourceFromId,
   getSelectedSource,
-  getSelectedScopeMappings,
-  getSelectedFrameBindings,
   getCurrentThread,
   getIsPaused,
 } from "../selectors";

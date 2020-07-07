@@ -4,7 +4,7 @@
 
 // @flow
 import { sortBy } from "lodash";
-import { getGeneratedFrameScope, getInlinePreviews, getSource } from "../../selectors";
+import { getFrameScope, getInlinePreviews, getSource } from "../../selectors";
 import { features } from "../../utils/prefs";
 import { validateThreadContext } from "../../utils/context";
 import { loadSourceText } from "../sources/loadSourceText";
@@ -40,9 +40,9 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
 
     log(`GenerateInlinePreview Start`);
 
-    const generatedFrameScopes = getGeneratedFrameScope(getState(), thread, frameId);
+    const frameScopes = getFrameScope(getState(), thread, frameId);
 
-    let scopes: Scope | null = generatedFrameScopes && generatedFrameScopes.scope;
+    let scopes: Scope | null = frameScopes && frameScopes.scope;
 
     if (!scopes || !scopes.bindings) {
       log(`GenerateInlinePreview LoadSourceText NoFrameScopes`);

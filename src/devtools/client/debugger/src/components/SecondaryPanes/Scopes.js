@@ -12,7 +12,7 @@ import { features } from "../../utils/prefs";
 import {
   getSelectedSource,
   getSelectedFrame,
-  getGeneratedFrameScope,
+  getFrameScope,
   getPauseReason,
   getThreadContext,
   getLastExpandedScopes,
@@ -33,8 +33,7 @@ type OwnProps = {||};
 type Props = {
   cx: ThreadContext,
   selectedFrame: Object,
-  generatedFrameScopes: Object,
-  originalFrameScopes: Object | null,
+  frameScopes: Object,
   isLoading: boolean,
   why: ?Why,
   openLink: typeof actions.openLink,
@@ -48,9 +47,7 @@ type Props = {
 };
 
 type State = {
-  originalScopes: ?(NamedValue[]),
-  generatedScopes: ?(NamedValue[]),
-  showOriginal: boolean,
+  scopes: ?(NamedValue[]),
 };
 
 type Node = {
@@ -63,40 +60,31 @@ type Node = {
 
 class Scopes extends PureComponent<Props, State> {
   constructor(props: Props) {
-    const { why, selectedFrame, originalFrameScopes, generatedFrameScopes } = props;
+    const { why, selectedFrame, frameScopes } = props;
 
     super(props);
 
     this.state = {
-      originalScopes: getScopes(why, selectedFrame, originalFrameScopes),
-      generatedScopes: getScopes(why, selectedFrame, generatedFrameScopes),
-      showOriginal: true,
+      scopes: getScopes(why, selectedFrame, frameScopes),
     };
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const { cx, selectedFrame, originalFrameScopes, generatedFrameScopes } = this.props;
+    const { cx, selectedFrame, frameScopes } = this.props;
     const isPausedChanged = cx.isPaused !== nextProps.cx.isPaused;
     const selectedFrameChanged = selectedFrame !== nextProps.selectedFrame;
-    const originalFrameScopesChanged = originalFrameScopes !== nextProps.originalFrameScopes;
-    const generatedFrameScopesChanged = generatedFrameScopes !== nextProps.generatedFrameScopes;
+    const frameScopesChanged = frameScopes !== nextProps.frameScopes;
 
     if (
       isPausedChanged ||
       selectedFrameChanged ||
-      originalFrameScopesChanged ||
-      generatedFrameScopesChanged
+      frameScopesChanged
     ) {
       this.setState({
-        originalScopes: getScopes(
+        scopes: getScopes(
           nextProps.why,
           nextProps.selectedFrame,
-          nextProps.originalFrameScopes
-        ),
-        generatedScopes: getScopes(
-          nextProps.why,
-          nextProps.selectedFrame,
-          nextProps.generatedFrameScopes
+          nextProps.frameScopes
         ),
       });
     }
@@ -183,9 +171,7 @@ class Scopes extends PureComponent<Props, State> {
       setExpandedScope,
       expandedScopes,
     } = this.props;
-    const { originalScopes, generatedScopes, showOriginal } = this.state;
-
-    const scopes = generatedScopes;
+    const { scopes } = this.state;
 
     function initiallyExpanded(item) {
       return expandedScopes.some(path => path == getScopeItemPath(item));
@@ -245,7 +231,7 @@ const mapStateToProps = state => {
   const selectedFrame = getSelectedFrame(state, cx.thread);
   const selectedSource = getSelectedSource(state);
 
-  const { scope: generatedFrameScopes, pending: generatedPending } = getGeneratedFrameScope(
+  const { scope, pending } = getFrameScope(
     state,
     cx.thread,
     selectedFrame && selectedFrame.id
@@ -257,9 +243,9 @@ const mapStateToProps = state => {
   return {
     cx,
     selectedFrame,
-    isLoading: generatedPending,
+    isLoading: pending,
     why: getPauseReason(state, cx.thread),
-    generatedFrameScopes,
+    frameScopes: scope,
     expandedScopes: getLastExpandedScopes(state, cx.thread),
   };
 };
