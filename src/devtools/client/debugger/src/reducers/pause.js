@@ -589,7 +589,8 @@ export function getAlternateSourceId(state, selectedSource) {
   if (!selectedFrame || selectedFrame.location.sourceId != selectedSource.id) {
     return null;
   }
-  return selectedFrame.alternateLocation.sourceId;
+  const { alternateLocation } = selectedFrame;
+  return alternateLocation ? alternateLocation.sourceId : null;
 }
 
 export default update;
