@@ -13,7 +13,7 @@ import type { Frame, Why, Scope } from "../../../types";
 
 import type { NamedValue } from "./types";
 
-import { createElementsFront } from "protocol/thread";
+import { ThreadFront, createElementsFront } from "protocol/thread";
 
 export type RenderableScope = {
   type: $ElementType<Scope, "type">,
@@ -105,7 +105,9 @@ export function getScope(
   const { type, actor } = scope;
 
   const isLocalScope = scope.actor === frameScopes.actor;
-  const useOriginalNames = hasOriginalNames(frameScopes);
+  const useOriginalNames =
+    hasOriginalNames(frameScopes) &&
+    ThreadFront.isSourceMappedScript(selectedFrame.location.sourceId);
 
   const key = `${actor}-${scopeIndex}`;
   if (type === "function" || type === "block") {

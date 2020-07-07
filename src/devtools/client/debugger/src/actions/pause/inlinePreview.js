@@ -9,6 +9,7 @@ import { features } from "../../utils/prefs";
 import { validateThreadContext } from "../../utils/context";
 import { hasOriginalNames } from "../../utils/pause/scopes/getScope";
 import { loadSourceText } from "../sources/loadSourceText";
+import { ThreadFront } from "protocol/thread";
 
 import type { ThreadContext, Frame, Scope, Preview } from "../../types";
 import type { ThunkArgs } from "../types";
@@ -77,7 +78,8 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
     const allPreviews = [];
     const pausedOnLine: number = location.line;
     const levels: number = getLocalScopeLevels(originalAstScopes);
-    const useOriginalNames = hasOriginalNames(scopes);
+    const useOriginalNames =
+      hasOriginalNames(scopes) && ThreadFront.isSourceMappedScript(source.id);
 
     for (let curLevel = 0; curLevel <= levels && scopes && scopes.bindings; curLevel++) {
       const previewBindings = scopes.bindings.map(async ({ name, originalName, value }) => {
