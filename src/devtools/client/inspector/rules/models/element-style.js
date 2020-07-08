@@ -144,19 +144,16 @@ class ElementStyle {
     const applied = this.element.getAppliedRules();
     const inline = this.element.getInlineStyle();
 
-    const entries = [...applied];
+    const entries = [];
     if (inline) {
       entries.push(inline);
     }
-
-    // Store the current list of rules (if any) during the population
-    // process. They will be reused if possible.
-    const existingRules = this.rules;
+    entries.push(...applied);
 
     this.rules = [];
 
     for (const entry of entries) {
-      this._maybeAddRule(entry, existingRules);
+      this._maybeAddRule(entry);
     }
 
     // Store a list of all pseudo-element types found in the matching rules.
@@ -165,19 +162,8 @@ class ElementStyle {
     // Mark overridden computed styles.
     this.onRuleUpdated();
 
-    this._sortRulesForPseudoElement();
-
     if (this.ruleView.isNewRulesView) {
       this.subscribeRulesToLocationChange();
-    }
-
-    // We're done with the previous list of rules.
-    for (const r of existingRules) {
-      if (r && r.editor) {
-        r.editor.destroy();
-      }
-
-      r.destroy();
     }
   }
 
@@ -214,26 +200,18 @@ class ElementStyle {
   }
 
   /**
-   * Put pseudo elements in front of others.
-   */
-  _sortRulesForPseudoElement() {
-    this.rules = this.rules.sort((a, b) => {
-      return (a.pseudoElement || "z") > (b.pseudoElement || "z");
-    });
-  }
-
-  /**
    * Add a rule if it's one we care about. Filters out duplicates and
    * inherited styles with no inherited properties.
    *
    * @param  {Object} ruleFront
    *         Rule to add.
-   * @param  {Array} existingRules
-   *         Rules to reuse if possible. If a rule is reused, then it
-   *         it will be deleted from this array.
    * @return {Boolean} true if we added the rule.
    */
-  _maybeAddRule(ruleFront, existingRules) {
+  _maybeAddRule(ruleFront) {
+    if (ruleFront.isSystem) {
+      return false;
+    }
+
     this.rules.push(new Rule(this, { rule: ruleFront }));
     return true;
   }
@@ -423,7 +401,7 @@ class ElementStyle {
       // When renaming a selector, the unmatched rule lingers in the Rule view, but it no
       // longer matches the node. This strict check avoids accidentally causing
       // declarations to be overridden in the remaining matching rules.
-      const isStyleRule = rule.pseudoElement === "" && rule.matchedSelectors.length > 0;
+      const isStyleRule = rule.pseudoElement === ""; // && rule.matchedSelectors.length > 0;
 
       // Style rules for pseudo-elements must always be considered, regardless if their
       // selector matches the node. As a convenience, declarations in rules for

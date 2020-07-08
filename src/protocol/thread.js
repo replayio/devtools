@@ -842,7 +842,7 @@ NodeFront.prototype = {
 
   getAppliedRules() {
     assert(this._loaded);
-    return this._rules.map(r => this._pause.getDOMFront(r)).filter(r => !r.isSystem);
+    return this._rules.map(r => this._pause.getDOMFront(r));
   },
 
   getInlineStyle() {

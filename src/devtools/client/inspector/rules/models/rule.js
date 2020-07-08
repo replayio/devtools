@@ -587,7 +587,7 @@ class Rule {
         this,
         name,
         value,
-        prop.priority,
+        prop.important ? "important" : undefined,
         !("commentOffsets" in prop),
         invisible
       );
