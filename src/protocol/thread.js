@@ -1211,7 +1211,8 @@ const ThreadFront = {
   },
 
   getScriptKind(scriptId) {
-    return this.scripts.get(scriptId).kind;
+    const info = this.scripts.get(scriptId);
+    return info ? info.kind : null;
   },
 
   async ensureScript(scriptId) {
@@ -1620,6 +1621,11 @@ const ThreadFront = {
     // Always ignore minified scripts.
     scriptIds = scriptIds.filter(id => !this.isMinifiedScript(id));
 
+    // Ignore inline scripts if we have an HTML script containing them.
+    if (scriptIds.some(id => this.getScriptKind(id) == "html")) {
+      scriptIds = scriptIds.filter(id => this.getScriptKind(id) != "inlineScript");
+    }
+
     // Determine the base generated/original ID to use for the script.
     let generatedId, originalId;
     for (const id of scriptIds) {
@@ -1637,10 +1643,6 @@ const ThreadFront = {
         }
         kind = minifiedInfo.kind;
         assert(kind != "prettyPrinted");
-      }
-      if (kind == "inlineScript") {
-        // Inline scripts should have an HTML version which we will always prefer.
-        continue;
       }
       if (kind == "sourceMapped") {
         originalId = id;
