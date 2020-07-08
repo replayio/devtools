@@ -256,9 +256,6 @@ let gLastImage;
 // Mouse information to draw.
 let gDrawMouse;
 
-// Text message to draw, if any.
-let gDrawMessage;
-
 function paintGraphics(screenShot, mouse) {
   if (!screenShot) {
     clearGraphics();
@@ -280,14 +277,6 @@ function clearGraphics() {
   gDrawImage = null;
   gLastImage = null;
   gDrawMouse = null;
-  gDrawMessage = null;
-  refreshGraphics();
-}
-
-function paintMessage(message) {
-  gDrawImage = null;
-  gDrawMouse = null;
-  gDrawMessage = message;
   refreshGraphics();
 }
 
@@ -323,7 +312,6 @@ function refreshGraphics() {
   const bounds = viewer.getBoundingClientRect();
 
   const canvas = document.getElementById("graphics");
-  const textElem = document.getElementById("viewer-text");
 
   // Find an image to draw.
   let image;
@@ -335,57 +323,46 @@ function refreshGraphics() {
     }
   }
 
-  if (image) {
-    canvas.style.visibility = "visible";
-    textElem.style.visibility = "hidden";
+  if (!image) {
+    return;
+  }
 
-    const scale = Math.min(bounds.width / image.width, bounds.height / image.height, 1);
+  canvas.style.visibility = "visible";
+  textElem.style.visibility = "hidden";
 
-    canvas.width = image.width;
-    canvas.height = image.height;
-    canvas.style.transform = `scale(${scale})`;
+  const scale = Math.min(bounds.width / image.width, bounds.height / image.height, 1);
 
-    const drawWidth = image.width * scale;
-    const drawHeight = image.height * scale;
-    const offsetLeft = (bounds.width - drawWidth) / 2;
-    const offsetTop = (bounds.height - drawHeight) / 2;
+  canvas.width = image.width;
+  canvas.height = image.height;
+  canvas.style.transform = `scale(${scale})`;
 
-    canvas.style.left = offsetLeft;
-    canvas.style.top = offsetTop;
+  const drawWidth = image.width * scale;
+  const drawHeight = image.height * scale;
+  const offsetLeft = (bounds.width - drawWidth) / 2;
+  const offsetTop = (bounds.height - drawHeight) / 2;
 
-    const cx = canvas.getContext("2d");
-    cx.drawImage(image, 0, 0);
+  canvas.style.left = offsetLeft;
+  canvas.style.top = offsetTop;
 
-    if (gDrawMouse) {
-      const { x, y, clickX, clickY } = gDrawMouse;
-      drawCursor(cx, x, y);
-      if (clickX !== undefined) {
-        drawClick(cx, x, y);
-      }
+  const cx = canvas.getContext("2d");
+  cx.drawImage(image, 0, 0);
+
+  if (gDrawMouse) {
+    const { x, y, clickX, clickY } = gDrawMouse;
+    drawCursor(cx, x, y);
+    if (clickX !== undefined) {
+      drawClick(cx, x, y);
     }
+  }
 
-    // Apply the same transforms to any displayed highlighter.
-    const highlighterContainer = document.querySelector(".highlighter-container");
-    if (highlighterContainer && gDevicePixelRatio) {
-      highlighterContainer.style.transform = `scale(${scale * gDevicePixelRatio})`;
-      highlighterContainer.style.left = offsetLeft;
-      highlighterContainer.style.top = offsetTop;
-      highlighterContainer.style.width = image.width;
-      highlighterContainer.style.height = image.height;
-    }
-  } else {
-    canvas.style.visibility = "hidden";
-    textElem.style.visibility = "visible";
-
-    textElem.innerText = gDrawMessage || "";
-
-    // It would be better to avoid computing this position manually.
-    const textBounds = textElem.getBoundingClientRect();
-
-    const offsetLeft = Math.max(0, (bounds.width - textBounds.width) / 2);
-    const offsetTop = Math.max(0, (bounds.height - textBounds.height) / 2);
-    textElem.style.left = offsetLeft;
-    textElem.style.top = offsetTop;
+  // Apply the same transforms to any displayed highlighter.
+  const highlighterContainer = document.querySelector(".highlighter-container");
+  if (highlighterContainer && gDevicePixelRatio) {
+    highlighterContainer.style.transform = `scale(${scale * gDevicePixelRatio})`;
+    highlighterContainer.style.left = offsetLeft;
+    highlighterContainer.style.top = offsetTop;
+    highlighterContainer.style.width = image.width;
+    highlighterContainer.style.height = image.height;
   }
 }
 
@@ -409,7 +386,6 @@ module.exports = {
   previousPaintEvent,
   paintGraphics,
   getGraphicsAtTime,
-  paintMessage,
   refreshGraphics,
   getDevicePixelRatio,
 };

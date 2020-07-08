@@ -104,6 +104,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   background-color: var(--theme-toolbar-selected-color);
 }
 
+#status {
+  padding-left: 10px;
+}
+
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
 @import url("devtools/client/themes/markup.css");

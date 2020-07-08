@@ -110,6 +110,7 @@ class App extends React.Component {
       <>
         <div id="header">
           <div className="logo"></div>
+          <div id="status"></div>
         </div>
 
         <SplitBox

@@ -112,6 +112,7 @@ function onSocketMessage(evt) {
 }
 
 function onSocketClose() {
+  setStatus("Disconnected.");
   log("Socket Closed");
 }
 
@@ -124,12 +125,17 @@ function log(text) {
   // when reviewing recordings of the viewer.
 }
 
+function setStatus(text) {
+  document.getElementById("status").innerText = text;
+}
+
 module.exports = {
   initSocket,
   sendMessage,
   addEventListener,
   removeEventListener,
   log,
+  setStatus,
 };
 
 // Debugging methods.

@@ -54,26 +54,45 @@ if (test) {
 
 require("./styles.css");
 
-const { initSocket, sendMessage, log } = require("protocol/socket");
+const { initSocket, sendMessage, log, setStatus } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
-const { paintMessage } = require("protocol/graphics");
 const { throttle, clamp, EventEmitter } = require("protocol/utils");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap");
 
 // Create a session to use while debugging.
 async function createSession() {
+  addEventListener("Recording.uploadedData", onUploadedData);
+  addEventListener("Recording.sessionError", onSessionError);
+
   const { sessionId } = await sendMessage("Recording.createSession", {
     recordingId,
   });
+  setStatus("");
   window.sessionId = sessionId;
   ThreadFront.setSessionId(sessionId);
   ThreadFront.setTest(test);
 }
 
+function onUploadedData({ uploaded, length }) {
+  const uploadedMB = (uploaded / (1024 * 1024)).toFixed(2);
+  const lengthMB = length ? (length / (1024 * 1024)).toFixed(2) : undefined;
+  if (lengthMB) {
+    setStatus(`Waiting for upload… ${uploadedMB} / ${lengthMB} MB`);
+  } else {
+    setStatus(`Waiting for upload… ${uploadedMB} MB`);
+  }
+}
+
+function onSessionError({ message }) {
+  setStatus(`Error: ${message}`);
+}
+
 async function initialize() {
+  loadImages();
+
   if (!recordingId) {
-    paintMessage("Recording ID not specified");
+    setStatus("Recording ID not specified");
     return;
   }
 
@@ -82,8 +101,6 @@ async function initialize() {
   paintMessage("");
 
   createSession();
-
-  loadImages();
 
   document.body.addEventListener("contextmenu", e => e.preventDefault());
 
