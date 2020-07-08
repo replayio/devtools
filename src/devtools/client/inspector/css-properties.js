@@ -1,7 +1,9 @@
-// Produced by logging the output of generateCssProperties() in actors/css-properties.js
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*
-module.exports = {
+// Produced by logging the output of generateCssProperties() in actors/css-properties.js
+const properties = {
   "align-content": {
     "isInherited": false,
     "values": [
@@ -10665,4 +10667,54 @@ module.exports = {
     ]
   }
 };
-*/
+
+const NON_ASCII = "[^\\x00-\\x7F]";
+const ESCAPE = "\\\\[^\n\r]";
+const FIRST_CHAR = ["[_a-z]", NON_ASCII, ESCAPE].join("|");
+const TRAILING_CHAR = ["[_a-z0-9-]", NON_ASCII, ESCAPE].join("|");
+const IS_VARIABLE_TOKEN = new RegExp(
+  `^--(${FIRST_CHAR})(${TRAILING_CHAR})*$`,
+  "i"
+);
+
+function isCssVariable(input) {
+  return !!input.match(IS_VARIABLE_TOKEN);
+}
+
+module.exports = {
+  supportsType(property, type) {
+    return (
+      properties[property] &&
+      properties[property].supports.includes(type)
+    );
+  },
+
+  supportsCssColor4ColorFunction() {
+    return true;
+  },
+
+  getSubproperties(name) {
+    // Custom Property Names (aka CSS Variables) are case-sensitive; do not lowercase.
+    name = name.startsWith("--") ? name : name.toLowerCase();
+    if (this.isKnown(name)) {
+      if (properties[name] && properties[name].subproperties) {
+        return properties[name].subproperties;
+      }
+      return [name];
+    }
+    return [];
+  },
+
+  isKnown(property) {
+    // Custom Property Names (aka CSS Variables) are case-sensitive; do not lowercase.
+    property = property.startsWith("--") ? property : property.toLowerCase();
+    return !!properties[property] || isCssVariable(property);
+  },
+
+  isInherited(property) {
+    return (
+      (properties[property] && properties[property].isInherited) ||
+      isCssVariable(property)
+    );
+  },
+};

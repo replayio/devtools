@@ -50,7 +50,7 @@ const { ToolSidebar } = require("devtools/client/inspector/toolsidebar");
 const MarkupView = require("devtools/client/inspector/markup/markup");
 const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");
 
-//const CSSProperties = require("./css-properties");
+const CSSProperties = require("./css-properties");
 
 const Highlighter = require("highlighter/highlighter");
 
@@ -283,15 +283,7 @@ Inspector.prototype = {
   },
 
   get cssProperties() {
-    return {
-      supportsType: () => true,
-      supportsCssColor4ColorFunction: () => true,
-      getSubproperties(name) {
-        return [name];
-        //return CSSProperties[name];
-      },
-      isKnown: () => true,
-    };
+    return CSSProperties;
   },
 
   /**

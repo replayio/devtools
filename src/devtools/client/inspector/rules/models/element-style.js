@@ -141,19 +141,25 @@ class ElementStyle {
    * ready.
    */
   populate() {
-    const applied = this.element.getAppliedRules();
-    const inline = this.element.getInlineStyle();
-
-    const entries = [];
-    if (inline) {
-      entries.push(inline);
-    }
-    entries.push(...applied);
-
     this.rules = [];
 
-    for (const entry of entries) {
-      this._maybeAddRule(entry);
+    const inline = this.element.getInlineStyle();
+    if (inline) {
+      this._maybeAddRule(inline);
+    }
+
+    const applied = this.element.getAppliedRules();
+    for (const rule of applied) {
+      this._maybeAddRule(rule);
+    }
+
+    for (let elem = this.element.parentNode(); elem; elem = elem.parentNode()) {
+      if (elem.nodeType == Node.ELEMENT_NODE) {
+        const parentApplied = elem.getAppliedRules();
+        for (const rule of parentApplied) {
+          this._maybeAddRule(rule, /* inherited */ elem);
+        }
+      }
     }
 
     // Store a list of all pseudo-element types found in the matching rules.
@@ -207,12 +213,12 @@ class ElementStyle {
    *         Rule to add.
    * @return {Boolean} true if we added the rule.
    */
-  _maybeAddRule(ruleFront) {
+  _maybeAddRule(ruleFront, inherited) {
     if (ruleFront.isSystem) {
       return false;
     }
 
-    this.rules.push(new Rule(this, { rule: ruleFront }));
+    this.rules.push(new Rule(this, { rule: ruleFront, inherited }));
     return true;
   }
 
