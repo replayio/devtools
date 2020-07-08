@@ -503,6 +503,28 @@ async function checkComputedStyle(style, value) {
   });
 }
 
+function getAppliedRulesJSON() {
+  const rules = document.querySelectorAll(".ruleview-rule");
+  return [...rules].map(rule => {
+    const selector = rule.querySelector(".ruleview-selectorcontainer").innerText.trim();
+    const source = rule.querySelector(".ruleview-rule-source").innerText.trim();
+    const properties = [...rule.querySelectorAll(".ruleview-property")].map(prop => {
+      return {
+        text: prop.innerText.trim(),
+        overridden: prop.className.includes("overridden"),
+      };
+    });
+    return { selector, source, properties };
+  });
+}
+
+async function checkAppliedRules(expected) {
+  await waitUntil(() => {
+    const json = getAppliedRulesJSON();
+    return JSON.stringify(json) == JSON.stringify(expected);
+  });
+}
+
 module.exports = {
   selectConsole,
   selectDebugger,
@@ -564,4 +586,6 @@ module.exports = {
   pickNode,
   selectMarkupNode,
   checkComputedStyle,
+  getAppliedRulesJSON,
+  checkAppliedRules,
 };

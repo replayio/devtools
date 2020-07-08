@@ -143,21 +143,36 @@ class ElementStyle {
   populate() {
     this.rules = [];
 
+    const applied = this.element.getAppliedRules();
+
+    // Show rules applied to pseudo-elements first.
+    for (const { rule, pseudoElement } of applied) {
+      if (pseudoElement) {
+        this._maybeAddRule(rule, undefined, pseudoElement);
+      }
+    }
+
+    // The inline rule has higher priority than applied rules.
     const inline = this.element.getInlineStyle();
     if (inline) {
       this._maybeAddRule(inline);
     }
 
-    const applied = this.element.getAppliedRules();
-    for (const rule of applied) {
-      this._maybeAddRule(rule);
+    // Show rules applied directly to the element in priority order.
+    for (const { rule, pseudoElement } of applied) {
+      if (!pseudoElement) {
+        this._maybeAddRule(rule);
+      }
     }
 
+    // Show relevant rules applied to parent elements.
     for (let elem = this.element.parentNode(); elem; elem = elem.parentNode()) {
       if (elem.nodeType == Node.ELEMENT_NODE) {
         const parentApplied = elem.getAppliedRules();
-        for (const rule of parentApplied) {
-          this._maybeAddRule(rule, /* inherited */ elem);
+        for (const { rule, pseudoElement } of parentApplied) {
+          if (!pseudoElement) {
+            this._maybeAddRule(rule, /* inherited */ elem);
+          }
         }
       }
     }
@@ -213,12 +228,12 @@ class ElementStyle {
    *         Rule to add.
    * @return {Boolean} true if we added the rule.
    */
-  _maybeAddRule(ruleFront, inherited) {
+  _maybeAddRule(ruleFront, inherited, pseudoElement) {
     if (ruleFront.isSystem) {
       return false;
     }
 
-    this.rules.push(new Rule(this, { rule: ruleFront, inherited }));
+    this.rules.push(new Rule(this, { rule: ruleFront, inherited, pseudoElement }));
     return true;
   }
 

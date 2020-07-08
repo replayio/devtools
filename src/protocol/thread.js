@@ -842,7 +842,9 @@ NodeFront.prototype = {
 
   getAppliedRules() {
     assert(this._loaded);
-    return this._rules.map(r => this._pause.getDOMFront(r));
+    return this._rules.map(({ rule, pseudoElement }) => {
+      return { rule: this._pause.getDOMFront(rule), pseudoElement };
+    });
   },
 
   getInlineStyle() {

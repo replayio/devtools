@@ -108,6 +108,7 @@ pref("devtools.layout.grid.opened", true);
 pref("devtools.layout.boxmodel.opened", true);
 pref("dom.input_events.beforeinput.enabled", false);
 pref("devtools.defaultColorUnit", "authored");
+pref("devtools.inspector.show_pseudo_elements", false);
 
 export const prefs = new PrefsHelper("devtools", {
   fission: ["Bool", "browsertoolbox.fission"],
