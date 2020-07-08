@@ -328,7 +328,6 @@ function refreshGraphics() {
   }
 
   canvas.style.visibility = "visible";
-  textElem.style.visibility = "hidden";
 
   const scale = Math.min(bounds.width / image.width, bounds.height / image.height, 1);
 

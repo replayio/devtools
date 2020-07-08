@@ -54,7 +54,13 @@ if (test) {
 
 require("./styles.css");
 
-const { initSocket, sendMessage, log, setStatus } = require("protocol/socket");
+const {
+  initSocket,
+  sendMessage,
+  log,
+  setStatus,
+  addEventListener,
+} = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const { throttle, clamp, EventEmitter } = require("protocol/utils");
 const loadImages = require("image/image");
@@ -97,8 +103,6 @@ async function initialize() {
   }
 
   initSocket(dispatch);
-
-  paintMessage("");
 
   createSession();
 
