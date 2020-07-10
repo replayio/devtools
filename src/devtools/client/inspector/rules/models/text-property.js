@@ -5,6 +5,7 @@
 "use strict";
 
 const { generateUUID } = require("devtools/shared/generate-uuid");
+const { hasCSSVariable } = require("devtools/client/inspector/rules/utils/utils");
 
 /*
 loader.lazyRequireGetter(
@@ -14,12 +15,6 @@ loader.lazyRequireGetter(
   true
 );
 
-loader.lazyRequireGetter(
-  this,
-  "hasCSSVariable",
-  "devtools/client/inspector/rules/utils/utils",
-  true
-);
 */
 
 /**
