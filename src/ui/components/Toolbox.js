@@ -182,7 +182,6 @@ class Toolbox extends React.Component {
   }
 
   renderInspector() {
-    const { nodePickerActive } = this.state;
     return (
       <div
         className="inspector-responsive-container theme-body inspector"
@@ -200,11 +199,6 @@ class Toolbox extends React.Component {
             className="devtools-toolbar devtools-input-toolbar"
             nowindowdrag="true"
           >
-            <button
-              id="command-button-pick"
-              className={classnames("devtools-button", { active: nodePickerActive })}
-              onClick={() => this.clickNodePickerButton()}
-            ></button>
             <div id="inspector-search" className="devtools-searchbox">
               <input
                 id="inspector-searchbox"
@@ -454,6 +448,7 @@ class Toolbox extends React.Component {
 
   nodePickerMouseClick(e) {
     this.nodePickerMouseClickInCanvas(this.mouseEventCanvasPosition(e));
+    this.selectTool("inspector");
   }
 
   // This is exposed separately for use in testing.
@@ -475,10 +470,17 @@ class Toolbox extends React.Component {
   }
 
   renderToolbar() {
-    const { selectedPanel } = this.state;
+    const { selectedPanel, nodePickerActive } = this.state;
 
     return (
       <div id="toolbox-toolbar">
+        <div
+          id="command-button-pick"
+          className={classnames("devtools-button toolbar-panel-button", {
+            active: nodePickerActive,
+          })}
+          onClick={() => this.clickNodePickerButton()}
+        ></div>
         <div
           className={classnames("toolbar-panel-button", {
             active: selectedPanel == "inspector",
