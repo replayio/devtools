@@ -46,24 +46,23 @@ function findBreakpointAtLocation(breakpoints, selectedSource, { line, column }:
 }
 
 // returns the closest active column breakpoint
-function findClosestBreakpoint(breakpoints, column) {
-  if (!breakpoints || breakpoints.length == 0) {
+function findClosestPosition(positions, column) {
+  if (!positions || positions.length == 0) {
     return null;
   }
 
-  const firstBreakpoint = breakpoints[0];
-  return breakpoints.reduce((closestBp, currentBp) => {
-    const currentColumn = currentBp.location.column;
-    const closestColumn = closestBp.location.column;
+  return positions.reduce((closestPos, currentPos) => {
+    const currentColumn = currentPos.column;
+    const closestColumn = closestPos.column;
     // check that breakpoint has a column.
     if (column && currentColumn && closestColumn) {
       const currentDistance = Math.abs(currentColumn - column);
       const closestDistance = Math.abs(closestColumn - column);
 
-      return currentDistance < closestDistance ? currentBp : closestBp;
+      return currentDistance < closestDistance ? currentPos : closestPos;
     }
-    return closestBp;
-  }, firstBreakpoint);
+    return closestPos;
+  }, positions[0]);
 }
 
 /*
@@ -95,8 +94,9 @@ export function getBreakpointsAtLine(state: State, line: number): Breakpoint[] {
 
 export function getClosestBreakpoint(state: State, position: PartialPosition): ?Breakpoint {
   const columnBreakpoints = getBreakpointsAtLine(state, position.line);
+  const positions = columnBreakpoints.map(bp => bp.location);
 
-  const breakpoint = findClosestBreakpoint(columnBreakpoints, position.column);
+  const breakpoint = findClosestPosition(positions, position.column);
   return (breakpoint: any);
 }
 
@@ -109,7 +109,7 @@ export function getClosestBreakpointPosition(
     throw new Error("no selectedSource");
   }
 
-  const columnBreakpoints = getBreakpointPositionsForLine(state, selectedSource.id, position.line);
+  const positions = getBreakpointPositionsForLine(state, selectedSource.id, position.line);
 
-  return findClosestBreakpoint(columnBreakpoints, position.column);
+  return findClosestPosition(positions, position.column);
 }
