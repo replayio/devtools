@@ -22,6 +22,7 @@ const RootContainer = require("devtools/client/inspector/markup/views/root-conta
 const { ThreadFront } = require("protocol/thread");
 const { log } = require("protocol/socket");
 const Highlighter = require("highlighter/highlighter.js");
+const { nodePicker } = require("ui/components/NodePicker");
 
 /*
 loader.lazyRequireGetter(
@@ -301,8 +302,8 @@ function MarkupView(inspector) {
   this.inspector.selection.on("new-node-front", this._onNewSelection);
   this.win.addEventListener("copy", this._onCopy);
   this.win.addEventListener("mouseup", this._onMouseUp);
-  this.inspector.toolbox.nodePicker.on("picker-node-canceled", this._onToolboxPickerCanceled);
-  this.inspector.toolbox.nodePicker.on("picker-node-hovered", this._onToolboxPickerHover);
+  nodePicker.on("picker-node-canceled", this._onToolboxPickerCanceled);
+  nodePicker.on("picker-node-hovered", this._onToolboxPickerHover);
 
   if (flags.testing) {
     // In tests, we start listening immediately to avoid having to simulate a mousemove.
@@ -2206,7 +2207,7 @@ MarkupView.prototype = {
     this._elt.removeEventListener("mouseout", this._onMouseOut);
     //this._frame.removeEventListener("focus", this._onFocus);
     this.inspector.selection.off("new-node-front", this._onNewSelection);
-    this.inspector.toolbox.nodePicker.off("picker-node-hovered", this._onToolboxPickerHover);
+    nodePicker.off("picker-node-hovered", this._onToolboxPickerHover);
     this.win.removeEventListener("copy", this._onCopy);
     this.win.removeEventListener("mouseup", this._onMouseUp);
 

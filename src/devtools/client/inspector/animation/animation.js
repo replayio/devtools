@@ -8,7 +8,7 @@ import { createElement, createFactory } from "react";
 import { Provider } from "react-redux";
 
 const EventEmitter = require("devtools/shared/event-emitter");
-
+const { nodePicker } = require("ui/components/NodePicker");
 const App = createFactory(require("devtools/client/inspector/animation/components/App"));
 const CurrentTimeTimer = require("devtools/client/inspector/animation/current-time-timer");
 
@@ -147,8 +147,8 @@ class AnimationInspector {
     this.inspector.sidebar.on("select", this.onSidebarSelectionChanged);
     this.inspector.toolbox.on("select", this.onSidebarSelectionChanged);
     this.inspector.toolbox.on("inspector-sidebar-resized", this.onSidebarResized);
-    this.inspector.toolbox.nodePicker.on("picker-started", this.onElementPickerStarted);
-    this.inspector.toolbox.nodePicker.on("picker-stopped", this.onElementPickerStopped);
+    nodePicker.on("picker-started", this.onElementPickerStarted);
+    nodePicker.on("picker-stopped", this.onElementPickerStopped);
   }
 
   destroy() {
@@ -157,8 +157,8 @@ class AnimationInspector {
     this.inspector.selection.off("new-node-front", this.update);
     this.inspector.sidebar.off("select", this.onSidebarSelectionChanged);
     this.inspector.toolbox.off("inspector-sidebar-resized", this.onSidebarResized);
-    this.inspector.toolbox.nodePicker.off("picker-started", this.onElementPickerStarted);
-    this.inspector.toolbox.nodePicker.off("picker-stopped", this.onElementPickerStopped);
+    nodePicker.off("picker-started", this.onElementPickerStarted);
+    nodePicker.off("picker-stopped", this.onElementPickerStopped);
     this.inspector.toolbox.off("select", this.onSidebarSelectionChanged);
 
     if (this.animationsFront) {
@@ -665,7 +665,7 @@ class AnimationInspector {
   }
 
   toggleElementPicker() {
-    this.inspector.toolbox.nodePicker.togglePicker();
+    nodePicker.togglePicker();
   }
 
   async update() {

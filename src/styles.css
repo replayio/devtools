@@ -97,6 +97,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
 
 #command-button-pick {
+  margin-left: 8px;
   margin-top: 8px;
 }
 #command-button-pick::before {

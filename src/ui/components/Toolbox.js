@@ -43,10 +43,10 @@ import { InspectorPanel } from "devtools/client/inspector/panel";
 import Selection from "devtools/client/framework/selection";
 import { log } from "protocol/socket";
 import { defer } from "protocol/utils";
-import { getDevicePixelRatio } from "protocol/graphics";
 import Highlighter from "highlighter/highlighter";
 
 import Timeline from "./Timeline";
+import NodePicker from "./NodePicker";
 import { ThreadFront } from "protocol/thread";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
@@ -70,16 +70,12 @@ class Toolbox extends React.Component {
 
   threadFront = ThreadFront;
   selection = new Selection();
-  nodePicker = {};
 
   panelWaiters = {};
 
   constructor(props) {
     super(props);
     EventEmitter.decorate(this);
-    EventEmitter.decorate(this.nodePicker);
-    this.nodePickerMouseMove = this.nodePickerMouseMove.bind(this);
-    this.nodePickerMouseClick = this.nodePickerMouseClick.bind(this);
 
     window.gToolbox = this;
   }
@@ -377,110 +373,12 @@ class Toolbox extends React.Component {
     );
   }
 
-  clickNodePickerButton() {
-    const { nodePickerActive } = this.state;
-    if (nodePickerActive) {
-      // The node picker mousedown listener will take care of deactivation.
-      return;
-    }
-
-    // Hacky workaround to make sure the picker stays deactivated when
-    // clicking on its icon.
-    const now = Date.now();
-    if (this.nodePickerRemoveTime && now - this.nodePickerRemoveTime < 200) {
-      return;
-    }
-
-    this.setState({ nodePickerActive: true });
-
-    this.threadFront.loadMouseTargets();
-    this.addNodePickerListeners();
-  }
-
-  addNodePickerListeners() {
-    document.body.addEventListener("mousemove", this.nodePickerMouseMove);
-    document.body.addEventListener("mousedown", this.nodePickerMouseClick);
-  }
-
-  removeNodePickerListeners() {
-    document.body.removeEventListener("mousemove", this.nodePickerMouseMove);
-    document.body.removeEventListener("mousedown", this.nodePickerMouseClick);
-  }
-
-  // Get the x/y coordinate of a mouse event wrt the recording's DOM.
-  mouseEventCanvasPosition(e) {
-    const canvas = document.getElementById("graphics");
-    const bounds = canvas.getBoundingClientRect();
-    if (
-      e.clientX < bounds.left ||
-      e.clientX > bounds.right ||
-      e.clientY < bounds.top ||
-      e.clientY > bounds.bottom
-    ) {
-      // Not in the canvas.
-      return null;
-    }
-
-    const scale = bounds.width / canvas.offsetWidth;
-    const pixelRatio = getDevicePixelRatio();
-    if (!pixelRatio) {
-      return null;
-    }
-
-    return {
-      x: (e.clientX - bounds.left) / scale / pixelRatio,
-      y: (e.clientY - bounds.top) / scale / pixelRatio,
-    };
-  }
-
-  lastPickerPosition = null;
-
-  async nodePickerMouseMove(e) {
-    const pos = this.mouseEventCanvasPosition(e);
-    this.lastPickerPosition = pos;
-    const nodeBounds = pos && (await ThreadFront.getMouseTarget(pos.x, pos.y));
-    if (this.lastPickerPosition == pos && nodeBounds) {
-      this.getHighlighter().highlight(nodeBounds);
-    } else {
-      this.getHighlighter().unhighlight();
-    }
-  }
-
-  nodePickerMouseClick(e) {
-    this.nodePickerMouseClickInCanvas(this.mouseEventCanvasPosition(e));
-    this.selectTool("inspector");
-  }
-
-  // This is exposed separately for use in testing.
-  async nodePickerMouseClickInCanvas(pos) {
-    this.setState({ nodePickerActive: false });
-    this.removeNodePickerListeners();
-    this.nodePickerRemoveTime = Date.now();
-
-    const nodeBounds = pos && (await ThreadFront.getMouseTarget(pos.x, pos.y));
-    if (nodeBounds) {
-      this.getHighlighter().highlight(nodeBounds);
-      const node = await ThreadFront.ensureNodeLoaded(nodeBounds.nodeId);
-      if (node && this.getHighlighter().currentNode == nodeBounds) {
-        this.selection.setNodeFront(node);
-      }
-    } else {
-      this.getHighlighter().unhighlight();
-    }
-  }
-
   renderToolbar() {
-    const { selectedPanel, nodePickerActive } = this.state;
+    const { selectedPanel } = this.state;
 
     return (
       <div id="toolbox-toolbar">
-        <div
-          id="command-button-pick"
-          className={classnames("devtools-button toolbar-panel-button", {
-            active: nodePickerActive,
-          })}
-          onClick={() => this.clickNodePickerButton()}
-        ></div>
+        <NodePicker toolbox={this} />
         <div
           className={classnames("toolbar-panel-button", {
             active: selectedPanel == "inspector",
