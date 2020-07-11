@@ -48,6 +48,14 @@ function setupAppHelper(store) {
     store,
     actions: bindActionCreators(actions, store.dispatch),
     selectors: bindSelectors({ store, selectors }),
+    local: () => {
+      const params = new URLSearchParams(document.location.search.substring(1));
+      window.location = `http://localhost:8080/index.html?id=${params.get("id")}`;
+    },
+    prod: () => {
+      const params = new URLSearchParams(document.location.search.substring(1));
+      window.location = `http://webreplay.io/view?id=${params.get("id")}`;
+    },
   };
 }
 
