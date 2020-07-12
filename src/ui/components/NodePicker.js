@@ -36,7 +36,6 @@ export default class NodePicker extends React.Component {
       return;
     }
 
-    await toolbox.startPanel("inspector");
     this.setState({ nodePickerActive: true });
 
     ThreadFront.loadMouseTargets();
