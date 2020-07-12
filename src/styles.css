@@ -97,15 +97,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
 
 #command-button-pick {
-  margin-left: 8px;
-  margin-top: 8px;
+  margin-left: 0px;
+  padding: 8px;
+  position: relative;
 }
+
 #command-button-pick::before {
   background: var(--theme-icon-color);
+}
+#command-button-pick::after {
+  width: 1px;
+  position: absolute;
+  right: 0;
+  content: " ";
+  background: var(--theme-toolbar-separator);
+  height: 24px;
+  top: 5px;
 }
 
 #command-button-pick.active::before {
   background-color: var(--theme-toolbar-selected-color);
+}
+
+#command-button-pick:hover {
+  background-color: var(--toolbarbutton-focus-background);
 }
 
 #status {
