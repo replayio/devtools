@@ -30,6 +30,7 @@ import type { ThunkArgs } from "../types";
 import type { Command } from "../../reducers/types";
 
 const { log } = require("protocol/socket");
+const { ThreadFront } = require("protocol/thread");
 
 export function selectThread(cx: Context, thread: ThreadId) {
   return async ({ dispatch, getState, client }: ThunkArgs) => {
@@ -67,11 +68,6 @@ export function command(cx: ThreadContext, type: Command, executionPoint: Execut
     const thread = getCurrentThread(getState());
     const point = getThreadExecutionPoint(getState(), thread);
 
-    const instantInfo = client.eventMethods.canInstantStep(point, type);
-    if (instantInfo) {
-      return doInstantStep(thunkArgs, instantInfo);
-    }
-
     if (!type) {
       return;
     }
@@ -92,55 +88,10 @@ export function command(cx: ThreadContext, type: Command, executionPoint: Execut
   };
 }
 
-async function doInstantStep({ dispatch, getState, client }, instantInfo) {
-  ChromeUtils.recordReplayLog(`Debugger InstantStep`);
-
-  const why = { type: "replayForcedPause" };
-  const { executionPoint, frames, environment } = instantInfo;
-  client.instantWarp(executionPoint);
-
-  const thread = getCurrentThread(getState());
-
-  const updates = [];
-  const batch = { type: "BATCH", updates };
-
-  updates.push({ type: "RESUME", thread, wasStepping: true });
-  updates.push({ type: "PAUSED", thread, why, executionPoint });
-
-  const frame = frames[0];
-  updates.push({ type: "FETCHED_FRAMES", thread, frames });
-
-  updates.push({
-    type: "ADD_SCOPES",
-    thread,
-    frame,
-    status: "done",
-    value: environment,
-  });
-
-  const source = getSource(getState(), frame.location.sourceId);
-  if (source) {
-    updates.push({
-      type: "SET_SELECTED_LOCATION",
-      source,
-      location: frame.location,
-    });
-  }
-
-  dispatch(batch);
-
-  const cx = getThreadContext(getState());
-
-  dispatch(setFramePositions());
-
-  dispatch(generateInlinePreview(cx, frame.id, frame.location));
-  await dispatch(evaluateExpressions(cx));
-}
-
 export function seekToPosition(point: ExecutionPoint, time) {
   return ({ dispatch, getState, client }: ThunkArgs) => {
     const cx = getThreadContext(getState());
-    client.timeWarp(point, time);
+    ThreadFront.timeWarp(point, time, /* hasFrames */ true);
   };
 }
 

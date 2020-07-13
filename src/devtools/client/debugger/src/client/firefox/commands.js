@@ -6,7 +6,7 @@
 
 import { prepareSourcePayload, createThread, createFrame } from "./create";
 import { updateTargets } from "./targets";
-import { clientEvents, eventMethods } from "./events";
+import { clientEvents } from "./events";
 
 import Reps from "devtools-reps";
 import type { Node } from "devtools-reps";
@@ -403,7 +403,6 @@ function pauseGrip(thread: string, func: Function): ObjectFront {
 
 function registerSourceActor(sourceActorId: string, sourceId: SourceId, url) {
   sourceActors[sourceActorId] = sourceId;
-  eventMethods.onSourceActorRegister(sourceActorId);
 }
 
 async function getSources(client: ThreadFront): Promise<Array<GeneratedSourceData>> {
@@ -498,15 +497,6 @@ function getFrontByID(actorID: String) {
   return devToolsClient.getFrontByID(actorID);
 }
 
-function timeWarp(point, time) {
-  ThreadFront.timeWarp(point, time, /* hasFrames */ true);
-}
-
-function instantWarp(point: ExecutionPoint) {
-  currentThreadFront.instantWarp(point);
-  currentThreadFront.emit("instantWarp", { executionPoint: point });
-}
-
 function fetchAncestorFramePositions(asyncIndex, frameId) {
   return ThreadFront.getFrameSteps(asyncIndex, frameId);
 }
@@ -561,11 +551,8 @@ const clientCommands = {
   setEventListenerBreakpoints,
   getEventListenerBreakpointTypes,
   getFrontByID,
-  timeWarp,
-  instantWarp,
   fetchAncestorFramePositions,
   pickExecutionPoints,
-  eventMethods,
 };
 
 export { setupCommands, clientCommands };

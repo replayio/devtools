@@ -61,16 +61,11 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
 
     log(`GenerateInlinePreview LoadSourceText Done`);
 
-    let originalAstScopes = client.eventMethods.maybeScopes(location);
+    const originalAstScopes = await parser.getScopes(location);
+    validateThreadContext(getState(), cx);
     if (!originalAstScopes) {
-      log(`GenerateInlinePreview FetchingScopes`);
-      originalAstScopes = await parser.getScopes(location);
-      client.eventMethods.addScopes(location, originalAstScopes);
-      validateThreadContext(getState(), cx);
-      if (!originalAstScopes) {
-        log(`GenerateInlinePreview NoScopes`);
-        return;
-      }
+      log(`GenerateInlinePreview NoScopes`);
+      return;
     }
 
     log(`GenerateInlinePreview ScopesLoaded`);
