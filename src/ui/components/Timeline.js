@@ -97,12 +97,6 @@ function getProgress(executionPoint) {
   return executionPoint && executionPoint.progress;
 }
 
-function getClosestMessage(messages, executionPoint) {
-  const progress = getProgress(executionPoint);
-
-  return sortBy(messages, message => Math.abs(progress - getMessageProgress(message)))[0];
-}
-
 function sameLocation(m1, m2) {
   const f1 = m1.frame;
   const f2 = m2.frame;
@@ -149,7 +143,6 @@ export class Timeline extends Component {
       recordingDuration: 0,
     };
 
-    this.hoveredMessage = null;
     this.overlayWidth = 1;
 
     gToolbox.timeline = this;
@@ -228,14 +221,6 @@ export class Timeline extends Component {
     return (1 - ratio) * maxSize + minSize;
   }
 
-  getClosestMessage(point) {
-    return getClosestMessage(this.state.messages, point);
-  }
-
-  getMessageFromPoint(point) {
-    return this.state.messages.find(message => message.executionPoint === point);
-  }
-
   // Get the time for a mouse event within the recording.
   getMouseTime(e) {
     const { zoomStartTime, zoomEndTime } = this.state;
@@ -272,6 +257,7 @@ export class Timeline extends Component {
     }
   };
 
+  // Called when hovering over a message in the console.
   onConsoleMessageHover = async (type, message) => {
     const { updateTooltip } = this.props;
     if (type == "mouseleave") {
@@ -321,28 +307,12 @@ export class Timeline extends Component {
   }
 
   unhighlightConsoleMessage() {
-    if (this.hoveredMessage) {
-      this.hoveredMessage.classList.remove("highlight");
+    if (this.state.highlightedMessage) {
+      this.setState({ highlightedMessage: null });
     }
-  }
-
-  highlightConsoleMessage(message) {
-    if (!message) {
-      return;
-    }
-
-    const element = this.findMessage(message);
-    if (!element) {
-      return;
-    }
-
-    this.unhighlightConsoleMessage();
-    element.classList.add("highlight");
-    this.hoveredMessage = element;
   }
 
   showMessage(message) {
-    this.highlightConsoleMessage(message);
     this.scrollToMessage(message);
     this.previewLocation(message);
   }
@@ -461,14 +431,6 @@ export class Timeline extends Component {
   seek(point, time, hasFrames) {
     if (!point) {
       return null;
-    }
-
-    const message = this.getMessageFromPoint(point);
-    if (message) {
-      this.showMessage(message);
-    } else {
-      const closestMessage = this.getClosestMessage(point);
-      this.setState({ hoveredMessage: closestMessage });
     }
     return this.threadFront.timeWarp(point, time, hasFrames);
   }
@@ -729,6 +691,7 @@ export class Timeline extends Component {
         e.stopPropagation();
         const { executionPoint, executionPointTime, executionPointHasFrames } = message;
         this.seek(executionPoint, executionPointTime, executionPointHasFrames);
+        this.showMessage(message);
       },
       onMouseEnter: () => this.onMessageMouseEnter(message),
       onMouseLeave: () => this.onMessageMouseLeave(),
