@@ -38,6 +38,8 @@ import { connect } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 
+import "styles.css";
+
 function setTheme(theme) {
   document.body.parentElement.className = theme;
 }
