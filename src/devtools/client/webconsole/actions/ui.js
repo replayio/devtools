@@ -26,6 +26,7 @@ const {
   EDITOR_ONBOARDING_DISMISS,
   EAGER_EVALUATION_TOGGLE,
   AUTOCOMPLETE_TOGGLE,
+  SET_ZOOMED_REGION,
 } = require("devtools/client/webconsole/constants");
 
 function openLink(url, e) {
@@ -203,6 +204,14 @@ function timeWarp(executionPoint) {
   };
 }
 
+function setZoomedRegion(zoomStartTime, zoomEndTime) {
+  return {
+    type: SET_ZOOMED_REGION,
+    zoomStartTime,
+    zoomEndTime,
+  };
+}
+
 module.exports = {
   contentMessagesToggle,
   eagerEvaluationToggle,
@@ -223,5 +232,6 @@ module.exports = {
   openLink,
   openSidebar,
   timeWarp,
+  setZoomedRegion,
   autocompleteToggle,
 };

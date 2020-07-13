@@ -436,6 +436,8 @@ export class Timeline extends Component {
       const { zoomStartTime, zoomEndTime } = zoomInfo;
       this.setState({ zoomStartTime, zoomEndTime });
 
+      gToolbox.getWebconsoleWrapper().setZoomedRegion(zoomStartTime, zoomEndTime);
+
       if (currentTime < zoomStartTime) {
         this.seekTime(zoomStartTime);
       } else if (zoomEndTime < currentTime) {
@@ -590,6 +592,7 @@ export class Timeline extends Component {
       zoomStartTime: 0,
       zoomEndTime: this.state.recordingDuration,
     });
+    gToolbox.getWebconsoleWrapper().setZoomedRegion(0, this.state.recordingDuration);
   }
 
   renderZoom() {

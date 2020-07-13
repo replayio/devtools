@@ -169,8 +169,8 @@ class WebConsoleWrapper {
     store.dispatch(actions.privateMessagesClear());
   }
 
-  dispatchPaused({ point }) {
-    store.dispatch(actions.setPauseExecutionPoint(point));
+  dispatchPaused({ point, time }) {
+    store.dispatch(actions.setPauseExecutionPoint(point, time));
   }
 
   dispatchMessageUpdate(message, res) {
@@ -259,6 +259,10 @@ class WebConsoleWrapper {
    */
   dispatchEvaluateExpression(expression) {
     store.dispatch(actions.evaluateExpression(expression));
+  }
+
+  setZoomedRegion(startTime, endTime) {
+    store.dispatch(actions.setZoomedRegion(startTime, endTime));
   }
 
   /**

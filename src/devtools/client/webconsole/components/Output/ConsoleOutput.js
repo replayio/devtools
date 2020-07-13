@@ -35,6 +35,11 @@ function messageExecutionPoint(msg) {
   return executionPoint || (lastExecutionPoint && lastExecutionPoint.point);
 }
 
+function messageTime(msg) {
+  const { executionPointTime, lastExecutionPoint } = msg;
+  return executionPointTime || (lastExecutionPoint && lastExecutionPoint.time) || 0;
+}
+
 function getClosestMessage(visibleMessages, messages, executionPoint) {
   if (!executionPoint || !visibleMessages || !visibleMessages.length) {
     return null;
@@ -194,6 +199,8 @@ class ConsoleOutput extends Component {
       timestampsVisible,
       initialized,
       pausedExecutionPoint,
+      zoomStartTime,
+      zoomEndTime,
     } = this.props;
 
     if (!initialized) {
@@ -202,6 +209,12 @@ class ConsoleOutput extends Component {
         visibleMessages = visibleMessages.slice(visibleMessages.length - numberMessagesFitViewport);
       }
     }
+
+    visibleMessages = visibleMessages.filter(id => {
+      const msg = messages.get(id);
+      const time = messageTime(msg);
+      return time >= zoomStartTime && time <= zoomEndTime;
+    });
 
     const pausedMessage = getClosestMessage(visibleMessages, messages, pausedExecutionPoint);
 
@@ -266,6 +279,8 @@ function mapStateToProps(state, props) {
     networkMessagesUpdate: getAllNetworkMessagesUpdateById(state),
     timestampsVisible: state.ui.timestampsVisible,
     networkMessageActiveTabId: state.ui.networkMessageActiveTabId,
+    zoomStartTime: state.ui.zoomStartTime,
+    zoomEndTime: state.ui.zoomEndTime,
   };
 }
 

@@ -19,6 +19,7 @@ const {
   EDITOR_ONBOARDING_DISMISS,
   EDITOR_TOGGLE,
   EDITOR_SET_WIDTH,
+  SET_ZOOMED_REGION,
 } = require("devtools/client/webconsole/constants");
 
 const UiState = overrides =>
@@ -36,6 +37,8 @@ const UiState = overrides =>
         reverseSearchInitialValue: "",
         editor: false,
         editorWidth: null,
+        zoomStartTime: 0,
+        zoomEndTime: Number.POSITIVE_INFINITY,
         showEditorOnboarding: false,
         filterBarDisplayMode: FILTERBAR_DISPLAY_MODES.WIDE,
       },
@@ -95,6 +98,12 @@ function ui(state = UiState(), action) {
       return {
         ...state,
         editorWidth: action.width,
+      };
+    case SET_ZOOMED_REGION:
+      return {
+        ...state,
+        zoomStartTime: action.zoomStartTime,
+        zoomEndTime: action.zoomEndTime,
       };
   }
 

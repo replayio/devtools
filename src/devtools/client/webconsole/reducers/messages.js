@@ -21,6 +21,7 @@ const {
 const { pointPrecedes, pointEquals } = require("protocol/execution-point-utils.js");
 const { sortBy } = require("lodash");
 const { log } = require("protocol/socket");
+const { assert } = require("protocol/utils");
 
 const MessageState = overrides =>
   Object.freeze(
@@ -51,6 +52,7 @@ const MessageState = overrides =>
         removedLogpointIds: new Set(),
         // Any execution point we are currently paused at, when replaying.
         pausedExecutionPoint: null,
+        pausedExecutionPointTime: 0,
         // Whether any messages with execution points have been seen.
         hasExecutionPoints: false,
         // Map of the form {messageId : networkInformation}
@@ -76,6 +78,7 @@ function cloneState(state) {
     logpointMessages: new Map(state.logpointMessages),
     removedLogpointIds: new Set(state.removedLogpointIds),
     pausedExecutionPoint: state.pausedExecutionPoint,
+    pausedExecutionPointTime: state.pausedExecutionPointTime,
     hasExecutionPoints: state.hasExecutionPoints,
     warningGroupsById: new Map(state.warningGroupsById),
     lastMessageId: state.lastMessageId,
@@ -296,11 +299,16 @@ function messages(state = MessageState(), action, filtersState, prefsState, uiSt
       if (
         state.pausedExecutionPoint &&
         action.executionPoint &&
-        pointEquals(state.pausedExecutionPoint, action.executionPoint)
+        pointEquals(state.pausedExecutionPoint, action.executionPoint) &&
+        state.pausedExecutionPointTime == action.time
       ) {
         return state;
       }
-      return { ...state, pausedExecutionPoint: action.executionPoint };
+      return {
+        ...state,
+        pausedExecutionPoint: action.executionPoint,
+        pausedExecutionPointTime: action.time,
+      };
     case constants.MESSAGES_ADD:
       // Preemptively remove messages that will never be rendered
       const list = [];
@@ -1274,16 +1282,17 @@ function getDefaultFiltersCounter() {
 // if other messages with real execution points appear later.
 function ensureExecutionPoint(state, newMessage) {
   if (newMessage.executionPoint) {
+    assert("executionPointTime" in newMessage);
     return;
   }
 
   // Add a lastExecutionPoint property which will group messages evaluated during
   // the same replay pause point. When applicable, it will place the message immediately
   // after the last visible message in the group without an execution point when sorting.
-  let point = { checkpoint: 0, progress: 0 },
-    messageCount = 1;
+  let point = { checkpoint: 0, progress: 0 }, time = 0, messageCount = 1;
   if (state.pausedExecutionPoint) {
     point = state.pausedExecutionPoint;
+    time = state.pausedExecutionPointTime;
     const lastMessage = getLastMessageWithPoint(state, point);
     if (lastMessage.lastExecutionPoint) {
       messageCount = lastMessage.lastExecutionPoint.messageCount + 1;
@@ -1296,14 +1305,16 @@ function ensureExecutionPoint(state, newMessage) {
       // to make sure that those messages are placed immediately after the execution
       // point's message.
       point = lastMessage.executionPoint;
+      time = lastMessage.executionPointTime;
       messageCount = 0;
     } else {
       point = lastMessage.lastExecutionPoint.point;
+      time = lastMessage.lastExecutionPoint.time;
       messageCount = lastMessage.lastExecutionPoint.messageCount + 1;
     }
   }
 
-  newMessage.lastExecutionPoint = { point, messageCount };
+  newMessage.lastExecutionPoint = { point, time, messageCount };
 }
 
 function getLastMessageWithPoint(state, point) {

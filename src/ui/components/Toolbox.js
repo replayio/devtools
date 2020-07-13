@@ -497,10 +497,18 @@ class Toolbox extends React.Component {
     );
   }
 
+  getWebconsoleWrapper() {
+    return this.getPanel("console").hud.ui.wrapper;
+  }
+
   // These methods are helpful when debugging.
 
   getDebuggerState() {
     return this.getPanel("debugger")._getState();
+  }
+
+  getConsoleState() {
+    return this.getWebconsoleWrapper().getStore().getState();
   }
 }
 export default connect(

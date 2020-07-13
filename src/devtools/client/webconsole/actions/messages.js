@@ -62,10 +62,11 @@ function messagesClearLogpoint(logpointId) {
   };
 }
 
-function setPauseExecutionPoint(executionPoint) {
+function setPauseExecutionPoint(executionPoint, time) {
   return {
     type: PAUSED_EXECUTION_POINT,
     executionPoint,
+    time,
   };
 }
 
