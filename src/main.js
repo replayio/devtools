@@ -50,21 +50,13 @@ if (test) {
 // when running automated tests, which we don't want to happen. It would
 // be good if this was less fragile...
 //
-// *** WARNING ***
 
-require("./styles.css");
-
-const {
-  initSocket,
-  sendMessage,
-  log,
-  setStatus,
-  addEventListener,
-} = require("protocol/socket");
+const { initSocket, sendMessage, log, setStatus, addEventListener } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const { throttle, clamp, EventEmitter } = require("protocol/utils");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap");
+const FullStory = require("@fullstory/browser");
 
 // Create a session to use while debugging.
 async function createSession() {
@@ -123,11 +115,17 @@ async function initialize() {
   };
 }
 
+FullStory.init({ orgId: "VXD33", devMode: test });
+
 setTimeout(async () => {
   // Wait for CodeMirror to load asynchronously.
   while (!window.CodeMirror) {
     await new Promise(resolve => setTimeout(resolve, 500));
   }
+
+  FullStory.event("Start", {
+    recordingId,
+  });
 
   bootstrapApp({ initialize });
 }, 0);

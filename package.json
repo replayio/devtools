@@ -9,6 +9,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.10.1",
     "@babel/plugin-transform-flow-strip-types": "^7.9.0",
     "@babel/preset-react": "^7.9.4",
+    "@fullstory/browser": "^1.4.4",
     "autoprefixer": "^9.7.6",
     "babel-loader": "^8.1.0",
     "classnames": "^2.2.6",
