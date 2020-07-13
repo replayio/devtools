@@ -161,6 +161,7 @@ export class Timeline extends Component {
 
     this.threadFront.on("paused", this.onPaused.bind(this));
     this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
+    this.threadFront.warpCallback = this.onWarp.bind(this);
 
     const description = await this.threadFront.getDescription(recordingId);
     this.setRecordingDescription(description);
@@ -189,6 +190,24 @@ export class Timeline extends Component {
 
   onEndpoint({ point, time }) {
     addLastScreen(gCurrentScreenShot, point, time);
+  }
+
+  // This callback is used to restrict warping by the thread to the region where
+  // we are currently zoomed.
+  onWarp(point, time, hasFrames) {
+    const { zoomStartTime, zoomEndTime } = this.state;
+
+    if (time < zoomStartTime) {
+      const startPoint = mostRecentPaintOrMouseEvent(zoomStartTime).point;
+      return { point: startPoint, time: zoomStartTime };
+    }
+
+    if (time > zoomEndTime) {
+      const endPoint = mostRecentPaintOrMouseEvent(zoomEndTime).point;
+      return { point: endPoint, time: zoomEndTime };
+    }
+
+    return null;
   }
 
   get toolbox() {

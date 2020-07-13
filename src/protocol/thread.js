@@ -1132,6 +1132,9 @@ const ThreadFront = {
   // Map breakpointId to information about the breakpoint, for all installed breakpoints.
   breakpoints: new Map(),
 
+  // Any callback to invoke to adjust the point which we zoom to.
+  warpCallback: null,
+
   setOnEndpoint(onEndpoint) {
     assert(!this.onEndpoint);
     this.onEndpoint = onEndpoint;
@@ -1180,6 +1183,18 @@ const ThreadFront = {
 
   timeWarp(point, time, hasFrames) {
     log(`TimeWarp ${point}`);
+
+    // The warp callback is used to change the locations where the thread is
+    // warping to.
+    if (this.warpCallback) {
+      const newTarget = this.warpCallback(point, time, hasFrames);
+      if (newTarget) {
+        point = newTarget.point;
+        time = newTarget.time;
+        hasFrames = newTarget.hasFrames;
+      }
+    }
+
     this.currentPoint = point;
     this.currentPointHasFrames = hasFrames;
     this.currentPause = null;
