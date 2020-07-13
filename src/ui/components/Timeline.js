@@ -440,8 +440,14 @@ export class Timeline extends Component {
       return null;
     }
 
-    const { point, time } = mostRecentPaintOrMouseEvent(targetTime);
-    this.seek(point, time);
+    const { point } = mostRecentPaintOrMouseEvent(targetTime);
+
+    // Seek to the exact time provided, even if it does not match up with a
+    // paint event. This can cause some slight UI weirdness: resumes done in
+    // the debugger will be relative to the point instead of the time,
+    // so e.g. running forward could land at a point before the time itself.
+    // This could be fixed but doesn't seem worth worrying about for now.
+    this.seek(point, targetTime);
   }
 
   async onPaused({ time }) {
