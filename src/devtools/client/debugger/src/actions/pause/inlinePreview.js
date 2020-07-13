@@ -227,14 +227,12 @@ function getExpressionNameAndValue(
         }
         displayValue = property ? property.contents : createPrimitiveValueFront(undefined);
         displayName += `.${meta.property}`;
-      } else if (displayValue && displayValue.preview && displayValue.preview.ownProperties) {
-        const { ownProperties } = displayValue.preview;
-        Object.keys(ownProperties).forEach(prop => {
-          if (prop === meta.property) {
-            displayValue = ownProperties[prop].value;
-            displayName += `.${meta.property}`;
-          }
-        });
+      } else if (displayValue) {
+        const preview = displayValue.previewValueMap();
+        if (preview[meta.property]) {
+          displayValue = preview[meta.property];
+          displayName += `.${meta.property}`;
+        }
       }
       meta = meta.parent;
     }
