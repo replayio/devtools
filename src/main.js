@@ -115,7 +115,7 @@ async function initialize() {
   };
 }
 
-FullStory.init({ orgId: "VXD33" });
+FullStory.init({ orgId: "VXD33", devMode: test });
 
 setTimeout(async () => {
   // Wait for CodeMirror to load asynchronously.
