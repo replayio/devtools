@@ -79,8 +79,11 @@
   background-color: var(--theme-tab-toolbar-background);
 }
 
-.frames [role="list"] [role="listitem"].selected,
-.frames [role="list"] [role="listitem"].selected .async-label {
+.frame-description {
+  width: 100%;
+  display: flex;
+}
+.frames [role="list"] [role="listitem"].selected .frame-description {
   background-color: var(--theme-selection-background);
   color: white;
 }

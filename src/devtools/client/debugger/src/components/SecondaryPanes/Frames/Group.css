@@ -19,7 +19,7 @@
   color: var(--theme-highlight-blue);
 }
 
-.frames-group .frames-list [role="listitem"] {
+.frames-group .frames-list .frame-description {
   padding-inline-start: 30px;
 }
 
@@ -40,4 +40,3 @@
 .frames-group .group-description {
   padding-inline-start: 6px;
 }
-
