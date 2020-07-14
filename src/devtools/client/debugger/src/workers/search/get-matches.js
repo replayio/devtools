@@ -4,7 +4,6 @@
 
 // @flow
 
-import assert from "../../utils/assert";
 import buildQuery from "../../utils/build-query";
 
 import type { SearchModifiers } from "../../types";
@@ -37,7 +36,9 @@ export default function getMatches(
       // change resulting in an infinite loop so we need to check for this and
       // increment it manually in that case.  See issue #7023
       if (singleMatch[0] === "") {
-        assert(!regexQuery.unicode, "lastIndex++ can cause issues in unicode mode");
+        if (!regexQuery.unicode) {
+          console.warn("lastIndex++ can cause issues in unicode mode");
+        }
         regexQuery.lastIndex++;
       }
     }
