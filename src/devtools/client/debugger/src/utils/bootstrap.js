@@ -14,7 +14,6 @@ import { isDevelopment } from "devtools-environment";
 import { AppConstants } from "devtools-modules";
 
 import * as search from "../workers/search";
-import * as prettyPrint from "../workers/pretty-print";
 import { ParserDispatcher } from "../workers/parser";
 
 import configureStore from "../actions/utils/create-store";
@@ -74,18 +73,16 @@ export function bootstrapStore(client: any, workers: Workers, panel: Panel, init
 }
 
 export function bootstrapWorkers(panelWorkers: Workers) {
-  const workerPath = "src/devtools/client/debugger/dist";
+  const workerPath = "dist";
 
-  prettyPrint.start(`${workerPath}/pretty-print-worker.js`);
   parser = new ParserDispatcher();
 
-  parser.start(`${workerPath}/parser-worker.js`);
-  search.start(`${workerPath}/search-worker.js`);
-  return { ...panelWorkers, prettyPrint, parser, search };
+  parser.start(`${workerPath}/parserWorker.js`);
+  search.start(`${workerPath}/searchWorker.js`);
+  return { ...panelWorkers, parser, search };
 }
 
 export function teardownWorkers() {
-  prettyPrint.stop();
   parser.stop();
   search.stop();
 }

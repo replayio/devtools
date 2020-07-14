@@ -139,14 +139,15 @@ module.exports = {
 };
 
 // Debugging methods.
+if (typeof window === "Object") {
+  window.disconnect = () => {
+    socket.close();
+  };
 
-window.disconnect = () => {
-  socket.close();
-};
-
-window.outstanding = () => {
-  return [...gMessageWaiters.entries()].map(([id, { method }]) => ({
-    id,
-    method,
-  }));
-};
+  window.outstanding = () => {
+    return [...gMessageWaiters.entries()].map(([id, { method }]) => ({
+      id,
+      method,
+    }));
+  };
+}

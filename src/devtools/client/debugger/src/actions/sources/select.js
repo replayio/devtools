@@ -14,7 +14,6 @@ import { tabExists } from "../../reducers/tabs";
 import { setSymbols } from "./symbols";
 import { setInScopeLines } from "../ast";
 import { closeActiveSearch, updateActiveFileSearch } from "../ui";
-import { togglePrettyPrint } from "./prettyPrint";
 import { addTab, closeTab } from "../tabs";
 import { loadSourceText } from "./loadSourceText";
 import { setBreakableLines } from ".";
@@ -146,16 +145,6 @@ export function selectLocation(
     }
 
     const sourceWithContent = getSourceWithContent(getState(), source.id);
-
-    if (
-      prefs.autoPrettyPrint &&
-      !getPrettySource(getState(), loadedSource.id) &&
-      canPrettyPrintSource(getState(), loadedSource.id) &&
-      isMinified(sourceWithContent)
-    ) {
-      await dispatch(togglePrettyPrint(cx, loadedSource.id));
-      dispatch(closeTab(cx, loadedSource));
-    }
 
     dispatch(setSymbols({ cx, source: loadedSource }));
     dispatch(setInScopeLines(cx));

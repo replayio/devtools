@@ -18,7 +18,6 @@ import { makeSourceId } from "../../client/firefox/create";
 import { toggleBlackBox } from "./blackbox";
 import { syncBreakpoint } from "../breakpoints";
 import { loadSourceText } from "./loadSourceText";
-import { togglePrettyPrint } from "./prettyPrint";
 import { selectLocation, setBreakableLines } from "../sources";
 
 import { getRawSourceURL, isPrettyURL, isUrlExtension, isInlineScript } from "../../utils/source";
@@ -71,11 +70,6 @@ function checkSelectedSource(cx: Context, sourceId: string) {
     const rawPendingUrl = getRawSourceURL(pendingUrl);
 
     if (rawPendingUrl === source.url) {
-      if (isPrettyURL(pendingUrl)) {
-        const prettySource = await dispatch(togglePrettyPrint(cx, source.id));
-        return dispatch(checkPendingBreakpoints(cx, prettySource.id));
-      }
-
       await dispatch(
         selectLocation(cx, {
           sourceId: source.id,

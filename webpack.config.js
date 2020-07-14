@@ -1,7 +1,11 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-  entry: "./src/main",
+  entry: {
+    main: "./src/main",
+    parserWorker: "./src/devtools/client/debugger/src/workers/parser/index",
+    searchWorker: "./src/devtools/client/debugger/src/workers/search/index",
+  },
   devtool: "source-map",
   output: {
     publicPath: "dist",
@@ -16,6 +20,7 @@ module.exports = {
     modules: [
       "src",
       "src/devtools/client/debugger/dist",
+      "src/devtools/client/debugger/packages",
       "src/devtools/client/shared/sourceeditor",
       "src/devtools/client/shared/sourceeditor/codemirror/lib",
       "src/devtools/client/shared/vendor",
@@ -26,7 +31,7 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        exclude: (request) => {
+        exclude: request => {
           return (
             request.includes("node_modules") ||
             request.includes("src/devtools/client/shared/vendor") ||
