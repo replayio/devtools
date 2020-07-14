@@ -170,10 +170,12 @@ export default class FrameComponent extends Component<FrameComponentProps> {
           </span>
         )}
         {this.isSelectable && <FrameIndent />}
-        <FrameTitle frame={frame} options={{ shouldMapDisplayName }} l10n={l10n} />
-        {!hideLocation && <span className="clipboard-only"> </span>}
-        {!hideLocation && <FrameLocation frame={frame} displayFullUrl={displayFullUrl} />}
-        {this.isSelectable && <br className="clipboard-only" />}
+        <div className="frame-description">
+          <FrameTitle frame={frame} options={{ shouldMapDisplayName }} l10n={l10n} />
+          {!hideLocation && <span className="clipboard-only"> </span>}
+          {!hideLocation && <FrameLocation frame={frame} displayFullUrl={displayFullUrl} />}
+          {this.isSelectable && <br className="clipboard-only" />}
+        </div>
       </div>
     );
   }
