@@ -3,8 +3,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
   entry: {
     main: "./src/main",
-    parserWorker: "./src/devtools/client/debugger/src/workers/parser/index",
-    searchWorker: "./src/devtools/client/debugger/src/workers/search/index",
+    parserWorker: "./src/devtools/client/debugger/src/workers/parser/worker",
+    searchWorker: "./src/devtools/client/debugger/src/workers/search/worker",
   },
   devtool: "source-map",
   output: {
