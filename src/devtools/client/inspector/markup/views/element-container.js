@@ -55,9 +55,11 @@ MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
     const tooltip = this.markup.eventDetailsTooltip;
     await tooltip.hide();
 
-    const listenerRaw = await this.node.getEventListeners();
-    const listenerInfo = listenerRaw.map(listener => {
-      const { handler, type, capture } = listener;
+    const listenerRaw = this.node.getEventListeners();
+    const frameworkListeners = await this.node.getFrameworkEventListeners();
+
+    const listenerInfo = [...listenerRaw, ...frameworkListeners].map(listener => {
+      const { handler, type, capture, tags = "" } = listener;
       const location = handler.functionLocation();
       const url = handler.functionLocationURL();
       let origin, line, column;
@@ -77,7 +79,7 @@ MarkupElementContainer.prototype = extend(MarkupContainer.prototype, {
         url,
         line,
         column,
-        tags: "",
+        tags,
         handler,
         scriptId: url ? location.scriptId : undefined,
         native: !url,

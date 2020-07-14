@@ -47,6 +47,7 @@ const {
   EventEmitter,
   ArrayMap,
 } = require("./utils");
+const { getFrameworkEventListeners } = require("./event-listeners");
 
 // Information about a protocol pause.
 function Pause(sessionId) {
@@ -628,12 +629,17 @@ function NodeFront(pause, data) {
   this._computedStyle = null;
   this._rules = null;
   this._listeners = null;
+  this._frameworkListenersWaiter = null;
   this._quads = null;
   this._bounds = null;
 }
 
 NodeFront.prototype = {
   then: undefined,
+
+  getObjectFront() {
+    return new ValueFront(this._pause, { object: this._object.objectId });
+  },
 
   isNodeBoundsFront() {
     return false;
@@ -838,6 +844,16 @@ NodeFront.prototype = {
   getEventListeners() {
     assert(this._loaded);
     return this._listeners;
+  },
+
+  async getFrameworkEventListeners() {
+    if (this._frameworkListenersWaiter) {
+      return this._frameworkListenersWaiter.promise;
+    }
+    this._frameworkListenersWaiter = defer();
+    const listeners = getFrameworkEventListeners(this);
+    this._frameworkListenersWaiter.resolve(listeners);
+    return listeners;
   },
 
   getAppliedRules() {
