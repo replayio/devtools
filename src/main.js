@@ -63,13 +63,22 @@ async function createSession() {
   addEventListener("Recording.uploadedData", onUploadedData);
   addEventListener("Recording.sessionError", onSessionError);
 
-  const { sessionId } = await sendMessage("Recording.createSession", {
-    recordingId,
-  });
-  setStatus("");
-  window.sessionId = sessionId;
-  ThreadFront.setSessionId(sessionId);
-  ThreadFront.setTest(test);
+  try {
+    const { sessionId } = await sendMessage("Recording.createSession", {
+      recordingId,
+    });
+    setStatus("");
+    window.sessionId = sessionId;
+    ThreadFront.setSessionId(sessionId);
+    ThreadFront.setTest(test);
+  } catch (e) {
+    if (e.code == 9) {
+      // Invalid recording ID.
+      setStatus("Error: Invalid recording ID");
+    } else {
+      throw e;
+    }
+  }
 }
 
 function onUploadedData({ uploaded, length }) {
