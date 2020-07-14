@@ -1152,36 +1152,22 @@ function isTextInParameters(matchStr, parameters) {
  * Returns true if given text is included in provided parameter.
  */
 function isTextInParameter(matchStr, parameter) {
-  const paramGrip = parameter && parameter.getGrip ? parameter.getGrip() : parameter;
+  if (parameter.isPrimitive()) {
+    return matchStr(String(parameter.primitive()));
+  }
 
-  if (paramGrip && paramGrip.class && matchStr(paramGrip.class)) {
+  if (!parameter.isObject()) {
+    return false;
+  }
+
+  if (matchStr(parameter.className())) {
     return true;
   }
 
-  const parameterType = typeof parameter;
-  if (parameterType !== "object" && parameterType !== "undefined") {
-    const str = paramGrip + "";
-    if (matchStr(str)) {
-      return true;
-    }
-  }
-
-  const previewItems = getGripPreviewItems(paramGrip);
+  const previewItems = getGripPreviewItems(parameter);
   for (const item of previewItems) {
     if (isTextInParameter(matchStr, item)) {
       return true;
-    }
-  }
-
-  if (paramGrip && paramGrip.ownProperties) {
-    for (const [key, desc] of Object.entries(paramGrip.ownProperties)) {
-      if (matchStr(key)) {
-        return true;
-      }
-
-      if (isTextInParameter(matchStr, getDescriptorValue(desc))) {
-        return true;
-      }
     }
   }
 

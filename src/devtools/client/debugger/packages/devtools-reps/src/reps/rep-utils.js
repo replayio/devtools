@@ -65,6 +65,8 @@ const ELLIPSIS = "\u2026";
 const dom = require("react-dom-factories");
 const { span } = dom;
 
+const { createPrimitiveValueFront } = require("protocol/thread");
+
 /**
  * Returns true if the given object is a grip (see RDP protocol)
  */
@@ -337,64 +339,32 @@ function wrapRender(renderMethod) {
  *                 if the grip does not have preview items
  */
 function getGripPreviewItems(grip) {
-  if (!grip) {
+  if (!grip.isObject()) {
     return [];
   }
 
+  const rv = [];
+
+  const children = grip.getChildren();
+  for (const { name, contents } of children) {
+    if (name == "<entries>" || grip.isMapEntry()) {
+      rv.push(...getGripPreviewItems(contents));
+    } else {
+      rv.push(createPrimitiveValueFront(name), contents);
+    }
+  }
+
   // Promise resolved value Grip
-  if (grip.promiseState && grip.promiseState.value) {
-    return [grip.promiseState.value];
-  }
-
-  // Array Grip
-  if (grip.preview && grip.preview.items) {
-    return grip.preview.items;
-  }
-
-  // Node Grip
-  if (grip.preview && grip.preview.childNodes) {
-    return grip.preview.childNodes;
-  }
-
-  // Set or Map Grip
-  if (grip.preview && grip.preview.entries) {
-    return grip.preview.entries.reduce((res, entry) => res.concat(entry), []);
-  }
-
-  // Event Grip
-  if (grip.preview && grip.preview.target) {
-    const keys = Object.keys(grip.preview.properties);
-    const values = Object.values(grip.preview.properties);
-    return [grip.preview.target, ...keys, ...values];
-  }
+  //if (grip.promiseState && grip.promiseState.value) {
+  //  return [grip.promiseState.value];
+  //}
 
   // RegEx Grip
-  if (grip.displayString) {
-    return [grip.displayString];
+  if (grip.className() == "RegExp") {
+    rv.push(createPrimitiveValueFront(grip.regexpString()));
   }
 
-  // Generic Grip
-  if (grip.preview && grip.preview.ownProperties) {
-    let propertiesValues = Object.values(grip.preview.ownProperties).map(
-      property => property.value || property
-    );
-
-    const propertyKeys = Object.keys(grip.preview.ownProperties);
-    propertiesValues = propertiesValues.concat(propertyKeys);
-
-    // ArrayBuffer Grip
-    if (grip.preview.safeGetterValues) {
-      propertiesValues = propertiesValues.concat(
-        Object.values(grip.preview.safeGetterValues).map(
-          property => property.getterValue || property
-        )
-      );
-    }
-
-    return propertiesValues;
-  }
-
-  return [];
+  return rv;
 }
 
 /**
