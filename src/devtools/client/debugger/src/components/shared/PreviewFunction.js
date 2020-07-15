@@ -30,12 +30,12 @@ const IGNORED_SOURCE_URLS = ["debugger eval code"];
 export default class PreviewFunction extends Component<Props> {
   renderFunctionName(func: FunctionType) {
     const { l10n } = this.context;
-    const name = func.functionName() || l10n.getStr("anonymousFunction");
+    const name = func.name || l10n.getStr("anonymousFunction");
     return <span className="function-name">{name}</span>;
   }
 
   renderParams(func: FunctionType) {
-    const parameterNames = func.functionParameterNames() || [];
+    const parameterNames = func.parameterNames || [];
     const params = parameterNames
       .filter(i => i)
       .map(param => (

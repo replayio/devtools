@@ -4,8 +4,7 @@
 
 // @flow
 
-import { workerUtils } from "devtools-utils";
-const { WorkerDispatcher } = workerUtils;
+import { WorkerDispatcher } from "devtools-utils/src/worker-utils";
 
 import type { AstSource, AstLocation, AstPosition } from "./types";
 import type { SourceLocation, SourceId, SourceContent } from "../../types";

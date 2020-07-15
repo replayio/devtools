@@ -145,20 +145,21 @@ module.exports = {
 };
 
 // Debugging methods.
-
-window.disconnect = () => {
-  socket.close();
-};
-
-window.outstanding = () => {
-  const messages = [...gMessageWaiters.entries()].map(([id, { method }]) => ({
-    id,
-    method,
-  }));
-  return {
-    messages,
-    time: Date.now() - gStartTime,
-    sent: gSentBytes,
-    received: gReceivedBytes,
+if (typeof window === "Object") {
+  window.disconnect = () => {
+    socket.close();
   };
-};
+
+  window.outstanding = () => {
+    const messages = [...gMessageWaiters.entries()].map(([id, { method }]) => ({
+      id,
+      method,
+    }));
+    return {
+      messages,
+      time: Date.now() - gStartTime,
+      sent: gSentBytes,
+      received: gReceivedBytes,
+    };
+  };
+}
