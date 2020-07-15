@@ -118,6 +118,28 @@ async function createLogpointAnalysis(logGroupId, mapper) {
   return analysisId;
 }
 
+// Given a WRP value representing an array, add the elements of that array to
+// the given values/data arrays.
+function mapperExtractArrayContents(arrayPath, valuesPath, datasPath) {
+  return `{
+    const { object } = ${arrayPath};
+    const { result: lengthResult } = sendCommand(
+      "Pause.getObjectProperty",
+      { object, name: "length" }
+    );
+    ${datasPath}.push(lengthResult.data);
+    const length = lengthResult.returned.value;
+    for (let i = 0; i < length; i++) {
+      const { result: elementResult } = sendCommand(
+        "Pause.getObjectProperty",
+        { object, name: i.toString() }
+      );
+      ${valuesPath}.push(elementResult.returned);
+      ${datasPath}.push(elementResult.data);
+    }
+  }`;
+}
+
 async function setLogpoint(logGroupId, scriptId, line, column, text, condition) {
   let conditionSection = "";
   if (condition) {
@@ -160,21 +182,7 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
     if (result.exception) {
       values.push(result.exception);
     } else {
-      const { object } = result.returned;
-      const { result: lengthResult } = sendCommand(
-        "Pause.getObjectProperty",
-        { object, name: "length" }
-      );
-      datas.push(lengthResult.data);
-      const length = lengthResult.returned.value;
-      for (let i = 0; i < length; i++) {
-        const { result: elementResult } = sendCommand(
-          "Pause.getObjectProperty",
-          { object, name: i.toString() }
-        );
-        values.push(elementResult.returned);
-        datas.push(elementResult.data);
-      }
+      ${mapperExtractArrayContents("result.returned", "values", "datas")}
     }
     return [{ key: point, value: { time, pauseId, location, values, datas } }];
   `;
@@ -225,14 +233,14 @@ function eventLogpointMapper(getFrameworkListeners) {
     const { frameId, location } = frame;
     const { result } = sendCommand(
       "Pause.evaluateInFrame",
-      { frameId, expression: "arguments[0]" }
+      { frameId, expression: "[...arguments]" }
     );
     const values = [];
     const datas = [result.data];
     if (result.exception) {
       values.push(result.exception);
     } else {
-      values.push(result.returned);
+      ${mapperExtractArrayContents("result.returned", "values", "datas")}
     }
     let frameworkListeners;
     ${frameworkText}
