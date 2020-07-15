@@ -145,7 +145,7 @@ module.exports = {
 };
 
 // Debugging methods.
-if (typeof window === "Object") {
+if (typeof window === "object") {
   window.disconnect = () => {
     socket.close();
   };
