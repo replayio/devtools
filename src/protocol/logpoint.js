@@ -67,7 +67,7 @@ addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
     }) => {
       const pause = new Pause(ThreadFront.sessionId);
       pause.instantiate(pauseId);
-      datas.forEach(d => pause.addData(d));
+      pause.addData(...datas);
       const valueFronts = values.map(v => new ValueFront(pause, v));
       const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
       LogpointHandlers.onResult(logGroupId, key, time, mappedLocation, pause, valueFronts);
@@ -224,7 +224,7 @@ function eventLogpointMapper(getFrameworkListeners) {
   let frameworkText = "";
   if (getFrameworkListeners) {
     frameworkText = logpointGetFrameworkEventListeners(
-      "frameId", "arguments[0].target", "datas", "frameworkListeners"
+      "frameId", "datas", "frameworkListeners"
     );
   }
   return `

@@ -48,14 +48,20 @@ async function getFrameworkEventListeners(node) {
   });
 }
 
-function logpointGetFrameworkEventListeners(frameId, node, datas, frameworkListeners) {
+function logpointGetFrameworkEventListeners(frameId, datas, frameworkListeners) {
   const evalText = `
-(node => {
+(array => {
   const rv = [];
-  while (node) {
-    const props = Object.getOwnPropertyNames(node);
-    const reactProp = props.find(v => v.startsWith("__reactEventHandlers$"));
-    if (reactProp) {
+  for (const maybeEvent of array) {
+    if (!(maybeEvent instanceof Event)) {
+      continue;
+    }
+    for (let node = maybeEvent.target; node; node = node.parentNode) {
+      const props = Object.getOwnPropertyNames(node);
+      const reactProp = props.find(v => v.startsWith("__reactEventHandlers$"));
+      if (!reactProp) {
+        continue;
+      }
       const reactObj = node[reactProp];
       const eventProps = Object.getOwnPropertyNames(reactObj);
       for (const name of eventProps) {
@@ -65,10 +71,9 @@ function logpointGetFrameworkEventListeners(frameId, node, datas, frameworkListe
         }
       }
     }
-    node = node.parentNode;
   }
   return rv;
-})(${node})
+})([...arguments])
 `;
 
   return `

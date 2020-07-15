@@ -88,7 +88,12 @@ Pause.prototype = {
     this.addData(data);
   },
 
-  addData({ frames, scopes, objects }) {
+  addData(...datas) {
+    datas.forEach(d => this._addDataObjects(d));
+    datas.forEach(d => this._updateDataFronts(d));
+  },
+
+  _addDataObjects({ frames, scopes, objects }) {
     (frames || []).forEach(f => {
       if (!this.frames.has(f.frameId)) {
         this.frames.set(f.frameId, f);
@@ -104,7 +109,9 @@ Pause.prototype = {
         this.objects.set(o.objectId, o);
       }
     });
+  },
 
+  _updateDataFronts({ frames, scopes, objects }) {
     (frames || []).forEach(frame => {
       frame.this = new ValueFront(this, frame.this);
     });
