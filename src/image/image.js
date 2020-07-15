@@ -56,6 +56,9 @@ const gBackgroundImages = {
   ".message:hover > .icon.rewindable": require("devtools/client/debugger/images/next-circle.svg"),
   "button.jump-definition": require("devtools/client/shared/components/reps/images/input.svg"),
   ".img.column-marker": require("devtools/client/debugger/images/column-marker.svg"),
+  ".event-tooltip-debugger-icon": require("devtools/client/shared/components/reps/images/input.svg"),
+  ".invoke-confirm .close-confirm-dialog-button::before": require("devtools/client/debugger/images/close.svg"),
+  ".invoke-confirm .learn-more-link::after": require("devtools/client/themes/images/help.svg"),
 };
 
 const gMaskImages = {

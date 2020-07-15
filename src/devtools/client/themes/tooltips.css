@@ -581,7 +581,6 @@ strong {
 .event-tooltip-debugger-icon {
   -moz-context-properties: stroke;
   stroke: var(--theme-icon-color);
-  background-image: url("resource://devtools/client/shared/components/reps/images/jump-definition.svg");
   background-repeat: no-repeat;
   background-position: center;
   width: 20px;
@@ -759,10 +758,6 @@ strong {
   max-width: 212px;
 }
 
-.invoke-confirm .close-confirm-dialog-button::before {
-  background-image: url("chrome://devtools/skin/images/close.svg");
-}
-
 .invoke-confirm .confirm-label {
   margin: 0;
   padding: 4px;
@@ -823,7 +818,6 @@ strong {
   height: 14px;
   fill: currentColor;
   -moz-context-properties: fill;
-  background-image: url(chrome://devtools/skin/images/help.svg);
   background-size: contain;
   background-repeat: no-repeat;
   margin-inline-start: 4px;
