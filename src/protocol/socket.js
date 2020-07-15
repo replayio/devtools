@@ -40,6 +40,11 @@ let gNextMessageId = 1;
 
 const gMessageWaiters = new Map();
 
+// These are helpful when investigating connection speeds.
+const gStartTime = Date.now();
+let gSentBytes = 0;
+let gReceivedBytes = 0;
+
 function initSocket(address) {
   socket = new WebSocket(address || "wss://dispatch.webreplay.io");
 
@@ -66,8 +71,9 @@ function sendMessage(method, params, sessionId, pauseId) {
 }
 
 const doSend = makeInfallible(msg => {
-  //console.log("SendMessage", msg);
-  socket.send(JSON.stringify(msg));
+  const str = JSON.stringify(msg);
+  gSentBytes += str.length;
+  socket.send(str);
 });
 
 function onSocketOpen() {
@@ -91,8 +97,8 @@ function removeEventListener(method) {
 }
 
 function onSocketMessage(evt) {
+  gReceivedBytes += evt.data.length;
   const msg = JSON.parse(evt.data);
-  //console.log("OnMessage", msg);
 
   if (msg.id) {
     const { method, resolve, reject } = gMessageWaiters.get(msg.id);
@@ -145,8 +151,14 @@ window.disconnect = () => {
 };
 
 window.outstanding = () => {
-  return [...gMessageWaiters.entries()].map(([id, { method }]) => ({
+  const messages = [...gMessageWaiters.entries()].map(([id, { method }]) => ({
     id,
     method,
   }));
+  return {
+    messages,
+    time: Date.now() - gStartTime,
+    sent: gSentBytes,
+    received: gReceivedBytes,
+  };
 };

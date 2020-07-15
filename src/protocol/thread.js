@@ -460,6 +460,15 @@ ValueFront.prototype = {
     }
   },
 
+  // When the function came from a logpoint and hasn't had its location
+  // mapped yet, this should be used to avoid confusing getPreferredLocation.
+  functionLocationFromLogpoint() {
+    const location = this._object.preview.functionLocation;
+    if (location) {
+      return location[0];
+    }
+  },
+
   isString() {
     return this.isPrimitive() && typeof this.primitive() == "string";
   },

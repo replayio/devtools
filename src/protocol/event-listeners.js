@@ -48,6 +48,40 @@ async function getFrameworkEventListeners(node) {
   });
 }
 
+function logpointGetFrameworkEventListeners(frameId, node, datas, frameworkListeners) {
+  const evalText = `
+(node => {
+  const rv = [];
+  while (node) {
+    const props = Object.getOwnPropertyNames(node);
+    const reactProp = props.find(v => v.startsWith("__reactEventHandlers$"));
+    if (reactProp) {
+      const reactObj = node[reactProp];
+      const eventProps = Object.getOwnPropertyNames(reactObj);
+      for (const name of eventProps) {
+        const v = reactObj[name];
+        if (typeof v == "function") {
+          rv.push(name, v);
+        }
+      }
+    }
+    node = node.parentNode;
+  }
+  return rv;
+})(${node})
+`;
+
+  return `
+const { result: frameworkResult } = sendCommand(
+  "Pause.evaluateInFrame",
+  { ${frameId}, expression: \`${evalText}\` }
+);
+${datas}.push(frameworkResult.data);
+${frameworkListeners} = frameworkResult.returned;
+`;
+}
+
 module.exports = {
   getFrameworkEventListeners,
+  logpointGetFrameworkEventListeners,
 };

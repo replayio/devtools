@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const { addEventListener, sendMessage, log } = require("./socket");
 const { assert, defer } = require("./utils");
 const { ThreadFront, ValueFront, Pause } = require("./thread");
+const { logpointGetFrameworkEventListeners } = require("./event-listeners");
 
 // Map log group ID to information about the logpoint.
 const gLogpoints = new Map();
@@ -60,13 +61,21 @@ addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
   }
 
   if (LogpointHandlers.onResult) {
-    results.forEach(async ({ key, value: { time, pauseId, location, values, datas } }) => {
+    results.forEach(async ({
+      key,
+      value: { time, pauseId, location, values, datas, frameworkListeners },
+    }) => {
       const pause = new Pause(ThreadFront.sessionId);
       pause.instantiate(pauseId);
       datas.forEach(d => pause.addData(d));
       const valueFronts = values.map(v => new ValueFront(pause, v));
       const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
       LogpointHandlers.onResult(logGroupId, key, time, mappedLocation, pause, valueFronts);
+
+      if (frameworkListeners) {
+        const frameworkListenersFront = new ValueFront(pause, frameworkListeners);
+        eventLogpointOnFrameworkListeners(logGroupId, key, frameworkListenersFront);
+      }
     });
   }
 });
@@ -193,8 +202,24 @@ function setLogpointByURL(logGroupId, scriptUrl, line, column, text, condition) 
   });
 }
 
-async function setEventLogpoint(logGroupId, eventTypes) {
-  const mapper = `
+// Event listener logpoints use a multistage analysis. First, the normal
+// logpoint analysis runs to generate points for the points where regular
+// DOM event listeners are called by the browser. During this first analysis,
+// we look for framework event listeners attached to the nodes that are
+// targeted by the discovered events.
+//
+// In the second phase, we create a new analysis for each point which framework
+// event listeners are associated with. This analysis runs against each call
+// to the framework event listener during the scope of the regular DOM event
+// listener.
+function eventLogpointMapper(getFrameworkListeners) {
+  let frameworkText = "";
+  if (getFrameworkListeners) {
+    frameworkText = logpointGetFrameworkEventListeners(
+      "frameId", "arguments[0].target", "datas", "frameworkListeners"
+    );
+  }
+  return `
     const { point, time, pauseId } = input;
     const { frame } = sendCommand("Pause.getTopFrame");
     const { frameId, location } = frame;
@@ -209,9 +234,17 @@ async function setEventLogpoint(logGroupId, eventTypes) {
     } else {
       values.push(result.returned);
     }
-    return [{ key: point, value: { time, pauseId, location, values, datas } }];
+    let frameworkListeners;
+    ${frameworkText}
+    return [{
+      key: point,
+      value: { time, pauseId, location, values, datas, frameworkListeners },
+    }];
   `;
+}
 
+async function setEventLogpoint(logGroupId, eventTypes) {
+  const mapper = eventLogpointMapper(/* getFrameworkListeners */ true);
   const analysisId = await createLogpointAnalysis(logGroupId, mapper);
 
   for (const eventType of eventTypes) {
@@ -219,6 +252,34 @@ async function setEventLogpoint(logGroupId, eventTypes) {
       analysisId,
       sessionId: await ThreadFront.waitForSession(),
       eventType,
+    });
+  }
+
+  sendMessage("Analysis.runAnalysis", { analysisId });
+  sendMessage("Analysis.findAnalysisPoints", { analysisId });
+}
+
+async function eventLogpointOnFrameworkListeners(logGroupId, point, frameworkListeners) {
+  const locations = [];
+  const children = await frameworkListeners.loadChildren();
+  for (const { contents } of children) {
+    if (contents.isObject() && contents.className() == "Function") {
+      locations.push(contents.functionLocationFromLogpoint());
+    }
+  }
+  if (!locations.length) {
+    return;
+  }
+
+  const mapper = eventLogpointMapper(/* getFrameworkListeners */ false);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper);
+
+  for (const location of locations) {
+    sendMessage("Analysis.addLocation", {
+      analysisId,
+      sessionId: await ThreadFront.waitForSession(),
+      location,
+      onStackFrame: point,
     });
   }
 
