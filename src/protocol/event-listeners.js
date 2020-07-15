@@ -37,7 +37,7 @@ async function getFrameworkEventListeners(node) {
   const props = await obj.loadChildren();
   const reactProp = props.find(v => v.name.startsWith("__reactEventHandlers$"));
   if (!reactProp) {
-    return null;
+    return [];
   }
 
   const handlerProps = await reactProp.contents.loadChildren();
