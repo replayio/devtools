@@ -113,6 +113,7 @@
   position: absolute;
   /* hiding button outside of row until hovered or focused */
   top: -100px;
+  right: 4px;
 }
 
 .expression-container:hover .expression-container__close-btn,
