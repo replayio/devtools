@@ -89,8 +89,6 @@
 
 .expression-container .tree .tree-node[aria-level="1"] {
   padding-top: 0px;
-  /* keep line-height at 14px to prevent row from shifting upon expansion */
-  line-height: 14px;
 }
 
 .expression-container .tree-node[aria-level="1"] .object-label {
