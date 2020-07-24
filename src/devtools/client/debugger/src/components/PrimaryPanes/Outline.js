@@ -32,6 +32,9 @@ import type { Symbols } from "../../reducers/ast";
 import type { SymbolDeclaration, FunctionDeclaration } from "../../workers/parser";
 import type { Source, Context, SourceLocation } from "../../types";
 
+const outlineHeaderHeight = 29;
+const outlineFooterHeight = 25;
+
 type OwnProps = {|
   alphabetizeOutline: boolean,
   onAlphabetizeClick: Function,
@@ -282,16 +285,21 @@ export class Outline extends Component<Props, State> {
     }
 
     return (
-      <ul ref="outlineList" className="outline-list devtools-monospace" dir="ltr">
-        {namedFunctions.map(func => this.renderFunction(func))}
-        {classes.map(klass => this.renderClassFunctions(klass, classFunctions))}
-      </ul>
+      <div
+        className="outline-list-wrapper"
+        style={{ height: `calc(100% - ${outlineHeaderHeight + outlineFooterHeight}px)` }}
+      >
+        <ul ref="outlineList" className="outline-list devtools-monospace" dir="ltr">
+          {namedFunctions.map(func => this.renderFunction(func))}
+          {classes.map(klass => this.renderClassFunctions(klass, classFunctions))}
+        </ul>
+      </div>
     );
   }
 
   renderFooter() {
     return (
-      <div className="outline-footer">
+      <div className="outline-footer" style={{ height: `${outlineFooterHeight}px` }}>
         <button
           onClick={this.props.onAlphabetizeClick}
           className={this.props.alphabetizeOutline ? "active" : ""}
@@ -323,7 +331,11 @@ export class Outline extends Component<Props, State> {
     return (
       <div className="outline">
         <div>
-          <OutlineFilter filter={filter} updateFilter={this.updateFilter} />
+          <OutlineFilter
+            filter={filter}
+            height={`${outlineHeaderHeight}px`}
+            updateFilter={this.updateFilter}
+          />
           {this.renderFunctions(symbolsToDisplay)}
           {this.renderFooter()}
         </div>

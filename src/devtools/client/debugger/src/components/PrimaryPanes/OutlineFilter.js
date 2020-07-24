@@ -11,6 +11,7 @@ import "./OutlineFilter.css";
 
 type Props = {
   filter: string,
+  height: string,
   updateFilter: (filter: string) => void,
 };
 
@@ -44,8 +45,10 @@ export default class OutlineFilter extends Component<Props, State> {
 
   render() {
     const { focused } = this.state;
+    const { height, filter } = this.props;
+
     return (
-      <div className="outline-filter">
+      <div className="outline-filter" style={{ height }}>
         <form>
           <input
             className={classnames("outline-filter-input devtools-filterinput", {
@@ -54,7 +57,7 @@ export default class OutlineFilter extends Component<Props, State> {
             onFocus={() => this.setFocus(true)}
             onBlur={() => this.setFocus(false)}
             placeholder={L10N.getStr("outline.placeholder")}
-            value={this.props.filter}
+            value={filter}
             type="text"
             onChange={this.onChange}
             onKeyDown={this.onKeyDown}
