@@ -124,7 +124,9 @@ async function initialize() {
   };
 }
 
-FullStory.init({ orgId: "VXD33", devMode: test });
+if (!test) {
+  FullStory.init({ orgId: "VXD33", devMode: test });
+}
 
 setTimeout(async () => {
   // Wait for CodeMirror to load asynchronously.
@@ -132,9 +134,11 @@ setTimeout(async () => {
     await new Promise(resolve => setTimeout(resolve, 500));
   }
 
-  FullStory.event("Start", {
-    recordingId,
-  });
+  if (!test) {
+    FullStory.event("Start", {
+      recordingId,
+    });
+  }
 
   bootstrapApp({ initialize });
 }, 0);
