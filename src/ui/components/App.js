@@ -37,6 +37,7 @@ import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { connect } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
+import { messages } from "../utils/messages";
 
 import "styles.css";
 
@@ -45,22 +46,67 @@ function setTheme(theme) {
 }
 
 class App extends React.Component {
+  statusRef = null;
+
   state = {
     orientation: "bottom",
     tooltip: null,
+    recordingId: null,
+    recordingInput: null,
+    recordingInputError: null,
   };
 
   componentDidMount() {
     const { theme } = this.props;
     setTheme(theme);
+
+    if (
+      this.statusRef &&
+      this.statusRef.innerHTML !== messages.noRecording &&
+      this.statusRef.innerHTML !== messages.errorRecording
+    ) {
+      const params = new URLSearchParams(document.location.search.substring(1));
+
+      this.setState({
+        recordingId: params.get("id"),
+      });
+    }
+
+    if (this.statusRef && this.statusRef.innerHTML === messages.errorRecording) {
+      console.log("here");
+      this.setState({
+        recordingId: null,
+        recordingInputError: messages.errorRecording,
+      });
+    }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const { theme } = this.props;
+
     if (theme !== prevProps.theme) {
       setTheme(theme);
     }
+
+    if (
+      this.state.recordingId &&
+      prevState.recordingId !== this.state.recordingId &&
+      this.statusRef &&
+      this.statusRef.innerHTML === messages.errorRecording
+    ) {
+      console.log("here componentDidUpdate");
+      this.setState({ recordingId: null, recordingInputError: messages.errorRecording });
+    }
   }
+
+  handleRecordingInputChange = event => {
+    this.setState({ recordingInput: event.target.value });
+  };
+
+  handleRecordingButtonClick = event => {
+    event.preventDefault();
+    window.location.href = `/?id=${this.state.recordingInput}`;
+  };
 
   renderTooltip(tooltip) {
     if (!tooltip) {
@@ -93,7 +139,7 @@ class App extends React.Component {
 
   render() {
     const { initialize } = this.props;
-    const { orientation } = this.state;
+    const { orientation, recordingId, recordingInputError } = this.state;
 
     const toolbox = <Toolbox initialize={initialize} />;
 
@@ -111,22 +157,69 @@ class App extends React.Component {
     return (
       <>
         <div id="header">
-          <div className="logo"></div>
-          <div id="status"></div>
+          <div className="logo" />
+          <div id="status" ref={r => (this.statusRef = r)} />
         </div>
 
-        <SplitBox
-          style={{ width: "100vw", overflow: "hidden" }}
-          splitterSize={1}
-          initialSize="50%"
-          minSize="20%"
-          maxSize="80%"
-          vert={vert}
-          onResizeEnd={num => {}}
-          startPanel={startPanel}
-          endPanelControl={false}
-          endPanel={endPanel}
-        />
+        {recordingId ? (
+          <SplitBox
+            style={{ width: "100vw", overflow: "hidden" }}
+            splitterSize={1}
+            initialSize="50%"
+            minSize="20%"
+            maxSize="80%"
+            vert={vert}
+            onResizeEnd={num => {}}
+            startPanel={startPanel}
+            endPanelControl={false}
+            endPanel={endPanel}
+          />
+        ) : (
+          <section className="landing-page-wrapper">
+            <div className="landing-page-container">
+              <p className="content">
+                Web Replay records your entire application, so you can track bugs down faster,
+                understand your code better, and always get perfect bug reports.
+              </p>
+              <ul className="content">
+                <li>
+                  <a
+                    href="https://www.notion.so/Docs-56758667f53a4d51b7c6fc7a641adb02"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    📘Some helpful tips for when you're just starting!
+                  </a>
+                </li>
+                <li>
+                  {" "}
+                  <a
+                    href="https://www.notion.so/End-To-End-Recordings-f179b640322846658a5de53761f5e56d"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    ⏺️ More recordings
+                  </a>
+                </li>
+              </ul>
+              <form className="content">
+                <p className="content">{recordingInputError}</p>
+                <input
+                  type="text"
+                  placeholder="Enter a recording id"
+                  onChange={event => this.handleRecordingInputChange(event)}
+                  className="input-expression"
+                />
+                <input
+                  type="button"
+                  value="Click"
+                  onClick={event => this.handleRecordingButtonClick(event)}
+                  className="content button"
+                />
+              </form>
+            </div>
+          </section>
+        )}
       </>
     );
   }

@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
 
 #header .logo {
-  /* mask: url("/src/images/logo.svg"); */
+  mask: url("/src/image/images/logo.svg");
   background: var(--theme-toolbar-selected-color);
   height: 14px;
   width: 124px;
@@ -125,6 +125,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #status {
   padding-left: 10px;
+}
+
+.landing-page-wrapper {
+  width: 100vw;
+  overflow: hidden;
+  height: 100%;
+  font-size: large;
+}
+
+.landing-page-container {
+  margin: 10% auto;
+  width: 400px;
+}
+
+.content {
+  margin-top: 2rem;
+}
+
+.content li {
+  list-style-type: none;
+}
+
+.input-expression {
+  border: 1px solid var(--theme-highlight-blue);
+}
+
+.button {
+  background-color: var(--theme-highlight-blue);
+  padding: 6px 20px;
+  border: 0;
+  color: #fff;
+  width: 100px;
+  font-size: large;
 }
 
 @import url("devtools/client/themes/variables.css");
