@@ -644,13 +644,17 @@ export class Timeline extends Component {
     const toPos = this.getVisiblePosition(to);
     const fromPos = this.getVisiblePosition(from);
 
-    return (toPos - fromPos) * this.overlayWidth;
+    return Math.abs((toPos - fromPos) * this.overlayWidth);
   }
 
   // Get the position of a time on the visible part of the timeline,
   // in the range [0, 1].
   getVisiblePosition(time) {
     const { zoomStartTime, zoomEndTime } = this.state;
+
+    if (!time) {
+      return 0;
+    }
 
     if (time <= zoomStartTime) {
       return 0;
@@ -668,21 +672,23 @@ export class Timeline extends Component {
     return this.getVisiblePosition(time) * this.overlayWidth;
   }
 
-  renderMessage(message, index) {
+  renderMessage(message, index, visibleIndex) {
     const { messages, currentTime, pausedMessage, highlightedMessage } = this.state;
 
     const offset = this.getPixelOffset(message.executionPointTime);
-    const previousMessage = messages[index - 1];
-
+    const previousVisibleMessage = messages[visibleIndex];
+    
     if (offset < 0) {
       return null;
     }
-
+    
     // Check to see if two messages overlay each other on the timeline
-    const isOverlayed =
-      previousMessage &&
-      this.getPixelDistance(message.executionPointTime, previousMessage.executionPointTime) <
-        markerWidth;
+    const distance = this.getPixelDistance(message.executionPointTime, previousVisibleMessage?.executionPointTime) 
+    if (distance < 1) {
+      return null;
+    }
+
+    const isOverlayed = distance < markerWidth;
 
     // Check to see if a message appears after the current execution point
     const isFuture =
@@ -728,7 +734,15 @@ export class Timeline extends Component {
 
   renderMessages() {
     const messages = this.state.messages;
-    return messages.map((message, index) => this.renderMessage(message, index));
+    let visibleIndex;
+
+    return messages.map((message, index) => {
+      const messageEl = this.renderMessage(message, index, visibleIndex)
+      if (messageEl) {
+        visibleIndex = index;
+      }
+      return messageEl;
+    });
   }
 
   renderHoverPoint() {
