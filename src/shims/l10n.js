@@ -23,25 +23,25 @@ const bundles = {
   ),
   "intl.properties": parse(require("toolkit/locales/en-US/chrome/global/intl.properties").default),
   "devtools/client/locales/font-inspector.properties": parse(
-    require("devtools/client/locales/en-US/font-inspector.properties").default
+    require("devtools/client/locales/en-us/font-inspector.properties").default
   ),
   "devtools/client/locales/inspector.properties": parse(
-    require("devtools/client/locales/en-US/inspector.properties").default
+    require("devtools/client/locales/en-us/inspector.properties").default
   ),
   "devtools/client/locales/layout.properties": parse(
-    require("devtools/client/locales/en-US/layout.properties").default
+    require("devtools/client/locales/en-us/layout.properties").default
   ),
   "devtools/client/locales/boxmodel.properties": parse(
-    require("devtools/client/locales/en-US/boxmodel.properties").default
+    require("devtools/client/locales/en-us/boxmodel.properties").default
   ),
   "devtools/client/locales/shared.properties": parse(
-    require("devtools/client/locales/en-US/shared.properties").default
+    require("devtools/client/locales/en-us/shared.properties").default
   ),
   "devtools/shared/locales/styleinspector.properties": parse(
     require("devtools/shared/locales/en-US/styleinspector.properties").default
   ),
   "devtools/client/locales/accessibility.properties": parse(
-    require("devtools/client/locales/en-US/accessibility.properties").default
+    require("devtools/client/locales/en-us/accessibility.properties").default
   ),
   "devtools/shared/locales/accessibility.properties": parse(
     require("devtools/shared/locales/en-US/accessibility.properties").default
