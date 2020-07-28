@@ -196,14 +196,21 @@ class Rule {
   }
 
   /**
-   * The rule's line within a stylesheet
+   * The rule's URL, accounting for any source mapping.
+   */
+  get ruleHref() {
+    return this.domRule ? this.domRule.href : null;
+  }
+
+  /**
+   * The rule's line within a stylesheet, accounting for source mapping.
    */
   get ruleLine() {
     return this.domRule ? this.domRule.line : -1;
   }
 
   /**
-   * The rule's column within a stylesheet
+   * The rule's column within a stylesheet, accounting for source mapping.
    */
   get ruleColumn() {
     return this.domRule ? this.domRule.column : null;

@@ -1008,6 +1008,9 @@ RuleFront.prototype = {
   },
 
   get href() {
+    if (this._rule.originalLocation) {
+      return this._rule.originalLocation.href;
+    }
     return this.parentStyleSheet && this.parentStyleSheet.href;
   },
 
@@ -1016,10 +1019,16 @@ RuleFront.prototype = {
   },
 
   get line() {
+    if (this._rule.originalLocation) {
+      return this._rule.originalLocation.startLine;
+    }
     return this._rule.startLine;
   },
 
   get column() {
+    if (this._rule.originalLocation) {
+      return this._rule.originalLocation.startColumn;
+    }
     return this._rule.startColumn;
   },
 

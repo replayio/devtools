@@ -80,10 +80,7 @@ RuleEditor.prototype = {
     this.toolbox.off("tool-registered", this._onToolChanged);
     this.toolbox.off("tool-unregistered", this._onToolChanged);
 
-    let url = null;
-    if (this.rule.sheet) {
-      url = this.rule.sheet.href || this.rule.sheet.nodeHref;
-    }
+    const url = this.rule.ruleHref;
     if (url && !this.rule.isSystem && this.rule.domRule.isRule()) {
       // Only get the original source link if the rule isn't a system
       // rule and if it isn't an inline rule.
@@ -279,7 +276,7 @@ RuleEditor.prototype = {
       gDevTools.showToolbox(target, "styleeditor").then(toolbox => {
         const { url, line, column } = this._currentLocation;
 
-        if (!this.rule.sheet.href && this.rule.sheet.nodeHref) {
+        if (!this.rule.ruleHref) {
           toolbox.getCurrentPanel().selectStyleSheet(this.rule.sheet, line, column);
         } else {
           toolbox.getCurrentPanel().selectStyleSheet(url, line, column);
@@ -308,12 +305,8 @@ RuleEditor.prototype = {
   _updateLocation: function (enabled, url, line, column) {
     let displayURL = url;
     if (!enabled) {
-      url = null;
-      displayURL = null;
-      if (this.rule.sheet) {
-        url = this.rule.sheet.href || this.rule.sheet.nodeHref;
-        displayURL = this.rule.sheet.href;
-      }
+      url = this.rule.ruleHref;
+      displayURL = this.rule.ruleHref;
       line = this.rule.ruleLine;
       column = this.rule.ruleColumn;
     }
@@ -344,7 +337,7 @@ RuleEditor.prototype = {
     if (this.rule.isSystem) {
       const sourceLabel = this.element.querySelector(".ruleview-rule-source-label");
       const title = this.rule.title;
-      const sourceHref = this.rule.sheet && this.rule.sheet.href ? this.rule.sheet.href : title;
+      const sourceHref = this.rule.ruleHref || title;
 
       const uaLabel = STYLE_INSPECTOR_L10N.getStr("rule.userAgentStyles");
       sourceLabel.textContent = uaLabel + " " + title;
@@ -361,10 +354,7 @@ RuleEditor.prototype = {
       this._updateLocation(false);
     }
 
-    let url = null;
-    if (this.rule.sheet) {
-      url = this.rule.sheet.href || this.rule.sheet.nodeHref;
-    }
+    const url = this.rule.ruleHref;
     if (url && !this.rule.isSystem && this.rule.domRule.isRule()) {
       // Only get the original source link if the rule isn't a system
       // rule and if it isn't an inline rule.
