@@ -46,61 +46,36 @@ function setTheme(theme) {
 }
 
 class App extends React.Component {
-  statusRef = null;
+  statusRef = React.createRef();
 
   state = {
     orientation: "bottom",
     tooltip: null,
     recordingId: null,
     recordingInput: null,
-    recordingInputError: null,
   };
 
   componentDidMount() {
     const { theme } = this.props;
     setTheme(theme);
 
-    if (
-      this.statusRef &&
-      this.statusRef.innerHTML !== messages.noRecording &&
-      this.statusRef.innerHTML !== messages.errorRecording
-    ) {
-      const params = new URLSearchParams(document.location.search.substring(1));
-
-      this.setState({
-        recordingId: params.get("id"),
-      });
-    }
-
-    if (this.statusRef && this.statusRef.innerHTML === messages.errorRecording) {
-      console.log("here");
-      this.setState({
-        recordingId: null,
-        recordingInputError: messages.errorRecording,
-      });
-    }
+    const params = new URLSearchParams(document.location.search.substring(1));
+    this.setState({
+      recordingId: params.get("id"),
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
     const { theme } = this.props;
+    const { recordingId, recordingInputError } = this.state;
 
     if (theme !== prevProps.theme) {
       setTheme(theme);
     }
-
-    if (
-      this.state.recordingId &&
-      prevState.recordingId !== this.state.recordingId &&
-      this.statusRef &&
-      this.statusRef.innerHTML === messages.errorRecording
-    ) {
-      console.log("here componentDidUpdate");
-      this.setState({ recordingId: null, recordingInputError: messages.errorRecording });
-    }
   }
 
   handleRecordingInputChange = event => {
-    this.setState({ recordingInput: event.target.value });
+    this.setState({ recordingInput: event.target.value, recordingInputError: null });
   };
 
   handleRecordingButtonClick = event => {
@@ -139,7 +114,7 @@ class App extends React.Component {
 
   render() {
     const { initialize } = this.props;
-    const { orientation, recordingId, recordingInputError } = this.state;
+    const { orientation, recordingId } = this.state;
 
     const toolbox = <Toolbox initialize={initialize} />;
 
@@ -158,7 +133,7 @@ class App extends React.Component {
       <>
         <div id="header">
           <div className="logo" />
-          <div id="status" ref={r => (this.statusRef = r)} />
+          <div id="status" ref={this.statusRef} />
         </div>
 
         {recordingId ? (
@@ -203,7 +178,6 @@ class App extends React.Component {
                 </li>
               </ul>
               <form className="content">
-                <p className="content">{recordingInputError}</p>
                 <input
                   type="text"
                   placeholder="Enter a recording id"
