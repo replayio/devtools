@@ -242,7 +242,7 @@ class TextProperty {
   }
 
   isUsed() {
-    return true;
+    return { used: true };
     /*
     const selfIndex = this.rule.textProps.indexOf(this);
     const declarations = this.rule.domRule.declarations;
