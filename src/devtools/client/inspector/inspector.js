@@ -338,7 +338,6 @@ Inspector.prototype = {
     this.toolbox.on("select", this.handleToolSelected);
     this.selection.on("new-node-front", this.onNewSelection);
     this.selection.on("detached-front", this.onDetached);
-    console.log("ListenForPaused");
     ThreadFront.on("paused", this.handleThreadPaused);
     ThreadFront.on("instantWarp", this.handleThreadPaused);
     ThreadFront.on("resumed", this.handleThreadResumed);
@@ -368,8 +367,6 @@ Inspector.prototype = {
       return this._defaultNode;
     }
 
-    console.log("Inspector getDefaultNodeForSelection Start");
-
     let rootNode = null;
     const pendingSelection = this._pendingSelection;
 
@@ -391,8 +388,6 @@ Inspector.prototype = {
     // as default selected, else set documentElement
     rootNode = await ThreadFront.getRootDOMNode();
 
-    console.log("Inspector getDefaultNodeForSelection HasRoot");
-
     if (hasNavigated()) {
       return null;
     }
@@ -404,8 +399,6 @@ Inspector.prototype = {
     let selectedNode;
     if (this.selectionCssSelectors.length) {
       selectedNode = await walker.findNodeFront(this.selectionCssSelectors);
-
-      console.log("Inspector getDefaultNodeForSelection FoundSelection");
     }
 
     if (hasNavigated()) {
@@ -415,8 +408,6 @@ Inspector.prototype = {
     if (!selectedNode) {
       selectedNode = await rootNode.querySelector("body");
 
-      console.log("Inspector getDefaultNodeForSelection GotBody");
-
       if (hasNavigated()) {
         return null;
       }
@@ -424,15 +415,11 @@ Inspector.prototype = {
       if (!selectedNode) {
         selectedNode = await this.walker.documentElement();
 
-        console.log("Inspector getDefaultNodeForSelection GotDocument");
-
         if (hasNavigated()) {
           return null;
         }
       }
     }
-
-    console.log("Inspector getDefaultNodeForSelection Finished", selectedNode);
 
     this._defaultNode = selectedNode;
     return selectedNode;
@@ -1213,7 +1200,6 @@ Inspector.prototype = {
    * When replaying, reset the inspector whenever the target pauses.
    */
   handleThreadPaused() {
-    console.log("Inspector HandleThreadPaused");
     this._replayResumed = false;
     this.onNewRoot();
   },
