@@ -1334,8 +1334,10 @@ const ThreadFront = {
     if (!scripts) {
       return;
     }
-    const { scriptId } = this._chooseScriptId(scripts);
-    return this.setBreakpoint(scriptId, line, column, condition);
+    const scriptIds = this._chooseScriptIdList(scripts);
+    return Promise.all(scriptIds.map(({ scriptId }) => {
+      this.setBreakpoint(scriptId, line, column, condition);
+    }));
   },
 
   async removeBreakpoint(scriptId, line, column) {
@@ -1353,8 +1355,10 @@ const ThreadFront = {
     if (!scripts) {
       return;
     }
-    const { scriptId } = this._chooseScriptId(scripts);
-    return this.removeBreakpoint(scriptId, line, column);
+    const scriptIds = this._chooseScriptIdList(scripts);
+    return Promise.all(scriptIds.map(({ scriptId }) => {
+      this.removeBreakpoint(scriptId, line, column);
+    }));
   },
 
   ensurePause(point) {
@@ -1714,6 +1718,44 @@ const ThreadFront = {
       return { scriptId: generatedId, alternateId: originalId };
     }
     return { scriptId: originalId, alternateId: generatedId };
+  },
+
+  // Get the set of chosen scripts from a list of script IDs which might
+  // represent different generated locations.
+  _chooseScriptIdList(scriptIds) {
+    const groups = this._groupScriptIds(scriptIds);
+    return groups.map(ids => this._chooseScriptId(ids));
+  },
+
+  // Group together a set of script IDs according to whether they are generated
+  // or original versions of each other.
+  _groupScriptIds(scriptIds) {
+    const groups = [];
+    while (scriptIds.length) {
+      const id = scriptIds[0];
+      const group = this._getAlternateScriptIds(id).filter(id => scriptIds.includes(id));
+      groups.push(group);
+      scriptIds = scriptIds.filter(id => !group.includes(id));
+    }
+    return groups;
+  },
+
+  // Get all original/generated IDs which can represent a location in scriptId.
+  _getAlternateScriptIds(scriptId) {
+    const rv = new Set();
+    const worklist = [scriptId];
+    while (worklist.length) {
+      scriptId = worklist.pop();
+      if (rv.has(scriptId)) {
+        continue;
+      }
+      rv.add(scriptId);
+      const { generatedScriptIds } = this.scripts.get(scriptId);
+      (generatedScriptIds || []).forEach(id => worklist.push(id));
+      const originalScriptIds = this.originalScripts.map.get(scriptId);
+      (originalScriptIds || []).forEach(id => worklist.push(id));
+    }
+    return [...rv];
   },
 
   // Return whether scriptId is minified and has a pretty printed alternate.
