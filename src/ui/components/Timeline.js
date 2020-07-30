@@ -672,6 +672,14 @@ export class Timeline extends Component {
     return this.getVisiblePosition(time) * this.overlayWidth;
   }
 
+  // Get the percent value for the left offset of a message.
+  getLeftOffset(message) {
+    const messagePosition = this.getVisiblePosition(message.executionPointTime) * 100;
+    const messageWidth = markerWidth / this.overlayWidth * 100;
+
+    return Math.max(messagePosition - messageWidth / 2, 0)
+  }
+
   renderMessage(message, index, visibleIndex) {
     const { messages, currentTime, pausedMessage, highlightedMessage } = this.state;
 
@@ -716,7 +724,7 @@ export class Timeline extends Component {
         location: atPausedLocation,
       }),
       style: {
-        left: `${Math.max(offset - markerWidth / 2, 0)}px`,
+        left: `${this.getLeftOffset(message)}%`,
         zIndex: `${index + 100}`,
       },
       title: getFormatStr("jumpMessage2", frameLocation),
