@@ -1140,8 +1140,12 @@ const ThreadFront = {
   // Pauses created for async parent frames of the current point.
   asyncPauses: [],
 
+  // Waiter for the associated session ID.
   sessionId: null,
   sessionWaiter: defer(),
+
+  // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
+  initializedWaiter: defer(),
 
   // Map scriptId to info about the script.
   scripts: new Map(),
@@ -1196,6 +1200,7 @@ const ThreadFront = {
     await gToolbox.startPanel("debugger");
 
     this.timeWarp(endpoint.point, endpoint.time);
+    this.initializedWaiter.resolve();
   },
 
   setTest(test) {
@@ -1528,6 +1533,10 @@ const ThreadFront = {
   },
 
   async _resumeOperation(command, selectedPoint) {
+    // Don't allow resumes until we've finished loading and did the initial
+    // warp to the endpoint.
+    await this.initializedWaiter.promise;
+
     let resumeEmitted = false;
     let resumeTarget = null;
 

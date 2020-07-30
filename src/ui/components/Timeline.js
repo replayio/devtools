@@ -189,7 +189,13 @@ export class Timeline extends Component {
   }
 
   onEndpoint({ point, time }) {
+    // This could be called before setRecordingDescription.
+    // These two methods should be commoned up.
     addLastScreen(gCurrentScreenShot, point, time);
+    this.setState({
+      zoomEndTime: time,
+      currentTime: time,
+    });
   }
 
   // This callback is used to restrict warping by the thread to the region where
