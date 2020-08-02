@@ -130,44 +130,12 @@ class CommandBar extends Component<Props> {
     this.props.resume(this.props.cx);
   }
 
-  renderPauseButton() {
-    const { cx, breakOnNext, isWaitingOnBreak } = this.props;
-
-    if (cx.isPaused) {
-      return debugBtn(
-        () => this.resume(),
-        "resume",
-        "active",
-        L10N.getFormatStr("resumeButtonTooltip", formatKey("resume"))
-      );
-    }
-
-    if (isWaitingOnBreak) {
-      return debugBtn(null, "pause", "disabled", L10N.getStr("pausePendingButtonTooltip"), true);
-    }
-
-    return debugBtn(
-      () => breakOnNext(cx),
-      "pause",
-      "active",
-      L10N.getFormatStr("pauseButtonTooltip", formatKey("resume"))
-    );
-  }
-
   renderReplayButtons() {
     const { cx } = this.props;
 
     const className = cx.isPaused ? "active" : "disabled";
 
     return [
-      debugBtn(
-        () => this.props.breakOnNext(cx),
-        "pause",
-        !cx.isPaused ? "active" : "disabled",
-        L10N.getFormatStr("pauseButtonTooltip", formatKey("resume")),
-        cx.isPaused
-      ),
-      <div key="divider-1" className="divider" />,
       debugBtn(() => this.props.rewind(cx), "rewind", className, "Rewind Execution", !cx.isPaused),
       debugBtn(
         () => this.props.resume(cx),
