@@ -1349,9 +1349,11 @@ const ThreadFront = {
       return;
     }
     const scriptIds = this._chooseScriptIdList(scripts);
-    return Promise.all(scriptIds.map(({ scriptId }) => {
-      this.setBreakpoint(scriptId, line, column, condition);
-    }));
+    return Promise.all(
+      scriptIds.map(({ scriptId }) => {
+        this.setBreakpoint(scriptId, line, column, condition);
+      })
+    );
   },
 
   async removeBreakpoint(scriptId, line, column) {
@@ -1370,9 +1372,11 @@ const ThreadFront = {
       return;
     }
     const scriptIds = this._chooseScriptIdList(scripts);
-    return Promise.all(scriptIds.map(({ scriptId }) => {
-      this.removeBreakpoint(scriptId, line, column);
-    }));
+    return Promise.all(
+      scriptIds.map(({ scriptId }) => {
+        this.removeBreakpoint(scriptId, line, column);
+      })
+    );
   },
 
   ensurePause(point) {
