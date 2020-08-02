@@ -178,30 +178,6 @@ class CommandBar extends Component<Props> {
     ];
   }
 
-  renderSkipPausingButton() {
-    const { skipPausing, toggleSkipPausing } = this.props;
-
-    if (!features.skipPausing) {
-      return null;
-    }
-
-    return (
-      <button
-        className={classnames("command-bar-button", "command-bar-skip-pausing", {
-          active: skipPausing,
-        })}
-        title={
-          skipPausing
-            ? L10N.getStr("undoSkipPausingTooltip.label")
-            : L10N.getStr("skipPausingTooltip.label")
-        }
-        onClick={toggleSkipPausing}
-      >
-        <AccessibleImage className="disable-pausing" />
-      </button>
-    );
-  }
-
   render() {
     return (
       <div
@@ -210,8 +186,6 @@ class CommandBar extends Component<Props> {
         })}
       >
         {this.renderReplayButtons()}
-        <div className="filler" />
-        {this.renderSkipPausingButton()}
       </div>
     );
   }
