@@ -27,8 +27,8 @@ const {
 } = require("protocol/graphics");
 const { pointEquals, pointPrecedes } = require("protocol/execution-point-utils.js");
 
-import { actions } from "../actions";
-import { selectors } from "../reducers";
+import { actions } from "../../actions";
+import { selectors } from "../../reducers";
 
 import { LocalizationHelper } from "devtools/shared/l10n";
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
@@ -691,13 +691,16 @@ export class Timeline extends Component {
 
     const offset = this.getPixelOffset(message.executionPointTime);
     const previousVisibleMessage = messages[visibleIndex];
-    
+
     if (offset < 0) {
       return null;
     }
-    
+
     // Check to see if two messages overlay each other on the timeline
-    const distance = this.getPixelDistance(message.executionPointTime, previousVisibleMessage?.executionPointTime) 
+    const distance = this.getPixelDistance(
+      message.executionPointTime,
+      previousVisibleMessage?.executionPointTime
+    );
     if (distance < 1) {
       return null;
     }
@@ -751,7 +754,7 @@ export class Timeline extends Component {
     let visibleIndex;
 
     return messages.map((message, index) => {
-      const messageEl = this.renderMessage(message, index, visibleIndex)
+      const messageEl = this.renderMessage(message, index, visibleIndex);
       if (messageEl) {
         visibleIndex = index;
       }
@@ -774,29 +777,6 @@ export class Timeline extends Component {
         },
       }),
     ];
-  }
-
-  renderTicks() {
-    return [];
-  }
-
-  renderTick(index) {
-    const { currentTime } = this.state;
-    const tickSize = this.getTickSize();
-    const offset = Math.round(this.getPixelOffset(currentTime));
-    const position = index * tickSize;
-    const isFuture = position > offset;
-
-    return dom.span({
-      className: classname("tick", {
-        future: isFuture,
-        highlight: true,
-      }),
-      style: {
-        left: `${position}px`,
-        width: `${tickSize}px`,
-      },
-    });
   }
 
   renderUnprocessedRegions() {
@@ -899,7 +879,6 @@ export class Timeline extends Component {
             }),
             ...this.renderMessages(),
             ...this.renderHoverPoint(),
-            ...this.renderTicks(),
             ...this.renderUnprocessedRegions(),
             ...this.renderZoomedRegion()
           ),
