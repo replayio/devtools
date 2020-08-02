@@ -92,7 +92,6 @@ type Props = {
   logEventBreakpoints: boolean,
   source: ?Source,
   toggleAllBreakpoints: typeof actions.toggleAllBreakpoints,
-  evaluateExpressions: typeof actions.evaluateExpressions,
   logExceptions: typeof actions.logExceptions,
   breakOnNext: typeof actions.breakOnNext,
   toggleEventLogging: typeof actions.toggleEventLogging,
@@ -158,20 +157,6 @@ class SecondaryPanes extends Component<Props, State> {
     const { expressions } = this.props;
 
     const buttons = [];
-
-    if (expressions.length) {
-      buttons.push(
-        debugBtn(
-          evt => {
-            evt.stopPropagation();
-            this.props.evaluateExpressions(this.props.cx);
-          },
-          "refresh",
-          "refresh",
-          L10N.getStr("watchExpressions.refreshButton")
-        )
-      );
-    }
 
     buttons.push(
       debugBtn(
@@ -465,7 +450,6 @@ const mapStateToProps = state => {
 
 export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
   toggleAllBreakpoints: actions.toggleAllBreakpoints,
-  evaluateExpressions: actions.evaluateExpressions,
   logExceptions: actions.logExceptions,
   breakOnNext: actions.breakOnNext,
   toggleEventLogging: actions.toggleEventLogging,
