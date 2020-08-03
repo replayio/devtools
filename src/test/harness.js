@@ -42,7 +42,7 @@ function finish() {
 
   // This is pretty goofy but this is recognized during automated tests and sent
   // to the UI process to indicate the test has finished.
-  dump(`WebReplaySendAsyncMessage TestFinished`);
+  dump(`RecReplaySendAsyncMessage TestFinished`);
 }
 
 function selectConsole() {

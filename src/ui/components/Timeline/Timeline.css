@@ -1,6 +1,6 @@
-/*. webreplay */
+/*. replay */
 
-.webreplay-player {
+.replay-player {
   -moz-appearance: none;
   background: var(--theme-tab-toolbar-background);
   border-bottom: 1px solid var(--theme-splitter-color);
@@ -9,7 +9,7 @@
   --progressbar-transition: 200ms;
 }
 
-.theme-light .webreplay-player {
+.theme-light .replay-player {
   --commandbar-button-hover-background: #efefef;
   --progress-recording-background: hsl(0, 100%, 97%);
   --progress-playing-background: hsl(207, 100%, 97%);
@@ -30,7 +30,7 @@
   --replay-head-background: var(--purple-50);
 }
 
-.theme-dark .webreplay-player {
+.theme-dark .replay-player {
   --commandbar-button-hover-background: #1a1a1a;
   --progress-recording-background: #310707;
   --progress-playing-background: #071a2b;
@@ -51,11 +51,11 @@
   --replay-head-background: var(--theme-highlight-purple);
 }
 
-.webreplay-player .overlay-container {
+.replay-player .overlay-container {
   display: flex;
 }
 
-.webreplay-player .progressBar {
+.replay-player .progressBar {
   position: relative;
   width: 100%;
   height: 25px;
@@ -65,7 +65,7 @@
   margin: 2px 5px 2px 0;
 }
 
-.webreplay-player .progress {
+.replay-player .progress {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -73,7 +73,7 @@
   transition-duration: var(--progressbar-transition);
 }
 
-.webreplay-player #overlay:not(.recording) .progress::after {
+.replay-player #overlay:not(.recording) .progress::after {
   background: var(--replay-head-background);
   width: 1px;
   height: 100%;
@@ -84,12 +84,12 @@
   position: absolute;
 }
 
-.webreplay-player .recording .progress {
+.replay-player .recording .progress {
   background: var(--progress-recording-background);
   transition-duration: var(--progressbar-transition);
 }
 
-.webreplay-player .message {
+.replay-player .message {
   position: absolute;
   height: 100%;
   width: 7px;
@@ -99,79 +99,79 @@
   background: var(--replaying-marker-background);
 }
 
-.webreplay-player .animate .message {
+.replay-player .animate .message {
   transition-duration: 100ms;
 }
 
-.webreplay-player .message.overlayed {
+.replay-player .message.overlayed {
   border: 0.5px solid var(--progress-playing-background);
   top: calc(50% - 3.75px);
   height: 7.5px;
   width: 7.5px;
 }
 
-.webreplay-player .message.overlayed.future {
+.replay-player .message.overlayed.future {
   border-color: var(--progressbar-background);
 }
 
-.webreplay-player .message.highlighted {
+.replay-player .message.highlighted {
   background-color: var(--replaying-marker-highlighted-background);
   transform: scale(1.25);
   transition-duration: 100ms;
 }
 
-.webreplay-player .message.location {
+.replay-player .message.location {
   background: var(--replaying-marker-location-background);
 }
 
-.webreplay-player .recording .message.highlighted {
+.replay-player .recording .message.highlighted {
   background-color: var(--recording-marker-background-hover);
 }
 
-.webreplay-player .recording .message.overlayed {
+.replay-player .recording .message.overlayed {
   border-color: var(--progress-recording-background);
 }
 
-.webreplay-player .recording .message {
+.replay-player .recording .message {
   background: var(--recording-marker-background);
 }
 
-.webreplay-player .recording .message:hover {
+.replay-player .recording .message:hover {
   background: var(--recording-marker-background-hover);
 }
 
-.webreplay-player .message:hover {
+.replay-player .message:hover {
   background: var(--replaying-marker-background-hover);
   cursor: pointer;
 }
 
-.webreplay-player .message:hover::before {
+.replay-player .message:hover::before {
   transform: scale(0.1);
 }
 
-.webreplay-player .hoverPoint {
+.replay-player .hoverPoint {
   position: absolute;
   height: 100%;
   width: 2px;
   background: var(--hover-point);
 }
 
-.webreplay-player .commands {
+.replay-player .commands {
   display: flex;
   margin: 0 4px;
 }
 
-.webreplay-player .command-button {
+.replay-player .command-button {
   display: flex;
   min-width: 20px;
   opacity: 0.4;
 }
 
-.webreplay-player .command-button.primary {
+.replay-player .command-button.primary {
   min-width: 22px;
 }
 
-.webreplay-player .btn {
+.replay-player .btn {
   width: 14px;
   height: 14px;
   mask-size: 14px;
@@ -180,35 +180,35 @@
   margin: 0 auto;
 }
 
-.webreplay-player .primary .btn {
+.replay-player .primary .btn {
   width: 18px;
   height: 17px;
   mask-size: 18px;
 }
 
-.webreplay-player .command-button.active:hover {
+.replay-player .command-button.active:hover {
   background: var(--commandbar-button-hover-background);
   cursor: pointer;
 }
 
-.webreplay-player .command-button.active {
+.replay-player .command-button.active {
   opacity: 1;
 }
 
-.webreplay-player div.command-button .rewind {
+.replay-player div.command-button .rewind {
   transform: scaleX(-1);
 }
 
-.webreplay-player div.command-button .previous {
+.replay-player div.command-button .previous {
   transform: scaleX(-1);
   margin-left: 8px;
 }
 
-.webreplay-player div.command-button .next {
+.replay-player div.command-button .next {
   margin-right: 8px;
 }
 
-.webreplay-player .progress-line {
+.replay-player .progress-line {
   width: 0%;
   height: 1px;
   background: var(--progressbar-line-color);
@@ -218,22 +218,22 @@
   transition-duration: var(--progressbar-transition);
 }
 
-.webreplay-player .progress-line.end {
+.replay-player .progress-line.end {
   opacity: 0.3;
 }
 
-.webreplay-player .recording .progress-line {
+.replay-player .recording .progress-line {
   background: var(--progress-recording-line);
   opacity: 0.3;
 }
 
-.webreplay-player .tick {
+.replay-player .tick {
   position: absolute;
   height: 100%;
 }
 
-.webreplay-player .tick::before,
-.webreplay-player .tick::after {
+.replay-player .tick::before,
+.replay-player .tick::after {
   height: 1.5px;
   width: 1px;
   right: 0;
@@ -242,64 +242,64 @@
   display: block;
 }
 
-.webreplay-player .recording .tick::before,
-.webreplay-player .recording .tick::after {
+.replay-player .recording .tick::before,
+.replay-player .recording .tick::after {
   background: var(--tick-recording-background);
 }
 
-.webreplay-player .tick.future::before,
-.webreplay-player .tick.future::after {
+.replay-player .tick.future::before,
+.replay-player .tick.future::after {
   background: var(--tick-future-background);
 }
 
-.webreplay-player .tick::before,
-.webreplay-player .tick::after {
+.replay-player .tick::before,
+.replay-player .tick::after {
   background: var(--tick-background);
 }
 
-.webreplay-player .tick::after {
+.replay-player .tick::after {
   bottom: 0;
 }
 
-.webreplay-player .tick::before {
+.replay-player .tick::before {
   top: 0;
 }
 
-.webreplay-player #overlay:hover .tick {
+.replay-player #overlay:hover .tick {
   opacity: 1;
 }
 
-.webreplay-player #overlay .tick {
+.replay-player #overlay .tick {
   opacity: 0.5;
 }
 
-.webreplay-player #overlay .tick:hover ~ .tick,
-.webreplay-player #overlay .tick.highlight ~ .tick:not(.highlight) {
+.replay-player #overlay .tick:hover ~ .tick,
+.replay-player #overlay .tick.highlight ~ .tick:not(.highlight) {
   opacity: 0.5;
 }
 
-.webreplay-player .untraversed {
+.replay-player .untraversed {
   position: absolute;
   height: 100%;
   background: #000000;
   opacity: 0.2;
 }
 
-.webreplay-player .unscanned {
+.replay-player .unscanned {
   position: absolute;
   height: 100%;
   background: #000000;
   opacity: 0.1;
 }
 
-.webreplay-player .zoomboundary {
+.replay-player .zoomboundary {
   padding-top: 7px;
   padding-right: 4px;
 }
 
-/*. webreplay */
+/*. replay */
 
-.webreplay-player {
+.replay-player {
   -moz-appearance: none;
   background: var(--theme-tab-toolbar-background);
   border-bottom: 1px solid var(--theme-splitter-color);
@@ -308,7 +308,7 @@
   --progressbar-transition: 200ms;
 }
 
-.theme-light .webreplay-player {
+.theme-light .replay-player {
   --commandbar-button-hover-background: #efefef;
   --progress-recording-background: hsl(0, 100%, 97%);
   --progress-playing-background: hsl(207, 100%, 97%);
@@ -328,7 +328,7 @@
   --replay-head-background: var(--purple-50);
 }
 
-.theme-dark .webreplay-player {
+.theme-dark .replay-player {
   --commandbar-button-hover-background: #1a1a1a;
   --progress-recording-background: #310707;
   --progress-playing-background: #071a2b;
@@ -348,6 +348,6 @@
   --replay-head-background: var(--theme-highlight-purple);
 }
 
-.webreplay-player .overlay-container {
+.replay-player .overlay-container {
   display: flex;
 }

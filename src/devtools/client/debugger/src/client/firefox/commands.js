@@ -81,7 +81,7 @@ async function loadObjectProperties(root: Node) {
 }
 
 function releaseActor(actor: String) {
-  // Object fronts are always thread scoped with web replay.
+  // Object fronts are always thread scoped in the replay viewer.
   return;
 
   /*

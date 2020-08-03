@@ -4,8 +4,8 @@
 
 "use strict";
 
-// The WebReplayPlayer is the React component which renders the devtools
-// timeline. It also manages which graphics are currently being rendered.
+// React component which renders the devtools timeline and manages which
+// graphics are currently being rendered.
 
 import { connect } from "react-redux";
 import { Component } from "react";
@@ -526,7 +526,7 @@ export class Timeline extends Component {
       paintGraphics(screen, mouse);
       const next = this.nextPlaybackTime(time);
       if (next) {
-        log(`WebReplayPlayer PlaybackNext`);
+        log(`PlaybackNext`);
 
         // For now we play back at 1x (or slower, while screens load).
         const paintTime = startDate + next - startTime;
@@ -542,7 +542,7 @@ export class Timeline extends Component {
           currentTime: next,
         });
       } else {
-        log(`WebReplayPlayer StopPlayback`);
+        log(`StopPlayback`);
         this.seekTime(time);
         this.setState({ playback: null });
       }
@@ -550,7 +550,7 @@ export class Timeline extends Component {
   }
 
   startPlayback() {
-    log(`WebReplayPlayer StartPlayback`);
+    log(`StartPlayback`);
 
     const startTime = this.state.currentTime;
     const startDate = Date.now();
@@ -570,7 +570,7 @@ export class Timeline extends Component {
   }
 
   stopPlayback() {
-    log(`WebReplayPlayer StopPlayback`);
+    log(`StopPlayback`);
 
     if (this.state.playback) {
       this.seekTime(this.state.playback.time);
@@ -824,7 +824,7 @@ export class Timeline extends Component {
     const { shouldAnimate } = this.state;
     return div(
       {
-        className: "webreplay-player",
+        className: "replay-player",
       },
       div(
         {

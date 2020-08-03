@@ -1,4 +1,4 @@
-Web app with developer tools built on the Web Replay Protocol
+Web app with developer tools built on the Record Replay Protocol
 
 Setup instructions:
 

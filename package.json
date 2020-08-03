@@ -1,7 +1,7 @@
 {
-  "name": "webreplay-devtools",
+  "name": "recordreplay-devtools",
   "version": "1.0.0",
-  "description": "Web app with developer tools built on the Web Replay Protocol",
+  "description": "Web app with developer tools built on the Record Replay Protocol",
   "main": "postcss.config.js",
   "dependencies": {
     "@babel/core": "^7.9.6",
@@ -59,12 +59,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WebReplay/webreplay-devtools.git"
+    "url": "git+https://github.com/RecordReplay/devtools.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/WebReplay/webreplay-devtools/issues"
+    "url": "https://github.com/RecordReplay/devtools/issues"
   },
-  "homepage": "https://github.com/WebReplay/webreplay-devtools#readme"
+  "homepage": "https://github.com/RecordReplay/devtools#readme"
 }

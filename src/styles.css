@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2020, Web Replay LLC
+Copyright (c) 2020 Record Replay Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

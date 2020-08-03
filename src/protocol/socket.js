@@ -1,7 +1,7 @@
 /*
 BSD 3-Clause License
 
-Copyright (c) 2020, Web Replay LLC
+Copyright (c) 2020 Record Replay Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ let gSentBytes = 0;
 let gReceivedBytes = 0;
 
 function initSocket(address) {
-  socket = new WebSocket(address || "wss://dispatch.webreplay.io");
+  socket = new WebSocket(address || "wss://dispatch.replay.io");
 
   socket.onopen = makeInfallible(onSocketOpen);
   socket.onclose = makeInfallible(onSocketClose);

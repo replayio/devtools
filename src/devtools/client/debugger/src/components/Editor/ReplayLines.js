@@ -84,7 +84,7 @@ export class ReplayLines extends PureComponent<Props> {
     // for there to be code both executed and not executed on a line, in which
     // case we will treat it as executed.
     //
-    // This is disabled for now, see https://github.com/WebReplay/webreplay/issues/141
+    // This is disabled for now, see https://github.com/RecordReplay/gecko-dev/issues/141
     /*
     for (const { location, generatedLocation } of unexecuted) {
       const line = getEditorLine(location, generatedLocation, sourceId);
