@@ -65,10 +65,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
 
 #header .logo {
-  height: 17px;
-  width: 24px;
+  height: 14px;
+  width: 18px;
   margin-left: 5px;
   background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .command-button {
