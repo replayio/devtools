@@ -59,6 +59,7 @@ const gBackgroundImages = {
   ".event-tooltip-debugger-icon": require("devtools/client/shared/components/reps/images/input.svg"),
   ".invoke-confirm .close-confirm-dialog-button::before": require("devtools/client/debugger/images/close.svg"),
   ".invoke-confirm .learn-more-link::after": require("devtools/client/themes/images/help.svg"),
+  "#header .logo": require("./images/logo.svg"),
 };
 
 const gMaskImages = {
@@ -116,7 +117,6 @@ const gMaskImages = {
   "#toolbox-toolbar-debugger .toolbar-panel-icon": require("devtools/client/themes/images/tool-debugger.svg"),
   "#toolbox-toolbar-inspector .toolbar-panel-icon": require("devtools/client/themes/images/tool-inspector.svg"),
   ".tree-node button.arrow": require("devtools/client/debugger/images/arrow.svg"),
-  "#header .logo": require("./images/logo.svg"),
   "#command-button-pick::before": require("devtools/client/themes/images/command-pick.svg"),
   "button.open-inspector": require("devtools/client/themes/images/open-inspector.svg"),
 };
