@@ -64,6 +64,7 @@ async function createSession() {
   addEventListener("Recording.sessionError", onSessionError);
 
   try {
+    ThreadFront.recordingId = recordingId;
     const { sessionId } = await sendMessage("Recording.createSession", {
       recordingId,
     });

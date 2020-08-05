@@ -1140,6 +1140,9 @@ const ThreadFront = {
   // Pauses created for async parent frames of the current point.
   asyncPauses: [],
 
+  // Recording ID being examined.
+  recordingId: null,
+
   // Waiter for the associated session ID.
   sessionId: null,
   sessionWaiter: defer(),
@@ -1825,11 +1828,11 @@ const ThreadFront = {
     return this.getPreferredLocation(mappedLocation);
   },
 
-  async getDescription(recordingId) {
+  async getRecordingDescription() {
     let description;
     try {
       description = await sendMessage("Recording.getDescription", {
-        recordingId,
+        recordingId: this.recordingId,
       });
     } catch (e) {
       // Getting the description will fail if it was never set. For now we don't
@@ -1840,6 +1843,53 @@ const ThreadFront = {
     }
 
     return description;
+  },
+
+  async watchMetadata(key, callback) {
+    if (!this.metadataListeners) {
+      addEventListener("Recording.metadataChange", ({ key, newValue }) => {
+        this.metadataListeners.forEach(entry => {
+          if (entry.key == key) {
+            entry.callback(newValue ? JSON.parse(newValue) : undefined);
+          }
+        });
+      });
+      this.metadataListeners = [];
+    }
+    this.metadataListeners.push({ key, callback });
+
+    const { value } = await sendMessage("Recording.metadataStartListening", {
+      recordingId: this.recordingId,
+      key,
+    });
+    callback(value ? JSON.parse(value) : undefined);
+  },
+
+  async updateMetadata(key, callback) {
+    // Keep trying to update the metadata until it succeeds --- we updated it
+    // before anyone else did. Use the callback to compute the new value in
+    // terms of the old value.
+    let { value } = await sendMessage("Recording.getMetadata", {
+      recordingId: this.recordingId,
+      key,
+    });
+    while (true) {
+      const newValue = JSON.stringify(
+        callback(value ? JSON.parse(value) : undefined)
+      );
+      const { updated, currentValue } = await sendMessage("Recording.setMetadata", {
+        recordingId: this.recordingId,
+        key,
+        newValue,
+        oldValue: value,
+      });
+      if (updated) {
+        // It worked! Hooray!
+        break;
+      }
+      // Retry with the value that was written by another client.
+      value = currentValue;
+    }
   },
 };
 

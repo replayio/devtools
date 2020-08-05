@@ -44,7 +44,6 @@ const markerWidth = 7;
 const imgDir = "devtools/skin/images";
 
 const url = new URL(window.location.href);
-const recordingId = url.searchParams.get("id");
 
 function classname(name, bools) {
   for (const key in bools) {
@@ -118,6 +117,7 @@ function createCommentElement(comment, callbacks) {
   confirmButton.addEventListener("click", () => {
     comment.contents = contentsElement.value;
     createContentsElement(false);
+    callbacks.updateComment();
   });
 
   const writeButton = document.createElement("button");
@@ -195,6 +195,9 @@ function getMessageLocation(message) {
 let gCurrentScreenShot;
 let gCurrentMouse;
 
+// Metadata key used to store comments.
+const CommentsMetadata = "devtools-comments";
+
 export class Timeline extends Component {
   static get propTypes() {
     return {
@@ -248,8 +251,9 @@ export class Timeline extends Component {
     this.threadFront.on("paused", this.onPaused.bind(this));
     this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
     this.threadFront.warpCallback = this.onWarp.bind(this);
+    this.threadFront.watchMetadata(CommentsMetadata, this.onComments.bind(this));
 
-    const description = await this.threadFront.getDescription(recordingId);
+    const description = await this.threadFront.getRecordingDescription();
     this.setRecordingDescription(description);
 
     window.addEventListener("resize", () => {
@@ -691,6 +695,7 @@ export class Timeline extends Component {
       hasFrames: this.threadFront.currentPointHasFrames,
       time: currentTime,
       contents: "",
+      saved: false,
     };
     this.setState({
       comments: [...comments, comment ],
@@ -706,23 +711,54 @@ export class Timeline extends Component {
     });
   }
 
+  setCommentVisible(comment, visible) {
+    this.setState({
+      comments: this.state.comments.map(c => {
+        if (c.id == comment.id) {
+          return { ...c, visible };
+        }
+        return c;
+      }),
+    });
+  }
+
+  removeComment(comment) {
+    this.setState({
+      comments: this.state.comments.filter(c => c.id != comment.id),
+    });
+  }
+
   renderComment(comment) {
     if (!comment.visible) {
       return;
     }
     const elem = ensureCommentElement(comment, {
       closeComment: () => {
-        this.setState({
-          comments: this.state.comments.map(c => {
-            if (c.id == comment.id) {
-              return { ...c, visible: false };
-            }
-            return c;
-          }),
-        });
+        if (comment.saved) {
+          this.setCommentVisible(comment, false);
+        } else {
+          this.removeComment(comment);
+        }
       },
       jumpToComment: () => {
         this.seek(comment.point, comment.time, comment.hasFrames);
+      },
+      updateComment: () => {
+        if (comment.contents) {
+          comment.saved = true;
+          this.threadFront.updateMetadata(
+            CommentsMetadata,
+            comments => [...(comments || []).filter(c => c.id != comment.id), comment]
+          );
+        } else {
+          if (comment.saved) {
+            this.threadFront.updateMetadata(
+              CommentsMetadata,
+              comments => (comments || []).filter(c => c.id != comment.id)
+            );
+          }
+          this.removeComment(comment);
+        }
       },
     });
     const offset = this.getPixelOffset(comment.time);
@@ -733,6 +769,22 @@ export class Timeline extends Component {
       window.innerWidth - bounds.width
     );
     elem.style.top = this.overlayTop - bounds.height - 5;
+  }
+
+  onComments(comments) {
+    this.setState({
+      comments: [
+        ...(comments || []).map(comment => {
+          // Comments are visible by default, unless they have been closed in
+          // the local session. Ignore the visible value we get from the server.
+          const visible = !this.state.comments.some(
+            c => c.id == comment.id && !c.visible
+          );
+          return { ...comment, visible };
+        }),
+        ...this.state.comments.filter(c => !c.saved),
+      ],
+    });
   }
 
   renderCommands() {
@@ -908,16 +960,7 @@ export class Timeline extends Component {
         zIndex: 100000, // Render comments in front of other markers
       },
       title: "Show comment",
-      onClick: e => {
-        this.setState({
-          comments: this.state.comments.map(c => {
-            if (c.id == comment.id) {
-              return { ...c, visible: true };
-            }
-            return c;
-          }),
-        });
-      },
+      onClick: e => this.setCommentVisible(comment, true),
       onMouseEnter: () => this.onCommentMouseEnter(comment),
       onMouseLeave: () => this.onCommentMouseLeave(),
     });
@@ -930,7 +973,7 @@ export class Timeline extends Component {
 
   renderHoverPoint() {
     const { hoverTime, hoveredMessage, hoveredComment, screen } = this.state;
-    if (hoverTime == null || hoveredMessage, hoveredComment) {
+    if (hoverTime == null || hoveredMessage || hoveredComment) {
       return [];
     }
     const offset = this.getPixelOffset(hoverTime);
