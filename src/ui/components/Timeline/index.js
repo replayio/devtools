@@ -166,14 +166,6 @@ function ensureCommentElement(comment, callbacks) {
   return elem;
 }
 
-function getMessageProgress(message) {
-  return getProgress(message.executionPoint);
-}
-
-function getProgress(executionPoint) {
-  return executionPoint && executionPoint.progress;
-}
-
 function sameLocation(m1, m2) {
   const f1 = m1.frame;
   const f2 = m2.frame;
@@ -349,11 +341,9 @@ export class Timeline extends Component {
     } = consoleState;
 
     if (visibleMessages != this.state.visibleMessages) {
-      let messages = visibleMessages
+      const messages = visibleMessages
         .map(id => messagesById.get(id))
         .filter(message => message.source == "console-api" || isError(message));
-
-      messages = sortBy(messages, message => getMessageProgress(message));
 
       this.setState({ messages, visibleMessages, shouldAnimate: false });
     }
