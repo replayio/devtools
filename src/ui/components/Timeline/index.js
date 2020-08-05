@@ -26,6 +26,7 @@ const {
   addLastScreen,
 } = require("protocol/graphics");
 const { pointEquals, pointPrecedes } = require("protocol/execution-point-utils.js");
+const { clamp } = require("protocol/utils");
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
@@ -90,39 +91,46 @@ function CommandButton({ img, className, onClick, active }) {
   );
 }
 
-function createCommentElement(contents) {
-  const comment = document.createElement("div");
+function createCommentElement(comment, callbacks) {
+  const element = document.createElement("div");
 
-  document.body.appendChild(comment);
-  comment.className = "comment-box";
-  comment.style.position = "absolute";
-  comment.style.left = "0px";
-  comment.style.top = "0px";
+  document.body.appendChild(element);
+  element.className = "comment-box";
+  element.style.position = "absolute";
+  element.style.left = "0px";
+  element.style.top = "0px";
 
   let contentsElement;
 
   const closeButton = document.createElement("button");
   closeButton.className = "comment-close";
-  comment.appendChild(closeButton);
-  closeButton.addEventListener("click", () => comment.remove());
+  element.appendChild(closeButton);
+  closeButton.addEventListener("click", () => {
+    callbacks.closeComment();
+  });
+
+  const jumpButton = document.createElement("button");
+  jumpButton.className = "comment-jump";
+  element.appendChild(jumpButton);
 
   const confirmButton = document.createElement("button");
   confirmButton.className = "comment-confirm";
-  comment.appendChild(confirmButton);
+  element.appendChild(confirmButton);
   confirmButton.addEventListener("click", () => {
-    contents = contentsElement.value;
+    comment.contents = contentsElement.value;
     createContentsElement(false);
   });
 
   const writeButton = document.createElement("button");
   writeButton.className = "comment-write";
-  comment.appendChild(writeButton);
+  element.appendChild(writeButton);
   writeButton.addEventListener("click", () => {
-    contents = contentsElement.innerText;
+    comment.contents = contentsElement.innerText;
     createContentsElement(true);
   });
 
-  createContentsElement(!contents);
+  createContentsElement(!comment.contents);
+  return element;
 
   function createContentsElement(isInput) {
     if (contentsElement) {
@@ -131,20 +139,32 @@ function createCommentElement(contents) {
     if (isInput) {
       contentsElement = document.createElement("textarea");
       contentsElement.className = "comment-input";
-      contentsElement.value = contents || "";
-      comment.appendChild(contentsElement);
+      contentsElement.value = comment.contents;
+      element.appendChild(contentsElement);
       contentsElement.focus();
       writeButton.style.display = "none";
       confirmButton.style.display = "inline";
     } else {
       contentsElement = document.createElement("div");
       contentsElement.className = "comment-contents";
-      contentsElement.innerText = contents || "";
-      comment.appendChild(contentsElement);
+      contentsElement.innerText = comment.contents;
+      element.appendChild(contentsElement);
       writeButton.style.display = "inline";
       confirmButton.style.display = "none";
     }
   }
+}
+
+// Map id => element for displayed comments
+const gCommentElements = new Map();
+
+function ensureCommentElement(comment, callbacks) {
+  let elem = gCommentElements.get(comment.id);
+  if (!elem) {
+    elem = createCommentElement(comment, callbacks);
+    gCommentElements.set(comment.id, elem);
+  }
+  return elem;
 }
 
 function getMessageProgress(message) {
@@ -205,6 +225,8 @@ export class Timeline extends Component {
       unprocessedRegions: [],
       shouldAnimate: true,
       recordingDuration: 0,
+      comments: [],
+      numResizes: 0,
     };
 
     this.overlayWidth = 1;
@@ -213,7 +235,7 @@ export class Timeline extends Component {
   }
 
   async componentDidMount() {
-    this.overlayWidth = this.updateOverlayWidth();
+    this.updateOverlayDimensions();
     this.threadFront.ensureProcessed(
       this.onMissingRegions.bind(this),
       this.onUnprocessedRegions.bind(this)
@@ -229,10 +251,14 @@ export class Timeline extends Component {
 
     const description = await this.threadFront.getDescription(recordingId);
     this.setRecordingDescription(description);
+
+    window.addEventListener("resize", () => {
+      this.setState({ numResizes: this.state.numResizes + 1 });
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    this.overlayWidth = this.updateOverlayWidth();
+    this.updateOverlayDimensions();
 
     if (prevState.closestMessage != this.state.closestMessage) {
       this.scrollToMessage(this.state.closestMessage);
@@ -657,16 +683,43 @@ export class Timeline extends Component {
   }
 
   startNewComment() {
-    this.newComment = createCommentElement();
+    const { comments, currentTime } = this.state;
+    const comment = {
+      id: (Math.random() * 1e9) | 0,
+      point: this.threadFront.currentPoint,
+      time: currentTime,
+      contents: "",
+    };
+    this.setState({
+      comments: [...comments, comment ],
+    });
   }
 
-  renderComment() {
+  renderCommentButton() {
     return CommandButton({
       className: "",
       active: true,
       img: "comment",
       onClick: () => this.startNewComment(),
     });
+  }
+
+  renderComment(comment) {
+    const elem = ensureCommentElement(comment, {
+      closeComment: () => {
+        this.setState({
+          comments: [...this.state.comments.filter(c => c.id != comment.id)],
+        });
+      },
+    });
+    const offset = this.getPixelOffset(comment.time);
+    const bounds = elem.getBoundingClientRect();
+    elem.style.left = clamp(
+      offset + this.overlayLeft - (bounds.width / 2),
+      0,
+      window.innerWidth - bounds.width
+    );
+    elem.style.top = this.overlayTop - bounds.height - 5;
   }
 
   renderCommands() {
@@ -696,9 +749,11 @@ export class Timeline extends Component {
     ];
   }
 
-  updateOverlayWidth() {
+  updateOverlayDimensions() {
     const el = ReactDOM.findDOMNode(this).querySelector(".progressBar");
-    return el ? el.clientWidth : 1;
+    this.overlayWidth = el ? el.clientWidth : 1;
+    this.overlayTop = el ? el.getBoundingClientRect().top : 1;
+    this.overlayLeft = el ? el.getBoundingClientRect().left : 1;
   }
 
   // calculate pixel distance from two times
@@ -891,8 +946,17 @@ export class Timeline extends Component {
 
   render() {
     const percent = this.getVisiblePosition(this.state.currentTime) * 100;
+    const { shouldAnimate, comments } = this.state;
 
-    const { shouldAnimate } = this.state;
+    // Remove comment elements that we don't want anymore. This should be
+    // React-ified better...
+    for (const [id, elem] of gCommentElements) {
+      if (!comments.some(c => c.id == id)) {
+        elem.remove();
+        gCommentElements.delete(id);
+      }
+    }
+
     return div(
       {
         className: "replay-player",
@@ -937,7 +1001,8 @@ export class Timeline extends Component {
             ...this.renderZoomedRegion()
           ),
           this.renderZoom(),
-          this.renderComment()
+          this.renderCommentButton(),
+          ...comments.map(c => this.renderComment(c))
         )
       )
     );

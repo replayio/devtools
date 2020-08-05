@@ -63,6 +63,7 @@ const gBackgroundImages = {
   ".comment-close": require("devtools/client/themes/images/close.svg"),
   ".comment-write": require("devtools/client/themes/images/pen.svg"),
   ".comment-confirm": require("devtools/client/themes/images/check.svg"),
+  ".comment-jump": require("devtools/client/debugger/images/next-circle.svg"),
 };
 
 const gMaskImages = {

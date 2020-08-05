@@ -131,7 +131,7 @@ if (!test) {
 setTimeout(async () => {
   // Wait for CodeMirror to load asynchronously.
   while (!window.CodeMirror) {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   if (!test) {
