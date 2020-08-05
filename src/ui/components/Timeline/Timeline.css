@@ -406,3 +406,17 @@
   font-family: ui-rounded;
   font-size: medium;
 }
+
+.replay-player .comment-marker {
+  position: absolute;
+  height: 100%;
+  width: 7px;
+  height: 7px;
+  border-radius: 4.5px;
+  top: calc(50% - 3.5px);
+  background-color: red;
+}
+
+.replay-player .comment-marker:hover {
+  cursor: pointer;
+}

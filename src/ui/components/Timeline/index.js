@@ -105,13 +105,12 @@ function createCommentElement(comment, callbacks) {
   const closeButton = document.createElement("button");
   closeButton.className = "comment-close";
   element.appendChild(closeButton);
-  closeButton.addEventListener("click", () => {
-    callbacks.closeComment();
-  });
+  closeButton.addEventListener("click", callbacks.closeComment);
 
   const jumpButton = document.createElement("button");
   jumpButton.className = "comment-jump";
   element.appendChild(jumpButton);
+  jumpButton.addEventListener("click", callbacks.jumpToComment);
 
   const confirmButton = document.createElement("button");
   confirmButton.className = "comment-confirm";
@@ -222,6 +221,7 @@ export class Timeline extends Component {
       messages: [],
       highlightedMessage: null,
       hoveredMessage: null,
+      hoveredComment: null,
       unprocessedRegions: [],
       shouldAnimate: true,
       recordingDuration: 0,
@@ -502,7 +502,7 @@ export class Timeline extends Component {
 
   onPlayerMouseUp = e => {
     const { setZoomRegion } = this.props;
-    const { hoverTime, startDragTime, currentTime, hoveredMessage } = this.state;
+    const { hoverTime, startDragTime, currentTime, hoveredMessage, hoveredComment } = this.state;
     const mouseTime = this.getMouseTime(e);
 
     this.setState({ startDragTime: null });
@@ -518,7 +518,7 @@ export class Timeline extends Component {
       } else if (zoomRegion.endTime < currentTime) {
         this.seekTime(zoomRegion.endTime);
       }
-    } else if (startDragTime != null && hoverTime != null && !hoveredMessage) {
+    } else if (startDragTime != null && hoverTime != null && !hoveredMessage && !hoveredComment) {
       const { point, time } = mostRecentPaintOrMouseEvent(mouseTime);
       this.seek(point, mouseTime);
     }
@@ -686,7 +686,9 @@ export class Timeline extends Component {
     const { comments, currentTime } = this.state;
     const comment = {
       id: (Math.random() * 1e9) | 0,
+      visible: true,
       point: this.threadFront.currentPoint,
+      hasFrames: this.threadFront.currentPointHasFrames,
       time: currentTime,
       contents: "",
     };
@@ -705,11 +707,22 @@ export class Timeline extends Component {
   }
 
   renderComment(comment) {
+    if (!comment.visible) {
+      return;
+    }
     const elem = ensureCommentElement(comment, {
       closeComment: () => {
         this.setState({
-          comments: [...this.state.comments.filter(c => c.id != comment.id)],
+          comments: this.state.comments.map(c => {
+            if (c.id == comment.id) {
+              return { ...c, visible: false };
+            }
+            return c;
+          }),
         });
+      },
+      jumpToComment: () => {
+        this.seek(comment.point, comment.time, comment.hasFrames);
       },
     });
     const offset = this.getPixelOffset(comment.time);
@@ -871,9 +884,53 @@ export class Timeline extends Component {
     });
   }
 
+  onCommentMouseEnter(comment) {
+    this.setState({ hoveredComment: comment });
+  }
+
+  onCommentMouseLeave() {
+    this.setState({ hoveredComment: null });
+  }
+
+  renderCommentMarker(comment) {
+    if (comment.time < this.zoomStartTime || comment.time > this.zoomEndTime) {
+      return;
+    }
+
+    const middlePercent = this.getVisiblePosition(comment.time) * 100;
+    const widthPercent = markerWidth / this.overlayWidth * 100;
+    const percent = Math.max(middlePercent - widthPercent / 2, 0);
+
+    return dom.a({
+      className: classname("comment-marker"),
+      style: {
+        left: `${percent}%`,
+        zIndex: 100000, // Render comments in front of other markers
+      },
+      title: "Show comment",
+      onClick: e => {
+        this.setState({
+          comments: this.state.comments.map(c => {
+            if (c.id == comment.id) {
+              return { ...c, visible: true };
+            }
+            return c;
+          }),
+        });
+      },
+      onMouseEnter: () => this.onCommentMouseEnter(comment),
+      onMouseLeave: () => this.onCommentMouseLeave(),
+    });
+  }
+
+  renderCommentMarkers() {
+    const comments = this.state.comments;
+    return comments.map(comment => this.renderCommentMarker(comment));
+  }
+
   renderHoverPoint() {
-    const { hoverTime, hoveredMessage, screen } = this.state;
-    if (hoverTime == null || hoveredMessage) {
+    const { hoverTime, hoveredMessage, hoveredComment, screen } = this.state;
+    if (hoverTime == null || hoveredMessage, hoveredComment) {
       return [];
     }
     const offset = this.getPixelOffset(hoverTime);
@@ -951,7 +1008,7 @@ export class Timeline extends Component {
     // Remove comment elements that we don't want anymore. This should be
     // React-ified better...
     for (const [id, elem] of gCommentElements) {
-      if (!comments.some(c => c.id == id)) {
+      if (!comments.some(c => c.id == id && c.visible)) {
         elem.remove();
         gCommentElements.delete(id);
       }
@@ -996,6 +1053,7 @@ export class Timeline extends Component {
               style: { left: `${percent}%`, width: `${100 - percent}%` },
             }),
             ...this.renderMessages(),
+            ...this.renderCommentMarkers(),
             ...this.renderHoverPoint(),
             ...this.renderUnprocessedRegions(),
             ...this.renderZoomedRegion()
