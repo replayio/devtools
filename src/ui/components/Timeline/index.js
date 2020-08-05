@@ -215,8 +215,7 @@ export class Timeline extends Component {
       playback: null,
       messages: [],
       highlightedMessage: null,
-      hoveredMessage: null,
-      hoveredComment: null,
+      hoveringOverMarker: false,
       unprocessedRegions: [],
       shouldAnimate: true,
       recordingDuration: 0,
@@ -405,12 +404,12 @@ export class Timeline extends Component {
     this.previewLocation(message);
   }
 
-  onMessageMouseEnter(message) {
-    this.setState({ hoveredMessage: message });
+  onMarkerMouseEnter() {
+    this.setState({ hoveringOverMarker: true });
   }
 
-  onMessageMouseLeave() {
-    this.setState({ hoveredMessage: null });
+  onMarkerMouseLeave() {
+    this.setState({ hoveringOverMarker: false });
   }
 
   async previewLocation(closestMessage) {
@@ -496,7 +495,7 @@ export class Timeline extends Component {
 
   onPlayerMouseUp = e => {
     const { setZoomRegion } = this.props;
-    const { hoverTime, startDragTime, currentTime, hoveredMessage, hoveredComment } = this.state;
+    const { hoverTime, startDragTime, currentTime, hoveringOverMarker } = this.state;
     const mouseTime = this.getMouseTime(e);
 
     this.setState({ startDragTime: null });
@@ -512,7 +511,7 @@ export class Timeline extends Component {
       } else if (zoomRegion.endTime < currentTime) {
         this.seekTime(zoomRegion.endTime);
       }
-    } else if (startDragTime != null && hoverTime != null && !hoveredMessage && !hoveredComment) {
+    } else if (startDragTime != null && hoverTime != null && !hoveringOverMarker) {
       const { point, time } = mostRecentPaintOrMouseEvent(mouseTime);
       this.seek(point, mouseTime);
     }
@@ -908,8 +907,8 @@ export class Timeline extends Component {
         this.seek(executionPoint, executionPointTime, executionPointHasFrames);
         this.showMessage(message);
       },
-      onMouseEnter: () => this.onMessageMouseEnter(message),
-      onMouseLeave: () => this.onMessageMouseLeave(),
+      onMouseEnter: () => this.onMarkerMouseEnter(),
+      onMouseLeave: () => this.onMarkerMouseLeave(),
     });
   }
 
@@ -924,14 +923,6 @@ export class Timeline extends Component {
       }
       return messageEl;
     });
-  }
-
-  onCommentMouseEnter(comment) {
-    this.setState({ hoveredComment: comment });
-  }
-
-  onCommentMouseLeave() {
-    this.setState({ hoveredComment: null });
   }
 
   renderCommentMarker(comment) {
@@ -951,8 +942,8 @@ export class Timeline extends Component {
       },
       title: "Show comment",
       onClick: e => this.setCommentVisible(comment, true),
-      onMouseEnter: () => this.onCommentMouseEnter(comment),
-      onMouseLeave: () => this.onCommentMouseLeave(),
+      onMouseEnter: () => this.onMarkerMouseEnter(),
+      onMouseLeave: () => this.onMarkerMouseLeave(),
     });
   }
 
@@ -962,8 +953,8 @@ export class Timeline extends Component {
   }
 
   renderHoverPoint() {
-    const { hoverTime, hoveredMessage, hoveredComment, screen } = this.state;
-    if (hoverTime == null || hoveredMessage || hoveredComment) {
+    const { hoverTime, hoveringOverMarker, screen } = this.state;
+    if (hoverTime == null || hoveringOverMarker) {
       return [];
     }
     const offset = this.getPixelOffset(hoverTime);
