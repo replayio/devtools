@@ -351,3 +351,51 @@
 .replay-player .overlay-container {
   display: flex;
 }
+
+.comment-box {
+  background-color: white;
+  border-radius: 10px;
+  border: 2px solid;
+  width: 200px;
+  height: 120px;
+}
+
+.comment-write {
+  width: 20px;
+  height: 20px;
+  float: right;
+  transform: scale(0.7);
+}
+
+.comment-confirm {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  float: right;
+}
+
+.comment-close {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  margin-right: 2px;
+  float: right;
+}
+
+.comment-input {
+  resize: none;
+  border: none;
+  width: calc(100% - 8px);
+  height: calc(100% - 22px);
+  margin-left: 4px;
+  font-family: ui-rounded;
+}
+
+.comment-contents {
+  width: calc(100% - 8px);
+  height: calc(100% - 22px);
+  margin-top: 18px;
+  margin-left: 4px;
+  font-family: ui-rounded;
+  font-size: medium;
+}

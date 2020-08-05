@@ -60,6 +60,9 @@ const gBackgroundImages = {
   ".invoke-confirm .close-confirm-dialog-button::before": require("devtools/client/debugger/images/close.svg"),
   ".invoke-confirm .learn-more-link::after": require("devtools/client/themes/images/help.svg"),
   "#header .logo": require("./images/logo.svg"),
+  ".comment-close": require("devtools/client/themes/images/close.svg"),
+  ".comment-write": require("devtools/client/themes/images/pen.svg"),
+  ".comment-confirm": require("devtools/client/themes/images/check.svg"),
 };
 
 const gMaskImages = {

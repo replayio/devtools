@@ -66,6 +66,7 @@ function CommandButton({ img, className, onClick, active }) {
     pause: SVG.ReplayPause,
     play: SVG.ReplayResume,
     zoomout: SVG.ZoomOut,
+    comment: SVG.Comment,
   };
 
   const attrs = {
@@ -87,6 +88,63 @@ function CommandButton({ img, className, onClick, active }) {
       },
     })
   );
+}
+
+function createCommentElement(contents) {
+  const comment = document.createElement("div");
+
+  document.body.appendChild(comment);
+  comment.className = "comment-box";
+  comment.style.position = "absolute";
+  comment.style.left = "0px";
+  comment.style.top = "0px";
+
+  let contentsElement;
+
+  const closeButton = document.createElement("button");
+  closeButton.className = "comment-close";
+  comment.appendChild(closeButton);
+  closeButton.addEventListener("click", () => comment.remove());
+
+  const confirmButton = document.createElement("button");
+  confirmButton.className = "comment-confirm";
+  comment.appendChild(confirmButton);
+  confirmButton.addEventListener("click", () => {
+    contents = contentsElement.value;
+    createContentsElement(false);
+  });
+
+  const writeButton = document.createElement("button");
+  writeButton.className = "comment-write";
+  comment.appendChild(writeButton);
+  writeButton.addEventListener("click", () => {
+    contents = contentsElement.innerText;
+    createContentsElement(true);
+  });
+
+  createContentsElement(!contents);
+
+  function createContentsElement(isInput) {
+    if (contentsElement) {
+      contentsElement.remove();
+    }
+    if (isInput) {
+      contentsElement = document.createElement("textarea");
+      contentsElement.className = "comment-input";
+      contentsElement.value = contents || "";
+      comment.appendChild(contentsElement);
+      contentsElement.focus();
+      writeButton.style.display = "none";
+      confirmButton.style.display = "inline";
+    } else {
+      contentsElement = document.createElement("div");
+      contentsElement.className = "comment-contents";
+      contentsElement.innerText = contents || "";
+      comment.appendChild(contentsElement);
+      writeButton.style.display = "inline";
+      confirmButton.style.display = "none";
+    }
+  }
 }
 
 function getMessageProgress(message) {
@@ -598,6 +656,19 @@ export class Timeline extends Component {
     });
   }
 
+  startNewComment() {
+    this.newComment = createCommentElement();
+  }
+
+  renderComment() {
+    return CommandButton({
+      className: "",
+      active: true,
+      img: "comment",
+      onClick: () => this.startNewComment(),
+    });
+  }
+
   renderCommands() {
     const { playback } = this.state;
 
@@ -865,7 +936,8 @@ export class Timeline extends Component {
             ...this.renderUnprocessedRegions(),
             ...this.renderZoomedRegion()
           ),
-          this.renderZoom()
+          this.renderZoom(),
+          this.renderComment()
         )
       )
     );
