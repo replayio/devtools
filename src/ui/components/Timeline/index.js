@@ -166,6 +166,17 @@ function ensureCommentElement(comment, callbacks) {
   return elem;
 }
 
+// Remove any comment elements that are not visible in the given comments.
+// This should be React-ified better...
+function removeOldCommentElements(comments) {
+  for (const [id, elem] of gCommentElements) {
+    if (!comments.some(c => c.id == id && c.visible)) {
+      elem.remove();
+      gCommentElements.delete(id);
+    }
+  }
+}
+
 function sameLocation(m1, m2) {
   const f1 = m1.frame;
   const f2 = m2.frame;
@@ -701,20 +712,22 @@ export class Timeline extends Component {
   }
 
   setCommentVisible(comment, visible) {
-    this.setState({
-      comments: this.state.comments.map(c => {
-        if (c.id == comment.id) {
-          return { ...c, visible };
-        }
-        return c;
-      }),
+    const comments = this.state.comments.map(c => {
+      if (c.id == comment.id) {
+        return { ...c, visible };
+      }
+      return c;
     });
+    this.setState({ comments });
+    if (!visible) {
+      removeOldCommentElements(comments);
+    }
   }
 
   removeComment(comment) {
-    this.setState({
-      comments: this.state.comments.filter(c => c.id != comment.id),
-    });
+    const comments = this.state.comments.filter(c => c.id != comment.id);
+    this.setState({ comments });
+    removeOldCommentElements(comments);
   }
 
   renderComment(comment) {
@@ -760,20 +773,20 @@ export class Timeline extends Component {
     elem.style.top = this.overlayTop - bounds.height - 5;
   }
 
-  onComments(comments) {
-    this.setState({
-      comments: [
-        ...(comments || []).map(comment => {
-          // Comments are visible by default, unless they have been closed in
-          // the local session. Ignore the visible value we get from the server.
-          const visible = !this.state.comments.some(
-            c => c.id == comment.id && !c.visible
-          );
-          return { ...comment, visible };
-        }),
-        ...this.state.comments.filter(c => !c.saved),
-      ],
-    });
+  onComments(newComments) {
+    const comments = [
+      ...(newComments || []).map(comment => {
+        // Comments are visible by default, unless they have been closed in
+        // the local session. Ignore the visible value we get from the server.
+        const visible = !this.state.comments.some(
+          c => c.id == comment.id && !c.visible
+        );
+        return { ...comment, visible };
+      }),
+      ...this.state.comments.filter(c => !c.saved),
+    ];
+    this.setState({ comments });
+    removeOldCommentElements(comments);
   }
 
   renderCommands() {
@@ -1028,15 +1041,6 @@ export class Timeline extends Component {
   render() {
     const percent = this.getVisiblePosition(this.state.currentTime) * 100;
     const { shouldAnimate, comments } = this.state;
-
-    // Remove comment elements that we don't want anymore. This should be
-    // React-ified better...
-    for (const [id, elem] of gCommentElements) {
-      if (!comments.some(c => c.id == id && c.visible)) {
-        elem.remove();
-        gCommentElements.delete(id);
-      }
-    }
 
     return div(
       {
