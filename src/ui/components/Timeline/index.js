@@ -148,7 +148,8 @@ function createCommentElement(comment, callbacks) {
       contentsElement.className = "comment-contents";
       contentsElement.innerText = comment.contents;
       element.appendChild(contentsElement);
-      writeButton.style.display = "inline";
+      // Comments identifying users can't be edited.
+      writeButton.style.display = comment.isUser ? "none" : "inline";
       confirmButton.style.display = "none";
     }
   }
@@ -200,6 +201,11 @@ let gCurrentMouse;
 
 // Metadata key used to store comments.
 const CommentsMetadata = "devtools-comments";
+
+// When viewing a recording, we add a comment and move it around to indicate the
+// point we are currently looking at. Since we don't have user accounts, make up
+// a short name to identify us when other people view the recording.
+//const UserComment = `User #${(Math.random() * 100) | 0}`;
 
 export class Timeline extends Component {
   static get propTypes() {
@@ -253,7 +259,7 @@ export class Timeline extends Component {
     this.threadFront.on("paused", this.onPaused.bind(this));
     this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
     this.threadFront.warpCallback = this.onWarp.bind(this);
-    this.threadFront.watchMetadata(CommentsMetadata, this.onComments.bind(this));
+    this.threadFront.watchMetadata(CommentsMetadata, this.onCommentsUpdate.bind(this));
 
     const description = await this.threadFront.getRecordingDescription();
     this.setRecordingDescription(description);
@@ -550,8 +556,35 @@ export class Timeline extends Component {
     this.seek(point, targetTime);
   }
 
-  async onPaused({ time }) {
+  async onPaused({ point, hasFrames, time }) {
     this.setState({ currentTime: time, playback: null });
+
+    // Update the users metadata so that other people visiting the recording can
+    // see where we are. This functionality is currently disabled: without user
+    // accounts, other tabs viewing the same recording will look like other
+    // users, and we end up cluttering the UI even when there is a single actual
+    // user viewing the recording. This will be revisited soon...
+    /*
+    const comment = {
+      id: this.threadFront.sessionId,
+      point,
+      hasFrames,
+      time,
+      contents: UserComment,
+      saved: true,
+      isUser: true,
+    };
+    this.threadFront.updateMetadata(
+      CommentsMetadata,
+      comments => {
+        // Stop trying to update if the thread has moved somewhere else.
+        if (this.threadFront.currentPoint != point) {
+          return null;
+        }
+        return [...(comments || []).filter(c => c.id != comment.id), comment];
+      }
+    );
+    */
 
     const { screen, mouse } = await getGraphicsAtTime(time);
     if (this.state.currentTime == time) {
@@ -773,15 +806,21 @@ export class Timeline extends Component {
     elem.style.top = this.overlayTop - bounds.height - 5;
   }
 
-  onComments(newComments) {
+  isServerCommentVisible(comment) {
+    // Comments are visible by default, unless they have been closed in
+    // the local session. Ignore the visible value we get from the server.
+    return !this.state.comments.some(
+      c => c.id == comment.id && !c.visible
+    );
+  }
+
+  onCommentsUpdate(newComments) {
     const comments = [
-      ...(newComments || []).map(comment => {
-        // Comments are visible by default, unless they have been closed in
-        // the local session. Ignore the visible value we get from the server.
-        const visible = !this.state.comments.some(
-          c => c.id == comment.id && !c.visible
-        );
-        return { ...comment, visible };
+      ...(newComments || []).filter(comment => {
+        // Ignore the comment for our own location.
+        return comment.id != this.threadFront.sessionId;
+      }).map(comment => {
+        return { ...comment, visible: this.isServerCommentVisible(comment) };
       }),
       ...this.state.comments.filter(c => !c.saved),
     ];

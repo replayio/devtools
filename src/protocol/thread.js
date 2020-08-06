@@ -1248,7 +1248,7 @@ const ThreadFront = {
     this.currentPointHasFrames = hasFrames;
     this.currentPause = null;
     this.asyncPauses.length = 0;
-    this.emit("paused", { point, time });
+    this.emit("paused", { point, hasFrames, time });
 
     this._precacheResumeTargets();
   },
@@ -1868,15 +1868,18 @@ const ThreadFront = {
   async updateMetadata(key, callback) {
     // Keep trying to update the metadata until it succeeds --- we updated it
     // before anyone else did. Use the callback to compute the new value in
-    // terms of the old value.
+    // terms of the old value. The callback can return null to cancel the update.
     let { value } = await sendMessage("Recording.getMetadata", {
       recordingId: this.recordingId,
       key,
     });
     while (true) {
-      const newValue = JSON.stringify(
-        callback(value ? JSON.parse(value) : undefined)
-      );
+      const newValueRaw = callback(value ? JSON.parse(value) : undefined);
+      if (!newValueRaw) {
+        // The update was cancelled.
+        return;
+      }
+      const newValue = JSON.stringify(newValueRaw);
       const { updated, currentValue } = await sendMessage("Recording.setMetadata", {
         recordingId: this.recordingId,
         key,
