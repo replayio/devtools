@@ -254,7 +254,7 @@ class App extends Component<Props, State> {
 
     return (
       <SplitBox
-        style={{ width: "100vw" }}
+        style={{ width: "100%" }}
         initialSize={prefs.endPanelSize}
         minSize={30}
         maxSize="70%"
@@ -266,7 +266,7 @@ class App extends Component<Props, State> {
         }}
         startPanel={
           <SplitBox
-            style={{ width: "100vw" }}
+            style={{ width: "100%" }}
             initialSize={prefs.startPanelSize}
             minSize={30}
             maxSize="85%"

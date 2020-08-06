@@ -299,17 +299,17 @@ function refreshGraphics() {
 
   const scale = Math.min(bounds.width / image.width, bounds.height / image.height, 1);
 
-  canvas.width = image.width;
-  canvas.height = image.height;
-  canvas.style.transform = `scale(${scale})`;
+  // canvas.width = image.width;
+  // canvas.height = image.height;
+  // canvas.style.transform = `scale(${scale})`;
 
-  const drawWidth = image.width * scale;
-  const drawHeight = image.height * scale;
-  const offsetLeft = (bounds.width - drawWidth) / 2;
-  const offsetTop = (bounds.height - drawHeight) / 2;
+  // const drawWidth = image.width * scale;
+  // const drawHeight = image.height * scale;
+  // const offsetLeft = (bounds.width - drawWidth) / 2;
+  // const offsetTop = (bounds.height - drawHeight) / 2;
 
-  canvas.style.left = offsetLeft;
-  canvas.style.top = offsetTop;
+  // canvas.style.left = offsetLeft;
+  // canvas.style.top = offsetTop;
 
   const cx = canvas.getContext("2d");
   cx.drawImage(image, 0, 0);

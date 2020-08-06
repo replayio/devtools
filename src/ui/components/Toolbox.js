@@ -427,7 +427,7 @@ class Toolbox extends React.Component {
           })}
         >
           <SplitBox
-            style={{ width: "100vw", overflow: "hidden" }}
+            style={{ width: "100%", overflow: "hidden" }}
             {...this.getSplitBoxDimensions()}
             splitterSize={1}
             vert={false}

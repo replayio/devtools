@@ -7,6 +7,8 @@
 #viewer {
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: row;
   width: 100%;
   height: 100%;
   background-color: #ececec;
@@ -14,14 +16,10 @@
 }
 
 #graphics {
+  flex-grow: 1;
   position: relative;
   transform-origin: top left;
   z-index: -1; /* Draw canvas behind the highlighter overlay. */
-}
-
-#viewer-text {
-  position: absolute;
-  font-size: x-large;
 }
 
 #header {
@@ -101,6 +99,10 @@
   width: 100%;
   height: 100%;
   z-index: 99;
+}
+
+.A11y-mouse {
+  width: 100%;
 }
 
 @import url("devtools/client/themes/variables.css");

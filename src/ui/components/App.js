@@ -1,12 +1,13 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
+import { connect } from "react-redux";
 
 import Toolbox from "./Toolbox";
 import Tooltip from "./Tooltip";
 import Comments from "./Comments";
 
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import { connect } from "react-redux";
+import EventsTimeline from "./EventsTimeline";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 
@@ -34,12 +35,29 @@ class App extends React.Component {
     }
   }
 
-  renderGraphics() {
+  // renderTooltip(tooltip) {
+  //   if (!tooltip) {
+  //     return null;
+  //   }
+
+  //   return (
+  //     <div className="timeline-tooltip" style={{ left: tooltip.left }}>
+  //       {tooltip.screen && (
+  //         <img
+  //           className="timeline-tooltip-image"
+  //           src={`data:${tooltip.screen.mimeType};base64,${tooltip.screen.data}`}
+  //         />
+  //       )}
+  //     </div>
+  //   );
+  // }
+
+  renderViewer() {
     const { tooltip } = this.props;
     return (
       <div id="viewer">
         <canvas id="graphics"></canvas>
-        <div id="viewer-text"></div>
+        <EventsTimeline />
         <div id="highlighter-root"></div>
         <Tooltip tooltip={tooltip} />
       </div>
@@ -54,11 +72,11 @@ class App extends React.Component {
 
     let startPanel, endPanel;
     if (orientation == "bottom" || orientation == "right") {
-      startPanel = this.renderGraphics();
+      startPanel = this.renderViewer();
       endPanel = toolbox;
     } else {
       startPanel = toolbox;
-      endPanel = this.renderGraphics();
+      endPanel = this.renderViewer();
     }
 
     const vert = orientation != "bottom";
@@ -71,19 +89,23 @@ class App extends React.Component {
         </div>
         <Comments />
         {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
-
-        <SplitBox
-          style={{ width: "100vw", overflow: "hidden" }}
-          splitterSize={1}
-          initialSize="50%"
-          minSize="20%"
-          maxSize="80%"
-          vert={vert}
-          onMove={num => updateTimelineDimensions()}
-          startPanel={startPanel}
-          endPanelControl={false}
-          endPanel={endPanel}
-        />
+        <div
+          className="outer-viewer"
+          style={{ display: "flex", height: "100%", flexDirection: "row" }}
+        >
+          <SplitBox
+            style={{ flexGrow: "1", overflow: "hidden" }}
+            splitterSize={1}
+            initialSize="50%"
+            minSize="20%"
+            maxSize="80%"
+            vert={vert}
+            onMove={num => updateTimelineDimensions()}
+            startPanel={startPanel}
+            endPanelControl={false}
+            endPanel={endPanel}
+          />
+        </div>
       </>
     );
   }
