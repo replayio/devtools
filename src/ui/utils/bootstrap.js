@@ -48,6 +48,7 @@ function setupAppHelper(store) {
     store,
     actions: bindActionCreators(actions, store.dispatch),
     selectors: bindSelectors({ store, selectors }),
+    prefs,
     local: () => {
       const params = new URLSearchParams(document.location.search.substring(1));
       window.location = `http://localhost:8080/index.html?id=${params.get("id")}`;
@@ -110,8 +111,12 @@ function registerStoreObserver(store, subscriber) {
 }
 
 function updatePrefs(state, oldState) {
-  const { isSplitConsoleOpen } = selectors;
+  const { isSplitConsoleOpen, getSelectedPanel } = selectors;
   if (isSplitConsoleOpen(state) != isSplitConsoleOpen(oldState)) {
     prefs.splitConsole = isSplitConsoleOpen(state);
+  }
+
+  if (getSelectedPanel(state) != getSelectedPanel(oldState)) {
+    prefs.selectedPanel = getSelectedPanel(state);
   }
 }
