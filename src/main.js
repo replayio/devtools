@@ -57,6 +57,7 @@ const { throttle, clamp, EventEmitter } = require("protocol/utils");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap");
 const FullStory = require("@fullstory/browser");
+const { setupTimeline } = require("./ui/actions/timeline");
 
 // Create a session to use while debugging.
 async function createSession() {
@@ -96,7 +97,13 @@ function onSessionError({ message }) {
   setStatus(`Error: ${message}`);
 }
 
+let initialized = false;
 async function initialize() {
+  if (initialized) {
+    return;
+  }
+
+  initialized = true;
   loadImages();
 
   if (!recordingId) {
@@ -141,5 +148,6 @@ setTimeout(async () => {
     });
   }
 
-  bootstrapApp({ initialize });
+  store = bootstrapApp({ initialize });
+  setupTimeline(recordingId, store);
 }, 0);

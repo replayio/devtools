@@ -10,6 +10,8 @@
 import { connect } from "react-redux";
 import { Component } from "react";
 import ReactDOM from "react-dom";
+import React from "react";
+
 import dom from "react-dom-factories";
 import PropTypes from "prop-types";
 import { sortBy, range } from "lodash";
@@ -23,10 +25,8 @@ const {
   previousPaintEvent,
   getGraphicsAtTime,
   paintGraphics,
-  addLastScreen,
   setResizeTimelineCallback,
 } = require("protocol/graphics");
-const { pointEquals, pointPrecedes } = require("protocol/execution-point-utils.js");
 const { clamp } = require("protocol/utils");
 
 import { actions } from "../../actions";
@@ -44,8 +44,6 @@ import "./Timeline.css";
 
 const markerWidth = 7;
 const imgDir = "devtools/skin/images";
-
-const url = new URL(window.location.href);
 
 function classname(name, bools) {
   for (const key in bools) {
@@ -262,10 +260,6 @@ function getMessageLocation(message) {
   return { sourceUrl: source, line, column };
 }
 
-// Graphics for the place where the thread is currently paused.
-let gCurrentScreenShot;
-let gCurrentMouse;
-
 // Metadata key used to store comments.
 const CommentsMetadata = "devtools-comments";
 
@@ -293,16 +287,6 @@ export class Timeline extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentTime: 0,
-      hoverTime: null,
-      startDragTime: null,
-      playback: null,
-      messages: [],
-      highlightedMessage: null,
-      hoveringOverMarker: false,
-      unprocessedRegions: [],
-      shouldAnimate: true,
-      recordingDuration: 0,
       comments: [],
       numResizes: 0,
     };
@@ -313,24 +297,15 @@ export class Timeline extends Component {
   }
 
   async componentDidMount() {
-    this.updateOverlayDimensions();
-    this.threadFront.ensureProcessed(
-      this.onMissingRegions.bind(this),
-      this.onUnprocessedRegions.bind(this)
-    );
+    this.updateOverlayWidth();
+    this.overlayWidth = this.updateOverlayWidth();
+    this.threadFront.ensureProcessed(this.onMissingRegions, this.onUnprocessedRegions);
 
     const consoleFrame = this.console.hud.ui;
     consoleFrame.on("message-hover", this.onConsoleMessageHover);
     consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate);
 
-    this.threadFront.on("paused", this.onPaused.bind(this));
-    this.threadFront.setOnEndpoint(this.onEndpoint.bind(this));
-    this.threadFront.warpCallback = this.onWarp.bind(this);
     this.threadFront.watchMetadata(CommentsMetadata, this.onCommentsUpdate.bind(this));
-
-    const description = await this.threadFront.getRecordingDescription();
-    this.setRecordingDescription(description);
-
     // Use this stupid hack to re-render the timeline whenever the canvas is
     // resized so that we reposition any visible comments.
     setResizeTimelineCallback(() => {
@@ -339,51 +314,11 @@ export class Timeline extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    this.updateOverlayDimensions();
+    this.updateOverlayWidth();
 
-    if (prevState.closestMessage != this.state.closestMessage) {
-      this.scrollToMessage(this.state.closestMessage);
+    if (prevState.closestMessage != this.props.closestMessage) {
+      this.scrollToMessage(this.props.closestMessage);
     }
-  }
-
-  setRecordingDescription({ duration, lastScreen }) {
-    this.setState({
-      recordingDuration: duration,
-      currentTime: duration,
-    });
-
-    this.props.setZoomRegion({ startTime: this.zoomStartTime, endTime: duration });
-
-    // Paint the last screen to get it up quickly, even though we don't know yet
-    // which execution point this is and have warped here.
-    gCurrentScreenShot = lastScreen;
-    paintGraphics(lastScreen);
-  }
-
-  onEndpoint({ point, time }) {
-    // This could be called before setRecordingDescription.
-    // These two methods should be commoned up.
-    addLastScreen(gCurrentScreenShot, point, time);
-    this.setState({
-      zoomEndTime: time,
-      currentTime: time,
-    });
-  }
-
-  // This callback is used to restrict warping by the thread to the region where
-  // we are currently zoomed.
-  onWarp(point, time) {
-    if (time < this.zoomStartTime) {
-      const startPoint = mostRecentPaintOrMouseEvent(this.zoomStartTime).point;
-      return { point: startPoint, time: this.zoomStartTime };
-    }
-
-    if (time > this.zoomEndTime) {
-      const endPoint = mostRecentPaintOrMouseEvent(this.zoomEndTime).point;
-      return { point: endPoint, time: this.zoomEndTime };
-    }
-
-    return null;
   }
 
   get toolbox() {
@@ -411,45 +346,45 @@ export class Timeline extends Component {
     return this.zoomStartTime + (this.zoomEndTime - this.zoomStartTime) * clickPosition;
   }
 
-  onMissingRegions(regions) {
+  onMissingRegions = regions => {
     log(`MissingRegions ${JSON.stringify(regions)}`);
-  }
+  };
 
-  onUnprocessedRegions({ regions }) {
+  onUnprocessedRegions = ({ regions }) => {
     log(`UnprocessedRegions ${JSON.stringify(regions)}`);
-    this.setState({ unprocessedRegions: regions });
-  }
+    this.props.setTimelineState({ unprocessedRegions: regions });
+  };
 
   onConsoleUpdate = consoleState => {
     const {
       messages: { visibleMessages, messagesById },
     } = consoleState;
 
-    if (visibleMessages != this.state.visibleMessages) {
+    if (visibleMessages != this.props.visibleMessages) {
       const messages = visibleMessages
         .map(id => messagesById.get(id))
         .filter(message => message.source == "console-api" || isError(message));
 
-      this.setState({ messages, visibleMessages, shouldAnimate: false });
+      this.props.setTimelineState({ messages, visibleMessages });
     }
   };
 
   // Called when hovering over a message in the console.
   onConsoleMessageHover = async (type, message) => {
-    const { updateTooltip } = this.props;
+    const { updateTooltip, highlightedMessage } = this.props;
     if (type == "mouseleave") {
       updateTooltip(null);
-      return this.setState({ highlightedMessage: null });
+      return this.props.setTimelineState({ highlightedMessage: null });
     }
 
     if (type == "mouseenter") {
       const time = message.executionPointTime;
       const offset = this.getPixelOffset(time);
       updateTooltip({ left: offset });
-      this.setState({ highlightedMessage: message.id });
+      this.props.setTimelineState({ highlightedMessage: message.id });
       const { screen, mouse } = await getGraphicsAtTime(time);
 
-      if (this.state.highlightedMessage === message.id) {
+      if (highlightedMessage === message.id) {
         updateTooltip({ screen, left: offset });
       }
     }
@@ -480,8 +415,8 @@ export class Timeline extends Component {
   }
 
   unhighlightConsoleMessage() {
-    if (this.state.highlightedMessage) {
-      this.setState({ highlightedMessage: null });
+    if (this.props.highlightedMessage) {
+      this.props.setTimelineState({ highlightedMessage: null });
     }
   }
 
@@ -523,8 +458,7 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseMove = async e => {
-    const { hoverTime, recordingDuration } = this.state;
-    const { updateTooltip } = this.props;
+    const { hoverTime, recordingDuration, updateTooltip } = this.props;
     if (!recordingDuration) {
       return;
     }
@@ -533,11 +467,11 @@ export class Timeline extends Component {
     const { point, time } = mostRecentPaintOrMouseEvent(mouseTime);
 
     if (hoverTime != time) {
-      this.setState({ hoverTime: mouseTime });
+      this.props.setTimelineState({ hoverTime: mouseTime });
       updateTooltip({ left: this.getPixelOffset(hoverTime) });
 
       const { screen, mouse } = await getGraphicsAtTime(time);
-      if (this.state.hoverTime === mouseTime) {
+      if (hoverTime === mouseTime) {
         updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
       }
     }
@@ -553,18 +487,18 @@ export class Timeline extends Component {
     // Restore the normal graphics.
 
     updateTooltip(null);
-    this.setState({ hoverTime: null, startDragTime: null });
+    this.props.setTimelineState({ hoverTime: null, startDragTime: null });
   };
 
   onPlayerMouseDown = () => {
-    const { hoverTime } = this.state;
+    const { hoverTime, setTimelineState } = this.props;
     if (hoverTime != null) {
-      this.setState({ startDragTime: hoverTime });
+      setTimelineState({ startDragTime: hoverTime });
     }
   };
 
   zoomedRegion() {
-    const { startDragTime, hoverTime } = this.state;
+    const { startDragTime, hoverTime } = this.props;
     if (startDragTime == null || hoverTime == null) {
       return null;
     }
@@ -580,11 +514,17 @@ export class Timeline extends Component {
   }
 
   onPlayerMouseUp = e => {
-    const { setZoomRegion } = this.props;
-    const { hoverTime, startDragTime, currentTime, hoveringOverMarker } = this.state;
+    const {
+      setZoomRegion,
+      hoverTime,
+      startDragTime,
+      currentTime,
+      hoveredMessage,
+      hoveringOverMarker,
+    } = this.props;
     const mouseTime = this.getMouseTime(e);
 
-    this.setState({ startDragTime: null });
+    this.props.setTimelineState({ startDragTime: null });
 
     const zoomRegion = this.zoomedRegion();
     if (zoomRegion) {
@@ -625,46 +565,8 @@ export class Timeline extends Component {
     this.seek(point, targetTime);
   }
 
-  async onPaused({ point, hasFrames, time }) {
-    this.setState({ currentTime: time, playback: null });
-
-    // Update the users metadata so that other people visiting the recording can
-    // see where we are. This functionality is currently disabled: without user
-    // accounts, other tabs viewing the same recording will look like other
-    // users, and we end up cluttering the UI even when there is a single actual
-    // user viewing the recording. This will be revisited soon...
-    /*
-    const comment = {
-      id: this.threadFront.sessionId,
-      point,
-      hasFrames,
-      time,
-      contents: UserComment,
-      saved: true,
-      isUser: true,
-    };
-    this.threadFront.updateMetadata(
-      CommentsMetadata,
-      comments => {
-        // Stop trying to update if the thread has moved somewhere else.
-        if (this.threadFront.currentPoint != point) {
-          return null;
-        }
-        return [...(comments || []).filter(c => c.id != comment.id), comment];
-      }
-    );
-    */
-
-    const { screen, mouse } = await getGraphicsAtTime(time);
-    if (this.state.currentTime == time) {
-      gCurrentScreenShot = screen;
-      gCurrentMouse = mouse;
-      paintGraphics(screen, mouse);
-    }
-  }
-
   doPrevious() {
-    const { currentTime } = this.state;
+    const { currentTime } = this.props;
     if (currentTime == this.zoomStartTime) {
       return;
     }
@@ -678,8 +580,8 @@ export class Timeline extends Component {
   }
 
   doNext() {
-    const { currentTime } = this.state;
-    if (currentTime == this.state.zoomEndTime) {
+    const { currentTime, zoomEndTime } = this.props;
+    if (currentTime == zoomEndTime) {
       return;
     }
 
@@ -688,11 +590,13 @@ export class Timeline extends Component {
       return;
     }
 
-    this.seekTime(Math.min(next.time, this.state.zoomEndTime));
+    this.seekTime(Math.min(next.time, zoomEndTime));
   }
 
   nextPlaybackTime(time) {
-    if (time == this.state.zoomEndTime) {
+    const { zoomEndTime } = this.props;
+
+    if (time == zoomEndTime) {
       return null;
     }
 
@@ -703,16 +607,16 @@ export class Timeline extends Component {
       nextEvent = nextPaintOrMouseEvent(nextEvent.time);
     }
 
-    if (nextEvent && nextEvent.time < this.state.zoomEndTime) {
+    if (nextEvent && nextEvent.time < zoomEndTime) {
       return nextEvent.time;
     }
 
-    return this.state.zoomEndTime;
+    return zoomEndTime;
   }
 
   playbackPaintFinished(time, screen, mouse) {
-    if (this.state.playback && time == this.state.playback.time) {
-      const { startTime, startDate } = this.state.playback;
+    if (this.props.playback && time == this.props.playback.time) {
+      const { startTime, startDate } = this.props.playback;
       paintGraphics(screen, mouse);
       const next = this.nextPlaybackTime(time);
       if (next) {
@@ -727,14 +631,14 @@ export class Timeline extends Component {
             this.playbackPaintFinished(next, screen, mouse);
           }, Math.max(0, paintTime - now));
         });
-        this.setState({
+        this.props.setTimelineState({
           playback: { time: next, startTime, startDate },
           currentTime: next,
         });
       } else {
         log(`StopPlayback`);
         this.seekTime(time);
-        this.setState({ playback: null });
+        this.props.setTimelineState({ playback: null });
       }
     }
   }
@@ -742,10 +646,10 @@ export class Timeline extends Component {
   startPlayback() {
     log(`StartPlayback`);
 
-    const startTime = this.state.currentTime;
+    const startTime = this.props.currentTime;
     const startDate = Date.now();
 
-    let time = this.nextPlaybackTime(this.state.currentTime);
+    let time = this.nextPlaybackTime(this.props.currentTime);
     if (!time) {
       time = this.zoomStartTime;
     }
@@ -753,7 +657,7 @@ export class Timeline extends Component {
       this.playbackPaintFinished(time, screen, mouse);
     });
 
-    this.setState({
+    this.props.setTimelineState({
       playback: { time, startTime, startDate },
       currentTime: time,
     });
@@ -762,22 +666,22 @@ export class Timeline extends Component {
   stopPlayback() {
     log(`StopPlayback`);
 
-    if (this.state.playback) {
-      this.seekTime(this.state.playback.time);
+    if (this.props.playback) {
+      this.seekTime(this.props.playback.time);
     }
-    this.setState({ playback: null });
+    this.props.setTimelineState({ playback: null });
   }
 
   doZoomOut() {
     this.props.setZoomRegion({
       startTime: 0,
-      endTime: this.state.recordingDuration,
+      endTime: this.props.recordingDuration,
     });
-    gToolbox.getWebconsoleWrapper().setZoomedRegion(0, this.state.recordingDuration);
+    gToolbox.getWebconsoleWrapper().setZoomedRegion(0, this.props.recordingDuration);
   }
 
   renderZoom() {
-    const { recordingDuration } = this.state;
+    const { recordingDuration } = this.props;
     const zoomed = this.zoomStartTime != 0 || this.zoomEndTime != recordingDuration;
 
     return CommandButton({
@@ -902,7 +806,7 @@ export class Timeline extends Component {
   }
 
   renderCommands() {
-    const { playback } = this.state;
+    const { playback } = this.props;
 
     return [
       CommandButton({
@@ -928,7 +832,7 @@ export class Timeline extends Component {
     ];
   }
 
-  updateOverlayDimensions() {
+  updateOverlayWidth() {
     const el = ReactDOM.findDOMNode(this).querySelector(".progressBar");
     this.overlayWidth = el ? el.clientWidth : 1;
     this.overlayTop = el ? el.getBoundingClientRect().top : 1;
@@ -975,7 +879,7 @@ export class Timeline extends Component {
   }
 
   renderMessage(message, index, visibleIndex) {
-    const { messages, currentTime, pausedMessage, highlightedMessage } = this.state;
+    const { messages, currentTime, pausedMessage, highlightedMessage } = this.props;
 
     const offset = this.getPixelOffset(message.executionPointTime);
     const previousVisibleMessage = messages[visibleIndex];
@@ -1038,7 +942,7 @@ export class Timeline extends Component {
   }
 
   renderMessages() {
-    const messages = this.state.messages;
+    const messages = this.props.messages;
     let visibleIndex;
 
     return messages.map((message, index) => {
@@ -1091,8 +995,8 @@ export class Timeline extends Component {
   }
 
   renderHoverPoint() {
-    const { hoverTime, hoveringOverMarker, screen } = this.state;
-    if (hoverTime == null || hoveringOverMarker) {
+    const { hoverTime, hoveredMessage } = this.props;
+    if (hoverTime == null || hoveredMessage) {
       return [];
     }
     const offset = this.getPixelOffset(hoverTime);
@@ -1108,7 +1012,7 @@ export class Timeline extends Component {
   }
 
   renderUnprocessedRegions() {
-    return this.state.unprocessedRegions.map(this.renderUnprocessedRegion.bind(this));
+    return this.props.unprocessedRegions.map(this.renderUnprocessedRegion.bind(this));
   }
 
   renderUnprocessedRegion({ begin, end }) {
@@ -1164,9 +1068,9 @@ export class Timeline extends Component {
   }
 
   render() {
-    const percent = this.getVisiblePosition(this.state.currentTime) * 100;
-    const { shouldAnimate, comments } = this.state;
+    const { comments } = this.state;
     const existingComments = [];
+    const percent = this.getVisiblePosition(this.props.currentTime) * 100;
 
     return div(
       {
@@ -1179,9 +1083,7 @@ export class Timeline extends Component {
         },
         div(
           {
-            className: classname("overlay-container", {
-              animate: shouldAnimate,
-            }),
+            className: classname("overlay-container", {}),
           },
           div({ className: "commands" }, ...this.renderCommands()),
           div(
@@ -1214,6 +1116,7 @@ export class Timeline extends Component {
           ),
           this.renderZoom(),
           this.renderCommentButton(),
+
           ...comments.map(c => this.renderComment(c, existingComments))
         )
       )
@@ -1224,9 +1127,19 @@ export class Timeline extends Component {
 export default connect(
   state => ({
     zoomRegion: selectors.getZoomRegion(state),
+    currentTime: selectors.getCurrentTime(state),
+    hoverTime: selectors.getHoverTime(state),
+    startDragTime: selectors.getStartDragTime(state),
+    playback: selectors.getPlayback(state),
+    messages: selectors.getMessages(state),
+    highlightedMessage: selectors.getHighlightedMessage(state),
+    hoveredMessage: selectors.getHoveredMessage(state),
+    unprocessedRegions: selectors.getUnprocessedRegions(state),
+    recordingDuration: selectors.getRecordingDuration(state),
   }),
   {
     updateTooltip: actions.updateTooltip,
     setZoomRegion: actions.setZoomRegion,
+    setTimelineState: actions.setTimelineState,
   }
 )(Timeline);

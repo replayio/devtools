@@ -1183,11 +1183,6 @@ const ThreadFront = {
   // Any callback to invoke to adjust the point which we zoom to.
   warpCallback: null,
 
-  setOnEndpoint(onEndpoint) {
-    assert(!this.onEndpoint);
-    this.onEndpoint = onEndpoint;
-  },
-
   async setSessionId(sessionId) {
     this.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
@@ -1195,9 +1190,7 @@ const ThreadFront = {
     log(`GotSessionId ${sessionId}`);
 
     const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
-    if (this.onEndpoint) {
-      this.onEndpoint(endpoint);
-    }
+    this.emit("endpoint", endpoint);
 
     // Make sure the debugger has added a pause listener before warping to the endpoint.
     await gToolbox.startPanel("debugger");
