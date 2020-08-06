@@ -146,8 +146,6 @@ class SplitBox extends Component {
     doc.documentElement.style.cursor = this.state.defaultCursor;
 
     this.splitBox.classList.remove("dragging");
-
-    this.dispatchResize();
   }
 
   /**

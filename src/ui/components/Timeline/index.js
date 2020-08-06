@@ -24,6 +24,7 @@ const {
   getGraphicsAtTime,
   paintGraphics,
   addLastScreen,
+  setResizeTimelineCallback,
 } = require("protocol/graphics");
 const { pointEquals, pointPrecedes } = require("protocol/execution-point-utils.js");
 const { clamp } = require("protocol/utils");
@@ -264,7 +265,9 @@ export class Timeline extends Component {
     const description = await this.threadFront.getRecordingDescription();
     this.setRecordingDescription(description);
 
-    window.addEventListener("resize", () => {
+    // Use this stupid hack to re-render the timeline whenever the canvas is
+    // resized so that we reposition any visible comments.
+    setResizeTimelineCallback(() => {
       this.setState({ numResizes: this.state.numResizes + 1 });
     });
   }
