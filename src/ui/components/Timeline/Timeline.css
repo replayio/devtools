@@ -357,7 +357,7 @@
   border-radius: 10px;
   border: 2px solid;
   width: 200px;
-  height: 120px;
+  height: 80px;
 }
 
 .comment-write {
@@ -405,6 +405,7 @@
   margin-left: 4px;
   font-family: ui-rounded;
   font-size: medium;
+  overflow: scroll;
 }
 
 .replay-player .comment-marker {
