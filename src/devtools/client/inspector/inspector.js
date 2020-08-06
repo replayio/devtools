@@ -257,13 +257,8 @@ Inspector.prototype = {
   },
 
   set is3PaneModeEnabled(value) {
-    if (this.currentTarget.chrome) {
-      this._is3PaneModeChromeEnabled = value;
-      Services.prefs.setBoolPref(THREE_PANE_CHROME_ENABLED_PREF, this._is3PaneModeChromeEnabled);
-    } else {
-      this._is3PaneModeEnabled = value;
-      Services.prefs.setBoolPref(THREE_PANE_ENABLED_PREF, this._is3PaneModeEnabled);
-    }
+    this._is3PaneModeEnabled = value;
+    Services.prefs.setBoolPref(THREE_PANE_ENABLED_PREF, this._is3PaneModeEnabled);
   },
 
   get search() {
