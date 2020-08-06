@@ -764,7 +764,9 @@ export class Timeline extends Component {
   }
 
   renderComment(comment) {
-    if (!comment.visible) {
+    if (comment.time < this.zoomStartTime ||
+        comment.time > this.zoomEndTime ||
+        !comment.visible) {
       return;
     }
     const elem = ensureCommentElement(comment, {
