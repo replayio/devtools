@@ -14,7 +14,9 @@ const { pref } = Services;
 
 // app prefs.
 pref("viewer.split-console", true);
+pref("viewer.selected-panel", "debugger");
 
 export const prefs = new PrefsHelper("viewer", {
   splitConsole: ["Bool", "split-console"],
+  selectedPanel: ["String", "selected-panel"],
 });

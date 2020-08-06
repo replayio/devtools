@@ -36,6 +36,7 @@ function initialAppState() {
   return {
     theme: "theme-light",
     splitConsoleOpen: prefs.splitConsole,
+    selectedPanel: prefs.selectedPanel,
     tooltip: null,
   };
 }
@@ -45,6 +46,11 @@ export default function update(state = initialAppState(), action) {
     case "update_theme": {
       return { ...state, theme: action.theme };
     }
+
+    case "set_selected_panel": {
+      return { ...state, selectedPanel: action.panel };
+    }
+
     case "set_split_console": {
       return { ...state, splitConsoleOpen: action.splitConsole };
     }
@@ -68,4 +74,8 @@ export function getTooltip(state) {
 
 export function isSplitConsoleOpen(state) {
   return state.app.splitConsoleOpen;
+}
+
+export function getSelectedPanel(state) {
+  return state.app.selectedPanel;
 }
