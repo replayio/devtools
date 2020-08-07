@@ -1202,7 +1202,7 @@ const ThreadFront = {
     // Make sure the debugger has added a pause listener before warping to the endpoint.
     await gToolbox.startPanel("debugger");
 
-    this.timeWarp(endpoint.point, endpoint.time);
+    this.timeWarp(endpoint.point, endpoint.time, /* hasFrames */ false, /* force */ true);
     this.initializedWaiter.resolve();
   },
 
@@ -1230,12 +1230,12 @@ const ThreadFront = {
     }
   },
 
-  timeWarp(point, time, hasFrames) {
+  timeWarp(point, time, hasFrames, force) {
     log(`TimeWarp ${point}`);
 
     // The warp callback is used to change the locations where the thread is
     // warping to.
-    if (this.warpCallback) {
+    if (this.warpCallback && !force) {
       const newTarget = this.warpCallback(point, time, hasFrames);
       if (newTarget) {
         point = newTarget.point;
