@@ -106,6 +106,22 @@ export function deleteExpression(expression: Expression) {
   };
 }
 
+function getEvaluateOptions(cx, state) {
+  const frameId = getSelectedFrameId(state, cx.thread);
+  if (!frameId) {
+    return { thread: cx.thread };
+  }
+
+  const frames = getFrames(state, cx.thread);
+  const frame = frames.find(f => f.id == frameId);
+
+  return {
+    asyncIndex: frame.asyncIndex,
+    frameId: frame.protocolId,
+    thread: cx.thread,
+  };
+}
+
 /**
  *
  * @memberof actions/pause
@@ -116,14 +132,9 @@ export function evaluateExpressions(cx: ThreadContext) {
   return async function ({ dispatch, getState, client }: ThunkArgs) {
     const expressions = getExpressions(getState());
     const inputs = expressions.map(({ input }) => input);
-    const frameId = getSelectedFrameId(getState(), cx.thread);
-    const frames = getFrames(getState(), cx.thread);
-    const frame = frames.find(f => f.id == frameId);
 
-    const results = await client.evaluateExpressions(inputs, {
-      frameId: frame.protocolId,
-      thread: cx.thread,
-    });
+    const options = getEvaluateOptions(cx, getState());
+    const results = await client.evaluateExpressions(inputs, options);
     dispatch({ type: "EVALUATE_EXPRESSIONS", cx, inputs, results });
   };
 }
@@ -145,20 +156,14 @@ function evaluateExpression(cx: ThreadContext, expression: Expression) {
     }
 
     let input = expression.input;
-    const frameId = getSelectedFrameId(getState(), cx.thread);
-    const frames = getFrames(getState(), cx.thread);
-    const frame = frames.find(f => f.id == frameId);
+    const options = getEvaluateOptions(cx, getState());
 
     return dispatch({
       type: "EVALUATE_EXPRESSION",
       cx,
       thread: cx.thread,
       input: expression.input,
-      [PROMISE]: client.evaluate(wrapExpression(input), {
-        asyncIndex: frame.asyncIndex,
-        frameId: frame.protocolId,
-        thread: cx.thread,
-      }),
+      [PROMISE]: client.evaluate(wrapExpression(input), options),
     });
   };
 }
