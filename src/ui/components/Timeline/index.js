@@ -31,6 +31,7 @@ const { clamp } = require("protocol/utils");
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
+import { features } from "../../utils/prefs";
 
 import { LocalizationHelper } from "devtools/shared/l10n";
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
@@ -227,7 +228,7 @@ function pickCommentElementLocation(left, top, { width, height }, existingCommen
       // existing comment. If we already slid in one of these directions, keep
       // going in that same direction.
       if (!direction) {
-        direction = (left < existing.left) ? "left" : "right";
+        direction = left < existing.left ? "left" : "right";
       }
       left = direction == "left" ? existing.left - width : existing.left + existing.width;
       top = initialTop;
@@ -799,11 +800,14 @@ export class Timeline extends Component {
       saved: false,
     };
     this.setState({
-      comments: [...comments, comment ],
+      comments: [...comments, comment],
     });
   }
 
   renderCommentButton() {
+    if (!features.comments) {
+      return null;
+    }
     return CommandButton({
       className: "",
       active: true,
@@ -832,9 +836,7 @@ export class Timeline extends Component {
   }
 
   renderComment(comment, existingComments) {
-    if (comment.time < this.zoomStartTime ||
-        comment.time > this.zoomEndTime ||
-        !comment.visible) {
+    if (comment.time < this.zoomStartTime || comment.time > this.zoomEndTime || !comment.visible) {
       return;
     }
     const elem = ensureCommentElement(comment, {
@@ -851,15 +853,14 @@ export class Timeline extends Component {
       updateComment: () => {
         if (comment.contents) {
           comment.saved = true;
-          this.threadFront.updateMetadata(
-            CommentsMetadata,
-            comments => [...(comments || []).filter(c => c.id != comment.id), comment]
-          );
+          this.threadFront.updateMetadata(CommentsMetadata, comments => [
+            ...(comments || []).filter(c => c.id != comment.id),
+            comment,
+          ]);
         } else {
           if (comment.saved) {
-            this.threadFront.updateMetadata(
-              CommentsMetadata,
-              comments => (comments || []).filter(c => c.id != comment.id)
+            this.threadFront.updateMetadata(CommentsMetadata, comments =>
+              (comments || []).filter(c => c.id != comment.id)
             );
           }
           this.removeComment(comment);
@@ -869,7 +870,7 @@ export class Timeline extends Component {
     const offset = this.getPixelOffset(comment.time);
     const bounds = elem.getBoundingClientRect();
     const { left, top } = pickCommentElementLocation(
-      offset + this.overlayLeft - (bounds.width / 2),
+      offset + this.overlayLeft - bounds.width / 2,
       this.overlayTop - bounds.height - 5,
       bounds,
       existingComments
@@ -881,19 +882,19 @@ export class Timeline extends Component {
   isServerCommentVisible(comment) {
     // Comments are visible by default, unless they have been closed in
     // the local session. Ignore the visible value we get from the server.
-    return !this.state.comments.some(
-      c => c.id == comment.id && !c.visible
-    );
+    return !this.state.comments.some(c => c.id == comment.id && !c.visible);
   }
 
   onCommentsUpdate(newComments) {
     const comments = [
-      ...(newComments || []).filter(comment => {
-        // Ignore the comment for our own location.
-        return comment.id != this.threadFront.sessionId;
-      }).map(comment => {
-        return { ...comment, visible: this.isServerCommentVisible(comment) };
-      }),
+      ...(newComments || [])
+        .filter(comment => {
+          // Ignore the comment for our own location.
+          return comment.id != this.threadFront.sessionId;
+        })
+        .map(comment => {
+          return { ...comment, visible: this.isServerCommentVisible(comment) };
+        }),
       ...this.state.comments.filter(c => !c.saved),
     ];
     this.setState({ comments });
@@ -968,9 +969,9 @@ export class Timeline extends Component {
   // Get the percent value for the left offset of a message.
   getLeftOffset(message) {
     const messagePosition = this.getVisiblePosition(message.executionPointTime) * 100;
-    const messageWidth = markerWidth / this.overlayWidth * 100;
+    const messageWidth = (markerWidth / this.overlayWidth) * 100;
 
-    return Math.max(messagePosition - messageWidth / 2, 0)
+    return Math.max(messagePosition - messageWidth / 2, 0);
   }
 
   renderMessage(message, index, visibleIndex) {
@@ -1063,7 +1064,7 @@ export class Timeline extends Component {
     }
 
     const middlePercent = this.getVisiblePosition(comment.time) * 100;
-    const widthPercent = markerWidth / this.overlayWidth * 100;
+    const widthPercent = (markerWidth / this.overlayWidth) * 100;
     const percent = Math.max(middlePercent - widthPercent / 2, 0);
 
     return dom.a({
