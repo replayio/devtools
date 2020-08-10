@@ -48,7 +48,7 @@ async function getFrameworkEventListeners(node) {
   });
 }
 
-function logpointGetFrameworkEventListeners(frameId, datas, frameworkListeners) {
+function logpointGetFrameworkEventListeners(frameId, frameworkListeners) {
   const evalText = `
 (array => {
   const rv = [];
@@ -81,7 +81,7 @@ const { result: frameworkResult } = sendCommand(
   "Pause.evaluateInFrame",
   { ${frameId}, expression: \`${evalText}\` }
 );
-${datas}.push(frameworkResult.data);
+addPauseData(frameworkResult.data);
 ${frameworkListeners} = frameworkResult.returned;
 `;
 }

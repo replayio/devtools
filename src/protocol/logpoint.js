@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 // Logpoints are used to perform evaluations at sets of execution points in the
-// recording being debugged. They are implemented using the WRP Analysis domain.
+// recording being debugged. They are implemented using the RRP Analysis domain.
 // This file manages logpoint state, for setting/removing logpoints and emitting
 // events which the webconsole listens to.
 //
@@ -63,11 +63,11 @@ addEventListener("Analysis.analysisResult", ({ analysisId, results }) => {
   if (LogpointHandlers.onResult) {
     results.forEach(async ({
       key,
-      value: { time, pauseId, location, values, datas, frameworkListeners },
+      value: { time, pauseId, location, values, data, frameworkListeners },
     }) => {
       const pause = new Pause(ThreadFront.sessionId);
       pause.instantiate(pauseId);
-      pause.addData(...datas);
+      pause.addData(data);
       const valueFronts = values.map(v => new ValueFront(pause, v));
       const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
       LogpointHandlers.onResult(logGroupId, key, time, mappedLocation, pause, valueFronts);
@@ -118,16 +118,31 @@ async function createLogpointAnalysis(logGroupId, mapper) {
   return analysisId;
 }
 
-// Given a WRP value representing an array, add the elements of that array to
+// Define some logpoint helpers to manage pause data.
+const Helpers = `
+  const finalData = { frames: [], scopes: [], objects: [] };
+  function addPauseData({ frames, scopes, objects }) {
+    finalData.frames.push(...(frames || []));
+    finalData.scopes.push(...(scopes || []));
+    finalData.objects.push(...(objects || []));
+  }
+  function getTopFrame() {
+    const { frame, data } = sendCommand("Pause.getTopFrame");
+    addPauseData(data);
+    return finalData.frames.find(f => f.frameId == frame);
+  }
+`;
+
+// Given an RRP value representing an array, add the elements of that array to
 // the given values/data arrays.
-function mapperExtractArrayContents(arrayPath, valuesPath, datasPath) {
+function mapperExtractArrayContents(arrayPath, valuesPath) {
   return `{
     const { object } = ${arrayPath};
     const { result: lengthResult } = sendCommand(
       "Pause.getObjectProperty",
       { object, name: "length" }
     );
-    ${datasPath}.push(lengthResult.data);
+    addPauseData(lengthResult.data);
     const length = lengthResult.returned.value;
     for (let i = 0; i < length; i++) {
       const { result: elementResult } = sendCommand(
@@ -135,7 +150,7 @@ function mapperExtractArrayContents(arrayPath, valuesPath, datasPath) {
         { object, name: i.toString() }
       );
       ${valuesPath}.push(elementResult.returned);
-      ${datasPath}.push(elementResult.data);
+      addPauseData(elementResult.data);
     }
   }`;
 }
@@ -150,6 +165,7 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
         "Pause.evaluateInFrame",
         { frameId, expression: ${JSON.stringify(condition)} }
       );
+      addPauseData(conditionResult.data);
       if (conditionResult.returned) {
         const { returned } = conditionResult;
         if ("value" in returned && !returned.value) {
@@ -160,15 +176,13 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
           return [];
         }
       }
-      datas.push(conditionResult.data);
     `;
   }
 
   const mapper = `
+    ${Helpers}
     const { point, time, pauseId } = input;
-    const { frame, data: frameData } = sendCommand("Pause.getTopFrame");
-    const { frameId, functionName, location } = frame;
-    const datas = [frameData];
+    const { frameId, functionName, location } = getTopFrame();
     ${conditionSection}
     const bindings = [
       { name: "displayName", value: functionName || "" }
@@ -178,13 +192,16 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
       { frameId, bindings, expression: "[" + ${JSON.stringify(text)} + "]" }
     );
     const values = [];
-    datas.push(result.data);
+    addPauseData(result.data);
     if (result.exception) {
       values.push(result.exception);
     } else {
-      ${mapperExtractArrayContents("result.returned", "values", "datas")}
+      ${mapperExtractArrayContents("result.returned", "values")}
     }
-    return [{ key: point, value: { time, pauseId, location, values, datas } }];
+    return [{
+      key: point,
+      value: { time, pauseId, location, values, data: finalData },
+    }];
   `;
 
   const analysisId = await createLogpointAnalysis(logGroupId, mapper);
@@ -224,29 +241,29 @@ function eventLogpointMapper(getFrameworkListeners) {
   let frameworkText = "";
   if (getFrameworkListeners) {
     frameworkText = logpointGetFrameworkEventListeners(
-      "frameId", "datas", "frameworkListeners"
+      "frameId", "frameworkListeners"
     );
   }
   return `
+    ${Helpers}
     const { point, time, pauseId } = input;
-    const { frame } = sendCommand("Pause.getTopFrame");
-    const { frameId, location } = frame;
+    const { frameId, location } = getTopFrame();
     const { result } = sendCommand(
       "Pause.evaluateInFrame",
       { frameId, expression: "[...arguments]" }
     );
     const values = [];
-    const datas = [result.data];
+    addPauseData(result.data);
     if (result.exception) {
       values.push(result.exception);
     } else {
-      ${mapperExtractArrayContents("result.returned", "values", "datas")}
+      ${mapperExtractArrayContents("result.returned", "values")}
     }
     let frameworkListeners;
     ${frameworkText}
     return [{
       key: point,
-      value: { time, pauseId, location, values, datas, frameworkListeners },
+      value: { time, pauseId, location, values, data: finalData, frameworkListeners },
     }];
   `;
 }
@@ -297,13 +314,16 @@ async function eventLogpointOnFrameworkListeners(logGroupId, point, frameworkLis
 
 async function setExceptionLogpoint(logGroupId) {
   const mapper = `
+    ${Helpers}
     const { point, time, pauseId } = input;
-    const { frame } = sendCommand("Pause.getTopFrame");
-    const { location } = frame;
-    const { exception, data } = sendCommand("Pause.getExceptionValue");
+    const { frameId, location } = getTopFrame();
+    const { exception, data: exceptionData } = sendCommand("Pause.getExceptionValue");
+    addPauseData(exceptionData);
     const values = [{ value: "Exception" }, exception];
-    const datas = [data];
-    return [{ key: point, value: { time, pauseId, location, values, datas } }];
+    return [{
+      key: point,
+      value: { time, pauseId, location, values, data: finalData },
+    }];
   `;
 
   const analysisId = await createLogpointAnalysis(logGroupId, mapper);
@@ -323,16 +343,14 @@ async function setExceptionLogpoint(logGroupId) {
 async function setRandomLogpoint(numLogs) {
   const mapper = `
     const { point, time, pauseId} = input;
-    const { frame } = sendCommand("Pause.getTopFrame");
-    const { frameId, location } = frame;
+    const { frameId, location } = getTopFrame();
     const { result } = sendCommand(
       "Pause.evaluateInFrame",
       { frameId, expression: "String([...arguments]).substring(0, 200)" }
     );
     const v = result.returned ? String(result.returned.value) : "";
     const values = [{ value: point + ": " + v }];
-    const datas = [];
-    return [{ key: point, value: { time, pauseId, location, values, datas } }];
+    return [{ key: point, value: { time, pauseId, location, values, data: {} } }];
   `;
 
   const logGroupId = Math.random().toString();
