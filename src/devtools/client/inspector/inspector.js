@@ -191,7 +191,7 @@ Inspector.prototype = {
     await this._onTargetAvailable();
 
     // We need to listen to changes in the target's pause state.
-    const dbg = this._getDebugger();
+    const dbg = await this._toolbox.getOrStartPanel("debugger");
     this._replayResumed = !dbg.isPaused();
 
     this.styleChangeTracker = new InspectorStyleChangeTracker(this);
@@ -199,10 +199,6 @@ Inspector.prototype = {
     this._markupBox = this.panelDoc.getElementById("markup-box");
 
     return this._deferredOpen();
-  },
-
-  _getDebugger() {
-    return this._toolbox.getPanel("debugger");
   },
 
   async _onTargetAvailable() {
@@ -261,13 +257,8 @@ Inspector.prototype = {
   },
 
   set is3PaneModeEnabled(value) {
-    if (this.currentTarget.chrome) {
-      this._is3PaneModeChromeEnabled = value;
-      Services.prefs.setBoolPref(THREE_PANE_CHROME_ENABLED_PREF, this._is3PaneModeChromeEnabled);
-    } else {
-      this._is3PaneModeEnabled = value;
-      Services.prefs.setBoolPref(THREE_PANE_ENABLED_PREF, this._is3PaneModeEnabled);
-    }
+    this._is3PaneModeEnabled = value;
+    Services.prefs.setBoolPref(THREE_PANE_ENABLED_PREF, this._is3PaneModeEnabled);
   },
 
   get search() {

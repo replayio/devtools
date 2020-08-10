@@ -60,7 +60,6 @@ const shortcuts = new KeyShortcuts({ window, target: document });
 
 class Toolbox extends React.Component {
   state = {
-    selectedPanel: "",
     panels: {},
   };
 
@@ -81,17 +80,17 @@ class Toolbox extends React.Component {
   }
 
   async componentDidMount() {
-    this.props.initialize();
+    const { initialize, selectedPanel } = this.props;
 
+    initialize();
     // Open the console so that the timeline gets events
     this.startPanel("console");
-
-    this.selectTool("debugger");
+    this.selectTool(selectedPanel);
     shortcuts.on("Esc", this.onEscape);
   }
 
   get currentTool() {
-    return this.state.selectedPanel;
+    return this.props.selectedPanel;
   }
 
   async startPanel(name) {
@@ -113,21 +112,28 @@ class Toolbox extends React.Component {
 
     this.setState({ panels: { ...this.state.panels, [name]: panel } });
     resolve();
+    return panel;
+  }
+
+  getOrStartPanel(name) {
+    return this.getPanel(name) || this.startPanel(name);
   }
 
   async selectTool(name) {
-    if (name == this.state.selectedPanel) {
+    const { selectedPanel, setSelectedPanel } = this.props;
+    let panel = this.state.panels[name];
+
+    if (panel && name == selectedPanel) {
       return;
     }
 
-    if (!this.state.panels[name]) {
-      await this.startPanel(name);
+    if (!panel) {
+      panel = await this.startPanel(name);
     }
 
     log(`Toolbox SelectTool ${name}`);
-    this.setState({ selectedPanel: name });
+    setSelectedPanel(name);
 
-    const panel = this.state.panels[name];
     if (panel.refresh) {
       panel.refresh();
     }
@@ -374,7 +380,7 @@ class Toolbox extends React.Component {
   }
 
   renderToolbar() {
-    const { selectedPanel } = this.state;
+    const { selectedPanel } = this.props;
 
     return (
       <div id="toolbox-toolbar">
@@ -414,8 +420,7 @@ class Toolbox extends React.Component {
   }
 
   getSplitBoxDimensions() {
-    const { selectedPanel } = this.state;
-    const { splitConsoleOpen } = this.props;
+    const { selectedPanel, splitConsoleOpen } = this.props;
 
     if (selectedPanel == "console") {
       return {
@@ -441,8 +446,7 @@ class Toolbox extends React.Component {
   }
 
   render() {
-    const { selectedPanel } = this.state;
-    const { splitConsoleOpen } = this.props;
+    const { selectedPanel, splitConsoleOpen } = this.props;
     return (
       <div id="toolbox" className={`${selectedPanel}`}>
         <div id="toolbox-border"></div>
@@ -513,9 +517,11 @@ class Toolbox extends React.Component {
 }
 export default connect(
   state => ({
+    selectedPanel: selectors.getSelectedPanel(state),
     splitConsoleOpen: selectors.isSplitConsoleOpen(state),
   }),
   {
     setSplitConsole: actions.setSplitConsole,
+    setSelectedPanel: actions.setSelectedPanel,
   }
 )(Toolbox);
