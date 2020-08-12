@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "Web app with developer tools built on the Record Replay Protocol",
   "main": "postcss.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --open",
+    "lint": "eslint --fix src"
+  },
   "dependencies": {
     "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
@@ -48,11 +53,6 @@
     "eslint-plugin-react-hooks": "^4.0.4",
     "eslint-plugin-react": "^7.20.0",
     "webpack-dev-server": "^3.11.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --open",
-    "lint": "eslint --fix src"
   },
   "browserslist": [
     "defaults"

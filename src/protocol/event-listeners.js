@@ -41,11 +41,13 @@ async function getFrameworkEventListeners(node) {
   }
 
   const handlerProps = await reactProp.contents.loadChildren();
-  return handlerProps.filter(({ name, contents }) => {
-    return contents.isObject() && contents.className() == "Function";
-  }).map(({ name, contents }) => {
-    return { handler: contents, type: name, capture: false, tags: "React" };
-  });
+  return handlerProps
+    .filter(({ name, contents }) => {
+      return contents.isObject() && contents.className() == "Function";
+    })
+    .map(({ name, contents }) => {
+      return { handler: contents, type: name, capture: false, tags: "React" };
+    });
 }
 
 function logpointGetFrameworkEventListeners(frameId, frameworkListeners) {

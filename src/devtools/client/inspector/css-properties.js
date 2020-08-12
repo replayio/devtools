@@ -5,8 +5,8 @@
 // Produced by logging the output of generateCssProperties() in actors/css-properties.js
 const properties = {
   "align-content": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "baseline",
       "center",
       "end",
@@ -25,16 +25,14 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "align-content"
-    ]
+    supports: [],
+    subproperties: ["align-content"],
   },
   "align-items": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "baseline",
       "center",
       "end",
@@ -52,16 +50,14 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "align-items"
-    ]
+    supports: [],
+    subproperties: ["align-items"],
   },
   "align-self": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "baseline",
       "center",
@@ -80,108 +76,50 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "align-self"
-    ]
+    supports: [],
+    subproperties: ["align-self"],
   },
   "backface-visibility": {
-    "isInherited": false,
-    "values": [
-      "hidden",
-      "inherit",
-      "initial",
-      "revert",
-      "unset",
-      "visible"
-    ],
-    "supports": [],
-    "subproperties": [
-      "backface-visibility"
-    ]
+    isInherited: false,
+    values: ["hidden", "inherit", "initial", "revert", "unset", "visible"],
+    supports: [],
+    subproperties: ["backface-visibility"],
   },
   "border-collapse": {
-    "isInherited": true,
-    "values": [
-      "collapse",
-      "inherit",
-      "initial",
-      "revert",
-      "separate",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-collapse"
-    ]
+    isInherited: true,
+    values: ["collapse", "inherit", "initial", "revert", "separate", "unset"],
+    supports: [],
+    subproperties: ["border-collapse"],
   },
   "border-image-repeat": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "repeat",
-      "revert",
-      "round",
-      "space",
-      "stretch",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-image-repeat"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "repeat", "revert", "round", "space", "stretch", "unset"],
+    supports: [],
+    subproperties: ["border-image-repeat"],
   },
   "box-decoration-break": {
-    "isInherited": false,
-    "values": [
-      "clone",
-      "inherit",
-      "initial",
-      "revert",
-      "slice",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "box-decoration-break"
-    ]
+    isInherited: false,
+    values: ["clone", "inherit", "initial", "revert", "slice", "unset"],
+    supports: [],
+    subproperties: ["box-decoration-break"],
   },
   "box-sizing": {
-    "isInherited": false,
-    "values": [
-      "border-box",
-      "content-box",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "box-sizing"
-    ]
+    isInherited: false,
+    values: ["border-box", "content-box", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["box-sizing"],
   },
   "break-inside": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "avoid",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "break-inside"
-    ]
+    isInherited: false,
+    values: ["auto", "avoid", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["break-inside"],
   },
   "caption-side": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "bottom",
       "bottom-outside",
       "inherit",
@@ -191,16 +129,14 @@ const properties = {
       "right",
       "top",
       "top-outside",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "caption-side"
-    ]
+    supports: [],
+    subproperties: ["caption-side"],
   },
-  "clear": {
-    "isInherited": false,
-    "values": [
+  clear: {
+    isInherited: false,
+    values: [
       "both",
       "inherit",
       "initial",
@@ -210,107 +146,50 @@ const properties = {
       "none",
       "revert",
       "right",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "clear"
-    ]
+    supports: [],
+    subproperties: ["clear"],
   },
   "color-adjust": {
-    "isInherited": true,
-    "values": [
-      "economy",
-      "exact",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "color-adjust"
-    ]
+    isInherited: true,
+    values: ["economy", "exact", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["color-adjust"],
   },
   "color-interpolation": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "linearrgb",
-      "revert",
-      "srgb",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "color-interpolation"
-    ]
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "linearrgb", "revert", "srgb", "unset"],
+    supports: [],
+    subproperties: ["color-interpolation"],
   },
   "color-interpolation-filters": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "linearrgb",
-      "revert",
-      "srgb",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "color-interpolation-filters"
-    ]
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "linearrgb", "revert", "srgb", "unset"],
+    supports: [],
+    subproperties: ["color-interpolation-filters"],
   },
   "column-count": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "column-count"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["column-count"],
   },
   "column-fill": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "balance",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "column-fill"
-    ]
+    isInherited: false,
+    values: ["auto", "balance", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["column-fill"],
   },
   "column-span": {
-    "isInherited": false,
-    "values": [
-      "all",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "column-span"
-    ]
+    isInherited: false,
+    values: ["all", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["column-span"],
   },
-  "contain": {
-    "isInherited": false,
-    "values": [
+  contain: {
+    isInherited: false,
+    values: [
       "content",
       "inherit",
       "initial",
@@ -320,31 +199,20 @@ const properties = {
       "revert",
       "size",
       "strict",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "contain"
-    ]
+    supports: [],
+    subproperties: ["contain"],
   },
-  "direction": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "ltr",
-      "revert",
-      "rtl",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "direction"
-    ]
+  direction: {
+    isInherited: true,
+    values: ["inherit", "initial", "ltr", "revert", "rtl", "unset"],
+    supports: [],
+    subproperties: ["direction"],
   },
-  "display": {
-    "isInherited": false,
-    "values": [
+  display: {
+    isInherited: false,
+    values: [
       "-webkit-box",
       "-webkit-inline-box",
       "block",
@@ -380,16 +248,14 @@ const properties = {
       "table-header-group",
       "table-row",
       "table-row-group",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "display"
-    ]
+    supports: [],
+    subproperties: ["display"],
   },
   "dominant-baseline": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "alphabetic",
       "auto",
       "central",
@@ -402,31 +268,20 @@ const properties = {
       "revert",
       "text-after-edge",
       "text-before-edge",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "dominant-baseline"
-    ]
+    supports: [],
+    subproperties: ["dominant-baseline"],
   },
   "empty-cells": {
-    "isInherited": true,
-    "values": [
-      "hide",
-      "inherit",
-      "initial",
-      "revert",
-      "show",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "empty-cells"
-    ]
+    isInherited: true,
+    values: ["hide", "inherit", "initial", "revert", "show", "unset"],
+    supports: [],
+    subproperties: ["empty-cells"],
   },
   "flex-direction": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "column",
       "column-reverse",
       "inherit",
@@ -434,32 +289,20 @@ const properties = {
       "revert",
       "row",
       "row-reverse",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "flex-direction"
-    ]
+    supports: [],
+    subproperties: ["flex-direction"],
   },
   "flex-wrap": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "nowrap",
-      "revert",
-      "unset",
-      "wrap",
-      "wrap-reverse"
-    ],
-    "supports": [],
-    "subproperties": [
-      "flex-wrap"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "nowrap", "revert", "unset", "wrap", "wrap-reverse"],
+    supports: [],
+    subproperties: ["flex-wrap"],
   },
-  "float": {
-    "isInherited": false,
-    "values": [
+  float: {
+    isInherited: false,
+    values: [
       "inherit",
       "initial",
       "inline-end",
@@ -468,61 +311,32 @@ const properties = {
       "none",
       "revert",
       "right",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "float"
-    ]
+    supports: [],
+    subproperties: ["float"],
   },
   "font-kerning": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-kerning"
-    ]
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "none", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-kerning"],
   },
   "font-optical-sizing": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-optical-sizing"
-    ]
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-optical-sizing"],
   },
   "font-size-adjust": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-size-adjust"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-size-adjust"],
   },
   "font-stretch": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "condensed",
       "expanded",
       "extra-condensed",
@@ -535,47 +349,26 @@ const properties = {
       "semi-expanded",
       "ultra-condensed",
       "ultra-expanded",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "font-stretch"
-    ]
+    supports: [],
+    subproperties: ["font-stretch"],
   },
   "font-style": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "italic",
-      "normal",
-      "oblique",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-style"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "italic", "normal", "oblique", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-style"],
   },
   "font-synthesis": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "style",
-      "unset",
-      "weight"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-synthesis"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "revert", "style", "unset", "weight"],
+    supports: [],
+    subproperties: ["font-synthesis"],
   },
   "font-variant-caps": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "all-petite-caps",
       "all-small-caps",
       "inherit",
@@ -586,16 +379,14 @@ const properties = {
       "small-caps",
       "titling-caps",
       "unicase",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "font-variant-caps"
-    ]
+    supports: [],
+    subproperties: ["font-variant-caps"],
   },
   "font-variant-east-asian": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "full-width",
       "inherit",
       "initial",
@@ -609,16 +400,14 @@ const properties = {
       "ruby",
       "simplified",
       "traditional",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "font-variant-east-asian"
-    ]
+    supports: [],
+    subproperties: ["font-variant-east-asian"],
   },
   "font-variant-ligatures": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "common-ligatures",
       "contextual",
       "discretionary-ligatures",
@@ -632,16 +421,14 @@ const properties = {
       "none",
       "normal",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "font-variant-ligatures"
-    ]
+    supports: [],
+    subproperties: ["font-variant-ligatures"],
   },
   "font-variant-numeric": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "diagonal-fractions",
       "inherit",
       "initial",
@@ -654,96 +441,44 @@ const properties = {
       "slashed-zero",
       "stacked-fractions",
       "tabular-nums",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "font-variant-numeric"
-    ]
+    supports: [],
+    subproperties: ["font-variant-numeric"],
   },
   "font-variant-position": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "sub",
-      "super",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-variant-position"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "normal", "revert", "sub", "super", "unset"],
+    supports: [],
+    subproperties: ["font-variant-position"],
   },
   "font-weight": {
-    "isInherited": true,
-    "values": [
-      "bold",
-      "bolder",
-      "inherit",
-      "initial",
-      "lighter",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-weight"
-    ]
+    isInherited: true,
+    values: ["bold", "bolder", "inherit", "initial", "lighter", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-weight"],
   },
   "grid-auto-flow": {
-    "isInherited": false,
-    "values": [
-      "column",
-      "dense",
-      "inherit",
-      "initial",
-      "revert",
-      "row",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "grid-auto-flow"
-    ]
+    isInherited: false,
+    values: ["column", "dense", "inherit", "initial", "revert", "row", "unset"],
+    supports: [],
+    subproperties: ["grid-auto-flow"],
   },
-  "hyphens": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "manual",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "hyphens"
-    ]
+  hyphens: {
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "manual", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["hyphens"],
   },
   "image-orientation": {
-    "isInherited": true,
-    "values": [
-      "from-image",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "image-orientation"
-    ]
+    isInherited: true,
+    values: ["from-image", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["image-orientation"],
   },
   "image-rendering": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "-moz-crisp-edges",
       "auto",
       "crisp-edges",
@@ -752,16 +487,14 @@ const properties = {
       "optimizequality",
       "optimizespeed",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "image-rendering"
-    ]
+    supports: [],
+    subproperties: ["image-rendering"],
   },
   "ime-mode": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "active",
       "auto",
       "disabled",
@@ -770,31 +503,20 @@ const properties = {
       "initial",
       "normal",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "ime-mode"
-    ]
+    supports: [],
+    subproperties: ["ime-mode"],
   },
-  "isolation": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "isolate",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "isolation"
-    ]
+  isolation: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "isolate", "revert", "unset"],
+    supports: [],
+    subproperties: ["isolation"],
   },
   "justify-content": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "center",
       "end",
       "flex-end",
@@ -812,16 +534,14 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "justify-content"
-    ]
+    supports: [],
+    subproperties: ["justify-content"],
   },
   "justify-items": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "baseline",
       "center",
       "end",
@@ -842,16 +562,14 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "justify-items"
-    ]
+    supports: [],
+    subproperties: ["justify-items"],
   },
   "justify-self": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "baseline",
       "center",
@@ -872,16 +590,14 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "justify-self"
-    ]
+    supports: [],
+    subproperties: ["justify-self"],
   },
   "line-break": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "anywhere",
       "auto",
       "inherit",
@@ -890,46 +606,26 @@ const properties = {
       "normal",
       "revert",
       "strict",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "line-break"
-    ]
+    supports: [],
+    subproperties: ["line-break"],
   },
   "list-style-position": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "inside",
-      "outside",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "list-style-position"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "inside", "outside", "revert", "unset"],
+    supports: [],
+    subproperties: ["list-style-position"],
   },
   "mask-type": {
-    "isInherited": false,
-    "values": [
-      "alpha",
-      "inherit",
-      "initial",
-      "luminance",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-type"
-    ]
+    isInherited: false,
+    values: ["alpha", "inherit", "initial", "luminance", "revert", "unset"],
+    supports: [],
+    subproperties: ["mask-type"],
   },
   "mix-blend-mode": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "color",
       "color-burn",
       "color-dodge",
@@ -949,16 +645,14 @@ const properties = {
       "saturation",
       "screen",
       "soft-light",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "mix-blend-mode"
-    ]
+    supports: [],
+    subproperties: ["mix-blend-mode"],
   },
   "-moz-appearance": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-gtk-info-bar",
       "-moz-mac-active-source-list-selection",
       "-moz-mac-disclosure-button-closed",
@@ -1088,16 +782,14 @@ const properties = {
       "treetwistyopen",
       "treeview",
       "unset",
-      "window"
+      "window",
     ],
-    "supports": [],
-    "subproperties": [
-      "-moz-appearance"
-    ]
+    supports: [],
+    subproperties: ["-moz-appearance"],
   },
   "-moz-box-align": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "baseline",
       "center",
       "end",
@@ -1106,31 +798,20 @@ const properties = {
       "revert",
       "start",
       "stretch",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-align"
-    ]
+    supports: [],
+    subproperties: ["-moz-box-align"],
   },
   "-moz-box-direction": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "reverse",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-direction"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "normal", "reverse", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-box-direction"],
   },
   "-moz-box-orient": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "block-axis",
       "horizontal",
       "inherit",
@@ -1138,123 +819,56 @@ const properties = {
       "inline-axis",
       "revert",
       "unset",
-      "vertical"
+      "vertical",
     ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-orient"
-    ]
+    supports: [],
+    subproperties: ["-moz-box-orient"],
   },
   "-moz-box-pack": {
-    "isInherited": false,
-    "values": [
-      "center",
-      "end",
-      "inherit",
-      "initial",
-      "justify",
-      "revert",
-      "start",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-pack"
-    ]
+    isInherited: false,
+    values: ["center", "end", "inherit", "initial", "justify", "revert", "start", "unset"],
+    supports: [],
+    subproperties: ["-moz-box-pack"],
   },
   "-moz-control-character-visibility": {
-    "isInherited": true,
-    "values": [
-      "hidden",
-      "inherit",
-      "initial",
-      "revert",
-      "unset",
-      "visible"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-control-character-visibility"
-    ]
+    isInherited: true,
+    values: ["hidden", "inherit", "initial", "revert", "unset", "visible"],
+    supports: [],
+    subproperties: ["-moz-control-character-visibility"],
   },
   "-moz-float-edge": {
-    "isInherited": false,
-    "values": [
-      "content-box",
-      "inherit",
-      "initial",
-      "margin-box",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-float-edge"
-    ]
+    isInherited: false,
+    values: ["content-box", "inherit", "initial", "margin-box", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-float-edge"],
   },
   "-moz-force-broken-image-icon": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-force-broken-image-icon"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-force-broken-image-icon"],
   },
   "-moz-orient": {
-    "isInherited": false,
-    "values": [
-      "block",
-      "horizontal",
-      "inherit",
-      "initial",
-      "inline",
-      "revert",
-      "unset",
-      "vertical"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-orient"
-    ]
+    isInherited: false,
+    values: ["block", "horizontal", "inherit", "initial", "inline", "revert", "unset", "vertical"],
+    supports: [],
+    subproperties: ["-moz-orient"],
   },
   "-moz-osx-font-smoothing": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "grayscale",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-osx-font-smoothing"
-    ]
+    isInherited: true,
+    values: ["auto", "grayscale", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-osx-font-smoothing"],
   },
   "-moz-text-size-adjust": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-text-size-adjust"
-    ]
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-text-size-adjust"],
   },
   "-moz-user-focus": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "ignore",
       "inherit",
       "initial",
@@ -1266,63 +880,32 @@ const properties = {
       "select-before",
       "select-menu",
       "select-same",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "-moz-user-focus"
-    ]
+    supports: [],
+    subproperties: ["-moz-user-focus"],
   },
   "-moz-user-input": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-user-input"
-    ]
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-user-input"],
   },
   "-moz-user-modify": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "read-only",
-      "read-write",
-      "revert",
-      "unset",
-      "write-only"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-user-modify"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "read-only", "read-write", "revert", "unset", "write-only"],
+    supports: [],
+    subproperties: ["-moz-user-modify"],
   },
   "-moz-window-dragging": {
-    "isInherited": false,
-    "values": [
-      "default",
-      "drag",
-      "inherit",
-      "initial",
-      "no-drag",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-window-dragging"
-    ]
+    isInherited: false,
+    values: ["default", "drag", "inherit", "initial", "no-drag", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-window-dragging"],
   },
   "object-fit": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "contain",
       "cover",
       "fill",
@@ -1331,31 +914,20 @@ const properties = {
       "none",
       "revert",
       "scale-down",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "object-fit"
-    ]
+    supports: [],
+    subproperties: ["object-fit"],
   },
   "offset-rotate": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "reverse",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "offset-rotate"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "reverse", "revert", "unset"],
+    supports: [],
+    subproperties: ["offset-rotate"],
   },
   "outline-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "dashed",
       "dotted",
@@ -1370,60 +942,32 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "outline-style"
-    ]
+    supports: [],
+    subproperties: ["outline-style"],
   },
   "overflow-anchor": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "overflow-anchor"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["overflow-anchor"],
   },
   "overflow-wrap": {
-    "isInherited": true,
-    "values": [
-      "anywhere",
-      "break-word",
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "overflow-wrap"
-    ]
+    isInherited: true,
+    values: ["anywhere", "break-word", "inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["overflow-wrap"],
   },
   "paint-order": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "paint-order"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["paint-order"],
   },
   "pointer-events": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "all",
       "auto",
       "fill",
@@ -1437,16 +981,14 @@ const properties = {
       "visible",
       "visiblefill",
       "visiblepainted",
-      "visiblestroke"
+      "visiblestroke",
     ],
-    "supports": [],
-    "subproperties": [
-      "pointer-events"
-    ]
+    supports: [],
+    subproperties: ["pointer-events"],
   },
-  "position": {
-    "isInherited": false,
-    "values": [
+  position: {
+    isInherited: false,
+    values: [
       "absolute",
       "fixed",
       "inherit",
@@ -1455,16 +997,14 @@ const properties = {
       "revert",
       "static",
       "sticky",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "position"
-    ]
+    supports: [],
+    subproperties: ["position"],
   },
-  "resize": {
-    "isInherited": false,
-    "values": [
+  resize: {
+    isInherited: false,
+    values: [
       "block",
       "both",
       "horizontal",
@@ -1474,16 +1014,14 @@ const properties = {
       "none",
       "revert",
       "unset",
-      "vertical"
+      "vertical",
     ],
-    "supports": [],
-    "subproperties": [
-      "resize"
-    ]
+    supports: [],
+    subproperties: ["resize"],
   },
   "ruby-align": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "center",
       "inherit",
       "initial",
@@ -1491,63 +1029,32 @@ const properties = {
       "space-around",
       "space-between",
       "start",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "ruby-align"
-    ]
+    supports: [],
+    subproperties: ["ruby-align"],
   },
   "ruby-position": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "over",
-      "revert",
-      "under",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "ruby-position"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "over", "revert", "under", "unset"],
+    supports: [],
+    subproperties: ["ruby-position"],
   },
   "scroll-behavior": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "smooth",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-behavior"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "smooth", "unset"],
+    supports: [],
+    subproperties: ["scroll-behavior"],
   },
   "scroll-snap-align": {
-    "isInherited": false,
-    "values": [
-      "center",
-      "end",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "start",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-snap-align"
-    ]
+    isInherited: false,
+    values: ["center", "end", "inherit", "initial", "none", "revert", "start", "unset"],
+    supports: [],
+    subproperties: ["scroll-snap-align"],
   },
   "scroll-snap-type": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "block",
       "both",
       "inherit",
@@ -1558,32 +1065,20 @@ const properties = {
       "revert",
       "unset",
       "x",
-      "y"
+      "y",
     ],
-    "supports": [],
-    "subproperties": [
-      "scroll-snap-type"
-    ]
+    supports: [],
+    subproperties: ["scroll-snap-type"],
   },
   "scrollbar-width": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scrollbar-width"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "none", "revert", "thin", "unset"],
+    supports: [],
+    subproperties: ["scrollbar-width"],
   },
   "shape-rendering": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "auto",
       "crispedges",
       "geometricprecision",
@@ -1591,63 +1086,32 @@ const properties = {
       "initial",
       "optimizespeed",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "shape-rendering"
-    ]
+    supports: [],
+    subproperties: ["shape-rendering"],
   },
   "stroke-linecap": {
-    "isInherited": true,
-    "values": [
-      "butt",
-      "inherit",
-      "initial",
-      "revert",
-      "round",
-      "square",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "stroke-linecap"
-    ]
+    isInherited: true,
+    values: ["butt", "inherit", "initial", "revert", "round", "square", "unset"],
+    supports: [],
+    subproperties: ["stroke-linecap"],
   },
   "stroke-linejoin": {
-    "isInherited": true,
-    "values": [
-      "bevel",
-      "inherit",
-      "initial",
-      "miter",
-      "revert",
-      "round",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "stroke-linejoin"
-    ]
+    isInherited: true,
+    values: ["bevel", "inherit", "initial", "miter", "revert", "round", "unset"],
+    supports: [],
+    subproperties: ["stroke-linejoin"],
   },
   "table-layout": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "fixed",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "table-layout"
-    ]
+    isInherited: false,
+    values: ["auto", "fixed", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["table-layout"],
   },
   "text-align": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "-moz-center",
       "-moz-left",
       "-moz-right",
@@ -1661,16 +1125,14 @@ const properties = {
       "revert",
       "right",
       "start",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "text-align"
-    ]
+    supports: [],
+    subproperties: ["text-align"],
   },
   "text-align-last": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "auto",
       "center",
       "end",
@@ -1681,47 +1143,26 @@ const properties = {
       "revert",
       "right",
       "start",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "text-align-last"
-    ]
+    supports: [],
+    subproperties: ["text-align-last"],
   },
   "text-anchor": {
-    "isInherited": true,
-    "values": [
-      "end",
-      "inherit",
-      "initial",
-      "middle",
-      "revert",
-      "start",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "text-anchor"
-    ]
+    isInherited: true,
+    values: ["end", "inherit", "initial", "middle", "revert", "start", "unset"],
+    supports: [],
+    subproperties: ["text-anchor"],
   },
   "text-combine-upright": {
-    "isInherited": true,
-    "values": [
-      "all",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "text-combine-upright"
-    ]
+    isInherited: true,
+    values: ["all", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["text-combine-upright"],
   },
   "text-decoration-line": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "blink",
       "inherit",
       "initial",
@@ -1730,32 +1171,20 @@ const properties = {
       "overline",
       "revert",
       "underline",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "text-decoration-line"
-    ]
+    supports: [],
+    subproperties: ["text-decoration-line"],
   },
   "text-decoration-skip-ink": {
-    "isInherited": true,
-    "values": [
-      "all",
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "text-decoration-skip-ink"
-    ]
+    isInherited: true,
+    values: ["all", "auto", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["text-decoration-skip-ink"],
   },
   "text-decoration-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-none",
       "dashed",
       "dotted",
@@ -1765,33 +1194,20 @@ const properties = {
       "revert",
       "solid",
       "unset",
-      "wavy"
+      "wavy",
     ],
-    "supports": [],
-    "subproperties": [
-      "text-decoration-style"
-    ]
+    supports: [],
+    subproperties: ["text-decoration-style"],
   },
   "text-emphasis-position": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "left",
-      "over",
-      "revert",
-      "right",
-      "under",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "text-emphasis-position"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "left", "over", "revert", "right", "under", "unset"],
+    supports: [],
+    subproperties: ["text-emphasis-position"],
   },
   "text-justify": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "auto",
       "distribute",
       "inherit",
@@ -1800,16 +1216,14 @@ const properties = {
       "inter-word",
       "none",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "text-justify"
-    ]
+    supports: [],
+    subproperties: ["text-justify"],
   },
   "text-orientation": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "inherit",
       "initial",
       "mixed",
@@ -1817,16 +1231,14 @@ const properties = {
       "sideways",
       "sideways-right",
       "unset",
-      "upright"
+      "upright",
     ],
-    "supports": [],
-    "subproperties": [
-      "text-orientation"
-    ]
+    supports: [],
+    subproperties: ["text-orientation"],
   },
   "text-rendering": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "auto",
       "geometricprecision",
       "inherit",
@@ -1834,16 +1246,14 @@ const properties = {
       "optimizelegibility",
       "optimizespeed",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "text-rendering"
-    ]
+    supports: [],
+    subproperties: ["text-rendering"],
   },
   "text-transform": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "capitalize",
       "full-size-kana",
       "full-width",
@@ -1853,16 +1263,14 @@ const properties = {
       "none",
       "revert",
       "unset",
-      "uppercase"
+      "uppercase",
     ],
-    "supports": [],
-    "subproperties": [
-      "text-transform"
-    ]
+    supports: [],
+    subproperties: ["text-transform"],
   },
   "text-underline-position": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "auto",
       "from-font",
       "inherit",
@@ -1871,16 +1279,14 @@ const properties = {
       "revert",
       "right",
       "under",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "text-underline-position"
-    ]
+    supports: [],
+    subproperties: ["text-underline-position"],
   },
   "touch-action": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "inherit",
       "initial",
@@ -1889,47 +1295,26 @@ const properties = {
       "pan-x",
       "pan-y",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "touch-action"
-    ]
+    supports: [],
+    subproperties: ["touch-action"],
   },
   "transform-box": {
-    "isInherited": false,
-    "values": [
-      "border-box",
-      "fill-box",
-      "inherit",
-      "initial",
-      "revert",
-      "unset",
-      "view-box"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transform-box"
-    ]
+    isInherited: false,
+    values: ["border-box", "fill-box", "inherit", "initial", "revert", "unset", "view-box"],
+    supports: [],
+    subproperties: ["transform-box"],
   },
   "transform-style": {
-    "isInherited": false,
-    "values": [
-      "flat",
-      "inherit",
-      "initial",
-      "preserve-3d",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transform-style"
-    ]
+    isInherited: false,
+    values: ["flat", "inherit", "initial", "preserve-3d", "revert", "unset"],
+    supports: [],
+    subproperties: ["transform-style"],
   },
   "unicode-bidi": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "bidi-override",
       "embed",
       "inherit",
@@ -1939,79 +1324,38 @@ const properties = {
       "normal",
       "plaintext",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "unicode-bidi"
-    ]
+    supports: [],
+    subproperties: ["unicode-bidi"],
   },
   "user-select": {
-    "isInherited": false,
-    "values": [
-      "-moz-none",
-      "all",
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "text",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "user-select"
-    ]
+    isInherited: false,
+    values: ["-moz-none", "all", "auto", "inherit", "initial", "none", "revert", "text", "unset"],
+    supports: [],
+    subproperties: ["user-select"],
   },
   "vector-effect": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "non-scaling-stroke",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "vector-effect"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "non-scaling-stroke", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["vector-effect"],
   },
-  "visibility": {
-    "isInherited": true,
-    "values": [
-      "collapse",
-      "hidden",
-      "inherit",
-      "initial",
-      "revert",
-      "unset",
-      "visible"
-    ],
-    "supports": [],
-    "subproperties": [
-      "visibility"
-    ]
+  visibility: {
+    isInherited: true,
+    values: ["collapse", "hidden", "inherit", "initial", "revert", "unset", "visible"],
+    supports: [],
+    subproperties: ["visibility"],
   },
   "-webkit-line-clamp": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-webkit-line-clamp"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["-webkit-line-clamp"],
   },
   "white-space": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "-moz-pre-space",
       "break-spaces",
       "inherit",
@@ -2022,16 +1366,14 @@ const properties = {
       "pre-line",
       "pre-wrap",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "white-space"
-    ]
+    supports: [],
+    subproperties: ["white-space"],
   },
   "word-break": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "break-all",
       "break-word",
       "inherit",
@@ -2039,16 +1381,14 @@ const properties = {
       "keep-all",
       "normal",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "word-break"
-    ]
+    supports: [],
+    subproperties: ["word-break"],
   },
   "writing-mode": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "horizontal-tb",
       "inherit",
       "initial",
@@ -2063,30 +1403,20 @@ const properties = {
       "tb-rl",
       "unset",
       "vertical-lr",
-      "vertical-rl"
+      "vertical-rl",
     ],
-    "supports": [],
-    "subproperties": [
-      "writing-mode"
-    ]
+    supports: [],
+    subproperties: ["writing-mode"],
   },
   "z-index": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "z-index"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["z-index"],
   },
   "break-after": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "always",
       "auto",
       "avoid",
@@ -2096,16 +1426,14 @@ const properties = {
       "page",
       "revert",
       "right",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "break-after"
-    ]
+    supports: [],
+    subproperties: ["break-after"],
   },
   "break-before": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "always",
       "auto",
       "avoid",
@@ -2115,154 +1443,88 @@ const properties = {
       "page",
       "revert",
       "right",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "break-before"
-    ]
+    supports: [],
+    subproperties: ["break-before"],
   },
   "clip-rule": {
-    "isInherited": true,
-    "values": [
-      "evenodd",
-      "inherit",
-      "initial",
-      "nonzero",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "clip-rule"
-    ]
+    isInherited: true,
+    values: ["evenodd", "inherit", "initial", "nonzero", "revert", "unset"],
+    supports: [],
+    subproperties: ["clip-rule"],
   },
   "fill-rule": {
-    "isInherited": true,
-    "values": [
-      "evenodd",
-      "inherit",
-      "initial",
-      "nonzero",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "fill-rule"
-    ]
+    isInherited: true,
+    values: ["evenodd", "inherit", "initial", "nonzero", "revert", "unset"],
+    supports: [],
+    subproperties: ["fill-rule"],
   },
   "fill-opacity": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "context-fill-opacity",
       "context-stroke-opacity",
       "inherit",
       "initial",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "fill-opacity"
-    ]
+    supports: [],
+    subproperties: ["fill-opacity"],
   },
   "stroke-opacity": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "context-fill-opacity",
       "context-stroke-opacity",
       "inherit",
       "initial",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "stroke-opacity"
-    ]
+    supports: [],
+    subproperties: ["stroke-opacity"],
   },
   "-moz-box-ordinal-group": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-ordinal-group"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-box-ordinal-group"],
   },
-  "order": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "order"
-    ]
+  order: {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["order"],
   },
   "flex-grow": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "flex-grow"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["flex-grow"],
   },
   "flex-shrink": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "flex-shrink"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["flex-shrink"],
   },
   "-moz-box-flex": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-flex"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-box-flex"],
   },
   "stroke-miterlimit": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "stroke-miterlimit"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["stroke-miterlimit"],
   },
   "overflow-block": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-hidden-unscrollable",
       "auto",
       "hidden",
@@ -2271,16 +1533,14 @@ const properties = {
       "revert",
       "scroll",
       "unset",
-      "visible"
+      "visible",
     ],
-    "supports": [],
-    "subproperties": [
-      "overflow-block"
-    ]
+    supports: [],
+    subproperties: ["overflow-block"],
   },
   "overflow-inline": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-hidden-unscrollable",
       "auto",
       "hidden",
@@ -2289,16 +1549,14 @@ const properties = {
       "revert",
       "scroll",
       "unset",
-      "visible"
+      "visible",
     ],
-    "supports": [],
-    "subproperties": [
-      "overflow-inline"
-    ]
+    supports: [],
+    subproperties: ["overflow-inline"],
   },
   "overflow-x": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-hidden-unscrollable",
       "auto",
       "hidden",
@@ -2307,16 +1565,14 @@ const properties = {
       "revert",
       "scroll",
       "unset",
-      "visible"
+      "visible",
     ],
-    "supports": [],
-    "subproperties": [
-      "overflow-x"
-    ]
+    supports: [],
+    subproperties: ["overflow-x"],
   },
   "overflow-y": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-hidden-unscrollable",
       "auto",
       "hidden",
@@ -2325,132 +1581,62 @@ const properties = {
       "revert",
       "scroll",
       "unset",
-      "visible"
+      "visible",
     ],
-    "supports": [],
-    "subproperties": [
-      "overflow-y"
-    ]
+    supports: [],
+    subproperties: ["overflow-y"],
   },
   "overscroll-behavior-block": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "contain",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "overscroll-behavior-block"
-    ]
+    isInherited: false,
+    values: ["auto", "contain", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["overscroll-behavior-block"],
   },
   "overscroll-behavior-inline": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "contain",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "overscroll-behavior-inline"
-    ]
+    isInherited: false,
+    values: ["auto", "contain", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["overscroll-behavior-inline"],
   },
   "overscroll-behavior-x": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "contain",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "overscroll-behavior-x"
-    ]
+    isInherited: false,
+    values: ["auto", "contain", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["overscroll-behavior-x"],
   },
   "overscroll-behavior-y": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "contain",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "overscroll-behavior-y"
-    ]
+    isInherited: false,
+    values: ["auto", "contain", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["overscroll-behavior-y"],
   },
   "flood-opacity": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "flood-opacity"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["flood-opacity"],
   },
-  "opacity": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "opacity"
-    ]
+  opacity: {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["opacity"],
   },
   "shape-image-threshold": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "shape-image-threshold"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["shape-image-threshold"],
   },
   "stop-opacity": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "stop-opacity"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["stop-opacity"],
   },
   "border-block-end-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -2464,16 +1650,14 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-block-end-style"
-    ]
+    supports: [],
+    subproperties: ["border-block-end-style"],
   },
   "border-block-start-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -2487,16 +1671,14 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-block-start-style"
-    ]
+    supports: [],
+    subproperties: ["border-block-start-style"],
   },
   "border-bottom-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -2510,16 +1692,14 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-bottom-style"
-    ]
+    supports: [],
+    subproperties: ["border-bottom-style"],
   },
   "border-inline-end-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -2533,16 +1713,14 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-inline-end-style"
-    ]
+    supports: [],
+    subproperties: ["border-inline-end-style"],
   },
   "border-inline-start-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -2556,16 +1734,14 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-inline-start-style"
-    ]
+    supports: [],
+    subproperties: ["border-inline-start-style"],
   },
   "border-left-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -2579,16 +1755,14 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-left-style"
-    ]
+    supports: [],
+    subproperties: ["border-left-style"],
   },
   "border-right-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -2602,16 +1776,14 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-right-style"
-    ]
+    supports: [],
+    subproperties: ["border-right-style"],
   },
   "border-top-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -2625,16 +1797,14 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-top-style"
-    ]
+    supports: [],
+    subproperties: ["border-top-style"],
   },
   "column-rule-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -2648,29 +1818,20 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "column-rule-style"
-    ]
+    supports: [],
+    subproperties: ["column-rule-style"],
   },
   "animation-delay": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-delay"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-delay"],
   },
   "animation-direction": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "alternate",
       "alternate-reverse",
       "inherit",
@@ -2678,89 +1839,44 @@ const properties = {
       "normal",
       "reverse",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "animation-direction"
-    ]
+    supports: [],
+    subproperties: ["animation-direction"],
   },
   "animation-duration": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-duration"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-duration"],
   },
   "animation-fill-mode": {
-    "isInherited": false,
-    "values": [
-      "backwards",
-      "both",
-      "forwards",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-fill-mode"
-    ]
+    isInherited: false,
+    values: ["backwards", "both", "forwards", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-fill-mode"],
   },
   "animation-iteration-count": {
-    "isInherited": false,
-    "values": [
-      "infinite",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-iteration-count"
-    ]
+    isInherited: false,
+    values: ["infinite", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-iteration-count"],
   },
   "animation-name": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-name"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-name"],
   },
   "animation-play-state": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "paused",
-      "revert",
-      "running",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-play-state"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "paused", "revert", "running", "unset"],
+    supports: [],
+    subproperties: ["animation-play-state"],
   },
   "animation-timing-function": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "cubic-bezier",
       "ease",
       "ease-in",
@@ -2773,34 +1889,20 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
-      "animation-timing-function"
-    ]
+    supports: ["timing-function"],
+    subproperties: ["animation-timing-function"],
   },
   "background-attachment": {
-    "isInherited": false,
-    "values": [
-      "fixed",
-      "inherit",
-      "initial",
-      "local",
-      "revert",
-      "scroll",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "background-attachment"
-    ]
+    isInherited: false,
+    values: ["fixed", "inherit", "initial", "local", "revert", "scroll", "unset"],
+    supports: [],
+    subproperties: ["background-attachment"],
   },
   "background-blend-mode": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "color",
       "color-burn",
       "color-dodge",
@@ -2820,16 +1922,14 @@ const properties = {
       "saturation",
       "screen",
       "soft-light",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "background-blend-mode"
-    ]
+    supports: [],
+    subproperties: ["background-blend-mode"],
   },
   "background-clip": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "border-box",
       "content-box",
       "inherit",
@@ -2837,16 +1937,14 @@ const properties = {
       "padding-box",
       "revert",
       "text",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "background-clip"
-    ]
+    supports: [],
+    subproperties: ["background-clip"],
   },
   "background-image": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-element",
       "-moz-image-rect",
       "-moz-linear-gradient",
@@ -2867,66 +1965,32 @@ const properties = {
       "repeating-radial-gradient",
       "revert",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "gradient"
-    ],
-    "subproperties": [
-      "background-image"
-    ]
+    supports: ["gradient"],
+    subproperties: ["background-image"],
   },
   "background-origin": {
-    "isInherited": false,
-    "values": [
-      "border-box",
-      "content-box",
-      "inherit",
-      "initial",
-      "padding-box",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "background-origin"
-    ]
+    isInherited: false,
+    values: ["border-box", "content-box", "inherit", "initial", "padding-box", "revert", "unset"],
+    supports: [],
+    subproperties: ["background-origin"],
   },
   "background-position-x": {
-    "isInherited": false,
-    "values": [
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "background-position-x"
-    ]
+    isInherited: false,
+    values: ["center", "inherit", "initial", "left", "revert", "right", "unset"],
+    supports: [],
+    subproperties: ["background-position-x"],
   },
   "background-position-y": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "revert",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "background-position-y"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "revert", "top", "unset"],
+    supports: [],
+    subproperties: ["background-position-y"],
   },
   "background-repeat": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "inherit",
       "initial",
       "no-repeat",
@@ -2936,59 +2000,32 @@ const properties = {
       "revert",
       "round",
       "space",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "background-repeat"
-    ]
+    supports: [],
+    subproperties: ["background-repeat"],
   },
   "background-size": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "contain",
-      "cover",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "background-size"
-    ]
+    isInherited: false,
+    values: ["auto", "contain", "cover", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["background-size"],
   },
   "border-image-outset": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-image-outset"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-image-outset"],
   },
   "border-image-slice": {
-    "isInherited": false,
-    "values": [
-      "fill",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-image-slice"
-    ]
+    isInherited: false,
+    values: ["fill", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-image-slice"],
   },
   "border-image-source": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-element",
       "-moz-image-rect",
       "-moz-linear-gradient",
@@ -3009,45 +2046,26 @@ const properties = {
       "repeating-radial-gradient",
       "revert",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "gradient"
-    ],
-    "subproperties": [
-      "border-image-source"
-    ]
+    supports: ["gradient"],
+    subproperties: ["border-image-source"],
   },
   "border-image-width": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-image-width"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-image-width"],
   },
   "border-spacing": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-spacing"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-spacing"],
   },
   "box-shadow": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -3060,18 +2078,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "box-shadow"
-    ]
+    supports: ["color"],
+    subproperties: ["box-shadow"],
   },
   "caret-color": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "COLOR",
       "auto",
       "currentColor",
@@ -3083,18 +2097,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "caret-color"
-    ]
+    supports: ["color"],
+    subproperties: ["caret-color"],
   },
   "clip-path": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "border-box",
       "circle",
       "content-box",
@@ -3112,16 +2122,14 @@ const properties = {
       "stroke-box",
       "unset",
       "url",
-      "view-box"
+      "view-box",
     ],
-    "supports": [],
-    "subproperties": [
-      "clip-path"
-    ]
+    supports: [],
+    subproperties: ["clip-path"],
   },
-  "color": {
-    "isInherited": true,
-    "values": [
+  color: {
+    isInherited: true,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -3132,32 +2140,20 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "color"
-    ]
+    supports: ["color"],
+    subproperties: ["color"],
   },
   "column-width": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "column-width"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["column-width"],
   },
-  "content": {
-    "isInherited": false,
-    "values": [
+  content: {
+    isInherited: false,
+    values: [
       "-moz-alt-content",
       "attr",
       "close-quote",
@@ -3172,30 +2168,20 @@ const properties = {
       "open-quote",
       "revert",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [],
-    "subproperties": [
-      "content"
-    ]
+    supports: [],
+    subproperties: ["content"],
   },
   "counter-increment": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "counter-increment"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["counter-increment"],
   },
-  "cursor": {
-    "isInherited": true,
-    "values": [
+  cursor: {
+    isInherited: true,
+    values: [
       "-moz-grab",
       "-moz-grabbing",
       "-moz-zoom-in",
@@ -3240,16 +2226,14 @@ const properties = {
       "w-resize",
       "wait",
       "zoom-in",
-      "zoom-out"
+      "zoom-out",
     ],
-    "supports": [],
-    "subproperties": [
-      "cursor"
-    ]
+    supports: [],
+    subproperties: ["cursor"],
   },
-  "filter": {
-    "isInherited": false,
-    "values": [
+  filter: {
+    isInherited: false,
+    values: [
       "blur",
       "brightness",
       "contrast",
@@ -3265,16 +2249,14 @@ const properties = {
       "saturate",
       "sepia",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [],
-    "subproperties": [
-      "filter"
-    ]
+    supports: [],
+    subproperties: ["filter"],
   },
   "flex-basis": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -3286,57 +2268,32 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "flex-basis"
-    ]
+    supports: [],
+    subproperties: ["flex-basis"],
   },
   "font-family": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-family"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-family"],
   },
   "font-feature-settings": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-feature-settings"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-feature-settings"],
   },
   "font-language-override": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-language-override"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-language-override"],
   },
   "font-size": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "inherit",
       "initial",
       "large",
@@ -3350,16 +2307,14 @@ const properties = {
       "x-small",
       "xx-large",
       "xx-small",
-      "xxx-large"
+      "xxx-large",
     ],
-    "supports": [],
-    "subproperties": [
-      "font-size"
-    ]
+    supports: [],
+    subproperties: ["font-size"],
   },
   "font-variant-alternates": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "annotation",
       "character-variant",
       "historical-forms",
@@ -3371,88 +2326,44 @@ const properties = {
       "styleset",
       "stylistic",
       "swash",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "font-variant-alternates"
-    ]
+    supports: [],
+    subproperties: ["font-variant-alternates"],
   },
   "font-variation-settings": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-variation-settings"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-variation-settings"],
   },
   "grid-template-areas": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "grid-template-areas"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["grid-template-areas"],
   },
   "letter-spacing": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "letter-spacing"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["letter-spacing"],
   },
   "line-height": {
-    "isInherited": true,
-    "values": [
-      "-moz-block-height",
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "line-height"
-    ]
+    isInherited: true,
+    values: ["-moz-block-height", "inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["line-height"],
   },
   "list-style-image": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset",
-      "url"
-    ],
-    "supports": [],
-    "subproperties": [
-      "list-style-image"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "none", "revert", "unset", "url"],
+    supports: [],
+    subproperties: ["list-style-image"],
   },
   "list-style-type": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "arabic-indic",
       "armenian",
       "bengali",
@@ -3513,16 +2424,14 @@ const properties = {
       "upper-alpha",
       "upper-armenian",
       "upper-latin",
-      "upper-roman"
+      "upper-roman",
     ],
-    "supports": [],
-    "subproperties": [
-      "list-style-type"
-    ]
+    supports: [],
+    subproperties: ["list-style-type"],
   },
   "mask-clip": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "border-box",
       "content-box",
       "fill-box",
@@ -3533,33 +2442,20 @@ const properties = {
       "revert",
       "stroke-box",
       "unset",
-      "view-box"
+      "view-box",
     ],
-    "supports": [],
-    "subproperties": [
-      "mask-clip"
-    ]
+    supports: [],
+    subproperties: ["mask-clip"],
   },
   "mask-composite": {
-    "isInherited": false,
-    "values": [
-      "add",
-      "exclude",
-      "inherit",
-      "initial",
-      "intersect",
-      "revert",
-      "subtract",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-composite"
-    ]
+    isInherited: false,
+    values: ["add", "exclude", "inherit", "initial", "intersect", "revert", "subtract", "unset"],
+    supports: [],
+    subproperties: ["mask-composite"],
   },
   "mask-image": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-element",
       "-moz-image-rect",
       "-moz-linear-gradient",
@@ -3580,34 +2476,20 @@ const properties = {
       "repeating-radial-gradient",
       "revert",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "gradient"
-    ],
-    "subproperties": [
-      "mask-image"
-    ]
+    supports: ["gradient"],
+    subproperties: ["mask-image"],
   },
   "mask-mode": {
-    "isInherited": false,
-    "values": [
-      "alpha",
-      "inherit",
-      "initial",
-      "luminance",
-      "match-source",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-mode"
-    ]
+    isInherited: false,
+    values: ["alpha", "inherit", "initial", "luminance", "match-source", "revert", "unset"],
+    supports: [],
+    subproperties: ["mask-mode"],
   },
   "mask-origin": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "border-box",
       "content-box",
       "fill-box",
@@ -3617,48 +2499,26 @@ const properties = {
       "revert",
       "stroke-box",
       "unset",
-      "view-box"
+      "view-box",
     ],
-    "supports": [],
-    "subproperties": [
-      "mask-origin"
-    ]
+    supports: [],
+    subproperties: ["mask-origin"],
   },
   "mask-position-x": {
-    "isInherited": false,
-    "values": [
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-position-x"
-    ]
+    isInherited: false,
+    values: ["center", "inherit", "initial", "left", "revert", "right", "unset"],
+    supports: [],
+    subproperties: ["mask-position-x"],
   },
   "mask-position-y": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "revert",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-position-y"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "revert", "top", "unset"],
+    supports: [],
+    subproperties: ["mask-position-y"],
   },
   "mask-repeat": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "inherit",
       "initial",
       "no-repeat",
@@ -3668,59 +2528,32 @@ const properties = {
       "revert",
       "round",
       "space",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "mask-repeat"
-    ]
+    supports: [],
+    subproperties: ["mask-repeat"],
   },
   "mask-size": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "contain",
-      "cover",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-size"
-    ]
+    isInherited: false,
+    values: ["auto", "contain", "cover", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["mask-size"],
   },
   "-moz-context-properties": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-context-properties"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-context-properties"],
   },
   "-moz-tab-size": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-tab-size"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-tab-size"],
   },
   "offset-anchor": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "bottom",
       "center",
@@ -3730,89 +2563,44 @@ const properties = {
       "revert",
       "right",
       "top",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "offset-anchor"
-    ]
+    supports: [],
+    subproperties: ["offset-anchor"],
   },
   "offset-path": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "path",
-      "ray",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "offset-path"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "path", "ray", "revert", "unset"],
+    supports: [],
+    subproperties: ["offset-path"],
   },
-  "perspective": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "perspective"
-    ]
+  perspective: {
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["perspective"],
   },
-  "quotes": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "quotes"
-    ]
+  quotes: {
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["quotes"],
   },
-  "rotate": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "rotate"
-    ]
+  rotate: {
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["rotate"],
   },
-  "scale": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scale"
-    ]
+  scale: {
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["scale"],
   },
   "scrollbar-color": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "COLOR",
       "auto",
       "currentColor",
@@ -3824,18 +2612,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "scrollbar-color"
-    ]
+    supports: ["color"],
+    subproperties: ["scrollbar-color"],
   },
   "shape-outside": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-element",
       "-moz-image-rect",
       "-moz-linear-gradient",
@@ -3864,76 +2648,38 @@ const properties = {
       "repeating-radial-gradient",
       "revert",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "gradient"
-    ],
-    "subproperties": [
-      "shape-outside"
-    ]
+    supports: ["gradient"],
+    subproperties: ["shape-outside"],
   },
   "stroke-dasharray": {
-    "isInherited": true,
-    "values": [
-      "context-value",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "stroke-dasharray"
-    ]
+    isInherited: true,
+    values: ["context-value", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["stroke-dasharray"],
   },
   "stroke-dashoffset": {
-    "isInherited": true,
-    "values": [
-      "context-value",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "stroke-dashoffset"
-    ]
+    isInherited: true,
+    values: ["context-value", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["stroke-dashoffset"],
   },
   "stroke-width": {
-    "isInherited": true,
-    "values": [
-      "context-value",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "stroke-width"
-    ]
+    isInherited: true,
+    values: ["context-value", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["stroke-width"],
   },
   "text-decoration-thickness": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "from-font",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "text-decoration-thickness"
-    ]
+    isInherited: false,
+    values: ["auto", "from-font", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["text-decoration-thickness"],
   },
   "text-emphasis-style": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "circle",
       "dot",
       "double-circle",
@@ -3945,31 +2691,20 @@ const properties = {
       "revert",
       "sesame",
       "triangle",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "text-emphasis-style"
-    ]
+    supports: [],
+    subproperties: ["text-emphasis-style"],
   },
   "text-overflow": {
-    "isInherited": false,
-    "values": [
-      "clip",
-      "ellipsis",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "text-overflow"
-    ]
+    isInherited: false,
+    values: ["clip", "ellipsis", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["text-overflow"],
   },
   "text-shadow": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -3981,59 +2716,32 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "text-shadow"
-    ]
+    supports: ["color"],
+    subproperties: ["text-shadow"],
   },
   "transition-delay": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transition-delay"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["transition-delay"],
   },
   "transition-duration": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transition-duration"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["transition-duration"],
   },
   "transition-property": {
-    "isInherited": false,
-    "values": [
-      "all",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transition-property"
-    ]
+    isInherited: false,
+    values: ["all", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["transition-property"],
   },
   "transition-timing-function": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "cubic-bezier",
       "ease",
       "ease-in",
@@ -4046,32 +2754,20 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
-      "transition-timing-function"
-    ]
+    supports: ["timing-function"],
+    subproperties: ["transition-timing-function"],
   },
-  "translate": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "translate"
-    ]
+  translate: {
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["translate"],
   },
   "vertical-align": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-middle-with-baseline",
       "baseline",
       "bottom",
@@ -4084,110 +2780,50 @@ const properties = {
       "text-bottom",
       "text-top",
       "top",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "vertical-align"
-    ]
+    supports: [],
+    subproperties: ["vertical-align"],
   },
   "will-change": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "will-change"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["will-change"],
   },
   "word-spacing": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "word-spacing"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["word-spacing"],
   },
-  "clip": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "rect",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "clip"
-    ]
+  clip: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "rect", "revert", "unset"],
+    supports: [],
+    subproperties: ["clip"],
   },
   "-moz-image-region": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "rect",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-image-region"
-    ]
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "rect", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-image-region"],
   },
   "object-position": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "object-position"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "left", "revert", "right", "top", "unset"],
+    supports: [],
+    subproperties: ["object-position"],
   },
   "perspective-origin": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "perspective-origin"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "left", "revert", "right", "top", "unset"],
+    supports: [],
+    subproperties: ["perspective-origin"],
   },
-  "fill": {
-    "isInherited": true,
-    "values": [
+  fill: {
+    isInherited: true,
+    values: [
       "COLOR",
       "context-fill",
       "context-stroke",
@@ -4202,18 +2838,14 @@ const properties = {
       "rgba",
       "transparent",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "fill"
-    ]
+    supports: ["color"],
+    subproperties: ["fill"],
   },
-  "stroke": {
-    "isInherited": true,
-    "values": [
+  stroke: {
+    isInherited: true,
+    values: [
       "COLOR",
       "context-fill",
       "context-stroke",
@@ -4228,64 +2860,32 @@ const properties = {
       "rgba",
       "transparent",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "stroke"
-    ]
+    supports: ["color"],
+    subproperties: ["stroke"],
   },
   "transform-origin": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transform-origin"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "left", "revert", "right", "top", "unset"],
+    supports: [],
+    subproperties: ["transform-origin"],
   },
   "counter-reset": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "counter-reset"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["counter-reset"],
   },
   "counter-set": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "counter-set"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["counter-set"],
   },
   "grid-template-columns": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "fit-content",
       "inherit",
@@ -4296,16 +2896,14 @@ const properties = {
       "none",
       "repeat",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "grid-template-columns"
-    ]
+    supports: [],
+    subproperties: ["grid-template-columns"],
   },
   "grid-template-rows": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "fit-content",
       "inherit",
@@ -4316,16 +2914,14 @@ const properties = {
       "none",
       "repeat",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "grid-template-rows"
-    ]
+    supports: [],
+    subproperties: ["grid-template-rows"],
   },
   "grid-auto-columns": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "fit-content",
       "inherit",
@@ -4334,16 +2930,14 @@ const properties = {
       "min-content",
       "minmax",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "grid-auto-columns"
-    ]
+    supports: [],
+    subproperties: ["grid-auto-columns"],
   },
   "grid-auto-rows": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "fit-content",
       "inherit",
@@ -4352,16 +2946,14 @@ const properties = {
       "min-content",
       "minmax",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "grid-auto-rows"
-    ]
+    supports: [],
+    subproperties: ["grid-auto-rows"],
   },
-  "transform": {
-    "isInherited": false,
-    "values": [
+  transform: {
+    isInherited: false,
+    values: [
       "accumulatematrix",
       "inherit",
       "initial",
@@ -4389,161 +2981,86 @@ const properties = {
       "translateX",
       "translateY",
       "translateZ",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "transform"
-    ]
+    supports: [],
+    subproperties: ["transform"],
   },
   "column-gap": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "column-gap"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["column-gap"],
   },
   "row-gap": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "row-gap"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["row-gap"],
   },
   "marker-end": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset",
-      "url"
-    ],
-    "supports": [],
-    "subproperties": [
-      "marker-end"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "none", "revert", "unset", "url"],
+    supports: [],
+    subproperties: ["marker-end"],
   },
   "marker-mid": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset",
-      "url"
-    ],
-    "supports": [],
-    "subproperties": [
-      "marker-mid"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "none", "revert", "unset", "url"],
+    supports: [],
+    subproperties: ["marker-mid"],
   },
   "marker-start": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: ["inherit", "initial", "none", "revert", "unset", "url"],
+    supports: [],
+    subproperties: ["marker-start"],
+  },
+  "grid-column-end": {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["grid-column-end"],
+  },
+  "grid-column-start": {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["grid-column-start"],
+  },
+  "grid-row-end": {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["grid-row-end"],
+  },
+  "grid-row-start": {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["grid-row-start"],
+  },
+  "max-block-size": {
+    isInherited: false,
+    values: [
+      "-moz-available",
+      "-moz-fit-content",
+      "-moz-max-content",
+      "-moz-min-content",
       "inherit",
       "initial",
+      "max-content",
+      "min-content",
       "none",
       "revert",
       "unset",
-      "url"
     ],
-    "supports": [],
-    "subproperties": [
-      "marker-start"
-    ]
-  },
-  "grid-column-end": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "grid-column-end"
-    ]
-  },
-  "grid-column-start": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "grid-column-start"
-    ]
-  },
-  "grid-row-end": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "grid-row-end"
-    ]
-  },
-  "grid-row-start": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "grid-row-start"
-    ]
-  },
-  "max-block-size": {
-    "isInherited": false,
-    "values": [
-      "-moz-available",
-      "-moz-fit-content",
-      "-moz-max-content",
-      "-moz-min-content",
-      "inherit",
-      "initial",
-      "max-content",
-      "min-content",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "max-block-size"
-    ]
+    supports: [],
+    subproperties: ["max-block-size"],
   },
   "max-height": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4554,16 +3071,14 @@ const properties = {
       "min-content",
       "none",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "max-height"
-    ]
+    supports: [],
+    subproperties: ["max-height"],
   },
   "max-inline-size": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4574,16 +3089,14 @@ const properties = {
       "min-content",
       "none",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "max-inline-size"
-    ]
+    supports: [],
+    subproperties: ["max-inline-size"],
   },
   "max-width": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4594,94 +3107,50 @@ const properties = {
       "min-content",
       "none",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "max-width"
-    ]
+    supports: [],
+    subproperties: ["max-width"],
   },
-  "cx": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "cx"
-    ]
+  cx: {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["cx"],
   },
-  "cy": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "cy"
-    ]
+  cy: {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["cy"],
   },
   "offset-distance": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "offset-distance"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["offset-distance"],
   },
   "text-indent": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "text-indent"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["text-indent"],
   },
-  "x": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "x"
-    ]
+  x: {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["x"],
   },
-  "y": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "y"
-    ]
+  y: {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["y"],
   },
   "block-size": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4692,16 +3161,14 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "block-size"
-    ]
+    supports: [],
+    subproperties: ["block-size"],
   },
-  "height": {
-    "isInherited": false,
-    "values": [
+  height: {
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4712,16 +3179,14 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "height"
-    ]
+    supports: [],
+    subproperties: ["height"],
   },
   "inline-size": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4732,16 +3197,14 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "inline-size"
-    ]
+    supports: [],
+    subproperties: ["inline-size"],
   },
   "min-block-size": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4752,16 +3215,14 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "min-block-size"
-    ]
+    supports: [],
+    subproperties: ["min-block-size"],
   },
   "min-height": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4772,16 +3233,14 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "min-height"
-    ]
+    supports: [],
+    subproperties: ["min-height"],
   },
   "min-inline-size": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4792,16 +3251,14 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "min-inline-size"
-    ]
+    supports: [],
+    subproperties: ["min-inline-size"],
   },
   "min-width": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4812,16 +3269,14 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "min-width"
-    ]
+    supports: [],
+    subproperties: ["min-width"],
   },
-  "width": {
-    "isInherited": false,
-    "values": [
+  width: {
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -4832,973 +3287,428 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "width"
-    ]
+    supports: [],
+    subproperties: ["width"],
   },
   "outline-offset": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "outline-offset"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["outline-offset"],
   },
   "scroll-margin-block-end": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-margin-block-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-margin-block-end"],
   },
   "scroll-margin-block-start": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-margin-block-start"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-margin-block-start"],
   },
   "scroll-margin-bottom": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-margin-bottom"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-margin-bottom"],
   },
   "scroll-margin-inline-end": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-margin-inline-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-margin-inline-end"],
   },
   "scroll-margin-inline-start": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-margin-inline-start"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-margin-inline-start"],
   },
   "scroll-margin-left": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-margin-left"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-margin-left"],
   },
   "scroll-margin-right": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-margin-right"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-margin-right"],
   },
   "scroll-margin-top": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-margin-top"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-margin-top"],
   },
   "padding-block-end": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-block-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-block-end"],
   },
   "padding-block-start": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-block-start"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-block-start"],
   },
   "padding-bottom": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-bottom"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-bottom"],
   },
   "padding-inline-end": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-inline-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-inline-end"],
   },
   "padding-inline-start": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-inline-start"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-inline-start"],
   },
   "padding-left": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-left"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-left"],
   },
   "padding-right": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-right"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-right"],
   },
   "padding-top": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-top"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-top"],
   },
-  "r": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "r"
-    ]
+  r: {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["r"],
   },
   "shape-margin": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "shape-margin"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["shape-margin"],
   },
-  "rx": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "rx"
-    ]
+  rx: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["rx"],
   },
-  "ry": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "ry"
-    ]
+  ry: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["ry"],
   },
   "scroll-padding-block-end": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-padding-block-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-padding-block-end"],
   },
   "scroll-padding-block-start": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-padding-block-start"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-padding-block-start"],
   },
   "scroll-padding-bottom": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-padding-bottom"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-padding-bottom"],
   },
   "scroll-padding-inline-end": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-padding-inline-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-padding-inline-end"],
   },
   "scroll-padding-inline-start": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-padding-inline-start"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-padding-inline-start"],
   },
   "scroll-padding-left": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-padding-left"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-padding-left"],
   },
   "scroll-padding-right": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-padding-right"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-padding-right"],
   },
   "scroll-padding-top": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-padding-top"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-padding-top"],
   },
   "border-block-end-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-block-end-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-block-end-width"],
   },
   "border-block-start-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-block-start-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-block-start-width"],
   },
   "border-bottom-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-bottom-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-bottom-width"],
   },
   "border-inline-end-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-inline-end-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-inline-end-width"],
   },
   "border-inline-start-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-inline-start-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-inline-start-width"],
   },
   "border-left-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-left-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-left-width"],
   },
   "border-right-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-right-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-right-width"],
   },
   "border-top-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-top-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-top-width"],
   },
   "column-rule-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "column-rule-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["column-rule-width"],
   },
   "outline-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "outline-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["outline-width"],
   },
   "-webkit-text-stroke-width": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-webkit-text-stroke-width"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["-webkit-text-stroke-width"],
   },
   "border-bottom-left-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-bottom-left-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-bottom-left-radius"],
   },
   "border-bottom-right-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-bottom-right-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-bottom-right-radius"],
   },
   "border-end-end-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-end-end-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-end-end-radius"],
   },
   "border-end-start-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-end-start-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-end-start-radius"],
   },
   "border-start-end-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-start-end-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-start-end-radius"],
   },
   "border-start-start-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-start-start-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-start-start-radius"],
   },
   "border-top-left-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-top-left-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-top-left-radius"],
   },
   "border-top-right-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-top-right-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-top-right-radius"],
   },
   "-moz-outline-radius-bottomleft": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-outline-radius-bottomleft"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-outline-radius-bottomleft"],
   },
   "-moz-outline-radius-bottomright": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-outline-radius-bottomright"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-outline-radius-bottomright"],
   },
   "-moz-outline-radius-topleft": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-outline-radius-topleft"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-outline-radius-topleft"],
   },
   "-moz-outline-radius-topright": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-outline-radius-topright"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-outline-radius-topright"],
   },
-  "bottom": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "bottom"
-    ]
+  bottom: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["bottom"],
   },
   "inset-block-end": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "inset-block-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["inset-block-end"],
   },
   "inset-block-start": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "inset-block-start"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["inset-block-start"],
   },
   "inset-inline-end": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "inset-inline-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["inset-inline-end"],
   },
   "inset-inline-start": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "inset-inline-start"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["inset-inline-start"],
   },
-  "left": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "left"
-    ]
+  left: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["left"],
   },
   "margin-block-end": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-block-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-block-end"],
   },
   "margin-block-start": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-block-start"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-block-start"],
   },
   "margin-bottom": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-bottom"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-bottom"],
   },
   "margin-inline-end": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-inline-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-inline-end"],
   },
   "margin-inline-start": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-inline-start"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-inline-start"],
   },
   "margin-left": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-left"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-left"],
   },
   "margin-right": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-right"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-right"],
   },
   "margin-top": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-top"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-top"],
   },
-  "right": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "right"
-    ]
+  right: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["right"],
   },
   "text-underline-offset": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "text-underline-offset"
-    ]
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["text-underline-offset"],
   },
-  "top": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "top"
-    ]
+  top: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["top"],
   },
   "background-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -5809,18 +3719,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "background-color"
-    ]
+    supports: ["color"],
+    subproperties: ["background-color"],
   },
   "border-block-end-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -5831,18 +3737,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-block-end-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-block-end-color"],
   },
   "border-block-start-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -5853,18 +3755,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-block-start-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-block-start-color"],
   },
   "border-bottom-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -5875,18 +3773,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-bottom-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-bottom-color"],
   },
   "border-inline-end-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -5897,18 +3791,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-inline-end-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-inline-end-color"],
   },
   "border-inline-start-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -5919,18 +3809,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-inline-start-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-inline-start-color"],
   },
   "border-left-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -5941,18 +3827,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-left-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-left-color"],
   },
   "border-right-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -5963,18 +3845,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-right-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-right-color"],
   },
   "border-top-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -5985,18 +3863,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-top-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-top-color"],
   },
   "column-rule-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6007,18 +3881,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "column-rule-color"
-    ]
+    supports: ["color"],
+    subproperties: ["column-rule-color"],
   },
   "flood-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6029,18 +3899,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "flood-color"
-    ]
+    supports: ["color"],
+    subproperties: ["flood-color"],
   },
   "lighting-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6051,18 +3917,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "lighting-color"
-    ]
+    supports: ["color"],
+    subproperties: ["lighting-color"],
   },
   "outline-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6073,18 +3935,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "outline-color"
-    ]
+    supports: ["color"],
+    subproperties: ["outline-color"],
   },
   "stop-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6095,18 +3953,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "stop-color"
-    ]
+    supports: ["color"],
+    subproperties: ["stop-color"],
   },
   "text-decoration-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6117,18 +3971,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "text-decoration-color"
-    ]
+    supports: ["color"],
+    subproperties: ["text-decoration-color"],
   },
   "text-emphasis-color": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6139,18 +3989,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "text-emphasis-color"
-    ]
+    supports: ["color"],
+    subproperties: ["text-emphasis-color"],
   },
   "-webkit-text-fill-color": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6161,18 +4007,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "-webkit-text-fill-color"
-    ]
+    supports: ["color"],
+    subproperties: ["-webkit-text-fill-color"],
   },
   "-webkit-text-stroke-color": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6183,18 +4025,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "-webkit-text-stroke-color"
-    ]
+    supports: ["color"],
+    subproperties: ["-webkit-text-stroke-color"],
   },
-  "background": {
-    "isInherited": false,
-    "values": [
+  background: {
+    isInherited: false,
+    values: [
       "COLOR",
       "-moz-element",
       "-moz-image-rect",
@@ -6243,13 +4081,10 @@ const properties = {
       "top",
       "transparent",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "color",
-      "gradient"
-    ],
-    "subproperties": [
+    supports: ["color", "gradient"],
+    subproperties: [
       "background-color",
       "background-position-x",
       "background-position-y",
@@ -6258,31 +4093,18 @@ const properties = {
       "background-image",
       "background-size",
       "background-origin",
-      "background-clip"
-    ]
+      "background-clip",
+    ],
   },
   "background-position": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "background-position-x",
-      "background-position-y"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "left", "revert", "right", "top", "unset"],
+    supports: [],
+    subproperties: ["background-position-x", "background-position-y"],
   },
   "border-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6293,21 +4115,19 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
+    supports: ["color"],
+    subproperties: [
       "border-top-color",
       "border-right-color",
       "border-bottom-color",
-      "border-left-color"
-    ]
+      "border-left-color",
+    ],
   },
   "border-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -6321,38 +4141,30 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
+    supports: [],
+    subproperties: [
       "border-top-style",
       "border-right-style",
       "border-bottom-style",
-      "border-left-style"
-    ]
+      "border-left-style",
+    ],
   },
   "border-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: [
       "border-top-width",
       "border-right-width",
       "border-bottom-width",
-      "border-left-width"
-    ]
+      "border-left-width",
+    ],
   },
   "border-top": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6376,20 +4188,14 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-top-color",
-      "border-top-style",
-      "border-top-width"
-    ]
+    supports: ["color"],
+    subproperties: ["border-top-color", "border-top-style", "border-top-width"],
   },
   "border-right": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6413,20 +4219,14 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-right-color",
-      "border-right-style",
-      "border-right-width"
-    ]
+    supports: ["color"],
+    subproperties: ["border-right-color", "border-right-style", "border-right-width"],
   },
   "border-bottom": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6450,20 +4250,14 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-bottom-color",
-      "border-bottom-style",
-      "border-bottom-width"
-    ]
+    supports: ["color"],
+    subproperties: ["border-bottom-color", "border-bottom-style", "border-bottom-width"],
   },
   "border-left": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6487,20 +4281,14 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-left-color",
-      "border-left-style",
-      "border-left-width"
-    ]
+    supports: ["color"],
+    subproperties: ["border-left-color", "border-left-style", "border-left-width"],
   },
   "border-block-start": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6524,20 +4312,18 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
+    supports: ["color"],
+    subproperties: [
       "border-block-start-color",
       "border-block-start-style",
-      "border-block-start-width"
-    ]
+      "border-block-start-width",
+    ],
   },
   "border-block-end": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6561,20 +4347,14 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-block-end-color",
-      "border-block-end-style",
-      "border-block-end-width"
-    ]
+    supports: ["color"],
+    subproperties: ["border-block-end-color", "border-block-end-style", "border-block-end-width"],
   },
   "border-inline-start": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6598,20 +4378,18 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
+    supports: ["color"],
+    subproperties: [
       "border-inline-start-color",
       "border-inline-start-style",
-      "border-inline-start-width"
-    ]
+      "border-inline-start-width",
+    ],
   },
   "border-inline-end": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6635,20 +4413,18 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
+    supports: ["color"],
+    subproperties: [
       "border-inline-end-color",
       "border-inline-end-style",
-      "border-inline-end-width"
-    ]
+      "border-inline-end-width",
+    ],
   },
-  "border": {
-    "isInherited": false,
-    "values": [
+  border: {
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6672,12 +4448,10 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
+    supports: ["color"],
+    subproperties: [
       "border-top-color",
       "border-top-style",
       "border-top-width",
@@ -6694,28 +4468,23 @@ const properties = {
       "border-image-repeat",
       "border-image-slice",
       "border-image-source",
-      "border-image-width"
-    ]
+      "border-image-width",
+    ],
   },
   "border-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: [
       "border-top-left-radius",
       "border-top-right-radius",
       "border-bottom-right-radius",
-      "border-bottom-left-radius"
-    ]
+      "border-bottom-left-radius",
+    ],
   },
   "border-image": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-element",
       "-moz-image-rect",
       "-moz-linear-gradient",
@@ -6742,39 +4511,26 @@ const properties = {
       "space",
       "stretch",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "gradient"
-    ],
-    "subproperties": [
+    supports: ["gradient"],
+    subproperties: [
       "border-image-outset",
       "border-image-repeat",
       "border-image-slice",
       "border-image-source",
-      "border-image-width"
-    ]
+      "border-image-width",
+    ],
   },
   "border-block-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-block-start-width",
-      "border-block-end-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-block-start-width", "border-block-end-width"],
   },
   "border-block-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -6788,17 +4544,14 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-block-start-style",
-      "border-block-end-style"
-    ]
+    supports: [],
+    subproperties: ["border-block-start-style", "border-block-end-style"],
   },
   "border-block-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6809,36 +4562,20 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-block-start-color",
-      "border-block-end-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-block-start-color", "border-block-end-color"],
   },
   "border-inline-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-inline-start-width",
-      "border-inline-end-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-inline-start-width", "border-inline-end-width"],
   },
   "border-inline-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -6852,17 +4589,14 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-inline-start-style",
-      "border-inline-end-style"
-    ]
+    supports: [],
+    subproperties: ["border-inline-start-style", "border-inline-end-style"],
   },
   "border-inline-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -6873,19 +4607,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-inline-start-color",
-      "border-inline-end-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-inline-start-color", "border-inline-end-color"],
   },
   "border-block": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6909,23 +4638,21 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
+    supports: ["color"],
+    subproperties: [
       "border-block-start-width",
       "border-block-end-width",
       "border-block-start-style",
       "border-block-end-style",
       "border-block-start-color",
-      "border-block-end-color"
-    ]
+      "border-block-end-color",
+    ],
   },
   "border-inline": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -6949,23 +4676,21 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
+    supports: ["color"],
+    subproperties: [
       "border-inline-start-width",
       "border-inline-end-width",
       "border-inline-start-style",
       "border-inline-end-style",
       "border-inline-start-color",
-      "border-inline-end-color"
-    ]
+      "border-inline-end-color",
+    ],
   },
-  "overflow": {
-    "isInherited": false,
-    "values": [
+  overflow: {
+    isInherited: false,
+    values: [
       "-moz-hidden-unscrollable",
       "auto",
       "hidden",
@@ -6974,17 +4699,14 @@ const properties = {
       "revert",
       "scroll",
       "unset",
-      "visible"
+      "visible",
     ],
-    "supports": [],
-    "subproperties": [
-      "overflow-x",
-      "overflow-y"
-    ]
+    supports: [],
+    subproperties: ["overflow-x", "overflow-y"],
   },
-  "transition": {
-    "isInherited": false,
-    "values": [
+  transition: {
+    isInherited: false,
+    values: [
       "all",
       "cubic-bezier",
       "ease",
@@ -6999,21 +4721,19 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
+    supports: ["timing-function"],
+    subproperties: [
       "transition-property",
       "transition-duration",
       "transition-timing-function",
-      "transition-delay"
-    ]
+      "transition-delay",
+    ],
   },
-  "animation": {
-    "isInherited": false,
-    "values": [
+  animation: {
+    isInherited: false,
+    values: [
       "alternate",
       "alternate-reverse",
       "backwards",
@@ -7037,12 +4757,10 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
+    supports: ["timing-function"],
+    subproperties: [
       "animation-name",
       "animation-duration",
       "animation-timing-function",
@@ -7050,29 +4768,18 @@ const properties = {
       "animation-iteration-count",
       "animation-direction",
       "animation-fill-mode",
-      "animation-play-state"
-    ]
+      "animation-play-state",
+    ],
   },
   "overscroll-behavior": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "contain",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "overscroll-behavior-x",
-      "overscroll-behavior-y"
-    ]
+    isInherited: false,
+    values: ["auto", "contain", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["overscroll-behavior-x", "overscroll-behavior-y"],
   },
   "page-break-before": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "always",
       "auto",
       "avoid",
@@ -7082,16 +4789,14 @@ const properties = {
       "page",
       "revert",
       "right",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "break-before"
-    ]
+    supports: [],
+    subproperties: ["break-before"],
   },
   "page-break-after": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "always",
       "auto",
       "avoid",
@@ -7101,16 +4806,14 @@ const properties = {
       "page",
       "revert",
       "right",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "break-after"
-    ]
+    supports: [],
+    subproperties: ["break-after"],
   },
-  "offset": {
-    "isInherited": false,
-    "values": [
+  offset: {
+    isInherited: false,
+    values: [
       "auto",
       "bottom",
       "center",
@@ -7124,34 +4827,20 @@ const properties = {
       "revert",
       "right",
       "top",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "offset-path",
-      "offset-distance",
-      "offset-rotate",
-      "offset-anchor"
-    ]
+    supports: [],
+    subproperties: ["offset-path", "offset-distance", "offset-rotate", "offset-anchor"],
   },
-  "columns": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "column-width",
-      "column-count"
-    ]
+  columns: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["column-width", "column-count"],
   },
   "column-rule": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -7175,20 +4864,14 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "column-rule-width",
-      "column-rule-style",
-      "column-rule-color"
-    ]
+    supports: ["color"],
+    subproperties: ["column-rule-width", "column-rule-style", "column-rule-color"],
   },
-  "font": {
-    "isInherited": true,
-    "values": [
+  font: {
+    isInherited: true,
+    values: [
       "-moz-button",
       "-moz-desktop",
       "-moz-dialog",
@@ -7238,10 +4921,10 @@ const properties = {
       "x-small",
       "xx-large",
       "xx-small",
-      "xxx-large"
+      "xxx-large",
     ],
-    "supports": [],
-    "subproperties": [
+    supports: [],
+    subproperties: [
       "font-style",
       "font-variant-caps",
       "font-weight",
@@ -7259,12 +4942,12 @@ const properties = {
       "font-variant-position",
       "font-language-override",
       "font-feature-settings",
-      "font-variation-settings"
-    ]
+      "font-variation-settings",
+    ],
   },
   "font-variant": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "all-petite-caps",
       "all-small-caps",
       "annotation",
@@ -7310,38 +4993,27 @@ const properties = {
       "titling-caps",
       "traditional",
       "unicase",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
+    supports: [],
+    subproperties: [
       "font-variant-caps",
       "font-variant-alternates",
       "font-variant-east-asian",
       "font-variant-ligatures",
       "font-variant-numeric",
-      "font-variant-position"
-    ]
-  },
-  "marker": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset",
-      "url"
+      "font-variant-position",
     ],
-    "supports": [],
-    "subproperties": [
-      "marker-start",
-      "marker-end",
-      "marker-mid"
-    ]
+  },
+  marker: {
+    isInherited: true,
+    values: ["inherit", "initial", "none", "revert", "unset", "url"],
+    supports: [],
+    subproperties: ["marker-start", "marker-end", "marker-mid"],
   },
   "text-emphasis": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "COLOR",
       "circle",
       "currentColor",
@@ -7360,19 +5032,14 @@ const properties = {
       "sesame",
       "transparent",
       "triangle",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "text-emphasis-style",
-      "text-emphasis-color"
-    ]
+    supports: ["color"],
+    subproperties: ["text-emphasis-style", "text-emphasis-color"],
   },
   "-webkit-text-stroke": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -7386,19 +5053,14 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "-webkit-text-stroke-width",
-      "-webkit-text-stroke-color"
-    ]
+    supports: ["color"],
+    subproperties: ["-webkit-text-stroke-width", "-webkit-text-stroke-color"],
   },
   "list-style": {
-    "isInherited": true,
-    "values": [
+    isInherited: true,
+    values: [
       "arabic-indic",
       "armenian",
       "bengali",
@@ -7462,109 +5124,55 @@ const properties = {
       "upper-armenian",
       "upper-latin",
       "upper-roman",
-      "url"
+      "url",
     ],
-    "supports": [],
-    "subproperties": [
-      "list-style-position",
-      "list-style-image",
-      "list-style-type"
-    ]
+    supports: [],
+    subproperties: ["list-style-position", "list-style-image", "list-style-type"],
   },
-  "margin": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-top",
-      "margin-right",
-      "margin-bottom",
-      "margin-left"
-    ]
+  margin: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-top", "margin-right", "margin-bottom", "margin-left"],
   },
   "margin-block": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-block-start",
-      "margin-block-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-block-start", "margin-block-end"],
   },
   "margin-inline": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-inline-start",
-      "margin-inline-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-inline-start", "margin-inline-end"],
   },
   "scroll-margin": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: [
       "scroll-margin-top",
       "scroll-margin-right",
       "scroll-margin-bottom",
-      "scroll-margin-left"
-    ]
+      "scroll-margin-left",
+    ],
   },
   "scroll-margin-block": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-margin-block-start",
-      "scroll-margin-block-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-margin-block-start", "scroll-margin-block-end"],
   },
   "scroll-margin-inline": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-margin-inline-start",
-      "scroll-margin-inline-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-margin-inline-start", "scroll-margin-inline-end"],
   },
-  "outline": {
-    "isInherited": false,
-    "values": [
+  outline: {
+    isInherited: false,
+    values: [
       "COLOR",
       "auto",
       "currentColor",
@@ -7589,127 +5197,66 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "outline-color",
-      "outline-style",
-      "outline-width"
-    ]
+    supports: ["color"],
+    subproperties: ["outline-color", "outline-style", "outline-width"],
   },
   "-moz-outline-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: [
       "-moz-outline-radius-topleft",
       "-moz-outline-radius-topright",
       "-moz-outline-radius-bottomright",
-      "-moz-outline-radius-bottomleft"
-    ]
-  },
-  "padding": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
+      "-moz-outline-radius-bottomleft",
     ],
-    "supports": [],
-    "subproperties": [
-      "padding-top",
-      "padding-right",
-      "padding-bottom",
-      "padding-left"
-    ]
+  },
+  padding: {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-top", "padding-right", "padding-bottom", "padding-left"],
   },
   "padding-block": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-block-start",
-      "padding-block-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-block-start", "padding-block-end"],
   },
   "padding-inline": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-inline-start",
-      "padding-inline-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-inline-start", "padding-inline-end"],
   },
   "scroll-padding": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: [
       "scroll-padding-top",
       "scroll-padding-right",
       "scroll-padding-bottom",
-      "scroll-padding-left"
-    ]
+      "scroll-padding-left",
+    ],
   },
   "scroll-padding-block": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-padding-block-start",
-      "scroll-padding-block-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-padding-block-start", "scroll-padding-block-end"],
   },
   "scroll-padding-inline": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "scroll-padding-inline-start",
-      "scroll-padding-inline-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["scroll-padding-inline-start", "scroll-padding-inline-end"],
   },
   "flex-flow": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "column",
       "column-reverse",
       "inherit",
@@ -7720,17 +5267,14 @@ const properties = {
       "row-reverse",
       "unset",
       "wrap",
-      "wrap-reverse"
+      "wrap-reverse",
     ],
-    "supports": [],
-    "subproperties": [
-      "flex-direction",
-      "flex-wrap"
-    ]
+    supports: [],
+    subproperties: ["flex-direction", "flex-wrap"],
   },
-  "flex": {
-    "isInherited": false,
-    "values": [
+  flex: {
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -7742,77 +5286,38 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "flex-grow",
-      "flex-shrink",
-      "flex-basis"
-    ]
+    supports: [],
+    subproperties: ["flex-grow", "flex-shrink", "flex-basis"],
   },
-  "gap": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "row-gap",
-      "column-gap"
-    ]
+  gap: {
+    isInherited: false,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["row-gap", "column-gap"],
   },
   "grid-row": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "grid-row-start",
-      "grid-row-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["grid-row-start", "grid-row-end"],
   },
   "grid-column": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "grid-column-start",
-      "grid-column-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["grid-column-start", "grid-column-end"],
   },
   "grid-area": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "grid-row-start",
-      "grid-row-end",
-      "grid-column-start",
-      "grid-column-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["grid-row-start", "grid-row-end", "grid-column-start", "grid-column-end"],
   },
   "grid-template": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "fit-content",
       "inherit",
@@ -7823,18 +5328,14 @@ const properties = {
       "none",
       "repeat",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "grid-template-rows",
-      "grid-template-columns",
-      "grid-template-areas"
-    ]
+    supports: [],
+    subproperties: ["grid-template-rows", "grid-template-columns", "grid-template-areas"],
   },
-  "grid": {
-    "isInherited": false,
-    "values": [
+  grid: {
+    isInherited: false,
+    values: [
       "auto",
       "column",
       "dense",
@@ -7848,21 +5349,21 @@ const properties = {
       "repeat",
       "revert",
       "row",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
+    supports: [],
+    subproperties: [
       "grid-template-rows",
       "grid-template-columns",
       "grid-template-areas",
       "grid-auto-rows",
       "grid-auto-columns",
-      "grid-auto-flow"
-    ]
+      "grid-auto-flow",
+    ],
   },
   "place-content": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "baseline",
       "center",
       "end",
@@ -7883,17 +5384,14 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "align-content",
-      "justify-content"
-    ]
+    supports: [],
+    subproperties: ["align-content", "justify-content"],
   },
   "place-self": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "baseline",
       "center",
@@ -7914,17 +5412,14 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "align-self",
-      "justify-self"
-    ]
+    supports: [],
+    subproperties: ["align-self", "justify-self"],
   },
   "place-items": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "baseline",
       "center",
       "end",
@@ -7945,64 +5440,32 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "align-items",
-      "justify-items"
-    ]
+    supports: [],
+    subproperties: ["align-items", "justify-items"],
   },
-  "inset": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "top",
-      "right",
-      "bottom",
-      "left"
-    ]
+  inset: {
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["top", "right", "bottom", "left"],
   },
   "inset-block": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "inset-block-start",
-      "inset-block-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["inset-block-start", "inset-block-end"],
   },
   "inset-inline": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "inset-inline-start",
-      "inset-inline-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["inset-inline-start", "inset-inline-end"],
   },
-  "mask": {
-    "isInherited": false,
-    "values": [
+  mask: {
+    isInherited: false,
+    values: [
       "-moz-element",
       "-moz-image-rect",
       "-moz-linear-gradient",
@@ -8051,12 +5514,10 @@ const properties = {
       "top",
       "unset",
       "url",
-      "view-box"
+      "view-box",
     ],
-    "supports": [
-      "gradient"
-    ],
-    "subproperties": [
+    supports: ["gradient"],
+    subproperties: [
       "mask-mode",
       "mask-repeat",
       "mask-clip",
@@ -8065,31 +5526,18 @@ const properties = {
       "mask-position-x",
       "mask-position-y",
       "mask-size",
-      "mask-image"
-    ]
+      "mask-image",
+    ],
   },
   "mask-position": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-position-x",
-      "mask-position-y"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "left", "revert", "right", "top", "unset"],
+    supports: [],
+    subproperties: ["mask-position-x", "mask-position-y"],
   },
   "text-decoration": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "-moz-none",
       "auto",
@@ -8113,28 +5561,21 @@ const properties = {
       "transparent",
       "underline",
       "unset",
-      "wavy"
+      "wavy",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
+    supports: ["color"],
+    subproperties: [
       "text-decoration-line",
       "text-decoration-style",
       "text-decoration-color",
-      "text-decoration-thickness"
-    ]
-  },
-  "all": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
+      "text-decoration-thickness",
     ],
-    "supports": [],
-    "subproperties": [
+  },
+  all: {
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: [
       "border-block-start-color",
       "border-block-start-style",
       "border-block-start-width",
@@ -8483,12 +5924,12 @@ const properties = {
       "-moz-box-flex",
       "-moz-box-orient",
       "-moz-box-pack",
-      "-moz-box-ordinal-group"
-    ]
+      "-moz-box-ordinal-group",
+    ],
   },
   "-webkit-background-clip": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "border-box",
       "content-box",
       "inherit",
@@ -8496,48 +5937,26 @@ const properties = {
       "padding-box",
       "revert",
       "text",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "background-clip"
-    ]
+    supports: [],
+    subproperties: ["background-clip"],
   },
   "-webkit-background-origin": {
-    "isInherited": false,
-    "values": [
-      "border-box",
-      "content-box",
-      "inherit",
-      "initial",
-      "padding-box",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "background-origin"
-    ]
+    isInherited: false,
+    values: ["border-box", "content-box", "inherit", "initial", "padding-box", "revert", "unset"],
+    supports: [],
+    subproperties: ["background-origin"],
   },
   "-webkit-background-size": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "contain",
-      "cover",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "background-size"
-    ]
+    isInherited: false,
+    values: ["auto", "contain", "cover", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["background-size"],
   },
   "-moz-border-start-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -8548,18 +5967,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-inline-start-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-inline-start-color"],
   },
   "-moz-border-start-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -8573,32 +5988,20 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-inline-start-style"
-    ]
+    supports: [],
+    subproperties: ["border-inline-start-style"],
   },
   "-moz-border-start-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-inline-start-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-inline-start-width"],
   },
   "-moz-border-end-color": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -8609,18 +6012,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "border-inline-end-color"
-    ]
+    supports: ["color"],
+    subproperties: ["border-inline-end-color"],
   },
   "-moz-border-end-style": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "dashed",
       "dotted",
       "double",
@@ -8634,110 +6033,56 @@ const properties = {
       "revert",
       "ridge",
       "solid",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "border-inline-end-style"
-    ]
+    supports: [],
+    subproperties: ["border-inline-end-style"],
   },
   "-moz-border-end-width": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "medium",
-      "revert",
-      "thick",
-      "thin",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-inline-end-width"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "medium", "revert", "thick", "thin", "unset"],
+    supports: [],
+    subproperties: ["border-inline-end-width"],
   },
   "-webkit-border-top-left-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-top-left-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-top-left-radius"],
   },
   "-webkit-border-top-right-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-top-right-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-top-right-radius"],
   },
   "-webkit-border-bottom-right-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-bottom-right-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-bottom-right-radius"],
   },
   "-webkit-border-bottom-left-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "border-bottom-left-radius"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["border-bottom-left-radius"],
   },
   "-moz-transition-duration": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transition-duration"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["transition-duration"],
   },
   "-webkit-transition-duration": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transition-duration"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["transition-duration"],
   },
   "-moz-transition-timing-function": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "cubic-bezier",
       "ease",
       "ease-in",
@@ -8750,18 +6095,14 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
-      "transition-timing-function"
-    ]
+    supports: ["timing-function"],
+    subproperties: ["transition-timing-function"],
   },
   "-webkit-transition-timing-function": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "cubic-bezier",
       "ease",
       "ease-in",
@@ -8774,128 +6115,62 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
-      "transition-timing-function"
-    ]
+    supports: ["timing-function"],
+    subproperties: ["transition-timing-function"],
   },
   "-moz-transition-property": {
-    "isInherited": false,
-    "values": [
-      "all",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transition-property"
-    ]
+    isInherited: false,
+    values: ["all", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["transition-property"],
   },
   "-webkit-transition-property": {
-    "isInherited": false,
-    "values": [
-      "all",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transition-property"
-    ]
+    isInherited: false,
+    values: ["all", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["transition-property"],
   },
   "-moz-transition-delay": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transition-delay"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["transition-delay"],
   },
   "-webkit-transition-delay": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transition-delay"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["transition-delay"],
   },
   "-moz-animation-name": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-name"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-name"],
   },
   "-webkit-animation-name": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-name"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-name"],
   },
   "-moz-animation-duration": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-duration"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-duration"],
   },
   "-webkit-animation-duration": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-duration"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-duration"],
   },
   "-moz-animation-timing-function": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "cubic-bezier",
       "ease",
       "ease-in",
@@ -8908,18 +6183,14 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
-      "animation-timing-function"
-    ]
+    supports: ["timing-function"],
+    subproperties: ["animation-timing-function"],
   },
   "-webkit-animation-timing-function": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "cubic-bezier",
       "ease",
       "ease-in",
@@ -8932,46 +6203,26 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
-      "animation-timing-function"
-    ]
+    supports: ["timing-function"],
+    subproperties: ["animation-timing-function"],
   },
   "-moz-animation-iteration-count": {
-    "isInherited": false,
-    "values": [
-      "infinite",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-iteration-count"
-    ]
+    isInherited: false,
+    values: ["infinite", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-iteration-count"],
   },
   "-webkit-animation-iteration-count": {
-    "isInherited": false,
-    "values": [
-      "infinite",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-iteration-count"
-    ]
+    isInherited: false,
+    values: ["infinite", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-iteration-count"],
   },
   "-moz-animation-direction": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "alternate",
       "alternate-reverse",
       "inherit",
@@ -8979,16 +6230,14 @@ const properties = {
       "normal",
       "reverse",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "animation-direction"
-    ]
+    supports: [],
+    subproperties: ["animation-direction"],
   },
   "-webkit-animation-direction": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "alternate",
       "alternate-reverse",
       "inherit",
@@ -8996,106 +6245,50 @@ const properties = {
       "normal",
       "reverse",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "animation-direction"
-    ]
+    supports: [],
+    subproperties: ["animation-direction"],
   },
   "-moz-animation-play-state": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "paused",
-      "revert",
-      "running",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-play-state"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "paused", "revert", "running", "unset"],
+    supports: [],
+    subproperties: ["animation-play-state"],
   },
   "-webkit-animation-play-state": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "paused",
-      "revert",
-      "running",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-play-state"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "paused", "revert", "running", "unset"],
+    supports: [],
+    subproperties: ["animation-play-state"],
   },
   "-moz-animation-fill-mode": {
-    "isInherited": false,
-    "values": [
-      "backwards",
-      "both",
-      "forwards",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-fill-mode"
-    ]
+    isInherited: false,
+    values: ["backwards", "both", "forwards", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-fill-mode"],
   },
   "-webkit-animation-fill-mode": {
-    "isInherited": false,
-    "values": [
-      "backwards",
-      "both",
-      "forwards",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-fill-mode"
-    ]
+    isInherited: false,
+    values: ["backwards", "both", "forwards", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-fill-mode"],
   },
   "-moz-animation-delay": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-delay"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-delay"],
   },
   "-webkit-animation-delay": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "animation-delay"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["animation-delay"],
   },
   "-moz-transform": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "accumulatematrix",
       "inherit",
       "initial",
@@ -9123,16 +6316,14 @@ const properties = {
       "translateX",
       "translateY",
       "translateZ",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "transform"
-    ]
+    supports: [],
+    subproperties: ["transform"],
   },
   "-webkit-transform": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "accumulatematrix",
       "inherit",
       "initial",
@@ -9160,191 +6351,80 @@ const properties = {
       "translateX",
       "translateY",
       "translateZ",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "transform"
-    ]
+    supports: [],
+    subproperties: ["transform"],
   },
   "page-break-inside": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "avoid",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "break-inside"
-    ]
+    isInherited: false,
+    values: ["auto", "avoid", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["break-inside"],
   },
   "-moz-perspective": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "perspective"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["perspective"],
   },
   "-webkit-perspective": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "perspective"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["perspective"],
   },
   "-moz-perspective-origin": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "perspective-origin"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "left", "revert", "right", "top", "unset"],
+    supports: [],
+    subproperties: ["perspective-origin"],
   },
   "-webkit-perspective-origin": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "perspective-origin"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "left", "revert", "right", "top", "unset"],
+    supports: [],
+    subproperties: ["perspective-origin"],
   },
   "-moz-backface-visibility": {
-    "isInherited": false,
-    "values": [
-      "hidden",
-      "inherit",
-      "initial",
-      "revert",
-      "unset",
-      "visible"
-    ],
-    "supports": [],
-    "subproperties": [
-      "backface-visibility"
-    ]
+    isInherited: false,
+    values: ["hidden", "inherit", "initial", "revert", "unset", "visible"],
+    supports: [],
+    subproperties: ["backface-visibility"],
   },
   "-webkit-backface-visibility": {
-    "isInherited": false,
-    "values": [
-      "hidden",
-      "inherit",
-      "initial",
-      "revert",
-      "unset",
-      "visible"
-    ],
-    "supports": [],
-    "subproperties": [
-      "backface-visibility"
-    ]
+    isInherited: false,
+    values: ["hidden", "inherit", "initial", "revert", "unset", "visible"],
+    supports: [],
+    subproperties: ["backface-visibility"],
   },
   "-moz-transform-style": {
-    "isInherited": false,
-    "values": [
-      "flat",
-      "inherit",
-      "initial",
-      "preserve-3d",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transform-style"
-    ]
+    isInherited: false,
+    values: ["flat", "inherit", "initial", "preserve-3d", "revert", "unset"],
+    supports: [],
+    subproperties: ["transform-style"],
   },
   "-webkit-transform-style": {
-    "isInherited": false,
-    "values": [
-      "flat",
-      "inherit",
-      "initial",
-      "preserve-3d",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transform-style"
-    ]
+    isInherited: false,
+    values: ["flat", "inherit", "initial", "preserve-3d", "revert", "unset"],
+    supports: [],
+    subproperties: ["transform-style"],
   },
   "-moz-transform-origin": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transform-origin"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "left", "revert", "right", "top", "unset"],
+    supports: [],
+    subproperties: ["transform-origin"],
   },
   "-webkit-transform-origin": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "transform-origin"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "left", "revert", "right", "top", "unset"],
+    supports: [],
+    subproperties: ["transform-origin"],
   },
   "-webkit-appearance": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-gtk-info-bar",
       "-moz-mac-active-source-list-selection",
       "-moz-mac-disclosure-button-closed",
@@ -9474,16 +6554,14 @@ const properties = {
       "treetwistyopen",
       "treeview",
       "unset",
-      "window"
+      "window",
     ],
-    "supports": [],
-    "subproperties": [
-      "-moz-appearance"
-    ]
+    supports: [],
+    subproperties: ["-moz-appearance"],
   },
   "-webkit-box-shadow": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "hsl",
@@ -9496,18 +6574,14 @@ const properties = {
       "rgb",
       "rgba",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
-      "box-shadow"
-    ]
+    supports: ["color"],
+    subproperties: ["box-shadow"],
   },
   "-webkit-filter": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "blur",
       "brightness",
       "contrast",
@@ -9523,145 +6597,68 @@ const properties = {
       "saturate",
       "sepia",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [],
-    "subproperties": [
-      "filter"
-    ]
+    supports: [],
+    subproperties: ["filter"],
   },
   "-moz-font-feature-settings": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-feature-settings"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-feature-settings"],
   },
   "-moz-font-language-override": {
-    "isInherited": true,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "font-language-override"
-    ]
+    isInherited: true,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["font-language-override"],
   },
   "-moz-hyphens": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "manual",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "hyphens"
-    ]
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "manual", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["hyphens"],
   },
   "-webkit-text-size-adjust": {
-    "isInherited": true,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-text-size-adjust"
-    ]
+    isInherited: true,
+    values: ["auto", "inherit", "initial", "none", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-text-size-adjust"],
   },
   "word-wrap": {
-    "isInherited": true,
-    "values": [
-      "anywhere",
-      "break-word",
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "overflow-wrap"
-    ]
+    isInherited: true,
+    values: ["anywhere", "break-word", "inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["overflow-wrap"],
   },
   "-moz-margin-start": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-inline-start"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-inline-start"],
   },
   "-moz-margin-end": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "margin-inline-end"
-    ]
+    isInherited: false,
+    values: ["auto", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["margin-inline-end"],
   },
   "-moz-padding-start": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-inline-start"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-inline-start"],
   },
   "-moz-padding-end": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "padding-inline-end"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["padding-inline-end"],
   },
   "-webkit-flex-direction": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "column",
       "column-reverse",
       "inherit",
@@ -9669,32 +6666,20 @@ const properties = {
       "revert",
       "row",
       "row-reverse",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "flex-direction"
-    ]
+    supports: [],
+    subproperties: ["flex-direction"],
   },
   "-webkit-flex-wrap": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "nowrap",
-      "revert",
-      "unset",
-      "wrap",
-      "wrap-reverse"
-    ],
-    "supports": [],
-    "subproperties": [
-      "flex-wrap"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "nowrap", "revert", "unset", "wrap", "wrap-reverse"],
+    supports: [],
+    subproperties: ["flex-wrap"],
   },
   "-webkit-justify-content": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "center",
       "end",
       "flex-end",
@@ -9712,16 +6697,14 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "justify-content"
-    ]
+    supports: [],
+    subproperties: ["justify-content"],
   },
   "-webkit-align-content": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "baseline",
       "center",
       "end",
@@ -9740,16 +6723,14 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "align-content"
-    ]
+    supports: [],
+    subproperties: ["align-content"],
   },
   "-webkit-align-items": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "baseline",
       "center",
       "end",
@@ -9767,42 +6748,26 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "align-items"
-    ]
+    supports: [],
+    subproperties: ["align-items"],
   },
   "-webkit-flex-grow": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "flex-grow"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["flex-grow"],
   },
   "-webkit-flex-shrink": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "flex-shrink"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["flex-shrink"],
   },
   "-webkit-align-self": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "auto",
       "baseline",
       "center",
@@ -9821,29 +6786,20 @@ const properties = {
       "start",
       "stretch",
       "unsafe",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "align-self"
-    ]
+    supports: [],
+    subproperties: ["align-self"],
   },
   "-webkit-order": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "order"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["order"],
   },
   "-webkit-flex-basis": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -9855,74 +6811,38 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "flex-basis"
-    ]
+    supports: [],
+    subproperties: ["flex-basis"],
   },
   "-moz-box-sizing": {
-    "isInherited": false,
-    "values": [
-      "border-box",
-      "content-box",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "box-sizing"
-    ]
+    isInherited: false,
+    values: ["border-box", "content-box", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["box-sizing"],
   },
   "-webkit-box-sizing": {
-    "isInherited": false,
-    "values": [
-      "border-box",
-      "content-box",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "box-sizing"
-    ]
+    isInherited: false,
+    values: ["border-box", "content-box", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["box-sizing"],
   },
   "grid-column-gap": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "column-gap"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["column-gap"],
   },
   "grid-row-gap": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "row-gap"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["row-gap"],
   },
   "-webkit-mask-repeat": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "inherit",
       "initial",
       "no-repeat",
@@ -9932,48 +6852,26 @@ const properties = {
       "revert",
       "round",
       "space",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "mask-repeat"
-    ]
+    supports: [],
+    subproperties: ["mask-repeat"],
   },
   "-webkit-mask-position-x": {
-    "isInherited": false,
-    "values": [
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-position-x"
-    ]
+    isInherited: false,
+    values: ["center", "inherit", "initial", "left", "revert", "right", "unset"],
+    supports: [],
+    subproperties: ["mask-position-x"],
   },
   "-webkit-mask-position-y": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "revert",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-position-y"
-    ]
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "revert", "top", "unset"],
+    supports: [],
+    subproperties: ["mask-position-y"],
   },
   "-webkit-mask-clip": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "border-box",
       "content-box",
       "fill-box",
@@ -9984,16 +6882,14 @@ const properties = {
       "revert",
       "stroke-box",
       "unset",
-      "view-box"
+      "view-box",
     ],
-    "supports": [],
-    "subproperties": [
-      "mask-clip"
-    ]
+    supports: [],
+    subproperties: ["mask-clip"],
   },
   "-webkit-mask-origin": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "border-box",
       "content-box",
       "fill-box",
@@ -10003,49 +6899,26 @@ const properties = {
       "revert",
       "stroke-box",
       "unset",
-      "view-box"
+      "view-box",
     ],
-    "supports": [],
-    "subproperties": [
-      "mask-origin"
-    ]
+    supports: [],
+    subproperties: ["mask-origin"],
   },
   "-webkit-mask-size": {
-    "isInherited": false,
-    "values": [
-      "auto",
-      "contain",
-      "cover",
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-size"
-    ]
+    isInherited: false,
+    values: ["auto", "contain", "cover", "inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["mask-size"],
   },
   "-webkit-mask-composite": {
-    "isInherited": false,
-    "values": [
-      "add",
-      "exclude",
-      "inherit",
-      "initial",
-      "intersect",
-      "revert",
-      "subtract",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-composite"
-    ]
+    isInherited: false,
+    values: ["add", "exclude", "inherit", "initial", "intersect", "revert", "subtract", "unset"],
+    supports: [],
+    subproperties: ["mask-composite"],
   },
   "-webkit-mask-image": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-element",
       "-moz-image-rect",
       "-moz-linear-gradient",
@@ -10066,54 +6939,26 @@ const properties = {
       "repeating-radial-gradient",
       "revert",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "gradient"
-    ],
-    "subproperties": [
-      "mask-image"
-    ]
+    supports: ["gradient"],
+    subproperties: ["mask-image"],
   },
   "-moz-user-select": {
-    "isInherited": false,
-    "values": [
-      "-moz-none",
-      "all",
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "text",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "user-select"
-    ]
+    isInherited: false,
+    values: ["-moz-none", "all", "auto", "inherit", "initial", "none", "revert", "text", "unset"],
+    supports: [],
+    subproperties: ["user-select"],
   },
   "-webkit-user-select": {
-    "isInherited": false,
-    "values": [
-      "-moz-none",
-      "all",
-      "auto",
-      "inherit",
-      "initial",
-      "none",
-      "revert",
-      "text",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "user-select"
-    ]
+    isInherited: false,
+    values: ["-moz-none", "all", "auto", "inherit", "initial", "none", "revert", "text", "unset"],
+    supports: [],
+    subproperties: ["user-select"],
   },
   "-webkit-box-align": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "baseline",
       "center",
       "end",
@@ -10122,44 +6967,26 @@ const properties = {
       "revert",
       "start",
       "stretch",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-align"
-    ]
+    supports: [],
+    subproperties: ["-moz-box-align"],
   },
   "-webkit-box-direction": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "reverse",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-direction"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "normal", "reverse", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-box-direction"],
   },
   "-webkit-box-flex": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-flex"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-box-flex"],
   },
   "-webkit-box-orient": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "block-axis",
       "horizontal",
       "inherit",
@@ -10167,46 +6994,26 @@ const properties = {
       "inline-axis",
       "revert",
       "unset",
-      "vertical"
+      "vertical",
     ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-orient"
-    ]
+    supports: [],
+    subproperties: ["-moz-box-orient"],
   },
   "-webkit-box-pack": {
-    "isInherited": false,
-    "values": [
-      "center",
-      "end",
-      "inherit",
-      "initial",
-      "justify",
-      "revert",
-      "start",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-pack"
-    ]
+    isInherited: false,
+    values: ["center", "end", "inherit", "initial", "justify", "revert", "start", "unset"],
+    supports: [],
+    subproperties: ["-moz-box-pack"],
   },
   "-webkit-box-ordinal-group": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "-moz-box-ordinal-group"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: ["-moz-box-ordinal-group"],
   },
   "-moz-border-start": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -10230,20 +7037,18 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
+    supports: ["color"],
+    subproperties: [
       "border-inline-start-color",
       "border-inline-start-style",
-      "border-inline-start-width"
-    ]
+      "border-inline-start-width",
+    ],
   },
   "-moz-border-end": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "COLOR",
       "currentColor",
       "dashed",
@@ -10267,36 +7072,29 @@ const properties = {
       "thick",
       "thin",
       "transparent",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "color"
-    ],
-    "subproperties": [
+    supports: ["color"],
+    subproperties: [
       "border-inline-end-color",
       "border-inline-end-style",
-      "border-inline-end-width"
-    ]
+      "border-inline-end-width",
+    ],
   },
   "-webkit-border-radius": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
+    isInherited: false,
+    values: ["inherit", "initial", "revert", "unset"],
+    supports: [],
+    subproperties: [
       "border-top-left-radius",
       "border-top-right-radius",
       "border-bottom-right-radius",
-      "border-bottom-left-radius"
-    ]
+      "border-bottom-left-radius",
+    ],
   },
   "-moz-border-image": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-element",
       "-moz-image-rect",
       "-moz-linear-gradient",
@@ -10323,22 +7121,20 @@ const properties = {
       "space",
       "stretch",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "gradient"
-    ],
-    "subproperties": [
+    supports: ["gradient"],
+    subproperties: [
       "border-image-outset",
       "border-image-repeat",
       "border-image-slice",
       "border-image-source",
-      "border-image-width"
-    ]
+      "border-image-width",
+    ],
   },
   "-webkit-border-image": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-element",
       "-moz-image-rect",
       "-moz-linear-gradient",
@@ -10365,22 +7161,20 @@ const properties = {
       "space",
       "stretch",
       "unset",
-      "url"
+      "url",
     ],
-    "supports": [
-      "gradient"
-    ],
-    "subproperties": [
+    supports: ["gradient"],
+    subproperties: [
       "border-image-outset",
       "border-image-repeat",
       "border-image-slice",
       "border-image-source",
-      "border-image-width"
-    ]
+      "border-image-width",
+    ],
   },
   "-moz-transition": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "all",
       "cubic-bezier",
       "ease",
@@ -10395,21 +7189,19 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
+    supports: ["timing-function"],
+    subproperties: [
       "transition-property",
       "transition-duration",
       "transition-timing-function",
-      "transition-delay"
-    ]
+      "transition-delay",
+    ],
   },
   "-webkit-transition": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "all",
       "cubic-bezier",
       "ease",
@@ -10424,21 +7216,19 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
+    supports: ["timing-function"],
+    subproperties: [
       "transition-property",
       "transition-duration",
       "transition-timing-function",
-      "transition-delay"
-    ]
+      "transition-delay",
+    ],
   },
   "-moz-animation": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "alternate",
       "alternate-reverse",
       "backwards",
@@ -10462,12 +7252,10 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
+    supports: ["timing-function"],
+    subproperties: [
       "animation-name",
       "animation-duration",
       "animation-timing-function",
@@ -10475,12 +7263,12 @@ const properties = {
       "animation-iteration-count",
       "animation-direction",
       "animation-fill-mode",
-      "animation-play-state"
-    ]
+      "animation-play-state",
+    ],
   },
   "-webkit-animation": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "alternate",
       "alternate-reverse",
       "backwards",
@@ -10504,12 +7292,10 @@ const properties = {
       "step-end",
       "step-start",
       "steps",
-      "unset"
+      "unset",
     ],
-    "supports": [
-      "timing-function"
-    ],
-    "subproperties": [
+    supports: ["timing-function"],
+    subproperties: [
       "animation-name",
       "animation-duration",
       "animation-timing-function",
@@ -10517,12 +7303,12 @@ const properties = {
       "animation-iteration-count",
       "animation-direction",
       "animation-fill-mode",
-      "animation-play-state"
-    ]
+      "animation-play-state",
+    ],
   },
   "-webkit-flex-flow": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "column",
       "column-reverse",
       "inherit",
@@ -10533,17 +7319,14 @@ const properties = {
       "row-reverse",
       "unset",
       "wrap",
-      "wrap-reverse"
+      "wrap-reverse",
     ],
-    "supports": [],
-    "subproperties": [
-      "flex-direction",
-      "flex-wrap"
-    ]
+    supports: [],
+    subproperties: ["flex-direction", "flex-wrap"],
   },
   "-webkit-flex": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-available",
       "-moz-fit-content",
       "-moz-max-content",
@@ -10555,33 +7338,20 @@ const properties = {
       "max-content",
       "min-content",
       "revert",
-      "unset"
+      "unset",
     ],
-    "supports": [],
-    "subproperties": [
-      "flex-grow",
-      "flex-shrink",
-      "flex-basis"
-    ]
+    supports: [],
+    subproperties: ["flex-grow", "flex-shrink", "flex-basis"],
   },
   "grid-gap": {
-    "isInherited": false,
-    "values": [
-      "inherit",
-      "initial",
-      "normal",
-      "revert",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "row-gap",
-      "column-gap"
-    ]
+    isInherited: false,
+    values: ["inherit", "initial", "normal", "revert", "unset"],
+    supports: [],
+    subproperties: ["row-gap", "column-gap"],
   },
   "-webkit-mask": {
-    "isInherited": false,
-    "values": [
+    isInherited: false,
+    values: [
       "-moz-element",
       "-moz-image-rect",
       "-moz-linear-gradient",
@@ -10630,12 +7400,10 @@ const properties = {
       "top",
       "unset",
       "url",
-      "view-box"
+      "view-box",
     ],
-    "supports": [
-      "gradient"
-    ],
-    "subproperties": [
+    supports: ["gradient"],
+    subproperties: [
       "mask-mode",
       "mask-repeat",
       "mask-clip",
@@ -10644,38 +7412,22 @@ const properties = {
       "mask-position-x",
       "mask-position-y",
       "mask-size",
-      "mask-image"
-    ]
+      "mask-image",
+    ],
   },
   "-webkit-mask-position": {
-    "isInherited": false,
-    "values": [
-      "bottom",
-      "center",
-      "inherit",
-      "initial",
-      "left",
-      "revert",
-      "right",
-      "top",
-      "unset"
-    ],
-    "supports": [],
-    "subproperties": [
-      "mask-position-x",
-      "mask-position-y"
-    ]
-  }
+    isInherited: false,
+    values: ["bottom", "center", "inherit", "initial", "left", "revert", "right", "top", "unset"],
+    supports: [],
+    subproperties: ["mask-position-x", "mask-position-y"],
+  },
 };
 
 const NON_ASCII = "[^\\x00-\\x7F]";
 const ESCAPE = "\\\\[^\n\r]";
 const FIRST_CHAR = ["[_a-z]", NON_ASCII, ESCAPE].join("|");
 const TRAILING_CHAR = ["[_a-z0-9-]", NON_ASCII, ESCAPE].join("|");
-const IS_VARIABLE_TOKEN = new RegExp(
-  `^--(${FIRST_CHAR})(${TRAILING_CHAR})*$`,
-  "i"
-);
+const IS_VARIABLE_TOKEN = new RegExp(`^--(${FIRST_CHAR})(${TRAILING_CHAR})*$`, "i");
 
 function isCssVariable(input) {
   return !!input.match(IS_VARIABLE_TOKEN);
@@ -10683,10 +7435,7 @@ function isCssVariable(input) {
 
 module.exports = {
   supportsType(property, type) {
-    return (
-      properties[property] &&
-      properties[property].supports.includes(type)
-    );
+    return properties[property] && properties[property].supports.includes(type);
   },
 
   supportsCssColor4ColorFunction() {
@@ -10712,9 +7461,6 @@ module.exports = {
   },
 
   isInherited(property) {
-    return (
-      (properties[property] && properties[property].isInherited) ||
-      isCssVariable(property)
-    );
+    return (properties[property] && properties[property].isInherited) || isCssVariable(property);
   },
 };

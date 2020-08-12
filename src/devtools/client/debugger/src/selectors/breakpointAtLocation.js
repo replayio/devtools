@@ -97,7 +97,7 @@ export function getClosestBreakpoint(state: State, position: PartialPosition): ?
   const positions = columnBreakpoints.map(bp => bp.location);
 
   const closestPosition = findClosestPosition(positions, position.column);
-  const breakpoint = columnBreakpoints.find(cbp => (cbp.location === closestPosition));
+  const breakpoint = columnBreakpoints.find(cbp => cbp.location === closestPosition);
   return breakpoint;
 }
 
