@@ -12,6 +12,7 @@ function initialTimelineState() {
     shouldAnimate: true,
     recordingDuration: 0,
     screenShot: null,
+    timelineDimensions: null,
     mouse: null,
   };
 }
@@ -31,50 +32,16 @@ export default function update(state = initialTimelineState(), action) {
   }
 }
 
-export function getZoomRegion(state) {
-  return state.timeline.zoomRegion;
-}
-
-export function getCurrentTime(state) {
-  return state.timeline.currentTime;
-}
-
-export function getHoverTime(state) {
-  return state.timeline.hoverTime;
-}
-
-export function getStartDragTime(state) {
-  return state.timeline.startDragTime;
-}
-
-export function getPlayback(state) {
-  return state.timeline.playback;
-}
-
-export function getMessages(state) {
-  return state.timeline.messages;
-}
-
-export function getHighlightedMessage(state) {
-  return state.timeline.highlightedMessage;
-}
-
-export function getHoveredMessage(state) {
-  return state.timeline.hoveredMessage;
-}
-
-export function getUnprocessedRegions(state) {
-  return state.timeline.unprocessedRegions;
-}
-
-export function getRecordingDuration(state) {
-  return state.timeline.recordingDuration;
-}
-
-export function getScreenShot(state) {
-  return state.timeline.screenShot;
-}
-
-export function getMouse(state) {
-  return state.timeline.mouse;
-}
+export const getZoomRegion = state => state.timeline.zoomRegion;
+export const getCurrentTime = state => state.timeline.currentTime;
+export const getHoverTime = state => state.timeline.hoverTime;
+export const getStartDragTime = state => state.timeline.startDragTime;
+export const getPlayback = state => state.timeline.playback;
+export const getMessages = state => state.timeline.messages;
+export const getHighlightedMessage = state => state.timeline.highlightedMessage;
+export const getHoveredMessage = state => state.timeline.hoveredMessage;
+export const getUnprocessedRegions = state => state.timeline.unprocessedRegions;
+export const getRecordingDuration = state => state.timeline.recordingDuration;
+export const getScreenShot = state => state.timeline.screenShot;
+export const getMouse = state => state.timeline.mouse;
+export const getTimelineDimensions = state => state.timeline.timelineDimensions;

@@ -1,6 +1,10 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
+
 import Toolbox from "./Toolbox";
+import Tooltip from "./Tooltip";
+import Comments from "./Comments";
+
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { connect } from "react-redux";
 import { actions } from "../actions";
@@ -30,23 +34,6 @@ class App extends React.Component {
     }
   }
 
-  renderTooltip(tooltip) {
-    if (!tooltip) {
-      return null;
-    }
-
-    return (
-      <div className="timeline-tooltip" style={{ left: tooltip.left }}>
-        {tooltip.screen && (
-          <img
-            className="timeline-tooltip-image"
-            src={`data:${tooltip.screen.mimeType};base64,${tooltip.screen.data}`}
-          />
-        )}
-      </div>
-    );
-  }
-
   renderGraphics() {
     const { tooltip } = this.props;
     return (
@@ -54,7 +41,8 @@ class App extends React.Component {
         <canvas id="graphics"></canvas>
         <div id="viewer-text"></div>
         <div id="highlighter-root"></div>
-        {this.renderTooltip(tooltip)}
+        <Tooltip tooltip={tooltip} />
+        <Comments />
       </div>
     );
   }

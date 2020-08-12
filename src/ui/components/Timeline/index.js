@@ -14,10 +14,9 @@ import React from "react";
 
 import dom from "react-dom-factories";
 import PropTypes from "prop-types";
-import { sortBy, range } from "lodash";
 
 import { SVG } from "image/svg";
-import { sendMessage, log } from "protocol/socket";
+import { log } from "protocol/socket";
 const {
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
@@ -25,9 +24,7 @@ const {
   previousPaintEvent,
   getGraphicsAtTime,
   paintGraphics,
-  setResizeTimelineCallback,
 } = require("protocol/graphics");
-const { clamp } = require("protocol/utils");
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
@@ -43,7 +40,6 @@ const { div } = dom;
 import "./Timeline.css";
 
 const markerWidth = 7;
-const imgDir = "devtools/skin/images";
 
 function classname(name, bools) {
   for (const key in bools) {
@@ -90,159 +86,6 @@ function CommandButton({ img, className, onClick, active }) {
   );
 }
 
-function createCommentElement(comment, callbacks) {
-  const element = document.createElement("div");
-
-  document.body.appendChild(element);
-  element.className = "comment-box";
-  element.style.position = "absolute";
-  element.style.left = "0px";
-  element.style.top = "0px";
-
-  let contentsElement;
-
-  const closeButton = document.createElement("button");
-  closeButton.className = "comment-close";
-  element.appendChild(closeButton);
-  closeButton.addEventListener("click", callbacks.closeComment);
-
-  const jumpButton = document.createElement("button");
-  jumpButton.className = "comment-jump";
-  element.appendChild(jumpButton);
-  jumpButton.addEventListener("click", callbacks.jumpToComment);
-
-  const confirmButton = document.createElement("button");
-  confirmButton.className = "comment-confirm";
-  element.appendChild(confirmButton);
-  confirmButton.addEventListener("click", () => {
-    comment.contents = contentsElement.value;
-    createContentsElement(false);
-    callbacks.updateComment();
-  });
-
-  const writeButton = document.createElement("button");
-  writeButton.className = "comment-write";
-  element.appendChild(writeButton);
-  writeButton.addEventListener("click", () => {
-    comment.contents = contentsElement.innerText;
-    createContentsElement(true);
-  });
-
-  createContentsElement(!comment.contents);
-  return element;
-
-  function createContentsElement(isInput) {
-    if (contentsElement) {
-      contentsElement.remove();
-    }
-    if (isInput) {
-      contentsElement = document.createElement("textarea");
-      contentsElement.className = "comment-input";
-      contentsElement.value = comment.contents;
-      element.appendChild(contentsElement);
-      contentsElement.focus();
-      writeButton.style.display = "none";
-      confirmButton.style.display = "inline";
-    } else {
-      contentsElement = document.createElement("div");
-      contentsElement.className = "comment-contents";
-      contentsElement.innerText = comment.contents;
-      element.appendChild(contentsElement);
-      // Comments identifying users can't be edited.
-      writeButton.style.display = comment.isUser ? "none" : "inline";
-      confirmButton.style.display = "none";
-    }
-  }
-}
-
-// Map id => element for displayed comments
-const gCommentElements = new Map();
-
-function ensureCommentElement(comment, callbacks) {
-  let elem = gCommentElements.get(comment.id);
-  if (!elem) {
-    elem = createCommentElement(comment, callbacks);
-    gCommentElements.set(comment.id, elem);
-  }
-  return elem;
-}
-
-// Remove any comment elements that are not visible in the given comments.
-// This should be React-ified better...
-function removeOldCommentElements(comments) {
-  for (const [id, elem] of gCommentElements) {
-    if (!comments.some(c => c.id == id && c.visible)) {
-      elem.remove();
-      gCommentElements.delete(id);
-    }
-  }
-}
-
-// For avoiding issues with floating point arithmetic.
-const TolerateOverlap = 2;
-
-// function commentsOverlap(c1, c2) {
-//   if (c1.left + c1.width < c2.left + TolerateOverlap) {
-//     return false;
-//   }
-//   if (c1.left + TolerateOverlap > c2.left + c2.width) {
-//     return false;
-//   }
-//   if (c1.top + c1.height < c2.top + TolerateOverlap) {
-//     return false;
-//   }
-//   if (c1.top + TolerateOverlap > c2.top + c2.height) {
-//     return false;
-//   }
-//   return true;
-// }
-
-// Try to find a location where we can render a comment that won't overlap with
-// any other existing comment.
-// function pickCommentElementLocation(left, top, { width, height }, existingComments) {
-//   const initialTop = top;
-
-//   // Whether we've already slid left or right.
-//   let direction;
-
-//   while (true) {
-//     // If the comment overlaps one we already rendered, slide its location and
-//     // restart the loop to watch for overlaps at the new location. This loop
-//     // will eventually terminate it, since we can slide arbitrarily far off the
-//     // screen (we'll clamp the final location to the visible area though).
-//     let slide = false;
-//     for (const existing of existingComments) {
-//       if (!commentsOverlap({ left, top, width, height }, existing)) {
-//         continue;
-//       }
-//       // Try sliding up first.
-//       const newTop = existing.top - height;
-//       if (newTop >= 0) {
-//         top = newTop;
-//         slide = true;
-//         break;
-//       }
-//       // Try sliding either left or right, depending on our relation with the
-//       // existing comment. If we already slid in one of these directions, keep
-//       // going in that same direction.
-//       if (!direction) {
-//         direction = left < existing.left ? "left" : "right";
-//       }
-//       left = direction == "left" ? existing.left - width : existing.left + existing.width;
-//       top = initialTop;
-//       slide = true;
-//     }
-//     if (!slide) {
-//       // We found a place to render the comment.
-//       existingComments.push({ left, top, width, height });
-//       return {
-//         left: clamp(left, 0, window.innerWidth - width),
-//         top,
-//       };
-//     }
-//   }
-// }
-
 function sameLocation(m1, m2) {
   const f1 = m1.frame;
   const f2 = m2.frame;
@@ -260,9 +103,6 @@ function getMessageLocation(message) {
   return { sourceUrl: source, line, column };
 }
 
-// Metadata key used to store comments.
-const CommentsMetadata = "devtools-comments";
-
 // When viewing a recording, we add a comment and move it around to indicate the
 // point we are currently looking at. Since we don't have user accounts, make up
 // a short name to identify us when other people view the recording.
@@ -276,14 +116,6 @@ export class Timeline extends Component {
     };
   }
 
-  get zoomStartTime() {
-    return this.props.zoomRegion.startTime;
-  }
-
-  get zoomEndTime() {
-    return this.props.zoomRegion.endTime;
-  }
-
   constructor(props) {
     super(props);
     this.state = {
@@ -291,30 +123,20 @@ export class Timeline extends Component {
       numResizes: 0,
     };
 
-    this.overlayWidth = 1;
-
     gToolbox.timeline = this;
   }
 
   async componentDidMount() {
     this.updateOverlayWidth();
-    this.overlayWidth = this.updateOverlayWidth();
     this.threadFront.ensureProcessed(this.onMissingRegions, this.onUnprocessedRegions);
 
     const consoleFrame = this.console.hud.ui;
     consoleFrame.on("message-hover", this.onConsoleMessageHover);
     consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate);
-
-    // this.threadFront.watchMetadata(CommentsMetadata, this.onCommentsUpdate.bind(this));
-    // Use this stupid hack to re-render the timeline whenever the canvas is
-    // resized so that we reposition any visible comments.
-    setResizeTimelineCallback(() => {
-      this.setState({ numResizes: this.state.numResizes + 1 });
-    });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    this.updateOverlayWidth();
+    // this.updateOverlayWidth();
 
     if (prevState.closestMessage != this.props.closestMessage) {
       this.scrollToMessage(this.props.closestMessage);
@@ -335,6 +157,18 @@ export class Timeline extends Component {
 
   get threadFront() {
     return this.toolbox.threadFront;
+  }
+
+  get overlayWidth() {
+    return this.props.timelineDimensions?.width || 1;
+  }
+
+  get zoomStartTime() {
+    return this.props.zoomRegion.startTime;
+  }
+
+  get zoomEndTime() {
+    return this.props.zoomRegion.endTime;
   }
 
   // Get the time for a mouse event within the recording.
@@ -704,39 +538,6 @@ export class Timeline extends Component {
     });
   }
 
-  // renderComment(comment, existingComments) {
-  //   if (comment.time < this.zoomStartTime || comment.time > this.zoomEndTime || !comment.visible) {
-  //     return;
-  //   }
-  //   const elem = ensureCommentElement(comment, {});
-  //   const offset = this.getPixelOffset(comment.time);
-  //   const bounds = elem.getBoundingClientRect();
-  //   const { left, top } = pickCommentElementLocation(
-  //     offset + this.overlayLeft - bounds.width / 2,
-  //     this.overlayTop - bounds.height - 5,
-  //     bounds,
-  //     existingComments
-  //   );
-  //   elem.style.left = left;
-  //   elem.style.top = top;
-  // }
-
-  // onCommentsUpdate(newComments) {
-  //   const comments = [
-  //     ...(newComments || [])
-  //       .filter(comment => {
-  //         // Ignore the comment for our own location.
-  //         return comment.id != this.threadFront.sessionId;
-  //       })
-  //       .map(comment => {
-  //         return { ...comment, visible: this.isServerCommentVisible(comment) };
-  //       }),
-  //     ...this.state.comments.filter(c => !c.saved),
-  //   ];
-  //   this.setState({ comments });
-  //   removeOldCommentElements(comments);
-  // }
-
   renderCommands() {
     const { playback } = this.props;
 
@@ -766,9 +567,12 @@ export class Timeline extends Component {
 
   updateOverlayWidth() {
     const el = ReactDOM.findDOMNode(this).querySelector(".progressBar");
-    this.overlayWidth = el ? el.clientWidth : 1;
-    this.overlayTop = el ? el.getBoundingClientRect().top : 1;
-    this.overlayLeft = el ? el.getBoundingClientRect().left : 1;
+    const width = el ? el.clientWidth : 1;
+    const left = el ? el.getBoundingClientRect().left : 1;
+    this.props.setTimelineState({ timelineDimensions: { width, left } });
+
+    // this.overlayTop = el ? el.getBoundingClientRect().top : 1;
+    // this.overlayLeft = el ? el.getBoundingClientRect().left : 1;
   }
 
   // calculate pixel distance from two times
@@ -1068,6 +872,7 @@ export default connect(
     hoveredMessage: selectors.getHoveredMessage(state),
     unprocessedRegions: selectors.getUnprocessedRegions(state),
     recordingDuration: selectors.getRecordingDuration(state),
+    timelineDimensions: selectors.getTimelineDimensions(state),
   }),
   {
     updateTooltip: actions.updateTooltip,

@@ -333,24 +333,12 @@ function refreshGraphics() {
   }
 }
 
-// This is installed to refresh the timeline whenever the canvas is resized.
-// The timeline renders any visible comments, whose position depends on where
-// the canvas is positioned. This isn't ideal.
-let gResizeTimelineCallback;
-
-function setResizeTimelineCallback(callback) {
-  gResizeTimelineCallback = callback;
-}
-
 // Install an observer to refresh graphics whenever the content canvas is resized.
 function installObserver() {
   const canvas = document.getElementById("viewer");
   if (canvas) {
     const observer = new ResizeObserver(() => {
       refreshGraphics();
-      if (gResizeTimelineCallback) {
-        gResizeTimelineCallback();
-      }
     });
     observer.observe(canvas);
   } else {
@@ -369,5 +357,4 @@ module.exports = {
   getGraphicsAtTime,
   refreshGraphics,
   getDevicePixelRatio,
-  setResizeTimelineCallback,
 };
