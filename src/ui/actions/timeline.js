@@ -1,7 +1,6 @@
 import { ThreadFront } from "protocol/thread";
-import { getScreenShot } from "../reducers";
-
 import { selectors } from "../reducers";
+
 import {
   addLastScreen,
   getGraphicsAtTime,
@@ -36,7 +35,7 @@ function onEndpoint({ point, time }) {
   return ({ getState, dispatch }) => {
     // This could be called before setRecordingDescription.
     // These two methods should be commoned up.
-    const screenshot = getScreenShot(getState());
+    const screenshot = selectors.getScreenShot(getState());
     addLastScreen(screenshot, point, time);
 
     dispatch(setTimelineState({ currentTime: time }));
