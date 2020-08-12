@@ -312,14 +312,7 @@ async function loadAsyncParentFrames(thread: string, asyncIndex) {
 }
 
 function convertScope(protocolScope) {
-  const {
-    scopeId,
-    type,
-    functionLexical,
-    object,
-    callee,
-    bindings,
-  } = protocolScope;
+  const { scopeId, type, functionLexical, object, callee, bindings } = protocolScope;
 
   return {
     actor: scopeId,

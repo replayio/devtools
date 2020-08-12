@@ -1275,7 +1275,9 @@ function ensureExecutionPoint(state, newMessage) {
   // Add a lastExecutionPoint property which will group messages evaluated during
   // the same replay pause point. When applicable, it will place the message immediately
   // after the last visible message in the group without an execution point when sorting.
-  let point = { checkpoint: 0, progress: 0 }, time = 0, messageCount = 1;
+  let point = { checkpoint: 0, progress: 0 },
+    time = 0,
+    messageCount = 1;
   if (state.pausedExecutionPoint) {
     point = state.pausedExecutionPoint;
     time = state.pausedExecutionPointTime;

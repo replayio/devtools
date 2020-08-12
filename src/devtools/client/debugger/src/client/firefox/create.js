@@ -57,7 +57,7 @@ export async function createFrame(thread: ThreadId, frame, index = 0, asyncIndex
     this: frame.this,
     source: null,
     index,
-    asyncCause: (asyncIndex && index == 0) ? "async" : undefined,
+    asyncCause: asyncIndex && index == 0 ? "async" : undefined,
     state: "on-stack",
   };
 }

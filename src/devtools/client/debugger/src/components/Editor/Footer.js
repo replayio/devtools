@@ -17,7 +17,7 @@ import {
 } from "../../selectors";
 
 import { isPretty, getFilename, shouldBlackbox } from "../../utils/source";
-import { canPrettyPrintSource, } from "../../reducers/sources";
+import { canPrettyPrintSource } from "../../reducers/sources";
 
 import { PaneToggleButton } from "../shared/Button";
 import AccessibleImage from "../shared/AccessibleImage";
@@ -190,11 +190,7 @@ class SourceFooter extends PureComponent<Props, State> {
   }
 
   renderSourceSummary() {
-    const {
-      alternateSource,
-      selectedSource,
-      showAlternateSource,
-    } = this.props;
+    const { alternateSource, selectedSource, showAlternateSource } = this.props;
 
     if (!alternateSource) {
       return null;
@@ -206,9 +202,7 @@ class SourceFooter extends PureComponent<Props, State> {
     const original = ThreadFront.isSourceMappedScript(selectedSource.id);
 
     const tooltip = L10N.getFormatStr(
-      original
-        ? "sourceFooter.generatedSourceTooltip"
-        : "sourceFooter.originalSourceTooltip",
+      original ? "sourceFooter.generatedSourceTooltip" : "sourceFooter.originalSourceTooltip",
       filename
     );
 

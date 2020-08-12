@@ -75,17 +75,9 @@ class Scopes extends PureComponent<Props, State> {
     const selectedFrameChanged = selectedFrame !== nextProps.selectedFrame;
     const frameScopesChanged = frameScopes !== nextProps.frameScopes;
 
-    if (
-      isPausedChanged ||
-      selectedFrameChanged ||
-      frameScopesChanged
-    ) {
+    if (isPausedChanged || selectedFrameChanged || frameScopesChanged) {
       this.setState({
-        scopes: getScopes(
-          nextProps.why,
-          nextProps.selectedFrame,
-          nextProps.frameScopes
-        ),
+        scopes: getScopes(nextProps.why, nextProps.selectedFrame, nextProps.frameScopes),
       });
     }
   }
@@ -231,11 +223,7 @@ const mapStateToProps = state => {
   const selectedFrame = getSelectedFrame(state, cx.thread);
   const selectedSource = getSelectedSource(state);
 
-  const { scope, pending } = getFrameScope(
-    state,
-    cx.thread,
-    selectedFrame && selectedFrame.id
-  ) || {
+  const { scope, pending } = getFrameScope(state, cx.thread, selectedFrame && selectedFrame.id) || {
     scope: null,
     pending: false,
   };
