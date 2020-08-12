@@ -45,6 +45,13 @@ function PrefsHelper(prefsRoot = "", prefsBlueprint = {}) {
   const observer = makeObserver(this, cache, prefsRoot, prefsBlueprint);
   this.registerObserver = () => observer.register();
   this.unregisterObserver = () => observer.unregister();
+  this.toJSON = () => {
+    const keys = Object.keys(prefsBlueprint);
+    return keys.reduce((obj, key) => {
+      obj[key] = this[key];
+      return obj;
+    }, {});
+  };
 }
 
 /**
