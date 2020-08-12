@@ -111,7 +111,7 @@ class Toolbox extends React.Component {
     await panel.open();
 
     this.setState({ panels: { ...this.state.panels, [name]: panel } });
-    resolve();
+    resolve(panel);
     return panel;
   }
 

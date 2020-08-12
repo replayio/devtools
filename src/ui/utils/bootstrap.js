@@ -99,6 +99,8 @@ export function bootstrapApp(props) {
     React.createElement(Provider, { store }, React.createElement(App, props)),
     document.querySelector("#app")
   );
+
+  return store;
 }
 
 function registerStoreObserver(store, subscriber) {
