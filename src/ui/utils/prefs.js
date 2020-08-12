@@ -1,4 +1,4 @@
-import { PrefsHelper, asyncStoreHelper } from "devtools-modules";
+import { PrefsHelper } from "devtools/client/shared/prefs";
 
 import Services from "devtools-services";
 

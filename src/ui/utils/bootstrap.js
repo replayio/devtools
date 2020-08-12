@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
 import { prefs as dbgPrefs } from "devtools/client/debugger/src/utils/prefs";
-import { prefs } from "./prefs";
+import { prefs, features } from "./prefs";
 import configureStore from "devtools/client/debugger/src/actions/utils/create-store";
 import { bindActionCreators, combineReducers } from "redux";
 import { reducers, selectors } from "../reducers";
@@ -18,6 +18,9 @@ function setupAppHelper(store) {
     actions: bindActionCreators(actions, store.dispatch),
     selectors: bindSelectors({ store, selectors }),
     prefs,
+    features,
+    dumpPrefs: () =>
+      JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
     local: () => {
       const params = new URLSearchParams(document.location.search.substring(1));
       window.location = `http://localhost:8080/index.html?id=${params.get("id")}`;
