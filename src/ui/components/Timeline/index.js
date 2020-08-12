@@ -181,67 +181,67 @@ function removeOldCommentElements(comments) {
 // For avoiding issues with floating point arithmetic.
 const TolerateOverlap = 2;
 
-function commentsOverlap(c1, c2) {
-  if (c1.left + c1.width < c2.left + TolerateOverlap) {
-    return false;
-  }
-  if (c1.left + TolerateOverlap > c2.left + c2.width) {
-    return false;
-  }
-  if (c1.top + c1.height < c2.top + TolerateOverlap) {
-    return false;
-  }
-  if (c1.top + TolerateOverlap > c2.top + c2.height) {
-    return false;
-  }
-  return true;
-}
+// function commentsOverlap(c1, c2) {
+//   if (c1.left + c1.width < c2.left + TolerateOverlap) {
+//     return false;
+//   }
+//   if (c1.left + TolerateOverlap > c2.left + c2.width) {
+//     return false;
+//   }
+//   if (c1.top + c1.height < c2.top + TolerateOverlap) {
+//     return false;
+//   }
+//   if (c1.top + TolerateOverlap > c2.top + c2.height) {
+//     return false;
+//   }
+//   return true;
+// }
 
 // Try to find a location where we can render a comment that won't overlap with
 // any other existing comment.
-function pickCommentElementLocation(left, top, { width, height }, existingComments) {
-  const initialTop = top;
+// function pickCommentElementLocation(left, top, { width, height }, existingComments) {
+//   const initialTop = top;
 
-  // Whether we've already slid left or right.
-  let direction;
+//   // Whether we've already slid left or right.
+//   let direction;
 
-  while (true) {
-    // If the comment overlaps one we already rendered, slide its location and
-    // restart the loop to watch for overlaps at the new location. This loop
-    // will eventually terminate it, since we can slide arbitrarily far off the
-    // screen (we'll clamp the final location to the visible area though).
-    let slide = false;
-    for (const existing of existingComments) {
-      if (!commentsOverlap({ left, top, width, height }, existing)) {
-        continue;
-      }
-      // Try sliding up first.
-      const newTop = existing.top - height;
-      if (newTop >= 0) {
-        top = newTop;
-        slide = true;
-        break;
-      }
-      // Try sliding either left or right, depending on our relation with the
-      // existing comment. If we already slid in one of these directions, keep
-      // going in that same direction.
-      if (!direction) {
-        direction = left < existing.left ? "left" : "right";
-      }
-      left = direction == "left" ? existing.left - width : existing.left + existing.width;
-      top = initialTop;
-      slide = true;
-    }
-    if (!slide) {
-      // We found a place to render the comment.
-      existingComments.push({ left, top, width, height });
-      return {
-        left: clamp(left, 0, window.innerWidth - width),
-        top,
-      };
-    }
-  }
-}
+//   while (true) {
+//     // If the comment overlaps one we already rendered, slide its location and
+//     // restart the loop to watch for overlaps at the new location. This loop
+//     // will eventually terminate it, since we can slide arbitrarily far off the
+//     // screen (we'll clamp the final location to the visible area though).
+//     let slide = false;
+//     for (const existing of existingComments) {
+//       if (!commentsOverlap({ left, top, width, height }, existing)) {
+//         continue;
+//       }
+//       // Try sliding up first.
+//       const newTop = existing.top - height;
+//       if (newTop >= 0) {
+//         top = newTop;
+//         slide = true;
+//         break;
+//       }
+//       // Try sliding either left or right, depending on our relation with the
+//       // existing comment. If we already slid in one of these directions, keep
+//       // going in that same direction.
+//       if (!direction) {
+//         direction = left < existing.left ? "left" : "right";
+//       }
+//       left = direction == "left" ? existing.left - width : existing.left + existing.width;
+//       top = initialTop;
+//       slide = true;
+//     }
+//     if (!slide) {
+//       // We found a place to render the comment.
+//       existingComments.push({ left, top, width, height });
+//       return {
+//         left: clamp(left, 0, window.innerWidth - width),
+//         top,
+//       };
+//     }
+//   }
+// }
 
 function sameLocation(m1, m2) {
   const f1 = m1.frame;
@@ -305,7 +305,7 @@ export class Timeline extends Component {
     consoleFrame.on("message-hover", this.onConsoleMessageHover);
     consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate);
 
-    this.threadFront.watchMetadata(CommentsMetadata, this.onCommentsUpdate.bind(this));
+    // this.threadFront.watchMetadata(CommentsMetadata, this.onCommentsUpdate.bind(this));
     // Use this stupid hack to re-render the timeline whenever the canvas is
     // resized so that we reposition any visible comments.
     setResizeTimelineCallback(() => {
@@ -692,22 +692,6 @@ export class Timeline extends Component {
     });
   }
 
-  startNewComment() {
-    const { comments, currentTime } = this.state;
-    const comment = {
-      id: (Math.random() * 1e9) | 0,
-      visible: true,
-      point: this.threadFront.currentPoint,
-      hasFrames: this.threadFront.currentPointHasFrames,
-      time: currentTime,
-      contents: "",
-      saved: false,
-    };
-    this.setState({
-      comments: [...comments, comment],
-    });
-  }
-
   renderCommentButton() {
     if (!features.comments) {
       return null;
@@ -716,94 +700,42 @@ export class Timeline extends Component {
       className: "",
       active: true,
       img: "comment",
-      onClick: () => this.startNewComment(),
+      onClick: this.props.startNewComment,
     });
   }
 
-  setCommentsVisible(list, visible) {
-    const comments = this.state.comments.map(c => {
-      if (list.some(c2 => c2.id == c.id)) {
-        return { ...c, visible };
-      }
-      return c;
-    });
-    this.setState({ comments });
-    if (!visible) {
-      removeOldCommentElements(comments);
-    }
-  }
+  // renderComment(comment, existingComments) {
+  //   if (comment.time < this.zoomStartTime || comment.time > this.zoomEndTime || !comment.visible) {
+  //     return;
+  //   }
+  //   const elem = ensureCommentElement(comment, {});
+  //   const offset = this.getPixelOffset(comment.time);
+  //   const bounds = elem.getBoundingClientRect();
+  //   const { left, top } = pickCommentElementLocation(
+  //     offset + this.overlayLeft - bounds.width / 2,
+  //     this.overlayTop - bounds.height - 5,
+  //     bounds,
+  //     existingComments
+  //   );
+  //   elem.style.left = left;
+  //   elem.style.top = top;
+  // }
 
-  removeComment(comment) {
-    const comments = this.state.comments.filter(c => c.id != comment.id);
-    this.setState({ comments });
-    removeOldCommentElements(comments);
-  }
-
-  renderComment(comment, existingComments) {
-    if (comment.time < this.zoomStartTime || comment.time > this.zoomEndTime || !comment.visible) {
-      return;
-    }
-    const elem = ensureCommentElement(comment, {
-      closeComment: () => {
-        if (comment.saved) {
-          this.setCommentsVisible([comment], false);
-        } else {
-          this.removeComment(comment);
-        }
-      },
-      jumpToComment: () => {
-        this.seek(comment.point, comment.time, comment.hasFrames);
-      },
-      updateComment: () => {
-        if (comment.contents) {
-          comment.saved = true;
-          this.threadFront.updateMetadata(CommentsMetadata, comments => [
-            ...(comments || []).filter(c => c.id != comment.id),
-            comment,
-          ]);
-        } else {
-          if (comment.saved) {
-            this.threadFront.updateMetadata(CommentsMetadata, comments =>
-              (comments || []).filter(c => c.id != comment.id)
-            );
-          }
-          this.removeComment(comment);
-        }
-      },
-    });
-    const offset = this.getPixelOffset(comment.time);
-    const bounds = elem.getBoundingClientRect();
-    const { left, top } = pickCommentElementLocation(
-      offset + this.overlayLeft - bounds.width / 2,
-      this.overlayTop - bounds.height - 5,
-      bounds,
-      existingComments
-    );
-    elem.style.left = left;
-    elem.style.top = top;
-  }
-
-  isServerCommentVisible(comment) {
-    // Comments are visible by default, unless they have been closed in
-    // the local session. Ignore the visible value we get from the server.
-    return !this.state.comments.some(c => c.id == comment.id && !c.visible);
-  }
-
-  onCommentsUpdate(newComments) {
-    const comments = [
-      ...(newComments || [])
-        .filter(comment => {
-          // Ignore the comment for our own location.
-          return comment.id != this.threadFront.sessionId;
-        })
-        .map(comment => {
-          return { ...comment, visible: this.isServerCommentVisible(comment) };
-        }),
-      ...this.state.comments.filter(c => !c.saved),
-    ];
-    this.setState({ comments });
-    removeOldCommentElements(comments);
-  }
+  // onCommentsUpdate(newComments) {
+  //   const comments = [
+  //     ...(newComments || [])
+  //       .filter(comment => {
+  //         // Ignore the comment for our own location.
+  //         return comment.id != this.threadFront.sessionId;
+  //       })
+  //       .map(comment => {
+  //         return { ...comment, visible: this.isServerCommentVisible(comment) };
+  //       }),
+  //     ...this.state.comments.filter(c => !c.saved),
+  //   ];
+  //   this.setState({ comments });
+  //   removeOldCommentElements(comments);
+  // }
 
   renderCommands() {
     const { playback } = this.props;
@@ -1068,8 +1000,8 @@ export class Timeline extends Component {
   }
 
   render() {
-    const { comments } = this.state;
-    const existingComments = [];
+    // const { comments } = this.state;
+    // const existingComments = [];
     const percent = this.getVisiblePosition(this.props.currentTime) * 100;
 
     return div(
@@ -1109,15 +1041,15 @@ export class Timeline extends Component {
               style: { left: `${percent}%`, width: `${100 - percent}%` },
             }),
             ...this.renderMessages(),
-            ...this.renderCommentMarkers(),
+            // ...this.renderCommentMarkers(),
             ...this.renderHoverPoint(),
             ...this.renderUnprocessedRegions(),
             ...this.renderZoomedRegion()
           ),
           this.renderZoom(),
-          this.renderCommentButton(),
+          this.renderCommentButton()
 
-          ...comments.map(c => this.renderComment(c, existingComments))
+          // ...comments.map(c => this.renderComment(c, existingComments))
         )
       )
     );
@@ -1141,5 +1073,6 @@ export default connect(
     updateTooltip: actions.updateTooltip,
     setZoomRegion: actions.setZoomRegion,
     setTimelineState: actions.setTimelineState,
+    createComment: actions.createComment,
   }
 )(Timeline);

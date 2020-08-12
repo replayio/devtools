@@ -21,11 +21,12 @@ if (test) {
 
 const { initSocket, sendMessage, log, setStatus, addEventListener } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
-const { throttle, clamp, EventEmitter } = require("protocol/utils");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap");
 const FullStory = require("@fullstory/browser");
 const { setupTimeline } = require("./ui/actions/timeline");
+const { setupMetadata } = require("./ui/actions/metadata");
+const { features } = require("./ui/utils/prefs");
 
 // Create a session to use while debugging.
 async function createSession() {
@@ -118,4 +119,7 @@ setTimeout(async () => {
 
   store = bootstrapApp({ initialize });
   setupTimeline(recordingId, store);
+  if (features.comments) {
+    setupMetadata(recordingId, store);
+  }
 }, 0);
