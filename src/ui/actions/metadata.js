@@ -48,12 +48,16 @@ export function createComment() {
       hasFrames: ThreadFront.currentPointHasFrames,
       time: currentTime,
       contents: "",
-      saved: false,
+      saved: true,
     };
+
+    const newComments = [...existingComments, comment];
+
+    ThreadFront.updateMetadata(CommentsMetadata, () => newComments);
 
     dispatch({
       type: "set_comments",
-      comments: [...existingComments, comment],
+      comments: newComments,
     });
   };
 }
@@ -110,7 +114,14 @@ export function removeComment(comment) {
   return ({ getState, dispatch }) => {
     const comments = selectors.getComments(getState());
     const newComments = comments.filter(c => c.id != comment.id);
+    ThreadFront.updateMetadata(CommentsMetadata, () => newComments);
     dispatch({ type: "set_comments", comments: newComments });
-    //   removeOldCommentElements(comments);
+  };
+}
+
+export function clearComments() {
+  return ({ dispatch }) => {
+    ThreadFront.updateMetadata(CommentsMetadata, () => []);
+    dispatch({ type: "set_comments", comments: [] });
   };
 }

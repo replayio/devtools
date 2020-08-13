@@ -1,8 +1,22 @@
 .comments {
-  height: 10px;
+  height: 40px;
   width: 100%;
-  border: 2px solid red;
+  background: red;
   position: absolute;
   bottom: 0;
   left: 0;
+  z-index: 99;
+}
+
+.comments-container {
+  position: relative;
+  height: 100%;
+}
+
+.comments .comment {
+  position: absolute;
+  background: white;
+  bottom: 5px;
+  width: 10px;
+  height: 10px;
 }
