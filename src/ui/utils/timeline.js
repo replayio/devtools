@@ -32,9 +32,9 @@ export function getPixelOffset({ time, overlayWidth, zoom }) {
 }
 
 // Get the percent value for the left offset of a message.
-export function getLeftOffset({ overlayWidth, message, zoom }) {
-  const messagePosition = getVisiblePosition({ time: message.executionPointTime, zoom }) * 100;
+export function getLeftOffset({ overlayWidth, time, zoom }) {
+  const position = getVisiblePosition({ time, zoom }) * 100;
   const messageWidth = (markerWidth / overlayWidth) * 100;
 
-  return Math.max(messagePosition - messageWidth / 2, 0);
+  return Math.max(position - messageWidth / 2, 0);
 }

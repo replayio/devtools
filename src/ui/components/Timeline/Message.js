@@ -94,7 +94,11 @@ class Message extends React.Component {
           location: atPausedLocation,
         })}
         style={{
-          left: `${getLeftOffset({ message, overlayWidth, zoom: zoomRegion })}%`,
+          left: `${getLeftOffset({
+            time: message.executionPointTime,
+            overlayWidth,
+            zoom: zoomRegion,
+          })}%`,
           zIndex: `${index + 100}`,
         }}
         title={getFormatStr("jumpMessage2", frameLocation)}

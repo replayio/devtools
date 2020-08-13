@@ -11,7 +11,6 @@ import { connect } from "react-redux";
 import { Component } from "react";
 import ReactDOM from "react-dom";
 import React from "react";
-
 import dom from "react-dom-factories";
 import PropTypes from "prop-types";
 
@@ -537,7 +536,7 @@ export class Timeline extends Component {
       className: "",
       active: true,
       img: "comment",
-      onClick: this.props.startNewComment,
+      onClick: () => this.props.createComment(),
     });
   }
 
