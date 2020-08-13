@@ -17,6 +17,7 @@ import PropTypes from "prop-types";
 
 import { SVG } from "image/svg";
 import { log } from "protocol/socket";
+
 const {
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
@@ -29,15 +30,16 @@ const {
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
 import { features } from "../../utils/prefs";
+import Message from "./Message";
 
 import { LocalizationHelper } from "devtools/shared/l10n";
-const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
-
-const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
 
 const { div } = dom;
 
 import "./Timeline.css";
+
+const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
+const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
 
 const markerWidth = 7;
 
@@ -84,13 +86,6 @@ function CommandButton({ img, className, onClick, active }) {
       },
     })
   );
-}
-
-function sameLocation(m1, m2) {
-  const f1 = m1.frame;
-  const f2 = m2.frame;
-
-  return f1.source === f2.source && f1.line === f2.line && f1.column === f2.column;
 }
 
 function getMessageLocation(message) {
@@ -259,13 +254,21 @@ export class Timeline extends Component {
     this.previewLocation(message);
   }
 
-  onMarkerMouseEnter() {
-    this.setState({ hoveringOverMarker: true });
-  }
+  onMarkerClick = (e, message) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { executionPoint, executionPointTime, executionPointHasFrames } = message;
+    this.seek(executionPoint, executionPointTime, executionPointHasFrames);
+    this.showMessage(message);
+  };
 
-  onMarkerMouseLeave() {
+  onMarkerMouseEnter = () => {
+    this.setState({ hoveringOverMarker: true });
+  };
+
+  onMarkerMouseLeave = () => {
     this.setState({ hoveringOverMarker: false });
-  }
+  };
 
   async previewLocation(closestMessage) {
     const location = getMessageLocation(closestMessage);
@@ -614,75 +617,28 @@ export class Timeline extends Component {
     return Math.max(messagePosition - messageWidth / 2, 0);
   }
 
-  renderMessage(message, index, visibleIndex) {
-    const { messages, currentTime, pausedMessage, highlightedMessage } = this.props;
-
-    const offset = this.getPixelOffset(message.executionPointTime);
-    const previousVisibleMessage = messages[visibleIndex];
-
-    if (offset < 0) {
-      return null;
-    }
-
-    // Check to see if two messages overlay each other on the timeline
-    const distance = this.getPixelDistance(
-      message.executionPointTime,
-      previousVisibleMessage?.executionPointTime
-    );
-    if (distance < 1) {
-      return null;
-    }
-
-    const isOverlayed = distance < markerWidth;
-
-    // Check to see if a message appears after the current execution point
-    const isFuture =
-      this.getPixelDistance(message.executionPointTime, currentTime) > markerWidth / 2;
-
-    const isHighlighted = highlightedMessage == message.id;
-
-    const atPausedLocation = pausedMessage && sameLocation(pausedMessage, message);
-
-    let frameLocation = "";
-    if (message.frame) {
-      const { source, line, column } = message.frame;
-      const filename = source.split("/").pop();
-      frameLocation = `${filename}:${line}`;
-      if (column > 100) {
-        frameLocation += `:${column}`;
-      }
-    }
-
-    return dom.a({
-      className: classname("message", {
-        overlayed: isOverlayed,
-        future: isFuture,
-        highlighted: isHighlighted,
-        location: atPausedLocation,
-      }),
-      style: {
-        left: `${this.getLeftOffset(message)}%`,
-        zIndex: `${index + 100}`,
-      },
-      title: getFormatStr("jumpMessage2", frameLocation),
-      onClick: e => {
-        e.preventDefault();
-        e.stopPropagation();
-        const { executionPoint, executionPointTime, executionPointHasFrames } = message;
-        this.seek(executionPoint, executionPointTime, executionPointHasFrames);
-        this.showMessage(message);
-      },
-      onMouseEnter: () => this.onMarkerMouseEnter(),
-      onMouseLeave: () => this.onMarkerMouseLeave(),
-    });
-  }
-
   renderMessages() {
-    const messages = this.props.messages;
+    const { messages, currentTime, pausedMessage, highlightedMessage, zoomRegion } = this.props;
     let visibleIndex;
 
     return messages.map((message, index) => {
-      const messageEl = this.renderMessage(message, index, visibleIndex);
+      const messageEl = (
+        <Message
+          message={message}
+          visibleIndex={visibleIndex}
+          index={index}
+          messages={messages}
+          currentTime={currentTime}
+          pausedMessage={pausedMessage}
+          highlightedMessage={highlightedMessage}
+          zoomRegion={zoomRegion}
+          overlayWidth={this.overlayWidth}
+          onMarkerClick={this.onMarkerClick}
+          onMarkerMouseEnter={this.onMarkerMouseEnter}
+          onMarkerMouseLeave={this.onMarkerMouseLeave}
+        />
+      );
+
       if (messageEl) {
         visibleIndex = index;
       }
