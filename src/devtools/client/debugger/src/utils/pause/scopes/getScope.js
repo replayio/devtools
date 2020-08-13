@@ -36,58 +36,15 @@ const {
   },
 } = objectInspector;
 
-// Normally, we show all variables found on a scope, using the name of that
-// variable. When a scope chain has original names, we make some changes to
-// avoid showing confusing names that aren't present in the displayed source.
-//
-// - Variables without an original name are hidden, with some exceptions.
-//
-// - Function scopes are named after the closest in scope original name,
-//   and are treated as anonymous if there is no such name.
-
-export function hasOriginalNames(scope) {
-  while (scope) {
-    for (const { originalName } of scope.bindings || []) {
-      if (originalName) {
-        return true;
-      }
-    }
-    scope = scope.parent;
-  }
-  return false;
-}
-
-function findOriginalName(scope, targetName) {
-  while (scope) {
-    for (const { name, originalName } of scope.bindings || []) {
-      if (name == targetName) {
-        return originalName;
-      }
-    }
-    scope = scope.parent;
-  }
-  return null;
-}
-
-function getScopeTitle(type, scope: RenderableScope, useOriginalNames) {
+function getScopeTitle(type, scope: RenderableScope) {
   if (type === "block" && scope.block && scope.block.displayName) {
     return scope.block.displayName;
   }
 
-  if (type === "function" && scope.callee) {
-    const name = scope.callee.functionName();
+  if (type === "function") {
+    const name = scope.functionName;
     if (name) {
-      if (useOriginalNames) {
-        // Look in the parent scope, which is where the function will be defined.
-        const originalName = findOriginalName(scope.parent, name);
-        if (originalName) {
-          return originalName;
-        } else {
-          return L10N.getStr("anonymousFunction");
-        }
-      } else {
-        return simplifyDisplayName(name);
-      }
+      return simplifyDisplayName(name);
     } else {
       return L10N.getStr("anonymousFunction");
     }
@@ -105,15 +62,12 @@ export function getScope(
   const { type, actor } = scope;
 
   const isLocalScope = scope.actor === frameScopes.actor;
-  const useOriginalNames =
-    hasOriginalNames(frameScopes) &&
-    ThreadFront.isSourceMappedScript(selectedFrame.location.sourceId);
 
   const key = `${actor}-${scopeIndex}`;
   if (type === "function" || type === "block") {
     const { bindings } = scope;
 
-    let vars = getBindingVariables(bindings, key, useOriginalNames);
+    let vars = getBindingVariables(bindings, key);
 
     // show exception, return, and this variables in innermost scope
     if (isLocalScope) {
@@ -136,7 +90,7 @@ export function getScope(
     }
 
     if (vars && vars.length) {
-      const title = getScopeTitle(type, scope, useOriginalNames) || "";
+      const title = getScopeTitle(type, scope) || "";
       vars.sort((a, b) => a.name.localeCompare(b.name));
       return {
         name: title,

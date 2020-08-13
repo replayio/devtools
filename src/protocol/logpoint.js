@@ -130,7 +130,7 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
     conditionSection = `
       const { result: conditionResult } = sendCommand(
         "Pause.evaluateInFrame",
-        { frameId, expression: ${JSON.stringify(condition)} }
+        { frameId, expression: ${JSON.stringify(condition)}, useOriginalScopes: true }
       );
       addPauseData(conditionResult.data);
       if (conditionResult.returned) {
@@ -154,10 +154,12 @@ async function setLogpoint(logGroupId, scriptId, line, column, text, condition) 
     const bindings = [
       { name: "displayName", value: functionName || "" }
     ];
-    const { result } = sendCommand(
-      "Pause.evaluateInFrame",
-      { frameId, bindings, expression: "[" + ${JSON.stringify(text)} + "]" }
-    );
+    const { result } = sendCommand("Pause.evaluateInFrame", {
+      frameId,
+      bindings,
+      expression: "[" + ${JSON.stringify(text)} + "]",
+      useOriginalScopes: true,
+    });
     const values = [];
     addPauseData(result.data);
     if (result.exception) {
@@ -309,10 +311,10 @@ async function setRandomLogpoint(numLogs) {
   const mapper = `
     const { point, time, pauseId} = input;
     const { frameId, location } = getTopFrame();
-    const { result } = sendCommand(
-      "Pause.evaluateInFrame",
-      { frameId, expression: "String([...arguments]).substring(0, 200)" }
-    );
+    const { result } = sendCommand("Pause.evaluateInFrame", {
+      frameId,
+      expression: "String([...arguments]).substring(0, 200)",
+    });
     const v = result.returned ? String(result.returned.value) : "";
     const values = [{ value: point + ": " + v }];
     return [{ key: point, value: { time, pauseId, location, values, data: {} } }];

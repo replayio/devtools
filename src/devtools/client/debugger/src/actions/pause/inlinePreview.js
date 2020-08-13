@@ -7,7 +7,6 @@ import { sortBy } from "lodash";
 import { getFrameScope, getInlinePreviews, getSource } from "../../selectors";
 import { features } from "../../utils/prefs";
 import { validateThreadContext } from "../../utils/context";
-import { hasOriginalNames } from "../../utils/pause/scopes/getScope";
 import { loadSourceText } from "../sources/loadSourceText";
 import { ThreadFront } from "protocol/thread";
 
@@ -73,21 +72,9 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
     const allPreviews = [];
     const pausedOnLine: number = location.line;
     const levels: number = getLocalScopeLevels(originalAstScopes);
-    const useOriginalNames =
-      hasOriginalNames(scopes) && ThreadFront.isSourceMappedScript(source.id);
 
     for (let curLevel = 0; curLevel <= levels && scopes && scopes.bindings; curLevel++) {
-      const previewBindings = scopes.bindings.map(async ({ name, originalName, value }) => {
-        // As for the scopes pane, when there are original names we only show
-        // those in inline previews.
-        if (useOriginalNames) {
-          if (originalName) {
-            name = originalName;
-          } else {
-            return;
-          }
-        }
-
+      const previewBindings = scopes.bindings.map(async ({ name, value }) => {
         // We want to show values of properties of objects only and not
         // function calls on other data types like someArr.forEach etc..
         let properties = null;

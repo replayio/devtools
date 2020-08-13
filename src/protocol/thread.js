@@ -90,7 +90,6 @@ Pause.prototype = {
         for (const v of scope.bindings) {
           newBindings.push({
             name: v.name,
-            originalName: v.originalName,
             value: new ValueFront(this, v),
           });
         }
@@ -98,9 +97,6 @@ Pause.prototype = {
       }
       if (scope.object) {
         scope.object = new ValueFront(this, { object: scope.object });
-      }
-      if (scope.callee) {
-        scope.callee = new ValueFront(this, { object: scope.callee });
       }
     });
 
@@ -160,8 +156,18 @@ Pause.prototype = {
 
   async getScopes(frameId) {
     const frame = this.frames.get(frameId);
+
+    // Normally we use the original scope chain for the frame if there is one,
+    // but when a generated script is marked as preferred we use the generated
+    // scope chain instead.
+    let scopeChain = frame.scopeChain;
+    if (frame.originalScopeChain &&
+        !ThreadFront.hasPreferredGeneratedScript(frame.location)) {
+      scopeChain = frame.originalScopeChain;
+    }
+
     return Promise.all(
-      frame.scopeChain.map(async id => {
+      scopeChain.map(async id => {
         if (!this.scopes.has(id)) {
           const { data } = await this.sendMessage("Pause.getScope", {
             scope: id,
@@ -190,7 +196,8 @@ Pause.prototype = {
     assert(this.createWaiter);
     await this.createWaiter;
     const { result } = frameId
-      ? await this.sendMessage("Pause.evaluateInFrame", { frameId, expression })
+      ? await this.sendMessage("Pause.evaluateInFrame",
+                               { frameId, expression, useOriginalScopes: true })
       : await this.sendMessage("Pause.evaluateInGlobal", { expression });
     const { returned, exception, failed, data } = result;
     this.addData(data);
@@ -1777,6 +1784,12 @@ const ThreadFront = {
     } else {
       this.preferredGeneratedScripts.delete(scriptId);
     }
+  },
+
+  hasPreferredGeneratedScript(location) {
+    return location.some(({ scriptId }) => {
+      return this.preferredGeneratedScripts.has(scriptId);
+    });
   },
 
   // Get the location to use for a generated location without alternatives.

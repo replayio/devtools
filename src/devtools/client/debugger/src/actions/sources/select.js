@@ -165,6 +165,11 @@ export function selectSpecificLocation(cx: Context, location: SourceLocation) {
   return selectLocation(cx, location, { keepContext: false });
 }
 
+// The RRP protocol values include both generated and original information about
+// a paused frame and its scope contents. The ThreadFront is responsible for
+// determining which one to use. When changing between a generated and original
+// source for a frame, we tell the thread which one we prefer, and then perform
+// the pause again to refresh all the debugger's state.
 export function showAlternateSource(oldSource, newSource) {
   return async ({ dispatch, getState, client }: ThunkArgs) => {
     if (ThreadFront.isSourceMappedScript(oldSource.id)) {
