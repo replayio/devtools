@@ -9,7 +9,7 @@ const flags = require("devtools/shared/flags");
 const { ELLIPSIS } = require("devtools/shared/l10n");
 const EventEmitter = require("devtools/shared/event-emitter");
 
-loader.lazyRequireGetter(this, "KeyShortcuts", "devtools/client/shared/key-shortcuts");
+// loader.lazyRequireGetter(this, "KeyShortcuts", "devtools/client/shared/key-shortcuts");
 
 const MAX_LABEL_LENGTH = 40;
 
@@ -394,9 +394,9 @@ HTMLBreadcrumbs.prototype = {
   },
 
   initKeyShortcuts() {
-    this.shortcuts = new KeyShortcuts({ window: this.win, target: this.outer });
-    this.shortcuts.on("Right", this.handleShortcut);
-    this.shortcuts.on("Left", this.handleShortcut);
+    // this.shortcuts = new KeyShortcuts({ window: this.win, target: this.outer });
+    // this.shortcuts.on("Right", this.handleShortcut);
+    // this.shortcuts.on("Left", this.handleShortcut);
   },
 
   /**
