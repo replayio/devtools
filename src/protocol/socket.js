@@ -100,7 +100,9 @@ function log(text) {
 }
 
 function setStatus(text) {
-  document.getElementById("status").innerText = text;
+  if (document.getElementById("status")) {
+    document.getElementById("status").innerText = text;
+  }
 }
 
 module.exports = {
