@@ -172,12 +172,12 @@ export function breakpointItems(
     toggleDisabledBreakpointItem(cx, breakpoint, breakpointActions),
   ];
 
-  if (breakpoint.originalText.startsWith("debugger")) {
-    items.push(
-      { type: "separator" },
-      toggleDbgStatementItem(cx, selectedLocation, breakpointActions, breakpoint)
-    );
-  }
+  // if (breakpoint.originalText.startsWith("debugger")) {
+  //   items.push(
+  //     { type: "separator" },
+  //     toggleDbgStatementItem(cx, selectedLocation, breakpointActions, breakpoint)
+  //   );
+  // }
 
   items.push(
     { type: "separator" },
@@ -209,9 +209,9 @@ export function createBreakpointItems(
     items.push(addLogPointItem(location, breakpointActions));
   }
 
-  if (lineText && lineText.startsWith("debugger")) {
-    items.push(toggleDbgStatementItem(cx, location, breakpointActions));
-  }
+  // if (lineText && lineText.startsWith("debugger")) {
+  //   items.push(toggleDbgStatementItem(cx, location, breakpointActions));
+  // }
   return items;
 }
 

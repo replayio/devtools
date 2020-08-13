@@ -282,18 +282,18 @@ export default function showContextMenu(props: Props) {
     {
       item: { type: "separator" },
     },
-    {
-      item: enableDbgStatementItem,
-      hidden: () => hideEnableDbgStatementItem,
-    },
-    {
-      item: disableDbgStatementItem,
-      hidden: () => hideDisableDbgStatementItem,
-    },
-    {
-      item: { type: "separator" },
-      hidden: () => hideDisableDbgStatementItem && hideEnableDbgStatementItem,
-    },
+    // {
+    //   item: enableDbgStatementItem,
+    //   hidden: () => hideEnableDbgStatementItem,
+    // },
+    // {
+    //   item: disableDbgStatementItem,
+    //   hidden: () => hideDisableDbgStatementItem,
+    // },
+    // {
+    //   item: { type: "separator" },
+    //   hidden: () => hideDisableDbgStatementItem && hideEnableDbgStatementItem,
+    // },
     {
       item: addConditionItem,
       hidden: () => breakpoint.options.condition,
