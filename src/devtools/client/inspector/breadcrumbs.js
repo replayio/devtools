@@ -534,8 +534,8 @@ HTMLBreadcrumbs.prototype = {
    * @param {DOMEvent} event.
    */
   handleClick: function (event) {
-    const target = event.originalTarget;
-    if (target.tagName == "button") {
+    const target = event.target.parentElement;
+    if (target.tagName == "BUTTON") {
       target.onBreadcrumbsClick();
     }
   },
@@ -545,8 +545,8 @@ HTMLBreadcrumbs.prototype = {
    * @param {DOMEvent} event.
    */
   handleMouseOver: function (event) {
-    const target = event.originalTarget;
-    if (target.tagName == "button") {
+    const target = event.target.parentElement;
+    if (target.tagName == "BUTTON") {
       target.onBreadcrumbsHover();
     }
   },
