@@ -154,31 +154,36 @@ Pause.prototype = {
     return this.stack;
   },
 
+  ensureScopeChain(scopeChain) {
+    return Promise.all(scopeChain.map(async id => {
+      if (!this.scopes.has(id)) {
+        const { data } = await this.sendMessage("Pause.getScope", {
+          scope: id,
+        });
+        this.addData(data);
+      }
+      const scope = this.scopes.get(id);
+      assert(scope);
+      return scope;
+    }));
+  },
+
   async getScopes(frameId) {
     const frame = this.frames.get(frameId);
 
     // Normally we use the original scope chain for the frame if there is one,
     // but when a generated script is marked as preferred we use the generated
-    // scope chain instead.
-    let scopeChain = frame.scopeChain;
+    // scope chain instead. In the original case we still load the frame's
+    // normal scope chain first, as currently the backend does not supply
+    // related objects when loading original scopes and we don't deal with that
+    // properly.
+    let scopeChain = await this.ensureScopeChain(frame.scopeChain);
     if (frame.originalScopeChain &&
         !ThreadFront.hasPreferredGeneratedScript(frame.location)) {
-      scopeChain = frame.originalScopeChain;
+      scopeChain = await this.ensureScopeChain(frame.originalScopeChain);
     }
 
-    return Promise.all(
-      scopeChain.map(async id => {
-        if (!this.scopes.has(id)) {
-          const { data } = await this.sendMessage("Pause.getScope", {
-            scope: id,
-          });
-          this.addData(data);
-        }
-        const scope = this.scopes.get(id);
-        assert(scope);
-        return scope;
-      })
-    );
+    return scopeChain;
   },
 
   sendMessage(method, params) {
