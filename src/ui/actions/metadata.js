@@ -19,14 +19,10 @@ function onCommentsUpdate(newComments) {
     const existingComments = selectors.getComments(getState());
 
     const comments = [
-      ...(newComments || [])
-        .filter(comment => {
-          // Ignore the comment for our own location.
-          return comment.id != ThreadFront.sessionId;
-        })
-        .map(comment => {
-          return { ...comment, visible: isServerCommentVisible(existingComments, comment) };
-        }),
+      ...(newComments || []).filter(comment => {
+        // Ignore the comment for our own location.
+        return comment.id != ThreadFront.sessionId;
+      }),
       ...existingComments.filter(c => !c.saved),
     ];
 
@@ -43,7 +39,7 @@ export function createComment() {
 
     const comment = {
       id: (Math.random() * 1e9) | 0,
-      visible: true,
+      visible: false,
       point: ThreadFront.currentPoint,
       hasFrames: ThreadFront.currentPointHasFrames,
       time: currentTime,
@@ -62,50 +58,6 @@ export function createComment() {
   };
 }
 
-export function updateComment(comment) {
-  return ({ dispatch }) => {
-    if (comment.contents) {
-      comment.saved = true;
-      ThreadFront.updateMetadata(CommentsMetadata, comments => [
-        ...(comments || []).filter(c => c.id != comment.id),
-        comment,
-      ]);
-    } else {
-      if (comment.saved) {
-        ThreadFront.updateMetadata(CommentsMetadata, comments =>
-          (comments || []).filter(c => c.id != comment.id)
-        );
-      }
-      dispatch(removeComment(comment));
-    }
-  };
-}
-
-export function closeComment() {
-  return ({ dispatch }) => {
-    if (comment.saved) {
-      dispatch(setCommentsVisible([comment], false));
-    } else {
-      dispatch(removeComment(comment));
-    }
-  };
-}
-
-function setCommentsVisible(list, visible) {
-  return ({ dispatch, getState }) => {
-    const existingComments = selectors.getComments(getState());
-
-    const comments = existingComments.map(c => {
-      if (list.some(c2 => c2.id == c.id)) {
-        return { ...c, visible };
-      }
-      return c;
-    });
-
-    dispatch({ type: "set_comments", comments });
-  };
-}
-
 export function jumpToComment(comment) {
   ThreadFront.timeWarp(comment.point, comment.time, comment.hasFrames);
 }
@@ -114,8 +66,40 @@ export function removeComment(comment) {
   return ({ getState, dispatch }) => {
     const comments = selectors.getComments(getState());
     const newComments = comments.filter(c => c.id != comment.id);
-    ThreadFront.updateMetadata(CommentsMetadata, () => newComments);
-    dispatch({ type: "set_comments", comments: newComments });
+  };
+}
+
+export function updateComment(comment) {
+  return ({ dispatch, getState }) => {
+    const existingComments = selectors.getComments(getState());
+
+    const commentIndex = existingComments.findIndex(c => c.id === comment.id);
+    const newComments = [...existingComments];
+    newComments.splice(commentIndex, 1, comment);
+    dispatch(updateComments(newComments));
+  };
+}
+
+export function updateComments(comments) {
+  return ({ dispatch }) => {
+    ThreadFront.updateMetadata(CommentsMetadata, () => comments);
+    dispatch({ type: "set_comments", comments: comments });
+  };
+}
+
+export function showComment(comment) {
+  return ({ dispatch, getState }) => {
+    const existingComments = selectors.getComments(getState());
+    const newComments = existingComments.map(c => ({ ...c, visible: c.id === comment.id }));
+    dispatch(updateComments(newComments));
+  };
+}
+
+export function hideComments() {
+  return ({ dispatch, getState }) => {
+    const existingComments = selectors.getComments(getState());
+    const newComments = existingComments.map(c => ({ ...c, visible: false }));
+    dispatch(updateComments(newComments));
   };
 }
 
