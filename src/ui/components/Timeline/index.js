@@ -416,8 +416,8 @@ export class Timeline extends Component {
   }
 
   doNext() {
-    const { currentTime, zoomEndTime } = this.props;
-    if (currentTime == zoomEndTime) {
+    const { currentTime } = this.props;
+    if (currentTime == this.zoomEndTime) {
       return;
     }
 
@@ -426,13 +426,11 @@ export class Timeline extends Component {
       return;
     }
 
-    this.seekTime(Math.min(next.time, zoomEndTime));
+    this.seekTime(Math.min(next.time, this.zoomEndTime));
   }
 
   nextPlaybackTime(time) {
-    const { zoomEndTime } = this.props;
-
-    if (time == zoomEndTime) {
+    if (time == this.zoomEndTime) {
       return null;
     }
 
@@ -443,11 +441,11 @@ export class Timeline extends Component {
       nextEvent = nextPaintOrMouseEvent(nextEvent.time);
     }
 
-    if (nextEvent && nextEvent.time < zoomEndTime) {
+    if (nextEvent && nextEvent.time < this.zoomEndTime) {
       return nextEvent.time;
     }
 
-    return zoomEndTime;
+    return this.zoomEndTime;
   }
 
   playbackPaintFinished(time, screen, mouse) {
