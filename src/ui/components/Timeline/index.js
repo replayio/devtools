@@ -569,7 +569,8 @@ export class Timeline extends Component {
     const el = ReactDOM.findDOMNode(this).querySelector(".progressBar");
     const width = el ? el.clientWidth : 1;
     const left = el ? el.getBoundingClientRect().left : 1;
-    this.props.setTimelineState({ timelineDimensions: { width, left } });
+    const top = el ? el.getBoundingClientRect().top : 1;
+    this.props.setTimelineState({ timelineDimensions: { width, left, top } });
 
     // this.overlayTop = el ? el.getBoundingClientRect().top : 1;
     // this.overlayLeft = el ? el.getBoundingClientRect().left : 1;

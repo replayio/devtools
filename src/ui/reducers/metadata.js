@@ -19,3 +19,7 @@ export default function update(state = initialTimelineState(), action) {
 export function getComments(state) {
   return state.metadata.comments;
 }
+
+export function commentVisible(state) {
+  return getComments(state).some(comment => comment.visible);
+}
