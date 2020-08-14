@@ -154,7 +154,7 @@ export class Timeline extends Component {
   }
 
   get overlayWidth() {
-    return this.props.timelineDimensions?.width || 1;
+    return this.props.timelineDimensions.width;
   }
 
   get zoomStartTime() {

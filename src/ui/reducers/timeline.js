@@ -12,7 +12,7 @@ function initialTimelineState() {
     shouldAnimate: true,
     recordingDuration: 0,
     screenShot: null,
-    timelineDimensions: null,
+    timelineDimensions: { left: 1, top: 1, width: 1 },
     mouse: null,
   };
 }
