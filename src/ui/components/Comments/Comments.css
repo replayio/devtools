@@ -1,7 +1,5 @@
 .comments {
-  height: 40px;
   width: 100%;
-  background: red;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -16,7 +14,58 @@
 .comments .comment {
   position: absolute;
   background: white;
-  bottom: 5px;
-  width: 10px;
-  height: 10px;
+  bottom: 1rem;
+  width: 360px;
+  border: 1px solid #ccc;
+  box-shadow: 0px 3px 4px #eaeaea;
+  border-radius: 3px;
+}
+
+.comment-body {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+}
+.comment-avatar {
+  background: #7ed8c8;
+  width: 54px;
+  height: 54px;
+  border-radius: 32px;
+  margin: 5px;
+  margin: 1rem 1rem 0 0;
+  border: 5px solid white;
+  flex-shrink: 0;
+  color: white;
+  text-align: center;
+  vertical-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  padding-top: 7px;
+}
+
+.comment-content {
+  display: flex;
+  flex-direction: column;
+}
+.comment-header {
+  display: flex;
+  line-height: 2rem;
+  margin-top: 1rem;
+}
+.comment-user {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.comment-date {
+  font-size: 1.2rem;
+  color: #757575;
+  margin-left: 9px;
+  line-height: 2rem;
+}
+.comment-description {
+  font-size: 1.3rem;
+  line-height: 2rem;
+  color: #737373;
+  margin-top: 1rem;
 }
