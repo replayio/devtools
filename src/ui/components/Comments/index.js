@@ -56,9 +56,9 @@ class Comment extends React.Component {
         }}
       >
         <div className="comment-body">
-          <div className="comment-avatar">J</div>
+          <div className="comment-avatar"></div>
           <div className="comment-content">
-            <div className="comment-header">
+            <div className="comment-header" style={{ display: "none" }}>
               <div className="comment-user">Jaril</div>
               <div className="comment-date">Today at 12:04am</div>
             </div>
@@ -87,6 +87,7 @@ class Comments extends React.Component {
               comment={comment}
               index={index}
               zoomRegion={zoomRegion}
+              timelineDimensions={timelineDimensions}
               showComment={showComment}
             />
           ))}
