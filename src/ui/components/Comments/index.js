@@ -25,7 +25,7 @@ class Comment extends React.Component {
     }
 
     return (
-      <a
+      <div
         className={classnames("comment", {})}
         style={{
           left: `${getLeftOffset({
@@ -35,7 +35,21 @@ class Comment extends React.Component {
           })}%`,
           zIndex: `${index + 100}`,
         }}
-      />
+      >
+        <div className="comment-body">
+          <div className="comment-avatar">J</div>
+          <div className="comment-content">
+            <div className="comment-header">
+              <div className="comment-user">Jaril</div>
+              <div className="comment-date">Today at 12:04am</div>
+            </div>
+            <div className="comment-description">
+              You can use Constraints to define how objects respond in scrolling Prototypes. Learn
+              more about Prototyping in Figma.
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 }
@@ -52,7 +66,7 @@ class Comments extends React.Component {
     return (
       <div className="comments">
         <div className="comments-container">
-          {comments.map((comment, index) => (
+          {(comments.length > 0 ? [comments[1]] : []).map((comment, index) => (
             <Comment
               key={comment.id}
               comment={comment}
