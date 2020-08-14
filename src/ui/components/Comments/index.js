@@ -11,11 +11,20 @@ import { getPixelOffset, getLeftOffset } from "../../utils/timeline";
 import "./Comments.css";
 
 class Comment extends React.Component {
+  onClickMarker = () => {
+    this.props.set;
+  };
   render() {
-    const { comment, zoomRegion, index, overlayWidth } = this.props;
+    const { comment, zoomRegion, index, overlayWidth, showComment } = this.props;
 
     const offset = getPixelOffset({
-      time: comment.executionPointTime,
+      time: comment.time,
+      overlayWidth,
+      zoom: zoomRegion,
+    });
+
+    const leftOffset = getLeftOffset({
+      time: comment.time,
       overlayWidth,
       zoom: zoomRegion,
     });
@@ -24,15 +33,25 @@ class Comment extends React.Component {
       return null;
     }
 
+    if (!comment.visible) {
+      return (
+        <div
+          className="comment-marker"
+          key={comment.id}
+          style={{
+            left: `${leftOffset}%`,
+          }}
+          onClick={() => showComment(comment)}
+        ></div>
+      );
+    }
+
     return (
       <div
         className={classnames("comment", {})}
+        key={comment.id}
         style={{
-          left: `${getLeftOffset({
-            time: comment.time,
-            overlayWidth,
-            zoom: zoomRegion,
-          })}%`,
+          left: `${leftOffset}%`,
           zIndex: `${index + 100}`,
         }}
       >
@@ -59,20 +78,20 @@ class Comments extends React.Component {
     return this.props.timelineDimensions?.width || 1;
   }
   render() {
-    const { comments, zoomRegion } = this.props;
+    const { comments, zoomRegion, showComment } = this.props;
     if (!features.comments) {
       return null;
     }
     return (
       <div className="comments">
         <div className="comments-container">
-          {(comments.length > 0 ? [comments[1]] : []).map((comment, index) => (
+          {comments.map((comment, index) => (
             <Comment
-              key={comment.id}
               comment={comment}
               index={index}
               overlayWidth={this.overlayWidth}
               zoomRegion={zoomRegion}
+              showComment={showComment}
             />
           ))}
         </div>
@@ -87,5 +106,7 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     zoomRegion: selectors.getZoomRegion(state),
   }),
-  {}
+  {
+    showComment: actions.showComment,
+  }
 )(Comments);
