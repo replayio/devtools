@@ -42,13 +42,12 @@ class App extends React.Component {
         <div id="viewer-text"></div>
         <div id="highlighter-root"></div>
         <Tooltip tooltip={tooltip} />
-        <Comments />
       </div>
     );
   }
 
   render() {
-    const { initialize } = this.props;
+    const { initialize, commentVisible, hideComments } = this.props;
     const { orientation } = this.state;
 
     const toolbox = <Toolbox initialize={initialize} />;
@@ -83,6 +82,8 @@ class App extends React.Component {
           endPanelControl={false}
           endPanel={endPanel}
         />
+        <Comments />
+        {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
       </>
     );
   }
@@ -92,8 +93,10 @@ export default connect(
   state => ({
     theme: selectors.getTheme(state),
     tooltip: selectors.getTooltip(state),
+    commentVisible: selectors.commentVisible(state),
   }),
   {
     updateTheme: actions.updateTheme,
+    hideComments: actions.hideComments,
   }
 )(App);

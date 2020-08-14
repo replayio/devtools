@@ -96,6 +96,13 @@
   padding-left: 10px;
 }
 
+.app-mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+}
+
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
 @import url("devtools/client/themes/markup.css");

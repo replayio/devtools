@@ -15,17 +15,17 @@ class Comment extends React.Component {
     this.props.set;
   };
   render() {
-    const { comment, zoomRegion, index, overlayWidth, showComment } = this.props;
+    const { comment, zoomRegion, index, timelineDimensions, showComment } = this.props;
 
     const offset = getPixelOffset({
       time: comment.time,
-      overlayWidth,
+      overlayWidth: timelineDimensions?.width,
       zoom: zoomRegion,
     });
 
     const leftOffset = getLeftOffset({
       time: comment.time,
-      overlayWidth,
+      overlayWidth: timelineDimensions?.width,
       zoom: zoomRegion,
     });
 
@@ -74,22 +74,18 @@ class Comment extends React.Component {
 }
 
 class Comments extends React.Component {
-  get overlayWidth() {
-    return this.props.timelineDimensions?.width || 1;
-  }
   render() {
-    const { comments, zoomRegion, showComment } = this.props;
+    const { comments, zoomRegion, showComment, timelineDimensions } = this.props;
     if (!features.comments) {
       return null;
     }
     return (
-      <div className="comments">
+      <div className="comments" style={{ top: timelineDimensions?.top }}>
         <div className="comments-container">
           {comments.map((comment, index) => (
             <Comment
               comment={comment}
               index={index}
-              overlayWidth={this.overlayWidth}
               zoomRegion={zoomRegion}
               showComment={showComment}
             />
