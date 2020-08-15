@@ -271,6 +271,7 @@ button.open-inspector {
 button.jump-definition {
   display: inline-block;
   height: 16px;
+  width: 16px;
   margin-left: 0.25em;
   vertical-align: middle;
   border-color: transparent;

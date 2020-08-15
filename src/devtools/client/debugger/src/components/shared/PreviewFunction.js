@@ -11,16 +11,14 @@ import { times, zip, flatten } from "lodash";
 
 import "./PreviewFunction.css";
 
-type FunctionType = {
+type FunctionType = {|
   name: string,
-  displayName?: string,
-  userDisplayName?: string,
-  parameterNames?: string[],
-  location?: {
-    url: string,
-    line: number,
-    column: number,
-  },
+  parameterNames: string[]
+|} | {
+  functionName(): string,
+  functionParameterNames(): string[],
+  functionLocation(): { line: number },
+  functionLocationURL(): string
 };
 
 type Props = { func: FunctionType };
@@ -30,12 +28,20 @@ const IGNORED_SOURCE_URLS = ["debugger eval code"];
 export default class PreviewFunction extends Component<Props> {
   renderFunctionName(func: FunctionType) {
     const { l10n } = this.context;
-    const name = func.name || l10n.getStr("anonymousFunction");
+    const name = (func.functionName
+      ? func.functionName()
+      : func.name
+    ) || l10n.getStr("anonymousFunction");
+
     return <span className="function-name">{name}</span>;
   }
 
   renderParams(func: FunctionType) {
-    const parameterNames = func.parameterNames || [];
+    const parameterNames = (func.functionParameterNames
+      ? func.functionParameterNames()
+      : func.parameterNames
+    ) || [];
+
     const params = parameterNames
       .filter(i => i)
       .map(param => (
@@ -55,7 +61,9 @@ export default class PreviewFunction extends Component<Props> {
   }
 
   jumpToDefinitionButton(func: FunctionType) {
-    return null;
+    if (!func.functionLocation) {
+      return null;
+    }
 
     const location = func.functionLocation();
     const locationURL = func.functionLocationURL();
