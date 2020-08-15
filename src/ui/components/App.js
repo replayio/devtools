@@ -47,7 +47,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { initialize, commentVisible, hideComments } = this.props;
+    const { initialize, commentVisible, hideComments, updateTimelineDimensions } = this.props;
     const { orientation } = this.state;
 
     const toolbox = <Toolbox initialize={initialize} />;
@@ -69,6 +69,8 @@ class App extends React.Component {
           <div className="logo"></div>
           <div id="status"></div>
         </div>
+        <Comments />
+        {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
 
         <SplitBox
           style={{ width: "100vw", overflow: "hidden" }}
@@ -77,13 +79,11 @@ class App extends React.Component {
           minSize="20%"
           maxSize="80%"
           vert={vert}
-          onResizeEnd={num => {}}
+          onMove={num => updateTimelineDimensions()}
           startPanel={startPanel}
           endPanelControl={false}
           endPanel={endPanel}
         />
-        <Comments />
-        {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
       </>
     );
   }
@@ -98,5 +98,6 @@ export default connect(
   {
     updateTheme: actions.updateTheme,
     hideComments: actions.hideComments,
+    updateTimelineDimensions: actions.updateTimelineDimensions,
   }
 )(App);

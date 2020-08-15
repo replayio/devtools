@@ -101,6 +101,16 @@ function setRecordingDescription({ duration, lastScreen }) {
   };
 }
 
+export function updateTimelineDimensions() {
+  return ({ dispatch }) => {
+    const el = document.querySelector(".progressBar");
+    const width = el ? el.clientWidth : 1;
+    const left = el ? el.getBoundingClientRect().left : 1;
+    const top = el ? el.getBoundingClientRect().top : 1;
+    dispatch(setTimelineState({ timelineDimensions: { width, left, top } }));
+  };
+}
+
 export function setTimelineState(state) {
   return { type: "set_timeline_state", state };
 }

@@ -14,7 +14,7 @@ function onCommentsUpdate(newComments) {
   };
 }
 
-export function createComment() {
+export function createComment(newComment) {
   return ({ getState, dispatch }) => {
     const existingComments = selectors.getComments(getState());
     const currentTime = selectors.getCurrentTime(getState());
@@ -23,10 +23,10 @@ export function createComment() {
       return;
     }
 
-    const comment = {
+    const comment = newComment || {
       id: (Math.random() * 1e9) | 0,
       sessionId: ThreadFront.sessionId,
-      visible: false,
+      visible: true,
       point: ThreadFront.currentPoint,
       hasFrames: ThreadFront.currentPointHasFrames,
       time: currentTime,

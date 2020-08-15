@@ -46,6 +46,8 @@ class SplitBox extends Component {
       onControlledPanelResized: PropTypes.func,
       // Retrieve DOM reference to the start panel element
       onSelectContainerElement: PropTypes.any,
+      // Called when a panel moves
+      onMove: PropTypes.func,
     };
   }
 
@@ -186,6 +188,9 @@ class SplitBox extends Component {
     // Fire resize events at the window occasionally so that any visible
     // CodeMirror instance can respond to the update.
     this.dispatchResize();
+    if (this.props.onMove) {
+      this.props.onMove(size);
+    }
   }
 
   dispatchResize = debounce(() => window.dispatchEvent(new Event("resize")), 50);
