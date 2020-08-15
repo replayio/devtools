@@ -14,6 +14,7 @@ export async function setupTimeline(recordingId, { dispatch }) {
   ThreadFront.warpCallback = onWarp;
   const description = await ThreadFront.getRecordingDescription(recordingId);
   dispatch(setRecordingDescription(description));
+  window.addEventListener("resize", () => dispatch(updateTimelineDimensions()));
 }
 
 function onWarp(point, time) {
