@@ -15,11 +15,21 @@ class Comment extends React.Component {
 
   onDescriptionChange = e => {
     const { comment, updateComment } = this.props;
+    const contents = e.target.value;
+    this.contents = e.target.value;
     if (e.charCode == "13") {
       this.setState({ editing: false });
-      updateComment({ ...comment, contents: e.target.value });
+      updateComment({ ...comment, contents });
     }
   };
+
+  componentWillUnmount() {
+    const { createComment, comment } = this.props;
+    // re-create the comment if the user clicks away without saving
+    if (comment.contents == "" && this.contents) {
+      createComment({ ...comment, visible: false, contents: this.contents });
+    }
+  }
 
   removeComment = () => {
     const { removeComment, comment } = this.props;
@@ -98,5 +108,6 @@ export default connect(
     showComment: actions.showComment,
     updateComment: actions.updateComment,
     removeComment: actions.removeComment,
+    createComment: actions.createComment,
   }
 )(Comment);

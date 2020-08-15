@@ -121,7 +121,7 @@ export class Timeline extends Component {
   }
 
   async componentDidMount() {
-    this.updateOverlayWidth();
+    this.props.updateTimelineDimensions();
     this.threadFront.ensureProcessed(this.onMissingRegions, this.onUnprocessedRegions);
 
     const consoleFrame = this.console.hud.ui;
@@ -130,8 +130,6 @@ export class Timeline extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // this.updateOverlayWidth();
-
     if (prevState.closestMessage != this.props.closestMessage) {
       this.scrollToMessage(this.props.closestMessage);
     }
@@ -565,17 +563,6 @@ export class Timeline extends Component {
     ];
   }
 
-  updateOverlayWidth() {
-    const el = ReactDOM.findDOMNode(this).querySelector(".progressBar");
-    const width = el ? el.clientWidth : 1;
-    const left = el ? el.getBoundingClientRect().left : 1;
-    const top = el ? el.getBoundingClientRect().top : 1;
-    this.props.setTimelineState({ timelineDimensions: { width, left, top } });
-
-    // this.overlayTop = el ? el.getBoundingClientRect().top : 1;
-    // this.overlayLeft = el ? el.getBoundingClientRect().left : 1;
-  }
-
   // calculate pixel distance from two times
   getPixelDistance(to, from) {
     const toPos = this.getVisiblePosition(to);
@@ -833,5 +820,6 @@ export default connect(
     setZoomRegion: actions.setZoomRegion,
     setTimelineState: actions.setTimelineState,
     createComment: actions.createComment,
+    updateTimelineDimensions: actions.updateTimelineDimensions,
   }
 )(Timeline);
