@@ -78,7 +78,7 @@ class Comment extends React.Component {
         }}
       >
         <div className="comment-body">
-          <div className="comment-avatar"></div>
+          {/* <div className="comment-avatar"></div> */}
           <div className="comment-content">
             <div className="comment-header">
               <div className="actions">

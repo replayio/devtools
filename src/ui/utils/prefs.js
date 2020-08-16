@@ -11,7 +11,7 @@ pref("viewer.split-console", true);
 pref("viewer.selected-panel", "debugger");
 
 // app features
-pref("viewer.features.comments", false);
+pref("viewer.features.comments", true);
 
 export const prefs = new PrefsHelper("viewer", {
   splitConsole: ["Bool", "split-console"],
