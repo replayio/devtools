@@ -95,12 +95,12 @@ class Toolbox extends React.Component {
       return;
     }
 
+    log(`Toolbox SelectTool ${name}`);
+    setSelectedPanel(name);
+
     if (!panel) {
       panel = await this.startPanel(name);
     }
-
-    log(`Toolbox SelectTool ${name}`);
-    setSelectedPanel(name);
 
     if (panel.refresh) {
       panel.refresh();
