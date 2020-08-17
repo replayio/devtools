@@ -48,12 +48,13 @@
 .toolbar-panel-button {
   float: left;
   display: flex;
-  margin-left: 10px;
   cursor: default;
   line-height: 35px;
   font-size: 1.1rem;
   color: var(--theme-toolbar-color);
   align-items: center;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .toolbar-panel-button:hover {
