@@ -123,6 +123,8 @@ const gMaskImages = {
   ".tree-node button.arrow": require("devtools/client/debugger/images/arrow.svg"),
   "#command-button-pick::before": require("devtools/client/themes/images/command-pick.svg"),
   "button.open-inspector": require("devtools/client/themes/images/open-inspector.svg"),
+  ".img.comment-icon": require("devtools/client/themes/images/comment.svg"),
+  ".img.comment": require("devtools/client/themes/images/comment-small.svg"),
 };
 
 const gContentImages = {
