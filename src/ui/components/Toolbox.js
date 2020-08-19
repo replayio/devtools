@@ -391,8 +391,11 @@ class Toolbox extends React.Component {
     const { selectedPanel, splitConsoleOpen } = this.props;
 
     if (selectedPanel == "console") {
+      // We intentionally don't pass in the `initialSize: "0%"` here. This is
+      // important for when the split console is open, and we switch panels from
+      // uncontrolled (console) to controlled (debugger/inspector). This way, the
+      // controlled height is not stuck at 0% until we resize the panel manually.
       return {
-        initialSize: "0%",
         minSize: 0,
         maxSize: 0,
       };
