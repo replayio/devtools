@@ -169,7 +169,7 @@ export class Timeline extends Component {
     const clickLeft = e.clientX;
 
     const clickPosition = (clickLeft - left) / width;
-    return this.zoomStartTime + (this.zoomEndTime - this.zoomStartTime) * clickPosition;
+    return Math.ceil(this.zoomStartTime + (this.zoomEndTime - this.zoomStartTime) * clickPosition);
   }
 
   onMissingRegions = regions => {

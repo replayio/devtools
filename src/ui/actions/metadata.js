@@ -1,11 +1,20 @@
 import { ThreadFront } from "protocol/thread";
-import { selectors } from "../reducers";
+import { selectors } from "ui/reducers";
+import { prefs, features } from "ui/utils/prefs";
 
 // Metadata key used to store comments.
 const CommentsMetadata = "devtools-comments";
+const UsersMetadata = "devtools-users";
+let heartbeatPing = Date.now();
 
 export function setupMetadata(recordingId, store) {
   ThreadFront.watchMetadata(CommentsMetadata, args => store.dispatch(onCommentsUpdate(args)));
+  ThreadFront.watchMetadata(UsersMetadata, args => store.dispatch(onUsersUpdate(args)));
+
+  if (features.users) {
+    store.dispatch(registerUser());
+    setInterval(() => store.dispatch(userHeartbeat()), 5000);
+  }
 }
 
 function onCommentsUpdate(newComments) {
@@ -96,5 +105,42 @@ export function clearComments() {
   return ({ dispatch }) => {
     ThreadFront.updateMetadata(CommentsMetadata, () => []);
     dispatch({ type: "set_comments", comments: [] });
+  };
+}
+
+export function registerUser() {
+  const user = prefs.user?.id
+    ? prefs.user
+    : {
+        id: `${Math.ceil(Math.random() * 10e4)}`,
+        avatar: Math.ceil(Math.random() * 10),
+      };
+
+  return { type: "register_user", user };
+}
+
+function userHeartbeat() {
+  return ({ getState }) => {
+    const me = selectors.getUser(getState());
+    ThreadFront.updateMetadata(UsersMetadata, (users = []) => {
+      const newUsers = [...users].filter(
+        user => user.id !== me.id && user.heartbeat - heartbeatPing < 60000
+      );
+
+      if (me.id) {
+        newUsers.push({ ...me, heartbeat: Date.now() });
+      }
+
+      return newUsers;
+    });
+
+    heartbeatPing = Date.now();
+  };
+}
+
+function onUsersUpdate(users) {
+  return ({ dispatch }) => {
+    // ThreadFront.updateMetadata(UsersMetadata, () => comments);
+    dispatch({ type: "update_users", users });
   };
 }
