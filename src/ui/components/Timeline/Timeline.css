@@ -382,13 +382,6 @@
   float: right;
 }
 
-.comment-jump {
-  width: 18px;
-  height: 18px;
-  float: right;
-  transform: scale(0.8);
-}
-
 .comment-input {
   resize: none;
   border: none;

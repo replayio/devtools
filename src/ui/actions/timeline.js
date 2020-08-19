@@ -119,3 +119,9 @@ export function setTimelineState(state) {
 export function setZoomRegion(region) {
   return { type: "set_zoom", region };
 }
+
+export function seek(point, time, hasFrames) {
+  return () => {
+    ThreadFront.timeWarp(point, time, hasFrames);
+  };
+}
