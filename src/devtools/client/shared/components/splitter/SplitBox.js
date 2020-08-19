@@ -223,7 +223,14 @@ class SplitBox extends Component {
   // eslint-disable-next-line complexity
   render() {
     const { endPanelControl, splitterSize, vert } = this.state;
-    const { startPanel, endPanel, minSize, maxSize, onSelectContainerElement } = this.props;
+    const {
+      startPanel,
+      endPanel,
+      minSize,
+      maxSize,
+      onSelectContainerElement,
+      initialSize,
+    } = this.props;
 
     const style = Object.assign(
       {
@@ -258,15 +265,17 @@ class SplitBox extends Component {
         width: endPanelControl ? this.state.width : null,
       };
     } else {
+      let height = this.state.height || initialSize;
+
       leftPanelStyle = {
         maxHeight: endPanelControl ? null : maxSize,
         minHeight: endPanelControl ? null : minSize,
-        height: endPanelControl ? null : this.state.height,
+        height: endPanelControl ? null : height,
       };
       rightPanelStyle = {
         maxHeight: endPanelControl ? maxSize : null,
         minHeight: endPanelControl ? minSize : null,
-        height: endPanelControl ? this.state.height : null,
+        height: endPanelControl ? height : null,
       };
     }
 
