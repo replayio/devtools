@@ -85,12 +85,13 @@ function registerStoreObserver(store, subscriber) {
 }
 
 function updatePrefs(state, oldState) {
-  const { isSplitConsoleOpen, getSelectedPanel } = selectors;
-  if (isSplitConsoleOpen(state) != isSplitConsoleOpen(oldState)) {
-    prefs.splitConsole = isSplitConsoleOpen(state);
+  function updatePref(field, selector) {
+    if (selector(state) != selector(oldState)) {
+      prefs[field] = selector(state);
+    }
   }
 
-  if (getSelectedPanel(state) != getSelectedPanel(oldState)) {
-    prefs.selectedPanel = getSelectedPanel(state);
-  }
+  updatePref("splitConsole", selectors.isSplitConsoleOpen);
+  updatePref("user", selectors.getUser);
+  updatePref("selectedPanel", selectors.getSelectedPanel);
 }
