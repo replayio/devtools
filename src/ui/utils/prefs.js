@@ -7,17 +7,21 @@ import Services from "devtools-services";
 const { pref } = Services;
 
 // app prefs.
-pref("viewer.split-console", true);
-pref("viewer.selected-panel", "debugger");
+pref("devtools.split-console", true);
+pref("devtools.selected-panel", "debugger");
+pref("devtools.user", "{}");
 
 // app features
-pref("viewer.features.comments", true);
+pref("devtools.features.comments", true);
+pref("devtools.features.users", false);
 
-export const prefs = new PrefsHelper("viewer", {
+export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
   selectedPanel: ["String", "selected-panel"],
+  user: ["Json", "user"],
 });
 
-export const features = new PrefsHelper("viewer", {
-  comments: ["Bool", "features.comments"],
+export const features = new PrefsHelper("devtools.features", {
+  comments: ["Bool", "comments"],
+  comments: ["Bool", "users"],
 });
