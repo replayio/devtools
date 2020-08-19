@@ -2232,6 +2232,10 @@ MarkupView.prototype = {
     this._lastDragTarget = null;
   },
 
+  clear() {
+    this._elt.innerHTML = "";
+  },
+
   /**
    * Find the closest element with class tag-line. These are used to indicate
    * drag and drop targets.
