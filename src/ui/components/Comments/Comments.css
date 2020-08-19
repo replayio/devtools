@@ -86,3 +86,18 @@
   line-height: 1.7rem;
   color: #777;
 }
+
+.comment .actions {
+  display: flex;
+  align-items: center;
+}
+
+.comment-jump {
+  width: 18px;
+  height: 18px;
+  transform: scale(0.8);
+}
+
+.comment-jump:hover {
+  cursor: pointer;
+}

@@ -381,7 +381,7 @@ export class Timeline extends Component {
     if (!point) {
       return null;
     }
-    return this.threadFront.timeWarp(point, time, hasFrames);
+    return this.props.seek(point, time, hasFrames);
   }
 
   seekTime(targetTime) {
@@ -821,5 +821,6 @@ export default connect(
     setTimelineState: actions.setTimelineState,
     createComment: actions.createComment,
     updateTimelineDimensions: actions.updateTimelineDimensions,
+    seek: actions.seek,
   }
 )(Timeline);

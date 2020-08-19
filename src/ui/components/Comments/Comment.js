@@ -36,6 +36,12 @@ class Comment extends React.Component {
     removeComment(comment);
   };
 
+  seek = () => {
+    const { comment, seek } = this.props;
+    const { time, point, hasFrames } = comment;
+    seek(point, time, hasFrames);
+  };
+
   render() {
     const { comment, zoomRegion, index, timelineDimensions, showComment } = this.props;
     const { editing, description } = this.state;
@@ -82,6 +88,7 @@ class Comment extends React.Component {
           <div className="comment-content">
             <div className="comment-header">
               <div className="actions">
+                <div className="comment-jump" onClick={() => this.seek()} />
                 <CloseButton handleClick={this.removeComment} />
               </div>
             </div>
@@ -109,5 +116,6 @@ export default connect(
     updateComment: actions.updateComment,
     removeComment: actions.removeComment,
     createComment: actions.createComment,
+    seek: actions.seek,
   }
 )(Comment);
