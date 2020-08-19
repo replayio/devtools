@@ -14,13 +14,13 @@ function ReadOnlyEditor(container, node) {
   this.markup = this.container.markup;
   this.buildMarkup();
 
-  if (node.isPseudoElement) {
+  if (node.pseudoType) {
     this.tag.classList.add("theme-fg-color3");
-    if (node.isMarkerPseudoElement) {
+    if (node.pseudoType == "marker") {
       this.tag.textContent = "::marker";
-    } else if (node.isBeforePseudoElement) {
+    } else if (node.pseudoType == "before") {
       this.tag.textContent = "::before";
-    } else if (node.isAfterPseudoElement) {
+    } else if (node.pseudoType == "after") {
       this.tag.textContent = "::after";
     }
   } else if (node.nodeType == nodeConstants.DOCUMENT_TYPE_NODE) {
