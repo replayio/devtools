@@ -96,6 +96,7 @@ class Toolbox extends React.Component {
     }
 
     log(`Toolbox SelectTool ${name}`);
+    FullStory.event("select-tool", { name });
     setSelectedPanel(name);
 
     if (!panel) {
