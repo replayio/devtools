@@ -23,5 +23,5 @@ export const prefs = new PrefsHelper("devtools", {
 
 export const features = new PrefsHelper("devtools.features", {
   comments: ["Bool", "comments"],
-  comments: ["Bool", "users"],
+  users: ["Bool", "users"],
 });
