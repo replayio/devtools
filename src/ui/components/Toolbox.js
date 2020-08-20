@@ -21,7 +21,7 @@ import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { connect } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
-import FullStory from "@fullstory/browser";
+import * as FullStory from "@fullstory/browser";
 
 import "./Toolbox.css";
 
