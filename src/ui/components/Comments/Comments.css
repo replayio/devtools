@@ -101,3 +101,13 @@
 .comment-jump:hover {
   cursor: pointer;
 }
+
+.dropdown-panel .menu-item {
+  padding: 4px 8px;
+  color: var(--theme-body-color);
+}
+
+.dropdown-panel .menu-item:hover {
+  cursor: pointer;
+  background-color: var(--theme-button-background);
+}

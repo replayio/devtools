@@ -6,7 +6,7 @@ import classnames from "classnames";
 import { selectors } from "../../reducers";
 import { actions } from "../../actions";
 import { getPixelOffset, getLeftOffset } from "../../utils/timeline";
-import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
+import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 
 class Comment extends React.Component {
   state = {
@@ -31,10 +31,31 @@ class Comment extends React.Component {
     }
   }
 
+  startEditing = () => {
+    this.setState({ editing: true });
+  };
+
+  stopEditing = () => {
+    this.setState({ editing: false });
+  };
+
   removeComment = () => {
     const { removeComment, comment } = this.props;
     removeComment(comment);
   };
+
+  renderDropdownPanel() {
+    return (
+      <div className="dropdown-panel">
+        <div className="menu-item" onClick={this.startEditing}>
+          Edit Comment
+        </div>
+        <div className="menu-item" onClick={this.removeComment}>
+          Delete Comment
+        </div>
+      </div>
+    );
+  }
 
   render() {
     const { comment, zoomRegion, index, timelineDimensions, showComment } = this.props;
@@ -82,14 +103,18 @@ class Comment extends React.Component {
           <div className="comment-content">
             <div className="comment-header">
               <div className="actions">
-                <CloseButton handleClick={this.removeComment} />
+                <Dropdown panel={this.renderDropdownPanel()} icon={<div>⋯</div>} />
               </div>
             </div>
             <div className="comment-description">
               {editing || comment.contents == "" ? (
-                <textarea onKeyPress={this.onDescriptionChange} defaultValue={comment.contents} />
+                <textarea
+                  onBlur={this.stopEditing}
+                  onKeyPress={this.onDescriptionChange}
+                  defaultValue={comment.contents}
+                />
               ) : (
-                <div onDoubleClick={() => this.setState({ editing: true })}>{comment.contents}</div>
+                <div onDoubleClick={this.startEditing}>{comment.contents}</div>
               )}
             </div>
           </div>
