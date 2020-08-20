@@ -84,7 +84,7 @@ type State = {
   endPanelSize: number,
 };
 
-class App extends Component<Props, State> {
+class Debugger extends Component<Props, State> {
   onLayoutChange: Function;
   getChildContext: Function;
   renderEditorPane: Function;
@@ -321,7 +321,7 @@ class App extends Component<Props, State> {
   }
 }
 
-App.childContextTypes = {
+Debugger.childContextTypes = {
   shortcuts: PropTypes.object,
   l10n: PropTypes.object,
 };
@@ -343,4 +343,4 @@ export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
   openQuickOpen: actions.openQuickOpen,
   closeQuickOpen: actions.closeQuickOpen,
   setOrientation: actions.setOrientation,
-})(App);
+})(Debugger);
