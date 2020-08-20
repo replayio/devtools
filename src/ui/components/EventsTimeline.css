@@ -78,12 +78,14 @@
   line-height: 1.5em;
 }
 
-.event .img {
-  width: 16px;
-  height: 16px;
+.events-timeline .avatar {
+  width: 18px;
+  height: 18px;
   margin-inline-end: 12px;
   margin-top: 2px;
   align-self: flex-start;
+  background-size: cover;
+  border-radius: 50%;
 }
 
 button.comment {

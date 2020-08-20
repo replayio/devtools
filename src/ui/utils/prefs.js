@@ -13,7 +13,7 @@ pref("devtools.user", "{}");
 
 // app features
 pref("devtools.features.comments", true);
-pref("devtools.features.users", false);
+pref("devtools.features.users", true);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -23,5 +23,5 @@ export const prefs = new PrefsHelper("devtools", {
 
 export const features = new PrefsHelper("devtools.features", {
   comments: ["Bool", "comments"],
-  comments: ["Bool", "users"],
+  users: ["Bool", "users"],
 });

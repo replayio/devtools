@@ -28,6 +28,7 @@ export function createComment(newComment) {
   return ({ getState, dispatch }) => {
     const existingComments = selectors.getComments(getState());
     const currentTime = selectors.getCurrentTime(getState());
+    const user = selectors.getUser(getState());
 
     if (existingComments.some(comment => comment.point === ThreadFront.currentPoint)) {
       return;
@@ -41,6 +42,7 @@ export function createComment(newComment) {
       hasFrames: ThreadFront.currentPointHasFrames,
       time: currentTime,
       contents: "",
+      user: user,
     };
 
     const newComments = [...existingComments, comment];
@@ -116,7 +118,7 @@ export function registerUser() {
     ? prefs.user
     : {
         id: `${Math.ceil(Math.random() * 10e4)}`,
-        avatar: Math.ceil(Math.random() * 10),
+        avatarID: Math.ceil(Math.random() * 10),
       };
 
   return { type: "register_user", user };

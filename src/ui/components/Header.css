@@ -1,0 +1,33 @@
+#header {
+  background-color: var(--theme-toolbar-background);
+  border-bottom: 1px solid var(--theme-splitter-color);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0 8px;
+}
+
+#header .logo {
+  height: 14px;
+  width: 18px;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+#status {
+  padding-left: 10px;
+  flex-grow: 1;
+}
+
+#header .avatar {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+}
+
+.avatars {
+  height: 100%;
+  align-items: center;
+  display: flex;
+}
