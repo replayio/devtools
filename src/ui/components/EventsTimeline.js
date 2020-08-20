@@ -6,19 +6,14 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { sortBy } from "lodash";
 
-import { ThreadFront } from "protocol/thread";
-
 import "./EventsTimeline.css";
 
 class EventsTimeline extends React.Component {
-  threadFront = ThreadFront;
   state = { expanded: true };
 
-  seekToMarker = (e, message) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const { point, time, hasFrames } = message;
-    return this.threadFront.timeWarp(point, time, hasFrames);
+  seekToComment = comment => {
+    const { point, time, hasFrames } = comment;
+    return this.props.seek(point, time, hasFrames);
   };
 
   toggleExpanded = () => {
@@ -34,7 +29,7 @@ class EventsTimeline extends React.Component {
     }
 
     return (
-      <div className="event" key={comment.id} onClick={e => this.seekToMarker(e, comment)}>
+      <div className="event" key={comment.id} onClick={e => this.seekToComment(comment)}>
         <div className="img comment"></div>
         <div className="label">{comment.contents}</div>
       </div>
@@ -87,14 +82,7 @@ class EventsTimeline extends React.Component {
 
 export default connect(
   state => ({
-    // timelineDimensions: selectors.getTimelineDimensions(state),
-    // zoomRegion: selectors.getZoomRegion(state),
     comments: selectors.getComments(state),
   }),
-  {
-    // showComment: actions.showComment,
-    // updateComment: actions.updateComment,
-    // removeComment: actions.removeComment,
-    // createComment: actions.createComment,
-  }
+  { seek: actions.seek }
 )(EventsTimeline);
