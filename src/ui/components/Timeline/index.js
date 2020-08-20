@@ -525,9 +525,6 @@ export class Timeline extends Component {
   }
 
   renderCommentButton() {
-    if (!features.comments) {
-      return null;
-    }
     return CommandButton({
       className: "",
       active: true,

@@ -11,9 +11,7 @@ import "./Comments.css";
 class Comments extends React.Component {
   render() {
     const { comments, timelineDimensions } = this.props;
-    if (!features.comments) {
-      return null;
-    }
+
     return (
       <div className="comments" style={timelineDimensions}>
         <div className="comments-container">
