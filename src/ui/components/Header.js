@@ -13,16 +13,39 @@ class Header extends React.Component {
     return avatarColors[avatarID % avatarColors.length];
   }
 
-  render() {
-    const { user } = this.props;
+  renderAvatars() {
+    const { user, getActiveUsers } = this.props;
 
+    const activeUsers = getActiveUsers();
+    const firstPlayer = this.props.user;
+    const otherPlayers = activeUsers.filter(user => user.id != firstPlayer.id);
+
+    // We sort the other players by id here to prevent them from shuffling
+    const sortedOtherPlayers = otherPlayers.sort((a, b) => a.id - b.id);
+
+    return (
+      <div className="avatars">
+        {this.renderAvatar(firstPlayer, true)}
+        {sortedOtherPlayers.map(player => this.renderAvatar(player, false))}
+      </div>
+    );
+  }
+
+  renderAvatar(player, isFirstPlayer) {
+    return (
+      <div
+        className={`avatar ${isFirstPlayer ? "first-player" : null}`}
+        style={{ background: this.getAvatarColor(player.avatarID) }}
+      ></div>
+    );
+  }
+
+  render() {
     return (
       <div id="header">
         <div className="logo"></div>
         <div id="status"></div>
-        <div className="avatars">
-          <div className="avatar" style={{ background: this.getAvatarColor(user.avatarID) }}></div>
-        </div>
+        {this.renderAvatars()}
       </div>
     );
   }
@@ -31,6 +54,7 @@ class Header extends React.Component {
 export default connect(
   state => ({
     user: selectors.getUser(state),
+    users: selectors.getUsers(state),
   }),
-  { seek: actions.seek }
+  { seek: actions.seek, getActiveUsers: actions.getActiveUsers }
 )(Header);

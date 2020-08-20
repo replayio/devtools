@@ -7,6 +7,7 @@ import { seek } from "./timeline";
 const CommentsMetadata = "devtools-comments";
 const UsersMetadata = "devtools-users";
 let heartbeatPing = Date.now();
+const refreshRate = 10000;
 
 export function setupMetadata(_, store) {
   ThreadFront.watchMetadata(CommentsMetadata, args => store.dispatch(onCommentsUpdate(args)));
@@ -129,7 +130,7 @@ function userHeartbeat() {
     const me = selectors.getUser(getState());
     ThreadFront.updateMetadata(UsersMetadata, (users = []) => {
       const newUsers = [...users].filter(
-        user => user.id !== me.id && user.heartbeat - heartbeatPing < 60000
+        user => user.id !== me.id && user.heartbeat - heartbeatPing < refreshRate
       );
 
       if (me.id) {
@@ -147,5 +148,14 @@ function onUsersUpdate(users) {
   return ({ dispatch }) => {
     // ThreadFront.updateMetadata(UsersMetadata, () => comments);
     dispatch({ type: "update_users", users });
+  };
+}
+
+export function getActiveUsers() {
+  return ({ getState }) => {
+    const users = selectors.getUsers(getState());
+    const activeUsers = users.filter(user => heartbeatPing - user.heartbeat < refreshRate);
+
+    return activeUsers;
   };
 }
