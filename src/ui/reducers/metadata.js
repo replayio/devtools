@@ -17,6 +17,7 @@ export default function update(state = initialTimelineState(), action) {
     case "register_user": {
       return { ...state, user: action.user };
     }
+
     case "update_users": {
       return { ...state, users: action.users };
     }

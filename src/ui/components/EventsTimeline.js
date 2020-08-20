@@ -8,6 +8,8 @@ import { sortBy } from "lodash";
 
 import "./EventsTimeline.css";
 
+const avatarColors = ["#2D4551", "#509A8F", "#E4C478", "#E9A56C", "#D97559"];
+
 class EventsTimeline extends React.Component {
   state = { expanded: true };
 
@@ -20,6 +22,19 @@ class EventsTimeline extends React.Component {
     this.setState({ expanded: !this.state.expanded });
   };
 
+  getAvatarColor(avatarID) {
+    return avatarColors[avatarID % avatarColors.length];
+  }
+
+  renderAvatar(user) {
+    // Comments that have been made prior to adding the users feature don't
+    // have an associated user. We just give those comments a grey circle.
+    // This should be removed eventually.
+    let color = user ? this.getAvatarColor(user.avatarID) : "#696969";
+
+    return <div className="avatar" style={{ background: color }}></div>;
+  }
+
   renderComment = comment => {
     // When a user adds a comment from the timeline, the comments array is updated
     // immediately with a new comment with empty content. We don't want to display
@@ -30,7 +45,7 @@ class EventsTimeline extends React.Component {
 
     return (
       <div className="event" key={comment.id} onClick={e => this.seekToComment(comment)}>
-        <div className="img comment"></div>
+        {this.renderAvatar(comment.user)}
         <div className="label">{comment.contents}</div>
       </div>
     );

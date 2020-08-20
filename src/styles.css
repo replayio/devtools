@@ -23,23 +23,6 @@
   transform-origin: top left;
 }
 
-#header {
-  background-color: var(--theme-toolbar-background);
-  border-bottom: 1px solid var(--theme-splitter-color);
-  height: 28px;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-#header .logo {
-  height: 14px;
-  width: 18px;
-  margin-left: 5px;
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
 .command-button {
   float: left;
 }
@@ -90,10 +73,6 @@
 
 #command-button-pick:hover {
   background-color: var(--toolbarbutton-focus-background);
-}
-
-#status {
-  padding-left: 10px;
 }
 
 .app-mask {

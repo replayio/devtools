@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import Toolbox from "./Toolbox";
 import Tooltip from "./Tooltip";
 import Comments from "./Comments";
+import Header from "./Header";
 
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import EventsTimeline from "./EventsTimeline";
@@ -68,10 +69,7 @@ class App extends React.Component {
 
     return (
       <>
-        <div id="header">
-          <div className="logo"></div>
-          <div id="status"></div>
-        </div>
+        <Header />
         <Comments />
         {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
         <SplitBox
