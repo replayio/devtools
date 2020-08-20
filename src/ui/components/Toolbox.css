@@ -35,7 +35,9 @@
 }
 
 /* Split Console styles */
-
+.toolbox-top-panels {
+  width: 100%;
+}
 .toolbox-top-panels .toolbox-panel.active {
   display: block;
 }

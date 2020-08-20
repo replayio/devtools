@@ -7,21 +7,20 @@
 #viewer {
   position: relative;
   overflow: hidden;
-  width: 100%;
-  height: 100%;
+  flex-grow: 1;
+}
+
+#outer-viewer {
+  overflow: hidden;
+  display: flex;
   background-color: #ececec;
-  z-index: -2; /* Draw background behind the canvas */
+  flex-grow: 1;
+  position: relative;
 }
 
 #graphics {
   position: relative;
   transform-origin: top left;
-  z-index: -1; /* Draw canvas behind the highlighter overlay. */
-}
-
-#viewer-text {
-  position: absolute;
-  font-size: x-large;
 }
 
 #header {
@@ -30,6 +29,7 @@
   height: 28px;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 #header .logo {
@@ -101,6 +101,10 @@
   width: 100%;
   height: 100%;
   z-index: 99;
+}
+
+.A11y-mouse, .A11y-keyboard {
+  width: 100%;
 }
 
 @import url("devtools/client/themes/variables.css");

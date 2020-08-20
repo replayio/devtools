@@ -1,0 +1,93 @@
+.events-timeline {
+  background: var(--grey-10);
+  border-left: 2px solid var(--grey-20);
+}
+
+.events-timeline.expanded {
+  width: 300px;
+  height: 100%;
+  flex-shrink: 0;
+  background: var(--grey-10);
+  display: flex;
+}
+
+.events-timeline.collapsed .events-timeline-comments {
+  display: none;
+}
+
+.events-timeline-comments {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.events-timeline .right-sidebar {
+  padding: 8px;
+}
+
+.events-timeline.expanded .right-sidebar {
+  border-left: 2px solid var(--grey-20);
+}
+
+.events-timeline button {
+  border: 4px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.events-timeline button:hover,
+.events-timeline.expanded button,
+.events-timeline.expanded button:focus {
+  background: var(--grey-20);
+}
+
+.events-timeline button:focus {
+  outline: 0;
+  background-color: transparent;
+}
+
+.events-timeline .comment-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.event {
+  padding: 20px 16px 20px;
+  line-height: 1.25rem;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.event:hover {
+  border-left: 4px solid #7ed8c8;
+  padding-left: 12px;
+}
+
+.event .label {
+  color: var(--theme-comment);
+  overflow-wrap: anywhere;
+  line-height: 1.75em;
+}
+
+.events-timeline-comments p {
+  color: var(--theme-comment);
+  padding: 16px;
+  line-height: 1.5em;
+}
+
+.event .img {
+  width: 16px;
+  height: 16px;
+  margin-inline-end: 12px;
+  margin-top: 2px;
+  align-self: flex-start;
+}
+
+button.comment {
+  mask-repeat: no-repeat;
+  background-color: #969696;
+  mask-position: center;
+}

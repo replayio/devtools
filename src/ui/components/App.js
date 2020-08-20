@@ -1,12 +1,13 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
+import { connect } from "react-redux";
 
 import Toolbox from "./Toolbox";
 import Tooltip from "./Tooltip";
 import Comments from "./Comments";
 
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import { connect } from "react-redux";
+import EventsTimeline from "./EventsTimeline";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 
@@ -34,13 +35,15 @@ class App extends React.Component {
     }
   }
 
-  renderGraphics() {
+  renderViewer(toolbox) {
     const { tooltip } = this.props;
     return (
-      <div id="viewer">
-        <canvas id="graphics"></canvas>
-        <div id="viewer-text"></div>
-        <div id="highlighter-root"></div>
+      <div id="outer-viewer">
+        <div id="viewer">
+          <canvas id="graphics"></canvas>
+          <div id="highlighter-root"></div>
+        </div>
+        <EventsTimeline toolbox={toolbox} />
         <Tooltip tooltip={tooltip} />
       </div>
     );
@@ -54,11 +57,11 @@ class App extends React.Component {
 
     let startPanel, endPanel;
     if (orientation == "bottom" || orientation == "right") {
-      startPanel = this.renderGraphics();
+      startPanel = this.renderViewer(toolbox);
       endPanel = toolbox;
     } else {
       startPanel = toolbox;
-      endPanel = this.renderGraphics();
+      endPanel = this.renderViewer(toolbox);
     }
 
     const vert = orientation != "bottom";
@@ -71,7 +74,6 @@ class App extends React.Component {
         </div>
         <Comments />
         {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
-
         <SplitBox
           style={{ width: "100vw", overflow: "hidden" }}
           splitterSize={1}
