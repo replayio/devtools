@@ -458,6 +458,8 @@ strong {
   flex: 1;
   font: menu;
   white-space: nowrap;
+  font-size: 1.2rem;
+  line-height: 1.6rem;
 }
 
 .tooltip-container[type="doorhanger"] .checkbox-container .menuitem > .command > .label {
