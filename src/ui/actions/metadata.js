@@ -1,13 +1,14 @@
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
 import { prefs, features } from "ui/utils/prefs";
+import { seek } from "./timeline";
 
 // Metadata key used to store comments.
 const CommentsMetadata = "devtools-comments";
 const UsersMetadata = "devtools-users";
 let heartbeatPing = Date.now();
 
-export function setupMetadata(recordingId, store) {
+export function setupMetadata(_, store) {
   ThreadFront.watchMetadata(CommentsMetadata, args => store.dispatch(onCommentsUpdate(args)));
   ThreadFront.watchMetadata(UsersMetadata, args => store.dispatch(onUsersUpdate(args)));
 
@@ -87,6 +88,8 @@ export function showComment(comment) {
   return ({ dispatch, getState }) => {
     const existingComments = selectors.getComments(getState());
     const newComments = existingComments.map(c => ({ ...c, visible: c.id === comment.id }));
+    const { time, point, hasFrames } = comment;
+    dispatch(seek(point, time, hasFrames));
     dispatch(updateComments(newComments));
   };
 }
