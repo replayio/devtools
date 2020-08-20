@@ -119,7 +119,5 @@ setTimeout(async () => {
 
   store = bootstrapApp({ initialize });
   setupTimeline(recordingId, store);
-  if (features.comments) {
-    setupMetadata(recordingId, store);
-  }
+  setupMetadata(recordingId, store);
 }, 0);
