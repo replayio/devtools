@@ -46,6 +46,7 @@ module.exports = {
               "@babel/plugin-transform-flow-strip-types",
               "@babel/plugin-proposal-class-properties",
               "@babel/plugin-proposal-optional-chaining",
+              "@fullstory/babel-plugin-annotate-react",
             ],
           },
         },
