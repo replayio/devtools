@@ -34,6 +34,7 @@ async function createSession() {
   addEventListener("Recording.sessionError", onSessionError);
 
   try {
+    ThreadFront.setTest(test);
     ThreadFront.recordingId = recordingId;
     const { sessionId } = await sendMessage("Recording.createSession", {
       recordingId,
@@ -41,7 +42,6 @@ async function createSession() {
     setStatus("");
     window.sessionId = sessionId;
     ThreadFront.setSessionId(sessionId);
-    ThreadFront.setTest(test);
   } catch (e) {
     if (e.code == 9) {
       // Invalid recording ID.
