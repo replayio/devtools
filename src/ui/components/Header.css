@@ -21,8 +21,8 @@
 }
 
 #header .avatar {
-  height: 32px;
-  width: 32px;
+  height: 28px;
+  width: 28px;
   border-radius: 50%;
 }
 
@@ -32,7 +32,7 @@
   display: flex;
 }
 
-.avatar.first-player {
+.avatar.first-player:not(:only-child) {
   margin-inline-end: 20px;
 }
 
