@@ -38,7 +38,7 @@ function insertEntrySorted(array, entry) {
   if (!array.length || array[array.length - 1].time <= entry.time) {
     array.push(entry);
   } else {
-    const index = mostRecentIndex(gPaintPoints, entry.time);
+    const index = mostRecentIndex(array, entry.time);
     if (index !== undefined) {
       array.splice(index + 1, 0, entry);
     } else {
