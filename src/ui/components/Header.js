@@ -3,6 +3,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import LoginButton from "ui/components/LoginButton";
 
 import "./Header.css";
 
@@ -46,6 +47,7 @@ class Header extends React.Component {
         <div className="logo"></div>
         <div id="status"></div>
         {this.renderAvatars()}
+        <LoginButton />
       </div>
     );
   }

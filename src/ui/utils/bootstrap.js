@@ -9,6 +9,7 @@ import { bindActionCreators, combineReducers } from "redux";
 import { reducers, selectors } from "../reducers";
 import { actions } from "../actions";
 import App from "ui/components/App";
+import { Auth0Provider } from "@auth0/auth0-react";
 
 const initialState = {};
 
@@ -68,7 +69,15 @@ export function bootstrapApp(props) {
   const store = bootstrapStore();
 
   ReactDOM.render(
-    React.createElement(Provider, { store }, React.createElement(App, props)),
+    <Provider store={store}>
+      <Auth0Provider
+        domain="webreplay.us.auth0.com"
+        clientId="4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo"
+        redirectUri={window.location.href}
+      >
+        {React.createElement(App, props)}
+      </Auth0Provider>
+    </Provider>,
     document.querySelector("#app")
   );
 
