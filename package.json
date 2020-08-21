@@ -16,6 +16,8 @@
     "@babel/preset-react": "^7.9.4",
     "@fullstory/babel-plugin-annotate-react": "^2.0.0",
     "@fullstory/browser": "^1.4.4",
+    "@sentry/apm": "^5.21.1",
+    "@sentry/react": "^5.21.1",
     "autoprefixer": "^9.7.6",
     "babel-loader": "^8.1.0",
     "classnames": "^2.2.6",

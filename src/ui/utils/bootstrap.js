@@ -8,9 +8,20 @@ import configureStore from "devtools/client/debugger/src/actions/utils/create-st
 import { bindActionCreators, combineReducers } from "redux";
 import { reducers, selectors } from "../reducers";
 import { actions } from "../actions";
+import * as Sentry from "@sentry/react";
+import { Integrations } from "@sentry/apm";
+
 import App from "ui/components/App";
 
 const initialState = {};
+
+export function setupSentry() {
+  Sentry.init({
+    dsn: "https://41c20dff316f42fea692ef4f0d055261@o437061.ingest.sentry.io/5399075",
+    integrations: [new Integrations.Tracing()],
+    tracesSampleRate: 1.0,
+  });
+}
 
 function setupAppHelper(store) {
   window.app = {
@@ -66,6 +77,7 @@ function bootstrapStore() {
 
 export function bootstrapApp(props) {
   const store = bootstrapStore();
+  setupSentry();
 
   ReactDOM.render(
     React.createElement(Provider, { store }, React.createElement(App, props)),
