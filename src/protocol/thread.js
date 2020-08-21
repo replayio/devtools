@@ -677,6 +677,11 @@ NodeFront.prototype = {
     return undefined;
   },
 
+  get doctypeString() {
+    // NYI
+    return "unknown";
+  },
+
   get attributes() {
     return this._node.attributes || [];
   },
