@@ -154,6 +154,10 @@ function onUsersUpdate(users) {
 export function getActiveUsers() {
   return ({ getState }) => {
     const users = selectors.getUsers(getState());
+    if (!users) {
+      return [];
+    }
+
     const activeUsers = users.filter(user => heartbeatPing - user.heartbeat < refreshRate);
 
     return activeUsers;
