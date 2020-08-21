@@ -16,6 +16,13 @@ import App from "ui/components/App";
 const initialState = {};
 
 export function setupSentry(context) {
+  const url = new URL(window.location.href);
+  const test = url.searchParams.get("test");
+
+  if (test || url.hostname == "localhost") {
+    return;
+  }
+
   Sentry.init({
     dsn: "https://41c20dff316f42fea692ef4f0d055261@o437061.ingest.sentry.io/5399075",
     integrations: [new Integrations.Tracing()],
