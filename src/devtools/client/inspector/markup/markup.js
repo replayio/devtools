@@ -2215,12 +2215,8 @@ MarkupView.prototype = {
     this._prefObserver.off(ATTR_COLLAPSE_LENGTH_PREF, this._onCollapseAttributesPrefChange);
     this._prefObserver.destroy();
 
-    for (const [, container] of this._containers) {
-      container.destroy();
-    }
+    this.clear();
     this._containers = null;
-
-    this._elt.innerHTML = "";
     this._elt = null;
 
     this.controllerWindow = null;
@@ -2233,6 +2229,10 @@ MarkupView.prototype = {
   },
 
   clear() {
+    for (const [, container] of this._containers) {
+      container.destroy();
+    }
+    this._containers.clear();
     this._elt.innerHTML = "";
   },
 

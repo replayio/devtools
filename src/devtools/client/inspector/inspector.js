@@ -1183,7 +1183,6 @@ Inspector.prototype = {
     }
 
     this._pendingSelection = null;
-    // this.onMarkupLoaded();
   },
 
   handleToolSelected(id) {
@@ -1459,10 +1458,6 @@ Inspector.prototype = {
 
     this._target.threadFront.off("paused", this.handleThreadPaused);
     this._target.threadFront.off("resumed", this.handleThreadResumed);
-
-    if (this.walker) {
-      this.walker.off("new-root", this.onNewRoot);
-    }
 
     this.cancelUpdate();
 
