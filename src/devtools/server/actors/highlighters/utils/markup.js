@@ -121,9 +121,9 @@ function isNodeValid(node, nodeType = Node.ELEMENT_NODE) {
 
   // NodeBoundsFront objects don't have information about the node itself,
   // but are only constructed for valid, connected elements.
-  // if (node.isNodeBoundsFront()) {
-  //   return true;
-  // }
+  if (node.isNodeBoundsFront()) {
+    return true;
+  }
 
   // Is it of the right type?
   if (node.nodeType !== nodeType) {

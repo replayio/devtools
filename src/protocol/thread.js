@@ -485,6 +485,10 @@ ValueFront.prototype = {
     return !!this._object.preview.node;
   },
 
+  isNodeBoundsFront() {
+    return false;
+  },
+
   nodeType() {
     return this._object.preview.node.nodeType;
   },
