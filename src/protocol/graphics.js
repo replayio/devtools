@@ -3,6 +3,8 @@
 const { ThreadFront } = require("./thread");
 const { sendMessage, addEventListener, log } = require("./socket");
 const { assert, binarySearch, defer } = require("./utils");
+const { ScreenshotDownloads } = require("./screenshot-downloads");
+const screenshotDownloads = new ScreenshotDownloads();
 
 // Given a sorted array of items with "time" properties, find the index of
 // the most recent item at or preceding a given time.
@@ -163,13 +165,8 @@ async function ensureScreenShotAtPoint(point, paintHash) {
   const { promise, resolve } = defer();
   gScreenShots.set(paintHash, promise);
 
-  const screen = (
-    await sendMessage(
-      "Graphics.getPaintContents",
-      { point, mimeType: "image/jpeg" },
-      ThreadFront.sessionId
-    )
-  ).screen;
+  const screen = await screenshotDownloads.downloadScreenshot(point);
+
   resolve(screen);
   return screen;
 }
