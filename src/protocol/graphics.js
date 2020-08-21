@@ -277,8 +277,11 @@ function drawClick(cx, x, y) {
 
 function refreshGraphics() {
   const viewer = document.getElementById("viewer");
-  const bounds = viewer.getBoundingClientRect();
+  if (!viewer) {
+    return;
+  }
 
+  const bounds = viewer.getBoundingClientRect();
   const canvas = document.getElementById("graphics");
 
   // Find an image to draw.
