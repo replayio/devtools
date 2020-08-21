@@ -12,6 +12,6 @@ module.exports = {
     "^devtools\\/(.*)": `${__dirname}/../../../../../$1`,
     "^Services": `${__dirname}/fixtures/Services`,
   },
-  setupFiles: ["<rootDir>setup.js"],
+  setupFiles: ["<rootDir>/setup.js"],
   snapshotSerializers: ["enzyme-to-json/serializer"],
 };

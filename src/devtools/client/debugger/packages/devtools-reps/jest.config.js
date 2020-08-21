@@ -12,7 +12,7 @@ module.exports = {
     "<rootDir>/test/__mocks__/selection.js",
     "<rootDir>/test/setup.js",
   ],
-  setupTestFrameworkScriptFile: "<rootDir>/test/setup-file.js",
+  setupFilesAfterEnv: ["<rootDir>/test/setup-file.js"],
   testMatch: ["**/tests/**/*.js"],
   testPathIgnorePatterns: [
     "/node_modules/",

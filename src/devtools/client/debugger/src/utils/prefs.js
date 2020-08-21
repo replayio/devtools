@@ -3,9 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // @flow
-
 import { PrefsHelper, asyncStoreHelper } from "devtools-modules";
-
 import Services from "devtools-services";
 
 // Schema version to bump when the async store format has changed incompatibly
