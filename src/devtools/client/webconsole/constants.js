@@ -123,7 +123,7 @@ const DEFAULT_FILTERS_VALUES = {
   [FILTERS.CSS]: false,
   [FILTERS.NET]: false,
   [FILTERS.NETXHR]: false,
-  [FILTERS.NODEMODULES]: false,
+  [FILTERS.NODEMODULES]: true,
 };
 
 const DEFAULT_FILTERS = Object.keys(DEFAULT_FILTERS_VALUES).filter(
