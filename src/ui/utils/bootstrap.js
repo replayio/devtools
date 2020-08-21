@@ -12,6 +12,7 @@ import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/apm";
 
 import App from "ui/components/App";
+import { Auth0Provider } from "@auth0/auth0-react";
 
 const initialState = {};
 
@@ -82,7 +83,15 @@ export function bootstrapApp(props, context) {
   setupSentry(context);
 
   ReactDOM.render(
-    React.createElement(Provider, { store }, React.createElement(App, props)),
+    <Provider store={store}>
+      <Auth0Provider
+        domain="webreplay.us.auth0.com"
+        clientId="4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo"
+        redirectUri={window.location.href}
+      >
+        {React.createElement(App, props)}
+      </Auth0Provider>
+    </Provider>,
     document.querySelector("#app")
   );
 

@@ -1,0 +1,8 @@
+
+.user-account button {
+  padding: 7px;
+  background: white;
+  color: black;
+  border: 1px solid black;
+  margin-inline-start: 12px;
+}
