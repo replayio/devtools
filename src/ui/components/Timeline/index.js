@@ -23,6 +23,7 @@ const {
   nextPaintEvent,
   previousPaintEvent,
   getGraphicsAtTime,
+  getScreenshotForTooltip,
   paintGraphics,
 } = require("protocol/graphics");
 
@@ -208,11 +209,14 @@ export class Timeline extends Component {
       const offset = this.getPixelOffset(time);
       updateTooltip({ left: offset });
       this.props.setTimelineState({ highlightedMessage: message.id });
-      const { screen, mouse } = await getGraphicsAtTime(time);
 
-      if (highlightedMessage === message.id) {
-        updateTooltip({ screen, left: offset });
-      }
+      try {
+        const screen = await getScreenshotForTooltip(time);
+
+        if (highlightedMessage === message.id) {
+          updateTooltip({ screen, left: offset });
+        }
+      } catch {}
     }
 
     return null;
@@ -304,10 +308,12 @@ export class Timeline extends Component {
       this.props.setTimelineState({ hoverTime: mouseTime });
       updateTooltip({ left: this.getPixelOffset(hoverTime) });
 
-      const { screen, mouse } = await getGraphicsAtTime(time);
-      if (hoverTime === mouseTime) {
-        updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
-      }
+      try {
+        const screen = await getScreenshotForTooltip(time);
+        if (hoverTime === mouseTime) {
+          updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
+        }
+      } catch {}
     }
   };
 

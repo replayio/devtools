@@ -3,8 +3,8 @@
 const { ThreadFront } = require("./thread");
 const { sendMessage, addEventListener, log } = require("./socket");
 const { assert, binarySearch, defer } = require("./utils");
-const { ScreenshotDownloads } = require("./screenshot-downloads");
-const screenshotDownloads = new ScreenshotDownloads();
+const { ScreenshotCache } = require("./screenshot-cache");
+const screenshotCache = new ScreenshotCache();
 
 // Given a sorted array of items with "time" properties, find the index of
 // the most recent item at or preceding a given time.
@@ -149,26 +149,8 @@ function getDevicePixelRatio() {
 // Paint Data Management
 //////////////////////////////
 
-// Map paint hashes to a promise that resolves with the associated screenshot.
-const gScreenShots = new Map();
-
 function addScreenShot(screenShot) {
-  gScreenShots.set(screenShot.hash, screenShot);
-}
-
-async function ensureScreenShotAtPoint(point, paintHash) {
-  const existing = gScreenShots.get(paintHash);
-  if (existing) {
-    return existing;
-  }
-
-  const { promise, resolve } = defer();
-  gScreenShots.set(paintHash, promise);
-
-  const screen = await screenshotDownloads.downloadScreenshot(point);
-
-  resolve(screen);
-  return screen;
+  screenshotCache.addScreenshot(screenShot);
 }
 
 // How recently a click must have occurred for it to be drawn.
@@ -183,15 +165,7 @@ async function getGraphicsAtTime(time) {
     return {};
   }
 
-  const screenPromise = ensureScreenShotAtPoint(point, paintHash);
-
-  // Start loading graphics at nearby points.
-  for (let i = paintIndex; i < paintIndex + 5 && i < gPaintPoints.length; i++) {
-    const { point, paintHash } = gPaintPoints[i];
-    ensureScreenShotAtPoint(point, paintHash);
-  }
-
-  const screen = await screenPromise;
+  const screen = await screenshotCache.getScreenshotForPlayback(point, paintHash);
 
   let mouse;
   const mouseEvent = mostRecentEntry(gMouseEvents, time);
@@ -205,6 +179,12 @@ async function getGraphicsAtTime(time) {
   }
 
   return { screen, mouse };
+}
+
+function getScreenshotForTooltip(time) {
+  const paintIndex = mostRecentIndex(gPaintPoints, time);
+  const { point, paintHash } = gPaintPoints[paintIndex];
+  return screenshotCache.getScreenshotForTooltip(point, paintHash);
 }
 
 //////////////////////////////
@@ -352,6 +332,7 @@ module.exports = {
   previousPaintEvent,
   paintGraphics,
   getGraphicsAtTime,
+  getScreenshotForTooltip,
   refreshGraphics,
   getDevicePixelRatio,
 };
