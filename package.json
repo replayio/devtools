@@ -26,7 +26,6 @@
     "codemirror": "^5.57.0",
     "css-loader": "^3.5.3",
     "debug": "^4.1.1",
-    "devtools-components": "^0.6.0",
     "devtools-environment": "0.0.6",
     "devtools-launchpad": "0.0.161",
     "devtools-modules": "1.1.9",

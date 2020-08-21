@@ -17,6 +17,7 @@ module.exports = {
     "package.json",
     "<rootDir>/packages",
   ],
+  modulePaths: ["<rootDir>/packages/"],
   modulePathIgnorePatterns: [
     "test/mochitest",
     "<rootDir>/firefox/",
