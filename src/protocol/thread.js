@@ -1667,13 +1667,13 @@ const ThreadFront = {
   // original or generated script and there is an alternative which users
   // can switch to, also returns that alternative.
   _chooseScriptId(scriptIds) {
-    // Always ignore minified scripts.
-    scriptIds = scriptIds.filter(id => !this.isMinifiedScript(id));
-
     // Ignore inline scripts if we have an HTML script containing them.
     if (scriptIds.some(id => this.getScriptKind(id) == "html")) {
       scriptIds = scriptIds.filter(id => this.getScriptKind(id) != "inlineScript");
     }
+
+    // Ignore minified scripts.
+    scriptIds = scriptIds.filter(id => !this.isMinifiedScript(id));
 
     // Determine the base generated/original ID to use for the script.
     let generatedId, originalId;
