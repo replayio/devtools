@@ -18,6 +18,8 @@ const MenuButton = createFactory(require("devtools/client/shared/components/menu
 const MenuItem = createFactory(require("devtools/client/shared/components/menu/MenuItem"));
 const MenuList = createFactory(require("devtools/client/shared/components/menu/MenuList"));
 
+const { FILTERS } = require("devtools/client/webconsole/constants");
+
 class ConsoleSettings extends Component {
   static get propTypes() {
     return {
@@ -28,11 +30,12 @@ class ConsoleSettings extends Component {
       timestampsVisible: PropTypes.bool.isRequired,
       webConsoleUI: PropTypes.object.isRequired,
       autocomplete: PropTypes.bool.isRequired,
+      filter: PropTypes.object.isRequired,
     };
   }
 
   renderMenuItems() {
-    const { dispatch, groupWarnings, timestampsVisible } = this.props;
+    const { dispatch, groupWarnings, timestampsVisible, filter } = this.props;
 
     const items = [];
 
@@ -74,6 +77,18 @@ class ConsoleSettings extends Component {
         label: l10n.getStr("webconsole.console.settings.menu.item.warningGroups.label"),
         tooltip: l10n.getStr("webconsole.console.settings.menu.item.warningGroups.tooltip"),
         onClick: () => dispatch(actions.warningGroupsToggle()),
+      })
+    );
+
+    // Timestamps
+    items.push(
+      MenuItem({
+        key: "webconsole-console-settings-add-node-module-messages",
+        checked: !filter[FILTERS.NODEMODULES],
+        className: "menu-item webconsole-console-settings-add-node-module-messages",
+        label: l10n.getStr("webconsole.console.settings.menu.item.nodeModuleMessages.label"),
+        tooltip: l10n.getStr("webconsole.console.settings.menu.item.nodeModuleMessages.tooltip"),
+        onClick: () => dispatch(actions.filterToggle(FILTERS.NODEMODULES)),
       })
     );
 
