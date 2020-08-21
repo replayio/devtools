@@ -8,6 +8,7 @@ const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
+const { Utils: WebConsoleUtils } = require("devtools/client/webconsole/utils");
 
 const actions = require("devtools/client/webconsole/actions/index");
 const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
