@@ -49,9 +49,7 @@ WebConsolePanel.prototype = {
       this.readyWaiter.resolve();
       this.emit("ready");
     } catch (e) {
-      const msg = "WebConsolePanel open failed. " + e.error + ": " + e.message;
-      dump(msg + "\n");
-      console.error(msg, e);
+      console.error(`WebConsolePanel open failed. ${e.error}: ${e.message}`, e);
     }
 
     return this;

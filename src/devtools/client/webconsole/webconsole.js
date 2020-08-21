@@ -8,6 +8,7 @@ const Services = require("Services");
 const { WebConsoleUI } = require("devtools/client/webconsole/webconsole-ui");
 const EventEmitter = require("devtools/shared/event-emitter");
 const Telemetry = require("devtools/client/shared/telemetry");
+const { openDocLink } = require("devtools/client/shared/link");
 
 var gHudId = 0;
 const isMacOS = Services.appinfo.OS === "Darwin";
