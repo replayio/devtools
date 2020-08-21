@@ -117,7 +117,7 @@ setTimeout(async () => {
     });
   }
 
-  store = bootstrapApp({ initialize });
+  store = bootstrapApp({ initialize }, { recordingId });
   setupTimeline(recordingId, store);
   setupMetadata(recordingId, store);
 }, 0);
