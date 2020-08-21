@@ -69,6 +69,7 @@ const prefs = {
       CSS: "filter.css",
       NET: "filter.net",
       NETXHR: "filter.netxhr",
+      NODEMODULES: "filter.nodemodules",
     },
     UI: {
       // Persist is only used by the webconsole.
@@ -109,6 +110,7 @@ const FILTERS = {
   NETXHR: "netxhr",
   TEXT: "text",
   WARN: "warn",
+  NODEMODULES: "nodemodules",
 };
 
 const DEFAULT_FILTERS_VALUES = {
@@ -121,10 +123,12 @@ const DEFAULT_FILTERS_VALUES = {
   [FILTERS.CSS]: false,
   [FILTERS.NET]: false,
   [FILTERS.NETXHR]: false,
+  [FILTERS.NODEMODULES]: false,
 };
 
 const DEFAULT_FILTERS = Object.keys(DEFAULT_FILTERS_VALUES).filter(
-  filter => DEFAULT_FILTERS_VALUES[filter] !== false
+  // We make an exception for node_modules here to keep it hidden by default
+  filter => DEFAULT_FILTERS_VALUES[filter] !== false || filter == "nodemodules"
 );
 
 const chromeRDPEnums = {

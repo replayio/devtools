@@ -284,6 +284,7 @@ class FilterBar extends Component {
       timestampsVisible,
       webConsoleUI,
       autocomplete,
+      filter,
     } = this.props;
 
     return ConsoleSettings({
@@ -295,6 +296,7 @@ class FilterBar extends Component {
       timestampsVisible,
       webConsoleUI,
       autocomplete,
+      filter,
     });
   }
 

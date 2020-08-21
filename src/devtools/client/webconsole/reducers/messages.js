@@ -969,6 +969,13 @@ function getMessageVisibility(
     };
   }
 
+  if (passNodeModuleFilters(message, filtersState)) {
+    return {
+      visible: false,
+      cause: FILTERS.NODEMODULES,
+    };
+  }
+
   // This should always be the last check, or we might report that a message was hidden
   // because of text search, while it may be hidden because its category is disabled.
   if (!passSearchFilters(message, filtersState)) {
@@ -1007,6 +1014,17 @@ function hasClosedParentGroup(group, messagesUI) {
 
 function isGroupClosed(groupId, messagesUI) {
   return messagesUI.includes(groupId) === false;
+}
+
+/**
+ * Returns true if the message is in node modules and should be hidden
+ *
+ * @param {Object} message - The message to check the filter against.
+ * @param {FilterState} filters - redux "filters" state.
+ * @returns {Boolean}
+ */
+function passNodeModuleFilters(message, filters) {
+  return message.frame?.source?.includes("node_modules") && filters[FILTERS.NODEMODULES] == false;
 }
 
 /**
