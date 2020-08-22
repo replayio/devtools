@@ -23,7 +23,7 @@ const { initSocket, sendMessage, log, setStatus, addEventListener } = require("p
 const { ThreadFront } = require("protocol/thread");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap");
-const FullStory = require("ui/utils/fullstory");
+const FullStory = require("ui/utils/fullstory").default;
 const { setupTimeline } = require("./ui/actions/timeline");
 const { setupMetadata } = require("./ui/actions/metadata");
 const { features } = require("./ui/utils/prefs");
@@ -42,6 +42,13 @@ async function createSession() {
     setStatus("");
     window.sessionId = sessionId;
     ThreadFront.setSessionId(sessionId);
+
+    if (!test) {
+      FullStory.setUserVars({
+        recordingId,
+        sessionId,
+      });
+    }
   } catch (e) {
     if (e.code == 9) {
       // Invalid recording ID.
@@ -109,12 +116,6 @@ setTimeout(async () => {
   // Wait for CodeMirror to load asynchronously.
   while (!window.CodeMirror) {
     await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
-  if (!test) {
-    FullStory.event("Start", {
-      recordingId,
-    });
   }
 
   store = bootstrapApp({ initialize }, { recordingId });

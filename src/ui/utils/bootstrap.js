@@ -10,6 +10,7 @@ import { reducers, selectors } from "../reducers";
 import { actions } from "../actions";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/apm";
+import { ThreadFront } from "protocol/thread";
 
 import App from "ui/components/App";
 import { Auth0Provider } from "@auth0/auth0-react";
@@ -52,6 +53,7 @@ function setupAppHelper(store) {
     selectors: bindSelectors({ store, selectors }),
     prefs,
     features,
+    threadFront: ThreadFront,
     dumpPrefs: () =>
       JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
     local: () => {

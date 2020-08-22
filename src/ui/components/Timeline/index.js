@@ -16,6 +16,7 @@ import PropTypes from "prop-types";
 
 import { SVG } from "image/svg";
 import { log } from "protocol/socket";
+import Fullstory from "ui/utils/fullstory";
 
 const {
   mostRecentPaintOrMouseEvent,
@@ -405,6 +406,7 @@ export class Timeline extends Component {
       return;
     }
 
+    FullStory.event("timeline::previous");
     const previous = previousPaintEvent(currentTime);
     if (!previous) {
       return;
@@ -419,6 +421,7 @@ export class Timeline extends Component {
       return;
     }
 
+    FullStory.event("timeline::next");
     const next = nextPaintEvent(currentTime);
     if (!next) {
       return;
@@ -477,6 +480,7 @@ export class Timeline extends Component {
 
   startPlayback() {
     log(`StartPlayback`);
+    FullStory.event("timeline::play");
 
     const startTime = this.props.currentTime;
     const startDate = Date.now();
@@ -497,6 +501,7 @@ export class Timeline extends Component {
 
   stopPlayback() {
     log(`StopPlayback`);
+    FullStory.event("timeline::stop");
 
     if (this.props.playback) {
       this.seekTime(this.props.playback.time);

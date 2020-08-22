@@ -23,6 +23,7 @@ import { setSkipPausing } from "../pause/skipPausing";
 import { recordEvent } from "../../utils/telemetry";
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
+import FullStory from "ui/utils/fullstory";
 
 import type { ThunkArgs } from "../types";
 import type {
@@ -112,6 +113,11 @@ export function addBreakpoint(
       return;
     }
 
+    FullStory.event(`debugger.breakpoint.add`, {
+      log: !!options.logValue,
+      condition: !!options.condition,
+    });
+
     const symbols = getSymbols(getState(), source);
     const astLocation = getASTLocation(source, symbols, location);
 
@@ -167,6 +173,8 @@ export function removeBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
     if (!breakpoint) {
       return;
     }
+
+    FullStory.event(`debugger.breakpoint.remove`);
 
     dispatch(setSkipPausing(false));
     dispatch({
@@ -268,6 +276,11 @@ export function setBreakpointOptions(
 
     // Note: setting a breakpoint's options implicitly enables it.
     breakpoint = { ...breakpoint, disabled: false, options };
+
+    FullStory.event(`debugger.breakpoint.update`, {
+      log: !!options.logValue,
+      condition: !!options.condition,
+    });
 
     dispatch({
       type: "SET_BREAKPOINT",

@@ -1,5 +1,6 @@
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "../reducers";
+import FullStory from "ui/utils/fullstory";
 
 import {
   addLastScreen,
@@ -45,6 +46,8 @@ function onEndpoint({ point, time }) {
 
 function onPaused({ time }) {
   return async ({ dispatch, getState }) => {
+    FullStory.event("paused");
+
     dispatch(setTimelineState({ currentTime: time, playback: null }));
 
     const { screen, mouse } = await getGraphicsAtTime(time);
@@ -53,33 +56,6 @@ function onPaused({ time }) {
       dispatch(setTimelineState({ screenShot: screen, mouse }));
       paintGraphics(screen, mouse);
     }
-
-    // Update the users metadata so that other people visiting the recording can
-    // see where we are. This functionality is currently disabled: without user
-    // accounts, other tabs viewing the same recording will look like other
-    // users, and we end up cluttering the UI even when there is a single actual
-    // user viewing the recording. This will be revisited soon...
-    /*
-    const comment = {
-      id: this.threadFront.sessionId,
-      point,
-      hasFrames,
-      time,
-      contents: UserComment,
-      saved: true,
-      isUser: true,
-    };
-    this.threadFront.updateMetadata(
-      CommentsMetadata,
-      comments => {
-        // Stop trying to update if the thread has moved somewhere else.
-        if (this.threadFront.currentPoint != point) {
-          return null;
-        }
-        return [...(comments || []).filter(c => c.id != comment.id), comment];
-      }
-    );
-    */
   };
 }
 
@@ -117,11 +93,13 @@ export function setTimelineState(state) {
 }
 
 export function setZoomRegion(region) {
+  FullStory.event("timeline::zoom");
   return { type: "set_zoom", region };
 }
 
 export function seek(point, time, hasFrames) {
   return () => {
+    FullStory.event("seek");
     ThreadFront.timeWarp(point, time, hasFrames);
   };
 }
