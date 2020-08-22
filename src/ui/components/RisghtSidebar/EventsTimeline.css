@@ -1,44 +1,8 @@
-.events-timeline {
-  background: var(--grey-10);
-  border-left: 2px solid var(--grey-20);
-  height: 100%;
-  background: var(--grey-10);
-  display: flex;
-  flex-shrink: 0;
-}
-
 .events-timeline-comments {
   flex-grow: 1;
   overflow: auto;
   width: 300px;
   border-left: 2px solid var(--grey-20);
-}
-
-.events-timeline .right-sidebar {
-  padding: 8px;
-  border-left: 2px solid var(--grey-20);
-}
-
-.events-timeline button {
-  border: 4px solid transparent;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.events-timeline button:hover,
-.events-timeline.expanded button,
-.events-timeline.expanded button:focus {
-  background: var(--grey-20);
-}
-
-.events-timeline button:focus {
-  outline: 0;
-  background-color: transparent;
-}
-
-.events-timeline .comment-icon {
-  width: 20px;
-  height: 20px;
 }
 
 .event {
@@ -69,7 +33,7 @@
   line-height: 1.5em;
 }
 
-.events-timeline .avatar {
+.events-timeline-comments .avatar {
   width: 24px;
   height: 24px;
   margin-inline-end: 12px;
@@ -77,10 +41,4 @@
   align-self: flex-start;
   background-size: cover;
   border-radius: 50%;
-}
-
-button.comment {
-  mask-repeat: no-repeat;
-  background-color: #969696;
-  mask-position: center;
 }

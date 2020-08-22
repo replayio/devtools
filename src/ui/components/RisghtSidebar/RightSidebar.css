@@ -1,0 +1,40 @@
+.right-sidebar {
+  background: var(--grey-10);
+  border-left: 2px solid var(--grey-20);
+  height: 100%;
+  background: var(--grey-10);
+  display: flex;
+  flex-shrink: 0;
+}
+
+.right-sidebar button {
+  border: 4px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.right-sidebar .drawer {
+  padding: 8px;
+  border-left: 2px solid var(--grey-20);
+}
+.right-sidebar button:hover,
+.right-sidebar.expanded button,
+.right-sidebar.expanded button:focus {
+  background: var(--grey-20);
+}
+
+.right-sidebar button:focus {
+  outline: 0;
+  background-color: transparent;
+}
+
+.right-sidebar .comment-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.right-sidebar button.comment {
+  mask-repeat: no-repeat;
+  background-color: #969696;
+  mask-position: center;
+}
