@@ -403,7 +403,6 @@ PrefBranch.prototype = {
    */
   _findOrCreatePref: function (keyName, userValue, hasUserValue, defaultValue, init = false) {
     let branch = this._createBranch(keyName.split("."));
-
     if (hasUserValue && typeof userValue !== typeof defaultValue) {
       throw new Error(`inconsistent values when creating ${keyName}`);
     }
@@ -453,6 +452,10 @@ PrefBranch.prototype = {
     }
 
     const key = this.getKeyName(event.key);
+
+    if (!key.startsWith(PREFIX)) {
+      return;
+    }
 
     // Ignore delete events.  Not clear what's correct.
     if (key === null || event.newValue === null) {
