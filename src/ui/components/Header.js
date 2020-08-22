@@ -1,18 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import LoginButton from "ui/components/LoginButton";
 
 import "./Header.css";
 
+import { useAuth0 } from "@auth0/auth0-react";
+import { features } from "ui/utils/prefs";
+
 const avatarColors = ["#2D4551", "#509A8F", "#E4C478", "#E9A56C", "#D97559"];
 
-class Header extends React.Component {
-  getAvatarColor(avatarID) {
-    return avatarColors[avatarID % avatarColors.length];
+const getAvatarColor = function (avatarID) {
+  return avatarColors[avatarID % avatarColors.length];
+};
+
+const Avatar = props => {
+  let { player, isFirstPlayer } = props;
+  let auth = useAuth0();
+
+  if (auth.isAuthenticated && isFirstPlayer) {
+    return (
+      <div className={`avatar authenticated first-player`}>
+        <img src={auth.user.picture} alt={auth.user.name} />
+        <span className="avatar-name">{auth.user.name}</span>
+      </div>
+    );
   }
 
+  return (
+    <div
+      className={`avatar ${isFirstPlayer ? "first-player" : ""}`}
+      style={{ background: getAvatarColor(props.player.avatarID) }}
+    />
+  );
+};
+
+class Header extends React.Component {
   renderAvatars() {
     const { user, getActiveUsers } = this.props;
 
@@ -20,13 +45,15 @@ class Header extends React.Component {
     const firstPlayer = this.props.user;
     const otherPlayers = activeUsers.filter(user => user.id != firstPlayer.id);
 
-    // We sort the other players by id here to prevent them from shuffling
+    // We sort the other players by ID here to prevent them from shuffling.
     const sortedOtherPlayers = otherPlayers.sort((a, b) => a.id - b.id);
 
     return (
       <div className="avatars">
-        {this.renderAvatar(firstPlayer, true)}
-        {sortedOtherPlayers.map(player => this.renderAvatar(player, false))}
+        <Avatar player={firstPlayer} isFirstPlayer={true} />
+        {sortedOtherPlayers.map(player => (
+          <Avatar player={player} isFirstPlayer={false} key={player.id} />
+        ))}
       </div>
     );
   }
@@ -34,7 +61,7 @@ class Header extends React.Component {
   renderAvatar(player, isFirstPlayer) {
     return (
       <div
-        className={`avatar ${isFirstPlayer ? "first-player" : null}`}
+        className={`avatar ${isFirstPlayer ? "first-player" : ""}`}
         style={{ background: this.getAvatarColor(player.avatarID) }}
       ></div>
     );
@@ -46,6 +73,7 @@ class Header extends React.Component {
         <div className="logo"></div>
         <div id="status"></div>
         {this.renderAvatars()}
+        {features.auth0 ? <LoginButton /> : null}
       </div>
     );
   }

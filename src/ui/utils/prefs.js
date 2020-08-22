@@ -14,6 +14,7 @@ pref("devtools.user", "{}");
 // app features
 pref("devtools.features.comments", true);
 pref("devtools.features.users", true);
+pref("devtools.features.auth0", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -24,4 +25,5 @@ export const prefs = new PrefsHelper("devtools", {
 export const features = new PrefsHelper("devtools.features", {
   comments: ["Bool", "comments"],
   users: ["Bool", "users"],
+  auth0: ["Bool", "auth0"],
 });
