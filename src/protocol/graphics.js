@@ -141,6 +141,10 @@ function previousPaintEvent(time) {
   return entry;
 }
 
+function getMostRecentPaintPoint(time) {
+  return mostRecentEntry(gPaintPoints, time);
+}
+
 function getDevicePixelRatio() {
   return gDevicePixelRatio;
 }
@@ -333,6 +337,7 @@ function installObserver() {
 installObserver();
 
 module.exports = {
+  screenshotCache,
   addLastScreen,
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
@@ -340,7 +345,7 @@ module.exports = {
   previousPaintEvent,
   paintGraphics,
   getGraphicsAtTime,
-  getScreenshotForTooltip,
+  getMostRecentPaintPoint,
   refreshGraphics,
   getDevicePixelRatio,
 };

@@ -1,6 +1,7 @@
 const { ThreadFront } = require("./thread");
 const { sendMessage } = require("./socket");
 const { defer } = require("./utils");
+const { getMostRecentPaintPoint } = require("./graphics");
 
 /**
  * This class manages the screenshot downloads and caches downloaded screenshots.
@@ -22,7 +23,8 @@ export class ScreenshotCache {
    * Returns a promise for the requested screenshot. The promise may be rejected
    * if another tooltip screenshot is requested before this download was started.
    */
-  async getScreenshotForTooltip(point, paintHash) {
+  async getScreenshotForTooltip(time) {
+    const { point, paintHash } = getMostRecentPaintPoint(time);
     if (this._cache.has(paintHash)) {
       return this._cache.get(paintHash);
     }

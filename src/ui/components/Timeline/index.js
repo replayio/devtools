@@ -18,12 +18,12 @@ import { SVG } from "image/svg";
 import { log } from "protocol/socket";
 
 const {
+  screenshotCache,
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
   nextPaintEvent,
   previousPaintEvent,
   getGraphicsAtTime,
-  getScreenshotForTooltip,
   paintGraphics,
 } = require("protocol/graphics");
 
@@ -211,7 +211,7 @@ export class Timeline extends Component {
       this.props.setTimelineState({ highlightedMessage: message.id });
 
       try {
-        const screen = await getScreenshotForTooltip(time);
+        const screen = await screenshotCache.getScreenshotForTooltip(time);
 
         if (highlightedMessage === message.id) {
           updateTooltip({ screen, left: offset });
@@ -309,7 +309,7 @@ export class Timeline extends Component {
       updateTooltip({ left: this.getPixelOffset(hoverTime) });
 
       try {
-        const screen = await getScreenshotForTooltip(time);
+        const screen = await screenshotCache.getScreenshotForTooltip(time);
         if (hoverTime === mouseTime) {
           updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
         }
