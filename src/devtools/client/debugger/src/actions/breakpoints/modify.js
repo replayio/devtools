@@ -20,7 +20,6 @@ import {
 import { setBreakpointPositions } from "./breakpointPositions";
 import { setSkipPausing } from "../pause/skipPausing";
 
-import { PROMISE } from "../utils/middleware/promise";
 import { recordEvent } from "../../utils/telemetry";
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
@@ -69,19 +68,20 @@ function clientRemoveBreakpoint(client, state, location: SourceLocation) {
 }
 
 export function enableBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
-  return ({ dispatch, getState, client, sourceMaps }: ThunkArgs) => {
+  return async ({ dispatch, getState, client, sourceMaps }: ThunkArgs) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint || !breakpoint.disabled) {
       return;
     }
 
     dispatch(setSkipPausing(false));
-    return dispatch({
+    dispatch({
       type: "SET_BREAKPOINT",
       cx,
       breakpoint: { ...breakpoint, disabled: false },
-      [PROMISE]: clientSetBreakpoint(client, getState(), breakpoint),
     });
+
+    await clientSetBreakpoint(client, getState(), breakpoint);
   };
 }
 
@@ -137,16 +137,19 @@ export function addBreakpoint(
     }
 
     dispatch(setSkipPausing(false));
-    return dispatch({
+    dispatch({
       type: "SET_BREAKPOINT",
       cx,
       breakpoint,
+    });
+
+    if (disabled) {
       // If we just clobbered an enabled breakpoint with a disabled one, we need
       // to remove any installed breakpoint in the server.
-      [PROMISE]: disabled
-        ? clientRemoveBreakpoint(client, getState(), location)
-        : clientSetBreakpoint(client, getState(), breakpoint),
-    });
+      await clientRemoveBreakpoint(client, getState(), location);
+    } else {
+      await clientSetBreakpoint(client, getState(), breakpoint);
+    }
   };
 }
 
@@ -157,7 +160,7 @@ export function addBreakpoint(
  * @static
  */
 export function removeBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
-  return ({ dispatch, getState, client }: ThunkArgs) => {
+  return async ({ dispatch, getState, client }: ThunkArgs) => {
     recordEvent("remove_breakpoint");
 
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
@@ -166,15 +169,16 @@ export function removeBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
     }
 
     dispatch(setSkipPausing(false));
-    return dispatch({
+    dispatch({
       type: "REMOVE_BREAKPOINT",
       cx,
       location: breakpoint.location,
-      // If the breakpoint is disabled then it is not installed in the server.
-      [PROMISE]: breakpoint.disabled
-        ? Promise.resolve()
-        : clientRemoveBreakpoint(client, getState(), breakpoint.location),
     });
+
+    // If the breakpoint is disabled then it is not installed in the server.
+    if (!breakpoint.disabled) {
+      await clientRemoveBreakpoint(client, getState(), breakpoint.location);
+    }
   };
 }
 
@@ -186,9 +190,7 @@ export function removeBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
  * @static
  */
 export function removeBreakpointAtGeneratedLocation(cx: Context, target: SourceLocation) {
-  return ({ dispatch, getState, client }: ThunkArgs) => {
-    // remove breakpoint from the server
-    const onBreakpointRemoved = clientRemoveBreakpoint(client, getState(), target);
+  return async ({ dispatch, getState, client }: ThunkArgs) => {
     // Remove any breakpoints matching the generated location.
     const breakpoints = getBreakpointsList(getState());
     for (const { location } of breakpoints) {
@@ -197,7 +199,6 @@ export function removeBreakpointAtGeneratedLocation(cx: Context, target: SourceL
           type: "REMOVE_BREAKPOINT",
           cx,
           location,
-          [PROMISE]: onBreakpointRemoved,
         });
       }
     }
@@ -213,7 +214,9 @@ export function removeBreakpointAtGeneratedLocation(cx: Context, target: SourceL
         });
       }
     }
-    return onBreakpointRemoved;
+
+    // remove breakpoint from the server
+    await clientRemoveBreakpoint(client, getState(), target);
   };
 }
 
@@ -224,19 +227,20 @@ export function removeBreakpointAtGeneratedLocation(cx: Context, target: SourceL
  * @static
  */
 export function disableBreakpoint(cx: Context, initialBreakpoint: Breakpoint) {
-  return ({ dispatch, getState, client }: ThunkArgs) => {
+  return async ({ dispatch, getState, client }: ThunkArgs) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint || breakpoint.disabled) {
       return;
     }
 
     dispatch(setSkipPausing(false));
-    return dispatch({
+    dispatch({
       type: "SET_BREAKPOINT",
       cx,
       breakpoint: { ...breakpoint, disabled: true },
-      [PROMISE]: clientRemoveBreakpoint(client, getState(), breakpoint.location),
     });
+
+    await clientRemoveBreakpoint(client, getState(), breakpoint.location);
   };
 }
 
@@ -256,7 +260,7 @@ export function setBreakpointOptions(
   location: SourceLocation,
   options: BreakpointOptions = {}
 ) {
-  return ({ dispatch, getState, client, sourceMaps }: ThunkArgs) => {
+  return async ({ dispatch, getState, client, sourceMaps }: ThunkArgs) => {
     let breakpoint = getBreakpoint(getState(), location);
     if (!breakpoint) {
       return dispatch(addBreakpoint(cx, location, options));
@@ -265,11 +269,12 @@ export function setBreakpointOptions(
     // Note: setting a breakpoint's options implicitly enables it.
     breakpoint = { ...breakpoint, disabled: false, options };
 
-    return dispatch({
+    dispatch({
       type: "SET_BREAKPOINT",
       cx,
       breakpoint,
-      [PROMISE]: clientSetBreakpoint(client, getState(), breakpoint),
     });
+
+    await clientSetBreakpoint(client, getState(), breakpoint);
   };
 }
