@@ -11,15 +11,9 @@ import "./EventsTimeline.css";
 const avatarColors = ["#2D4551", "#509A8F", "#E4C478", "#E9A56C", "#D97559"];
 
 class EventsTimeline extends React.Component {
-  state = { expanded: true };
-
   seekToComment = comment => {
     const { point, time, hasFrames } = comment;
     return this.props.seek(point, time, hasFrames);
-  };
-
-  toggleExpanded = () => {
-    this.setState({ expanded: !this.state.expanded });
   };
 
   getAvatarColor(avatarID) {
@@ -51,7 +45,7 @@ class EventsTimeline extends React.Component {
     );
   };
 
-  renderComments() {
+  render() {
     const { comments } = this.props;
 
     // This shows an empty state for when there are no comments yet. It also
@@ -68,28 +62,6 @@ class EventsTimeline extends React.Component {
     return (
       <div className="events-timeline-comments">
         {sortBy(comments, comment => comment.time).map(this.renderComment)}
-      </div>
-    );
-  }
-
-  renderRightSidebar() {
-    return (
-      <div className="right-sidebar">
-        <button className="comment-button-container" onClick={this.toggleExpanded}>
-          <div className="img comment-icon"></div>
-        </button>
-      </div>
-    );
-  }
-
-  render() {
-    const { comments } = this.props;
-    const { expanded } = this.state;
-
-    return (
-      <div className={expanded ? "events-timeline expanded" : "events-timeline collapsed"}>
-        {this.renderComments()}
-        {this.renderRightSidebar()}
       </div>
     );
   }
