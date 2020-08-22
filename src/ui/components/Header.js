@@ -38,6 +38,11 @@ const Avatar = props => {
 };
 
 class Header extends React.Component {
+  componentDidMount() {
+    // @see https://docs.headwayapp.co/widget for more configuration options.
+    Headway.init({ selector: "#headway", account: "J1Dlp7" });
+  }
+
   renderAvatars() {
     const { user, getActiveUsers } = this.props;
 
@@ -73,8 +78,13 @@ class Header extends React.Component {
       <div id="header">
         <div className="logo"></div>
         <div id="status"></div>
-        {this.renderAvatars()}
-        {features.auth0 ? <LoginButton /> : null}
+        <div className="links">
+          <a id="headway" onClick={Headway.show}>
+            What's new
+          </a>
+          {this.renderAvatars()}
+          {features.auth0 ? <LoginButton /> : null}
+        </div>
       </div>
     );
   }

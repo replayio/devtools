@@ -18,6 +18,13 @@
 #status {
   padding-left: 10px;
   flex-grow: 1;
+  color: var(--theme-comment);
+  font-size: 1.1rem;
+}
+
+#header .links {
+  display: flex;
+  align-items: center;
 }
 
 #header .avatar:not(.authenticated) {
@@ -55,4 +62,17 @@
 
 .avatar .user-name {
   margin-right: 8px;
+}
+
+#headway {
+  display: flex;
+  line-height: 32px;
+  height: 30px;
+  color: var(--theme-comment);
+  font-size: 1.1rem;
+}
+
+#headway:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
