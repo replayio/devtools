@@ -45,8 +45,15 @@ module.exports = {
     // Map all require("devtools/...") to the real devtools root.
     "^devtools\\/(.*)": "<rootDir>/../../$1",
     "^protocol\\/(.*)": "<rootDir>/../../../protocol/$1",
+    "^shims\\/(.*)": "<rootDir>/../../../shims/$1",
     // src/devtools/client/shared/vendor/WasmParser.js
     "wasmparser/dist/WasmParser": "<rootDir>/../shared/vendor/WasmParser",
     "wasmparser/dist/WasmDis": "<rootDir>/../shared/vendor/WasmDis",
+    "devtools-modules": "<rootDir>/dist/devtools-modules",
+    // "devtools-source-map": "<rootDir>/dist/devtools-source-map",
+    "devtools-environment": "<rootDir>/dist/devtools-environment",
+    "devtools-launchpad": "<rootDir>/dist/devtools-launchpad",
+    "lodash-move": "<rootDir>/dist/lodash-move",
+    codemirror: "<rootDir>/../shared/sourceeditor/codemirror/lib/codemirror.js",
   },
 };

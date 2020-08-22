@@ -6,6 +6,8 @@
 
 // $FlowIgnore
 global.Worker = require("workerjs");
+global.loader = {};
+global.loader.lazyRequireGetter = () => {};
 
 import path from "path";
 // import getConfig from "../../bin/getConfig";
@@ -13,39 +15,33 @@ import { readFileSync } from "fs";
 import Enzyme from "enzyme";
 // $FlowIgnore
 import Adapter from "enzyme-adapter-react-16";
-import { setupHelper } from "../utils/dbg";
-import { prefs } from "../utils/prefs";
 
-import { startSourceMapWorker, stopSourceMapWorker } from "devtools-source-map";
+// import { startSourceMapWorker, stopSourceMapWorker } from "devtools-source-map";
 
 // import {
 //   start as startPrettyPrintWorker,
 //   stop as stopPrettyPrintWorker,
 // } from "../workers/pretty-print";
 
-import { ParserDispatcher } from "../workers/parser";
-import { start as startSearchWorker, stop as stopSearchWorker } from "../workers/search";
-import { clearDocuments } from "../utils/editor";
-import { clearHistory } from "./utils/history";
+const { ParserDispatcher } = require("../workers/parser");
+const { start: startSearchWorker, stop: stopSearchWorker } = require("../workers/search");
+const { clearDocuments } = require("../utils/editor");
+const { clearHistory } = require("./utils/history");
 
-import env from "devtools-environment/test-flag";
+const env = require("devtools-environment/test-flag");
+
 env.testing = true;
+
+const { prefs } = require("../utils/prefs");
+
+const { setupHelper } = require("../utils/dbg");
 
 const rootPath = path.join(__dirname, "../../");
 
-function getL10nBundle() {
-  const read = file => readFileSync(path.join(rootPath, file));
-
-  try {
-    return read("./assets/panel/debugger.properties");
-  } catch (e) {
-    return read("../locales/en-US/debugger.properties");
-  }
-}
+const { LocalizationHelper } = require("devtools/shared/l10n");
 
 global.DebuggerConfig = {};
-global.L10N = require("devtools-launchpad").L10N;
-global.L10N.setBundle(getL10nBundle());
+global.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 global.jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
 global.performance = { now: () => 0 };
 
@@ -64,7 +60,7 @@ export const parserWorker = new ParserDispatcher();
 export const evaluationsParser = new ParserDispatcher();
 
 beforeAll(() => {
-  startSourceMapWorker(path.join(rootPath, "node_modules/devtools-source-map/src/worker.js"), "");
+  // startSourceMapWorker(path.join(rootPath, "node_modules/devtools-source-map/src/worker.js"), "");
   // startPrettyPrintWorker(path.join(rootPath, "src/workers/pretty-print/worker.js"));
   parserWorker.start(path.join(rootPath, "src/workers/parser/worker.js"));
   evaluationsParser.start(path.join(rootPath, "src/workers/parser/worker.js"));
@@ -73,7 +69,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  stopSourceMapWorker();
+  // stopSourceMapWorker();
   // stopPrettyPrintWorker();
   parserWorker.stop();
   evaluationsParser.stop();
