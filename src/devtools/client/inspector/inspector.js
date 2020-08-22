@@ -340,11 +340,8 @@ Inspector.prototype = {
   _onBeforeNavigate: function () {
     this._defaultNode = null;
     this.selection.setNodeFront(null);
+    this._destroyMarkup();
     this._pendingSelection = null;
-
-    if (this.markup) {
-      this.markup.clear();
-    }
   },
 
   _getDefaultSelection: function () {
@@ -376,7 +373,7 @@ Inspector.prototype = {
       return null;
     }
 
-    // this._showMarkupLoading();
+    this._showMarkupLoading();
 
     // If available, set either the previously selected node or the body
     // as default selected, else set documentElement
@@ -1147,7 +1144,13 @@ Inspector.prototype = {
   },
 
   /**
-   * Reset the inspector on new root mutation.
+   * Reset the inspector on new root mutation. This is called every time the
+   * thread's position changes. This isn't super efficient, but we do things
+   * this way because at each point the thread is paused we will be operating
+   * on a different set of node fronts, which is essentially a new DOM tree
+   * from the inspector's perspective. Clearing out the markup, selection,
+   * and other state gives us a clean break from the previous pause point and
+   * makes it easier to keep state consistent.
    */
   async onNewRoot(force) {
     // Don't reload the inspector when not selected.
@@ -1159,9 +1162,7 @@ Inspector.prototype = {
 
     this._defaultNode = null;
     this.selection.setNodeFront(null);
-    if (this.markup) {
-      this.markup.clear();
-    }
+    this._destroyMarkup();
 
     const selectionId = Math.random();
     this._pendingSelection = selectionId;
@@ -1183,6 +1184,7 @@ Inspector.prototype = {
     }
 
     this._pendingSelection = null;
+    this.onMarkupLoaded();
   },
 
   handleToolSelected(id) {
@@ -1217,7 +1219,7 @@ Inspector.prototype = {
 
     const loading = document.getElementById("markup-loading");
     loading.hidden = true;
-    log(`Inspector HideMarkupLoading`);
+    //log(`Inspector HideMarkupLoading`);
 
     if (!this.markup) {
       return;
@@ -1239,9 +1241,9 @@ Inspector.prototype = {
   },
 
   _showMarkupLoading() {
-    const loading = document.getElementById("markup-loading");
-    loading.hidden = false;
-    log(`Inspector ShowMarkupLoading`);
+    //const loading = document.getElementById("markup-loading");
+    //loading.hidden = false;
+    //log(`Inspector ShowMarkupLoading`);
   },
 
   _selectionCssSelectors: null,
@@ -1518,19 +1520,10 @@ Inspector.prototype = {
   },
 
   _destroyMarkup: function () {
-    let destroyPromise;
-
     if (this.markup) {
-      destroyPromise = this.markup.destroy();
+      this.markup.destroy();
       this.markup = null;
-    } else {
-      destroyPromise = Promise.resolve();
     }
-
-    // Allow showing loading message.
-    //this._markupBox.style.visibility = "hidden";
-
-    return destroyPromise;
   },
 
   onEyeDropperButtonClicked: function () {
