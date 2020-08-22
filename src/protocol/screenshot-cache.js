@@ -1,7 +1,6 @@
 const { ThreadFront } = require("./thread");
 const { sendMessage } = require("./socket");
 const { defer } = require("./utils");
-const { getMostRecentPaintPoint } = require("./graphics");
 
 export class DownloadCancelledError extends Error {}
 
@@ -25,8 +24,7 @@ export class ScreenshotCache {
    * Returns a promise for the requested screenshot. The promise may be rejected
    * if another tooltip screenshot is requested before this download was started.
    */
-  async getScreenshotForTooltip(time) {
-    const { point, paintHash } = getMostRecentPaintPoint(time);
+  async getScreenshotForTooltip(point, paintHash) {
     if (this._cache.has(paintHash)) {
       return this._cache.get(paintHash);
     }

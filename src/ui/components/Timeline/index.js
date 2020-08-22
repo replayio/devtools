@@ -19,6 +19,7 @@ import { log } from "protocol/socket";
 
 const {
   screenshotCache,
+  getMostRecentPaintPoint,
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
   nextPaintEvent,
@@ -211,9 +212,10 @@ export class Timeline extends Component {
       this.props.setTimelineState({ highlightedMessage: message.id });
 
       try {
-        const screen = await screenshotCache.getScreenshotForTooltip(time);
+        const { point, paintHash } = getMostRecentPaintPoint(mouseTime);
+        const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
 
-        if (highlightedMessage === message.id) {
+        if (this.props.highlightedMessage === message.id) {
           updateTooltip({ screen, left: offset });
         }
       } catch {}
@@ -296,21 +298,24 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseMove = async e => {
-    const { hoverTime, recordingDuration, updateTooltip } = this.props;
+    const { hoverTime, recordingDuration, setTimelineState, updateTooltip } = this.props;
     if (!recordingDuration) {
       return;
     }
 
     const mouseTime = this.getMouseTime(e);
-    const { point, time } = mostRecentPaintOrMouseEvent(mouseTime);
 
-    if (hoverTime != time) {
-      this.props.setTimelineState({ hoverTime: mouseTime });
-      updateTooltip({ left: this.getPixelOffset(hoverTime) });
+    if (hoverTime != mouseTime) {
+      setTimelineState({ hoverTime: mouseTime });
+      updateTooltip({ left: this.getPixelOffset(mouseTime) });
 
       try {
-        const screen = await screenshotCache.getScreenshotForTooltip(time);
-        if (hoverTime === mouseTime) {
+        const { point, paintHash } = getMostRecentPaintPoint(mouseTime);
+        const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
+
+        // this.props.hoverTime may have changed, but it may also still result in the same paintHash
+        const { paintHash: currentPaintHash } = getMostRecentPaintPoint(this.props.hoverTime);
+        if (currentPaintHash === paintHash) {
           updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
         }
       } catch {}

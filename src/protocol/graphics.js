@@ -193,12 +193,6 @@ async function getGraphicsAtTime(time) {
   return { screen, mouse };
 }
 
-function getScreenshotForTooltip(time) {
-  const paintIndex = mostRecentIndex(gPaintPoints, time);
-  const { point, paintHash } = gPaintPoints[paintIndex];
-  return screenshotCache.getScreenshotForTooltip(point, paintHash);
-}
-
 //////////////////////////////
 // Rendering State
 //////////////////////////////
