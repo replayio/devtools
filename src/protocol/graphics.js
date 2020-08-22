@@ -3,6 +3,8 @@
 const { ThreadFront } = require("./thread");
 const { sendMessage, addEventListener, log } = require("./socket");
 const { assert, binarySearch, defer } = require("./utils");
+const { ScreenshotCache } = require("./screenshot-cache");
+const screenshotCache = new ScreenshotCache();
 
 // Given a sorted array of items with "time" properties, find the index of
 // the most recent item at or preceding a given time.
@@ -139,6 +141,10 @@ function previousPaintEvent(time) {
   return entry;
 }
 
+function getMostRecentPaintPoint(time) {
+  return mostRecentEntry(gPaintPoints, time);
+}
+
 function getDevicePixelRatio() {
   return gDevicePixelRatio;
 }
@@ -147,31 +153,8 @@ function getDevicePixelRatio() {
 // Paint Data Management
 //////////////////////////////
 
-// Map paint hashes to a promise that resolves with the associated screenshot.
-const gScreenShots = new Map();
-
 function addScreenShot(screenShot) {
-  gScreenShots.set(screenShot.hash, screenShot);
-}
-
-async function ensureScreenShotAtPoint(point, paintHash) {
-  const existing = gScreenShots.get(paintHash);
-  if (existing) {
-    return existing;
-  }
-
-  const { promise, resolve } = defer();
-  gScreenShots.set(paintHash, promise);
-
-  const screen = (
-    await sendMessage(
-      "Graphics.getPaintContents",
-      { point, mimeType: "image/jpeg" },
-      ThreadFront.sessionId
-    )
-  ).screen;
-  resolve(screen);
-  return screen;
+  screenshotCache.addScreenshot(screenShot);
 }
 
 // How recently a click must have occurred for it to be drawn.
@@ -186,12 +169,12 @@ async function getGraphicsAtTime(time) {
     return {};
   }
 
-  const screenPromise = ensureScreenShotAtPoint(point, paintHash);
+  const screenPromise = screenshotCache.getScreenshotForPlayback(point, paintHash);
 
   // Start loading graphics at nearby points.
   for (let i = paintIndex; i < paintIndex + 5 && i < gPaintPoints.length; i++) {
     const { point, paintHash } = gPaintPoints[i];
-    ensureScreenShotAtPoint(point, paintHash);
+    screenshotCache.getScreenshotForPlayback(point, paintHash);
   }
 
   const screen = await screenPromise;
@@ -351,6 +334,7 @@ function installObserver() {
 installObserver();
 
 module.exports = {
+  screenshotCache,
   addLastScreen,
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
@@ -358,6 +342,7 @@ module.exports = {
   previousPaintEvent,
   paintGraphics,
   getGraphicsAtTime,
+  getMostRecentPaintPoint,
   refreshGraphics,
   getDevicePixelRatio,
 };

@@ -19,6 +19,8 @@ import { log } from "protocol/socket";
 import Fullstory from "ui/utils/fullstory";
 
 const {
+  screenshotCache,
+  getMostRecentPaintPoint,
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
   nextPaintEvent,
@@ -209,11 +211,15 @@ export class Timeline extends Component {
       const offset = this.getPixelOffset(time);
       updateTooltip({ left: offset });
       this.props.setTimelineState({ highlightedMessage: message.id });
-      const { screen, mouse } = await getGraphicsAtTime(time);
 
-      if (highlightedMessage === message.id) {
-        updateTooltip({ screen, left: offset });
-      }
+      try {
+        const { point, paintHash } = getMostRecentPaintPoint(mouseTime);
+        const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
+
+        if (this.props.highlightedMessage === message.id) {
+          updateTooltip({ screen, left: offset });
+        }
+      } catch {}
     }
 
     return null;
@@ -293,22 +299,27 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseMove = async e => {
-    const { hoverTime, recordingDuration, updateTooltip } = this.props;
+    const { hoverTime, recordingDuration, setTimelineState, updateTooltip } = this.props;
     if (!recordingDuration) {
       return;
     }
 
     const mouseTime = this.getMouseTime(e);
-    const { point, time } = mostRecentPaintOrMouseEvent(mouseTime);
 
-    if (hoverTime != time) {
-      this.props.setTimelineState({ hoverTime: mouseTime });
-      updateTooltip({ left: this.getPixelOffset(hoverTime) });
+    if (hoverTime != mouseTime) {
+      setTimelineState({ hoverTime: mouseTime });
+      updateTooltip({ left: this.getPixelOffset(mouseTime) });
 
-      const { screen, mouse } = await getGraphicsAtTime(time);
-      if (hoverTime === mouseTime) {
-        updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
-      }
+      try {
+        const { point, paintHash } = getMostRecentPaintPoint(mouseTime);
+        const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
+
+        // this.props.hoverTime may have changed, but it may also still result in the same paintHash
+        const { paintHash: currentPaintHash } = getMostRecentPaintPoint(this.props.hoverTime);
+        if (currentPaintHash === paintHash) {
+          updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
+        }
+      } catch {}
     }
   };
 
