@@ -46,7 +46,11 @@ class EventsTimeline extends React.Component {
   };
 
   render() {
-    const { comments } = this.props;
+    const { comments, expanded } = this.props;
+
+    if (!expanded) {
+      return null;
+    }
 
     // This shows an empty state for when there are no comments yet. It also
     // prevents an empty comment from displayed when the user is still filling
