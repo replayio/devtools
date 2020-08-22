@@ -20,6 +20,7 @@ import { fetchScopes } from "./fetchScopes";
 import { fetchFrames } from "./fetchFrames";
 import { recordEvent } from "../../utils/telemetry";
 import assert from "../../utils/assert";
+import FullStory from "ui/utils/fullstory";
 
 import { generateInlinePreview } from "./inlinePreview";
 import { setFramePositions } from "./setFramePositions";
@@ -64,6 +65,7 @@ export function command(cx: ThreadContext, type: Command, executionPoint: Execut
   return async (thunkArgs: ThunkArgs) => {
     const { dispatch, getState, client } = thunkArgs;
     log(`Debugger CommandStart ${type}`);
+    FullStory.event(`debugger.${type}`);
 
     const thread = getCurrentThread(getState());
     const point = getThreadExecutionPoint(getState(), thread);

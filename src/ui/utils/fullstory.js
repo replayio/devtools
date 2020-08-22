@@ -5,18 +5,12 @@ const FullStory = require("@fullstory/browser");
 
 let gInitialized;
 
-function init(...args) {
-  FullStory.init(...args);
-  gInitialized = true;
-}
-
-function event(...args) {
-  if (gInitialized) {
-    FullStory.event(...args);
-  }
-}
-
-module.exports = {
-  init,
-  event,
+export default {
+  init(...args) {
+    FullStory.init(...args);
+    gInitialized = true;
+  },
+  event: (name, options) => gInitialized && FullStory.event(name, options),
+  identify: uuid => gInitialized && uuid && FullStory.identify(uuid),
+  setUserVars: options => gInitialized && FullStory.setUserVars(options),
 };
