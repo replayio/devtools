@@ -20,7 +20,7 @@
   flex-grow: 1;
 }
 
-#header .avatar {
+#header .avatar:not(.authenticated) {
   height: 28px;
   width: 28px;
   border-radius: 50%;
@@ -32,6 +32,11 @@
   display: flex;
 }
 
+.avatar {
+  display: flex;
+  align-items: center;
+}
+
 .avatar.first-player:not(:only-child) {
   margin-inline-end: 20px;
 }
@@ -39,4 +44,15 @@
 #header .avatar:not(.first-player) {
   margin-left: -8px;
   box-shadow: 0px 0px 0px 2px white;
+}
+
+.avatar img {
+  height: 28px;
+  width: 28px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.avatar .user-name {
+  margin-right: 8px;
 }
