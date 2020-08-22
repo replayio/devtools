@@ -1311,6 +1311,7 @@ const ThreadFront = {
   async setBreakpoint(scriptId, line, column, condition) {
     const location = { scriptId, line, column };
     try {
+      this._invalidateResumeTargets();
       const { breakpointId } = await sendMessage(
         "Debugger.setBreakpoint",
         { location, condition },
@@ -1318,7 +1319,6 @@ const ThreadFront = {
       );
       if (breakpointId) {
         this.breakpoints.set(breakpointId, { location });
-        this._invalidateResumeTargets();
       }
     } catch (e) {
       // An error will be generated if the breakpoint location is not valid for
@@ -1345,8 +1345,8 @@ const ThreadFront = {
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
       if (location.scriptId == scriptId && location.line == line && location.column == column) {
         this.breakpoints.delete(breakpointId);
-        await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
         this._invalidateResumeTargets();
+        await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
       }
     }
   },
@@ -1570,13 +1570,13 @@ const ThreadFront = {
   },
 
   async blackbox(scriptId, begin, end) {
-    await sendMessage("Debugger.blackboxScript", { scriptId, begin, end }, this.sessionId);
     this._invalidateResumeTargets();
+    await sendMessage("Debugger.blackboxScript", { scriptId, begin, end }, this.sessionId);
   },
 
   async unblackbox(scriptId, begin, end) {
-    await sendMessage("Debugger.unblackboxScript", { scriptId, begin, end }, this.sessionId);
     this._invalidateResumeTargets();
+    await sendMessage("Debugger.unblackboxScript", { scriptId, begin, end }, this.sessionId);
   },
 
   async findConsoleMessages(onConsoleMessage) {
