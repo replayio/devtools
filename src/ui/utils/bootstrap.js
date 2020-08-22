@@ -20,6 +20,8 @@ export function setupSentry(context) {
   const url = new URL(window.location.href);
   const test = url.searchParams.get("test");
 
+  const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
+
   if (test || url.hostname == "localhost") {
     return;
   }
@@ -28,9 +30,19 @@ export function setupSentry(context) {
     dsn: "https://41c20dff316f42fea692ef4f0d055261@o437061.ingest.sentry.io/5399075",
     integrations: [new Integrations.Tracing()],
     tracesSampleRate: 1.0,
+    beforeSend(event) {
+      if (event) {
+        const exceptionValue = event?.exception.values[0].value;
+        if (ignoreList.some(ignore => exceptionValue.includes(ignore))) {
+          return null;
+        }
+      }
+
+      return event;
+    },
   });
 
-  Sentry.setContext("recording", context);
+  Sentry.setContext("recording", { ...context, url: window.location.href });
 }
 
 function setupAppHelper(store) {
