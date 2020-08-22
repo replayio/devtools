@@ -3,6 +3,8 @@ const { sendMessage } = require("./socket");
 const { defer } = require("./utils");
 const { getMostRecentPaintPoint } = require("./graphics");
 
+export class DownloadCancelledError extends Error {}
+
 /**
  * This class manages the screenshot downloads and caches downloaded screenshots.
  * It throttles the screenshot downloads for the tooltip, only starting
@@ -33,7 +35,7 @@ export class ScreenshotCache {
     }
 
     if (this._queuedDownloadForTooltip) {
-      this._queuedDownloadForTooltip.reject('Download cancelled');
+      this._queuedDownloadForTooltip.reject(new DownloadCancelledError());
       this._queuedDownloadForTooltip = undefined;
     }
 
