@@ -165,7 +165,15 @@ async function getGraphicsAtTime(time) {
     return {};
   }
 
-  const screen = await screenshotCache.getScreenshotForPlayback(point, paintHash);
+  const screenPromise = screenshotCache.getScreenshotForPlayback(point, paintHash);
+
+  // Start loading graphics at nearby points.
+  for (let i = paintIndex; i < paintIndex + 5 && i < gPaintPoints.length; i++) {
+    const { point, paintHash } = gPaintPoints[i];
+    screenshotCache.getScreenshotForPlayback(point, paintHash);
+  }
+
+  const screen = await screenPromise;
 
   let mouse;
   const mouseEvent = mostRecentEntry(gMouseEvents, time);
