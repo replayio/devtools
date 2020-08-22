@@ -61,6 +61,7 @@ class Header extends React.Component {
   renderAvatar(player, isFirstPlayer) {
     return (
       <div
+        key={player.avatarID}
         className={`avatar ${isFirstPlayer ? "first-player" : ""}`}
         style={{ background: this.getAvatarColor(player.avatarID) }}
       ></div>

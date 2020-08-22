@@ -8,7 +8,7 @@ import Comments from "./Comments";
 import Header from "./Header";
 
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import EventsTimeline from "./EventsTimeline";
+import RightSidebar from "./RisghtSidebar";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 
@@ -44,7 +44,7 @@ class App extends React.Component {
           <canvas id="graphics"></canvas>
           <div id="highlighter-root"></div>
         </div>
-        <EventsTimeline toolbox={toolbox} />
+        <RightSidebar toolbox={toolbox} />
         <Tooltip tooltip={tooltip} />
       </div>
     );
