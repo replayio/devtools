@@ -39,8 +39,10 @@ const Avatar = props => {
 
 class Header extends React.Component {
   componentDidMount() {
-    // @see https://docs.headwayapp.co/widget for more configuration options.
-    Headway?.init(HW_config);
+    if (typeof Headway === "object") {
+      // @see https://docs.headwayapp.co/widget for more configuration options.
+      Headway.init(HW_config);
+    }
   }
 
   toggleHeadway = () => {
