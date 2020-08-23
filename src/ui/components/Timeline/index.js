@@ -16,7 +16,7 @@ import PropTypes from "prop-types";
 
 import { SVG } from "image/svg";
 import { log } from "protocol/socket";
-import Fullstory from "ui/utils/fullstory";
+import FullStory from "ui/utils/fullstory";
 
 const {
   screenshotCache,
