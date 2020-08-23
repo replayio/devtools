@@ -14,6 +14,7 @@ function initialTimelineState() {
     screenShot: null,
     timelineDimensions: { left: 1, top: 1, width: 1 },
     mouse: null,
+    loaded: false,
   };
 }
 
@@ -45,3 +46,4 @@ export const getRecordingDuration = state => state.timeline.recordingDuration;
 export const getScreenShot = state => state.timeline.screenShot;
 export const getMouse = state => state.timeline.mouse;
 export const getTimelineDimensions = state => state.timeline.timelineDimensions;
+export const getTimelineLoaded = state => state.timeline.loaded;

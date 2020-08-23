@@ -1,0 +1,17 @@
+name: Cypress
+
+on: pull_request
+
+jobs:
+  cypress:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Deps
+        run: npm install
+      - name: Build webpack
+        run: ./node_modules/.bin/webpack
+      - name: Start server
+        run: python -m SimpleHTTPServer 8080 &
+      - name: Cypress run
+        uses: cypress-io/github-action@v2

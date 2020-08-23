@@ -181,7 +181,7 @@ export class Timeline extends Component {
 
   onUnprocessedRegions = ({ regions }) => {
     log(`UnprocessedRegions ${JSON.stringify(regions)}`);
-    this.props.setTimelineState({ unprocessedRegions: regions });
+    this.props.setTimelineState({ unprocessedRegions: regions, loaded: regions.length == 0 });
   };
 
   onConsoleUpdate = consoleState => {
@@ -574,7 +574,7 @@ export class Timeline extends Component {
       }),
 
       CommandButton({
-        className: "primary",
+        className: "primary ",
         active: true,
         img: playback ? "pause" : "play",
         onClick: () => (playback ? this.stopPlayback() : this.startPlayback()),
@@ -771,9 +771,8 @@ export class Timeline extends Component {
   }
 
   render() {
-    // const { comments } = this.state;
-    // const existingComments = [];
-    const percent = this.getVisiblePosition(this.props.currentTime) * 100;
+    const { loaded, currentTime } = this.props;
+    const percent = this.getVisiblePosition(currentTime) * 100;
 
     return div(
       {
@@ -791,7 +790,8 @@ export class Timeline extends Component {
           div({ className: "commands" }, ...this.renderCommands()),
           div(
             {
-              className: "progressBar",
+              className: classname("progressBar", { loaded }),
+              ["data-progress"]: Math.ceil(percent),
               ref: a => (this.$progressBar = a),
               onMouseEnter: this.onPlayerMouseEnter,
               onMouseMove: this.onPlayerMouseMove,
@@ -840,6 +840,7 @@ export default connect(
     unprocessedRegions: selectors.getUnprocessedRegions(state),
     recordingDuration: selectors.getRecordingDuration(state),
     timelineDimensions: selectors.getTimelineDimensions(state),
+    loaded: selectors.getTimelineLoaded(state),
   }),
   {
     updateTooltip: actions.updateTooltip,
