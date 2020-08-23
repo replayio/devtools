@@ -40,7 +40,7 @@ const Avatar = props => {
 class Header extends React.Component {
   componentDidMount() {
     // @see https://docs.headwayapp.co/widget for more configuration options.
-    Headway.init({ selector: "#headway", account: "J1Dlp7" });
+    Headway?.init(HW_config);
   }
 
   renderAvatars() {

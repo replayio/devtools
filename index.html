@@ -63,5 +63,11 @@
       }
     })();
   </script>
-  <script async src="https://cdn.headwayapp.co/widget.js"></script>
+  <script>
+    var HW_config = {
+      selector: "#headway",
+      account: "J1Dlp7",
+    };
+  </script>
+  <script onload="Headway.init(HW_config)" async src="https://cdn.headwayapp.co/widget.js"></script>
 </html>
