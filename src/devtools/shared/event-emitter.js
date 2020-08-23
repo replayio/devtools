@@ -233,8 +233,6 @@ class EventEmitter {
           } catch (ex) {
             // Prevent a bad listener from interfering with the others.
             console.error(ex);
-            const msg = ex + ": " + ex.stack;
-            dump(msg + "\n");
           }
         }
       }
