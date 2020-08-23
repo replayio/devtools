@@ -155,17 +155,19 @@ Pause.prototype = {
   },
 
   ensureScopeChain(scopeChain) {
-    return Promise.all(scopeChain.map(async id => {
-      if (!this.scopes.has(id)) {
-        const { data } = await this.sendMessage("Pause.getScope", {
-          scope: id,
-        });
-        this.addData(data);
-      }
-      const scope = this.scopes.get(id);
-      assert(scope);
-      return scope;
-    }));
+    return Promise.all(
+      scopeChain.map(async id => {
+        if (!this.scopes.has(id)) {
+          const { data } = await this.sendMessage("Pause.getScope", {
+            scope: id,
+          });
+          this.addData(data);
+        }
+        const scope = this.scopes.get(id);
+        assert(scope);
+        return scope;
+      })
+    );
   },
 
   async getScopes(frameId) {
@@ -178,8 +180,7 @@ Pause.prototype = {
     // related objects when loading original scopes and we don't deal with that
     // properly.
     let scopeChain = await this.ensureScopeChain(frame.scopeChain);
-    if (frame.originalScopeChain &&
-        !ThreadFront.hasPreferredGeneratedScript(frame.location)) {
+    if (frame.originalScopeChain && !ThreadFront.hasPreferredGeneratedScript(frame.location)) {
       scopeChain = await this.ensureScopeChain(frame.originalScopeChain);
     }
 
@@ -201,8 +202,11 @@ Pause.prototype = {
     assert(this.createWaiter);
     await this.createWaiter;
     const { result } = frameId
-      ? await this.sendMessage("Pause.evaluateInFrame",
-                               { frameId, expression, useOriginalScopes: true })
+      ? await this.sendMessage("Pause.evaluateInFrame", {
+          frameId,
+          expression,
+          useOriginalScopes: true,
+        })
       : await this.sendMessage("Pause.evaluateInGlobal", { expression });
     const { returned, exception, failed, data } = result;
     this.addData(data);
