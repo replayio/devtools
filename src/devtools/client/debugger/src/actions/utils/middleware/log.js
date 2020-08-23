@@ -101,7 +101,7 @@ export function log({ dispatch, getState }: ThunkArgs) {
     if (prefs.logActions) {
       if (isTesting()) {
         // $FlowIgnore
-        dump(`[ACTION] ${action.type} ${asyncMsg} - ${serializeAction(action)}\n`);
+        console.log(`[ACTION] ${action.type} ${asyncMsg} - ${serializeAction(action)}\n`);
       } else {
         console.log(action, asyncMsg);
       }
