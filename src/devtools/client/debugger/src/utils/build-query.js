@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // @flow
-import escapeRegExp from "lodash/escapeRegExp";
+import { escapeRegExp } from "lodash";
 
 import type { SearchModifiers } from "../types";
 
