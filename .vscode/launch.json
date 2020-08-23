@@ -10,6 +10,13 @@
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/node_modules/.bin/webpack"
+    },
+    {
+      "type": "firefox",
+      "request": "launch",
+      "name": "Launch Firefox",
+      "url": "http://localhost:8080/?id=b0b8e1b5-6e67-45ef-bc43-9889c9f8da34", // the Firebugs recording
+      "webRoot": "${workspaceFolder}"
     }
   ]
 }
