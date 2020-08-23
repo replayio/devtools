@@ -317,7 +317,7 @@ export class Timeline extends Component {
         // this.props.hoverTime may have changed, but it may also still result in the same paintHash
         const { paintHash: currentPaintHash } = getMostRecentPaintPoint(this.props.hoverTime);
         if (currentPaintHash === paintHash) {
-          updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
+          updateTooltip({ screen, left: this.getPixelOffset(this.props.hoverTime) });
         }
       } catch {}
     }
