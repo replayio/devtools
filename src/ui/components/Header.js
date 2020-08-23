@@ -43,6 +43,10 @@ class Header extends React.Component {
     Headway?.init(HW_config);
   }
 
+  toggleHeadway = () => {
+    Headway.toggle();
+  };
+
   renderAvatars() {
     const { user, getActiveUsers } = this.props;
 
@@ -79,7 +83,7 @@ class Header extends React.Component {
         <div className="logo"></div>
         <div id="status"></div>
         <div className="links">
-          <a id="headway" onClick={Headway.show}>
+          <a id="headway" onClick={this.toggleHeadway}>
             What&apos;s new
           </a>
           {this.renderAvatars()}
