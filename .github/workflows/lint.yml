@@ -7,6 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install NPM cache
+        uses: c-hive/gha-npm-cache@v1
+      - name: Install JS dependencies
+        run: npm install
       - uses: hallee/eslint-action@1.0.3
         # GITHUB_TOKEN in forked repositories is read-only
         # https://help.github.com/en/actions/reference/events-that-trigger-workflows#pull-request-event-pull_request
