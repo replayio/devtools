@@ -13,7 +13,6 @@ export class DownloadCancelledError extends Error {}
  * Downloads for playback are run independently of those for the tooltip.
  */
 export class ScreenshotCache {
-
   // Map paint hashes to a promise that resolves with the associated screenshot.
   _cache = new Map();
 
@@ -28,7 +27,7 @@ export class ScreenshotCache {
     if (this._cache.has(paintHash)) {
       return this._cache.get(paintHash);
     }
-    if (this._queuedDownloadForTooltip && (this._queuedDownloadForTooltip.point === point)) {
+    if (this._queuedDownloadForTooltip && this._queuedDownloadForTooltip.point === point) {
       return this._queuedDownloadForTooltip.promise;
     }
 
@@ -67,7 +66,7 @@ export class ScreenshotCache {
   }
 
   addScreenshot(screenshot) {
-      this._cache.set(screenshot.hash, Promise.resolve(screenshot));
+    this._cache.set(screenshot.hash, Promise.resolve(screenshot));
   }
 
   async _downloadQueued() {
