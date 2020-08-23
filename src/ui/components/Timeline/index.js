@@ -213,7 +213,9 @@ export class Timeline extends Component {
       this.props.setTimelineState({ highlightedMessage: message.id });
 
       try {
-        const { point, paintHash } = getMostRecentPaintPoint(mouseTime);
+        const paintPoint = getMostRecentPaintPoint(mouseTime);
+        if (!paintPoint) return null;
+        const { point, paintHash } = paintPoint;
         const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
 
         if (this.props.highlightedMessage === message.id) {
@@ -311,11 +313,15 @@ export class Timeline extends Component {
       updateTooltip({ left: this.getPixelOffset(mouseTime) });
 
       try {
-        const { point, paintHash } = getMostRecentPaintPoint(mouseTime);
+        const paintPoint = getMostRecentPaintPoint(mouseTime);
+        if (!paintPoint) return;
+        const { point, paintHash } = paintPoint;
         const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
 
         // this.props.hoverTime may have changed, but it may also still result in the same paintHash
-        const { paintHash: currentPaintHash } = getMostRecentPaintPoint(this.props.hoverTime);
+        const currentPaintPoint = getMostRecentPaintPoint(this.props.hoverTime);
+        if (!currentPaintPoint) return;
+        const { paintHash: currentPaintHash } = currentPaintPoint;
         if (currentPaintHash === paintHash) {
           updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
         }
@@ -384,8 +390,10 @@ export class Timeline extends Component {
         this.seekTime(zoomRegion.endTime);
       }
     } else if (startDragTime != null && hoverTime != null && !hoveringOverMarker) {
-      const { point, time } = mostRecentPaintOrMouseEvent(mouseTime);
-      this.seek(point, mouseTime);
+      const event = mostRecentPaintOrMouseEvent(mouseTime);
+      if (event) {
+        this.seek(event.point, mouseTime);
+      }
     }
   };
 
@@ -401,14 +409,16 @@ export class Timeline extends Component {
       return null;
     }
 
-    const { point } = mostRecentPaintOrMouseEvent(targetTime);
+    const event = mostRecentPaintOrMouseEvent(targetTime);
 
-    // Seek to the exact time provided, even if it does not match up with a
-    // paint event. This can cause some slight UI weirdness: resumes done in
-    // the debugger will be relative to the point instead of the time,
-    // so e.g. running forward could land at a point before the time itself.
-    // This could be fixed but doesn't seem worth worrying about for now.
-    this.seek(point, targetTime);
+    if (event) {
+      // Seek to the exact time provided, even if it does not match up with a
+      // paint event. This can cause some slight UI weirdness: resumes done in
+      // the debugger will be relative to the point instead of the time,
+      // so e.g. running forward could land at a point before the time itself.
+      // This could be fixed but doesn't seem worth worrying about for now.
+      this.seek(event.point, targetTime);
+    }
   }
 
   doPrevious() {
@@ -472,6 +482,7 @@ export class Timeline extends Component {
         const paintTime = startDate + next - startTime;
 
         getGraphicsAtTime(next).then(({ screen, mouse }) => {
+          if (!screen) return;
           const now = Date.now();
           setTimeout(() => {
             this.playbackPaintFinished(next, screen, mouse);
@@ -501,7 +512,9 @@ export class Timeline extends Component {
       time = this.zoomStartTime;
     }
     getGraphicsAtTime(time).then(({ screen, mouse }) => {
-      this.playbackPaintFinished(time, screen, mouse);
+      if (screen) {
+        this.playbackPaintFinished(time, screen, mouse);
+      }
     });
 
     this.props.setTimelineState({

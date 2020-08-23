@@ -135,7 +135,7 @@ function nextPaintEvent(time) {
 
 function previousPaintEvent(time) {
   const entry = mostRecentEntry(gPaintPoints, time);
-  if (entry.time == time) {
+  if (entry && (entry.time == time)) {
     return mostRecentEntry(gPaintPoints, time - 1);
   }
   return entry;
@@ -162,7 +162,7 @@ const ClickThresholdMs = 200;
 
 async function getGraphicsAtTime(time) {
   const paintIndex = mostRecentIndex(gPaintPoints, time);
-  const { point, paintHash } = gPaintPoints[paintIndex];
+  const { point, paintHash } = gPaintPoints[paintIndex] || {};
 
   if (paintHash === undefined) {
     // There are no graphics to paint here.

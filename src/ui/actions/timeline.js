@@ -21,13 +21,17 @@ export async function setupTimeline(recordingId, { dispatch }) {
 function onWarp(point, time) {
   const { startTime, endTime } = selectors.getZoomRegion(store.getState());
   if (time < startTime) {
-    const startPoint = mostRecentPaintOrMouseEvent(startTime).point;
-    return { point: startPoint, time: startTime };
+    const startEvent = mostRecentPaintOrMouseEvent(startTime);
+    if (startEvent) {
+      return { point: startEvent.point, time: startTime };
+    }
   }
 
   if (time > endTime) {
-    const endPoint = mostRecentPaintOrMouseEvent(endTime).point;
-    return { point: endPoint, time: endTime };
+    const endEvent = mostRecentPaintOrMouseEvent(endTime);
+    if (endEvent) {
+      return { point: endEvent.point, time: endTime };
+    }
   }
 
   return null;
@@ -52,7 +56,7 @@ function onPaused({ time }) {
 
     const { screen, mouse } = await getGraphicsAtTime(time);
 
-    if (selectors.getCurrentTime(getState()) == time) {
+    if (screen && selectors.getCurrentTime(getState()) == time) {
       dispatch(setTimelineState({ screenShot: screen, mouse }));
       paintGraphics(screen, mouse);
     }
