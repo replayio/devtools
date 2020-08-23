@@ -26,6 +26,7 @@
     "debug": "^4.1.1",
     "devtools-sprintf-js": "^1.0.3",
     "extract-loader": "^5.0.1",
+    "lodash": "^4.17.20",
     "md5": "^2.2.1",
     "mini-css-extract-plugin": "^0.9.0",
     "parse-script-tags": "^0.1.6",
@@ -53,8 +54,8 @@
     "eslint-plugin-import": "^2.21.2",
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-prettier": "^3.1.4",
-    "eslint-plugin-react-hooks": "^4.0.4",
     "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-react-hooks": "^4.0.4",
     "webpack-dev-server": "^3.11.0"
   },
   "browserslist": [

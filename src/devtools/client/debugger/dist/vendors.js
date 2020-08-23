@@ -3,125 +3,157 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 (function webpackUniversalModuleDefinition(root, factory) {
-  if (typeof exports === 'object' && typeof module === 'object')
-    module.exports = factory(require("prop-types"), require("react-dom-factories"), require("react"), require("devtools-services"), require("react-dom"), require("devtools/client/shared/vendor/lodash"), require("devtools/client/framework/menu"), require("devtools/client/framework/menu-item"));
-  else if (typeof define === 'function' && define.amd)
-    define(["prop-types", "react-dom-factories", "react", "Services", "devtools/shared/flags", "react-dom", "devtools/client/shared/vendor/lodash", "devtools/client/framework/menu", "devtools/client/framework/menu-item"], factory);
-  else {
-    var a = typeof exports === 'object' ? factory(
+  if (typeof exports === "object" && typeof module === "object")
+    module.exports = factory(
       require("prop-types"),
       require("react-dom-factories"),
       require("react"),
-      require("devtools/shared/flags"),
+      require("devtools-services"),
       require("react-dom"),
-      require("devtools/client/shared/vendor/lodash"),
-      require("devtools/client/framework/menu"), require("devtools/client/framework/menu-item")) : factory(root["prop-types"], root["react-dom-factories"], root["react"], root["Services"], root["devtools/shared/flags"], root["react-dom"], root["devtools/client/shared/vendor/lodash"], root["devtools/client/framework/menu"], root["devtools/client/framework/menu-item"]);
-    for (var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+      require("lodash"),
+      require("devtools/client/framework/menu"),
+      require("devtools/client/framework/menu-item")
+    );
+  else if (typeof define === "function" && define.amd)
+    define([
+      "prop-types",
+      "react-dom-factories",
+      "react",
+      "Services",
+      "devtools/shared/flags",
+      "react-dom",
+      "lodash",
+      "devtools/client/framework/menu",
+      "devtools/client/framework/menu-item",
+    ], factory);
+  else {
+    var a =
+      typeof exports === "object"
+        ? factory(
+            require("prop-types"),
+            require("react-dom-factories"),
+            require("react"),
+            require("devtools/shared/flags"),
+            require("react-dom"),
+            require("lodash"),
+            require("devtools/client/framework/menu"),
+            require("devtools/client/framework/menu-item")
+          )
+        : factory(
+            root["prop-types"],
+            root["react-dom-factories"],
+            root["react"],
+            root["Services"],
+            root["devtools/shared/flags"],
+            root["react-dom"],
+            root["lodash"],
+            root["devtools/client/framework/menu"],
+            root["devtools/client/framework/menu-item"]
+          );
+    for (var i in a) (typeof exports === "object" ? exports : root)[i] = a[i];
   }
-})(typeof self !== 'undefined' ? self : this, function (
+})(typeof self !== "undefined" ? self : this, function (
   __WEBPACK_EXTERNAL_MODULE_0__,
   __WEBPACK_EXTERNAL_MODULE_1__,
   __WEBPACK_EXTERNAL_MODULE_6__,
   __WEBPACK_EXTERNAL_MODULE_37__,
   __WEBPACK_EXTERNAL_MODULE_103__,
-  /*__WEBPACK_EXTERNAL_MODULE_112__,*/ __WEBPACK_EXTERNAL_MODULE_417__, __WEBPACK_EXTERNAL_MODULE_490__, __WEBPACK_EXTERNAL_MODULE_491__) {
-  return /******/ (function (modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if (installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-        /******/
-      }
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-        /******/
-      };
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-      /******/
-    }
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function (exports, name, getter) {
-/******/ 		if (!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-      /******/
-    });
-        /******/
-      }
-      /******/
-    };
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function (module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-      /******/
-    };
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function (object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/assets/build";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 413);
+  /*__WEBPACK_EXTERNAL_MODULE_112__,*/ __WEBPACK_EXTERNAL_MODULE_417__,
+  __WEBPACK_EXTERNAL_MODULE_490__,
+  __WEBPACK_EXTERNAL_MODULE_491__
+) {
+  return /******/ (function (modules) {
+    // webpackBootstrap
+    /******/ // The module cache
+    /******/ var installedModules = {}; // The require function
     /******/
-  })
-/************************************************************************/
-/******/({
-
-/***/ 0:
-/***/ (function (module, exports) {
-
+    /******/ /******/ function __webpack_require__(moduleId) {
+      /******/
+      /******/ // Check if module is in cache
+      /******/ if (installedModules[moduleId]) {
+        /******/ return installedModules[moduleId].exports;
+        /******/
+      } // Create a new module (and put it into the cache)
+      /******/ /******/ var module = (installedModules[moduleId] = {
+        /******/ i: moduleId,
+        /******/ l: false,
+        /******/ exports: {},
+        /******/
+      }); // Execute the module function
+      /******/
+      /******/ /******/ modules[moduleId].call(
+        module.exports,
+        module,
+        module.exports,
+        __webpack_require__
+      ); // Flag the module as loaded
+      /******/
+      /******/ /******/ module.l = true; // Return the exports of the module
+      /******/
+      /******/ /******/ return module.exports;
+      /******/
+    } // expose the modules object (__webpack_modules__)
+    /******/
+    /******/
+    /******/ /******/ __webpack_require__.m = modules; // expose the module cache
+    /******/
+    /******/ /******/ __webpack_require__.c = installedModules; // define getter function for harmony exports
+    /******/
+    /******/ /******/ __webpack_require__.d = function (exports, name, getter) {
+      /******/ if (!__webpack_require__.o(exports, name)) {
+        /******/ Object.defineProperty(exports, name, {
+          /******/ configurable: false,
+          /******/ enumerable: true,
+          /******/ get: getter,
+          /******/
+        });
+        /******/
+      }
+      /******/
+    }; // getDefaultExport function for compatibility with non-harmony modules
+    /******/
+    /******/ /******/ __webpack_require__.n = function (module) {
+      /******/ var getter =
+        module && module.__esModule
+          ? /******/ function getDefault() {
+              return module["default"];
+            }
+          : /******/ function getModuleExports() {
+              return module;
+            };
+      /******/ __webpack_require__.d(getter, "a", getter);
+      /******/ return getter;
+      /******/
+    }; // Object.prototype.hasOwnProperty.call
+    /******/
+    /******/ /******/ __webpack_require__.o = function (object, property) {
+      return Object.prototype.hasOwnProperty.call(object, property);
+    }; // __webpack_public_path__
+    /******/
+    /******/ /******/ __webpack_require__.p = "/assets/build"; // Load entry module and return exports
+    /******/
+    /******/ /******/ return __webpack_require__((__webpack_require__.s = 413));
+    /******/
+  })(
+    /************************************************************************/
+    /******/ {
+      /***/ 0: /***/ function (module, exports) {
         module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
 
         /***/
-      }),
+      },
 
-/***/ 1:
-/***/ (function (module, exports) {
-
+      /***/ 1: /***/ function (module, exports) {
         module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
         /***/
-      }),
+      },
 
-/***/ 102:
-/***/ (function (module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function (process) {/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
+      /***/ 102: /***/ function (module, exports, __webpack_require__) {
+        /* WEBPACK VAR INJECTION */ (function (process) {
+          /* This Source Code Form is subject to the terms of the Mozilla Public
+           * License, v. 2.0. If a copy of the MPL was not distributed with this
+           * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
           const flag = __webpack_require__(103);
 
           function isBrowser() {
@@ -129,7 +161,7 @@
           }
 
           function isNode() {
-            return process && process.release && process.release.name == 'node';
+            return process && process.release && process.release.name == "node";
           }
 
           function isDevelopment() {
@@ -157,50 +189,44 @@
             isDevelopment,
             isTesting,
             isFirefoxPanel,
-            isFirefox
+            isFirefox,
           };
           /* WEBPACK VAR INJECTION */
-        }.call(exports, __webpack_require__(35)))
+        }.call(exports, __webpack_require__(35)));
 
         /***/
-      }),
+      },
 
-/***/ 103:
-/***/ (function (module, exports) {
-
+      /***/ 103: /***/ function (module, exports) {
         module.exports = __WEBPACK_EXTERNAL_MODULE_103__;
 
         /***/
-      }),
+      },
 
-/***/ 108:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 108: /***/ function (module, exports, __webpack_require__) {
         "use strict";
-
 
         var _tree = _interopRequireDefault(__webpack_require__(109));
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
         module.exports = {
-          Tree: _tree.default
+          Tree: _tree.default,
         };
 
         /***/
-      }),
+      },
 
-/***/ 109:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 109: /***/ function (module, exports, __webpack_require__) {
         "use strict";
 
-
         Object.defineProperty(exports, "__esModule", {
-          value: true
+          value: true,
         });
         exports.default = void 0;
 
@@ -210,23 +236,29 @@
 
         var _propTypes = _interopRequireDefault(__webpack_require__(0));
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-        const {
-          Component,
-          createFactory
-        } = _react.default;
+        const { Component, createFactory } = _react.default;
 
         __webpack_require__(110); // depth
-
 
         const AUTO_EXPAND_DEPTH = 0; // Simplied selector targetting elements that can receive the focus,
         // full version at https://stackoverflow.com/questions/1599660.
 
-        const FOCUSABLE_SELECTOR = ["a[href]:not([tabindex='-1'])", "button:not([disabled]):not([tabindex='-1'])", "iframe:not([tabindex='-1'])", "input:not([disabled]):not([tabindex='-1'])", "select:not([disabled]):not([tabindex='-1'])", "textarea:not([disabled]):not([tabindex='-1'])", "[tabindex]:not([tabindex='-1'])"].join(", ");
+        const FOCUSABLE_SELECTOR = [
+          "a[href]:not([tabindex='-1'])",
+          "button:not([disabled]):not([tabindex='-1'])",
+          "iframe:not([tabindex='-1'])",
+          "input:not([disabled]):not([tabindex='-1'])",
+          "select:not([disabled]):not([tabindex='-1'])",
+          "textarea:not([disabled]):not([tabindex='-1'])",
+          "[tabindex]:not([tabindex='-1'])",
+        ].join(", ");
         /**
          * An arrow that displays whether its node is expanded (▼) or collapsed
          * (▶). When its node has no children, it is hidden.
@@ -235,7 +267,7 @@
         class ArrowExpander extends Component {
           static get propTypes() {
             return {
-              expanded: _propTypes.default.bool
+              expanded: _propTypes.default.bool,
             };
           }
 
@@ -244,9 +276,7 @@
           }
 
           render() {
-            const {
-              expanded
-            } = this.props;
+            const { expanded } = this.props;
             const classNames = ["arrow"];
 
             if (expanded) {
@@ -254,19 +284,24 @@
             }
 
             return _reactDomFactories.default.button({
-              className: classNames.join(" ")
+              className: classNames.join(" "),
             });
           }
-
         }
 
-        const treeIndent = _reactDomFactories.default.span({
-          className: "tree-indent"
-        }, "\u200B");
+        const treeIndent = _reactDomFactories.default.span(
+          {
+            className: "tree-indent",
+          },
+          "\u200B"
+        );
 
-        const treeLastIndent = _reactDomFactories.default.span({
-          className: "tree-indent tree-last-indent"
-        }, "\u200B");
+        const treeLastIndent = _reactDomFactories.default.span(
+          {
+            className: "tree-indent tree-last-indent",
+          },
+          "\u200B"
+        );
 
         class TreeNode extends Component {
           static get propTypes() {
@@ -281,7 +316,7 @@
               isExpandable: _propTypes.default.bool.isRequired,
               onClick: _propTypes.default.func,
               shouldItemUpdate: _propTypes.default.func,
-              renderItem: _propTypes.default.func.isRequired
+              renderItem: _propTypes.default.func.isRequired,
             };
           }
 
@@ -310,16 +345,23 @@
           }
 
           shouldComponentUpdate(nextProps) {
-            return this.props.item !== nextProps.item || this.props.shouldItemUpdate && this.props.shouldItemUpdate(this.props.item, nextProps.item) || this.props.focused !== nextProps.focused || this.props.expanded !== nextProps.expanded;
+            return (
+              this.props.item !== nextProps.item ||
+              (this.props.shouldItemUpdate &&
+                this.props.shouldItemUpdate(this.props.item, nextProps.item)) ||
+              this.props.focused !== nextProps.focused ||
+              this.props.expanded !== nextProps.expanded
+            );
           }
           /**
            * Get a list of all elements that are focusable with a keyboard inside the
            * tree node.
            */
 
-
           getFocusableElements() {
-            return this.treeNodeRef.current ? Array.from(this.treeNodeRef.current.querySelectorAll(FOCUSABLE_SELECTOR)) : [];
+            return this.treeNodeRef.current
+              ? Array.from(this.treeNodeRef.current.querySelectorAll(FOCUSABLE_SELECTOR))
+              : [];
           }
           /**
            * Wrap and move keyboard focus to first/last focusable element inside the
@@ -330,7 +372,6 @@
            * @param  {Boolean} back     direction
            * @return {Boolean}          true there is a newly focused element.
            */
-
 
           _wrapMoveFocus(current, back) {
             const elms = this.getFocusableElements();
@@ -354,11 +395,7 @@
           }
 
           _onKeyDown(e) {
-            const {
-              target,
-              key,
-              shiftKey
-            } = e;
+            const { target, key, shiftKey } = e;
 
             if (key !== "Tab") {
               return;
@@ -384,12 +421,14 @@
               active,
               expanded,
               renderItem,
-              isExpandable
+              isExpandable,
             } = this.props;
-            const arrow = isExpandable ? ArrowExpanderFactory({
-              item,
-              expanded
-            }) : null;
+            const arrow = isExpandable
+              ? ArrowExpanderFactory({
+                  item,
+                  expanded,
+                })
+              : null;
             let ariaExpanded;
 
             if (this.props.isExpandable) {
@@ -400,29 +439,34 @@
               ariaExpanded = true;
             }
 
-            const indents = Array.from({
-              length: depth
-            }, (_, i) => {
-              if (i == depth - 1) {
-                return treeLastIndent;
+            const indents = Array.from(
+              {
+                length: depth,
+              },
+              (_, i) => {
+                if (i == depth - 1) {
+                  return treeLastIndent;
+                }
+
+                return treeIndent;
               }
-
-              return treeIndent;
-            });
+            );
             const items = indents.concat(renderItem(item, depth, focused, arrow, expanded));
-            return _reactDomFactories.default.div({
-              id,
-              className: `tree-node${focused ? " focused" : ""}${active ? " active" : ""}`,
-              onClick: this.props.onClick,
-              onKeyDownCapture: active ? this._onKeyDown : null,
-              role: "treeitem",
-              ref: this.treeNodeRef,
-              "aria-level": depth + 1,
-              "aria-expanded": ariaExpanded,
-              "data-expandable": this.props.isExpandable
-            }, ...items);
+            return _reactDomFactories.default.div(
+              {
+                id,
+                className: `tree-node${focused ? " focused" : ""}${active ? " active" : ""}`,
+                onClick: this.props.onClick,
+                onKeyDownCapture: active ? this._onKeyDown : null,
+                role: "treeitem",
+                ref: this.treeNodeRef,
+                "aria-level": depth + 1,
+                "aria-expanded": ariaExpanded,
+                "data-expandable": this.props.isExpandable,
+              },
+              ...items
+            );
           }
-
         }
 
         const ArrowExpanderFactory = createFactory(ArrowExpander);
@@ -438,9 +482,7 @@
          * @returns {Function}
          */
 
-        function oncePerAnimationFrame(fn, {
-          getDocument
-        }) {
+        function oncePerAnimationFrame(fn, { getDocument }) {
           let animationId = null;
           let argsToPass = null;
           return function (...args) {
@@ -538,7 +580,6 @@
          *       }
          *     }
          */
-
 
         class Tree extends Component {
           static get propTypes() {
@@ -673,27 +714,28 @@
               // style object to be applied to the root element.
               style: _propTypes.default.object,
               // Prevents blur when Tree loses focus
-              preventBlur: _propTypes.default.bool
+              preventBlur: _propTypes.default.bool,
             };
           }
 
           static get defaultProps() {
             return {
               autoExpandDepth: AUTO_EXPAND_DEPTH,
-              autoExpandAll: true
+              autoExpandAll: true,
             };
           }
 
           constructor(props) {
             super(props);
             this.state = {
-              autoExpanded: new Set()
+              autoExpanded: new Set(),
             };
             this.treeRef = _react.default.createRef();
 
-            const opaf = fn => oncePerAnimationFrame(fn, {
-              getDocument: () => this.treeRef.current && this.treeRef.current.ownerDocument
-            });
+            const opaf = fn =>
+              oncePerAnimationFrame(fn, {
+                getDocument: () => this.treeRef.current && this.treeRef.current.ownerDocument,
+              });
 
             this._onExpand = opaf(this._onExpand).bind(this);
             this._onCollapse = opaf(this._onCollapse).bind(this);
@@ -734,11 +776,7 @@
           }
 
           _autoExpand() {
-            const {
-              autoExpandDepth,
-              autoExpandNodeChildrenLimit,
-              initiallyExpanded
-            } = this.props;
+            const { autoExpandDepth, autoExpandNodeChildrenLimit, initiallyExpanded } = this.props;
 
             if (!autoExpandDepth && !initiallyExpanded) {
               return;
@@ -746,7 +784,6 @@
             // not use the usual DFS infrastructure because we don't want to ignore
             // collapsed nodes. Any initially expanded items will be expanded regardless
             // of how deep they are.
-
 
             const autoExpand = (item, currentDepth) => {
               const initial = initiallyExpanded && initiallyExpanded(item);
@@ -757,7 +794,11 @@
 
               const children = this.props.getChildren(item);
 
-              if (!initial && autoExpandNodeChildrenLimit && children.length > autoExpandNodeChildrenLimit) {
+              if (
+                !initial &&
+                autoExpandNodeChildrenLimit &&
+                children.length > autoExpandNodeChildrenLimit
+              ) {
                 return;
               }
 
@@ -823,11 +864,10 @@
            * Perform a pre-order depth-first search from item.
            */
 
-
           _dfs(item, maxDepth = Infinity, traversal = [], _depth = 0) {
             traversal.push({
               item,
-              depth: _depth
+              depth: _depth,
             });
 
             if (!this.props.isExpanded(item)) {
@@ -853,7 +893,6 @@
            * Perform a pre-order depth-first search over the whole forest.
            */
 
-
           _dfsFromRoots(maxDepth = Infinity) {
             const traversal = [];
             const roots = this.props.getRoots();
@@ -871,7 +910,6 @@
            * @param {Object} item
            * @param {Boolean} expandAllChildren
            */
-
 
           _onExpand(item, expandAllChildren) {
             if (this.props.onExpand) {
@@ -894,7 +932,6 @@
            * @param {Object} item
            */
 
-
           _onCollapse(item) {
             if (this.props.onCollapse) {
               this.props.onCollapse(item);
@@ -913,11 +950,8 @@
            *                 the element is off canvas.
            */
 
-
           _focus(item, options = {}) {
-            const {
-              preventAutoScroll
-            } = options;
+            const { preventAutoScroll } = options;
 
             if (item && !preventAutoScroll) {
               this._scrollNodeIntoView(item, options);
@@ -944,7 +978,6 @@
            *        The item to be activated, or undefined to activate no item.
            */
 
-
           _activate(item) {
             if (this.props.onActivate) {
               this.props.onActivate(item);
@@ -963,7 +996,6 @@
            *                 the element is off canvas.
            */
 
-
           _scrollNodeIntoView(item, options = {}) {
             if (item !== undefined) {
               const treeElement = this.treeRef.current;
@@ -971,10 +1003,7 @@
               const element = doc.getElementById(this.props.getKey(item));
 
               if (element) {
-                const {
-                  top,
-                  bottom
-                } = element.getBoundingClientRect();
+                const { top, bottom } = element.getBoundingClientRect();
 
                 const closestScrolledParent = node => {
                   if (node == null) {
@@ -989,14 +1018,18 @@
                 };
 
                 const scrolledParent = closestScrolledParent(treeElement);
-                const scrolledParentRect = scrolledParent ? scrolledParent.getBoundingClientRect() : null;
-                const isVisible = !scrolledParent || top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom;
+                const scrolledParentRect = scrolledParent
+                  ? scrolledParent.getBoundingClientRect()
+                  : null;
+                const isVisible =
+                  !scrolledParent ||
+                  (top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom);
 
                 if (!isVisible) {
-                  const {
-                    alignTo
-                  } = options;
-                  const scrollToTop = alignTo ? alignTo === "top" : !scrolledParentRect || top < scrolledParentRect.top;
+                  const { alignTo } = options;
+                  const scrollToTop = alignTo
+                    ? alignTo === "top"
+                    : !scrolledParentRect || top < scrolledParentRect.top;
                   element.scrollIntoView(scrollToTop);
                 }
               }
@@ -1006,12 +1039,9 @@
            * Sets the state to have no focused item.
            */
 
-
           _onBlur(e) {
             if (this.props.active != undefined) {
-              const {
-                relatedTarget
-              } = e;
+              const { relatedTarget } = e;
 
               if (!this.treeRef.current.contains(relatedTarget)) {
                 this._activate(undefined);
@@ -1027,12 +1057,10 @@
            */
           // eslint-disable-next-line complexity
 
-
           _onKeyDown(e) {
             if (this.props.focused == null) {
               return;
             } // Allow parent nodes to use navigation arrows with modifiers.
-
 
             if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey) {
               return;
@@ -1054,7 +1082,10 @@
                 return;
 
               case "ArrowLeft":
-                if (this.props.isExpanded(this.props.focused) && this._nodeIsExpandable(this.props.focused)) {
+                if (
+                  this.props.isExpanded(this.props.focused) &&
+                  this._nodeIsExpandable(this.props.focused)
+                ) {
                   this._onCollapse(this.props.focused);
                 } else {
                   this._focusParentNode();
@@ -1063,7 +1094,10 @@
                 return;
 
               case "ArrowRight":
-                if (this._nodeIsExpandable(this.props.focused) && !this.props.isExpanded(this.props.focused)) {
+                if (
+                  this._nodeIsExpandable(this.props.focused) &&
+                  !this.props.isExpanded(this.props.focused)
+                ) {
                   this._onExpand(this.props.focused);
                 } else {
                   this._focusNextNode();
@@ -1103,13 +1137,11 @@
                 if (this.treeRef.current !== doc.activeElement) {
                   this.treeRef.current.focus();
                 }
-
             }
           }
           /**
            * Sets the previous node relative to the currently focused item, to focused.
            */
-
 
           _focusPrevNode() {
             // Start a depth first search and keep going until we reach the currently
@@ -1136,14 +1168,13 @@
             }
 
             this._focus(prev, {
-              alignTo: "top"
+              alignTo: "top",
             });
           }
           /**
            * Handles the down arrow key which will focus either the next child
            * or sibling row.
            */
-
 
           _focusNextNode() {
             // Start a depth first search and keep going until we reach the currently
@@ -1164,7 +1195,7 @@
 
             if (i + 1 < traversal.length) {
               this._focus(traversal[i + 1].item, {
-                alignTo: "bottom"
+                alignTo: "bottom",
               });
             }
           }
@@ -1172,7 +1203,6 @@
            * Handles the left arrow key, going back up to the current rows'
            * parent row.
            */
-
 
           _focusParentNode() {
             const parent = this.props.getParent(this.props.focused);
@@ -1184,7 +1214,7 @@
             }
 
             this._focus(parent, {
-              alignTo: "top"
+              alignTo: "top",
             });
           }
 
@@ -1192,7 +1222,7 @@
             const traversal = this._dfsFromRoots();
 
             this._focus(traversal[0].item, {
-              alignTo: "top"
+              alignTo: "top",
             });
           }
 
@@ -1202,26 +1232,22 @@
             const lastIndex = traversal.length - 1;
 
             this._focus(traversal[lastIndex].item, {
-              alignTo: "bottom"
+              alignTo: "bottom",
             });
           }
 
           _nodeIsExpandable(item) {
-            return this.props.isExpandable ? this.props.isExpandable(item) : !!this.props.getChildren(item).length;
+            return this.props.isExpandable
+              ? this.props.isExpandable(item)
+              : !!this.props.getChildren(item).length;
           }
 
           render() {
             const traversal = this._dfsFromRoots();
 
-            const {
-              active,
-              focused
-            } = this.props;
+            const { active, focused } = this.props;
             const nodes = traversal.map((v, i) => {
-              const {
-                item,
-                depth
-              } = traversal[i];
+              const { item, depth } = traversal[i];
               const key = this.props.getKey(item, i);
               return TreeNodeFactory({
                 // We make a key unique depending on whether the tree node is in active
@@ -1247,7 +1273,7 @@
                   // it should be scrolled into view.
 
                   this._focus(item, {
-                    preventAutoScroll: true
+                    preventAutoScroll: true,
                   });
 
                   if (this.props.isExpanded(item)) {
@@ -1256,68 +1282,75 @@
                     this.props.onExpand(item, e.altKey);
                   } // Focus should always remain on the tree container itself.
 
-
                   this.treeRef.current.focus();
-                }
+                },
               });
             });
             const style = Object.assign({}, this.props.style || {});
-            return _reactDomFactories.default.div({
-              className: `tree ${this.props.className ? this.props.className : ""}`,
-              ref: this.treeRef,
-              role: "tree",
-              tabIndex: "0",
-              onKeyDown: this._onKeyDown,
-              onKeyPress: this._preventArrowKeyScrolling,
-              onKeyUp: this._preventArrowKeyScrolling,
-              onFocus: ({
-                nativeEvent
-              }) => {
-                if (focused || !nativeEvent || !this.treeRef.current) {
-                  return;
-                }
+            return _reactDomFactories.default.div(
+              {
+                className: `tree ${this.props.className ? this.props.className : ""}`,
+                ref: this.treeRef,
+                role: "tree",
+                tabIndex: "0",
+                onKeyDown: this._onKeyDown,
+                onKeyPress: this._preventArrowKeyScrolling,
+                onKeyUp: this._preventArrowKeyScrolling,
+                onFocus: ({ nativeEvent }) => {
+                  if (focused || !nativeEvent || !this.treeRef.current) {
+                    return;
+                  }
 
-                const {
-                  explicitOriginalTarget
-                } = nativeEvent; // Only set default focus to the first tree node if the focus came
-                // from outside the tree (e.g. by tabbing to the tree from other
-                // external elements).
+                  const { explicitOriginalTarget } = nativeEvent; // Only set default focus to the first tree node if the focus came
+                  // from outside the tree (e.g. by tabbing to the tree from other
+                  // external elements).
 
-                if (explicitOriginalTarget !== this.treeRef.current && !this.treeRef.current.contains(explicitOriginalTarget)) {
-                  this._focus(traversal[0].item);
-                }
+                  if (
+                    explicitOriginalTarget !== this.treeRef.current &&
+                    !this.treeRef.current.contains(explicitOriginalTarget)
+                  ) {
+                    this._focus(traversal[0].item);
+                  }
+                },
+                onBlur: this._onBlur,
+                "aria-label": this.props.label,
+                "aria-labelledby": this.props.labelledby,
+                "aria-activedescendant": focused && this.props.getKey(focused),
+                style,
               },
-              onBlur: this._onBlur,
-              "aria-label": this.props.label,
-              "aria-labelledby": this.props.labelledby,
-              "aria-activedescendant": focused && this.props.getKey(focused),
-              style
-            }, nodes);
+              nodes
+            );
           }
-
         }
 
         var _default = Tree;
         exports.default = _default;
 
         /***/
-      }),
+      },
 
-/***/ 110:
-/***/ (function (module, exports) {
-
+      /***/ 110: /***/ function (module, exports) {
         // removed by extract-text-webpack-plugin
-
         /***/
-      }),
+      },
 
-/***/ 111:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 111: /***/ function (module, exports, __webpack_require__) {
         (function () {
-          var computeScore, countDir, file_coeff, getExtension, getExtensionScore, isMatch, scorePath, scoreSize, tau_depth, _ref;
+          var computeScore,
+            countDir,
+            file_coeff,
+            getExtension,
+            getExtensionScore,
+            isMatch,
+            scorePath,
+            scoreSize,
+            tau_depth,
+            _ref;
 
-          _ref = __webpack_require__(66), isMatch = _ref.isMatch, computeScore = _ref.computeScore, scoreSize = _ref.scoreSize;
+          (_ref = __webpack_require__(66)),
+            (isMatch = _ref.isMatch),
+            (computeScore = _ref.computeScore),
+            (scoreSize = _ref.scoreSize);
 
           tau_depth = 20;
 
@@ -1325,7 +1358,7 @@
 
           exports.score = function (string, query, options) {
             var allowErrors, preparedQuery, score, string_lw;
-            preparedQuery = options.preparedQuery, allowErrors = options.allowErrors;
+            (preparedQuery = options.preparedQuery), (allowErrors = options.allowErrors);
             if (!(allowErrors || isMatch(string, preparedQuery.core_lw, preparedQuery.core_up))) {
               return 0;
             }
@@ -1336,11 +1369,22 @@
           };
 
           scorePath = function (subject, subject_lw, fullPathScore, options) {
-            var alpha, basePathScore, basePos, depth, end, extAdjust, fileLength, pathSeparator, preparedQuery, useExtensionBonus;
+            var alpha,
+              basePathScore,
+              basePos,
+              depth,
+              end,
+              extAdjust,
+              fileLength,
+              pathSeparator,
+              preparedQuery,
+              useExtensionBonus;
             if (fullPathScore === 0) {
               return 0;
             }
-            preparedQuery = options.preparedQuery, useExtensionBonus = options.useExtensionBonus, pathSeparator = options.pathSeparator;
+            (preparedQuery = options.preparedQuery),
+              (useExtensionBonus = options.useExtensionBonus),
+              (pathSeparator = options.pathSeparator);
             end = subject.length - 1;
             while (subject[end] === pathSeparator) {
               end--;
@@ -1359,9 +1403,20 @@
             while (basePos > -1 && depth-- > 0) {
               basePos = subject.lastIndexOf(pathSeparator, basePos - 1);
             }
-            basePathScore = basePos === -1 ? fullPathScore : extAdjust * computeScore(subject.slice(basePos + 1, end + 1), subject_lw.slice(basePos + 1, end + 1), preparedQuery);
-            alpha = 0.5 * tau_depth / (tau_depth + countDir(subject, end + 1, pathSeparator));
-            return alpha * basePathScore + (1 - alpha) * fullPathScore * scoreSize(0, file_coeff * fileLength);
+            basePathScore =
+              basePos === -1
+                ? fullPathScore
+                : extAdjust *
+                  computeScore(
+                    subject.slice(basePos + 1, end + 1),
+                    subject_lw.slice(basePos + 1, end + 1),
+                    preparedQuery
+                  );
+            alpha = (0.5 * tau_depth) / (tau_depth + countDir(subject, end + 1, pathSeparator));
+            return (
+              alpha * basePathScore +
+              (1 - alpha) * fullPathScore * scoreSize(0, file_coeff * fileLength)
+            );
           };
 
           exports.countDir = countDir = function (path, end, pathSeparator) {
@@ -1422,41 +1477,35 @@
             }
             return matched / m;
           };
-
-        }).call(this);
-
+        }.call(this));
 
         /***/
-      }),
+      },
 
-/***/ 112:
-/***/ (function (module, exports) {
-
+      /***/ 112: /***/ function (module, exports) {
         module.exports = __WEBPACK_EXTERNAL_MODULE_112__;
 
         /***/
-      }),
+      },
 
-/***/ 13:
-/***/ (function (module, exports) {
-
+      /***/ 13: /***/ function (module, exports) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
         function networkRequest(url, opts) {
           return fetch(url, {
-            cache: opts.loadFromCache ? "default" : "no-cache"
+            cache: opts.loadFromCache ? "default" : "no-cache",
           }).then(res => {
             if (res.status >= 200 && res.status < 300) {
               if (res.headers.get("Content-Type") === "application/wasm") {
                 return res.arrayBuffer().then(buffer => ({
                   content: buffer,
-                  isDwarf: true
+                  isDwarf: true,
                 }));
               }
 
               return res.text().then(text => ({
-                content: text
+                content: text,
               }));
             }
 
@@ -1467,11 +1516,9 @@
         module.exports = networkRequest;
 
         /***/
-      }),
+      },
 
-/***/ 14:
-/***/ (function (module, exports) {
-
+      /***/ 14: /***/ function (module, exports) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
@@ -1498,9 +1545,7 @@
             this.worker = null;
           },
 
-          task(method, {
-            queue = false
-          } = {}) {
+          task(method, { queue = false } = {}) {
             const calls = [];
 
             const push = args => {
@@ -1529,12 +1574,10 @@
               this.worker.postMessage({
                 id,
                 method,
-                calls: items.map(item => item[0])
+                calls: items.map(item => item[0]),
               });
 
-              const listener = ({
-                data: result
-              }) => {
+              const listener = ({ data: result }) => {
                 if (result.id !== id) {
                   return;
                 }
@@ -1565,37 +1608,37 @@
 
           invoke(method, ...args) {
             return this.task(method)(...args);
-          }
-
+          },
         };
 
         function workerHandler(publicInterface) {
           return function (msg) {
-            const {
-              id,
-              method,
-              calls
-            } = msg.data;
-            Promise.all(calls.map(args => {
-              try {
-                const response = publicInterface[method].apply(undefined, args);
+            const { id, method, calls } = msg.data;
+            Promise.all(
+              calls.map(args => {
+                try {
+                  const response = publicInterface[method].apply(undefined, args);
 
-                if (response instanceof Promise) {
-                  return response.then(val => ({
-                    response: val
-                  }), err => asErrorMessage(err));
+                  if (response instanceof Promise) {
+                    return response.then(
+                      val => ({
+                        response: val,
+                      }),
+                      err => asErrorMessage(err)
+                    );
+                  }
+
+                  return {
+                    response,
+                  };
+                } catch (error) {
+                  return asErrorMessage(error);
                 }
-
-                return {
-                  response
-                };
-              } catch (error) {
-                return asErrorMessage(error);
-              }
-            })).then(results => {
+              })
+            ).then(results => {
               self.postMessage({
                 id,
-                results
+                results,
               });
             });
           };
@@ -1608,28 +1651,26 @@
             return {
               error: true,
               message: error.message,
-              metadata: error.metadata
+              metadata: error.metadata,
             };
           }
 
           return {
             error: true,
             message: error == null ? error : error.toString(),
-            metadata: undefined
+            metadata: undefined,
           };
         }
 
         module.exports = {
           WorkerDispatcher,
-          workerHandler
+          workerHandler,
         };
 
         /***/
-      }),
+      },
 
-/***/ 15:
-/***/ (function (module, exports) {
-
+      /***/ 15: /***/ function (module, exports) {
         var g;
 
         // This works in non-strict mode
@@ -1642,8 +1683,7 @@
           g = g || Function("return this")() || (1, eval)("this");
         } catch (e) {
           // This works if the window reference is available
-          if (typeof window === "object")
-            g = window;
+          if (typeof window === "object") g = window;
         }
 
         // g can still be undefined, but nothing to do about it...
@@ -1652,25 +1692,18 @@
 
         module.exports = g;
 
-
         /***/
-      }),
+      },
 
-/***/ 183:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 183: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-        const {
-          PrefsHelper
-        } = __webpack_require__(424);
+        const { PrefsHelper } = __webpack_require__(424);
 
         const KeyShortcuts = __webpack_require__(425);
 
-        const {
-          ZoomKeys
-        } = __webpack_require__(426);
+        const { ZoomKeys } = __webpack_require__(426);
 
         const EventEmitter = __webpack_require__(65);
 
@@ -1682,11 +1715,7 @@
 
         const Telemetry = __webpack_require__(429);
 
-        const {
-          getUnicodeHostname,
-          getUnicodeUrlPath,
-          getUnicodeUrl
-        } = __webpack_require__(430);
+        const { getUnicodeHostname, getUnicodeUrlPath, getUnicodeUrl } = __webpack_require__(430);
 
         const PluralForm = __webpack_require__(501);
 
@@ -1705,24 +1734,33 @@
           getUnicodeUrlPath,
           getUnicodeUrl,
           PluralForm,
-          saveAs
+          saveAs,
         };
 
         /***/
-      }),
+      },
 
-/***/ 184:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 184: /***/ function (module, exports, __webpack_require__) {
         (function () {
-          var Query, coreChars, countDir, getCharCodes, getExtension, opt_char_re, truncatedUpperCase, _ref;
+          var Query,
+            coreChars,
+            countDir,
+            getCharCodes,
+            getExtension,
+            opt_char_re,
+            truncatedUpperCase,
+            _ref;
 
-          _ref = __webpack_require__(111), countDir = _ref.countDir, getExtension = _ref.getExtension;
+          (_ref = __webpack_require__(111)),
+            (countDir = _ref.countDir),
+            (getExtension = _ref.getExtension);
 
           module.exports = Query = (function () {
             function Query(query, _arg) {
               var optCharRegEx, pathSeparator, _ref1;
-              _ref1 = _arg != null ? _arg : {}, optCharRegEx = _ref1.optCharRegEx, pathSeparator = _ref1.pathSeparator;
+              (_ref1 = _arg != null ? _arg : {}),
+                (optCharRegEx = _ref1.optCharRegEx),
+                (pathSeparator = _ref1.pathSeparator);
               if (!(query && query.length)) {
                 return null;
               }
@@ -1737,7 +1775,6 @@
             }
 
             return Query;
-
           })();
 
           opt_char_re = /[ _\-:\/\\]/g;
@@ -1746,7 +1783,7 @@
             if (optCharRegEx == null) {
               optCharRegEx = opt_char_re;
             }
-            return query.replace(optCharRegEx, '');
+            return query.replace(optCharRegEx, "");
           };
 
           truncatedUpperCase = function (str) {
@@ -1769,21 +1806,16 @@
             }
             return charCodes;
           };
-
-        }).call(this);
-
+        }.call(this));
 
         /***/
-      }),
+      },
 
-/***/ 185:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 185: /***/ function (module, exports, __webpack_require__) {
         "use strict";
 
-
         Object.defineProperty(exports, "__esModule", {
-          value: true
+          value: true,
         });
         exports.default = void 0;
 
@@ -1795,7 +1827,9 @@
 
         var _tabList = _interopRequireDefault(__webpack_require__(441));
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
         class TabList extends _react.default.Component {
           constructor(props) {
@@ -1818,13 +1852,13 @@
             if (vertical) {
               return {
                 ArrowDown: this.next.bind(this),
-                ArrowUp: this.previous.bind(this)
+                ArrowUp: this.previous.bind(this),
               };
             }
 
             return {
               ArrowLeft: this.previous.bind(this),
-              ArrowRight: this.next.bind(this)
+              ArrowRight: this.next.bind(this),
             };
           }
 
@@ -1853,33 +1887,30 @@
           }
 
           render() {
-            const {
-              accessibleId,
-              activeIndex,
-              children,
-              className,
-              onActivateTab
-            } = this.props;
-            return _react.default.createElement("ul", {
-              className: className,
-              onKeyUp: this.handleKeyPress,
-              role: "tablist"
-            }, _react.default.Children.map(children, (child, index) => {
-              if (child.type !== _tab.default) {
-                throw new Error('Direct children of a <TabList> must be a <Tab>');
-              }
+            const { accessibleId, activeIndex, children, className, onActivateTab } = this.props;
+            return _react.default.createElement(
+              "ul",
+              {
+                className: className,
+                onKeyUp: this.handleKeyPress,
+                role: "tablist",
+              },
+              _react.default.Children.map(children, (child, index) => {
+                if (child.type !== _tab.default) {
+                  throw new Error("Direct children of a <TabList> must be a <Tab>");
+                }
 
-              const active = index === activeIndex;
-              const tabRef = this.tabRefs[index];
-              return _react.default.cloneElement(child, {
-                accessibleId: active ? accessibleId : undefined,
-                active,
-                tabRef,
-                onActivate: () => onActivateTab(index)
-              });
-            }));
+                const active = index === activeIndex;
+                const tabRef = this.tabRefs[index];
+                return _react.default.cloneElement(child, {
+                  accessibleId: active ? accessibleId : undefined,
+                  active,
+                  tabRef,
+                  onActivate: () => onActivateTab(index),
+                });
+              })
+            );
           }
-
         }
 
         exports.default = TabList;
@@ -1889,28 +1920,25 @@
           children: _propTypes.default.node,
           className: _propTypes.default.string,
           onActivateTab: _propTypes.default.func,
-          vertical: _propTypes.default.bool
+          vertical: _propTypes.default.bool,
         };
         TabList.defaultProps = {
           accessibleId: undefined,
           activeIndex: 0,
           children: null,
           className: _tabList.default.container,
-          onActivateTab: () => { },
-          vertical: false
+          onActivateTab: () => {},
+          vertical: false,
         };
 
         /***/
-      }),
+      },
 
-/***/ 186:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 186: /***/ function (module, exports, __webpack_require__) {
         "use strict";
 
-
         Object.defineProperty(exports, "__esModule", {
-          value: true
+          value: true,
         });
         exports.default = Tab;
 
@@ -1922,26 +1950,25 @@
 
         var _tab = _interopRequireDefault(__webpack_require__(440));
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
-        function Tab({
-          accessibleId,
-          active,
-          children,
-          className,
-          onActivate,
-          tabRef
-        }) {
-          return _react.default.createElement("li", {
-            "aria-selected": active,
-            className: className,
-            id: accessibleId,
-            onClick: onActivate,
-            onKeyDown: () => { },
-            ref: tabRef,
-            role: "tab",
-            tabIndex: active ? 0 : undefined
-          }, children);
+        function Tab({ accessibleId, active, children, className, onActivate, tabRef }) {
+          return _react.default.createElement(
+            "li",
+            {
+              "aria-selected": active,
+              className: className,
+              id: accessibleId,
+              onClick: onActivate,
+              onKeyDown: () => {},
+              ref: tabRef,
+              role: "tab",
+              tabIndex: active ? 0 : undefined,
+            },
+            children
+          );
         }
 
         Tab.propTypes = {
@@ -1950,27 +1977,24 @@
           children: _propTypes.default.node.isRequired,
           className: _propTypes.default.string,
           onActivate: _propTypes.default.func,
-          tabRef: _ref.default
+          tabRef: _ref.default,
         };
         Tab.defaultProps = {
           accessibleId: undefined,
           active: false,
           className: _tab.default.container,
           onActivate: undefined,
-          tabRef: undefined
+          tabRef: undefined,
         };
 
         /***/
-      }),
+      },
 
-/***/ 187:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 187: /***/ function (module, exports, __webpack_require__) {
         "use strict";
 
-
         Object.defineProperty(exports, "__esModule", {
-          value: true
+          value: true,
         });
         exports.default = TabPanels;
 
@@ -1978,21 +2002,27 @@
 
         var _react = _interopRequireDefault(__webpack_require__(6));
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
         function TabPanels({
           accessibleId,
           activeIndex,
           children,
           className,
-          hasFocusableContent
+          hasFocusableContent,
         }) {
-          return _react.default.createElement("div", {
-            "aria-labelledby": accessibleId,
-            role: "tabpanel",
-            className: className,
-            tabIndex: hasFocusableContent ? undefined : 0
-          }, _react.default.Children.toArray(children)[activeIndex]);
+          return _react.default.createElement(
+            "div",
+            {
+              "aria-labelledby": accessibleId,
+              role: "tabpanel",
+              className: className,
+              tabIndex: hasFocusableContent ? undefined : 0,
+            },
+            _react.default.Children.toArray(children)[activeIndex]
+          );
         }
 
         TabPanels.propTypes = {
@@ -2000,23 +2030,21 @@
           activeIndex: _propTypes.default.number,
           children: _propTypes.default.node.isRequired,
           className: _propTypes.default.string,
-          hasFocusableContent: _propTypes.default.bool.isRequired
+          hasFocusableContent: _propTypes.default.bool.isRequired,
         };
         TabPanels.defaultProps = {
           accessibleId: undefined,
           activeIndex: 0,
-          className: null
+          className: null,
         };
 
         /***/
-      }),
+      },
 
-/***/ 22:
-/***/ (function (module, exports) {
-
+      /***/ 22: /***/ function (module, exports) {
         module.exports = function (module) {
           if (!module.webpackPolyfill) {
-            module.deprecate = function () { };
+            module.deprecate = function () {};
             module.paths = [];
             // module.parent = undefined by default
             if (!module.children) module.children = [];
@@ -2024,28 +2052,25 @@
               enumerable: true,
               get: function () {
                 return module.l;
-              }
+              },
             });
             Object.defineProperty(module, "id", {
               enumerable: true,
               get: function () {
                 return module.i;
-              }
+              },
             });
             module.webpackPolyfill = 1;
           }
           return module;
         };
 
-
         /***/
-      }),
+      },
 
-/***/ 35:
-/***/ (function (module, exports) {
-
+      /***/ 35: /***/ function (module, exports) {
         // shim for using process in browser
-        var process = module.exports = {};
+        var process = (module.exports = {});
 
         // cached from whatever global is present so that test runners that stub it
         // don't break things.  But we need to wrap it in a try catch in case it is
@@ -2056,14 +2081,14 @@
         var cachedClearTimeout;
 
         function defaultSetTimout() {
-          throw new Error('setTimeout has not been defined');
+          throw new Error("setTimeout has not been defined");
         }
         function defaultClearTimeout() {
-          throw new Error('clearTimeout has not been defined');
+          throw new Error("clearTimeout has not been defined");
         }
         (function () {
           try {
-            if (typeof setTimeout === 'function') {
+            if (typeof setTimeout === "function") {
               cachedSetTimeout = setTimeout;
             } else {
               cachedSetTimeout = defaultSetTimout;
@@ -2072,7 +2097,7 @@
             cachedSetTimeout = defaultSetTimout;
           }
           try {
-            if (typeof clearTimeout === 'function') {
+            if (typeof clearTimeout === "function") {
               cachedClearTimeout = clearTimeout;
             } else {
               cachedClearTimeout = defaultClearTimeout;
@@ -2080,7 +2105,7 @@
           } catch (e) {
             cachedClearTimeout = defaultClearTimeout;
           }
-        }())
+        })();
         function runTimeout(fun) {
           if (cachedSetTimeout === setTimeout) {
             //normal enviroments in sane situations
@@ -2103,8 +2128,6 @@
               return cachedSetTimeout.call(this, fun, 0);
             }
           }
-
-
         }
         function runClearTimeout(marker) {
           if (cachedClearTimeout === clearTimeout) {
@@ -2129,9 +2152,6 @@
               return cachedClearTimeout.call(this, marker);
             }
           }
-
-
-
         }
         var queue = [];
         var draining = false;
@@ -2198,14 +2218,14 @@
         Item.prototype.run = function () {
           this.fun.apply(null, this.array);
         };
-        process.title = 'browser';
+        process.title = "browser";
         process.browser = true;
         process.env = {};
         process.argv = [];
-        process.version = ''; // empty string to avoid regexp issues
+        process.version = ""; // empty string to avoid regexp issues
         process.versions = {};
 
-        function noop() { }
+        function noop() {}
 
         process.on = noop;
         process.addListener = noop;
@@ -2217,47 +2237,44 @@
         process.prependListener = noop;
         process.prependOnceListener = noop;
 
-        process.listeners = function (name) { return [] }
+        process.listeners = function (name) {
+          return [];
+        };
 
         process.binding = function (name) {
-          throw new Error('process.binding is not supported');
+          throw new Error("process.binding is not supported");
         };
 
-        process.cwd = function () { return '/' };
+        process.cwd = function () {
+          return "/";
+        };
         process.chdir = function (dir) {
-          throw new Error('process.chdir is not supported');
+          throw new Error("process.chdir is not supported");
         };
-        process.umask = function () { return 0; };
-
+        process.umask = function () {
+          return 0;
+        };
 
         /***/
-      }),
+      },
 
-/***/ 37:
-/***/ (function (module, exports) {
-
+      /***/ 37: /***/ function (module, exports) {
         module.exports = __WEBPACK_EXTERNAL_MODULE_37__;
 
         /***/
-      }),
+      },
 
-/***/ 413:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 413: /***/ function (module, exports, __webpack_require__) {
         module.exports = __webpack_require__(414);
 
-
         /***/
-      }),
+      },
 
-/***/ 414:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 414: /***/ function (module, exports, __webpack_require__) {
         "use strict";
 
-
         Object.defineProperty(exports, "__esModule", {
-          value: true
+          value: true,
         });
         exports.vendored = void 0;
 
@@ -2285,9 +2302,34 @@
 
         var _lodashMove = _interopRequireDefault(__webpack_require__(449));
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
-        function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+        function _interopRequireWildcard(obj) {
+          if (obj && obj.__esModule) {
+            return obj;
+          } else {
+            var newObj = {};
+            if (obj != null) {
+              for (var key in obj) {
+                if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                  var desc =
+                    Object.defineProperty && Object.getOwnPropertyDescriptor
+                      ? Object.getOwnPropertyDescriptor(obj, key)
+                      : {};
+                  if (desc.get || desc.set) {
+                    Object.defineProperty(newObj, key, desc);
+                  } else {
+                    newObj[key] = obj[key];
+                  }
+                }
+              }
+            }
+            newObj.default = obj;
+            return newObj;
+          }
+        }
 
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -2323,16 +2365,14 @@
           "fuzzaldrin-plus": fuzzaldrinPlus,
           "lodash-move": _lodashMove.default,
           "react-aria-components/src/tabs": reactAriaComponentsTabs,
-          "react-transition-group/Transition": transition
+          "react-transition-group/Transition": transition,
         };
         exports.vendored = vendored;
 
         /***/
-      }),
+      },
 
-/***/ 415:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 415: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -2341,18 +2381,13 @@
         module.exports = feature;
 
         /***/
-      }),
+      },
 
-/***/ 416:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 416: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-        const {
-          get: pick,
-          set: put
-        } = __webpack_require__(417);
+        const { get: pick, set: put } = __webpack_require__(417);
 
         const fs = __webpack_require__(418);
 
@@ -2384,7 +2419,7 @@
           const localConfigPath = path.resolve(relativePath, "../configs/local.json");
           const output = JSON.stringify(config, null, 2);
           fs.writeFileSync(localConfigPath, output, {
-            flag: "w"
+            flag: "w",
           });
           return output;
         }
@@ -2394,32 +2429,25 @@
           setValue,
           getConfig,
           setConfig,
-          updateLocalConfig
+          updateLocalConfig,
         };
 
         /***/
-      }),
+      },
 
-/***/ 417:
-/***/ (function (module, exports) {
-
+      /***/ 417: /***/ function (module, exports) {
         module.exports = __WEBPACK_EXTERNAL_MODULE_417__;
 
         /***/
-      }),
+      },
 
-/***/ 418:
-/***/ (function (module, exports) {
-
-
-
+      /***/ 418: /***/ function (module, exports) {
         /***/
-      }),
+      },
 
-/***/ 419:
-/***/ (function (module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function (process) {// Copyright Joyent, Inc. and other Node contributors.
+      /***/ 419: /***/ function (module, exports, __webpack_require__) {
+        /* WEBPACK VAR INJECTION */ (function (process) {
+          // Copyright Joyent, Inc. and other Node contributors.
           //
           // Permission is hereby granted, free of charge, to any person obtaining a
           // copy of this software and associated documentation files (the
@@ -2449,9 +2477,9 @@
             var up = 0;
             for (var i = parts.length - 1; i >= 0; i--) {
               var last = parts[i];
-              if (last === '.') {
+              if (last === ".") {
                 parts.splice(i, 1);
-              } else if (last === '..') {
+              } else if (last === "..") {
                 parts.splice(i, 1);
                 up++;
               } else if (up) {
@@ -2463,7 +2491,7 @@
             // if the path is allowed to go above the root, restore leading ..s
             if (allowAboveRoot) {
               for (; up--; up) {
-                parts.unshift('..');
+                parts.unshift("..");
               }
             }
 
@@ -2472,8 +2500,7 @@
 
           // Split a filename into [root, dir, basename, ext], unix version
           // 'root' is just a slash, or nothing.
-          var splitPathRe =
-            /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
+          var splitPathRe = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
           var splitPath = function (filename) {
             return splitPathRe.exec(filename).slice(1);
           };
@@ -2481,71 +2508,78 @@
           // path.resolve([from ...], to)
           // posix version
           exports.resolve = function () {
-            var resolvedPath = '',
+            var resolvedPath = "",
               resolvedAbsolute = false;
 
             for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-              var path = (i >= 0) ? arguments[i] : process.cwd();
+              var path = i >= 0 ? arguments[i] : process.cwd();
 
               // Skip empty and invalid entries
-              if (typeof path !== 'string') {
-                throw new TypeError('Arguments to path.resolve must be strings');
+              if (typeof path !== "string") {
+                throw new TypeError("Arguments to path.resolve must be strings");
               } else if (!path) {
                 continue;
               }
 
-              resolvedPath = path + '/' + resolvedPath;
-              resolvedAbsolute = path.charAt(0) === '/';
+              resolvedPath = path + "/" + resolvedPath;
+              resolvedAbsolute = path.charAt(0) === "/";
             }
 
             // At this point the path should be resolved to a full absolute path, but
             // handle relative paths to be safe (might happen when process.cwd() fails)
 
             // Normalize the path
-            resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function (p) {
-              return !!p;
-            }), !resolvedAbsolute).join('/');
+            resolvedPath = normalizeArray(
+              filter(resolvedPath.split("/"), function (p) {
+                return !!p;
+              }),
+              !resolvedAbsolute
+            ).join("/");
 
-            return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+            return (resolvedAbsolute ? "/" : "") + resolvedPath || ".";
           };
 
           // path.normalize(path)
           // posix version
           exports.normalize = function (path) {
             var isAbsolute = exports.isAbsolute(path),
-              trailingSlash = substr(path, -1) === '/';
+              trailingSlash = substr(path, -1) === "/";
 
             // Normalize the path
-            path = normalizeArray(filter(path.split('/'), function (p) {
-              return !!p;
-            }), !isAbsolute).join('/');
+            path = normalizeArray(
+              filter(path.split("/"), function (p) {
+                return !!p;
+              }),
+              !isAbsolute
+            ).join("/");
 
             if (!path && !isAbsolute) {
-              path = '.';
+              path = ".";
             }
             if (path && trailingSlash) {
-              path += '/';
+              path += "/";
             }
 
-            return (isAbsolute ? '/' : '') + path;
+            return (isAbsolute ? "/" : "") + path;
           };
 
           // posix version
           exports.isAbsolute = function (path) {
-            return path.charAt(0) === '/';
+            return path.charAt(0) === "/";
           };
 
           // posix version
           exports.join = function () {
             var paths = Array.prototype.slice.call(arguments, 0);
-            return exports.normalize(filter(paths, function (p, index) {
-              if (typeof p !== 'string') {
-                throw new TypeError('Arguments to path.join must be strings');
-              }
-              return p;
-            }).join('/'));
+            return exports.normalize(
+              filter(paths, function (p, index) {
+                if (typeof p !== "string") {
+                  throw new TypeError("Arguments to path.join must be strings");
+                }
+                return p;
+              }).join("/")
+            );
           };
-
 
           // path.relative(from, to)
           // posix version
@@ -2556,20 +2590,20 @@
             function trim(arr) {
               var start = 0;
               for (; start < arr.length; start++) {
-                if (arr[start] !== '') break;
+                if (arr[start] !== "") break;
               }
 
               var end = arr.length - 1;
               for (; end >= 0; end--) {
-                if (arr[end] !== '') break;
+                if (arr[end] !== "") break;
               }
 
               if (start > end) return [];
               return arr.slice(start, end - start + 1);
             }
 
-            var fromParts = trim(from.split('/'));
-            var toParts = trim(to.split('/'));
+            var fromParts = trim(from.split("/"));
+            var toParts = trim(to.split("/"));
 
             var length = Math.min(fromParts.length, toParts.length);
             var samePartsLength = length;
@@ -2582,16 +2616,16 @@
 
             var outputParts = [];
             for (var i = samePartsLength; i < fromParts.length; i++) {
-              outputParts.push('..');
+              outputParts.push("..");
             }
 
             outputParts = outputParts.concat(toParts.slice(samePartsLength));
 
-            return outputParts.join('/');
+            return outputParts.join("/");
           };
 
-          exports.sep = '/';
-          exports.delimiter = ':';
+          exports.sep = "/";
+          exports.delimiter = ":";
 
           exports.dirname = function (path) {
             var result = splitPath(path),
@@ -2600,7 +2634,7 @@
 
             if (!root && !dir) {
               // No dirname whatsoever
-              return '.';
+              return ".";
             }
 
             if (dir) {
@@ -2611,7 +2645,6 @@
             return root + dir;
           };
 
-
           exports.basename = function (path, ext) {
             var f = splitPath(path)[2];
             // TODO: make this comparison case-insensitive on windows?
@@ -2620,7 +2653,6 @@
             }
             return f;
           };
-
 
           exports.extname = function (path) {
             return splitPath(path)[3];
@@ -2636,23 +2668,23 @@
           }
 
           // String.prototype.substr - negative index don't work in IE8
-          var substr = 'ab'.substr(-1) === 'b'
-            ? function (str, start, len) { return str.substr(start, len) }
-            : function (str, start, len) {
-              if (start < 0) start = str.length + start;
-              return str.substr(start, len);
-            }
-            ;
+          var substr =
+            "ab".substr(-1) === "b"
+              ? function (str, start, len) {
+                  return str.substr(start, len);
+                }
+              : function (str, start, len) {
+                  if (start < 0) start = str.length + start;
+                  return str.substr(start, len);
+                };
 
           /* WEBPACK VAR INJECTION */
-        }.call(exports, __webpack_require__(35)))
+        }.call(exports, __webpack_require__(35)));
 
         /***/
-      }),
+      },
 
-/***/ 420:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 420: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -2743,11 +2775,13 @@
           }
 
           let menu = new Menu();
-          items.filter(item => item.visible === undefined || item.visible === true).forEach(item => {
-            let menuItem = new MenuItem(item);
-            menuItem.submenu = createSubMenu(item.submenu);
-            menu.append(menuItem);
-          });
+          items
+            .filter(item => item.visible === undefined || item.visible === true)
+            .forEach(item => {
+              let menuItem = new MenuItem(item);
+              menuItem.submenu = createSubMenu(item.submenu);
+              menu.append(menuItem);
+            });
 
           if (inToolbox()) {
             menu.popup(evt.screenX, evt.screenY, window.parent.document);
@@ -2773,18 +2807,16 @@
         function showSubMenu(subMenu, menuItemNode, popup) {
           if (subMenu) {
             let subMenuNode = menuItemNode.querySelector("menupopup");
-            let {
-              top
-            } = menuItemNode.getBoundingClientRect();
-            let {
-              left,
-              width
-            } = popup.getBoundingClientRect();
+            let { top } = menuItemNode.getBoundingClientRect();
+            let { left, width } = popup.getBoundingClientRect();
             subMenuNode.style.setProperty("left", `${left + width - 1}px`);
             subMenuNode.style.setProperty("top", `${top}px`);
-            let subMenuItemNodes = menuItemNode.querySelector("menupopup:not(.landing-popup)").childNodes;
+            let subMenuItemNodes = menuItemNode.querySelector("menupopup:not(.landing-popup)")
+              .childNodes;
             subMenuItemNodes.forEach((subMenuItemNode, j) => {
-              let subMenuItem = subMenu.items.filter(item => item.visible === undefined || item.visible === true)[j];
+              let subMenuItem = subMenu.items.filter(
+                item => item.visible === undefined || item.visible === true
+              )[j];
 
               if (!subMenuItem.disabled && subMenuItem.visible) {
                 subMenuItemNode.onclick = () => {
@@ -2797,23 +2829,23 @@
         }
 
         function buildMenu(items) {
-          return items.map(itm => {
-            const hide = typeof itm.hidden === "function" ? itm.hidden() : itm.hidden;
-            return hide ? null : itm.item;
-          }).filter(itm => itm !== null);
+          return items
+            .map(itm => {
+              const hide = typeof itm.hidden === "function" ? itm.hidden() : itm.hidden;
+              return hide ? null : itm.item;
+            })
+            .filter(itm => itm !== null);
         }
 
         module.exports = {
           showMenu,
-          buildMenu
+          buildMenu,
         };
 
         /***/
-      }),
+      },
 
-/***/ 422:
-/***/ (function (module, exports) {
-
+      /***/ 422: /***/ function (module, exports) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -2838,18 +2870,16 @@
           return {
             resolve: resolve,
             reject: reject,
-            promise: promise
+            promise: promise,
           };
         };
 
         module.exports = p;
 
         /***/
-      }),
+      },
 
-/***/ 424:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 424: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -2883,7 +2913,6 @@
          *        An object containing { accessorName: [prefType, prefName, prefDefault] } keys.
          */
 
-
         function PrefsHelper(prefsRoot = "", prefsBlueprint = {}) {
           EventEmitter.decorate(this);
           let cache = new Map();
@@ -2909,7 +2938,6 @@
          * @return any
          */
 
-
         function get(cache, prefType, prefsRoot, prefName) {
           let cachedPref = cache.get(prefName);
 
@@ -2931,7 +2959,6 @@
          * @param any value
          */
 
-
         function set(cache, prefType, prefsRoot, prefName, value) {
           Services.prefs["set" + prefType + "Pref"]([prefsRoot, prefName].join("."), value);
           cache.set(prefName, value);
@@ -2952,19 +2979,29 @@
          * @param array serializer [optional]
          */
 
-
-        function map(self, cache, accessorName, prefType, prefsRoot, prefName, prefDefault, serializer = {
-          in: e => e,
-          out: e => e
-        }) {
+        function map(
+          self,
+          cache,
+          accessorName,
+          prefType,
+          prefsRoot,
+          prefName,
+          prefDefault,
+          serializer = {
+            in: e => e,
+            out: e => e,
+          }
+        ) {
           if (prefName in self) {
-            throw new Error(`Can't use ${prefName} because it overrides a property` + "on the instance.");
+            throw new Error(
+              `Can't use ${prefName} because it overrides a property` + "on the instance."
+            );
           }
 
           if (prefType == "Json") {
             map(self, cache, accessorName, "String", prefsRoot, prefName, prefDefault, {
               in: JSON.parse,
-              out: JSON.stringify
+              out: JSON.stringify,
             });
             return;
           }
@@ -2972,7 +3009,7 @@
           if (prefType == "Float") {
             map(self, cache, accessorName, "Char", prefsRoot, prefName, prefDefault, {
               in: Number.parseFloat,
-              out: n => n + ""
+              out: n => n + "",
             });
             return;
           }
@@ -2982,14 +3019,14 @@
               try {
                 return serializer.in(get(cache, prefType, prefsRoot, prefName));
               } catch (e) {
-                if (typeof prefDefault !== 'undefined') {
+                if (typeof prefDefault !== "undefined") {
                   return prefDefault;
                 }
 
                 throw e;
               }
             },
-            set: e => set(cache, prefType, prefsRoot, prefName, serializer.out(e))
+            set: e => set(cache, prefType, prefsRoot, prefName, serializer.out(e)),
           });
         }
         /**
@@ -3000,7 +3037,6 @@
          * @param object prefsBlueprint
          * @return string
          */
-
 
         function accessorNameForPref(somePrefName, prefsBlueprint) {
           for (let accessorName in prefsBlueprint) {
@@ -3023,7 +3059,6 @@
          * @return object
          */
 
-
         function makeObserver(self, cache, prefsRoot, prefsBlueprint) {
           return {
             register: function () {
@@ -3045,75 +3080,71 @@
 
               cache.delete(prefName);
               self.emit("pref-changed", accessorName, self[accessorName]);
-            }
+            },
           };
         }
 
         exports.PrefsHelper = PrefsHelper;
 
         /***/
-      }),
+      },
 
-/***/ 425:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 425: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-        const {
-          appinfo
-        } = __webpack_require__(37);
+        const { appinfo } = __webpack_require__(37);
 
         const EventEmitter = __webpack_require__(65);
 
         const isOSX = appinfo.OS === "Darwin"; // List of electron keys mapped to DOM API (DOM_VK_*) key code
 
         const ElectronKeysMapping = {
-          "F1": "DOM_VK_F1",
-          "F2": "DOM_VK_F2",
-          "F3": "DOM_VK_F3",
-          "F4": "DOM_VK_F4",
-          "F5": "DOM_VK_F5",
-          "F6": "DOM_VK_F6",
-          "F7": "DOM_VK_F7",
-          "F8": "DOM_VK_F8",
-          "F9": "DOM_VK_F9",
-          "F10": "DOM_VK_F10",
-          "F11": "DOM_VK_F11",
-          "F12": "DOM_VK_F12",
-          "F13": "DOM_VK_F13",
-          "F14": "DOM_VK_F14",
-          "F15": "DOM_VK_F15",
-          "F16": "DOM_VK_F16",
-          "F17": "DOM_VK_F17",
-          "F18": "DOM_VK_F18",
-          "F19": "DOM_VK_F19",
-          "F20": "DOM_VK_F20",
-          "F21": "DOM_VK_F21",
-          "F22": "DOM_VK_F22",
-          "F23": "DOM_VK_F23",
-          "F24": "DOM_VK_F24",
-          "Space": "DOM_VK_SPACE",
-          "Backspace": "DOM_VK_BACK_SPACE",
-          "Delete": "DOM_VK_DELETE",
-          "Insert": "DOM_VK_INSERT",
-          "Return": "DOM_VK_RETURN",
-          "Enter": "DOM_VK_RETURN",
-          "Up": "DOM_VK_UP",
-          "Down": "DOM_VK_DOWN",
-          "Left": "DOM_VK_LEFT",
-          "Right": "DOM_VK_RIGHT",
-          "Home": "DOM_VK_HOME",
-          "End": "DOM_VK_END",
-          "PageUp": "DOM_VK_PAGE_UP",
-          "PageDown": "DOM_VK_PAGE_DOWN",
-          "Escape": "DOM_VK_ESCAPE",
-          "Esc": "DOM_VK_ESCAPE",
-          "Tab": "DOM_VK_TAB",
-          "VolumeUp": "DOM_VK_VOLUME_UP",
-          "VolumeDown": "DOM_VK_VOLUME_DOWN",
-          "VolumeMute": "DOM_VK_VOLUME_MUTE",
-          "PrintScreen": "DOM_VK_PRINTSCREEN"
+          F1: "DOM_VK_F1",
+          F2: "DOM_VK_F2",
+          F3: "DOM_VK_F3",
+          F4: "DOM_VK_F4",
+          F5: "DOM_VK_F5",
+          F6: "DOM_VK_F6",
+          F7: "DOM_VK_F7",
+          F8: "DOM_VK_F8",
+          F9: "DOM_VK_F9",
+          F10: "DOM_VK_F10",
+          F11: "DOM_VK_F11",
+          F12: "DOM_VK_F12",
+          F13: "DOM_VK_F13",
+          F14: "DOM_VK_F14",
+          F15: "DOM_VK_F15",
+          F16: "DOM_VK_F16",
+          F17: "DOM_VK_F17",
+          F18: "DOM_VK_F18",
+          F19: "DOM_VK_F19",
+          F20: "DOM_VK_F20",
+          F21: "DOM_VK_F21",
+          F22: "DOM_VK_F22",
+          F23: "DOM_VK_F23",
+          F24: "DOM_VK_F24",
+          Space: "DOM_VK_SPACE",
+          Backspace: "DOM_VK_BACK_SPACE",
+          Delete: "DOM_VK_DELETE",
+          Insert: "DOM_VK_INSERT",
+          Return: "DOM_VK_RETURN",
+          Enter: "DOM_VK_RETURN",
+          Up: "DOM_VK_UP",
+          Down: "DOM_VK_DOWN",
+          Left: "DOM_VK_LEFT",
+          Right: "DOM_VK_RIGHT",
+          Home: "DOM_VK_HOME",
+          End: "DOM_VK_END",
+          PageUp: "DOM_VK_PAGE_UP",
+          PageDown: "DOM_VK_PAGE_DOWN",
+          Escape: "DOM_VK_ESCAPE",
+          Esc: "DOM_VK_ESCAPE",
+          Tab: "DOM_VK_TAB",
+          VolumeUp: "DOM_VK_VOLUME_UP",
+          VolumeDown: "DOM_VK_VOLUME_DOWN",
+          VolumeMute: "DOM_VK_VOLUME_MUTE",
+          PrintScreen: "DOM_VK_PRINTSCREEN",
         };
         /**
          * Helper to listen for keyboard events decribed in .properties file.
@@ -3132,10 +3163,7 @@
          *        If omitted, we listen for all events fired on `window`.
          */
 
-        function KeyShortcuts({
-          window,
-          target
-        }) {
+        function KeyShortcuts({ window, target }) {
           this.window = window;
           this.target = target || window;
           this.keys = new Map();
@@ -3154,7 +3182,6 @@
          *        https://github.com/electron/electron/blob/master/docs/api/accelerator.md
          */
 
-
         KeyShortcuts.parseElectronKey = function (window, str) {
           let modifiers = str.split("+");
           let key = modifiers.pop();
@@ -3166,7 +3193,7 @@
             // Set for character keys
             key: undefined,
             // Set for non-character keys
-            keyCode: undefined
+            keyCode: undefined,
           };
 
           for (let mod of modifiers) {
@@ -3190,7 +3217,6 @@
             }
           } // Plus is a special case. It's a character key and shouldn't be matched
           // against a keycode as it is only accessible via Shift/Capslock
-
 
           if (key === "Plus") {
             key = "+";
@@ -3265,7 +3291,6 @@
             } // Shift is a special modifier, it may implicitely be required if the
             // expected key is a special character accessible via shift.
 
-
             if (shortcut.shift != event.shiftKey && event.key && event.key.match(/[a-zA-Z]/)) {
               return false;
             }
@@ -3276,12 +3301,14 @@
               return ElectronKeysMapping[event.key] === shortcut.key;
             } // get the key from the keyCode if key is not provided.
 
-
             let key = event.key || String.fromCharCode(event.keyCode); // For character keys, we match if the final character is the expected one.
             // But for digits we also accept indirect match to please azerty keyboard,
             // which requires Shift to be pressed to get digits.
 
-            return key.toLowerCase() == shortcut.key || shortcut.key.match(/^[0-9]$/) && event.keyCode == shortcut.key.charCodeAt(0);
+            return (
+              key.toLowerCase() == shortcut.key ||
+              (shortcut.key.match(/^[0-9]$/) && event.keyCode == shortcut.key.charCodeAt(0))
+            );
           },
 
           handleEvent(event) {
@@ -3312,17 +3339,14 @@
 
           off(key, listener) {
             this.eventEmitter.off(key, listener);
-          }
-
+          },
         };
         module.exports = KeyShortcuts;
 
         /***/
-      }),
+      },
 
-/***/ 426:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 426: /***/ function (module, exports, __webpack_require__) {
         "use strict";
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -3335,14 +3359,12 @@
          * https://developer.mozilla.org/en-US/Firefox/Releases/3/Full_page_zoom
          */
 
-        exports.register = function (window) { };
+        exports.register = function (window) {};
 
         /***/
-      }),
+      },
 
-/***/ 427:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 427: /***/ function (module, exports, __webpack_require__) {
         "use strict";
         /**
          *
@@ -3386,7 +3408,6 @@
          *
          */
 
-
         const DBNAME = "devtools-async-storage";
         const DBVERSION = 1;
         const STORENAME = "keyvaluepairs";
@@ -3421,79 +3442,99 @@
         function getItem(itemKey) {
           return new Promise((resolve, reject) => {
             let req;
-            withStore("readonly", store => {
-              store.transaction.oncomplete = function onComplete() {
-                let value = req.result;
+            withStore(
+              "readonly",
+              store => {
+                store.transaction.oncomplete = function onComplete() {
+                  let value = req.result;
 
-                if (value === undefined) {
-                  value = null;
-                }
+                  if (value === undefined) {
+                    value = null;
+                  }
 
-                resolve(value);
-              };
+                  resolve(value);
+                };
 
-              req = store.get(itemKey);
+                req = store.get(itemKey);
 
-              req.onerror = function getItemOnError() {
-                reject("Error in asyncStorage.getItem(): ", req.error.name);
-              };
-            }, reject);
+                req.onerror = function getItemOnError() {
+                  reject("Error in asyncStorage.getItem(): ", req.error.name);
+                };
+              },
+              reject
+            );
           });
         }
 
         function setItem(itemKey, value) {
           return new Promise((resolve, reject) => {
-            withStore("readwrite", store => {
-              store.transaction.oncomplete = resolve;
-              const req = store.put(value, itemKey);
+            withStore(
+              "readwrite",
+              store => {
+                store.transaction.oncomplete = resolve;
+                const req = store.put(value, itemKey);
 
-              req.onerror = function setItemOnError() {
-                reject("Error in asyncStorage.setItem(): ", req.error.name);
-              };
-            }, reject);
+                req.onerror = function setItemOnError() {
+                  reject("Error in asyncStorage.setItem(): ", req.error.name);
+                };
+              },
+              reject
+            );
           });
         }
 
         function removeItem(itemKey) {
           return new Promise((resolve, reject) => {
-            withStore("readwrite", store => {
-              store.transaction.oncomplete = resolve;
-              const req = store.delete(itemKey);
+            withStore(
+              "readwrite",
+              store => {
+                store.transaction.oncomplete = resolve;
+                const req = store.delete(itemKey);
 
-              req.onerror = function removeItemOnError() {
-                reject("Error in asyncStorage.removeItem(): ", req.error.name);
-              };
-            }, reject);
+                req.onerror = function removeItemOnError() {
+                  reject("Error in asyncStorage.removeItem(): ", req.error.name);
+                };
+              },
+              reject
+            );
           });
         }
 
         function clear() {
           return new Promise((resolve, reject) => {
-            withStore("readwrite", store => {
-              store.transaction.oncomplete = resolve;
-              const req = store.clear();
+            withStore(
+              "readwrite",
+              store => {
+                store.transaction.oncomplete = resolve;
+                const req = store.clear();
 
-              req.onerror = function clearOnError() {
-                reject("Error in asyncStorage.clear(): ", req.error.name);
-              };
-            }, reject);
+                req.onerror = function clearOnError() {
+                  reject("Error in asyncStorage.clear(): ", req.error.name);
+                };
+              },
+              reject
+            );
           });
         }
 
         function length() {
           return new Promise((resolve, reject) => {
             let req;
-            withStore("readonly", store => {
-              store.transaction.oncomplete = function onComplete() {
-                resolve(req.result);
-              };
+            withStore(
+              "readonly",
+              store => {
+                store.transaction.oncomplete = function onComplete() {
+                  resolve(req.result);
+                };
 
-              req = store.count();
+                req = store.count();
 
-              req.onerror = function lengthOnError() {
-                reject("Error in asyncStorage.length(): ", req.error.name);
-              };
-            }, reject);
+                req.onerror = function lengthOnError() {
+                  reject("Error in asyncStorage.length(): ", req.error.name);
+                };
+              },
+              reject
+            );
           });
         }
 
@@ -3505,38 +3546,41 @@
             }
 
             let req;
-            withStore("readonly", store => {
-              store.transaction.oncomplete = function onComplete() {
-                const cursor = req.result;
-                resolve(cursor ? cursor.key : null);
-              };
+            withStore(
+              "readonly",
+              store => {
+                store.transaction.oncomplete = function onComplete() {
+                  const cursor = req.result;
+                  resolve(cursor ? cursor.key : null);
+                };
 
-              let advanced = false;
-              req = store.openCursor();
+                let advanced = false;
+                req = store.openCursor();
 
-              req.onsuccess = function keyOnSuccess() {
-                const cursor = req.result;
+                req.onsuccess = function keyOnSuccess() {
+                  const cursor = req.result;
 
-                if (!cursor) {
-                  // this means there weren"t enough keys
-                  return;
-                }
+                  if (!cursor) {
+                    // this means there weren"t enough keys
+                    return;
+                  }
 
-                if (n === 0 || advanced) {
-                  // Either 1) we have the first key, return it if that's what they
-                  // wanted, or 2) we"ve got the nth key.
-                  return;
-                } // Otherwise, ask the cursor to skip ahead n records
+                  if (n === 0 || advanced) {
+                    // Either 1) we have the first key, return it if that's what they
+                    // wanted, or 2) we"ve got the nth key.
+                    return;
+                  } // Otherwise, ask the cursor to skip ahead n records
 
+                  advanced = true;
+                  cursor.advance(n);
+                };
 
-                advanced = true;
-                cursor.advance(n);
-              };
-
-              req.onerror = function keyOnError() {
-                reject("Error in asyncStorage.key(): ", req.error.name);
-              };
-            }, reject);
+                req.onerror = function keyOnError() {
+                  reject("Error in asyncStorage.key(): ", req.error.name);
+                };
+              },
+              reject
+            );
           });
         }
 
@@ -3548,14 +3592,12 @@
         exports.key = key;
 
         /***/
-      }),
+      },
 
-/***/ 428:
-/***/ (function (module, exports) {
-
+      /***/ 428: /***/ function (module, exports) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
-        * License, v. 2.0. If a copy of the MPL was not distributed with this
-        * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+         * License, v. 2.0. If a copy of the MPL was not distributed with this
+         * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
         // TODO : Localize this (was l10n.getStr("frame.unknownSource"))
         const UNKNOWN_SOURCE_STRING = "(unknown)"; // Character codes used in various parsing helper functions.
 
@@ -3588,14 +3630,14 @@
 
         const gSourceNamesStore = new Map();
         /**
-        * Takes a string and returns an object containing all the properties
-        * available on an URL instance, with additional properties (fileName),
-        * Leverages caching.
-        *
-        * @param {String} location
-        * @return {Object?} An object containing most properties available
-        *                   in https://developer.mozilla.org/en-US/docs/Web/API/URL
-        */
+         * Takes a string and returns an object containing all the properties
+         * available on an URL instance, with additional properties (fileName),
+         * Leverages caching.
+         *
+         * @param {String} location
+         * @return {Object?} An object containing most properties available
+         *                   in https://developer.mozilla.org/en-US/docs/Web/API/URL
+         */
 
         function parseURL(location) {
           let url = gURLStore.get(location);
@@ -3620,14 +3662,16 @@
               hash: url.hash,
               username: url.username,
               password: url.password,
-              origin: url.origin
+              origin: url.origin,
             }; // Definitions:
             // Example: https://foo.com:8888/file.js
             // `hostname`: "foo.com"
             // `host`: "foo.com:8888"
 
             let isChrome = isChromeScheme(location);
-            url.fileName = url.pathname ? url.pathname.slice(url.pathname.lastIndexOf("/") + 1) || "/" : "/";
+            url.fileName = url.pathname
+              ? url.pathname.slice(url.pathname.lastIndexOf("/") + 1) || "/"
+              : "/";
 
             if (isChrome) {
               url.hostname = null;
@@ -3658,7 +3702,6 @@
         *             - "http://page.com/test.js#go?q=query" -> "page.com"
         */
 
-
         function getSourceNames(source) {
           let data = gSourceNamesStore.get(source);
 
@@ -3678,7 +3721,7 @@
               short = `data:${sourceStr.substring(commaIndex + 1)}`.slice(0, 100);
               let result = {
                 short,
-                long: sourceStr
+                long: sourceStr,
               };
               gSourceNamesStore.set(source, result);
               return result;
@@ -3723,7 +3766,7 @@
           let result = {
             short,
             long,
-            host
+            host,
           };
           gSourceNamesStore.set(source, result);
           return result;
@@ -3733,13 +3776,22 @@
         // They are written this way because they are hot. Each frame is checked for
         // being content or chrome when processing the profile.
 
-
         function isColonSlashSlash(location, i = 0) {
-          return location.charCodeAt(++i) === CHAR_CODE_COLON && location.charCodeAt(++i) === CHAR_CODE_SLASH && location.charCodeAt(++i) === CHAR_CODE_SLASH;
+          return (
+            location.charCodeAt(++i) === CHAR_CODE_COLON &&
+            location.charCodeAt(++i) === CHAR_CODE_SLASH &&
+            location.charCodeAt(++i) === CHAR_CODE_SLASH
+          );
         }
 
         function isDataScheme(location, i = 0) {
-          return location.charCodeAt(i) === CHAR_CODE_D && location.charCodeAt(++i) === CHAR_CODE_A && location.charCodeAt(++i) === CHAR_CODE_T && location.charCodeAt(++i) === CHAR_CODE_A && location.charCodeAt(++i) === CHAR_CODE_COLON;
+          return (
+            location.charCodeAt(i) === CHAR_CODE_D &&
+            location.charCodeAt(++i) === CHAR_CODE_A &&
+            location.charCodeAt(++i) === CHAR_CODE_T &&
+            location.charCodeAt(++i) === CHAR_CODE_A &&
+            location.charCodeAt(++i) === CHAR_CODE_COLON
+          );
         }
 
         function isContentScheme(location, i = 0) {
@@ -3748,7 +3800,11 @@
           switch (firstChar) {
             // "http://" or "https://"
             case CHAR_CODE_H:
-              if (location.charCodeAt(++i) === CHAR_CODE_T && location.charCodeAt(++i) === CHAR_CODE_T && location.charCodeAt(++i) === CHAR_CODE_P) {
+              if (
+                location.charCodeAt(++i) === CHAR_CODE_T &&
+                location.charCodeAt(++i) === CHAR_CODE_T &&
+                location.charCodeAt(++i) === CHAR_CODE_P
+              ) {
                 if (location.charCodeAt(i + 1) === CHAR_CODE_S) {
                   ++i;
                 }
@@ -3760,7 +3816,11 @@
             // "file://"
 
             case CHAR_CODE_F:
-              if (location.charCodeAt(++i) === CHAR_CODE_I && location.charCodeAt(++i) === CHAR_CODE_L && location.charCodeAt(++i) === CHAR_CODE_E) {
+              if (
+                location.charCodeAt(++i) === CHAR_CODE_I &&
+                location.charCodeAt(++i) === CHAR_CODE_L &&
+                location.charCodeAt(++i) === CHAR_CODE_E
+              ) {
                 return isColonSlashSlash(location, i);
               }
 
@@ -3768,7 +3828,10 @@
             // "app://"
 
             case CHAR_CODE_A:
-              if (location.charCodeAt(++i) == CHAR_CODE_P && location.charCodeAt(++i) == CHAR_CODE_P) {
+              if (
+                location.charCodeAt(++i) == CHAR_CODE_P &&
+                location.charCodeAt(++i) == CHAR_CODE_P
+              ) {
                 return isColonSlashSlash(location, i);
               }
 
@@ -3776,7 +3839,12 @@
             // "blob:"
 
             case CHAR_CODE_B:
-              if (location.charCodeAt(++i) == CHAR_CODE_L && location.charCodeAt(++i) == CHAR_CODE_O && location.charCodeAt(++i) == CHAR_CODE_B && location.charCodeAt(++i) == CHAR_CODE_COLON) {
+              if (
+                location.charCodeAt(++i) == CHAR_CODE_L &&
+                location.charCodeAt(++i) == CHAR_CODE_O &&
+                location.charCodeAt(++i) == CHAR_CODE_B &&
+                location.charCodeAt(++i) == CHAR_CODE_COLON
+              ) {
                 return isContentScheme(location, i + 1);
               }
 
@@ -3793,7 +3861,13 @@
           switch (firstChar) {
             // "chrome://"
             case CHAR_CODE_C:
-              if (location.charCodeAt(++i) === CHAR_CODE_H && location.charCodeAt(++i) === CHAR_CODE_R && location.charCodeAt(++i) === CHAR_CODE_O && location.charCodeAt(++i) === CHAR_CODE_M && location.charCodeAt(++i) === CHAR_CODE_E) {
+              if (
+                location.charCodeAt(++i) === CHAR_CODE_H &&
+                location.charCodeAt(++i) === CHAR_CODE_R &&
+                location.charCodeAt(++i) === CHAR_CODE_O &&
+                location.charCodeAt(++i) === CHAR_CODE_M &&
+                location.charCodeAt(++i) === CHAR_CODE_E
+              ) {
                 return isColonSlashSlash(location, i);
               }
 
@@ -3801,7 +3875,15 @@
             // "resource://"
 
             case CHAR_CODE_R:
-              if (location.charCodeAt(++i) === CHAR_CODE_E && location.charCodeAt(++i) === CHAR_CODE_S && location.charCodeAt(++i) === CHAR_CODE_O && location.charCodeAt(++i) === CHAR_CODE_U && location.charCodeAt(++i) === CHAR_CODE_R && location.charCodeAt(++i) === CHAR_CODE_C && location.charCodeAt(++i) === CHAR_CODE_E) {
+              if (
+                location.charCodeAt(++i) === CHAR_CODE_E &&
+                location.charCodeAt(++i) === CHAR_CODE_S &&
+                location.charCodeAt(++i) === CHAR_CODE_O &&
+                location.charCodeAt(++i) === CHAR_CODE_U &&
+                location.charCodeAt(++i) === CHAR_CODE_R &&
+                location.charCodeAt(++i) === CHAR_CODE_C &&
+                location.charCodeAt(++i) === CHAR_CODE_E
+              ) {
                 return isColonSlashSlash(location, i);
               }
 
@@ -3809,7 +3891,15 @@
             // "jar:file://"
 
             case CHAR_CODE_J:
-              if (location.charCodeAt(++i) === CHAR_CODE_A && location.charCodeAt(++i) === CHAR_CODE_R && location.charCodeAt(++i) === CHAR_CODE_COLON && location.charCodeAt(++i) === CHAR_CODE_F && location.charCodeAt(++i) === CHAR_CODE_I && location.charCodeAt(++i) === CHAR_CODE_L && location.charCodeAt(++i) === CHAR_CODE_E) {
+              if (
+                location.charCodeAt(++i) === CHAR_CODE_A &&
+                location.charCodeAt(++i) === CHAR_CODE_R &&
+                location.charCodeAt(++i) === CHAR_CODE_COLON &&
+                location.charCodeAt(++i) === CHAR_CODE_F &&
+                location.charCodeAt(++i) === CHAR_CODE_I &&
+                location.charCodeAt(++i) === CHAR_CODE_L &&
+                location.charCodeAt(++i) === CHAR_CODE_E
+              ) {
                 return isColonSlashSlash(location, i);
               }
 
@@ -3821,18 +3911,31 @@
         }
 
         function isWASM(location, i = 0) {
-          return (// "wasm-function["
-            location.charCodeAt(i) === CHAR_CODE_W && location.charCodeAt(++i) === CHAR_CODE_A && location.charCodeAt(++i) === CHAR_CODE_S && location.charCodeAt(++i) === CHAR_CODE_M && location.charCodeAt(++i) === CHAR_CODE_DASH && location.charCodeAt(++i) === CHAR_CODE_F && location.charCodeAt(++i) === CHAR_CODE_U && location.charCodeAt(++i) === CHAR_CODE_N && location.charCodeAt(++i) === CHAR_CODE_C && location.charCodeAt(++i) === CHAR_CODE_T && location.charCodeAt(++i) === CHAR_CODE_I && location.charCodeAt(++i) === CHAR_CODE_O && location.charCodeAt(++i) === CHAR_CODE_N && location.charCodeAt(++i) === CHAR_CODE_L_SQUARE_BRACKET
+          return (
+            // "wasm-function["
+            location.charCodeAt(i) === CHAR_CODE_W &&
+            location.charCodeAt(++i) === CHAR_CODE_A &&
+            location.charCodeAt(++i) === CHAR_CODE_S &&
+            location.charCodeAt(++i) === CHAR_CODE_M &&
+            location.charCodeAt(++i) === CHAR_CODE_DASH &&
+            location.charCodeAt(++i) === CHAR_CODE_F &&
+            location.charCodeAt(++i) === CHAR_CODE_U &&
+            location.charCodeAt(++i) === CHAR_CODE_N &&
+            location.charCodeAt(++i) === CHAR_CODE_C &&
+            location.charCodeAt(++i) === CHAR_CODE_T &&
+            location.charCodeAt(++i) === CHAR_CODE_I &&
+            location.charCodeAt(++i) === CHAR_CODE_O &&
+            location.charCodeAt(++i) === CHAR_CODE_N &&
+            location.charCodeAt(++i) === CHAR_CODE_L_SQUARE_BRACKET
           );
         }
         /**
-        * A utility method to get the file name from a sourcemapped location
-        * The sourcemap location can be in any form. This method returns a
-        * formatted file name for different cases like Windows or OSX.
-        * @param source
-        * @returns String
-        */
-
+         * A utility method to get the file name from a sourcemapped location
+         * The sourcemap location can be in any form. This method returns a
+         * formatted file name for different cases like Windows or OSX.
+         * @param source
+         * @returns String
+         */
 
         function getSourceMappedFile(source) {
           // If sourcemapped source is a OSX path, return
@@ -3855,15 +3958,13 @@
           isContentScheme,
           isWASM,
           isDataScheme,
-          getSourceMappedFile
+          getSourceMappedFile,
         };
 
         /***/
-      }),
+      },
 
-/***/ 429:
-/***/ (function (module, exports) {
-
+      /***/ 429: /***/ function (module, exports) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
@@ -3899,7 +4000,6 @@
            *          one will be cleared in order to avoid measurements errors.
            */
 
-
           start(histogramId, obj) {
             return true;
           }
@@ -3926,7 +4026,6 @@
            *          one will be cleared in order to avoid measurements errors.
            */
 
-
           startKeyed(histogramId, key, obj) {
             return true;
           }
@@ -3949,7 +4048,6 @@
            *          True if the timer was succesfully stopped and the data was added
            *          to the histogram, False otherwise.
            */
-
 
           finish(histogramId, obj, canceledOkay) {
             return true;
@@ -3976,7 +4074,6 @@
            *          to the histogram, False otherwise.
            */
 
-
           finishKeyed(histogramId, key, obj, cancelledOkay) {
             return true;
           }
@@ -3987,10 +4084,9 @@
            *         Histogram in which the data is to be stored.
            */
 
-
           getHistogramById(histogramId) {
             return {
-              add: () => { }
+              add: () => {},
             };
           }
           /**
@@ -4000,10 +4096,9 @@
            *         Histogram in which the data is to be stored.
            */
 
-
           getKeyedHistogramById(histogramId) {
             return {
-              add: () => { }
+              add: () => {},
             };
           }
           /**
@@ -4015,8 +4110,7 @@
            *         Value to store.
            */
 
-
-          scalarSet(scalarId, value) { }
+          scalarSet(scalarId, value) {}
           /**
            * Log a value to a count scalar.
            *
@@ -4026,8 +4120,7 @@
            *         Value to store.
            */
 
-
-          scalarAdd(scalarId, value) { }
+          scalarAdd(scalarId, value) {}
           /**
            * Log a value to a keyed count scalar.
            *
@@ -4039,8 +4132,7 @@
            *         Value to store.
            */
 
-
-          keyedScalarAdd(scalarId, key, value) { }
+          keyedScalarAdd(scalarId, key, value) {}
           /**
            * Event telemetry is disabled by default. Use this method to enable it for
            * a particular category.
@@ -4048,7 +4140,6 @@
            * @param {Boolean} enabled
            *        Enabled: true or false.
            */
-
 
           setEventRecordingEnabled(enabled) {
             return enabled;
@@ -4085,8 +4176,7 @@
            *        ]
            */
 
-
-          preparePendingEvent(obj, method, object, value, expected = []) { }
+          preparePendingEvent(obj, method, object, value, expected = []) {}
           /**
            * Adds an expected property for either a current or future pending event.
            * This means that if preparePendingEvent() is called before or after sending
@@ -4111,8 +4201,7 @@
            *        The pending property value
            */
 
-
-          addEventProperty(obj, method, object, value, pendingPropName, pendingPropValue) { }
+          addEventProperty(obj, method, object, value, pendingPropName, pendingPropValue) {}
           /**
            * Adds expected properties for either a current or future pending event.
            * This means that if preparePendingEvent() is called before or after sending
@@ -4136,8 +4225,7 @@
            *        event as properties.
            */
 
-
-          addEventProperties(obj, method, object, value, pendingObject) { }
+          addEventProperties(obj, method, object, value, pendingObject) {}
           /**
            * A private method that is not to be used externally. This method is used to
            * prepare a pending telemetry event for sending and then send it via
@@ -4158,8 +4246,7 @@
            *        for the event) e.g. "console"
            */
 
-
-          _sendPendingEvent(obj, method, object, value) { }
+          _sendPendingEvent(obj, method, object, value) {}
           /**
            * Send a telemetry event.
            *
@@ -4181,8 +4268,7 @@
            *        }
            */
 
-
-          recordEvent(method, object, value, extra) { }
+          recordEvent(method, object, value, extra) {}
           /**
            * Sends telemetry pings to indicate that a tool has been opened.
            *
@@ -4197,8 +4283,7 @@
            *        concurrently, as long as they are associated with different objects.
            */
 
-
-          toolOpened(id, sessionId, obj) { }
+          toolOpened(id, sessionId, obj) {}
           /**
            * Sends telemetry pings to indicate that a tool has been closed.
            *
@@ -4206,19 +4291,15 @@
            *        The ID of the tool opened.
            */
 
-
-          toolClosed(id, sessionId, obj) { }
-
+          toolClosed(id, sessionId, obj) {}
         }
 
         module.exports = Telemetry;
 
         /***/
-      }),
+      },
 
-/***/ 430:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 430: /***/ function (module, exports, __webpack_require__) {
         "use strict";
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -4232,7 +4313,6 @@
         // Please keep in mind that if the feature in this file has changed, don't
         // forget to also change that accordingly in
         // devtools/client/shared/unicode-url.js in the mozilla-central repository.
-
 
         const punycode = __webpack_require__(521);
         /**
@@ -4253,11 +4333,10 @@
          *                  a readable ASCII hostname or a Unicode hostname.
          */
 
-
         function getUnicodeHostname(hostname) {
           try {
             return punycode.toUnicode(hostname);
-          } catch (err) { }
+          } catch (err) {}
 
           return hostname;
         }
@@ -4281,11 +4360,10 @@
          *                  ASCII url or a Unicode url.
          */
 
-
         function getUnicodeUrlPath(urlPath) {
           try {
             return decodeURIComponent(urlPath);
-          } catch (err) { }
+          } catch (err) {}
 
           return urlPath;
         }
@@ -4315,13 +4393,9 @@
          *                  this function if the `url` itself is readable.
          */
 
-
         function getUnicodeUrl(url) {
           try {
-            const {
-              protocol,
-              hostname
-            } = new URL(url);
+            const { protocol, hostname } = new URL(url);
 
             if (protocol === "data:") {
               // Never convert a data: URI.
@@ -4331,7 +4405,7 @@
             const readableHostname = getUnicodeHostname(hostname);
             url = decodeURIComponent(url);
             return url.replace(hostname, readableHostname);
-          } catch (err) { }
+          } catch (err) {}
 
           return url;
         }
@@ -4339,26 +4413,28 @@
         module.exports = {
           getUnicodeHostname,
           getUnicodeUrlPath,
-          getUnicodeUrl
+          getUnicodeUrl,
         };
 
         /***/
-      }),
+      },
 
-/***/ 431:
-/***/ (function (module, exports) {
-
+      /***/ 431: /***/ function (module, exports) {
         // removed by extract-text-webpack-plugin
-
         /***/
-      }),
+      },
 
-/***/ 432:
-/***/ (function (module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function (process) {
+      /***/ 432: /***/ function (module, exports, __webpack_require__) {
+        /* WEBPACK VAR INJECTION */ (function (process) {
           (function () {
-            var Query, defaultPathSeparator, filter, matcher, parseOptions, pathScorer, preparedQueryCache, scorer;
+            var Query,
+              defaultPathSeparator,
+              filter,
+              matcher,
+              parseOptions,
+              pathScorer,
+              preparedQueryCache,
+              scorer;
 
             filter = __webpack_require__(433);
 
@@ -4372,14 +4448,23 @@
 
             preparedQueryCache = null;
 
-            defaultPathSeparator = (typeof process !== "undefined" && process !== null ? process.platform : void 0) === "win32" ? '\\' : '/';
+            defaultPathSeparator =
+              (typeof process !== "undefined" && process !== null ? process.platform : void 0) ===
+              "win32"
+                ? "\\"
+                : "/";
 
             module.exports = {
               filter: function (candidates, query, options) {
                 if (options == null) {
                   options = {};
                 }
-                if (!((query != null ? query.length : void 0) && (candidates != null ? candidates.length : void 0))) {
+                if (
+                  !(
+                    (query != null ? query.length : void 0) &&
+                    (candidates != null ? candidates.length : void 0)
+                  )
+                ) {
                   return [];
                 }
                 options = parseOptions(options, query);
@@ -4389,7 +4474,12 @@
                 if (options == null) {
                   options = {};
                 }
-                if (!((string != null ? string.length : void 0) && (query != null ? query.length : void 0))) {
+                if (
+                  !(
+                    (string != null ? string.length : void 0) &&
+                    (query != null ? query.length : void 0)
+                  )
+                ) {
                   return 0;
                 }
                 options = parseOptions(options, query);
@@ -4411,11 +4501,17 @@
                   return [];
                 }
                 if (string === query) {
-                  return (function () {
+                  return function () {
                     _results = [];
-                    for (var _i = 0, _ref = string.length; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--) { _results.push(_i); }
+                    for (
+                      var _i = 0, _ref = string.length;
+                      0 <= _ref ? _i < _ref : _i > _ref;
+                      0 <= _ref ? _i++ : _i--
+                    ) {
+                      _results.push(_i);
+                    }
                     return _results;
-                  }).apply(this);
+                  }.apply(this);
                 }
                 options = parseOptions(options, query);
                 return matcher.match(string, query, options);
@@ -4439,7 +4535,7 @@
                 }
                 options = parseOptions(options, query);
                 return options.preparedQuery;
-              }
+              },
             };
 
             parseOptions = function (options, query) {
@@ -4462,22 +4558,22 @@
                 options.wrap = null;
               }
               if (options.preparedQuery == null) {
-                options.preparedQuery = preparedQueryCache && preparedQueryCache.query === query ? preparedQueryCache : (preparedQueryCache = new Query(query, options));
+                options.preparedQuery =
+                  preparedQueryCache && preparedQueryCache.query === query
+                    ? preparedQueryCache
+                    : (preparedQueryCache = new Query(query, options));
               }
               return options;
             };
-
-          }).call(this);
+          }.call(this));
 
           /* WEBPACK VAR INJECTION */
-        }.call(exports, __webpack_require__(35)))
+        }.call(exports, __webpack_require__(35)));
 
         /***/
-      }),
+      },
 
-/***/ 433:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 433: /***/ function (module, exports, __webpack_require__) {
         (function () {
           var Query, pathScorer, pluckCandidates, scorer, sortCandidates;
 
@@ -4496,10 +4592,25 @@
           };
 
           module.exports = function (candidates, query, options) {
-            var bKey, candidate, key, maxInners, maxResults, score, scoreProvider, scoredCandidates, spotLeft, string, usePathScoring, _i, _len;
+            var bKey,
+              candidate,
+              key,
+              maxInners,
+              maxResults,
+              score,
+              scoreProvider,
+              scoredCandidates,
+              spotLeft,
+              string,
+              usePathScoring,
+              _i,
+              _len;
             scoredCandidates = [];
-            key = options.key, maxResults = options.maxResults, maxInners = options.maxInners, usePathScoring = options.usePathScoring;
-            spotLeft = (maxInners != null) && maxInners > 0 ? maxInners : candidates.length + 1;
+            (key = options.key),
+              (maxResults = options.maxResults),
+              (maxInners = options.maxInners),
+              (usePathScoring = options.usePathScoring);
+            spotLeft = maxInners != null && maxInners > 0 ? maxInners : candidates.length + 1;
             bKey = key != null;
             scoreProvider = usePathScoring ? pathScorer : scorer;
             for (_i = 0, _len = candidates.length; _i < _len; _i++) {
@@ -4512,7 +4623,7 @@
               if (score > 0) {
                 scoredCandidates.push({
                   candidate: candidate,
-                  score: score
+                  score: score,
                 });
                 if (!--spotLeft) {
                   break;
@@ -4526,24 +4637,36 @@
             }
             return candidates;
           };
-
-        }).call(this);
-
+        }.call(this));
 
         /***/
-      }),
+      },
 
-/***/ 434:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 434: /***/ function (module, exports, __webpack_require__) {
         (function () {
-          var basenameMatch, computeMatch, isMatch, isWordStart, match, mergeMatches, scoreAcronyms, scoreCharacter, scoreConsecutives, _ref;
+          var basenameMatch,
+            computeMatch,
+            isMatch,
+            isWordStart,
+            match,
+            mergeMatches,
+            scoreAcronyms,
+            scoreCharacter,
+            scoreConsecutives,
+            _ref;
 
-          _ref = __webpack_require__(66), isMatch = _ref.isMatch, isWordStart = _ref.isWordStart, scoreConsecutives = _ref.scoreConsecutives, scoreCharacter = _ref.scoreCharacter, scoreAcronyms = _ref.scoreAcronyms;
+          (_ref = __webpack_require__(66)),
+            (isMatch = _ref.isMatch),
+            (isWordStart = _ref.isWordStart),
+            (scoreConsecutives = _ref.scoreConsecutives),
+            (scoreCharacter = _ref.scoreCharacter),
+            (scoreAcronyms = _ref.scoreAcronyms);
 
           exports.match = match = function (string, query, options) {
             var allowErrors, baseMatches, matches, pathSeparator, preparedQuery, string_lw;
-            allowErrors = options.allowErrors, preparedQuery = options.preparedQuery, pathSeparator = options.pathSeparator;
+            (allowErrors = options.allowErrors),
+              (preparedQuery = options.preparedQuery),
+              (pathSeparator = options.pathSeparator);
             if (!(allowErrors || isMatch(string, preparedQuery.core_lw, preparedQuery.core_up))) {
               return [];
             }
@@ -4560,18 +4683,29 @@
           };
 
           exports.wrap = function (string, query, options) {
-            var matchIndex, matchPos, matchPositions, output, strPos, tagClass, tagClose, tagOpen, _ref1;
-            if ((options.wrap != null)) {
-              _ref1 = options.wrap, tagClass = _ref1.tagClass, tagOpen = _ref1.tagOpen, tagClose = _ref1.tagClose;
+            var matchIndex,
+              matchPos,
+              matchPositions,
+              output,
+              strPos,
+              tagClass,
+              tagClose,
+              tagOpen,
+              _ref1;
+            if (options.wrap != null) {
+              (_ref1 = options.wrap),
+                (tagClass = _ref1.tagClass),
+                (tagOpen = _ref1.tagOpen),
+                (tagClose = _ref1.tagClose);
             }
             if (tagClass == null) {
-              tagClass = 'highlight';
+              tagClass = "highlight";
             }
             if (tagOpen == null) {
               tagOpen = '<strong class="' + tagClass + '">';
             }
             if (tagClose == null) {
-              tagClose = '</strong>';
+              tagClose = "</strong>";
             }
             if (string === query) {
               return tagOpen + string + tagClose;
@@ -4580,7 +4714,7 @@
             if (matchPositions.length === 0) {
               return string;
             }
-            output = '';
+            output = "";
             matchIndex = -1;
             strPos = 0;
             while (++matchIndex < matchPositions.length) {
@@ -4630,7 +4764,12 @@
             }
             basePos++;
             end++;
-            return computeMatch(subject.slice(basePos, end), subject_lw.slice(basePos, end), preparedQuery, basePos);
+            return computeMatch(
+              subject.slice(basePos, end),
+              subject_lw.slice(basePos, end),
+              preparedQuery,
+              basePos
+            );
           };
 
           mergeMatches = function (a, b) {
@@ -4664,7 +4803,32 @@
           };
 
           computeMatch = function (subject, subject_lw, preparedQuery, offset) {
-            var DIAGONAL, LEFT, STOP, UP, acro_score, align, backtrack, csc_diag, csc_row, csc_score, i, j, m, matches, move, n, pos, query, query_lw, score, score_diag, score_row, score_up, si_lw, start, trace;
+            var DIAGONAL,
+              LEFT,
+              STOP,
+              UP,
+              acro_score,
+              align,
+              backtrack,
+              csc_diag,
+              csc_row,
+              csc_score,
+              i,
+              j,
+              m,
+              matches,
+              move,
+              n,
+              pos,
+              query,
+              query_lw,
+              score,
+              score_diag,
+              score_row,
+              score_up,
+              si_lw,
+              start,
+              trace;
             if (offset == null) {
               offset = 0;
             }
@@ -4699,7 +4863,10 @@
                 score_diag = score_up;
                 if (query_lw[j] === si_lw) {
                   start = isWordStart(i, subject, subject_lw);
-                  csc_score = csc_diag > 0 ? csc_diag : scoreConsecutives(subject, subject_lw, query, query_lw, i, j, start);
+                  csc_score =
+                    csc_diag > 0
+                      ? csc_diag
+                      : scoreConsecutives(subject, subject_lw, query, query_lw, i, j, start);
                   align = score_diag + scoreCharacter(i, j, start, acro_score, csc_score);
                 }
                 score_up = score_row[j];
@@ -4749,18 +4916,13 @@
             matches.reverse();
             return matches;
           };
-
-        }).call(this);
-
+        }.call(this));
 
         /***/
-      }),
+      },
 
-/***/ 435:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 435: /***/ function (module, exports, __webpack_require__) {
         "use strict";
-
 
         exports.__esModule = true;
         exports.EXITING = exports.ENTERED = exports.ENTERING = exports.EXITED = exports.UNMOUNTED = undefined;
@@ -4781,23 +4943,68 @@
 
         var _PropTypes = __webpack_require__(437);
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
-        function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+        function _interopRequireWildcard(obj) {
+          if (obj && obj.__esModule) {
+            return obj;
+          } else {
+            var newObj = {};
+            if (obj != null) {
+              for (var key in obj) {
+                if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+              }
+            }
+            newObj.default = obj;
+            return newObj;
+          }
+        }
 
-        function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+        function _objectWithoutProperties(obj, keys) {
+          var target = {};
+          for (var i in obj) {
+            if (keys.indexOf(i) >= 0) continue;
+            if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+            target[i] = obj[i];
+          }
+          return target;
+        }
 
-        function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+        function _classCallCheck(instance, Constructor) {
+          if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+          }
+        }
 
-        function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+        function _possibleConstructorReturn(self, call) {
+          if (!self) {
+            throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+          }
+          return call && (typeof call === "object" || typeof call === "function") ? call : self;
+        }
 
-        function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+        function _inherits(subClass, superClass) {
+          if (typeof superClass !== "function" && superClass !== null) {
+            throw new TypeError(
+              "Super expression must either be null or a function, not " + typeof superClass
+            );
+          }
+          subClass.prototype = Object.create(superClass && superClass.prototype, {
+            constructor: { value: subClass, enumerable: false, writable: true, configurable: true },
+          });
+          if (superClass)
+            Object.setPrototypeOf
+              ? Object.setPrototypeOf(subClass, superClass)
+              : (subClass.__proto__ = superClass);
+        }
 
-        var UNMOUNTED = exports.UNMOUNTED = 'unmounted';
-        var EXITED = exports.EXITED = 'exited';
-        var ENTERING = exports.ENTERING = 'entering';
-        var ENTERED = exports.ENTERED = 'entered';
-        var EXITING = exports.EXITING = 'exiting';
+        var UNMOUNTED = (exports.UNMOUNTED = "unmounted");
+        var EXITED = (exports.EXITED = "exited");
+        var ENTERING = (exports.ENTERING = "entering");
+        var ENTERED = (exports.ENTERED = "entered");
+        var EXITING = (exports.EXITING = "exiting");
 
         /**
          * The Transition component lets you describe a transition from one component
@@ -4900,13 +5107,16 @@
          *
          */
 
-        var Transition = function (_React$Component) {
+        var Transition = (function (_React$Component) {
           _inherits(Transition, _React$Component);
 
           function Transition(props, context) {
             _classCallCheck(this, Transition);
 
-            var _this = _possibleConstructorReturn(this, _React$Component.call(this, props, context));
+            var _this = _possibleConstructorReturn(
+              this,
+              _React$Component.call(this, props, context)
+            );
 
             var parentGroup = context.transitionGroup;
             // In the context of a TransitionGroup all enters are really appears
@@ -4939,7 +5149,7 @@
 
           Transition.prototype.getChildContext = function getChildContext() {
             return {
-              transitionGroup: null // allows for nested Transitions
+              transitionGroup: null, // allows for nested Transitions
             };
           };
 
@@ -4981,7 +5191,6 @@
             if (prevProps !== this.props) {
               var status = this.state.status;
 
-
               if (this.props.in) {
                 if (status !== ENTERING && status !== ENTERED) {
                   nextStatus = ENTERING;
@@ -5008,7 +5217,7 @@
 
             exit = enter = appear = timeout;
 
-            if (timeout != null && typeof timeout !== 'number') {
+            if (timeout != null && typeof timeout !== "number") {
               exit = timeout.exit;
               enter = timeout.enter;
               appear = timeout.appear;
@@ -5017,7 +5226,8 @@
           };
 
           Transition.prototype.updateStatus = function updateStatus() {
-            var mounting = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+            var mounting =
+              arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
             var nextStatus = arguments[1];
 
             if (nextStatus !== null) {
@@ -5040,7 +5250,9 @@
 
             var enter = this.props.enter;
 
-            var appearing = this.context.transitionGroup ? this.context.transitionGroup.isMounting : mounting;
+            var appearing = this.context.transitionGroup
+              ? this.context.transitionGroup.isMounting
+              : mounting;
 
             var timeouts = this.getTimeouts();
 
@@ -5153,9 +5365,8 @@
 
             var _props = this.props,
               children = _props.children,
-              childProps = _objectWithoutProperties(_props, ['children']);
+              childProps = _objectWithoutProperties(_props, ["children"]);
             // filter props for Transtition
-
 
             delete childProps.in;
             delete childProps.mountOnEnter;
@@ -5172,7 +5383,7 @@
             delete childProps.onExiting;
             delete childProps.onExited;
 
-            if (typeof children === 'function') {
+            if (typeof children === "function") {
               return children(status, childProps);
             }
 
@@ -5181,158 +5392,167 @@
           };
 
           return Transition;
-        }(_react2.default.Component);
+        })(_react2.default.Component);
 
         Transition.contextTypes = {
-          transitionGroup: PropTypes.object
+          transitionGroup: PropTypes.object,
         };
         Transition.childContextTypes = {
-          transitionGroup: function transitionGroup() { }
+          transitionGroup: function transitionGroup() {},
         };
 
+        Transition.propTypes = false
+          ? {
+              /**
+               * A `function` child can be used instead of a React element.
+               * This function is called with the current transition status
+               * ('entering', 'entered', 'exiting', 'exited', 'unmounted'), which can be used
+               * to apply context specific props to a component.
+               *
+               * ```jsx
+               * <Transition timeout={150}>
+               *   {(status) => (
+               *     <MyComponent className={`fade fade-${status}`} />
+               *   )}
+               * </Transition>
+               * ```
+               */
+              children: PropTypes.oneOfType([
+                PropTypes.func.isRequired,
+                PropTypes.element.isRequired,
+              ]).isRequired,
 
-        Transition.propTypes = false ? {
-          /**
-           * A `function` child can be used instead of a React element.
-           * This function is called with the current transition status
-           * ('entering', 'entered', 'exiting', 'exited', 'unmounted'), which can be used
-           * to apply context specific props to a component.
-           *
-           * ```jsx
-           * <Transition timeout={150}>
-           *   {(status) => (
-           *     <MyComponent className={`fade fade-${status}`} />
-           *   )}
-           * </Transition>
-           * ```
-           */
-          children: PropTypes.oneOfType([PropTypes.func.isRequired, PropTypes.element.isRequired]).isRequired,
+              /**
+               * Show the component; triggers the enter or exit states
+               */
+              in: PropTypes.bool,
 
-          /**
-           * Show the component; triggers the enter or exit states
-           */
-          in: PropTypes.bool,
+              /**
+               * By default the child component is mounted immediately along with
+               * the parent `Transition` component. If you want to "lazy mount" the component on the
+               * first `in={true}` you can set `mountOnEnter`. After the first enter transition the component will stay
+               * mounted, even on "exited", unless you also specify `unmountOnExit`.
+               */
+              mountOnEnter: PropTypes.bool,
 
-          /**
-           * By default the child component is mounted immediately along with
-           * the parent `Transition` component. If you want to "lazy mount" the component on the
-           * first `in={true}` you can set `mountOnEnter`. After the first enter transition the component will stay
-           * mounted, even on "exited", unless you also specify `unmountOnExit`.
-           */
-          mountOnEnter: PropTypes.bool,
+              /**
+               * By default the child component stays mounted after it reaches the `'exited'` state.
+               * Set `unmountOnExit` if you'd prefer to unmount the component after it finishes exiting.
+               */
+              unmountOnExit: PropTypes.bool,
 
-          /**
-           * By default the child component stays mounted after it reaches the `'exited'` state.
-           * Set `unmountOnExit` if you'd prefer to unmount the component after it finishes exiting.
-           */
-          unmountOnExit: PropTypes.bool,
+              /**
+               * Normally a component is not transitioned if it is shown when the `<Transition>` component mounts.
+               * If you want to transition on the first mount set `appear` to `true`, and the
+               * component will transition in as soon as the `<Transition>` mounts.
+               *
+               * > Note: there are no specific "appear" states. `appear` only adds an additional `enter` transition.
+               */
+              appear: PropTypes.bool,
 
-          /**
-           * Normally a component is not transitioned if it is shown when the `<Transition>` component mounts.
-           * If you want to transition on the first mount set `appear` to `true`, and the
-           * component will transition in as soon as the `<Transition>` mounts.
-           *
-           * > Note: there are no specific "appear" states. `appear` only adds an additional `enter` transition.
-           */
-          appear: PropTypes.bool,
+              /**
+               * Enable or disable enter transitions.
+               */
+              enter: PropTypes.bool,
 
-          /**
-           * Enable or disable enter transitions.
-           */
-          enter: PropTypes.bool,
+              /**
+               * Enable or disable exit transitions.
+               */
+              exit: PropTypes.bool,
 
-          /**
-           * Enable or disable exit transitions.
-           */
-          exit: PropTypes.bool,
+              /**
+               * The duration of the transition, in milliseconds.
+               * Required unless `addEndListener` is provided
+               *
+               * You may specify a single timeout for all transitions like: `timeout={500}`,
+               * or individually like:
+               *
+               * ```jsx
+               * timeout={{
+               *  enter: 300,
+               *  exit: 500,
+               * }}
+               * ```
+               *
+               * @type {number | { enter?: number, exit?: number }}
+               */
+              timeout: function timeout(props) {
+                for (
+                  var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1;
+                  _key < _len;
+                  _key++
+                ) {
+                  args[_key - 1] = arguments[_key];
+                }
 
-          /**
-           * The duration of the transition, in milliseconds.
-           * Required unless `addEndListener` is provided
-           *
-           * You may specify a single timeout for all transitions like: `timeout={500}`,
-           * or individually like:
-           *
-           * ```jsx
-           * timeout={{
-           *  enter: 300,
-           *  exit: 500,
-           * }}
-           * ```
-           *
-           * @type {number | { enter?: number, exit?: number }}
-           */
-          timeout: function timeout(props) {
-            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-              args[_key - 1] = arguments[_key];
+                var pt = _PropTypes.timeoutsShape;
+                if (!props.addEndListener) pt = pt.isRequired;
+                return pt.apply(undefined, [props].concat(args));
+              },
+
+              /**
+               * Add a custom transition end trigger. Called with the transitioning
+               * DOM node and a `done` callback. Allows for more fine grained transition end
+               * logic. **Note:** Timeouts are still used as a fallback if provided.
+               *
+               * ```jsx
+               * addEndListener={(node, done) => {
+               *   // use the css transitionend event to mark the finish of a transition
+               *   node.addEventListener('transitionend', done, false);
+               * }}
+               * ```
+               */
+              addEndListener: PropTypes.func,
+
+              /**
+               * Callback fired before the "entering" status is applied. An extra parameter
+               * `isAppearing` is supplied to indicate if the enter stage is occurring on the initial mount
+               *
+               * @type Function(node: HtmlElement, isAppearing: bool) -> void
+               */
+              onEnter: PropTypes.func,
+
+              /**
+               * Callback fired after the "entering" status is applied. An extra parameter
+               * `isAppearing` is supplied to indicate if the enter stage is occurring on the initial mount
+               *
+               * @type Function(node: HtmlElement, isAppearing: bool)
+               */
+              onEntering: PropTypes.func,
+
+              /**
+               * Callback fired after the "entered" status is applied. An extra parameter
+               * `isAppearing` is supplied to indicate if the enter stage is occurring on the initial mount
+               *
+               * @type Function(node: HtmlElement, isAppearing: bool) -> void
+               */
+              onEntered: PropTypes.func,
+
+              /**
+               * Callback fired before the "exiting" status is applied.
+               *
+               * @type Function(node: HtmlElement) -> void
+               */
+              onExit: PropTypes.func,
+
+              /**
+               * Callback fired after the "exiting" status is applied.
+               *
+               * @type Function(node: HtmlElement) -> void
+               */
+              onExiting: PropTypes.func,
+
+              /**
+               * Callback fired after the "exited" status is applied.
+               *
+               * @type Function(node: HtmlElement) -> void
+               */
+              onExited: PropTypes.func,
+
+              // Name the function so it is clearer in the documentation
             }
-
-            var pt = _PropTypes.timeoutsShape;
-            if (!props.addEndListener) pt = pt.isRequired;
-            return pt.apply(undefined, [props].concat(args));
-          },
-
-          /**
-           * Add a custom transition end trigger. Called with the transitioning
-           * DOM node and a `done` callback. Allows for more fine grained transition end
-           * logic. **Note:** Timeouts are still used as a fallback if provided.
-           *
-           * ```jsx
-           * addEndListener={(node, done) => {
-           *   // use the css transitionend event to mark the finish of a transition
-           *   node.addEventListener('transitionend', done, false);
-           * }}
-           * ```
-           */
-          addEndListener: PropTypes.func,
-
-          /**
-           * Callback fired before the "entering" status is applied. An extra parameter
-           * `isAppearing` is supplied to indicate if the enter stage is occurring on the initial mount
-           *
-           * @type Function(node: HtmlElement, isAppearing: bool) -> void
-           */
-          onEnter: PropTypes.func,
-
-          /**
-           * Callback fired after the "entering" status is applied. An extra parameter
-           * `isAppearing` is supplied to indicate if the enter stage is occurring on the initial mount
-           *
-           * @type Function(node: HtmlElement, isAppearing: bool)
-           */
-          onEntering: PropTypes.func,
-
-          /**
-           * Callback fired after the "entered" status is applied. An extra parameter
-           * `isAppearing` is supplied to indicate if the enter stage is occurring on the initial mount
-           *
-           * @type Function(node: HtmlElement, isAppearing: bool) -> void
-           */
-          onEntered: PropTypes.func,
-
-          /**
-           * Callback fired before the "exiting" status is applied.
-           *
-           * @type Function(node: HtmlElement) -> void
-           */
-          onExit: PropTypes.func,
-
-          /**
-           * Callback fired after the "exiting" status is applied.
-           *
-           * @type Function(node: HtmlElement) -> void
-           */
-          onExiting: PropTypes.func,
-
-          /**
-           * Callback fired after the "exited" status is applied.
-           *
-           * @type Function(node: HtmlElement) -> void
-           */
-          onExited: PropTypes.func
-
-          // Name the function so it is clearer in the documentation
-        } : {}; function noop() { }
+          : {};
+        function noop() {}
 
         Transition.defaultProps = {
           in: false,
@@ -5348,7 +5568,7 @@
 
           onExit: noop,
           onExiting: noop,
-          onExited: noop
+          onExited: noop,
         };
 
         Transition.UNMOUNTED = 0;
@@ -5360,14 +5580,18 @@
         exports.default = (0, _reactLifecyclesCompat.polyfill)(Transition);
 
         /***/
-      }),
+      },
 
-/***/ 436:
-/***/ (function (module, __webpack_exports__, __webpack_require__) {
-
+      /***/ 436: /***/ function (module, __webpack_exports__, __webpack_require__) {
         "use strict";
         Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "polyfill", function () { return polyfill; });
+        /* harmony export (binding) */ __webpack_require__.d(
+          __webpack_exports__,
+          "polyfill",
+          function () {
+            return polyfill;
+          }
+        );
         /**
          * Copyright (c) 2013-present, Facebook, Inc.
          *
@@ -5401,10 +5625,7 @@
             this.props = nextProps;
             this.state = nextState;
             this.__reactInternalSnapshotFlag = true;
-            this.__reactInternalSnapshot = this.getSnapshotBeforeUpdate(
-              prevProps,
-              prevState
-            );
+            this.__reactInternalSnapshot = this.getSnapshotBeforeUpdate(prevProps, prevState);
           } finally {
             this.props = prevProps;
             this.state = prevState;
@@ -5421,12 +5642,12 @@
           var prototype = Component.prototype;
 
           if (!prototype || !prototype.isReactComponent) {
-            throw new Error('Can only polyfill class components');
+            throw new Error("Can only polyfill class components");
           }
 
           if (
-            typeof Component.getDerivedStateFromProps !== 'function' &&
-            typeof prototype.getSnapshotBeforeUpdate !== 'function'
+            typeof Component.getDerivedStateFromProps !== "function" &&
+            typeof prototype.getSnapshotBeforeUpdate !== "function"
           ) {
             return Component;
           }
@@ -5437,20 +5658,20 @@
           var foundWillMountName = null;
           var foundWillReceivePropsName = null;
           var foundWillUpdateName = null;
-          if (typeof prototype.componentWillMount === 'function') {
-            foundWillMountName = 'componentWillMount';
-          } else if (typeof prototype.UNSAFE_componentWillMount === 'function') {
-            foundWillMountName = 'UNSAFE_componentWillMount';
+          if (typeof prototype.componentWillMount === "function") {
+            foundWillMountName = "componentWillMount";
+          } else if (typeof prototype.UNSAFE_componentWillMount === "function") {
+            foundWillMountName = "UNSAFE_componentWillMount";
           }
-          if (typeof prototype.componentWillReceiveProps === 'function') {
-            foundWillReceivePropsName = 'componentWillReceiveProps';
-          } else if (typeof prototype.UNSAFE_componentWillReceiveProps === 'function') {
-            foundWillReceivePropsName = 'UNSAFE_componentWillReceiveProps';
+          if (typeof prototype.componentWillReceiveProps === "function") {
+            foundWillReceivePropsName = "componentWillReceiveProps";
+          } else if (typeof prototype.UNSAFE_componentWillReceiveProps === "function") {
+            foundWillReceivePropsName = "UNSAFE_componentWillReceiveProps";
           }
-          if (typeof prototype.componentWillUpdate === 'function') {
-            foundWillUpdateName = 'componentWillUpdate';
-          } else if (typeof prototype.UNSAFE_componentWillUpdate === 'function') {
-            foundWillUpdateName = 'UNSAFE_componentWillUpdate';
+          if (typeof prototype.componentWillUpdate === "function") {
+            foundWillUpdateName = "componentWillUpdate";
+          } else if (typeof prototype.UNSAFE_componentWillUpdate === "function") {
+            foundWillUpdateName = "UNSAFE_componentWillUpdate";
           }
           if (
             foundWillMountName !== null ||
@@ -5459,30 +5680,28 @@
           ) {
             var componentName = Component.displayName || Component.name;
             var newApiName =
-              typeof Component.getDerivedStateFromProps === 'function'
-                ? 'getDerivedStateFromProps()'
-                : 'getSnapshotBeforeUpdate()';
+              typeof Component.getDerivedStateFromProps === "function"
+                ? "getDerivedStateFromProps()"
+                : "getSnapshotBeforeUpdate()";
 
             throw Error(
-              'Unsafe legacy lifecycles will not be called for components using new component APIs.\n\n' +
-              componentName +
-              ' uses ' +
-              newApiName +
-              ' but also contains the following legacy lifecycles:' +
-              (foundWillMountName !== null ? '\n  ' + foundWillMountName : '') +
-              (foundWillReceivePropsName !== null
-                ? '\n  ' + foundWillReceivePropsName
-                : '') +
-              (foundWillUpdateName !== null ? '\n  ' + foundWillUpdateName : '') +
-              '\n\nThe above lifecycles should be removed. Learn more about this warning here:\n' +
-              'https://fb.me/react-async-component-lifecycle-hooks'
+              "Unsafe legacy lifecycles will not be called for components using new component APIs.\n\n" +
+                componentName +
+                " uses " +
+                newApiName +
+                " but also contains the following legacy lifecycles:" +
+                (foundWillMountName !== null ? "\n  " + foundWillMountName : "") +
+                (foundWillReceivePropsName !== null ? "\n  " + foundWillReceivePropsName : "") +
+                (foundWillUpdateName !== null ? "\n  " + foundWillUpdateName : "") +
+                "\n\nThe above lifecycles should be removed. Learn more about this warning here:\n" +
+                "https://fb.me/react-async-component-lifecycle-hooks"
             );
           }
 
           // React <= 16.2 does not support static getDerivedStateFromProps.
           // As a workaround, use cWM and cWRP to invoke the new static lifecycle.
           // Newer versions of React will ignore these lifecycles if gDSFP exists.
-          if (typeof Component.getDerivedStateFromProps === 'function') {
+          if (typeof Component.getDerivedStateFromProps === "function") {
             prototype.componentWillMount = componentWillMount;
             prototype.componentWillReceiveProps = componentWillReceiveProps;
           }
@@ -5490,10 +5709,10 @@
           // React <= 16.2 does not support getSnapshotBeforeUpdate.
           // As a workaround, use cWU to invoke the new lifecycle.
           // Newer versions of React will ignore that lifecycle if gSBU exists.
-          if (typeof prototype.getSnapshotBeforeUpdate === 'function') {
-            if (typeof prototype.componentDidUpdate !== 'function') {
+          if (typeof prototype.getSnapshotBeforeUpdate === "function") {
+            if (typeof prototype.componentDidUpdate !== "function") {
               throw new Error(
-                'Cannot polyfill getSnapshotBeforeUpdate() for components that do not define componentDidUpdate() on the prototype'
+                "Cannot polyfill getSnapshotBeforeUpdate() for components that do not define componentDidUpdate() on the prototype"
               );
             }
 
@@ -5525,17 +5744,11 @@
           return Component;
         }
 
-
-
-
         /***/
-      }),
+      },
 
-/***/ 437:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 437: /***/ function (module, exports, __webpack_require__) {
         "use strict";
-
 
         exports.__esModule = true;
         exports.classNamesShape = exports.timeoutsShape = undefined;
@@ -5545,22 +5758,31 @@
 
         var _propTypes2 = _interopRequireDefault(_propTypes);
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
         function transitionTimeout(transitionType) {
-          var timeoutPropName = 'transition' + transitionType + 'Timeout';
-          var enabledPropName = 'transition' + transitionType;
+          var timeoutPropName = "transition" + transitionType + "Timeout";
+          var enabledPropName = "transition" + transitionType;
 
           return function (props) {
             // If the transition is enabled
             if (props[enabledPropName]) {
               // If no timeout duration is provided
               if (props[timeoutPropName] == null) {
-                return new Error(timeoutPropName + ' wasn\'t supplied to CSSTransitionGroup: ' + 'this can cause unreliable animations and won\'t be supported in ' + 'a future version of React. See ' + 'https://fb.me/react-animation-transition-group-timeout for more ' + 'information.');
+                return new Error(
+                  timeoutPropName +
+                    " wasn't supplied to CSSTransitionGroup: " +
+                    "this can cause unreliable animations and won't be supported in " +
+                    "a future version of React. See " +
+                    "https://fb.me/react-animation-transition-group-timeout for more " +
+                    "information."
+                );
 
                 // If the duration isn't a number
-              } else if (typeof props[timeoutPropName] !== 'number') {
-                return new Error(timeoutPropName + ' must be a number (in milliseconds)');
+              } else if (typeof props[timeoutPropName] !== "number") {
+                return new Error(timeoutPropName + " must be a number (in milliseconds)");
               }
             }
 
@@ -5568,59 +5790,63 @@
           };
         }
 
-        var timeoutsShape = exports.timeoutsShape = _propTypes2.default.oneOfType([_propTypes2.default.number, _propTypes2.default.shape({
-          enter: _propTypes2.default.number,
-          exit: _propTypes2.default.number
-        }).isRequired]);
+        var timeoutsShape = (exports.timeoutsShape = _propTypes2.default.oneOfType([
+          _propTypes2.default.number,
+          _propTypes2.default.shape({
+            enter: _propTypes2.default.number,
+            exit: _propTypes2.default.number,
+          }).isRequired,
+        ]));
 
-        var classNamesShape = exports.classNamesShape = _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.shape({
-          enter: _propTypes2.default.string,
-          exit: _propTypes2.default.string,
-          active: _propTypes2.default.string
-        }), _propTypes2.default.shape({
-          enter: _propTypes2.default.string,
-          enterDone: _propTypes2.default.string,
-          enterActive: _propTypes2.default.string,
-          exit: _propTypes2.default.string,
-          exitDone: _propTypes2.default.string,
-          exitActive: _propTypes2.default.string
-        })]);
+        var classNamesShape = (exports.classNamesShape = _propTypes2.default.oneOfType([
+          _propTypes2.default.string,
+          _propTypes2.default.shape({
+            enter: _propTypes2.default.string,
+            exit: _propTypes2.default.string,
+            active: _propTypes2.default.string,
+          }),
+          _propTypes2.default.shape({
+            enter: _propTypes2.default.string,
+            enterDone: _propTypes2.default.string,
+            enterActive: _propTypes2.default.string,
+            exit: _propTypes2.default.string,
+            exitDone: _propTypes2.default.string,
+            exitActive: _propTypes2.default.string,
+          }),
+        ]));
 
         /***/
-      }),
+      },
 
-/***/ 438:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 438: /***/ function (module, exports, __webpack_require__) {
         "use strict";
 
-
         Object.defineProperty(exports, "__esModule", {
-          value: true
+          value: true,
         });
         Object.defineProperty(exports, "TabList", {
           enumerable: true,
           get: function () {
             return _tabList.default;
-          }
+          },
         });
         Object.defineProperty(exports, "TabPanels", {
           enumerable: true,
           get: function () {
             return _tabPanels.default;
-          }
+          },
         });
         Object.defineProperty(exports, "Tab", {
           enumerable: true,
           get: function () {
             return _tab.default;
-          }
+          },
         });
         Object.defineProperty(exports, "Tabs", {
           enumerable: true,
           get: function () {
             return _tabs.default;
-          }
+          },
         });
 
         var _tabList = _interopRequireDefault(__webpack_require__(185));
@@ -5631,56 +5857,48 @@
 
         var _tabs = _interopRequireDefault(__webpack_require__(442));
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
         /***/
-      }),
+      },
 
-/***/ 439:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 439: /***/ function (module, exports, __webpack_require__) {
         "use strict";
 
-
         Object.defineProperty(exports, "__esModule", {
-          value: true
+          value: true,
         });
         exports.default = void 0;
 
         var _propTypes = _interopRequireDefault(__webpack_require__(0));
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
         var _default = _propTypes.default.object;
         exports.default = _default;
 
         /***/
-      }),
+      },
 
-/***/ 440:
-/***/ (function (module, exports) {
-
+      /***/ 440: /***/ function (module, exports) {
         // removed by extract-text-webpack-plugin
-
         /***/
-      }),
+      },
 
-/***/ 441:
-/***/ (function (module, exports) {
-
+      /***/ 441: /***/ function (module, exports) {
         // removed by extract-text-webpack-plugin
-
         /***/
-      }),
+      },
 
-/***/ 442:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 442: /***/ function (module, exports, __webpack_require__) {
         "use strict";
 
-
         Object.defineProperty(exports, "__esModule", {
-          value: true
+          value: true,
         });
         exports.default = void 0;
 
@@ -5694,7 +5912,9 @@
 
         var _tabPanels = _interopRequireDefault(__webpack_require__(187));
 
-        function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
         class Tabs extends _react.default.Component {
           constructor() {
@@ -5703,40 +5923,38 @@
           }
 
           render() {
-            const {
-              activeIndex,
-              children,
-              className,
-              onActivateTab
-            } = this.props;
+            const { activeIndex, children, className, onActivateTab } = this.props;
             const accessibleId = this.accessibleId;
-            return _react.default.createElement("div", {
-              className: className
-            }, _react.default.Children.map(children, child => {
-              if (!child) {
-                return child;
-              }
-
-              switch (child.type) {
-                case _tabList.default:
-                  return _react.default.cloneElement(child, {
-                    accessibleId,
-                    activeIndex,
-                    onActivateTab
-                  });
-
-                case _tabPanels.default:
-                  return _react.default.cloneElement(child, {
-                    accessibleId,
-                    activeIndex
-                  });
-
-                default:
+            return _react.default.createElement(
+              "div",
+              {
+                className: className,
+              },
+              _react.default.Children.map(children, child => {
+                if (!child) {
                   return child;
-              }
-            }));
-          }
+                }
 
+                switch (child.type) {
+                  case _tabList.default:
+                    return _react.default.cloneElement(child, {
+                      accessibleId,
+                      activeIndex,
+                      onActivateTab,
+                    });
+
+                  case _tabPanels.default:
+                    return _react.default.cloneElement(child, {
+                      accessibleId,
+                      activeIndex,
+                    });
+
+                  default:
+                    return child;
+                }
+              })
+            );
+          }
         }
 
         exports.default = Tabs;
@@ -5744,25 +5962,22 @@
           activeIndex: _propTypes.default.number.isRequired,
           children: _propTypes.default.node,
           className: _propTypes.default.string,
-          onActivateTab: _propTypes.default.func
+          onActivateTab: _propTypes.default.func,
         };
         Tabs.defaultProps = {
           children: null,
           className: undefined,
-          onActivateTab: () => { }
+          onActivateTab: () => {},
         };
 
         /***/
-      }),
+      },
 
-/***/ 443:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 443: /***/ function (module, exports, __webpack_require__) {
         "use strict";
 
-
         Object.defineProperty(exports, "__esModule", {
-          value: true
+          value: true,
         });
         exports.default = uniqueId;
         let counter = 0;
@@ -5773,11 +5988,9 @@
         }
 
         /***/
-      }),
+      },
 
-/***/ 445:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 445: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
@@ -5786,11 +5999,9 @@
         module.exports = SplitBox;
 
         /***/
-      }),
+      },
 
-/***/ 446:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 446: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
@@ -5799,9 +6010,7 @@
         const ReactDOM = __webpack_require__(103);
 
         const Draggable = React.createFactory(__webpack_require__(447));
-        const {
-          Component
-        } = React;
+        const { Component } = React;
 
         const PropTypes = __webpack_require__(0);
 
@@ -5812,7 +6021,6 @@
          * This component represents a Splitter. The splitter supports vertical
          * as well as horizontal mode.
          */
-
 
         class SplitBox extends Component {
           static get propTypes() {
@@ -5846,7 +6054,7 @@
               // Optional style properties passed into the splitbox
               style: PropTypes.object,
               // Optional callback when splitbox resize stops
-              onResizeEnd: PropTypes.func
+              onResizeEnd: PropTypes.func,
             };
           }
 
@@ -5856,7 +6064,7 @@
               vert: true,
               endPanelControl: false,
               endPanelCollapsed: false,
-              startPanelCollapsed: false
+              startPanelCollapsed: false,
             };
           }
 
@@ -5866,7 +6074,7 @@
               vert: props.vert,
               // We use integers for these properties
               width: parseInt(props.initialWidth || props.initialSize, 10),
-              height: parseInt(props.initialHeight || props.initialSize, 10)
+              height: parseInt(props.initialHeight || props.initialSize, 10),
             };
             this.onStartMove = this.onStartMove.bind(this);
             this.onStopMove = this.onStopMove.bind(this);
@@ -5877,14 +6085,18 @@
           componentWillReceiveProps(nextProps) {
             if (this.props.vert !== nextProps.vert) {
               this.setState({
-                vert: nextProps.vert
+                vert: nextProps.vert,
               });
             }
 
-            if (this.props.initialSize !== nextProps.initialSize || this.props.initialWidth !== nextProps.initialWidth || this.props.initialHeight !== nextProps.initialHeight) {
+            if (
+              this.props.initialSize !== nextProps.initialSize ||
+              this.props.initialWidth !== nextProps.initialWidth ||
+              this.props.initialHeight !== nextProps.initialHeight
+            ) {
               this.setState({
                 width: parseInt(nextProps.initialWidth || nextProps.initialSize, 10),
-                height: parseInt(nextProps.initialHeight || nextProps.initialSize, 10)
+                height: parseInt(nextProps.initialHeight || nextProps.initialSize, 10),
               });
             }
           } // Dragging Events
@@ -5895,7 +6107,6 @@
            * the splitter bar area (happens frequently).
            */
 
-
           onStartMove() {
             const splitBox = ReactDOM.findDOMNode(this);
             const doc = splitBox.ownerDocument;
@@ -5904,7 +6115,7 @@
             splitBox.classList.add("dragging");
             document.dispatchEvent(new CustomEvent("drag:start"));
             this.setState({
-              defaultCursor: defaultCursor
+              defaultCursor: defaultCursor,
             });
           }
 
@@ -5925,11 +6136,7 @@
            * the splitter box.
            */
 
-
-          onMove({
-            movementX,
-            movementY
-          }) {
+          onMove({ movementX, movementY }) {
             const node = ReactDOM.findDOMNode(this);
             const doc = node.ownerDocument;
 
@@ -5950,15 +6157,14 @@
               }
 
               this.setState((state, props) => ({
-                width: state.width + movementX
+                width: state.width + movementX,
               }));
             } else {
               this.setState((state, props) => ({
-                height: state.height + movementY
+                height: state.height + movementY,
               }));
             }
           } // Rendering
-
 
           preparePanelStyles() {
             const vert = this.state.vert;
@@ -5967,7 +6173,7 @@
               maxSize,
               startPanelCollapsed,
               endPanelControl,
-              endPanelCollapsed
+              endPanelCollapsed,
             } = this.props;
             let leftPanelStyle, rightPanelStyle; // Set proper size for panels depending on the current state.
 
@@ -5977,12 +6183,12 @@
               leftPanelStyle = {
                 maxWidth: endPanelControl ? null : maxSize,
                 minWidth: endPanelControl ? null : minSize,
-                width: startPanelCollapsed ? 0 : startWidth
+                width: startPanelCollapsed ? 0 : startWidth,
               };
               rightPanelStyle = {
                 maxWidth: endPanelControl ? maxSize : null,
                 minWidth: endPanelControl ? minSize : null,
-                width: endPanelCollapsed ? 0 : endWidth
+                width: endPanelCollapsed ? 0 : endWidth,
               };
             } else {
               const startHeight = endPanelControl ? null : this.state.height,
@@ -5990,18 +6196,18 @@
               leftPanelStyle = {
                 maxHeight: endPanelControl ? null : maxSize,
                 minHeight: endPanelControl ? null : minSize,
-                height: endPanelCollapsed ? maxSize : startHeight
+                height: endPanelCollapsed ? maxSize : startHeight,
               };
               rightPanelStyle = {
                 maxHeight: endPanelControl ? maxSize : null,
                 minHeight: endPanelControl ? minSize : null,
-                height: startPanelCollapsed ? maxSize : endHeight
+                height: startPanelCollapsed ? maxSize : endHeight,
               };
             }
 
             return {
               leftPanelStyle,
-              rightPanelStyle
+              rightPanelStyle,
             };
           }
 
@@ -6013,7 +6219,7 @@
               endPanel,
               endPanelControl,
               splitterSize,
-              endPanelCollapsed
+              endPanelCollapsed,
             } = this.props;
             const style = Object.assign({}, this.props.style); // Calculate class names list.
 
@@ -6024,42 +6230,51 @@
               classNames = classNames.concat(this.props.className.split(" "));
             }
 
-            const {
-              leftPanelStyle,
-              rightPanelStyle
-            } = this.preparePanelStyles(); // Calculate splitter size
+            const { leftPanelStyle, rightPanelStyle } = this.preparePanelStyles(); // Calculate splitter size
 
             const splitterStyle = {
-              flex: `0 0 ${splitterSize}px`
+              flex: `0 0 ${splitterSize}px`,
             };
-            return dom.div({
-              className: classNames.join(" "),
-              style: style
-            }, !startPanelCollapsed ? dom.div({
-              className: endPanelControl ? "uncontrolled" : "controlled",
-              style: leftPanelStyle
-            }, startPanel) : null, Draggable({
-              className: "splitter",
-              style: splitterStyle,
-              onStart: this.onStartMove,
-              onStop: this.onStopMove,
-              onMove: this.onMove
-            }), !endPanelCollapsed ? dom.div({
-              className: endPanelControl ? "controlled" : "uncontrolled",
-              style: rightPanelStyle
-            }, endPanel) : null);
+            return dom.div(
+              {
+                className: classNames.join(" "),
+                style: style,
+              },
+              !startPanelCollapsed
+                ? dom.div(
+                    {
+                      className: endPanelControl ? "uncontrolled" : "controlled",
+                      style: leftPanelStyle,
+                    },
+                    startPanel
+                  )
+                : null,
+              Draggable({
+                className: "splitter",
+                style: splitterStyle,
+                onStart: this.onStartMove,
+                onStop: this.onStopMove,
+                onMove: this.onMove,
+              }),
+              !endPanelCollapsed
+                ? dom.div(
+                    {
+                      className: endPanelControl ? "controlled" : "uncontrolled",
+                      style: rightPanelStyle,
+                    },
+                    endPanel
+                  )
+                : null
+            );
           }
-
         }
 
         module.exports = SplitBox;
 
         /***/
-      }),
+      },
 
-/***/ 447:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 447: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
@@ -6067,9 +6282,7 @@
 
         const ReactDOM = __webpack_require__(103);
 
-        const {
-          Component
-        } = React;
+        const { Component } = React;
 
         const PropTypes = __webpack_require__(0);
 
@@ -6082,7 +6295,7 @@
               onStart: PropTypes.func,
               onStop: PropTypes.func,
               style: PropTypes.object,
-              className: PropTypes.string
+              className: PropTypes.string,
             };
           }
 
@@ -6109,7 +6322,6 @@
             } // We pass the whole event because we don't know which properties
             // the callee needs.
 
-
             this.props.onMove(ev);
           }
 
@@ -6125,37 +6337,39 @@
             return dom.div({
               style: this.props.style,
               className: this.props.className,
-              onMouseDown: this.startDragging
+              onMouseDown: this.startDragging,
             });
           }
-
         }
 
         module.exports = Draggable;
 
         /***/
-      }),
+      },
 
-/***/ 448:
-/***/ (function (module, exports) {
-
+      /***/ 448: /***/ function (module, exports) {
         // removed by extract-text-webpack-plugin
-
         /***/
-      }),
+      },
 
-/***/ 449:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 449: /***/ function (module, exports, __webpack_require__) {
         "use strict";
 
-
         Object.defineProperty(exports, "__esModule", {
-          value: true
+          value: true,
         });
         exports.default = move;
 
-        function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+        function _toConsumableArray(arr) {
+          if (Array.isArray(arr)) {
+            for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+              arr2[i] = arr[i];
+            }
+            return arr2;
+          } else {
+            return Array.from(arr);
+          }
+        }
 
         function move(array, moveIndex, toIndex) {
           /* #move - Moves an array item from one position in an array to another.
@@ -6172,63 +6386,142 @@
 
           if (diff > 0) {
             // move left
-            return [].concat(_toConsumableArray(array.slice(0, toIndex)), [item], _toConsumableArray(array.slice(toIndex, moveIndex)), _toConsumableArray(array.slice(moveIndex + 1, length)));
+            return [].concat(
+              _toConsumableArray(array.slice(0, toIndex)),
+              [item],
+              _toConsumableArray(array.slice(toIndex, moveIndex)),
+              _toConsumableArray(array.slice(moveIndex + 1, length))
+            );
           } else if (diff < 0) {
             // move right
-            return [].concat(_toConsumableArray(array.slice(0, moveIndex)), _toConsumableArray(array.slice(moveIndex + 1, toIndex + 1)), [item], _toConsumableArray(array.slice(toIndex + 1, length)));
+            return [].concat(
+              _toConsumableArray(array.slice(0, moveIndex)),
+              _toConsumableArray(array.slice(moveIndex + 1, toIndex + 1)),
+              [item],
+              _toConsumableArray(array.slice(toIndex + 1, length))
+            );
           }
           return array;
         }
 
         /***/
-      }),
+      },
 
-/***/ 490:
-/***/ (function (module, exports) {
-
+      /***/ 490: /***/ function (module, exports) {
         module.exports = __WEBPACK_EXTERNAL_MODULE_490__;
 
         /***/
-      }),
+      },
 
-/***/ 491:
-/***/ (function (module, exports) {
-
+      /***/ 491: /***/ function (module, exports) {
         module.exports = __WEBPACK_EXTERNAL_MODULE_491__;
 
         /***/
-      }),
+      },
 
-/***/ 501:
-/***/ (function (module, exports) {
-
+      /***/ 501: /***/ function (module, exports) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
-        * License, v. 2.0. If a copy of the MPL was not distributed with this
-        * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+         * License, v. 2.0. If a copy of the MPL was not distributed with this
+         * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
         // These are the available plural functions that give the appropriate index
         // based on the plural rule number specified. The first element is the number
         // of plural forms and the second is the function to figure out the index.
-        const gFunctions = [// 0: Chinese
+        const gFunctions = [
+          // 0: Chinese
           [1, n => 0], // 1: English
-          [2, n => n != 1 ? 1 : 0], // 2: French
-          [2, n => n > 1 ? 1 : 0], // 3: Latvian
-          [3, n => n % 10 == 1 && n % 100 != 11 ? 1 : n % 10 == 0 ? 0 : 2], // 4: Scottish Gaelic
-          [4, n => n == 1 || n == 11 ? 0 : n == 2 || n == 12 ? 1 : n > 0 && n < 20 ? 2 : 3], // 5: Romanian
-          [3, n => n == 1 ? 0 : n == 0 || n % 100 > 0 && n % 100 < 20 ? 1 : 2], // 6: Lithuanian
-          [3, n => n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && (n % 100 < 10 || n % 100 >= 20) ? 2 : 1], // 7: Russian
-          [3, n => n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2], // 8: Slovak
-          [3, n => n == 1 ? 0 : n >= 2 && n <= 4 ? 1 : 2], // 9: Polish
-          [3, n => n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2], // 10: Slovenian
-          [4, n => n % 100 == 1 ? 0 : n % 100 == 2 ? 1 : n % 100 == 3 || n % 100 == 4 ? 2 : 3], // 11: Irish Gaeilge
-          [5, n => n == 1 ? 0 : n == 2 ? 1 : n >= 3 && n <= 6 ? 2 : n >= 7 && n <= 10 ? 3 : 4], // 12: Arabic
-          [6, n => n == 0 ? 5 : n == 1 ? 0 : n == 2 ? 1 : n % 100 >= 3 && n % 100 <= 10 ? 2 : n % 100 >= 11 && n % 100 <= 99 ? 3 : 4], // 13: Maltese
-          [4, n => n == 1 ? 0 : n == 0 || n % 100 > 0 && n % 100 <= 10 ? 1 : n % 100 > 10 && n % 100 < 20 ? 2 : 3], // 14: Unused
-          [3, n => n % 10 == 1 ? 0 : n % 10 == 2 ? 1 : 2], // 15: Icelandic, Macedonian
-          [2, n => n % 10 == 1 && n % 100 != 11 ? 0 : 1], // 16: Breton
-          [5, n => n % 10 == 1 && n % 100 != 11 && n % 100 != 71 && n % 100 != 91 ? 0 : n % 10 == 2 && n % 100 != 12 && n % 100 != 72 && n % 100 != 92 ? 1 : (n % 10 == 3 || n % 10 == 4 || n % 10 == 9) && n % 100 != 13 && n % 100 != 14 && n % 100 != 19 && n % 100 != 73 && n % 100 != 74 && n % 100 != 79 && n % 100 != 93 && n % 100 != 94 && n % 100 != 99 ? 2 : n % 1000000 == 0 && n != 0 ? 3 : 4], // 17: Shuar
-          [2, n => n != 0 ? 1 : 0], // 18: Welsh
-          [6, n => n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n == 3 ? 3 : n == 6 ? 4 : 5], // 19: Bosnian, Croatian, Serbian
-          [3, n => n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2]];
+          [2, n => (n != 1 ? 1 : 0)], // 2: French
+          [2, n => (n > 1 ? 1 : 0)], // 3: Latvian
+          [3, n => (n % 10 == 1 && n % 100 != 11 ? 1 : n % 10 == 0 ? 0 : 2)], // 4: Scottish Gaelic
+          [4, n => (n == 1 || n == 11 ? 0 : n == 2 || n == 12 ? 1 : n > 0 && n < 20 ? 2 : 3)], // 5: Romanian
+          [3, n => (n == 1 ? 0 : n == 0 || (n % 100 > 0 && n % 100 < 20) ? 1 : 2)], // 6: Lithuanian
+          [
+            3,
+            n =>
+              n % 10 == 1 && n % 100 != 11
+                ? 0
+                : n % 10 >= 2 && (n % 100 < 10 || n % 100 >= 20)
+                ? 2
+                : 1,
+          ], // 7: Russian
+          [
+            3,
+            n =>
+              n % 10 == 1 && n % 100 != 11
+                ? 0
+                : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
+                ? 1
+                : 2,
+          ], // 8: Slovak
+          [3, n => (n == 1 ? 0 : n >= 2 && n <= 4 ? 1 : 2)], // 9: Polish
+          [
+            3,
+            n =>
+              n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2,
+          ], // 10: Slovenian
+          [4, n => (n % 100 == 1 ? 0 : n % 100 == 2 ? 1 : n % 100 == 3 || n % 100 == 4 ? 2 : 3)], // 11: Irish Gaeilge
+          [5, n => (n == 1 ? 0 : n == 2 ? 1 : n >= 3 && n <= 6 ? 2 : n >= 7 && n <= 10 ? 3 : 4)], // 12: Arabic
+          [
+            6,
+            n =>
+              n == 0
+                ? 5
+                : n == 1
+                ? 0
+                : n == 2
+                ? 1
+                : n % 100 >= 3 && n % 100 <= 10
+                ? 2
+                : n % 100 >= 11 && n % 100 <= 99
+                ? 3
+                : 4,
+          ], // 13: Maltese
+          [
+            4,
+            n =>
+              n == 1
+                ? 0
+                : n == 0 || (n % 100 > 0 && n % 100 <= 10)
+                ? 1
+                : n % 100 > 10 && n % 100 < 20
+                ? 2
+                : 3,
+          ], // 14: Unused
+          [3, n => (n % 10 == 1 ? 0 : n % 10 == 2 ? 1 : 2)], // 15: Icelandic, Macedonian
+          [2, n => (n % 10 == 1 && n % 100 != 11 ? 0 : 1)], // 16: Breton
+          [
+            5,
+            n =>
+              n % 10 == 1 && n % 100 != 11 && n % 100 != 71 && n % 100 != 91
+                ? 0
+                : n % 10 == 2 && n % 100 != 12 && n % 100 != 72 && n % 100 != 92
+                ? 1
+                : (n % 10 == 3 || n % 10 == 4 || n % 10 == 9) &&
+                  n % 100 != 13 &&
+                  n % 100 != 14 &&
+                  n % 100 != 19 &&
+                  n % 100 != 73 &&
+                  n % 100 != 74 &&
+                  n % 100 != 79 &&
+                  n % 100 != 93 &&
+                  n % 100 != 94 &&
+                  n % 100 != 99
+                ? 2
+                : n % 1000000 == 0 && n != 0
+                ? 3
+                : 4,
+          ], // 17: Shuar
+          [2, n => (n != 0 ? 1 : 0)], // 18: Welsh
+          [6, n => (n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n == 3 ? 3 : n == 6 ? 4 : 5)], // 19: Bosnian, Croatian, Serbian
+          [
+            3,
+            n =>
+              n % 10 == 1 && n % 100 != 11
+                ? 0
+                : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
+                ? 1
+                : 2,
+          ],
+        ];
         const PluralForm = {
           /**
            * Get the correct plural form of a word based on the number
@@ -6267,26 +6560,38 @@
               aRuleNum = 0;
             } // Get the desired pluralRule function
 
-
             let [numForms, pluralFunc] = gFunctions[aRuleNum]; // Return functions that give 1) the number of forms and 2) gets the right
             // plural form
 
-            return [function (aNum, aWords) {
-              // Figure out which index to use for the semi-colon separated words
-              let index = pluralFunc(aNum ? Number(aNum) : 0);
-              let words = aWords ? aWords.split(/;/) : [""]; // Explicitly check bounds to avoid strict warnings
+            return [
+              function (aNum, aWords) {
+                // Figure out which index to use for the semi-colon separated words
+                let index = pluralFunc(aNum ? Number(aNum) : 0);
+                let words = aWords ? aWords.split(/;/) : [""]; // Explicitly check bounds to avoid strict warnings
 
-              let ret = index < words.length ? words[index] : undefined; // Check for array out of bounds or empty strings
+                let ret = index < words.length ? words[index] : undefined; // Check for array out of bounds or empty strings
 
-              if (ret == undefined || ret == "") {
-                // Display a message in the error console
-                log(["Index #", index, " of '", aWords, "' for value ", aNum, " is invalid -- plural rule #", aRuleNum, ";"]); // Default to the first entry (which might be empty, but not undefined)
+                if (ret == undefined || ret == "") {
+                  // Display a message in the error console
+                  log([
+                    "Index #",
+                    index,
+                    " of '",
+                    aWords,
+                    "' for value ",
+                    aNum,
+                    " is invalid -- plural rule #",
+                    aRuleNum,
+                    ";",
+                  ]); // Default to the first entry (which might be empty, but not undefined)
 
-                ret = words[0];
-              }
+                  ret = words[0];
+                }
 
-              return ret;
-            }, () => numForms];
+                return ret;
+              },
+              () => numForms,
+            ];
           },
 
           /**
@@ -6312,8 +6617,7 @@
               // Fallback to English if the pluralRule property is not available.
               return 1;
             }
-          }
-
+          },
         };
         /**
          * Private helper function to log errors to the error console and command line
@@ -6330,16 +6634,13 @@
         module.exports = PluralForm;
 
         /***/
-      }),
+      },
 
-/***/ 516:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 516: /***/ function (module, exports, __webpack_require__) {
         "use strict";
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
 
         const asyncStorage = __webpack_require__(427);
         /*
@@ -6352,7 +6653,6 @@
          *   asyncStore.a = 2     // => asyncStorage.setItem("r._a", 2)
          */
 
-
         function asyncStoreHelper(root, mappings) {
           let store = {};
 
@@ -6364,17 +6664,18 @@
             return Array.isArray(mappings[key]) ? mappings[key][1] : null;
           }
 
-          Object.keys(mappings).map(key => Object.defineProperty(store, key, {
-            async get() {
-              const value = await asyncStorage.getItem(`${root}.${getMappingKey(key)}`);
-              return value || getMappingDefaultValue(key);
-            },
+          Object.keys(mappings).map(key =>
+            Object.defineProperty(store, key, {
+              async get() {
+                const value = await asyncStorage.getItem(`${root}.${getMappingKey(key)}`);
+                return value || getMappingDefaultValue(key);
+              },
 
-            set(value) {
-              return asyncStorage.setItem(`${root}.${getMappingKey(key)}`, value);
-            }
-
-          }));
+              set(value) {
+                return asyncStorage.setItem(`${root}.${getMappingKey(key)}`, value);
+              },
+            })
+          );
           store = new Proxy(store, {
             set: function (target, property, value, receiver) {
               if (!mappings.hasOwnProperty(property)) {
@@ -6383,7 +6684,7 @@
 
               Reflect.set(...arguments);
               return true;
-            }
+            },
           });
           return store;
         }
@@ -6391,29 +6692,22 @@
         module.exports = asyncStoreHelper;
 
         /***/
-      }),
+      },
 
-/***/ 520:
-/***/ (function (module, exports) {
-
-        module.exports = () => { };
+      /***/ 520: /***/ function (module, exports) {
+        module.exports = () => {};
 
         /***/
-      }),
+      },
 
-/***/ 521:
-/***/ (function (module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function (module, global) {
-          var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/punycode v1.4.1 by @mathias */
-          ; (function (root) {
-
+      /***/ 521: /***/ function (module, exports, __webpack_require__) {
+        /* WEBPACK VAR INJECTION */ (function (module, global) {
+          var __WEBPACK_AMD_DEFINE_RESULT__; /*! https://mths.be/punycode v1.4.1 by @mathias */
+          (function (root) {
             /** Detect free variables */
-            var freeExports = typeof exports == 'object' && exports &&
-              !exports.nodeType && exports;
-            var freeModule = typeof module == 'object' && module &&
-              !module.nodeType && module;
-            var freeGlobal = typeof global == 'object' && global;
+            var freeExports = typeof exports == "object" && exports && !exports.nodeType && exports;
+            var freeModule = typeof module == "object" && module && !module.nodeType && module;
+            var freeGlobal = typeof global == "object" && global;
             if (
               freeGlobal.global === freeGlobal ||
               freeGlobal.window === freeGlobal ||
@@ -6428,10 +6722,8 @@
              * @type Object
              */
             var punycode,
-
               /** Highest positive signed 32-bit float value */
               maxInt = 2147483647, // aka. 0x7FFFFFFF or 2^31-1
-
               /** Bootstring parameters */
               base = 36,
               tMin = 1,
@@ -6440,25 +6732,21 @@
               damp = 700,
               initialBias = 72,
               initialN = 128, // 0x80
-              delimiter = '-', // '\x2D'
-
+              delimiter = "-", // '\x2D'
               /** Regular expressions */
               regexPunycode = /^xn--/,
               regexNonASCII = /[^\x20-\x7E]/, // unprintable ASCII chars + non-ASCII chars
               regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g, // RFC 3490 separators
-
               /** Error messages */
               errors = {
-                'overflow': 'Overflow: input needs wider integers to process',
-                'not-basic': 'Illegal input >= 0x80 (not a basic code point)',
-                'invalid-input': 'Invalid input'
+                overflow: "Overflow: input needs wider integers to process",
+                "not-basic": "Illegal input >= 0x80 (not a basic code point)",
+                "invalid-input": "Invalid input",
               },
-
               /** Convenience shortcuts */
               baseMinusTMin = base - tMin,
               floor = Math.floor,
               stringFromCharCode = String.fromCharCode,
-
               /** Temporary variable */
               key;
 
@@ -6502,18 +6790,18 @@
              * function.
              */
             function mapDomain(string, fn) {
-              var parts = string.split('@');
-              var result = '';
+              var parts = string.split("@");
+              var result = "";
               if (parts.length > 1) {
                 // In email addresses, only the domain name should be punycoded. Leave
                 // the local part (i.e. everything up to `@`) intact.
-                result = parts[0] + '@';
+                result = parts[0] + "@";
                 string = parts[1];
               }
               // Avoid `split(regex)` for IE8 compatibility. See #17.
-              string = string.replace(regexSeparators, '\x2E');
-              var labels = string.split('.');
-              var encoded = map(labels, fn).join('.');
+              string = string.replace(regexSeparators, "\x2E");
+              var labels = string.split(".");
+              var encoded = map(labels, fn).join(".");
               return result + encoded;
             }
 
@@ -6538,11 +6826,12 @@
                 extra;
               while (counter < length) {
                 value = string.charCodeAt(counter++);
-                if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+                if (value >= 0xd800 && value <= 0xdbff && counter < length) {
                   // high surrogate, and there is a next character
                   extra = string.charCodeAt(counter++);
-                  if ((extra & 0xFC00) == 0xDC00) { // low surrogate
-                    output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+                  if ((extra & 0xfc00) == 0xdc00) {
+                    // low surrogate
+                    output.push(((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000);
                   } else {
                     // unmatched surrogate; only append this code unit, in case the next
                     // code unit is the high surrogate of a surrogate pair
@@ -6566,15 +6855,15 @@
              */
             function ucs2encode(array) {
               return map(array, function (value) {
-                var output = '';
-                if (value > 0xFFFF) {
+                var output = "";
+                if (value > 0xffff) {
                   value -= 0x10000;
-                  output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
-                  value = 0xDC00 | value & 0x3FF;
+                  output += stringFromCharCode(((value >>> 10) & 0x3ff) | 0xd800);
+                  value = 0xdc00 | (value & 0x3ff);
                 }
                 output += stringFromCharCode(value);
                 return output;
-              }).join('');
+              }).join("");
             }
 
             /**
@@ -6625,10 +6914,10 @@
               var k = 0;
               delta = firstTime ? floor(delta / damp) : delta >> 1;
               delta += floor(delta / numPoints);
-              for (/* no initialization */; delta > baseMinusTMin * tMax >> 1; k += base) {
+              for (; /* no initialization */ delta > (baseMinusTMin * tMax) >> 1; k += base) {
                 delta = floor(delta / baseMinusTMin);
               }
-              return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
+              return floor(k + ((baseMinusTMin + 1) * delta) / (delta + skew));
             }
 
             /**
@@ -6669,7 +6958,7 @@
               for (j = 0; j < basic; ++j) {
                 // if it's not a basic code point
                 if (input.charCodeAt(j) >= 0x80) {
-                  error('not-basic');
+                  error("not-basic");
                 }
                 output.push(input.charCodeAt(j));
               }
@@ -6677,27 +6966,29 @@
               // Main decoding loop: start just after the last delimiter if any basic code
               // points were copied; start at the beginning otherwise.
 
-              for (index = basic > 0 ? basic + 1 : 0; index < inputLength; /* no final expression */) {
+              for (
+                index = basic > 0 ? basic + 1 : 0;
+                index < inputLength /* no final expression */;
 
+              ) {
                 // `index` is the index of the next character to be consumed.
                 // Decode a generalized variable-length integer into `delta`,
                 // which gets added to `i`. The overflow checking is easier
                 // if we increase `i` as we go, then subtract off its starting
                 // value at the end to obtain `delta`.
-                for (oldi = i, w = 1, k = base; /* no condition */; k += base) {
-
+                for (oldi = i, w = 1, k = base /* no condition */; ; k += base) {
                   if (index >= inputLength) {
-                    error('invalid-input');
+                    error("invalid-input");
                   }
 
                   digit = basicToDigit(input.charCodeAt(index++));
 
                   if (digit >= base || digit > floor((maxInt - i) / w)) {
-                    error('overflow');
+                    error("overflow");
                   }
 
                   i += digit * w;
-                  t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+                  t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
 
                   if (digit < t) {
                     break;
@@ -6705,11 +6996,10 @@
 
                   baseMinusT = base - t;
                   if (w > floor(maxInt / baseMinusT)) {
-                    error('overflow');
+                    error("overflow");
                   }
 
                   w *= baseMinusT;
-
                 }
 
                 out = output.length + 1;
@@ -6718,7 +7008,7 @@
                 // `i` was supposed to wrap around from `out` to `0`,
                 // incrementing `n` each time, so we'll fix that now:
                 if (floor(i / out) > maxInt - n) {
-                  error('overflow');
+                  error("overflow");
                 }
 
                 n += floor(i / out);
@@ -6726,7 +7016,6 @@
 
                 // Insert `n` at position `i` of the output
                 output.splice(i++, 0, n);
-
               }
 
               return ucs2encode(output);
@@ -6790,7 +7079,6 @@
 
               // Main encoding loop:
               while (handledCPCount < inputLength) {
-
                 // All non-basic code points < n have been handled already. Find the next
                 // larger one:
                 for (m = maxInt, j = 0; j < inputLength; ++j) {
@@ -6804,7 +7092,7 @@
                 // but guard against overflow
                 handledCPCountPlusOne = handledCPCount + 1;
                 if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
-                  error('overflow');
+                  error("overflow");
                 }
 
                 delta += (m - n) * handledCPCountPlusOne;
@@ -6814,21 +7102,19 @@
                   currentValue = input[j];
 
                   if (currentValue < n && ++delta > maxInt) {
-                    error('overflow');
+                    error("overflow");
                   }
 
                   if (currentValue == n) {
                     // Represent delta as a generalized variable-length integer
-                    for (q = delta, k = base; /* no condition */; k += base) {
-                      t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+                    for (q = delta, k = base /* no condition */; ; k += base) {
+                      t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
                       if (q < t) {
                         break;
                       }
                       qMinusT = q - t;
                       baseMinusT = base - t;
-                      output.push(
-                        stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0))
-                      );
+                      output.push(stringFromCharCode(digitToBasic(t + (qMinusT % baseMinusT), 0)));
                       q = floor(qMinusT / baseMinusT);
                     }
 
@@ -6841,9 +7127,8 @@
 
                 ++delta;
                 ++n;
-
               }
-              return output.join('');
+              return output.join("");
             }
 
             /**
@@ -6859,9 +7144,7 @@
              */
             function toUnicode(input) {
               return mapDomain(input, function (string) {
-                return regexPunycode.test(string)
-                  ? decode(string.slice(4).toLowerCase())
-                  : string;
+                return regexPunycode.test(string) ? decode(string.slice(4).toLowerCase()) : string;
               });
             }
 
@@ -6878,9 +7161,7 @@
              */
             function toASCII(input) {
               return mapDomain(input, function (string) {
-                return regexNonASCII.test(string)
-                  ? 'xn--' + encode(string)
-                  : string;
+                return regexNonASCII.test(string) ? "xn--" + encode(string) : string;
               });
             }
 
@@ -6893,7 +7174,7 @@
                * @memberOf punycode
                * @type String
                */
-              'version': '1.4.1',
+              version: "1.4.1",
               /**
                * An object of methods to convert from JavaScript's internal character
                * representation (UCS-2) to Unicode code points, and back.
@@ -6901,26 +7182,25 @@
                * @memberOf punycode
                * @type Object
                */
-              'ucs2': {
-                'decode': ucs2decode,
-                'encode': ucs2encode
+              ucs2: {
+                decode: ucs2decode,
+                encode: ucs2encode,
               },
-              'decode': decode,
-              'encode': encode,
-              'toASCII': toASCII,
-              'toUnicode': toUnicode
+              decode: decode,
+              encode: encode,
+              toASCII: toASCII,
+              toUnicode: toUnicode,
             };
 
             /** Expose `punycode` */
             // Some AMD build optimizers, like r.js, check for specific condition patterns
             // like the following:
-            if (
-              true
-            ) {
-              !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
+            if (true) {
+              !((__WEBPACK_AMD_DEFINE_RESULT__ = function () {
                 return punycode;
-              }).call(exports, __webpack_require__, exports, module),
-                __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+              }.call(exports, __webpack_require__, exports, module)),
+              __WEBPACK_AMD_DEFINE_RESULT__ !== undefined &&
+                (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
             } else if (freeExports && freeModule) {
               if (module.exports == freeExports) {
                 // in Node.js, io.js, or RingoJS v0.8.0+
@@ -6935,30 +7215,25 @@
               // in Rhino or a web browser
               root.punycode = punycode;
             }
-
-          }(this));
+          })(this);
 
           /* WEBPACK VAR INJECTION */
-        }.call(exports, __webpack_require__(22)(module), __webpack_require__(15)))
+        }.call(exports, __webpack_require__(22)(module), __webpack_require__(15)));
 
         /***/
-      }),
+      },
 
-/***/ 6:
-/***/ (function (module, exports) {
-
+      /***/ 6: /***/ function (module, exports) {
         module.exports = __WEBPACK_EXTERNAL_MODULE_6__;
 
         /***/
-      }),
+      },
 
-/***/ 65:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 65: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-        var EventEmitter = function EventEmitter() { };
+        var EventEmitter = function EventEmitter() {};
 
         module.exports = EventEmitter;
 
@@ -6970,7 +7245,6 @@
          *        Bind all public methods of EventEmitter to
          *        the aObjectToDecorate object.
          */
-
 
         EventEmitter.decorate = function EventEmitter_decorate(aObjectToDecorate) {
           let emitter = new EventEmitter();
@@ -7046,9 +7320,12 @@
             let listeners = this._eventEmitterListeners.get(aEvent);
 
             if (listeners) {
-              this._eventEmitterListeners.set(aEvent, listeners.filter(l => {
-                return l !== aListener && l._originalListener !== aListener;
-              }));
+              this._eventEmitterListeners.set(
+                aEvent,
+                listeners.filter(l => {
+                  return l !== aListener && l._originalListener !== aListener;
+                })
+              );
             }
           },
 
@@ -7071,8 +7348,10 @@
               } // If listeners were removed during emission, make sure the
               // event handler we're going to fire wasn't removed.
 
-
-              if (originalListeners === this._eventEmitterListeners.get(aEvent) || this._eventEmitterListeners.get(aEvent).some(l => l === listener)) {
+              if (
+                originalListeners === this._eventEmitterListeners.get(aEvent) ||
+                this._eventEmitterListeners.get(aEvent).some(l => l === listener)
+              ) {
                 try {
                   listener.apply(null, arguments);
                 } catch (ex) {
@@ -7083,17 +7362,34 @@
                 }
               }
             }
-          }
+          },
         };
 
         /***/
-      }),
+      },
 
-/***/ 66:
-/***/ (function (module, exports) {
-
+      /***/ 66: /***/ function (module, exports) {
         (function () {
-          var AcronymResult, computeScore, emptyAcronymResult, isAcronymFullWord, isMatch, isSeparator, isWordEnd, isWordStart, miss_coeff, pos_bonus, scoreAcronyms, scoreCharacter, scoreConsecutives, scoreExact, scoreExactMatch, scorePattern, scorePosition, scoreSize, tau_size, wm;
+          var AcronymResult,
+            computeScore,
+            emptyAcronymResult,
+            isAcronymFullWord,
+            isMatch,
+            isSeparator,
+            isWordEnd,
+            isWordStart,
+            miss_coeff,
+            pos_bonus,
+            scoreAcronyms,
+            scoreCharacter,
+            scoreConsecutives,
+            scoreExact,
+            scoreExactMatch,
+            scorePattern,
+            scorePosition,
+            scoreSize,
+            tau_size,
+            wm;
 
           wm = 150;
 
@@ -7105,7 +7401,7 @@
 
           exports.score = function (string, query, options) {
             var allowErrors, preparedQuery, score, string_lw;
-            preparedQuery = options.preparedQuery, allowErrors = options.allowErrors;
+            (preparedQuery = options.preparedQuery), (allowErrors = options.allowErrors);
             if (!(allowErrors || isMatch(string, preparedQuery.core_lw, preparedQuery.core_up))) {
               return 0;
             }
@@ -7140,7 +7436,30 @@
           };
 
           exports.computeScore = computeScore = function (subject, subject_lw, preparedQuery) {
-            var acro, acro_score, align, csc_diag, csc_row, csc_score, csc_should_rebuild, i, j, m, miss_budget, miss_left, n, pos, query, query_lw, record_miss, score, score_diag, score_row, score_up, si_lw, start, sz;
+            var acro,
+              acro_score,
+              align,
+              csc_diag,
+              csc_row,
+              csc_score,
+              csc_should_rebuild,
+              i,
+              j,
+              m,
+              miss_budget,
+              miss_left,
+              n,
+              pos,
+              query,
+              query_lw,
+              record_miss,
+              score,
+              score_diag,
+              score_row,
+              score_up,
+              si_lw,
+              start,
+              sz;
             query = preparedQuery.query;
             query_lw = preparedQuery.query_lw;
             m = subject.length;
@@ -7192,7 +7511,10 @@
                 csc_score = 0;
                 if (query_lw[j] === si_lw) {
                   start = isWordStart(i, subject, subject_lw);
-                  csc_score = csc_diag > 0 ? csc_diag : scoreConsecutives(subject, subject_lw, query, query_lw, i, j, start);
+                  csc_score =
+                    csc_diag > 0
+                      ? csc_diag
+                      : scoreConsecutives(subject, subject_lw, query, query_lw, i, j, start);
                   align = score_diag + scoreCharacter(i, j, start, acro_score, csc_score);
                   if (align > score) {
                     score = align;
@@ -7221,7 +7543,9 @@
             }
             curr_s = subject[pos];
             prev_s = subject[pos - 1];
-            return isSeparator(prev_s) || (curr_s !== subject_lw[pos] && prev_s === subject_lw[pos - 1]);
+            return (
+              isSeparator(prev_s) || (curr_s !== subject_lw[pos] && prev_s === subject_lw[pos - 1])
+            );
           };
 
           exports.isWordEnd = isWordEnd = function (pos, subject, subject_lw, len) {
@@ -7231,11 +7555,13 @@
             }
             curr_s = subject[pos];
             next_s = subject[pos + 1];
-            return isSeparator(next_s) || (curr_s === subject_lw[pos] && next_s !== subject_lw[pos + 1]);
+            return (
+              isSeparator(next_s) || (curr_s === subject_lw[pos] && next_s !== subject_lw[pos + 1])
+            );
           };
 
           isSeparator = function (c) {
-            return c === ' ' || c === '.' || c === '-' || c === '_' || c === '/' || c === '\\';
+            return c === " " || c === "." || c === "-" || c === "_" || c === "/" || c === "\\";
           };
 
           scorePosition = function (pos) {
@@ -7293,7 +7619,15 @@
             return posBonus + wm * csc_score;
           };
 
-          exports.scoreConsecutives = scoreConsecutives = function (subject, subject_lw, query, query_lw, i, j, startOfWord) {
+          exports.scoreConsecutives = scoreConsecutives = function (
+            subject,
+            subject_lw,
+            query,
+            query_lw,
+            i,
+            j,
+            startOfWord
+          ) {
             var k, m, mi, n, nj, sameCase, sz;
             m = subject.length;
             n = query.length;
@@ -7319,7 +7653,15 @@
             return scorePattern(sz, n, sameCase, startOfWord, isWordEnd(i, subject, subject_lw, m));
           };
 
-          exports.scoreExactMatch = scoreExactMatch = function (subject, subject_lw, query, query_lw, pos, n, m) {
+          exports.scoreExactMatch = scoreExactMatch = function (
+            subject,
+            subject_lw,
+            query,
+            query_lw,
+            pos,
+            n,
+            m
+          ) {
             var end, i, pos2, sameCase, start;
             start = isWordStart(pos, subject, subject_lw);
             if (!start) {
@@ -7350,7 +7692,6 @@
             }
 
             return AcronymResult;
-
           })();
 
           emptyAcronymResult = new AcronymResult(0, 0.1, 0);
@@ -7417,17 +7758,14 @@
             }
             return true;
           };
-
-        }).call(this);
-
+        }.call(this));
 
         /***/
-      }),
+      },
 
-/***/ 67:
-/***/ (function (module, exports, __webpack_require__) {
-
-        var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+      /***/ 67: /***/ function (module, exports, __webpack_require__) {
+        var __WEBPACK_AMD_DEFINE_ARRAY__,
+          __WEBPACK_AMD_DEFINE_RESULT__; /*!
   Copyright (c) 2017 Jed Watson.
   Licensed under the MIT License (MIT), see
   http://jedwatson.github.io/classnames
@@ -7435,7 +7773,7 @@
         /* global define */
 
         (function () {
-          'use strict';
+          "use strict";
 
           var hasOwn = {}.hasOwnProperty;
 
@@ -7448,14 +7786,14 @@
 
               var argType = typeof arg;
 
-              if (argType === 'string' || argType === 'number') {
+              if (argType === "string" || argType === "number") {
                 classes.push(arg);
               } else if (Array.isArray(arg) && arg.length) {
                 var inner = classNames.apply(null, arg);
                 if (inner) {
                   classes.push(inner);
                 }
-              } else if (argType === 'object') {
+              } else if (argType === "object") {
                 for (var key in arg) {
                   if (hasOwn.call(arg, key) && arg[key]) {
                     classes.push(key);
@@ -7464,30 +7802,29 @@
               }
             }
 
-            return classes.join(' ');
+            return classes.join(" ");
           }
 
-          if (typeof module !== 'undefined' && module.exports) {
+          if (typeof module !== "undefined" && module.exports) {
             classNames.default = classNames;
             module.exports = classNames;
           } else if (true) {
             // register as 'classnames', consistent with npm package name
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function () {
+            !((__WEBPACK_AMD_DEFINE_ARRAY__ = []),
+            (__WEBPACK_AMD_DEFINE_RESULT__ = function () {
               return classNames;
-            }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
-              __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+            }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)),
+            __WEBPACK_AMD_DEFINE_RESULT__ !== undefined &&
+              (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
           } else {
             window.classNames = classNames;
           }
-        }());
-
+        })();
 
         /***/
-      }),
+      },
 
-/***/ 7:
-/***/ (function (module, exports, __webpack_require__) {
-
+      /***/ 7: /***/ function (module, exports, __webpack_require__) {
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
@@ -7497,12 +7834,13 @@
 
         module.exports = {
           networkRequest,
-          workerUtils
+          workerUtils,
         };
 
         /***/
-      })
+      },
 
-    /******/
-  });
+      /******/
+    }
+  );
 });
