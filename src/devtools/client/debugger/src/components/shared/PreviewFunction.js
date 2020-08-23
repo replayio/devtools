@@ -11,15 +11,17 @@ import { times, zip, flatten } from "lodash";
 
 import "./PreviewFunction.css";
 
-type FunctionType = {|
-  name: string,
-  parameterNames: string[]
-|} | {
-  functionName(): string,
-  functionParameterNames(): string[],
-  functionLocation(): { line: number },
-  functionLocationURL(): string
-};
+type FunctionType =
+  | {|
+      name: string,
+      parameterNames: string[],
+    |}
+  | {
+      functionName(): string,
+      functionParameterNames(): string[],
+      functionLocation(): { line: number },
+      functionLocationURL(): string,
+    };
 
 type Props = { func: FunctionType };
 
@@ -28,19 +30,15 @@ const IGNORED_SOURCE_URLS = ["debugger eval code"];
 export default class PreviewFunction extends Component<Props> {
   renderFunctionName(func: FunctionType) {
     const { l10n } = this.context;
-    const name = (func.functionName
-      ? func.functionName()
-      : func.name
-    ) || l10n.getStr("anonymousFunction");
+    const name =
+      (func.functionName ? func.functionName() : func.name) || l10n.getStr("anonymousFunction");
 
     return <span className="function-name">{name}</span>;
   }
 
   renderParams(func: FunctionType) {
-    const parameterNames = (func.functionParameterNames
-      ? func.functionParameterNames()
-      : func.parameterNames
-    ) || [];
+    const parameterNames =
+      (func.functionParameterNames ? func.functionParameterNames() : func.parameterNames) || [];
 
     const params = parameterNames
       .filter(i => i)

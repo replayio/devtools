@@ -80,7 +80,7 @@ class Header extends React.Component {
         <div id="status"></div>
         <div className="links">
           <a id="headway" onClick={Headway.show}>
-            What's new
+            What&apos;s new
           </a>
           {this.renderAvatars()}
           {features.auth0 ? <LoginButton /> : null}
