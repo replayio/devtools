@@ -1,0 +1,16 @@
+name: Run correctness tests and deploy on success
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Run correctness tests
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Deps
+        run: npm install
+      - name: Build webpack
+        run: ./node_modules/.bin/webpack --mode development
