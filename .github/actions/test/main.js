@@ -7,13 +7,17 @@ function spawnChecked(...args) {
   }
 }
 
+console.log(new Date, "Start");
+
 spawnChecked("mv", ["dist/dist.tgz", "dist.tgz"]);
 spawnChecked("tar", ["-xzf", "dist.tgz"]);
-console.log("Unpackaged distribution");
+
+console.log(new Date, "Unpackaged distribution");
 
 spawnChecked("hdiutil", ["attach", "replay/replay.dmg"]);
 spawnChecked("cp", ["-R", "/Volumes/Replay/Replay.app", "/Applications"]);
 spawnChecked("hdiutil", ["detach", "/Volumes/Replay/"]);
-console.log("Installed replay browser");
+
+console.log(new Date, "Installed replay browser");
 
 require("../../../test/run");

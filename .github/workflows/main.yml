@@ -40,6 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
+      - run: npm install tmp
       - uses: ./.github/actions/test
   deploy:
     name: Deploy to S3
