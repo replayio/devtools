@@ -1,0 +1,103 @@
+.events-timeline-comments {
+  flex-grow: 1;
+  overflow: auto;
+  width: 300px;
+  border-left: 2px solid var(--grey-20);
+  overflow-x: hidden;
+}
+
+.events-timeline-comments .comment {
+  padding: 20px 16px 20px;
+  line-height: 1.25rem;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+  border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.events-timeline-comments .comment:hover {
+  border-left: 4px solid #7ed8c8;
+  padding-left: 12px;
+}
+
+.comment .label {
+  color: var(--theme-comment);
+  overflow-wrap: anywhere;
+  line-height: 1.75em;
+}
+
+.comment .editor {
+  flex-grow: 1;
+}
+
+.comment .editor textarea {
+  margin-bottom: 12px;
+  font-size: 1rem;
+  line-height: 1.75em;
+}
+
+.comment .editor .buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.comment .editor button {
+  padding: 6px;
+}
+
+.comment .editor button.save {
+  color: white;
+  background-color: #5EA3F8;
+}
+
+.comment .editor button:not(:last-child) {
+  margin-inline-end: 4px;
+}
+
+.events-timeline-comments p {
+  color: var(--theme-comment);
+  padding: 16px;
+  line-height: 1.5em;
+}
+
+.events-timeline-comments .comment-avatar {
+  width: 24px;
+  height: 24px;
+  margin-inline-end: 12px;
+  margin-top: 2px;
+  align-self: flex-start;
+  background-size: cover;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.events-timeline-comments .comment-body {
+  align-self: center;
+  flex-grow: 1;
+}
+
+.events-timeline-comments .dropdown-block {
+  align-self: flex-start;
+  flex-shrink: 0;
+}
+
+.events-timeline-comments .dropdown {
+  left: -150px;
+}
+
+.events-timeline-comments .dropdown-button {
+  height: 28px;
+  width: 28px;
+}
+
+.right-sidebar .comment-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.right-sidebar button.comment {
+  mask-repeat: no-repeat;
+  background-color: #969696;
+  mask-position: center;
+}
