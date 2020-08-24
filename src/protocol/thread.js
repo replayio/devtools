@@ -1167,6 +1167,12 @@ const ThreadFront = {
   // Epoch which invalidates step targets when advanced.
   resumeTargetEpoch: 0,
 
+  // How many in flight commands can change resume targets we get from the server.
+  numPendingInvalidateCommands: 0,
+
+  // Resolve hooks for promises waiting for pending invalidate commands to finish. wai
+  invalidateCommandWaiters: [],
+
   // Pauses for each point we have stopped or might stop at.
   allPauses: new Map(),
 
@@ -1315,16 +1321,16 @@ const ThreadFront = {
   async setBreakpoint(scriptId, line, column, condition) {
     const location = { scriptId, line, column };
     try {
-      this._invalidateResumeTargets();
-      const { breakpointId } = await sendMessage(
-        "Debugger.setBreakpoint",
-        { location, condition },
-        this.sessionId
-      );
-      if (breakpointId) {
-        this.breakpoints.set(breakpointId, { location });
-      }
-      this._precacheResumeTargets();
+      this._invalidateResumeTargets(async () => {
+        const { breakpointId } = await sendMessage(
+          "Debugger.setBreakpoint",
+          { location, condition },
+          this.sessionId
+        );
+        if (breakpointId) {
+          this.breakpoints.set(breakpointId, { location });
+        }
+      });
     } catch (e) {
       // An error will be generated if the breakpoint location is not valid for
       // this script. We don't keep precise track of which locations are valid
@@ -1350,9 +1356,9 @@ const ThreadFront = {
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
       if (location.scriptId == scriptId && location.line == line && location.column == column) {
         this.breakpoints.delete(breakpointId);
-        this._invalidateResumeTargets();
-        await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
-        this._precacheResumeTargets();
+        this._invalidateResumeTargets(async () => {
+          await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
+        });
       }
     }
   },
@@ -1504,9 +1510,36 @@ const ThreadFront = {
     });
   },
 
-  _invalidateResumeTargets() {
+  // Perform an operation that will change our cached targets about where resume
+  // operations will finish.
+  async _invalidateResumeTargets(callback) {
     this.resumeTargets.clear();
     this.resumeTargetEpoch++;
+    this.numPendingInvalidateCommands++;
+
+    try {
+      await callback();
+    } finally {
+      if (--this.numPendingInvalidateCommands == 0) {
+        this.invalidateCommandWaiters.forEach(resolve => resolve());
+        this.invalidateCommandWaiters.length = 0;
+        this._precacheResumeTargets();
+      }
+    }
+  },
+
+  // Wait for any in flight invalidation commands to finish. Note: currently
+  // this is only used during tests. Uses could be expanded to ensure that we
+  // don't perform resumes until all invalidating commands have settled, though
+  // this risks slowing things down and/or getting stuck if the server is having
+  // a problem.
+  waitForInvalidateCommandsToFinish() {
+    if (!this.numPendingInvalidateCommands) {
+      return;
+    }
+    const { promise, resolve } = defer();
+    this.invalidateCommandWaiters.push(resolve);
+    return promise;
   },
 
   async _findResumeTarget(point, command) {
@@ -1575,15 +1608,15 @@ const ThreadFront = {
   },
 
   async blackbox(scriptId, begin, end) {
-    this._invalidateResumeTargets();
-    await sendMessage("Debugger.blackboxScript", { scriptId, begin, end }, this.sessionId);
-    this._precacheResumeTargets();
+    this._invalidateResumeTargets(async () => {
+      await sendMessage("Debugger.blackboxScript", { scriptId, begin, end }, this.sessionId);
+    });
   },
 
   async unblackbox(scriptId, begin, end) {
-    this._invalidateResumeTargets();
-    await sendMessage("Debugger.unblackboxScript", { scriptId, begin, end }, this.sessionId);
-    this._precacheResumeTargets();
+    this._invalidateResumeTargets(async () => {
+      await sendMessage("Debugger.unblackboxScript", { scriptId, begin, end }, this.sessionId);
+    });
   },
 
   async findConsoleMessages(onConsoleMessage) {

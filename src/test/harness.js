@@ -91,6 +91,7 @@ async function addBreakpoint(url, line, column, options) {
   await waitUntil(() => {
     return dbgSelectors.getBreakpointCount() == bpCount + 1;
   });
+  await ThreadFront.waitForInvalidateCommandsToFinish();
 }
 
 async function setBreakpointOptions(url, line, column, options) {
@@ -98,6 +99,7 @@ async function setBreakpointOptions(url, line, column, options) {
   const sourceId = source.id;
   column = column || getFirstBreakpointColumn(line, sourceId);
   await dbg.actions.addBreakpoint(getContext(), { sourceId, line, column }, options);
+  await ThreadFront.waitForInvalidateCommandsToFinish();
 }
 
 async function disableBreakpoint(url, line, column) {
@@ -107,6 +109,7 @@ async function disableBreakpoint(url, line, column) {
   const location = { sourceId, sourceUrl: source.url, line, column };
   const bp = dbgSelectors.getBreakpointForLocation(location);
   await dbg.actions.disableBreakpoint(getContext(), bp);
+  await ThreadFront.waitForInvalidateCommandsToFinish();
 }
 
 function getFirstBreakpointColumn(line, sourceId) {
@@ -115,8 +118,9 @@ function getFirstBreakpointColumn(line, sourceId) {
   return position.column;
 }
 
-function removeAllBreakpoints() {
-  return dbg.actions.removeAllBreakpoints(getContext());
+async function removeAllBreakpoints() {
+  await dbg.actions.removeAllBreakpoints(getContext());
+  await ThreadFront.waitForInvalidateCommandsToFinish();
 }
 
 function isPaused() {
