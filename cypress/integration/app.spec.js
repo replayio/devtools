@@ -34,6 +34,46 @@ context("Actions", () => {
       cy.get(".command-button .play").click().get('[data-progress="100"]'));
   });
 
+  context("Inspector", () => {
+    it("Inspect .App styles", () =>
+      cy
+        .get("#toolbox-toolbar-inspector")
+        .click()
+        // Find body element
+        .get(".tag")
+        .contains("body")
+        .closest("li.child")
+        .find("ul.children")
+        .children()
+        .should("have.length.above", 4)
+
+        // Find root root element
+        .get(".attr-value")
+        .contains("root")
+        .closest("li.child")
+        .scrollIntoView()
+
+        // Expand the root element
+        .find(".expander")
+        .click()
+        .closest("li.child")
+        .find("ul.children")
+        .children()
+
+        // Find App element
+        .get(".attr-value")
+        .contains("App")
+        .click()
+
+        // Find .App selector
+        .get(".ruleview-selector")
+        .contains(".App")
+
+        // Find display property
+        .get(".ruleview-propertyname")
+        .contains("display"));
+  });
+
   context("Debugger", () => {
     it("clicking the first comment navigates to react-dom.production.min.js#1964", () =>
       cy
