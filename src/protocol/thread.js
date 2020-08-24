@@ -1324,6 +1324,7 @@ const ThreadFront = {
       if (breakpointId) {
         this.breakpoints.set(breakpointId, { location });
       }
+      this._precacheResumeTargets();
     } catch (e) {
       // An error will be generated if the breakpoint location is not valid for
       // this script. We don't keep precise track of which locations are valid
@@ -1351,6 +1352,7 @@ const ThreadFront = {
         this.breakpoints.delete(breakpointId);
         this._invalidateResumeTargets();
         await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
+        this._precacheResumeTargets();
       }
     }
   },
@@ -1505,7 +1507,6 @@ const ThreadFront = {
   _invalidateResumeTargets() {
     this.resumeTargets.clear();
     this.resumeTargetEpoch++;
-    this._precacheResumeTargets();
   },
 
   async _findResumeTarget(point, command) {
@@ -1576,11 +1577,13 @@ const ThreadFront = {
   async blackbox(scriptId, begin, end) {
     this._invalidateResumeTargets();
     await sendMessage("Debugger.blackboxScript", { scriptId, begin, end }, this.sessionId);
+    this._precacheResumeTargets();
   },
 
   async unblackbox(scriptId, begin, end) {
     this._invalidateResumeTargets();
     await sendMessage("Debugger.unblackboxScript", { scriptId, begin, end }, this.sessionId);
+    this._precacheResumeTargets();
   },
 
   async findConsoleMessages(onConsoleMessage) {
