@@ -38,3 +38,11 @@ export function getLeftOffset({ overlayWidth, time, zoom }) {
 
   return Math.max(position - messageWidth / 2, 0);
 }
+
+// Get the percent value for the left offset of a comment.
+export function getCommentLeftOffset({ overlayWidth, time, zoom, commentWidth }) {
+  const position = getVisiblePosition({ time, zoom }) * 100;
+  const messageWidth = (commentWidth / overlayWidth) * 100;
+
+  return Math.min(Math.max(position, 0), 100 - messageWidth);
+}
