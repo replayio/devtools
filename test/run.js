@@ -99,6 +99,7 @@ function getContentType(url) {
 
 const Manifest = [
   ["breakpoints-01.js", "doc_rr_basic.html"],
+  /*
   ["breakpoints-02.js", "doc_rr_basic.html"],
   ["breakpoints-03.js", "doc_rr_basic.html"],
   ["breakpoints-04.js", "doc_control_flow.html"],
@@ -129,6 +130,7 @@ const Manifest = [
   ["inspector-03.js", "doc_inspector_styles.html"],
   ["inspector-04.js", "doc_inspector_styles.html"],
   ["inspector-05.js", "doc_inspector_sourcemapped.html"],
+  */
 ];
 
 async function runMatchingTests() {

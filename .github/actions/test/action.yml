@@ -1,0 +1,6 @@
+name: "Test"
+description: "Run correctness tests"
+
+runs:
+  using: "node12"
+  main: "./main.js"

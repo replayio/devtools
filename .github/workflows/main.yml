@@ -10,7 +10,4 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Deps
-        run: npm install
-      - name: Build webpack
-        run: ./node_modules/.bin/webpack --mode development
+      - uses: ./.github/actions/test
