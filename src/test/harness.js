@@ -152,7 +152,9 @@ function waitForSelectedSource(url) {
       return false;
     }
 
-    return hasSymbols(source) && getBreakableLines(source.id);
+    // The hasSymbols check is disabled. Sometimes the parser worker fails for
+    // unclear reasons. See https://github.com/RecordReplay/devtools/issues/433
+    return /*hasSymbols(source) &&*/ getBreakableLines(source.id);
   });
 }
 
