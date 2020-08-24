@@ -7,18 +7,13 @@ function spawnChecked(...args) {
   }
 }
 
-spawnChecked("wget", ["https://replay.io/downloads/replay.dmg"]);
-console.log("Fetched replay.dmg");
+spawnChecked("mv", ["dist/dist.tgz", "dist.tgz"]);
+spawnChecked("tar", ["-xzf", "dist.tgz"]);
+console.log("Unpackaged distribution");
 
-spawnChecked("hdiutil", ["attach", "replay.dmg"]);
+spawnChecked("hdiutil", ["attach", "replay/replay.dmg"]);
 spawnChecked("cp", ["-R", "/Volumes/Replay/Replay.app", "/Applications"]);
 spawnChecked("hdiutil", ["detach", "/Volumes/Replay/"]);
 console.log("Installed replay browser");
-
-spawnChecked("npm", ["install"]);
-console.log("Installed dependencies");
-
-spawnChecked("./node_modules/.bin/webpack", ["--mode", "development"]);
-console.log("Built webpack");
 
 require("../../../test/run");

@@ -1,19 +1,50 @@
-name: Run correctness tests and deploy on success
+name: Test and deploy
 on:
   push:
     branches:
       - master
 
 jobs:
-  #test:
-  #  name: Run correctness tests
-  #  runs-on: macos-latest
-  #  steps:
-  #    - uses: actions/checkout@v2
-  #    - uses: ./.github/actions/test
+  build:
+    name: Build webpack
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: npm install
+      - name: Build webpack
+        run: ./node_modules/.bin/webpack --mode=development
+      - name: Tar up output files
+        run: tar -czf dist.tgz index.html dist
+      - name: Create artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist.tgz
+  download:
+    name: Download replay browser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download
+        run: wget https://replay.io/downloads/replay.dmg
+      - name: Create artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: replay
+          path: replay.dmg
+  test:
+    name: Run correctness tests
+    runs-on: macos-latest
+    needs: [build, download]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+      - uses: ./.github/actions/test
   deploy:
     name: Deploy to S3
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Checkout
         uses: actions/checkout@v2
