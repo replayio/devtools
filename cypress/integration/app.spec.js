@@ -22,7 +22,7 @@ context("Actions", () => {
   });
 
   context("Timeline Play buttons", () => {
-    beforeEach(() => cy.get(".events-timeline-comments .event:first-child").click());
+    beforeEach(() => cy.get(".events-timeline-comments .comment:first-child").click());
 
     it("Clicking previous seeks to the previous frame", () =>
       cy.get(".command-button .previous").click().get('[data-progress="38"]'));
@@ -77,7 +77,7 @@ context("Actions", () => {
   context("Debugger", () => {
     it("clicking the first comment navigates to react-dom.production.min.js#1964", () =>
       cy
-        .get(".events-timeline-comments .event:first-child")
+        .get(".events-timeline-comments .comment:first-child")
         .click()
         .get(".source-tab .filename")
         .should("have.text", "react-dom.production.min.js")
