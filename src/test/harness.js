@@ -3,17 +3,13 @@
 
 const { ThreadFront } = require("protocol/thread");
 const { setRandomLogpoint } = require("protocol/logpoint");
-const { assert } = require("protocol/utils");
+const { assert, waitForTime } = require("protocol/utils");
 
 const dbg = gToolbox.getPanel("debugger").getVarsForTests();
 
 const dbgSelectors = {};
 for (const [name, method] of Object.entries(dbg.selectors)) {
   dbgSelectors[name] = (...args) => method(dbg.store.getState(), ...args);
-}
-
-function waitForTime(ms) {
-  return new Promise(r => setTimeout(r, ms));
 }
 
 function waitForElapsedTime(time, ms) {

@@ -17,6 +17,10 @@ function defer() {
   return { promise, resolve, reject };
 }
 
+function waitForTime(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function throttle(callback, time) {
   let scheduled = false;
   return () => {
@@ -143,6 +147,7 @@ ArrayMap.prototype = {
 module.exports = {
   makeInfallible,
   defer,
+  waitForTime,
   throttle,
   clamp,
   assert,
