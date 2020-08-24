@@ -125,6 +125,7 @@ const gMaskImages = {
   "button.open-inspector": require("devtools/client/themes/images/open-inspector.svg"),
   ".img.comment-icon": require("devtools/client/themes/images/comment.svg"),
   ".img.comment": require("devtools/client/themes/images/comment-small.svg"),
+  ".img.timeline-avatar": require("./images/timeline-avatar.svg"),
 };
 
 const gContentImages = {

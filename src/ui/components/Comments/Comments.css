@@ -7,11 +7,11 @@
 }
 
 .comment-marker {
-  width: 12px;
-  height: 12px;
+  width: 24px;
+  height: 28px;
   bottom: 0.5rem;
   background-color: #7ed8c8;
-  border-radius: 15px;
+  /* border-radius: 15px; */
   z-index: 100;
   position: absolute;
   border: 1px solid white;

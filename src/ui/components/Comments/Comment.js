@@ -79,7 +79,7 @@ class Comment extends React.Component {
     if (!comment.visible) {
       return (
         <div
-          className="comment-marker"
+          className="comment-marker timeline-avatar img"
           key={comment.id}
           style={{
             left: `calc(${leftOffset}%)`,
