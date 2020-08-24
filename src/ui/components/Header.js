@@ -4,17 +4,11 @@ import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import LoginButton from "ui/components/LoginButton";
-
+import { getAvatarColor } from "ui/utils/user";
 import "./Header.css";
 
 import { useAuth0 } from "@auth0/auth0-react";
 import { features } from "ui/utils/prefs";
-
-const avatarColors = ["#2D4551", "#509A8F", "#E4C478", "#E9A56C", "#D97559"];
-
-const getAvatarColor = function (avatarID) {
-  return avatarColors[avatarID % avatarColors.length];
-};
 
 const Avatar = props => {
   let { player, isFirstPlayer } = props;
@@ -32,7 +26,7 @@ const Avatar = props => {
   return (
     <div
       className={`avatar ${isFirstPlayer ? "first-player" : ""}`}
-      style={{ background: getAvatarColor(props.player.avatarID) }}
+      style={{ background: getAvatarColor(player?.avatarID) }}
     />
   );
 };
