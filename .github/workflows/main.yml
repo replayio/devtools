@@ -5,9 +5,23 @@ on:
       - master
 
 jobs:
-  test:
-    name: Run correctness tests
-    runs-on: macos-latest
+  #test:
+  #  name: Run correctness tests
+  #  runs-on: macos-latest
+  #  steps:
+  #    - uses: actions/checkout@v2
+  #    - uses: ./.github/actions/test
+  deploy:
+    name: Deploy to S3
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/test
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Deploy to S3
+        uses: ./.github/actions/deploy
