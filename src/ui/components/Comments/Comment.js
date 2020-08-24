@@ -5,7 +5,7 @@ import classnames from "classnames";
 
 import { selectors } from "../../reducers";
 import { actions } from "../../actions";
-import { getPixelOffset, getLeftOffset } from "../../utils/timeline";
+import { getPixelOffset, getLeftOffset, getCommentLeftOffset } from "../../utils/timeline";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 
 class Comment extends React.Component {
@@ -60,16 +60,18 @@ class Comment extends React.Component {
   render() {
     const { comment, zoomRegion, index, timelineDimensions, showComment } = this.props;
     const { editing, description } = this.state;
+    const commentWidth = 280;
     const offset = getPixelOffset({
       time: comment.time,
       overlayWidth: timelineDimensions.width,
       zoom: zoomRegion,
     });
 
-    const leftOffset = getLeftOffset({
+    const leftOffset = getCommentLeftOffset({
       time: comment.time,
       overlayWidth: timelineDimensions.width,
       zoom: zoomRegion,
+      commentWidth: commentWidth,
     });
 
     if (offset < 0) {
@@ -96,6 +98,7 @@ class Comment extends React.Component {
         style={{
           left: `${leftOffset}%`,
           zIndex: `${index + 100}`,
+          width: `${commentWidth}px`,
         }}
       >
         <div className="comment-body">
