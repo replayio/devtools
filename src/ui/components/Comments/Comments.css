@@ -33,13 +33,13 @@
   z-index: 101;
 }
 
-.comment-body {
+.comments-container .comment-body {
   display: flex;
   flex-direction: row;
   padding: 1rem;
 }
 
-.comment-avatar {
+.comments-container .comment-avatar {
   background: #7ed8c8;
   width: 44px;
   height: 44px;

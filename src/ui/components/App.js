@@ -8,7 +8,7 @@ import Comments from "./Comments";
 import Header from "./Header";
 
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import RightSidebar from "./RisghtSidebar";
+import RightSidebar from "./RightSidebar";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 

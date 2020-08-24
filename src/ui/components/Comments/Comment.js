@@ -67,11 +67,16 @@ class Comment extends React.Component {
       zoom: zoomRegion,
     });
 
-    const leftOffset = getCommentLeftOffset({
+    const commentLeftOffset = getCommentLeftOffset({
       time: comment.time,
       overlayWidth: timelineDimensions.width,
       zoom: zoomRegion,
       commentWidth: commentWidth,
+    });
+    const leftOffset = getLeftOffset({
+      time: comment.time,
+      overlayWidth: timelineDimensions.width,
+      zoom: zoomRegion,
     });
 
     if (offset < 0) {
@@ -96,7 +101,7 @@ class Comment extends React.Component {
         className={classnames("comment", {})}
         key={comment.id}
         style={{
-          left: `${leftOffset}%`,
+          left: `${commentLeftOffset}%`,
           zIndex: `${index + 100}`,
           width: `${commentWidth}px`,
         }}
