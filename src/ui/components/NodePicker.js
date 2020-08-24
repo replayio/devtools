@@ -15,6 +15,7 @@ export default class NodePicker extends React.Component {
   constructor(props) {
     super(props);
     EventEmitter.decorate(nodePicker);
+    gToolbox.nodePicker = this;
   }
 
   getHighlighter() {

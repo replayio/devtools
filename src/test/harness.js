@@ -471,8 +471,8 @@ async function getMarkupCanvasCoordinate(text) {
 }
 
 async function pickNode(x, y) {
-  gToolbox.clickNodePickerButton();
-  gToolbox.nodePickerMouseClickInCanvas({ x, y });
+  gToolbox.nodePicker.clickNodePickerButton();
+  gToolbox.nodePicker.nodePickerMouseClickInCanvas({ x, y });
 }
 
 async function selectMarkupNode(node) {
