@@ -10,9 +10,19 @@
   </body>
 
   <script>
-    window.loader = {
+    var loader = {
       lazyRequireGetter() {},
       lazyGetter() {},
+    };
+    var HW_config = {
+      selector: "#headway",
+      account: "J1Dlp7",
+    };
+    var intercomSettings = {
+      app_id: "k7f741xx",
+      // name: "<%= current_user.name %>", // Full name
+      // email: "<%= current_user.email %>", // Email address
+      // created_at: "<%= current_user.created_at.to_i %>", // Signup date as a Unix timestamp
     };
   </script>
   <script
@@ -20,14 +30,6 @@
     src="src/devtools/client/shared/sourceeditor/codemirror/codemirror.bundle.js"
   ></script>
   <script async src="dist/main.js"></script>
-  <script>
-    window.intercomSettings = {
-      app_id: "k7f741xx",
-      // name: "<%= current_user.name %>", // Full name
-      // email: "<%= current_user.email %>", // Email address
-      // created_at: "<%= current_user.created_at.to_i %>", // Signup date as a Unix timestamp
-    };
-  </script>
 
   <script>
     // We pre-filled your app ID in the widget URL: 'https://widget.intercom.io/widget/k7f741xx'
@@ -63,11 +65,6 @@
       }
     })();
   </script>
-  <script>
-    var HW_config = {
-      selector: "#headway",
-      account: "J1Dlp7",
-    };
-  </script>
+
   <script onload="Headway.init(HW_config)" async src="https://cdn.headwayapp.co/widget.js"></script>
 </html>
