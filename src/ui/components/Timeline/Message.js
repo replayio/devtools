@@ -55,11 +55,9 @@ class Message extends React.Component {
       zoom: zoomRegion,
     });
 
-    if (distance < 1) {
+    if (distance < 2.5) {
       return null;
     }
-
-    const isOverlayed = distance < markerWidth;
 
     // Check to see if a message appears after the current execution point
     const isFuture =
@@ -88,7 +86,6 @@ class Message extends React.Component {
     return (
       <a
         className={classnames("message", {
-          overlayed: isOverlayed,
           future: isFuture,
           highlighted: isHighlighted,
           location: atPausedLocation,
