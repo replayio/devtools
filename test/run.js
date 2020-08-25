@@ -143,7 +143,7 @@ const Manifest = [
 
 async function runMatchingTests() {
   for (let i = 0; i < Manifest.length; i++) {
-    const [test, html] = manifest[i];
+    const [test, html] = Manifest[i];
     if (stripeCount && (i % stripeCount != stripeIndex)) {
       continue;
     }
