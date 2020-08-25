@@ -37,6 +37,16 @@ for (let i = 2; i < process.argv.length; i++) {
   }
 }
 
+// The INPUT_STRIPE environment variable is set when running as a Github action.
+// This splits testing across multiple machines by having each only do every
+// other stripeCount tests, staggered so that all tests run on some machine.
+let stripeIndex, stripeCount;
+if (process.env.INPUT_STRIPE) {
+  const match = /(\d+)\/(\d+)/.exec(process.env.INPUT_STRIPE);
+  stripeIndex = +match[1];
+  stripeCount = +match[2];
+}
+
 let gInstallDir = process.env.RECORD_REPLAY_PATH;
 if (!gInstallDir) {
   gInstallDir = "/Applications/Replay.app";
@@ -99,7 +109,6 @@ function getContentType(url) {
 
 const Manifest = [
   ["breakpoints-01.js", "doc_rr_basic.html"],
-  /*
   ["breakpoints-02.js", "doc_rr_basic.html"],
   ["breakpoints-03.js", "doc_rr_basic.html"],
   ["breakpoints-04.js", "doc_control_flow.html"],
@@ -130,11 +139,14 @@ const Manifest = [
   ["inspector-03.js", "doc_inspector_styles.html"],
   ["inspector-04.js", "doc_inspector_styles.html"],
   ["inspector-05.js", "doc_inspector_sourcemapped.html"],
-  */
 ];
 
 async function runMatchingTests() {
-  for (const [test, html] of Manifest) {
+  for (let i = 0; i < Manifest.length; i++) {
+    const [test, html] = manifest[i];
+    if (stripeCount && (i % stripeCount != stripeIndex)) {
+      continue;
+    }
     await runTest("test/harness.js", test, 120, {
       RECORD_REPLAY_TEST_URL: `http://localhost:7998/${html}`,
     });
