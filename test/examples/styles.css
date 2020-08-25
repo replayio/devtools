@@ -1,0 +1,36 @@
+
+#conflict {
+    background-color: blue;
+}
+
+#conflict {
+    background-color: gray;
+    font-size: x-large;
+}
+
+body {
+    background-color: green;
+    font-size: large;
+}
+
+body div {
+    background-color: red;
+    color: black !important;
+}
+
+div {
+    background-color: black;
+    color: white !important;
+}
+
+div::first-letter {
+    color: teal;
+}
+
+#important {
+    background-color: purple !important;
+}
+
+#important {
+    background-color: black;
+}

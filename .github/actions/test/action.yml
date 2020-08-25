@@ -1,0 +1,10 @@
+name: "Test"
+description: "Run correctness tests"
+inputs:
+  stripe:
+    description: "Stripe to run, in the form INDEX/TOTAL"
+    required: true
+
+runs:
+  using: "node12"
+  main: "./main.js"

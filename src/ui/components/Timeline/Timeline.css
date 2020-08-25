@@ -73,7 +73,7 @@
   transition-duration: var(--progressbar-transition);
 }
 
-.replay-player #overlay:not(.recording) .progress::after {
+.replay-player #overlay .progress::after {
   background: var(--replay-head-background);
   width: 1px;
   height: 100%;
@@ -84,33 +84,19 @@
   position: absolute;
 }
 
-.replay-player .recording .progress {
-  background: var(--progress-recording-background);
-  transition-duration: var(--progressbar-transition);
-}
-
 .replay-player .message {
   position: absolute;
   height: 100%;
-  width: 7px;
-  height: 7px;
   border-radius: 4.5px;
   top: calc(50% - 3.5px);
   background: var(--replaying-marker-background);
-}
-
-.replay-player .animate .message {
-  transition-duration: 100ms;
-}
-
-.replay-player .message.overlayed {
   border: 0.5px solid var(--progress-playing-background);
   top: calc(50% - 3.75px);
   height: 7.5px;
   width: 7.5px;
 }
 
-.replay-player .message.overlayed.future {
+.replay-player .message.future {
   border-color: var(--progressbar-background);
 }
 
@@ -122,22 +108,6 @@
 
 .replay-player .message.location {
   background: var(--replaying-marker-location-background);
-}
-
-.replay-player .recording .message.highlighted {
-  background-color: var(--recording-marker-background-hover);
-}
-
-.replay-player .recording .message.overlayed {
-  border-color: var(--progress-recording-background);
-}
-
-.replay-player .recording .message {
-  background: var(--recording-marker-background);
-}
-
-.replay-player .recording .message:hover {
-  background: var(--recording-marker-background-hover);
 }
 
 .replay-player .message:hover {
@@ -222,11 +192,6 @@
   opacity: 0.3;
 }
 
-.replay-player .recording .progress-line {
-  background: var(--progress-recording-line);
-  opacity: 0.3;
-}
-
 .replay-player .tick {
   position: absolute;
   height: 100%;
@@ -240,11 +205,6 @@
   position: absolute;
   content: "";
   display: block;
-}
-
-.replay-player .recording .tick::before,
-.replay-player .recording .tick::after {
-  background: var(--tick-recording-background);
 }
 
 .replay-player .tick.future::before,

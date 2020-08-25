@@ -1,0 +1,6 @@
+name: "Deploy"
+description: "Deploy to S3"
+
+runs:
+  using: "node12"
+  main: "./main.js"

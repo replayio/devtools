@@ -1,0 +1,20 @@
+# We generate 80MB+ of artifacts on each run of main.yml, mainly to store the
+# downloaded replay browser. Clean these artifacts regularly to keep them from
+# piling up.
+#
+# From https://github.com/glassechidna/artifact-cleaner
+
+name: Clean Artifacts
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: cleanup
+        uses: glassechidna/artifact-cleaner@master
+        with:
+          minimumAge: 86400 # all artifacts at least one day old
