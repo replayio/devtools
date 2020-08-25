@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { getAvatarColor } from "ui/utils/user";
+import classnames from "classnames";
 
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 
@@ -142,7 +143,7 @@ class Comment extends React.Component {
   }
 
   render() {
-    const { comment, id } = this.props;
+    const { comment, id, currentTime } = this.props;
 
     // When a user adds a comment from the timeline, the comments array is updated
     // immediately with a new comment with empty content. We don't want to display
@@ -151,8 +152,14 @@ class Comment extends React.Component {
       return null;
     }
 
+    const selected = currentTime === comment.time;
+
     return (
-      <div className="comment" onClick={this.seekToComment} onDoubleClick={this.startEditing}>
+      <div
+        className={classnames("comment", { selected })}
+        onClick={this.seekToComment}
+        onDoubleClick={this.startEditing}
+      >
         {this.renderAvatar()}
         {this.renderBody()}
         <div onClick={e => e.stopPropagation()}>
@@ -163,7 +170,7 @@ class Comment extends React.Component {
   }
 }
 
-export default connect(null, {
+export default connect(state => ({ currentTime: selectors.getCurrentTime(state) }), {
   seek: actions.seek,
   updateComment: actions.updateComment,
   removeComment: actions.removeComment,

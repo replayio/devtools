@@ -21,6 +21,11 @@
   padding-left: 12px;
 }
 
+.events-timeline-comments .comment.selected {
+  border-left: 4px solid #5EA3F8;
+  padding-left: 12px;
+}
+
 .comment .label {
   color: var(--theme-comment);
   overflow-wrap: anywhere;
