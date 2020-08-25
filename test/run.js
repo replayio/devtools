@@ -157,6 +157,8 @@ function tmpFile() {
   return os.tmpdir() + ((Math.random() * 1e9) | 0);
 }
 
+let numFailures = 0;
+
 async function runTest(path, local, timeout = 60, env = {}) {
   const testURL = env.RECORD_REPLAY_TEST_URL || "";
   for (const pattern of patterns) {
@@ -205,19 +207,33 @@ async function runTest(path, local, timeout = 60, env = {}) {
   );
 
   let passed = false;
-  const recordings = [];
+
+  // Recording ID of any viewer recording we've detected.
+  let recordingId;
 
   const waiter = defer();
 
   function processOutput(data) {
-    const match = /CreateRecording (.*)/.exec(data.toString());
-    if (match) {
-      recordings.push(match[1]);
+    const match = /CreateRecording (.*?) (.*)/.exec(data.toString());
+    if (match && match[2].startsWith("http://localhost:8002/view")) {
+      recordingId = match[1];
     }
     if (/TestPassed/.test(data.toString())) {
       passed = true;
     }
     process.stdout.write(data);
+  }
+
+  function logFailure(why) {
+    numFailures++;
+    console.log(`[${elapsedTime()}] Test failed: ${why}`);
+
+    // Log an error which github will recognize.
+    let msg = `::error ::Failure ${local}`;
+    if (recordingId) {
+      msg += ` https://replay.io/view?id=${recordingId}`;
+    }
+    spawnChecked("echo", []);
   }
 
   gecko.stdout.on("data", processOutput);
@@ -248,13 +264,6 @@ async function runTest(path, local, timeout = 60, env = {}) {
   }
 
   await waiter.promise;
-}
-
-let numFailures = 0;
-
-function logFailure(why) {
-  numFailures++;
-  console.log(`[${elapsedTime()}] Test failed: ${why}`);
 }
 
 (async function () {
