@@ -4,7 +4,6 @@
 
 const fs = require("fs");
 const http = require("http");
-const tmp = require("tmp");
 const { spawnSync, spawn } = require("child_process");
 const { defer, waitForTime } = require("../src/protocol/utils");
 
@@ -141,6 +140,10 @@ async function runMatchingTests() {
   }
 }
 
+function tmpFile() {
+  return os.tmpdir() + (Math.random() * 1e9) | 0;
+}
+
 async function runTest(path, local, timeout = 60, env = {}) {
   const testURL = env.RECORD_REPLAY_TEST_URL || "";
   for (const pattern of patterns) {
@@ -156,7 +159,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
 
   console.log(`[${elapsedTime()}] Starting test ${path} ${testURL} ${local}`);
 
-  const generatedScriptPath = tmp.fileSync().name;
+  const generatedScriptPath = tmpFile();
   const generatedScriptFd = fs.openSync(generatedScriptPath, "w");
   spawnSync(
     "clang",
@@ -167,7 +170,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
 
   const profileArgs = [];
   if (!process.env.NORMAL_PROFILE) {
-    const profile = tmp.dirSync().name;
+    const profile = tmpFile();
     profileArgs.push("-profile", profile);
   }
 
