@@ -233,7 +233,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
     if (recordingId) {
       msg += ` https://replay.io/view?id=${recordingId}`;
     }
-    spawnChecked("echo", []);
+    spawnChecked("echo", [msg], { stdio: "inherit" });
   }
 
   gecko.stdout.on("data", processOutput);
