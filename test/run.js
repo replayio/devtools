@@ -4,6 +4,7 @@
 
 const fs = require("fs");
 const http = require("http");
+const os = require("os");
 const { spawnSync, spawn } = require("child_process");
 const { defer, waitForTime } = require("../src/protocol/utils");
 
