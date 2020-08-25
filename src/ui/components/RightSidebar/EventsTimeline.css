@@ -77,6 +77,12 @@
   flex-shrink: 0;
 }
 
+.events-timeline-comments .comment-avatar img {
+  width: inherit;
+  height: inherit;
+  border-radius: 50%;
+}
+
 .events-timeline-comments .comment-body {
   align-self: center;
   flex-grow: 1;

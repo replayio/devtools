@@ -4,32 +4,10 @@ import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import LoginButton from "ui/components/LoginButton";
-import { getAvatarColor } from "ui/utils/user";
+import Avatar from "ui/components/Avatar";
 import "./Header.css";
 
-import { useAuth0 } from "@auth0/auth0-react";
 import { features } from "ui/utils/prefs";
-
-const Avatar = props => {
-  let { player, isFirstPlayer } = props;
-  let auth = useAuth0();
-
-  if (auth.isAuthenticated && isFirstPlayer) {
-    return (
-      <div className={`avatar authenticated first-player`}>
-        <img src={auth.user.picture} alt={auth.user.name} />
-        <span className="avatar-name">{auth.user.name}</span>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className={`avatar ${isFirstPlayer ? "first-player" : ""}`}
-      style={{ background: getAvatarColor(player?.avatarID) }}
-    />
-  );
-};
 
 class Header extends React.Component {
   componentDidMount() {
@@ -60,16 +38,6 @@ class Header extends React.Component {
           <Avatar player={player} isFirstPlayer={false} key={player.id} />
         ))}
       </div>
-    );
-  }
-
-  renderAvatar(player, isFirstPlayer) {
-    return (
-      <div
-        key={player.avatarID}
-        className={`avatar ${isFirstPlayer ? "first-player" : ""}`}
-        style={{ background: this.getAvatarColor(player.avatarID) }}
-      ></div>
     );
   }
 
