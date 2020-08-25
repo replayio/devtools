@@ -38,6 +38,7 @@ let urlbar;
 // Start recording a url in the current tab.
 async function startRecordingTab(url, waitPath) {
   await waitForTime(2000);
+  await waitUntil(() => !!document.getElementById("urlbar"));
 
   urlbar = new modules.UrlbarInput({
     textbox: document.getElementById("urlbar"),
