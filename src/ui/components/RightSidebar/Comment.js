@@ -3,6 +3,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import { getAvatarColor } from "ui/utils/user";
 
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 
@@ -14,11 +15,6 @@ class Comment extends React.Component {
       inputValue: props.comment.contents,
       editing: false,
     };
-  }
-
-  getAvatarColor(avatarID) {
-    const avatarColors = ["#2D4551", "#509A8F", "#E4C478", "#E9A56C", "#D97559"];
-    return avatarColors[avatarID % avatarColors.length];
   }
 
   startEditing = () => {
@@ -83,14 +79,18 @@ class Comment extends React.Component {
   }
 
   renderAvatar() {
-    const user = this.props.comment.user;
+    const { comment } = this.props;
 
     // Comments that have been made prior to adding the users feature don't
     // have an associated user. We just give those comments a grey circle.
     // This should be removed eventually.
-    let color = user ? this.getAvatarColor(user.avatarID) : "#696969";
 
-    return <div className="comment-avatar" style={{ background: color }}></div>;
+    return (
+      <div
+        className="comment-avatar"
+        style={{ background: getAvatarColor(comment?.user.avatarID) }}
+      ></div>
+    );
   }
 
   renderLabel() {

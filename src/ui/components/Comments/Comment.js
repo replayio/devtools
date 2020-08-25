@@ -3,10 +3,11 @@ import React from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
 
-import { selectors } from "../../reducers";
-import { actions } from "../../actions";
-import { getPixelOffset, getLeftOffset, getCommentLeftOffset } from "../../utils/timeline";
+import { selectors } from "ui/reducers";
+import { actions } from "ui/actions";
+import { getPixelOffset, getLeftOffset, getCommentLeftOffset } from "ui/utils/timeline";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
+import { getAvatarColor } from "ui/utils/user";
 
 class Comment extends React.Component {
   state = {
@@ -83,6 +84,8 @@ class Comment extends React.Component {
       return null;
     }
 
+    const commentColor = getAvatarColor(comment.user?.avatarID);
+
     if (!comment.visible) {
       return (
         <div
@@ -90,6 +93,7 @@ class Comment extends React.Component {
           key={comment.id}
           style={{
             left: `calc(${leftOffset}%)`,
+            backgroundColor: commentColor,
           }}
           onClick={() => showComment(comment)}
         ></div>
