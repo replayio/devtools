@@ -142,7 +142,7 @@ async function runMatchingTests() {
 }
 
 function tmpFile() {
-  return os.tmpdir() + (Math.random() * 1e9) | 0;
+  return os.tmpdir() + ((Math.random() * 1e9) | 0);
 }
 
 async function runTest(path, local, timeout = 60, env = {}) {
