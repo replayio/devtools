@@ -68,7 +68,15 @@ async function stopRecordingAndLoadDevtools() {
 
   // Record the devtools session itself.
   if (!env.get("RECORD_REPLAY_DONT_RECORD_VIEWER")) {
-    await waitForTime(3000);
+    while (true) {
+      dump(`TestHarnessWaitForDevtools\n`);
+
+      // This is the server used for hosting the devtools in run.js. This is cheesy...
+      if (await waitForLoad("localhost:8002")) {
+        break;
+      }
+    }
+
     await clickRecordingButton();
   }
 
