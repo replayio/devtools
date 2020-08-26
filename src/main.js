@@ -26,7 +26,7 @@ const { bootstrapApp } = require("ui/utils/bootstrap");
 const FullStory = require("ui/utils/fullstory").default;
 const { setupTimeline } = require("./ui/actions/timeline");
 const { setupMetadata } = require("./ui/actions/metadata");
-const { features } = require("./ui/utils/prefs");
+const { prefs } = require("./ui/utils/prefs");
 
 // Create a session to use while debugging.
 async function createSession() {
@@ -42,6 +42,8 @@ async function createSession() {
     setStatus("");
     window.sessionId = sessionId;
     ThreadFront.setSessionId(sessionId);
+
+    prefs.recordingId = recordingId;
 
     if (!test) {
       FullStory.setUserVars({
@@ -76,6 +78,11 @@ function onSessionError({ message }) {
 let initialized = false;
 async function initialize() {
   if (initialized) {
+    return;
+  }
+
+  if (recordingId === null && prefs.recordingId) {
+    window.location = `${window.location.href}?id=${prefs.recordingId}`;
     return;
   }
 
