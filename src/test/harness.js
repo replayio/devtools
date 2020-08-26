@@ -79,7 +79,7 @@ async function selectSource(url) {
   return waitForSelectedSource(url);
 }
 
-async function addBreakpoint(url, line, column, options) {
+async function addBreakpoint(url, line, column, options = { logValue: "displayName" }) {
   const source = await waitForSource(url);
   const sourceId = source.id;
   const bpCount = dbgSelectors.getBreakpointCount();
