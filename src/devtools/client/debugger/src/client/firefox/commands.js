@@ -211,25 +211,19 @@ function setBreakpoint(location: BreakpointLocation, options: BreakpointOptions)
 
   const { condition, logValue, logGroupId } = options;
   const { line, column, sourceUrl, sourceId } = location;
-  if (logValue) {
-    const promises = [];
-    if (sourceId) {
-      promises.push(
-        ThreadFront.removeBreakpoint(sourceId, line, column),
-        setLogpoint(logGroupId, sourceId, line, column, logValue, condition)
-      );
-    } else {
-      promises.push(
-        ThreadFront.removeBreakpointByURL(sourceUrl, line, column),
-        setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition)
-      );
-    }
-    return Promise.all(promises);
-  }
+  const promises = [];
   if (sourceId) {
-    return ThreadFront.setBreakpoint(sourceId, line, column, condition);
+    promises.push(
+      ThreadFront.setBreakpoint(sourceId, line, column, condition),
+      setLogpoint(logGroupId, sourceId, line, column, logValue, condition)
+    );
+  } else {
+    promises.push(
+      ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition),
+      setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition)
+    );
   }
-  return ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition);
+  return Promise.all(promises);
 }
 
 function removeBreakpoint(location: PendingLocation) {

@@ -228,9 +228,7 @@ export function addBreakpointAtLine(
     };
 
     const options = {};
-    if (shouldLog) {
-      options.logValue = "displayName";
-    }
+    options.logValue = "displayName";
 
     return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled));
   };
