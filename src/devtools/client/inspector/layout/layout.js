@@ -36,7 +36,6 @@ class LayoutView {
       onShowBoxModelEditor,
       onShowBoxModelHighlighter,
       onShowRulePreviewTooltip,
-      onToggleGeometryEditor,
     } = this.inspector.getPanel("boxmodel").getComponentProps();
 
     const layoutApp = LayoutApp({
@@ -45,7 +44,6 @@ class LayoutView {
       onShowBoxModelHighlighter,
       onShowBoxModelHighlighterForNode,
       onShowRulePreviewTooltip,
-      onToggleGeometryEditor,
       setSelectedNode,
       /**
        * Shows the box model properties under the box model if true, otherwise, hidden by

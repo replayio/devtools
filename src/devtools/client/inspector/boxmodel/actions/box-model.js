@@ -5,25 +5,11 @@
 "use strict";
 
 const {
-  UPDATE_GEOMETRY_EDITOR_ENABLED,
   UPDATE_LAYOUT,
   UPDATE_OFFSET_PARENT,
 } = require("devtools/client/inspector/boxmodel/actions/index");
 
 module.exports = {
-  /**
-   * Updates the geometry editor's enabled state.
-   *
-   * @param  {Boolean} enabled
-   *         Whether or not the geometry editor is enabled or not.
-   */
-  updateGeometryEditorEnabled(enabled) {
-    return {
-      type: UPDATE_GEOMETRY_EDITOR_ENABLED,
-      enabled,
-    };
-  },
-
   /**
    * Updates the layout state with the new layout properties.
    */

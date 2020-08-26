@@ -32,7 +32,6 @@ class LayoutApp extends PureComponent {
       onShowBoxModelEditor: PropTypes.func.isRequired,
       onShowBoxModelHighlighter: PropTypes.func.isRequired,
       onShowBoxModelHighlighterForNode: PropTypes.func.isRequired,
-      onToggleGeometryEditor: PropTypes.func.isRequired,
       setSelectedNode: PropTypes.func.isRequired,
       showBoxModelProperties: PropTypes.bool.isRequired,
     };
