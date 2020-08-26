@@ -1,15 +1,18 @@
 <body>
 <div style="color: red" onclick="console.log('LOG')" id="maindiv">HELLO</div>
 <script>
-
 function recordingFinished() {
   dump(`RecReplaySendAsyncMessage RecordingFinished`);
 }
+
 function foo() {
   document.getElementById("maindiv").innerHTML = "GOODBYE";
   window.setTimeout(recordingFinished);
 }
-window.setTimeout(foo);
+
+function iframeFinished() {
+  window.setTimeout(foo);
+}
 </script>
 <div id="div1">
   <div id="div2">

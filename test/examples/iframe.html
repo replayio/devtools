@@ -1,1 +1,12 @@
 <div id="iframediv">IFRAME</div>
+<script>
+const elem = document.getElementById("iframediv");
+elem.addEventListener("click", e => console.log("iframe clicked"));
+
+window.setTimeout(() => {
+  elem.click();
+  window.setTimeout(() => {
+    window.parent.iframeFinished();
+  });
+});
+</script>
