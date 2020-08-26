@@ -674,7 +674,7 @@ MarkupView.prototype = {
    *         requests queued up
    */
   _hideBoxModel: async function (forceHide) {
-    if (!this._highlightedNodeFront) {
+    if (!this._highlightedNodeFront || this._highlightedNodeFront != Highlighter.currentNode) {
       return Promise.resolve();
     }
 
