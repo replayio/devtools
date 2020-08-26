@@ -466,10 +466,21 @@ function boundsCenter(bounds) {
   };
 }
 
-async function getMarkupCanvasCoordinate(text) {
+async function getMarkupCanvasCoordinate(text, iframes = []) {
+  let x = 0, y = 0;
+  for (const iframeText of iframes) {
+    const node = (await ThreadFront.searchDOM(iframeText))[0];
+    await node.ensureLoaded();
+    const { left, top } = node.getBoundingClientRect();
+    x += left;
+    y += top;
+  }
   const node = (await ThreadFront.searchDOM(text))[0];
   await node.ensureLoaded();
-  return boundsCenter(node.getBoundingClientRect());
+  const center = boundsCenter(node.getBoundingClientRect());
+  x += center.x;
+  y += center.y;
+  return { x, y };
 }
 
 async function pickNode(x, y) {

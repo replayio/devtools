@@ -9,10 +9,15 @@
 
   await Test.selectInspector();
 
-  const { x, y } = await Test.getMarkupCanvasCoordinate("maindiv");
-  await Test.pickNode(x, y);
-
+  // Pick an element outside the iframe.
+  const mainpoint = await Test.getMarkupCanvasCoordinate("maindiv");
+  await Test.pickNode(mainpoint.x, mainpoint.y);
   await Test.waitForSelectedMarkupNode(`id="maindiv"`);
+
+  // Pick an element inside the iframe.
+  const framepoint = await Test.getMarkupCanvasCoordinate("iframediv", ["myiframe"]);
+  await Test.pickNode(framepoint.x, framepoint.y);
+  await Test.waitForSelectedMarkupNode(`id="iframediv"`);
 
   Test.finish();
 })();
