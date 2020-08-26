@@ -45,12 +45,19 @@ async function startRecordingTab(url, waitPath) {
     textbox: document.getElementById("urlbar"),
   });
 
-  loadUrl(url);
-  if (waitPath) {
-    await waitForLoad(waitPath);
-  } else {
-    await waitForTime(500);
+  while (true) {
+    dump(`TestHarnessLoadURL ${url}\n`);
+    loadUrl(url);
+    if (waitPath) {
+      if (await waitForLoad(waitPath)) {
+        break;
+      }
+    } else {
+      await waitForTime(500);
+      break;
+    }
   }
+
   await clickRecordingButton();
 }
 
@@ -76,14 +83,16 @@ function loadUrl(url) {
   EventUtils.synthesizeKey("VK_RETURN");
 }
 
-function waitForLoad(urlPattern) {
-  return waitUntil(() => {
+// Gives up after 5 seconds, returns whether the load was successful.
+async function waitForLoad(urlPattern) {
+  for (let i = 0; i < 50; i++) {
+    await waitForTime(100);
     if (window.gBrowser.currentURI.spec.includes(urlPattern)) {
       return true;
     }
-    dump(`TestHarnessUnexpectedURL ${window.gBrowser.currentURI.spec}\n`);
-    return false;
-  });
+  }
+  dump(`TestHarnessWaitForLoad TimedOut ${window.gBrowser.currentURI.spec}`);
+  return false;
 }
 
 function waitForTime(ms) {
