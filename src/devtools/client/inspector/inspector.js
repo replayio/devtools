@@ -36,7 +36,6 @@ require("devtools/client/inspector/components/InspectorTabPanel.css");
 require("devtools/client/shared/components/splitter/SplitBox.css");
 require("devtools/client/shared/components/Accordion.css");
 //require("devtools/client/shared/components/reps/reps.css");
-//require("devtools/client/shared/components/tree/TreeView.css");
 //require("devtools/content/shared/widgets/cubic-bezier.css");
 //require("devtools/content/shared/widgets/filter-widget.css");
 //require("devtools/content/shared/widgets/spectrum.css");
@@ -54,11 +53,6 @@ const CSSProperties = require("./css-properties");
 const Highlighter = require("highlighter/highlighter");
 
 /*
-loader.lazyRequireGetter(
-  this,
-  "ExtensionSidebar",
-  "devtools/client/inspector/extensions/extension-sidebar"
-);
 loader.lazyRequireGetter(
   this,
   "saveScreenshot",
@@ -318,7 +312,6 @@ Inspector.prototype = {
     // All the components are initialized. Take care of the remaining initialization
     // and setup.
     this.breadcrumbs = new HTMLBreadcrumbs(this);
-    this.setupExtensionSidebars();
     this.setupSearchBox();
     await this.setupToolbar();
 
@@ -994,72 +987,6 @@ Inspector.prototype = {
     this.sidebar.on("destroy", this.onSidebarHidden);
 
     this.sidebar.show();
-  },
-
-  /**
-   * Setup any extension sidebar already registered to the toolbox when the inspector.
-   * has been created for the first time.
-   */
-  setupExtensionSidebars() {
-    /*
-    for (const [sidebarId, { title }] of this.toolbox
-      .inspectorExtensionSidebars) {
-      this.addExtensionSidebar(sidebarId, { title });
-    }
-    */
-  },
-
-  /**
-   * Create a side-panel tab controlled by an extension
-   * using the devtools.panels.elements.createSidebarPane and sidebar object API
-   *
-   * @param {String} id
-   *        An unique id for the sidebar tab.
-   * @param {Object} options
-   * @param {String} options.title
-   *        The tab title
-   */
-  addExtensionSidebar: function (id, { title }) {
-    if (this._panels.has(id)) {
-      throw new Error(`Cannot create an extension sidebar for the existent id: ${id}`);
-    }
-
-    const extensionSidebar = new ExtensionSidebar(this, { id, title });
-
-    // TODO(rpl): pass some extension metadata (e.g. extension name and icon) to customize
-    // the render of the extension title (e.g. use the icon in the sidebar and show the
-    // extension name in a tooltip).
-    this.addSidebarTab(id, title, extensionSidebar.provider, false);
-
-    this._panels.set(id, extensionSidebar);
-
-    // Emit the created ExtensionSidebar instance to the listeners registered
-    // on the toolbox by the "devtools.panels.elements" WebExtensions API.
-    this.toolbox.emit(`extension-sidebar-created-${id}`, extensionSidebar);
-  },
-
-  /**
-   * Remove and destroy a side-panel tab controlled by an extension (e.g. when the
-   * extension has been disable/uninstalled while the toolbox and inspector were
-   * still open).
-   *
-   * @param {String} id
-   *        The id of the sidebar tab to destroy.
-   */
-  removeExtensionSidebar: function (id) {
-    if (!this._panels.has(id)) {
-      throw new Error(`Unable to find a sidebar panel with id "${id}"`);
-    }
-
-    const panel = this._panels.get(id);
-
-    if (!(panel instanceof ExtensionSidebar)) {
-      throw new Error(`The sidebar panel with id "${id}" is not an ExtensionSidebar`);
-    }
-
-    this._panels.delete(id);
-    this.sidebar.removeTab(id);
-    panel.destroy();
   },
 
   /**
