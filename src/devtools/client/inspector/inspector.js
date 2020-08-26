@@ -18,13 +18,10 @@ require("devtools/client/themes/breadcrumbs.css");
 require("devtools/client/themes/inspector.css");
 require("devtools/client/themes/badge.css");
 require("devtools/client/themes/rules.css");
-require("devtools/client/themes/compatibility.css");
 require("devtools/client/themes/computed.css");
 require("devtools/client/themes/changes.css");
-require("devtools/client/themes/fonts.css");
 require("devtools/client/themes/boxmodel.css");
 require("devtools/client/themes/layout.css");
-require("devtools/client/themes/animation.css");
 require("devtools/client/themes/splitters.css");
 require("devtools/client/themes/variables.css");
 require("devtools/client/themes/common.css");
@@ -37,7 +34,6 @@ require("devtools/client/inspector/components/InspectorTabPanel.css");
 require("devtools/client/shared/components/splitter/SplitBox.css");
 require("devtools/client/shared/components/Accordion.css");
 //require("devtools/client/shared/components/reps/reps.css");
-//require("devtools/client/shared/components/tree/TreeView.css");
 //require("devtools/content/shared/widgets/cubic-bezier.css");
 //require("devtools/content/shared/widgets/filter-widget.css");
 //require("devtools/content/shared/widgets/spectrum.css");
@@ -55,11 +51,6 @@ const CSSProperties = require("./css-properties");
 const Highlighter = require("highlighter/highlighter");
 
 /*
-loader.lazyRequireGetter(
-  this,
-  "ExtensionSidebar",
-  "devtools/client/inspector/extensions/extension-sidebar"
-);
 loader.lazyRequireGetter(
   this,
   "saveScreenshot",
@@ -319,7 +310,6 @@ Inspector.prototype = {
     // All the components are initialized. Take care of the remaining initialization
     // and setup.
     this.breadcrumbs = new HTMLBreadcrumbs(this);
-    this.setupExtensionSidebars();
     this.setupSearchBox();
     await this.setupToolbar();
 
@@ -843,10 +833,6 @@ Inspector.prototype = {
 
     let panel;
     switch (id) {
-      case "animationinspector":
-        const AnimationInspector = require("devtools/client/inspector/animation/animation");
-        panel = new AnimationInspector(this, this.panelWin);
-        break;
       case "boxmodel":
         // box-model isn't a panel on its own, it used to, now it is being used by
         // the layout view which retrieves an instance via getPanel.
@@ -857,17 +843,9 @@ Inspector.prototype = {
         const ChangesView = require("devtools/client/inspector/changes/ChangesView");
         panel = new ChangesView(this, this.panelWin);
         break;
-      case "compatibilityview":
-        const CompatibilityView = require("devtools/client/inspector/compatibility/CompatibilityView");
-        panel = new CompatibilityView(this, this.panelWin);
-        break;
       case "computedview":
         const { ComputedViewTool } = require("devtools/client/inspector/computed/computed");
         panel = new ComputedViewTool(this, this.panelWin);
-        break;
-      case "fontinspector":
-        const FontInspector = require("devtools/client/inspector/fonts/fonts");
-        panel = new FontInspector(this, this.panelWin);
         break;
       case "layoutview":
         const LayoutView = require("devtools/client/inspector/layout/layout");
@@ -943,16 +921,6 @@ Inspector.prototype = {
         id: "changesview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.changesViewTitle"),
       },
-      {
-        id: "fontinspector",
-        title: INSPECTOR_L10N.getStr("inspector.sidebar.fontInspectorTitle"),
-      },
-      {
-        id: "animationinspector",
-        title: INSPECTOR_L10N.getStr(
-          "inspector.sidebar.animationInspectorTitle"
-        ),
-      },
       */
     ];
 
@@ -960,13 +928,6 @@ Inspector.prototype = {
       sidebarPanels.push({
         id: "newruleview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
-      });
-    }
-
-    if (Services.prefs.getBoolPref("devtools.inspector.compatibility.enabled")) {
-      sidebarPanels.push({
-        id: "compatibilityview",
-        title: INSPECTOR_L10N.getStr("inspector.sidebar.compatibilityViewTitle"),
       });
     }
 
@@ -1005,72 +966,6 @@ Inspector.prototype = {
     this.sidebar.on("destroy", this.onSidebarHidden);
 
     this.sidebar.show();
-  },
-
-  /**
-   * Setup any extension sidebar already registered to the toolbox when the inspector.
-   * has been created for the first time.
-   */
-  setupExtensionSidebars() {
-    /*
-    for (const [sidebarId, { title }] of this.toolbox
-      .inspectorExtensionSidebars) {
-      this.addExtensionSidebar(sidebarId, { title });
-    }
-    */
-  },
-
-  /**
-   * Create a side-panel tab controlled by an extension
-   * using the devtools.panels.elements.createSidebarPane and sidebar object API
-   *
-   * @param {String} id
-   *        An unique id for the sidebar tab.
-   * @param {Object} options
-   * @param {String} options.title
-   *        The tab title
-   */
-  addExtensionSidebar: function (id, { title }) {
-    if (this._panels.has(id)) {
-      throw new Error(`Cannot create an extension sidebar for the existent id: ${id}`);
-    }
-
-    const extensionSidebar = new ExtensionSidebar(this, { id, title });
-
-    // TODO(rpl): pass some extension metadata (e.g. extension name and icon) to customize
-    // the render of the extension title (e.g. use the icon in the sidebar and show the
-    // extension name in a tooltip).
-    this.addSidebarTab(id, title, extensionSidebar.provider, false);
-
-    this._panels.set(id, extensionSidebar);
-
-    // Emit the created ExtensionSidebar instance to the listeners registered
-    // on the toolbox by the "devtools.panels.elements" WebExtensions API.
-    this.toolbox.emit(`extension-sidebar-created-${id}`, extensionSidebar);
-  },
-
-  /**
-   * Remove and destroy a side-panel tab controlled by an extension (e.g. when the
-   * extension has been disable/uninstalled while the toolbox and inspector were
-   * still open).
-   *
-   * @param {String} id
-   *        The id of the sidebar tab to destroy.
-   */
-  removeExtensionSidebar: function (id) {
-    if (!this._panels.has(id)) {
-      throw new Error(`Unable to find a sidebar panel with id "${id}"`);
-    }
-
-    const panel = this._panels.get(id);
-
-    if (!(panel instanceof ExtensionSidebar)) {
-      throw new Error(`The sidebar panel with id "${id}" is not an ExtensionSidebar`);
-    }
-
-    this._panels.delete(id);
-    this.sidebar.removeTab(id);
-    panel.destroy();
   },
 
   /**

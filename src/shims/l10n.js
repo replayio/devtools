@@ -22,9 +22,6 @@ const bundles = {
     require("devtools/client/locales/en-us/sourceeditor.properties").default
   ),
   "intl.properties": parse(require("toolkit/locales/en-US/chrome/global/intl.properties").default),
-  "devtools/client/locales/font-inspector.properties": parse(
-    require("devtools/client/locales/en-us/font-inspector.properties").default
-  ),
   "devtools/client/locales/inspector.properties": parse(
     require("devtools/client/locales/en-us/inspector.properties").default
   ),

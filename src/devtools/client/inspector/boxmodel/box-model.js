@@ -4,11 +4,7 @@
 
 "use strict";
 
-const {
-  updateGeometryEditorEnabled,
-  updateLayout,
-  updateOffsetParent,
-} = require("devtools/client/inspector/boxmodel/actions/box-model");
+const { updateLayout } = require("devtools/client/inspector/boxmodel/actions/box-model");
 
 loader.lazyRequireGetter(
   this,
@@ -42,15 +38,11 @@ function BoxModel(inspector, window) {
   this.updateBoxModel = this.updateBoxModel.bind(this);
 
   this.onHideBoxModelHighlighter = this.onHideBoxModelHighlighter.bind(this);
-  this.onHideGeometryEditor = this.onHideGeometryEditor.bind(this);
-  this.onMarkupViewLeave = this.onMarkupViewLeave.bind(this);
-  this.onMarkupViewNodeHover = this.onMarkupViewNodeHover.bind(this);
   this.onNewSelection = this.onNewSelection.bind(this);
   this.onShowBoxModelEditor = this.onShowBoxModelEditor.bind(this);
   this.onShowBoxModelHighlighter = this.onShowBoxModelHighlighter.bind(this);
   this.onShowRulePreviewTooltip = this.onShowRulePreviewTooltip.bind(this);
   this.onSidebarSelect = this.onSidebarSelect.bind(this);
-  this.onToggleGeometryEditor = this.onToggleGeometryEditor.bind(this);
 
   this.inspector.selection.on("new-node-front", this.onNewSelection);
   this.inspector.sidebar.on("select", this.onSidebarSelect);
@@ -102,7 +94,6 @@ BoxModel.prototype = {
       onShowBoxModelEditor: this.onShowBoxModelEditor,
       onShowBoxModelHighlighter: this.onShowBoxModelHighlighter,
       onShowRulePreviewTooltip: this.onShowRulePreviewTooltip,
-      onToggleGeometryEditor: this.onToggleGeometryEditor,
     };
   },
 
@@ -232,47 +223,6 @@ BoxModel.prototype = {
   },
 
   /**
-   * Hides the geometry editor and updates the box moodel store with the new
-   * geometry editor enabled state.
-   */
-  onHideGeometryEditor() {
-    const { markup, selection, inspector } = this.inspector;
-
-    this.highlighters.hideGeometryEditor();
-    this.store.dispatch(updateGeometryEditorEnabled(false));
-
-    inspector.toolbox.nodePicker.off("picker-started", this.onHideGeometryEditor);
-    selection.off("new-node-front", this.onHideGeometryEditor);
-    markup.off("leave", this.onMarkupViewLeave);
-    markup.off("node-hover", this.onMarkupViewNodeHover);
-  },
-
-  /**
-   * Handler function that re-shows the geometry editor for an element that already
-   * had the geometry editor enabled. This handler function is called on a "leave" event
-   * on the markup view.
-   */
-  onMarkupViewLeave() {
-    const state = this.store.getState();
-    const enabled = state.boxModel.geometryEditorEnabled;
-
-    if (!enabled) {
-      return;
-    }
-
-    const nodeFront = this.inspector.selection.nodeFront;
-    this.highlighters.showGeometryEditor(nodeFront);
-  },
-
-  /**
-   * Handler function that temporarily hides the geomery editor when the
-   * markup view has a "node-hover" event.
-   */
-  onMarkupViewNodeHover() {
-    this.highlighters.hideGeometryEditor();
-  },
-
-  /**
    * Selection 'new-node-front' event handler.
    */
   onNewSelection() {
@@ -398,34 +348,6 @@ BoxModel.prototype = {
     }
 
     this.updateBoxModel();
-  },
-
-  /**
-   * Toggles on/off the geometry editor for the current element when the geometry editor
-   * toggle button is clicked.
-   */
-  onToggleGeometryEditor() {
-    const { markup, selection, inspector } = this.inspector;
-    const nodeFront = this.inspector.selection.nodeFront;
-    const state = this.store.getState();
-    const enabled = !state.boxModel.geometryEditorEnabled;
-
-    this.highlighters.toggleGeometryHighlighter(nodeFront);
-    this.store.dispatch(updateGeometryEditorEnabled(enabled));
-
-    if (enabled) {
-      // Hide completely the geometry editor if the picker is clicked or a new node front
-      inspector.toolbox.nodePicker.on("picker-started", this.onHideGeometryEditor);
-      selection.on("new-node-front", this.onHideGeometryEditor);
-      // Temporary hide the geometry editor
-      markup.on("leave", this.onMarkupViewLeave);
-      markup.on("node-hover", this.onMarkupViewNodeHover);
-    } else {
-      inspector.toolbox.nodePicker.off("picker-started", this.onHideGeometryEditor);
-      selection.off("new-node-front", this.onHideGeometryEditor);
-      markup.off("leave", this.onMarkupViewLeave);
-      markup.off("node-hover", this.onMarkupViewNodeHover);
-    }
   },
 };
 

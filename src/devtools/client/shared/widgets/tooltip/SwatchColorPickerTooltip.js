@@ -10,7 +10,6 @@ const SwatchBasedEditorTooltip = require("devtools/client/shared/widgets/tooltip
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 const { openDocLink } = require("devtools/client/shared/link");
-const { A11Y_CONTRAST_LEARN_MORE_LINK } = require("devtools/client/accessibility/constants");
 
 loader.lazyRequireGetter(this, "wrapMoveFocus", "devtools/client/shared/focus", true);
 loader.lazyRequireGetter(this, "getFocusableElements", "devtools/client/shared/focus", true);
@@ -18,6 +17,9 @@ loader.lazyRequireGetter(this, "PICKER_TYPES", "devtools/shared/picker-constants
 
 const TELEMETRY_PICKER_EYEDROPPER_OPEN_COUNT = "DEVTOOLS_PICKER_EYEDROPPER_OPENED_COUNT";
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
+const A11Y_CONTRAST_LEARN_MORE_LINK =
+  "https://developer.mozilla.org/docs/Web/Accessibility/Understanding_WCAG/Perceivable/" +
+  "Color_contrast?utm_source=devtools&utm_medium=a11y-panel-checks-color-contrast";
 
 /**
  * The swatch color picker tooltip class is a specific class meant to be used
