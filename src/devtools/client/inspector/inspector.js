@@ -21,7 +21,6 @@ require("devtools/client/themes/rules.css");
 require("devtools/client/themes/compatibility.css");
 require("devtools/client/themes/computed.css");
 require("devtools/client/themes/changes.css");
-require("devtools/client/themes/fonts.css");
 require("devtools/client/themes/boxmodel.css");
 require("devtools/client/themes/layout.css");
 require("devtools/client/themes/splitters.css");
@@ -853,10 +852,6 @@ Inspector.prototype = {
         const { ComputedViewTool } = require("devtools/client/inspector/computed/computed");
         panel = new ComputedViewTool(this, this.panelWin);
         break;
-      case "fontinspector":
-        const FontInspector = require("devtools/client/inspector/fonts/fonts");
-        panel = new FontInspector(this, this.panelWin);
-        break;
       case "layoutview":
         const LayoutView = require("devtools/client/inspector/layout/layout");
         panel = new LayoutView(this, this.panelWin);
@@ -930,10 +925,6 @@ Inspector.prototype = {
       {
         id: "changesview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.changesViewTitle"),
-      },
-      {
-        id: "fontinspector",
-        title: INSPECTOR_L10N.getStr("inspector.sidebar.fontInspectorTitle"),
       },
       */
     ];
