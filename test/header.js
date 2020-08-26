@@ -38,7 +38,7 @@ let urlbar;
 // Start recording a url in the current tab.
 async function startRecordingTab(url, waitPath) {
   await waitForTime(2000);
-  await waitUntil(() => !!document.getElementById("urlbar"));
+  await waitUntil(() => !!document.getElementById("urlbar") && window.gBrowser);
   dump(`TestHarnessHasURLBar\n`);
 
   urlbar = new modules.UrlbarInput({
