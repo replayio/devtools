@@ -93,6 +93,7 @@
   background: #ececec;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .timeline-tooltip-image {
