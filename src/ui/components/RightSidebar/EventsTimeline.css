@@ -2,8 +2,9 @@
   flex-grow: 1;
   overflow: auto;
   width: 300px;
-  border-left: 2px solid var(--grey-20);
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .events-timeline-comments .comment {
@@ -13,7 +14,7 @@
   display: flex;
   flex-direction: row;
   cursor: pointer;
-  border-bottom: 1px solid var(--theme-splitter-color);
+  border-bottom: 1px solid var(--grey-20);
 }
 
 .events-timeline-comments .comment:hover {
@@ -100,6 +101,15 @@
 .events-timeline-comments .dropdown-button {
   height: 28px;
   width: 28px;
+}
+
+.events-timeline-comments .add-comment {
+  padding: 12px;
+  color: white;
+  background-color: #5EA3F8;
+  margin-top: 12px;
+  align-self: center;
+  cursor: pointer;
 }
 
 .right-sidebar .comment-icon {
