@@ -81,16 +81,15 @@ class Comment extends React.Component {
 
   renderAvatar() {
     const { comment } = this.props;
-
-    // Comments that have been made prior to adding the users feature don't
-    // have an associated user. We just give those comments a grey circle.
-    // This should be removed eventually.
+    const { picture, name } = comment.user;
 
     return (
       <div
         className="comment-avatar"
         style={{ background: getAvatarColor(comment?.user.avatarID) }}
-      ></div>
+      >
+        {picture ? <img src={picture} alt={name} /> : null}
+      </div>
     );
   }
 

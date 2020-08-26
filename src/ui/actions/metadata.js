@@ -169,3 +169,14 @@ export function getActiveUsers() {
     return activeUsers;
   };
 }
+
+export function updateUser(authUser = {}) {
+  return ({ dispatch, getState }) => {
+    const user = selectors.getUser(getState());
+    const { picture, name } = authUser;
+    const { id, avatarID } = user;
+    const updatedUser = { id, avatarID, picture, name };
+
+    dispatch({ type: "register_user", user: updatedUser });
+  };
+}
