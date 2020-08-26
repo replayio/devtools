@@ -147,7 +147,7 @@ async function runMatchingTests() {
     if (stripeCount && (i % stripeCount != stripeIndex)) {
       continue;
     }
-    await runTest("test/harness.js", test, 120, {
+    await runTest("test/harness.js", test, 240, {
       RECORD_REPLAY_TEST_URL: `http://localhost:7998/${html}`,
     });
   }
