@@ -99,6 +99,11 @@ function bootstrapStore() {
   return store;
 }
 
+function getRedirectUri() {
+  const { host, pathname } = window.location;
+  return "http://" + host + pathname;
+}
+
 export function bootstrapApp(props, context) {
   const store = bootstrapStore();
   setupSentry(context);
@@ -108,7 +113,7 @@ export function bootstrapApp(props, context) {
       <Auth0Provider
         domain="webreplay.us.auth0.com"
         clientId="4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo"
-        redirectUri={window.location.href}
+        redirectUri={getRedirectUri()}
       >
         {React.createElement(App, props)}
       </Auth0Provider>

@@ -10,6 +10,7 @@ const { pref } = Services;
 pref("devtools.split-console", true);
 pref("devtools.selected-panel", "debugger");
 pref("devtools.user", "{}");
+pref("devtools.recording-id", "");
 
 // app features
 pref("devtools.features.comments", true);
@@ -20,6 +21,7 @@ export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
   selectedPanel: ["String", "selected-panel"],
   user: ["Json", "user"],
+  recordingId: ["Json", "recording-id"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
