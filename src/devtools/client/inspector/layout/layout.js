@@ -6,7 +6,6 @@
 
 const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
-const FlexboxInspector = require("devtools/client/inspector/flexbox/flexbox");
 const GridInspector = require("devtools/client/inspector/grids/grid-inspector");
 
 const LayoutApp = createFactory(require("devtools/client/inspector/layout/components/LayoutApp"));
@@ -47,12 +46,6 @@ class LayoutView {
       onToggleGeometryEditor,
     } = this.inspector.getPanel("boxmodel").getComponentProps();
 
-    this.flexboxInspector = new FlexboxInspector(this.inspector, this.inspector.panelWin);
-    const {
-      onSetFlexboxOverlayColor,
-      onToggleFlexboxHighlighter,
-    } = this.flexboxInspector.getComponentProps();
-
     this.gridInspector = new GridInspector(this.inspector, this.inspector.panelWin);
     const {
       onSetGridOverlayColor,
@@ -66,14 +59,12 @@ class LayoutView {
     const layoutApp = LayoutApp({
       getSwatchColorPickerTooltip: () => this.swatchColorPickerTooltip,
       onHideBoxModelHighlighter,
-      onSetFlexboxOverlayColor,
       onSetGridOverlayColor,
       onShowBoxModelEditor,
       onShowBoxModelHighlighter,
       onShowBoxModelHighlighterForNode,
       onShowRulePreviewTooltip,
       onShowGridOutlineHighlight,
-      onToggleFlexboxHighlighter,
       onToggleGeometryEditor,
       onToggleGridHighlighter,
       onToggleShowGridAreas,
@@ -111,7 +102,6 @@ class LayoutView {
       this._swatchColorPickerTooltip = null;
     }
 
-    this.flexboxInspector.destroy();
     this.gridInspector.destroy();
 
     this.document = null;
