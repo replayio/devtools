@@ -13,10 +13,8 @@ const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const Accordion = createFactory(require("devtools/client/shared/components/Accordion"));
 const BoxModel = createFactory(require("devtools/client/inspector/boxmodel/components/BoxModel"));
-const Grid = createFactory(require("devtools/client/inspector/grids/components/Grid"));
 
 const BoxModelTypes = require("devtools/client/inspector/boxmodel/types");
-const GridTypes = require("devtools/client/inspector/grids/types");
 
 const BOXMODEL_STRINGS_URI = "devtools/client/locales/boxmodel.properties";
 const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
@@ -24,27 +22,17 @@ const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
 const LAYOUT_STRINGS_URI = "devtools/client/locales/layout.properties";
 const LAYOUT_L10N = new LocalizationHelper(LAYOUT_STRINGS_URI);
 
-const GRID_OPENED_PREF = "devtools.layout.grid.opened";
 const BOXMODEL_OPENED_PREF = "devtools.layout.boxmodel.opened";
 
 class LayoutApp extends PureComponent {
   static get propTypes() {
     return {
       boxModel: PropTypes.shape(BoxModelTypes.boxModel).isRequired,
-      getSwatchColorPickerTooltip: PropTypes.func.isRequired,
-      grids: PropTypes.arrayOf(PropTypes.shape(GridTypes.grid)).isRequired,
-      highlighterSettings: PropTypes.shape(GridTypes.highlighterSettings).isRequired,
       onHideBoxModelHighlighter: PropTypes.func.isRequired,
-      onSetGridOverlayColor: PropTypes.func.isRequired,
       onShowBoxModelEditor: PropTypes.func.isRequired,
       onShowBoxModelHighlighter: PropTypes.func.isRequired,
       onShowBoxModelHighlighterForNode: PropTypes.func.isRequired,
-      onShowGridOutlineHighlight: PropTypes.func.isRequired,
       onToggleGeometryEditor: PropTypes.func.isRequired,
-      onToggleGridHighlighter: PropTypes.func.isRequired,
-      onToggleShowGridAreas: PropTypes.func.isRequired,
-      onToggleShowGridLineNumbers: PropTypes.func.isRequired,
-      onToggleShowInfiniteLines: PropTypes.func.isRequired,
       setSelectedNode: PropTypes.func.isRequired,
       showBoxModelProperties: PropTypes.bool.isRequired,
     };
