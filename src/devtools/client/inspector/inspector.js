@@ -24,7 +24,6 @@ require("devtools/client/themes/changes.css");
 require("devtools/client/themes/fonts.css");
 require("devtools/client/themes/boxmodel.css");
 require("devtools/client/themes/layout.css");
-require("devtools/client/themes/animation.css");
 require("devtools/client/themes/splitters.css");
 require("devtools/client/themes/variables.css");
 require("devtools/client/themes/common.css");
@@ -843,10 +842,6 @@ Inspector.prototype = {
 
     let panel;
     switch (id) {
-      case "animationinspector":
-        const AnimationInspector = require("devtools/client/inspector/animation/animation");
-        panel = new AnimationInspector(this, this.panelWin);
-        break;
       case "boxmodel":
         // box-model isn't a panel on its own, it used to, now it is being used by
         // the layout view which retrieves an instance via getPanel.
@@ -946,12 +941,6 @@ Inspector.prototype = {
       {
         id: "fontinspector",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.fontInspectorTitle"),
-      },
-      {
-        id: "animationinspector",
-        title: INSPECTOR_L10N.getStr(
-          "inspector.sidebar.animationInspectorTitle"
-        ),
       },
       */
     ];
