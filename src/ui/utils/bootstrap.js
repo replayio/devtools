@@ -100,8 +100,8 @@ function bootstrapStore() {
 }
 
 function getRedirectUri() {
-  const { host, pathname } = window.location;
-  return "http://" + host + pathname;
+  const { host, pathname, protocol } = window.location;
+  return protocol + "//" + host + pathname;
 }
 
 export function bootstrapApp(props, context) {
