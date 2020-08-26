@@ -39,11 +39,12 @@
     [ "obj: Object { value: 16, subobj: {…} }" ]
   );
 
+  await Test.removeAllBreakpoints();
   await Test.addBreakpoint("doc_rr_console.html", 11);
   await Test.rewindToLine(11);
 
   await Test.executeInConsole("object");
-  await Test.warpToMessage("Logpoint 2");
+  await Test.warpToMessage("Iteration 3");
 
   msg = await Test.waitForMessage("Object { obj: {…}, value: 0 }");
   await Test.checkMessageObjectContents(

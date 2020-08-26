@@ -19,6 +19,7 @@
   // isn't ideal.
   await Test.addBreakpoint("doc_rr_logs.html", 16);
   await Test.rewindToLine(16);
+  await Test.removeAllBreakpoints();
   await Test.checkPausedMessage("number: 1");
 
   await Test.warpToMessage("number: 2");
