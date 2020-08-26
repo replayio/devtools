@@ -585,7 +585,7 @@ export class Timeline extends Component {
       className: "",
       active: true,
       img: "comment",
-      onClick: () => this.props.createComment(),
+      onClick: () => this.props.createComment(null, true, "timeline"),
     });
   }
 

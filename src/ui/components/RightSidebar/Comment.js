@@ -18,12 +18,25 @@ class Comment extends React.Component {
     };
   }
 
+  componentDidMount() {
+    const { contents, addedFrom } = this.props.comment;
+    const { editing } = this.state;
+
+    // A newly-added (empty) comment from the Events Timeline "Add a Comment" button
+    // should directly go into editing mode.
+    if (!contents && addedFrom == "eventsTimeline") {
+      this.startEditing();
+    }
+  }
+
   startEditing = () => {
     this.setState({ editing: true });
+    this.props.toggleAddingCommentOn();
   };
 
   stopEditing = () => {
     this.setState({ editing: false });
+    this.props.toggleAddingCommentOff();
   };
 
   onChange = e => {
@@ -132,25 +145,15 @@ class Comment extends React.Component {
   }
 
   renderBody() {
-    const { editing } = this.state;
-
     return (
       <div className="comment-body">
-        {editing ? this.renderCommentEditor() : this.renderLabel()}
+        {this.state.editing ? this.renderCommentEditor() : this.renderLabel()}
       </div>
     );
   }
 
   render() {
     const { comment, id, currentTime } = this.props;
-
-    // When a user adds a comment from the timeline, the comments array is updated
-    // immediately with a new comment with empty content. We don't want to display
-    // that empty comment until the user has submitted its content.
-    if (!comment.contents) {
-      return null;
-    }
-
     const selected = currentTime === comment.time;
 
     return (

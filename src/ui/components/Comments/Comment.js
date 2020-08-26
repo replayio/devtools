@@ -15,9 +15,13 @@ class Comment extends React.Component {
   };
 
   onDescriptionChange = e => {
+    this.contents = e.target.value;
+  };
+
+  onKeyPress = e => {
     const { comment, updateComment } = this.props;
     const contents = e.target.value;
-    this.contents = e.target.value;
+
     if (e.charCode == "13") {
       this.setState({ editing: false });
       updateComment({ ...comment, contents });
@@ -122,7 +126,8 @@ class Comment extends React.Component {
               {editing || comment.contents == "" ? (
                 <textarea
                   onBlur={this.stopEditing}
-                  onKeyPress={this.onDescriptionChange}
+                  onChange={this.onDescriptionChange}
+                  onKeyPress={this.onKeyPress}
                   defaultValue={comment.contents}
                 />
               ) : (

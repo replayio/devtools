@@ -12,8 +12,31 @@ import "./EventsTimeline.css";
 
 class EventsTimeline extends React.Component {
   state = {
-    editing: false,
+    addingComment: false,
   };
+
+  toggleAddingCommentOff = () => {
+    this.setState({ addingComment: false });
+  };
+
+  toggleAddingCommentOn = () => {
+    this.setState({ addingComment: true });
+  };
+
+  renderAddCommentButton() {
+    const { createComment } = this.props;
+    const { addingComment } = this.state;
+
+    if (addingComment) {
+      return null;
+    }
+
+    return (
+      <button className="add-comment" onClick={() => createComment(null, false, "eventsTimeline")}>
+        Add a comment
+      </button>
+    );
+  }
 
   render() {
     const { comments, expanded } = this.props;
@@ -22,13 +45,11 @@ class EventsTimeline extends React.Component {
       return null;
     }
 
-    // This shows an empty state for when there are no comments yet. It also
-    // prevents an empty comment from displayed when the user is still filling
-    // in the content with the textbox.
-    if (!comments.length || comments[0].content) {
+    if (!comments.length) {
       return (
         <div className="events-timeline-comments">
           <p>There is nothing here yet. Try adding a comment in the timeline below.</p>
+          {this.renderAddCommentButton()}
         </div>
       );
     }
@@ -36,8 +57,14 @@ class EventsTimeline extends React.Component {
     return (
       <div className="events-timeline-comments">
         {sortBy(comments, comment => comment.time).map(comment => (
-          <Comment comment={comment} key={comment.id} />
+          <Comment
+            comment={comment}
+            key={comment.id}
+            toggleAddingCommentOff={this.toggleAddingCommentOff}
+            toggleAddingCommentOn={this.toggleAddingCommentOn}
+          />
         ))}
+        {this.renderAddCommentButton()}
       </div>
     );
   }
@@ -47,5 +74,5 @@ export default connect(
   state => ({
     comments: selectors.getComments(state),
   }),
-  {}
+  { createComment: actions.createComment }
 )(EventsTimeline);
