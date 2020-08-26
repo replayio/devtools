@@ -1581,8 +1581,7 @@ const ThreadFront = {
     }, 0);
 
     const point = selectedPoint || this.currentPoint;
-    const target = await this._findResumeTarget(point, command);
-    resumeTarget = target;
+    resumeTarget = await this._findResumeTarget(point, command);
     if (resumeEmitted) {
       warpToTarget();
     }
@@ -1605,6 +1604,11 @@ const ThreadFront = {
   },
   stepOut(point) {
     this._resumeOperation("Debugger.findStepOutTarget", point);
+  },
+
+  async resumeTarget(point) {
+    await this.initializedWaiter.promise;
+    return this._findResumeTarget(point, "Debugger.findResumeTarget");
   },
 
   async blackbox(scriptId, begin, end) {

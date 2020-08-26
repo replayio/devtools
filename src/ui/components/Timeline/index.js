@@ -29,6 +29,8 @@ const {
   paintGraphics,
 } = require("protocol/graphics");
 
+const { assert } = require("protocol/utils");
+
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
 import { features } from "../../utils/prefs";
@@ -472,7 +474,16 @@ export class Timeline extends Component {
 
   playbackPaintFinished(time, screen, mouse) {
     if (this.props.playback && time == this.props.playback.time) {
-      const { startTime, startDate } = this.props.playback;
+      const { startTime, startDate, pauseTarget } = this.props.playback;
+
+      // If we play past the next time when execution should pause,
+      // stop playback and seek to the pause target.
+      if (pauseTarget && pauseTarget.time < time) {
+        this.props.setTimelineState({ playback: null });
+        this.seek(pauseTarget.point, pauseTarget.time, !!pauseTarget.frame);
+        return;
+      }
+
       paintGraphics(screen, mouse);
       const next = this.nextPlaybackTime(time);
       if (next) {
@@ -488,7 +499,7 @@ export class Timeline extends Component {
           }, Math.max(0, paintTime - now));
         });
         this.props.setTimelineState({
-          playback: { time: next, startTime, startDate },
+          playback: { time: next, startTime, startDate, pauseTarget },
           currentTime: next,
         });
       } else {
@@ -499,24 +510,43 @@ export class Timeline extends Component {
     }
   }
 
-  startPlayback() {
+  async startPlayback() {
     log(`StartPlayback`);
     FullStory.event("timeline::play");
 
-    const startTime = this.props.currentTime;
+    const { currentTime } = this.props;
+
     const startDate = Date.now();
 
-    let time = this.nextPlaybackTime(this.props.currentTime);
-    if (!time) {
-      time = this.zoomStartTime;
+    let startTime = currentTime;
+    let startPoint = this.threadFront.currentPoint;
+
+    if (currentTime == this.zoomEndTime) {
+      startTime = this.zoomStartTime;
+      const startEvent = mostRecentPaintOrMouseEvent(startTime);
+      startPoint = startEvent ? startEvent.point : "0";
     }
-    getGraphicsAtTime(time).then(({ screen, mouse }) => {
-      this.playbackPaintFinished(time, screen, mouse);
-    });
 
     this.props.setTimelineState({
-      playback: { time, startTime, startDate },
-      currentTime: time,
+      playback: { startTime, startDate },
+      currentTime: startTime,
+    });
+
+    const pauseTarget = await this.threadFront.resumeTarget(startPoint);
+
+    if (!this.props.playback) {
+      return;
+    }
+
+    const time = this.nextPlaybackTime(startTime);
+    assert(time);
+
+    this.props.setTimelineState({
+      playback: { startTime, startDate, time, pauseTarget }
+    });
+
+    getGraphicsAtTime(time).then(({ screen, mouse }) => {
+      this.playbackPaintFinished(time, screen, mouse);
     });
   }
 
