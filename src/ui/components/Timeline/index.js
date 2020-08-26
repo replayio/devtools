@@ -482,7 +482,6 @@ export class Timeline extends Component {
         const paintTime = startDate + next - startTime;
 
         getGraphicsAtTime(next).then(({ screen, mouse }) => {
-          if (!screen) return;
           const now = Date.now();
           setTimeout(() => {
             this.playbackPaintFinished(next, screen, mouse);
@@ -512,9 +511,7 @@ export class Timeline extends Component {
       time = this.zoomStartTime;
     }
     getGraphicsAtTime(time).then(({ screen, mouse }) => {
-      if (screen) {
-        this.playbackPaintFinished(time, screen, mouse);
-      }
+      this.playbackPaintFinished(time, screen, mouse);
     });
 
     this.props.setTimelineState({
