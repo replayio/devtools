@@ -81,14 +81,15 @@ class Comment extends React.Component {
 
   renderAvatar() {
     const { comment } = this.props;
-    const { picture, name } = comment.user;
+    if (!comment.user) {
+      return <div className="comment-avatar" style={{ background: getAvatarColor(null) }}></div>;
+    }
+
+    const { picture, name, avatarID } = comment.user;
 
     return (
-      <div
-        className="comment-avatar"
-        style={{ background: getAvatarColor(comment?.user.avatarID) }}
-      >
-        {picture ? <img src={picture} alt={name} /> : null}
+      <div className="comment-avatar" style={{ background: getAvatarColor(avatarID) }}>
+        {<img src={picture} alt={name} />}
       </div>
     );
   }
