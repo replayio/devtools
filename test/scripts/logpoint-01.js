@@ -31,8 +31,8 @@
   await Test.checkEvaluateInTopFrame("number", 5);
   await Test.reverseStepOverToLine(19);
 
-  await Test.addBreakpoint("doc_rr_basic.html", 21);
-  await Test.resumeToLine(21);
+  // The logpoint acts like a breakpoint when resuming.
+  await Test.resumeToLine(20);
 
   Test.finish();
 })();
