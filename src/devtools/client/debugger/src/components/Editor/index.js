@@ -575,12 +575,12 @@ class Editor extends PureComponent<Props, State> {
     return (
       <div>
         <DebugLine />
-        <HighlightLine />
+        {/* <HighlightLine /> */}
         {features.jumpLine ? <ReplayLines /> : null}
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
-        <HighlightLines editor={editor} />
+        {/* <HighlightLines editor={editor} /> */}
         {
           <EditorMenu
             editor={editor}

@@ -4,13 +4,14 @@
 
 // @flow
 
-import { PureComponent } from "react";
+import React, { PureComponent } from "react";
 import classnames from "classnames";
 
 import { getDocument, toEditorLine } from "../../utils/editor";
 import { features } from "../../utils/prefs";
 import { showMenu } from "devtools-contextmenu";
 import { breakpointItems } from "./menus/breakpoints";
+import Panel from "devtools/client/debugger/src/components/Editor/Panel";
 import type { BreakpointItemActions } from "./menus/breakpoints";
 import type { EditorItemActions } from "./menus/editor";
 
@@ -125,15 +126,16 @@ class Breakpoint extends PureComponent<Props> {
     editor.codeMirror.addLineClass(line, "line", "new-breakpoint");
     editor.codeMirror.removeLineClass(line, "line", "breakpoint-disabled");
     editor.codeMirror.removeLineClass(line, "line", "has-condition");
-    editor.codeMirror.removeLineClass(line, "line", "has-log");
+    // editor.codeMirror.removeLineClass(line, "line", "has-log");
 
     if (breakpoint.disabled) {
       editor.codeMirror.addLineClass(line, "line", "breakpoint-disabled");
     }
 
-    if (breakpoint.options.logValue) {
-      editor.codeMirror.addLineClass(line, "line", "has-log");
-    } else if (breakpoint.options.condition) {
+    // if (breakpoint.options.logValue) {
+    //   editor.codeMirror.addLineClass(line, "line", "has-log");
+    // }
+    if (breakpoint.options.condition) {
       editor.codeMirror.addLineClass(line, "line", "has-condition");
     }
   }
@@ -162,7 +164,11 @@ class Breakpoint extends PureComponent<Props> {
   }
 
   render() {
-    return null;
+    const { editor, breakpoint } = this.props;
+
+    return (
+      <Panel breakpoint={breakpoint} editor={editor} location={breakpoint.location} log={true} />
+    );
   }
 }
 
