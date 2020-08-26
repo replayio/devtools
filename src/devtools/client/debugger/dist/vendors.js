@@ -3432,9 +3432,13 @@
 
             openreq.onsuccess = function withStoreOnSuccess() {
               db = openreq.result;
-              const transaction = db.transaction(STORENAME, type);
-              const store = transaction.objectStore(STORENAME);
-              onsuccess(store);
+              try {
+                const transaction = db.transaction(STORENAME, type);
+                const store = transaction.objectStore(STORENAME);
+                onsuccess(store);
+              } catch (e) {
+                onerror();
+              }
             };
           }
         }
