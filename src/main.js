@@ -82,7 +82,11 @@ async function initialize() {
   }
 
   if (recordingId === null && prefs.recordingId) {
-    window.location = `${window.location.href}?id=${prefs.recordingId}`;
+    const { host, pathname, protocol, search } = window.location;
+    const params = new URLSearchParams(search);
+    params.set("id", prefs.recordingId);
+
+    window.location = `${protocol}//${host}${pathname}?${decodeURIComponent(params)}`;
     return;
   }
 
