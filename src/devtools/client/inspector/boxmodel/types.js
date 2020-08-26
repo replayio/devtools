@@ -10,9 +10,6 @@ const PropTypes = require("prop-types");
  * The box model data for the current selected node.
  */
 exports.boxModel = {
-  // Whether or not the geometry editor is enabled
-  geometryEditorEnabled: PropTypes.bool,
-
   // The layout information of the current selected node
   layout: PropTypes.object,
 

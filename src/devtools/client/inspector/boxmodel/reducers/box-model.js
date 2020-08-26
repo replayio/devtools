@@ -5,24 +5,16 @@
 "use strict";
 
 const {
-  UPDATE_GEOMETRY_EDITOR_ENABLED,
   UPDATE_LAYOUT,
   UPDATE_OFFSET_PARENT,
 } = require("devtools/client/inspector/boxmodel/actions/index");
 
 const INITIAL_BOX_MODEL = {
-  geometryEditorEnabled: false,
   layout: {},
   offsetParent: null,
 };
 
 const reducers = {
-  [UPDATE_GEOMETRY_EDITOR_ENABLED](boxModel, { enabled }) {
-    return Object.assign({}, boxModel, {
-      geometryEditorEnabled: enabled,
-    });
-  },
-
   [UPDATE_LAYOUT](boxModel, { layout }) {
     return Object.assign({}, boxModel, {
       layout,

@@ -8,9 +8,6 @@ const { createEnum } = require("devtools/client/shared/enum");
 
 createEnum(
   [
-    // Updates the geometry editor's enabled state.
-    "UPDATE_GEOMETRY_EDITOR_ENABLED",
-
     // Updates the layout state with the latest layout properties.
     "UPDATE_LAYOUT",
 

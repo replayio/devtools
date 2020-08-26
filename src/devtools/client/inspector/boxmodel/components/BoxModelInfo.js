@@ -11,9 +11,6 @@ const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const Types = require("devtools/client/inspector/boxmodel/types");
 
-const BOXMODEL_STRINGS_URI = "devtools/client/locales/boxmodel.properties";
-const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
-
 const SHARED_STRINGS_URI = "devtools/client/locales/shared.properties";
 const SHARED_L10N = new LocalizationHelper(SHARED_STRINGS_URI);
 
@@ -21,28 +18,17 @@ class BoxModelInfo extends PureComponent {
   static get propTypes() {
     return {
       boxModel: PropTypes.shape(Types.boxModel).isRequired,
-      onToggleGeometryEditor: PropTypes.func.isRequired,
     };
   }
 
   constructor(props) {
     super(props);
-    this.onToggleGeometryEditor = this.onToggleGeometryEditor.bind(this);
-  }
-
-  onToggleGeometryEditor(e) {
-    this.props.onToggleGeometryEditor();
   }
 
   render() {
     const { boxModel } = this.props;
-    const { geometryEditorEnabled, layout } = boxModel;
-    const { height = "-", isPositionEditable, position, width = "-" } = layout;
-
-    let buttonClass = "layout-geometry-editor devtools-button";
-    if (geometryEditorEnabled) {
-      buttonClass += " checked";
-    }
+    const { layout } = boxModel;
+    const { height = "-", position, width = "-" } = layout;
 
     return dom.div(
       { className: "boxmodel-info" },
@@ -52,13 +38,6 @@ class BoxModelInfo extends PureComponent {
       ),
       dom.section(
         { className: "boxmodel-position-group" },
-        isPositionEditable
-          ? dom.button({
-              className: buttonClass,
-              title: BOXMODEL_L10N.getStr("boxmodel.geometryButton.tooltip"),
-              onClick: this.onToggleGeometryEditor,
-            })
-          : null,
         dom.span({ className: "boxmodel-element-position" }, position)
       )
     );

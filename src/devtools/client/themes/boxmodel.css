@@ -3,22 +3,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/ */
 
 :root {
-  --marginbox-color: #FDFFDF;
+  --marginbox-color: #fdffdf;
   --borderbox-color: var(--grey-50);
-  --paddingbox-color: #E3DCFF;
-  --contentbox-color: #CFF0FB;
-  --marginbox-border-color: #D8E60A;
-  --contentbox-border-color: #54A9FF;
+  --paddingbox-color: #e3dcff;
+  --contentbox-color: #cff0fb;
+  --marginbox-border-color: #d8e60a;
+  --contentbox-border-color: #54a9ff;
   --position-border-color: var(--grey-50);
 }
 
 :root.theme-dark {
-  --marginbox-color: #73764A;
+  --marginbox-color: #73764a;
   --borderbox-color: var(--grey-70);
-  --paddingbox-color: #6657A6;
-  --contentbox-color: #407AA4;
-  --marginbox-border-color: #BDCA00;
-  --contentbox-border-color: #00B8FF;
+  --paddingbox-color: #6657a6;
+  --contentbox-color: #407aa4;
+  --marginbox-border-color: #bdca00;
+  --contentbox-border-color: #00b8ff;
   --position-border-color: var(--grey-40);
 }
 
@@ -36,10 +36,6 @@
   display: flex;
   align-items: center;
   padding: 4px 19px;
-}
-
-.layout-geometry-editor::before {
-  background: url(images/geometry-editor.svg) no-repeat center center / 16px 16px;
 }
 
 /* Main: contains the box-model regions */
