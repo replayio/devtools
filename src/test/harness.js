@@ -190,7 +190,7 @@ function waitForPausedLine(line) {
 
 function resumeThenPauseAtLineFunctionFactory(method) {
   return async function (lineno, waitForLine) {
-    console.log(`Starting ${method} to ${lineno}...`);
+    console.log(`Starting ${method} to ${lineno}...`, new Date);
     await dbg.actions[method](getThreadContext());
     if (lineno !== undefined) {
       await waitForPaused();
@@ -203,7 +203,7 @@ function resumeThenPauseAtLineFunctionFactory(method) {
       const pauseLine = getVisibleSelectedFrameLine();
       assert(pauseLine == lineno, `Expected line ${lineno} got ${pauseLine}`);
     }
-    console.log(`Finished ${method} to ${lineno}!`);
+    console.log(`Finished ${method} to ${lineno}!`, new Date);
   };
 }
 
