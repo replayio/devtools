@@ -39,6 +39,7 @@ let urlbar;
 async function startRecordingTab(url, waitPath) {
   await waitForTime(2000);
   await waitUntil(() => !!document.getElementById("urlbar"));
+  dump(`TestHarnessHasURLBar\n`);
 
   urlbar = new modules.UrlbarInput({
     textbox: document.getElementById("urlbar"),
@@ -76,7 +77,13 @@ function loadUrl(url) {
 }
 
 function waitForLoad(urlPattern) {
-  return waitUntil(() => window.gBrowser.currentURI.spec.includes(urlPattern));
+  return waitUntil(() => {
+    if (window.gBrowser.currentURI.spec.includes(urlPattern)) {
+      return true;
+    }
+    dump(`TestHarnessUnexpectedURL ${window.gBrowser.currentURI.spec}\n`);
+    return false;
+  });
 }
 
 function waitForTime(ms) {
