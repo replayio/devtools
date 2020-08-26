@@ -18,7 +18,6 @@ require("devtools/client/themes/breadcrumbs.css");
 require("devtools/client/themes/inspector.css");
 require("devtools/client/themes/badge.css");
 require("devtools/client/themes/rules.css");
-require("devtools/client/themes/compatibility.css");
 require("devtools/client/themes/computed.css");
 require("devtools/client/themes/changes.css");
 require("devtools/client/themes/boxmodel.css");
@@ -844,10 +843,6 @@ Inspector.prototype = {
         const ChangesView = require("devtools/client/inspector/changes/ChangesView");
         panel = new ChangesView(this, this.panelWin);
         break;
-      case "compatibilityview":
-        const CompatibilityView = require("devtools/client/inspector/compatibility/CompatibilityView");
-        panel = new CompatibilityView(this, this.panelWin);
-        break;
       case "computedview":
         const { ComputedViewTool } = require("devtools/client/inspector/computed/computed");
         panel = new ComputedViewTool(this, this.panelWin);
@@ -933,13 +928,6 @@ Inspector.prototype = {
       sidebarPanels.push({
         id: "newruleview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
-      });
-    }
-
-    if (Services.prefs.getBoolPref("devtools.inspector.compatibility.enabled")) {
-      sidebarPanels.push({
-        id: "compatibilityview",
-        title: INSPECTOR_L10N.getStr("inspector.sidebar.compatibilityViewTitle"),
       });
     }
 

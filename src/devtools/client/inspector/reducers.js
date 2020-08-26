@@ -10,7 +10,6 @@
 exports.boxModel = require("devtools/client/inspector/boxmodel/reducers/box-model");
 exports.changes = require("devtools/client/inspector/changes/reducers/changes");
 exports.classList = require("devtools/client/inspector/rules/reducers/class-list");
-exports.compatibility = require("devtools/client/inspector/compatibility/reducers/compatibility");
 exports.pseudoClasses = require("devtools/client/inspector/rules/reducers/pseudo-classes");
 exports.rules = require("devtools/client/inspector/rules/reducers/rules");
 
