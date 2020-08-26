@@ -6667,8 +6667,12 @@
           Object.keys(mappings).map(key =>
             Object.defineProperty(store, key, {
               async get() {
-                const value = await asyncStorage.getItem(`${root}.${getMappingKey(key)}`);
-                return value || getMappingDefaultValue(key);
+                try {
+                  const value = await asyncStorage.getItem(`${root}.${getMappingKey(key)}`);
+                  return value || getMappingDefaultValue(key);
+                } catch (e) {
+                  return getMappingDefaultValue(key);
+                }
               },
 
               set(value) {
