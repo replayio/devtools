@@ -67,7 +67,6 @@ pref("devtools.debugger.features.map-expression-bindings", true);
 pref("devtools.debugger.features.map-await-expression", true);
 pref("devtools.debugger.features.xhr-breakpoints", true);
 pref("devtools.debugger.features.original-blackbox", true);
-pref("devtools.debugger.features.event-listeners-breakpoints", true);
 pref("devtools.debugger.features.dom-mutation-breakpoints", true);
 pref("devtools.debugger.features.log-points", true);
 pref("devtools.debugger.features.inline-preview", true);
@@ -174,7 +173,6 @@ export const features = new PrefsHelper("devtools.debugger.features", {
   componentPane: ["Bool", "component-pane"],
   xhrBreakpoints: ["Bool", "xhr-breakpoints"],
   originalBlackbox: ["Bool", "original-blackbox"],
-  eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
   domMutationBreakpoints: ["Bool", "dom-mutation-breakpoints"],
   logPoints: ["Bool", "log-points"],
   commandClick: ["Bool", "command-click"],
@@ -190,7 +188,6 @@ export const asyncStore = asyncStoreHelper("debugger", {
   pendingBreakpoints: ["pending-breakpoints", {}],
   tabs: ["tabs", []],
   xhrBreakpoints: ["xhr-breakpoints", []],
-  eventListenerBreakpoints: ["event-listener-breakpoints", undefined],
   tabsBlackBoxed: ["tabsBlackBoxed", []],
 });
 
@@ -203,7 +200,6 @@ export function verifyPrefSchema(): void {
     asyncStore.pendingBreakpoints = {};
     asyncStore.tabs = [];
     asyncStore.xhrBreakpoints = [];
-    asyncStore.eventListenerBreakpoints = undefined;
     prefs.debuggerPrefsSchemaVersion = prefsSchemaVersion;
   }
 }

@@ -1,4 +1,5 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
+import { asyncStoreHelper } from "devtools-modules";
 
 import Services from "devtools-services";
 
@@ -11,6 +12,7 @@ pref("devtools.split-console", true);
 pref("devtools.selected-panel", "debugger");
 pref("devtools.user", "{}");
 pref("devtools.recording-id", "");
+pref("devtools.event-listeners-breakpoints", true);
 
 // app features
 pref("devtools.features.comments", true);
@@ -22,10 +24,15 @@ export const prefs = new PrefsHelper("devtools", {
   selectedPanel: ["String", "selected-panel"],
   user: ["Json", "user"],
   recordingId: ["Json", "recording-id"],
+  eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
   comments: ["Bool", "comments"],
   users: ["Bool", "users"],
   auth0: ["Bool", "auth0"],
+});
+
+export const asyncStore = asyncStoreHelper("devtools", {
+  eventListenerBreakpoints: ["event-listener-breakpoints", undefined],
 });

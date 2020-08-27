@@ -23,7 +23,7 @@
 }
 
 .events-timeline-comments .comment.selected {
-  border-left: 4px solid #5EA3F8;
+  border-left: 4px solid #5ea3f8;
   padding-left: 12px;
 }
 
@@ -54,7 +54,7 @@
 
 .comment .editor button.save {
   color: white;
-  background-color: #5EA3F8;
+  background-color: #5ea3f8;
 }
 
 .comment .editor button:not(:last-child) {
@@ -106,15 +106,10 @@
 .events-timeline-comments .add-comment {
   padding: 12px;
   color: white;
-  background-color: #5EA3F8;
+  background-color: #5ea3f8;
   margin-top: 12px;
   align-self: center;
   cursor: pointer;
-}
-
-.right-sidebar .comment-icon {
-  width: 20px;
-  height: 20px;
 }
 
 .right-sidebar button.comment {

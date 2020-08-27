@@ -107,13 +107,13 @@ function updatePrefs(state: any) {
   const previousTabs = currentTabs;
   currentPendingBreakpoints = selectors.getPendingBreakpoints(state);
   currentXHRBreakpoints = selectors.getXHRBreakpoints(state);
-  currentEventBreakpoints = state.eventListenerBreakpoints;
   currentTabs = selectors.getTabs(state);
 
   if (previousPendingBreakpoints && currentPendingBreakpoints !== previousPendingBreakpoints) {
     asyncStore.pendingBreakpoints = currentPendingBreakpoints;
   }
 
+  currentEventBreakpoints = state.eventListenerBreakpoints;
   if (previousEventBreakpoints && previousEventBreakpoints !== currentEventBreakpoints) {
     asyncStore.eventListenerBreakpoints = currentEventBreakpoints;
   }

@@ -8,12 +8,8 @@ import React, { Component } from "react";
 import classnames from "classnames";
 
 import { connect } from "../../utils/connect";
-import actions from "../../actions";
-import {
-  getActiveEventListeners,
-  getEventListenerBreakpointTypes,
-  getEventListenerExpanded,
-} from "../../selectors";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 
 import AccessibleImage from "../shared/AccessibleImage";
 
@@ -291,9 +287,9 @@ class EventListeners extends Component<Props, State> {
 }
 
 const mapStateToProps = state => ({
-  activeEventListeners: getActiveEventListeners(state),
-  categories: getEventListenerBreakpointTypes(state),
-  expandedCategories: getEventListenerExpanded(state),
+  activeEventListeners: selectors.getActiveEventListeners(state),
+  categories: selectors.getEventListenerBreakpointTypes(state),
+  expandedCategories: selectors.getEventListenerExpanded(state),
 });
 
 export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {

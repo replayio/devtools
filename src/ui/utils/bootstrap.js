@@ -3,8 +3,9 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
 import { prefs as dbgPrefs } from "devtools/client/debugger/src/utils/prefs";
-import { prefs, features } from "./prefs";
+import { prefs, features, asyncStore } from "./prefs";
 import configureStore from "devtools/client/debugger/src/actions/utils/create-store";
+import { clientCommands } from "devtools/client/debugger/src/client/firefox/commands";
 import { bindActionCreators, combineReducers } from "redux";
 import { reducers, selectors } from "../reducers";
 import { actions } from "../actions";
@@ -15,7 +16,12 @@ import { ThreadFront } from "protocol/thread";
 import App from "ui/components/App";
 import { Auth0Provider } from "@auth0/auth0-react";
 
-const initialState = {};
+async function getInitialState() {
+  const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;
+  return {
+    eventListenerBreakpoints,
+  };
+}
 
 export function setupSentry(context) {
   const url = new URL(window.location.href);
@@ -82,15 +88,16 @@ function bindSelectors(obj) {
   }, {});
 }
 
-function bootstrapStore() {
+async function bootstrapStore() {
   const createStore = configureStore({
     log: dbgPrefs.logging,
     timing: dbgPrefs.timing,
     makeThunkArgs: (args, state) => {
-      return { ...args };
+      return { ...args, client: clientCommands };
     },
   });
 
+  const initialState = await getInitialState();
   const store = createStore(combineReducers(reducers), initialState);
   registerStoreObserver(store, updatePrefs);
 
@@ -104,8 +111,8 @@ function getRedirectUri() {
   return protocol + "//" + host + pathname;
 }
 
-export function bootstrapApp(props, context) {
-  const store = bootstrapStore();
+export async function bootstrapApp(props, context) {
+  const store = await bootstrapStore();
   setupSentry(context);
 
   ReactDOM.render(
@@ -139,8 +146,14 @@ function updatePrefs(state, oldState) {
       prefs[field] = selector(state);
     }
   }
+  function updateAsyncPref(field, selector) {
+    if (selector(state) != selector(oldState)) {
+      asyncStore[field] = selector(state);
+    }
+  }
 
   updatePref("splitConsole", selectors.isSplitConsoleOpen);
   updatePref("user", selectors.getUser);
   updatePref("selectedPanel", selectors.getSelectedPanel);
+  updateAsyncPref("eventListenerBreakpoints", state => state.eventListenerBreakpoints);
 }
