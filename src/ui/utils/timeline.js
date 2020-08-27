@@ -1,4 +1,4 @@
-const markerWidth = 7;
+const timelineMarkerWidth = 7;
 
 // calculate pixel distance from two times
 export function getPixelDistance({ to, from, zoom, overlayWidth }) {
@@ -34,7 +34,7 @@ export function getPixelOffset({ time, overlayWidth, zoom }) {
 // Get the percent value for the left offset of a message.
 export function getLeftOffset({ overlayWidth, time, zoom }) {
   const position = getVisiblePosition({ time, zoom }) * 100;
-  const messageWidth = (markerWidth / overlayWidth) * 100;
+  const messageWidth = (timelineMarkerWidth / overlayWidth) * 100;
 
   return Math.max(position - messageWidth / 2, 0);
 }
@@ -45,4 +45,13 @@ export function getCommentLeftOffset({ overlayWidth, time, zoom, commentWidth })
   const messageWidth = (commentWidth / overlayWidth) * 100;
 
   return Math.min(Math.max(position, 0), 100 - messageWidth);
+}
+
+// Get the percent value for the left offset of a comment marker.
+export function getMarkerLeftOffset({ overlayWidth, time, zoom, markerWidth }) {
+  const position = getVisiblePosition({ time, zoom }) * 100;
+  const commentMarkerWidth = (markerWidth / overlayWidth) * 100;
+  const pausedLocationMarkerWidth = (1 / overlayWidth) * 100;
+
+  return Math.max(position + pausedLocationMarkerWidth - commentMarkerWidth / 2, 0);
 }

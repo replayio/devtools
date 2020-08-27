@@ -262,7 +262,7 @@
 .replay-player {
   -moz-appearance: none;
   background: var(--theme-tab-toolbar-background);
-  border-bottom: 1px solid var(--theme-splitter-color);
+  border-bottom: 1px solid var(--grey-20);
   box-sizing: border-box;
   min-height: 29px;
   --progressbar-transition: 200ms;
