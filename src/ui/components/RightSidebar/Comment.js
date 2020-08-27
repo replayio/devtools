@@ -102,7 +102,7 @@ class Comment extends React.Component {
 
     return (
       <div className="comment-avatar" style={{ background: getAvatarColor(avatarID) }}>
-        {<img src={picture} alt={name} />}
+        {picture && <img src={picture} alt={name} />}
       </div>
     );
   }
