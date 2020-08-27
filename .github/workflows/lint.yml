@@ -9,5 +9,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install Deps
         run: npm install
-      - name: Run eslint
-        run: npm run lint
+      - name: eslint + fix
+        uses: getsentry/action-eslint-fix@v1
