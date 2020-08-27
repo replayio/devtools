@@ -4,7 +4,7 @@
 
 "use strict";
 
-loader.lazyRequireGetter(this, "openDocLink", "devtools/client/shared/link", true);
+import { openDocLink } from "devtools/client/shared/link";
 
 class InactiveCssTooltipHelper {
   constructor() {

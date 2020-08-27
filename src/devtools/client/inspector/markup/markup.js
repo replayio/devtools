@@ -23,7 +23,7 @@ const { ThreadFront } = require("protocol/thread");
 const { log } = require("protocol/socket");
 const Highlighter = require("highlighter/highlighter.js");
 const { nodePicker } = require("ui/components/NodePicker");
-
+const { openDocLink } = require("devtools/client/shared/link");
 /*
 loader.lazyRequireGetter(
   this,
@@ -53,12 +53,7 @@ loader.lazyRequireGetter(
   "devtools/client/inspector/shared/utils",
   true
 );
-loader.lazyRequireGetter(
-  this,
-  "openContentLink",
-  "devtools/client/shared/link",
-  true
-);
+
 */
 
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
@@ -1024,7 +1019,7 @@ MarkupView.prototype = {
         .resolveRelativeURL(link, this.inspector.selection.nodeFront)
         .then(url => {
           if (type === "uri") {
-            openContentLink(url);
+            openDocLink(url);
           } else if (type === "cssresource") {
             return this.toolbox.viewSourceInStyleEditor(url);
           } else if (type === "jsresource") {

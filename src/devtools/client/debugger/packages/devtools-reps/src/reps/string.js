@@ -9,11 +9,9 @@ const PropTypes = require("prop-types");
 const {
   containsURL,
   escapeString,
-  getGripType,
   rawCropString,
   sanitizeString,
   wrapRender,
-  isGrip,
   ELLIPSIS,
   uneatLastUrlCharsRegex,
   urlRegex,
