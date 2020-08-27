@@ -35,12 +35,11 @@ function FunctionRep(props) {
         // Stop the event propagation so we don't trigger ObjectInspector
         // expand/collapse.
         e.stopPropagation();
-        if (recordTelemetryEvent) {
-          recordTelemetryEvent("jump_to_definition");
-        }
-
-        const sourceLocation = await getSourceLocation(location, sourceMapService);
-        onViewSourceInDebugger(sourceLocation);
+        onViewSourceInDebugger({
+          url,
+          line: location.line,
+          column: location.column,
+        });
       },
     });
   }
