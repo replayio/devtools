@@ -6,6 +6,7 @@ import { LocalizationHelper } from "devtools/shared/l10n";
 import { defer, assert } from "protocol/utils";
 import { bootstrapApp } from "devtools/client/debugger/src/utils/bootstrap";
 import { resizeBreakpointGutter } from "./src/utils/ui";
+import { openDocLink } from "devtools/client/shared/link";
 
 function registerStoreObserver(store, subscriber) {
   let oldState = store.getState();
@@ -122,7 +123,7 @@ export class DebuggerPanel {
   }
 
   openLink(url) {
-    openContentLink(url);
+    openDocLink(url);
   }
 
   async openConsoleAndEvaluate(input) {

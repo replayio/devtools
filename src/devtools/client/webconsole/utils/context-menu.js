@@ -11,15 +11,11 @@ const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
 //const clipboardHelper = require("devtools/shared/platform/clipboard");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const actions = require("devtools/client/webconsole/actions/index");
+const { openDocLink } = require("devtools/client/shared/link");
 
 /*
 loader.lazyRequireGetter(this, "saveAs", "devtools/shared/DevToolsUtils", true);
-loader.lazyRequireGetter(
-  this,
-  "openContentLink",
-  "devtools/client/shared/link",
-  true
-);
+
 loader.lazyRequireGetter(
   this,
   "getElementText",
@@ -132,7 +128,7 @@ function createContextMenu(event, message, webConsoleWrapper) {
         if (!request) {
           return;
         }
-        openContentLink(request.url);
+        openDocLink(request.url);
       },
     })
   );
@@ -273,7 +269,7 @@ function createContextMenu(event, message, webConsoleWrapper) {
         label: l10n.getStr("webconsole.menu.openURL.label"),
         accesskey: l10n.getStr("webconsole.menu.openURL.accesskey"),
         click: () =>
-          openContentLink(url, {
+          openDocLink(url, {
             inBackground: true,
             relatedToCurrent: true,
           }),
