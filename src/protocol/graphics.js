@@ -135,7 +135,7 @@ function nextPaintEvent(time) {
 
 function previousPaintEvent(time) {
   const entry = mostRecentEntry(gPaintPoints, time);
-  if (entry && (entry.time == time)) {
+  if (entry && entry.time == time) {
     return mostRecentEntry(gPaintPoints, time - 1);
   }
   return entry;

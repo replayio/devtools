@@ -61,5 +61,4 @@ export function getEventListenerExpanded(state: State): EventListenerExpandedLis
   return state.eventListenerBreakpoints.expanded;
 }
 
-
 export default update;
