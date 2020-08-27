@@ -5,6 +5,7 @@
 import { LocalizationHelper } from "devtools/shared/l10n";
 import { defer, assert } from "protocol/utils";
 import { bootstrapApp } from "devtools/client/debugger/src/utils/bootstrap";
+import { resizeBreakpointGutter } from "./src/utils/ui";
 
 function registerStoreObserver(store, subscriber) {
   let oldState = store.getState();
@@ -84,6 +85,7 @@ export class DebuggerPanel {
             this._actions.selectLocation(cx, location);
           }
         }
+        resizeBreakpointGutter(codeMirror);
       }, 0);
     };
     codeMirror.on("refresh", handler);
