@@ -202,28 +202,16 @@ export class Timeline extends Component {
 
   // Called when hovering over a message in the console.
   onConsoleMessageHover = async (type, message) => {
-    const { updateTooltip, highlightedMessage } = this.props;
+    const { highlightedMessage, setTimelineToMessage, hideTooltip } = this.props;
+
     if (type == "mouseleave") {
-      updateTooltip(null);
-      return this.props.setTimelineState({ highlightedMessage: null });
+      hideTooltip();
     }
 
     if (type == "mouseenter") {
       const time = message.executionPointTime;
       const offset = this.getPixelOffset(time);
-      updateTooltip({ left: offset });
-      this.props.setTimelineState({ highlightedMessage: message.id });
-
-      try {
-        const paintPoint = getMostRecentPaintPoint(mouseTime);
-        if (!paintPoint) return null;
-        const { point, paintHash } = paintPoint;
-        const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
-
-        if (this.props.highlightedMessage === message.id) {
-          updateTooltip({ screen, left: offset });
-        }
-      } catch {}
+      setTimelineToMessage({ message, offset });
     }
 
     return null;
@@ -290,11 +278,11 @@ export class Timeline extends Component {
   }
 
   hoverTimer = () => {
-    const { updateTooltip } = this.props;
+    const { hideTooltip } = this.props;
     const isHovered = window.elementIsHovered(this.$progressBar);
     if (!isHovered) {
       clearInterval(this.hoverInterval);
-      updateTooltip(null);
+      hideTooltip();
     }
   };
 
@@ -303,7 +291,7 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseMove = async e => {
-    const { hoverTime, recordingDuration, setTimelineState, updateTooltip } = this.props;
+    const { hoverTime, recordingDuration, setTimelineToTime } = this.props;
     if (!recordingDuration) {
       return;
     }
@@ -311,28 +299,13 @@ export class Timeline extends Component {
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != mouseTime) {
-      setTimelineState({ hoverTime: mouseTime });
-      updateTooltip({ left: this.getPixelOffset(mouseTime) });
-
-      try {
-        const paintPoint = getMostRecentPaintPoint(mouseTime);
-        if (!paintPoint) return;
-        const { point, paintHash } = paintPoint;
-        const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
-
-        // this.props.hoverTime may have changed, but it may also still result in the same paintHash
-        const currentPaintPoint = getMostRecentPaintPoint(this.props.hoverTime);
-        if (!currentPaintPoint) return;
-        const { paintHash: currentPaintHash } = currentPaintPoint;
-        if (currentPaintHash === paintHash) {
-          updateTooltip({ screen, left: this.getPixelOffset(hoverTime) });
-        }
-      } catch {}
+      const offset = this.getPixelOffset(mouseTime);
+      setTimelineToTime({ time: mouseTime, offset });
     }
   };
 
   onPlayerMouseLeave = () => {
-    const { updateTooltip } = this.props;
+    const { hideTooltip } = this.props;
     clearInterval(this.hoverInterval);
 
     this.unhighlightConsoleMessage();
@@ -340,8 +313,8 @@ export class Timeline extends Component {
 
     // Restore the normal graphics.
 
-    updateTooltip(null);
-    this.props.setTimelineState({ hoverTime: null, startDragTime: null });
+    hideTooltip();
+    this.props.setTimelineState({ startDragTime: null });
   };
 
   onPlayerMouseDown = () => {
@@ -542,7 +515,7 @@ export class Timeline extends Component {
     assert(time);
 
     this.props.setTimelineState({
-      playback: { startTime, startDate, time, pauseTarget }
+      playback: { startTime, startDate, time, pauseTarget },
     });
 
     getGraphicsAtTime(time).then(({ screen, mouse }) => {
@@ -870,7 +843,9 @@ export default connect(
     loaded: selectors.getTimelineLoaded(state),
   }),
   {
-    updateTooltip: actions.updateTooltip,
+    setTimelineToTime: actions.setTimelineToTime,
+    setTimelineToMessage: actions.setTimelineToMessage,
+    hideTooltip: actions.hideTooltip,
     setZoomRegion: actions.setZoomRegion,
     setTimelineState: actions.setTimelineState,
     createComment: actions.createComment,

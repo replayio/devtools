@@ -23,8 +23,13 @@ export default function update(state = initialTimelineState(), action) {
     case "set_zoom": {
       return { ...state, zoomRegion: action.region };
     }
+
     case "set_timeline_state": {
       return { ...state, ...action.state };
+    }
+
+    case "update_tooltip": {
+      return { ...state, tooltip: action.tooltip };
     }
 
     default: {
@@ -47,3 +52,4 @@ export const getScreenShot = state => state.timeline.screenShot;
 export const getMouse = state => state.timeline.mouse;
 export const getTimelineDimensions = state => state.timeline.timelineDimensions;
 export const getTimelineLoaded = state => state.timeline.loaded;
+export const getTooltip = state => state.timeline.tooltip;

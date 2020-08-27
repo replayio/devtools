@@ -3,10 +3,12 @@ import { selectors } from "../reducers";
 import FullStory from "ui/utils/fullstory";
 
 import {
+  screenshotCache,
   addLastScreen,
   getGraphicsAtTime,
   paintGraphics,
   mostRecentPaintOrMouseEvent,
+  getMostRecentPaintPoint,
 } from "protocol/graphics";
 
 export async function setupTimeline(recordingId, { dispatch }) {
@@ -94,6 +96,55 @@ export function updateTimelineDimensions() {
 
 export function setTimelineState(state) {
   return { type: "set_timeline_state", state };
+}
+
+export function setTimelineToTime({ time, offset }) {
+  return async ({ dispatch, getState }) => {
+    try {
+      dispatch(updateTooltip({ left: offset }));
+      dispatch(setTimelineState({ hoverTime: time }));
+
+      const paintPoint = getMostRecentPaintPoint(time);
+      if (!paintPoint) return;
+      const { point, paintHash } = paintPoint;
+      const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
+
+      const currentTime = selectors.getHoverTime(getState());
+      if (currentTime === time) {
+        dispatch(updateTooltip({ screen, left: offset }));
+      }
+    } catch {}
+  };
+}
+
+export function setTimelineToMessage({ message, offset }) {
+  return async ({ dispatch, getState }) => {
+    try {
+      dispatch(updateTooltip({ left: offset }));
+      dispatch(setTimelineState({ highlightedMessage: message.id }));
+
+      const paintPoint = getMostRecentPaintPoint(message.executionPointTime);
+      if (!paintPoint) return;
+      const { point, paintHash } = paintPoint;
+      const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
+
+      const currentMessageId = selectors.getHighlightedMessage(getState());
+      if (currentMessageId === message.id) {
+        dispatch(updateTooltip({ screen, left: offset }));
+      }
+    } catch {}
+  };
+}
+
+export function hideTooltip() {
+  return ({ dispatch }) => {
+    dispatch(updateTooltip(null));
+    dispatch(setTimelineState({ hoverTime: null, highlightedMessage: null }));
+  };
+}
+
+function updateTooltip(tooltip) {
+  return { type: "update_tooltip", tooltip };
 }
 
 export function setZoomRegion(region) {
