@@ -8,3 +8,9 @@ npm start
 ```
 
 Then open http://localhost:8080/index.html?id=79f0cacd-727b-456d-8970-dbb4866ce6c7 in any browser.
+
+Running tests:
+
+```
+node test/run.js [--pattern pat]
+```
