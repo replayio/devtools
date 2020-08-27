@@ -3,10 +3,10 @@
 .replay-player {
   -moz-appearance: none;
   background: var(--theme-tab-toolbar-background);
-  border-bottom: 1px solid var(--theme-splitter-color);
   box-sizing: border-box;
   min-height: 29px;
   --progressbar-transition: 200ms;
+  display: flex;
 }
 
 .theme-light .replay-player {
@@ -53,6 +53,8 @@
 
 .replay-player .overlay-container {
   display: flex;
+  position: relative;
+  flex-grow: 1;
 }
 
 .replay-player .progressBar {
@@ -62,7 +64,7 @@
   background: var(--progressbar-background);
   border: 1px solid var(--proggressbar-border-color);
   overflow: hidden;
-  margin: 2px 5px 2px 0;
+  margin: 6px 5px 2px 0;
 }
 
 .replay-player .progress {
@@ -73,7 +75,7 @@
   transition-duration: var(--progressbar-transition);
 }
 
-.replay-player #overlay .progress::after {
+.replay-player .progress::after {
   background: var(--replay-head-background);
   width: 1px;
   height: 100%;
@@ -122,8 +124,9 @@
 .replay-player .hoverPoint {
   position: absolute;
   height: 100%;
-  width: 2px;
+  width: 1px;
   background: var(--hover-point);
+  pointer-events: none;
 }
 
 .replay-player .commands {
@@ -135,6 +138,8 @@
   display: flex;
   min-width: 20px;
   opacity: 0.4;
+  height: 29px;
+  margin-top: 4px;
 }
 
 .replay-player .command-button.primary {
@@ -225,16 +230,16 @@
   top: 0;
 }
 
-.replay-player #overlay:hover .tick {
+.replay-player .overlay-container:hover .tick {
   opacity: 1;
 }
 
-.replay-player #overlay .tick {
+.replay-player .overlay-container .tick {
   opacity: 0.5;
 }
 
-.replay-player #overlay .tick:hover ~ .tick,
-.replay-player #overlay .tick.highlight ~ .tick:not(.highlight) {
+.replay-player .overlay-container .tick:hover ~ .tick,
+.replay-player .overlay-container .tick.highlight ~ .tick:not(.highlight) {
   opacity: 0.5;
 }
 
@@ -262,10 +267,12 @@
 .replay-player {
   -moz-appearance: none;
   background: var(--theme-tab-toolbar-background);
-  border-bottom: 1px solid var(--grey-20);
   box-sizing: border-box;
   min-height: 29px;
   --progressbar-transition: 200ms;
+  display: flex;
+  height: 100%;
+  padding-right: 10px;
 }
 
 .theme-light .replay-player {
@@ -310,6 +317,8 @@
 
 .replay-player .overlay-container {
   display: flex;
+  position: relative;
+  flex-grow: 1;
 }
 
 .comment-box {

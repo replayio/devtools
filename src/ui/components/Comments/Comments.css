@@ -23,7 +23,7 @@
   cursor: pointer;
 }
 
-.comment-marker:hover {
+.comment-marker:hover, .comment-marker.hovered {
   top: 29px;
   animation-duration: 200ms;
   background-color: #7ed8c8;
@@ -32,6 +32,28 @@
 
 .comment-marker.paused {
   background-color: #5EA3F8;
+}
+
+.create-comment {
+  width: 15px;
+  height: 15px;
+  top: 30px;
+  z-index: 100;
+  position: absolute;
+  outline: none;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.create-comment:hover {
+  background-color: transparent;
+  top: 29px;
+  animation-duration: 200ms;
+  cursor: pointer;
+}
+
+.create-comment:focus {
+  background-color: transparent;
 }
 
 .comments .comment {
