@@ -259,6 +259,7 @@ async function toggleBlackboxSelectedSource() {
   const blackboxed = getSelectedSource().isBlackBoxed;
   document.querySelector(".black-box").click();
   await waitUntil(() => getSelectedSource().isBlackBoxed != blackboxed);
+  await ThreadFront.waitForInvalidateCommandsToFinish();
 }
 
 function findMessages(text, extraSelector = "") {
