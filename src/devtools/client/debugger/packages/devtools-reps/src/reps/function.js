@@ -5,6 +5,7 @@
 // ReactJS
 const PropTypes = require("prop-types");
 const { button, span } = require("react-dom-factories");
+const FullStory = require("ui/utils/fullstory").default;
 
 // Reps
 const { getGripType, isGrip, cropString, wrapRender } = require("./rep-utils");
@@ -21,7 +22,7 @@ FunctionRep.propTypes = {
 };
 
 function FunctionRep(props) {
-  const { object: grip, onViewSourceInDebugger, recordTelemetryEvent } = props;
+  const { object: grip, onViewSourceInDebugger } = props;
 
   let jumpToDefinitionButton;
   const location = grip.functionLocation();
@@ -35,6 +36,7 @@ function FunctionRep(props) {
         // Stop the event propagation so we don't trigger ObjectInspector
         // expand/collapse.
         e.stopPropagation();
+        FullStory.event("console::jumpToDefinition");
         onViewSourceInDebugger({
           url,
           line: location.line,
