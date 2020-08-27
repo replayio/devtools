@@ -401,7 +401,7 @@ async function selectFrame(index) {
 }
 
 function addEventListenerLogpoints(logpoints) {
-  return dbg.actions.addEventListenerBreakpoints(logpoints);
+  return app.actions.addEventListenerBreakpoints(logpoints);
 }
 
 async function toggleExceptionLogging() {
