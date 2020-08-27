@@ -7,19 +7,31 @@
 }
 
 .comment-marker {
-  width: 20px;
-  height: 20px;
-  bottom: 0.5rem;
-  border-radius: 15px;
+  width: 15px;
+  height: 15px;
+  top: 30px;
   z-index: 100;
   position: absolute;
-  border: 1px solid white;
+  background-color: var(--theme-comment);
+  outline: none;
+}
+
+.comment-marker.expanded {
+  top: 29px;
+  animation-duration: 200ms;
+  background-color: #5EA3F8;
+  cursor: pointer;
 }
 
 .comment-marker:hover {
-  transform: scale(1.25);
+  top: 29px;
   animation-duration: 200ms;
+  background-color: #7ed8c8;
   cursor: pointer;
+}
+
+.comment-marker.paused {
+  background-color: #5EA3F8;
 }
 
 .comments .comment {

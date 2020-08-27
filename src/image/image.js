@@ -126,6 +126,8 @@ const gMaskImages = {
   ".img.comment-icon": require("devtools/client/themes/images/comment.svg"),
   ".img.lightning": require("image/images/lightning.svg"),
   ".img.comment": require("devtools/client/themes/images/comment-small.svg"),
+  ".img.comment-marker": require("devtools/client/themes/images/comment-marker.svg"),
+  ".img.comment-marker.paused.expanded": require("devtools/client/themes/images/comment-marker-filled.svg"),
 };
 
 const gContentImages = {
