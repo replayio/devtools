@@ -24,7 +24,6 @@ import {
   getThreadContext,
   getSourceFromId,
   getSkipPausing,
-  shouldLogEventBreakpoints,
   getFramesLoading,
 } from "../../selectors";
 
@@ -39,8 +38,6 @@ import Threads from "./Threads";
 import Accordion from "../shared/Accordion";
 import CommandBar from "./CommandBar";
 import XHRBreakpoints from "./XHRBreakpoints";
-import EventListeners from "./EventListeners";
-import DOMMutationBreakpoints from "./DOMMutationBreakpoints";
 import WhyPaused from "./WhyPaused";
 import FrameTimeline from "./FrameTimeline";
 
@@ -281,31 +278,6 @@ class SecondaryPanes extends Component<Props, State> {
     };
   }
 
-  getEventListenersItem(): AccordionPaneItem {
-    return {
-      header: L10N.getStr("eventListenersHeader1"),
-      className: "event-listeners-pane",
-      component: <EventListeners />,
-      opened: prefs.eventListenersVisible,
-      onToggle: opened => {
-        prefs.eventListenersVisible = opened;
-      },
-    };
-  }
-
-  getDOMMutationsItem(): AccordionPaneItem {
-    return {
-      header: L10N.getStr("domMutationHeader"),
-      className: "dom-mutations-pane",
-      buttons: [],
-      component: <DOMMutationBreakpoints />,
-      opened: prefs.domMutationBreakpointsVisible,
-      onToggle: opened => {
-        prefs.domMutationBreakpointsVisible = opened;
-      },
-    };
-  }
-
   getStartItems(): AccordionPaneItem[] {
     const items: AccordionPaneItem[] = [];
     const { horizontal, hasFrames, framesLoading } = this.props;
@@ -328,22 +300,6 @@ class SecondaryPanes extends Component<Props, State> {
     } else if (framesLoading) {
       items.push(this.getCallStackItem());
     }
-
-    /*
-    if (features.xhrBreakpoints) {
-      items.push(this.getXHRItem());
-    }
-    */
-
-    if (features.eventListenersBreakpoints) {
-      items.push(this.getEventListenersItem());
-    }
-
-    /*
-    if (features.domMutationBreakpoints) {
-      items.push(this.getDOMMutationsItem());
-    }
-    */
 
     return items;
   }
@@ -443,7 +399,6 @@ const mapStateToProps = state => {
     shouldLogExceptions: getShouldLogExceptions(state),
     workers: getThreads(state),
     skipPausing: getSkipPausing(state),
-    logEventBreakpoints: shouldLogEventBreakpoints(state),
     source: selectedFrame && getSourceFromId(state, selectedFrame.location.sourceId),
   };
 };

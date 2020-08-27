@@ -44,12 +44,6 @@ function update(
     case "UPDATE_EVENT_LISTENER_EXPANDED":
       return { ...state, expanded: action.expanded };
 
-    case "TOGGLE_EVENT_LISTENERS": {
-      const { logEventBreakpoints } = action;
-      prefs.logEventBreakpoints = logEventBreakpoints;
-      return { ...state, logEventBreakpoints };
-    }
-
     default:
       return state;
   }
@@ -67,8 +61,5 @@ export function getEventListenerExpanded(state: State): EventListenerExpandedLis
   return state.eventListenerBreakpoints.expanded;
 }
 
-export function shouldLogEventBreakpoints(state: State) {
-  return state.eventListenerBreakpoints.logEventBreakpoints;
-}
 
 export default update;

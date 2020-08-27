@@ -124,6 +124,7 @@ const gMaskImages = {
   "#command-button-pick::before": require("devtools/client/themes/images/command-pick.svg"),
   "button.open-inspector": require("devtools/client/themes/images/open-inspector.svg"),
   ".img.comment-icon": require("devtools/client/themes/images/comment.svg"),
+  ".img.lightning": require("image/images/lightning.svg"),
   ".img.comment": require("devtools/client/themes/images/comment-small.svg"),
 };
 

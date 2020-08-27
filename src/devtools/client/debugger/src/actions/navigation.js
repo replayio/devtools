@@ -9,16 +9,9 @@ import sourceQueue from "../utils/source-queue";
 
 import { updateThreads } from "./threads";
 import { evaluateExpressions } from "./expressions";
-import { logExceptions } from "./logExceptions";
-import { addEventListenerBreakpoints } from "./event-listeners";
 
 import { clearWasmStates } from "../utils/wasm";
-import {
-  getMainThread,
-  getThreadContext,
-  getShouldLogExceptions,
-  getActiveEventListeners,
-} from "../selectors";
+import { getMainThread, getThreadContext } from "../selectors";
 import type { Action, ThunkArgs } from "./types";
 
 /**
@@ -65,13 +58,6 @@ export function connect(url: string, actor: string, traits: Object, isWebExtensi
 
     const cx = getThreadContext(getState());
     dispatch(evaluateExpressions(cx));
-
-    // Log exceptions if configured to do so.
-    dispatch(logExceptions(getShouldLogExceptions(getState())));
-
-    // Log any selected event listeners.
-    const eventListeners = getActiveEventListeners(getState());
-    dispatch(addEventListenerBreakpoints(eventListeners));
   };
 }
 

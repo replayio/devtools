@@ -6,17 +6,29 @@
 
 import { uniq, remove } from "lodash";
 
-import {
-  getActiveEventListeners,
-  getEventListenerExpanded,
-  shouldLogEventBreakpoints,
-} from "../selectors";
+const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
+import { getActiveEventListeners, getEventListenerExpanded } from "../selectors";
 
 import type { ThunkArgs } from "./types";
 
-async function updateBreakpoints(dispatch, client, newEvents: string[]) {
-  dispatch({ type: "UPDATE_EVENT_LISTENERS", active: newEvents });
-  await client.setEventListenerBreakpoints(newEvents);
+export async function setupEventListeners(_, store) {
+  store.dispatch(getEventListenerBreakpointTypes());
+
+  const eventListeners = getActiveEventListeners(store.getState());
+  await store.dispatch(setEventListeners(eventListeners));
+}
+
+function updateEventListeners(newEvents: string[]) {
+  return async ({ dispatch, client }) => {
+    dispatch({ type: "UPDATE_EVENT_LISTENERS", active: newEvents });
+    await client.setEventListenerBreakpoints(newEvents);
+  };
+}
+
+function setEventListeners(newEvents: string[]) {
+  return async ({ client }) => {
+    await client.setEventListenerBreakpoints(newEvents);
+  };
 }
 
 async function updateExpanded(dispatch, newExpanded: string[]) {
@@ -27,22 +39,24 @@ async function updateExpanded(dispatch, newExpanded: string[]) {
 }
 
 export function addEventListenerBreakpoints(eventsToAdd: string[]) {
-  return async ({ dispatch, client, getState }: ThunkArgs) => {
-    const activeListenerBreakpoints = await getActiveEventListeners(getState());
-
-    const newEvents = uniq([...eventsToAdd, ...activeListenerBreakpoints]);
-
-    await updateBreakpoints(dispatch, client, newEvents);
+  return async ({ dispatch, getState }: ThunkArgs) => {
+    try {
+      const activeListenerBreakpoints = getActiveEventListeners(getState());
+      const newEvents = uniq([...eventsToAdd, ...activeListenerBreakpoints]);
+      await dispatch(updateEventListeners(newEvents));
+    } catch (e) {
+      console.error(e);
+    }
   };
 }
 
 export function removeEventListenerBreakpoints(eventsToRemove: string[]) {
   return async ({ dispatch, client, getState }: ThunkArgs) => {
-    const activeListenerBreakpoints = await getActiveEventListeners(getState());
+    const activeListenerBreakpoints = getActiveEventListeners(getState());
 
     const newEvents = remove(activeListenerBreakpoints, event => !eventsToRemove.includes(event));
 
-    await updateBreakpoints(dispatch, client, newEvents);
+    await dispatch(updateEventListeners(newEvents));
   };
 }
 
@@ -68,7 +82,7 @@ export function removeEventListenerExpanded(category: string) {
 
 export function getEventListenerBreakpointTypes() {
   return async ({ dispatch, client }: ThunkArgs) => {
-    const categories = await client.getEventListenerBreakpointTypes();
+    const categories = await getAvailableEventBreakpoints();
     dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
   };
 }

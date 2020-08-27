@@ -20,7 +20,6 @@ export async function onConnect(connection: any, _actions: Object, panel) {
   setupEvents({ actions, devToolsClient, panel });
 
   actions.connect("", ThreadFront.actor, {}, false);
-  actions.getEventListenerBreakpointTypes().catch(e => console.error(e));
 
   ThreadFront.findScripts(({ scriptId, url, sourceMapURL }) => {
     const source = {

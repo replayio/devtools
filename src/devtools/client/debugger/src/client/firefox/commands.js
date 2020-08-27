@@ -37,7 +37,6 @@ const {
   removeLogpoint,
 } = require("protocol/logpoint");
 const { assert } = require("protocol/utils");
-const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
 
 let targets: { [string]: Target };
 let currentThreadFront: ThreadFront;
@@ -365,11 +364,6 @@ function setEventListenerBreakpoints(ids: string[]) {
   }
 }
 
-// eslint-disable-next-line
-async function getEventListenerBreakpointTypes(): Promise<EventListenerCategoryList> {
-  return getAvailableEventBreakpoints();
-}
-
 let gExceptionLogpointGroupId;
 
 function logExceptions(shouldLog: boolean) {
@@ -536,7 +530,6 @@ const clientCommands = {
   sendPacket,
   setSkipPausing,
   setEventListenerBreakpoints,
-  getEventListenerBreakpointTypes,
   getFrontByID,
   fetchAncestorFramePositions,
   pickExecutionPoints,

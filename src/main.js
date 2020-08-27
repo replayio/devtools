@@ -26,6 +26,7 @@ const { bootstrapApp } = require("ui/utils/bootstrap");
 const FullStory = require("ui/utils/fullstory").default;
 const { setupTimeline } = require("./ui/actions/timeline");
 const { setupMetadata } = require("./ui/actions/metadata");
+const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { prefs } = require("./ui/utils/prefs");
 
 // Create a session to use while debugging.
@@ -129,7 +130,8 @@ setTimeout(async () => {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 
-  store = bootstrapApp({ initialize }, { recordingId });
+  store = await bootstrapApp({ initialize }, { recordingId });
   setupTimeline(recordingId, store);
   setupMetadata(recordingId, store);
+  setupEventListeners(recordingId, store);
 }, 0);

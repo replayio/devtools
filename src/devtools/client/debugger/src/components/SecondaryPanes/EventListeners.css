@@ -2,6 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+.event-listeners {
+  width: 230px;
+  padding: 20px;
+}
+
 .event-listeners-content {
   padding-block: 4px;
 }

@@ -25,7 +25,6 @@ import projectTextSearch from "./project-text-search";
 import quickOpen from "./quick-open";
 import sourceTree from "./source-tree";
 import threads from "./threads";
-import eventListenerBreakpoints from "./event-listeners";
 
 import { objectInspector } from "devtools-reps";
 
@@ -46,6 +45,5 @@ export default {
   sourceTree,
   threads,
   objectInspector: objectInspector.reducer.default,
-  eventListenerBreakpoints,
   preview,
 };
