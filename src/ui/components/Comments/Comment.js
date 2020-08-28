@@ -2,6 +2,7 @@ import ReactDOM from "react-dom";
 import React from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
+import CommentMarker from "./CommentMarker";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -61,47 +62,21 @@ class Comment extends React.Component {
     );
   }
 
-  renderCommentMarker(leftOffset) {
-    const { comment, showComment, currentTime } = this.props;
-    const pausedAtComment = currentTime == comment.time;
-
-    return (
-      <button
-        className={classnames("img comment-marker", {
-          expanded: comment.visible,
-          paused: pausedAtComment,
-        })}
-        key={comment.id}
-        style={{
-          left: `calc(${leftOffset}%)`,
-        }}
-        onClick={() => showComment(comment)}
-      ></button>
-    );
-  }
-
   render() {
-    const { comment, zoomRegion, index, timelineDimensions, showComment } = this.props;
+    const { comment, zoomRegion, index, timelineDimensions } = this.props;
     const { editing, description } = this.state;
     const commentWidth = 280;
-    const markerWidth = 15;
+
     const offset = getPixelOffset({
       time: comment.time,
       overlayWidth: timelineDimensions.width,
       zoom: zoomRegion,
     });
-
     const commentLeftOffset = getCommentLeftOffset({
       time: comment.time,
       overlayWidth: timelineDimensions.width,
       zoom: zoomRegion,
       commentWidth: commentWidth,
-    });
-    const markerLeftOffset = getMarkerLeftOffset({
-      time: comment.time,
-      overlayWidth: timelineDimensions.width,
-      zoom: zoomRegion,
-      markerWidth: markerWidth,
     });
 
     if (offset < 0) {
@@ -109,12 +84,12 @@ class Comment extends React.Component {
     }
 
     if (!comment.visible) {
-      return this.renderCommentMarker(markerLeftOffset);
+      return <CommentMarker comment={comment} />;
     }
 
     return (
       <div>
-        {this.renderCommentMarker(markerLeftOffset)}
+        <CommentMarker comment={comment} />
         <div
           className={classnames("comment", {})}
           key={comment.id}
@@ -125,7 +100,6 @@ class Comment extends React.Component {
           }}
         >
           <div className="comment-body">
-            {/* <div className="comment-avatar"></div> */}
             <div className="comment-content">
               <div className="comment-header">
                 <div className="actions">

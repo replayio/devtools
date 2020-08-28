@@ -553,15 +553,6 @@ export class Timeline extends Component {
     });
   }
 
-  renderCommentButton() {
-    return CommandButton({
-      className: "",
-      active: true,
-      img: "comment",
-      onClick: () => this.props.createComment(null, true, "timeline"),
-    });
-  }
-
   renderCommands() {
     const { playback } = this.props;
 
@@ -707,7 +698,7 @@ export class Timeline extends Component {
       dom.span({
         className: "hoverPoint",
         style: {
-          left: `${Math.max(offset - markerWidth / 2, 0)}px`,
+          left: `${Math.max(offset, 0)}px`,
           zIndex: 1000,
         },
       }),
@@ -778,50 +769,40 @@ export class Timeline extends Component {
       {
         className: "replay-player",
       },
+      div({ className: "commands" }, ...this.renderCommands()),
       div(
         {
-          id: "overlay",
-          className: classname("", { paused: true }),
+          className: classname("overlay-container", { paused: true }),
         },
         div(
           {
-            className: classname("overlay-container", {}),
+            className: classname("progressBar", { loaded }),
+            ["data-progress"]: Math.ceil(percent),
+            ref: a => (this.$progressBar = a),
+            onMouseEnter: this.onPlayerMouseEnter,
+            onMouseMove: this.onPlayerMouseMove,
+            onMouseLeave: this.onPlayerMouseLeave,
+            onMouseDown: this.onPlayerMouseDown,
+            onMouseUp: this.onPlayerMouseUp,
           },
-          div({ className: "commands" }, ...this.renderCommands()),
-          div(
-            {
-              className: classname("progressBar", { loaded }),
-              ["data-progress"]: Math.ceil(percent),
-              ref: a => (this.$progressBar = a),
-              onMouseEnter: this.onPlayerMouseEnter,
-              onMouseMove: this.onPlayerMouseMove,
-              onMouseLeave: this.onPlayerMouseLeave,
-              onMouseDown: this.onPlayerMouseDown,
-              onMouseUp: this.onPlayerMouseUp,
-            },
-            div({
-              className: "progress",
-              style: { width: `${percent}%` },
-            }),
-            div({
-              className: "progress-line",
-              style: { width: `${percent}%` },
-            }),
-            div({
-              className: "progress-line end",
-              style: { left: `${percent}%`, width: `${100 - percent}%` },
-            }),
-            ...this.renderMessages(),
-            // ...this.renderCommentMarkers(),
-            ...this.renderHoverPoint(),
-            ...this.renderUnprocessedRegions(),
-            ...this.renderZoomedRegion()
-          ),
-          this.renderZoom(),
-          this.renderCommentButton()
-
-          // ...comments.map(c => this.renderComment(c, existingComments))
-        )
+          div({
+            className: "progress",
+            style: { width: `${percent}%` },
+          }),
+          div({
+            className: "progress-line",
+            style: { width: `${percent}%` },
+          }),
+          div({
+            className: "progress-line end",
+            style: { left: `${percent}%`, width: `${100 - percent}%` },
+          }),
+          ...this.renderMessages(),
+          ...this.renderUnprocessedRegions(),
+          ...this.renderZoomedRegion()
+        ),
+        ...this.renderHoverPoint(),
+        this.renderZoom()
       )
     );
   }
@@ -848,7 +829,6 @@ export default connect(
     hideTooltip: actions.hideTooltip,
     setZoomRegion: actions.setZoomRegion,
     setTimelineState: actions.setTimelineState,
-    createComment: actions.createComment,
     updateTimelineDimensions: actions.updateTimelineDimensions,
     seek: actions.seek,
   }
