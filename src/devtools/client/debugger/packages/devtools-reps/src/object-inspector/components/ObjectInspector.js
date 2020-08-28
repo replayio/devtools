@@ -186,7 +186,7 @@ class ObjectInspector extends Component<Props> {
       return;
     }
 
-    const { nodeExpand, nodeCollapse, recordTelemetryEvent, setExpanded, roots } = this.props;
+    const { nodeExpand, nodeCollapse, setExpanded, roots } = this.props;
 
     if (expand === true) {
       nodeExpand(item);

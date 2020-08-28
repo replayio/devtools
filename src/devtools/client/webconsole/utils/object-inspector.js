@@ -55,7 +55,6 @@ function getObjectInspector(frontOrPrimitiveGrip, serviceContainer, override = {
     mode: MODE.LONG,
     roots,
     onViewSourceInDebugger: serviceContainer.onViewSourceInDebugger,
-    recordTelemetryEvent: serviceContainer.recordTelemetryEvent,
     openLink: serviceContainer.openLink,
     sourceMapService: serviceContainer.sourceMapService,
     renderStacktrace: stacktrace =>
