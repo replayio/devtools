@@ -34,7 +34,7 @@ export function createComment(newComment, visible, addedFrom) {
 
     FullStory.event("comment::create");
 
-    if (existingComments.some(comment => comment.point === ThreadFront.currentPoint)) {
+    if (existingComments.some(comment => comment.time === currentTime)) {
       return;
     }
 

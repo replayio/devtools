@@ -17,6 +17,8 @@ class Comments extends React.Component {
   render() {
     const { comments, timelineDimensions } = this.props;
 
+    const sortedComments = comments.sort((a, b) => a.time - b.time);
+
     return (
       <div className="comments" style={timelineDimensions}>
         <div className="comments-container">

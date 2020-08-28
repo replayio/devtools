@@ -15,6 +15,17 @@ class Comment extends React.Component {
     editing: false,
   };
 
+  componentDidMount() {
+    const { contents, addedFrom } = this.props.comment;
+    const { editing } = this.state;
+
+    // A newly-added (empty) comment from the Timeline's create comment button
+    // should directly go into editing mode.
+    if (!contents && addedFrom == "timeline") {
+      this.startEditing();
+    }
+  }
+
   componentDidUpdate() {
     // Clear the editing state whenever a timeline comment is collapsed
     // into its marker.
@@ -92,7 +103,7 @@ class Comment extends React.Component {
             </div>
           </div>
           <div className="comment-description">
-            {editing || comment.contents == "" ? (
+            {editing ? (
               <CommentEditor comment={comment} stopEditing={this.stopEditing} />
             ) : (
               this.renderLabel()
@@ -133,7 +144,7 @@ class Comment extends React.Component {
       <div>
         <CommentMarker comment={comment} />
         <div
-          className={classnames("comment", {})}
+          className={classnames("comment")}
           style={{
             left: `${commentLeftOffset}%`,
             zIndex: `${index + 100}`,
@@ -157,6 +168,5 @@ export default connect(
     showComment: actions.showComment,
     updateComment: actions.updateComment,
     removeComment: actions.removeComment,
-    createComment: actions.createComment,
   }
 )(Comment);

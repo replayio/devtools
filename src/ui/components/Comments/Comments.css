@@ -7,49 +7,35 @@
 }
 
 .comment-marker {
-  width: 15px;
-  height: 15px;
-  top: 30px;
-  z-index: 100;
+  width: 19px;
+  height: 19px;
+  top: 26px;
+  z-index: 2;
   position: absolute;
-  background-color: var(--theme-comment);
+  background-color: transparent;
   outline: none;
 }
 
-.comment-marker.expanded {
-  top: 29px;
+.comment-marker:hover, .comment-marker.hovered, .comment-marker.expanded, .create-comment:hover {
+  margin-top: -1px;
   animation-duration: 200ms;
-  background-color: #5EA3F8;
-  cursor: pointer;
-}
-
-.comment-marker:hover, .comment-marker.hovered {
-  top: 29px;
-  animation-duration: 200ms;
-  background-color: #7ed8c8;
+  background-color: transparent;
   cursor: pointer;
 }
 
 .comment-marker.paused {
-  background-color: #5EA3F8;
+  z-index: 3;
 }
 
 .create-comment {
-  width: 15px;
-  height: 15px;
-  top: 30px;
+  width: 19px;
+  height: 19px;
+  top: 26px;
   z-index: 100;
   position: absolute;
   outline: none;
   background-position: center;
   background-repeat: no-repeat;
-}
-
-.create-comment:hover {
-  background-color: transparent;
-  top: 29px;
-  animation-duration: 200ms;
-  cursor: pointer;
 }
 
 .create-comment:focus {

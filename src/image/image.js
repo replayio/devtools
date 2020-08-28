@@ -65,6 +65,8 @@ const gBackgroundImages = {
   ".comment-confirm": require("devtools/client/themes/images/check.svg"),
   ".comment-jump": require("devtools/client/debugger/images/next-circle.svg"),
   ".create-comment": require("devtools/client/themes/images/comment-add.svg"),
+  ".comment-marker": require("devtools/client/themes/images/comment-marker.svg"),
+  ".comment-marker.paused.expanded": require("devtools/client/themes/images/comment-marker-filled-blue.svg"),
 };
 
 const gMaskImages = {
@@ -126,9 +128,6 @@ const gMaskImages = {
   "button.open-inspector": require("devtools/client/themes/images/open-inspector.svg"),
   ".img.comment-icon": require("devtools/client/themes/images/comment.svg"),
   ".img.lightning": require("image/images/lightning.svg"),
-  ".img.comment": require("devtools/client/themes/images/comment-small.svg"),
-  ".img.comment-marker": require("devtools/client/themes/images/comment-marker.svg"),
-  ".img.comment-marker.paused.expanded": require("devtools/client/themes/images/comment-marker-filled.svg"),
 };
 
 const gContentImages = {
