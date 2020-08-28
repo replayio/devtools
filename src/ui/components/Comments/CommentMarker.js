@@ -4,10 +4,16 @@ import classnames from "classnames";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getPixelOffset, getCommentLeftOffset, getMarkerLeftOffset } from "ui/utils/timeline";
+import {
+  getPixelOffset,
+  getCommentLeftOffset,
+  getMarkerLeftOffset,
+  getTimeMidpoint,
+} from "ui/utils/timeline";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 
 const markerWidth = 15;
+const tolerance = 2;
 
 class CommentMarker extends React.Component {
   calculateLeftOffset(time) {
@@ -21,35 +27,72 @@ class CommentMarker extends React.Component {
     });
   }
 
+  getCommentAtTime(time) {
+    const { comments, currentTime } = this.props;
+    const index = comments.findIndex(comment => comment.time === currentTime);
+
+    return comments[index];
+  }
+
+  getIsCloseToHover(commentTime, hoverTime, tolerance) {
+    const { timelineDimensions, zoomRegion } = this.props;
+
+    const commentMidpoint = getTimeMidpoint({
+      time: commentTime,
+      overlayWidth: timelineDimensions.width,
+      zoom: zoomRegion,
+    });
+    const hoverMidpoint = getTimeMidpoint({
+      time: hoverTime,
+      overlayWidth: timelineDimensions.width,
+      zoom: zoomRegion,
+    });
+
+    return Math.abs(commentMidpoint - hoverMidpoint) < tolerance;
+  }
+
+  renderCreateCommentButton() {
+    const { createComment, currentTime } = this.props;
+
+    if (this.getCommentAtTime(currentTime)) {
+      return null;
+    }
+
+    return (
+      <button
+        className={classnames("create-comment")}
+        style={{
+          left: `${this.calculateLeftOffset(currentTime)}%`,
+        }}
+        onClick={() => createComment(null, true, "timeline")}
+      ></button>
+    );
+  }
+
   render() {
-    const { comment, showComment, createComment, currentTime, hoverTime } = this.props;
+    const { comment, showComment, currentTime, hoverTime } = this.props;
 
     if (!comment) {
-      return (
-        <button
-          className={classnames("create-comment")}
-          style={{
-            left: `calc(${this.calculateLeftOffset(currentTime)}%)`,
-          }}
-          onClick={() => createComment(null, true, "timeline")}
-        ></button>
-      );
+      return this.renderCreateCommentButton();
     }
 
     const { time, visible, id } = comment;
     const pausedAtComment = currentTime == time;
-    const hoveredCloseToCommentTime = Math.abs(hoverTime - time) < 50;
+
+    // If a comment is close enough to the hovered time, we give
+    // it the same hovered styling as a comment with exact time match.
+    // The tolerance here is +/- 2% relative to the timeline's width.
+    const isCloseToHover = this.getIsCloseToHover(time, hoverTime, tolerance);
 
     return (
       <button
         className={classnames("img comment-marker", {
-          hovered: hoveredCloseToCommentTime,
+          hovered: isCloseToHover,
           expanded: visible,
           paused: pausedAtComment,
         })}
-        key={id}
         style={{
-          left: `calc(${this.calculateLeftOffset(time)}%)`,
+          left: `${this.calculateLeftOffset(time)}%`,
         }}
         onClick={() => showComment(comment)}
       ></button>
@@ -63,6 +106,7 @@ export default connect(
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
+    comments: selectors.getComments(state),
   }),
   {
     createComment: actions.createComment,
