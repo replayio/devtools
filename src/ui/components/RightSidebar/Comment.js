@@ -5,6 +5,7 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { getAvatarColor } from "ui/utils/user";
 import classnames from "classnames";
+import CommentEditor from "ui/components/Comments/CommentEditor";
 
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 
@@ -13,7 +14,6 @@ class Comment extends React.Component {
     super(props);
 
     this.state = {
-      inputValue: props.comment.contents,
       editing: false,
     };
   }
@@ -37,35 +37,6 @@ class Comment extends React.Component {
   stopEditing = () => {
     this.setState({ editing: false });
     this.props.toggleAddingCommentOff();
-  };
-
-  onChange = e => {
-    this.setState({ inputValue: e.target.value });
-  };
-
-  onKeyDown = e => {
-    if (e.key == "Escape") {
-      this.stopEditingComment();
-    } else if (e.key == "Enter") {
-      this.saveEditedComment(e);
-    }
-  };
-
-  saveEditedComment = e => {
-    const { comment } = this.props;
-    const { inputValue } = this.state;
-
-    e.stopPropagation();
-    this.stopEditing();
-    this.props.updateComment({ ...comment, contents: inputValue });
-  };
-
-  stopEditingComment = e => {
-    const { comment } = this.props;
-
-    this.setState({ inputValue: comment.contents });
-    e.stopPropagation();
-    this.stopEditing();
   };
 
   seekToComment = comment => {
@@ -117,38 +88,14 @@ class Comment extends React.Component {
     );
   }
 
-  renderButtons() {
-    return (
-      <div className="buttons">
-        <button className="cancel" onClick={this.stopEditingComment}>
-          Cancel
-        </button>
-        <button className="save" onClick={this.saveEditedComment}>
-          Save
-        </button>
-      </div>
-    );
-  }
-
-  renderCommentEditor() {
-    const { comment } = this.props;
-
-    return (
-      <div className="editor">
-        <textarea
-          defaultValue={comment.contents}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-        />
-        {this.renderButtons()}
-      </div>
-    );
-  }
-
   renderBody() {
     return (
       <div className="comment-body">
-        {this.state.editing ? this.renderCommentEditor() : this.renderLabel()}
+        {this.state.editing ? (
+          <CommentEditor comment={this.props.comment} stopEditing={this.stopEditing} />
+        ) : (
+          this.renderLabel()
+        )}
       </div>
     );
   }
@@ -175,6 +122,5 @@ class Comment extends React.Component {
 
 export default connect(state => ({ currentTime: selectors.getCurrentTime(state) }), {
   seek: actions.seek,
-  updateComment: actions.updateComment,
   removeComment: actions.removeComment,
 })(Comment);
