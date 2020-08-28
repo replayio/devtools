@@ -13,14 +13,10 @@ const {
   advanceValidate,
   blurOnMultipleProperties,
 } = require("devtools/client/inspector/shared/utils");
+const { openDocLink } = require("devtools/client/shared/link");
 
 /*
-loader.lazyRequireGetter(
-  this,
-  "openContentLink",
-  "devtools/client/shared/link",
-  true
-);
+
 loader.lazyRequireGetter(
   this,
   "parseDeclarations",
@@ -323,7 +319,7 @@ TextPropertyEditor.prototype = {
         if (target.nodeName === "a") {
           event.stopPropagation();
           event.preventDefault();
-          openContentLink(target.href);
+          openDocLink(target.href);
         }
       });
 

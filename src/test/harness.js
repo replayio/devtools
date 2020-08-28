@@ -190,7 +190,7 @@ function waitForPausedLine(line) {
 
 function resumeThenPauseAtLineFunctionFactory(method) {
   return async function (lineno, waitForLine) {
-    console.log(`Starting ${method} to ${lineno}...`, new Date);
+    console.log(`Starting ${method} to ${lineno}...`, new Date());
     await dbg.actions[method](getThreadContext());
     if (lineno !== undefined) {
       await waitForPaused();
@@ -203,7 +203,7 @@ function resumeThenPauseAtLineFunctionFactory(method) {
       const pauseLine = getVisibleSelectedFrameLine();
       assert(pauseLine == lineno, `Expected line ${lineno} got ${pauseLine}`);
     }
-    console.log(`Finished ${method} to ${lineno}!`, new Date);
+    console.log(`Finished ${method} to ${lineno}!`, new Date());
   };
 }
 
@@ -401,7 +401,7 @@ async function selectFrame(index) {
 }
 
 function addEventListenerLogpoints(logpoints) {
-  return dbg.actions.addEventListenerBreakpoints(logpoints);
+  return app.actions.addEventListenerBreakpoints(logpoints);
 }
 
 async function toggleExceptionLogging() {
@@ -468,7 +468,8 @@ function boundsCenter(bounds) {
 }
 
 async function getMarkupCanvasCoordinate(text, iframes = []) {
-  let x = 0, y = 0;
+  let x = 0,
+    y = 0;
   for (const iframeText of iframes) {
     const node = (await ThreadFront.searchDOM(iframeText))[0];
     await node.ensureLoaded();

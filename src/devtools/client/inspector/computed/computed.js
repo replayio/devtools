@@ -10,6 +10,8 @@ const CssLogic = require("devtools/shared/inspector/css-logic");
 const OutputParser = require("devtools/client/shared/output-parser");
 const { PrefObserver } = require("devtools/client/shared/prefs");
 const { createChild } = require("devtools/client/inspector/shared/utils");
+const { openDocLink } = require("devtools/client/shared/link");
+
 const {
   VIEW_NODE_SELECTOR_TYPE,
   VIEW_NODE_PROPERTY_TYPE,
@@ -29,7 +31,6 @@ loader.lazyRequireGetter(
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
 
 loader.lazyRequireGetter(this, "clipboardHelper", "devtools/shared/platform/clipboard");
-loader.lazyRequireGetter(this, "openContentLink", "devtools/client/shared/link", true);
 
 const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
 const { LocalizationHelper } = require("devtools/shared/l10n");
@@ -727,7 +728,7 @@ CssComputedView.prototype = {
     if (target.nodeName === "a") {
       event.stopPropagation();
       event.preventDefault();
-      openContentLink(target.href);
+      openDocLink(target.href);
     }
   },
 
@@ -1212,7 +1213,7 @@ PropertyView.prototype = {
    * The action when a user clicks on the MDN help link for a property.
    */
   mdnLinkClick: function (event) {
-    openContentLink(this.link);
+    openDocLink(this.link);
   },
 
   /**

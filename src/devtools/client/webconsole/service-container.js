@@ -23,7 +23,6 @@ function setupServiceContainer({ webConsoleUI, hud, toolbox, webConsoleWrapper }
     // NOTE these methods are proxied currently because the
     // service container is passed down the tree. These methods should eventually
     // be moved to redux actions.
-    recordTelemetryEvent: (event, extra = {}) => hud.recordEvent(event, extra),
     openLink: (url, e) => hud.openLink(url, e),
     openNodeInInspector: grip => hud.openNodeInInspector(grip),
     getInputSelection: () => hud.getInputSelection(),
