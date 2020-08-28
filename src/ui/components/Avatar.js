@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import { connect } from "react-redux";
@@ -14,7 +14,7 @@ const Avatar = props => {
     if (!player.name) {
       // Check if the user has just logged out. If so, update and add the associated
       // picture and name from the user metadata.
-      updateUser(auth.user);
+      useEffect(() => updateUser(auth.user));
     }
 
     return (
@@ -28,7 +28,7 @@ const Avatar = props => {
   // Check if the user has just logged out. If so, update and remove the associated
   // picture and name from the user metadata.
   if (!auth.isAuthenticated && isFirstPlayer && player.name) {
-    updateUser();
+    useEffect(() => updateUser());
   }
 
   return (
