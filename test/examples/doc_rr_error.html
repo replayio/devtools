@@ -19,5 +19,19 @@ function f() {
   throw new Error("Number " + number);
 }
 window.setTimeout(f, 1);
+
+// Make sure things work with Error subclasses.
+class MyError extends Error {}
+class MyError2 extends Error {
+  constructor(name) {
+    super(name);
+  }
+}
+window.setTimeout(() => {
+  throw new MyError();
+});
+window.setTimeout(() => {
+  throw new MyError2();
+});
 </script>
 </html>
