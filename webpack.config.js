@@ -17,6 +17,10 @@ module.exports = {
   },
   plugins: [new MiniCssExtractPlugin()],
   resolve: {
+    extensions: [
+      ".js",
+      ".ts",
+    ],
     modules: [
       "src",
       "src/devtools/client/debugger/dist",
@@ -30,7 +34,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(j|t)s$/,
         exclude: request => {
           return (
             request.includes("node_modules") ||
@@ -41,7 +45,10 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-react"],
+            presets: [
+              "@babel/preset-typescript",
+              "@babel/preset-react"
+            ],
             plugins: [
               "@babel/plugin-transform-flow-strip-types",
               "@babel/plugin-proposal-class-properties",
