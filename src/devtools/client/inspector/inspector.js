@@ -90,10 +90,6 @@ const PORTRAIT_MODE_WIDTH_THRESHOLD = 700;
 const SIDE_PORTAIT_MODE_WIDTH_THRESHOLD = 1000;
 
 const THREE_PANE_ENABLED_PREF = "devtools.inspector.three-pane-enabled";
-const THREE_PANE_ENABLED_SCALAR = "devtools.inspector.three_pane_enabled";
-const THREE_PANE_CHROME_ENABLED_PREF = "devtools.inspector.chrome.three-pane-enabled";
-const TELEMETRY_EYEDROPPER_OPENED = "devtools.toolbar.eyedropper.opened";
-const TELEMETRY_SCALAR_NODE_SELECTION_COUNT = "devtools.inspector.node_selection_count";
 
 /**
  * Represents an open instance of the Inspector for a tab.
@@ -1458,7 +1454,6 @@ Inspector.prototype = {
     }
     // turn off node picker when color picker is starting
     this.toolbox.nodePicker.stop().catch(console.error);
-    this.telemetry.scalarSet(TELEMETRY_EYEDROPPER_OPENED, 1);
     this.eyeDropperButton.classList.add("checked");
     this.startEyeDropperListeners();
     return this.inspectorFront.pickColorFromPage({ copyOnSelect: true }).catch(console.error);
