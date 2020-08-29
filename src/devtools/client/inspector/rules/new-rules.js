@@ -50,7 +50,6 @@ class RulesView {
     this.inspector = inspector;
     this.selection = inspector.selection;
     this.store = inspector.store;
-    this.telemetry = inspector.telemetry;
     this.toolbox = inspector.toolbox;
     this.isNewRulesView = true;
 
@@ -155,7 +154,6 @@ class RulesView {
     this.selection = null;
     this.showUserAgentStyles = null;
     this.store = null;
-    this.telemetry = null;
     this.toolbox = null;
   }
 
@@ -358,9 +356,6 @@ class RulesView {
    */
   onToggleDeclaration(ruleId, declarationId) {
     this.elementStyle.toggleDeclaration(ruleId, declarationId);
-    this.telemetry.recordEvent("edit_rule", "ruleview", null, {
-      session_id: this.toolbox.sessionId,
-    });
   }
 
   /**
@@ -443,9 +438,6 @@ class RulesView {
         }
 
         await this.elementStyle.modifyDeclarationName(ruleId, declarationId, name);
-        this.telemetry.recordEvent("edit_rule", "ruleview", null, {
-          session_id: this.toolbox.sessionId,
-        });
       },
       element,
       popup: this.autocompletePopup,
@@ -486,9 +478,6 @@ class RulesView {
         }
 
         await this.elementStyle.modifyDeclarationValue(ruleId, declarationId, value);
-        this.telemetry.recordEvent("edit_rule", "ruleview", null, {
-          session_id: this.toolbox.sessionId,
-        });
       },
       element,
       maxWidth: () => {
@@ -527,9 +516,6 @@ class RulesView {
         }
 
         this.elementStyle.addNewDeclaration(ruleId, value);
-        this.telemetry.recordEvent("edit_rule", "ruleview", null, {
-          session_id: this.toolbox.sessionId,
-        });
       },
       element,
       popup: this.autocompletePopup,
