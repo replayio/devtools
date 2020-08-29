@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --open",
-    "lint": "eslint --fix src"
+    "lint": "eslint --fix src",
+    "typecheck": "tsc --watch"
   },
   "dependencies": {
     "@auth0/auth0-react": "^1.0.0",
