@@ -319,13 +319,7 @@ class RulesView {
    * Returns true if the rules panel is visible, and false otherwise.
    */
   isPanelVisible() {
-    return (
-      this.inspector &&
-      this.inspector.toolbox &&
-      this.inspector.sidebar &&
-      this.inspector.toolbox.currentToolId === "inspector" &&
-      this.inspector.sidebar.getCurrentTabID() === "newruleview"
-    );
+    return this.inspector?.sidebar?.getCurrentTabID() === "newruleview";
   }
 
   /**
