@@ -233,36 +233,6 @@ class RulesView {
   }
 
   /**
-   * Returns the grid line names of the grid that the currently selected element is
-   * contained in.
-   *
-   * @return {Object} that contains the names of the cols and rows as arrays
-   * { cols: [], rows: [] }.
-   */
-  async getGridlineNames() {
-    const gridLineNames = { cols: [], rows: [] };
-    const layoutInspector = await this.inspector.walker.getLayoutInspector();
-    const gridFront = await layoutInspector.getCurrentGrid(this.selection.nodeFront);
-
-    if (gridFront) {
-      const gridFragments = gridFront.gridFragments;
-
-      for (const gridFragment of gridFragments) {
-        for (const rowLine of gridFragment.rows.lines) {
-          gridLineNames.rows = gridLineNames.rows.concat(rowLine.names);
-        }
-        for (const colLine of gridFragment.cols.lines) {
-          gridLineNames.cols = gridLineNames.cols.concat(colLine.names);
-        }
-      }
-    }
-
-    // This event is emitted for testing purposes.
-    this.inspector.emit("grid-line-names-updated");
-    return gridLineNames;
-  }
-
-  /**
    * Get the type of a given node in the Rules view.
    *
    * @param {DOMNode} node
@@ -521,7 +491,6 @@ class RulesView {
         });
       },
       element,
-      getGridLineNames: this.getGridlineNames,
       maxWidth: () => {
         // Return the width of the closest declaration container element.
         const containerElement = element.closest(".ruleview-propertycontainer");
