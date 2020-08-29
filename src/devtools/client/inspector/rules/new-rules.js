@@ -21,9 +21,7 @@ const {
 } = require("devtools/client/inspector/rules/actions/pseudo-classes");
 const {
   updateAddRuleEnabled,
-  updateColorSchemeSimulationHidden,
   updateHighlightedSelector,
-  updatePrintSimulationHidden,
   updateRules,
   updateSourceLinkEnabled,
 } = require("devtools/client/inspector/rules/actions/rules");
@@ -45,7 +43,6 @@ loader.lazyRequireGetter(
 loader.lazyRequireGetter(this, "advanceValidate", "devtools/client/inspector/shared/utils", true);
 loader.lazyRequireGetter(this, "AutocompletePopup", "devtools/client/shared/autocomplete-popup");
 loader.lazyRequireGetter(this, "InplaceEditor", "devtools/client/shared/inplace-editor", true);
-loader.lazyRequireGetter(this, "COLOR_SCHEMES", "devtools/client/inspector/rules/constants", true);
 
 const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
 
@@ -69,8 +66,6 @@ class RulesView {
     this.onSetClassState = this.onSetClassState.bind(this);
     this.onToggleClassPanelExpanded = this.onToggleClassPanelExpanded.bind(this);
     this.onToggleDeclaration = this.onToggleDeclaration.bind(this);
-    this.onTogglePrintSimulation = this.onTogglePrintSimulation.bind(this);
-    this.onToggleColorSchemeSimulation = this.onToggleColorSchemeSimulation.bind(this);
     this.onTogglePseudoClass = this.onTogglePseudoClass.bind(this);
     this.onToolChanged = this.onToolChanged.bind(this);
     this.onToggleSelectorHighlighter = this.onToggleSelectorHighlighter.bind(this);
@@ -104,9 +99,7 @@ class RulesView {
       onOpenSourceLink: this.onOpenSourceLink,
       onSetClassState: this.onSetClassState,
       onToggleClassPanelExpanded: this.onToggleClassPanelExpanded,
-      onToggleColorSchemeSimulation: this.onToggleColorSchemeSimulation,
       onToggleDeclaration: this.onToggleDeclaration,
-      onTogglePrintSimulation: this.onTogglePrintSimulation,
       onTogglePseudoClass: this.onTogglePseudoClass,
       onToggleSelectorHighlighter: this.onToggleSelectorHighlighter,
       showContextMenu: this.showContextMenu,
@@ -115,8 +108,6 @@ class RulesView {
       showNewDeclarationEditor: this.showNewDeclarationEditor,
       showSelectorEditor: this.showSelectorEditor,
     });
-
-    this.initSimulationFeatures();
 
     const provider = createElement(
       Provider,
@@ -131,52 +122,6 @@ class RulesView {
 
     // Exposes the provider to let inspector.js use it in setupSidebar.
     this.provider = provider;
-  }
-
-  /**
-   * Initializes the content-viewer front and enable the print and color scheme simulation
-   * if they are supported in the current target.
-   */
-  async initSimulationFeatures() {
-    // In order to query if the content-viewer actor's print and color simulation methods are
-    // supported, we have to call the content-viewer front so that the actor is lazily loaded.
-    // This allows us to use `actorHasMethod`. Please see `getActorDescription` for more
-    // information.
-    try {
-      this.contentViewerFront = await this.currentTarget.getFront("contentViewer");
-    } catch (e) {
-      console.error(e);
-    }
-
-    // Bug 1606852: For backwards compatibility, we need to get the emulation actor. The ContentViewer
-    // actor is only available in Firefox 73 or newer. We can remove this call when Firefox 73
-    // is on release.
-    if (!this.contentViewerFront) {
-      this.contentViewerFront = await this.currentTarget.getFront("emulation");
-    }
-
-    if (!this.currentTarget.chrome) {
-      this.store.dispatch(updatePrintSimulationHidden(false));
-    } else {
-      this.store.dispatch(updatePrintSimulationHidden(true));
-    }
-
-    // Show the color scheme simulation toggle button if:
-    // - The feature pref is enabled.
-    // - Color scheme simulation is supported for the current target.
-    const isEmulateColorSchemeSupported =
-      (await this.currentTarget.actorHasMethod("contentViewer", "getEmulatedColorScheme")) ||
-      // Bug 1606852: We can removed this check when Firefox 73 is on release.
-      (await this.currentTarget.actorHasMethod("emulation", "getEmulatedColorScheme"));
-
-    if (
-      Services.prefs.getBoolPref("devtools.inspector.color-scheme-simulation.enabled") &&
-      isEmulateColorSchemeSupported
-    ) {
-      this.store.dispatch(updateColorSchemeSimulationHidden(false));
-    } else {
-      this.store.dispatch(updateColorSchemeSimulationHidden(true));
-    }
   }
 
   destroy() {
@@ -210,11 +155,6 @@ class RulesView {
     if (this.elementStyle) {
       this.elementStyle.destroy();
       this.elementStyle = null;
-    }
-
-    if (this.contentViewerFront) {
-      this.contentViewerFront.destroy();
-      this.contentViewerFront = null;
     }
 
     this._dummyElement = null;
@@ -489,32 +429,6 @@ class RulesView {
     this.telemetry.recordEvent("edit_rule", "ruleview", null, {
       session_id: this.toolbox.sessionId,
     });
-  }
-
-  /**
-   * Handler for toggling color scheme simulation.
-   */
-  async onToggleColorSchemeSimulation() {
-    const currentState = await this.contentViewerFront.getEmulatedColorScheme();
-    const index = COLOR_SCHEMES.indexOf(currentState);
-    const nextState = COLOR_SCHEMES[(index + 1) % COLOR_SCHEMES.length];
-    await this.contentViewerFront.setEmulatedColorScheme(nextState);
-    await this.updateElementStyle();
-  }
-
-  /**
-   * Handler for toggling print media simulation.
-   */
-  async onTogglePrintSimulation() {
-    const enabled = await this.contentViewerFront.getIsPrintSimulationEnabled();
-
-    if (!enabled) {
-      await this.contentViewerFront.startPrintMediaSimulation();
-    } else {
-      await this.contentViewerFront.stopPrintMediaSimulation(false);
-    }
-
-    await this.updateElementStyle();
   }
 
   /**
