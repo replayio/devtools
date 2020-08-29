@@ -23,7 +23,6 @@ const {
   updateAddRuleEnabled,
   updateHighlightedSelector,
   updateRules,
-  updateSourceLinkEnabled,
 } = require("devtools/client/inspector/rules/actions/rules");
 
 const RulesApp = createFactory(require("devtools/client/inspector/rules/components/RulesApp"));
@@ -31,8 +30,6 @@ const RulesApp = createFactory(require("devtools/client/inspector/rules/componen
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
-loader.lazyRequireGetter(this, "Tools", "devtools/client/definitions", true);
-loader.lazyRequireGetter(this, "gDevTools", "devtools/client/framework/devtools", true);
 loader.lazyRequireGetter(this, "ClassList", "devtools/client/inspector/rules/models/class-list");
 loader.lazyRequireGetter(this, "getNodeInfo", "devtools/client/inspector/rules/utils/utils", true);
 loader.lazyRequireGetter(
@@ -61,13 +58,11 @@ class RulesView {
 
     this.onAddClass = this.onAddClass.bind(this);
     this.onAddRule = this.onAddRule.bind(this);
-    this.onOpenSourceLink = this.onOpenSourceLink.bind(this);
     this.onSelection = this.onSelection.bind(this);
     this.onSetClassState = this.onSetClassState.bind(this);
     this.onToggleClassPanelExpanded = this.onToggleClassPanelExpanded.bind(this);
     this.onToggleDeclaration = this.onToggleDeclaration.bind(this);
     this.onTogglePseudoClass = this.onTogglePseudoClass.bind(this);
-    this.onToolChanged = this.onToolChanged.bind(this);
     this.onToggleSelectorHighlighter = this.onToggleSelectorHighlighter.bind(this);
     this.showContextMenu = this.showContextMenu.bind(this);
     this.showDeclarationNameEditor = this.showDeclarationNameEditor.bind(this);
@@ -80,8 +75,6 @@ class RulesView {
     this.inspector.sidebar.on("select", this.onSelection);
     this.selection.on("detached-front", this.onSelection);
     this.selection.on("new-node-front", this.onSelection);
-    this.toolbox.on("tool-registered", this.onToolChanged);
-    this.toolbox.on("tool-unregistered", this.onToolChanged);
 
     this.init();
 
@@ -96,7 +89,6 @@ class RulesView {
     const rulesApp = RulesApp({
       onAddClass: this.onAddClass,
       onAddRule: this.onAddRule,
-      onOpenSourceLink: this.onOpenSourceLink,
       onSetClassState: this.onSetClassState,
       onToggleClassPanelExpanded: this.onToggleClassPanelExpanded,
       onToggleDeclaration: this.onToggleDeclaration,
@@ -128,8 +120,6 @@ class RulesView {
     this.inspector.sidebar.off("select", this.onSelection);
     this.selection.off("detached-front", this.onSelection);
     this.selection.off("new-node-front", this.onSelection);
-    this.toolbox.off("tool-registered", this.onToolChanged);
-    this.toolbox.off("tool-unregistered", this.onToolChanged);
 
     if (this._autocompletePopup) {
       this._autocompletePopup.destroy();
@@ -341,28 +331,6 @@ class RulesView {
   }
 
   /**
-   * Handler for opening the source link of the given rule in the Style Editor.
-   *
-   * @param  {String} ruleId
-   *         The id of the Rule for opening the source link.
-   */
-  async onOpenSourceLink(ruleId) {
-    const rule = this.elementStyle.getRule(ruleId);
-    if (!rule || !Tools.styleEditor.isTargetSupported(this.currentTarget)) {
-      return;
-    }
-
-    const toolbox = await gDevTools.showToolbox(this.currentTarget, "styleeditor");
-    const styleEditor = toolbox.getCurrentPanel();
-    if (!styleEditor) {
-      return;
-    }
-
-    const { url, line, column } = rule.sourceLocation;
-    styleEditor.selectStyleSheet(url, line, column);
-  }
-
-  /**
    * Handler for selection events "detached-front" and "new-node-front" and inspector
    * sidbar "select" event. Updates the rules view with the selected node if the panel
    * is visible.
@@ -473,20 +441,6 @@ class RulesView {
       this.store.dispatch(updateHighlightedSelector(""));
       // This event is emitted for testing purposes.
       this.emit("ruleview-selectorhighlighter-toggled", false);
-    }
-  }
-
-  /**
-   * Handler for when the toolbox's tools are registered or unregistered.
-   * The source links in the rules view should be enabled only while the
-   * Style Editor is registered because that's where source links point to.
-   */
-  onToolChanged() {
-    const prevIsSourceLinkEnabled = this.store.getState().rules.isSourceLinkEnabled;
-    const isSourceLinkEnabled = this.toolbox.isToolRegistered("styleeditor");
-
-    if (prevIsSourceLinkEnabled !== isSourceLinkEnabled) {
-      this.store.dispatch(updateSourceLinkEnabled(isSourceLinkEnabled));
     }
   }
 

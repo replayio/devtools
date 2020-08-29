@@ -23,7 +23,6 @@ const Types = require("devtools/client/inspector/rules/types");
 class Rule extends PureComponent {
   static get propTypes() {
     return {
-      onOpenSourceLink: PropTypes.func.isRequired,
       onToggleDeclaration: PropTypes.func.isRequired,
       onToggleSelectorHighlighter: PropTypes.func.isRequired,
       rule: PropTypes.shape(Types.rule).isRequired,
@@ -76,7 +75,6 @@ class Rule extends PureComponent {
 
   render() {
     const {
-      onOpenSourceLink,
       onToggleDeclaration,
       onToggleSelectorHighlighter,
       rule,
@@ -97,7 +95,6 @@ class Rule extends PureComponent {
       SourceLink({
         id,
         isUserAgentStyle,
-        onOpenSourceLink,
         sourceLink,
         type,
       }),
