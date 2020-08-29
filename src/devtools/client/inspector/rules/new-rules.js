@@ -9,6 +9,12 @@ const ElementStyle = require("devtools/client/inspector/rules/models/element-sty
 const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 const EventEmitter = require("devtools/shared/event-emitter");
+const ClassList = require("devtools/client/inspector/rules/models/class-list");
+const { getNodeInfo } = require("devtools/client/inspector/rules/utils/utils");
+const StyleInspectorMenu = require("devtools/client/inspector/shared/style-inspector-menu");
+const { advanceValidate } = require("devtools/client/inspector/shared/utils");
+const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
+const { InplaceEditor } = require("devtools/client/shared/inplace-editor");
 
 const {
   updateClasses,
@@ -29,17 +35,6 @@ const RulesApp = createFactory(require("devtools/client/inspector/rules/componen
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
-
-loader.lazyRequireGetter(this, "ClassList", "devtools/client/inspector/rules/models/class-list");
-loader.lazyRequireGetter(this, "getNodeInfo", "devtools/client/inspector/rules/utils/utils", true);
-loader.lazyRequireGetter(
-  this,
-  "StyleInspectorMenu",
-  "devtools/client/inspector/shared/style-inspector-menu"
-);
-loader.lazyRequireGetter(this, "advanceValidate", "devtools/client/inspector/shared/utils", true);
-loader.lazyRequireGetter(this, "AutocompletePopup", "devtools/client/shared/autocomplete-popup");
-loader.lazyRequireGetter(this, "InplaceEditor", "devtools/client/shared/inplace-editor", true);
 
 const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
 
