@@ -261,8 +261,8 @@ class WebConsoleWrapper {
     store.dispatch(actions.evaluateExpression(expression));
   }
 
-  setZoomedRegion(startTime, endTime) {
-    store.dispatch(actions.setZoomedRegion(startTime, endTime));
+  setZoomedRegion({ startTime, endTime, scale }) {
+    store.dispatch(actions.setZoomedRegion(startTime, endTime, scale));
   }
 
   /**

@@ -204,11 +204,12 @@ function timeWarp(executionPoint) {
   };
 }
 
-function setZoomedRegion(zoomStartTime, zoomEndTime) {
+function setZoomedRegion(zoomStartTime, zoomEndTime, scale) {
   return {
     type: SET_ZOOMED_REGION,
     zoomStartTime,
     zoomEndTime,
+    scale,
   };
 }
 

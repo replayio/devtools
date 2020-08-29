@@ -17,6 +17,7 @@ import PropTypes from "prop-types";
 import { SVG } from "image/svg";
 import { log } from "protocol/socket";
 import FullStory from "ui/utils/fullstory";
+import ScrollContainer from "ui/components/Timeline/ScrollContainer";
 
 const {
   screenshotCache,
@@ -67,7 +68,6 @@ function CommandButton({ img, className, onClick, active }) {
     previous: SVG.NextButton,
     pause: SVG.ReplayPause,
     play: SVG.ReplayResume,
-    zoomout: SVG.ZoomOut,
     comment: SVG.Comment,
   };
 
@@ -304,67 +304,11 @@ export class Timeline extends Component {
     }
   };
 
-  onPlayerMouseLeave = () => {
-    const { hideTooltip } = this.props;
-    clearInterval(this.hoverInterval);
-
-    this.unhighlightConsoleMessage();
-    this.clearPreviewLocation();
-
-    // Restore the normal graphics.
-
-    hideTooltip();
-    this.props.setTimelineState({ startDragTime: null });
-  };
-
-  onPlayerMouseDown = () => {
-    const { hoverTime, setTimelineState } = this.props;
-    if (hoverTime != null) {
-      setTimelineState({ startDragTime: hoverTime });
-    }
-  };
-
-  zoomedRegion() {
-    const { startDragTime, hoverTime } = this.props;
-    if (startDragTime == null || hoverTime == null) {
-      return null;
-    }
-    const dragPos = this.getVisiblePosition(startDragTime);
-    const hoverPos = this.getVisiblePosition(hoverTime);
-    if (Math.abs(dragPos - hoverPos) < 0.02) {
-      return null;
-    }
-    if (dragPos < hoverPos) {
-      return { startTime: startDragTime, endTime: hoverTime };
-    }
-    return { startTime: hoverTime, endTime: startDragTime };
-  }
-
   onPlayerMouseUp = e => {
-    const {
-      setZoomRegion,
-      hoverTime,
-      startDragTime,
-      currentTime,
-      hoveredMessage,
-      hoveringOverMarker,
-    } = this.props;
+    const { hoverTime, hoveringOverMarker } = this.props;
     const mouseTime = this.getMouseTime(e);
 
-    this.props.setTimelineState({ startDragTime: null });
-
-    const zoomRegion = this.zoomedRegion();
-    if (zoomRegion) {
-      setZoomRegion(zoomRegion);
-
-      gToolbox.getWebconsoleWrapper().setZoomedRegion(zoomRegion.startTime, zoomRegion.endTime);
-
-      if (currentTime < zoomRegion.startTime) {
-        this.seekTime(zoomRegion.startTime);
-      } else if (zoomRegion.endTime < currentTime) {
-        this.seekTime(zoomRegion.endTime);
-      }
-    } else if (startDragTime != null && hoverTime != null && !hoveringOverMarker) {
+    if (hoverTime != null && !hoveringOverMarker) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
       if (event) {
         this.seek(event.point, mouseTime);
@@ -531,26 +475,6 @@ export class Timeline extends Component {
       this.seekTime(this.props.playback.time);
     }
     this.props.setTimelineState({ playback: null });
-  }
-
-  doZoomOut() {
-    this.props.setZoomRegion({
-      startTime: 0,
-      endTime: this.props.recordingDuration,
-    });
-    gToolbox.getWebconsoleWrapper().setZoomedRegion(0, this.props.recordingDuration);
-  }
-
-  renderZoom() {
-    const { recordingDuration } = this.props;
-    const zoomed = this.zoomStartTime != 0 || this.zoomEndTime != recordingDuration;
-
-    return CommandButton({
-      className: "",
-      active: zoomed,
-      img: "zoomout",
-      onClick: () => this.doZoomOut(),
-    });
   }
 
   renderCommands() {
@@ -734,33 +658,6 @@ export class Timeline extends Component {
     });
   }
 
-  renderZoomedRegion() {
-    const info = this.zoomedRegion();
-    if (!info) {
-      return [];
-    }
-
-    let startOffset = this.getPixelOffset(info.startTime);
-    let endOffset = this.getPixelOffset(info.endTime);
-
-    return [
-      dom.span({
-        className: "untraversed",
-        style: {
-          left: "0px",
-          width: `${startOffset}px`,
-        },
-      }),
-      dom.span({
-        className: "untraversed",
-        style: {
-          left: `${endOffset}px`,
-          width: `${this.overlayWidth - endOffset}px`,
-        },
-      }),
-    ];
-  }
-
   render() {
     const { loaded, currentTime } = this.props;
     const percent = this.getVisiblePosition(currentTime) * 100;
@@ -797,12 +694,11 @@ export class Timeline extends Component {
             className: "progress-line end",
             style: { left: `${percent}%`, width: `${100 - percent}%` },
           }),
-          ...this.renderMessages(),
+          div({ className: "message-container" }, ...this.renderMessages()),
           ...this.renderUnprocessedRegions(),
-          ...this.renderZoomedRegion()
+          <ScrollContainer />
         ),
-        ...this.renderHoverPoint(),
-        this.renderZoom()
+        ...this.renderHoverPoint()
       )
     );
   }
@@ -813,7 +709,6 @@ export default connect(
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
-    startDragTime: selectors.getStartDragTime(state),
     playback: selectors.getPlayback(state),
     messages: selectors.getMessages(state),
     highlightedMessage: selectors.getHighlightedMessage(state),
@@ -827,7 +722,6 @@ export default connect(
     setTimelineToTime: actions.setTimelineToTime,
     setTimelineToMessage: actions.setTimelineToMessage,
     hideTooltip: actions.hideTooltip,
-    setZoomRegion: actions.setZoomRegion,
     setTimelineState: actions.setTimelineState,
     updateTimelineDimensions: actions.updateTimelineDimensions,
     seek: actions.seek,
