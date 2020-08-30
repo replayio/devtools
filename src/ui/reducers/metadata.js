@@ -5,6 +5,7 @@ function initialTimelineState() {
     comments: [],
     user: prefs.user,
     users: [],
+    title: "",
   };
 }
 
@@ -22,24 +23,18 @@ export default function update(state = initialTimelineState(), action) {
       return { ...state, users: action.users };
     }
 
+    case "update_title": {
+      return { ...state, title: action.title };
+    }
+
     default: {
       return state;
     }
   }
 }
 
-export function getComments(state) {
-  return state.metadata.comments;
-}
-
-export function getUser(state) {
-  return state.metadata.user;
-}
-
-export function getUsers(state) {
-  return state.metadata.users;
-}
-
-export function commentVisible(state) {
-  return getComments(state).some(comment => comment.visible);
-}
+export const getComments = state => state.metadata.comments;
+export const getUser = state => state.metadata.user;
+export const getUsers = state => state.metadata.users;
+export const getTitle = state => state.metadata.title;
+export const commentVisible = state => getComments(state).some(comment => comment.visible);

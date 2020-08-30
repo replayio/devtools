@@ -15,9 +15,16 @@
   background-size: contain;
 }
 
+.recording-title {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--grey-55);
+}
+
 #status {
   padding-left: 10px;
-  flex-grow: 1;
+  /* flex-grow: 1; */
   color: var(--theme-comment);
   font-size: 1.1rem;
 }

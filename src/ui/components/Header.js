@@ -25,7 +25,7 @@ class Header extends React.Component {
     const { user, getActiveUsers } = this.props;
 
     const activeUsers = getActiveUsers();
-    const firstPlayer = this.props.user;
+    const firstPlayer = user;
     const otherPlayers = activeUsers.filter(user => user.id != firstPlayer.id);
 
     // We sort the other players by ID here to prevent them from shuffling.
@@ -42,10 +42,12 @@ class Header extends React.Component {
   }
 
   render() {
+    const { title } = this.props;
     return (
       <div id="header">
         <div className="logo"></div>
         <div id="status"></div>
+        <div className="recording-title">{title}</div>
         <div className="links">
           <a id="headway" onClick={this.toggleHeadway}>
             What&apos;s new
@@ -62,6 +64,7 @@ export default connect(
   state => ({
     user: selectors.getUser(state),
     users: selectors.getUsers(state),
+    title: selectors.getTitle(state),
   }),
   { seek: actions.seek, getActiveUsers: actions.getActiveUsers }
 )(Header);

@@ -7,12 +7,15 @@ import FullStory from "ui/utils/fullstory";
 // Metadata key used to store comments.
 const CommentsMetadata = "devtools-comments";
 const UsersMetadata = "devtools-users";
+const TitleMetadata = "devtools-title";
+
 let heartbeatPing = Date.now();
 const refreshRate = 10000;
 
 export function setupMetadata(_, store) {
   ThreadFront.watchMetadata(CommentsMetadata, args => store.dispatch(onCommentsUpdate(args)));
   ThreadFront.watchMetadata(UsersMetadata, args => store.dispatch(onUsersUpdate(args)));
+  ThreadFront.watchMetadata(TitleMetadata, args => store.dispatch(onTitleUpdate(args)));
 
   if (features.users) {
     store.dispatch(registerUser());
@@ -179,5 +182,29 @@ export function updateUser(authUser = {}) {
     const updatedUser = { id, avatarID, picture, name };
 
     dispatch({ type: "register_user", user: updatedUser });
+  };
+}
+
+function onTitleUpdate(title) {
+  return async ({ dispatch, getState }) => {
+    if (title === selectors.getTitle(getState())) {
+      return;
+    }
+
+    if (!title) {
+      await new Promise(r => setTimeout(r, 5000));
+      const titleVal = await ThreadFront.evaluate(0, null, "window.location.host");
+      title = titleVal.returned.primitive();
+      return dispatch(updateTitle(title));
+    }
+
+    dispatch({ type: "update_title", title });
+  };
+}
+
+export function updateTitle(title) {
+  return ({ dispatch }) => {
+    ThreadFront.updateMetadata(TitleMetadata, () => title);
+    dispatch({ type: "update_title", title });
   };
 }
