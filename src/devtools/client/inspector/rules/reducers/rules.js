@@ -74,16 +74,16 @@ function getRuleState(rule) {
   return {
     // Array of CSS declarations.
     declarations: rule.declarations.map(declaration =>
-      getDeclarationState(declaration, rule.domRule.actorID)
+      getDeclarationState(declaration, rule.domRule.objectId())
     ),
     // An unique CSS rule id.
-    id: rule.domRule.actorID,
+    id: rule.domRule.objectId(),
     // An object containing information about the CSS rule's inheritance.
     inheritance: rule.inheritance,
     // Whether or not the rule does not match the current selected element.
     isUnmatched: rule.isUnmatched,
     // Whether or not the rule is an user agent style.
-    isUserAgentStyle: rule.isSystem,
+    isUserAgentStyle: rule.domRule.isSystem,
     // An object containing information about the CSS keyframes rules.
     keyframesRule: rule.keyframesRule,
     // The pseudo-element keyword used in the rule.
