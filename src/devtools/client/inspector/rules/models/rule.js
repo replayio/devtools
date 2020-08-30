@@ -129,7 +129,7 @@ class Rule {
       this._sourceLocation = {
         column: this.ruleColumn,
         line: this.ruleLine,
-        url: this.sheet ? this.sheet.href || this.sheet.nodeHref : null,
+        url: this.ruleHref,
       };
     }
 
@@ -917,7 +917,7 @@ class Rule {
       line,
       url,
     };
-    this.store.dispatch(updateSourceLink(this.domRule.actorID, this.sourceLink));
+    this.store.dispatch(updateSourceLink(this.domRule.objectId(), this.sourceLink));
   }
 }
 
