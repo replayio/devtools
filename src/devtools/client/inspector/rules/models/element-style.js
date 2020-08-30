@@ -86,11 +86,11 @@ class ElementStyle {
 
     this.onRefresh = this.onRefresh.bind(this);
 
-    if (this.ruleView.isNewRulesView) {
-      this.pageStyle.on("stylesheet-updated", this.onRefresh);
-      this.ruleView.inspector.styleChangeTracker.on("style-changed", this.onRefresh);
-      this.ruleView.selection.on("pseudoclass", this.onRefresh);
-    }
+    // if (this.ruleView.isNewRulesView) {
+    //   this.pageStyle.on("stylesheet-updated", this.onRefresh);
+    //   this.ruleView.inspector.styleChangeTracker.on("style-changed", this.onRefresh);
+    //   this.ruleView.selection.on("pseudoclass", this.onRefresh);
+    // }
   }
 
   get unusedCssEnabled() {
@@ -116,11 +116,11 @@ class ElementStyle {
       rule.destroy();
     }
 
-    if (this.ruleView.isNewRulesView) {
-      this.pageStyle.off("stylesheet-updated", this.onRefresh);
-      this.ruleView.inspector.styleChangeTracker.off("style-changed", this.onRefresh);
-      this.ruleView.selection.off("pseudoclass", this.onRefresh);
-    }
+    // if (this.ruleView.isNewRulesView) {
+    //   this.pageStyle.off("stylesheet-updated", this.onRefresh);
+    //   this.ruleView.inspector.styleChangeTracker.off("style-changed", this.onRefresh);
+    //   this.ruleView.selection.off("pseudoclass", this.onRefresh);
+    // }
   }
 
   /**
@@ -183,9 +183,9 @@ class ElementStyle {
     // Mark overridden computed styles.
     this.onRuleUpdated();
 
-    if (this.ruleView.isNewRulesView) {
-      this.subscribeRulesToLocationChange();
-    }
+    // if (this.ruleView.isNewRulesView) {
+    //   this.subscribeRulesToLocationChange();
+    // }
   }
 
   /**
@@ -377,7 +377,7 @@ class ElementStyle {
    *
    * @param {TextProperty} declaration
    *        A TextProperty of a rule.
-   * @param {Set<>String} variableNamesSet
+   * @param {Set<String>} variableNamesSet
    *        A Set of CSS variable names that have been updated.
    */
   _hasUpdatedCSSVariable(declaration, variableNamesSet) {
