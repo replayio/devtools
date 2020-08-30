@@ -260,8 +260,8 @@ class Declaration extends PureComponent {
           ),
           ";"
         ),
-        this.renderWarning(),
-        this.renderOverriddenFilter()
+        this.renderWarning()
+        // this.renderOverriddenFilter()
       ),
       this.renderComputedPropertyList(),
       this.renderShorthandOverriddenList()
