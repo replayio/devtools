@@ -168,6 +168,7 @@ exports.rule = {
     title: PropTypes.string,
   }),
 
-  // The CSS rule type.
+  // The type of CSS rule.
+  // See https://developer.mozilla.org/en-US/docs/Web/API/CSSRule#Type_constants
   type: PropTypes.number,
 };

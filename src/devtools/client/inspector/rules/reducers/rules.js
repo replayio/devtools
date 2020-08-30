@@ -92,7 +92,7 @@ function getRuleState(rule) {
     selector: rule.selector,
     // An object containing information about the CSS rule's stylesheet source.
     sourceLink: rule.sourceLink,
-    // The CSS rule type.
+    // The type of CSS rule.
     type: rule.domRule.type,
   };
 }

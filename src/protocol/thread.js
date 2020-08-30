@@ -970,6 +970,10 @@ RuleFront.prototype = {
     return true;
   },
 
+  /**
+   * The type of CSS rule.
+   * See https://developer.mozilla.org/en-US/docs/Web/API/CSSRule#Type_constants.
+   */
   get type() {
     return this._rule.type;
   },
@@ -1007,6 +1011,9 @@ RuleFront.prototype = {
     return this.parentStyleSheet && this.parentStyleSheet.href;
   },
 
+  /**
+   * Whether or not the rule is an user agent style.
+   */
   get isSystem() {
     return this.parentStyleSheet && this.parentStyleSheet.isSystem;
   },

@@ -8,7 +8,7 @@ const Services = require("Services");
 const Rule = require("devtools/client/inspector/rules/models/rule");
 const UserProperties = require("devtools/client/inspector/rules/models/user-properties");
 
-const { promiseWarn } = require("devtools/client/inspector/shared/utils");
+// const { promiseWarn } = require("devtools/client/inspector/shared/utils");
 /*
 loader.lazyRequireGetter(
   this,
@@ -49,7 +49,7 @@ const PREF_INACTIVE_CSS_ENABLED = "devtools.inspector.inactive.css.enabled";
  */
 class ElementStyle {
   /**
-   * @param  {Element} element
+   * @param  {NodeFront} element
    *         The element whose style we are viewing.
    * @param  {CssRuleView} ruleView
    *         The instance of the rule-view panel.
@@ -224,12 +224,14 @@ class ElementStyle {
    * Add a rule if it's one we care about. Filters out duplicates and
    * inherited styles with no inherited properties.
    *
-   * @param  {Object} ruleFront
+   * @param  {RuleFront} ruleFront
    *         Rule to add.
    * @return {Boolean} true if we added the rule.
    */
   _maybeAddRule(ruleFront, inherited, pseudoElement) {
     if (ruleFront.isSystem) {
+      // We currently don't display any user agent styles.
+      // See https://github.com/RecordReplay/devtools/issues/546
       return false;
     }
 
