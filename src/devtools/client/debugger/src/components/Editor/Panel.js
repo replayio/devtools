@@ -15,12 +15,6 @@ import { getContext } from "../../selectors";
 
 import type { SourceLocation, Context, Breakpoint } from "../../types";
 
-function addNewLine(doc: Object) {
-  const cursor = doc.getCursor();
-  const pos = { line: cursor.line, ch: cursor.ch };
-  doc.replaceRange("\n", pos);
-}
-
 type OwnProps = {|
   editor: Object,
 |};
@@ -61,12 +55,8 @@ export class Panel extends PureComponent<Props> {
       return;
     }
 
-    if (e.metaKey) {
+    if (e.metaKey && e.which == 13) {
       return this.save();
-    }
-
-    if (e.altKey) {
-      addNewLine(this.codeMirror.doc);
     }
 
     this.toggleActionsPanel();
