@@ -109,12 +109,12 @@ class Rule extends PureComponent {
             showSelectorEditor,
             type,
           }),
-          type !== CSSRule.KEYFRAME_RULE
-            ? SelectorHighlighter({
-                onToggleSelectorHighlighter,
-                selector,
-              })
-            : null,
+          // type !== CSSRule.KEYFRAME_RULE
+          //   ? SelectorHighlighter({
+          //       onToggleSelectorHighlighter,
+          //       selector,
+          //     })
+          //   : null,
           dom.span({ className: "ruleview-ruleopen" }, " {")
         ),
         Declarations({
