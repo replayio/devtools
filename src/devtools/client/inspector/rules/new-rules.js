@@ -560,14 +560,14 @@ class RulesView {
     }
 
     if (!element) {
-      this.store.dispatch(disableAllPseudoClasses());
-      this.store.dispatch(updateAddRuleEnabled(false));
-      this.store.dispatch(updateClasses([]));
+      // this.store.dispatch(disableAllPseudoClasses());
+      // this.store.dispatch(updateAddRuleEnabled(false));
+      // this.store.dispatch(updateClasses([]));
       this.store.dispatch(updateRules([]));
       return;
     }
 
-    this.pageStyle = element.inspectorFront.pageStyle;
+    this.pageStyle = undefined;
     this.elementStyle = new ElementStyle(
       element,
       this,
@@ -595,10 +595,10 @@ class RulesView {
   async updateElementStyle() {
     await this.elementStyle.populate();
 
-    const isAddRuleEnabled = this.selection.isElementNode() && !this.selection.isAnonymousNode();
-    this.store.dispatch(updateAddRuleEnabled(isAddRuleEnabled));
-    this.store.dispatch(setPseudoClassLocks(this.elementStyle.element.pseudoClassLocks));
-    this.updateClassList();
+    // const isAddRuleEnabled = this.selection.isElementNode() && !this.selection.isAnonymousNode();
+    // this.store.dispatch(updateAddRuleEnabled(isAddRuleEnabled));
+    // this.store.dispatch(setPseudoClassLocks(this.elementStyle.element.pseudoClassLocks));
+    // this.updateClassList();
     this.updateRules();
   }
 
