@@ -126,7 +126,8 @@ class Selector extends PureComponent {
         ref: this.selectorRef,
         tabIndex: 0,
       },
-      this.renderSelector()
+      // this.renderSelector()
+      this.props.selector.selectorText
     );
   }
 }
