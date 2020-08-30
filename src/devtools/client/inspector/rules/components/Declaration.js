@@ -7,7 +7,7 @@
 const { createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
-const { editableItem } = require("devtools/client/shared/inplace-editor");
+// const { editableItem } = require("devtools/client/shared/inplace-editor");
 
 const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
 const Types = require("devtools/client/inspector/rules/types");
@@ -220,16 +220,15 @@ class Declaration extends PureComponent {
       },
       dom.div(
         { className: "ruleview-propertycontainer" },
-        /*
         dom.input({
           "aria-labelledby": id,
           className: "ruleview-enableproperty",
           checked: isEnabled,
           onChange: this.onToggleDeclarationChange,
           tabIndex: "-1",
+          style: { visibility: "hidden" },
           type: "checkbox",
         }),
-        */
         dom.span(
           { className: "ruleview-namecontainer" },
           dom.span(
