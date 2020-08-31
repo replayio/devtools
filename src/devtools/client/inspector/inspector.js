@@ -6,13 +6,13 @@
 
 const Services = require("Services");
 const EventEmitter = require("devtools/shared/event-emitter");
-const { executeSoon } = require("devtools/shared/DevToolsUtils");
 const createStore = require("devtools/client/inspector/store");
 const InspectorStyleChangeTracker = require("devtools/client/inspector/shared/style-change-tracker");
 const { log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const React = require("react");
 const ReactDOM = require("react-dom");
+const { setupInspectorHelper } = require("ui/utils/bootstrap");
 
 require("devtools/client/themes/breadcrumbs.css");
 require("devtools/client/themes/inspector.css");
@@ -39,6 +39,7 @@ require("devtools/client/shared/components/Accordion.css");
 //require("devtools/content/shared/widgets/spectrum.css");
 
 const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
+const { prefs, features } = require("devtools/client/inspector/prefs");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
 const { InspectorSearch } = require("devtools/client/inspector/inspector-search");
 
@@ -139,7 +140,7 @@ function Inspector(toolbox) {
   // Map [panel id => panel instance]
   // Stores all the instances of sidebar panels like rule view, computed view, ...
   this._panels = new Map();
-
+  setupInspectorHelper(this);
   this._clearSearchResultsLabel = this._clearSearchResultsLabel.bind(this);
   this._handleRejectionIfNotDestroyed = this._handleRejectionIfNotDestroyed.bind(this);
   this._onTargetAvailable = this._onTargetAvailable.bind(this);
@@ -237,7 +238,7 @@ Inspector.prototype = {
 
   get is3PaneModeEnabled() {
     if (!this._is3PaneModeEnabled) {
-      this._is3PaneModeEnabled = Services.prefs.getBoolPref(THREE_PANE_ENABLED_PREF);
+      this._is3PaneModeEnabled = prefs.threePaneEnabled;
     }
 
     return this._is3PaneModeEnabled;
@@ -245,7 +246,7 @@ Inspector.prototype = {
 
   set is3PaneModeEnabled(value) {
     this._is3PaneModeEnabled = value;
-    Services.prefs.setBoolPref(THREE_PANE_ENABLED_PREF, this._is3PaneModeEnabled);
+    prefs.threePaneEnabled = this._is3PaneModeEnabled;
   },
 
   get search() {
@@ -920,7 +921,7 @@ Inspector.prototype = {
       */
     ];
 
-    if (Services.prefs.getBoolPref("devtools.inspector.new-rulesview.enabled")) {
+    if (features.newRulesView) {
       sidebarPanels.push({
         id: "newruleview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
