@@ -24,7 +24,7 @@ class CommentEditor extends React.Component {
   onKeyDown = e => {
     if (e.key == "Escape") {
       this.stopEditingComment();
-    } else if (e.key == "Enter") {
+    } else if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) {
       this.saveEditedComment(e);
     }
   };
