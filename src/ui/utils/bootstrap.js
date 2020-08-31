@@ -2,7 +2,15 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
-import { prefs as dbgPrefs } from "devtools/client/debugger/src/utils/prefs";
+import {
+  prefs as dbgPrefs,
+  features as dbgFeatures,
+} from "devtools/client/debugger/src/utils/prefs";
+import {
+  prefs as inspectorPrefs,
+  features as inspectorFeatures,
+} from "devtools/client/inspector/prefs";
+
 import { prefs, features, asyncStore } from "./prefs";
 import configureStore from "devtools/client/debugger/src/actions/utils/create-store";
 import { clientCommands } from "devtools/client/debugger/src/client/firefox/commands";
@@ -78,6 +86,15 @@ export function setupConsoleHelper({ store, selectors, actions }) {
     store,
     actions: bindActionCreators(actions, store.dispatch),
     selectors: bindSelectors({ store, selectors }),
+  };
+}
+
+export function setupInspectorHelper(inspector) {
+  window.app.inspector = {
+    store: inspector.store,
+
+    prefs: inspectorPrefs,
+    features: inspectorFeatures,
   };
 }
 
