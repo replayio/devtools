@@ -2,10 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-import type { PersistedTab, VisibleTab } from "../reducers/tabs";
-import type { TabList, Tab, TabsSources } from "../reducers/types";
 
 /*
  * Finds the hidden tabs by comparing the tabs' top offset.
@@ -17,7 +15,7 @@ import type { TabList, Tab, TabsSources } from "../reducers/types";
  * @returns Array
  */
 
-export function getHiddenTabs(sourceTabs: TabsSources, sourceTabEls: Array<any>): TabsSources {
+export function getHiddenTabs(sourceTabs, sourceTabEls) {
   sourceTabEls = [].slice.call(sourceTabEls);
   function getTopOffset() {
     const topOffsets = sourceTabEls.map(t => t.getBoundingClientRect().top);
@@ -37,7 +35,7 @@ export function getHiddenTabs(sourceTabs: TabsSources, sourceTabEls: Array<any>)
   });
 }
 
-export function getFramework(tabs: TabList, url: string) {
+export function getFramework(tabs, url) {
   const tab = tabs.find(t => t.url === url);
 
   if (tab) {
@@ -106,11 +104,11 @@ export function getTabMenuItems() {
   };
 }
 
-export function isSimilarTab(tab: Tab, url: string, isOriginal: boolean) {
+export function isSimilarTab(tab, url, isOriginal) {
   return tab.url === url && tab.isOriginal === isOriginal;
 }
 
-export function persistTabs(tabs: VisibleTab[]): PersistedTab[] {
+export function persistTabs(tabs) {
   return [...tabs]
     .filter(tab => tab.url)
     .map(tab => {

@@ -2,15 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
-declare var describe: (name: string, func: () => void) => void;
-declare var it: (desc: string, func: () => void) => void;
-declare var expect: (value: any) => any;
+// 
 
 import update, { initialSourcesState, getDisplayedSources } from "../sources";
 import { initialThreadsState } from "../threads";
 import updateSourceActors from "../source-actors";
-import type { SourceActor } from "../../types";
 import { prefs } from "../../utils/prefs";
 import { makeMockSource, mockcx } from "../../utils/test-mockup";
 import { getResourceIds } from "../../utils/resource";
@@ -37,7 +33,7 @@ const chromeExtensionSource = {
 
 const mockedSources = [extensionSource, firefoxExtensionSource, chromeExtensionSource];
 
-const mockSourceActors: Array<SourceActor> = ([
+const mockSourceActors = ([
   {
     id: "extensionId-actor",
     actor: "extensionId-actor",
@@ -56,7 +52,7 @@ const mockSourceActors: Array<SourceActor> = ([
     source: "chromeExtension",
     thread: "foo",
   },
-]: any);
+]);
 
 describe("sources reducer", () => {
   it("should work", () => {

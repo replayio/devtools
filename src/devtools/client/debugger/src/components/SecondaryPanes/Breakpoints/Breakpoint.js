@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { PureComponent } from "react";
 import { connect } from "../../../utils/connect";
@@ -21,18 +21,7 @@ import {
 } from "../../../utils/breakpoint";
 import { features } from "../../../utils/prefs";
 
-import type {
-  Breakpoint as BreakpointType,
-  Frame,
-  Source,
-  SourceLocation,
-  Context,
-} from "../../../types";
-import type SourceEditor from "../../../utils/editor/source-editor";
 
-type FormattedFrame = Frame & {
-  selectedLocation: SourceLocation,
-};
 
 import {
   getBreakpointsList,
@@ -42,35 +31,9 @@ import {
   getContext,
 } from "../../../selectors";
 
-type OwnProps = {|
-  source: Source,
-  selectedSource: ?Source,
-  breakpoint: BreakpointType,
-  editor: SourceEditor,
-|};
-type Props = {
-  cx: Context,
-  breakpoint: BreakpointType,
-  breakpoints: BreakpointType[],
-  selectedSource: ?Source,
-  source: Source,
-  frame: FormattedFrame,
-  editor: SourceEditor,
-  enableBreakpoint: typeof actions.enableBreakpoint,
-  removeBreakpoint: typeof actions.removeBreakpoint,
-  removeBreakpoints: typeof actions.removeBreakpoints,
-  removeAllBreakpoints: typeof actions.removeAllBreakpoints,
-  disableBreakpoint: typeof actions.disableBreakpoint,
-  setBreakpointOptions: typeof actions.setBreakpointOptions,
-  toggleAllBreakpoints: typeof actions.toggleAllBreakpoints,
-  toggleBreakpoints: typeof actions.toggleBreakpoints,
-  toggleDisabledBreakpoint: typeof actions.toggleDisabledBreakpoint,
-  openConditionalPanel: typeof actions.openConditionalPanel,
-  selectSpecificLocation: typeof actions.selectSpecificLocation,
-};
 
-class Breakpoint extends PureComponent<Props> {
-  onContextMenu = (e: SyntheticEvent<HTMLElement>) => {
+class Breakpoint extends PureComponent {
+  onContextMenu = (e) => {
     showContextMenu({ ...this.props, contextMenuEvent: e });
   };
 
@@ -88,13 +51,13 @@ class Breakpoint extends PureComponent<Props> {
     }
   };
 
-  selectBreakpoint = (event: SyntheticEvent<>) => {
+  selectBreakpoint = (event) => {
     event.preventDefault();
     const { cx, selectSpecificLocation } = this.props;
     selectSpecificLocation(cx, this.selectedLocation);
   };
 
-  removeBreakpoint = (event: SyntheticEvent<>) => {
+  removeBreakpoint = (event) => {
     const { cx, removeBreakpoint, breakpoint } = this.props;
     event.stopPropagation();
     removeBreakpoint(cx, breakpoint);
@@ -142,7 +105,7 @@ class Breakpoint extends PureComponent<Props> {
   }
 
   highlightText = memoize(
-    (text: string = "", editor: SourceEditor) => {
+    (text = "", editor) => {
       const node = document.createElement("div");
       editor.CodeMirror.runMode(text, "application/javascript", node);
       return { __html: node.innerHTML };
@@ -200,7 +163,7 @@ class Breakpoint extends PureComponent<Props> {
 const getFormattedFrame = createSelector(
   getSelectedSource,
   getSelectedFrame,
-  (selectedSource: ?Source, frame: ?Frame): ?FormattedFrame => {
+  (selectedSource, frame) => {
     if (!frame) {
       return null;
     }
@@ -212,13 +175,13 @@ const getFormattedFrame = createSelector(
   }
 );
 
-const mapStateToProps = (state, p: OwnProps) => ({
+const mapStateToProps = (state, p) => ({
   cx: getContext(state),
   breakpoints: getBreakpointsList(state),
   frame: getFormattedFrame(state, getCurrentThread(state)),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   enableBreakpoint: actions.enableBreakpoint,
   removeBreakpoint: actions.removeBreakpoint,
   removeBreakpoints: actions.removeBreakpoints,

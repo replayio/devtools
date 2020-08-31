@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import {
   createInitial,
@@ -12,24 +12,10 @@ import {
   makeWeakQuery,
   makeShallowQuery,
   makeStrictQuery,
-  type Id,
-  type Resource,
-  type ResourceValues,
-  type ResourceIdentity,
-  type QueryMapNoArgs,
-  type QueryMapWithArgs,
-  type QueryFilter,
-  type QueryReduce,
 } from "..";
 
-type TestResource = Resource<{
-  id: string,
-  name: string,
-  data: number,
-  obj: {},
-}>;
 
-const makeResource = (id: string): TestResource => ({
+const makeResource = (id) => ({
   id,
   name: `name-${id}`,
   data: 42,
@@ -38,31 +24,23 @@ const makeResource = (id: string): TestResource => ({
 
 // Jest's mock type just wouldn't cooperate below, so this is a custom version
 // that does what I need.
-type MockedFn<InputFn, OutputFn> = OutputFn & {
-  mock: {
-    calls: Array<any>,
-  },
-  mockImplementation(fn: InputFn): void,
-};
 
 // We need to pass the 'needsArgs' prop through to the query fn so we use
 // this utility to do that and at the same time preserve typechecking.
-const mockFn = (f: any) => Object.assign((jest.fn(f): any), f);
+const mockFn = (f) => Object.assign((jest.fn(f)), f);
 
-const mockFilter = <Args, F: QueryFilter<TestResource, Args>>(callback: F): MockedFn<F, F> =>
+const mockFilter =(callback) =>
   mockFn(callback);
-const mockMapNoArgs = <Mapped, F: (TestResource, ResourceIdentity) => Mapped>(
-  callback: F
-): MockedFn<F, QueryMapNoArgs<TestResource, Mapped>> => mockFn(callback);
-const mockMapWithArgs = <Args, Mapped, F: (TestResource, ResourceIdentity, Args) => Mapped>(
-  callback: F
-): MockedFn<F, QueryMapWithArgs<TestResource, Args, Mapped>> => mockFn(makeMapWithArgs(callback));
-const mockReduce = <Args, Mapped, Reduced, F: QueryReduce<TestResource, Args, Mapped, Reduced>>(
-  callback: F
-): MockedFn<F, F> => mockFn(callback);
+const mockMapNoArgs =(
+  callback
+) => mockFn(callback);
+const mockMapWithArgs =(
+  callback
+) => mockFn(makeMapWithArgs(callback));
+const mockReduce =(
+  callback
+) => mockFn(callback);
 
-type TestArgs = Array<Id<TestResource>>;
-type TestReduced = { [Id<TestResource>]: TestResource };
 
 describe("resource query operations", () => {
   let r1, r2, r3;
@@ -79,17 +57,17 @@ describe("resource query operations", () => {
     initialState = insertResources(initialState, [r1, r2, r3]);
 
     mapNoArgs = mockMapNoArgs(
-      (resource: TestResource, ident: ResourceIdentity): TestResource => resource
+      (resource, ident) => resource
     );
     mapWithArgs = mockMapWithArgs(
-      (resource: TestResource, ident: ResourceIdentity, args: mixed): TestResource => resource
+      (resource, ident, args) => resource
     );
     reduce = mockReduce(
       (
-        mapped: $ReadOnlyArray<TestResource>,
-        ids: $ReadOnlyArray<string>,
-        args: mixed
-      ): TestReduced => {
+        mapped,
+        ids,
+        args
+      ) => {
         return mapped.reduce((acc, item, i) => {
           acc[ids[i]] = item;
           return acc;
@@ -104,7 +82,7 @@ describe("resource query operations", () => {
     beforeEach(() => {
       filter = mockFilter(
         // eslint-disable-next-line max-nested-callbacks
-        (values: ResourceValues<TestResource>, args: TestArgs): TestArgs => args
+        (values, args) => args
       );
     });
 
@@ -447,7 +425,7 @@ describe("resource query operations", () => {
     beforeEach(() => {
       filter = mockFilter(
         // eslint-disable-next-line max-nested-callbacks
-        (values: ResourceValues<TestResource>, { ids }: { ids: TestArgs }): TestArgs => ids
+        (values, { ids }) => ids
       );
     });
 
@@ -745,7 +723,7 @@ describe("resource query operations", () => {
     beforeEach(() => {
       filter = mockFilter(
         // eslint-disable-next-line max-nested-callbacks
-        (values: ResourceValues<TestResource>, ids: Array<string>): TestArgs => ids
+        (values, ids) => ids
       );
     });
 

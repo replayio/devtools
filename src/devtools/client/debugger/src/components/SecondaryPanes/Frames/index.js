@@ -2,13 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { Component } from "react";
 import { connect } from "../../../utils/connect";
 import PropTypes from "prop-types";
 
-import type { Frame, ThreadContext } from "../../../types";
 
 import FrameComponent from "./Frame";
 import Group from "./Group";
@@ -30,41 +29,18 @@ import "./Frames.css";
 
 const NUM_FRAMES_SHOWN = 7;
 
-type OwnProps = {|
-  getFrameTitle?: string => string,
-  panel: "debugger" | "webconsole",
-|};
 
-type Props = {
-  cx: ThreadContext,
-  frames: Array<Frame>,
-  framesLoading: boolean,
-  frameworkGroupingOn: boolean,
-  selectedFrame: Object,
-  selectFrame: typeof actions.selectFrame,
-  selectLocation: typeof actions.selectLocation,
-  toggleBlackBox: Function,
-  toggleFrameworkGrouping: Function,
-  disableFrameTruncate: boolean,
-  disableContextMenu: boolean,
-  displayFullUrl: boolean,
-  getFrameTitle?: string => string,
-  panel: "debugger" | "webconsole",
-};
 
-type State = {
-  showAllFrames: boolean,
-};
 
-class Frames extends Component<Props, State> {
-  renderFrames: Function;
-  toggleFramesDisplay: Function;
-  truncateFrames: Function;
-  copyStackTrace: Function;
-  toggleFrameworkGrouping: Function;
-  renderToggleButton: Function;
+class Frames extends Component {
+  renderFrames;
+  toggleFramesDisplay;
+  truncateFrames;
+  copyStackTrace;
+  toggleFrameworkGrouping;
+  renderToggleButton;
 
-  constructor(props: Props) {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -72,7 +48,7 @@ class Frames extends Component<Props, State> {
     };
   }
 
-  shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
+  shouldComponentUpdate(nextProps, nextState) {
     const { frames, selectedFrame, frameworkGroupingOn } = this.props;
     const { showAllFrames } = this.state;
     return (
@@ -83,13 +59,13 @@ class Frames extends Component<Props, State> {
     );
   }
 
-  toggleFramesDisplay = (): void => {
+  toggleFramesDisplay = () => {
     this.setState(prevState => ({
       showAllFrames: !prevState.showAllFrames,
     }));
   };
 
-  collapseFrames(frames: Array<Frame>) {
+  collapseFrames(frames) {
     const { frameworkGroupingOn } = this.props;
     if (!frameworkGroupingOn) {
       return frames;
@@ -98,7 +74,7 @@ class Frames extends Component<Props, State> {
     return collapseFrames(frames);
   }
 
-  truncateFrames(frames: Array<Frame>): Array<Frame> {
+  truncateFrames(frames) {
     const numFramesToShow = this.state.showAllFrames ? frames.length : NUM_FRAMES_SHOWN;
 
     return frames.slice(0, numFramesToShow);
@@ -116,7 +92,7 @@ class Frames extends Component<Props, State> {
     toggleFrameworkGrouping(!frameworkGroupingOn);
   };
 
-  renderFrames(frames: Frame[]) {
+  renderFrames(frames) {
     const {
       cx,
       selectFrame,
@@ -131,18 +107,17 @@ class Frames extends Component<Props, State> {
     } = this.props;
 
     const framesOrGroups = this.truncateFrames(this.collapseFrames(frames));
-    type FrameOrGroup = Frame | Frame[];
 
     // We're not using a <ul> because it adds new lines before and after when
     // the user copies the trace. Needed for the console which has several
     // places where we don't want to have those new lines.
     return (
       <div role="list">
-        {framesOrGroups.map((frameOrGroup: FrameOrGroup) =>
+        {framesOrGroups.map((frameOrGroup) =>
           frameOrGroup.id ? (
             <FrameComponent
               cx={cx}
-              frame={(frameOrGroup: any)}
+              frame={(frameOrGroup)}
               toggleFrameworkGrouping={this.toggleFrameworkGrouping}
               copyStackTrace={this.copyStackTrace}
               frameworkGroupingOn={frameworkGroupingOn}
@@ -159,7 +134,7 @@ class Frames extends Component<Props, State> {
           ) : (
             <Group
               cx={cx}
-              group={(frameOrGroup: any)}
+              group={(frameOrGroup)}
               toggleFrameworkGrouping={this.toggleFrameworkGrouping}
               copyStackTrace={this.copyStackTrace}
               frameworkGroupingOn={frameworkGroupingOn}
@@ -179,13 +154,13 @@ class Frames extends Component<Props, State> {
     );
   }
 
-  renderToggleButton(frames: Frame[]) {
+  renderToggleButton(frames) {
     const { l10n } = this.context;
     const buttonMessage = this.state.showAllFrames
       ? l10n.getStr("callStack.collapse")
       : l10n.getStr("callStack.expand");
 
-    frames = (this.collapseFrames(frames): any);
+    frames = (this.collapseFrames(frames));
     if (frames.length <= NUM_FRAMES_SHOWN) {
       return null;
     }
@@ -234,7 +209,7 @@ const mapStateToProps = state => ({
   displayFullUrl: false,
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   selectFrame: actions.selectFrame,
   selectLocation: actions.selectLocation,
   toggleBlackBox: actions.toggleBlackBox,

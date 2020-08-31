@@ -2,16 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { getSelectedFrame, getFrameScope } from "../../selectors";
 import { generateInlinePreview } from "./inlinePreview";
 import { PROMISE } from "../utils/middleware/promise";
-import type { ThreadContext } from "../../types";
-import type { ThunkArgs } from "../types";
 
-export function fetchScopes(cx: ThreadContext) {
-  return async function ({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
+export function fetchScopes(cx) {
+  return async function ({ dispatch, getState, client, sourceMaps }) {
     const frame = getSelectedFrame(getState(), cx.thread);
     if (!frame || getFrameScope(getState(), cx.thread, frame.id)) {
       return;

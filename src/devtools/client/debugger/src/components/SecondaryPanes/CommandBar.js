@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import PropTypes from "prop-types";
 import React, { Component } from "react";
@@ -23,14 +23,12 @@ import AccessibleImage from "../shared/AccessibleImage";
 import "./CommandBar.css";
 
 import { appinfo } from "devtools-services";
-import type { ThreadContext } from "../../types";
 
 const isMacOS = appinfo.OS === "Darwin";
 
 // NOTE: the "resume" command will call either the resume or breakOnNext action
 // depending on whether or not the debugger is paused or running
 const COMMANDS = ["resume", "stepOver", "stepIn", "stepOut"];
-type CommandActionType = "resume" | "stepOver" | "stepIn" | "stepOut";
 
 const KEYS = {
   WINNT: {
@@ -73,26 +71,8 @@ function formatKey(action) {
   return formatKeyShortcut(key);
 }
 
-type OwnProps = {|
-  horizontal: boolean,
-|};
-type Props = {
-  cx: ThreadContext,
-  isWaitingOnBreak: boolean,
-  horizontal: boolean,
-  skipPausing: boolean,
-  resume: typeof actions.resume,
-  stepIn: typeof actions.stepIn,
-  stepOut: typeof actions.stepOut,
-  stepOver: typeof actions.stepOver,
-  breakOnNext: typeof actions.breakOnNext,
-  rewind: typeof actions.rewind,
-  reverseStepOver: typeof actions.reverseStepOver,
-  pauseOnExceptions: typeof actions.pauseOnExceptions,
-  toggleSkipPausing: typeof actions.toggleSkipPausing,
-};
 
-class CommandBar extends Component<Props> {
+class CommandBar extends Component {
   componentWillUnmount() {
     const shortcuts = this.context.shortcuts;
     COMMANDS.forEach(action => shortcuts.off(getKey(action)));
@@ -115,7 +95,7 @@ class CommandBar extends Component<Props> {
     }
   }
 
-  handleEvent(e: Event, action: CommandActionType) {
+  handleEvent(e, action) {
     const { cx } = this.props;
     e.preventDefault();
     e.stopPropagation();
@@ -201,7 +181,7 @@ const mapStateToProps = state => ({
   skipPausing: getSkipPausing(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   resume: actions.resume,
   stepIn: actions.stepIn,
   stepOut: actions.stepOut,

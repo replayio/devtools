@@ -2,21 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import { PureComponent } from "react";
 import { toEditorPosition, getDocument, hasDocument } from "../../utils/editor";
 import { connect } from "../../utils/connect";
 import { getFramePositions } from "../../selectors";
 import actions from "../../actions";
 
-import type { SourceLocation, SourceWithContent } from "../../types";
 
-type OwnProps = {||};
-type Props = {
-  positions: any,
-  unexecuted: any,
-  seekToPosition: typeof actions.seekToPosition,
-};
 
 const jumpButton = document.createElement("img");
 jumpButton.src = require("devtools/client/debugger/images/next-circle.svg").default;
@@ -28,7 +21,7 @@ function getEditorLine(location, sourceId) {
   return toEditorPosition(location).line;
 }
 
-export class ReplayLines extends PureComponent<Props> {
+export class ReplayLines extends PureComponent {
   componentDidMount() {
     const { positions, unexecuted } = this.props;
     this.jumps = [];
@@ -136,6 +129,6 @@ const mapStateToProps = state => {
   return { positions, unexecuted };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   seekToPosition: actions.seekToPosition,
 })(ReplayLines);

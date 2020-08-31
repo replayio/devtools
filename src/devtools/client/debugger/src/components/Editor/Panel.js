@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
@@ -13,26 +13,14 @@ import actions from "../../actions";
 
 import { getContext } from "../../selectors";
 
-import type { SourceLocation, Context, Breakpoint } from "../../types";
 
-type OwnProps = {|
-  editor: Object,
-|};
-type Props = {
-  cx: Context,
-  breakpoint: ?Object,
-  setBreakpointOptions: typeof actions.setBreakpointOptions,
-  location: SourceLocation,
-  log: boolean,
-  editor: Object,
-};
 
-export class Panel extends PureComponent<Props> {
-  cbPanel: null | Object;
-  input: ?HTMLTextAreaElement;
-  codeMirror: ?Object;
-  panelNode: ?HTMLDivElement;
-  scrollParent: ?HTMLElement;
+export class Panel extends PureComponent {
+  cbPanel;
+  input;
+  codeMirror;
+  panelNode;
+  scrollParent;
 
   constructor() {
     super();
@@ -219,6 +207,6 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   setBreakpointOptions: actions.setBreakpointOptions,
 })(Panel);

@@ -2,17 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import buildQuery from "../../utils/build-query";
 
-import type { SearchModifiers } from "../../types";
 
 export default function getMatches(
-  query: string,
-  text: string,
-  modifiers: SearchModifiers
-): Object[] {
+  query,
+  text,
+  modifiers
+) {
   if (!query || !text || !modifiers) {
     return [];
   }

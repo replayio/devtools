@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { isFirefox } from "devtools-environment";
 
-export function scrollList(resultList: Element[], index: number): void {
+export function scrollList(resultList, index) {
   if (!resultList.hasOwnProperty(index)) {
     return;
   }
@@ -30,8 +30,8 @@ export function scrollList(resultList: Element[], index: number): void {
   scroll();
 }
 
-function chromeScrollList(elem: Element, index: number): void {
-  const resultsEl: any = elem.parentNode;
+function chromeScrollList(elem, index) {
+  const resultsEl = elem.parentNode;
 
   if (!resultsEl || resultsEl.children.length === 0) {
     return;
@@ -41,12 +41,12 @@ function chromeScrollList(elem: Element, index: number): void {
   // https://nolanlawson.com/2018/09/25/accurately-measuring-layout-on-the-web/
   requestAnimationFrame(() => {
     setTimeout(() => {
-      const resultsHeight: number = resultsEl.clientHeight;
-      const itemHeight: number = resultsEl.children[0].clientHeight;
-      const numVisible: number = resultsHeight / itemHeight;
-      const positionsToScroll: number = index - numVisible + 1;
-      const itemOffset: number = resultsHeight % itemHeight;
-      const scroll: number = positionsToScroll * (itemHeight + 2) + itemOffset;
+      const resultsHeight = resultsEl.clientHeight;
+      const itemHeight = resultsEl.children[0].clientHeight;
+      const numVisible = resultsHeight / itemHeight;
+      const positionsToScroll = index - numVisible + 1;
+      const itemOffset = resultsHeight % itemHeight;
+      const scroll = positionsToScroll * (itemHeight + 2) + itemOffset;
 
       resultsEl.scrollTop = Math.max(0, scroll);
     });

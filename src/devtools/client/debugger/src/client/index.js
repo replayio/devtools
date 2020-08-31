@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import * as firefox from "./firefox";
 
@@ -13,11 +13,10 @@ import { bootstrapApp, bootstrapStore, bootstrapWorkers } from "../utils/bootstr
 
 import { initialBreakpointsState } from "../reducers/breakpoints";
 
-import type { Panel } from "./firefox/types";
 
 async function syncBreakpoints() {
   const breakpoints = await asyncStore.pendingBreakpoints;
-  const breakpointValues = (Object.values(breakpoints): any);
+  const breakpointValues = (Object.values(breakpoints));
   breakpointValues.forEach(({ disabled, options, location }) => {
     if (!disabled) {
       firefox.clientCommands.setBreakpoint(location, options);
@@ -49,11 +48,11 @@ async function loadInitialState() {
   };
 }
 
-function getClient(connection: any) {
+function getClient(connection) {
   return firefox;
 }
 
-export async function onConnect(connection: Object, panelWorkers: Object, panel: Panel) {
+export async function onConnect(connection, panelWorkers, panel) {
   // NOTE: the landing page does not connect to a JS process
   if (!connection) {
     return;

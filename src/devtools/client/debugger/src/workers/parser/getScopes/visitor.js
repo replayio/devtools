@@ -2,12 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import isEmpty from "lodash/isEmpty";
-import type { SourceId, SourceLocation } from "../../../types";
 import * as t from "@babel/types";
-import type { Node, TraversalAncestors, Location as BabelLocation } from "@babel/types";
 
 import getFunctionName from "../utils/getFunctionName";
 import { getAst } from "../utils/ast";
@@ -32,122 +30,24 @@ import { getAst } from "../utils/ast";
  * "global"
  * Variables that reference undeclared global values.
  */
-export type BindingType = "implicit" | "var" | "const" | "let" | "import" | "global";
 
-export type BindingLocationType = "ref" | BindingDeclarationType;
-export type BindingDeclarationType =
-  | "fn-expr"
-  | "fn-decl"
-  | "fn-param"
-  | "class-decl"
-  | "class-inner"
-  | "import-decl"
-  | "import-ns-decl"
-  | "ts-enum-decl"
-  | "ts-namespace-decl"
-  | "var"
-  | "let"
-  | "const"
-  | "catch";
 
-export type BindingLocation = BindingDeclarationLocation | BindingRefLocation;
 
-export type BindingRefLocation = {
-  type: "ref",
-  start: SourceLocation,
-  end: SourceLocation,
-  meta?: BindingMetaValue | null,
-};
-export type BindingDeclarationLocation = {
-  type: BindingDeclarationType,
-
-  start: SourceLocation,
-  end: SourceLocation,
-
-  // The overall location of the declaration that this binding is part of.
-  declaration: {
-    start: SourceLocation,
-    end: SourceLocation,
-  },
-
-  // If this declaration was an import, include the name of the imported
-  // binding that this binding references.
-  importName?: string,
-};
-export type BindingData = {
-  type: BindingType,
-  refs: Array<BindingLocation>,
-};
 
 // Location information about the expression immediartely surrounding a
 // given binding reference.
-export type BindingMetaValue =
-  | {
-      type: "inherit",
-      start: SourceLocation,
-      end: SourceLocation,
-      parent: BindingMetaValue | null,
-    }
-  | {
-      type: "call",
-      start: SourceLocation,
-      end: SourceLocation,
-      parent: BindingMetaValue | null,
-    }
-  | {
-      type: "member",
-      start: SourceLocation,
-      end: SourceLocation,
-      property: string,
-      parent: BindingMetaValue | null,
-    };
 
-export type ScopeBindingList = {
-  [name: string]: BindingData,
-};
 
-export type SourceScope = {
-  type: "object" | "function" | "block",
-  scopeKind: string,
-  displayName: string,
-  start: SourceLocation,
-  end: SourceLocation,
-  bindings: ScopeBindingList,
-};
 
-export type ParsedScope = SourceScope & {
-  children: ?(ParsedScope[]),
-};
 
-export type ParseJSScopeVisitor = {
-  traverseVisitor: any,
-  toParsedScopes: () => ParsedScope[],
-};
 
-type TempScope = {
-  type: "object" | "function" | "function-body" | "block" | "module",
-  displayName: string,
-  parent: TempScope | null,
-  children: Array<TempScope>,
-  loc: BabelLocation,
-  bindings: ScopeBindingList,
-};
 
-type ScopeCollectionVisitorState = {
-  sourceId: SourceId,
-  inType: Node | null,
-  freeVariables: Map<string, Array<BindingLocation>>,
-  freeVariableStack: Array<Map<string, Array<BindingLocation>>>,
-  scope: TempScope,
-  scopeStack: Array<TempScope>,
-  declarationBindingIds: Set<Node>,
-};
 
-function isGeneratedId(id: string) {
+function isGeneratedId(id) {
   return !/\/originalSource/.test(id);
 }
 
-export function parseSourceScopes(sourceId: SourceId): ?Array<ParsedScope> {
+export function parseSourceScopes(sourceId) {
   const ast = getAst(sourceId);
   if (isEmpty(ast)) {
     return null;
@@ -156,7 +56,7 @@ export function parseSourceScopes(sourceId: SourceId): ?Array<ParsedScope> {
   return buildScopeList(ast, sourceId);
 }
 
-export function buildScopeList(ast: Node, sourceId: SourceId) {
+export function buildScopeList(ast, sourceId) {
   const { global, lexical } = createGlobalScope(ast, sourceId);
 
   const state = {
@@ -188,7 +88,7 @@ export function buildScopeList(ast: Node, sourceId: SourceId) {
   // code is an ES6 module rather than a script.
   if (
     isGeneratedId(sourceId) ||
-    ((ast: any).program.sourceType === "script" && !looksLikeCommonJS(global))
+    ((ast).program.sourceType === "script" && !looksLikeCommonJS(global))
   ) {
     stripModuleScope(global);
   }
@@ -196,7 +96,7 @@ export function buildScopeList(ast: Node, sourceId: SourceId) {
   return toParsedScopes([global], sourceId) || [];
 }
 
-function toParsedScopes(children: TempScope[], sourceId: SourceId): ?(ParsedScope[]) {
+function toParsedScopes(children, sourceId) {
   if (!children || children.length === 0) {
     return undefined;
   }
@@ -214,21 +114,17 @@ function toParsedScopes(children: TempScope[], sourceId: SourceId): ?(ParsedScop
 }
 
 function createTempScope(
-  type: "object" | "function" | "function-body" | "block" | "module",
-  displayName: string,
-  parent: TempScope | null,
-  loc: {
-    start: SourceLocation,
-    end: SourceLocation,
-  }
-): TempScope {
+  type,
+  displayName,
+  parent,
+  loc) {
   const result = {
     type,
     displayName,
     parent,
     children: [],
     loc,
-    bindings: (Object.create(null): any),
+    bindings: (Object.create(null)),
   };
   if (parent) {
     parent.children.push(result);
@@ -236,14 +132,10 @@ function createTempScope(
   return result;
 }
 function pushTempScope(
-  state: ScopeCollectionVisitorState,
-  type: "object" | "function" | "function-body" | "block" | "module",
-  displayName: string,
-  loc: {
-    start: SourceLocation,
-    end: SourceLocation,
-  }
-): TempScope {
+  state,
+  type,
+  displayName,
+  loc) {
   const scope = createTempScope(type, displayName, state.scope, loc);
 
   state.scope = scope;
@@ -253,11 +145,11 @@ function pushTempScope(
   return scope;
 }
 
-function isNode(node?: Node, type: string): boolean {
+function isNode(node, type) {
   return node ? node.type === type : false;
 }
 
-function getVarScope(scope: TempScope): TempScope {
+function getVarScope(scope) {
   let s = scope;
   while (s.type !== "function" && s.type !== "module") {
     if (!s.parent) {
@@ -268,7 +160,7 @@ function getVarScope(scope: TempScope): TempScope {
   return s;
 }
 
-function fromBabelLocation(location: BabelLocation, sourceId: SourceId): SourceLocation {
+function fromBabelLocation(location, sourceId) {
   return {
     sourceId,
     line: location.line,
@@ -277,12 +169,12 @@ function fromBabelLocation(location: BabelLocation, sourceId: SourceId): SourceL
 }
 
 function parseDeclarator(
-  declaratorId: Node,
-  targetScope: TempScope,
-  type: BindingType,
-  locationType: BindingDeclarationType,
-  declaration: Node,
-  state: ScopeCollectionVisitorState
+  declaratorId,
+  targetScope,
+  type,
+  locationType,
+  declaration,
+  state
 ) {
   if (isNode(declaratorId, "Identifier")) {
     let existing = targetScope.bindings[declaratorId.name];
@@ -348,9 +240,9 @@ function isLexicalVariable(node) {
 }
 
 function createGlobalScope(
-  ast: Node,
-  sourceId: SourceId
-): { global: TempScope, lexical: TempScope } {
+  ast,
+  sourceId
+) {
   const global = createTempScope("object", "Global", null, {
     start: fromBabelLocation(ast.loc.start, sourceId),
     end: fromBabelLocation(ast.loc.end, sourceId),
@@ -366,7 +258,7 @@ function createGlobalScope(
 
 const scopeCollectionVisitor = {
   // eslint-disable-next-line complexity
-  enter(node: Node, ancestors: TraversalAncestors, state: ScopeCollectionVisitorState) {
+  enter(node, ancestors, state) {
     state.scopeStack.push(state.scope);
 
     const parentNode = ancestors.length === 0 ? null : ancestors[ancestors.length - 1].node;
@@ -733,7 +625,7 @@ const scopeCollectionVisitor = {
       state.inType = node;
     }
   },
-  exit(node: Node, ancestors: TraversalAncestors, state: ScopeCollectionVisitorState) {
+  exit(node, ancestors, state) {
     const currentScope = state.scope;
     const parentScope = state.scopeStack.pop();
     if (!parentScope) {
@@ -780,7 +672,7 @@ const scopeCollectionVisitor = {
   },
 };
 
-function isOpeningJSXIdentifier(node: Node, ancestors: TraversalAncestors): boolean {
+function isOpeningJSXIdentifier(node, ancestors) {
   if (!t.isJSXIdentifier(node)) {
     return false;
   }
@@ -799,11 +691,11 @@ function isOpeningJSXIdentifier(node: Node, ancestors: TraversalAncestors): bool
 }
 
 function buildMetaBindings(
-  sourceId: SourceId,
-  node: Node,
-  ancestors: TraversalAncestors,
-  parentIndex: number = ancestors.length - 1
-): BindingMetaValue | null {
+  sourceId,
+  node,
+  ancestors,
+  parentIndex = ancestors.length - 1
+) {
   if (parentIndex <= 1) {
     return null;
   }
@@ -888,7 +780,7 @@ function buildMetaBindings(
   return null;
 }
 
-function looksLikeCommonJS(rootScope: TempScope): boolean {
+function looksLikeCommonJS(rootScope) {
   const hasRefs = name => rootScope.bindings[name] && rootScope.bindings[name].refs.length > 0;
 
   return (
@@ -900,7 +792,7 @@ function looksLikeCommonJS(rootScope: TempScope): boolean {
   );
 }
 
-function stripModuleScope(rootScope: TempScope): void {
+function stripModuleScope(rootScope) {
   const rootLexicalScope = rootScope.children[0];
   const moduleScope = rootLexicalScope.children[0];
   if (moduleScope.type !== "module") {

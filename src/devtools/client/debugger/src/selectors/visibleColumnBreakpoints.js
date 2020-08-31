@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-// @flow
+// 
 
 import { groupBy } from "lodash";
 import { createSelector } from "reselect";
@@ -18,26 +18,11 @@ import { getVisibleBreakpoints } from "./visibleBreakpoints";
 import { sortSelectedLocations } from "../utils/location";
 import { getLineText } from "../utils/source";
 
-import type { Selector, State } from "../reducers/types";
 
-import type {
-  SourceLocation,
-  PartialPosition,
-  Breakpoint,
-  Range,
-  BreakpointPositions,
-  BreakpointPosition,
-  SourceWithContent,
-} from "../types";
 
-export type ColumnBreakpoint = {|
-  +location: SourceLocation,
-  +breakpoint: ?Breakpoint,
-|};
 
-export type ColumnBreakpoints = Array<ColumnBreakpoint>;
 
-function contains(location: PartialPosition, range: Range) {
+function contains(location, range) {
   return (
     location.line >= range.start.line &&
     location.line <= range.end.line &&
@@ -51,7 +36,7 @@ function groupBreakpoints(breakpoints, selectedSource) {
     return {};
   }
 
-  const map: any = groupBy(
+  const map = groupBy(
     breakpoints.filter(breakpoint => !breakpoint.options.hidden),
     breakpoint => breakpoint.location.line
   );
@@ -107,8 +92,8 @@ function filterInLine(positions, selectedSource, selectedContent) {
   });
 }
 
-function formatPositions(positions: BreakpointPosition[], selectedSource, breakpointMap) {
-  return (positions: any).map(location => {
+function formatPositions(positions, selectedSource, breakpointMap) {
+  return (positions).map(location => {
     return {
       location,
       breakpoint: findBreakpoint(location, breakpointMap),
@@ -116,15 +101,15 @@ function formatPositions(positions: BreakpointPosition[], selectedSource, breakp
   });
 }
 
-function convertToList(breakpointPositions: BreakpointPositions): BreakpointPosition[] {
-  return ([].concat(...Object.values(breakpointPositions)): any);
+function convertToList(breakpointPositions) {
+  return ([].concat(...Object.values(breakpointPositions)));
 }
 
 export function getColumnBreakpoints(
-  positions: BreakpointPosition[],
-  breakpoints: ?(Breakpoint[]),
-  viewport: ?Range,
-  selectedSource: ?SourceWithContent
+  positions,
+  breakpoints,
+  viewport,
+  selectedSource
 ) {
   if (!positions || !selectedSource) {
     return [];
@@ -161,7 +146,7 @@ const getVisibleBreakpointPositions = createSelector(
   }
 );
 
-export const visibleColumnBreakpoints: Selector<ColumnBreakpoints> = createSelector(
+export const visibleColumnBreakpoints = createSelector(
   getVisibleBreakpointPositions,
   getVisibleBreakpoints,
   getViewport,
@@ -170,9 +155,9 @@ export const visibleColumnBreakpoints: Selector<ColumnBreakpoints> = createSelec
 );
 
 export function getFirstBreakpointPosition(
-  state: State,
-  { line, sourceId }: SourceLocation
-): ?BreakpointPosition {
+  state,
+  { line, sourceId }
+) {
   const positions = getBreakpointPositionsForSource(state, sourceId);
   const source = getSource(state, sourceId);
 

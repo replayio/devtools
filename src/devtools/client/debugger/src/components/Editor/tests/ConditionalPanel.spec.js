@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import React from "react";
 import { mount } from "enzyme";
 import { ConditionalPanel } from "../ConditionalPanel";
@@ -12,12 +12,12 @@ import * as mocks from "../../../utils/test-mockup";
 const source = mocks.makeMockSource();
 
 function generateDefaults(
-  overrides: Object,
-  log: boolean,
-  line: number,
-  column: number,
-  condition: ?string,
-  logValue: ?string
+  overrides,
+  log,
+  line,
+  column,
+  condition,
+  logValue
 ) {
   const breakpoint = mocks.makeMockBreakpoint(source, line, column);
   breakpoint.options.condition = condition;
@@ -56,11 +56,11 @@ function generateDefaults(
 }
 
 function render(
-  log: boolean,
-  line: number,
-  column: number,
-  condition: ?string,
-  logValue: ?string,
+  log,
+  line,
+  column,
+  condition,
+  logValue,
   overrides = {}
 ) {
   const defaults = generateDefaults(overrides, log, line, column, condition, logValue);

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import {
   getActiveSearch,
@@ -15,16 +15,13 @@ import {
   getProjectDirectoryRoot,
 } from "../selectors";
 import { selectSource } from "../actions/sources/select";
-import type { ThunkArgs, panelPositionType } from "./types";
 import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { searchContents } from "./file-search";
 import { copyToTheClipboard } from "../utils/clipboard";
 import { isFulfilled } from "../utils/async-value";
 
-import type { SourceLocation, Context, Source } from "../types";
-import type { ActiveSearchType, OrientationType, SelectedPrimaryPaneTabType } from "../reducers/ui";
 
-export function setPrimaryPaneTab(tabName: SelectedPrimaryPaneTabType) {
+export function setPrimaryPaneTab(tabName) {
   return { type: "SET_PRIMARY_PANE_TAB", tabName };
 }
 
@@ -35,8 +32,8 @@ export function closeActiveSearch() {
   };
 }
 
-export function setActiveSearch(activeSearch?: ActiveSearchType) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function setActiveSearch(activeSearch) {
+  return ({ dispatch, getState }) => {
     const activeSearchState = getActiveSearch(getState());
     if (activeSearchState === activeSearch) {
       return;
@@ -53,8 +50,8 @@ export function setActiveSearch(activeSearch?: ActiveSearchType) {
   };
 }
 
-export function updateActiveFileSearch(cx: Context) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function updateActiveFileSearch(cx) {
+  return ({ dispatch, getState }) => {
     const isFileSearchOpen = getActiveSearch(getState()) === "file";
     const fileSearchQuery = getFileSearchQuery(getState());
     if (isFileSearchOpen && fileSearchQuery) {
@@ -64,8 +61,8 @@ export function updateActiveFileSearch(cx: Context) {
   };
 }
 
-export function toggleFrameworkGrouping(toggleValue: boolean) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function toggleFrameworkGrouping(toggleValue) {
+  return ({ dispatch, getState }) => {
     dispatch({
       type: "TOGGLE_FRAMEWORK_GROUPING",
       value: toggleValue,
@@ -73,8 +70,8 @@ export function toggleFrameworkGrouping(toggleValue: boolean) {
   };
 }
 
-export function toggleInlinePreview(toggleValue: boolean) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function toggleInlinePreview(toggleValue) {
+  return ({ dispatch, getState }) => {
     dispatch({
       type: "TOGGLE_INLINE_PREVIEW",
       value: toggleValue,
@@ -82,8 +79,8 @@ export function toggleInlinePreview(toggleValue: boolean) {
   };
 }
 
-export function showSource(cx: Context, sourceId: string) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function showSource(cx, sourceId) {
+  return ({ dispatch, getState }) => {
     const source = getSource(getState(), sourceId);
     if (!source) {
       return;
@@ -105,8 +102,8 @@ export function showSource(cx: Context, sourceId: string) {
   };
 }
 
-export function togglePaneCollapse(position: panelPositionType, paneCollapsed: boolean) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function togglePaneCollapse(position, paneCollapsed) {
+  return ({ dispatch, getState }) => {
     const prevPaneCollapse = getPaneCollapse(getState(), position);
     if (prevPaneCollapse === paneCollapsed) {
       return;
@@ -124,15 +121,15 @@ export function togglePaneCollapse(position: panelPositionType, paneCollapsed: b
  * @memberof actions/sources
  * @static
  */
-export function highlightLineRange(location: { start: number, end: number, sourceId: string }) {
+export function highlightLineRange(location) {
   return {
     type: "HIGHLIGHT_LINES",
     location,
   };
 }
 
-export function flashLineRange(location: { start: number, end: number, sourceId: string }) {
-  return ({ dispatch }: ThunkArgs) => {
+export function flashLineRange(location) {
+  return ({ dispatch }) => {
     dispatch(highlightLineRange(location));
     setTimeout(() => dispatch(clearHighlightLineRange()), 200);
   };
@@ -148,7 +145,7 @@ export function clearHighlightLineRange() {
   };
 }
 
-export function openConditionalPanel(location: ?SourceLocation, log: boolean = false) {
+export function openConditionalPanel(location, log = false) {
   if (!location) {
     return;
   }
@@ -166,7 +163,7 @@ export function closeConditionalPanel() {
   };
 }
 
-export function clearProjectDirectoryRoot(cx: Context) {
+export function clearProjectDirectoryRoot(cx) {
   return {
     type: "SET_PROJECT_DIRECTORY_ROOT",
     cx,
@@ -174,8 +171,8 @@ export function clearProjectDirectoryRoot(cx: Context) {
   };
 }
 
-export function setProjectDirectoryRoot(cx: Context, newRoot: string) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function setProjectDirectoryRoot(cx, newRoot) {
+  return ({ dispatch, getState }) => {
     const threadActor = startsWithThreadActor(getState(), newRoot);
 
     let curRoot = getProjectDirectoryRoot(getState());
@@ -210,16 +207,16 @@ export function updateViewport() {
   };
 }
 
-export function updateCursorPosition(cursorPosition: SourceLocation) {
+export function updateCursorPosition(cursorPosition) {
   return { type: "SET_CURSOR_POSITION", cursorPosition };
 }
 
-export function setOrientation(orientation: OrientationType) {
+export function setOrientation(orientation) {
   return { type: "SET_ORIENTATION", orientation };
 }
 
-export function copyToClipboard(source: Source) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function copyToClipboard(source) {
+  return ({ dispatch, getState }) => {
     const content = getSourceContent(getState(), source.id);
     if (content && isFulfilled(content) && content.value.type === "text") {
       copyToTheClipboard(content.value.value);

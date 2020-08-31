@@ -2,17 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-import type { SourceId, AstSource } from "./types";
 
-const cachedSources: Map<SourceId, AstSource> = new Map();
+const cachedSources = new Map();
 
-export function setSource(source: AstSource) {
+export function setSource(source) {
   cachedSources.set(source.id, source);
 }
 
-export function getSource(sourceId: SourceId): AstSource {
+export function getSource(sourceId) {
   const source = cachedSources.get(sourceId);
   if (!source) {
     throw new Error(`Parser: source ${sourceId} was not provided.`);

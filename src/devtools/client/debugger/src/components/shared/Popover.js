@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import React, { Component } from "react";
 import classNames from "classnames";
 import BracketArrow from "./BracketArrow";
@@ -10,35 +10,15 @@ import SmartGap from "./SmartGap";
 
 import "./Popover.css";
 
-type Props = {
-  editorRef: ?HTMLDivElement,
-  targetPosition: Object,
-  children: ?React$Element<any>,
-  target: HTMLDivElement,
-  type?: "popover" | "tooltip",
-  mouseout: Function,
-};
 
-type Orientation = "up" | "down" | "right";
-type TargetMid = {
-  x: number,
-  y: number,
-};
-export type Coords = {
-  left: number,
-  top: number,
-  targetMid: TargetMid,
-  orientation: Orientation,
-};
 
-type State = { coords: Coords };
 
-class Popover extends Component<Props, State> {
-  $popover: ?HTMLDivElement;
-  $tooltip: ?HTMLDivElement;
-  $gap: ?HTMLDivElement;
-  timerId: ?TimeoutID;
-  wasOnGap: boolean;
+class Popover extends Component {
+  $popover;
+  $tooltip;
+  $gap;
+  timerId;
+  wasOnGap;
   state = {
     coords: {
       left: 0,
@@ -48,8 +28,8 @@ class Popover extends Component<Props, State> {
     },
   };
   firstRender = true;
-  gapHeight: number;
-  gapHeight: number;
+  gapHeight;
+  gapHeight;
 
   static defaultProps = {
     type: "popover",
@@ -108,10 +88,10 @@ class Popover extends Component<Props, State> {
   };
 
   calculateLeft(
-    target: ClientRect,
-    editor: ClientRect,
-    popover: ClientRect,
-    orientation?: Orientation
+    target,
+    editor,
+    popover,
+    orientation
   ) {
     const estimatedLeft = target.left;
     const estimatedRight = estimatedLeft + popover.width;
@@ -127,9 +107,9 @@ class Popover extends Component<Props, State> {
   }
 
   calculateTopForRightOrientation = (
-    target: ClientRect,
-    editor: ClientRect,
-    popover: ClientRect
+    target,
+    editor,
+    popover
   ) => {
     if (popover.height <= editor.height) {
       const rightOrientationTop = target.top - popover.height / 2;
@@ -145,7 +125,7 @@ class Popover extends Component<Props, State> {
     return editor.top - target.height;
   };
 
-  calculateOrientation(target: ClientRect, editor: ClientRect, popover: ClientRect) {
+  calculateOrientation(target, editor, popover) {
     const estimatedBottom = target.bottom + popover.height;
     if (editor.bottom > estimatedBottom) {
       return "down";
@@ -159,10 +139,10 @@ class Popover extends Component<Props, State> {
   }
 
   calculateTop = (
-    target: ClientRect,
-    editor: ClientRect,
-    popover: ClientRect,
-    orientation?: string
+    target,
+    editor,
+    popover,
+    orientation
   ) => {
     if (orientation === "down") {
       return target.bottom;
@@ -257,7 +237,7 @@ class Popover extends Component<Props, State> {
     );
   }
 
-  getPopoverArrow(orientation: Orientation, left: number, top: number) {
+  getPopoverArrow(orientation, left, top) {
     let arrowProps = {};
 
     if (orientation === "up") {

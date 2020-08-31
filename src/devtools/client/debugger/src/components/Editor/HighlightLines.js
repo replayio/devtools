@@ -2,22 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import { Component } from "react";
 import { range, isEmpty } from "lodash";
 import { connect } from "../../utils/connect";
 import { getHighlightedLineRange } from "../../selectors";
 
-type OwnProps = {|
-  editor: Object,
-|};
-type Props = {
-  highlightedLineRange: Object,
-  editor: Object,
-};
 
-class HighlightLines extends Component<Props> {
-  highlightLineRange: Function;
+class HighlightLines extends Component {
+  highlightLineRange;
 
   componentDidMount() {
     this.highlightLineRange();
@@ -77,6 +70,6 @@ class HighlightLines extends Component<Props> {
   }
 }
 
-export default connect<Props, OwnProps, _, _, _, _>(state => ({
+export default connect(state => ({
   highlightedLineRange: getHighlightedLineRange(state),
 }))(HighlightLines);

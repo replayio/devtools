@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-// @flow
+// 
 
 /* Checks to see if the root element is available and
  * if the element is visible. We check the width of the element
@@ -15,7 +15,7 @@ export function isVisible() {
 
 /* Gets the line numbers width in the code editor
  */
-export function getLineNumberWidth(editor: Object) {
+export function getLineNumberWidth(editor) {
   const gutters = editor.display.gutters;
   const lineNumbers = gutters.querySelector(".CodeMirror-linenumbers");
   return lineNumbers && lineNumbers.clientWidth;
@@ -27,7 +27,7 @@ export function getLineNumberWidth(editor: Object) {
  * beneath the line numbers. This makes it easy to be flexible with
  * how we overlay breakpoints.
  */
-export function resizeBreakpointGutter(editor: Object) {
+export function resizeBreakpointGutter(editor) {
   const gutters = editor.display.gutters;
   const breakpoints = gutters.querySelector(".breakpoints");
   if (breakpoints) {
@@ -39,7 +39,7 @@ export function resizeBreakpointGutter(editor: Object) {
  * Forces the left toggle button in source header to be the same size
  * as the line numbers gutter.
  */
-export function resizeToggleButton(editor: Object) {
+export function resizeToggleButton(editor) {
   const toggleButton = document.querySelector(".source-header .toggle-button-start");
   if (toggleButton) {
     toggleButton.style.width = `${getLineNumberWidth(editor)}px`;

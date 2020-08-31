@@ -3,14 +3,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React from "react";
 import { shallow } from "enzyme";
 
 import DebugLine from "../DebugLine";
 
-import type { SourceWithContent } from "../../../types";
 import * as asyncValue from "../../../utils/async-value";
 import { createSourceObject } from "../../../utils/test-head";
 import { setDocument, toEditorLine } from "../../../utils/editor";
@@ -36,7 +35,7 @@ function generateDefaults(editor, overrides) {
     source: ({
       ...createSourceObject("foo"),
       content: null,
-    }: SourceWithContent),
+    }),
     ...overrides,
   };
 }

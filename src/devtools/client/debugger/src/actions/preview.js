@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { isConsole } from "../utils/preview";
 import { findBestMatchExpression } from "../utils/ast";
@@ -20,9 +20,6 @@ import {
   getPreviewCount,
 } from "../selectors";
 
-import type { Action, ThunkArgs } from "./types";
-import type { Position, Context } from "../types";
-import type { AstLocation } from "../workers/parser";
 
 function findExpressionMatch(state, codeMirror, tokenPos) {
   const source = getSelectedSource(state);
@@ -41,8 +38,8 @@ function findExpressionMatch(state, codeMirror, tokenPos) {
   return match;
 }
 
-export function updatePreview(cx: Context, target: HTMLElement, tokenPos: Object, codeMirror: any) {
-  return ({ dispatch, getState, client, sourceMaps }: ThunkArgs) => {
+export function updatePreview(cx, target, tokenPos, codeMirror) {
+  return ({ dispatch, getState, client, sourceMaps }) => {
     const cursorPos = target.getBoundingClientRect();
 
     if (!isSelectedFrameVisible(getState()) || !isLineInScope(getState(), tokenPos.line)) {
@@ -65,14 +62,14 @@ export function updatePreview(cx: Context, target: HTMLElement, tokenPos: Object
 }
 
 export function setPreview(
-  cx: Context,
-  expression: string,
-  location: AstLocation,
-  tokenPos: Position,
-  cursorPos: ClientRect,
-  target: HTMLElement
+  cx,
+  expression,
+  location,
+  tokenPos,
+  cursorPos,
+  target
 ) {
-  return async ({ dispatch, getState, client, sourceMaps }: ThunkArgs) => {
+  return async ({ dispatch, getState, client, sourceMaps }) => {
     dispatch({ type: "START_PREVIEW" });
     const previewCount = getPreviewCount(getState());
     if (getPreview(getState())) {
@@ -133,8 +130,8 @@ export function setPreview(
   };
 }
 
-export function clearPreview(cx: Context) {
-  return ({ dispatch, getState, client }: ThunkArgs) => {
+export function clearPreview(cx) {
+  return ({ dispatch, getState, client }) => {
     const currentSelection = getPreview(getState());
     if (!currentSelection) {
       return;
@@ -144,7 +141,7 @@ export function clearPreview(cx: Context) {
       ({
         type: "CLEAR_PREVIEW",
         cx,
-      }: Action)
+      })
     );
   };
 }

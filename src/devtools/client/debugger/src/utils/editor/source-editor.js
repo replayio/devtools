@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 /**
  * CodeMirror source editor utils
@@ -34,37 +34,21 @@ require("codemirror/mode/rust/rust");
 require("./source-editor.css");
 
 // NOTE: we should eventually use debugger-html context type mode
-type Mode = string | Object;
-export type AlignOpts = "top" | "center" | "bottom";
 
 // Maximum allowed margin (in number of lines) from top or bottom of the editor
 // while shifting to a line which was initially out of view.
 const MAX_VERTICAL_OFFSET = 3;
 
-type SourceEditorOpts = {
-  enableCodeFolding: boolean,
-  extraKeys: Object,
-  gutters: string[],
-  foldGutter: boolean,
-  lineNumbers: boolean,
-  lineWrapping: boolean,
-  matchBrackets: boolean,
-  mode: string,
-  readOnly: boolean,
-  showAnnotationRuler: boolean,
-  theme: string,
-  value: string,
-};
 
 export default class SourceEditor {
-  opts: SourceEditorOpts;
-  editor: any;
+  opts;
+  editor;
 
-  constructor(opts: SourceEditorOpts) {
+  constructor(opts) {
     this.opts = opts;
   }
 
-  appendToLocalElement(node: any) {
+  appendToLocalElement(node) {
     this.editor = CodeMirror(node, this.opts);
   }
 
@@ -75,7 +59,7 @@ export default class SourceEditor {
     }
   }
 
-  get codeMirror(): any {
+  get codeMirror() {
     return this.editor;
   }
 
@@ -83,7 +67,7 @@ export default class SourceEditor {
     return CodeMirror;
   }
 
-  setText(str: string) {
+  setText(str) {
     this.editor.setValue(str);
   }
 
@@ -91,7 +75,7 @@ export default class SourceEditor {
     return this.editor.getValue();
   }
 
-  setMode(value: Mode) {
+  setMode(value) {
     this.editor.setOption("mode", value);
   }
 
@@ -99,7 +83,7 @@ export default class SourceEditor {
    * Replaces the current document with a new source document
    * @memberof utils/source-editor
    */
-  replaceDocument(doc: any) {
+  replaceDocument(doc) {
     this.editor.swapDoc(doc);
   }
 
@@ -118,7 +102,7 @@ export default class SourceEditor {
    * bottom.
    * @memberof utils/source-editor
    */
-  alignLine(line: number, align: AlignOpts = "top") {
+  alignLine(line, align = "top") {
     const cm = this.editor;
     const editorClientRect = cm.getWrapperElement().getBoundingClientRect();
 
@@ -154,7 +138,7 @@ export default class SourceEditor {
    * Scrolls the view such that the given line number is the first visible line.
    * @memberof utils/source-editor
    */
-  setFirstVisibleLine(line: number) {
+  setFirstVisibleLine(line) {
     const { top } = this.editor.charCoords({ line, ch: 0 }, "local");
     this.editor.scrollTo(0, top);
   }

@@ -2,10 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-import type { ActorId, ExecutionPoint } from "../../types";
-import type { ThunkArgs } from "../types";
 
 import { getSourceByActorId, getCurrentThread, getSelectedFrame } from "../../selectors";
 import { zip } from "lodash";
@@ -13,7 +11,7 @@ import { zip } from "lodash";
 const { ThreadFront } = require("protocol/thread");
 
 export function setFramePositions() {
-  return async ({ dispatch, getState, client }: ThunkArgs) => {
+  return async ({ dispatch, getState, client }) => {
     const thread = getCurrentThread(getState());
     const frame = getSelectedFrame(getState(), thread);
     if (!frame) {

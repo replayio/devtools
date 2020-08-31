@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { PureComponent } from "react";
 import { connect } from "../../utils/connect";
@@ -13,8 +13,6 @@ import SourceIcon from "../shared/SourceIcon";
 import { CloseButton } from "../shared/Button";
 import { copyToTheClipboard } from "../../utils/clipboard";
 
-import type { Source, Context } from "../../types";
-import type { TabsSources } from "../../reducers/types";
 
 import actions from "../../actions";
 
@@ -36,42 +34,17 @@ import {
   getHasSiblingOfSameName,
   getContext,
 } from "../../selectors";
-import type { ActiveSearchType } from "../../selectors";
 
 import classnames from "classnames";
 
-type OwnProps = {|
-  source: Source,
-  onDragOver: Function,
-  onDragStart: Function,
-  onDragEnd: Function,
-|};
-type Props = {
-  cx: Context,
-  tabSources: TabsSources,
-  selectedSource: ?Source,
-  source: Source,
-  onDragOver: Function,
-  onDragStart: Function,
-  onDragEnd: Function,
-  activeSearch: ?ActiveSearchType,
-  hasSiblingOfSameName: boolean,
-  selectSource: typeof actions.selectSource,
-  closeTab: typeof actions.closeTab,
-  closeTabs: typeof actions.closeTabs,
-  copyToClipboard: typeof actions.copyToClipboard,
-  togglePrettyPrint: typeof actions.togglePrettyPrint,
-  showSource: typeof actions.showSource,
-  toggleBlackBox: typeof actions.toggleBlackBox,
-};
 
-class Tab extends PureComponent<Props> {
-  onTabContextMenu = (event: SyntheticClipboardEvent<HTMLDivElement>, tab: string) => {
+class Tab extends PureComponent {
+  onTabContextMenu = (event, tab) => {
     event.preventDefault();
     this.showContextMenu(event, tab);
   };
 
-  showContextMenu(e: SyntheticClipboardEvent<HTMLDivElement>, tab: string) {
+  showContextMenu(e, tab) {
     const {
       cx,
       closeTab,
@@ -263,7 +236,7 @@ const mapStateToProps = (state, { source }) => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
+export default connect(
   mapStateToProps,
   {
     selectSource: actions.selectSource,

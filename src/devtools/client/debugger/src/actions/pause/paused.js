@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import {
   getHiddenBreakpoint,
   isEvaluatingExpression,
@@ -19,8 +19,6 @@ import assert from "../../utils/assert";
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
 
-import type { Pause } from "../../types";
-import type { ThunkArgs } from "../types";
 
 /**
  * Debugger has just paused
@@ -30,7 +28,7 @@ import type { ThunkArgs } from "../types";
  * @static
  */
 export function paused(pauseInfo) {
-  return async function ({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
+  return async function ({ dispatch, getState, client, sourceMaps }) {
     const { thread, executionPoint } = pauseInfo;
 
     dispatch({ type: "PAUSED", thread, executionPoint });

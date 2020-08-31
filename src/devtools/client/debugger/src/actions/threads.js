@@ -2,17 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { differenceBy } from "lodash";
-import type { Action, ThunkArgs } from "./types";
 import { removeSourceActors } from "./source-actors";
 import { newGeneratedSources } from "./sources";
 
 import { getContext, getAllThreads, getThreads, getSourceActorsForThread } from "../selectors";
 
 export function updateThreads() {
-  return async function ({ dispatch, getState, client }: ThunkArgs) {
+  return async function ({ dispatch, getState, client }) {
     const cx = getContext(getState());
     const threads = await client.fetchThreads();
 
@@ -31,11 +30,11 @@ export function updateThreads() {
           type: "REMOVE_THREADS",
           cx,
           threads: removedThreads.map(t => t.actor),
-        }: Action)
+        })
       );
     }
     if (addedThreads.length > 0) {
-      dispatch(({ type: "INSERT_THREADS", cx, threads: addedThreads }: Action));
+      dispatch(({ type: "INSERT_THREADS", cx, threads: addedThreads }));
 
       // Fetch the sources and install breakpoints on any new workers.
       // NOTE: This runs in the background and fails quietly because it is
@@ -63,7 +62,7 @@ export function updateThreads() {
                 cx,
                 thread: thread.actor,
                 status: fetchedThread.serviceWorkerStatus,
-              }: Action)
+              })
             );
           }
         }
@@ -72,8 +71,8 @@ export function updateThreads() {
   };
 }
 
-export function ensureHasThread(thread: string) {
-  return async function ({ dispatch, getState, client }: ThunkArgs) {
+export function ensureHasThread(thread) {
+  return async function ({ dispatch, getState, client }) {
     const currentThreads = getAllThreads(getState());
     if (!currentThreads.some(t => t.actor == thread)) {
       await dispatch(updateThreads());

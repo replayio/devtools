@@ -2,9 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-import type { SourceContent } from "../types";
 import { DevToolsUtils } from "devtools-modules";
 
 /**
@@ -16,7 +15,7 @@ import { DevToolsUtils } from "devtools-modules";
  * @memberof utils/utils
  * @static
  */
-export function handleError(err: any) {
+export function handleError(err) {
   console.log("ERROR: ", err);
 }
 
@@ -24,7 +23,7 @@ export function handleError(err: any) {
  * @memberof utils/utils
  * @static
  */
-export function promisify(context: any, method: any, ...args: any): Promise<mixed> {
+export function promisify(context, method, ...args) {
   return new Promise((resolve, reject) => {
     args.push(response => {
       if (response.error) {
@@ -41,18 +40,18 @@ export function promisify(context: any, method: any, ...args: any): Promise<mixe
  * @memberof utils/utils
  * @static
  */
-export function endTruncateStr(str: any, size: number) {
+export function endTruncateStr(str, size) {
   if (str.length > size) {
     return `…${str.slice(str.length - size)}`;
   }
   return str;
 }
 
-export function waitForMs(ms: number): Promise<void> {
+export function waitForMs(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function downloadFile(content: SourceContent, fileName: string) {
+export function downloadFile(content, fileName) {
   if (content.type !== "text") {
     return;
   }

@@ -2,26 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { prefs } from "../utils/prefs";
 
-import type { State } from "./types";
-import type {
-  EventListenerAction,
-  EventListenerActiveList,
-  EventListenerCategoryList,
-  EventListenerExpandedList,
-} from "../actions/types";
 
-export type EventListenersState = {|
-  +active: EventListenerActiveList,
-  +categories: EventListenerCategoryList,
-  +expanded: EventListenerExpandedList,
-  +logEventBreakpoints: boolean,
-|};
 
-export function initialEventListenerState(): EventListenersState {
+export function initialEventListenerState() {
   return {
     active: [],
     categories: [],
@@ -31,8 +18,8 @@ export function initialEventListenerState(): EventListenersState {
 }
 
 function update(
-  state: EventListenersState = initialEventListenerState(),
-  action: EventListenerAction
+  state = initialEventListenerState(),
+  action
 ) {
   switch (action.type) {
     case "UPDATE_EVENT_LISTENERS":
@@ -49,15 +36,15 @@ function update(
   }
 }
 
-export function getActiveEventListeners(state: State): EventListenerActiveList {
+export function getActiveEventListeners(state) {
   return state.eventListenerBreakpoints.active;
 }
 
-export function getEventListenerBreakpointTypes(state: State): EventListenerCategoryList {
+export function getEventListenerBreakpointTypes(state) {
   return state.eventListenerBreakpoints.categories;
 }
 
-export function getEventListenerExpanded(state: State): EventListenerExpandedList {
+export function getEventListenerExpanded(state) {
   return state.eventListenerBreakpoints.expanded;
 }
 

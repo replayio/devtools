@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { containsPosition, containsLocation, nodeContainsPosition } from "../utils/contains";
 
@@ -23,8 +23,8 @@ function getTestLoc() {
 // to undefined. Using zero instead causes test failures, and allowing it to be
 // undefined causes many flow errors in code manipulating AstPosition.
 // Fake a coercion of undefined to number as a workaround for now.
-function undefinedColumn(): number {
-  return (undefined: any);
+function undefinedColumn() {
+  return (undefined);
 }
 
 function startPos(lineOffset, columnOffset) {

@@ -2,19 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 // Maybe reuse file search's functions?
 
 import getMatches from "./get-matches";
 
-import type { SourceId, TextSourceContent } from "../../types";
 
 export function findSourceMatches(
-  sourceId: SourceId,
-  content: TextSourceContent,
-  queryText: string
-): Object[] {
+  sourceId,
+  content,
+  queryText
+) {
   if (queryText == "") {
     return [];
   }
@@ -48,7 +47,7 @@ const endRegex = new RegExp(
   ["([ !@#$%^&*()_+-=[]{};':\"\\|,.<>/?])", '[^ !@#$%^&*()_+-=[]{};\':"\\|,.<>/?]*$"/'].join("")
 );
 
-function truncateLine(text: string, column: number) {
+function truncateLine(text, column) {
   if (text.length < 100) {
     return {
       matchIndex: column,

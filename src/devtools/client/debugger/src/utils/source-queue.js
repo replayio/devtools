@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { throttle } from "lodash";
-import type { QueuedSourceData } from "../types";
 
 let newQueuedSources;
 let queuedSources;
@@ -20,15 +19,15 @@ async function dispatchNewSources() {
 const queue = throttle(dispatchNewSources, 100);
 
 export default {
-  initialize: (actions: Object) => {
+  initialize: (actions) => {
     newQueuedSources = actions.newQueuedSources;
     queuedSources = [];
   },
-  queue: (source: QueuedSourceData) => {
+  queue: (source) => {
     queuedSources.push(source);
     queue();
   },
-  queueSources: (sources: QueuedSourceData[]) => {
+  queueSources: (sources) => {
     if (sources.length > 0) {
       queuedSources = queuedSources.concat(sources);
       queue();

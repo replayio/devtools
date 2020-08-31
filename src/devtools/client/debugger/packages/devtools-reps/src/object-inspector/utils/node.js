@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 const { maybeEscapePropertyName } = require("../../reps/rep-utils");
 const ArrayRep = require("../../reps/array");
@@ -33,14 +33,6 @@ const NODE_TYPES = {
   BLOCK: Symbol("☲"),
 };
 
-import type {
-  CachedNodes,
-  GripProperties,
-  LoadedProperties,
-  Node,
-  ObjectInspectorItemContentsValue,
-  RdpGrip,
-} from "../types";
 
 let WINDOW_PROPERTIES = {};
 
@@ -48,25 +40,25 @@ if (typeof window === "object") {
   WINDOW_PROPERTIES = Object.getOwnPropertyNames(window);
 }
 
-function getType(item: Node): Symbol {
+function getType(item) {
   return item.type;
 }
 
-function getValue(item: Node): RdpGrip | ObjectInspectorItemContentsValue {
+function getValue(item) {
   return item.contents;
 }
 
-function getFront(item: Node): Object {
+function getFront(item) {
   return item && item.contents && item.contents.front;
 }
 
-function getActor(item: Node, roots) {
+function getActor(item, roots) {
   const isRoot = isNodeRoot(item, roots);
   const value = getValue(item);
   return isRoot || !value ? null : value.actor;
 }
 
-function isNodeRoot(item: Node, roots) {
+function isNodeRoot(item, roots) {
   const gripItem = getClosestGripNode(item);
   const value = getValue(gripItem);
 
@@ -79,51 +71,51 @@ function isNodeRoot(item: Node, roots) {
   );
 }
 
-function nodeIsBucket(item: Node): boolean {
+function nodeIsBucket(item) {
   return getType(item) === NODE_TYPES.BUCKET;
 }
 
-function nodeIsEntries(item: Node): boolean {
+function nodeIsEntries(item) {
   return getType(item) === NODE_TYPES.ENTRIES;
 }
 
-function nodeIsMapEntry(item: Node): boolean {
+function nodeIsMapEntry(item) {
   return GripMapEntryRep.supportsObject(getValue(item));
 }
 
-function nodeHasChildren(item: Node): boolean {
+function nodeHasChildren(item) {
   return getValue(item).hasChildren();
 }
 
-function nodeHasValue(item: Node): boolean {
+function nodeHasValue(item) {
   return item && item.contents && item.contents.hasOwnProperty("value");
 }
 
-function nodeHasGetterValue(item: Node): boolean {
+function nodeHasGetterValue(item) {
   return item && item.contents && item.contents.hasOwnProperty("getterValue");
 }
 
-function nodeIsObject(item: Node): boolean {
+function nodeIsObject(item) {
   const value = getValue(item);
   return value && value.isObject();
 }
 
-function nodeIsArrayLike(item: Node): boolean {
+function nodeIsArrayLike(item) {
   const value = getValue(item);
   return GripArrayRep.supportsObject(value) || ArrayRep.supportsObject(value);
 }
 
-function nodeIsFunction(item: Node): boolean {
+function nodeIsFunction(item) {
   const value = getValue(item);
   return value && value.className() === "Function";
 }
 
-function nodeIsOptimizedOut(item: Node): boolean {
+function nodeIsOptimizedOut(item) {
   const value = getValue(item);
   return !nodeHasChildren(item) && value && value.isUnavailable();
 }
 
-function nodeIsUninitializedBinding(item: Node): boolean {
+function nodeIsUninitializedBinding(item) {
   const value = getValue(item);
   return value && value.isUninitialized();
 }
@@ -131,7 +123,7 @@ function nodeIsUninitializedBinding(item: Node): boolean {
 // Used to check if an item represents a binding that exists in a sourcemap's
 // original file content, but does not match up with a binding found in the
 // generated code.
-function nodeIsUnmappedBinding(item: Node): boolean {
+function nodeIsUnmappedBinding(item) {
   return false;
   //const value = getValue(item);
   //return value && value.unmapped;
@@ -140,36 +132,36 @@ function nodeIsUnmappedBinding(item: Node): boolean {
 // Used to check if an item represents a binding that exists in the debugger's
 // parser result, but does not match up with a binding returned by the
 // devtools server.
-function nodeIsUnscopedBinding(item: Node): boolean {
+function nodeIsUnscopedBinding(item) {
   return false;
   //const value = getValue(item);
   //return value && value.unscoped;
 }
 
-function nodeIsMissingArguments(item: Node): boolean {
+function nodeIsMissingArguments(item) {
   return false;
   //const value = getValue(item);
   //return !nodeHasChildren(item) && value && value.missingArguments;
 }
 
-function nodeHasProperties(item: Node): boolean {
+function nodeHasProperties(item) {
   return !nodeHasChildren(item) && nodeIsObject(item);
 }
 
-function nodeIsPrimitive(item: Node): boolean {
+function nodeIsPrimitive(item) {
   const v = getValue(item);
   return v.isPrimitive() || v.isUninitialized() || v.isUnavailable();
 }
 
-function nodeIsDefaultProperties(item: Node): boolean {
+function nodeIsDefaultProperties(item) {
   return getType(item) === NODE_TYPES.DEFAULT_PROPERTIES;
 }
 
-function isDefaultWindowProperty(name: string): boolean {
+function isDefaultWindowProperty(name) {
   return WINDOW_PROPERTIES.includes(name);
 }
 
-function nodeIsPromise(item: Node): boolean {
+function nodeIsPromise(item) {
   const value = getValue(item);
   if (!value) {
     return false;
@@ -178,7 +170,7 @@ function nodeIsPromise(item: Node): boolean {
   return value.className() == "Promise";
 }
 
-function nodeIsProxy(item: Node): boolean {
+function nodeIsProxy(item) {
   const value = getValue(item);
   if (!value) {
     return false;
@@ -187,11 +179,11 @@ function nodeIsProxy(item: Node): boolean {
   return value.className() == "Proxy";
 }
 
-function nodeIsPrototype(item: Node): boolean {
+function nodeIsPrototype(item) {
   return item.name == "<prototype>";
 }
 
-function nodeIsWindow(item: Node): boolean {
+function nodeIsWindow(item) {
   const value = getValue(item);
   if (!value) {
     return false;
@@ -200,51 +192,51 @@ function nodeIsWindow(item: Node): boolean {
   return value.className() == "Window";
 }
 
-function nodeIsGetter(item: Node): boolean {
+function nodeIsGetter(item) {
   return getType(item) === NODE_TYPES.GET;
 }
 
-function nodeIsSetter(item: Node): boolean {
+function nodeIsSetter(item) {
   return getType(item) === NODE_TYPES.SET;
 }
 
-function nodeIsBlock(item: Node) {
+function nodeIsBlock(item) {
   return getValue(item).isScope();
   //return getType(item) === NODE_TYPES.BLOCK;
 }
 
-function nodeIsError(item: Node): boolean {
+function nodeIsError(item) {
   return ErrorRep.supportsObject(getValue(item));
 }
 
-function nodeIsLongString(item: Node): boolean {
+function nodeIsLongString(item) {
   return isLongString(getValue(item));
 }
 
-function nodeIsBigInt(item: Node): boolean {
+function nodeIsBigInt(item) {
   return BigIntRep.supportsObject(getValue(item));
 }
 
-function nodeHasFullText(item: Node): boolean {
+function nodeHasFullText(item) {
   const value = getValue(item);
   return nodeIsLongString(item) && value.hasOwnProperty("fullText");
 }
 
-function nodeHasGetter(item: Node): boolean {
+function nodeHasGetter(item) {
   const getter = getNodeGetter(item);
   return getter && getter.type !== "undefined";
 }
 
-function nodeHasSetter(item: Node): boolean {
+function nodeHasSetter(item) {
   const setter = getNodeSetter(item);
   return setter && setter.type !== "undefined";
 }
 
-function nodeHasAccessors(item: Node): boolean {
+function nodeHasAccessors(item) {
   return nodeHasGetter(item) || nodeHasSetter(item);
 }
 
-function nodeSupportsNumericalBucketing(item: Node): boolean {
+function nodeSupportsNumericalBucketing(item) {
   // We exclude elements with entries since it's the <entries> node
   // itself that can have buckets.
   return (
@@ -252,7 +244,7 @@ function nodeSupportsNumericalBucketing(item: Node): boolean {
   );
 }
 
-function nodeHasEntries(item: Node): boolean {
+function nodeHasEntries(item) {
   const value = getValue(item);
   if (!value) {
     return false;
@@ -267,14 +259,14 @@ function nodeHasEntries(item: Node): boolean {
   );
 }
 
-function nodeNeedsNumericalBuckets(item: Node): boolean {
+function nodeNeedsNumericalBuckets(item) {
   return (
     nodeSupportsNumericalBucketing(item) &&
     getNumericalPropertiesCount(item) > MAX_NUMERICAL_PROPERTIES
   );
 }
 
-function makeNodesForPromiseProperties(item: Node): Array<Node> {
+function makeNodesForPromiseProperties(item) {
   const {
     promiseState: { reason, value, state },
   } = getValue(item);
@@ -320,7 +312,7 @@ function makeNodesForPromiseProperties(item: Node): Array<Node> {
   return properties;
 }
 
-function makeNodesForProxyProperties(loadedProps: GripProperties, item: Node): Array<Node> {
+function makeNodesForProxyProperties(loadedProps, item) {
   const { proxyHandler, proxyTarget } = loadedProps;
 
   const isProxyHandlerFront = proxyHandler && proxyHandler.getGrip;
@@ -347,7 +339,7 @@ function makeNodesForProxyProperties(loadedProps: GripProperties, item: Node): A
   ];
 }
 
-function makeNodesForEntries(item: Node): Node {
+function makeNodesForEntries(item) {
   const nodeName = "<entries>";
 
   return createNode({
@@ -358,7 +350,7 @@ function makeNodesForEntries(item: Node): Node {
   });
 }
 
-function makeNodesForMapEntry(item: Node): Array<Node> {
+function makeNodesForMapEntry(item) {
   const nodeValue = getValue(item);
   if (!nodeValue || !nodeValue.preview) {
     return [];
@@ -389,17 +381,17 @@ function makeNodesForMapEntry(item: Node): Array<Node> {
   ];
 }
 
-function getNodeGetter(item: Node): ?Object {
+function getNodeGetter(item) {
   return undefined;
   //return item && item.contents ? item.contents.get : undefined;
 }
 
-function getNodeSetter(item: Node): ?Object {
+function getNodeSetter(item) {
   return undefined;
   //return item && item.contents ? item.contents.set : undefined;
 }
 
-function sortProperties(properties: Array<any>): Array<any> {
+function sortProperties(properties) {
   return properties.sort((a, b) => {
     // Sort numbers in ascending order and sort strings lexicographically
     const aInt = parseInt(a, 10);
@@ -413,7 +405,7 @@ function sortProperties(properties: Array<any>): Array<any> {
   });
 }
 
-function makeNumericalBuckets(parent: Node): Array<Node> {
+function makeNumericalBuckets(parent) {
   const numProperties = getNumericalPropertiesCount(parent);
 
   // We want to have at most a hundred slices.
@@ -446,10 +438,10 @@ function makeNumericalBuckets(parent: Node): Array<Node> {
 }
 
 function makeDefaultPropsBucket(
-  propertiesNames: Array<string>,
-  parent: Node,
-  ownProperties: Object
-): Array<Node> {
+  propertiesNames,
+  parent,
+  ownProperties
+) {
   const userPropertiesNames = [];
   const defaultProperties = [];
 
@@ -482,10 +474,10 @@ function makeDefaultPropsBucket(
 }
 
 function makeNodesForOwnProps(
-  propertiesNames: Array<string>,
-  parent: Node,
-  ownProperties: Object
-): Array<Node> {
+  propertiesNames,
+  parent,
+  ownProperties
+) {
   return propertiesNames.map(name => {
     const property = ownProperties[name];
 
@@ -514,7 +506,7 @@ function makeNodesForOwnProps(
   });
 }
 
-function makeNodesForProperties(objProps: GripProperties, parent: Node): Array<Node> {
+function makeNodesForProperties(objProps, parent) {
   const { ownProperties = {}, ownSymbols, prototype, safeGetterValues } = objProps;
 
   const parentValue = getValue(parent);
@@ -608,7 +600,7 @@ function makeNodesForProperties(objProps: GripProperties, parent: Node): Array<N
   return nodes;
 }
 
-function setNodeFullText(loadedProps: GripProperties, node: Node): Node {
+function setNodeFullText(loadedProps, node) {
   if (nodeHasFullText(node) || !nodeIsLongString(node)) {
     return node;
   }
@@ -623,7 +615,7 @@ function setNodeFullText(loadedProps: GripProperties, node: Node): Node {
   return node;
 }
 
-function makeNodeForPrototype(objProps: GripProperties, parent: Node): ?Node {
+function makeNodeForPrototype(objProps, parent) {
   const { prototype } = objProps || {};
 
   // Add the prototype if it exists and is not null
@@ -642,15 +634,7 @@ function makeNodeForPrototype(objProps: GripProperties, parent: Node): ?Node {
   return null;
 }
 
-function createNode(options: {
-  parent: Node,
-  name: string,
-  contents: any,
-  path?: string,
-  type?: Symbol,
-  meta?: Object,
-  propertyName?: string,
-}): ?Node {
+function createNode(options) {
   const { parent, name, propertyName, path, contents, type = NODE_TYPES.GRIP, meta } = options;
 
   if (contents === undefined) {
@@ -699,16 +683,12 @@ function createSetterNode({ parent, property, name }) {
   });
 }
 
-function setNodeChildren(node: Node, children: Array<Node>): Node {
+function setNodeChildren(node, children) {
   node.contents = children;
   return node;
 }
 
-function getChildren(options: {
-  cachedNodes: CachedNodes,
-  loadedProperties: LoadedProperties,
-  item: Node,
-}): Array<Node> {
+function getChildren(options) {
   const { cachedNodes, item, loadedProperties = new Map() } = options;
 
   const key = item.path;
@@ -740,11 +720,11 @@ function getPathExpression(item) {
   return item.name;
 }
 
-function getParent(item: Node): Node | null {
+function getParent(item) {
   return item.parent;
 }
 
-function getNumericalPropertiesCount(item: Node): number {
+function getNumericalPropertiesCount(item) {
   if (nodeIsBucket(item)) {
     return item.meta.endIndex - item.meta.startIndex + 1;
   }
@@ -769,7 +749,7 @@ function getNumericalPropertiesCount(item: Node): number {
   return 0;
 }
 
-function getClosestGripNode(item: Node): Node | null {
+function getClosestGripNode(item) {
   const type = getType(item);
   if (
     type !== NODE_TYPES.BUCKET &&
@@ -787,7 +767,7 @@ function getClosestGripNode(item: Node): Node | null {
   return getClosestGripNode(parent);
 }
 
-function getClosestNonBucketNode(item: Node): Node | null {
+function getClosestNonBucketNode(item) {
   const type = getType(item);
 
   if (type !== NODE_TYPES.BUCKET) {
@@ -802,7 +782,7 @@ function getClosestNonBucketNode(item: Node): Node | null {
   return getClosestNonBucketNode(parent);
 }
 
-function getParentGripNode(item: Node | null): Node | null {
+function getParentGripNode(item) {
   const parentNode = getParent(item);
   if (!parentNode) {
     return null;
@@ -811,7 +791,7 @@ function getParentGripNode(item: Node | null): Node | null {
   return getClosestGripNode(parentNode);
 }
 
-function getParentGripValue(item: Node | null): any {
+function getParentGripValue(item) {
   const parentGripNode = getParentGripNode(item);
   if (!parentGripNode) {
     return null;
@@ -820,7 +800,7 @@ function getParentGripValue(item: Node | null): any {
   return getValue(parentGripNode);
 }
 
-function getParentFront(item: Node | null): any {
+function getParentFront(item) {
   const parentGripNode = getParentGripNode(item);
   if (!parentGripNode) {
     return null;
@@ -829,7 +809,7 @@ function getParentFront(item: Node | null): any {
   return getFront(parentGripNode);
 }
 
-function getNonPrototypeParentGripValue(item: Node | null): Node | null {
+function getNonPrototypeParentGripValue(item) {
   const parentGripNode = getParentGripNode(item);
   if (!parentGripNode) {
     return null;

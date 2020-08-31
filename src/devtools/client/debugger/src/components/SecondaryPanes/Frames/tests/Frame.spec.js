@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React from "react";
 import { shallow, mount } from "enzyme";
@@ -12,7 +12,7 @@ import { makeMockFrame, makeMockSource, mockthreadcx } from "../../../../utils/t
 import FrameMenu from "../FrameMenu";
 jest.mock("../FrameMenu", () => jest.fn());
 
-function frameProperties(frame, selectedFrame: any, overrides = {}) {
+function frameProperties(frame, selectedFrame, overrides = {}) {
   return {
     cx: mockthreadcx,
     frame,

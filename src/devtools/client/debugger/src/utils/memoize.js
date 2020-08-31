@@ -2,13 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-type Value = any;
-type Key = any;
-type Store = WeakMap<Key, Store | Value>;
 
-function hasValue(keys: Key[], store: Store) {
+function hasValue(keys, store) {
   let currentStore = store;
   for (const key of keys) {
     if (!currentStore || !currentStore.has(key)) {
@@ -20,7 +17,7 @@ function hasValue(keys: Key[], store: Store) {
   return true;
 }
 
-function getValue(keys: Key[], store: Store): Value {
+function getValue(keys, store) {
   let currentStore = store;
   for (const key of keys) {
     if (!currentStore) {
@@ -32,7 +29,7 @@ function getValue(keys: Key[], store: Store): Value {
   return currentStore;
 }
 
-function setValue(keys: Key[], store: Store, value: Value) {
+function setValue(keys, store, value) {
   const keysExceptLast = keys.slice(0, -1);
   const lastKey = keys[keys.length - 1];
 
@@ -54,10 +51,10 @@ function setValue(keys: Key[], store: Store, value: Value) {
 }
 
 // memoize with n arguments
-export default function memoize(func: Function) {
+export default function memoize(func) {
   const store = new WeakMap();
 
-  return function (...keys: Key[]) {
+  return function (...keys) {
     if (hasValue(keys, store)) {
       return getValue(keys, store);
     }

@@ -2,36 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import {
   buildScopeList,
   parseSourceScopes,
-  type SourceScope,
-  type ParsedScope,
-  type BindingData,
-  type BindingDeclarationLocation,
-  type BindingLocation,
-  type BindingLocationType,
-  type BindingMetaValue,
-  type BindingType,
 } from "./visitor";
 
-export type {
-  SourceScope,
-  BindingData,
-  BindingDeclarationLocation,
-  BindingLocation,
-  BindingLocationType,
-  BindingMetaValue,
-  BindingType,
-};
 
-import type { SourceLocation } from "../../../types";
 
 let parsedScopesCache = new Map();
 
-export default function getScopes(location: SourceLocation): SourceScope[] {
+export default function getScopes(location) {
   const { sourceId } = location;
   let parsedScopes = parsedScopesCache.get(sourceId);
   if (!parsedScopes) {
@@ -50,9 +32,9 @@ export { buildScopeList };
 /**
  * Searches all scopes and their bindings at the specific location.
  */
-function findScopes(scopes: ParsedScope[], location: SourceLocation): SourceScope[] {
+function findScopes(scopes, location) {
   // Find inner most in the tree structure.
-  let searchInScopes: ?(ParsedScope[]) = scopes;
+  let searchInScopes = scopes;
   const found = [];
   while (searchInScopes) {
     const foundOne = searchInScopes.some(s => {
@@ -78,7 +60,7 @@ function findScopes(scopes: ParsedScope[], location: SourceLocation): SourceScop
   }));
 }
 
-function compareLocations(a: SourceLocation, b: SourceLocation): number {
+function compareLocations(a, b) {
   // According to type of Location.column can be undefined, if will not be the
   // case here, ignoring flow error.
   // $FlowIgnore

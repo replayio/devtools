@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { clearDocuments } from "../utils/editor";
 import sourceQueue from "../utils/source-queue";
@@ -12,7 +12,6 @@ import { evaluateExpressions } from "./expressions";
 
 import { clearWasmStates } from "../utils/wasm";
 import { getMainThread, getThreadContext } from "../selectors";
-import type { Action, ThunkArgs } from "./types";
 
 /**
  * Redux actions for the navigation state
@@ -23,8 +22,8 @@ import type { Action, ThunkArgs } from "./types";
  * @memberof actions/navigation
  * @static
  */
-export function willNavigate(event: Object) {
-  return async function ({ dispatch, getState, client, sourceMaps, parser }: ThunkArgs) {
+export function willNavigate(event) {
+  return async function ({ dispatch, getState, client, sourceMaps, parser }) {
     sourceQueue.clear();
     sourceMaps.clearSourceMaps();
     clearWasmStates();
@@ -39,8 +38,8 @@ export function willNavigate(event: Object) {
   };
 }
 
-export function connect(url: string, actor: string, traits: Object, isWebExtension: boolean) {
-  return async function ({ dispatch, getState }: ThunkArgs) {
+export function connect(url, actor, traits, isWebExtension) {
+  return async function ({ dispatch, getState }) {
     await dispatch(updateThreads());
     await dispatch(
       ({
@@ -53,7 +52,7 @@ export function connect(url: string, actor: string, traits: Object, isWebExtensi
         },
         traits,
         isWebExtension,
-      }: Action)
+      })
     );
 
     const cx = getThreadContext(getState());
@@ -66,7 +65,7 @@ export function connect(url: string, actor: string, traits: Object, isWebExtensi
  * @static
  */
 export function navigated() {
-  return async function ({ dispatch, panel }: ThunkArgs) {
+  return async function ({ dispatch, panel }) {
     await dispatch(updateThreads());
     panel.emit("reloaded");
   };

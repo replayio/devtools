@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
@@ -18,34 +18,20 @@ import {
   getContext,
 } from "../../selectors";
 
-import type { SourceLocation, Context, Breakpoint } from "../../types";
 
-function addNewLine(doc: Object) {
+function addNewLine(doc) {
   const cursor = doc.getCursor();
   const pos = { line: cursor.line, ch: cursor.ch };
   doc.replaceRange("\n", pos);
 }
 
-type OwnProps = {|
-  editor: Object,
-|};
-type Props = {
-  cx: Context,
-  breakpoint: ?Object,
-  setBreakpointOptions: typeof actions.setBreakpointOptions,
-  location: SourceLocation,
-  log: boolean,
-  editor: Object,
-  openConditionalPanel: typeof actions.openConditionalPanel,
-  closeConditionalPanel: typeof actions.closeConditionalPanel,
-};
 
-export class ConditionalPanel extends PureComponent<Props> {
-  cbPanel: null | Object;
-  input: ?HTMLTextAreaElement;
-  codeMirror: ?Object;
-  panelNode: ?HTMLDivElement;
-  scrollParent: ?HTMLElement;
+export class ConditionalPanel extends PureComponent {
+  cbPanel;
+  input;
+  codeMirror;
+  panelNode;
+  scrollParent;
 
   constructor() {
     super();
@@ -66,7 +52,7 @@ export class ConditionalPanel extends PureComponent<Props> {
     this.props.closeConditionalPanel();
   };
 
-  onKey = (e: SyntheticKeyboardEvent<HTMLTextAreaElement>) => {
+  onKey = (e) => {
     if (e.key === "Enter") {
       if (this.codeMirror && e.altKey) {
         addNewLine(this.codeMirror.doc);
@@ -78,7 +64,7 @@ export class ConditionalPanel extends PureComponent<Props> {
     }
   };
 
-  setBreakpoint(value: string) {
+  setBreakpoint(value) {
     const { cx, log, breakpoint } = this.props;
     // If breakpoint is `pending`, props will not contain a breakpoint.
     // If source is a URL without location, breakpoint will contain no generatedLocation.
@@ -119,7 +105,7 @@ export class ConditionalPanel extends PureComponent<Props> {
     return this.clearConditionalPanel();
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps) {
     this.keepFocusOnInput();
   }
 
@@ -130,7 +116,7 @@ export class ConditionalPanel extends PureComponent<Props> {
     return this.clearConditionalPanel();
   }
 
-  renderToWidget(props: Props) {
+  renderToWidget(props) {
     if (this.cbPanel) {
       this.clearConditionalPanel();
     }
@@ -143,13 +129,13 @@ export class ConditionalPanel extends PureComponent<Props> {
     });
 
     if (this.input) {
-      let parent: ?Node = this.input.parentNode;
+      let parent = this.input.parentNode;
       while (parent) {
         if (parent instanceof HTMLElement && parent.classList.contains("CodeMirror-scroll")) {
           this.scrollParent = parent;
           break;
         }
-        parent = (parent.parentNode: ?Node);
+        parent = (parent.parentNode);
       }
 
       if (this.scrollParent) {
@@ -159,7 +145,7 @@ export class ConditionalPanel extends PureComponent<Props> {
     }
   }
 
-  createEditor = (input: ?HTMLTextAreaElement) => {
+  createEditor = (input) => {
     const { log, editor, closeConditionalPanel } = this.props;
     const codeMirror = editor.CodeMirror.fromTextArea(input, {
       mode: "javascript",
@@ -198,7 +184,7 @@ export class ConditionalPanel extends PureComponent<Props> {
     return log ? options.logValue : options.condition;
   }
 
-  renderConditionalPanel(props: Props) {
+  renderConditionalPanel(props) {
     const { log } = props;
     const defaultValue = this.getDefaultValue();
 
@@ -231,7 +217,7 @@ const mapStateToProps = state => {
     throw new Error("Conditional panel location needed.");
   }
 
-  const breakpoint: ?Breakpoint = getClosestBreakpoint(state, location);
+  const breakpoint = getClosestBreakpoint(state, location);
 
   return {
     cx: getContext(state),
@@ -249,7 +235,7 @@ const mapDispatchToProps = {
   closeConditionalPanel,
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(
+export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(ConditionalPanel);

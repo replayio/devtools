@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 const { Component } = require("react");
 const dom = require("react-dom-factories");
@@ -40,47 +40,8 @@ const {
   getNonPrototypeParentGripValue,
 } = Utils.node;
 
-type Props = {
-  item: Node,
-  depth: number,
-  expanded: boolean,
-  focused: boolean,
-  arrow: ReactElement,
-  setExpanded: (item: Node, expanded: boolean) => void,
-  mode: Mode,
-  dimTopLevelWindow: boolean,
-  invokeGetter: () => void,
-  onDoubleClick: ?(
-    item: Node,
-    options: {
-      depth: number,
-      focused: boolean,
-      expanded: boolean,
-    }
-  ) => any,
-  onCmdCtrlClick: ?(
-    item: Node,
-    options: {
-      depth: number,
-      event: SyntheticEvent,
-      focused: boolean,
-      expanded: boolean,
-    }
-  ) => any,
-  onLabelClick: ?(
-    item: Node,
-    options: {
-      depth: number,
-      focused: boolean,
-      expanded: boolean,
-      setExpanded: (Node, boolean) => any,
-    }
-  ) => any,
-  onContextMenu: (event: any, item: Node) => null,
-  renderItemActions: (item: Node) => ?ReactElement,
-};
 
-class ObjectInspectorItem extends Component<Props> {
+class ObjectInspectorItem extends Component {
   static get defaultProps() {
     return {
       onContextMenu: () => {},
@@ -89,10 +50,7 @@ class ObjectInspectorItem extends Component<Props> {
   }
 
   // eslint-disable-next-line complexity
-  getLabelAndValue(): {
-    value?: string | Element,
-    label?: string,
-  } {
+  getLabelAndValue() {
     const { item, depth, expanded, mode } = this.props;
 
     const label = item.name;
@@ -183,7 +141,7 @@ class ObjectInspectorItem extends Component<Props> {
     };
   }
 
-  getTreeItemProps(): Object {
+  getTreeItemProps() {
     const {
       item,
       depth,
@@ -195,7 +153,7 @@ class ObjectInspectorItem extends Component<Props> {
       onContextMenu,
     } = this.props;
 
-    const parentElementProps: Object = {
+    const parentElementProps = {
       key: item.path,
       className: classnames("node object-node", {
         focused,
@@ -251,7 +209,7 @@ class ObjectInspectorItem extends Component<Props> {
     return parentElementProps;
   }
 
-  renderLabel(label: string) {
+  renderLabel(label) {
     if (label === null || typeof label === "undefined") {
       return null;
     }

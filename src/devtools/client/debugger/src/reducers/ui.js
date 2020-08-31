@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 /**
  * UI reducer
@@ -11,37 +11,13 @@
 
 import { prefs, features } from "../utils/prefs";
 
-import type { Source, SourceLocation, Range } from "../types";
 
-import type { Action, panelPositionType } from "../actions/types";
 
-export type ActiveSearchType = "project" | "file";
 
-export type OrientationType = "horizontal" | "vertical";
 
-export type SelectedPrimaryPaneTabType = "sources" | "outline";
 
-export type UIState = {
-  selectedPrimaryPaneTab: SelectedPrimaryPaneTabType,
-  activeSearch: ?ActiveSearchType,
-  shownSource: ?Source,
-  startPanelCollapsed: boolean,
-  endPanelCollapsed: boolean,
-  frameworkGroupingOn: boolean,
-  orientation: OrientationType,
-  viewport: ?Range,
-  cursorPosition: ?SourceLocation,
-  highlightedLineRange?: {
-    start?: number,
-    end?: number,
-    sourceId?: number,
-  },
-  conditionalPanelLocation: null | SourceLocation,
-  isLogPoint: boolean,
-  inlinePreviewEnabled: boolean,
-};
 
-export const createUIState = (): UIState => ({
+export const createUIState = () => ({
   selectedPrimaryPaneTab: "sources",
   activeSearch: null,
   shownSource: null,
@@ -57,7 +33,7 @@ export const createUIState = (): UIState => ({
   inlinePreviewEnabled: features.inlinePreview,
 });
 
-function update(state: UIState = createUIState(), action: Action): UIState {
+function update(state = createUIState(), action) {
   switch (action.type) {
     case "TOGGLE_ACTIVE_SEARCH": {
       return { ...state, activeSearch: action.value };
@@ -145,25 +121,24 @@ function update(state: UIState = createUIState(), action: Action): UIState {
 
 // NOTE: we'd like to have the app state fully typed
 // https://github.com/firefox-devtools/debugger/blob/master/src/reducers/sources.js#L179-L185
-type OuterState = { ui: UIState };
 
-export function getSelectedPrimaryPaneTab(state: OuterState): SelectedPrimaryPaneTabType {
+export function getSelectedPrimaryPaneTab(state) {
   return state.ui.selectedPrimaryPaneTab;
 }
 
-export function getActiveSearch(state: OuterState): ?ActiveSearchType {
+export function getActiveSearch(state) {
   return state.ui.activeSearch;
 }
 
-export function getFrameworkGroupingState(state: OuterState): boolean {
+export function getFrameworkGroupingState(state) {
   return state.ui.frameworkGroupingOn;
 }
 
-export function getShownSource(state: OuterState): ?Source {
+export function getShownSource(state) {
   return state.ui.shownSource;
 }
 
-export function getPaneCollapse(state: OuterState, position: panelPositionType): boolean {
+export function getPaneCollapse(state, position) {
   if (position == "start") {
     return state.ui.startPanelCollapsed;
   }
@@ -171,31 +146,31 @@ export function getPaneCollapse(state: OuterState, position: panelPositionType):
   return state.ui.endPanelCollapsed;
 }
 
-export function getHighlightedLineRange(state: OuterState) {
+export function getHighlightedLineRange(state) {
   return state.ui.highlightedLineRange;
 }
 
-export function getConditionalPanelLocation(state: OuterState): null | SourceLocation {
+export function getConditionalPanelLocation(state) {
   return state.ui.conditionalPanelLocation;
 }
 
-export function getLogPointStatus(state: OuterState): boolean {
+export function getLogPointStatus(state) {
   return state.ui.isLogPoint;
 }
 
-export function getOrientation(state: OuterState): OrientationType {
+export function getOrientation(state) {
   return state.ui.orientation;
 }
 
-export function getViewport(state: OuterState) {
+export function getViewport(state) {
   return state.ui.viewport;
 }
 
-export function getCursorPosition(state: OuterState) {
+export function getCursorPosition(state) {
   return state.ui.cursorPosition;
 }
 
-export function getInlinePreview(state: OuterState) {
+export function getInlinePreview(state) {
   return state.ui.inlinePreviewEnabled;
 }
 

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 // Dependencies
 import React, { Component } from "react";
@@ -43,39 +43,9 @@ import {
 import { parse } from "../../utils/url";
 import { getRawSourceURL } from "../../utils/source";
 
-import type { TreeNode, TreeDirectory, ParentMap } from "../../utils/sources-tree/types";
-import type { Source, Context, Thread } from "../../types";
-import type { SourcesMapByThread, State as AppState } from "../../reducers/types";
-import type { Item } from "../shared/ManagedTree";
 
-type OwnProps = {|
-  threads: Thread[],
-|};
-type Props = {
-  cx: Context,
-  threads: Thread[],
-  sources: SourcesMapByThread,
-  sourceCount: number,
-  shownSource: ?Source,
-  selectedSource: ?Source,
-  debuggeeUrl: string,
-  projectRoot: string,
-  expanded: Set<string>,
-  selectSource: typeof actions.selectSource,
-  setExpandedState: typeof actions.setExpandedState,
-  focusItem: typeof actions.focusItem,
-  focused: ?TreeNode,
-};
 
-type State = {
-  parentMap: ParentMap,
-  sourceTree: TreeDirectory,
-  uncollapsedTree: TreeDirectory,
-  listItems?: any,
-  highlightItems?: any,
-};
 
-type SetExpanded = (item: TreeNode, expanded: boolean, altKey: boolean) => void;
 
 function shouldAutoExpand(depth, item, debuggeeUrl, projectRoot) {
   if (projectRoot != "" || depth !== 1) {
@@ -97,8 +67,8 @@ function findSource({ threads, sources }, itemPath, source) {
   return source;
 }
 
-class SourcesTree extends Component<Props, State> {
-  constructor(props: Props) {
+class SourcesTree extends Component {
+  constructor(props) {
     super(props);
     const { debuggeeUrl, sources, threads } = this.props;
 
@@ -109,7 +79,7 @@ class SourcesTree extends Component<Props, State> {
     });
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  componentWillReceiveProps(nextProps) {
     const { projectRoot, debuggeeUrl, sources, shownSource, selectedSource, threads } = this.props;
     const { uncollapsedTree, sourceTree } = this.state;
 
@@ -156,27 +126,27 @@ class SourcesTree extends Component<Props, State> {
     }
   }
 
-  selectItem = (item: TreeNode) => {
+  selectItem = (item) => {
     if (item.type == "source" && !Array.isArray(item.contents)) {
       this.props.selectSource(this.props.cx, item.contents.id);
     }
   };
 
-  onFocus = (item: TreeNode) => {
+  onFocus = (item) => {
     this.props.focusItem(item);
   };
 
-  onActivate = (item: TreeNode) => {
+  onActivate = (item) => {
     this.selectItem(item);
   };
 
   // NOTE: we get the source from sources because item.contents is cached
-  getSource(item: TreeNode): ?Source {
+  getSource(item) {
     const source = getSourceFromNode(item);
     return findSource(this.props, item.path, source);
   }
 
-  getPath = (item: TreeNode): string => {
+  getPath = (item) => {
     const { path } = item;
     const source = this.getSource(item);
 
@@ -189,11 +159,11 @@ class SourcesTree extends Component<Props, State> {
     return `${path}/${source.id}/${blackBoxedPart}`;
   };
 
-  onExpand = (item: Item, expandedState: Set<string>) => {
+  onExpand = (item, expandedState) => {
     this.props.setExpandedState(expandedState);
   };
 
-  onCollapse = (item: Item, expandedState: Set<string>) => {
+  onCollapse = (item, expandedState) => {
     this.props.setExpandedState(expandedState);
   };
 
@@ -202,7 +172,7 @@ class SourcesTree extends Component<Props, State> {
     return sourceTree.contents.length === 0;
   }
 
-  renderEmptyElement(message: string) {
+  renderEmptyElement(message) {
     return (
       <div key="empty" className="no-sources-message">
         {message}
@@ -210,7 +180,7 @@ class SourcesTree extends Component<Props, State> {
     );
   }
 
-  getRoots = (sourceTree: TreeDirectory, projectRoot: string) => {
+  getRoots = (sourceTree, projectRoot) => {
     const sourceContents = sourceTree.contents[0];
 
     if (projectRoot && sourceContents) {
@@ -223,17 +193,17 @@ class SourcesTree extends Component<Props, State> {
     return sourceTree.contents;
   };
 
-  getChildren = (item: $Shape<TreeDirectory>) => {
+  getChildren = (item) => {
     return nodeHasChildren(item) ? item.contents : [];
   };
 
   renderItem = (
-    item: TreeNode,
-    depth: number,
-    focused: boolean,
-    _: mixed,
-    expanded: boolean,
-    { setExpanded }: { setExpanded: SetExpanded }
+    item,
+    depth,
+    focused,
+    _,
+    expanded,
+    { setExpanded }
   ) => {
     const { debuggeeUrl, projectRoot, threads } = this.props;
 
@@ -266,7 +236,7 @@ class SourcesTree extends Component<Props, State> {
       expanded,
       focused,
       getChildren: this.getChildren,
-      getParent: (item: $Shape<TreeNode>) => parentMap.get(item),
+      getParent: (item) => parentMap.get(item),
       getPath: this.getPath,
       getRoots: () => this.getRoots(sourceTree, projectRoot),
       highlightItems,
@@ -284,7 +254,7 @@ class SourcesTree extends Component<Props, State> {
     return <ManagedTree {...treeProps} />;
   }
 
-  renderPane(child: React$Node) {
+  renderPane(child) {
     const { projectRoot } = this.props;
 
     return (
@@ -313,10 +283,10 @@ class SourcesTree extends Component<Props, State> {
 }
 
 function getSourceForTree(
-  state: AppState,
-  displayedSources: SourcesMapByThread,
-  source: ?Source
-): ?Source {
+  state,
+  displayedSources,
+  source
+) {
   if (!source) {
     return null;
   }
@@ -347,7 +317,7 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   selectSource: actions.selectSource,
   setExpandedState: actions.setExpandedState,
   focusItem: actions.focusItem,

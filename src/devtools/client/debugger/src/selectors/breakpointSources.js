@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { sortBy, uniq } from "lodash";
 import { createSelector } from "reselect";
@@ -16,18 +16,12 @@ import { getFilename } from "../utils/source";
 import { makeShallowQuery } from "../utils/resource";
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
 
-import type { Source, Breakpoint } from "../types";
-import type { Selector, SourceBase, State } from "../reducers/types";
 
-export type BreakpointSources = Array<{
-  source: Source,
-  breakpoints: Breakpoint[],
-}>;
 
 function getBreakpointsForSource(
-  source: Source,
-  selectedSource: ?Source,
-  breakpoints: Breakpoint[]
+  source,
+  selectedSource,
+  breakpoints
 ) {
   return sortSelectedBreakpoints(breakpoints, selectedSource)
     .filter(
@@ -37,7 +31,7 @@ function getBreakpointsForSource(
     .filter(bp => bp.location.sourceId == source.id);
 }
 
-export const findBreakpointSources = (state: State) => {
+export const findBreakpointSources = (state) => {
   const breakpoints = getBreakpointsList(state);
   const sources = getSources(state);
   const selectedSource = getSelectedSource(state);
@@ -47,17 +41,17 @@ export const findBreakpointSources = (state: State) => {
 const queryBreakpointSources = makeShallowQuery({
   filter: (_, { breakpoints, selectedSource }) => uniq(breakpoints.map(bp => bp.location.sourceId)),
   map: resourceAsSourceBase,
-  reduce: (sources): Array<SourceBase> => {
+  reduce: (sources) => {
     const filtered = sources.filter(source => source && !source.isBlackBoxed);
     return sortBy(filtered, source => getFilename(source));
   },
 });
 
-export const getBreakpointSources: Selector<BreakpointSources> = createSelector(
+export const getBreakpointSources = createSelector(
   getBreakpointsList,
   findBreakpointSources,
   getSelectedSource,
-  (breakpoints: Breakpoint[], sources: Source[], selectedSource: ?Source) => {
+  (breakpoints, sources, selectedSource) => {
     return sources
       .map(source => ({
         source,

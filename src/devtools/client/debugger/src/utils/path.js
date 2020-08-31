@@ -2,25 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-export function basename(path: string) {
+export function basename(path) {
   return path.split("/").pop();
 }
 
-export function dirname(path: string) {
+export function dirname(path) {
   const idx = path.lastIndexOf("/");
   return path.slice(0, idx);
 }
 
-export function isURL(str: string) {
+export function isURL(str) {
   return str.includes("://");
 }
 
-export function isAbsolute(str: string) {
+export function isAbsolute(str) {
   return str[0] === "/";
 }
 
-export function join(base: string, dir: string) {
+export function join(base, dir) {
   return `${base}/${dir}`;
 }

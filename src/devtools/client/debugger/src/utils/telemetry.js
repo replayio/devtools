@@ -42,7 +42,7 @@
  * );
  */
 
-// @flow
+// 
 
 import { Telemetry } from "devtools-modules";
 import { isFirefoxPanel } from "devtools-environment";
@@ -53,7 +53,7 @@ const telemetry = new Telemetry();
  * @memberof utils/telemetry
  * @static
  */
-export function recordEvent(eventName: string, fields: {} = {}) {
+export function recordEvent(eventName, fields = {}) {
   let sessionId = -1;
 
   if (typeof window !== "object") {

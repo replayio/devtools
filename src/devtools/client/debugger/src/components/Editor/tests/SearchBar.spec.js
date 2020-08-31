@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React from "react";
 import { shallow } from "enzyme";
@@ -21,7 +21,7 @@ jest.mock("../../../utils/editor", () => ({
   find: () => ({ ch: "1", line: "1" }),
 }));
 
-function generateDefaults(): any {
+function generateDefaults() {
   return {
     query: "",
     searchOn: true,

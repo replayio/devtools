@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import { sortBy } from "lodash";
 import { getFrameScope, getInlinePreviews, getSource } from "../../selectors";
 import { features } from "../../utils/prefs";
@@ -10,15 +10,13 @@ import { validateThreadContext } from "../../utils/context";
 import { loadSourceText } from "../sources/loadSourceText";
 import { ThreadFront } from "protocol/thread";
 
-import type { ThreadContext, Frame, Scope, Preview } from "../../types";
-import type { ThunkArgs } from "../types";
 
 const { log } = require("protocol/socket");
 const { createPrimitiveValueFront } = require("protocol/thread");
 
 // We need to display all variables in the current functional scope so
 // include all data for block scopes until the first functional scope
-function getLocalScopeLevels(originalAstScopes): number {
+function getLocalScopeLevels(originalAstScopes) {
   let levels = 0;
   while (originalAstScopes[levels] && originalAstScopes[levels].type === "block") {
     levels++;
@@ -26,8 +24,8 @@ function getLocalScopeLevels(originalAstScopes): number {
   return levels;
 }
 
-export function generateInlinePreview(cx: ThreadContext, frameId, location) {
-  return async function ({ dispatch, getState, parser, client }: ThunkArgs) {
+export function generateInlinePreview(cx, frameId, location) {
+  return async function ({ dispatch, getState, parser, client }) {
     if (!features.inlinePreview) {
       return;
     }
@@ -43,7 +41,7 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
 
     const frameScopes = getFrameScope(getState(), thread, frameId);
 
-    let scopes: Scope | null = frameScopes && frameScopes.scope;
+    let scopes = frameScopes && frameScopes.scope;
 
     if (!scopes || !scopes.bindings) {
       log(`GenerateInlinePreview LoadSourceText NoFrameScopes`);
@@ -70,8 +68,8 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
     log(`GenerateInlinePreview ScopesLoaded`);
 
     const allPreviews = [];
-    const pausedOnLine: number = location.line;
-    const levels: number = getLocalScopeLevels(originalAstScopes);
+    const pausedOnLine = location.line;
+    const levels = getLocalScopeLevels(originalAstScopes);
 
     for (let curLevel = 0; curLevel <= levels && scopes && scopes.bindings; curLevel++) {
       const previewBindings = scopes.bindings.map(async ({ name, value }) => {
@@ -86,7 +84,7 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
           });
         }
 
-        const previewsFromBindings: Array<Preview> = getBindingValues(
+        const previewsFromBindings = getBindingValues(
           originalAstScopes,
           pausedOnLine,
           name,
@@ -129,13 +127,13 @@ export function generateInlinePreview(cx: ThreadContext, frameId, location) {
 }
 
 function getBindingValues(
-  originalAstScopes: Object,
-  pausedOnLine: number,
-  name: string,
-  value: any,
-  curLevel: number,
-  properties: Array<Object> | null
-): Array<Preview> {
+  originalAstScopes,
+  pausedOnLine,
+  name,
+  value,
+  curLevel,
+  properties
+) {
   const previews = [];
 
   const binding = originalAstScopes[curLevel] && originalAstScopes[curLevel].bindings[name];
@@ -153,7 +151,7 @@ function getBindingValues(
     const ref = binding.refs[i];
     // Subtracting 1 from line as codemirror lines are 0 indexed
     const line = ref.start.line - 1;
-    const column: number = ref.start.column;
+    const column = ref.start.column;
     // We don't want to render inline preview below the paused line
     if (line >= pausedOnLine - 1) {
       continue;
@@ -183,11 +181,11 @@ function getBindingValues(
 }
 
 function getExpressionNameAndValue(
-  name: string,
-  value: any,
+  name,
+  value,
   // TODO: Add data type to ref
-  ref: Object,
-  properties: Array<Object> | null
+  ref,
+  properties
 ) {
   let displayName = name;
   let displayValue = value;
@@ -200,7 +198,7 @@ function getExpressionNameAndValue(
     while (meta) {
       // Initially properties will be an array, after that it will be an object
       if (displayValue === value) {
-        const property: Object = properties.find(prop => prop.name === meta.property);
+        const property = properties.find(prop => prop.name === meta.property);
         if (!property) {
           // If we don't find the property, it might be on the prototype.
           // Until we're sure we're showing the right thing, don't show

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import { PureComponent } from "react";
 import classnames from "classnames";
 import { showMenu } from "devtools-contextmenu";
@@ -11,21 +11,8 @@ import { getDocument } from "../../utils/editor";
 import { breakpointItems, createBreakpointItems } from "./menus/breakpoints";
 
 // eslint-disable-next-line max-len
-import type { ColumnBreakpoint as ColumnBreakpointType } from "../../selectors/visibleColumnBreakpoints";
-import type { BreakpointItemActions } from "./menus/breakpoints";
-import type { Source, Context } from "../../types";
 
-type Bookmark = {
-  clear: Function,
-};
 
-type Props = {
-  cx: Context,
-  editor: Object,
-  source: Source,
-  columnBreakpoint: ColumnBreakpointType,
-  breakpointActions: BreakpointItemActions,
-};
 
 const breakpointButton = document.createElement("button");
 breakpointButton.innerHTML =
@@ -50,16 +37,16 @@ function makeBookmark({ breakpoint }, { onClick, onContextMenu }) {
   bp.onclick = onClick;
 
   // NOTE: flow does not know about oncontextmenu
-  (bp: any).oncontextmenu = onContextMenu;
+  (bp).oncontextmenu = onContextMenu;
 
   return bp;
 }
 
-export default class ColumnBreakpoint extends PureComponent<Props> {
-  addColumnBreakpoint: Function;
-  bookmark: ?Bookmark;
+export default class ColumnBreakpoint extends PureComponent {
+  addColumnBreakpoint;
+  bookmark;
 
-  addColumnBreakpoint = (nextProps: ?Props) => {
+  addColumnBreakpoint = (nextProps) => {
     const { columnBreakpoint, source } = nextProps || this.props;
 
     const sourceId = source.id;
@@ -84,14 +71,14 @@ export default class ColumnBreakpoint extends PureComponent<Props> {
     }
   };
 
-  onClick = (event: MouseEvent) => {
+  onClick = (event) => {
     event.stopPropagation();
     event.preventDefault();
     const { cx, columnBreakpoint, breakpointActions } = this.props;
 
     // disable column breakpoint on shift-click.
     if (event.shiftKey) {
-      const breakpoint: breakpoint = columnBreakpoint.breakpoint;
+      const breakpoint = columnBreakpoint.breakpoint;
       return breakpointActions.toggleDisabledBreakpoint(cx, breakpoint);
     }
 
@@ -102,7 +89,7 @@ export default class ColumnBreakpoint extends PureComponent<Props> {
     }
   };
 
-  onContextMenu = (event: MouseEvent) => {
+  onContextMenu = (event) => {
     event.stopPropagation();
     event.preventDefault();
     const {

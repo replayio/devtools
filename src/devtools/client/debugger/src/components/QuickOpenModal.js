@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import React, { Component } from "react";
 import { connect } from "../utils/connect";
 import fuzzyAldrin from "fuzzaldrin-plus";
@@ -34,47 +34,12 @@ import Modal from "./shared/Modal";
 import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
 
-import type { FormattedSymbolDeclarations, QuickOpenResult } from "../utils/quick-open";
 
-import type { Source, Context } from "../types";
-import type { QuickOpenType } from "../reducers/quick-open";
-import type { Tab } from "../reducers/tabs";
 
 import "./QuickOpenModal.css";
 
-type OwnProps = {|
-  shortcutsModalEnabled: boolean,
-  toggleShortcutsModal: () => void,
-|};
-type Props = {
-  cx: Context,
-  enabled: boolean,
-  displayedSources: Source[],
-  selectedSource: ?Source,
-  selectedContentLoaded?: boolean,
-  query: string,
-  searchType: QuickOpenType,
-  symbols: FormattedSymbolDeclarations,
-  symbolsLoading: boolean,
-  tabs: Tab[],
-  shortcutsModalEnabled: boolean,
-  selectSpecificLocation: typeof actions.selectSpecificLocation,
-  setQuickOpenQuery: typeof actions.setQuickOpenQuery,
-  highlightLineRange: typeof actions.highlightLineRange,
-  closeQuickOpen: typeof actions.closeQuickOpen,
-  toggleShortcutsModal: () => void,
-};
 
-type State = {
-  results: ?Array<QuickOpenResult>,
-  selectedIndex: number,
-};
 
-type GotoLocationType = {
-  sourceId?: string,
-  line: number,
-  column?: number,
-};
 
 const updateResultsThrottle = 100;
 const maxResults = 100;
@@ -92,13 +57,13 @@ function filter(values, query) {
   });
 }
 
-export class QuickOpenModal extends Component<Props, State> {
-  constructor(props: Props) {
+export class QuickOpenModal extends Component {
+  constructor(props) {
     super(props);
     this.state = { results: null, selectedIndex: 0 };
   }
 
-  setResults(results: ?Array<QuickOpenResult>) {
+  setResults(results) {
     if (results) {
       results = results.slice(0, maxResults);
     }
@@ -115,7 +80,7 @@ export class QuickOpenModal extends Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps) {
     const nowEnabled = !prevProps.enabled && this.props.enabled;
     const queryChanged = prevProps.query !== this.props.query;
 
@@ -132,17 +97,17 @@ export class QuickOpenModal extends Component<Props, State> {
     this.props.closeQuickOpen();
   };
 
-  dropGoto = (query: string) => {
+  dropGoto = (query) => {
     const index = query.indexOf(":");
     return index !== -1 ? query.slice(0, index) : query;
   };
 
   formatSources = memoizeLast((displayedSources, tabs) => {
-    const tabUrls = new Set(tabs.map((tab: Tab) => tab.url));
+    const tabUrls = new Set(tabs.map((tab) => tab.url));
     return formatSources(displayedSources, tabUrls);
   });
 
-  searchSources = (query: string) => {
+  searchSources = (query) => {
     const { displayedSources, tabs } = this.props;
 
     const sources = this.formatSources(displayedSources, tabs);
@@ -150,7 +115,7 @@ export class QuickOpenModal extends Component<Props, State> {
     return this.setResults(results);
   };
 
-  searchSymbols = (query: string) => {
+  searchSymbols = (query) => {
     const {
       symbols: { functions },
     } = this.props;
@@ -165,7 +130,7 @@ export class QuickOpenModal extends Component<Props, State> {
     return this.setResults(results);
   };
 
-  searchShortcuts = (query: string) => {
+  searchShortcuts = (query) => {
     const results = formatShortcutResults();
     if (query == "?") {
       this.setResults(results);
@@ -176,7 +141,7 @@ export class QuickOpenModal extends Component<Props, State> {
 
   showTopSources = () => {
     const { displayedSources, tabs } = this.props;
-    const tabUrls = new Set(tabs.map((tab: Tab) => tab.url));
+    const tabUrls = new Set(tabs.map((tab) => tab.url));
 
     if (tabs.length > 0) {
       this.setResults(
@@ -190,7 +155,7 @@ export class QuickOpenModal extends Component<Props, State> {
     }
   };
 
-  updateResults = throttle((query: string) => {
+  updateResults = throttle((query) => {
     if (this.isGotoQuery()) {
       return;
     }
@@ -210,13 +175,13 @@ export class QuickOpenModal extends Component<Props, State> {
     return this.searchSources(query);
   }, updateResultsThrottle);
 
-  setModifier = (item: QuickOpenResult) => {
+  setModifier = (item) => {
     if (["@", "#", ":"].includes(item.id)) {
       this.props.setQuickOpenQuery(item.id);
     }
   };
 
-  selectResultItem = (e: SyntheticEvent<HTMLElement>, item: ?QuickOpenResult) => {
+  selectResultItem = (e, item) => {
     if (item == null) {
       return;
     }
@@ -239,7 +204,7 @@ export class QuickOpenModal extends Component<Props, State> {
     this.gotoLocation({ sourceId: item.id, line: 0 });
   };
 
-  onSelectResultItem = (item: QuickOpenResult) => {
+  onSelectResultItem = (item) => {
     const { selectedSource, highlightLineRange } = this.props;
     if (selectedSource == null || !this.isSymbolSearch()) {
       return;
@@ -255,7 +220,7 @@ export class QuickOpenModal extends Component<Props, State> {
     }
   };
 
-  traverseResults = (e: SyntheticKeyboardEvent<HTMLElement>) => {
+  traverseResults = (e) => {
     const direction = e.key === "ArrowUp" ? -1 : 1;
     const { selectedIndex, results } = this.state;
     const resultCount = this.getResultCount();
@@ -269,7 +234,7 @@ export class QuickOpenModal extends Component<Props, State> {
     }
   };
 
-  gotoLocation = (location: ?GotoLocationType) => {
+  gotoLocation = (location) => {
     const { cx, selectSpecificLocation, selectedSource } = this.props;
 
     if (location != null) {
@@ -284,7 +249,7 @@ export class QuickOpenModal extends Component<Props, State> {
     }
   };
 
-  onChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
+  onChange = (e) => {
     const { selectedSource, selectedContentLoaded, setQuickOpenQuery } = this.props;
     setQuickOpenQuery(e.target.value);
     const noSource = !selectedSource || !selectedContentLoaded;
@@ -295,7 +260,7 @@ export class QuickOpenModal extends Component<Props, State> {
     this.updateResults(e.target.value);
   };
 
-  onKeyDown = (e: SyntheticKeyboardEvent<HTMLInputElement>) => {
+  onKeyDown = (e) => {
     const { enabled, query } = this.props;
     const { results, selectedIndex } = this.state;
     const isGoToQuery = this.isGotoQuery();
@@ -341,10 +306,10 @@ export class QuickOpenModal extends Component<Props, State> {
 
   /* eslint-disable react/no-danger */
   renderHighlight(
-    candidateString: string | React$Element<"div">,
-    query: string,
-    name: string
-  ): string | React$Element<"div"> {
+    candidateString,
+    query,
+    name
+  ) {
     const options = {
       wrap: {
         tagOpen: '<mark class="highlight">',
@@ -355,7 +320,7 @@ export class QuickOpenModal extends Component<Props, State> {
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
   }
 
-  highlightMatching = (query: string, results: QuickOpenResult[]): QuickOpenResult[] => {
+  highlightMatching = (query, results) => {
     let newQuery = query;
     if (newQuery === "") {
       return results;
@@ -458,7 +423,7 @@ function mapStateToProps(state) {
 }
 
 /* istanbul ignore next: ignoring testing of redux connection stuff */
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   selectSpecificLocation: actions.selectSpecificLocation,
   setQuickOpenQuery: actions.setQuickOpenQuery,
   highlightLineRange: actions.highlightLineRange,

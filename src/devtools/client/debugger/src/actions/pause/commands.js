@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import {
   getSelectedFrame,
@@ -25,16 +25,13 @@ import FullStory from "ui/utils/fullstory";
 import { generateInlinePreview } from "./inlinePreview";
 import { setFramePositions } from "./setFramePositions";
 
-import type { ThreadId, Context, ThreadContext, ExecutionPoint } from "../../types";
 
-import type { ThunkArgs } from "../types";
-import type { Command } from "../../reducers/types";
 
 const { log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 
-export function selectThread(cx: Context, thread: ThreadId) {
-  return async ({ dispatch, getState, client }: ThunkArgs) => {
+export function selectThread(cx, thread) {
+  return async ({ dispatch, getState, client }) => {
     await dispatch({ cx, type: "SELECT_THREAD", thread });
 
     // Get a new context now that the current thread has changed.
@@ -61,8 +58,8 @@ export function selectThread(cx: Context, thread: ThreadId) {
  * @memberof actions/pause
  * @static
  */
-export function command(cx: ThreadContext, type: Command, executionPoint: ExecutionPoint) {
-  return async (thunkArgs: ThunkArgs) => {
+export function command(cx, type, executionPoint) {
+  return async (thunkArgs) => {
     const { dispatch, getState, client } = thunkArgs;
     log(`Debugger CommandStart ${type}`);
     FullStory.event(`debugger.${type}`);
@@ -90,8 +87,8 @@ export function command(cx: ThreadContext, type: Command, executionPoint: Execut
   };
 }
 
-export function seekToPosition(point: ExecutionPoint, time) {
-  return ({ dispatch, getState, client }: ThunkArgs) => {
+export function seekToPosition(point, time) {
+  return ({ dispatch, getState, client }) => {
     const cx = getThreadContext(getState());
     ThreadFront.timeWarp(point, time, /* hasFrames */ true);
   };
@@ -103,8 +100,8 @@ export function seekToPosition(point: ExecutionPoint, time) {
  * @static
  * @returns {Function} {@link command}
  */
-export function stepIn(cx: ThreadContext) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function stepIn(cx) {
+  return ({ dispatch, getState }) => {
     if (cx.isPaused) {
       return dispatch(command(cx, "stepIn"));
     }
@@ -117,8 +114,8 @@ export function stepIn(cx: ThreadContext) {
  * @static
  * @returns {Function} {@link command}
  */
-export function stepOver(cx: ThreadContext) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function stepOver(cx) {
+  return ({ dispatch, getState }) => {
     if (cx.isPaused) {
       return dispatch(command(cx, "stepOver"));
     }
@@ -131,8 +128,8 @@ export function stepOver(cx: ThreadContext) {
  * @static
  * @returns {Function} {@link command}
  */
-export function stepOut(cx: ThreadContext) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function stepOut(cx) {
+  return ({ dispatch, getState }) => {
     if (cx.isPaused) {
       return dispatch(command(cx, "stepOut"));
     }
@@ -145,8 +142,8 @@ export function stepOut(cx: ThreadContext) {
  * @static
  * @returns {Function} {@link command}
  */
-export function resume(cx: ThreadContext) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function resume(cx) {
+  return ({ dispatch, getState }) => {
     if (cx.isPaused) {
       recordEvent("continue");
       return dispatch(command(cx, "resume"));
@@ -160,8 +157,8 @@ export function resume(cx: ThreadContext) {
  * @static
  * @returns {Function} {@link command}
  */
-export function rewind(cx: ThreadContext) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function rewind(cx) {
+  return ({ dispatch, getState }) => {
     if (cx.isPaused) {
       return dispatch(command(cx, "rewind"));
     }
@@ -174,8 +171,8 @@ export function rewind(cx: ThreadContext) {
  * @static
  * @returns {Function} {@link command}
  */
-export function reverseStepOver(cx: ThreadContext) {
-  return ({ dispatch, getState }: ThunkArgs) => {
+export function reverseStepOver(cx) {
+  return ({ dispatch, getState }) => {
     if (cx.isPaused) {
       return dispatch(command(cx, "reverseStepOver"));
     }

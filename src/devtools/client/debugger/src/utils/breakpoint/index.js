@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { getBreakpoint, getSource, getSourceActorsForSource } from "../../selectors";
 import { sortSelectedLocations } from "../location";
@@ -12,22 +12,11 @@ import { features } from "../prefs";
 export * from "./astBreakpointLocation";
 export * from "./breakpointPositions";
 
-import type {
-  Source,
-  SourceActor,
-  SourceLocation,
-  SourceActorLocation,
-  PendingLocation,
-  Breakpoint,
-  BreakpointLocation,
-  PendingBreakpoint,
-} from "../../types";
 
-import type { State } from "../../reducers/types";
 
 // Return the first argument that is a string, or null if nothing is a
 // string.
-export function firstString(...args: string[]) {
+export function firstString(...args) {
   for (const arg of args) {
     if (typeof arg === "string") {
       return arg;
@@ -37,20 +26,19 @@ export function firstString(...args: string[]) {
 }
 
 // The ID for a Breakpoint is derived from its location in its Source.
-export function makeBreakpointId(location: SourceLocation) {
+export function makeBreakpointId(location) {
   const { sourceId, line, column } = location;
   const columnString = column || "";
   return `${sourceId}:${line}:${columnString}`;
 }
 
-export function getLocationWithoutColumn(location: SourceLocation) {
+export function getLocationWithoutColumn(location) {
   const { sourceId, line } = location;
   return `${sourceId}:${line}`;
 }
 
-type AnySourceLocation = SourceLocation | PendingLocation;
 
-export function makePendingLocationId(location: AnySourceLocation) {
+export function makePendingLocationId(location) {
   assertPendingLocation(location);
   const { sourceUrl, line, column } = location;
   const sourceUrlString = sourceUrl || "";
@@ -59,12 +47,12 @@ export function makePendingLocationId(location: AnySourceLocation) {
   return `${sourceUrlString}:${line}:${columnString}`;
 }
 
-export function makeBreakpointLocation(state: State, location: SourceLocation): BreakpointLocation {
+export function makeBreakpointLocation(state, location) {
   const source = getSource(state, location.sourceId);
   if (!source) {
     throw new Error("no source");
   }
-  const breakpointLocation: any = {
+  const breakpointLocation = {
     line: location.line,
     column: location.column,
   };
@@ -76,7 +64,7 @@ export function makeBreakpointLocation(state: State, location: SourceLocation): 
   return breakpointLocation;
 }
 
-export function makeSourceActorLocation(sourceActor: SourceActor, location: SourceLocation) {
+export function makeSourceActorLocation(sourceActor, location) {
   return {
     sourceActor,
     line: location.line,
@@ -85,27 +73,27 @@ export function makeSourceActorLocation(sourceActor: SourceActor, location: Sour
 }
 
 // The ID for a BreakpointActor is derived from its location in its SourceActor.
-export function makeBreakpointActorId(location: SourceActorLocation) {
+export function makeBreakpointActorId(location) {
   const { sourceActor, line, column } = location;
   const columnString = column || "";
-  return `${(sourceActor: any)}:${line}:${columnString}`;
+  return `${(sourceActor)}:${line}:${columnString}`;
 }
 
-export function assertBreakpoint(breakpoint: Breakpoint) {
+export function assertBreakpoint(breakpoint) {
   assertLocation(breakpoint.location);
 }
 
-export function assertPendingBreakpoint(pendingBreakpoint: PendingBreakpoint) {
+export function assertPendingBreakpoint(pendingBreakpoint) {
   assertPendingLocation(pendingBreakpoint.location);
 }
 
-export function assertLocation(location: SourceLocation) {
+export function assertLocation(location) {
   assertPendingLocation(location);
   const { sourceId } = location;
   assert(!!sourceId, "location must have a source id");
 }
 
-export function assertPendingLocation(location: PendingLocation) {
+export function assertPendingLocation(location) {
   assert(!!location, "location must exist");
 
   const { sourceUrl } = location;
@@ -117,7 +105,7 @@ export function assertPendingLocation(location: PendingLocation) {
 }
 
 // syncing
-export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }: SourceLocation) {
+export function breakpointAtLocation(breakpoints, { line, column }) {
   return breakpoints.find(breakpoint => {
     const sameLine = breakpoint.location.line === line;
     if (!sameLine) {
@@ -134,12 +122,12 @@ export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }
   });
 }
 
-export function breakpointExists(state: State, location: SourceLocation) {
+export function breakpointExists(state, location) {
   const currentBp = getBreakpoint(state, location);
   return currentBp && !currentBp.disabled;
 }
 
-export function createXHRBreakpoint(path: string, method: string, overrides?: Object = {}) {
+export function createXHRBreakpoint(path, method, overrides = {}) {
   const properties = {
     path,
     method,
@@ -151,12 +139,12 @@ export function createXHRBreakpoint(path: string, method: string, overrides?: Ob
   return { ...properties, ...overrides };
 }
 
-function createPendingLocation(location: PendingLocation) {
+function createPendingLocation(location) {
   const { sourceUrl, line, column } = location;
   return { sourceUrl, line, column };
 }
 
-export function createPendingBreakpoint(bp: Breakpoint) {
+export function createPendingBreakpoint(bp) {
   const pendingLocation = createPendingLocation(bp.location);
 
   assertPendingLocation(pendingLocation);
@@ -169,13 +157,13 @@ export function createPendingBreakpoint(bp: Breakpoint) {
   };
 }
 
-export function getSelectedText(breakpoint: Breakpoint, selectedSource: ?Source) {
+export function getSelectedText(breakpoint, selectedSource) {
   return breakpoint.text;
 }
 
 export function sortSelectedBreakpoints(
-  breakpoints: Array<Breakpoint>,
-  selectedSource: ?Source
-): Array<Breakpoint> {
+  breakpoints,
+  selectedSource
+) {
   return sortSelectedLocations(breakpoints, selectedSource);
 }

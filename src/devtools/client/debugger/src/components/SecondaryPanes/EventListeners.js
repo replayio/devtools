@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { Component } from "react";
 import classnames from "classnames";
@@ -13,39 +13,18 @@ import { selectors } from "ui/reducers";
 
 import AccessibleImage from "../shared/AccessibleImage";
 
-import type {
-  EventListenerEvent,
-  EventListenerActiveList,
-  EventListenerCategory,
-  EventListenerCategoryList,
-  EventListenerExpandedList,
-} from "../../actions/types";
 
 import "./EventListeners.css";
 
-type State = {
-  searchText: string,
-  focused: boolean,
-};
 
-type OwnProps = {||};
-type Props = {
-  categories: EventListenerCategoryList,
-  expandedCategories: EventListenerExpandedList,
-  activeEventListeners: EventListenerActiveList,
-  addEventListeners: typeof actions.addEventListenerBreakpoints,
-  removeEventListeners: typeof actions.removeEventListenerBreakpoints,
-  addEventListenerExpanded: typeof actions.addEventListenerExpanded,
-  removeEventListenerExpanded: typeof actions.removeEventListenerExpanded,
-};
 
-class EventListeners extends Component<Props, State> {
+class EventListeners extends Component {
   state = {
     searchText: "",
     focused: false,
   };
 
-  hasMatch(eventOrCategoryName: string, searchText: string) {
+  hasMatch(eventOrCategoryName, searchText) {
     const lowercaseEventOrCategoryName = eventOrCategoryName.toLowerCase();
     const lowercaseSearchText = searchText.toLowerCase();
 
@@ -72,7 +51,7 @@ class EventListeners extends Component<Props, State> {
     return searchResults;
   }
 
-  onCategoryToggle(category: string) {
+  onCategoryToggle(category) {
     const {
       expandedCategories,
       removeEventListenerExpanded,
@@ -86,7 +65,7 @@ class EventListeners extends Component<Props, State> {
     }
   }
 
-  onCategoryClick(category: EventListenerCategory, isChecked: boolean) {
+  onCategoryClick(category, isChecked) {
     const { addEventListeners, removeEventListeners } = this.props;
     const eventsIds = category.events.map(event => event.id);
 
@@ -97,7 +76,7 @@ class EventListeners extends Component<Props, State> {
     }
   }
 
-  onEventTypeClick(eventId: string, isChecked: boolean) {
+  onEventTypeClick(eventId, isChecked) {
     const { addEventListeners, removeEventListeners } = this.props;
     if (isChecked) {
       addEventListeners([eventId]);
@@ -106,21 +85,21 @@ class EventListeners extends Component<Props, State> {
     }
   }
 
-  onInputChange = (event: SyntheticEvent<HTMLInputElement>) => {
+  onInputChange = (event) => {
     this.setState({ searchText: event.currentTarget.value });
   };
 
-  onKeyDown = (event: SyntheticKeyboardEvent<HTMLElement>) => {
+  onKeyDown = (event) => {
     if (event.key === "Escape") {
       this.setState({ searchText: "" });
     }
   };
 
-  onFocus = (event: SyntheticEvent<>) => {
+  onFocus = (event) => {
     this.setState({ focused: true });
   };
 
-  onBlur = (event: SyntheticEvent<>) => {
+  onBlur = (event) => {
     this.setState({ focused: false });
   };
 
@@ -189,7 +168,7 @@ class EventListeners extends Component<Props, State> {
     );
   }
 
-  renderCategoryHeading(category: EventListenerCategory) {
+  renderCategoryHeading(category) {
     const { activeEventListeners, expandedCategories } = this.props;
     const { events } = category;
 
@@ -226,7 +205,7 @@ class EventListeners extends Component<Props, State> {
     );
   }
 
-  renderCategoryListing(category: EventListenerCategory) {
+  renderCategoryListing(category) {
     const { expandedCategories } = this.props;
 
     const expanded = expandedCategories.includes(category.name);
@@ -243,11 +222,11 @@ class EventListeners extends Component<Props, State> {
     );
   }
 
-  renderCategory(category: string) {
+  renderCategory(category) {
     return <span className="category-label">{category} ▸ </span>;
   }
 
-  renderListenerEvent(event: EventListenerEvent, category: string) {
+  renderListenerEvent(event, category) {
     const { activeEventListeners } = this.props;
     const { searchText } = this.state;
 
@@ -292,7 +271,7 @@ const mapStateToProps = state => ({
   expandedCategories: selectors.getEventListenerExpanded(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   addEventListeners: actions.addEventListenerBreakpoints,
   removeEventListeners: actions.removeEventListenerBreakpoints,
   addEventListenerExpanded: actions.addEventListenerExpanded,
