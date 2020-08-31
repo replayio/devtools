@@ -63,3 +63,24 @@ export function getTimeMidpoint({ overlayWidth, time, zoom }) {
 
   return Math.max(position + pausedLocationMarkerWidth / 2, 0);
 }
+
+export function getNewZoomRegion({ hoverTime, newScale, zoomRegion, recordingDuration }) {
+  let scale = zoomRegion.scale;
+  let length = zoomRegion.endTime - zoomRegion.startTime;
+  let leftToHover = hoverTime - zoomRegion.startTime;
+  let rightToHover = zoomRegion.endTime - hoverTime;
+
+  let newLength = recordingDuration / newScale;
+  let newStart = zoomRegion.startTime - (newLength - length) * (leftToHover / length);
+  let newEnd = zoomRegion.endTime + (newLength - length) * (rightToHover / length);
+
+  if (newStart < 0) {
+    newStart = 0;
+    newEnd = newLength;
+  } else if (newEnd > recordingDuration) {
+    newEnd = recordingDuration;
+    newStart = recordingDuration - newLength;
+  }
+
+  return { start: newStart, end: newEnd };
+}

@@ -73,6 +73,7 @@
   height: 100%;
   background: var(--progress-playing-background);
   transition-duration: var(--progressbar-transition);
+  pointer-events: none;
 }
 
 .replay-player .progress::after {
@@ -86,14 +87,17 @@
   position: absolute;
 }
 
+.replay-player .message-container {
+  top: calc(50% - 2.75px);
+  position: absolute;
+  width: 100%;
+}
+
 .replay-player .message {
   position: absolute;
-  height: 100%;
   border-radius: 4.5px;
-  top: calc(50% - 3.5px);
   background: var(--replaying-marker-background);
   border: 0.5px solid var(--progress-playing-background);
-  top: calc(50% - 3.75px);
   height: 7.5px;
   width: 7.5px;
 }
@@ -191,6 +195,7 @@
   left: 0;
   top: 50%;
   transition-duration: var(--progressbar-transition);
+  pointer-events: none;
 }
 
 .replay-player .progress-line.end {

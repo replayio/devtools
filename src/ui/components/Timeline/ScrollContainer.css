@@ -1,0 +1,13 @@
+.replay-player .scroll-container {
+  overflow-y: auto;
+  height: 100%;
+}
+
+.replay-player .scroll-content {
+  display: flex;
+  color: transparent;
+}
+
+.replay-player .scroll-container::-webkit-scrollbar {
+  display: none;
+}

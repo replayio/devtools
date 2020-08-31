@@ -1,9 +1,8 @@
 function initialTimelineState() {
   return {
-    zoomRegion: { startTime: 0, endTime: 0 },
+    zoomRegion: { startTime: 0, endTime: 0, scale: 1 },
     currentTime: 0,
     hoverTime: null,
-    startDragTime: null,
     playback: null,
     messages: [],
     highlightedMessage: null,
@@ -41,7 +40,6 @@ export default function update(state = initialTimelineState(), action) {
 export const getZoomRegion = state => state.timeline.zoomRegion;
 export const getCurrentTime = state => state.timeline.currentTime;
 export const getHoverTime = state => state.timeline.hoverTime;
-export const getStartDragTime = state => state.timeline.startDragTime;
 export const getPlayback = state => state.timeline.playback;
 export const getMessages = state => state.timeline.messages;
 export const getHighlightedMessage = state => state.timeline.highlightedMessage;
