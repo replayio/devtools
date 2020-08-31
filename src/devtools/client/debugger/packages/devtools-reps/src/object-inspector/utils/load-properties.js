@@ -5,10 +5,10 @@
 const { getClosestGripNode, getValue } = require("./node");
 
 function loadItemProperties(
-  item: Node,
-  client: Client,
-  loadedProperties: LoadedProperties
-): Promise<GripProperties> {
+  item,
+  client,
+  loadedProperties
+) {
   const gripItem = getClosestGripNode(item);
   const value = getValue(gripItem);
 
