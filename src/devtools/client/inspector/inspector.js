@@ -39,7 +39,6 @@ require("devtools/client/shared/components/Accordion.css");
 //require("devtools/content/shared/widgets/spectrum.css");
 
 const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
-const { prefs, features } = require("devtools/client/inspector/prefs");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
 const { InspectorSearch } = require("devtools/client/inspector/inspector-search");
 
@@ -52,27 +51,28 @@ const CSSProperties = require("./css-properties");
 const Highlighter = require("highlighter/highlighter");
 
 /*
-loader.lazyRequireGetter(
-  this,
-  "saveScreenshot",
-  "devtools/shared/screenshot/save"
-);
-loader.lazyRequireGetter(
-  this,
-  "PICKER_TYPES",
-  "devtools/shared/picker-constants"
-);
+ loader.lazyRequireGetter(
+   this,
+   "saveScreenshot",
+   "devtools/shared/screenshot/save"
+ );
+ loader.lazyRequireGetter(
+   this,
+   "PICKER_TYPES",
+   "devtools/shared/picker-constants"
+ );
+ 
+ // This import to chrome code is forbidden according to the inspector specific
+ // eslintrc. TODO: Fix in Bug 1591091.
+ // eslint-disable-next-line mozilla/reject-some-requires
+ loader.lazyImporter(
+   this,
+   "DeferredTask",
+   "resource://gre/modules/DeferredTask.jsm"
+ );
+ */
 
-// This import to chrome code is forbidden according to the inspector specific
-// eslintrc. TODO: Fix in Bug 1591091.
-// eslint-disable-next-line mozilla/reject-some-requires
-loader.lazyImporter(
-  this,
-  "DeferredTask",
-  "resource://gre/modules/DeferredTask.jsm"
-);
-*/
-
+const { prefs, features } = require("devtools/client/inspector/prefs");
 const { LocalizationHelper, localizeMarkup } = require("devtools/shared/l10n");
 const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
@@ -126,47 +126,26 @@ const THREE_PANE_ENABLED_PREF = "devtools.inspector.three-pane-enabled";
  *      Fired when the stylesheet source links have been updated (when switching
  *      to source-mapped files)
  */
-function Inspector(toolbox) {
-  EventEmitter.decorate(this);
+class Inspector {
+  constructor(toolbox) {
+    EventEmitter.decorate(this);
 
-  this._toolbox = toolbox;
-  this._target = toolbox.target;
-  this.panelDoc = window.document;
-  this.panelWin = window;
-  this.panelWin.inspector = this;
-  this.telemetry = toolbox.telemetry;
-  this.store = createStore();
+    this._toolbox = toolbox;
+    this._target = toolbox.target;
+    this.panelDoc = window.document;
+    this.panelWin = window;
+    this.panelWin.inspector = this;
+    this.telemetry = toolbox.telemetry;
+    this.store = createStore();
 
-  // Map [panel id => panel instance]
-  // Stores all the instances of sidebar panels like rule view, computed view, ...
-  this._panels = new Map();
-  setupInspectorHelper(this);
-  this._clearSearchResultsLabel = this._clearSearchResultsLabel.bind(this);
-  this._handleRejectionIfNotDestroyed = this._handleRejectionIfNotDestroyed.bind(this);
-  this._onTargetAvailable = this._onTargetAvailable.bind(this);
-  this._onTargetDestroyed = this._onTargetDestroyed.bind(this);
-  this._onBeforeNavigate = this._onBeforeNavigate.bind(this);
-  this._updateSearchResultsLabel = this._updateSearchResultsLabel.bind(this);
+    // Map [panel id => panel instance]
+    // Stores all the instances of sidebar panels like rule view, computed view, ...
+    this._panels = new Map();
 
-  this.onDetached = this.onDetached.bind(this);
-  this.onHostChanged = this.onHostChanged.bind(this);
-  this.onNewSelection = this.onNewSelection.bind(this);
-  this.onNewRoot = this.onNewRoot.bind(this);
-  this.onPanelWindowResize = this.onPanelWindowResize.bind(this);
-  this.onShowBoxModelHighlighterForNode = this.onShowBoxModelHighlighterForNode.bind(this);
-  this.onSidebarHidden = this.onSidebarHidden.bind(this);
-  this.onSidebarResized = this.onSidebarResized.bind(this);
-  this.onSidebarSelect = this.onSidebarSelect.bind(this);
-  this.onSidebarShown = this.onSidebarShown.bind(this);
-  this.onSidebarToggle = this.onSidebarToggle.bind(this);
-  this.handleThreadPaused = this.handleThreadPaused.bind(this);
-  this.handleThreadResumed = this.handleThreadResumed.bind(this);
-  this.handleToolSelected = this.handleToolSelected.bind(this);
+    this.highlighter = Highlighter;
+    setupInspectorHelper(this);
+  }
 
-  this.highlighter = Highlighter;
-}
-
-Inspector.prototype = {
   /**
    * InspectorPanel.open() is effectively an asynchronous constructor.
    * Set any attributes or listeners that rely on the document being loaded or fronts
@@ -187,9 +166,9 @@ Inspector.prototype = {
     this._markupBox = this.panelDoc.getElementById("markup-box");
 
     return this._deferredOpen();
-  },
+  }
 
-  async _onTargetAvailable() {
+  _onTargetAvailable = async () => {
     await Promise.all([this._getDefaultSelection()]);
 
     // When we navigate to another process and switch to a new
@@ -207,9 +186,9 @@ Inspector.prototype = {
     } else {
       this.once("ready", this.onNewRoot);
     }
-  },
+  };
 
-  _onTargetDestroyed({ type, targetFront, isTopLevel }) {
+  _onTargetDestroyed = ({ type, targetFront, isTopLevel }) => {
     // Ignore all targets but the top level one
     if (!isTopLevel) {
       return;
@@ -218,11 +197,11 @@ Inspector.prototype = {
 
     this._defaultNode = null;
     this.selection.setNodeFront(null);
-  },
+  };
 
   get toolbox() {
     return this._toolbox;
-  },
+  }
 
   get highlighters() {
     if (!this._highlighters) {
@@ -230,11 +209,11 @@ Inspector.prototype = {
     }
 
     return this._highlighters;
-  },
+  }
 
   get isHighlighterReady() {
     return !!this._highlighters;
-  },
+  }
 
   get is3PaneModeEnabled() {
     if (!this._is3PaneModeEnabled) {
@@ -242,12 +221,12 @@ Inspector.prototype = {
     }
 
     return this._is3PaneModeEnabled;
-  },
+  }
 
   set is3PaneModeEnabled(value) {
     this._is3PaneModeEnabled = value;
     prefs.threePaneEnabled = this._is3PaneModeEnabled;
-  },
+  }
 
   get search() {
     if (!this._search) {
@@ -255,15 +234,15 @@ Inspector.prototype = {
     }
 
     return this._search;
-  },
+  }
 
   get selection() {
     return this.toolbox.selection;
-  },
+  }
 
   get cssProperties() {
     return CSSProperties;
-  },
+  }
 
   /**
    * Handle promise rejections for various asynchronous actions, and only log errors if
@@ -271,13 +250,13 @@ Inspector.prototype = {
    * This is useful to silence useless errors that happen when the inspector is closed
    * while still initializing (and making protocol requests).
    */
-  _handleRejectionIfNotDestroyed: function (e) {
+  _handleRejectionIfNotDestroyed = e => {
     if (!this._destroyed) {
       console.error(e);
     }
-  },
+  };
 
-  _deferredOpen: async function () {
+  _deferredOpen = async () => {
     this.isReady = false;
 
     // Set the node front so that the markup and sidebar panels will have the selected
@@ -322,25 +301,25 @@ Inspector.prototype = {
 
     this.emit("ready");
     return this;
-  },
+  };
 
-  _onBeforeNavigate: function () {
+  _onBeforeNavigate = () => {
     this._defaultNode = null;
     this.selection.setNodeFront(null);
     this._destroyMarkup();
     this._pendingSelection = null;
-  },
+  };
 
-  _getDefaultSelection: function () {
+  _getDefaultSelection() {
     // This may throw if the document is still loading and we are
     // refering to a dead about:blank document
     return this._getDefaultNodeForSelection().catch(this._handleRejectionIfNotDestroyed);
-  },
+  }
 
   /**
    * Return a promise that will resolve to the default node for selection.
    */
-  _getDefaultNodeForSelection: async function () {
+  _getDefaultNodeForSelection = async () => {
     if (this._defaultNode) {
       return this._defaultNode;
     }
@@ -401,12 +380,12 @@ Inspector.prototype = {
 
     this._defaultNode = selectedNode;
     return selectedNode;
-  },
+  };
 
   /**
    * Hooks the searchbar to show result and auto completion suggestions.
    */
-  setupSearchBox: function () {
+  setupSearchBox() {
     this.searchBox = this.panelDoc.getElementById("inspector-searchbox");
     this.searchClearButton = this.panelDoc.getElementById("inspector-searchinput-clear");
     this.searchResultsContainer = this.panelDoc.getElementById("inspector-searchlabel-container");
@@ -422,7 +401,7 @@ Inspector.prototype = {
     );
 
     this.createSearchBoxShortcuts();
-  },
+  }
 
   createSearchBoxShortcuts() {
     this.searchboxShortcuts = new KeyShortcuts({
@@ -451,17 +430,17 @@ Inspector.prototype = {
         this.searchBox.focus();
       }
     });
-  },
+  }
 
   get searchSuggestions() {
     return this.search.autocompleter;
-  },
+  }
 
-  _clearSearchResultsLabel: function (result) {
+  _clearSearchResultsLabel = result => {
     return this._updateSearchResultsLabel(result, true);
-  },
+  };
 
-  _updateSearchResultsLabel: function (result, clear = false) {
+  _updateSearchResultsLabel = (result, clear = false) => {
     let str = "";
     if (!clear) {
       if (result) {
@@ -480,19 +459,19 @@ Inspector.prototype = {
     }
 
     this.searchResultsLabel.textContent = str;
-  },
+  };
 
   get React() {
     return this._toolbox.React;
-  },
+  }
 
   get ReactDOM() {
     return this._toolbox.ReactDOM;
-  },
+  }
 
   get ReactRedux() {
     return this._toolbox.ReactRedux;
-  },
+  }
 
   get InspectorTabPanel() {
     if (!this._InspectorTabPanel) {
@@ -501,7 +480,7 @@ Inspector.prototype = {
       );
     }
     return this._InspectorTabPanel;
-  },
+  }
 
   get InspectorSplitBox() {
     if (!this._InspectorSplitBox) {
@@ -510,43 +489,43 @@ Inspector.prototype = {
       );
     }
     return this._InspectorSplitBox;
-  },
+  }
 
   get TabBar() {
     if (!this._TabBar) {
       this._TabBar = React.createFactory(require("devtools/client/shared/components/tabs/TabBar"));
     }
     return this._TabBar;
-  },
+  }
 
   /**
    * Check if the inspector should use the landscape mode.
    *
    * @return {Boolean} true if the inspector should be in landscape mode.
    */
-  useLandscapeMode: function () {
+  useLandscapeMode() {
     return true;
     /*
-    if (!this.panelDoc) {
-      return true;
-    }
-
-    const splitterBox = this.panelDoc.getElementById("inspector-splitter-box");
-    const { width } = window.windowUtils.getBoundsWithoutFlushing(splitterBox);
-
-    return this.is3PaneModeEnabled &&
-      (this.toolbox.hostType == Toolbox.HostType.LEFT ||
-        this.toolbox.hostType == Toolbox.HostType.RIGHT)
-      ? width > SIDE_PORTAIT_MODE_WIDTH_THRESHOLD
-      : width > PORTRAIT_MODE_WIDTH_THRESHOLD;
-    */
-  },
+       if (!this.panelDoc) {
+         return true;
+       }
+   
+       const splitterBox = this.panelDoc.getElementById("inspector-splitter-box");
+       const { width } = window.windowUtils.getBoundsWithoutFlushing(splitterBox);
+   
+       return this.is3PaneModeEnabled &&
+         (this.toolbox.hostType == Toolbox.HostType.LEFT ||
+           this.toolbox.hostType == Toolbox.HostType.RIGHT)
+         ? width > SIDE_PORTAIT_MODE_WIDTH_THRESHOLD
+         : width > PORTRAIT_MODE_WIDTH_THRESHOLD;
+       */
+  }
 
   /**
    * Build Splitter located between the main and side area of
    * the Inspector panel.
    */
-  setupSplitter: function () {
+  setupSplitter() {
     const { width, height, splitSidebarWidth } = this.getSidebarSize();
 
     this.sidebarSplitBoxRef = React.createRef();
@@ -586,9 +565,9 @@ Inspector.prototype = {
     );
 
     this.panelWin.addEventListener("resize", this.onPanelWindowResize, true);
-  },
+  }
 
-  _onLazyPanelResize: async function () {
+  async _onLazyPanelResize() {
     // We can be called on a closed window because of the deferred task.
     if (window.closed) {
       return;
@@ -596,30 +575,30 @@ Inspector.prototype = {
 
     this.splitBox.setState({ vert: this.useLandscapeMode() });
     this.emit("inspector-resize");
-  },
+  }
 
   /**
    * If Toolbox width is less than 600 px, the splitter changes its mode
    * to `horizontal` to support portrait view.
    */
-  onPanelWindowResize: function () {
+  onPanelWindowResize = () => {
     if (this.toolbox.currentTool !== "inspector") {
       return;
     }
 
     /*
-    if (!this._lazyResizeHandler) {
-      this._lazyResizeHandler = new DeferredTask(
-        this._onLazyPanelResize.bind(this),
-        LAZY_RESIZE_INTERVAL_MS,
-        0
-      );
-    }
-    this._lazyResizeHandler.arm();
-    */
-  },
+       if (!this._lazyResizeHandler) {
+         this._lazyResizeHandler = new DeferredTask(
+           this._onLazyPanelResize.bind(this),
+           LAZY_RESIZE_INTERVAL_MS,
+           0
+         );
+       }
+       this._lazyResizeHandler.arm();
+       */
+  };
 
-  getSidebarSize: function () {
+  getSidebarSize() {
     let width;
     let height;
     let splitSidebarWidth;
@@ -642,9 +621,9 @@ Inspector.prototype = {
     }
 
     return { width, height, splitSidebarWidth };
-  },
+  }
 
-  onSidebarHidden: function () {
+  onSidebarHidden = () => {
     // Store the current splitter size to preferences.
     const state = this.splitBox.state;
     Services.prefs.setIntPref("devtools.toolsidebar-width.inspector", state.width);
@@ -653,13 +632,13 @@ Inspector.prototype = {
       "devtools.toolsidebar-width.inspector.splitsidebar",
       this.sidebarSplitBoxRef.current.state.width
     );
-  },
+  };
 
-  onSidebarResized: function (width, height) {
+  onSidebarResized = (width, height) => {
     this.toolbox.emit("inspector-sidebar-resized", { width, height });
-  },
+  };
 
-  onSidebarSelect: function (toolId) {
+  onSidebarSelect = toolId => {
     // Save the currently selected sidebar panel
     Services.prefs.setCharPref("devtools.inspector.activeSidebar", toolId);
 
@@ -668,19 +647,19 @@ Inspector.prototype = {
     this.getPanel(toolId);
 
     this.toolbox.emit("inspector-sidebar-select", toolId);
-  },
+  };
 
-  onSidebarShown: function () {
+  onSidebarShown = () => {
     const { width, height, splitSidebarWidth } = this.getSidebarSize();
     this.splitBox.setState({ width, height });
     this.sidebarSplitBoxRef.current.setState({ width: splitSidebarWidth });
-  },
+  };
 
-  async onSidebarToggle() {
+  onSidebarToggle = async () => {
     this.is3PaneModeEnabled = !this.is3PaneModeEnabled;
     await this.setupToolbar();
     this.addRuleView({ skipQueue: true });
-  },
+  };
 
   /**
    * Sets the inspector sidebar split box state. Shows the splitter inside the sidebar
@@ -732,7 +711,7 @@ Inspector.prototype = {
       splitterSize: 1,
       width: sidebarSplitboxWidth,
     });
-  },
+  }
 
   /**
    * Adds the rule view to the middle (in landscape/horizontal mode) or bottom-left panel
@@ -811,19 +790,19 @@ Inspector.prototype = {
     }
 
     this.emit("ruleview-added");
-  },
+  }
 
   /**
    * Returns a boolean indicating whether a sidebar panel instance exists.
    */
-  hasPanel: function (id) {
+  hasPanel(id) {
     return this._panels.has(id);
-  },
+  }
 
   /**
    * Lazily get and create panel instances displayed in the sidebar
    */
-  getPanel: function (id) {
+  getPanel(id) {
     if (this._panels.has(id)) {
       return this._panels.get(id);
     }
@@ -866,7 +845,7 @@ Inspector.prototype = {
     }
 
     return panel;
-  },
+  }
 
   /**
    * Build the sidebar.
@@ -914,11 +893,11 @@ Inspector.prototype = {
         title: INSPECTOR_L10N.getStr("inspector.sidebar.computedViewTitle"),
       },
       /*
-      {
-        id: "changesview",
-        title: INSPECTOR_L10N.getStr("inspector.sidebar.changesViewTitle"),
-      },
-      */
+         {
+           id: "changesview",
+           title: INSPECTOR_L10N.getStr("inspector.sidebar.changesViewTitle"),
+         },
+         */
     ];
 
     if (features.newRulesView) {
@@ -963,7 +942,7 @@ Inspector.prototype = {
     this.sidebar.on("destroy", this.onSidebarHidden);
 
     this.sidebar.show();
-  },
+  }
 
   /**
    * Register a side-panel tab. This API can be used outside of
@@ -975,9 +954,9 @@ Inspector.prototype = {
    * @param {React.Component} panel component. See `InspectorPanelTab` as an example.
    * @param {boolean} selected true if the panel should be selected
    */
-  addSidebarTab: function (id, title, panel, selected) {
+  addSidebarTab(id, title, panel, selected) {
     this.sidebar.addTab(id, title, panel, selected);
-  },
+  }
 
   /**
    * Method to check whether the document is a HTML document and
@@ -988,7 +967,7 @@ Inspector.prototype = {
    */
   async supportsEyeDropper() {
     return true;
-  },
+  }
 
   async setupToolbar() {
     this.teardownToolbar();
@@ -1021,9 +1000,9 @@ Inspector.prototype = {
     }
 
     this.emit("inspector-toolbar-updated");
-  },
+  }
 
-  teardownToolbar: function () {
+  teardownToolbar() {
     if (this.addNodeButton) {
       this.addNodeButton.removeEventListener("click", this.addNode);
       this.addNodeButton = null;
@@ -1033,7 +1012,7 @@ Inspector.prototype = {
       this.eyeDropperButton.removeEventListener("click", this.onEyeDropperButtonClicked);
       this.eyeDropperButton = null;
     }
-  },
+  }
 
   /**
    * Reset the inspector on new root mutation. This is called every time the
@@ -1044,7 +1023,7 @@ Inspector.prototype = {
    * and other state gives us a clean break from the previous pause point and
    * makes it easier to keep state consistent.
    */
-  async onNewRoot(force) {
+  onNewRoot = async force => {
     // Don't reload the inspector when not selected.
     if (this.toolbox && this.toolbox.currentTool != "inspector" && !force) {
       this._hasNewRoot = true;
@@ -1077,29 +1056,29 @@ Inspector.prototype = {
 
     this._pendingSelection = null;
     this.onMarkupLoaded();
-  },
+  };
 
-  handleToolSelected(id) {
+  handleToolSelected = id => {
     if (id == "inspector" && this._hasNewRoot) {
       this.onNewRoot(/* force */ true);
     }
-  },
+  };
 
   /**
    * When replaying, reset the inspector whenever the target pauses.
    */
-  handleThreadPaused() {
+  handleThreadPaused = () => {
     this._replayResumed = false;
     this.onNewRoot();
-  },
+  };
 
   /**
    * When replaying, reset the inspector whenever the target resumes.
    */
-  handleThreadResumed() {
+  handleThreadResumed = () => {
     this._replayResumed = true;
     this.onNewRoot();
-  },
+  };
 
   /**
    * Handler for "markuploaded" event fired on a new root mutation and after the markup
@@ -1130,15 +1109,15 @@ Inspector.prototype = {
     }
 
     this.emit("new-root");
-  },
+  }
 
   _showMarkupLoading() {
     //const loading = document.getElementById("markup-loading");
     //loading.hidden = false;
     //log(`Inspector ShowMarkupLoading`);
-  },
+  }
 
-  _selectionCssSelectors: null,
+  _selectionCssSelectors = null;
 
   /**
    * Set the array of CSS selectors for the currently selected node.
@@ -1155,7 +1134,7 @@ Inspector.prototype = {
       selectors: cssSelectors,
       url: this.currentTarget.url,
     };
-  },
+  }
 
   /**
    * Get the CSS selectors for the current selection if any, that is, if a node
@@ -1166,7 +1145,7 @@ Inspector.prototype = {
       return this._selectionCssSelectors.selectors;
     }
     return [];
-  },
+  }
 
   /**
    * Some inspector ruleview helpers rely on the selectionCssSelector to get the
@@ -1182,7 +1161,7 @@ Inspector.prototype = {
     }
 
     return null;
-  },
+  }
 
   /**
    * On any new selection made by the user, store the array of css selectors
@@ -1190,19 +1169,19 @@ Inspector.prototype = {
    */
   updateSelectionCssSelectors() {
     /*
-    if (this.selection.isElementNode()) {
-      this.selection.nodeFront.getAllSelectors().then(selectors => {
-        this.selectionCssSelectors = selectors;
-      }, this._handleRejectionIfNotDestroyed);
-    }
-    */
-  },
+       if (this.selection.isElementNode()) {
+         this.selection.nodeFront.getAllSelectors().then(selectors => {
+           this.selectionCssSelectors = selectors;
+         }, this._handleRejectionIfNotDestroyed);
+       }
+       */
+  }
 
   /**
    * Can a new HTML element be inserted into the currently selected element?
    * @return {Boolean}
    */
-  canAddHTMLChild: function () {
+  canAddHTMLChild() {
     const selection = this.selection;
 
     // Don't allow to insert an element into these elements. This should only
@@ -1216,7 +1195,7 @@ Inspector.prototype = {
       !selection.isAnonymousNode() &&
       !invalidTagNames.includes(selection.nodeFront.nodeName.toLowerCase())
     );
-  },
+  }
 
   /**
    * Update the state of the add button in the toolbar depending on the current selection.
@@ -1228,13 +1207,13 @@ Inspector.prototype = {
     } else {
       btn.setAttribute("disabled", "true");
     }
-  },
+  }
 
   /**
    * Handler for the "host-changed" event from the toolbox. Resets the inspector
    * sidebar sizes when the toolbox host type changes.
    */
-  async onHostChanged() {
+  onHostChanged = async () => {
     // Eagerly call our resize handling code to process the fact that we
     // switched hosts. If we don't do this, we'll wait for resize events + 200ms
     // to have passed, which causes the old layout to noticeably show up in the
@@ -1252,12 +1231,12 @@ Inspector.prototype = {
     this.createSearchBoxShortcuts();
 
     this.setSidebarSplitBoxState();
-  },
+  };
 
   /**
    * When a new node is selected.
    */
-  onNewSelection: function (value, reason) {
+  onNewSelection = (value, reason) => {
     if (reason === "selection-destroy") {
       return;
     }
@@ -1273,7 +1252,7 @@ Inspector.prototype = {
         console.error(ex);
       }
     }, 0);
-  },
+  };
 
   /**
    * Delay the "inspector-updated" notification while a tool
@@ -1281,7 +1260,7 @@ Inspector.prototype = {
    * invoked when the tool is done updating with the node
    * that the tool is viewing.
    */
-  updating: function (name) {
+  updating(name) {
     if (this._updateProgress && this._updateProgress.node != this.selection.nodeFront) {
       this.cancelUpdate();
     }
@@ -1292,7 +1271,7 @@ Inspector.prototype = {
       this._updateProgress = {
         node: this.selection.nodeFront,
         outstanding: new Set(),
-        checkDone: function () {
+        checkDone() {
           if (this !== self._updateProgress) {
             return;
           }
@@ -1315,36 +1294,36 @@ Inspector.prototype = {
     }
 
     const progress = this._updateProgress;
-    const done = function () {
+    const done = () => {
       progress.outstanding.delete(done);
       progress.checkDone();
     };
     progress.outstanding.add(done);
     return done;
-  },
+  }
 
   /**
    * Cancel notification of inspector updates.
    */
-  cancelUpdate: function () {
+  cancelUpdate() {
     this._updateProgress = null;
-  },
+  }
 
   /**
    * When a node is deleted, select its parent node or the defaultNode if no
    * parent is found (may happen when deleting an iframe inside which the
    * node was selected).
    */
-  onDetached: function (parentNode) {
+  onDetached = parentNode => {
     this.breadcrumbs.cutAfter(this.breadcrumbs.indexOf(parentNode));
     const nodeFront = parentNode ? parentNode : this._defaultNode;
     this.selection.setNodeFront(nodeFront, { reason: "detached" });
-  },
+  };
 
   /**
    * Destroy the inspector.
    */
-  destroy: function () {
+  destroy() {
     if (this._destroyed) {
       return;
     }
@@ -1409,45 +1388,45 @@ Inspector.prototype = {
     this.store = null;
     this.telemetry = null;
     this._pendingSelection = null;
-  },
+  }
 
-  _destroyMarkup: function () {
+  _destroyMarkup() {
     if (this.markup) {
       this.markup.destroy();
       this.markup = null;
     }
-  },
+  }
 
-  onEyeDropperButtonClicked: function () {
+  onEyeDropperButtonClicked() {
     this.eyeDropperButton.classList.contains("checked")
       ? this.hideEyeDropper()
       : this.showEyeDropper();
-  },
+  }
 
-  startEyeDropperListeners: function () {
+  startEyeDropperListeners() {
     this.toolbox.tellRDMAboutPickerState(true, PICKER_TYPES.EYEDROPPER);
     this.inspectorFront.once("color-pick-canceled", this.onEyeDropperDone);
     this.inspectorFront.once("color-picked", this.onEyeDropperDone);
     this.walker.once("new-root", this.onEyeDropperDone);
-  },
+  }
 
-  stopEyeDropperListeners: function () {
+  stopEyeDropperListeners() {
     this.toolbox.tellRDMAboutPickerState(false, PICKER_TYPES.EYEDROPPER);
     this.inspectorFront.off("color-pick-canceled", this.onEyeDropperDone);
     this.inspectorFront.off("color-picked", this.onEyeDropperDone);
     this.walker.off("new-root", this.onEyeDropperDone);
-  },
+  }
 
-  onEyeDropperDone: function () {
+  onEyeDropperDone() {
     this.eyeDropperButton.classList.remove("checked");
     this.stopEyeDropperListeners();
-  },
+  }
 
   /**
    * Show the eyedropper on the page.
    * @return {Promise} resolves when the eyedropper is visible.
    */
-  showEyeDropper: function () {
+  showEyeDropper() {
     // The eyedropper button doesn't exist, most probably because the actor doesn't
     // support the pickColorFromPage, or because the page isn't HTML.
     if (!this.eyeDropperButton) {
@@ -1458,13 +1437,13 @@ Inspector.prototype = {
     this.eyeDropperButton.classList.add("checked");
     this.startEyeDropperListeners();
     return this.inspectorFront.pickColorFromPage({ copyOnSelect: true }).catch(console.error);
-  },
+  }
 
   /**
    * Hide the eyedropper.
    * @return {Promise} resolves when the eyedropper is hidden.
    */
-  hideEyeDropper: function () {
+  hideEyeDropper() {
     // The eyedropper button doesn't exist, most probably  because the page isn't HTML.
     if (!this.eyeDropperButton) {
       return null;
@@ -1473,7 +1452,7 @@ Inspector.prototype = {
     this.eyeDropperButton.classList.remove("checked");
     this.stopEyeDropperListeners();
     return this.inspectorFront.cancelPickColorFromPage().catch(console.error);
-  },
+  }
 
   /**
    * Create a new node as the last child of the current selection, expand the
@@ -1500,12 +1479,12 @@ Inspector.prototype = {
 
     // Expand the parent node.
     this.markup.expandNode(nodeFront);
-  },
+  }
 
   /**
    * Toggle a pseudo class.
    */
-  togglePseudoClass: function (pseudo) {
+  togglePseudoClass(pseudo) {
     if (this.selection.isElementNode()) {
       const node = this.selection.nodeFront;
       if (node.hasPseudoClassLock(pseudo)) {
@@ -1520,7 +1499,7 @@ Inspector.prototype = {
       });
     }
     return promise.resolve();
-  },
+  }
 
   /**
    * Initiate screenshot command on selected node.
@@ -1541,7 +1520,7 @@ Inspector.prototype = {
     const screenshotFront = await this.currentTarget.getFront("screenshot");
     const screenshot = await screenshotFront.capture(args);
     await saveScreenshot(this.panelWin, args, screenshot);
-  },
+  }
 
   /**
    * Returns an object containing the shared handler functions used in the box
@@ -1552,7 +1531,7 @@ Inspector.prototype = {
       setSelectedNode: this.selection.setNodeFront,
       onShowBoxModelHighlighterForNode: this.onShowBoxModelHighlighterForNode,
     };
-  },
+  }
 
   /**
    * Shows the box-model highlighter on the element corresponding to the provided
@@ -1563,9 +1542,9 @@ Inspector.prototype = {
    * @param  {Object} options
    *         Options passed to the highlighter actor.
    */
-  onShowBoxModelHighlighterForNode(nodeFront, options) {
+  onShowBoxModelHighlighterForNode = (nodeFront, options) => {
     nodeFront.highlighterFront.highlight(nodeFront, options);
-  },
+  };
 
   async inspectNodeActor(nodeActor, inspectFromAnnotation) {
     const nodeFront = await this.inspectorFront.getNodeFrontFromNodeGrip({
@@ -1589,7 +1568,7 @@ Inspector.prototype = {
       reason: inspectFromAnnotation,
     });
     return true;
-  },
-};
+  }
+}
 
 exports.Inspector = Inspector;
