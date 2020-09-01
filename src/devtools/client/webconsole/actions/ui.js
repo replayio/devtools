@@ -150,34 +150,6 @@ function setEditorWidth(width) {
   };
 }
 
-/**
- * Dispatches a SHOW_OBJECT_IN_SIDEBAR action, with a grip property corresponding to the
- * {actor} parameter in the {messageId} message.
- *
- * @param {String} actorID: Actor id of the object we want to place in the sidebar.
- * @param {String} messageId: id of the message containing the {actor} parameter.
- */
-function showMessageObjectInSidebar(actorID, messageId) {
-  return ({ dispatch, getState }) => {
-    const { parameters } = getMessage(getState(), messageId);
-    if (Array.isArray(parameters)) {
-      for (const parameter of parameters) {
-        if (parameter && parameter.actorID === actorID) {
-          dispatch(showObjectInSidebar(parameter));
-          return;
-        }
-      }
-    }
-  };
-}
-
-function showObjectInSidebar(front) {
-  return {
-    type: SHOW_OBJECT_IN_SIDEBAR,
-    front,
-  };
-}
-
 function reverseSearchInputToggle({ initialValue } = {}) {
   return {
     type: REVERSE_SEARCH_INPUT_TOGGLE,
@@ -189,12 +161,6 @@ function filterBarDisplayModeSet(displayMode) {
   return {
     type: FILTERBAR_DISPLAY_MODE_SET,
     displayMode,
-  };
-}
-
-function openSidebar(messageId, rootActorId) {
-  return ({ dispatch }) => {
-    dispatch(showMessageObjectInSidebar(rootActorId, messageId));
   };
 }
 
@@ -224,14 +190,11 @@ module.exports = {
   reverseSearchInputToggle,
   selectNetworkMessageTab,
   setEditorWidth,
-  showMessageObjectInSidebar,
-  showObjectInSidebar,
   sidebarClose,
   splitConsoleCloseButtonToggle,
   timestampsToggle,
   warningGroupsToggle,
   openLink,
-  openSidebar,
   timeWarp,
   setZoomedRegion,
   autocompleteToggle,

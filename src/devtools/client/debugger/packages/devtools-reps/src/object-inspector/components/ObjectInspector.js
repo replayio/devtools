@@ -30,8 +30,6 @@ const {
   nodeHasSetter,
 } = Utils.node;
 
-
-
 // This implements a component that renders an interactive inspector
 // for looking at JavaScript objects. It expects descriptions of
 // objects from the protocol, and will dynamically fetch children

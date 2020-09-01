@@ -4,12 +4,8 @@
 
 "use strict";
 
-const { createContextMenu } = require("devtools/client/webconsole/utils/context-menu");
-
 function setupServiceContainer({ webConsoleUI, hud, toolbox, webConsoleWrapper }) {
   const serviceContainer = {
-    openContextMenu: (event, message) => createContextMenu(event, message, webConsoleWrapper),
-
     // NOTE these methods are proxied currently because the
     // service container is passed down the tree. These methods should eventually
     // be moved to redux actions.
@@ -17,7 +13,6 @@ function setupServiceContainer({ webConsoleUI, hud, toolbox, webConsoleWrapper }
     openNodeInInspector: grip => hud.openNodeInInspector(grip),
     getInputSelection: () => hud.getInputSelection(),
     onViewSource: frame => hud.viewSource(frame.url, frame.line),
-    resendNetworkRequest: requestId => hud.resendNetworkRequest(requestId),
     focusInput: () => hud.focusInput(),
     setInputValue: value => hud.setInputValue(value),
     canRewind: () => hud.canRewind(),

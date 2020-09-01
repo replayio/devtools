@@ -4,18 +4,6 @@
 
 "use strict";
 
-function openNetworkPanel(messageId) {
-  return ({ hud }) => {
-    hud.openNetworkPanel(messageId);
-  };
-}
-
-function resendNetworkRequest(messageId) {
-  return ({ hud }) => {
-    hud.resendNetworkRequest(messageId);
-  };
-}
-
 function highlightDomElement(grip) {
   return ({ hud }) => {
     const highlighter = hud.getHighlighter();
@@ -37,6 +25,4 @@ function unHighlightDomElement(grip) {
 module.exports = {
   highlightDomElement,
   unHighlightDomElement,
-  openNetworkPanel,
-  resendNetworkRequest,
 };

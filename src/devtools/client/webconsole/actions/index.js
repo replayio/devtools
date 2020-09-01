@@ -11,7 +11,6 @@ const actionModules = [
   require("devtools/client/webconsole/actions/messages"),
   require("devtools/client/webconsole/actions/ui"),
   require("devtools/client/webconsole/actions/notifications"),
-  require("devtools/client/webconsole/actions/object"),
   require("devtools/client/webconsole/actions/toolbox"),
   require("devtools/client/webconsole/actions/history"),
 ];
