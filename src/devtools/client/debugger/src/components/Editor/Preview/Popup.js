@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { Component } from "react";
 import { connect } from "../../../utils/connect";
@@ -28,34 +28,14 @@ import PreviewFunction from "../../shared/PreviewFunction";
 
 import "./Popup.css";
 
-import type { ThreadContext } from "../../../types";
-import type { Preview } from "../../../reducers/types";
 
-type OwnProps = {|
-  editor: any,
-  preview: Preview,
-  editorRef: ?HTMLDivElement,
-|};
-type Props = {
-  cx: ThreadContext,
-  preview: Preview,
-  editor: any,
-  editorRef: ?HTMLDivElement,
-  addExpression: typeof actions.addExpression,
-  selectSourceURL: typeof actions.selectSourceURL,
-  openLink: typeof actions.openLink,
-  openElementInInspector: typeof actions.openElementInInspectorCommand,
-  highlightDomElement: typeof actions.highlightDomElement,
-  unHighlightDomElement: typeof actions.unHighlightDomElement,
-  clearPreview: typeof actions.clearPreview,
-};
 
-export class Popup extends Component<Props> {
-  marker: any;
-  pos: any;
-  popover: ?React$ElementRef<typeof Popover>;
+export class Popup extends Component {
+  marker;
+  pos;
+  popover;
 
-  constructor(props: Props) {
+  constructor(props) {
     super(props);
   }
 
@@ -243,7 +223,7 @@ export class Popup extends Component<Props> {
   }
 }
 
-export function addHighlightToTargetSiblings(target: Element, props: Object) {
+export function addHighlightToTargetSiblings(target, props) {
   // This function searches for related tokens that should also be highlighted when previewed.
   // Here is the process:
   // It conducts a search on the target's next siblings and then another search for the previous siblings.
@@ -292,7 +272,7 @@ export function addHighlightToTargetSiblings(target: Element, props: Object) {
   }
 }
 
-export function removeHighlightForTargetSiblings(target: Element) {
+export function removeHighlightForTargetSiblings(target) {
   // Look at target's previous and next token siblings.
   // If they also have the highlight class 'preview-token',
   // remove that class.
@@ -332,4 +312,4 @@ const mapDispatchToProps = {
   clearPreview,
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, mapDispatchToProps)(Popup);
+export default connect(mapStateToProps, mapDispatchToProps)(Popup);

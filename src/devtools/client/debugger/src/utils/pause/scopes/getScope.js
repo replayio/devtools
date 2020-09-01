@@ -2,33 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { objectInspector } from "devtools-reps";
 import { getBindingVariables } from "./getVariables";
 import { getFramePopVariables, getThisVariable } from "./utils";
 import { simplifyDisplayName } from "../../pause/frames";
 
-import type { Frame, Why, Scope } from "../../../types";
 
-import type { NamedValue } from "./types";
 
 import { ThreadFront, createElementsFront } from "protocol/thread";
 
-export type RenderableScope = {
-  type: $ElementType<Scope, "type">,
-  scopeKind: $ElementType<Scope, "scopeKind">,
-  actor: $ElementType<Scope, "actor">,
-  bindings: $ElementType<Scope, "bindings">,
-  parent: ?RenderableScope,
-  object?: ?Object,
-  function?: ?{
-    displayName: string,
-  },
-  block?: ?{
-    displayName: string,
-  },
-};
 
 const {
   utils: {
@@ -36,7 +20,7 @@ const {
   },
 } = objectInspector;
 
-function getScopeTitle(type, scope: RenderableScope) {
+function getScopeTitle(type, scope) {
   if (type === "block" && scope.block && scope.block.displayName) {
     return scope.block.displayName;
   }
@@ -53,12 +37,12 @@ function getScopeTitle(type, scope: RenderableScope) {
 }
 
 export function getScope(
-  scope: RenderableScope,
-  selectedFrame: Frame,
-  frameScopes: RenderableScope,
-  why: Why,
-  scopeIndex: number
-): ?NamedValue {
+  scope,
+  selectedFrame,
+  frameScopes,
+  why,
+  scopeIndex
+) {
   const { type, actor } = scope;
 
   const isLocalScope = scope.actor === frameScopes.actor;
@@ -119,10 +103,10 @@ export function getScope(
 }
 
 export function mergeScopes(
-  scope: RenderableScope,
-  parentScope: RenderableScope,
-  item: NamedValue,
-  parentItem: NamedValue
+  scope,
+  parentScope,
+  item,
+  parentItem
 ) {
   if (scope.scopeKind == "function lexical" && parentScope.type == "function") {
     const contents = item.contents.getChildren().concat(parentItem.contents.getChildren());

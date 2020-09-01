@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { Component } from "react";
 import classnames from "classnames";
@@ -20,31 +20,18 @@ import { makeBreakpointId, sortSelectedBreakpoints } from "../../../utils/breakp
 
 import { getSelectedSource, getBreakpointSources } from "../../../selectors";
 
-import type { Source } from "../../../types";
-import type { BreakpointSources } from "../../../selectors/breakpointSources";
-import type SourceEditor from "../../../utils/editor/source-editor";
 
 import "./Breakpoints.css";
 
-type OwnProps = {|
-  shouldLogExceptions: boolean,
-  logExceptions: Function,
-|};
-type Props = {
-  breakpointSources: BreakpointSources,
-  selectedSource: ?Source,
-  shouldLogExceptions: boolean,
-  logExceptions: Function,
-};
 
-class Breakpoints extends Component<Props> {
-  headlessEditor: ?SourceEditor;
+class Breakpoints extends Component {
+  headlessEditor;
 
   componentWillUnmount() {
     this.removeEditor();
   }
 
-  getEditor(): SourceEditor {
+  getEditor() {
     if (!this.headlessEditor) {
       this.headlessEditor = createHeadlessEditor();
     }
@@ -56,7 +43,7 @@ class Breakpoints extends Component<Props> {
       return;
     }
     this.headlessEditor.destroy();
-    this.headlessEditor = (null: any);
+    this.headlessEditor = (null);
   }
 
   renderExceptionsOptions() {
@@ -125,6 +112,6 @@ const mapStateToProps = state => ({
   selectedSource: getSelectedSource(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   logExceptions: actions.logExceptions,
 })(Breakpoints);

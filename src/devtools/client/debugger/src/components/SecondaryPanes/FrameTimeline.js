@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { Component } from "react";
 import { isEqual } from "lodash";
@@ -14,7 +14,6 @@ import {
   getThreadContext,
   getThreadExecutionPoint,
 } from "../../selectors";
-import type { SourceLocation, Frame } from "../../types";
 
 import { getSelectedLocation } from "../../reducers/sources";
 
@@ -23,22 +22,9 @@ import actions from "../../actions";
 import classnames from "classnames";
 import "./FrameTimeline.css";
 
-type Props = {
-  framePositions: any,
-  selectedLocation: ?SourceLocation,
-  previewLocation: typeof actions.previewPausedLocationBySourceId,
-  seekToPosition: typeof actions.seekToPosition,
-  selectedFrame: Frame,
-  executionPoint: any,
-};
-type OwnProps = {};
 
-type State = {
-  scrubbing: boolean,
-  scrubbingProgress: number, // [0, 100]
-};
 
-function isSameLocation(frameLocation: SourceLocation, selectedLocation: ?SourceLocation) {
+function isSameLocation(frameLocation, selectedLocation) {
   if (!frameLocation || !selectedLocation) {
     return;
   }
@@ -50,7 +36,7 @@ function isSameLocation(frameLocation: SourceLocation, selectedLocation: ?Source
   );
 }
 
-function getBoundingClientRect(element: ?HTMLElement) {
+function getBoundingClientRect(element) {
   if (!element) {
     // $FlowIgnore
     return;
@@ -58,11 +44,11 @@ function getBoundingClientRect(element: ?HTMLElement) {
   return element.getBoundingClientRect();
 }
 
-class FrameTimeline extends Component<Props, State> {
-  _timeline: ?HTMLElement;
-  _marker: ?HTMLElement;
+class FrameTimeline extends Component {
+  _timeline;
+  _marker;
 
-  constructor(props: Props) {
+  constructor(props) {
     super(props);
   }
 
@@ -71,7 +57,7 @@ class FrameTimeline extends Component<Props, State> {
     scrubbingProgress: 0,
   };
 
-  componentDidUpdate(prevProps: Props, prevState: State) {
+  componentDidUpdate(prevProps, prevState) {
     if (!document.body) {
       return;
     }
@@ -91,13 +77,13 @@ class FrameTimeline extends Component<Props, State> {
     }
   }
 
-  getProgress(clientX: number) {
+  getProgress(clientX) {
     const { width, left } = getBoundingClientRect(this._timeline);
     const progress = ((clientX - left) / width) * 100;
     return Math.min(Math.max(progress, 0), 100);
   }
 
-  getPosition(progress: ?number) {
+  getPosition(progress) {
     const { framePositions } = this.props;
     if (!framePositions) {
       return;
@@ -108,7 +94,7 @@ class FrameTimeline extends Component<Props, State> {
     return framePositions.positions[displayIndex];
   }
 
-  displayPreview(progress: number) {
+  displayPreview(progress) {
     const { previewLocation } = this.props;
 
     const position = this.getPosition(progress);
@@ -118,12 +104,12 @@ class FrameTimeline extends Component<Props, State> {
     }
   }
 
-  onMouseDown = (event: SyntheticMouseEvent<>) => {
+  onMouseDown = (event) => {
     const progress = this.getProgress(event.clientX);
     this.setState({ scrubbing: true, scrubbingProgress: progress });
   };
 
-  onMouseUp = (event: MouseEvent) => {
+  onMouseUp = (event) => {
     const { seekToPosition, selectedLocation } = this.props;
 
     const progress = this.getProgress(event.clientX);
@@ -135,7 +121,7 @@ class FrameTimeline extends Component<Props, State> {
     }
   };
 
-  onMouseMove = (event: MouseEvent) => {
+  onMouseMove = (event) => {
     const progress = this.getProgress(event.clientX);
 
     this.displayPreview(progress);
@@ -222,7 +208,7 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   seekToPosition: actions.seekToPosition,
   previewLocation: actions.previewPausedLocationBySourceId,
 })(FrameTimeline);

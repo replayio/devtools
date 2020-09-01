@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 jest.mock("devtools-environment", () => ({
   isFirefox: jest.fn(),
@@ -25,7 +25,7 @@ describe("scrollList", () => {
     const ul = document.createElement("ul");
     const li = document.createElement("li");
 
-    (li: any).scrollIntoView = jest.fn();
+    (li).scrollIntoView = jest.fn();
     ul.appendChild(li);
     isFirefox.mockImplementation(() => true);
 

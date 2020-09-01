@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React from "react";
 import { shallow } from "enzyme";
@@ -43,7 +43,7 @@ function render(overrides = {}) {
 
 describe("Outline", () => {
   afterEach(() => {
-    (copyToTheClipboard: any).mockClear();
+    (copyToTheClipboard).mockClear();
     showMenu.mockClear();
   });
 
@@ -80,7 +80,7 @@ describe("Outline", () => {
     describe("renders loading", () => {
       it("if symbols is not defined", () => {
         const { component } = render({
-          symbols: (null: any),
+          symbols: (null),
         });
         expect(component).toMatchSnapshot();
       });
@@ -109,7 +109,7 @@ describe("Outline", () => {
     describe("renders placeholder", () => {
       it("`No File Selected` if selectedSource is not defined", async () => {
         const { component } = render({
-          selectedSource: (null: any),
+          selectedSource: (null),
         });
         expect(component).toMatchSnapshot();
       });
@@ -217,7 +217,7 @@ describe("Outline", () => {
     });
 
     it("does not select an item if selectedSource is not defined", async () => {
-      const { instance, props } = render({ selectedSource: (null: any) });
+      const { instance, props } = render({ selectedSource: (null) });
       await instance.selectItem({});
       expect(props.selectLocation).not.toHaveBeenCalled();
     });
@@ -244,7 +244,7 @@ describe("Outline", () => {
         stopPropagation: jest.fn(),
       };
       const { instance } = render({
-        selectedSource: (null: any),
+        selectedSource: (null),
       });
       await instance.onContextMenu(mockEvent, {});
       expect(mockEvent.preventDefault).toHaveBeenCalled();

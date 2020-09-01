@@ -2,17 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 // This module converts Firefox specific types to the generic types
 
-import type { Frame, ThreadId, GeneratedSourceData, Thread } from "../../types";
-import type { PausedPacket, FrameFront, SourcePayload, Target } from "./types";
 
 import { clientCommands } from "./commands";
 
 const { ThreadFront } = require("protocol/thread");
 
-export function prepareSourcePayload(threadFront, source: SourcePayload): GeneratedSourceData {
+export function prepareSourcePayload(threadFront, source) {
   // We populate the set of sources as soon as we hear about them. Note that
   // this means that we have seen an actor, but it might still be in the
   // debounced queue for creation, so the Redux store itself might not have
@@ -22,7 +20,7 @@ export function prepareSourcePayload(threadFront, source: SourcePayload): Genera
   return { thread: threadFront.actor, source };
 }
 
-export async function createFrame(thread: ThreadId, frame, index = 0, asyncIndex = 0): ?Frame {
+export async function createFrame(thread, frame, index = 0, asyncIndex = 0) {
   if (!frame) {
     return null;
   }
@@ -62,11 +60,11 @@ export async function createFrame(thread: ThreadId, frame, index = 0, asyncIndex
   };
 }
 
-export function makeSourceId(source: SourcePayload, isServiceWorker: boolean) {
+export function makeSourceId(source, isServiceWorker) {
   return source.actor;
 }
 
-export function createPause(thread: string, packet: PausedPacket): any {
+export function createPause(thread, packet) {
   return {
     ...packet,
     thread,
@@ -75,7 +73,7 @@ export function createPause(thread: string, packet: PausedPacket): any {
   };
 }
 
-function getTargetType(target: Target) {
+function getTargetType(target) {
   if (target.isWorkerTarget) {
     return "worker";
   }
@@ -87,7 +85,7 @@ function getTargetType(target: Target) {
   return "mainThread";
 }
 
-export function createThread(actor: string, target: Target): Thread {
+export function createThread(actor, target) {
   return {
     actor,
     url: target.url,

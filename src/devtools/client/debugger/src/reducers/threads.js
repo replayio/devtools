@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 /**
  * Threads reducer
@@ -14,18 +14,9 @@ import { createSelector } from "reselect";
 
 import { features } from "../utils/prefs";
 
-import type { Selector, State } from "./types";
-import type { Thread, ThreadList } from "../types";
-import type { Action } from "../actions/types";
 
-export type ThreadsState = {
-  threads: ThreadList,
-  mainThread: Thread,
-  traits: Object,
-  isWebExtension: boolean,
-};
 
-export function initialThreadsState(): ThreadsState {
+export function initialThreadsState() {
   return {
     threads: [],
     mainThread: {
@@ -40,9 +31,9 @@ export function initialThreadsState(): ThreadsState {
 }
 
 export default function update(
-  state: ThreadsState = initialThreadsState(),
-  action: Action
-): ThreadsState {
+  state = initialThreadsState(),
+  action
+) {
   switch (action.type) {
     case "CONNECT":
       return {
@@ -83,43 +74,42 @@ export default function update(
   }
 }
 
-export const getThreads = (state: OuterState) => state.threads.threads;
+export const getThreads = (state) => state.threads.threads;
 
-export const getWorkerCount = (state: OuterState) => getThreads(state).length;
+export const getWorkerCount = (state) => getThreads(state).length;
 
-export function getWorkerByThread(state: OuterState, thread: string) {
+export function getWorkerByThread(state, thread) {
   return getThreads(state).find(worker => worker.actor == thread);
 }
 
-export function getMainThread(state: OuterState): Thread {
+export function getMainThread(state) {
   return state.threads.mainThread;
 }
 
-export function getDebuggeeUrl(state: OuterState): string {
+export function getDebuggeeUrl(state) {
   return getMainThread(state).url;
 }
 
-export const getAllThreads: Selector<Thread[]> = createSelector(
+export const getAllThreads = createSelector(
   getMainThread,
   getThreads,
   (mainThread, threads) => [mainThread, ...sortBy(threads, thread => thread.name)]
 );
 
-export function getCanRewind(state: State) {
+export function getCanRewind(state) {
   return state.threads.traits.canRewind;
 }
 
-export function supportsWasm(state: State) {
+export function supportsWasm(state) {
   return features.wasm && state.threads.traits.wasmBinarySource;
 }
 
 // checks if a path begins with a thread actor
 // e.g "server1.conn0.child1/workerTarget22/context1/dbg-workers.glitch.me"
-export function startsWithThreadActor(state: State, path: string) {
+export function startsWithThreadActor(state, path) {
   const threadActors = getAllThreads(state).map(t => t.actor);
 
   const match = path.match(new RegExp(`(${threadActors.join("|")})\/(.*)`));
   return match && match[1];
 }
 
-type OuterState = { threads: ThreadsState };

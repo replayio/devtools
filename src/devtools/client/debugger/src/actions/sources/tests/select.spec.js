@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { getSymbols } from "../../../reducers/ast";
 import {
@@ -163,7 +163,7 @@ describe("sources", () => {
   it("sets and clears selected location correctly", async () => {
     const { dispatch, getState, cx } = createStore(mockCommandClient);
     const source = await dispatch(actions.newGeneratedSource(makeSource("testSource")));
-    const location = ({ test: "testLocation" }: any);
+    const location = ({ test: "testLocation" });
 
     // set value
     dispatch(actions.setSelectedLocation(cx, source, location));

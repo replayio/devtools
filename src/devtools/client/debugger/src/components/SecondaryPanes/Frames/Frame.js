@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
@@ -15,22 +15,15 @@ import FrameMenu from "./FrameMenu";
 import FrameIndent from "./FrameIndent";
 import actions from "../../../actions";
 
-import type { Frame, ThreadContext } from "../../../types";
 
-type FrameTitleProps = {
-  frame: Frame,
-  options: Object,
-  l10n: Object,
-};
 
-function FrameTitle({ frame, options = {}, l10n }: FrameTitleProps) {
+function FrameTitle({ frame, options = {}, l10n }) {
   const displayName = formatDisplayName(frame, options, l10n);
   return <span className="title">{displayName}</span>;
 }
 
-type FrameLocationProps = { frame: Frame, displayFullUrl: boolean };
 
-function FrameLocation({ frame, displayFullUrl = false }: FrameLocationProps) {
+function FrameLocation({ frame, displayFullUrl = false }) {
   if (!frame.source) {
     return null;
   }
@@ -56,25 +49,8 @@ function FrameLocation({ frame, displayFullUrl = false }: FrameLocationProps) {
 
 FrameLocation.displayName = "FrameLocation";
 
-type FrameComponentProps = {
-  cx: ThreadContext,
-  frame: Frame,
-  selectedFrame: Frame,
-  copyStackTrace: Function,
-  toggleFrameworkGrouping: Function,
-  selectFrame: typeof actions.selectFrame,
-  selectLocation: typeof actions.selectLocation,
-  frameworkGroupingOn: boolean,
-  hideLocation: boolean,
-  shouldMapDisplayName: boolean,
-  toggleBlackBox: Function,
-  displayFullUrl: boolean,
-  getFrameTitle?: string => string,
-  disableContextMenu: boolean,
-  panel: "debugger" | "console",
-};
 
-export default class FrameComponent extends Component<FrameComponentProps> {
+export default class FrameComponent extends Component {
   static defaultProps = {
     hideLocation: false,
     shouldMapDisplayName: true,
@@ -89,7 +65,7 @@ export default class FrameComponent extends Component<FrameComponentProps> {
     return this.props.panel == "debugger";
   }
 
-  onContextMenu(event: SyntheticMouseEvent<HTMLElement>) {
+  onContextMenu(event) {
     const {
       frame,
       copyStackTrace,
@@ -107,7 +83,7 @@ export default class FrameComponent extends Component<FrameComponentProps> {
     );
   }
 
-  onMouseDown(e: SyntheticMouseEvent<HTMLElement>, frame: Frame, selectedFrame: Frame) {
+  onMouseDown(e, frame, selectedFrame) {
     if (e.button !== 0) {
       return;
     }
@@ -115,7 +91,7 @@ export default class FrameComponent extends Component<FrameComponentProps> {
     this.props.selectFrame(this.props.cx, frame);
   }
 
-  onKeyUp(event: SyntheticKeyboardEvent<HTMLElement>, frame: Frame, selectedFrame: Frame) {
+  onKeyUp(event, frame, selectedFrame) {
     if (event.key != "Enter") {
       return;
     }

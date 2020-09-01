@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
@@ -11,24 +11,12 @@ import { times, zip, flatten } from "lodash";
 
 import "./PreviewFunction.css";
 
-type FunctionType =
-  | {|
-      name: string,
-      parameterNames: string[],
-    |}
-  | {
-      functionName(): string,
-      functionParameterNames(): string[],
-      functionLocation(): { line: number },
-      functionLocationURL(): string,
-    };
 
-type Props = { func: FunctionType };
 
 const IGNORED_SOURCE_URLS = ["debugger eval code"];
 
-export default class PreviewFunction extends Component<Props> {
-  renderFunctionName(func: FunctionType) {
+export default class PreviewFunction extends Component {
+  renderFunctionName(func) {
     const { l10n } = this.context;
     const name =
       (func.functionName ? func.functionName() : func.name) || l10n.getStr("anonymousFunction");
@@ -36,7 +24,7 @@ export default class PreviewFunction extends Component<Props> {
     return <span className="function-name">{name}</span>;
   }
 
-  renderParams(func: FunctionType) {
+  renderParams(func) {
     const parameterNames =
       (func.functionParameterNames ? func.functionParameterNames() : func.parameterNames) || [];
 
@@ -58,7 +46,7 @@ export default class PreviewFunction extends Component<Props> {
     return flatten(zip(params, commas));
   }
 
-  jumpToDefinitionButton(func: FunctionType) {
+  jumpToDefinitionButton(func) {
     if (!func.functionLocation) {
       return null;
     }

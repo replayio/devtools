@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { setBreakpointPositions } from "./breakpointPositions";
 import { setSymbols } from "../sources/symbols";
@@ -18,26 +18,16 @@ import { comparePosition, createLocation } from "../../utils/location";
 import { getSource } from "../../selectors";
 import { addBreakpoint } from ".";
 
-import type { ThunkArgs } from "../types";
-import type { LoadedSymbols } from "../../reducers/types";
 
-import type {
-  SourceLocation,
-  ASTLocation,
-  PendingBreakpoint,
-  SourceId,
-  BreakpointPositions,
-  Context,
-} from "../../types";
 
 async function findNewLocation(
-  cx: Context,
-  { name, offset, index }: ASTLocation,
-  location: SourceLocation,
+  cx,
+  { name, offset, index },
+  location,
   source,
   thunkArgs
 ) {
-  const symbols: LoadedSymbols = await thunkArgs.dispatch(setSymbols({ cx, source }));
+  const symbols = await thunkArgs.dispatch(setSymbols({ cx, source }));
   const func = symbols ? findFunctionByName(symbols, name, index) : null;
 
   // Fallback onto the location line, if we do not find a function.
@@ -55,11 +45,11 @@ async function findNewLocation(
 }
 
 export function syncBreakpoint(
-  cx: Context,
-  sourceId: SourceId,
-  pendingBreakpoint: PendingBreakpoint
+  cx,
+  sourceId,
+  pendingBreakpoint
 ) {
-  return async (thunkArgs: ThunkArgs) => {
+  return async (thunkArgs) => {
     const { getState, client, dispatch } = thunkArgs;
     assertPendingBreakpoint(pendingBreakpoint);
 

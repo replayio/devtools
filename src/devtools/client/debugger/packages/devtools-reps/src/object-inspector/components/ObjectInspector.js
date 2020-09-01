@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 const { Component, createFactory, createElement } = require("react");
 const { connect } = require("react-redux");
@@ -30,12 +30,7 @@ const {
   nodeHasSetter,
 } = Utils.node;
 
-import type { CachedNodes, Props } from "../types";
 
-type DefaultProps = {
-  autoExpandAll: boolean,
-  autoExpandDepth: number,
-};
 
 // This implements a component that renders an interactive inspector
 // for looking at JavaScript objects. It expects descriptions of
@@ -64,13 +59,13 @@ type DefaultProps = {
 // fetched, and a primitive value that should be displayed with no
 // children.
 
-class ObjectInspector extends Component<Props> {
-  static defaultProps: DefaultProps;
-  constructor(props: Props) {
+class ObjectInspector extends Component {
+  static defaultProps;
+  constructor(props) {
     super();
     this.cachedNodes = new Map();
 
-    const self: any = this;
+    const self = this;
 
     self.getItemChildren = this.getItemChildren.bind(this);
     self.isNodeExpandable = this.isNodeExpandable.bind(this);
@@ -117,7 +112,7 @@ class ObjectInspector extends Component<Props> {
     }
   }
 
-  shouldComponentUpdate(nextProps: Props) {
+  shouldComponentUpdate(nextProps) {
     const { expandedPaths, loadedProperties } = this.props;
 
     // We should update if:
@@ -145,10 +140,10 @@ class ObjectInspector extends Component<Props> {
     this.props.closeObjectInspector();
   }
 
-  props: Props;
-  cachedNodes: CachedNodes;
+  props;
+  cachedNodes;
 
-  getItemChildren(item: Node): Array<Node> | NodeContents | null {
+  getItemChildren(item) {
     const { loadedProperties } = this.props;
     const { cachedNodes } = this;
 
@@ -159,17 +154,17 @@ class ObjectInspector extends Component<Props> {
     });
   }
 
-  getRoots(): Array<Node> {
+  getRoots() {
     return this.props.roots;
   }
 
-  getNodeKey(item: Node): string {
+  getNodeKey(item) {
     return item.path && typeof item.path.toString === "function"
       ? item.path.toString()
       : item.contents.id();
   }
 
-  isNodeExpandable(item: Node): boolean {
+  isNodeExpandable(item) {
     if (nodeIsPrimitive(item)) {
       return false;
     }
@@ -181,7 +176,7 @@ class ObjectInspector extends Component<Props> {
     return true;
   }
 
-  setExpanded(item: Node, expand: boolean) {
+  setExpanded(item, expand) {
     if (!this.isNodeExpandable(item)) {
       return;
     }
@@ -199,7 +194,7 @@ class ObjectInspector extends Component<Props> {
     }
   }
 
-  focusItem(item: Node) {
+  focusItem(item) {
     const { focusable = true, onFocus } = this.props;
 
     if (focusable && this.focusedItem !== item) {
@@ -212,7 +207,7 @@ class ObjectInspector extends Component<Props> {
     }
   }
 
-  activateItem(item: Node) {
+  activateItem(item) {
     const { focusable = true, onActivate } = this.props;
 
     if (focusable && this.activeItem !== item) {
@@ -225,7 +220,7 @@ class ObjectInspector extends Component<Props> {
     }
   }
 
-  shouldItemUpdate(prevItem: Node, nextItem: Node) {
+  shouldItemUpdate(prevItem, nextItem) {
     return false;
   }
 
@@ -289,7 +284,7 @@ function mapStateToProps(state, props) {
 
 const OI = connect(mapStateToProps, actions)(ObjectInspector);
 
-export default (props: Props) => {
+export default (props) => {
   const { roots } = props;
 
   if (roots.length == 0) {

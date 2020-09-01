@@ -7,10 +7,10 @@
  * https://dxr.mozilla.org/mozilla-central/source/devtools/shared/platform/content/clipboard.js
  */
 
-// @flow
+// 
 
-export function copyToTheClipboard(string: string) {
-  const doCopy = function (e: any) {
+export function copyToTheClipboard(string) {
+  const doCopy = function (e) {
     e.clipboardData.setData("text/plain", string);
     e.preventDefault();
   };

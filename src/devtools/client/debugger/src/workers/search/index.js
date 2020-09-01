@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import { WorkerDispatcher } from "devtools-utils/src/worker-utils";
 
 let startArgs;
@@ -17,7 +17,7 @@ function getDispatcher() {
   return dispatcher;
 }
 
-export const start = (...args: any[]) => {
+export const start = (...args) => {
   startArgs = args;
 };
 
@@ -29,10 +29,10 @@ export const stop = () => {
   }
 };
 
-export const getMatches = (...args: any[]) => {
+export const getMatches = (...args) => {
   return getDispatcher().invoke("getMatches", ...args);
 };
 
-export const findSourceMatches = (...args: any[]) => {
+export const findSourceMatches = (...args) => {
   return getDispatcher().invoke("findSourceMatches", ...args);
 };

@@ -2,19 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React from "react";
-import type { Coords } from "./Popover";
 
-type Props = {
-  token: HTMLDivElement,
-  preview: ?HTMLDivElement,
-  type: ?string,
-  gapHeight: number,
-  coords: Coords,
-  offset: number,
-};
 
 function shorten(coordinates) {
   // In cases where the token is wider than the preview, the smartGap
@@ -26,12 +17,12 @@ function shorten(coordinates) {
 }
 
 function getSmartGapCoordinates(
-  preview: ClientRect,
-  token: ClientRect,
-  offset: number,
-  orientation: string,
-  gapHeight: number,
-  coords: Coords
+  preview,
+  token,
+  offset,
+  orientation,
+  gapHeight,
+  coords
 ) {
   if (orientation === "up") {
     const coordinates = [
@@ -84,12 +75,12 @@ function getSmartGapCoordinates(
 }
 
 function getSmartGapDimensions(
-  previewRect: ClientRect,
-  tokenRect: ClientRect,
-  offset: number,
-  orientation: string,
-  gapHeight: number,
-  coords: Coords
+  previewRect,
+  tokenRect,
+  offset,
+  orientation,
+  gapHeight,
+  coords
 ) {
   if (orientation === "up") {
     return {
@@ -109,7 +100,7 @@ function getSmartGapDimensions(
   };
 }
 
-export default function SmartGap({ token, preview, type, gapHeight, coords, offset }: Props) {
+export default function SmartGap({ token, preview, type, gapHeight, coords, offset }) {
   const tokenRect = token.getBoundingClientRect();
   // $FlowIgnore
   const previewRect = preview.getBoundingClientRect();

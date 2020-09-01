@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { PrefsHelper, asyncStoreHelper } from "devtools-modules";
 
@@ -191,11 +191,11 @@ export const asyncStore = asyncStoreHelper("debugger", {
   tabsBlackBoxed: ["tabsBlackBoxed", []],
 });
 
-export function resetSchemaVersion(): void {
+export function resetSchemaVersion() {
   prefs.debuggerPrefsSchemaVersion = prefsSchemaVersion;
 }
 
-export function verifyPrefSchema(): void {
+export function verifyPrefSchema() {
   if (prefs.debuggerPrefsSchemaVersion < prefsSchemaVersion) {
     asyncStore.pendingBreakpoints = {};
     asyncStore.tabs = [];

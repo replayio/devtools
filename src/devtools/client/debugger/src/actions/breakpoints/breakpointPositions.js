@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { uniqBy, zip } from "lodash";
 
@@ -13,21 +13,13 @@ import {
   getSourceActorsForSource,
 } from "../../selectors";
 
-import type {
-  MappedLocation,
-  Range,
-  SourceLocation,
-  BreakpointPositions,
-  Context,
-} from "../../types";
 
 import { makeBreakpointId } from "../../utils/breakpoint";
-import { memoizeableAction, type MemoizedAction } from "../../utils/memoizableAction";
+import { memoizeableAction, } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
-import type { ThunkArgs } from "../../actions/types";
 import { loadSourceActorBreakpointColumns } from "../source-actors";
 
-function filterByUniqLocation(positions: MappedLocation[]) {
+function filterByUniqLocation(positions) {
   return uniqBy(positions, makeBreakpointId);
 }
 
@@ -114,10 +106,7 @@ function generatedSourceActorKey(state, sourceId) {
   return [sourceId, ...actors].join(":");
 }
 
-export const setBreakpointPositions: MemoizedAction<
-  {| cx: Context, sourceId: string, line?: number |},
-  ?BreakpointPositions
-> = memoizeableAction("setBreakpointPositions", {
+export const setBreakpointPositions = memoizeableAction("setBreakpointPositions", {
   getValue: ({ sourceId, line }, { getState }) => {
     const positions = getBreakpointPositionsForSource(getState(), sourceId);
     if (!positions) {

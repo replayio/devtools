@@ -2,11 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { getSymbols } from "../getSymbols";
 
-import type { SourceId } from "../../../types";
 
 function formatLocation(loc) {
   if (!loc) {
@@ -46,7 +45,7 @@ function formatString(name, symbols) {
   return `${name}: ${symbols[name]}`;
 }
 
-function formatKey(name: string, symbols: any) {
+function formatKey(name, symbols) {
   if (bools.includes(name)) {
     return formatBool(name, symbols);
   }
@@ -58,7 +57,7 @@ function formatKey(name: string, symbols: any) {
   return `${name}:\n${symbols[name].map(summarize).join("\n")}`;
 }
 
-export function formatSymbols(sourceId: SourceId) {
+export function formatSymbols(sourceId) {
   const symbols = getSymbols(sourceId);
 
   return Object.keys(symbols)

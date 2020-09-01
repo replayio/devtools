@@ -2,15 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { createParentMap } from "./utils";
 import flattenDeep from "lodash/flattenDeep";
-import type { TreeNode, TreeDirectory } from "./types";
-import type { Source } from "../../types";
 
-function findSourceItem(sourceTree: TreeDirectory, source: Source): ?TreeNode {
-  function _traverse(subtree: TreeNode) {
+function findSourceItem(sourceTree, source) {
+  function _traverse(subtree) {
     if (subtree.type === "source") {
       if (subtree.contents.id === source.id) {
         return subtree;
@@ -26,8 +24,8 @@ function findSourceItem(sourceTree: TreeDirectory, source: Source): ?TreeNode {
   return _traverse(sourceTree);
 }
 
-export function findSourceTreeNodes(sourceTree: TreeDirectory, path: string) {
-  function _traverse(subtree: TreeNode) {
+export function findSourceTreeNodes(sourceTree, path) {
+  function _traverse(subtree) {
     if (subtree.path.endsWith(path)) {
       return subtree;
     }
@@ -43,7 +41,7 @@ export function findSourceTreeNodes(sourceTree: TreeDirectory, path: string) {
   return Array.isArray(result) ? flattenDeep(result) : result;
 }
 
-function getAncestors(sourceTree: TreeDirectory, item: ?TreeNode) {
+function getAncestors(sourceTree, item) {
   if (!item) {
     return null;
   }
@@ -61,7 +59,7 @@ function getAncestors(sourceTree: TreeDirectory, item: ?TreeNode) {
   }
 }
 
-export function getDirectories(source: Source, sourceTree: TreeDirectory) {
+export function getDirectories(source, sourceTree) {
   const item = findSourceItem(sourceTree, source);
   const ancestors = getAncestors(sourceTree, item);
   return ancestors || [sourceTree];

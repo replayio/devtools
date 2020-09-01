@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 /* eslint max-nested-callbacks: ["error", 4]*/
 
@@ -17,9 +17,8 @@ import {
   nodeHasChildren,
 } from "../index";
 
-type RawSource = {| url: string, id: string, actors?: any |};
 
-function createSourcesMap(sources: RawSource[]) {
+function createSourcesMap(sources) {
   const sourcesMap = sources.reduce((map, source) => {
     map[source.id] = makeMockSource(source.url, source.id);
     return map;
@@ -28,7 +27,7 @@ function createSourcesMap(sources: RawSource[]) {
   return sourcesMap;
 }
 
-function createSourcesList(sources: { url: string, id?: string }[]) {
+function createSourcesList(sources) {
   return sources.map((s, i) => makeMockSource(s.url, s.id));
 }
 

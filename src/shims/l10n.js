@@ -57,18 +57,18 @@ export class LocalizationHelper {
     }
   }
 
-  getStr(key: string) {
+  getStr(key) {
     if (!this.strings[key]) {
       throw new Error(`L10N key ${key} cannot be found.`);
     }
     return this.strings[key];
   }
 
-  getFormatStr(name: string, ...args: any) {
+  getFormatStr(name, ...args) {
     return sprintf(this.getStr(name), ...args);
   }
 
-  numberWithDecimals(number: number, decimals: number = 0) {
+  numberWithDecimals(number, decimals = 0) {
     // If this is an integer, don't do anything special.
     if (number === (number | 0)) {
       return number;

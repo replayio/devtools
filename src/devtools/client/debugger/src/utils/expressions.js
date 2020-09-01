@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { correctIndentation } from "./indentation";
-import type { Expression } from "../types";
 const { createUnavailableValueFront } = require("protocol/thread");
 
 const UNAVAILABLE_GRIP = createUnavailableValueFront();
@@ -16,7 +15,7 @@ const UNAVAILABLE_GRIP = createUnavailableValueFront();
  *
  * NOTE: we add line after the expression to protect against comments.
  */
-export function wrapExpression(input: string) {
+export function wrapExpression(input) {
   return correctIndentation(`
     try {
       ${input}
@@ -34,7 +33,7 @@ function isUnavailable(value) {
   return ["ReferenceError", "TypeError"].includes(value.preview.name);
 }
 
-export function getValue(expression: Expression) {
+export function getValue(expression) {
   const { value, exception, error } = expression;
 
   if (error) {

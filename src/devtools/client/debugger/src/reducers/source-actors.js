@@ -2,11 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-import type { Action } from "../actions/types";
-import type { SourceId, ThreadId } from "../types";
-import { asSettled, type AsyncValue, type SettledValue } from "../utils/async-value";
+import { asSettled, } from "../utils/async-value";
 import {
   createInitial,
   insertResources,
@@ -18,62 +16,18 @@ import {
   makeWeakQuery,
   makeIdQuery,
   makeReduceAllQuery,
-  type Resource,
-  type ResourceState,
-  type WeakQuery,
-  type IdQuery,
-  type ReduceAllQuery,
 } from "../utils/resource";
 
 import { asyncActionAsValue } from "../actions/utils/middleware/promise";
-import type {
-  SourceActorBreakpointColumnsAction,
-  SourceActorBreakableLinesAction,
-} from "../actions/types/SourceActorAction";
 
-export opaque type SourceActorId: string = string;
-export type SourceActor = {|
-  +id: SourceActorId,
-  +actor: string,
-  +thread: ThreadId,
-  +source: SourceId,
 
-  +isBlackBoxed: boolean,
 
-  // The URL of the sourcemap for this source if there is one.
-  +sourceMapURL: string | null,
-
-  // The URL of the actor itself. If the source was from an "eval" or other
-  // string-based source, this will not be known.
-  +url: string | null,
-
-  // If this script was introduced by an eval, this will be the URL of the
-  // script that triggered the evaluation.
-  +introductionUrl: string | null,
-
-  // The debugger's Debugger.Source API provides type information for the
-  // cause of this source's creation.
-  +introductionType: string | null,
-|};
-
-type SourceActorResource = Resource<{
-  ...SourceActor,
-
-  // The list of breakpoint positions on each line of the file.
-  breakpointPositions: Map<number, AsyncValue<Array<number>>>,
-
-  // The list of lines that contain breakpoints.
-  breakableLines: AsyncValue<Array<number>> | null,
-}>;
-export type SourceActorsState = ResourceState<SourceActorResource>;
-export type SourceActorOuterState = { sourceActors: SourceActorsState };
-
-const initial: SourceActorsState = createInitial();
+const initial = createInitial();
 
 export default function update(
-  state: SourceActorsState = initial,
-  action: Action
-): SourceActorsState {
+  state = initial,
+  action
+) {
   switch (action.type) {
     case "INSERT_SOURCE_ACTORS": {
       const { items } = action;
@@ -114,7 +68,7 @@ export default function update(
   return state;
 }
 
-function clearSourceActorMapURL(state: SourceActorsState, id: SourceActorId): SourceActorsState {
+function clearSourceActorMapURL(state, id) {
   if (!hasResource(state, id)) {
     return state;
   }
@@ -128,9 +82,9 @@ function clearSourceActorMapURL(state: SourceActorsState, id: SourceActorId): So
 }
 
 function updateBreakpointColumns(
-  state: SourceActorsState,
-  action: SourceActorBreakpointColumnsAction
-): SourceActorsState {
+  state,
+  action
+) {
   const { sourceId, line } = action;
   const value = asyncActionAsValue(action);
 
@@ -145,9 +99,9 @@ function updateBreakpointColumns(
 }
 
 function updateBreakableLines(
-  state: SourceActorsState,
-  action: SourceActorBreakableLinesAction
-): SourceActorsState {
+  state,
+  action
+) {
   const value = asyncActionAsValue(action);
   const { sourceId } = action;
 
@@ -162,7 +116,7 @@ export function resourceAsSourceActor({
   breakpointPositions,
   breakableLines,
   ...sourceActor
-}: SourceActorResource): SourceActor {
+}) {
   return sourceActor;
 }
 
@@ -170,15 +124,15 @@ export function resourceAsSourceActor({
 // functions are required to convert back and forth in order to get a string
 // version of the IDs. That should be super rarely used, but it means that
 // we can very easily see where we're relying on the string version of IDs.
-export function stringToSourceActorId(s: string): SourceActorId {
+export function stringToSourceActorId(s) {
   return s;
 }
 
-export function hasSourceActor(state: SourceActorOuterState, id: SourceActorId): boolean {
+export function hasSourceActor(state, id) {
   return hasResource(state.sourceActors, id);
 }
 
-export function getSourceActor(state: SourceActorOuterState, id: SourceActorId): SourceActor {
+export function getSourceActor(state, id) {
   return getMappedResource(state.sourceActors, id, resourceAsSourceActor);
 }
 
@@ -186,21 +140,18 @@ export function getSourceActor(state: SourceActorOuterState, id: SourceActorId):
  * Get all of the source actors for a set of IDs. Caches based on the identity
  * of "ids" when possible.
  */
-const querySourceActorsById: IdQuery<SourceActorResource, SourceActor> = makeIdQuery(
+const querySourceActorsById = makeIdQuery(
   resourceAsSourceActor
 );
 
 export function getSourceActors(
-  state: SourceActorOuterState,
-  ids: Array<SourceActorId>
-): Array<SourceActor> {
+  state,
+  ids
+) {
   return querySourceActorsById(state.sourceActors, ids);
 }
 
-const querySourcesByThreadID: ReduceAllQuery<
-  SourceActorResource,
-  { [ThreadId]: Array<SourceActor> }
-> = makeReduceAllQuery(resourceAsSourceActor, actors => {
+const querySourcesByThreadID = makeReduceAllQuery(resourceAsSourceActor, actors => {
   return actors.reduce((acc, actor) => {
     acc[actor.thread] = acc[actor.thread] || [];
     acc[actor.thread].push(actor);
@@ -208,9 +159,9 @@ const querySourcesByThreadID: ReduceAllQuery<
   }, {});
 });
 export function getSourceActorsForThread(
-  state: SourceActorOuterState,
-  ids: ThreadId | Array<ThreadId>
-): Array<SourceActor> {
+  state,
+  ids
+) {
   const sourcesByThread = querySourcesByThreadID(state.sourceActors);
 
   let sources = [];
@@ -220,10 +171,7 @@ export function getSourceActorsForThread(
   return sources;
 }
 
-const queryThreadsBySourceObject: ReduceAllQuery<
-  SourceActorResource,
-  { [SourceId]: Array<ThreadId> }
-> = makeReduceAllQuery(
+const queryThreadsBySourceObject = makeReduceAllQuery(
   actor => ({ thread: actor.thread, source: actor.source }),
   actors =>
     actors.reduce((acc, { source, thread }) => {
@@ -239,35 +187,31 @@ const queryThreadsBySourceObject: ReduceAllQuery<
 );
 
 export function getAllThreadsBySource(
-  state: SourceActorOuterState
-): { [SourceId]: Array<ThreadId> } {
+  state
+) {
   return queryThreadsBySourceObject(state.sourceActors);
 }
 
 export function getSourceActorBreakableLines(
-  state: SourceActorOuterState,
-  id: SourceActorId
-): SettledValue<Array<number>> | null {
+  state,
+  id
+) {
   const { breakableLines } = getResource(state.sourceActors, id);
 
   return asSettled(breakableLines);
 }
 
 export function getSourceActorBreakpointColumns(
-  state: SourceActorOuterState,
-  id: SourceActorId,
-  line: number
-): SettledValue<Array<number>> | null {
+  state,
+  id,
+  line
+) {
   const { breakpointPositions } = getResource(state.sourceActors, id);
 
   return asSettled(breakpointPositions.get(line) || null);
 }
 
-export const getBreakableLinesForSourceActors: WeakQuery<
-  SourceActorResource,
-  Array<SourceActorId>,
-  Array<number>
-> = makeWeakQuery({
+export const getBreakableLinesForSourceActors = makeWeakQuery({
   filter: (state, ids) => ids,
   map: ({ breakableLines }) => breakableLines,
   reduce: items =>

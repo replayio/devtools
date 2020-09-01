@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
@@ -22,8 +22,6 @@ import {
   getCanRewind,
 } from "../selectors";
 
-import type { OrientationType } from "../reducers/types";
-import type { Source } from "../types";
 
 import { KeyShortcuts } from "devtools-modules";
 import Services from "devtools-services";
@@ -46,7 +44,6 @@ import "devtools/client/themes/common.css";
 // $FlowIgnore
 //import "devtools-launchpad/src/components/Root.css";
 
-import type { ActiveSearchType } from "../selectors";
 
 import "./shared/menu.css";
 
@@ -61,39 +58,18 @@ import EditorFooter from "./Editor/Footer";
 import QuickOpenModal from "./QuickOpenModal";
 import WhyPaused from "./SecondaryPanes/WhyPaused";
 
-type OwnProps = {||};
-type Props = {
-  selectedSource: ?Source,
-  orientation: OrientationType,
-  startPanelCollapsed: boolean,
-  endPanelCollapsed: boolean,
-  activeSearch: ?ActiveSearchType,
-  quickOpenEnabled: boolean,
-  canRewind: boolean,
-  setActiveSearch: typeof actions.setActiveSearch,
-  closeActiveSearch: typeof actions.closeActiveSearch,
-  closeProjectSearch: typeof actions.closeProjectSearch,
-  openQuickOpen: typeof actions.openQuickOpen,
-  closeQuickOpen: typeof actions.closeQuickOpen,
-  setOrientation: typeof actions.setOrientation,
-};
 
-type State = {
-  shortcutsModalEnabled: boolean,
-  startPanelSize: number,
-  endPanelSize: number,
-};
 
-class Debugger extends Component<Props, State> {
-  onLayoutChange: Function;
-  getChildContext: Function;
-  renderEditorPane: Function;
-  renderLayout: Function;
-  toggleQuickOpenModal: Function;
-  onEscape: Function;
-  onCommandSlash: Function;
+class Debugger extends Component {
+  onLayoutChange;
+  getChildContext;
+  renderEditorPane;
+  renderLayout;
+  toggleQuickOpenModal;
+  onEscape;
+  onCommandSlash;
 
-  constructor(props: Props) {
+  constructor(props) {
     super(props);
     this.state = {
       shortcutsModalEnabled: false,
@@ -144,7 +120,7 @@ class Debugger extends Component<Props, State> {
     shortcuts.off("Escape", this.onEscape);
   }
 
-  onEscape = (_: mixed, e: KeyboardEvent) => {
+  onEscape = (_, e) => {
     const { activeSearch, closeActiveSearch, closeQuickOpen, quickOpenEnabled } = this.props;
     const { shortcutsModalEnabled } = this.state;
 
@@ -172,7 +148,7 @@ class Debugger extends Component<Props, State> {
     return this.props.orientation === "horizontal";
   }
 
-  toggleQuickOpenModal = (_: mixed, e: SyntheticEvent<HTMLElement>, query?: string) => {
+  toggleQuickOpenModal = (_, e, query) => {
     const { quickOpenEnabled, openQuickOpen, closeQuickOpen } = this.props;
 
     e.preventDefault();
@@ -336,7 +312,7 @@ const mapStateToProps = state => ({
   orientation: getOrientation(state),
 });
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   setActiveSearch: actions.setActiveSearch,
   closeActiveSearch: actions.closeActiveSearch,
   closeProjectSearch: actions.closeProjectSearch,

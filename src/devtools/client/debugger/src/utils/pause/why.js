@@ -2,9 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-import type { Why } from "../../types";
 
 // Map protocol pause "why" reason to a valid L10N key
 // These are the known unhandled reasons:
@@ -33,7 +32,7 @@ const reasons = {
   other: "whyPaused.other",
 };
 
-export function getPauseReason(why?: ?Why): string | null {
+export function getPauseReason(why) {
   if (!why) {
     return null;
   }
@@ -46,15 +45,15 @@ export function getPauseReason(why?: ?Why): string | null {
   return reasons[reasonType];
 }
 
-export function isException(why: Why) {
+export function isException(why) {
   return why && why.type && why.type === "exception";
 }
 
-export function isInterrupted(why: ?Why) {
+export function isInterrupted(why) {
   return why && why.type && why.type === "interrupted";
 }
 
-export function inDebuggerEval(why: ?Why) {
+export function inDebuggerEval(why) {
   if (
     why &&
     why.type === "exception" &&

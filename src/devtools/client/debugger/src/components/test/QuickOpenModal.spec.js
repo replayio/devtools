@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React from "react";
 import lodash from "lodash";
@@ -21,7 +21,7 @@ import { filter } from "fuzzaldrin-plus";
 lodash.throttle = jest.fn(fn => fn);
 
 function generateModal(propOverrides, renderType = "shallow") {
-  const props: any = {
+  const props = {
     cx: mockcx,
     enabled: false,
     query: "",
@@ -401,7 +401,7 @@ describe("QuickOpenModal", () => {
     });
 
     it("on Enter with results, handle symbol shortcut", () => {
-      const symbols: Object = [":", "#", "@"];
+      const symbols = [":", "#", "@"];
       let key;
       let symbol;
       for (key in symbols) {

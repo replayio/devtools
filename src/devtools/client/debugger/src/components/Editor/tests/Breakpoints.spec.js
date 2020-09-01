@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React from "react";
 import { shallow } from "enzyme";
@@ -12,7 +12,7 @@ import * as I from "immutable";
 // $FlowIgnore
 const BreakpointsComponent = Breakpoints.WrappedComponent;
 
-function generateDefaults(overrides): any {
+function generateDefaults(overrides) {
   const sourceId = "server1.conn1.child1/source1";
   const matchingBreakpoints = { id1: { location: { sourceId } } };
 

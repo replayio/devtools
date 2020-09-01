@@ -2,22 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
-import type {
-  GripProperties,
-  ObjectFront,
-  PropertiesIterator,
-  Node,
-  LongStringFront,
-} from "../types";
+// 
 
 const { getValue, nodeHasFullText } = require("../utils/node");
 
 async function enumIndexedProperties(
-  objectFront: ObjectFront,
-  start: ?number,
-  end: ?number
-): Promise<{ ownProperties?: Object }> {
+  objectFront,
+  start,
+  end
+) {
   try {
     const iterator = await objectFront.enumProperties({
       ignoreNonIndexedProperties: true,
@@ -31,10 +24,10 @@ async function enumIndexedProperties(
 }
 
 async function enumNonIndexedProperties(
-  objectFront: ObjectFront,
-  start: ?number,
-  end: ?number
-): Promise<{ ownProperties?: Object }> {
+  objectFront,
+  start,
+  end
+) {
   try {
     const iterator = await objectFront.enumProperties({
       ignoreIndexedProperties: true,
@@ -48,10 +41,10 @@ async function enumNonIndexedProperties(
 }
 
 async function enumEntries(
-  objectFront: ObjectFront,
-  start: ?number,
-  end: ?number
-): Promise<{ ownProperties?: Object }> {
+  objectFront,
+  start,
+  end
+) {
   try {
     const iterator = await objectFront.enumEntries();
     const response = await iteratorSlice(iterator, start, end);
@@ -63,10 +56,10 @@ async function enumEntries(
 }
 
 async function enumSymbols(
-  objectFront: ObjectFront,
-  start: ?number,
-  end: ?number
-): Promise<{ ownSymbols?: Array<Object> }> {
+  objectFront,
+  start,
+  end
+) {
   try {
     const iterator = await objectFront.enumSymbols();
     const response = await iteratorSlice(iterator, start, end);
@@ -77,7 +70,7 @@ async function enumSymbols(
   }
 }
 
-async function getPrototype(objectFront: ObjectFront): ?Promise<{ prototype?: Object }> {
+async function getPrototype(objectFront) {
   if (typeof objectFront.getPrototype !== "function") {
     console.error("objectFront.getPrototype is not a function");
     return Promise.resolve({});
@@ -86,9 +79,9 @@ async function getPrototype(objectFront: ObjectFront): ?Promise<{ prototype?: Ob
 }
 
 async function getFullText(
-  longStringFront: LongStringFront,
-  item: Node
-): Promise<{ fullText?: string }> {
+  longStringFront,
+  item
+) {
   const { initial, fullText, length } = getValue(item);
   // Return fullText property if it exists so that it can be added to the
   // loadedProperties map.
@@ -108,16 +101,16 @@ async function getFullText(
 }
 
 async function getProxySlots(
-  objectFront: ObjectFront
-): Promise<{ proxyTarget?: Object, proxyHandler?: Object }> {
+  objectFront
+) {
   return objectFront.getProxySlots();
 }
 
 function iteratorSlice(
-  iterator: PropertiesIterator,
-  start: ?number,
-  end: ?number
-): Promise<GripProperties> {
+  iterator,
+  start,
+  end
+) {
   start = start || 0;
   const count = end ? end - start + 1 : iterator.count;
 

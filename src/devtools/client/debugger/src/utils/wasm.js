@@ -2,20 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-/* @flow */
+/*  */
 
 import { BinaryReader } from "wasmparser/dist/WasmParser";
 import { WasmDisassembler, NameSectionReader } from "wasmparser/dist/WasmDis";
 
-import type { SourceId, WasmSourceContent } from "../types";
-type WasmState = {
-  lines: Array<number>,
-  offsets: Array<number>,
-};
 
-var wasmStates: { [string]: WasmState } = (Object.create(null): any);
+var wasmStates = (Object.create(null));
 
-function maybeWasmSectionNameResolver(data: Uint8Array) {
+function maybeWasmSectionNameResolver(data) {
   try {
     const parser = new BinaryReader();
     parser.setData(data.buffer, 0, data.length);
@@ -32,7 +27,7 @@ function maybeWasmSectionNameResolver(data: Uint8Array) {
  * @memberof utils/wasm
  * @static
  */
-export function getWasmText(sourceId: string, data: Uint8Array) {
+export function getWasmText(sourceId, data) {
   const nameResolver = maybeWasmSectionNameResolver(data);
   const parser = new BinaryReader();
   parser.setData(data.buffer, 0, data.length);
@@ -62,12 +57,12 @@ export function getWasmText(sourceId: string, data: Uint8Array) {
  * @memberof utils/wasm
  * @static
  */
-export function getWasmLineNumberFormatter(sourceId: string) {
+export function getWasmLineNumberFormatter(sourceId) {
   const codeOf0 = 48,
     codeOfA = 65;
   const buffer = [codeOf0, codeOf0, codeOf0, codeOf0, codeOf0, codeOf0, codeOf0, codeOf0];
   let last0 = 7;
-  return function (number: number) {
+  return function (number) {
     const offset = lineToWasmOffset(sourceId, number - 1);
     if (offset == undefined) {
       return "";
@@ -89,7 +84,7 @@ export function getWasmLineNumberFormatter(sourceId: string) {
  * @memberof utils/wasm
  * @static
  */
-export function isWasm(sourceId: string) {
+export function isWasm(sourceId) {
   return sourceId in wasmStates;
 }
 
@@ -97,7 +92,7 @@ export function isWasm(sourceId: string) {
  * @memberof utils/wasm
  * @static
  */
-export function lineToWasmOffset(sourceId: string, number: number): ?number {
+export function lineToWasmOffset(sourceId, number) {
   const wasmState = wasmStates[sourceId];
   if (!wasmState) {
     return undefined;
@@ -113,7 +108,7 @@ export function lineToWasmOffset(sourceId: string, number: number): ?number {
  * @memberof utils/wasm
  * @static
  */
-export function wasmOffsetToLine(sourceId: string, offset: number): ?number {
+export function wasmOffsetToLine(sourceId, offset) {
   const wasmState = wasmStates[sourceId];
   if (!wasmState) {
     return undefined;
@@ -126,11 +121,11 @@ export function wasmOffsetToLine(sourceId: string, offset: number): ?number {
  * @static
  */
 export function clearWasmStates() {
-  wasmStates = (Object.create(null): any);
+  wasmStates = (Object.create(null));
 }
 
-const wasmLines: WeakMap<WasmSourceContent, string[]> = new WeakMap();
-export function renderWasmText(sourceId: SourceId, content: WasmSourceContent): string[] {
+const wasmLines = new WeakMap();
+export function renderWasmText(sourceId, content) {
   if (wasmLines.has(content)) {
     return wasmLines.get(content) || [];
   }

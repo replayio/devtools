@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { Component } from "react";
 import { connect } from "../../utils/connect";
@@ -36,61 +36,12 @@ import { features } from "../../utils/prefs";
 import { downloadFile } from "../../utils/utils";
 import { isFulfilled } from "../../utils/async-value";
 
-import type { TreeNode } from "../../utils/sources-tree/types";
-import type { Source, Context, Thread, SourceContent } from "../../types";
 
-type OwnProps = {|
-  item: TreeNode,
-  threads: Thread[],
-  depth: number,
-  focused: boolean,
-  autoExpand: ?boolean,
-  expanded: boolean,
-  focusItem: TreeNode => void,
-  selectItem: TreeNode => void,
-  source: ?Source,
-  debuggeeUrl: string,
-  projectRoot: string,
-  setExpanded: (TreeNode, boolean, boolean) => void,
-|};
-type Props = {
-  source: ?Source,
-  item: TreeNode,
-  autoExpand: ?boolean,
-  cx: Context,
-  debuggeeUrl: string,
-  projectRoot: string,
-  extensionName: string | null,
-  sourceContent: ?SourceContent,
-  depth: number,
-  focused: boolean,
-  expanded: boolean,
-  threads: Thread[],
-  mainThread: Thread,
-  hasMatchingGeneratedSource: boolean,
-  hasSiblingOfSameName: boolean,
-  hasPrettySource: boolean,
-  focusItem: TreeNode => void,
-  selectItem: TreeNode => void,
-  setExpanded: (TreeNode, boolean, boolean) => void,
-  clearProjectDirectoryRoot: typeof actions.clearProjectDirectoryRoot,
-  setProjectDirectoryRoot: typeof actions.setProjectDirectoryRoot,
-  toggleBlackBox: typeof actions.toggleBlackBox,
-  loadSourceText: typeof actions.loadSourceText,
-};
 
-type State = {};
 
-type MenuOption = {
-  id: string,
-  label: string,
-  disabled: boolean,
-  click: () => any,
-};
 
-type ContextMenu = Array<MenuOption>;
 
-class SourceTreeItem extends Component<Props, State> {
+class SourceTreeItem extends Component {
   componentDidMount() {
     const { autoExpand, item } = this.props;
     if (autoExpand) {
@@ -98,7 +49,7 @@ class SourceTreeItem extends Component<Props, State> {
     }
   }
 
-  onClick = (e: MouseEvent) => {
+  onClick = (e) => {
     const { item, focusItem, selectItem } = this.props;
 
     focusItem(item);
@@ -107,7 +58,7 @@ class SourceTreeItem extends Component<Props, State> {
     }
   };
 
-  onContextMenu = (event: Event, item: TreeNode) => {
+  onContextMenu = (event, item) => {
     const copySourceUri2Label = L10N.getStr("copySourceUri2");
     const copySourceUri2Key = L10N.getStr("copySourceUri2.accesskey");
     const setDirectoryRootLabel = L10N.getStr("setDirectoryRoot.label");
@@ -186,7 +137,7 @@ class SourceTreeItem extends Component<Props, State> {
     showMenu(event, menuOptions);
   };
 
-  handleDownloadFile = async (cx: Context, source: ?Source, item: TreeNode) => {
+  handleDownloadFile = async (cx, source, item) => {
     if (!source) {
       return;
     }
@@ -201,7 +152,7 @@ class SourceTreeItem extends Component<Props, State> {
     downloadFile(data, item.name);
   };
 
-  addCollapseExpandAllOptions = (menuOptions: ContextMenu, item: TreeNode) => {
+  addCollapseExpandAllOptions = (menuOptions, item) => {
     const { setExpanded } = this.props;
 
     menuOptions.push({
@@ -228,7 +179,7 @@ class SourceTreeItem extends Component<Props, State> {
     );
   }
 
-  renderIcon(item: TreeNode, depth: number) {
+  renderIcon(item, depth) {
     const { debuggeeUrl, projectRoot, source, hasPrettySource, threads } = this.props;
 
     if (item.name === "webpack://") {
@@ -281,7 +232,7 @@ class SourceTreeItem extends Component<Props, State> {
     return null;
   }
 
-  renderItemName(depth: number) {
+  renderItemName(depth) {
     const { item, threads, extensionName } = this.props;
 
     if (depth === 0) {
@@ -356,7 +307,7 @@ class SourceTreeItem extends Component<Props, State> {
   }
 }
 
-function getHasMatchingGeneratedSource(state, source: ?Source) {
+function getHasMatchingGeneratedSource(state, source) {
   if (!source) {
     return false;
   }
@@ -364,7 +315,7 @@ function getHasMatchingGeneratedSource(state, source: ?Source) {
   return !!getGeneratedSourceByURL(state, source.url);
 }
 
-function getSourceContentValue(state, source: Source) {
+function getSourceContentValue(state, source) {
   const content = getSourceContent(state, source.id);
   return content && isFulfilled(content) ? content.value : null;
 }
@@ -373,7 +324,7 @@ function isExtensionDirectory(depth, extensionName) {
   return extensionName && (depth === 1 || depth === 0);
 }
 
-const mapStateToProps = (state, props: OwnProps) => {
+const mapStateToProps = (state, props) => {
   const { source, item } = props;
   return {
     cx: getContext(state),
@@ -387,7 +338,7 @@ const mapStateToProps = (state, props: OwnProps) => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   setProjectDirectoryRoot: actions.setProjectDirectoryRoot,
   clearProjectDirectoryRoot: actions.clearProjectDirectoryRoot,
   toggleBlackBox: actions.toggleBlackBox,

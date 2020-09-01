@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 /**
  * Breakpoints reducer
@@ -16,21 +16,12 @@ import { makeBreakpointId } from "../utils/breakpoint";
 // eslint-disable-next-line max-len
 import { getBreakpointsList as getBreakpointsListSelector } from "../selectors/breakpoints";
 
-import type { XHRBreakpoint, Breakpoint, BreakpointId, SourceLocation } from "../types";
-import type { Action } from "../actions/types";
 
-export type BreakpointsMap = { [BreakpointId]: Breakpoint };
-export type XHRBreakpointsList = $ReadOnlyArray<XHRBreakpoint>;
 
-export type BreakpointsState = {
-  breakpoints: BreakpointsMap,
-  xhrBreakpoints: XHRBreakpointsList,
-  breakpointsDisabled: boolean,
-};
 
 export function initialBreakpointsState(
-  xhrBreakpoints?: XHRBreakpointsList = []
-): BreakpointsState {
+  xhrBreakpoints = []
+) {
   return {
     breakpoints: {},
     xhrBreakpoints,
@@ -39,9 +30,9 @@ export function initialBreakpointsState(
 }
 
 function update(
-  state: BreakpointsState = initialBreakpointsState(),
-  action: Action
-): BreakpointsState {
+  state = initialBreakpointsState(),
+  action
+) {
   switch (action.type) {
     case "SET_BREAKPOINT": {
       return setBreakpoint(state, action);
@@ -134,13 +125,13 @@ function updateXHRBreakpoint(state, action) {
   };
 }
 
-function setBreakpoint(state, { breakpoint }): BreakpointsState {
+function setBreakpoint(state, { breakpoint }) {
   const id = makeBreakpointId(breakpoint.location);
   const breakpoints = { ...state.breakpoints, [id]: breakpoint };
   return { ...state, breakpoints };
 }
 
-function removeBreakpoint(state, { location }): BreakpointsState {
+function removeBreakpoint(state, { location }) {
   const id = makeBreakpointId(location);
   const breakpoints = { ...state.breakpoints };
   delete breakpoints[id];
@@ -154,21 +145,20 @@ function isMatchingLocation(location1, location2) {
 // Selectors
 // TODO: these functions should be moved out of the reducer
 
-type OuterState = { breakpoints: BreakpointsState };
 
-export function getBreakpointsMap(state: OuterState): BreakpointsMap {
+export function getBreakpointsMap(state) {
   return state.breakpoints.breakpoints;
 }
 
-export function getBreakpointsList(state: OuterState): Breakpoint[] {
-  return getBreakpointsListSelector((state: any));
+export function getBreakpointsList(state) {
+  return getBreakpointsListSelector((state));
 }
 
-export function getBreakpointCount(state: OuterState): number {
+export function getBreakpointCount(state) {
   return getBreakpointsList(state).length;
 }
 
-export function getBreakpoint(state: OuterState, location: ?SourceLocation): ?Breakpoint {
+export function getBreakpoint(state, location) {
   if (!location) {
     return undefined;
   }
@@ -177,16 +167,16 @@ export function getBreakpoint(state: OuterState, location: ?SourceLocation): ?Br
   return breakpoints[makeBreakpointId(location)];
 }
 
-export function getBreakpointsDisabled(state: OuterState): boolean {
+export function getBreakpointsDisabled(state) {
   const breakpoints = getBreakpointsList(state);
   return breakpoints.every(breakpoint => breakpoint.disabled);
 }
 
 export function getBreakpointsForSource(
-  state: OuterState,
-  sourceId: string,
-  line: ?number
-): Breakpoint[] {
+  state,
+  sourceId,
+  line
+) {
   if (!sourceId) {
     return [];
   }
@@ -199,9 +189,9 @@ export function getBreakpointsForSource(
 }
 
 export function getBreakpointForLocation(
-  state: OuterState,
-  location: ?SourceLocation
-): ?Breakpoint {
+  state,
+  location
+) {
   if (!location) {
     return undefined;
   }
@@ -212,12 +202,12 @@ export function getBreakpointForLocation(
   });
 }
 
-export function getHiddenBreakpoint(state: OuterState): ?Breakpoint {
+export function getHiddenBreakpoint(state) {
   const breakpoints = getBreakpointsList(state);
   return breakpoints.find(bp => bp.options.hidden);
 }
 
-export function hasLogpoint(state: OuterState, location: ?SourceLocation): ?string {
+export function hasLogpoint(state, location) {
   const breakpoint = getBreakpoint(state, location);
   return breakpoint && breakpoint.options.logValue;
 }

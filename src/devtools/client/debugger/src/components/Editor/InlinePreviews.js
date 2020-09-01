@@ -2,31 +2,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import React, { Component } from "react";
 import InlinePreviewRow from "./InlinePreviewRow";
 import { connect } from "../../utils/connect";
 import { getSelectedFrame, getCurrentThread, getInlinePreviews } from "../../selectors";
 
-import type { Frame } from "../../types";
 
-type OwnProps = {|
-  editor: Object,
-  selectedSource: Object,
-|};
-type Props = {
-  editor: Object,
-  +selectedFrame: ?Frame,
-  selectedSource: Object,
-  +previews: ?Object,
-};
 
-function hasPreviews(previews: ?Object) {
+function hasPreviews(previews) {
   return !!previews && Object.keys(previews).length > 0;
 }
 
-class InlinePreviews extends Component<Props> {
-  shouldComponentUpdate({ previews }: Props) {
+class InlinePreviews extends Component {
+  shouldComponentUpdate({ previews }) {
     return hasPreviews(previews);
   }
 
@@ -41,12 +30,12 @@ class InlinePreviews extends Component<Props> {
     ) {
       return null;
     }
-    const previewsObj: Object = previews;
+    const previewsObj = previews;
 
     let inlinePreviewRows;
     editor.codeMirror.operation(() => {
-      inlinePreviewRows = Object.keys(previewsObj).map((line: string) => {
-        const lineNum: number = parseInt(line, 10);
+      inlinePreviewRows = Object.keys(previewsObj).map((line) => {
+        const lineNum = parseInt(line, 10);
 
         return (
           <InlinePreviewRow
@@ -65,10 +54,7 @@ class InlinePreviews extends Component<Props> {
 
 const mapStateToProps = (
   state
-): {|
-  selectedFrame: ?Frame,
-  previews: ?Object,
-|} => {
+) => {
   const thread = getCurrentThread(state);
   const selectedFrame = getSelectedFrame(state, thread);
 
@@ -85,4 +71,4 @@ const mapStateToProps = (
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(InlinePreviews);
+export default connect(mapStateToProps)(InlinePreviews);

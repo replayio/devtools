@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 /**
  * Quick Open reducer
@@ -10,26 +10,19 @@
  */
 
 import { parseQuickOpenQuery } from "../utils/quick-open";
-import type { Action } from "../actions/types";
 
-export type QuickOpenType = "sources" | "functions" | "goto" | "gotoSource";
 
-export type QuickOpenState = {
-  enabled: boolean,
-  query: string,
-  searchType: QuickOpenType,
-};
 
-export const createQuickOpenState = (): QuickOpenState => ({
+export const createQuickOpenState = () => ({
   enabled: false,
   query: "",
   searchType: "sources",
 });
 
 export default function update(
-  state: QuickOpenState = createQuickOpenState(),
-  action: Action
-): QuickOpenState {
+  state = createQuickOpenState(),
+  action
+) {
   switch (action.type) {
     case "OPEN_QUICK_OPEN":
       if (action.query != null) {
@@ -54,18 +47,15 @@ export default function update(
   }
 }
 
-type OuterState = {
-  quickOpen: QuickOpenState,
-};
 
-export function getQuickOpenEnabled(state: OuterState): boolean {
+export function getQuickOpenEnabled(state) {
   return state.quickOpen.enabled;
 }
 
-export function getQuickOpenQuery(state: OuterState) {
+export function getQuickOpenQuery(state) {
   return state.quickOpen.query;
 }
 
-export function getQuickOpenType(state: OuterState): QuickOpenType {
+export function getQuickOpenType(state) {
   return state.quickOpen.searchType;
 }

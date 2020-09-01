@@ -2,10 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
-declare var describe: (name: string, func: () => void) => void;
-declare var test: (desc: string, func: () => void) => void;
-declare var expect: (value: any) => any;
+// 
 
 import update, {
   createQuickOpenState,
@@ -17,7 +14,7 @@ import { setQuickOpenQuery, openQuickOpen, closeQuickOpen } from "../../actions/
 
 describe("quickOpen reducer", () => {
   test("initial state", () => {
-    const state = update(undefined, ({ type: "FAKE" }: any));
+    const state = update(undefined, ({ type: "FAKE" }));
     expect(getQuickOpenQuery({ quickOpen: state })).toEqual("");
     expect(getQuickOpenType({ quickOpen: state })).toEqual("sources");
   });

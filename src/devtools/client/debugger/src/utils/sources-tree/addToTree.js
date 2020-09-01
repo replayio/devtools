@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import {
   nodeHasChildren,
@@ -15,16 +15,13 @@ import {
 import { createTreeNodeMatcher, findNodeInContents } from "./treeOrder";
 import { getURL } from "./getURL";
 
-import type { ParsedURL } from "./getURL";
-import type { TreeDirectory, TreeNode } from "./types";
-import type { Source } from "../../types";
 
 function createNodeInTree(
-  part: string,
-  path: string,
-  tree: TreeDirectory,
-  index: number
-): TreeDirectory {
+  part,
+  path,
+  tree,
+  index
+) {
   const node = createDirectoryNode(part, path, []);
 
   // we are modifying the tree
@@ -41,15 +38,15 @@ function createNodeInTree(
  * 2. if it does not exist create it
  */
 function findOrCreateNode(
-  parts: string[],
-  subTree: TreeDirectory,
-  path: string,
-  part: string,
-  index: number,
-  url: Object,
-  debuggeeHost: ?string,
-  source: Source
-): TreeDirectory {
+  parts,
+  subTree,
+  path,
+  part,
+  index,
+  url,
+  debuggeeHost,
+  source
+) {
   const addedPartIsFile = partIsFile(index, parts, url);
 
   const { found: childFound, index: childIndex } = findNodeInContents(
@@ -78,7 +75,7 @@ function findOrCreateNode(
   }
 
   // if there is no naming conflict, we can traverse into the child
-  return (child: any);
+  return (child);
 }
 
 /*
@@ -86,12 +83,12 @@ function findOrCreateNode(
  * adding new nodes along the way
  */
 function traverseTree(
-  url: ParsedURL,
-  tree: TreeDirectory,
-  debuggeeHost: ?string,
-  source: Source,
-  thread: string
-): TreeNode {
+  url,
+  tree,
+  debuggeeHost,
+  source,
+  thread
+) {
   const parts = url.path.replace(/\/$/, "").split("/");
   parts[0] = url.group;
   if (thread) {
@@ -115,7 +112,7 @@ function traverseTree(
 /*
  * Add a source file to a directory node in the tree
  */
-function addSourceToNode(node: TreeDirectory, url: ParsedURL, source: Source): Source | TreeNode[] {
+function addSourceToNode(node, url, source) {
   const isFile = !isPathDirectory(url.path);
 
   if (node.type == "source" && !isFile) {
@@ -159,10 +156,10 @@ function addSourceToNode(node: TreeDirectory, url: ParsedURL, source: Source): S
  * @static
  */
 export function addToTree(
-  tree: TreeDirectory,
-  source: Source,
-  debuggeeHost: ?string,
-  thread: string
+  tree,
+  source,
+  debuggeeHost,
+  thread
 ) {
   const url = getURL(source, debuggeeHost);
 

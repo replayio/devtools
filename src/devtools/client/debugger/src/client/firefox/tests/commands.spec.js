@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { setupCommands, clientCommands } from "../commands";
 
@@ -13,14 +13,14 @@ function makeThreadCLient(resp) {
     pauseGrip: () => ({
       getPrototypeAndProperties: async () => resp,
     }),
-  }: any);
+  });
 }
 
 function makeDependencies() {
   return {
-    devToolsClient: (null: any),
+    devToolsClient: (null),
     supportsWasm: true,
-    currentTarget: (null: any),
+    currentTarget: (null),
   };
 }
 

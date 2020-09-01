@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import {
   clearSearch,
@@ -14,8 +14,6 @@ import {
 } from "../utils/editor";
 import { renderWasmText } from "../utils/wasm";
 import { getMatches } from "../workers/search";
-import type { Action, FileTextSearchModifier, ThunkArgs } from "./types";
-import type { Context } from "../types";
 
 import {
   getSelectedSourceWithContent,
@@ -26,11 +24,9 @@ import {
 
 import { closeActiveSearch, clearHighlightLineRange, setActiveSearch } from "./ui";
 import { isFulfilled } from "../utils/async-value";
-type Editor = Object;
-type Match = Object;
 
-export function doSearch(cx: Context, query: string, editor: Editor) {
-  return ({ getState, dispatch }: ThunkArgs) => {
+export function doSearch(cx, query, editor) {
+  return ({ getState, dispatch }) => {
     const selectedSource = getSelectedSourceWithContent(getState());
     if (!selectedSource || !selectedSource.content) {
       return;
@@ -41,8 +37,8 @@ export function doSearch(cx: Context, query: string, editor: Editor) {
   };
 }
 
-export function doSearchForHighlight(query: string, editor: Editor, line: number, ch: number) {
-  return async ({ getState, dispatch }: ThunkArgs) => {
+export function doSearchForHighlight(query, editor, line, ch) {
+  return async ({ getState, dispatch }) => {
     const selectedSource = getSelectedSourceWithContent(getState());
     if (!selectedSource || !selectedSource.content) {
       return;
@@ -51,7 +47,7 @@ export function doSearchForHighlight(query: string, editor: Editor, line: number
   };
 }
 
-export function setFileSearchQuery(cx: Context, query: string): Action {
+export function setFileSearchQuery(cx, query) {
   return {
     type: "UPDATE_FILE_SEARCH_QUERY",
     cx,
@@ -59,16 +55,16 @@ export function setFileSearchQuery(cx: Context, query: string): Action {
   };
 }
 
-export function toggleFileSearchModifier(cx: Context, modifier: FileTextSearchModifier): Action {
+export function toggleFileSearchModifier(cx, modifier) {
   return { type: "TOGGLE_FILE_SEARCH_MODIFIER", cx, modifier };
 }
 
 export function updateSearchResults(
-  cx: Context,
-  characterIndex: number,
-  line: number,
-  matches: Match[]
-): Action {
+  cx,
+  characterIndex,
+  line,
+  matches
+) {
   const matchIndex = matches.findIndex(elm => elm.line === line && elm.ch === characterIndex);
 
   return {
@@ -84,12 +80,12 @@ export function updateSearchResults(
 }
 
 export function searchContents(
-  cx: Context,
-  query: string,
-  editor: Object,
-  focusFirstResult?: boolean = true
+  cx,
+  query,
+  editor,
+  focusFirstResult = true
 ) {
-  return async ({ getState, dispatch }: ThunkArgs) => {
+  return async ({ getState, dispatch }) => {
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());
 
@@ -132,12 +128,12 @@ export function searchContents(
 }
 
 export function searchContentsForHighlight(
-  query: string,
-  editor: Object,
-  line: number,
-  ch: number
+  query,
+  editor,
+  line,
+  ch
 ) {
-  return async ({ getState, dispatch }: ThunkArgs) => {
+  return async ({ getState, dispatch }) => {
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());
 
@@ -150,8 +146,8 @@ export function searchContentsForHighlight(
   };
 }
 
-export function traverseResults(cx: Context, rev: boolean, editor: Editor) {
-  return async ({ getState, dispatch }: ThunkArgs) => {
+export function traverseResults(cx, rev, editor) {
+  return async ({ getState, dispatch }) => {
     if (!editor) {
       return;
     }
@@ -180,8 +176,8 @@ export function traverseResults(cx: Context, rev: boolean, editor: Editor) {
   };
 }
 
-export function closeFileSearch(cx: Context, editor: Editor) {
-  return ({ getState, dispatch }: ThunkArgs) => {
+export function closeFileSearch(cx, editor) {
+  return ({ getState, dispatch }) => {
     if (editor) {
       const query = getFileSearchQuery(getState());
       const ctx = { ed: editor, cm: editor.codeMirror };

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { getMode } from "../source";
 
@@ -11,30 +11,22 @@ import { isMinified } from "../isMinified";
 import { resizeBreakpointGutter, resizeToggleButton } from "../ui";
 import SourceEditor from "./source-editor";
 
-import type {
-  SourceId,
-  Source,
-  SourceContent,
-  SourceWithContent,
-  SourceDocuments,
-} from "../../types";
-import type { SymbolDeclarations } from "../../workers/parser";
 
-let sourceDocs: SourceDocuments = {};
+let sourceDocs = {};
 
-export function getDocument(key: string) {
+export function getDocument(key) {
   return sourceDocs[key];
 }
 
-export function hasDocument(key: string): boolean {
+export function hasDocument(key) {
   return !!getDocument(key);
 }
 
-export function setDocument(key: string, doc: any) {
+export function setDocument(key, doc) {
   sourceDocs[key] = doc;
 }
 
-export function removeDocument(key: string) {
+export function removeDocument(key) {
   delete sourceDocs[key];
 }
 
@@ -42,7 +34,7 @@ export function clearDocuments() {
   sourceDocs = {};
 }
 
-export function updateDocument(editor: SourceEditor, source: Source) {
+export function updateDocument(editor, source) {
   if (!source) {
     return;
   }
@@ -52,14 +44,14 @@ export function updateDocument(editor: SourceEditor, source: Source) {
   editor.replaceDocument(doc);
 }
 
-export function clearEditor(editor: SourceEditor) {
+export function clearEditor(editor) {
   const doc = editor.createDocument();
   editor.replaceDocument(doc);
   editor.setText("");
   editor.setMode({ name: "text" });
 }
 
-export function showLoading(editor: SourceEditor) {
+export function showLoading(editor) {
   let doc = getDocument("loading");
 
   if (doc) {
@@ -73,7 +65,7 @@ export function showLoading(editor: SourceEditor) {
   }
 }
 
-export function showErrorMessage(editor: Object, msg: string) {
+export function showErrorMessage(editor, msg) {
   let error;
   if (msg.includes("WebAssembly binary source is not available")) {
     error = L10N.getStr("wasmIsNotAvailable");
@@ -86,7 +78,7 @@ export function showErrorMessage(editor: Object, msg: string) {
   editor.setMode({ name: "text" });
 }
 
-function setEditorText(editor: Object, sourceId: SourceId, content: SourceContent) {
+function setEditorText(editor, sourceId, content) {
   if (content.type === "wasm") {
     const wasmLines = renderWasmText(sourceId, content);
     // cm will try to split into lines anyway, saving memory
@@ -106,7 +98,7 @@ function setEditorText(editor: Object, sourceId: SourceId, content: SourceConten
   }
 }
 
-function setMode(editor, source: SourceWithContent, content: SourceContent, symbols) {
+function setMode(editor, source, content, symbols) {
   // Disable modes for minified files with 1+ million characters Bug 1569829
   if (content.type === "text" && isMinified(source) && content.value.length > 1000000) {
     return;
@@ -124,10 +116,10 @@ function setMode(editor, source: SourceWithContent, content: SourceContent, symb
  * document with the correct mode and text.
  */
 export function showSourceText(
-  editor: Object,
-  source: SourceWithContent,
-  content: SourceContent,
-  symbols?: SymbolDeclarations
+  editor,
+  source,
+  content,
+  symbols
 ) {
   if (hasDocument(source.id)) {
     const doc = getDocument(source.id);

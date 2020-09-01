@@ -2,19 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { parse } from "../url";
 import { getUnicodeHostname, getUnicodeUrlPath } from "devtools-modules";
 
-import type { Source } from "../../types";
-export type ParsedURL = {
-  path: string,
-  group: string,
-  filename: string,
-};
 
-export function getFilenameFromPath(pathname?: string) {
+export function getFilenameFromPath(pathname) {
   let filename = "";
   if (pathname) {
     filename = pathname.substring(pathname.lastIndexOf("/") + 1);
@@ -29,7 +23,7 @@ export function getFilenameFromPath(pathname?: string) {
 const NoDomain = "(no domain)";
 const def = { path: "", group: "", filename: "" };
 
-export function getURL(source: Source, defaultDomain: ?string = ""): ParsedURL {
+export function getURL(source, defaultDomain = "") {
   const { url } = source;
   if (!url) {
     return def;

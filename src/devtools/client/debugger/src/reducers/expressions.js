@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 /**
  * Expressions reducer
@@ -14,17 +14,7 @@ import { omit, zip } from "lodash";
 import { createSelector } from "reselect";
 import { prefs } from "../utils/prefs";
 
-import type { Expression } from "../types";
-import type { Selector, State } from "../reducers/types";
-import type { Action } from "../actions/types";
 
-type AutocompleteMatches = { [string]: string[] };
-export type ExpressionState = {
-  expressions: Expression[],
-  expressionError: boolean,
-  autocompleteMatches: AutocompleteMatches,
-  currentAutocompleteInput: string | null,
-};
 
 export const createExpressionState = () => ({
   expressions: restoreExpressions(),
@@ -33,7 +23,7 @@ export const createExpressionState = () => ({
   currentAutocompleteInput: null,
 });
 
-function update(state: ExpressionState = createExpressionState(), action: Action): ExpressionState {
+function update(state = createExpressionState(), action) {
   switch (action.type) {
     case "ADD_EXPRESSION":
       if (action.expressionError) {
@@ -117,14 +107,14 @@ function storeExpressions({ expressions }) {
   prefs.expressions = expressions.map(expression => omit(expression, "value"));
 }
 
-function appendExpressionToList(state: ExpressionState, value: any) {
+function appendExpressionToList(state, value) {
   const newState = { ...state, expressions: [...state.expressions, value] };
 
   storeExpressions(newState);
   return newState;
 }
 
-function updateExpressionInList(state: ExpressionState, key: string, value: any) {
+function updateExpressionInList(state, key, value) {
   const list = [...state.expressions];
   const index = list.findIndex(e => e.input == key);
   list[index] = value;
@@ -134,7 +124,7 @@ function updateExpressionInList(state: ExpressionState, key: string, value: any)
   return newState;
 }
 
-function deleteExpression(state: ExpressionState, input: string) {
+function deleteExpression(state, input) {
   const list = [...state.expressions];
   const index = list.findIndex(e => e.input == input);
   list.splice(index, 1);
@@ -145,28 +135,28 @@ function deleteExpression(state: ExpressionState, input: string) {
 
 const getExpressionsWrapper = state => state.expressions;
 
-export const getExpressions: Selector<Array<Expression>> = createSelector(
+export const getExpressions = createSelector(
   getExpressionsWrapper,
   expressions => expressions.expressions
 );
 
-export const getAutocompleteMatches: Selector<AutocompleteMatches> = createSelector(
+export const getAutocompleteMatches = createSelector(
   getExpressionsWrapper,
   expressions => expressions.autocompleteMatches
 );
 
-export function getExpression(state: State, input: string) {
+export function getExpression(state, input) {
   return getExpressions(state).find(exp => exp.input == input);
 }
 
-export function getAutocompleteMatchset(state: State) {
+export function getAutocompleteMatchset(state) {
   const input = state.expressions.currentAutocompleteInput;
   if (input) {
     return getAutocompleteMatches(state)[input];
   }
 }
 
-export const getExpressionError: Selector<boolean> = createSelector(
+export const getExpressionError = createSelector(
   getExpressionsWrapper,
   expressions => expressions.expressionError
 );

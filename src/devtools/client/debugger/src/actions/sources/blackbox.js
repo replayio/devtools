@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 /**
  * Redux actions for the sources state
@@ -15,18 +15,16 @@ import { getSourceActorsForSource } from "../../selectors";
 
 import { PROMISE } from "../utils/middleware/promise";
 
-import type { Source, Context } from "../../types";
-import type { ThunkArgs } from "../types";
 
-async function blackboxActors(state, client, sourceId, isBlackBoxed, range?) {
+async function blackboxActors(state, client, sourceId, isBlackBoxed, range) {
   for (const actor of getSourceActorsForSource(state, sourceId)) {
     await client.blackBox(actor, isBlackBoxed, range);
   }
   return { isBlackBoxed: !isBlackBoxed };
 }
 
-export function toggleBlackBox(cx: Context, source: Source) {
-  return async ({ dispatch, getState, client, sourceMaps }: ThunkArgs) => {
+export function toggleBlackBox(cx, source) {
+  return async ({ dispatch, getState, client, sourceMaps }) => {
     const { isBlackBoxed } = source;
 
     if (!isBlackBoxed) {

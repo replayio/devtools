@@ -2,13 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-export function strictEqual(value: mixed, other: mixed): boolean {
+export function strictEqual(value, other) {
   return value === other;
 }
 
-export function shallowEqual(value: mixed, other: mixed): boolean {
+export function shallowEqual(value, other) {
   return (
     value === other ||
     (Array.isArray(value) && Array.isArray(other) && arrayShallowEqual(value, other)) ||
@@ -17,13 +17,13 @@ export function shallowEqual(value: mixed, other: mixed): boolean {
 }
 
 export function arrayShallowEqual(
-  value: $ReadOnlyArray<mixed>,
-  other: $ReadOnlyArray<mixed>
-): boolean {
+  value,
+  other
+) {
   return value.length === other.length && value.every((k, i) => k === other[i]);
 }
 
-function objectShallowEqual(value: { [string]: mixed }, other: { [string]: mixed }): boolean {
+function objectShallowEqual(value, other) {
   const existingKeys = Object.keys(other);
   const keys = Object.keys(value);
 
@@ -34,6 +34,6 @@ function objectShallowEqual(value: { [string]: mixed }, other: { [string]: mixed
   );
 }
 
-function isObject(value: mixed): boolean %checks {
+function isObject(value) {
   return typeof value === "object" && !!value;
 }

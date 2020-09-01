@@ -2,9 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-import type { SourcePacket, PausedPacket, Target, DevToolsClient } from "./types";
 
 import Actions from "../../actions";
 
@@ -21,22 +20,18 @@ const {
 const { ThreadFront } = require("protocol/thread");
 const { log } = require("protocol/socket");
 
-type Dependencies = {
-  actions: typeof Actions,
-  devToolsClient: DevToolsClient,
-};
 
-let actions: typeof Actions;
-let isInterrupted: boolean;
+let actions;
+let isInterrupted;
 let panel;
 
-function addThreadEventListeners(thread: ThreadFront) {
+function addThreadEventListeners(thread) {
   const removeListeners = [];
   threadFrontListeners.set(thread, removeListeners);
   thread.replayFetchPreloadedData();
 }
 
-function setupEvents(dependencies: Dependencies) {
+function setupEvents(dependencies) {
   const { devToolsClient } = dependencies;
   actions = dependencies.actions;
   panel = dependencies.panel;
@@ -47,7 +42,7 @@ function setupEvents(dependencies: Dependencies) {
   });
 }
 
-function removeEventsTopTarget(targetFront: Target) {
+function removeEventsTopTarget(targetFront) {
   targetFront.off("workerListChanged", threadListChanged);
   removeThreadEventListeners(targetFront.threadFront);
   workersListener.removeListener();
@@ -70,7 +65,7 @@ function resumed(threadFront) {
   actions.resumed(threadFront.actor);
 }
 
-function newSource(threadFront, { source }: SourcePacket) {
+function newSource(threadFront, { source }) {
   sourceQueue.queue({
     type: "generated",
     data: prepareSourcePayload(threadFront, source),
@@ -83,7 +78,7 @@ function threadListChanged() {
 
 function replayFramePositions(
   threadFront,
-  { positions, unexecutedLocations, frame, thread }: Object
+  { positions, unexecutedLocations, frame, thread }
 ) {
   actions.setFramePositions(positions, unexecutedLocations, frame, thread);
 }

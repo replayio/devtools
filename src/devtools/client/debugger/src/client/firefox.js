@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { setupCommands, clientCommands } from "./firefox/commands";
 import { setupEvents, clientEvents } from "./firefox/events";
@@ -12,7 +12,7 @@ const { ThreadFront } = require("protocol/thread");
 
 let actions;
 
-export async function onConnect(connection: any, _actions: Object, panel) {
+export async function onConnect(connection, _actions, panel) {
   const { devToolsClient, targetList } = connection;
   actions = _actions;
 

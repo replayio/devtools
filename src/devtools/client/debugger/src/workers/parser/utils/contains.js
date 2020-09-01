@@ -2,12 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-import type { AstLocation, AstPosition } from "../types";
-import type { Node } from "@babel/types";
 
-function startsBefore(a: AstLocation, b: AstPosition) {
+function startsBefore(a, b) {
   let before = a.start.line < b.line;
   if (a.start.line === b.line) {
     before = a.start.column >= 0 && b.column >= 0 ? a.start.column <= b.column : true;
@@ -15,7 +13,7 @@ function startsBefore(a: AstLocation, b: AstPosition) {
   return before;
 }
 
-function endsAfter(a: AstLocation, b: AstPosition) {
+function endsAfter(a, b) {
   let after = a.end.line > b.line;
   if (a.end.line === b.line) {
     after = a.end.column >= 0 && b.column >= 0 ? a.end.column >= b.column : true;
@@ -23,14 +21,14 @@ function endsAfter(a: AstLocation, b: AstPosition) {
   return after;
 }
 
-export function containsPosition(a: AstLocation, b: AstPosition) {
+export function containsPosition(a, b) {
   return startsBefore(a, b) && endsAfter(a, b);
 }
 
-export function containsLocation(a: AstLocation, b: AstLocation) {
+export function containsLocation(a, b) {
   return containsPosition(a, b.start) && containsPosition(a, b.end);
 }
 
-export function nodeContainsPosition(node: Node, position: AstPosition) {
+export function nodeContainsPosition(node, position) {
   return containsPosition(node.loc, position);
 }

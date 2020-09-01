@@ -2,17 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import buildQuery from "../build-query";
 
-import type { SearchModifiers } from "../../types";
 
 /**
  * @memberof utils/source-search
  * @static
  */
-function getSearchCursor(cm, query: string, pos, modifiers: SearchModifiers) {
+function getSearchCursor(cm, query, pos, modifiers) {
   const regexQuery = buildQuery(query, modifiers, { isGlobal: true });
   return cm.getSearchCursor(regexQuery, pos);
 }
@@ -31,7 +30,7 @@ function SearchState() {
  * @memberof utils/source-search
  * @static
  */
-function getSearchState(cm: any, query) {
+function getSearchState(cm, query) {
   const state = cm.state.search || (cm.state.search = new SearchState());
   return state;
 }
@@ -104,7 +103,7 @@ function updateCursor(cm, state, keepSelection) {
   }
 }
 
-export function getMatchIndex(count: number, currentIndex: number, rev: boolean) {
+export function getMatchIndex(count, currentIndex, rev) {
   if (!rev) {
     if (currentIndex == count - 1) {
       return 0;
@@ -133,8 +132,8 @@ function doSearch(
   rev,
   query,
   keepSelection,
-  modifiers: SearchModifiers,
-  focusFirstResult?: boolean = true
+  modifiers,
+  focusFirstResult = true
 ) {
   const { cm, ed } = ctx;
   if (!cm) {
@@ -168,13 +167,13 @@ function doSearch(
 }
 
 export function searchSourceForHighlight(
-  ctx: Object,
-  rev: boolean,
-  query: string,
-  keepSelection: boolean,
-  modifiers: SearchModifiers,
-  line: number,
-  ch: number
+  ctx,
+  rev,
+  query,
+  keepSelection,
+  modifiers,
+  line,
+  ch
 ) {
   const { cm } = ctx;
   if (!cm) {
@@ -262,7 +261,7 @@ function findNextOnLine(ctx, rev, query, newQuery, modifiers, line, ch) {
  * @memberof utils/source-search
  * @static
  */
-export function removeOverlay(ctx: any, query: string) {
+export function removeOverlay(ctx, query) {
   const state = getSearchState(ctx.cm, query);
   ctx.cm.removeOverlay(state.overlay);
   const { line, ch } = ctx.cm.getCursor();
@@ -275,7 +274,7 @@ export function removeOverlay(ctx: any, query: string) {
  * @memberof utils/source-search
  * @static
  */
-export function clearSearch(cm: any, query: string) {
+export function clearSearch(cm, query) {
   const state = getSearchState(cm, query);
 
   state.results = [];
@@ -294,11 +293,11 @@ export function clearSearch(cm: any, query: string) {
  * @static
  */
 export function find(
-  ctx: any,
-  query: string,
-  keepSelection: boolean,
-  modifiers: SearchModifiers,
-  focusFirstResult?: boolean
+  ctx,
+  query,
+  keepSelection,
+  modifiers,
+  focusFirstResult
 ) {
   clearSearch(ctx.cm, query);
   return doSearch(ctx, false, query, keepSelection, modifiers, focusFirstResult);
@@ -311,10 +310,10 @@ export function find(
  * @static
  */
 export function findNext(
-  ctx: any,
-  query: string,
-  keepSelection: boolean,
-  modifiers: SearchModifiers
+  ctx,
+  query,
+  keepSelection,
+  modifiers
 ) {
   return doSearch(ctx, false, query, keepSelection, modifiers);
 }
@@ -326,10 +325,10 @@ export function findNext(
  * @static
  */
 export function findPrev(
-  ctx: any,
-  query: string,
-  keepSelection: boolean,
-  modifiers: SearchModifiers
+  ctx,
+  query,
+  keepSelection,
+  modifiers
 ) {
   return doSearch(ctx, true, query, keepSelection, modifiers);
 }

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { Component } from "react";
 import classnames from "classnames";
@@ -45,16 +45,7 @@ import Scopes from "./Scopes";
 
 import "./SecondaryPanes.css";
 
-import type { Expression, Frame, ThreadList, ThreadContext, Source } from "../../types";
 
-type AccordionPaneItem = {
-  header: string,
-  component: any,
-  opened?: boolean,
-  onToggle?: () => void,
-  shouldOpen?: () => boolean,
-  buttons?: any,
-};
 
 function debugBtn(onClick, type, className, tooltip) {
   return (
@@ -64,41 +55,13 @@ function debugBtn(onClick, type, className, tooltip) {
   );
 }
 
-type State = {
-  showExpressionsInput: boolean,
-  showXHRInput: boolean,
-};
 
-type OwnProps = {|
-  horizontal: boolean,
-|};
-type Props = {
-  cx: ThreadContext,
-  expressions: List<Expression>,
-  hasFrames: boolean,
-  framesLoading: boolean,
-  horizontal: boolean,
-  breakpoints: Object,
-  selectedFrame: ?Frame,
-  breakpointsDisabled: boolean,
-  isWaitingOnBreak: boolean,
-  renderWhyPauseDelay: number,
-  shouldLogExceptions: boolean,
-  workers: ThreadList,
-  skipPausing: boolean,
-  logEventBreakpoints: boolean,
-  source: ?Source,
-  toggleAllBreakpoints: typeof actions.toggleAllBreakpoints,
-  logExceptions: typeof actions.logExceptions,
-  breakOnNext: typeof actions.breakOnNext,
-  toggleEventLogging: typeof actions.toggleEventLogging,
-};
 
 const mdnLink =
   "https://developer.mozilla.org/docs/Tools/Debugger/Using_the_Debugger_map_scopes_feature?utm_source=devtools&utm_medium=debugger-map-scopes";
 
-class SecondaryPanes extends Component<Props, State> {
-  constructor(props: Props) {
+class SecondaryPanes extends Component {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -192,7 +155,7 @@ class SecondaryPanes extends Component<Props, State> {
     return buttons;
   }
 
-  getScopeItem(): AccordionPaneItem {
+  getScopeItem() {
     return {
       header: L10N.getStr("scopes.header"),
       className: "scopes-pane",
@@ -204,7 +167,7 @@ class SecondaryPanes extends Component<Props, State> {
     };
   }
 
-  getWatchItem(): AccordionPaneItem {
+  getWatchItem() {
     return {
       header: L10N.getStr("watchExpressions.header"),
       className: "watch-expressions-pane",
@@ -222,7 +185,7 @@ class SecondaryPanes extends Component<Props, State> {
     };
   }
 
-  getXHRItem(): AccordionPaneItem {
+  getXHRItem() {
     return {
       header: L10N.getStr("xhrBreakpoints.header"),
       className: "xhr-breakpoints-pane",
@@ -237,7 +200,7 @@ class SecondaryPanes extends Component<Props, State> {
     };
   }
 
-  getCallStackItem(): AccordionPaneItem {
+  getCallStackItem() {
     return {
       header: L10N.getStr("callStack.header"),
       className: "call-stack-pane",
@@ -249,7 +212,7 @@ class SecondaryPanes extends Component<Props, State> {
     };
   }
 
-  getThreadsItem(): AccordionPaneItem {
+  getThreadsItem() {
     return {
       header: L10N.getStr("threadsHeader"),
       className: "threads-pane",
@@ -261,7 +224,7 @@ class SecondaryPanes extends Component<Props, State> {
     };
   }
 
-  getBreakpointsItem(): AccordionPaneItem {
+  getBreakpointsItem() {
     const { shouldLogExceptions, logExceptions } = this.props;
 
     return {
@@ -278,8 +241,8 @@ class SecondaryPanes extends Component<Props, State> {
     };
   }
 
-  getStartItems(): AccordionPaneItem[] {
-    const items: AccordionPaneItem[] = [];
+  getStartItems() {
+    const items = [];
     const { horizontal, hasFrames, framesLoading } = this.props;
 
     if (horizontal) {
@@ -304,12 +267,12 @@ class SecondaryPanes extends Component<Props, State> {
     return items;
   }
 
-  getEndItems(): AccordionPaneItem[] {
+  getEndItems() {
     if (this.props.horizontal) {
       return [];
     }
 
-    const items: AccordionPaneItem[] = [];
+    const items = [];
     if (features.workers && this.props.workers.length > 0) {
       items.push(this.getThreadsItem());
     }
@@ -323,7 +286,7 @@ class SecondaryPanes extends Component<Props, State> {
     return items;
   }
 
-  getItems(): AccordionPaneItem[] {
+  getItems() {
     return [...this.getStartItems(), ...this.getEndItems()];
   }
 
@@ -403,7 +366,7 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   toggleAllBreakpoints: actions.toggleAllBreakpoints,
   logExceptions: actions.logExceptions,
   breakOnNext: actions.breakOnNext,

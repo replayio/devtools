@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import React, { PureComponent } from "react";
 import { showMenu } from "devtools-contextmenu";
 import { connect } from "../../utils/connect";
@@ -22,44 +22,16 @@ import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 
 const { objectInspector } = require("devtools-reps");
 
-import type { ThreadContext, Why } from "../../types";
-import type { NamedValue } from "../../utils/pause/scopes/types";
 
 import "./Scopes.css";
 
 const ObjectInspector = objectInspector.ObjectInspector.default;
 
-type OwnProps = {||};
-type Props = {
-  cx: ThreadContext,
-  selectedFrame: Object,
-  frameScopes: Object,
-  isLoading: boolean,
-  why: ?Why,
-  openLink: typeof actions.openLink,
-  openElementInInspector: typeof actions.openElementInInspectorCommand,
-  highlightDomElement: typeof actions.highlightDomElement,
-  unHighlightDomElement: typeof actions.unHighlightDomElement,
-  setExpandedScope: typeof actions.setExpandedScope,
-  addWatchpoint: typeof actions.addWatchpoint,
-  removeWatchpoint: typeof actions.removeWatchpoint,
-  expandedScopes: string[],
-};
 
-type State = {
-  scopes: ?(NamedValue[]),
-};
 
-type Node = {
-  contents: ?{
-    watchpoint: ?"get" | "set",
-  },
-  name: string,
-  path: string,
-};
 
-class Scopes extends PureComponent<Props, State> {
-  constructor(props: Props) {
+class Scopes extends PureComponent {
+  constructor(props) {
     const { why, selectedFrame, frameScopes } = props;
 
     super(props);
@@ -69,7 +41,7 @@ class Scopes extends PureComponent<Props, State> {
     };
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { cx, selectedFrame, frameScopes } = this.props;
     const isPausedChanged = cx.isPaused !== nextProps.cx.isPaused;
     const selectedFrameChanged = selectedFrame !== nextProps.selectedFrame;
@@ -82,7 +54,7 @@ class Scopes extends PureComponent<Props, State> {
     }
   }
 
-  onContextMenu = (event: any, item: any) => {
+  onContextMenu = (event, item) => {
     const { addWatchpoint, removeWatchpoint } = this.props;
 
     if (!features.watchpoints || !item.parent || !item.contents.configurable) {
@@ -133,7 +105,7 @@ class Scopes extends PureComponent<Props, State> {
     showMenu(event, menuItems);
   };
 
-  renderWatchpointButton = (item: Node) => {
+  renderWatchpointButton = (item) => {
     return null;
 
     const { removeWatchpoint } = this.props;
@@ -238,7 +210,7 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   openLink: actions.openLink,
   openElementInInspector: actions.openElementInInspectorCommand,
   highlightDomElement: actions.highlightDomElement,

@@ -2,17 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
-import type { Position } from "../../types";
 
-type Token = {
-  startColumn: number,
-  endColumn: number,
-  type: string,
-};
 
-export function tokenAtTextPosition(cm: any, { line, column }: Position): Token | null {
+export function tokenAtTextPosition(cm, { line, column }) {
   if (line < 0 || line >= cm.lineCount()) {
     return null;
   }
@@ -27,7 +21,7 @@ export function tokenAtTextPosition(cm: any, { line, column }: Position): Token 
 
 // The strategy of querying codeMirror tokens was borrowed
 // from Chrome's inital implementation in JavaScriptSourceFrame.js#L414
-export function getExpressionFromCoords(cm: any, coord: Position) {
+export function getExpressionFromCoords(cm, coord) {
   const token = tokenAtTextPosition(cm, coord);
   if (!token) {
     return null;

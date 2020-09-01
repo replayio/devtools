@@ -2,21 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { parse } from "../../utils/url";
 
-import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
-import type { Source } from "../../types";
 import { isPretty } from "../source";
 import { getURL } from "./getURL";
 const IGNORED_URLS = ["debugger eval code", "XStringBundle"];
 
-export function nodeHasChildren(item: TreeNode): boolean {
+export function nodeHasChildren(item) {
   return item.type == "directory" && Array.isArray(item.contents);
 }
 
-export function isExactUrlMatch(pathPart: string, debuggeeUrl: string) {
+export function isExactUrlMatch(pathPart, debuggeeUrl) {
   // compare to hostname with an optional 'www.' prefix
   const { host } = parse(debuggeeUrl);
   if (!host) {
@@ -25,7 +23,7 @@ export function isExactUrlMatch(pathPart: string, debuggeeUrl: string) {
   return host === pathPart || host.replace(/^www\./, "") === pathPart.replace(/^www\./, "");
 }
 
-export function isPathDirectory(path: string) {
+export function isPathDirectory(path) {
   // Assume that all urls point to files except when they end with '/'
   // Or directory node has children
 
@@ -57,22 +55,22 @@ export function isPathDirectory(path: string) {
   }
 }
 
-export function isDirectory(item: TreeNode) {
+export function isDirectory(item) {
   return (item.type === "directory" || isPathDirectory(item.path)) && item.name != "(index)";
 }
 
-export function getSourceFromNode(item: TreeNode): ?Source {
+export function getSourceFromNode(item) {
   const { contents } = item;
   if (!isDirectory(item) && !Array.isArray(contents)) {
     return contents;
   }
 }
 
-export function isSource(item: TreeNode) {
+export function isSource(item) {
   return item.type === "source";
 }
 
-export function getFileExtension(source: Source): string {
+export function getFileExtension(source) {
   const { path } = getURL(source);
   if (!path) {
     return "";
@@ -82,11 +80,11 @@ export function getFileExtension(source: Source): string {
   return lastIndex !== -1 ? path.slice(lastIndex + 1) : "";
 }
 
-export function isNotJavaScript(source: Source): boolean {
+export function isNotJavaScript(source) {
   return ["css", "svg", "png"].includes(getFileExtension(source));
 }
 
-export function isInvalidUrl(url: Object, source: Source) {
+export function isInvalidUrl(url, source) {
   return (
     !source.url ||
     !url.group ||
@@ -96,16 +94,16 @@ export function isInvalidUrl(url: Object, source: Source) {
   );
 }
 
-export function partIsFile(index: number, parts: Array<string>, url: Object) {
+export function partIsFile(index, parts, url) {
   const isLastPart = index === parts.length - 1;
   return isLastPart && !isDirectory(url);
 }
 
 export function createDirectoryNode(
-  name: string,
-  path: string,
-  contents: TreeNode[]
-): TreeDirectory {
+  name,
+  path,
+  contents
+) {
   return {
     type: "directory",
     name,
@@ -114,7 +112,7 @@ export function createDirectoryNode(
   };
 }
 
-export function createSourceNode(name: string, path: string, contents: Source): TreeSource {
+export function createSourceNode(name, path, contents) {
   return {
     type: "source",
     name,
@@ -123,7 +121,7 @@ export function createSourceNode(name: string, path: string, contents: Source): 
   };
 }
 
-export function createParentMap(tree: TreeNode): ParentMap {
+export function createParentMap(tree) {
   const map = new WeakMap();
 
   function _traverse(subtree) {
@@ -144,7 +142,7 @@ export function createParentMap(tree: TreeNode): ParentMap {
   return map;
 }
 
-export function getRelativePath(url: string) {
+export function getRelativePath(url) {
   const { pathname } = parse(url);
   if (!pathname) {
     return url;
@@ -154,7 +152,7 @@ export function getRelativePath(url: string) {
   return index !== -1 ? pathname.slice(index + 1) : "";
 }
 
-export function getPathWithoutThread(path: string) {
+export function getPathWithoutThread(path) {
   const pathParts = path.split(/(context\d+?\/)/).splice(2);
   if (pathParts && pathParts.length > 0) {
     return pathParts.join("");

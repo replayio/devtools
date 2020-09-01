@@ -2,20 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import { showMenu } from "devtools-contextmenu";
 import { copyToTheClipboard } from "../../../utils/clipboard";
-import type { ContextMenuItem, Frame, ThreadContext } from "../../../types";
 import { kebabCase } from "lodash";
 
 const blackboxString = "blackboxContextItem.blackbox";
 const unblackboxString = "blackboxContextItem.unblackbox";
 
 function formatMenuElement(
-  labelString: string,
-  click: Function,
-  disabled: boolean = false
-): ContextMenuItem {
+  labelString,
+  click,
+  disabled = false
+) {
   const label = L10N.getStr(labelString);
   const accesskey = L10N.getStr(`${labelString}.accesskey`);
   const id = `node-menu-${kebabCase(label)}`;
@@ -49,11 +48,11 @@ function blackBoxSource(cx, source, toggleBlackBox) {
 }
 
 export default function FrameMenu(
-  frame: Frame,
-  frameworkGroupingOn: boolean,
-  callbacks: Object,
-  event: SyntheticMouseEvent<HTMLElement>,
-  cx: ThreadContext
+  frame,
+  frameworkGroupingOn,
+  callbacks,
+  event,
+  cx
 ) {
   event.stopPropagation();
   event.preventDefault();

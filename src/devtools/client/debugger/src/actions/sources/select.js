@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 /**
  * Redux actions for the sources state
@@ -37,10 +37,8 @@ import {
   getThreadExecutionPoint,
 } from "../../selectors";
 
-import type { SourceLocation, PartialPosition, Source, Context } from "../../types";
-import type { ThunkArgs } from "../types";
 
-export const setSelectedLocation = (cx: Context, source: Source, location: SourceLocation) => ({
+export const setSelectedLocation = (cx, source, location) => ({
   type: "SET_SELECTED_LOCATION",
   cx,
   source,
@@ -48,9 +46,9 @@ export const setSelectedLocation = (cx: Context, source: Source, location: Sourc
 });
 
 export const setPendingSelectedLocation = (
-  cx: Context,
-  url: string,
-  options?: PartialPosition
+  cx,
+  url,
+  options
 ) => ({
   type: "SET_PENDING_SELECTED_LOCATION",
   cx,
@@ -59,7 +57,7 @@ export const setPendingSelectedLocation = (
   column: options ? options.column : null,
 });
 
-export const clearSelectedLocation = (cx: Context) => ({
+export const clearSelectedLocation = (cx) => ({
   type: "CLEAR_SELECTED_LOCATION",
   cx,
 });
@@ -75,8 +73,8 @@ export const clearSelectedLocation = (cx: Context) => ({
  * @memberof actions/sources
  * @static
  */
-export function selectSourceURL(cx: Context, url: string, options?: PartialPosition) {
-  return async ({ dispatch, getState }: ThunkArgs) => {
+export function selectSourceURL(cx, url, options) {
+  return async ({ dispatch, getState }) => {
     const source = getSourceByURL(getState(), url);
     if (!source) {
       return dispatch(setPendingSelectedLocation(cx, url, options));
@@ -92,8 +90,8 @@ export function selectSourceURL(cx: Context, url: string, options?: PartialPosit
  * @memberof actions/sources
  * @static
  */
-export function selectSource(cx: Context, sourceId: string, options: PartialPosition = {}) {
-  return async ({ dispatch }: ThunkArgs) => {
+export function selectSource(cx, sourceId, options = {}) {
+  return async ({ dispatch }) => {
     const location = createLocation({ ...options, sourceId });
     return dispatch(selectSpecificLocation(cx, location));
   };
@@ -104,11 +102,11 @@ export function selectSource(cx: Context, sourceId: string, options: PartialPosi
  * @static
  */
 export function selectLocation(
-  cx: Context,
-  location: SourceLocation,
-  { keepContext = true }: Object = {}
+  cx,
+  location,
+  { keepContext = true } = {}
 ) {
-  return async ({ dispatch, getState, client }: ThunkArgs) => {
+  return async ({ dispatch, getState, client }) => {
     const currentSource = getSelectedSource(getState());
 
     if (!client) {
@@ -161,7 +159,7 @@ export function selectLocation(
  * @memberof actions/sources
  * @static
  */
-export function selectSpecificLocation(cx: Context, location: SourceLocation) {
+export function selectSpecificLocation(cx, location) {
   return selectLocation(cx, location, { keepContext: false });
 }
 
@@ -171,7 +169,7 @@ export function selectSpecificLocation(cx: Context, location: SourceLocation) {
 // source for a frame, we tell the thread which one we prefer, and then perform
 // the pause again to refresh all the debugger's state.
 export function showAlternateSource(oldSource, newSource) {
-  return async ({ dispatch, getState, client }: ThunkArgs) => {
+  return async ({ dispatch, getState, client }) => {
     if (ThreadFront.isSourceMappedScript(oldSource.id)) {
       ThreadFront.preferScript(newSource.id, true);
     } else {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 import React, { PureComponent } from "react";
 import { connect } from "../../utils/connect";
 import classnames from "classnames";
@@ -22,38 +22,15 @@ import { canPrettyPrintSource } from "../../reducers/sources";
 import { PaneToggleButton } from "../shared/Button";
 import AccessibleImage from "../shared/AccessibleImage";
 
-import type { SourceWithContent, Source, Context } from "../../types";
 
 import { ThreadFront } from "protocol/thread";
 
 import "./Footer.css";
 
-type CursorPosition = {
-  line: number,
-  column: number,
-};
 
-type OwnProps = {|
-  horizontal: boolean,
-|};
-type Props = {
-  cx: Context,
-  selectedSource: ?SourceWithContent,
-  alternateSource: boolean,
-  endPanelCollapsed: boolean,
-  horizontal: boolean,
-  canPrettyPrint: boolean,
-  togglePrettyPrint: typeof actions.togglePrettyPrint,
-  toggleBlackBox: typeof actions.toggleBlackBox,
-  showAlternateSource: typeof actions.showAlternateSource,
-  togglePaneCollapse: typeof actions.togglePaneCollapse,
-};
 
-type State = {
-  cursorPosition: CursorPosition,
-};
 
-class SourceFooter extends PureComponent<Props, State> {
+class SourceFooter extends PureComponent {
   constructor() {
     super();
 
@@ -76,7 +53,7 @@ class SourceFooter extends PureComponent<Props, State> {
     }
   }
 
-  toggleCodeMirror(eventDoc: Object, toggle: boolean) {
+  toggleCodeMirror(eventDoc, toggle) {
     if (toggle === true) {
       eventDoc.CodeMirror.on("cursorActivity", this.onCursorChange);
     } else {
@@ -177,7 +154,7 @@ class SourceFooter extends PureComponent<Props, State> {
         key="toggle"
         collapsed={this.props.endPanelCollapsed}
         horizontal={this.props.horizontal}
-        handleClick={(this.props.togglePaneCollapse: any)}
+        handleClick={(this.props.togglePaneCollapse)}
         position="end"
       />
     );
@@ -217,7 +194,7 @@ class SourceFooter extends PureComponent<Props, State> {
     );
   }
 
-  onCursorChange = (event: any) => {
+  onCursorChange = (event) => {
     const { line, ch } = event.doc.getCursor();
     this.setState({ cursorPosition: { line, column: ch } });
   };
@@ -271,7 +248,7 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps, {
+export default connect(mapStateToProps, {
   togglePrettyPrint: actions.togglePrettyPrint,
   toggleBlackBox: actions.toggleBlackBox,
   showAlternateSource: actions.showAlternateSource,

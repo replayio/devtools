@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import { isTesting } from "devtools-environment";
-import type { ThunkArgs } from "../../types";
 import { prefs } from "../../../utils/prefs";
 
 const blacklist = [
@@ -23,7 +22,7 @@ const blacklist = [
   "IN_SCOPE_LINES",
 ];
 
-function cloneAction(action: any) {
+function cloneAction(action) {
   action = action || {};
   action = { ...action };
 
@@ -94,8 +93,8 @@ function serializeAction(action) {
  * A middleware that logs all actions coming through the system
  * to the console.
  */
-export function log({ dispatch, getState }: ThunkArgs) {
-  return (next: any) => (action: any) => {
+export function log({ dispatch, getState }) {
+  return (next) => (action) => {
     const asyncMsg = !action.status ? "" : `[${action.status}]`;
 
     if (prefs.logActions) {

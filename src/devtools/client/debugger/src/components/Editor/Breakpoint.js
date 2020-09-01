@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React, { PureComponent } from "react";
 import classnames from "classnames";
@@ -12,30 +12,19 @@ import { features } from "../../utils/prefs";
 import { showMenu } from "devtools-contextmenu";
 import { breakpointItems } from "./menus/breakpoints";
 import Panel from "devtools/client/debugger/src/components/Editor/Panel";
-import type { BreakpointItemActions } from "./menus/breakpoints";
-import type { EditorItemActions } from "./menus/editor";
 
-import type { Source, Breakpoint as BreakpointType, ThreadContext } from "../../types";
 
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =
   '<svg viewBox="0 0 60 15" width="60" height="15"><path d="M53.07.5H1.5c-.54 0-1 .46-1 1v12c0 .54.46 1 1 1h51.57c.58 0 1.15-.26 1.53-.7l4.7-6.3-4.7-6.3c-.38-.44-.95-.7-1.53-.7z"/></svg>';
 
-type Props = {
-  cx: ThreadContext,
-  breakpoint: BreakpointType,
-  selectedSource: Source,
-  editor: Object,
-  breakpointActions: BreakpointItemActions,
-  editorActions: EditorItemActions,
-};
 
-class Breakpoint extends PureComponent<Props> {
+class Breakpoint extends PureComponent {
   componentDidMount() {
     this.addBreakpoint(this.props);
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps) {
     this.removeBreakpoint(prevProps);
     this.addBreakpoint(this.props);
   }
@@ -55,12 +44,12 @@ class Breakpoint extends PureComponent<Props> {
 
     bp.onmousedown = this.onClick;
     // NOTE: flow does not know about oncontextmenu
-    (bp: any).oncontextmenu = this.onContextMenu;
+    (bp).oncontextmenu = this.onContextMenu;
 
     return bp;
   }
 
-  onClick = (event: MouseEvent) => {
+  onClick = (event) => {
     const { cx, breakpointActions, editorActions, breakpoint, selectedSource } = this.props;
 
     // ignore right clicks
@@ -95,7 +84,7 @@ class Breakpoint extends PureComponent<Props> {
     );
   };
 
-  onContextMenu = (event: MouseEvent) => {
+  onContextMenu = (event) => {
     const { cx, breakpoint, selectedSource, breakpointActions } = this.props;
     event.stopPropagation();
     event.preventDefault();
@@ -104,7 +93,7 @@ class Breakpoint extends PureComponent<Props> {
     showMenu(event, breakpointItems(cx, breakpoint, selectedLocation, breakpointActions));
   };
 
-  addBreakpoint(props: Props) {
+  addBreakpoint(props) {
     const { breakpoint, editor, selectedSource } = props;
     const selectedLocation = breakpoint.location;
 
@@ -140,7 +129,7 @@ class Breakpoint extends PureComponent<Props> {
     }
   }
 
-  removeBreakpoint(props: Props) {
+  removeBreakpoint(props) {
     const { selectedSource, breakpoint } = props;
     if (!selectedSource) {
       return;

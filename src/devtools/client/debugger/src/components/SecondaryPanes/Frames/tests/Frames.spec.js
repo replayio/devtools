@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// @flow
+// 
 
 import React from "react";
 import { mount, shallow } from "enzyme";
@@ -11,7 +11,6 @@ import Frames from "../index.js";
 import { formatCallStackFrames } from "../../../../selectors/getCallStackFrames";
 import { makeMockFrame, makeMockSource } from "../../../../utils/test-mockup";
 import { createInitial, insertResources } from "../../../../utils/resource";
-import type { SourceResourceState } from "../../../../reducers/sources";
 
 function render(overrides = {}) {
   const defaultProps = {
@@ -194,7 +193,7 @@ describe("Frames", () => {
     it("filters blackboxed frames", () => {
       const source1 = makeMockSource(undefined, "1");
       const source2 = makeMockSource(undefined, "2");
-      (source2: any).isBlackBoxed = true;
+      (source2).isBlackBoxed = true;
 
       const frames = [
         makeMockFrame("1", source1),
@@ -203,7 +202,7 @@ describe("Frames", () => {
         makeMockFrame("8", source2),
       ];
 
-      const sources: SourceResourceState = insertResources(createInitial(), [
+      const sources = insertResources(createInitial(), [
         { ...source1, content: null },
         { ...source2, content: null },
       ]);
