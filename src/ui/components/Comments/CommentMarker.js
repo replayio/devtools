@@ -52,15 +52,15 @@ class CommentMarker extends React.Component {
   }
 
   renderCreateCommentButton() {
-    const { createComment, currentTime } = this.props;
+    const { createComment, currentTime, zoomRegion } = this.props;
 
-    if (this.getCommentAtTime(currentTime)) {
+    if (this.getCommentAtTime(currentTime) || currentTime > zoomRegion.endTime) {
       return null;
     }
 
     return (
       <button
-        className={classnames("create-comment")}
+        className="create-comment"
         style={{
           left: `${this.calculateLeftOffset(currentTime)}%`,
         }}
@@ -70,15 +70,18 @@ class CommentMarker extends React.Component {
   }
 
   render() {
-    const { comment, showComment, currentTime, hoverTime } = this.props;
+    const { comment, showComment, currentTime, hoverTime, zoomRegion } = this.props;
 
     if (!comment) {
       return this.renderCreateCommentButton();
     }
 
+    if (comment.time > zoomRegion.endTime) {
+      return null;
+    }
+
     const { time, visible, id } = comment;
     const pausedAtComment = currentTime == time;
-
     // If a comment is close enough to the hovered time, we give
     // it the same hovered styling as a comment with exact time match.
     // The tolerance here is +/- 2% relative to the timeline's width.
