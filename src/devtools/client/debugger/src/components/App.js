@@ -147,19 +147,22 @@ class Debugger extends Component<Props, State> {
   onEscape = (_: mixed, e: KeyboardEvent) => {
     const { activeSearch, closeActiveSearch, closeQuickOpen, quickOpenEnabled } = this.props;
     const { shortcutsModalEnabled } = this.state;
+    const anyTrue = activeSearch || quickOpenEnabled || shortcutsModalEnabled;
+
+    if (anyTrue) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
     if (activeSearch) {
-      e.preventDefault();
       closeActiveSearch();
     }
 
     if (quickOpenEnabled) {
-      e.preventDefault();
       closeQuickOpen();
     }
 
     if (shortcutsModalEnabled) {
-      e.preventDefault();
       this.toggleShortcutsModal();
     }
   };
