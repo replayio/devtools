@@ -8,21 +8,15 @@ const Menu = require("devtools/client/framework/menu");
 const MenuItem = require("devtools/client/framework/menu-item");
 
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
-//const clipboardHelper = require("devtools/shared/platform/clipboard");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const actions = require("devtools/client/webconsole/actions/index");
 const { openDocLink } = require("devtools/client/shared/link");
+const {
+  getElementText,
+  copyStringToClipboard,
+} = require("devtools/client/webconsole/utils/clipboard");
 
-/*
 loader.lazyRequireGetter(this, "saveAs", "devtools/shared/DevToolsUtils", true);
-
-loader.lazyRequireGetter(
-  this,
-  "getElementText",
-  "devtools/client/webconsole/utils/clipboard",
-  true
-);
-*/
 
 /**
  * Create a Menu instance for the webconsole.
@@ -76,73 +70,73 @@ function createContextMenu(event, message, webConsoleWrapper) {
   const menu = new Menu({ id: "webconsole-menu" });
 
   // Copy URL for a network request.
-  menu.append(
-    new MenuItem({
-      id: "console-menu-copy-url",
-      label: l10n.getStr("webconsole.menu.copyURL.label"),
-      accesskey: l10n.getStr("webconsole.menu.copyURL.accesskey"),
-      visible: source === MESSAGE_SOURCE.NETWORK,
-      click: () => {
-        if (!request) {
-          return;
-        }
-        clipboardHelper.copyString(request.url);
-      },
-    })
-  );
+  // menu.append(
+  //   new MenuItem({
+  //     id: "console-menu-copy-url",
+  //     label: l10n.getStr("webconsole.menu.copyURL.label"),
+  //     accesskey: l10n.getStr("webconsole.menu.copyURL.accesskey"),
+  //     visible: source === MESSAGE_SOURCE.NETWORK,
+  //     click: () => {
+  //       if (!request) {
+  //         return;
+  //       }
+  //       copyStringToClipboard(request.url);
+  //     },
+  //   })
+  // );
 
-  // Open Network message in the Network panel.
-  if (toolbox && request) {
-    menu.append(
-      new MenuItem({
-        id: "console-menu-open-in-network-panel",
-        label: l10n.getStr("webconsole.menu.openInNetworkPanel.label"),
-        accesskey: l10n.getStr("webconsole.menu.openInNetworkPanel.accesskey"),
-        visible: source === MESSAGE_SOURCE.NETWORK,
-        click: () => dispatch(actions.openNetworkPanel(message.messageId)),
-      })
-    );
-  }
+  // // Open Network message in the Network panel.
+  // if (toolbox && request) {
+  //   menu.append(
+  //     new MenuItem({
+  //       id: "console-menu-open-in-network-panel",
+  //       label: l10n.getStr("webconsole.menu.openInNetworkPanel.label"),
+  //       accesskey: l10n.getStr("webconsole.menu.openInNetworkPanel.accesskey"),
+  //       visible: source === MESSAGE_SOURCE.NETWORK,
+  //       click: () => dispatch(actions.openNetworkPanel(message.messageId)),
+  //     })
+  //   );
+  // }
 
-  // Resend Network message.
-  if (toolbox && request) {
-    menu.append(
-      new MenuItem({
-        id: "console-menu-resend-network-request",
-        label: l10n.getStr("webconsole.menu.resendNetworkRequest.label"),
-        accesskey: l10n.getStr("webconsole.menu.resendNetworkRequest.accesskey"),
-        visible: source === MESSAGE_SOURCE.NETWORK,
-        click: () => dispatch(actions.resendNetworkRequest(messageId)),
-      })
-    );
-  }
+  // // Resend Network message.
+  // if (toolbox && request) {
+  //   menu.append(
+  //     new MenuItem({
+  //       id: "console-menu-resend-network-request",
+  //       label: l10n.getStr("webconsole.menu.resendNetworkRequest.label"),
+  //       accesskey: l10n.getStr("webconsole.menu.resendNetworkRequest.accesskey"),
+  //       visible: source === MESSAGE_SOURCE.NETWORK,
+  //       click: () => dispatch(actions.resendNetworkRequest(messageId)),
+  //     })
+  //   );
+  // }
 
-  // Open URL in a new tab for a network request.
-  menu.append(
-    new MenuItem({
-      id: "console-menu-open-url",
-      label: l10n.getStr("webconsole.menu.openURL.label"),
-      accesskey: l10n.getStr("webconsole.menu.openURL.accesskey"),
-      visible: source === MESSAGE_SOURCE.NETWORK,
-      click: () => {
-        if (!request) {
-          return;
-        }
-        openDocLink(request.url);
-      },
-    })
-  );
+  // // Open URL in a new tab for a network request.
+  // menu.append(
+  //   new MenuItem({
+  //     id: "console-menu-open-url",
+  //     label: l10n.getStr("webconsole.menu.openURL.label"),
+  //     accesskey: l10n.getStr("webconsole.menu.openURL.accesskey"),
+  //     visible: source === MESSAGE_SOURCE.NETWORK,
+  //     click: () => {
+  //       if (!request) {
+  //         return;
+  //       }
+  //       openDocLink(request.url);
+  //     },
+  //   })
+  // );
 
   // Store as global variable.
-  menu.append(
-    new MenuItem({
-      id: "console-menu-store",
-      label: l10n.getStr("webconsole.menu.storeAsGlobalVar.label"),
-      accesskey: l10n.getStr("webconsole.menu.storeAsGlobalVar.accesskey"),
-      disabled: !actor,
-      click: () => dispatch(actions.storeAsGlobal(actor)),
-    })
-  );
+  // menu.append(
+  //   new MenuItem({
+  //     id: "console-menu-store",
+  //     label: l10n.getStr("webconsole.menu.storeAsGlobalVar.label"),
+  //     accesskey: l10n.getStr("webconsole.menu.storeAsGlobalVar.accesskey"),
+  //     disabled: !actor,
+  //     click: () => dispatch(actions.storeAsGlobal(actor)),
+  //   })
+  // );
 
   // Copy message or grip.
   menu.append(
@@ -156,9 +150,9 @@ function createContextMenu(event, message, webConsoleWrapper) {
         if (selection.isCollapsed) {
           // If the selection is empty/collapsed, copy the text content of the
           // message for which the context menu was opened.
-          clipboardHelper.copyString(clipboardText);
+          copyStringToClipboard(clipboardText);
         } else {
-          clipboardHelper.copyString(selection.toString());
+          copyStringToClipboard(selection.toString());
         }
       },
     })
@@ -190,65 +184,65 @@ function createContextMenu(event, message, webConsoleWrapper) {
     })
   );
 
-  const exportSubmenu = new Menu({
-    id: "export-submenu",
-  });
+  // const exportSubmenu = new Menu({
+  //   id: "export-submenu",
+  // });
 
-  // Export to clipboard
-  exportSubmenu.append(
-    new MenuItem({
-      id: "console-menu-export-clipboard",
-      label: l10n.getStr("webconsole.menu.exportSubmenu.exportCliboard.label"),
-      disabled: false,
-      click: () => {
-        const webconsoleOutput = parentNode.querySelector(".webconsole-output");
-        clipboardHelper.copyString(getElementText(webconsoleOutput));
-      },
-    })
-  );
+  // // Export to clipboard
+  // exportSubmenu.append(
+  //   new MenuItem({
+  //     id: "console-menu-export-clipboard",
+  //     label: l10n.getStr("webconsole.menu.exportSubmenu.exportCliboard.label"),
+  //     disabled: false,
+  //     click: () => {
+  //       const webconsoleOutput = parentNode.querySelector(".webconsole-output");
+  //       copyStringToClipboard(getElementText(webconsoleOutput));
+  //     },
+  //   })
+  // );
 
-  // Export to file
-  exportSubmenu.append(
-    new MenuItem({
-      id: "console-menu-export-file",
-      label: l10n.getStr("webconsole.menu.exportSubmenu.exportFile.label"),
-      disabled: false,
-      // Note: not async, but returns a promise for the actual save.
-      click: () => {
-        const date = new Date();
-        const suggestedName =
-          `console-export-${date.getFullYear()}-` +
-          `${date.getMonth() + 1}-${date.getDate()}_${date.getHours()}-` +
-          `${date.getMinutes()}-${date.getSeconds()}.txt`;
-        const webconsoleOutput = parentNode.querySelector(".webconsole-output");
-        const data = new TextEncoder().encode(getElementText(webconsoleOutput));
-        return saveAs(window, data, suggestedName);
-      },
-    })
-  );
+  // // Export to file
+  // exportSubmenu.append(
+  //   new MenuItem({
+  //     id: "console-menu-export-file",
+  //     label: l10n.getStr("webconsole.menu.exportSubmenu.exportFile.label"),
+  //     disabled: false,
+  //     // Note: not async, but returns a promise for the actual save.
+  //     click: () => {
+  //       const date = new Date();
+  //       const suggestedName =
+  //         `console-export-${date.getFullYear()}-` +
+  //         `${date.getMonth() + 1}-${date.getDate()}_${date.getHours()}-` +
+  //         `${date.getMinutes()}-${date.getSeconds()}.txt`;
+  //       const webconsoleOutput = parentNode.querySelector(".webconsole-output");
+  //       const data = new TextEncoder().encode(getElementText(webconsoleOutput));
+  //       return saveAs(window, data, suggestedName);
+  //     },
+  //   })
+  // );
 
-  menu.append(
-    new MenuItem({
-      id: "console-menu-export",
-      label: l10n.getStr("webconsole.menu.exportSubmenu.label"),
-      disabled: false,
-      submenu: exportSubmenu,
-    })
-  );
+  // menu.append(
+  //   new MenuItem({
+  //     id: "console-menu-export",
+  //     label: l10n.getStr("webconsole.menu.exportSubmenu.label"),
+  //     disabled: false,
+  //     submenu: exportSubmenu,
+  //   })
+  // );
 
-  // Open object in sidebar.
-  const shouldOpenSidebar = store.getState().prefs.sidebarToggle;
-  if (shouldOpenSidebar) {
-    menu.append(
-      new MenuItem({
-        id: "console-menu-open-sidebar",
-        label: l10n.getStr("webconsole.menu.openInSidebar.label"),
-        accesskey: l10n.getStr("webconsole.menu.openInSidebar.accesskey"),
-        disabled: !rootActorId,
-        click: () => dispatch(actions.openSidebar(messageId, rootActorId)),
-      })
-    );
-  }
+  // // Open object in sidebar.
+  // const shouldOpenSidebar = store.getState().prefs.sidebarToggle;
+  // if (shouldOpenSidebar) {
+  //   menu.append(
+  //     new MenuItem({
+  //       id: "console-menu-open-sidebar",
+  //       label: l10n.getStr("webconsole.menu.openInSidebar.label"),
+  //       accesskey: l10n.getStr("webconsole.menu.openInSidebar.accesskey"),
+  //       disabled: !rootActorId,
+  //       click: () => dispatch(actions.openSidebar(messageId, rootActorId)),
+  //     })
+  //   );
+  // }
 
   // Add time warp option if available.
   if (executionPoint) {
@@ -263,32 +257,32 @@ function createContextMenu(event, message, webConsoleWrapper) {
   }
 
   if (url) {
-    menu.append(
-      new MenuItem({
-        id: "console-menu-open-url",
-        label: l10n.getStr("webconsole.menu.openURL.label"),
-        accesskey: l10n.getStr("webconsole.menu.openURL.accesskey"),
-        click: () =>
-          openDocLink(url, {
-            inBackground: true,
-            relatedToCurrent: true,
-          }),
-      })
-    );
+    // menu.append(
+    //   new MenuItem({
+    //     id: "console-menu-open-url",
+    //     label: l10n.getStr("webconsole.menu.openURL.label"),
+    //     accesskey: l10n.getStr("webconsole.menu.openURL.accesskey"),
+    //     click: () =>
+    //       openDocLink(url, {
+    //         inBackground: true,
+    //         relatedToCurrent: true,
+    //       }),
+    //   })
+    // );
     menu.append(
       new MenuItem({
         id: "console-menu-copy-url",
         label: l10n.getStr("webconsole.menu.copyURL.label"),
         accesskey: l10n.getStr("webconsole.menu.copyURL.accesskey"),
-        click: () => clipboardHelper.copyString(url),
+        click: () => copyStringToClipboard(url),
       })
     );
   }
 
   // Emit the "menu-open" event for testing.
-  const { screenX, screenY } = event;
+  const { clientX, clientY } = event;
   menu.once("open", () => webConsoleWrapper.emitForTests("menu-open"));
-  menu.popup(screenX, screenY, hud.chromeWindow.document);
+  menu.popup(clientX, clientY, window.document);
 
   return menu;
 }

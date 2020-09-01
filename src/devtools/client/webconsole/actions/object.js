@@ -30,10 +30,9 @@ function copyMessageObject(actor, variableText) {
       const res = await client.evaluateJSAsync("copy(_self)", {
         selectedObjectActor: actor,
       });
-
-      clipboardHelper.copyString(res.helperResult.value);
+      navigator.clipboard.writeText(res.helperResult.value);
     } else {
-      clipboardHelper.copyString(variableText);
+      navigator.clipboard.writeText(variableText);
     }
   };
 }

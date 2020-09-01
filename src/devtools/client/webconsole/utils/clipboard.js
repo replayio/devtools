@@ -51,6 +51,11 @@ function getElementText(el) {
   return text;
 }
 
+function copyStringToClipboard(string) {
+  navigator.clipboard.writeText(string);
+}
+
 module.exports = {
   getElementText,
+  copyStringToClipboard,
 };
