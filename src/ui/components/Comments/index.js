@@ -15,7 +15,7 @@ class Comments extends React.Component {
   }
 
   render() {
-    const { comments, timelineDimensions } = this.props;
+    const { comments, timelineDimensions, playback } = this.props;
 
     const sortedComments = comments.sort((a, b) => a.time - b.time);
 
@@ -25,7 +25,7 @@ class Comments extends React.Component {
           {comments.map((comment, index) => (
             <Comment key={comment.id} comment={comment} index={index} />
           ))}
-          {this.renderAddCommentButton()}
+          {!playback ? this.renderAddCommentButton() : null}
         </div>
       </div>
     );
@@ -33,6 +33,7 @@ class Comments extends React.Component {
 }
 
 export default connect(state => ({
+  playback: selectors.getPlayback(state),
   comments: selectors.getComments(state),
   timelineDimensions: selectors.getTimelineDimensions(state),
   zoomRegion: selectors.getZoomRegion(state),
