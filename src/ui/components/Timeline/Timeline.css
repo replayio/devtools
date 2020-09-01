@@ -72,7 +72,6 @@
   width: 100%;
   height: 100%;
   background: var(--progress-playing-background);
-  transition-duration: var(--progressbar-transition);
   pointer-events: none;
 }
 
@@ -194,7 +193,6 @@
   position: absolute;
   left: 0;
   top: 50%;
-  transition-duration: var(--progressbar-transition);
   pointer-events: none;
 }
 
