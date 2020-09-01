@@ -111,7 +111,7 @@ export class Panel extends PureComponent<Props> {
     }
   };
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     return this.renderToWidget(this.props);
   }
 

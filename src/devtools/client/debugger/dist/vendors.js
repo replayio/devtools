@@ -765,7 +765,7 @@
             }
           }
 
-          componentWillReceiveProps(nextProps) {
+          UNSAFE_componentWillReceiveProps(nextProps) {
             this._autoExpand();
           }
 
@@ -5603,7 +5603,7 @@
          * LICENSE file in the root directory of this source tree.
          */
 
-        function componentWillMount() {
+        function UNSAFE_componentWillMount() {
           // Call this.constructor.gDSFP to support sub-classes.
           var state = this.constructor.getDerivedStateFromProps(this.props, this.state);
           if (state !== null && state !== undefined) {
@@ -5611,7 +5611,7 @@
           }
         }
 
-        function componentWillReceiveProps(nextProps) {
+        function UNSAFE_componentWillReceiveProps(nextProps) {
           // Call this.constructor.gDSFP to support sub-classes.
           // Use the setState() updater to ensure state isn't stale in certain edge cases.
           function updater(prevState) {
@@ -5622,7 +5622,7 @@
           this.setState(updater.bind(this));
         }
 
-        function componentWillUpdate(nextProps, nextState) {
+        function UNSAFE_componentWillUpdate(nextProps, nextState) {
           try {
             var prevProps = this.props;
             var prevState = this.state;
@@ -5638,9 +5638,9 @@
 
         // React may warn about cWM/cWRP/cWU methods being deprecated.
         // Add a flag to suppress these warnings for this special case.
-        componentWillMount.__suppressDeprecationWarning = true;
-        componentWillReceiveProps.__suppressDeprecationWarning = true;
-        componentWillUpdate.__suppressDeprecationWarning = true;
+        UNSAFE_componentWillMount.__suppressDeprecationWarning = true;
+        UNSAFE_componentWillReceiveProps.__suppressDeprecationWarning = true;
+        UNSAFE_componentWillUpdate.__suppressDeprecationWarning = true;
 
         function polyfill(Component) {
           var prototype = Component.prototype;
@@ -5662,20 +5662,20 @@
           var foundWillMountName = null;
           var foundWillReceivePropsName = null;
           var foundWillUpdateName = null;
-          if (typeof prototype.componentWillMount === "function") {
-            foundWillMountName = "componentWillMount";
-          } else if (typeof prototype.UNSAFE_componentWillMount === "function") {
+          if (typeof prototype.UNSAFE_componentWillMount === "function") {
             foundWillMountName = "UNSAFE_componentWillMount";
+          } else if (typeof prototype.UNSAFE_UNSAFE_componentWillMount === "function") {
+            foundWillMountName = "UNSAFE_UNSAFE_componentWillMount";
           }
-          if (typeof prototype.componentWillReceiveProps === "function") {
-            foundWillReceivePropsName = "componentWillReceiveProps";
-          } else if (typeof prototype.UNSAFE_componentWillReceiveProps === "function") {
+          if (typeof prototype.UNSAFE_componentWillReceiveProps === "function") {
             foundWillReceivePropsName = "UNSAFE_componentWillReceiveProps";
+          } else if (typeof prototype.UNSAFE_UNSAFE_componentWillReceiveProps === "function") {
+            foundWillReceivePropsName = "UNSAFE_UNSAFE_componentWillReceiveProps";
           }
-          if (typeof prototype.componentWillUpdate === "function") {
-            foundWillUpdateName = "componentWillUpdate";
-          } else if (typeof prototype.UNSAFE_componentWillUpdate === "function") {
+          if (typeof prototype.UNSAFE_componentWillUpdate === "function") {
             foundWillUpdateName = "UNSAFE_componentWillUpdate";
+          } else if (typeof prototype.UNSAFE_UNSAFE_componentWillUpdate === "function") {
+            foundWillUpdateName = "UNSAFE_UNSAFE_componentWillUpdate";
           }
           if (
             foundWillMountName !== null ||
@@ -5706,8 +5706,8 @@
           // As a workaround, use cWM and cWRP to invoke the new static lifecycle.
           // Newer versions of React will ignore these lifecycles if gDSFP exists.
           if (typeof Component.getDerivedStateFromProps === "function") {
-            prototype.componentWillMount = componentWillMount;
-            prototype.componentWillReceiveProps = componentWillReceiveProps;
+            prototype.UNSAFE_componentWillMount = UNSAFE_componentWillMount;
+            prototype.UNSAFE_componentWillReceiveProps = UNSAFE_componentWillReceiveProps;
           }
 
           // React <= 16.2 does not support getSnapshotBeforeUpdate.
@@ -5720,7 +5720,7 @@
               );
             }
 
-            prototype.componentWillUpdate = componentWillUpdate;
+            prototype.UNSAFE_componentWillUpdate = UNSAFE_componentWillUpdate;
 
             var componentDidUpdate = prototype.componentDidUpdate;
 
@@ -6086,7 +6086,7 @@
             this.preparePanelStyles = this.preparePanelStyles.bind(this);
           }
 
-          componentWillReceiveProps(nextProps) {
+          UNSAFE_componentWillReceiveProps(nextProps) {
             if (this.props.vert !== nextProps.vert) {
               this.setState({
                 vert: nextProps.vert,

@@ -85,7 +85,7 @@ class SplitBox extends Component {
     this.onMove = this.onMove.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { endPanelControl, splitterSize, vert } = nextProps;
 
     if (endPanelControl != this.props.endPanelControl) {

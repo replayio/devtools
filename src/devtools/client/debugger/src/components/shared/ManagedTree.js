@@ -48,7 +48,7 @@ class ManagedTree extends Component<Props, State> {
     onFocus: () => {},
   };
 
-  componentWillReceiveProps(nextProps: Props) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     const { listItems, highlightItems } = this.props;
     if (nextProps.listItems && nextProps.listItems != listItems) {
       this.expandListItems(nextProps.listItems);

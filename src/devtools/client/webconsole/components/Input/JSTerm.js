@@ -477,7 +477,7 @@ class JSTerm extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.imperativeUpdate(nextProps);
   }
 

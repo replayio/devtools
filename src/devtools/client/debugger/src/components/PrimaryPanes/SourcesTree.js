@@ -109,7 +109,7 @@ class SourcesTree extends Component<Props, State> {
     });
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     const { projectRoot, debuggeeUrl, sources, shownSource, selectedSource, threads } = this.props;
     const { uncollapsedTree, sourceTree } = this.state;
 

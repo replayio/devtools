@@ -69,7 +69,7 @@ class Scopes extends PureComponent<Props, State> {
     };
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     const { cx, selectedFrame, frameScopes } = this.props;
     const isPausedChanged = cx.isPaused !== nextProps.cx.isPaused;
     const selectedFrameChanged = selectedFrame !== nextProps.selectedFrame;

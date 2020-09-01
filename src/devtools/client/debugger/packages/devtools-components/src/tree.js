@@ -517,7 +517,7 @@ class Tree extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this._autoExpand();
   }
 

@@ -47,7 +47,7 @@ class SmartTrace extends Component {
     return { l10n: dbgL10n };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const mappedStack = this.props.stacktrace.map(async frame => {
       const { lineNumber, columnNumber, filename } = frame;
       const scriptIds = ThreadFront.getScriptIdsForURL(filename);
