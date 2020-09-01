@@ -15,14 +15,6 @@ export function getVisiblePosition({ time, zoom }) {
     return 0;
   }
 
-  if (time <= zoom.startTime) {
-    return 0;
-  }
-
-  if (time >= zoom.endTime) {
-    return 1;
-  }
-
   return (time - zoom.startTime) / (zoom.endTime - zoom.startTime);
 }
 
@@ -53,7 +45,7 @@ export function getMarkerLeftOffset({ overlayWidth, time, zoom, markerWidth }) {
   const commentMarkerWidth = (markerWidth / overlayWidth) * 100;
   const pausedLocationMarkerWidth = (1 / overlayWidth) * 100;
 
-  return Math.max(position + pausedLocationMarkerWidth - commentMarkerWidth / 2, 0);
+  return position + pausedLocationMarkerWidth - commentMarkerWidth / 2;
 }
 
 // Get the percent value for the midpoint of a time in the timeline.
