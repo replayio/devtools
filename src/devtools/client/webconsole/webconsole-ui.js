@@ -361,8 +361,8 @@ class WebConsoleUI {
     }
   }
 
-  _onChangeSplitConsoleState() {
-    this.wrapper.dispatchSplitConsoleCloseButtonToggle();
+  _onChangeSplitConsoleState(selectedPanel) {
+    this.wrapper.dispatchSplitConsoleCloseButtonToggle(selectedPanel);
   }
 
   /**

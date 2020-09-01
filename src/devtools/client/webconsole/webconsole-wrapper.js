@@ -198,15 +198,12 @@ class WebConsoleWrapper {
     store.dispatch(actions.sidebarClose());
   }
 
-  dispatchSplitConsoleCloseButtonToggle() {
+  dispatchSplitConsoleCloseButtonToggle(selectedPanel) {
     if (!store) {
       return;
     }
-    store.dispatch(
-      actions.splitConsoleCloseButtonToggle(
-        this.toolbox && this.toolbox.currentToolId !== "webconsole"
-      )
-    );
+    const shouldDisplayButton = this.toolbox && selectedPanel !== "console";
+    store.dispatch(actions.splitConsoleCloseButtonToggle(shouldDisplayButton));
   }
 
   dispatchTabWillNavigate(packet) {
