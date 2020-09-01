@@ -90,7 +90,7 @@ define(function (require, exports, module) {
       });
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
       // I don't like accessing the underlying DOM elements directly,
       // but this optimization makes the filtering so damn fast!
       // The row doesn't have to be re-rendered, all we really need

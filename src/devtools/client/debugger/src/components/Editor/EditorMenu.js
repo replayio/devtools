@@ -42,7 +42,7 @@ type Props = {
 };
 
 class EditorMenu extends Component<Props> {
-  componentWillUpdate(nextProps: Props) {
+  UNSAFE_componentWillUpdate(nextProps: Props) {
     this.props.clearContextMenu();
     if (nextProps.contextMenu) {
       this.showMenu(nextProps);

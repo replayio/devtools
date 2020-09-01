@@ -223,7 +223,7 @@ define(function (require, exports, module) {
       this.renderRows = this.renderRows.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
       const { expandedNodes, selected } = nextProps;
       const state = {
         expandedNodes,

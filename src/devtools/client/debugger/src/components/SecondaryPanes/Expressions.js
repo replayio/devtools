@@ -91,7 +91,7 @@ class Expressions extends Component<Props, State> {
     });
   };
 
-  componentWillReceiveProps(nextProps: Props) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (this.state.editing && !nextProps.expressionError) {
       this.clear();
     }

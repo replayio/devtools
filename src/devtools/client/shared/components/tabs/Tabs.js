@@ -110,7 +110,7 @@ define(function (require, exports, module) {
       }
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
       let { children, activeTab } = nextProps;
       const panels = children.filter(panel => panel);
       let created = [...this.state.created];

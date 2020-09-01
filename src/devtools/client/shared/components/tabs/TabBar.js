@@ -89,7 +89,7 @@ class Tabbar extends Component {
     this.renderTab = this.renderTab.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { activeTabId, children = [] } = nextProps;
     const tabs = this.createTabs(children);
     const activeTab = tabs.findIndex((tab, index) => tab.id === activeTabId);

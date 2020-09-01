@@ -77,7 +77,7 @@ class SplitBox extends Component {
     this.preparePanelStyles = this.preparePanelStyles.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.vert !== nextProps.vert) {
       this.setState({ vert: nextProps.vert });
     }

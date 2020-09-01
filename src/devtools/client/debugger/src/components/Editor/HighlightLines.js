@@ -23,7 +23,7 @@ class HighlightLines extends Component<Props> {
     this.highlightLineRange();
   }
 
-  componentWillUpdate() {
+  UNSAFE_componentWillUpdate() {
     this.clearHighlightRange();
   }
 

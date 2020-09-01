@@ -113,7 +113,7 @@ class ConsoleOutput extends Component {
     });
   }
 
-  componentWillUpdate(nextProps, nextState) {
+  UNSAFE_componentWillUpdate(nextProps, nextState) {
     const outputNode = this.outputNode;
     if (!outputNode || !outputNode.lastChild) {
       // Force a scroll to bottom when messages are added to an empty console.

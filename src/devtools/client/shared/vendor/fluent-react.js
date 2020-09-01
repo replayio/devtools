@@ -310,7 +310,7 @@ class LocalizationProvider extends react.Component {
     };
   }
 
-  componentWillReceiveProps(next) {
+  UNSAFE_componentWillReceiveProps(next) {
     const { bundles } = next;
 
     if (bundles !== this.props.bundles) {

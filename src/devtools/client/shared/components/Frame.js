@@ -68,7 +68,7 @@ class Frame extends Component {
     this.getSourceForClick = this.getSourceForClick.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.sourceMapService) {
       const { source, line, column } = this.props.frame;
       this.unsubscribeSourceMapService = this.props.sourceMapService.subscribe(
