@@ -100,7 +100,6 @@ class JSTerm extends Component {
 
     this._onEditorChanges = this._onEditorChanges.bind(this);
     this._onEditorBeforeChange = this._onEditorBeforeChange.bind(this);
-    this.onContextMenu = this.onContextMenu.bind(this);
     this.imperativeUpdate = this.imperativeUpdate.bind(this);
 
     // We debounce the autocompleteUpdate so we don't send too many requests to the server
@@ -1185,10 +1184,6 @@ class JSTerm extends Component {
     return this.editor ? this.editor.defaultCharWidth() : null;
   }
 
-  onContextMenu(e) {
-    this.props.serviceContainer.openEditContextMenu(e);
-  }
-
   destroy() {
     this.autocompleteUpdate.cancel();
     this.terminalInputChanged.cancel();
@@ -1287,7 +1282,6 @@ class JSTerm extends Component {
         key: "jsterm-container",
         "aria-live": "off",
         tabIndex: -1,
-        onContextMenu: this.onContextMenu,
         ref: node => {
           this.node = node;
         },
