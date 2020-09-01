@@ -63,8 +63,6 @@ class JSTerm extends Component {
       webConsoleUI: PropTypes.object.isRequired,
       // Needed for opening context menu
       serviceContainer: PropTypes.object.isRequired,
-      // Handler for clipboard 'paste' event (also used for 'drop' event, callback).
-      onPaste: PropTypes.func,
       // Evaluate provided expression.
       evaluateExpression: PropTypes.func.isRequired,
       // Update position in the history after executing an expression (action).
@@ -451,8 +449,6 @@ class JSTerm extends Component {
       this.editor.appendToLocalElement(this.node);
 
       const cm = this.editor.codeMirror;
-      cm.on("paste", (_, event) => this.props.onPaste(event));
-      cm.on("drop", (_, event) => this.props.onPaste(event));
 
       this.node.addEventListener("keydown", event => {
         if (event.keyCode === KeyCodes.DOM_VK_ESCAPE) {
