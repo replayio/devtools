@@ -12,7 +12,7 @@ import {
 } from "ui/utils/timeline";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 
-const markerWidth = 15;
+const markerWidth = 19;
 const tolerance = 2;
 
 class CommentMarker extends React.Component {

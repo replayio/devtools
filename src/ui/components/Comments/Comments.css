@@ -4,12 +4,12 @@
 
 .comments-container {
   position: relative;
+  top: 26px;
 }
 
 .comment-marker {
   width: 19px;
   height: 19px;
-  top: 26px;
   z-index: 2;
   position: absolute;
   background-color: transparent;
@@ -30,7 +30,6 @@
 .create-comment {
   width: 19px;
   height: 19px;
-  top: 26px;
   z-index: 100;
   position: absolute;
   outline: none;
