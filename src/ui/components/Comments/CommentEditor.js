@@ -44,10 +44,15 @@ class CommentEditor extends React.Component {
   };
 
   stopEditingComment = e => {
-    const { comment, stopEditing } = this.props;
+    const { removeComment, comment, stopEditing } = this.props;
+    const { inputValue } = this.state;
+    e.stopPropagation();
+
+    if (comment.contents == "" && inputValue == "") {
+      return removeComment(comment);
+    }
 
     this.setState({ inputValue: comment.contents });
-    e.stopPropagation();
     stopEditing();
   };
 
