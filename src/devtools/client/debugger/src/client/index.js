@@ -35,7 +35,7 @@ function syncXHRBreakpoints() {
   });
 }
 
-async function loadInitialState() {
+export async function loadInitialState() {
   const pendingBreakpoints = await asyncStore.pendingBreakpoints;
   const tabs = { tabs: await asyncStore.tabs };
   const xhrBreakpoints = await asyncStore.xhrBreakpoints;
@@ -53,7 +53,7 @@ function getClient(connection: any) {
   return firefox;
 }
 
-export async function onConnect(connection: Object, panelWorkers: Object, panel: Panel) {
+export async function onConnect(store, connection: Object, panelWorkers: Object, panel: Panel) {
   // NOTE: the landing page does not connect to a JS process
   if (!connection) {
     return;
@@ -64,12 +64,11 @@ export async function onConnect(connection: Object, panelWorkers: Object, panel:
   const client = getClient(connection);
   const commands = client.clientCommands;
 
-  const initialState = await loadInitialState();
-  const workers = bootstrapWorkers(panelWorkers);
+  // const initialState = await loadInitialState();
 
   panel.parserDispatcher = workers.parser;
 
-  const { store, actions, selectors } = bootstrapStore(commands, workers, panel, initialState);
+  // const { store, actions, selectors } = bootstrapStore(commands, workers, panel, initialState);
 
   const connected = client.onConnect(connection, actions, panel);
 

@@ -12,13 +12,25 @@
  */
 
 import { createStore, applyMiddleware } from "redux";
-import { waitUntilService } from "./middleware/wait-service";
-import { log } from "./middleware/log";
-import { history } from "./middleware/history";
-import { promise } from "./middleware/promise";
-import { thunk } from "./middleware/thunk";
-import { timing } from "./middleware/timing";
-import { context } from "./middleware/context";
+import { waitUntilService } from "devtools/client/debugger/src/actions/middleware/wait-service";
+import { log } from "devtools/client/debugger/src/actions/middleware/log";
+import { history } from "devtools/client/debugger/src/actions/middleware/history";
+import { promise } from "devtools/client/debugger/src/actions/middleware/promise";
+import { thunk } from "devtools/client/debugger/src/actions/middleware/thunk";
+import { timing } from "devtools/client/debugger/src/actions/middleware/timing";
+import { context } from "devtools/client/debugger/src/actions/middleware/context";
+
+/**
+ * @memberof utils/create-store
+ * @static
+ */
+type ReduxStoreOptions = {
+  makeThunkArgs?: Function,
+  history?: Array<Object>,
+  middleware?: Function[],
+  log?: boolean,
+  timing?: boolean,
+};
 
 /**
  * This creates a dispatcher with all the standard middleware in place

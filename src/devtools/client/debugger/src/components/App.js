@@ -40,7 +40,6 @@ import "./variables.css";
 import "./App.css";
 
 import "devtools/client/themes/variables.css";
-import "devtools/client/themes/webconsole.css";
 import "devtools/client/themes/common.css";
 
 // $FlowIgnore
@@ -147,21 +146,6 @@ class Debugger extends Component<Props, State> {
   onEscape = (_: mixed, e: KeyboardEvent) => {
     const { activeSearch, closeActiveSearch, closeQuickOpen, quickOpenEnabled } = this.props;
     const { shortcutsModalEnabled } = this.state;
-
-    if (activeSearch) {
-      e.preventDefault();
-      closeActiveSearch();
-    }
-
-    if (quickOpenEnabled) {
-      e.preventDefault();
-      closeQuickOpen();
-    }
-
-    if (shortcutsModalEnabled) {
-      e.preventDefault();
-      this.toggleShortcutsModal();
-    }
   };
 
   onCommandSlash = () => {

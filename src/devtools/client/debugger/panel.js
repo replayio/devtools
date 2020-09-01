@@ -7,6 +7,9 @@ import { defer, assert } from "protocol/utils";
 import { bootstrapApp } from "devtools/client/debugger/src/utils/bootstrap";
 import { resizeBreakpointGutter } from "./src/utils/ui";
 import { openDocLink } from "devtools/client/shared/link";
+import * as actions from "ui/actions";
+import { selectors } from "ui/reducers";
+import { clientCommands as client } from "devtools/client/debugger/src/client/firefox/commands";
 
 function registerStoreObserver(store, subscriber) {
   let oldState = store.getState();
@@ -38,7 +41,8 @@ export class DebuggerPanel {
   }
 
   async open() {
-    const { actions, store, selectors, client } = await this.panelWin.Debugger.bootstrap({
+    await this.panelWin.Debugger.bootstrap({
+      store: gDevToolsStore,
       workers: {
         sourceMaps: this.toolbox.sourceMapService,
         evaluationsParser: this.toolbox.parserService,
@@ -46,10 +50,7 @@ export class DebuggerPanel {
       panel: this,
     });
 
-    this._actions = actions;
-    this._store = store;
-    this._selectors = selectors;
-    this._client = client;
+    this._store = gDevToolsStore;
     this.isReady = true;
     this.readyWaiter.resolve();
 
@@ -79,11 +80,11 @@ export class DebuggerPanel {
     const handler = () => {
       codeMirror.off("refresh", handler);
       setTimeout(() => {
-        if (!this._selectors.selectedLocationHasScrolled(this._getState())) {
-          const location = this._selectors.getSelectedLocation(this._getState());
+        if (!selectors.selectedLocationHasScrolled(this._getState())) {
+          const location = selectors.getSelectedLocation(this._getState());
           if (location) {
-            const cx = this._selectors.getContext(this._getState());
-            this._actions.selectLocation(cx, location);
+            const cx = selectors.getContext(this._getState());
+            actions.selectLocation(cx, location);
           }
         }
         resizeBreakpointGutter(codeMirror);
@@ -93,7 +94,7 @@ export class DebuggerPanel {
   }
 
   _onDebuggerStateChange(state, oldState) {
-    const { getCurrentThread } = this._selectors;
+    const { getCurrentThread } = selectors;
 
     if (getCurrentThread(state) !== getCurrentThread(oldState)) {
       this.toolbox.selectThread(getCurrentThread(state));
@@ -108,9 +109,8 @@ export class DebuggerPanel {
     assert(this.isReady);
     return {
       store: this._store,
-      selectors: this._selectors,
-      actions: this._actions,
-      client: this._client,
+      selectors: selectors,
+      actions: actions,
     };
   }
 
@@ -169,8 +169,8 @@ export class DebuggerPanel {
   }
 
   getFrames() {
-    const thread = this._selectors.getCurrentThread(this._getState());
-    const frames = this._selectors.getFrames(this._getState(), thread);
+    const thread = selectors.getCurrentThread(this._getState());
+    const frames = selectors.getFrames(this._getState(), thread);
 
     // Frames is null when the debugger is not paused.
     if (!frames) {
@@ -180,7 +180,7 @@ export class DebuggerPanel {
       };
     }
 
-    const selectedFrame = this._selectors.getSelectedFrame(this._getState(), thread);
+    const selectedFrame = selectors.getSelectedFrame(this._getState(), thread);
     const selected = frames.findIndex(frame => frame.id == selectedFrame.id);
 
     frames.forEach(frame => {
@@ -191,23 +191,23 @@ export class DebuggerPanel {
   }
 
   isPaused() {
-    const thread = this._selectors.getCurrentThread(this._getState());
-    return this._selectors.getIsPaused(this._getState(), thread);
+    const thread = selectors.getCurrentThread(this._getState());
+    return selectors.getIsPaused(this._getState(), thread);
   }
 
   interrupt() {
-    const cx = this._selectors.getThreadContext(this._getState());
-    this._actions.breakOnNext(cx);
+    const cx = selectors.getThreadContext(this._getState());
+    actions.breakOnNext(cx);
   }
 
   selectSourceURL(url, line, column) {
-    const cx = this._selectors.getContext(this._getState());
-    return this._actions.selectSourceURL(cx, url, { line, column });
+    const cx = selectors.getContext(this._getState());
+    return actions.selectSourceURL(cx, url, { line, column });
   }
 
   async selectWorker(workerTargetFront) {
     const threadId = workerTargetFront.threadFront.actorID;
-    const isThreadAvailable = this._selectors
+    const isThreadAvailable = selectors
       .getThreads(this._getState())
       .find(x => x.actor === threadId);
 
@@ -224,8 +224,8 @@ export class DebuggerPanel {
     }
 
     // select worker's thread
-    const cx = this._selectors.getContext(this._getState());
-    this._actions.selectThread(cx, threadId);
+    const cx = selectors.getContext(this._getState());
+    actions.selectThread(cx, threadId);
 
     // select worker's source
     const source = this.getSourceByURL(workerTargetFront._url);
@@ -233,33 +233,33 @@ export class DebuggerPanel {
   }
 
   previewPausedLocation(location) {
-    return this._actions.previewPausedLocation(location);
+    return actions.previewPausedLocation(location);
   }
 
   clearPreviewPausedLocation() {
-    return this._actions.clearPreviewPausedLocation();
+    return actions.clearPreviewPausedLocation();
   }
 
   async selectSource(sourceId, line, column) {
-    const cx = this._selectors.getContext(this._getState());
+    const cx = selectors.getContext(this._getState());
     const location = { sourceId, line, column };
 
-    await this._actions.selectSource(cx, sourceId, location);
-    if (this._selectors.hasLogpoint(this._getState(), location)) {
-      this._actions.openConditionalPanel(location, true);
+    await actions.selectSource(cx, sourceId, location);
+    if (selectors.hasLogpoint(this._getState(), location)) {
+      actions.openConditionalPanel(location, true);
     }
   }
 
   canLoadSource(sourceId) {
-    return this._selectors.canLoadSource(this._getState(), sourceId);
+    return selectors.canLoadSource(this._getState(), sourceId);
   }
 
   getSourceByActorId(sourceId) {
-    return this._selectors.getSourceByActorId(this._getState(), sourceId);
+    return selectors.getSourceByActorId(this._getState(), sourceId);
   }
 
   getSourceByURL(sourceURL) {
-    return this._selectors.getSourceByURL(this._getState(), sourceURL);
+    return selectors.getSourceByURL(this._getState(), sourceURL);
   }
 
   destroy() {

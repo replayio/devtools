@@ -121,6 +121,9 @@ class Toolbox extends React.Component {
   }
 
   onEscape = () => {
+    if (dbg.selectors.quickOpenEnabled() || e.cancelled) {
+      return;
+    }
     this.toggleSplitConsole(!this.props.splitConsoleOpen);
   };
 

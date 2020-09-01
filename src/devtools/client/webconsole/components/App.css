@@ -23,70 +23,20 @@ body {
   position: relative;
 }
 
+#toolbox-content-console {
+  height: 100%;
+  overflow: hidden;
+}
+
 .webconsole-app {
   --object-inspector-hover-background: transparent;
   --attachment-margin-block-end: 3px;
   --primary-toolbar-height: 29px;
   display: flex;
   flex-direction: column;
-  /*display: grid;*/
-  /*
-    * Here's the design we want in in-line mode
-    * +----------------------------------------------+
-    * |    Filter bar primary      ↔                 |
-    * +----------------------------↔                 |
-    * |   [Filter bar secondary]   ↔                 |
-    * +----------------------------↔                 |
-    * |                            ↔                 |
-    * +  +----------------------+  ↔                 |
-    * |  |                      |  ↔                 |
-    * |  |        Output        |  ↔    [sidebar]    |
-    * |  |                      |  ↔                 |
-    * |  +----------------------+  ↔                 |
-    * |  |   [NotificationBox]  |  ↔                 |
-    * |  +----------------------+  ↔                 |
-    * |  |                      |  ↔                 |
-    * |  |        JSTerm        |  ↔                 |
-    * |  |                      |  ↔                 |
-    * |  +----------------------+  ↔                 |
-    * |  |  [EagerEvaluation]   |  ↔                 |
-    * |  +----------------------+  ↔                 |
-    * |                            ↔                 |
-    * +----------------------------↔                 |
-    * |  [Reverse search input]    ↔                 |
-    * +----------------------------------------------+
-    *
-     * - ↔ are width resizers
-     * - Elements inside brackets may not be visible, so we set
-     *   rows/columns to "auto" to make them collapse when the element
-     *   they contain is hidden.
-     */
-  /*
-  grid-template-areas: "filter-toolbar           sidebar"
-                       "filter-toolbar-secondary sidebar"
-                       "output-input             sidebar"
-                       "reverse-search           sidebar";
-  grid-template-rows: var(--primary-toolbar-height) auto 1fr auto;
-  grid-template-columns: minmax(200px, 1fr) minmax(0, auto);
-  */
   width: 100vw;
   color: var(--console-output-color);
   -moz-user-focus: normal;
-}
-
-.webconsole-filteringbar-wrapper {
-  grid-column: filter-toolbar;
-  grid-row: filter-toolbar / filter-toolbar-secondary;
-  grid-template-rows: subgrid;
-}
-
-.webconsole-filterbar-primary {
-  grid-row: filter-toolbar;
-}
-
-/* Only put the filter buttons toolbar on its own row in narrow filterbar layout  */
-.narrow .devtools-toolbar.webconsole-filterbar-secondary {
-  grid-row: filter-toolbar-secondary;
 }
 
 .flexible-output-input {
@@ -97,7 +47,6 @@ body {
 }
 
 .flexible-output-input .webconsole-output {
-  /* height: calc(100% - 55px); */
   overflow: hidden auto;
 }
 
@@ -137,8 +86,8 @@ body {
   --jsterm-padding-top: 0;
   --jsterm-padding-bottom: 0;
   min-height: calc(
-    var(--console-row-height) + var(--jsterm-border-width) +
-      var(--jsterm-padding-top) + var(--jsterm-padding-bottom)
+    var(--console-row-height) + var(--jsterm-border-width) + var(--jsterm-padding-top) +
+      var(--jsterm-padding-bottom)
   );
   padding-top: var(--jsterm-padding-top);
   padding-bottom: var(--jsterm-padding-bottom);
@@ -152,8 +101,7 @@ body {
   --jsterm-border-width: 1px;
 }
 
-.webconsole-app:not(.jsterm-editor):not(.eager-evaluation)
-  .jsterm-input-container {
+.webconsole-app:not(.jsterm-editor):not(.eager-evaluation) .jsterm-input-container {
   /* The input should be full-height when eager evaluation is disabled. */
   flex-grow: 1;
   --jsterm-padding-top: var(--console-input-extra-padding);
@@ -303,9 +251,7 @@ body {
   height: unset;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-executeButton {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-executeButton {
   padding-inline: 4px 8px;
   height: 20px;
   margin-inline-start: 5px;
@@ -313,9 +259,7 @@ body {
   align-items: center;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-executeButton::before {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-executeButton::before {
   height: 16px;
   width: 16px;
   -moz-context-properties: fill;
@@ -323,9 +267,7 @@ body {
   margin-inline-end: 2px;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-evaluation-selector-button {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-evaluation-selector-button {
   height: 20px;
   margin-inline-start: 5px;
   padding-inline: 8px 16px !important;
@@ -333,33 +275,23 @@ body {
   background-position-y: calc(50% + 1px) !important;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-history-prevExpressionButton {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-history-prevExpressionButton {
   grid-column: -5 / -6;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-history-nextExpressionButton {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-history-nextExpressionButton {
   grid-column: -4 / -5;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-reverseSearchButton {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-reverseSearchButton {
   grid-column: -3 / -4;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-historyNavSeparator {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-historyNavSeparator {
   grid-column: -2 / -3;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-closeButton {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-closeButton {
   grid-column: -1 / -2;
 }
 
@@ -375,9 +307,7 @@ body {
   background-size: 16px;
 }
 
-.jsterm-editor
-  .webconsole-editor-toolbar
-  .webconsole-editor-toolbar-reverseSearchButton::before {
+.jsterm-editor .webconsole-editor-toolbar .webconsole-editor-toolbar-reverseSearchButton::before {
   background-size: 14px;
 }
 

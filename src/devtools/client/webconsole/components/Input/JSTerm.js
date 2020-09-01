@@ -273,8 +273,6 @@ class JSTerm extends Component {
             ]);
           },
 
-          [Editor.accel("O")]: async () => this._openFile(),
-
           Tab: () => {
             if (this.hasEmptyInput()) {
               this.editor.codeMirror.getInputField().blur();
@@ -631,44 +629,6 @@ class JSTerm extends Component {
   _getValue() {
     // FIXME
     return this.editor ? this.editor.getText() || "" : "";
-  }
-
-  /**
-   * Open the file picker for the user to select a javascript file and open it.
-   *
-   */
-  async _openFile() {
-    const fp = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-    fp.init(
-      this.webConsoleUI.document.defaultView,
-      l10n.getStr("webconsole.input.openJavaScriptFile"),
-      Ci.nsIFilePicker.modeOpen
-    );
-
-    // Append file filters
-    fp.appendFilter(l10n.getStr("webconsole.input.openJavaScriptFileFilter"), "*.js");
-
-    function readFile(file) {
-      return new Promise(resolve => {
-        const { OS } = Cu.import("resource://gre/modules/osfile.jsm");
-        OS.File.read(file.path).then(data => {
-          const decoder = new TextDecoder();
-          resolve(decoder.decode(data));
-        });
-      });
-    }
-
-    const content = await new Promise(resolve => {
-      fp.open(rv => {
-        if (rv == Ci.nsIFilePicker.returnOK) {
-          const file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
-          file.initWithPath(fp.file.path);
-          readFile(file).then(resolve);
-        }
-      });
-    });
-
-    this._setValue(content);
   }
 
   getSelectionStart() {
@@ -1222,65 +1182,7 @@ class JSTerm extends Component {
     });
   }
 
-  renderEvaluationSelector() {
-    if (
-      !this.props.webConsoleUI.wrapper.toolbox ||
-      this.props.editorMode ||
-      !this.props.showEvaluationSelector
-    ) {
-      return null;
-    }
-
-    return EvaluationSelector(this.props);
-  }
-
-  renderEditorOnboarding() {
-    if (!this.props.showEditorOnboarding) {
-      return null;
-    }
-
-    // We deliberately use getStr, and not getFormatStr, because we want keyboard
-    // shortcuts to be wrapped in their own span.
-    const label = l10n.getStr("webconsole.input.editor.onboarding.label");
-    let [prefix, suffix] = label.split("%1$S");
-    suffix = suffix.split("%2$S");
-
-    const enterString = l10n.getStr("webconsole.enterKey");
-
-    return dom.header(
-      { className: "editor-onboarding" },
-      dom.img({
-        className: "editor-onboarding-fox",
-        src: "chrome://devtools/skin/images/fox-smiling.svg",
-      }),
-      dom.p(
-        {},
-        prefix,
-        dom.span({ className: "editor-onboarding-shortcut" }, enterString),
-        suffix[0],
-        dom.span({ className: "editor-onboarding-shortcut" }, [
-          isMacOS ? `Cmd+${enterString}` : `Ctrl+${enterString}`,
-        ]),
-        suffix[1]
-      ),
-      dom.button(
-        {
-          className: "editor-onboarding-dismiss-button",
-          onClick: () => this.props.editorOnboardingDismiss(),
-        },
-        l10n.getStr("webconsole.input.editor.onboarding.dissmis.label")
-      )
-    );
-  }
-
   render() {
-    if (
-      this.props.webConsoleUI.isBrowserConsole &&
-      !Services.prefs.getBoolPref("devtools.chrome.enabled")
-    ) {
-      return null;
-    }
-
     return dom.div(
       {
         className: "jsterm-input-container devtools-input",
@@ -1291,7 +1193,7 @@ class JSTerm extends Component {
         ref: node => {
           this.node = node;
         },
-      },
+      }
       /*
       dom.div(
         { className: "webconsole-input-buttons" },
@@ -1299,7 +1201,7 @@ class JSTerm extends Component {
         this.renderOpenEditorButton()
       ),
       */
-      this.renderEditorOnboarding()
+      // this.renderEditorOnboarding()
     );
   }
 }

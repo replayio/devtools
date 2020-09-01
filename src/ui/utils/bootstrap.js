@@ -2,10 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
-import {
-  prefs as dbgPrefs,
-  features as dbgFeatures,
-} from "devtools/client/debugger/src/utils/prefs";
+import { prefs as dbgPrefs } from "devtools/client/debugger/src/utils/prefs";
+
 import {
   prefs as inspectorPrefs,
   features as inspectorFeatures,
@@ -13,7 +11,10 @@ import {
 
 import { prefs, features, asyncStore } from "./prefs";
 import configureStore from "devtools/client/debugger/src/actions/utils/create-store";
+import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
 import { clientCommands } from "devtools/client/debugger/src/client/firefox/commands";
+import * as debuggerReducers from "devtools/client/debugger/src/reducers";
+import { loadInitialState } from "devtools/client/debugger/src/client";
 import { bindActionCreators, combineReducers } from "redux";
 import { reducers, selectors } from "../reducers";
 import { actions } from "../actions";
@@ -105,17 +106,23 @@ function bindSelectors(obj) {
   }, {});
 }
 
-async function bootstrapStore() {
+async function bootstrapStore(props) {
+  const workers = bootstrapWorkers(panelWorkers);
+  const panel = props.panels["debugger"];
   const createStore = configureStore({
     log: dbgPrefs.logging,
     timing: dbgPrefs.timing,
     makeThunkArgs: (args, state) => {
-      return { ...args, client: clientCommands };
+      return { ...args, client: clientCommands, ...workers, panel };
     },
   });
 
-  const initialState = await getInitialState();
-  const store = createStore(combineReducers(reducers), initialState);
+  const initialAppState = await getInitialState();
+  const initialDebuggerState = await loadInitialState();
+  const store = createStore(combineReducers({ ...reducers, ...debuggerReducers }), {
+    ...initialAppState,
+    ...initialDebuggerState,
+  });
   registerStoreObserver(store, updatePrefs);
 
   setupAppHelper(store);
@@ -129,7 +136,7 @@ function getRedirectUri() {
 }
 
 export async function bootstrapApp(props, context) {
-  const store = await bootstrapStore();
+  const store = await bootstrapStore(props);
   setupSentry(context);
 
   ReactDOM.render(

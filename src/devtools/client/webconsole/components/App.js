@@ -342,26 +342,9 @@ class App extends Component {
   }
 
   renderRootElement(children) {
-    const { editorMode, serviceContainer, sidebarVisible } = this.props;
-
-    const classNames = ["webconsole-app"];
-    if (sidebarVisible) {
-      classNames.push("sidebar-visible");
-    }
-    if (editorMode) {
-      classNames.push("jsterm-editor");
-    }
-    if (serviceContainer.canRewind()) {
-      classNames.push("can-rewind");
-    }
-
-    if (this.props.eagerEvaluationEnabled) {
-      classNames.push("eager-evaluation");
-    }
-
     return div(
       {
-        className: classNames.join(" "),
+        className: "webconsole-app",
         onKeyDown: this.onKeyDown,
         onClick: this.onClick,
         ref: node => {
@@ -380,33 +363,33 @@ class App extends Component {
     const notificationBox = this.renderNotificationBox();
     const jsterm = this.renderJsTerm();
     const eager = this.renderEagerEvaluation();
-    const reverseSearch = this.renderReverseSearch();
+    // const reverseSearch = this.renderReverseSearch();
     const sidebar = this.renderSideBar();
     const confirmDialog = this.renderConfirmDialog();
 
     return this.renderRootElement([
       filterBar,
-      editorToolbar,
+      // editorToolbar,
       dom.div(
         { className: "flexible-output-input", key: "in-out-container" },
-        consoleOutput,
-        notificationBox,
-        jsterm,
-        eager
+        consoleOutput
+        // notificationBox
+        // jsterm,
+        // eager
       ),
-      editorMode
-        ? GridElementWidthResizer({
-            key: "editor-resizer",
-            enabled: editorMode,
-            position: "end",
-            className: "editor-resizer",
-            getControlledElementNode: () => webConsoleUI.jsterm.node,
-            onResizeEnd: width => dispatch(actions.setEditorWidth(width)),
-          })
-        : null,
-      reverseSearch,
-      sidebar,
-      confirmDialog,
+      // editorMode
+      //   ? GridElementWidthResizer({
+      //       key: "editor-resizer",
+      //       enabled: editorMode,
+      //       position: "end",
+      //       className: "editor-resizer",
+      //       getControlledElementNode: () => webConsoleUI.jsterm.node,
+      //       onResizeEnd: width => dispatch(actions.setEditorWidth(width)),
+      //     })
+      //   : null,
+      // reverseSearch,
+      // sidebar,
+      // confirmDialog,
     ]);
   }
 }

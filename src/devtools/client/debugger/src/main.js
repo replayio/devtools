@@ -17,6 +17,7 @@ function unmountRoot() {
 export default {
   bootstrap: ({ targetList, devToolsClient, workers, panel }: any) =>
     onConnect(
+      store,
       {
         tab: { clientType: "firefox" },
         targetList,

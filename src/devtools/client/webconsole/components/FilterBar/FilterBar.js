@@ -321,6 +321,7 @@ class FilterBar extends Component {
   }
 
   render() {
+    return dom.div({}, "yo");
     const { closeButtonVisible, displayMode } = this.props;
 
     const isNarrow = displayMode === FILTERBAR_DISPLAY_MODES.NARROW;
