@@ -129,15 +129,13 @@ class Declaration extends PureComponent {
   }
 
   renderOverriddenFilter() {
-    if (this.props.declaration.isDeclarationValid) {
+    if (!this.props.declaration.isDeclarationValid || !this.props.declaration.isOverridden) {
       return null;
     }
 
     return dom.div({
-      className: "ruleview-warning",
-      title: this.props.declaration.isNameValid
-        ? getStr("rule.warningName.title")
-        : getStr("rule.warning.title"),
+      className: "ruleview-overridden-rule-filter",
+      title: getStr("rule.filterProperty.title"),
     });
   }
 
@@ -182,13 +180,15 @@ class Declaration extends PureComponent {
   }
 
   renderWarning() {
-    if (!this.props.declaration.isDeclarationValid || !this.props.declaration.isOverridden) {
+    if (this.props.declaration.isDeclarationValid) {
       return null;
     }
 
     return dom.div({
-      className: "ruleview-overridden-rule-filter",
-      title: getStr("rule.filterProperty.title"),
+      className: "ruleview-warning",
+      title: this.props.declaration.isNameValid
+        ? getStr("rule.warningName.title")
+        : getStr("rule.warning.title"),
     });
   }
 
