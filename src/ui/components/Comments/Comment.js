@@ -82,10 +82,13 @@ class Comment extends React.Component {
 
   renderLabel() {
     const { comment } = this.props;
+    const lines = comment.contents.split("\n");
 
     return (
       <div className="label" onDoubleClick={this.startEditing}>
-        {comment.contents}
+        {lines.map((line, i) => (
+          <div key={i}>{line}</div>
+        ))}
       </div>
     );
   }
