@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^1.0.0",
-    "@babel/core": "^7.9.6",
+    "@babel/core": "^7.11.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-optional-chaining": "^7.10.1",
     "@babel/plugin-transform-flow-strip-types": "^7.9.0",
