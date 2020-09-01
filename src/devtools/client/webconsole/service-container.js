@@ -6,19 +6,9 @@
 
 const { createContextMenu } = require("devtools/client/webconsole/utils/context-menu");
 
-const { createEditContextMenu } = require("devtools/client/framework/toolbox-context-menu");
-
 function setupServiceContainer({ webConsoleUI, hud, toolbox, webConsoleWrapper }) {
   const serviceContainer = {
     openContextMenu: (event, message) => createContextMenu(event, message, webConsoleWrapper),
-
-    openEditContextMenu: event => {
-      const { screenX, screenY } = event;
-      const menu = createEditContextMenu(window, "webconsole-menu");
-      // Emit the "menu-open" event for testing.
-      menu.once("open", () => webConsoleWrapper.emitForTests("menu-open"));
-      menu.popup(screenX, screenY, hud.chromeWindow.document);
-    },
 
     // NOTE these methods are proxied currently because the
     // service container is passed down the tree. These methods should eventually
