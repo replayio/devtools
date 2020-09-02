@@ -641,6 +641,10 @@ function NodeFront(pause, data) {
 NodeFront.prototype = {
   then: undefined,
 
+  objectId() {
+    return this._object.objectId;
+  },
+
   getObjectFront() {
     return new ValueFront(this._pause, { object: this._object.objectId });
   },
