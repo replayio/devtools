@@ -83,11 +83,14 @@ class RulesApp extends PureComponent {
 
       if (inheritedNodeId !== lastInheritedNodeId) {
         lastInheritedNodeId = inheritedNodeId;
-        output.push(dom.div({ className: "ruleview-header" }, inheritedSource));
+        output.push(
+          dom.div({ key: inheritedNodeId, className: "ruleview-header" }, inheritedSource)
+        );
       }
 
       output.push(
         Rule({
+          key: rule.id,
           ...this.getRuleProps(),
           rule,
         })
