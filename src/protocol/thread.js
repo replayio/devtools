@@ -16,6 +16,7 @@ const {
   ArrayMap,
 } = require("./utils");
 const { getFrameworkEventListeners } = require("./event-listeners");
+const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
 
 // Information about a protocol pause.
 function Pause(sessionId) {
@@ -1044,7 +1045,8 @@ RuleFront.prototype = {
 
 Object.setPrototypeOf(RuleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
-// Manages interaction with a CSSStyleDeclaration.
+// Manages interaction with a CSSStyleDeclaration. StyleFront represents an inline
+// element style.
 function StyleFront(pause, data) {
   this._pause = pause;
 
@@ -1070,11 +1072,15 @@ StyleFront.prototype = {
   get style() {
     return this;
   },
+
+  get type() {
+    return ELEMENT_STYLE;
+  },
+
   parentStyleSheet: null,
   mediaText: undefined,
   line: undefined,
   column: undefined,
-  type: undefined,
   selectors: undefined,
   href: undefined,
   isSystem: false,
