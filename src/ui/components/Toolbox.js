@@ -120,7 +120,11 @@ class Toolbox extends React.Component {
     }
   }
 
-  onEscape = () => {
+  onEscape = e => {
+    if (e.cancelBubble) {
+      return;
+    }
+
     this.toggleSplitConsole(!this.props.splitConsoleOpen);
   };
 
