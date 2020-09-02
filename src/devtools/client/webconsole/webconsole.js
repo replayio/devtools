@@ -304,14 +304,6 @@ class WebConsole {
     this.recordEvent("jump_to_source");
   }
 
-  async openNetworkPanel(requestId) {
-    if (!this.toolbox) {
-      return;
-    }
-    const netmonitor = await this.toolbox.selectTool("netmonitor");
-    await netmonitor.panelWin.Netmonitor.inspectRequest(requestId);
-  }
-
   getHighlighter() {
     if (!this.toolbox) {
       return null;
@@ -323,15 +315,6 @@ class WebConsole {
 
     this._highlighter = this.toolbox.getHighlighter();
     return this._highlighter;
-  }
-
-  async resendNetworkRequest(requestId) {
-    if (!this.toolbox) {
-      return;
-    }
-
-    const api = await this.toolbox.getNetMonitorAPI();
-    await api.resendRequest(requestId);
   }
 
   async openNodeInInspector(grip) {

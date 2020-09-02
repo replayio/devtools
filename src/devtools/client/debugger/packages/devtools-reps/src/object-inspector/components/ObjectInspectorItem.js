@@ -147,7 +147,6 @@ class ObjectInspectorItem extends Component {
       depth,
       focused,
       expanded,
-      onCmdCtrlClick,
       onDoubleClick,
       dimTopLevelWindow,
       onContextMenu,
@@ -167,17 +166,6 @@ class ObjectInspectorItem extends Component {
         block: nodeIsBlock(item),
       }),
       onClick: e => {
-        if (onCmdCtrlClick && ((isMacOS && e.metaKey) || (!isMacOS && e.ctrlKey))) {
-          onCmdCtrlClick(item, {
-            depth,
-            event: e,
-            focused,
-            expanded,
-          });
-          e.stopPropagation();
-          return;
-        }
-
         // If this click happened because the user selected some text, bail out.
         // Note that if the user selected some text before and then clicks here,
         // the previously selected text will be first unselected, unless the

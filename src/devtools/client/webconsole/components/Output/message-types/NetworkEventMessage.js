@@ -31,10 +31,7 @@ NetworkEventMessage.displayName = "NetworkEventMessage";
 
 NetworkEventMessage.propTypes = {
   message: PropTypes.object.isRequired,
-  serviceContainer: PropTypes.shape({
-    openNetworkPanel: PropTypes.func.isRequired,
-    resendNetworkRequest: PropTypes.func.isRequired,
-  }),
+  serviceContainer: PropTypes.shape({}),
   timestampsVisible: PropTypes.bool.isRequired,
   networkMessageUpdate: PropTypes.object.isRequired,
 };

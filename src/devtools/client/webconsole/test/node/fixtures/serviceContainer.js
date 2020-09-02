@@ -13,8 +13,6 @@ module.exports = {
   },
   onViewSourceInDebugger: () => {},
   onViewSourceInStyleEditor: () => {},
-  openNetworkPanel: () => {},
-  resendNetworkRequest: () => {},
   sourceMapService: {
     subscribe: () => {},
     originalPositionFor: () => {
