@@ -146,13 +146,13 @@ exports.rule = {
   // Whether or not the rule is an user agent style.
   isUserAgentStyle: PropTypes.bool,
 
-  // An object containing information about the CSS keyframes rules.
-  keyframesRule: PropTypes.shape({
-    // The actor ID of the keyframes rule.
-    id: PropTypes.string,
-    // The keyframes rule name.
-    keyframesName: PropTypes.string,
-  }),
+  // // An object containing information about the CSS keyframes rules.
+  // keyframesRule: PropTypes.shape({
+  //   // The actor ID of the keyframes rule.
+  //   id: PropTypes.string,
+  //   // The keyframes rule name.
+  //   keyframesName: PropTypes.string,
+  // }),
 
   // The pseudo-element keyword used in the rule.
   pseudoElement: PropTypes.string,

@@ -96,6 +96,7 @@ class RulesApp extends PureComponent {
     return output;
   }
 
+  /*
   renderKeyframesRules(rules) {
     if (!rules.length) {
       return null;
@@ -129,6 +130,7 @@ class RulesApp extends PureComponent {
 
     return output;
   }
+  */
 
   renderStyleRules(rules) {
     if (!rules.length) {
@@ -173,15 +175,15 @@ class RulesApp extends PureComponent {
   render() {
     const { rules } = this.props.rules;
     const inheritedRules = [];
-    const keyframesRules = [];
+    // const keyframesRules = [];
     const pseudoElementRules = [];
     const styleRules = [];
 
     for (const rule of rules) {
       if (rule.inheritance) {
         inheritedRules.push(rule);
-      } else if (rule.keyframesRule) {
-        keyframesRules.push(rule);
+        // } else if (rule.keyframesRule) {
+        // keyframesRules.push(rule);
       } else if (rule.pseudoElement) {
         pseudoElementRules.push(rule);
       } else {
@@ -218,8 +220,8 @@ class RulesApp extends PureComponent {
                 null,
                 this.renderPseudoElementRules(pseudoElementRules),
                 this.renderStyleRules(styleRules),
-                this.renderInheritedRules(inheritedRules),
-                this.renderKeyframesRules(keyframesRules)
+                this.renderInheritedRules(inheritedRules)
+                // this.renderKeyframesRules(keyframesRules)
               )
             : dom.div({ className: "devtools-sidepanel-no-result" }, getStr("rule.empty"))
         )
