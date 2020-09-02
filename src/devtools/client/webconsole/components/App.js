@@ -8,7 +8,6 @@ const { Component, createFactory } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
-const { Utils: WebConsoleUtils } = require("devtools/client/webconsole/utils");
 
 const actions = require("devtools/client/webconsole/actions/index");
 const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
@@ -52,9 +51,6 @@ const GridElementWidthResizer = createFactory(
 
 const l10n = require("devtools/client/webconsole/utils/l10n");
 
-const SELF_XSS_OK = l10n.getStr("selfxss.okstring");
-const SELF_XSS_MSG = l10n.getFormatStr("selfxss.msg", [SELF_XSS_OK]);
-
 const { getAllNotifications } = require("devtools/client/webconsole/selectors/notifications");
 const { div } = dom;
 const isMacOS = Services.appinfo.OS === "Darwin";
@@ -90,7 +86,6 @@ class App extends Component {
     super(props);
 
     this.onClick = this.onClick.bind(this);
-    this.onPaste = this.onPaste.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onBlur = this.onBlur.bind(this);
   }
@@ -173,60 +168,6 @@ class App extends Component {
     }
   }
 
-  onPaste(event) {
-    const { dispatch, webConsoleUI, notifications } = this.props;
-
-    const { usageCount, CONSOLE_ENTRY_THRESHOLD } = WebConsoleUtils;
-
-    // Bail out if self-xss notification is suppressed.
-    if (webConsoleUI.isBrowserConsole || usageCount >= CONSOLE_ENTRY_THRESHOLD) {
-      return;
-    }
-
-    // Stop event propagation, so the clipboard content is *not* inserted.
-    event.preventDefault();
-    event.stopPropagation();
-
-    // Bail out if self-xss notification is already there.
-    if (getNotificationWithValue(notifications, "selfxss-notification")) {
-      return;
-    }
-
-    const input = event.target;
-
-    // Cleanup function if notification is closed by the user.
-    const removeCallback = eventType => {
-      if (eventType == "removed") {
-        input.removeEventListener("keyup", pasteKeyUpHandler);
-        dispatch(actions.removeNotification("selfxss-notification"));
-      }
-    };
-
-    // Create self-xss notification
-    dispatch(
-      actions.appendNotification(
-        SELF_XSS_MSG,
-        "selfxss-notification",
-        null,
-        PriorityLevels.PRIORITY_WARNING_HIGH,
-        null,
-        removeCallback
-      )
-    );
-
-    // Remove notification automatically when the user types "allow pasting".
-    const pasteKeyUpHandler = e => {
-      const value = e.target.value;
-      if (value.includes(SELF_XSS_OK)) {
-        dispatch(actions.removeNotification("selfxss-notification"));
-        input.removeEventListener("keyup", pasteKeyUpHandler);
-        WebConsoleUtils.usageCount = WebConsoleUtils.CONSOLE_ENTRY_THRESHOLD;
-      }
-    };
-
-    input.addEventListener("keyup", pasteKeyUpHandler);
-  }
-
   renderFilterBar() {
     const { closeSplitConsole, filterBarDisplayMode, webConsoleUI } = this.props;
 
@@ -278,7 +219,6 @@ class App extends Component {
       key: "jsterm",
       webConsoleUI,
       serviceContainer,
-      onPaste: this.onPaste,
       autocomplete,
       editorMode,
       editorWidth,
