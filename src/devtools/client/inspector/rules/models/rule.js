@@ -160,6 +160,7 @@ class Rule {
     return this._inheritedSource;
   }
 
+  /*
   get keyframesName() {
     if (this._keyframesName) {
       return this._keyframesName;
@@ -181,6 +182,7 @@ class Rule {
       keyframesName: this.keyframesName,
     };
   }
+  */
 
   get selectorText() {
     return this.domRule.selectors
