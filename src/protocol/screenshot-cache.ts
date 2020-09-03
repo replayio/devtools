@@ -28,32 +28,32 @@ export interface QueuedScreenshotDownload {
  */
 export class ScreenshotCache {
   // Map paint hashes to a promise that resolves with the associated screenshot.
-  _cache = new Map<string, Promise<Screenshot>>();
+  private cache = new Map<string, Promise<Screenshot>>();
 
-  _queuedDownloadForTooltip: QueuedScreenshotDownload | undefined;
-  _runningDownloadForTooltip = false;
+  private queuedDownloadForTooltip: QueuedScreenshotDownload | undefined;
+  private runningDownloadForTooltip = false;
 
   /**
    * Returns a promise for the requested screenshot. The promise may be rejected
    * if another tooltip screenshot is requested before this download was started.
    */
   async getScreenshotForTooltip(point: string, paintHash: string): Promise<Screenshot> {
-    if (this._cache.has(paintHash)) {
-      return this._cache.get(paintHash)!;
+    if (this.cache.has(paintHash)) {
+      return this.cache.get(paintHash)!;
     }
-    if (this._queuedDownloadForTooltip && this._queuedDownloadForTooltip.point === point) {
-      return this._queuedDownloadForTooltip.promise;
+    if (this.queuedDownloadForTooltip && this.queuedDownloadForTooltip.point === point) {
+      return this.queuedDownloadForTooltip.promise;
     }
 
-    if (this._queuedDownloadForTooltip) {
-      this._queuedDownloadForTooltip.reject(new DownloadCancelledError());
-      this._queuedDownloadForTooltip = undefined;
+    if (this.queuedDownloadForTooltip) {
+      this.queuedDownloadForTooltip.reject(new DownloadCancelledError());
+      this.queuedDownloadForTooltip = undefined;
     }
 
     const { promise, resolve, reject } = defer();
-    this._queuedDownloadForTooltip = { point, paintHash, promise, resolve, reject };
+    this.queuedDownloadForTooltip = { point, paintHash, promise, resolve, reject };
 
-    this._startQueuedDownloadIfPossible();
+    this.startQueuedDownloadIfPossible();
 
     return promise;
   }
@@ -63,49 +63,49 @@ export class ScreenshotCache {
    * immediately and will only be rejected if sendMessage() throws.
    */
   async getScreenshotForPlayback(point: string, paintHash: string): Promise<Screenshot> {
-    if (this._cache.has(paintHash)) {
-      return this._cache.get(paintHash)!;
+    if (this.cache.has(paintHash)) {
+      return this.cache.get(paintHash)!;
     }
 
-    const promise = this._download(point);
+    const promise = this.download(point);
 
-    this._cache.set(paintHash, promise);
+    this.cache.set(paintHash, promise);
     return promise;
   }
 
-  async _startQueuedDownloadIfPossible() {
-    if (this._queuedDownloadForTooltip && !this._runningDownloadForTooltip) {
-      this._downloadQueued();
+  private async startQueuedDownloadIfPossible() {
+    if (this.queuedDownloadForTooltip && !this.runningDownloadForTooltip) {
+      this.downloadQueued();
     }
   }
 
   addScreenshot(screenshot: Screenshot) {
-    this._cache.set(screenshot.hash, Promise.resolve(screenshot));
+    this.cache.set(screenshot.hash, Promise.resolve(screenshot));
   }
 
-  async _downloadQueued() {
-    if (!this._queuedDownloadForTooltip) return;
+  private async downloadQueued() {
+    if (!this.queuedDownloadForTooltip) return;
 
-    const { point, paintHash, promise, resolve, reject } = this._queuedDownloadForTooltip;
+    const { point, paintHash, promise, resolve, reject } = this.queuedDownloadForTooltip;
 
-    this._queuedDownloadForTooltip = undefined;
-    this._runningDownloadForTooltip = true;
+    this.queuedDownloadForTooltip = undefined;
+    this.runningDownloadForTooltip = true;
 
-    this._cache.set(paintHash, promise);
+    this.cache.set(paintHash, promise);
 
     try {
-      const screen = await this._download(point);
+      const screen = await this.download(point);
       resolve(screen);
     } catch (e) {
       reject(e);
     }
 
-    this._runningDownloadForTooltip = false;
+    this.runningDownloadForTooltip = false;
 
-    this._startQueuedDownloadIfPossible();
+    this.startQueuedDownloadIfPossible();
   }
 
-  async _download(point: string): Promise<Screenshot> {
+  private async download(point: string): Promise<Screenshot> {
     const screen = (
       await sendMessage(
         "Graphics.getPaintContents",
