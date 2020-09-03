@@ -1708,6 +1708,12 @@ const ThreadFront = {
     return locations.find(l => l.scriptId == scriptId);
   },
 
+  // Given an RRP MappedLocation array with locations in different scripts
+  // representing the same generated location (i.e. a generated location plus
+  // all the corresponding locations in original or pretty printed scripts etc.),
+  // choose the location which we should be using within the devtools. Normally
+  // this is the most original location, except when preferScript has been used
+  // to prefer a generated script instead.
   async getPreferredLocation(locations) {
     await Promise.all(locations.map(({ scriptId }) => this.ensureScript(scriptId)));
     return this.getPreferredLocationRaw(locations);
@@ -1857,7 +1863,10 @@ const ThreadFront = {
     });
   },
 
-  // Get the location to use for a generated location without alternatives.
+  // Given a location in a generated script, get the preferred location to use.
+  // This has to query the server to get the original / pretty printed locations
+  // corresponding to this generated location, so getPreferredLocation is
+  // better to use when possible.
   async getPreferredMappedLocation(location) {
     const { mappedLocation } = await sendMessage(
       "Debugger.getMappedLocation",
