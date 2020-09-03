@@ -7,7 +7,7 @@
 const { createFactory, createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
-const { editableItem } = require("devtools/client/shared/inplace-editor");
+// const { editableItem } = require("devtools/client/shared/inplace-editor");
 
 const Declarations = createFactory(
   require("devtools/client/inspector/rules/components/Declarations")
@@ -37,7 +37,7 @@ class Rule extends PureComponent {
     super(props);
 
     this.closeBraceSpan = createRef();
-    this.newDeclarationSpan = createRef();
+    // this.newDeclarationSpan = createRef();
 
     this.state = {
       // Whether or not the new declaration editor is visible.
@@ -124,18 +124,18 @@ class Rule extends PureComponent {
           showDeclarationNameEditor,
           showDeclarationValueEditor,
         }),
-        dom.li(
-          {
-            className: "ruleview-property ruleview-newproperty",
-            style: {
-              display: this.state.isNewDeclarationEditorVisible ? "block" : "none",
-            },
-          },
-          dom.span({
-            className: "ruleview-propertyname",
-            ref: this.newDeclarationSpan,
-          })
-        ),
+        // dom.li(
+        //   {
+        //     className: "ruleview-property ruleview-newproperty",
+        //     style: {
+        //       display: this.state.isNewDeclarationEditorVisible ? "block" : "none",
+        //     },
+        //   },
+        //   dom.span({
+        //     className: "ruleview-propertyname",
+        //     ref: this.newDeclarationSpan,
+        //   })
+        // ),
         dom.div(
           {
             className: "ruleview-ruleclose",
