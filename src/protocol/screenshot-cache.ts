@@ -2,6 +2,8 @@ const { ThreadFront } = require("./thread");
 const { sendMessage } = require("./socket");
 const { defer } = require("./utils");
 
+const resizeHeightForTooltip = 180;
+
 export class DownloadCancelledError extends Error {}
 
 export interface Screenshot {
@@ -28,7 +30,8 @@ export interface QueuedScreenshotDownload {
  */
 export class ScreenshotCache {
   // Map paint hashes to a promise that resolves with the associated screenshot.
-  private cache = new Map<string, Promise<Screenshot>>();
+  private fullsizeCache = new Map<string, Promise<Screenshot>>();
+  private resizedCache = new Map<string, Promise<Screenshot>>();
 
   private queuedDownloadForTooltip: QueuedScreenshotDownload | undefined;
   private runningDownloadForTooltip = false;
@@ -38,8 +41,11 @@ export class ScreenshotCache {
    * if another tooltip screenshot is requested before this download was started.
    */
   async getScreenshotForTooltip(point: string, paintHash: string): Promise<Screenshot> {
-    if (this.cache.has(paintHash)) {
-      return this.cache.get(paintHash)!;
+    if (this.resizedCache.has(paintHash)) {
+      return this.resizedCache.get(paintHash)!;
+    }
+    if (this.fullsizeCache.has(paintHash)) {
+      return this.fullsizeCache.get(paintHash)!;
     }
     if (this.queuedDownloadForTooltip && this.queuedDownloadForTooltip.point === point) {
       return this.queuedDownloadForTooltip.promise;
@@ -63,13 +69,13 @@ export class ScreenshotCache {
    * immediately and will only be rejected if sendMessage() throws.
    */
   async getScreenshotForPlayback(point: string, paintHash: string): Promise<Screenshot> {
-    if (this.cache.has(paintHash)) {
-      return this.cache.get(paintHash)!;
+    if (this.fullsizeCache.has(paintHash)) {
+      return this.fullsizeCache.get(paintHash)!;
     }
 
     const promise = this.download(point);
 
-    this.cache.set(paintHash, promise);
+    this.fullsizeCache.set(paintHash, promise);
     return promise;
   }
 
@@ -80,7 +86,7 @@ export class ScreenshotCache {
   }
 
   addScreenshot(screenshot: Screenshot) {
-    this.cache.set(screenshot.hash, Promise.resolve(screenshot));
+    this.fullsizeCache.set(screenshot.hash, Promise.resolve(screenshot));
   }
 
   private async downloadQueued() {
@@ -91,10 +97,10 @@ export class ScreenshotCache {
     this.queuedDownloadForTooltip = undefined;
     this.runningDownloadForTooltip = true;
 
-    this.cache.set(paintHash, promise);
+    this.resizedCache.set(paintHash, promise);
 
     try {
-      const screen = await this.download(point);
+      const screen = await this.download(point, resizeHeightForTooltip);
       resolve(screen);
     } catch (e) {
       reject(e);
@@ -105,11 +111,11 @@ export class ScreenshotCache {
     this.startQueuedDownloadIfPossible();
   }
 
-  private async download(point: string): Promise<Screenshot> {
+  private async download(point: string, resizeHeight?: number): Promise<Screenshot> {
     const screen = (
       await sendMessage(
         "Graphics.getPaintContents",
-        { point, mimeType: "image/jpeg" },
+        { point, mimeType: "image/jpeg", resizeHeight },
         ThreadFront.sessionId
       )
     ).screen;
