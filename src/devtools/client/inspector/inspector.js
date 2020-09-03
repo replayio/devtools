@@ -61,7 +61,7 @@ const Highlighter = require("highlighter/highlighter");
    "PICKER_TYPES",
    "devtools/shared/picker-constants"
  );
- 
+
  // This import to chrome code is forbidden according to the inspector specific
  // eslintrc. TODO: Fix in Bug 1591091.
  // eslint-disable-next-line mozilla/reject-some-requires
@@ -509,10 +509,10 @@ class Inspector {
        if (!this.panelDoc) {
          return true;
        }
-   
+
        const splitterBox = this.panelDoc.getElementById("inspector-splitter-box");
        const { width } = window.windowUtils.getBoundsWithoutFlushing(splitterBox);
-   
+
        return this.is3PaneModeEnabled &&
          (this.toolbox.hostType == Toolbox.HostType.LEFT ||
            this.toolbox.hostType == Toolbox.HostType.RIGHT)
@@ -726,6 +726,17 @@ class Inspector {
    */
   addRuleView({ defaultTab = "ruleview", skipQueue = false } = {}) {
     const ruleViewSidebar = this.sidebarSplitBoxRef.current.startPanelContainer;
+    const id = "newruleview";
+    const title = INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle");
+    const panel = {
+      props: {
+        id,
+        title,
+      },
+      panel: () => {
+        return this.getPanel(id).provider;
+      },
+    };
 
     if (this.is3PaneModeEnabled) {
       // Convert to 3 pane mode by removing the rule view from the inspector sidebar
@@ -736,16 +747,11 @@ class Inspector {
       this.setSidebarSplitBoxState();
 
       // Force the rule view panel creation by calling getPanel
-      this.getPanel("ruleview");
+      this.getPanel(id);
 
-      this.sidebar.removeTab("ruleview");
+      this.sidebar.removeTab(id);
 
-      this.ruleViewSideBar.addExistingTab(
-        "ruleview",
-        INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
-        true
-      );
-
+      this.ruleViewSideBar.addTab(id, title, panel, true);
       this.ruleViewSideBar.show();
     } else {
       // Removes the rule view from the 3 pane mode and adds the rule view to the main
@@ -770,22 +776,12 @@ class Inspector {
       });
 
       this.ruleViewSideBar.hide();
-      this.ruleViewSideBar.removeTab("ruleview");
+      this.ruleViewSideBar.removeTab(id);
 
       if (skipQueue) {
-        this.sidebar.addExistingTab(
-          "ruleview",
-          INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
-          defaultTab == "ruleview",
-          0
-        );
+        this.sidebar.addTab(id, title, panel, defaultTab === id, 0);
       } else {
-        this.sidebar.queueExistingTab(
-          "ruleview",
-          INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
-          defaultTab == "ruleview",
-          0
-        );
+        this.sidebar.queueTab(id, title, panel, defaultTab === id, 0);
       }
     }
 
@@ -900,9 +896,9 @@ class Inspector {
          */
     ];
 
-    if (features.newRulesView) {
+    if (features.oldRulesView) {
       sidebarPanels.push({
-        id: "newruleview",
+        id: "ruleview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
       });
     }
@@ -912,6 +908,8 @@ class Inspector {
       // the DOM and wrap it in a React component (InspectorTabPanel) so it behaves like
       // other panels when using the Inspector's tool sidebar.
       if (id === "computedview") {
+        this.sidebar.queueExistingTab(id, title, defaultTab === id);
+      } else if (id === "ruleview") {
         this.sidebar.queueExistingTab(id, title, defaultTab === id);
       } else {
         // When `panel` is a function, it is called when the tab should render. It is
