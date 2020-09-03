@@ -8,12 +8,12 @@ const { pref } = Services;
 pref("devtools.inspector.three-pane-enabled", false);
 
 // features
-pref("devtools.inspector.features.new-rulesview.enabled", false);
+pref("devtools.inspector.features.old-rulesview.enabled", false);
 
 export const prefs = new PrefsHelper("devtools.inspector", {
   threePaneEnabled: ["Bool", "three-pane-enabled"],
 });
 
 export const features = new PrefsHelper("devtools.inspector.features", {
-  newRulesView: ["Bool", "new-rulesview.enabled"],
+  oldRulesView: ["Bool", "old-rulesview.enabled"],
 });
