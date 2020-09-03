@@ -4,6 +4,20 @@ const { defer } = require("./utils");
 
 export class DownloadCancelledError extends Error {}
 
+export interface Screenshot {
+  data: string;
+  hash: string;
+  mimeType: string;
+}
+
+export interface QueuedScreenshotDownload {
+  point: string;
+  paintHash: string;
+  promise: Promise<Screenshot>;
+  resolve: (screenshot: Screenshot) => void;
+  reject: (reason: any) => void;
+}
+
 /**
  * This class manages the screenshot downloads and caches downloaded screenshots.
  * It throttles the screenshot downloads for the tooltip, only starting
@@ -14,18 +28,18 @@ export class DownloadCancelledError extends Error {}
  */
 export class ScreenshotCache {
   // Map paint hashes to a promise that resolves with the associated screenshot.
-  _cache = new Map();
+  _cache = new Map<string, Promise<Screenshot>>();
 
-  _queuedDownloadForTooltip;
+  _queuedDownloadForTooltip: QueuedScreenshotDownload | undefined;
   _runningDownloadForTooltip = false;
 
   /**
    * Returns a promise for the requested screenshot. The promise may be rejected
    * if another tooltip screenshot is requested before this download was started.
    */
-  async getScreenshotForTooltip(point, paintHash) {
+  async getScreenshotForTooltip(point: string, paintHash: string): Promise<Screenshot> {
     if (this._cache.has(paintHash)) {
-      return this._cache.get(paintHash);
+      return this._cache.get(paintHash)!;
     }
     if (this._queuedDownloadForTooltip && this._queuedDownloadForTooltip.point === point) {
       return this._queuedDownloadForTooltip.promise;
@@ -48,9 +62,9 @@ export class ScreenshotCache {
    * Returns a promise for the requested screenshot. The download will be started
    * immediately and will only be rejected if sendMessage() throws.
    */
-  async getScreenshotForPlayback(point, paintHash) {
+  async getScreenshotForPlayback(point: string, paintHash: string): Promise<Screenshot> {
     if (this._cache.has(paintHash)) {
-      return this._cache.get(paintHash);
+      return this._cache.get(paintHash)!;
     }
 
     const promise = this._download(point);
@@ -60,20 +74,22 @@ export class ScreenshotCache {
   }
 
   async _startQueuedDownloadIfPossible() {
-    if (this._queuedDownloadForTooltip && !this._runningDownloadForToolTip) {
+    if (this._queuedDownloadForTooltip && !this._runningDownloadForTooltip) {
       this._downloadQueued();
     }
   }
 
-  addScreenshot(screenshot) {
+  addScreenshot(screenshot: Screenshot) {
     this._cache.set(screenshot.hash, Promise.resolve(screenshot));
   }
 
   async _downloadQueued() {
+    if (!this._queuedDownloadForTooltip) return;
+
     const { point, paintHash, promise, resolve, reject } = this._queuedDownloadForTooltip;
 
     this._queuedDownloadForTooltip = undefined;
-    this._runningDownloadForToolTip = true;
+    this._runningDownloadForTooltip = true;
 
     this._cache.set(paintHash, promise);
 
@@ -84,12 +100,12 @@ export class ScreenshotCache {
       reject(e);
     }
 
-    this._runningDownloadForToolTip = false;
+    this._runningDownloadForTooltip = false;
 
     this._startQueuedDownloadIfPossible();
   }
 
-  async _download(point) {
+  async _download(point: string): Promise<Screenshot> {
     const screen = (
       await sendMessage(
         "Graphics.getPaintContents",
