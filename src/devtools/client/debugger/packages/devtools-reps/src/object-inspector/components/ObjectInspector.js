@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 const { Component, createFactory, createElement } = require("react");
 const { connect } = require("react-redux");
@@ -282,7 +282,7 @@ function mapStateToProps(state, props) {
 
 const OI = connect(mapStateToProps, actions)(ObjectInspector);
 
-export default (props) => {
+export default props => {
   const { roots } = props;
 
   if (roots.length == 0) {

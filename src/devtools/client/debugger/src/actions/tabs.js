@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Redux actions for the editor tabs
@@ -13,7 +13,6 @@ import { removeDocument } from "../utils/editor";
 import { selectSource } from "./sources";
 
 import { getSourceByURL, getSourceTabs, getNewSelectedSourceId } from "../selectors";
-
 
 export function updateTab(source, framework) {
   const { url, id: sourceId } = source;
@@ -65,7 +64,7 @@ export function closeTab(cx, source) {
     removeDocument(source.id);
 
     const tabs = getSourceTabs(getState());
-    dispatch(({ type: "CLOSE_TAB", source }));
+    dispatch({ type: "CLOSE_TAB", source });
 
     const sourceId = getNewSelectedSourceId(getState(), tabs);
     dispatch(selectSource(cx, sourceId));
@@ -82,7 +81,7 @@ export function closeTabs(cx, urls) {
 
     const tabs = getSourceTabs(getState());
     sources.map(source => removeDocument(source.id));
-    dispatch(({ type: "CLOSE_TABS", sources }));
+    dispatch({ type: "CLOSE_TABS", sources });
 
     const sourceId = getNewSelectedSourceId(getState(), tabs);
     dispatch(selectSource(cx, sourceId));

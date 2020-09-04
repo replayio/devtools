@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import { PureComponent } from "react";
 import classnames from "classnames";
 import { showMenu } from "devtools-contextmenu";
@@ -11,8 +11,6 @@ import { getDocument } from "../../utils/editor";
 import { breakpointItems, createBreakpointItems } from "./menus/breakpoints";
 
 // eslint-disable-next-line max-len
-
-
 
 const breakpointButton = document.createElement("button");
 breakpointButton.innerHTML =
@@ -37,7 +35,7 @@ function makeBookmark({ breakpoint }, { onClick, onContextMenu }) {
   bp.onclick = onClick;
 
   // NOTE: flow does not know about oncontextmenu
-  (bp).oncontextmenu = onContextMenu;
+  bp.oncontextmenu = onContextMenu;
 
   return bp;
 }
@@ -46,7 +44,7 @@ export default class ColumnBreakpoint extends PureComponent {
   addColumnBreakpoint;
   bookmark;
 
-  addColumnBreakpoint = (nextProps) => {
+  addColumnBreakpoint = nextProps => {
     const { columnBreakpoint, source } = nextProps || this.props;
 
     const sourceId = source.id;
@@ -71,7 +69,7 @@ export default class ColumnBreakpoint extends PureComponent {
     }
   };
 
-  onClick = (event) => {
+  onClick = event => {
     event.stopPropagation();
     event.preventDefault();
     const { cx, columnBreakpoint, breakpointActions } = this.props;
@@ -89,7 +87,7 @@ export default class ColumnBreakpoint extends PureComponent {
     }
   };
 
-  onContextMenu = (event) => {
+  onContextMenu = event => {
     event.stopPropagation();
     event.preventDefault();
     const {

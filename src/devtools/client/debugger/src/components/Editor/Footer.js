@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { PureComponent } from "react";
 import { connect } from "../../utils/connect";
 import classnames from "classnames";
@@ -22,13 +22,9 @@ import { canPrettyPrintSource } from "../../reducers/sources";
 import { PaneToggleButton } from "../shared/Button";
 import AccessibleImage from "../shared/AccessibleImage";
 
-
 import { ThreadFront } from "protocol/thread";
 
 import "./Footer.css";
-
-
-
 
 class SourceFooter extends PureComponent {
   constructor() {
@@ -154,7 +150,7 @@ class SourceFooter extends PureComponent {
         key="toggle"
         collapsed={this.props.endPanelCollapsed}
         horizontal={this.props.horizontal}
-        handleClick={(this.props.togglePaneCollapse)}
+        handleClick={this.props.togglePaneCollapse}
         position="end"
       />
     );
@@ -194,7 +190,7 @@ class SourceFooter extends PureComponent {
     );
   }
 
-  onCursorChange = (event) => {
+  onCursorChange = event => {
     const { line, ch } = event.doc.getCursor();
     this.setState({ cursorPosition: { line, column: ch } });
   };

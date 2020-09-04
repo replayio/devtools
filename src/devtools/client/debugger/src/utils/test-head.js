@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Utils for Jest
@@ -79,11 +79,8 @@ function makeFrame({ id, sourceId, thread }, opts = {}) {
   };
 }
 
-function createSourceObject(
-  filename,
-  props = {}
-) {
-  return ({
+function createSourceObject(filename, props = {}) {
+  return {
     id: filename,
     url: makeSourceURL(filename),
     isBlackBoxed: !!props.isBlackBoxed,
@@ -92,7 +89,7 @@ function createSourceObject(
     introductionType: props.introductionType || null,
     isExtension: false,
     isOriginal: filename.includes("originalSource"),
-  });
+  };
 }
 
 function createOriginalSourceObject(generated) {
@@ -101,7 +98,7 @@ function createOriginalSourceObject(generated) {
     id: `${generated.id}/originalSource`,
   };
 
-  return (rv);
+  return rv;
 }
 
 function makeSourceURL(filename) {

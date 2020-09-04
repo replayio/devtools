@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import {
   getExpression,
@@ -18,7 +18,6 @@ import {
 import { PROMISE } from "./utils/middleware/promise";
 import { wrapExpression } from "../utils/expressions";
 import { features } from "../utils/prefs";
-
 
 /**
  * Add expression for debugger to watch

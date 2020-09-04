@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Redux actions for the sources state
@@ -37,7 +37,6 @@ import {
   getThreadExecutionPoint,
 } from "../../selectors";
 
-
 export const setSelectedLocation = (cx, source, location) => ({
   type: "SET_SELECTED_LOCATION",
   cx,
@@ -45,11 +44,7 @@ export const setSelectedLocation = (cx, source, location) => ({
   location,
 });
 
-export const setPendingSelectedLocation = (
-  cx,
-  url,
-  options
-) => ({
+export const setPendingSelectedLocation = (cx, url, options) => ({
   type: "SET_PENDING_SELECTED_LOCATION",
   cx,
   url,
@@ -57,7 +52,7 @@ export const setPendingSelectedLocation = (
   column: options ? options.column : null,
 });
 
-export const clearSelectedLocation = (cx) => ({
+export const clearSelectedLocation = cx => ({
   type: "CLEAR_SELECTED_LOCATION",
   cx,
 });
@@ -101,11 +96,7 @@ export function selectSource(cx, sourceId, options = {}) {
  * @memberof actions/sources
  * @static
  */
-export function selectLocation(
-  cx,
-  location,
-  { keepContext = true } = {}
-) {
+export function selectLocation(cx, location, { keepContext = true } = {}) {
   return async ({ dispatch, getState, client }) => {
     const currentSource = getSelectedSource(getState());
 

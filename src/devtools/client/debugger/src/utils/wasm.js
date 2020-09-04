@@ -7,8 +7,7 @@
 import { BinaryReader } from "wasmparser/dist/WasmParser";
 import { WasmDisassembler, NameSectionReader } from "wasmparser/dist/WasmDis";
 
-
-var wasmStates = (Object.create(null));
+var wasmStates = Object.create(null);
 
 function maybeWasmSectionNameResolver(data) {
   try {
@@ -121,7 +120,7 @@ export function wasmOffsetToLine(sourceId, offset) {
  * @static
  */
 export function clearWasmStates() {
-  wasmStates = (Object.create(null));
+  wasmStates = Object.create(null);
 }
 
 const wasmLines = new WeakMap();

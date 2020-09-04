@@ -2,16 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { findClosestFunction } from "../ast";
 
-
-export function getASTLocation(
-  source,
-  symbols,
-  location
-) {
+export function getASTLocation(source, symbols, location) {
   if (source.isWasm || !symbols || symbols.loading) {
     return { name: undefined, offset: location, index: 0 };
   }

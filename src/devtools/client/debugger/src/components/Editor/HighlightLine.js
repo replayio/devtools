@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import { Component } from "react";
 import { toEditorLine, endOperation, startOperation } from "../../utils/editor";
 import { getDocument, hasDocument } from "../../utils/editor/source-documents";
@@ -15,9 +15,6 @@ import {
   getPauseCommand,
   getCurrentThread,
 } from "../../selectors";
-
-
-
 
 function isDebugLine(selectedFrame, selectedLocation) {
   if (!selectedFrame) {
@@ -85,11 +82,7 @@ export class HighlightLine extends Component {
     endOperation();
   }
 
-  setHighlightLine(
-    selectedLocation,
-    selectedFrame,
-    selectedSource
-  ) {
+  setHighlightLine(selectedLocation, selectedFrame, selectedSource) {
     const { sourceId, line } = selectedLocation;
     if (!this.shouldSetHighlightLine(selectedLocation, selectedSource)) {
       return;

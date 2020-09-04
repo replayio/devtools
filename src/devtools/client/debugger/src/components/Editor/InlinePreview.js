@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { PureComponent } from "react";
 import Reps from "devtools-reps";
 
@@ -15,7 +15,6 @@ const {
   },
   MODE,
 } = Reps;
-
 
 // Renders single variable preview inside a codemirror line widget
 class InlinePreview extends PureComponent {

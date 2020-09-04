@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import { connect } from "../../utils/connect";
@@ -36,11 +36,6 @@ import { features } from "../../utils/prefs";
 import { downloadFile } from "../../utils/utils";
 import { isFulfilled } from "../../utils/async-value";
 
-
-
-
-
-
 class SourceTreeItem extends Component {
   componentDidMount() {
     const { autoExpand, item } = this.props;
@@ -49,7 +44,7 @@ class SourceTreeItem extends Component {
     }
   }
 
-  onClick = (e) => {
+  onClick = e => {
     const { item, focusItem, selectItem } = this.props;
 
     focusItem(item);

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import * as t from "@babel/types";
 import { getClosestPath } from "./utils/closest";
@@ -39,11 +39,7 @@ function getSteppableExpression(sourceId, pausedPosition) {
   return closestPath.find(p => t.isAwaitExpression(p.node) || t.isYieldExpression(p.node));
 }
 
-function _getNextStep(
-  statement,
-  sourceId,
-  position
-) {
+function _getNextStep(statement, sourceId, position) {
   const nextStatement = statement.getSibling(1);
   if (nextStatement) {
     return {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React from "react";
 import { bindActionCreators, combineReducers } from "redux";
@@ -22,7 +22,6 @@ import * as selectors from "../selectors";
 import App from "../components/App";
 import { asyncStore, prefs } from "./prefs";
 import { persistTabs } from "../utils/tabs";
-
 
 let parser;
 
@@ -49,7 +48,6 @@ function renderPanel(component, store, panel) {
     root
   );
 }
-
 
 export function bootstrapStore(client, workers, panel, initialState) {
   const createStore = configureStore({

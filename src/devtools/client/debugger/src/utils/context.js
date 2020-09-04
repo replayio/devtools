@@ -1,8 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-// 
-
+//
 
 import { getThreadContext } from "../selectors";
 
@@ -29,7 +28,6 @@ import { getThreadContext } from "../selectors";
 // A ThreadContext is invalidated if the target navigates, or if the current
 // thread changes, pauses, or resumes.
 
-
 export class ContextError extends Error {}
 
 export function validateNavigateContext(state, cx) {}
@@ -50,7 +48,7 @@ export function validateContext(state, cx) {
   validateNavigateContext(state, cx);
 
   if ("thread" in cx) {
-    validateThreadContext(state, (cx));
+    validateThreadContext(state, cx);
   }
 }
 

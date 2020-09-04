@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { setBreakpointPositions } from "./breakpointPositions";
 import { setSymbols } from "../sources/symbols";
@@ -18,15 +18,7 @@ import { comparePosition, createLocation } from "../../utils/location";
 import { getSource } from "../../selectors";
 import { addBreakpoint } from ".";
 
-
-
-async function findNewLocation(
-  cx,
-  { name, offset, index },
-  location,
-  source,
-  thunkArgs
-) {
+async function findNewLocation(cx, { name, offset, index }, location, source, thunkArgs) {
   const symbols = await thunkArgs.dispatch(setSymbols({ cx, source }));
   const func = symbols ? findFunctionByName(symbols, name, index) : null;
 
@@ -44,12 +36,8 @@ async function findNewLocation(
   };
 }
 
-export function syncBreakpoint(
-  cx,
-  sourceId,
-  pendingBreakpoint
-) {
-  return async (thunkArgs) => {
+export function syncBreakpoint(cx, sourceId, pendingBreakpoint) {
+  return async thunkArgs => {
     const { getState, client, dispatch } = thunkArgs;
     assertPendingBreakpoint(pendingBreakpoint);
 

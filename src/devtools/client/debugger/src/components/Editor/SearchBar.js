@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import PropTypes from "prop-types";
 import React, { Component } from "react";
@@ -25,12 +25,10 @@ import { removeOverlay } from "../../utils/editor";
 import { scrollList } from "../../utils/result-list";
 import classnames from "classnames";
 
-
 import SearchInput from "../shared/SearchInput";
 import { debounce } from "lodash";
 import "./SearchBar.css";
 import { PluralForm } from "devtools-modules";
-
 
 function getShortcuts() {
   const searchAgainKey = L10N.getStr("sourceSearch.search.again.key3");
@@ -43,8 +41,6 @@ function getShortcuts() {
     searchShortcut: searchKey,
   };
 }
-
-
 
 class SearchBar extends Component {
   constructor(props) {
@@ -89,7 +85,7 @@ class SearchBar extends Component {
     }
   }
 
-  onEscape = (e) => {
+  onEscape = e => {
     this.closeSearch(e);
   };
 
@@ -101,7 +97,7 @@ class SearchBar extends Component {
     }
   };
 
-  closeSearch = (e) => {
+  closeSearch = e => {
     const { cx, closeFileSearch, editor, searchOn, query } = this.props;
     this.clearSearch();
     if (editor && searchOn) {
@@ -112,7 +108,7 @@ class SearchBar extends Component {
     this.setState({ query, inputFocused: false });
   };
 
-  toggleSearch = (e) => {
+  toggleSearch = e => {
     e.stopPropagation();
     e.preventDefault();
     const { editor, searchOn, setActiveSearch } = this.props;
@@ -136,7 +132,7 @@ class SearchBar extends Component {
     }
   };
 
-  doSearch = (query) => {
+  doSearch = query => {
     const { cx, selectedSource, selectedContentLoaded } = this.props;
     if (!selectedSource || !selectedContentLoaded) {
       return;
@@ -158,21 +154,21 @@ class SearchBar extends Component {
 
   // Handlers
 
-  onChange = (e) => {
+  onChange = e => {
     this.setState({ query: e.target.value });
 
     return this.doSearch(e.target.value);
   };
 
-  onFocus = (e) => {
+  onFocus = e => {
     this.setState({ inputFocused: true });
   };
 
-  onBlur = (e) => {
+  onBlur = e => {
     this.setState({ inputFocused: false });
   };
 
-  onKeyDown = (e) => {
+  onKeyDown = e => {
     if (e.key !== "Enter" && e.key !== "F3") {
       return;
     }
@@ -182,7 +178,7 @@ class SearchBar extends Component {
     return this.doSearch(e.target.value);
   };
 
-  onHistoryScroll = (query) => {
+  onHistoryScroll = query => {
     this.setState({ query });
     this.doSearch(query);
   };
@@ -228,7 +224,7 @@ class SearchBar extends Component {
             toggleFileSearchModifier(cx, modVal);
             doSearch(query);
           }}
-          onKeyDown={(e) => {
+          onKeyDown={e => {
             if (e.key === "Enter") {
               toggleFileSearchModifier(cx, modVal);
               doSearch(query);

@@ -2,12 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
-
-
-
-
-
+//
 
 /**
  * Breakpoint ID
@@ -30,10 +25,6 @@
  * @static
  */
 
-
-
-
-
 /**
  * Source File Location
  *
@@ -41,18 +32,10 @@
  * @static
  */
 
-
-
-
-
-
-
-
 // Type of location used when setting breakpoints in the server. Exactly one of
 // { sourceUrl, sourceId } must be specified. Soon this will replace
 // SourceLocation and PendingLocation, and SourceActorLocation will be removed
 // (bug 1524374).
-
 
 /**
  * Breakpoint is associated with a Source.
@@ -64,7 +47,6 @@
 /**
  * Options for a breakpoint that can be modified by the user.
  */
-
 
 /**
  * XHR Breakpoint
@@ -93,16 +75,11 @@
  * @static
  */
 
-
-
-
 /**
  * Frame
  * @memberof types
  * @static
  */
-
-
 
 /**
  * ContextMenuItem
@@ -133,7 +110,6 @@
  * @static
  */
 
-
 /**
  * Pause
  * @memberof types
@@ -158,15 +134,12 @@
  * @static
  */
 
-
-
 /**
  * Source
  *
  * @memberof types
  * @static
  */
-
 
 /**
  * Script
@@ -190,14 +163,3 @@
  * @memberof types
  * @static
  */
-
-
-
-
-
-
-
-
-
-
-

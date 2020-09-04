@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 // eslint-disable-next-line max-len
 import { getFilename } from "../../source";
@@ -65,15 +65,11 @@ function mapDisplayNames(frame, library) {
 }
 
 function getFrameDisplayName(frame) {
-  const { displayName, originalDisplayName, userDisplayName, name } = (frame);
+  const { displayName, originalDisplayName, userDisplayName, name } = frame;
   return originalDisplayName || userDisplayName || displayName || name;
 }
 
-export function formatDisplayName(
-  frame,
-  { shouldMapDisplayName = true } = {},
-  l10n
-) {
+export function formatDisplayName(frame, { shouldMapDisplayName = true } = {}, l10n) {
   const { library } = frame;
   let displayName = getFrameDisplayName(frame);
   if (library && shouldMapDisplayName) {

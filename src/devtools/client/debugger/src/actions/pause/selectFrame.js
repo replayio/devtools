@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { selectLocation } from "../sources";
 import { evaluateExpressions } from "../expressions";
@@ -10,7 +10,6 @@ import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
 import assert from "../../utils/assert";
 import { getCanRewind } from "../../reducers/threads";
-
 
 /**
  * @memberof actions/pause

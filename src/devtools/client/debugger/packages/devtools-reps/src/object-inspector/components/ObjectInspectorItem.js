@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 const { Component } = require("react");
 const dom = require("react-dom-factories");
@@ -39,7 +39,6 @@ const {
   nodeHasGetter,
   getNonPrototypeParentGripValue,
 } = Utils.node;
-
 
 class ObjectInspectorItem extends Component {
   static get defaultProps() {

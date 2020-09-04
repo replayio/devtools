@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { PROMISE } from "../utils/middleware/promise";
 import {
@@ -20,20 +20,15 @@ import { addBreakpoint } from "../breakpoints";
 import { isFulfilled, fulfilled } from "../../utils/async-value";
 
 import { isPretty } from "../../utils/source";
-import { memoizeableAction, } from "../../utils/memoizableAction";
+import { memoizeableAction } from "../../utils/memoizableAction";
 
 import { Telemetry } from "devtools-modules";
-
 
 // Measures the time it takes for a source to load
 const loadSourceHistogram = "DEVTOOLS_DEBUGGER_LOAD_SOURCE_MS";
 const telemetry = new Telemetry();
 
-async function loadSource(
-  state,
-  source,
-  { sourceMaps, client, getState }
-) {
+async function loadSource(state, source, { sourceMaps, client, getState }) {
   // We only need the source text from one actor, but messages sent to retrieve
   // the source might fail if the actor has or is about to shut down. Keep
   // trying with different actors until one request succeeds.
@@ -58,8 +53,8 @@ async function loadSource(
   }
 
   return {
-    text: (response).source,
-    contentType: (response).contentType || "text/javascript",
+    text: response.source,
+    contentType: response.contentType || "text/javascript",
   };
 }
 

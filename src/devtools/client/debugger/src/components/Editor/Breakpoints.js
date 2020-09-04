@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { Component } from "react";
 import Breakpoint from "./Breakpoint";
 
@@ -11,8 +11,6 @@ import { makeBreakpointId } from "../../utils/breakpoint";
 import { connect } from "../../utils/connect";
 import { breakpointItemActions } from "./menus/breakpoints";
 import { editorItemActions } from "./menus/editor";
-
-
 
 class Breakpoints extends Component {
   render() {

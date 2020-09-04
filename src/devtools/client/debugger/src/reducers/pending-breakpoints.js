@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Pending breakpoints reducer
@@ -10,8 +10,6 @@
  */
 
 import { createPendingBreakpoint, makePendingLocationId } from "../utils/breakpoint";
-
-
 
 function update(state = {}, action) {
   switch (action.type) {
@@ -54,19 +52,15 @@ function removeBreakpoint(state, { location }) {
 // Selectors
 // TODO: these functions should be moved out of the reducer
 
-
 export function getPendingBreakpoints(state) {
   return state.pendingBreakpoints;
 }
 
 export function getPendingBreakpointList(state) {
-  return (Object.values(getPendingBreakpoints(state)));
+  return Object.values(getPendingBreakpoints(state));
 }
 
-export function getPendingBreakpointsForSource(
-  state,
-  source
-) {
+export function getPendingBreakpointsForSource(state, source) {
   return getPendingBreakpointList(state).filter(pendingBreakpoint => {
     return pendingBreakpoint.location.sourceUrl === source.url;
   });

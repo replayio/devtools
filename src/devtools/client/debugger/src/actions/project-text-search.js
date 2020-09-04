@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Redux actions for the search state
@@ -20,7 +20,6 @@ import {
   getTextSearchStatus,
 } from "../reducers/project-text-search";
 
-
 export function addSearchQuery(cx, query) {
   return { type: "ADD_QUERY", cx, query };
 }
@@ -29,12 +28,7 @@ export function addOngoingSearch(cx, ongoingSearch) {
   return { type: "ADD_ONGOING_SEARCH", cx, ongoingSearch };
 }
 
-export function addSearchResult(
-  cx,
-  sourceId,
-  filepath,
-  matches
-) {
+export function addSearchResult(cx, sourceId, filepath, matches) {
   return {
     type: "ADD_SEARCH_RESULT",
     cx,

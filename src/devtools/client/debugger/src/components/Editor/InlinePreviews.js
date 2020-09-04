@@ -2,13 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { Component } from "react";
 import InlinePreviewRow from "./InlinePreviewRow";
 import { connect } from "../../utils/connect";
 import { getSelectedFrame, getCurrentThread, getInlinePreviews } from "../../selectors";
-
-
 
 function hasPreviews(previews) {
   return !!previews && Object.keys(previews).length > 0;
@@ -34,7 +32,7 @@ class InlinePreviews extends Component {
 
     let inlinePreviewRows;
     editor.codeMirror.operation(() => {
-      inlinePreviewRows = Object.keys(previewsObj).map((line) => {
+      inlinePreviewRows = Object.keys(previewsObj).map(line => {
         const lineNum = parseInt(line, 10);
 
         return (
@@ -52,9 +50,7 @@ class InlinePreviews extends Component {
   }
 }
 
-const mapStateToProps = (
-  state
-) => {
+const mapStateToProps = state => {
   const thread = getCurrentThread(state);
   const selectedFrame = getSelectedFrame(state, thread);
 

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { PureComponent } from "react";
 import { showMenu } from "devtools-contextmenu";
 import { connect } from "../../utils/connect";
@@ -22,13 +22,9 @@ import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 
 const { objectInspector } = require("devtools-reps");
 
-
 import "./Scopes.css";
 
 const ObjectInspector = objectInspector.ObjectInspector.default;
-
-
-
 
 class Scopes extends PureComponent {
   constructor(props) {
@@ -105,7 +101,7 @@ class Scopes extends PureComponent {
     showMenu(event, menuItems);
   };
 
-  renderWatchpointButton = (item) => {
+  renderWatchpointButton = item => {
     return null;
 
     const { removeWatchpoint } = this.props;

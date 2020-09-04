@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { differenceBy } from "lodash";
 import { removeSourceActors } from "./source-actors";
@@ -25,16 +25,14 @@ export function updateThreads() {
         removedThreads.map(t => t.actor)
       );
       dispatch(removeSourceActors(sourceActors));
-      dispatch(
-        ({
-          type: "REMOVE_THREADS",
-          cx,
-          threads: removedThreads.map(t => t.actor),
-        })
-      );
+      dispatch({
+        type: "REMOVE_THREADS",
+        cx,
+        threads: removedThreads.map(t => t.actor),
+      });
     }
     if (addedThreads.length > 0) {
-      dispatch(({ type: "INSERT_THREADS", cx, threads: addedThreads }));
+      dispatch({ type: "INSERT_THREADS", cx, threads: addedThreads });
 
       // Fetch the sources and install breakpoints on any new workers.
       // NOTE: This runs in the background and fails quietly because it is
@@ -56,14 +54,12 @@ export function updateThreads() {
             fetchedThread.actor == thread.actor &&
             fetchedThread.serviceWorkerStatus != thread.serviceWorkerStatus
           ) {
-            dispatch(
-              ({
-                type: "UPDATE_SERVICE_WORKER_STATUS",
-                cx,
-                thread: thread.actor,
-                status: fetchedThread.serviceWorkerStatus,
-              })
-            );
+            dispatch({
+              type: "UPDATE_SERVICE_WORKER_STATUS",
+              cx,
+              thread: thread.actor,
+              status: fetchedThread.serviceWorkerStatus,
+            });
           }
         }
       }

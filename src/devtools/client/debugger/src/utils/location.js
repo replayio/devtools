@@ -2,10 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import { sortBy } from "lodash";
-
-
 
 export function comparePosition(a, b) {
   return a && b && a.line == b.line && a.column == b.column;
@@ -26,10 +24,7 @@ export function createLocation({
   };
 }
 
-export function sortSelectedLocations(
-  locations,
-  selectedSource
-) {
+export function sortSelectedLocations(locations, selectedSource) {
   return sortBy(locations, [
     // Priority: line number, undefined column, column number
     location => location.line,

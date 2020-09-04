@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { getTokenLocation } from ".";
 import { isEqual } from "lodash";
@@ -69,7 +69,7 @@ export function onMouseOver(codeMirror) {
     });
   }
 
-  return (enterEvent) => {
+  return enterEvent => {
     const { target } = enterEvent;
 
     if (isInvalidTarget(target)) {

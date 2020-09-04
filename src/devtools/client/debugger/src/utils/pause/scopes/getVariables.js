@@ -4,9 +4,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import { toPairs } from "lodash";
-
 
 // VarAndBindingsPair actually is [name: string, contents: BindingContents]
 
@@ -14,10 +13,7 @@ import { toPairs } from "lodash";
 
 // Create the tree nodes representing all the variables and arguments
 // for the bindings from a scope.
-export function getBindingVariables(
-  bindings,
-  parentName
-) {
+export function getBindingVariables(bindings, parentName) {
   if (!bindings) {
     return [];
   }

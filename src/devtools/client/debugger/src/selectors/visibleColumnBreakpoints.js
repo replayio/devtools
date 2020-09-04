@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-// 
+//
 
 import { groupBy } from "lodash";
 import { createSelector } from "reselect";
@@ -17,10 +17,6 @@ import {
 import { getVisibleBreakpoints } from "./visibleBreakpoints";
 import { sortSelectedLocations } from "../utils/location";
 import { getLineText } from "../utils/source";
-
-
-
-
 
 function contains(location, range) {
   return (
@@ -93,7 +89,7 @@ function filterInLine(positions, selectedSource, selectedContent) {
 }
 
 function formatPositions(positions, selectedSource, breakpointMap) {
-  return (positions).map(location => {
+  return positions.map(location => {
     return {
       location,
       breakpoint: findBreakpoint(location, breakpointMap),
@@ -102,15 +98,10 @@ function formatPositions(positions, selectedSource, breakpointMap) {
 }
 
 function convertToList(breakpointPositions) {
-  return ([].concat(...Object.values(breakpointPositions)));
+  return [].concat(...Object.values(breakpointPositions));
 }
 
-export function getColumnBreakpoints(
-  positions,
-  breakpoints,
-  viewport,
-  selectedSource
-) {
+export function getColumnBreakpoints(positions, breakpoints, viewport, selectedSource) {
   if (!positions || !selectedSource) {
     return [];
   }
@@ -154,10 +145,7 @@ export const visibleColumnBreakpoints = createSelector(
   getColumnBreakpoints
 );
 
-export function getFirstBreakpointPosition(
-  state,
-  { line, sourceId }
-) {
+export function getFirstBreakpointPosition(state, { line, sourceId }) {
   const positions = getBreakpointPositionsForSource(state, sourceId);
   const source = getSource(state, sourceId);
 

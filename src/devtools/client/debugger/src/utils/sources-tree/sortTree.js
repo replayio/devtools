@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { nodeHasChildren, isExactUrlMatch } from "./utils";
-
 
 /**
  * Look at the nodes in the source tree, and determine the index of where to
@@ -14,7 +13,7 @@ import { nodeHasChildren, isExactUrlMatch } from "./utils";
  * @static
  */
 export function sortTree(tree, debuggeeUrl = "") {
-  return (tree.contents).sort((previousNode, currentNode) => {
+  return tree.contents.sort((previousNode, currentNode) => {
     const currentNodeIsDir = nodeHasChildren(currentNode);
     const previousNodeIsDir = nodeHasChildren(previousNode);
     if (currentNode.name === "(index)") {

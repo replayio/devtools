@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import { isEqual } from "lodash";
@@ -21,8 +21,6 @@ import actions from "../../actions";
 
 import classnames from "classnames";
 import "./FrameTimeline.css";
-
-
 
 function isSameLocation(frameLocation, selectedLocation) {
   if (!frameLocation || !selectedLocation) {
@@ -104,12 +102,12 @@ class FrameTimeline extends Component {
     }
   }
 
-  onMouseDown = (event) => {
+  onMouseDown = event => {
     const progress = this.getProgress(event.clientX);
     this.setState({ scrubbing: true, scrubbingProgress: progress });
   };
 
-  onMouseUp = (event) => {
+  onMouseUp = event => {
     const { seekToPosition, selectedLocation } = this.props;
 
     const progress = this.getProgress(event.clientX);
@@ -121,7 +119,7 @@ class FrameTimeline extends Component {
     }
   };
 
-  onMouseMove = (event) => {
+  onMouseMove = event => {
     const progress = this.getProgress(event.clientX);
 
     this.displayPreview(progress);

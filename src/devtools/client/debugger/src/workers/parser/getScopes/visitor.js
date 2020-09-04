@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import isEmpty from "lodash/isEmpty";
 import * as t from "@babel/types";
@@ -31,17 +31,8 @@ import { getAst } from "../utils/ast";
  * Variables that reference undeclared global values.
  */
 
-
-
-
 // Location information about the expression immediartely surrounding a
 // given binding reference.
-
-
-
-
-
-
 
 function isGeneratedId(id) {
   return !/\/originalSource/.test(id);
@@ -88,7 +79,7 @@ export function buildScopeList(ast, sourceId) {
   // code is an ES6 module rather than a script.
   if (
     isGeneratedId(sourceId) ||
-    ((ast).program.sourceType === "script" && !looksLikeCommonJS(global))
+    (ast.program.sourceType === "script" && !looksLikeCommonJS(global))
   ) {
     stripModuleScope(global);
   }
@@ -113,29 +104,21 @@ function toParsedScopes(children, sourceId) {
   }));
 }
 
-function createTempScope(
-  type,
-  displayName,
-  parent,
-  loc) {
+function createTempScope(type, displayName, parent, loc) {
   const result = {
     type,
     displayName,
     parent,
     children: [],
     loc,
-    bindings: (Object.create(null)),
+    bindings: Object.create(null),
   };
   if (parent) {
     parent.children.push(result);
   }
   return result;
 }
-function pushTempScope(
-  state,
-  type,
-  displayName,
-  loc) {
+function pushTempScope(state, type, displayName, loc) {
   const scope = createTempScope(type, displayName, state.scope, loc);
 
   state.scope = scope;
@@ -168,14 +151,7 @@ function fromBabelLocation(location, sourceId) {
   };
 }
 
-function parseDeclarator(
-  declaratorId,
-  targetScope,
-  type,
-  locationType,
-  declaration,
-  state
-) {
+function parseDeclarator(declaratorId, targetScope, type, locationType, declaration, state) {
   if (isNode(declaratorId, "Identifier")) {
     let existing = targetScope.bindings[declaratorId.name];
     if (!existing) {
@@ -239,10 +215,7 @@ function isLexicalVariable(node) {
   return isNode(node, "VariableDeclaration") && isLetOrConst(node);
 }
 
-function createGlobalScope(
-  ast,
-  sourceId
-) {
+function createGlobalScope(ast, sourceId) {
   const global = createTempScope("object", "Global", null, {
     start: fromBabelLocation(ast.loc.start, sourceId),
     end: fromBabelLocation(ast.loc.end, sourceId),
@@ -690,12 +663,7 @@ function isOpeningJSXIdentifier(node, ancestors) {
   return false;
 }
 
-function buildMetaBindings(
-  sourceId,
-  node,
-  ancestors,
-  parentIndex = ancestors.length - 1
-) {
+function buildMetaBindings(sourceId, node, ancestors, parentIndex = ancestors.length - 1) {
   if (parentIndex <= 1) {
     return null;
   }

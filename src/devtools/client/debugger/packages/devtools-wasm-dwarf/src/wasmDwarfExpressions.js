@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 /* eslint camelcase: 0*/
 /* eslint-disable no-inline-comments */
-
 
 class Value {
   val;
@@ -253,7 +252,6 @@ function decodeExpr(expr) {
   const typeFormatter = Int32Formatter;
   return toJS(code, typeFormatter) || `dwarf("${expr}")`;
 }
-
 
 module.exports = {
   decodeExpr,

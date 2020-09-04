@@ -2,16 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import { isFulfilled } from "./async-value";
 import { findClosestFunction } from "./ast";
 import { correctIndentation } from "./indentation";
 
-export function findFunctionText(
-  line,
-  source,
-  symbols
-) {
+export function findFunctionText(line, source, symbols) {
   const func = findClosestFunction(symbols, {
     sourceId: source.id,
     line,

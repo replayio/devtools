@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { PureComponent } from "react";
 import { connect } from "../../../utils/connect";
@@ -21,8 +21,6 @@ import {
 } from "../../../utils/breakpoint";
 import { features } from "../../../utils/prefs";
 
-
-
 import {
   getBreakpointsList,
   getSelectedFrame,
@@ -31,9 +29,8 @@ import {
   getContext,
 } from "../../../selectors";
 
-
 class Breakpoint extends PureComponent {
-  onContextMenu = (e) => {
+  onContextMenu = e => {
     showContextMenu({ ...this.props, contextMenuEvent: e });
   };
 
@@ -51,13 +48,13 @@ class Breakpoint extends PureComponent {
     }
   };
 
-  selectBreakpoint = (event) => {
+  selectBreakpoint = event => {
     event.preventDefault();
     const { cx, selectSpecificLocation } = this.props;
     selectSpecificLocation(cx, this.selectedLocation);
   };
 
-  removeBreakpoint = (event) => {
+  removeBreakpoint = event => {
     const { cx, removeBreakpoint, breakpoint } = this.props;
     event.stopPropagation();
     removeBreakpoint(cx, breakpoint);

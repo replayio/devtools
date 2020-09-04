@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import { memoize } from "lodash";
 import { URL } from "whatwg-url";
 
@@ -26,7 +26,7 @@ const defaultUrl = {
 export const parse = memoize(function parse(url) {
   try {
     const urlObj = new URL(url);
-    (urlObj).path = urlObj.pathname + urlObj.search;
+    urlObj.path = urlObj.pathname + urlObj.search;
     return urlObj;
   } catch (err) {
     // If we're given simply a filename...

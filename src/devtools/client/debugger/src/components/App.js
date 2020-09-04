@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
@@ -21,7 +21,6 @@ import {
   getOrientation,
   getCanRewind,
 } from "../selectors";
-
 
 import { KeyShortcuts } from "devtools-modules";
 import Services from "devtools-services";
@@ -44,7 +43,6 @@ import "devtools/client/themes/common.css";
 // $FlowIgnore
 //import "devtools-launchpad/src/components/Root.css";
 
-
 import "./shared/menu.css";
 
 import SplitBox from "devtools-splitter";
@@ -57,8 +55,6 @@ import EditorTabs from "./Editor/Tabs";
 import EditorFooter from "./Editor/Footer";
 import QuickOpenModal from "./QuickOpenModal";
 import WhyPaused from "./SecondaryPanes/WhyPaused";
-
-
 
 class Debugger extends Component {
   onLayoutChange;

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 export function strictEqual(value, other) {
   return value === other;
@@ -16,10 +16,7 @@ export function shallowEqual(value, other) {
   );
 }
 
-export function arrayShallowEqual(
-  value,
-  other
-) {
+export function arrayShallowEqual(value, other) {
   return value.length === other.length && value.every((k, i) => k === other[i]);
 }
 

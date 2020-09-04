@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import generate from "@babel/generator";
 import * as t from "@babel/types";
@@ -102,9 +102,7 @@ function addTopDeclarationNodes(ast, declarationNodes) {
  *   - declarations: {Array<Node>} An array of all the declaration nodes needed
  *                   outside of the async iife.
  */
-function translateDeclarationsIntoAssignment(
-  ast
-) {
+function translateDeclarationsIntoAssignment(ast) {
   const declarations = [];
   t.traverse(ast, (node, ancestors) => {
     const parent = ancestors[ancestors.length - 1];

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Redux actions for the sources state
@@ -11,7 +11,7 @@
 
 import { flatten } from "lodash";
 
-import { stringToSourceActorId, } from "../../reducers/source-actors";
+import { stringToSourceActorId } from "../../reducers/source-actors";
 import { supportsWasm } from "../../reducers/threads";
 import { insertSourceActors } from "../../actions/source-actors";
 import { makeSourceId } from "../../client/firefox/create";
@@ -36,7 +36,6 @@ import {
 import { prefs } from "../../utils/prefs";
 import sourceQueue from "../../utils/source-queue";
 import { validateNavigateContext, ContextError } from "../../utils/context";
-
 
 import { ThreadFront } from "protocol/thread";
 
@@ -249,7 +248,7 @@ export function newGeneratedSources(sourceInfo) {
       resultIds.push(newId);
     }
 
-    const newSources = (Object.values(newSourcesObj));
+    const newSources = Object.values(newSourcesObj);
 
     const cx = getContext(getState());
     dispatch(addSources(cx, newSources));

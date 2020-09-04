@@ -2,15 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 const { getValue, nodeHasFullText } = require("../utils/node");
 
-async function enumIndexedProperties(
-  objectFront,
-  start,
-  end
-) {
+async function enumIndexedProperties(objectFront, start, end) {
   try {
     const iterator = await objectFront.enumProperties({
       ignoreNonIndexedProperties: true,
@@ -23,11 +19,7 @@ async function enumIndexedProperties(
   }
 }
 
-async function enumNonIndexedProperties(
-  objectFront,
-  start,
-  end
-) {
+async function enumNonIndexedProperties(objectFront, start, end) {
   try {
     const iterator = await objectFront.enumProperties({
       ignoreIndexedProperties: true,
@@ -40,11 +32,7 @@ async function enumNonIndexedProperties(
   }
 }
 
-async function enumEntries(
-  objectFront,
-  start,
-  end
-) {
+async function enumEntries(objectFront, start, end) {
   try {
     const iterator = await objectFront.enumEntries();
     const response = await iteratorSlice(iterator, start, end);
@@ -55,11 +43,7 @@ async function enumEntries(
   }
 }
 
-async function enumSymbols(
-  objectFront,
-  start,
-  end
-) {
+async function enumSymbols(objectFront, start, end) {
   try {
     const iterator = await objectFront.enumSymbols();
     const response = await iteratorSlice(iterator, start, end);
@@ -78,10 +62,7 @@ async function getPrototype(objectFront) {
   return objectFront.getPrototype();
 }
 
-async function getFullText(
-  longStringFront,
-  item
-) {
+async function getFullText(longStringFront, item) {
   const { initial, fullText, length } = getValue(item);
   // Return fullText property if it exists so that it can be added to the
   // loadedProperties map.
@@ -100,17 +81,11 @@ async function getFullText(
   }
 }
 
-async function getProxySlots(
-  objectFront
-) {
+async function getProxySlots(objectFront) {
   return objectFront.getProxySlots();
 }
 
-function iteratorSlice(
-  iterator,
-  start,
-  end
-) {
+function iteratorSlice(iterator, start, end) {
   start = start || 0;
   const count = end ? end - start + 1 : iterator.count;
 

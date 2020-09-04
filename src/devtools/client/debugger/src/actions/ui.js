@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import {
   getActiveSearch,
@@ -19,7 +19,6 @@ import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { searchContents } from "./file-search";
 import { copyToTheClipboard } from "../utils/clipboard";
 import { isFulfilled } from "../utils/async-value";
-
 
 export function setPrimaryPaneTab(tabName) {
   return { type: "SET_PRIMARY_PANE_TAB", tabName };

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import classnames from "classnames";
@@ -20,9 +20,7 @@ import { makeBreakpointId, sortSelectedBreakpoints } from "../../../utils/breakp
 
 import { getSelectedSource, getBreakpointSources } from "../../../selectors";
 
-
 import "./Breakpoints.css";
-
 
 class Breakpoints extends Component {
   headlessEditor;
@@ -43,7 +41,7 @@ class Breakpoints extends Component {
       return;
     }
     this.headlessEditor.destroy();
-    this.headlessEditor = (null);
+    this.headlessEditor = null;
   }
 
   renderExceptionsOptions() {

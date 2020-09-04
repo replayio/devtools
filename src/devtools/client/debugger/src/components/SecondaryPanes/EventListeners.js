@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import classnames from "classnames";
@@ -13,10 +13,7 @@ import { selectors } from "ui/reducers";
 
 import AccessibleImage from "../shared/AccessibleImage";
 
-
 import "./EventListeners.css";
-
-
 
 class EventListeners extends Component {
   state = {
@@ -85,21 +82,21 @@ class EventListeners extends Component {
     }
   }
 
-  onInputChange = (event) => {
+  onInputChange = event => {
     this.setState({ searchText: event.currentTarget.value });
   };
 
-  onKeyDown = (event) => {
+  onKeyDown = event => {
     if (event.key === "Escape") {
       this.setState({ searchText: "" });
     }
   };
 
-  onFocus = (event) => {
+  onFocus = event => {
     this.setState({ focused: true });
   };
 
-  onBlur = (event) => {
+  onBlur = event => {
     this.setState({ focused: false });
   };
 

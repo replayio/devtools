@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 
@@ -27,8 +27,6 @@ const arrowBtn = (onClick, type, className, tooltip) => {
     </button>
   );
 };
-
-
 
 class SearchInput extends Component {
   displayName;
@@ -98,7 +96,7 @@ class SearchInput extends Component {
     ];
   }
 
-  onFocus = (e) => {
+  onFocus = e => {
     const { onFocus } = this.props;
 
     if (onFocus) {
@@ -106,7 +104,7 @@ class SearchInput extends Component {
     }
   };
 
-  onBlur = (e) => {
+  onBlur = e => {
     const { onBlur } = this.props;
 
     if (onBlur) {
@@ -114,7 +112,7 @@ class SearchInput extends Component {
     }
   };
 
-  onKeyDown = (e) => {
+  onKeyDown = e => {
     const { onHistoryScroll, onKeyDown } = this.props;
     if (!onHistoryScroll) {
       return onKeyDown(e);

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import {
   createInitial,
@@ -15,22 +15,21 @@ import {
   getMappedResource,
 } from "..";
 
-
-const makeResource = (id) => ({
+const makeResource = id => ({
   id,
   name: `name-${id}`,
   data: 42,
   obj: {},
 });
 
-const mapName = (resource) => resource.name;
+const mapName = resource => resource.name;
 const mapWithIdent = (resource, identity) => ({
   resource,
   identity,
   obj: {},
 });
 
-const clone =(v) => (JSON.parse((JSON.stringify(v))));
+const clone = v => JSON.parse(JSON.stringify(v));
 
 describe("resource CRUD operations", () => {
   let r1, r2, r3;

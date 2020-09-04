@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import {
   clearSearch,
@@ -59,12 +59,7 @@ export function toggleFileSearchModifier(cx, modifier) {
   return { type: "TOGGLE_FILE_SEARCH_MODIFIER", cx, modifier };
 }
 
-export function updateSearchResults(
-  cx,
-  characterIndex,
-  line,
-  matches
-) {
+export function updateSearchResults(cx, characterIndex, line, matches) {
   const matchIndex = matches.findIndex(elm => elm.line === line && elm.ch === characterIndex);
 
   return {
@@ -79,12 +74,7 @@ export function updateSearchResults(
   };
 }
 
-export function searchContents(
-  cx,
-  query,
-  editor,
-  focusFirstResult = true
-) {
+export function searchContents(cx, query, editor, focusFirstResult = true) {
   return async ({ getState, dispatch }) => {
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());
@@ -127,12 +117,7 @@ export function searchContents(
   };
 }
 
-export function searchContentsForHighlight(
-  query,
-  editor,
-  line,
-  ch
-) {
+export function searchContentsForHighlight(query, editor, line, ch) {
   return async ({ getState, dispatch }) => {
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());

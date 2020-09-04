@@ -2,14 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Source tree reducer
  * @module reducers/source-tree
  */
-
-
 
 export function InitialState() {
   return {
@@ -18,10 +16,7 @@ export function InitialState() {
   };
 }
 
-export default function update(
-  state = InitialState(),
-  action
-) {
+export default function update(state = InitialState(), action) {
   switch (action.type) {
     case "SET_EXPANDED_STATE":
       return updateExpanded(state, action);
@@ -39,7 +34,6 @@ function updateExpanded(state, action) {
     expanded: new Set(action.expanded),
   };
 }
-
 
 export function getExpandedState(state) {
   return state.sourceTree.expanded;

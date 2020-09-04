@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { isTesting } from "devtools-environment";
 import { prefs } from "../../../utils/prefs";
@@ -94,7 +94,7 @@ function serializeAction(action) {
  * to the console.
  */
 export function log({ dispatch, getState }) {
-  return (next) => (action) => {
+  return next => action => {
     const asyncMsg = !action.status ? "" : `[${action.status}]`;
 
     if (prefs.logActions) {

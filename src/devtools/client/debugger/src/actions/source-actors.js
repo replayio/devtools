@@ -2,16 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import {
   getSourceActor,
   getSourceActorBreakableLines,
   getSourceActorBreakpointColumns,
 } from "../reducers/source-actors";
-import { memoizeableAction, } from "../utils/memoizableAction";
+import { memoizeableAction } from "../utils/memoizableAction";
 import { PROMISE } from "./utils/middleware/promise";
-
 
 export function insertSourceActor(item) {
   return insertSourceActors([item]);
@@ -34,28 +33,31 @@ export function removeSourceActors(items) {
   };
 }
 
-export const loadSourceActorBreakpointColumns = memoizeableAction("loadSourceActorBreakpointColumns", {
-  createKey: ({ id, line }) => `${id}:${line}`,
-  getValue: ({ id, line }, { getState }) => getSourceActorBreakpointColumns(getState(), id, line),
-  action: async ({ id, line }, { dispatch, getState, client }) => {
-    await dispatch({
-      type: "SET_SOURCE_ACTOR_BREAKPOINT_COLUMNS",
-      sourceId: id,
-      line,
-      [PROMISE]: (async () => {
-        const positions = await client.getSourceActorBreakpointPositions(
-          getSourceActor(getState(), id),
-          {
-            start: { line, column: 0 },
-            end: { line: line + 1, column: 0 },
-          }
-        );
+export const loadSourceActorBreakpointColumns = memoizeableAction(
+  "loadSourceActorBreakpointColumns",
+  {
+    createKey: ({ id, line }) => `${id}:${line}`,
+    getValue: ({ id, line }, { getState }) => getSourceActorBreakpointColumns(getState(), id, line),
+    action: async ({ id, line }, { dispatch, getState, client }) => {
+      await dispatch({
+        type: "SET_SOURCE_ACTOR_BREAKPOINT_COLUMNS",
+        sourceId: id,
+        line,
+        [PROMISE]: (async () => {
+          const positions = await client.getSourceActorBreakpointPositions(
+            getSourceActor(getState(), id),
+            {
+              start: { line, column: 0 },
+              end: { line: line + 1, column: 0 },
+            }
+          );
 
-        return positions[line] || [];
-      })(),
-    });
-  },
-});
+          return positions[line] || [];
+        })(),
+      });
+    },
+  }
+);
 
 export const loadSourceActorBreakableLines = memoizeableAction("loadSourceActorBreakableLines", {
   createKey: args => args.id,

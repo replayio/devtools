@@ -2,13 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { flatMap, zip, range } from "lodash";
 
 import { getFrameUrl } from "./getFrameUrl";
 import { getLibraryFromUrl } from "./getLibraryFromUrl";
-
 
 export function annotateFrames(frames) {
   const annotatedFrames = frames.map(f => annotateFrame(f, frames));

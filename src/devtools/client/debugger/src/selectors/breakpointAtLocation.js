@@ -2,11 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { getSelectedSource, getBreakpointPositionsForLine } from "../reducers/sources";
 import { getBreakpointsList } from "../reducers/breakpoints";
-
 
 function getColumn(column, selectedSource) {
   return column;
@@ -24,7 +23,6 @@ function getBreakpointsForSource(state, selectedSource) {
     return location.sourceId === selectedSource.id;
   });
 }
-
 
 function findBreakpointAtLocation(breakpoints, selectedSource, { line, column }) {
   return breakpoints.find(breakpoint => {
@@ -98,10 +96,7 @@ export function getClosestBreakpoint(state, position) {
   return breakpoint;
 }
 
-export function getClosestBreakpointPosition(
-  state,
-  position
-) {
+export function getClosestBreakpointPosition(state, position) {
   const selectedSource = getSelectedSource(state);
   if (!selectedSource) {
     throw new Error("no selectedSource");

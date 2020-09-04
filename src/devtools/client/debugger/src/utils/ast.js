@@ -2,9 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
-
-
+//
 
 export function findBestMatchExpression(symbols, tokenPos) {
   if (symbols.loading) {
@@ -80,10 +78,7 @@ function findClosestofSymbol(declarations, location) {
   }, null);
 }
 
-export function findClosestFunction(
-  symbols,
-  location
-) {
+export function findClosestFunction(symbols, location) {
   if (!symbols || symbols.loading) {
     return null;
   }
@@ -91,10 +86,7 @@ export function findClosestFunction(
   return findClosestofSymbol(symbols.functions, location);
 }
 
-export function findClosestClass(
-  symbols,
-  location
-) {
+export function findClosestClass(symbols, location) {
   if (!symbols || symbols.loading) {
     return null;
   }

@@ -2,13 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
-import { asSettled, } from "./async-value";
+import { asSettled } from "./async-value";
 import { validateContext } from "./context";
-
-
-
 
 /*
  * memoizableActon is a utility for actions that should only be performed
@@ -32,10 +29,7 @@ import { validateContext } from "./context";
  * );
  *
  */
-export function memoizeableAction(
-  name,
-  { getValue, createKey, action }
-) {
+export function memoizeableAction(name, { getValue, createKey, action }) {
   const requests = new Map();
   return args => async thunkArgs => {
     let result = asSettled(getValue(args, thunkArgs));

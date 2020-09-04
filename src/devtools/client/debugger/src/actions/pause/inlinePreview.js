@@ -2,14 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import { sortBy } from "lodash";
 import { getFrameScope, getInlinePreviews, getSource } from "../../selectors";
 import { features } from "../../utils/prefs";
 import { validateThreadContext } from "../../utils/context";
 import { loadSourceText } from "../sources/loadSourceText";
 import { ThreadFront } from "protocol/thread";
-
 
 const { log } = require("protocol/socket");
 const { createPrimitiveValueFront } = require("protocol/thread");
@@ -126,14 +125,7 @@ export function generateInlinePreview(cx, frameId, location) {
   };
 }
 
-function getBindingValues(
-  originalAstScopes,
-  pausedOnLine,
-  name,
-  value,
-  curLevel,
-  properties
-) {
+function getBindingValues(originalAstScopes, pausedOnLine, name, value, curLevel, properties) {
   const previews = [];
 
   const binding = originalAstScopes[curLevel] && originalAstScopes[curLevel].bindings[name];

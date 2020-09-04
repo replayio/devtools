@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { containsPosition, containsLocation, nodeContainsPosition } from "../utils/contains";
 
@@ -24,7 +24,7 @@ function getTestLoc() {
 // undefined causes many flow errors in code manipulating AstPosition.
 // Fake a coercion of undefined to number as a workaround for now.
 function undefinedColumn() {
-  return (undefined);
+  return undefined;
 }
 
 function startPos(lineOffset, columnOffset) {

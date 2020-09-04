@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import { endTruncateStr } from "./utils";
 import { isPretty, getFilename, getSourceClassnames, getSourceQueryString } from "./source";
-
 
 export const MODIFIERS = {
   "@": "functions",
@@ -61,8 +60,6 @@ export function formatSourcesForList(source, tabUrls) {
   };
 }
 
-
-
 export function formatSymbol(symbol) {
   return {
     id: `${symbol.name}:${symbol.location.start.line}`,
@@ -105,10 +102,7 @@ export function formatShortcutResults() {
   ];
 }
 
-export function formatSources(
-  sources,
-  tabUrls
-) {
+export function formatSources(sources, tabUrls) {
   const formattedSources = [];
 
   for (let i = 0; i < sources.length; ++i) {

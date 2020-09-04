@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { get, findIndex } from "lodash";
 
@@ -20,7 +20,6 @@ function collapseLastFrames(frames) {
   const lastGroup = frames.slice(index);
   return { newFrames, lastGroup };
 }
-
 
 export function collapseFrames(frames) {
   // We collapse groups of one so that user frames

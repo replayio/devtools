@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import {
   nodeHasChildren,
@@ -15,13 +15,7 @@ import {
 import { createTreeNodeMatcher, findNodeInContents } from "./treeOrder";
 import { getURL } from "./getURL";
 
-
-function createNodeInTree(
-  part,
-  path,
-  tree,
-  index
-) {
+function createNodeInTree(part, path, tree, index) {
   const node = createDirectoryNode(part, path, []);
 
   // we are modifying the tree
@@ -37,16 +31,7 @@ function createNodeInTree(
  * 1. if it exists return it
  * 2. if it does not exist create it
  */
-function findOrCreateNode(
-  parts,
-  subTree,
-  path,
-  part,
-  index,
-  url,
-  debuggeeHost,
-  source
-) {
+function findOrCreateNode(parts, subTree, path, part, index, url, debuggeeHost, source) {
   const addedPartIsFile = partIsFile(index, parts, url);
 
   const { found: childFound, index: childIndex } = findNodeInContents(
@@ -75,20 +60,14 @@ function findOrCreateNode(
   }
 
   // if there is no naming conflict, we can traverse into the child
-  return (child);
+  return child;
 }
 
 /*
  * walk the source tree to the final node for a given url,
  * adding new nodes along the way
  */
-function traverseTree(
-  url,
-  tree,
-  debuggeeHost,
-  source,
-  thread
-) {
+function traverseTree(url, tree, debuggeeHost, source, thread) {
   const parts = url.path.replace(/\/$/, "").split("/");
   parts[0] = url.group;
   if (thread) {
@@ -155,12 +134,7 @@ function addSourceToNode(node, url, source) {
  * @memberof utils/sources-tree
  * @static
  */
-export function addToTree(
-  tree,
-  source,
-  debuggeeHost,
-  thread
-) {
+export function addToTree(tree, source, debuggeeHost, thread) {
   const url = getURL(source, debuggeeHost);
 
   if (isInvalidUrl(url, source)) {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import { connect } from "../../utils/connect";
@@ -12,8 +12,6 @@ import actions from "../../actions";
 import { getCurrentThread, getIsPaused, getContext } from "../../selectors";
 import { isWorker } from "../../utils/threads";
 import AccessibleImage from "../shared/AccessibleImage";
-
-
 
 export class Thread extends Component {
   onSelectThread = () => {

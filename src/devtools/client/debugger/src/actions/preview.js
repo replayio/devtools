@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { isConsole } from "../utils/preview";
 import { findBestMatchExpression } from "../utils/ast";
@@ -19,7 +19,6 @@ import {
   getCurrentThread,
   getPreviewCount,
 } from "../selectors";
-
 
 function findExpressionMatch(state, codeMirror, tokenPos) {
   const source = getSelectedSource(state);
@@ -61,14 +60,7 @@ export function updatePreview(cx, target, tokenPos, codeMirror) {
   };
 }
 
-export function setPreview(
-  cx,
-  expression,
-  location,
-  tokenPos,
-  cursorPos,
-  target
-) {
+export function setPreview(cx, expression, location, tokenPos, cursorPos, target) {
   return async ({ dispatch, getState, client, sourceMaps }) => {
     dispatch({ type: "START_PREVIEW" });
     const previewCount = getPreviewCount(getState());
@@ -137,11 +129,9 @@ export function clearPreview(cx) {
       return;
     }
 
-    return dispatch(
-      ({
-        type: "CLEAR_PREVIEW",
-        cx,
-      })
-    );
+    return dispatch({
+      type: "CLEAR_PREVIEW",
+      cx,
+    });
   };
 }

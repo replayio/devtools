@@ -2,13 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { uniq, remove } from "lodash";
 
 const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
 import { getActiveEventListeners, getEventListenerExpanded } from "../selectors";
-
 
 export async function setupEventListeners(_, store) {
   store.dispatch(getEventListenerBreakpointTypes());

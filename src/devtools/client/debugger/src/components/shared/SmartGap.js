@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React from "react";
-
 
 function shorten(coordinates) {
   // In cases where the token is wider than the preview, the smartGap
@@ -16,14 +15,7 @@ function shorten(coordinates) {
   return coordinates;
 }
 
-function getSmartGapCoordinates(
-  preview,
-  token,
-  offset,
-  orientation,
-  gapHeight,
-  coords
-) {
+function getSmartGapCoordinates(preview, token, offset, orientation, gapHeight, coords) {
   if (orientation === "up") {
     const coordinates = [
       token.left - coords.left + offset,
@@ -74,14 +66,7 @@ function getSmartGapCoordinates(
   ];
 }
 
-function getSmartGapDimensions(
-  previewRect,
-  tokenRect,
-  offset,
-  orientation,
-  gapHeight,
-  coords
-) {
+function getSmartGapDimensions(previewRect, tokenRect, offset, orientation, gapHeight, coords) {
   if (orientation === "up") {
     return {
       height: tokenRect.top + tokenRect.height - coords.top - previewRect.height + gapHeight,

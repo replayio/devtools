@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { PureComponent } from "react";
 import { connect } from "../../utils/connect";
 import AccessibleImage from "../shared/AccessibleImage";
@@ -18,8 +18,6 @@ import { getPauseReason } from "../../utils/pause";
 import { getCurrentThread, getPaneCollapse, getPauseReason as getWhy } from "../../selectors";
 
 import "./WhyPaused.css";
-
-
 
 class WhyPaused extends PureComponent {
   constructor(props) {
