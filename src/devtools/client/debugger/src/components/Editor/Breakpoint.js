@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { PureComponent } from "react";
 import classnames from "classnames";
@@ -13,11 +13,9 @@ import { showMenu } from "devtools-contextmenu";
 import { breakpointItems } from "./menus/breakpoints";
 import Panel from "devtools/client/debugger/src/components/Editor/Panel";
 
-
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =
   '<svg viewBox="0 0 60 15" width="60" height="15"><path d="M53.07.5H1.5c-.54 0-1 .46-1 1v12c0 .54.46 1 1 1h51.57c.58 0 1.15-.26 1.53-.7l4.7-6.3-4.7-6.3c-.38-.44-.95-.7-1.53-.7z"/></svg>';
-
 
 class Breakpoint extends PureComponent {
   componentDidMount() {
@@ -44,12 +42,12 @@ class Breakpoint extends PureComponent {
 
     bp.onmousedown = this.onClick;
     // NOTE: flow does not know about oncontextmenu
-    (bp).oncontextmenu = this.onContextMenu;
+    bp.oncontextmenu = this.onContextMenu;
 
     return bp;
   }
 
-  onClick = (event) => {
+  onClick = event => {
     const { cx, breakpointActions, editorActions, breakpoint, selectedSource } = this.props;
 
     // ignore right clicks
@@ -84,7 +82,7 @@ class Breakpoint extends PureComponent {
     );
   };
 
-  onContextMenu = (event) => {
+  onContextMenu = event => {
     const { cx, breakpoint, selectedSource, breakpointActions } = this.props;
     event.stopPropagation();
     event.preventDefault();
@@ -155,9 +153,13 @@ class Breakpoint extends PureComponent {
   render() {
     const { editor, breakpoint } = this.props;
 
-    return (
-      <Panel breakpoint={breakpoint} editor={editor} location={breakpoint.location} log={true} />
-    );
+    if (breakpoint.options.logValue) {
+      return (
+        <Panel breakpoint={breakpoint} editor={editor} location={breakpoint.location} log={true} />
+      );
+    }
+
+    return null;
   }
 }
 

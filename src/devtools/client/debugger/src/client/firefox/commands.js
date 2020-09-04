@@ -187,15 +187,15 @@ function setBreakpoint(location, options) {
   const { line, column, sourceUrl, sourceId } = location;
   const promises = [];
   if (sourceId) {
-    promises.push(
-      ThreadFront.setBreakpoint(sourceId, line, column, condition),
-      setLogpoint(logGroupId, sourceId, line, column, logValue, condition)
-    );
+    promises.push(ThreadFront.setBreakpoint(sourceId, line, column, condition));
+    if (logValue) {
+      promises.push(setLogpoint(logGroupId, sourceId, line, column, logValue, condition));
+    }
   } else {
-    promises.push(
-      ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition),
-      setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition)
-    );
+    promises.push(ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition));
+    if (logValue) {
+      promises.push(setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition));
+    }
   }
   return Promise.all(promises);
 }
