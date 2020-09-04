@@ -51,15 +51,25 @@
   color: var(--theme-comment);
 }
 
-.breakpoint-panel .actions.editing {
-  opacity: 1;
+.breakpoint-panel .actions.hidden,
+.breakpoint-panel .edit-actions.hidden {
+  display: none;
 }
-.breakpoint-panel .actions {
-  opacity: 0;
+.breakpoint-panel .edit-actions {
   display: flex;
   flex-direction: row;
   flex-grow: 1;
 
   margin-right: 30px;
   align-items: center;
+}
+
+.breakpoint-panel .actions {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+
+  margin-right: 30px;
+  align-items: center;
+  width: 80px;
 }
