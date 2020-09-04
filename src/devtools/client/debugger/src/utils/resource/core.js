@@ -2,12 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
-
-
-
-
-
+//
 
 export function createInitial() {
   return {
@@ -16,10 +11,7 @@ export function createInitial() {
   };
 }
 
-export function insertResources(
-  state,
-  resources
-) {
+export function insertResources(state, resources) {
   if (resources.length === 0) {
     return state;
   }
@@ -44,10 +36,7 @@ export function insertResources(
   return state;
 }
 
-export function removeResources(
-  state,
-  resources
-) {
+export function removeResources(state, resources) {
   if (resources.length === 0) {
     return state;
   }
@@ -75,10 +64,7 @@ export function removeResources(
   return state;
 }
 
-export function updateResources(
-  state,
-  resources
-) {
+export function updateResources(state, resources) {
   if (resources.length === 0) {
     return state;
   }
@@ -125,20 +111,17 @@ export function updateResources(
 }
 
 export function makeIdentity() {
-  return ({});
+  return {};
 }
 
-export function getValidatedResource(
-  state,
-  id
-) {
+export function getValidatedResource(state, id) {
   const value = state.values[id];
   const identity = state.identity[id];
   if ((value && !identity) || (!value && identity)) {
     throw new Error(`Resource state corrupt: ${id} has mismatched value and identity`);
   }
 
-  return value ? (state) : null;
+  return value ? state : null;
 }
 
 export function getResourceValues(state) {

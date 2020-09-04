@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import fs from "fs";
 import path from "path";
@@ -39,10 +39,7 @@ export function getSource(name, type) {
   return getSourceWithContent(name, type);
 }
 
-export function getSourceWithContent(
-  name,
-  type
-) {
+export function getSourceWithContent(name, type) {
   const { value: text, contentType } = getSourceContent(name, type);
 
   return makeMockSourceAndContent(undefined, name, contentType, text);
@@ -66,10 +63,7 @@ export function getOriginalSource(name, type) {
   return getOriginalSourceWithContent(name, type);
 }
 
-export function getOriginalSourceWithContent(
-  name,
-  type
-) {
+export function getOriginalSourceWithContent(name, type) {
   const { value: text, contentType } = getSourceContent(name, type);
 
   return makeMockSourceAndContent(undefined, `${name}/originalSource-1`, contentType, text);

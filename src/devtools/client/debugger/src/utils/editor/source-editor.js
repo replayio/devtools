@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * CodeMirror source editor utils
@@ -38,7 +38,6 @@ require("./source-editor.css");
 // Maximum allowed margin (in number of lines) from top or bottom of the editor
 // while shifting to a line which was initially out of view.
 const MAX_VERTICAL_OFFSET = 3;
-
 
 export default class SourceEditor {
   opts;

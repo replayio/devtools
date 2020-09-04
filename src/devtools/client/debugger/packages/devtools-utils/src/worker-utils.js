@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
-
+//
 
 function WorkerDispatcher() {
   this.msgId = 1;
@@ -29,7 +28,7 @@ WorkerDispatcher.prototype = {
 
   task(method, { queue = false } = {}) {
     const calls = [];
-    const push = (args) => {
+    const push = args => {
       return new Promise((resolve, reject) => {
         if (queue && calls.length === 0) {
           Promise.resolve().then(flush);
@@ -74,7 +73,7 @@ WorkerDispatcher.prototype = {
 
           if (resultData.error) {
             const err = new Error(resultData.message);
-            (err).metadata = resultData.metadata;
+            err.metadata = resultData.metadata;
             reject(err);
           } else {
             resolve(resultData.response);
@@ -95,7 +94,7 @@ WorkerDispatcher.prototype = {
 
 function workerHandler(publicInterface) {
   return function (msg) {
-    const { id, method, calls } = (msg.data);
+    const { id, method, calls } = msg.data;
 
     Promise.all(
       calls.map(args => {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import { connect } from "../../utils/connect";
@@ -14,9 +14,6 @@ import { CloseButton } from "../shared/Button";
 import "./XHRBreakpoints.css";
 import { getXHRBreakpoints, shouldPauseOnAnyXHR } from "../../selectors";
 import ExceptionOption from "./Breakpoints/ExceptionOption";
-
-
-
 
 // At present, the "Pause on any URL" checkbox creates an xhrBreakpoint
 // of "ANY" with no path, so we can remove that before creating the list
@@ -67,7 +64,7 @@ class XHRBreakpoints extends Component {
     }
   }
 
-  handleNewSubmit = (e) => {
+  handleNewSubmit = e => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -85,7 +82,7 @@ class XHRBreakpoints extends Component {
     );
   };
 
-  handleExistingSubmit = (e) => {
+  handleExistingSubmit = e => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -100,11 +97,11 @@ class XHRBreakpoints extends Component {
     this.hideInput();
   };
 
-  handleChange = (e) => {
+  handleChange = e => {
     this.setState({ inputValue: e.target.value });
   };
 
-  handleMethodChange = (e) => {
+  handleMethodChange = e => {
     this.setState({
       focused: true,
       editing: true,
@@ -134,11 +131,11 @@ class XHRBreakpoints extends Component {
     this.setState({ focused: true, editing: true });
   };
 
-  onMouseDown = (e) => {
+  onMouseDown = e => {
     this.setState({ editing: false, clickedOnFormElement: true });
   };
 
-  handleTab = (e) => {
+  handleTab = e => {
     if (e.key !== "Tab") {
       return;
     }
@@ -155,7 +152,7 @@ class XHRBreakpoints extends Component {
     }
   };
 
-  editExpression = (index) => {
+  editExpression = index => {
     const { xhrBreakpoints } = this.props;
     const { path, method } = xhrBreakpoints[index];
     this.setState({
@@ -191,7 +188,7 @@ class XHRBreakpoints extends Component {
     );
   }
 
-  handleCheckbox = (index) => {
+  handleCheckbox = index => {
     const { xhrBreakpoints, enableXHRBreakpoint, disableXHRBreakpoint } = this.props;
     const breakpoint = xhrBreakpoints[index];
     if (breakpoint.disabled) {
@@ -201,7 +198,7 @@ class XHRBreakpoints extends Component {
     }
   };
 
-  renderBreakpoint = (breakpoint) => {
+  renderBreakpoint = breakpoint => {
     const { path, disabled, method } = breakpoint;
     const { editIndex } = this.state;
     const { removeXHRBreakpoint, xhrBreakpoints } = this.props;
@@ -276,7 +273,7 @@ class XHRBreakpoints extends Component {
     );
   };
 
-  renderMethodOption = (method) => {
+  renderMethodOption = method => {
     return (
       <option
         key={method}

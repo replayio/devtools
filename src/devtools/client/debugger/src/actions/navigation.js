@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { clearDocuments } from "../utils/editor";
 import sourceQueue from "../utils/source-queue";
@@ -41,19 +41,17 @@ export function willNavigate(event) {
 export function connect(url, actor, traits, isWebExtension) {
   return async function ({ dispatch, getState }) {
     await dispatch(updateThreads());
-    await dispatch(
-      ({
-        type: "CONNECT",
-        mainThread: {
-          url,
-          actor,
-          type: "mainThread",
-          name: L10N.getStr("mainThread"),
-        },
-        traits,
-        isWebExtension,
-      })
-    );
+    await dispatch({
+      type: "CONNECT",
+      mainThread: {
+        url,
+        actor,
+        type: "mainThread",
+        name: L10N.getStr("mainThread"),
+      },
+      traits,
+      isWebExtension,
+    });
 
     const cx = getThreadContext(getState());
     dispatch(evaluateExpressions(cx));

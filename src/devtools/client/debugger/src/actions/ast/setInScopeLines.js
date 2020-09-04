@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { hasInScopeLines, getSourceWithContent, getVisibleSelectedFrame } from "../../selectors";
 
@@ -10,7 +10,6 @@ import { getSourceLineCount } from "../../utils/source";
 
 import { range, flatMap, uniq, without } from "lodash";
 import { isFulfilled } from "../../utils/async-value";
-
 
 function getOutOfScopeLines(outOfScopeLocations) {
   if (!outOfScopeLocations) {
@@ -27,10 +26,7 @@ async function getInScopeLines(cx, location, { dispatch, getState, parser }) {
 
   let locations = null;
   if (location.line && source && !source.isWasm) {
-    locations = await parser.findOutOfScopeLocations(
-      source.id,
-      ((location))
-    );
+    locations = await parser.findOutOfScopeLocations(source.id, location);
   }
 
   const linesOutOfScope = getOutOfScopeLines(locations);
@@ -43,7 +39,7 @@ async function getInScopeLines(cx, location, { dispatch, getState, parser }) {
 }
 
 export function setInScopeLines(cx) {
-  return async (thunkArgs) => {
+  return async thunkArgs => {
     const { getState, dispatch } = thunkArgs;
     const visibleFrame = getVisibleSelectedFrame(getState());
 

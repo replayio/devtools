@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import PropTypes from "prop-types";
 import React, { PureComponent } from "react";
@@ -21,7 +21,6 @@ import { showMenu } from "devtools-contextmenu";
 import { createBreakpointItems, breakpointItemActions } from "./menus/breakpoints";
 
 import { continueToHereItem, editorItemActions } from "./menus/editor";
-
 
 import {
   getActiveSearch,
@@ -80,12 +79,9 @@ import "./Editor.css";
 import "./Breakpoints.css";
 import "./InlinePreview.css";
 
-
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
 };
-
-
 
 class Editor extends PureComponent {
   $editorWrapper;
@@ -94,7 +90,7 @@ class Editor extends PureComponent {
 
     this.state = {
       highlightedLineRange: null,
-      editor: (null),
+      editor: null,
       contextMenu: null,
     };
   }
@@ -182,7 +178,7 @@ class Editor extends PureComponent {
     if (this.state.editor) {
       this.state.editor.destroy();
       this.state.editor.codeMirror.off("scroll", this.onEditorScroll);
-      this.setState({ editor: (null) });
+      this.setState({ editor: null });
     }
 
     const shortcuts = this.context.shortcuts;
@@ -314,7 +310,7 @@ class Editor extends PureComponent {
       closeConditionalPanel();
     }
 
-    const target = (event.target);
+    const target = event.target;
     const { id: sourceId } = selectedSource;
     const line = lineAtHeight(editor, sourceId, event);
 
@@ -382,7 +378,7 @@ class Editor extends PureComponent {
     return addBreakpointAtLine(cx, sourceLine, ev.altKey, ev.shiftKey);
   };
 
-  onGutterContextMenu = (event) => {
+  onGutterContextMenu = event => {
     return this.openMenu(event);
   };
 

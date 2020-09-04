@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
-
+//
 
 const { loadItemProperties } = require("./utils/load-properties");
 const {
@@ -14,8 +13,6 @@ const {
   nodeIsBucket,
 } = require("./utils/node");
 const { getLoadedProperties, getActors, getWatchpoints } = require("./reducer");
-
-
 
 /**
  * This action is responsible for expanding a given node, which also means that

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import Modal from "./shared/Modal";
@@ -10,7 +10,6 @@ import classnames from "classnames";
 import { formatKeyShortcut } from "../utils/text";
 
 import "./ShortcutsModal.css";
-
 
 export class ShortcutsModal extends Component {
   renderPrettyCombos(combo) {

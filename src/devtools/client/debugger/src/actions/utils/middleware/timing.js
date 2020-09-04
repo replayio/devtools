@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Redux middleware that sets performance markers for all actions such that they
@@ -20,7 +20,7 @@ const measure =
     : (a, b, c) => {};
 
 export function timing(store) {
-  return (next) => (action) => {
+  return next => action => {
     mark(`${action.type}_start`);
     const result = next(action);
     mark(`${action.type}_end`);

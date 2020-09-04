@@ -2,12 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import { connect } from "../../../utils/connect";
 import PropTypes from "prop-types";
-
 
 import FrameComponent from "./Frame";
 import Group from "./Group";
@@ -28,9 +27,6 @@ import {
 import "./Frames.css";
 
 const NUM_FRAMES_SHOWN = 7;
-
-
-
 
 class Frames extends Component {
   renderFrames;
@@ -113,11 +109,11 @@ class Frames extends Component {
     // places where we don't want to have those new lines.
     return (
       <div role="list">
-        {framesOrGroups.map((frameOrGroup) =>
+        {framesOrGroups.map(frameOrGroup =>
           frameOrGroup.id ? (
             <FrameComponent
               cx={cx}
-              frame={(frameOrGroup)}
+              frame={frameOrGroup}
               toggleFrameworkGrouping={this.toggleFrameworkGrouping}
               copyStackTrace={this.copyStackTrace}
               frameworkGroupingOn={frameworkGroupingOn}
@@ -134,7 +130,7 @@ class Frames extends Component {
           ) : (
             <Group
               cx={cx}
-              group={(frameOrGroup)}
+              group={frameOrGroup}
               toggleFrameworkGrouping={this.toggleFrameworkGrouping}
               copyStackTrace={this.copyStackTrace}
               frameworkGroupingOn={frameworkGroupingOn}
@@ -160,7 +156,7 @@ class Frames extends Component {
       ? l10n.getStr("callStack.collapse")
       : l10n.getStr("callStack.expand");
 
-    frames = (this.collapseFrames(frames));
+    frames = this.collapseFrames(frames);
     if (frames.length <= NUM_FRAMES_SHOWN) {
       return null;
     }

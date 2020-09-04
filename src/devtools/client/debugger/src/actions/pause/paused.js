@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import {
   getHiddenBreakpoint,
   isEvaluatingExpression,
@@ -18,7 +18,6 @@ import assert from "../../utils/assert";
 
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
-
 
 /**
  * Debugger has just paused

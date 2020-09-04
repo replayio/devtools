@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { parseScript } from "./utils/ast";
 import { buildScopeList } from "./getScopes";
@@ -33,10 +33,7 @@ function locationKey(start) {
   return `${start.line}:${start.column}`;
 }
 
-export default function mapOriginalExpression(
-  expression,
-  ast,
-  mappings) {
+export default function mapOriginalExpression(expression, ast, mappings) {
   const scopes = buildScopeList(ast, "");
   let shouldUpdate = false;
 

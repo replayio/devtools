@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Breakpoints reducer
@@ -16,12 +16,7 @@ import { makeBreakpointId } from "../utils/breakpoint";
 // eslint-disable-next-line max-len
 import { getBreakpointsList as getBreakpointsListSelector } from "../selectors/breakpoints";
 
-
-
-
-export function initialBreakpointsState(
-  xhrBreakpoints = []
-) {
+export function initialBreakpointsState(xhrBreakpoints = []) {
   return {
     breakpoints: {},
     xhrBreakpoints,
@@ -29,10 +24,7 @@ export function initialBreakpointsState(
   };
 }
 
-function update(
-  state = initialBreakpointsState(),
-  action
-) {
+function update(state = initialBreakpointsState(), action) {
   switch (action.type) {
     case "SET_BREAKPOINT": {
       return setBreakpoint(state, action);
@@ -145,13 +137,12 @@ function isMatchingLocation(location1, location2) {
 // Selectors
 // TODO: these functions should be moved out of the reducer
 
-
 export function getBreakpointsMap(state) {
   return state.breakpoints.breakpoints;
 }
 
 export function getBreakpointsList(state) {
-  return getBreakpointsListSelector((state));
+  return getBreakpointsListSelector(state);
 }
 
 export function getBreakpointCount(state) {
@@ -172,11 +163,7 @@ export function getBreakpointsDisabled(state) {
   return breakpoints.every(breakpoint => breakpoint.disabled);
 }
 
-export function getBreakpointsForSource(
-  state,
-  sourceId,
-  line
-) {
+export function getBreakpointsForSource(state, sourceId, line) {
   if (!sourceId) {
     return [];
   }
@@ -188,10 +175,7 @@ export function getBreakpointsForSource(
   });
 }
 
-export function getBreakpointForLocation(
-  state,
-  location
-) {
+export function getBreakpointForLocation(state, location) {
   if (!location) {
     return undefined;
   }

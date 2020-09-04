@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import {
   getSelectedSource,
@@ -15,7 +15,6 @@ import { addHiddenBreakpoint } from "../breakpoints";
 import { setBreakpointPositions } from "../breakpoints/breakpointPositions";
 
 import { resume, rewind } from "./commands";
-
 
 export function continueToHere(cx, location) {
   return async function ({ dispatch, getState }) {

@@ -2,17 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { objectInspector } from "devtools-reps";
 import { getBindingVariables } from "./getVariables";
 import { getFramePopVariables, getThisVariable } from "./utils";
 import { simplifyDisplayName } from "../../pause/frames";
 
-
-
 import { ThreadFront, createElementsFront } from "protocol/thread";
-
 
 const {
   utils: {
@@ -36,13 +33,7 @@ function getScopeTitle(type, scope) {
   return L10N.getStr("scopes.block");
 }
 
-export function getScope(
-  scope,
-  selectedFrame,
-  frameScopes,
-  why,
-  scopeIndex
-) {
+export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {
   const { type, actor } = scope;
 
   const isLocalScope = scope.actor === frameScopes.actor;
@@ -102,12 +93,7 @@ export function getScope(
   return null;
 }
 
-export function mergeScopes(
-  scope,
-  parentScope,
-  item,
-  parentItem
-) {
+export function mergeScopes(scope, parentScope, item, parentItem) {
   if (scope.scopeKind == "function lexical" && parentScope.type == "function") {
     const contents = item.contents.getChildren().concat(parentItem.contents.getChildren());
     contents.sort((a, b) => a.name.localeCompare(b.name));

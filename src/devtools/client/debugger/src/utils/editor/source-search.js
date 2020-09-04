@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import buildQuery from "../build-query";
-
 
 /**
  * @memberof utils/source-search
@@ -127,14 +126,7 @@ export function getMatchIndex(count, currentIndex, rev) {
  * @memberof utils/source-search
  * @static
  */
-function doSearch(
-  ctx,
-  rev,
-  query,
-  keepSelection,
-  modifiers,
-  focusFirstResult = true
-) {
+function doSearch(ctx, rev, query, keepSelection, modifiers, focusFirstResult = true) {
   const { cm, ed } = ctx;
   if (!cm) {
     return;
@@ -166,15 +158,7 @@ function doSearch(
   });
 }
 
-export function searchSourceForHighlight(
-  ctx,
-  rev,
-  query,
-  keepSelection,
-  modifiers,
-  line,
-  ch
-) {
+export function searchSourceForHighlight(ctx, rev, query, keepSelection, modifiers, line, ch) {
   const { cm } = ctx;
   if (!cm) {
     return;
@@ -292,13 +276,7 @@ export function clearSearch(cm, query) {
  * @memberof utils/source-search
  * @static
  */
-export function find(
-  ctx,
-  query,
-  keepSelection,
-  modifiers,
-  focusFirstResult
-) {
+export function find(ctx, query, keepSelection, modifiers, focusFirstResult) {
   clearSearch(ctx.cm, query);
   return doSearch(ctx, false, query, keepSelection, modifiers, focusFirstResult);
 }
@@ -309,12 +287,7 @@ export function find(
  * @memberof utils/source-search
  * @static
  */
-export function findNext(
-  ctx,
-  query,
-  keepSelection,
-  modifiers
-) {
+export function findNext(ctx, query, keepSelection, modifiers) {
   return doSearch(ctx, false, query, keepSelection, modifiers);
 }
 
@@ -324,12 +297,7 @@ export function findNext(
  * @memberof utils/source-search
  * @static
  */
-export function findPrev(
-  ctx,
-  query,
-  keepSelection,
-  modifiers
-) {
+export function findPrev(ctx, query, keepSelection, modifiers) {
   return doSearch(ctx, true, query, keepSelection, modifiers);
 }
 

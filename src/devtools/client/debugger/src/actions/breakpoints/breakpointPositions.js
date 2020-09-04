@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { uniqBy, zip } from "lodash";
 
@@ -13,9 +13,8 @@ import {
   getSourceActorsForSource,
 } from "../../selectors";
 
-
 import { makeBreakpointId } from "../../utils/breakpoint";
-import { memoizeableAction, } from "../../utils/memoizableAction";
+import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
 import { loadSourceActorBreakpointColumns } from "../source-actors";
 

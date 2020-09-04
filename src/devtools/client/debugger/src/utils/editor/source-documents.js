@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { getMode } from "../source";
 
@@ -10,7 +10,6 @@ import { isWasm, getWasmLineNumberFormatter, renderWasmText } from "../wasm";
 import { isMinified } from "../isMinified";
 import { resizeBreakpointGutter, resizeToggleButton } from "../ui";
 import SourceEditor from "./source-editor";
-
 
 let sourceDocs = {};
 
@@ -115,12 +114,7 @@ function setMode(editor, source, content, symbols) {
  * Handle getting the source document or creating a new
  * document with the correct mode and text.
  */
-export function showSourceText(
-  editor,
-  source,
-  content,
-  symbols
-) {
+export function showSourceText(editor, source, content, symbols) {
   if (hasDocument(source.id)) {
     const doc = getDocument(source.id);
     if (editor.codeMirror.doc === doc) {

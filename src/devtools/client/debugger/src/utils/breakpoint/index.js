@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { getBreakpoint, getSource, getSourceActorsForSource } from "../../selectors";
 import { sortSelectedLocations } from "../location";
@@ -11,8 +11,6 @@ import { features } from "../prefs";
 
 export * from "./astBreakpointLocation";
 export * from "./breakpointPositions";
-
-
 
 // Return the first argument that is a string, or null if nothing is a
 // string.
@@ -36,7 +34,6 @@ export function getLocationWithoutColumn(location) {
   const { sourceId, line } = location;
   return `${sourceId}:${line}`;
 }
-
 
 export function makePendingLocationId(location) {
   assertPendingLocation(location);
@@ -76,7 +73,7 @@ export function makeSourceActorLocation(sourceActor, location) {
 export function makeBreakpointActorId(location) {
   const { sourceActor, line, column } = location;
   const columnString = column || "";
-  return `${(sourceActor)}:${line}:${columnString}`;
+  return `${sourceActor}:${line}:${columnString}`;
 }
 
 export function assertBreakpoint(breakpoint) {
@@ -161,9 +158,6 @@ export function getSelectedText(breakpoint, selectedSource) {
   return breakpoint.text;
 }
 
-export function sortSelectedBreakpoints(
-  breakpoints,
-  selectedSource
-) {
+export function sortSelectedBreakpoints(breakpoints, selectedSource) {
   return sortSelectedLocations(breakpoints, selectedSource);
 }

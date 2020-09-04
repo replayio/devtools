@@ -2,16 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 // @format
 
 /**
  * Project text search reducer
  * @module reducers/project-text-search
  */
-
-
-
 
 export const statusType = {
   initial: "INITIAL",
@@ -20,7 +17,6 @@ export const statusType = {
   done: "DONE",
   error: "ERROR",
 };
-
 
 export function initialProjectTextSearchState() {
   return {
@@ -31,10 +27,7 @@ export function initialProjectTextSearchState() {
   };
 }
 
-function update(
-  state = initialProjectTextSearchState(),
-  action
-) {
+function update(state = initialProjectTextSearchState(), action) {
   switch (action.type) {
     case "ADD_QUERY":
       return { ...state, query: action.query };
@@ -68,7 +61,6 @@ function update(
   }
   return state;
 }
-
 
 export function getTextSearchOperation(state) {
   return state.projectTextSearch.ongoingSearch;

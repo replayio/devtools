@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Redux actions for the sources state
@@ -14,7 +14,6 @@ import { features } from "../../utils/prefs";
 import { getSourceActorsForSource } from "../../selectors";
 
 import { PROMISE } from "../utils/middleware/promise";
-
 
 async function blackboxActors(state, client, sourceId, isBlackBoxed, range) {
   for (const actor of getSourceActorsForSource(state, sourceId)) {

@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { validateNavigateContext, validateContext } from "../../../utils/context";
-
 
 const { log } = require("protocol/socket");
 
@@ -57,7 +56,7 @@ function logAction(action) {
 // Middleware which looks for actions that have a cx property and ignores
 // them if the context is no longer valid.
 function context({ dispatch, getState }) {
-  return (next) => (action) => {
+  return next => action => {
     if ("cx" in action) {
       validateActionContext(getState, action);
     }

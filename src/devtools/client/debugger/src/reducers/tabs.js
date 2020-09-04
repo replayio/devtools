@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Tabs reducer
@@ -16,13 +16,6 @@ import { isSimilarTab, persistTabs } from "../utils/tabs";
 import { makeShallowQuery } from "../utils/resource";
 
 import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
-
-
-
-
-
-
-
 
 function initialTabState() {
   return { tabs: [] };
@@ -230,7 +223,7 @@ function moveTabInListBySourceId(state, { sourceId, tabIndex: newIndex }) {
 
 // Selectors
 
-export const getTabs = (state) => state.tabs.tabs;
+export const getTabs = state => state.tabs.tabs;
 
 export const getSourceTabs = createSelector(
   state => state.tabs,

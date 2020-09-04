@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import classnames from "classnames";
@@ -45,8 +45,6 @@ import Scopes from "./Scopes";
 
 import "./SecondaryPanes.css";
 
-
-
 function debugBtn(onClick, type, className, tooltip) {
   return (
     <button onClick={onClick} className={`${type} ${className}`} key={type} title={tooltip}>
@@ -54,8 +52,6 @@ function debugBtn(onClick, type, className, tooltip) {
     </button>
   );
 }
-
-
 
 const mdnLink =
   "https://developer.mozilla.org/docs/Tools/Debugger/Using_the_Debugger_map_scopes_feature?utm_source=devtools&utm_medium=debugger-map-scopes";

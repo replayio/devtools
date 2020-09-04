@@ -2,16 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 /* eslint camelcase: 0*/
-
 
 const { decodeExpr } = require("./wasmDwarfExpressions");
 
 const xScopes = new Map();
-
-
-
 
 function indexLinkingNames(items) {
   const result = new Map();
@@ -42,10 +38,7 @@ function getIndexedItem(index, key) {
   return null;
 }
 
-
-async function getXScopes(
-  sourceId,
-  getSourceMap) {
+async function getXScopes(sourceId, getSourceMap) {
   if (xScopes.has(sourceId)) {
     return xScopes.get(sourceId);
   }
@@ -74,8 +67,6 @@ function isInRange(item, pc) {
   }
   return false;
 }
-
-
 
 function decodeExprAt(expr, pc) {
   if (typeof expr === "string") {
@@ -112,12 +103,7 @@ function getVariables(scope, pc) {
   };
 }
 
-function filterScopes(
-  items,
-  pc,
-  lastItem,
-  index
-) {
+function filterScopes(items, pc, lastItem, index) {
   if (!items) {
     return [];
   }
@@ -163,7 +149,6 @@ function filterScopes(
   }, []);
 }
 
-
 class XScope {
   xScope;
   sourceMapContext;
@@ -202,10 +187,7 @@ class XScope {
   }
 }
 
-async function getWasmXScopes(
-  sourceId,
-  sourceMapContext
-) {
+async function getWasmXScopes(sourceId, sourceMapContext) {
   const { getSourceMap } = sourceMapContext;
   const xScopeData = await getXScopes(sourceId, getSourceMap);
   if (!xScopeData) {

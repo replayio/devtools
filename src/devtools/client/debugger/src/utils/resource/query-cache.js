@@ -2,19 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { strictEqual, shallowEqual } from "./compare";
-
-
 
 /**
  * A query 'cache' function that uses the identity of the arguments object to
  * cache data for the query itself.
  */
-export function queryCacheWeak(
-  handler
-) {
+export function queryCacheWeak(handler) {
   const cache = new WeakMap();
   return makeCacheFunction({
     handler,
@@ -48,9 +44,7 @@ export function queryCacheShallow(handler) {
  * A query 'cache' function that uses strict comparison to cache the most
  * recent calculated result based on the value of the argument.
  */
-export function queryCacheStrict(
-  handler
-) {
+export function queryCacheStrict(handler) {
   let latestEntry = null;
   return makeCacheFunction({
     handler,
@@ -62,10 +56,7 @@ export function queryCacheStrict(
   });
 }
 
-
-function makeCacheFunction(
-  info
-) {
+function makeCacheFunction(info) {
   const { handler, compareArgs, getEntry, setEntry } = info;
 
   return (state, args) => {

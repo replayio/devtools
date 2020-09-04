@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
@@ -10,8 +10,6 @@ import PropTypes from "prop-types";
 import { times, zip, flatten } from "lodash";
 
 import "./PreviewFunction.css";
-
-
 
 const IGNORED_SOURCE_URLS = ["debugger eval code"];
 

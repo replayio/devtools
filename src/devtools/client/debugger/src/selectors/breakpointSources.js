@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { sortBy, uniq } from "lodash";
 import { createSelector } from "reselect";
@@ -16,13 +16,7 @@ import { getFilename } from "../utils/source";
 import { makeShallowQuery } from "../utils/resource";
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
 
-
-
-function getBreakpointsForSource(
-  source,
-  selectedSource,
-  breakpoints
-) {
+function getBreakpointsForSource(source, selectedSource, breakpoints) {
   return sortSelectedBreakpoints(breakpoints, selectedSource)
     .filter(
       bp =>
@@ -31,7 +25,7 @@ function getBreakpointsForSource(
     .filter(bp => bp.location.sourceId == source.id);
 }
 
-export const findBreakpointSources = (state) => {
+export const findBreakpointSources = state => {
   const breakpoints = getBreakpointsList(state);
   const sources = getSources(state);
   const selectedSource = getSelectedSource(state);
@@ -41,7 +35,7 @@ export const findBreakpointSources = (state) => {
 const queryBreakpointSources = makeShallowQuery({
   filter: (_, { breakpoints, selectedSource }) => uniq(breakpoints.map(bp => bp.location.sourceId)),
   map: resourceAsSourceBase,
-  reduce: (sources) => {
+  reduce: sources => {
     const filtered = sources.filter(source => source && !source.isBlackBoxed);
     return sortBy(filtered, source => getFilename(source));
   },

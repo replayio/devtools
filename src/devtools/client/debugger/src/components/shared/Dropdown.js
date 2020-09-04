@@ -2,11 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { Component } from "react";
 import "./Dropdown.css";
-
-
 
 export class Dropdown extends Component {
   toggleDropdown;
@@ -17,7 +15,7 @@ export class Dropdown extends Component {
     };
   }
 
-  toggleDropdown = (e) => {
+  toggleDropdown = e => {
     this.setState(prevState => ({
       dropdownShown: !prevState.dropdownShown,
     }));

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * This file is for use by unit tests for isolated debugger components that do
@@ -29,12 +29,7 @@ function makeMockSource(url = "url", id = "source") {
   };
 }
 
-function makeMockSourceWithContent(
-  url,
-  id,
-  contentType = "text/javascript",
-  text = ""
-) {
+function makeMockSourceWithContent(url, id, contentType = "text/javascript", text = "") {
   const source = makeMockSource(url, id);
 
   return {
@@ -49,12 +44,7 @@ function makeMockSourceWithContent(
   };
 }
 
-function makeMockSourceAndContent(
-  url,
-  id,
-  contentType = "text/javascript",
-  text = ""
-) {
+function makeMockSourceAndContent(url, id, contentType = "text/javascript", text = "") {
   const source = makeMockSource(url, id);
 
   return {
@@ -95,11 +85,7 @@ function makeMockWasmSourceWithContent(text) {
   };
 }
 
-function makeMockScope(
-  actor = "scope-actor",
-  type = "block",
-  parent = null
-) {
+function makeMockScope(actor = "scope-actor", type = "block", parent = null) {
   return {
     actor,
     parent,
@@ -121,11 +107,7 @@ function mockScopeAddVariable(scope, name) {
   scope.bindings.variables[name] = { value: null };
 }
 
-function makeMockBreakpoint(
-  source = makeMockSource(),
-  line = 1,
-  column
-) {
+function makeMockBreakpoint(source = makeMockSource(), line = 1, column) {
   const location = column ? { sourceId: source.id, line, column } : { sourceId: source.id, line };
   return {
     id: "breakpoint",

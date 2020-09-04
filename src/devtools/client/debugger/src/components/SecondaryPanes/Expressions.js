@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { Component } from "react";
 import { connect } from "../../utils/connect";
 import classnames from "classnames";
@@ -22,12 +22,9 @@ import { getValue } from "../../utils/expressions";
 import { CloseButton } from "../shared/Button";
 import { debounce } from "lodash";
 
-
 import "./Expressions.css";
 
 const ObjectInspector = objectInspector.ObjectInspector.default;
-
-
 
 class Expressions extends Component {
   _input;
@@ -111,7 +108,7 @@ class Expressions extends Component {
     deleteExpression(expression);
   }
 
-  handleChange = (e) => {
+  handleChange = e => {
     const { target } = e;
     if (features.autocompleteExpression) {
       this.findAutocompleteMatches(target.value, target.selectionStart);
@@ -124,7 +121,7 @@ class Expressions extends Component {
     autocomplete(this.props.cx, value, selectionStart);
   }, 250);
 
-  handleKeyDown = (e) => {
+  handleKeyDown = e => {
     if (e.key === "Escape") {
       this.clear();
     }
@@ -153,7 +150,7 @@ class Expressions extends Component {
     this.hideInput();
   };
 
-  handleNewSubmit = async (e) => {
+  handleNewSubmit = async e => {
     const { inputValue } = this.state;
     e.preventDefault();
     e.stopPropagation();
@@ -291,9 +288,7 @@ class Expressions extends Component {
       >
         <form
           className="expression-input-form"
-          onSubmit={(e) =>
-            this.handleExistingSubmit(e, expression)
-          }
+          onSubmit={e => this.handleExistingSubmit(e, expression)}
         >
           <input
             className={classnames("input-expression", { error })}
@@ -329,7 +324,7 @@ class Expressions extends Component {
 
 const mapStateToProps = state => ({
   cx: getThreadContext(state),
-  autocompleteMatches: (getAutocompleteMatchset(state)),
+  autocompleteMatches: getAutocompleteMatchset(state),
   expressions: getExpressions(state),
   expressionError: getExpressionError(state),
 });

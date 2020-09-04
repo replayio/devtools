@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import {
   getSelectedFrame,
@@ -24,8 +24,6 @@ import FullStory from "ui/utils/fullstory";
 
 import { generateInlinePreview } from "./inlinePreview";
 import { setFramePositions } from "./setFramePositions";
-
-
 
 const { log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
@@ -59,7 +57,7 @@ export function selectThread(cx, thread) {
  * @static
  */
 export function command(cx, type, executionPoint) {
-  return async (thunkArgs) => {
+  return async thunkArgs => {
     const { dispatch, getState, client } = thunkArgs;
     log(`Debugger CommandStart ${type}`);
     FullStory.event(`debugger.${type}`);

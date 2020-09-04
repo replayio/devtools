@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { bindActionCreators } from "redux";
 
@@ -15,13 +15,7 @@ import { features } from "../../../utils/prefs";
 import { isFulfilled } from "../../../utils/async-value";
 import actions from "../../../actions";
 
-
-export const continueToHereItem = (
-  cx,
-  location,
-  isPaused,
-  editorActions
-) => ({
+export const continueToHereItem = (cx, location, isPaused, editorActions) => ({
   accesskey: L10N.getStr("editor.continueToHere.accesskey"),
   disabled: !isPaused,
   click: () => editorActions.continueToHere(cx, location),
@@ -39,11 +33,7 @@ const copyToClipboardItem = (selectedContent, editorActions) => ({
   click: () => selectedContent.type === "text" && copyToTheClipboard(selectedContent.value),
 });
 
-const copySourceItem = (
-  selectedSource,
-  selectionText,
-  editorActions
-) => ({
+const copySourceItem = (selectedSource, selectionText, editorActions) => ({
   id: "node-menu-copy-source",
   label: L10N.getStr("copySource.label"),
   accesskey: L10N.getStr("copySource.accesskey"),
@@ -76,11 +66,7 @@ const jumpToMappedLocationItem = (
   click: () => editorActions.jumpToMappedLocation(cx, location),
 });
 
-const showSourceMenuItem = (
-  cx,
-  selectedSource,
-  editorActions
-) => ({
+const showSourceMenuItem = (cx, selectedSource, editorActions) => ({
   id: "node-menu-show-source",
   label: L10N.getStr("sourceTabs.revealInTree"),
   accesskey: L10N.getStr("sourceTabs.revealInTree.accesskey"),
@@ -88,11 +74,7 @@ const showSourceMenuItem = (
   click: () => editorActions.showSource(cx, selectedSource.id),
 });
 
-const blackBoxMenuItem = (
-  cx,
-  selectedSource,
-  editorActions
-) => ({
+const blackBoxMenuItem = (cx, selectedSource, editorActions) => ({
   id: "node-menu-blackbox",
   label: selectedSource.isBlackBoxed
     ? L10N.getStr("blackboxContextItem.unblackbox")
@@ -104,40 +86,27 @@ const blackBoxMenuItem = (
   click: () => editorActions.toggleBlackBox(cx, selectedSource),
 });
 
-const watchExpressionItem = (
-  cx,
-  selectedSource,
-  selectionText,
-  editorActions
-) => ({
+const watchExpressionItem = (cx, selectedSource, selectionText, editorActions) => ({
   id: "node-menu-add-watch-expression",
   label: L10N.getStr("expressions.label"),
   accesskey: L10N.getStr("expressions.accesskey"),
   click: () => editorActions.addExpression(cx, selectionText),
 });
 
-const evaluateInConsoleItem = (
-  selectedSource,
-  selectionText,
-  editorActions
-) => ({
+const evaluateInConsoleItem = (selectedSource, selectionText, editorActions) => ({
   id: "node-menu-evaluate-in-console",
   label: L10N.getStr("evaluateInConsole.label"),
   click: () => editorActions.evaluateInConsole(selectionText),
 });
 
-const downloadFileItem = (
-  selectedSource,
-  selectedContent,
-  editorActions
-) => ({
+const downloadFileItem = (selectedSource, selectedContent, editorActions) => ({
   id: "node-menu-download-file",
   label: L10N.getStr("downloadFile.label"),
   accesskey: L10N.getStr("downloadFile.accesskey"),
   click: () => downloadFile(selectedContent, getFilename(selectedSource)),
 });
 
-const inlinePreviewItem = (editorActions) => ({
+const inlinePreviewItem = editorActions => ({
   id: "node-menu-inline-preview",
   label: features.inlinePreview
     ? L10N.getStr("inlinePreview.hide.label")
@@ -191,7 +160,6 @@ export function editorMenuItems({
 
   return items;
 }
-
 
 export function editorItemActions(dispatch) {
   return bindActionCreators(

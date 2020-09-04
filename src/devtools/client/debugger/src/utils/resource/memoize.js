@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { shallowEqual } from "./compare";
 
@@ -19,7 +19,7 @@ export function memoizeResourceShallow(map) {
     let existingEntry = cache.get(identity);
 
     if (!existingEntry || existingEntry.input !== input) {
-      const mapper = (map);
+      const mapper = map;
       const output = mapper(input, identity, args);
 
       if (existingEntry) {
@@ -43,5 +43,5 @@ export function memoizeResourceShallow(map) {
     return existingEntry.output;
   };
   fn.needsArgs = map.needsArgs;
-  return (fn);
+  return fn;
 }

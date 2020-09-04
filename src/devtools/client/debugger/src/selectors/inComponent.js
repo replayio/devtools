@@ -2,11 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { getSymbols, getSource, getSelectedFrame, getCurrentThread } from ".";
 import { findClosestClass } from "../utils/ast";
-
 
 export function inComponent(state) {
   const thread = getCurrentThread(state);

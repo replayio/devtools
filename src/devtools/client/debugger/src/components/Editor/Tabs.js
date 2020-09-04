@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
@@ -29,9 +29,6 @@ import { PaneToggleButton } from "../shared/Button";
 import Dropdown from "../shared/Dropdown";
 import AccessibleImage from "../shared/AccessibleImage";
 import CommandBar from "../SecondaryPanes/CommandBar";
-
-
-
 
 function haveTabSourcesChanged(tabSources, prevTabSources) {
   if (tabSources.length !== prevTabSources.length) {
@@ -149,7 +146,7 @@ class Tabs extends PureComponent {
     return "file";
   }
 
-  renderDropdownSource = (source) => {
+  renderDropdownSource = source => {
     const { cx, selectSource } = this.props;
     const filename = getFilename(source);
 
@@ -260,7 +257,7 @@ class Tabs extends PureComponent {
       <PaneToggleButton
         position="start"
         collapsed={this.props.startPanelCollapsed}
-        handleClick={(this.props.togglePaneCollapse)}
+        handleClick={this.props.togglePaneCollapse}
       />
     );
   }
@@ -275,7 +272,7 @@ class Tabs extends PureComponent {
       <PaneToggleButton
         position="end"
         collapsed={endPanelCollapsed}
-        handleClick={(togglePaneCollapse)}
+        handleClick={togglePaneCollapse}
         horizontal={horizontal}
       />
     );

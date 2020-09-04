@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import classnames from "classnames";
@@ -26,10 +26,7 @@ import Outline from "./Outline";
 import SourcesTree from "./SourcesTree";
 import AccessibleImage from "../shared/AccessibleImage";
 
-
 import "./Sources.css";
-
-
 
 class PrimaryPanes extends Component {
   constructor(props) {
@@ -40,7 +37,7 @@ class PrimaryPanes extends Component {
     };
   }
 
-  showPane = (selectedPane) => {
+  showPane = selectedPane => {
     this.props.setPrimaryPaneTab(selectedPane);
   };
 
@@ -50,7 +47,7 @@ class PrimaryPanes extends Component {
     this.setState({ alphabetizeOutline });
   };
 
-  onActivateTab = (index) => {
+  onActivateTab = index => {
     if (index === 0) {
       this.showPane("sources");
     } else {
@@ -58,7 +55,7 @@ class PrimaryPanes extends Component {
     }
   };
 
-  getRootLabel = (projectRoot) => {
+  getRootLabel = projectRoot => {
     const { threads, rootExtensionName } = this.props;
     const targetThread = threads.find(thread => thread.actor === projectRoot);
 

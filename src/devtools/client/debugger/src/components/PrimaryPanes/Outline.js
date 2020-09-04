@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import { showMenu } from "devtools-contextmenu";
@@ -26,10 +26,6 @@ import OutlineFilter from "./OutlineFilter";
 import "./Outline.css";
 import PreviewFunction from "../shared/PreviewFunction";
 import { uniq, sortBy } from "lodash";
-
-
-
-
 
 /**
  * Check whether the name argument matches the fuzzy filter argument
@@ -157,7 +153,7 @@ export class Outline extends Component {
     showMenu(event, menuOptions);
   }
 
-  updateFilter = (filter) => {
+  updateFilter = filter => {
     this.setState({ filter: filter.trim() });
   };
 
@@ -317,7 +313,7 @@ const mapStateToProps = state => {
   return {
     cx: getContext(state),
     symbols,
-    selectedSource: (selectedSource),
+    selectedSource: selectedSource,
     cursorPosition: getCursorPosition(state),
     getFunctionText: line => {
       if (selectedSource) {

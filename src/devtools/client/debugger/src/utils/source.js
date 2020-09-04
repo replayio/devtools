@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Utils for working with Source URLs
@@ -21,9 +21,7 @@ export { isMinified } from "./isMinified";
 import { getURL, getFileExtension } from "./sources-tree";
 import { features } from "./prefs";
 
-
-import { isFulfilled, } from "./async-value";
-
+import { isFulfilled } from "./async-value";
 
 export const sourceTypes = {
   coffee: "coffeescript",
@@ -123,11 +121,7 @@ export function getRawSourceURL(url) {
   return url && url.endsWith(":formatted") ? url.slice(0, -":formatted".length) : url;
 }
 
-function resolveFileURL(
-  url,
-  transformUrl = initialUrl => initialUrl,
-  truncate = true
-) {
+function resolveFileURL(url, transformUrl = initialUrl => initialUrl, truncate = true) {
   url = getRawSourceURL(url || "");
   const name = transformUrl(url);
   if (!truncate) {
@@ -165,11 +159,7 @@ export function getFilename(source, rawSourceURL = getRawSourceURL(source.url)) 
  * @memberof utils/source
  * @static
  */
-export function getTruncatedFileName(
-  source,
-  querystring = "",
-  length = 30
-) {
+export function getTruncatedFileName(source, querystring = "", length = 30) {
   return truncateMiddleText(`${getFilename(source)}${querystring}`, length);
 }
 
@@ -308,11 +298,7 @@ export function getSourceLineCount(content) {
  * @static
  */
 // eslint-disable-next-line complexity
-export function getMode(
-  source,
-  content,
-  symbols
-) {
+export function getMode(source, content, symbols) {
   const extension = getFileExtension(source);
 
   if (content.type !== "text") {
@@ -391,30 +377,24 @@ export function isInlineScript(source) {
   return source.introductionType === "scriptElement";
 }
 
-export const getLineText = memoizeLast(
-  (sourceId, asyncContent, line) => {
-    if (!asyncContent || !isFulfilled(asyncContent)) {
-      return "";
-    }
-
-    const content = asyncContent.value;
-
-    if (content.type === "wasm") {
-      const editorLine = toEditorLine(sourceId, line);
-      const lines = renderWasmText(sourceId, content);
-      return lines[editorLine] || "";
-    }
-
-    const lineText = content.value.split("\n")[line - 1];
-    return lineText || "";
+export const getLineText = memoizeLast((sourceId, asyncContent, line) => {
+  if (!asyncContent || !isFulfilled(asyncContent)) {
+    return "";
   }
-);
 
-export function getTextAtPosition(
-  sourceId,
-  asyncContent,
-  location
-) {
+  const content = asyncContent.value;
+
+  if (content.type === "wasm") {
+    const editorLine = toEditorLine(sourceId, line);
+    const lines = renderWasmText(sourceId, content);
+    return lines[editorLine] || "";
+  }
+
+  const lineText = content.value.split("\n")[line - 1];
+  return lineText || "";
+});
+
+export function getTextAtPosition(sourceId, asyncContent, location) {
   const { column, line = 0 } = location;
 
   const lineText = getLineText(sourceId, asyncContent, line);

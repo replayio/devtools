@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import PropTypes from "prop-types";
 import React, { Component } from "react";
@@ -30,11 +30,6 @@ import AccessibleImage from "./shared/AccessibleImage";
 import { PluralForm } from "devtools-modules";
 
 import "./ProjectSearch.css";
-
-
-
-
-
 
 function getFilePath(item, index) {
   return item.type === "RESULT"
@@ -96,7 +91,7 @@ export class ProjectSearch extends Component {
 
   isProjectSearchEnabled = () => this.props.activeSearch === "project";
 
-  selectMatchItem = (matchItem) => {
+  selectMatchItem = matchItem => {
     this.props.selectSpecificLocation(this.props.cx, {
       sourceId: matchItem.sourceId,
       line: matchItem.line,
@@ -112,7 +107,7 @@ export class ProjectSearch extends Component {
 
   getResultCount = () => this.props.results.reduce((count, file) => count + file.matches.length, 0);
 
-  onKeyDown = (e) => {
+  onKeyDown = e => {
     if (e.key === "Escape") {
       return;
     }
@@ -129,7 +124,7 @@ export class ProjectSearch extends Component {
     }
   };
 
-  onHistoryScroll = (query) => {
+  onHistoryScroll = query => {
     this.setState({ inputValue: query });
   };
 
@@ -142,13 +137,13 @@ export class ProjectSearch extends Component {
     }
   };
 
-  onFocus = (item) => {
+  onFocus = item => {
     if (this.state.focusedItem !== item) {
       this.setState({ focusedItem: item });
     }
   };
 
-  inputOnChange = (e) => {
+  inputOnChange = e => {
     const inputValue = e.target.value;
     const { cx, clearSearch } = this.props;
     this.setState({ inputValue });

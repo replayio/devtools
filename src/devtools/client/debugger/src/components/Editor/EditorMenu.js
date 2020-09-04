@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { Component } from "react";
 import { connect } from "../../utils/connect";
@@ -19,8 +19,6 @@ import {
 } from "../../selectors";
 
 import { editorMenuItems, editorItemActions } from "./menus/editor";
-
-
 
 class EditorMenu extends Component {
   UNSAFE_componentWillUpdate(nextProps) {
@@ -45,7 +43,7 @@ class EditorMenu extends Component {
       editor,
       selectedSource,
       // Use a coercion, as contextMenu is optional
-      (event)
+      event
     );
 
     showMenu(
@@ -82,7 +80,4 @@ const mapDispatchToProps = dispatch => ({
   editorActions: editorItemActions(dispatch),
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(EditorMenu);
+export default connect(mapStateToProps, mapDispatchToProps)(EditorMenu);

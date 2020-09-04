@@ -7,7 +7,7 @@
  * https://dxr.mozilla.org/mozilla-central/source/devtools/shared/platform/content/clipboard.js
  */
 
-// 
+//
 
 export function copyToTheClipboard(string) {
   const doCopy = function (e) {

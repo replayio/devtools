@@ -2,27 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import React, { Component } from "react";
 import classnames from "classnames";
 
 import "./OutlineFilter.css";
 
-
-
 export default class OutlineFilter extends Component {
   state = { focused: false };
 
-  setFocus = (shouldFocus) => {
+  setFocus = shouldFocus => {
     this.setState({ focused: shouldFocus });
   };
 
-  onChange = (e) => {
+  onChange = e => {
     this.props.updateFilter(e.target.value);
   };
 
-  onKeyDown = (e) => {
+  onKeyDown = e => {
     if (e.key === "Escape" && this.props.filter !== "") {
       // use preventDefault to override toggling the split-console which is
       // also bound to the ESC key

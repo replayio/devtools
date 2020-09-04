@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
@@ -18,13 +18,11 @@ import {
   getContext,
 } from "../../selectors";
 
-
 function addNewLine(doc) {
   const cursor = doc.getCursor();
   const pos = { line: cursor.line, ch: cursor.ch };
   doc.replaceRange("\n", pos);
 }
-
 
 export class ConditionalPanel extends PureComponent {
   cbPanel;
@@ -52,7 +50,7 @@ export class ConditionalPanel extends PureComponent {
     this.props.closeConditionalPanel();
   };
 
-  onKey = (e) => {
+  onKey = e => {
     if (e.key === "Enter") {
       if (this.codeMirror && e.altKey) {
         addNewLine(this.codeMirror.doc);
@@ -135,7 +133,7 @@ export class ConditionalPanel extends PureComponent {
           this.scrollParent = parent;
           break;
         }
-        parent = (parent.parentNode);
+        parent = parent.parentNode;
       }
 
       if (this.scrollParent) {
@@ -145,7 +143,7 @@ export class ConditionalPanel extends PureComponent {
     }
   }
 
-  createEditor = (input) => {
+  createEditor = input => {
     const { log, editor, closeConditionalPanel } = this.props;
     const codeMirror = editor.CodeMirror.fromTextArea(input, {
       mode: "javascript",
@@ -235,7 +233,4 @@ const mapDispatchToProps = {
   closeConditionalPanel,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ConditionalPanel);
+export default connect(mapStateToProps, mapDispatchToProps)(ConditionalPanel);

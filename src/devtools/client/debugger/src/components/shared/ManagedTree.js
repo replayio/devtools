@@ -2,14 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { Component } from "react";
 import "./ManagedTree.css";
 
 const { Tree } = require("devtools-components");
-
-
-
 
 class ManagedTree extends Component {
   constructor(props) {

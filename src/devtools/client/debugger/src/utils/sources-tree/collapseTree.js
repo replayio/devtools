@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { createDirectoryNode } from "./utils";
-
 
 /**
  * Take an existing source tree, and return a new one with collapsed nodes.
@@ -48,5 +47,5 @@ function _collapseTree(node, depth) {
 
 export function collapseTree(node) {
   const tree = _collapseTree(node, 0);
-  return ((tree));
+  return tree;
 }

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import { PureComponent } from "react";
 import {
   toEditorPosition,
@@ -22,9 +22,6 @@ import {
   getCurrentThread,
   getPausePreviewLocation,
 } from "../../selectors";
-
-
-
 
 function isDocumentReady(source, location) {
   return location && source && source.content && hasDocument(location.sourceId);

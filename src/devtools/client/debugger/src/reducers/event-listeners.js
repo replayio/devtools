@@ -2,11 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { prefs } from "../utils/prefs";
-
-
 
 export function initialEventListenerState() {
   return {
@@ -17,10 +15,7 @@ export function initialEventListenerState() {
   };
 }
 
-function update(
-  state = initialEventListenerState(),
-  action
-) {
+function update(state = initialEventListenerState(), action) {
   switch (action.type) {
     case "UPDATE_EVENT_LISTENERS":
       return { ...state, active: action.active };

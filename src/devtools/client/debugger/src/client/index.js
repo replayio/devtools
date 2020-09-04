@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import * as firefox from "./firefox";
 
@@ -13,10 +13,9 @@ import { bootstrapApp, bootstrapStore, bootstrapWorkers } from "../utils/bootstr
 
 import { initialBreakpointsState } from "../reducers/breakpoints";
 
-
 async function syncBreakpoints() {
   const breakpoints = await asyncStore.pendingBreakpoints;
-  const breakpointValues = (Object.values(breakpoints));
+  const breakpointValues = Object.values(breakpoints);
   breakpointValues.forEach(({ disabled, options, location }) => {
     if (!disabled) {
       firefox.clientCommands.setBreakpoint(location, options);

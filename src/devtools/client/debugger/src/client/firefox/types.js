@@ -2,16 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * These are Firefox specific types that allow us to type check
  * the packet information exchanged using the Firefox Remote Debug Protocol
  * https://wiki.mozilla.org/Remote_Debugging_Protocol
  */
-
-
-
 
 /**
  * The protocol is carried by a reliable, bi-directional byte stream; data sent
@@ -49,8 +46,6 @@
  * @memberof firefox/packets
  * @static
  */
-
-
 
 /**
  * Frame Packet
@@ -91,13 +86,11 @@
  * @static
  */
 
-
 /**
  * Tab Target gives access to the browser tabs
  * @memberof firefox
  * @static
  */
-
 
 /**
  * Clients for accessing the Firefox debug server and browser
@@ -110,7 +103,6 @@
  * @memberof firefox
  * @static
  */
-
 
 /**
  * A grip is a JSON value that refers to a specific JavaScript value in the
@@ -128,7 +120,6 @@
  * @static
  */
 
-
 /**
  * SourceClient
  * @memberof firefox
@@ -141,11 +132,8 @@
  * @static
  */
 
-
-
 /**
  * ThreadFront
  * @memberof firefox
  * @static
  */
-

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Ast reducer
@@ -10,14 +10,6 @@
  */
 
 import { makeBreakpointId } from "../utils/breakpoint";
-
-
-
-
-
-
-
-
 
 export function initialASTState() {
   return {
@@ -37,7 +29,7 @@ function update(state = initialASTState(), action) {
         };
       }
 
-      const value = ((action)).value;
+      const value = action.value;
       return {
         ...state,
         symbols: { ...state.symbols, [sourceId]: value },

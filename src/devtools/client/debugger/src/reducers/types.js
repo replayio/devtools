@@ -7,9 +7,4 @@
  * @module reducers/types
  */
 
-// 
-
-
-
-
-
+//

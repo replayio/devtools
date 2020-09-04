@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { WorkerDispatcher } from "devtools-utils/src/worker-utils";
-
 
 const { log } = require("protocol/socket");
 
@@ -52,13 +51,7 @@ export class ParserDispatcher extends WorkerDispatcher {
     return this.invoke("hasSyntaxError", input);
   }
 
-  async mapExpression(
-    expression,
-    mappings,
-    bindings,
-    shouldMapBindings,
-    shouldMapAwait
-  ) {
+  async mapExpression(expression, mappings, bindings, shouldMapBindings, shouldMapAwait) {
     log(`WorkerDispatch Parser mapExpression`);
     return this.invoke(
       "mapExpression",
@@ -74,6 +67,3 @@ export class ParserDispatcher extends WorkerDispatcher {
     await this.clearState();
   }
 }
-
-
-

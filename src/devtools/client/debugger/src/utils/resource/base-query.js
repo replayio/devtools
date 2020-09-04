@@ -2,37 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
-import {
-  getResourceValues,
-  getValidatedResource,
-  makeIdentity,
-} from "./core";
+import { getResourceValues, getValidatedResource, makeIdentity } from "./core";
 import { arrayShallowEqual } from "./compare";
 
-
-
-
-
-
-
-
-export function makeMapWithArgs(
-  map
-) {
+export function makeMapWithArgs(map) {
   const wrapper = (resource, identity, args) => map(resource, identity, args);
   wrapper.needsArgs = true;
   return wrapper;
 }
 
-export function makeResourceQuery({
-  cache,
-  filter,
-  map,
-  reduce,
-  resultCompare,
-}) {
+export function makeResourceQuery({ cache, filter, map, reduce, resultCompare }) {
   const loadResource = makeResourceMapper(map);
 
   return cache((state, context, existing) => {
@@ -55,10 +36,7 @@ export function makeResourceQuery({
   });
 }
 
-
-function makeResourceMapper(
-  map
-) {
+function makeResourceMapper(map) {
   return map.needsArgs ? makeResourceArgsMapper(map) : makeResourceNoArgsMapper(map);
 }
 
@@ -68,27 +46,18 @@ function makeResourceMapper(
  * _and_ the arguments being passed to the query. That means they need extra
  * logic when loading those resources.
  */
-function makeResourceArgsMapper(
-  map
-) {
+function makeResourceArgsMapper(map) {
   const mapper = (value, identity, context) =>
     map(value, getIdentity(context.identMap, identity), context.args);
   return (state, id, context) => getCachedResource(state, id, context, mapper);
 }
 
-function makeResourceNoArgsMapper(
-  map
-) {
+function makeResourceNoArgsMapper(map) {
   const mapper = (value, identity, context) => map(value, identity);
   return (state, id, context) => getCachedResource(state, id, context, mapper);
 }
 
-function getCachedResource(
-  state,
-  id,
-  context,
-  map
-) {
+function getCachedResource(state, id, context, map) {
   const validatedState = getValidatedResource(state, id);
   if (!validatedState) {
     throw new Error(`Resource ${id} does not exist`);
@@ -97,10 +66,7 @@ function getCachedResource(
   return map(validatedState.values[id], validatedState.identity[id], context);
 }
 
-function getIdentity(
-  identMap,
-  identity
-) {
+function getIdentity(identMap, identity) {
   let ident = identMap.get(identity);
   if (!ident) {
     ident = makeIdentity();

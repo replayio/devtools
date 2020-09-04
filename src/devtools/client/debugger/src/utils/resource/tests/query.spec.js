@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import {
   createInitial,
@@ -14,8 +14,7 @@ import {
   makeStrictQuery,
 } from "..";
 
-
-const makeResource = (id) => ({
+const makeResource = id => ({
   id,
   name: `name-${id}`,
   data: 42,
@@ -27,20 +26,12 @@ const makeResource = (id) => ({
 
 // We need to pass the 'needsArgs' prop through to the query fn so we use
 // this utility to do that and at the same time preserve typechecking.
-const mockFn = (f) => Object.assign((jest.fn(f)), f);
+const mockFn = f => Object.assign(jest.fn(f), f);
 
-const mockFilter =(callback) =>
-  mockFn(callback);
-const mockMapNoArgs =(
-  callback
-) => mockFn(callback);
-const mockMapWithArgs =(
-  callback
-) => mockFn(makeMapWithArgs(callback));
-const mockReduce =(
-  callback
-) => mockFn(callback);
-
+const mockFilter = callback => mockFn(callback);
+const mockMapNoArgs = callback => mockFn(callback);
+const mockMapWithArgs = callback => mockFn(makeMapWithArgs(callback));
+const mockReduce = callback => mockFn(callback);
 
 describe("resource query operations", () => {
   let r1, r2, r3;
@@ -56,24 +47,14 @@ describe("resource query operations", () => {
 
     initialState = insertResources(initialState, [r1, r2, r3]);
 
-    mapNoArgs = mockMapNoArgs(
-      (resource, ident) => resource
-    );
-    mapWithArgs = mockMapWithArgs(
-      (resource, ident, args) => resource
-    );
-    reduce = mockReduce(
-      (
-        mapped,
-        ids,
-        args
-      ) => {
-        return mapped.reduce((acc, item, i) => {
-          acc[ids[i]] = item;
-          return acc;
-        }, {});
-      }
-    );
+    mapNoArgs = mockMapNoArgs((resource, ident) => resource);
+    mapWithArgs = mockMapWithArgs((resource, ident, args) => resource);
+    reduce = mockReduce((mapped, ids, args) => {
+      return mapped.reduce((acc, item, i) => {
+        acc[ids[i]] = item;
+        return acc;
+      }, {});
+    });
   });
 
   describe("weak cache", () => {

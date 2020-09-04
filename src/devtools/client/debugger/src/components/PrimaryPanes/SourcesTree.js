@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 // Dependencies
 import React, { Component } from "react";
@@ -42,10 +42,6 @@ import {
 } from "../../utils/sources-tree";
 import { parse } from "../../utils/url";
 import { getRawSourceURL } from "../../utils/source";
-
-
-
-
 
 function shouldAutoExpand(depth, item, debuggeeUrl, projectRoot) {
   if (projectRoot != "" || depth !== 1) {
@@ -126,17 +122,17 @@ class SourcesTree extends Component {
     }
   }
 
-  selectItem = (item) => {
+  selectItem = item => {
     if (item.type == "source" && !Array.isArray(item.contents)) {
       this.props.selectSource(this.props.cx, item.contents.id);
     }
   };
 
-  onFocus = (item) => {
+  onFocus = item => {
     this.props.focusItem(item);
   };
 
-  onActivate = (item) => {
+  onActivate = item => {
     this.selectItem(item);
   };
 
@@ -146,7 +142,7 @@ class SourcesTree extends Component {
     return findSource(this.props, item.path, source);
   }
 
-  getPath = (item) => {
+  getPath = item => {
     const { path } = item;
     const source = this.getSource(item);
 
@@ -193,18 +189,11 @@ class SourcesTree extends Component {
     return sourceTree.contents;
   };
 
-  getChildren = (item) => {
+  getChildren = item => {
     return nodeHasChildren(item) ? item.contents : [];
   };
 
-  renderItem = (
-    item,
-    depth,
-    focused,
-    _,
-    expanded,
-    { setExpanded }
-  ) => {
+  renderItem = (item, depth, focused, _, expanded, { setExpanded }) => {
     const { debuggeeUrl, projectRoot, threads } = this.props;
 
     return (
@@ -236,7 +225,7 @@ class SourcesTree extends Component {
       expanded,
       focused,
       getChildren: this.getChildren,
-      getParent: (item) => parentMap.get(item),
+      getParent: item => parentMap.get(item),
       getPath: this.getPath,
       getRoots: () => this.getRoots(sourceTree, projectRoot),
       highlightItems,
@@ -282,11 +271,7 @@ class SourcesTree extends Component {
   }
 }
 
-function getSourceForTree(
-  state,
-  displayedSources,
-  source
-) {
+function getSourceForTree(state, displayedSources, source) {
   if (!source) {
     return null;
   }

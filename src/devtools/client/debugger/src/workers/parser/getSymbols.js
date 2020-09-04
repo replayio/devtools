@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import * as t from "@babel/types";
 
@@ -24,15 +24,6 @@ import {
 import { inferClassName } from "./utils/inferClassName";
 import getFunctionName from "./utils/getFunctionName";
 import { getFramework } from "./frameworks";
-
-
-
-
-
-
-
-
-
 
 let symbolDeclarations = new Map();
 
@@ -252,12 +243,7 @@ function extractSymbols(sourceId) {
   return symbols;
 }
 
-function extendSnippet(
-  name,
-  expression,
-  path,
-  prevPath
-) {
+function extendSnippet(name, expression, path, prevPath) {
   const computed = path && path.node.computed;
   const prevComputed = prevPath && prevPath.node.computed;
   const prevArray = t.isArrayExpression(prevPath);
@@ -344,11 +330,7 @@ function getArraySnippet(path, prevPath, expression) {
   return getSnippet(nextPath, nextPrevPath, extendedExpression);
 }
 
-function getSnippet(
-  path,
-  prevPath,
-  expression = ""
-) {
+function getSnippet(path, prevPath, expression = "") {
   if (!path) {
     return expression;
   }

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * A middleware which acts like a service, because it is stateful
@@ -52,7 +52,7 @@ export function waitUntilService({ dispatch, getState }) {
     }
   }
 
-  return (next) => (action) => {
+  return next => action => {
     if (action.type === NAME) {
       pending.push(action);
       return null;

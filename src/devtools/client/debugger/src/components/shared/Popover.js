@@ -2,16 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { Component } from "react";
 import classNames from "classnames";
 import BracketArrow from "./BracketArrow";
 import SmartGap from "./SmartGap";
 
 import "./Popover.css";
-
-
-
 
 class Popover extends Component {
   $popover;
@@ -87,12 +84,7 @@ class Popover extends Component {
     this.props.mouseout();
   };
 
-  calculateLeft(
-    target,
-    editor,
-    popover,
-    orientation
-  ) {
+  calculateLeft(target, editor, popover, orientation) {
     const estimatedLeft = target.left;
     const estimatedRight = estimatedLeft + popover.width;
     const isOverflowingRight = estimatedRight > editor.right;
@@ -106,11 +98,7 @@ class Popover extends Component {
     return estimatedLeft;
   }
 
-  calculateTopForRightOrientation = (
-    target,
-    editor,
-    popover
-  ) => {
+  calculateTopForRightOrientation = (target, editor, popover) => {
     if (popover.height <= editor.height) {
       const rightOrientationTop = target.top - popover.height / 2;
       if (rightOrientationTop < editor.top) {
@@ -138,12 +126,7 @@ class Popover extends Component {
     return "right";
   }
 
-  calculateTop = (
-    target,
-    editor,
-    popover,
-    orientation
-  ) => {
+  calculateTop = (target, editor, popover, orientation) => {
     if (orientation === "down") {
       return target.bottom;
     }

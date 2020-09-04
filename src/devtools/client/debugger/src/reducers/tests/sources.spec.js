@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import update, { initialSourcesState, getDisplayedSources } from "../sources";
 import { initialThreadsState } from "../threads";
@@ -33,7 +33,7 @@ const chromeExtensionSource = {
 
 const mockedSources = [extensionSource, firefoxExtensionSource, chromeExtensionSource];
 
-const mockSourceActors = ([
+const mockSourceActors = [
   {
     id: "extensionId-actor",
     actor: "extensionId-actor",
@@ -52,7 +52,7 @@ const mockSourceActors = ([
     source: "chromeExtension",
     thread: "foo",
   },
-]);
+];
 
 describe("sources reducer", () => {
   it("should work", () => {

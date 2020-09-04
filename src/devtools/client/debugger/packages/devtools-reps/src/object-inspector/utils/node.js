@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 const { maybeEscapePropertyName } = require("../../reps/rep-utils");
 const ArrayRep = require("../../reps/array");
@@ -32,7 +32,6 @@ const NODE_TYPES = {
   PROTOTYPE: Symbol("<prototype>"),
   BLOCK: Symbol("☲"),
 };
-
 
 let WINDOW_PROPERTIES = {};
 
@@ -437,11 +436,7 @@ function makeNumericalBuckets(parent) {
   return buckets;
 }
 
-function makeDefaultPropsBucket(
-  propertiesNames,
-  parent,
-  ownProperties
-) {
+function makeDefaultPropsBucket(propertiesNames, parent, ownProperties) {
   const userPropertiesNames = [];
   const defaultProperties = [];
 
@@ -473,11 +468,7 @@ function makeDefaultPropsBucket(
   return nodes;
 }
 
-function makeNodesForOwnProps(
-  propertiesNames,
-  parent,
-  ownProperties
-) {
+function makeNodesForOwnProps(propertiesNames, parent, ownProperties) {
   return propertiesNames.map(name => {
     const property = ownProperties[name];
 

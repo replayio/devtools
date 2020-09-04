@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
@@ -37,8 +37,6 @@ function FrameLocation({ frame, expanded }) {
 
 FrameLocation.displayName = "FrameLocation";
 
-
-
 export default class Group extends Component {
   toggleFrames;
 
@@ -70,7 +68,7 @@ export default class Group extends Component {
     );
   }
 
-  toggleFrames = (event) => {
+  toggleFrames = event => {
     event.stopPropagation();
     this.setState(prevState => ({ expanded: !prevState.expanded }));
   };

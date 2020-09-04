@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 export * from "./source-documents";
 export * from "./get-token-location";
@@ -14,7 +14,6 @@ import { createEditor } from "./create-editor";
 import { findNext, findPrev } from "./source-search";
 
 import { isWasm, lineToWasmOffset, wasmOffsetToLine } from "../wasm";
-
 
 let editor;
 
@@ -53,13 +52,7 @@ export function endOperation() {
   codeMirror.endOperation();
 }
 
-export function traverseResults(
-  e,
-  ctx,
-  query,
-  dir,
-  modifiers
-) {
+export function traverseResults(e, ctx, query, dir, modifiers) {
   e.stopPropagation();
   e.preventDefault();
 
@@ -191,11 +184,7 @@ export function lineAtHeight({ codeMirror }, sourceId, event) {
   return toSourceLine(sourceId, _editorLine);
 }
 
-export function getSourceLocationFromMouseEvent(
-  { codeMirror },
-  source,
-  e
-) {
+export function getSourceLocationFromMouseEvent({ codeMirror }, source, e) {
   const { line, ch } = codeMirror.coordsChar({
     left: e.clientX,
     top: e.clientY,

@@ -42,7 +42,7 @@
  * );
  */
 
-// 
+//
 
 import { Telemetry } from "devtools-modules";
 import { isFirefoxPanel } from "devtools-environment";

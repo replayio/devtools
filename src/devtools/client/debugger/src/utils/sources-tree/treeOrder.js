@@ -2,13 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { parse } from "../url";
 
 import { nodeHasChildren } from "./utils";
-
-
 
 /*
  * Gets domain from url (without www prefix)
@@ -93,14 +91,8 @@ const matcherFunctions = [isIndexName, isExactDomainMatch];
  * - hosts/directories (not files) sorted by name
  * - files sorted by name
  */
-export function createTreeNodeMatcher(
-  part,
-  isDir,
-  debuggeeHost,
-  source,
-  sortByUrl
-) {
-  return (node) => {
+export function createTreeNodeMatcher(part, isDir, debuggeeHost, source, sortByUrl) {
+  return node => {
     for (let i = 0; i < matcherFunctions.length; i++) {
       // Check part against exceptions
       if (matcherFunctions[i](part, debuggeeHost)) {

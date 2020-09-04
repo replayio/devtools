@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 
@@ -10,8 +10,6 @@ import actions from "../../actions";
 import assert from "../../utils/assert";
 import { connect } from "../../utils/connect";
 import InlinePreview from "./InlinePreview";
-
-
 
 import "./InlinePreview.css";
 
@@ -65,7 +63,7 @@ class InlinePreviewRow extends PureComponent {
 
     ReactDOM.render(
       <React.Fragment>
-        {previews.map((preview) => (
+        {previews.map(preview => (
           <InlinePreview
             line={line}
             key={`${line}-${preview.name}`}

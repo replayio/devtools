@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 /* eslint complexity: ["error", 35]*/
 
 /**
@@ -14,8 +14,6 @@ import { prefs } from "../utils/prefs";
 import { getSelectedSourceId } from "./sources";
 import { getSelectedFrame, getFramePositions } from "../selectors/pause";
 import { findLast, find } from "lodash";
-
-
 
 // Pause state associated with an individual thread.
 
@@ -461,13 +459,7 @@ export function getSelectedInlinePreviews(state) {
   return getInlinePreviews(state, thread, frameId);
 }
 
-export function getInlinePreviewExpression(
-  state,
-  thread,
-  frameId,
-  line,
-  expression
-) {
+export function getInlinePreviewExpression(state, thread, frameId, line, expression) {
   const previews = getThreadPauseState(state.pause, thread).inlinePreview[frameId];
   return previews && previews[line] && previews[line][expression];
 }

@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
-import { asSettled, } from "../utils/async-value";
+import { asSettled } from "../utils/async-value";
 import {
   createInitial,
   insertResources,
@@ -20,14 +20,9 @@ import {
 
 import { asyncActionAsValue } from "../actions/utils/middleware/promise";
 
-
-
 const initial = createInitial();
 
-export default function update(
-  state = initial,
-  action
-) {
+export default function update(state = initial, action) {
   switch (action.type) {
     case "INSERT_SOURCE_ACTORS": {
       const { items } = action;
@@ -81,10 +76,7 @@ function clearSourceActorMapURL(state, id) {
   ]);
 }
 
-function updateBreakpointColumns(
-  state,
-  action
-) {
+function updateBreakpointColumns(state, action) {
   const { sourceId, line } = action;
   const value = asyncActionAsValue(action);
 
@@ -98,10 +90,7 @@ function updateBreakpointColumns(
   return updateResources(state, [{ id: sourceId, breakpointPositions }]);
 }
 
-function updateBreakableLines(
-  state,
-  action
-) {
+function updateBreakableLines(state, action) {
   const value = asyncActionAsValue(action);
   const { sourceId } = action;
 
@@ -112,11 +101,7 @@ function updateBreakableLines(
   return updateResources(state, [{ id: sourceId, breakableLines: value }]);
 }
 
-export function resourceAsSourceActor({
-  breakpointPositions,
-  breakableLines,
-  ...sourceActor
-}) {
+export function resourceAsSourceActor({ breakpointPositions, breakableLines, ...sourceActor }) {
   return sourceActor;
 }
 
@@ -140,14 +125,9 @@ export function getSourceActor(state, id) {
  * Get all of the source actors for a set of IDs. Caches based on the identity
  * of "ids" when possible.
  */
-const querySourceActorsById = makeIdQuery(
-  resourceAsSourceActor
-);
+const querySourceActorsById = makeIdQuery(resourceAsSourceActor);
 
-export function getSourceActors(
-  state,
-  ids
-) {
+export function getSourceActors(state, ids) {
   return querySourceActorsById(state.sourceActors, ids);
 }
 
@@ -158,10 +138,7 @@ const querySourcesByThreadID = makeReduceAllQuery(resourceAsSourceActor, actors 
     return acc;
   }, {});
 });
-export function getSourceActorsForThread(
-  state,
-  ids
-) {
+export function getSourceActorsForThread(state, ids) {
   const sourcesByThread = querySourcesByThreadID(state.sourceActors);
 
   let sources = [];
@@ -186,26 +163,17 @@ const queryThreadsBySourceObject = makeReduceAllQuery(
     }, {})
 );
 
-export function getAllThreadsBySource(
-  state
-) {
+export function getAllThreadsBySource(state) {
   return queryThreadsBySourceObject(state.sourceActors);
 }
 
-export function getSourceActorBreakableLines(
-  state,
-  id
-) {
+export function getSourceActorBreakableLines(state, id) {
   const { breakableLines } = getResource(state.sourceActors, id);
 
   return asSettled(breakableLines);
 }
 
-export function getSourceActorBreakpointColumns(
-  state,
-  id,
-  line
-) {
+export function getSourceActorBreakpointColumns(state, id, line) {
   const { breakpointPositions } = getResource(state.sourceActors, id);
 
   return asSettled(breakpointPositions.get(line) || null);

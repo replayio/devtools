@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 /**
  * Redux actions for breakpoints
@@ -23,7 +23,6 @@ import { addBreakpoint, removeBreakpoint, enableBreakpoint, disableBreakpoint } 
 import remapLocations from "./remapLocations";
 
 // this will need to be changed so that addCLientBreakpoint is removed
-
 
 export * from "./breakpointPositions";
 export * from "./modify";
@@ -95,11 +94,7 @@ export function toggleAllBreakpoints(cx, shouldDisableBreakpoints) {
  * @memberof actions/breakpoints
  * @static
  */
-export function toggleBreakpoints(
-  cx,
-  shouldDisableBreakpoints,
-  breakpoints
-) {
+export function toggleBreakpoints(cx, shouldDisableBreakpoints, breakpoints) {
   return async ({ dispatch }) => {
     const promises = breakpoints.map(breakpoint =>
       shouldDisableBreakpoints
@@ -111,11 +106,7 @@ export function toggleBreakpoints(
   };
 }
 
-export function toggleBreakpointsAtLine(
-  cx,
-  shouldDisableBreakpoints,
-  line
-) {
+export function toggleBreakpointsAtLine(cx, shouldDisableBreakpoints, line) {
   return async ({ dispatch, getState }) => {
     const breakpoints = getBreakpointsAtLine(getState(), line);
     return dispatch(toggleBreakpoints(cx, shouldDisableBreakpoints, breakpoints));
@@ -205,12 +196,7 @@ export function toggleBreakpointAtLine(cx, line) {
   };
 }
 
-export function addBreakpointAtLine(
-  cx,
-  line,
-  shouldLog = false,
-  disabled = false
-) {
+export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = false) {
   return ({ dispatch, getState, client, sourceMaps }) => {
     const state = getState();
     const source = getSelectedSource(state);
