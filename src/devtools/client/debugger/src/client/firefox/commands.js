@@ -2,15 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { prepareSourcePayload, createThread, createFrame } from "./create";
 import { updateTargets } from "./targets";
 import { clientEvents } from "./events";
 
 import Reps from "devtools-reps";
-
-
 
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const {
@@ -29,7 +27,6 @@ let devToolsClient;
 let sourceActors;
 let breakpoints;
 let eventBreakpoints;
-
 
 function setupCommands(dependencies) {
   devToolsClient = dependencies.devToolsClient;
@@ -86,7 +83,7 @@ function getTargetsMap() {
 }
 
 function listThreadFronts() {
-  const targetList = (Object.values(getTargetsMap()));
+  const targetList = Object.values(getTargetsMap());
   return targetList.map(target => target.threadFront).filter(t => !!t);
 }
 
@@ -122,10 +119,7 @@ function breakOnNext(thread) {
   return lookupThreadFront(thread).breakOnNext();
 }
 
-async function sourceContents({
-  actor,
-  thread,
-}) {
+async function sourceContents({ actor, thread }) {
   const threadFront = lookupThreadFront(thread);
   const { scriptSource, contentType } = await threadFront.getScriptSource(actor);
   return { source: scriptSource, contentType };
@@ -207,8 +201,8 @@ function setBreakpoint(location, options) {
 }
 
 function removeBreakpoint(location) {
-  maybeClearLogpoint((location));
-  delete breakpoints[locationKey((location))];
+  maybeClearLogpoint(location);
+  delete breakpoints[locationKey(location)];
 
   const { line, column, sourceUrl, sourceId } = location;
   if (sourceId) {
@@ -221,11 +215,7 @@ async function evaluateExpressions(scripts, options) {
   return Promise.all(scripts.map(script => evaluate(script, options)));
 }
 
-
-async function evaluate(
-  script,
-  { thread, asyncIndex, frameId } = {}
-) {
+async function evaluate(script, { thread, asyncIndex, frameId } = {}) {
   const threadFront = lookupThreadFront(thread);
   const { returned, exception, failed } = await threadFront.evaluate(asyncIndex, frameId, script);
   if (failed) {
@@ -274,9 +264,7 @@ function getProperties(thread, grip) {
 
 async function getFrames(thread) {
   const frames = await lookupThreadFront(thread).getFrames();
-  return Promise.all(
-    frames.map((frame, i) => createFrame(thread, frame, i))
-  );
+  return Promise.all(frames.map((frame, i) => createFrame(thread, frame, i)));
 }
 
 async function loadAsyncParentFrames(thread, asyncIndex) {
@@ -308,11 +296,7 @@ async function getFrameScopes(frame) {
   return converted[0];
 }
 
-async function blackBox(
-  sourceActor,
-  isBlackBoxed,
-  range
-) {
+async function blackBox(sourceActor, isBlackBoxed, range) {
   const begin = range ? range.start : undefined;
   const end = range ? range.end : undefined;
   if (isBlackBoxed) {
@@ -374,7 +358,7 @@ async function getSources(client) {
 
 function getAllThreadFronts() {
   const fronts = [currentThreadFront];
-  for (const { threadFront } of (Object.values(targets))) {
+  for (const { threadFront } of Object.values(targets)) {
     fronts.push(threadFront);
   }
   return fronts;
@@ -427,29 +411,21 @@ async function fetchThreads() {
   });
 
   // eslint-disable-next-line
-  return (Object.entries(targets).map)(([actor, target]) =>
-    createThread((actor), (target))
-  );
+  return Object.entries(targets).map(([actor, target]) => createThread(actor, target));
 }
 
 function getMainThread() {
   return currentThreadFront.actor;
 }
 
-async function getSourceActorBreakpointPositions(
-  { thread, actor },
-  range
-) {
+async function getSourceActorBreakpointPositions({ thread, actor }, range) {
   const linePositions = await ThreadFront.getBreakpointPositionsCompressed(actor, range);
   const rv = {};
   linePositions.forEach(({ line, columns }) => (rv[line] = columns));
   return rv;
 }
 
-async function getSourceActorBreakableLines({
-  thread,
-  actor,
-}) {
+async function getSourceActorBreakableLines({ thread, actor }) {
   const positions = await ThreadFront.getBreakpointPositionsCompressed(actor);
   return positions.map(({ line }) => line);
 }
