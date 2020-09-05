@@ -4,6 +4,8 @@
 
 "use strict";
 
+const CodeMirror = require("codemirror");
+
 const {
   EXPAND_TAB,
   TAB_SIZE,
@@ -329,27 +331,27 @@ Editor.prototype = {
         this.config.cssProperties
       );
 
-      const cssSpec = win.CodeMirror.resolveMode("text/css");
+      const cssSpec = CodeMirror.resolveMode("text/css");
       cssSpec.propertyKeywords = propertyKeywords;
       cssSpec.colorKeywords = colorKeywords;
       cssSpec.valueKeywords = valueKeywords;
-      win.CodeMirror.defineMIME("text/css", cssSpec);
+      CodeMirror.defineMIME("text/css", cssSpec);
 
-      const scssSpec = win.CodeMirror.resolveMode("text/x-scss");
+      const scssSpec = CodeMirror.resolveMode("text/x-scss");
       scssSpec.propertyKeywords = propertyKeywords;
       scssSpec.colorKeywords = colorKeywords;
       scssSpec.valueKeywords = valueKeywords;
-      win.CodeMirror.defineMIME("text/x-scss", scssSpec);
+      CodeMirror.defineMIME("text/x-scss", scssSpec);
     }
 
-    win.CodeMirror.commands.save = () => this.emit("saveRequested");
+    CodeMirror.commands.save = () => this.emit("saveRequested");
 
     // Create a CodeMirror instance add support for context menus,
     // overwrite the default controller (otherwise items in the top and
     // context menus won't work).
 
-    const cm = win.CodeMirror(el, this.config);
-    this.Doc = win.CodeMirror.Doc;
+    const cm = CodeMirror(el, this.config);
+    this.Doc = CodeMirror.Doc;
 
     // Disable APZ for source editors. It currently causes the line numbers to
     // "tear off" and swim around on top of the content. Bug 1160601 tracks
@@ -409,7 +411,7 @@ Editor.prototype = {
       this.emit("gutterClick", lineOrOffset, ev.button);
     });
 
-    win.CodeMirror.defineExtension("l10n", name => {
+    CodeMirror.defineExtension("l10n", name => {
       return L10N.getStr(name);
     });
 
@@ -417,7 +419,7 @@ Editor.prototype = {
       this._initSearchShortcuts(win);
     } else {
       // Hotfix for Bug 1527898. We should remove those overrides as part of Bug 1527903.
-      Object.assign(win.CodeMirror.commands, {
+      Object.assign(CodeMirror.commands, {
         find: null,
         findPersistent: null,
         findPersistentNext: null,

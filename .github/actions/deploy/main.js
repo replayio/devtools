@@ -21,7 +21,6 @@ upload("dist/parserWorker.js.map");
 upload("dist/searchWorker.js");
 upload("dist/searchWorker.js.map");
 
-upload("src/devtools/client/shared/sourceeditor/codemirror/codemirror.bundle.js");
 upload("src/devtools/client/shared/vendor/whatwg-url.js");
 
 invalidateCloudFront();
