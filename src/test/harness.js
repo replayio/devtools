@@ -530,10 +530,19 @@ function getAppliedRulesJSON() {
 }
 
 async function checkAppliedRules(expected) {
+  await ensurePseudoElementRulesExpanded();
   await waitUntil(() => {
     const json = getAppliedRulesJSON();
     return JSON.stringify(json) == JSON.stringify(expected);
   });
+}
+
+async function ensurePseudoElementRulesExpanded() {
+  const header = document.getElementById("rules-section-pseudoelement-header");
+  if (header && header.getAttribute("aria-expanded") != "true") {
+    header.click();
+    await waitUntil(() => header.getAttribute("aria-expanded") == "true");
+  }
 }
 
 module.exports = {
