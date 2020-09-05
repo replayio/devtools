@@ -20,8 +20,6 @@ import FullStory from "ui/utils/fullstory";
 import ScrollContainer from "ui/components/Timeline/ScrollContainer";
 
 const {
-  screenshotCache,
-  getMostRecentPaintPoint,
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
   nextPaintEvent,
@@ -34,7 +32,6 @@ const { assert } = require("protocol/utils");
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
-import { features } from "../../utils/prefs";
 import Message from "./Message";
 
 import { LocalizationHelper } from "devtools/shared/l10n";
@@ -127,7 +124,6 @@ export class Timeline extends Component {
 
   async componentDidMount() {
     this.props.updateTimelineDimensions();
-    this.threadFront.ensureProcessed(this.onMissingRegions, this.onUnprocessedRegions);
 
     const consoleFrame = this.console.hud.ui;
     consoleFrame.on("message-hover", this.onConsoleMessageHover);
@@ -176,15 +172,6 @@ export class Timeline extends Component {
     const clickPosition = (clickLeft - left) / width;
     return Math.ceil(this.zoomStartTime + (this.zoomEndTime - this.zoomStartTime) * clickPosition);
   }
-
-  onMissingRegions = regions => {
-    log(`MissingRegions ${JSON.stringify(regions)}`);
-  };
-
-  onUnprocessedRegions = ({ regions }) => {
-    log(`UnprocessedRegions ${JSON.stringify(regions)}`);
-    this.props.setTimelineState({ unprocessedRegions: regions, loaded: regions.length == 0 });
-  };
 
   onConsoleUpdate = consoleState => {
     const {

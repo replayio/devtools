@@ -24,10 +24,11 @@ const { ThreadFront } = require("protocol/thread");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap");
 const FullStory = require("ui/utils/fullstory").default;
-const { setupTimeline } = require("./ui/actions/timeline");
-const { setupMetadata } = require("./ui/actions/metadata");
+const { setupTimeline } = require("ui/actions/timeline");
+const { setupMetadata } = require("ui/actions/metadata");
+const { setupApp } = require("ui/actions/app");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
-const { prefs } = require("./ui/utils/prefs");
+const { prefs } = require("ui/utils/prefs");
 
 // Create a session to use while debugging.
 async function createSession() {
@@ -131,6 +132,7 @@ setTimeout(async () => {
   }
 
   store = await bootstrapApp({ initialize }, { recordingId });
+  setupApp(recordingId, store);
   setupTimeline(recordingId, store);
   setupMetadata(recordingId, store);
   setupEventListeners(recordingId, store);
