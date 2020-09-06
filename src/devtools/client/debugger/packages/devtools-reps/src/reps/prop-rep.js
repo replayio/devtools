@@ -50,11 +50,11 @@ function PropRep(props) {
     if (!suppressQuotes) {
       name = maybeEscapePropertyName(name);
     }
-    key = span({ className: "nodeName", key: `nodeName-${props.key}` }, name);
+    key = span({ className: "nodeName", key: `nodeName-${name}` }, name);
   } else {
     key = Rep({
       ...props,
-      key: `nodeName-${props.key}`,
+      key: `nodeName-${name}`,
       className: "nodeName",
       object: name,
       mode: mode || MODE.TINY,
@@ -67,11 +67,11 @@ function PropRep(props) {
     span(
       {
         className: "objectEqual",
-        key: `objectEqual-${props.key}`,
+        key: `objectEqual-${name}`,
       },
       equal
     ),
-    span({ key: `rep-${props.key}` }, Rep({ ...props })),
+    span({ key: `rep-${name}` }, Rep({ ...props })),
   ];
 }
 
