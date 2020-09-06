@@ -37,9 +37,8 @@ export class ParserDispatcher extends WorkerDispatcher {
   async setSource(sourceId, content) {
     const astSource = {
       id: sourceId,
-      text: content.type === "wasm" ? "" : content.value,
+      text: content.value,
       contentType: content.contentType || null,
-      isWasm: content.type === "wasm",
     };
 
     log(`WorkerDispatch Parser setSource`);

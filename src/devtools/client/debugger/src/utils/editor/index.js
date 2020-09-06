@@ -13,8 +13,6 @@ export { onMouseOver } from "./token-events";
 import { createEditor } from "./create-editor";
 import { findNext, findPrev } from "./source-search";
 
-import { isWasm, lineToWasmOffset, wasmOffsetToLine } from "../wasm";
-
 let editor;
 
 export function getEditor() {
@@ -64,26 +62,17 @@ export function traverseResults(e, ctx, query, dir, modifiers) {
 }
 
 export function toEditorLine(sourceId, lineOrOffset) {
-  if (isWasm(sourceId)) {
-    // TODO ensure offset is always "mappable" to edit line.
-    return wasmOffsetToLine(sourceId, lineOrOffset) || 0;
-  }
-
   return lineOrOffset ? lineOrOffset - 1 : 1;
 }
 
 export function fromEditorLine(sourceId, line) {
-  if (isWasm(sourceId)) {
-    return lineToWasmOffset(sourceId, line) || 0;
-  }
-
   return line + 1;
 }
 
 export function toEditorPosition(location) {
   return {
     line: toEditorLine(location.sourceId, location.line),
-    column: isWasm(location.sourceId) || !location.column ? 0 : location.column,
+    column: !location.column ? 0 : location.column,
   };
 }
 
@@ -96,7 +85,7 @@ export function toEditorRange(sourceId, location) {
 }
 
 export function toSourceLine(sourceId, line) {
-  return isWasm(sourceId) ? lineToWasmOffset(sourceId, line) : line + 1;
+  return line + 1;
 }
 
 export function scrollToColumn(codeMirror, line, column) {
@@ -194,7 +183,7 @@ export function getSourceLocationFromMouseEvent({ codeMirror }, source, e) {
   return {
     sourceId,
     line: fromEditorLine(sourceId, line),
-    column: isWasm(sourceId) ? 0 : ch + 1,
+    column: ch + 1,
   };
 }
 

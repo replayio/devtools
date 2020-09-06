@@ -15,11 +15,8 @@ import { endTruncateStr } from "./utils";
 import { truncateMiddleText } from "../utils/text";
 import { parse as parseURL } from "../utils/url";
 import { memoizeLast } from "../utils/memoizeLast";
-import { renderWasmText } from "./wasm";
-import { toEditorLine } from "./editor";
 export { isMinified } from "./isMinified";
 import { getURL, getFileExtension } from "./sources-tree";
-import { features } from "./prefs";
 
 import { isFulfilled } from "./async-value";
 
@@ -74,7 +71,7 @@ export function shouldBlackbox(source) {
  */
 export function isJavaScript(source, content) {
   const extension = getFileExtension(source).toLowerCase();
-  const contentType = content.type === "wasm" ? null : content.contentType;
+  const contentType = content.contentType;
   return (
     javascriptLikeExtensions.includes(extension) ||
     !!(contentType && contentType.includes("javascript"))
@@ -244,7 +241,6 @@ const contentTypeModeMap = {
   "text/x-elm": { name: "elm" },
   "text/x-clojure": { name: "clojure" },
   "text/x-clojurescript": { name: "clojure" },
-  "text/wasm": { name: "text" },
   "text/html": { name: "htmlmixed" },
 };
 
@@ -263,11 +259,6 @@ export function getSourcePath(url) {
  * the function returns amount of bytes.
  */
 export function getSourceLineCount(content) {
-  if (content.type === "wasm") {
-    const { binary } = content.value;
-    return binary.length;
-  }
-
   let count = 0;
 
   for (let i = 0; i < content.value.length; ++i) {
@@ -358,7 +349,7 @@ export function getMode(source, content, symbols) {
     return contentTypeModeMap["text/typescript"];
   }
 
-  if (/script|elm|jsx|clojure|wasm|html/.test(contentType)) {
+  if (/script|elm|jsx|clojure|html/.test(contentType)) {
     if (contentType in contentTypeModeMap) {
       return contentTypeModeMap[contentType];
     }
@@ -383,12 +374,6 @@ export const getLineText = memoizeLast((sourceId, asyncContent, line) => {
   }
 
   const content = asyncContent.value;
-
-  if (content.type === "wasm") {
-    const editorLine = toEditorLine(sourceId, line);
-    const lines = renderWasmText(sourceId, content);
-    return lines[editorLine] || "";
-  }
 
   const lineText = content.value.split("\n")[line - 1];
   return lineText || "";

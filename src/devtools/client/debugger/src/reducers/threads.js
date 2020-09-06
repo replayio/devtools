@@ -94,10 +94,6 @@ export function getCanRewind(state) {
   return state.threads.traits.canRewind;
 }
 
-export function supportsWasm(state) {
-  return features.wasm && state.threads.traits.wasmBinarySource;
-}
-
 // checks if a path begins with a thread actor
 // e.g "server1.conn0.child1/workerTarget22/context1/dbg-workers.glitch.me"
 export function startsWithThreadActor(state, path) {

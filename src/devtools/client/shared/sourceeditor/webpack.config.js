@@ -29,7 +29,6 @@ module.exports = (env, argv) => {
       "./codemirror/mode/elm/elm.js",
       "./codemirror/mode/clike/clike.js",
       "./codemirror/mode/rust/rust.js",
-      "./codemirror/mode/wasm/wasm.js",
       "./codemirror/addon/selection/active-line.js",
       "./codemirror/addon/edit/trailingspace.js",
       "./codemirror/addon/fold/foldcode.js",

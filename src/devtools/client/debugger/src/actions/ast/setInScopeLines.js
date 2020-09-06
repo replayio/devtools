@@ -25,7 +25,7 @@ async function getInScopeLines(cx, location, { dispatch, getState, parser }) {
   const source = getSourceWithContent(getState(), location.sourceId);
 
   let locations = null;
-  if (location.line && source && !source.isWasm) {
+  if (location.line && source) {
     locations = await parser.findOutOfScopeLocations(source.id, location);
   }
 
