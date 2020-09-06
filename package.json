@@ -20,7 +20,6 @@
     "@fullstory/browser": "^1.4.4",
     "@sentry/apm": "^5.21.1",
     "@sentry/react": "^5.21.1",
-    "antd": "^4.6.2",
     "autoprefixer": "^9.7.6",
     "babel-loader": "^8.1.0",
     "classnames": "^2.2.6",

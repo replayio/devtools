@@ -5,9 +5,7 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import LoginButton from "ui/components/LoginButton";
 import Avatar from "ui/components/Avatar";
-import { Progress } from "antd";
 import "./Header.css";
-import "antd/dist/antd.css";
 
 import { features } from "ui/utils/prefs";
 import { string } from "prop-types";
@@ -44,26 +42,6 @@ class Header extends React.Component {
     );
   }
 
-  // renderStatus() {
-  //   const { status } = this.props;
-  //   console.log("check status", status);
-
-  //   if (!status) return null;
-  //   if (typeof status === "string") return status;
-  //   console.log(typeof status);
-  //   const { type, message } = status;
-  //   console.log("returning a message", message);
-  //   // opportunity to style error status' differently in the future
-  //   if (type === "message" || type === "error") return message;
-
-  //   if (type === "upload")
-  //     return lengthMB ? (
-  //       <Progress type="circle" percent={(uploadedMB / lengthMB) * 100} width={40} />
-  //     ) : (
-  //       `Waiting for upload… ${uploadedMB} MB`
-  //     );
-  // }
-
   render() {
     const { loading, uploading } = this.props;
     const isLoaded = loading == 100;
@@ -75,8 +53,10 @@ class Header extends React.Component {
       <>
         <div id="header">
           <div className="logo"></div>
+          {/* NOTE: Should we use the app state to set this status rather than relying on `innerText`? */}
           <div id="status"></div>
-          {uploading && <div id="upload">{upload}</div>}
+          {/* NOTE: This needs a way to determine when the upload is completed: specifically when there is no `totalMB` */}
+          {uploading && <div className="upload-status">{upload}</div>}
           <div className="links">
             <a id="headway" onClick={this.toggleHeadway}>
               What&apos;s new

@@ -16,11 +16,13 @@
   background-size: contain;
 }
 
-#status {
+#status,
+.loading-status {
   padding-left: 10px;
   flex-grow: 1;
   color: var(--theme-comment);
   font-size: 1.1rem;
+  margin-right: auto;
 }
 
 #header .links {

@@ -57,6 +57,7 @@ class App extends React.Component {
       hideComments,
       updateTimelineDimensions,
       loading,
+      uploading,
       initialize,
     } = this.props;
     const { orientation } = this.state;
@@ -77,7 +78,7 @@ class App extends React.Component {
 
     return (
       <>
-        <Header loading={loading} />
+        <Header loading={loading} uploading={uploading} />
         <Comments />
         {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
         <SplitBox
