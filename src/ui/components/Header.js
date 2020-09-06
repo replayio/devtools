@@ -45,15 +45,15 @@ class Header extends React.Component {
   render() {
     const { loading, uploading } = this.props;
     const isLoaded = loading == 100;
-    const upload = uploading?.totalMb
-      ? `${(uploading?.uploadedMb / uploading?.totalMB) * 100}%`
+    const upload = uploading?.totalMB
+      ? `${(uploading?.uploadedMB / uploading?.totalMB) * 100}%`
       : `${uploading?.uploadedMB}MB`;
 
     return (
       <>
         <div id="header">
           <div className="logo"></div>
-          {/* NOTE: Should we use the app state to set this status rather than relying on `innerText`? */}
+          {/* NOTE: Should we use the app state to set this status rather than relying on `element.innerText`? */}
           <div id="status"></div>
           {/* NOTE: This needs a way to determine when the upload is completed: specifically when there is no `totalMB` */}
           {uploading && <div className="upload-status">{upload}</div>}

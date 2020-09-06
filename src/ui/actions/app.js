@@ -10,7 +10,6 @@ export function setupApp(_, store) {
   );
 
   const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 500);
-  ``;
 }
 
 function bumpLoading() {
@@ -52,7 +51,5 @@ export function setSelectedPanel(panel) {
 }
 
 export function setUploading(upload) {
-  console.log("setting the status", upload);
-
   return { type: "uploading", upload };
 }

@@ -25,8 +25,8 @@ export default function update(state = initialAppState(), action) {
       return { ...state, splitConsoleOpen: action.splitConsole };
     }
 
-    case "set_status": {
-      return { ...state, status: action.status };
+    case "uploading": {
+      return { ...state, status: action.upload };
     }
 
     case "loading": {
