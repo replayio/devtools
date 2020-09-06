@@ -12,7 +12,6 @@ import {
   removeOverlay,
   searchSourceForHighlight,
 } from "../utils/editor";
-import { renderWasmText } from "../utils/wasm";
 import { getMatches } from "../workers/search";
 
 import {
@@ -97,13 +96,7 @@ export function searchContents(cx, query, editor, focusFirstResult = true) {
       return;
     }
 
-    let text;
-    if (selectedContent.type === "wasm") {
-      text = renderWasmText(selectedSource.id, selectedContent).join("\n");
-    } else {
-      text = selectedContent.value;
-    }
-
+    const text = selectedContent.value;
     const matches = await getMatches(query, text, modifiers);
 
     const res = find(ctx, query, true, modifiers, focusFirstResult);

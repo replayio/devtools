@@ -15,7 +15,6 @@ export function findFunctionText(line, source, symbols) {
   });
 
   if (
-    source.isWasm ||
     !func ||
     !source.content ||
     !isFulfilled(source.content) ||

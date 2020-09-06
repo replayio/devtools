@@ -22,7 +22,6 @@ function makeMockSource(url = "url", id = "source") {
     relativeUrl: url,
     introductionUrl: null,
     introductionType: undefined,
-    isWasm: false,
     extensionName: null,
     isExtension: false,
     isOriginal: id.includes("originalSource"),
@@ -54,34 +53,6 @@ function makeMockSourceAndContent(url, id, contentType = "text/javascript", text
       value: text,
       contentType,
     },
-  };
-}
-
-function makeMockWasmSource() {
-  return {
-    id: "wasm-source-id",
-    url: "url",
-    isBlackBoxed: false,
-    isPrettyPrinted: false,
-    relativeUrl: "url",
-    introductionUrl: null,
-    introductionType: undefined,
-    isWasm: true,
-    extensionName: null,
-    isExtension: false,
-    isOriginal: false,
-  };
-}
-
-function makeMockWasmSourceWithContent(text) {
-  const source = makeMockWasmSource();
-
-  return {
-    ...source,
-    content: asyncValue.fulfilled({
-      type: "wasm",
-      value: text,
-    }),
   };
 }
 
@@ -182,8 +153,6 @@ export {
   makeMockSource,
   makeMockSourceWithContent,
   makeMockSourceAndContent,
-  makeMockWasmSource,
-  makeMockWasmSourceWithContent,
   makeMockScope,
   mockScopeAddVariable,
   makeMockBreakpoint,

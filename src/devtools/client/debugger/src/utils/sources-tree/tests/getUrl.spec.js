@@ -17,7 +17,6 @@ function createMockSource(props) {
         sourceMapURL: "",
         isBlackBoxed: false,
         isPrettyPrinted: false,
-        isWasm: false,
       },
       props
     ),

@@ -10,7 +10,6 @@ import sourceQueue from "../utils/source-queue";
 import { updateThreads } from "./threads";
 import { evaluateExpressions } from "./expressions";
 
-import { clearWasmStates } from "../utils/wasm";
 import { getMainThread, getThreadContext } from "../selectors";
 
 /**
@@ -26,7 +25,6 @@ export function willNavigate(event) {
   return async function ({ dispatch, getState, client, sourceMaps, parser }) {
     sourceQueue.clear();
     sourceMaps.clearSourceMaps();
-    clearWasmStates();
     clearDocuments();
     parser.clear();
     const thread = getMainThread(getState());

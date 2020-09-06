@@ -136,12 +136,8 @@ export function editorMenuItems({
     continueToHereItem(cx, location, isPaused, editorActions),
     { type: "separator" },
     ...(content ? [copyToClipboardItem(content, editorActions)] : []),
-    ...(!selectedSource.isWasm
-      ? [
-          copySourceItem(selectedSource, selectionText, editorActions),
-          copySourceUri2Item(selectedSource, editorActions),
-        ]
-      : []),
+    copySourceItem(selectedSource, selectionText, editorActions),
+    copySourceUri2Item(selectedSource, editorActions),
     ...(content ? [downloadFileItem(selectedSource, content, editorActions)] : []),
     { type: "separator" },
     showSourceMenuItem(cx, selectedSource, editorActions),

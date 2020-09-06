@@ -51,7 +51,6 @@ export function populateSource(name, type) {
     id: source.id,
     text: content.value,
     contentType: content.contentType,
-    isWasm: false,
   });
   return {
     ...source,
@@ -75,7 +74,6 @@ export function populateOriginalSource(name, type) {
     id: source.id,
     text: content.value,
     contentType: content.contentType,
-    isWasm: false,
   });
   return {
     ...source,

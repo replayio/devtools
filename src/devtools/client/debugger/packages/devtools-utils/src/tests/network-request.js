@@ -20,16 +20,6 @@ describe("network request", () => {
     expect(res).toEqual({ content: "Yay" });
   });
 
-  it("wasm successful fetch", async () => {
-    global.fetch.mockImplementation(async () => ({
-      status: 200,
-      headers: { get: () => "application/wasm" },
-      arrayBuffer: async () => "Yay",
-    }));
-    const res = await networkRequest("foo");
-    expect(res).toEqual({ content: "Yay", isDwarf: true });
-  });
-
   it("failed fetch", async () => {
     global.fetch.mockImplementation(async () => ({
       status: 400,

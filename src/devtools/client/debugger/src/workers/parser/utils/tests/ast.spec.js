@@ -20,7 +20,6 @@ cases(
       id: source.id,
       text: source.content.value || "",
       contentType: source.content.contentType,
-      isWasm: false,
     });
     const ast = getAst("foo");
     expect(ast && Object.keys(ast)).toEqual(astKeys);

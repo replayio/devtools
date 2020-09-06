@@ -78,7 +78,7 @@ async function loadSourceTextPromise(
   }
   const content = getSourceContent(getState(), newSource.id);
 
-  if (!newSource.isWasm && content) {
+  if (content) {
     parser.setSource(
       newSource.id,
       isFulfilled(content) ? content.value : { type: "text", value: "", contentType: undefined }

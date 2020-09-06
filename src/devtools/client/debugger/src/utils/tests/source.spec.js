@@ -350,13 +350,6 @@ describe("sources", () => {
       expect(getMode(source, source.content)).toEqual({ name: "coffeescript" });
     });
 
-    it("wasm", () => {
-      const source = makeMockWasmSourceWithContent({
-        binary: "\x00asm\x01\x00\x00\x00",
-      });
-      expect(getMode(source, source.content.value)).toEqual({ name: "text" });
-    });
-
     it("marko", () => {
       const source = makeMockSourceAndContent(
         "http://localhost.com:7999/increment/sometestfile.marko",
@@ -389,13 +382,6 @@ describe("sources", () => {
   });
 
   describe("getSourceLineCount", () => {
-    it("should give us the amount bytes for wasm source", () => {
-      const { content } = makeMockWasmSourceWithContent({
-        binary: "\x00asm\x01\x00\x00\x00",
-      });
-      expect(getSourceLineCount(content.value)).toEqual(8);
-    });
-
     it("should give us the amout of lines for js source", () => {
       const { content } = makeMockSourceWithContent(
         undefined,
