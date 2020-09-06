@@ -4,6 +4,7 @@
   height: 40px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   flex-shrink: 0;
   padding: 0 8px;
 }
@@ -15,7 +16,7 @@
   background-size: contain;
 }
 
-.status {
+#status {
   padding-left: 10px;
   flex-grow: 1;
   color: var(--theme-comment);

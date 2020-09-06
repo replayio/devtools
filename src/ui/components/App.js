@@ -103,6 +103,7 @@ export default connect(
     tooltip: selectors.getTooltip(state),
     commentVisible: selectors.commentVisible(state),
     loading: selectors.getLoading(state),
+    uploading: selectors.getUploading(state),
   }),
   {
     updateTheme: actions.updateTheme,

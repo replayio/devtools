@@ -44,34 +44,39 @@ class Header extends React.Component {
     );
   }
 
-  renderStatus() {
-    const { status } = this.props;
-    console.log("check status", status);
+  // renderStatus() {
+  //   const { status } = this.props;
+  //   console.log("check status", status);
 
-    if (!status) return null;
-    if (typeof status === "string") return status;
-    console.log(typeof status);
-    const { type, message } = status;
-    console.log("returning a message", message);
-    // opportunity to style error status' differently in the future
-    if (type === "message" || type === "error") return message;
+  //   if (!status) return null;
+  //   if (typeof status === "string") return status;
+  //   console.log(typeof status);
+  //   const { type, message } = status;
+  //   console.log("returning a message", message);
+  //   // opportunity to style error status' differently in the future
+  //   if (type === "message" || type === "error") return message;
 
-    if (type === "upload")
-      return lengthMB ? (
-        <Progress type="circle" percent={(uploadedMB / lengthMB) * 100} width={40} />
-      ) : (
-        `Waiting for upload… ${uploadedMB} MB`
-      );
-  }
+  //   if (type === "upload")
+  //     return lengthMB ? (
+  //       <Progress type="circle" percent={(uploadedMB / lengthMB) * 100} width={40} />
+  //     ) : (
+  //       `Waiting for upload… ${uploadedMB} MB`
+  //     );
+  // }
 
   render() {
-    const { loading } = this.props;
+    const { loading, uploading } = this.props;
     const isLoaded = loading == 100;
+    const upload = uploading?.totalMb
+      ? `${(uploading?.uploadedMb / uploading?.totalMB) * 100}%`
+      : `${uploading?.uploadedMB}MB`;
+
     return (
       <>
         <div id="header">
           <div className="logo"></div>
           <div id="status"></div>
+          {uploading && <div id="upload">{upload}</div>}
           <div className="links">
             <a id="headway" onClick={this.toggleHeadway}>
               What&apos;s new
@@ -90,7 +95,6 @@ export default connect(
   state => ({
     user: selectors.getUser(state),
     users: selectors.getUsers(state),
-    status: selectors.getStatus(state),
   }),
   { seek: actions.seek, getActiveUsers: actions.getActiveUsers }
 )(Header);

@@ -1,5 +1,4 @@
 const { defer, makeInfallible } = require("./utils");
-const { setStatus } = require("../ui/actions/app");
 
 let socket;
 let gSocketOpen = false;
@@ -48,7 +47,6 @@ const doSend = makeInfallible(msg => {
 
 function onSocketOpen() {
   console.log("Socket Open");
-  setStatus({ type: "message", message: "Connected" });
   gPendingMessages.forEach(msg => doSend(msg));
   gPendingMessages.length = 0;
   gSocketOpen = true;
@@ -105,11 +103,11 @@ function log(text) {
   // when reviewing recordings of the viewer.
 }
 
-// function setStatus(text) {
-//   if (document.getElementById("status")) {
-//     document.getElementById("status").innerText = text;
-//   }
-// }
+function setStatus(text) {
+  if (document.getElementById("status")) {
+    document.getElementById("status").innerText = text;
+  }
+}
 
 module.exports = {
   initSocket,
@@ -117,7 +115,7 @@ module.exports = {
   addEventListener,
   removeEventListener,
   log,
-  // setStatus,
+  setStatus,
 };
 
 // Debugging methods.
