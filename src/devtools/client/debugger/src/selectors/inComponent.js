@@ -4,12 +4,11 @@
 
 //
 
-import { getSymbols, getSource, getSelectedFrame, getCurrentThread } from ".";
+import { getSymbols, getSource, getSelectedFrame } from ".";
 import { findClosestClass } from "../utils/ast";
 
 export function inComponent(state) {
-  const thread = getCurrentThread(state);
-  const selectedFrame = getSelectedFrame(state, thread);
+  const selectedFrame = getSelectedFrame(state);
   if (!selectedFrame) {
     return;
   }

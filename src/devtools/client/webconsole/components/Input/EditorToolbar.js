@@ -9,10 +9,6 @@ const { Component, createFactory } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 
-const EvaluationSelector = createFactory(
-  require("devtools/client/webconsole/components/Input/EvaluationSelector")
-);
-
 const actions = require("devtools/client/webconsole/actions/index");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const Services = require("Services");
@@ -29,7 +25,6 @@ class EditorToolbar extends Component {
       reverseSearchInputVisible: PropTypes.bool.isRequired,
       serviceContainer: PropTypes.object.isRequired,
       webConsoleUI: PropTypes.object.isRequired,
-      showEvaluationSelector: PropTypes.bool,
     };
   }
 
@@ -48,16 +43,6 @@ class EditorToolbar extends Component {
         initialValue: serviceContainer.getInputSelection(),
       })
     );
-  }
-
-  renderEvaluationSelector() {
-    if (!this.props.webConsoleUI.wrapper.toolbox || !this.props.showEvaluationSelector) {
-      return null;
-    }
-
-    return EvaluationSelector({
-      webConsoleUI: this.props.webConsoleUI,
-    });
   }
 
   render() {
@@ -83,7 +68,6 @@ class EditorToolbar extends Component {
         },
         l10n.getStr("webconsole.editor.toolbar.executeButton.label")
       ),
-      this.renderEvaluationSelector(),
       dom.button({
         className: "devtools-button webconsole-editor-toolbar-history-prevExpressionButton",
         title: l10n.getStr("webconsole.editor.toolbar.history.prevExpressionButton.tooltip"),

@@ -4,20 +4,9 @@
 
 //
 
-import {
-  getExpression,
-  getExpressions,
-  getSelectedFrame,
-  getSelectedFrameId,
-  getFrames,
-  getSourceFromId,
-  getSelectedSource,
-  getCurrentThread,
-  getIsPaused,
-} from "../selectors";
+import { getExpression, getExpressions, getSelectedFrameId, getFrames } from "../selectors";
 import { PROMISE } from "./utils/middleware/promise";
 import { wrapExpression } from "../utils/expressions";
-import { features } from "../utils/prefs";
 
 /**
  * Add expression for debugger to watch

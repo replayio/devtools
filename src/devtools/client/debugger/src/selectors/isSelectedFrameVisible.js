@@ -4,16 +4,15 @@
 
 //
 
-import { getSelectedFrame, getSelectedLocation, getCurrentThread } from ".";
+import { getSelectedFrame, getSelectedLocation } from ".";
 
 /*
  * Checks to if the selected frame's source is currently
  * selected.
  */
 export function isSelectedFrameVisible(state) {
-  const thread = getCurrentThread(state);
   const selectedLocation = getSelectedLocation(state);
-  const selectedFrame = getSelectedFrame(state, thread);
+  const selectedFrame = getSelectedFrame(state);
 
   if (!selectedFrame || !selectedLocation) {
     return false;

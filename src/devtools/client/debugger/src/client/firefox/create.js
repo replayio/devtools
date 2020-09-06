@@ -9,17 +9,12 @@ import { clientCommands } from "./commands";
 
 const { ThreadFront } = require("protocol/thread");
 
-export function prepareSourcePayload(threadFront, source) {
-  // We populate the set of sources as soon as we hear about them. Note that
-  // this means that we have seen an actor, but it might still be in the
-  // debounced queue for creation, so the Redux store itself might not have
-  // a source actor with this ID yet.
+export function prepareSourcePayload(source) {
   clientCommands.registerSourceActor(source.actor, makeSourceId(source, false));
-
-  return { thread: threadFront.actor, source };
+  return { thread: ThreadFront.actor, source };
 }
 
-export async function createFrame(thread, frame, index = 0, asyncIndex = 0) {
+export async function createFrame(frame, index = 0, asyncIndex = 0) {
   if (!frame) {
     return null;
   }
@@ -47,7 +42,6 @@ export async function createFrame(thread, frame, index = 0, asyncIndex = 0) {
     id: `${asyncIndex}:${index}`,
     protocolId: frame.frameId,
     asyncIndex,
-    thread,
     displayName,
     location,
     alternateLocation,
@@ -63,33 +57,10 @@ export function makeSourceId(source, isServiceWorker) {
   return source.actor;
 }
 
-export function createPause(thread, packet) {
+export function createPause(packet) {
   return {
     ...packet,
-    thread,
-    frame: createFrame(thread, packet.frame),
+    frame: createFrame(packet.frame),
     executionPoint: packet.executionPoint,
-  };
-}
-
-function getTargetType(target) {
-  if (target.isWorkerTarget) {
-    return "worker";
-  }
-
-  if (target.isContentProcess) {
-    return "contentProcess";
-  }
-
-  return "mainThread";
-}
-
-export function createThread(actor, target) {
-  return {
-    actor,
-    url: target.url,
-    type: getTargetType(target),
-    name: target.name,
-    serviceWorkerStatus: target.debuggerServiceWorkerStatus,
   };
 }

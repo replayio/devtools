@@ -4,41 +4,28 @@
 
 //
 
-import { isValidThreadContext } from "../../utils/context";
-
 // How many times to fetch an async set of parent frames.
 const MaxAsyncFrames = 5;
 
 export function fetchFrames(cx) {
   return async function ({ dispatch, client, getState }) {
-    const { thread } = cx;
     let frames;
     try {
-      frames = await client.getFrames(thread);
-    } catch (e) {
-      // getFrames will fail if the thread has resumed. In this case the thread
-      // should no longer be valid and the frames we would have fetched would be
-      // discarded anyways.
-      if (isValidThreadContext(getState(), cx)) {
-        throw e;
-      }
-    }
-    dispatch({ type: "FETCHED_FRAMES", thread, frames, cx });
+      frames = await client.getFrames();
+    } catch (e) {}
+    dispatch({ type: "FETCHED_FRAMES", frames, cx });
 
     for (let i = 0; i < MaxAsyncFrames; i++) {
       let asyncFrames;
       try {
-        asyncFrames = await client.loadAsyncParentFrames(thread, i + 1);
+        asyncFrames = await client.loadAsyncParentFrames(i + 1);
       } catch (e) {
-        if (isValidThreadContext(getState(), cx)) {
-          throw e;
-        }
         break;
       }
       if (!asyncFrames.length) {
         break;
       }
-      dispatch({ type: "ADD_ASYNC_FRAMES", thread, asyncFrames, cx });
+      dispatch({ type: "ADD_ASYNC_FRAMES", asyncFrames, cx });
     }
   };
 }

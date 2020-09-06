@@ -37,10 +37,6 @@ const { getHistory, getHistoryValue } = require("devtools/client/webconsole/sele
 const { getAutocompleteState } = require("devtools/client/webconsole/selectors/autocomplete");
 const actions = require("devtools/client/webconsole/actions/index");
 
-const EvaluationSelector = createFactory(
-  require("devtools/client/webconsole/components/Input/EvaluationSelector")
-);
-
 // Constants used for defining the direction of JSTerm input history navigation.
 const { HISTORY_BACK, HISTORY_FORWARD } = require("devtools/client/webconsole/constants");
 
@@ -83,7 +79,6 @@ class JSTerm extends Component {
       editorWidth: PropTypes.number,
       showEditorOnboarding: PropTypes.bool,
       autocomplete: PropTypes.bool,
-      showEvaluationSelector: PropTypes.bool,
       autocompletePopupPosition: PropTypes.string,
     };
   }
@@ -1213,18 +1208,6 @@ class JSTerm extends Component {
     });
   }
 
-  renderEvaluationSelector() {
-    if (
-      !this.props.webConsoleUI.wrapper.toolbox ||
-      this.props.editorMode ||
-      !this.props.showEvaluationSelector
-    ) {
-      return null;
-    }
-
-    return EvaluationSelector(this.props);
-  }
-
   renderEditorOnboarding() {
     if (!this.props.showEditorOnboarding) {
       return null;
@@ -1285,7 +1268,6 @@ class JSTerm extends Component {
       /*
       dom.div(
         { className: "webconsole-input-buttons" },
-        this.renderEvaluationSelector(),
         this.renderOpenEditorButton()
       ),
       */
@@ -1302,7 +1284,6 @@ function mapStateToProps(state) {
     getValueFromHistory: direction => getHistoryValue(state, direction),
     autocompleteData: getAutocompleteState(state),
     showEditorOnboarding: state.ui.showEditorOnboarding,
-    showEvaluationSelector: state.ui.showEvaluationSelector,
     autocompletePopupPosition: state.prefs.eagerEvaluation ? "top" : "bottom",
   };
 }

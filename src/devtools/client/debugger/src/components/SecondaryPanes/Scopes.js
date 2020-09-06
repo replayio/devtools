@@ -188,10 +188,9 @@ class Scopes extends PureComponent {
 
 const mapStateToProps = state => {
   const cx = getThreadContext(state);
-  const selectedFrame = getSelectedFrame(state, cx.thread);
-  const selectedSource = getSelectedSource(state);
+  const selectedFrame = getSelectedFrame(state);
 
-  const { scope, pending } = getFrameScope(state, cx.thread, selectedFrame && selectedFrame.id) || {
+  const { scope, pending } = getFrameScope(state, selectedFrame?.id) || {
     scope: null,
     pending: false,
   };
@@ -200,9 +199,9 @@ const mapStateToProps = state => {
     cx,
     selectedFrame,
     isLoading: pending,
-    why: getPauseReason(state, cx.thread),
+    why: getPauseReason(state),
     frameScopes: scope,
-    expandedScopes: getLastExpandedScopes(state, cx.thread),
+    expandedScopes: getLastExpandedScopes(state),
   };
 };
 

@@ -28,13 +28,6 @@ function clearThread(target) {
   return { type: "CLEAR_THREAD", target };
 }
 
-exports.selectThread = selectThread;
-function selectThread(thread) {
-  return function (dispatch) {
-    dispatch({ type: "SELECT_THREAD", thread });
-  };
-}
-
 function getTargetType(target) {
   if (target.isWorkerTarget) {
     return "worker";

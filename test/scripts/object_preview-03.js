@@ -1,5 +1,5 @@
 // Test previews when switching between frames and stepping.
-(async function() {
+(async function () {
   await Test.addBreakpoint("doc_rr_preview.html", 17);
   await Test.rewindToLine(17);
 
@@ -27,7 +27,7 @@
   await Test.waitForFrameTimeline("57%");
 
   // barobj is already expanded.
-  //await Test.toggleScopeNode("barobj");
+  await Test.toggleScopeNode("barobj");
   await Test.findScopeNode("barprop1");
   await Test.waitForScopeValue("barprop1", `"updated"`);
 
@@ -36,7 +36,7 @@
 
   await Test.checkInlinePreview("bararr", "Array(2) [ 5, 6 ]");
 
-  //await Test.toggleScopeNode("barobj");
+  await Test.toggleScopeNode("barobj");
   await Test.findScopeNode("barprop1");
   await Test.waitForScopeValue("barprop1", "2");
 

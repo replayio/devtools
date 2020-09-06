@@ -6,9 +6,7 @@
 import { sortBy } from "lodash";
 import { getFrameScope, getInlinePreviews, getSource } from "../../selectors";
 import { features } from "../../utils/prefs";
-import { validateThreadContext } from "../../utils/context";
 import { loadSourceText } from "../sources/loadSourceText";
-import { ThreadFront } from "protocol/thread";
 
 const { log } = require("protocol/socket");
 const { createPrimitiveValueFront } = require("protocol/thread");
@@ -29,16 +27,14 @@ export function generateInlinePreview(cx, frameId, location) {
       return;
     }
 
-    const { thread } = cx;
-
     // Avoid regenerating inline previews when we already have preview data
-    if (getInlinePreviews(getState(), thread, frameId)) {
+    if (getInlinePreviews(getState(), frameId)) {
       return;
     }
 
     log(`GenerateInlinePreview Start`);
 
-    const frameScopes = getFrameScope(getState(), thread, frameId);
+    const frameScopes = getFrameScope(getState(), frameId);
 
     let scopes = frameScopes && frameScopes.scope;
 
@@ -58,7 +54,6 @@ export function generateInlinePreview(cx, frameId, location) {
     log(`GenerateInlinePreview LoadSourceText Done`);
 
     const originalAstScopes = await parser.getScopes(location);
-    validateThreadContext(getState(), cx);
     if (!originalAstScopes) {
       log(`GenerateInlinePreview NoScopes`);
       return;
@@ -118,7 +113,6 @@ export function generateInlinePreview(cx, frameId, location) {
 
     return dispatch({
       type: "ADD_INLINE_PREVIEW",
-      thread,
       frameId,
       previews,
     });

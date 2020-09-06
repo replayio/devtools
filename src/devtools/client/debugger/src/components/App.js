@@ -19,7 +19,6 @@ import {
   getActiveSearch,
   getQuickOpenEnabled,
   getOrientation,
-  getCanRewind,
 } from "../selectors";
 
 import { KeyShortcuts } from "devtools-modules";
@@ -302,7 +301,6 @@ Debugger.childContextTypes = {
 };
 
 const mapStateToProps = state => ({
-  canRewind: getCanRewind(state),
   selectedSource: getSelectedSource(state),
   startPanelCollapsed: getPaneCollapse(state, "start"),
   endPanelCollapsed: getPaneCollapse(state, "end"),

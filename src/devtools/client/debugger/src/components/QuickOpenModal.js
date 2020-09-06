@@ -11,7 +11,7 @@ import { throttle } from "lodash";
 
 import actions from "../actions";
 import {
-  getDisplayedSourcesList,
+  getSourceList,
   getQuickOpenEnabled,
   getQuickOpenQuery,
   getQuickOpenType,
@@ -394,7 +394,7 @@ export class QuickOpenModal extends Component {
 /* istanbul ignore next: ignoring testing of redux connection stuff */
 function mapStateToProps(state) {
   const selectedSource = getSelectedSource(state);
-  const displayedSources = getDisplayedSourcesList(state);
+  const displayedSources = getSourceList(state);
   const tabs = getTabs(state);
 
   return {

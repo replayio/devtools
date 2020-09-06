@@ -7,7 +7,6 @@
 import {
   getSelectedSource,
   getSelectedFrame,
-  getCanRewind,
   getClosestBreakpointPosition,
   getBreakpoint,
 } from "../../selectors";
@@ -47,7 +46,7 @@ export function continueToHere(cx, location) {
     // If we're replaying and the user selects a line above the currently
     // paused line, lets rewind to it. NOTE: this ignores a couple important
     // cases like loops, and wanting to play forward to the next function call.
-    const action = getCanRewind(getState()) && line < debugLine ? rewind : resume;
+    const action = line < debugLine ? rewind : resume;
 
     // Set a hidden breakpoint if we do not already have a breakpoint
     // at the closest position

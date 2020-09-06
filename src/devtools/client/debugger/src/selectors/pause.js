@@ -3,50 +3,32 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { getCurrentThread } from "../reducers/pause";
 import { getSelectedLocation } from "../reducers/sources";
 
 import { createSelector } from "reselect";
 
-export const getSelectedFrames = createSelector(
-  state => state.pause.threads,
-  threadPauseState => {
-    const selectedFrames = {};
-    for (const thread in threadPauseState) {
-      const pausedThread = threadPauseState[thread];
-      const { selectedFrameId, frames } = pausedThread;
-      if (frames) {
-        selectedFrames[thread] = frames.find(frame => frame.id == selectedFrameId);
-      }
-    }
-    return selectedFrames;
+export function getSelectedFrame(state) {
+  const { selectedFrameId, frames } = state.pause;
+  if (!selectedFrameId || !frames) {
+    return null;
   }
-);
 
-export function getSelectedFrame(state, thread) {
-  const selectedFrames = getSelectedFrames(state);
-  return selectedFrames[thread];
+  return frames.find(frame => frame.id == selectedFrameId);
 }
 
-export const getVisibleSelectedFrame = createSelector(
-  getSelectedLocation,
-  getSelectedFrames,
-  getCurrentThread,
-  (selectedLocation, selectedFrames, thread) => {
-    const selectedFrame = selectedFrames[thread];
-    if (!selectedFrame) {
-      return null;
-    }
-
-    const { id, displayName } = selectedFrame;
-
-    return {
-      id,
-      displayName,
-      location: selectedFrame.location,
-    };
+export const getVisibleSelectedFrame = createSelector(getSelectedFrame, selectedFrame => {
+  if (!selectedFrame) {
+    return null;
   }
-);
+
+  const { id, displayName } = selectedFrame;
+
+  return {
+    id,
+    displayName,
+    location: selectedFrame.location,
+  };
+});
 
 export function getFramePositions(state) {
   return state.pause.replayFramePositions;

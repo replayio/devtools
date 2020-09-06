@@ -6,7 +6,7 @@
 import React, { Component } from "react";
 import InlinePreviewRow from "./InlinePreviewRow";
 import { connect } from "../../utils/connect";
-import { getSelectedFrame, getCurrentThread, getInlinePreviews } from "../../selectors";
+import { getSelectedFrame, getInlinePreviews } from "../../selectors";
 
 function hasPreviews(previews) {
   return !!previews && Object.keys(previews).length > 0;
@@ -51,8 +51,7 @@ class InlinePreviews extends Component {
 }
 
 const mapStateToProps = state => {
-  const thread = getCurrentThread(state);
-  const selectedFrame = getSelectedFrame(state, thread);
+  const selectedFrame = getSelectedFrame(state);
 
   if (!selectedFrame) {
     return {
@@ -63,7 +62,7 @@ const mapStateToProps = state => {
 
   return {
     selectedFrame,
-    previews: getInlinePreviews(state, thread, selectedFrame.id),
+    previews: getInlinePreviews(state, selectedFrame.id),
   };
 };
 

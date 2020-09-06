@@ -76,7 +76,6 @@ function configureStore(webConsoleUI, options = {}) {
       editorWidth: prefs.editorWidth,
       showEditorOnboarding: prefs.showEditorOnboarding,
       timestampsVisible: prefs.timestampsVisible,
-      showEvaluationSelector: prefs.showEvaluationSelector,
     }),
   };
 

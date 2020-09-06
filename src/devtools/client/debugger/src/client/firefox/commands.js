@@ -4,8 +4,7 @@
 
 //
 
-import { prepareSourcePayload, createThread, createFrame } from "./create";
-import { updateTargets } from "./targets";
+import { prepareSourcePayload, createFrame } from "./create";
 import { clientEvents } from "./events";
 
 import Reps from "devtools-reps";
@@ -35,17 +34,12 @@ function setupCommands(dependencies) {
   breakpoints = {};
 }
 
-function lookupThreadFront(thread) {
-  // There is only a single thread possible currently.
-  return ThreadFront;
-}
-
 function createObjectFront(grip) {
   if (!grip.actor) {
     throw new Error("Actor is missing");
   }
 
-  return devToolsClient.createObjectFront(grip, currentThreadFront);
+  return devToolsClient.createObjectFront(grip, ThreadFront);
 }
 
 async function loadObjectProperties(root) {
@@ -77,50 +71,36 @@ function sendPacket(packet) {
   return devToolsClient.request(packet);
 }
 
-// Get a copy of the current targets.
-function getTargetsMap() {
-  return Object.assign({}, targets);
+function resume(point) {
+  return ThreadFront.resume(point);
 }
 
-function listThreadFronts() {
-  const targetList = Object.values(getTargetsMap());
-  return targetList.map(target => target.threadFront).filter(t => !!t);
+function stepIn(point) {
+  return ThreadFront.stepIn(point);
 }
 
-function forEachThread(iteratee) {
-  return iteratee(ThreadFront);
+function stepOver(point) {
+  return ThreadFront.stepOver(point);
 }
 
-function resume(thread, point) {
-  return lookupThreadFront(thread).resume(point);
+function stepOut(point) {
+  return ThreadFront.stepOut(point);
 }
 
-function stepIn(thread, point) {
-  return lookupThreadFront(thread).stepIn(point);
+function rewind(point) {
+  return ThreadFront.rewind(point);
 }
 
-function stepOver(thread, point) {
-  return lookupThreadFront(thread).stepOver(point);
-}
-
-function stepOut(thread, point) {
-  return lookupThreadFront(thread).stepOut(point);
-}
-
-function rewind(thread, point) {
-  return lookupThreadFront(thread).rewind(point);
-}
-
-function reverseStepOver(thread, point) {
-  return lookupThreadFront(thread).reverseStepOver(point);
+function reverseStepOver(point) {
+  return ThreadFront.reverseStepOver(point);
 }
 
 function breakOnNext(thread) {
-  return lookupThreadFront(thread).breakOnNext();
+  return ThreadFront.breakOnNext();
 }
 
-async function sourceContents({ actor, thread }) {
-  const threadFront = lookupThreadFront(thread);
+async function sourceContents({ actor }) {
+  const threadFront = ThreadFront;
   const { scriptSource, contentType } = await threadFront.getScriptSource(actor);
   return { source: scriptSource, contentType };
 }
@@ -215,9 +195,8 @@ async function evaluateExpressions(scripts, options) {
   return Promise.all(scripts.map(script => evaluate(script, options)));
 }
 
-async function evaluate(script, { thread, asyncIndex, frameId } = {}) {
-  const threadFront = lookupThreadFront(thread);
-  const { returned, exception, failed } = await threadFront.evaluate(asyncIndex, frameId, script);
+async function evaluate(script, { asyncIndex, frameId } = {}) {
+  const { returned, exception, failed } = await ThreadFront.evaluate(asyncIndex, frameId, script);
   if (failed) {
     return { exception: createPrimitiveValueFront("Evaluation failed") };
   }
@@ -249,8 +228,8 @@ function reload() {
   return currentTarget.reload();
 }
 
-function getProperties(thread, grip) {
-  const objClient = lookupThreadFront(thread).pauseGrip(grip);
+function getProperties(grip) {
+  const objClient = ThreadFront.pauseGrip(grip);
 
   return objClient.getPrototypeAndProperties().then(resp => {
     const { ownProperties, safeGetterValues } = resp;
@@ -262,14 +241,14 @@ function getProperties(thread, grip) {
   });
 }
 
-async function getFrames(thread) {
-  const frames = await lookupThreadFront(thread).getFrames();
-  return Promise.all(frames.map((frame, i) => createFrame(thread, frame, i)));
+async function getFrames() {
+  const frames = await ThreadFront.getFrames();
+  return Promise.all(frames.map((frame, i) => createFrame(frame, i)));
 }
 
-async function loadAsyncParentFrames(thread, asyncIndex) {
-  const frames = await lookupThreadFront(thread).loadAsyncParentFrames();
-  return Promise.all(frames.map((frame, i) => createFrame(thread, frame, i, asyncIndex)));
+async function loadAsyncParentFrames(asyncIndex) {
+  const frames = await ThreadFront.loadAsyncParentFrames();
+  return Promise.all(frames.map((frame, i) => createFrame(frame, i, asyncIndex)));
 }
 
 function convertScope(protocolScope) {
@@ -287,8 +266,7 @@ function convertScope(protocolScope) {
 }
 
 async function getFrameScopes(frame) {
-  const threadFront = lookupThreadFront(frame.thread);
-  const scopes = await threadFront.getScopes(frame.asyncIndex, frame.protocolId);
+  const scopes = await ThreadFront.getScopes(frame.asyncIndex, frame.protocolId);
   const converted = scopes.map(convertScope);
   for (let i = 0; i + 1 < converted.length; i++) {
     converted[i].parent = converted[i + 1];
@@ -307,11 +285,11 @@ async function blackBox(sourceActor, isBlackBoxed, range) {
 }
 
 function setSkipPausing(shouldSkip) {
-  return forEachThread(thread => thread.setSkipPausing(shouldSkip));
+  return ThreadFront.setSkipPausing(shouldSkip);
 }
 
 function interrupt(thread) {
-  return lookupThreadFront(thread).interrupt();
+  return ThreadFront.interrupt();
 }
 
 let gEventLogpointGroupId;
@@ -342,8 +320,8 @@ function logExceptions(shouldLog) {
   }
 }
 
-function pauseGrip(thread, func) {
-  return lookupThreadFront(thread).pauseGrip(func);
+function pauseGrip(func) {
+  return ThreadFront.pauseGrip(func);
 }
 
 function registerSourceActor(sourceActorId, sourceId, url) {
@@ -353,39 +331,23 @@ function registerSourceActor(sourceActorId, sourceId, url) {
 async function getSources(client) {
   const { sources } = await client.getSources();
 
-  return sources.map(source => prepareSourcePayload(client, source));
-}
-
-function getAllThreadFronts() {
-  const fronts = [currentThreadFront];
-  for (const { threadFront } of Object.values(targets)) {
-    fronts.push(threadFront);
-  }
-  return fronts;
+  return sources.map(source => prepareSourcePayload(source));
 }
 
 // Fetch the sources for all the targets
 async function fetchSources() {
-  let sources = [];
-  for (const threadFront of getAllThreadFronts()) {
-    sources = sources.concat(await getSources(threadFront));
-  }
-  return sources;
-}
+  let sources = await getSources(ThreadFront);
 
-async function fetchThreadSources(thread) {
-  return getSources(lookupThreadFront(thread));
+  return sources;
 }
 
 // Check if any of the targets were paused before we opened
 // the debugger. If one is paused. Fake a `pause` RDP event
 // by directly calling the client event listener.
 async function checkIfAlreadyPaused() {
-  for (const threadFront of getAllThreadFronts()) {
-    const pausedPacket = threadFront.getLastPausePacket();
-    if (pausedPacket) {
-      clientEvents.paused(threadFront, pausedPacket);
-    }
+  const pausedPacket = ThreadFront.getLastPausePacket();
+  if (pausedPacket) {
+    clientEvents.paused(ThreadFront, pausedPacket);
   }
 }
 
@@ -396,36 +358,18 @@ function getSourceForActor(actor) {
   return sourceActors[actor];
 }
 
-async function fetchThreads() {
-  const options = {
-    breakpoints,
-    eventBreakpoints,
-    observeAsmJS: true,
-  };
-
-  await updateTargets({
-    currentTarget,
-    devToolsClient,
-    targets,
-    options,
-  });
-
-  // eslint-disable-next-line
-  return Object.entries(targets).map(([actor, target]) => createThread(actor, target));
-}
-
 function getMainThread() {
   return currentThreadFront.actor;
 }
 
-async function getSourceActorBreakpointPositions({ thread, actor }, range) {
+async function getSourceActorBreakpointPositions({ actor }, range) {
   const linePositions = await ThreadFront.getBreakpointPositionsCompressed(actor, range);
   const rv = {};
   linePositions.forEach(({ line, columns }) => (rv[line] = columns));
   return rv;
 }
 
-async function getSourceActorBreakableLines({ thread, actor }) {
+async function getSourceActorBreakableLines({ actor }) {
   const positions = await ThreadFront.getBreakpointPositionsCompressed(actor);
   return positions.map(({ line }) => line);
 }
@@ -478,10 +422,8 @@ const clientCommands = {
   loadAsyncParentFrames,
   logExceptions,
   fetchSources,
-  fetchThreadSources,
   checkIfAlreadyPaused,
   registerSourceActor,
-  fetchThreads,
   getMainThread,
   sendPacket,
   setSkipPausing,

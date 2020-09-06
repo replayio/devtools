@@ -8,13 +8,7 @@ import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
 
-import {
-  getSelectedSource,
-  getSourcesForTabs,
-  getIsPaused,
-  getCurrentThread,
-  getContext,
-} from "../../selectors";
+import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
 import { isVisible } from "../../utils/ui";
 
 import { getHiddenTabs } from "../../utils/tabs";
@@ -295,7 +289,7 @@ const mapStateToProps = state => ({
   cx: getContext(state),
   selectedSource: getSelectedSource(state),
   tabSources: getSourcesForTabs(state),
-  isPaused: getIsPaused(state, getCurrentThread(state)),
+  isPaused: getIsPaused(state),
 });
 
 export default connect(mapStateToProps, {

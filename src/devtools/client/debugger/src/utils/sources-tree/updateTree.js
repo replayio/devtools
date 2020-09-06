@@ -23,37 +23,25 @@ function getSourcesToAdd(newSources, prevSources) {
   return sourcesToAdd;
 }
 
-export function createTree({ debuggeeUrl, sources, threads }) {
+export function createTree({ debuggeeUrl, sources }) {
   const uncollapsedTree = createDirectoryNode("root", "", []);
 
   return updateTree({
     debuggeeUrl,
     newSources: sources,
     prevSources: {},
-    threads,
     uncollapsedTree,
   });
 }
 
-export function updateTree({ newSources, prevSources, debuggeeUrl, uncollapsedTree, threads }) {
+export function updateTree({ newSources, prevSources, debuggeeUrl, uncollapsedTree }) {
   const debuggeeHost = getDomain(debuggeeUrl);
-  const contexts = Object.keys(newSources);
 
-  contexts.forEach(context => {
-    const thread = threads.find(t => t.actor === context);
-    if (!thread) {
-      return;
-    }
+  const sourcesToAdd = getSourcesToAdd(Object.values(newSources), Object.values(prevSources));
 
-    const sourcesToAdd = getSourcesToAdd(
-      Object.values(newSources[context]),
-      prevSources[context] ? Object.values(prevSources[context]) : null
-    );
-
-    for (const source of sourcesToAdd) {
-      addToTree(uncollapsedTree, source, debuggeeHost, thread.actor);
-    }
-  });
+  for (const source of sourcesToAdd) {
+    addToTree(uncollapsedTree, source, debuggeeHost);
+  }
 
   const newSourceTree = collapseTree(uncollapsedTree);
 

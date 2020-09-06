@@ -67,20 +67,13 @@ function findOrCreateNode(parts, subTree, path, part, index, url, debuggeeHost, 
  * walk the source tree to the final node for a given url,
  * adding new nodes along the way
  */
-function traverseTree(url, tree, debuggeeHost, source, thread) {
+function traverseTree(url, tree, debuggeeHost, source) {
   const parts = url.path.replace(/\/$/, "").split("/");
   parts[0] = url.group;
-  if (thread) {
-    parts.unshift(thread);
-  }
 
   let path = "";
   return parts.reduce((subTree, part, index) => {
-    if (index == 0 && thread) {
-      path = thread;
-    } else {
-      path = `${path}/${part}`;
-    }
+    path = `${path}/${part}`;
 
     const debuggeeHostIfRoot = index === 1 ? debuggeeHost : null;
 
@@ -134,14 +127,14 @@ function addSourceToNode(node, url, source) {
  * @memberof utils/sources-tree
  * @static
  */
-export function addToTree(tree, source, debuggeeHost, thread) {
+export function addToTree(tree, source, debuggeeHost) {
   const url = getURL(source, debuggeeHost);
 
   if (isInvalidUrl(url, source)) {
     return;
   }
 
-  const finalNode = traverseTree(url, tree, debuggeeHost, source, thread);
+  const finalNode = traverseTree(url, tree, debuggeeHost, source);
 
   // $FlowIgnore
   finalNode.contents = addSourceToNode(finalNode, url, source);

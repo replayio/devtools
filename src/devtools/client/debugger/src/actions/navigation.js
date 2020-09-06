@@ -7,7 +7,6 @@
 import { clearDocuments } from "../utils/editor";
 import sourceQueue from "../utils/source-queue";
 
-import { updateThreads } from "./threads";
 import { evaluateExpressions } from "./expressions";
 
 import { getMainThread, getThreadContext } from "../selectors";
@@ -38,7 +37,6 @@ export function willNavigate(event) {
 
 export function connect(url, actor, traits, isWebExtension) {
   return async function ({ dispatch, getState }) {
-    await dispatch(updateThreads());
     await dispatch({
       type: "CONNECT",
       mainThread: {
@@ -62,7 +60,6 @@ export function connect(url, actor, traits, isWebExtension) {
  */
 export function navigated() {
   return async function ({ dispatch, panel }) {
-    await dispatch(updateThreads());
     panel.emit("reloaded");
   };
 }

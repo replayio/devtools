@@ -16,7 +16,6 @@ import {
   getSelectedSource,
   getSelectedFrame,
   getSymbols,
-  getCurrentThread,
   getPreviewCount,
 } from "../selectors";
 
@@ -73,8 +72,7 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
       return;
     }
 
-    const thread = getCurrentThread(getState());
-    const selectedFrame = getSelectedFrame(getState(), thread);
+    const selectedFrame = getSelectedFrame(getState());
 
     if (!selectedFrame) {
       return;

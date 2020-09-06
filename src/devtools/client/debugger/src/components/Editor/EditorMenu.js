@@ -10,13 +10,7 @@ import { showMenu } from "devtools-contextmenu";
 
 import { getSourceLocationFromMouseEvent } from "../../utils/editor";
 import { isPretty } from "../../utils/source";
-import {
-  getPrettySource,
-  getIsPaused,
-  getCurrentThread,
-  getThreadContext,
-  isSourceWithMap,
-} from "../../selectors";
+import { getPrettySource, getIsPaused, getThreadContext, isSourceWithMap } from "../../selectors";
 
 import { editorMenuItems, editorItemActions } from "./menus/editor";
 
@@ -68,7 +62,7 @@ class EditorMenu extends Component {
 
 const mapStateToProps = (state, props) => ({
   cx: getThreadContext(state),
-  isPaused: getIsPaused(state, getCurrentThread(state)),
+  isPaused: getIsPaused(state),
   hasMappedLocation:
     (props.selectedSource.isOriginal ||
       isSourceWithMap(state, props.selectedSource.id) ||

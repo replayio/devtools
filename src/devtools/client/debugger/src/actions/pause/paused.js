@@ -26,21 +26,18 @@ import { setFramePositions } from "./setFramePositions";
  * @memberof actions/pause
  * @static
  */
-export function paused(pauseInfo) {
-  return async function ({ dispatch, getState, client, sourceMaps }) {
-    const { thread, executionPoint } = pauseInfo;
-
-    dispatch({ type: "PAUSED", thread, executionPoint });
+export function paused({ executionPoint }) {
+  return async function ({ dispatch, getState }) {
+    dispatch({ type: "PAUSED", executionPoint });
 
     // Get a context capturing the newly paused and selected thread.
     const cx = getThreadContext(getState());
-    assert(cx.thread == thread, "Thread mismatch");
 
     await dispatch(markEvaluatedExpressionsAsLoading(cx));
 
     await dispatch(fetchFrames(cx));
 
-    const frame = getSelectedFrame(getState(), thread);
+    const frame = getSelectedFrame(getState());
     if (frame) {
       dispatch(selectLocation(cx, frame.location, { remap: true }));
     }

@@ -424,14 +424,7 @@ export function getRelativeUrl(source, root) {
   return url.slice(url.indexOf(root) + root.length + 1);
 }
 
-export function underRoot(source, root, threadActors) {
-  // source.url doesn't include thread actor ID, so remove the thread actor ID from the root
-  threadActors.forEach(threadActor => {
-    if (root.includes(threadActor)) {
-      root = root.slice(threadActor.length + 1);
-    }
-  });
-
+export function underRoot(source, root) {
   if (source.url && source.url.includes("chrome://")) {
     const { group, path } = getURL(source);
     return (group + path).includes(root);

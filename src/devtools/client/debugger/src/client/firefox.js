@@ -6,7 +6,6 @@
 
 import { setupCommands, clientCommands } from "./firefox/commands";
 import { setupEvents, clientEvents } from "./firefox/events";
-import { features, prefs } from "../utils/prefs";
 
 const { ThreadFront } = require("protocol/thread");
 
@@ -17,7 +16,7 @@ export async function onConnect(connection, _actions, panel) {
   actions = _actions;
 
   setupCommands({ devToolsClient });
-  setupEvents({ actions, devToolsClient, panel });
+  setupEvents({ actions, panel });
 
   actions.connect("", ThreadFront.actor, {}, false);
 

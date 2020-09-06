@@ -28,12 +28,8 @@ import { ThreadFront } from "protocol/thread";
 import {
   getSource,
   getSourceByURL,
-  getPrettySource,
   getActiveSearch,
-  getSelectedLocation,
   getSelectedSource,
-  canPrettyPrintSource,
-  getCurrentThread,
   getThreadExecutionPoint,
 } from "../../selectors";
 
@@ -160,15 +156,14 @@ export function selectSpecificLocation(cx, location) {
 // source for a frame, we tell the thread which one we prefer, and then perform
 // the pause again to refresh all the debugger's state.
 export function showAlternateSource(oldSource, newSource) {
-  return async ({ dispatch, getState, client }) => {
+  return async ({ dispatch, getState }) => {
     if (ThreadFront.isSourceMappedScript(oldSource.id)) {
       ThreadFront.preferScript(newSource.id, true);
     } else {
       ThreadFront.preferScript(oldSource.id, false);
     }
 
-    const thread = getCurrentThread(getState());
-    const executionPoint = getThreadExecutionPoint(getState(), thread);
-    await dispatch(paused({ thread, executionPoint }));
+    const executionPoint = getThreadExecutionPoint(getState());
+    await dispatch(paused({ executionPoint }));
   };
 }
