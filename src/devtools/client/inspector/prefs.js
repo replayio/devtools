@@ -9,7 +9,7 @@ pref("devtools.inspector.three-pane-enabled", false);
 
 // features
 pref("devtools.inspector.features.old-rulesview.enabled", false);
-pref("devtools.inspector.features.new-markupview.enabled", true);
+pref("devtools.inspector.features.new-markupview.enabled", false);
 
 export const prefs = new PrefsHelper("devtools.inspector", {
   threePaneEnabled: ["Bool", "three-pane-enabled"],

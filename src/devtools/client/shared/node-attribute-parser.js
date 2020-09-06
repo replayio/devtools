@@ -32,7 +32,6 @@ const TYPE_IDREF_LIST = "idrefList";
 const TYPE_JS_RESOURCE_URI = "jsresource";
 const TYPE_CSS_RESOURCE_URI = "cssresource";
 
-const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 const WILDCARD = Symbol();
@@ -61,7 +60,6 @@ const ATTRIBUTE_TYPES = new Map([
     "command",
     {
       menuitem: { namespaceURI: HTML_NS, type: TYPE_IDREF },
-      key: { namespaceURI: XUL_NS, type: TYPE_IDREF },
     },
   ],
   [
@@ -144,7 +142,6 @@ const ATTRIBUTE_TYPES = new Map([
     "menu",
     {
       button: { namespaceURI: HTML_NS, type: TYPE_IDREF },
-      WILDCARD: { namespaceURI: XUL_NS, type: TYPE_IDREF },
     },
   ],
   [
@@ -169,7 +166,6 @@ const ATTRIBUTE_TYPES = new Map([
       source: { namespaceURI: HTML_NS, type: TYPE_URI },
       track: { namespaceURI: HTML_NS, type: TYPE_URI },
       video: { namespaceURI: HTML_NS, type: TYPE_URI },
-      stringbundle: { namespaceURI: XUL_NS, type: TYPE_URI },
     },
   ],
   [
@@ -181,17 +177,7 @@ const ATTRIBUTE_TYPES = new Map([
     },
   ],
   ["xmlns", { WILDCARD: { namespaceURI: WILDCARD, type: TYPE_URI } }],
-  ["containment", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_URI } }],
-  ["context", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_IDREF } }],
-  ["datasources", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_URI_LIST } }],
-  ["insertafter", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_IDREF } }],
-  ["insertbefore", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_IDREF } }],
-  ["observes", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_IDREF } }],
-  ["popup", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_IDREF } }],
-  ["ref", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_URI } }],
-  ["removeelement", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_IDREF } }],
-  ["template", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_IDREF } }],
-  ["tooltip", { WILDCARD: { namespaceURI: XUL_NS, type: TYPE_IDREF } }],
+
   // SVG links aren't handled yet, see bug 1158831.
   // ["fill", {
   //   WILDCARD: {namespaceURI: SVG_NS, type: },

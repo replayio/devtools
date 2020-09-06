@@ -7,7 +7,7 @@
 const { createFactory } = require("react");
 const ReactDOM = require("react-dom");
 
-const TextNode = createFactory(require("devtools/client/inspector/markup/components/TextNode"));
+const TextNode = createFactory(require("devtools/client/inspector/markup/components/OldTextNode"));
 
 const {
   getAutocompleteMaxWidth,

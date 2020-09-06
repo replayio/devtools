@@ -69,10 +69,10 @@ body.dragging .tag-line {
 }
 
 #root-wrapper:after {
-   content: "";
-   display: block;
-   clear: both;
-   position:relative;
+  content: "";
+  display: block;
+  clear: both;
+  position: relative;
 }
 
 .html-editor {
@@ -88,7 +88,7 @@ body.dragging .tag-line {
 }
 
 .html-editor-inner {
-  border: solid .1px;
+  border: solid 0.1px;
   flex: 1 1 auto;
 
   /* Keep the editor away from the markup view floating scrollbars */
@@ -163,8 +163,11 @@ ul.children + .tag-line::before {
   cursor: default;
 }
 
+/* TODO: Remove the attribute selectors when the old markup view is no longer needed. */
 .tag-line[selected] + .children,
-.tag-line[selected] ~ .tag-line {
+.tag-line[selected] ~ .tag-line,
+.tag-line.selected + .children,
+.tag-line.selected ~ .tag-line {
   background-image: linear-gradient(to top, var(--markup-outline), var(--markup-outline));
   background-position: 0 0;
   background-repeat: no-repeat;
@@ -173,11 +176,15 @@ ul.children + .tag-line::before {
   margin-left: -8px;
 }
 
-.tag-line[selected] + .children {
+/* TODO: Remove the attribute selectors when the old markup view is no longer needed. */
+.tag-line[selected] + .children,
+.tag-line.selected + .children {
   background-position-y: 2px;
 }
 
-.tag-line[selected] ~ .tag-line {
+/* TODO: Remove the attribute selectors when the old markup view is no longer needed. */
+.tag-line[selected] ~ .tag-line,
+.tag-line.selected ~ .tag-line {
   background-position-y: -2px;
   /* Unset transition-property to prevent the markup outline from horizontal shifting */
   transition-property: none;
@@ -212,7 +219,9 @@ ul.children + .tag-line::before {
   display: block;
 }
 
-.tag-line[selected] .markup-tag-mutation-marker {
+/* TODO: Remove the attribute selectors when the old markup view is no longer needed. */
+.tag-line[selected] .markup-tag-mutation-marker,
+.tag-line.selected .markup-tag-mutation-marker {
   stroke: #fff;
 }
 
@@ -249,7 +258,8 @@ ul.children + .tag-line::before {
   z-index: 1;
 }
 
-.child.collapsed .child, .child.collapsed .children {
+.child.collapsed .child,
+.child.collapsed .children {
   display: none;
 }
 
@@ -330,7 +340,7 @@ ul.children + .tag-line::before {
 }
 
 .flash-out {
-  transition: background,color .5s;
+  transition: background, color 0.5s;
 }
 
 .editor {
@@ -363,7 +373,7 @@ ul.children + .tag-line::before {
 .styleinspector-propertyeditor {
   vertical-align: top;
   margin: -1px 0;
-  border: 1px solid #CCC;
+  border: 1px solid #ccc;
 }
 
 .reveal-link {

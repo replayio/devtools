@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 
 import { EventEmitter } from "protocol/utils";
 import classnames from "classnames";

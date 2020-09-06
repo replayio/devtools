@@ -1,60 +1,28 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-"use strict";
-
-const { createElement, createRef, Fragment, PureComponent } = require("react");
+const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
-const { editableItem } = require("devtools/client/shared/inplace-editor");
 
-const { getStr, getFormatStr } = require("devtools/client/inspector/markup/utils/l10n");
+const { getStr, getFormatStr } = require("../utils/l10n");
 
 class TextNode extends PureComponent {
   static get propTypes() {
     return {
-      showTextEditor: PropTypes.func.isRequired,
       type: PropTypes.string.isRequired,
       value: PropTypes.string.isRequired,
     };
   }
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      value: this.props.value,
-    };
-
-    this.valuePreRef = createRef();
-  }
-
-  componentDidMount() {
-    editableItem(
-      {
-        element: this.valuePreRef.current,
-        trigger: "dblclick",
-      },
-      element => {
-        this.props.showTextEditor(element);
-      }
-    );
-  }
-
   render() {
-    const { value } = this.state;
-    const isComment = this.props.type === "comment";
+    const { type, value } = this.props;
+    const isComment = type === "comment";
     const isWhiteSpace = !/[^\s]/.exec(value);
 
-    return createElement(
-      Fragment,
-      null,
+    return dom.span(
+      { className: "editor" + (isComment ? " comment" : " text ") },
       isComment ? dom.span({}, "<!--") : null,
       dom.pre(
         {
           className: isWhiteSpace ? "whitespace" : "",
-          ref: this.valuePreRef,
           style: {
             display: "inline-block",
             whiteSpace: "normal",

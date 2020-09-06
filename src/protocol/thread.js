@@ -17,6 +17,7 @@ const {
 } = require("./utils");
 const { getFrameworkEventListeners } = require("./event-listeners");
 const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
+const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 // Information about a protocol pause.
 function Pause(sessionId) {
@@ -663,6 +664,7 @@ NodeFront.prototype = {
     return this._node.isConnected;
   },
 
+  // The node's `nodeType` which identifies what the node is.
   get nodeType() {
     return this._node.nodeType;
   },
@@ -675,12 +677,14 @@ NodeFront.prototype = {
     return this.nodeName.toLowerCase();
   },
 
+  // The name of the current node.
   get tagName() {
     if (this.nodeType == Node.ELEMENT_NODE) {
       return this._node.nodeName;
     }
   },
 
+  // The pseudo element type.
   get pseudoType() {
     return this._node.pseudoType;
   },
@@ -690,9 +694,10 @@ NodeFront.prototype = {
     return [];
   },
 
+  // The namespace URI of the node.
   get namespaceURI() {
     // NYI
-    return undefined;
+    return HTML_NS;
   },
 
   get doctypeString() {
@@ -700,6 +705,7 @@ NodeFront.prototype = {
     return "unknown";
   },
 
+  // A list of the node's attributes.
   get attributes() {
     return this._node.attributes || [];
   },
@@ -730,6 +736,7 @@ NodeFront.prototype = {
     return this.parentNode();
   },
 
+  // Whether or not the node has child nodes.
   get hasChildren() {
     return this._node.childNodes && this._node.childNodes.length != 0;
   },
@@ -748,6 +755,7 @@ NodeFront.prototype = {
     return childNodes;
   },
 
+  // The node's `nodeValue` which identifies the value of the current node.
   getNodeValue() {
     return this._node.nodeValue;
   },
@@ -841,10 +849,12 @@ NodeFront.prototype = {
     return Promise.all(promises);
   },
 
+  // Whether or not the node is displayed.
   get isDisplayed() {
     return this.displayType != "none";
   },
 
+  // The computed display style property value of the node.
   get displayType() {
     assert(this._loaded);
     return this._computedStyle.get("display");
@@ -855,6 +865,7 @@ NodeFront.prototype = {
     return this._computedStyle;
   },
 
+  // Whether or not the node has event listeners.
   get hasEventListeners() {
     assert(this._loaded);
     return this._listeners.length != 0;
