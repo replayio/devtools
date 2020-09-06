@@ -362,11 +362,6 @@ function updateLoadedState(state, action) {
       value: action.value.text,
       contentType: action.value.contentType,
     });
-  } else {
-    content = fulfilled({
-      type: "wasm",
-      value: action.value.text,
-    });
   }
 
   return {

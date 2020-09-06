@@ -157,7 +157,6 @@ export function newOriginalSources(sourceInfo) {
         url,
         relativeUrl: url,
         isPrettyPrinted: false,
-        isWasm: false,
         isBlackBoxed: false,
         introductionUrl: null,
         introductionType: undefined,
@@ -221,7 +220,6 @@ export function newGeneratedSources(sourceInfo) {
           introductionUrl: source.introductionUrl,
           introductionType: source.introductionType,
           isBlackBoxed: false,
-          isWasm: !!supportsWasm(getState()) && source.introductionType === "wasm",
           isExtension: false,
           isOriginal,
         };

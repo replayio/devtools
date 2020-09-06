@@ -6,7 +6,11 @@ function initialAppState() {
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
     tooltip: null,
+<<<<<<< HEAD
     status: null,
+=======
+    loading: 4,
+>>>>>>> upstream/master
   };
 }
 
@@ -24,8 +28,13 @@ export default function update(state = initialAppState(), action) {
       return { ...state, splitConsoleOpen: action.splitConsole };
     }
 
+<<<<<<< HEAD
     case "set_status": {
       return { ...state, status: action.status };
+=======
+    case "loading": {
+      return { ...state, loading: action.loading };
+>>>>>>> upstream/master
     }
 
     default: {
@@ -49,3 +58,5 @@ export function isSplitConsoleOpen(state) {
 export function getSelectedPanel(state) {
   return state.app.selectedPanel;
 }
+
+export const getLoading = state => state.app.loading;

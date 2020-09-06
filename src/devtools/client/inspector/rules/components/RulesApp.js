@@ -76,17 +76,21 @@ class RulesApp extends PureComponent {
     }
 
     const output = [];
-    let lastInherited;
+    let lastInheritedNodeId;
 
     for (const rule of rules) {
-      if (rule.inheritance.inherited !== lastInherited) {
-        lastInherited = rule.inheritance.inherited;
+      const { inheritedNodeId, inheritedSource } = rule.inheritance;
 
-        output.push(dom.div({ className: "ruleview-header" }, rule.inheritance.inheritedSource));
+      if (inheritedNodeId !== lastInheritedNodeId) {
+        lastInheritedNodeId = inheritedNodeId;
+        output.push(
+          dom.div({ key: inheritedNodeId, className: "ruleview-header" }, inheritedSource)
+        );
       }
 
       output.push(
         Rule({
+          key: rule.id,
           ...this.getRuleProps(),
           rule,
         })
@@ -96,6 +100,7 @@ class RulesApp extends PureComponent {
     return output;
   }
 
+  /*
   renderKeyframesRules(rules) {
     if (!rules.length) {
       return null;
@@ -129,6 +134,7 @@ class RulesApp extends PureComponent {
 
     return output;
   }
+  */
 
   renderStyleRules(rules) {
     if (!rules.length) {
@@ -173,15 +179,15 @@ class RulesApp extends PureComponent {
   render() {
     const { rules } = this.props.rules;
     const inheritedRules = [];
-    const keyframesRules = [];
+    // const keyframesRules = [];
     const pseudoElementRules = [];
     const styleRules = [];
 
     for (const rule of rules) {
       if (rule.inheritance) {
         inheritedRules.push(rule);
-      } else if (rule.keyframesRule) {
-        keyframesRules.push(rule);
+        // } else if (rule.keyframesRule) {
+        // keyframesRules.push(rule);
       } else if (rule.pseudoElement) {
         pseudoElementRules.push(rule);
       } else {
@@ -218,8 +224,8 @@ class RulesApp extends PureComponent {
                 null,
                 this.renderPseudoElementRules(pseudoElementRules),
                 this.renderStyleRules(styleRules),
-                this.renderInheritedRules(inheritedRules),
-                this.renderKeyframesRules(keyframesRules)
+                this.renderInheritedRules(inheritedRules)
+                // this.renderKeyframesRules(keyframesRules)
               )
             : dom.div({ className: "devtools-sidepanel-no-result" }, getStr("rule.empty"))
         )

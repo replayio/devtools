@@ -272,7 +272,9 @@ class RulesView {
    * Returns true if the rules panel is visible, and false otherwise.
    */
   isPanelVisible() {
-    return this.inspector?.sidebar?.getCurrentTabID() === "newruleview";
+    return this.inspector.is3PaneModeEnabled
+      ? true
+      : this.inspector?.sidebar?.getCurrentTabID() === "newruleview";
   }
 
   /**

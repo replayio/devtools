@@ -65,18 +65,23 @@ class Header extends React.Component {
   }
 
   render() {
+    const { loading } = this.props;
+    const isLoaded = loading == 100;
     return (
-      <div id="header">
-        <div className="logo"></div>
-        <div className="status">{this.renderStatus()}</div>
-        <div className="links">
-          <a id="headway" onClick={this.toggleHeadway}>
-            What&apos;s new
-          </a>
-          {this.renderAvatars()}
-          {features.auth0 ? <LoginButton /> : null}
+      <>
+        <div id="header">
+          <div className="logo"></div>
+          <div id="status"></div>
+          <div className="links">
+            <a id="headway" onClick={this.toggleHeadway}>
+              What&apos;s new
+            </a>
+            {this.renderAvatars()}
+            {features.auth0 ? <LoginButton /> : null}
+          </div>
         </div>
-      </div>
+        {!isLoaded && <div className="loading-bar" style={{ width: `${loading}%` }}></div>}
+      </>
     );
   }
 }

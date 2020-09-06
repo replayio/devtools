@@ -40,6 +40,7 @@ function sendMessage(method, params, sessionId, pauseId) {
 }
 
 const doSend = makeInfallible(msg => {
+  window.performance?.mark(`${msg.method}_start`);
   const str = JSON.stringify(msg);
   gSentBytes += str.length;
   socket.send(str);
@@ -72,6 +73,9 @@ function onSocketMessage(evt) {
 
   if (msg.id) {
     const { method, resolve, reject } = gMessageWaiters.get(msg.id);
+    window.performance?.mark(`${method}_end`);
+    window.performance?.measure(method, `${method}_start`, `${method}_end`);
+
     gMessageWaiters.delete(msg.id);
     if (msg.error) {
       console.warn("Message failed", method, msg.error, msg.data);

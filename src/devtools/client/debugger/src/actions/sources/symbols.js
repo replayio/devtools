@@ -32,10 +32,6 @@ async function doSetSymbols(cx, source, { dispatch, getState, parser }) {
 
 export const setSymbols = memoizeableAction("setSymbols", {
   getValue: ({ source }, { getState }) => {
-    if (source.isWasm) {
-      return fulfilled(null);
-    }
-
     const symbols = getSymbols(getState(), source);
     if (!symbols || symbols.loading) {
       return null;

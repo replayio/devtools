@@ -79,7 +79,6 @@ Editor.modes = {
   js: { name: "javascript" },
   text: { name: "text" },
   vs: { name: "x-shader/x-vertex" },
-  wasm: { name: "wasm" },
 };
 
 /**
@@ -405,7 +404,7 @@ Editor.prototype = {
     });
 
     cm.on("gutterClick", (cmArg, line, gutter, ev) => {
-      const lineOrOffset = !this.isWasm ? line : this.lineToWasmOffset(line);
+      const lineOrOffset = line;
       this.emit("gutterClick", lineOrOffset, ev.button);
     });
 
@@ -544,25 +543,6 @@ Editor.prototype = {
     return cm.getDoc();
   },
 
-  get isWasm() {
-    return wasm.isWasm(this.getDoc());
-  },
-
-  wasmOffsetToLine: function (offset) {
-    return wasm.wasmOffsetToLine(this.getDoc(), offset);
-  },
-
-  lineToWasmOffset: function (number) {
-    return wasm.lineToWasmOffset(this.getDoc(), number);
-  },
-
-  toLineIfWasmOffset: function (maybeOffset) {
-    if (typeof maybeOffset !== "number" || !this.isWasm) {
-      return maybeOffset;
-    }
-    return this.wasmOffsetToLine(maybeOffset);
-  },
-
   lineInfo: function (lineOrOffset) {
     const line = this.toLineIfWasmOffset(lineOrOffset);
     if (line == undefined) {
@@ -573,7 +553,7 @@ Editor.prototype = {
   },
 
   getLineOrOffset: function (line) {
-    return this.isWasm ? this.lineToWasmOffset(line) : line;
+    return line;
   },
 
   /**
@@ -582,30 +562,7 @@ Editor.prototype = {
    */
   setText: function (value) {
     const cm = editors.get(this);
-
-    if (typeof value !== "string" && "binary" in value) {
-      // wasm?
-      // binary does not survive as Uint8Array, converting from string
-      const binary = value.binary;
-      const data = new Uint8Array(binary.length);
-      for (let i = 0; i < data.length; i++) {
-        data[i] = binary.charCodeAt(i);
-      }
-      const { lines, done } = wasm.getWasmText(this.getDoc(), data);
-      const MAX_LINES = 10000000;
-      if (lines.length > MAX_LINES) {
-        lines.splice(MAX_LINES, lines.length - MAX_LINES);
-        lines.push(";; .... text is truncated due to the size");
-      }
-      if (!done) {
-        lines.push(";; .... possible error during wast conversion");
-      }
-      // cm will try to split into lines anyway, saving memory
-      value = { split: () => lines };
-    }
-
     cm.setValue(value);
-
     this.resetIndentUnit();
   },
 

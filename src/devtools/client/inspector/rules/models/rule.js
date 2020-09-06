@@ -89,15 +89,40 @@ class Rule {
     return this.textProps;
   }
 
+  /**
+   * If this is an inherited rule, return an object containing information about the
+   * element in which the rule is inherited from and the element source name to display.
+   */
   get inheritance() {
     if (!this.inherited) {
       return null;
     }
 
     return {
-      inherited: this.inherited,
+      // The NodeFront object id for the element in which the rule is inherited from.
+      inheritedNodeId: this.inherited.objectId(),
+      // The display name for the element in which the rule is inherited from.
       inheritedSource: this.inheritedSource,
     };
+  }
+
+  /**
+   * If this is an inherited rule, return the display name for the element in which the
+   * rule is inherited from.
+   */
+  get inheritedSource() {
+    if (this._inheritedSource) {
+      return this._inheritedSource;
+    }
+    this._inheritedSource = "";
+    if (this.inherited) {
+      let eltText = this.inherited.displayName;
+      if (this.inherited.id) {
+        eltText += "#" + this.inherited.id;
+      }
+      this._inheritedSource = STYLE_INSPECTOR_L10N.getFormatStr("rule.inheritedFrom", eltText);
+    }
+    return this._inheritedSource;
   }
 
   get selector() {
@@ -145,21 +170,7 @@ class Rule {
     return title + (this.mediaText ? " @media " + this.mediaText : "");
   }
 
-  get inheritedSource() {
-    if (this._inheritedSource) {
-      return this._inheritedSource;
-    }
-    this._inheritedSource = "";
-    if (this.inherited) {
-      let eltText = this.inherited.displayName;
-      if (this.inherited.id) {
-        eltText += "#" + this.inherited.id;
-      }
-      this._inheritedSource = STYLE_INSPECTOR_L10N.getFormatStr("rule.inheritedFrom", eltText);
-    }
-    return this._inheritedSource;
-  }
-
+  /*
   get keyframesName() {
     if (this._keyframesName) {
       return this._keyframesName;
@@ -181,6 +192,7 @@ class Rule {
       keyframesName: this.keyframesName,
     };
   }
+  */
 
   get selectorText() {
     return this.domRule.selectors

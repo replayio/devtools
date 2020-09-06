@@ -26,6 +26,7 @@ class App extends React.Component {
 
   componentDidMount() {
     const { theme } = this.props;
+
     setTheme(theme);
   }
 
@@ -51,7 +52,13 @@ class App extends React.Component {
   }
 
   render() {
-    const { initialize, commentVisible, hideComments, updateTimelineDimensions } = this.props;
+    const {
+      commentVisible,
+      hideComments,
+      updateTimelineDimensions,
+      loading,
+      initialize,
+    } = this.props;
     const { orientation } = this.state;
 
     const toolbox = <Toolbox initialize={initialize} />;
@@ -66,10 +73,11 @@ class App extends React.Component {
     }
 
     const vert = orientation != "bottom";
+    const isLoaded = loading === 100;
 
     return (
       <>
-        <Header />
+        <Header loading={loading} />
         <Comments />
         {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
         <SplitBox
@@ -94,6 +102,7 @@ export default connect(
     theme: selectors.getTheme(state),
     tooltip: selectors.getTooltip(state),
     commentVisible: selectors.commentVisible(state),
+    loading: selectors.getLoading(state),
   }),
   {
     updateTheme: actions.updateTheme,

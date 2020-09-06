@@ -7,7 +7,7 @@
 import { findClosestFunction } from "../ast";
 
 export function getASTLocation(source, symbols, location) {
-  if (source.isWasm || !symbols || symbols.loading) {
+  if (!symbols || symbols.loading) {
     return { name: undefined, offset: location, index: 0 };
   }
 

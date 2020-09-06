@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
@@ -12,8 +12,6 @@ import { toEditorLine } from "../../utils/editor";
 import actions from "../../actions";
 
 import { getContext } from "../../selectors";
-
-
 
 export class Panel extends PureComponent {
   cbPanel;
@@ -53,9 +51,11 @@ export class Panel extends PureComponent {
   toggleActionsPanel() {
     const value = this.codeMirror.getValue();
     if (value == this.initialValue) {
-      this.actionsNode.classList.remove("editing");
+      this.editActionsNode.classList.add("hidden");
+      this.actionsNode.classList.remove("hidden");
     } else {
-      this.actionsNode.classList.add("editing");
+      this.editActionsNode.classList.remove("hidden");
+      this.actionsNode.classList.add("hidden");
     }
   }
 
@@ -71,6 +71,11 @@ export class Panel extends PureComponent {
     this.toggleActionsPanel();
   };
 
+  delete = () => {
+    this.removeLogpoint();
+    this.toggleActionsPanel();
+  };
+
   setBreakpoint(value) {
     const { cx, breakpoint } = this.props;
     const location = breakpoint.location;
@@ -80,6 +85,15 @@ export class Panel extends PureComponent {
       ...options,
       logValue: value,
     });
+  }
+
+  removeLogpoint() {
+    const { cx, breakpoint } = this.props;
+    const location = breakpoint.location;
+    const options = { ...breakpoint?.options } || {};
+    delete options.logValue;
+
+    return this.props.setBreakpointOptions(cx, location);
   }
 
   clearPanel() {
@@ -182,12 +196,17 @@ export class Panel extends PureComponent {
       >
         <div className="prompt">»</div>
         <textarea defaultValue={defaultValue} ref={input => this.createEditor(input)} />
-        <div className="actions" ref={node => (this.actionsNode = node)}>
+        <div className="edit-actions hidden" ref={node => (this.editActionsNode = node)}>
           <button className="save" onClick={this.save}>
             Save
           </button>
           <a className="cancel" onClick={this.cancel}>
             Cancel
+          </a>
+        </div>
+        <div className="actions" ref={node => (this.actionsNode = node)}>
+          <a className="cancel" onClick={this.delete}>
+            Hide Logs
           </a>
         </div>
       </div>,

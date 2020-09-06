@@ -38,6 +38,7 @@ class Declaration extends PureComponent {
     this.onToggleDeclarationChange = this.onToggleDeclarationChange.bind(this);
   }
 
+  /*
   componentDidMount() {
     if (this.props.isUserAgentStyle) {
       // Declaration is not editable.
@@ -46,7 +47,6 @@ class Declaration extends PureComponent {
 
     const { ruleId, id } = this.props.declaration;
 
-    /*
     editableItem(
       {
         element: this.nameSpanRef.current,
@@ -64,8 +64,8 @@ class Declaration extends PureComponent {
         this.props.showDeclarationValueEditor(element, ruleId, id);
       }
     );
-    */
   }
+  */
 
   get hasComputed() {
     // Only show the computed list expander or the shorthand overridden list if:
@@ -129,15 +129,13 @@ class Declaration extends PureComponent {
   }
 
   renderOverriddenFilter() {
-    if (this.props.declaration.isDeclarationValid) {
+    if (!this.props.declaration.isDeclarationValid || !this.props.declaration.isOverridden) {
       return null;
     }
 
     return dom.div({
-      className: "ruleview-warning",
-      title: this.props.declaration.isNameValid
-        ? getStr("rule.warningName.title")
-        : getStr("rule.warning.title"),
+      className: "ruleview-overridden-rule-filter",
+      title: getStr("rule.filterProperty.title"),
     });
   }
 
@@ -182,13 +180,15 @@ class Declaration extends PureComponent {
   }
 
   renderWarning() {
-    if (!this.props.declaration.isDeclarationValid || !this.props.declaration.isOverridden) {
+    if (this.props.declaration.isDeclarationValid) {
       return null;
     }
 
     return dom.div({
-      className: "ruleview-overridden-rule-filter",
-      title: getStr("rule.filterProperty.title"),
+      className: "ruleview-warning",
+      title: this.props.declaration.isNameValid
+        ? getStr("rule.warningName.title")
+        : getStr("rule.warning.title"),
     });
   }
 
@@ -200,6 +200,7 @@ class Declaration extends PureComponent {
       isOverridden,
       isPropertyChanged,
       name,
+      priority,
       value,
     } = this.props.declaration;
 
@@ -256,7 +257,7 @@ class Declaration extends PureComponent {
               ref: this.valueSpanRef,
               tabIndex: 0,
             },
-            value
+            value + (priority ? ` !${priority}` : "")
           ),
           ";"
         ),

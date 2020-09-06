@@ -70,7 +70,6 @@ class ConsoleOutput extends Component {
       messagesUi: PropTypes.array.isRequired,
       serviceContainer: PropTypes.shape({
         attachRefToWebConsoleUI: PropTypes.func.isRequired,
-        openContextMenu: PropTypes.func.isRequired,
         sourceMapService: PropTypes.object,
       }),
       dispatch: PropTypes.func.isRequired,

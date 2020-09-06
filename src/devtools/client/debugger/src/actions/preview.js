@@ -7,7 +7,7 @@
 import { isConsole } from "../utils/preview";
 import { findBestMatchExpression } from "../utils/ast";
 import { getExpressionFromCoords } from "../utils/editor/get-expression";
-import { isTesting } from "devtools-environment";
+import { createPrimitiveValueFront } from "protocol/thread";
 
 import {
   getPreview,
@@ -80,11 +80,15 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
       return;
     }
 
-    const { result } = await client.evaluate(expression, {
+    let { result } = await client.evaluate(expression, {
       asyncIndex: selectedFrame.asyncIndex,
       frameId: selectedFrame.protocolId,
       thread,
     });
+
+    if (result === undefined) {
+      result = createPrimitiveValueFront(undefined);
+    }
 
     const root = {
       name: expression,

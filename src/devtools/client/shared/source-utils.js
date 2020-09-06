@@ -303,26 +303,6 @@ function isChromeScheme(location, i = 0) {
   );
 }
 
-function isWASM(location, i = 0) {
-  return (
-    // "wasm-function["
-    location.charCodeAt(i) === CHAR_CODE_W &&
-    location.charCodeAt(++i) === CHAR_CODE_A &&
-    location.charCodeAt(++i) === CHAR_CODE_S &&
-    location.charCodeAt(++i) === CHAR_CODE_M &&
-    location.charCodeAt(++i) === CHAR_CODE_DASH &&
-    location.charCodeAt(++i) === CHAR_CODE_F &&
-    location.charCodeAt(++i) === CHAR_CODE_U &&
-    location.charCodeAt(++i) === CHAR_CODE_N &&
-    location.charCodeAt(++i) === CHAR_CODE_C &&
-    location.charCodeAt(++i) === CHAR_CODE_T &&
-    location.charCodeAt(++i) === CHAR_CODE_I &&
-    location.charCodeAt(++i) === CHAR_CODE_O &&
-    location.charCodeAt(++i) === CHAR_CODE_N &&
-    location.charCodeAt(++i) === CHAR_CODE_L_SQUARE_BRACKET
-  );
-}
-
 /**
  * A utility method to get the file name from a sourcemapped location
  * The sourcemap location can be in any form. This method returns a
@@ -347,6 +327,5 @@ exports.parseURL = parseURL;
 exports.getSourceNames = getSourceNames;
 exports.isChromeScheme = isChromeScheme;
 exports.isContentScheme = isContentScheme;
-exports.isWASM = isWASM;
 exports.isDataScheme = isDataScheme;
 exports.getSourceMappedFile = getSourceMappedFile;
