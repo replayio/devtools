@@ -6,6 +6,7 @@ function initialAppState() {
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
     tooltip: null,
+    status: null,
   };
 }
 
@@ -23,6 +24,10 @@ export default function update(state = initialAppState(), action) {
       return { ...state, splitConsoleOpen: action.splitConsole };
     }
 
+    case "set_status": {
+      return { ...state, status: action.status };
+    }
+
     default: {
       return state;
     }
@@ -31,6 +36,10 @@ export default function update(state = initialAppState(), action) {
 
 export function getTheme(state) {
   return state.app.theme;
+}
+
+export function getStatus(state) {
+  return state.app.status;
 }
 
 export function isSplitConsoleOpen(state) {

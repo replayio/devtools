@@ -9,3 +9,9 @@ export function setSplitConsole(open) {
 export function setSelectedPanel(panel) {
   return { type: "set_selected_panel", panel };
 }
+
+export function setStatus(status) {
+  console.log("setting the status", status);
+
+  return { type: "set_status", status };
+}

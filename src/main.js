@@ -19,13 +19,14 @@ if (test) {
 // be good if this was less fragile...
 //
 
-const { initSocket, sendMessage, log, setStatus, addEventListener } = require("protocol/socket");
+const { initSocket, sendMessage, log, addEventListener } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap");
 const FullStory = require("ui/utils/fullstory").default;
 const { setupTimeline } = require("./ui/actions/timeline");
 const { setupMetadata } = require("./ui/actions/metadata");
+const { setStatus } = require("./ui/actions/app");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { prefs } = require("./ui/utils/prefs");
 
@@ -40,7 +41,8 @@ async function createSession() {
     const { sessionId } = await sendMessage("Recording.createSession", {
       recordingId,
     });
-    setStatus("");
+    setStatus(null);
+    console.log("setting status to null");
     window.sessionId = sessionId;
     ThreadFront.setSessionId(sessionId);
 
@@ -55,7 +57,7 @@ async function createSession() {
   } catch (e) {
     if (e.code == 9) {
       // Invalid recording ID.
-      setStatus("Error: Invalid recording ID");
+      setStatus({ type: "error", message: "Error: Invalid recording ID" });
     } else {
       throw e;
     }
@@ -65,15 +67,16 @@ async function createSession() {
 function onUploadedData({ uploaded, length }) {
   const uploadedMB = (uploaded / (1024 * 1024)).toFixed(2);
   const lengthMB = length ? (length / (1024 * 1024)).toFixed(2) : undefined;
-  if (lengthMB) {
-    setStatus(`Waiting for upload… ${uploadedMB} / ${lengthMB} MB`);
-  } else {
-    setStatus(`Waiting for upload… ${uploadedMB} MB`);
-  }
+  setStatus({ type: "upload", uploadedMB, lengthMB });
+  // if (lengthMB) {
+  //   setStatus(`Waiting for upload… ${uploadedMB} / ${lengthMB} MB`);
+  // } else {
+  //   setStatus(`Waiting for upload… ${uploadedMB} MB`);
+  // }
 }
 
 function onSessionError({ message }) {
-  setStatus(`Error: ${message}`);
+  setStatus({ type: "error", message: `Error: ${message}` });
 }
 
 let initialized = false;
@@ -95,7 +98,7 @@ async function initialize() {
   loadImages();
 
   if (!recordingId) {
-    setStatus("Recording ID not specified");
+    setStatus({ type: "message", message: "Recording ID not specified" });
     return;
   }
 
