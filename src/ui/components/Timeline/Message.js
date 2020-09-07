@@ -85,6 +85,7 @@ class Message extends React.Component {
 
     return (
       <a
+        tabIndex={0}
         className={classnames("message", {
           future: isFuture,
           highlighted: isHighlighted,
@@ -100,6 +101,7 @@ class Message extends React.Component {
         }}
         title={getFormatStr("jumpMessage2", frameLocation)}
         onClick={e => onMarkerClick(e, message)}
+        onFocus={e => onMarkerClick(e, message)}
         onMouseEnter={onMarkerMouseEnter}
         onMouseLeave={onMarkerMouseLeave}
       />
