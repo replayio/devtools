@@ -86,7 +86,6 @@ class ConsoleOutput extends Component {
 
   constructor(props) {
     super(props);
-    this.onContextMenu = this.onContextMenu.bind(this);
     this.maybeScrollToBottom = this.maybeScrollToBottom.bind(this);
     gToolbox.consoleOutput = this;
   }
@@ -178,12 +177,6 @@ class ConsoleOutput extends Component {
     }
   }
 
-  onContextMenu(e) {
-    this.props.serviceContainer.openContextMenu(e);
-    e.stopPropagation();
-    e.preventDefault();
-  }
-
   render() {
     let {
       dispatch,
@@ -243,7 +236,6 @@ class ConsoleOutput extends Component {
       {
         className: "webconsole-output",
         role: "main",
-        onContextMenu: this.onContextMenu,
         ref: node => {
           this.outputNode = node;
         },

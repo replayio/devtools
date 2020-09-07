@@ -54,7 +54,6 @@ class Message extends Component {
         onViewSource: PropTypes.func.isRequired,
         onViewSourceInDebugger: PropTypes.func,
         onViewSourceInStyleEditor: PropTypes.func,
-        openContextMenu: PropTypes.func.isRequired,
         openLink: PropTypes.func.isRequired,
         sourceMapService: PropTypes.any,
         canRewind: PropTypes.func.isRequired,
@@ -83,7 +82,6 @@ class Message extends Component {
     super(props);
     this.onLearnMoreClick = this.onLearnMoreClick.bind(this);
     this.toggleMessage = this.toggleMessage.bind(this);
-    this.onContextMenu = this.onContextMenu.bind(this);
     this.onMouseEvent = this.onMouseEvent.bind(this);
     this.renderIcon = this.renderIcon.bind(this);
   }
@@ -137,19 +135,6 @@ class Message extends Component {
     } else {
       dispatch(actions.messageOpen(messageId));
     }
-  }
-
-  onContextMenu(e) {
-    const { serviceContainer, source, request, messageId, executionPoint } = this.props;
-    const messageInfo = {
-      source,
-      request,
-      messageId,
-      executionPoint,
-    };
-    serviceContainer.openContextMenu(e, messageInfo);
-    e.stopPropagation();
-    e.preventDefault();
   }
 
   onMouseEvent(ev) {
@@ -405,7 +390,6 @@ class Message extends Component {
     return dom.div(
       {
         className: topLevelClasses.join(" "),
-        onContextMenu: this.onContextMenu,
         ...mouseEvents,
         ref: node => {
           this.messageNode = node;
