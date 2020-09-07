@@ -100,7 +100,6 @@ class Message extends React.Component {
           zIndex: `${index + 100}`,
         }}
         title={getFormatStr("jumpMessage2", frameLocation)}
-        onClick={e => onMarkerClick(e, message)}
         onFocus={e => onMarkerClick(e, message)}
         onMouseEnter={onMarkerMouseEnter}
         onMouseLeave={onMarkerMouseLeave}
