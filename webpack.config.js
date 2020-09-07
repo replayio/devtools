@@ -13,6 +13,7 @@ module.exports = {
   devServer: {
     contentBase: ".",
     index: "index.html",
+    historyApiFallback: true,
     liveReload: false,
   },
   plugins: [new MiniCssExtractPlugin()],

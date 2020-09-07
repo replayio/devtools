@@ -1,112 +1,35 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
 import { connect } from "react-redux";
+import { createBrowserHistory } from "history";
+import { Route, Switch, BrowserRouter } from "react-router-dom";
 
-import Toolbox from "./Toolbox";
-import Tooltip from "./Tooltip";
-import Comments from "./Comments";
 import Header from "./Header";
+import Main from "./Main";
 
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import RightSidebar from "./RightSidebar";
-import { actions } from "../actions";
 import { selectors } from "../reducers";
 
 import "styles.css";
 
-function setTheme(theme) {
-  document.body.parentElement.className = theme;
-}
+export const history = createBrowserHistory();
 
 class App extends React.Component {
-  state = {
-    orientation: "bottom",
-    tooltip: null,
-  };
-
-  componentDidMount() {
-    const { theme } = this.props;
-
-    setTheme(theme);
-  }
-
-  componentDidUpdate(prevProps) {
-    const { theme } = this.props;
-    if (theme !== prevProps.theme) {
-      setTheme(theme);
-    }
-  }
-
-  renderViewer(toolbox) {
-    const { tooltip } = this.props;
-    return (
-      <div id="outer-viewer">
-        <div id="viewer">
-          <canvas id="graphics"></canvas>
-          <div id="highlighter-root"></div>
-        </div>
-        <RightSidebar toolbox={toolbox} />
-        <Tooltip tooltip={tooltip} />
-      </div>
-    );
-  }
-
   render() {
-    const {
-      commentVisible,
-      hideComments,
-      updateTimelineDimensions,
-      loading,
-      initialize,
-    } = this.props;
-    const { orientation } = this.state;
-
-    const toolbox = <Toolbox initialize={initialize} />;
-
-    let startPanel, endPanel;
-    if (orientation == "bottom" || orientation == "right") {
-      startPanel = this.renderViewer(toolbox);
-      endPanel = toolbox;
-    } else {
-      startPanel = toolbox;
-      endPanel = this.renderViewer(toolbox);
-    }
-
-    const vert = orientation != "bottom";
-    const isLoaded = loading === 100;
+    const { loading, initialize } = this.props;
 
     return (
-      <>
+      <BrowserRouter history={history}>
         <Header loading={loading} />
-        <Comments />
-        {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
-        <SplitBox
-          style={{ width: "100vw", overflow: "hidden" }}
-          splitterSize={1}
-          initialSize="50%"
-          minSize="20%"
-          maxSize="80%"
-          vert={vert}
-          onMove={num => updateTimelineDimensions()}
-          startPanel={startPanel}
-          endPanelControl={false}
-          endPanel={endPanel}
-        />
-      </>
+        <Switch>
+          <Route path="/" exact>
+            <Main initialize={initialize} />
+          </Route>
+        </Switch>
+      </BrowserRouter>
     );
   }
 }
 
-export default connect(
-  state => ({
-    theme: selectors.getTheme(state),
-    tooltip: selectors.getTooltip(state),
-    commentVisible: selectors.commentVisible(state),
-    loading: selectors.getLoading(state),
-  }),
-  {
-    updateTheme: actions.updateTheme,
-    hideComments: actions.hideComments,
-    updateTimelineDimensions: actions.updateTimelineDimensions,
-  }
-)(App);
+export default connect(state => ({
+  loading: selectors.getLoading(state),
+}))(App);

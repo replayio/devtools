@@ -21,7 +21,7 @@ import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/apm";
 import { ThreadFront } from "protocol/thread";
 
-import App from "ui/components/App";
+import App, { history } from "ui/components/App";
 import { Auth0Provider } from "@auth0/auth0-react";
 
 async function getInitialState() {
@@ -123,10 +123,11 @@ async function bootstrapStore() {
   return store;
 }
 
-function getRedirectUri() {
-  const { host, pathname, protocol } = window.location;
-  return protocol + "//" + host + pathname;
-}
+const onRedirectCallback = () => {
+  // If using a Hash Router, you need to use window.history.replaceState to
+  // remove the `code` and `state` query parameters from the callback url.
+  window.history.replaceState({}, document.title, window.location.pathname);
+};
 
 export async function bootstrapApp(props, context) {
   const store = await bootstrapStore();
@@ -137,7 +138,9 @@ export async function bootstrapApp(props, context) {
       <Auth0Provider
         domain="webreplay.us.auth0.com"
         clientId="4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo"
-        redirectUri={getRedirectUri()}
+        redirectUri={window.location.origin}
+        scope="openid profile email user_id"
+        onRedirectCallback={onRedirectCallback}
       >
         {React.createElement(App, props)}
       </Auth0Provider>
