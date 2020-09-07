@@ -41,7 +41,7 @@
  * store.on('add-breakpoint', breakpoint => { ... });
  */
 
-const { combineReducers } = require("devtools/client/shared/vendor/redux");
+const { combineReducers } = require("redux");
 
 /**
  * Make an emitter that is meant to be used in redux reducers. This

@@ -3,11 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const {
-  combineReducers,
-  createStore,
-  applyMiddleware,
-} = require("devtools/client/shared/vendor/redux");
+const { combineReducers, createStore, applyMiddleware } = require("redux");
 const { thunk } = require("devtools/client/shared/redux/middleware/thunk");
 const { thunkWithOptions } = require("devtools/client/shared/redux/middleware/thunk-with-options");
 const { waitUntilService } = require("devtools/client/shared/redux/middleware/wait-service");

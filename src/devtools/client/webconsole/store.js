@@ -9,7 +9,7 @@ const { PrefState } = require("devtools/client/webconsole/reducers/prefs");
 const { UiState } = require("devtools/client/webconsole/reducers/ui");
 
 // Redux
-const { applyMiddleware, compose, createStore } = require("devtools/client/shared/vendor/redux");
+const { applyMiddleware, compose, createStore } = require("redux");
 
 // Prefs
 const { prefs, getPrefsService } = require("devtools/client/webconsole/utils/prefs");
