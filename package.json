@@ -42,6 +42,7 @@
     "react-dom-factories": "^1.0.2",
     "react-redux": "^5.0.7",
     "react-transition-group": "^2.0.1",
+    "redux": "^4.0.5",
     "style-loader": "^1.2.1",
     "url-loader": "^4.1.0",
     "webpack": "^4.43.0",
