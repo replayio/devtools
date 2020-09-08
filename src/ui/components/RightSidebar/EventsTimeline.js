@@ -12,27 +12,27 @@ import "./EventsTimeline.css";
 
 class EventsTimeline extends React.Component {
   state = {
-    addingComment: false,
+    editingComment: false,
   };
 
-  toggleAddingCommentOff = () => {
-    this.setState({ addingComment: false });
+  toggleEditingCommentOn = () => {
+    this.setState({ editingComment: true });
   };
 
-  toggleAddingCommentOn = () => {
-    this.setState({ addingComment: true });
+  toggleEditingCommentOff = () => {
+    this.setState({ editingComment: false });
   };
 
   renderAddCommentButton() {
-    const { createComment } = this.props;
-    const { addingComment } = this.state;
+    const { createComment, focusedCommentId } = this.props;
+    const { editingComment } = this.state;
 
-    if (addingComment) {
+    if (focusedCommentId || editingComment) {
       return null;
     }
 
     return (
-      <button className="add-comment" onClick={() => createComment(null, false, "eventsTimeline")}>
+      <button className="add-comment" onClick={() => createComment()}>
         Add a comment
       </button>
     );
@@ -60,8 +60,8 @@ class EventsTimeline extends React.Component {
           <Comment
             comment={comment}
             key={comment.id}
-            toggleAddingCommentOff={this.toggleAddingCommentOff}
-            toggleAddingCommentOn={this.toggleAddingCommentOn}
+            toggleEditingCommentOff={this.toggleEditingCommentOff}
+            toggleEditingCommentOn={this.toggleEditingCommentOn}
           />
         ))}
         {this.renderAddCommentButton()}
@@ -73,6 +73,7 @@ class EventsTimeline extends React.Component {
 export default connect(
   state => ({
     comments: selectors.getComments(state),
+    focusedCommentId: selectors.getFocusedCommentId(state),
   }),
   { createComment: actions.createComment }
 )(EventsTimeline);
