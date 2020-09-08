@@ -16,7 +16,6 @@ require("codemirror/mode/coffeescript/coffeescript.js");
 require("codemirror/mode/elm/elm.js");
 require("codemirror/mode/clike/clike.js");
 require("codemirror/mode/rust/rust.js");
-require("codemirror/mode/wasm/wasm.js");
 require("codemirror/addon/selection/active-line.js");
 require("codemirror/addon/edit/trailingspace.js");
 require("codemirror/addon/fold/foldcode.js");
