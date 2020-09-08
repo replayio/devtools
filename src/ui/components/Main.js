@@ -60,9 +60,7 @@ class Main extends React.Component {
     if (isLoading) {
       return <h3>Loading ... </h3>;
     }
-    if (!isAuthenticated) {
-      return <h3>Please Login</h3>;
-    }
+
     const toolbox = <Toolbox initialize={initialize} />;
 
     let startPanel, endPanel;
