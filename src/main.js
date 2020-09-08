@@ -19,6 +19,8 @@ if (test) {
 // be good if this was less fragile...
 //
 
+require("devtools/codemirror-addons");
+
 const { initSocket, sendMessage, log, setStatus, addEventListener } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const loadImages = require("image/image");
@@ -125,15 +127,10 @@ if (!test) {
   FullStory.init({ orgId: "VXD33", devMode: test });
 }
 
-setTimeout(async () => {
-  // Wait for CodeMirror to load asynchronously.
-  while (!window.CodeMirror) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
+(async () => {
   store = await bootstrapApp({ initialize }, { recordingId });
   setupApp(recordingId, store);
   setupTimeline(recordingId, store);
   setupMetadata(recordingId, store);
   setupEventListeners(recordingId, store);
-}, 0);
+})();
