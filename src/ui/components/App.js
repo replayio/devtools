@@ -25,8 +25,9 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    const { theme } = this.props;
+    const { theme, initialize } = this.props;
 
+    initialize();
     setTheme(theme);
   }
 
@@ -52,16 +53,21 @@ class App extends React.Component {
   }
 
   render() {
-    const {
-      commentVisible,
-      hideComments,
-      updateTimelineDimensions,
-      loading,
-      initialize,
-    } = this.props;
+    const { commentVisible, hideComments, updateTimelineDimensions, loading } = this.props;
     const { orientation } = this.state;
+    const isLoading = loading < 100;
 
-    const toolbox = <Toolbox initialize={initialize} />;
+    if (isLoading) {
+      return (
+        <>
+          <Header />
+          <div className="loading-bar" style={{ width: `${loading}%` }} />
+        </>
+      );
+    }
+
+    const vert = orientation != "bottom";
+    const toolbox = <Toolbox />;
 
     let startPanel, endPanel;
     if (orientation == "bottom" || orientation == "right") {
@@ -72,12 +78,9 @@ class App extends React.Component {
       endPanel = this.renderViewer(toolbox);
     }
 
-    const vert = orientation != "bottom";
-    const isLoaded = loading === 100;
-
     return (
       <>
-        <Header loading={loading} />
+        <Header />
         <Comments />
         {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
         <SplitBox

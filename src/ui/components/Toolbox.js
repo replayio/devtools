@@ -49,9 +49,9 @@ class Toolbox extends React.Component {
   }
 
   async componentDidMount() {
-    const { selectedPanel, initialize } = this.props;
+    const { selectedPanel } = this.props;
 
-    initialize();
+    this.threadFront.initializeToolbox();
     // Open the console so that the timeline gets events
     this.startPanel("console");
     this.selectTool(selectedPanel);

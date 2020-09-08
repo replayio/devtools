@@ -1207,12 +1207,24 @@ const ThreadFront = {
 
     const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
     this.emit("endpoint", endpoint);
+  },
+
+  async initializeToolbox() {
+    const sessionId = await this.waitForSession();
+    const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
 
     // Make sure the debugger has added a pause listener before warping to the endpoint.
     await gToolbox.startPanel("debugger");
-
     this.timeWarp(endpoint.point, endpoint.time, /* hasFrames */ false, /* force */ true);
     this.initializedWaiter.resolve();
+
+    if (this.testName) {
+      await gToolbox.selectTool("debugger");
+      window.Test = require("test/harness");
+      const script = document.createElement("script");
+      script.src = `/test?${this.testName}`;
+      document.head.appendChild(script);
+    }
   },
 
   setTest(test) {
@@ -1230,13 +1242,6 @@ const ThreadFront = {
     addEventListener("Session.unprocessedRegions", onUnprocessedRegions);
 
     await sendMessage("Session.ensureProcessed", {}, sessionId);
-    if (this.testName) {
-      await gToolbox.selectTool("debugger");
-      window.Test = require("test/harness");
-      const script = document.createElement("script");
-      script.src = `/test?${this.testName}`;
-      document.head.appendChild(script);
-    }
   },
 
   timeWarp(point, time, hasFrames, force) {

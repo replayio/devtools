@@ -80,6 +80,5 @@
 .loading-bar {
   height: 4px;
   background: linear-gradient(138.3deg, #236eff 7.98%, #71e5ff 93.53%);
-
-  animation-duration: 500;
+  transition-duration: 300ms;
 }
