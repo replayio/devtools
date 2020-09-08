@@ -76,7 +76,7 @@ function setupIntercom() {
 export default function Intercom({}) {
   useEffect(() => bootstrapIntercom(), []);
   return (
-    <a className="intercom-launcher" href="mailto:YOUR_APP_ID@incoming.intercom.io">
+    <a className="intercom-launcher" href=`"mailto:${APP_ID}@incoming.intercom.io"`>
       <div className="intercom-icon-close"></div>
       <div className="intercom-icon-open"></div>
       <span className="intercom-unread-count"></span>
