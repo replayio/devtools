@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
+import { BrowserRouter as Router } from "react-router-dom";
 
 import {
   prefs as dbgPrefs,
@@ -22,7 +23,7 @@ import { Integrations } from "@sentry/apm";
 import { ThreadFront } from "protocol/thread";
 
 import App from "ui/components/App";
-import { Auth0Provider } from "@auth0/auth0-react";
+import Auth0ProviderWithHistory from "./auth0";
 
 async function getInitialState() {
   const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;
@@ -133,15 +134,11 @@ export async function bootstrapApp(props, context) {
   setupSentry(context);
 
   ReactDOM.render(
-    <Provider store={store}>
-      <Auth0Provider
-        domain="webreplay.us.auth0.com"
-        clientId="4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo"
-        redirectUri={getRedirectUri()}
-      >
-        {React.createElement(App, props)}
-      </Auth0Provider>
-    </Provider>,
+    <Router>
+      <Auth0ProviderWithHistory>
+        <Provider store={store}>{React.createElement(App, props)}</Provider>
+      </Auth0ProviderWithHistory>
+    </Router>,
     document.querySelector("#app")
   );
 
