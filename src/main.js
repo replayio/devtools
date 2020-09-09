@@ -32,6 +32,8 @@ const { setupApp } = require("ui/actions/app");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { prefs } = require("ui/utils/prefs");
 
+const { createApolloClient } = require("ui/utils/apolloClient");
+
 // Create a session to use while debugging.
 async function createSession() {
   addEventListener("Recording.uploadedData", onUploadedData);
@@ -89,7 +91,7 @@ async function initialize() {
   loadImages();
 
   if (!recordingId) {
-    setStatus("Recording ID not specified");
+    // setStatus("Recording ID not specified");
     return;
   }
 
@@ -124,4 +126,5 @@ if (!test) {
   setupTimeline(recordingId, store);
   setupMetadata(recordingId, store);
   setupEventListeners(recordingId, store);
+  window.apolloClient = createApolloClient();
 })();

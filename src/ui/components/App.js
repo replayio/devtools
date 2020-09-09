@@ -61,7 +61,7 @@ class App extends React.Component {
       return (
         <>
           <Header />
-          <div className="loading-bar" style={{ width: `${loading}%` }} />
+          {/* <div className="loading-bar" style={{ width: `${loading}%` }} /> */}
         </>
       );
     }

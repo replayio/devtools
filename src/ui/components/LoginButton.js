@@ -5,7 +5,7 @@ import "./LoginButton.css";
 
 const LoginButton = () => {
   const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0();
-
+  console.log(user);
   if (isAuthenticated) {
     return (
       <div className="user-account">
