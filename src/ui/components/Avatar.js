@@ -27,9 +27,12 @@ const Avatar = props => {
 
   // Check if the user has just logged out. If so, update and remove the associated
   // picture and name from the user metadata.
-  if (!auth.isAuthenticated && isFirstPlayer && player.name) {
-    useEffect(() => updateUser());
-  }
+
+  useEffect(() => {
+    if (!auth.isAuthenticated && isFirstPlayer && player.name) {
+      updateUser();
+    }
+  });
 
   return (
     <div

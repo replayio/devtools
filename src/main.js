@@ -85,15 +85,6 @@ async function initialize() {
     return;
   }
 
-  if (recordingId === null && prefs.recordingId) {
-    const { host, pathname, protocol, search } = window.location;
-    const params = new URLSearchParams(search);
-    params.set("id", prefs.recordingId);
-
-    window.location = `${protocol}//${host}${pathname}?${decodeURIComponent(params)}`;
-    return;
-  }
-
   initialized = true;
   loadImages();
 
