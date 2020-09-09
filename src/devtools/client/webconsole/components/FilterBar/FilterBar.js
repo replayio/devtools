@@ -170,7 +170,7 @@ class FilterBar extends Component {
     return dom.button({
       className: "devtools-button devtools-clear-icon",
       title: l10n.getStr("webconsole.clearButton.tooltip"),
-      onClick: () => this.props.dispatch(actions.messagesClear()),
+      onClick: () => this.props.dispatch(actions.messagesClearEvaluations()),
     });
   }
 

@@ -342,6 +342,42 @@ function messages(state = MessageState(), action, filtersState, prefsState, uiSt
     case constants.MESSAGES_CLEAR:
       return MessageState({});
 
+    case constants.MESSAGES_CLEAR_EVALUATIONS: {
+      const removedIds = [];
+      for (const [id, message] of messagesById) {
+        if (message.type === "command" || message.type === "result") {
+          removedIds.push(id);
+        }
+      }
+
+      // If there have been no console evaluations, there's no need to change the state.
+      if (removedIds.length === 0) {
+        return state;
+      }
+
+      return removeMessagesFromState(
+        {
+          ...state,
+        },
+        removedIds
+      );
+    }
+
+    case constants.MESSAGES_CLEAR_EVALUATION: {
+      const commandId = action.messageId;
+
+      // This assumes that messages IDs are generated sequentially, and the result's ID
+      // should be the command message's ID + 1.
+      const resultId = (Number(commandId) + 1).toString();
+
+      return removeMessagesFromState(
+        {
+          ...state,
+        },
+        [commandId, resultId]
+      );
+    }
+
     case constants.PRIVATE_MESSAGES_CLEAR: {
       const removedIds = [];
       for (const [id, message] of messagesById) {

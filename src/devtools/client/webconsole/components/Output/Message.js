@@ -12,6 +12,7 @@ const actions = require("devtools/client/webconsole/actions/index");
 const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const MessageIcon = require("devtools/client/webconsole/components/Output/MessageIcon");
+const { CloseButton } = require("devtools/client/debugger/src/components/shared/Button");
 const FrameView = createFactory(require("devtools/client/shared/components/Frame"));
 
 const CollapseButton = require("devtools/client/webconsole/components/Output/CollapseButton");
@@ -189,6 +190,14 @@ class Message extends Component {
       },
       l10n.timestampString(this.props.timeStamp || Date.now())
     );
+  }
+
+  renderDeleteButton() {
+    const { dispatch, message } = this.props;
+
+    return createElement(CloseButton, {
+      handleClick: () => dispatch(actions.messagesClearEvaluation(message.id)),
+    });
   }
 
   renderErrorState() {
@@ -420,7 +429,7 @@ class Message extends Component {
           repeat ? " " : null,
           repeat,
           " ",
-          location
+          type == "command" ? this.renderDeleteButton() : null
         ),
         attachment,
         ...notesNodes

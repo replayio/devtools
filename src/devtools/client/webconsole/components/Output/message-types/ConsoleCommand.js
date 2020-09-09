@@ -22,7 +22,14 @@ ConsoleCommand.propTypes = {
  * Displays input from the console.
  */
 function ConsoleCommand(props) {
-  const { message, timestampsVisible, serviceContainer, maybeScrollToBottom, isPaused } = props;
+  const {
+    message,
+    timestampsVisible,
+    serviceContainer,
+    maybeScrollToBottom,
+    isPaused,
+    dispatch,
+  } = props;
 
   const { indent, source, type, level, timeStamp } = message;
   const messageText = trimCode(message.messageText);
@@ -44,6 +51,7 @@ function ConsoleCommand(props) {
     maybeScrollToBottom,
     message,
     isPaused,
+    dispatch,
   });
 }
 
