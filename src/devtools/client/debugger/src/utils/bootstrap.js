@@ -5,9 +5,10 @@
 //
 
 import React from "react";
-import { bindActionCreators, combineReducers } from "redux";
+import { bindActionCreators, combineReducers, applyMiddleware } from "redux";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
+import LogRocket from "logrocket";
 
 import ToolboxProvider from "devtools/client/framework/store-provider";
 import { isDevelopment } from "devtools-environment";
@@ -58,7 +59,11 @@ export function bootstrapStore(client, workers, panel, initialState) {
     },
   });
 
-  const store = createStore(combineReducers(reducers), initialState);
+  const store = createStore(
+    combineReducers(reducers),
+    initialState,
+    applyMiddleware(LogRocket.reduxMiddleware())
+  );
   store.subscribe(() => updatePrefs(store.getState()));
 
   const actions = bindActionCreators(require("../actions").default, store.dispatch);
