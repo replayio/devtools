@@ -15,7 +15,7 @@ import {
 import { prefs, features, asyncStore } from "./prefs";
 import configureStore from "devtools/client/debugger/src/actions/utils/create-store";
 import { clientCommands } from "devtools/client/debugger/src/client/firefox/commands";
-import { bindActionCreators, combineReducers } from "redux";
+import { bindActionCreators, combineReducers, applyMiddleware } from "redux";
 import { reducers, selectors } from "../reducers";
 import { actions } from "../actions";
 import * as Sentry from "@sentry/react";
@@ -24,12 +24,25 @@ import { ThreadFront } from "protocol/thread";
 
 import App from "ui/components/App";
 import Auth0ProviderWithHistory from "./auth0";
+import LogRocket from "logrocket";
+import setupLogRocketReact from "logrocket-react";
 
 async function getInitialState() {
   const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;
   return {
     eventListenerBreakpoints,
   };
+}
+
+function setupLogRocket() {
+  LogRocket.init("4sdo4i/replay");
+
+  setupLogRocketReact(LogRocket);
+  LogRocket.getSessionURL(sessionURL => {
+    Sentry.configureScope(scope => {
+      scope.setExtra("sessionURL", sessionURL);
+    });
+  });
 }
 
 export function setupSentry(context) {
@@ -116,7 +129,11 @@ async function bootstrapStore() {
   });
 
   const initialState = await getInitialState();
-  const store = createStore(combineReducers(reducers), initialState);
+  const store = createStore(
+    combineReducers(reducers),
+    initialState,
+    applyMiddleware(LogRocket.reduxMiddleware())
+  );
   registerStoreObserver(store, updatePrefs);
 
   setupAppHelper(store);
@@ -132,6 +149,7 @@ function getRedirectUri() {
 export async function bootstrapApp(props, context) {
   const store = await bootstrapStore();
   setupSentry(context);
+  setupLogRocket();
 
   ReactDOM.render(
     <Router>

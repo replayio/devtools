@@ -30,6 +30,7 @@ module.exports = {
         ],
       ],
       plugins: [
+        "add-react-displayname",
         "@babel/plugin-transform-flow-strip-types",
         "@babel/plugin-proposal-class-properties",
         [
