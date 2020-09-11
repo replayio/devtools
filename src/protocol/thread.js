@@ -1928,6 +1928,11 @@ const ThreadFront = {
     callback(value ? JSON.parse(value) : undefined);
   },
 
+  async getRecordings(authId) {
+    const response = await sendMessage("Internal.getRecordings", { authId });
+    return response.recordings;
+  },
+
   async updateMetadata(key, callback) {
     // Keep trying to update the metadata until it succeeds --- we updated it
     // before anyone else did. Use the callback to compute the new value in
