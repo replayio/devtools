@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import { connect } from "react-redux";
-import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { getAvatarColor } from "ui/utils/user";
 
 const Avatar = props => {
-  let { player, isFirstPlayer, updateUser, isLoggedIn, setLoggedIn, setLoggedOut } = props;
+  let { player, isFirstPlayer, updateUser } = props;
   let auth = useAuth0();
 
   if (auth.isAuthenticated && isFirstPlayer) {
@@ -20,7 +19,6 @@ const Avatar = props => {
     return (
       <div className={`avatar authenticated first-player`}>
         <img src={auth.user.picture} alt={auth.user.name} />
-        <span className="avatar-name">{auth.user.name}</span>
       </div>
     );
   }

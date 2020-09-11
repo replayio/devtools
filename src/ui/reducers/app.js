@@ -2,6 +2,7 @@ import { prefs } from "../utils/prefs";
 
 function initialAppState() {
   return {
+    recordingId: null,
     theme: "theme-light",
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
@@ -12,6 +13,9 @@ function initialAppState() {
 
 export default function update(state = initialAppState(), action) {
   switch (action.type) {
+    case "setup_app": {
+      return { ...state, recordingId: action.recordingId };
+    }
     case "update_theme": {
       return { ...state, theme: action.theme };
     }
@@ -34,16 +38,8 @@ export default function update(state = initialAppState(), action) {
   }
 }
 
-export function getTheme(state) {
-  return state.app.theme;
-}
-
-export function isSplitConsoleOpen(state) {
-  return state.app.splitConsoleOpen;
-}
-
-export function getSelectedPanel(state) {
-  return state.app.selectedPanel;
-}
-
+export const getTheme = state => state.app.theme;
+export const isSplitConsoleOpen = state => state.app.splitConsoleOpen;
+export const getSelectedPanel = state => state.app.selectedPanel;
 export const getLoading = state => state.app.loading;
+export const getRecordingId = state => state.app.recordingId;
