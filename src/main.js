@@ -31,6 +31,7 @@ const { setupMetadata } = require("ui/actions/metadata");
 const { setupApp } = require("ui/actions/app");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { prefs } = require("ui/utils/prefs");
+const { features } = require("./ui/utils/prefs");
 
 // Create a session to use while debugging.
 async function createSession() {
@@ -89,7 +90,9 @@ async function initialize() {
   loadImages();
 
   if (!recordingId) {
-    setStatus("Recording ID not specified");
+    if (!features.auth0) {
+      setStatus("Recording ID not specified");
+    }
     return;
   }
 

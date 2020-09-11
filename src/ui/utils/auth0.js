@@ -9,11 +9,15 @@ const Auth0ProviderWithHistory = ({ children }) => {
     history.push(appState?.returnTo || window.location.pathname);
   };
 
+  const {
+    location: { origin, pathname },
+  } = window;
+
   return (
     <Auth0Provider
       domain={"webreplay.us.auth0.com"}
       clientId={"4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo"}
-      redirectUri={window.location.origin}
+      redirectUri={origin + pathname}
       onRedirectCallback={onRedirectCallback}
       cacheLocation="localstorage"
     >

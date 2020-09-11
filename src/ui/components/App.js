@@ -53,7 +53,13 @@ class App extends React.Component {
   }
 
   render() {
-    const { commentVisible, hideComments, updateTimelineDimensions, loading } = this.props;
+    const {
+      commentVisible,
+      hideComments,
+      updateTimelineDimensions,
+      recordingId,
+      loading,
+    } = this.props;
     const { orientation } = this.state;
     const isLoading = loading < 100;
 
@@ -61,7 +67,7 @@ class App extends React.Component {
       return (
         <>
           <Header />
-          <div className="loading-bar" style={{ width: `${loading}%` }} />
+          {recordingId && <div className="loading-bar" style={{ width: `${loading}%` }} />}
         </>
       );
     }
@@ -106,6 +112,7 @@ export default connect(
     tooltip: selectors.getTooltip(state),
     commentVisible: selectors.commentVisible(state),
     loading: selectors.getLoading(state),
+    recordingId: selectors.getRecordingId(state),
   }),
   {
     updateTheme: actions.updateTheme,
