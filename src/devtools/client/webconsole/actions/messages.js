@@ -20,6 +20,8 @@ const {
   MESSAGE_UPDATE_PAYLOAD,
   PAUSED_EXECUTION_POINT,
   PRIVATE_MESSAGES_CLEAR,
+  MESSAGES_CLEAR_EVALUATIONS,
+  MESSAGES_CLEAR_EVALUATION,
 } = require("devtools/client/webconsole/constants");
 
 const defaultIdGenerator = new IdGenerator();
@@ -52,6 +54,19 @@ function messagesAdd(packets, idGenerator = null) {
 function messagesClear() {
   return {
     type: MESSAGES_CLEAR,
+  };
+}
+
+function messagesClearEvaluations() {
+  return {
+    type: MESSAGES_CLEAR_EVALUATIONS,
+  };
+}
+
+function messagesClearEvaluation(messageId) {
+  return {
+    type: MESSAGES_CLEAR_EVALUATION,
+    messageId,
   };
 }
 
@@ -158,6 +173,8 @@ function jumpToExecutionPoint(executionPoint) {
 module.exports = {
   messagesAdd,
   messagesClear,
+  messagesClearEvaluations,
+  messagesClearEvaluation,
   messagesClearLogpoint,
   messageOpen,
   messageClose,
