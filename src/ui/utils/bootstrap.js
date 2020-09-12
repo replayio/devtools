@@ -27,6 +27,9 @@ import Auth0ProviderWithHistory from "./auth0";
 import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
 
+const url = new URL(window.location.href);
+const test = url.searchParams.get("test");
+
 async function getInitialState() {
   const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;
   return {
@@ -35,6 +38,10 @@ async function getInitialState() {
 }
 
 function setupLogRocket() {
+  if (test || url.hostname == "localhost") {
+    return;
+  }
+
   LogRocket.init("4sdo4i/replay");
 
   setupLogRocketReact(LogRocket);
@@ -46,9 +53,6 @@ function setupLogRocket() {
 }
 
 export function setupSentry(context) {
-  const url = new URL(window.location.href);
-  const test = url.searchParams.get("test");
-
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
 
   if (test || url.hostname == "localhost") {
