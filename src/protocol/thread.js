@@ -1219,6 +1219,7 @@ const ThreadFront = {
     this.initializedWaiter.resolve();
 
     if (this.testName) {
+      sendMessage("Internal.labelTestSession", { sessionId });
       await gToolbox.selectTool("debugger");
       window.Test = require("test/harness");
       const script = document.createElement("script");
