@@ -5,32 +5,36 @@ import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { getAvatarColor } from "ui/utils/user";
 
+function sendUserToBrowser(user) {
+  user = user === null ? "" : user;
+  if (typeof window == "object") {
+    window.dispatchEvent(
+      new window.CustomEvent("WebChannelMessageToChrome", {
+        detail: JSON.stringify({
+          id: "record-replay",
+          message: { user },
+        }),
+      })
+    );
+  }
+}
+
 const Avatar = props => {
   let { player, isFirstPlayer, updateUser } = props;
   let auth = useAuth0();
 
-  if (auth.isAuthenticated && isFirstPlayer) {
-    if (!player.name) {
-      // Check if the user has just logged out. If so, update and add the associated
-      // picture and name from the user metadata.
-      useEffect(() => updateUser(auth.user));
-    }
+  useEffect(() => {
+    sendUserToBrowser(auth.user);
+    updateUser(auth.user);
+  }, [auth.user]);
 
+  if (auth.isAuthenticated && isFirstPlayer) {
     return (
       <div className={`avatar authenticated first-player`}>
         <img src={auth.user.picture} alt={auth.user.name} />
       </div>
     );
   }
-
-  // Check if the user has just logged out. If so, update and remove the associated
-  // picture and name from the user metadata.
-
-  useEffect(() => {
-    if (!auth.isAuthenticated && isFirstPlayer && player.name) {
-      updateUser();
-    }
-  });
 
   return (
     <div
