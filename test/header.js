@@ -23,10 +23,7 @@ const EventUtils = {
   _EU_Cc: Cc,
 };
 
-Services.scriptloader.loadSubScript(
-  "chrome://remote/content/external/EventUtils.js",
-  EventUtils
-);
+Services.scriptloader.loadSubScript("chrome://remote/content/external/EventUtils.js", EventUtils);
 
 const modules = {};
 XPCOMUtils.defineLazyModuleGetters(modules, {
@@ -72,7 +69,7 @@ async function stopRecordingAndLoadDevtools() {
       dump(`TestHarnessWaitForDevtools\n`);
 
       // This is the server used for hosting the devtools in run.js. This is cheesy...
-      if (await waitForLoad("localhost:8002")) {
+      if (await waitForLoad("localhost:8080")) {
         break;
       }
     }
