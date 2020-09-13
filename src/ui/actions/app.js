@@ -3,16 +3,14 @@ import { selectors } from "ui/reducers";
 
 export function setupApp(recordingId, store) {
   store.dispatch({ type: "setup_app", recordingId });
-  if (recordingId) {
-    ThreadFront.ensureProcessed(_, regions => store.dispatch(onUnprocessedRegions(regions))).then(
-      () => {
-        clearInterval(loadingInterval);
-        store.dispatch({ type: "loading", loading: 100 });
-      }
-    );
+  ThreadFront.ensureProcessed(_, regions => store.dispatch(onUnprocessedRegions(regions))).then(
+    () => {
+      clearInterval(loadingInterval);
+      store.dispatch({ type: "loading", loading: 100 });
+    }
+  );
 
-    const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 500);
-  }
+  const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 500);
 }
 
 function bumpLoading() {

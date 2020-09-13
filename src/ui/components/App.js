@@ -6,6 +6,7 @@ import Toolbox from "./Toolbox";
 import Tooltip from "./Tooltip";
 import Comments from "./Comments";
 import Header from "./Header";
+import Recordings from "./Recordings";
 
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import RightSidebar from "./RightSidebar";
@@ -25,9 +26,7 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    const { theme, initialize } = this.props;
-
-    initialize();
+    const { theme } = this.props;
     setTheme(theme);
   }
 
@@ -67,7 +66,11 @@ class App extends React.Component {
       return (
         <>
           <Header />
-          {recordingId && <div className="loading-bar" style={{ width: `${loading}%` }} />}
+          {recordingId ? (
+            <div className="loading-bar" style={{ width: `${loading}%` }} />
+          ) : (
+            <Recordings />
+          )}
         </>
       );
     }
@@ -113,6 +116,7 @@ export default connect(
     commentVisible: selectors.commentVisible(state),
     loading: selectors.getLoading(state),
     recordingId: selectors.getRecordingId(state),
+    user: selectors.getUser(state),
   }),
   {
     updateTheme: actions.updateTheme,

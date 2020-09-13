@@ -32,6 +32,7 @@ const { setupApp } = require("ui/actions/app");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { prefs } = require("ui/utils/prefs");
 const { features } = require("./ui/utils/prefs");
+const { setTimelineState } = require("./ui/actions/timeline");
 
 // Create a session to use while debugging.
 async function createSession() {
@@ -82,23 +83,14 @@ function onSessionError({ message }) {
 
 let initialized = false;
 async function initialize() {
-  if (initialized) {
-    return;
-  }
-
-  initialized = true;
   loadImages();
 
-  if (!recordingId) {
-    if (!features.auth0) {
-      setStatus("Recording ID not specified");
-    }
-    return;
-  }
-
+  // Initialize the socket so we can communicate with the server
   initSocket(dispatch);
 
-  createSession();
+  if (recordingId) {
+    createSession();
+  }
 
   document.body.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -122,9 +114,17 @@ if (!test) {
 }
 
 (async () => {
-  store = await bootstrapApp({ initialize }, { recordingId });
-  setupApp(recordingId, store);
-  setupTimeline(recordingId, store);
-  setupMetadata(recordingId, store);
-  setupEventListeners(recordingId, store);
+  store = await bootstrapApp({}, { recordingId });
+
+  if (!initialized) {
+    initialized = true;
+    await initialize();
+  }
+
+  if (recordingId) {
+    setupApp(recordingId, store);
+    setupTimeline(recordingId, store);
+    setupMetadata(recordingId, store);
+    setupEventListeners(recordingId, store);
+  }
 })();
