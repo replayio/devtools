@@ -11,16 +11,23 @@ module.exports = {
     publicPath: "dist",
   },
   devServer: {
+    before: app => {
+      app.get("/view", (req, res) => {
+        res.sendFile("index.html", { root: "." });
+      });
+
+      app.get("/test", (req, res) => {
+        const testFile = req.url.substring(6);
+        res.sendFile(testFile, { root: "./test/scripts" });
+      });
+    },
     contentBase: ".",
     index: "index.html",
     liveReload: false,
   },
   plugins: [new MiniCssExtractPlugin()],
   resolve: {
-    extensions: [
-      ".js",
-      ".ts",
-    ],
+    extensions: [".js", ".ts"],
     modules: [
       "src",
       "src/devtools/client/debugger/dist",
@@ -45,10 +52,7 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: [
-              "@babel/preset-typescript",
-              "@babel/preset-react"
-            ],
+            presets: ["@babel/preset-typescript", "@babel/preset-react"],
             plugins: [
               "@babel/plugin-transform-flow-strip-types",
               "@babel/plugin-proposal-class-properties",

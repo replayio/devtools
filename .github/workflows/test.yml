@@ -15,7 +15,7 @@ jobs:
       - name: Build webpack
         run: ./node_modules/.bin/webpack --mode=development
       - name: Tar up output files
-        run: tar -czf dist.tgz index.html dist
+        run: tar -czf dist.tgz index.html dist node_modules
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:

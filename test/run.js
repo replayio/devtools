@@ -43,6 +43,10 @@ Arguments:
 }
 
 function processEnvironmentVariables() {
+  /*
+   * RECORD_REPLAY_DONT_RECORD_VIEWER  Disables recording the viewer
+   */
+
   // The INPUT_STRIPE environment variable is set when running as a Github action.
   // This splits testing across multiple machines by having each only do every
   // other stripeCount tests, staggered so that all tests run on some machine.
@@ -56,32 +60,6 @@ function processEnvironmentVariables() {
 
   // Get the address to use for the dispatch server.
   dispatchServer = process.env.RECORD_REPLAY_SERVER || "wss://dispatch.replay.io";
-}
-// Create a server for the devtools.
-function startDevtoolsServer() {
-  const viewServer = http.createServer((request, response) => {
-    if (request.url.startsWith("/view?")) {
-      const content = fs.readFileSync("./index.html");
-      response.writeHead(200, { "Content-Type": "" });
-      response.end(content);
-      return;
-    }
-    if (request.url.startsWith("/test?")) {
-      const content = fs.readFileSync(`test/scripts/${request.url.substring(6)}`);
-      response.writeHead(200, { "Content-Type": "text/javascript" });
-      response.end(content);
-      return;
-    }
-    try {
-      const content = fs.readFileSync(`.${request.url}`);
-      response.writeHead(200, { "Content-Type": getContentType(request.url) });
-      response.end(content);
-    } catch (e) {
-      response.writeHead(404);
-      response.end();
-    }
-  });
-  viewServer.listen(8002);
 }
 
 function startExampleServer() {
@@ -124,6 +102,23 @@ function tmpFile() {
   return os.tmpdir() + ((Math.random() * 1e9) | 0);
 }
 
+function createTestScript({ path }) {
+  const generatedScriptPath = tmpFile();
+  const generatedScriptFd = fs.openSync(generatedScriptPath, "w");
+  spawnSync("clang", ["-C", "-E", "-P", "-nostdinc", "-undef", "-x", "c++", path], {
+    stdio: [, generatedScriptFd, generatedScriptFd],
+  });
+  fs.closeSync(generatedScriptFd);
+
+  // print test file
+  if (false) {
+    const testFile = fs.readFileSync(generatedScriptPath, { encoding: "utf-8" });
+    console.log(testFile);
+  }
+
+  return generatedScriptPath;
+}
+
 let numFailures = 0;
 
 async function runTest(path, local, timeout = 60, env = {}) {
@@ -136,13 +131,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
   }
 
   console.log(`[${elapsedTime()}] Starting test ${path} ${testURL} ${local}`);
-
-  const generatedScriptPath = tmpFile();
-  const generatedScriptFd = fs.openSync(generatedScriptPath, "w");
-  spawnSync("clang", ["-C", "-E", "-P", "-nostdinc", "-undef", "-x", "c++", path], {
-    stdio: [, generatedScriptFd, generatedScriptFd],
-  });
-  fs.closeSync(generatedScriptFd);
+  const testScript = createTestScript({ path });
 
   const profileArgs = [];
   if (!process.env.NORMAL_PROFILE) {
@@ -155,11 +144,11 @@ async function runTest(path, local, timeout = 60, env = {}) {
       ...process.env,
       ...env,
       MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
-      RECORD_REPLAY_TEST_SCRIPT: generatedScriptPath,
+      RECORD_REPLAY_TEST_SCRIPT: testScript,
       RECORD_REPLAY_LOCAL_TEST: local,
       RECORD_REPLAY_NO_UPDATE: "1",
       RECORD_REPLAY_SERVER: dispatchServer,
-      RECORD_REPLAY_VIEW_HOST: "http://localhost:8002",
+      RECORD_REPLAY_VIEW_HOST: "http://localhost:8080",
     },
   });
 
@@ -227,7 +216,6 @@ async function runTest(path, local, timeout = 60, env = {}) {
   processArgs();
   processEnvironmentVariables();
   startExampleServer();
-  startDevtoolsServer();
 
   for (let i = 0; i < count; i++) {
     await runMatchingTests();
