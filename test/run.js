@@ -161,7 +161,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
 
   function processOutput(data) {
     const match = /CreateRecording (.*?) (.*)/.exec(data.toString());
-    if (match && match[2].startsWith("http://localhost:8002/view")) {
+    if (match && match[2].startsWith("http://localhost:8080/view")) {
       recordingId = match[1];
     }
     if (/TestPassed/.test(data.toString())) {
