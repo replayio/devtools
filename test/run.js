@@ -7,11 +7,15 @@ const http = require("http");
 const os = require("os");
 const { spawnSync, spawn } = require("child_process");
 const { defer } = require("../src/protocol/utils");
+const url = require("url");
+
 const Manifest = require("./manifest.json");
+let ExampleRecordings = require("./example-recordings.json");
 
 let count = 1;
 const patterns = [];
 let stripeIndex, stripeCount, dispatchServer, gInstallDir;
+let shouldRecord = false;
 const startTime = Date.now();
 
 function processArgs() {
@@ -24,16 +28,16 @@ Arguments:
   for (let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
     const next = process.argv[++i];
-    if (!next) {
-      console.log(usage);
-      process.exit(0);
-    }
+
     switch (arg) {
       case "--count":
         count = +next;
         break;
       case "--pattern":
         patterns.push(next);
+        break;
+      case "--record":
+        shouldRecord = true;
         break;
       default:
         console.log(usage);
@@ -88,12 +92,17 @@ function getContentType(url) {
 
 async function runMatchingTests() {
   for (let i = 0; i < Manifest.length; i++) {
-    const [test, html] = Manifest[i];
+    const [test, example] = Manifest[i];
+    const exampleRecordingId = ExampleRecordings[example];
     if (stripeCount && i % stripeCount != stripeIndex) {
       continue;
     }
+
     await runTest("test/harness.js", test, 240, {
-      RECORD_REPLAY_TEST_URL: `http://localhost:7998/${html}`,
+      RECORD_REPLAY_TEST_URL:
+        shouldRecord || !exampleRecordingId
+          ? `http://localhost:7998/${example}`
+          : `http://localhost:8080/view?id=${exampleRecordingId}&test=${test}`,
     });
   }
 }
@@ -164,6 +173,15 @@ async function runTest(path, local, timeout = 60, env = {}) {
     if (match && match[2].startsWith("http://localhost:8080/view")) {
       recordingId = match[1];
     }
+    if (match && match[2].startsWith("http://localhost:7998")) {
+      const exampleRecordingId = match[1];
+      const example = url.parse(match[2]).pathname.slice(1);
+      console.log(`example`, exampleRecordingId, example, url.parse(match[2]));
+
+      ExampleRecordings = { ...ExampleRecordings, [example]: exampleRecordingId };
+      fs.writeFileSync("./example-recordings.json", JSON.stringify(ExampleRecordings, null, 2));
+    }
+
     if (/TestPassed/.test(data.toString())) {
       passed = true;
     }

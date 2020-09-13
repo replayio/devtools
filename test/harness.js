@@ -13,8 +13,8 @@ const url = env.get("RECORD_REPLAY_TEST_URL");
   await startRecordingTab(url, "localhost");
   dump(`TestHarnessRecordingTabStarted\n`);
 
-  await waitForMessage("RecordingFinished");
-  dump(`TestHarnessRecordingFinished\n`);
+  // await waitForMessage("RecordingFinished");
+  // dump(`TestHarnessRecordingFinished\n`);
 
   await stopRecordingAndLoadDevtools();
   dump(`TestHarnessFinished\n`);

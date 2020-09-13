@@ -32,8 +32,7 @@ XPCOMUtils.defineLazyModuleGetters(modules, {
 
 let urlbar;
 
-// Start recording a url in the current tab.
-async function startRecordingTab(url, waitPath) {
+async function waitForUrlBar() {
   await waitForTime(2000);
   await waitUntil(() => !!document.getElementById("urlbar") && window.gBrowser);
   dump(`TestHarnessHasURLBar\n`);
@@ -41,6 +40,11 @@ async function startRecordingTab(url, waitPath) {
   urlbar = new modules.UrlbarInput({
     textbox: document.getElementById("urlbar"),
   });
+}
+
+// Start recording a url in the current tab.
+async function startRecordingTab(url, waitPath) {
+  await waitForUrlBar();
 
   while (true) {
     dump(`TestHarnessLoadURL ${url}\n`);
@@ -82,6 +86,7 @@ async function stopRecordingAndLoadDevtools() {
 }
 
 function loadUrl(url) {
+  dump(`LOAD URL ${url}\n`);
   urlbar.focus();
   urlbar.select();
   EventUtils.sendString(url);
