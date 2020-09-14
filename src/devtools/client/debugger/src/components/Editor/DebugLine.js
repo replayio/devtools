@@ -19,7 +19,6 @@ import {
   getVisibleSelectedFrame,
   getPauseReason,
   getSourceWithContent,
-  getCurrentThread,
   getPausePreviewLocation,
 } from "../../selectors";
 
@@ -117,7 +116,7 @@ const mapStateToProps = state => {
     frame,
     location,
     source: location && getSourceWithContent(state, location.sourceId),
-    why: getPauseReason(state, getCurrentThread(state)),
+    why: getPauseReason(state),
   };
 };
 

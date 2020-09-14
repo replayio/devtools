@@ -15,7 +15,7 @@ const {
 } = Reps;
 
 import { getPauseReason } from "../../utils/pause";
-import { getCurrentThread, getPaneCollapse, getPauseReason as getWhy } from "../../selectors";
+import { getPaneCollapse, getPauseReason as getWhy } from "../../selectors";
 
 import "./WhyPaused.css";
 
@@ -137,7 +137,7 @@ class WhyPaused extends PureComponent {
 
 const mapStateToProps = state => ({
   endPanelCollapsed: getPaneCollapse(state, "end"),
-  why: getWhy(state, getCurrentThread(state)),
+  why: getWhy(state),
 });
 
 export default connect(mapStateToProps, {

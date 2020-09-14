@@ -13,7 +13,6 @@ import {
   getActiveSearch,
   getProjectDirectoryRoot,
   getSelectedPrimaryPaneTab,
-  getAllThreads,
   getContext,
   getExtensionNameBySourceUrl,
 } from "../../selectors";
@@ -56,8 +55,7 @@ class PrimaryPanes extends Component {
   };
 
   getRootLabel = projectRoot => {
-    const { threads, rootExtensionName } = this.props;
-    const targetThread = threads.find(thread => thread.actor === projectRoot);
+    const { rootExtensionName } = this.props;
 
     if (targetThread) {
       return targetThread.name;
@@ -119,8 +117,8 @@ class PrimaryPanes extends Component {
     );
   }
 
-  renderThreadSources() {
-    return <SourcesTree threads={this.props.threads} />;
+  renderSources() {
+    return <SourcesTree />;
   }
 
   render() {
@@ -136,10 +134,7 @@ class PrimaryPanes extends Component {
           })}
           hasFocusableContent
         >
-          <div className="threads-list">
-            {this.renderProjectRootHeader()}
-            {this.renderThreadSources()}
-          </div>
+          <div className="threads-list">{this.renderSources()}</div>
           <Outline
             alphabetizeOutline={this.state.alphabetizeOutline}
             onAlphabetizeClick={this.onAlphabetizeClick}
@@ -158,7 +153,6 @@ const mapStateToProps = state => {
     cx: getContext(state),
     selectedTab: getSelectedPrimaryPaneTab(state),
     sourceSearchOn: getActiveSearch(state) === "source",
-    threads: getAllThreads(state),
     projectRoot: newProjectRoot,
     rootExtensionName: extensionAsRoot ? getExtensionNameBySourceUrl(state, newProjectRoot) : null,
   };

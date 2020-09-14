@@ -4,17 +4,8 @@
 
 //
 
-import Actions from "../../actions";
-
-import { createPause, prepareSourcePayload, createFrame } from "./create";
-import { clientCommands } from "./commands";
+import { prepareSourcePayload } from "./create";
 import sourceQueue from "../../utils/source-queue";
-import { prefs, features } from "../../utils/prefs";
-
-const {
-  WorkersListener,
-  // $FlowIgnore
-} = require("devtools/client/shared/workers-listener.js");
 
 const { ThreadFront } = require("protocol/thread");
 const { log } = require("protocol/socket");
@@ -23,14 +14,7 @@ let actions;
 let isInterrupted;
 let panel;
 
-function addThreadEventListeners(thread) {
-  const removeListeners = [];
-  threadFrontListeners.set(thread, removeListeners);
-  thread.replayFetchPreloadedData();
-}
-
 function setupEvents(dependencies) {
-  const { devToolsClient } = dependencies;
   actions = dependencies.actions;
   panel = dependencies.panel;
   sourceQueue.initialize(actions);
@@ -40,18 +24,12 @@ function setupEvents(dependencies) {
   });
 }
 
-function removeEventsTopTarget(targetFront) {
-  targetFront.off("workerListChanged", threadListChanged);
-  removeThreadEventListeners(targetFront.threadFront);
-  workersListener.removeListener();
-}
-
-async function paused(threadFront, { point }) {
+async function paused(_, { point }) {
   log("ThreadFront.paused");
-  actions.paused({ thread: threadFront.actor, executionPoint: point });
+  actions.paused({ thread: ThreadFront.actor, executionPoint: point });
 }
 
-function resumed(threadFront) {
+function resumed() {
   // NOTE: the client suppresses resumed events while interrupted
   // to prevent unintentional behavior.
   // see [client docs](../README.md#interrupted) for more information.
@@ -60,29 +38,20 @@ function resumed(threadFront) {
     return;
   }
 
-  actions.resumed(threadFront.actor);
+  actions.resumed();
 }
 
-function newSource(threadFront, { source }) {
+function newSource(_, { source }) {
   sourceQueue.queue({
     type: "generated",
-    data: prepareSourcePayload(threadFront, source),
+    data: prepareSourcePayload(source),
   });
-}
-
-function threadListChanged() {
-  actions.updateThreads();
-}
-
-function replayFramePositions(threadFront, { positions, unexecutedLocations, frame, thread }) {
-  actions.setFramePositions(positions, unexecutedLocations, frame, thread);
 }
 
 const clientEvents = {
   paused,
   resumed,
   newSource,
-  replayFramePositions,
 };
 
-export { removeEventsTopTarget, setupEvents, clientEvents, addThreadEventListeners };
+export { setupEvents, clientEvents };

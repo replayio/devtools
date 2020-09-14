@@ -4,15 +4,14 @@
 
 //
 
-import { getSourceByActorId, getCurrentThread, getSelectedFrame } from "../../selectors";
+import { getSourceByActorId, getSelectedFrame } from "../../selectors";
 import { zip } from "lodash";
 
 const { ThreadFront } = require("protocol/thread");
 
 export function setFramePositions() {
   return async ({ dispatch, getState, client }) => {
-    const thread = getCurrentThread(getState());
-    const frame = getSelectedFrame(getState(), thread);
+    const frame = getSelectedFrame(getState());
     if (!frame) {
       return;
     }
@@ -32,7 +31,7 @@ export function setFramePositions() {
       return { point, time, location };
     });
 
-    if (frame != getSelectedFrame(getState(), thread)) {
+    if (frame != getSelectedFrame(getState())) {
       return;
     }
 

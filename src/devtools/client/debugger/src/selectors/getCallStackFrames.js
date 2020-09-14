@@ -5,7 +5,7 @@
 //
 
 import { getSources, getSelectedSource, getSourceInSources } from "../reducers/sources";
-import { getCurrentThreadFrames } from "../reducers/pause";
+import { getCurrentFrames } from "../reducers/pause";
 import { annotateFrames } from "../utils/pause/frames";
 import { get } from "lodash";
 import { createSelector } from "reselect";
@@ -41,8 +41,8 @@ export function formatCallStackFrames(frames, sources, selectedSource) {
 }
 
 // eslint-disable-next-line
-export const getCallStackFrames = (createSelector)(
-  getCurrentThreadFrames,
+export const getCallStackFrames = createSelector(
+  getCurrentFrames,
   getSources,
   getSelectedSource,
   formatCallStackFrames

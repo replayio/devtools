@@ -7,7 +7,6 @@
 import React, { Component } from "react";
 import classnames from "classnames";
 import { connect } from "../../utils/connect";
-import { List } from "immutable";
 
 import actions from "../../actions";
 import {
@@ -19,8 +18,6 @@ import {
   getPauseCommand,
   getSelectedFrame,
   getShouldLogExceptions,
-  getThreads,
-  getCurrentThread,
   getThreadContext,
   getSourceFromId,
   getSkipPausing,
@@ -34,7 +31,6 @@ import Breakpoints from "./Breakpoints";
 import Expressions from "./Expressions";
 import SplitBox from "devtools-splitter";
 import Frames from "./Frames";
-import Threads from "./Threads";
 import Accordion from "../shared/Accordion";
 import CommandBar from "./CommandBar";
 import XHRBreakpoints from "./XHRBreakpoints";
@@ -208,18 +204,6 @@ class SecondaryPanes extends Component {
     };
   }
 
-  getThreadsItem() {
-    return {
-      header: L10N.getStr("threadsHeader"),
-      className: "threads-pane",
-      component: <Threads />,
-      opened: prefs.workersVisible,
-      onToggle: opened => {
-        prefs.workersVisible = opened;
-      },
-    };
-  }
-
   getBreakpointsItem() {
     const { shouldLogExceptions, logExceptions } = this.props;
 
@@ -242,10 +226,6 @@ class SecondaryPanes extends Component {
     const { horizontal, hasFrames, framesLoading } = this.props;
 
     if (horizontal) {
-      if (features.workers && this.props.workers.length > 0) {
-        items.push(this.getThreadsItem());
-      }
-
       items.push(this.getWatchItem());
     }
 
@@ -269,9 +249,6 @@ class SecondaryPanes extends Component {
     }
 
     const items = [];
-    if (features.workers && this.props.workers.length > 0) {
-      items.push(this.getThreadsItem());
-    }
 
     items.push(this.getWatchItem());
 
@@ -342,21 +319,19 @@ function getRenderWhyPauseDelay(state, thread) {
 }
 
 const mapStateToProps = state => {
-  const thread = getCurrentThread(state);
-  const selectedFrame = getSelectedFrame(state, thread);
+  const selectedFrame = getSelectedFrame(state);
 
   return {
     cx: getThreadContext(state),
     expressions: getExpressions(state),
-    hasFrames: !!getTopFrame(state, thread),
-    framesLoading: getFramesLoading(state, thread),
+    hasFrames: !!getTopFrame(state),
+    framesLoading: getFramesLoading(state),
     breakpoints: getBreakpointsList(state),
     breakpointsDisabled: getBreakpointsDisabled(state),
-    isWaitingOnBreak: getIsWaitingOnBreak(state, thread),
-    renderWhyPauseDelay: getRenderWhyPauseDelay(state, thread),
+    isWaitingOnBreak: getIsWaitingOnBreak(state),
+    renderWhyPauseDelay: getRenderWhyPauseDelay(state),
     selectedFrame,
     shouldLogExceptions: getShouldLogExceptions(state),
-    workers: getThreads(state),
     skipPausing: getSkipPausing(state),
     source: selectedFrame && getSourceFromId(state, selectedFrame.location.sourceId),
   };

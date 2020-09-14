@@ -10,7 +10,6 @@
  */
 
 export {
-  selectThread,
   stepIn,
   stepOver,
   stepOut,

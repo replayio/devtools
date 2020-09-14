@@ -9,12 +9,7 @@ import { connect } from "../../../utils/connect";
 
 import Popup from "./Popup";
 
-import {
-  getPreview,
-  getThreadContext,
-  getCurrentThread,
-  getHighlightedCalls,
-} from "../../../selectors";
+import { getPreview, getThreadContext } from "../../../selectors";
 import actions from "../../../actions";
 
 class Preview extends PureComponent {
@@ -48,9 +43,9 @@ class Preview extends PureComponent {
   }
 
   onTokenEnter = ({ target, tokenPos }) => {
-    const { cx, editor, updatePreview, highlightedCalls } = this.props;
+    const { cx, editor, updatePreview } = this.props;
 
-    if (cx.isPaused && !this.state.selecting && highlightedCalls === null) {
+    if (cx.isPaused && !this.state.selecting) {
       updatePreview(cx, target, tokenPos, editor.codeMirror);
     }
   };
@@ -86,9 +81,7 @@ class Preview extends PureComponent {
 }
 
 const mapStateToProps = state => {
-  const thread = getCurrentThread(state);
   return {
-    highlightedCalls: getHighlightedCalls(state, thread),
     cx: getThreadContext(state),
     preview: getPreview(state),
   };

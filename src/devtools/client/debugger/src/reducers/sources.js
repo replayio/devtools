@@ -41,10 +41,8 @@ import {
   hasSourceActor,
   getSourceActor,
   getSourceActors,
-  getAllThreadsBySource,
   getBreakableLinesForSourceActors,
 } from "./source-actors";
-import { getThreads, getMainThread } from "./threads";
 import { uniq } from "lodash";
 
 export function initialSourcesState() {
@@ -627,11 +625,11 @@ const queryAllDisplayedSources = makeReduceQuery(
     (
       resource,
       ident,
-      { projectDirectoryRoot, chromeAndExtensionsEnabled, debuggeeIsWebExtension, threadActors }
+      { projectDirectoryRoot, chromeAndExtensionsEnabled, debuggeeIsWebExtension }
     ) => ({
       id: resource.id,
       displayed:
-        underRoot(resource, projectDirectoryRoot, threadActors) &&
+        underRoot(resource, projectDirectoryRoot) &&
         (!resource.isExtension || chromeAndExtensionsEnabled || debuggeeIsWebExtension),
     })
   ),
@@ -644,48 +642,13 @@ const queryAllDisplayedSources = makeReduceQuery(
     }, [])
 );
 
-function getAllDisplayedSources(state) {
-  return queryAllDisplayedSources(state.sources.sources, {
-    projectDirectoryRoot: state.sources.projectDirectoryRoot,
-    chromeAndExtensionsEnabled: state.sources.chromeAndExtensionsEnabled,
-    debuggeeIsWebExtension: state.threads.isWebExtension,
-    threadActors: [getMainThread(state).actor, ...getThreads(state).map(t => t.actor)],
-  });
-}
-
-const getDisplayedSourceIDs = createSelector(
-  getAllThreadsBySource,
-  getAllDisplayedSources,
-  (threadsBySource, displayedSources) => {
-    const sourceIDsByThread = {};
-
-    for (const sourceId of displayedSources) {
-      const threads = threadsBySource[sourceId] || [];
-
-      for (const thread of threads) {
-        if (!sourceIDsByThread[thread]) {
-          sourceIDsByThread[thread] = new Set();
-        }
-        sourceIDsByThread[thread].add(sourceId);
-      }
-    }
-    return sourceIDsByThread;
-  }
-);
-
 export const getDisplayedSources = createSelector(
   state => state.sources.sources,
-  getDisplayedSourceIDs,
-  (sources, idsByThread) => {
+  sources => {
     const result = {};
 
-    for (const thread of Object.keys(idsByThread)) {
-      for (const id of idsByThread[thread]) {
-        if (!result[thread]) {
-          result[thread] = {};
-        }
-        result[thread][id] = getResource(sources, id);
-      }
+    for (const id in sources.identity) {
+      result[id] = getResource(sources, id);
     }
 
     return result;

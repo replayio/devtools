@@ -9,17 +9,10 @@ import React, { Component } from "react";
 
 import { connect } from "../../utils/connect";
 import classnames from "classnames";
-import { features } from "../../utils/prefs";
-import {
-  getIsWaitingOnBreak,
-  getSkipPausing,
-  getCurrentThread,
-  getThreadContext,
-} from "../../selectors";
+import { getIsWaitingOnBreak, getSkipPausing, getThreadContext } from "../../selectors";
 import { formatKeyShortcut } from "../../utils/text";
 import actions from "../../actions";
 import { debugBtn } from "../shared/Button/CommandBarButton";
-import AccessibleImage from "../shared/AccessibleImage";
 import "./CommandBar.css";
 
 import { appinfo } from "devtools-services";
@@ -176,7 +169,7 @@ CommandBar.contextTypes = {
 
 const mapStateToProps = state => ({
   cx: getThreadContext(state),
-  isWaitingOnBreak: getIsWaitingOnBreak(state, getCurrentThread(state)),
+  isWaitingOnBreak: getIsWaitingOnBreak(state),
   skipPausing: getSkipPausing(state),
 });
 

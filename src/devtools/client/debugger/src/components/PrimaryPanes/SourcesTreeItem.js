@@ -11,14 +11,12 @@ import { showMenu } from "devtools-contextmenu";
 
 import SourceIcon from "../shared/SourceIcon";
 import AccessibleImage from "../shared/AccessibleImage";
-import { isWorker } from "../../utils/threads";
 
 import {
   getGeneratedSourceByURL,
   getHasSiblingOfSameName,
   hasPrettySource as checkHasPrettySource,
   getContext,
-  getMainThread,
   getExtensionNameBySourceUrl,
   getSourceContent,
 } from "../../selectors";
@@ -175,7 +173,7 @@ class SourceTreeItem extends Component {
   }
 
   renderIcon(item, depth) {
-    const { debuggeeUrl, projectRoot, source, hasPrettySource, threads } = this.props;
+    const { source, hasPrettySource } = this.props;
 
     if (item.name === "webpack://") {
       return <AccessibleImage className="webpack" />;
@@ -185,28 +183,9 @@ class SourceTreeItem extends Component {
       return <AccessibleImage className="extension" />;
     }
 
-    // Threads level
-    if (depth === 0 && projectRoot === "") {
-      const thread = threads.find(thrd => thrd.actor == item.name);
-
-      if (thread) {
-        const icon = isWorker(thread) ? "worker" : "window";
-        return (
-          <AccessibleImage
-            className={classnames(icon, {
-              debuggee: debuggeeUrl && debuggeeUrl.includes(item.name),
-            })}
-          />
-        );
-      }
-    }
-
     if (isDirectory(item)) {
       // Domain level
-      if (
-        (depth === 1 && projectRoot === "") ||
-        (depth === 0 && threads.find(thrd => thrd.actor === projectRoot))
-      ) {
+      if (depth === 1) {
         return <AccessibleImage className="globe-small" />;
       }
       return <AccessibleImage className="folder" />;
@@ -228,14 +207,7 @@ class SourceTreeItem extends Component {
   }
 
   renderItemName(depth) {
-    const { item, threads, extensionName } = this.props;
-
-    if (depth === 0) {
-      const thread = threads.find(({ actor }) => actor == item.name);
-      if (thread) {
-        return thread.name + (thread.serviceWorkerStatus ? ` (${thread.serviceWorkerStatus})` : "");
-      }
-    }
+    const { item, extensionName } = this.props;
 
     if (isExtensionDirectory(depth, extensionName)) {
       return extensionName;
@@ -271,9 +243,7 @@ class SourceTreeItem extends Component {
       hasSiblingOfSameName,
     } = this.props;
 
-    const suffix = /*hasMatchingGeneratedSource ? (
-      <span className="suffix">{L10N.getStr("sourceFooter.mappedSuffix")}</span>
-    ) :*/ null;
+    const suffix = null;
 
     let querystring;
     if (hasSiblingOfSameName) {
@@ -323,7 +293,6 @@ const mapStateToProps = (state, props) => {
   const { source, item } = props;
   return {
     cx: getContext(state),
-    mainThread: getMainThread(state),
     hasMatchingGeneratedSource: getHasMatchingGeneratedSource(state, source),
     hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
     hasPrettySource: source ? checkHasPrettySource(state, source.id) : false,

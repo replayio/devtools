@@ -32,27 +32,10 @@ export class ContextError extends Error {}
 
 export function validateNavigateContext(state, cx) {}
 
-export function validateThreadContext(state, cx) {
-  const newcx = getThreadContext(state);
-
-  if (cx.thread != newcx.thread) {
-    throw new ContextError("Current thread has changed");
-  }
-
-  if (cx.pauseCounter != newcx.pauseCounter) {
-    throw new ContextError("Current thread has paused or resumed");
-  }
-}
-
 export function validateContext(state, cx) {
   validateNavigateContext(state, cx);
-
-  if ("thread" in cx) {
-    validateThreadContext(state, cx);
-  }
-}
-
-export function isValidThreadContext(state, cx) {
   const newcx = getThreadContext(state);
-  return cx.thread == newcx.thread && cx.pauseCounter == newcx.pauseCounter;
+  if (cx.pauseCounter && cx.pauseCounter != newcx.pauseCounter) {
+    throw new ContextError("Current thread has paused or resumed");
+  }
 }

@@ -23,7 +23,7 @@ export function resumed(thread) {
     dispatch({ type: "RESUME", thread, wasStepping });
 
     const cx = getThreadContext(getState());
-    if (!wasStepping && !wasPausedInEval && cx.thread == thread) {
+    if (!wasStepping && !wasPausedInEval) {
       await dispatch(evaluateExpressions(cx));
     }
   };

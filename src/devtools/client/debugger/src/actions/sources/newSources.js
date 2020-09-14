@@ -301,7 +301,7 @@ export function ensureSourceActor(thread, sourceActor) {
       return Promise.resolve();
     }
 
-    const sources = await client.fetchThreadSources(thread);
+    const sources = await client.fetchSources(thread);
     await dispatch(newGeneratedSources(sources));
   };
 }

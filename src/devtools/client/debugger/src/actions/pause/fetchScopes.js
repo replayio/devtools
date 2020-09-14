@@ -9,9 +9,9 @@ import { generateInlinePreview } from "./inlinePreview";
 import { PROMISE } from "../utils/middleware/promise";
 
 export function fetchScopes(cx) {
-  return async function ({ dispatch, getState, client, sourceMaps }) {
-    const frame = getSelectedFrame(getState(), cx.thread);
-    if (!frame || getFrameScope(getState(), cx.thread, frame.id)) {
+  return async function ({ dispatch, getState, client }) {
+    const frame = getSelectedFrame(getState());
+    if (!frame || getFrameScope(getState(), frame.id)) {
       return;
     }
 

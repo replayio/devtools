@@ -9,7 +9,6 @@ import { evaluateExpressions } from "../expressions";
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
 import assert from "../../utils/assert";
-import { getCanRewind } from "../../reducers/threads";
 
 /**
  * @memberof actions/pause
@@ -32,9 +31,7 @@ export function selectFrame(cx, frame) {
       frame,
     });
 
-    if (getCanRewind(getState())) {
-      client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
-    }
+    client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
 
     dispatch(selectLocation(cx, frame.location));
     dispatch(setFramePositions());

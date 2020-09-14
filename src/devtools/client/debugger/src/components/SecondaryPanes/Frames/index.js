@@ -19,7 +19,6 @@ import {
   getFrameworkGroupingState,
   getSelectedFrame,
   getCallStackFrames,
-  getCurrentThread,
   getThreadContext,
   getFramesLoading,
 } from "../../../selectors";
@@ -197,9 +196,9 @@ Frames.contextTypes = { l10n: PropTypes.object };
 const mapStateToProps = state => ({
   cx: getThreadContext(state),
   frames: getCallStackFrames(state),
-  framesLoading: getFramesLoading(state, getCurrentThread(state)),
+  framesLoading: getFramesLoading(state),
   frameworkGroupingOn: getFrameworkGroupingState(state),
-  selectedFrame: getSelectedFrame(state, getCurrentThread(state)),
+  selectedFrame: getSelectedFrame(state),
   disableFrameTruncate: false,
   disableContextMenu: false,
   displayFullUrl: false,

@@ -13,7 +13,6 @@ import {
   getSelectedLocation,
   getSelectedSourceWithContent,
   getPauseCommand,
-  getCurrentThread,
 } from "../../selectors";
 
 function isDebugLine(selectedFrame, selectedLocation) {
@@ -139,7 +138,7 @@ export default connect(state => {
     throw new Error("must have selected location");
   }
   return {
-    pauseCommand: getPauseCommand(state, getCurrentThread(state)),
+    pauseCommand: getPauseCommand(state),
     selectedFrame: getVisibleSelectedFrame(state),
     selectedLocation,
     selectedSource: getSelectedSourceWithContent(state),

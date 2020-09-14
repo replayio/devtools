@@ -37,28 +37,7 @@ export default function update(state = initialThreadsState(), action) {
         traits: action.traits,
         isWebExtension: action.isWebExtension,
       };
-    case "INSERT_THREADS":
-      return {
-        ...state,
-        threads: [...state.threads, ...action.threads],
-      };
-    case "REMOVE_THREADS":
-      const { threads } = action;
-      return {
-        ...state,
-        threads: state.threads.filter(w => !threads.includes(w.actor)),
-      };
-    case "UPDATE_SERVICE_WORKER_STATUS":
-      const { thread, status } = action;
-      return {
-        ...state,
-        threads: state.threads.map(t => {
-          if (t.actor == thread) {
-            return { ...t, serviceWorkerStatus: status };
-          }
-          return t;
-        }),
-      };
+
     case "NAVIGATE":
       return {
         ...initialThreadsState(),
@@ -69,36 +48,10 @@ export default function update(state = initialThreadsState(), action) {
   }
 }
 
-export const getThreads = state => state.threads.threads;
-
-export const getWorkerCount = state => getThreads(state).length;
-
-export function getWorkerByThread(state, thread) {
-  return getThreads(state).find(worker => worker.actor == thread);
-}
-
 export function getMainThread(state) {
   return state.threads.mainThread;
 }
 
 export function getDebuggeeUrl(state) {
   return getMainThread(state).url;
-}
-
-export const getAllThreads = createSelector(getMainThread, getThreads, (mainThread, threads) => [
-  mainThread,
-  ...sortBy(threads, thread => thread.name),
-]);
-
-export function getCanRewind(state) {
-  return state.threads.traits.canRewind;
-}
-
-// checks if a path begins with a thread actor
-// e.g "server1.conn0.child1/workerTarget22/context1/dbg-workers.glitch.me"
-export function startsWithThreadActor(state, path) {
-  const threadActors = getAllThreads(state).map(t => t.actor);
-
-  const match = path.match(new RegExp(`(${threadActors.join("|")})\/(.*)`));
-  return match && match[1];
 }

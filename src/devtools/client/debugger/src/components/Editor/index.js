@@ -29,12 +29,10 @@ import {
   getConditionalPanelLocation,
   getSymbols,
   getIsPaused,
-  getCurrentThread,
   getThreadContext,
   getSkipPausing,
   getInlinePreview,
   getSelectedFrame,
-  getHighlightedCalls,
 } from "../../selectors";
 
 // Redux actions
@@ -589,11 +587,10 @@ const mapStateToProps = state => {
     searchOn: getActiveSearch(state) === "file",
     conditionalPanelLocation: getConditionalPanelLocation(state),
     symbols: getSymbols(state, selectedSource),
-    isPaused: getIsPaused(state, getCurrentThread(state)),
+    isPaused: getIsPaused(state),
     skipPausing: getSkipPausing(state),
     inlinePreviewEnabled: getInlinePreview(state),
-    selectedFrame: getSelectedFrame(state, getCurrentThread(state)),
-    highlightedCalls: getHighlightedCalls(state, getCurrentThread(state)),
+    selectedFrame: getSelectedFrame(state),
   };
 };
 

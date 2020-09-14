@@ -52,13 +52,9 @@ function shouldAutoExpand(depth, item, debuggeeUrl, projectRoot) {
   return item.name === host;
 }
 
-function findSource({ threads, sources }, itemPath, source) {
-  const targetThread = threads.find(thread => itemPath.includes(thread.actor));
-  if (targetThread && source) {
-    const { actor } = targetThread;
-    if (sources[actor]) {
-      return sources[actor][source.id];
-    }
+function findSource({ sources }, itemPath, source) {
+  if (source) {
+    return sources[source.id];
   }
   return source;
 }
@@ -66,23 +62,21 @@ function findSource({ threads, sources }, itemPath, source) {
 class SourcesTree extends Component {
   constructor(props) {
     super(props);
-    const { debuggeeUrl, sources, threads } = this.props;
+    const { debuggeeUrl, sources } = this.props;
 
     this.state = createTree({
       debuggeeUrl,
       sources,
-      threads,
     });
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const { projectRoot, debuggeeUrl, sources, shownSource, selectedSource, threads } = this.props;
+    const { projectRoot, debuggeeUrl, sources, shownSource, selectedSource } = this.props;
     const { uncollapsedTree, sourceTree } = this.state;
 
     if (
       projectRoot != nextProps.projectRoot ||
       debuggeeUrl != nextProps.debuggeeUrl ||
-      threads != nextProps.threads ||
       nextProps.sourceCount === 0
     ) {
       // early recreate tree because of changes
@@ -91,7 +85,6 @@ class SourcesTree extends Component {
         createTree({
           sources: nextProps.sources,
           debuggeeUrl: nextProps.debuggeeUrl,
-          threads: nextProps.threads,
         })
       );
     }
@@ -112,7 +105,6 @@ class SourcesTree extends Component {
       this.setState(
         updateTree({
           newSources: nextProps.sources,
-          threads: nextProps.threads,
           prevSources: sources,
           debuggeeUrl,
           uncollapsedTree,
@@ -177,15 +169,6 @@ class SourcesTree extends Component {
   }
 
   getRoots = (sourceTree, projectRoot) => {
-    const sourceContents = sourceTree.contents[0];
-
-    if (projectRoot && sourceContents) {
-      const roots = findSourceTreeNodes(sourceTree, projectRoot);
-      // NOTE if there is one root, we want to show its content
-      // TODO with multiple roots we should try and show the thread name
-      return roots && roots.length == 1 ? roots[0].contents : roots;
-    }
-
     return sourceTree.contents;
   };
 
@@ -194,12 +177,11 @@ class SourcesTree extends Component {
   };
 
   renderItem = (item, depth, focused, _, expanded, { setExpanded }) => {
-    const { debuggeeUrl, projectRoot, threads } = this.props;
+    const { debuggeeUrl, projectRoot } = this.props;
 
     return (
       <SourcesTreeItem
         item={item}
-        threads={threads}
         depth={depth}
         focused={focused}
         autoExpand={shouldAutoExpand(depth, item, debuggeeUrl, projectRoot)}
@@ -276,7 +258,7 @@ function getSourceForTree(state, displayedSources, source) {
     return null;
   }
 
-  if (!source || !source.isPrettyPrinted) {
+  if (!source.isPrettyPrinted) {
     return source;
   }
 
@@ -286,19 +268,18 @@ function getSourceForTree(state, displayedSources, source) {
 const mapStateToProps = (state, props) => {
   const selectedSource = getSelectedSource(state);
   const shownSource = getShownSource(state);
-  const displayedSources = getDisplayedSources(state);
+  const sources = getDisplayedSources(state);
 
   return {
-    threads: props.threads,
     cx: getContext(state),
-    shownSource: getSourceForTree(state, displayedSources, shownSource),
-    selectedSource: getSourceForTree(state, displayedSources, selectedSource),
+    shownSource: shownSource,
+    selectedSource: selectedSource,
     debuggeeUrl: getDebuggeeUrl(state),
     expanded: getExpandedState(state),
     focused: getFocusedSourceItem(state),
     projectRoot: getProjectDirectoryRoot(state),
-    sources: displayedSources,
-    sourceCount: Object.values(displayedSources).length,
+    sources: sources,
+    sourceCount: Object.values(sources).length,
   };
 };
 

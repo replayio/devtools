@@ -120,7 +120,7 @@ async function removeAllBreakpoints() {
 }
 
 function isPaused() {
-  return dbgSelectors.getIsPaused(dbgSelectors.getCurrentThread());
+  return dbgSelectors.getIsPaused();
 }
 
 async function waitForLoadedScopes() {
@@ -159,13 +159,13 @@ function waitForSelectedSource(url) {
 }
 
 async function waitForPaused(url) {
-  const { getSelectedScope, getCurrentThread, getCurrentThreadFrames } = dbgSelectors;
+  const { getSelectedScope, getCurrentFrames } = dbgSelectors;
 
   await waitUntil(() => {
-    return isPaused() && !!getSelectedScope(getCurrentThread());
+    return isPaused() && !!getSelectedScope();
   });
 
-  await waitUntil(() => getCurrentThreadFrames());
+  await waitUntil(() => getCurrentFrames());
   await waitForLoadedScopes();
   await waitForSelectedSource(url);
 }
@@ -175,7 +175,7 @@ async function waitForPausedNoSource() {
 }
 
 function hasFrames() {
-  const frames = dbgSelectors.getCurrentThreadFrames();
+  const frames = dbgSelectors.getCurrentFrames();
   return frames.length > 0;
 }
 
@@ -390,13 +390,13 @@ function waitForFrameTimeline(width) {
 
 async function checkFrames(count) {
   return waitUntil(() => {
-    const frames = dbgSelectors.getFrames(dbgSelectors.getCurrentThread());
+    const frames = dbgSelectors.getFrames();
     return frames.length == count;
   });
 }
 
 async function selectFrame(index) {
-  const frames = dbgSelectors.getFrames(dbgSelectors.getCurrentThread());
+  const frames = dbgSelectors.getFrames();
   await dbg.actions.selectFrame(getThreadContext(), frames[index]);
 }
 

@@ -25,7 +25,6 @@ import {
   getBreakpointsList,
   getSelectedFrame,
   getSelectedSource,
-  getCurrentThread,
   getContext,
 } from "../../../selectors";
 
@@ -174,7 +173,7 @@ const getFormattedFrame = createSelector(
 const mapStateToProps = (state, p) => ({
   cx: getContext(state),
   breakpoints: getBreakpointsList(state),
-  frame: getFormattedFrame(state, getCurrentThread(state)),
+  frame: getFormattedFrame(state),
 });
 
 export default connect(mapStateToProps, {

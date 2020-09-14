@@ -5,49 +5,19 @@
 //
 
 import {
-  getSelectedFrame,
   getThreadContext,
   getThreadExecutionPoint,
-  getCurrentThread,
-  getSource,
   getResumePoint,
   getFramePositions,
 } from "../../selectors";
 import { PROMISE } from "../utils/middleware/promise";
-import { evaluateExpressions } from "../expressions";
-import { selectLocation } from "../sources";
-import { fetchScopes } from "./fetchScopes";
-import { fetchFrames } from "./fetchFrames";
 import { recordEvent } from "../../utils/telemetry";
-import assert from "../../utils/assert";
 import FullStory from "ui/utils/fullstory";
 
-import { generateInlinePreview } from "./inlinePreview";
 import { setFramePositions } from "./setFramePositions";
 
 const { log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
-
-export function selectThread(cx, thread) {
-  return async ({ dispatch, getState, client }) => {
-    await dispatch({ cx, type: "SELECT_THREAD", thread });
-
-    // Get a new context now that the current thread has changed.
-    const threadcx = getThreadContext(getState());
-    assert(threadcx.thread == thread, "Thread mismatch");
-
-    const serverRequests = [];
-    serverRequests.push(dispatch(evaluateExpressions(threadcx)));
-
-    const frame = getSelectedFrame(getState(), thread);
-    if (frame) {
-      serverRequests.push(dispatch(selectLocation(threadcx, frame.location)));
-      serverRequests.push(dispatch(fetchFrames(threadcx)));
-      serverRequests.push(dispatch(fetchScopes(threadcx)));
-    }
-    await Promise.all(serverRequests);
-  };
-}
 
 /**
  * Debugger commands like stepOver, stepIn, stepUp
@@ -56,19 +26,18 @@ export function selectThread(cx, thread) {
  * @memberof actions/pause
  * @static
  */
-export function command(cx, type, executionPoint) {
+export function command(cx, type) {
   return async thunkArgs => {
     const { dispatch, getState, client } = thunkArgs;
     log(`Debugger CommandStart ${type}`);
     FullStory.event(`debugger.${type}`);
 
-    const thread = getCurrentThread(getState());
-    const point = getThreadExecutionPoint(getState(), thread);
+    const point = getThreadExecutionPoint(getState());
 
     if (!type) {
       return;
     }
-    if (!getFramePositions(getState(), thread)) {
+    if (!getFramePositions(getState())) {
       await dispatch(setFramePositions());
     }
     const nextPoint = getResumePoint(getState(), type);
@@ -79,14 +48,13 @@ export function command(cx, type, executionPoint) {
       type: "COMMAND",
       command: type,
       cx,
-      thread: cx.thread,
-      [PROMISE]: client[type](cx.thread, nextPoint),
+      [PROMISE]: client[type](nextPoint),
     });
   };
 }
 
 export function seekToPosition(point, time) {
-  return ({ dispatch, getState, client }) => {
+  return ({ getState }) => {
     const cx = getThreadContext(getState());
     ThreadFront.timeWarp(point, time, /* hasFrames */ true);
   };
