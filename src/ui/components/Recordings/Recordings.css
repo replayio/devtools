@@ -63,7 +63,7 @@
   border-radius: 2px;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,.3);
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .recording button.link {
@@ -75,4 +75,45 @@
   right: 20px;
   border-radius: 50%;
   box-shadow: 0 2px 6px 1px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-panel {
+  display: flex;
+  flex-direction: column;
+  width: 600px;
+  max-width: 80vw;
+  margin: 0 auto;
+  align-items: center;
+}
+
+.welcome-panel img.logo {
+  box-sizing: border-box;
+  width: 32px;
+  margin-top: 50px;
+}
+
+.welcome-panel img.atwork {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.welcome-panel button {
+  background: #1890ff;
+  border: none;
+  color: white;
+  font-size: 16px;
+  line-height: 28px;
+  width: 80px;
+  border-radius: 2px;
+}
+
+.welcome-panel button:hover {
+  cursor: pointer;
+  background-color: #2a90ff;
+}
+
+.welcome-screen {
+  background: #f0f2f5;
+  height: 100%;
 }

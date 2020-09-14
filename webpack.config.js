@@ -21,7 +21,7 @@ module.exports = {
         res.sendFile(testFile, { root: "./test/scripts" });
       });
     },
-    contentBase: ".",
+    contentBase: [".", "./src/image"],
     index: "index.html",
     liveReload: false,
   },
