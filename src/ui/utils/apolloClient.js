@@ -1,16 +1,21 @@
 import { gql, ApolloClient, InMemoryCache } from "@apollo/client";
 import { HttpLink } from "apollo-link-http";
+import { useAuth0 } from "@auth0/auth0-react";
+
+const auth = useAuth0();
+const hasuraToken = auth.getAccessTokenSilently({
+  audience: "hasura-api",
+});
 
 const createHttpLink = headers => {
-  const httpLink = new HttpLink({
+  return new HttpLink({
     uri: "http://graphql.replay.io/v1/graphql",
     headers: {
       ...headers,
-      //   "x-hasura-admin-secret": "supersecret",
-    }, // auth token is fetched on the server side
+      Authorization: `Bearer ${hasuraToken}`,
+    },
     fetch,
   });
-  return httpLink;
 };
 
 export const createApolloClient = () => {
@@ -24,8 +29,8 @@ export const createApolloClient = () => {
   client
     .query({
       query: gql`
-        query MyRecordingsQuery($user_id: String) {
-          recordings(where: { user: { auth_id: { _eq: $user_id } } }, order_by: { date: asc }) {
+        query MyRecordingsQuery {
+          recordings(order_by: { date: asc }) {
             title
             id
             recording_id
@@ -36,9 +41,6 @@ export const createApolloClient = () => {
           }
         }
       `,
-      options: {
-        user_id: "google-oauth2|104244849821918151681",
-      },
     })
     .then(result => console.log(result));
   return client;
