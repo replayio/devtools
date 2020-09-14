@@ -6,7 +6,7 @@ import Toolbox from "./Toolbox";
 import Tooltip from "./Tooltip";
 import Comments from "./Comments";
 import Header from "./Header";
-import Recordings from "./Recordings";
+import Recordings from "./Recordings/index";
 
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import RightSidebar from "./RightSidebar";
