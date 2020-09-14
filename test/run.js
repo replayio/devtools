@@ -1,44 +1,51 @@
 /* Copyright 2020 Record Replay Inc. */
 
 // Harness for end-to-end tests. Run this from the devtools root directory.
-
 const fs = require("fs");
 const http = require("http");
 const os = require("os");
 const { spawnSync, spawn } = require("child_process");
 const { defer } = require("../src/protocol/utils");
+const url = require("url");
+const minimist = require("minimist");
 const Manifest = require("./manifest.json");
+
+const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
+  ? JSON.parse(fs.readFileSync("./test/example-recordings.json"))
+  : {};
 
 let count = 1;
 const patterns = [];
 let stripeIndex, stripeCount, dispatchServer, gInstallDir;
+let shouldRecordExamples = false;
+let shouldRecordAll = false;
+let shouldRecordViewer = false;
 const startTime = Date.now();
 
 function processArgs() {
-  const usage = `
-Usage: run.js arguments
-Arguments:
-  --count N: Run tests N times
-  --pattern PAT: Only run tests matching PAT
-`;
-  for (let i = 2; i < process.argv.length; i++) {
-    const arg = process.argv[i];
-    const next = process.argv[++i];
-    if (!next) {
-      console.log(usage);
-      process.exit(0);
-    }
-    switch (arg) {
-      case "--count":
-        count = +next;
-        break;
-      case "--pattern":
-        patterns.push(next);
-        break;
-      default:
-        console.log(usage);
-        process.exit(0);
-    }
+  const argv = minimist(process.argv.slice(2));
+
+  if ((argv._.length == 0 && Object.keys(argv).length == 1) || argv["h"] || argv["help"]) {
+    const usage = `
+      Usage: run.js arguments
+      Arguments:
+        --count N: Run tests N times
+        --pattern PAT: Only run tests matching PAT
+        --record-examples: Record the example and save the recordings locally for testing
+        --record-viewer: Record the viewer while the test is running
+        --record-all: Record examples and save the recordings locally, and record the viewer
+    `;
+    console.log(usage);
+    process.exit(0);
+  }
+
+  shouldRecordExamples = argv["record-examples"] || shouldRecordExamples;
+  shouldRecordViewer = argv["record-viewer"] || shouldRecordViewer;
+  shouldRecordAll = argv["record-all"] || shouldRecordAll;
+  count += argv.count || 0;
+
+  if (argv.pattern) {
+    patterns.push(argv.pattern);
   }
 }
 
@@ -88,13 +95,26 @@ function getContentType(url) {
 
 async function runMatchingTests() {
   for (let i = 0; i < Manifest.length; i++) {
-    const [test, html] = Manifest[i];
+    const [test, example] = Manifest[i];
+    const exampleRecordingId = ExampleRecordings[example];
     if (stripeCount && i % stripeCount != stripeIndex) {
       continue;
     }
-    await runTest("test/harness.js", test, 240, {
-      RECORD_REPLAY_TEST_URL: `http://localhost:7998/${html}`,
-    });
+
+    // To make tests run faster, we save recordings of the examples locally. This happens just once -
+    // when the test is first run. In subsequent tests that require that example, we simply use the
+    // saved recording of the example instead of making another recording. To re-record an example,
+    // the user can pass in the `--record-examples` or `--record-all` flag to the test runner.
+    const env = {
+      RECORD_REPLAY_RECORD_EXAMPLE: shouldRecordAll || shouldRecordExamples || !exampleRecordingId,
+      RECORD_REPLAY_DONT_RECORD_VIEWER: shouldRecordAll ? false : !shouldRecordViewer,
+      RECORD_REPLAY_TEST_URL:
+        shouldRecordExamples || !exampleRecordingId
+          ? `http://localhost:7998/${example}`
+          : `http://localhost:8080/view?id=${exampleRecordingId}&test=${test}`,
+    };
+
+    await runTest("test/harness.js", test, 240, env);
   }
 }
 
@@ -119,7 +139,7 @@ function createTestScript({ path }) {
   return generatedScriptPath;
 }
 
-let numFailures = 0;
+let failures = [];
 
 async function runTest(path, local, timeout = 60, env = {}) {
   const testURL = env.RECORD_REPLAY_TEST_URL || "";
@@ -164,6 +184,19 @@ async function runTest(path, local, timeout = 60, env = {}) {
     if (match && match[2].startsWith("http://localhost:8080/view")) {
       recordingId = match[1];
     }
+    if (match && match[2].startsWith("http://localhost:7998")) {
+      const exampleRecordingId = match[1];
+      const example = url.parse(match[2]).pathname.slice(1);
+      console.log(`example`, exampleRecordingId, example, url.parse(match[2]));
+
+      const newExampleRecordings = { ...ExampleRecordings, [example]: exampleRecordingId };
+
+      fs.writeFileSync(
+        "./test/example-recordings.json",
+        JSON.stringify(newExampleRecordings, null, 2)
+      );
+    }
+
     if (/TestPassed/.test(data.toString())) {
       passed = true;
     }
@@ -171,7 +204,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
   }
 
   function logFailure(why) {
-    numFailures++;
+    failures.push[`Failed test: ${local} ${why}`];
     console.log(`[${elapsedTime()}] Test failed: ${why}`);
 
     // Log an error which github will recognize.
@@ -221,13 +254,14 @@ async function runTest(path, local, timeout = 60, env = {}) {
     await runMatchingTests();
   }
 
-  if (numFailures) {
-    console.log(`[${elapsedTime()}] Had ${numFailures} test failures.`);
+  if (failures.length) {
+    console.log(`[${elapsedTime()}] Had ${failures.length} test failures.`);
+    failures.forEach(failure => console.log(failure));
   } else {
     console.log(`[${elapsedTime()}] All tests passed.`);
   }
 
-  process.exit(numFailures ? 1 : 0);
+  process.exit(failures.length ? 1 : 0);
 })();
 
 function spawnChecked(...args) {
