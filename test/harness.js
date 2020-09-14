@@ -8,14 +8,29 @@ dump(`TestHarnessStart\n`);
 
 // env is declared in the scope this is evaluated in.
 const url = env.get("RECORD_REPLAY_TEST_URL");
+const recordExample = env.get("RECORD_REPLAY_RECORD_EXAMPLE") == "true";
+const recordViewer = env.get("RECORD_REPLAY_DONT_RECORD_VIEWER") == "false";
 
 (async function() {
-  await startRecordingTab(url, "localhost");
-  dump(`TestHarnessRecordingTabStarted\n`);
+  await openUrlInTab(url, "localhost");
 
-  await waitForMessage("RecordingFinished");
-  dump(`TestHarnessRecordingFinished\n`);
+  if (recordExample) {
+    clickRecordingButton();
+    dump(`TestHarnessExampleRecordingTabStarted\n`);
+    await waitForMessage("RecordingFinished");
+    clickRecordingButton();
+    dump(`TestHarnessExampleRecordingTabFinished\n`);
+  } else {
+    dump(`TestHarnessRetrievingExampleFromRecordings`);
+  }
+  
+  if (recordViewer) {
+    await waitForDevtools();
+    clickRecordingButton();
+    dump(`TestHarnessViewerRecordingTabStarted\n`);
+  }
 
-  await stopRecordingAndLoadDevtools();
+  await waitForMessage("TestFinished");
+  finishTest();
   dump(`TestHarnessFinished\n`);
 })();
