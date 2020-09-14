@@ -34,6 +34,8 @@ const { prefs } = require("ui/utils/prefs");
 const { features } = require("./ui/utils/prefs");
 const { setTimelineState } = require("./ui/actions/timeline");
 
+const { createApolloClient } = require("ui/utils/apolloClient");
+
 // Create a session to use while debugging.
 async function createSession() {
   addEventListener("Recording.uploadedData", onUploadedData);
