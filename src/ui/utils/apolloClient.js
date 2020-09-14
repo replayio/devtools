@@ -1,25 +1,26 @@
 import { gql, ApolloClient, InMemoryCache } from "@apollo/client";
 import { HttpLink } from "apollo-link-http";
-import { useAuth0 } from "@auth0/auth0-react";
 
-const auth = useAuth0();
-const hasuraToken = auth.getAccessTokenSilently({
-  audience: "hasura-api",
-});
+export const createApolloClient = async auth0Client => {
+  if (auth0Client.isLoading === true) {
+    return;
+  }
+  const createHttpLink = async headers => {
+    const hasuraToken = await auth0Client.getAccessTokenSilently({
+      audience: "hasura-api",
+    });
 
-const createHttpLink = headers => {
-  return new HttpLink({
-    uri: "http://graphql.replay.io/v1/graphql",
-    headers: {
-      ...headers,
-      Authorization: `Bearer ${hasuraToken}`,
-    },
-    fetch,
-  });
-};
+    return new HttpLink({
+      uri: "http://graphql.replay.io/v1/graphql",
+      headers: {
+        ...headers,
+        Authorization: `Bearer ${hasuraToken}`,
+      },
+      fetch,
+    });
+  };
 
-export const createApolloClient = () => {
-  const link = createHttpLink({});
+  const link = await createHttpLink({});
 
   const client = new ApolloClient({
     link,
@@ -30,14 +31,8 @@ export const createApolloClient = () => {
     .query({
       query: gql`
         query MyRecordingsQuery {
-          recordings(order_by: { date: asc }) {
-            title
+          recordings {
             id
-            recording_id
-            user {
-              auth_id
-            }
-            url
           }
         }
       `,
