@@ -17,7 +17,7 @@
   await Test.waitForMessage("/abc/gi");
   await Test.waitForMessage("Date");
 
-  await Test.checkMessageStack('RangeError: "foo"', [32, 52]);
+  await Test.waitForMessage('RangeError: "foo"');
   await Test.waitForMessage('<div id="foo" class="bar" style="visibility: visible" blahblah="">');
 
   msg = await Test.waitForMessage("function bar()");
@@ -28,7 +28,7 @@
   await Test.warpToMessage("Done");
 
   await Test.executeInConsole("Error('helo')");
-  await Test.checkMessageStack('Error: "helo"', [1, 49, 52]);
+  await Test.waitForMessage('Error: "helo"');
 
   await Test.executeInConsole(
     `
@@ -39,7 +39,7 @@ f();
 `
   );
   // FIXME the first line in this stack isn't right.
-  await Test.checkMessageStack('Error: "there"', [2/*3*/, 5, 49, 52]);
+  await Test.waitForMessage('Error: "there"');
 
   Test.executeInConsole("Array(1, 2, 3)");
   msg = await Test.waitForMessage("Array(3) [ 1, 2, 3 ]");

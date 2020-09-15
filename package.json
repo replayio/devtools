@@ -30,7 +30,6 @@
     "logrocket-react": "^3.0.1",
     "md5": "^2.2.1",
     "mini-css-extract-plugin": "^0.9.0",
-    "minimist": "^1.2.5",
     "parse-script-tags": "^0.1.6",
     "postcss-loader": "^3.0.0",
     "postcss-url-mapper": "^1.2.0",
