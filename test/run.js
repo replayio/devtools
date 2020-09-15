@@ -1,5 +1,4 @@
 /* Copyright 2020 Record Replay Inc. */
-
 // Harness for end-to-end tests. Run this from the devtools root directory.
 const fs = require("fs");
 const http = require("http");
@@ -17,15 +16,14 @@ const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
 let count = 1;
 const patterns = [];
 let stripeIndex, stripeCount, dispatchServer, gInstallDir;
+const startTime = Date.now();
 let shouldRecordExamples = false;
 let shouldRecordAll = false;
 let shouldRecordViewer = false;
-const startTime = Date.now();
 
 function processArgs() {
   const argv = minimist(process.argv.slice(2));
-
-  if ((argv._.length == 0 && Object.keys(argv).length == 1) || argv["h"] || argv["help"]) {
+  if (argv["h"] || argv["help"] || hasUnknownArg(argv)) {
     const usage = `
       Usage: run.js arguments
       Arguments:
@@ -49,6 +47,14 @@ function processArgs() {
   }
 }
 
+function hasUnknownArg(argv) {
+  let knownArgs = ["pattern", "count", "record-examples", "record-viewer", "record-all"];
+  let argvArgs = Object.keys(argv).slice(1);
+
+  // This checks if every argument in argv has a matching knownArg. If not, we return true.
+  return !argvArgs.every(arg => knownArgs.includes(arg));
+}
+
 function processEnvironmentVariables() {
   /*
    * RECORD_REPLAY_DONT_RECORD_VIEWER  Disables recording the viewer
@@ -61,6 +67,8 @@ function processEnvironmentVariables() {
     const match = /(\d+)\/(\d+)/.exec(process.env.INPUT_STRIPE);
     stripeIndex = +match[1];
     stripeCount = +match[2];
+
+    shouldRecordAll = true;
   }
 
   gInstallDir = process.env.RECORD_REPLAY_PATH || "/Applications/Replay.app";

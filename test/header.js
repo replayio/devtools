@@ -134,6 +134,7 @@ function defer() {
 }
 
 function waitForMessage(msg) {
+  log(`WaitingForMessage ${msg}`);
   const { resolve, promise } = defer();
   const listener = {
     receiveMessage() {
