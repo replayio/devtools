@@ -81,7 +81,6 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
     let { result } = await client.evaluate(expression, {
       asyncIndex: selectedFrame.asyncIndex,
       frameId: selectedFrame.protocolId,
-      thread,
     });
 
     if (result === undefined) {
