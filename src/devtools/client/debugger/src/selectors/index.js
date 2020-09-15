@@ -44,7 +44,6 @@ export { getXHRBreakpoints, shouldPauseOnAnyXHR } from "./breakpoints";
 export * from "./visibleColumnBreakpoints";
 export {
   getSelectedFrame,
-  getSelectedFrames,
   getVisibleSelectedFrame,
   getFramePositions,
 } from "./pause";
