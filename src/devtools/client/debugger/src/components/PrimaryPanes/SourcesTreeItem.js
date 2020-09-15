@@ -103,28 +103,6 @@ class SourceTreeItem extends Component {
 
     if (isDirectory(item)) {
       this.addCollapseExpandAllOptions(menuOptions, item);
-
-      if (features.root) {
-        const { path } = item;
-        const { cx, projectRoot } = this.props;
-
-        if (projectRoot.endsWith(path)) {
-          menuOptions.push({
-            id: "node-remove-directory-root",
-            label: removeDirectoryRootLabel,
-            disabled: false,
-            click: () => this.props.clearProjectDirectoryRoot(cx),
-          });
-        } else {
-          menuOptions.push({
-            id: "node-set-directory-root",
-            label: setDirectoryRootLabel,
-            accesskey: setDirectoryRootKey,
-            disabled: false,
-            click: () => this.props.setProjectDirectoryRoot(cx, path),
-          });
-        }
-      }
     }
 
     showMenu(event, menuOptions);
@@ -303,8 +281,6 @@ const mapStateToProps = (state, props) => {
 };
 
 export default connect(mapStateToProps, {
-  setProjectDirectoryRoot: actions.setProjectDirectoryRoot,
-  clearProjectDirectoryRoot: actions.clearProjectDirectoryRoot,
   toggleBlackBox: actions.toggleBlackBox,
   loadSourceText: actions.loadSourceText,
 })(SourceTreeItem);

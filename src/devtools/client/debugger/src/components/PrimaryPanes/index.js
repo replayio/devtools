@@ -11,7 +11,6 @@ import { Tab, Tabs, TabList, TabPanels } from "react-aria-components/src/tabs";
 import actions from "../../actions";
 import {
   getActiveSearch,
-  getProjectDirectoryRoot,
   getSelectedPrimaryPaneTab,
   getContext,
   getExtensionNameBySourceUrl,
@@ -28,13 +27,9 @@ import AccessibleImage from "../shared/AccessibleImage";
 import "./Sources.css";
 
 class PrimaryPanes extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      alphabetizeOutline: prefs.alphabetizeOutline,
-    };
-  }
+  state = {
+    alphabetizeOutline: prefs.alphabetizeOutline,
+  };
 
   showPane = selectedPane => {
     this.props.setPrimaryPaneTab(selectedPane);
@@ -52,25 +47,6 @@ class PrimaryPanes extends Component {
     } else {
       this.showPane("outline");
     }
-  };
-
-  getRootLabel = projectRoot => {
-    const { rootExtensionName } = this.props;
-
-    if (targetThread) {
-      return targetThread.name;
-    } else if (rootExtensionName) {
-      return rootExtensionName;
-    } else if (projectRoot.endsWith("://")) {
-      if (projectRoot === "ng://") {
-        return "Angular";
-      } else if (projectRoot === "webpack://") {
-        return "Webpack";
-      }
-      return `${unescape(projectRoot)}`;
-    }
-
-    return projectRoot.split("/").pop();
   };
 
   renderOutlineTabs() {
@@ -93,45 +69,20 @@ class PrimaryPanes extends Component {
     ];
   }
 
-  renderProjectRootHeader() {
-    const { cx, projectRoot } = this.props;
-
-    if (!projectRoot) {
-      return null;
-    }
-
-    const rootLabel = this.getRootLabel(projectRoot);
-
-    return (
-      <div key="root" className="sources-clear-root-container">
-        <button
-          className="sources-clear-root"
-          onClick={() => this.props.clearProjectDirectoryRoot(cx)}
-          title={L10N.getStr("removeDirectoryRoot.label")}
-        >
-          <AccessibleImage className="home" />
-          <AccessibleImage className="breadcrumb" />
-          <span className="sources-clear-root-label">{rootLabel}</span>
-        </button>
-      </div>
-    );
-  }
 
   renderSources() {
     return <SourcesTree />;
   }
 
   render() {
-    const { selectedTab, projectRoot } = this.props;
+    const { selectedTab } = this.props;
     const activeIndex = selectedTab === "sources" ? 0 : 1;
 
     return (
       <Tabs activeIndex={activeIndex} className="sources-panel" onActivateTab={this.onActivateTab}>
         <TabList className="source-outline-tabs">{this.renderOutlineTabs()}</TabList>
         <TabPanels
-          className={classnames("source-outline-panel", {
-            "has-root": projectRoot,
-          })}
+          className={"source-outline-panel"}
           hasFocusableContent
         >
           <div className="threads-list">{this.renderSources()}</div>
@@ -146,15 +97,11 @@ class PrimaryPanes extends Component {
 }
 
 const mapStateToProps = state => {
-  const newProjectRoot = getProjectDirectoryRoot(state);
-  const extensionAsRoot = isExtensionDirectoryPath(newProjectRoot);
-
+  
   return {
     cx: getContext(state),
     selectedTab: getSelectedPrimaryPaneTab(state),
     sourceSearchOn: getActiveSearch(state) === "source",
-    projectRoot: newProjectRoot,
-    rootExtensionName: extensionAsRoot ? getExtensionNameBySourceUrl(state, newProjectRoot) : null,
   };
 };
 
@@ -162,7 +109,6 @@ const connector = connect(mapStateToProps, {
   setPrimaryPaneTab: actions.setPrimaryPaneTab,
   setActiveSearch: actions.setActiveSearch,
   closeActiveSearch: actions.closeActiveSearch,
-  clearProjectDirectoryRoot: actions.clearProjectDirectoryRoot,
 });
 
 export default connector(PrimaryPanes);

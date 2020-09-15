@@ -11,7 +11,6 @@ import {
   getSource,
   getSourceContent,
   getFileSearchQuery,
-  getProjectDirectoryRoot,
 } from "../selectors";
 import { selectSource } from "../actions/sources/select";
 import { getEditor, getLocationsInViewport } from "../utils/editor";
@@ -158,43 +157,6 @@ export function openConditionalPanel(location, log = false) {
 export function closeConditionalPanel() {
   return {
     type: "CLOSE_CONDITIONAL_PANEL",
-  };
-}
-
-export function clearProjectDirectoryRoot(cx) {
-  return {
-    type: "SET_PROJECT_DIRECTORY_ROOT",
-    cx,
-    url: "",
-  };
-}
-
-export function setProjectDirectoryRoot(cx, newRoot) {
-  return ({ dispatch, getState }) => {
-    const threadActor = null;
-
-    let curRoot = getProjectDirectoryRoot(getState());
-
-    // Remove the thread actor ID from the root path
-    if (threadActor) {
-      newRoot = newRoot.slice(threadActor.length + 1);
-      curRoot = curRoot.slice(threadActor.length + 1);
-    }
-
-    if (newRoot && curRoot) {
-      const newRootArr = newRoot.replace(/\/+/g, "/").split("/");
-      const curRootArr = curRoot.replace(/^\//, "").replace(/\/+/g, "/").split("/");
-      if (newRootArr[0] !== curRootArr[0]) {
-        newRootArr.splice(0, 2);
-        newRoot = `${curRoot}/${newRootArr.join("/")}`;
-      }
-    }
-
-    dispatch({
-      type: "SET_PROJECT_DIRECTORY_ROOT",
-      cx,
-      url: newRoot,
-    });
   };
 }
 

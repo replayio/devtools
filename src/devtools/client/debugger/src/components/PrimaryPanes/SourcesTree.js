@@ -15,7 +15,6 @@ import {
   getSelectedSource,
   getDebuggeeUrl,
   getExpandedState,
-  getProjectDirectoryRoot,
   getDisplayedSources,
   getFocusedSourceItem,
   getContext,
@@ -43,8 +42,8 @@ import {
 import { parse } from "../../utils/url";
 import { getRawSourceURL } from "../../utils/source";
 
-function shouldAutoExpand(depth, item, debuggeeUrl, projectRoot) {
-  if (projectRoot != "" || depth !== 1) {
+function shouldAutoExpand(depth, item, debuggeeUrl) {
+  if (depth !== 1) {
     return false;
   }
 
@@ -71,11 +70,10 @@ class SourcesTree extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const { projectRoot, debuggeeUrl, sources, shownSource, selectedSource } = this.props;
+    const {  debuggeeUrl, sources, shownSource, selectedSource } = this.props;
     const { uncollapsedTree, sourceTree } = this.state;
 
     if (
-      projectRoot != nextProps.projectRoot ||
       debuggeeUrl != nextProps.debuggeeUrl ||
       nextProps.sourceCount === 0
     ) {
@@ -168,7 +166,7 @@ class SourcesTree extends Component {
     );
   }
 
-  getRoots = (sourceTree, projectRoot) => {
+  getRoots = (sourceTree) => {
     return sourceTree.contents;
   };
 
@@ -177,27 +175,26 @@ class SourcesTree extends Component {
   };
 
   renderItem = (item, depth, focused, _, expanded, { setExpanded }) => {
-    const { debuggeeUrl, projectRoot } = this.props;
+    const { debuggeeUrl } = this.props;
 
     return (
       <SourcesTreeItem
         item={item}
         depth={depth}
         focused={focused}
-        autoExpand={shouldAutoExpand(depth, item, debuggeeUrl, projectRoot)}
+        autoExpand={shouldAutoExpand(depth, item, debuggeeUrl)}
         expanded={expanded}
         focusItem={this.onFocus}
         selectItem={this.selectItem}
         source={this.getSource(item)}
         debuggeeUrl={debuggeeUrl}
-        projectRoot={projectRoot}
         setExpanded={setExpanded}
       />
     );
   };
 
   renderTree() {
-    const { expanded, focused, projectRoot } = this.props;
+    const { expanded, focused } = this.props;
 
     const { highlightItems, listItems, parentMap, sourceTree } = this.state;
 
@@ -209,7 +206,7 @@ class SourcesTree extends Component {
       getChildren: this.getChildren,
       getParent: item => parentMap.get(item),
       getPath: this.getPath,
-      getRoots: () => this.getRoots(sourceTree, projectRoot),
+      getRoots: () => this.getRoots(sourceTree),
       highlightItems,
       itemHeight: 21,
       key: this.isEmpty() ? "empty" : "full",
@@ -226,15 +223,8 @@ class SourcesTree extends Component {
   }
 
   renderPane(child) {
-    const { projectRoot } = this.props;
-
     return (
-      <div
-        key="pane"
-        className={classnames("sources-pane", {
-          "sources-list-custom-root": projectRoot,
-        })}
-      >
+      <div key="pane" className="sources-pane">
         {child}
       </div>
     );
@@ -277,7 +267,6 @@ const mapStateToProps = (state, props) => {
     debuggeeUrl: getDebuggeeUrl(state),
     expanded: getExpandedState(state),
     focused: getFocusedSourceItem(state),
-    projectRoot: getProjectDirectoryRoot(state),
     sources: sources,
     sourceCount: Object.values(sources).length,
   };

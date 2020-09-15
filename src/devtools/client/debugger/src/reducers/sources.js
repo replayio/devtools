@@ -58,7 +58,6 @@ export function initialSourcesState() {
     selectedLocation: undefined,
     pendingSelectedLocation: prefs.pendingSelectedLocation,
     selectedLocationHasScrolled: false,
-    projectDirectoryRoot: prefs.projectDirectoryRoot,
     chromeAndExtensionsEnabled: prefs.chromeAndExtensionsEnabled,
     focusedItem: null,
   };
@@ -144,8 +143,6 @@ function update(state = initialSourcesState(), action) {
       }
       break;
 
-    case "SET_PROJECT_DIRECTORY_ROOT":
-      return updateProjectDirectoryRoot(state, action.url);
 
     case "SET_ORIGINAL_BREAKABLE_LINES": {
       const { breakableLines, sourceId } = action;
@@ -231,8 +228,6 @@ function addSources(state, sources) {
     }
   }
 
-  state = updateRootRelativeValues(state, sources);
-
   return state;
 }
 
@@ -285,54 +280,6 @@ function removeSourceActors(state, action) {
   for (const source of sources) {
     state.actors[source] = state.actors[source].filter(id => !actors.has(id));
   }
-
-  return state;
-}
-
-/*
- * Update sources when the project directory root changes
- */
-function updateProjectDirectoryRoot(state, root) {
-  // Only update prefs when projectDirectoryRoot isn't a thread actor,
-  // because when debugger is reopened, thread actor will change. See bug 1596323.
-  if (actorType(root) !== "thread") {
-    prefs.projectDirectoryRoot = root;
-  }
-
-  return updateRootRelativeValues(state, undefined, root);
-}
-
-/* Checks if a path is a thread actor or not
- * e.g returns 'thread' for "server0.conn1.child1/workerTarget42/thread1"
- */
-function actorType(actor) {
-  const match = actor.match(/\/([a-z]+)\d+/);
-  return match ? match[1] : null;
-}
-
-function updateRootRelativeValues(
-  state,
-  sources,
-  projectDirectoryRoot = state.projectDirectoryRoot
-) {
-  const wrappedIdsOrIds = sources ? sources : getResourceIds(state.sources);
-
-  state = {
-    ...state,
-    projectDirectoryRoot,
-  };
-
-  const relativeURLUpdates = wrappedIdsOrIds.map(wrappedIdOrId => {
-    const id = typeof wrappedIdOrId === "string" ? wrappedIdOrId : wrappedIdOrId.id;
-    const source = getResource(state.sources, id);
-
-    return {
-      id,
-      relativeUrl: getRelativeUrl(source, state.projectDirectoryRoot),
-    };
-  });
-
-  state.sources = updateResources(state.sources, relativeURLUpdates);
 
   return state;
 }
@@ -615,32 +562,6 @@ export function getSelectedSourceId(state) {
   const source = getSelectedSource(state);
   return source && source.id;
 }
-
-export function getProjectDirectoryRoot(state) {
-  return state.sources.projectDirectoryRoot;
-}
-
-const queryAllDisplayedSources = makeReduceQuery(
-  makeMapWithArgs(
-    (
-      resource,
-      ident,
-      { projectDirectoryRoot, chromeAndExtensionsEnabled, debuggeeIsWebExtension }
-    ) => ({
-      id: resource.id,
-      displayed:
-        underRoot(resource, projectDirectoryRoot) &&
-        (!resource.isExtension || chromeAndExtensionsEnabled || debuggeeIsWebExtension),
-    })
-  ),
-  items =>
-    items.reduce((acc, { id, displayed }) => {
-      if (displayed) {
-        acc.push(id);
-      }
-      return acc;
-    }, [])
-);
 
 export const getDisplayedSources = createSelector(
   state => state.sources.sources,
