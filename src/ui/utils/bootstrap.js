@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
+import { Auth0Context } from "@auth0/auth0-react";
 
 import {
   prefs as dbgPrefs,
@@ -26,6 +27,8 @@ import App from "ui/components/App";
 import Auth0ProviderWithHistory from "./auth0";
 import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
+import { createApolloClient } from "./apolloClient";
+import { ApolloProvider } from "@apollo/client";
 
 const url = new URL(window.location.href);
 const test = url.searchParams.get("test");
@@ -168,7 +171,15 @@ export async function bootstrapApp(props, context) {
   ReactDOM.render(
     <Router>
       <Auth0ProviderWithHistory>
-        <Provider store={store}>{React.createElement(App, props)}</Provider>
+        <Auth0Context.Consumer>
+          {auth0Client => {
+            return (
+              <ApolloProvider client={createApolloClient(auth0Client)}>
+                <Provider store={store}>{React.createElement(App, props)}</Provider>
+              </ApolloProvider>
+            );
+          }}
+        </Auth0Context.Consumer>
       </Auth0ProviderWithHistory>
     </Router>,
     document.querySelector("#app")
