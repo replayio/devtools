@@ -99,7 +99,6 @@ function setupAppHelper(store) {
     },
     prod: () => {
       const params = new URLSearchParams(document.location.search.substring(1));
-      console.log(">>", params.get("id"), typeof params.get("id"));
 
       if (params.get("id")) {
         window.location = `http://replay.io/view?id=${params.get("id")}`;
