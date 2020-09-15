@@ -2,7 +2,6 @@ import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
 import { prefs, features } from "ui/utils/prefs";
 import { seek } from "./timeline";
-import FullStory from "ui/utils/fullstory";
 
 // Metadata key used to store comments.
 const CommentsMetadata = "devtools-comments";
@@ -31,8 +30,6 @@ export function createComment(newComment, visible, addedFrom) {
     const existingComments = selectors.getComments(getState());
     const currentTime = selectors.getCurrentTime(getState());
     const user = selectors.getUser(getState());
-
-    FullStory.event("comment::create");
 
     if (existingComments.some(comment => comment.time === currentTime)) {
       return;
@@ -75,8 +72,6 @@ export function removeComment(comment) {
 
 export function updateComment(comment) {
   return ({ dispatch, getState }) => {
-    FullStory.event("comment::update");
-
     const existingComments = selectors.getComments(getState());
 
     const commentIndex = existingComments.findIndex(c => c.id === comment.id);
@@ -128,7 +123,6 @@ export function registerUser() {
         avatarID: Math.ceil(Math.random() * 10),
       };
 
-  FullStory.identify(user.id);
   return { type: "register_user", user };
 }
 

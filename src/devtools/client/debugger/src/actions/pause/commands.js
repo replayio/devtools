@@ -12,7 +12,6 @@ import {
 } from "../../selectors";
 import { PROMISE } from "../utils/middleware/promise";
 import { recordEvent } from "../../utils/telemetry";
-import FullStory from "ui/utils/fullstory";
 
 import { setFramePositions } from "./setFramePositions";
 
@@ -30,7 +29,6 @@ export function command(cx, type) {
   return async thunkArgs => {
     const { dispatch, getState, client } = thunkArgs;
     log(`Debugger CommandStart ${type}`);
-    FullStory.event(`debugger.${type}`);
 
     const point = getThreadExecutionPoint(getState());
 
