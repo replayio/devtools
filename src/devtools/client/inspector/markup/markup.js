@@ -465,7 +465,7 @@ MarkupView.prototype = {
   },
 
   _onContextMenu: function (event) {
-    this.contextMenu.show(event);
+    // this.contextMenu.show(event);
   },
 
   /**
