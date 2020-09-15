@@ -17,7 +17,7 @@ pref("devtools.event-listeners-breakpoints", true);
 // app features
 pref("devtools.features.comments", true);
 pref("devtools.features.users", true);
-pref("devtools.features.auth0", false);
+pref("devtools.features.auth0", true);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
