@@ -31,4 +31,4 @@ spawn("node_modules/.bin/webpack-dev-server", {
   stdio: "inherit",
 });
 
-require("../../../test/run");
+require("../../../test/run")({_: ["record-all"]});
