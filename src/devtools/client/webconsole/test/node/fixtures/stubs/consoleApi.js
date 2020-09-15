@@ -473,19 +473,19 @@ rawPackets.set(`console.table(['red', 'green', 'blue']);`, {
           sealed: false,
           preview: null,
           ownProperties: {
-            "0": {
+            0: {
               configurable: true,
               enumerable: true,
               writable: true,
               value: "red",
             },
-            "1": {
+            1: {
               configurable: true,
               enumerable: true,
               writable: true,
               value: "green",
             },
-            "2": {
+            2: {
               configurable: true,
               enumerable: true,
               writable: true,
@@ -1192,19 +1192,19 @@ rawPackets.set(`console.table(['a', 'b', 'c'])`, {
           sealed: false,
           preview: null,
           ownProperties: {
-            "0": {
+            0: {
               configurable: true,
               enumerable: true,
               writable: true,
               value: "a",
             },
-            "1": {
+            1: {
               configurable: true,
               enumerable: true,
               writable: true,
               value: "b",
             },
-            "2": {
+            2: {
               configurable: true,
               enumerable: true,
               writable: true,

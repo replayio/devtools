@@ -70,13 +70,10 @@ class SourcesTree extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {  debuggeeUrl, sources, shownSource, selectedSource } = this.props;
+    const { debuggeeUrl, sources, shownSource, selectedSource } = this.props;
     const { uncollapsedTree, sourceTree } = this.state;
 
-    if (
-      debuggeeUrl != nextProps.debuggeeUrl ||
-      nextProps.sourceCount === 0
-    ) {
+    if (debuggeeUrl != nextProps.debuggeeUrl || nextProps.sourceCount === 0) {
       // early recreate tree because of changes
       // to project root, debuggee url or lack of sources
       return this.setState(
@@ -166,7 +163,7 @@ class SourcesTree extends Component {
     );
   }
 
-  getRoots = (sourceTree) => {
+  getRoots = sourceTree => {
     return sourceTree.contents;
   };
 

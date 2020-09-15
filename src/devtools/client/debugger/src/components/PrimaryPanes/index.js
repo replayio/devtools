@@ -69,7 +69,6 @@ class PrimaryPanes extends Component {
     ];
   }
 
-
   renderSources() {
     return <SourcesTree />;
   }
@@ -81,10 +80,7 @@ class PrimaryPanes extends Component {
     return (
       <Tabs activeIndex={activeIndex} className="sources-panel" onActivateTab={this.onActivateTab}>
         <TabList className="source-outline-tabs">{this.renderOutlineTabs()}</TabList>
-        <TabPanels
-          className={"source-outline-panel"}
-          hasFocusableContent
-        >
+        <TabPanels className={"source-outline-panel"} hasFocusableContent>
           <div className="threads-list">{this.renderSources()}</div>
           <Outline
             alphabetizeOutline={this.state.alphabetizeOutline}
@@ -97,7 +93,6 @@ class PrimaryPanes extends Component {
 }
 
 const mapStateToProps = state => {
-  
   return {
     cx: getContext(state),
     selectedTab: getSelectedPrimaryPaneTab(state),
