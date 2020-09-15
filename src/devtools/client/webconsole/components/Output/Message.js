@@ -57,7 +57,6 @@ class Message extends Component {
         onViewSourceInStyleEditor: PropTypes.func,
         openLink: PropTypes.func.isRequired,
         sourceMapService: PropTypes.any,
-        canRewind: PropTypes.func.isRequired,
         jumpToExecutionPoint: PropTypes.func,
         onMessageHover: PropTypes.func,
       }),
@@ -140,7 +139,7 @@ class Message extends Component {
 
   onMouseEvent(ev) {
     const { message, serviceContainer, executionPoint } = this.props;
-    if (serviceContainer.canRewind() && executionPoint) {
+    if (executionPoint) {
       serviceContainer.onMessageHover(ev.type, message);
     }
   }
@@ -391,10 +390,9 @@ class Message extends Component {
 
     const bodyElements = Array.isArray(messageBody) ? messageBody : [messageBody];
 
-    const mouseEvents =
-      serviceContainer.canRewind() && executionPoint
-        ? { onMouseEnter: this.onMouseEvent, onMouseLeave: this.onMouseEvent }
-        : {};
+    const mouseEvents = executionPoint
+      ? { onMouseEnter: this.onMouseEvent, onMouseLeave: this.onMouseEvent }
+      : {};
 
     return dom.div(
       {

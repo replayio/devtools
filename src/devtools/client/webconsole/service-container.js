@@ -15,7 +15,6 @@ function setupServiceContainer({ webConsoleUI, hud, toolbox, webConsoleWrapper }
     onViewSource: frame => hud.viewSource(frame.url, frame.line),
     focusInput: () => hud.focusInput(),
     setInputValue: value => hud.setInputValue(value),
-    canRewind: () => hud.canRewind(),
     onMessageHover: (type, message) => webConsoleUI.onMessageHover(type, message),
     getLongString: grip => webConsoleUI.getLongString(grip),
     getJsTermTooltipAnchor: () => webConsoleUI.getJsTermTooltipAnchor(),

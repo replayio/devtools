@@ -288,9 +288,6 @@ class App extends Component {
     if (editorMode) {
       classNames.push("jsterm-editor");
     }
-    if (serviceContainer.canRewind()) {
-      classNames.push("can-rewind");
-    }
 
     if (this.props.eagerEvaluationEnabled) {
       classNames.push("eager-evaluation");
