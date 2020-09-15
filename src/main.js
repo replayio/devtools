@@ -25,13 +25,11 @@ const { initSocket, sendMessage, log, setStatus, addEventListener } = require("p
 const { ThreadFront } = require("protocol/thread");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap");
-const FullStory = require("ui/utils/fullstory").default;
 const { setupTimeline } = require("ui/actions/timeline");
 const { setupMetadata } = require("ui/actions/metadata");
 const { setupApp } = require("ui/actions/app");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { prefs } = require("ui/utils/prefs");
-const { features } = require("./ui/utils/prefs");
 const { setTimelineState } = require("./ui/actions/timeline");
 
 // Create a session to use while debugging.
@@ -50,13 +48,6 @@ async function createSession() {
     ThreadFront.setSessionId(sessionId);
 
     prefs.recordingId = recordingId;
-
-    if (!test) {
-      FullStory.setUserVars({
-        recordingId,
-        sessionId,
-      });
-    }
   } catch (e) {
     if (e.code == 9) {
       // Invalid recording ID.
@@ -107,10 +98,6 @@ async function initialize() {
       left <= mouseClientX && mouseClientX <= right && top <= mouseClientY && mouseClientY <= bottom
     );
   };
-}
-
-if (!test) {
-  FullStory.init({ orgId: "VXD33", devMode: test });
 }
 
 (async () => {

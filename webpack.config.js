@@ -55,9 +55,9 @@ module.exports = {
             presets: ["@babel/preset-typescript", "@babel/preset-react"],
             plugins: [
               "@babel/plugin-transform-flow-strip-types",
+              "@babel/plugin-transform-react-display-name",
               "@babel/plugin-proposal-class-properties",
               "@babel/plugin-proposal-optional-chaining",
-              "@fullstory/babel-plugin-annotate-react",
             ],
           },
         },

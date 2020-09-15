@@ -1,6 +1,5 @@
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "../reducers";
-import FullStory from "ui/utils/fullstory";
 
 import {
   screenshotCache,
@@ -52,8 +51,6 @@ function onEndpoint({ point, time }) {
 
 function onPaused({ time }) {
   return async ({ dispatch, getState }) => {
-    FullStory.event("paused");
-
     dispatch(setTimelineState({ currentTime: time, playback: null }));
 
     const { screen, mouse } = await getGraphicsAtTime(time);
@@ -148,13 +145,11 @@ function updateTooltip(tooltip) {
 }
 
 export function setZoomRegion(region) {
-  FullStory.event("timeline::zoom");
   return { type: "set_zoom", region };
 }
 
 export function seek(point, time, hasFrames) {
   return () => {
-    FullStory.event("seek");
     ThreadFront.timeWarp(point, time, hasFrames);
   };
 }

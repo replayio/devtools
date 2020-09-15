@@ -21,7 +21,6 @@ import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { connect } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
-import FullStory from "ui/utils/fullstory";
 
 import "./Toolbox.css";
 
@@ -97,7 +96,6 @@ class Toolbox extends React.Component {
     }
 
     log(`Toolbox SelectTool ${name}`);
-    FullStory.event("select-tool", { name });
     setSelectedPanel(name);
 
     if (!panel) {

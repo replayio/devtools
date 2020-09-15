@@ -16,13 +16,10 @@
     "@babel/plugin-proposal-optional-chaining": "^7.10.1",
     "@babel/plugin-transform-flow-strip-types": "^7.9.0",
     "@babel/preset-react": "^7.9.4",
-    "@fullstory/babel-plugin-annotate-react": "^2.0.0",
-    "@fullstory/browser": "^1.4.4",
     "@sentry/apm": "^5.21.1",
     "@sentry/react": "^5.21.1",
     "autoprefixer": "^9.7.6",
     "babel-loader": "^8.1.0",
-    "babel-plugin-add-react-displayname": "0.0.5",
     "classnames": "^2.2.6",
     "css-loader": "^3.5.3",
     "debug": "^4.1.1",
@@ -54,6 +51,7 @@
     "webpack-cli": "^3.3.11"
   },
   "devDependencies": {
+    "@babel/plugin-transform-react-display-name": "^7.10.4",
     "@babel/preset-typescript": "^7.10.4",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.3.0",

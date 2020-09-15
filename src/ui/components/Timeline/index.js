@@ -16,7 +16,7 @@ import PropTypes from "prop-types";
 
 import { SVG } from "image/svg";
 import { log } from "protocol/socket";
-import FullStory from "ui/utils/fullstory";
+
 import ScrollContainer from "ui/components/Timeline/ScrollContainer";
 
 const {
@@ -333,7 +333,6 @@ export class Timeline extends Component {
       return;
     }
 
-    FullStory.event("timeline::previous");
     const previous = previousPaintEvent(currentTime);
     if (!previous) {
       return;
@@ -348,7 +347,6 @@ export class Timeline extends Component {
       return;
     }
 
-    FullStory.event("timeline::next");
     const next = nextPaintEvent(currentTime);
     if (!next) {
       return;
@@ -416,7 +414,6 @@ export class Timeline extends Component {
 
   async startPlayback() {
     log(`StartPlayback`);
-    FullStory.event("timeline::play");
 
     const { currentTime } = this.props;
 
@@ -456,7 +453,6 @@ export class Timeline extends Component {
 
   stopPlayback() {
     log(`StopPlayback`);
-    FullStory.event("timeline::stop");
 
     if (this.props.playback) {
       this.seekTime(this.props.playback.time);

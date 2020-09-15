@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-// 
+//
 
 import { makeBreakpointLocation, makeBreakpointId, getASTLocation } from "../../utils/breakpoint";
 
@@ -23,8 +23,6 @@ import { setSkipPausing } from "../pause/skipPausing";
 import { recordEvent } from "../../utils/telemetry";
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
-import FullStory from "ui/utils/fullstory";
-
 
 // This file has the primitive operations used to modify individual breakpoints
 // and keep them in sync with the breakpoints installed on server threads. These
@@ -105,11 +103,6 @@ export function addBreakpoint(
       return;
     }
 
-    FullStory.event(`debugger.breakpoint.add`, {
-      log: !!options.logValue,
-      condition: !!options.condition,
-    });
-
     const symbols = getSymbols(getState(), source);
     const astLocation = getASTLocation(source, symbols, location);
 
@@ -165,8 +158,6 @@ export function removeBreakpoint(cx, initialBreakpoint) {
     if (!breakpoint) {
       return;
     }
-
-    FullStory.event(`debugger.breakpoint.remove`);
 
     dispatch(setSkipPausing(false));
     dispatch({
@@ -255,11 +246,7 @@ export function disableBreakpoint(cx, initialBreakpoint) {
  * @param {Object} options
  *        Any options to set on the breakpoint
  */
-export function setBreakpointOptions(
-  cx,
-  location,
-  options = {}
-) {
+export function setBreakpointOptions(cx, location, options = {}) {
   return async ({ dispatch, getState, client, sourceMaps }) => {
     let breakpoint = getBreakpoint(getState(), location);
     if (!breakpoint) {
@@ -268,11 +255,6 @@ export function setBreakpointOptions(
 
     // Note: setting a breakpoint's options implicitly enables it.
     breakpoint = { ...breakpoint, disabled: false, options };
-
-    FullStory.event(`debugger.breakpoint.update`, {
-      log: !!options.logValue,
-      condition: !!options.condition,
-    });
 
     dispatch({
       type: "SET_BREAKPOINT",
