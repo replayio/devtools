@@ -10,7 +10,6 @@ import {
   getQuickOpenEnabled,
   getSource,
   getSourceContent,
-  startsWithThreadActor,
   getFileSearchQuery,
   getProjectDirectoryRoot,
 } from "../selectors";
@@ -172,7 +171,7 @@ export function clearProjectDirectoryRoot(cx) {
 
 export function setProjectDirectoryRoot(cx, newRoot) {
   return ({ dispatch, getState }) => {
-    const threadActor = startsWithThreadActor(getState(), newRoot);
+    const threadActor = null;
 
     let curRoot = getProjectDirectoryRoot(getState());
 
