@@ -24,6 +24,7 @@ module.exports = {
     contentBase: [".", "./src/image"],
     index: "index.html",
     liveReload: false,
+    disableHostCheck: true,
   },
   plugins: [new MiniCssExtractPlugin()],
   resolve: {
