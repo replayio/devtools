@@ -277,9 +277,9 @@ class Debugger extends Component {
   }
 
   render() {
-    const { quickOpenEnabled, canRewind } = this.props;
+    const { quickOpenEnabled } = this.props;
     return (
-      <div className={classnames("debugger", { "can-rewind": canRewind })}>
+      <div className="debugger">
         <A11yIntention>
           {this.renderLayout()}
           {quickOpenEnabled === true && (
