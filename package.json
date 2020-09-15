@@ -10,6 +10,7 @@
     "typecheck": "tsc --watch"
   },
   "dependencies": {
+    "@apollo/client": "^3.1.5",
     "@auth0/auth0-react": "^1.0.0",
     "@babel/core": "^7.11.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
@@ -18,6 +19,7 @@
     "@babel/preset-react": "^7.9.4",
     "@sentry/apm": "^5.21.1",
     "@sentry/react": "^5.21.1",
+    "apollo-link-http": "^1.5.17",
     "autoprefixer": "^9.7.6",
     "babel-loader": "^8.1.0",
     "classnames": "^2.2.6",
@@ -25,6 +27,7 @@
     "debug": "^4.1.1",
     "devtools-sprintf-js": "^1.0.3",
     "extract-loader": "^5.0.1",
+    "graphql": "^15.3.0",
     "lodash": "^4.17.20",
     "logrocket": "^1.0.12",
     "logrocket-react": "^3.0.1",
