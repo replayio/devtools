@@ -143,7 +143,6 @@ function update(state = initialSourcesState(), action) {
       }
       break;
 
-
     case "SET_ORIGINAL_BREAKABLE_LINES": {
       const { breakableLines, sourceId } = action;
       return {

@@ -37,7 +37,7 @@ stubs.set("properties", {
 
 stubs.set("11-entries", {
   ownProperties: {
-    "0": {
+    0: {
       enumerable: true,
       value: {
         type: "mapEntry",
@@ -47,7 +47,7 @@ stubs.set("11-entries", {
         },
       },
     },
-    "1": {
+    1: {
       enumerable: true,
       value: {
         type: "mapEntry",
@@ -57,7 +57,7 @@ stubs.set("11-entries", {
         },
       },
     },
-    "2": {
+    2: {
       enumerable: true,
       value: {
         type: "mapEntry",
@@ -67,7 +67,7 @@ stubs.set("11-entries", {
         },
       },
     },
-    "3": {
+    3: {
       enumerable: true,
       value: {
         type: "mapEntry",
@@ -77,7 +77,7 @@ stubs.set("11-entries", {
         },
       },
     },
-    "4": {
+    4: {
       enumerable: true,
       value: {
         type: "mapEntry",
@@ -87,7 +87,7 @@ stubs.set("11-entries", {
         },
       },
     },
-    "5": {
+    5: {
       enumerable: true,
       value: {
         type: "mapEntry",
@@ -97,7 +97,7 @@ stubs.set("11-entries", {
         },
       },
     },
-    "6": {
+    6: {
       enumerable: true,
       value: {
         type: "mapEntry",
@@ -107,7 +107,7 @@ stubs.set("11-entries", {
         },
       },
     },
-    "7": {
+    7: {
       enumerable: true,
       value: {
         type: "mapEntry",
@@ -117,7 +117,7 @@ stubs.set("11-entries", {
         },
       },
     },
-    "8": {
+    8: {
       enumerable: true,
       value: {
         type: "mapEntry",
@@ -127,7 +127,7 @@ stubs.set("11-entries", {
         },
       },
     },
-    "9": {
+    9: {
       enumerable: true,
       value: {
         type: "mapEntry",
@@ -137,7 +137,7 @@ stubs.set("11-entries", {
         },
       },
     },
-    "10": {
+    10: {
       enumerable: true,
       value: {
         type: "mapEntry",

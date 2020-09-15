@@ -42,11 +42,7 @@ export { getBreakpointSources } from "./breakpointSources";
 export { isLineInScope } from "./isLineInScope";
 export { getXHRBreakpoints, shouldPauseOnAnyXHR } from "./breakpoints";
 export * from "./visibleColumnBreakpoints";
-export {
-  getSelectedFrame,
-  getVisibleSelectedFrame,
-  getFramePositions,
-} from "./pause";
+export { getSelectedFrame, getVisibleSelectedFrame, getFramePositions } from "./pause";
 
 /*
 

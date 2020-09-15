@@ -553,7 +553,7 @@ ValueFront.prototype = {
     rv.sort((a, b) => {
       const _a = a.name?.toUpperCase();
       const _b = b.name?.toUpperCase();
-      return (_a < _b) ? -1 : ((_a > _b) ? 1 : 0);
+      return _a < _b ? -1 : _a > _b ? 1 : 0;
     });
     if (["Set", "WeakSet", "Map", "WeakMap"].includes(this.className())) {
       const elements = this.previewContainerEntries().map(({ key, value }, i) => {
