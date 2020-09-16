@@ -113,7 +113,7 @@ export function selectLocation(cx, location, { keepContext = true } = {}) {
       dispatch(closeActiveSearch());
     }
 
-    if (tabExists(getState(), source.id)) {
+    if (!tabExists(getState(), source.id)) {
       dispatch(addTab(source));
     }
 
