@@ -9,7 +9,6 @@ import forwardData from "image/lottie/forward.json";
 import "./Recordings.css";
 
 function Forward() {
-  console.log(forwardData.default);
   const defaultOptions = {
     loop: true,
     autoplay: true,
