@@ -3,11 +3,36 @@ import { connect } from "react-redux";
 import { selectors } from "../../reducers";
 import { Recording } from "./Recording";
 import { useAuth0 } from "@auth0/auth0-react";
+import Lottie from "react-lottie";
+import forwardData from "image/lottie/forward.json";
 
 import "./Recordings.css";
 
+function Forward() {
+  console.log(forwardData.default);
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: forwardData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
+  return <Lottie options={defaultOptions} height={50} width={200} />;
+}
+
 const Recordings = props => {
-  const { loginWithRedirect, isAuthenticated } = useAuth0();
+  const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
+
+  if (props.recordings === null || isLoading) {
+    return (
+      <div className="loading-pane">
+        <Forward />
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="welcome-screen">
@@ -19,6 +44,7 @@ const Recordings = props => {
       </div>
     );
   }
+
   return (
     <div className="recordings">
       {props.recordings &&
