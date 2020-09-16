@@ -128,9 +128,7 @@ function resolveFileURL(url, transformUrl = initialUrl => initialUrl, truncate =
 }
 
 export function getFormattedSourceId(id) {
-  const firstIndex = id.indexOf("/");
-  const secondIndex = id.indexOf("/", firstIndex);
-  return `SOURCE${id.slice(firstIndex, secondIndex)}`;
+  return `SOURCE ${id}`;
 }
 
 /**
