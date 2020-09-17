@@ -123,7 +123,7 @@ function getBindingValues(originalAstScopes, pausedOnLine, name, value, curLevel
   const previews = [];
 
   const binding = originalAstScopes[curLevel] && originalAstScopes[curLevel].bindings[name];
-  if (!binding) {
+  if (!binding || !binding.refs) {
     return previews;
   }
 
