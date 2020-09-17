@@ -24,7 +24,7 @@ function Forward() {
 const Recordings = props => {
   const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
 
-  if (props.recordings === null || isLoading) {
+  if (isLoading || (isAuthenticated && props.recordings === null)) {
     return (
       <div className="loading-pane">
         <Forward />
