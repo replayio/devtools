@@ -15,9 +15,9 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Build webpack
-        run: ./node_modules/.bin/webpack --mode=development
+        run: ./node_modules/.bin/webpack --mode=production
       - name: Tar up output files
-        run: tar -czf dist.tgz index.html dist
+        run: tar -czf dist.tgz index.html dist node_modules
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
