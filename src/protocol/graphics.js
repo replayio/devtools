@@ -232,7 +232,7 @@ function clearGraphics() {
 }
 
 function drawCursor(cx, x, y) {
-  const scale = 3;
+  const scale = 1.5 * (gDevicePixelRatio || 1);
   const path = new Path2D(`
 M ${x} ${y}
 V ${y + 10 * scale}
@@ -251,10 +251,11 @@ Z
 }
 
 function drawClick(cx, x, y) {
+  const scale = gDevicePixelRatio || 1;
   cx.strokeStyle = "black";
   cx.lineWidth = 3;
   cx.beginPath();
-  cx.arc(x, y, 50, 0, 2 * Math.PI);
+  cx.arc(x, y, 25 * scale, 0, 2 * Math.PI);
   cx.stroke();
 }
 
@@ -283,7 +284,8 @@ function refreshGraphics() {
 
   canvas.style.visibility = "visible";
 
-  const scale = Math.min(bounds.width / image.width, bounds.height / image.height, 1);
+  const maxScale = 1 / (gDevicePixelRatio || 1);
+  const scale = Math.min(bounds.width / image.width, bounds.height / image.height, maxScale);
 
   canvas.width = image.width;
   canvas.height = image.height;
