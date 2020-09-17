@@ -6,7 +6,6 @@ const os = require("os");
 const { spawnSync, spawn } = require("child_process");
 const { defer } = require("../src/protocol/utils");
 const url = require("url");
-const minimist = require("minimist");
 const Manifest = require("./manifest.json");
 
 const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
@@ -18,41 +17,44 @@ const patterns = [];
 let stripeIndex, stripeCount, dispatchServer, gInstallDir;
 const startTime = Date.now();
 let shouldRecordExamples = false;
-let shouldRecordAll = false;
 let shouldRecordViewer = false;
 
 function processArgs() {
-  const argv = minimist(process.argv.slice(2));
-  if (argv["h"] || argv["help"] || hasUnknownArg(argv)) {
-    const usage = `
-      Usage: run.js arguments
-      Arguments:
-        --count N: Run tests N times
-        --pattern PAT: Only run tests matching PAT
-        --record-examples: Record the example and save the recordings locally for testing
-        --record-viewer: Record the viewer while the test is running
-        --record-all: Record examples and save the recordings locally, and record the viewer
-    `;
-    console.log(usage);
-    process.exit(0);
+  const usage = `
+    Usage: run.js arguments
+    Arguments:
+      --count N: Run tests N times
+      --pattern PAT: Only run tests matching PAT
+      --record-examples: Record the example and save the recordings locally for testing
+      --record-viewer: Record the viewer while the test is running
+      --record-all: Record examples and save the recordings locally, and record the viewer
+  `;
+  for (let i = 2; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+    switch (arg) {
+      case "--count":
+        count = +process.argv[++i];
+        break;
+      case "--pattern":
+        patterns.push(process.argv[++i]);
+        break;
+      case "--record-examples":
+        shouldRecordExamples = true;
+        break;
+      case "--record-viewer":
+        shouldRecordViewer = true;
+        break;
+      case "--record-all":
+        shouldRecordViewer = true;
+        shouldRecordExamples = true;
+        break;
+      case "--help":
+      case "-h":
+      default:
+        console.log(usage);
+        process.exit(0);
+    }
   }
-
-  shouldRecordExamples = argv["record-examples"] || shouldRecordExamples;
-  shouldRecordViewer = argv["record-viewer"] || shouldRecordViewer;
-  shouldRecordAll = argv["record-all"] || shouldRecordAll;
-  count += argv.count || 0;
-
-  if (argv.pattern) {
-    patterns.push(argv.pattern);
-  }
-}
-
-function hasUnknownArg(argv) {
-  let knownArgs = ["pattern", "count", "record-examples", "record-viewer", "record-all"];
-  let argvArgs = Object.keys(argv).slice(1);
-
-  // This checks if every argument in argv has a matching knownArg. If not, we return true.
-  return !argvArgs.every(arg => knownArgs.includes(arg));
 }
 
 function processEnvironmentVariables() {
@@ -68,7 +70,8 @@ function processEnvironmentVariables() {
     stripeIndex = +match[1];
     stripeCount = +match[2];
 
-    shouldRecordAll = true;
+    shouldRecordViewer = true;
+    shouldRecordExample = true;
   }
 
   gInstallDir = process.env.RECORD_REPLAY_PATH || "/Applications/Replay.app";
@@ -114,8 +117,8 @@ async function runMatchingTests() {
     // saved recording of the example instead of making another recording. To re-record an example,
     // the user can pass in the `--record-examples` or `--record-all` flag to the test runner.
     const env = {
-      RECORD_REPLAY_RECORD_EXAMPLE: shouldRecordAll || shouldRecordExamples || !exampleRecordingId,
-      RECORD_REPLAY_DONT_RECORD_VIEWER: shouldRecordAll ? false : !shouldRecordViewer,
+      RECORD_REPLAY_RECORD_EXAMPLE: shouldRecordExamples || !exampleRecordingId,
+      RECORD_REPLAY_DONT_RECORD_VIEWER: !shouldRecordViewer,
       RECORD_REPLAY_TEST_URL:
         shouldRecordExamples || !exampleRecordingId
           ? `http://localhost:7998/${example}`
@@ -212,7 +215,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
   }
 
   function logFailure(why) {
-    failures.push[`Failed test: ${local} ${why}`];
+    failures.push(`Failed test: ${local} ${why}`);
     console.log(`[${elapsedTime()}] Test failed: ${why}`);
 
     // Log an error which github will recognize.
