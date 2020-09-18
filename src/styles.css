@@ -86,6 +86,16 @@
   width: 100%;
 }
 
+.loader {
+  margin: auto;
+}
+
+.popup-error {
+  margin: auto;
+  font-size: 1.5em;
+  text-align: center;
+}
+
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
 @import url("devtools/client/themes/markup.css");

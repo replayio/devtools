@@ -6,21 +6,7 @@ export const createApolloClient = async auth0Client => {
     return;
   }
   const createHttpLink = async headers => {
-    let hasuraToken;
-
-    try {
-      hasuraToken = await auth0Client.getAccessTokenSilently({
-        audience: "hasura-api",
-      });
-    } catch (e) {
-      if (e.error !== "login_required") {
-        throw e;
-      }
-
-      hasuraToken = await auth0Client.getAccessTokenWithPopup({
-        audience: "hasura-api",
-      });
-    }
+    let hasuraToken = await getToken(auth0Client);
 
     return new HttpLink({
       uri: "https://graphql.replay.io/v1/graphql",
@@ -41,3 +27,23 @@ export const createApolloClient = async auth0Client => {
 
   return client;
 };
+
+async function getToken(auth0Client) {
+  try {
+    return await auth0Client.getAccessTokenSilently({
+      audience: "hasura-api",
+    });
+  } catch (e) {
+    if (e.error !== "login_required" && e.error !== "consent_required") {
+      throw e;
+    }
+
+    try {
+      return await auth0Client.getAccessTokenWithPopup({
+        audience: "hasura-api",
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
+}
