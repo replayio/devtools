@@ -17,6 +17,7 @@ const {
 } = require("./utils");
 const { getFrameworkEventListeners } = require("./event-listeners");
 const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
+const { MappedLocationCache } = require("./mapped-location-cache");
 
 // Information about a protocol pause.
 function Pause(sessionId) {
@@ -1181,6 +1182,8 @@ const ThreadFront = {
   // original script.
   preferredGeneratedScripts: new Set(),
 
+  mappedLocations: new MappedLocationCache(),
+
   skipPausing: false,
 
   // Points which will be reached when stepping in various directions from a point.
@@ -1206,6 +1209,7 @@ const ThreadFront = {
 
   async setSessionId(sessionId) {
     this.sessionId = sessionId;
+    this.mappedLocations.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
 
     log(`GotSessionId ${sessionId}`);
@@ -1889,11 +1893,7 @@ const ThreadFront = {
   // corresponding to this generated location, so getPreferredLocation is
   // better to use when possible.
   async getPreferredMappedLocation(location) {
-    const { mappedLocation } = await sendMessage(
-      "Debugger.getMappedLocation",
-      { location },
-      this.sessionId
-    );
+    const mappedLocation = await this.mappedLocations.getMappedLocation(location);
     return this.getPreferredLocation(mappedLocation);
   },
 
