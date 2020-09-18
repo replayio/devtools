@@ -33,10 +33,6 @@ export default function update(state = initialAppState(), action) {
       return { ...state, loading: action.loading };
     }
 
-    case "set_recordings": {
-      return { ...state, recordings: action.recordings };
-    }
-
     default: {
       return state;
     }

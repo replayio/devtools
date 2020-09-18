@@ -173,12 +173,5 @@ export function updateUser(authUser = {}) {
     const updatedUser = { id, avatarID, picture, name };
 
     dispatch({ type: "register_user", user: updatedUser });
-
-    if (authUser.sub) {
-      try {
-        const recordings = await ThreadFront.getRecordings(authUser.sub);
-        dispatch({ type: "set_recordings", recordings });
-      } catch (e) {}
-    }
   };
 }

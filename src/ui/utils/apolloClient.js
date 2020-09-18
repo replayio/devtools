@@ -23,7 +23,7 @@ export const createApolloClient = async auth0Client => {
     }
 
     return new HttpLink({
-      uri: "http://graphql.replay.io/v1/graphql",
+      uri: "https://graphql.replay.io/v1/graphql",
       headers: {
         ...headers,
         Authorization: `Bearer ${hasuraToken}`,
@@ -39,16 +39,5 @@ export const createApolloClient = async auth0Client => {
     cache: new InMemoryCache(),
   });
 
-  client
-    .query({
-      query: gql`
-        query MyRecordingsQuery {
-          recordings {
-            id
-          }
-        }
-      `,
-    })
-    .then(result => console.log(result));
   return client;
 };
