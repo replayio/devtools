@@ -1,8 +1,13 @@
-
 .user-account button {
   padding: 7px;
   background: white;
-  color: black;
-  border: 1px solid black;
+  color: var(--grey-80);
+  border: 1px solid var(--grey-50);
   margin-inline-start: 12px;
+  border-radius: 2px;
+}
+
+.user-account button:hover {
+  border: 1px solid var(--grey-70);
+  cursor: pointer;
 }
