@@ -5,6 +5,7 @@ import { Recording } from "./Recording";
 import { useAuth0 } from "@auth0/auth0-react";
 import Lottie from "react-lottie";
 import forwardData from "image/lottie/forward.json";
+import { sortBy } from "lodash";
 
 import "./Recordings.css";
 
@@ -23,8 +24,8 @@ function Forward() {
 
 const Recordings = props => {
   const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
-
-  if (isLoading || (isAuthenticated && props.recordings === null)) {
+  const { recordings } = props;
+  if (isLoading || (isAuthenticated && recordings === null)) {
     return (
       <div className="loading-pane">
         <Forward />
@@ -46,8 +47,9 @@ const Recordings = props => {
 
   return (
     <div className="recordings">
-      {props.recordings &&
-        props.recordings.map((recording, i) => <Recording data={recording} key={i} />)}
+      {sortBy(props.recordings, recording => -new Date(recording.date)).map((recording, i) => (
+        <Recording data={recording} key={i} />
+      ))}
     </div>
   );
 };
