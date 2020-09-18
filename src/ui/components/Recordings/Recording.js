@@ -1,18 +1,14 @@
-const React = require("react");
-import { useHistory } from "react-router-dom";
+import React from "react";
+import moment from "moment";
 
 function formatDate(date) {
-  let dateString = new Date(date).toString().split(" ");
-  return `${dateString[1]} ${dateString[2]}, ${dateString[4].slice(0, 5)}`;
+  return moment(date).format("MMM Do, h:mm a");
 }
 
 export const Recording = ({ data }) => {
-  let history = useHistory();
-
   function navigateToRecording() {
     window.location = `/view?id=${data.recording_id}`;
   }
-
   return (
     <div className="recording">
       <div className="screenshot">
