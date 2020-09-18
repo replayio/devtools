@@ -2,6 +2,7 @@ import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
 import { prefs, features } from "ui/utils/prefs";
 import { seek } from "./timeline";
+import LogRocket from "ui/utils/logrocket";
 
 // Metadata key used to store comments.
 const CommentsMetadata = "devtools-comments";
@@ -173,5 +174,12 @@ export function updateUser(authUser = {}) {
     const updatedUser = { id, avatarID, picture, name };
 
     dispatch({ type: "register_user", user: updatedUser });
+
+    if (authUser.sub) {
+      LogRocket.identify(authUser.sub, {
+        name: authUser.name,
+        email: authUser.email,
+      });
+    }
   };
 }

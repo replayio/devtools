@@ -25,13 +25,13 @@ import { ThreadFront } from "protocol/thread";
 
 import App from "ui/components/App";
 import Auth0ProviderWithHistory from "./auth0";
-import LogRocket from "logrocket";
-import setupLogRocketReact from "logrocket-react";
+import LogRocket from "./logrocket";
 import { createApolloClient } from "./apolloClient";
 import { ApolloProvider } from "@apollo/client";
 
 const url = new URL(window.location.href);
-const test = url.searchParams.get("test");
+const test = url.searchParams.get("test") != null;
+const setupTelemetry = !test && url.hostname != "localhost";
 
 async function getInitialState() {
   const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;
@@ -41,13 +41,11 @@ async function getInitialState() {
 }
 
 function setupLogRocket() {
-  if (test || url.hostname == "localhost") {
+  if (setupTelemetry) {
     return;
   }
 
   LogRocket.init("4sdo4i/replay");
-
-  setupLogRocketReact(LogRocket);
   LogRocket.getSessionURL(sessionURL => {
     Sentry.configureScope(scope => {
       scope.setExtra("sessionURL", sessionURL);
@@ -58,7 +56,7 @@ function setupLogRocket() {
 export function setupSentry(context) {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
 
-  if (test || url.hostname == "localhost") {
+  if (setupTelemetry) {
     return;
   }
 
@@ -146,11 +144,9 @@ async function bootstrapStore() {
   });
 
   const initialState = await getInitialState();
-  const store = createStore(
-    combineReducers(reducers),
-    initialState,
-    applyMiddleware(LogRocket.reduxMiddleware())
-  );
+  const middleware = setupTelemetry ? applyMiddleware(LogRocket.reduxMiddleware()) : undefined;
+
+  const store = createStore(combineReducers(reducers), initialState, middleware);
   registerStoreObserver(store, updatePrefs);
 
   setupAppHelper(store);
