@@ -338,7 +338,7 @@ function ValueFront(pause, protocolValue, elements) {
     this._primitive = Number(protocolValue.unserializableNumber);
   } else if ("bigint" in protocolValue) {
     this._hasPrimitive = true;
-    this._primitive = BigInt(protocolValue.bigint);
+    this._primitive = protocolValue.bigint;
   } else if ("uninitialized" in protocolValue) {
     this._uninitialized = true;
   } else if ("unavailable" in protocolValue) {
