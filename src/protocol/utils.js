@@ -144,6 +144,10 @@ ArrayMap.prototype = {
   },
 };
 
+function compareBigInt(a, b) {
+  return a.length < b.length ? -1 : a.length > b.length ? 1 : a < b ? -1 : a > b ? 1 : 0;
+}
+
 module.exports = {
   makeInfallible,
   defer,
@@ -155,4 +159,5 @@ module.exports = {
   DisallowEverythingProxyHandler,
   EventEmitter,
   ArrayMap,
+  compareBigInt,
 };
