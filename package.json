@@ -28,6 +28,7 @@
     "devtools-sprintf-js": "^1.0.3",
     "extract-loader": "^5.0.1",
     "graphql": "^15.3.0",
+    "jsbi": "^3.1.4",
     "lodash": "^4.17.20",
     "logrocket": "^1.0.12",
     "logrocket-react": "^3.0.1",
