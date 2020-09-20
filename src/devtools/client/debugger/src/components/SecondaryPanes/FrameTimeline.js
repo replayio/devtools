@@ -22,6 +22,8 @@ import actions from "../../actions";
 import classnames from "classnames";
 import "./FrameTimeline.css";
 
+import JSBI from "jsbi";
+
 function isSameLocation(frameLocation, selectedLocation) {
   if (!frameLocation || !selectedLocation) {
     return;
@@ -141,7 +143,7 @@ class FrameTimeline extends Component {
     let index = 0;
     for (let i = 0; i < framePositions.positions.length; i++, index++) {
       const { location, point } = framePositions.positions[i];
-      if (BigInt(executionPoint) <= BigInt(point)) {
+      if (JSBI.lessThanOrEqual(JSBI.BigInt(executionPoint), JSBI.BigInt(point))) {
         break;
       }
     }

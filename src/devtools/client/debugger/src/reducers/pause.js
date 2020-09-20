@@ -13,6 +13,7 @@
 import { prefs } from "../utils/prefs";
 import { getSelectedFrame, getFramePositions } from "../selectors/pause";
 import { findLast, find } from "lodash";
+import JSBI from "jsbi";
 
 function createPauseState() {
   return {
@@ -401,11 +402,11 @@ export function getResumePoint(state, type) {
   }
 
   if (type == "reverseStepOver" || type == "rewind") {
-    return findLast(framePoints, p => BigInt(p) < BigInt(executionPoint));
+    return findLast(framePoints, p => JSBI.lessThan(JSBI.BigInt(p), JSBI.BigInt(executionPoint)));
   }
 
   if (type == "stepOver" || type == "resume" || type == "stepIn" || type == "stepUp") {
-    return find(framePoints, p => BigInt(p) > BigInt(executionPoint));
+    return find(framePoints, p => JSBI.greaterThan(JSBI.BigInt(p), JSBI.BigInt(executionPoint)));
   }
 }
 
