@@ -1,4 +1,4 @@
-const JSBI = require("jsbi").default;
+const JSBI = require("jsbi");
 
 function pointEquals(p1, p2) {
   p1 == p2;

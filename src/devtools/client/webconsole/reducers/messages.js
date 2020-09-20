@@ -22,7 +22,7 @@ const { pointPrecedes, pointEquals } = require("protocol/execution-point-utils.j
 const { sortBy } = require("lodash");
 const { log } = require("protocol/socket");
 const { assert } = require("protocol/utils");
-const JSBI = require("jsbi").default;
+const JSBI = require("jsbi");
 
 const MessageState = overrides =>
   Object.freeze(
