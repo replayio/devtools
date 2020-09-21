@@ -5,6 +5,7 @@ const { sendMessage, addEventListener, log } = require("./socket");
 const { assert, binarySearch, defer } = require("./utils");
 const { ScreenshotCache } = require("./screenshot-cache");
 const screenshotCache = new ScreenshotCache();
+const ResizeObserverPolyfill = require("resize-observer-polyfill").default;
 
 // Given a sorted array of items with "time" properties, find the index of
 // the most recent item at or preceding a given time.
@@ -325,7 +326,7 @@ function refreshGraphics() {
 function installObserver() {
   const canvas = document.getElementById("viewer");
   if (canvas) {
-    const observer = new ResizeObserver(() => {
+    const observer = new ResizeObserverPolyfill(() => {
       refreshGraphics();
     });
     observer.observe(canvas);
