@@ -5,8 +5,21 @@ const PropTypes = require("prop-types");
 const NodeAttribute = createFactory(require("./NodeAttribute"));
 const TextNode = createFactory(require("./TextNode"));
 
+const { getStr } = require("../utils/l10n");
 const { HTML_VOID_ELEMENTS } = require("../constants");
 const Types = require("../types");
+
+// Contains only valid computed display property types of the node to display in the
+// element markup and their respective title tooltip text.
+const DISPLAY_TYPES = {
+  flex: getStr("markupView.display.flex.tooltiptext2"),
+  "inline-flex": getStr("markupView.display.inlineFlex.tooltiptext2"),
+  grid: getStr("markupView.display.grid.tooltiptext2"),
+  "inline-grid": getStr("markupView.display.inlineGrid.tooltiptext2"),
+  subgrid: getStr("markupView.display.subgrid.tooltiptiptext"),
+  "flow-root": getStr("markupView.display.flowRoot.tooltiptext"),
+  contents: getStr("markupView.display.contents.tooltiptext2"),
+};
 
 class ElementNode extends PureComponent {
   static get propTypes() {
@@ -59,6 +72,36 @@ class ElementNode extends PureComponent {
     );
   }
 
+  renderEventBadge() {
+    if (!this.props.node.hasEventListeners) {
+      return null;
+    }
+
+    return dom.div(
+      {
+        className: "inspector-badge interactive",
+        title: getStr("markupView.event.tooltiptext"),
+      },
+      "event"
+    );
+  }
+
+  renderDisplayBadge() {
+    const { displayType } = this.props.node;
+
+    if (!(displayType in DISPLAY_TYPES)) {
+      return null;
+    }
+
+    return dom.div(
+      {
+        className: "inspector-badge",
+        title: DISPLAY_TYPES[displayType],
+      },
+      displayType
+    );
+  }
+
   renderInlineTextChild() {
     const { isInlineTextChild, value } = this.props.node;
 
@@ -84,6 +127,20 @@ class ElementNode extends PureComponent {
     );
   }
 
+  renderScrollableBadge() {
+    if (!this.props.node.isScrollable) {
+      return null;
+    }
+
+    return dom.div(
+      {
+        className: "inspector-badge scrollable-badge",
+        title: getStr("markupView.scrollableBadge.tooltip"),
+      },
+      getStr("markupView.scrollableBadge.label")
+    );
+  }
+
   render() {
     return dom.span(
       { className: "editor" },
@@ -93,7 +150,10 @@ class ElementNode extends PureComponent {
         onClick: this.onExpandBadgeClick,
       }),
       this.renderInlineTextChild(),
-      this.renderCloseTag()
+      this.renderCloseTag(),
+      this.renderEventBadge(),
+      this.renderDisplayBadge(),
+      this.renderScrollableBadge()
     );
   }
 }

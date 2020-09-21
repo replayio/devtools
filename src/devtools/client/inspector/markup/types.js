@@ -64,6 +64,9 @@ exports.node = {
   // Whether or not the node is an inline text child.
   isInlineTextChild: PropTypes.bool,
 
+  // Whether or not the node is scrollable.
+  isScrollable: PropTypes.bool,
+
   // The namespace URI of the node.
   namespaceURI: PropTypes.string,
 
