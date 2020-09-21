@@ -111,6 +111,8 @@ class MarkupView {
       isExpanded,
       // Whether or not the node is an inline text child. NYI
       isInlineTextChild: !!node.inlineTextChild,
+      // Whether or not the node is scrollable. NYI
+      isScrollable: node.isScrollable,
       // The namespace URI of the node. NYI
       namespaceURI: node.namespaceURI,
       // The object id of the parent node.

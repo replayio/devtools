@@ -916,6 +916,7 @@ NodeFront.prototype = {
     return undefined;
   },
 
+  // Whether or not the node is scrollable.
   get isScrollable() {
     // NYI
     return false;
