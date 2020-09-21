@@ -21,7 +21,7 @@ const {
 const { pointPrecedes, pointEquals } = require("protocol/execution-point-utils.js");
 const { sortBy } = require("lodash");
 const { log } = require("protocol/socket");
-const { assert } = require("protocol/utils");
+const { assert, compareNumericStrings } = require("protocol/utils");
 
 const MessageState = overrides =>
   Object.freeze(
@@ -1403,11 +1403,21 @@ function maybeSortVisibleMessages(state, sortWarningGroupMessage = false, timeSt
   // messages with execution points, as either we aren't replaying or haven't
   // seen any messages yet.
   if (state.hasExecutionPoints) {
-    state.visibleMessages = sortBy(
-      state.visibleMessages,
-      message => BigInt(messageExecutionPoint(state, message)),
-      message => messageCountSinceLastExecutionPoint(state, message)
-    );
+    state.visibleMessages = [...state.visibleMessages].sort((a, b) => {
+      const compared = compareNumericStrings(
+        messageExecutionPoint(state, a),
+        messageExecutionPoint(state, b)
+      );
+      if (compared < 0) {
+        return -1;
+      } else if (compared > 0) {
+        return 1;
+      } else {
+        const _a = messageCountSinceLastExecutionPoint(state, a);
+        const _b = messageCountSinceLastExecutionPoint(state, b);
+        return _a < _b ? -1 : _a > _b ? 1 : 0;
+      }
+    });
   }
 
   if (state.warningGroupsById.size > 0 && sortWarningGroupMessage) {
