@@ -13,7 +13,7 @@
 import { prefs } from "../utils/prefs";
 import { getSelectedFrame, getFramePositions } from "../selectors/pause";
 import { findLast, find } from "lodash";
-import { compareBigInt } from "protocol/utils";
+import { compareNumericStrings } from "protocol/utils";
 
 function createPauseState() {
   return {
@@ -402,11 +402,11 @@ export function getResumePoint(state, type) {
   }
 
   if (type == "reverseStepOver" || type == "rewind") {
-    return findLast(framePoints, p => compareBigInt(p, executionPoint) < 0);
+    return findLast(framePoints, p => compareNumericStrings(p, executionPoint) < 0);
   }
 
   if (type == "stepOver" || type == "resume" || type == "stepIn" || type == "stepUp") {
-    return find(framePoints, p => compareBigInt(p, executionPoint) > 0);
+    return find(framePoints, p => compareNumericStrings(p, executionPoint) > 0);
   }
 }
 

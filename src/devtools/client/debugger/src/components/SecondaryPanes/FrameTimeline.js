@@ -21,7 +21,7 @@ import actions from "../../actions";
 
 import classnames from "classnames";
 import "./FrameTimeline.css";
-import { compareBigInt } from "protocol/utils";
+import { compareNumericStrings } from "protocol/utils";
 
 function isSameLocation(frameLocation, selectedLocation) {
   if (!frameLocation || !selectedLocation) {
@@ -142,7 +142,7 @@ class FrameTimeline extends Component {
     let index = 0;
     for (let i = 0; i < framePositions.positions.length; i++, index++) {
       const { location, point } = framePositions.positions[i];
-      if (compareBigInt(executionPoint, point) <= 0) {
+      if (compareNumericStrings(executionPoint, point) <= 0) {
         break;
       }
     }

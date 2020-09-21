@@ -144,7 +144,13 @@ ArrayMap.prototype = {
   },
 };
 
-function compareBigInt(a, b) {
+/**
+ * Compare 2 integers encoded as numeric strings, because we want to avoid using BigInt (for now).
+ * This will only work correctly if both strings encode positive integers (without decimal places),
+ * using the same base (usually 10) and don't use "fancy stuff" like leading "+", "0" or scientific
+ * notation.
+ */
+function compareNumericStrings(a, b) {
   return a.length < b.length ? -1 : a.length > b.length ? 1 : a < b ? -1 : a > b ? 1 : 0;
 }
 
@@ -159,5 +165,5 @@ module.exports = {
   DisallowEverythingProxyHandler,
   EventEmitter,
   ArrayMap,
-  compareBigInt,
+  compareNumericStrings,
 };
