@@ -105,11 +105,11 @@ class Node extends PureComponent {
   }
 
   renderComponent() {
-    const { node } = this.props;
+    const { node, onToggleNodeExpanded } = this.props;
 
     let component = null;
     if (node.type === ELEMENT_NODE) {
-      component = ElementNode({ node });
+      component = ElementNode({ node, onToggleNodeExpanded });
     } else if (node.type === COMMENT_NODE || node.type === TEXT_NODE) {
       component = TextNode({
         type: node.type,

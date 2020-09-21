@@ -12,7 +12,19 @@ class ElementNode extends PureComponent {
   static get propTypes() {
     return {
       node: PropTypes.shape(Types.node).isRequired,
+      onToggleNodeExpanded: PropTypes.func.isRequired,
     };
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.onExpandBadgeClick = this.onExpandBadgeClick.bind(this);
+  }
+
+  onExpandBadgeClick(event) {
+    event.stopPropagation();
+    this.props.onToggleNodeExpanded(this.props.node.id, false);
   }
 
   renderAttributes() {
@@ -76,6 +88,10 @@ class ElementNode extends PureComponent {
     return dom.span(
       { className: "editor" },
       this.renderOpenTag(),
+      dom.span({
+        className: "markup-expand-badge",
+        onClick: this.onExpandBadgeClick,
+      }),
       this.renderInlineTextChild(),
       this.renderCloseTag()
     );
