@@ -31,16 +31,17 @@ class Comment extends React.Component {
 
   startEditing = () => {
     this.setState({ editing: true });
-    this.props.toggleAddingCommentOn();
+    this.props.toggleEditingCommentOn();
   };
 
   stopEditing = () => {
     this.setState({ editing: false });
-    this.props.toggleAddingCommentOff();
+    this.props.toggleEditingCommentOff();
   };
 
-  seekToComment = comment => {
+  seekToComment = e => {
     const { point, time, hasFrames } = this.props.comment;
+
     if (this.state.editing) {
       return null;
     }
@@ -95,7 +96,11 @@ class Comment extends React.Component {
     return (
       <div className="comment-body">
         {this.state.editing ? (
-          <CommentEditor comment={this.props.comment} stopEditing={this.stopEditing} />
+          <CommentEditor
+            comment={this.props.comment}
+            stopEditing={this.stopEditing}
+            location="rightSidebar"
+          />
         ) : (
           this.renderLabel()
         )}

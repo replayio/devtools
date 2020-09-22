@@ -64,7 +64,7 @@ class DevTools extends React.Component {
   }
 
   render() {
-    const { hideComments, loading, commentVisible } = this.props;
+    const { unfocusComment, loading, hasFocusedComment } = this.props;
     const recordingIsLoading = loading < 100;
 
     if (recordingIsLoading) {
@@ -76,11 +76,16 @@ class DevTools extends React.Component {
       );
     }
 
+    function handleClick() {
+      debugger;
+      unfocusComment();
+    }
+
     return (
       <>
         <Header />
         <Comments />
-        {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
+        {hasFocusedComment && <div className="app-mask" onClick={handleClick} />}
         {this.renderSplitBox()}
       </>
     );
@@ -90,12 +95,11 @@ class DevTools extends React.Component {
 export default connect(
   state => ({
     loading: selectors.getLoading(state),
-    user: selectors.getUser(state),
     tooltip: selectors.getTooltip(state),
-    commentVisible: selectors.commentVisible(state),
+    hasFocusedComment: selectors.hasFocusedComment(state),
   }),
   {
-    hideComments: actions.hideComments,
     updateTimelineDimensions: actions.updateTimelineDimensions,
+    unfocusComment: actions.unfocusComment,
   }
 )(DevTools);

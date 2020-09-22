@@ -16,20 +16,22 @@ class Comment extends React.Component {
   };
 
   componentDidMount() {
-    const { contents, addedFrom } = this.props.comment;
-    const { editing } = this.state;
+    const { comment } = this.props;
 
-    // A newly-added (empty) comment from the Timeline's create comment button
-    // should directly go into editing mode.
-    if (!contents && addedFrom == "timeline") {
+    // A newly-added comment, which is initialized as empty, should go directly
+    // into editing mode.
+    if (!comment.contents) {
       this.startEditing();
     }
   }
 
   componentDidUpdate() {
-    // Clear the editing state whenever a timeline comment is collapsed
-    // into its marker.
-    if (this.state.editing && !this.props.comment.visible) {
+    const { comment, focusedCommentId } = this.props;
+    const notFocused = focusedCommentId !== comment.id;
+
+    // We make sure that all unfocused comments are not in their editing state.
+    // This way when a user focuses on a comment, the editor is not displayed.
+    if (notFocused && this.state.editing) {
       this.stopEditing();
     }
   }
@@ -42,8 +44,9 @@ class Comment extends React.Component {
     this.setState({ editing: false });
   };
 
-  removeComment = () => {
-    const { removeComment, comment } = this.props;
+  deleteComment = () => {
+    const { removeComment, unfocusComment, comment } = this.props;
+    unfocusComment();
     removeComment(comment);
   };
 
@@ -55,28 +58,10 @@ class Comment extends React.Component {
             Edit Comment
           </div>
         ) : null}
-        <div className="menu-item" onClick={this.removeComment}>
+        <div className="menu-item" onClick={this.deleteComment}>
           Delete Comment
         </div>
       </div>
-    );
-  }
-
-  renderCommentMarker(leftOffset) {
-    const { comment, showComment, currentTime } = this.props;
-    const pausedAtComment = currentTime == comment.time;
-
-    return (
-      <button
-        className={classnames("img comment-marker", {
-          expanded: comment.visible,
-          paused: pausedAtComment,
-        })}
-        style={{
-          left: `calc(${leftOffset}%)`,
-        }}
-        onClick={() => showComment(comment)}
-      ></button>
     );
   }
 
@@ -107,7 +92,7 @@ class Comment extends React.Component {
           </div>
           <div className="comment-description">
             {editing ? (
-              <CommentEditor comment={comment} stopEditing={this.stopEditing} />
+              <CommentEditor comment={comment} stopEditing={this.stopEditing} location="timeline" />
             ) : (
               this.renderLabel()
             )}
@@ -118,10 +103,14 @@ class Comment extends React.Component {
   }
 
   render() {
-    const { comment, zoomRegion, index, timelineDimensions } = this.props;
+    const { comment, zoomRegion, index, timelineDimensions, focusedCommentId } = this.props;
     const { description } = this.state;
-
     const commentWidth = 280;
+    const shouldCollapse = focusedCommentId !== comment.id;
+
+    if (shouldCollapse) {
+      return <CommentMarker comment={comment} />;
+    }
 
     const offset = getPixelOffset({
       time: comment.time,
@@ -137,10 +126,6 @@ class Comment extends React.Component {
 
     if (offset < 0) {
       return null;
-    }
-
-    if (!comment.visible) {
-      return <CommentMarker comment={comment} />;
     }
 
     return (
@@ -166,10 +151,10 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
+    focusedCommentId: selectors.getFocusedCommentId(state),
   }),
   {
-    showComment: actions.showComment,
-    updateComment: actions.updateComment,
     removeComment: actions.removeComment,
+    unfocusComment: actions.unfocusComment,
   }
 )(Comment);

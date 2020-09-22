@@ -52,9 +52,13 @@ class CommentMarker extends React.Component {
   }
 
   renderCreateCommentButton() {
-    const { createComment, currentTime, zoomRegion } = this.props;
+    const { createComment, currentTime, zoomRegion, focusedCommentId } = this.props;
 
-    if (this.getCommentAtTime(currentTime) || currentTime > zoomRegion.endTime) {
+    if (
+      this.getCommentAtTime(currentTime) ||
+      currentTime > zoomRegion.endTime ||
+      focusedCommentId
+    ) {
       return null;
     }
 
@@ -64,13 +68,20 @@ class CommentMarker extends React.Component {
         style={{
           left: `${this.calculateLeftOffset(currentTime)}%`,
         }}
-        onClick={() => createComment(null, true, "timeline")}
+        onClick={() => createComment()}
       ></button>
     );
   }
 
   render() {
-    const { comment, showComment, currentTime, hoverTime, zoomRegion } = this.props;
+    const {
+      comment,
+      focusComment,
+      currentTime,
+      hoverTime,
+      zoomRegion,
+      focusedCommentId,
+    } = this.props;
 
     if (!comment) {
       return this.renderCreateCommentButton();
@@ -80,7 +91,7 @@ class CommentMarker extends React.Component {
       return null;
     }
 
-    const { time, visible, id } = comment;
+    const { time, id } = comment;
     const pausedAtComment = currentTime == time;
     // If a comment is close enough to the hovered time, we give
     // it the same hovered styling as a comment with exact time match.
@@ -91,13 +102,13 @@ class CommentMarker extends React.Component {
       <button
         className={classnames("img comment-marker", {
           hovered: isCloseToHover,
-          expanded: visible,
+          expanded: id === focusedCommentId,
           paused: pausedAtComment,
         })}
         style={{
           left: `${this.calculateLeftOffset(time)}%`,
         }}
-        onClick={() => showComment(comment)}
+        onClick={() => focusComment(comment)}
       ></button>
     );
   }
@@ -110,9 +121,10 @@ export default connect(
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
     comments: selectors.getComments(state),
+    focusedCommentId: selectors.getFocusedCommentId(state),
   }),
   {
     createComment: actions.createComment,
-    showComment: actions.showComment,
+    focusComment: actions.focusComment,
   }
 )(CommentMarker);

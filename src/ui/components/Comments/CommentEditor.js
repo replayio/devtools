@@ -6,8 +6,6 @@ import { actions } from "ui/actions";
 import { getAvatarColor } from "ui/utils/user";
 import classnames from "classnames";
 
-import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
-
 class CommentEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -15,6 +13,14 @@ class CommentEditor extends React.Component {
     this.state = {
       inputValue: props.comment.contents,
     };
+  }
+
+  componentDidMount() {
+    const { inputValue } = this.state;
+    const textarea = this._textarea;
+
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
   }
 
   onChange = e => {
@@ -30,30 +36,22 @@ class CommentEditor extends React.Component {
   };
 
   saveEditedComment = e => {
-    const { comment, stopEditing, removeComment } = this.props;
+    const { comment, stopEditing, location, saveComment } = this.props;
     const { inputValue } = this.state;
-
     e.stopPropagation();
     stopEditing();
 
-    if (inputValue == "") {
-      return removeComment(comment);
-    }
-
-    this.props.updateComment({ ...comment, contents: inputValue });
+    saveComment(inputValue, location, comment);
   };
 
   stopEditingComment = e => {
-    const { removeComment, comment, stopEditing } = this.props;
+    const { comment, stopEditing, unfocusComment } = this.props;
     const { inputValue } = this.state;
     e.stopPropagation();
-
-    if (comment.contents == "" && inputValue == "") {
-      return removeComment(comment);
-    }
-
-    this.setState({ inputValue: comment.contents });
     stopEditing();
+    this.setState({ inputValue: comment.contents });
+
+    unfocusComment(comment);
   };
 
   renderButtons() {
@@ -78,6 +76,7 @@ class CommentEditor extends React.Component {
           defaultValue={comment.contents}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
+          ref={c => (this._textarea = c)}
         />
         {this.renderButtons()}
       </div>
@@ -85,7 +84,7 @@ class CommentEditor extends React.Component {
   }
 }
 
-export default connect(state => ({ currentTime: selectors.getCurrentTime(state) }), {
-  updateComment: actions.updateComment,
-  removeComment: actions.removeComment,
+export default connect(() => ({}), {
+  unfocusComment: actions.unfocusComment,
+  saveComment: actions.saveComment,
 })(CommentEditor);
