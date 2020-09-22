@@ -17,7 +17,26 @@ function WelcomePage() {
   );
 }
 
+function FirstRecording() {
+  return (
+    <div>
+      <h2>Your First Recording</h2>
+      <p>You don’t have any recordings yet. Try recording our version of TodoMVC below.</p>
+      <form>
+        <input type="textarea"></input>
+        <input type="submit">Start Recording</input>
+      </form>
+    </div>
+  );
+}
+
 function AccountPage() {
+  const { data, loading } = useQuery(RECORDINGS);
+
+  if (data.recordings && !data.recordings.length) {
+    return <FirstRecording />
+  }
+
   return <Recordings />;
 }
 
