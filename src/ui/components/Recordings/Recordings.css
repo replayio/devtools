@@ -122,11 +122,3 @@
   background: #f0f2f5;
   height: 100%;
 }
-
-.loading-pane {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}

@@ -1,126 +1,69 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-
-import Toolbox from "./Toolbox";
-import Tooltip from "./Tooltip";
-import Comments from "./Comments";
-import Header from "./Header";
-import Recordings from "./Recordings/index";
-
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import RightSidebar from "./RightSidebar";
-import { actions } from "../actions";
+import DevTools from "./DevTools";
+import Account from "./Account";
+import Loader from "./shared/Loader";
+import Error from "./shared/Error";
 import { selectors } from "../reducers";
+import { useApolloClient, ApolloProvider } from "@apollo/client";
+import { useAuth0 } from "@auth0/auth0-react";
 
 import "styles.css";
 
-function setTheme(theme) {
-  document.body.parentElement.className = theme;
+function useGetApolloClient() {
+  const [apolloClient, setApolloClient] = useState(null);
+  const [consentPopupBlocked, setConsentPopupBlocked] = useState(null);
+
+  useApolloClient().then(
+    client => {
+      // This callback sets the instantiated apolloClient in the App
+      // component's state. This makes sure that the App is re-rendered
+      // once the apolloClient has been instantiated with createApolloClient.
+      if (apolloClient === null && client) {
+        setApolloClient(client);
+      }
+    },
+    error => {
+      // This lets us know that the user needs to consent to Auth0, but
+      // is currently blocking popups.
+      if (!consentPopupBlocked && error.message === "Could not open popup") {
+        setConsentPopupBlocked(true);
+      } else if (error.message !== "Could not open popup") {
+        throw error;
+      }
+    }
+  );
+
+  return { apolloClient, consentPopupBlocked };
 }
 
-class App extends React.Component {
-  state = {
-    orientation: "bottom",
-    tooltip: null,
-  };
+function App({ theme, recordingId }) {
+  const { isAuthenticated, isLoading } = useAuth0();
+  const { apolloClient, consentPopupBlocked } = useGetApolloClient();
 
-  componentDidMount() {
-    const { theme } = this.props;
-    setTheme(theme);
+  useEffect(() => {
+    document.body.parentElement.className = theme;
+  }, [theme]);
+
+  if (consentPopupBlocked) {
+    return <Error />;
   }
 
-  componentDidUpdate(prevProps) {
-    const { theme } = this.props;
-    if (theme !== prevProps.theme) {
-      setTheme(theme);
-    }
+  if (isLoading || (isAuthenticated && !apolloClient)) {
+    return <Loader />;
   }
 
-  renderViewer(toolbox) {
-    const { tooltip } = this.props;
-    return (
-      <div id="outer-viewer">
-        <div id="viewer">
-          <canvas id="graphics"></canvas>
-          <div id="highlighter-root"></div>
-        </div>
-        <RightSidebar toolbox={toolbox} />
-        <Tooltip tooltip={tooltip} />
-      </div>
-    );
-  }
-
-  render() {
-    const {
-      commentVisible,
-      hideComments,
-      updateTimelineDimensions,
-      recordingId,
-      loading,
-    } = this.props;
-    const { orientation } = this.state;
-    const isLoading = loading < 100;
-
-    if (isLoading) {
-      return (
-        <>
-          <Header />
-          {recordingId ? (
-            <div className="loading-bar" style={{ width: `${loading}%` }} />
-          ) : (
-            <Recordings />
-          )}
-        </>
-      );
-    }
-
-    const vert = orientation != "bottom";
-    const toolbox = <Toolbox />;
-
-    let startPanel, endPanel;
-    if (orientation == "bottom" || orientation == "right") {
-      startPanel = this.renderViewer(toolbox);
-      endPanel = toolbox;
-    } else {
-      startPanel = toolbox;
-      endPanel = this.renderViewer(toolbox);
-    }
-
-    return (
-      <>
-        <Header />
-        <Comments />
-        {commentVisible && <div className="app-mask" onClick={() => hideComments()} />}
-        <SplitBox
-          style={{ width: "100vw", overflow: "hidden" }}
-          splitterSize={1}
-          initialSize="50%"
-          minSize="20%"
-          maxSize="80%"
-          vert={vert}
-          onMove={num => updateTimelineDimensions()}
-          startPanel={startPanel}
-          endPanelControl={false}
-          endPanel={endPanel}
-        />
-      </>
-    );
-  }
+  return (
+    <ApolloProvider client={apolloClient}>
+      {recordingId ? <DevTools /> : <Account />}
+    </ApolloProvider>
+  );
 }
 
 export default connect(
   state => ({
     theme: selectors.getTheme(state),
-    tooltip: selectors.getTooltip(state),
-    commentVisible: selectors.commentVisible(state),
-    loading: selectors.getLoading(state),
     recordingId: selectors.getRecordingId(state),
-    user: selectors.getUser(state),
   }),
-  {
-    updateTheme: actions.updateTheme,
-    hideComments: actions.hideComments,
-    updateTimelineDimensions: actions.updateTimelineDimensions,
-  }
+  {}
 )(App);
