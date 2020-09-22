@@ -12,6 +12,7 @@ class MarkupApp extends PureComponent {
     return {
       markup: PropTypes.shape(Types.markup).isRequired,
       onSelectNode: PropTypes.func.isRequired,
+      onShowEventTooltip: PropTypes.func.isRequired,
       onToggleNodeExpanded: PropTypes.func.isRequired,
     };
   }
@@ -36,6 +37,7 @@ class MarkupApp extends PureComponent {
           markup,
           node: tree[nodeId],
           onSelectNode: this.props.onSelectNode,
+          onShowEventTooltip: this.props.onShowEventTooltip,
           onToggleNodeExpanded: this.props.onToggleNodeExpanded,
         });
       })

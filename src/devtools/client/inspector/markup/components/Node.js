@@ -20,6 +20,7 @@ class Node extends PureComponent {
       markup: PropTypes.shape(Types.markup).isRequired,
       node: PropTypes.shape(Types.node).isRequired,
       onSelectNode: PropTypes.func.isRequired,
+      onShowEventTooltip: PropTypes.func.isRequired,
       onToggleNodeExpanded: PropTypes.func.isRequired,
     };
   }
@@ -73,6 +74,7 @@ class Node extends PureComponent {
           markup,
           node: tree[childId],
           onSelectNode: this.props.onSelectNode,
+          onShowEventTooltip: this.props.onShowEventTooltip,
           onToggleNodeExpanded: this.props.onToggleNodeExpanded,
         });
       })
@@ -105,11 +107,11 @@ class Node extends PureComponent {
   }
 
   renderComponent() {
-    const { node, onToggleNodeExpanded } = this.props;
+    const { node, onShowEventTooltip, onToggleNodeExpanded } = this.props;
 
     let component = null;
     if (node.type === ELEMENT_NODE) {
-      component = ElementNode({ node, onToggleNodeExpanded });
+      component = ElementNode({ node, onShowEventTooltip, onToggleNodeExpanded });
     } else if (node.type === COMMENT_NODE || node.type === TEXT_NODE) {
       component = TextNode({
         type: node.type,
