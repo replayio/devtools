@@ -31,7 +31,7 @@ import { ApolloProvider } from "@apollo/client";
 
 const url = new URL(window.location.href);
 const test = url.searchParams.get("test") != null;
-const setupTelemetry = !test && url.hostname != "localhost";
+const skipTelemetry = test || url.hostname == "localhost";
 
 async function getInitialState() {
   const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;
@@ -41,7 +41,7 @@ async function getInitialState() {
 }
 
 function setupLogRocket() {
-  if (setupTelemetry) {
+  if (skipTelemetry) {
     return;
   }
 
@@ -56,7 +56,7 @@ function setupLogRocket() {
 export function setupSentry(context) {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
 
-  if (setupTelemetry) {
+  if (skipTelemetry) {
     return;
   }
 
@@ -144,7 +144,7 @@ async function bootstrapStore() {
   });
 
   const initialState = await getInitialState();
-  const middleware = setupTelemetry ? applyMiddleware(LogRocket.reduxMiddleware()) : undefined;
+  const middleware = skipTelemetry ? undefined : applyMiddleware(LogRocket.reduxMiddleware());
 
   const store = createStore(combineReducers(reducers), initialState, middleware);
   registerStoreObserver(store, updatePrefs);
