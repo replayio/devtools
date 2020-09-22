@@ -25,6 +25,7 @@ class ElementNode extends PureComponent {
   static get propTypes() {
     return {
       node: PropTypes.shape(Types.node).isRequired,
+      onShowEventTooltip: PropTypes.func.isRequired,
       onToggleNodeExpanded: PropTypes.func.isRequired,
     };
   }
@@ -32,7 +33,13 @@ class ElementNode extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.onEventBadgeClick = this.onEventBadgeClick.bind(this);
     this.onExpandBadgeClick = this.onExpandBadgeClick.bind(this);
+  }
+
+  onEventBadgeClick(event) {
+    event.stopPropagation();
+    this.props.onShowEventTooltip(this.props.node.id, event.target);
   }
 
   onExpandBadgeClick(event) {
@@ -81,6 +88,7 @@ class ElementNode extends PureComponent {
       {
         className: "inspector-badge interactive",
         title: getStr("markupView.event.tooltiptext"),
+        onClick: this.onEventBadgeClick,
       },
       "event"
     );

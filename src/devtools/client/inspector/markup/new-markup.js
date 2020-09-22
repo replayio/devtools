@@ -2,6 +2,8 @@ const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 const { ThreadFront } = require("protocol/thread");
 const { DOCUMENT_TYPE_NODE } = require("devtools/shared/dom-node-constants");
+const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+const { setEventTooltip } = require("devtools/client/shared/widgets/tooltip/EventTooltipHelper");
 
 const {
   updateNodeExpanded,
@@ -20,6 +22,7 @@ class MarkupView {
     this.inspector = inspector;
     this.selection = inspector.selection;
     this.store = inspector.store;
+    this.toolbox = inspector.toolbox;
 
     // A map containing currently seen NodeFront objects in the markup tree.
     // For a given NodeFront's object id, returns the NodeFront associated with it.
@@ -30,6 +33,7 @@ class MarkupView {
     this.tree = {};
 
     this.onSelectNode = this.onSelectNode.bind(this);
+    this.onShowEventTooltip = this.onShowEventTooltip.bind(this);
     this.onToggleNodeExpanded = this.onToggleNodeExpanded.bind(this);
     this.update = this.update.bind(this);
 
@@ -46,6 +50,7 @@ class MarkupView {
 
     const markupApp = MarkupApp({
       onSelectNode: this.onSelectNode,
+      onShowEventTooltip: this.onShowEventTooltip,
       onToggleNodeExpanded: this.onToggleNodeExpanded,
     });
 
@@ -68,11 +73,28 @@ class MarkupView {
     this.inspector.sidebar.off("markupview-selected", this.update);
     this.selection.off("new-node-front", this.update);
 
+    if (this._eventTooltip) {
+      this._eventTooltip.destroy();
+      this._eventTooltip = null;
+    }
+
     this.inspector = null;
     this.nodes = null;
     this.selection = null;
     this.store = null;
+    this.toolbox = null;
     this.tree = null;
+  }
+
+  get eventTooltip() {
+    if (!this._eventTooltip) {
+      this._eventTooltip = new HTMLTooltip(this.toolbox.doc, {
+        type: "arrow",
+        consumeOutsideClicks: false,
+      });
+    }
+
+    return this._eventTooltip;
   }
 
   /**
@@ -132,7 +154,7 @@ class MarkupView {
    * Collapses the given node in the markup tree.
    *
    * @param  {String} nodeId
-   *         The actor ID of the node to collapse.
+   *         The NodeFront object id to collapse.
    */
   collapseNode(nodeId) {
     this.store.dispatch(updateNodeExpanded(nodeId, false));
@@ -142,7 +164,7 @@ class MarkupView {
    * Expands the given node in the markup tree.
    *
    * @param  {String} nodeId
-   *         The actor ID of the node to expand.
+   *         The NodeFront object id to expand.
    */
   async expandNode(nodeId) {
     await this.getChildren(this.nodes.get(nodeId));
@@ -219,10 +241,60 @@ class MarkupView {
    * Selects the given node in the markup tree.
    *
    * @param  {String} nodeId
-   *         The actor ID of the node to select.
+   *         The NodeFront object id to select.
    */
   onSelectNode(nodeId) {
     this.store.dispatch(updateSelectedNode(nodeId));
+  }
+
+  /**
+   * Shows the event tooltip for the given node.
+   *
+   * @param  {String} nodeId
+   *         The NodeFront object id to show the event tooltip.
+   * @param  {DOMNode} target
+   *         The anchor element for the tooltip.
+   */
+  async onShowEventTooltip(nodeId, target) {
+    const nodeFront = this.nodes.get(nodeId);
+    const listenerRaw = nodeFront.getEventListeners();
+    const frameworkListeners = await nodeFront.getFrameworkEventListeners();
+
+    const listenerInfo = [...listenerRaw, ...frameworkListeners].map(listener => {
+      const { handler, type, capture, tags = "" } = listener;
+      const location = handler.functionLocation();
+      const url = handler.functionLocationURL();
+      let origin, line, column;
+
+      if (location && url) {
+        line = location.line;
+        column = location.column;
+        origin = `${url}:${line}:${column}`;
+      } else {
+        // We end up here for DOM0 handlers...
+        origin = "[native code]";
+      }
+
+      return {
+        capturing: capture,
+        DOM0: false,
+        type,
+        origin,
+        url,
+        line,
+        column,
+        tags,
+        handler,
+        scriptId: url ? location.scriptId : undefined,
+        native: !url,
+        hide: {
+          debugger: !url,
+        },
+      };
+    });
+
+    setEventTooltip(this.eventTooltip, listenerInfo, this.toolbox);
+    this.eventTooltip.show(target);
   }
 
   /**
@@ -230,7 +302,7 @@ class MarkupView {
    * Expands the given node if the node is not expanded and vice versa.
    *
    * @param  {String} nodeId
-   *         The actor ID of the node to expand or collapse.
+   *         The NodeFront object id to expand or collapse.
    * @param  {Boolean} isExpanded
    *         Whether or not the node is expanded.
    */
