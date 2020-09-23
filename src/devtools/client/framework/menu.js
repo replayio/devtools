@@ -143,8 +143,10 @@ Menu.prototype.popup = function (screenX, screenY) {
   popup.style.left = `${left}px`;
 
   const listener = () => {
+    if (popup) {
+      document.body.removeChild(popup);
+    }
     gMenuPopup = null;
-    document.body.removeChild(popup);
     document.removeEventListener("mousedown", listener);
     document.body.removeEventListener("contextmenu", listener);
   };
