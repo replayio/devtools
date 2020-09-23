@@ -84,6 +84,26 @@ function getAutocompleteMaxWidth(element, container) {
 }
 
 /**
+ * Returns whether or not the display type is a flex display.
+ *
+ * @param  {String} displayType
+ *         The display style property value of the node.
+ */
+function isFlexDisplayType(displayType) {
+  return displayType === "flex" || displayType === "inline-flex;";
+}
+
+/**
+ * Returns whether or not the display type is a grid display.
+ *
+ * @param  {String} displayType
+ *         The display style property value of the node.
+ */
+function isGridDisplayType(displayType) {
+  return displayType === "grid" || displayType === "inline-grid" || displayType === "subgrid";
+}
+
+/**
  * Parse attribute names and values from a string.
  *
  * @param  {String} attr
@@ -130,5 +150,7 @@ module.exports = {
   flashElementOn,
   flashElementOff,
   getAutocompleteMaxWidth,
+  isFlexDisplayType,
+  isGridDisplayType,
   parseAttributeValues,
 };

@@ -823,6 +823,10 @@ class Inspector {
         const LayoutView = require("devtools/client/inspector/layout/layout");
         panel = new LayoutView(this, this.panelWin);
         break;
+      case "markupview":
+        const NewMarkupView = require("devtools/client/inspector/markup/new-markup");
+        panel = new NewMarkupView(this, this.panelWin);
+        break;
       case "newruleview":
         const RulesView = require("devtools/client/inspector/rules/new-rules");
         panel = new RulesView(this, this.panelWin);
@@ -900,6 +904,13 @@ class Inspector {
       sidebarPanels.push({
         id: "ruleview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
+      });
+    }
+
+    if (features.newMarkupView) {
+      sidebarPanels.push({
+        id: "markupview",
+        title: INSPECTOR_L10N.getStr("inspector.panelLabel.markupView"),
       });
     }
 

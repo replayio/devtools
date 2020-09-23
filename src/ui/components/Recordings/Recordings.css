@@ -53,9 +53,9 @@
   width: 100%;
 }
 
-/* .recordings  .recording .screenshot:hover .overlay {
+.recordings .recording .screenshot:hover .overlay {
   visibility: visible;
-} */
+}
 
 .recordings .recording .overlay {
   display: none;
@@ -68,7 +68,7 @@
   border-radius: 2px;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .recordings .recording button.link {
@@ -120,13 +120,5 @@
 
 .welcome-screen {
   background: #f0f2f5;
-  height: 100%;
-}
-
-.loading-pane {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   height: 100%;
 }

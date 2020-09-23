@@ -2,6 +2,7 @@ import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
 import { prefs, features } from "ui/utils/prefs";
 import { seek } from "./timeline";
+import LogRocket from "ui/utils/logrocket";
 
 // Metadata key used to store comments.
 const CommentsMetadata = "devtools-comments";
@@ -25,7 +26,7 @@ function onCommentsUpdate(newComments) {
   };
 }
 
-export function createComment(newComment, visible, addedFrom) {
+export function createComment(newComment) {
   return ({ getState, dispatch }) => {
     const existingComments = selectors.getComments(getState());
     const currentTime = selectors.getCurrentTime(getState());
@@ -43,8 +44,6 @@ export function createComment(newComment, visible, addedFrom) {
       time: currentTime,
       contents: "",
       user: user,
-      addedFrom,
-      visible,
     };
 
     const newComments = [...existingComments, comment];
@@ -54,6 +53,10 @@ export function createComment(newComment, visible, addedFrom) {
     dispatch({
       type: "set_comments",
       comments: newComments,
+    });
+    dispatch({
+      type: "set_focused_comment_id",
+      id: comment.id,
     });
   };
 }
@@ -81,6 +84,30 @@ export function updateComment(comment) {
   };
 }
 
+export function saveComment(newContents, location, oldComment) {
+  return ({ dispatch, getState }) => {
+    const comments = selectors.getComments(getState());
+
+    // Only update the comment's contents if the user is trying to save a
+    // non-empty string. Otherwise, delete the comment.
+    if (newContents === "") {
+      const newComments = comments.filter(c => c.id != oldComment.id);
+      dispatch(updateComments(newComments));
+    } else {
+      const commentIndex = comments.findIndex(c => c.id === oldComment.id);
+      const newComment = { ...oldComment, contents: newContents };
+      const newComments = [...comments];
+
+      newComments.splice(commentIndex, 1, newComment);
+      dispatch(updateComments(newComments));
+    }
+
+    if (location === "timeline") {
+      dispatch({ type: "set_focused_comment_id", id: null });
+    }
+  };
+}
+
 export function updateComments(comments) {
   return ({ dispatch }) => {
     ThreadFront.updateMetadata(CommentsMetadata, () => comments);
@@ -88,31 +115,34 @@ export function updateComments(comments) {
   };
 }
 
-export function showComment(comment) {
+export function focusComment(comment) {
   return ({ dispatch, getState }) => {
-    const existingComments = selectors.getComments(getState());
-    const newComments = existingComments.map(c => ({ ...c, visible: c.id === comment.id }));
-    const { time, point, hasFrames } = comment;
+    const { id, time, point, hasFrames } = comment;
+    dispatch({ type: "set_focused_comment_id", id });
     dispatch(seek(point, time, hasFrames));
-    dispatch(updateComments(newComments));
   };
 }
 
-export function hideComments() {
+export function unfocusComment(comment) {
   return ({ dispatch, getState }) => {
-    const existingComments = selectors.getComments(getState());
-    const newComments = existingComments
-      .map(c => ({ ...c, visible: false }))
-      .filter(c => c.contents != "");
-    dispatch(updateComments(newComments));
+    // Unlike the timeline, the selecting a comment on the right sidebar doesn't
+    // focus on that comment. Instead, we pass in the comment that is being edited
+    const focusedComment = selectors.getFocusedComment(getState()) || comment;
+
+    // We should remove empty comments (e.g. newly created comments)
+    if (focusedComment.contents === "") {
+      const comments = selectors.getComments(getState());
+      const newComments = comments.filter(c => c.id != focusedComment.id);
+
+      dispatch(updateComments(newComments));
+    }
+
+    dispatch({ type: "set_focused_comment_id", id: null });
   };
 }
 
-export function clearComments() {
-  return ({ dispatch }) => {
-    ThreadFront.updateMetadata(CommentsMetadata, () => []);
-    dispatch({ type: "set_comments", comments: [] });
-  };
+function setFocusedCommentId(id) {
+  return { type: "set_focused_comment_id", id };
 }
 
 export function registerUser() {
@@ -175,10 +205,10 @@ export function updateUser(authUser = {}) {
     dispatch({ type: "register_user", user: updatedUser });
 
     if (authUser.sub) {
-      try {
-        const recordings = await ThreadFront.getRecordings(authUser.sub);
-        dispatch({ type: "set_recordings", recordings });
-      } catch (e) {}
+      LogRocket.identify(authUser.sub, {
+        name: authUser.name,
+        email: authUser.email,
+      });
     }
   };
 }

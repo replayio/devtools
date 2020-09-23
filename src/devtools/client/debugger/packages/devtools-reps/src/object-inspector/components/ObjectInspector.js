@@ -282,6 +282,7 @@ function mapStateToProps(state, props) {
 
 const OI = connect(mapStateToProps, actions)(ObjectInspector);
 
+// eslint-disable-next-line
 export default props => {
   const { roots } = props;
 

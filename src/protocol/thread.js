@@ -18,6 +18,7 @@ const {
 const { getFrameworkEventListeners } = require("./event-listeners");
 const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
 const { MappedLocationCache } = require("./mapped-location-cache");
+const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 // Information about a protocol pause.
 function Pause(sessionId) {
@@ -339,7 +340,7 @@ function ValueFront(pause, protocolValue, elements) {
     this._primitive = Number(protocolValue.unserializableNumber);
   } else if ("bigint" in protocolValue) {
     this._hasPrimitive = true;
-    this._primitive = BigInt(protocolValue.bigint);
+    this._primitive = protocolValue.bigint;
   } else if ("uninitialized" in protocolValue) {
     this._uninitialized = true;
   } else if ("unavailable" in protocolValue) {
@@ -554,7 +555,7 @@ ValueFront.prototype = {
     rv.sort((a, b) => {
       const _a = a.name?.toUpperCase();
       const _b = b.name?.toUpperCase();
-      return (_a < _b) ? -1 : ((_a > _b) ? 1 : 0);
+      return _a < _b ? -1 : _a > _b ? 1 : 0;
     });
     if (["Set", "WeakSet", "Map", "WeakMap"].includes(this.className())) {
       const elements = this.previewContainerEntries().map(({ key, value }, i) => {
@@ -664,6 +665,7 @@ NodeFront.prototype = {
     return this._node.isConnected;
   },
 
+  // The node's `nodeType` which identifies what the node is.
   get nodeType() {
     return this._node.nodeType;
   },
@@ -676,12 +678,14 @@ NodeFront.prototype = {
     return this.nodeName.toLowerCase();
   },
 
+  // The name of the current node.
   get tagName() {
     if (this.nodeType == Node.ELEMENT_NODE) {
       return this._node.nodeName;
     }
   },
 
+  // The pseudo element type.
   get pseudoType() {
     return this._node.pseudoType;
   },
@@ -691,9 +695,10 @@ NodeFront.prototype = {
     return [];
   },
 
+  // The namespace URI of the node.
   get namespaceURI() {
     // NYI
-    return undefined;
+    return HTML_NS;
   },
 
   get doctypeString() {
@@ -701,6 +706,7 @@ NodeFront.prototype = {
     return "unknown";
   },
 
+  // A list of the node's attributes.
   get attributes() {
     return this._node.attributes || [];
   },
@@ -731,6 +737,7 @@ NodeFront.prototype = {
     return this.parentNode();
   },
 
+  // Whether or not the node has child nodes.
   get hasChildren() {
     return this._node.childNodes && this._node.childNodes.length != 0;
   },
@@ -749,6 +756,7 @@ NodeFront.prototype = {
     return childNodes;
   },
 
+  // The node's `nodeValue` which identifies the value of the current node.
   getNodeValue() {
     return this._node.nodeValue;
   },
@@ -842,10 +850,12 @@ NodeFront.prototype = {
     return Promise.all(promises);
   },
 
+  // Whether or not the node is displayed.
   get isDisplayed() {
     return this.displayType != "none";
   },
 
+  // The computed display style property value of the node.
   get displayType() {
     assert(this._loaded);
     return this._computedStyle.get("display");
@@ -856,6 +866,7 @@ NodeFront.prototype = {
     return this._computedStyle;
   },
 
+  // Whether or not the node has event listeners.
   get hasEventListeners() {
     assert(this._loaded);
     return this._listeners.length != 0;
@@ -906,6 +917,7 @@ NodeFront.prototype = {
     return undefined;
   },
 
+  // Whether or not the node is scrollable.
   get isScrollable() {
     // NYI
     return false;
@@ -1932,11 +1944,6 @@ const ThreadFront = {
       key,
     });
     callback(value ? JSON.parse(value) : undefined);
-  },
-
-  async getRecordings(authId) {
-    const response = await sendMessage("Internal.getRecordings", { authId });
-    return response.recordings;
   },
 
   async updateMetadata(key, callback) {
