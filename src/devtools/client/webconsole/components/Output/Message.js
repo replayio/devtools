@@ -4,7 +4,6 @@
 
 "use strict";
 
-// React & Redux
 const { Component, createFactory, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
@@ -427,6 +426,7 @@ class Message extends Component {
           repeat ? " " : null,
           repeat,
           " ",
+          location,
           type == "command" ? this.renderDeleteButton() : null
         ),
         attachment,
