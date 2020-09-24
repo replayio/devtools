@@ -82,7 +82,8 @@
   z-index: 99;
 }
 
-.A11y-mouse, .A11y-keyboard {
+.A11y-mouse,
+.A11y-keyboard {
   width: 100%;
 }
 
@@ -98,6 +99,7 @@
 
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
+@import url("devtools/client/themes/components-frame.css");
 @import url("devtools/client/themes/markup.css");
 @import url("devtools/client/themes/common.css");
 @import url("devtools/client/debugger/dist/vendors.css");
