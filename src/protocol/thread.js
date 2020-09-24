@@ -314,6 +314,7 @@ function ValueFront(pause, protocolValue, elements) {
   // For primitive values.
   this._hasPrimitive = false;
   this._primitive = undefined;
+  this._isBigInt = false;
 
   // For objects.
   this._object = null;
@@ -340,6 +341,7 @@ function ValueFront(pause, protocolValue, elements) {
     this._primitive = Number(protocolValue.unserializableNumber);
   } else if ("bigint" in protocolValue) {
     this._hasPrimitive = true;
+    this._isBigInt = true;
     this._primitive = protocolValue.bigint;
   } else if ("uninitialized" in protocolValue) {
     this._uninitialized = true;
@@ -464,11 +466,15 @@ ValueFront.prototype = {
   },
 
   isString() {
-    return this.isPrimitive() && typeof this.primitive() == "string";
+    return this.isPrimitive() && typeof this.primitive() == "string" && !this._isBigInt;
   },
 
   isPrimitive() {
     return this._hasPrimitive;
+  },
+
+  isBigInt() {
+    return this._isBigInt;
   },
 
   primitive() {

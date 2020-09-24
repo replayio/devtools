@@ -16,12 +16,12 @@ BigInt.propTypes = {
 };
 
 function BigInt(props) {
-  const text = props.object.primitive().toString();
+  const text = props.object.primitive();
   return span({ className: "objectBox objectBox-number" }, `${text}n`);
 }
 
 function supportsObject(valueFront, noGrip = false) {
-  return valueFront.isPrimitive() && typeof valueFront.primitive() == "bigint";
+  return valueFront.isBigInt();
 }
 
 // Exports from this module
