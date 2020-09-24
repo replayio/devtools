@@ -427,7 +427,7 @@ class Message extends Component {
           repeat,
           " ",
           location,
-          type == MESSAGE_TYPE.COMMAND ? this.renderDeleteButton() : null
+          this.renderDeleteButton()
         ),
         attachment,
         ...notesNodes
