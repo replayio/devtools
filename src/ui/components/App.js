@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import DevTools from "./DevTools";
-import Account from "./Account";
+import { Account } from "./Account/index";
 import Loader from "./shared/Loader";
 import Error from "./shared/Error";
 import { selectors } from "../reducers";

@@ -16,7 +16,7 @@ const RECORDINGS = gql`
   }
 `;
 
-function UserPrompt({ children }) {
+export function UserPrompt({ children }) {
   return <div className="user-prompt">{children}</div>;
 }
 
@@ -74,7 +74,7 @@ function WelcomePage() {
   );
 }
 
-export default function Account() {
+export function Account() {
   const { isAuthenticated } = useAuth0();
   if (!isAuthenticated) {
     return <WelcomePage />;

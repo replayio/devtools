@@ -9,7 +9,7 @@ function initialTimelineState() {
     hoveredMessage: null,
     unprocessedRegions: [],
     shouldAnimate: true,
-    recordingDuration: 0,
+    recordingDuration: null,
     screenShot: null,
     timelineDimensions: { left: 1, top: 1, width: 1 },
     mouse: null,

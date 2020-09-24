@@ -10,13 +10,15 @@ export function setupApp(recordingId, store) {
     }
   );
 
-  const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 500);
+  const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 1000);
 }
 
 function bumpLoading() {
   return ({ dispatch, getState }) => {
     const loading = selectors.getLoading(getState());
-    dispatch({ type: "loading", loading: Math.min(loading + 1, 99) });
+    const increment = Math.random() * 4;
+
+    dispatch({ type: "loading", loading: Math.min(loading + increment, 99) });
   };
 }
 

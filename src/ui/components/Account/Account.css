@@ -127,6 +127,14 @@
   color: var(--dark-blue);
 }
 
+.user-prompt .preview-container {
+  width: 400px;
+  height: 250px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 @keyframes jump {
   0%   {transform: translate(0,0);}
   10%  {transform: translate(0,-6px);}
