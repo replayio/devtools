@@ -146,6 +146,12 @@ function getMostRecentPaintPoint(time) {
   return mostRecentEntry(gPaintPoints, time);
 }
 
+function getClosestPaintPoint(time) {
+  const entryBefore = mostRecentEntry(gPaintPoints, time);
+  const entryAfter = nextEntry(gPaintPoints, time);
+  return closerEntry(time, entryBefore, entryAfter);
+}
+
 function getDevicePixelRatio() {
   return gDevicePixelRatio;
 }
@@ -348,4 +354,5 @@ module.exports = {
   getMostRecentPaintPoint,
   refreshGraphics,
   getDevicePixelRatio,
+  getClosestPaintPoint,
 };
