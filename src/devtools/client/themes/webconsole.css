@@ -7,8 +7,8 @@
   /* Minimum height of a message (excluding borders) */
   --console-row-height: 20px;
   /* We need a unitless line-height to render formatted messages correctly.
-   * Target line-height computed value is 14px, for a 11px font-size. */
-  --console-output-line-height: calc(14 / 11);
+   * Target line-height computed value is 16px, for a 11px font-size. */
+  --console-output-line-height: calc(16 / 11);
   --console-output-vertical-padding: 3px;
   /* Additional vertical padding used on the JSTerm and EagerEvaluation
    * containers. Set to 0 to make the messages and input seamless. */
@@ -118,7 +118,7 @@
 
 @media (min-width: 1000px) {
   .webconsole-app .message {
-    padding-inline-end: 12px;
+    padding-inline-end: 6px;
   }
 }
 
@@ -312,7 +312,7 @@
   max-width: 40vw;
   flex-shrink: 0;
   color: var(--frame-link-source);
-  margin-left: 1ch;
+  margin: 0 1ch;
   /* Makes the file name truncated (and ellipsis shown) on the left side */
   direction: rtl;
   white-space: nowrap;
