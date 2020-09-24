@@ -345,7 +345,7 @@ function messages(state = MessageState(), action, filtersState, prefsState, uiSt
     case constants.MESSAGES_CLEAR_EVALUATIONS: {
       const removedIds = [];
       for (const [id, message] of messagesById) {
-        if (message.type === "command" || message.type === "result") {
+        if (message.type === MESSAGE_TYPE.COMMAND || message.type === MESSAGE_TYPE.RESULT) {
           removedIds.push(id);
         }
       }
