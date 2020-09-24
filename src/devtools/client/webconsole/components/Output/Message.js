@@ -191,10 +191,10 @@ class Message extends Component {
   }
 
   renderDeleteButton() {
-    const { dispatch, message } = this.props;
+    const { dispatch, message, type } = this.props;
 
     return createElement(CloseButton, {
-      handleClick: () => dispatch(actions.messagesClearEvaluation(message.id)),
+      handleClick: () => dispatch(actions.messagesClearEvaluation(message.id, type)),
     });
   }
 

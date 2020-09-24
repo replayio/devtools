@@ -63,10 +63,13 @@ function messagesClearEvaluations() {
   };
 }
 
-function messagesClearEvaluation(messageId) {
+function messagesClearEvaluation(messageId, messageType) {
+  // The messageType is only used for logging purposes to determine what type of messages
+  // are typically cleared.
   return {
     type: MESSAGES_CLEAR_EVALUATION,
     messageId,
+    messageType,
   };
 }
 
