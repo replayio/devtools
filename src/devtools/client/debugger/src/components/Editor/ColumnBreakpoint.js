@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { PureComponent } from "react";
+import { Component } from "react";
 import classnames from "classnames";
 import { showMenu } from "devtools-contextmenu";
 
@@ -40,7 +40,7 @@ function makeBookmark({ breakpoint }, { onClick, onContextMenu }) {
   return bp;
 }
 
-export default class ColumnBreakpoint extends PureComponent {
+export default class ColumnBreakpoint extends Component {
   addColumnBreakpoint;
   bookmark;
 
@@ -119,6 +119,10 @@ export default class ColumnBreakpoint extends PureComponent {
   componentDidUpdate() {
     this.clearColumnBreakpoint();
     this.addColumnBreakpoint();
+  }
+
+  shouldComponentUpdate(nextProps) {
+    return this.props.columnBreakpoint.breakpoint != nextProps.columnBreakpoint.breakpoint;
   }
 
   render() {
