@@ -56,12 +56,15 @@ export function DevTools({
   hasFocusedComment,
   updateTimelineDimensions,
   recordingDuration,
+  sessionId,
 }) {
+  const recordingIsUploaded = sessionId !== null;
+  const recordingIsFetchedFromServer = recordingDuration !== null;
   const recordingIsLoading = loading < 100;
 
-  if (recordingDuration === null) {
+  if (!recordingIsFetchedFromServer || !recordingIsUploaded) {
     return <Loader />;
-  } else if (recordingIsLoading) {
+  } else if (!recordingIsLoading) {
     return <RecordingLoadingScreen />;
   }
 
@@ -81,6 +84,7 @@ export default connect(
     tooltip: selectors.getTooltip(state),
     hasFocusedComment: selectors.hasFocusedComment(state),
     recordingDuration: selectors.getRecordingDuration(state),
+    sessionId: selectors.getSessionId(state),
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,

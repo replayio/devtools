@@ -8,7 +8,7 @@ function initialAppState() {
     selectedPanel: prefs.selectedPanel,
     tooltip: null,
     loading: 4,
-    recordings: null,
+    sessionId: null,
   };
 }
 
@@ -33,6 +33,10 @@ export default function update(state = initialAppState(), action) {
       return { ...state, loading: action.loading };
     }
 
+    case "set_session_id": {
+      return { ...state, sessionId: action.sessionId };
+    }
+
     default: {
       return state;
     }
@@ -44,4 +48,4 @@ export const isSplitConsoleOpen = state => state.app.splitConsoleOpen;
 export const getSelectedPanel = state => state.app.selectedPanel;
 export const getLoading = state => state.app.loading;
 export const getRecordingId = state => state.app.recordingId;
-export const getRecordings = state => state.app.recordings;
+export const getSessionId = state => state.app.sessionId;

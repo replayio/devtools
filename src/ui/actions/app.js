@@ -3,6 +3,9 @@ import { selectors } from "ui/reducers";
 
 export function setupApp(recordingId, store) {
   store.dispatch({ type: "setup_app", recordingId });
+  ThreadFront.waitForSession().then(sessionId =>
+    store.dispatch({ type: "set_session_id", sessionId })
+  );
   ThreadFront.ensureProcessed(_, regions => store.dispatch(onUnprocessedRegions(regions))).then(
     () => {
       clearInterval(loadingInterval);
