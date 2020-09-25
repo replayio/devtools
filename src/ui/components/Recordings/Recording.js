@@ -6,9 +6,14 @@ function formatDate(date) {
 }
 
 export const Recording = ({ data }) => {
-  function navigateToRecording() {
+  function navigateToRecording(event) {
+    if (event.metaKey) {
+      return window.open(`/view?id=${data.recording_id}`)
+    }
+
     window.location = `/view?id=${data.recording_id}`;
   }
+
   return (
     <div className="recording">
       <div className="screenshot">
@@ -24,10 +29,10 @@ export const Recording = ({ data }) => {
             &middot;&middot;&middot;
           </Button>
         </Dropdown> */}
-        <div className="overlay" onClick={() => navigateToRecording()} />
+        <div className="overlay" onClick={e => navigateToRecording(e)} />
         {/* <button icon={<LinkIconSvg />} onClick={() => navigateToRecording} /> */}
       </div>
-      <div className="title" onClick={() => navigateToRecording()}>
+      <div className="title" onClick={e => navigateToRecording(e)}>
         {data.recordingTitle || data.title}
       </div>
       {/* <div className="title" onClick={() => setEnableTitleEdit(true)}>
