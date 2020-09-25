@@ -64,7 +64,7 @@ export function DevTools({
 
   if (!recordingIsFetchedFromServer || !recordingIsUploaded) {
     return <Loader />;
-  } else if (!recordingIsLoading) {
+  } else if (recordingIsLoading) {
     return <RecordingLoadingScreen />;
   }
 
