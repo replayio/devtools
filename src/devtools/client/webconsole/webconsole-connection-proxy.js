@@ -41,7 +41,7 @@ WebConsoleConnectionProxy.prototype = {
     //console.log("ConsoleMessage", msg);
 
     const stacktrace = await convertStack(msg.stack, msg.data);
-    const sourceId = stacktrace ? stacktrace[0].sourceId : undefined;
+    const sourceId = stacktrace?.[0]?.sourceId;
 
     let { url, scriptId, line, column } = msg;
 
