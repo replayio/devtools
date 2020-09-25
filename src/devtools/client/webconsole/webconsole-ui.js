@@ -6,9 +6,6 @@
 
 const Services = require("Services");
 const EventEmitter = require("devtools/shared/event-emitter");
-const {
-  WebConsoleConnectionProxy,
-} = require("devtools/client/webconsole/webconsole-connection-proxy");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 
@@ -43,61 +40,8 @@ class WebConsoleUI {
 
     this._onPanelSelected = this._onPanelSelected.bind(this);
     this._onChangeSplitConsoleState = this._onChangeSplitConsoleState.bind(this);
-    this._onTargetDestroyed = this._onTargetDestroyed.bind(this);
 
     EventEmitter.decorate(this);
-
-    this.proxy = new WebConsoleConnectionProxy(this);
-  }
-
-  /**
-   * Getter for the WebConsoleFront.
-   * @type object
-   */
-  get webConsoleFront() {
-    const proxy = this.getProxy();
-
-    if (!proxy) {
-      return null;
-    }
-
-    return proxy.webConsoleFront;
-  }
-
-  /**
-   * Return the main target proxy, i.e. the proxy for MainProcessTarget in BrowserConsole,
-   * and the proxy for the target passed from the Toolbox to WebConsole.
-   *
-   * @returns {WebConsoleConnectionProxy}
-   */
-  getProxy() {
-    return this.proxy;
-  }
-
-  /**
-   * Return all the proxies we're currently managing (i.e. the "main" one, and the
-   * possible additional ones).
-   *
-   * @param {Boolean} filterDisconnectedProxies: True by default, if false, this
-   *   function also returns not-already-connected or already disconnected proxies.
-   *
-   * @returns {Array<WebConsoleConnectionProxy>}
-   */
-  getAllProxies(filterDisconnectedProxies = true) {
-    let proxies = [this.getProxy()];
-
-    if (this.additionalProxies) {
-      proxies = proxies.concat([...this.additionalProxies.values()]);
-    }
-
-    // Ignore Fronts that are already destroyed
-    if (filterDisconnectedProxies) {
-      proxies = proxies.filter(proxy => {
-        return proxy && proxy.webConsoleFront && !!proxy.webConsoleFront.actorID;
-      });
-    }
-
-    return proxies;
   }
 
   /**
@@ -112,10 +56,8 @@ class WebConsoleUI {
 
     this._initializer = (async () => {
       this._initUI();
-      await this._attachTargets();
 
       this._commands = new ConsoleCommands({
-        proxy: this.getProxy(),
         hud: this.hud,
         threadFront: this.hud.toolbox && this.hud.toolbox.threadFront,
       });
@@ -126,44 +68,7 @@ class WebConsoleUI {
     return this._initializer;
   }
 
-  destroy() {
-    if (!this.hud) {
-      return;
-    }
-
-    this.React = this.ReactDOM = this.FrameView = null;
-
-    if (this.wrapper) {
-      this.wrapper.getStore().dispatch(START_IGNORE_ACTION);
-    }
-
-    if (this.outputNode) {
-      // We do this because it's much faster than letting React handle the ConsoleOutput
-      // unmounting.
-      this.outputNode.innerHTML = "";
-    }
-
-    if (this.jsterm) {
-      this.jsterm.destroy();
-      this.jsterm = null;
-    }
-
-    const toolbox = this.hud.toolbox;
-    if (toolbox) {
-      toolbox.off("webconsole-selected", this._onPanelSelected);
-      toolbox.off("split-console", this._onChangeSplitConsoleState);
-      toolbox.off("select", this._onChangeSplitConsoleState);
-    }
-
-    for (const proxy of this.getAllProxies()) {
-      proxy.disconnect();
-    }
-    this.proxy = null;
-    this.additionalProxies = null;
-
-    // Nullify `hud` last as it nullify also target which is used on destroy
-    this.window = this.hud = this.wrapper = null;
-  }
+  destroy() {}
 
   /**
    * Clear the Web Console output.
@@ -184,35 +89,10 @@ class WebConsoleUI {
       this.wrapper.dispatchMessagesClear();
     }
     this.clearNetworkRequests();
-    if (clearStorage) {
-      this.clearMessagesCache();
-    }
     this.emitForTests("messages-cleared");
   }
 
-  clearNetworkRequests() {
-    for (const proxy of this.getAllProxies()) {
-      proxy.webConsoleFront.clearNetworkRequests();
-    }
-  }
-
-  clearMessagesCache() {
-    for (const proxy of this.getAllProxies()) {
-      proxy.webConsoleFront.clearMessagesCache();
-    }
-  }
-
-  /**
-   * Remove all of the private messages from the Web Console output.
-   *
-   * This method emits the "private-messages-cleared" notification.
-   */
-  clearPrivateMessages() {
-    if (this.wrapper) {
-      this.wrapper.dispatchPrivateMessagesClear();
-      this.emitForTests("private-messages-cleared");
-    }
-  }
+  clearNetworkRequests() {}
 
   inspectObjectActor(objectActor) {
     const webConsoleFront = this.webConsoleFront;
@@ -254,34 +134,6 @@ class WebConsoleUI {
 
     // Make sure the web console client connection is established first.
     return this.webConsoleFront.setPreferences(toSet);
-  }
-
-  /**
-   * Connect to the server using the remote debugging protocol.
-   *
-   * @private
-   * @return object
-   *         A promise object that is resolved/reject based on the proxies connections.
-   */
-  async _attachTargets() {
-    this.additionalProxies = new Map();
-  }
-
-  /**
-   * Called any time a target has been destroyed.
-   *
-   * @private
-   * See _onTargetAvailable for param's description.
-   */
-  _onTargetDestroyed({ type, targetFront, isTopLevel }) {
-    if (isTopLevel) {
-      this.proxy.disconnect();
-      this.proxy = null;
-    } else {
-      const proxy = this.additionalProxies.get(targetFront);
-      proxy.disconnect();
-      this.additionalProxies.delete(targetFront);
-    }
   }
 
   _initUI() {
@@ -345,7 +197,7 @@ class WebConsoleUI {
   }
 
   getLongString(grip) {
-    return this.getProxy().webConsoleFront.getString(grip);
+    return this.webConsoleFront.getString(grip);
   }
 
   /**

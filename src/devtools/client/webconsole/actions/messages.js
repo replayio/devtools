@@ -88,12 +88,6 @@ function setPauseExecutionPoint(executionPoint, time) {
   };
 }
 
-function privateMessagesClear() {
-  return {
-    type: PRIVATE_MESSAGES_CLEAR,
-  };
-}
-
 function messageOpen(id) {
   return {
     type: MESSAGE_OPEN,
@@ -185,7 +179,6 @@ module.exports = {
   messageUpdatePayload,
   networkMessageUpdate,
   networkUpdateRequest,
-  privateMessagesClear,
   // for test purpose only.
   setPauseExecutionPoint,
   jumpToExecutionPoint,

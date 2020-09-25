@@ -6,13 +6,13 @@
 const { createElement, createFactory } = require("react");
 const ReactDOM = require("react-dom");
 const { Provider } = require("react-redux");
-const ToolboxProvider = require("devtools/client/framework/store-provider");
+const { ThreadFront } = require("protocol/thread");
+const { LogpointHandlers } = require("protocol/logpoint");
 
 const actions = require("devtools/client/webconsole/actions/index");
 const selectors = require("devtools/client/webconsole/selectors/index");
 const { configureStore } = require("devtools/client/webconsole/store");
 const { setupConsoleHelper } = require("ui/utils/bootstrap");
-const { isPacketPrivate } = require("devtools/client/webconsole/utils/messages");
 
 const Telemetry = require("devtools/client/shared/telemetry");
 
@@ -23,8 +23,27 @@ const { setupServiceContainer } = require("devtools/client/webconsole/service-co
 
 const Constants = require("devtools/client/webconsole/constants");
 
-function renderApp({ app, store, toolbox, root }) {
+function renderApp({ app, store, root }) {
   return ReactDOM.render(createElement(Provider, { store }, app), root);
+}
+
+function convertStack(stack, { frames }) {
+  if (!stack) {
+    return null;
+  }
+  return Promise.all(
+    stack.map(async frameId => {
+      const frame = frames.find(f => f.frameId == frameId);
+      const location = await ThreadFront.getPreferredLocation(frame.location);
+      return {
+        filename: await ThreadFront.getScriptURL(location.scriptId),
+        sourceId: location.scriptId,
+        lineNumber: location.line,
+        columnNumber: location.column,
+        functionName: frame.functionName,
+      };
+    })
+  );
 }
 
 let store = null;
@@ -54,6 +73,12 @@ class WebConsoleWrapper {
     this.queuedRequestUpdates = [];
     this.throttledDispatchPromise = null;
     this.telemetry = new Telemetry();
+
+    ThreadFront.findConsoleMessages(this.onConsoleMessage);
+
+    LogpointHandlers.onPointLoading = this.onLogpointLoading;
+    LogpointHandlers.onResult = this.onLogpointResult;
+    LogpointHandlers.clearLogpoint = this.clearLogpoint;
   }
 
   async init() {
@@ -91,21 +116,112 @@ class WebConsoleWrapper {
       });
 
       // Render the root Application component.
-      if (this.parentNode) {
-        this.body = renderApp({
-          app,
-          store,
-          root: this.parentNode,
-          toolbox: this.toolbox,
-        });
+      this.body = renderApp({
+        app,
+        store,
+        root: this.parentNode,
+      });
 
-        setupConsoleHelper({ store, selectors, actions });
-      } else {
-        // If there's no parentNode, we are in a test. So we can resolve immediately.
-        resolve();
-      }
+      setupConsoleHelper({ store, selectors, actions });
     });
   }
+
+  onConsoleMessage = async (_, msg) => {
+    const stacktrace = await convertStack(msg.stack, msg.data);
+    const sourceId = stacktrace?.[0]?.sourceId;
+
+    let { url, scriptId, line, column } = msg;
+
+    if (msg.point.frame) {
+      // If the execution point has a location, use any mappings in that location.
+      // The message properties do not reflect any source mapping.
+      const location = await ThreadFront.getPreferredLocation(msg.point.frame);
+      url = await ThreadFront.getScriptURL(location.scriptId);
+      line = location.line;
+      column = location.column;
+    } else {
+      if (!scriptId) {
+        const ids = ThreadFront.getScriptIdsForURL(url);
+        if (ids.length == 1) {
+          scriptId = ids[0];
+        }
+      }
+      if (scriptId) {
+        // Ask the ThreadFront to map the location we got manually.
+        const location = await ThreadFront.getPreferredMappedLocation({
+          scriptId,
+          line,
+          column,
+        });
+        url = await ThreadFront.getScriptURL(location.scriptId);
+        line = location.line;
+        column = location.column;
+      }
+    }
+
+    const packet = {
+      errorMessage: msg.text,
+      errorMessageName: "ErrorMessageName",
+      sourceName: url,
+      sourceId,
+      lineNumber: line,
+      columnNumber: column,
+      category: msg.source,
+      warning: msg.level == "warning",
+      error: msg.level == "error",
+      info: msg.level == "info",
+      trace: msg.level == "trace",
+      assert: msg.level == "assert",
+      stacktrace,
+      argumentValues: msg.argumentValues,
+      executionPoint: msg.point.point,
+      executionPointTime: msg.point.time,
+      executionPointHasFrames: !!stacktrace,
+    };
+
+    this.dispatchMessageAdd(packet);
+  };
+
+  onLogpointLoading = async (logGroupId, point, time, { scriptId, line, column }) => {
+    const packet = {
+      errorMessage: "Loading...",
+      sourceName: await ThreadFront.getScriptURL(scriptId),
+      sourceId: scriptId,
+      lineNumber: line,
+      columnNumber: column,
+      category: "ConsoleAPI",
+      info: true,
+      executionPoint: point,
+      executionPointTime: time,
+      executionPointHasFrames: true,
+      logpointId: logGroupId,
+    };
+
+    this.dispatchMessageAdd(packet);
+  };
+
+  onLogpointResult = async (logGroupId, point, time, { scriptId, line, column }, pause, values) => {
+    const packet = {
+      errorMessage: "",
+      sourceName: await ThreadFront.getScriptURL(scriptId),
+      sourceId: scriptId,
+      lineNumber: line,
+      columnNumber: column,
+      category: "ConsoleAPI",
+      info: true,
+      argumentValues: values,
+      executionPoint: point,
+      executionPointTime: time,
+      executionPointHasFrames: true,
+      logpointId: logGroupId,
+    };
+
+    this.dispatchMessageAdd(packet);
+  };
+
+  clearLogpoint = logGroupId => {
+    store.dispatch(actions.messagesClearLogpoint(logGroupId));
+  };
 
   dispatchMessageAdd(packet) {
     this.batchedMessagesAdd([packet]);
@@ -124,49 +240,6 @@ class WebConsoleWrapper {
     this.queuedRequestUpdates = [];
     store.dispatch(actions.messagesClear());
     this.webConsoleUI.emitForTests("messages-cleared");
-  }
-
-  dispatchPrivateMessagesClear() {
-    // We might still have pending private message additions when the private messages
-    // clear action is triggered. We need to remove any private-window-issued packets from
-    // the queue so they won't appear in the output.
-
-    // For (network) message updates, we need to check both messages queue and the state
-    // since we can receive updates even if the message isn't rendered yet.
-    const messages = [...getAllMessagesById(store.getState()).values()];
-    this.queuedMessageUpdates = this.queuedMessageUpdates.filter(({ networkInfo }) => {
-      const { actor } = networkInfo;
-
-      const queuedNetworkMessage = this.queuedMessageAdds.find(p => p.actor === actor);
-      if (queuedNetworkMessage && isPacketPrivate(queuedNetworkMessage)) {
-        return false;
-      }
-
-      const requestMessage = messages.find(message => actor === message.actor);
-      if (requestMessage && requestMessage.private === true) {
-        return false;
-      }
-
-      return true;
-    });
-
-    // For (network) requests updates, we can check only the state, since there must be a
-    // user interaction to get an update (i.e. the network message is displayed and thus
-    // in the state).
-    this.queuedRequestUpdates = this.queuedRequestUpdates.filter(({ id }) => {
-      const requestMessage = getMessage(store.getState(), id);
-      if (requestMessage && requestMessage.private === true) {
-        return false;
-      }
-
-      return true;
-    });
-
-    // Finally we clear the messages queue. This needs to be done here since we use it to
-    // clean the other queues.
-    this.queuedMessageAdds = this.queuedMessageAdds.filter(p => !isPacketPrivate(p));
-
-    store.dispatch(actions.privateMessagesClear());
   }
 
   dispatchPaused({ point, time }) {
@@ -240,10 +313,6 @@ class WebConsoleWrapper {
   batchedMessagesAdd(messages) {
     this.queuedMessageAdds = this.queuedMessageAdds.concat(messages);
     this.setTimeoutIfNeeded();
-  }
-
-  dispatchClearLogpointMessages(logpointId) {
-    store.dispatch(actions.messagesClearLogpoint(logpointId));
   }
 
   dispatchClearHistory() {

@@ -25,10 +25,6 @@ const { thunkWithOptions } = require("devtools/client/shared/redux/middleware/th
 
 // Enhancers
 const enableBatching = require("devtools/client/webconsole/enhancers/batching");
-const enableActorReleaser = require("devtools/client/webconsole/enhancers/actor-releaser");
-const ensureCSSErrorReportingEnabled = require("devtools/client/webconsole/enhancers/css-error-reporting");
-const enableNetProvider = require("devtools/client/webconsole/enhancers/net-provider");
-const enableMessagesCacheClearing = require("devtools/client/webconsole/enhancers/message-cache-clearing");
 
 /**
  * Create and configure store for the Console panel. This is the place
@@ -91,18 +87,7 @@ function configureStore(webConsoleUI, options = {}) {
     eventTelemetry.bind(null, options.telemetry, sessionId)
   );
 
-  return createStore(
-    createRootReducer(),
-    initialState,
-    compose(
-      middleware,
-      enableActorReleaser(webConsoleUI),
-      enableBatching(),
-      enableNetProvider(webConsoleUI),
-      enableMessagesCacheClearing(webConsoleUI),
-      ensureCSSErrorReportingEnabled(webConsoleUI)
-    )
-  );
+  return createStore(createRootReducer(), initialState, compose(middleware, enableBatching()));
 }
 
 function createRootReducer() {
