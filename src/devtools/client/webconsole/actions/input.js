@@ -67,7 +67,7 @@ function evaluateExpression(expression) {
  *        The message received from the server.
  */
 function onExpressionEvaluated(response) {
-  return async ({ dispatch, webConsoleUI }) => {
+  return async ({ dispatch }) => {
     if (response.error) {
       console.error(`Evaluation error`, response.error, ": ", response.message);
       return;
@@ -79,73 +79,8 @@ function onExpressionEvaluated(response) {
       return;
     }
 
-    if (!response.helperResult) {
-      dispatch(messagesActions.messagesAdd([response]));
-      return;
-    }
-
-    await dispatch(handleHelperResult(response));
-  };
-}
-
-function handleHelperResult(response) {
-  return async ({ dispatch, hud, webConsoleUI }) => {
-    const result = response.result;
-    const helperResult = response.helperResult;
-    const helperHasRawOutput = !!(helperResult || {}).rawOutput;
-
-    if (helperResult && helperResult.type) {
-      switch (helperResult.type) {
-        case "clearOutput":
-          dispatch(messagesActions.messagesClear());
-          break;
-        case "clearHistory":
-          dispatch(historyActions.clearHistory());
-          break;
-        case "inspectObject": {
-          const objectActor = helperResult.object;
-          if (hud.toolbox && !helperResult.forceExpandInConsole) {
-            hud.toolbox.inspectObjectActor(objectActor);
-          } else {
-            webConsoleUI.inspectObjectActor(objectActor);
-          }
-          break;
-        }
-        case "help":
-          hud.openLink(HELP_URL);
-          break;
-        case "copyValueToClipboard":
-          clipboardHelper.copyString(helperResult.value);
-          break;
-        case "screenshotOutput":
-          const { args, value } = helperResult;
-          const screenshotMessages = await saveScreenshot(
-            webConsoleUI.getPanelWindow(),
-            args,
-            value
-          );
-          dispatch(
-            messagesActions.messagesAdd(
-              screenshotMessages.map(message => ({
-                message,
-                type: "logMessage",
-              }))
-            )
-          );
-          // early return as we already dispatched necessary messages.
-          return;
-      }
-    }
-
-    const hasErrorMessage =
-      response.exceptionMessage || (helperResult && helperResult.type === "error");
-
-    // Hide undefined results coming from helper functions.
-    const hasUndefinedResult = result && typeof result == "object" && result.type == "undefined";
-
-    if (hasErrorMessage || helperHasRawOutput || !hasUndefinedResult) {
-      dispatch(messagesActions.messagesAdd([response]));
-    }
+    dispatch(messagesActions.messagesAdd([response]));
+    return;
   };
 }
 
