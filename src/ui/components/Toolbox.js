@@ -423,7 +423,6 @@ class Toolbox extends React.Component {
     const { selectedPanel, splitConsoleOpen } = this.props;
     return (
       <div id="toolbox" className={`${selectedPanel}`}>
-        <div id="toolbox-border"></div>
         <div id="toolbox-timeline">{this.renderTimeline()}</div>
         {this.renderToolbar()}
         <div
