@@ -13,14 +13,16 @@ function useGetPreviewScreen({ loading, recordingDuration }) {
       const time = (loading / 100) * recordingDuration;
       let screen;
 
-      try {
-        const closestPaintPoint = getClosestPaintPoint(time);
+      const closestPaintPoint = getClosestPaintPoint(time);
+      if (closestPaintPoint) {
         const { point, paintHash } = closestPaintPoint;
         screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
-      } catch {
+      } else {
         const nextPaintPoint = nextPaintEvent(time);
-        const { point, paintHash } = nextPaintPoint;
-        screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
+        if (nextPaintPoint) {
+          const { point, paintHash } = nextPaintPoint;
+          screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
+        }
       }
 
       setScreen(screen);
