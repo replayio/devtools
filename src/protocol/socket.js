@@ -1,4 +1,5 @@
 const { defer, makeInfallible } = require("./utils");
+const { ProtocolClient } = require("record-replay-protocol/js/client");
 
 let socket;
 let gSocketOpen = false;
@@ -65,6 +66,12 @@ function removeEventListener(method) {
   gEventListeners.delete(method);
 }
 
+const client = new ProtocolClient({
+  sendCommand: sendMessage,
+  addEventListener,
+  removeEventListener,
+});
+
 function onSocketMessage(evt) {
   gReceivedBytes += evt.data.length;
   const msg = JSON.parse(evt.data);
@@ -114,6 +121,7 @@ module.exports = {
   sendMessage,
   addEventListener,
   removeEventListener,
+  client,
   log,
   setStatus,
 };
