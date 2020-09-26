@@ -1,13 +1,6 @@
-const { sendMessage } = require("./socket");
+const { client } = require("./socket");
 const { defer } = require("./utils");
-
-interface Location {
-  scriptId: string;
-  line: number;
-  column: number;
-}
-
-type MappedLocation = Location[];
+import { Location, MappedLocation } from "record-replay-protocol/js/protocol";
 
 export class MappedLocationCache {
   // Map locations encoded as strings to the corresponding MappedLocations
@@ -35,8 +28,8 @@ export class MappedLocationCache {
 
     const { promise, resolve } = defer();
     this.runningRequests.set(cacheKey, promise);
-    const { mappedLocation } = await sendMessage(
-      "Debugger.getMappedLocation", { location }, this.sessionId
+    const { mappedLocation } = await client.Debugger.getMappedLocation(
+      { location }, this.sessionId
     );
     this.runningRequests.delete(cacheKey);
     resolve(mappedLocation);
