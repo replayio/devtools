@@ -13,12 +13,10 @@ const {
 const { getAllPrefs } = require("devtools/client/webconsole/selectors/prefs");
 
 const messagesActions = require("devtools/client/webconsole/actions/messages");
-const historyActions = require("devtools/client/webconsole/actions/history");
 const { ConsoleCommand } = require("devtools/client/webconsole/types");
-const HELP_URL = "https://developer.mozilla.org/docs/Tools/Web_Console/Helpers";
 
 function evaluateExpression(expression) {
-  return async ({ dispatch, toolbox, webConsoleUI, hud, client }) => {
+  return async ({ dispatch, webConsoleUI, hud }) => {
     if (!expression) {
       expression = hud.getInputSelection() || hud.getInputValue();
     }
@@ -48,7 +46,7 @@ function evaluateExpression(expression) {
     // we still need to pass the error response to onExpressionEvaluated.
     const onSettled = res => res;
 
-    const response = await client
+    const response = await hud
       .evaluateJSAsync(expression, {
         frameActor,
         forConsoleMessage: true,

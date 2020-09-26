@@ -9,8 +9,8 @@ const { WebConsoleUI } = require("devtools/client/webconsole/webconsole-ui");
 const EventEmitter = require("devtools/shared/event-emitter");
 const Telemetry = require("devtools/client/shared/telemetry");
 const { openDocLink } = require("devtools/client/shared/link");
+const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 
-var gHudId = 0;
 const isMacOS = Services.appinfo.OS === "Darwin";
 
 /**
@@ -31,27 +31,12 @@ class WebConsole {
   constructor(toolbox) {
     this.toolbox = toolbox;
     this.toolbox.webconsoleHud = this;
-    this.hudId = "hud_" + ++gHudId;
     this.telemetry = new Telemetry();
 
     this.ui = new WebConsoleUI(this);
     this._destroyer = null;
 
     EventEmitter.decorate(this);
-  }
-
-  recordEvent(event, extra = {}) {}
-
-  get currentTarget() {
-    return this.toolbox.target;
-  }
-
-  get targetList() {
-    return this.toolbox.targetList;
-  }
-
-  getFrontByID(id) {
-    return this.currentTarget.client.getFrontByID(id);
   }
 
   /**
@@ -272,37 +257,27 @@ class WebConsole {
    * @param {Object} options: Options for evaluation. See evaluateJSAsync method on
    *                          devtools/shared/fronts/webconsole.js
    */
-  evaluateJSAsync(expression, options = {}) {
-    return this.ui._commands.evaluateJSAsync(expression, options);
+  async evaluateJSAsync(expression, options = {}) {
+    const { frameActor } = options;
+    const rv = await ThreadFront.evaluate(/* asyncIndex */ 0, frameActor, expression);
+    const { returned, exception, failed } = rv;
+
+    let v;
+    if (failed) {
+      v = createPrimitiveValueFront("Error: Evaluation failed");
+    } else if (returned) {
+      v = returned;
+    } else {
+      v = exception;
+    }
+
+    return {
+      type: "evaluationResult",
+      result: v,
+    };
   }
 
-  /**
-   * Destroy the object. Call this method to avoid memory leaks when the Web
-   * Console is closed.
-   *
-   * @return object
-   *         A promise object that is resolved once the Web Console is closed.
-   */
-  destroy() {
-    if (!this.hudId) {
-      return;
-    }
-
-    if (this.ui) {
-      this.ui.destroy();
-    }
-
-    if (this._parserService) {
-      this._parserService.stop();
-      this._parserService = null;
-    }
-
-    const id = Utils.supportsString(this.hudId);
-    Services.obs.notifyObservers(id, "web-console-destroyed");
-    this.hudId = null;
-
-    this.emit("destroyed");
-  }
+  destroy() {}
 }
 
 module.exports = WebConsole;

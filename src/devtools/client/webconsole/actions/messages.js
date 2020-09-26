@@ -6,6 +6,7 @@
 
 const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
 const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
+const { ThreadFront } = require("protocol/thread");
 
 const {
   MESSAGES_ADD,
@@ -103,8 +104,8 @@ function messageUpdatePayload(id, data) {
 }
 
 function jumpToExecutionPoint(executionPoint) {
-  return ({ client }) => {
-    client.timeWarp(executionPoint);
+  return () => {
+    ThreadFront.timeWarp(executionPoint);
   };
 }
 

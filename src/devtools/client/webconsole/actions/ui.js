@@ -7,6 +7,7 @@
 const { getAllPrefs } = require("devtools/client/webconsole/selectors/prefs");
 const { getAllUi } = require("devtools/client/webconsole/selectors/ui");
 const { getMessage } = require("devtools/client/webconsole/selectors/messages");
+const { ThreadFront } = require("protocol/thread");
 
 const {
   INITIALIZE,
@@ -145,8 +146,8 @@ function filterBarDisplayModeSet(displayMode) {
 }
 
 function timeWarp(executionPoint) {
-  return ({ client }) => {
-    client.timeWarp(executionPoint);
+  return () => {
+    ThreadFront.timeWarp(executionPoint);
   };
 }
 

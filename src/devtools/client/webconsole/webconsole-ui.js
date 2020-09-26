@@ -4,21 +4,11 @@
 
 "use strict";
 
-const Services = require("Services");
 const EventEmitter = require("devtools/shared/event-emitter");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 
-const { getAdHocFrontOrPrimitiveGrip } = require("protocol/object");
-
-const { constants } = require("devtools/client/webconsole/constants");
-
-const { START_IGNORE_ACTION } = require("devtools/client/shared/redux/middleware/ignore");
 const ConsoleCommands = require("devtools/client/webconsole/commands.js");
-
-const ZoomKeys = require("devtools/client/shared/zoom-keys");
-
-const PREF_SIDEBAR_ENABLED = "devtools.webconsole.sidebarToggle";
 
 /**
  * A WebConsoleUI instance is an interactive console initialized *per target*
@@ -33,12 +23,7 @@ class WebConsoleUI {
    * @param {WebConsole} hud: The WebConsole owner object.
    */
   constructor(hud) {
-    this.window = window;
     this.hud = hud;
-    this.hudId = this.hud.hudId;
-
-    this._onPanelSelected = this._onPanelSelected.bind(this);
-    this._onChangeSplitConsoleState = this._onChangeSplitConsoleState.bind(this);
 
     EventEmitter.decorate(this);
   }
@@ -55,11 +40,6 @@ class WebConsoleUI {
 
     this._initializer = (async () => {
       this._initUI();
-
-      this._commands = new ConsoleCommands({
-        hud: this.hud,
-        threadFront: this.hud.toolbox && this.hud.toolbox.threadFront,
-      });
 
       await this.wrapper.init();
     })();
@@ -85,31 +65,6 @@ class WebConsoleUI {
       event.preventDefault();
     }
     this.wrapper.dispatchMessagesClear();
-  }
-
-  getPanelWindow() {
-    return this.window;
-  }
-
-  /**
-   * Setter for saving of network request and response bodies.
-   *
-   * @param boolean value
-   *        The new value you want to set.
-   */
-  async setSaveRequestAndResponseBodies(value) {
-    if (!this.webConsoleFront) {
-      // Don't continue if the webconsole disconnected.
-      return null;
-    }
-
-    const newValue = !!value;
-    const toSet = {
-      "NetworkMonitor.saveRequestAndResponseBodies": newValue,
-    };
-
-    // Make sure the web console client connection is established first.
-    return this.webConsoleFront.setPreferences(toSet);
   }
 
   _initUI() {
@@ -147,10 +102,9 @@ class WebConsoleUI {
 
     // Use a Custom Element to handle syntax highlighting to avoid
     // dealing with refs or innerHTML from React.
-    const win = this.window;
-    win.customElements.define(
+    customElements.define(
       "syntax-highlighted",
-      class extends win.HTMLElement {
+      class extends HTMLElement {
         connectedCallback() {
           if (!this.connected) {
             this.connected = true;
@@ -162,9 +116,7 @@ class WebConsoleUI {
   }
 
   _initShortcuts() {
-    const shortcuts = new KeyShortcuts({
-      window: this.window,
-    });
+    const shortcuts = new KeyShortcuts({ window });
 
     let clearShortcut;
     clearShortcut = l10n.getStr("webconsole.clear.key");
@@ -172,29 +124,22 @@ class WebConsoleUI {
     shortcuts.on(clearShortcut, event => this.clearOutput(true, event));
   }
 
-<<<<<<< HEAD
-  getLongString(grip) {
-    return this.webConsoleFront.getString(grip);
-  }
-
-=======
->>>>>>> 7818fe4e... Refactor console (part 2)
   /**
    * Sets the focus to JavaScript input field when the web console tab is
    * selected or when there is a split console present.
    * @private
    */
-  _onPanelSelected() {
+  _onPanelSelected = () => {
     // We can only focus when we have the jsterm reference. This is fine because if the
     // jsterm is not mounted yet, it will be focused in JSTerm's componentDidMount.
     if (this.jsterm) {
       this.jsterm.focus();
     }
-  }
+  };
 
-  _onChangeSplitConsoleState(selectedPanel) {
+  _onChangeSplitConsoleState = selectedPanel => {
     this.wrapper.dispatchSplitConsoleCloseButtonToggle(selectedPanel);
-  }
+  };
 
   getInputCursor() {
     return this.jsterm && this.jsterm.getSelectionStart();
@@ -222,27 +167,6 @@ class WebConsoleUI {
     }
 
     return frame.protocolId;
-  }
-
-  getWebconsoleFront({ frameActorId } = {}) {
-    if (frameActorId) {
-      const frameFront = this.hud.getFrontByID(frameActorId);
-      if (!frameFront) {
-        throw new Error("Missing frame front");
-      }
-      return frameFront.getWebConsoleFront();
-    }
-
-    if (!this.hud.toolbox) {
-      return this.webConsoleFront;
-    }
-
-    const threadFront = this.hud.toolbox.getSelectedThreadFront();
-    if (!threadFront) {
-      return this.webConsoleFront;
-    }
-
-    return threadFront.getWebconsoleFront();
   }
 
   getSelectedNodeActor() {
