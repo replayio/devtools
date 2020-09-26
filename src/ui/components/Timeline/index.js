@@ -9,15 +9,13 @@
 
 import { connect } from "react-redux";
 import { Component } from "react";
-import ReactDOM from "react-dom";
 import React from "react";
 import dom from "react-dom-factories";
 import PropTypes from "prop-types";
-
-import { SVG } from "image/svg";
 import { log } from "protocol/socket";
 
-import ScrollContainer from "ui/components/Timeline/ScrollContainer";
+import CommandButton from "./CommandButton";
+import ScrollContainer from "./ScrollContainer";
 
 const {
   mostRecentPaintOrMouseEvent,
@@ -34,14 +32,9 @@ import { actions } from "../../actions";
 import { selectors } from "../../reducers";
 import Message from "./Message";
 
-import { LocalizationHelper } from "devtools/shared/l10n";
-
 const { div } = dom;
 
 import "./Timeline.css";
-
-const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
-const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
 
 const markerWidth = 7;
 
@@ -57,36 +50,6 @@ function classname(name, bools) {
 
 function isError(message) {
   return message.source === "javascript" && message.level === "error";
-}
-
-function CommandButton({ img, className, onClick, active }) {
-  const images = {
-    next: SVG.NextButton,
-    previous: SVG.NextButton,
-    pause: SVG.ReplayPause,
-    play: SVG.ReplayResume,
-    comment: SVG.Comment,
-  };
-
-  const attrs = {
-    className: classname(`command-button ${className}`, { active }),
-    onClick,
-  };
-
-  attrs.title = L10N.getStr(`toolbox.replay.${img}`);
-
-  const base64 = btoa(images[img]);
-
-  return dom.div(
-    attrs,
-    dom.div({
-      className: `btn ${img} ${className}`,
-      style: {
-        WebkitMaskImage: `url("data:image/svg+xml;base64,${base64}")`,
-        maskImage: `url("data:image/svg+xml;base64,${base64}")`,
-      },
-    })
-  );
 }
 
 function getMessageLocation(message) {
