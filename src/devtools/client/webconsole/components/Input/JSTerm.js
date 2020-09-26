@@ -89,7 +89,6 @@ class JSTerm extends Component {
     const { webConsoleUI } = props;
 
     this.webConsoleUI = webConsoleUI;
-    this.hudId = this.webConsoleUI.hudId;
 
     this._onEditorChanges = this._onEditorChanges.bind(this);
     this._onEditorBeforeChange = this._onEditorBeforeChange.bind(this);

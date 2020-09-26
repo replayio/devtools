@@ -55,10 +55,6 @@ WebConsolePanel.prototype = {
     return this;
   },
 
-  get currentTarget() {
-    return this._toolbox.target;
-  },
-
   _isReady: false,
   get isReady() {
     return this._isReady;
