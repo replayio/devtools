@@ -140,8 +140,6 @@ class JSTerm extends Component {
     const doc = this.webConsoleUI.document;
     const toolbox = this.webConsoleUI.wrapper.toolbox;
     const tooltipDoc = toolbox ? toolbox.doc : doc;
-    // The popup will be attached to the toolbox document or HUD document in the case
-    // such as the browser console which doesn't have a toolbox.
     this.autocompletePopup = new AutocompletePopup(tooltipDoc, autocompleteOptions);
 
     if (this.node) {
@@ -610,8 +608,6 @@ class JSTerm extends Component {
         this.editor.setAutoCompletionText();
       });
     }
-
-    this.emitForTests("set-input-value");
   }
 
   /**
@@ -1248,13 +1244,6 @@ class JSTerm extends Component {
   }
 
   render() {
-    if (
-      this.props.webConsoleUI.isBrowserConsole &&
-      !Services.prefs.getBoolPref("devtools.chrome.enabled")
-    ) {
-      return null;
-    }
-
     return dom.div(
       {
         className: "jsterm-input-container devtools-input",

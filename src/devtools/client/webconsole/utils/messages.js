@@ -72,7 +72,7 @@ const {
   MESSAGE_TYPE,
   MESSAGE_LEVEL,
 } = require("devtools/client/webconsole/constants");
-const { ConsoleMessage, NetworkEventMessage } = require("devtools/client/webconsole/types");
+const { ConsoleMessage } = require("devtools/client/webconsole/types");
 
 function prepareMessage(packet, idGenerator) {
   if (!packet.source) {
@@ -106,10 +106,6 @@ function transformPacket(packet) {
 
     case "PageError": {
       return transformPageErrorPacket(packet);
-    }
-
-    case "networkEvent": {
-      return transformNetworkEventPacket(packet);
     }
 
     case "evaluationResult":
@@ -166,7 +162,6 @@ function transformConsoleAPICallPacket(message) {
     executionPointTime: message.executionPointTime,
     executionPointHasFrames: message.executionPointHasFrames,
     logpointId: message.logpointId,
-    chromeContext: message.chromeContext,
   });
 }
 
@@ -191,7 +186,6 @@ function transformLogMessagePacket(packet) {
     messageText: message,
     timeStamp,
     private: message.private,
-    chromeContext: message.chromeContext,
   });
 }
 
@@ -212,11 +206,9 @@ function transformPageErrorPacket(pageError) {
       }
     : null;
 
-  const matchesCSS = pageError.category == "CSS Parser";
-  const messageSource = matchesCSS ? MESSAGE_SOURCE.CSS : MESSAGE_SOURCE.JAVASCRIPT;
   return new ConsoleMessage({
     innerWindowID: pageError.innerWindowID,
-    source: messageSource,
+    source: MESSAGE_SOURCE.JAVASCRIPT,
     type: MESSAGE_TYPE.LOG,
     level,
     category: pageError.category,
@@ -231,32 +223,6 @@ function transformPageErrorPacket(pageError) {
     executionPoint: pageError.executionPoint,
     executionPointTime: pageError.executionPointTime,
     executionPointHasFrames: pageError.executionPointHasFrames,
-    chromeContext: pageError.chromeContext,
-    // Backward compatibility: cssSelectors might not be available when debugging
-    // Firefox 67 or older.
-    // Remove `|| ""` when Firefox 68 is on the release channel.
-    cssSelectors: pageError.cssSelectors || "",
-  });
-}
-
-function transformNetworkEventPacket(packet) {
-  const { networkEvent } = packet;
-
-  return new NetworkEventMessage({
-    actor: networkEvent.actor,
-    isXHR: networkEvent.isXHR,
-    request: networkEvent.request,
-    response: networkEvent.response,
-    timeStamp: networkEvent.timeStamp,
-    totalTime: networkEvent.totalTime,
-    url: networkEvent.request.url,
-    urlDetails: getUrlDetails(networkEvent.request.url),
-    method: networkEvent.request.method,
-    updates: networkEvent.updates,
-    cause: networkEvent.cause,
-    private: networkEvent.private,
-    securityState: networkEvent.securityState,
-    chromeContext: networkEvent.chromeContext,
   });
 }
 
@@ -320,9 +286,6 @@ function convertCachedPacket(packet) {
   } else if (packet._type === "PageError") {
     convertPacket.pageError = packet;
     convertPacket.type = "pageError";
-  } else if (packet._type === "NetworkEvent") {
-    convertPacket.networkEvent = packet;
-    convertPacket.type = "networkEvent";
   } else if (packet._type === "LogMessage") {
     convertPacket = {
       ...packet,
@@ -379,15 +342,6 @@ function isGroupType(type) {
 function getInitialMessageCountForViewport(win) {
   const minMessageHeight = 20;
   return Math.ceil(win.innerHeight / minMessageHeight);
-}
-
-function isPacketPrivate(packet) {
-  return (
-    packet.private === true ||
-    (packet.message && packet.message.private === true) ||
-    (packet.pageError && packet.pageError.private === true) ||
-    (packet.networkEvent && packet.networkEvent.private === true)
-  );
 }
 
 function createWarningGroupMessage(id, type, firstMessage) {
@@ -586,7 +540,6 @@ module.exports = {
   getWarningGroupType,
   isContentBlockingMessage,
   isGroupType,
-  isPacketPrivate,
   isWarningGroup,
   l10n,
   prepareMessage,

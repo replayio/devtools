@@ -55,9 +55,6 @@ const MessageState = overrides =>
         pausedExecutionPointTime: 0,
         // Whether any messages with execution points have been seen.
         hasExecutionPoints: false,
-        // Map of the form {messageId : networkInformation}
-        // `networkInformation` holds request, response, totalTime, ...
-        networkMessagesUpdateById: {},
         // Id of the last messages that was added.
         lastMessageId: null,
       },
@@ -74,7 +71,6 @@ function cloneState(state) {
     messagesPayloadById: new Map(state.messagesPayloadById),
     groupsById: new Map(state.groupsById),
     currentGroup: state.currentGroup,
-    networkMessagesUpdateById: { ...state.networkMessagesUpdateById },
     logpointMessages: new Map(state.logpointMessages),
     removedLogpointIds: new Set(state.removedLogpointIds),
     pausedExecutionPoint: state.pausedExecutionPoint,
@@ -269,25 +265,12 @@ function addMessage(newMessage, state, filtersState, prefsState, uiState) {
     state.filteredMessagesCount[cause]++;
   }
 
-  // Append received network-data also into networkMessagesUpdateById
-  // that is responsible for collecting (lazy loaded) HTTP payload data.
-  if (newMessage.source == "network") {
-    state.networkMessagesUpdateById[newMessage.actor] = newMessage;
-  }
-
   return removeMessagesFromState(state, removedIds);
 }
 
 // eslint-disable-next-line complexity
 function messages(state = MessageState(), action, filtersState, prefsState, uiState) {
-  const {
-    messagesById,
-    messagesPayloadById,
-    messagesUiById,
-    networkMessagesUpdateById,
-    groupsById,
-    visibleMessages,
-  } = state;
+  const { messagesById, messagesPayloadById, messagesUiById, groupsById, visibleMessages } = state;
 
   const { logLimit } = prefsState;
 
@@ -454,15 +437,6 @@ function messages(state = MessageState(), action, filtersState, prefsState, uiSt
         ];
       }
 
-      // If the current message is a network event, mark it as opened-once,
-      // so HTTP details are not fetched again the next time the user
-      // opens the log.
-      if (currMessage.source == "network") {
-        openState.messagesById = new Map(messagesById).set(action.id, {
-          ...currMessage,
-          openedOnce: true,
-        });
-      }
       return openState;
 
     case constants.MESSAGE_CLOSE:
@@ -499,35 +473,6 @@ function messages(state = MessageState(), action, filtersState, prefsState, uiSt
         ...state,
         messagesPayloadById: new Map(messagesPayloadById).set(action.id, action.data),
       };
-
-    case constants.NETWORK_MESSAGE_UPDATE:
-      return {
-        ...state,
-        networkMessagesUpdateById: {
-          ...networkMessagesUpdateById,
-          [action.message.id]: action.message,
-        },
-      };
-
-    /*
-    case UPDATE_REQUEST: {
-      const request = networkMessagesUpdateById[action.id];
-      if (!request) {
-        return state;
-      }
-
-      return {
-        ...state,
-        networkMessagesUpdateById: {
-          ...networkMessagesUpdateById,
-          [action.id]: {
-            ...request,
-            ...processNetworkUpdates(action.data, request),
-          },
-        },
-      };
-    }
-    */
 
     case constants.WARNING_GROUPS_TOGGLE:
       // There's no warningGroups, and the pref was set to false,
@@ -584,7 +529,6 @@ function messages(state = MessageState(), action, filtersState, prefsState, uiSt
     case constants.FILTER_TEXT_SET:
     case constants.FILTERS_CLEAR:
     case constants.DEFAULT_FILTERS_RESET:
-    case constants.SHOW_CONTENT_MESSAGES_TOGGLE:
       return setVisibleMessages({
         messagesState: state,
         filtersState,
@@ -805,10 +749,6 @@ function removeMessagesFromState(state, removedMessagesIds) {
     state.groupsById = cleanUpMap(state.groupsById);
   }
 
-  if (objectHasRemovedIdKey(state.networkMessagesUpdateById)) {
-    state.networkMessagesUpdateById = cleanUpObject(state.networkMessagesUpdateById);
-  }
-
   return state;
 }
 
@@ -857,20 +797,6 @@ function getMessageVisibility(
     checkParentWarningGroupVisibility = true,
   }
 ) {
-  // Do not display the message if it's not from chromeContext and we don't show content
-  // messages.
-  if (
-    !uiState.showContentMessages &&
-    message.chromeContext === false &&
-    message.type !== MESSAGE_TYPE.COMMAND &&
-    message.type !== MESSAGE_TYPE.RESULT
-  ) {
-    return {
-      visible: false,
-      cause: "contentMessage",
-    };
-  }
-
   const warningGroupMessageId = getParentWarningGroupMessageId(message);
   const parentWarningGroupMessage = messagesState.messagesById.get(warningGroupMessageId);
 
@@ -984,27 +910,6 @@ function getMessageVisibility(
     };
   }
 
-  if (!passCssFilters(message, filtersState)) {
-    return {
-      visible: false,
-      cause: FILTERS.CSS,
-    };
-  }
-
-  if (!passNetworkFilter(message, filtersState)) {
-    return {
-      visible: false,
-      cause: FILTERS.NET,
-    };
-  }
-
-  if (!passXhrFilter(message, filtersState)) {
-    return {
-      visible: false,
-      cause: FILTERS.NETXHR,
-    };
-  }
-
   if (passNodeModuleFilters(message, filtersState)) {
     return {
       visible: false,
@@ -1064,42 +969,6 @@ function passNodeModuleFilters(message, filters) {
 }
 
 /**
- * Returns true if the message shouldn't be hidden because of the network filter state.
- *
- * @param {Object} message - The message to check the filter against.
- * @param {FilterState} filters - redux "filters" state.
- * @returns {Boolean}
- */
-function passNetworkFilter(message, filters) {
-  // The message passes the filter if it is not a network message,
-  // or if it is an xhr one,
-  // or if the network filter is on.
-  return (
-    message.source !== MESSAGE_SOURCE.NETWORK ||
-    message.isXHR === true ||
-    filters[FILTERS.NET] === true
-  );
-}
-
-/**
- * Returns true if the message shouldn't be hidden because of the xhr filter state.
- *
- * @param {Object} message - The message to check the filter against.
- * @param {FilterState} filters - redux "filters" state.
- * @returns {Boolean}
- */
-function passXhrFilter(message, filters) {
-  // The message passes the filter if it is not a network message,
-  // or if it is a non-xhr one,
-  // or if the xhr filter is on.
-  return (
-    message.source !== MESSAGE_SOURCE.NETWORK ||
-    message.isXHR === false ||
-    filters[FILTERS.NETXHR] === true
-  );
-}
-
-/**
  * Returns true if the message shouldn't be hidden because of levels filter state.
  *
  * @param {Object} message - The message to check the filter against.
@@ -1114,19 +983,6 @@ function passLevelFilters(message, filters) {
       message.source !== MESSAGE_SOURCE.JAVASCRIPT) ||
     filters[message.level] === true
   );
-}
-
-/**
- * Returns true if the message shouldn't be hidden because of the CSS filter state.
- *
- * @param {Object} message - The message to check the filter against.
- * @param {FilterState} filters - redux "filters" state.
- * @returns {Boolean}
- */
-function passCssFilters(message, filters) {
-  // The message passes the filter if it is not a CSS message,
-  // or if the CSS filter is on.
-  return message.source !== MESSAGE_SOURCE.CSS || filters.css === true;
 }
 
 /**

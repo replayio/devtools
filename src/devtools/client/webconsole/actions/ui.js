@@ -13,9 +13,6 @@ const {
   PERSIST_TOGGLE,
   PREFS,
   REVERSE_SEARCH_INPUT_TOGGLE,
-  SELECT_NETWORK_MESSAGE_TAB,
-  SHOW_CONTENT_MESSAGES_TOGGLE,
-  SHOW_OBJECT_IN_SIDEBAR,
   SIDEBAR_CLOSE,
   SPLIT_CONSOLE_CLOSE_BUTTON_TOGGLE,
   TIMESTAMPS_TOGGLE,
@@ -42,16 +39,6 @@ function persistToggle() {
     });
     const uiState = getAllUi(getState());
     prefsService.setBoolPref(PREFS.UI.PERSIST, uiState.persistLogs);
-  };
-}
-
-function contentMessagesToggle() {
-  return ({ dispatch, getState, prefsService }) => {
-    dispatch({
-      type: SHOW_CONTENT_MESSAGES_TOGGLE,
-    });
-    const uiState = getAllUi(getState());
-    prefsService.setBoolPref(PREFS.UI.CONTENT_MESSAGES, uiState.showContentMessages);
   };
 }
 
@@ -92,13 +79,6 @@ function eagerEvaluationToggle() {
     });
     const prefsState = getAllPrefs(getState());
     prefsService.setBoolPref(PREFS.FEATURES.EAGER_EVALUATION, prefsState.eagerEvaluation);
-  };
-}
-
-function selectNetworkMessageTab(id) {
-  return {
-    type: SELECT_NETWORK_MESSAGE_TAB,
-    id,
   };
 }
 
@@ -180,7 +160,6 @@ function setZoomedRegion(zoomStartTime, zoomEndTime, scale) {
 }
 
 module.exports = {
-  contentMessagesToggle,
   eagerEvaluationToggle,
   editorOnboardingDismiss,
   editorToggle,
@@ -188,7 +167,6 @@ module.exports = {
   initialize,
   persistToggle,
   reverseSearchInputToggle,
-  selectNetworkMessageTab,
   setEditorWidth,
   sidebarClose,
   splitConsoleCloseButtonToggle,

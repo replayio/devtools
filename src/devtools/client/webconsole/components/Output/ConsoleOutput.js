@@ -12,7 +12,6 @@ const {
   getAllMessagesById,
   getAllMessagesUiById,
   getAllMessagesPayloadById,
-  getAllNetworkMessagesUpdateById,
   getVisibleMessages,
   getPausedExecutionPoint,
   getAllWarningGroupsById,
@@ -70,15 +69,12 @@ class ConsoleOutput extends Component {
       messagesUi: PropTypes.array.isRequired,
       serviceContainer: PropTypes.shape({
         attachRefToWebConsoleUI: PropTypes.func.isRequired,
-        sourceMapService: PropTypes.object,
       }),
       dispatch: PropTypes.func.isRequired,
       timestampsVisible: PropTypes.bool,
       messagesPayload: PropTypes.object.isRequired,
       warningGroups: PropTypes.object.isRequired,
-      networkMessagesUpdate: PropTypes.object.isRequired,
       visibleMessages: PropTypes.array.isRequired,
-      networkMessageActiveTabId: PropTypes.string.isRequired,
       onFirstMeaningfulPaint: PropTypes.func.isRequired,
       pausedExecutionPoint: PropTypes.any,
     };
@@ -185,8 +181,6 @@ class ConsoleOutput extends Component {
       messagesUi,
       messagesPayload,
       warningGroups,
-      networkMessagesUpdate,
-      networkMessageActiveTabId,
       serviceContainer,
       timestampsVisible,
       initialized,
@@ -224,8 +218,6 @@ class ConsoleOutput extends Component {
           warningGroups && warningGroups.size > 0
             ? isMessageInWarningGroup(messages.get(messageId), visibleMessages)
             : false,
-        networkMessageUpdate: networkMessagesUpdate[messageId],
-        networkMessageActiveTabId,
         pausedExecutionPoint,
         getMessage: () => messages.get(messageId),
         isPaused: !!pausedMessage && pausedMessage.id == messageId,
@@ -267,9 +259,7 @@ function mapStateToProps(state, props) {
     messagesUi: getAllMessagesUiById(state),
     messagesPayload: getAllMessagesPayloadById(state),
     warningGroups: getAllWarningGroupsById(state),
-    networkMessagesUpdate: getAllNetworkMessagesUpdateById(state),
     timestampsVisible: state.ui.timestampsVisible,
-    networkMessageActiveTabId: state.ui.networkMessageActiveTabId,
     zoomStartTime: state.ui.zoomStartTime,
     zoomEndTime: state.ui.zoomEndTime,
   };
