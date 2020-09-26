@@ -19,10 +19,6 @@ const Telemetry = require("devtools/client/shared/telemetry");
 const EventEmitter = require("devtools/shared/event-emitter");
 const App = createFactory(require("devtools/client/webconsole/components/App"));
 
-const { setupServiceContainer } = require("devtools/client/webconsole/service-container");
-
-const Constants = require("devtools/client/webconsole/constants");
-
 function renderApp({ app, store, root }) {
   return ReactDOM.render(createElement(Provider, { store }, app), root);
 }
@@ -44,6 +40,31 @@ function convertStack(stack, { frames }) {
       };
     })
   );
+}
+
+function setupServiceContainer({ webConsoleUI, hud, toolbox, webConsoleWrapper }) {
+  const { highlight, unhighlight } = toolbox.getHighlighter();
+
+  return {
+    // NOTE these methods are proxied currently because the
+    // service container is passed down the tree. These methods should eventually
+    // be moved to redux actions.
+    openLink: (url, e) => hud.openLink(url, e),
+    openNodeInInspector: grip => hud.openNodeInInspector(grip),
+    getInputSelection: () => hud.getInputSelection(),
+    focusInput: () => hud.focusInput(),
+    setInputValue: value => hud.setInputValue(value),
+    onMessageHover: (type, message) => webConsoleUI.onMessageHover(type, message),
+    getJsTermTooltipAnchor: () => webConsoleUI.getJsTermTooltipAnchor(),
+    attachRefToWebConsoleUI: (id, node) => webConsoleUI.attachRef(id, node),
+    requestData: (id, type) => webConsoleWrapper.requestData(id, type),
+    createElement: nodename => webConsoleWrapper.createElement(nodename),
+    highlightDomElement: highlight,
+    unHighlightDomElement: unhighlight,
+    jumpToExecutionPoint: (point, time, hasFrames) =>
+      toolbox.threadFront.timeWarp(point, time, hasFrames),
+    onViewSourceInDebugger: frame => hud.onViewSourceInDebugger(frame),
+  };
 }
 
 let store = null;
@@ -69,8 +90,6 @@ class WebConsoleWrapper {
     this.dispatchPaused = this.dispatchPaused.bind(this);
 
     this.queuedMessageAdds = [];
-    this.queuedMessageUpdates = [];
-    this.queuedRequestUpdates = [];
     this.throttledDispatchPromise = null;
     this.telemetry = new Telemetry();
 
@@ -235,8 +254,6 @@ class WebConsoleWrapper {
     // triggered, so we need to flush them to make sure we don't have unexpected behavior
     // in the ConsoleOutput.
     this.queuedMessageAdds = [];
-    this.queuedMessageUpdates = [];
-    this.queuedRequestUpdates = [];
     store.dispatch(actions.messagesClear());
   }
 
@@ -254,16 +271,6 @@ class WebConsoleWrapper {
     }
     const shouldDisplayButton = this.toolbox && selectedPanel !== "console";
     store.dispatch(actions.splitConsoleCloseButtonToggle(shouldDisplayButton));
-  }
-
-  batchedMessageUpdates(info) {
-    this.queuedMessageUpdates.push(info);
-    this.setTimeoutIfNeeded();
-  }
-
-  batchedRequestUpdates(message) {
-    this.queuedRequestUpdates.push(message);
-    return this.setTimeoutIfNeeded();
   }
 
   batchedMessagesAdd(messages) {
@@ -287,16 +294,6 @@ class WebConsoleWrapper {
     store.dispatch(actions.setZoomedRegion(startTime, endTime, scale));
   }
 
-  /**
-   * Returns a Promise that resolves once any async dispatch is finally dispatched.
-   */
-  waitAsyncDispatches() {
-    if (!this.throttledDispatchPromise) {
-      return Promise.resolve();
-    }
-    return this.throttledDispatchPromise;
-  }
-
   setTimeoutIfNeeded() {
     if (this.throttledDispatchPromise) {
       return this.throttledDispatchPromise;
@@ -313,21 +310,6 @@ class WebConsoleWrapper {
         }
 
         store.dispatch(actions.messagesAdd(this.queuedMessageAdds));
-
-        const length = this.queuedMessageAdds.length;
-
-        // This telemetry event is only useful when we have a toolbox so only
-        // send it when we have one.
-        if (this.toolbox) {
-          this.telemetry.addEventProperty(
-            this.toolbox,
-            "enter",
-            "webconsole",
-            null,
-            "message_count",
-            length
-          );
-        }
 
         this.queuedMessageAdds = [];
 
