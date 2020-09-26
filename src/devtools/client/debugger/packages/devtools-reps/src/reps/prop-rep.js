@@ -41,7 +41,7 @@ function PropRep(props) {
   const Grip = require("./grip");
   const { Rep } = require("./rep");
 
-  let { name, mode, equal, suppressQuotes } = props;
+  let { name, mode, equal, suppressQuotes, index } = props;
 
   let key;
   // The key can be a simple string, for plain objects,
@@ -50,11 +50,11 @@ function PropRep(props) {
     if (!suppressQuotes) {
       name = maybeEscapePropertyName(name);
     }
-    key = span({ className: "nodeName", key: `nodeName` }, name);
+    key = span({ className: "nodeName", key: `nodeName-${index}` }, name);
   } else {
     key = Rep({
       ...props,
-      key: `nodeName`,
+      key: `nodeName-${index}`,
       className: "nodeName",
       object: name,
       mode: mode || MODE.TINY,
@@ -67,11 +67,11 @@ function PropRep(props) {
     span(
       {
         className: "objectEqual",
-        key: `objectEqual`,
+        key: `objectEqual-${index}`,
       },
       equal
     ),
-    span({ key: `rep` }, Rep({ ...props })),
+    span({ key: `rep-${index}` }, Rep({ ...props })),
   ];
 }
 

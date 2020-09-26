@@ -235,6 +235,7 @@ function getProps(componentProps, properties, indexes, suppressQuotes) {
       name,
       object: value,
       equal: ": ",
+      index: i,
       defaultRep: Grip,
       title: null,
       suppressQuotes,
