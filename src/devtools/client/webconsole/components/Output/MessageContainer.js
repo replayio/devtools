@@ -20,7 +20,6 @@ const componentMap = new Map([
     "ConsoleCommand",
     require("devtools/client/webconsole/components/Output/message-types/ConsoleCommand"),
   ],
-  ["CSSWarning", require("devtools/client/webconsole/components/Output/message-types/CSSWarning")],
   [
     "DefaultRenderer",
     require("devtools/client/webconsole/components/Output/message-types/DefaultRenderer"),
@@ -28,10 +27,6 @@ const componentMap = new Map([
   [
     "EvaluationResult",
     require("devtools/client/webconsole/components/Output/message-types/EvaluationResult"),
-  ],
-  [
-    "NetworkEventMessage",
-    require("devtools/client/webconsole/components/Output/message-types/NetworkEventMessage"),
   ],
   ["PageError", require("devtools/client/webconsole/components/Output/message-types/PageError")],
   [
@@ -51,7 +46,6 @@ class MessageContainer extends Component {
       repeat: PropTypes.number,
       badge: PropTypes.number,
       indent: PropTypes.number,
-      networkMessageUpdate: PropTypes.object,
       getMessage: PropTypes.func.isRequired,
       isPaused: PropTypes.bool.isRequired,
       pausedExecutionPoint: PropTypes.any,
@@ -71,7 +65,6 @@ class MessageContainer extends Component {
       "open",
       "payload",
       "timestampsVisible",
-      "networkMessageUpdate",
       "isPaused",
       "pausedExecutionPoint",
       "badge",
@@ -97,10 +90,6 @@ function getMessageComponent(message) {
   switch (message.source) {
     case MESSAGE_SOURCE.CONSOLE_API:
       return componentMap.get("ConsoleApiCall");
-    case MESSAGE_SOURCE.NETWORK:
-      return componentMap.get("NetworkEventMessage");
-    case MESSAGE_SOURCE.CSS:
-      return componentMap.get("CSSWarning");
     case MESSAGE_SOURCE.JAVASCRIPT:
       switch (message.type) {
         case MESSAGE_TYPE.COMMAND:

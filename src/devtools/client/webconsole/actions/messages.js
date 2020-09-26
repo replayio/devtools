@@ -10,8 +10,6 @@ const { batchActions } = require("devtools/client/shared/redux/middleware/deboun
 
 const {
   MESSAGES_ADD,
-  NETWORK_MESSAGE_UPDATE,
-  NETWORK_UPDATE_REQUEST,
   MESSAGES_CLEAR,
   MESSAGES_CLEAR_LOGPOINT,
   MESSAGE_OPEN,
@@ -19,7 +17,6 @@ const {
   MESSAGE_TYPE,
   MESSAGE_UPDATE_PAYLOAD,
   PAUSED_EXECUTION_POINT,
-  PRIVATE_MESSAGES_CLEAR,
   MESSAGES_CLEAR_EVALUATIONS,
   MESSAGES_CLEAR_EVALUATION,
 } = require("devtools/client/webconsole/constants");
@@ -103,27 +100,6 @@ function messageClose(id) {
 }
 
 /**
- * Make a query on the server to get a list of DOM elements matching the given
- * CSS selectors and set the result as a message's additional data payload.
- *
- * @param {String} id
- *        Message ID
- * @param {String} cssSelectors
- *        CSS selectors string to use in the querySelectorAll() call
- * @return {[type]} [description]
- */
-function messageGetMatchingElements(id, cssSelectors) {
-  return async ({ dispatch, client }) => {
-    try {
-      const response = await client.evaluateJSAsync(`document.querySelectorAll('${cssSelectors}')`);
-      dispatch(messageUpdatePayload(id, response.result));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-}
-
-/**
  * Associate additional data with a message without mutating the original message object.
  *
  * @param {String} id
@@ -134,28 +110,6 @@ function messageGetMatchingElements(id, cssSelectors) {
 function messageUpdatePayload(id, data) {
   return {
     type: MESSAGE_UPDATE_PAYLOAD,
-    id,
-    data,
-  };
-}
-
-function networkMessageUpdate(packet, idGenerator = null, response) {
-  if (idGenerator == null) {
-    idGenerator = defaultIdGenerator;
-  }
-
-  const message = prepareMessage(packet, idGenerator);
-
-  return {
-    type: NETWORK_MESSAGE_UPDATE,
-    message,
-    response,
-  };
-}
-
-function networkUpdateRequest(id, data) {
-  return {
-    type: NETWORK_UPDATE_REQUEST,
     id,
     data,
   };
@@ -175,10 +129,7 @@ module.exports = {
   messagesClearLogpoint,
   messageOpen,
   messageClose,
-  messageGetMatchingElements,
   messageUpdatePayload,
-  networkMessageUpdate,
-  networkUpdateRequest,
   // for test purpose only.
   setPauseExecutionPoint,
   jumpToExecutionPoint,

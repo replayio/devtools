@@ -36,7 +36,6 @@ class WebConsoleUI {
     this.window = window;
     this.hud = hud;
     this.hudId = this.hud.hudId;
-    this.isBrowserConsole = this.hud.isBrowserConsole;
 
     this._onPanelSelected = this._onPanelSelected.bind(this);
     this._onChangeSplitConsoleState = this._onChangeSplitConsoleState.bind(this);
@@ -85,14 +84,8 @@ class WebConsoleUI {
     if (event) {
       event.preventDefault();
     }
-    if (this.wrapper) {
-      this.wrapper.dispatchMessagesClear();
-    }
-    this.clearNetworkRequests();
-    this.emitForTests("messages-cleared");
+    this.wrapper.dispatchMessagesClear();
   }
-
-  clearNetworkRequests() {}
 
   inspectObjectActor(objectActor) {
     const webConsoleFront = this.webConsoleFront;
@@ -196,10 +189,13 @@ class WebConsoleUI {
     shortcuts.on(clearShortcut, event => this.clearOutput(true, event));
   }
 
+<<<<<<< HEAD
   getLongString(grip) {
     return this.webConsoleFront.getString(grip);
   }
 
+=======
+>>>>>>> 7818fe4e... Refactor console (part 2)
   /**
    * Sets the focus to JavaScript input field when the web console tab is
    * selected or when there is a split console present.
@@ -215,29 +211,6 @@ class WebConsoleUI {
 
   _onChangeSplitConsoleState(selectedPanel) {
     this.wrapper.dispatchSplitConsoleCloseButtonToggle(selectedPanel);
-  }
-
-  /**
-   * Handler for the tabNavigated notification.
-   *
-   * @param string event
-   *        Event name.
-   * @param object packet
-   *        Notification packet received from the server.
-   */
-  async handleTabNavigated(packet) {
-    if (!packet.nativeConsoleAPI) {
-      this.logWarningAboutReplacedAPI();
-    }
-
-    // Wait for completion of any async dispatch before notifying that the console
-    // is fully updated after a page reload
-    await this.wrapper.waitAsyncDispatches();
-    this.emit("reloaded");
-  }
-
-  handleTabWillNavigate(packet) {
-    this.wrapper.dispatchTabWillNavigate(packet);
   }
 
   getInputCursor() {

@@ -12,16 +12,11 @@ import { PrefsHelper } from "devtools-modules";
 const prefsSchemaVersion = 11;
 const { pref } = Services;
 
-// Filter preferences only have the suffix since they can be used either for the
-// webconsole or the browser console.
 pref("console.filter.error", true);
 pref("console.filter.warn", true);
 pref("console.filter.info", true);
 pref("console.filter.log", true);
 pref("console.filter.debug", true);
-pref("console.filter.css", true);
-pref("console.filter.net", true);
-pref("console.filter.netxhr", true);
 
 // Persist is only used by the webconsole.
 pref("console.persistLogs", false);
@@ -29,8 +24,6 @@ pref("console.persistLogs", false);
 pref("console.inputHistoryCount", true);
 // Is editor mode enabled.
 pref("console.input.editor", false);
-// Display content messages in the browser console.
-pref("console.contentMessages", true);
 // Display timestamp in messages.
 pref("console.timestampMessages", true);
 
@@ -42,12 +35,10 @@ pref("console.input.editorOnboarding", true);
 // Show the Input Context the selector
 pref("console.input.context", true);
 
-// We use the same pref to enable the sidebar on webconsole and browser console.
 pref("console.sidebarToggle", true);
 pref("console.input.autocomplete", true);
 pref("console.input.eagerEvaluation", true);
 pref("console.groupWarningMessages", true);
-pref("console.browsertoolbox.fission", true);
 
 export const prefs = new PrefsHelper("console", {
   filterError: ["Bool", "filter.error"],
@@ -55,13 +46,9 @@ export const prefs = new PrefsHelper("console", {
   filterInfo: ["Bool", "filter.info"],
   filterLog: ["Bool", "filter.log"],
   filterDebug: ["Bool", "filter.debug"],
-  filterCss: ["Bool", "filter.css"],
-  filterNet: ["Bool", "filter.net"],
-  filterNetxhr: ["Bool", "filter.netxhr"],
   persistLogs: ["Bool", "persistLogs"],
   inputHistoryCount: ["Bool", "inputHistoryCount"],
   editor: ["Bool", "input.editor"],
-  contentMessages: ["Bool", "contentMessages"],
   timestampMessages: ["Bool", "timestampMessages"],
   timestampsVisible: ["Bool", "timestampsVisible"],
   aeditorWidth: ["Bool", "input.editorWidth"],
@@ -71,7 +58,6 @@ export const prefs = new PrefsHelper("console", {
   inputAutocomplete: ["Bool", "input.autocomplete"],
   inputEagerEvaluation: ["Bool", "input.eagerEvaluation"],
   groupWarningMessages: ["Bool", "groupWarningMessages"],
-  browsertoolboxFission: ["Bool", "browsertoolbox.fission"],
 });
 
 export function getPrefsService(hud) {

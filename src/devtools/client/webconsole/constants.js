@@ -32,16 +32,12 @@ const actionTypes = {
   MESSAGES_CLEAR_EVALUATIONS: "MESSAGES_CLEAR_EVALUATIONS",
   MESSAGES_CLEAR_EVALUATION: "MESSAGES_CLEAR_EVALUATION",
   MESSAGES_CLEAR_LOGPOINT: "MESSAGES_CLEAR_LOGPOINT",
-  NETWORK_MESSAGE_UPDATE: "NETWORK_MESSAGE_UPDATE",
-  NETWORK_UPDATE_REQUEST: "NETWORK_UPDATE_REQUEST",
   PERSIST_TOGGLE: "PERSIST_TOGGLE",
   PRIVATE_MESSAGES_CLEAR: "PRIVATE_MESSAGES_CLEAR",
   REMOVE_NOTIFICATION: "REMOVE_NOTIFICATION",
   FRONTS_TO_RELEASE_CLEAR: "FRONTS_TO_RELEASE_CLEAR",
   REVERSE_SEARCH_INPUT_TOGGLE: "REVERSE_SEARCH_INPUT_TOGGLE",
-  SELECT_NETWORK_MESSAGE_TAB: "SELECT_NETWORK_MESSAGE_TAB",
   SHOW_OBJECT_IN_SIDEBAR: "SHOW_OBJECT_IN_SIDEBAR",
-  SHOW_CONTENT_MESSAGES_TOGGLE: "SHOW_CONTENT_MESSAGES_TOGGLE",
   SIDEBAR_CLOSE: "SIDEBAR_CLOSE",
   SPLIT_CONSOLE_CLOSE_BUTTON_TOGGLE: "SPLIT_CONSOLE_CLOSE_BUTTON_TOGGLE",
   TIMESTAMPS_TOGGLE: "TIMESTAMPS_TOGGLE",
@@ -60,8 +56,6 @@ const actionTypes = {
 
 const prefs = {
   PREFS: {
-    // Filter preferences only have the suffix since they can be used either for the
-    // webconsole or the browser console.
     FILTER: {
       ERROR: "filter.error",
       WARN: "filter.warn",
@@ -80,8 +74,6 @@ const prefs = {
       INPUT_HISTORY_COUNT: "devtools.webconsole.inputHistoryCount",
       // Is editor mode enabled.
       EDITOR: "input.editor",
-      // Display content messages in the browser console.
-      CONTENT_MESSAGES: "devtools.browserconsole.contentMessages",
       // Display timestamp in messages.
       MESSAGE_TIMESTAMP: "devtools.webconsole.timestampMessages",
       // Store the editor width.
@@ -92,12 +84,10 @@ const prefs = {
       CONTEXT_SELECTOR: "devtools.webconsole.input.context",
     },
     FEATURES: {
-      // We use the same pref to enable the sidebar on webconsole and browser console.
       SIDEBAR_TOGGLE: "devtools.webconsole.sidebarToggle",
       AUTOCOMPLETE: "devtools.webconsole.input.autocomplete",
       EAGER_EVALUATION: "devtools.webconsole.input.eagerEvaluation",
       GROUP_WARNINGS: "devtools.webconsole.groupWarningMessages",
-      BROWSER_TOOLBOX_FISSION: "devtools.browsertoolbox.fission",
     },
   },
 };

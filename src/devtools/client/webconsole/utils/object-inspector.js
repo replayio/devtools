@@ -56,7 +56,6 @@ function getObjectInspector(frontOrPrimitiveGrip, serviceContainer, override = {
     roots,
     onViewSourceInDebugger: serviceContainer.onViewSourceInDebugger,
     openLink: serviceContainer.openLink,
-    sourceMapService: serviceContainer.sourceMapService,
     // eslint-disable-next-line
     renderStacktrace: stacktrace =>
       createElement(SmartTrace, {
@@ -65,9 +64,7 @@ function getObjectInspector(frontOrPrimitiveGrip, serviceContainer, override = {
         onViewSourceInDebugger: serviceContainer
           ? serviceContainer.onViewSourceInDebugger || serviceContainer.onViewSource
           : null,
-        onViewSource: serviceContainer.onViewSource,
         onReady: override.maybeScrollToBottom,
-        sourceMapService: serviceContainer ? serviceContainer.sourceMapService : null,
       }),
   };
 

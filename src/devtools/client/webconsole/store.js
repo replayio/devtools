@@ -57,17 +57,9 @@ function configureStore(webConsoleUI, options = {}) {
       info: prefs.filterInfo,
       debug: prefs.filterDebug,
       log: prefs.filterLog,
-      css: prefs.filterCss,
-      net: prefs.filterNet,
-      netxhr: prefs.filterNetxhr,
     }),
     ui: UiState({
-      networkMessageActiveTabId: "headers",
       persistLogs: prefs.persistLogs,
-      showContentMessages:
-        webConsoleUI.isBrowserConsole || webConsoleUI.isBrowserToolboxConsole
-          ? prefs.showContentMessages
-          : true,
       editor: prefs.editor,
       editorWidth: prefs.editorWidth,
       showEditorOnboarding: prefs.showEditorOnboarding,

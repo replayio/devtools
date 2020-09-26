@@ -50,12 +50,8 @@ class Message extends Component {
       timeStamp: PropTypes.number,
       timestampsVisible: PropTypes.bool,
       serviceContainer: PropTypes.shape({
-        emitForTests: PropTypes.func.isRequired,
-        onViewSource: PropTypes.func.isRequired,
         onViewSourceInDebugger: PropTypes.func,
-        onViewSourceInStyleEditor: PropTypes.func,
         openLink: PropTypes.func.isRequired,
-        sourceMapService: PropTypes.any,
         jumpToExecutionPoint: PropTypes.func,
         onMessageHover: PropTypes.func,
       }),
@@ -103,7 +99,6 @@ class Message extends Component {
   // did not emit for them.
   emitNewMessage(node) {
     const { serviceContainer, messageId, timeStamp } = this.props;
-    serviceContainer.emitForTests("new-messages", new Set([{ node, messageId, timeStamp }]));
   }
 
   onLearnMoreClick(e) {
@@ -298,11 +293,8 @@ class Message extends Component {
         },
         createElement(SmartTrace, {
           stacktrace,
-          onViewSourceInDebugger:
-            serviceContainer.onViewSourceInDebugger || serviceContainer.onViewSource,
-          onViewSource: serviceContainer.onViewSource,
+          onViewSourceInDebugger: serviceContainer.onViewSourceInDebugger,
           onReady: this.props.maybeScrollToBottom,
-          sourceMapService: serviceContainer.sourceMapService,
         })
       );
     }
@@ -328,13 +320,8 @@ class Message extends Component {
             note.frame
               ? FrameView({
                   frame: note.frame,
-                  onClick: serviceContainer
-                    ? serviceContainer.onViewSourceInDebugger || serviceContainer.onViewSource
-                    : undefined,
+                  onClick: serviceContainer.onViewSourceInDebugger,
                   showEmptyPathAsHost: true,
-                  sourceMapService: serviceContainer
-                    ? serviceContainer.sourceMapService
-                    : undefined,
                 })
               : null
           )
@@ -349,26 +336,14 @@ class Message extends Component {
         ? createElement(MessageRepeat, { repeat: this.props.repeat })
         : null;
 
-    let onFrameClick;
-    if (serviceContainer && frame) {
-      if (source === MESSAGE_SOURCE.CSS) {
-        onFrameClick = serviceContainer.onViewSourceInStyleEditor || serviceContainer.onViewSource;
-      } else {
-        // Point everything else to debugger, if source not available,
-        // it will fall back to view-source.
-        onFrameClick = serviceContainer.onViewSourceInDebugger || serviceContainer.onViewSource;
-      }
-    }
-
     // Configure the location.
     const location = dom.span(
       { className: "message-location devtools-monospace" },
       frame
         ? FrameView({
             frame,
-            onClick: onFrameClick,
+            onClick: frame ? serviceContainer.onViewSourceInDebugger : undefined,
             showEmptyPathAsHost: true,
-            sourceMapService: serviceContainer ? serviceContainer.sourceMapService : undefined,
             messageSource: source,
           })
         : null

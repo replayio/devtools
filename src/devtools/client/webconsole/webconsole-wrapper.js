@@ -86,7 +86,6 @@ class WebConsoleWrapper {
 
     return new Promise(resolve => {
       store = configureStore(this.webConsoleUI, {
-        // We may not have access to the toolbox (e.g. in the browser console).
         telemetry: this.telemetry,
         thunkArgs: {
           webConsoleUI,
@@ -239,32 +238,10 @@ class WebConsoleWrapper {
     this.queuedMessageUpdates = [];
     this.queuedRequestUpdates = [];
     store.dispatch(actions.messagesClear());
-    this.webConsoleUI.emitForTests("messages-cleared");
   }
 
   dispatchPaused({ point, time }) {
     store.dispatch(actions.setPauseExecutionPoint(point, time));
-  }
-
-  dispatchMessageUpdate(message, res) {
-    // network-message-updated will emit when all the update message arrives.
-    // Since we can't ensure the order of the network update, we check
-    // that networkInfo.updates has all we need.
-    // Note that 'requestPostData' is sent only for POST requests, so we need
-    // to count with that.
-    const NUMBER_OF_NETWORK_UPDATE = 8;
-
-    let expectedLength = NUMBER_OF_NETWORK_UPDATE;
-    if (res.networkInfo.updates.includes("responseCache")) {
-      expectedLength++;
-    }
-    if (res.networkInfo.updates.includes("requestPostData")) {
-      expectedLength++;
-    }
-
-    if (res.networkInfo.updates.length === expectedLength) {
-      this.batchedMessageUpdates({ res, message });
-    }
   }
 
   dispatchSidebarClose() {
@@ -277,27 +254,6 @@ class WebConsoleWrapper {
     }
     const shouldDisplayButton = this.toolbox && selectedPanel !== "console";
     store.dispatch(actions.splitConsoleCloseButtonToggle(shouldDisplayButton));
-  }
-
-  dispatchTabWillNavigate(packet) {
-    const { ui } = store.getState();
-
-    // For the browser console, we receive tab navigation
-    // when the original top level window we attached to is closed,
-    // but we don't want to reset console history and just switch to
-    // the next available window.
-    if (ui.persistLogs || this.webConsoleUI.isBrowserConsole) {
-      // Add a type in order for this event packet to be identified by
-      // utils/messages.js's `transformPacket`
-      packet.type = "will-navigate";
-      this.dispatchMessageAdd(packet);
-    } else {
-      this.webConsoleUI.clearNetworkRequests();
-      this.dispatchMessagesClear();
-      store.dispatch({
-        type: Constants.WILL_NAVIGATE,
-      });
-    }
   }
 
   batchedMessageUpdates(info) {
@@ -375,28 +331,6 @@ class WebConsoleWrapper {
 
         this.queuedMessageAdds = [];
 
-        if (this.queuedMessageUpdates.length > 0) {
-          for (const { message, res } of this.queuedMessageUpdates) {
-            await store.dispatch(actions.networkMessageUpdate(message, null, res));
-            this.webConsoleUI.emitForTests("network-message-updated", res);
-          }
-          this.queuedMessageUpdates = [];
-        }
-        if (this.queuedRequestUpdates.length > 0) {
-          for (const { id, data } of this.queuedRequestUpdates) {
-            await store.dispatch(actions.networkUpdateRequest(id, data));
-          }
-          this.queuedRequestUpdates = [];
-
-          // Fire an event indicating that all data fetched from
-          // the backend has been received. This is based on
-          // 'FirefoxDataProvider.isQueuePayloadReady', see more
-          // comments in that method.
-          // (netmonitor/src/connector/firefox-data-provider).
-          // This event might be utilized in tests to find the right
-          // time when to finish.
-          this.webConsoleUI.emitForTests("network-request-payload-ready");
-        }
         done();
       }, 50);
     });

@@ -48,40 +48,12 @@ exports.ConsoleMessage = function (props) {
       errorMessageName: null,
       exceptionDocURL: null,
       executionPoint: undefined,
-      cssSelectors: "",
       userProvidedStyles: null,
       notes: null,
       indent: 0,
       prefix: "",
       private: false,
       logpointId: undefined,
-      chromeContext: false,
-    },
-    props
-  );
-};
-
-exports.NetworkEventMessage = function (props) {
-  return Object.assign(
-    {
-      id: null,
-      actor: null,
-      level: MESSAGE_LEVEL.LOG,
-      isXHR: false,
-      request: null,
-      response: null,
-      source: MESSAGE_SOURCE.NETWORK,
-      type: MESSAGE_TYPE.LOG,
-      groupId: null,
-      timeStamp: null,
-      totalTime: null,
-      indent: 0,
-      updates: null,
-      openedOnce: false,
-      securityState: null,
-      securityInfo: null,
-      requestHeadersFromUploadStream: null,
-      private: false,
     },
     props
   );

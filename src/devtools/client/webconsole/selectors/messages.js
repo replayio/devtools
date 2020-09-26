@@ -41,10 +41,6 @@ function getAllRepeatById(state) {
   return state.messages.repeatById;
 }
 
-function getAllNetworkMessagesUpdateById(state) {
-  return state.messages.networkMessagesUpdateById;
-}
-
 function getGroupsById(state) {
   return state.messages.groupsById;
 }
@@ -71,7 +67,6 @@ module.exports = {
   getAllMessagesById,
   getAllMessagesPayloadById,
   getAllMessagesUiById,
-  getAllNetworkMessagesUpdateById,
   getAllRepeatById,
   getCurrentGroup,
   getFilteredMessagesCount,

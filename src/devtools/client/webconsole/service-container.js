@@ -12,13 +12,10 @@ function setupServiceContainer({ webConsoleUI, hud, toolbox, webConsoleWrapper }
     openLink: (url, e) => hud.openLink(url, e),
     openNodeInInspector: grip => hud.openNodeInInspector(grip),
     getInputSelection: () => hud.getInputSelection(),
-    onViewSource: frame => hud.viewSource(frame.url, frame.line),
     focusInput: () => hud.focusInput(),
     setInputValue: value => hud.setInputValue(value),
     onMessageHover: (type, message) => webConsoleUI.onMessageHover(type, message),
-    getLongString: grip => webConsoleUI.getLongString(grip),
     getJsTermTooltipAnchor: () => webConsoleUI.getJsTermTooltipAnchor(),
-    emitForTests: (event, value) => webConsoleUI.emitForTests(event, value),
     attachRefToWebConsoleUI: (id, node) => webConsoleUI.attachRef(id, node),
     requestData: (id, type) => webConsoleWrapper.requestData(id, type),
     createElement: nodename => webConsoleWrapper.createElement(nodename),
@@ -28,13 +25,11 @@ function setupServiceContainer({ webConsoleUI, hud, toolbox, webConsoleWrapper }
     const { highlight, unhighlight } = toolbox.getHighlighter();
 
     Object.assign(serviceContainer, {
-      sourceMapService: toolbox.sourceMapURLService,
       highlightDomElement: highlight,
       unHighlightDomElement: unhighlight,
       jumpToExecutionPoint: (point, time, hasFrames) =>
         toolbox.threadFront.timeWarp(point, time, hasFrames),
       onViewSourceInDebugger: frame => hud.onViewSourceInDebugger(frame),
-      onViewSourceInStyleEditor: frame => hud.onViewSourceInStyleEditor(frame),
     });
   }
 

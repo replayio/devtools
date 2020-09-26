@@ -50,25 +50,6 @@ class WebConsole {
     return this.toolbox.targetList;
   }
 
-  /**
-   * Getter for the window that can provide various utilities that the web
-   * console makes use of, like opening links, managing popups, etc.  In
-   * most cases, this will be |this.browserWindow|, but in some uses (such as
-   * the Browser Toolbox), there is no browser window, so an alternative window
-   * hosts the utilities there.
-   * @type nsIDOMWindow
-   */
-  get chromeUtilsWindow() {
-    if (this.browserWindow) {
-      return this.browserWindow;
-    }
-    return DevToolsUtils.getTopWindow(this.chromeWindow);
-  }
-
-  get gViewSourceUtils() {
-    return this.chromeUtilsWindow.gViewSourceUtils;
-  }
-
   getFrontByID(id) {
     return this.currentTarget.client.getFrontByID(id);
   }
@@ -173,32 +154,10 @@ class WebConsole {
   }
 
   /**
-   * Tries to open a Stylesheet file related to the web page for the web console
-   * instance in the Style Editor. If the file is not found, it is opened in
-   * source view instead.
-   *
-   * Manually handle the case where toolbox does not exist (Browser Console).
-   *
-   * @param string sourceURL
-   *        The URL of the file.
-   * @param integer sourceLine
-   *        The line number which you want to place the caret.
-   */
-  viewSourceInStyleEditor(sourceURL, sourceLine) {
-    const toolbox = this.toolbox;
-    if (!toolbox) {
-      this.viewSource(sourceURL, sourceLine);
-      return;
-    }
-    toolbox.viewSourceInStyleEditor(sourceURL, sourceLine);
-  }
-
-  /**
    * Tries to open a JavaScript file related to the web page for the web console
    * instance in the Script Debugger. If the file is not found, it is opened in
    * source view instead.
    *
-   * Manually handle the case where toolbox does not exist (Browser Console).
    *
    * @param string sourceURL
    *        The URL of the file.
@@ -208,14 +167,7 @@ class WebConsole {
    *        The column number which you want to place the caret.
    */
   async viewSourceInDebugger(sourceURL, sourceLine, sourceColumn) {
-    const toolbox = this.toolbox;
-    if (!toolbox) {
-      this.viewSource(sourceURL, sourceLine, sourceColumn);
-      return;
-    }
-
-    await toolbox.viewSourceInDebugger(sourceURL, sourceLine, sourceColumn);
-    this.ui.emitForTests("source-in-debugger-opened");
+    await this.toolbox.viewSourceInDebugger(sourceURL, sourceLine, sourceColumn);
   }
 
   /**
@@ -233,9 +185,7 @@ class WebConsole {
    */
   getDebuggerFrames() {
     const toolbox = this.toolbox;
-    if (!toolbox) {
-      return null;
-    }
+
     const panel = toolbox.getPanel("debugger");
 
     if (!panel) {
@@ -273,9 +223,7 @@ class WebConsole {
    */
   getInspectorSelection() {
     const toolbox = this.toolbox;
-    if (!toolbox) {
-      return null;
-    }
+
     const panel = toolbox.getPanel("inspector");
     if (!panel || !panel.selection) {
       return null;
@@ -284,27 +232,10 @@ class WebConsole {
   }
 
   async onViewSourceInDebugger(frame) {
-    if (this.toolbox) {
-      await this.toolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.scriptId);
-
-      this.recordEvent("jump_to_source");
-      this.emitForTests("source-in-debugger-opened");
-    }
-  }
-
-  async onViewSourceInStyleEditor(frame) {
-    if (!this.toolbox) {
-      return;
-    }
-    await this.toolbox.viewSourceInStyleEditor(frame.url, frame.line, frame.column);
-    this.recordEvent("jump_to_source");
+    await this.toolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.scriptId);
   }
 
   getHighlighter() {
-    if (!this.toolbox) {
-      return null;
-    }
-
     if (this._highlighter) {
       return this._highlighter;
     }
