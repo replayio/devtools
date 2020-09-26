@@ -18,13 +18,7 @@ const { prefs, getPrefsService } = require("devtools/client/webconsole/utils/pre
 const { reducers } = require("devtools/client/webconsole/reducers/index");
 
 // Middlewares
-const { ignore } = require("devtools/client/shared/redux/middleware/ignore");
-const eventTelemetry = require("devtools/client/webconsole/middleware/event-telemetry");
-const historyPersistence = require("devtools/client/webconsole/middleware/history-persistence");
 const { thunkWithOptions } = require("devtools/client/shared/redux/middleware/thunk-with-options");
-
-// Enhancers
-const enableBatching = require("devtools/client/webconsole/enhancers/batching");
 
 /**
  * Create and configure store for the Console panel. This is the place
@@ -32,7 +26,6 @@ const enableBatching = require("devtools/client/webconsole/enhancers/batching");
  */
 function configureStore(webConsoleUI, options = {}) {
   const prefsService = getPrefsService(webConsoleUI);
-  const { getBoolPref, getIntPref } = prefsService;
 
   const logLimit = 1000;
   //options.logLimit || Math.max(getIntPref("devtools.hud.loglimit"), 1);
@@ -67,19 +60,14 @@ function configureStore(webConsoleUI, options = {}) {
     }),
   };
 
-  const toolbox = options.thunkArgs.toolbox;
-  const sessionId = (toolbox && toolbox.sessionId) || -1;
   const middleware = applyMiddleware(
-    ignore,
     thunkWithOptions.bind(null, {
       prefsService,
       ...options.thunkArgs,
-    }),
-    historyPersistence,
-    eventTelemetry.bind(null, options.telemetry, sessionId)
+    })
   );
 
-  return createStore(createRootReducer(), initialState, compose(middleware, enableBatching()));
+  return createStore(createRootReducer(), initialState, compose(middleware));
 }
 
 function createRootReducer() {

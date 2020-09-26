@@ -6,7 +6,6 @@
 
 const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
 const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
-const { batchActions } = require("devtools/client/shared/redux/middleware/debounce");
 
 const {
   MESSAGES_ADD,
@@ -14,7 +13,6 @@ const {
   MESSAGES_CLEAR_LOGPOINT,
   MESSAGE_OPEN,
   MESSAGE_CLOSE,
-  MESSAGE_TYPE,
   MESSAGE_UPDATE_PAYLOAD,
   PAUSED_EXECUTION_POINT,
   MESSAGES_CLEAR_EVALUATIONS,
@@ -28,17 +26,6 @@ function messagesAdd(packets, idGenerator = null) {
     idGenerator = defaultIdGenerator;
   }
   const messages = packets.map(packet => prepareMessage(packet, idGenerator));
-  for (let i = messages.length - 1; i >= 0; i--) {
-    if (messages[i].type === MESSAGE_TYPE.CLEAR) {
-      return batchActions([
-        messagesClear(),
-        {
-          type: MESSAGES_ADD,
-          messages: messages.slice(i),
-        },
-      ]);
-    }
-  }
 
   // When this is used for non-cached messages then handle clear message and
   // split up into batches
