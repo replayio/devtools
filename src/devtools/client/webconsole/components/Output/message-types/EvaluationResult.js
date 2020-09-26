@@ -39,7 +39,6 @@ function EvaluationResult(props) {
   const {
     source,
     type,
-    helperType,
     level,
     id: messageId,
     indent,
@@ -71,7 +70,6 @@ function EvaluationResult(props) {
       useQuotes: true,
       escapeWhitespace: false,
       type,
-      helperType,
       maybeScrollToBottom,
     });
   }

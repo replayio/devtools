@@ -87,23 +87,6 @@ class WebConsoleUI {
     this.wrapper.dispatchMessagesClear();
   }
 
-  inspectObjectActor(objectActor) {
-    const webConsoleFront = this.webConsoleFront;
-    this.wrapper.dispatchMessageAdd(
-      {
-        helperResult: {
-          type: "inspectObject",
-          object:
-            objectActor && objectActor.getGrip
-              ? objectActor
-              : getAdHocFrontOrPrimitiveGrip(objectActor, webConsoleFront),
-        },
-      },
-      true
-    );
-    return this.wrapper;
-  }
-
   getPanelWindow() {
     return this.window;
   }

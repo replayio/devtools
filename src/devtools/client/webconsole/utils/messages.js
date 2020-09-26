@@ -240,15 +240,9 @@ function transformEvaluationResultPacket(packet) {
     notes,
   } = packet;
 
-  const parameter = helperResult && helperResult.object ? helperResult.object : result;
+  const parameter = result;
 
-  if (helperResult && helperResult.type === "error") {
-    try {
-      exceptionMessage = l10n.getStr(helperResult.message);
-    } catch (ex) {
-      exceptionMessage = helperResult.message;
-    }
-  } else if (typeof exception === "string") {
+  if (typeof exception === "string") {
     // Wrap thrown strings in Error objects, so `throw "foo"` outputs "Error: foo"
     exceptionMessage = new Error(exceptionMessage).toString();
   }
@@ -261,7 +255,6 @@ function transformEvaluationResultPacket(packet) {
   return new ConsoleMessage({
     source: MESSAGE_SOURCE.JAVASCRIPT,
     type: MESSAGE_TYPE.RESULT,
-    helperType: helperResult ? helperResult.type : null,
     level,
     messageText: exceptionMessage,
     parameters: [parameter],

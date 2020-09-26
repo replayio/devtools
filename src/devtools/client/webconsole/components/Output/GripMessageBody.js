@@ -24,7 +24,6 @@ GripMessageBody.propTypes = {
   useQuotes: PropTypes.bool,
   escapeWhitespace: PropTypes.bool,
   type: PropTypes.string,
-  helperType: PropTypes.string,
   maybeScrollToBottom: PropTypes.func,
 };
 
@@ -109,9 +108,9 @@ function cleanupStyle(userProvidedStyle, createElement) {
 }
 
 function shouldAutoExpandObjectInspector(props) {
-  const { helperType, type } = props;
+  const { type } = props;
 
-  return type === MESSAGE_TYPE.DIR || helperType === JSTERM_COMMANDS.INSPECT;
+  return type === MESSAGE_TYPE.DIR;
 }
 
 module.exports = GripMessageBody;
