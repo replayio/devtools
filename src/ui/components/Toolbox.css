@@ -8,17 +8,11 @@
   z-index: 1; /* Draw toolbox in front of the highlighter overlay. */
 }
 
-#toolbox-border {
-  height: 0px;
-  background: var(--theme-toolbar-background);
-}
-
 #toolbox-timeline {
   height: 58px;
   background: var(--theme-toolbar-background);
   border-top: 1px solid var(--theme-splitter-color);
   border-bottom: 1px solid var(--theme-splitter-color);
-
 }
 
 #toolbox-toolbar {
