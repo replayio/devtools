@@ -4,30 +4,16 @@ import { connect } from "react-redux";
 import Toolbox from "./Toolbox";
 import Comments from "./Comments";
 import Recordings from "./Recordings/index";
-import Tooltip from "./Tooltip";
 import Header from "./Header";
+import Viewer from "./Viewer";
 import Loader from "./shared/Loader";
 import { UserPrompt } from "./Account/index";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import RightSidebar from "./RightSidebar";
 import RecordingLoadingScreen from "./RecordingLoadingScreen";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { screenshotCache, nextPaintEvent, getClosestPaintPoint } from "protocol/graphics";
-
-function Viewer({ tooltip }) {
-  return (
-    <div id="outer-viewer">
-      <div id="viewer">
-        <canvas id="graphics"></canvas>
-        <div id="highlighter-root"></div>
-      </div>
-      <RightSidebar />
-      <Tooltip tooltip={tooltip} />
-    </div>
-  );
-}
 
 function DevtoolsSplitBox({ updateTimelineDimensions, tooltip }) {
   const toolbox = <Toolbox />;
