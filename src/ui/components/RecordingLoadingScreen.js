@@ -5,6 +5,16 @@ import { UserPrompt } from "./Account/index";
 import { screenshotCache, nextPaintEvent, getClosestPaintPoint } from "protocol/graphics";
 import { selectors } from "../reducers";
 
+async function getScreenshotSafely(paintPoint) {
+  if (!paintPoint) {
+    return null;
+  }
+  const { point, paintHash } = paintPoint;
+  try {
+    return await screenshotCache.getScreenshotForTooltip(point, paintHash);
+  } catch (e) {}
+}
+
 function useGetPreviewScreen({ loading, recordingDuration }) {
   const [screen, setScreen] = useState(null);
 
@@ -14,18 +24,16 @@ function useGetPreviewScreen({ loading, recordingDuration }) {
       let screen;
 
       const closestPaintPoint = getClosestPaintPoint(time);
-      if (closestPaintPoint) {
-        const { point, paintHash } = closestPaintPoint;
-        screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
-      } else {
+      screen = await getScreenshotSafely(closestPaintPoint);
+
+      if (!screen) {
         const nextPaintPoint = nextPaintEvent(time);
-        if (nextPaintPoint) {
-          const { point, paintHash } = nextPaintPoint;
-          screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
-        }
+        screen = await getScreenshotSafely(nextPaintPoint);
       }
 
-      setScreen(screen);
+      if (screen) {
+        setScreen(screen);
+      }
     }
 
     getAndSetScreen();
