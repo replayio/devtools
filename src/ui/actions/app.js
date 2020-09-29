@@ -48,6 +48,10 @@ export function updateTheme(theme) {
   return { type: "update_theme", theme };
 }
 
+export function setToolboxOpen(isToolboxOpen) {
+  return { type: "set_toolbox_open", isToolboxOpen };
+}
+
 export function setSplitConsole(open) {
   return { type: "set_split_console", splitConsole: open };
 }
