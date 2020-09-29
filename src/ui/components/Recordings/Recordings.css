@@ -1,10 +1,10 @@
 .recordings {
-  margin: 40px auto 0;
-  /* width: 100%;
-  max-width: 1200px; */
+  margin: 0 auto;
+  padding-top: 40px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  overflow: auto;
 }
 
 .recordings .recording:hover {
