@@ -3,6 +3,7 @@ import Recordings from "../Recordings/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import Header from "../Header";
 import Loader from "../shared/Loader";
+import UserPrompt from "../shared/UserPrompt";
 import { gql, useQuery } from "@apollo/client";
 import classnames from "classnames";
 
@@ -15,10 +16,6 @@ const RECORDINGS = gql`
     }
   }
 `;
-
-export function UserPrompt({ children }) {
-  return <div className="user-prompt">{children}</div>;
-}
 
 function FirstRecordingPrompt() {
   return (

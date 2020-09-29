@@ -68,8 +68,8 @@ function onUploadedData({ uploaded, length }) {
   }
 }
 
-function onSessionError({ message }) {
-  setStatus(`Error: ${message}`);
+function onSessionError(error) {
+  store.dispatch({ type: "set_error_message", message: error.message });
 }
 
 let initialized = false;
