@@ -68,7 +68,7 @@ function WelcomePage() {
       <div className="welcome-panel">
         <img className="logo" src="images/logo.svg" />
         <img className="atwork" src="images/computer-work.svg" />
-        <button onClick={() => loginWithRedirect()}>Log In</button>
+        <button onClick={() => loginWithRedirect()}>Sign In</button>
       </div>
     </div>
   );
