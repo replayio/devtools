@@ -42,7 +42,7 @@ class Message extends Component {
       executionPoint: PropTypes.string,
       executionPointTime: PropTypes.any,
       executionPointHasFrames: PropTypes.any,
-      pausedExecutionPoint: PropTypes.string,
+      pausedExecutionPointTime: PropTypes.number,
       scrollToMessage: PropTypes.bool,
       exceptionDocURL: PropTypes.string,
       request: PropTypes.object,
@@ -138,6 +138,61 @@ class Message extends Component {
     }
   }
 
+  renderOverlayButton() {
+    const {
+      executionPoint,
+      executionPointTime,
+      executionPointHasFrames,
+      serviceContainer,
+      inWarningGroup,
+      pausedExecutionPointTime,
+      frame,
+    } = this.props;
+    let onRewindClick = null;
+    let overlayType, label, onClick;
+
+    if (inWarningGroup) {
+      return undefined;
+    }
+
+    if (executionPoint) {
+      onRewindClick = () => {
+        serviceContainer.jumpToExecutionPoint(
+          executionPoint,
+          executionPointTime,
+          executionPointHasFrames
+        );
+      };
+    }
+
+    if (executionPointTime > pausedExecutionPointTime) {
+      overlayType = "fast-forward";
+      label = "Fast Forward";
+      onClick = onRewindClick;
+    } else if (executionPointTime < pausedExecutionPointTime) {
+      overlayType = "rewind";
+      label = "Rewind";
+      onClick = onRewindClick;
+    } else {
+      overlayType = "debug";
+      label = "Debug";
+      onClick = () => {
+        serviceContainer.onViewSourceInDebugger({
+          line: frame.line,
+          column: frame.column,
+          sourceId: frame.sourceId,
+          url: frame.source,
+        });
+      };
+    }
+
+    return dom.div(
+      { className: `overlay-container ${overlayType}`, onClick },
+      dom.div({ className: "info" }, dom.div({ className: "label" }, label)),
+      dom.div({ className: "button" }, dom.div({ className: "img" }))
+    );
+  }
+
   renderIcon() {
     const {
       level,
@@ -154,22 +209,7 @@ class Message extends Component {
       return undefined;
     }
 
-    let onRewindClick = null;
-    if (executionPoint) {
-      onRewindClick = () => {
-        serviceContainer.jumpToExecutionPoint(
-          executionPoint,
-          executionPointTime,
-          executionPointHasFrames
-        );
-      };
-    }
-
-    return MessageIcon({
-      level,
-      onRewindClick,
-      type,
-    });
+    return MessageIcon({ level, type });
   }
 
   renderTimestamp() {
@@ -265,7 +305,6 @@ class Message extends Component {
       serviceContainer,
       exceptionDocURL,
       executionPoint,
-      pausedExecutionPoint,
       messageId,
       notes,
     } = this.props;
@@ -281,6 +320,7 @@ class Message extends Component {
 
     const timestampEl = this.renderTimestamp();
     const icon = this.renderIcon();
+    const overlayButton = this.renderOverlayButton();
 
     // Figure out if there is an expandable part to the message.
     let attachment = null;
@@ -381,6 +421,7 @@ class Message extends Component {
         "data-message-id": messageId,
         "aria-live": type === MESSAGE_TYPE.COMMAND ? "off" : "polite",
       },
+      overlayButton,
       timestampEl,
       MessageIndent({
         indent,

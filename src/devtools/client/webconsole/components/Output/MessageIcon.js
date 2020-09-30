@@ -27,11 +27,6 @@ function getIconElement(level, onRewindClick, type) {
   let title = l10n.getStr(l10nLevels[level] || level);
   const classnames = ["icon"];
 
-  if (onRewindClick) {
-    title = l10n.getFormatStr("webconsole.jumpButton.tooltip", [title]);
-    classnames.push("rewindable");
-  }
-
   if (type === "logPoint") {
     classnames.push("logpoint");
   }
@@ -39,7 +34,6 @@ function getIconElement(level, onRewindClick, type) {
   {
     return dom.span({
       className: classnames.join(" "),
-      onClick: onRewindClick,
       title,
       "aria-live": "off",
     });

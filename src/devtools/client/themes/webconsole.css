@@ -959,20 +959,6 @@ a.learn-more-link.webconsole-learn-more-link {
   margin-top: calc(var(--console-output-vertical-padding) - 1px);
 }
 
-.webconsole-app .message:hover > .icon.rewindable {
-  cursor: pointer;
-  transform: rotate(180deg);
-}
-
-/*
- * we flip the next.svg icon by default because when we're
- * not paused, we would jump back. We remove the transform here
- * because we want to jump forward.
- */
-.webconsole-app .message.paused ~ .message:hover .icon.rewindable {
-  transform: none;
-}
-
 .webconsole-output .paused ~ .message:last-of-type,
 .webconsole-output .paused:last-of-type {
   border-bottom-width: 0;
@@ -993,4 +979,113 @@ a.learn-more-link.webconsole-learn-more-link {
   left: -9999px;
   width: 0;
   height: 0;
+}
+
+/* Overlay buttons */
+.overlay-container {
+  cursor: pointer;
+}
+
+.overlay-container > * {
+  display: flex;
+  position: absolute;
+  height: 22px;
+  align-items: center;
+  z-index: 1;
+  border-top-right-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  transition-duration: var(--slide-in-duration);
+  --rewind-button-width: 28px;
+  --message-left-padding: 4px;
+  --slide-in-duration: 200ms;
+  --border-radius: 8px;
+  --rewind-left-padding: 5px;
+  --rewind-info-button-width: 64px;
+  --fast-forward-info-button-width: 92px;
+  --debug-info-button-width: 60px;
+}
+
+.overlay-container .button {
+  width: var(--rewind-button-width);
+  padding-left: var(--rewind-left-padding);
+  margin-left: calc(0px - var(--message-left-padding) - var(--rewind-button-width));
+  background: linear-gradient(0deg, #2D7EFF 0%, #2D7EFF 100%);
+  /* for debugging the final position when hovered */
+  /* margin-left: calc(0px - var(--message-left-padding)) !important; */
+}
+
+.overlay-container.debug .button {
+  margin-left: calc(0px - var(--message-left-padding));
+  background: linear-gradient(0deg, #5B41FF 0%, #5B41FF 100%);
+}
+
+.overlay-container .info {
+  background-color: #2D7EFF;
+  /* for debugging the final position when hovered */
+  /* margin-left: calc(var(--rewind-button-width) - var(--message-left-padding) - var(--border-radius)) !important; */
+}
+
+.overlay-container.rewind .info {
+  width: var(--rewind-info-button-width);
+  margin-left: calc(0px - var(--message-left-padding) - var(--rewind-info-button-width) );
+}
+
+.overlay-container.fast-forward .info {
+  width: var(--fast-forward-info-button-width);
+  margin-left: calc(0px - var(--message-left-padding) - var(--fast-forward-info-button-width) );
+}
+
+.overlay-container.debug .info {
+  width: var(--debug-info-button-width);
+  margin-left: calc(0px - var(--message-left-padding) - var(--debug-info-button-width) );
+  background-color: #5B41FF;
+}
+
+.overlay-container .info .label {
+  color: white;
+  opacity: 0%;
+  transition-duration: 100ms;
+  transition-delay: 150ms;
+}
+
+.overlay-container .img {
+  opacity: 100%;
+  background-color: white;
+  background-position: center;
+  height: 14px;
+  transition-property: opacity;
+  transition-duration: 100ms;
+  transition-delay: 150ms;
+}
+
+.overlay-container.fast-forward .img {
+  transform: scaleX(-1);
+}
+
+/* Hovered Overlay buttons */
+
+.message:hover .button {
+  margin-left: calc(0px - var(--message-left-padding));
+}
+
+.message:hover .button .img {
+  opacity: 100%;
+}
+
+.overlay-container:hover .button {
+  background: linear-gradient(152.2deg, #67DAFF 6.75%, #4382FF 93.14%);
+  box-shadow: 1px 0px 3px rgb(0,0,0,0.3);
+}
+
+.overlay-container.debug:hover .button {
+  background: linear-gradient(152.2deg, #5B41FF 6.75%, #B043FF 93.14%);
+}
+
+.overlay-container:hover .info {
+  padding-left: 16px;
+  margin-left: calc(var(--rewind-button-width) - var(--message-left-padding) - var(--border-radius));
+}
+
+.overlay-container:hover .info .label {
+  opacity: 100%;
 }
