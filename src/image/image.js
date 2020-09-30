@@ -53,7 +53,6 @@ const gBackgroundImages = {
   "#split-console-close-button::before": require("devtools/client/themes/images/close.svg"),
   '.menuitem > .command[aria-checked="true"]': require("devtools/client/themes/images/check.svg"),
   ".message.network > .collapse-button::before, .message.startGroup > .indent[data-indent='0'] ~ .collapse-button::before, .message.startGroupCollapsed > .indent[data-indent='0'] ~ .collapse-button::before": require("devtools/client/themes/images/arrow-big.svg"),
-  ".message:hover > .icon.rewindable": require("devtools/client/debugger/images/next-circle.svg"),
   "button.jump-definition": require("devtools/client/shared/components/reps/images/jump-definition-dark.svg"),
   ".img.column-marker": require("devtools/client/debugger/images/column-marker.svg"),
   ".event-tooltip-debugger-icon": require("devtools/client/shared/components/reps/images/jump-definition-dark.svg"),
@@ -129,6 +128,9 @@ const gMaskImages = {
   "button.open-inspector": require("devtools/client/themes/images/open-inspector.svg"),
   ".img.comment-icon": require("devtools/client/themes/images/comment.svg"),
   ".img.lightning": require("image/images/lightning.svg"),
+  ".overlay-container.rewind .img": require("devtools/client/debugger/images/rewind-button.svg"),
+  ".overlay-container.fast-forward .img": require("devtools/client/debugger/images/rewind-button.svg"),
+  ".overlay-container.debug .img": require("devtools/client/debugger/images/diamond-pause.svg"),
 };
 
 const gContentImages = {

@@ -41,6 +41,7 @@ function ConsoleApiCall(props) {
     timestampsVisible,
     repeat,
     pausedExecutionPoint,
+    pausedExecutionPointTime,
     isPaused,
     maybeScrollToBottom,
   } = props;
@@ -140,6 +141,7 @@ function ConsoleApiCall(props) {
     executionPointTime,
     executionPointHasFrames,
     pausedExecutionPoint,
+    pausedExecutionPointTime,
     isPaused,
     open,
     collapsible,

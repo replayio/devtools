@@ -49,6 +49,10 @@ function getPausedExecutionPoint(state) {
   return state.messages.pausedExecutionPoint;
 }
 
+function getPausedExecutionPointTime(state) {
+  return state.messages.pausedExecutionPointTime;
+}
+
 function getAllWarningGroupsById(state) {
   return state.messages.warningGroupsById;
 }
@@ -74,5 +78,6 @@ module.exports = {
   getMessage,
   getVisibleMessages,
   getPausedExecutionPoint,
+  getPausedExecutionPointTime,
   isMessageInWarningGroup,
 };

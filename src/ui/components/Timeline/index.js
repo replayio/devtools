@@ -255,7 +255,8 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseUp = e => {
-    const { hoverTime, hoveringOverMarker } = this.props;
+    const { hoverTime } = this.props;
+    const { hoveringOverMarker } = this.state;
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != null && !hoveringOverMarker) {
@@ -624,8 +625,6 @@ export class Timeline extends Component {
             ref: a => (this.$progressBar = a),
             onMouseEnter: this.onPlayerMouseEnter,
             onMouseMove: this.onPlayerMouseMove,
-            onMouseLeave: this.onPlayerMouseLeave,
-            onMouseDown: this.onPlayerMouseDown,
             onMouseUp: this.onPlayerMouseUp,
           },
           div({

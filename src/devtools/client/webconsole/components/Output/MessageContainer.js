@@ -48,7 +48,8 @@ class MessageContainer extends Component {
       indent: PropTypes.number,
       getMessage: PropTypes.func.isRequired,
       isPaused: PropTypes.bool.isRequired,
-      pausedExecutionPoint: PropTypes.any,
+      pausedExecutionPoint: PropTypes.string,
+      pausedExecutionPointTime: PropTypes.number,
       inWarningGroup: PropTypes.bool,
     };
   }
