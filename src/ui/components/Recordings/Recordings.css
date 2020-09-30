@@ -26,9 +26,15 @@
   font-weight: 600;
   margin: 0.6em 0 0.2em;
   color: var(--primary-color);
+  text-overflow: ellipsis;
+  white-space: nowrap;
   padding: 0;
   background: none;
   border: none;
+}
+
+.recordings .recording input.title {
+  width: 100%;
 }
 
 .recordings .recording .secondary {
@@ -53,7 +59,7 @@
   width: 100%;
 }
 
-.recordings .recording .screenshot:hover .overlay {
+.recordings .recording:hover .overlay {
   visibility: visible;
 }
 
@@ -68,7 +74,28 @@
   border-radius: 2px;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.recordings .recording .dropdown-block {
+  display: none;
+  position: absolute;
+  height: 28px;
+  right: 20px;
+  top: 20px;
+  z-index: 1;
+}
+
+.recordings .recording:hover .dropdown-block {
+  display: block;
+}
+
+.recordings .recording .dropdown-button {
+  color: white;
+}
+
+.recordings .recording .dropdown-button:focus {
+  outline: none;
 }
 
 .recordings .recording button.link {

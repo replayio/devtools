@@ -4,7 +4,7 @@ import { selectors } from "../../reducers";
 import { Recording } from "./Recording";
 import { useAuth0 } from "@auth0/auth0-react";
 import { sortBy } from "lodash";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import Loader from "../shared/Loader.js";
 
 import "./Recordings.css";
@@ -27,19 +27,37 @@ const RECORDINGS = gql`
   }
 `;
 
+const DELETE_RECORDING = gql`
+  mutation DeleteRecording($id: uuid) {
+    delete_recordings(where: { id: { _eq: $id } }) {
+      returning {
+        id
+      }
+    }
+  }
+`;
+
 const Recordings = props => {
-  const { data, loading } = useQuery(RECORDINGS);
+  const { data, loading, refetch } = useQuery(RECORDINGS);
+  const [deleteRecording] = useMutation(DELETE_RECORDING);
 
   if (loading) {
     return <Loader />;
   }
+
+  const onDeleteRecording = async id => {
+    await deleteRecording({ variables: { id } });
+    refetch();
+  };
 
   const sortedRecordings = sortBy(data.recordings, recording => -new Date(recording.date));
 
   return (
     <div className="recordings">
       {sortedRecordings &&
-        sortedRecordings.map((recording, i) => <Recording data={recording} key={i} />)}
+        sortedRecordings.map((recording, i) => (
+          <Recording data={recording} key={i} onDeleteRecording={onDeleteRecording} />
+        ))}
     </div>
   );
 };
