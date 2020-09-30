@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import Header from "./Header";
-import { UserPrompt } from "./Account/index";
+import UserPrompt from "./shared/UserPrompt";
 import { screenshotCache, nextPaintEvent, getClosestPaintPoint } from "protocol/graphics";
 import { selectors } from "../reducers";
 

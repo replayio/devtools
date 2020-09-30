@@ -7,7 +7,6 @@ import Recordings from "./Recordings/index";
 import Header from "./Header";
 import Viewer from "./Viewer";
 import Loader from "./shared/Loader";
-import { UserPrompt } from "./Account/index";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import RecordingLoadingScreen from "./RecordingLoadingScreen";
 
@@ -46,6 +45,7 @@ export class DevTools extends React.Component {
       recordingDuration,
       sessionId,
     } = this.props;
+
     const isRecordingUploaded = sessionId !== null;
     const isRecordingFetchedFromServer = recordingDuration !== null;
     const isRecordingLoading = loading < 100;

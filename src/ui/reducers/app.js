@@ -3,6 +3,7 @@ import { prefs } from "../utils/prefs";
 function initialAppState() {
   return {
     recordingId: null,
+    errorMessage: null,
     theme: "theme-light",
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
@@ -17,6 +18,11 @@ export default function update(state = initialAppState(), action) {
     case "setup_app": {
       return { ...state, recordingId: action.recordingId };
     }
+
+    case "set_error_message": {
+      return { ...state, errorMessage: action.message };
+    }
+
     case "update_theme": {
       return { ...state, theme: action.theme };
     }
@@ -49,3 +55,4 @@ export const getSelectedPanel = state => state.app.selectedPanel;
 export const getLoading = state => state.app.loading;
 export const getRecordingId = state => state.app.recordingId;
 export const getSessionId = state => state.app.sessionId;
+export const getErrorMessage = state => state.app.errorMessage;

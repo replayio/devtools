@@ -3,7 +3,8 @@ import { connect } from "react-redux";
 import DevTools from "./DevTools";
 import { Account } from "./Account/index";
 import Loader from "./shared/Loader";
-import Error from "./shared/Error";
+import { SessionError } from "./shared/Error";
+import { PopupBlockedError } from "./shared/Error";
 import { selectors } from "../reducers";
 import { useApolloClient, ApolloProvider } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -37,7 +38,7 @@ function useGetApolloClient() {
   return { apolloClient, consentPopupBlocked };
 }
 
-function App({ theme, recordingId }) {
+function App({ theme, recordingId, sessionError }) {
   const { isAuthenticated, isLoading } = useAuth0();
   const { apolloClient, consentPopupBlocked } = useGetApolloClient();
 
@@ -46,7 +47,7 @@ function App({ theme, recordingId }) {
   }, [theme]);
 
   if (consentPopupBlocked) {
-    return <Error />;
+    return <PopupBlockedError />;
   }
 
   if (isLoading || (isAuthenticated && !apolloClient)) {
@@ -55,6 +56,7 @@ function App({ theme, recordingId }) {
 
   return (
     <ApolloProvider client={apolloClient}>
+      {sessionError && <SessionError error={sessionError} />}
       {recordingId ? <DevTools /> : <Account />}
     </ApolloProvider>
   );
@@ -64,6 +66,7 @@ export default connect(
   state => ({
     theme: selectors.getTheme(state),
     recordingId: selectors.getRecordingId(state),
+    sessionError: selectors.getErrorMessage(state),
   }),
   {}
 )(App);
