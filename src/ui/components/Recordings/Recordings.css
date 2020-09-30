@@ -74,7 +74,7 @@
   border-radius: 2px;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 .recordings .recording .dropdown-block {
@@ -92,6 +92,15 @@
 
 .recordings .recording .dropdown-button {
   color: white;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.recordings .recording .dropdown-button:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.recordings .recording .open .dropdown-button {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .recordings .recording .dropdown-button:focus {
