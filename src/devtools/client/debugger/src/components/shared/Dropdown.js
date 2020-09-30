@@ -4,16 +4,20 @@
 
 //
 import React, { Component } from "react";
+import classnames from "classnames";
+
 import "./Dropdown.css";
 
 export class Dropdown extends Component {
   toggleDropdown;
-  constructor(props) {
-    super(props);
-    this.state = {
-      dropdownShown: false,
-    };
-  }
+
+  state = {
+    dropdownShown: false,
+  };
+
+  defaultProps = {
+    panelStyles: {},
+  };
 
   toggleDropdown = e => {
     this.setState(prevState => ({
@@ -22,11 +26,12 @@ export class Dropdown extends Component {
   };
 
   renderPanel() {
+    const { panelStyles } = this.props;
     return (
       <div
         className="dropdown"
         onClick={this.toggleDropdown}
-        style={{ display: this.state.dropdownShown ? "block" : "none" }}
+        style={{ display: this.state.dropdownShown ? "block" : "none", ...panelStyles }}
       >
         {this.props.panel}
       </div>
@@ -54,7 +59,7 @@ export class Dropdown extends Component {
 
   render() {
     return (
-      <div className="dropdown-block">
+      <div className={classnames("dropdown-block", { open: this.state.dropdownShown })}>
         {this.renderPanel()}
         {this.renderButton()}
         {this.renderMask()}
