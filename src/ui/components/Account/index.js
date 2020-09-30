@@ -6,6 +6,7 @@ import Loader from "../shared/Loader";
 import UserPrompt from "../shared/UserPrompt";
 import { gql, useQuery } from "@apollo/client";
 import classnames from "classnames";
+import { setUserInBrowserPrefs } from "../../utils/browser";
 
 import "./Account.css";
 
@@ -59,6 +60,10 @@ function AccountPage() {
 
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
+
+  useEffect(() => {
+    setUserInBrowserPrefs(null);
+  }, []);
 
   return (
     <div className="welcome-screen">
