@@ -5,8 +5,7 @@
 .dropdown {
   background: var(--theme-body-background);
   border: 1px solid var(--theme-splitter-color);
-  border-radius: 4px;
-  box-shadow: 0 4px 4px 0 var(--search-overlays-semitransparent);
+  border-radius: 2px;
   max-height: 300px;
   position: absolute;
   top: 24px;
@@ -93,4 +92,16 @@
   z-index: 999;
   left: 0;
   top: 0;
+}
+
+.dropdown-panel .menu-item {
+  padding: 4px 8px;
+  color: var(--theme-body-color);
+  line-height: 1.75rem;
+  font-size: 1.1rem;
+}
+
+.dropdown-panel .menu-item:hover {
+  cursor: pointer;
+  background-color: var(--grey-20);
 }

@@ -3,8 +3,10 @@ import Recordings from "../Recordings/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import Header from "../Header";
 import Loader from "../shared/Loader";
+import UserPrompt from "../shared/UserPrompt";
 import { gql, useQuery } from "@apollo/client";
 import classnames from "classnames";
+import { setUserInBrowserPrefs } from "../../utils/browser";
 
 import "./Account.css";
 
@@ -15,10 +17,6 @@ const RECORDINGS = gql`
     }
   }
 `;
-
-export function UserPrompt({ children }) {
-  return <div className="user-prompt">{children}</div>;
-}
 
 function FirstRecordingPrompt() {
   return (
@@ -63,12 +61,16 @@ function AccountPage() {
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
 
+  useEffect(() => {
+    setUserInBrowserPrefs(null);
+  }, []);
+
   return (
     <div className="welcome-screen">
       <div className="welcome-panel">
         <img className="logo" src="images/logo.svg" />
         <img className="atwork" src="images/computer-work.svg" />
-        <button onClick={() => loginWithRedirect()}>Log In</button>
+        <button onClick={() => loginWithRedirect()}>Sign In</button>
       </div>
     </div>
   );

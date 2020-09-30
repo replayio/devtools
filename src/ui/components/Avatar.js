@@ -4,27 +4,14 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { getAvatarColor } from "ui/utils/user";
-
-function sendUserToBrowser(user) {
-  user = user === null ? "" : user;
-  if (typeof window == "object") {
-    window.dispatchEvent(
-      new window.CustomEvent("WebChannelMessageToChrome", {
-        detail: JSON.stringify({
-          id: "record-replay",
-          message: { user },
-        }),
-      })
-    );
-  }
-}
+import { setUserInBrowserPrefs } from "../utils/browser";
 
 const Avatar = props => {
   let { player, isFirstPlayer, updateUser } = props;
   let auth = useAuth0();
 
   useEffect(() => {
-    sendUserToBrowser(auth.user);
+    setUserInBrowserPrefs(auth.user);
     updateUser(auth.user);
   }, [auth.user]);
 

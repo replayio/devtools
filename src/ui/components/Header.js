@@ -44,8 +44,10 @@ class Header extends React.Component {
   render() {
     return (
       <div id="header">
-        <div className="logo"></div>
-        <div id="status"></div>
+        <a href="/view">
+          <div className="logo" />
+        </a>
+        <div id="status" />
         <div className="links">
           <a id="headway" onClick={this.toggleHeadway}>
             What&apos;s new

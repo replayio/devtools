@@ -3,6 +3,7 @@ import { prefs } from "../utils/prefs";
 function initialAppState() {
   return {
     recordingId: null,
+    errorMessage: null,
     theme: "theme-light",
     // Whether or not the developer tools toolbox is opened.
     isToolboxOpen: prefs.isToolboxOpen,
@@ -57,3 +58,4 @@ export const getSelectedPanel = state => state.app.selectedPanel;
 export const getLoading = state => state.app.loading;
 export const getRecordingId = state => state.app.recordingId;
 export const getSessionId = state => state.app.sessionId;
+export const getErrorMessage = state => state.app.errorMessage;

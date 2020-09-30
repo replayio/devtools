@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { connect } from "react-redux";
 
 import Toolbox from "./Toolbox";
@@ -7,7 +7,6 @@ import Recordings from "./Recordings/index";
 import Header from "./Header";
 import Viewer from "./Viewer";
 import Loader from "./shared/Loader";
-import { UserPrompt } from "./Account/index";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import RecordingLoadingScreen from "./RecordingLoadingScreen";
 
@@ -35,33 +34,37 @@ function DevtoolsSplitBox({ updateTimelineDimensions, tooltip }) {
   );
 }
 
-export function DevTools({
-  unfocusComment,
-  loading,
-  tooltip,
-  hasFocusedComment,
-  updateTimelineDimensions,
-  recordingDuration,
-  sessionId,
-}) {
-  const recordingIsUploaded = sessionId !== null;
-  const recordingIsFetchedFromServer = recordingDuration !== null;
-  const recordingIsLoading = loading < 100;
+export class DevTools extends React.Component {
+  render() {
+    const {
+      unfocusComment,
+      loading,
+      tooltip,
+      hasFocusedComment,
+      updateTimelineDimensions,
+      recordingDuration,
+      sessionId,
+    } = this.props;
 
-  if (!recordingIsFetchedFromServer || !recordingIsUploaded) {
-    return <Loader />;
-  } else if (recordingIsLoading) {
-    return <RecordingLoadingScreen />;
+    const isRecordingUploaded = sessionId !== null;
+    const isRecordingFetchedFromServer = recordingDuration !== null;
+    const isRecordingLoading = loading < 100;
+
+    if (!isRecordingFetchedFromServer || !isRecordingUploaded) {
+      return <Loader />;
+    } else if (isRecordingLoading) {
+      return <RecordingLoadingScreen />;
+    }
+
+    return (
+      <>
+        <Header />
+        <Comments />
+        {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
+        <DevtoolsSplitBox tooltip={tooltip} updateTimelineDimensions={updateTimelineDimensions} />
+      </>
+    );
   }
-
-  return (
-    <>
-      <Header />
-      <Comments />
-      {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
-      <DevtoolsSplitBox tooltip={tooltip} updateTimelineDimensions={updateTimelineDimensions} />
-    </>
-  );
 }
 
 export default connect(
