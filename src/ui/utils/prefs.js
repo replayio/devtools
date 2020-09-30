@@ -13,6 +13,8 @@ pref("devtools.selected-panel", "debugger");
 pref("devtools.user", "{}");
 pref("devtools.recording-id", "");
 pref("devtools.event-listeners-breakpoints", true);
+// Whether or not the developer tools toolbox is opened by default.
+pref("devtools.toolbox-opened", true);
 
 // app features
 pref("devtools.features.comments", true);
@@ -20,6 +22,7 @@ pref("devtools.features.users", true);
 pref("devtools.features.auth0", true);
 
 export const prefs = new PrefsHelper("devtools", {
+  isToolboxOpen: ["Bool", "toolbox-opened"],
   splitConsole: ["Bool", "split-console"],
   selectedPanel: ["String", "selected-panel"],
   user: ["Json", "user"],

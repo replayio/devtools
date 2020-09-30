@@ -5,6 +5,8 @@ function initialAppState() {
     recordingId: null,
     errorMessage: null,
     theme: "theme-light",
+    // Whether or not the developer tools toolbox is opened.
+    isToolboxOpen: prefs.isToolboxOpen,
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
     tooltip: null,
@@ -19,10 +21,6 @@ export default function update(state = initialAppState(), action) {
       return { ...state, recordingId: action.recordingId };
     }
 
-    case "set_error_message": {
-      return { ...state, errorMessage: action.message };
-    }
-
     case "update_theme": {
       return { ...state, theme: action.theme };
     }
@@ -33,6 +31,10 @@ export default function update(state = initialAppState(), action) {
 
     case "set_split_console": {
       return { ...state, splitConsoleOpen: action.splitConsole };
+    }
+
+    case "set_toolbox_open": {
+      return { ...state, isToolboxOpen: action.isToolboxOpen };
     }
 
     case "loading": {
@@ -51,6 +53,7 @@ export default function update(state = initialAppState(), action) {
 
 export const getTheme = state => state.app.theme;
 export const isSplitConsoleOpen = state => state.app.splitConsoleOpen;
+export const isToolboxOpen = state => state.app.isToolboxOpen;
 export const getSelectedPanel = state => state.app.selectedPanel;
 export const getLoading = state => state.app.loading;
 export const getRecordingId = state => state.app.recordingId;
