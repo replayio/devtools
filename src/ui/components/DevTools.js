@@ -34,25 +34,35 @@ function DevtoolsSplitBox({ updateTimelineDimensions, tooltip }) {
   );
 }
 
+function getUploadingMessage(uploading) {
+  if (!uploading) {
+    return "";
+  }
+
+  const { total, amount } = uploading;
+  if (total) {
+    return `Waiting for upload… ${amount} / ${total} MB`;
+  }
+
+  return `Waiting for upload… ${amount} MB`;
+}
+
 export class DevTools extends React.Component {
   render() {
     const {
       unfocusComment,
       loading,
+      uploading,
       tooltip,
       hasFocusedComment,
       updateTimelineDimensions,
       recordingDuration,
-      sessionId,
     } = this.props;
 
-    const isRecordingUploaded = sessionId !== null;
-    const isRecordingFetchedFromServer = recordingDuration !== null;
-    const isRecordingLoading = loading < 100;
-
-    if (!isRecordingFetchedFromServer || !isRecordingUploaded) {
-      return <Loader />;
-    } else if (isRecordingLoading) {
+    if (recordingDuration === null || uploading) {
+      const message = getUploadingMessage(uploading);
+      return <Loader message={message} />;
+    } else if (loading < 100) {
       return <RecordingLoadingScreen />;
     }
 
@@ -70,6 +80,7 @@ export class DevTools extends React.Component {
 export default connect(
   state => ({
     loading: selectors.getLoading(state),
+    uploading: selectors.getUploading(state),
     tooltip: selectors.getTooltip(state),
     hasFocusedComment: selectors.hasFocusedComment(state),
     recordingDuration: selectors.getRecordingDuration(state),

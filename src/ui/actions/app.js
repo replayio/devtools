@@ -63,3 +63,7 @@ export function setSelectedPanel(panel) {
 export function setErrorMessage(message) {
   return { type: "set_error_message", message };
 }
+
+export function setUploading(uploading) {
+  return { type: "set_uploading", uploading };
+}

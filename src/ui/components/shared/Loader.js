@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import Lottie from "react-lottie";
 import forwardData from "image/lottie/forward.json";
 
-export default function Loader() {
+export default function Loader({ message }) {
   const defaultOptions = {
     loop: true,
     autoplay: true,
@@ -15,6 +15,7 @@ export default function Loader() {
   return (
     <div className="loader">
       <Lottie options={defaultOptions} height={50} width={200} />
+      <div className="loading-message">{message}</div>
     </div>
   );
 }

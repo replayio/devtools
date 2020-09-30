@@ -21,16 +21,19 @@ if (test) {
 
 require("devtools/codemirror-addons");
 
-const { initSocket, sendMessage, log, setStatus, addEventListener } = require("protocol/socket");
+const { initSocket, sendMessage, setStatus, addEventListener } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap");
-const { setupTimeline } = require("ui/actions/timeline");
-const { setupMetadata } = require("ui/actions/metadata");
-const { setupApp } = require("ui/actions/app");
+const {
+  setupTimeline,
+  setupMetadata,
+  setUploading,
+  setupApp,
+  setErrorMessage,
+} = require("ui/actions").actions;
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { prefs } = require("ui/utils/prefs");
-const { setTimelineState } = require("./ui/actions/timeline");
 
 // Create a session to use while debugging.
 async function createSession() {
@@ -43,15 +46,13 @@ async function createSession() {
     const { sessionId } = await sendMessage("Recording.createSession", {
       recordingId,
     });
-    setStatus("");
     window.sessionId = sessionId;
     ThreadFront.setSessionId(sessionId);
-
+    store.dispatch(setUploading(null));
     prefs.recordingId = recordingId;
   } catch (e) {
     if (e.code == 9) {
-      // Invalid recording ID.
-      setStatus("Error: Invalid recording ID");
+      store.dispatch(setErrorMessage("Invalid recording ID"));
     } else {
       throw e;
     }
@@ -61,15 +62,11 @@ async function createSession() {
 function onUploadedData({ uploaded, length }) {
   const uploadedMB = (uploaded / (1024 * 1024)).toFixed(2);
   const lengthMB = length ? (length / (1024 * 1024)).toFixed(2) : undefined;
-  if (lengthMB) {
-    setStatus(`Waiting for upload… ${uploadedMB} / ${lengthMB} MB`);
-  } else {
-    setStatus(`Waiting for upload… ${uploadedMB} MB`);
-  }
+  store.dispatch(setUploading({ total: lengthMB, amount: uploadedMB }));
 }
 
 function onSessionError(error) {
-  store.dispatch({ type: "set_error_message", message: error.message });
+  store.dispatch(setErrorMessage(error.message));
 }
 
 let initialized = false;
