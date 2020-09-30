@@ -55,3 +55,7 @@ export function setSplitConsole(open) {
 export function setSelectedPanel(panel) {
   return { type: "set_selected_panel", panel };
 }
+
+export function setErrorMessage(message) {
+  return { type: "set_error_message", message };
+}
