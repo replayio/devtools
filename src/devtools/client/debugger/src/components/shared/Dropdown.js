@@ -15,7 +15,7 @@ export class Dropdown extends Component {
     dropdownShown: false,
   };
 
-  defaultProps = {
+  static defaultProps = {
     panelStyles: {},
   };
 
