@@ -4,8 +4,9 @@
   font-family: sans-serif;
   display: flex;
   flex-direction: column;
-  --toolbox-background: #f9f9fa;
   z-index: 1; /* Draw toolbox in front of the highlighter overlay. */
+  --toolbox-background: #f9f9fa;
+  --paused-background-color: #5b41ff;
 }
 
 #toolbox-timeline {

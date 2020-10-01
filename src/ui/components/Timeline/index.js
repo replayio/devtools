@@ -75,17 +75,14 @@ export class Timeline extends Component {
     };
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      comments: [],
-      numResizes: 0,
-    };
-
-    gToolbox.timeline = this;
-  }
+  state = {
+    comments: [],
+    numResizes: 0,
+    hoveringOverMarker: false,
+  };
 
   async componentDidMount() {
+    gToolbox.timeline = this;
     this.props.updateTimelineDimensions();
 
     const consoleFrame = this.console.hud.ui;
