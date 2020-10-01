@@ -1,69 +1,115 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import LoginButton from "ui/components/LoginButton";
 import Avatar from "ui/components/Avatar";
+import Title from "./shared/Title";
 import "./Header.css";
 
 import { features } from "ui/utils/prefs";
+import { gql, useQuery } from "@apollo/client";
 
-class Header extends React.Component {
-  componentDidMount() {
-    if (typeof Headway === "object") {
-      // @see https://docs.headwayapp.co/widget for more configuration options.
-      Headway.init(HW_config);
+const RECORDING_TITLE = gql`
+  query RecordingTitle($recordingId: String) {
+    recordings(where: { recording_id: { _eq: $recordingId } }) {
+      id
+      title
+      recordingTitle
     }
   }
+`;
 
-  toggleHeadway = () => {
-    Headway.toggle();
-  };
+function Avatars({ user, getActiveUsers }) {
+  const activeUsers = getActiveUsers();
+  const firstPlayer = user;
+  const otherPlayers = activeUsers.filter(user => user.id != firstPlayer.id);
 
-  renderAvatars() {
-    const { user, getActiveUsers } = this.props;
+  // We sort the other players by ID here to prevent them from shuffling.
+  const sortedOtherPlayers = otherPlayers.sort((a, b) => a.id - b.id);
 
-    const activeUsers = getActiveUsers();
-    const firstPlayer = this.props.user;
-    const otherPlayers = activeUsers.filter(user => user.id != firstPlayer.id);
+  return (
+    <div className="avatars">
+      <Avatar player={firstPlayer} isFirstPlayer={true} />
+      {sortedOtherPlayers.map(player => (
+        <Avatar player={player} isFirstPlayer={false} key={player.id} />
+      ))}
+    </div>
+  );
+}
 
-    // We sort the other players by ID here to prevent them from shuffling.
-    const sortedOtherPlayers = otherPlayers.sort((a, b) => a.id - b.id);
+function Links({ user, getActiveUsers }) {
+  return (
+    <div className="links">
+      <a id="headway" onClick={() => Headway.toggle()}>
+        What&apos;s new
+      </a>
+      <Avatars user={user} getActiveUsers={getActiveUsers} />
+      {features.auth0 ? <LoginButton /> : null}
+    </div>
+  );
+}
 
-    return (
-      <div className="avatars">
-        <Avatar player={firstPlayer} isFirstPlayer={true} />
-        {sortedOtherPlayers.map(player => (
-          <Avatar player={player} isFirstPlayer={false} key={player.id} />
-        ))}
-      </div>
-    );
+function Logo() {
+  return (
+    <>
+      <a href="/view">
+        <div className="logo" />
+      </a>
+      <div id="status" />
+    </>
+  );
+}
+
+function useGetTitle(recordingId) {
+  if (!recordingId) {
+    return null;
   }
 
-  render() {
-    return (
-      <div id="header">
-        <a href="/view">
-          <div className="logo" />
-        </a>
-        <div id="status" />
-        <div className="links">
-          <a id="headway" onClick={this.toggleHeadway}>
-            What&apos;s new
-          </a>
-          {this.renderAvatars()}
-          {features.auth0 ? <LoginButton /> : null}
-        </div>
-      </div>
-    );
+  const { data, loading, error } = useQuery(RECORDING_TITLE, {
+    variables: { recordingId },
+  });
+
+  if (!data || !data.recordings[0]) {
+    return null;
   }
+
+  return data.recordings[0].recordingTitle || data.recordings[0].title;
+}
+
+function Header({ user, getActiveUsers, recordingId }) {
+  const [editingTitle, setEditingTitle] = useState(false);
+  const defaultTitle = useGetTitle(recordingId);
+
+  useEffect(() => {
+    if (typeof Headway === "object") {
+      Headway.init(HW_config);
+    }
+  }, []);
+
+  return (
+    <div id="header">
+      <Logo />
+      {!recordingId ? (
+        <div className="title">Recordings</div>
+      ) : (
+        <Title
+          defaultTitle={defaultTitle}
+          recordingId={recordingId}
+          setEditingTitle={setEditingTitle}
+          editingTitle={editingTitle}
+        />
+      )}
+      <Links user={user} getActiveUsers={getActiveUsers} />
+    </div>
+  );
 }
 
 export default connect(
   state => ({
     user: selectors.getUser(state),
-    users: selectors.getUsers(state),
+    recordingId: selectors.getRecordingId(state),
   }),
-  { seek: actions.seek, getActiveUsers: actions.getActiveUsers }
+  { getActiveUsers: actions.getActiveUsers }
 )(Header);
