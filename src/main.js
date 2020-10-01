@@ -29,6 +29,7 @@ const {
   setupTimeline,
   setupMetadata,
   setUploading,
+  setSessionId,
   setupApp,
   setErrorMessage,
 } = require("ui/actions").actions;
@@ -49,6 +50,7 @@ async function createSession() {
     window.sessionId = sessionId;
     ThreadFront.setSessionId(sessionId);
     store.dispatch(setUploading(null));
+    store.dispatch(setSessionId(sessionId));
     prefs.recordingId = recordingId;
   } catch (e) {
     if (e.code == 9) {

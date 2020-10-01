@@ -3,9 +3,6 @@ import { selectors } from "ui/reducers";
 
 export function setupApp(recordingId, store) {
   store.dispatch({ type: "setup_app", recordingId });
-  ThreadFront.waitForSession().then(sessionId =>
-    store.dispatch({ type: "set_session_id", sessionId })
-  );
   ThreadFront.ensureProcessed(_, regions => store.dispatch(onUnprocessedRegions(regions))).then(
     () => {
       clearInterval(loadingInterval);
@@ -66,4 +63,8 @@ export function setErrorMessage(message) {
 
 export function setUploading(uploading) {
   return { type: "set_uploading", uploading };
+}
+
+export function setSessionId(sessionId) {
+  return { type: "set_session_id", sessionId };
 }
