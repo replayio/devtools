@@ -8,7 +8,9 @@ import { hasInScopeLines, getSourceWithContent, getVisibleSelectedFrame } from "
 
 import { getSourceLineCount } from "../../utils/source";
 
-import { range, flatMap, uniq, without } from "lodash";
+import { range, flatMap, uniq } from "lodash";
+import arrayWithout from "lodash/_baseDifference";
+
 import { isFulfilled } from "../../utils/async-value";
 
 function getOutOfScopeLines(outOfScopeLocations) {
@@ -35,7 +37,7 @@ async function getInScopeLines(cx, location, { dispatch, getState, parser }) {
 
   const sourceLines = range(1, sourceNumLines + 1);
 
-  return !linesOutOfScope ? sourceLines : without(sourceLines, ...linesOutOfScope);
+  return !linesOutOfScope ? sourceLines : arrayWithout(sourceLines, linesOutOfScope);
 }
 
 export function setInScopeLines(cx) {
