@@ -206,9 +206,7 @@
 }
 
 /* Center first level indent within the left gutter */
-.webconsole-app
-  .message:not(.startGroup):not(.startGroupCollapsed)
-  > .indent[data-indent="1"] {
+.webconsole-app .message:not(.startGroup):not(.startGroupCollapsed) > .indent[data-indent="1"] {
   margin-inline-start: calc(1px + var(--console-icon-horizontal-offset));
   margin-inline-end: calc(11px - var(--console-icon-horizontal-offset));
 }
@@ -880,14 +878,8 @@ a.learn-more-link.webconsole-learn-more-link {
 
 /* Center the collapse button in the left gutter (first-level only) */
 .webconsole-app .message.network > .collapse-button,
-.webconsole-app
-  .message.startGroup
-  > .indent[data-indent="0"]
-  ~ .collapse-button,
-.webconsole-app
-  .message.startGroupCollapsed
-  > .indent[data-indent="0"]
-  ~ .collapse-button {
+.webconsole-app .message.startGroup > .indent[data-indent="0"] ~ .collapse-button,
+.webconsole-app .message.startGroupCollapsed > .indent[data-indent="0"] ~ .collapse-button {
   width: 24px;
   margin-inline-start: var(--console-icon-horizontal-offset);
   margin-inline-end: calc(4px - var(--console-icon-horizontal-offset));
@@ -895,14 +887,8 @@ a.learn-more-link.webconsole-learn-more-link {
 
 /* Use a bigger arrow that is visually similar to other icons (10px) */
 .webconsole-app .message.network > .collapse-button::before,
-.webconsole-app
-  .message.startGroup
-  > .indent[data-indent="0"]
-  ~ .collapse-button::before,
-.webconsole-app
-  .message.startGroupCollapsed
-  > .indent[data-indent="0"]
-  ~ .collapse-button::before {
+.webconsole-app .message.startGroup > .indent[data-indent="0"] ~ .collapse-button::before,
+.webconsole-app .message.startGroupCollapsed > .indent[data-indent="0"] ~ .collapse-button::before {
   width: 100%;
   fill: var(--theme-icon-dimmed-color);
 }
@@ -944,9 +930,9 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .webconsole-app .message.paused:not(.paused-before) {
-  border-top-color: var(--purple-50);
+  border-top-color: #5b41ff;
   /* always show the border, even for the last child */
-  border-top-width: 1px;
+  border-top-width: 2px;
 }
 
 .webconsole-app .message.paused ~ .message .message-body-wrapper,
@@ -1009,36 +995,40 @@ a.learn-more-link.webconsole-learn-more-link {
   width: var(--rewind-button-width);
   padding-left: var(--rewind-left-padding);
   margin-left: calc(0px - var(--message-left-padding) - var(--rewind-button-width));
-  background: linear-gradient(0deg, #2D7EFF 0%, #2D7EFF 100%);
+  background: linear-gradient(0deg, #2d7eff 0%, #2d7eff 100%);
   /* for debugging the final position when hovered */
   /* margin-left: calc(0px - var(--message-left-padding)) !important; */
 }
 
 .overlay-container.debug .button {
   margin-left: calc(0px - var(--message-left-padding));
-  background: linear-gradient(0deg, #5B41FF 0%, #5B41FF 100%);
+  background: linear-gradient(
+    0deg,
+    var(--paused-background-color) 0%,
+    var(--paused-background-color) 100%
+  );
 }
 
 .overlay-container .info {
-  background-color: #2D7EFF;
+  background-color: #2d7eff;
   /* for debugging the final position when hovered */
   /* margin-left: calc(var(--rewind-button-width) - var(--message-left-padding) - var(--border-radius)) !important; */
 }
 
 .overlay-container.rewind .info {
   width: var(--rewind-info-button-width);
-  margin-left: calc(0px - var(--message-left-padding) - var(--rewind-info-button-width) );
+  margin-left: calc(0px - var(--message-left-padding) - var(--rewind-info-button-width));
 }
 
 .overlay-container.fast-forward .info {
   width: var(--fast-forward-info-button-width);
-  margin-left: calc(0px - var(--message-left-padding) - var(--fast-forward-info-button-width) );
+  margin-left: calc(0px - var(--message-left-padding) - var(--fast-forward-info-button-width));
 }
 
 .overlay-container.debug .info {
   width: var(--debug-info-button-width);
-  margin-left: calc(0px - var(--message-left-padding) - var(--debug-info-button-width) );
-  background-color: #5B41FF;
+  margin-left: calc(0px - var(--message-left-padding) - var(--debug-info-button-width));
+  background-color: var(--paused-background-color);
 }
 
 .overlay-container .info .label {
@@ -1046,6 +1036,7 @@ a.learn-more-link.webconsole-learn-more-link {
   opacity: 0%;
   transition-duration: 100ms;
   transition-delay: 150ms;
+  transition-timing-function: ease-in-out;
 }
 
 .overlay-container .img {
@@ -1056,6 +1047,7 @@ a.learn-more-link.webconsole-learn-more-link {
   transition-property: opacity;
   transition-duration: 100ms;
   transition-delay: 150ms;
+  transition-timing-function: ease-in-out;
 }
 
 .overlay-container.fast-forward .img {
@@ -1073,17 +1065,19 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .overlay-container:hover .button {
-  background: linear-gradient(152.2deg, #67DAFF 6.75%, #4382FF 93.14%);
-  box-shadow: 1px 0px 3px rgb(0,0,0,0.3);
+  background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
+  box-shadow: 1px 0px 3px rgb(0, 0, 0, 0.3);
 }
 
 .overlay-container.debug:hover .button {
-  background: linear-gradient(152.2deg, #5B41FF 6.75%, #B043FF 93.14%);
+  background: linear-gradient(152.2deg, #5b41ff 6.75%, #b043ff 93.14%);
 }
 
 .overlay-container:hover .info {
   padding-left: 16px;
-  margin-left: calc(var(--rewind-button-width) - var(--message-left-padding) - var(--border-radius));
+  margin-left: calc(
+    var(--rewind-button-width) - var(--message-left-padding) - var(--border-radius)
+  );
 }
 
 .overlay-container:hover .info .label {

@@ -151,7 +151,7 @@ class Message extends Component {
     let onRewindClick = null;
     let overlayType, label, onClick;
 
-    if (inWarningGroup) {
+    if (!pausedExecutionPointTime || inWarningGroup) {
       return undefined;
     }
 

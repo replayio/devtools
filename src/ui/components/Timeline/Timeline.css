@@ -73,17 +73,9 @@
   height: 100%;
   background: var(--progress-playing-background);
   pointer-events: none;
-}
-
-.replay-player .progress::after {
-  background: var(--replay-head-background);
-  width: 1px;
-  height: 100%;
-  right: -0.5px;
-  opacity: 0.4;
-  display: block;
-  content: "";
-  position: absolute;
+  border-right-color: var(--replay-head-background);
+  border-right-width: 2px;
+  border-right-style: solid;
 }
 
 .replay-player .message-container {
@@ -99,6 +91,10 @@
   border: 0.5px solid var(--progress-playing-background);
   height: 7.5px;
   width: 7.5px;
+}
+
+.replay-player .message:focus {
+  outline: none;
 }
 
 .replay-player .message.future {
@@ -118,6 +114,7 @@
 .replay-player .message:hover {
   background: var(--replaying-marker-background-hover);
   cursor: pointer;
+  transform: scale(1.25);
 }
 
 .replay-player .message:hover::before {
