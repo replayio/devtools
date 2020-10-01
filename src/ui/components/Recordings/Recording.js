@@ -1,61 +1,13 @@
 import React, { useState } from "react";
+import Title from "../shared/Title";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import moment from "moment";
-import { gql, useMutation } from "@apollo/client";
 
 function formatDate(date) {
   return moment(date).format("MMM Do, h:mm a");
 }
 
-const UPDATE_RECORDING = gql`
-  mutation MyMutation($id: uuid, $title: String) {
-    update_recordings(_set: { recordingTitle: $title }, where: { id: { _eq: $id } }) {
-      returning {
-        id
-        recordingTitle
-      }
-    }
-  }
-`;
-
-const Title = ({ defaultTitle, id, setEditingTitle, editingTitle }) => {
-  const [updateRecordingTitle] = useMutation(UPDATE_RECORDING);
-  const [title, setTitle] = useState(defaultTitle);
-
-  const saveTitle = () => {
-    updateRecordingTitle({ variables: { id, title } });
-    setEditingTitle(false);
-  };
-  const handleKeyDown = event => {
-    if (event.key == "Enter") {
-      saveTitle();
-    } else if (event.key == "Escape") {
-      setEditingTitle(false);
-    }
-  };
-
-  if (editingTitle) {
-    return (
-      <input
-        type="text"
-        className="title"
-        value={title}
-        onChange={e => setTitle(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onBlur={saveTitle}
-        autoFocus
-      />
-    );
-  }
-
-  return (
-    <div className="title" onClick={() => setEditingTitle(true)}>
-      {title}
-    </div>
-  );
-};
-
-const DropdownPanel = ({ editingTitle, setEditingTitle, onDeleteRecording, id }) => {
+const DropdownPanel = ({ editingTitle, setEditingTitle, onDeleteRecording, recordingId }) => {
   return (
     <div className="dropdown-panel">
       {!editingTitle ? (
@@ -76,7 +28,7 @@ export const Recording = ({ data, onDeleteRecording }) => {
     <DropdownPanel
       editingTitle={editingTitle}
       setEditingTitle={setEditingTitle}
-      id={data.id}
+      recordingId={data.recording_id}
       onDeleteRecording={onDeleteRecording}
     />
   );
@@ -98,7 +50,7 @@ export const Recording = ({ data, onDeleteRecording }) => {
       </div>
       <Title
         defaultTitle={data.recordingTitle || data.title || "Untitled"}
-        id={data.id}
+        recordingId={data.recording_id}
         editingTitle={editingTitle}
         setEditingTitle={setEditingTitle}
       />

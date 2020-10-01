@@ -85,3 +85,43 @@
   background: linear-gradient(138.3deg, #236eff 7.98%, #71e5ff 93.53%);
   transition-duration: 300ms;
 }
+
+#header .title {
+  position: absolute;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  max-width: 320px;
+  color: var(--grey-90);
+  font-size: 1.25rem;
+  line-height: 26px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: none;
+  cursor: text;
+}
+
+#header .title:not(input):hover {
+  color: #2D7EFF;
+}
+
+#header input.title:focus {
+  border: none;
+  outline: none;
+  width: 400px;
+}
+
+@media (max-width: 760px) {
+  #header .title {
+    width: 140px;
+  }
+}
+
+@media (max-width: 600px) {
+  #header .title {
+    display: none;
+  }
+}

@@ -50,7 +50,7 @@ function App({ theme, recordingId, sessionError }) {
     return <PopupBlockedError />;
   }
 
-  if (isLoading || (isAuthenticated && !apolloClient)) {
+  if (isLoading || !apolloClient) {
     return <Loader />;
   }
 
