@@ -11,6 +11,7 @@ function initialAppState() {
     selectedPanel: prefs.selectedPanel,
     tooltip: null,
     loading: 4,
+    uploading: null,
     sessionId: null,
   };
 }
@@ -19,6 +20,14 @@ export default function update(state = initialAppState(), action) {
   switch (action.type) {
     case "setup_app": {
       return { ...state, recordingId: action.recordingId };
+    }
+
+    case "set_uploading": {
+      return { ...state, uploading: action.uploading };
+    }
+
+    case "set_error_message": {
+      return { ...state, errorMessage: action.message };
     }
 
     case "update_theme": {
@@ -56,6 +65,7 @@ export const isSplitConsoleOpen = state => state.app.splitConsoleOpen;
 export const isToolboxOpen = state => state.app.isToolboxOpen;
 export const getSelectedPanel = state => state.app.selectedPanel;
 export const getLoading = state => state.app.loading;
+export const getUploading = state => state.app.uploading;
 export const getRecordingId = state => state.app.recordingId;
 export const getSessionId = state => state.app.sessionId;
 export const getErrorMessage = state => state.app.errorMessage;
