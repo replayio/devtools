@@ -67,15 +67,16 @@ function useGetTitle(recordingId) {
     return null;
   }
 
-  const { data, loading, error } = useQuery(RECORDING_TITLE, {
+  const { data } = useQuery(RECORDING_TITLE, {
     variables: { recordingId },
   });
 
-  if (!data || !data.recordings[0]) {
+  const firstRecording = data?.recordings[0];
+  if (!firstRecording) {
     return null;
   }
 
-  return data.recordings[0].recordingTitle || data.recordings[0].title;
+  return firstRecording.recordingTitle || firstRecording.title;
 }
 
 function Header({ user, getActiveUsers, recordingId }) {
