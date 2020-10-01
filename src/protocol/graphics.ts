@@ -1,19 +1,25 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
 
 const { ThreadFront } = require("./thread");
-const { sendMessage, addEventListener, log } = require("./socket");
 const { assert, binarySearch, defer } = require("./utils");
-const { ScreenshotCache } = require("./screenshot-cache");
-const screenshotCache = new ScreenshotCache();
+import { ScreenshotCache } from "./screenshot-cache";
 const ResizeObserverPolyfill = require("resize-observer-polyfill").default;
+import { TimeStampedPoint, MouseEvent, paintPoints, mouseEvents, ScreenShot } from "record-replay-protocol/js/protocol";
+import { client } from "./socket";
+
+export const screenshotCache = new ScreenshotCache();
+
+interface Timed {
+  time: number;
+}
 
 // Given a sorted array of items with "time" properties, find the index of
 // the most recent item at or preceding a given time.
-function mostRecentIndex(array, time) {
+function mostRecentIndex<T extends Timed>(array: T[], time: number): number | undefined {
   if (!array.length || time < array[0].time) {
     return undefined;
   }
-  const index = binarySearch(0, array.length, index => {
+  const index = binarySearch(0, array.length, (index: number) => {
     return time - array[index].time;
   });
   assert(array[index].time <= time);
@@ -23,12 +29,12 @@ function mostRecentIndex(array, time) {
   return index;
 }
 
-function mostRecentEntry(array, time) {
+function mostRecentEntry<T extends Timed>(array: T[], time: number) {
   const index = mostRecentIndex(array, time);
   return index !== undefined ? array[index] : null;
 }
 
-function nextEntry(array, time) {
+function nextEntry<T extends Timed>(array: T[], time: number) {
   const index = mostRecentIndex(array, time);
   if (index === undefined) {
     return array.length ? array[0] : null;
@@ -37,7 +43,7 @@ function nextEntry(array, time) {
 }
 
 // Add an entry with a "time" property to an array that is sorted by time.
-function insertEntrySorted(array, entry) {
+function insertEntrySorted<T extends Timed>(array: T[], entry: T) {
   if (!array.length || array[array.length - 1].time <= entry.time) {
     array.push(entry);
   } else {
@@ -50,7 +56,7 @@ function insertEntrySorted(array, entry) {
   }
 }
 
-function closerEntry(time, entry1, entry2) {
+function closerEntry<T1 extends Timed, T2 extends Timed>(time: number, entry1: T1 | null, entry2: T2 | null) {
   if (!entry1) {
     return entry2;
   }
@@ -67,28 +73,32 @@ function closerEntry(time, entry1, entry2) {
 // Paint / Mouse Event Points
 //////////////////////////////
 
+interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
+  paintHash: string;
+}
+
 // All paints that have occurred in the recording, in order. Include the
 // beginning point of the recording as well, which is not painted and has
 // a known point and time.
-const gPaintPoints = [{ point: "0", time: 0 }];
+const gPaintPoints: TimeStampedPointWithPaintHash[] = [{ point: "0", time: 0, paintHash: "" }];
 
 // All mouse events that have occurred in the recording, in order.
-const gMouseEvents = [];
+const gMouseEvents: MouseEvent[] = [];
 
 // All mouse click events that have occurred in the recording, in order.
-const gMouseClickEvents = [];
+const gMouseClickEvents: MouseEvent[] = [];
 
 // Device pixel ratio used by recording screen shots.
-let gDevicePixelRatio;
+let gDevicePixelRatio: number;
 
-function onPaints({ paints }) {
+function onPaints({ paints }: paintPoints) {
   paints.forEach(({ point, time, screenShots }) => {
-    const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg").hash;
+    const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")!.hash;
     insertEntrySorted(gPaintPoints, { point, time, paintHash });
   });
 }
 
-function onMouseEvents({ events }) {
+function onMouseEvents({ events }: mouseEvents) {
   events.forEach(entry => {
     insertEntrySorted(gMouseEvents, entry);
     if (entry.kind == "mousedown") {
@@ -97,19 +107,19 @@ function onMouseEvents({ events }) {
   });
 }
 
-ThreadFront.sessionWaiter.promise.then(sessionId => {
-  sendMessage("Graphics.findPaints", {}, sessionId);
-  addEventListener("Graphics.paintPoints", onPaints);
+ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
+  client.Graphics.findPaints({}, sessionId);
+  client.Graphics.addPaintPointsListener(onPaints);
 
-  sendMessage("Session.findMouseEvents", {}, sessionId);
-  addEventListener("Session.mouseEvents", onMouseEvents);
+  client.Session.findMouseEvents({}, sessionId);
+  client.Session.addMouseEventsListener(onMouseEvents);
 
-  sendMessage("Graphics.getDevicePixelRatio", {}, sessionId).then(({ ratio }) => {
+  client.Graphics.getDevicePixelRatio({}, sessionId).then(({ ratio }) => {
     gDevicePixelRatio = ratio;
   });
 });
 
-function addLastScreen(screen, point, time) {
+export function addLastScreen(screen: ScreenShot, point: string, time: number) {
   let paintHash;
   if (screen) {
     addScreenShot(screen);
@@ -118,23 +128,23 @@ function addLastScreen(screen, point, time) {
   insertEntrySorted(gPaintPoints, { point, time, paintHash });
 }
 
-function mostRecentPaintOrMouseEvent(time) {
+export function mostRecentPaintOrMouseEvent(time: number) {
   const paintEntry = mostRecentEntry(gPaintPoints, time);
   const mouseEntry = mostRecentEntry(gMouseEvents, time);
   return closerEntry(time, paintEntry, mouseEntry);
 }
 
-function nextPaintOrMouseEvent(time) {
+export function nextPaintOrMouseEvent(time: number) {
   const paintEntry = nextEntry(gPaintPoints, time);
   const mouseEntry = nextEntry(gMouseEvents, time);
   return closerEntry(time, paintEntry, mouseEntry);
 }
 
-function nextPaintEvent(time) {
+export function nextPaintEvent(time: number) {
   return nextEntry(gPaintPoints, time);
 }
 
-function previousPaintEvent(time) {
+export function previousPaintEvent(time: number) {
   const entry = mostRecentEntry(gPaintPoints, time);
   if (entry && entry.time == time) {
     return mostRecentEntry(gPaintPoints, time - 1);
@@ -142,17 +152,17 @@ function previousPaintEvent(time) {
   return entry;
 }
 
-function getMostRecentPaintPoint(time) {
+export function getMostRecentPaintPoint(time: number) {
   return mostRecentEntry(gPaintPoints, time);
 }
 
-function getClosestPaintPoint(time) {
+export function getClosestPaintPoint(time: number) {
   const entryBefore = mostRecentEntry(gPaintPoints, time);
   const entryAfter = nextEntry(gPaintPoints, time);
   return closerEntry(time, entryBefore, entryAfter);
 }
 
-function getDevicePixelRatio() {
+export function getDevicePixelRatio() {
   return gDevicePixelRatio;
 }
 
@@ -160,21 +170,28 @@ function getDevicePixelRatio() {
 // Paint Data Management
 //////////////////////////////
 
-function addScreenShot(screenShot) {
+function addScreenShot(screenShot: ScreenShot) {
   screenshotCache.addScreenshot(screenShot);
 }
 
 // How recently a click must have occurred for it to be drawn.
 const ClickThresholdMs = 200;
 
-async function getGraphicsAtTime(time) {
-  const paintIndex = mostRecentIndex(gPaintPoints, time);
-  const { point, paintHash } = gPaintPoints[paintIndex] || {};
+interface MouseAndClickPosition {
+  x: number;
+  y: number;
+  clickX?: number;
+  clickY?: number;
+}
 
-  if (paintHash === undefined) {
+export async function getGraphicsAtTime(time: number): Promise<{ screen?: ScreenShot, mouse?: MouseAndClickPosition }> {
+  const paintIndex = mostRecentIndex(gPaintPoints, time);
+  if (paintIndex === undefined) {
     // There are no graphics to paint here.
     return {};
   }
+
+  const { point, paintHash } = gPaintPoints[paintIndex] || {};
 
   const screenPromise = screenshotCache.getScreenshotForPlayback(point, paintHash);
 
@@ -186,7 +203,7 @@ async function getGraphicsAtTime(time) {
 
   const screen = await screenPromise;
 
-  let mouse;
+  let mouse: MouseAndClickPosition | undefined;
   const mouseEvent = mostRecentEntry(gMouseEvents, time);
   if (mouseEvent) {
     mouse = { x: mouseEvent.clientX, y: mouseEvent.clientY };
@@ -205,16 +222,16 @@ async function getGraphicsAtTime(time) {
 //////////////////////////////
 
 // Image to draw, if any.
-let gDrawImage;
+let gDrawImage: HTMLImageElement | null = null;
 
 // Last image we were drawing, if any. This continues to be painted until the
 // current image loads.
-let gLastImage;
+let gLastImage: HTMLImageElement | null = null;
 
 // Mouse information to draw.
-let gDrawMouse;
+let gDrawMouse: MouseAndClickPosition | null = null;
 
-function paintGraphics(screenShot, mouse) {
+export function paintGraphics(screenShot: ScreenShot, mouse: MouseAndClickPosition) {
   if (!screenShot) {
     clearGraphics();
     return;
@@ -238,7 +255,7 @@ function clearGraphics() {
   refreshGraphics();
 }
 
-function drawCursor(cx, x, y) {
+function drawCursor(cx: CanvasRenderingContext2D, x: number, y: number) {
   const scale = 1.5 * (gDevicePixelRatio || 1);
   const path = new Path2D(`
 M ${x} ${y}
@@ -257,7 +274,7 @@ Z
   cx.stroke(path);
 }
 
-function drawClick(cx, x, y) {
+function drawClick(cx: CanvasRenderingContext2D, x: number, y: number) {
   const scale = gDevicePixelRatio || 1;
   cx.strokeStyle = "black";
   cx.lineWidth = 3;
@@ -266,14 +283,14 @@ function drawClick(cx, x, y) {
   cx.stroke();
 }
 
-function refreshGraphics() {
+export function refreshGraphics() {
   const viewer = document.getElementById("viewer");
   if (!viewer) {
     return;
   }
 
   const bounds = viewer.getBoundingClientRect();
-  const canvas = document.getElementById("graphics");
+  const canvas = document.getElementById("graphics") as HTMLCanvasElement;
 
   // Find an image to draw.
   let image;
@@ -303,10 +320,10 @@ function refreshGraphics() {
   const offsetLeft = (bounds.width - drawWidth) / 2;
   const offsetTop = (bounds.height - drawHeight) / 2;
 
-  canvas.style.left = offsetLeft;
-  canvas.style.top = offsetTop;
+  canvas.style.left = String(offsetLeft);
+  canvas.style.top = String(offsetTop);
 
-  const cx = canvas.getContext("2d");
+  const cx = canvas.getContext("2d")!;
   cx.drawImage(image, 0, 0);
 
   if (gDrawMouse) {
@@ -318,13 +335,13 @@ function refreshGraphics() {
   }
 
   // Apply the same transforms to any displayed highlighter.
-  const highlighterContainer = document.querySelector(".highlighter-container");
+  const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;
   if (highlighterContainer && gDevicePixelRatio) {
     highlighterContainer.style.transform = `scale(${scale * gDevicePixelRatio})`;
-    highlighterContainer.style.left = offsetLeft;
-    highlighterContainer.style.top = offsetTop;
-    highlighterContainer.style.width = image.width;
-    highlighterContainer.style.height = image.height;
+    highlighterContainer.style.left = String(offsetLeft);
+    highlighterContainer.style.top = String(offsetTop);
+    highlighterContainer.style.width = String(image.width);
+    highlighterContainer.style.height = String(image.height);
   }
 }
 
@@ -341,18 +358,3 @@ function installObserver() {
   }
 }
 installObserver();
-
-module.exports = {
-  screenshotCache,
-  addLastScreen,
-  mostRecentPaintOrMouseEvent,
-  nextPaintOrMouseEvent,
-  nextPaintEvent,
-  previousPaintEvent,
-  paintGraphics,
-  getGraphicsAtTime,
-  getMostRecentPaintPoint,
-  refreshGraphics,
-  getDevicePixelRatio,
-  getClosestPaintPoint,
-};
