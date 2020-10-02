@@ -16,8 +16,8 @@
   --progress-recording-background: hsl(0, 100%, 97%);
   --progress-playing-background: #d4ebff;
   --recording-marker-background: hsl(14.9, 100%, 67%);
-  --replaying-marker-fill: var(--blue-40);
-  --replaying-marker-stroke: var(--blue-40);
+  --replaying-marker-fill: #3a8edb;
+  --replaying-marker-stroke: #266fb1;
   --replaying-paused-marker-fill: #5b41ff;
   --replaying-paused-marker-stroke: #3d23e2;
   --replaying-marker-highlighted-background: var(--blue-60);
@@ -41,8 +41,8 @@
   --progress-recording-line: #ff2038;
   --recording-marker-background: #9b3131;
   --recording-marker-background-hover: #a82323;
-  --replaying-marker-fill: #266fb1;
-  --replaying-marker-stroke: #3a8edb;
+  --replaying-marker-fill: var(--blue-40);
+  --replaying-marker-stroke: var(--blue-40);
   --replaying-paused-marker-fill: #5b41ff;
   --replaying-paused-marker-stroke: #1a72dc;
   --replaying-marker-highlighted-background: #3084d0;

@@ -229,12 +229,15 @@ export class Timeline extends Component {
     const isHovered = window.elementIsHovered(this.$progressBar);
     if (!isHovered) {
       clearInterval(this.hoverInterval);
+      this.hoverInterval = null;
       hideTooltip();
     }
   };
 
   onPlayerMouseEnter = async e => {
-    this.hoverInterval = setInterval(this.hoverTimer, 100);
+    if (!this.hoverInterval) {
+      this.hoverInterval = setInterval(this.hoverTimer, 100);
+    }
   };
 
   onPlayerMouseMove = async e => {
