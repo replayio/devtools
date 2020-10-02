@@ -278,7 +278,7 @@
 .theme-light .replay-player {
   --commandbar-button-hover-background: #efefef;
   --progress-recording-background: hsl(0, 100%, 97%);
-  --progress-playing-background: hsl(207, 100%, 97%);
+  --progress-playing-background: linear-gradient(100.04deg, #d4ebff 50%, #c0e2ff 90%);
   --recording-marker-background: hsl(14.9, 100%, 67%);
   --replaying-marker-background: var(--blue-40);
   --replaying-marker-highlighted-background: var(--blue-60);
