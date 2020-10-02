@@ -573,9 +573,9 @@ export class Timeline extends Component {
           left: `${Math.max(offset, 0)}px`,
         },
       },
-      dom.img({
-        src: "images/scrubber.svg",
-      })
+      <svg width="9" height="10" viewBox="0 0 9 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0H9V6L4.5 10L0 6V0Z" fill="#9400FF" />
+      </svg>
     );
   }
 
@@ -590,9 +590,9 @@ export class Timeline extends Component {
           left: `${Math.max(offset, 0)}px`,
         },
       },
-      dom.img({
-        src: "images/scrubber.svg",
-      })
+      <svg width="9" height="10" viewBox="0 0 9 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0H9V6L4.5 10L0 6V0Z" fill="#9400FF" />
+      </svg>
     );
   }
 
