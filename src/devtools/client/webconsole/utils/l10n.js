@@ -19,11 +19,9 @@ const l10n = {
    */
   timestampString: function (milliseconds) {
     const d = new Date(milliseconds ? milliseconds : null);
-    const hours = d.getHours();
     const minutes = d.getMinutes();
     const seconds = d.getSeconds();
-    milliseconds = d.getMilliseconds();
-    const parameters = [hours, minutes, seconds, milliseconds];
+    const parameters = [minutes, seconds];
     return l10n.getFormatStr("timestampFormat", parameters);
   },
 
