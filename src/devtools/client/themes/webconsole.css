@@ -962,11 +962,11 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 /* Overlay buttons */
-.overlay-container {
+.webconsole-output .overlay-container {
   cursor: pointer;
 }
 
-.overlay-container > * {
+.webconsole-output .overlay-container > * {
   display: flex;
   position: absolute;
   height: 22px;
@@ -985,7 +985,7 @@ a.learn-more-link.webconsole-learn-more-link {
   --debug-info-button-width: 60px;
 }
 
-.overlay-container .button {
+.webconsole-output .overlay-container .button {
   width: var(--rewind-button-width);
   padding-left: var(--rewind-left-padding);
   margin-left: calc(0px - var(--message-left-padding) - var(--rewind-button-width));
@@ -994,7 +994,7 @@ a.learn-more-link.webconsole-learn-more-link {
   /* margin-left: calc(0px - var(--message-left-padding)) !important; */
 }
 
-.overlay-container.debug .button {
+.webconsole-output .overlay-container.debug .button {
   margin-left: calc(0px - var(--message-left-padding));
   background: linear-gradient(
     0deg,
@@ -1003,29 +1003,29 @@ a.learn-more-link.webconsole-learn-more-link {
   );
 }
 
-.overlay-container .info {
+.webconsole-output .overlay-container .info {
   background-color: #2d7eff;
   /* for debugging the final position when hovered */
   /* margin-left: calc(var(--rewind-button-width) - var(--message-left-padding) - var(--border-radius)) !important; */
 }
 
-.overlay-container.rewind .info {
+.webconsole-output .overlay-container.rewind .info {
   width: var(--rewind-info-button-width);
   margin-left: calc(0px - var(--message-left-padding) - var(--rewind-info-button-width));
 }
 
-.overlay-container.fast-forward .info {
+.webconsole-output .overlay-container.fast-forward .info {
   width: var(--fast-forward-info-button-width);
   margin-left: calc(0px - var(--message-left-padding) - var(--fast-forward-info-button-width));
 }
 
-.overlay-container.debug .info {
+.webconsole-output .overlay-container.debug .info {
   width: var(--debug-info-button-width);
   margin-left: calc(0px - var(--message-left-padding) - var(--debug-info-button-width));
   background-color: var(--paused-background-color);
 }
 
-.overlay-container .info .label {
+.webconsole-output .overlay-container .info .label {
   color: white;
   opacity: 0%;
   transition-duration: 100ms;
@@ -1033,7 +1033,7 @@ a.learn-more-link.webconsole-learn-more-link {
   transition-timing-function: ease-in-out;
 }
 
-.overlay-container .img {
+.webconsole-output .overlay-container .img {
   opacity: 100%;
   background-color: white;
   background-position: center;
@@ -1044,7 +1044,7 @@ a.learn-more-link.webconsole-learn-more-link {
   transition-timing-function: ease-in-out;
 }
 
-.overlay-container.fast-forward .img {
+.webconsole-output .overlay-container.fast-forward .img {
   transform: scaleX(-1);
 }
 
@@ -1066,22 +1066,22 @@ a.learn-more-link.webconsole-learn-more-link {
   opacity: 100%;
 }
 
-.overlay-container:hover .button {
+.webconsole-output .overlay-container:hover .button {
   background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
   box-shadow: 1px 0px 3px rgb(0, 0, 0, 0.3);
 }
 
-.overlay-container.debug:hover .button {
+.webconsole-output .overlay-container.debug:hover .button {
   background: linear-gradient(152.2deg, #5b41ff 6.75%, #b043ff 93.14%);
 }
 
-.overlay-container:hover .info {
+.webconsole-output .overlay-container:hover .info {
   padding-left: 16px;
   margin-left: calc(
     var(--rewind-button-width) - var(--message-left-padding) - var(--border-radius)
   );
 }
 
-.overlay-container:hover .info .label {
+.webconsole-output .overlay-container:hover .info .label {
   opacity: 100%;
 }
