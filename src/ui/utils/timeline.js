@@ -1,4 +1,4 @@
-const timelineMarkerWidth = 11;
+export const timelineMarkerWidth = 11;
 
 // calculate pixel distance from two times
 export function getPixelDistance({ to, from, zoom, overlayWidth }) {

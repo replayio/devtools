@@ -31,12 +31,11 @@ const { assert } = require("protocol/utils");
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
 import Message from "./Message";
+import { timelineMarkerWidth } from "../../utils/timeline";
 
 const { div } = dom;
 
 import "./Timeline.css";
-
-const markerWidth = 11;
 
 function classname(name, bools) {
   for (const key in bools) {
@@ -485,7 +484,7 @@ export class Timeline extends Component {
   // Get the percent value for the left offset of a message.
   getLeftOffset(message) {
     const messagePosition = this.getVisiblePosition(message.executionPointTime) * 100;
-    const messageWidth = (markerWidth / this.overlayWidth) * 100;
+    const messageWidth = (timelineMarkerWidth / this.overlayWidth) * 100;
 
     return Math.max(messagePosition - messageWidth / 2, 0);
   }
@@ -532,7 +531,7 @@ export class Timeline extends Component {
     }
 
     const middlePercent = this.getVisiblePosition(comment.time) * 100;
-    const widthPercent = (markerWidth / this.overlayWidth) * 100;
+    const widthPercent = (timelineMarkerWidth / this.overlayWidth) * 100;
     const percent = Math.max(middlePercent - widthPercent / 2, 0);
 
     return dom.a({
