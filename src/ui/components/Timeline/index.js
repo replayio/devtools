@@ -31,12 +31,11 @@ const { assert } = require("protocol/utils");
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
 import Message from "./Message";
+import { timelineMarkerWidth } from "../../constants";
 
 const { div } = dom;
 
 import "./Timeline.css";
-
-const markerWidth = 7;
 
 function classname(name, bools) {
   for (const key in bools) {
@@ -229,12 +228,15 @@ export class Timeline extends Component {
     const isHovered = window.elementIsHovered(this.$progressBar);
     if (!isHovered) {
       clearInterval(this.hoverInterval);
+      this.hoverInterval = null;
       hideTooltip();
     }
   };
 
   onPlayerMouseEnter = async e => {
-    this.hoverInterval = setInterval(this.hoverTimer, 100);
+    if (!this.hoverInterval) {
+      this.hoverInterval = setInterval(this.hoverTimer, 100);
+    }
   };
 
   onPlayerMouseMove = async e => {
@@ -482,13 +484,13 @@ export class Timeline extends Component {
   // Get the percent value for the left offset of a message.
   getLeftOffset(message) {
     const messagePosition = this.getVisiblePosition(message.executionPointTime) * 100;
-    const messageWidth = (markerWidth / this.overlayWidth) * 100;
+    const messageWidth = (timelineMarkerWidth / this.overlayWidth) * 100;
 
     return Math.max(messagePosition - messageWidth / 2, 0);
   }
 
   renderMessages() {
-    const { messages, currentTime, pausedMessage, highlightedMessage, zoomRegion } = this.props;
+    const { messages, currentTime, highlightedMessage, zoomRegion } = this.props;
     let visibleIndex;
 
     return messages.map((message, index) => {
@@ -499,7 +501,6 @@ export class Timeline extends Component {
           index={index}
           messages={messages}
           currentTime={currentTime}
-          pausedMessage={pausedMessage}
           highlightedMessage={highlightedMessage}
           zoomRegion={zoomRegion}
           overlayWidth={this.overlayWidth}
@@ -530,7 +531,7 @@ export class Timeline extends Component {
     }
 
     const middlePercent = this.getVisiblePosition(comment.time) * 100;
-    const widthPercent = (markerWidth / this.overlayWidth) * 100;
+    const widthPercent = (timelineMarkerWidth / this.overlayWidth) * 100;
     const percent = Math.max(middlePercent - widthPercent / 2, 0);
 
     return dom.a({
@@ -556,21 +557,43 @@ export class Timeline extends Component {
     return comments.map(comment => this.renderCommentMarker(comment));
   }
 
-  renderHoverPoint() {
-    const { hoverTime, hoveredMessage } = this.props;
+  renderHoverScrubber() {
+    const { hoverTime, hoveredMessage, currentTime } = this.props;
+
     if (hoverTime == null || hoveredMessage) {
       return [];
     }
-    const offset = this.getPixelOffset(hoverTime);
-    return [
-      dom.span({
-        className: "hoverPoint",
+
+    let offset = this.getPixelOffset(hoverTime);
+
+    return dom.span(
+      {
+        className: "scrubber hovered",
         style: {
           left: `${Math.max(offset, 0)}px`,
-          zIndex: 1000,
         },
-      }),
-    ];
+      },
+      dom.img({
+        src: "images/scrubber.svg",
+      })
+    );
+  }
+
+  renderPausedScrubber() {
+    const { hoverTime, hoveredMessage, currentTime } = this.props;
+    let offset = this.getPixelOffset(currentTime);
+
+    return dom.span(
+      {
+        className: "scrubber",
+        style: {
+          left: `${Math.max(offset, 0)}px`,
+        },
+      },
+      dom.img({
+        src: "images/scrubber.svg",
+      })
+    );
   }
 
   renderUnprocessedRegions() {
@@ -640,7 +663,8 @@ export class Timeline extends Component {
           ...this.renderUnprocessedRegions(),
           <ScrollContainer />
         ),
-        ...this.renderHoverPoint()
+        this.renderHoverScrubber(),
+        this.renderPausedScrubber()
       )
     );
   }
