@@ -36,7 +36,7 @@ const { div } = dom;
 
 import "./Timeline.css";
 
-const markerWidth = 7;
+const markerWidth = 11;
 
 function classname(name, bools) {
   for (const key in bools) {
@@ -488,7 +488,7 @@ export class Timeline extends Component {
   }
 
   renderMessages() {
-    const { messages, currentTime, pausedMessage, highlightedMessage, zoomRegion } = this.props;
+    const { messages, currentTime, highlightedMessage, zoomRegion } = this.props;
     let visibleIndex;
 
     return messages.map((message, index) => {
@@ -499,7 +499,6 @@ export class Timeline extends Component {
           index={index}
           messages={messages}
           currentTime={currentTime}
-          pausedMessage={pausedMessage}
           highlightedMessage={highlightedMessage}
           zoomRegion={zoomRegion}
           overlayWidth={this.overlayWidth}
@@ -556,21 +555,43 @@ export class Timeline extends Component {
     return comments.map(comment => this.renderCommentMarker(comment));
   }
 
-  renderHoverPoint() {
-    const { hoverTime, hoveredMessage } = this.props;
+  renderHoverScrubber() {
+    const { hoverTime, hoveredMessage, currentTime } = this.props;
+
     if (hoverTime == null || hoveredMessage) {
       return [];
     }
-    const offset = this.getPixelOffset(hoverTime);
-    return [
-      dom.span({
-        className: "hoverPoint",
+
+    let offset = this.getPixelOffset(hoverTime);
+
+    return dom.span(
+      {
+        className: "scrubber hovered",
         style: {
           left: `${Math.max(offset, 0)}px`,
-          zIndex: 1000,
         },
-      }),
-    ];
+      },
+      dom.img({
+        src: "images/scrubber.svg",
+      })
+    );
+  }
+
+  renderPausedScrubber() {
+    const { hoverTime, hoveredMessage, currentTime } = this.props;
+    let offset = this.getPixelOffset(currentTime);
+
+    return dom.span(
+      {
+        className: "scrubber",
+        style: {
+          left: `${Math.max(offset, 0)}px`,
+        },
+      },
+      dom.img({
+        src: "images/scrubber.svg",
+      })
+    );
   }
 
   renderUnprocessedRegions() {
@@ -640,7 +661,8 @@ export class Timeline extends Component {
           ...this.renderUnprocessedRegions(),
           <ScrollContainer />
         ),
-        ...this.renderHoverPoint()
+        this.renderHoverScrubber(),
+        this.renderPausedScrubber()
       )
     );
   }

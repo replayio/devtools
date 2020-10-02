@@ -7,19 +7,23 @@
   min-height: 29px;
   --progressbar-transition: 200ms;
   display: flex;
+  height: 100%;
+  padding-right: 10px;
 }
 
 .theme-light .replay-player {
   --commandbar-button-hover-background: #efefef;
   --progress-recording-background: hsl(0, 100%, 97%);
-  --progress-playing-background: hsl(207, 100%, 97%);
+  --progress-playing-background: #d4ebff;
   --recording-marker-background: hsl(14.9, 100%, 67%);
-  --replaying-marker-background: var(--blue-40);
+  --replaying-marker-fill: var(--blue-40);
+  --replaying-marker-stroke: var(--blue-40);
+  --replaying-paused-marker-fill: #5b41ff;
+  --replaying-paused-marker-stroke: #3d23e2;
   --replaying-marker-highlighted-background: var(--blue-60);
-  --replaying-marker-location-background: var(--blue-50);
   --recording-marker-background-hover: hsl(14.9, 100%, 47%);
-  --replaying-marker-background-hover: var(--blue-60);
-  --hover-point: var(--blue-50);
+  --replaying-marker-fill-hover: var(--blue-60);
+  --hover-scrubber-line-background: var(--blue-50);
   --progress-recording-line: #d0021b;
   --progressbar-background: #fff;
   --progressbar-line-color: var(--blue-40);
@@ -37,11 +41,13 @@
   --progress-recording-line: #ff2038;
   --recording-marker-background: #9b3131;
   --recording-marker-background-hover: #a82323;
-  --replaying-marker-background: #266fb1;
+  --replaying-marker-fill: #266fb1;
+  --replaying-marker-stroke: #3a8edb;
+  --replaying-paused-marker-fill: #5b41ff;
+  --replaying-paused-marker-stroke: #1a72dc;
   --replaying-marker-highlighted-background: #3084d0;
-  --replaying-marker-location-background: #3084d0;
-  --replaying-marker-background-hover: #3a8edb;
-  --hover-point: var(--blue-50);
+  --replaying-marker-fill-hover: #3a8edb;
+  --hover-scrubber-line-background: var(--blue-50);
   --progressbar-background: #0c0c0d;
   --proggressbar-border-color: var(--theme-splitter-color);
   --progressbar-line-color: #0a4786;
@@ -61,7 +67,7 @@
   position: relative;
   width: 100%;
   height: 25px;
-  background: var(--progressbar-background);
+  background: #d4ebff;
   border: 1px solid var(--proggressbar-border-color);
   overflow: hidden;
   margin: 6px 5px 2px 0;
@@ -71,62 +77,83 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background: var(--progress-playing-background);
+  background: #c0e2ff;
   pointer-events: none;
   border-right-color: var(--replay-head-background);
-  border-right-width: 2px;
+  border-right-width: 1px;
   border-right-style: solid;
 }
 
 .replay-player .message-container {
-  top: calc(50% - 2.75px);
   position: absolute;
   width: 100%;
+  height: 100%;
 }
 
 .replay-player .message {
   position: absolute;
-  border-radius: 4.5px;
-  background: var(--replaying-marker-background);
-  border: 0.5px solid var(--progress-playing-background);
-  height: 7.5px;
-  width: 7.5px;
+  height: 11px;
+  width: 11px;
+  position: absolute;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
+}
+
+.replay-player .message:hover {
+  cursor: pointer;
+}
+
+.replay-player .message.highlighted .fill {
+  fill: var(--replaying-marker-stroke);
+  transition-duration: 100ms;
+}
+
+.replay-player .message.highlighted  {
+  transform: scale(1.2);
+  transition-duration: 100ms;
+}
+
+.replay-player .message .fill {
+  fill: var(--replaying-marker-fill);
+}
+
+.replay-player .message .stroke {
+  stroke: var(--replaying-marker-stroke);
+  pointer-events: none;
+}
+
+.replay-player .message.paused .fill {
+  fill: var(--replaying-paused-marker-fill);
+}
+
+.replay-player .message.paused .stroke {
+  stroke: var(--replaying-paused-marker-stroke);
 }
 
 .replay-player .message:focus {
   outline: none;
 }
 
-.replay-player .message.future {
-  border-color: var(--progressbar-background);
-}
-
-.replay-player .message.highlighted {
-  background-color: var(--replaying-marker-highlighted-background);
-  transform: scale(1.25);
-  transition-duration: 100ms;
-}
-
-.replay-player .message.location {
-  background: var(--replaying-marker-location-background);
-}
-
-.replay-player .message:hover {
-  background: var(--replaying-marker-background-hover);
-  cursor: pointer;
-  transform: scale(1.25);
-}
-
-.replay-player .message:hover::before {
-  transform: scale(0.1);
-}
-
-.replay-player .hoverPoint {
+.replay-player .scrubber {
   position: absolute;
   height: 100%;
   width: 1px;
-  background: var(--hover-point);
   pointer-events: none;
+  background: transparent;
+  z-index: 1000;
+}
+
+.replay-player .scrubber.hovered {
+  background: var(--hover-scrubber-line-background);
+}
+
+/* The scrubber is 9px wide, so shifting it 4px to the left
+gets the scrubber's center position (5px) right on top of the
+pause line or the hover preview line */
+.replay-player .scrubber img {
+  margin-left: -4px;
 }
 
 .replay-player .commands {
@@ -188,9 +215,11 @@
   height: 1px;
   background: var(--progressbar-line-color);
   position: absolute;
-  left: 0;
-  top: 50%;
   pointer-events: none;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
 }
 
 .replay-player .progress-line.end {
@@ -260,126 +289,4 @@
 .replay-player .zoomboundary {
   padding-top: 7px;
   padding-right: 4px;
-}
-
-/*. replay */
-
-.replay-player {
-  -moz-appearance: none;
-  background: var(--theme-tab-toolbar-background);
-  box-sizing: border-box;
-  min-height: 29px;
-  --progressbar-transition: 200ms;
-  display: flex;
-  height: 100%;
-  padding-right: 10px;
-}
-
-.theme-light .replay-player {
-  --commandbar-button-hover-background: #efefef;
-  --progress-recording-background: hsl(0, 100%, 97%);
-  --progress-playing-background: linear-gradient(100.04deg, #d4ebff 50%, #c0e2ff 90%);
-  --recording-marker-background: hsl(14.9, 100%, 67%);
-  --replaying-marker-background: var(--blue-40);
-  --replaying-marker-highlighted-background: var(--blue-60);
-  --replaying-marker-location-background: var(--blue-50);
-  --recording-marker-background-hover: hsl(14.9, 100%, 47%);
-  --replaying-marker-background-hover: var(--blue-60);
-  --progress-recording-line: #d0021b;
-  --progressbar-background: #fff;
-  --progressbar-line-color: var(--blue-40);
-  --proggressbar-border-color: var(--theme-splitter-color);
-  --tick-future-background: #bfc9d2;
-  --tick-background: var(--blue-50);
-  --tick-recording-background: #d0021b;
-  --replay-head-background: var(--purple-50);
-}
-
-.theme-dark .replay-player {
-  --commandbar-button-hover-background: #1a1a1a;
-  --progress-recording-background: #310707;
-  --progress-playing-background: #071a2b;
-  --progress-recording-line: #ff2038;
-  --recording-marker-background: #9b3131;
-  --recording-marker-background-hover: #a82323;
-  --replaying-marker-background: #266fb1;
-  --replaying-marker-highlighted-background: #3084d0;
-  --replaying-marker-location-background: #3084d0;
-  --replaying-marker-background-hover: #3a8edb;
-  --progressbar-background: #0c0c0d;
-  --proggressbar-border-color: var(--theme-splitter-color);
-  --progressbar-line-color: #0a4786;
-  --tick-future-background: #bfc9d2;
-  --tick-background: var(--blue-50);
-  --tick-recording-background: #e77884;
-  --replay-head-background: var(--theme-highlight-purple);
-}
-
-.replay-player .overlay-container {
-  display: flex;
-  position: relative;
-  flex-grow: 1;
-}
-
-.comment-box {
-  background-color: white;
-  border-radius: 10px;
-  border: 2px solid;
-  width: 200px;
-  height: 80px;
-}
-
-.comment-write {
-  width: 20px;
-  height: 20px;
-  float: right;
-  transform: scale(0.7);
-}
-
-.comment-confirm {
-  width: 16px;
-  height: 16px;
-  margin-top: 1px;
-  float: right;
-}
-
-.comment-close {
-  width: 16px;
-  height: 16px;
-  margin-top: 2px;
-  margin-right: 2px;
-  float: right;
-}
-
-.comment-input {
-  resize: none;
-  border: none;
-  width: calc(100% - 8px);
-  height: calc(100% - 22px);
-  margin-left: 4px;
-  font-family: ui-rounded;
-}
-
-.comment-contents {
-  width: calc(100% - 8px);
-  height: calc(100% - 22px);
-  margin-top: 18px;
-  margin-left: 4px;
-  font-family: ui-rounded;
-  font-size: medium;
-  overflow: scroll;
-}
-
-.replay-player .comment-marker {
-  position: absolute;
-  height: 100%;
-  width: 7px;
-  height: 7px;
-  border-radius: 4.5px;
-  top: calc(50% - 3.5px);
-  background-color: red;
-}
-
-.replay-player .comment-marker:hover {
-  cursor: pointer;
 }
