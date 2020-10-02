@@ -31,7 +31,7 @@ const { assert } = require("protocol/utils");
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
 import Message from "./Message";
-import { timelineMarkerWidth } from "../../utils/timeline";
+import { timelineMarkerWidth } from "../../constants";
 
 const { div } = dom;
 

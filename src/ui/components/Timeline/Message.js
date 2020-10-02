@@ -5,7 +5,7 @@ import { LocalizationHelper } from "devtools/shared/l10n";
 import { getPixelOffset, getPixelDistance, getLeftOffset } from "../../utils/timeline";
 import { connect } from "react-redux";
 import classnames from "classnames";
-import { timelineMarkerWidth } from "../../utils/timeline";
+import { timelineMarkerWidth } from "../../constants";
 
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
 const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
