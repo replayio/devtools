@@ -215,15 +215,7 @@ class Frame extends Component {
     // If we have a line number > 0.
     if (line) {
       let lineInfo = `:${line}`;
-      // Add `data-line` attribute for testing
       attributes["data-line"] = line;
-
-      // Intentionally exclude 0
-      if (column) {
-        lineInfo += `:${column}`;
-        // Add `data-column` attribute for testing
-        attributes["data-column"] = column;
-      }
 
       sourceElements.push(
         dom.span(
