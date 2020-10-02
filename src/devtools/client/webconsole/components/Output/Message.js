@@ -194,16 +194,7 @@ class Message extends Component {
   }
 
   renderIcon() {
-    const {
-      level,
-      messageId,
-      executionPoint,
-      executionPointTime,
-      executionPointHasFrames,
-      serviceContainer,
-      inWarningGroup,
-      type,
-    } = this.props;
+    const { level, inWarningGroup, type } = this.props;
 
     if (inWarningGroup) {
       return undefined;
