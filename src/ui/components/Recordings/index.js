@@ -28,8 +28,8 @@ const RECORDINGS = gql`
 `;
 
 const DELETE_RECORDING = gql`
-  mutation DeleteRecording($id: uuid) {
-    delete_recordings(where: { id: { _eq: $id } }) {
+  mutation DeleteRecording($recordingId: String) {
+    delete_recordings(where: { recording_id: { _eq: $recordingId } }) {
       returning {
         id
       }
@@ -45,8 +45,8 @@ const Recordings = props => {
     return <Loader />;
   }
 
-  const onDeleteRecording = async id => {
-    await deleteRecording({ variables: { id } });
+  const onDeleteRecording = async recordingId => {
+    await deleteRecording({ variables: { recordingId } });
     refetch();
   };
 
