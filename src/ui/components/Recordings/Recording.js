@@ -15,7 +15,7 @@ const DropdownPanel = ({ editingTitle, setEditingTitle, onDeleteRecording, recor
           Edit Title
         </div>
       ) : null}
-      <div className="menu-item" onClick={() => onDeleteRecording(id)}>
+      <div className="menu-item" onClick={() => onDeleteRecording(recordingId)}>
         Delete Recording
       </div>
     </div>
