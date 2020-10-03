@@ -318,59 +318,76 @@ export class Timeline extends Component {
     this.seekTime(Math.min(next.time, this.zoomEndTime));
   }
 
-  nextPlaybackTime(time) {
-    if (time == this.zoomEndTime) {
-      return null;
+  /**
+   * Playback the recording segment from `startTime` to `endTime`.
+   * Optionally a `pauseTarget` may be given that will be seeked to after finishing playback.
+   */
+  async playback(startTime, endTime, pauseTarget) {
+    if (pauseTarget) {
+      assert(endTime <= pauseTarget.time);
     }
 
-    let nextEvent = nextPaintOrMouseEvent(time);
+    let startDate = Date.now();
+    let currentDate = startDate;
+    let currentTime = startTime;
+    let nextGraphicsTime;
+    let nextGraphicsPromise;
 
-    // Skip over mouse events that are too close to the current time.
-    while (nextEvent && nextEvent.clientX && nextEvent.time < time + 100) {
-      nextEvent = nextPaintOrMouseEvent(nextEvent.time);
-    }
+    const prepareNextGraphics = () => {
+      nextGraphicsTime = nextPaintOrMouseEvent(currentTime)?.time || this.zoomEndTime;
+      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
+    };
 
-    if (nextEvent && nextEvent.time < this.zoomEndTime) {
-      return nextEvent.time;
-    }
+    prepareNextGraphics();
 
-    return this.zoomEndTime;
-  }
-
-  playbackPaintFinished(time, screen, mouse) {
-    if (this.props.playback && time == this.props.playback.time) {
-      const { startTime, startDate, pauseTarget } = this.props.playback;
-
-      // If we play past the next time when execution should pause,
-      // stop playback and seek to the pause target.
-      if (pauseTarget && pauseTarget.time < time) {
-        this.props.setTimelineState({ playback: null });
-        this.seek(pauseTarget.point, pauseTarget.time, !!pauseTarget.frame);
+    while (this.props.playback) {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      if (!this.props.playback) {
         return;
       }
 
-      paintGraphics(screen, mouse);
-      const next = this.nextPlaybackTime(time);
-      if (next) {
-        log(`PlaybackNext`);
+      currentDate = Date.now();
+      currentTime = startTime + (currentDate - startDate);
 
-        // For now we play back at 1x (or slower, while screens load).
-        const paintTime = startDate + next - startTime;
+      if (currentTime > endTime) {
+        log(`FinishPlayback`);
+        if (pauseTarget) {
+          this.seek(pauseTarget.point, pauseTarget.time, !!pauseTarget.frame);
+        } else {
+          this.seekTime(endTime);
+        }
+        this.props.setTimelineState({ currentTime: endTime, playback: null });
+        return;
+      }
 
-        getGraphicsAtTime(next).then(({ screen, mouse }) => {
-          const now = Date.now();
-          setTimeout(() => {
-            this.playbackPaintFinished(next, screen, mouse);
-          }, Math.max(0, paintTime - now));
-        });
-        this.props.setTimelineState({
-          playback: { time: next, startTime, startDate, pauseTarget },
-          currentTime: next,
-        });
-      } else {
-        log(`StopPlayback`);
-        this.seekTime(time);
-        this.props.setTimelineState({ playback: null });
+      this.props.setTimelineState({
+        currentTime,
+        playback: { startTime, startDate, pauseTarget, time: currentTime },
+      });
+
+      if (currentTime >= nextGraphicsTime) {
+        const { screen, mouse } = await nextGraphicsPromise;
+        if (!this.props.playback) {
+          return;
+        }
+
+        // playback may have stalled waiting for `nextGraphicsPromise` and would jump
+        // in the next iteration in order to catch up. To avoid jumps of more than
+        // 100 milliseconds, we reset `startTime` and `startDate` as if playback had
+        // been started right now
+        if (Date.now() - currentDate > 100) {
+          startTime = currentTime;
+          startDate = Date.now();
+          this.props.setTimelineState({
+            currentTime,
+            playback: { startTime, startDate, pauseTarget, time: currentTime },
+          });
+        }
+
+        if (screen) {
+          paintGraphics(screen, mouse);
+        }
+        prepareNextGraphics();
       }
     }
   }
@@ -402,16 +419,8 @@ export class Timeline extends Component {
       return;
     }
 
-    const time = this.nextPlaybackTime(startTime);
-    assert(time);
-
-    this.props.setTimelineState({
-      playback: { startTime, startDate, time, pauseTarget },
-    });
-
-    getGraphicsAtTime(time).then(({ screen, mouse }) => {
-      this.playbackPaintFinished(time, screen, mouse);
-    });
+    const endTime = pauseTarget ? Math.min(pauseTarget.time, this.zoomEndTime) : this.zoomEndTime;
+    this.playback(startTime, endTime, pauseTarget);
   }
 
   stopPlayback() {
