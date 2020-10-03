@@ -191,7 +191,10 @@ export async function getGraphicsAtTime(time: number): Promise<{ screen?: Screen
     return {};
   }
 
-  const { point, paintHash } = gPaintPoints[paintIndex] || {};
+  const { point, paintHash } = gPaintPoints[paintIndex];
+  if (!paintHash) {
+    return {};
+  }
 
   const screenPromise = screenshotCache.getScreenshotForPlayback(point, paintHash);
 
