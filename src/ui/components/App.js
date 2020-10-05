@@ -3,8 +3,7 @@ import { connect } from "react-redux";
 import DevTools from "./DevTools";
 import { Account } from "./Account/index";
 import Loader from "./shared/Loader";
-import { SessionError } from "./shared/Error";
-import { PopupBlockedError } from "./shared/Error";
+import { SessionError, PopupBlockedError, UnauthorizedAccessError } from "./shared/Error";
 import { selectors } from "../reducers";
 import { useApolloClient, ApolloProvider } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -41,6 +40,7 @@ function useGetApolloClient() {
 function App({ theme, recordingId, sessionError }) {
   const { isAuthenticated, isLoading } = useAuth0();
   const { apolloClient, consentPopupBlocked } = useGetApolloClient();
+  const isAuthor = false;
 
   useEffect(() => {
     document.body.parentElement.className = theme;
@@ -52,6 +52,10 @@ function App({ theme, recordingId, sessionError }) {
 
   if (isLoading || !apolloClient) {
     return <Loader />;
+  }
+
+  if (!isAuthor) {
+    return <UnauthorizedAccessError />;
   }
 
   return (

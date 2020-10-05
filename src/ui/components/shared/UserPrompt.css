@@ -109,6 +109,11 @@
 }
 
 .user-prompt-container.error {
+  background: linear-gradient(152.2deg, #67DAFF 6.75%, #4382FF 93.14%);
+  z-index: 1000;
+}
+
+.user-prompt-container.error.overlay {
   background: linear-gradient(152.2deg, rgba(103, 218, 255, 0.90) 6.75%, rgba(67, 130, 255, 0.90) 93.14%);
   z-index: 1000;
 }
