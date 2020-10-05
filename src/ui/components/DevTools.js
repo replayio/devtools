@@ -22,11 +22,6 @@ const GET_RECORDING = gql`
   query MyQuery($recordingId: String) {
     recordings(where: { recording_id: { _eq: $recordingId } }) {
       id
-      is_private
-      user_id
-      user {
-        auth_id
-      }
     }
   }
 `;

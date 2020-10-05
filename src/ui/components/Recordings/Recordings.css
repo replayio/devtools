@@ -44,6 +44,10 @@
   font-weight: 400;
 }
 
+.recordings .recording .permissions {
+  line-height: 2em;
+}
+
 .recordings .recording .screenshot {
   width: 100%;
   height: 240px;
