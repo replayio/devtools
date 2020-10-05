@@ -121,7 +121,10 @@ async function clickButton(button) {
 
 function clickRecordingButton() {
   log(`ClickRecordingButton`);
-  return clickButton(document.getElementById("recording-button"));
+  const button =
+    document.getElementById("recording-button") ||
+    document.getElementById("record-button");
+  return clickButton(button);
 }
 
 function defer() {
