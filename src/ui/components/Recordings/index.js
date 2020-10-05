@@ -10,8 +10,8 @@ import Loader from "../shared/Loader.js";
 import "./Recordings.css";
 
 const RECORDINGS = gql`
-  query MyRecordingsQuery {
-    recordings {
+  query MyRecordingsQuery($authId: String) {
+    recordings(where: { user: { auth_id: { _eq: $authId } } }) {
       id
       url
       title
@@ -38,7 +38,10 @@ const DELETE_RECORDING = gql`
 `;
 
 const Recordings = props => {
-  const { data, loading, refetch } = useQuery(RECORDINGS);
+  const { user } = useAuth0();
+  const { data, loading, refetch } = useQuery(RECORDINGS, {
+    variables: { authId: user.sub },
+  });
   const [deleteRecording] = useMutation(DELETE_RECORDING);
 
   if (loading) {
