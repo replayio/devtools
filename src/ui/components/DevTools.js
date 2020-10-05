@@ -9,10 +9,36 @@ import Viewer from "./Viewer";
 import Loader from "./shared/Loader";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import RecordingLoadingScreen from "./RecordingLoadingScreen";
+import { UnauthorizedAccessError } from "./shared/Error";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { screenshotCache, nextPaintEvent, getClosestPaintPoint } from "protocol/graphics";
+import { gql, useQuery } from "@apollo/client";
+import { useAuth0 } from "@auth0/auth0-react";
+import { data } from "react-dom-factories";
+
+const GET_RECORDING_ANONYMOUS = gql`
+  query MyQuery($recordingId: String) {
+    recordings(where: { recording_id: { _eq: $recordingId } }) {
+      id
+      is_private
+    }
+  }
+`;
+
+const GET_RECORDING = gql`
+  query MyQuery($recordingId: String) {
+    recordings(where: { recording_id: { _eq: $recordingId } }) {
+      id
+      is_private
+      user_id
+      user {
+        auth_id
+      }
+    }
+  }
+`;
 
 function DevtoolsSplitBox({ updateTimelineDimensions, tooltip }) {
   const toolbox = <Toolbox />;
@@ -47,34 +73,57 @@ function getUploadingMessage(uploading) {
   return `Waiting for upload… ${amount} MB`;
 }
 
-export class DevTools extends React.Component {
-  render() {
-    const {
-      unfocusComment,
-      loading,
-      uploading,
-      tooltip,
-      hasFocusedComment,
-      updateTimelineDimensions,
-      recordingDuration,
-    } = this.props;
+function getIsAuthorized(recordingId, auth0User, isAuthenticated) {
+  const query = isAuthenticated ? GET_RECORDING : GET_RECORDING_ANONYMOUS;
 
-    if (recordingDuration === null || uploading) {
-      const message = getUploadingMessage(uploading);
-      return <Loader message={message} />;
-    } else if (loading < 100) {
-      return <RecordingLoadingScreen />;
-    }
+  const { data } = useQuery(query, {
+    variables: { recordingId },
+  });
 
-    return (
-      <>
-        <Header />
-        <Comments />
-        {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
-        <DevtoolsSplitBox tooltip={tooltip} updateTimelineDimensions={updateTimelineDimensions} />
-      </>
-    );
+  // Comment this block out if you want to simulate a private recording
+  if (!data.recordings[0].is_private) {
+    return true;
   }
+
+  if (!isAuthenticated) {
+    return false;
+  }
+
+  return data.recordings[0].user.auth_id === auth0User.sub ? true : false;
+}
+
+function DevTools({
+  unfocusComment,
+  loading,
+  uploading,
+  tooltip,
+  hasFocusedComment,
+  updateTimelineDimensions,
+  recordingDuration,
+  recordingId,
+}) {
+  const { user, isAuthenticated } = useAuth0();
+  const isAuthorized = getIsAuthorized(recordingId, user, isAuthenticated);
+
+  if (!isAuthorized) {
+    return <UnauthorizedAccessError />;
+  }
+
+  if (recordingDuration === null || uploading) {
+    const message = getUploadingMessage(uploading);
+    return <Loader message={message} />;
+  } else if (loading < 100) {
+    return <RecordingLoadingScreen />;
+  }
+
+  return (
+    <>
+      <Header />
+      <Comments />
+      {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
+      <DevtoolsSplitBox tooltip={tooltip} updateTimelineDimensions={updateTimelineDimensions} />
+    </>
+  );
 }
 
 export default connect(
@@ -85,6 +134,7 @@ export default connect(
     hasFocusedComment: selectors.hasFocusedComment(state),
     recordingDuration: selectors.getRecordingDuration(state),
     sessionId: selectors.getSessionId(state),
+    recordingId: selectors.getRecordingId(state),
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,
