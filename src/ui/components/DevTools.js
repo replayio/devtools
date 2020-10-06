@@ -18,15 +18,6 @@ import { gql, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 import { data } from "react-dom-factories";
 
-const GET_RECORDING_ANONYMOUS = gql`
-  query MyQuery($recordingId: String) {
-    recordings(where: { recording_id: { _eq: $recordingId } }) {
-      id
-      is_private
-    }
-  }
-`;
-
 const GET_RECORDING = gql`
   query MyQuery($recordingId: String) {
     recordings(where: { recording_id: { _eq: $recordingId } }) {
@@ -73,23 +64,15 @@ function getUploadingMessage(uploading) {
   return `Waiting for upload… ${amount} MB`;
 }
 
-function getIsAuthorized(recordingId, auth0User, isAuthenticated) {
-  const query = isAuthenticated ? GET_RECORDING : GET_RECORDING_ANONYMOUS;
+function getIsAuthorized({ data, error, isAuthenticated }) {
+  // We let Hasura decide whether or not the user can view a recording. The response to our query
+  // will have a recording if they're authorized to view the recording, and will be empty if not.
+  // What this doesn't explicitly tell us is *why* that user is allowed to view the recording: is the
+  // recording public, or is the user the original creator for that recording? You can check that
+  // by checking the recording's user field, which will be null for non-creator users.
+  const isAuthorized = data.recordings.length !== 0;
 
-  const { data } = useQuery(query, {
-    variables: { recordingId },
-  });
-
-  // Comment this block out if you want to simulate a private recording
-  if (!data.recordings[0].is_private) {
-    return true;
-  }
-
-  if (!isAuthenticated) {
-    return false;
-  }
-
-  return data.recordings[0].user.auth_id === auth0User.sub ? true : false;
+  return isAuthorized ? true : false;
 }
 
 function DevTools({
@@ -103,13 +86,19 @@ function DevTools({
   recordingId,
 }) {
   const { user, isAuthenticated } = useAuth0();
-  const isAuthorized = getIsAuthorized(recordingId, user, isAuthenticated);
+  const { data, error, loading: queryIsLoading } = useQuery(GET_RECORDING, {
+    variables: { recordingId },
+  });
+
+  if (queryIsLoading) {
+    return <Loader />;
+  }
+
+  const isAuthorized = getIsAuthorized({ data, error, isAuthenticated });
 
   if (!isAuthorized) {
     return <UnauthorizedAccessError />;
-  }
-
-  if (recordingDuration === null || uploading) {
+  } else if (recordingDuration === null || uploading) {
     const message = getUploadingMessage(uploading);
     return <Loader message={message} />;
   } else if (loading < 100) {
