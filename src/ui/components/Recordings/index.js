@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { connect } from "react-redux";
-import { selectors } from "../../reducers";
+import React, { useState } from "react";
 import { Recording } from "./Recording";
-import { useAuth0 } from "@auth0/auth0-react";
 import { sortBy } from "lodash";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import Loader from "../shared/Loader.js";
@@ -11,7 +8,7 @@ import "./Recordings.css";
 
 const RECORDINGS = gql`
   query MyRecordingsQuery {
-    recordings {
+    recordings(limit: 10) {
       id
       url
       title
@@ -37,10 +34,40 @@ const DELETE_RECORDING = gql`
   }
 `;
 
-const Recordings = props => {
+const DELETE_RECORDINGS = gql`
+  mutation DeleteRecording($recordingIds: [String!]) {
+    delete_recordings(where: { recording_id: { _in: $recordingIds } }) {
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+function useRecordingSelectList() {
+  const [selectedSet, setList] = useState(new Set());
+  const toggleRecording = recordingId => {
+    if (selectedSet.has(recordingId)) {
+      selectedSet.delete(recordingId);
+    } else {
+      selectedSet.add(recordingId);
+    }
+    return setList(new Set(selectedSet));
+  };
+
+  const clearRecordings = () => setList(new Set());
+
+  const selectedList = [...selectedSet];
+  return { selectedList, toggleRecording, clearRecordings };
+}
+
+const Recordings = () => {
   const { data, loading, refetch } = useQuery(RECORDINGS);
   const [deleteRecording] = useMutation(DELETE_RECORDING);
+  const [deleteRecordings] = useMutation(DELETE_RECORDINGS);
+  const { selectedList, toggleRecording, clearRecordings } = useRecordingSelectList();
 
+  console.log(selectedList);
   if (loading) {
     return <Loader />;
   }
@@ -50,14 +77,33 @@ const Recordings = props => {
     refetch();
   };
 
+  const onDeleteRecordings = async () => {
+    deleteRecordings({ recordingIds: selectedList });
+    clearRecordings();
+    refetch();
+  };
+
+  window.recordings = data.recordings;
   const sortedRecordings = sortBy(data.recordings, recording => -new Date(recording.date));
 
   return (
-    <div className="recordings">
-      {sortedRecordings &&
-        sortedRecordings.map((recording, i) => (
-          <Recording data={recording} key={i} onDeleteRecording={onDeleteRecording} />
-        ))}
+    <div>
+      <div className="actions">
+        <a href="#" onClick={onDeleteRecordings}>
+          Delete Recordings
+        </a>
+      </div>
+      <div className="recordings">
+        {sortedRecordings &&
+          sortedRecordings.map((recording, i) => (
+            <Recording
+              data={recording}
+              key={i}
+              toggleRecording={toggleRecording}
+              onDeleteRecording={onDeleteRecording}
+            />
+          ))}
+      </div>
     </div>
   );
 };

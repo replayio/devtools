@@ -116,6 +116,20 @@
   border-radius: 50%;
   box-shadow: 0 2px 6px 1px rgba(0, 0, 0, 0.2);
 }
+.recordings .recording:hover .recording-checkbox {
+  visibility: visible;
+}
+
+.recordings .recording-checkbox {
+  visibility: hidden;
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  width: 20px;
+  height: 20px;
+  top: 20px;
+  z-index: 100;
+}
 
 .welcome-panel {
   display: flex;

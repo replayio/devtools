@@ -22,7 +22,7 @@ const DropdownPanel = ({ editingTitle, setEditingTitle, onDeleteRecording, recor
   );
 };
 
-export const Recording = ({ data, onDeleteRecording }) => {
+export const Recording = ({ data, onDeleteRecording, toggleRecording }) => {
   const [editingTitle, setEditingTitle] = useState(false);
   const Panel = (
     <DropdownPanel
@@ -40,11 +40,17 @@ export const Recording = ({ data, onDeleteRecording }) => {
     window.location = `/view?id=${data.recording_id}`;
   };
 
+  const toggleCheckbox = event => {
+    event.stopPropagation();
+    toggleRecording(data.recording_id);
+  };
+
   return (
     <div className="recording">
       <div className="screenshot">
         <img src={`data:image/png;base64, ${data.last_screen_data}`} alt="recording screenshot" />
         <Dropdown panel={Panel} icon={<div>•••</div>} panelStyles={{ top: "28px" }} />
+        <input type="checkbox" className="recording-checkbox" onClick={toggleCheckbox} />
         <div className="overlay" onClick={e => navigateToRecording(e)} />
         {/* <button icon={<LinkIconSvg />} onClick={() => navigateToRecording} /> */}
       </div>
