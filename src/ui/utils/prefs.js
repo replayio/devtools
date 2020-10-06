@@ -35,7 +35,7 @@ export const features = new PrefsHelper("devtools.features", {
   comments: ["Bool", "comments"],
   users: ["Bool", "users"],
   auth0: ["Bool", "auth0"],
-  auth0: ["Bool", "private"],
+  private: ["Bool", "private"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

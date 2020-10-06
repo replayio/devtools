@@ -22,9 +22,6 @@ const RECORDINGS = gql`
       description
       date
       last_screen_data
-      user {
-        auth_id
-      }
       is_private
     }
   }

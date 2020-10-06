@@ -3,6 +3,7 @@ import Title from "../shared/Title";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import moment from "moment";
 import { gql, useMutation } from "@apollo/client";
+import { features } from "ui/utils/prefs";
 
 const UPDATE_IS_PRIVATE = gql`
   mutation MyMutation($recordingId: String, $isPrivate: Boolean) {
@@ -40,7 +41,7 @@ const DropdownPanel = ({
       <div className="menu-item" onClick={() => onDeleteRecording(recordingId)}>
         Delete Recording
       </div>
-      {isPrivate ? (
+      {!features.private ? null : isPrivate ? (
         <div className="menu-item" onClick={toggleIsPrivate}>
           Make recording public
         </div>
@@ -96,9 +97,11 @@ export const Recording = ({ data, onDeleteRecording }) => {
           setEditingTitle={setEditingTitle}
         />
         <div className="secondary">{formatDate(data.date)}</div>
-        <div className="permissions" onClick={toggleIsPrivate}>
-          {data.is_private ? "Private" : "Public"}
-        </div>
+        {features.private ? (
+          <div className="permissions" onClick={toggleIsPrivate}>
+            {data.is_private ? "Private" : "Public"}
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -17,6 +17,7 @@ import { screenshotCache, nextPaintEvent, getClosestPaintPoint } from "protocol/
 import { gql, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 import { data } from "react-dom-factories";
+import { features } from "ui/utils/prefs";
 
 const GET_RECORDING = gql`
   query MyQuery($recordingId: String) {
@@ -65,9 +66,7 @@ function getIsAuthorized({ data, error, isAuthenticated }) {
   // What this doesn't explicitly tell us is *why* that user is allowed to view the recording: is the
   // recording public, or is the user the original creator for that recording? You can check that
   // by checking the recording's user field, which will be null for non-creator users.
-  const isAuthorized = data.recordings.length !== 0;
-
-  return isAuthorized ? true : false;
+  return data.recordings.length === 0 ? false : true;
 }
 
 function DevTools({
@@ -89,7 +88,7 @@ function DevTools({
     return <Loader />;
   }
 
-  const isAuthorized = getIsAuthorized({ data, error, isAuthenticated });
+  const isAuthorized = features.private ? getIsAuthorized({ data, error, isAuthenticated }) : true;
 
   if (!isAuthorized) {
     return <UnauthorizedAccessError />;
