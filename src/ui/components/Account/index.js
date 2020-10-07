@@ -1,17 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
 import Recordings from "../Recordings/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import Header from "../Header";
 import Loader from "../shared/Loader";
+import Modal from "../shared/Modal";
 import UserPrompt from "../shared/UserPrompt";
 import { gql, useQuery } from "@apollo/client";
 import { setUserInBrowserPrefs } from "../../utils/browser";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 
 import "./Account.css";
 
 const RECORDINGS = gql`
   query MyRecordingsQuery {
     recordings {
+      user_id
       id
     }
   }
@@ -75,16 +80,25 @@ function WelcomePage() {
   );
 }
 
-export function Account() {
+function Account({ modal }) {
   const { isAuthenticated } = useAuth0();
+
   if (!isAuthenticated) {
     return <WelcomePage />;
   }
 
   return (
     <>
+      {modal ? <Modal /> : null}
       <Header />
       <AccountPage />
     </>
   );
 }
+
+export default connect(
+  state => ({
+    modal: selectors.getModal(state),
+  }),
+  {}
+)(Account);

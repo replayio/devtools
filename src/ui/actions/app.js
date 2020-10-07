@@ -67,3 +67,20 @@ export function setErrorMessage(message) {
 export function setUploading(uploading) {
   return { type: "set_uploading", uploading };
 }
+
+export function setSharingModal(recordingId) {
+  return {
+    type: "set_sharing_modal",
+    modal: {
+      type: "sharing",
+      recordingId,
+      mask: true,
+    },
+  };
+}
+
+export function hideModal() {
+  return {
+    type: "hide_modal",
+  };
+}

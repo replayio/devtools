@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import DevTools from "./DevTools";
-import { Account } from "./Account/index";
+import Account from "./Account/index";
 import Loader from "./shared/Loader";
 import { SessionError, PopupBlockedError } from "./shared/Error";
-import { selectors } from "../reducers";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 import { useApolloClient, ApolloProvider } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -52,6 +53,8 @@ function App({ theme, recordingId, sessionError }) {
   if (isLoading || !apolloClient) {
     return <Loader />;
   }
+
+  // sessionError = true;
 
   return (
     <ApolloProvider client={apolloClient}>

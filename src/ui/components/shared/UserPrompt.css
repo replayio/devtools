@@ -7,11 +7,6 @@
   font-size: 1.25rem;
   text-align: center;
   width: 630px;
-  --light-grey: #969696;
-  --dark-grey: #696969;
-  --light-blue: #61CDFF;
-  --dark-blue: #2D7EFF;
-  --faint-red: rgba(255, 0, 0, 0.5);
 }
 
 .user-prompt p, .user-prompt li {
@@ -41,7 +36,7 @@
   font-size: 1.25rem;
   margin: auto;
   border: 1px solid var(--light-grey);
-  color: var(--light-grey);
+  /* color: var(--light-grey); */
 }
 
 .user-prompt .error {
