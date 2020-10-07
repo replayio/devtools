@@ -5,8 +5,8 @@ import { gql, useLazyQuery, useQuery, useMutation } from "@apollo/client";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import Modal from "./Modal";
-
 import Loader from "./Loader";
+import { features } from "ui/utils/prefs";
 
 import "./Sharing.css";
 import { bindActionCreators } from "redux";
@@ -25,7 +25,7 @@ import { bindActionCreators } from "redux";
 // Figure out what the unified userprompt/modal would look like
 
 const GET_OWNER_AND_COLLABORATORS = gql`
-  query MyQuery($idUuid: uuid, $idString: String) {
+  query GetOwnerAndCollaborators($idUuid: uuid, $idString: String) {
     collaborators(
       where: {
         recording: { recording_id: { _eq: $idString }, _or: { recording_id: { _eq: $idString } } }
@@ -52,6 +52,7 @@ const GET_OWNER_AND_COLLABORATORS = gql`
         picture
       }
       id
+      is_private
     }
   }
 `;
@@ -90,8 +91,22 @@ const GET_OWNER_AND_COLLABORATORS = gql`
 //   }
 // `;
 
+const UPDATE_IS_PRIVATE = gql`
+  mutation SetRecordingIsPrivate($recordingId: String, $isPrivate: Boolean) {
+    update_recordings(
+      where: { recording_id: { _eq: $recordingId } }
+      _set: { is_private: $isPrivate }
+    ) {
+      returning {
+        is_private
+        id
+      }
+    }
+  }
+`;
+
 const GET_COLLABORATOR_ID = gql`
-  query MyQuery($email: String = "") {
+  query GetCollaboratorId($email: String = "") {
     users(where: { email: { _eq: $email } }) {
       id
       email
@@ -100,7 +115,7 @@ const GET_COLLABORATOR_ID = gql`
 `;
 
 const ADD_COLLABORATOR = gql`
-  mutation MyMutation($objects: [collaborators_insert_input!]! = {}) {
+  mutation AddCollaborator($objects: [collaborators_insert_input!]! = {}) {
     insert_collaborators(objects: $objects) {
       affected_rows
     }
@@ -108,7 +123,7 @@ const ADD_COLLABORATOR = gql`
 `;
 
 const DELETE_COLLABORATOR = gql`
-  mutation MyMutation($recordingId: uuid, $userId: uuid) {
+  mutation DeleteCollaborator($recordingId: uuid, $userId: uuid) {
     delete_collaborators(
       where: { _and: { recording_id: { _eq: $recordingId } }, user_id: { _eq: $userId } }
     ) {
@@ -261,6 +276,18 @@ function Sharing({ modal, hideModal }) {
     variables: { idUuid: modal.recordingId, idString: modal.recordingId },
     pollInterval: 1000,
   });
+  const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE);
+  const fakeRecordingId = "afb1e1de-721c-44e8-929c-6a1798617618"; // use a fake id here since recording_id != id for old recordings
+
+  const toggleIsPrivate = () => {
+    // updateIsPrivate({ variables: { recordingId: data.recording_id, isPrivate: !isPrivate } });
+    updateIsPrivate({
+      variables: {
+        recordingId: data.recordings[0].recording_id,
+        isPrivate: !data.recordings[0].is_private,
+      },
+    });
+  }
 
   if (loading) {
     return (
@@ -278,7 +305,6 @@ function Sharing({ modal, hideModal }) {
     );
   }
 
-  const fakeRecordingId = "afb1e1de-721c-44e8-929c-6a1798617618"; // use a fake id here since recording_id != id for old recordings
 
   return (
     <Modal opaque={modal.opaque}>
@@ -291,6 +317,13 @@ function Sharing({ modal, hideModal }) {
           <div className="content">Done</div>
         </button>
       </div>
+      {features.private ? (
+        <div className="permissions tip" onClick={toggleIsPrivate}>
+          {data.recordings[0].is_private
+            ? "Private: Only you and collaborators can view this recording"
+            : "Public: Everybody with this link can view this recording"}
+        </div>
+      ) : null}
     </Modal>
   );
 }
