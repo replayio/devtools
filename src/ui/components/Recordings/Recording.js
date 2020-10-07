@@ -6,7 +6,7 @@ import { gql, useMutation } from "@apollo/client";
 import { features } from "ui/utils/prefs";
 
 const UPDATE_IS_PRIVATE = gql`
-  mutation MyMutation($recordingId: String, $isPrivate: Boolean) {
+  mutation SetRecordingIsPrivate($recordingId: String, $isPrivate: Boolean) {
     update_recordings(
       where: { recording_id: { _eq: $recordingId } }
       _set: { is_private: $isPrivate }
@@ -43,11 +43,11 @@ const DropdownPanel = ({
       </div>
       {!features.private ? null : isPrivate ? (
         <div className="menu-item" onClick={toggleIsPrivate}>
-          Make recording public
+          Make public
         </div>
       ) : (
         <div className="menu-item" onClick={toggleIsPrivate}>
-          Make recording private
+          Make private
         </div>
       )}
     </div>

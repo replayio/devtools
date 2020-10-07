@@ -61,12 +61,16 @@ function getUploadingMessage(uploading) {
 }
 
 function getIsAuthorized({ data, error, isAuthenticated }) {
+  if (!features.private) {
+    return true;
+  }
+
   // We let Hasura decide whether or not the user can view a recording. The response to our query
   // will have a recording if they're authorized to view the recording, and will be empty if not.
   // What this doesn't explicitly tell us is *why* that user is allowed to view the recording: is the
   // recording public, or is the user the original creator for that recording? You can check that
   // by checking the recording's user field, which will be null for non-creator users.
-  return data.recordings.length === 0 ? false : true;
+  return data.recordings.length > 0 ? true : false;
 }
 
 function DevTools({
@@ -88,7 +92,7 @@ function DevTools({
     return <Loader />;
   }
 
-  const isAuthorized = features.private ? getIsAuthorized({ data, error, isAuthenticated }) : true;
+  const isAuthorized = getIsAuthorized({ data, error, isAuthenticated });
 
   if (!isAuthorized) {
     return <UnauthorizedAccessError />;
