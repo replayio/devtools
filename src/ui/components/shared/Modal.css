@@ -3,20 +3,35 @@
   display: flex;
   height: 100%;
   width: 100%;
+  max-height: 100%;
+  background: rgba(0,0,0,0.5);
+  box-shadow: none;
+  transition: none;
   z-index: 2;
 }
 
-.modal-container.mask {
-  background: rgba(0,0,0,0.5);
+.modal-container.opaque {
+  background: linear-gradient(152.2deg, #67DAFF 6.75%, #4382FF 93.14%);
+}
+
+.modal-container.translucent {
+  background: linear-gradient(152.2deg, rgba(103, 218, 255, 0.90) 6.75%, rgba(67, 130, 255, 0.90) 93.14%);
+}
+
+.modal-container.error {
+  z-index: 1000;
 }
 
 .modal-container .modal {
+  max-height: fit-content;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   padding: 8rem 5rem 5rem;
+  /* padding: 5rem; */
+  /* text-align: center; */
   margin: auto;
   border-radius: 2rem;
   background: white;
@@ -25,112 +40,25 @@
   width: 600px;
 }
 
+.modal-container.error .modal {
+  min-height: 460px;
+  min-width: 630px;
+  border-radius: 2rem;
+  justify-content: center;
+}
+
+.modal-container.error .modal:not(.no-bg) {
+  background-image: url(https://svgshare.com/i/Q8u.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .modal-container .modal > *:not(button) {
   width: 100%;
 }
 
 .modal-container .modal > *:not(:last-child) {
   margin-bottom: 2rem;
-}
-
-.modal-container .permissions-list {
-  width: 40rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-container .permission {
-  display: flex;
-  align-items: center;
-  padding: 12px 4px;
-  transition-duration: 200ms;
-}
-
-.modal-container .permission:hover {
-  background: #EEE;
-  border-radius: 8px;
-}
-
-.modal-container .permission:not(:last-child) {
-  margin-bottom: 4px;
-}
-
-.modal-container .permission .icon {
-  height: 3rem;
-  width: 3rem;
-  border-radius: 50%;
-  margin: 0 12px 0 8px;
-  flex-shrink: 0;
-  background: var(--dark-grey);
-  background-position: center;
-  background-size: contain;
-}
-
-.modal-container .permission .main {
-  flex-grow: 1;
-}
-
-.modal-container .permission .role {
-  flex-shrink: 0;
-  padding: 0px 8px;
-  color: var(--light-grey)
-}
-
-.modal-container .modal form {
-  display: flex;
-  flex-direction: row;
-}
-
-.modal-container .modal input[type=text] {
-  height: 40px;
-  display: block;
-  flex-grow: 1;
-  padding: 1rem;
-  text-align: center;
-  font-size: 1.25rem;
-  margin: auto;
-  border: 1px solid var(--light-grey);
-  color: var(--light-grey);
-}
-
-.modal-container .modal input[type=submit] {
-  display: none;
-  flex-shrink: 0;
-  color: white;
-  background: var(--dark-blue);
-  border: 0px;
-  padding: 0px 2rem;
-  border-radius: 1rem;
-}
-
-.modal-container .modal form:focus-within input[type=submit] {
-  display: block;
-  margin-left: 1rem;
-}
-
-.modal-container .buttons {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-}
-
-.modal-container button {
-  display: flex;
-  flex-direction: row;
-  padding: 1rem 2rem;
-  border-radius: 2rem;
-  align-items: center;
-  color: white;
-  background: var(--light-blue);
-  line-height: 1.5rem;
-  outline: none;
-  cursor: pointer;
-}
-
-.modal-container button.cancel {
-  border: none;
-  background: transparent;
-  color: var(--light-blue);
 }
 
 .modal-container button.close-modal {
@@ -148,24 +76,34 @@
   color: white;
 }
 
-.modal-container .spinner {
-  display: flex;
-  height: 40px;
-  flex-direction: row;
-  justify-content: center;
-  flex-grow: 1;
-  padding: 1rem;
-  text-align: center;
-  font-size: 1.25rem;
-  margin: auto;
-  border: 1px solid var(--light-grey);
-  color: var(--light-grey);
+.modal-container p, .modal-container li {
+  color: var(--dark-grey);
+  line-height: 1.5;
 }
 
-.modal-container .spinner .img.refresh {
-  height: 16px;
-  padding-inline-end: 1em;
-  margin-inline-end: .5em;
-  background-color: var(--light-grey);
-  animation: spin .7s linear infinite;
+.modal-container ol {
+  text-align: left;
 }
+
+.modal-container button {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem 2rem;
+  border-radius: 2rem;
+  align-items: center;
+  color: white;
+  background: var(--light-blue);
+  line-height: 1.5rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.modal-container button:hover {
+  box-shadow: 0px 0px 5px 0px var(--light-grey);
+  background-color: var(--dark-blue);
+}
+
+.modal-container .modal button .content {
+  padding-top: 0.5px; 
+}
+

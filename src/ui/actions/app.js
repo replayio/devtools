@@ -74,7 +74,7 @@ export function setSharingModal(recordingId) {
     modal: {
       type: "sharing",
       recordingId,
-      mask: true,
+      opaque: false,
     },
   };
 }

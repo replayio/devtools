@@ -4,8 +4,8 @@ import Recordings from "../Recordings/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import Header from "../Header";
 import Loader from "../shared/Loader";
+import Sharing from "../shared/Sharing";
 import Modal from "../shared/Modal";
-import UserPrompt from "../shared/UserPrompt";
 import { gql, useQuery } from "@apollo/client";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 import { actions } from "ui/actions";
@@ -24,7 +24,7 @@ const RECORDINGS = gql`
 
 function FirstRecordingPrompt() {
   return (
-    <UserPrompt>
+    <Modal error translucent noBackground>
       <h1>Your First Recording</h1>
       <p>You don&apos;t have any recordings yet, so we&apos;ll walk you through your first one.</p>
       <ol>
@@ -44,7 +44,7 @@ function FirstRecordingPrompt() {
         style={{ width: "80%" }}
       />
       <p className="tip">The record button can be found to the left of the URL bar.</p>
-    </UserPrompt>
+    </Modal>
   );
 }
 
@@ -89,7 +89,7 @@ function Account({ modal }) {
 
   return (
     <>
-      {modal ? <Modal /> : null}
+      {modal?.type === "sharing" ? <Sharing /> : null}
       <Header />
       <AccountPage />
     </>

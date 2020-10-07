@@ -54,11 +54,9 @@ function App({ theme, recordingId, sessionError }) {
     return <Loader />;
   }
 
-  // sessionError = true;
-
   return (
     <ApolloProvider client={apolloClient}>
-      {sessionError && <SessionError error={sessionError} />}
+      {sessionError  && <SessionError error={sessionError} />}
       {recordingId ? <DevTools /> : <Account />}
     </ApolloProvider>
   );
