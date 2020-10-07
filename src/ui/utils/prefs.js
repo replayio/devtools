@@ -20,6 +20,7 @@ pref("devtools.toolbox-opened", true);
 pref("devtools.features.comments", true);
 pref("devtools.features.users", true);
 pref("devtools.features.auth0", true);
+pref("devtools.features.private", false);
 
 export const prefs = new PrefsHelper("devtools", {
   isToolboxOpen: ["Bool", "toolbox-opened"],
@@ -34,6 +35,7 @@ export const features = new PrefsHelper("devtools.features", {
   comments: ["Bool", "comments"],
   users: ["Bool", "users"],
   auth0: ["Bool", "auth0"],
+  private: ["Bool", "private"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

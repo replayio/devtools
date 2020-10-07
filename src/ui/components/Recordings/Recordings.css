@@ -4,7 +4,6 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  overflow: auto;
 }
 
 .recordings .recording:hover {
@@ -42,6 +41,10 @@
   line-height: 20px;
   font-size: 14px;
   font-weight: 400;
+}
+
+.recordings .recording .permissions {
+  line-height: 2em;
 }
 
 .recordings .recording .screenshot {

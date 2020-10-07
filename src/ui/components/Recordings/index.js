@@ -21,8 +21,8 @@ const RECORDINGS = gql`
       duration
       description
       date
-      user_id
       last_screen_data
+      is_private
     }
   }
 `;
