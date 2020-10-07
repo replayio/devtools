@@ -10,9 +10,26 @@ import Loader from "./Loader";
 import "./Modal.css";
 import { bindActionCreators } from "redux";
 
+// This is a contrived demo since I don't have a new recording to experiment with. Once
+// the Hasura table and dispatcher are synced again, I should:
+
+// 1) GET_O_AND_C should take just one argument $recording_id: uuid
+// 2) We should only match the recording_id, and not the id in the GOAC collaborators args
+// 3) Remove the fakeRecordingId that we pass down from the SharingModal component
+
+// TODOS
+// Add a way to merge and update the cache upon deletion
+// Trigger a refetch of collaborators upon mutation
+// Take out the sharingmodal logic and styles from modal and reuse it somehow with userprompt
+// Figure out what the unified userprompt/modal would look like
+
 const GET_OWNER_AND_COLLABORATORS = gql`
-  query MyQuery($recordingId: uuid) {
-    collaborators(where: { recording_id: { _eq: $recordingId } }) {
+  query MyQuery($idUuid: uuid, $idString: String) {
+    collaborators(
+      where: {
+        recording: { recording_id: { _eq: $idString }, _or: { recording_id: { _eq: $idString } } }
+      }
+    ) {
       user {
         auth_id
         email
@@ -24,7 +41,7 @@ const GET_OWNER_AND_COLLABORATORS = gql`
       user_id
       recording_id
     }
-    recordings(where: { id: { _eq: $recordingId } }) {
+    recordings(where: { recording_id: { _eq: $idString } }) {
       user {
         auth_id
         email
@@ -37,6 +54,40 @@ const GET_OWNER_AND_COLLABORATORS = gql`
     }
   }
 `;
+
+// Older recordings have a different recordingId vs id. For, Newer recordings it's the same.
+// The id search param is the same as a recording's recording_id field. The recording's id field
+// has usually been different from that recording_id, so older recordings have two separate values
+// for id and recording_id. However, newer recordings have the same recording_id and id. To guard
+// against an invalid recording id query, we just match the recording's recording_id field.
+
+// const GET_OWNER_AND_COLLABORATORS = gql`
+//   query MyQuery($recordingId: uuid) {
+//     collaborators(where: { recording_id: { _eq: $recordingId } }) {
+//       user {
+//         auth_id
+//         email
+//         id
+//         name
+//         nickname
+//         picture
+//       }
+//       user_id
+//       recording_id
+//     }
+//     recordings(where: { id: { _eq: $recordingId } }) {
+//       user {
+//         auth_id
+//         email
+//         id
+//         name
+//         nickname
+//         picture
+//       }
+//       id
+//     }
+//   }
+// `;
 
 const GET_COLLABORATOR_ID = gql`
   query MyQuery($email: String = "") {
@@ -67,12 +118,19 @@ const DELETE_COLLABORATOR = gql`
 
 function Permission({ classname, name, email, role, picture, id, recordingId }) {
   const [deleteCollaborator, { called, loading, error }] = useMutation(DELETE_COLLABORATOR);
-  const options = { variables: { recordingId: recordingId, userId: id } };
+  const options = { variables: { recordingId, userId: id } };
   const handleDeleteClick = () => {
     deleteCollaborator(options);
   };
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
-  console.log(options);
+  if (error) {
+    // Error state: Show the error message for 2s, then re-render the original permission.
+    setTimeout(() => setShowErrorMessage(false), 2000);
+    return <div className="permission">Could not delete this collaborator</div>;
+  }
+
+  console.log(">>delete options", options);
   console.log(called, loading, error);
 
   return (
@@ -82,7 +140,7 @@ function Permission({ classname, name, email, role, picture, id, recordingId }) 
         <div className="name">{name}</div>
         <div className="email">{email}</div>
       </div>
-      <div className="role" onClick={handleDeleteClick}>
+      <div className="role" onClick={role == "collaborator" ? handleDeleteClick : () => {}}>
         {role}
       </div>
     </div>
@@ -92,7 +150,7 @@ function Permission({ classname, name, email, role, picture, id, recordingId }) 
 function PermissionsList({ data, recordingId }) {
   const owner = data.recordings[0].user;
   const collaborators = data.collaborators;
-  console.log(collaborators);
+  console.log(">>PermissionsList", recordingId);
 
   return (
     <div className="permissions-list">
@@ -114,7 +172,7 @@ function PermissionsList({ data, recordingId }) {
   );
 }
 
-function NewCollaboratorForm({ added, setAdded, recordingId }) {
+function NewCollaboratorInput({ data, recordingId }) {
   const [inputValue, setInputValue] = useState("");
   const [showSpinner, setShowSpinner] = useState(false);
 
@@ -127,6 +185,7 @@ function NewCollaboratorForm({ added, setAdded, recordingId }) {
     <form>
       {showSpinner ? (
         <MutationLoader
+          owner={data.recordings[0].user}
           inputValue={inputValue}
           recordingId={recordingId}
           setShowSpinner={setShowSpinner}
@@ -145,7 +204,7 @@ function NewCollaboratorForm({ added, setAdded, recordingId }) {
   );
 }
 
-function MutationLoader({ inputValue, recordingId, setShowSpinner, setInputValue }) {
+function MutationLoader({ owner, inputValue, recordingId, setShowSpinner, setInputValue }) {
   const { data, loading, error } = useQuery(GET_COLLABORATOR_ID, {
     variables: { email: inputValue },
   });
@@ -154,19 +213,39 @@ function MutationLoader({ inputValue, recordingId, setShowSpinner, setInputValue
     { called: mutationCalled, loading: mutationLoading, error: mutationError },
   ] = useMutation(ADD_COLLABORATOR);
 
+  useEffect(() => {
+    // Upon succesfully adding a collaborator, this component dismounts itself.
+    if (mutationCalled && !mutationLoading && !mutationError) {
+      setInputValue("");
+      setShowSpinner(false);
+    }
+  });
+
+  if (inputValue === owner.email) {
+    setTimeout(() => setShowSpinner(false), 2000);
+    setInputValue("");
+    return <div className="spinner">ERROR: You can not add yourself as a collaborator.</div>;
+  } else if (error) {
+    setTimeout(() => setShowSpinner(false), 2000);
+    return (
+      <div className="spinner">ERROR: We can not fetch that collaborator right now. Try again.</div>
+    );
+  } else if (mutationError) {
+    setTimeout(() => setShowSpinner(false), 2000);
+    return (
+      <div className="spinner">ERROR: We can not add that collaborator right now. Try again.</div>
+    );
+  } else if (!loading && data.users.length === 0) {
+    setTimeout(() => setShowSpinner(false), 2000);
+    return <div className="spinner">ERROR: That e-mail address is not a valid Replay user.</div>;
+  }
+
   if (!loading && !mutationCalled) {
     const userId = data.users[0].id;
     addNewCollaborator({
       variables: { objects: [{ recording_id: recordingId, user_id: userId }] },
     });
   }
-
-  useEffect(() => {
-    if (mutationCalled && !mutationLoading && !mutationError) {
-      setInputValue("");
-      setShowSpinner(false);
-    }
-  });
 
   return (
     <div className="spinner">
@@ -176,10 +255,9 @@ function MutationLoader({ inputValue, recordingId, setShowSpinner, setInputValue
   );
 }
 
-function Modal({ modal, hideModal }) {
-  const [added, setAdded] = useState(true);
+function SharingModal({ modal, hideModal }) {
   const { data, loading, error } = useQuery(GET_OWNER_AND_COLLABORATORS, {
-    variables: { recordingId: modal.recordingId },
+    variables: { idUuid: modal.recordingId, idString: modal.recordingId },
     pollInterval: 1000,
   });
 
@@ -191,21 +269,39 @@ function Modal({ modal, hideModal }) {
         </div>
       </div>
     );
-  }
-
-  return (
-    <div className={classnames("modal-container", { mask: modal.mask })}>
-      <div className={classnames("modal")}>
-        <button className="close-modal" onClick={hideModal}>X</button>
-        <h2>Share this recording with others</h2>
-        <NewCollaboratorForm added={added} setAdded={setAdded} recordingId={modal.recordingId} />
-        <PermissionsList data={data} recordingId={modal.recordingId} />
-        <div className="buttons">
-          <button className="done" onClick={hideModal}>
-            Done
-          </button>
+  } else if (error || data.recordings.length !== 1 || !data.recordings[0].user) {
+    // Error state: Show the error message for 2s, then dismount SharingModal.
+    setTimeout(() => hideModal(), 2000);
+    return (
+      <div className={classnames("modal-container", { mask: modal.mask })}>
+        <div className={classnames("modal")}>
+          <p>Can&apos;t fetch your sharing permissions at this time</p>
         </div>
       </div>
+    );
+  }
+
+  const fakeRecordingId = "afb1e1de-721c-44e8-929c-6a1798617618"; // use a fake id here since recording_id != id for old recordings
+
+  return (
+    <Modal mask={modal.mask}>
+      <button className="close-modal" onClick={hideModal}>X</button>
+      <h2>Share this recording with others</h2>
+      <NewCollaboratorInput data={data} recordingId={fakeRecordingId}/>
+      <PermissionsList data={data} recordingId={fakeRecordingId} />
+      <div className="buttons">
+        <button className="done" onClick={hideModal}>
+          Done
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+function Modal({ children, mask }) {
+  return (
+    <div className={classnames("modal-container", { mask })}>
+      <div className={classnames("modal")}>{children}</div>
     </div>
   );
 }
@@ -215,4 +311,4 @@ export default connect(
     modal: selectors.getModal(state),
   }),
   { hideModal: actions.hideModal }
-)(Modal);
+)(SharingModal);
