@@ -20,13 +20,14 @@ function waitForElapsedTime(time, ms) {
 }
 
 async function waitUntil(fn) {
-  while (true) {
+  for (let i = 0; i < 200; i++) {
     const rv = fn();
     if (rv) {
       return rv;
     }
-    await waitForTime(50);
+    await waitForTime(i < 10 ? 50 : 100);
   }
+  throw new Error("waitUntil() timed out");
 }
 
 function finish() {
