@@ -132,9 +132,9 @@ const DELETE_COLLABORATOR = gql`
   }
 `;
 
-function Permission({ classname, name, email, role, picture, id, recordingId }) {
+function Permission({ user, role, recordingId }) {
   const [deleteCollaborator, { called, loading, error }] = useMutation(DELETE_COLLABORATOR);
-  const options = { variables: { recordingId, userId: id } };
+  const options = { variables: { recordingId, userId: user.id } };
   const handleDeleteClick = () => {
     deleteCollaborator(options);
   };
@@ -151,10 +151,10 @@ function Permission({ classname, name, email, role, picture, id, recordingId }) 
 
   return (
     <div className="permission">
-      <div className="icon" style={{ backgroundImage: `url(${picture})` }} />
+      <div className="icon" style={{ backgroundImage: `url(${user.picture})` }} />
       <div className="main">
-        <div className="name">{name}</div>
-        <div className="email">{email}</div>
+        <div className="name">{user.name}</div>
+        <div className="email">{user.email}</div>
       </div>
       <div className="role" onClick={role == "collaborator" ? handleDeleteClick : () => {}}>
         {role}
@@ -166,20 +166,16 @@ function Permission({ classname, name, email, role, picture, id, recordingId }) 
 function PermissionsList({ data, recordingId }) {
   const owner = data.recordings[0].user;
   const collaborators = data.collaborators;
-  console.log(">>PermissionsList", recordingId);
 
   return (
     <div className="permissions-list">
-      <Permission name={owner.nickname} email={owner.email} role={"owner"} />
+      <Permission user={owner} role={"owner"} />
       {collaborators
         ? collaborators.map((collaborator, i) => (
             <Permission
-              name={collaborator.user.name}
-              email={collaborator.user.email}
+              user={collaborator.user}
               role={"collaborator"}
-              picture={collaborator.user.picture}
               key={i}
-              id={collaborator.user.id}
               recordingId={recordingId}
             />
           ))
@@ -280,14 +276,13 @@ function Sharing({ modal, hideModal }) {
   const fakeRecordingId = "afb1e1de-721c-44e8-929c-6a1798617618"; // use a fake id here since recording_id != id for old recordings
 
   const toggleIsPrivate = () => {
-    // updateIsPrivate({ variables: { recordingId: data.recording_id, isPrivate: !isPrivate } });
     updateIsPrivate({
       variables: {
         recordingId: data.recordings[0].recording_id,
         isPrivate: !data.recordings[0].is_private,
       },
     });
-  }
+  };
 
   if (loading) {
     return (
@@ -305,13 +300,12 @@ function Sharing({ modal, hideModal }) {
     );
   }
 
-
   return (
     <Modal opaque={modal.opaque}>
       <button className="close-modal" onClick={hideModal}>X</button>
       <h2>Share this recording with others</h2>
-      <NewCollaboratorInput data={data} recordingId={fakeRecordingId}/>
-      <PermissionsList data={data} recordingId={fakeRecordingId} />
+      <NewCollaboratorInput data={data} recordingId={modal.recordingId} />
+      <PermissionsList data={data} recordingId={modal.recordingId} />
       <div className="buttons">
         <button className="done" onClick={hideModal}>
           <div className="content">Done</div>
