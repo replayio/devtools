@@ -16,7 +16,6 @@ import "./Account.css";
 const RECORDINGS = gql`
   query MyRecordingsQuery {
     recordings {
-      user_id
       id
     }
   }

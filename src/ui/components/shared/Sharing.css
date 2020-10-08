@@ -43,6 +43,36 @@
   color: var(--light-grey)
 }
 
+.modal-container .permission:not(:first-child):hover .role {
+  display: none;
+}
+
+.modal-container .permission button.delete {
+  display: none;
+  flex-shrink: 0;
+  padding: 4px;
+  margin-right: 8px;
+  border-radius: 4px; 
+  background: transparent;
+  box-shadow: none;
+}
+
+.modal-container .permission:hover button.delete {
+  display: block;
+}
+
+.modal-container .permission button.delete:hover {
+  background: var(--dark-blue);
+}
+
+.modal-container .permission button.delete .img {
+  background: var(--light-grey);
+}
+
+.modal-container .permission button.delete:hover .img {
+  background-color: white;
+}
+
 .modal-container .modal form {
   display: flex;
   flex-direction: row;
@@ -63,11 +93,13 @@
 .modal-container .modal input[type=submit] {
   display: block;
   margin-left: 1rem;
+  font-size: 1.25rem;
   flex-shrink: 0;
   color: white;
   background: var(--dark-blue);
   border: 0px;
   padding: 0px 2rem;
+  cursor: pointer;
 }
 
 .modal-container .buttons {
@@ -108,15 +140,12 @@
   right: 2rem;
   padding: 1rem;
   border-radius: 50%;
+  box-shadow: none;
   background: transparent;
 }
 
 .modal-container button.close-modal:hover {
-  background: var(--light-grey);
-}
-
-.modal-container button.close-modal:hover .img.close {
-  background-color: white;
+  background: #EEE;
 }
 
 .modal-container .privacy {

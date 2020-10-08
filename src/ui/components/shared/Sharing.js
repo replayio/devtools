@@ -119,9 +119,12 @@ function Permission({ user, role, recordingId, refetch }) {
         <div className="name">{user.name}</div>
         <div className="email">{user.email}</div>
       </div>
-      <div className="role" onClick={role == "collaborator" ? handleDeleteClick : () => {}}>
-        {role}
-      </div>
+      <div className="role">{role}</div>
+      {role === "collaborator" ? (
+        <button className="delete" onClick={handleDeleteClick}>
+          <div className="img close" />
+        </button>
+      ) : null}
     </div>
   );
 }
