@@ -119,6 +119,10 @@ async function runMatchingTests() {
     const env = {
       RECORD_REPLAY_RECORD_EXAMPLE: shouldRecordExamples || !exampleRecordingId,
       RECORD_REPLAY_DONT_RECORD_VIEWER: !shouldRecordViewer,
+      // Don't start processing recordings when they are created while we are
+      // running tests. This reduces server load if we are recording the viewer
+      // itself.
+      RECORD_REPLAY_DONT_PROCESS_RECORDINGS: true,
       RECORD_REPLAY_TEST_URL:
         shouldRecordExamples || !exampleRecordingId
           ? `http://localhost:7998/${example}`
