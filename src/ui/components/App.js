@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import DevTools from "./DevTools";
-import { Account } from "./Account/index";
+import Account from "./Account";
 import Loader from "./shared/Loader";
 import { SessionError, PopupBlockedError } from "./shared/Error";
-import { selectors } from "../reducers";
+import { selectors } from "ui/reducers";
 import { useApolloClient, ApolloProvider } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 

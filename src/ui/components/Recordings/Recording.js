@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+import { connect } from "react-redux";
 import Title from "../shared/Title";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import moment from "moment";
 import { gql, useMutation } from "@apollo/client";
 import { features } from "ui/utils/prefs";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 
 const UPDATE_IS_PRIVATE = gql`
   mutation SetRecordingIsPrivate($recordingId: String, $isPrivate: Boolean) {
@@ -30,6 +33,7 @@ const DropdownPanel = ({
   recordingId,
   toggleIsPrivate,
   isPrivate,
+  setSharingModal,
 }) => {
   return (
     <div className="dropdown-panel">
@@ -50,11 +54,14 @@ const DropdownPanel = ({
           Make private
         </div>
       )}
+      <div className="menu-item" onClick={() => setSharingModal(recordingId)}>
+        Open sharing preferences
+      </div>
     </div>
   );
 };
 
-export const Recording = ({ data, onDeleteRecording }) => {
+const Recording = ({ data, onDeleteRecording, setSharingModal }) => {
   const [editingTitle, setEditingTitle] = useState(false);
   const [isPrivate, setIsPrivate] = useState(data.is_private);
   const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE);
@@ -78,6 +85,7 @@ export const Recording = ({ data, onDeleteRecording }) => {
       onDeleteRecording={onDeleteRecording}
       toggleIsPrivate={toggleIsPrivate}
       isPrivate={isPrivate}
+      setSharingModal={setSharingModal}
     />
   );
 
@@ -106,3 +114,12 @@ export const Recording = ({ data, onDeleteRecording }) => {
     </div>
   );
 };
+
+export default connect(
+  state => ({
+    modal: selectors.getModal(state),
+  }),
+  {
+    setSharingModal: actions.setSharingModal,
+  }
+)(Recording);

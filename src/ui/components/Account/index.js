@@ -1,11 +1,15 @@
 import React, { useEffect } from "react";
+import { connect } from "react-redux";
 import Recordings from "../Recordings/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import Header from "../Header";
 import Loader from "../shared/Loader";
-import UserPrompt from "../shared/UserPrompt";
+import Sharing from "../shared/Sharing";
+import Modal from "../shared/Modal";
 import { gql, useQuery } from "@apollo/client";
 import { setUserInBrowserPrefs } from "../../utils/browser";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 
 import "./Account.css";
 
@@ -19,7 +23,7 @@ const RECORDINGS = gql`
 
 function FirstRecordingPrompt() {
   return (
-    <UserPrompt>
+    <Modal error translucent noBackground>
       <h1>Your First Recording</h1>
       <p>You don&apos;t have any recordings yet, so we&apos;ll walk you through your first one.</p>
       <ol>
@@ -39,7 +43,7 @@ function FirstRecordingPrompt() {
         style={{ width: "80%" }}
       />
       <p className="tip">The record button can be found to the left of the URL bar.</p>
-    </UserPrompt>
+    </Modal>
   );
 }
 
@@ -75,16 +79,25 @@ function WelcomePage() {
   );
 }
 
-export function Account() {
+function Account({ modal }) {
   const { isAuthenticated } = useAuth0();
+
   if (!isAuthenticated) {
     return <WelcomePage />;
   }
 
   return (
     <>
+      {modal?.type === "sharing" ? <Sharing /> : null}
       <Header />
       <AccountPage />
     </>
   );
 }
+
+export default connect(
+  state => ({
+    modal: selectors.getModal(state),
+  }),
+  {}
+)(Account);

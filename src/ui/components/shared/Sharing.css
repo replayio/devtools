@@ -1,0 +1,169 @@
+/* Sharing modal styles */
+
+.modal-container .permissions-list {
+  width: 40rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-container .permission {
+  display: flex;
+  align-items: center;
+  padding: 12px 4px;
+  transition: background 200ms ease-in-out;
+}
+
+.modal-container .permission:hover {
+  background: #EEE;
+  border-radius: 8px;
+}
+
+.modal-container .permission:not(:last-child) {
+  margin-bottom: 4px;
+}
+
+.modal-container .permission .icon {
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  margin: 0 12px 0 8px;
+  flex-shrink: 0;
+  background: var(--dark-grey);
+  background-position: center;
+  background-size: contain;
+}
+
+.modal-container .permission .main {
+  flex-grow: 1;
+}
+
+.modal-container .permission .role {
+  flex-shrink: 0;
+  padding: 0px 8px;
+  color: var(--light-grey)
+}
+
+.modal-container .permission:not(:first-child):hover .role {
+  display: none;
+}
+
+.modal-container .permission button.delete {
+  display: none;
+  flex-shrink: 0;
+  padding: 4px;
+  margin-right: 8px;
+  border-radius: 4px; 
+  background: transparent;
+  box-shadow: none;
+}
+
+.modal-container .permission:hover button.delete {
+  display: block;
+}
+
+.modal-container .permission button.delete:hover {
+  background: var(--dark-blue);
+}
+
+.modal-container .permission button.delete .img {
+  background: var(--light-grey);
+}
+
+.modal-container .permission button.delete:hover .img {
+  background-color: white;
+}
+
+.modal-container .modal form {
+  display: flex;
+  flex-direction: row;
+}
+
+.modal-container .modal input[type=text] {
+  height: 40px;
+  display: block;
+  flex-grow: 1;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.25rem;
+  margin: auto;
+  border: 1px solid var(--light-grey);
+  color: var(--light-grey);
+}
+
+.modal-container .modal input[type=submit] {
+  display: block;
+  margin-left: 1rem;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  color: white;
+  background: var(--dark-blue);
+  border: 0px;
+  padding: 0px 2rem;
+  cursor: pointer;
+}
+
+.modal-container .buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.modal-container .status {
+  display: flex;
+  height: 40px;
+  flex-direction: row;
+  justify-content: center;
+  flex-grow: 1;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.25rem;
+  margin: auto;
+  border: 1px solid var(--light-grey);
+  color: var(--light-grey);
+}
+
+.modal-container .status .img.refresh {
+  height: 16px;
+  padding-inline-end: 1em;
+  margin-inline-end: .5em;
+  background-color: var(--light-grey);
+  animation: spin .7s linear infinite;
+}
+
+.modal-container .status.error {
+  color: red;
+}
+
+.modal-container button.close-modal {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  padding: 1rem;
+  border-radius: 50%;
+  box-shadow: none;
+  background: transparent;
+}
+
+.modal-container button.close-modal:hover {
+  background: #EEE;
+}
+
+.modal-container .privacy {
+  display: flex;
+  align-items: center;
+  cursor: pointer
+}
+
+.modal-container .privacy:hover {
+  color: var(--dark-blue);
+}
+
+.modal-container .privacy .img {
+  height: 24px;
+  width: 24px;
+  margin-right: 4px;
+}
+
+.modal-container .privacy:hover .img {
+  background: var(--dark-blue);
+}

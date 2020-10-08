@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { selectors } from "../../reducers";
-import { Recording } from "./Recording";
+import Recording from "./Recording";
 import { useAuth0 } from "@auth0/auth0-react";
 import { sortBy } from "lodash";
 import { gql, useQuery, useMutation } from "@apollo/client";

@@ -1,0 +1,92 @@
+.modal-container {
+  position: absolute;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  max-height: 100%;
+  background: rgba(0,0,0,0.5);
+
+  z-index: 2;
+}
+
+.modal-container.opaque {
+  background: linear-gradient(152.2deg, #67DAFF 6.75%, #4382FF 93.14%);
+}
+
+.modal-container.translucent {
+  background: linear-gradient(152.2deg, rgba(103, 218, 255, 0.90) 6.75%, rgba(67, 130, 255, 0.90) 93.14%);
+}
+
+.modal-container.error {
+  z-index: 1000;
+}
+
+.modal-container .modal {
+  max-height: fit-content;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 8rem 5rem 5rem;
+  box-shadow: none;
+  transition: none;
+  margin: auto;
+  border-radius: 2rem;
+  background: white;
+  font-size: 1.25rem;
+  width: 600px;
+}
+
+.modal-container.error .modal {
+  min-height: 460px;
+  min-width: 630px;
+  border-radius: 2rem;
+  justify-content: center;
+}
+
+.modal-container.error .modal:not(.no-bg) {
+  background-image: url(https://svgshare.com/i/Q8u.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.modal-container .modal > *:not(button) {
+  width: 100%;
+}
+
+.modal-container .modal > *:not(:last-child) {
+  margin-bottom: 2rem;
+}
+
+.modal-container p, .modal-container li {
+  color: var(--dark-grey);
+  line-height: 1.5;
+}
+
+.modal-container ol {
+  text-align: left;
+}
+
+.modal-container button {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem 2rem;
+  border-radius: 2rem;
+  align-items: center;
+  color: white;
+  background: var(--light-blue);
+  line-height: 1.5rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.modal-container button:hover {
+  box-shadow: 0px 0px 5px 0px var(--light-grey);
+  background-color: var(--dark-blue);
+}
+
+.modal-container .modal button .content {
+  padding-top: 0.5px; 
+}
+

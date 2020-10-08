@@ -2,6 +2,11 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  --light-grey: #969696;
+  --dark-grey: #696969;
+  --light-blue: #61CDFF;
+  --dark-blue: #2D7EFF;
+  --faint-red: rgba(255, 0, 0, 0.5);
 }
 
 #viewer {

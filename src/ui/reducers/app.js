@@ -13,6 +13,7 @@ function initialAppState() {
     loading: 4,
     uploading: null,
     sessionId: null,
+    modal: null,
   };
 }
 
@@ -54,6 +55,10 @@ export default function update(state = initialAppState(), action) {
       return { ...state, sessionId: action.sessionId };
     }
 
+    case "set_modal": {
+      return { ...state, modal: action.modal };
+    }
+
     default: {
       return state;
     }
@@ -69,3 +74,4 @@ export const getUploading = state => state.app.uploading;
 export const getRecordingId = state => state.app.recordingId;
 export const getSessionId = state => state.app.sessionId;
 export const getErrorMessage = state => state.app.errorMessage;
+export const getModal = state => state.app.modal;
