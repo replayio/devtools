@@ -11,26 +11,9 @@ import { features } from "ui/utils/prefs";
 import "./Sharing.css";
 import { bindActionCreators } from "redux";
 
-// This is a contrived demo since I don't have a new recording to experiment with. Once
-// the Hasura table and dispatcher are synced again, I should:
-
-// 1) GET_O_AND_C should take just one argument $recording_id: uuid
-// 2) We should only match the recording_id, and not the id in the GOAC collaborators args
-// 3) Remove the fakeRecordingId that we pass down from the SharingModal component
-
-// TODOS
-// Add a way to merge and update the cache upon deletion
-// Trigger a refetch of collaborators upon mutation
-// Take out the sharingmodal logic and styles from modal and reuse it somehow with userprompt
-// Figure out what the unified userprompt/modal would look like
-
 const GET_OWNER_AND_COLLABORATORS = gql`
-  query GetOwnerAndCollaborators($idUuid: uuid, $idString: String) {
-    collaborators(
-      where: {
-        recording: { recording_id: { _eq: $idString }, _or: { recording_id: { _eq: $idString } } }
-      }
-    ) {
+  query MyQuery($recordingId: uuid) {
+    collaborators(where: { recording_id: { _eq: $recordingId } }) {
       user {
         auth_id
         email
@@ -42,7 +25,7 @@ const GET_OWNER_AND_COLLABORATORS = gql`
       user_id
       recording_id
     }
-    recordings(where: { recording_id: { _eq: $idString } }) {
+    recordings(where: { id: { _eq: $recordingId } }) {
       user {
         auth_id
         email
@@ -56,40 +39,6 @@ const GET_OWNER_AND_COLLABORATORS = gql`
     }
   }
 `;
-
-// Older recordings have a different recordingId vs id. For, Newer recordings it's the same.
-// The id search param is the same as a recording's recording_id field. The recording's id field
-// has usually been different from that recording_id, so older recordings have two separate values
-// for id and recording_id. However, newer recordings have the same recording_id and id. To guard
-// against an invalid recording id query, we just match the recording's recording_id field.
-
-// const GET_OWNER_AND_COLLABORATORS = gql`
-//   query MyQuery($recordingId: uuid) {
-//     collaborators(where: { recording_id: { _eq: $recordingId } }) {
-//       user {
-//         auth_id
-//         email
-//         id
-//         name
-//         nickname
-//         picture
-//       }
-//       user_id
-//       recording_id
-//     }
-//     recordings(where: { id: { _eq: $recordingId } }) {
-//       user {
-//         auth_id
-//         email
-//         id
-//         name
-//         nickname
-//         picture
-//       }
-//       id
-//     }
-//   }
-// `;
 
 const UPDATE_IS_PRIVATE = gql`
   mutation SetRecordingIsPrivate($recordingId: String, $isPrivate: Boolean) {
@@ -132,22 +81,37 @@ const DELETE_COLLABORATOR = gql`
   }
 `;
 
-function Permission({ user, role, recordingId }) {
+function Privacy({ isPrivate, toggleIsPrivate }) {
+  return (
+    <div className="privacy" onClick={toggleIsPrivate}>
+      {isPrivate ? (
+        <>
+          <div className="img locked" />
+          <span>Private: Only you and collaborators can view this recording</span>
+        </>
+      ) : (
+        <>
+          <div className="img unlocked" />
+          <span>Public: Everybody with this link can view this recording</span>
+        </>
+      )}
+    </div>
+  );
+}
+
+function Permission({ user, role, recordingId, refetch }) {
   const [deleteCollaborator, { called, loading, error }] = useMutation(DELETE_COLLABORATOR);
   const options = { variables: { recordingId, userId: user.id } };
   const handleDeleteClick = () => {
     deleteCollaborator(options);
+    refetch();
   };
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   if (error) {
-    // Error state: Show the error message for 2s, then re-render the original permission.
     setTimeout(() => setShowErrorMessage(false), 2000);
     return <div className="permission">Could not delete this collaborator</div>;
   }
-
-  console.log(">>delete options", options);
-  console.log(called, loading, error);
 
   return (
     <div className="permission">
@@ -163,7 +127,7 @@ function Permission({ user, role, recordingId }) {
   );
 }
 
-function PermissionsList({ data, recordingId }) {
+function PermissionsList({ data, recordingId, refetch }) {
   const owner = data.recordings[0].user;
   const collaborators = data.collaborators;
 
@@ -177,6 +141,7 @@ function PermissionsList({ data, recordingId }) {
               role={"collaborator"}
               key={i}
               recordingId={recordingId}
+              refetch={refetch}
             />
           ))
         : null}
@@ -184,39 +149,7 @@ function PermissionsList({ data, recordingId }) {
   );
 }
 
-function NewCollaboratorInput({ data, recordingId }) {
-  const [inputValue, setInputValue] = useState("");
-  const [showSpinner, setShowSpinner] = useState(false);
-
-  const handleSubmit = e => {
-    e.preventDefault();
-    setShowSpinner(true);
-  };
-
-  return (
-    <form>
-      {showSpinner ? (
-        <MutationLoader
-          owner={data.recordings[0].user}
-          inputValue={inputValue}
-          recordingId={recordingId}
-          setShowSpinner={setShowSpinner}
-          setInputValue={setInputValue}
-        />
-      ) : (
-        <input
-          type="text"
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-          placeholder="Add a collaborator"
-        />
-      )}
-      <input type="submit" onClick={handleSubmit} value={"Add"} />
-    </form>
-  );
-}
-
-function MutationLoader({ owner, inputValue, recordingId, setShowSpinner, setInputValue }) {
+function MutationStatus({ owner, inputValue, recordingId, setInProgress, setInputValue, refetch }) {
   const { data, loading, error } = useQuery(GET_COLLABORATOR_ID, {
     variables: { email: inputValue },
   });
@@ -229,27 +162,28 @@ function MutationLoader({ owner, inputValue, recordingId, setShowSpinner, setInp
     // Upon succesfully adding a collaborator, this component dismounts itself.
     if (mutationCalled && !mutationLoading && !mutationError) {
       setInputValue("");
-      setShowSpinner(false);
+      refetch();
+      setInProgress(false);
     }
   });
 
   if (inputValue === owner.email) {
-    setTimeout(() => setShowSpinner(false), 2000);
+    setTimeout(() => setInProgress(false), 2000);
     setInputValue("");
-    return <div className="spinner">ERROR: You can not add yourself as a collaborator.</div>;
+    return <div className="status">ERROR: You can not add yourself as a collaborator.</div>;
   } else if (error) {
-    setTimeout(() => setShowSpinner(false), 2000);
+    setTimeout(() => setInProgress(false), 2000);
     return (
-      <div className="spinner">ERROR: We can not fetch that collaborator right now. Try again.</div>
+      <div className="status">ERROR: We can not fetch that collaborator right now. Try again.</div>
     );
   } else if (mutationError) {
-    setTimeout(() => setShowSpinner(false), 2000);
+    setTimeout(() => setInProgress(false), 2000);
     return (
-      <div className="spinner">ERROR: We can not add that collaborator right now. Try again.</div>
+      <div className="status">ERROR: We can not add that collaborator right now. Try again.</div>
     );
   } else if (!loading && data.users.length === 0) {
-    setTimeout(() => setShowSpinner(false), 2000);
-    return <div className="spinner">ERROR: That e-mail address is not a valid Replay user.</div>;
+    setTimeout(() => setInProgress(false), 2000);
+    return <div className="status">ERROR: That e-mail address is not a valid Replay user.</div>;
   }
 
   if (!loading && !mutationCalled) {
@@ -260,20 +194,53 @@ function MutationLoader({ owner, inputValue, recordingId, setShowSpinner, setInp
   }
 
   return (
-    <div className="spinner">
+    <div className="status">
       <div className="img refresh" />
       <span className="content">Adding...</span>
     </div>
   );
 }
 
+function NewCollaboratorInput({ data, recordingId, refetch }) {
+  const [inputValue, setInputValue] = useState("");
+  const [inProgress, setInProgress] = useState(false);
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    setInProgress(true);
+  };
+
+  if (inProgress) {
+    return (
+      <MutationStatus
+        owner={data.recordings[0].user}
+        inputValue={inputValue}
+        recordingId={recordingId}
+        setInProgress={setInProgress}
+        setInputValue={setInputValue}
+        refetch={refetch}
+      />
+    );
+  }
+
+  return (
+    <form>
+      <input
+        type="text"
+        value={inputValue}
+        onChange={e => setInputValue(e.target.value)}
+        placeholder="Add a collaborator"
+      />
+      <input type="submit" onClick={handleSubmit} value={"Add"} />
+    </form>
+  );
+}
+
 function Sharing({ modal, hideModal }) {
-  const { data, loading, error } = useQuery(GET_OWNER_AND_COLLABORATORS, {
-    variables: { idUuid: modal.recordingId, idString: modal.recordingId },
-    pollInterval: 1000,
+  const { data, loading, error, refetch } = useQuery(GET_OWNER_AND_COLLABORATORS, {
+    variables: { recordingId: modal.recordingId },
   });
   const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE);
-  const fakeRecordingId = "afb1e1de-721c-44e8-929c-6a1798617618"; // use a fake id here since recording_id != id for old recordings
 
   const toggleIsPrivate = () => {
     updateIsPrivate({
@@ -291,7 +258,6 @@ function Sharing({ modal, hideModal }) {
       </Modal>
     );
   } else if (error || data.recordings.length !== 1 || !data.recordings[0].user) {
-    // Error state: Show the error message for 2s, then dismount SharingModal.
     setTimeout(() => hideModal(), 2000);
     return (
       <Modal opaque={modal.opaque}>
@@ -302,22 +268,25 @@ function Sharing({ modal, hideModal }) {
 
   return (
     <Modal opaque={modal.opaque}>
-      <button className="close-modal" onClick={hideModal}>X</button>
+      <button className="close-modal" onClick={hideModal}>
+        <div className="img close" />
+      </button>
       <h2>Share this recording with others</h2>
-      <NewCollaboratorInput data={data} recordingId={modal.recordingId} />
-      <PermissionsList data={data} recordingId={modal.recordingId} />
+      <NewCollaboratorInput data={data} recordingId={modal.recordingId} refetch={refetch} />
+      <PermissionsList data={data} recordingId={modal.recordingId} refetch={refetch} />
       <div className="buttons">
         <button className="done" onClick={hideModal}>
           <div className="content">Done</div>
         </button>
       </div>
-      {features.private ? (
+      {/* {features.private ? (
         <div className="permissions tip" onClick={toggleIsPrivate}>
           {data.recordings[0].is_private
             ? "Private: Only you and collaborators can view this recording"
             : "Public: Everybody with this link can view this recording"}
         </div>
-      ) : null}
+      ) : null} */}
+      <Privacy isPrivate={data.recordings[0].is_private} toggleIsPrivate={toggleIsPrivate} />
     </Modal>
   );
 }

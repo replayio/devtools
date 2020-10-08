@@ -5,8 +5,7 @@
   width: 100%;
   max-height: 100%;
   background: rgba(0,0,0,0.5);
-  box-shadow: none;
-  transition: none;
+
   z-index: 2;
 }
 
@@ -30,12 +29,11 @@
   justify-content: center;
   flex-direction: column;
   padding: 8rem 5rem 5rem;
-  /* padding: 5rem; */
-  /* text-align: center; */
+  box-shadow: none;
+  transition: none;
   margin: auto;
   border-radius: 2rem;
   background: white;
-  box-shadow: none;
   font-size: 1.25rem;
   width: 600px;
 }
@@ -59,21 +57,6 @@
 
 .modal-container .modal > *:not(:last-child) {
   margin-bottom: 2rem;
-}
-
-.modal-container button.close-modal {
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-  padding: 1rem 1.25rem;
-  border-radius: 50%;
-  color: var(--light-grey);
-  background: transparent;
-}
-
-.modal-container button.close-modal:hover {
-  background: var(--light-grey);
-  color: white;
 }
 
 .modal-container p, .modal-container li {

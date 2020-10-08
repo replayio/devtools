@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   padding: 12px 4px;
-  transition-duration: 200ms;
+  transition: background 200ms ease-in-out;
 }
 
 .modal-container .permission:hover {
@@ -81,7 +81,7 @@
   justify-content: flex-end;
 }
 
-.modal-container .spinner {
+.modal-container .status {
   display: flex;
   height: 40px;
   flex-direction: row;
@@ -95,10 +95,47 @@
   color: var(--light-grey);
 }
 
-.modal-container .spinner .img.refresh {
+.modal-container .status .img.refresh {
   height: 16px;
   padding-inline-end: 1em;
   margin-inline-end: .5em;
   background-color: var(--light-grey);
   animation: spin .7s linear infinite;
+}
+
+.modal-container button.close-modal {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  padding: 1rem;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.modal-container button.close-modal:hover {
+  background: var(--light-grey);
+}
+
+.modal-container button.close-modal:hover .img.close {
+  background-color: white;
+}
+
+.modal-container .privacy {
+  display: flex;
+  align-items: center;
+  cursor: pointer
+}
+
+.modal-container .privacy:hover {
+  color: var(--dark-blue);
+}
+
+.modal-container .privacy .img {
+  height: 24px;
+  width: 24px;
+  margin-right: 4px;
+}
+
+.modal-container .privacy:hover .img {
+  background: var(--dark-blue);
 }
