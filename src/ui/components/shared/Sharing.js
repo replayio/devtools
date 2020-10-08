@@ -9,6 +9,7 @@ import Loader from "./Loader";
 import { features } from "ui/utils/prefs";
 
 import "./Sharing.css";
+import { setConstantValue } from "typescript";
 
 const GET_OWNER_AND_COLLABORATORS = gql`
   query MyQuery($recordingId: uuid) {
@@ -151,78 +152,81 @@ function PermissionsList({ data, recordingId, refetch }) {
   );
 }
 
-function MutationStatus({ owner, inputValue, recordingId, setInProgress, setInputValue, refetch }) {
+function Fetcher({ setStatus, email }) {
   const { data, loading, error } = useQuery(GET_COLLABORATOR_ID, {
-    variables: { email: inputValue },
+    variables: { email },
   });
-  const [
-    addNewCollaborator,
-    { called: mutationCalled, loading: mutationLoading, error: mutationError },
-  ] = useMutation(ADD_COLLABORATOR);
 
   useEffect(() => {
-    // Upon succesfully adding a collaborator, this component dismounts itself.
-    if (mutationCalled && !mutationLoading && !mutationError) {
-      setInputValue("");
-      refetch();
-      setInProgress(false);
+    if (!loading) {
+      setStatus({ type: "fetched-user", data, error });
     }
   });
 
-  if (inputValue === owner.email) {
-    setTimeout(() => setInProgress(false), 2000);
-    setInputValue("");
-    return <div className="status error">You can not add yourself as a collaborator.</div>;
-  } else if (error) {
-    setTimeout(() => setInProgress(false), 2000);
-    return (
-      <div className="status error">We can not fetch that collaborator right now. Try again.</div>
-    );
-  } else if (mutationError) {
-    setTimeout(() => setInProgress(false), 2000);
-    return (
-      <div className="status error">We can not add that collaborator right now. Try again.</div>
-    );
-  } else if (!loading && data.users.length === 0) {
-    setTimeout(() => setInProgress(false), 2000);
-    return <div className="status error">That e-mail address is not a valid Replay user.</div>;
-  }
+  return <div className="status">{loading ? "Fetching" : "Fetched"}</div>;
+}
 
-  if (!loading && !mutationCalled) {
-    const userId = data.users[0].id;
+function Submitter({ setStatus, userId, recordingId }) {
+  const [addNewCollaborator, { loading, error }] = useMutation(ADD_COLLABORATOR);
+
+  useEffect(() => {
     addNewCollaborator({
       variables: { objects: [{ recording_id: recordingId, user_id: userId }] },
     });
-  }
+  }, []);
 
-  return (
-    <div className="status">
-      <div className="img refresh" />
-      <span className="content">Adding...</span>
-    </div>
-  );
+  useEffect(() => {
+    if (!loading) {
+      setStatus({ type: "submitted-user", error });
+    }
+  });
+
+  return <div className="status">{loading ? "Submitting" : "Submitted"}</div>;
 }
 
-function NewCollaboratorForm({ data, recordingId, refetch }) {
+function EmailForm({ data, recordingId, refetch }) {
   const [inputValue, setInputValue] = useState("");
-  const [inProgress, setInProgress] = useState(false);
+  const [status, setStatus] = useState({ type: "input" });
 
   const handleSubmit = e => {
     e.preventDefault();
-    setInProgress(true);
+    setStatus({ type: "submitted-email" });
+  };
+  const ErrorHandler = ({ message }) => {
+    setTimeout(() => {
+      setStatus({ type: "input" });
+      setInputValue("");
+    }, 2000);
+
+    return <div className="status error">{message}</div>;
   };
 
-  if (inProgress) {
+  // The status.type progresses as follows:
+  // (start) input -> submitted-email -> fetched-user -> submitted-user -> input (end)
+  if (status.type === "submitted-email") {
+    return <Fetcher setStatus={setStatus} email={inputValue} />;
+  }
+
+  if (status.type === "fetched-user") {
+    if (status.error) {
+      return <ErrorHandler message={"We can not fetch that collaborator right now."} />;
+    } else if (status.data.users.length === 0) {
+      return <ErrorHandler message={"That e-mail address is not a valid Replay user."} />;
+    }
+
     return (
-      <MutationStatus
-        owner={data.recordings[0].user}
-        inputValue={inputValue}
-        recordingId={recordingId}
-        setInProgress={setInProgress}
-        setInputValue={setInputValue}
-        refetch={refetch}
-      />
+      <Submitter setStatus={setStatus} userId={status.data.users[0].id} recordingId={recordingId} />
     );
+  }
+
+  if (status.type === "submitted-user") {
+    if (status.error) {
+      return <ErrorHandler message={"We can not add that collaborator right now."} />;
+    }
+
+    refetch();
+    setStatus({ type: "input" });
+    setInputValue("");
   }
 
   return (
@@ -274,20 +278,13 @@ function Sharing({ modal, hideModal }) {
         <div className="img close" />
       </button>
       <h2>Share this recording with others</h2>
-      <NewCollaboratorForm data={data} recordingId={modal.recordingId} refetch={refetch} />
+      <EmailForm data={data} recordingId={modal.recordingId} refetch={refetch} />
       <PermissionsList data={data} recordingId={modal.recordingId} refetch={refetch} />
       <div className="buttons">
         <button className="done" onClick={hideModal}>
           <div className="content">Done</div>
         </button>
       </div>
-      {/* {features.private ? (
-        <div className="permissions tip" onClick={toggleIsPrivate}>
-          {data.recordings[0].is_private
-            ? "Private: Only you and collaborators can view this recording"
-            : "Public: Everybody with this link can view this recording"}
-        </div>
-      ) : null} */}
       <Privacy isPrivate={data.recordings[0].is_private} toggleIsPrivate={toggleIsPrivate} />
     </Modal>
   );
