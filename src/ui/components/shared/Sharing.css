@@ -61,18 +61,13 @@
 }
 
 .modal-container .modal input[type=submit] {
-  display: none;
+  display: block;
+  margin-left: 1rem;
   flex-shrink: 0;
   color: white;
   background: var(--dark-blue);
   border: 0px;
   padding: 0px 2rem;
-  border-radius: 1rem;
-}
-
-.modal-container .modal form:focus-within input[type=submit] {
-  display: block;
-  margin-left: 1rem;
 }
 
 .modal-container .buttons {
@@ -101,6 +96,10 @@
   margin-inline-end: .5em;
   background-color: var(--light-grey);
   animation: spin .7s linear infinite;
+}
+
+.modal-container .status.error {
+  color: red;
 }
 
 .modal-container button.close-modal {

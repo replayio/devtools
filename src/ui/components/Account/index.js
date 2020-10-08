@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import Recordings from "../Recordings/index";
 import { useAuth0 } from "@auth0/auth0-react";

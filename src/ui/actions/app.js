@@ -70,7 +70,7 @@ export function setUploading(uploading) {
 
 export function setSharingModal(recordingId) {
   return {
-    type: "set_sharing_modal",
+    type: "set_modal",
     modal: {
       type: "sharing",
       recordingId,
@@ -81,6 +81,7 @@ export function setSharingModal(recordingId) {
 
 export function hideModal() {
   return {
-    type: "hide_modal",
+    type: "set_modal",
+    modal: null,
   };
 }

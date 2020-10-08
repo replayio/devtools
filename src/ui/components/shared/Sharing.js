@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
-import { gql, useLazyQuery, useQuery, useMutation } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import Modal from "./Modal";
@@ -9,7 +9,6 @@ import Loader from "./Loader";
 import { features } from "ui/utils/prefs";
 
 import "./Sharing.css";
-import { bindActionCreators } from "redux";
 
 const GET_OWNER_AND_COLLABORATORS = gql`
   query MyQuery($recordingId: uuid) {
@@ -170,20 +169,20 @@ function MutationStatus({ owner, inputValue, recordingId, setInProgress, setInpu
   if (inputValue === owner.email) {
     setTimeout(() => setInProgress(false), 2000);
     setInputValue("");
-    return <div className="status">ERROR: You can not add yourself as a collaborator.</div>;
+    return <div className="status error">You can not add yourself as a collaborator.</div>;
   } else if (error) {
     setTimeout(() => setInProgress(false), 2000);
     return (
-      <div className="status">ERROR: We can not fetch that collaborator right now. Try again.</div>
+      <div className="status error">We can not fetch that collaborator right now. Try again.</div>
     );
   } else if (mutationError) {
     setTimeout(() => setInProgress(false), 2000);
     return (
-      <div className="status">ERROR: We can not add that collaborator right now. Try again.</div>
+      <div className="status error">We can not add that collaborator right now. Try again.</div>
     );
   } else if (!loading && data.users.length === 0) {
     setTimeout(() => setInProgress(false), 2000);
-    return <div className="status">ERROR: That e-mail address is not a valid Replay user.</div>;
+    return <div className="status error">That e-mail address is not a valid Replay user.</div>;
   }
 
   if (!loading && !mutationCalled) {
@@ -201,7 +200,7 @@ function MutationStatus({ owner, inputValue, recordingId, setInProgress, setInpu
   );
 }
 
-function NewCollaboratorInput({ data, recordingId, refetch }) {
+function NewCollaboratorForm({ data, recordingId, refetch }) {
   const [inputValue, setInputValue] = useState("");
   const [inProgress, setInProgress] = useState(false);
 
@@ -272,7 +271,7 @@ function Sharing({ modal, hideModal }) {
         <div className="img close" />
       </button>
       <h2>Share this recording with others</h2>
-      <NewCollaboratorInput data={data} recordingId={modal.recordingId} refetch={refetch} />
+      <NewCollaboratorForm data={data} recordingId={modal.recordingId} refetch={refetch} />
       <PermissionsList data={data} recordingId={modal.recordingId} refetch={refetch} />
       <div className="buttons">
         <button className="done" onClick={hideModal}>

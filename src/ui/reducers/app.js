@@ -14,11 +14,6 @@ function initialAppState() {
     uploading: null,
     sessionId: null,
     modal: null,
-    // modal: {
-    //   type: "sharing",
-    //   recordingId: "72ea0294-9937-45a5-b71c-45bcd7aee575",
-    //   mask: true,
-    // },
   };
 }
 
@@ -60,12 +55,8 @@ export default function update(state = initialAppState(), action) {
       return { ...state, sessionId: action.sessionId };
     }
 
-    case "set_sharing_modal": {
-      return { ...state, modal: { type: "sharing", ...action.modal } };
-    }
-
-    case "hide_modal": {
-      return { ...state, modal: null };
+    case "set_modal": {
+      return { ...state, modal: action.modal };
     }
 
     default: {
