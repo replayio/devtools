@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import classnames from "classnames";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import Modal from "./Modal";
 import Loader from "./Loader";
-import { features } from "ui/utils/prefs";
 
 import "./Sharing.css";
-import { setConstantValue } from "typescript";
 
 const GET_OWNER_AND_COLLABORATORS = gql`
   query MyQuery($recordingId: uuid) {
