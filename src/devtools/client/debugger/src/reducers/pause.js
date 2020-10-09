@@ -76,7 +76,7 @@ function update(state = createPauseState(), action) {
 
     case "FETCHED_FRAMES": {
       const { frames } = action;
-      const selectedFrameId = frames.length ? frames[0].id : undefined;
+      const selectedFrameId = frames && frames.length ? frames[0].id : undefined;
       return {
         ...state,
         frames,
