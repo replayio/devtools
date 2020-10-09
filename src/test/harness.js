@@ -338,6 +338,7 @@ async function toggleObjectInspectorNode(node) {
 
 async function checkMessageObjectContents(msg, expected, expandList = []) {
   const oi = await findMessageExpandableObjectInspector(msg);
+
   await toggleObjectInspectorNode(oi);
 
   for (const label of expandList) {
@@ -546,7 +547,7 @@ async function ensurePseudoElementRulesExpanded() {
   }
 }
 
-module.exports = {
+const testCommands = {
   selectConsole,
   selectDebugger,
   selectInspector,
@@ -587,6 +588,7 @@ module.exports = {
   checkJumpIcon,
   checkMessageObjectContents,
   toggleObjectInspectorNode,
+  findMessageExpandableObjectInspector,
   findScopeNode,
   toggleScopeNode,
   executeInConsole,
@@ -610,3 +612,11 @@ module.exports = {
   getAppliedRulesJSON,
   checkAppliedRules,
 };
+
+module.exports = Object.entries(testCommands).reduce((exports, [name, func]) => {
+  exports[name] = (...args) => {
+    console.log(name, ...args);
+    return func(...args);
+  };
+  return exports;
+}, {});

@@ -151,7 +151,7 @@ class Message extends Component {
     let onRewindClick = null;
     let overlayType, label, onClick;
 
-    if (!pausedExecutionPointTime || inWarningGroup) {
+    if (inWarningGroup) {
       return undefined;
     }
 
@@ -165,13 +165,13 @@ class Message extends Component {
       };
     }
 
-    if (executionPointTime > pausedExecutionPointTime) {
-      overlayType = "fast-forward";
-      label = "Fast Forward";
-      onClick = onRewindClick;
-    } else if (executionPointTime < pausedExecutionPointTime) {
+    if (!pausedExecutionPointTime || executionPointTime < pausedExecutionPointTime) {
       overlayType = "rewind";
       label = "Rewind";
+      onClick = onRewindClick;
+    } else if (executionPointTime > pausedExecutionPointTime) {
+      overlayType = "fast-forward";
+      label = "Fast Forward";
       onClick = onRewindClick;
     } else {
       overlayType = "debug";
@@ -187,7 +187,7 @@ class Message extends Component {
     }
 
     return dom.div(
-      { className: `overlay-container ${overlayType}`, onClick },
+      { className: `overlay-container rewindable ${overlayType}`, onClick },
       dom.div({ className: "info" }, dom.div({ className: "label" }, label)),
       dom.div({ className: "button" }, dom.div({ className: "img" }))
     );

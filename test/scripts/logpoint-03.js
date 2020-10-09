@@ -1,5 +1,5 @@
 // Test event logpoints when replaying.
-(async function() {
+(async function () {
   await Test.selectConsole();
   await Test.addEventListenerLogpoints(["event.mouse.click"]);
 
