@@ -1,6 +1,6 @@
 # It would be nice if this could be commoned up with deploy.yml
 name: Run tests
-on: pull_request
+on: [pull_request, workflow_dispatch]
 
 jobs:
   build:
