@@ -1,20 +1,34 @@
-const { defer, makeInfallible } = require("./utils");
-const { ProtocolClient } = require("record-replay-protocol/js/client");
+import { defer, makeInfallible } from "./utils";
+import { ProtocolClient } from "record-replay-protocol/js/client";
 
-let socket;
+interface Message {
+  id: number;
+  method: string;
+  params: any;
+  sessionId?: string;
+  pauseId?: string;
+}
+
+let socket: WebSocket;
 let gSocketOpen = false;
 
-let gPendingMessages = [];
+let gPendingMessages: Message[] = [];
 let gNextMessageId = 1;
 
-const gMessageWaiters = new Map();
+interface MessageWaiter {
+  method: string;
+  resolve: (value: any) => void;
+  reject: (reason: any) => void;
+}
+
+const gMessageWaiters = new Map<number, MessageWaiter>();
 
 // These are helpful when investigating connection speeds.
 const gStartTime = Date.now();
 let gSentBytes = 0;
 let gReceivedBytes = 0;
 
-function initSocket(address) {
+export function initSocket(address?: string) {
   socket = new WebSocket(address || "wss://dispatch.replay.io");
 
   socket.onopen = makeInfallible(onSocketOpen);
@@ -23,7 +37,7 @@ function initSocket(address) {
   socket.onmessage = makeInfallible(onSocketMessage);
 }
 
-function sendMessage(method, params, sessionId, pauseId) {
+export function sendMessage(method: string, params: any, sessionId?: string, pauseId?: string) {
   const id = gNextMessageId++;
   const msg = { id, sessionId, pauseId, method, params };
 
@@ -33,7 +47,7 @@ function sendMessage(method, params, sessionId, pauseId) {
     gPendingMessages.push(msg);
   }
 
-  const { promise, resolve, reject } = defer();
+  const { promise, resolve, reject } = defer<any>();
   gMessageWaiters.set(id, { method, resolve, reject });
 
   return promise;
@@ -53,31 +67,31 @@ function onSocketOpen() {
   gSocketOpen = true;
 }
 
-const gEventListeners = new Map();
+const gEventListeners = new Map<string, (ev: any) => void>();
 
-function addEventListener(method, handler) {
+export function addEventListener(method: string, handler: (ev: any) => void) {
   if (gEventListeners.has(method)) {
-    throw new Error("Duplicate event listener", method);
+    throw new Error("Duplicate event listener: " + method);
   }
   gEventListeners.set(method, handler);
 }
 
-function removeEventListener(method) {
+export function removeEventListener(method: string) {
   gEventListeners.delete(method);
 }
 
-const client = new ProtocolClient({
+export const client = new ProtocolClient({
   sendCommand: sendMessage,
   addEventListener,
   removeEventListener,
 });
 
-function onSocketMessage(evt) {
+function onSocketMessage(evt: MessageEvent<any>) {
   gReceivedBytes += evt.data.length;
   const msg = JSON.parse(evt.data);
 
   if (msg.id) {
-    const { method, resolve, reject } = gMessageWaiters.get(msg.id);
+    const { method, resolve, reject } = gMessageWaiters.get(msg.id)!;
     window.performance?.mark(`${method}_end`);
     window.performance?.measure(method, `${method}_start`, `${method}_end`);
 
@@ -89,7 +103,7 @@ function onSocketMessage(evt) {
       resolve(msg.result);
     }
   } else if (gEventListeners.has(msg.method)) {
-    const handler = gEventListeners.get(msg.method);
+    const handler = gEventListeners.get(msg.method)!;
     handler(msg.params);
   } else {
     console.error("Received unknown message", msg);
@@ -105,34 +119,24 @@ function onSocketError() {
   log("Socket Error");
 }
 
-function log(text) {
+export function log(text: string) {
   // Don't actually log anything. This is a convenient place to add a logpoint
   // when reviewing recordings of the viewer.
 }
 
-function setStatus(text) {
+export function setStatus(text: string) {
   if (document.getElementById("status")) {
-    document.getElementById("status").innerText = text;
+    document.getElementById("status")!.innerText = text;
   }
 }
 
-module.exports = {
-  initSocket,
-  sendMessage,
-  addEventListener,
-  removeEventListener,
-  client,
-  log,
-  setStatus,
-};
-
 // Debugging methods.
 if (typeof window === "object") {
-  window.disconnect = () => {
+  (window as any).disconnect = () => {
     socket.close();
   };
 
-  window.outstanding = () => {
+  (window as any).outstanding = () => {
     const messages = [...gMessageWaiters.entries()].map(([id, { method }]) => ({
       id,
       method,

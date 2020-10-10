@@ -1,5 +1,5 @@
-function makeInfallible(fn, thisv) {
-  return (...args) => {
+export function makeInfallible(fn: (...args: any[]) => void, thisv?: any) {
+  return (...args: any[]) => {
     try {
       fn.apply(thisv, args);
     } catch (e) {
@@ -8,20 +8,21 @@ function makeInfallible(fn, thisv) {
   };
 }
 
-function defer() {
-  let resolve, reject;
-  const promise = new Promise((res, rej) => {
+export function defer<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason: any) => void;
+  const promise = new Promise<T>((res, rej) => {
     resolve = res;
     reject = rej;
   });
   return { promise, resolve, reject };
 }
 
-function waitForTime(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+export function waitForTime(ms: number) {
+  return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
 
-function throttle(callback, time) {
+export function throttle(callback: () => void, time: number) {
   let scheduled = false;
   return () => {
     if (scheduled) {
@@ -35,19 +36,19 @@ function throttle(callback, time) {
   };
 }
 
-function clamp(value, min, max) {
+export function clamp(value: number, min: number, max: number) {
   assert(min < max);
   return Math.max(min, Math.min(max, value));
 }
 
-function assert(v, msg = "Assertion failed!") {
+export function assert(v: any, msg = "Assertion failed!") {
   if (!v) {
     console.error(msg);
     throw new Error(msg);
   }
 }
 
-function binarySearch(start, end, callback) {
+export function binarySearch(start: number, end: number, callback: (mid: number) => number) {
   while (start + 1 < end) {
     const mid = ((start + end) / 2) | 0;
     const rv = callback(mid);
@@ -64,14 +65,14 @@ function NotAllowed() {
   console.error("Not allowed");
 }
 
-const DisallowEverythingProxyHandler = {
+export const DisallowEverythingProxyHandler = {
   getPrototypeOf() {
     NotAllowed();
   },
   has() {
     NotAllowed();
   },
-  get(_, name) {
+  get() {
     NotAllowed();
   },
   //set() { NotAllowed(); },
@@ -104,13 +105,20 @@ const DisallowEverythingProxyHandler = {
   },
 };
 
-const EventEmitter = {
-  decorate(obj) {
-    obj.eventListeners = new Map();
+export interface EventEmitter<T> {
+  eventListeners: Map<string, ((value: T) => void)[]>;
+  on: (name: string, handler: (value: T) => void) => void;
+  off: (name: string, handler: (value: T) => void) => void;
+  emit: (name: string, value: T) => void;
+}
+
+export const EventEmitter = {
+  decorate<T>(obj: EventEmitter<T>) {
+    obj.eventListeners = new Map<string, ((value: T) => void)[]>();
 
     obj.on = (name, handler) => {
       if (obj.eventListeners.has(name)) {
-        obj.eventListeners.get(name).push(handler);
+        obj.eventListeners.get(name)!.push(handler);
       } else {
         obj.eventListeners.set(name, [handler]);
       }
@@ -130,19 +138,21 @@ const EventEmitter = {
 };
 
 // Map from keys to arrays of values.
-function ArrayMap() {
-  this.map = new Map();
-}
+export class ArrayMap<K, V> {
+  map: Map<K, V[]>;
 
-ArrayMap.prototype = {
-  add(key, value) {
+  constructor() {
+    this.map = new Map<K, V[]>();
+  }
+
+  add(key: K, value: V) {
     if (this.map.has(key)) {
-      this.map.get(key).push(value);
+      this.map.get(key)!.push(value);
     } else {
       this.map.set(key, [value]);
     }
-  },
-};
+  }
+}
 
 /**
  * Compare 2 integers encoded as numeric strings, because we want to avoid using BigInt (for now).
@@ -150,20 +160,6 @@ ArrayMap.prototype = {
  * using the same base (usually 10) and don't use "fancy stuff" like leading "+", "0" or scientific
  * notation.
  */
-function compareNumericStrings(a, b) {
+export function compareNumericStrings(a: string, b: string) {
   return a.length < b.length ? -1 : a.length > b.length ? 1 : a < b ? -1 : a > b ? 1 : 0;
 }
-
-module.exports = {
-  makeInfallible,
-  defer,
-  waitForTime,
-  throttle,
-  clamp,
-  assert,
-  binarySearch,
-  DisallowEverythingProxyHandler,
-  EventEmitter,
-  ArrayMap,
-  compareNumericStrings,
-};
