@@ -1,5 +1,5 @@
-const { client } = require("./socket");
-const { defer } = require("./utils");
+import { client } from "./socket";
+import { defer } from "./utils";
 import { Location, MappedLocation } from "record-replay-protocol/js/protocol";
 
 export class MappedLocationCache {
@@ -26,7 +26,7 @@ export class MappedLocationCache {
       return [ location ];
     }
 
-    const { promise, resolve } = defer();
+    const { promise, resolve } = defer<MappedLocation>();
     this.runningRequests.set(cacheKey, promise);
     const { mappedLocation } = await client.Debugger.getMappedLocation(
       { location }, this.sessionId

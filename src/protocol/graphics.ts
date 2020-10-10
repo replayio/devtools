@@ -1,10 +1,10 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
 
 const { ThreadFront } = require("./thread");
-const { assert, binarySearch, defer } = require("./utils");
+import { assert, binarySearch } from "./utils";
 import { ScreenshotCache } from "./screenshot-cache";
-const ResizeObserverPolyfill = require("resize-observer-polyfill").default;
-import { TimeStampedPoint, MouseEvent, paintPoints, mouseEvents, ScreenShot } from "record-replay-protocol/js/protocol";
+import ResizeObserverPolyfill from "resize-observer-polyfill";
+import { TimeStampedPoint, MouseEvent, paintPoints, mouseEvents, ScreenShot } from "record-replay-protocol";
 import { client } from "./socket";
 
 export const screenshotCache = new ScreenshotCache();

@@ -18,7 +18,7 @@ const {
   getDescriptorValue,
   getParentWarningGroupMessageId,
 } = require("devtools/client/webconsole/utils/messages");
-const { pointPrecedes, pointEquals } = require("protocol/execution-point-utils.js");
+const { pointPrecedes, pointEquals } = require("protocol/execution-point-utils");
 const { sortBy } = require("lodash");
 const { log } = require("protocol/socket");
 const { assert, compareNumericStrings } = require("protocol/utils");

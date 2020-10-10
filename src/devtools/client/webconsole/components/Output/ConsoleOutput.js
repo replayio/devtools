@@ -23,7 +23,7 @@ const PropTypes = require("prop-types");
 const {
   MessageContainer,
 } = require("devtools/client/webconsole/components/Output/MessageContainer");
-const { pointPrecedes } = require("protocol/execution-point-utils.js");
+const { pointPrecedes } = require("protocol/execution-point-utils");
 
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const {
