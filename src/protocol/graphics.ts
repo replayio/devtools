@@ -120,12 +120,11 @@ ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
 });
 
 export function addLastScreen(screen: ScreenShot, point: string, time: number) {
-  let paintHash;
   if (screen) {
     addScreenShot(screen);
-    paintHash = screen.hash;
+    const paintHash = screen.hash;
+    insertEntrySorted(gPaintPoints, { point, time, paintHash });
   }
-  insertEntrySorted(gPaintPoints, { point, time, paintHash });
 }
 
 export function mostRecentPaintOrMouseEvent(time: number) {
