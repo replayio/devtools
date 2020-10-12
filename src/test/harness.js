@@ -4,6 +4,7 @@
 const { ThreadFront } = require("protocol/thread");
 const { setRandomLogpoint } = require("protocol/logpoint");
 const { assert, waitForTime } = require("protocol/utils");
+const { mapValues } = require("lodash");
 
 const dbg = gToolbox.getPanel("debugger").getVarsForTests();
 
@@ -547,7 +548,7 @@ async function ensurePseudoElementRulesExpanded() {
   }
 }
 
-module.exports = {
+const testCommands = {
   selectConsole,
   selectDebugger,
   selectInspector,
@@ -611,3 +612,10 @@ module.exports = {
   getAppliedRulesJSON,
   checkAppliedRules,
 };
+
+module.exports = mapValues(testCommands, (command, name) => {
+  return (...args) => {
+    console.log(name, ...args);
+    return command(...args);
+  };
+});
