@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import Recordings from "../Recordings/index";
 import { useAuth0 } from "@auth0/auth0-react";
-import Header from "../Header";
+import Header from "../Header/index";
 import Loader from "../shared/Loader";
 import Modal from "../shared/Modal";
 import { gql, useQuery } from "@apollo/client";
