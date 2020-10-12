@@ -39,12 +39,18 @@ function Avatars({ user, getActiveUsers }) {
   );
 }
 
-function Links({ user, getActiveUsers }) {
+function Links({ user, getActiveUsers, recordingId, setSharingModal }) {
   return (
     <div className="links">
       <a id="headway" onClick={() => Headway.toggle()}>
         What&apos;s new
       </a>
+      {recordingId ? (
+        <button className="share" onClick={() => setSharingModal(recordingId)}>
+          <div className="img share" />
+          <span className="content">Share</span>
+        </button>
+      ) : null}
       <Avatars user={user} getActiveUsers={getActiveUsers} />
       {features.auth0 ? <LoginButton /> : null}
     </div>
@@ -79,7 +85,7 @@ function useGetTitle(recordingId) {
   return firstRecording.recordingTitle || firstRecording.title;
 }
 
-function Header({ user, getActiveUsers, recordingId }) {
+function Header({ user, getActiveUsers, recordingId, setSharingModal }) {
   const [editingTitle, setEditingTitle] = useState(false);
   const defaultTitle = useGetTitle(recordingId);
 
@@ -102,7 +108,12 @@ function Header({ user, getActiveUsers, recordingId }) {
           editingTitle={editingTitle}
         />
       )}
-      <Links user={user} getActiveUsers={getActiveUsers} />
+      <Links
+        user={user}
+        getActiveUsers={getActiveUsers}
+        recordingId={recordingId}
+        setSharingModal={setSharingModal}
+      />
     </div>
   );
 }
@@ -112,5 +123,8 @@ export default connect(
     user: selectors.getUser(state),
     recordingId: selectors.getRecordingId(state),
   }),
-  { getActiveUsers: actions.getActiveUsers }
+  {
+    getActiveUsers: actions.getActiveUsers,
+    setSharingModal: actions.setSharingModal,
+  }
 )(Header);

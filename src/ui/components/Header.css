@@ -80,10 +80,37 @@
   text-decoration: underline;
 }
 
-.loading-bar {
-  height: 4px;
-  background: linear-gradient(138.3deg, #236eff 7.98%, #71e5ff 93.53%);
-  transition-duration: 300ms;
+#header button {
+  cursor: pointer;
+}
+
+#header button.share {
+  margin-left: 8px;
+  margin-right: 16px;
+  padding: 8px 12px;
+  background: var(--dark-blue);
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+#header button.share .img.share {
+  background: white;
+  margin-right: 4px;
+}
+
+.user-account button {
+  padding: 7px;
+  background: white;
+  color: var(--grey-80);
+  border: 1px solid var(--grey-50);
+  margin-inline-start: 12px;
+  border-radius: 2px;
+}
+
+.user-account button:hover {
+  border: 1px solid var(--grey-70);
+  cursor: pointer;
 }
 
 #header .title {

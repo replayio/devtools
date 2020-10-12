@@ -122,6 +122,7 @@ const gMaskImages = {
   ".img.worker": require("devtools/client/debugger/images/worker.svg"),
   ".img.locked": require("devtools/client/debugger/images/locked.svg"),
   ".img.unlocked": require("devtools/client/debugger/images/unlocked.svg"),
+  ".img.share": require("devtools/client/debugger/images/share.svg"),
   "#toolbox-toolbar-console .toolbar-panel-icon": require("devtools/client/themes/images/tool-webconsole.svg"),
   "#toolbox-toolbar-debugger .toolbar-panel-icon": require("devtools/client/themes/images/tool-debugger.svg"),
   "#toolbox-toolbar-inspector .toolbar-panel-icon": require("devtools/client/themes/images/tool-inspector.svg"),
