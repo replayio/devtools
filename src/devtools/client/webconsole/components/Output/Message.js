@@ -145,13 +145,13 @@ class Message extends Component {
       executionPointHasFrames,
       serviceContainer,
       inWarningGroup,
-      pausedExecutionPointTime,
+      pausedExecutionPointTime = Number.POSITIVE_INFINITY,
       frame,
     } = this.props;
     let onRewindClick = null;
     let overlayType, label, onClick;
 
-    if (!pausedExecutionPointTime || inWarningGroup) {
+    if (inWarningGroup) {
       return undefined;
     }
 

@@ -27,6 +27,7 @@ async function waitUntil(fn) {
     }
     await waitForTime(i < 10 ? 50 : 100);
   }
+  console.trace("waitUntil() timed out");
   throw new Error("waitUntil() timed out");
 }
 
@@ -277,7 +278,7 @@ function waitForMessage(text, extraSelector) {
 
 async function warpToMessage(text) {
   const msg = await waitForMessage(text);
-  const warpButton = msg.querySelector(".rewind");
+  const warpButton = msg.querySelector(".rewind") || msg.querySelector(".fast-forward");
   warpButton.click();
   await waitForPaused();
 }
