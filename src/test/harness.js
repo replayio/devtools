@@ -277,7 +277,7 @@ function waitForMessage(text, extraSelector) {
 
 async function warpToMessage(text) {
   const msg = await waitForMessage(text);
-  const warpButton = msg.querySelector(".rewindable");
+  const warpButton = msg.querySelector(".rewind");
   warpButton.click();
   await waitForPaused();
 }
