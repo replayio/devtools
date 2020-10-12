@@ -4,7 +4,6 @@ const fs = require("fs");
 const http = require("http");
 const os = require("os");
 const { spawnSync, spawn } = require("child_process");
-const { defer } = require("../src/protocol/utils");
 const url = require("url");
 const Manifest = require("./manifest.json");
 
@@ -192,7 +191,8 @@ async function runTest(path, local, timeout = 60, env = {}) {
   // Recording ID of any viewer recording we've detected.
   let recordingId;
 
-  const waiter = defer();
+  let resolve;
+  const promise = new Promise(r => (resolve = r));
 
   function processOutput(data) {
     const match = /CreateRecording (.*?) (.*)/.exec(data.toString());
@@ -244,7 +244,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
         logFailure("Exited without passing test");
       }
     }
-    waiter.resolve();
+    resolve();
   });
 
   if (!process.env.RECORD_REPLAY_NO_TIMEOUT) {
@@ -257,7 +257,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
     }, timeout * 1000);
   }
 
-  await waiter.promise;
+  await promise;
 }
 
 (async function () {
