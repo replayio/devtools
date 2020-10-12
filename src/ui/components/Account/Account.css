@@ -1,4 +1,4 @@
-.user-prompt button .spinner {
+.modal-container button .spinner {
   display: none;
   width: 1.5rem;
   height: 1.5rem;
@@ -8,28 +8,28 @@
   animation: spin 0.7s linear infinite;
 }
 
-.user-prompt.clicked button .spinner {
+.modal-container.clicked button .spinner {
   display: block;
 }
 
-.user-prompt button.jump {
+.modal-container button.jump {
   animation: jump 0.5s linear alternate 3;
   box-shadow: 0px 0px 5px 0px var(--light-grey);
 }
 
-.user-prompt.clicked p {
+.modal-container.clicked p {
   opacity: 50%;
   color: var(--light-grey);
   transition-duration: 500ms;
   transition-timing-function: ease;
 }
 
-.user-prompt.clicked p.done {
+.modal-container.clicked p.done {
   opacity: 100%;
   color: var(--dark-blue);
 }
 
-.user-prompt .preview-container {
+.modal-container .preview-container {
   width: 400px;
   height: 250px;
   background-size: contain;
