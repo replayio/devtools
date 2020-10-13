@@ -30,7 +30,17 @@ export function PopupBlockedError() {
   );
 }
 
-export function SessionError({ error }) {
+export function Error({ error }) {
+  if (error != "Session died unexpectedly") {
+    return (
+      <Modal opaque error>
+        <h1>Whoops!</h1>
+        <p>Looks like something went wrong with this page.</p>
+        <p className="tip">Error: {error}</p>
+      </Modal>
+    );
+  }
+
   return (
     <Modal translucent error>
       <h1>Whoops!</h1>

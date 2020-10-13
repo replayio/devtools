@@ -53,6 +53,8 @@ async function createSession() {
   } catch (e) {
     if (e.code == 9) {
       store.dispatch(setErrorMessage("Invalid recording ID"));
+    } else if (e.code == 31) {
+      store.dispatch(setErrorMessage("This recording format is no longer supported"));
     } else {
       throw e;
     }
