@@ -28,7 +28,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  z-index: var(--z-index-6--mask)
+  z-index: var(--z-index-7--mask);
 }
 
 .dropdown-container .content {
@@ -42,7 +42,7 @@
   box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
   background: var(--theme-toolbar-background);
   color: var(--theme-toolbar-color);
-  z-index: var(--z-index-7--dropdown)
+  z-index: var(--z-index-8--dropdown)
 }
 
 .dropdown-container .content.top-right {

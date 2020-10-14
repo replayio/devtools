@@ -1,34 +1,101 @@
-.modal-container.error .modal {
-  text-align: center;  
+.error-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
-.modal-container.error .modal button.clicked {
+.error-container.expected {
+  z-index: var(--z-index-8--expected-error);
+}
+
+.error-container.unexpected {
+  z-index: var(--z-index-10--unexpected-error);
+}
+
+.error-mask {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+}
+
+.error-container.unexpected .error-mask {
+  background: linear-gradient(152.2deg, rgba(103, 218, 255, 0.90) 6.75%, rgba(67, 130, 255, 0.90) 93.14%);
+}
+
+.error-container.expected .error-mask {
+  background: linear-gradient(152.2deg, #67DAFF 6.75%, #4382FF 93.14%);
+}
+
+.error-content {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: max-content;
+  width: 640px;
+  min-height: 460px;
+  min-width: 640px;
+  border-radius: 8px;
+  padding: 20px;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--theme-toolbar-background);
+  color: var(--theme-toolbar-color);
+  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+  font-size: 1.25rem;
+}
+
+.error-content {
+  background-image: url(images/stargazing.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.error-content > *:not(:last-child) {
+  margin-bottom: 20px;
+}
+
+.error-content .error-message {
+  position: absolute;
+  margin: 0px;
+  bottom: 20px;
+  color: var(--theme-comment);
+  font-size: 1rem;
+}
+
+/* Refresh button */
+
+.error-content button {
+  display: flex;
+  flex-direction: row;
+  padding: 10px 15px;
+  border-radius: 4px;
+  align-items: center;
+  color: white;
+  background: var(--light-blue);
+  line-height: 16px;
+  outline: none;
+  cursor: pointer;
+}
+
+.error-content button:hover {
+  box-shadow: 0px 0px 5px 0px var(--light-grey);
+  background-color: var(--dark-blue);
+}
+
+.error-content button.clicked {
   background: linear-gradient(152.34deg, #3398ff 25.66%, #007dfd 78.07%);
 }
 
-.modal-container.error .modal button.clicked .img.refresh {
+.error-content button.clicked .img.refresh {
   animation: spin .7s linear infinite;
 }
 
-.modal-container.error .modal .tip {
-  color: var(--light-grey);
-  width: 75%;
-  font-size: 1.1rem;
-  line-height: 1.5;
-  background-image: "/images"
-}
-
-.modal-container.error .modal .tip .record {
-  margin: 0 .5rem;
-  border: 1px solid var(--faint-red);
-  padding: 2px 5px;
-  border-radius: 5px;
-  font-size: .8rem;
-  vertical-align: text-bottom;
-  color: var(--faint-red)
-}
-
-.modal-container.error .modal button .img.refresh {
+.error-content button .img.refresh {
   margin-inline-end: .5em;
   background-color: white;
 }

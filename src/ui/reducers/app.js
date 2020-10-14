@@ -3,7 +3,8 @@ import { prefs } from "../utils/prefs";
 function initialAppState() {
   return {
     recordingId: null,
-    errorMessage: null,
+    expectedError: null,
+    unexpectedError: null,
     theme: "theme-light",
     // Whether or not the developer tools toolbox is opened.
     isToolboxOpen: prefs.isToolboxOpen,
@@ -27,8 +28,12 @@ export default function update(state = initialAppState(), action) {
       return { ...state, uploading: action.uploading };
     }
 
-    case "set_error_message": {
-      return { ...state, errorMessage: action.message };
+    case "set_expected_error": {
+      return { ...state, expectedError: action.error };
+    }
+
+    case "set_unexpected_error": {
+      return { ...state, unexpectedError: action.error };
     }
 
     case "update_theme": {
@@ -73,5 +78,6 @@ export const getLoading = state => state.app.loading;
 export const getUploading = state => state.app.uploading;
 export const getRecordingId = state => state.app.recordingId;
 export const getSessionId = state => state.app.sessionId;
-export const getErrorMessage = state => state.app.errorMessage;
+export const getExpectedError = state => state.app.expectedError;
+export const getUnexpectedError = state => state.app.unexpectedError;
 export const getModal = state => state.app.modal;

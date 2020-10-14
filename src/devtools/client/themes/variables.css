@@ -367,17 +367,16 @@ custom variable for it below so we can keep track of everything in one place. */
   --z-index-4--name: var(--z-index-4);
   --z-index-5--name: var(--z-index-5);
   --z-index-6--name: var(--z-index-6);
+  --z-index-7--name: var(--z-index-7);
 
-  --z-index-6--mask: var(--z-index-6);
+  --z-index-7--mask: var(--z-index-7);
 
-  --z-index-7--error: var(--z-index-7);
-  --z-index-7--modal: var(--z-index-7);
-  --z-index-7--dropdown: var(--z-index-7);
-
-  --z-index-8--mask: var(--z-index-8);
+  --z-index-8--expected-error: var(--z-index-8);
+  --z-index-8--modal: var(--z-index-8);
+  --z-index-8--dropdown: var(--z-index-8);
 
   --z-index-9--modal-error: var(--z-index-9);
   --z-index-9--dropdown-error: var(--z-index-9);
 
-  --z-index-10--fatal-error: var(--z-index-10);
+  --z-index-10--unexpected-error: var(--z-index-10);
 }

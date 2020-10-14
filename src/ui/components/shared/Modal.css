@@ -5,7 +5,7 @@
   width: 100%;
   max-height: 100%;
   background: rgba(0,0,0,0.5);
-  z-index: var(--z-index-7--modal);
+  z-index: var(--z-index-8--modal);
 }
 
 .modal-container.opaque {
@@ -89,3 +89,29 @@
   padding-top: 0.5px; 
 }
 
+.modal-container.error .modal {
+  text-align: center;
+}
+
+.modal-container.error .modal .tip {
+  color: var(--light-grey);
+  width: 75%;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  background-image: "/images"
+}
+
+.modal-container.error .modal .tip .record {
+  margin: 0 .5rem;
+  border: 1px solid var(--faint-red);
+  padding: 2px 5px;
+  border-radius: 5px;
+  font-size: .8rem;
+  vertical-align: text-bottom;
+  color: var(--faint-red)
+}
+
+.modal-container.error .modal button .img.refresh {
+  margin-inline-end: .5em;
+  background-color: white;
+}

@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import DevTools from "./DevTools";
 import Account from "./Account";
 import Loader from "./shared/Loader";
-import { SessionError, PopupBlockedError } from "./shared/Error";
+import { AppErrors, PopupBlockedError } from "./shared/Error";
 import Sharing from "./shared/Sharing";
 import { selectors } from "ui/reducers";
 import { useApolloClient, ApolloProvider } from "@apollo/client";
@@ -56,9 +56,9 @@ function App({ theme, recordingId, sessionError, modal }) {
 
   return (
     <ApolloProvider client={apolloClient}>
-      {sessionError ? <SessionError error={sessionError} /> : null}
-      {modal?.type === "sharing" ? <Sharing /> : null}
       {recordingId ? <DevTools /> : <Account />}
+      {modal?.type === "sharing" ? <Sharing /> : null}
+      <AppErrors />
     </ApolloProvider>
   );
 }
@@ -67,7 +67,6 @@ export default connect(
   state => ({
     theme: selectors.getTheme(state),
     recordingId: selectors.getRecordingId(state),
-    sessionError: selectors.getErrorMessage(state),
     modal: selectors.getModal(state),
   }),
   {}

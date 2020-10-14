@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Modal from "./Modal";
 import classnames from "classnames";
 import { useAuth0 } from "@auth0/auth0-react";
+import { connect } from "react-redux";
+import { selectors } from "ui/reducers";
 
 import "./Error.css";
 
@@ -20,41 +22,88 @@ function RefreshButton() {
   );
 }
 
+function SignInButton() {
+  const { loginWithRedirect } = useAuth0();
+
+  return <button onClick={loginWithRedirect}>Sign in</button>;
+}
+
+function ActionButton({ action }) {
+  if (action == "refresh") {
+    return <RefreshButton />;
+  } else if (action == "sign-in") {
+    return <SignInButton />;
+  }
+
+  return null;
+}
+
+function Error({ children, refresh, expected, unexpected, error }) {
+  return (
+    <div className={classnames("error-container", { expected, unexpected })}>
+      <div className="error-mask" />
+      <div className={"error-content"}>
+        <h1>Whoops</h1>
+        {children}
+        {error.message ? <p className="error-message">{error.message}</p> : null}
+        <ActionButton action={refresh ? "refresh" : error?.action} />
+      </div>
+    </div>
+  );
+}
+
+function ExpectedError({ error }) {
+  // This is for the class of errors that:
+  // 1) Happens before to the app's initial page load has successfully completed.
+  // 2) Is deterministic (e.g. bad recording ID).
+  // 3) Will not be fixed by a page refresh.
+
+  const isServerError = error.code;
+  const content = isServerError ? "Looks like something went wrong with this page" : error.message;
+
+  return (
+    <Error error={error} expected>
+      <p>{content}</p>
+    </Error>
+  );
+}
+
+function UnexpectedError({ error }) {
+  // This is for the class of errors that:
+  // 1) Happens after the app's initial page load has successfully completed.
+  // 2) Is non-deterministic (e.g. an unexpected crash).
+  // 3) Might be fixed by a page refresh.
+
+  return (
+    <Error error={error} refresh unexpected>
+      <p>Looks like something went wrong with this page</p>
+    </Error>
+  );
+}
+
+function _AppErrors({ expectedError, unexpectedError }) {
+  return (
+    <>
+      {expectedError ? <ExpectedError error={expectedError} /> : null}
+      {unexpectedError ? <UnexpectedError error={unexpectedError} /> : null}
+    </>
+  );
+}
+
+export const AppErrors = connect(
+  state => ({
+    expectedError: selectors.getExpectedError(state),
+    unexpectedError: selectors.getUnexpectedError(state),
+  }),
+  null
+)(_AppErrors);
+
 export function PopupBlockedError() {
-  return (
-    <Modal opaque error>
-      <h1>Uh-oh</h1>
-      <p>Please turn off your pop-up blocker and refresh this page.</p>
-      <RefreshButton />
-    </Modal>
-  );
-}
-
-export function SessionError({ error }) {
-  return (
-    <Modal translucent error>
-      <h1>Whoops!</h1>
-      <p>Looks like something went wrong with this page.</p>
-      <RefreshButton />
-      <p className="tip">Error: {error}</p>
-    </Modal>
-  );
-}
-
-export function UnauthorizedAccessError() {
-  const { loginWithRedirect, isAuthenticated } = useAuth0();
+  const error = { message: "OAuth consent popup blocked" };
 
   return (
-    <Modal opaque error>
-      <h1>This is a private recording</h1>
-      {!isAuthenticated ? (
-        <>
-          <p>You need to sign in to view this recording.</p>
-          <button onClick={loginWithRedirect}>Sign in</button>
-        </>
-      ) : (
-        <p>You don&apos;t have permission to view this recording.</p>
-      )}
-    </Modal>
+    <Error refresh expected error={error}>
+      <p>Please turn off your pop up blocker and refresh this page.</p>
+    </Error>
   );
 }
