@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import Header from "./Header/index";
-import Modal from "./shared/Modal";
+import Prompt from "./shared/Prompt";
 import { screenshotCache, nextPaintEvent, getClosestPaintPoint } from "protocol/graphics";
 import { selectors } from "../reducers";
 
@@ -56,12 +56,12 @@ function RecordingLoadingScreen({ loading, recordingDuration }) {
 
   return (
     <>
-      <Modal error opaque noBackground>
+      <Prompt>
         <h1>We&apos;re getting your recording ready</h1>
         <PreviewContainer screen={screen} />
         <div className="loading-bar" style={{ width: `${loading}%` }} />
         <p className="tip">{Math.floor(loading)}%</p>
-      </Modal>
+      </Prompt>
     </>
   );
 }

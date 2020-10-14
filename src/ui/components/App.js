@@ -4,7 +4,7 @@ import DevTools from "./DevTools";
 import Account from "./Account";
 import Loader from "./shared/Loader";
 import { AppErrors, PopupBlockedError } from "./shared/Error";
-import Sharing from "./shared/Sharing";
+import SharingModal from "./shared/SharingModal";
 import { selectors } from "ui/reducers";
 import { useApolloClient, ApolloProvider } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -57,7 +57,7 @@ function App({ theme, recordingId, sessionError, modal }) {
   return (
     <ApolloProvider client={apolloClient}>
       {recordingId ? <DevTools /> : <Account />}
-      {modal?.type === "sharing" ? <Sharing /> : null}
+      {modal?.type === "sharing" ? <SharingModal /> : null}
       <AppErrors />
     </ApolloProvider>
   );

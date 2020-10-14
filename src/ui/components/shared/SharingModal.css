@@ -1,16 +1,37 @@
-/* Sharing modal styles */
+.modal-container .modal-content {
+  min-height: auto;
+  height: 320px;
+  min-width: 400px;
+}
+
+.modal-content > *:not(:last-child) {
+  margin-bottom: 12px;
+}
+
+.modal-container .row.title {
+  display: flex;
+  flex-direction: row;
+  line-height: 16px;
+  padding: 8px 0px;
+}
+
+.modal-container .row.title .img {
+  margin-right: 8px;
+}
 
 .modal-container .permissions-list {
-  width: 40rem;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  overflow: auto;
 }
 
 .modal-container .permission {
   display: flex;
   align-items: center;
-  padding: 12px 4px;
+  padding: 8px;
   transition: background 200ms ease-in-out;
+  border-radius: 4px;
 }
 
 .modal-container .permission:hover {
@@ -23,10 +44,10 @@
 }
 
 .modal-container .permission .icon {
-  height: 3rem;
-  width: 3rem;
+  height: 32px;
+  width: 32px;
   border-radius: 50%;
-  margin: 0 12px 0 8px;
+  margin-right: 8px;
   flex-shrink: 0;
   background: var(--dark-grey);
   background-position: center;
@@ -40,6 +61,10 @@
 .modal-container .permission .role {
   flex-shrink: 0;
   padding: 0px 8px;
+  color: var(--theme-comment);
+}
+
+.modal-container .permission .email {
   color: var(--light-grey)
 }
 
@@ -51,8 +76,7 @@
   display: none;
   flex-shrink: 0;
   padding: 4px;
-  margin-right: 8px;
-  border-radius: 4px; 
+  border-radius: 4px;
   background: transparent;
   box-shadow: none;
 }
@@ -73,58 +97,51 @@
   background-color: white;
 }
 
-.modal-container .modal form {
+.modal-container form {
   display: flex;
   flex-direction: row;
 }
 
-.modal-container .modal input[type=text] {
-  height: 40px;
-  display: block;
-  flex-grow: 1;
-  padding: 1rem;
-  text-align: center;
-  font-size: 1.25rem;
-  margin: auto;
-  border: 1px solid var(--light-grey);
-  color: var(--light-grey);
+.modal-container input {
+  font-size: 1rem;
+  border-radius: 4px;
+  border: none;
 }
 
-.modal-container .modal input[type=submit] {
-  display: block;
-  margin-left: 1rem;
-  font-size: 1.25rem;
+.modal-container input[type=text] {
+  margin-right: 8px;
+  background-color: #EEE;
+  line-height: 16px;
+  padding: 8px;
+  flex-grow: 1;
+}
+
+.modal-container input[type=submit] {
   flex-shrink: 0;
   color: white;
   background: var(--dark-blue);
-  border: 0px;
-  padding: 0px 2rem;
+  padding: 8px 12px;
   cursor: pointer;
 }
 
 .modal-container .bottom {
   display: flex;
-  justify-content: space-between;
-}
-
-.modal-container .buttons {
-  display: flex;
-  flex-direction: row;
   justify-content: flex-end;
 }
 
 .modal-container .status {
   display: flex;
-  height: 40px;
-  flex-direction: row;
+  line-height: 16px;
+  padding: 7px;
   justify-content: center;
-  flex-grow: 1;
-  padding: 1rem;
-  text-align: center;
-  font-size: 1.25rem;
-  margin: auto;
   border: 1px solid var(--light-grey);
   color: var(--light-grey);
+  border-radius: 4px;
+}
+
+.modal-container .status:last-child {
+  margin: auto;
+  border: none;
 }
 
 .modal-container .status .img.refresh {
@@ -139,36 +156,14 @@
   color: red;
 }
 
-.modal-container button.close-modal {
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-  padding: 1rem;
-  border-radius: 50%;
-  box-shadow: none;
-  background: transparent;
-}
-
-.modal-container button.close-modal:hover {
-  background: #EEE;
-}
-
-.modal-container .privacy {
+.modal-container button:not(.modal-close) {
+  border-radius: 4px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: white;
   display: flex;
   align-items: center;
-  cursor: pointer
-}
-
-.modal-container .privacy:hover {
-  color: var(--dark-blue);
-}
-
-.modal-container .privacy .img {
-  height: 24px;
-  width: 24px;
-  margin-right: 4px;
-}
-
-.modal-container .privacy:hover .img {
   background: var(--dark-blue);
+  cursor: pointer;
+  line-height: 16px;
 }

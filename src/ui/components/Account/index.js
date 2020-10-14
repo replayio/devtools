@@ -4,7 +4,7 @@ import Recordings from "../Recordings/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import Header from "../Header/index";
 import Loader from "../shared/Loader";
-import Modal from "../shared/Modal";
+import Prompt from "../shared/Prompt";
 import { gql, useQuery } from "@apollo/client";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 import { actions } from "ui/actions";
@@ -22,27 +22,30 @@ const RECORDINGS = gql`
 
 function FirstRecordingPrompt() {
   return (
-    <Modal error translucent noBackground>
-      <h1>Your First Recording</h1>
-      <p>You don&apos;t have any recordings yet, so we&apos;ll walk you through your first one.</p>
-      <ol>
-        <li>Open a new tab</li>
-        <li>Navigate to the URL you would like to record</li>
-        <li>Click on the Record button</li>
-        <li>When you&apos;re done recording, click on the Record button again to stop and save</li>
-      </ol>
-      <p>
-        Once saved, the tab will automatically redirect you to that recording. The recording is just
-        a link which you are free to revisit by yourself or share with others. You can also access
-        any past recordings here in your <a href="https://replay.io/view">account</a>.
-      </p>
-      <hr />
-      <img
-        src="https://user-images.githubusercontent.com/15959269/94066534-98f29300-fdba-11ea-96c8-0fd5851d53d3.png"
-        style={{ width: "80%" }}
-      />
-      <p className="tip">The record button can be found to the left of the URL bar.</p>
-    </Modal>
+    <div className="first-recording-prompt">
+      <Prompt>
+        <h1>Your First Recording</h1>
+        <p>
+          You don&apos;t have any recordings yet, so we&apos;ll walk you through your first one.
+        </p>
+        <ol>
+          <li>Open a new tab</li>
+          <li>Navigate to the URL you would like to record</li>
+          <li>Click on the Record button</li>
+          <li>
+            When you&apos;re done recording, click on the Record button again to stop and save
+          </li>
+        </ol>
+        <p>
+          Once saved, the tab will automatically redirect you to that recording. The recording is
+          just a link which you are free to revisit by yourself or share with others. You can also
+          access any past recordings here in your <a href="https://replay.io/view">account</a>.
+        </p>
+        <hr />
+        <img src="images/record-screenshot.png" style={{ width: "80%" }} />
+        <p className="tip">The record button can be found to the right of the URL bar.</p>
+      </Prompt>
+    </div>
   );
 }
 

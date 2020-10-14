@@ -3,13 +3,12 @@ import { connect } from "react-redux";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import Modal from "./Modal";
 import Loader from "./Loader";
-
-import "./Sharing.css";
+import Modal from "ui/components/shared/Modal";
+import "./SharingModal.css";
 
 const GET_OWNER_AND_COLLABORATORS = gql`
-  query MyQuery($recordingId: uuid) {
+  query GetOwnerAndCollaborators($recordingId: uuid) {
     collaborators(where: { recording_id: { _eq: $recordingId } }) {
       user {
         auth_id
@@ -33,20 +32,6 @@ const GET_OWNER_AND_COLLABORATORS = gql`
       }
       id
       is_private
-    }
-  }
-`;
-
-const UPDATE_IS_PRIVATE = gql`
-  mutation SetRecordingIsPrivate($recordingId: String, $isPrivate: Boolean) {
-    update_recordings(
-      where: { recording_id: { _eq: $recordingId } }
-      _set: { is_private: $isPrivate }
-    ) {
-      returning {
-        is_private
-        id
-      }
     }
   }
 `;
@@ -78,30 +63,12 @@ const DELETE_COLLABORATOR = gql`
   }
 `;
 
-function Privacy({ isPrivate, toggleIsPrivate }) {
-  return (
-    <div className="privacy" onClick={toggleIsPrivate}>
-      {isPrivate ? (
-        <>
-          <div className="img locked" />
-          <span>Private: Only you and collaborators can view this recording</span>
-        </>
-      ) : (
-        <>
-          <div className="img unlocked" />
-          <span>Public: Everybody with this link can view this recording</span>
-        </>
-      )}
-    </div>
-  );
-}
-
-function Permission({ user, role, recordingId, refetch }) {
-  const [deleteCollaborator, { called, loading, error }] = useMutation(DELETE_COLLABORATOR);
-  const options = { variables: { recordingId, userId: user.id } };
+function Permission({ user, role, recordingId }) {
+  const [deleteCollaborator, { error }] = useMutation(DELETE_COLLABORATOR, {
+    refetchQueries: ["GetOwnerAndCollaborators"],
+  });
   const handleDeleteClick = () => {
-    deleteCollaborator(options);
-    refetch();
+    deleteCollaborator({ variables: { recordingId, userId: user.id } });
   };
   const [showErrorMessage, setShowErrorMessage] = useState(false);
 
@@ -127,7 +94,7 @@ function Permission({ user, role, recordingId, refetch }) {
   );
 }
 
-function PermissionsList({ data, recordingId, refetch }) {
+function PermissionsList({ data, recordingId }) {
   const owner = data.recordings[0].user;
   const collaborators = data.collaborators;
 
@@ -141,7 +108,6 @@ function PermissionsList({ data, recordingId, refetch }) {
               role={"collaborator"}
               key={i}
               recordingId={recordingId}
-              refetch={refetch}
             />
           ))
         : null}
@@ -160,11 +126,13 @@ function Fetcher({ setStatus, email }) {
     }
   });
 
-  return <div className="status">{loading ? "Fetching" : "Fetched"}</div>;
+  return <div className="row status">{loading ? "Fetching" : "Fetched"}</div>;
 }
 
 function Submitter({ setStatus, userId, recordingId }) {
-  const [addNewCollaborator, { loading, error }] = useMutation(ADD_COLLABORATOR);
+  const [addNewCollaborator, { loading, error }] = useMutation(ADD_COLLABORATOR, {
+    refetchQueries: ["GetOwnerAndCollaborators"],
+  });
 
   useEffect(() => {
     addNewCollaborator({
@@ -178,10 +146,10 @@ function Submitter({ setStatus, userId, recordingId }) {
     }
   });
 
-  return <div className="status">{loading ? "Submitting" : "Submitted"}</div>;
+  return <div className="row status">{loading ? "Submitting" : "Submitted"}</div>;
 }
 
-function EmailForm({ data, recordingId, refetch }) {
+function EmailForm({ data, recordingId }) {
   const [inputValue, setInputValue] = useState("");
   const [status, setStatus] = useState({ type: "input" });
 
@@ -195,7 +163,7 @@ function EmailForm({ data, recordingId, refetch }) {
       setInputValue("");
     }, 2000);
 
-    return <div className="status error">{message}</div>;
+    return <div className="row status error">{message}</div>;
   };
 
   // The status.type progresses as follows:
@@ -221,13 +189,12 @@ function EmailForm({ data, recordingId, refetch }) {
       return <ErrorHandler message={"We can not add that collaborator right now."} />;
     }
 
-    refetch();
     setStatus({ type: "input" });
     setInputValue("");
   }
 
   return (
-    <form>
+    <form className="row">
       <input
         type="text"
         value={inputValue}
@@ -240,50 +207,34 @@ function EmailForm({ data, recordingId, refetch }) {
 }
 
 function Sharing({ modal, hideModal }) {
-  const { data, loading, error, refetch } = useQuery(GET_OWNER_AND_COLLABORATORS, {
+  const { data, loading, error } = useQuery(GET_OWNER_AND_COLLABORATORS, {
     variables: { recordingId: modal.recordingId },
   });
-  const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE);
-
-  const toggleIsPrivate = () => {
-    updateIsPrivate({
-      variables: {
-        recordingId: data.recordings[0].recording_id,
-        isPrivate: !data.recordings[0].is_private,
-      },
-    });
-  };
 
   if (loading) {
-    return (
-      <Modal opaque={modal.opaque}>
-        <Loader />
-      </Modal>
-    );
+    return <Modal />;
   } else if (error || data.recordings.length !== 1 || !data.recordings[0].user) {
     setTimeout(() => hideModal(), 2000);
     return (
-      <Modal opaque={modal.opaque}>
-        <p>Can&apos;t fetch your sharing permissions at this time</p>
+      <Modal>
+        <div className="row status">Can&apos;t fetch your sharing permissions at this time</div>
       </Modal>
     );
   }
 
   return (
-    <Modal opaque={modal.opaque}>
-      <button className="close-modal" onClick={hideModal}>
-        <div className="img close" />
-      </button>
-      <h2>Share this recording with others</h2>
-      <EmailForm data={data} recordingId={modal.recordingId} refetch={refetch} />
-      <PermissionsList data={data} recordingId={modal.recordingId} refetch={refetch} />
+    <Modal>
+      <div className="row title">
+        <div className="img invite" />
+        <p>Add collaborators</p>
+      </div>
+      <EmailForm data={data} recordingId={modal.recordingId} />
+      <PermissionsList data={data} recordingId={modal.recordingId} />
       <div className="bottom">
-        <Privacy isPrivate={data.recordings[0].is_private} toggleIsPrivate={toggleIsPrivate} />
-        <div className="buttons">
-          <button className="done" onClick={hideModal}>
-            <div className="content">Done</div>
-          </button>
-        </div>
+        <div className="spacer" />
+        <button className="done" onClick={hideModal}>
+          <div className="content">Done</div>
+        </button>
       </div>
     </Modal>
   );
