@@ -55,6 +55,26 @@ function Links({ user, getActiveUsers, recordingId, setSharingModal }) {
   );
 }
 
+function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
+  const { data } = useQuery(GET_RECORDING_TITLE, {
+    variables: { recordingId },
+  });
+
+  if (!recordingId) {
+    return <div className="title">Recordings</div>;
+  }
+
+  const { recordingTitle, title } = data.recordings[0];
+
+  return (
+    <Title
+      defaultTitle={recordingTitle || title}
+      setEditingTitle={setEditingTitle}
+      editingTitle={editingTitle}
+    />
+  );
+}
+
 function Logo() {
   return (
     <>
@@ -68,10 +88,6 @@ function Logo() {
 
 function Header({ user, getActiveUsers, recordingId, setSharingModal }) {
   const [editingTitle, setEditingTitle] = useState(false);
-  const { data } = useQuery(GET_RECORDING_TITLE, {
-    variables: { recordingId },
-  });
-  const { recordingTitle, title } = data.recordings[0];
 
   useEffect(() => {
     if (typeof Headway === "object") {
@@ -82,16 +98,11 @@ function Header({ user, getActiveUsers, recordingId, setSharingModal }) {
   return (
     <div id="header">
       <Logo />
-      {!recordingId ? (
-        <div className="title">Recordings</div>
-      ) : (
-        <Title
-          defaultTitle={recordingTitle || title}
-          recordingId={recordingId}
-          setEditingTitle={setEditingTitle}
-          editingTitle={editingTitle}
-        />
-      )}
+      <HeaderTitle
+        recordingId={recordingId}
+        setEditingTitle={setEditingTitle}
+        editingTitle={editingTitle}
+      />
       <Links
         user={user}
         getActiveUsers={getActiveUsers}
