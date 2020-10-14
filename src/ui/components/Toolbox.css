@@ -4,7 +4,6 @@
   font-family: sans-serif;
   display: flex;
   flex-direction: column;
-  z-index: 1; /* Draw toolbox in front of the highlighter overlay. */
   --toolbox-background: #f9f9fa;
   --paused-background-color: #5b41ff;
 }
@@ -89,7 +88,6 @@
   background: #ececec;
   align-items: center;
   justify-content: center;
-  z-index: 1;
 }
 
 .timeline-tooltip-image {

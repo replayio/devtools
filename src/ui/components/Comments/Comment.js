@@ -135,7 +135,6 @@ class Comment extends React.Component {
           className={classnames("comment")}
           style={{
             left: `${commentLeftOffset}%`,
-            zIndex: `${index + 100}`,
             width: `${commentWidth}px`,
           }}
         >

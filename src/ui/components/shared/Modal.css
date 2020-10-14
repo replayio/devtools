@@ -5,8 +5,7 @@
   width: 100%;
   max-height: 100%;
   background: rgba(0,0,0,0.5);
-
-  z-index: 10;
+  z-index: var(--z-index-7--modal);
 }
 
 .modal-container.opaque {
@@ -18,7 +17,7 @@
 }
 
 .modal-container.error {
-  z-index: 1000;
+  z-index: var(--z-index-10--fatal-error);
 }
 
 .modal-container .modal {
