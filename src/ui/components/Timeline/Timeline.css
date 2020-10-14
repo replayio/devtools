@@ -88,10 +88,10 @@
   position: absolute;
   width: 100%;
   height: 100%;
+  pointer-events: none;
 }
 
 .replay-player .message {
-  position: absolute;
   height: 11px;
   width: 11px;
   position: absolute;
@@ -99,6 +99,7 @@
   margin-bottom: auto;
   top: 0;
   bottom: 0;
+  pointer-events: all;
 }
 
 .replay-player .message:hover {
@@ -124,6 +125,10 @@
   pointer-events: none;
 }
 
+.replay-player .message.paused {
+  z-index: var(--z-index-1--paused-message);
+}
+
 .replay-player .message.paused .fill {
   fill: var(--replaying-paused-marker-fill);
 }
@@ -142,7 +147,6 @@
   width: 1px;
   pointer-events: none;
   background: transparent;
-  z-index: 1000;
 }
 
 .replay-player .scrubber.hovered path {

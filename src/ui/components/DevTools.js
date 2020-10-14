@@ -109,9 +109,9 @@ function DevTools({
   return (
     <>
       <Header />
-      <Comments />
-      {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
       <DevtoolsSplitBox tooltip={tooltip} updateTimelineDimensions={updateTimelineDimensions} />
+      {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
+      <Comments />
     </>
   );
 }

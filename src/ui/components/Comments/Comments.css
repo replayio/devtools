@@ -10,7 +10,6 @@
 .comment-marker {
   width: 19px;
   height: 19px;
-  z-index: 2;
   position: absolute;
   background-color: transparent;
   outline: none;
@@ -27,13 +26,12 @@
 }
 
 .comment-marker.paused {
-  z-index: 3;
+  z-index: var(--z-index-1--paused-comment);
 }
 
 .create-comment {
   width: 19px;
   height: 19px;
-  z-index: 5;
   position: absolute;
   outline: none;
   background-position: center;
@@ -47,11 +45,10 @@
 .comments .comment {
   position: absolute;
   background: white;
-  bottom: 1rem;
+  bottom: 4rem;
   border: 1px solid #ccc;
   box-shadow: 0px 3px 4px #eaeaea;
   border-radius: 3px;
-  z-index: 5;
   font-size: 1rem;
 }
 

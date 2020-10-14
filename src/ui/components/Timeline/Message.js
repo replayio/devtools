@@ -127,7 +127,6 @@ class Message extends React.Component {
             overlayWidth,
             zoom: zoomRegion,
           })}%`,
-          zIndex: `${index + 100}`,
         }}
         title={getFormatStr("jumpMessage2", frameLocation)}
       >
