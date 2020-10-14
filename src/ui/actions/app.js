@@ -60,8 +60,12 @@ export function setSelectedPanel(panel) {
   return { type: "set_selected_panel", panel };
 }
 
-export function setErrorMessage(message) {
-  return { type: "set_error_message", message };
+export function setExpectedError(error) {
+  return { type: "set_expected_error", error };
+}
+
+export function setUnexpectedError(error) {
+  return { type: "set_unexpected_error", error };
 }
 
 export function setUploading(uploading) {

@@ -18,6 +18,7 @@ import { gql, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 import { data } from "react-dom-factories";
 import { features } from "ui/utils/prefs";
+import { setExpectedError } from "../actions/app";
 
 const GET_RECORDING = gql`
   query GetRecording($recordingId: String) {
@@ -85,24 +86,40 @@ function DevTools({
   updateTimelineDimensions,
   recordingDuration,
   recordingId,
+  expectedError,
+  setExpectedError,
 }) {
   const { user, isAuthenticated } = useAuth0();
   const { data, error, loading: queryIsLoading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
   });
 
+  if (expectedError) {
+    return null;
+  }
+
   if (queryIsLoading) {
     return <Loader />;
+  } else if (recordingDuration === null || uploading) {
+    const message = getUploadingMessage(uploading);
+    return <Loader message={message} />;
   }
 
   const isAuthorized = getIsAuthorized({ data, error, isAuthenticated });
 
   if (!isAuthorized) {
-    return <UnauthorizedAccessError />;
-  } else if (recordingDuration === null || uploading) {
-    const message = getUploadingMessage(uploading);
-    return <Loader message={message} />;
-  } else if (loading < 100) {
+    if (isAuthenticated) {
+      setExpectedError({ message: "You don't have permission to view this recording." });
+    } else {
+      setExpectedError({
+        message: "You need to sign in to view this recording.",
+        action: "sign-in",
+      });
+    }
+    return null;
+  }
+
+  if (loading < 100) {
     return <RecordingLoadingScreen />;
   }
 
@@ -125,9 +142,11 @@ export default connect(
     recordingDuration: selectors.getRecordingDuration(state),
     sessionId: selectors.getSessionId(state),
     recordingId: selectors.getRecordingId(state),
+    expectedError: selectors.getExpectedError(state)
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,
     unfocusComment: actions.unfocusComment,
+    setExpectedError: actions.setExpectedError,
   }
 )(DevTools);

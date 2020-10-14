@@ -30,7 +30,8 @@ const {
   setupMetadata,
   setUploading,
   setupApp,
-  setErrorMessage,
+  setUnexpectedError,
+  setExpectedError,
 } = require("ui/actions").actions;
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { prefs } = require("ui/utils/prefs");
@@ -51,8 +52,8 @@ async function createSession() {
     store.dispatch(setUploading(null));
     prefs.recordingId = recordingId;
   } catch (e) {
-    if (e.code == 9) {
-      store.dispatch(setErrorMessage("Invalid recording ID"));
+    if (e.code == 9 || e.code == 31) {
+      store.dispatch(setExpectedError(e));
     } else {
       throw e;
     }
@@ -66,7 +67,7 @@ function onUploadedData({ uploaded, length }) {
 }
 
 function onSessionError(error) {
-  store.dispatch(setErrorMessage(error.message));
+  store.dispatch(setUnexpectedError(error));
 }
 
 let initialized = false;
