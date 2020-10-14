@@ -110,7 +110,7 @@ function ShareDropdown({ recordingId, setSharingModal }) {
     variables: { recordingId },
   });
 
-  const isPrivate = data.recordings[0].is_private;
+  const isPrivate = data.recordings[0]?.is_private;
   const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE, {
     variables: { recordingId, isPrivate: !isPrivate },
   });
