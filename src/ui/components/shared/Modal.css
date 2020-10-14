@@ -6,7 +6,7 @@
   max-height: 100%;
   background: rgba(0,0,0,0.5);
 
-  z-index: 2;
+  z-index: 10;
 }
 
 .modal-container.opaque {
@@ -35,12 +35,12 @@
   border-radius: 2rem;
   background: white;
   font-size: 1.25rem;
-  width: 600px;
+  width: 640px;
 }
 
 .modal-container.error .modal {
   min-height: 460px;
-  min-width: 630px;
+  min-width: 640px;
   border-radius: 2rem;
   justify-content: center;
 }

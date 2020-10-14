@@ -33,7 +33,7 @@
 .create-comment {
   width: 19px;
   height: 19px;
-  z-index: 100;
+  z-index: 5;
   position: absolute;
   outline: none;
   background-position: center;
@@ -51,7 +51,7 @@
   border: 1px solid #ccc;
   box-shadow: 0px 3px 4px #eaeaea;
   border-radius: 3px;
-  z-index: 101;
+  z-index: 5;
   font-size: 1rem;
 }
 

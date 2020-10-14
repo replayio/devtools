@@ -5,13 +5,14 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import LoginButton from "ui/components/LoginButton";
 import Avatar from "ui/components/Avatar";
-import Title from "./shared/Title";
+import Title from "ui/components/shared/Title";
+import ShareDropdown from "ui/components/Header/ShareDropdown";
 import "./Header.css";
 
 import { features } from "ui/utils/prefs";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 
-const RECORDING_TITLE = gql`
+const GET_RECORDING_TITLE = gql`
   query RecordingTitle($recordingId: String) {
     recordings(where: { recording_id: { _eq: $recordingId } }) {
       id
@@ -39,12 +40,15 @@ function Avatars({ user, getActiveUsers }) {
   );
 }
 
-function Links({ user, getActiveUsers }) {
+function Links({ user, getActiveUsers, recordingId, setSharingModal }) {
   return (
     <div className="links">
       <a id="headway" onClick={() => Headway.toggle()}>
         What&apos;s new
       </a>
+      {recordingId ? (
+        <ShareDropdown recordingId={recordingId} setSharingModal={setSharingModal} />
+      ) : null}
       <Avatars user={user} getActiveUsers={getActiveUsers} />
       {features.auth0 ? <LoginButton /> : null}
     </div>
@@ -62,26 +66,12 @@ function Logo() {
   );
 }
 
-function useGetTitle(recordingId) {
-  if (!recordingId) {
-    return null;
-  }
-
-  const { data } = useQuery(RECORDING_TITLE, {
+function Header({ user, getActiveUsers, recordingId, setSharingModal }) {
+  const [editingTitle, setEditingTitle] = useState(false);
+  const { data } = useQuery(GET_RECORDING_TITLE, {
     variables: { recordingId },
   });
-
-  const firstRecording = data?.recordings[0];
-  if (!firstRecording) {
-    return null;
-  }
-
-  return firstRecording.recordingTitle || firstRecording.title;
-}
-
-function Header({ user, getActiveUsers, recordingId }) {
-  const [editingTitle, setEditingTitle] = useState(false);
-  const defaultTitle = useGetTitle(recordingId);
+  const { recordingTitle, title } = data.recordings[0];
 
   useEffect(() => {
     if (typeof Headway === "object") {
@@ -96,13 +86,18 @@ function Header({ user, getActiveUsers, recordingId }) {
         <div className="title">Recordings</div>
       ) : (
         <Title
-          defaultTitle={defaultTitle}
+          defaultTitle={recordingTitle || title}
           recordingId={recordingId}
           setEditingTitle={setEditingTitle}
           editingTitle={editingTitle}
         />
       )}
-      <Links user={user} getActiveUsers={getActiveUsers} />
+      <Links
+        user={user}
+        getActiveUsers={getActiveUsers}
+        recordingId={recordingId}
+        setSharingModal={setSharingModal}
+      />
     </div>
   );
 }
@@ -112,5 +107,8 @@ export default connect(
     user: selectors.getUser(state),
     recordingId: selectors.getRecordingId(state),
   }),
-  { getActiveUsers: actions.getActiveUsers }
+  {
+    getActiveUsers: actions.getActiveUsers,
+    setSharingModal: actions.setSharingModal,
+  }
 )(Header);

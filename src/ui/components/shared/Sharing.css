@@ -102,6 +102,11 @@
   cursor: pointer;
 }
 
+.modal-container .bottom {
+  display: flex;
+  justify-content: space-between;
+}
+
 .modal-container .buttons {
   display: flex;
   flex-direction: row;

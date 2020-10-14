@@ -2,9 +2,8 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import Recordings from "../Recordings/index";
 import { useAuth0 } from "@auth0/auth0-react";
-import Header from "../Header";
+import Header from "../Header/index";
 import Loader from "../shared/Loader";
-import Sharing from "../shared/Sharing";
 import Modal from "../shared/Modal";
 import { gql, useQuery } from "@apollo/client";
 import { setUserInBrowserPrefs } from "../../utils/browser";
@@ -79,7 +78,7 @@ function WelcomePage() {
   );
 }
 
-function Account({ modal }) {
+export default function Account() {
   const { isAuthenticated } = useAuth0();
 
   if (!isAuthenticated) {
@@ -88,16 +87,8 @@ function Account({ modal }) {
 
   return (
     <>
-      {modal?.type === "sharing" ? <Sharing /> : null}
       <Header />
       <AccountPage />
     </>
   );
 }
-
-export default connect(
-  state => ({
-    modal: selectors.getModal(state),
-  }),
-  {}
-)(Account);

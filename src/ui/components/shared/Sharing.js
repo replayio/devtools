@@ -277,12 +277,14 @@ function Sharing({ modal, hideModal }) {
       <h2>Share this recording with others</h2>
       <EmailForm data={data} recordingId={modal.recordingId} refetch={refetch} />
       <PermissionsList data={data} recordingId={modal.recordingId} refetch={refetch} />
-      <div className="buttons">
-        <button className="done" onClick={hideModal}>
-          <div className="content">Done</div>
-        </button>
+      <div className="bottom">
+        <Privacy isPrivate={data.recordings[0].is_private} toggleIsPrivate={toggleIsPrivate} />
+        <div className="buttons">
+          <button className="done" onClick={hideModal}>
+            <div className="content">Done</div>
+          </button>
+        </div>
       </div>
-      <Privacy isPrivate={data.recordings[0].is_private} toggleIsPrivate={toggleIsPrivate} />
     </Modal>
   );
 }

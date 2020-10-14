@@ -4,6 +4,7 @@ import DevTools from "./DevTools";
 import Account from "./Account";
 import Loader from "./shared/Loader";
 import { SessionError, PopupBlockedError } from "./shared/Error";
+import Sharing from "./shared/Sharing";
 import { selectors } from "ui/reducers";
 import { useApolloClient, ApolloProvider } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -37,7 +38,7 @@ function useGetApolloClient() {
   return { apolloClient, consentPopupBlocked };
 }
 
-function App({ theme, recordingId, sessionError }) {
+function App({ theme, recordingId, sessionError, modal }) {
   const { isAuthenticated, isLoading } = useAuth0();
   const { apolloClient, consentPopupBlocked } = useGetApolloClient();
 
@@ -55,7 +56,8 @@ function App({ theme, recordingId, sessionError }) {
 
   return (
     <ApolloProvider client={apolloClient}>
-      {sessionError && <SessionError error={sessionError} />}
+      {sessionError ? <SessionError error={sessionError} /> : null}
+      {modal?.type === "sharing" ? <Sharing /> : null}
       {recordingId ? <DevTools /> : <Account />}
     </ApolloProvider>
   );
@@ -66,6 +68,7 @@ export default connect(
     theme: selectors.getTheme(state),
     recordingId: selectors.getRecordingId(state),
     sessionError: selectors.getErrorMessage(state),
+    modal: selectors.getModal(state),
   }),
   {}
 )(App);

@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import Toolbox from "./Toolbox";
 import Comments from "./Comments";
 import Recordings from "./Recordings/index";
-import Header from "./Header";
+import Header from "./Header/index";
 import Viewer from "./Viewer";
 import Loader from "./shared/Loader";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
@@ -20,9 +20,12 @@ import { data } from "react-dom-factories";
 import { features } from "ui/utils/prefs";
 
 const GET_RECORDING = gql`
-  query MyQuery($recordingId: String) {
+  query GetRecording($recordingId: String) {
     recordings(where: { recording_id: { _eq: $recordingId } }) {
       id
+      title
+      recordingTitle
+      is_private
     }
   }
 `;

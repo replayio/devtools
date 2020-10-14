@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import Header from "./Header";
+import Header from "./Header/index";
 import Modal from "./shared/Modal";
 import { screenshotCache, nextPaintEvent, getClosestPaintPoint } from "protocol/graphics";
 import { selectors } from "../reducers";
@@ -56,7 +56,6 @@ function RecordingLoadingScreen({ loading, recordingDuration }) {
 
   return (
     <>
-      <Header />
       <Modal error opaque noBackground>
         <h1>We&apos;re getting your recording ready</h1>
         <PreviewContainer screen={screen} />

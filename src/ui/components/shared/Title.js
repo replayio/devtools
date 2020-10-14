@@ -29,7 +29,6 @@ export default function Title({ defaultTitle, recordingId, setEditingTitle, edit
     updateRecordingTitle({ variables: { recordingId, title } });
     setEditingTitle(false);
   };
-
   const handleKeyDown = event => {
     if (event.key == "Enter") {
       saveTitle();
@@ -37,7 +36,6 @@ export default function Title({ defaultTitle, recordingId, setEditingTitle, edit
       setEditingTitle(false);
     }
   };
-
   const handleClick = () => {
     if (isAuthenticated) {
       setEditingTitle(true);
