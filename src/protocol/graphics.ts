@@ -4,7 +4,13 @@ const { ThreadFront } = require("./thread");
 import { assert, binarySearch } from "./utils";
 import { ScreenshotCache } from "./screenshot-cache";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
-import { TimeStampedPoint, MouseEvent, paintPoints, mouseEvents, ScreenShot } from "record-replay-protocol";
+import {
+  TimeStampedPoint,
+  MouseEvent,
+  paintPoints,
+  mouseEvents,
+  ScreenShot,
+} from "record-replay-protocol";
 import { client } from "./socket";
 
 export const screenshotCache = new ScreenshotCache();
@@ -56,7 +62,11 @@ function insertEntrySorted<T extends Timed>(array: T[], entry: T) {
   }
 }
 
-function closerEntry<T1 extends Timed, T2 extends Timed>(time: number, entry1: T1 | null, entry2: T2 | null) {
+function closerEntry<T1 extends Timed, T2 extends Timed>(
+  time: number,
+  entry1: T1 | null,
+  entry2: T2 | null
+) {
   if (!entry1) {
     return entry2;
   }
@@ -183,7 +193,9 @@ interface MouseAndClickPosition {
   clickY?: number;
 }
 
-export async function getGraphicsAtTime(time: number): Promise<{ screen?: ScreenShot, mouse?: MouseAndClickPosition }> {
+export async function getGraphicsAtTime(
+  time: number
+): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
   const paintIndex = mostRecentIndex(gPaintPoints, time);
   if (paintIndex === undefined) {
     // There are no graphics to paint here.

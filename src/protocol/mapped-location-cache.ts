@@ -11,7 +11,6 @@ export class MappedLocationCache {
   sessionId: string | undefined;
 
   async getMappedLocation(location: Location): Promise<MappedLocation> {
-
     const cacheKey = this.encodeLocation(location);
 
     if (this.cache.has(cacheKey)) {
@@ -23,13 +22,14 @@ export class MappedLocationCache {
     }
 
     if (!this.sessionId) {
-      return [ location ];
+      return [location];
     }
 
     const { promise, resolve } = defer<MappedLocation>();
     this.runningRequests.set(cacheKey, promise);
     const { mappedLocation } = await client.Debugger.getMappedLocation(
-      { location }, this.sessionId
+      { location },
+      this.sessionId
     );
     this.runningRequests.delete(cacheKey);
     resolve(mappedLocation);
