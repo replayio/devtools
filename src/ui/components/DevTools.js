@@ -142,7 +142,7 @@ export default connect(
     recordingDuration: selectors.getRecordingDuration(state),
     sessionId: selectors.getSessionId(state),
     recordingId: selectors.getRecordingId(state),
-    expectedError: selectors.getExpectedError(state)
+    expectedError: selectors.getExpectedError(state),
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,
