@@ -6,8 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --open",
-    "lint": "eslint --fix src",
-    "typecheck": "tsc --watch"
+    "lint": "eslint src",
+    "lint:fix": "npm run lint -- --fix",
+    "typecheck": "tsc",
+    "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
     "@apollo/client": "^3.1.5",
