@@ -64,7 +64,8 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
     return <div className="title">Recordings</div>;
   }
 
-  const { recordingTitle, title } = data.recordings[0];
+  const recording = data.recordings[0];
+  const { recordingTitle, title } = recording || {};
 
   return (
     <Title
