@@ -1,5 +1,5 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@typescript-eslint/parser",
   "env": {
     "browser": true,
     "es6": true
@@ -16,7 +16,7 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "plugins": ["react", "prettier"],
+  "plugins": ["react", "prettier", "@typescript-eslint"],
   "rules": {
     "react/prop-types": 0,
     "react/require-default-props": 0,
@@ -38,5 +38,10 @@
     "react": {
       "version": "16.8"
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.ts"]
+    }
+  ]
 }
