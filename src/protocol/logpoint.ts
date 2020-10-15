@@ -6,7 +6,13 @@
 // Each logpoint has an associated log group ID, used to manipulate all the
 // messages associated with the logpoint atomically.
 
-import { AnalysisId, createAnalysisResult, ExecutionPoint, Location, PointDescription } from "record-replay-protocol";
+import {
+  AnalysisId,
+  createAnalysisResult,
+  ExecutionPoint,
+  Location,
+  PointDescription,
+} from "record-replay-protocol";
 import { client, log } from "./socket";
 import { defer } from "./utils";
 const { ThreadFront, ValueFront, Pause } = require("./thread");
@@ -26,8 +32,20 @@ const gAnalysisLogGroupIDs = new Map<AnalysisId, string>();
 
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
-  onResult?: (logGroupId: string, key: ExecutionPoint, time: number, mappedLocation: Location, pause: any, valueFronts: any) => void;
-  onPointLoading?: (logGroupId: string, point: ExecutionPoint, time: number, location: Location) => void;
+  onResult?: (
+    logGroupId: string,
+    key: ExecutionPoint,
+    time: number,
+    mappedLocation: Location,
+    pause: any,
+    valueFronts: any
+  ) => void;
+  onPointLoading?: (
+    logGroupId: string,
+    point: ExecutionPoint,
+    time: number,
+    location: Location
+  ) => void;
   clearLogpoint?: (logGroupId: string) => void;
 } = {};
 
@@ -276,7 +294,11 @@ export async function setEventLogpoint(logGroupId: string, eventTypes: string[])
   client.Analysis.findAnalysisPoints({ analysisId });
 }
 
-async function eventLogpointOnFrameworkListeners(logGroupId: string, point: ExecutionPoint, frameworkListeners: any) {
+async function eventLogpointOnFrameworkListeners(
+  logGroupId: string,
+  point: ExecutionPoint,
+  frameworkListeners: any
+) {
   const locations = [];
   const children = await frameworkListeners.loadChildren();
   for (const { contents } of children) {

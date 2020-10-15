@@ -66,7 +66,10 @@ export class ScreenshotCache {
    * Returns a promise for the requested screenshot. The download will be started
    * immediately and will only be rejected if sendMessage() throws.
    */
-  async getScreenshotForPlayback(point: string, paintHash: string): Promise<ScreenShot | undefined> {
+  async getScreenshotForPlayback(
+    point: string,
+    paintHash: string
+  ): Promise<ScreenShot | undefined> {
     if (!paintHash) {
       return undefined;
     }
