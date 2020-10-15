@@ -18,6 +18,7 @@ module.exports = {
         /[/\\]node_modules[/\\]react-aria-components[/\\]/,
       ],
       presets: [
+        "@babel/preset-typescript",
         "@babel/preset-react",
         [
           "@babel/preset-env",
