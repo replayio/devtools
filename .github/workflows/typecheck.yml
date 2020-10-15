@@ -1,0 +1,13 @@
+name: Typecheck
+
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Deps
+        run: npm install
+      - name: Run tsc
+        run: npm run typecheck
