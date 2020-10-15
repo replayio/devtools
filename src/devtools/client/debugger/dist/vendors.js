@@ -8,7 +8,6 @@
       require("prop-types"),
       require("react-dom-factories"),
       require("react"),
-      require("devtools-services"),
       require("react-dom"),
       require("lodash"),
       require("devtools/client/framework/menu"),

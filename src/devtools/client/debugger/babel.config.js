@@ -39,6 +39,8 @@ module.exports = {
             alias: {
               // Map all require("devtools/...") to the real devtools root.
               "^devtools\\/(.*)": `${__dirname}/../../\\1`,
+              "devtools-services": `${__dirname}/dist/devtools-services.js`,
+              "devtools-modules": `${__dirname}/dist/devtools-modules`,
             },
           },
         ],
