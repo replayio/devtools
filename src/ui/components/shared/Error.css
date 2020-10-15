@@ -32,12 +32,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: max-content;
   width: 640px;
-  min-height: 460px;
-  min-width: 640px;
+  height: 460px;
   border-radius: 8px;
-  padding: 20px;
+  padding: 40px;
   margin: auto;
   top: 0;
   bottom: 0;

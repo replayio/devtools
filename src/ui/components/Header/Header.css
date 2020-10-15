@@ -133,6 +133,11 @@
   transition-duration: 300ms;
 }
 
+@keyframes dropdownFadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
 @media (max-width: 760px) {
   #header .title {
     width: 140px;

@@ -93,9 +93,9 @@ const Recording = ({ data, onDeleteRecording, setSharingModal }) => {
     <div className="recording">
       <div className="screenshot">
         <img src={`data:image/png;base64, ${data.last_screen_data}`} alt="recording screenshot" />
-        <Dropdown panel={Panel} icon={<div>•••</div>} panelStyles={{ top: "28px" }} />
         <div className="overlay" onClick={e => navigateToRecording(e)} />
         {/* <button icon={<LinkIconSvg />} onClick={() => navigateToRecording} /> */}
+        <Dropdown panel={Panel} icon={<div>•••</div>} panelStyles={{ top: "28px" }} />
       </div>
       <div className="description">
         <Title
