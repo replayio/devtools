@@ -16,12 +16,12 @@ import Adapter from "enzyme-adapter-react-16";
 import { setupHelper } from "../utils/dbg";
 import { prefs } from "../utils/prefs";
 
-import { startSourceMapWorker, stopSourceMapWorker } from "devtools-source-map";
+//import { startSourceMapWorker, stopSourceMapWorker } from "devtools-source-map";
 
-import {
-  start as startPrettyPrintWorker,
-  stop as stopPrettyPrintWorker,
-} from "../workers/pretty-print";
+// import {
+//   start as startPrettyPrintWorker,
+//   stop as stopPrettyPrintWorker,
+// } from "../workers/pretty-print";
 
 import { ParserDispatcher } from "../workers/parser";
 import { start as startSearchWorker, stop as stopSearchWorker } from "../workers/search";
@@ -64,8 +64,8 @@ export const parserWorker = new ParserDispatcher();
 export const evaluationsParser = new ParserDispatcher();
 
 beforeAll(() => {
-  startSourceMapWorker(path.join(rootPath, "node_modules/devtools-source-map/src/worker.js"), "");
-  startPrettyPrintWorker(path.join(rootPath, "src/workers/pretty-print/worker.js"));
+//  startSourceMapWorker(path.join(rootPath, "node_modules/devtools-source-map/src/worker.js"), "");
+//  startPrettyPrintWorker(path.join(rootPath, "src/workers/pretty-print/worker.js"));
   parserWorker.start(path.join(rootPath, "src/workers/parser/worker.js"));
   evaluationsParser.start(path.join(rootPath, "src/workers/parser/worker.js"));
   startSearchWorker(path.join(rootPath, "src/workers/search/worker.js"));
@@ -73,8 +73,8 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  stopSourceMapWorker();
-  stopPrettyPrintWorker();
+//  stopSourceMapWorker();
+//  stopPrettyPrintWorker();
   parserWorker.stop();
   evaluationsParser.stop();
   stopSearchWorker();
