@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import LoginButton from "ui/components/LoginButton";
 import Avatar from "ui/components/Avatar";
 import Title from "ui/components/shared/Title";
 import ShareDropdown from "ui/components/Header/ShareDropdown";
+import UserOptions from "ui/components/Header/UserOptions";
 import "./Header.css";
 
 import { gql, useQuery, useMutation } from "@apollo/client";
@@ -31,7 +31,6 @@ function Avatars({ user, getActiveUsers }) {
 
   return (
     <div className="avatars">
-      <Avatar player={firstPlayer} isFirstPlayer={true} />
       {sortedOtherPlayers.map(player => (
         <Avatar player={player} isFirstPlayer={false} key={player.id} />
       ))}
@@ -42,12 +41,9 @@ function Avatars({ user, getActiveUsers }) {
 function Links({ user, getActiveUsers, recordingId, setSharingModal }) {
   return (
     <div className="links">
-      <a id="headway" onClick={() => Headway.toggle()}>
-        What&apos;s new
-      </a>
-      {recordingId ? <ShareDropdown /> : null}
       <Avatars user={user} getActiveUsers={getActiveUsers} />
-      <LoginButton />
+      {recordingId ? <ShareDropdown /> : null}
+      <UserOptions />
     </div>
   );
 }
@@ -86,12 +82,6 @@ function Logo() {
 
 function Header({ user, getActiveUsers, recordingId, setSharingModal }) {
   const [editingTitle, setEditingTitle] = useState(false);
-
-  useEffect(() => {
-    if (typeof Headway === "object") {
-      Headway.init(HW_config);
-    }
-  }, []);
 
   return (
     <div id="header">

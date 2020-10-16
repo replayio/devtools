@@ -9,8 +9,8 @@ import Loader from "../shared/Loader.js";
 
 import "./Recordings.css";
 
-const RECORDINGS = gql`
-  query MyRecordingsQuery($authId: String) {
+const GET_MY_RECORDINGS = gql`
+  query GetMyRecordings($authId: String) {
     recordings(where: { user: { auth_id: { _eq: $authId } } }) {
       id
       url
@@ -39,18 +39,15 @@ const DELETE_RECORDING = gql`
 
 const Recordings = props => {
   const { user } = useAuth0();
-  const { data, loading, refetch } = useQuery(RECORDINGS, {
+  const { data, refetch } = useQuery(GET_MY_RECORDINGS, {
     variables: { authId: user.sub },
   });
-  const [deleteRecording] = useMutation(DELETE_RECORDING);
-
-  if (loading) {
-    return <Loader />;
-  }
+  const [deleteRecording] = useMutation(DELETE_RECORDING, {
+    refetchQueries: ["GetMyRecordings"],
+  });
 
   const onDeleteRecording = async recordingId => {
     await deleteRecording({ variables: { recordingId } });
-    refetch();
   };
 
   const sortedRecordings = sortBy(data.recordings, recording => -new Date(recording.date));

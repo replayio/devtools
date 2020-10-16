@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import { useAuth0 } from "@auth0/auth0-react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import Dropdown from "ui/components/shared/Dropdown";
-import { useAuth0 } from "@auth0/auth0-react";
 import "./ShareDropdown.css";
 
 const UPDATE_IS_PRIVATE = gql`
@@ -156,6 +156,7 @@ function OwnerSettings({ recordingId, setSharingModal, setExpanded }) {
 }
 
 function ShareDropdown({ recordingId, setSharingModal }) {
+  const { isAuthenticated } = useAuth0();
   const [expanded, setExpanded] = useState(false);
   const isOwner = useIsOwner(recordingId);
   const buttonContent = (
@@ -167,7 +168,12 @@ function ShareDropdown({ recordingId, setSharingModal }) {
 
   return (
     <div className="share">
-      <Dropdown buttonContent={buttonContent} setExpanded={setExpanded} expanded={expanded}>
+      <Dropdown
+        buttonContent={buttonContent}
+        buttonStyle={isAuthenticated ? "primary" : "secondary"}
+        setExpanded={setExpanded}
+        expanded={expanded}
+      >
         <CopyUrl recordingId={recordingId} />
         {isOwner ? (
           <OwnerSettings
