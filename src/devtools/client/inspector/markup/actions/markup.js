@@ -1,4 +1,6 @@
 const {
+  ADD_NODE,
+  UPDATE_CHILDREN,
   UPDATE_NODE_EXPANDED,
   UPDATE_ROOT_NODE,
   UPDATE_SELECTED_NODE,
@@ -6,6 +8,27 @@ const {
 } = require("./index");
 
 module.exports = {
+  /**
+   * Adds a node to the tree.
+   */
+  addNode(node) {
+    return {
+      type: ADD_NODE,
+      node,
+    };
+  },
+
+  /**
+   * Updates the children of a node.
+   */
+  updateChildren(parentNodeId, childNodeIds) {
+    return {
+      type: UPDATE_CHILDREN,
+      parentNodeId,
+      childNodeIds,
+    };
+  },
+
   /**
    * Updates the expanded state for a given node.
    *
