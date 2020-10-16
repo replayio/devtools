@@ -107,7 +107,7 @@ class MarkupView {
    * @param  {Boolean} isExpanded
    *         Whether or not the node is expanded.
    */
-  async addNodeToTree(node, { isExpanded = false } = {}) {
+  addNodeToTree(node, { isExpanded = false } = {}) {
     const parentNode = node.parentNode();
     const id = node.objectId();
 
@@ -169,6 +169,7 @@ class MarkupView {
    */
   async expandNode(nodeId) {
     await this.getChildren(this.nodes.get(nodeId));
+    if (!this.tree) return;
     this.tree[nodeId].isExpanded = true;
     this.store.dispatch(updateTree(this.tree));
   }
@@ -182,7 +183,7 @@ class MarkupView {
    */
   async getChildren(node) {
     const children = await node.childNodes();
-
+    if (!this.tree) return;
     this.tree[node.objectId()].children = children.map(child => child.objectId());
 
     // Adds the children into the tree model. No need to fetch their children yet
@@ -194,7 +195,7 @@ class MarkupView {
       }
 
       if (!this.tree[childNodeId]) {
-        await this.addNodeToTree(childNodeFront);
+        this.addNodeToTree(childNodeFront);
       }
     }
   }
@@ -230,11 +231,11 @@ class MarkupView {
       }
 
       this.nodes.set(currentNode.objectId(), currentNode);
-      await this.addNodeToTree(currentNode, { isExpanded: true });
+      this.addNodeToTree(currentNode, { isExpanded: true });
       await this.getChildren(currentNode);
 
       // Walk up the parent nodes until the known root node.
-      if (currentNode === ThreadFront.getKnownRootDOMNode()) {
+      if (currentNode === ThreadFront.getKnownRootDOMNode() || !this.tree) {
         break;
       }
 
@@ -329,11 +330,14 @@ class MarkupView {
       return;
     }
 
-    await this.importNode(this.selection.nodeFront);
+    const nodeFront = this.selection.nodeFront;
+    await this.importNode(nodeFront);
 
-    this.store.dispatch(updateTree(this.tree));
-    this.store.dispatch(updateRootNode(ThreadFront.getKnownRootDOMNode().objectId()));
-    this.store.dispatch(updateSelectedNode(this.selection.nodeFront.objectId()));
+    if (this.selection?.nodeFront === nodeFront) {
+      this.store.dispatch(updateTree(this.tree));
+      this.store.dispatch(updateRootNode(ThreadFront.getKnownRootDOMNode().objectId()));
+      this.store.dispatch(updateSelectedNode(this.selection.nodeFront.objectId()));
+    }
   }
 }
 
