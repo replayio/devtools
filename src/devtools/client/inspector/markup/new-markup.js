@@ -4,6 +4,7 @@ const { ThreadFront } = require("protocol/thread");
 const { DOCUMENT_TYPE_NODE } = require("devtools/shared/dom-node-constants");
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const { setEventTooltip } = require("devtools/client/shared/widgets/tooltip/EventTooltipHelper");
+const Highlighter = require("highlighter/highlighter.js");
 
 const {
   updateNodeExpanded,
@@ -33,9 +34,13 @@ class MarkupView {
     // an object representing the properties of the given node.
     this.tree = {};
 
+    this.hoveredNodeId = undefined;
+
     this.onSelectNode = this.onSelectNode.bind(this);
     this.onShowEventTooltip = this.onShowEventTooltip.bind(this);
     this.onToggleNodeExpanded = this.onToggleNodeExpanded.bind(this);
+    this.onMouseEnterNode = this.onMouseEnterNode.bind(this);
+    this.onMouseLeaveNode = this.onMouseLeaveNode.bind(this);
     this.update = this.update.bind(this);
 
     this.inspector.sidebar.on("markupview-selected", this.update);
@@ -53,6 +58,8 @@ class MarkupView {
       onSelectNode: this.onSelectNode,
       onShowEventTooltip: this.onShowEventTooltip,
       onToggleNodeExpanded: this.onToggleNodeExpanded,
+      onMouseEnterNode: this.onMouseEnterNode,
+      onMouseLeaveNode: this.onMouseLeaveNode,
     });
 
     const provider = createElement(
@@ -320,6 +327,20 @@ class MarkupView {
     }
 
     this.store.dispatch(updateSelectedNode(nodeId));
+  }
+
+  onMouseEnterNode(nodeId) {
+    if (this.hoveredNodeId !== nodeId) {
+      this.hoveredNodeId = nodeId;
+      Highlighter.highlight(this.nodes.get(nodeId));
+    }
+  }
+
+  onMouseLeaveNode(nodeId) {
+    if (this.hoveredNodeId === nodeId) {
+      this.hoveredNodeId = undefined;
+      Highlighter.unhighlight();
+    }
   }
 
   /**
