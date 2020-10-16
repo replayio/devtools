@@ -160,13 +160,13 @@ class Node extends PureComponent {
           (showExpander ? " expandable" : ""),
         role: "presentation",
         onClick: this.onSelectNodeClick,
-        onMouseEnter: this.onMouseEnter,
-        onMouseLeave: this.onMouseLeave,
       },
       dom.div(
         {
           className: "tag-line" + (isSelected ? " selected" : ""),
           role: "treeitem",
+          onMouseEnter: this.onMouseEnter,
+          onMouseLeave: this.onMouseLeave,
         },
         dom.span({
           className: "tag-state" + (isSelected ? " theme-selected" : ""),
