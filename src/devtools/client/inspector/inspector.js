@@ -44,6 +44,7 @@ const { InspectorSearch } = require("devtools/client/inspector/inspector-search"
 
 const { ToolSidebar } = require("devtools/client/inspector/toolsidebar");
 const MarkupView = require("devtools/client/inspector/markup/markup");
+const NewMarkupView = require("devtools/client/inspector/markup/new-markup");
 const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");
 
 const CSSProperties = require("./css-properties");
@@ -824,7 +825,6 @@ class Inspector {
         panel = new LayoutView(this, this.panelWin);
         break;
       case "markupview":
-        const NewMarkupView = require("devtools/client/inspector/markup/new-markup");
         panel = new NewMarkupView(this, this.panelWin);
         break;
       case "newruleview":
@@ -907,7 +907,7 @@ class Inspector {
       });
     }
 
-    if (features.newMarkupView) {
+    if (features.newMarkupView && features.oldMarkupView) {
       sidebarPanels.push({
         id: "markupview",
         title: INSPECTOR_L10N.getStr("inspector.panelLabel.markupView"),
@@ -1095,18 +1095,23 @@ class Inspector {
    * highlighter state.
    */
   async onMarkupLoaded() {
-    this.markup = new MarkupView(this);
+    if (features.oldMarkupView) {
+      this.markup = new MarkupView(this);
+    } else {
+      this.markup = new NewMarkupView(this);
+      ReactDOM.render(this.markup.provider, document.getElementById("markup-root"));
+    }
 
     const loading = document.getElementById("markup-loading");
     loading.hidden = true;
     //log(`Inspector HideMarkupLoading`);
 
-    if (!this.markup) {
-      return;
-    }
-
     if (this.selection.nodeFront) {
-      this.markup.expandNode(this.selection.nodeFront);
+      if (features.oldMarkupView) {
+        this.markup.expandNode(this.selection.nodeFront);
+      } else {
+        this.markup.update();
+      }
     }
 
     // Restore the highlighter states prior to emitting "new-root".
@@ -1401,6 +1406,9 @@ class Inspector {
 
   _destroyMarkup() {
     if (this.markup) {
+      if (!features.oldMarkupView) {
+        ReactDOM.unmountComponentAtNode(document.getElementById("markup-root"));
+      }
       this.markup.destroy();
       this.markup = null;
     }
