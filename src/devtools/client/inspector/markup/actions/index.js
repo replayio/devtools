@@ -2,6 +2,12 @@ const { createEnum } = require("devtools/client/shared/enum");
 
 createEnum(
   [
+    // Adds a node to the tree.
+    "ADD_NODE",
+
+    // Updates the children of a node.
+    "UPDATE_CHILDREN",
+
     // Updates the expanded state for a given node.
     "UPDATE_NODE_EXPANDED",
 
