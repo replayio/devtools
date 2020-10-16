@@ -30,6 +30,8 @@ class Node extends PureComponent {
 
     this.onExpanderToggle = this.onExpanderToggle.bind(this);
     this.onSelectNodeClick = this.onSelectNodeClick.bind(this);
+    this.onMouseEnter = this.onMouseEnter.bind(this);
+    this.onMouseLeave = this.onMouseLeave.bind(this);
   }
 
   onExpanderToggle(event) {
@@ -49,6 +51,14 @@ class Node extends PureComponent {
     }
 
     this.props.onSelectNode(node.id);
+  }
+
+  onMouseEnter() {
+    this.props.onMouseEnterNode(this.props.node.id);
+  }
+
+  onMouseLeave() {
+    this.props.onMouseLeaveNode(this.props.node.id);
   }
 
   /**
@@ -76,6 +86,8 @@ class Node extends PureComponent {
           onSelectNode: this.props.onSelectNode,
           onShowEventTooltip: this.props.onShowEventTooltip,
           onToggleNodeExpanded: this.props.onToggleNodeExpanded,
+          onMouseEnterNode: this.props.onMouseEnterNode,
+          onMouseLeaveNode: this.props.onMouseLeaveNode,
         });
       })
     );
@@ -148,6 +160,8 @@ class Node extends PureComponent {
           (showExpander ? " expandable" : ""),
         role: "presentation",
         onClick: this.onSelectNodeClick,
+        onMouseEnter: this.onMouseEnter,
+        onMouseLeave: this.onMouseLeave,
       },
       dom.div(
         {

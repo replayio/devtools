@@ -39,6 +39,8 @@ class MarkupApp extends PureComponent {
           onSelectNode: this.props.onSelectNode,
           onShowEventTooltip: this.props.onShowEventTooltip,
           onToggleNodeExpanded: this.props.onToggleNodeExpanded,
+          onMouseEnterNode: this.props.onMouseEnterNode,
+          onMouseLeaveNode: this.props.onMouseLeaveNode,
         });
       })
     );
