@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { selectors } from "ui/reducers";
+import { actions } from "ui/actions";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import Dropdown from "ui/components/shared/Dropdown";
+import { useAuth0 } from "@auth0/auth0-react";
 import "./ShareDropdown.css";
-import { features } from "../../utils/prefs";
 
 const UPDATE_IS_PRIVATE = gql`
   mutation SetRecordingIsPrivate($recordingId: String, $isPrivate: Boolean) {
@@ -26,6 +29,25 @@ const GET_RECORDING_PRIVACY = gql`
     }
   }
 `;
+
+const GET_OWNER_AUTH_ID = gql`
+  query GetOwnerAuthId($recordingId: String) {
+    recordings(where: { recording_id: { _eq: $recordingId } }) {
+      user {
+        auth_id
+      }
+    }
+  }
+`;
+
+function getIsOwner(recordingId) {
+  const { user } = useAuth0();
+  const { data } = useQuery(GET_OWNER_AUTH_ID, {
+    variables: { recordingId },
+  });
+
+  return user.sub === data.recordings[0]?.user.auth_id;
+}
 
 function CopyUrl({ recordingId }) {
   const [copyClicked, setCopyClicked] = useState(false);
@@ -104,22 +126,34 @@ function Collaborators({ recordingId, setExpanded, setSharingModal }) {
   );
 }
 
-function ShareDropdown({ recordingId, setSharingModal }) {
-  const [expanded, setExpanded] = useState(false);
-  const { data, refetch } = useQuery(GET_RECORDING_PRIVACY, {
+function OwnerSettings({ recordingId, setSharingModal, setExpanded }) {
+  const { data } = useQuery(GET_RECORDING_PRIVACY, {
     variables: { recordingId },
   });
 
   const isPrivate = data.recordings[0]?.is_private;
   const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE, {
     variables: { recordingId, isPrivate: !isPrivate },
+    refetchQueries: ["GetRecordingPrivacy"],
   });
 
-  const toggleIsPrivate = () => {
-    updateIsPrivate();
-    refetch();
-  };
+  return (
+    <>
+      <Privacy isPrivate={isPrivate} toggleIsPrivate={updateIsPrivate} />
+      {isPrivate ? (
+        <Collaborators
+          recordingId={recordingId}
+          setExpanded={setExpanded}
+          setSharingModal={setSharingModal}
+        />
+      ) : null}
+    </>
+  );
+}
 
+function ShareDropdown({ recordingId, setSharingModal }) {
+  const [expanded, setExpanded] = useState(false);
+  const isOwner = getIsOwner(recordingId);
   const buttonContent = (
     <>
       <div className="img share" />
@@ -127,23 +161,12 @@ function ShareDropdown({ recordingId, setSharingModal }) {
     </>
   );
 
-  if (!features.private) {
-    return (
-      <div className="share">
-        <Dropdown buttonContent={buttonContent} setExpanded={setExpanded} expanded={expanded}>
-          <CopyUrl recordingId={recordingId} />
-        </Dropdown>
-      </div>
-    );
-  }
-
   return (
     <div className="share">
       <Dropdown buttonContent={buttonContent} setExpanded={setExpanded} expanded={expanded}>
         <CopyUrl recordingId={recordingId} />
-        <Privacy isPrivate={isPrivate} toggleIsPrivate={toggleIsPrivate} />
-        {isPrivate ? (
-          <Collaborators
+        {isOwner ? (
+          <OwnerSettings
             recordingId={recordingId}
             setExpanded={setExpanded}
             setSharingModal={setSharingModal}
@@ -154,4 +177,11 @@ function ShareDropdown({ recordingId, setSharingModal }) {
   );
 }
 
-export default ShareDropdown;
+export default connect(
+  state => ({
+    recordingId: selectors.getRecordingId(state),
+  }),
+  {
+    setSharingModal: actions.setSharingModal,
+  }
+)(ShareDropdown);

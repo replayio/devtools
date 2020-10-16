@@ -17,7 +17,6 @@ import { screenshotCache, nextPaintEvent, getClosestPaintPoint } from "protocol/
 import { gql, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 import { data } from "react-dom-factories";
-import { features } from "ui/utils/prefs";
 import { setExpectedError } from "../actions/app";
 
 const GET_RECORDING = gql`
@@ -27,6 +26,9 @@ const GET_RECORDING = gql`
       title
       recordingTitle
       is_private
+      user {
+        auth_id
+      }
     }
   }
 `;
@@ -65,16 +67,9 @@ function getUploadingMessage(uploading) {
 }
 
 function getIsAuthorized({ data, error, isAuthenticated }) {
-  if (!features.private) {
-    return true;
-  }
-
   // We let Hasura decide whether or not the user can view a recording. The response to our query
   // will have a recording if they're authorized to view the recording, and will be empty if not.
-  // What this doesn't explicitly tell us is *why* that user is allowed to view the recording: is the
-  // recording public, or is the user the original creator for that recording? You can check that
-  // by checking the recording's user field, which will be null for non-creator users.
-  return data.recordings.length > 0 ? true : false;
+  return data.recordings.length;
 }
 
 function DevTools({

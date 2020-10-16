@@ -9,7 +9,6 @@ import Title from "ui/components/shared/Title";
 import ShareDropdown from "ui/components/Header/ShareDropdown";
 import "./Header.css";
 
-import { features } from "ui/utils/prefs";
 import { gql, useQuery, useMutation } from "@apollo/client";
 
 const GET_RECORDING_TITLE = gql`
@@ -46,11 +45,9 @@ function Links({ user, getActiveUsers, recordingId, setSharingModal }) {
       <a id="headway" onClick={() => Headway.toggle()}>
         What&apos;s new
       </a>
-      {recordingId ? (
-        <ShareDropdown recordingId={recordingId} setSharingModal={setSharingModal} />
-      ) : null}
+      {recordingId ? <ShareDropdown /> : null}
       <Avatars user={user} getActiveUsers={getActiveUsers} />
-      {features.auth0 ? <LoginButton /> : null}
+      <LoginButton />
     </div>
   );
 }
