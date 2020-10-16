@@ -229,25 +229,26 @@ class WebConsole {
     return this._highlighter;
   }
 
-  async openNodeInInspector(grip) {
+  async openNodeInInspector(valueFront) {
     if (!this.toolbox) {
       return;
     }
 
     const onSelectInspector = this.toolbox.selectTool("inspector", "inspect_dom");
 
-    const onNodeFront = this.toolbox.target
-      .getFront("inspector")
-      .then(inspectorFront => inspectorFront.getNodeFrontFromNodeGrip(grip));
+    const onNodeFront = valueFront
+      .getPause()
+      .ensureDOMFrontAndParents(valueFront._object.objectId)
+      .then(async nf => {
+        await nf.ensureParentsLoaded();
+        return nf;
+      });
 
-    const [nodeFront, inspectorPanel] = await Promise.all([onNodeFront, onSelectInspector]);
+    const [nodeFront] = await Promise.all([onNodeFront, onSelectInspector]);
 
-    const onInspectorUpdated = inspectorPanel.once("inspector-updated");
-    const onNodeFrontSet = this.toolbox.selection.setNodeFront(nodeFront, {
+    await this.toolbox.selection.setNodeFront(nodeFront, {
       reason: "console",
     });
-
-    await Promise.all([onNodeFrontSet, onInspectorUpdated]);
   }
 
   /**
