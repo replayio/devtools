@@ -14,6 +14,7 @@ const {
 
 const MarkupApp = createFactory(require("./components/MarkupApp"));
 
+const { features } = require("../prefs");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
@@ -202,7 +203,11 @@ class MarkupView {
    * Returns true if the markup panel is visisble, and false otherwise.
    */
   isPanelVisible() {
-    return this.inspector?.sidebar?.getCurrentTabID() === "markupview";
+    if (features.oldMarkupView) {
+      return this.inspector?.sidebar?.getCurrentTabID() === "markupview";
+    } else {
+      return this.inspector?.toolbox?.currentTool === "inspector";
+    }
   }
 
   /**
