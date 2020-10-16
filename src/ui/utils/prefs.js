@@ -20,7 +20,7 @@ pref("devtools.toolbox-opened", true);
 pref("devtools.features.comments", true);
 pref("devtools.features.users", true);
 pref("devtools.features.auth0", true);
-pref("devtools.features.private", false);
+pref("devtools.features.private", true);
 
 export const prefs = new PrefsHelper("devtools", {
   isToolboxOpen: ["Bool", "toolbox-opened"],

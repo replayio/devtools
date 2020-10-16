@@ -4,7 +4,6 @@ import Title from "../shared/Title";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import moment from "moment";
 import { gql, useMutation } from "@apollo/client";
-import { features } from "ui/utils/prefs";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 
@@ -45,7 +44,7 @@ const DropdownPanel = ({
       <div className="menu-item" onClick={() => onDeleteRecording(recordingId)}>
         Delete Recording
       </div>
-      {!features.private ? null : isPrivate ? (
+      {isPrivate ? (
         <div className="menu-item" onClick={toggleIsPrivate}>
           Make public
         </div>
@@ -105,11 +104,9 @@ const Recording = ({ data, onDeleteRecording, setSharingModal }) => {
           setEditingTitle={setEditingTitle}
         />
         <div className="secondary">{formatDate(data.date)}</div>
-        {features.private ? (
-          <div className="permissions" onClick={toggleIsPrivate}>
-            {data.is_private ? "Private" : "Public"}
-          </div>
-        ) : null}
+        <div className="permissions" onClick={toggleIsPrivate}>
+          {data.is_private ? "Private" : "Public"}
+        </div>
       </div>
     </div>
   );
