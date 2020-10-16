@@ -69,7 +69,7 @@ function getUploadingMessage(uploading) {
 function getIsAuthorized({ data, error, isAuthenticated }) {
   // We let Hasura decide whether or not the user can view a recording. The response to our query
   // will have a recording if they're authorized to view the recording, and will be empty if not.
-  return data.recordings.length > 0 ? true : false;
+  return data.recordings.length;
 }
 
 function DevTools({
