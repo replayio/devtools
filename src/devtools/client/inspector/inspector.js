@@ -1099,7 +1099,6 @@ class Inspector {
       this.markup = new MarkupView(this);
     } else {
       this.markup = new NewMarkupView(this);
-      ReactDOM.render(this.markup.provider, document.getElementById("markup-root"));
     }
 
     const loading = document.getElementById("markup-loading");
@@ -1110,7 +1109,8 @@ class Inspector {
       if (features.oldMarkupView) {
         this.markup.expandNode(this.selection.nodeFront);
       } else {
-        this.markup.update();
+        await this.markup.update();
+        ReactDOM.render(this.markup.provider, document.getElementById("markup-root"));
       }
     }
 
