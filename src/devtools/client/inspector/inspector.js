@@ -279,8 +279,6 @@ class Inspector {
     // Setup the sidebar panels.
     this.setupSidebar();
 
-    this.onMarkupLoaded();
-
     this.isReady = true;
 
     // All the components are initialized. Take care of the remaining initialization
