@@ -156,6 +156,17 @@ class Inspector {
     // Localize all the nodes containing a data-localization attribute.
     //localizeMarkup(this.panelDoc);
 
+    // Setup the splitter before the sidebar is displayed so, we don't miss any events.
+    this.setupSplitter();
+
+    // We can display right panel with: tab bar, markup view and breadbrumb. Right after
+    // the splitter set the right and left panel sizes, in order to avoid resizing it
+    // during load of the inspector.
+    this.panelDoc.getElementById("inspector-main-content").style.visibility = "visible";
+
+    // Setup the sidebar panels.
+    this.setupSidebar();
+
     await this._onTargetAvailable();
 
     // We need to listen to changes in the target's pause state.
@@ -268,17 +279,6 @@ class Inspector {
         reason: "inspector-open",
       });
     }
-
-    // Setup the splitter before the sidebar is displayed so, we don't miss any events.
-    this.setupSplitter();
-
-    // We can display right panel with: tab bar, markup view and breadbrumb. Right after
-    // the splitter set the right and left panel sizes, in order to avoid resizing it
-    // during load of the inspector.
-    this.panelDoc.getElementById("inspector-main-content").style.visibility = "visible";
-
-    // Setup the sidebar panels.
-    this.setupSidebar();
 
     this.isReady = true;
 
