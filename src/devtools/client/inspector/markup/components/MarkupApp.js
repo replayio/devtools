@@ -17,7 +17,7 @@ class MarkupApp extends PureComponent {
     };
   }
 
-  renderTreeView() {
+  render() {
     const { markup } = this.props;
     const { rootNode, tree } = markup;
 
@@ -43,19 +43,6 @@ class MarkupApp extends PureComponent {
           onMouseLeaveNode: this.props.onMouseLeaveNode,
         });
       })
-    );
-  }
-
-  render() {
-    return dom.div(
-      {
-        id: "markup-box",
-        className: "theme-body devtools-monospace",
-      },
-      dom.div(
-        { id: "markup-root-wrapper", role: "presentation" },
-        dom.div({ id: "markup-root", role: "presentation" }, this.renderTreeView())
-      )
     );
   }
 }
