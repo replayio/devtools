@@ -1101,10 +1101,6 @@ class Inspector {
       this.markup = new NewMarkupView(this);
     }
 
-    const loading = document.getElementById("markup-loading");
-    loading.hidden = true;
-    //log(`Inspector HideMarkupLoading`);
-
     if (this.selection.nodeFront) {
       if (features.oldMarkupView) {
         this.markup.expandNode(this.selection.nodeFront);
@@ -1113,6 +1109,10 @@ class Inspector {
         ReactDOM.render(this.markup.provider, document.getElementById("markup-root"));
       }
     }
+
+    const loading = document.getElementById("markup-loading");
+    loading.hidden = true;
+    //log(`Inspector HideMarkupLoading`);
 
     // Restore the highlighter states prior to emitting "new-root".
     if (this._highlighters) {
