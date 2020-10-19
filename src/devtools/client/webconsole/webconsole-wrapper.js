@@ -12,7 +12,7 @@ const { LogpointHandlers } = require("protocol/logpoint");
 const actions = require("devtools/client/webconsole/actions/index");
 const selectors = require("devtools/client/webconsole/selectors/index");
 const { configureStore } = require("devtools/client/webconsole/store");
-const { setupConsoleHelper } = require("ui/utils/bootstrap");
+const { setupConsoleHelper } = require("ui/utils/bootstrap/helpers");
 
 const Telemetry = require("devtools/client/shared/telemetry");
 
