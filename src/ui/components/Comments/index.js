@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import Comment from "./Comment";
 import CommentMarker from "./CommentMarker";
 import { selectors } from "../../reducers";
-import { features } from "../../utils/prefs";
 
 import "./Comments.css";
 
