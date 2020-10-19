@@ -47,6 +47,11 @@
   line-height: 16px;
 }
 
+#header .user-options a.changelog {
+  width: 100%;
+  text-decoration: none;
+}
+
 #header .user-options button {
   padding: 8px;
   width: 100%;
@@ -54,15 +59,4 @@
   background: transparent;
   align-items: center;
   line-height: 16px;
-}
-
-#header .user-options button.changelog {
-  padding: 0px 8px;
-}
-
-#header .user-options button.changelog #headway {
-  display: flex;
-  line-height: 16px;
-  align-items: center;
-  width: 100%;
 }

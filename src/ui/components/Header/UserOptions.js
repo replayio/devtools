@@ -5,24 +5,6 @@ import Avatar from "ui/components/Avatar";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./UserOptions.css";
 
-function Changelog() {
-  useEffect(() => {
-    if (typeof Headway === "object") {
-      Headway.init(HW_config);
-    }
-  }, []);
-
-  return (
-    <div className="row clickable">
-      <button className="changelog">
-        <a id="headway" onClick={Headway.toggle}>
-          What&apos;s new
-        </a>
-      </button>
-    </div>
-  );
-}
-
 export default function UserOptions() {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated, user } = useAuth0();
@@ -50,7 +32,16 @@ export default function UserOptions() {
             <div className="user-email">{user.email}</div>
           </div>
         </div>
-        <Changelog />
+        <div className="row clickable">
+          <a
+            className="changelog"
+            href="https://headwayapp.co/replay-changelog"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <button>Changelog</button>
+          </a>
+        </div>
         <div className="row clickable">
           <LoginButton />
         </div>

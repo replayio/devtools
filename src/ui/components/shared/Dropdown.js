@@ -8,7 +8,7 @@ function Dropdown({
   setExpanded,
   expanded,
   position = "bottom-left",
-  buttonStyle = "primary"
+  buttonStyle = "primary",
 }) {
   return (
     <div className="dropdown-wrapper">
