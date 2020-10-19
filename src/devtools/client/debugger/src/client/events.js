@@ -5,7 +5,7 @@
 //
 
 import { prepareSourcePayload } from "./create";
-import sourceQueue from "../../utils/source-queue";
+import sourceQueue from "../utils/source-queue";
 
 const { ThreadFront } = require("protocol/thread");
 const { log } = require("protocol/socket");

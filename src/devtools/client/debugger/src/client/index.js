@@ -47,10 +47,6 @@ async function loadInitialState() {
   };
 }
 
-function getClient(connection) {
-  return firefox;
-}
-
 export async function onConnect(connection, panelWorkers, panel) {
   // NOTE: the landing page does not connect to a JS process
   if (!connection) {
@@ -59,20 +55,16 @@ export async function onConnect(connection, panelWorkers, panel) {
 
   verifyPrefSchema();
 
-  const client = getClient(connection);
+  const client = firefox;
   const commands = client.clientCommands;
 
   const initialState = await loadInitialState();
   const workers = bootstrapWorkers(panelWorkers);
 
-  panel.parserDispatcher = workers.parser;
-
   const { store, actions, selectors } = bootstrapStore(commands, workers, panel, initialState);
 
   const connected = client.onConnect(connection, actions, panel);
 
-  await syncBreakpoints();
-  syncXHRBreakpoints();
   setupHelper({
     store,
     actions,
@@ -82,6 +74,8 @@ export async function onConnect(connection, panelWorkers, panel) {
     client: client.clientCommands,
   });
 
+  await syncBreakpoints();
+  syncXHRBreakpoints();
   await connected;
   return { store, actions, selectors, client: commands };
 }
