@@ -24,7 +24,7 @@ require("devtools/codemirror-addons");
 const { initSocket, sendMessage, setStatus, addEventListener } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const loadImages = require("image/image");
-const { bootstrapApp } = require("ui/utils/bootstrap");
+const { bootstrapApp } = require("ui/utils/bootstrap/bootstrap");
 const {
   setupTimeline,
   setupMetadata,

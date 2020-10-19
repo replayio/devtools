@@ -12,7 +12,7 @@ const { log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const React = require("react");
 const ReactDOM = require("react-dom");
-const { setupInspectorHelper } = require("ui/utils/bootstrap");
+const { setupInspectorHelper } = require("ui/utils/bootstrap/helpers");
 
 require("devtools/client/themes/breadcrumbs.css");
 require("devtools/client/themes/inspector.css");
