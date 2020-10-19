@@ -40,11 +40,15 @@ const GET_OWNER_AUTH_ID = gql`
   }
 `;
 
-function getIsOwner(recordingId) {
-  const { user } = useAuth0();
-  const { data } = useQuery(GET_OWNER_AUTH_ID, {
+function useIsOwner(recordingId) {
+  const { user, isAuthenticated } = useAuth0();
+  const { data, loading } = useQuery(GET_OWNER_AUTH_ID, {
     variables: { recordingId },
   });
+
+  if (!isAuthenticated || loading) {
+    return false;
+  }
 
   return user.sub === data.recordings[0]?.user.auth_id;
 }
@@ -153,7 +157,7 @@ function OwnerSettings({ recordingId, setSharingModal, setExpanded }) {
 
 function ShareDropdown({ recordingId, setSharingModal }) {
   const [expanded, setExpanded] = useState(false);
-  const isOwner = getIsOwner(recordingId);
+  const isOwner = useIsOwner(recordingId);
   const buttonContent = (
     <>
       <div className="img share" />

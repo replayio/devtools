@@ -20,9 +20,10 @@ export default function Title({ defaultTitle, recordingId, setEditingTitle, edit
   const { isAuthenticated } = useAuth0();
   const [updateRecordingTitle] = useMutation(UPDATE_RECORDING);
   const [title, setTitle] = useState(defaultTitle);
+  const test = new URL(window.location.href).searchParams.get("test");
 
   useEffect(() => {
-    setTitle(defaultTitle);
+    setTitle(test ? `Test: ${test}` : defaultTitle);
   }, [defaultTitle]);
 
   const saveTitle = () => {
