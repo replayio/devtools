@@ -5,14 +5,9 @@
 //
 
 import React from "react";
-import { bindActionCreators, combineReducers, applyMiddleware } from "redux";
-import ReactDOM from "react-dom";
+import { combineReducers, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import LogRocket from "logrocket";
-
-import ToolboxProvider from "devtools/client/framework/store-provider";
-import { isDevelopment } from "devtools-environment";
-import { AppConstants } from "devtools-modules";
 
 import * as search from "../workers/search";
 import { ParserDispatcher } from "../workers/parser";
@@ -25,30 +20,6 @@ import { asyncStore, prefs } from "./prefs";
 import { persistTabs } from "../utils/tabs";
 
 let parser;
-
-function renderPanel(component, store, panel) {
-  const root = document.createElement("div");
-  root.className = "launchpad-root theme-body";
-  root.style.setProperty("flex", "1");
-  const mount = document.querySelector("#mount");
-  if (!mount) {
-    return;
-  }
-  mount.appendChild(root);
-
-  ReactDOM.render(
-    React.createElement(
-      Provider,
-      { store },
-      React.createElement(
-        ToolboxProvider,
-        { store: panel.getToolboxStore() },
-        React.createElement(component)
-      )
-    ),
-    root
-  );
-}
 
 export function bootstrapStore(client, workers, panel, initialState) {
   const createStore = configureStore({
@@ -66,7 +37,6 @@ export function bootstrapStore(client, workers, panel, initialState) {
   );
   store.subscribe(() => updatePrefs(store.getState()));
 
-  const actions = bindActionCreators(require("../actions").default, store.dispatch);
 
   return { store, actions, selectors };
 }
@@ -86,23 +56,13 @@ export function teardownWorkers() {
   search.stop();
 }
 
-export function bootstrapApp(store) {
-  return (
-    <Provider store={store}>
-      <App />
-    </Provider>
-  );
-}
-
 let currentPendingBreakpoints;
 let currentXHRBreakpoints;
-let currentEventBreakpoints;
 let currentTabs;
 
-function updatePrefs(state) {
+export function updatePrefs(state) {
   const previousPendingBreakpoints = currentPendingBreakpoints;
   const previousXHRBreakpoints = currentXHRBreakpoints;
-  const previousEventBreakpoints = currentEventBreakpoints;
   const previousTabs = currentTabs;
   currentPendingBreakpoints = selectors.getPendingBreakpoints(state);
   currentXHRBreakpoints = selectors.getXHRBreakpoints(state);
@@ -110,11 +70,6 @@ function updatePrefs(state) {
 
   if (previousPendingBreakpoints && currentPendingBreakpoints !== previousPendingBreakpoints) {
     asyncStore.pendingBreakpoints = currentPendingBreakpoints;
-  }
-
-  currentEventBreakpoints = state.eventListenerBreakpoints;
-  if (previousEventBreakpoints && previousEventBreakpoints !== currentEventBreakpoints) {
-    asyncStore.eventListenerBreakpoints = currentEventBreakpoints;
   }
 
   if (previousTabs && previousTabs !== currentTabs) {

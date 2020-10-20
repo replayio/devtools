@@ -33,6 +33,8 @@ const {
   setUnexpectedError,
   setExpectedError,
 } = require("ui/actions").actions;
+
+const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { prefs } = require("ui/utils/prefs");
 
@@ -72,6 +74,8 @@ function onSessionError(error) {
 
 let initialized = false;
 async function initialize() {
+
+  window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
   loadImages();
 
   // Initialize the socket so we can communicate with the server

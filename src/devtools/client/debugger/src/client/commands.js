@@ -17,34 +17,21 @@ const {
   setExceptionLogpoint,
   removeLogpoint,
 } = require("protocol/logpoint");
-const { assert } = require("protocol/utils");
 
-let targets;
 let currentThreadFront;
 let currentTarget;
 let devToolsClient;
 let sourceActors;
 let breakpoints;
-let eventBreakpoints;
 
-function setupCommands(dependencies) {
-  devToolsClient = dependencies.devToolsClient;
-  targets = {};
+function setupCommands() {
   sourceActors = {};
   breakpoints = {};
 }
 
-function createObjectFront(grip) {
-  if (!grip.actor) {
-    throw new Error("Actor is missing");
-  }
-
-  return devToolsClient.createObjectFront(grip, ThreadFront);
-}
-
 async function loadObjectProperties(root) {
   const utils = Reps.objectInspector.utils;
-  const properties = await utils.loadProperties.loadItemProperties(root, devToolsClient);
+  const properties = await utils.loadProperties.loadItemProperties(root);
   return utils.node.getChildren({
     item: root,
     loadedProperties: new Map([[root.path, properties]]),
@@ -54,21 +41,6 @@ async function loadObjectProperties(root) {
 function releaseActor(actor) {
   // Object fronts are always thread scoped in the replay viewer.
   return;
-
-  /*
-  if (!actor) {
-    return;
-  }
-  const objFront = devToolsClient.getFrontByID(actor);
-
-  if (objFront) {
-    return objFront.release().catch(() => {});
-  }
-  */
-}
-
-function sendPacket(packet) {
-  return devToolsClient.request(packet);
 }
 
 function resume(point) {
@@ -114,17 +86,9 @@ function removeXHRBreakpoint(path, method) {
 }
 
 function addWatchpoint(object, property, label, watchpointType) {
-  if (currentTarget.traits.watchpoints) {
-    const objectFront = createObjectFront(object);
-    return objectFront.addWatchpoint(property, label, watchpointType);
-  }
 }
 
 async function removeWatchpoint(object, property) {
-  if (currentTarget.traits.watchpoints) {
-    const objectFront = createObjectFront(object);
-    await objectFront.removeWatchpoint(property);
-  }
 }
 
 // Get the string key to use for a breakpoint location.
@@ -389,7 +353,6 @@ function pickExecutionPoints(count, options) {
 const clientCommands = {
   autocomplete,
   blackBox,
-  createObjectFront,
   loadObjectProperties,
   releaseActor,
   interrupt,
@@ -425,7 +388,6 @@ const clientCommands = {
   checkIfAlreadyPaused,
   registerSourceActor,
   getMainThread,
-  sendPacket,
   setSkipPausing,
   setEventListenerBreakpoints,
   getFrontByID,

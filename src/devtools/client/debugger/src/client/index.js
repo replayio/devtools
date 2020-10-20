@@ -4,13 +4,18 @@
 
 //
 
-import * as firefox from "./firefox";
+import { bindActionCreators } from "redux";
+
+const { ThreadFront } = require("protocol/thread");
+
+import { setupCommands, clientCommands } from "./commands";
+import { setupEvents, clientEvents } from "./events";
 
 import { asyncStore, verifyPrefSchema } from "../utils/prefs";
-import { setupHelper } from "../utils/dbg";
+import actions from '../actions'
+import * as selectors from "../selectors";
 
-import { bootstrapApp, bootstrapStore, bootstrapWorkers } from "../utils/bootstrap";
-
+import { updatePrefs } from "../utils/bootstrap";
 import { initialBreakpointsState } from "../reducers/breakpoints";
 
 async function syncBreakpoints() {
@@ -18,7 +23,7 @@ async function syncBreakpoints() {
   const breakpointValues = Object.values(breakpoints);
   breakpointValues.forEach(({ disabled, options, location }) => {
     if (!disabled) {
-      firefox.clientCommands.setBreakpoint(location, options);
+      clientCommands.setBreakpoint(location, options);
     }
   });
 }
@@ -27,13 +32,13 @@ function syncXHRBreakpoints() {
   asyncStore.xhrBreakpoints.then(bps => {
     bps.forEach(({ path, method, disabled }) => {
       if (!disabled) {
-        firefox.clientCommands.setXHRBreakpoint(path, method);
+        clientCommands.setXHRBreakpoint(path, method);
       }
     });
   });
 }
 
-async function loadInitialState() {
+export async function loadInitialState() {
   const pendingBreakpoints = await asyncStore.pendingBreakpoints;
   const tabs = { tabs: await asyncStore.tabs };
   const xhrBreakpoints = await asyncStore.xhrBreakpoints;
@@ -47,35 +52,34 @@ async function loadInitialState() {
   };
 }
 
-export async function onConnect(connection, panelWorkers, panel) {
-  // NOTE: the landing page does not connect to a JS process
-  if (!connection) {
-    return;
-  }
+let boundActions;
+let store;
+
+export function bootstrap(_store) {
+  store = _store;
+  boundActions = bindActionCreators(actions, store.dispatch);
 
   verifyPrefSchema();
+  setupCommands();
+  setupEvents({ actions: boundActions });
+  store.subscribe(() => updatePrefs(store.getState()));
+}
 
-  const client = firefox;
-  const commands = client.clientCommands;
+export async function onConnect() {
+  store.dispatch(actions.connect("", ThreadFront.actor, {}, false));
 
-  const initialState = await loadInitialState();
-  const workers = bootstrapWorkers(panelWorkers);
+  ThreadFront.findScripts(({ scriptId, url, sourceMapURL }) =>
+    clientEvents.newSource(ThreadFront, {
+      source: {
+        actor: scriptId,
+        url,
+        sourceMapURL,
+      }
+    })
+  );
 
-  const { store, actions, selectors } = bootstrapStore(commands, workers, panel, initialState);
-
-  const connected = client.onConnect(connection, actions, panel);
-
-  setupHelper({
-    store,
-    actions,
-    selectors,
-    workers,
-    connection,
-    client: client.clientCommands,
-  });
 
   await syncBreakpoints();
   syncXHRBreakpoints();
-  await connected;
-  return { store, actions, selectors, client: commands };
+  return { store, actions: boundActions, selectors, client: clientCommands };
 }

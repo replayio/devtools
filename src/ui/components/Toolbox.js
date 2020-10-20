@@ -3,20 +3,20 @@ import React from "react";
 import { EventEmitter } from "protocol/utils";
 import classnames from "classnames";
 
-import { DebuggerPanel } from "devtools/client/debugger/panel";
-
-import { WebConsolePanel } from "devtools/client/webconsole/panel";
-import { InspectorPanel } from "devtools/client/inspector/panel";
 import Selection from "devtools/client/framework/selection";
 import { log } from "protocol/socket";
 import { defer } from "protocol/utils";
 import Highlighter from "highlighter/highlighter";
+import DebuggerApp from "devtools/client/debugger/src/components/App";
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
+import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
+import { DebuggerPanel } from "devtools/client/debugger/panel";
+import { WebConsolePanel } from "devtools/client/webconsole/panel";
+import { InspectorPanel } from "devtools/client/inspector/panel";
 
 import Timeline from "./Timeline";
 import NodePicker from "./NodePicker";
 import { ThreadFront } from "protocol/thread";
-import KeyShortcuts from "devtools/client/shared/key-shortcuts";
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { connect } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
@@ -143,15 +143,6 @@ class Toolbox extends React.Component {
     }
 
     return <Timeline toolbox={this} />;
-  }
-
-  renderDebugger() {
-    const { panels } = this.state;
-    if (!panels.debugger) {
-      return null;
-    }
-
-    return panels.debugger.renderApp();
   }
 
   renderInspector() {
@@ -436,7 +427,7 @@ class Toolbox extends React.Component {
             {...this.getSplitBoxDimensions()}
             splitterSize={1}
             vert={false}
-            onResizeEnd={num => {}}
+            onResizeEnd={num => { }}
             startPanel={
               <div className="toolbox-top-panels">
                 <div
@@ -445,7 +436,7 @@ class Toolbox extends React.Component {
                   })}
                   id="toolbox-content-debugger"
                 >
-                  {this.renderDebugger()}
+                  <DebuggerApp />
                 </div>
                 <div
                   className={classnames("toolbox-panel theme-body", {

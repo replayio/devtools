@@ -48,12 +48,6 @@ function nodeLoadProperties(node, actor) {
     try {
       const properties = await loadItemProperties(node, client, loadedProperties);
 
-      // If the client does not have a releaseActor function, it means the actors are
-      // handled directly by the consumer, so we don't need to track them.
-      if (!client || !client.releaseActor) {
-        actor = null;
-      }
-
       dispatch(nodePropertiesLoaded(node, actor, properties));
     } catch (e) {
       console.error(e);
@@ -137,7 +131,6 @@ function closeObjectInspector() {
  */
 function rootsChanged(props) {
   return ({ dispatch, client, getState }) => {
-    releaseActors(getState(), client, dispatch);
     dispatch({
       type: "ROOTS_CHANGED",
       data: props,
@@ -166,6 +159,7 @@ async function releaseActors(state, client, dispatch) {
 
 function invokeGetter(node, receiverId) {
   return async ({ dispatch, client, getState }) => {
+    return
     try {
       const objectFront =
         getParentFront(node) || client.createObjectFront(getParentGripValue(node));

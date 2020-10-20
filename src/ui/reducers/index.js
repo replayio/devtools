@@ -1,13 +1,15 @@
 import app, * as appSelectors from "./app";
 import timeline, * as timelineSelectors from "./timeline";
 import metadata, * as metadataSelectors from "./metadata";
-import eventListenerBreakpoints, * as eventListenerBreakpointsSelectors from "devtools/client/debugger/src/reducers/event-listeners";
+import * as eventListenerBreakpointsSelectors from "devtools/client/debugger/src/reducers/event-listeners";
+import debuggerReducers from "devtools/client/debugger/src/reducers"
+
 
 export const reducers = {
   app,
   timeline,
   metadata,
-  eventListenerBreakpoints,
+  ...debuggerReducers
 };
 
 export const selectors = {
