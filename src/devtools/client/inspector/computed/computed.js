@@ -61,10 +61,10 @@ function UpdateProcess(win, array, options) {
   this.index = 0;
   this.array = array;
 
-  this.onItem = options.onItem || function () { };
-  this.onBatch = options.onBatch || function () { };
-  this.onDone = options.onDone || function () { };
-  this.onCancel = options.onCancel || function () { };
+  this.onItem = options.onItem || function () {};
+  this.onBatch = options.onBatch || function () {};
+  this.onDone = options.onDone || function () {};
+  this.onCancel = options.onCancel || function () {};
   this.threshold = options.threshold || 45;
 
   this.canceled = false;
@@ -687,7 +687,7 @@ CssComputedView.prototype = {
       if (!this._isDestroyed) {
         console.warn(
           "The creation of property views was cancelled because " +
-          "the computed-view was destroyed before it was done creating views"
+            "the computed-view was destroyed before it was done creating views"
         );
       } else {
         console.error(e);

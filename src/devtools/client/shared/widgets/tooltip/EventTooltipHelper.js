@@ -118,7 +118,6 @@ EventTooltip.prototype = {
               this._tooltip.emit("event-tooltip-source-map-ready");
             }
           };
-
         }
       }
 
