@@ -20,7 +20,9 @@ const INITIAL_MARKUP = {
   rootNode: null,
   // The selected node to display in the DOM view.
   selectedNode: null,
-  // The markup tree representation of the DOM view.
+  // An object representing the markup tree. The key to the object represents the object
+  // ID of a NodeFront of a given node. The value of each item in the object contains
+  // an object representing the properties of the given node.
   tree: {},
 };
 
