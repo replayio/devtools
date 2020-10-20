@@ -7,61 +7,76 @@
   margin: 1em 0;
   position: relative;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   background: var(--theme-toolbar-background);
   border-top: 1px solid var(--theme-splitter-color);
   border-bottom: 1px solid var(--theme-splitter-color);
+  margin-left: 40px;
+  border-radius: 4px;
+  border: 1px solid var(--theme-splitter-color);
+  width: 500px;
+  padding: 12px;
 }
 
-.breakpoint-panel .prompt {
-  font-size: 1.8em;
-  color: var(--theme-graphs-orange);
-  padding-left: 3px;
-  padding-right: 3px;
-  padding-bottom: 3px;
-  text-align: right;
-  width: 30px;
-  align-self: baseline;
-  margin-top: 3px;
+.breakpoint-panel .text {
+  font-family: sans-serif;
+  line-height: 16px;
 }
 
-.breakpoint-panel.log-point .prompt {
-  color: var(--purple-60);
-}
-
-.breakpoint-panel .CodeMirror {
-  margin: 6px 10px;
-}
-
-.breakpoint-panel .CodeMirror {
-  background: var(--theme-toolbar-background);
-}
-
-.breakpoint-panel .save {
-  background: var(--blue-50);
-  color: white;
-  height: 20px;
-  border-radius: 2px;
-  background: var(--blue-50);
-  padding: 4px 8px;
-  margin-right: 16px;
-}
-
-.breakpoint-panel .cancel {
+.breakpoint-panel .label {
   color: var(--theme-comment);
 }
 
-.breakpoint-panel .actions.hidden,
-.breakpoint-panel .edit-actions.hidden {
-  display: none;
+.breakpoint-panel .input-row {
+  display: flex;
 }
+
+.breakpoint-panel .input-row > *:not(:last-child) {
+  margin-right: 8px;
+}
+
+.breakpoint-panel .cm-s-mozilla {
+  background-color: white;
+  border: 1px solid var(--theme-splitter-color);
+  border-radius: 4px;
+  padding-top: 1px;
+}
+
+.breakpoint-panel button {
+  height: 100%;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-family: sans-serif;
+}
+
+.breakpoint-panel button.save,
+.breakpoint-panel button.edit {
+  background: var(--blue-40);
+  color: white;
+}
+
+.breakpoint-panel button.save:hover {
+  background: var(--blue-50);
+  color: white;
+}
+
+.breakpoint-panel button.cancel {
+  border: 1px solid var(--theme-splitter-color);
+  margin-right: 6px;
+  color: var(--theme-comment);
+}
+
 .breakpoint-panel .edit-actions {
   display: flex;
-  flex-direction: row;
+  flex-direction: row-reverse;
   flex-grow: 1;
-
-  margin-right: 30px;
   align-items: center;
+}
+
+.breakpoint-panel .edit-actions.hidden,
+.breakpoint-panel .label.hidden {
+  display: none;
 }
 
 .breakpoint-panel .actions {
