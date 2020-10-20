@@ -16,10 +16,6 @@ GripMessageBody.displayName = "GripMessageBody";
 
 GripMessageBody.propTypes = {
   grip: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]).isRequired,
-  serviceContainer: PropTypes.shape({
-    createElement: PropTypes.func.isRequired,
-    onViewSourceInDebugger: PropTypes.func.isRequired,
-  }),
   userProvidedStyle: PropTypes.string,
   useQuotes: PropTypes.bool,
   escapeWhitespace: PropTypes.bool,
@@ -35,7 +31,6 @@ function GripMessageBody(props) {
   const {
     grip,
     userProvidedStyle,
-    serviceContainer,
     useQuotes,
     escapeWhitespace,
     mode = MODE.LONG,
@@ -45,7 +40,7 @@ function GripMessageBody(props) {
 
   let styleObject;
   if (userProvidedStyle && userProvidedStyle !== "") {
-    styleObject = cleanupStyle(userProvidedStyle, serviceContainer.createElement);
+    styleObject = cleanupStyle(userProvidedStyle, (nodename) => document.createElement(nodename));
   }
 
   const objectInspectorProps = {
@@ -63,7 +58,7 @@ function GripMessageBody(props) {
     });
   }
 
-  return getObjectInspector(grip, serviceContainer, objectInspectorProps);
+  return getObjectInspector(grip, objectInspectorProps);
 }
 
 // Regular expression that matches the allowed CSS property names.

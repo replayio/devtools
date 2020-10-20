@@ -28,7 +28,6 @@ class ConsoleTable extends Component {
     return {
       dispatch: PropTypes.func.isRequired,
       parameters: PropTypes.array.isRequired,
-      serviceContainer: PropTypes.object.isRequired,
       id: PropTypes.string.isRequired,
     };
   }
@@ -58,7 +57,7 @@ class ConsoleTable extends Component {
   }
 
   getRows(columns, items) {
-    const { dispatch, serviceContainer } = this.props;
+    const { dispatch } = this.props;
 
     return items.map((item, index) => {
       const cells = [];
@@ -70,12 +69,11 @@ class ConsoleTable extends Component {
           typeof cellValue === "undefined"
             ? ""
             : GripMessageBody({
-                grip: cellValue,
-                mode: MODE.SHORT,
-                useQuotes: false,
-                serviceContainer,
-                dispatch,
-              });
+              grip: cellValue,
+              mode: MODE.SHORT,
+              useQuotes: false,
+              dispatch,
+            });
 
         cells.push(
           dom.div(

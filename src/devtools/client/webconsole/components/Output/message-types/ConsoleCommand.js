@@ -14,7 +14,6 @@ ConsoleCommand.displayName = "ConsoleCommand";
 ConsoleCommand.propTypes = {
   message: PropTypes.object.isRequired,
   timestampsVisible: PropTypes.bool.isRequired,
-  serviceContainer: PropTypes.object,
   maybeScrollToBottom: PropTypes.func,
 };
 
@@ -25,10 +24,9 @@ function ConsoleCommand(props) {
   const {
     message,
     timestampsVisible,
-    serviceContainer,
     maybeScrollToBottom,
     isPaused,
-    dispatch,
+    dispatch
   } = props;
 
   const { indent, source, type, level, timeStamp } = message;
@@ -38,13 +36,13 @@ function ConsoleCommand(props) {
   // (no CodeMirror editor), then it will just render text.
   const messageBody = createElement("syntax-highlighted", null, messageText);
 
+  console.log(`>>> rendering ConsoleCommand`, { dispatch: !!dispatch })
   return Message({
     source,
     type,
     level,
     topLevelClasses: [],
     messageBody,
-    serviceContainer,
     indent,
     timeStamp,
     timestampsVisible,

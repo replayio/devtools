@@ -12,7 +12,6 @@ const { defer } = require("protocol/utils");
  * A DevToolPanel that controls the Web Console.
  */
 function WebConsolePanel(toolbox) {
-  this._frameWindow = window;
   this._toolbox = toolbox;
   EventEmitter.decorate(this);
 
@@ -40,34 +39,11 @@ WebConsolePanel.prototype = {
    *         A promise that is resolved when the Web Console completes opening.
    */
   open: async function () {
-    try {
-      // Open the Web Console.
-      this.hud = new WebConsole(this._toolbox);
-      await this.hud.init();
-
-      this._isReady = true;
-      this.readyWaiter.resolve();
-      this.emit("ready");
-    } catch (e) {
-      console.error(`WebConsolePanel open failed. ${e.error}: ${e.message}`, e);
-    }
-
+    this.hud = new WebConsole(this._toolbox);
+    await this.hud.init();
     return this;
   },
 
-  _isReady: false,
-  get isReady() {
-    return this._isReady;
-  },
-
   destroy: function () {
-    if (!this._toolbox) {
-      return;
-    }
-    this.hud.destroy();
-    this.hud = null;
-    this._frameWindow = null;
-    this._toolbox = null;
-    this.emit("destroyed");
   },
 };

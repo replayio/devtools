@@ -30,7 +30,6 @@ class EagerEvaluation extends Component {
   static get propTypes() {
     return {
       terminalEagerResult: PropTypes.any,
-      serviceContainer: PropTypes.object.isRequired,
       highlightDomElement: PropTypes.func.isRequired,
       unHighlightDomElement: PropTypes.func.isRequired,
     };
@@ -78,16 +77,16 @@ class EagerEvaluation extends Component {
       { className: "eager-evaluation-result", key: "eager-evaluation-result" },
       hasResult
         ? dom.span(
-            { className: "eager-evaluation-result__row" },
-            dom.span({
-              className: "eager-evaluation-result__icon",
-              key: "icon",
-            }),
-            dom.span(
-              { className: "eager-evaluation-result__text", key: "text" },
-              this.renderRepsResult()
-            )
+          { className: "eager-evaluation-result__row" },
+          dom.span({
+            className: "eager-evaluation-result__icon",
+            key: "icon",
+          }),
+          dom.span(
+            { className: "eager-evaluation-result__text", key: "text" },
+            this.renderRepsResult()
           )
+        )
         : null
     );
   }

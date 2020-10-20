@@ -19,7 +19,6 @@ PageError.propTypes = {
   message: PropTypes.object.isRequired,
   open: PropTypes.bool,
   timestampsVisible: PropTypes.bool.isRequired,
-  serviceContainer: PropTypes.object,
   maybeScrollToBottom: PropTypes.func,
   inWarningGroup: PropTypes.bool.isRequired,
 };
@@ -34,7 +33,6 @@ function PageError(props) {
     message,
     open,
     repeat,
-    serviceContainer,
     timestampsVisible,
     isPaused,
     maybeScrollToBottom,
@@ -63,7 +61,6 @@ function PageError(props) {
     useQuotes: false,
     escapeWhitespace: false,
     urlCropLimit: 120,
-    openLink: serviceContainer.openLink,
   });
 
   return Message({
@@ -85,7 +82,6 @@ function PageError(props) {
     repeat,
     frame,
     stacktrace,
-    serviceContainer,
     exceptionDocURL,
     timeStamp,
     notes,

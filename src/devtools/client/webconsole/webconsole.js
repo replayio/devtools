@@ -6,8 +6,6 @@
 
 const Services = require("Services");
 const { WebConsoleUI } = require("devtools/client/webconsole/webconsole-ui");
-const EventEmitter = require("devtools/shared/event-emitter");
-const Telemetry = require("devtools/client/shared/telemetry");
 const { openDocLink } = require("devtools/client/shared/link");
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 
@@ -30,25 +28,10 @@ class WebConsole {
    */
   constructor(toolbox) {
     this.toolbox = toolbox;
-    this.toolbox.webconsoleHud = this;
-    this.telemetry = new Telemetry();
-
-    this.ui = new WebConsoleUI(this);
-    this._destroyer = null;
-
-    EventEmitter.decorate(this);
+    this.ui = new WebConsoleUI(this, toolbox);
   }
 
-  /**
-   * Initialize the Web Console instance.
-   *
-   * @param {Boolean} emitCreatedEvent: Defaults to true. If false is passed,
-   *        We won't be sending the 'web-console-created' event.
-   *
-   * @return object
-   *         A promise for the initialization.
-   */
-  async init(emitCreatedEvent = true) {
+  async init() {
     await this.ui.init();
   }
 
@@ -278,7 +261,7 @@ class WebConsole {
     };
   }
 
-  destroy() {}
+  destroy() { }
 }
 
 module.exports = WebConsole;

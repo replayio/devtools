@@ -21,12 +21,11 @@ WarningGroup.propTypes = {
   dispatch: PropTypes.func.isRequired,
   message: PropTypes.object.isRequired,
   timestampsVisible: PropTypes.bool.isRequired,
-  serviceContainer: PropTypes.object,
   badge: PropTypes.number.isRequired,
 };
 
 function WarningGroup(props) {
-  const { dispatch, message, serviceContainer, timestampsVisible, badge, open } = props;
+  const { dispatch, message, timestampsVisible, badge, open } = props;
 
   const { source, type, level, id: messageId, indent, timeStamp } = message;
 
@@ -52,7 +51,6 @@ function WarningGroup(props) {
     messageBody,
     messageId,
     open,
-    serviceContainer,
     source,
     timeStamp,
     timestampsVisible,
