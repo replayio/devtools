@@ -9,37 +9,37 @@
  * @static
  */
 export function openLink(url) {
-  return async function ({ panel }) {
-    return panel.openLink(url);
+  return async function ({ panels }) {
+    return panels.debugger?.openLink(url);
   };
 }
 
 export function evaluateInConsole(inputString) {
-  return async ({ panel }) => {
-    return panel.openConsoleAndEvaluate(inputString);
+  return async ({ panels }) => {
+    return panels.debugger?.openConsoleAndEvaluate(inputString);
   };
 }
 
 export function openElementInInspectorCommand(grip) {
-  return async ({ panel }) => {
-    return panel.openElementInInspector(grip);
+  return async ({ panels }) => {
+    return panels.debugger?.openElementInInspector(grip);
   };
 }
 
 export function openInspector(grip) {
-  return async ({ panel }) => {
-    return panel.openInspector();
+  return async ({ panels }) => {
+    return panels.debugger?.openInspector();
   };
 }
 
 export function highlightDomElement(grip) {
-  return async ({ panel }) => {
-    return panel.highlightDomElement(grip);
+  return async ({ panels }) => {
+    return panels.debugger?.highlightDomElement(grip);
   };
 }
 
 export function unHighlightDomElement(grip) {
-  return async ({ panel }) => {
-    return panel.unHighlightDomElement(grip);
+  return async ({ panels }) => {
+    return panels.debugger?.unHighlightDomElement(grip);
   };
 }

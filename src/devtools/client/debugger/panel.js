@@ -2,20 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { LocalizationHelper } from "devtools/shared/l10n";
 import { defer, assert } from "protocol/utils";
-import { bootstrapApp } from "devtools/client/debugger/src/utils/bootstrap";
 import { resizeBreakpointGutter } from "./src/utils/ui";
 import { openDocLink } from "devtools/client/shared/link";
-
-function registerStoreObserver(store, subscriber) {
-  let oldState = store.getState();
-  store.subscribe(() => {
-    const state = store.getState();
-    subscriber(state, oldState);
-    oldState = state;
-  });
-}
+import { onConnect } from "devtools/client/debugger/src/client";
 
 async function getNodeFront(gripOrFront, toolbox) {
   // Given a NodeFront
@@ -29,21 +19,12 @@ async function getNodeFront(gripOrFront, toolbox) {
 
 export class DebuggerPanel {
   constructor(toolbox) {
-    this.panelWin = window;
-    this.panelWin.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
-    this.panelWin.Debugger = require("./src/main").default;
-
     this.toolbox = toolbox;
     this.readyWaiter = defer();
   }
 
   async open() {
-    const { actions, store, selectors, client } = await this.panelWin.Debugger.bootstrap({
-      workers: {
-        evaluationsParser: this.toolbox.parserService,
-      },
-      panel: this,
-    });
+    const { actions, store, selectors, client } = await onConnect();
 
     this._actions = actions;
     this._store = store;
@@ -51,8 +32,6 @@ export class DebuggerPanel {
     this._client = client;
     this.isReady = true;
     this.readyWaiter.resolve();
-
-    registerStoreObserver(this._store, this._onDebuggerStateChange.bind(this));
 
     return this;
   }
@@ -89,12 +68,6 @@ export class DebuggerPanel {
       }, 0);
     };
     codeMirror.on("refresh", handler);
-  }
-
-  _onDebuggerStateChange(state, oldState) {}
-
-  renderApp() {
-    return bootstrapApp(this._store);
   }
 
   getVarsForTests() {

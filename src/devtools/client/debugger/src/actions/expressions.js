@@ -17,12 +17,12 @@ import { wrapExpression } from "../utils/expressions";
  * @static
  */
 export function addExpression(cx, input) {
-  return async ({ dispatch, getState, evaluationsParser }) => {
+  return async ({ dispatch, getState, parser }) => {
     if (!input) {
       return;
     }
 
-    const expressionError = await evaluationsParser.hasSyntaxError(input);
+    const expressionError = await parser.hasSyntaxError(input);
 
     const expression = getExpression(getState(), input);
     if (expression) {

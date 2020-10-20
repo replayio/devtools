@@ -4,7 +4,7 @@
 
 const { getClosestGripNode, getValue } = require("./node");
 
-function loadItemProperties(item, client, loadedProperties) {
+function loadItemProperties(item) {
   const gripItem = getClosestGripNode(item);
   const value = getValue(gripItem);
 

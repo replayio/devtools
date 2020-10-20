@@ -59,7 +59,5 @@ export function connect(url, actor, traits, isWebExtension) {
  * @static
  */
 export function navigated() {
-  return async function ({ dispatch, panel }) {
-    panel.emit("reloaded");
-  };
+  return async function ({}) {};
 }
