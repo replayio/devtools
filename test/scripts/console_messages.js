@@ -1,6 +1,6 @@
 // Test expanding console objects that were logged by console messages,
 // logpoints, and evaluations when the debugger is somewhere else.
-(async function() {
+(async function () {
   await Test.selectConsole();
 
   let msg;
@@ -9,22 +9,25 @@
   await Test.checkMessageObjectContents(
     msg,
     ["subobj: Object { subvalue: 9 }"],
-    [ "obj: Object { value: 6, subobj: {…} }" ]
+    ["obj: Object { value: 6, subobj: {…} }"]
   );
 
   msg = await Test.waitForMessage("Iteration 5");
   await Test.checkMessageObjectContents(
     msg,
     ["subobj: Object { subvalue: 15 }"],
-    [ "obj: Object { value: 10, subobj: {…} }" ]
+    ["obj: Object { value: 10, subobj: {…} }"]
   );
 
   msg = await Test.waitForMessage("Iteration 7");
   await Test.checkMessageObjectContents(
     msg,
     ["subobj: Object { subvalue: 21 }"],
-    [ "obj: Object { value: 14, subobj: {…} }" ]
+    ["obj: Object { value: 14, subobj: {…} }"]
   );
+
+  Test.clickMessageLocationLink(msg)
+  await Test.waitUntil(() => Test.dbgSelectors.getSelectedLocation()?.line == 15)
 
   await Test.addBreakpoint("doc_rr_console.html", 16, undefined, {
     logValue: `"Logpoint " + iteration, object`,
@@ -36,7 +39,7 @@
     // Disabled due to https://github.com/RecordReplay/devtools/issues/476
     //["subobj: Object { subvalue: 24 }"],
     ["subobj: Object"],
-    [ "obj: Object { value: 16, subobj: {…} }" ]
+    ["obj: Object { value: 16, subobj: {…} }"]
   );
 
   await Test.removeAllBreakpoints();
@@ -50,7 +53,7 @@
   await Test.checkMessageObjectContents(
     msg,
     ["subobj: Object { subvalue: 0 }"],
-    [ "obj: Object { value: 0, subobj: {…} }" ]
+    ["obj: Object { value: 0, subobj: {…} }"]
   );
 
   Test.finish();

@@ -8,7 +8,7 @@ const { Component, createFactory, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const actions = require("devtools/client/webconsole/actions/index");
-const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
+const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const MessageIcon = require("devtools/client/webconsole/components/Output/MessageIcon");
 const { CloseButton } = require("devtools/client/debugger/src/components/shared/Button");
@@ -18,7 +18,6 @@ const CollapseButton = require("devtools/client/webconsole/components/Output/Col
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
 const PropTypes = require("prop-types");
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
-const { pointPrecedes } = require("protocol/execution-point-utils");
 
 class Message extends Component {
   static get propTypes() {
@@ -49,12 +48,6 @@ class Message extends Component {
       dispatch: PropTypes.func,
       timeStamp: PropTypes.number,
       timestampsVisible: PropTypes.bool,
-      serviceContainer: PropTypes.shape({
-        onViewSourceInDebugger: PropTypes.func,
-        openLink: PropTypes.func.isRequired,
-        jumpToExecutionPoint: PropTypes.func,
-        onMessageHover: PropTypes.func,
-      }),
       notes: PropTypes.arrayOf(
         PropTypes.shape({
           messageBody: PropTypes.string.isRequired,
@@ -97,14 +90,17 @@ class Message extends Component {
 
   // Event used in tests. Some message types don't pass it in because existing tests
   // did not emit for them.
-  emitNewMessage(node) {
-    const { serviceContainer, messageId, timeStamp } = this.props;
-  }
+  emitNewMessage(node) { }
 
   onLearnMoreClick(e) {
-    const { exceptionDocURL } = this.props;
-    this.props.serviceContainer.openLink(exceptionDocURL, e);
+    const { exceptionDocURL, dispatch } = this.props;
+    dispatch(actions.openLink(exceptionDocURL, e));
     e.preventDefault();
+  }
+
+  onViewSourceInDebugger = (frame) => {
+    const { dispatch } = this.props;
+    dispatch(actions.onViewSourceInDebugger(frame))
   }
 
   toggleMessage(e) {
@@ -132,9 +128,9 @@ class Message extends Component {
   }
 
   onMouseEvent(ev) {
-    const { message, serviceContainer, executionPoint } = this.props;
+    const { dispatch, message, executionPoint } = this.props;
     if (executionPoint) {
-      serviceContainer.onMessageHover(ev.type, message);
+      dispatch(actions.onMessageHover(ev.type, message));
     }
   }
 
@@ -143,7 +139,7 @@ class Message extends Component {
       executionPoint,
       executionPointTime,
       executionPointHasFrames,
-      serviceContainer,
+      dispatch,
       inWarningGroup,
       pausedExecutionPointTime = Number.POSITIVE_INFINITY,
       type,
@@ -158,10 +154,8 @@ class Message extends Component {
 
     if (executionPoint) {
       onRewindClick = () => {
-        serviceContainer.jumpToExecutionPoint(
-          executionPoint,
-          executionPointTime,
-          executionPointHasFrames
+        dispatch(
+          actions.jumpToExecutionPoint(executionPoint, executionPointTime, executionPointHasFrames)
         );
       };
     }
@@ -177,14 +171,12 @@ class Message extends Component {
     } else if (!["command", "result"].includes(type)) {
       overlayType = "debug";
       label = "Debug";
-      onClick = () => {
-        serviceContainer.onViewSourceInDebugger({
-          line: frame.line,
-          column: frame.column,
-          sourceId: frame.sourceId,
-          url: frame.source,
-        });
-      };
+      onClick = () => this.onViewSourceInDebugger({
+        line: frame.line,
+        column: frame.column,
+        sourceId: frame.sourceId,
+        url: frame.source,
+      })
     }
 
     return dom.div(
@@ -294,7 +286,6 @@ class Message extends Component {
       messageBody,
       frame,
       stacktrace,
-      serviceContainer,
       exceptionDocURL,
       executionPoint,
       messageId,
@@ -325,7 +316,7 @@ class Message extends Component {
         },
         createElement(SmartTrace, {
           stacktrace,
-          onViewSourceInDebugger: serviceContainer.onViewSourceInDebugger,
+          onViewSourceInDebugger: this.onViewSourceInDebugger,
           onReady: this.props.maybeScrollToBottom,
         })
       );
@@ -351,10 +342,10 @@ class Message extends Component {
             { className: "message-location devtools-monospace" },
             note.frame
               ? FrameView({
-                  frame: note.frame,
-                  onClick: serviceContainer.onViewSourceInDebugger,
-                  showEmptyPathAsHost: true,
-                })
+                frame: note.frame,
+                onClick: this.onViewSourceInDebugger,
+                showEmptyPathAsHost: true,
+              })
               : null
           )
         )
@@ -373,11 +364,11 @@ class Message extends Component {
       { className: "message-location devtools-monospace" },
       frame
         ? FrameView({
-            frame,
-            onClick: frame ? serviceContainer.onViewSourceInDebugger : undefined,
-            showEmptyPathAsHost: true,
-            messageSource: source,
-          })
+          frame,
+          onClick: frame ? this.onViewSourceInDebugger : undefined,
+          showEmptyPathAsHost: true,
+          messageSource: source,
+        })
         : null
     );
 

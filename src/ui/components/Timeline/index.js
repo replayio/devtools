@@ -84,9 +84,9 @@ export class Timeline extends Component {
     gToolbox.timeline = this;
     this.props.updateTimelineDimensions();
 
-    const consoleFrame = this.console.hud.ui;
-    consoleFrame.on("message-hover", this.onConsoleMessageHover);
-    consoleFrame.wrapper.subscribeToStore(this.onConsoleUpdate);
+    const webconsoleUI = this.console.hud.ui;
+    webconsoleUI.on("message-hover", this.onConsoleMessageHover);
+    webconsoleUI.subscribeToStore(this.onConsoleUpdate);
   }
 
   componentDidUpdate(prevProps, prevState) {

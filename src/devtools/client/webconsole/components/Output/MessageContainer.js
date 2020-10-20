@@ -40,7 +40,6 @@ class MessageContainer extends Component {
     return {
       messageId: PropTypes.string.isRequired,
       open: PropTypes.bool.isRequired,
-      serviceContainer: PropTypes.object.isRequired,
       payload: PropTypes.object,
       timestampsVisible: PropTypes.bool,
       repeat: PropTypes.number,
@@ -77,7 +76,6 @@ class MessageContainer extends Component {
 
   render() {
     const message = this.props.getMessage();
-
     const MessageComponent = getMessageComponent(message);
     return MessageComponent(Object.assign({ message }, this.props));
   }

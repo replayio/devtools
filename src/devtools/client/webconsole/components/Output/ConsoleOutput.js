@@ -6,7 +6,7 @@
 const { Component, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
-const { initialize } = require("devtools/client/webconsole/actions/ui");
+const actions = require("devtools/client/webconsole/actions/index");
 
 const {
   getAllMessagesById,
@@ -29,6 +29,7 @@ const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const {
   getInitialMessageCountForViewport,
 } = require("devtools/client/webconsole/utils/messages.js");
+const { bindActionCreators } = require("redux");
 
 function messageExecutionPoint(msg) {
   const { executionPoint, lastExecutionPoint } = msg;
@@ -68,15 +69,10 @@ class ConsoleOutput extends Component {
       initialized: PropTypes.bool.isRequired,
       messages: PropTypes.object.isRequired,
       messagesUi: PropTypes.array.isRequired,
-      serviceContainer: PropTypes.shape({
-        attachRefToWebConsoleUI: PropTypes.func.isRequired,
-      }),
-      dispatch: PropTypes.func.isRequired,
       timestampsVisible: PropTypes.bool,
       messagesPayload: PropTypes.object.isRequired,
       warningGroups: PropTypes.object.isRequired,
       visibleMessages: PropTypes.array.isRequired,
-      onFirstMeaningfulPaint: PropTypes.func.isRequired,
       pausedExecutionPoint: PropTypes.string,
       pausedExecutionPointTime: PropTypes.number,
     };
@@ -93,19 +89,10 @@ class ConsoleOutput extends Component {
       scrollToBottom(this.outputNode);
     }
 
-    const { serviceContainer, onFirstMeaningfulPaint, dispatch } = this.props;
-    serviceContainer.attachRefToWebConsoleUI("outputScroller", this.outputNode);
-
     // Waiting for the next paint.
     new Promise(res => requestAnimationFrame(res)).then(() => {
-      if (onFirstMeaningfulPaint) {
-        onFirstMeaningfulPaint();
-      }
-
       // Dispatching on next tick so we don't block on action execution.
-      setTimeout(() => {
-        dispatch(initialize());
-      }, 0);
+      setTimeout(this.props.initialize, 0);
     });
   }
 
@@ -183,13 +170,13 @@ class ConsoleOutput extends Component {
       messagesUi,
       messagesPayload,
       warningGroups,
-      serviceContainer,
       timestampsVisible,
       initialized,
       pausedExecutionPoint,
       pausedExecutionPointTime,
       zoomStartTime,
       zoomEndTime,
+      onMessageHover,
     } = this.props;
 
     if (!initialized) {
@@ -206,13 +193,11 @@ class ConsoleOutput extends Component {
     });
 
     const pausedMessage = getClosestMessage(visibleMessages, messages, pausedExecutionPoint);
-
     const messageNodes = visibleMessages.map(messageId =>
       createElement(MessageContainer, {
         dispatch,
         key: messageId,
         messageId,
-        serviceContainer,
         open: messagesUi.includes(messageId),
         payload: messagesPayload.get(messageId),
         timestampsVisible,
@@ -223,6 +208,7 @@ class ConsoleOutput extends Component {
             : false,
         pausedExecutionPoint,
         pausedExecutionPointTime,
+        onMessageHover,
         getMessage: () => messages.get(messageId),
         isPaused: !!pausedMessage && pausedMessage.id == messageId,
       })
@@ -269,5 +255,10 @@ function mapStateToProps(state, props) {
     zoomEndTime: state.ui.zoomEndTime,
   };
 }
+const mapDispatchToProps = dispatch => ({
+  openLink: actions.openLink,
+  initialize: actions.initialize,
+  dispatch,
+});
 
-module.exports = connect(mapStateToProps)(ConsoleOutput);
+module.exports = connect(mapStateToProps, mapDispatchToProps)(ConsoleOutput);
