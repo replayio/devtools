@@ -4,8 +4,8 @@
 
 //
 
-import { setupCommands, clientCommands } from "./firefox/commands";
-import { setupEvents, clientEvents } from "./firefox/events";
+import { setupCommands, clientCommands } from "./commands";
+import { setupEvents, clientEvents } from "./events";
 
 const { ThreadFront } = require("protocol/thread");
 

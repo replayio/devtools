@@ -9,33 +9,28 @@
  * @module actions/sources
  */
 
-import { flatten } from "lodash";
-
 import { stringToSourceActorId } from "../../reducers/source-actors";
-import { supportsWasm } from "../../reducers/threads";
 import { insertSourceActors } from "../../actions/source-actors";
-import { makeSourceId } from "../../client/firefox/create";
+import { makeSourceId } from "../../client/create";
 import { toggleBlackBox } from "./blackbox";
 import { syncBreakpoint } from "../breakpoints";
 import { loadSourceText } from "./loadSourceText";
 import { selectLocation, setBreakableLines } from "../sources";
 
-import { getRawSourceURL, isPrettyURL, isUrlExtension, isInlineScript } from "../../utils/source";
+import { getRawSourceURL, isInlineScript } from "../../utils/source";
 import {
   getBlackBoxList,
   getSource,
   getSourceFromId,
   hasSourceActor,
-  getSourceByActorId,
   getPendingSelectedLocation,
   getPendingBreakpointsForSource,
   getContext,
   isSourceLoadingOrLoaded,
 } from "../../selectors";
 
-import { prefs } from "../../utils/prefs";
 import sourceQueue from "../../utils/source-queue";
-import { validateNavigateContext, ContextError } from "../../utils/context";
+import { ContextError } from "../../utils/context";
 
 import { ThreadFront } from "protocol/thread";
 
