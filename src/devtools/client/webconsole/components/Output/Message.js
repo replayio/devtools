@@ -146,6 +146,7 @@ class Message extends Component {
       serviceContainer,
       inWarningGroup,
       pausedExecutionPointTime = Number.POSITIVE_INFINITY,
+      type,
       frame,
     } = this.props;
     let onRewindClick = null;
@@ -173,7 +174,7 @@ class Message extends Component {
       overlayType = "rewind";
       label = "Rewind";
       onClick = onRewindClick;
-    } else {
+    } else if (!["command", "result"].includes(type)) {
       overlayType = "debug";
       label = "Debug";
       onClick = () => {
@@ -350,10 +351,10 @@ class Message extends Component {
             { className: "message-location devtools-monospace" },
             note.frame
               ? FrameView({
-                  frame: note.frame,
-                  onClick: serviceContainer.onViewSourceInDebugger,
-                  showEmptyPathAsHost: true,
-                })
+                frame: note.frame,
+                onClick: serviceContainer.onViewSourceInDebugger,
+                showEmptyPathAsHost: true,
+              })
               : null
           )
         )
@@ -372,11 +373,11 @@ class Message extends Component {
       { className: "message-location devtools-monospace" },
       frame
         ? FrameView({
-            frame,
-            onClick: frame ? serviceContainer.onViewSourceInDebugger : undefined,
-            showEmptyPathAsHost: true,
-            messageSource: source,
-          })
+          frame,
+          onClick: frame ? serviceContainer.onViewSourceInDebugger : undefined,
+          showEmptyPathAsHost: true,
+          messageSource: source,
+        })
         : null
     );
 
