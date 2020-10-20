@@ -12,10 +12,20 @@ import { selectors } from "ui/reducers";
 
 import "./Account.css";
 
-const RECORDINGS = gql`
-  query MyRecordingsQuery {
-    recordings {
+const GET_MY_RECORDINGS = gql`
+  query GetMyRecordings($authId: String) {
+    recordings(where: { user: { auth_id: { _eq: $authId } } }) {
       id
+      url
+      title
+      recording_id
+      recordingTitle
+      last_screen_mime_type
+      duration
+      description
+      date
+      last_screen_data
+      is_private
     }
   }
 `;
@@ -50,7 +60,11 @@ function FirstRecordingPrompt() {
 }
 
 function AccountPage() {
-  const { data, loading } = useQuery(RECORDINGS, { pollInterval: 10000 });
+  const { user } = useAuth0();
+  const { data, loading } = useQuery(GET_MY_RECORDINGS, {
+    variables: { authId: user.sub },
+    pollInterval: 10000,
+  });
 
   if (loading) {
     return <Loader />;

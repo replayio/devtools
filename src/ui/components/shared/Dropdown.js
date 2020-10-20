@@ -2,10 +2,17 @@ import React from "react";
 import classnames from "classnames";
 import "./Dropdown.css";
 
-function Dropdown({ buttonContent, children, setExpanded, expanded, position = "bottom-left" }) {
+function Dropdown({
+  buttonContent,
+  children,
+  setExpanded,
+  expanded,
+  position = "bottom-left",
+  buttonStyle = "primary",
+}) {
   return (
     <div className="dropdown-wrapper">
-      <button className="expand-dropdown" onClick={() => setExpanded(true)}>
+      <button className={`expand-dropdown ${buttonStyle}`} onClick={() => setExpanded(true)}>
         {buttonContent}
       </button>
       {expanded ? (
