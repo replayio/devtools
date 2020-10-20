@@ -11,12 +11,9 @@ const { ThreadFront } = require("protocol/thread");
 const { log } = require("protocol/socket");
 
 let actions;
-let isInterrupted;
-let panel;
 
 function setupEvents(dependencies) {
   actions = dependencies.actions;
-  panel = dependencies.panel;
   sourceQueue.initialize(actions);
 
   Object.keys(clientEvents).forEach(eventName => {
@@ -30,14 +27,6 @@ async function paused(_, { point }) {
 }
 
 function resumed() {
-  // NOTE: the client suppresses resumed events while interrupted
-  // to prevent unintentional behavior.
-  // see [client docs](../README.md#interrupted) for more information.
-  if (isInterrupted) {
-    isInterrupted = false;
-    return;
-  }
-
   actions.resumed();
 }
 
