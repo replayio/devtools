@@ -69,8 +69,8 @@ function GripMessageBody(props) {
 // Regular expression that matches the allowed CSS property names.
 const allowedStylesRegex = new RegExp(
   "^(?:-moz-)?(?:background|border|box|clear|color|cursor|display|float|font|line|" +
-  "margin|padding|text|transition|outline|white-space|word|writing|" +
-  "(?:min-|max-)?width|(?:min-|max-)?height)"
+    "margin|padding|text|transition|outline|white-space|word|writing|" +
+    "(?:min-|max-)?width|(?:min-|max-)?height)"
 );
 
 // Regular expression that matches the forbidden CSS property values.

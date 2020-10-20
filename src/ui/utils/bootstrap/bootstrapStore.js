@@ -6,7 +6,6 @@ import configureStore from "devtools/client/debugger/src/actions/utils/create-st
 import { clientCommands } from "devtools/client/debugger/src/client/firefox/commands";
 import LogRocket from "ui/utils/logrocket";
 
-
 async function getInitialState() {
   const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;
   return {
