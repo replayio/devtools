@@ -22,7 +22,65 @@ function unHighlightDomElement(grip) {
   };
 }
 
-module.exports = {
-  highlightDomElement,
-  unHighlightDomElement,
-};
+// NOTE these methods are proxied currently because the
+// service container is passed down the tree. These methods should eventually
+// be moved to redux actions.
+export function openLink(url, e) {
+  return ({ hud }) => {
+    hud.openLink(url, e);
+  };
+}
+
+export function openNodeInInspectorgrip() {
+  return ({ hud }) => {
+    hud.openNodeInInspector(grip);
+  };
+}
+
+export function getInputSelection() {
+  return ({ hud }) => {
+    hud.getInputSelection();
+  };
+}
+
+export function focusInput() {
+  return ({ hud }) => {
+    hud.focusInput();
+  };
+}
+
+export function setInputValuevalue() {
+  return ({ hud }) => {
+    hud.setInputValue(value);
+  };
+}
+
+export function onMessageHover(type, message) {
+  return ({ webConsoleUI }) => {
+    webConsoleUI.onMessageHover(type, message);
+  };
+}
+
+export function getJsTermTooltipAnchor() {
+  return ({ webConsoleUI }) => {
+    webConsoleUI.getJsTermTooltipAnchor();
+  };
+}
+
+export function requestData(id, type) {
+  return ({ webconsoleUI }) => {
+    webconsoleUI.requestData(id, type);
+  };
+}
+
+export function jumpToExecutionPoint(point, time, hasFrames) {
+  return ({ toolbox }) => {
+    toolbox.threadFront.timeWarp(point, time, hasFrames);
+  };
+}
+
+export function onViewSourceInDebugger(frame) {
+  return ({ toolbox }) => {
+    toolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.scriptId);
+  };
+}

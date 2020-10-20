@@ -22,7 +22,6 @@ ConsoleApiCall.propTypes = {
   dispatch: PropTypes.func.isRequired,
   message: PropTypes.object.isRequired,
   open: PropTypes.bool,
-  serviceContainer: PropTypes.object.isRequired,
   timestampsVisible: PropTypes.bool.isRequired,
   maybeScrollToBottom: PropTypes.func,
 };
@@ -37,7 +36,6 @@ function ConsoleApiCall(props) {
     message,
     open,
     payload,
-    serviceContainer,
     timestampsVisible,
     repeat,
     pausedExecutionPoint,
@@ -69,7 +67,6 @@ function ConsoleApiCall(props) {
     messageId,
     parameters,
     userProvidedStyles,
-    serviceContainer,
     type,
     maybeScrollToBottom,
   };
@@ -109,7 +106,6 @@ function ConsoleApiCall(props) {
       dispatch,
       messageId,
       grip: messageText,
-      serviceContainer,
       useQuotes: false,
       transformEmptyString: true,
       type,
@@ -121,7 +117,6 @@ function ConsoleApiCall(props) {
     attachment = ConsoleTable({
       dispatch,
       id: message.id,
-      serviceContainer,
       parameters: message.parameters,
       tableData: payload,
     });
@@ -134,7 +129,6 @@ function ConsoleApiCall(props) {
 
   const collapsible = isGroupType(type) || (type === "error" && Array.isArray(stacktrace));
   const topLevelClasses = ["cm-s-mozilla"];
-
   return Message({
     messageId,
     executionPoint,
@@ -155,7 +149,6 @@ function ConsoleApiCall(props) {
     frame,
     stacktrace,
     attachment,
-    serviceContainer,
     dispatch,
     indent,
     timeStamp,
@@ -173,7 +166,6 @@ function formatReps(options = {}) {
     loadedObjectEntries,
     messageId,
     parameters,
-    serviceContainer,
     userProvidedStyles,
     type,
     maybeScrollToBottom,
@@ -189,7 +181,6 @@ function formatReps(options = {}) {
           grip,
           key,
           userProvidedStyle: userProvidedStyles ? userProvidedStyles[key] : null,
-          serviceContainer,
           useQuotes: false,
           loadedObjectProperties,
           loadedObjectEntries,

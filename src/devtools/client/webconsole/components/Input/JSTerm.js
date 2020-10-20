@@ -57,8 +57,6 @@ class JSTerm extends Component {
       history: PropTypes.object.isRequired,
       // Console object.
       webConsoleUI: PropTypes.object.isRequired,
-      // Needed for opening context menu
-      serviceContainer: PropTypes.object.isRequired,
       // Evaluate provided expression.
       evaluateExpression: PropTypes.func.isRequired,
       // Update position in the history after executing an expression (action).
@@ -136,10 +134,7 @@ class JSTerm extends Component {
       useXulWrapper: true,
     };
 
-    const doc = this.webConsoleUI.document;
-    const toolbox = this.webConsoleUI.wrapper.toolbox;
-    const tooltipDoc = toolbox ? toolbox.doc : doc;
-    this.autocompletePopup = new AutocompletePopup(tooltipDoc, autocompleteOptions);
+    this.autocompletePopup = new AutocompletePopup(document, autocompleteOptions);
 
     if (this.node) {
       const onArrowUp = () => {
@@ -362,10 +357,6 @@ class JSTerm extends Component {
           PageUp: () => {
             if (this.autocompletePopup.isOpen) {
               this.autocompletePopup.selectPreviousPageItem();
-            } else {
-              const { outputScroller } = this.webConsoleUI;
-              const { scrollTop, clientHeight } = outputScroller;
-              outputScroller.scrollTop = Math.max(0, scrollTop - clientHeight);
             }
 
             return null;
@@ -374,23 +365,13 @@ class JSTerm extends Component {
           PageDown: () => {
             if (this.autocompletePopup.isOpen) {
               this.autocompletePopup.selectNextPageItem();
-            } else {
-              const { outputScroller } = this.webConsoleUI;
-              const { scrollTop, scrollHeight, clientHeight } = outputScroller;
-              outputScroller.scrollTop = Math.min(scrollHeight, scrollTop + clientHeight);
             }
-
             return null;
           },
 
           Home: () => {
             if (this.autocompletePopup.isOpen) {
               this.autocompletePopup.selectItemAtIndex(0);
-              return null;
-            }
-
-            if (!this._getValue()) {
-              this.webConsoleUI.outputScroller.scrollTop = 0;
               return null;
             }
 
@@ -404,12 +385,6 @@ class JSTerm extends Component {
           End: () => {
             if (this.autocompletePopup.isOpen) {
               this.autocompletePopup.selectItemAtIndex(this.autocompletePopup.itemCount - 1);
-              return null;
-            }
-
-            if (!this._getValue()) {
-              const { outputScroller } = this.webConsoleUI;
-              outputScroller.scrollTop = outputScroller.scrollHeight;
               return null;
             }
 
@@ -927,7 +902,7 @@ class JSTerm extends Component {
       // We need to show the popup at the "." or "[".
       const xOffset = -1 * matchProp.length * this._inputCharWidth;
       const yOffset = 5;
-      const popupAlignElement = this.props.serviceContainer.getJsTermTooltipAnchor();
+      const popupAlignElement = this.props.getJsTermTooltipAnchor();
       await popup.openPopup(popupAlignElement, xOffset, yOffset, 0, {
         preventSelectCallback: true,
       });
@@ -1287,6 +1262,7 @@ function mapDispatchToProps(dispatch) {
     editorToggle: () => dispatch(actions.editorToggle()),
     editorOnboardingDismiss: () => dispatch(actions.editorOnboardingDismiss()),
     terminalInputChanged: value => dispatch(actions.terminalInputChanged(value)),
+    getJsTermTooltipAnchor: () => dispatch(actions.getJsTermTooltipAnchor()),
   };
 }
 

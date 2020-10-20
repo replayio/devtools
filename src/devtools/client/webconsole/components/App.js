@@ -23,27 +23,10 @@ const ReverseSearchInput = createFactory(
   require("devtools/client/webconsole/components/Input/ReverseSearchInput")
 );
 const JSTerm = createFactory(require("devtools/client/webconsole/components/Input/JSTerm"));
-const ConfirmDialog = createFactory(
-  require("devtools/client/webconsole/components/Input/ConfirmDialog")
-);
+
 const EagerEvaluation = createFactory(
   require("devtools/client/webconsole/components/Input/EagerEvaluation")
 );
-
-// And lazy load the ones that may not be used.
-const SideBar = createFactory(require("devtools/client/webconsole/components/SideBar"));
-
-const EditorToolbar = createFactory(
-  require("devtools/client/webconsole/components/Input/EditorToolbar")
-);
-
-const NotificationBox = createFactory(
-  require("devtools/client/shared/components/NotificationBox").NotificationBox
-);
-const {
-  getNotificationWithValue,
-  PriorityLevels,
-} = require("devtools/client/shared/components/NotificationBox");
 
 const GridElementWidthResizer = createFactory(
   require("devtools/client/shared/components/splitter/GridElementWidthResizer")
@@ -66,8 +49,6 @@ class App extends Component {
       dispatch: PropTypes.func.isRequired,
       webConsoleUI: PropTypes.object.isRequired,
       notifications: PropTypes.object,
-      onFirstMeaningfulPaint: PropTypes.func.isRequired,
-      serviceContainer: PropTypes.object.isRequired,
       closeSplitConsole: PropTypes.func.isRequired,
       autocomplete: PropTypes.bool,
       currentReverseSearchEntry: PropTypes.string,
@@ -178,44 +159,16 @@ class App extends Component {
     });
   }
 
-  renderEditorToolbar() {
-    const {
-      editorMode,
-      dispatch,
-      reverseSearchInputVisible,
-      serviceContainer,
-      webConsoleUI,
-    } = this.props;
-
-    return editorMode
-      ? EditorToolbar({
-          key: "editor-toolbar",
-          editorMode,
-          dispatch,
-          reverseSearchInputVisible,
-          serviceContainer,
-          webConsoleUI,
-        })
-      : null;
-  }
-
   renderConsoleOutput() {
-    const { onFirstMeaningfulPaint, serviceContainer } = this.props;
-
-    return ConsoleOutput({
-      key: "console-output",
-      serviceContainer,
-      onFirstMeaningfulPaint,
-    });
+    return ConsoleOutput({ key: "console-output" });
   }
 
   renderJsTerm() {
-    const { webConsoleUI, serviceContainer, autocomplete, editorMode, editorWidth } = this.props;
+    const { webConsoleUI, autocomplete, editorMode, editorWidth } = this.props;
 
     return JSTerm({
       key: "jsterm",
       webConsoleUI,
-      serviceContainer,
       autocomplete,
       editorMode,
       editorWidth,
@@ -223,63 +176,16 @@ class App extends Component {
   }
 
   renderEagerEvaluation() {
-    const { eagerEvaluationEnabled, serviceContainer } = this.props;
+    const { eagerEvaluationEnabled } = this.props;
     if (!eagerEvaluationEnabled) {
       return null;
     }
 
-    return EagerEvaluation({ serviceContainer });
-  }
-
-  renderReverseSearch() {
-    const { serviceContainer, reverseSearchInitialValue } = this.props;
-
-    return ReverseSearchInput({
-      key: "reverse-search-input",
-      setInputValue: serviceContainer.setInputValue,
-      focusInput: serviceContainer.focusInput,
-      initialValue: reverseSearchInitialValue,
-    });
-  }
-
-  renderSideBar() {
-    const { serviceContainer, sidebarVisible } = this.props;
-    return sidebarVisible
-      ? SideBar({
-          key: "sidebar",
-          serviceContainer,
-          visible: sidebarVisible,
-        })
-      : null;
-  }
-
-  renderNotificationBox() {
-    const { notifications, editorMode } = this.props;
-
-    return notifications && notifications.size > 0
-      ? NotificationBox({
-          id: "webconsole-notificationbox",
-          key: "notification-box",
-          displayBorderTop: !editorMode,
-          displayBorderBottom: editorMode,
-          wrapping: true,
-          notifications,
-        })
-      : null;
-  }
-
-  renderConfirmDialog() {
-    const { webConsoleUI, serviceContainer } = this.props;
-
-    return ConfirmDialog({
-      webConsoleUI,
-      serviceContainer,
-      key: "confirm-dialog",
-    });
+    return EagerEvaluation({});
   }
 
   renderRootElement(children) {
-    const { editorMode, serviceContainer, sidebarVisible } = this.props;
+    const { editorMode, sidebarVisible } = this.props;
 
     const classNames = ["webconsole-app"];
     if (sidebarVisible) {
@@ -309,22 +215,15 @@ class App extends Component {
   render() {
     const { webConsoleUI, editorMode, dispatch } = this.props;
     const filterBar = this.renderFilterBar();
-    const editorToolbar = this.renderEditorToolbar();
     const consoleOutput = this.renderConsoleOutput();
-    const notificationBox = this.renderNotificationBox();
     const jsterm = this.renderJsTerm();
     const eager = this.renderEagerEvaluation();
-    const reverseSearch = this.renderReverseSearch();
-    const sidebar = this.renderSideBar();
-    const confirmDialog = this.renderConfirmDialog();
 
     return this.renderRootElement([
       filterBar,
-      editorToolbar,
       dom.div(
         { className: "flexible-output-input", key: "in-out-container" },
         consoleOutput,
-        notificationBox,
         jsterm,
         eager
       ),
@@ -338,9 +237,6 @@ class App extends Component {
             onResizeEnd: width => dispatch(actions.setEditorWidth(width)),
           })
         : null,
-      reverseSearch,
-      sidebar,
-      confirmDialog,
     ]);
   }
 }

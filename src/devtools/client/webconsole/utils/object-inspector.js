@@ -8,45 +8,36 @@ const { createFactory, createElement } = require("react");
 
 const reps = require("devtools/client/debugger/packages/devtools-reps/src");
 const { REPS, MODE } = reps;
+const actions = require("devtools/client/webconsole/actions/index");
 
 const ObjectInspector = createFactory(reps.objectInspector.ObjectInspector.default);
-
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
-const { ObjectFront } = require("protocol/thread");
 
 /**
  * Create and return an ObjectInspector for the given front.
  *
  * @param {Object} grip
  *        The object grip to create an ObjectInspector for.
- * @param {Object} serviceContainer
- *        Object containing various utility functions
  * @param {Object} override
  *        Object containing props that should override the default props passed to
  *        ObjectInspector.
  * @returns {ObjectInspector}
  *        An ObjectInspector for the given grip.
  */
-function getObjectInspector(frontOrPrimitiveGrip, serviceContainer, override = {}) {
-  let onDOMNodeMouseOver;
-  let onDOMNodeMouseOut;
-  let onInspectIconClick;
+function getObjectInspector(frontOrPrimitiveGrip, override = {}) {
 
-  if (serviceContainer) {
-    onDOMNodeMouseOver = serviceContainer.highlightDomElement
-      ? object => serviceContainer.highlightDomElement(object)
-      : null;
-    onDOMNodeMouseOut = serviceContainer.unHighlightDomElement
-      ? object => serviceContainer.unHighlightDomElement(object)
-      : null;
-    onInspectIconClick = serviceContainer.openNodeInInspector
-      ? (object, e) => {
-          // Stop the event propagation so we don't trigger ObjectInspector expand/collapse.
-          e.stopPropagation();
-          serviceContainer.openNodeInInspector(object);
-        }
-      : null;
+
+
+  const { dispatch } = override
+
+  const onDOMNodeMouseOver = object => dispatch(actions.highlightDomElement(object))
+  const onDOMNodeMouseOut = object => dispatch(actions.unHighlightDomElement(object))
+  const onInspectIconClick = (object, e) => {
+    // Stop the event propagation so we don't trigger ObjectInspector expand/collapse.
+    e.stopPropagation();
+    dispatch(actions.openNodeInInspector(object))
   }
+
 
   const roots = createRoots(frontOrPrimitiveGrip, override.pathPrefix);
 
@@ -54,16 +45,14 @@ function getObjectInspector(frontOrPrimitiveGrip, serviceContainer, override = {
     autoExpandDepth: 0,
     mode: MODE.LONG,
     roots,
-    onViewSourceInDebugger: serviceContainer.onViewSourceInDebugger,
-    openLink: serviceContainer.openLink,
+    onViewSourceInDebugger: frame => dispatch(actions.onViewSourceInDebugger(frame)),
+    openLink: (url, e) => dispatch(actions.openLink(url, e)),
     // eslint-disable-next-line
     renderStacktrace: stacktrace =>
       createElement(SmartTrace, {
         key: "stacktrace",
         stacktrace,
-        onViewSourceInDebugger: serviceContainer
-          ? serviceContainer.onViewSourceInDebugger || serviceContainer.onViewSource
-          : null,
+        onViewSourceInDebugger: frame => dispatch(actions.onViewSourceInDebugger(frame)),
         onReady: override.maybeScrollToBottom,
       }),
   };

@@ -10,6 +10,42 @@ const { l10n } = require("devtools/client/webconsole/utils/messages");
 
 const ConsoleCommands = require("devtools/client/webconsole/commands.js");
 
+const { createElement, createFactory } = require("react");
+const ReactDOM = require("react-dom");
+const { Provider } = require("react-redux");
+const { ThreadFront } = require("protocol/thread");
+const { LogpointHandlers } = require("protocol/logpoint");
+
+const actions = require("devtools/client/webconsole/actions/index");
+const selectors = require("devtools/client/webconsole/selectors/index");
+const { configureStore } = require("devtools/client/webconsole/store");
+const { setupConsoleHelper } = require("ui/utils/bootstrap/helpers");
+
+const App = createFactory(require("devtools/client/webconsole/components/App"));
+
+function renderApp({ app, store, root }) {
+  return ReactDOM.render(createElement(Provider, { store }, app), root);
+}
+
+function convertStack(stack, { frames }) {
+  if (!stack) {
+    return null;
+  }
+  return Promise.all(
+    stack.map(async frameId => {
+      const frame = frames.find(f => f.frameId == frameId);
+      const location = await ThreadFront.getPreferredLocation(frame.location);
+      return {
+        filename: await ThreadFront.getScriptURL(location.scriptId),
+        sourceId: location.scriptId,
+        lineNumber: location.line,
+        columnNumber: location.column,
+        functionName: frame.functionName,
+      };
+    })
+  );
+}
+
 /**
  * A WebConsoleUI instance is an interactive console initialized *per target*
  * that displays console log data as well as provides an interactive terminal to
@@ -22,8 +58,13 @@ class WebConsoleUI {
   /*
    * @param {WebConsole} hud: The WebConsole owner object.
    */
-  constructor(hud) {
+  constructor(hud, toolbox) {
     this.hud = hud;
+    this.toolbox = toolbox;
+    this.document = document;
+
+    this.queuedMessageAdds = [];
+    this.throttledDispatchPromise = null;
 
     EventEmitter.decorate(this);
   }
@@ -33,60 +74,45 @@ class WebConsoleUI {
    * @return object
    *         A promise object that resolves once the frame is ready to use.
    */
-  init() {
-    if (this._initializer) {
-      return this._initializer;
-    }
-
-    this._initializer = (async () => {
-      this._initUI();
-
-      await this.wrapper.init();
-    })();
-
-    return this._initializer;
-  }
-
-  destroy() {}
-
-  /**
-   * Clear the Web Console output.
-   *
-   * This method emits the "messages-cleared" notification.
-   *
-   * @param boolean clearStorage
-   *        True if you want to clear the console messages storage associated to
-   *        this Web Console.
-   * @param object event
-   *        If the event exists, calls preventDefault on it.
-   */
-  clearOutput(clearStorage, event) {
-    if (event) {
-      event.preventDefault();
-    }
-    this.wrapper.dispatchMessagesClear();
-  }
-
-  _initUI() {
+  async init() {
     this.document = window.document;
     this.rootElement = this.document.documentElement;
-
-    this.outputNode = this.document.getElementById("toolbox-content-console");
-
-    const toolbox = this.hud.toolbox;
-
-    const WebConsoleWrapper = require("devtools/client/webconsole/webconsole-wrapper");
-
-    this.wrapper = new WebConsoleWrapper(this.outputNode, this, toolbox, this.document);
 
     this._initShortcuts();
     this._initOutputSyntaxHighlighting();
 
-    if (toolbox) {
-      toolbox.on("webconsole-selected", this._onPanelSelected);
-      toolbox.on("split-console", this._onChangeSplitConsoleState);
-      toolbox.on("select", this._onChangeSplitConsoleState);
-    }
+    this.store = configureStore(this, {
+      thunkArgs: {
+        webConsoleUI: this,
+        hud: this.hud,
+        toolbox: this.toolbox,
+      },
+    });
+
+    LogpointHandlers.onPointLoading = this.onLogpointLoading;
+    LogpointHandlers.onResult = this.onLogpointResult;
+    LogpointHandlers.clearLogpoint = this.clearLogpoint;
+    ThreadFront.findConsoleMessages(this.onConsoleMessage);
+    this.toolbox.on("webconsole-selected", this._onPanelSelected);
+    this.toolbox.on("split-console", this._onChangeSplitConsoleState);
+    this.toolbox.on("select", this._onChangeSplitConsoleState);
+    ThreadFront.on("paused", this.dispatchPaused);
+    ThreadFront.on("instantWarp", this.dispatchPaused);
+
+    const root = this.document.getElementById("toolbox-content-console");
+
+    // Render the root Application component.
+    this.body = renderApp({
+      app: App({
+        webConsoleUI: this,
+        closeSplitConsole: this.closeSplitConsole,
+      }),
+      store: this.store,
+      root,
+    });
+
+    this.outputNode = this.document.getElementById("toolbox-content-console");
+    setupConsoleHelper({ store, selectors, actions });
   }
 
   _initOutputSyntaxHighlighting() {
@@ -116,12 +142,7 @@ class WebConsoleUI {
   }
 
   _initShortcuts() {
-    const shortcuts = new KeyShortcuts({ window });
 
-    let clearShortcut;
-    clearShortcut = l10n.getStr("webconsole.clear.key");
-
-    shortcuts.on(clearShortcut, event => this.clearOutput(true, event));
   }
 
   /**
@@ -138,7 +159,8 @@ class WebConsoleUI {
   };
 
   _onChangeSplitConsoleState = selectedPanel => {
-    this.wrapper.dispatchSplitConsoleCloseButtonToggle(selectedPanel);
+    const shouldDisplayButton = selectedPanel !== "console";
+    this.store.dispatch(actions.splitConsoleCloseButtonToggle(shouldDisplayButton));
   };
 
   getInputCursor() {
@@ -182,6 +204,166 @@ class WebConsoleUI {
   onMessageHover(type, message) {
     this.emit("message-hover", type, message);
   }
+
+  onConsoleMessage = async (_, msg) => {
+    const stacktrace = await convertStack(msg.stack, msg.data);
+    const sourceId = stacktrace?.[0]?.sourceId;
+
+    let { url, scriptId, line, column } = msg;
+
+    if (msg.point.frame) {
+      // If the execution point has a location, use any mappings in that location.
+      // The message properties do not reflect any source mapping.
+      const location = await ThreadFront.getPreferredLocation(msg.point.frame);
+      url = await ThreadFront.getScriptURL(location.scriptId);
+      line = location.line;
+      column = location.column;
+    } else {
+      if (!scriptId) {
+        const ids = ThreadFront.getScriptIdsForURL(url);
+        if (ids.length == 1) {
+          scriptId = ids[0];
+        }
+      }
+      if (scriptId) {
+        // Ask the ThreadFront to map the location we got manually.
+        const location = await ThreadFront.getPreferredMappedLocation({
+          scriptId,
+          line,
+          column,
+        });
+        url = await ThreadFront.getScriptURL(location.scriptId);
+        line = location.line;
+        column = location.column;
+      }
+    }
+
+    const packet = {
+      errorMessage: msg.text,
+      errorMessageName: "ErrorMessageName",
+      sourceName: url,
+      sourceId,
+      lineNumber: line,
+      columnNumber: column,
+      category: msg.source,
+      warning: msg.level == "warning",
+      error: msg.level == "error",
+      info: msg.level == "info",
+      trace: msg.level == "trace",
+      assert: msg.level == "assert",
+      stacktrace,
+      argumentValues: msg.argumentValues,
+      executionPoint: msg.point.point,
+      executionPointTime: msg.point.time,
+      executionPointHasFrames: !!stacktrace,
+    };
+
+    this.dispatchMessageAdd(packet);
+  };
+
+  onLogpointLoading = async (logGroupId, point, time, { scriptId, line, column }) => {
+    const packet = {
+      errorMessage: "Loading...",
+      sourceName: await ThreadFront.getScriptURL(scriptId),
+      sourceId: scriptId,
+      lineNumber: line,
+      columnNumber: column,
+      category: "ConsoleAPI",
+      info: true,
+      executionPoint: point,
+      executionPointTime: time,
+      executionPointHasFrames: true,
+      logpointId: logGroupId,
+    };
+
+    this.dispatchMessageAdd(packet);
+  };
+
+  onLogpointResult = async (logGroupId, point, time, { scriptId, line, column }, pause, values) => {
+    const packet = {
+      errorMessage: "",
+      sourceName: await ThreadFront.getScriptURL(scriptId),
+      sourceId: scriptId,
+      lineNumber: line,
+      columnNumber: column,
+      category: "ConsoleAPI",
+      info: true,
+      argumentValues: values,
+      executionPoint: point,
+      executionPointTime: time,
+      executionPointHasFrames: true,
+      logpointId: logGroupId,
+    };
+
+    this.dispatchMessageAdd(packet);
+  };
+
+  clearLogpoint = logGroupId => {
+    this.store.dispatch(actions.messagesClearLogpoint(logGroupId));
+  };
+
+  subscribeToStore(callback) {
+    this.store.subscribe(() => callback(this.store.getState()));
+  }
+
+  dispatchMessageAdd(packet) {
+    this.batchedMessagesAdd([packet]);
+  }
+
+  dispatchMessagesAdd(messages) {
+    this.batchedMessagesAdd(messages);
+  }
+
+  dispatchMessagesClear() {
+    // We might still have pending message additions and updates when the clear action is
+    // triggered, so we need to flush them to make sure we don't have unexpected behavior
+    // in the ConsoleOutput.
+    this.queuedMessageAdds = [];
+    this.store.dispatch(actions.messagesClear());
+  }
+
+  dispatchPaused = ({ point, time }) => {
+    this.store.dispatch(actions.setPauseExecutionPoint(point, time));
+  };
+
+  batchedMessagesAdd(messages) {
+    this.queuedMessageAdds = this.queuedMessageAdds.concat(messages);
+    this.setTimeoutIfNeeded();
+  }
+
+  /**
+   *
+   * @param {String} expression: The expression to evaluate
+   */
+  dispatchEvaluateExpression(expression) {
+    this.store.dispatch(actions.evaluateExpression(expression));
+  }
+
+  setZoomedRegion({ startTime, endTime, scale }) {
+    this.store.dispatch(actions.setZoomedRegion(startTime, endTime, scale));
+  }
+
+  setTimeoutIfNeeded() {
+    if (this.throttledDispatchPromise) {
+      return this.throttledDispatchPromise;
+    }
+    this.throttledDispatchPromise = new Promise(done => {
+      setTimeout(async () => {
+        this.throttledDispatchPromise = null;
+        this.store.dispatch(actions.messagesAdd(this.queuedMessageAdds));
+
+        this.queuedMessageAdds = [];
+
+        done();
+      }, 50);
+    });
+    return this.throttledDispatchPromise;
+  }
+
+  // Called by pushing close button.
+  closeSplitConsole = () => {
+    this.toolbox.toggleSplitConsole(false);
+  };
 }
 
 exports.WebConsoleUI = WebConsoleUI;

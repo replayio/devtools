@@ -16,7 +16,6 @@ EvaluationResult.propTypes = {
   dispatch: PropTypes.func.isRequired,
   message: PropTypes.object.isRequired,
   timestampsVisible: PropTypes.bool.isRequired,
-  serviceContainer: PropTypes.object,
   maybeScrollToBottom: PropTypes.func,
   open: PropTypes.bool,
 };
@@ -26,15 +25,7 @@ EvaluationResult.defaultProps = {
 };
 
 function EvaluationResult(props) {
-  const {
-    dispatch,
-    message,
-    serviceContainer,
-    timestampsVisible,
-    maybeScrollToBottom,
-    open,
-    isPaused,
-  } = props;
+  const { dispatch, message, timestampsVisible, maybeScrollToBottom, open, isPaused } = props;
 
   const {
     source,
@@ -66,7 +57,6 @@ function EvaluationResult(props) {
       dispatch,
       messageId,
       grip: parameters[0],
-      serviceContainer,
       useQuotes: true,
       escapeWhitespace: false,
       type,
@@ -85,7 +75,6 @@ function EvaluationResult(props) {
     topLevelClasses,
     messageBody,
     messageId,
-    serviceContainer,
     exceptionDocURL,
     stacktrace,
     collapsible: Array.isArray(stacktrace),
