@@ -45,8 +45,6 @@ class Frame extends Component {
       showEmptyPathAsHost: PropTypes.bool,
       // Option to display a full source instead of just the filename.
       showFullSourceUrl: PropTypes.bool,
-      // Service to enable the source map feature for console.
-      sourceMapService: PropTypes.object,
       // The source of the message
       messageSource: PropTypes.string,
     };
@@ -66,24 +64,6 @@ class Frame extends Component {
     super(props);
     this._locationChanged = this._locationChanged.bind(this);
     this.getSourceForClick = this.getSourceForClick.bind(this);
-  }
-
-  UNSAFE_componentWillMount() {
-    if (this.props.sourceMapService) {
-      const { source, line, column } = this.props.frame;
-      this.unsubscribeSourceMapService = this.props.sourceMapService.subscribe(
-        source,
-        line,
-        column,
-        this._locationChanged
-      );
-    }
-  }
-
-  componentWillUnmount() {
-    if (typeof this.unsubscribeSourceMapService === "function") {
-      this.unsubscribeSourceMapService();
-    }
   }
 
   _locationChanged(isSourceMapped, url, line, column) {
