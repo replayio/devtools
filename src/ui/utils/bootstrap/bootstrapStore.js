@@ -4,6 +4,8 @@ import { reducers, selectors } from "../../reducers";
 import { setupAppHelper } from "./helpers";
 import configureStore from "devtools/client/debugger/src/actions/utils/create-store";
 import { clientCommands } from "devtools/client/debugger/src/client/firefox/commands";
+import LogRocket from "ui/utils/logrocket";
+
 
 async function getInitialState() {
   const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;

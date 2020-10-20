@@ -21,7 +21,7 @@ export function isTest() {
   return url.searchParams.get("test");
 }
 
-const skipTelemetry = test || url.hostname == "localhost";
+const skipTelemetry = (test || url.hostname == "localhost");
 
 function setupLogRocket() {
   if (skipTelemetry) {
