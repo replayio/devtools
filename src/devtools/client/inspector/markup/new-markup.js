@@ -102,15 +102,6 @@ class MarkupView {
   }
 
   /**
-   * An object representing the markup tree. The key to the object represents the object
-   * ID of a NodeFront of a given node. The value of each item in the object contains
-   * an object representing the properties of the given node.
-   */
-  getTree() {
-    return this.store.getState().tree;
-  }
-
-  /**
    * Given the NodeFront, add a representation of the node's properties to the
    * markup tree object.
    *
