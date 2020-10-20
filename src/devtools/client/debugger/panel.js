@@ -210,9 +210,6 @@ export class DebuggerPanel {
     const location = { sourceId, line, column };
 
     await this._actions.selectSource(cx, sourceId, location);
-    if (this._selectors.hasLogpoint(this._getState(), location)) {
-      this._actions.openConditionalPanel(location, true);
-    }
   }
 
   canLoadSource(sourceId) {
