@@ -40,7 +40,6 @@ export class DebuggerPanel {
   async open() {
     const { actions, store, selectors, client } = await this.panelWin.Debugger.bootstrap({
       workers: {
-        sourceMaps: this.toolbox.sourceMapService,
         evaluationsParser: this.toolbox.parserService,
       },
       panel: this,
@@ -92,7 +91,7 @@ export class DebuggerPanel {
     codeMirror.on("refresh", handler);
   }
 
-  _onDebuggerStateChange(state, oldState) {}
+  _onDebuggerStateChange(state, oldState) { }
 
   renderApp() {
     return bootstrapApp(this._store);

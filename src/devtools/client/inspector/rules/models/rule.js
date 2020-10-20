@@ -141,10 +141,6 @@ class Rule {
     };
   }
 
-  get sourceMapURLService() {
-    return this.inspector.toolbox.sourceMapURLService;
-  }
-
   /**
    * Returns the original source location which includes the original URL, line and
    * column numbers.
@@ -875,61 +871,6 @@ class Rule {
       // Reflect the new active/inactive flag state in the UI.
       textProp.editor.updatePropertyUsedIndicator();
     });
-  }
-
-  /**
-   * Handler for "location-changed" events fired from the StyleRuleActor. This could
-   * occur by adding a new declaration to the rule. Updates the source location of the
-   * rule. This will overwrite the source map location.
-   */
-  onLocationChanged() {
-    const url = this.sheet ? this.sheet.href || this.sheet.nodeHref : null;
-    this.updateSourceLocation(url, this.ruleLine, this.ruleColumn);
-  }
-
-  /**
-   * Subscribes the rule to the source map service to map the the original source
-   * location.
-   */
-  subscribeToLocationChange() {
-    const { url, line, column } = this.sourceLocation;
-
-    if (url && !this.isSystem && this.domRule.isRule()) {
-      // Subscribe returns an unsubscribe function that can be called on destroy.
-      this.unsubscribeSourceMap = this.sourceMapURLService.subscribe(
-        url,
-        line,
-        column,
-        (enabled, sourceUrl, sourceLine, sourceColumn) => {
-          if (enabled) {
-            // Only update the source location if source map is in use.
-            this.updateSourceLocation(sourceUrl, sourceLine, sourceColumn);
-          }
-        }
-      );
-    }
-
-    this.domRule.on("location-changed", this.onLocationChanged);
-  }
-
-  /**
-   * Handler for any location changes called from the SourceMapURLService and can also be
-   * called from onLocationChanged(). Updates the source location for the rule.
-   *
-   * @param  {String} url
-   *         The original URL.
-   * @param  {Number} line
-   *         The original line number.
-   * @param  {number} column
-   *         The original column number.
-   */
-  updateSourceLocation(url, line, column) {
-    this._sourceLocation = {
-      column,
-      line,
-      url,
-    };
-    this.store.dispatch(updateSourceLink(this.domRule.objectId(), this.sourceLink));
   }
 }
 

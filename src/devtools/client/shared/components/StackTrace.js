@@ -34,13 +34,11 @@ class StackTrace extends Component {
     return {
       stacktrace: PropTypes.array.isRequired,
       onViewSourceInDebugger: PropTypes.func.isRequired,
-      // Service to enable the source map feature.
-      sourceMapService: PropTypes.object,
     };
   }
 
   render() {
-    const { stacktrace, onViewSourceInDebugger, sourceMapService } = this.props;
+    const { stacktrace, onViewSourceInDebugger } = this.props;
 
     if (!stacktrace) {
       return null;
@@ -74,7 +72,6 @@ class StackTrace extends Component {
           showAnonymousFunctionName: true,
           showFullSourceUrl: true,
           onClick: onViewSourceInDebugger,
-          sourceMapService,
         }),
         "\n"
       );

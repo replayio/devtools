@@ -60,8 +60,6 @@ EventTooltip.prototype = {
     this.container = doc.createElementNS(XHTML_NS, "div");
     this.container.className = "devtools-tooltip-events-container";
 
-    const sourceMapService = this._toolbox.sourceMapURLService;
-
     const Bubbling = L10N.getStr("eventsTooltip.Bubbling");
     const Capturing = L10N.getStr("eventsTooltip.Capturing");
     for (const listener of this._eventListenerInfos) {
@@ -121,20 +119,6 @@ EventTooltip.prototype = {
             }
           };
 
-          /*
-          sourceMapService.subscribe(
-            location.url,
-            location.line,
-            location.column,
-            callback
-          );
-          this._subscriptions.push({
-            url: location.url,
-            line: location.line,
-            column: location.column,
-            callback,
-          });
-          */
         }
       }
 
@@ -345,16 +329,6 @@ EventTooltip.prototype = {
     const sourceNodes = this.container.querySelectorAll(".event-tooltip-debugger-icon");
     for (const node of sourceNodes) {
       node.removeEventListener("click", this._debugClicked);
-    }
-
-    const sourceMapService = this._toolbox.sourceMapURLService;
-    for (const subscription of this._subscriptions) {
-      sourceMapService.unsubscribe(
-        subscription.url,
-        subscription.line,
-        subscription.column,
-        subscription.callback
-      );
     }
 
     this._eventListenerInfos = this._toolbox = this._tooltip = null;
