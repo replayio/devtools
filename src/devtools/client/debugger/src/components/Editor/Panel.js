@@ -36,13 +36,13 @@ export class Panel extends PureComponent {
     }
   }
 
-  onKey = e => {
-    if (!this.input || !this.codeMirror) {
-      return;
+  onInput = e => {
+    if (e.keyCode === 13) {
+      return this.save();
     }
 
-    if (e.metaKey && e.which == 13) {
-      return this.save();
+    if (!this.input || !this.codeMirror) {
+      return;
     }
 
     this.toggleActionsPanel();
@@ -51,11 +51,9 @@ export class Panel extends PureComponent {
   toggleActionsPanel() {
     const value = this.codeMirror.getValue();
     if (value == this.initialValue) {
-      this.editActionsNode.classList.add("hidden");
-      this.actionsNode.classList.remove("hidden");
+      this.setViewing();
     } else {
-      this.editActionsNode.classList.remove("hidden");
-      this.actionsNode.classList.add("hidden");
+      this.setEditing();
     }
   }
 
@@ -68,12 +66,11 @@ export class Panel extends PureComponent {
 
   cancel = () => {
     this.codeMirror.doc.setValue(this.initialValue);
-    this.toggleActionsPanel();
+    this.setViewing();
   };
 
   delete = () => {
     this.removeLogpoint();
-    this.toggleActionsPanel();
   };
 
   setBreakpoint(value) {
@@ -111,6 +108,16 @@ export class Panel extends PureComponent {
       const { scrollLeft } = this.scrollParent;
       this.panelNode.style.transform = `translateX(${scrollLeft}px)`;
     }
+  };
+
+  setEditing = () => {
+    this.editActionsNode.classList.remove("hidden");
+    this.labelNode.classList.remove("hidden");
+  };
+
+  setViewing = () => {
+    this.editActionsNode.classList.add("hidden");
+    this.labelNode.classList.add("hidden");
   };
 
   UNSAFE_componentWillMount() {
@@ -162,19 +169,22 @@ export class Panel extends PureComponent {
       placeholder: "Log message, e.g. displayName",
     });
 
-    // codeMirror.on("keydown", (cm, e) => {
-    //   if (e.key === "Enter") {
-    //     e.codemirrorIgnore = true;
-    //   } else {
-    //     e.codemirrorIgnore = false;
-    //   }
-    // });
+    codeMirror.on("keydown", (cm, e) => {
+      if (e.key === "Enter") {
+        e.codemirrorIgnore = true;
+        e.preventDefault();
+      }
+    });
 
     const codeMirrorWrapper = codeMirror.getWrapperElement();
 
-    codeMirrorWrapper.addEventListener("keydown", e => {
+    codeMirrorWrapper.addEventListener("keyup", e => {
       codeMirror.save();
-      this.onKey(e);
+      this.onInput(e);
+    });
+
+    codeMirrorWrapper.addEventListener("click", e => {
+      this.setEditing();
     });
 
     this.input = input;
@@ -194,20 +204,20 @@ export class Panel extends PureComponent {
         onClick={() => this.keepFocusOnInput()}
         ref={node => (this.panelNode = node)}
       >
-        <div className="prompt">»</div>
-        <textarea defaultValue={defaultValue} ref={input => this.createEditor(input)} />
-        <div className="edit-actions hidden" ref={node => (this.editActionsNode = node)}>
-          <button className="save" onClick={this.save}>
-            Save
-          </button>
-          <a className="cancel" onClick={this.cancel}>
-            Cancel
-          </a>
+        <div className="text title">Logpoint: Line {breakpoint.location.line}</div>
+        <div className="text label hidden" ref={node => (this.labelNode = node)}>
+          Log message (e.g. &apos;x is x&apos;, x)
         </div>
-        <div className="actions" ref={node => (this.actionsNode = node)}>
-          <a className="cancel" onClick={this.delete}>
-            Hide Logs
-          </a>
+        <div className="input-row">
+          <textarea defaultValue={defaultValue} ref={input => this.createEditor(input)} />
+          <div className="edit-actions hidden" ref={node => (this.editActionsNode = node)}>
+            <button className="text save" onClick={this.save}>
+              Save
+            </button>
+            <button className="text cancel" onClick={this.cancel}>
+              Cancel
+            </button>
+          </div>
         </div>
       </div>,
       panel
