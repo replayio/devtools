@@ -86,20 +86,7 @@ RuleEditor.prototype = {
       // rule and if it isn't an inline rule.
       const sourceLine = this.rule.ruleLine;
       const sourceColumn = this.rule.ruleColumn;
-
-      if (this._sourceMapURLService) {
-        this._sourceMapURLService.unsubscribe(url, sourceLine, sourceColumn, this._updateLocation);
-      }
     }
-  },
-
-  get sourceMapURLService() {
-    if (!this._sourceMapURLService) {
-      // sourceMapURLService is a lazy getter in the toolbox.
-      this._sourceMapURLService = this.toolbox.sourceMapURLService;
-    }
-
-    return this._sourceMapURLService;
   },
 
   get isSelectorEditable() {
@@ -285,54 +272,6 @@ RuleEditor.prototype = {
     }
   },
 
-  /**
-   * Update the text of the source link to reflect whether we're showing
-   * original sources or not.  This is a callback for
-   * SourceMapURLService.subscribe, which see.
-   *
-   * @param {Boolean} enabled
-   *        True if the passed-in location should be used; this means
-   *        that source mapping is in use and the remaining arguments
-   *        are the original location.  False if the already-known
-   *        (stored) location should be used.
-   * @param {String} url
-   *        The original URL
-   * @param {Number} line
-   *        The original line number
-   * @param {number} column
-   *        The original column number
-   */
-  _updateLocation: function (enabled, url, line, column) {
-    let displayURL = url;
-    if (!enabled) {
-      url = this.rule.ruleHref;
-      displayURL = this.rule.ruleHref;
-      line = this.rule.ruleLine;
-      column = this.rule.ruleColumn;
-    }
-
-    this._currentLocation = {
-      url,
-      line,
-      column,
-    };
-
-    let sourceTextContent = CssLogic.shortSource({ href: displayURL });
-    let title = displayURL ? displayURL : sourceTextContent;
-    if (line > 0) {
-      sourceTextContent += ":" + line;
-      title += ":" + line;
-    }
-    if (this.rule.mediaText) {
-      sourceTextContent += " @" + this.rule.mediaText;
-      title += " @" + this.rule.mediaText;
-    }
-
-    const sourceLabel = this.element.querySelector(".ruleview-rule-source-label");
-    sourceLabel.setAttribute("title", title);
-    sourceLabel.textContent = sourceTextContent;
-  },
-
   updateSourceLink: function () {
     if (this.rule.isSystem) {
       const sourceLabel = this.element.querySelector(".ruleview-rule-source-label");
@@ -360,14 +299,7 @@ RuleEditor.prototype = {
       // rule and if it isn't an inline rule.
       const sourceLine = this.rule.ruleLine;
       const sourceColumn = this.rule.ruleColumn;
-      /*
-      this.sourceMapURLService.subscribe(
-        url,
-        sourceLine,
-        sourceColumn,
-        this._updateLocation
-      );
-      */
+
       // Set "unselectable" appropriately.
       this._onToolChanged();
     } else if (!this.rule.domRule.isRule()) {

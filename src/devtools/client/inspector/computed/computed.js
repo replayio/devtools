@@ -1271,8 +1271,6 @@ function SelectorView(tree, selectorInfo) {
       column: rule.column,
     };
     this.generatedLocation = this.currentLocation;
-    this.sourceMapURLService = this.tree.inspector.toolbox.sourceMapURLService;
-    this.sourceMapURLService.subscribe(url, rule.line, rule.column, this._updateLocation);
   }
 }
 
@@ -1358,46 +1356,6 @@ SelectorView.prototype = {
   },
 
   /**
-   * Update the text of the source link to reflect whether we're showing
-   * original sources or not.  This is a callback for
-   * SourceMapURLService.subscribe, which see.
-   *
-   * @param {Boolean} enabled
-   *        True if the passed-in location should be used; this means
-   *        that source mapping is in use and the remaining arguments
-   *        are the original location.  False if the already-known
-   *        (stored) location should be used.
-   * @param {String} url
-   *        The original URL
-   * @param {Number} line
-   *        The original line number
-   * @param {number} column
-   *        The original column number
-   */
-  _updateLocation: function (enabled, url, line, column) {
-    if (!this.tree.element) {
-      return;
-    }
-
-    // Update |currentLocation| to be whichever location is being
-    // displayed at the moment.
-    if (enabled) {
-      this.currentLocation = { href: url, line, column };
-    } else {
-      this.currentLocation = this.generatedLocation;
-    }
-
-    const selector = '[sourcelocation="' + this.source + '"]';
-    const link = this.tree.element.querySelector(selector);
-    if (link) {
-      const text = CssLogic.shortSource(this.currentLocation) + ":" + this.currentLocation.line;
-      link.textContent = text;
-    }
-
-    this.tree.inspector.emit("computed-view-sourcelinks-updated");
-  },
-
-  /**
    * When a css link is clicked this method is called in order to either:
    *   1. Open the link in view source (for chrome stylesheets).
    *   2. Open the link in the style editor.
@@ -1436,7 +1394,6 @@ SelectorView.prototype = {
     const rule = this.selectorInfo.rule;
     if (rule && rule.parentStyleSheet && rule.type != ELEMENT_STYLE) {
       const url = rule.parentStyleSheet.href || rule.parentStyleSheet.nodeHref;
-      this.sourceMapURLService.unsubscribe(url, rule.line, rule.column, this._updateLocation);
     }
   },
 };

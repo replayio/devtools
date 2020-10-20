@@ -40,7 +40,6 @@ export class DebuggerPanel {
   async open() {
     const { actions, store, selectors, client } = await this.panelWin.Debugger.bootstrap({
       workers: {
-        sourceMaps: this.toolbox.sourceMapService,
         evaluationsParser: this.toolbox.parserService,
       },
       panel: this,
