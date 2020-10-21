@@ -176,7 +176,6 @@ class ConsoleOutput extends Component {
       pausedExecutionPointTime,
       zoomStartTime,
       zoomEndTime,
-      onMessageHover,
     } = this.props;
 
     if (!initialized) {
@@ -208,7 +207,6 @@ class ConsoleOutput extends Component {
             : false,
         pausedExecutionPoint,
         pausedExecutionPointTime,
-        onMessageHover,
         getMessage: () => messages.get(messageId),
         isPaused: !!pausedMessage && pausedMessage.id == messageId,
       })

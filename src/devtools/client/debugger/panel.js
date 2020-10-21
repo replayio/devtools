@@ -83,8 +83,8 @@ export class DebuggerPanel {
   }
 
   async openConsoleAndEvaluate(input) {
-    const { hud } = await this.toolbox.selectTool("console");
-    hud.dispatchEvaluateExpression(input);
+    const consolePanel = await this.toolbox.selectTool("console");
+    consolePanel.evaluateExpression(input);
   }
 
   async openInspector() {
@@ -147,6 +147,13 @@ export class DebuggerPanel {
     });
 
     return { frames, selected };
+  }
+
+  // Retrieves the debugger's currently selected frame front
+  getFrameId() {
+    const state = this.getFrames();
+    const frame = state?.frames[state?.selected];
+    return frame?.protocolId;
   }
 
   isPaused() {

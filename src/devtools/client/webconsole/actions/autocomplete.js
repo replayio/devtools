@@ -21,7 +21,7 @@ const {
  * @param {Array<String>} expressionVars: Array of the variables defined in the expression.
  */
 function autocompleteUpdate(force, getterPath, expressionVars) {
-  return async ({ dispatch, getState, hud }) => {
+  return async ({ dispatch, getState, hud, toolbox }) => {
     // FIXME autocomplete is disabled
     return;
 
@@ -31,7 +31,7 @@ function autocompleteUpdate(force, getterPath, expressionVars) {
     }
 
     const inputValue = hud.getInputValue();
-    const frameActorId = await hud.getFrameActor();
+    const frameActorId = toolbox.getPanel("debugger")?.getFrameId();
     const webconsoleFront = await hud.getWebconsoleFront({
       frameActorId,
     });

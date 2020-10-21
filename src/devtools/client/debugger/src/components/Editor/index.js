@@ -118,9 +118,7 @@ class Editor extends PureComponent {
     const editor = getEditor();
 
     // disables the default search shortcuts
-    // $FlowIgnore
-    editor._initShortcuts = () => { };
-
+    editor._initShortcuts = () => {};
     const node = ReactDOM.findDOMNode(this);
     if (node instanceof HTMLElement) {
       editor.appendToLocalElement(node.querySelector(".editor-mount"));

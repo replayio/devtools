@@ -20,13 +20,7 @@ const { reducers } = require("devtools/client/webconsole/reducers/index");
 // Middlewares
 const { thunkWithOptions } = require("devtools/client/shared/redux/middleware/thunk-with-options");
 
-/**
- * Create and configure store for the Console panel. This is the place
- * where various enhancers and middleware can be registered.
- */
-function configureStore(hud, options = {}) {
-  const prefsService = getPrefsService(hud);
-
+function getInitialState() {
   const logLimit = 1000;
   //options.logLimit || Math.max(getIntPref("devtools.hud.loglimit"), 1);
   const sidebarToggle = prefs.sidebarToggle;
@@ -35,7 +29,7 @@ function configureStore(hud, options = {}) {
   const groupWarnings = prefs.groupWarningMessages;
   const historyCount = prefs.historyCount;
 
-  const initialState = {
+  return {
     prefs: PrefState({
       logLimit,
       sidebarToggle,
@@ -59,7 +53,16 @@ function configureStore(hud, options = {}) {
       timestampsVisible: prefs.timestampsVisible,
     }),
   };
+}
 
+/**
+ * Create and configure store for the Console panel. This is the place
+ * where various enhancers and middleware can be registered.
+ */
+function configureStore(hud, options = {}) {
+  const prefsService = getPrefsService(hud);
+
+  const initialState = getInitialState();
   const middleware = applyMiddleware(
     thunkWithOptions.bind(null, {
       prefsService,

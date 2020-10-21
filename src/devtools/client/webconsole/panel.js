@@ -4,42 +4,57 @@
 
 "use strict";
 
-const WebConsole = require("./webconsole");
-const EventEmitter = require("devtools/shared/event-emitter");
+import { WebConsole } from "./webconsole";
+import EventEmitter from "devtools/shared/event-emitter";
+import actions from "devtools/client/webconsole/actions/index";
 
-/**
- * A DevToolPanel that controls the Web Console.
- */
-function WebConsolePanel(toolbox) {
-  this._toolbox = toolbox;
-  EventEmitter.decorate(this);
-}
+export class WebConsolePanel {
+  constructor(toolbox) {
+    this.toolbox = toolbox;
+    EventEmitter.decorate(this);
+  }
 
-exports.WebConsolePanel = WebConsolePanel;
+  async open() {
+    this.hud = new WebConsole(this.toolbox);
 
-WebConsolePanel.prototype = {
-  hud: null,
+    this.toolbox.on("webconsole-selected", this._onPanelSelected);
+    this.toolbox.on("split-console", this._onChangeSplitConsoleState);
+    this.toolbox.on("select", this._onChangeSplitConsoleState);
+
+    const { store } = await this.hud.init();
+    this.store = store;
+    return this;
+  }
 
   /**
    * Called by the WebConsole's onkey command handler.
    * If the WebConsole is opened, check if the JSTerm's input line has focus.
    * If not, focus it.
    */
-  focusInput: function () {
+  focusInput() {
     window.jsterm.focus();
-  },
+  }
 
-  /**
-   * Open is effectively an asynchronous constructor.
-   *
-   * @return object
-   *         A promise that is resolved when the Web Console completes opening.
-   */
-  open: async function () {
-    this.hud = new WebConsole(this._toolbox);
-    await this.hud.init();
-    return this;
-  },
+  subscribeToStore(callback) {
+    this.store.subscribe(() => callback(this.store.getState()));
+  }
 
-  destroy: function () {},
-};
+  _onChangeSplitConsoleState = selectedPanel => {
+    const shouldDisplayButton = selectedPanel !== "console";
+    this.store.dispatch(actions.splitConsoleCloseButtonToggle(shouldDisplayButton));
+  };
+
+  _onPanelSelected = () => {
+    window.jsterm?.focus();
+  };
+
+  evaluateExpression(expression) {
+    this.store.dispatch(actions.evaluateExpression(expression));
+  }
+
+  setZoomedRegion({ startTime, endTime, scale }) {
+    this.store.dispatch(actions.setZoomedRegion(startTime, endTime, scale));
+  }
+
+  destroy() {}
+}

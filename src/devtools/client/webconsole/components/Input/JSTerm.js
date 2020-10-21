@@ -856,7 +856,9 @@ class JSTerm extends Component {
       // We need to show the popup at the "." or "[".
       const xOffset = -1 * matchProp.length * this._inputCharWidth;
       const yOffset = 5;
-      const popupAlignElement = this.props.getJsTermTooltipAnchor();
+      const popupAlignElement = document
+        .getElementById("toolbox-content-console")
+        .querySelector(".CodeMirror-cursor");
       await popup.openPopup(popupAlignElement, xOffset, yOffset, 0, {
         preventSelectCallback: true,
       });
@@ -1201,7 +1203,6 @@ function mapDispatchToProps(dispatch) {
     editorToggle: () => dispatch(actions.editorToggle()),
     editorOnboardingDismiss: () => dispatch(actions.editorOnboardingDismiss()),
     terminalInputChanged: value => dispatch(actions.terminalInputChanged(value)),
-    getJsTermTooltipAnchor: () => dispatch(actions.getJsTermTooltipAnchor()),
   };
 }
 

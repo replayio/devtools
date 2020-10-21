@@ -131,8 +131,8 @@ export const EventEmitter = {
       );
     };
 
-    obj.emit = (name, value) => {
-      (obj.eventListeners.get(name) || []).forEach(handler => handler(value));
+    obj.emit = (name, ...values) => {
+      (obj.eventListeners.get(name) || []).forEach(handler => handler(...values));
     };
   },
 };
