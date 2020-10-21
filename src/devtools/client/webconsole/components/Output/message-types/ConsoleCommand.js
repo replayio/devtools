@@ -30,7 +30,6 @@ function ConsoleCommand(props) {
   // (no CodeMirror editor), then it will just render text.
   const messageBody = createElement("syntax-highlighted", null, messageText);
 
-  console.log(`>>> rendering ConsoleCommand`, { dispatch: !!dispatch });
   return Message({
     source,
     type,

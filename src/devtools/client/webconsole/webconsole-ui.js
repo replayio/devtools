@@ -141,9 +141,7 @@ class WebConsoleUI {
     );
   }
 
-  _initShortcuts() {
-
-  }
+  _initShortcuts() {}
 
   /**
    * Sets the focus to JavaScript input field when the web console tab is

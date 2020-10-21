@@ -25,19 +25,15 @@ const SmartTrace = require("devtools/client/shared/components/SmartTrace");
  *        An ObjectInspector for the given grip.
  */
 function getObjectInspector(frontOrPrimitiveGrip, override = {}) {
+  const { dispatch } = override;
 
-
-
-  const { dispatch } = override
-
-  const onDOMNodeMouseOver = object => dispatch(actions.highlightDomElement(object))
-  const onDOMNodeMouseOut = object => dispatch(actions.unHighlightDomElement(object))
+  const onDOMNodeMouseOver = object => dispatch(actions.highlightDomElement(object));
+  const onDOMNodeMouseOut = object => dispatch(actions.unHighlightDomElement(object));
   const onInspectIconClick = (object, e) => {
     // Stop the event propagation so we don't trigger ObjectInspector expand/collapse.
     e.stopPropagation();
-    dispatch(actions.openNodeInInspector(object))
-  }
-
+    dispatch(actions.openNodeInInspector(object));
+  };
 
   const roots = createRoots(frontOrPrimitiveGrip, override.pathPrefix);
 
