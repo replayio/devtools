@@ -90,7 +90,7 @@ class Message extends Component {
 
   // Event used in tests. Some message types don't pass it in because existing tests
   // did not emit for them.
-  emitNewMessage(node) { }
+  emitNewMessage(node) {}
 
   onLearnMoreClick(e) {
     const { exceptionDocURL, dispatch } = this.props;
@@ -98,10 +98,10 @@ class Message extends Component {
     e.preventDefault();
   }
 
-  onViewSourceInDebugger = (frame) => {
+  onViewSourceInDebugger = frame => {
     const { dispatch } = this.props;
-    dispatch(actions.onViewSourceInDebugger(frame))
-  }
+    dispatch(actions.onViewSourceInDebugger(frame));
+  };
 
   toggleMessage(e) {
     // Don't bubble up to the main App component, which  redirects focus to input,
@@ -171,12 +171,13 @@ class Message extends Component {
     } else if (!["command", "result"].includes(type)) {
       overlayType = "debug";
       label = "Debug";
-      onClick = () => this.onViewSourceInDebugger({
-        line: frame.line,
-        column: frame.column,
-        sourceId: frame.sourceId,
-        url: frame.source,
-      })
+      onClick = () =>
+        this.onViewSourceInDebugger({
+          line: frame.line,
+          column: frame.column,
+          sourceId: frame.sourceId,
+          url: frame.source,
+        });
     }
 
     return dom.div(
@@ -342,10 +343,10 @@ class Message extends Component {
             { className: "message-location devtools-monospace" },
             note.frame
               ? FrameView({
-                frame: note.frame,
-                onClick: this.onViewSourceInDebugger,
-                showEmptyPathAsHost: true,
-              })
+                  frame: note.frame,
+                  onClick: this.onViewSourceInDebugger,
+                  showEmptyPathAsHost: true,
+                })
               : null
           )
         )
@@ -364,11 +365,11 @@ class Message extends Component {
       { className: "message-location devtools-monospace" },
       frame
         ? FrameView({
-          frame,
-          onClick: frame ? this.onViewSourceInDebugger : undefined,
-          showEmptyPathAsHost: true,
-          messageSource: source,
-        })
+            frame,
+            onClick: frame ? this.onViewSourceInDebugger : undefined,
+            showEmptyPathAsHost: true,
+            messageSource: source,
+          })
         : null
     );
 
