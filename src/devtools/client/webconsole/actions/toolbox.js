@@ -65,14 +65,8 @@ export function focusInput() {
 }
 
 export function onMessageHover(type, message) {
-  return ({ hud }) => {
-    hud.emit("message-hover", type, message);
-  };
-}
-
-export function getJsTermTooltipAnchor() {
-  return ({ hud }) => {
-    hud.getJsTermTooltipAnchor();
+  return ({ toolbox }) => {
+    toolbox.emit("message-hover", type, message);
   };
 }
 

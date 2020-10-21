@@ -22,7 +22,7 @@ function ScrollContainer({ hoverTime, zoomRegion, setZoomRegion, recordingDurati
     });
     setZoomRegion(newZoomRegion);
 
-    gToolbox.getPanel("console").hud.setZoomedRegion(newZoomRegion);
+    gToolbox.getPanel("console").setZoomedRegion(newZoomRegion);
   };
 
   return (

@@ -5,7 +5,7 @@
 "use strict";
 
 // React & Redux
-const { createElement, createFactory } = require("react");
+const { createElement, createFactory, useEffect } = require("react");
 const PropTypes = require("prop-types");
 const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
 
@@ -22,7 +22,6 @@ ConsoleCommand.propTypes = {
  */
 function ConsoleCommand(props) {
   const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch } = props;
-
   const { indent, source, type, level, timeStamp } = message;
   const messageText = trimCode(message.messageText);
 

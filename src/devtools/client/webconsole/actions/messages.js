@@ -7,6 +7,7 @@
 const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
 const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
 const { ThreadFront } = require("protocol/thread");
+const { LogpointHandlers } = require("protocol/logpoint");
 
 const {
   MESSAGES_ADD,
@@ -21,8 +22,165 @@ const {
 } = require("devtools/client/webconsole/constants");
 
 const defaultIdGenerator = new IdGenerator();
+let queuedMessages = [];
+let throttledDispatchPromise = null;
 
-function messagesAdd(packets, idGenerator = null) {
+export function setupMessages(store) {
+  LogpointHandlers.onPointLoading = (logGroupId, point, time, location) =>
+    store.dispatch(onLogpointLoading(logGroupId, point, time, location));
+  LogpointHandlers.onResult = (logGroupId, point, time, location, pause, values) =>
+    store.dispatch(onLogpointResult(logGroupId, point, time, location, pause, values));
+  LogpointHandlers.clearLogpoint = logGroupId => store.dispatch(messagesClearLogpoint(logGroupId));
+  ThreadFront.findConsoleMessages((_, msg) => store.dispatch(onConsoleMessage(msg)));
+
+  ThreadFront.on("paused", ({ point, time }) =>
+    store.dispatch(setPauseExecutionPoint(point, time))
+  );
+  ThreadFront.on("instantWarp", ({ point, time }) =>
+    store.dispatch(setPauseExecutionPoint(point, time))
+  );
+}
+
+function convertStack(stack, { frames }) {
+  if (!stack) {
+    return null;
+  }
+  return Promise.all(
+    stack.map(async frameId => {
+      const frame = frames.find(f => f.frameId == frameId);
+      const location = await ThreadFront.getPreferredLocation(frame.location);
+      return {
+        filename: await ThreadFront.getScriptURL(location.scriptId),
+        sourceId: location.scriptId,
+        lineNumber: location.line,
+        columnNumber: location.column,
+        functionName: frame.functionName,
+      };
+    })
+  );
+}
+
+function onConsoleMessage(msg) {
+  return async ({ dispatch }) => {
+    const stacktrace = await convertStack(msg.stack, msg.data);
+    const sourceId = stacktrace?.[0]?.sourceId;
+
+    let { url, scriptId, line, column } = msg;
+
+    if (msg.point.frame) {
+      // If the execution point has a location, use any mappings in that location.
+      // The message properties do not reflect any source mapping.
+      const location = await ThreadFront.getPreferredLocation(msg.point.frame);
+      url = await ThreadFront.getScriptURL(location.scriptId);
+      line = location.line;
+      column = location.column;
+    } else {
+      if (!scriptId) {
+        const ids = ThreadFront.getScriptIdsForURL(url);
+        if (ids.length == 1) {
+          scriptId = ids[0];
+        }
+      }
+      if (scriptId) {
+        // Ask the ThreadFront to map the location we got manually.
+        const location = await ThreadFront.getPreferredMappedLocation({
+          scriptId,
+          line,
+          column,
+        });
+        url = await ThreadFront.getScriptURL(location.scriptId);
+        line = location.line;
+        column = location.column;
+      }
+    }
+
+    const packet = {
+      errorMessage: msg.text,
+      errorMessageName: "ErrorMessageName",
+      sourceName: url,
+      sourceId,
+      lineNumber: line,
+      columnNumber: column,
+      category: msg.source,
+      warning: msg.level == "warning",
+      error: msg.level == "error",
+      info: msg.level == "info",
+      trace: msg.level == "trace",
+      assert: msg.level == "assert",
+      stacktrace,
+      argumentValues: msg.argumentValues,
+      executionPoint: msg.point.point,
+      executionPointTime: msg.point.time,
+      executionPointHasFrames: !!stacktrace,
+    };
+
+    dispatch(dispatchMessageAdd(packet));
+  };
+}
+
+function onLogpointLoading(logGroupId, point, time, { scriptId, line, column }) {
+  return async ({ dispatch }) => {
+    const packet = {
+      errorMessage: "Loading...",
+      sourceName: await ThreadFront.getScriptURL(scriptId),
+      sourceId: scriptId,
+      lineNumber: line,
+      columnNumber: column,
+      category: "ConsoleAPI",
+      info: true,
+      executionPoint: point,
+      executionPointTime: time,
+      executionPointHasFrames: true,
+      logpointId: logGroupId,
+    };
+
+    dispatch(dispatchMessageAdd(packet));
+  };
+}
+
+function onLogpointResult(logGroupId, point, time, { scriptId, line, column }, _, values) {
+  return async ({ dispatch }) => {
+    const packet = {
+      errorMessage: "",
+      sourceName: await ThreadFront.getScriptURL(scriptId),
+      sourceId: scriptId,
+      lineNumber: line,
+      columnNumber: column,
+      category: "ConsoleAPI",
+      info: true,
+      argumentValues: values,
+      executionPoint: point,
+      executionPointTime: time,
+      executionPointHasFrames: true,
+      logpointId: logGroupId,
+    };
+
+    dispatch(dispatchMessageAdd(packet));
+  };
+}
+
+function dispatchMessageAdd(packet) {
+  return ({ dispatch }) => {
+    queuedMessages = queuedMessages.concat(packet);
+    if (throttledDispatchPromise) {
+      return throttledDispatchPromise;
+    }
+
+    throttledDispatchPromise = new Promise(done => {
+      setTimeout(async () => {
+        throttledDispatchPromise = null;
+        dispatch(messagesAdd(queuedMessages));
+
+        queuedMessages = [];
+
+        done();
+      }, 50);
+    });
+    return throttledDispatchPromise;
+  };
+}
+
+export function messagesAdd(packets, idGenerator = null) {
   if (idGenerator == null) {
     idGenerator = defaultIdGenerator;
   }
@@ -36,19 +194,19 @@ function messagesAdd(packets, idGenerator = null) {
   };
 }
 
-function messagesClear() {
+export function messagesClear() {
   return {
     type: MESSAGES_CLEAR,
   };
 }
 
-function messagesClearEvaluations() {
+export function messagesClearEvaluations() {
   return {
     type: MESSAGES_CLEAR_EVALUATIONS,
   };
 }
 
-function messagesClearEvaluation(messageId, messageType) {
+export function messagesClearEvaluation(messageId, messageType) {
   // The messageType is only used for logging purposes to determine what type of messages
   // are typically cleared.
   return {
@@ -58,14 +216,14 @@ function messagesClearEvaluation(messageId, messageType) {
   };
 }
 
-function messagesClearLogpoint(logpointId) {
+export function messagesClearLogpoint(logpointId) {
   return {
     type: MESSAGES_CLEAR_LOGPOINT,
     logpointId,
   };
 }
 
-function setPauseExecutionPoint(executionPoint, time) {
+export function setPauseExecutionPoint(executionPoint, time) {
   return {
     type: PAUSED_EXECUTION_POINT,
     executionPoint,
@@ -73,14 +231,14 @@ function setPauseExecutionPoint(executionPoint, time) {
   };
 }
 
-function messageOpen(id) {
+export function messageOpen(id) {
   return {
     type: MESSAGE_OPEN,
     id,
   };
 }
 
-function messageClose(id) {
+export function messageClose(id) {
   return {
     type: MESSAGE_CLOSE,
     id,
@@ -95,7 +253,7 @@ function messageClose(id) {
  * @param {Object} data
  *        Object with arbitrary data.
  */
-function messageUpdatePayload(id, data) {
+export function messageUpdatePayload(id, data) {
   return {
     type: MESSAGE_UPDATE_PAYLOAD,
     id,
@@ -103,22 +261,8 @@ function messageUpdatePayload(id, data) {
   };
 }
 
-function jumpToExecutionPoint(executionPoint) {
+export function jumpToExecutionPoint(executionPoint) {
   return () => {
     ThreadFront.timeWarp(executionPoint);
   };
 }
-
-module.exports = {
-  messagesAdd,
-  messagesClear,
-  messagesClearEvaluations,
-  messagesClearEvaluation,
-  messagesClearLogpoint,
-  messageOpen,
-  messageClose,
-  messageUpdatePayload,
-  // for test purpose only.
-  setPauseExecutionPoint,
-  jumpToExecutionPoint,
-};

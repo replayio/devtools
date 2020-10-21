@@ -4,7 +4,6 @@
 
 "use strict";
 
-const { Utils: WebConsoleUtils } = require("devtools/client/webconsole/utils");
 const {
   EVALUATE_EXPRESSION,
   SET_TERMINAL_INPUT,
@@ -17,7 +16,7 @@ const messagesActions = require("devtools/client/webconsole/actions/messages");
 const { ConsoleCommand } = require("devtools/client/webconsole/types");
 
 function evaluateExpression(expression) {
-  return async ({ dispatch, hud }) => {
+  return async ({ dispatch, toolbox }) => {
     if (!expression) {
       const inputSelection = window.jsterm?.editor.getSelection();
       const inputValue = window.jsterm?._getValue();
@@ -36,14 +35,9 @@ function evaluateExpression(expression) {
         }),
       ])
     );
-    dispatch({
-      type: EVALUATE_EXPRESSION,
-      expression,
-    });
+    dispatch({ type: EVALUATE_EXPRESSION, expression });
 
-    WebConsoleUtils.usageCount++;
-
-    const frameActor = await hud.getFrameActor();
+    const frameActor = toolbox.getPanel("debugger").getFrameId();
 
     // Even if the evaluation fails,
     // we still need to pass the error response to onExpressionEvaluated.
@@ -161,8 +155,8 @@ function terminalInputChanged(expression) {
     let mapped;
     ({ expression, mapped } = await getMappedExpression(hud, expression));
 
-    const frameActor = await hud.getFrameActor();
-    const selectedThreadFront = toolbox && toolbox.getSelectedThreadFront();
+    const frameActor = toolbox.getPanel("debugger").getFrameId();
+    const selectedThreadFront = toolbox?.getSelectedThreadFront();
 
     const response = await client.evaluateJSAsync(expression, {
       frameActor,
