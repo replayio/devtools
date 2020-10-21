@@ -23,7 +23,6 @@ const { FILTERS } = require("devtools/client/webconsole/constants");
 class ConsoleSettings extends Component {
   static get propTypes() {
     return {
-      dispatch: PropTypes.func.isRequired,
       eagerEvaluation: PropTypes.bool.isRequired,
       groupWarnings: PropTypes.bool.isRequired,
       persistLogs: PropTypes.bool.isRequired,

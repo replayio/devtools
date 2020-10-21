@@ -30,10 +30,6 @@ class Toolbox extends React.Component {
     panels: {},
   };
 
-  parserService = {
-    hasSyntaxError: text => false,
-  };
-
   threadFront = ThreadFront;
   selection = new Selection();
 
@@ -427,7 +423,7 @@ class Toolbox extends React.Component {
             {...this.getSplitBoxDimensions()}
             splitterSize={1}
             vert={false}
-            onResizeEnd={num => {}}
+            onResizeEnd={num => { }}
             startPanel={
               <div className="toolbox-top-panels">
                 <div

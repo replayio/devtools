@@ -37,8 +37,6 @@ class FilterBar extends Component {
   static get propTypes() {
     return {
       closeButtonVisible: PropTypes.bool,
-      closeSplitConsole: PropTypes.func,
-      dispatch: PropTypes.func.isRequired,
       displayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)]).isRequired,
       filter: PropTypes.object.isRequired,
       filteredMessagesCount: PropTypes.object.isRequired,
@@ -117,7 +115,7 @@ class FilterBar extends Component {
    * the filter buttons are rendered inline.
    */
   maybeUpdateLayout() {
-    const { dispatch, displayMode } = this.props;
+    const { filterBarDisplayModeSet, displayMode } = this.props;
 
     // If we don't have the wrapperNode reference, or if the wrapperNode isn't connected
     // anymore, we disconnect the resize observer (componentWillUnmount is never called
@@ -132,7 +130,7 @@ class FilterBar extends Component {
 
     if (displayMode === FILTERBAR_DISPLAY_MODES.WIDE) {
       if (filterInputWidth <= this.filterInputMinWidth) {
-        dispatch(actions.filterBarDisplayModeSet(FILTERBAR_DISPLAY_MODES.NARROW));
+        filterBarDisplayModeSet(FILTERBAR_DISPLAY_MODES.NARROW)
       }
 
       return;
@@ -284,9 +282,7 @@ class FilterBar extends Component {
         key: "split-console-close-button",
         className: "devtools-button",
         title: l10n.getStr("webconsole.closeSplitConsoleButton.tooltip"),
-        onClick: () => {
-          closeSplitConsole();
-        },
+        onClick: () => closeSplitConsole()
       })
     );
   }
@@ -355,4 +351,7 @@ function mapStateToProps(state) {
   };
 }
 
-module.exports = connect(mapStateToProps)(FilterBar);
+module.exports = connect(mapStateToProps, () => ({
+  closeSplitConsole: actions.closeSplitConsole,
+  filterBarDisplayModeSet: actions.filterBarDisplayModeSet
+}))(FilterBar);

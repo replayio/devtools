@@ -25,7 +25,8 @@ function autocompleteUpdate(force, getterPath, expressionVars) {
     // FIXME autocomplete is disabled
     return;
 
-    if (hud.inputHasSelection()) {
+    const inputHasSelection = this.jsterm?.editor.getSelection();
+    if (inputHasSelection) {
       return dispatch(autocompleteClear());
     }
 
@@ -138,6 +139,7 @@ function autocompleteDataFetch({
   expressionVars,
 }) {
   return async ({ dispatch, webConsoleUI }) => {
+    return;
     const selectedNodeActor = webConsoleUI.getSelectedNodeActor();
     const id = generateRequestId();
     dispatch({ type: AUTOCOMPLETE_PENDING_REQUEST, id });

@@ -374,7 +374,10 @@ async function toggleScopeNode(text) {
 }
 
 async function executeInConsole(text) {
-  gToolbox.getPanel("console").hud.evaluateInput(text);
+  const consolePanel = gToolbox.getPanel("console");
+  consolePanel.hud.jsterm._setValue(value);
+  consolePanel.hud.jsterm._execute();
+
 }
 
 async function checkInlinePreview(name, text) {
