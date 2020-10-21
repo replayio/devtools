@@ -4,7 +4,7 @@
 
 .breakpoint-panel {
   cursor: initial;
-  margin: 1em 0;
+  margin: 12px 0 8px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -18,21 +18,54 @@
   padding: 12px;
 }
 
+.breakpoint-panel > *:not(:last-child) {
+  margin-bottom: 4px;
+}
+
 .breakpoint-panel .text {
   font-family: sans-serif;
   line-height: 16px;
 }
 
+.breakpoint-panel .row > *:not(:last-child) {
+  margin-right: 8px;
+}
+
+.breakpoint-panel .header {
+  /* margin-bottom: 4px; */
+  display: flex;
+  flex-direction: row;
+}
+
 .breakpoint-panel .label {
   color: var(--theme-comment);
+  margin-right: 4px;
+}
+
+.breakpoint-panel .add-condition,
+.breakpoint-panel .remove-condition {
+  color: var(--blue-40);
+  cursor: pointer;
+  text-decoration: underline;
+};
+
+.breakpoint-panel .add-condition:hover {
+  color: var(--blue-50);
+  color: red;
+}
+
+.breakpoint-panel .conditional-row.hidden {
+  height: 0;
+  overflow: hidden;
+}
+
+.breakpoint-panel .label.log-message {
+  margin-bottom: 0px;
 }
 
 .breakpoint-panel .input-row {
   display: flex;
-}
-
-.breakpoint-panel .input-row > *:not(:last-child) {
-  margin-right: 8px;
+  align-items: center;
 }
 
 .breakpoint-panel .cm-s-mozilla {
@@ -72,10 +105,24 @@
   flex-direction: row-reverse;
   flex-grow: 1;
   align-items: center;
+  margin-left: 8px;
+}
+
+.breakpoint-panel .edit-actions.full {
+  flex-direction: row;
+  margin-left: 0px;
+}
+
+.breakpoint-panel .edit-actions.full button.save {
+  margin-right: 6px;
 }
 
 .breakpoint-panel .edit-actions.hidden,
-.breakpoint-panel .label.hidden {
+.breakpoint-panel .label.hidden,
+.breakpoint-panel .add-condition.hidden,
+.breakpoint-panel .remove-condition.hidden,
+.breakpoint-panel .header.logpoint.hidden,
+.breakpoint-panel .header.conditional-logpoint.hidden {
   display: none;
 }
 
