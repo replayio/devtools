@@ -84,9 +84,9 @@ export class Timeline extends Component {
     gToolbox.timeline = this;
     this.props.updateTimelineDimensions();
 
-    const webconsoleUI = this.console.hud.ui;
-    webconsoleUI.on("message-hover", this.onConsoleMessageHover);
-    webconsoleUI.subscribeToStore(this.onConsoleUpdate);
+    const webconsole = this.toolbox.getPanel("console").hud;
+    webconsole.on("message-hover", this.onConsoleMessageHover);
+    webconsole.subscribeToStore(this.onConsoleUpdate);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -97,10 +97,6 @@ export class Timeline extends Component {
 
   get toolbox() {
     return this.props.toolbox;
-  }
-
-  get console() {
-    return this.toolbox.getPanel("console");
   }
 
   get debugger() {
@@ -164,7 +160,7 @@ export class Timeline extends Component {
   };
 
   findMessage(message) {
-    const consoleOutput = this.console.hud.ui.outputNode;
+    const consoleOutput = this.toolbox.getPanel("console").hud.outputNode;
     return consoleOutput.querySelector(`.message[data-message-id="${message.id}"]`);
   }
 
@@ -174,7 +170,7 @@ export class Timeline extends Component {
     }
 
     const element = this.findMessage(message);
-    const consoleOutput = this.console.hud.ui.outputNode;
+    const consoleOutput = this.toolbox.getPanel("console").hud.outputNode;
 
     if (element) {
       const consoleHeight = consoleOutput.getBoundingClientRect().height;

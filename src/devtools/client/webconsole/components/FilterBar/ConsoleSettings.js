@@ -27,7 +27,6 @@ class ConsoleSettings extends Component {
       groupWarnings: PropTypes.bool.isRequired,
       persistLogs: PropTypes.bool.isRequired,
       timestampsVisible: PropTypes.bool.isRequired,
-      webConsoleUI: PropTypes.object.isRequired,
       autocomplete: PropTypes.bool.isRequired,
       filter: PropTypes.object.isRequired,
     };
@@ -129,14 +128,10 @@ class ConsoleSettings extends Component {
   }
 
   render() {
-    const { webConsoleUI } = this.props;
-    const doc = webConsoleUI.document;
-    const toolbox = webConsoleUI.toolbox;
-
     return MenuButton(
       {
         menuId: "webconsole-console-settings-menu-button",
-        toolboxDoc: toolbox ? toolbox.doc : doc,
+        toolboxDoc: document,
         className: "devtools-button webconsole-console-settings-menu-button",
         title: l10n.getStr("webconsole.console.settings.menu.button.tooltip"),
       },

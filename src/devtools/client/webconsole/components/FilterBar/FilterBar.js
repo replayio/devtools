@@ -44,7 +44,6 @@ class FilterBar extends Component {
       persistLogs: PropTypes.bool.isRequired,
       eagerEvaluation: PropTypes.bool.isRequired,
       timestampsVisible: PropTypes.bool.isRequired,
-      webConsoleUI: PropTypes.object.isRequired,
       autocomplete: PropTypes.bool.isRequired,
     };
   }
@@ -130,7 +129,7 @@ class FilterBar extends Component {
 
     if (displayMode === FILTERBAR_DISPLAY_MODES.WIDE) {
       if (filterInputWidth <= this.filterInputMinWidth) {
-        filterBarDisplayModeSet(FILTERBAR_DISPLAY_MODES.NARROW)
+        filterBarDisplayModeSet(FILTERBAR_DISPLAY_MODES.NARROW);
       }
 
       return;
@@ -148,7 +147,7 @@ class FilterBar extends Component {
       );
 
       if (filterInputWidth - this.filterInputMinWidth > filterButtonsToolbarWidth) {
-        dispatch(actions.filterBarDisplayModeSet(FILTERBAR_DISPLAY_MODES.WIDE));
+        filterBarDisplayModeSet(FILTERBAR_DISPLAY_MODES.WIDE);
       }
     }
   }
@@ -163,7 +162,7 @@ class FilterBar extends Component {
     return dom.button({
       className: "devtools-button devtools-clear-icon",
       title: l10n.getStr("webconsole.clearButton.tooltip"),
-      onClick: () => this.props.dispatch(actions.messagesClearEvaluations()),
+      onClick: () => this.props.messagesClearEvaluations(),
     });
   }
 
@@ -217,7 +216,7 @@ class FilterBar extends Component {
   }
 
   renderSearchBox() {
-    const { dispatch, filteredMessagesCount } = this.props;
+    const { filteredMessagesCount } = this.props;
 
     let searchBoxSummary;
     let searchBoxSummaryTooltip;
@@ -239,7 +238,7 @@ class FilterBar extends Component {
       type: "filter",
       placeholder: l10n.getStr("webconsole.filterInput.placeholder"),
       keyShortcut: l10n.getStr("webconsole.find.key"),
-      onChange: text => dispatch(actions.filterTextSet(text)),
+      onChange: text => filterTextSet(text),
       summary: searchBoxSummary,
       summaryTooltip: searchBoxSummaryTooltip,
     });
@@ -252,7 +251,6 @@ class FilterBar extends Component {
       groupWarnings,
       persistLogs,
       timestampsVisible,
-      webConsoleUI,
       autocomplete,
       filter,
     } = this.props;
@@ -263,7 +261,6 @@ class FilterBar extends Component {
       groupWarnings,
       persistLogs,
       timestampsVisible,
-      webConsoleUI,
       autocomplete,
       filter,
     });
@@ -282,7 +279,7 @@ class FilterBar extends Component {
         key: "split-console-close-button",
         className: "devtools-button",
         title: l10n.getStr("webconsole.closeSplitConsoleButton.tooltip"),
-        onClick: () => closeSplitConsole()
+        onClick: () => closeSplitConsole(),
       })
     );
   }
@@ -353,5 +350,7 @@ function mapStateToProps(state) {
 
 module.exports = connect(mapStateToProps, () => ({
   closeSplitConsole: actions.closeSplitConsole,
-  filterBarDisplayModeSet: actions.filterBarDisplayModeSet
+  filterBarDisplayModeSet: actions.filterBarDisplayModeSet,
+  messagesClearEvaluations: actions.messagesClearEvaluations,
+  filterTextSet: actions.filterTextSet,
 }))(FilterBar);

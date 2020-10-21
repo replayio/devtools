@@ -21,22 +21,22 @@ const {
  * @param {Array<String>} expressionVars: Array of the variables defined in the expression.
  */
 function autocompleteUpdate(force, getterPath, expressionVars) {
-  return async ({ dispatch, getState, webConsoleUI, hud }) => {
+  return async ({ dispatch, getState, hud }) => {
     // FIXME autocomplete is disabled
     return;
 
-    const inputHasSelection = this.jsterm?.editor.getSelection();
+    const inputHasSelection = window.jsterm.editor.getSelection();
     if (inputHasSelection) {
       return dispatch(autocompleteClear());
     }
 
     const inputValue = hud.getInputValue();
-    const frameActorId = await webConsoleUI.getFrameActor();
-    const webconsoleFront = await webConsoleUI.getWebconsoleFront({
+    const frameActorId = await hud.getFrameActor();
+    const webconsoleFront = await hud.getWebconsoleFront({
       frameActorId,
     });
 
-    const cursor = webConsoleUI.getInputCursor();
+    const cursor = window.jsterm.getSelectionStart();
 
     const state = getState().autocomplete;
     const { cache } = state;
@@ -138,9 +138,9 @@ function autocompleteDataFetch({
   authorizedEvaluations,
   expressionVars,
 }) {
-  return async ({ dispatch, webConsoleUI }) => {
+  return async ({ dispatch, hud }) => {
     return;
-    const selectedNodeActor = webConsoleUI.getSelectedNodeActor();
+    const selectedNodeActor = hud.getSelectedNodeActor();
     const id = generateRequestId();
     dispatch({ type: AUTOCOMPLETE_PENDING_REQUEST, id });
 

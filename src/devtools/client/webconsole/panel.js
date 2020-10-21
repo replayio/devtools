@@ -26,7 +26,7 @@ WebConsolePanel.prototype = {
    * If not, focus it.
    */
   focusInput: function () {
-    this.hud.jsterm.focus();
+    window.jsterm.focus();
   },
 
   /**

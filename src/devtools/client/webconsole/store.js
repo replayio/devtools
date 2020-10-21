@@ -24,8 +24,8 @@ const { thunkWithOptions } = require("devtools/client/shared/redux/middleware/th
  * Create and configure store for the Console panel. This is the place
  * where various enhancers and middleware can be registered.
  */
-function configureStore(webConsoleUI, options = {}) {
-  const prefsService = getPrefsService(webConsoleUI);
+function configureStore(hud, options = {}) {
+  const prefsService = getPrefsService(hud);
 
   const logLimit = 1000;
   //options.logLimit || Math.max(getIntPref("devtools.hud.loglimit"), 1);
