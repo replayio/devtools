@@ -320,7 +320,7 @@ class MarkupContextMenu {
   _showDOMProperties() {
     this.toolbox.openSplitConsole().then(() => {
       const { hud } = this.toolbox.getPanel("webconsole");
-      hud.ui.wrapper.dispatchEvaluateExpression("inspect($0, true)");
+      hud.ui.dispatchEvaluateExpression("inspect($0, true)");
     });
   }
 
@@ -332,6 +332,7 @@ class MarkupContextMenu {
    * autofills it with the temp variable.
    */
   async _useInConsole() {
+    return
     await this.toolbox.openSplitConsole();
     const { hud } = this.toolbox.getPanel("webconsole");
 

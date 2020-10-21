@@ -5,10 +5,6 @@
 "use strict";
 
 const EventEmitter = require("devtools/shared/event-emitter");
-const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
-const { l10n } = require("devtools/client/webconsole/utils/messages");
-
-const ConsoleCommands = require("devtools/client/webconsole/commands.js");
 
 const { createElement, createFactory } = require("react");
 const ReactDOM = require("react-dom");
@@ -78,7 +74,6 @@ class WebConsoleUI {
     this.document = window.document;
     this.rootElement = this.document.documentElement;
 
-    this._initShortcuts();
     this._initOutputSyntaxHighlighting();
 
     this.store = configureStore(this, {
@@ -105,7 +100,6 @@ class WebConsoleUI {
     this.body = renderApp({
       app: App({
         webConsoleUI: this,
-        closeSplitConsole: this.closeSplitConsole,
       }),
       store: this.store,
       root,
@@ -140,8 +134,6 @@ class WebConsoleUI {
       }
     );
   }
-
-  _initShortcuts() {}
 
   /**
    * Sets the focus to JavaScript input field when the web console tab is
@@ -187,20 +179,6 @@ class WebConsoleUI {
     }
 
     return frame.protocolId;
-  }
-
-  getSelectedNodeActor() {
-    const front = this.getSelectedNodeFront();
-    return front ? front.actorID : null;
-  }
-
-  getSelectedNodeFront() {
-    const inspectorSelection = this.hud.getInspectorSelection();
-    return inspectorSelection ? inspectorSelection.nodeFront : null;
-  }
-
-  onMessageHover(type, message) {
-    this.emit("message-hover", type, message);
   }
 
   onConsoleMessage = async (_, msg) => {
@@ -308,18 +286,6 @@ class WebConsoleUI {
     this.batchedMessagesAdd([packet]);
   }
 
-  dispatchMessagesAdd(messages) {
-    this.batchedMessagesAdd(messages);
-  }
-
-  dispatchMessagesClear() {
-    // We might still have pending message additions and updates when the clear action is
-    // triggered, so we need to flush them to make sure we don't have unexpected behavior
-    // in the ConsoleOutput.
-    this.queuedMessageAdds = [];
-    this.store.dispatch(actions.messagesClear());
-  }
-
   dispatchPaused = ({ point, time }) => {
     this.store.dispatch(actions.setPauseExecutionPoint(point, time));
   };
@@ -357,11 +323,6 @@ class WebConsoleUI {
     });
     return this.throttledDispatchPromise;
   }
-
-  // Called by pushing close button.
-  closeSplitConsole = () => {
-    this.toolbox.toggleSplitConsole(false);
-  };
 }
 
 exports.WebConsoleUI = WebConsoleUI;

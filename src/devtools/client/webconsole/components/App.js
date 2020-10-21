@@ -49,7 +49,6 @@ class App extends Component {
       dispatch: PropTypes.func.isRequired,
       webConsoleUI: PropTypes.object.isRequired,
       notifications: PropTypes.object,
-      closeSplitConsole: PropTypes.func.isRequired,
       autocomplete: PropTypes.bool,
       currentReverseSearchEntry: PropTypes.string,
       reverseSearchInputVisible: PropTypes.bool,
@@ -149,11 +148,10 @@ class App extends Component {
   }
 
   renderFilterBar() {
-    const { closeSplitConsole, filterBarDisplayMode, webConsoleUI } = this.props;
+    const { filterBarDisplayMode, webConsoleUI } = this.props;
 
     return FilterBar({
       key: "filterbar",
-      closeSplitConsole,
       displayMode: filterBarDisplayMode,
       webConsoleUI,
     });
@@ -229,13 +227,13 @@ class App extends Component {
       ),
       editorMode
         ? GridElementWidthResizer({
-            key: "editor-resizer",
-            enabled: editorMode,
-            position: "end",
-            className: "editor-resizer",
-            getControlledElementNode: () => webConsoleUI.jsterm.node,
-            onResizeEnd: width => dispatch(actions.setEditorWidth(width)),
-          })
+          key: "editor-resizer",
+          enabled: editorMode,
+          position: "end",
+          className: "editor-resizer",
+          getControlledElementNode: () => webConsoleUI.jsterm.node,
+          onResizeEnd: width => dispatch(actions.setEditorWidth(width)),
+        })
         : null,
     ]);
   }

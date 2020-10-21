@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 "use strict";
+const { openDocLink } = require("devtools/client/shared/link");
 
 export function highlightDomElement(grip) {
   return ({ hud }) => {
@@ -26,22 +27,37 @@ export function unHighlightDomElement(grip) {
 // service container is passed down the tree. These methods should eventually
 // be moved to redux actions.
 export function openLink(url, e) {
-  return ({ hud }) => {
-    hud.openLink(url, e);
+  return ({ }) => {
+    openDocLink(url, {
+      relatedToCurrent: true,
+      inBackground: isMacOS ? e.metaKey : e.ctrlKey,
+    });
+    if (e && typeof e.stopPropagation === "function") {
+      e.stopPropagation();
+    }
   };
 }
 
-export function openNodeInInspector(grip) {
-  return ({ hud }) => {
-    hud.openNodeInInspector(grip);
+export function openNodeInInspector(valueFront) {
+  return async ({ toolbox }) => {
+    const onSelectInspector = toolbox.selectTool("inspector", "inspect_dom");
+
+    const onNodeFront = valueFront
+      .getPause()
+      .ensureDOMFrontAndParents(valueFront._object.objectId)
+      .then(async nf => {
+        await nf.ensureParentsLoaded();
+        return nf;
+      });
+
+    const [nodeFront] = await Promise.all([onNodeFront, onSelectInspector]);
+
+    await toolbox.selection.setNodeFront(nodeFront, {
+      reason: "console",
+    });
   };
 }
 
-export function getInputSelection() {
-  return ({ hud }) => {
-    hud.getInputSelection();
-  };
-}
 
 export function focusInput() {
   return ({ hud }) => {
@@ -49,15 +65,9 @@ export function focusInput() {
   };
 }
 
-export function setInputValuevalue() {
-  return ({ hud }) => {
-    hud.setInputValue(value);
-  };
-}
-
 export function onMessageHover(type, message) {
   return ({ webConsoleUI }) => {
-    webConsoleUI.onMessageHover(type, message);
+    webConsoleUI.emit("message-hover", type, message);
   };
 }
 
@@ -82,5 +92,11 @@ export function jumpToExecutionPoint(point, time, hasFrames) {
 export function onViewSourceInDebugger(frame) {
   return ({ toolbox }) => {
     toolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.scriptId);
+  };
+}
+
+export function closeSplitConsole() {
+  return ({ toolbox }) => {
+    toolbox.toggleSplitConsole(false);
   };
 }

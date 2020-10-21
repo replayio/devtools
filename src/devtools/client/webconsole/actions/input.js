@@ -11,6 +11,7 @@ const {
   SET_TERMINAL_EAGER_RESULT,
 } = require("devtools/client/webconsole/constants");
 const { getAllPrefs } = require("devtools/client/webconsole/selectors/prefs");
+const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 
 const messagesActions = require("devtools/client/webconsole/actions/messages");
 const { ConsoleCommand } = require("devtools/client/webconsole/types");
@@ -18,7 +19,9 @@ const { ConsoleCommand } = require("devtools/client/webconsole/types");
 function evaluateExpression(expression) {
   return async ({ dispatch, webConsoleUI, hud }) => {
     if (!expression) {
-      expression = hud.getInputSelection() || hud.getInputValue();
+      const inputSelection = hud.jsterm?.editor.getSelection();
+      const inputValue = hud.jsterm?._getValue();
+      expression = inputSelection || inputValue;
     }
     if (!expression) {
       return null;
@@ -46,14 +49,41 @@ function evaluateExpression(expression) {
     // we still need to pass the error response to onExpressionEvaluated.
     const onSettled = res => res;
 
-    const response = await hud
-      .evaluateJSAsync(expression, {
-        frameActor,
-        forConsoleMessage: true,
-      })
+    const response = await evaluateJSAsync(expression, {
+      frameActor,
+      forConsoleMessage: true,
+    })
       .then(onSettled, onSettled);
 
     return dispatch(onExpressionEvaluated(response));
+  };
+}
+
+
+/**
+ * Evaluate a JavaScript expression asynchronously.
+ *
+ * @param {String} string: The code you want to evaluate.
+ * @param {Object} options: Options for evaluation. See evaluateJSAsync method on
+ *                          devtools/shared/fronts/webconsole.js
+ */
+async function evaluateJSAsync(expression, options = {}) {
+  const { frameActor } = options;
+  const rv = await ThreadFront.evaluate(/* asyncIndex */ 0, frameActor, expression);
+  const { returned, exception, failed } = rv;
+
+  let v;
+  if (failed) {
+    v = createPrimitiveValueFront("Error: Evaluation failed");
+  } else if (returned) {
+    v = returned;
+  } else {
+    v = exception;
+  }
+
+  return {
+    type: "evaluationResult",
+    result: v,
   };
 }
 
@@ -90,7 +120,7 @@ function focusInput() {
 
 function setInputValue(value) {
   return ({ hud }) => {
-    return hud.setInputValue(value);
+    hud.jsterm?._setValue(newValue);
   };
 }
 
