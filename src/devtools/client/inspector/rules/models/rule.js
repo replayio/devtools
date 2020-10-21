@@ -74,9 +74,7 @@ class Rule {
 
     this.getUniqueSelector = this.getUniqueSelector.bind(this);
     this.onDeclarationsUpdated = this.onDeclarationsUpdated.bind(this);
-    this.onLocationChanged = this.onLocationChanged.bind(this);
     this.onStyleRuleFrontUpdated = this.onStyleRuleFrontUpdated.bind(this);
-    this.updateSourceLocation = this.updateSourceLocation.bind(this);
   }
 
   destroy() {
