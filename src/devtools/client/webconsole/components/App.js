@@ -47,7 +47,6 @@ class App extends Component {
   static get propTypes() {
     return {
       dispatch: PropTypes.func.isRequired,
-      webConsoleUI: PropTypes.object.isRequired,
       notifications: PropTypes.object,
       autocomplete: PropTypes.bool,
       currentReverseSearchEntry: PropTypes.string,
@@ -78,13 +77,13 @@ class App extends Component {
   }
 
   onKeyDown(event) {
-    const { dispatch, webConsoleUI } = this.props;
+    const { dispatch } = this.props;
 
     if (
       (!isMacOS && event.key === "F9") ||
       (isMacOS && event.key === "r" && event.ctrlKey === true)
     ) {
-      const initialValue = webConsoleUI.jsterm && webConsoleUI.jsterm.getSelectedText();
+      const initialValue = window.jsterm.getSelectedText();
       dispatch(actions.reverseSearchInputToggle({ initialValue }));
       event.stopPropagation();
     }
@@ -101,7 +100,7 @@ class App extends Component {
 
   onClick(event) {
     const target = event.originalTarget || event.target;
-    const { reverseSearchInputVisible, dispatch, webConsoleUI } = this.props;
+    const { reverseSearchInputVisible, dispatch } = this.props;
 
     if (reverseSearchInputVisible === true && !target.closest(".reverse-search")) {
       event.preventDefault();
@@ -137,23 +136,21 @@ class App extends Component {
     }
 
     // Do not focus if something is selected
-    const selection = webConsoleUI.document.defaultView.getSelection();
+    const selection = document.defaultView.getSelection();
     if (selection && !selection.isCollapsed) {
       return;
     }
 
-    if (webConsoleUI && webConsoleUI.jsterm) {
-      webConsoleUI.jsterm.focus();
-    }
+    window.jsterm?.focus();
   }
 
   renderFilterBar() {
-    const { filterBarDisplayMode, webConsoleUI } = this.props;
+    const { filterBarDisplayMode, dispatch } = this.props;
 
     return FilterBar({
       key: "filterbar",
       displayMode: filterBarDisplayMode,
-      webConsoleUI,
+      dispatch,
     });
   }
 
@@ -162,11 +159,10 @@ class App extends Component {
   }
 
   renderJsTerm() {
-    const { webConsoleUI, autocomplete, editorMode, editorWidth } = this.props;
+    const { autocomplete, editorMode, editorWidth } = this.props;
 
     return JSTerm({
       key: "jsterm",
-      webConsoleUI,
       autocomplete,
       editorMode,
       editorWidth,
@@ -211,7 +207,7 @@ class App extends Component {
   }
 
   render() {
-    const { webConsoleUI, editorMode, dispatch } = this.props;
+    const { editorMode, dispatch } = this.props;
     const filterBar = this.renderFilterBar();
     const consoleOutput = this.renderConsoleOutput();
     const jsterm = this.renderJsTerm();
@@ -227,13 +223,13 @@ class App extends Component {
       ),
       editorMode
         ? GridElementWidthResizer({
-          key: "editor-resizer",
-          enabled: editorMode,
-          position: "end",
-          className: "editor-resizer",
-          getControlledElementNode: () => webConsoleUI.jsterm.node,
-          onResizeEnd: width => dispatch(actions.setEditorWidth(width)),
-        })
+            key: "editor-resizer",
+            enabled: editorMode,
+            position: "end",
+            className: "editor-resizer",
+            getControlledElementNode: () => window.jsterm.node,
+            onResizeEnd: width => dispatch(actions.setEditorWidth(width)),
+          })
         : null,
     ]);
   }

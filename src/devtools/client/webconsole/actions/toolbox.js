@@ -6,8 +6,8 @@
 const { openDocLink } = require("devtools/client/shared/link");
 
 export function highlightDomElement(grip) {
-  return ({ hud }) => {
-    const highlighter = hud.getHighlighter();
+  return ({ toolbox }) => {
+    const highlighter = toolbox.getHighlighter();
     if (highlighter) {
       highlighter.highlight(grip);
     }
@@ -15,8 +15,8 @@ export function highlightDomElement(grip) {
 }
 
 export function unHighlightDomElement(grip) {
-  return ({ hud }) => {
-    const highlighter = hud.getHighlighter();
+  return ({ toolbox }) => {
+    const highlighter = toolbox.getHighlighter();
     if (highlighter) {
       highlighter.unhighlight(grip);
     }
@@ -27,7 +27,7 @@ export function unHighlightDomElement(grip) {
 // service container is passed down the tree. These methods should eventually
 // be moved to redux actions.
 export function openLink(url, e) {
-  return ({ }) => {
+  return () => {
     openDocLink(url, {
       relatedToCurrent: true,
       inBackground: isMacOS ? e.metaKey : e.ctrlKey,
@@ -58,7 +58,6 @@ export function openNodeInInspector(valueFront) {
   };
 }
 
-
 export function focusInput() {
   return ({ hud }) => {
     hud.focusInput();
@@ -66,20 +65,14 @@ export function focusInput() {
 }
 
 export function onMessageHover(type, message) {
-  return ({ webConsoleUI }) => {
-    webConsoleUI.emit("message-hover", type, message);
+  return ({ hud }) => {
+    hud.emit("message-hover", type, message);
   };
 }
 
 export function getJsTermTooltipAnchor() {
-  return ({ webConsoleUI }) => {
-    webConsoleUI.getJsTermTooltipAnchor();
-  };
-}
-
-export function requestData(id, type) {
-  return ({ webconsoleUI }) => {
-    webconsoleUI.requestData(id, type);
+  return ({ hud }) => {
+    hud.getJsTermTooltipAnchor();
   };
 }
 

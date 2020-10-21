@@ -94,7 +94,7 @@ export class DebuggerPanel {
 
   async openConsoleAndEvaluate(input) {
     const { hud } = await this.toolbox.selectTool("console");
-    hud.ui.dispatchEvaluateExpression(input);
+    hud.dispatchEvaluateExpression(input);
   }
 
   async openInspector() {

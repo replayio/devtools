@@ -55,8 +55,6 @@ class JSTerm extends Component {
       getValueFromHistory: PropTypes.func.isRequired,
       // History of executed expression (state).
       history: PropTypes.object.isRequired,
-      // Console object.
-      webConsoleUI: PropTypes.object.isRequired,
       // Evaluate provided expression.
       evaluateExpression: PropTypes.func.isRequired,
       // Update position in the history after executing an expression (action).
@@ -83,10 +81,6 @@ class JSTerm extends Component {
 
   constructor(props) {
     super(props);
-
-    const { webConsoleUI } = props;
-
-    this.webConsoleUI = webConsoleUI;
 
     this._onEditorChanges = this._onEditorChanges.bind(this);
     this._onEditorBeforeChange = this._onEditorBeforeChange.bind(this);
@@ -117,7 +111,7 @@ class JSTerm extends Component {
     this.autocompletePopup = null;
 
     EventEmitter.decorate(this);
-    webConsoleUI.jsterm = this;
+    window.jsterm = this;
   }
 
   componentDidMount() {
@@ -256,8 +250,6 @@ class JSTerm extends Component {
               },
             ]);
           },
-
-          [Editor.accel("O")]: async () => this._openFile(),
 
           Tab: () => {
             if (this.hasEmptyInput()) {
@@ -591,44 +583,6 @@ class JSTerm extends Component {
   _getValue() {
     // FIXME
     return this.editor ? this.editor.getText() || "" : "";
-  }
-
-  /**
-   * Open the file picker for the user to select a javascript file and open it.
-   *
-   */
-  async _openFile() {
-    const fp = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
-    fp.init(
-      this.webConsoleUI.document.defaultView,
-      l10n.getStr("webconsole.input.openJavaScriptFile"),
-      Ci.nsIFilePicker.modeOpen
-    );
-
-    // Append file filters
-    fp.appendFilter(l10n.getStr("webconsole.input.openJavaScriptFileFilter"), "*.js");
-
-    function readFile(file) {
-      return new Promise(resolve => {
-        const { OS } = Cu.import("resource://gre/modules/osfile.jsm");
-        OS.File.read(file.path).then(data => {
-          const decoder = new TextDecoder();
-          resolve(decoder.decode(data));
-        });
-      });
-    }
-
-    const content = await new Promise(resolve => {
-      fp.open(rv => {
-        if (rv == Ci.nsIFilePicker.returnOK) {
-          const file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
-          file.initWithPath(fp.file.path);
-          readFile(file).then(resolve);
-        }
-      });
-    });
-
-    this._setValue(content);
   }
 
   getSelectionStart() {
@@ -1145,22 +1099,7 @@ class JSTerm extends Component {
     return this.editor ? this.editor.defaultCharWidth() : null;
   }
 
-  destroy() {
-    this.autocompleteUpdate.cancel();
-    this.terminalInputChanged.cancel();
-
-    if (this.autocompletePopup) {
-      this.autocompletePopup.destroy();
-      this.autocompletePopup = null;
-    }
-
-    if (this.editor) {
-      this.editor.destroy();
-      this.editor = null;
-    }
-
-    this.webConsoleUI = null;
-  }
+  destroy() {}
 
   renderOpenEditorButton() {
     if (this.props.editorMode) {
