@@ -47,6 +47,7 @@ function GripMessageBody(props) {
     autoExpandDepth: shouldAutoExpandObjectInspector(props) ? 1 : 0,
     mode,
     maybeScrollToBottom,
+    dispatch,
   };
 
   if (grip.isString()) {
@@ -57,8 +58,6 @@ function GripMessageBody(props) {
       style: styleObject,
     });
   }
-
-  Object.assign(objectInspectorProps, { dispatch });
 
   return getObjectInspector(grip, objectInspectorProps);
 }
