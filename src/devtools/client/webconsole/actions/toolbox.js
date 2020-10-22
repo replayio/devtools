@@ -4,7 +4,7 @@
 
 "use strict";
 
-function highlightDomElement(grip) {
+export function highlightDomElement(grip) {
   return ({ hud }) => {
     const highlighter = hud.getHighlighter();
     if (highlighter) {
@@ -13,7 +13,7 @@ function highlightDomElement(grip) {
   };
 }
 
-function unHighlightDomElement(grip) {
+export function unHighlightDomElement(grip) {
   return ({ hud }) => {
     const highlighter = hud.getHighlighter();
     if (highlighter) {
@@ -31,7 +31,7 @@ export function openLink(url, e) {
   };
 }
 
-export function openNodeInInspectorgrip() {
+export function openNodeInInspector(grip) {
   return ({ hud }) => {
     hud.openNodeInInspector(grip);
   };

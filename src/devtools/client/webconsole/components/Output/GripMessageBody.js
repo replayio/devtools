@@ -55,9 +55,10 @@ function GripMessageBody(props) {
       transformEmptyString: true,
       escapeWhitespace,
       style: styleObject,
-      dispatch,
     });
   }
+
+  Object.assign(objectInspectorProps, { dispatch });
 
   return getObjectInspector(grip, objectInspectorProps);
 }
