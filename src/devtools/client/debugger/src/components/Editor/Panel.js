@@ -6,7 +6,7 @@
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
-import classNames from "classnames";
+import classnames from "classnames";
 import "./Panel.css";
 import { toEditorLine } from "../../utils/editor";
 import actions from "../../actions";
@@ -23,66 +23,71 @@ export class Panel extends PureComponent {
   constructor() {
     super();
     this.cbPanel = null;
+
+    this.panel = document.createElement("div");
+    this.panel.classList.add("logpoint-panel");
+
+    this.state = {
+      editing: false,
+      logValue: null,
+      conditionValue: null,
+      editCondition: false,
+    };
   }
 
   componentDidMount() {
+    this.renderToWidget(this.props);
     const { breakpoint } = this.props;
-    this.initialValue = breakpoint.options.logValue;
+    this.setState({
+      logValue: breakpoint.options.logValue,
+      conditionValue: breakpoint.options.condition || null,
+    });
   }
 
-  keepFocusOnInput() {
-    if (this.input) {
-      this.input.focus();
-    }
-  }
+  componentDidUpdate(_, prevState) {
+    const { editing, conditionValue, editCondition } = this.state;
 
-  onInput = e => {
-    if (e.keyCode === 13) {
-      return this.save();
+    if (!prevState.editing && editing) {
+      this.logInputNode.focus();
     }
 
-    if (!this.input || !this.codeMirror) {
-      return;
+    if (prevState.conditionValue === null && conditionValue === "") {
+      this.conditionInputNode.focus();
+    } else if (this.logInputNode && prevState.conditionValue === "" && conditionValue === null) {
+      this.logInputNode.focus();
     }
 
-    this.toggleActionsPanel();
-  };
-
-  toggleActionsPanel() {
-    const value = this.codeMirror.getValue();
-    if (value == this.initialValue) {
-      this.setViewing();
-    } else {
-      this.setEditing();
+    if (editCondition) {
+      this.conditionInputNode.focus();
+      this.setState({ editCondition: false });
     }
   }
 
-  save = () => {
-    const value = this.codeMirror.getValue();
-    this.initialValue = value;
-    this.toggleActionsPanel();
-    this.setBreakpoint(value);
-  };
+  componentWillUnmount() {
+    // This is called if CodeMirror is re-initializing itself before the
+    // user closes the panel. Clear the widget, and re-render it
+    // as soon as this component gets remounted
+    return this.clearPanel();
+  }
 
-  cancel = () => {
-    this.codeMirror.doc.setValue(this.initialValue);
-    this.setViewing();
-  };
+  renderToWidget() {
+    const { breakpoint, editor } = this.props;
+    const { location } = breakpoint;
+
+    if (this.cbPanel) {
+      this.clearPanel();
+    }
+
+    const editorLine = toEditorLine(location.sourceId, location.line || 0);
+    this.cbPanel = editor.codeMirror.addLineWidget(editorLine, this.panel, {
+      // coverGutter: true,
+      noHScroll: true,
+    });
+  }
 
   delete = () => {
     this.removeLogpoint();
   };
-
-  setBreakpoint(value) {
-    const { cx, breakpoint } = this.props;
-    const location = breakpoint.location;
-    const options = breakpoint?.options || {};
-
-    return this.props.setBreakpointOptions(cx, location, {
-      ...options,
-      logValue: value,
-    });
-  }
 
   removeLogpoint() {
     const { cx, breakpoint } = this.props;
@@ -98,135 +103,238 @@ export class Panel extends PureComponent {
       this.cbPanel.clear();
       this.cbPanel = null;
     }
-    if (this.scrollParent) {
-      this.scrollParent.removeEventListener("scroll", this.repositionOnScroll);
-    }
   }
 
-  repositionOnScroll = () => {
-    if (this.panelNode && this.scrollParent) {
-      const { scrollLeft } = this.scrollParent;
-      this.panelNode.style.transform = `translateX(${scrollLeft}px)`;
+  setBreakpoint(value) {
+    const { cx, breakpoint } = this.props;
+    const { logValue, conditionValue } = this.state;
+
+    const location = breakpoint.location;
+    const options = breakpoint?.options || {};
+    const newOptions = { ...options, logValue, condition: conditionValue };
+
+    if (!conditionValue) {
+      delete newOptions.condition;
+    }
+
+    this.props.setBreakpointOptions(cx, location, newOptions);
+  }
+
+  toggleEditingOn = () => {
+    this.setState({ editing: true });
+  };
+
+  toggleEditingOff = () => {
+    this.setState({ editing: false });
+  };
+
+  setConditionValue = conditionValue => {
+    this.setState({ conditionValue });
+  };
+
+  editCondition = () => {
+    this.toggleEditingOn();
+    this.setState({ editCondition: true });
+  };
+
+  onLogChange = e => {
+    this.setState({ logValue: e.target.value });
+  };
+
+  onConditionChange = e => {
+    this.setState({ conditionValue: e.target.value });
+  };
+
+  saveLogpoint = e => {
+    const { cx, breakpoint } = this.props;
+    const location = breakpoint.location;
+    const options = breakpoint?.options || {};
+
+    this.props.setBreakpointOptions(cx, location, {
+      ...options,
+      logValue: value,
+    });
+
+    this.toggleEditingOff();
+  };
+
+  handleCancel = e => {
+    const { breakpoint } = this.props;
+
+    this.setState({
+      logValue: breakpoint.options.logValue,
+      conditionValue: breakpoint.options.condition || null,
+    });
+    this.toggleEditingOff();
+  };
+
+  handleSave = () => {
+    const { conditionValue } = this.state;
+
+    if (conditionValue === "") {
+      this.setConditionValue(null);
+    }
+
+    this.setBreakpoint();
+    this.toggleEditingOff();
+  };
+
+  handleKeyDown = e => {
+    if (e.key == "Escape") {
+      this.handleCancel();
+    } else if (e.key == "Enter") {
+      this.handleSave();
     }
   };
 
-  setEditing = () => {
-    this.editActionsNode.classList.remove("hidden");
-    this.labelNode.classList.remove("hidden");
-  };
+  renderEditActions() {
+    const { conditionValue } = this.state;
+    const hasCondition = conditionValue !== null;
 
-  setViewing = () => {
-    this.editActionsNode.classList.add("hidden");
-    this.labelNode.classList.add("hidden");
-  };
-
-  UNSAFE_componentWillMount() {
-    return this.renderToWidget(this.props);
-  }
-
-  componentWillUnmount() {
-    // This is called if CodeMirror is re-initializing itself before the
-    // user closes the panel. Clear the widget, and re-render it
-    // as soon as this component gets remounted
-    return this.clearPanel();
-  }
-
-  renderToWidget(props) {
-    if (this.cbPanel) {
-      this.clearPanel();
-    }
-    const { breakpoint, editor } = props;
-    const { location } = breakpoint;
-
-    const editorLine = toEditorLine(location.sourceId, location.line || 0);
-    this.cbPanel = editor.codeMirror.addLineWidget(editorLine, this.renderPanel(props), {
-      coverGutter: true,
-      noHScroll: true,
-    });
-
-    if (this.input) {
-      let parent = this.input.parentNode;
-      while (parent) {
-        if (parent instanceof HTMLElement && parent.classList.contains("CodeMirror-scroll")) {
-          this.scrollParent = parent;
-          break;
-        }
-        parent = parent.parentNode;
-      }
-
-      if (this.scrollParent) {
-        this.scrollParent.addEventListener("scroll", this.repositionOnScroll);
-        this.repositionOnScroll();
-      }
-    }
-  }
-
-  createEditor = input => {
-    const { log, editor } = this.props;
-    const codeMirror = editor.CodeMirror.fromTextArea(input, {
-      mode: "javascript",
-      theme: "mozilla",
-      placeholder: "Log message, e.g. displayName",
-    });
-
-    codeMirror.on("keydown", (cm, e) => {
-      if (e.key === "Enter") {
-        e.codemirrorIgnore = true;
-        e.preventDefault();
-      }
-    });
-
-    const codeMirrorWrapper = codeMirror.getWrapperElement();
-
-    codeMirrorWrapper.addEventListener("keyup", e => {
-      codeMirror.save();
-      this.onInput(e);
-    });
-
-    codeMirrorWrapper.addEventListener("click", e => {
-      this.setEditing();
-    });
-
-    this.input = input;
-    this.codeMirror = codeMirror;
-    setTimeout(() => codeMirror.focus(), 0);
-    codeMirror.setCursor(codeMirror.lineCount(), 0);
-  };
-
-  renderPanel(props) {
-    const { breakpoint } = props;
-    const defaultValue = breakpoint?.options.logValue;
-
-    const panel = document.createElement("div");
-    ReactDOM.render(
-      <div
-        className="breakpoint-panel log-point"
-        onClick={() => this.keepFocusOnInput()}
-        ref={node => (this.panelNode = node)}
-      >
-        <div className="text title">Logpoint: Line {breakpoint.location.line}</div>
-        <div className="text label hidden" ref={node => (this.labelNode = node)}>
-          Log message (e.g. &apos;x is x&apos;, x)
+    if (hasCondition) {
+      return (
+        <div className="edit-actions">
+          <button className="save" onClick={this.handleSave}>
+            Save
+          </button>
+          <button className="cancel" onClick={this.handleCancel}>
+            Cancel
+          </button>
         </div>
-        <div className="input-row">
-          <textarea defaultValue={defaultValue} ref={input => this.createEditor(input)} />
-          <div className="edit-actions hidden" ref={node => (this.editActionsNode = node)}>
-            <button className="text save" onClick={this.save}>
-              Save
-            </button>
-            <button className="text cancel" onClick={this.cancel}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>,
-      panel
+      );
+    }
+
+    return (
+      <div className="edit-actions">
+        <button className="cancel" onClick={this.handleCancel}>
+          Cancel
+        </button>
+        <button className="save" onClick={this.handleSave}>
+          Save
+        </button>
+      </div>
     );
-    return panel;
+  }
+
+  renderLogpointForm() {
+    const { logValue, conditionValue } = this.state;
+    const hasCondition = conditionValue !== null;
+
+    return (
+      <form>
+        {hasCondition ? (
+          <>
+            <label htmlFor="condition">Condition (e.g. x === true)</label>
+            <input
+              type="text"
+              id="condition"
+              value={conditionValue}
+              onChange={this.onConditionChange}
+              onKeyDown={this.handleKeyDown}
+              ref={node => (this.conditionInputNode = node)}
+            />
+          </>
+        ) : null}
+        <label htmlFor="logpoint">{`Log message (e.g. "x is", x)`}</label>
+        <div className="input-container">
+          <input
+            type="text"
+            id="logpoint"
+            value={logValue}
+            onChange={this.onLogChange}
+            onKeyDown={this.handleKeyDown}
+            ref={node => (this.logInputNode = node)}
+          />
+          {this.renderEditActions()}
+        </div>
+      </form>
+    );
+  }
+
+  renderLogSummary() {
+    const { logValue } = this.state;
+    return (
+      <button className="log" onClick={this.toggleEditingOn}>
+        console.log(<span className="expression">{logValue}</span>);
+      </button>
+    );
+  }
+
+  renderConditionSummary() {
+    const { conditionValue } = this.state;
+    return (
+      <button className="condition" onClick={this.editCondition}>
+        if (<span className="expression">{conditionValue}</span>)
+      </button>
+    );
+  }
+
+  renderSummary() {
+    const { conditionValue } = this.state;
+    const hasCondition = conditionValue !== null;
+
+    if (!hasCondition) {
+      return <div className="summary">{this.renderLogSummary()}</div>;
+    }
+
+    return (
+      <div className="summary">
+        {this.renderConditionSummary()}
+        {this.renderLogSummary()}
+      </div>
+    );
+  }
+
+  renderHeaderAction() {
+    const { editing, conditionValue } = this.state;
+    const hasCondition = conditionValue !== null;
+
+    if (!editing) {
+      return (
+        <div className="header-action" tabIndex="0" onClick={this.toggleEditingOn}>
+          Edit
+        </div>
+      );
+    }
+
+    return hasCondition ? (
+      <div className="header-action" tabIndex="0" onClick={() => this.setConditionValue(null)}>
+        Remove Condition
+      </div>
+    ) : (
+      <div className="header-action" tabIndex="0" onClick={() => this.setConditionValue("")}>
+        Add Condition
+      </div>
+    );
+  }
+
+  renderHeader() {
+    const { breakpoint } = this.props;
+    const { conditionValue } = this.state;
+    const hasCondition = conditionValue !== null;
+
+    return (
+      <div className="header">
+        <div className="type">{hasCondition ? "Conditional Logpoint" : "Logpoint"}:</div>
+        <div className="line">Line {breakpoint.location.line}</div>
+        {this.renderHeaderAction()}
+      </div>
+    );
   }
 
   render() {
-    return null;
+    const { editing, conditionValue } = this.state;
+    const hasCondition = conditionValue !== null;
+    const panel = this.panel;
+
+    const panelElem = (
+      <div className={classnames("breakpoint-panel log-point", { conditional: hasCondition })}>
+        {this.renderHeader()}
+        {editing ? this.renderLogpointForm() : this.renderSummary()}
+      </div>
+    );
+
+    return ReactDOM.createPortal(panelElem, panel);
   }
 }
 

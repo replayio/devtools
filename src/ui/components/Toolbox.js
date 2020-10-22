@@ -64,6 +64,8 @@ class Toolbox extends React.Component {
     const { promise, resolve } = defer();
     this.panelWaiters[name] = promise;
 
+    console.log(">>startPanel", name);
+
     const panels = {
       debugger: DebuggerPanel,
       console: WebConsolePanel,
@@ -73,7 +75,10 @@ class Toolbox extends React.Component {
     const panel = new panels[name](this);
     await panel.open();
 
-    this.setState({ panels: { ...this.state.panels, [name]: panel } });
+    this.setState({ panels: { ...this.state.panels, [name]: panel } }, () => {
+      console.log("state is updated", name, this.state);
+    });
+    console.log(">>startPanel after setState", name);
     resolve(panel);
     return panel;
   }
