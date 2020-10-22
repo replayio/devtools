@@ -15,7 +15,7 @@ import {
 } from "record-replay-protocol";
 import { client, log } from "./socket";
 import { defer } from "./utils";
-const { ThreadFront, ValueFront, Pause } = require("./thread");
+import { ThreadFront, ValueFront, Pause } from "./thread";
 const { logpointGetFrameworkEventListeners } = require("./event-listeners");
 
 interface LogpointInfo {
@@ -37,8 +37,8 @@ export const LogpointHandlers: {
     key: ExecutionPoint,
     time: number,
     mappedLocation: Location,
-    pause: any,
-    valueFronts: any
+    pause: Pause,
+    valueFronts: ValueFront[]
   ) => void;
   onPointLoading?: (
     logGroupId: string,
@@ -60,7 +60,7 @@ client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
   if (LogpointHandlers.onResult) {
     results.forEach(
       async ({ key, value: { time, pauseId, location, values, data, frameworkListeners } }) => {
-        const pause = new Pause(ThreadFront.sessionId);
+        const pause = new Pause(ThreadFront.sessionId!);
         pause.instantiate(pauseId);
         pause.addData(data);
         const valueFronts = values.map((v: any) => new ValueFront(pause, v));
@@ -92,6 +92,7 @@ client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
 
   if (LogpointHandlers.onPointLoading) {
     points.forEach(async ({ point, time, frame }) => {
+      if (!frame) return;
       const location = await ThreadFront.getPreferredLocation(frame);
       LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
     });
@@ -386,7 +387,7 @@ export async function setRandomLogpoint(numLogs: number) {
     await promise;
   }
 
-  return info.points.map((p: any) => p.point);
+  return info.points.map(p => p.point);
 }
 
 export function removeLogpoint(logGroupId: string) {

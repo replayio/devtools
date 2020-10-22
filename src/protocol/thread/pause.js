@@ -1,4 +1,4 @@
-const { sendMessage } = require("../socket");
+const { client } = require("../socket");
 const { defer, assert } = require("../utils");
 const { ValueFront } = require("./value");
 import { ThreadFront } from "./thread";
@@ -29,7 +29,7 @@ Pause.prototype = {
   create(point) {
     assert(!this.createWaiter);
     assert(!this.pauseId);
-    this.createWaiter = sendMessage("Session.createPause", { point }, this.sessionId).then(
+    this.createWaiter = client.Session.createPause({ point }, this.sessionId).then(
       ({ pauseId, stack, data }) => {
         this.pauseId = pauseId;
         this.addData(data);
@@ -149,7 +149,7 @@ Pause.prototype = {
     return Promise.all(
       scopeChain.map(async id => {
         if (!this.scopes.has(id)) {
-          const { data } = await this.sendMessage("Pause.getScope", {
+          const { data } = await this.sendMessage(client.Pause.getScope, {
             scope: id,
           });
           this.addData(data);
@@ -179,11 +179,11 @@ Pause.prototype = {
   },
 
   sendMessage(method, params) {
-    return sendMessage(method, params, this.sessionId, this.pauseId);
+    return method(params, this.sessionId, this.pauseId);
   },
 
   async getObjectPreview(object) {
-    const { data } = await this.sendMessage("Pause.getObjectPreview", {
+    const { data } = await this.sendMessage(client.Pause.getObjectPreview, {
       object,
     });
     this.addData(data);
@@ -193,12 +193,12 @@ Pause.prototype = {
     assert(this.createWaiter);
     await this.createWaiter;
     const { result } = frameId
-      ? await this.sendMessage("Pause.evaluateInFrame", {
+      ? await this.sendMessage(client.Pause.evaluateInFrame, {
           frameId,
           expression,
           useOriginalScopes: true,
         })
-      : await this.sendMessage("Pause.evaluateInGlobal", { expression });
+      : await this.sendMessage(client.Pause.evaluateInGlobal, { expression });
     const { returned, exception, failed, data } = result;
     this.addData(data);
     return { returned, exception, failed };
@@ -237,7 +237,7 @@ Pause.prototype = {
     while (parentId) {
       const data = this.objects.get(parentId);
       if (!data || !data.preview) {
-        const { data } = await this.sendMessage("DOM.getParentNodes", { node: parentId });
+        const { data } = await this.sendMessage(client.DOM.getParentNodes, { node: parentId });
         this.addData(data);
         break;
       }
@@ -252,13 +252,13 @@ Pause.prototype = {
     }
     assert(this.createWaiter);
     await this.createWaiter;
-    const { document, data } = await this.sendMessage("DOM.getDocument");
+    const { document, data } = await this.sendMessage(client.DOM.getDocument);
     this.addData(data);
     this.documentNode = this.getDOMFront(document);
   },
 
   async searchDOM(query) {
-    const { nodes, data } = await this.sendMessage("DOM.performSearch", { query });
+    const { nodes, data } = await this.sendMessage(client.DOM.performSearch, { query });
     this.addData(data);
     return nodes.map(node => this.getDOMFront(node));
   },
@@ -268,7 +268,7 @@ Pause.prototype = {
       return this.loadMouseTargetsWaiter.promise;
     }
     this.loadMouseTargetsWaiter = defer();
-    const { elements } = await this.sendMessage("DOM.getAllBoundingClientRects");
+    const { elements } = await this.sendMessage(client.DOM.getAllBoundingClientRects);
     this.mouseTargets = elements;
     this.loadMouseTargetsWaiter.resolve();
   },
@@ -286,7 +286,7 @@ Pause.prototype = {
 
   async getFrameSteps(frameId) {
     if (!this.frameSteps.has(frameId)) {
-      const { steps } = await this.sendMessage("Pause.getFrameSteps", {
+      const { steps } = await this.sendMessage(client.Pause.getFrameSteps, {
         frameId,
       });
       this.frameSteps.set(frameId, steps);

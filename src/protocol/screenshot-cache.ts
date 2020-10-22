@@ -1,5 +1,5 @@
-const { ThreadFront } = require("./thread");
-const { defer } = require("./utils");
+import { ThreadFront } from "./thread";
+import { defer } from "./utils";
 import { client } from "./socket";
 import { ScreenShot } from "record-replay-protocol/js/protocol";
 
@@ -54,7 +54,7 @@ export class ScreenshotCache {
       this.queuedDownloadForTooltip = undefined;
     }
 
-    const { promise, resolve, reject } = defer();
+    const { promise, resolve, reject } = defer<ScreenShot>();
     this.queuedDownloadForTooltip = { point, paintHash, promise, resolve, reject };
 
     this.startQueuedDownloadIfPossible();
@@ -119,7 +119,7 @@ export class ScreenshotCache {
     const screen = (
       await client.Graphics.getPaintContents(
         { point, mimeType: "image/jpeg", resizeHeight },
-        ThreadFront.sessionId
+        ThreadFront.sessionId!
       )
     ).screen;
 

@@ -8,6 +8,12 @@ export function makeInfallible(fn: (...args: any[]) => void, thisv?: any) {
   };
 }
 
+export interface Deferred<T> {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+  reject: (reason: any) => void;
+}
+
 export function defer<T>() {
   let resolve!: (value: T) => void;
   let reject!: (reason: any) => void;
@@ -65,13 +71,15 @@ function NotAllowed() {
   console.error("Not allowed");
 }
 
-export const DisallowEverythingProxyHandler = {
+export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
   getPrototypeOf() {
     NotAllowed();
+    return null;
   },
-  has() {
-    NotAllowed();
-  },
+  //has() {
+  //  NotAllowed();
+  //  return false;
+  //},
   get() {
     NotAllowed();
   },
@@ -81,40 +89,48 @@ export const DisallowEverythingProxyHandler = {
   },
   construct() {
     NotAllowed();
+    return {};
   },
   getOwnPropertyDescriptor() {
     NotAllowed();
+    return undefined;
   },
   ownKeys() {
     NotAllowed();
+    return [];
   },
   isExtensible() {
     NotAllowed();
+    return false;
   },
   setPrototypeOf() {
     NotAllowed();
+    return false;
   },
   preventExtensions() {
     NotAllowed();
+    return true;
   },
   defineProperty() {
     NotAllowed();
+    return false;
   },
   deleteProperty() {
     NotAllowed();
+    return false;
   },
 };
 
 export interface EventEmitter<T> {
-  eventListeners: Map<string, ((value: T) => void)[]>;
-  on: (name: string, handler: (value: T) => void) => void;
-  off: (name: string, handler: (value: T) => void) => void;
-  emit: (name: string, value: T) => void;
+  eventListeners: Map<string, ((value?: T) => void)[]>;
+  on: (name: string, handler: (value?: T) => void) => void;
+  off: (name: string, handler: (value?: T) => void) => void;
+  emit: (name: string, value?: T) => void;
 }
 
 export const EventEmitter = {
   decorate<T>(obj: EventEmitter<T>) {
-    obj.eventListeners = new Map<string, ((value: T) => void)[]>();
+    obj.eventListeners = new Map<string, ((value?: T) => void)[]>();
 
     obj.on = (name, handler) => {
       if (obj.eventListeners.has(name)) {
