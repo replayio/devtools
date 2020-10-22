@@ -1,6 +1,6 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
 
-const { ThreadFront } = require("./thread");
+import { ThreadFront } from "./thread";
 import { assert, binarySearch } from "./utils";
 import { ScreenshotCache } from "./screenshot-cache";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
