@@ -87,7 +87,7 @@ class Toolbox extends React.Component {
     let panel = this.state.panels[name];
 
     if (panel && name == selectedPanel) {
-      return;
+      return panel;
     }
 
     log(`Toolbox SelectTool ${name}`);
@@ -102,6 +102,7 @@ class Toolbox extends React.Component {
     }
 
     this.emit("select", name);
+    return panel;
   }
 
   async viewSourceInDebugger(url, line, column, id) {
