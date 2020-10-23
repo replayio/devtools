@@ -7,14 +7,14 @@ const { getStr, getFormatStr } = require("../utils/l10n");
 class TextNode extends PureComponent {
   static get propTypes() {
     return {
-      type: PropTypes.string.isRequired,
+      type: PropTypes.number.isRequired,
       value: PropTypes.string.isRequired,
     };
   }
 
   render() {
     const { type, value } = this.props;
-    const isComment = type === "comment";
+    const isComment = type === 8;
     const isWhiteSpace = !/[^\s]/.exec(value);
 
     return dom.span(
