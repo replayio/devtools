@@ -101,18 +101,22 @@ export class DebuggerPanel {
     this.toolbox.selectTool("inspector");
   }
 
-  async openElementInInspector(gripOrFront) {
+  async openElementInInspector(valueFront) {
     const onSelectInspector = this.toolbox.selectTool("inspector");
-    const onGripNodeToFront = getNodeFront(gripOrFront, this.toolbox);
 
-    const [front, inspector] = await Promise.all([onGripNodeToFront, onSelectInspector]);
+    const onNodeFront = valueFront
+      .getPause()
+      .ensureDOMFrontAndParents(valueFront._object.objectId)
+      .then(async nf => {
+        await nf.ensureParentsLoaded();
+        return nf;
+      });
 
-    const onInspectorUpdated = inspector.once("inspector-updated");
-    const onNodeFrontSet = this.toolbox.selection.setNodeFront(front, {
+    const [nodeFront] = await Promise.all([onNodeFront, onSelectInspector]);
+
+    await this.toolbox.selection.setNodeFront(nodeFront, {
       reason: "debugger",
     });
-
-    return Promise.all([onNodeFrontSet, onInspectorUpdated]);
   }
 
   async highlightDomElement(gripOrFront) {
