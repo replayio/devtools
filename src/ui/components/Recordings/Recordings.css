@@ -4,6 +4,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  overflow: auto;
 }
 
 .recordings .recording:hover {
