@@ -60,7 +60,7 @@ class Breakpoint extends PureComponent {
 
     const selectedLocation = breakpoint.location;
     if (event.metaKey) {
-      return editorActions.continueToHere(cx, selectedLocation.line);
+      return editorActions.continueToHere(cx, selectedLocation);
     }
 
     if (event.shiftKey) {
