@@ -32,6 +32,12 @@
   line-height: 16px;
 }
 
+.breakpoint-panel .action {
+  color: var(--dark-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .breakpoint-panel > *:not(:last-child) {
   margin-bottom: 8px;
 }
@@ -48,16 +54,26 @@
   margin-right: 8px;
 }
 
-.breakpoint-panel .header-action {
-  color: var(--dark-blue);
-  text-decoration: underline;
-  cursor: pointer;
+.breakpoint-panel .summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.breakpoint-panel .summary {
+.breakpoint-panel .summary .preview {
   font-family: var(--monospace-font-family);
   display: flex;
   flex-direction: row;
+  overflow: hidden;
+}
+
+.breakpoint-panel .summary .action {
+  display: none;
+  padding: 4px 4px 4px 8px;
+}
+
+.breakpoint-panel:hover .summary .action {
+  display: block;
 }
 
 .breakpoint-panel .summary button {

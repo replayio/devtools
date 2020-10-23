@@ -176,7 +176,7 @@ export class Panel extends PureComponent {
     this.toggleEditingOff();
   };
 
-  handleSave = () => {
+  handleSave = e => {
     const { conditionValue } = this.state;
 
     if (conditionValue === "") {
@@ -202,10 +202,10 @@ export class Panel extends PureComponent {
     if (hasCondition) {
       return (
         <div className="edit-actions">
-          <button className="save" onClick={this.handleSave}>
+          <button className="save" type="button" onClick={this.handleSave}>
             Save
           </button>
-          <button className="cancel" onClick={this.handleCancel}>
+          <button className="cancel" type="button" onClick={this.handleCancel}>
             Cancel
           </button>
         </div>
@@ -214,10 +214,10 @@ export class Panel extends PureComponent {
 
     return (
       <div className="edit-actions">
-        <button className="cancel" onClick={this.handleCancel}>
+        <button className="cancel" type="button" onClick={this.handleCancel}>
           Cancel
         </button>
-        <button className="save" onClick={this.handleSave}>
+        <button className="save" type="button" onClick={this.handleSave}>
           Save
         </button>
       </div>
@@ -264,7 +264,7 @@ export class Panel extends PureComponent {
   renderLogSummary() {
     const { logValue } = this.state;
     return (
-      <button className="log" onClick={this.toggleEditingOn}>
+      <button className="log" type="button" onClick={this.toggleEditingOn}>
         console.log(<span className="expression">{logValue}</span>);
       </button>
     );
@@ -273,7 +273,7 @@ export class Panel extends PureComponent {
   renderConditionSummary() {
     const { conditionValue } = this.state;
     return (
-      <button className="condition" onClick={this.editCondition}>
+      <button className="condition" type="button" onClick={this.editCondition}>
         if (<span className="expression">{conditionValue}</span>)
       </button>
     );
@@ -283,14 +283,21 @@ export class Panel extends PureComponent {
     const { conditionValue } = this.state;
     const hasCondition = conditionValue !== null;
 
-    if (!hasCondition) {
-      return <div className="summary">{this.renderLogSummary()}</div>;
-    }
-
     return (
-      <div className="summary">
-        {this.renderConditionSummary()}
-        {this.renderLogSummary()}
+      <div className="summary" onClick={this.toggleEditingOn}>
+        <div className="preview">
+          {hasCondition ? (
+            <>
+              {this.renderConditionSummary()}
+              {this.renderLogSummary()}
+            </>
+          ) : (
+            this.renderLogSummary()
+          )}
+        </div>
+        <div className="action" tabIndex="0" onClick={this.toggleEditingOn}>
+          Edit
+        </div>
       </div>
     );
   }
@@ -301,18 +308,18 @@ export class Panel extends PureComponent {
 
     if (!editing) {
       return (
-        <div className="header-action" tabIndex="0" onClick={this.toggleEditingOn}>
+        <div className="action" tabIndex="0" onClick={this.toggleEditingOn}>
           Edit
         </div>
       );
     }
 
     return hasCondition ? (
-      <div className="header-action" tabIndex="0" onClick={() => this.setConditionValue(null)}>
+      <div className="action" tabIndex="0" onClick={() => this.setConditionValue(null)}>
         Remove Condition
       </div>
     ) : (
-      <div className="header-action" tabIndex="0" onClick={() => this.setConditionValue("")}>
+      <div className="action" tabIndex="0" onClick={() => this.setConditionValue("")}>
         Add Condition
       </div>
     );
@@ -325,7 +332,7 @@ export class Panel extends PureComponent {
 
     return (
       <div className="header">
-        <div className="type">{hasCondition ? "Conditional Logpoint" : "Logpoint"}:</div>
+        <div className="type">Logpoint:</div>
         <div className="line">Line {breakpoint.location.line}</div>
         {this.renderHeaderAction()}
       </div>
