@@ -209,21 +209,7 @@ class WebConsole {
   }
 
   async openNodeInInspector(valueFront) {
-    const onSelectInspector = this.toolbox.selectTool("inspector", "inspect_dom");
-
-    const onNodeFront = valueFront
-      .getPause()
-      .ensureDOMFrontAndParents(valueFront._object.objectId)
-      .then(async nf => {
-        await nf.ensureParentsLoaded();
-        return nf;
-      });
-
-    const [nodeFront] = await Promise.all([onNodeFront, onSelectInspector]);
-
-    await this.toolbox.selection.setNodeFront(nodeFront, {
-      reason: "console",
-    });
+    gToolbox.openElementInInspector(valueFront, "console");
   }
 
   /**

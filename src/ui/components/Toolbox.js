@@ -118,6 +118,19 @@ class Toolbox extends React.Component {
     }
   }
 
+  async openElementInInspector(valueFront, reason) {
+    const onSelectInspector = this.selectTool("inspector");
+
+    const onNodeFront = valueFront
+      .getPause()
+      .ensureDOMFrontAndParents(valueFront._object.objectId)
+      .then(nodeFront => nodeFront.ensureParentsLoaded());
+
+    const [nodeFront] = await Promise.all([onNodeFront, onSelectInspector]);
+
+    await this.selection.setNodeFront(nodeFront, { reason });
+  }
+
   onEscape = e => {
     if (e.cancelBubble) {
       return;

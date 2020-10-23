@@ -224,7 +224,8 @@ NodeFront.prototype = {
       promises.push(node.ensureLoaded());
       node = node.parentNode();
     }
-    return Promise.all(promises);
+    await Promise.all(promises);
+    return this;
   },
 
   // Whether or not the node is displayed.
