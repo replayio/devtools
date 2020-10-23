@@ -156,8 +156,6 @@ class Inspector {
     // Localize all the nodes containing a data-localization attribute.
     //localizeMarkup(this.panelDoc);
 
-    await this._onTargetAvailable();
-
     // We need to listen to changes in the target's pause state.
     const dbg = await this._toolbox.getOrStartPanel("debugger");
     this._replayResumed = !dbg.isPaused();
@@ -166,28 +164,12 @@ class Inspector {
 
     this._markupBox = this.panelDoc.getElementById("markup-box");
 
-    return this._deferredOpen();
+    await this._deferredOpen();
+
+    await this.onNewRoot();
+
+    return this;
   }
-
-  _onTargetAvailable = async () => {
-    await Promise.all([this._getDefaultSelection()]);
-
-    // When we navigate to another process and switch to a new
-    // target and the inspector is already ready, we want to
-    // update the markup view accordingly. So force a new-root event.
-    // For the initial panel startup, the initial top level target
-    // update the markup view from _deferredOpen.
-    // We might want to followup here in order to share the same
-    // codepath between the initial top level target and the next
-    // one we switch to. i.e. extract from deferredOpen code
-    // which has to be called only once on inspector startup.
-    // Then move the rest to onNewRoot and always call onNewRoot from here.
-    if (this.isReady) {
-      this.onNewRoot();
-    } else {
-      this.once("ready", this.onNewRoot);
-    }
-  };
 
   _onTargetDestroyed = ({ type, targetFront, isTopLevel }) => {
     // Ignore all targets but the top level one
@@ -299,7 +281,6 @@ class Inspector {
     ThreadFront.on("resumed", this.handleThreadResumed);
 
     this.emit("ready");
-    return this;
   };
 
   _onBeforeNavigate = () => {
@@ -308,12 +289,6 @@ class Inspector {
     this._destroyMarkup();
     this._pendingSelection = null;
   };
-
-  _getDefaultSelection() {
-    // This may throw if the document is still loading and we are
-    // refering to a dead about:blank document
-    return this._getDefaultNodeForSelection().catch(this._handleRejectionIfNotDestroyed);
-  }
 
   /**
    * Return a promise that will resolve to the default node for selection.
