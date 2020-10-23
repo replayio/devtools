@@ -257,7 +257,7 @@ class MarkupView {
    *         The NodeFront object id to select.
    */
   onSelectNode(nodeId) {
-    this.store.dispatch(updateSelectedNode(nodeId));
+    this.selection.setNodeFront(this.nodes.get(nodeId));
   }
 
   /**
@@ -326,7 +326,7 @@ class MarkupView {
       this.expandNode(nodeId);
     }
 
-    this.store.dispatch(updateSelectedNode(nodeId));
+    this.selection.setNodeFront(this.nodes.get(nodeId));
   }
 
   onMouseEnterNode(nodeId) {
