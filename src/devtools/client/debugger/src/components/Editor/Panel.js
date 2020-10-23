@@ -338,8 +338,11 @@ export class Panel extends PureComponent {
     const panel = this.panel;
 
     const panelElem = (
-      <div className={classnames("breakpoint-panel log-point", { conditional: hasCondition })} ref={node => this.panelNode = node}>
-        {this.renderHeader()}
+      <div
+        className={classnames("breakpoint-panel log-point", { editing, conditional: hasCondition })}
+        ref={node => (this.panelNode = node)}
+      >
+        {editing ? this.renderHeader() : null}
         {editing ? this.renderLogpointForm() : this.renderSummary()}
       </div>
     );
