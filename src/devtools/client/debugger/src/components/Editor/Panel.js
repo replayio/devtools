@@ -158,6 +158,14 @@ export class Panel extends PureComponent {
     this.toggleEditingOff();
   };
 
+  handleInputBlur = () => {
+    setTimeout(() => {
+      if (!this.panelNode.contains(document.activeElement)) {
+        this.handleCancel();
+      }
+    }, 500);
+  };
+
   handleCancel = e => {
     const { breakpoint } = this.props;
 
@@ -231,6 +239,7 @@ export class Panel extends PureComponent {
               value={conditionValue}
               onChange={this.onConditionChange}
               onKeyDown={this.handleKeyDown}
+              onBlur={this.handleInputBlur}
               ref={node => (this.conditionInputNode = node)}
             />
           </>
@@ -243,6 +252,7 @@ export class Panel extends PureComponent {
             value={logValue}
             onChange={this.onLogChange}
             onKeyDown={this.handleKeyDown}
+            onBlur={this.handleInputBlur}
             ref={node => (this.logInputNode = node)}
           />
           {this.renderEditActions()}
@@ -328,7 +338,7 @@ export class Panel extends PureComponent {
     const panel = this.panel;
 
     const panelElem = (
-      <div className={classnames("breakpoint-panel log-point", { conditional: hasCondition })}>
+      <div className={classnames("breakpoint-panel log-point", { conditional: hasCondition })} ref={node => this.panelNode = node}>
         {this.renderHeader()}
         {editing ? this.renderLogpointForm() : this.renderSummary()}
       </div>

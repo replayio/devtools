@@ -149,7 +149,6 @@ class Editor extends PureComponent {
     this.onEditorScroll();
     this.setState({ editor });
 
-    console.log(">>setupEditor debugger panel:", gToolbox.getPanel("debugger"));
     gToolbox.getPanel("debugger").editor = this;
     return editor;
   }
