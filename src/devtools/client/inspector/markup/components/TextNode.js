@@ -1,6 +1,7 @@
 const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
+const { COMMENT_NODE } = require("devtools/shared/dom-node-constants");
 
 const { getStr, getFormatStr } = require("../utils/l10n");
 
@@ -14,7 +15,7 @@ class TextNode extends PureComponent {
 
   render() {
     const { type, value } = this.props;
-    const isComment = type === 8;
+    const isComment = type === COMMENT_NODE;
     const isWhiteSpace = !/[^\s]/.exec(value);
 
     return dom.span(
