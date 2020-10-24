@@ -4,42 +4,24 @@
 
 .breakpoint-panel {
   cursor: initial;
-  margin: 1em 0;
   position: relative;
   display: flex;
   flex-direction: column;
+  margin: 8px 0 8px 12px;
+  padding: 8px 12px;
   background: var(--theme-toolbar-background);
   border-top: 1px solid var(--theme-splitter-color);
   border-bottom: 1px solid var(--theme-splitter-color);
-  margin-left: 40px;
   border-radius: 4px;
   border: 1px solid var(--theme-splitter-color);
   width: 500px;
-  padding: 12px;
-}
-
-.breakpoint-panel .text {
   font-family: sans-serif;
   line-height: 16px;
+  color: var(--theme-toolbar-color);
 }
 
-.breakpoint-panel .label {
-  color: var(--theme-comment);
-}
-
-.breakpoint-panel .input-row {
-  display: flex;
-}
-
-.breakpoint-panel .input-row > *:not(:last-child) {
-  margin-right: 8px;
-}
-
-.breakpoint-panel .cm-s-mozilla {
-  background-color: white;
-  border: 1px solid var(--theme-splitter-color);
-  border-radius: 4px;
-  padding-top: 1px;
+.breakpoint-panel.editing {
+  padding: 12px;
 }
 
 .breakpoint-panel button {
@@ -47,44 +29,136 @@
   border-radius: 4px;
   padding: 4px 8px;
   cursor: pointer;
-  font-family: sans-serif;
+  line-height: 16px;
 }
 
-.breakpoint-panel button.save,
-.breakpoint-panel button.edit {
-  background: var(--blue-40);
+.breakpoint-panel .action {
+  color: var(--dark-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.breakpoint-panel > *:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+.breakpoint-panel .header {
+  display: flex;
+}
+
+.breakpoint-panel .header .type {
+  margin-right: 4px;
+}
+
+.breakpoint-panel .header .line {
+  margin-right: 8px;
+}
+
+.breakpoint-panel .summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.breakpoint-panel .summary .preview {
+  font-family: var(--monospace-font-family);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.breakpoint-panel .summary .action {
+  display: none;
+  padding: 4px 4px 4px 8px;
+}
+
+.breakpoint-panel:hover .summary .action {
+  display: block;
+}
+
+.breakpoint-panel .summary button {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 4px;
+  color: var(--theme-comment);
+}
+
+.breakpoint-panel .summary button:hover .expression {
+  color: var(--dark-blue);
+}
+
+.breakpoint-panel form {
+  display: flex;
+  flex-direction: column;
+}
+
+.breakpoint-panel form label {
+  color: var(--theme-comment);
+}
+
+.breakpoint-panel form label:not(:first-child) {
+  margin-top: 4px;
+}
+
+.brekapoint-panel form label .expression {
+  font-family: var(--monospace-font-family);
+}
+
+.breakpoint-panel form .input-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.breakpoint-panel form input[type="text"] {
+  display: flex;
+  width: 100%;
+  background-color: white;
+  line-height: 16px;
+  padding: 4px;
+  border-radius: 4px;
+  font-family: var(--monospace-font-family);
+  font-size: 1rem;
+  border: 1px solid var(--theme-splitter-color);
+  color: var(--theme-toolbar-color);
+}
+
+.breakpoint-panel .input-container > *:not(:last-child) {
+  margin-right: 8px;
+}
+
+.breakpoint-panel .edit-actions {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.breakpoint-panel .edit-actions > *:not(:last-child) {
+  margin-right: 8px;
+}
+
+.breakpoint-panel button.save {
+  background: var(--dark-blue);
   color: white;
 }
 
 .breakpoint-panel button.save:hover {
-  background: var(--blue-50);
+  background: #2270ec;
   color: white;
 }
 
 .breakpoint-panel button.cancel {
   border: 1px solid var(--theme-splitter-color);
-  margin-right: 6px;
   color: var(--theme-comment);
 }
 
-.breakpoint-panel .edit-actions {
+/* Conditional Logpoint Panel styling */
+
+.breakpoint-panel.conditional .input-container {
   display: flex;
-  flex-direction: row-reverse;
-  flex-grow: 1;
-  align-items: center;
+  flex-direction: column;
 }
 
-.breakpoint-panel .edit-actions.hidden,
-.breakpoint-panel .label.hidden {
-  display: none;
-}
-
-.breakpoint-panel .actions {
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-
-  margin-right: 30px;
-  align-items: center;
-  width: 80px;
+.breakpoint-panel.conditional .edit-actions {
+  margin-top: 8px;
 }
