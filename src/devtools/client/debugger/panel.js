@@ -7,16 +7,6 @@ import { resizeBreakpointGutter } from "./src/utils/ui";
 import { openDocLink } from "devtools/client/shared/link";
 import { onConnect } from "devtools/client/debugger/src/client";
 
-async function getNodeFront(gripOrFront, toolbox) {
-  // Given a NodeFront
-  if ("actorID" in gripOrFront) {
-    return new Promise(resolve => resolve(gripOrFront));
-  }
-
-  const inspectorFront = await toolbox.target.getFront("inspector");
-  return inspectorFront.getNodeFrontFromNodeGrip(gripOrFront);
-}
-
 export class DebuggerPanel {
   constructor(toolbox) {
     this.toolbox = toolbox;
