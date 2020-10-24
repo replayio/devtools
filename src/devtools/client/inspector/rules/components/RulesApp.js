@@ -30,7 +30,7 @@ class RulesApp extends PureComponent {
       onToggleDeclaration: PropTypes.func.isRequired,
       onTogglePseudoClass: PropTypes.func.isRequired,
       onToggleSelectorHighlighter: PropTypes.func.isRequired,
-      rules: PropTypes.arrayOf(PropTypes.shape(Types.rule)).isRequired,
+      rules: PropTypes.shape(Types.rules).isRequired,
       showContextMenu: PropTypes.func.isRequired,
       showDeclarationNameEditor: PropTypes.func.isRequired,
       showDeclarationValueEditor: PropTypes.func.isRequired,
