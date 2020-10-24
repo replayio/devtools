@@ -125,7 +125,7 @@ const selector = (exports.selector = {
 /**
  * A CSS Rule.
  */
-exports.rule = {
+const rule = (exports.rule = {
   // Array of CSS declarations.
   declarations: PropTypes.arrayOf(PropTypes.shape(declaration)),
 
@@ -171,4 +171,10 @@ exports.rule = {
   // The type of CSS rule.
   // See https://developer.mozilla.org/en-US/docs/Web/API/CSSRule#Type_constants
   type: PropTypes.number,
+});
+
+exports.rules = {
+  isAddRuleEnabled: PropTypes.bool.isRequired,
+  highlightedSelector: PropTypes.string.isRequired,
+  rules: PropTypes.arrayOf(PropTypes.shape(rule)).isRequired,
 };
