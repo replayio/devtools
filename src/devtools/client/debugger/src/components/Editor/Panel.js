@@ -263,6 +263,7 @@ export class Panel extends PureComponent {
 
   renderLogSummary() {
     const { logValue } = this.state;
+
     return (
       <button className="log" type="button" onClick={this.toggleEditingOn}>
         console.log(<span className="expression">{logValue}</span>);
@@ -272,6 +273,7 @@ export class Panel extends PureComponent {
 
   renderConditionSummary() {
     const { conditionValue } = this.state;
+
     return (
       <button className="condition" type="button" onClick={this.editCondition}>
         if (<span className="expression">{conditionValue}</span>)
