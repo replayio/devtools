@@ -28,12 +28,6 @@ export * from "./breakpointPositions";
 export * from "./modify";
 export * from "./syncBreakpoint";
 
-export function addHiddenBreakpoint(cx, location) {
-  return ({ dispatch }) => {
-    return dispatch(addBreakpoint(cx, location, { hidden: true }));
-  };
-}
-
 /**
  * Disable all breakpoints in a source
  *

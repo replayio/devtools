@@ -3,12 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import {
-  getHiddenBreakpoint,
-  isEvaluatingExpression,
-  getSelectedFrame,
-  getThreadContext,
-} from "../../selectors";
+import { getSelectedFrame, getThreadContext } from "../../selectors";
 
 import { fetchFrames } from ".";
 import { removeBreakpoint } from "../breakpoints";
@@ -40,11 +35,6 @@ export function paused({ executionPoint }) {
     const frame = getSelectedFrame(getState());
     if (frame) {
       dispatch(selectLocation(cx, frame.location, { remap: true }));
-    }
-
-    const hiddenBreakpoint = getHiddenBreakpoint(getState());
-    if (hiddenBreakpoint) {
-      dispatch(removeBreakpoint(cx, hiddenBreakpoint));
     }
 
     const promises = [];

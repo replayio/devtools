@@ -15,9 +15,9 @@ import { features } from "../../../utils/prefs";
 import { isFulfilled } from "../../../utils/async-value";
 import actions from "../../../actions";
 
-export const continueToHereItem = (cx, location, isPaused, editorActions) => ({
+export const continueToHereItem = (cx, location, disabled, editorActions) => ({
   accesskey: L10N.getStr("editor.continueToHere.accesskey"),
-  disabled: !isPaused,
+  disabled,
   click: () => editorActions.continueToHere(cx, location),
   id: "node-menu-continue-to-here",
   label: L10N.getStr("editor.continueToHere.label"),

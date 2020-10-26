@@ -33,6 +33,7 @@ import {
   getSkipPausing,
   getInlinePreview,
   getSelectedFrame,
+  getFramePositions,
 } from "../../selectors";
 
 // Redux actions
@@ -118,7 +119,7 @@ class Editor extends PureComponent {
 
     // disables the default search shortcuts
     // $FlowIgnore
-    editor._initShortcuts = () => {};
+    editor._initShortcuts = () => { };
 
     const node = ReactDOM.findDOMNode(this);
     if (node instanceof HTMLElement) {
@@ -297,6 +298,7 @@ class Editor extends PureComponent {
       isPaused,
       conditionalPanelLocation,
       closeConditionalPanel,
+      framePositions,
     } = this.props;
     const { editor } = this.state;
     if (!selectedSource || !editor) {
@@ -320,11 +322,12 @@ class Editor extends PureComponent {
 
     if (target.classList.contains("CodeMirror-linenumber")) {
       const lineText = getLineText(sourceId, selectedSource.content, line).trim();
+      const disabled = !isPaused || !framePositions;
 
       return showMenu(event, [
         ...createBreakpointItems(cx, location, breakpointActions, lineText),
         { type: "separator" },
-        continueToHereItem(cx, location, isPaused, editorActions),
+        continueToHereItem(cx, location, disabled, editorActions),
       ]);
     }
 
@@ -370,7 +373,7 @@ class Editor extends PureComponent {
     }
 
     if (ev.metaKey) {
-      return continueToHere(cx, sourceLine);
+      return continueToHere(cx, { line: sourceLine });
     }
 
     return addBreakpointAtLine(cx, sourceLine, ev.altKey, ev.shiftKey);
@@ -591,6 +594,7 @@ const mapStateToProps = state => {
     skipPausing: getSkipPausing(state),
     inlinePreviewEnabled: getInlinePreview(state),
     selectedFrame: getSelectedFrame(state),
+    framePositions: getFramePositions(state),
   };
 };
 
