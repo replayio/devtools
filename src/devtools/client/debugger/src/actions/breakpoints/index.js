@@ -212,7 +212,8 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
     };
 
     const options = {};
-    options.logValue = "displayName";
+    const file = source.url.split("/").pop();
+    options.logValue = `"${file}:${line}"`;
 
     return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled));
   };
