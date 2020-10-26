@@ -39,11 +39,7 @@ class EventsTimeline extends React.Component {
   }
 
   render() {
-    const { comments, expanded } = this.props;
-
-    if (!expanded) {
-      return null;
-    }
+    const { comments } = this.props;
 
     if (!comments.length) {
       return (
