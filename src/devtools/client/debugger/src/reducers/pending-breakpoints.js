@@ -31,10 +31,6 @@ function update(state = {}, action) {
 }
 
 function setBreakpoint(state, { breakpoint }) {
-  if (breakpoint.options.hidden) {
-    return state;
-  }
-
   const locationId = makePendingLocationId(breakpoint.location);
   const pendingBreakpoint = createPendingBreakpoint(breakpoint);
 

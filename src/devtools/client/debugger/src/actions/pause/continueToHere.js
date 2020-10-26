@@ -4,62 +4,32 @@
 
 //
 
-import {
-  getSelectedSource,
-  getSelectedFrame,
-  getClosestBreakpointPosition,
-  getBreakpoint,
-} from "../../selectors";
-import { addHiddenBreakpoint } from "../breakpoints";
-import { setBreakpointPositions } from "../breakpoints/breakpointPositions";
-
-import { resume, rewind } from "./commands";
+import { getFramePositions } from "../../selectors";
+import actions from "../../actions";
 
 export function continueToHere(cx, location) {
   return async function ({ dispatch, getState }) {
-    const { line, column, sourceId } = location;
-    const selectedSource = getSelectedSource(getState());
-    const selectedFrame = getSelectedFrame(getState(), cx.thread);
+    const framePositions = getFramePositions(getState());
 
-    if (!selectedFrame || !selectedSource) {
+    if (!framePositions) {
       return;
     }
 
-    const debugLine = selectedFrame.location.line;
-    // If the user selects a line to continue to,
-    // it must be different than the currently paused line.
-    if (!column && debugLine == line) {
+    const { positions } = framePositions;
+    const { line } = location;
+
+    if (!positions || !line) {
       return;
     }
 
-    await dispatch(setBreakpointPositions({ cx, sourceId, line }));
-    const position = getClosestBreakpointPosition(getState(), location);
+    // Look for the first point on that line, ignoring column breakpoints
+    const selectedPosition = positions.find(position => position.location.line === line);
 
-    // If the user selects a location in the editor,
-    // there must be a place we can pause on that line.
-    if (column && !position) {
+    if (!selectedPosition) {
       return;
     }
 
-    const pauseLocation = column && position ? position.location : location;
-
-    // If we're replaying and the user selects a line above the currently
-    // paused line, lets rewind to it. NOTE: this ignores a couple important
-    // cases like loops, and wanting to play forward to the next function call.
-    const action = line < debugLine ? rewind : resume;
-
-    // Set a hidden breakpoint if we do not already have a breakpoint
-    // at the closest position
-    if (!getBreakpoint(getState(), pauseLocation)) {
-      await dispatch(
-        addHiddenBreakpoint(cx, {
-          sourceId: selectedSource.id,
-          line: pauseLocation.line,
-          column: pauseLocation.column,
-        })
-      );
-    }
-
-    dispatch(action(cx));
+    const { point, time } = selectedPosition;
+    return dispatch(actions.seekToPosition(point, time));
   };
 }

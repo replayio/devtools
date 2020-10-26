@@ -95,11 +95,6 @@ class Breakpoint extends PureComponent {
     const { breakpoint, editor, selectedSource } = props;
     const selectedLocation = breakpoint.location;
 
-    // Hidden Breakpoints are never rendered on the client
-    if (breakpoint.options.hidden) {
-      return;
-    }
-
     if (!selectedSource) {
       return;
     }

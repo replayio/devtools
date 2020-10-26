@@ -32,10 +32,7 @@ function groupBreakpoints(breakpoints, selectedSource) {
     return {};
   }
 
-  const map = groupBy(
-    breakpoints.filter(breakpoint => !breakpoint.options.hidden),
-    breakpoint => breakpoint.location.line
-  );
+  const map = groupBy(breakpoint => breakpoint.location.line);
 
   for (const line in map) {
     map[line] = groupBy(map[line], breakpoint => breakpoint.location.column);

@@ -186,11 +186,6 @@ export function getBreakpointForLocation(state, location) {
   });
 }
 
-export function getHiddenBreakpoint(state) {
-  const breakpoints = getBreakpointsList(state);
-  return breakpoints.find(bp => bp.options.hidden);
-}
-
 export function hasLogpoint(state, location) {
   const breakpoint = getBreakpoint(state, location);
   return breakpoint && breakpoint.options.logValue;
