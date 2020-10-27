@@ -227,14 +227,6 @@ const stepOverAndPause = resumeAndPauseFunctionFactory("stepOver");
 const stepInAndPause = resumeAndPauseFunctionFactory("stepIn");
 const stepOutAndPause = resumeAndPauseFunctionFactory("stepOut");
 
-async function ensureWatchpointsExpanded() {
-  const header = document.querySelector(".watch-expressions-pane ._header");
-  if (!header.querySelector(".expanded")) {
-    header.click();
-    await waitUntil(() => header.querySelector(".expanded"));
-  }
-}
-
 async function checkEvaluateInTopFrame(text, expected) {
   await ensureWatchpointsExpanded();
   await dbg.actions.addExpression(getThreadContext(), text);

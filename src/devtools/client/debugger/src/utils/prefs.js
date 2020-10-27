@@ -26,7 +26,6 @@ pref("devtools.debugger.call-stack-visible", true);
 pref("devtools.debugger.scopes-visible", true);
 pref("devtools.debugger.component-visible", false);
 pref("devtools.debugger.workers-visible", false);
-pref("devtools.debugger.expressions-visible", false);
 pref("devtools.debugger.xhr-breakpoints-visible", false);
 pref("devtools.debugger.breakpoints-visible", true);
 pref("devtools.debugger.event-listeners-visible", false);
@@ -39,7 +38,6 @@ pref("devtools.debugger.tabsBlackBoxed", "[]");
 pref("devtools.debugger.ui.editor-wrapping", false);
 pref("devtools.debugger.ui.framework-grouping-on", true);
 pref("devtools.debugger.pending-selected-location", "{}");
-pref("devtools.debugger.expressions", "[]");
 pref("devtools.debugger.file-search-case-sensitive", false);
 pref("devtools.debugger.file-search-whole-word", false);
 pref("devtools.debugger.file-search-regex-match", false);
@@ -122,7 +120,6 @@ export const prefs = new PrefsHelper("devtools", {
   componentVisible: ["Bool", "debugger.component-visible"],
   workersVisible: ["Bool", "debugger.workers-visible"],
   breakpointsVisible: ["Bool", "debugger.breakpoints-visible"],
-  expressionsVisible: ["Bool", "debugger.expressions-visible"],
   xhrBreakpointsVisible: ["Bool", "debugger.xhr-breakpoints-visible"],
   eventListenersVisible: ["Bool", "debugger.event-listeners-visible"],
   domMutationBreakpointsVisible: ["Bool", "debugger.dom-mutation-breakpoints-visible"],
@@ -132,7 +129,6 @@ export const prefs = new PrefsHelper("devtools", {
   endPanelSize: ["Int", "debugger.end-panel-size"],
   frameworkGroupingOn: ["Bool", "debugger.ui.framework-grouping-on"],
   pendingSelectedLocation: ["Json", "debugger.pending-selected-location", {}],
-  expressions: ["Json", "debugger.expressions", []],
   fileSearchCaseSensitive: ["Bool", "debugger.file-search-case-sensitive"],
   fileSearchWholeWord: ["Bool", "debugger.file-search-whole-word"],
   fileSearchRegexMatch: ["Bool", "debugger.file-search-regex-match"],

@@ -89,6 +89,5 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   clearPreview: actions.clearPreview,
-  addExpression: actions.addExpression,
   updatePreview: actions.updatePreview,
 })(Preview);

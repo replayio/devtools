@@ -7,7 +7,6 @@ import { getSelectedFrame, getThreadContext } from "../../selectors";
 
 import { fetchFrames } from ".";
 import { removeBreakpoint } from "../breakpoints";
-import { evaluateExpressions, markEvaluatedExpressionsAsLoading } from "../expressions";
 import { selectLocation } from "../sources";
 import assert from "../../utils/assert";
 
@@ -28,8 +27,6 @@ export function paused({ executionPoint }) {
     // Get a context capturing the newly paused and selected thread.
     const cx = getThreadContext(getState());
 
-    await dispatch(markEvaluatedExpressionsAsLoading(cx));
-
     await dispatch(fetchFrames(cx));
 
     const frame = getSelectedFrame(getState());
@@ -47,10 +44,6 @@ export function paused({ executionPoint }) {
     promises.push(
       (async () => {
         await dispatch(fetchScopes(cx));
-
-        // Run after fetching scoping data so that it may make use of the sourcemap
-        // expression mappings for local variables.
-        await dispatch(evaluateExpressions(cx));
       })()
     );
 

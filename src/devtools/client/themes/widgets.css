@@ -133,10 +133,6 @@
 
 /* Custom scope stylings */
 
-.variables-view-watch-expressions .title > .name  {
-  max-width: 14em;
-}
-
 /* Generic variables traits */
 
 .variables-view-variable:not(:last-child) {

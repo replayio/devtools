@@ -6,7 +6,6 @@
 
 import * as ast from "./ast";
 import * as breakpoints from "./breakpoints";
-import * as expressions from "./expressions";
 import * as logExceptions from "./logExceptions";
 import * as pause from "./pause";
 import * as navigation from "./navigation";
@@ -27,7 +26,6 @@ export default {
   ...ast,
   ...navigation,
   ...breakpoints,
-  ...expressions,
   ...logExceptions,
   ...sources,
   ...sourcesActors,

@@ -5,7 +5,6 @@
 //
 
 import { isStepping, getPauseReason, getThreadContext } from "../../selectors";
-import { evaluateExpressions } from "../expressions";
 import { inDebuggerEval } from "../../utils/pause";
 
 /**
@@ -23,8 +22,5 @@ export function resumed(thread) {
     dispatch({ type: "RESUME", thread, wasStepping });
 
     const cx = getThreadContext(getState());
-    if (!wasStepping && !wasPausedInEval) {
-      await dispatch(evaluateExpressions(cx));
-    }
   };
 }

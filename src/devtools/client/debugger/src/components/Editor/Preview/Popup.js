@@ -291,7 +291,6 @@ const mapStateToProps = state => ({
 });
 
 const {
-  addExpression,
   selectSourceURL,
   openLink,
   openElementInInspectorCommand,
@@ -301,7 +300,6 @@ const {
 } = actions;
 
 const mapDispatchToProps = {
-  addExpression,
   selectSourceURL,
   openLink,
   openElementInInspector: openElementInInspectorCommand,

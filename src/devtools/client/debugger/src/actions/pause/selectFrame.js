@@ -5,7 +5,6 @@
 //
 
 import { selectLocation } from "../sources";
-import { evaluateExpressions } from "../expressions";
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
 import assert from "../../utils/assert";
@@ -36,7 +35,6 @@ export function selectFrame(cx, frame) {
     dispatch(selectLocation(cx, frame.location));
     dispatch(setFramePositions());
 
-    dispatch(evaluateExpressions(cx));
     dispatch(fetchScopes(cx));
   };
 }

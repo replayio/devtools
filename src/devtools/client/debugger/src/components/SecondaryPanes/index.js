@@ -13,7 +13,6 @@ import {
   getTopFrame,
   getBreakpointsList,
   getBreakpointsDisabled,
-  getExpressions,
   getIsWaitingOnBreak,
   getPauseCommand,
   getSelectedFrame,
@@ -28,7 +27,6 @@ import AccessibleImage from "../shared/AccessibleImage";
 import { prefs, features } from "../../utils/prefs";
 
 import Breakpoints from "./Breakpoints";
-import Expressions from "./Expressions";
 import SplitBox from "devtools-splitter";
 import Frames from "./Frames";
 import Accordion from "../shared/Accordion";
@@ -57,14 +55,9 @@ class SecondaryPanes extends Component {
     super(props);
 
     this.state = {
-      showExpressionsInput: false,
       showXHRInput: false,
     };
   }
-
-  onExpressionAdded = () => {
-    this.setState({ showExpressionsInput: false });
-  };
 
   onXHRAdded = () => {
     this.setState({ showXHRInput: false });
@@ -105,28 +98,6 @@ class SecondaryPanes extends Component {
     return <input {...inputProps} />;
   }
 
-  watchExpressionHeaderButtons() {
-    const { expressions } = this.props;
-
-    const buttons = [];
-
-    buttons.push(
-      debugBtn(
-        evt => {
-          if (prefs.expressionsVisible) {
-            evt.stopPropagation();
-          }
-          this.setState({ showExpressionsInput: true });
-        },
-        "plus",
-        "plus",
-        L10N.getStr("expressions.placeholder")
-      )
-    );
-
-    return buttons;
-  }
-
   xhrBreakpointsHeaderButtons() {
     const buttons = [];
 
@@ -155,24 +126,6 @@ class SecondaryPanes extends Component {
       opened: prefs.scopesVisible,
       onToggle: opened => {
         prefs.scopesVisible = opened;
-      },
-    };
-  }
-
-  getWatchItem() {
-    return {
-      header: L10N.getStr("watchExpressions.header"),
-      className: "watch-expressions-pane",
-      buttons: this.watchExpressionHeaderButtons(),
-      component: (
-        <Expressions
-          showInput={this.state.showExpressionsInput}
-          onExpressionAdded={this.onExpressionAdded}
-        />
-      ),
-      opened: prefs.expressionsVisible,
-      onToggle: opened => {
-        prefs.expressionsVisible = opened;
       },
     };
   }
@@ -225,10 +178,6 @@ class SecondaryPanes extends Component {
     const items = [];
     const { horizontal, hasFrames, framesLoading } = this.props;
 
-    if (horizontal) {
-      items.push(this.getWatchItem());
-    }
-
     items.push(this.getBreakpointsItem());
 
     if (hasFrames) {
@@ -249,8 +198,6 @@ class SecondaryPanes extends Component {
     }
 
     const items = [];
-
-    items.push(this.getWatchItem());
 
     if (this.props.hasFrames) {
       items.push(this.getScopeItem());
@@ -323,7 +270,6 @@ const mapStateToProps = state => {
 
   return {
     cx: getThreadContext(state),
-    expressions: getExpressions(state),
     hasFrames: !!getTopFrame(state),
     framesLoading: getFramesLoading(state),
     breakpoints: getBreakpointsList(state),

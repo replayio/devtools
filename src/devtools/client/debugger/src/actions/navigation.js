@@ -7,8 +7,6 @@
 import { clearDocuments } from "../utils/editor";
 import sourceQueue from "../utils/source-queue";
 
-import { evaluateExpressions } from "./expressions";
-
 import { getMainThread, getThreadContext } from "../selectors";
 
 /**
@@ -50,7 +48,6 @@ export function connect(url, actor, traits, isWebExtension) {
     });
 
     const cx = getThreadContext(getState());
-    dispatch(evaluateExpressions(cx));
   };
 }
 
