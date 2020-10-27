@@ -228,13 +228,16 @@ const stepInAndPause = resumeAndPauseFunctionFactory("stepIn");
 const stepOutAndPause = resumeAndPauseFunctionFactory("stepOut");
 
 async function checkEvaluateInTopFrame(text, expected) {
-  await ensureWatchpointsExpanded();
-  await dbg.actions.addExpression(getThreadContext(), text);
+  selectConsole();
+  executeInConsole(text);
+
   await waitUntil(() => {
-    const node = document.querySelector(".watch-expressions-pane .object-node");
-    return node && node.innerText == `${text}: ${expected}`;
+    const node = document.querySelector(".message.result .objectBox");
+    return node?.innerText == `${expected}`;
   });
-  await dbg.actions.deleteExpression({ input: text });
+
+  document.querySelector(".devtools-clear-icon").click();
+  selectDebugger();
 }
 
 async function waitForScopeValue(name, value) {
