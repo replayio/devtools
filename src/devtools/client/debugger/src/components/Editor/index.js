@@ -31,7 +31,6 @@ import {
   getIsPaused,
   getThreadContext,
   getSkipPausing,
-  getInlinePreview,
   getSelectedFrame,
   getFramePositions,
 } from "../../selectors";
@@ -50,7 +49,6 @@ import ReplayLines from "./ReplayLines";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
 import ConditionalPanel from "./ConditionalPanel";
-import InlinePreviews from "./InlinePreviews";
 
 import {
   showSourceText,
@@ -76,7 +74,6 @@ import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
 
 import "./Editor.css";
 import "./Breakpoints.css";
-import "./InlinePreview.css";
 
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
@@ -505,13 +502,7 @@ class Editor extends PureComponent {
   }
 
   renderItems() {
-    const {
-      cx,
-      selectedSource,
-      conditionalPanelLocation,
-      isPaused,
-      inlinePreviewEnabled,
-    } = this.props;
+    const { cx, selectedSource, conditionalPanelLocation, isPaused } = this.props;
     const { editor, contextMenu } = this.state;
 
     if (!selectedSource || !editor || !getDocument(selectedSource.id)) {
@@ -536,12 +527,7 @@ class Editor extends PureComponent {
           />
         }
         {conditionalPanelLocation ? <ConditionalPanel editor={editor} /> : null}
-
         <ColumnBreakpoints editor={editor} />
-
-        {isPaused && inlinePreviewEnabled ? (
-          <InlinePreviews editor={editor} selectedSource={selectedSource} />
-        ) : null}
       </div>
     );
   }
@@ -590,7 +576,6 @@ const mapStateToProps = state => {
     symbols: getSymbols(state, selectedSource),
     isPaused: getIsPaused(state),
     skipPausing: getSkipPausing(state),
-    inlinePreviewEnabled: getInlinePreview(state),
     selectedFrame: getSelectedFrame(state),
     framePositions: getFramePositions(state),
   };

@@ -106,14 +106,6 @@ const downloadFileItem = (selectedSource, selectedContent, editorActions) => ({
   click: () => downloadFile(selectedContent, getFilename(selectedSource)),
 });
 
-const inlinePreviewItem = editorActions => ({
-  id: "node-menu-inline-preview",
-  label: features.inlinePreview
-    ? L10N.getStr("inlinePreview.hide.label")
-    : L10N.getStr("inlinePreview.show.label"),
-  click: () => editorActions.toggleInlinePreview(!features.inlinePreview),
-});
-
 export function editorMenuItems({
   cx,
   editorActions,
@@ -152,8 +144,6 @@ export function editorMenuItems({
     );
   }
 
-  items.push({ type: "separator" }, inlinePreviewItem(editorActions));
-
   return items;
 }
 
@@ -167,7 +157,6 @@ export function editorItemActions(dispatch) {
       jumpToMappedLocation: actions.jumpToMappedLocation,
       showSource: actions.showSource,
       toggleBlackBox: actions.toggleBlackBox,
-      toggleInlinePreview: actions.toggleInlinePreview,
     },
     dispatch
   );

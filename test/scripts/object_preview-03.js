@@ -8,7 +8,6 @@
   await Test.findScopeNode("barprop2");
   await Test.waitForScopeValue("barprop1", "2");
 
-  await Test.checkInlinePreview("bararr", "Array(2) [ 5, 6 ]");
   await Test.waitForFrameTimeline("28%");
 
   await Test.checkFrames(2);
@@ -23,7 +22,6 @@
   //await Test.waitForInstantStep("stepOver");
   await Test.stepOverToLine(18);
 
-  await Test.checkInlinePreview("bararr", 'Array(3) [ 5, 6, "new" ]');
   await Test.waitForFrameTimeline("57%");
 
   // barobj is already expanded.
@@ -33,8 +31,6 @@
 
   //await Test.waitForInstantStep("reverseStepOver");
   await Test.reverseStepOverToLine(17);
-
-  await Test.checkInlinePreview("bararr", "Array(2) [ 5, 6 ]");
 
   await Test.toggleScopeNode("barobj");
   await Test.findScopeNode("barprop1");
