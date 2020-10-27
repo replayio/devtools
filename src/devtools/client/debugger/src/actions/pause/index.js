@@ -27,6 +27,5 @@ export { breakOnNext } from "./breakOnNext";
 export { selectFrame } from "./selectFrame";
 export { toggleSkipPausing, setSkipPausing } from "./skipPausing";
 export { setExpandedScope } from "./expandScopes";
-export { generateInlinePreview } from "./inlinePreview";
 export * from "./previewPausedLocation";
 export { setFramePositions } from "./setFramePositions";

@@ -5,7 +5,7 @@
 
   const msg = await Test.waitForMessage("click");
 
-  // The message's inline preview should contain useful properties.
+  // The message's preview should contain useful properties.
   const regexps = [
     /target: div#divvy/,
     /clientX: \d+/,

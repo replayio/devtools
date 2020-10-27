@@ -24,7 +24,6 @@ export const createUIState = () => ({
   orientation: "horizontal",
   viewport: null,
   cursorPosition: null,
-  inlinePreviewEnabled: features.inlinePreview,
 });
 
 function update(state = createUIState(), action) {
@@ -36,11 +35,6 @@ function update(state = createUIState(), action) {
     case "TOGGLE_FRAMEWORK_GROUPING": {
       prefs.frameworkGroupingOn = action.value;
       return { ...state, frameworkGroupingOn: action.value };
-    }
-
-    case "TOGGLE_INLINE_PREVIEW": {
-      features.inlinePreview = action.value;
-      return { ...state, inlinePreviewEnabled: action.value };
     }
 
     case "SET_ORIENTATION": {
@@ -162,10 +156,6 @@ export function getViewport(state) {
 
 export function getCursorPosition(state) {
   return state.ui.cursorPosition;
-}
-
-export function getInlinePreview(state) {
-  return state.ui.inlinePreviewEnabled;
 }
 
 export default update;

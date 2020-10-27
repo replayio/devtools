@@ -68,7 +68,6 @@ pref("devtools.debugger.features.xhr-breakpoints", true);
 pref("devtools.debugger.features.original-blackbox", true);
 pref("devtools.debugger.features.dom-mutation-breakpoints", true);
 pref("devtools.debugger.features.log-points", true);
-pref("devtools.debugger.features.inline-preview", true);
 pref("devtools.debugger.features.overlay-step-buttons", true);
 pref("devtools.debugger.features.watchpoints", true);
 pref("devtools.debugger.features.frame-step", true);
@@ -174,7 +173,6 @@ export const features = new PrefsHelper("devtools.debugger.features", {
   logPoints: ["Bool", "log-points"],
   commandClick: ["Bool", "command-click"],
   showOverlay: ["Bool", "overlay"],
-  inlinePreview: ["Bool", "inline-preview"],
   watchpoints: ["Bool", "watchpoints"],
   windowlessServiceWorkers: ["Bool", "windowless-service-workers"],
   frameStep: ["Bool", "frame-step"],

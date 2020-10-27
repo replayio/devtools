@@ -5,7 +5,6 @@
 //
 
 import { getSelectedFrame, getFrameScope } from "../../selectors";
-import { generateInlinePreview } from "./inlinePreview";
 import { PROMISE } from "../utils/middleware/promise";
 
 export function fetchScopes(cx) {
@@ -21,10 +20,6 @@ export function fetchScopes(cx) {
       thread: cx.thread,
       frame,
       [PROMISE]: client.getFrameScopes(frame),
-    });
-
-    scopes.then(() => {
-      dispatch(generateInlinePreview(cx, frame.id, frame.location));
     });
   };
 }

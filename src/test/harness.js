@@ -133,10 +133,6 @@ async function waitForLoadedScopes() {
   await waitUntil(() => scopes.querySelector('.tree-node[aria-level="2"]'));
 }
 
-async function waitForInlinePreviews() {
-  await waitUntil(() => dbgSelectors.getSelectedInlinePreviews());
-}
-
 function waitForSelectedSource(url) {
   const { getSelectedSourceWithContent, hasSymbols, getBreakableLines } = dbgSelectors;
 
@@ -378,24 +374,12 @@ async function executeInConsole(value) {
   window.jsterm._execute();
 }
 
-async function checkInlinePreview(name, text) {
-  await waitUntil(() => {
-    const previews = document.querySelectorAll(".inline-preview-outer");
-    return [...previews].some(p => {
-      const label = p.querySelector(".inline-preview-label");
-      const value = p.querySelector(".inline-preview-value");
-      return label.innerText.includes(name) && value.innerText.includes(text);
-    });
-  });
-}
-
 function waitForFrameTimeline(width) {
   return waitUntil(() => {
     const elem = document.querySelector(".frame-timeline-progress");
     return elem && elem.style.width == width;
   });
 }
-
 async function checkFrames(count) {
   return waitUntil(() => {
     const frames = dbgSelectors.getFrames();
@@ -580,7 +564,6 @@ const testCommands = {
   stepOutAndPause,
   hasFrames,
   waitForLoadedScopes,
-  waitForInlinePreviews,
   checkEvaluateInTopFrame,
   waitForScopeValue,
   toggleBlackboxSelectedSource,
@@ -597,7 +580,6 @@ const testCommands = {
   findScopeNode,
   toggleScopeNode,
   executeInConsole,
-  checkInlinePreview,
   waitForFrameTimeline,
   checkFrames,
   selectFrame,

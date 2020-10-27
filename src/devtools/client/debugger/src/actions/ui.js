@@ -67,15 +67,6 @@ export function toggleFrameworkGrouping(toggleValue) {
   };
 }
 
-export function toggleInlinePreview(toggleValue) {
-  return ({ dispatch, getState }) => {
-    dispatch({
-      type: "TOGGLE_INLINE_PREVIEW",
-      value: toggleValue,
-    });
-  };
-}
-
 export function showSource(cx, sourceId) {
   return ({ dispatch, getState }) => {
     const source = getSource(getState(), sourceId);

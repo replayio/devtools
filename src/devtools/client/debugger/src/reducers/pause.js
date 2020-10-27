@@ -45,7 +45,6 @@ const resumedPauseState = {
   selectedFrameId: null,
   executionPoint: null,
   why: null,
-  inlinePreview: {},
 };
 
 function update(state = createPauseState(), action) {
@@ -228,18 +227,6 @@ function update(state = createPauseState(), action) {
       return { ...state, expandedScopes };
     }
 
-    case "ADD_INLINE_PREVIEW": {
-      const { frameId, previews } = action;
-
-      return {
-        ...state,
-        inlinePreview: {
-          ...state.inlinePreview,
-          [frameId]: previews,
-        },
-      };
-    }
-
     case "BATCH":
       action.updates.forEach(u => (state = update(state, u)));
       return state;
@@ -365,24 +352,6 @@ export function getThreadExecutionPoint(state) {
 
 export function getSkipPausing(state) {
   return state.pause.skipPausing;
-}
-
-export function getInlinePreviews(state, frameId) {
-  return state.pause.inlinePreview[frameId];
-}
-
-export function getSelectedInlinePreviews(state) {
-  const frameId = getSelectedFrameId(state);
-  if (!frameId) {
-    return null;
-  }
-
-  return getInlinePreviews(state, frameId);
-}
-
-export function getInlinePreviewExpression(state, frameId, line, expression) {
-  const previews = state.pause.inlinePreview[frameId];
-  return previews && previews[line] && previews[line][expression];
 }
 
 export function getLastExpandedScopes(state) {
