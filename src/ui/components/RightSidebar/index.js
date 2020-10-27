@@ -3,33 +3,91 @@ import ReactDOM from "react-dom";
 import EventsTimeline from "./EventsTimeline";
 import Intercom from "./Intercom";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
-
+import classnames from "classnames";
 import "./RightSidebar.css";
+
+function Tooltip({ tooltip, drawerNode }) {
+  const top = tooltip.targetNode.top - drawerNode.getBoundingClientRect().top;
+
+  return (
+    <div className="tooltip" style={{ top: top }}>
+      {tooltip.name}
+    </div>
+  );
+}
+
+function Buttons({ setExpanded, expanded, tooltip, setTooltip }) {
+  const [commentButtonNode, setCommentButtonNode] = useState(null);
+  const [eventButtonNode, setEventButtonNode] = useState(null);
+  const [nextAction, setNextAction] = useState(null);
+
+  const handleMouseEnter = (node, name) => {
+    const target = node;
+    const id = setTimeout(() => {
+      setTooltip({ name, targetNode: target.getBoundingClientRect() });
+    }, 200);
+
+    clearTimeout(nextAction);
+    setNextAction(id);
+  };
+  const handleMouseLeave = e => {
+    const id = setTimeout(() => {
+      setTooltip(null);
+    }, 200);
+
+    clearTimeout(nextAction);
+    setNextAction(id);
+  };
+
+  return (
+    <div className="drawer-buttons">
+      <button
+        className={classnames({ expanded: expanded === "comments" })}
+        onClick={() => setExpanded(expanded === "comments" ? null : "comments")}
+        ref={node => setCommentButtonNode(node)}
+        onMouseEnter={() => handleMouseEnter(commentButtonNode, "Comments")}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="img comment-icon"></div>
+      </button>
+      <button
+        className={classnames({ expanded: expanded === "event-logpoints" })}
+        onClick={() => setExpanded(expanded === "event-logpoints" ? null : "event-logpoints")}
+        ref={node => setEventButtonNode(node)}
+        onMouseEnter={() => handleMouseEnter(eventButtonNode, "Event Logpoints")}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="img lightning"></div>
+      </button>
+    </div>
+  );
+}
+
+function Drawer({ setExpanded, expanded }) {
+  const [tooltip, setTooltip] = useState(null);
+  const [drawerNode, setDrawerNode] = useState(null);
+
+  return (
+    <div className="drawer" ref={node => setDrawerNode(node)}>
+      <Buttons
+        setExpanded={setExpanded}
+        expanded={expanded}
+        tooltip={tooltip}
+        setTooltip={setTooltip}
+      />
+      {tooltip ? <Tooltip tooltip={tooltip} drawerNode={drawerNode} /> : null}
+    </div>
+  );
+}
 
 export default function RightSidebar({}) {
   const [expanded, setExpanded] = useState(true);
+
   return (
     <div className="right-sidebar">
       {expanded === "comments" && <EventsTimeline expanded={expanded} />}
-      {expanded === "events" && <EventListeners />}
-      <div className="drawer">
-        <div className="buttons">
-          <button
-            className="comment-button-container"
-            onClick={() => setExpanded(expanded === "comments" ? null : "comments")}
-          >
-            <div className="img comment-icon"></div>
-          </button>
-          <button
-            className="comment-button-container"
-            onClick={() => setExpanded(expanded === "events" ? null : "events")}
-          >
-            <div className="img lightning"></div>
-          </button>
-        </div>
-
-        <Intercom />
-      </div>
+      {expanded === "event-logpoints" && <EventListeners />}
+      <Drawer setExpanded={setExpanded} expanded={expanded} />
     </div>
   );
 }
