@@ -103,7 +103,6 @@
     "navigate": false,
     "removeBreakpoint": false,
     "addBreakpoint": false,
-    "addExpression": false,
     "toggleCallStack": false,
     "toggleScopes": false,
     "isVisibleWithin": false,

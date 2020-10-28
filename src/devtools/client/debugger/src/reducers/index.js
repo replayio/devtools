@@ -9,7 +9,6 @@
  * @module reducers/index
  */
 
-import expressions from "./expressions";
 import sourceActors from "./source-actors";
 import sources from "./sources";
 import tabs from "./tabs";
@@ -29,7 +28,6 @@ import eventListenerBreakpoints from "./event-listeners";
 import { objectInspector } from "devtools-reps";
 
 export default {
-  expressions,
   sourceActors,
   sources,
   tabs,

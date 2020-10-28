@@ -227,22 +227,17 @@ const stepOverAndPause = resumeAndPauseFunctionFactory("stepOver");
 const stepInAndPause = resumeAndPauseFunctionFactory("stepIn");
 const stepOutAndPause = resumeAndPauseFunctionFactory("stepOut");
 
-async function ensureWatchpointsExpanded() {
-  const header = document.querySelector(".watch-expressions-pane ._header");
-  if (!header.querySelector(".expanded")) {
-    header.click();
-    await waitUntil(() => header.querySelector(".expanded"));
-  }
-}
-
 async function checkEvaluateInTopFrame(text, expected) {
-  await ensureWatchpointsExpanded();
-  await dbg.actions.addExpression(getThreadContext(), text);
+  selectConsole();
+  executeInConsole(text);
+
   await waitUntil(() => {
-    const node = document.querySelector(".watch-expressions-pane .object-node");
-    return node && node.innerText == `${text}: ${expected}`;
+    const node = document.querySelector(".message.result .objectBox");
+    return node?.innerText == `${expected}`;
   });
-  await dbg.actions.deleteExpression({ input: text });
+
+  document.querySelector(".devtools-clear-icon").click();
+  selectDebugger();
 }
 
 async function waitForScopeValue(name, value) {

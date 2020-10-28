@@ -117,12 +117,6 @@
  */
 
 /**
- * Expression
- * @memberof types
- * @static
- */
-
-/**
  * PreviewGrip
  * @memberof types
  * @static

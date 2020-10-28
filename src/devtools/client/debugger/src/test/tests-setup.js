@@ -88,7 +88,6 @@ beforeEach(async () => {
   evaluationsParser.clear();
   clearHistory();
   clearDocuments();
-  prefs.expressions = [];
 
   // Ensures window.dbg is there to track telemetry
   setupHelper({ selectors: {} });

@@ -22,7 +22,6 @@
   ["object_preview-01.js", "doc_rr_objects.html"],
   ["object_preview-02.js", "doc_rr_objects.html"],
   ["object_preview-03.js", "doc_rr_preview.html"],
-  ["object_preview-04.js", "doc_rr_preview_bundle.html"],
   ["object_preview-05.js", "doc_prod_bundle.html"],
   ["worker-01.js", "doc_rr_worker.html"],
   ["inspector-01.js", "doc_inspector_basic.html"],

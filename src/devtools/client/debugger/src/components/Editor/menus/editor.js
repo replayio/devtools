@@ -86,13 +86,6 @@ const blackBoxMenuItem = (cx, selectedSource, editorActions) => ({
   click: () => editorActions.toggleBlackBox(cx, selectedSource),
 });
 
-const watchExpressionItem = (cx, selectedSource, selectionText, editorActions) => ({
-  id: "node-menu-add-watch-expression",
-  label: L10N.getStr("expressions.label"),
-  accesskey: L10N.getStr("expressions.accesskey"),
-  click: () => editorActions.addExpression(cx, selectionText),
-});
-
 const evaluateInConsoleItem = (selectedSource, selectionText, editorActions) => ({
   id: "node-menu-evaluate-in-console",
   label: L10N.getStr("evaluateInConsole.label"),
@@ -139,7 +132,6 @@ export function editorMenuItems({
   if (isTextSelected) {
     items.push(
       { type: "separator" },
-      watchExpressionItem(cx, selectedSource, selectionText, editorActions),
       evaluateInConsoleItem(selectedSource, selectionText, editorActions)
     );
   }
@@ -150,7 +142,6 @@ export function editorMenuItems({
 export function editorItemActions(dispatch) {
   return bindActionCreators(
     {
-      addExpression: actions.addExpression,
       continueToHere: actions.continueToHere,
       evaluateInConsole: actions.evaluateInConsole,
       flashLineRange: actions.flashLineRange,

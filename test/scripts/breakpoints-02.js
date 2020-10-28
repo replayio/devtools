@@ -4,9 +4,9 @@
 
   await Test.rewindToLine(21);
   await Test.checkEvaluateInTopFrame("number", 10);
-  await Test.checkEvaluateInTopFrame("dump(3)", `"Evaluation failed"`);
+  await Test.checkEvaluateInTopFrame("dump(3)", `"Error: Evaluation failed"`);
   await Test.checkEvaluateInTopFrame("number", 10);
-  await Test.checkEvaluateInTopFrame("dump(3)", `"Evaluation failed"`);
+  await Test.checkEvaluateInTopFrame("dump(3)", `"Error: Evaluation failed"`);
   await Test.checkEvaluateInTopFrame("number", 10);
   await Test.checkEvaluateInTopFrame("testStepping2()", undefined);
 
