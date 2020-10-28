@@ -16,7 +16,6 @@ import {
   getIsWaitingOnBreak,
   getPauseCommand,
   getSelectedFrame,
-  getShouldLogExceptions,
   getThreadContext,
   getSourceFromId,
   getSkipPausing,
@@ -158,15 +157,11 @@ class SecondaryPanes extends Component {
   }
 
   getBreakpointsItem() {
-    const { shouldLogExceptions, logExceptions } = this.props;
-
     return {
       header: L10N.getStr("breakpoints.header"),
       className: "breakpoints-pane",
       buttons: [this.renderBreakpointsToggle()],
-      component: (
-        <Breakpoints shouldLogExceptions={shouldLogExceptions} logExceptions={logExceptions} />
-      ),
+      component: <Breakpoints />,
       opened: prefs.breakpointsVisible,
       onToggle: opened => {
         prefs.breakpointsVisible = opened;
@@ -277,7 +272,6 @@ const mapStateToProps = state => {
     isWaitingOnBreak: getIsWaitingOnBreak(state),
     renderWhyPauseDelay: getRenderWhyPauseDelay(state),
     selectedFrame,
-    shouldLogExceptions: getShouldLogExceptions(state),
     skipPausing: getSkipPausing(state),
     source: selectedFrame && getSourceFromId(state, selectedFrame.location.sourceId),
   };
@@ -285,7 +279,6 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   toggleAllBreakpoints: actions.toggleAllBreakpoints,
-  logExceptions: actions.logExceptions,
   breakOnNext: actions.breakOnNext,
   toggleEventLogging: actions.toggleEventLogging,
 })(SecondaryPanes);

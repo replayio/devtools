@@ -54,3 +54,22 @@
   background: var(--theme-icon-color);
   transition: 200ms;
 }
+
+.right-sidebar .logpoints {
+  width: 300px;
+}
+
+.right-sidebar .logpoints .pane-header {
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  margin: 20px 20px 12px 20px;
+}
+
+.right-sidebar .logpoints .pane-header > *:not(:last-child) {
+  margin-right: 4px;
+}
+
+.right-sidebar .logpoints input[type="checkbox"] {
+  margin-right: 4px;
+}

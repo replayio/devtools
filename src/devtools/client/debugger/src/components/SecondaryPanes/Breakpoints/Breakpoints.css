@@ -134,6 +134,7 @@ html .breakpoints-list .breakpoint.paused {
 
 .breakpoint-line-close {
   margin-inline-start: 4px;
+  position: relative;
 }
 
 .breakpoints-list .breakpoint .breakpoint-line {
@@ -194,14 +195,7 @@ html .breakpoints-list .breakpoint.paused {
   position: absolute;
   /* hide button outside of row until hovered or focused */
   top: -100px;
-}
-
-[dir="ltr"] .breakpoint .close-btn {
-  right: 12px;
-}
-
-[dir="rtl"] .breakpoint .close-btn {
-  left: 12px;
+  right: 0px;
 }
 
 /* Reveal the remove button on hover/focus */

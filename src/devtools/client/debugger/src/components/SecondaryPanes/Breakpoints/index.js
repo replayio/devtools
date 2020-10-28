@@ -18,7 +18,11 @@ import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 
 import { makeBreakpointId, sortSelectedBreakpoints } from "../../../utils/breakpoint";
 
-import { getSelectedSource, getBreakpointSources } from "../../../selectors";
+import {
+  getSelectedSource,
+  getBreakpointSources,
+  getShouldLogExceptions,
+} from "../../../selectors";
 
 import "./Breakpoints.css";
 
@@ -66,7 +70,7 @@ class Breakpoints extends Component {
   }
 
   renderBreakpoints() {
-    const { breakpointSources, selectedSource } = this.props;
+    const { breakpointSources, selectedSource, sidebar } = this.props;
     if (!breakpointSources.length) {
       return null;
     }
@@ -96,18 +100,33 @@ class Breakpoints extends Component {
   }
 
   render() {
-    return (
+    const pane = (
       <div className="pane">
         {this.renderExceptionsOptions()}
         {this.renderBreakpoints()}
       </div>
     );
+
+    if (this.props.sidebar) {
+      return (
+        <div className="logpoints">
+          <div className="pane-header">
+            <div className="img logpoint" />
+            <div className="pane-header-content">Logpoints</div>
+          </div>
+          {pane}
+        </div>
+      );
+    }
+
+    return pane;
   }
 }
 
 const mapStateToProps = state => ({
   breakpointSources: getBreakpointSources(state),
   selectedSource: getSelectedSource(state),
+  shouldLogExceptions: getShouldLogExceptions(state),
 });
 
 export default connect(mapStateToProps, {
