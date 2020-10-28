@@ -159,10 +159,12 @@ class FilterBar extends Component {
   }
 
   renderClearButton() {
+    const { messagesClearEvaluations } = this.props;
+
     return dom.button({
       className: "devtools-button devtools-clear-icon",
       title: l10n.getStr("webconsole.clearButton.tooltip"),
-      onClick: () => this.props.messagesClearEvaluations(),
+      onClick: messagesClearEvaluations,
     });
   }
 
@@ -216,7 +218,7 @@ class FilterBar extends Component {
   }
 
   renderSearchBox() {
-    const { filteredMessagesCount } = this.props;
+    const { filteredMessagesCount, filterTextSet } = this.props;
 
     let searchBoxSummary;
     let searchBoxSummaryTooltip;
@@ -348,9 +350,9 @@ function mapStateToProps(state) {
   };
 }
 
-module.exports = connect(mapStateToProps, () => ({
+module.exports = connect(mapStateToProps, {
   closeSplitConsole: actions.closeSplitConsole,
   filterBarDisplayModeSet: actions.filterBarDisplayModeSet,
   messagesClearEvaluations: actions.messagesClearEvaluations,
   filterTextSet: actions.filterTextSet,
-}))(FilterBar);
+})(FilterBar);
