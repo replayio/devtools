@@ -65,6 +65,7 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
       defaultTitle={recordingTitle || title}
       setEditingTitle={setEditingTitle}
       editingTitle={editingTitle}
+      recordingId={recordingId}
     />
   );
 }
