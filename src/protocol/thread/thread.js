@@ -249,9 +249,7 @@ export const ThreadFront = {
     }
     const scriptIds = this._chooseScriptIdList(scripts);
     return Promise.all(
-      scriptIds.map(({ scriptId }) => {
-        this.setBreakpoint(scriptId, line, column, condition);
-      })
+      scriptIds.map(({ scriptId }) => this.setBreakpoint(scriptId, line, column, condition))
     );
   },
 
@@ -273,9 +271,7 @@ export const ThreadFront = {
     }
     const scriptIds = this._chooseScriptIdList(scripts);
     return Promise.all(
-      scriptIds.map(({ scriptId }) => {
-        this.removeBreakpoint(scriptId, line, column);
-      })
+      scriptIds.map(({ scriptId }) => this.removeBreakpoint(scriptId, line, column))
     );
   },
 
@@ -514,14 +510,14 @@ export const ThreadFront = {
     return this._findResumeTarget(point, "Debugger.findResumeTarget");
   },
 
-  async blackbox(scriptId, begin, end) {
-    this._invalidateResumeTargets(async () => {
+  blackbox(scriptId, begin, end) {
+    return this._invalidateResumeTargets(async () => {
       await sendMessage("Debugger.blackboxScript", { scriptId, begin, end }, this.sessionId);
     });
   },
 
-  async unblackbox(scriptId, begin, end) {
-    this._invalidateResumeTargets(async () => {
+  unblackbox(scriptId, begin, end) {
+    return this._invalidateResumeTargets(async () => {
       await sendMessage("Debugger.unblackboxScript", { scriptId, begin, end }, this.sessionId);
     });
   },
