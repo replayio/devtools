@@ -34,6 +34,7 @@ const {
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
+const { DevToolsToolbox } = require("ui/utils/devtools-toolbox");
 const { prefs } = require("ui/utils/prefs");
 
 // Create a session to use while debugging.
@@ -100,7 +101,7 @@ async function initialize() {
 }
 
 (async () => {
-  window.gToolbox = null;
+  window.gToolbox = new DevToolsToolbox();
   store = await bootstrapApp({}, { recordingId });
 
   if (!initialized) {

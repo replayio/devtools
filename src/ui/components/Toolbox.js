@@ -1,24 +1,14 @@
 import React from "react";
-
-import { EventEmitter } from "protocol/utils";
 import classnames from "classnames";
-
-import Selection from "devtools/client/framework/selection";
-import { log } from "protocol/socket";
-import { defer } from "protocol/utils";
-import Highlighter from "highlighter/highlighter";
-import DebuggerApp from "devtools/client/debugger/src/components/App";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import { DebuggerPanel } from "devtools/client/debugger/panel";
-import { WebConsolePanel } from "devtools/client/webconsole/panel";
-import { InspectorPanel } from "devtools/client/inspector/panel";
+
+import DebuggerApp from "devtools/client/debugger/src/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 
 import Timeline from "./Timeline";
 import NodePicker from "./NodePicker";
-import { ThreadFront } from "protocol/thread";
 import { connect } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
@@ -32,92 +22,15 @@ import "./Toolbox.css";
 const shortcuts = new KeyShortcuts({ window, target: document });
 
 class Toolbox extends React.Component {
-  state = {
-    panels: {},
-  };
-
-  threadFront = ThreadFront;
-  selection = new Selection();
-
-  panelWaiters = {};
-
-  constructor(props) {
-    super(props);
-    EventEmitter.decorate(this);
-
-    window.gToolbox = this;
-  }
-
   async componentDidMount() {
     const { selectedPanel } = this.props;
+    await gToolbox.init(selectedPanel);
 
-    this.threadFront.initializeToolbox();
-    // Open the console so that the timeline gets events
-    this.startPanel("console");
-    this.selectTool(selectedPanel);
     shortcuts.on("Esc", this.onEscape);
   }
 
   get currentTool() {
     return this.props.selectedPanel;
-  }
-
-  async startPanel(name) {
-    if (this.panelWaiters[name]) {
-      return this.panelWaiters[name];
-    }
-
-    const { promise, resolve } = defer();
-    this.panelWaiters[name] = promise;
-
-    const panels = {
-      debugger: DebuggerPanel,
-      console: WebConsolePanel,
-      inspector: InspectorPanel,
-    };
-
-    const panel = new panels[name](this);
-    await panel.open();
-
-    this.setState({ panels: { ...this.state.panels, [name]: panel } });
-    resolve(panel);
-    return panel;
-  }
-
-  getOrStartPanel(name) {
-    return this.getPanel(name) || this.startPanel(name);
-  }
-
-  async selectTool(name) {
-    const { selectedPanel, setSelectedPanel } = this.props;
-    let panel = this.state.panels[name];
-
-    if (panel && name == selectedPanel) {
-      return panel;
-    }
-
-    log(`Toolbox SelectTool ${name}`);
-    setSelectedPanel(name);
-
-    if (!panel) {
-      panel = await this.startPanel(name);
-    }
-
-    if (panel.refresh) {
-      panel.refresh();
-    }
-
-    this.emit("select", name);
-    return panel;
-  }
-
-  async viewSourceInDebugger(url, line, column, id) {
-    const dbg = this.getPanel("debugger");
-    const source = id ? dbg.getSourceByActorId(id) : dbg.getSourceByURL(url);
-    if (source) {
-      this.selectTool("debugger");
-      dbg.selectSource(source.id, line, column);
-    }
   }
 
   onEscape = e => {
@@ -128,28 +41,20 @@ class Toolbox extends React.Component {
     this.toggleSplitConsole(!this.props.splitConsoleOpen);
   };
 
-  getPanel(name) {
-    return this.state.panels[name];
-  }
-
   toggleSplitConsole(open) {
     this.props.setSplitConsole(open);
   }
 
-  getHighlighter() {
-    return Highlighter;
-  }
-
   renderTimeline() {
-    if (!this.getPanel("console")) {
+    if (!gToolbox.getPanel("console")) {
       return null;
     }
 
-    return <Timeline toolbox={this} />;
+    return <Timeline />;
   }
 
   renderInspector() {
-    const inspector = this.getPanel("inspector");
+    const inspector = gToolbox.getPanel("inspector");
     let markupView;
     let rulesPanel;
     let layoutPanel;
@@ -231,13 +136,13 @@ class Toolbox extends React.Component {
 
     return (
       <div id="toolbox-toolbar">
-        <NodePicker toolbox={this} />
+        <NodePicker />
         <div
           className={classnames("toolbar-panel-button", {
             active: selectedPanel == "inspector",
           })}
           id="toolbox-toolbar-inspector"
-          onClick={() => this.selectTool("inspector")}
+          onClick={() => gToolbox.selectTool("inspector")}
         >
           <div className="toolbar-panel-icon"></div>
           Elements
@@ -247,7 +152,7 @@ class Toolbox extends React.Component {
             active: selectedPanel == "debugger",
           })}
           id="toolbox-toolbar-debugger"
-          onClick={() => this.selectTool("debugger")}
+          onClick={() => gToolbox.selectTool("debugger")}
         >
           <div className="toolbar-panel-icon"></div>
           Sources
@@ -257,7 +162,7 @@ class Toolbox extends React.Component {
             active: selectedPanel == "console",
           })}
           id="toolbox-toolbar-console"
-          onClick={() => this.selectTool("console")}
+          onClick={() => gToolbox.selectTool("console")}
         >
           <div className="toolbar-panel-icon"></div>
           Console
