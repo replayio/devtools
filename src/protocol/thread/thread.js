@@ -341,7 +341,7 @@ export const ThreadFront = {
   },
 
   async evaluate(asyncIndex, frameId, text) {
-    const pause = this.pauseForAsyncIndex();
+    const pause = this.pauseForAsyncIndex(asyncIndex);
     const rv = await pause.evaluate(frameId, text);
     if (rv.returned) {
       rv.returned = new ValueFront(pause, rv.returned);
