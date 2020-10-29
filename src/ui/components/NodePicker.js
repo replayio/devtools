@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { EventEmitter } from "protocol/utils";
 import classnames from "classnames";
 import { ThreadFront } from "protocol/thread";
@@ -15,6 +14,8 @@ export default class NodePicker extends React.Component {
   constructor(props) {
     super(props);
     EventEmitter.decorate(nodePicker);
+
+    // Used in the test harness for picking a node.
     gToolbox.nodePicker = this;
   }
 
@@ -23,7 +24,6 @@ export default class NodePicker extends React.Component {
   }
 
   async clickNodePickerButton() {
-    const { toolbox } = this.props;
     const { nodePickerActive } = this.state;
     if (nodePickerActive) {
       // The node picker mousedown listener will take care of deactivation.
@@ -91,15 +91,12 @@ export default class NodePicker extends React.Component {
   };
 
   nodePickerMouseClick = e => {
-    const { toolbox } = this.props;
-
     this.nodePickerMouseClickInCanvas(this.mouseEventCanvasPosition(e));
-    toolbox.selectTool("inspector");
+    gToolbox.selectTool("inspector");
   };
 
   // This is exposed separately for use in testing.
   async nodePickerMouseClickInCanvas(pos) {
-    const { toolbox } = this.props;
     this.setState({ nodePickerActive: false });
     this.removeNodePickerListeners();
     this.nodePickerRemoveTime = Date.now();
@@ -109,7 +106,7 @@ export default class NodePicker extends React.Component {
       this.getHighlighter().highlight(nodeBounds);
       const node = await ThreadFront.ensureNodeLoaded(nodeBounds.nodeId);
       if (node && this.getHighlighter().currentNode == nodeBounds) {
-        toolbox.selection.setNodeFront(node);
+        gToolbox.selection.setNodeFront(node);
       }
     } else {
       this.getHighlighter().unhighlight();
