@@ -11,7 +11,6 @@ import { connect } from "react-redux";
 import { Component } from "react";
 import React from "react";
 import dom from "react-dom-factories";
-import PropTypes from "prop-types";
 import { log } from "protocol/socket";
 
 import CommandButton from "./CommandButton";
@@ -63,13 +62,6 @@ function getMessageLocation(message) {
 //const UserComment = `User #${(Math.random() * 100) | 0}`;
 
 export class Timeline extends Component {
-  static get propTypes() {
-    return {
-      toolbox: PropTypes.object,
-      console: PropTypes.object,
-    };
-  }
-
   state = {
     comments: [],
     numResizes: 0,
@@ -77,7 +69,9 @@ export class Timeline extends Component {
   };
 
   async componentDidMount() {
+    // Used in the test harness for starting playback recording.
     gToolbox.timeline = this;
+
     this.props.updateTimelineDimensions();
 
     this.toolbox.on("message-hover", this.onConsoleMessageHover);
@@ -90,7 +84,7 @@ export class Timeline extends Component {
   }
 
   get toolbox() {
-    return this.props.toolbox;
+    return gToolbox;
   }
 
   get debugger() {
