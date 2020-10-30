@@ -60,7 +60,7 @@
 }
 
 .sources-list .tree .focused .label {
-  color: #fff;
+  color: #ffffff;
 }
 
 /* Use the same width as .img.arrow */
@@ -101,7 +101,6 @@
 }
 
 .sources-panel .outline {
-  display: flex;
   height: 100%;
 }
 
