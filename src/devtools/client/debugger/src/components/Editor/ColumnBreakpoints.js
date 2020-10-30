@@ -5,7 +5,6 @@
 //
 
 import React, { Component } from "react";
-import { bindActionCreators } from "redux";
 import ColumnBreakpoint from "./ColumnBreakpoint";
 
 import { getSelectedSource, visibleColumnBreakpoints, getContext } from "../../selectors";
@@ -46,4 +45,4 @@ const mapStateToProps = state => ({
   columnBreakpoints: visibleColumnBreakpoints(state),
 });
 
-export default connect(mapStateToProps, null)(ColumnBreakpoints);
+export default connect(mapStateToProps)(ColumnBreakpoints);

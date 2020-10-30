@@ -36,12 +36,9 @@ class Breakpoints extends Component {
   }
 }
 
-export default connect(
-  state => ({
-    // Retrieves only the first breakpoint per line so that the
-    // breakpoint marker represents only the first breakpoint
-    breakpoints: getFirstVisibleBreakpoints(state),
-    selectedSource: getSelectedSource(state),
-  }),
-  null
-)(Breakpoints);
+export default connect(state => ({
+  // Retrieves only the first breakpoint per line so that the
+  // breakpoint marker represents only the first breakpoint
+  breakpoints: getFirstVisibleBreakpoints(state),
+  selectedSource: getSelectedSource(state),
+}))(Breakpoints);

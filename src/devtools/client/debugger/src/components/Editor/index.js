@@ -18,6 +18,7 @@ import { features } from "../../utils/prefs";
 import { getIndentation } from "../../utils/indentation";
 
 import { showMenu } from "devtools-contextmenu";
+import { continueToHereItem, editorItemActions } from "./menus/editor";
 
 import {
   getActiveSearch,
@@ -311,6 +312,12 @@ class Editor extends PureComponent {
 
     const location = { line, column: undefined, sourceId };
 
+    if (target.classList.contains("CodeMirror-linenumber")) {
+      const disabled = !isPaused || !framePositions;
+
+      return showMenu(event, [continueToHereItem(cx, location, disabled, editorActions)]);
+    }
+
     if (target.getAttribute("id") === "columnmarker") {
       return;
     }
@@ -349,6 +356,10 @@ class Editor extends PureComponent {
     const sourceLine = toSourceLine(selectedSource.id, line);
     if (typeof sourceLine !== "number") {
       return;
+    }
+
+    if (ev.metaKey) {
+      return continueToHere(cx, { line: sourceLine });
     }
 
     return addBreakpointAtLine(cx, sourceLine, ev.altKey, ev.shiftKey);
@@ -566,6 +577,7 @@ const mapDispatchToProps = dispatch => ({
     {
       openConditionalPanel: actions.openConditionalPanel,
       closeConditionalPanel: actions.closeConditionalPanel,
+      continueToHere: actions.continueToHere,
       toggleBreakpointAtLine: actions.toggleBreakpointAtLine,
       addBreakpointAtLine: actions.addBreakpointAtLine,
       jumpToMappedLocation: actions.jumpToMappedLocation,
@@ -577,6 +589,7 @@ const mapDispatchToProps = dispatch => ({
     },
     dispatch
   ),
+  editorActions: editorItemActions(dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Editor);
