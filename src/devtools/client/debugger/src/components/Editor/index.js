@@ -19,8 +19,6 @@ import { getIndentation } from "../../utils/indentation";
 
 import { showMenu } from "devtools-contextmenu";
 
-import { editorItemActions } from "./menus/editor";
-
 import {
   getActiveSearch,
   getSelectedLocation,
@@ -579,7 +577,6 @@ const mapDispatchToProps = dispatch => ({
     },
     dispatch
   ),
-  editorActions: editorItemActions(dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Editor);

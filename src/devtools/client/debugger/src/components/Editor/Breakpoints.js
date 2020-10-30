@@ -9,7 +9,6 @@ import Breakpoint from "./Breakpoint";
 import { getSelectedSource, getFirstVisibleBreakpoints } from "../../selectors";
 import { makeBreakpointId } from "../../utils/breakpoint";
 import { connect } from "../../utils/connect";
-import { editorItemActions } from "./menus/editor";
 
 class Breakpoints extends Component {
   render() {
@@ -29,7 +28,6 @@ class Breakpoints extends Component {
               breakpoint={bp}
               selectedSource={selectedSource}
               editor={editor}
-              editorActions={editorActions}
             />
           );
         })}
@@ -45,7 +43,5 @@ export default connect(
     breakpoints: getFirstVisibleBreakpoints(state),
     selectedSource: getSelectedSource(state),
   }),
-  dispatch => ({
-    editorActions: editorItemActions(dispatch),
-  })
+  null
 )(Breakpoints);

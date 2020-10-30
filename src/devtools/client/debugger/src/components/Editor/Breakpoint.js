@@ -49,7 +49,6 @@ class Breakpoint extends PureComponent {
   onClick = event => {
     const {
       cx,
-      editorActions,
       breakpoint,
       selectedSource,
       toggleBreakpointsAtLine,
