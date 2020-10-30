@@ -56,6 +56,8 @@ export class WebConsole {
   }
 
   async init() {
+    this.outputNode = this.document.getElementById("toolbox-content-console");
+
     const store = configureStore(this, {
       thunkArgs: {
         hud: this,
@@ -67,7 +69,7 @@ export class WebConsole {
     renderApp({
       app: App(),
       store,
-      root: document.getElementById("toolbox-content-console"),
+      root: this.outputNode,
     });
 
     setupConsoleHelper({ store, selectors, actions });
