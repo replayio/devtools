@@ -120,6 +120,10 @@ export class ConditionalPanel extends PureComponent {
     }
     const { location, editor } = props;
 
+    if (!location) {
+      throw new Error("Conditional panel location needed.");
+    }
+
     const editorLine = toEditorLine(location.sourceId, location.line || 0);
     this.cbPanel = editor.codeMirror.addLineWidget(editorLine, this.renderConditionalPanel(props), {
       coverGutter: true,
@@ -211,15 +215,9 @@ export class ConditionalPanel extends PureComponent {
 const mapStateToProps = state => {
   const location = getConditionalPanelLocation(state);
 
-  if (!location) {
-    throw new Error("Conditional panel location needed.");
-  }
-
-  const breakpoint = getClosestBreakpoint(state, location);
-
   return {
     cx: getContext(state),
-    breakpoint,
+    breakpoint: getClosestBreakpoint(state, location),
     location,
     log: getLogPointStatus(state),
   };
