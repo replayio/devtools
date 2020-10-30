@@ -117,9 +117,6 @@ export function editorMenuItems({
       : null;
 
   items.push(
-    jumpToMappedLocationItem(cx, selectedSource, location, hasMappedLocation, editorActions),
-    continueToHereItem(cx, location, isPaused, editorActions),
-    { type: "separator" },
     ...(content ? [copyToClipboardItem(content, editorActions)] : []),
     copySourceItem(selectedSource, selectionText, editorActions),
     copySourceUri2Item(selectedSource, editorActions),

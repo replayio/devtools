@@ -6,11 +6,10 @@
 
 import React, { PureComponent } from "react";
 import classnames from "classnames";
-
+import { connect } from "../../utils/connect";
+import actions from "../../actions";
 import { getDocument, toEditorLine } from "../../utils/editor";
 import { features } from "../../utils/prefs";
-import { showMenu } from "devtools-contextmenu";
-import { breakpointItems } from "./menus/breakpoints";
 import Panel from "devtools/client/debugger/src/components/Editor/Panel";
 
 const breakpointSvg = document.createElement("div");
@@ -48,7 +47,14 @@ class Breakpoint extends PureComponent {
   }
 
   onClick = event => {
-    const { cx, breakpointActions, editorActions, breakpoint, selectedSource } = this.props;
+    const {
+      cx,
+      breakpoint,
+      selectedSource,
+      toggleBreakpointsAtLine,
+      toggleDisabledBreakpoint,
+      removeBreakpointsAtLine,
+    } = this.props;
 
     // ignore right clicks
     if ((event.ctrlKey && event.button === 0) || event.button === 2) {
@@ -59,36 +65,23 @@ class Breakpoint extends PureComponent {
     event.preventDefault();
 
     const selectedLocation = breakpoint.location;
-    if (event.metaKey) {
-      return editorActions.continueToHere(cx, selectedLocation);
-    }
 
     if (event.shiftKey) {
       if (features.columnBreakpoints) {
-        return breakpointActions.toggleBreakpointsAtLine(
-          cx,
-          !breakpoint.disabled,
-          selectedLocation.line
-        );
+        return toggleBreakpointsAtLine(cx, !breakpoint.disabled, selectedLocation.line);
       }
 
-      return breakpointActions.toggleDisabledBreakpoint(cx, breakpoint);
+      return toggleDisabledBreakpoint(cx, breakpoint);
     }
 
-    return breakpointActions.removeBreakpointsAtLine(
-      cx,
-      selectedLocation.sourceId,
-      selectedLocation.line
-    );
+    return removeBreakpointsAtLine(cx, selectedLocation.sourceId, selectedLocation.line);
   };
 
   onContextMenu = event => {
-    const { cx, breakpoint, selectedSource, breakpointActions } = this.props;
     event.stopPropagation();
     event.preventDefault();
-    const selectedLocation = breakpoint.location;
 
-    showMenu(event, breakpointItems(cx, breakpoint, selectedLocation, breakpointActions));
+    return;
   };
 
   addBreakpoint(props) {
@@ -158,4 +151,8 @@ class Breakpoint extends PureComponent {
   }
 }
 
-export default Breakpoint;
+export default connect(null, {
+  toggleBreakpointsAtLine: actions.toggleBreakpointsAtLine,
+  toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
+  removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
+})(Breakpoint);
