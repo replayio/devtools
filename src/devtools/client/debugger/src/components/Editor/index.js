@@ -18,7 +18,7 @@ import { features } from "../../utils/prefs";
 import { getIndentation } from "../../utils/indentation";
 
 import { showMenu } from "devtools-contextmenu";
-import { createBreakpointItems, breakpointItemActions } from "./menus/breakpoints";
+import { breakpointItemActions } from "./menus/breakpoints";
 
 import { editorItemActions } from "./menus/editor";
 
@@ -318,11 +318,11 @@ class Editor extends PureComponent {
     // Bail here so the user doesn't open the default context menu editor
     // when they click on a line in the gutter.
     if (target.classList.contains("CodeMirror-linenumber")) {
-      const lineText = getLineText(sourceId, selectedSource.content, line).trim();
-      const disabled = !isPaused || !framePositions;
+      // const lineText = getLineText(sourceId, selectedSource.content, line).trim();
+      // const disabled = !isPaused || !framePositions;
 
-      return showMenu(event, [...createBreakpointItems(cx, location, breakpointActions, lineText)]);
-      // return;
+      // return showMenu(event, [...createBreakpointItems(cx, location, breakpointActions, lineText)]);
+      return;
     }
 
     if (target.getAttribute("id") === "columnmarker") {

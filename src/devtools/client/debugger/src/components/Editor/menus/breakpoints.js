@@ -9,15 +9,6 @@ import { bindActionCreators } from "redux";
 import { features } from "../../../utils/prefs";
 import { formatKeyShortcut } from "../../../utils/text";
 
-export const addBreakpointItem = (cx, location, breakpointActions) => ({
-  id: "node-menu-add-breakpoint",
-  label: L10N.getStr("editor.addBreakpoint"),
-  accesskey: L10N.getStr("shortcuts.toggleBreakpoint.accesskey"),
-  disabled: false,
-  click: () => breakpointActions.addBreakpoint(cx, location),
-  accelerator: formatKeyShortcut(L10N.getStr("toggleBreakpoint.key")),
-});
-
 export const removeBreakpointItem = (cx, breakpoint, breakpointActions) => ({
   id: "node-menu-remove-breakpoint",
   label: L10N.getStr("editor.removeBreakpoint"),
@@ -25,15 +16,6 @@ export const removeBreakpointItem = (cx, breakpoint, breakpointActions) => ({
   disabled: false,
   click: () => breakpointActions.removeBreakpoint(cx, breakpoint),
   accelerator: formatKeyShortcut(L10N.getStr("toggleBreakpoint.key")),
-});
-
-export const addConditionalBreakpointItem = (location, breakpointActions) => ({
-  id: "node-menu-add-conditional-breakpoint",
-  label: L10N.getStr("editor.addConditionBreakpoint"),
-  accelerator: formatKeyShortcut(L10N.getStr("toggleCondPanel.breakpoint.key")),
-  accesskey: L10N.getStr("editor.addConditionBreakpoint.accesskey"),
-  disabled: false,
-  click: () => breakpointActions.openConditionalPanel(location),
 });
 
 export const editConditionalBreakpointItem = (location, breakpointActions) => ({
@@ -50,18 +32,8 @@ export const conditionalBreakpointItem = (breakpoint, location, breakpointAction
     options: { condition },
   } = breakpoint;
   return condition
-    ? editConditionalBreakpointItem(location, breakpointActions)
-    : addConditionalBreakpointItem(location, breakpointActions);
+    ? editConditionalBreakpointItem(location, breakpointActions) : null;
 };
-
-export const addLogPointItem = (location, breakpointActions) => ({
-  id: "node-menu-add-log-point",
-  label: L10N.getStr("editor.addLogPoint"),
-  accesskey: L10N.getStr("editor.addLogPoint.accesskey"),
-  disabled: false,
-  click: () => breakpointActions.openConditionalPanel(location, true),
-  accelerator: formatKeyShortcut(L10N.getStr("toggleCondPanel.logPoint.key")),
-});
 
 export const editLogPointItem = (location, breakpointActions) => ({
   id: "node-menu-edit-log-point",
@@ -98,31 +70,6 @@ export const toggleDisabledBreakpointItem = (cx, breakpoint, breakpointActions) 
   };
 };
 
-export const toggleDbgStatementItem = (cx, location, breakpointActions, breakpoint) => {
-  if (breakpoint && breakpoint.options.condition === "false") {
-    return {
-      disabled: false,
-      id: "node-menu-enable-dbgStatement",
-      label: L10N.getStr("breakpointMenuItem.enabledbg.label"),
-      click: () =>
-        breakpointActions.setBreakpointOptions(cx, location, {
-          ...breakpoint.options,
-          condition: null,
-        }),
-    };
-  }
-
-  return {
-    disabled: false,
-    id: "node-menu-disable-dbgStatement",
-    label: L10N.getStr("breakpointMenuItem.disabledbg.label"),
-    click: () =>
-      breakpointActions.setBreakpointOptions(cx, location, {
-        condition: "false",
-      }),
-  };
-};
-
 export function breakpointItems(cx, breakpoint, selectedLocation, breakpointActions) {
   const items = [
     removeBreakpointItem(cx, breakpoint, breakpointActions),
@@ -130,10 +77,7 @@ export function breakpointItems(cx, breakpoint, selectedLocation, breakpointActi
   ];
 
   if (breakpoint.originalText.startsWith("debugger")) {
-    items.push(
-      { type: "separator" },
-      toggleDbgStatementItem(cx, selectedLocation, breakpointActions, breakpoint)
-    );
+    items.push({ type: "separator" });
   }
 
   items.push(
@@ -151,21 +95,6 @@ export function breakpointItems(cx, breakpoint, selectedLocation, breakpointActi
   return items;
 }
 
-export function createBreakpointItems(cx, location, breakpointActions, lineText) {
-  const items = [
-    addBreakpointItem(cx, location, breakpointActions),
-    addConditionalBreakpointItem(location, breakpointActions),
-  ];
-
-  if (features.logPoints) {
-    items.push(addLogPointItem(location, breakpointActions));
-  }
-
-  if (lineText && lineText.startsWith("debugger")) {
-    items.push(toggleDbgStatementItem(cx, location, breakpointActions));
-  }
-  return items;
-}
 
 // ToDo: Only enable if there are more than one breakpoints on a line?
 export const removeBreakpointsOnLineItem = (cx, location, breakpointActions) => ({
@@ -195,7 +124,6 @@ export const disableBreakpointsOnLineItem = (cx, location, breakpointActions) =>
 export function breakpointItemActions(dispatch) {
   return bindActionCreators(
     {
-      addBreakpoint: actions.addBreakpoint,
       removeBreakpoint: actions.removeBreakpoint,
       removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
       enableBreakpointsAtLine: actions.enableBreakpointsAtLine,

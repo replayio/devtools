@@ -8,7 +8,7 @@ import classnames from "classnames";
 import { showMenu } from "devtools-contextmenu";
 
 import { getDocument } from "../../utils/editor";
-import { breakpointItems, createBreakpointItems } from "./menus/breakpoints";
+import { breakpointItems } from "./menus/breakpoints";
 
 // eslint-disable-next-line max-len
 
@@ -97,7 +97,7 @@ export default class ColumnBreakpoint extends Component {
       breakpointActions,
     } = this.props;
 
-    let items = createBreakpointItems(cx, location, breakpointActions);
+    let items;
 
     if (breakpoint) {
       const selectedLocation = breakpoint.location;
