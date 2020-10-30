@@ -18,8 +18,6 @@ import { features } from "../../utils/prefs";
 import { getIndentation } from "../../utils/indentation";
 
 import { showMenu } from "devtools-contextmenu";
-import { createBreakpointItems, breakpointItemActions } from "./menus/breakpoints";
-
 import { continueToHereItem, editorItemActions } from "./menus/editor";
 
 import {
@@ -288,7 +286,6 @@ class Editor extends PureComponent {
     const {
       cx,
       selectedSource,
-      breakpointActions,
       editorActions,
       isPaused,
       conditionalPanelLocation,
@@ -316,14 +313,9 @@ class Editor extends PureComponent {
     const location = { line, column: undefined, sourceId };
 
     if (target.classList.contains("CodeMirror-linenumber")) {
-      const lineText = getLineText(sourceId, selectedSource.content, line).trim();
       const disabled = !isPaused || !framePositions;
 
-      return showMenu(event, [
-        ...createBreakpointItems(cx, location, breakpointActions, lineText),
-        { type: "separator" },
-        continueToHereItem(cx, location, disabled, editorActions),
-      ]);
+      return showMenu(event, [continueToHereItem(cx, location, disabled, editorActions)]);
     }
 
     if (target.getAttribute("id") === "columnmarker") {
@@ -344,7 +336,6 @@ class Editor extends PureComponent {
       conditionalPanelLocation,
       closeConditionalPanel,
       addBreakpointAtLine,
-      continueToHere,
       toggleBlackBox,
     } = this.props;
 
@@ -598,7 +589,6 @@ const mapDispatchToProps = dispatch => ({
     },
     dispatch
   ),
-  breakpointActions: breakpointItemActions(dispatch),
   editorActions: editorItemActions(dispatch),
 });
 

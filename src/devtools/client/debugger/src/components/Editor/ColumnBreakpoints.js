@@ -5,13 +5,11 @@
 //
 
 import React, { Component } from "react";
-
 import ColumnBreakpoint from "./ColumnBreakpoint";
 
 import { getSelectedSource, visibleColumnBreakpoints, getContext } from "../../selectors";
 import { connect } from "../../utils/connect";
 import { makeBreakpointId } from "../../utils/breakpoint";
-import { breakpointItemActions } from "./menus/breakpoints";
 
 // eslint-disable-next-line max-len
 
@@ -19,7 +17,7 @@ class ColumnBreakpoints extends Component {
   props;
 
   render() {
-    const { cx, editor, columnBreakpoints, selectedSource, breakpointActions } = this.props;
+    const { cx, editor, columnBreakpoints, selectedSource } = this.props;
 
     if (!selectedSource || selectedSource.isBlackBoxed || columnBreakpoints.length === 0) {
       return null;
@@ -34,7 +32,6 @@ class ColumnBreakpoints extends Component {
           columnBreakpoint={breakpoint}
           editor={editor}
           source={selectedSource}
-          breakpointActions={breakpointActions}
         />
       ));
     });
@@ -48,6 +45,4 @@ const mapStateToProps = state => ({
   columnBreakpoints: visibleColumnBreakpoints(state),
 });
 
-export default connect(mapStateToProps, dispatch => ({
-  breakpointActions: breakpointItemActions(dispatch),
-}))(ColumnBreakpoints);
+export default connect(mapStateToProps)(ColumnBreakpoints);
