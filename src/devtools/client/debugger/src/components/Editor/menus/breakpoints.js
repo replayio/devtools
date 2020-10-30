@@ -7,8 +7,6 @@
 import actions from "../../../actions";
 import { bindActionCreators } from "redux";
 
-export const breakpointItems = () => {};
-
 export function breakpointItemActions(dispatch) {
   return bindActionCreators(
     {

@@ -8,7 +8,6 @@ import classnames from "classnames";
 import { showMenu } from "devtools-contextmenu";
 
 import { getDocument } from "../../utils/editor";
-import { breakpointItems } from "./menus/breakpoints";
 
 // eslint-disable-next-line max-len
 
@@ -90,22 +89,8 @@ export default class ColumnBreakpoint extends Component {
   onContextMenu = event => {
     event.stopPropagation();
     event.preventDefault();
-    const {
-      cx,
-      columnBreakpoint: { breakpoint, location },
-      source,
-      breakpointActions,
-    } = this.props;
 
-    let items;
-
-    if (breakpoint) {
-      const selectedLocation = breakpoint.location;
-
-      items = breakpointItems(cx, breakpoint, selectedLocation, breakpointActions);
-    }
-
-    showMenu(event, items);
+    return;
   };
 
   componentDidMount() {
