@@ -15,14 +15,6 @@ import { features } from "../../../utils/prefs";
 import { isFulfilled } from "../../../utils/async-value";
 import actions from "../../../actions";
 
-export const continueToHereItem = (cx, location, disabled, editorActions) => ({
-  accesskey: L10N.getStr("editor.continueToHere.accesskey"),
-  disabled,
-  click: () => editorActions.continueToHere(cx, location),
-  id: "node-menu-continue-to-here",
-  label: L10N.getStr("editor.continueToHere.label"),
-});
-
 // menu items
 
 const copyToClipboardItem = (selectedContent, editorActions) => ({
@@ -117,9 +109,6 @@ export function editorMenuItems({
       : null;
 
   items.push(
-    jumpToMappedLocationItem(cx, selectedSource, location, hasMappedLocation, editorActions),
-    continueToHereItem(cx, location, isPaused, editorActions),
-    { type: "separator" },
     ...(content ? [copyToClipboardItem(content, editorActions)] : []),
     copySourceItem(selectedSource, selectionText, editorActions),
     copySourceUri2Item(selectedSource, editorActions),
@@ -142,7 +131,6 @@ export function editorMenuItems({
 export function editorItemActions(dispatch) {
   return bindActionCreators(
     {
-      continueToHere: actions.continueToHere,
       evaluateInConsole: actions.evaluateInConsole,
       flashLineRange: actions.flashLineRange,
       jumpToMappedLocation: actions.jumpToMappedLocation,

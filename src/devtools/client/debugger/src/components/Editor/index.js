@@ -20,7 +20,7 @@ import { getIndentation } from "../../utils/indentation";
 import { showMenu } from "devtools-contextmenu";
 import { createBreakpointItems, breakpointItemActions } from "./menus/breakpoints";
 
-import { continueToHereItem, editorItemActions } from "./menus/editor";
+import { editorItemActions } from "./menus/editor";
 
 import {
   getActiveSearch,
@@ -315,15 +315,14 @@ class Editor extends PureComponent {
 
     const location = { line, column: undefined, sourceId };
 
+    // Bail here so the user doesn't open the default context menu editor
+    // when they click on a line in the gutter.
     if (target.classList.contains("CodeMirror-linenumber")) {
       const lineText = getLineText(sourceId, selectedSource.content, line).trim();
       const disabled = !isPaused || !framePositions;
 
-      return showMenu(event, [
-        ...createBreakpointItems(cx, location, breakpointActions, lineText),
-        { type: "separator" },
-        continueToHereItem(cx, location, disabled, editorActions),
-      ]);
+      return showMenu(event, [...createBreakpointItems(cx, location, breakpointActions, lineText)]);
+      // return;
     }
 
     if (target.getAttribute("id") === "columnmarker") {
@@ -344,7 +343,6 @@ class Editor extends PureComponent {
       conditionalPanelLocation,
       closeConditionalPanel,
       addBreakpointAtLine,
-      continueToHere,
       toggleBlackBox,
     } = this.props;
 
@@ -365,10 +363,6 @@ class Editor extends PureComponent {
     const sourceLine = toSourceLine(selectedSource.id, line);
     if (typeof sourceLine !== "number") {
       return;
-    }
-
-    if (ev.metaKey) {
-      return continueToHere(cx, { line: sourceLine });
     }
 
     return addBreakpointAtLine(cx, sourceLine, ev.altKey, ev.shiftKey);
@@ -586,7 +580,6 @@ const mapDispatchToProps = dispatch => ({
     {
       openConditionalPanel: actions.openConditionalPanel,
       closeConditionalPanel: actions.closeConditionalPanel,
-      continueToHere: actions.continueToHere,
       toggleBreakpointAtLine: actions.toggleBreakpointAtLine,
       addBreakpointAtLine: actions.addBreakpointAtLine,
       jumpToMappedLocation: actions.jumpToMappedLocation,

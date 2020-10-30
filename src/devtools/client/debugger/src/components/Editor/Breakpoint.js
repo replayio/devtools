@@ -59,9 +59,6 @@ class Breakpoint extends PureComponent {
     event.preventDefault();
 
     const selectedLocation = breakpoint.location;
-    if (event.metaKey) {
-      return editorActions.continueToHere(cx, selectedLocation);
-    }
 
     if (event.shiftKey) {
       if (features.columnBreakpoints) {

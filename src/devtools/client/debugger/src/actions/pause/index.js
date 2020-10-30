@@ -22,7 +22,6 @@ export { fetchFrames } from "./fetchFrames";
 export { fetchScopes } from "./fetchScopes";
 export { paused } from "./paused";
 export { resumed } from "./resumed";
-export { continueToHere } from "./continueToHere";
 export { breakOnNext } from "./breakOnNext";
 export { selectFrame } from "./selectFrame";
 export { toggleSkipPausing, setSkipPausing } from "./skipPausing";
