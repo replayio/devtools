@@ -268,7 +268,9 @@ export class Outline extends Component {
       <div className="outline-footer">
         <button
           onClick={this.props.onAlphabetizeClick}
-          className={this.props.alphabetizeOutline ? "active" : ""}
+          className={
+            this.props.alphabetizeOutline ? "sort-button sort-button--active" : "sort-button"
+          }
         >
           {L10N.getStr("outline.sortLabel")}
         </button>
@@ -296,7 +298,7 @@ export class Outline extends Component {
 
     return (
       <div className="outline">
-        <div>
+        <div className="outline__container">
           <OutlineFilter filter={filter} updateFilter={this.updateFilter} />
           {this.renderFunctions(symbolsToDisplay)}
           {this.renderFooter()}
