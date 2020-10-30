@@ -24,7 +24,6 @@ import {
   getActiveSearch,
   getSelectedLocation,
   getSelectedSourceWithContent,
-  getConditionalPanelLocation,
   getSymbols,
   getIsPaused,
   getThreadContext,
@@ -46,7 +45,6 @@ import HighlightLine from "./HighlightLine";
 import ReplayLines from "./ReplayLines";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
-import ConditionalPanel from "./ConditionalPanel";
 
 import {
   showSourceText,
@@ -151,8 +149,6 @@ class Editor extends PureComponent {
     const { shortcuts } = this.context;
 
     shortcuts.on(L10N.getStr("toggleBreakpoint.key"), this.onToggleBreakpoint);
-    shortcuts.on(L10N.getStr("toggleCondPanel.breakpoint.key"), this.onToggleConditionalPanel);
-    shortcuts.on(L10N.getStr("toggleCondPanel.logPoint.key"), this.onToggleConditionalPanel);
     shortcuts.on(L10N.getStr("sourceTabs.closeTab.key"), this.onClosePress);
     shortcuts.on("Esc", this.onEscape);
   }
@@ -176,8 +172,6 @@ class Editor extends PureComponent {
     const shortcuts = this.context.shortcuts;
     shortcuts.off(L10N.getStr("sourceTabs.closeTab.key"));
     shortcuts.off(L10N.getStr("toggleBreakpoint.key"));
-    shortcuts.off(L10N.getStr("toggleCondPanel.breakpoint.key"));
-    shortcuts.off(L10N.getStr("toggleCondPanel.logPoint.key"));
   }
 
   getCurrentLine() {
@@ -201,45 +195,6 @@ class Editor extends PureComponent {
     }
 
     this.props.toggleBreakpointAtLine(this.props.cx, line);
-  };
-
-  onToggleConditionalPanel = (key, e) => {
-    e.stopPropagation();
-    e.preventDefault();
-
-    const {
-      conditionalPanelLocation,
-      closeConditionalPanel,
-      openConditionalPanel,
-      selectedSource,
-    } = this.props;
-
-    const line = this.getCurrentLine();
-
-    const { codeMirror } = this.state.editor;
-    // add one to column for correct position in editor.
-    const column = getCursorColumn(codeMirror) + 1;
-
-    if (conditionalPanelLocation) {
-      return closeConditionalPanel();
-    }
-
-    if (!selectedSource) {
-      return;
-    }
-
-    if (typeof line !== "number") {
-      return;
-    }
-
-    return openConditionalPanel(
-      {
-        line,
-        column,
-        sourceId: selectedSource.id,
-      },
-      false
-    );
   };
 
   onEditorScroll = debounce(this.props.updateViewport, 75);
@@ -283,23 +238,10 @@ class Editor extends PureComponent {
     event.stopPropagation();
     event.preventDefault();
 
-    const {
-      cx,
-      selectedSource,
-      editorActions,
-      isPaused,
-      conditionalPanelLocation,
-      closeConditionalPanel,
-      framePositions,
-    } = this.props;
+    const { cx, selectedSource, editorActions, isPaused, framePositions } = this.props;
     const { editor } = this.state;
     if (!selectedSource || !editor) {
       return;
-    }
-
-    // only allow one conditionalPanel location.
-    if (conditionalPanelLocation) {
-      closeConditionalPanel();
     }
 
     const target = event.target;
@@ -330,14 +272,7 @@ class Editor extends PureComponent {
   };
 
   onGutterClick = (cm, line, gutter, ev) => {
-    const {
-      cx,
-      selectedSource,
-      conditionalPanelLocation,
-      closeConditionalPanel,
-      addBreakpointAtLine,
-      toggleBlackBox,
-    } = this.props;
+    const { cx, selectedSource, addBreakpointAtLine, continueToHere, toggleBlackBox } = this.props;
 
     // ignore right clicks in the gutter
     if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !selectedSource) {
@@ -347,10 +282,6 @@ class Editor extends PureComponent {
     // if user clicks gutter to set breakpoint on blackboxed source, un-blackbox the source.
     if (selectedSource && selectedSource.isBlackBoxed) {
       toggleBlackBox(cx, selectedSource);
-    }
-
-    if (conditionalPanelLocation) {
-      return closeConditionalPanel();
     }
 
     const sourceLine = toSourceLine(selectedSource.id, line);
@@ -493,7 +424,7 @@ class Editor extends PureComponent {
   }
 
   renderItems() {
-    const { cx, selectedSource, conditionalPanelLocation, isPaused } = this.props;
+    const { cx, selectedSource, isPaused } = this.props;
     const { editor, contextMenu } = this.state;
 
     if (!selectedSource || !editor || !getDocument(selectedSource.id)) {
@@ -517,7 +448,6 @@ class Editor extends PureComponent {
             selectedSource={selectedSource}
           />
         }
-        {conditionalPanelLocation ? <ConditionalPanel editor={editor} /> : null}
         <ColumnBreakpoints editor={editor} />
       </div>
     );
@@ -563,7 +493,6 @@ const mapStateToProps = state => {
     selectedLocation: getSelectedLocation(state),
     selectedSource,
     searchOn: getActiveSearch(state) === "file",
-    conditionalPanelLocation: getConditionalPanelLocation(state),
     symbols: getSymbols(state, selectedSource),
     isPaused: getIsPaused(state),
     skipPausing: getSkipPausing(state),
@@ -575,8 +504,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   ...bindActionCreators(
     {
-      openConditionalPanel: actions.openConditionalPanel,
-      closeConditionalPanel: actions.closeConditionalPanel,
       continueToHere: actions.continueToHere,
       toggleBreakpointAtLine: actions.toggleBreakpointAtLine,
       addBreakpointAtLine: actions.addBreakpointAtLine,

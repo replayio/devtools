@@ -19,8 +19,6 @@ export const createUIState = () => ({
   endPanelCollapsed: prefs.endPanelCollapsed,
   frameworkGroupingOn: prefs.frameworkGroupingOn,
   highlightedLineRange: undefined,
-  conditionalPanelLocation: null,
-  isLogPoint: false,
   orientation: "horizontal",
   viewport: null,
   cursorPosition: null,
@@ -68,16 +66,6 @@ function update(state = createUIState(), action) {
     case "CLOSE_QUICK_OPEN":
     case "CLEAR_HIGHLIGHT_LINES":
       return { ...state, highlightedLineRange: {} };
-
-    case "OPEN_CONDITIONAL_PANEL":
-      return {
-        ...state,
-        conditionalPanelLocation: action.location,
-        isLogPoint: action.log,
-      };
-
-    case "CLOSE_CONDITIONAL_PANEL":
-      return { ...state, conditionalPanelLocation: null };
 
     case "SET_PRIMARY_PANE_TAB":
       return { ...state, selectedPrimaryPaneTab: action.tabName };
@@ -136,14 +124,6 @@ export function getPaneCollapse(state, position) {
 
 export function getHighlightedLineRange(state) {
   return state.ui.highlightedLineRange;
-}
-
-export function getConditionalPanelLocation(state) {
-  return state.ui.conditionalPanelLocation;
-}
-
-export function getLogPointStatus(state) {
-  return state.ui.isLogPoint;
 }
 
 export function getOrientation(state) {
