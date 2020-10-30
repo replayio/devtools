@@ -6,9 +6,12 @@
 import React, { Component } from "react";
 import Breakpoint from "./Breakpoint";
 
-import { getSelectedSource, getFirstVisibleBreakpoints } from "../../selectors";
-import { makeBreakpointId } from "../../utils/breakpoint";
-import { connect } from "../../utils/connect";
+import {
+  getSelectedSource,
+  getFirstVisibleBreakpoints,
+} from "devtools/client/debugger/src/selectors";
+import { makeBreakpointId } from "devtools/client/debugger/src/utils/breakpoint";
+import { connect } from "devtools/client/debugger/src/utils/connect";
 
 class Breakpoints extends Component {
   render() {
