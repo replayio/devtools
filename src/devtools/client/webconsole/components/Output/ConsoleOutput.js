@@ -14,7 +14,6 @@ const {
   getAllMessagesPayloadById,
   getVisibleMessages,
   getPausedExecutionPoint,
-  getPausedExecutionPointTime,
   getAllWarningGroupsById,
   isMessageInWarningGroup,
 } = require("devtools/client/webconsole/selectors/messages");
@@ -74,7 +73,6 @@ class ConsoleOutput extends Component {
       warningGroups: PropTypes.object.isRequired,
       visibleMessages: PropTypes.array.isRequired,
       pausedExecutionPoint: PropTypes.string,
-      pausedExecutionPointTime: PropTypes.number,
     };
   }
 
@@ -173,7 +171,6 @@ class ConsoleOutput extends Component {
       timestampsVisible,
       initialized,
       pausedExecutionPoint,
-      pausedExecutionPointTime,
       zoomStartTime,
       zoomEndTime,
     } = this.props;
@@ -206,7 +203,6 @@ class ConsoleOutput extends Component {
             ? isMessageInWarningGroup(messages.get(messageId), visibleMessages)
             : false,
         pausedExecutionPoint,
-        pausedExecutionPointTime,
         getMessage: () => messages.get(messageId),
         isPaused: !!pausedMessage && pausedMessage.id == messageId,
       })
@@ -242,7 +238,6 @@ function mapStateToProps(state, props) {
   return {
     initialized: state.ui.initialized,
     pausedExecutionPoint: getPausedExecutionPoint(state),
-    pausedExecutionPointTime: getPausedExecutionPointTime(state),
     messages: getAllMessagesById(state),
     visibleMessages: getVisibleMessages(state),
     messagesUi: getAllMessagesUiById(state),
