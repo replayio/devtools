@@ -187,6 +187,7 @@ Pause.prototype = {
       object,
     });
     this.addData(data);
+    return this.objects.get(object);
   },
 
   async evaluate(frameId, expression) {
@@ -228,6 +229,30 @@ Pause.prototype = {
       throw new Error("Unexpected DOM front");
     }
     this.domFronts.set(objectId, front);
+    return front;
+  },
+
+  getNodeFront(objectId) {
+    const front = this.getDOMFront(objectId);
+    assert(front instanceof NodeFront);
+    return front;
+  },
+
+  getRuleFront(objectId) {
+    const front = this.getDOMFront(objectId);
+    assert(front instanceof RuleFront);
+    return front;
+  },
+
+  getStyleFront(objectId) {
+    const front = this.getDOMFront(objectId);
+    assert(front instanceof StyleFront);
+    return front;
+  },
+
+  getStyleSheetFront(objectId) {
+    const front = this.getDOMFront(objectId);
+    assert(front instanceof StyleSheetFront);
     return front;
   },
 

@@ -43,7 +43,7 @@ export class ValueFront {
     } else if ("object" in protocolValue) {
       const data = pause!.objects.get(protocolValue.object);
       assert(data);
-      this._object = data!;
+      this._object = data;
     } else if ("unserializableNumber" in protocolValue) {
       this._hasPrimitive = true;
       this._primitive = Number(protocolValue.unserializableNumber);

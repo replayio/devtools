@@ -47,8 +47,8 @@ export function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
-export function assert(v: any, msg = "Assertion failed!") {
-  if (!v) {
+export function assert(condition: any, msg = "Assertion failed!"): asserts condition {
+  if (!condition) {
     console.error(msg);
     throw new Error(msg);
   }

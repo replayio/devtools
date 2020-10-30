@@ -1,20 +1,19 @@
-import { Object as ObjectDescription, StyleSheet } from "record-replay-protocol";
-import { Pause } from "./pause";
-
-const { assert, DisallowEverythingProxyHandler } = require("../utils");
+import { StyleSheet } from "record-replay-protocol";
+import { Pause, WiredObject } from "./pause";
+import { assert, DisallowEverythingProxyHandler } from "../utils";
 
 // Manages interaction with a StyleSheet.
 export class StyleSheetFront {
   private _pause: Pause;
-  private _object: ObjectDescription;
+  private _object: WiredObject;
   private _styleSheet: StyleSheet;
 
-  constructor(pause: Pause, data: ObjectDescription) {
+  constructor(pause: Pause, data: WiredObject & { preview: { styleSheet: StyleSheet } }) {
     this._pause = pause;
 
     assert(data && data.preview && data.preview.styleSheet);
     this._object = data;
-    this._styleSheet = data.preview!.styleSheet!;
+    this._styleSheet = data.preview.styleSheet;
   }
 
   get href() {
