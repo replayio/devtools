@@ -447,7 +447,7 @@ PrefBranch.prototype = {
    *        storage change
    */
   _onStorageChange: function (event) {
-    if (event.storageArea !== localStorage) {
+    if (event.storageArea !== localStorage || !event.key) {
       return;
     }
 
