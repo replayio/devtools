@@ -36,12 +36,10 @@ import {
 import actions from "../../actions";
 
 import SearchBar from "./SearchBar";
-import HighlightLines from "./HighlightLines";
 import Preview from "./Preview";
-import Breakpoints from "./Breakpoints";
+import Breakpoints from "./Breakpoints/Breakpoints";
 import ColumnBreakpoints from "./ColumnBreakpoints";
 import DebugLine from "./DebugLine";
-import HighlightLine from "./HighlightLine";
 import ReplayLines from "./ReplayLines";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
@@ -69,7 +67,6 @@ import {
 import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
 
 import "./Editor.css";
-import "./Breakpoints.css";
 
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",

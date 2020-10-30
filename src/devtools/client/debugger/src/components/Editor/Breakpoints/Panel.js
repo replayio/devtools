@@ -5,13 +5,13 @@
 //
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
-import { connect } from "../../utils/connect";
 import classnames from "classnames";
-import "./Panel.css";
-import { toEditorLine } from "../../utils/editor";
-import actions from "../../actions";
+import { connect } from "devtools/client/debugger/src/utils/connect";
+import { toEditorLine } from "devtools/client/debugger/src/utils/editor";
+import actions from "devtools/client/debugger/src/actions";
+import { getContext } from "devtools/client/debugger/src/selectors";
 
-import { getContext } from "../../selectors";
+import "./Panel.css";
 
 export class Panel extends PureComponent {
   cbPanel;
@@ -330,7 +330,6 @@ export class Panel extends PureComponent {
   renderHeader() {
     const { breakpoint } = this.props;
     const { conditionValue } = this.state;
-    const hasCondition = conditionValue !== null;
 
     return (
       <div className="header">

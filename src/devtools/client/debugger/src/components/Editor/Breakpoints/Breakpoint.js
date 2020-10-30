@@ -6,11 +6,13 @@
 
 import React, { PureComponent } from "react";
 import classnames from "classnames";
-import { connect } from "../../utils/connect";
-import actions from "../../actions";
-import { getDocument, toEditorLine } from "../../utils/editor";
-import { features } from "../../utils/prefs";
-import Panel from "devtools/client/debugger/src/components/Editor/Panel";
+import actions from "devtools/client/debugger/src/actions";
+import { connect } from "devtools/client/debugger/src/utils/connect";
+import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
+import { features } from "devtools/client/debugger/src/utils/prefs";
+import Panel from "./Panel";
+
+import "./Breakpoints.css";
 
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =
