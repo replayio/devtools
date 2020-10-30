@@ -1,20 +1,19 @@
-import { Object as ObjectDescription, Rule } from "record-replay-protocol";
+import { Rule } from "record-replay-protocol";
 import { assert, DisallowEverythingProxyHandler } from "../utils";
-import { Pause } from "./pause";
-import { StyleSheetFront } from "./styleSheet";
+import { Pause, WiredObject } from "./pause";
 
 // Manages interaction with a CSSRule.
 export class RuleFront {
   private _pause: Pause;
-  private _object: ObjectDescription;
+  private _object: WiredObject;
   private _rule: Rule;
 
-  constructor(pause: Pause, data: ObjectDescription) {
+  constructor(pause: Pause, data: WiredObject & { preview: { rule: Rule } }) {
     this._pause = pause;
 
     assert(data && data.preview && data.preview.rule);
     this._object = data;
-    this._rule = data.preview!.rule!;
+    this._rule = data.preview.rule;
   }
 
   objectId() {
@@ -47,17 +46,14 @@ export class RuleFront {
 
   get style() {
     if (this._rule.style) {
-      return this._pause.getDOMFront(this._rule.style);
+      return this._pause.getStyleFront(this._rule.style);
     }
     return null;
   }
 
   get parentStyleSheet() {
     if (this._rule.parentStyleSheet) {
-      return this._pause.getDOMFront(this._rule.parentStyleSheet) as
-        | StyleSheetFront
-        | null
-        | undefined;
+      return this._pause.getStyleSheetFront(this._rule.parentStyleSheet);
     }
     return null;
   }

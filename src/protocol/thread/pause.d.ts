@@ -99,12 +99,16 @@ export declare class Pause {
   getFrames(): Promise<WiredFrame[] | undefined>;
   ensureScopeChain(scopeChain: ScopeId[]): Promise<WiredScope[]>;
   getScopes(frameId: FrameId): Promise<WiredScope[]>;
-  getObjectPreview(object: ObjectId): Promise<void>;
+  getObjectPreview(object: ObjectId): Promise<WiredObject>;
   evaluate(frameId: FrameId | undefined, expression: string): Promise<EvaluationResult>;
   getDOMFront(objectId: undefined): null;
   getDOMFront(objectId: ObjectId): DOMFront;
   getDOMFront(objectId: ObjectId | undefined): DOMFront | null;
-  ensureDOMFrontAndParents(nodeId: ObjectId): NodeFront;
+  getNodeFront(objectId: ObjectId): NodeFront;
+  getRuleFront(objectId: ObjectId): RuleFront;
+  getStyleFront(objectId: ObjectId): StyleFront;
+  getStyleSheetFront(objectId: ObjectId): StyleSheetFront;
+  ensureDOMFrontAndParents(nodeId: ObjectId): Promise<NodeFront>;
   loadDocument(): Promise<void>;
   searchDOM(query: string): Promise<NodeFront[]>;
   loadMouseTargets(): Promise<void>;

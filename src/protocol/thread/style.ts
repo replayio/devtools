@@ -1,7 +1,6 @@
-import { Object as ObjectDescription, StyleDeclaration } from "record-replay-protocol";
-import { Pause } from "./pause";
-
-const { assert, DisallowEverythingProxyHandler } = require("../utils");
+import { StyleDeclaration } from "record-replay-protocol";
+import { Pause, WiredObject } from "./pause";
+import { assert, DisallowEverythingProxyHandler } from "../utils";
 const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
 
 // Manages interaction with a CSSStyleDeclaration. StyleFront represents an inline
@@ -15,15 +14,15 @@ export class StyleFront {
   href = undefined;
   isSystem = false;
   private _pause: Pause;
-  private _object: ObjectDescription;
+  private _object: WiredObject;
   private _style: StyleDeclaration;
 
-  constructor(pause: Pause, data: ObjectDescription) {
+  constructor(pause: Pause, data: WiredObject & { preview: { style: StyleDeclaration } }) {
     this._pause = pause;
 
     assert(data && data.preview && data.preview.style);
     this._object = data;
-    this._style = data.preview!.style!;
+    this._style = data.preview.style;
   }
 
   objectId() {

@@ -1,5 +1,4 @@
 import {
-  Object as ObjectDescription,
   Node as NodeDescription,
   AppliedRule,
   BoxModel,
@@ -7,7 +6,7 @@ import {
   Quads,
 } from "record-replay-protocol";
 import { client } from "../socket";
-import { Pause } from "./pause";
+import { Pause, WiredObject } from "./pause";
 import { defer, assert, DisallowEverythingProxyHandler, Deferred } from "../utils";
 const { getFrameworkEventListeners } = require("../event-listeners");
 import { ValueFront } from "./value";
@@ -24,7 +23,7 @@ export interface WiredEventListener {
 export class NodeFront {
   then = undefined;
   private _pause: Pause;
-  private _object: ObjectDescription;
+  private _object: WiredObject;
   private _node: NodeDescription;
   private _loadWaiter: Deferred<void> | null;
   private _loaded: boolean;
@@ -35,13 +34,13 @@ export class NodeFront {
   private _quads: BoxModel | null;
   private _bounds: Rect | null;
 
-  constructor(pause: Pause, data: ObjectDescription) {
+  constructor(pause: Pause, data: WiredObject & { preview: { node: NodeDescription } }) {
     this._pause = pause;
 
     // The contents of the Node must already be available.
     assert(data && data.preview && data.preview.node);
     this._object = data;
-    this._node = data.preview!.node!;
+    this._node = data.preview.node;
 
     // Additional data that can be loaded for the node.
     this._loadWaiter = null;
@@ -134,7 +133,7 @@ export class NodeFront {
   }
 
   parentNode() {
-    return this._pause.getDOMFront(this._node.parentNode) as NodeFront | null;
+    return this._node.parentNode ? this._pause.getNodeFront(this._node.parentNode) : null;
   }
 
   parentOrHost() {
@@ -156,7 +155,7 @@ export class NodeFront {
       return !data || !data.preview;
     });
     await Promise.all(missingPreviews.map(id => this._pause.getObjectPreview(id)));
-    const childNodes = this._node.childNodes.map(id => this._pause.getDOMFront(id) as NodeFront);
+    const childNodes = this._node.childNodes.map(id => this._pause.getNodeFront(id));
     await Promise.all(childNodes.map(node => node.ensureLoaded()));
     return childNodes;
   }
@@ -187,7 +186,7 @@ export class NodeFront {
       selector,
     });
     this._pause.addData(data);
-    return this._pause.getDOMFront(result) as NodeFront | null;
+    return result ? this._pause.getNodeFront(result) : null;
   }
 
   isLoaded() {
@@ -223,7 +222,7 @@ export class NodeFront {
           this._listeners = listeners.map(listener => ({
             ...listener,
             handler: new ValueFront(this._pause, { object: listener.handler }),
-            node: this._pause.getDOMFront(listener.node) as NodeFront,
+            node: this._pause.getNodeFront(listener.node),
           }));
         }),
       this._pause
@@ -294,13 +293,13 @@ export class NodeFront {
   getAppliedRules() {
     assert(this._loaded);
     return this._rules!.map(({ rule, pseudoElement }) => {
-      return { rule: this._pause.getDOMFront(rule), pseudoElement };
+      return { rule: this._pause.getRuleFront(rule), pseudoElement };
     });
   }
 
   getInlineStyle() {
     if (this._node.style) {
-      return this._pause.getDOMFront(this._node.style);
+      return this._pause.getStyleFront(this._node.style);
     }
     return null;
   }
