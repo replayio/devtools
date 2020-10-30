@@ -21,7 +21,7 @@ class MarkupApp extends PureComponent {
     const { markup } = this.props;
     const { rootNode, tree } = markup;
 
-    if (!rootNode) {
+    if (!rootNode || !tree[rootNode]) {
       return null;
     }
 
