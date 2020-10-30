@@ -41,7 +41,7 @@ class Message extends Component {
       executionPoint: PropTypes.string,
       executionPointTime: PropTypes.any,
       executionPointHasFrames: PropTypes.any,
-      pausedExecutionPointTime: PropTypes.number,
+      pausedExecutionPoint: PropTypes.string,
       scrollToMessage: PropTypes.bool,
       exceptionDocURL: PropTypes.string,
       request: PropTypes.object,
@@ -141,30 +141,27 @@ class Message extends Component {
       executionPointHasFrames,
       dispatch,
       inWarningGroup,
-      pausedExecutionPointTime = Number.POSITIVE_INFINITY,
+      pausedExecutionPoint = Number.POSITIVE_INFINITY,
       type,
       frame,
     } = this.props;
-    let onRewindClick = null;
-    let overlayType, label, onClick;
 
-    if (inWarningGroup) {
+    if (inWarningGroup || !pausedExecutionPoint || !executionPoint) {
       return undefined;
     }
 
-    if (executionPoint) {
-      onRewindClick = () => {
-        dispatch(
-          actions.jumpToExecutionPoint(executionPoint, executionPointTime, executionPointHasFrames)
-        );
-      };
-    }
+    let overlayType, label, onClick;
+    let onRewindClick = () => {
+      dispatch(
+        actions.jumpToExecutionPoint(executionPoint, executionPointTime, executionPointHasFrames)
+      );
+    };
 
-    if (executionPointTime > pausedExecutionPointTime) {
+    if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {
       overlayType = "fast-forward";
       label = "Fast Forward";
       onClick = onRewindClick;
-    } else if (executionPointTime < pausedExecutionPointTime) {
+    } else if (BigInt(executionPoint) < BigInt(pausedExecutionPoint)) {
       overlayType = "rewind";
       label = "Rewind";
       onClick = onRewindClick;
