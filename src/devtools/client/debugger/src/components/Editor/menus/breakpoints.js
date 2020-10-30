@@ -12,14 +12,7 @@ export function breakpointItemActions(dispatch) {
     {
       addBreakpoint: actions.addBreakpoint,
       removeBreakpoint: actions.removeBreakpoint,
-      removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
-      enableBreakpointsAtLine: actions.enableBreakpointsAtLine,
-      disableBreakpointsAtLine: actions.disableBreakpointsAtLine,
-      disableBreakpoint: actions.disableBreakpoint,
       toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
-      toggleBreakpointsAtLine: actions.toggleBreakpointsAtLine,
-      setBreakpointOptions: actions.setBreakpointOptions,
-      openConditionalPanel: actions.openConditionalPanel,
     },
     dispatch
   );

@@ -5,7 +5,8 @@
 //
 import { Component } from "react";
 import classnames from "classnames";
-import { showMenu } from "devtools-contextmenu";
+import { connect } from "../../utils/connect";
+import actions from "../../actions";
 
 import { getDocument } from "../../utils/editor";
 
@@ -39,7 +40,7 @@ function makeBookmark({ breakpoint }, { onClick, onContextMenu }) {
   return bp;
 }
 
-export default class ColumnBreakpoint extends Component {
+class ColumnBreakpoint extends Component {
   addColumnBreakpoint;
   bookmark;
 
@@ -71,18 +72,24 @@ export default class ColumnBreakpoint extends Component {
   onClick = event => {
     event.stopPropagation();
     event.preventDefault();
-    const { cx, columnBreakpoint, breakpointActions } = this.props;
+    const {
+      cx,
+      columnBreakpoint,
+      toggleDisabledBreakpoint,
+      addBreakpoint,
+      removeBreakpoint,
+    } = this.props;
 
     // disable column breakpoint on shift-click.
     if (event.shiftKey) {
       const breakpoint = columnBreakpoint.breakpoint;
-      return breakpointActions.toggleDisabledBreakpoint(cx, breakpoint);
+      return toggleDisabledBreakpoint(cx, breakpoint);
     }
 
     if (columnBreakpoint.breakpoint) {
-      breakpointActions.removeBreakpoint(cx, columnBreakpoint.breakpoint);
+      removeBreakpoint(cx, columnBreakpoint.breakpoint);
     } else {
-      breakpointActions.addBreakpoint(cx, columnBreakpoint.location);
+      addBreakpoint(cx, columnBreakpoint.location);
     }
   };
 
@@ -114,3 +121,9 @@ export default class ColumnBreakpoint extends Component {
     return null;
   }
 }
+
+export default connect(null, {
+  addBreakpoint: actions.addBreakpoint,
+  removeBreakpoint: actions.removeBreakpoint,
+  toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
+})(ColumnBreakpoint);

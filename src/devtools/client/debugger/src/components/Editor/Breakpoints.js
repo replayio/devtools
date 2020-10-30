@@ -9,19 +9,11 @@ import Breakpoint from "./Breakpoint";
 import { getSelectedSource, getFirstVisibleBreakpoints } from "../../selectors";
 import { makeBreakpointId } from "../../utils/breakpoint";
 import { connect } from "../../utils/connect";
-import { breakpointItemActions } from "./menus/breakpoints";
 import { editorItemActions } from "./menus/editor";
 
 class Breakpoints extends Component {
   render() {
-    const {
-      cx,
-      breakpoints,
-      selectedSource,
-      editor,
-      breakpointActions,
-      editorActions,
-    } = this.props;
+    const { cx, breakpoints, selectedSource, editor, editorActions } = this.props;
 
     if (!selectedSource || !breakpoints || selectedSource.isBlackBoxed) {
       return null;
@@ -37,7 +29,6 @@ class Breakpoints extends Component {
               breakpoint={bp}
               selectedSource={selectedSource}
               editor={editor}
-              breakpointActions={breakpointActions}
               editorActions={editorActions}
             />
           );
@@ -55,7 +46,6 @@ export default connect(
     selectedSource: getSelectedSource(state),
   }),
   dispatch => ({
-    breakpointActions: breakpointItemActions(dispatch),
     editorActions: editorItemActions(dispatch),
   })
 )(Breakpoints);

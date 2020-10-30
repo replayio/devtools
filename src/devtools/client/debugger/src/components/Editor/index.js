@@ -18,7 +18,6 @@ import { features } from "../../utils/prefs";
 import { getIndentation } from "../../utils/indentation";
 
 import { showMenu } from "devtools-contextmenu";
-import { breakpointItemActions } from "./menus/breakpoints";
 
 import { editorItemActions } from "./menus/editor";
 
@@ -288,7 +287,6 @@ class Editor extends PureComponent {
     const {
       cx,
       selectedSource,
-      breakpointActions,
       editorActions,
       isPaused,
       conditionalPanelLocation,
@@ -581,7 +579,6 @@ const mapDispatchToProps = dispatch => ({
     },
     dispatch
   ),
-  breakpointActions: breakpointItemActions(dispatch),
   editorActions: editorItemActions(dispatch),
 });
 

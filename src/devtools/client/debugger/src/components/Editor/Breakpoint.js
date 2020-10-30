@@ -6,10 +6,10 @@
 
 import React, { PureComponent } from "react";
 import classnames from "classnames";
-
+import { connect } from "../../utils/connect";
+import actions from "../../actions";
 import { getDocument, toEditorLine } from "../../utils/editor";
 import { features } from "../../utils/prefs";
-import { showMenu } from "devtools-contextmenu";
 import Panel from "devtools/client/debugger/src/components/Editor/Panel";
 
 const breakpointSvg = document.createElement("div");
@@ -47,7 +47,15 @@ class Breakpoint extends PureComponent {
   }
 
   onClick = event => {
-    const { cx, breakpointActions, editorActions, breakpoint, selectedSource } = this.props;
+    const {
+      cx,
+      editorActions,
+      breakpoint,
+      selectedSource,
+      toggleBreakpointsAtLine,
+      toggleDisabledBreakpoint,
+      removeBreakpointsAtLine,
+    } = this.props;
 
     // ignore right clicks
     if ((event.ctrlKey && event.button === 0) || event.button === 2) {
@@ -61,21 +69,13 @@ class Breakpoint extends PureComponent {
 
     if (event.shiftKey) {
       if (features.columnBreakpoints) {
-        return breakpointActions.toggleBreakpointsAtLine(
-          cx,
-          !breakpoint.disabled,
-          selectedLocation.line
-        );
+        return toggleBreakpointsAtLine(cx, !breakpoint.disabled, selectedLocation.line);
       }
 
-      return breakpointActions.toggleDisabledBreakpoint(cx, breakpoint);
+      return toggleDisabledBreakpoint(cx, breakpoint);
     }
 
-    return breakpointActions.removeBreakpointsAtLine(
-      cx,
-      selectedLocation.sourceId,
-      selectedLocation.line
-    );
+    return removeBreakpointsAtLine(cx, selectedLocation.sourceId, selectedLocation.line);
   };
 
   onContextMenu = event => {
@@ -152,4 +152,8 @@ class Breakpoint extends PureComponent {
   }
 }
 
-export default Breakpoint;
+export default connect(null, {
+  toggleBreakpointsAtLine: actions.toggleBreakpointsAtLine,
+  toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
+  removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
+})(Breakpoint);
