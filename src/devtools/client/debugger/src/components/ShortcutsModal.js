@@ -39,14 +39,6 @@ export class ShortcutsModal extends Component {
           L10N.getStr("shortcuts.toggleBreakpoint"),
           formatKeyShortcut(L10N.getStr("toggleBreakpoint.key"))
         )}
-        {this.renderShorcutItem(
-          L10N.getStr("shortcuts.toggleCondPanel.breakpoint"),
-          formatKeyShortcut(L10N.getStr("toggleCondPanel.breakpoint.key"))
-        )}
-        {this.renderShorcutItem(
-          L10N.getStr("shortcuts.toggleCondPanel.logPoint"),
-          formatKeyShortcut(L10N.getStr("toggleCondPanel.logPoint.key"))
-        )}
       </ul>
     );
   }

@@ -27,12 +27,7 @@ export {
 
 export { getQuickOpenEnabled, getQuickOpenQuery, getQuickOpenType } from "../reducers/quick-open";
 
-export {
-  getClosestBreakpoint,
-  getBreakpointAtLocation,
-  getBreakpointsAtLine,
-  getClosestBreakpointPosition,
-} from "./breakpointAtLocation";
+export { getBreakpointAtLocation, getBreakpointsAtLine } from "./breakpointAtLocation";
 export { getVisibleBreakpoints, getFirstVisibleBreakpoints } from "./visibleBreakpoints";
 export { inComponent } from "./inComponent";
 export { isSelectedFrameVisible } from "./isSelectedFrameVisible";

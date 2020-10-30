@@ -38,15 +38,6 @@ class Breakpoint extends PureComponent {
     return breakpoint.location;
   }
 
-  onDoubleClick = () => {
-    const { breakpoint, openConditionalPanel } = this.props;
-    if (breakpoint.options.condition) {
-      openConditionalPanel(this.selectedLocation);
-    } else if (breakpoint.options.logValue) {
-      openConditionalPanel(this.selectedLocation, true);
-    }
-  };
-
   selectBreakpoint = event => {
     event.preventDefault();
     const { cx, selectSpecificLocation } = this.props;
@@ -187,5 +178,4 @@ export default connect(mapStateToProps, {
   toggleAllBreakpoints: actions.toggleAllBreakpoints,
   toggleBreakpoints: actions.toggleBreakpoints,
   toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
-  openConditionalPanel: actions.openConditionalPanel,
 })(Breakpoint);

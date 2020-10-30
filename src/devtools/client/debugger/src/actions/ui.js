@@ -133,24 +133,6 @@ export function clearHighlightLineRange() {
   };
 }
 
-export function openConditionalPanel(location, log = false) {
-  if (!location) {
-    return;
-  }
-
-  return {
-    type: "OPEN_CONDITIONAL_PANEL",
-    location,
-    log,
-  };
-}
-
-export function closeConditionalPanel() {
-  return {
-    type: "CLOSE_CONDITIONAL_PANEL",
-  };
-}
-
 export function updateViewport() {
   return {
     type: "SET_VIEWPORT",

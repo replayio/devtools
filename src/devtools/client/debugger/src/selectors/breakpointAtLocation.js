@@ -86,23 +86,3 @@ export function getBreakpointsAtLine(state, line) {
 
   return breakpoints.filter(breakpoint => getLocation(breakpoint, selectedSource).line === line);
 }
-
-export function getClosestBreakpoint(state, position) {
-  const columnBreakpoints = getBreakpointsAtLine(state, position.line);
-  const positions = columnBreakpoints.map(bp => bp.location);
-
-  const closestPosition = findClosestPosition(positions, position.column);
-  const breakpoint = columnBreakpoints.find(cbp => cbp.location === closestPosition);
-  return breakpoint;
-}
-
-export function getClosestBreakpointPosition(state, position) {
-  const selectedSource = getSelectedSource(state);
-  if (!selectedSource) {
-    throw new Error("no selectedSource");
-  }
-
-  const positions = getBreakpointPositionsForLine(state, selectedSource.id, position.line);
-
-  return findClosestPosition(positions, position.column);
-}
