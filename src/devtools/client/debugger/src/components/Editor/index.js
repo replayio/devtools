@@ -315,16 +315,6 @@ class Editor extends PureComponent {
 
     const location = { line, column: undefined, sourceId };
 
-    // Bail here so the user doesn't open the default context menu editor
-    // when they click on a line in the gutter.
-    if (target.classList.contains("CodeMirror-linenumber")) {
-      // const lineText = getLineText(sourceId, selectedSource.content, line).trim();
-      // const disabled = !isPaused || !framePositions;
-
-      // return showMenu(event, [...createBreakpointItems(cx, location, breakpointActions, lineText)]);
-      return;
-    }
-
     if (target.getAttribute("id") === "columnmarker") {
       return;
     }

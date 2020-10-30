@@ -10,7 +10,6 @@ import classnames from "classnames";
 import { getDocument, toEditorLine } from "../../utils/editor";
 import { features } from "../../utils/prefs";
 import { showMenu } from "devtools-contextmenu";
-import { breakpointItems } from "./menus/breakpoints";
 import Panel from "devtools/client/debugger/src/components/Editor/Panel";
 
 const breakpointSvg = document.createElement("div");
@@ -80,12 +79,10 @@ class Breakpoint extends PureComponent {
   };
 
   onContextMenu = event => {
-    const { cx, breakpoint, selectedSource, breakpointActions } = this.props;
     event.stopPropagation();
     event.preventDefault();
-    const selectedLocation = breakpoint.location;
 
-    showMenu(event, breakpointItems(cx, breakpoint, selectedLocation, breakpointActions));
+    return;
   };
 
   addBreakpoint(props) {

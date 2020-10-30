@@ -38,6 +38,8 @@ export default function showContextMenu(props) {
   const disableSelfLabel = L10N.getStr("breakpointMenuItem.disableSelf2.label");
   const disableAllLabel = L10N.getStr("breakpointMenuItem.disableAll2.label");
   const disableOthersLabel = L10N.getStr("breakpointMenuItem.disableOthers2.label");
+  const enableDbgStatementLabel = L10N.getStr("breakpointMenuItem.enabledbg.label");
+  const disableDbgStatementLabel = L10N.getStr("breakpointMenuItem.disabledbg.label");
   const removeConditionLabel = L10N.getStr("breakpointMenuItem.removeCondition2.label");
   const addConditionLabel = L10N.getStr("breakpointMenuItem.addCondition2.label");
   const editConditionLabel = L10N.getStr("breakpointMenuItem.editCondition2.label");
