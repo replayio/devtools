@@ -90,7 +90,7 @@ class RulesApp extends PureComponent {
 
       output.push(
         Rule({
-          key: rule.id,
+          key: `${inheritedNodeId}|${rule.id}`,
           ...this.getRuleProps(),
           rule,
         })
