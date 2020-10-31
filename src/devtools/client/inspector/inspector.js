@@ -1072,15 +1072,11 @@ class Inspector {
       this.markup = new MarkupView(this);
     } else {
       this.markup = new NewMarkupView(this);
+      ReactDOM.render(this.markup.provider, document.getElementById("markup-root"));
     }
 
-    if (this.selection.nodeFront) {
-      if (features.oldMarkupView) {
-        this.markup.expandNode(this.selection.nodeFront);
-      } else {
-        await this.markup.update();
-        ReactDOM.render(this.markup.provider, document.getElementById("markup-root"));
-      }
+    if (this.selection.nodeFront && features.oldMarkupView) {
+      this.markup.expandNode(this.selection.nodeFront);
     }
 
     const loading = document.getElementById("markup-loading");
