@@ -27,10 +27,6 @@ class MarkupView {
     this.store = inspector.store;
     this.toolbox = inspector.toolbox;
 
-    // A map containing currently seen NodeFront objects in the markup tree.
-    // For a given NodeFront's object id, returns the NodeFront associated with it.
-    this.nodes = new Map();
-
     this.hoveredNodeId = undefined;
 
     this.onSelectNode = this.onSelectNode.bind(this);
@@ -84,7 +80,6 @@ class MarkupView {
     }
 
     this.inspector = null;
-    this.nodes = null;
     this.selection = null;
     this.store = null;
     this.toolbox = null;
@@ -173,7 +168,7 @@ class MarkupView {
    *         The NodeFront object id to expand.
    */
   async expandNode(nodeId) {
-    await this.getChildren(this.nodes.get(nodeId));
+    await this.getChildren(ThreadFront.currentPause.getNodeFront(nodeId));
     this.store?.dispatch(updateNodeExpanded(nodeId, true));
   }
 
@@ -186,16 +181,11 @@ class MarkupView {
    */
   async getChildren(node) {
     const children = await node.childNodes();
-    if (!this.nodes || !this.store) return;
+    if (!this.store) return;
 
     // Adds the children into the tree model. No need to fetch their children yet
     // since they aren't expanded.
     for (const childNodeFront of children) {
-      const childNodeId = childNodeFront.objectId();
-      if (!this.nodes.has(childNodeId)) {
-        this.nodes.set(childNodeId, childNodeFront);
-      }
-
       this.addNodeToTree(childNodeFront);
     }
 
@@ -226,18 +216,18 @@ class MarkupView {
    *         The selected NodeFront in the markup tree.
    */
   async importNode(node) {
+    const tree = this.store.getState().markup.tree;
     let currentNode = node;
 
     // Walk up the parent of the selected node to make sure they are known and expanded
     // starting from the selected node itself since we want to display it expanded with
     // its children visible.
     while (currentNode) {
-      if (!this.nodes || this.nodes.has(currentNode.objectId())) {
+      if (currentNode.objectId() in tree) {
         // We can stop importing once we encounter a node that is already known.
         break;
       }
 
-      this.nodes.set(currentNode.objectId(), currentNode);
       this.addNodeToTree(currentNode, { isExpanded: true });
       await this.getChildren(currentNode);
 
@@ -257,7 +247,7 @@ class MarkupView {
    *         The NodeFront object id to select.
    */
   onSelectNode(nodeId) {
-    this.selection.setNodeFront(this.nodes.get(nodeId));
+    this.selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
   }
 
   /**
@@ -269,7 +259,7 @@ class MarkupView {
    *         The anchor element for the tooltip.
    */
   async onShowEventTooltip(nodeId, target) {
-    const nodeFront = this.nodes.get(nodeId);
+    const nodeFront = ThreadFront.currentPause.getNodeFront(nodeId);
     const listenerRaw = nodeFront.getEventListeners();
     const frameworkListeners = await nodeFront.getFrameworkEventListeners();
 
@@ -326,13 +316,13 @@ class MarkupView {
       this.expandNode(nodeId);
     }
 
-    this.selection.setNodeFront(this.nodes.get(nodeId));
+    this.selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
   }
 
   onMouseEnterNode(nodeId) {
     if (this.hoveredNodeId !== nodeId) {
       this.hoveredNodeId = nodeId;
-      Highlighter.highlight(this.nodes.get(nodeId));
+      Highlighter.highlight(ThreadFront.currentPause.getNodeFront(nodeId));
     }
   }
 
