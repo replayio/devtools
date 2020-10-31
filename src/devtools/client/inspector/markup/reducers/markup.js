@@ -1,11 +1,10 @@
+const { assert } = require("protocol/utils");
 const Services = require("Services");
 const {
-  ADD_NODE,
-  UPDATE_CHILDREN,
+  NEW_ROOT,
+  ADD_CHILDREN,
   UPDATE_NODE_EXPANDED,
-  UPDATE_ROOT_NODE,
   UPDATE_SELECTED_NODE,
-  UPDATE_TREE,
 } = require("../actions/index");
 
 const ATTR_COLLAPSE_ENABLED_PREF = "devtools.markup.collapseAttributes";
@@ -27,31 +26,43 @@ const INITIAL_MARKUP = {
 };
 
 const reducers = {
-  [ADD_NODE](markup, { node }) {
-    if (markup.tree[node.id]) return markup;
-
+  [NEW_ROOT](markup, { rootNode }) {
     return {
       ...markup,
       tree: {
-        ...markup.tree,
-        [node.id]: node,
+        [rootNode.id]: rootNode,
       },
+      rootNode: rootNode.id,
     };
   },
 
-  [UPDATE_CHILDREN](markup, { parentNodeId, childNodeIds }) {
-    if (!markup.tree[parentNodeId]) return markup;
+  [ADD_CHILDREN](markup, { parentNodeId, children }) {
+    assert(markup.tree[parentNodeId]);
 
-    return {
-      ...markup,
-      tree: {
-        ...markup.tree,
-        [parentNodeId]: {
-          ...markup.tree[parentNodeId],
-          children: childNodeIds,
+    const newNodes = {};
+    let hasNewNodes = false;
+    for (const node of children) {
+      if (!(node.id in markup.tree)) {
+        newNodes[node.id] = node;
+        hasNewNodes = true;
+      }
+    }
+
+    if (hasNewNodes) {
+      return {
+        ...markup,
+        tree: {
+          ...markup.tree,
+          ...newNodes,
+          [parentNodeId]: {
+            ...markup.tree[parentNodeId],
+            children: children.map(child => child.id),
+          },
         },
-      },
-    };
+      };
+    } else {
+      return markup;
+    }
   },
 
   [UPDATE_NODE_EXPANDED](markup, { nodeId, isExpanded }) {
@@ -67,24 +78,10 @@ const reducers = {
     };
   },
 
-  [UPDATE_ROOT_NODE](markup, { rootNode }) {
-    return {
-      ...markup,
-      rootNode,
-    };
-  },
-
   [UPDATE_SELECTED_NODE](markup, { selectedNode }) {
     return {
       ...markup,
       selectedNode,
-    };
-  },
-
-  [UPDATE_TREE](markup, { tree }) {
-    return {
-      ...markup,
-      tree,
     };
   },
 };
