@@ -39,6 +39,8 @@
   height: 100%;
   margin: 0;
   padding: 0 0 4px 0;
+  display: grid;
+  grid-auto-rows: 1fr;
   bottom: 25px;
   left: 0;
   right: 0;
@@ -102,6 +104,7 @@
   padding: 3px 10px 3px 10px;
   cursor: default;
   white-space: nowrap;
+  transition: background-color 0.2s ease-out;
 }
 
 .outline-list > .outline-list__element {
