@@ -31,7 +31,7 @@ const focusableSelector = [
  * @return {DOMNode}
  *         newly focused element
  */
-function wrapMoveFocus(elms, current, back) {
+export function wrapMoveFocus(elms, current, back) {
   let next;
 
   if (elms.length === 0) {
@@ -59,13 +59,6 @@ function wrapMoveFocus(elms, current, back) {
  * @return {Array}
  *         array of focusable children elements inside the parent
  */
-function getFocusableElements(parentEl) {
+export function getFocusableElements(parentEl) {
   return parentEl ? Array.from(parentEl.querySelectorAll(focusableSelector)) : [];
 }
-
-// Make this available to both AMD and CJS environments
-define(function (require, exports, module) {
-  module.exports.focusableSelector = focusableSelector;
-  exports.wrapMoveFocus = wrapMoveFocus;
-  exports.getFocusableElements = getFocusableElements;
-});
