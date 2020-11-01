@@ -85,7 +85,7 @@ async function waitForLoad(urlPattern) {
       return true;
     }
   }
-  dump(`TestHarnessWaitForLoad TimedOut ${window.gBrowser.currentURI.spec}`);
+  dump(`TestHarnessWaitForLoad TimedOut ${window.gBrowser.currentURI.spec}\n`);
   return false;
 }
 
