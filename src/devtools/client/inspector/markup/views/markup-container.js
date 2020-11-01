@@ -6,17 +6,8 @@
 
 const { KeyCodes } = require("devtools/client/shared/keycodes");
 const { flashElementOn, flashElementOff } = require("devtools/client/inspector/markup/utils");
-
+const { wrapMoveFocus } = require("devtools/client/shared/focus");
 const { ThreadFront } = require("protocol/thread");
-
-/*
-loader.lazyRequireGetter(
-  this,
-  "wrapMoveFocus",
-  "devtools/client/shared/focus",
-  true
-);
-*/
 
 const DRAG_DROP_MIN_INITIAL_DISTANCE = 10;
 const TYPES = {
