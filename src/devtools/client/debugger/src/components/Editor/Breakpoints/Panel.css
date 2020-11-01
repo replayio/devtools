@@ -110,7 +110,7 @@
   flex-direction: row;
 }
 
-.breakpoint-panel form input[type="text"] {
+.breakpoint-panel form .CodeMirror {
   display: flex;
   width: 100%;
   background-color: white;
@@ -121,6 +121,11 @@
   font-size: 1rem;
   border: 1px solid var(--theme-splitter-color);
   color: var(--theme-toolbar-color);
+}
+
+.breakpoint-panel .CodeMirror-scroll {
+  display: flex;
+  flex-grow: 1;
 }
 
 .breakpoint-panel .input-container > *:not(:last-child) {

@@ -10,6 +10,7 @@ import { connect } from "devtools/client/debugger/src/utils/connect";
 import { toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import actions from "devtools/client/debugger/src/actions";
 import { getContext } from "devtools/client/debugger/src/selectors";
+import { BreakpointEditor } from "./Editor";
 
 import "./Panel.css";
 
@@ -18,7 +19,6 @@ export class Panel extends PureComponent {
   input;
   codeMirror;
   panelNode;
-  scrollParent;
 
   constructor() {
     super();
@@ -45,20 +45,9 @@ export class Panel extends PureComponent {
   }
 
   componentDidUpdate(_, prevState) {
-    const { editing, conditionValue, editCondition } = this.state;
-
-    if (!prevState.editing && editing) {
-      this.logInputNode.focus();
-    }
-
-    if (prevState.conditionValue === null && conditionValue === "") {
-      this.conditionInputNode.focus();
-    } else if (this.logInputNode && prevState.conditionValue === "" && conditionValue === null) {
-      this.logInputNode.focus();
-    }
+    const { editCondition } = this.state;
 
     if (editCondition) {
-      this.conditionInputNode.focus();
       this.setState({ editCondition: false });
     }
   }
@@ -85,19 +74,6 @@ export class Panel extends PureComponent {
     });
   }
 
-  delete = () => {
-    this.removeLogpoint();
-  };
-
-  removeLogpoint() {
-    const { cx, breakpoint } = this.props;
-    const location = breakpoint.location;
-    const options = { ...breakpoint?.options } || {};
-    delete options.logValue;
-
-    return this.props.setBreakpointOptions(cx, location);
-  }
-
   clearPanel() {
     if (this.cbPanel) {
       this.cbPanel.clear();
@@ -105,19 +81,17 @@ export class Panel extends PureComponent {
     }
   }
 
-  setBreakpoint(value) {
+  setBreakpoint() {
     const { cx, breakpoint } = this.props;
     const { logValue, conditionValue } = this.state;
 
-    const location = breakpoint.location;
-    const options = breakpoint?.options || {};
-    const newOptions = { ...options, logValue, condition: conditionValue };
+    const newOptions = { ...breakpoint.options, logValue };
 
-    if (!conditionValue) {
-      delete newOptions.condition;
+    if (conditionValue) {
+      newOptions.condition = conditionValue;
     }
 
-    this.props.setBreakpointOptions(cx, location, newOptions);
+    this.props.setBreakpointOptions(cx, breakpoint.location, newOptions);
   }
 
   toggleEditingOn = () => {
@@ -130,32 +104,6 @@ export class Panel extends PureComponent {
 
   setConditionValue = conditionValue => {
     this.setState({ conditionValue });
-  };
-
-  editCondition = () => {
-    this.toggleEditingOn();
-    this.setState({ editCondition: true });
-  };
-
-  onLogChange = e => {
-    this.setState({ logValue: e.target.value });
-  };
-
-  onConditionChange = e => {
-    this.setState({ conditionValue: e.target.value });
-  };
-
-  saveLogpoint = e => {
-    const { cx, breakpoint } = this.props;
-    const location = breakpoint.location;
-    const options = breakpoint?.options || {};
-
-    this.props.setBreakpointOptions(cx, location, {
-      ...options,
-      logValue: value,
-    });
-
-    this.toggleEditingOff();
   };
 
   handleInputBlur = () => {
@@ -230,31 +178,28 @@ export class Panel extends PureComponent {
 
     return (
       <form>
-        {hasCondition ? (
-          <>
-            <label htmlFor="condition">Condition (e.g. x === true)</label>
-            <input
-              type="text"
-              id="condition"
-              value={conditionValue}
-              onChange={this.onConditionChange}
-              onKeyDown={this.handleKeyDown}
-              onBlur={this.handleInputBlur}
-              ref={node => (this.conditionInputNode = node)}
-            />
-          </>
-        ) : null}
         <label htmlFor="logpoint">{`Log message (e.g. "x is", x)`}</label>
         <div className="input-container">
-          <input
-            type="text"
+          <BreakpointEditor
             id="logpoint"
-            value={logValue}
-            onChange={this.onLogChange}
-            onKeyDown={this.handleKeyDown}
+            autofocus={true}
+            defaultValue={logValue}
+            onChange={cm => this.setState({ logValue: cm.getValue().trim() })}
             onBlur={this.handleInputBlur}
-            ref={node => (this.logInputNode = node)}
+            onKeyDown={this.handleKeyDown}
           />
+          {hasCondition ? (
+            <>
+              <label htmlFor="condition">Condition (e.g. x === true)</label>
+              <BreakpointEditor
+                id="condition"
+                defaultValue={conditionValue}
+                onChange={cm => this.setState({ conditionValue: cm.getValue().trim() })}
+                onBlur={this.handleInputBlur}
+                onKeyDown={this.handleKeyDown}
+              />
+            </>
+          ) : null}
           {this.renderEditActions()}
         </div>
       </form>
@@ -274,8 +219,13 @@ export class Panel extends PureComponent {
   renderConditionSummary() {
     const { conditionValue } = this.state;
 
+    const onClick = () => {
+      this.toggleEditingOn();
+      this.setState({ editCondition: true });
+    };
+
     return (
-      <button className="condition" type="button" onClick={this.editCondition}>
+      <button className="condition" type="button" onClick={onClick}>
         if (<span className="expression">{conditionValue}</span>)
       </button>
     );
