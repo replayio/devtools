@@ -52,30 +52,30 @@ class JSTerm extends Component {
     return {
       // Returns previous or next value from the history
       // (depending on direction argument).
-      getValueFromHistory: PropTypes.func.isRequired,
+      // getValueFromHistory: PropTypes.func.isRequired,
       // History of executed expression (state).
-      history: PropTypes.object.isRequired,
+      // history: PropTypes.object.isRequired,
       // Evaluate provided expression.
       evaluateExpression: PropTypes.func.isRequired,
       // Update position in the history after executing an expression (action).
-      updateHistoryPosition: PropTypes.func.isRequired,
+      // updateHistoryPosition: PropTypes.func.isRequired,
       // Update autocomplete popup state.
-      autocompleteUpdate: PropTypes.func.isRequired,
-      autocompleteClear: PropTypes.func.isRequired,
-      // Data to be displayed in the autocomplete popup.
-      autocompleteData: PropTypes.object.isRequired,
-      // Toggle the editor mode.
-      editorToggle: PropTypes.func.isRequired,
-      // Dismiss the editor onboarding UI.
-      editorOnboardingDismiss: PropTypes.func.isRequired,
-      // Set the last JS input value.
-      terminalInputChanged: PropTypes.func.isRequired,
-      // Is the input in editor mode.
-      editorMode: PropTypes.bool,
-      editorWidth: PropTypes.number,
-      showEditorOnboarding: PropTypes.bool,
-      autocomplete: PropTypes.bool,
-      autocompletePopupPosition: PropTypes.string,
+      // autocompleteUpdate: PropTypes.func.isRequired,
+      // autocompleteClear: PropTypes.func.isRequired,
+      // // Data to be displayed in the autocomplete popup.
+      // // autocompleteData: PropTypes.object.isRequired,
+      // // Toggle the editor mode.
+      // editorToggle: PropTypes.func.isRequired,
+      // // Dismiss the editor onboarding UI.
+      // editorOnboardingDismiss: PropTypes.func.isRequired,
+      // // Set the last JS input value.
+      // terminalInputChanged: PropTypes.func.isRequired,
+      // // Is the input in editor mode.
+      // editorMode: PropTypes.bool,
+      // editorWidth: PropTypes.number,
+      // showEditorOnboarding: PropTypes.bool,
+      // autocomplete: PropTypes.bool,
+      // autocompletePopupPosition: PropTypes.string,
     };
   }
 
@@ -93,7 +93,7 @@ class JSTerm extends Component {
 
     // Updates to the terminal input which can trigger eager evaluations are
     // similarly debounced.
-    this.terminalInputChanged = debounce(this.props.terminalInputChanged, 75, this);
+    // this.terminalInputChanged = debounce(this.props.terminalInputChanged, 75, this);
 
     // Because the autocomplete has a slight delay (75ms), there can be time where the
     // codeMirror completion text is out-of-date, which might lead to issue when the user
@@ -555,7 +555,7 @@ class JSTerm extends Component {
    */
   _setValue(newValue = "") {
     this.lastInputValue = newValue;
-    this.terminalInputChanged(newValue);
+    // this.terminalInputChanged(newValue);
 
     if (this.editor) {
       // In order to get the autocomplete popup to work properly, we need to set the
@@ -694,7 +694,7 @@ class JSTerm extends Component {
         this.autocompleteUpdate(false, null, this._getExpressionVariables());
       }
       this.lastInputValue = value;
-      this.terminalInputChanged(value);
+      // this.terminalInputChanged(value);
     }
   }
 
@@ -870,7 +870,7 @@ class JSTerm extends Component {
     // trigger it here as well as in onAutocompleteSelect as we set the items with
     // preventSelectCallback (which means we won't trigger onAutocompleteSelect when the
     // popup is open).
-    this.terminalInputChanged(this.getInputValueWithCompletionText().expression);
+    // this.terminalInputChanged(this.getInputValueWithCompletionText().expression);
 
     this.emit("autocomplete-updated");
   }
@@ -900,7 +900,7 @@ class JSTerm extends Component {
       this.setAutoCompletionText("");
     }
     // Eager evaluation results incorporate the current autocomplete item.
-    this.terminalInputChanged(this.getInputValueWithCompletionText().expression);
+    // this.terminalInputChanged(this.getInputValueWithCompletionText().expression);
   }
 
   /**
@@ -911,7 +911,7 @@ class JSTerm extends Component {
   clearCompletion() {
     this.autocompleteUpdate.cancel();
     // Update Eager evaluation result as the completion text was removed.
-    this.terminalInputChanged(this._getValue());
+    // this.terminalInputChanged(this._getValue());
 
     this.setAutoCompletionText("");
     let onPopupClosed = Promise.resolve();
@@ -1184,25 +1184,25 @@ class JSTerm extends Component {
 
 function mapStateToProps(state) {
   return {
-    history: getHistory(state),
-    getValueFromHistory: direction => getHistoryValue(state, direction),
-    autocompleteData: getAutocompleteState(state),
-    showEditorOnboarding: state.ui.showEditorOnboarding,
-    autocompletePopupPosition: state.prefs.eagerEvaluation ? "top" : "bottom",
+    // history: getHistory(state),
+    // getValueFromHistory: direction => getHistoryValue(state, direction),
+    // autocompleteData: getAutocompleteState(state),
+    // showEditorOnboarding: state.consoleUI.showEditorOnboarding,
+    // autocompletePopupPosition: state.prefs.eagerEvaluation ? "top" : "bottom",
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    updateHistoryPosition: (direction, expression) =>
-      dispatch(actions.updateHistoryPosition(direction, expression)),
-    autocompleteUpdate: (force, getterPath, expressionVars) =>
-      dispatch(actions.autocompleteUpdate(force, getterPath, expressionVars)),
-    autocompleteClear: () => dispatch(actions.autocompleteClear()),
+    // updateHistoryPosition: (direction, expression) =>
+    //   dispatch(actions.updateHistoryPosition(direction, expression)),
+    // autocompleteUpdate: (force, getterPath, expressionVars) =>
+    //   dispatch(actions.autocompleteUpdate(force, getterPath, expressionVars)),
+    // autocompleteClear: () => dispatch(actions.autocompleteClear()),
     evaluateExpression: expression => dispatch(actions.evaluateExpression(expression)),
-    editorToggle: () => dispatch(actions.editorToggle()),
-    editorOnboardingDismiss: () => dispatch(actions.editorOnboardingDismiss()),
-    terminalInputChanged: value => dispatch(actions.terminalInputChanged(value)),
+    // editorToggle: () => dispatch(actions.editorToggle()),
+    // editorOnboardingDismiss: () => dispatch(actions.editorOnboardingDismiss()),
+    // terminalInputChanged: value => dispatch(actions.terminalInputChanged(value)),
   };
 }
 

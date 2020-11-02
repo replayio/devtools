@@ -47,10 +47,6 @@ function classname(name, bools) {
   return name;
 }
 
-function isError(message) {
-  return message.source === "javascript" && message.level === "error";
-}
-
 function getMessageLocation(message) {
   if (!message.frame) {
     return null;
@@ -85,7 +81,6 @@ export class Timeline extends Component {
     this.props.updateTimelineDimensions();
 
     this.toolbox.on("message-hover", this.onConsoleMessageHover);
-    this.toolbox.getPanel("console").subscribeToStore(this.onConsoleUpdate);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -127,20 +122,6 @@ export class Timeline extends Component {
     return Math.ceil(this.zoomStartTime + (this.zoomEndTime - this.zoomStartTime) * clickPosition);
   }
 
-  onConsoleUpdate = consoleState => {
-    const {
-      messages: { visibleMessages, messagesById },
-    } = consoleState;
-
-    if (visibleMessages != this.props.visibleMessages) {
-      const messages = visibleMessages
-        .map(id => messagesById.get(id))
-        .filter(message => message.source == "console-api" || isError(message));
-
-      this.props.setTimelineState({ messages, visibleMessages });
-    }
-  };
-
   // Called when hovering over a message in the console.
   onConsoleMessageHover = async (type, message) => {
     const { highlightedMessage, setTimelineToMessage, hideTooltip } = this.props;
@@ -159,8 +140,8 @@ export class Timeline extends Component {
   };
 
   findMessage(message) {
-    const consoleOutput = this.toolbox.getPanel("console").hud.outputNode;
-    return consoleOutput.querySelector(`.message[data-message-id="${message.id}"]`);
+    const outputNode = document.getElementById("toolbox-content-console");
+    return outputNode.querySelector(`.message[data-message-id="${message.id}"]`);
   }
 
   scrollToMessage(message) {
@@ -169,10 +150,10 @@ export class Timeline extends Component {
     }
 
     const element = this.findMessage(message);
-    const consoleOutput = this.toolbox.getPanel("console").hud.outputNode;
+    const outputNode = document.getElementById("toolbox-content-console");
 
     if (element) {
-      const consoleHeight = consoleOutput.getBoundingClientRect().height;
+      const consoleHeight = outputNode.getBoundingClientRect().height;
       const elementTop = element.getBoundingClientRect().top;
       if (elementTop < 30 || elementTop + 50 > consoleHeight) {
         element.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -687,6 +668,7 @@ export default connect(
     recordingDuration: selectors.getRecordingDuration(state),
     timelineDimensions: selectors.getTimelineDimensions(state),
     loaded: selectors.getTimelineLoaded(state),
+    messages: selectors.getMessagesForTimeline(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,

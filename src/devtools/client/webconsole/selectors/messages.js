@@ -4,80 +4,77 @@
 "use strict";
 
 const { getWarningGroupType } = require("devtools/client/webconsole/utils/messages");
-const { getParentWarningGroupMessageId } = require("devtools/client/webconsole/utils/messages");
+const {
+  getParentWarningGroupMessageId,
+  isError,
+} = require("devtools/client/webconsole/utils/messages");
+import { createSelector } from "reselect";
 
-function getAllMessagesById(state) {
+export function getAllMessagesById(state) {
   return state.messages.messagesById;
 }
 
-function getMessage(state, id) {
+export const getMessages = createSelector(
+  getAllMessagesById,
+  getVisibleMessages,
+  (messagesById, visibleMessages) => visibleMessages.map(id => messagesById.get(id))
+);
+
+export const getMessagesForTimeline = createSelector(getMessages, messages =>
+  messages.filter(message => message.source == "console-api" || isError(message))
+);
+
+export function getMessage(state, id) {
   return getAllMessagesById(state).get(id);
 }
 
-function getAllMessagesUiById(state) {
+export function getAllMessagesUiById(state) {
   return state.messages.messagesUiById;
 }
-function getAllMessagesPayloadById(state) {
+export function getAllMessagesPayloadById(state) {
   return state.messages.messagesPayloadById;
 }
 
-function getAllGroupsById(state) {
+export function getAllGroupsById(state) {
   return state.messages.groupsById;
 }
 
-function getCurrentGroup(state) {
+export function getCurrentGroup(state) {
   return state.messages.currentGroup;
 }
 
-function getVisibleMessages(state) {
+export function getVisibleMessages(state) {
   return state.messages.visibleMessages;
 }
 
-function getFilteredMessagesCount(state) {
+export function getFilteredMessagesCount(state) {
   return state.messages.filteredMessagesCount;
 }
 
-function getAllRepeatById(state) {
+export function getAllRepeatById(state) {
   return state.messages.repeatById;
 }
 
-function getGroupsById(state) {
+export function getGroupsById(state) {
   return state.messages.groupsById;
 }
 
-function getPausedExecutionPoint(state) {
+export function getPausedExecutionPoint(state) {
   return state.messages.pausedExecutionPoint;
 }
 
-function getPausedExecutionPointTime(state) {
+export function getPausedExecutionPointTime(state) {
   return state.messages.pausedExecutionPointTime;
 }
 
-function getAllWarningGroupsById(state) {
+export function getAllWarningGroupsById(state) {
   return state.messages.warningGroupsById;
 }
 
-function isMessageInWarningGroup(message, visibleMessages = []) {
+export function isMessageInWarningGroup(message, visibleMessages = []) {
   if (!getWarningGroupType(message)) {
     return false;
   }
 
   return visibleMessages.includes(getParentWarningGroupMessageId(message));
 }
-
-module.exports = {
-  getAllGroupsById,
-  getAllWarningGroupsById,
-  getAllMessagesById,
-  getAllMessagesPayloadById,
-  getAllMessagesUiById,
-  getAllRepeatById,
-  getCurrentGroup,
-  getFilteredMessagesCount,
-  getGroupsById,
-  getMessage,
-  getVisibleMessages,
-  getPausedExecutionPoint,
-  getPausedExecutionPointTime,
-  isMessageInWarningGroup,
-};

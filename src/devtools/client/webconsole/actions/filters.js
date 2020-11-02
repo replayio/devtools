@@ -14,41 +14,45 @@ const {
   FILTERS,
 } = require("devtools/client/webconsole/constants");
 
-function filterTextSet(text) {
-  return {
-    type: FILTER_TEXT_SET,
-    text,
+export function filterTextSet(text) {
+  return ({ dispatch, getState }) => {
+    const filtersState = { ...getAllFilters(getState()), text };
+    return dispatch({
+      type: FILTER_TEXT_SET,
+      filtersState,
+      text,
+    });
   };
 }
 
-function filterToggle(filter) {
+export function filterToggle(filter) {
   return ({ dispatch, getState, prefsService }) => {
+    const filters = getAllFilters(getState());
+    const filtersState = { ...filters, [filter]: !filters[filter] };
+
     dispatch({
       type: FILTER_TOGGLE,
+      filtersState,
       filter,
     });
-    const filterState = getAllFilters(getState());
-    prefsService.setBoolPref(PREFS.FILTER[filter.toUpperCase()], filterState[filter]);
+
+    prefsService.setBoolPref(PREFS.FILTER[filter.toUpperCase()], filtersState[filter]);
   };
 }
 
-function filtersClear() {
+export function filtersClear() {
   return ({ dispatch, getState, prefsService }) => {
+    const filtersState = getAllFilters(getState());
+
     dispatch({
       type: FILTERS_CLEAR,
+      filtersState,
     });
 
-    const filterState = getAllFilters(getState());
-    for (const filter in filterState) {
+    for (const filter in filtersState) {
       if (filter !== FILTERS.TEXT) {
         prefsService.clearUserPref(PREFS.FILTER[filter.toUpperCase()]);
       }
     }
   };
 }
-
-module.exports = {
-  filterTextSet,
-  filterToggle,
-  filtersClear,
-};

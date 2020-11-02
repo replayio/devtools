@@ -19,8 +19,7 @@ exports.reducers = {
   filters,
   messages,
   prefs,
-  ui,
+  consoleUI: ui,
   notifications,
-  history,
   objectInspector,
 };

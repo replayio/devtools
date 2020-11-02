@@ -34,7 +34,6 @@ const GridElementWidthResizer = createFactory(
 
 const l10n = require("devtools/client/webconsole/utils/l10n");
 
-const { getAllNotifications } = require("devtools/client/webconsole/selectors/notifications");
 const { div } = dom;
 const isMacOS = Services.appinfo.OS === "Darwin";
 
@@ -211,15 +210,15 @@ class App extends Component {
     const filterBar = this.renderFilterBar();
     const consoleOutput = this.renderConsoleOutput();
     const jsterm = this.renderJsTerm();
-    const eager = this.renderEagerEvaluation();
+    // const eager = this.renderEagerEvaluation();
 
     return this.renderRootElement([
       filterBar,
       dom.div(
         { className: "flexible-output-input", key: "in-out-container" },
         consoleOutput,
-        jsterm,
-        eager
+        jsterm
+        // eager
       ),
       editorMode
         ? GridElementWidthResizer({
@@ -235,17 +234,18 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  notifications: getAllNotifications(state),
-  reverseSearchInputVisible: state.ui.reverseSearchInputVisible,
-  reverseSearchInitialValue: state.ui.reverseSearchInitialValue,
-  editorMode: state.ui.editor,
-  editorWidth: state.ui.editorWidth,
-  sidebarVisible: state.ui.sidebarVisible,
-  filterBarDisplayMode: state.ui.filterBarDisplayMode,
-  eagerEvaluationEnabled: state.prefs.eagerEvaluation,
-  autocomplete: state.prefs.autocomplete,
-});
+const mapStateToProps = state => {
+  return {
+    reverseSearchInputVisible: state.consoleUI.reverseSearchInputVisible,
+    reverseSearchInitialValue: state.consoleUI.reverseSearchInitialValue,
+    editorMode: state.consoleUI.editor,
+    editorWidth: state.consoleUI.editorWidth,
+    sidebarVisible: state.consoleUI.sidebarVisible,
+    filterBarDisplayMode: state.consoleUI.filterBarDisplayMode,
+    eagerEvaluationEnabled: state.prefs.eagerEvaluation,
+    autocomplete: state.prefs.autocomplete,
+  };
+};
 
 const mapDispatchToProps = dispatch => ({
   dispatch,

@@ -4,6 +4,8 @@
 
 "use strict";
 
+import { getAllFilters } from "../selectors/filters";
+
 const { prepareMessage } = require("devtools/client/webconsole/utils/messages");
 const { IdGenerator } = require("devtools/client/webconsole/utils/id-generator");
 const { ThreadFront } = require("protocol/thread");
@@ -181,16 +183,18 @@ function dispatchMessageAdd(packet) {
 }
 
 export function messagesAdd(packets, idGenerator = null) {
-  if (idGenerator == null) {
-    idGenerator = defaultIdGenerator;
-  }
-  const messages = packets.map(packet => prepareMessage(packet, idGenerator));
+  return ({ dispatch, getState }) => {
+    if (idGenerator == null) {
+      idGenerator = defaultIdGenerator;
+    }
+    const messages = packets.map(packet => prepareMessage(packet, idGenerator));
+    const filtersState = getAllFilters(getState());
 
-  // When this is used for non-cached messages then handle clear message and
-  // split up into batches
-  return {
-    type: MESSAGES_ADD,
-    messages,
+    return dispatch({
+      type: MESSAGES_ADD,
+      messages,
+      filtersState,
+    });
   };
 }
 
@@ -232,9 +236,13 @@ export function setPauseExecutionPoint(executionPoint, time) {
 }
 
 export function messageOpen(id) {
-  return {
-    type: MESSAGE_OPEN,
-    id,
+  return ({ dispatch, getState }) => {
+    const filtersState = getAllFilters(getState());
+    return dispatch({
+      type: MESSAGE_OPEN,
+      id,
+      filtersState,
+    });
   };
 }
 

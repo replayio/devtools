@@ -236,16 +236,16 @@ function isScrolledToBottom(lastNode, scrollNode) {
 
 function mapStateToProps(state, props) {
   return {
-    initialized: state.ui.initialized,
+    initialized: state.consoleUI.initialized,
     pausedExecutionPoint: getPausedExecutionPoint(state),
     messages: getAllMessagesById(state),
     visibleMessages: getVisibleMessages(state),
     messagesUi: getAllMessagesUiById(state),
     messagesPayload: getAllMessagesPayloadById(state),
     warningGroups: getAllWarningGroupsById(state),
-    timestampsVisible: state.ui.timestampsVisible,
-    zoomStartTime: state.ui.zoomStartTime,
-    zoomEndTime: state.ui.zoomEndTime,
+    timestampsVisible: state.consoleUI.timestampsVisible,
+    zoomStartTime: state.consoleUI.zoomStartTime,
+    zoomEndTime: state.consoleUI.zoomEndTime,
   };
 }
 const mapDispatchToProps = dispatch => ({

@@ -102,6 +102,7 @@ async function initialize() {
 }
 
 (async () => {
+  window.gToolbox = null;
   store = await bootstrapApp({}, { recordingId });
 
   if (!initialized) {
