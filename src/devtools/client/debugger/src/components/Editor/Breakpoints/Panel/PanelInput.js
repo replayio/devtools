@@ -1,11 +1,10 @@
 import React, { useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
-// import { createEditor } from "devtools/client/debugger/src/utils/editor"
 import CodeMirror from "codemirror";
 
-export function BreakpointEditor({
+export function PanelInput({
   defaultValue,
-  autofocus,
+  autofocus = false,
   onBlur,
   onChange,
   onKeyDown,
@@ -13,18 +12,21 @@ export function BreakpointEditor({
   onMouseOver,
   onScroll,
   onGutterClick,
+  id,
 }) {
-  const editorNode = useRef(null);
+  const textAreaNode = useRef(null);
+  const codeMirrorNode = useRef(null);
   useEffect(() => {
     requestAnimationFrame(() => {
-      const codeMirror = CodeMirror.fromTextArea(editorNode.current, {
+      const codeMirror = CodeMirror.fromTextArea(textAreaNode.current, {
         mode: "javascript",
         theme: "mozilla",
         lineNumbers: false,
         autofocus,
       });
 
-      codeMirror.setValue(defaultValue || "");
+      const inputValue = defaultValue || "";
+      codeMirror.setValue(inputValue);
       const codeMirrorWrapper = codeMirror.getWrapperElement();
 
       // Set code editor wrapper to be focusable
@@ -38,7 +40,7 @@ export function BreakpointEditor({
       }
 
       if (onBlur) {
-        codeMirrorWrapper.addEventListener("blur", e => onBlur(e));
+        codeMirror.on("blur", e => onBlur(e));
       }
 
       if (onChange) {
@@ -58,11 +60,17 @@ export function BreakpointEditor({
       }
 
       setTimeout(() => codeMirror.focus(), 0);
-      codeMirror.setCursor(0, 0);
-      window.foo = codeMirror;
+      codeMirror.setCursor(0, inputValue.length);
+      codeMirrorNode.current = codeMirror;
       return codeMirror;
     });
+
+    return () => {
+      // Convert the editor's codeMirror node to a textarea so that CodeMirror
+      // handles its lifecycle for us. Without this, the editor sticks around.
+      codeMirrorNode.current.toTextArea();
+    };
   }, []);
 
-  return <textarea ref={editorNode} className="editor-mount" />;
+  return <textarea ref={textAreaNode} className={`editor-mount`} />;
 }

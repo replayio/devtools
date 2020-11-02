@@ -38,29 +38,13 @@
   cursor: pointer;
 }
 
-.breakpoint-panel > *:not(:last-child) {
-  margin-bottom: 8px;
-}
-
-.breakpoint-panel .header {
-  display: flex;
-}
-
-.breakpoint-panel .header .type {
-  margin-right: 4px;
-}
-
-.breakpoint-panel .header .line {
-  margin-right: 8px;
-}
-
 .breakpoint-panel .summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.breakpoint-panel .summary .preview {
+.breakpoint-panel .summary .options {
   font-family: var(--monospace-font-family);
   display: flex;
   flex-direction: row;
@@ -86,6 +70,22 @@
 
 .breakpoint-panel .summary button:hover .expression {
   color: var(--dark-blue);
+}
+
+.breakpoint-panel .panel-editor > *:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+.breakpoint-panel .header {
+  display: flex;
+}
+
+.breakpoint-panel .header .type {
+  margin-right: 4px;
+}
+
+.breakpoint-panel .header .line {
+  margin-right: 8px;
 }
 
 .breakpoint-panel form {
@@ -115,12 +115,20 @@
   width: 100%;
   background-color: white;
   line-height: 16px;
-  padding: 4px;
   border-radius: 4px;
   font-family: var(--monospace-font-family);
   font-size: 1rem;
   border: 1px solid var(--theme-splitter-color);
   color: var(--theme-toolbar-color);
+}
+
+.breakpoint-panel form textarea {
+  width: 100%;
+  height: 26px;
+  resize: none;
+  background-color: white;
+  border: 1px solid var(--theme-splitter-color);
+  border-radius: 4px;
 }
 
 .breakpoint-panel .CodeMirror-scroll {
@@ -159,11 +167,11 @@
 
 /* Conditional Logpoint Panel styling */
 
-.breakpoint-panel.conditional .input-container {
+.panel-editor.conditional .input-container {
   display: flex;
   flex-direction: column;
 }
 
-.breakpoint-panel.conditional .edit-actions {
+.panel-editor.conditional .edit-actions {
   margin-top: 8px;
 }
