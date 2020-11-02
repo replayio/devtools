@@ -234,7 +234,7 @@ export function setLogpointByURL(
   text: string,
   condition: string
 ) {
-  const scriptIds = ThreadFront.urlScripts.map.get(scriptUrl);
+  const scriptIds = ThreadFront.getScriptIdsForURL(scriptUrl);
   (scriptIds || []).forEach((scriptId: string) => {
     setLogpoint(logGroupId, scriptId, line, column, text, condition);
   });

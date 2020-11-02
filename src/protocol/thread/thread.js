@@ -194,7 +194,14 @@ export const ThreadFront = {
   },
 
   getScriptIdsForURL(url) {
-    return this.urlScripts.map.get(url) || [];
+    // Ignore IDs which are generated versions of another ID with the same URL.
+    // This happens with inline scripts for HTML pages, in which case we only
+    // want the ID for the HTML itself.
+    const ids = this.urlScripts.map.get(url) || [];
+    return ids.filter(id => {
+      const originalIds = this.originalScripts.map.get(id);
+      return (originalIds || []).every(originalId => !ids.includes(originalId));
+    });
   },
 
   async getScriptSource(scriptId) {
@@ -243,7 +250,7 @@ export const ThreadFront = {
   },
 
   setBreakpointByURL(url, line, column, condition) {
-    const scripts = this.urlScripts.map.get(url);
+    const scripts = this.getScriptIdsForURL(url);
     if (!scripts) {
       return;
     }
@@ -265,7 +272,7 @@ export const ThreadFront = {
   },
 
   removeBreakpointByURL(url, line, column) {
-    const scripts = this.urlScripts.map.get(url);
+    const scripts = this.getScriptIdsForURL(url);
     if (!scripts) {
       return;
     }
