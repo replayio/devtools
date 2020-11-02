@@ -15,7 +15,6 @@ import {
   getBreakpointsForSource,
   getSourceActorsForSource,
 } from "../../selectors";
-import { addBreakpoint } from "../breakpoints";
 
 import { isFulfilled, fulfilled } from "../../utils/async-value";
 
@@ -83,12 +82,6 @@ async function loadSourceTextPromise(
       newSource.id,
       isFulfilled(content) ? content.value : { type: "text", value: "", contentType: undefined }
     );
-
-    // Update the text in any breakpoints for this source by re-adding them.
-    const breakpoints = getBreakpointsForSource(getState(), source.id);
-    for (const { location, options, disabled } of breakpoints) {
-      await dispatch(addBreakpoint(cx, location, options, disabled));
-    }
   }
 }
 
