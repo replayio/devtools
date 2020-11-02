@@ -9,37 +9,37 @@
  * @static
  */
 export function openLink(url) {
-  return function () {
-    gToolbox.getPanel("debugger")?.openLink(url);
+  return ({ toolbox }) => {
+    toolbox.getPanel("debugger")?.openLink(url);
   };
 }
 
 export function evaluateInConsole(inputString) {
-  return function () {
-    gToolbox.getPanel("debugger")?.openConsoleAndEvaluate(inputString);
+  return ({ toolbox }) => {
+    toolbox.getPanel("debugger")?.openConsoleAndEvaluate(inputString);
   };
 }
 
 export function openElementInInspectorCommand(grip) {
-  return function () {
-    gToolbox.getPanel("debugger")?.openElementInInspector(grip);
+  return ({ toolbox }) => {
+    toolbox.getPanel("debugger")?.openElementInInspector(grip);
   };
 }
 
 export function openInspector(grip) {
-  return function () {
-    gToolbox.getPanel("debugger")?.openInspector();
+  return ({ toolbox }) => {
+    toolbox.getPanel("debugger")?.openInspector();
   };
 }
 
 export function highlightDomElement(grip) {
-  return function () {
-    gToolbox.getPanel("debugger")?.highlightDomElement(grip);
+  return ({ toolbox }) => {
+    toolbox.getPanel("debugger")?.highlightDomElement(grip);
   };
 }
 
 export function unHighlightDomElement(grip) {
-  return function () {
-    gToolbox.getPanel("debugger")?.unHighlightDomElement(grip);
+  return ({ toolbox }) => {
+    toolbox.getPanel("debugger")?.unHighlightDomElement(grip);
   };
 }

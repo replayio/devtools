@@ -3,12 +3,15 @@ import timeline, * as timelineSelectors from "./timeline";
 import metadata, * as metadataSelectors from "./metadata";
 import * as eventListenerBreakpointsSelectors from "devtools/client/debugger/src/reducers/event-listeners";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
+import consoleReducers from "devtools/client/webconsole/reducers";
+import * as consoleSelectors from "devtools/client/webconsole/selectors";
 
 export const reducers = {
   app,
   timeline,
   metadata,
   ...debuggerReducers,
+  ...consoleReducers.reducers,
 };
 
 export const selectors = {
@@ -16,4 +19,5 @@ export const selectors = {
   ...timelineSelectors,
   ...metadataSelectors,
   ...eventListenerBreakpointsSelectors,
+  ...consoleSelectors,
 };

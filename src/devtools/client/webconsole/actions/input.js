@@ -104,12 +104,6 @@ function onExpressionEvaluated(response) {
   };
 }
 
-function focusInput() {
-  return ({ hud }) => {
-    return hud.focusInput();
-  };
-}
-
 function setInputValue(value) {
   return () => {
     window.jsterm?._setValue(newValue);
@@ -117,7 +111,7 @@ function setInputValue(value) {
 }
 
 function terminalInputChanged(expression) {
-  return async ({ dispatch, hud, toolbox, client, getState }) => {
+  return async ({ getState }) => {
     const prefs = getAllPrefs(getState());
     if (!prefs.eagerEvaluation) {
       return;
@@ -153,7 +147,7 @@ function terminalInputChanged(expression) {
     }
 
     let mapped;
-    ({ expression, mapped } = await getMappedExpression(hud, expression));
+    ({ expression, mapped } = await getMappedExpression(expression));
 
     const frameActor = toolbox.getPanel("debugger").getFrameId();
     const selectedThreadFront = toolbox?.getSelectedThreadFront();
@@ -161,7 +155,6 @@ function terminalInputChanged(expression) {
     const response = await client.evaluateJSAsync(expression, {
       frameActor,
       selectedThreadFront,
-      selectedNodeFront: hud.getSelectedNodeFront(),
       mapped,
       eager: true,
     });
@@ -187,7 +180,6 @@ function getEagerEvaluationResult(response) {
 
 module.exports = {
   evaluateExpression,
-  focusInput,
   setInputValue,
   terminalInputChanged,
 };

@@ -67,16 +67,16 @@ class ConsoleSettings extends Component {
     );
 
     // Warning Groups
-    items.push(
-      MenuItem({
-        key: "webconsole-console-settings-menu-item-warning-groups",
-        checked: groupWarnings,
-        className: "menu-item webconsole-console-settings-menu-item-warning-groups",
-        label: l10n.getStr("webconsole.console.settings.menu.item.warningGroups.label"),
-        tooltip: l10n.getStr("webconsole.console.settings.menu.item.warningGroups.tooltip"),
-        onClick: () => dispatch(actions.warningGroupsToggle()),
-      })
-    );
+    // items.push(
+    //   MenuItem({
+    //     key: "webconsole-console-settings-menu-item-warning-groups",
+    //     checked: groupWarnings,
+    //     className: "menu-item webconsole-console-settings-menu-item-warning-groups",
+    //     label: l10n.getStr("webconsole.console.settings.menu.item.warningGroups.label"),
+    //     tooltip: l10n.getStr("webconsole.console.settings.menu.item.warningGroups.tooltip"),
+    //     onClick: () => dispatch(actions.warningGroupsToggle()),
+    //   })
+    // );
 
     // Timestamps
     items.push(

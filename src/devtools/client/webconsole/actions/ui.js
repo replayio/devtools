@@ -6,7 +6,6 @@
 
 const { getAllPrefs } = require("devtools/client/webconsole/selectors/prefs");
 const { getAllUi } = require("devtools/client/webconsole/selectors/ui");
-const { getMessage } = require("devtools/client/webconsole/selectors/messages");
 const { ThreadFront } = require("protocol/thread");
 
 const {
@@ -26,12 +25,7 @@ const {
   AUTOCOMPLETE_TOGGLE,
   SET_ZOOMED_REGION,
 } = require("devtools/client/webconsole/constants");
-
-function openLink(url, e) {
-  return ({ hud }) => {
-    return hud.openLink(url, e);
-  };
-}
+const { getAllFilters } = require("../selectors/filters");
 
 function persistToggle() {
   return ({ dispatch, getState, prefsService }) => {
@@ -65,8 +59,10 @@ function autocompleteToggle() {
 
 function warningGroupsToggle() {
   return ({ dispatch, getState, prefsService }) => {
+    const filtersState = getAllFilters(getState());
     dispatch({
       type: WARNING_GROUPS_TOGGLE,
+      filtersState,
     });
     const prefsState = getAllPrefs(getState());
     prefsService.setBoolPref(PREFS.FEATURES.GROUP_WARNINGS, prefsState.groupWarnings);
@@ -173,7 +169,6 @@ module.exports = {
   splitConsoleCloseButtonToggle,
   timestampsToggle,
   warningGroupsToggle,
-  openLink,
   timeWarp,
   setZoomedRegion,
   autocompleteToggle,

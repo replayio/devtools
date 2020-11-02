@@ -524,6 +524,10 @@ function getDescriptorValue(descriptor) {
   return descriptor;
 }
 
+function isError(message) {
+  return message.source === "javascript" && message.level === "error";
+}
+
 module.exports = {
   createWarningGroupMessage,
   getArrayTypeNames,
@@ -534,6 +538,7 @@ module.exports = {
   isContentBlockingMessage,
   isGroupType,
   isWarningGroup,
+  isError,
   l10n,
   prepareMessage,
 };

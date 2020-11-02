@@ -18,7 +18,7 @@ function filters(state = FilterState(), action) {
       return FilterState();
     case constants.FILTER_TEXT_SET:
       const { text } = action;
-      return cloneState(state, { [constants.FILTERS.TEXT]: text });
+      return cloneState(state, { text });
   }
 
   return state;
