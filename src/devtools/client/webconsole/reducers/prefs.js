@@ -14,11 +14,7 @@ const PrefState = overrides =>
     Object.assign(
       {
         logLimit: 1000,
-        sidebarToggle: false,
-        groupWarnings: true,
-        autocomplete: false,
-        eagerEvaluation: false,
-        historyCount: 50,
+        groupWarnings: true
       },
       overrides
     )

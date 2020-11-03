@@ -13,12 +13,12 @@ FilterButton.propTypes = {
   label: PropTypes.string.isRequired,
   filterKey: PropTypes.string.isRequired,
   active: PropTypes.bool.isRequired,
-  dispatch: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
   title: PropTypes.string,
 };
 
 function FilterButton(props) {
-  const { active, label, filterKey, dispatch, title } = props;
+  const { active, label, filterKey, onClick, title } = props;
 
   return dom.button(
     {
@@ -26,9 +26,7 @@ function FilterButton(props) {
       className: "devtools-togglebutton",
       "data-category": filterKey,
       title,
-      onClick: () => {
-        dispatch(actions.filterToggle(filterKey));
-      },
+      onClick
     },
     label
   );

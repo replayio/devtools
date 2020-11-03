@@ -24,7 +24,6 @@ const UiState = overrides =>
     Object.assign(
       {
         persistLogs: false,
-        sidebarVisible: false,
         timestampsVisible: true,
         frontInSidebar: null,
         closeButtonVisible: true,
@@ -50,16 +49,10 @@ function ui(state = UiState(), action) {
     case SIDEBAR_CLOSE:
       return {
         ...state,
-        sidebarVisible: false,
         frontInSidebar: null,
       };
     case MESSAGES_CLEAR:
-      return { ...state, sidebarVisible: false, frontInSidebar: null };
-    case SHOW_OBJECT_IN_SIDEBAR:
-      if (action.front === state.frontInSidebar) {
-        return state;
-      }
-      return { ...state, sidebarVisible: true, frontInSidebar: action.front };
+      return { ...state, frontInSidebar: null };
     case SPLIT_CONSOLE_CLOSE_BUTTON_TOGGLE:
       return { ...state, closeButtonVisible: action.shouldDisplayButton };
     case REVERSE_SEARCH_INPUT_TOGGLE:

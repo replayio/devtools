@@ -83,10 +83,6 @@ const prefs = {
       CONTEXT_SELECTOR: "devtools.webconsole.input.context",
     },
     FEATURES: {
-      SIDEBAR_TOGGLE: "devtools.webconsole.sidebarToggle",
-      AUTOCOMPLETE: "devtools.webconsole.input.autocomplete",
-      EAGER_EVALUATION: "devtools.webconsole.input.eagerEvaluation",
-      GROUP_WARNINGS: "devtools.webconsole.groupWarningMessages",
     },
   },
 };

@@ -9,18 +9,10 @@ import { UiState } from "devtools/client/webconsole/reducers/ui";
 import { prefs } from "devtools/client/webconsole/utils/prefs";
 
 export function getConsoleInitialState() {
-  const sidebarToggle = prefs.sidebarToggle;
-  const autocomplete = prefs.inputAutocomplete;
-  // const eagerEvaluation = prefs.inputEagerEvaluation;
   const groupWarnings = prefs.groupWarningMessages;
-  // const historyCount = prefs.historyCount;
 
   return {
     prefs: PrefState({
-      sidebarToggle,
-      autocomplete,
-      // eagerEvaluation,
-      // historyCount,
       groupWarnings,
     }),
     filters: FilterState({
@@ -31,10 +23,6 @@ export function getConsoleInitialState() {
       log: prefs.filterLog,
     }),
     consoleUI: UiState({
-      persistLogs: prefs.persistLogs,
-      editor: prefs.editor,
-      editorWidth: prefs.editorWidth,
-      showEditorOnboarding: prefs.showEditorOnboarding,
       timestampsVisible: prefs.timestampsVisible,
     }),
   };

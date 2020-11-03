@@ -109,77 +109,7 @@ function setInputValue(value) {
     window.jsterm?._setValue(newValue);
   };
 }
-
-function terminalInputChanged(expression) {
-  return async ({ getState }) => {
-    const prefs = getAllPrefs(getState());
-    if (!prefs.eagerEvaluation) {
-      return;
-    }
-
-    // FIXME Eager evaluation is NYI
-    return;
-    /*
-    const { terminalInput = "" } = getState().history;
-    // Only re-evaluate if the expression did change.
-    if (
-      (!terminalInput && !expression) ||
-      (typeof terminalInput === "string" &&
-        typeof expression === "string" &&
-        expression.trim() === terminalInput.trim())
-    ) {
-      return;
-    }
-
-    dispatch({
-      type: SET_TERMINAL_INPUT,
-      expression: expression.trim(),
-    });
-
-    // There's no need to evaluate an empty string.
-    if (!expression || !expression.trim()) {
-      // eslint-disable-next-line consistent-return
-      return dispatch({
-        type: SET_TERMINAL_EAGER_RESULT,
-        expression,
-        result: null,
-      });
-    }
-
-    let mapped;
-    ({ expression, mapped } = await getMappedExpression(expression));
-
-    const frameActor = toolbox.getPanel("debugger").getFrameId();
-    const selectedThreadFront = toolbox?.getSelectedThreadFront();
-
-    const response = await client.evaluateJSAsync(expression, {
-      frameActor,
-      selectedThreadFront,
-      mapped,
-      eager: true,
-    });
-
-    // eslint-disable-next-line consistent-return
-    return dispatch({
-      type: SET_TERMINAL_EAGER_RESULT,
-      result: getEagerEvaluationResult(response),
-    });
-    */
-  };
-}
-
-function getEagerEvaluationResult(response) {
-  const result = response.exception || response.result;
-  // Don't show syntax errors results to the user.
-  if ((result && result.isSyntaxError) || (result && result.type == "undefined")) {
-    return null;
-  }
-
-  return result;
-}
-
 module.exports = {
   evaluateExpression,
   setInputValue,
-  terminalInputChanged,
 };

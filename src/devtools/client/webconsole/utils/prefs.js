@@ -28,17 +28,8 @@ pref("console.input.editor", false);
 pref("console.timestampMessages", true);
 
 pref("console.timestampsVisible", false);
-// Store the editor width.
-pref("console.input.editorWidth", true);
-// Show the Editor onboarding UI
-pref("console.input.editorOnboarding", true);
-// Show the Input Context the selector
-pref("console.input.context", true);
 
-pref("console.sidebarToggle", true);
-pref("console.input.autocomplete", true);
-pref("console.input.eagerEvaluation", true);
-pref("console.groupWarningMessages", true);
+pref("console.input.context", true);
 
 export const prefs = new PrefsHelper("console", {
   filterError: ["Bool", "filter.error"],
@@ -51,21 +42,15 @@ export const prefs = new PrefsHelper("console", {
   editor: ["Bool", "input.editor"],
   timestampMessages: ["Bool", "timestampMessages"],
   timestampsVisible: ["Bool", "timestampsVisible"],
-  aeditorWidth: ["Bool", "input.editorWidth"],
-  editorOnboarding: ["Bool", "input.editorOnboarding"],
   inputContext: ["Bool", "input.context"],
-  sidebarToggle: ["Bool", "sidebarToggle"],
-  inputAutocomplete: ["Bool", "input.autocomplete"],
-  inputEagerEvaluation: ["Bool", "input.eagerEvaluation"],
-  groupWarningMessages: ["Bool", "groupWarningMessages"],
 });
 
 export function getPrefsService() {
   return {
     getBoolPref: (pref, deflt) => deflt,
     getIntPref: (pref, deflt) => deflt,
-    setBoolPref: (pref, value) => {},
-    setIntPref: (pref, value) => {},
-    clearUserPref: pref => {},
+    setBoolPref: (pref, value) => { },
+    setIntPref: (pref, value) => { },
+    clearUserPref: pref => { },
   };
 }
