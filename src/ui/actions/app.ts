@@ -1,11 +1,20 @@
 import { Action } from "redux";
 import { UIStore, UIThunkAction } from ".";
-import { RecordingId, sessionError, SessionId, unprocessedRegions } from "record-replay-protocol";
+import {
+  RecordingId,
+  sessionError,
+  SessionId,
+  unprocessedRegions,
+  PointDescription,
+  Location,
+} from "record-replay-protocol";
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
 import { ExpectedError, Modal, PanelName } from "ui/state/app";
+const { PointHandlers } = require("protocol/logpoint");
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
+export type SetupAppAction2 = Action<"setup_app"> & { recordingId: RecordingId };
 export type LoadingAction = Action<"loading"> & { loading: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
@@ -16,6 +25,13 @@ export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: Exp
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & { error: sessionError };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: boolean };
 export type SetModalAction = Action<"set_modal"> & { modal: Modal | null };
+export type SetPendingNotificationAction = Action<"set_pending_notification"> & {
+  location: Location;
+};
+export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
+  analysisPoints: PointDescription[] | null;
+  location: Location;
+};
 export type AppAction =
   | SetupAppAction
   | LoadingAction
@@ -27,10 +43,13 @@ export type AppAction =
   | SetExpectedErrorAction
   | SetUnexpectedErrorAction
   | SetUploadingAction
-  | SetModalAction;
+  | SetModalAction
+  | SetPendingNotificationAction
+  | SetAnalysisPointsAction;
 
 export function setupApp(recordingId: RecordingId, store: UIStore) {
   store.dispatch({ type: "setup_app", recordingId });
+  setupPointHandlers(store);
 
   ThreadFront.waitForSession().then(sessionId =>
     store.dispatch({ type: "set_session_id", sessionId })
@@ -44,6 +63,19 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
   });
 
   const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 1000);
+}
+
+function setupPointHandlers(store: UIStore) {
+  PointHandlers.onPoints = (points: PointDescription[], info: any) => {
+    const { location } = info;
+    if (location) {
+      store.dispatch(setAnalysisPoints(points, location));
+    }
+  };
+
+  PointHandlers.addPendingNotification = (location: any) => {
+    store.dispatch(setPendingNotification(location));
+  };
 }
 
 function bumpLoading(): UIThunkAction {
@@ -117,5 +149,20 @@ export function hideModal(): SetModalAction {
   return {
     type: "set_modal",
     modal: null,
+  };
+}
+
+export function setAnalysisPoints(points: PointDescription[], location: Location) {
+  return {
+    type: "set_analysis_points",
+    analysisPoints: points,
+    location,
+  };
+}
+
+export function setPendingNotification(location: any): SetPendingNotificationAction {
+  return {
+    type: "set_pending_notification",
+    location: location,
   };
 }

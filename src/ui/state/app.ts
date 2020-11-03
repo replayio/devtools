@@ -1,4 +1,4 @@
-import { RecordingId, sessionError, SessionId } from "record-replay-protocol";
+import { RecordingId, sessionError, SessionId, PointDescription } from "record-replay-protocol";
 
 export type PanelName = "console" | "debugger" | "inspector";
 
@@ -30,4 +30,10 @@ export interface AppState {
   unexpectedError: sessionError | null;
   modal: Modal | null;
   selectedPanel: PanelName;
+  pendingNotification: any;
+  analysisPoints: AnalysisPoints;
+}
+
+export interface AnalysisPoints {
+  [key: string]: PointDescription;
 }

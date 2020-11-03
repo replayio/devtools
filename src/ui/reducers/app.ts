@@ -2,6 +2,7 @@ import { AppState } from "ui/state/app";
 import { AppAction } from "ui/actions/app";
 import { UIState } from "ui/state";
 const { prefs } = require("../utils/prefs");
+const { makeBreakpointId } = require("../../devtools/client/debugger/src/utils/breakpoint");
 
 function initialAppState(): AppState {
   return {
@@ -17,6 +18,8 @@ function initialAppState(): AppState {
     uploading: null,
     sessionId: null,
     modal: null,
+    pendingNotification: null,
+    analysisPoints: {},
   };
 }
 
@@ -66,6 +69,22 @@ export default function update(state = initialAppState(), action: AppAction) {
       return { ...state, modal: action.modal };
     }
 
+    case "set_analysis_points": {
+      const id = makeBreakpointId(action.location);
+
+      return {
+        ...state,
+        analysisPoints: {
+          ...state.analysisPoints,
+          [id]: action.analysisPoints,
+        },
+      };
+    }
+
+    case "set_pending_notification": {
+      return { ...state, pendingNotification: action.location };
+    }
+
     default: {
       return state;
     }
@@ -83,3 +102,7 @@ export const getSessionId = (state: UIState) => state.app.sessionId;
 export const getExpectedError = (state: UIState) => state.app.expectedError;
 export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getModal = (state: UIState) => state.app.modal;
+export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
+export const getPendingNotification = (state: UIState) => state.app.pendingNotification;
+export const getAnalysisPointsForLocation = (state: UIState, location: any) =>
+  location && state.app.analysisPoints[makeBreakpointId(location)];
