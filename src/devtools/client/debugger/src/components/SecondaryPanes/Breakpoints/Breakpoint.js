@@ -9,7 +9,7 @@ import { connect } from "../../../utils/connect";
 import { createSelector } from "reselect";
 import classnames from "classnames";
 import actions from "../../../actions";
-import { memoize } from "lodash";
+import { find, findLast, memoize } from "lodash";
 
 import showContextMenu from "./BreakpointsContextMenu";
 import { CloseButton } from "../../shared/Button";
@@ -27,6 +27,11 @@ import {
   getSelectedSource,
   getContext,
 } from "../../../selectors";
+import { selectors } from "../../../../../../../ui/reducers";
+const { getAnalysisPointsForLocation } = selectors;
+
+import { getThreadExecutionPoint } from "../../../reducers/pause";
+import { compareNumericStrings } from "../../../../../../../protocol/utils";
 
 class Breakpoint extends PureComponent {
   onContextMenu = e => {
@@ -99,10 +104,24 @@ class Breakpoint extends PureComponent {
     text => text
   );
 
+  navigateToPrev(point) {
+    if (point) {
+      this.props.seekToPosition(point.point, point.time);
+    }
+  }
+
   render() {
-    const { breakpoint, editor } = this.props;
+    const { breakpoint, editor, executionPoint, analysisPoints } = this.props;
     const text = this.getBreakpointText();
     const labelId = `${breakpoint.id}-label`;
+
+    let prev;
+    let next;
+
+    if (executionPoint && analysisPoints?.length > 0) {
+      prev = findLast(analysisPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
+      next = find(analysisPoints, p => compareNumericStrings(p.point, executionPoint) > 0);
+    }
 
     return (
       <div
@@ -132,6 +151,28 @@ class Breakpoint extends PureComponent {
         >
           <span dangerouslySetInnerHTML={this.highlightText(text, editor)} />
         </span>
+
+        <div>
+          Hits: {analysisPoints ? analysisPoints.length : 0} |
+          <button
+            className="button-prev"
+            disabled={!prev}
+            onClick={() => {
+              this.navigateToPrev(prev);
+            }}
+          >
+            ►
+          </button>{" "}
+          <button
+            className="button-next"
+            disabled={!next}
+            onClick={() => {
+              this.navigateToPrev(next);
+            }}
+          >
+            ►
+          </button>
+        </div>
         <div className="breakpoint-line-close">
           <div className="breakpoint-line devtools-monospace">{this.getBreakpointLocation()}</div>
           <CloseButton
@@ -144,25 +185,23 @@ class Breakpoint extends PureComponent {
   }
 }
 
-const getFormattedFrame = createSelector(
-  getSelectedSource,
-  getSelectedFrame,
-  (selectedSource, frame) => {
-    if (!frame) {
-      return null;
-    }
-
-    return {
-      ...frame,
-      selectedLocation: frame.location,
-    };
+const getFormattedFrame = createSelector(getSelectedFrame, frame => {
+  if (!frame) {
+    return null;
   }
-);
+
+  return {
+    ...frame,
+    selectedLocation: frame.location,
+  };
+});
 
 const mapStateToProps = (state, p) => ({
   cx: getContext(state),
   breakpoints: getBreakpointsList(state),
   frame: getFormattedFrame(state),
+  analysisPoints: getAnalysisPointsForLocation(state, p.breakpoint.location),
+  executionPoint: getThreadExecutionPoint(state),
 });
 
 export default connect(mapStateToProps, {
@@ -176,4 +215,5 @@ export default connect(mapStateToProps, {
   toggleAllBreakpoints: actions.toggleAllBreakpoints,
   toggleBreakpoints: actions.toggleBreakpoints,
   toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
+  seekToPosition: actions.seekToPosition,
 })(Breakpoint);

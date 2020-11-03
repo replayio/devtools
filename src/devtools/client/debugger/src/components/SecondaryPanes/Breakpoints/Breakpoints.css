@@ -231,3 +231,7 @@ html .breakpoints-list .breakpoint.paused {
   padding-top: 1px;
 }
 
+.button-prev {
+  transform: rotate(180deg);
+  cursor: pointer;
+}
