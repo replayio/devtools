@@ -4,7 +4,7 @@ import CodeMirror from "codemirror";
 
 export function PanelInput({
   defaultValue,
-  autofocus = false,
+  autofocus,
   onBlur,
   onChange,
   onKeyDown,
@@ -59,7 +59,6 @@ export function PanelInput({
         codeMirror.on("gutterClick", onGutterClick);
       }
 
-      setTimeout(() => codeMirror.focus(), 0);
       codeMirror.setCursor(0, inputValue.length);
       codeMirrorNode.current = codeMirror;
       return codeMirror;
@@ -67,10 +66,16 @@ export function PanelInput({
 
     return () => {
       // Convert the editor's codeMirror node to a textarea so that CodeMirror
-      // handles its lifecycle for us. Without this, the editor sticks around.
+      // handles its cleanup for us. Without this, the editor sticks around.
       codeMirrorNode.current.toTextArea();
     };
   }, []);
+
+  useEffect(() => {
+    if (autofocus) {
+      setTimeout(() => codeMirrorNode.current.focus(), 0);
+    }
+  });
 
   return <textarea ref={textAreaNode} className={`editor-mount`} />;
 }

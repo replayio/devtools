@@ -36,18 +36,13 @@ class PanelEditor extends PureComponent {
   };
 
   handleCancel = e => {
-    const { breakpoint, toggleEditingOff } = this.props;
+    const { toggleEditingOff } = this.props;
 
-    this.setState({
-      logValue: breakpoint.options.logValue,
-      conditionValue: breakpoint.options.condition || null,
-    });
     toggleEditingOff();
   };
 
   handleSave = () => {
     const { toggleEditingOff } = this.props;
-    const { conditionValue } = this.state;
 
     this.setBreakpoint();
     toggleEditingOff();
@@ -103,6 +98,7 @@ class PanelEditor extends PureComponent {
 
   renderForm() {
     const { logValue, conditionValue } = this.state;
+    const { inputToFocus } = this.props;
     const hasCondition = conditionValue !== null;
 
     return (
@@ -111,7 +107,7 @@ class PanelEditor extends PureComponent {
         <div className="input-container">
           <PanelInput
             id="logpoint"
-            autofocus={true}
+            autofocus={inputToFocus == "logValue" ? true : false}
             defaultValue={logValue}
             onChange={cm => this.setState({ logValue: cm.getValue().trim() })}
             onBlur={this.handleInputBlur}
@@ -122,6 +118,7 @@ class PanelEditor extends PureComponent {
               <label htmlFor="condition">Condition (e.g. x === true)</label>
               <PanelInput
                 id="condition"
+                autofocus={inputToFocus == "condition" ? true : false}
                 defaultValue={conditionValue}
                 onChange={cm => this.setState({ conditionValue: cm.getValue().trim() })}
                 onBlur={this.handleInputBlur}
@@ -140,24 +137,25 @@ class PanelEditor extends PureComponent {
     const { conditionValue } = this.state;
     const hasCondition = conditionValue !== null;
 
+    const addCondition = () => {
+      this.props.setInputToFocus("condition");
+      this.setState({ conditionValue: "" });
+    };
+    const removeCondition = () => {
+      this.props.setInputToFocus("logValue");
+      this.setState({ conditionValue: null });
+    };
+
     return (
       <div className="header">
         <div className="type">Logpoint:</div>
         <div className="line">Line {breakpoint.location.line}</div>
         {hasCondition ? (
-          <div
-            className="action"
-            tabIndex="0"
-            onClick={() => this.setState({ conditionValue: null })}
-          >
+          <div className="action" tabIndex="0" onClick={removeCondition}>
             Remove Condition
           </div>
         ) : (
-          <div
-            className="action"
-            tabIndex="0"
-            onClick={() => this.setState({ conditionValue: "" })}
-          >
+          <div className="action" tabIndex="0" onClick={addCondition}>
             Add Condition
           </div>
         )}

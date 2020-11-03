@@ -11,23 +11,29 @@ import { toEditorLine } from "devtools/client/debugger/src/utils/editor";
 
 import "./Panel.css";
 
-function PanelSummary({ breakpoint, toggleEditingOn }) {
+function PanelSummary({ breakpoint, toggleEditingOn, setInputToFocus }) {
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
+  const handleClick = (event, input) => {
+    event.stopPropagation();
+    toggleEditingOn();
+    setInputToFocus(input);
+  };
+
   return (
-    <div className="summary" onClick={toggleEditingOn}>
+    <div className="summary" onClick={e => handleClick(e, "logValue")}>
       <div className="options">
         {conditionValue ? (
-          <button className="condition" type="button" onClick={toggleEditingOn}>
+          <button className="condition" type="button" onClick={e => handleClick(e, "condition")}>
             if (<span className="expression">{conditionValue}</span>)
           </button>
         ) : null}
-        <button className="log" type="button" onClick={toggleEditingOn}>
+        <button className="log" type="button" onClick={e => handleClick(e, "logValue")}>
           console.log(<span className="expression">{logValue}</span>);
         </button>
       </div>
-      <div className="action" tabIndex="0" onClick={toggleEditingOn}>
+      <div className="action" tabIndex="0" onClick={e => handleClick(e, "logValue")}>
         Edit
       </div>
     </div>
@@ -56,6 +62,7 @@ function Widget({ location, children, editor }) {
 
 function Panel({ breakpoint, editor }) {
   const [editing, setEditing] = useState(false);
+  const [inputToFocus, setInputToFocus] = useState("logValue");
 
   const toggleEditingOn = () => setEditing(true);
   const toggleEditingOff = () => setEditing(false);
@@ -64,9 +71,18 @@ function Panel({ breakpoint, editor }) {
     <Widget location={breakpoint.location} editor={editor}>
       <div className={classnames("breakpoint-panel", { editing })}>
         {editing ? (
-          <PanelEditor breakpoint={breakpoint} toggleEditingOff={toggleEditingOff} />
+          <PanelEditor
+            breakpoint={breakpoint}
+            toggleEditingOff={toggleEditingOff}
+            inputToFocus={inputToFocus}
+            setInputToFocus={setInputToFocus}
+          />
         ) : (
-          <PanelSummary breakpoint={breakpoint} toggleEditingOn={toggleEditingOn} />
+          <PanelSummary
+            breakpoint={breakpoint}
+            toggleEditingOn={toggleEditingOn}
+            setInputToFocus={setInputToFocus}
+          />
         )}
       </div>
     </Widget>
