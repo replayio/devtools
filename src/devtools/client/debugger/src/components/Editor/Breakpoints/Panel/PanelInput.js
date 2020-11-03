@@ -75,7 +75,7 @@ export function PanelInput({
     if (autofocus) {
       setTimeout(() => codeMirrorNode.current.focus(), 0);
     }
-  });
+  }, [autofocus]);
 
   return <textarea ref={textAreaNode} className={`editor-mount`} />;
 }

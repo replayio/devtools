@@ -107,7 +107,7 @@ class PanelEditor extends PureComponent {
         <div className="input-container">
           <PanelInput
             id="logpoint"
-            autofocus={inputToFocus == "logValue" ? true : false}
+            autofocus={inputToFocus == "logValue"}
             defaultValue={logValue}
             onChange={cm => this.setState({ logValue: cm.getValue().trim() })}
             onBlur={this.handleInputBlur}
@@ -118,7 +118,7 @@ class PanelEditor extends PureComponent {
               <label htmlFor="condition">Condition (e.g. x === true)</label>
               <PanelInput
                 id="condition"
-                autofocus={inputToFocus == "condition" ? true : false}
+                autofocus={inputToFocus == "condition"}
                 defaultValue={conditionValue}
                 onChange={cm => this.setState({ conditionValue: cm.getValue().trim() })}
                 onBlur={this.handleInputBlur}
