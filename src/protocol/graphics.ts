@@ -129,7 +129,7 @@ ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
   });
 });
 
-export function addLastScreen(screen: ScreenShot, point: string, time: number) {
+export function addLastScreen(screen: ScreenShot | null, point: string, time: number) {
   if (screen) {
     addScreenShot(screen);
     const paintHash = screen.hash;
@@ -186,7 +186,7 @@ function addScreenShot(screenShot: ScreenShot) {
 // How recently a click must have occurred for it to be drawn.
 const ClickThresholdMs = 200;
 
-interface MouseAndClickPosition {
+export interface MouseAndClickPosition {
   x: number;
   y: number;
   clickX?: number;
@@ -245,7 +245,7 @@ let gLastImage: HTMLImageElement | null = null;
 // Mouse information to draw.
 let gDrawMouse: MouseAndClickPosition | null = null;
 
-export function paintGraphics(screenShot: ScreenShot, mouse: MouseAndClickPosition) {
+export function paintGraphics(screenShot?: ScreenShot, mouse?: MouseAndClickPosition) {
   if (!screenShot) {
     clearGraphics();
     return;
@@ -258,7 +258,7 @@ export function paintGraphics(screenShot: ScreenShot, mouse: MouseAndClickPositi
   gDrawImage = new Image();
   gDrawImage.onload = refreshGraphics;
   gDrawImage.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
-  gDrawMouse = mouse;
+  gDrawMouse = mouse || null;
   refreshGraphics();
 }
 

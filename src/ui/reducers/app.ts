@@ -1,6 +1,9 @@
-import { prefs } from "../utils/prefs";
+import { AppState } from "ui/state/app";
+import { AppAction } from "ui/actions/app";
+import { UIState } from "ui/state";
+const { prefs } = require("../utils/prefs");
 
-function initialAppState() {
+function initialAppState(): AppState {
   return {
     recordingId: null,
     expectedError: null,
@@ -10,7 +13,6 @@ function initialAppState() {
     isToolboxOpen: prefs.isToolboxOpen,
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
-    tooltip: null,
     loading: 4,
     uploading: null,
     sessionId: null,
@@ -18,7 +20,7 @@ function initialAppState() {
   };
 }
 
-export default function update(state = initialAppState(), action) {
+export default function update(state = initialAppState(), action: AppAction) {
   switch (action.type) {
     case "setup_app": {
       return { ...state, recordingId: action.recordingId };
@@ -70,14 +72,14 @@ export default function update(state = initialAppState(), action) {
   }
 }
 
-export const getTheme = state => state.app.theme;
-export const isSplitConsoleOpen = state => state.app.splitConsoleOpen;
-export const isToolboxOpen = state => state.app.isToolboxOpen;
-export const getSelectedPanel = state => state.app.selectedPanel;
-export const getLoading = state => state.app.loading;
-export const getUploading = state => state.app.uploading;
-export const getRecordingId = state => state.app.recordingId;
-export const getSessionId = state => state.app.sessionId;
-export const getExpectedError = state => state.app.expectedError;
-export const getUnexpectedError = state => state.app.unexpectedError;
-export const getModal = state => state.app.modal;
+export const getTheme = (state: UIState) => state.app.theme;
+export const isSplitConsoleOpen = (state: UIState) => state.app.splitConsoleOpen;
+export const isToolboxOpen = (state: UIState) => state.app.isToolboxOpen;
+export const getSelectedPanel = (state: UIState) => state.app.selectedPanel;
+export const getLoading = (state: UIState) => state.app.loading;
+export const getUploading = (state: UIState) => state.app.uploading;
+export const getRecordingId = (state: UIState) => state.app.recordingId;
+export const getSessionId = (state: UIState) => state.app.sessionId;
+export const getExpectedError = (state: UIState) => state.app.expectedError;
+export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
+export const getModal = (state: UIState) => state.app.modal;
