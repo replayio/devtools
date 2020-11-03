@@ -40,11 +40,7 @@ class FilterBar extends Component {
       displayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)]).isRequired,
       filter: PropTypes.object.isRequired,
       filteredMessagesCount: PropTypes.object.isRequired,
-      groupWarnings: PropTypes.bool.isRequired,
-      persistLogs: PropTypes.bool.isRequired,
-      eagerEvaluation: PropTypes.bool.isRequired,
       timestampsVisible: PropTypes.bool.isRequired,
-      autocomplete: PropTypes.bool.isRequired,
     };
   }
 
@@ -72,28 +68,20 @@ class FilterBar extends Component {
     this.resizeObserver.observe(this.wrapperNode);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     const {
       closeButtonVisible,
       displayMode,
       filter,
       filteredMessagesCount,
-      groupWarnings,
-      persistLogs,
       timestampsVisible,
-      eagerEvaluation,
-      autocomplete,
     } = this.props;
 
     if (
       nextProps.closeButtonVisible !== closeButtonVisible ||
       nextProps.displayMode !== displayMode ||
       nextProps.filter !== filter ||
-      nextProps.groupWarnings !== groupWarnings ||
-      nextProps.persistLogs !== persistLogs ||
-      nextProps.timestampsVisible !== timestampsVisible ||
-      nextProps.eagerEvaluation !== eagerEvaluation ||
-      nextProps.autocomplete !== autocomplete
+      nextProps.timestampsVisible !== timestampsVisible
     ) {
       return true;
     }
@@ -188,31 +176,31 @@ class FilterBar extends Component {
         active: filter[FILTERS.ERROR],
         label: getLabel(l10n.getStr("webconsole.errorsFilterButton.label"), FILTERS.ERROR),
         filterKey: FILTERS.ERROR,
-        dispatch,
+        onClick: () => filterToggle(FILTERS.ERROR),
       }),
       FilterButton({
         active: filter[FILTERS.WARN],
         label: getLabel(l10n.getStr("webconsole.warningsFilterButton.label"), FILTERS.WARN),
         filterKey: FILTERS.WARN,
-        dispatch,
+        onClick: () => filterToggle(FILTERS.WARN),
       }),
       FilterButton({
         active: filter[FILTERS.LOG],
         label: getLabel(l10n.getStr("webconsole.logsFilterButton.label"), FILTERS.LOG),
         filterKey: FILTERS.LOG,
-        dispatch,
+        onClick: () => filterToggle(FILTERS.LOG),
       }),
       FilterButton({
         active: filter[FILTERS.INFO],
         label: getLabel(l10n.getStr("webconsole.infoFilterButton.label"), FILTERS.INFO),
         filterKey: FILTERS.INFO,
-        dispatch,
+        onClick: () => filterToggle(FILTERS.INFO),
       }),
       FilterButton({
         active: filter[FILTERS.DEBUG],
         label: getLabel(l10n.getStr("webconsole.debugFilterButton.label"), FILTERS.DEBUG),
         filterKey: FILTERS.DEBUG,
-        dispatch,
+        onClick: () => filterToggle(FILTERS.DEBUG),
       })
     );
   }
@@ -249,21 +237,14 @@ class FilterBar extends Component {
   renderSettingsButton() {
     const {
       dispatch,
-      eagerEvaluation,
       groupWarnings,
-      persistLogs,
       timestampsVisible,
-      autocomplete,
       filter,
     } = this.props;
 
     return ConsoleSettings({
       dispatch,
-      eagerEvaluation,
-      groupWarnings,
-      persistLogs,
       timestampsVisible,
-      autocomplete,
       filter,
     });
   }
@@ -355,4 +336,5 @@ module.exports = connect(mapStateToProps, {
   filterBarDisplayModeSet: actions.filterBarDisplayModeSet,
   messagesClearEvaluations: actions.messagesClearEvaluations,
   filterTextSet: actions.filterTextSet,
+  filterToggle: actions.filterToggle
 })(FilterBar);

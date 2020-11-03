@@ -23,36 +23,15 @@ const { FILTERS } = require("devtools/client/webconsole/constants");
 class ConsoleSettings extends Component {
   static get propTypes() {
     return {
-      eagerEvaluation: PropTypes.bool.isRequired,
-      groupWarnings: PropTypes.bool.isRequired,
-      persistLogs: PropTypes.bool.isRequired,
       timestampsVisible: PropTypes.bool.isRequired,
-      autocomplete: PropTypes.bool.isRequired,
       filter: PropTypes.object.isRequired,
     };
   }
 
   renderMenuItems() {
-    const { dispatch, groupWarnings, timestampsVisible, filter } = this.props;
+    const { dispatch, timestampsVisible, filter } = this.props;
 
     const items = [];
-
-    // Persist Logs
-    // items.push(
-    //   MenuItem({
-    //     key: "webconsole-console-settings-menu-item-persistent-logs",
-    //     checked: persistLogs,
-    //     className:
-    //       "menu-item webconsole-console-settings-menu-item-persistentLogs",
-    //     label: l10n.getStr(
-    //       "webconsole.console.settings.menu.item.enablePersistentLogs.label"
-    //     ),
-    //     tooltip: l10n.getStr(
-    //       "webconsole.console.settings.menu.item.enablePersistentLogs.tooltip"
-    //     ),
-    //     onClick: () => dispatch(actions.persistToggle()),
-    //   })
-    // );
 
     // Timestamps
     items.push(
@@ -66,18 +45,6 @@ class ConsoleSettings extends Component {
       })
     );
 
-    // Warning Groups
-    // items.push(
-    //   MenuItem({
-    //     key: "webconsole-console-settings-menu-item-warning-groups",
-    //     checked: groupWarnings,
-    //     className: "menu-item webconsole-console-settings-menu-item-warning-groups",
-    //     label: l10n.getStr("webconsole.console.settings.menu.item.warningGroups.label"),
-    //     tooltip: l10n.getStr("webconsole.console.settings.menu.item.warningGroups.tooltip"),
-    //     onClick: () => dispatch(actions.warningGroupsToggle()),
-    //   })
-    // );
-
     // Timestamps
     items.push(
       MenuItem({
@@ -89,40 +56,6 @@ class ConsoleSettings extends Component {
         onClick: () => dispatch(actions.filterToggle(FILTERS.NODEMODULES)),
       })
     );
-
-    // autocomplete
-    // items.push(
-    //   MenuItem({
-    //     key: "webconsole-console-settings-menu-item-autocomplete",
-    //     checked: autocomplete,
-    //     className:
-    //       "menu-item webconsole-console-settings-menu-item-autocomplete",
-    //     label: l10n.getStr(
-    //       "webconsole.console.settings.menu.item.autocomplete.label"
-    //     ),
-    //     tooltip: l10n.getStr(
-    //       "webconsole.console.settings.menu.item.autocomplete.tooltip"
-    //     ),
-    //     onClick: () => dispatch(actions.autocompleteToggle()),
-    //   })
-    // );
-
-    // Eager Evaluation
-    // items.push(
-    //   MenuItem({
-    //     key: "webconsole-console-settings-menu-item-eager-evaluation",
-    //     checked: eagerEvaluation,
-    //     className:
-    //       "menu-item webconsole-console-settings-menu-item-eager-evaluation",
-    //     label: l10n.getStr(
-    //       "webconsole.console.settings.menu.item.instantEvaluation.label"
-    //     ),
-    //     tooltip: l10n.getStr(
-    //       "webconsole.console.settings.menu.item.instantEvaluation.tooltip"
-    //     ),
-    //     onClick: () => dispatch(actions.eagerEvaluationToggle()),
-    //   })
-    // );
 
     return MenuList({ id: "webconsole-console-settings-menu-list" }, items);
   }
