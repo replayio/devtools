@@ -1,8 +1,11 @@
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
+const { PointHandlers } = require("protocol/logpoint");
 
 export function setupApp(recordingId, store) {
   store.dispatch({ type: "setup_app", recordingId });
+  setupPointHandlers(store);
+
   ThreadFront.waitForSession().then(sessionId =>
     store.dispatch({ type: "set_session_id", sessionId })
   );
@@ -13,7 +16,25 @@ export function setupApp(recordingId, store) {
     }
   );
 
-  const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 1000);
+  const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 1000);}
+
+function setupPointHandlers(store) {
+  PointHandlers.onPoints = points => {
+    const location = points[0].frame[0];
+    const pendingNotificationLocation = selectors.getPendingNotification(store.getState());
+
+    if (
+      location.line == pendingNotificationLocation.line &&
+      location.scriptId == pendingNotificationLocation.sourceId &&
+      location.column == pendingNotificationLocation.column
+    ) {
+      store.dispatch(setLastAnalysisPoints(points));
+      store.dispatch(setPendingNotification(null));
+    }
+  };
+  PointHandlers.addPendingNotification = location => {
+    store.dispatch(setPendingNotification(location));
+  };
 }
 
 function bumpLoading() {
@@ -87,5 +108,19 @@ export function hideModal() {
   return {
     type: "set_modal",
     modal: null,
+  };
+}
+
+export function setLastAnalysisPoints(points) {
+  return {
+    type: "set_last_analysis_points",
+    lastAnalysisPoints: points,
+  };
+}
+
+export function setPendingNotification(location) {
+  return {
+    type: "set_pending_notification",
+    location: location,
   };
 }
