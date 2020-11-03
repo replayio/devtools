@@ -23,6 +23,7 @@ import { setSkipPausing } from "../pause/skipPausing";
 import { recordEvent } from "../../utils/telemetry";
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
+const { PointHandlers } = require("../../../../../../../src/protocol/logpoint");
 
 // This file has the primitive operations used to modify individual breakpoints
 // and keep them in sync with the breakpoints installed on server threads. These
@@ -133,6 +134,14 @@ export function addBreakpoint(
       cx,
       breakpoint,
     });
+
+    // We don't want notifications to show up for synced breakpoints that are added when we
+    // start up the devtools. We only want them to show up for breakpoints that are added when
+    // the user clicks on the gutter. Checking `isPaused` makes sure that we exclude all of the
+    // synced breakpoints from displaying notifications.
+    if (cx.isPaused) {
+      PointHandlers.addPendingNotification(location);
+    }
 
     if (disabled) {
       // If we just clobbered an enabled breakpoint with a disabled one, we need
