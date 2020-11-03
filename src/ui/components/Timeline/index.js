@@ -661,7 +661,6 @@ export default connect(
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
     playback: selectors.getPlayback(state),
-    messages: selectors.getMessages(state),
     highlightedMessage: selectors.getHighlightedMessage(state),
     hoveredMessage: selectors.getHoveredMessage(state),
     unprocessedRegions: selectors.getUnprocessedRegions(state),

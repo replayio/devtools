@@ -1,6 +1,9 @@
-import { prefs } from "ui/utils/prefs";
+import { MetadataAction } from "ui/actions/metadata";
+import { UIState } from "ui/state";
+import { MetadataState } from "ui/state/metadata";
+const { prefs } = require("ui/utils/prefs");
 
-function initialTimelineState() {
+function initialMetadataState(): MetadataState {
   return {
     comments: [],
     user: prefs.user,
@@ -9,7 +12,10 @@ function initialTimelineState() {
   };
 }
 
-export default function update(state = initialTimelineState(), action) {
+export default function update(
+  state: MetadataState = initialMetadataState(),
+  action: MetadataAction
+): MetadataState {
   switch (action.type) {
     case "set_comments": {
       return { ...state, comments: action.comments };
@@ -33,26 +39,26 @@ export default function update(state = initialTimelineState(), action) {
   }
 }
 
-export function getComments(state) {
+export function getComments(state: UIState) {
   return state.metadata.comments;
 }
 
-export function getUser(state) {
+export function getUser(state: UIState) {
   return state.metadata.user;
 }
 
-export function getUsers(state) {
+export function getUsers(state: UIState) {
   return state.metadata.users;
 }
 
-export function getFocusedCommentId(state) {
+export function getFocusedCommentId(state: UIState) {
   return state.metadata.focusedCommentId;
 }
 
-export function getFocusedComment(state) {
+export function getFocusedComment(state: UIState) {
   return state.metadata.comments.find(c => c.id === getFocusedCommentId(state));
 }
 
-export function hasFocusedComment(state) {
+export function hasFocusedComment(state: UIState) {
   return state.metadata.focusedCommentId !== null;
 }

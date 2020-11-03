@@ -1,6 +1,6 @@
+import { ExecutionPoint, RecordingId, ScreenShot, TimeStampedPoint } from "record-replay-protocol";
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "../reducers";
-
 import {
   screenshotCache,
   addLastScreen,
@@ -9,36 +9,50 @@ import {
   mostRecentPaintOrMouseEvent,
   getMostRecentPaintPoint,
 } from "protocol/graphics";
+import { UIStore, UIThunkAction } from ".";
+import { Action } from "redux";
+import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
+import { TimelineState, Tooltip, ZoomRegion } from "ui/state/timeline";
 
-export async function setupTimeline(recordingId, { dispatch }) {
+export type SetTimelineStateAction = Action<"set_timeline_state"> & {
+  state: Partial<TimelineState>;
+};
+export type UpdateTooltipAction = Action<"update_tooltip"> & { tooltip: Tooltip | null };
+export type SetZoomRegionAction = Action<"set_zoom"> & { region: ZoomRegion };
+export type TimelineAction = SetTimelineStateAction | UpdateTooltipAction | SetZoomRegionAction;
+
+export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
+  const { dispatch } = store;
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
   ThreadFront.on("endpoint", args => dispatch(onEndpoint(args)));
-  ThreadFront.warpCallback = onWarp;
-  const description = await ThreadFront.getRecordingDescription(recordingId);
+  ThreadFront.warpCallback = onWarp(store);
+  const description = await ThreadFront.getRecordingDescription();
   dispatch(setRecordingDescription(description));
   window.addEventListener("resize", () => dispatch(updateTimelineDimensions()));
 }
 
-function onWarp(point, time) {
-  const { startTime, endTime } = selectors.getZoomRegion(store.getState());
-  if (time < startTime) {
-    const startEvent = mostRecentPaintOrMouseEvent(startTime);
-    if (startEvent) {
-      return { point: startEvent.point, time: startTime };
+function onWarp(store: UIStore) {
+  return function (point: ExecutionPoint, time: number) {
+    const { startTime, endTime } = selectors.getZoomRegion(store.getState());
+    if (time < startTime) {
+      const startEvent = mostRecentPaintOrMouseEvent(startTime);
+      if (startEvent) {
+        return { point: startEvent.point, time: startTime };
+      }
     }
-  }
 
-  if (time > endTime) {
-    const endEvent = mostRecentPaintOrMouseEvent(endTime);
-    if (endEvent) {
-      return { point: endEvent.point, time: endTime };
+    if (time > endTime) {
+      const endEvent = mostRecentPaintOrMouseEvent(endTime);
+      if (endEvent) {
+        return { point: endEvent.point, time: endTime };
+      }
     }
-  }
 
-  return null;
+    return null;
+  };
 }
 
-function onEndpoint({ point, time }) {
+function onEndpoint({ point, time }: TimeStampedPoint): UIThunkAction {
   return ({ getState, dispatch }) => {
     // This could be called before setRecordingDescription.
     // These two methods should be commoned up.
@@ -49,7 +63,7 @@ function onEndpoint({ point, time }) {
   };
 }
 
-function onPaused({ time }) {
+function onPaused({ time }: PauseEventArgs): UIThunkAction {
   return async ({ dispatch, getState }) => {
     dispatch(setTimelineState({ currentTime: time, playback: null }));
 
@@ -62,7 +76,7 @@ function onPaused({ time }) {
   };
 }
 
-function setRecordingDescription({ duration, lastScreen }) {
+function setRecordingDescription({ duration, lastScreen }: RecordingDescription): UIThunkAction {
   return ({ dispatch, getState }) => {
     const zoomRegion = selectors.getZoomRegion(getState());
 
@@ -81,7 +95,7 @@ function setRecordingDescription({ duration, lastScreen }) {
   };
 }
 
-export function updateTimelineDimensions() {
+export function updateTimelineDimensions(): UIThunkAction {
   return ({ dispatch }) => {
     const el = document.querySelector(".progressBar");
     const width = el ? el.clientWidth : 1;
@@ -91,11 +105,17 @@ export function updateTimelineDimensions() {
   };
 }
 
-export function setTimelineState(state) {
+export function setTimelineState(state: Partial<TimelineState>): SetTimelineStateAction {
   return { type: "set_timeline_state", state };
 }
 
-export function setTimelineToTime({ time, offset }) {
+export function setTimelineToTime({
+  time,
+  offset,
+}: {
+  time: number;
+  offset: number;
+}): UIThunkAction {
   return async ({ dispatch, getState }) => {
     try {
       dispatch(updateTooltip({ left: offset }));
@@ -114,7 +134,13 @@ export function setTimelineToTime({ time, offset }) {
   };
 }
 
-export function setTimelineToMessage({ message, offset }) {
+export function setTimelineToMessage({
+  message,
+  offset,
+}: {
+  message: any;
+  offset: number;
+}): UIThunkAction {
   return async ({ dispatch, getState }) => {
     try {
       dispatch(updateTooltip({ left: offset }));
@@ -133,22 +159,22 @@ export function setTimelineToMessage({ message, offset }) {
   };
 }
 
-export function hideTooltip() {
+export function hideTooltip(): UIThunkAction {
   return ({ dispatch }) => {
     dispatch(updateTooltip(null));
     dispatch(setTimelineState({ hoverTime: null, highlightedMessage: null }));
   };
 }
 
-function updateTooltip(tooltip) {
+function updateTooltip(tooltip: Tooltip | null): UpdateTooltipAction {
   return { type: "update_tooltip", tooltip };
 }
 
-export function setZoomRegion(region) {
+export function setZoomRegion(region: ZoomRegion): SetZoomRegionAction {
   return { type: "set_zoom", region };
 }
 
-export function seek(point, time, hasFrames) {
+export function seek(point: ExecutionPoint, time: number, hasFrames: boolean): UIThunkAction {
   return () => {
     ThreadFront.timeWarp(point, time, hasFrames);
   };

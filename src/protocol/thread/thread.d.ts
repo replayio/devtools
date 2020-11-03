@@ -1,9 +1,7 @@
 import {
   BreakpointId,
   ExecutionPoint,
-  Frame,
   FrameId,
-  getDescriptionResult,
   getScriptSourceResult,
   Location,
   MappedLocation,
@@ -14,7 +12,7 @@ import {
   PointDescription,
   RecordingId,
   SameLineScriptLocations,
-  Scope,
+  ScreenShot,
   ScriptId,
   ScriptKind,
   ScriptLocation,
@@ -28,12 +26,24 @@ import { ArrayMap, Deferred } from "../utils";
 import { NodeBoundsFront } from "./bounds";
 import { NodeFront } from "./node";
 import { Pause, EvaluationResult, WiredFrame, WiredScope } from "./pause";
-import { ValueFront } from "./value";
+
+export interface RecordingDescription {
+  duration: TimeStamp;
+  length?: number;
+  lastScreen?: ScreenShot;
+  commandLineArguments?: string[];
+}
 
 export interface Script {
   kind: ScriptKind;
   url?: string;
   generatedScriptIds?: ScriptId[];
+}
+
+export interface PauseEventArgs {
+  point: ExecutionPoint;
+  time: number;
+  hasFrames: boolean;
 }
 
 export declare const ThreadFront: {
@@ -72,8 +82,8 @@ export declare const ThreadFront: {
   setTest(test: string): void;
   waitForSession(): Promise<string>;
   ensureProcessed(
-    onMissingRegions: (parameters: missingRegions) => void,
-    onUnprocessedRegions: (parameters: unprocessedRegions) => void
+    onMissingRegions: ((parameters: missingRegions) => void) | undefined,
+    onUnprocessedRegions: ((parameters: unprocessedRegions) => void) | undefined
   ): Promise<void>;
   timeWarp(point: ExecutionPoint, time?: number, hasFrames?: boolean, force?: boolean): void;
   findScripts(onScript: (script: scriptParsed) => void): Promise<void>;
@@ -136,8 +146,9 @@ export declare const ThreadFront: {
   preferScript(scriptId: ScriptId, value: boolean): void;
   hasPreferredGeneratedScript(location: MappedLocation): boolean;
   getPreferredMappedLocation(location: Location): Promise<Location>;
-  getRecordingDescription(): Promise<getDescriptionResult | { duration: TimeStamp }>;
+  getRecordingDescription(): Promise<RecordingDescription>;
   watchMetadata(key: string, callback: (args: any) => any): Promise<void>;
+  updateMetadata(key: string, callback: (args: any) => any): Promise<void>;
 
   // added by EventEmitter.decorate(ThreadFront)
   eventListeners: Map<string, ((value?: any) => void)[]>;

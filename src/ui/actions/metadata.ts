@@ -1,8 +1,22 @@
 import { ThreadFront } from "protocol/thread";
+import { Action } from "redux";
 import { selectors } from "ui/reducers";
-import { prefs, features } from "ui/utils/prefs";
+import { UIStore, UIThunkAction } from ".";
+import { Comment } from "ui/state/metadata";
+const { prefs, features } = require("ui/utils/prefs");
 import { seek } from "./timeline";
-import LogRocket from "ui/utils/logrocket";
+import { User } from "ui/state/metadata";
+const LogRocket = require("ui/utils/logrocket");
+
+export type SetCommentsAction = Action<"set_comments"> & { comments: Comment[] };
+export type SetFocusedCommentAction = Action<"set_focused_comment_id"> & { id: number | null };
+export type RegisterUserAction = Action<"register_user"> & { user: User };
+export type UpdateUsersAction = Action<"update_users"> & { users: User[] };
+export type MetadataAction =
+  | SetCommentsAction
+  | SetFocusedCommentAction
+  | RegisterUserAction
+  | UpdateUsersAction;
 
 // Metadata key used to store comments.
 const CommentsMetadata = "devtools-comments";
@@ -10,7 +24,7 @@ const UsersMetadata = "devtools-users";
 let heartbeatPing = Date.now();
 const refreshRate = 10000;
 
-export function setupMetadata(_, store) {
+export function setupMetadata(_: any, store: UIStore) {
   ThreadFront.watchMetadata(CommentsMetadata, args => store.dispatch(onCommentsUpdate(args)));
   ThreadFront.watchMetadata(UsersMetadata, args => store.dispatch(onUsersUpdate(args)));
 
@@ -20,13 +34,13 @@ export function setupMetadata(_, store) {
   }
 }
 
-function onCommentsUpdate(newComments) {
+function onCommentsUpdate(newComments: Comment[]): UIThunkAction {
   return ({ dispatch }) => {
     dispatch({ type: "set_comments", comments: newComments || [] });
   };
 }
 
-export function createComment(newComment) {
+export function createComment(newComment: Comment): UIThunkAction {
   return ({ getState, dispatch }) => {
     const existingComments = selectors.getComments(getState());
     const currentTime = selectors.getCurrentTime(getState());
@@ -61,11 +75,13 @@ export function createComment(newComment) {
   };
 }
 
-export function jumpToComment(comment) {
-  dispatch(seek(comment.point, comment.time, comment.hasFrames));
+export function jumpToComment(comment: Comment): UIThunkAction {
+  return ({ dispatch }) => {
+    dispatch(seek(comment.point, comment.time, comment.hasFrames));
+  };
 }
 
-export function removeComment(comment) {
+export function removeComment(comment: Comment): UIThunkAction {
   return ({ getState, dispatch }) => {
     const comments = selectors.getComments(getState());
     const newComments = comments.filter(c => c.id != comment.id);
@@ -73,7 +89,7 @@ export function removeComment(comment) {
   };
 }
 
-export function updateComment(comment) {
+export function updateComment(comment: Comment): UIThunkAction {
   return ({ dispatch, getState }) => {
     const existingComments = selectors.getComments(getState());
 
@@ -84,7 +100,11 @@ export function updateComment(comment) {
   };
 }
 
-export function saveComment(newContents, location, oldComment) {
+export function saveComment(
+  newContents: string,
+  location: string,
+  oldComment: Comment
+): UIThunkAction {
   return ({ dispatch, getState }) => {
     const comments = selectors.getComments(getState());
 
@@ -108,14 +128,14 @@ export function saveComment(newContents, location, oldComment) {
   };
 }
 
-export function updateComments(comments) {
+export function updateComments(comments: Comment[]): UIThunkAction {
   return ({ dispatch }) => {
     ThreadFront.updateMetadata(CommentsMetadata, () => comments);
     dispatch({ type: "set_comments", comments });
   };
 }
 
-export function focusComment(comment) {
+export function focusComment(comment: Comment): UIThunkAction {
   return ({ dispatch, getState }) => {
     const { id, time, point, hasFrames } = comment;
     dispatch({ type: "set_focused_comment_id", id });
@@ -123,7 +143,7 @@ export function focusComment(comment) {
   };
 }
 
-export function unfocusComment(comment) {
+export function unfocusComment(comment: Comment): UIThunkAction {
   return ({ dispatch, getState }) => {
     // Unlike the timeline, the selecting a comment on the right sidebar doesn't
     // focus on that comment. Instead, we pass in the comment that is being edited
@@ -141,11 +161,11 @@ export function unfocusComment(comment) {
   };
 }
 
-function setFocusedCommentId(id) {
+function setFocusedCommentId(id: number): SetFocusedCommentAction {
   return { type: "set_focused_comment_id", id };
 }
 
-export function registerUser() {
+export function registerUser(): RegisterUserAction {
   const user = prefs.user?.id
     ? prefs.user
     : {
@@ -156,7 +176,7 @@ export function registerUser() {
   return { type: "register_user", user };
 }
 
-function userHeartbeat() {
+function userHeartbeat(): UIThunkAction {
   return ({ getState }) => {
     const me = selectors.getUser(getState());
     ThreadFront.updateMetadata(UsersMetadata, (users = []) => {
@@ -175,27 +195,27 @@ function userHeartbeat() {
   };
 }
 
-function onUsersUpdate(users) {
+function onUsersUpdate(users: User[]): UIThunkAction {
   return ({ dispatch }) => {
     // ThreadFront.updateMetadata(UsersMetadata, () => comments);
     dispatch({ type: "update_users", users });
   };
 }
 
-export function getActiveUsers() {
+export function getActiveUsers(): UIThunkAction {
   return ({ getState }) => {
     const users = selectors.getUsers(getState());
     if (!users) {
       return [];
     }
 
-    const activeUsers = users.filter(user => heartbeatPing - user.heartbeat < refreshRate);
+    const activeUsers = users.filter(user => heartbeatPing - (user.heartbeat || 0) < refreshRate);
 
     return activeUsers;
   };
 }
 
-export function updateUser(authUser = {}) {
+export function updateUser(authUser: any = {}): UIThunkAction {
   return async ({ dispatch, getState }) => {
     const user = selectors.getUser(getState());
     const { picture, name } = authUser;
