@@ -17,6 +17,8 @@ function initialAppState(): AppState {
     uploading: null,
     sessionId: null,
     modal: null,
+    lastAnalysisPoints: null,
+    pendingNotification: null,
   };
 }
 
@@ -66,6 +68,14 @@ export default function update(state = initialAppState(), action: AppAction) {
       return { ...state, modal: action.modal };
     }
 
+    case "set_last_analysis_points": {
+      return { ...state, lastAnalysisPoints: action.lastAnalysisPoints };
+    }
+
+    case "set_pending_notification": {
+      return { ...state, pendingNotification: action.location };
+    }
+
     default: {
       return state;
     }
@@ -83,3 +93,5 @@ export const getSessionId = (state: UIState) => state.app.sessionId;
 export const getExpectedError = (state: UIState) => state.app.expectedError;
 export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getModal = (state: UIState) => state.app.modal;
+export const getLastAnalysisPoints = (state: UIState) => state.app.lastAnalysisPoints;
+export const getPendingNotification = (state: UIState) => state.app.pendingNotification;

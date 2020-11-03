@@ -49,6 +49,8 @@ export const LogpointHandlers: {
   clearLogpoint?: (logGroupId: string) => void;
 } = {};
 
+export const PointHandlers: { onPoints?: (points: PointDescription[]) => void } = {};
+
 client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
   log(`AnalysisResults ${results.length}`);
 
@@ -88,6 +90,10 @@ client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
   info.points.push(...points);
   if (info.pointsWaiter) {
     info.pointsWaiter();
+  }
+
+  if (PointHandlers.onPoints && points[0].frame?.length) {
+    PointHandlers.onPoints(points);
   }
 
   if (LogpointHandlers.onPointLoading) {
