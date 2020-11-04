@@ -9,7 +9,6 @@ const { getAllUi } = require("devtools/client/webconsole/selectors/ui");
 const { ThreadFront } = require("protocol/thread");
 
 const {
-  INITIALIZE,
   PERSIST_TOGGLE,
   PREFS,
   REVERSE_SEARCH_INPUT_TOGGLE,
@@ -76,12 +75,6 @@ function eagerEvaluationToggle() {
     });
     const prefsState = getAllPrefs(getState());
     prefsService.setBoolPref(PREFS.FEATURES.EAGER_EVALUATION, prefsState.eagerEvaluation);
-  };
-}
-
-function initialize() {
-  return {
-    type: INITIALIZE,
   };
 }
 
@@ -161,7 +154,6 @@ module.exports = {
   editorOnboardingDismiss,
   editorToggle,
   filterBarDisplayModeSet,
-  initialize,
   persistToggle,
   reverseSearchInputToggle,
   setEditorWidth,

@@ -65,7 +65,6 @@ function getClosestMessage(visibleMessages, messages, executionPoint) {
 class ConsoleOutput extends Component {
   static get propTypes() {
     return {
-      initialized: PropTypes.bool.isRequired,
       messages: PropTypes.object.isRequired,
       messagesUi: PropTypes.array.isRequired,
       timestampsVisible: PropTypes.bool,
@@ -76,86 +75,8 @@ class ConsoleOutput extends Component {
     };
   }
 
-  constructor(props) {
-    super(props);
-    this.maybeScrollToBottom = this.maybeScrollToBottom.bind(this);
-    gToolbox.consoleOutput = this;
-  }
-
   componentDidMount() {
     if (this.props.visibleMessages.length > 0) {
-      scrollToBottom(this.outputNode);
-    }
-
-    // Waiting for the next paint.
-    new Promise(res => requestAnimationFrame(res)).then(() => {
-      // Dispatching on next tick so we don't block on action execution.
-      setTimeout(this.props.initialize, 0);
-    });
-  }
-
-  UNSAFE_componentWillUpdate(nextProps, nextState) {
-    const outputNode = this.outputNode;
-    if (!outputNode || !outputNode.lastChild) {
-      // Force a scroll to bottom when messages are added to an empty console.
-      // This makes the console stay pinned to the bottom if a batch of messages
-      // are added after a page refresh (Bug 1402237).
-      this.shouldScrollBottom = true;
-      return;
-    }
-
-    // We need to scroll to the bottom if:
-    // - we are reacting to "initialize" action, and we are already scrolled to the bottom
-    // - the number of messages displayed changed and we are already scrolled to the
-    //   bottom, but not if we are reacting to a group opening.
-
-    const lastChild = outputNode.lastChild;
-    const visibleMessagesDelta =
-      nextProps.visibleMessages.length - this.props.visibleMessages.length;
-    const messagesDelta = nextProps.messages.size - this.props.messages.size;
-
-    const messagesUiDelta = nextProps.messagesUi.length - this.props.messagesUi.length;
-    const isOpeningGroup =
-      messagesUiDelta > 0 &&
-      nextProps.messagesUi.some(
-        id =>
-          !this.props.messagesUi.includes(id) &&
-          nextProps.messagesUi.includes(id) &&
-          this.props.visibleMessages.includes(id) &&
-          nextProps.visibleMessages.includes(id)
-      );
-
-    this.shouldScrollBottom =
-      (!this.props.initialized &&
-        nextProps.initialized &&
-        isScrolledToBottom(lastChild, outputNode)) ||
-      (isScrolledToBottom(lastChild, outputNode) && visibleMessagesDelta > 0 && !isOpeningGroup);
-
-    // When evaluation results are added, scroll to them.
-    this.shouldScrollMessageId = null;
-    this.shouldScrollMessageNode = null;
-    if (messagesDelta > 0) {
-      const lastMessage = [...nextProps.messages.values()][nextProps.messages.size - 1];
-      if (lastMessage.type == MESSAGE_TYPE.RESULT) {
-        this.shouldScrollMessageId = lastMessage.id;
-      }
-    }
-  }
-
-  componentDidUpdate() {
-    this.maybeScrollToBottom();
-
-    if (this.shouldScrollMessageNode) {
-      // Scroll to the previous message node if it exists. It should be the
-      // input which triggered the evaluation result we're scrolling to.
-      const previous = this.shouldScrollMessageNode.previousSibling;
-      (previous || this.shouldScrollMessageNode).scrollIntoView();
-      this.shouldScrollMessageNode = null;
-    }
-  }
-
-  maybeScrollToBottom() {
-    if (this.outputNode && this.shouldScrollBottom) {
       scrollToBottom(this.outputNode);
     }
   }
@@ -219,16 +140,8 @@ function scrollToBottom(node) {
   }
 }
 
-function isScrolledToBottom(lastNode, scrollNode) {
-  const lastNodeHeight = lastNode ? lastNode.clientHeight : 0;
-  return (
-    scrollNode.scrollTop + scrollNode.clientHeight >= scrollNode.scrollHeight - lastNodeHeight / 2
-  );
-}
-
 function mapStateToProps(state, props) {
   return {
-    initialized: state.consoleUI.initialized,
     pausedExecutionPoint: getPausedExecutionPoint(state),
     messages: getAllMessagesById(state),
     visibleMessages: getVisibleMessages(state),
@@ -242,7 +155,6 @@ function mapStateToProps(state, props) {
 }
 const mapDispatchToProps = dispatch => ({
   openLink: actions.openLink,
-  initialize: actions.initialize,
   dispatch,
 });
 

@@ -288,7 +288,6 @@ function messages(state = MessageState(), action) {
     case constants.MESSAGES_ADD:
       // Preemptively remove messages that will never be rendered
       const list = [];
-      let prunableCount = 0;
       for (let i = action.messages.length - 1; i >= 0; i--) {
         const message = action.messages[i];
         if (
@@ -296,13 +295,7 @@ function messages(state = MessageState(), action) {
           !isGroupType(message.type) &&
           message.type !== MESSAGE_TYPE.END_GROUP
         ) {
-          prunableCount++;
-          // Once we've added the max number of messages that can be added, stop.
-          if (prunableCount <= logLimit) {
-            list.unshift(action.messages[i]);
-          } else {
-            break;
-          }
+          list.unshift(action.messages[i]);
         } else {
           list.unshift(message);
         }
@@ -313,7 +306,7 @@ function messages(state = MessageState(), action) {
         newState = addMessage(message, newState, filtersState);
       });
 
-      return limitTopLevelMessageCount(newState);
+      return newState;
 
     case constants.MESSAGES_CLEAR:
       return MessageState({});
@@ -593,51 +586,6 @@ function getOutermostGroup(message, groupsById) {
     return null;
   }
   return groups[groups.length - 1];
-}
-
-/**
- * Remove all top level messages that exceeds message limit.
- * Also populate an array of all backend actors associated with these
- * messages so they can be released.
- */
-function limitTopLevelMessageCount(newState) {
-  let topLevelCount =
-    newState.groupsById.size === 0 ? newState.messagesById.size : getToplevelMessageCount(newState);
-
-  if (topLevelCount <= logLimit) {
-    return newState;
-  }
-
-  const removedMessagesId = [];
-
-  let cleaningGroup = false;
-  for (const [id, message] of newState.messagesById) {
-    // If we were cleaning a group and the current message does not have
-    // a groupId, we're done cleaning.
-    if (cleaningGroup === true && !message.groupId) {
-      cleaningGroup = false;
-    }
-
-    // If we're not cleaning a group and the message count is below the logLimit,
-    // we exit the loop.
-    if (cleaningGroup === false && topLevelCount <= logLimit) {
-      break;
-    }
-
-    // If we're not currently cleaning a group, and the current message is identified
-    // as a group, set the cleaning flag to true.
-    if (cleaningGroup === false && newState.groupsById.has(id)) {
-      cleaningGroup = true;
-    }
-
-    if (!message.groupId) {
-      topLevelCount--;
-    }
-
-    removedMessagesId.push(id);
-  }
-
-  return removeMessagesFromState(newState, removedMessagesId);
 }
 
 /**
