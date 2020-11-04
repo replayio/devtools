@@ -7,6 +7,7 @@ const {
   ELEMENT_NODE,
   TEXT_NODE,
 } = require("devtools/shared/dom-node-constants");
+const { features } = require("devtools/client/inspector/prefs");
 
 const ElementNode = createFactory(require("./ElementNode"));
 const ReadOnlyNode = createFactory(require("./ReadOnlyNode"));
@@ -143,6 +144,12 @@ class Node extends PureComponent {
   render() {
     const { markup, node } = this.props;
     const { rootNode, selectedNode } = markup;
+
+    const isWhitespaceTextNode = node.type === TEXT_NODE && !/[^\s]/.exec(node.value);
+    if (isWhitespaceTextNode && !features.showWhitespaceNodes) {
+      return null;
+    }
+
     // Whether or not the node can be expanded - True if node has children and child is
     // not an inline text node.
     const canExpand = node.hasChildren && !node.isInlineTextChild;
