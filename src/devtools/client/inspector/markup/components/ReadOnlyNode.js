@@ -21,7 +21,7 @@ class ReadOnlyNode extends PureComponent {
           className: "tag" + (pseudoType ? " theme-fg-color3" : ""),
           tabIndex: isDocType ? -1 : "",
         },
-        pseudoType ? `::${pseudoType}` : displayName
+        isDocType ? `<!DOCTYPE ${displayName}>` : pseudoType ? `::${pseudoType}` : displayName
       )
     );
   }
