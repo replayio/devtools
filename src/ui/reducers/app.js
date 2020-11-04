@@ -1,3 +1,4 @@
+import { makeBreakpointId } from "../../devtools/client/debugger/src/utils/breakpoint";
 import { prefs } from "../utils/prefs";
 
 function initialAppState() {
@@ -70,6 +71,19 @@ export default function update(state = initialAppState(), action) {
       return { ...state, lastAnalysisPoints: action.lastAnalysisPoints };
     }
 
+
+    case "set_analysis_points": {
+      const id = makeBreakpointId(location);
+
+      return {
+        ...state,
+        analysisPoints: {
+          ...state.analysisPoints,
+          [id]: action.analysisPoints
+        }
+      }
+    }
+
     case "set_pending_notification": {
       return { ...state, pendingNotification: action.location };
     }
@@ -93,3 +107,4 @@ export const getUnexpectedError = state => state.app.unexpectedError;
 export const getModal = state => state.app.modal;
 export const getLastAnalysisPoints = state => state.app.lastAnalysisPoints;
 export const getPendingNotification = state => state.app.pendingNotification;
+export const getAnalysisPointsForLocation = (state, location) => state.app.analysisPoints[makeBreakpointId(location)]

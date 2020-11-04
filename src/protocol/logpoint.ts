@@ -49,7 +49,7 @@ export const LogpointHandlers: {
   clearLogpoint?: (logGroupId: string) => void;
 } = {};
 
-export const PointHandlers: { onPoints?: (points: PointDescription[]) => void } = {};
+export const PointHandlers: { onPoints?: (points: PointDescription[], info: LogpointInfo) => void } = {};
 
 client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
   log(`AnalysisResults ${results.length}`);
@@ -93,7 +93,7 @@ client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
   }
 
   if (PointHandlers.onPoints) {
-    PointHandlers.onPoints(points);
+    PointHandlers.onPoints(points, info);
   }
 
   if (LogpointHandlers.onPointLoading) {
@@ -105,9 +105,9 @@ client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
   }
 });
 
-async function createLogpointAnalysis(logGroupId: string, mapper: string) {
+async function createLogpointAnalysis(logGroupId: string, mapper: string, location) {
   if (!gLogpoints.has(logGroupId)) {
-    gLogpoints.set(logGroupId, { analysisWaiters: [], points: [] });
+    gLogpoints.set(logGroupId, { analysisWaiters: [], points: [], location });
   }
 
   const waiter = client.Analysis.createAnalysis({
@@ -216,7 +216,8 @@ export async function setLogpoint(
     }];
   `;
 
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper);
+  const location = {line, column, scriptId}
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper, location );
 
   client.Analysis.addLocation({
     analysisId,
@@ -287,7 +288,7 @@ function eventLogpointMapper(getFrameworkListeners: boolean) {
 
 export async function setEventLogpoint(logGroupId: string, eventTypes: string[]) {
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ true);
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null);
 
   for (const eventType of eventTypes) {
     client.Analysis.addEventHandlerEntryPoints({
@@ -318,7 +319,7 @@ async function eventLogpointOnFrameworkListeners(
   }
 
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ false);
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null, null);
 
   for (const location of locations) {
     client.Analysis.addLocation({
@@ -347,7 +348,7 @@ export async function setExceptionLogpoint(logGroupId: string) {
     }];
   `;
 
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null);
 
   client.Analysis.addExceptionPoints({
     analysisId,
@@ -375,7 +376,7 @@ export async function setRandomLogpoint(numLogs: number) {
   `;
 
   const logGroupId = Math.random().toString();
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null);
 
   client.Analysis.addRandomPoints({
     analysisId,
