@@ -42,16 +42,22 @@ function PanelSummary({ breakpoint, toggleEditingOn, setInputToFocus }) {
 
 function Widget({ location, children, editor }) {
   const [node, setNode] = useState(null);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const _node = document.createElement("div");
+    if (loading) {
+      const _node = document.createElement("div");
+      setNode(_node);
+      setLoading(false);
+      return;
+    }
     const editorLine = toEditorLine(location.sourceId, location.line || 0);
-    const _widget = editor.codeMirror.addLineWidget(editorLine, _node, {
+    const _widget = editor.codeMirror.addLineWidget(editorLine, node, {
       noHScroll: true,
     });
-
-    setNode(_node);
-  }, []);
+    return () => {
+      _widget.clear();
+    };
+  }, [loading]);
 
   if (!node) {
     return null;
