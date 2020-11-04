@@ -27,6 +27,7 @@ import {
   getSelectedSource,
   getContext,
 } from "../../../selectors";
+import { seekToPosition } from "../../../actions/pause";
 
 class Breakpoint extends PureComponent {
   onContextMenu = e => {
@@ -100,9 +101,12 @@ class Breakpoint extends PureComponent {
   );
 
   render() {
-    const { breakpoint, editor } = this.props;
+    const { breakpoint, editor, pause } = this.props;
     const text = this.getBreakpointText();
     const labelId = `${breakpoint.id}-label`;
+    const currentPause = pause;
+    const prev = analysisPoints.find()
+    const next = analysisPoints.find()
 
     return (
       <div
@@ -134,6 +138,12 @@ class Breakpoint extends PureComponent {
         >
           <span dangerouslySetInnerHTML={this.highlightText(text, editor)} />
         </span>
+
+        <div>
+          {analysisPoints.length} hits
+          <button onClick={() => { console.log("previous") }}>Prev</button>
+          <button onClick={() => { console.log("next"); seekToPosition(next); }}>Next</button>
+        </div>
         <div className="breakpoint-line-close">
           <div className="breakpoint-line devtools-monospace">{this.getBreakpointLocation()}</div>
           <CloseButton
@@ -165,6 +175,7 @@ const mapStateToProps = (state, p) => ({
   cx: getContext(state),
   breakpoints: getBreakpointsList(state),
   frame: getFormattedFrame(state),
+  analysisPoints: getAnalysisPointsForLocation(state, p),
 });
 
 export default connect(mapStateToProps, {

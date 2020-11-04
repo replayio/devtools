@@ -32,4 +32,9 @@ export interface AppState {
   selectedPanel: PanelName;
   lastAnalysisPoints: PointDescription[] | null;
   pendingNotification: any;
+  analysisPoints: AnalysisPoints;
+}
+
+export interface AnalysisPoints {
+  [key: string]: PointDescription;
 }

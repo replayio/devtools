@@ -16,19 +16,24 @@ export function setupApp(recordingId, store) {
     }
   );
 
-  const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 1000);}
+  const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 1000);
+}
 
 function setupPointHandlers(store) {
-  PointHandlers.onPoints = points => {
-    const location = points[0].frame[0];
+  PointHandlers.onPoints = (points, info) => {
+    if (points.length == 0) {
+      // ...
+    }
+    // const location = points[0].frame[0];
+    const { location } = info;
     const pendingNotificationLocation = selectors.getPendingNotification(store.getState());
 
     if (
       location.line == pendingNotificationLocation.line &&
-      location.scriptId == pendingNotificationLocation.sourceId &&
-      location.column == pendingNotificationLocation.column
+      location.column == pendingNotificationLocation.column &&
+      location.scriptId == pendingNotificationLocation.sourceId
     ) {
-      store.dispatch(setLastAnalysisPoints(points));
+      store.dispatch(setLastAnalysisPoints(points, location));
       store.dispatch(setPendingNotification(null));
     }
   };
@@ -117,6 +122,15 @@ export function setLastAnalysisPoints(points) {
     lastAnalysisPoints: points,
   };
 }
+
+export function setAnalysisPoints(points, location) {
+  return {
+    type: "set_analysis_points",
+    analysisPoints: points,
+    location
+  };
+}
+
 
 export function setPendingNotification(location) {
   return {

@@ -28,6 +28,9 @@ export type SetLastAnalysisPointsAction = Action<"set_last_analysis_points"> & {
   lastAnalysisPoints: PointDescription[] | null;
 };
 export type SetPendingNotificationAction = Action<"set_pending_notification"> & { location: any };
+export type SetAnalysisPoints = Action<"set_analysis_points"> & {
+  analysisPoints: PointDescription[][] | null;
+};
 export type AppAction =
   | SetupAppAction
   | LoadingAction
@@ -41,7 +44,8 @@ export type AppAction =
   | SetUploadingAction
   | SetModalAction
   | SetLastAnalysisPointsAction
-  | SetPendingNotificationAction;
+  | SetPendingNotificationAction
+  | SetAnalysisPoints;
 
 export function setupApp(recordingId: RecordingId, store: UIStore) {
   store.dispatch({ type: "setup_app", recordingId });
