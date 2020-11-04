@@ -70,12 +70,12 @@ export default function update(state = initialAppState(), action: AppAction) {
       return { ...state, modal: action.modal };
     }
 
-    case "set_last_analysis_points": {
-      return { ...state, lastAnalysisPoints: action.lastAnalysisPoints };
-    }
+    // case "set_last_analysis_points": {
+    //   return { ...state, lastAnalysisPoints: action.lastAnalysisPoints };
+    // }
 
     case "set_analysis_points": {
-      const id = makeBreakpointId(location);
+      const id = makeBreakpointId(action.location);
 
       return {
         ...state,
@@ -107,8 +107,8 @@ export const getSessionId = (state: UIState) => state.app.sessionId;
 export const getExpectedError = (state: UIState) => state.app.expectedError;
 export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getModal = (state: UIState) => state.app.modal;
-export const getLastAnalysisPoints = (state: UIState) => state.app.lastAnalysisPoints;
+// export const getLastAnalysisPoints = (state: UIState) => state.app.lastAnalysisPoints;
+export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
 export const getPendingNotification = (state: UIState) => state.app.pendingNotification;
-export const getAnalysisPointsForLocation = (state: UIState, location: any) => {
-  return state.app.analysisPoints[makeBreakpointId(location)];
-}
+export const getAnalysisPointsForLocation = (state: UIState, location: any) =>
+  state.app.analysisPoints[makeBreakpointId(location)];

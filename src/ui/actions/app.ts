@@ -66,22 +66,17 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
 }
 
 function setupPointHandlers(store: UIStore) {
-  PointHandlers.onPoints = (points: PointDescription[]) => {
-    if (!points[0].frame?.length) {
-      return;
+  PointHandlers.onPoints = (points: PointDescription[], info: any) => {
+    if (points.length == 0) {
+      // ...
     }
-
-    const location = points[0].frame[0];
+    // const location = points[0].frame[0];
+    const { location } = info;
     const pendingNotificationLocation = selectors.getPendingNotification(store.getState());
 
-    if (
-      location?.line == pendingNotificationLocation?.line &&
-      location?.scriptId == pendingNotificationLocation?.sourceId &&
-      location?.column == pendingNotificationLocation?.column
-    ) {
-      store.dispatch(setLastAnalysisPoints(points));
-      store.dispatch(setPendingNotification(null));
-    }
+    store.dispatch(setLastAnalysisPoints(points, location));
+    store.dispatch(setAnalysisPoints(points, location));
+    store.dispatch(setPendingNotification(null));
   };
   PointHandlers.addPendingNotification = (location: any) => {
     store.dispatch(setPendingNotification(location));
@@ -166,6 +161,14 @@ export function setLastAnalysisPoints(points: PointDescription[]): SetLastAnalys
   return {
     type: "set_last_analysis_points",
     lastAnalysisPoints: points,
+  };
+}
+
+export function setAnalysisPoints(points: PointDescription[][], location: any) {
+  return {
+    type: "set_analysis_points",
+    analysisPoints: points,
+    location,
   };
 }
 

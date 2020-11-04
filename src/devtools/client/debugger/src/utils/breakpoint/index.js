@@ -27,7 +27,7 @@ export function firstString(...args) {
 export function makeBreakpointId(location) {
   const { sourceId, line, column } = location;
   const columnString = column || "";
-  return `${sourceId}:${line}:${columnString}`;
+  return `${sourceId || location.scriptId}:${line}:${columnString}`;
 }
 
 export function getLocationWithoutColumn(location) {

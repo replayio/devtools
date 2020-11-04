@@ -28,14 +28,9 @@ function setupPointHandlers(store) {
     const { location } = info;
     const pendingNotificationLocation = selectors.getPendingNotification(store.getState());
 
-    if (
-      location.line == pendingNotificationLocation.line &&
-      location.column == pendingNotificationLocation.column &&
-      location.scriptId == pendingNotificationLocation.sourceId
-    ) {
-      store.dispatch(setLastAnalysisPoints(points, location));
-      store.dispatch(setPendingNotification(null));
-    }
+    store.dispatch(setLastAnalysisPoints(points, location));
+    store.dispatch(setAnalysisPoints(points, location));
+    store.dispatch(setPendingNotification(null));
   };
   PointHandlers.addPendingNotification = location => {
     store.dispatch(setPendingNotification(location));
@@ -127,10 +122,9 @@ export function setAnalysisPoints(points, location) {
   return {
     type: "set_analysis_points",
     analysisPoints: points,
-    location
+    location,
   };
 }
-
 
 export function setPendingNotification(location) {
   return {

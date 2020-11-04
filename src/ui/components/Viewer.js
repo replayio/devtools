@@ -16,10 +16,6 @@ function _Toast({ lastAnalysisPoints, setLastAnalysisPoints }) {
 
     clearTimeout(timeoutId.current);
 
-    const id = setTimeout(() => {
-      setLastAnalysisPoints(null);
-    }, 2000);
-
     timeoutId.current = id;
   }, [lastAnalysisPoints]);
 
@@ -33,18 +29,20 @@ function _Toast({ lastAnalysisPoints, setLastAnalysisPoints }) {
 const Toast = connect(
   state => {
     return {
-      lastAnalysisPoints: selectors.getLastAnalysisPoints(state),
+      // lastAnalysisPoints: selectors.getLastAnalysisPoints(state),
+      analysisPoints: selectors.getAnalysisPoints(state),
     };
   },
   {
-    setLastAnalysisPoints: actions.setLastAnalysisPoints,
+    // setLastAnalysisPoints: actions.setLastAnalysisPoints,
+    setAnalysisPoints: actions.setAnalysisPoints,
   }
 )(_Toast);
 
 export default function Viewer({ tooltip }) {
   return (
     <div id="outer-viewer">
-      <Toast />
+      {/*<Toast />*/}
       <div id="viewer">
         <canvas id="graphics"></canvas>
         <div id="highlighter-root"></div>

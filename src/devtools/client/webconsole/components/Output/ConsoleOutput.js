@@ -53,9 +53,16 @@ function getClosestMessage(visibleMessages, messages, executionPoint) {
   for (const id of visibleMessages) {
     const msg = messages.get(id);
     const point = messageExecutionPoint(msg);
+    console.log("pointPrecedes");
     if (point && pointPrecedes(executionPoint, point)) {
       break;
     }
+
+    /*
+    if (point && pointPrecedes(currentPausedPoint, point)) {
+      break;
+    }
+    * */
     last = msg;
   }
 
