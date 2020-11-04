@@ -169,18 +169,10 @@ class ConsoleOutput extends Component {
       messagesPayload,
       warningGroups,
       timestampsVisible,
-      initialized,
       pausedExecutionPoint,
       zoomStartTime,
       zoomEndTime,
     } = this.props;
-
-    if (!initialized) {
-      const numberMessagesFitViewport = getInitialMessageCountForViewport(window);
-      if (numberMessagesFitViewport < visibleMessages.length) {
-        visibleMessages = visibleMessages.slice(visibleMessages.length - numberMessagesFitViewport);
-      }
-    }
 
     visibleMessages = visibleMessages.filter(id => {
       const msg = messages.get(id);
