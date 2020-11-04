@@ -332,11 +332,6 @@ function isGroupType(type) {
   return [MESSAGE_TYPE.START_GROUP, MESSAGE_TYPE.START_GROUP_COLLAPSED].includes(type);
 }
 
-function getInitialMessageCountForViewport(win) {
-  const minMessageHeight = 20;
-  return Math.ceil(win.innerHeight / minMessageHeight);
-}
-
 function createWarningGroupMessage(id, type, firstMessage) {
   return new ConsoleMessage({
     id,
@@ -532,7 +527,6 @@ module.exports = {
   createWarningGroupMessage,
   getArrayTypeNames,
   getDescriptorValue,
-  getInitialMessageCountForViewport,
   getParentWarningGroupMessageId,
   getWarningGroupType,
   isContentBlockingMessage,
