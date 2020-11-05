@@ -119,11 +119,14 @@ async function clickButton(button) {
   EventUtils.synthesizeMouseAtCenter(button, {}, document.window);
 }
 
+function getCurrentUrl() {
+  return window.gBrowser.currentURI.spec;
+}
+
 function clickRecordingButton() {
   log(`ClickRecordingButton`);
   const button =
-    document.getElementById("recording-button") ||
-    document.getElementById("record-button");
+    document.getElementById("recording-button") || document.getElementById("record-button");
   return clickButton(button);
 }
 
