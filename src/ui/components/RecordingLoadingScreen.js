@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { connect } from "react-redux";
 import Header from "./Header/index";
 import Prompt from "./shared/Prompt";
@@ -17,6 +17,11 @@ async function getScreenshotSafely(paintPoint) {
 
 function useGetPreviewScreen({ loading, recordingDuration }) {
   const [screen, setScreen] = useState(null);
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    mounted.current = true;
+  }, []);
 
   useEffect(() => {
     async function getAndSetScreen() {
@@ -31,12 +36,16 @@ function useGetPreviewScreen({ loading, recordingDuration }) {
         screen = await getScreenshotSafely(nextPaintPoint);
       }
 
-      if (screen) {
+      if (screen && mounted.current) {
         setScreen(screen);
       }
     }
 
     getAndSetScreen();
+
+    return () => {
+      mounted.current = false;
+    };
   }, [loading]);
 
   return screen;
