@@ -5,9 +5,9 @@
 //
 
 import { getBreakpoint, getSource, getSourceActorsForSource } from "../../selectors";
-import { sortSelectedLocations } from "../location";
 import assert from "../assert";
 import { features } from "../prefs";
+import { sortBy } from "lodash";
 
 export * from "./astBreakpointLocation";
 export * from "./breakpointPositions";
@@ -159,5 +159,11 @@ export function getSelectedText(breakpoint, selectedSource) {
 }
 
 export function sortSelectedBreakpoints(breakpoints, selectedSource) {
-  return sortSelectedLocations(breakpoints, selectedSource);
+  return sortBy(breakpoints, [
+    // Priority: line number, undefined column, column number
+    breakpoint => breakpoint.location.line,
+    breakpoint => {
+      return breakpoint.location.column === undefined || breakpoint.location.column;
+    },
+  ]);
 }
