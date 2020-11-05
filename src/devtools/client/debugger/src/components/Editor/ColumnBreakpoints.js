@@ -25,13 +25,14 @@ class ColumnBreakpoints extends Component {
 
     let breakpoints;
     editor.codeMirror.operation(() => {
-      breakpoints = columnBreakpoints.map(breakpoint => (
+      breakpoints = columnBreakpoints.map((breakpoint, i) => (
         <ColumnBreakpoint
           cx={cx}
           key={makeBreakpointId(breakpoint.location)}
           columnBreakpoint={breakpoint}
           editor={editor}
           source={selectedSource}
+          insertAt={i}
         />
       ));
     });

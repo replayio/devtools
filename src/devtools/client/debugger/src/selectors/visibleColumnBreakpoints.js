@@ -109,7 +109,6 @@ export function getColumnBreakpoints(positions, breakpoints, viewport, selectedS
   // - there is atleast one other breakpoint on that line
   // - there is a breakpoint on that line
   const breakpointMap = groupBreakpoints(breakpoints, selectedSource);
-  positions = filterByLineCount(positions, selectedSource);
   positions = filterVisible(positions, selectedSource, viewport);
   positions = filterInLine(positions, selectedSource, selectedSource.content);
   positions = filterByBreakpoints(positions, selectedSource, breakpointMap);

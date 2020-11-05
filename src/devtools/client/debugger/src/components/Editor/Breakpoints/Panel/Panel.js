@@ -40,7 +40,7 @@ function PanelSummary({ breakpoint, toggleEditingOn, setInputToFocus }) {
   );
 }
 
-function Widget({ location, children, editor }) {
+function Widget({ location, children, editor, insertAt }) {
   const [node, setNode] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -53,6 +53,7 @@ function Widget({ location, children, editor }) {
     const editorLine = toEditorLine(location.sourceId, location.line || 0);
     const _widget = editor.codeMirror.addLineWidget(editorLine, node, {
       noHScroll: true,
+      insertAt,
     });
     return () => {
       _widget.clear();
@@ -66,7 +67,7 @@ function Widget({ location, children, editor }) {
   return ReactDOM.createPortal(<>{children}</>, node);
 }
 
-function Panel({ breakpoint, editor }) {
+function Panel({ breakpoint, editor, insertAt }) {
   const [editing, setEditing] = useState(false);
   const [inputToFocus, setInputToFocus] = useState("logValue");
 
@@ -74,7 +75,7 @@ function Panel({ breakpoint, editor }) {
   const toggleEditingOff = () => setEditing(false);
 
   return (
-    <Widget location={breakpoint.location} editor={editor}>
+    <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
       <div className={classnames("breakpoint-panel", { editing })}>
         {editing ? (
           <PanelEditor
