@@ -8,7 +8,7 @@ import Services from "devtools-services";
 const { pref } = Services;
 
 // app prefs.
-pref("devtools.split-console", true);
+pref("devtools.split-console", false);
 pref("devtools.selected-panel", "debugger");
 pref("devtools.user", "{}");
 pref("devtools.recording-id", "");
