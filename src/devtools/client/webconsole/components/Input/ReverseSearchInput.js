@@ -223,7 +223,7 @@ class ReverseSearchInput extends Component {
 }
 
 const mapStateToProps = state => ({
-  visible: state.ui.reverseSearchInputVisible,
+  visible: state.consoleUI.reverseSearchInputVisible,
   reverseSearchTotalResults: getReverseSearchTotalResults(state),
   reverseSearchResultPosition: getReverseSearchResultPosition(state),
   reverseSearchResult: getReverseSearchResult(state),

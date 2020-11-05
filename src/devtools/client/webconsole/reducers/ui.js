@@ -4,7 +4,6 @@
 "use strict";
 
 const {
-  INITIALIZE,
   MESSAGES_CLEAR,
   PERSIST_TOGGLE,
   REVERSE_SEARCH_INPUT_TOGGLE,
@@ -24,7 +23,6 @@ const UiState = overrides =>
   Object.freeze(
     Object.assign(
       {
-        initialized: false,
         persistLogs: false,
         sidebarVisible: false,
         timestampsVisible: true,
@@ -55,8 +53,6 @@ function ui(state = UiState(), action) {
         sidebarVisible: false,
         frontInSidebar: null,
       };
-    case INITIALIZE:
-      return { ...state, initialized: true };
     case MESSAGES_CLEAR:
       return { ...state, sidebarVisible: false, frontInSidebar: null };
     case SHOW_OBJECT_IN_SIDEBAR:

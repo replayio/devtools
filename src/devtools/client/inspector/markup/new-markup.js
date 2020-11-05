@@ -1,18 +1,11 @@
 const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 const { ThreadFront } = require("protocol/thread");
-const { DOCUMENT_TYPE_NODE } = require("devtools/shared/dom-node-constants");
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const { setEventTooltip } = require("devtools/client/shared/widgets/tooltip/EventTooltipHelper");
 const Highlighter = require("highlighter/highlighter.js");
 
-const {
-  addNode,
-  updateChildren,
-  updateNodeExpanded,
-  updateRootNode,
-  updateSelectedNode,
-} = require("./actions/markup");
+const { newRoot, expandNode, updateNodeExpanded, selectionChanged } = require("./actions/markup");
 
 const MarkupApp = createFactory(require("./components/MarkupApp"));
 
@@ -26,10 +19,6 @@ class MarkupView {
     this.selection = inspector.selection;
     this.store = inspector.store;
     this.toolbox = inspector.toolbox;
-
-    // A map containing currently seen NodeFront objects in the markup tree.
-    // For a given NodeFront's object id, returns the NodeFront associated with it.
-    this.nodes = new Map();
 
     this.hoveredNodeId = undefined;
 
@@ -50,6 +39,9 @@ class MarkupView {
     if (!this.inspector) {
       return;
     }
+
+    this.store.dispatch(newRoot(ThreadFront.getKnownRootDOMNode()));
+    this.store.dispatch(selectionChanged(this.selection, true));
 
     const markupApp = MarkupApp({
       onSelectNode: this.onSelectNode,
@@ -84,7 +76,6 @@ class MarkupView {
     }
 
     this.inspector = null;
-    this.nodes = null;
     this.selection = null;
     this.store = null;
     this.toolbox = null;
@@ -99,61 +90,6 @@ class MarkupView {
     }
 
     return this._eventTooltip;
-  }
-
-  /**
-   * Given the NodeFront, add a representation of the node's properties to the
-   * markup tree object.
-   *
-   * @param  {NodeFront} node
-   *         The NodeFront of the node to add to the markup tree.
-   * @param  {Boolean} isExpanded
-   *         Whether or not the node is expanded.
-   */
-  addNodeToTree(node, { isExpanded = false } = {}) {
-    const parentNode = node.parentNode();
-    const id = node.objectId();
-
-    this.store.dispatch(
-      addNode({
-        // A list of the node's attributes.
-        attributes: node.attributes,
-        // Array of child node object ids.
-        children: [],
-        // The display name for the UI. This is either the lower casee of the node's tag
-        // name or the doctype string for a document type node.
-        displayName: node.nodeType === DOCUMENT_TYPE_NODE ? node.doctypeString : node.displayName,
-        // The computed display style property value of the node.
-        displayType: node.displayType,
-        // Whether or not the node has child nodes.
-        hasChildren: node.hasChildren,
-        // Whether or not the node has event listeners.
-        hasEventListeners: node.hasEventListeners,
-        // An unique NodeFront object id.
-        id,
-        // Whether or not the node is displayed. If a node has the attribute
-        // `display: none`, it is not displayed (faded in the markup view).
-        isDisplayed: node.isDisplayed,
-        // Whether or not the node is expanded.
-        isExpanded,
-        // Whether or not the node is an inline text child. NYI
-        isInlineTextChild: !!node.inlineTextChild,
-        // Whether or not the node is scrollable. NYI
-        isScrollable: node.isScrollable,
-        // The namespace URI of the node. NYI
-        namespaceURI: node.namespaceURI,
-        // The object id of the parent node.
-        parentNodeId: parentNode?.objectId(),
-        // The pseudo element type.
-        pseudoType: node.pseudoType,
-        // The name of the current node.
-        tagName: node.tagName,
-        // The node's `nodeType` which identifies what the node is.
-        type: node.nodeType,
-        // The node's `nodeValue` which identifies the value of the current node.
-        value: node.getNodeValue(),
-      })
-    );
   }
 
   /**
@@ -173,38 +109,7 @@ class MarkupView {
    *         The NodeFront object id to expand.
    */
   async expandNode(nodeId) {
-    await this.getChildren(this.nodes.get(nodeId));
-    this.store?.dispatch(updateNodeExpanded(nodeId, true));
-  }
-
-  /**
-   * Helper function to the update() function. Fetches the children and adds them to the
-   * markup tree.
-   *
-   * @param  {NodeFront} node
-   *         The NodeFront of the node to fetch the children from.
-   */
-  async getChildren(node) {
-    const children = await node.childNodes();
-    if (!this.nodes || !this.store) return;
-
-    // Adds the children into the tree model. No need to fetch their children yet
-    // since they aren't expanded.
-    for (const childNodeFront of children) {
-      const childNodeId = childNodeFront.objectId();
-      if (!this.nodes.has(childNodeId)) {
-        this.nodes.set(childNodeId, childNodeFront);
-      }
-
-      this.addNodeToTree(childNodeFront);
-    }
-
-    this.store.dispatch(
-      updateChildren(
-        node.objectId(),
-        children.map(child => child.objectId())
-      )
-    );
+    this.store?.dispatch(expandNode(nodeId));
   }
 
   /**
@@ -219,45 +124,13 @@ class MarkupView {
   }
 
   /**
-   * Import the selected node and import all of its ancestor nodes to construct the
-   * markup tree representation.
-   *
-   * @param  {NodeFront} node
-   *         The selected NodeFront in the markup tree.
-   */
-  async importNode(node) {
-    let currentNode = node;
-
-    // Walk up the parent of the selected node to make sure they are known and expanded
-    // starting from the selected node itself since we want to display it expanded with
-    // its children visible.
-    while (currentNode) {
-      if (!this.nodes || this.nodes.has(currentNode.objectId())) {
-        // We can stop importing once we encounter a node that is already known.
-        break;
-      }
-
-      this.nodes.set(currentNode.objectId(), currentNode);
-      this.addNodeToTree(currentNode, { isExpanded: true });
-      await this.getChildren(currentNode);
-
-      // Walk up the parent nodes until the known root node.
-      if (currentNode === ThreadFront.getKnownRootDOMNode()) {
-        break;
-      }
-
-      currentNode = currentNode.parentNode();
-    }
-  }
-
-  /**
    * Selects the given node in the markup tree.
    *
    * @param  {String} nodeId
    *         The NodeFront object id to select.
    */
   onSelectNode(nodeId) {
-    this.selection.setNodeFront(this.nodes.get(nodeId));
+    this.selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
   }
 
   /**
@@ -269,7 +142,7 @@ class MarkupView {
    *         The anchor element for the tooltip.
    */
   async onShowEventTooltip(nodeId, target) {
-    const nodeFront = this.nodes.get(nodeId);
+    const nodeFront = ThreadFront.currentPause.getNodeFront(nodeId);
     const listenerRaw = nodeFront.getEventListeners();
     const frameworkListeners = await nodeFront.getFrameworkEventListeners();
 
@@ -326,13 +199,13 @@ class MarkupView {
       this.expandNode(nodeId);
     }
 
-    this.selection.setNodeFront(this.nodes.get(nodeId));
+    this.selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
   }
 
   onMouseEnterNode(nodeId) {
     if (this.hoveredNodeId !== nodeId) {
       this.hoveredNodeId = nodeId;
-      Highlighter.highlight(this.nodes.get(nodeId));
+      Highlighter.highlight(ThreadFront.currentPause.getNodeFront(nodeId));
     }
   }
 
@@ -344,20 +217,14 @@ class MarkupView {
   }
 
   /**
-   * Updates the markup tree baseed on the current node selection.
+   * Updates the markup tree based on the current node selection.
    */
   async update() {
     if (!this.isPanelVisible() || !this.selection.isNode()) {
       return;
     }
 
-    const nodeFront = this.selection.nodeFront;
-    await this.importNode(nodeFront);
-
-    if (this.store && this.selection?.nodeFront === nodeFront) {
-      this.store.dispatch(updateRootNode(ThreadFront.getKnownRootDOMNode().objectId()));
-      this.store.dispatch(updateSelectedNode(this.selection.nodeFront.objectId()));
-    }
+    this.store?.dispatch(selectionChanged(this.selection, false));
   }
 }
 

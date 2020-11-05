@@ -16,9 +16,7 @@ export function thunk(makeArgs) {
     const args = { dispatch, getState };
 
     return next => action => {
-      return typeof action === "function"
-        ? action(makeArgs ? makeArgs(args, getState()) : args)
-        : next(action);
+      return typeof action === "function" ? action(makeArgs ? makeArgs(args) : args) : next(action);
     };
   };
 }

@@ -23,7 +23,6 @@ class SmartTrace extends Component {
   static get propTypes() {
     return {
       stacktrace: PropTypes.array.isRequired,
-      onViewSource: PropTypes.func.isRequired,
       onViewSourceInDebugger: PropTypes.func.isRequired,
       // Function that will be called when the SmartTrace is ready, i.e. once it was
       // rendered.

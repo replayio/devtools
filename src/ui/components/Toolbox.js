@@ -13,6 +13,7 @@ import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { DebuggerPanel } from "devtools/client/debugger/panel";
 import { WebConsolePanel } from "devtools/client/webconsole/panel";
 import { InspectorPanel } from "devtools/client/inspector/panel";
+import WebConsoleApp from "devtools/client/webconsole/components/App";
 
 import Timeline from "./Timeline";
 import NodePicker from "./NodePicker";
@@ -352,7 +353,7 @@ class Toolbox extends React.Component {
           onClick={() => this.selectTool("inspector")}
         >
           <div className="toolbar-panel-icon"></div>
-          Inspector
+          Elements
         </div>
         <div
           className={classnames("toolbar-panel-button", {
@@ -362,7 +363,7 @@ class Toolbox extends React.Component {
           onClick={() => this.selectTool("debugger")}
         >
           <div className="toolbar-panel-icon"></div>
-          Debugger
+          Sources
         </div>
         <div
           className={classnames("toolbar-panel-button", {
@@ -453,7 +454,9 @@ class Toolbox extends React.Component {
                     active: selectedPanel == "console" || splitConsoleOpen,
                   })}
                   id="toolbox-content-console"
-                />
+                >
+                  <WebConsoleApp />
+                </div>
               </div>
             }
           />

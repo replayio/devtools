@@ -14,16 +14,13 @@ export default function showContextMenu(props) {
     cx,
     breakpoint,
     breakpoints,
-    selectedSource,
     removeBreakpoint,
     removeBreakpoints,
     removeAllBreakpoints,
     toggleBreakpoints,
     toggleAllBreakpoints,
     toggleDisabledBreakpoint,
-    selectSpecificLocation,
     setBreakpointOptions,
-    openConditionalPanel,
     contextMenuEvent,
   } = props;
 
@@ -40,9 +37,6 @@ export default function showContextMenu(props) {
   const disableOthersLabel = L10N.getStr("breakpointMenuItem.disableOthers2.label");
   const enableDbgStatementLabel = L10N.getStr("breakpointMenuItem.enabledbg.label");
   const disableDbgStatementLabel = L10N.getStr("breakpointMenuItem.disabledbg.label");
-  const removeConditionLabel = L10N.getStr("breakpointMenuItem.removeCondition2.label");
-  const addConditionLabel = L10N.getStr("breakpointMenuItem.addCondition2.label");
-  const editConditionLabel = L10N.getStr("breakpointMenuItem.editCondition2.label");
 
   const deleteSelfKey = L10N.getStr("breakpointMenuItem.deleteSelf2.accesskey");
   const deleteAllKey = L10N.getStr("breakpointMenuItem.deleteAll2.accesskey");
@@ -53,9 +47,6 @@ export default function showContextMenu(props) {
   const disableSelfKey = L10N.getStr("breakpointMenuItem.disableSelf2.accesskey");
   const disableAllKey = L10N.getStr("breakpointMenuItem.disableAll2.accesskey");
   const disableOthersKey = L10N.getStr("breakpointMenuItem.disableOthers2.accesskey");
-  const removeConditionKey = L10N.getStr("breakpointMenuItem.removeCondition2.accesskey");
-  const editConditionKey = L10N.getStr("breakpointMenuItem.editCondition2.accesskey");
-  const addConditionKey = L10N.getStr("breakpointMenuItem.addCondition2.accesskey");
 
   const selectedLocation = breakpoint.location;
   const otherBreakpoints = breakpoints.filter(b => b.id !== breakpoint.id);
@@ -163,47 +154,12 @@ export default function showContextMenu(props) {
       }),
   };
 
-  const removeConditionItem = {
-    id: "node-menu-remove-condition",
-    label: removeConditionLabel,
-    accesskey: removeConditionKey,
-    disabled: false,
-    click: () =>
-      setBreakpointOptions(cx, selectedLocation, {
-        ...breakpoint.options,
-        condition: null,
-      }),
-  };
-
-  const addConditionItem = {
-    id: "node-menu-add-condition",
-    label: addConditionLabel,
-    accesskey: addConditionKey,
-    click: () => {
-      selectSpecificLocation(cx, selectedLocation);
-      openConditionalPanel(selectedLocation);
-    },
-    accelerator: formatKeyShortcut(L10N.getStr("toggleCondPanel.breakpoint.key")),
-  };
-
-  const editConditionItem = {
-    id: "node-menu-edit-condition",
-    label: editConditionLabel,
-    accesskey: editConditionKey,
-    click: () => {
-      selectSpecificLocation(cx, selectedLocation);
-      openConditionalPanel(selectedLocation);
-    },
-    accelerator: formatKeyShortcut(L10N.getStr("toggleCondPanel.breakpoint.key")),
-  };
-
   const addLogPointItem = {
     id: "node-menu-add-log-point",
     label: L10N.getStr("editor.addLogPoint"),
     accesskey: L10N.getStr("editor.addLogPoint.accesskey"),
     disabled: false,
-    click: () => openConditionalPanel(selectedLocation, true),
-    accelerator: formatKeyShortcut(L10N.getStr("toggleCondPanel.logPoint.key")),
+    click: () => {},
   };
 
   const editLogPointItem = {
@@ -211,8 +167,7 @@ export default function showContextMenu(props) {
     label: L10N.getStr("editor.editLogPoint"),
     accesskey: L10N.getStr("editor.editLogPoint.accesskey"),
     disabled: false,
-    click: () => openConditionalPanel(selectedLocation, true),
-    accelerator: formatKeyShortcut(L10N.getStr("toggleCondPanel.logPoint.key")),
+    click: () => {},
   };
 
   const removeLogPointItem = {
@@ -274,18 +229,6 @@ export default function showContextMenu(props) {
     {
       item: { type: "separator" },
       hidden: () => hideDisableDbgStatementItem && hideEnableDbgStatementItem,
-    },
-    {
-      item: addConditionItem,
-      hidden: () => breakpoint.options.condition,
-    },
-    {
-      item: editConditionItem,
-      hidden: () => !breakpoint.options.condition,
-    },
-    {
-      item: removeConditionItem,
-      hidden: () => !breakpoint.options.condition,
     },
     {
       item: logPointItem,

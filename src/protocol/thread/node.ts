@@ -106,8 +106,7 @@ export class NodeFront {
   }
 
   get doctypeString() {
-    // NYI
-    return "unknown";
+    return `<!DOCTYPE ${this.nodeName}>`;
   }
 
   // A list of the node's attributes.

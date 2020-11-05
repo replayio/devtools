@@ -4,9 +4,12 @@
 
 "use strict";
 
-import { WebConsole } from "./webconsole";
 import EventEmitter from "devtools/shared/event-emitter";
 import actions from "devtools/client/webconsole/actions/index";
+import * as selectors from "devtools/client/webconsole/selectors/index";
+import { setupConsoleHelper } from "ui/utils/bootstrap/helpers";
+import { setupMessages } from "devtools/client/webconsole/actions/messages";
+import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
 
 export class WebConsolePanel {
   constructor(toolbox) {
@@ -15,13 +18,15 @@ export class WebConsolePanel {
   }
 
   async open() {
-    this.hud = new WebConsole(this.toolbox);
-
     this.toolbox.on("webconsole-selected", this._onPanelSelected);
     this.toolbox.on("split-console", this._onChangeSplitConsoleState);
     this.toolbox.on("select", this._onChangeSplitConsoleState);
 
-    const { store } = await this.hud.init();
+    setupConsoleHelper({ store, selectors, actions });
+    initOutputSyntaxHighlighting();
+
+    // TODO: the store should be associated with the toolbox
+    setupMessages(store);
     this.store = store;
     return this;
   }

@@ -5,7 +5,7 @@
 "use strict";
 
 function getAllUi(state) {
-  return state.ui;
+  return state.consoleUI;
 }
 
 module.exports = {

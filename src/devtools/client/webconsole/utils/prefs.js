@@ -60,7 +60,7 @@ export const prefs = new PrefsHelper("console", {
   groupWarningMessages: ["Bool", "groupWarningMessages"],
 });
 
-export function getPrefsService(hud) {
+export function getPrefsService() {
   return {
     getBoolPref: (pref, deflt) => deflt,
     getIntPref: (pref, deflt) => deflt,

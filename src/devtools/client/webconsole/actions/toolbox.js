@@ -23,21 +23,6 @@ export function unHighlightDomElement(grip) {
   };
 }
 
-// NOTE these methods are proxied currently because the
-// service container is passed down the tree. These methods should eventually
-// be moved to redux actions.
-export function openLink(url, e) {
-  return () => {
-    openDocLink(url, {
-      relatedToCurrent: true,
-      inBackground: isMacOS ? e.metaKey : e.ctrlKey,
-    });
-    if (e && typeof e.stopPropagation === "function") {
-      e.stopPropagation();
-    }
-  };
-}
-
 export function openNodeInInspector(valueFront) {
   return async ({ toolbox }) => {
     const onSelectInspector = toolbox.selectTool("inspector", "inspect_dom");
@@ -55,12 +40,6 @@ export function openNodeInInspector(valueFront) {
     await toolbox.selection.setNodeFront(nodeFront, {
       reason: "console",
     });
-  };
-}
-
-export function focusInput() {
-  return ({ hud }) => {
-    hud.focusInput();
   };
 }
 
