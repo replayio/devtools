@@ -106,7 +106,7 @@ export class NodeFront {
   }
 
   get doctypeString() {
-    return `<!DOCTYPE ${this.nodeName}>`
+    return `<!DOCTYPE ${this.nodeName}>`;
   }
 
   // A list of the node's attributes.
