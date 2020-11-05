@@ -2184,7 +2184,7 @@
         var id = cm.display.gutterSpecs[k].className, found = markers.hasOwnProperty(id) && markers[id];
         if (found)
           { gutterWrap.appendChild(elt("div", [found], "CodeMirror-gutter-elt",
-                                     ("left: " + (dims.gutterLeft[id]) + "px; width: " + (dims.gutterWidth[id]) + "px"))); }
+                                     ("left: " + (dims.gutterLeft[id]) + "px; width: " + (cm.display.lineNumWidth) + "px"))); }
       } }
     }
   }
