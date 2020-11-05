@@ -1,5 +1,5 @@
 // Test scope mapping and switching between generated/original sources.
-(async function() {
+(async function () {
   await Test.addBreakpoint("bundle_input.js", 15, undefined, {
     logValue: "barobj.barprop1 * 10",
   });

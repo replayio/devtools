@@ -26,7 +26,7 @@
     ["obj: Object { value: 14, subobj: {…} }"]
   );
 
-  Test.clickMessageLocationLink(msg)
+  Test.getMessageLocationLink(msg).click();
   await Test.waitUntil(() => Test.dbgSelectors.getSelectedLocation()?.line == 15)
 
   await Test.addBreakpoint("doc_rr_console.html", 16, undefined, {
