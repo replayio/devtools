@@ -213,6 +213,30 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
   };
 }
 
+export function addBreakpointAtColumn(cx, location) {
+  return ({ dispatch, getState }) => {
+    const state = getState();
+    const source = getSelectedSource(state);
+    const { column, line } = location;
+
+    if (!source) {
+      return;
+    }
+    const breakpointLocation = {
+      sourceId: source.id,
+      sourceUrl: source.url,
+      column: column,
+      line: line,
+    };
+
+    const options = {};
+    const file = source.url.split("/").pop();
+    options.logValue = `"${file}:${line}:${column}"`;
+
+    return dispatch(addBreakpoint(cx, breakpointLocation, options));
+  };
+}
+
 export function removeBreakpointsAtLine(cx, sourceId, line) {
   return ({ dispatch, getState, client, sourceMaps }) => {
     const breakpointsAtLine = getBreakpointsForSource(getState(), sourceId, line);

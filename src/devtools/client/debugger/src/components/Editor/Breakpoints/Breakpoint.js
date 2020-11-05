@@ -141,14 +141,6 @@ class Breakpoint extends PureComponent {
   }
 
   render() {
-    const { editor, breakpoint } = this.props;
-
-    if (breakpoint.options.logValue) {
-      return (
-        <Panel breakpoint={breakpoint} editor={editor} location={breakpoint.location} log={true} />
-      );
-    }
-
     return null;
   }
 }

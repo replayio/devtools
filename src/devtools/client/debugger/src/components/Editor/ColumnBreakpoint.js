@@ -3,12 +3,14 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { Component } from "react";
+import React, { Component } from "react";
 import classnames from "classnames";
 import { connect } from "../../utils/connect";
 import actions from "../../actions";
 
 import { getDocument } from "../../utils/editor";
+// import Panel from "../Breakpoints/Panel/index";
+import Panel from "./Breakpoints/Panel/index";
 
 // eslint-disable-next-line max-len
 
@@ -76,7 +78,7 @@ class ColumnBreakpoint extends Component {
       cx,
       columnBreakpoint,
       toggleDisabledBreakpoint,
-      addBreakpoint,
+      addBreakpointAtColumn,
       removeBreakpoint,
     } = this.props;
 
@@ -89,7 +91,7 @@ class ColumnBreakpoint extends Component {
     if (columnBreakpoint.breakpoint) {
       removeBreakpoint(cx, columnBreakpoint.breakpoint);
     } else {
-      addBreakpoint(cx, columnBreakpoint.location);
+      addBreakpointAtColumn(cx, columnBreakpoint.location);
     }
   };
 
@@ -118,12 +120,18 @@ class ColumnBreakpoint extends Component {
   }
 
   render() {
-    return null;
+    const { editor, columnBreakpoint } = this.props;
+
+    if (!columnBreakpoint.breakpoint) {
+      return null;
+    }
+
+    return <Panel breakpoint={columnBreakpoint.breakpoint} editor={editor} />;
   }
 }
 
 export default connect(null, {
-  addBreakpoint: actions.addBreakpoint,
+  addBreakpointAtColumn: actions.addBreakpointAtColumn,
   removeBreakpoint: actions.removeBreakpoint,
   toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
 })(ColumnBreakpoint);
