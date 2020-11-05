@@ -14,7 +14,7 @@ const PrefState = overrides =>
     Object.assign(
       {
         logLimit: 1000,
-        groupWarnings: true
+        groupWarnings: true,
       },
       overrides
     )

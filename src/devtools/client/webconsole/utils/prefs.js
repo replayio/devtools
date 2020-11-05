@@ -49,8 +49,8 @@ export function getPrefsService() {
   return {
     getBoolPref: (pref, deflt) => deflt,
     getIntPref: (pref, deflt) => deflt,
-    setBoolPref: (pref, value) => { },
-    setIntPref: (pref, value) => { },
-    clearUserPref: pref => { },
+    setBoolPref: (pref, value) => {},
+    setIntPref: (pref, value) => {},
+    clearUserPref: pref => {},
   };
 }
