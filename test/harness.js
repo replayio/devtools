@@ -23,14 +23,23 @@ const recordViewer = env.get("RECORD_REPLAY_DONT_RECORD_VIEWER") == "false";
   } else {
     dump(`TestHarnessRetrievingExampleFromRecordings`);
   }
-  
+
+  await waitForDevtools();
+  const exampleReplayUrl = getCurrentUrl();
+
   if (recordViewer) {
-    await waitForDevtools();
     clickRecordingButton();
     dump(`TestHarnessViewerRecordingTabStarted\n`);
   }
 
   await waitForMessage("TestFinished");
+
+  if (recordViewer) {
+    clickRecordingButton();
+    await waitUntil(() => getCurrentUrl() !== exampleReplayUrl);
+    dump(`TestHarnessViewerRecordingTabFinished\n`);
+  }
+
   finishTest();
   dump(`TestHarnessFinished\n`);
 })();
