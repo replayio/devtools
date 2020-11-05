@@ -9,7 +9,7 @@ import { connect } from "../../../utils/connect";
 import { createSelector } from "reselect";
 import classnames from "classnames";
 import actions from "../../../actions";
-import { memoize } from "lodash";
+import { find, findLast, memoize } from "lodash";
 
 import showContextMenu from "./BreakpointsContextMenu";
 import { CloseButton } from "../../shared/Button";
@@ -26,11 +26,14 @@ import {
   getSelectedFrame,
   getSelectedSource,
   getContext,
+  getFramePositions,
+  isTopFrame,
 } from "../../../selectors";
-import { seekToPosition } from "../../../actions/pause";
 import { selectors } from "../../../../../../../ui/reducers";
-
 const { getAnalysisPointsForLocation } = selectors;
+
+import { getThreadExecutionPoint } from "../../../reducers/pause";
+import { compareNumericStrings } from "../../../../../../../protocol/utils";
 
 class Breakpoint extends PureComponent {
   onContextMenu = e => {
@@ -103,10 +106,26 @@ class Breakpoint extends PureComponent {
     text => text
   );
 
+  navigateToPrev(point) {
+    if (point) {
+      this.props.seekToPosition(point.point, point.time);
+    }
+  }
+
   render() {
     const { breakpoint, editor, pause, analysisPoints } = this.props;
     const text = this.getBreakpointText();
     const labelId = `${breakpoint.id}-label`;
+
+    //where are we currently paused?
+    const currentPause = pause;
+    let prev;
+    let next;
+
+    if (currentPause && analysisPoints && analysisPoints.length > 0) {
+      prev = findLast(analysisPoints, p => compareNumericStrings(p.point, currentPause) < 0);
+      next = find(analysisPoints, p => compareNumericStrings(p.point, currentPause) > 0);
+    }
 
     return (
       <div
@@ -140,19 +159,20 @@ class Breakpoint extends PureComponent {
         </span>
 
         <div>
-          #{this.props.analysisPoints ? this.props.analysisPoints.length : 0} hits |
+          #{analysisPoints ? analysisPoints.length : 0} hits |
           <button
+            disabled={!prev}
             onClick={() => {
-              console.log("previous");
+              this.navigateToPrev(prev);
             }}
           >
-            Prev
+            <b>PREVIOUS</b>
           </button>{" "}
           |
           <button
+            disabled={!next}
             onClick={() => {
-              console.log("next");
-              seekToPosition(next);
+              this.navigateToPrev(next);
             }}
           >
             Next
@@ -190,6 +210,7 @@ const mapStateToProps = (state, p) => ({
   breakpoints: getBreakpointsList(state),
   frame: getFormattedFrame(state),
   analysisPoints: getAnalysisPointsForLocation(state, p.breakpoint.location),
+  pause: getThreadExecutionPoint(state),
 });
 
 export default connect(mapStateToProps, {
@@ -203,4 +224,5 @@ export default connect(mapStateToProps, {
   toggleAllBreakpoints: actions.toggleAllBreakpoints,
   toggleBreakpoints: actions.toggleBreakpoints,
   toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
+  seekToPosition: actions.seekToPosition,
 })(Breakpoint);

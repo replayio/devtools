@@ -52,6 +52,7 @@ export function command(cx, type) {
 }
 
 export function seekToPosition(point, time) {
+  console.log("seektoposition");
   return ({ getState }) => {
     const cx = getThreadContext(getState());
     ThreadFront.timeWarp(point, time, /* hasFrames */ true);
