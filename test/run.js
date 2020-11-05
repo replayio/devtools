@@ -2,6 +2,7 @@
 // Harness for end-to-end tests. Run this from the devtools root directory.
 const fs = require("fs");
 const http = require("http");
+const https = require("https");
 const os = require("os");
 const { spawnSync, spawn } = require("child_process");
 const url = require("url");
@@ -56,6 +57,8 @@ function processArgs() {
   }
 }
 
+const DefaultDispatchServer = "wss://dispatch.replay.io";
+
 function processEnvironmentVariables() {
   /*
    * RECORD_REPLAY_DONT_RECORD_VIEWER  Disables recording the viewer
@@ -76,7 +79,7 @@ function processEnvironmentVariables() {
   gInstallDir = process.env.RECORD_REPLAY_PATH || "/Applications/Replay.app";
 
   // Get the address to use for the dispatch server.
-  dispatchServer = process.env.RECORD_REPLAY_SERVER || "wss://dispatch.replay.io";
+  dispatchServer = process.env.RECORD_REPLAY_SERVER || DefaultDispatchServer;
 }
 
 function startExampleServer() {
@@ -198,6 +201,10 @@ async function runTest(path, local, timeout = 60, env = {}) {
     const match = /CreateRecording (.*?) (.*)/.exec(data.toString());
     if (match && match[2].startsWith("http://localhost:8080/view")) {
       recordingId = match[1];
+
+      if (dispatchServer == DefaultDispatchServer) {
+        addTestRecordingId(recordingId);
+      }
     }
     if (match && match[2].startsWith("http://localhost:7998")) {
       const exampleRecordingId = match[1];
@@ -283,5 +290,22 @@ function spawnChecked(...args) {
   const rv = spawnSync.apply(this, args);
   if (rv.status != 0 || rv.error) {
     throw new Error("Spawned process failed");
+  }
+}
+
+function addTestRecordingId(recordingId) {
+  try {
+    const options = {
+      hostname: "test-inbox.replay.io",
+      port: 8004,
+      path: `/${recordingId}`,
+      method: "GET",
+    };
+    const req = https.request(options, res => {
+      console.log("AddTestRecordingId", recordingId, res.statusCode);
+    });
+    req.end();
+  } catch (e) {
+    console.error("addTestRecordingId failed", e);
   }
 }
