@@ -120,13 +120,13 @@ class ColumnBreakpoint extends Component {
   }
 
   render() {
-    const { editor, columnBreakpoint } = this.props;
+    const { editor, columnBreakpoint, insertAt } = this.props;
 
     if (!columnBreakpoint.breakpoint) {
       return null;
     }
 
-    return <Panel breakpoint={columnBreakpoint.breakpoint} editor={editor} />;
+    return <Panel breakpoint={columnBreakpoint.breakpoint} editor={editor} insertAt={insertAt} />;
   }
 }
 
