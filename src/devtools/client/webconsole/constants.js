@@ -82,8 +82,7 @@ const prefs = {
       // Show the Input Context the selector
       CONTEXT_SELECTOR: "devtools.webconsole.input.context",
     },
-    FEATURES: {
-    },
+    FEATURES: {},
   },
 };
 

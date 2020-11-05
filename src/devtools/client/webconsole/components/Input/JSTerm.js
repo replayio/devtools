@@ -4,7 +4,7 @@
 
 "use strict";
 
-const React = require("react")
+const React = require("react");
 const { connect } = require("react-redux");
 const Services = require("Services");
 const isMacOS = Services.appinfo.OS === "Darwin";
@@ -105,7 +105,6 @@ class JSTerm extends React.Component {
               return false;
             }
 
-
             // Something is selected, let the editor handle the indent.
             return true;
           },
@@ -141,7 +140,6 @@ class JSTerm extends React.Component {
     }
   }
 
-
   focus() {
     if (this.editor) {
       this.editor.focus();
@@ -157,6 +155,7 @@ class JSTerm extends React.Component {
       return;
     }
 
+    this.props.evaluateExpression(executeString);
     this._setValue("");
   }
 
@@ -212,21 +211,22 @@ class JSTerm extends React.Component {
     return this._getValue() === "";
   }
 
-  destroy() { }
+  destroy() {}
 
   render() {
-    return <div
-      className="jsterm-input-container devtools-input"
-      key="jsterm-container"
-      aria-live="off"
-      tabIndex={-1}
-      ref={node => {
-        this.node = node;
-      }}
-    />
+    return (
+      <div
+        className="jsterm-input-container devtools-input"
+        key="jsterm-container"
+        aria-live="off"
+        tabIndex={-1}
+        ref={node => {
+          this.node = node;
+        }}
+      />
+    );
   }
 }
-
 
 function mapStateToProps(state) {
   return {};
@@ -234,6 +234,6 @@ function mapStateToProps(state) {
 
 const mapDispatchToProp = {
   evaluateExpression: actions.evaluateExpression,
-}
+};
 
 module.exports = connect(mapStateToProps, mapDispatchToProp)(JSTerm);

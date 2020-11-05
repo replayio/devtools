@@ -9,8 +9,8 @@ const { connect } = require("devtools/client/shared/redux/visibility-handler-con
 const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
 
 // We directly require Components that we know are going to be used right away
-const ConsoleOutput = require("devtools/client/webconsole/components/Output/ConsoleOutput")
-const FilterBar = require("devtools/client/webconsole/components/FilterBar/FilterBar")
+const ConsoleOutput = require("devtools/client/webconsole/components/Output/ConsoleOutput");
+const FilterBar = require("devtools/client/webconsole/components/FilterBar/FilterBar");
 const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm");
 
 require("./App.css");
@@ -30,8 +30,7 @@ class App extends React.Component {
     window.addEventListener("blur", this.onBlur);
   }
 
-
-  onClick = (event) => {
+  onClick = event => {
     const target = event.originalTarget || event.target;
 
     // Do not focus on middle/right-click or 2+ clicks.
@@ -62,7 +61,7 @@ class App extends React.Component {
     }
 
     window.jsterm?.focus();
-  }
+  };
 
   renderFilterBar() {
     const { filterBarDisplayMode, dispatch } = this.props;
@@ -82,31 +81,27 @@ class App extends React.Component {
     return JSTerm({ key: "jsterm" });
   }
 
-  renderRootElement(children) {
-
-  }
+  renderRootElement(children) {}
 
   render() {
     const { filterBarDisplayMode } = this.props;
 
-    return <div
-      className="webconsole-app"
-      onClick={this.onClick}
-      ref={node => {
-        this.node = node;
-      }}
-    >
+    return (
+      <div
+        className="webconsole-app"
+        onClick={this.onClick}
+        ref={node => {
+          this.node = node;
+        }}
+      >
+        <FilterBar key="filterbar" displayMode={filterBarDisplayMode} />
 
-      <FilterBar
-        key="filterbar"
-        displayMode={filterBarDisplayMode}
-      />
-
-      <div className="flexible-output-input" key="in-out-container" >
-        <ConsoleOutput key="console-output" />
-        <JSTerm key="jsterm" />
+        <div className="flexible-output-input" key="in-out-container">
+          <ConsoleOutput key="console-output" />
+          <JSTerm key="jsterm" />
+        </div>
       </div>
-    </div>
+    );
   }
 }
 
@@ -115,6 +110,5 @@ const mapStateToProps = state => {
     filterBarDisplayMode: state.consoleUI.filterBarDisplayMode,
   };
 };
-
 
 module.exports = connect(mapStateToProps)(App);

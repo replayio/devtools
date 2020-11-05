@@ -235,12 +235,7 @@ class FilterBar extends Component {
   }
 
   renderSettingsButton() {
-    const {
-      dispatch,
-      groupWarnings,
-      timestampsVisible,
-      filter,
-    } = this.props;
+    const { dispatch, timestampsVisible, filter } = this.props;
 
     return ConsoleSettings({
       dispatch,
@@ -323,11 +318,7 @@ function mapStateToProps(state) {
     closeButtonVisible: uiState.closeButtonVisible,
     filter: getAllFilters(state),
     filteredMessagesCount: getFilteredMessagesCount(state),
-    groupWarnings: prefsState.groupWarnings,
-    persistLogs: uiState.persistLogs,
-    eagerEvaluation: prefsState.eagerEvaluation,
     timestampsVisible: uiState.timestampsVisible,
-    autocomplete: prefsState.autocomplete,
   };
 }
 
@@ -336,5 +327,5 @@ module.exports = connect(mapStateToProps, {
   filterBarDisplayModeSet: actions.filterBarDisplayModeSet,
   messagesClearEvaluations: actions.messagesClearEvaluations,
   filterTextSet: actions.filterTextSet,
-  filterToggle: actions.filterToggle
+  filterToggle: actions.filterToggle,
 })(FilterBar);

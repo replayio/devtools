@@ -26,7 +26,7 @@ function FilterButton(props) {
       className: "devtools-togglebutton",
       "data-category": filterKey,
       title,
-      onClick
+      onClick,
     },
     label
   );
