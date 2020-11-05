@@ -353,7 +353,7 @@ class Toolbox extends React.Component {
           onClick={() => this.selectTool("inspector")}
         >
           <div className="toolbar-panel-icon"></div>
-          Inspector
+          Elements
         </div>
         <div
           className={classnames("toolbar-panel-button", {
@@ -363,7 +363,7 @@ class Toolbox extends React.Component {
           onClick={() => this.selectTool("debugger")}
         >
           <div className="toolbar-panel-icon"></div>
-          Debugger
+          Sources
         </div>
         <div
           className={classnames("toolbar-panel-button", {
