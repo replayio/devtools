@@ -103,24 +103,10 @@
   text-overflow: ellipsis;
 }
 
-html[dir="rtl"] .breakpoints-list .breakpoint,
-html[dir="rtl"] .breakpoints-list .breakpoint-heading,
-html[dir="rtl"] .breakpoints-exceptions {
-  border-right: 4px solid transparent;
-}
-
-html:not([dir="rtl"]) .breakpoints-list .breakpoint,
-html:not([dir="rtl"]) .breakpoints-list .breakpoint-heading,
-html:not([dir="rtl"]) .breakpoints-exceptions {
+html .breakpoints-list .breakpoint,
+html .breakpoints-list .breakpoint-heading,
+html .breakpoints-exceptions {
   border-left: 4px solid transparent;
-}
-
-html .breakpoints-list .breakpoint.is-conditional {
-  border-inline-start-color: var(--theme-graphs-yellow);
-}
-
-html .breakpoints-list .breakpoint.is-log {
-  border-inline-start-color: var(--theme-graphs-purple);
 }
 
 html .breakpoints-list .breakpoint.paused {
@@ -194,14 +180,7 @@ html .breakpoints-list .breakpoint.paused {
   position: absolute;
   /* hide button outside of row until hovered or focused */
   top: -100px;
-}
-
-[dir="ltr"] .breakpoint .close-btn {
   right: 12px;
-}
-
-[dir="rtl"] .breakpoint .close-btn {
-  left: 12px;
 }
 
 /* Reveal the remove button on hover/focus */

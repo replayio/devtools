@@ -16,10 +16,6 @@
 
 .theme-light,
 .theme-dark {
-  --logpoint-fill: var(--theme-graphs-purple);
-  --logpoint-stroke: var(--purple-60);
-  --breakpoint-condition-fill: var(--theme-graphs-yellow);
-  --breakpoint-condition-stroke: var(--theme-graphs-orange);
   --breakpoint-skipped-opacity: 0.15;
   --breakpoint-inactive-opacity: 0.3;
   --breakpoint-disabled-opacity: 0.6;
@@ -75,16 +71,6 @@
   right: -16px;
 }
 
-.new-breakpoint.has-condition .CodeMirror-gutter-wrapper svg {
-  fill: var(--breakpoint-condition-fill);
-  stroke: var(--breakpoint-condition-stroke);
-}
-
-.new-breakpoint.has-log .CodeMirror-gutter-wrapper svg {
-  fill: var(--logpoint-fill);
-  stroke: var(--logpoint-stroke);
-}
-
 .editor.new-breakpoint.breakpoint-disabled svg {
   fill-opacity: var(--breakpoint-disabled-opacity);
   stroke-opacity: var(--breakpoint-disabled-opacity);
@@ -127,21 +113,6 @@
 .column-breakpoint.disabled svg {
   fill-opacity: var(--breakpoint-disabled-opacity);
   stroke-opacity: var(--breakpoint-disabled-opacity);
-}
-
-.column-breakpoint.has-log.disabled svg {
-  fill-opacity: 0.5;
-  stroke-opacity: 0.5;
-}
-
-.column-breakpoint.has-condition svg {
-  fill: var(--breakpoint-condition-fill);
-  stroke: var(--breakpoint-condition-stroke);
-}
-
-.column-breakpoint.has-log svg {
-  fill: var(--logpoint-fill);
-  stroke: var(--logpoint-stroke);
 }
 
 .editor-wrapper.skip-pausing .column-breakpoint svg {
