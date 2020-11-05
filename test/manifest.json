@@ -4,6 +4,7 @@
   ["breakpoints-03.js", "doc_rr_basic.html"],
   ["breakpoints-04.js", "doc_control_flow.html"],
   ["breakpoints-05.js", "doc_debugger_statements.html"],
+  ["breakpoints-06.js", "doc_prod_bundle.html"],
   ["stepping-01.js", "doc_rr_basic.html"],
   ["stepping-02.js", "doc_rr_basic.html"],
   ["stepping-03.js", "doc_rr_basic.html"],

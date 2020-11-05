@@ -265,12 +265,12 @@ function findMessages(text, extraSelector = "") {
 function waitForMessage(text, extraSelector) {
   return waitUntil(() => {
     const messages = findMessages(text, extraSelector);
-    return messages.length ? messages[0] : null;
+    return messages?.[0];
   });
 }
 
-function clickMessageLocationLink(msg) {
-  msg.querySelector(".frame-link a").click();
+function getMessageLocationLink(msg) {
+  return msg.querySelector(".frame-link a");
 }
 
 async function warpToMessage(text) {
@@ -563,7 +563,7 @@ const testCommands = {
   checkEvaluateInTopFrame,
   waitForScopeValue,
   toggleBlackboxSelectedSource,
-  clickMessageLocationLink,
+  getMessageLocationLink,
   findMessages,
   waitForMessage,
   warpToMessage,
