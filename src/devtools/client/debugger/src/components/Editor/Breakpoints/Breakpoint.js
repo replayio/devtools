@@ -102,18 +102,9 @@ class Breakpoint extends PureComponent {
 
     editor.codeMirror.addLineClass(line, "line", "new-breakpoint");
     editor.codeMirror.removeLineClass(line, "line", "breakpoint-disabled");
-    editor.codeMirror.removeLineClass(line, "line", "has-condition");
-    // editor.codeMirror.removeLineClass(line, "line", "has-log");
 
     if (breakpoint.disabled) {
       editor.codeMirror.addLineClass(line, "line", "breakpoint-disabled");
-    }
-
-    // if (breakpoint.options.logValue) {
-    //   editor.codeMirror.addLineClass(line, "line", "has-log");
-    // }
-    if (breakpoint.options.condition) {
-      editor.codeMirror.addLineClass(line, "line", "has-condition");
     }
   }
 
@@ -136,8 +127,6 @@ class Breakpoint extends PureComponent {
     doc.setGutterMarker(line, "breakpoints", null);
     doc.removeLineClass(line, "line", "new-breakpoint");
     doc.removeLineClass(line, "line", "breakpoint-disabled");
-    doc.removeLineClass(line, "line", "has-condition");
-    doc.removeLineClass(line, "line", "has-log");
   }
 
   render() {

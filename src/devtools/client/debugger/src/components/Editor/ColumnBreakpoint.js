@@ -25,8 +25,6 @@ function makeBookmark({ breakpoint }, { onClick, onContextMenu }) {
   const logValue = breakpoint && breakpoint.options.logValue;
 
   bp.className = classnames("column-breakpoint", {
-    "has-condition": condition,
-    "has-log": logValue,
     active: isActive,
     disabled: isDisabled,
   });

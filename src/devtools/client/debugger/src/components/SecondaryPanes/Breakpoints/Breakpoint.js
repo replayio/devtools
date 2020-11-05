@@ -110,8 +110,6 @@ class Breakpoint extends PureComponent {
           breakpoint,
           paused: this.isCurrentlyPausedAtBreakpoint(),
           disabled: breakpoint.disabled,
-          "is-conditional": !!breakpoint.options.condition,
-          // "is-log": !!breakpoint.options.logValue,
         })}
         onClick={this.selectBreakpoint}
         onDoubleClick={this.onDoubleClick}
