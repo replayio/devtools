@@ -9,15 +9,11 @@ import Viewer from "./Viewer";
 import Loader from "./shared/Loader";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import RecordingLoadingScreen from "./RecordingLoadingScreen";
-import { UnauthorizedAccessError } from "./shared/Error";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
-import { screenshotCache, nextPaintEvent, getClosestPaintPoint } from "protocol/graphics";
 import { gql, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
-import { data } from "react-dom-factories";
-import { setExpectedError } from "../actions/app";
 
 const GET_RECORDING = gql`
   query GetRecording($recordingId: String) {

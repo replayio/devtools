@@ -7,28 +7,20 @@
 import Services from "devtools-services";
 import { PrefsHelper } from "devtools-modules";
 
-// Schema version to bump when the async store format has changed incompatibly
-// and old stores should be cleared.
-const prefsSchemaVersion = 11;
 const { pref } = Services;
 
 pref("console.filter.error", true);
-pref("console.filter.warn", true);
-pref("console.filter.info", true);
+pref("console.filter.warn", false);
+pref("console.filter.info", false);
 pref("console.filter.log", true);
-pref("console.filter.debug", true);
+pref("console.filter.debug", false);
+pref("console.filter.nodemodules", false);
 
-// Persist is only used by the webconsole.
 pref("console.persistLogs", false);
-// Max number of entries in history list.
 pref("console.inputHistoryCount", true);
-// Is editor mode enabled.
 pref("console.input.editor", false);
-// Display timestamp in messages.
 pref("console.timestampMessages", true);
-
 pref("console.timestampsVisible", false);
-
 pref("console.input.context", true);
 
 export const prefs = new PrefsHelper("console", {
@@ -37,6 +29,7 @@ export const prefs = new PrefsHelper("console", {
   filterInfo: ["Bool", "filter.info"],
   filterLog: ["Bool", "filter.log"],
   filterDebug: ["Bool", "filter.debug"],
+  filterNodeModules: ["Bool", "filter.nodemodules"],
   persistLogs: ["Bool", "persistLogs"],
   inputHistoryCount: ["Bool", "inputHistoryCount"],
   editor: ["Bool", "input.editor"],

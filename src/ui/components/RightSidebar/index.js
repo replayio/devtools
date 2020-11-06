@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import ReactDOM from "react-dom";
 import EventsTimeline from "./EventsTimeline";
-import Intercom from "./Intercom";
-import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
 import classnames from "classnames";
 import "./RightSidebar.css";
 
@@ -50,15 +47,6 @@ function Buttons({ setExpanded, expanded, tooltip, setTooltip }) {
       >
         <div className="img comment-icon"></div>
       </button>
-      <button
-        className={classnames({ expanded: expanded === "event-logpoints" })}
-        onClick={() => setExpanded(expanded === "event-logpoints" ? null : "event-logpoints")}
-        ref={node => setEventButtonNode(node)}
-        onMouseEnter={() => handleMouseEnter(eventButtonNode, "Event Logpoints")}
-        onMouseLeave={handleMouseLeave}
-      >
-        <div className="img lightning"></div>
-      </button>
     </div>
   );
 }
@@ -86,7 +74,7 @@ export default function RightSidebar({}) {
   return (
     <div className="right-sidebar">
       {expanded === "comments" && <EventsTimeline expanded={expanded} />}
-      {expanded === "event-logpoints" && <EventListeners />}
+      {/* {expanded === "event-logpoints" && <EventListeners />} */}
       <Drawer setExpanded={setExpanded} expanded={expanded} />
     </div>
   );

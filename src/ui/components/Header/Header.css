@@ -113,6 +113,22 @@ button.login {
   animation: dropdownFadeIn ease 200ms;
 }
 
+#header .dropdown-wrapper button {
+  border-radius: 4px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: white;
+  display: flex;
+  align-items: center;
+  background: var(--dark-blue);
+  cursor: pointer;
+  line-height: 16px;
+}
+
+#header .dropdown-wrapper button .img {
+  background: white;
+}
+
 .loading-bar {
   height: 4px;
   background: linear-gradient(138.3deg, #236eff 7.98%, #71e5ff 93.53%);
