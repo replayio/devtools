@@ -28,6 +28,7 @@
     "autoprefixer": "^9.8.6",
     "babel-loader": "^8.1.0",
     "classnames": "^2.2.6",
+    "codemirror": "^5.58.2",
     "css-loader": "^3.5.3",
     "debug": "^4.2.0",
     "devtools-sprintf-js": "^1.0.3",
