@@ -157,7 +157,7 @@ class FilterBar extends Component {
   }
 
   renderFiltersConfigBar() {
-    const { dispatch, filter, filteredMessagesCount } = this.props;
+    const { filter, filterToggle, filteredMessagesCount } = this.props;
 
     const getLabel = (baseLabel, filterKey) => {
       const count = filteredMessagesCount[filterKey];
