@@ -19,8 +19,6 @@ if (test) {
 // be good if this was less fragile...
 //
 
-require("devtools/codemirror-addons");
-
 const { initSocket, sendMessage, setStatus, addEventListener } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const loadImages = require("image/image");

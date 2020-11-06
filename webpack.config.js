@@ -33,8 +33,6 @@ module.exports = {
       "src",
       "src/devtools/client/debugger/dist",
       "src/devtools/client/debugger/packages",
-      "src/devtools/client/shared/sourceeditor",
-      "src/devtools/client/shared/sourceeditor/codemirror/lib",
       "src/devtools/client/shared/vendor",
       "node_modules",
     ],

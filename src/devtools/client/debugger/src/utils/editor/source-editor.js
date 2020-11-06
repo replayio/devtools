@@ -10,7 +10,6 @@
  */
 
 const CodeMirror = require("codemirror");
-const Services = require("Services");
 
 // $FlowIgnore
 require("codemirror/lib/codemirror.css");
