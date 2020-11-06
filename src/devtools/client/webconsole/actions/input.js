@@ -106,7 +106,7 @@ function onExpressionEvaluated(response) {
 
 function setInputValue(value) {
   return () => {
-    window.jsterm?._setValue(newValue);
+    window.jsterm.setValue(newValue);
   };
 }
 module.exports = {

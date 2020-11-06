@@ -69,7 +69,7 @@ class JSTerm extends React.Component {
     }
 
     this.props.evaluateExpression(executeString);
-    this._setValue("");
+    this.setValue("");
     return null;
   };
 
@@ -80,7 +80,7 @@ class JSTerm extends React.Component {
    *        The new value to set.
    * @returns void
    */
-  _setValue(newValue = "") {
+  setValue(newValue = "") {
     // In order to get the autocomplete popup to work properly, we need to set the
     // editor text and the cursor in the same operation. If we don't, the text change
     // is done before the cursor is moved, and the autocompletion call to the server
