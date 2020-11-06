@@ -26,10 +26,6 @@ class App extends React.Component {
     };
   }
 
-  componentDidMount() {
-    window.addEventListener("blur", this.onBlur);
-  }
-
   onClick = event => {
     const target = event.originalTarget || event.target;
 
