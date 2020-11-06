@@ -31,11 +31,6 @@ export class WebConsolePanel {
     return this;
   }
 
-  /**
-   * Called by the WebConsole's onkey command handler.
-   * If the WebConsole is opened, check if the JSTerm's input line has focus.
-   * If not, focus it.
-   */
   focusInput() {
     window.jsterm.focus();
   }

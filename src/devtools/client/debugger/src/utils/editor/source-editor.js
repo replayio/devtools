@@ -10,6 +10,7 @@
  */
 
 const CodeMirror = require("codemirror");
+const Services = require("Services");
 
 // $FlowIgnore
 require("codemirror/lib/codemirror.css");
@@ -39,7 +40,7 @@ require("./source-editor.css");
 // while shifting to a line which was initially out of view.
 const MAX_VERTICAL_OFFSET = 3;
 
-export default class SourceEditor {
+export default class Editor {
   opts;
   editor;
 
@@ -66,12 +67,25 @@ export default class SourceEditor {
     return CodeMirror;
   }
 
+  focus() {
+    this.editor.focus();
+  }
+
   setText(str) {
     this.editor.setValue(str);
   }
 
   getText() {
     return this.editor.getValue();
+  }
+
+  getSelection() {
+    return this.editor.getSelection();
+  }
+
+  setCursor({ line, ch }, align) {
+    this.alignLine(line, align);
+    this.editor.setCursor({ line: line, ch: ch });
   }
 
   setMode(value) {

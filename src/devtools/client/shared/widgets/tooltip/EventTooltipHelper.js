@@ -7,7 +7,7 @@
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
-const Editor = require("devtools/client/shared/sourceeditor/editor");
+const Editor = require("devtools/client/debugger/src/utils/editor/source-editor").default;
 
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
 const CONTAINER_WIDTH = 500;
