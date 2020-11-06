@@ -3,10 +3,10 @@ import { Action } from "redux";
 import { selectors } from "ui/reducers";
 import { UIStore, UIThunkAction } from ".";
 import { Comment } from "ui/state/metadata";
-import { prefs, features } from "ui/utils/prefs";
+const { prefs, features } = require("ui/utils/prefs");
 import { seek } from "./timeline";
 import { User } from "ui/state/metadata";
-import LogRocket from "ui/utils/logrocket";
+const LogRocket = require("ui/utils/logrocket");
 
 export type SetCommentsAction = Action<"set_comments"> & { comments: Comment[] };
 export type SetFocusedCommentAction = Action<"set_focused_comment_id"> & { id: number | null };
