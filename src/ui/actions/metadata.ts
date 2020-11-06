@@ -6,7 +6,7 @@ import { Comment } from "ui/state/metadata";
 const { prefs, features } = require("ui/utils/prefs");
 import { seek } from "./timeline";
 import { User } from "ui/state/metadata";
-const LogRocket = require("ui/utils/logrocket");
+const LogRocket = require("ui/utils/logrocket").default;
 
 export type SetCommentsAction = Action<"set_comments"> & { comments: Comment[] };
 export type SetFocusedCommentAction = Action<"set_focused_comment_id"> & { id: number | null };
