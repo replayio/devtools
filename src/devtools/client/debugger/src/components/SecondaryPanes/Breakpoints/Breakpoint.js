@@ -159,23 +159,24 @@ class Breakpoint extends PureComponent {
         </span>
 
         <div>
-          #{analysisPoints ? analysisPoints.length : 0} hits |
+          Hits: {analysisPoints ? analysisPoints.length : 0} |
           <button
+            className="button-prev"
             disabled={!prev}
             onClick={() => {
               this.navigateToPrev(prev);
             }}
           >
-            <b>PREVIOUS</b>
+            ►
           </button>{" "}
-          |
           <button
+            className="button-next"
             disabled={!next}
             onClick={() => {
               this.navigateToPrev(next);
             }}
           >
-            Next
+            ►
           </button>
         </div>
         <div className="breakpoint-line-close">
