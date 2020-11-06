@@ -365,8 +365,8 @@ async function toggleScopeNode(text) {
 }
 
 async function executeInConsole(value) {
-  window.jsterm._setValue(value);
-  window.jsterm._execute();
+  window.jsterm.setValue(value);
+  window.jsterm.execute();
 }
 
 function waitForFrameTimeline(width) {
