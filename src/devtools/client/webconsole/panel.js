@@ -6,8 +6,6 @@
 
 import EventEmitter from "devtools/shared/event-emitter";
 import actions from "devtools/client/webconsole/actions/index";
-import * as selectors from "devtools/client/webconsole/selectors/index";
-import { setupConsoleHelper } from "ui/utils/bootstrap/helpers";
 import { setupMessages } from "devtools/client/webconsole/actions/messages";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
 
@@ -22,7 +20,6 @@ export class WebConsolePanel {
     this.toolbox.on("split-console", this._onChangeSplitConsoleState);
     this.toolbox.on("select", this._onChangeSplitConsoleState);
 
-    setupConsoleHelper({ store, selectors, actions });
     initOutputSyntaxHighlighting();
 
     // TODO: the store should be associated with the toolbox

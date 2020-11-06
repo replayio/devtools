@@ -5,9 +5,7 @@
 //
 
 import { buildMenu, showMenu } from "devtools-contextmenu";
-import actions from "../../../actions";
 import { features } from "../../../utils/prefs";
-import { formatKeyShortcut } from "../../../utils/text";
 
 export default function showContextMenu(props) {
   const {

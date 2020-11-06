@@ -4,7 +4,8 @@
 "use strict";
 
 // React & Redux
-const { Component, createFactory } = require("react");
+const React = require("react");
+const { Component, createFactory, useState } = React;
 const { connect } = require("react-redux");
 const dom = require("react-dom-factories");
 
@@ -14,7 +15,6 @@ const actions = require("devtools/client/webconsole/actions/index");
 // Selectors
 const { getAllFilters } = require("devtools/client/webconsole/selectors/filters");
 const { getFilteredMessagesCount } = require("devtools/client/webconsole/selectors/messages");
-const { getAllPrefs } = require("devtools/client/webconsole/selectors/prefs");
 const { getAllUi } = require("devtools/client/webconsole/selectors/ui");
 
 // Utilities
@@ -22,10 +22,10 @@ const { l10n } = require("devtools/client/webconsole/utils/messages");
 const { PluralForm } = require("devtools/shared/plural-form");
 
 // Constants
-const { FILTERS, FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
+const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
 
 // Additional Components
-const FilterButton = require("devtools/client/webconsole/components/FilterBar/FilterButton");
+const { Events } = require("devtools/client/webconsole/components/FilterBar/Events");
 const ConsoleSettings = createFactory(
   require("devtools/client/webconsole/components/FilterBar/ConsoleSettings")
 );
@@ -38,7 +38,6 @@ class FilterBar extends Component {
     return {
       closeButtonVisible: PropTypes.bool,
       displayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)]).isRequired,
-      filter: PropTypes.object.isRequired,
       filteredMessagesCount: PropTypes.object.isRequired,
       timestampsVisible: PropTypes.bool.isRequired,
     };
@@ -46,7 +45,6 @@ class FilterBar extends Component {
 
   constructor(props) {
     super(props);
-    this.renderFiltersConfigBar = this.renderFiltersConfigBar.bind(this);
     this.maybeUpdateLayout = this.maybeUpdateLayout.bind(this);
     this.resizeObserver = new ResizeObserver(this.maybeUpdateLayout);
   }
@@ -72,7 +70,6 @@ class FilterBar extends Component {
     const {
       closeButtonVisible,
       displayMode,
-      filter,
       filteredMessagesCount,
       timestampsVisible,
     } = this.props;
@@ -80,7 +77,6 @@ class FilterBar extends Component {
     if (
       nextProps.closeButtonVisible !== closeButtonVisible ||
       nextProps.displayMode !== displayMode ||
-      nextProps.filter !== filter ||
       nextProps.timestampsVisible !== timestampsVisible
     ) {
       return true;
@@ -156,55 +152,6 @@ class FilterBar extends Component {
     });
   }
 
-  renderFiltersConfigBar() {
-    const { filter, filterToggle, filteredMessagesCount } = this.props;
-
-    const getLabel = (baseLabel, filterKey) => {
-      const count = filteredMessagesCount[filterKey];
-      if (filter[filterKey] || count === 0) {
-        return baseLabel;
-      }
-      return `${baseLabel} (${count})`;
-    };
-
-    return dom.div(
-      {
-        className: "devtools-toolbar webconsole-filterbar-secondary",
-        key: "config-bar",
-      },
-      FilterButton({
-        active: filter[FILTERS.ERROR],
-        label: getLabel(l10n.getStr("webconsole.errorsFilterButton.label"), FILTERS.ERROR),
-        filterKey: FILTERS.ERROR,
-        onClick: () => filterToggle(FILTERS.ERROR),
-      }),
-      FilterButton({
-        active: filter[FILTERS.WARN],
-        label: getLabel(l10n.getStr("webconsole.warningsFilterButton.label"), FILTERS.WARN),
-        filterKey: FILTERS.WARN,
-        onClick: () => filterToggle(FILTERS.WARN),
-      }),
-      FilterButton({
-        active: filter[FILTERS.LOG],
-        label: getLabel(l10n.getStr("webconsole.logsFilterButton.label"), FILTERS.LOG),
-        filterKey: FILTERS.LOG,
-        onClick: () => filterToggle(FILTERS.LOG),
-      }),
-      FilterButton({
-        active: filter[FILTERS.INFO],
-        label: getLabel(l10n.getStr("webconsole.infoFilterButton.label"), FILTERS.INFO),
-        filterKey: FILTERS.INFO,
-        onClick: () => filterToggle(FILTERS.INFO),
-      }),
-      FilterButton({
-        active: filter[FILTERS.DEBUG],
-        label: getLabel(l10n.getStr("webconsole.debugFilterButton.label"), FILTERS.DEBUG),
-        filterKey: FILTERS.DEBUG,
-        onClick: () => filterToggle(FILTERS.DEBUG),
-      })
-    );
-  }
-
   renderSearchBox() {
     const { filteredMessagesCount, filterTextSet } = this.props;
 
@@ -235,12 +182,10 @@ class FilterBar extends Component {
   }
 
   renderSettingsButton() {
-    const { dispatch, timestampsVisible, filter } = this.props;
+    const { timestampsVisible } = this.props;
 
     return ConsoleSettings({
-      dispatch,
       timestampsVisible,
-      filter,
     });
   }
 
@@ -271,7 +216,6 @@ class FilterBar extends Component {
     const separator = this.renderSeparator();
     const clearButton = this.renderClearButton();
     const searchBox = this.renderSearchBox();
-    const filtersConfigBar = this.renderFiltersConfigBar();
     const settingsButton = this.renderSettingsButton();
 
     const children = [
@@ -284,7 +228,7 @@ class FilterBar extends Component {
         separator,
         searchBox,
         isWide && separator,
-        isWide && filtersConfigBar,
+        <Events />,
         separator,
         settingsButton
       ),
@@ -292,10 +236,6 @@ class FilterBar extends Component {
 
     if (closeButtonVisible) {
       children.push(this.renderCloseButton());
-    }
-
-    if (isNarrow) {
-      children.push(filtersConfigBar);
     }
 
     return dom.div(
@@ -313,16 +253,14 @@ class FilterBar extends Component {
 
 function mapStateToProps(state) {
   const uiState = getAllUi(state);
-  const prefsState = getAllPrefs(state);
   return {
     closeButtonVisible: uiState.closeButtonVisible,
-    filter: getAllFilters(state),
     filteredMessagesCount: getFilteredMessagesCount(state),
     timestampsVisible: uiState.timestampsVisible,
   };
 }
 
-module.exports = connect(mapStateToProps, {
+export default connect(mapStateToProps, {
   closeSplitConsole: actions.closeSplitConsole,
   filterBarDisplayModeSet: actions.filterBarDisplayModeSet,
   messagesClearEvaluations: actions.messagesClearEvaluations,

@@ -2,18 +2,6 @@
   position: relative;
 }
 
-.dropdown-wrapper button {
-  border-radius: 4px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  color: white;
-  display: flex;
-  align-items: center;
-  background: var(--dark-blue);
-  cursor: pointer;
-  line-height: 16px;
-}
-
 .dropdown-wrapper button.secondary {
   color: var(--dark-blue);
   border: 1px solid var(--dark-blue);
@@ -27,10 +15,6 @@
 
 .dropdown-wrapper button .img:not(:last-child) {
   margin-right: 4px;
-}
-
-.dropdown-wrapper button .img {
-  background: white;
 }
 
 .dropdown-container .mask {

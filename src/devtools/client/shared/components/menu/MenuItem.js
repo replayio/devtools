@@ -10,6 +10,7 @@
 const { createRef, PureComponent } = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
+const { text } = require("react-dom-factories");
 const { button, li, span } = dom;
 
 class MenuItem extends PureComponent {
@@ -44,7 +45,7 @@ class MenuItem extends PureComponent {
       id: PropTypes.string,
 
       // The item label.
-      label: PropTypes.string.isRequired,
+      label: PropTypes.string,
 
       // An optional callback to be invoked when the item is selected.
       onClick: PropTypes.func,
@@ -69,39 +70,6 @@ class MenuItem extends PureComponent {
   constructor(props) {
     super(props);
     this.labelRef = createRef();
-  }
-
-  componentDidMount() {
-    if (!this.labelRef.current) {
-      return;
-    }
-
-    // Pre-fetch any backgrounds specified for the item.
-    // const win = this.labelRef.current.ownerDocument.defaultView;
-    // this.preloadCallback = win.requestIdleCallback(() => {
-    //   this.preloadCallback = null;
-    //   if (!this.labelRef.current) {
-    //     return;
-    //   }
-
-    // const backgrounds = win
-    //   .getComputedStyle(this.labelRef.current, ":before")
-    //   .getCSSImageURLs("background-image");
-    // for (const background of backgrounds) {
-    //   const image = new Image();
-    //   image.src = background;
-    // }
-    // });
-  }
-
-  componentWillUnmount() {
-    if (!this.labelRef.current || !this.preloadCallback) {
-      return;
-    }
-
-    const win = this.labelRef.current.ownerDocument.defaultView;
-    win.cancelIdleCallback(this.preloadCallback);
-    this.preloadCallback = null;
   }
 
   render() {
@@ -146,11 +114,12 @@ class MenuItem extends PureComponent {
       attr["aria-checked"] = true;
     }
 
-    const textLabel = span(
-      { key: "label", className: "label", ref: this.labelRef },
-      this.props.label
-    );
-    const children = [textLabel];
+    const children = [];
+    if (this.props.label) {
+      children.push(
+        span({ key: "label", className: "label", ref: this.labelRef }, this.props.label)
+      );
+    }
 
     if (typeof this.props.accelerator !== "undefined") {
       const acceleratorLabel = span(

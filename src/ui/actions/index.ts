@@ -9,6 +9,7 @@ import type { MetadataAction } from "./metadata";
 import type { TimelineAction } from "./timeline";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
+const consoleActions = require("devtools/client/webconsole/actions");
 
 export type UIAction = AppAction | MetadataAction | TimelineAction;
 
@@ -31,4 +32,5 @@ export const actions = {
   ...metadataActions,
   ...eventListeners,
   ...debuggerActions,
+  ...consoleActions,
 };

@@ -4,6 +4,7 @@ import { ThreadFront } from "protocol/thread";
 import { prefs, features } from "ui/utils/prefs";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
+import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 
 import {
   prefs as inspectorPrefs,
@@ -15,6 +16,7 @@ export function setupAppHelper(store) {
     store,
     actions: bindActionCreators(actions, store.dispatch),
     selectors: bindSelectors({ store, selectors }),
+    consolePrefs,
     prefs,
     features,
     threadFront: ThreadFront,
@@ -38,14 +40,6 @@ export function setupAppHelper(store) {
         window.location = "http://replay.io/view";
       }
     },
-  };
-}
-
-export function setupConsoleHelper({ store, selectors, actions }) {
-  window.app.console = {
-    store,
-    actions: bindActionCreators(actions, store.dispatch),
-    selectors: bindSelectors({ store, selectors }),
   };
 }
 

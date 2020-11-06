@@ -10,7 +10,7 @@ const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constant
 
 // We directly require Components that we know are going to be used right away
 const ConsoleOutput = require("devtools/client/webconsole/components/Output/ConsoleOutput");
-const FilterBar = require("devtools/client/webconsole/components/FilterBar/FilterBar");
+const FilterBar = require("devtools/client/webconsole/components/FilterBar/FilterBar").default;
 const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm").default;
 
 require("./App.css");
