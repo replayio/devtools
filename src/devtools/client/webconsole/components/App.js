@@ -11,7 +11,7 @@ const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constant
 // We directly require Components that we know are going to be used right away
 const ConsoleOutput = require("devtools/client/webconsole/components/Output/ConsoleOutput");
 const FilterBar = require("devtools/client/webconsole/components/FilterBar/FilterBar");
-const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm");
+const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm").default;
 
 require("./App.css");
 
@@ -56,28 +56,8 @@ class App extends React.Component {
       return;
     }
 
-    window.jsterm?.focus();
+    window.jsterm.focus();
   };
-
-  renderFilterBar() {
-    const { filterBarDisplayMode, dispatch } = this.props;
-
-    return FilterBar({
-      key: "filterbar",
-      displayMode: filterBarDisplayMode,
-      dispatch,
-    });
-  }
-
-  renderConsoleOutput() {
-    return ConsoleOutput({ key: "console-output" });
-  }
-
-  renderJsTerm() {
-    return JSTerm({ key: "jsterm" });
-  }
-
-  renderRootElement(children) {}
 
   render() {
     const { filterBarDisplayMode } = this.props;

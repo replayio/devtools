@@ -4,15 +4,11 @@
 
 "use strict";
 
-const React = require("react");
-const { connect } = require("react-redux");
-const Services = require("Services");
-
-const Editor = require("devtools/client/debugger/src/utils/editor/source-editor").default;
-const EventEmitter = require("devtools/shared/event-emitter");
-
-const PropTypes = require("prop-types");
-const actions = require("devtools/client/webconsole/actions/index");
+import React from "react";
+import { connect } from "react-redux";
+import Editor from "devtools/client/debugger/src/utils/editor/source-editor";
+import PropTypes from "prop-types";
+import actions from "devtools/client/webconsole/actions/index";
 
 function createEditor({ execute }) {
   const editor = new Editor({
@@ -51,7 +47,6 @@ class JSTerm extends React.Component {
 
   constructor(props) {
     super(props);
-
     window.jsterm = this;
   }
 
@@ -133,7 +128,7 @@ class JSTerm extends React.Component {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps() {
   return {};
 }
 
@@ -141,4 +136,4 @@ const mapDispatchToProp = {
   evaluateExpression: actions.evaluateExpression,
 };
 
-module.exports = connect(mapStateToProps, mapDispatchToProp)(JSTerm);
+export default connect(mapStateToProps, mapDispatchToProp)(JSTerm);
