@@ -17,7 +17,9 @@ export function setFramePositions() {
     }
 
     const positions = await client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
-    const { sourceId: protocolSourceId } = await ThreadFront.getPreferredLocation(positions[0].frame);
+    const { sourceId: protocolSourceId } = await ThreadFront.getPreferredLocation(
+      positions[0].frame
+    );
     const sourceId = getSourceByActorId(getState(), protocolSourceId).id;
 
     const locations = await Promise.all(

@@ -56,12 +56,12 @@ class PanelEditor extends PureComponent {
     }, 500);
   };
 
-  handleKeyDown = e => {
-    if (e.key == "Escape") {
-      this.handleCancel();
-    } else if (e.key == "Enter") {
-      this.handleSave();
-    }
+  onEnter = () => {
+    this.handleSave();
+  };
+
+  onEscape = () => {
+    this.handleCancel();
   };
 
   renderActions() {
@@ -111,7 +111,8 @@ class PanelEditor extends PureComponent {
             defaultValue={logValue}
             onChange={cm => this.setState({ logValue: cm.getValue().trim() })}
             onBlur={this.handleInputBlur}
-            onKeyDown={this.handleKeyDown}
+            onEnter={this.onEnter}
+            onEscape={this.onEscape}
           />
           {hasCondition ? (
             <>
@@ -122,7 +123,8 @@ class PanelEditor extends PureComponent {
                 defaultValue={conditionValue}
                 onChange={cm => this.setState({ conditionValue: cm.getValue().trim() })}
                 onBlur={this.handleInputBlur}
-                onKeyDown={this.handleKeyDown}
+                onEnter={this.onEnter}
+                onEscape={this.onEscape}
               />
             </>
           ) : null}
