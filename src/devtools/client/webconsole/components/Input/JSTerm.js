@@ -20,6 +20,7 @@ function createEditor({ execute }) {
       name: "javascript",
       globalVars: true,
     },
+    theme: "mozilla",
     styleActiveLine: false,
     tabIndex: "0",
     readOnly: false,
