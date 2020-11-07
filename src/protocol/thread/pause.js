@@ -172,7 +172,7 @@ Pause.prototype = {
     // properly.
     let scopeChain = await this.ensureScopeChain(frame.scopeChain);
     if (frame.originalScopeChain && !ThreadFront.hasPreferredGeneratedSource(frame.location)) {
-    scopeChain = await this.ensureScopeChain(frame.originalScopeChain);
+      scopeChain = await this.ensureScopeChain(frame.originalScopeChain);
     }
 
     return scopeChain;

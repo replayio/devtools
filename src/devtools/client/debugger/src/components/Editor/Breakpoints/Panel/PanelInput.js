@@ -8,21 +8,42 @@ export function PanelInput({
   onBlur,
   onChange,
   onKeyDown,
+  onEnter,
+  onEscape,
   onClick,
   onMouseOver,
   onScroll,
   onGutterClick,
-  id,
 }) {
   const textAreaNode = useRef(null);
   const codeMirrorNode = useRef(null);
   useEffect(() => {
     requestAnimationFrame(() => {
+      let extraKeys = {
+        Esc: false,
+        "Cmd-F": false,
+        "Ctrl-F": false,
+      };
+
+      if (onEnter) {
+        extraKeys = {
+          ...extraKeys,
+          Enter: onEnter,
+          "Cmd-Enter": onEnter,
+          "Ctrl-Enter": onEnter,
+        };
+      }
+
+      if (onEscape) {
+        extraKeys.Esc = onEscape;
+      }
+
       const codeMirror = CodeMirror.fromTextArea(textAreaNode.current, {
         mode: "javascript",
         theme: "mozilla",
         lineNumbers: false,
         autofocus,
+        extraKeys,
       });
 
       const inputValue = defaultValue || "";
