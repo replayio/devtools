@@ -205,12 +205,12 @@ export const ThreadFront = {
   },
 
   async getSourceContents(sourceId) {
-    const { sourceSource, contentType } = await sendMessage(
+    const { contents, contentType } = await sendMessage(
       "Debugger.getSourceContents",
       { sourceId },
       this.sessionId
     );
-    return { sourceSource, contentType };
+    return { contents, contentType };
   },
 
   async getBreakpointPositionsCompressed(sourceId, range) {
