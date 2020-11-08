@@ -52,8 +52,8 @@ function convertStack(stack, { frames }) {
       const frame = frames.find(f => f.frameId == frameId);
       const location = await ThreadFront.getPreferredLocation(frame.location);
       return {
-        filename: await ThreadFront.getScriptURL(location.scriptId),
-        sourceId: location.scriptId,
+        filename: await ThreadFront.getSourceURL(location.sourceId),
+        sourceId: location.sourceId,
         lineNumber: location.line,
         columnNumber: location.column,
         functionName: frame.functionName,
@@ -67,30 +67,30 @@ function onConsoleMessage(msg) {
     const stacktrace = await convertStack(msg.stack, msg.data);
     const sourceId = stacktrace?.[0]?.sourceId;
 
-    let { url, scriptId, line, column } = msg;
+    let { url, sourceId: msgSourceId, line, column } = msg;
 
     if (msg.point.frame) {
       // If the execution point has a location, use any mappings in that location.
       // The message properties do not reflect any source mapping.
       const location = await ThreadFront.getPreferredLocation(msg.point.frame);
-      url = await ThreadFront.getScriptURL(location.scriptId);
+      url = await ThreadFront.getSourceURL(location.sourceId);
       line = location.line;
       column = location.column;
     } else {
-      if (!scriptId) {
-        const ids = ThreadFront.getScriptIdsForURL(url);
+      if (!msgSourceId) {
+        const ids = ThreadFront.getSourceIdsForURL(url);
         if (ids.length == 1) {
-          scriptId = ids[0];
+          msgSourceId = ids[0];
         }
       }
-      if (scriptId) {
+      if (msgSourceId) {
         // Ask the ThreadFront to map the location we got manually.
         const location = await ThreadFront.getPreferredMappedLocation({
-          scriptId,
+          sourceId: msgSourceId,
           line,
           column,
         });
-        url = await ThreadFront.getScriptURL(location.scriptId);
+        url = await ThreadFront.getSourceURL(location.sourceId);
         line = location.line;
         column = location.column;
       }
@@ -120,12 +120,12 @@ function onConsoleMessage(msg) {
   };
 }
 
-function onLogpointLoading(logGroupId, point, time, { scriptId, line, column }) {
+function onLogpointLoading(logGroupId, point, time, { sourceId, line, column }) {
   return async ({ dispatch }) => {
     const packet = {
       errorMessage: "Loading...",
-      sourceName: await ThreadFront.getScriptURL(scriptId),
-      sourceId: scriptId,
+      sourceName: await ThreadFront.getSourceURL(sourceId),
+      sourceId: sourceId,
       lineNumber: line,
       columnNumber: column,
       category: "ConsoleAPI",
@@ -140,12 +140,12 @@ function onLogpointLoading(logGroupId, point, time, { scriptId, line, column }) 
   };
 }
 
-function onLogpointResult(logGroupId, point, time, { scriptId, line, column }, _, values) {
+function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, _, values) {
   return async ({ dispatch }) => {
     const packet = {
       errorMessage: "",
-      sourceName: await ThreadFront.getScriptURL(scriptId),
-      sourceId: scriptId,
+      sourceName: await ThreadFront.getSourceURL(sourceId),
+      sourceId: sourceId,
       lineNumber: line,
       columnNumber: column,
       category: "ConsoleAPI",

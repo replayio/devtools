@@ -37,21 +37,21 @@ export const ThreadFront = {
   // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
   initializedWaiter: defer(),
 
-  // Map scriptId to info about the script.
-  scripts: new Map(),
+  // Map sourceId to info about the source.
+  sources: new Map(),
 
-  // Resolve hooks for promises waiting on a script ID to be known.
-  scriptWaiters: new ArrayMap(),
+  // Resolve hooks for promises waiting on a source ID to be known.
+  sourceWaiters: new ArrayMap(),
 
-  // Map URL to scriptId[].
-  urlScripts: new ArrayMap(),
+  // Map URL to sourceId[].
+  urlSources: new ArrayMap(),
 
-  // Map scriptId to scriptId[], reversing the generatedScriptIds map.
-  originalScripts: new ArrayMap(),
+  // Map sourceId to sourceId[], reversing the generatedSourceIds map.
+  originalSources: new ArrayMap(),
 
-  // Script IDs for generated scripts which should be preferred over any
-  // original script.
-  preferredGeneratedScripts: new Set(),
+  // Source IDs for generated sources which should be preferred over any
+  // original source.
+  preferredGeneratedSources: new Set(),
 
   mappedLocations: new MappedLocationCache(),
 
@@ -148,77 +148,77 @@ export const ThreadFront = {
     this._precacheResumeTargets();
   },
 
-  async findScripts(onScript) {
+  async findSources(onSource) {
     const sessionId = await this.waitForSession();
-    this.onScript = onScript;
+    this.onSource = onSource;
 
-    sendMessage("Debugger.findScripts", {}, sessionId);
-    addEventListener("Debugger.scriptParsed", script => {
-      let { scriptId, kind, url, generatedScriptIds } = script;
-      this.scripts.set(scriptId, { kind, url, generatedScriptIds });
+    sendMessage("Debugger.findSources", {}, sessionId);
+    addEventListener("Debugger.newSource", source => {
+      let { sourceId, kind, url, generatedSourceIds } = source;
+      this.sources.set(sourceId, { kind, url, generatedSourceIds });
       if (url) {
-        this.urlScripts.add(url, scriptId);
+        this.urlSources.add(url, sourceId);
       }
-      for (const generatedId of generatedScriptIds || []) {
-        this.originalScripts.add(generatedId, scriptId);
+      for (const generatedId of generatedSourceIds || []) {
+        this.originalSources.add(generatedId, sourceId);
       }
-      const waiters = this.scriptWaiters.map.get(scriptId);
+      const waiters = this.sourceWaiters.map.get(sourceId);
       (waiters || []).forEach(resolve => resolve());
-      this.scriptWaiters.map.delete(scriptId);
-      onScript(script);
+      this.sourceWaiters.map.delete(sourceId);
+      onSource(source);
     });
   },
 
-  getScriptKind(scriptId) {
-    const info = this.scripts.get(scriptId);
+  getSourceKind(sourceId) {
+    const info = this.sources.get(sourceId);
     return info ? info.kind : null;
   },
 
-  async ensureScript(scriptId) {
-    if (!this.scripts.has(scriptId)) {
+  async ensureSource(sourceId) {
+    if (!this.sources.has(sourceId)) {
       const { promise, resolve } = defer();
-      this.scriptWaiters.add(scriptId, resolve);
+      this.sourceWaiters.add(sourceId, resolve);
       await promise;
     }
-    return this.scripts.get(scriptId);
+    return this.sources.get(sourceId);
   },
 
-  getScriptURLRaw(scriptId) {
-    const info = this.scripts.get(scriptId);
+  getSourceURLRaw(sourceId) {
+    const info = this.sources.get(sourceId);
     return info && info.url;
   },
 
-  async getScriptURL(scriptId) {
-    const info = await this.ensureScript(scriptId);
+  async getSourceURL(sourceId) {
+    const info = await this.ensureSource(sourceId);
     return info.url;
   },
 
-  getScriptIdsForURL(url) {
+  getSourceIdsForURL(url) {
     // Ignore IDs which are generated versions of another ID with the same URL.
-    // This happens with inline scripts for HTML pages, in which case we only
+    // This happens with inline sources for HTML pages, in which case we only
     // want the ID for the HTML itself.
-    const ids = this.urlScripts.map.get(url) || [];
+    const ids = this.urlSources.map.get(url) || [];
     return ids.filter(id => {
-      const originalIds = this.originalScripts.map.get(id);
+      const originalIds = this.originalSources.map.get(id);
       return (originalIds || []).every(originalId => !ids.includes(originalId));
     });
   },
 
-  async getScriptSource(scriptId) {
-    const { scriptSource, contentType } = await sendMessage(
-      "Debugger.getScriptSource",
-      { scriptId },
+  async getSourceContents(sourceId) {
+    const { sourceSource, contentType } = await sendMessage(
+      "Debugger.getSourceContents",
+      { sourceId },
       this.sessionId
     );
-    return { scriptSource, contentType };
+    return { sourceSource, contentType };
   },
 
-  async getBreakpointPositionsCompressed(scriptId, range) {
+  async getBreakpointPositionsCompressed(sourceId, range) {
     const begin = range ? range.start : undefined;
     const end = range ? range.end : undefined;
     const { lineLocations } = await sendMessage(
       "Debugger.getPossibleBreakpoints",
-      { scriptId, begin, end },
+      { sourceId, begin, end },
       this.sessionId
     );
     return lineLocations;
@@ -228,8 +228,8 @@ export const ThreadFront = {
     this.skipPausing = skip;
   },
 
-  async setBreakpoint(scriptId, line, column, condition) {
-    const location = { scriptId, line, column };
+  async setBreakpoint(sourceId, line, column, condition) {
+    const location = { sourceId, line, column };
     try {
       this._invalidateResumeTargets(async () => {
         const { breakpointId } = await sendMessage(
@@ -243,26 +243,26 @@ export const ThreadFront = {
       });
     } catch (e) {
       // An error will be generated if the breakpoint location is not valid for
-      // this script. We don't keep precise track of which locations are valid
-      // for which inline scripts in an HTML file (which share the same URL),
+      // this source. We don't keep precise track of which locations are valid
+      // for which inline sources in an HTML file (which share the same URL),
       // so ignore these errors.
     }
   },
 
   setBreakpointByURL(url, line, column, condition) {
-    const scripts = this.getScriptIdsForURL(url);
-    if (!scripts) {
+    const sources = this.getSourceIdsForURL(url);
+    if (!sources) {
       return;
     }
-    const scriptIds = this._chooseScriptIdList(scripts);
+    const sourceIds = this._chooseSourceIdList(sources);
     return Promise.all(
-      scriptIds.map(({ scriptId }) => this.setBreakpoint(scriptId, line, column, condition))
+      sourceIds.map(({ sourceId }) => this.setBreakpoint(sourceId, line, column, condition))
     );
   },
 
-  async removeBreakpoint(scriptId, line, column) {
+  async removeBreakpoint(sourceId, line, column) {
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
-      if (location.scriptId == scriptId && location.line == line && location.column == column) {
+      if (location.sourceId == sourceId && location.line == line && location.column == column) {
         this.breakpoints.delete(breakpointId);
         this._invalidateResumeTargets(async () => {
           await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
@@ -272,13 +272,13 @@ export const ThreadFront = {
   },
 
   removeBreakpointByURL(url, line, column) {
-    const scripts = this.getScriptIdsForURL(url);
-    if (!scripts) {
+    const sources = this.getSourceIdsForURL(url);
+    if (!sources) {
       return;
     }
-    const scriptIds = this._chooseScriptIdList(scripts);
+    const sourceIds = this._chooseSourceIdList(sources);
     return Promise.all(
-      scriptIds.map(({ scriptId }) => this.removeBreakpoint(scriptId, line, column))
+      sourceIds.map(({ sourceId }) => this.removeBreakpoint(sourceId, line, column))
     );
   },
 
@@ -517,15 +517,15 @@ export const ThreadFront = {
     return this._findResumeTarget(point, "Debugger.findResumeTarget");
   },
 
-  blackbox(scriptId, begin, end) {
+  blackbox(sourceId, begin, end) {
     return this._invalidateResumeTargets(async () => {
-      await sendMessage("Debugger.blackboxScript", { scriptId, begin, end }, this.sessionId);
+      await sendMessage("Debugger.blackboxSource", { sourceId, begin, end }, this.sessionId);
     });
   },
 
-  unblackbox(scriptId, begin, end) {
+  unblackbox(sourceId, begin, end) {
     return this._invalidateResumeTargets(async () => {
-      await sendMessage("Debugger.unblackboxScript", { scriptId, begin, end }, this.sessionId);
+      await sendMessage("Debugger.unblackboxSource", { sourceId, begin, end }, this.sessionId);
     });
   },
 
@@ -603,57 +603,57 @@ export const ThreadFront = {
   },
 
   getPreferredLocationRaw(locations) {
-    const { scriptId } = this._chooseScriptId(locations.map(l => l.scriptId));
-    return locations.find(l => l.scriptId == scriptId);
+    const { sourceId } = this._chooseSourceId(locations.map(l => l.sourceId));
+    return locations.find(l => l.sourceId == sourceId);
   },
 
-  // Given an RRP MappedLocation array with locations in different scripts
+  // Given an RRP MappedLocation array with locations in different sources
   // representing the same generated location (i.e. a generated location plus
-  // all the corresponding locations in original or pretty printed scripts etc.),
+  // all the corresponding locations in original or pretty printed sources etc.),
   // choose the location which we should be using within the devtools. Normally
-  // this is the most original location, except when preferScript has been used
-  // to prefer a generated script instead.
+  // this is the most original location, except when preferSource has been used
+  // to prefer a generated source instead.
   async getPreferredLocation(locations) {
-    await Promise.all(locations.map(({ scriptId }) => this.ensureScript(scriptId)));
+    await Promise.all(locations.map(({ sourceId }) => this.ensureSource(sourceId)));
     return this.getPreferredLocationRaw(locations);
   },
 
   async getAlternateLocation(locations) {
-    await Promise.all(locations.map(({ scriptId }) => this.ensureScript(scriptId)));
-    const { alternateId } = this._chooseScriptId(locations.map(l => l.scriptId));
+    await Promise.all(locations.map(({ sourceId }) => this.ensureSource(sourceId)));
+    const { alternateId } = this._chooseSourceId(locations.map(l => l.sourceId));
     if (alternateId) {
-      return locations.find(l => l.scriptId == alternateId);
+      return locations.find(l => l.sourceId == alternateId);
     }
     return null;
   },
 
-  // Get the script which should be used in the devtools from an array of
-  // scripts representing the same location. If the chosen script is an
-  // original or generated script and there is an alternative which users
+  // Get the source which should be used in the devtools from an array of
+  // sources representing the same location. If the chosen source is an
+  // original or generated source and there is an alternative which users
   // can switch to, also returns that alternative.
-  _chooseScriptId(scriptIds) {
-    // Ignore inline scripts if we have an HTML script containing them.
-    if (scriptIds.some(id => this.getScriptKind(id) == "html")) {
-      scriptIds = scriptIds.filter(id => this.getScriptKind(id) != "inlineScript");
+  _chooseSourceId(sourceIds) {
+    // Ignore inline sources if we have an HTML source containing them.
+    if (sourceIds.some(id => this.getSourceKind(id) == "html")) {
+      sourceIds = sourceIds.filter(id => this.getSourceKind(id) != "inlineSource");
     }
 
-    // Ignore minified scripts.
-    scriptIds = scriptIds.filter(id => !this.isMinifiedScript(id));
+    // Ignore minified sources.
+    sourceIds = sourceIds.filter(id => !this.isMinifiedSource(id));
 
-    // Determine the base generated/original ID to use for the script.
+    // Determine the base generated/original ID to use for the source.
     let generatedId, originalId;
-    for (const id of scriptIds) {
-      const info = this.scripts.get(id);
+    for (const id of sourceIds) {
+      const info = this.sources.get(id);
       if (!info) {
-        // Scripts haven't finished loading, bail out and return this one.
-        return { scriptId: id };
+        // Sources haven't finished loading, bail out and return this one.
+        return { sourceId: id };
       }
-      // Determine the kind of this script, or its minified version.
+      // Determine the kind of this source, or its minified version.
       let kind = info.kind;
       if (kind == "prettyPrinted") {
-        const minifiedInfo = this.scripts.get(info.generatedScriptIds[0]);
+        const minifiedInfo = this.sources.get(info.generatedSourceIds[0]);
         if (!minifiedInfo) {
-          return { scriptId: id };
+          return { sourceId: id };
         }
         kind = minifiedInfo.kind;
         assert(kind != "prettyPrinted");
@@ -668,76 +668,76 @@ export const ThreadFront = {
 
     if (!generatedId) {
       assert(originalId);
-      return { scriptId: originalId };
+      return { sourceId: originalId };
     }
 
     if (!originalId) {
-      return { scriptId: generatedId };
+      return { sourceId: generatedId };
     }
 
-    // Prefer original scripts over generated scripts, except when overridden
+    // Prefer original sources over generated sources, except when overridden
     // through user action.
-    if (this.preferredGeneratedScripts.has(generatedId)) {
-      return { scriptId: generatedId, alternateId: originalId };
+    if (this.preferredGeneratedSources.has(generatedId)) {
+      return { sourceId: generatedId, alternateId: originalId };
     }
-    return { scriptId: originalId, alternateId: generatedId };
+    return { sourceId: originalId, alternateId: generatedId };
   },
 
-  // Get the set of chosen scripts from a list of script IDs which might
+  // Get the set of chosen sources from a list of source IDs which might
   // represent different generated locations.
-  _chooseScriptIdList(scriptIds) {
-    const groups = this._groupScriptIds(scriptIds);
-    return groups.map(ids => this._chooseScriptId(ids));
+  _chooseSourceIdList(sourceIds) {
+    const groups = this._groupSourceIds(sourceIds);
+    return groups.map(ids => this._chooseSourceId(ids));
   },
 
-  // Group together a set of script IDs according to whether they are generated
+  // Group together a set of source IDs according to whether they are generated
   // or original versions of each other.
-  _groupScriptIds(scriptIds) {
+  _groupSourceIds(sourceIds) {
     const groups = [];
-    while (scriptIds.length) {
-      const id = scriptIds[0];
-      const group = this._getAlternateScriptIds(id).filter(id => scriptIds.includes(id));
+    while (sourceIds.length) {
+      const id = sourceIds[0];
+      const group = this._getAlternateSourceIds(id).filter(id => sourceIds.includes(id));
       groups.push(group);
-      scriptIds = scriptIds.filter(id => !group.includes(id));
+      sourceIds = sourceIds.filter(id => !group.includes(id));
     }
     return groups;
   },
 
-  // Get all original/generated IDs which can represent a location in scriptId.
-  _getAlternateScriptIds(scriptId) {
+  // Get all original/generated IDs which can represent a location in sourceId.
+  _getAlternateSourceIds(sourceId) {
     const rv = new Set();
-    const worklist = [scriptId];
+    const worklist = [sourceId];
     while (worklist.length) {
-      scriptId = worklist.pop();
-      if (rv.has(scriptId)) {
+      sourceId = worklist.pop();
+      if (rv.has(sourceId)) {
         continue;
       }
-      rv.add(scriptId);
-      const { generatedScriptIds } = this.scripts.get(scriptId);
-      (generatedScriptIds || []).forEach(id => worklist.push(id));
-      const originalScriptIds = this.originalScripts.map.get(scriptId);
-      (originalScriptIds || []).forEach(id => worklist.push(id));
+      rv.add(sourceId);
+      const { generatedSourceIds } = this.sources.get(sourceId);
+      (generatedSourceIds || []).forEach(id => worklist.push(id));
+      const originalSourceIds = this.originalSources.map.get(sourceId);
+      (originalSourceIds || []).forEach(id => worklist.push(id));
     }
     return [...rv];
   },
 
-  // Return whether scriptId is minified and has a pretty printed alternate.
-  isMinifiedScript(scriptId) {
-    const originalIds = this.originalScripts.map.get(scriptId) || [];
+  // Return whether sourceId is minified and has a pretty printed alternate.
+  isMinifiedSource(sourceId) {
+    const originalIds = this.originalSources.map.get(sourceId) || [];
     return originalIds.some(id => {
-      const info = this.scripts.get(id);
+      const info = this.sources.get(id);
       return info && info.kind == "prettyPrinted";
     });
   },
 
-  isSourceMappedScript(scriptId) {
-    const info = this.scripts.get(scriptId);
+  isSourceMappedSource(sourceId) {
+    const info = this.sources.get(sourceId);
     if (!info) {
       return false;
     }
     let kind = info.kind;
     if (kind == "prettyPrinted") {
-      const minifiedInfo = this.scripts.get(info.generatedScriptIds[0]);
+      const minifiedInfo = this.sources.get(info.generatedSourceIds[0]);
       if (!minifiedInfo) {
         return false;
       }
@@ -747,22 +747,22 @@ export const ThreadFront = {
     return kind == "sourceMapped";
   },
 
-  preferScript(scriptId, value) {
-    assert(!this.isSourceMappedScript(scriptId));
+  preferSource(sourceId, value) {
+    assert(!this.isSourceMappedSource(sourceId));
     if (value) {
-      this.preferredGeneratedScripts.add(scriptId);
+      this.preferredGeneratedSources.add(sourceId);
     } else {
-      this.preferredGeneratedScripts.delete(scriptId);
+      this.preferredGeneratedSources.delete(sourceId);
     }
   },
 
-  hasPreferredGeneratedScript(location) {
-    return location.some(({ scriptId }) => {
-      return this.preferredGeneratedScripts.has(scriptId);
+  hasPreferredGeneratedSource(location) {
+    return location.some(({ sourceId }) => {
+      return this.preferredGeneratedSources.has(sourceId);
     });
   },
 
-  // Given a location in a generated script, get the preferred location to use.
+  // Given a location in a generated source, get the preferred location to use.
   // This has to query the server to get the original / pretty printed locations
   // corresponding to this generated location, so getPreferredLocation is
   // better to use when possible.

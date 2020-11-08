@@ -171,7 +171,7 @@ class MarkupView {
         column,
         tags,
         handler,
-        scriptId: url ? location.scriptId : undefined,
+        sourceId: url ? location.sourceId : undefined,
         native: !url,
         hide: {
           debugger: !url,

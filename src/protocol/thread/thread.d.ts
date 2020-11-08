@@ -2,7 +2,7 @@ import {
   BreakpointId,
   ExecutionPoint,
   FrameId,
-  getScriptSourceResult,
+  getSourceContentsResult,
   Location,
   MappedLocation,
   Message,
@@ -11,12 +11,12 @@ import {
   PauseDescription,
   PointDescription,
   RecordingId,
-  SameLineScriptLocations,
+  SameLineSourceLocations,
   ScreenShot,
-  ScriptId,
-  ScriptKind,
-  ScriptLocation,
-  scriptParsed,
+  SourceId,
+  SourceKind,
+  SourceLocation,
+  newSource,
   SessionId,
   TimeStamp,
   unprocessedRegions,
@@ -34,10 +34,10 @@ export interface RecordingDescription {
   commandLineArguments?: string[];
 }
 
-export interface Script {
-  kind: ScriptKind;
+export interface Source {
+  kind: SourceKind;
   url?: string;
-  generatedScriptIds?: ScriptId[];
+  generatedSourceIds?: SourceId[];
 }
 
 export interface PauseEventArgs {
@@ -56,11 +56,11 @@ export declare const ThreadFront: {
   sessionId: SessionId | null;
   sessionWaiter: Deferred<SessionId>;
   initializedWaiter: Deferred<void>;
-  scripts: Map<string, Script>;
-  scriptWaiters: ArrayMap<string, () => void>;
-  urlScripts: ArrayMap<string, ScriptId>;
-  originalScripts: ArrayMap<ScriptId, ScriptId>;
-  preferredGeneratedScripts: Set<ScriptId>;
+  sources: Map<string, Source>;
+  sourceWaiters: ArrayMap<string, () => void>;
+  urlSources: ArrayMap<string, SourceId>;
+  originalSources: ArrayMap<SourceId, SourceId>;
+  preferredGeneratedSources: Set<SourceId>;
   mappedLocations: MappedLocationCache;
   skipPausing: boolean;
   resumeTargets: Map<string, PauseDescription>;
@@ -86,20 +86,20 @@ export declare const ThreadFront: {
     onUnprocessedRegions: ((parameters: unprocessedRegions) => void) | undefined
   ): Promise<void>;
   timeWarp(point: ExecutionPoint, time?: number, hasFrames?: boolean, force?: boolean): void;
-  findScripts(onScript: (script: scriptParsed) => void): Promise<void>;
-  getScriptKind(scriptId: ScriptId): ScriptKind | null;
-  ensureScript(scriptId: ScriptId): Promise<Script>;
-  getScriptURLRaw(scriptId: ScriptId): string | undefined;
-  getScriptURL(scriptId: ScriptId): Promise<string | undefined>;
-  getScriptIdsForURL(url: string): ScriptId[];
-  getScriptSource(scriptId: ScriptId): Promise<getScriptSourceResult>;
+  findSources(onSource: (source: newSource) => void): Promise<void>;
+  getSourceKind(sourceId: SourceId): SourceKind | null;
+  ensureSource(sourceId: SourceId): Promise<Source>;
+  getSourceURLRaw(sourceId: SourceId): string | undefined;
+  getSourceURL(sourceId: SourceId): Promise<string | undefined>;
+  getSourceIdsForURL(url: string): SourceId[];
+  getSourceSource(sourceId: SourceId): Promise<getSourceContentsResult>;
   getBreakpointPositionsCompressed(
-    scriptId: ScriptId,
-    range?: { start: ScriptLocation; end: ScriptLocation }
-  ): Promise<SameLineScriptLocations[]>;
+    sourceId: SourceId,
+    range?: { start: SourceLocation; end: SourceLocation }
+  ): Promise<SameLineSourceLocations[]>;
   setSkipPausing(skip: boolean): void;
   setBreakpoint(
-    scriptId: ScriptId,
+    sourceId: SourceId,
     line: number,
     column: number,
     condition?: string
@@ -110,7 +110,7 @@ export declare const ThreadFront: {
     column: number,
     condition?: string
   ): Promise<void[]> | undefined;
-  removeBreakpoint(scriptId: ScriptId, line: number, column: number): Promise<void>;
+  removeBreakpoint(sourceId: SourceId, line: number, column: number): Promise<void>;
   removeBreakpointByURL(url: string, line: number, column: number): Promise<void[]> | undefined;
   ensurePause(point: ExecutionPoint): Pause;
   ensureCurrentPause(): void;
@@ -128,8 +128,8 @@ export declare const ThreadFront: {
   stepIn(point: ExecutionPoint): void;
   stepOut(point: ExecutionPoint): void;
   resumeTarget(point: ExecutionPoint): Promise<PauseDescription>;
-  blackbox(scriptId: ScriptId, begin: ScriptLocation, end: ScriptLocation): Promise<void>;
-  unblackbox(scriptId: ScriptId, begin: ScriptLocation, end: ScriptLocation): Promise<void>;
+  blackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation): Promise<void>;
+  unblackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation): Promise<void>;
   findConsoleMessages(onConsoleMessage: (pause: Pause, message: Message) => void): Promise<void>;
   getRootDOMNode(): Promise<NodeFront | null>;
   getKnownRootDOMNode(): NodeFront;
@@ -141,10 +141,10 @@ export declare const ThreadFront: {
   getPreferredLocationRaw(locations: MappedLocation): Location;
   getPreferredLocation(locations: MappedLocation): Promise<Location>;
   getAlternateLocation(locations: MappedLocation): Promise<Location | null>;
-  isMinifiedScript(scriptId: ScriptId): boolean;
-  isSourceMappedScript(scriptId: ScriptId): boolean;
-  preferScript(scriptId: ScriptId, value: boolean): void;
-  hasPreferredGeneratedScript(location: MappedLocation): boolean;
+  isMinifiedSource(sourceId: SourceId): boolean;
+  isSourceMappedSource(sourceId: SourceId): boolean;
+  preferSource(sourceId: SourceId, value: boolean): void;
+  hasPreferredGeneratedSource(location: MappedLocation): boolean;
   getPreferredMappedLocation(location: Location): Promise<Location>;
   getRecordingDescription(): Promise<RecordingDescription>;
   watchMetadata(key: string, callback: (args: any) => any): Promise<void>;

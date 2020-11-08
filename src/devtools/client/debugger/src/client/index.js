@@ -68,10 +68,10 @@ export function bootstrap(_store) {
 export async function onConnect() {
   store.dispatch(actions.connect("", ThreadFront.actor, {}, false));
 
-  ThreadFront.findScripts(({ scriptId, url, sourceMapURL }) =>
+  ThreadFront.findSources(({ sourceId, url, sourceMapURL }) =>
     clientEvents.newSource(ThreadFront, {
       source: {
-        actor: scriptId,
+        actor: sourceId,
         url,
         sourceMapURL,
       },

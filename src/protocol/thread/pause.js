@@ -165,14 +165,14 @@ Pause.prototype = {
     const frame = this.frames.get(frameId);
 
     // Normally we use the original scope chain for the frame if there is one,
-    // but when a generated script is marked as preferred we use the generated
+    // but when a generated source is marked as preferred we use the generated
     // scope chain instead. In the original case we still load the frame's
     // normal scope chain first, as currently the backend does not supply
     // related objects when loading original scopes and we don't deal with that
     // properly.
     let scopeChain = await this.ensureScopeChain(frame.scopeChain);
-    if (frame.originalScopeChain && !ThreadFront.hasPreferredGeneratedScript(frame.location)) {
-      scopeChain = await this.ensureScopeChain(frame.originalScopeChain);
+    if (frame.originalScopeChain && !ThreadFront.hasPreferredGeneratedSource(frame.location)) {
+    scopeChain = await this.ensureScopeChain(frame.originalScopeChain);
     }
 
     return scopeChain;

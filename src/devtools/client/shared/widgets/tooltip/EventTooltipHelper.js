@@ -180,7 +180,7 @@ EventTooltip.prototype = {
         editor: editor,
         handler: listener.handler,
         uri: listener.origin,
-        sourceActor: listener.scriptId,
+        sourceActor: listener.sourceId,
         dom0: listener.DOM0,
         native: listener.native,
         appended: false,

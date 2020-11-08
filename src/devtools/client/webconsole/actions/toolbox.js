@@ -57,7 +57,7 @@ export function jumpToExecutionPoint(point, time, hasFrames) {
 
 export function onViewSourceInDebugger(frame) {
   return ({ toolbox }) => {
-    toolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.scriptId);
+    toolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.sourceId);
   };
 }
 

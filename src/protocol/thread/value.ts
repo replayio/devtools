@@ -159,7 +159,7 @@ export class ValueFront {
   functionLocationURL() {
     const location = this.functionLocation();
     if (location) {
-      return ThreadFront.getScriptURLRaw(location.scriptId);
+      return ThreadFront.getSourceURLRaw(location.sourceId);
     }
   }
 

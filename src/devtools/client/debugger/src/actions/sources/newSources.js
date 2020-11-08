@@ -189,7 +189,7 @@ export function newGeneratedSources(sourceInfo) {
     for (const { thread, isServiceWorker, source, id } of sourceInfo) {
       const newId = id || makeSourceId(source, isServiceWorker);
 
-      const kind = ThreadFront.getScriptKind(source.actor);
+      const kind = ThreadFront.getSourceKind(source.actor);
       const isPrettyPrinted = kind == "prettyPrinted";
       const isOriginal = kind == "sourceMapped";
 
@@ -200,8 +200,8 @@ export function newGeneratedSources(sourceInfo) {
         url = undefined;
       }
 
-      if (ThreadFront.isMinifiedScript(source.actor)) {
-        // Ignore minified scripts which have a pretty printed version.
+      if (ThreadFront.isMinifiedSource(source.actor)) {
+        // Ignore minified sources which have a pretty printed version.
         url = undefined;
       }
 

@@ -172,7 +172,7 @@ class SourceFooter extends PureComponent {
     const filename = getFilename(alternateSource);
     const title = L10N.getFormatStr("sourceFooter.alternateSource", filename);
 
-    const original = ThreadFront.isSourceMappedScript(selectedSource.id);
+    const original = ThreadFront.isSourceMappedSource(selectedSource.id);
 
     const tooltip = L10N.getFormatStr(
       original ? "sourceFooter.generatedSourceTooltip" : "sourceFooter.originalSourceTooltip",

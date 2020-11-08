@@ -73,8 +73,8 @@ function breakOnNext(thread) {
 
 async function sourceContents({ actor }) {
   const threadFront = ThreadFront;
-  const { scriptSource, contentType } = await threadFront.getScriptSource(actor);
-  return { source: scriptSource, contentType };
+  const { contents, contentType } = await threadFront.getSourceContents(actor);
+  return { source: contents, contentType };
 }
 
 function setXHRBreakpoint(path, method) {
@@ -153,12 +153,12 @@ function removeBreakpoint(location) {
   return ThreadFront.removeBreakpointByURL(sourceUrl, line, column);
 }
 
-async function evaluateExpressions(scripts, options) {
-  return Promise.all(scripts.map(script => evaluate(script, options)));
+async function evaluateExpressions(sources, options) {
+  return Promise.all(sources.map(source => evaluate(source, options)));
 }
 
-async function evaluate(script, { asyncIndex, frameId } = {}) {
-  const { returned, exception, failed } = await ThreadFront.evaluate(asyncIndex, frameId, script);
+async function evaluate(source, { asyncIndex, frameId } = {}) {
+  const { returned, exception, failed } = await ThreadFront.evaluate(asyncIndex, frameId, source);
   if (failed) {
     return { exception: createPrimitiveValueFront("Evaluation failed") };
   }

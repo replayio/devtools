@@ -154,7 +154,7 @@ function mapperExtractArrayContents(arrayPath: string, valuesPath: string) {
 
 export async function setLogpoint(
   logGroupId: string,
-  scriptId: string,
+  sourceId: string,
   line: number,
   column: number,
   text: string,
@@ -215,7 +215,7 @@ export async function setLogpoint(
   client.Analysis.addLocation({
     analysisId,
     sessionId: await ThreadFront.waitForSession(),
-    location: { scriptId, line, column },
+    location: { sourceId, line, column },
   });
   client.Analysis.runAnalysis({ analysisId });
 
@@ -228,15 +228,15 @@ export async function setLogpoint(
 
 export function setLogpointByURL(
   logGroupId: string,
-  scriptUrl: string,
+  url: string,
   line: number,
   column: number,
   text: string,
   condition: string
 ) {
-  const scriptIds = ThreadFront.getScriptIdsForURL(scriptUrl);
-  (scriptIds || []).forEach((scriptId: string) => {
-    setLogpoint(logGroupId, scriptId, line, column, text, condition);
+  const sourceIds = ThreadFront.getSourceIdsForURL(url);
+  (sourceIds || []).forEach((sourceId: string) => {
+    setLogpoint(logGroupId, sourceId, line, column, text, condition);
   });
 }
 

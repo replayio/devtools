@@ -42,6 +42,6 @@ export class MappedLocationCache {
    * Encode a location as a string for use as a cache key
    */
   private encodeLocation(location: Location): string {
-    return `${location.scriptId}|${location.line}|${location.column}`;
+    return `${location.sourceId}|${location.line}|${location.column}`;
   }
 }

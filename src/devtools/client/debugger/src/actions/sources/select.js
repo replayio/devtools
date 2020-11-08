@@ -157,10 +157,10 @@ export function selectSpecificLocation(cx, location) {
 // the pause again to refresh all the debugger's state.
 export function showAlternateSource(oldSource, newSource) {
   return async ({ dispatch, getState }) => {
-    if (ThreadFront.isSourceMappedScript(oldSource.id)) {
-      ThreadFront.preferScript(newSource.id, true);
+    if (ThreadFront.isSourceMappedSource(oldSource.id)) {
+      ThreadFront.preferSource(newSource.id, true);
     } else {
-      ThreadFront.preferScript(oldSource.id, false);
+      ThreadFront.preferSource(oldSource.id, false);
     }
 
     const executionPoint = getThreadExecutionPoint(getState());

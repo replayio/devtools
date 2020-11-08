@@ -49,12 +49,12 @@ class SmartTrace extends Component {
   UNSAFE_componentWillMount() {
     const mappedStack = this.props.stacktrace.map(async frame => {
       const { lineNumber, columnNumber, filename } = frame;
-      const scriptIds = ThreadFront.getScriptIdsForURL(filename);
-      if (scriptIds.length != 1) {
+      const sourceIds = ThreadFront.getSourceIdsForURL(filename);
+      if (sourceIds.length != 1) {
         return frame;
       }
       const location = {
-        scriptId: scriptIds[0],
+        sourceId: sourceIds[0],
         line: lineNumber,
         column: columnNumber,
       };
@@ -63,7 +63,7 @@ class SmartTrace extends Component {
         ...frame,
         lineNumber: mapped.line,
         columnNumber: mapped.column,
-        filename: await ThreadFront.getScriptURL(mapped.scriptId),
+        filename: await ThreadFront.getSourceURL(mapped.sourceId),
       };
     });
 
