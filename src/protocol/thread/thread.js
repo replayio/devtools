@@ -634,7 +634,7 @@ export const ThreadFront = {
   _chooseSourceId(sourceIds) {
     // Ignore inline sources if we have an HTML source containing them.
     if (sourceIds.some(id => this.getSourceKind(id) == "html")) {
-      sourceIds = sourceIds.filter(id => this.getSourceKind(id) != "inlineSource");
+      sourceIds = sourceIds.filter(id => this.getSourceKind(id) != "inlineScript");
     }
 
     // Ignore minified sources.
