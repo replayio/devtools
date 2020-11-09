@@ -13,7 +13,6 @@ import classnames from "classnames";
 import { debounce } from "lodash";
 
 import { isFirefox } from "devtools-environment";
-import { getLineText } from "./../../utils/source";
 import { features } from "../../utils/prefs";
 import { getIndentation } from "../../utils/indentation";
 
@@ -51,7 +50,6 @@ import {
   getEditor,
   clearEditor,
   getCursorLine,
-  getCursorColumn,
   lineAtHeight,
   toSourceLine,
   getDocument,
@@ -138,7 +136,6 @@ class Editor extends PureComponent {
     this.onEditorScroll();
     this.setState({ editor });
 
-    gToolbox.getPanel("debugger").editor = this;
     return editor;
   }
 

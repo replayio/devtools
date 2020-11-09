@@ -41,7 +41,7 @@ export function connect(url, actor, traits, isWebExtension) {
         url,
         actor,
         type: "mainThread",
-        name: L10N.getStr("mainThread"),
+        name: "Main Thread",
       },
       traits,
       isWebExtension,

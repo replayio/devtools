@@ -28,8 +28,8 @@ export function removeEditor() {
   editor = null;
 }
 
-function getCodeMirror() {
-  return editor && editor.hasCodeMirror ? editor.codeMirror : null;
+export function getCodeMirror() {
+  return editor?.codeMirror;
 }
 
 export function startOperation() {
