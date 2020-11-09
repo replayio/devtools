@@ -370,7 +370,7 @@ function messages(state = MessageState(), action) {
       const currMessage = messagesById.get(action.id);
 
       // If the message is a console.group/groupCollapsed or a warning group.
-      if (isGroupType(currMessage.type) || isWarningGroup(currMessage)) {
+      if (isGroupType(currMessage?.type) || isWarningGroup(currMessage)) {
         // We want to make its children visible
         const messagesToShow = [...messagesById].reduce((res, [id, message]) => {
           if (
@@ -410,7 +410,7 @@ function messages(state = MessageState(), action) {
       closeState.messagesUiById = [...closeState.messagesUiById];
 
       // If the message is a group
-      if (isGroupType(messagesById.get(messageId).type)) {
+      if (isGroupType(messagesById.get(messageId)?.type)) {
         // Hide all its children, unless they're in a warningGroup.
         closeState.visibleMessages = visibleMessages.filter((id, i, arr) => {
           const message = messagesById.get(id);
