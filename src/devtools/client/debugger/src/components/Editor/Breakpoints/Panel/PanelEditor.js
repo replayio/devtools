@@ -8,18 +8,14 @@ import actions from "devtools/client/debugger/src/actions";
 class PanelEditor extends PureComponent {
   panelEditorNode;
 
-  state = {
-    logValue: null,
-    conditionValue: null,
-  };
+  constructor(props) {
+    const { breakpoint } = props;
+    super(props);
 
-  componentDidMount() {
-    const { breakpoint } = this.props;
-
-    this.setState({
+    this.state = {
       logValue: breakpoint.options.logValue,
       conditionValue: breakpoint.options.condition || null,
-    });
+    };
   }
 
   setBreakpoint = () => {
@@ -168,12 +164,6 @@ class PanelEditor extends PureComponent {
   render() {
     const { conditionValue, logValue } = this.state;
     const hasCondition = conditionValue !== null;
-
-    if (!logValue) {
-      // Skip the first render. The state doesn't have the default values for
-      // logValue and conditionValue until after the component mounts.
-      return null;
-    }
 
     return (
       <div

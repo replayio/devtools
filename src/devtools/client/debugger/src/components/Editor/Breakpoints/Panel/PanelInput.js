@@ -94,9 +94,9 @@ export function PanelInput({
 
   useEffect(() => {
     if (autofocus) {
-      setTimeout(() => codeMirrorNode.current.focus(), 0);
+      setTimeout(() => codeMirrorNode.current?.focus(), 0);
     }
-  }, [autofocus]);
+  }, [codeMirrorNode, autofocus]);
 
   return <textarea ref={textAreaNode} className={`editor-mount`} />;
 }
