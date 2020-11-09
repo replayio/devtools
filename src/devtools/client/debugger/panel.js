@@ -55,6 +55,7 @@ export class DebuggerPanel {
           }
         }
         resizeBreakpointGutter(codeMirror);
+        codeMirror.refresh();
       }, 0);
     };
     codeMirror.on("refresh", handler);
