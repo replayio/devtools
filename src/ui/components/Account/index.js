@@ -7,8 +7,6 @@ import Loader from "../shared/Loader";
 import Prompt from "../shared/Prompt";
 import { gql, useQuery } from "@apollo/client";
 import { setUserInBrowserPrefs } from "../../utils/browser";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
 
 import "./Account.css";
 
@@ -61,13 +59,18 @@ function FirstRecordingPrompt() {
 
 function AccountPage() {
   const { user } = useAuth0();
-  const { data, loading } = useQuery(GET_MY_RECORDINGS, {
+  const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
     variables: { authId: user.sub },
     pollInterval: 10000,
   });
 
   if (loading) {
     return <Loader />;
+  }
+
+  if (error) {
+    console.error("Failed to fetch recordings:", error);
+    throw new Error(error);
   }
 
   if (data.recordings && !data.recordings.length) {
