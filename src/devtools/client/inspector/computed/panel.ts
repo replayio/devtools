@@ -12,6 +12,10 @@ export class ComputedPanel {
     this.provider = createElement(InspectorTabPanel, { id: "sidebar-panel-computedview" });
   }
 
+  get computedView() {
+    return this.tool.computedView;
+  }
+
   destroy() {
     this.tool.destroy();
     this.tool = undefined;

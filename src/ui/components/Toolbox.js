@@ -157,9 +157,9 @@ class Toolbox extends React.Component {
     if (inspector) {
       markupView = inspector._inspector.getPanel("markupview").provider;
       rulesPanel = {
-        id: "newruleview",
+        id: "ruleview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
-        panel: inspector._inspector.getPanel("newruleview").provider,
+        panel: inspector._inspector.getPanel("ruleview").provider,
       };
       layoutPanel = {
         id: "layoutview",
