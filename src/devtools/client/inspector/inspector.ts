@@ -2,13 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+// "use strict";
 
 // const Services = require("Services");
 const EventEmitter = require("devtools/shared/event-emitter");
 // const InspectorStyleChangeTracker = require("devtools/client/inspector/shared/style-change-tracker");
 // const { log } = require("protocol/socket");
-const { ThreadFront } = require("protocol/thread");
+import { ThreadFront } from "protocol/thread";
+import { NodeFront } from "protocol/thread/node";
+import { UIStore } from "ui/actions";
+import { InspectorPanel } from "./components/App";
 // const React = require("react");
 // const ReactDOM = require("react-dom");
 // const { setupInspectorHelper } = require("ui/utils/bootstrap/helpers");
@@ -126,17 +129,46 @@ const THREE_PANE_ENABLED_PREF = "devtools.inspector.three-pane-enabled";
  *      Fired when the stylesheet source links have been updated (when switching
  *      to source-mapped files)
  */
-class Inspector {
-  constructor(toolbox) {
+export class Inspector {
+  panelDoc: Document | null;
+  panelWin: Window | null;
+  store: UIStore | null;
+  highlighter: any;
+  isReady?: boolean;
+  searchBox?: HTMLElement | null;
+  searchClearButton?: HTMLElement | null;
+  searchResultsContainer?: HTMLElement | null;
+  searchResultsLabel?: HTMLElement | null;
+  searchboxShortcuts?: any;
+  breadcrumbs?: any;
+  markup?: any;
+
+  private _toolbox: any;
+  private _panels: Map<string, InspectorPanel>;
+  private _replayResumed?: boolean;
+  private _highlighters?: any;
+  private _search?: any;
+  private _defaultNode?: NodeFront | null;
+  private _hasNewRoot?: boolean;
+  private _pendingSelection?: number | null;
+  private _destroyed?: boolean;
+
+  // added by EventEmitter.decorate(ThreadFront)
+  eventListeners!: Map<string, ((value?: any) => void)[]>;
+  on!: (name: string, handler: (value?: any) => void) => void;
+  off!: (name: string, handler: (value?: any) => void) => void;
+  emit!: (name: string, value?: any) => void;
+
+  constructor(toolbox: any) {
     EventEmitter.decorate(this);
 
     this._toolbox = toolbox;
     // this._target = toolbox.target;
     this.panelDoc = window.document;
     this.panelWin = window;
-    this.panelWin.inspector = this;
+    (this.panelWin as any).inspector = this;
     // this.telemetry = toolbox.telemetry;
-    this.store = window.app.store;
+    this.store = (window as any).app.store;
 
     // Map [panel id => panel instance]
     // Stores all the instances of sidebar panels like rule view, computed view, ...
@@ -256,7 +288,7 @@ class Inspector {
     // We can display right panel with: tab bar, markup view and breadbrumb. Right after
     // the splitter set the right and left panel sizes, in order to avoid resizing it
     // during load of the inspector.
-    this.panelDoc.getElementById("inspector-main-content").style.visibility = "visible";
+    this.panelDoc!.getElementById("inspector-main-content")!.style.visibility = "visible";
 
     // Setup the sidebar panels.
     // this.setupSidebar();
@@ -359,12 +391,14 @@ class Inspector {
    * Hooks the searchbar to show result and auto completion suggestions.
    */
   setupSearchBox() {
+    if (!this.panelDoc) return;
+
     this.searchBox = this.panelDoc.getElementById("inspector-searchbox");
     this.searchClearButton = this.panelDoc.getElementById("inspector-searchinput-clear");
     this.searchResultsContainer = this.panelDoc.getElementById("inspector-searchlabel-container");
     this.searchResultsLabel = this.panelDoc.getElementById("inspector-searchlabel");
 
-    this.searchBox.addEventListener(
+    this.searchBox!.addEventListener(
       "focus",
       () => {
         this.search.on("search-cleared", this._clearSearchResultsLabel);
@@ -378,14 +412,14 @@ class Inspector {
 
   createSearchBoxShortcuts() {
     this.searchboxShortcuts = new KeyShortcuts({
-      window: this.panelDoc.defaultView,
+      window: this.panelDoc!.defaultView,
       // The inspector search shortcuts need to be available from everywhere in the
       // inspector, and the inspector uses iframes (markupview, sidepanel webextensions).
       // Use the chromeEventHandler as the target to catch events from all frames.
       //target: this.toolbox.getChromeEventHandler(),
     });
     const key = INSPECTOR_L10N.getStr("inspector.searchHTML.key");
-    this.searchboxShortcuts.on(key, event => {
+    this.searchboxShortcuts.on(key, (event: any) => {
       // Prevent overriding same shortcut from the computed/rule views
       if (
         event.originalTarget.closest("#sidebar-panel-ruleview") ||
@@ -400,7 +434,7 @@ class Inspector {
       // because the inspector uses iframes.
       if (win === this.panelWin || win.parent === this.panelWin) {
         event.preventDefault();
-        this.searchBox.focus();
+        this.searchBox!.focus();
       }
     });
   }
@@ -409,11 +443,11 @@ class Inspector {
     return this.search.autocompleter;
   }
 
-  _clearSearchResultsLabel = result => {
+  _clearSearchResultsLabel = (result: any) => {
     return this._updateSearchResultsLabel(result, true);
   };
 
-  _updateSearchResultsLabel = (result, clear = false) => {
+  _updateSearchResultsLabel = (result: any, clear = false) => {
     let str = "";
     if (!clear) {
       if (result) {
@@ -426,12 +460,12 @@ class Inspector {
         str = INSPECTOR_L10N.getStr("inspector.searchResultsNone");
       }
 
-      this.searchResultsContainer.hidden = false;
+      this.searchResultsContainer!.hidden = false;
     } else {
-      this.searchResultsContainer.hidden = true;
+      this.searchResultsContainer!.hidden = true;
     }
 
-    this.searchResultsLabel.textContent = str;
+    this.searchResultsLabel!.textContent = str;
   };
 
   // get React() {
@@ -764,14 +798,14 @@ class Inspector {
   /**
    * Returns a boolean indicating whether a sidebar panel instance exists.
    */
-  hasPanel(id) {
+  hasPanel(id: string) {
     return this._panels.has(id);
   }
 
   /**
    * Lazily get and create panel instances displayed in the sidebar
    */
-  getPanel(id) {
+  getPanel(id: string) {
     if (this._panels.has(id)) {
       return this._panels.get(id);
     }
@@ -1004,7 +1038,7 @@ class Inspector {
    * and other state gives us a clean break from the previous pause point and
    * makes it easier to keep state consistent.
    */
-  onNewRoot = async force => {
+  onNewRoot = async (force?: boolean) => {
     // Don't reload the inspector when not selected.
     if (this.toolbox && this.toolbox.currentTool != "inspector" && !force) {
       this._hasNewRoot = true;
@@ -1039,7 +1073,7 @@ class Inspector {
     this.onMarkupLoaded();
   };
 
-  handleToolSelected = id => {
+  handleToolSelected = (id: string) => {
     if (id == "inspector" && this._hasNewRoot) {
       this.onNewRoot(/* force */ true);
     }
@@ -1078,7 +1112,7 @@ class Inspector {
       this.markup.expandNode(this.selection.nodeFront);
     }
 
-    const loading = document.getElementById("markup-loading");
+    const loading = document.getElementById("markup-loading")!;
     loading.hidden = true;
     //log(`Inspector HideMarkupLoading`);
 
@@ -1361,9 +1395,9 @@ class Inspector {
     this._toolbox = null;
     this.breadcrumbs = null;
     this.panelDoc = null;
-    this.panelWin.inspector = null;
+    (this.panelWin as any).inspector = null;
     this.panelWin = null;
-    this.resultsLength = null;
+    // this.resultsLength = null;
     this.searchBox = null;
     // this.show3PaneTooltip = null;
     // this.sidebar = null;
@@ -1469,7 +1503,7 @@ class Inspector {
   /**
    * Toggle a pseudo class.
    */
-  togglePseudoClass(pseudo) {
+  togglePseudoClass(pseudo: any) {
     if (this.selection.isElementNode()) {
       const node = this.selection.nodeFront;
       if (node.hasPseudoClassLock(pseudo)) {
@@ -1483,7 +1517,7 @@ class Inspector {
         parents: hierarchical,
       });
     }
-    return promise.resolve();
+    // return promise.resolve();
   }
 
   /**
@@ -1527,33 +1561,31 @@ class Inspector {
    * @param  {Object} options
    *         Options passed to the highlighter actor.
    */
-  onShowBoxModelHighlighterForNode = (nodeFront, options) => {
-    nodeFront.highlighterFront.highlight(nodeFront, options);
+  onShowBoxModelHighlighterForNode = (nodeFront: NodeFront, options: any) => {
+    // nodeFront.highlighterFront.highlight(nodeFront, options);
   };
 
-  async inspectNodeActor(nodeActor, inspectFromAnnotation) {
-    const nodeFront = await this.inspectorFront.getNodeFrontFromNodeGrip({
-      actor: nodeActor,
-    });
-    if (!nodeFront) {
-      console.error(
-        "The object cannot be linked to the inspector, the " +
-          "corresponding nodeFront could not be found."
-      );
-      return false;
-    }
+  // async inspectNodeActor(nodeActor, inspectFromAnnotation) {
+  //   const nodeFront = await this.inspectorFront.getNodeFrontFromNodeGrip({
+  //     actor: nodeActor,
+  //   });
+  //   if (!nodeFront) {
+  //     console.error(
+  //       "The object cannot be linked to the inspector, the " +
+  //         "corresponding nodeFront could not be found."
+  //     );
+  //     return false;
+  //   }
 
-    const isAttached = await this.walker.isInDOMTree(nodeFront);
-    if (!isAttached) {
-      console.error("Selected DOMNode is not attached to the document tree.");
-      return false;
-    }
+  //   const isAttached = await this.walker.isInDOMTree(nodeFront);
+  //   if (!isAttached) {
+  //     console.error("Selected DOMNode is not attached to the document tree.");
+  //     return false;
+  //   }
 
-    await this.selection.setNodeFront(nodeFront, {
-      reason: inspectFromAnnotation,
-    });
-    return true;
-  }
+  //   await this.selection.setNodeFront(nodeFront, {
+  //     reason: inspectFromAnnotation,
+  //   });
+  //   return true;
+  // }
 }
-
-exports.Inspector = Inspector;
