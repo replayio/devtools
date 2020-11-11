@@ -166,6 +166,7 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
         <li key={panel.id} className={className} role="presentation">
           <span className="devtools-tab-line"></span>
           <a
+            id={`${panel.id}-tab`}
             tabIndex={isPanelSelected ? 0 : -1}
             title={panel.title}
             role="tab"

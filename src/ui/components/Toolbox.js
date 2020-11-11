@@ -167,9 +167,9 @@ class Toolbox extends React.Component {
         panel: inspector._inspector.getPanel("layoutview").provider,
       };
       computedPanel = {
-        id: "wrappedcomputedview",
+        id: "computedview",
         title: INSPECTOR_L10N.getStr("inspector.sidebar.computedViewTitle"),
-        panel: inspector._inspector.getPanel("wrappedcomputedview").provider,
+        panel: inspector._inspector.getPanel("computedview").provider,
       };
     }
     return (
