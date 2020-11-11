@@ -28,7 +28,7 @@ module.exports = {
   },
   plugins: [new MiniCssExtractPlugin()],
   resolve: {
-    extensions: [".js", ".ts"],
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
     modules: [
       "src",
       "src/devtools/client/debugger/dist",
@@ -40,7 +40,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(j|t)s$/,
+        test: /\.(j|t)sx?$/,
         exclude: request => {
           return (
             request.includes("node_modules") ||

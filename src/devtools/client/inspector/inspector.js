@@ -251,7 +251,7 @@ class Inspector {
     }
 
     // Setup the splitter before the sidebar is displayed so, we don't miss any events.
-    this.setupSplitter();
+    // this.setupSplitter();
 
     // We can display right panel with: tab bar, markup view and breadbrumb. Right after
     // the splitter set the right and left panel sizes, in order to avoid resizing it
@@ -259,15 +259,15 @@ class Inspector {
     this.panelDoc.getElementById("inspector-main-content").style.visibility = "visible";
 
     // Setup the sidebar panels.
-    this.setupSidebar();
+    // this.setupSidebar();
 
     this.isReady = true;
 
     // All the components are initialized. Take care of the remaining initialization
     // and setup.
     this.breadcrumbs = new HTMLBreadcrumbs(this);
-    this.setupSearchBox();
-    await this.setupToolbar();
+    // this.setupSearchBox();
+    // await this.setupToolbar();
 
     this.onNewSelection();
 
@@ -1071,7 +1071,7 @@ class Inspector {
       this.markup = new MarkupView(this);
     } else {
       this.markup = new NewMarkupView(this);
-      ReactDOM.render(this.markup.provider, document.getElementById("markup-root"));
+      // ReactDOM.render(this.markup.provider, document.getElementById("markup-root"));
     }
 
     if (this.selection.nodeFront && features.oldMarkupView) {

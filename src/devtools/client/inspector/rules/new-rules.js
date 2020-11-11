@@ -66,7 +66,7 @@ class RulesView {
     this.updateClassList = this.updateClassList.bind(this);
     this.updateRules = this.updateRules.bind(this);
 
-    this.inspector.sidebar.on("select", this.onSelection);
+//    this.inspector.sidebar.on("select", this.onSelection);
     this.selection.on("detached-front", this.onSelection);
     this.selection.on("new-node-front", this.onSelection);
 
