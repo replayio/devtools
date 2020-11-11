@@ -461,12 +461,11 @@ class Editor extends PureComponent {
   }
 
   render() {
-    const { selectedSource, skipPausing } = this.props;
+    const { selectedSource } = this.props;
     return (
       <div
         className={classnames("editor-wrapper", {
           blackboxed: selectedSource && selectedSource.isBlackBoxed,
-          "skip-pausing": skipPausing,
         })}
         ref={c => (this.$editorWrapper = c)}
       >

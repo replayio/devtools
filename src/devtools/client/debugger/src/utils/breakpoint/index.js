@@ -124,18 +124,6 @@ export function breakpointExists(state, location) {
   return currentBp && !currentBp.disabled;
 }
 
-export function createXHRBreakpoint(path, method, overrides = {}) {
-  const properties = {
-    path,
-    method,
-    disabled: false,
-    loading: false,
-    text: L10N.getFormatStr("xhrBreakpoints.item.label", path),
-  };
-
-  return { ...properties, ...overrides };
-}
-
 function createPendingLocation(location) {
   const { sourceUrl, line, column } = location;
   return { sourceUrl, line, column };

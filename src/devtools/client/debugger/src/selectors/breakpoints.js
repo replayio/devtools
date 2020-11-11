@@ -6,19 +6,6 @@
 
 import { createSelector } from "reselect";
 
-export function getXHRBreakpoints(state) {
-  return state.breakpoints.xhrBreakpoints;
-}
-
-export const shouldPauseOnAnyXHR = createSelector(getXHRBreakpoints, xhrBreakpoints => {
-  const emptyBp = xhrBreakpoints.find(({ path }) => path.length === 0);
-  if (!emptyBp) {
-    return false;
-  }
-
-  return !emptyBp.disabled;
-});
-
 export const getBreakpointsList = createSelector(
   state => state.breakpoints.breakpoints,
   breakpoints => Object.values(breakpoints)

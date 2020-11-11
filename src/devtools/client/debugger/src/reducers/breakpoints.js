@@ -16,10 +16,9 @@ import { makeBreakpointId } from "../utils/breakpoint";
 // eslint-disable-next-line max-len
 import { getBreakpointsList as getBreakpointsListSelector } from "../selectors/breakpoints";
 
-export function initialBreakpointsState(xhrBreakpoints = []) {
+export function initialBreakpointsState() {
   return {
     breakpoints: {},
-    xhrBreakpoints,
     breakpointsDisabled: false,
   };
 }
@@ -39,7 +38,7 @@ function update(state = initialBreakpointsState(), action) {
     }
 
     case "NAVIGATE": {
-      return initialBreakpointsState(state.xhrBreakpoints);
+      return initialBreakpointsState();
     }
 
     case "SET_XHR_BREAKPOINT": {
@@ -64,57 +63,6 @@ function update(state = initialBreakpointsState(), action) {
   }
 
   return state;
-}
-
-function addXHRBreakpoint(state, action) {
-  const { xhrBreakpoints } = state;
-  const { breakpoint } = action;
-  const { path, method } = breakpoint;
-
-  const existingBreakpointIndex = state.xhrBreakpoints.findIndex(
-    bp => bp.path === path && bp.method === method
-  );
-
-  if (existingBreakpointIndex === -1) {
-    return {
-      ...state,
-      xhrBreakpoints: [...xhrBreakpoints, breakpoint],
-    };
-  } else if (xhrBreakpoints[existingBreakpointIndex] !== breakpoint) {
-    const newXhrBreakpoints = [...xhrBreakpoints];
-    newXhrBreakpoints[existingBreakpointIndex] = breakpoint;
-    return {
-      ...state,
-      xhrBreakpoints: newXhrBreakpoints,
-    };
-  }
-
-  return state;
-}
-
-function removeXHRBreakpoint(state, action) {
-  const { breakpoint } = action;
-  const { xhrBreakpoints } = state;
-
-  if (action.status === "start") {
-    return state;
-  }
-
-  return {
-    ...state,
-    xhrBreakpoints: xhrBreakpoints.filter(bp => !isEqual(bp, breakpoint)),
-  };
-}
-
-function updateXHRBreakpoint(state, action) {
-  const { breakpoint, index } = action;
-  const { xhrBreakpoints } = state;
-  const newXhrBreakpoints = [...xhrBreakpoints];
-  newXhrBreakpoints[index] = breakpoint;
-  return {
-    ...state,
-    xhrBreakpoints: newXhrBreakpoints,
-  };
 }
 
 function setBreakpoint(state, { breakpoint }) {

@@ -19,7 +19,6 @@ import {
   getShouldLogExceptions,
   getThreadContext,
   getSourceFromId,
-  getSkipPausing,
   getFramesLoading,
 } from "../../selectors";
 
@@ -31,7 +30,6 @@ import SplitBox from "devtools-splitter";
 import Frames from "./Frames";
 import Accordion from "../shared/Accordion";
 import CommandBar from "./CommandBar";
-import XHRBreakpoints from "./XHRBreakpoints";
 import WhyPaused from "./WhyPaused";
 import FrameTimeline from "./FrameTimeline";
 
@@ -67,7 +65,7 @@ class SecondaryPanes extends Component {
     const { cx, toggleAllBreakpoints, breakpoints, breakpointsDisabled } = this.props;
     const isIndeterminate = !breakpointsDisabled && breakpoints.some(x => x.disabled);
 
-    if (features.skipPausing || breakpoints.length === 0) {
+    if (breakpoints.length === 0) {
       return null;
     }
 
@@ -98,26 +96,6 @@ class SecondaryPanes extends Component {
     return <input {...inputProps} />;
   }
 
-  xhrBreakpointsHeaderButtons() {
-    const buttons = [];
-
-    buttons.push(
-      debugBtn(
-        evt => {
-          if (prefs.xhrBreakpointsVisible) {
-            evt.stopPropagation();
-          }
-          this.setState({ showXHRInput: true });
-        },
-        "plus",
-        "plus",
-        L10N.getStr("xhrBreakpoints.label")
-      )
-    );
-
-    return buttons;
-  }
-
   getScopeItem() {
     return {
       header: L10N.getStr("scopes.header"),
@@ -126,21 +104,6 @@ class SecondaryPanes extends Component {
       opened: prefs.scopesVisible,
       onToggle: opened => {
         prefs.scopesVisible = opened;
-      },
-    };
-  }
-
-  getXHRItem() {
-    return {
-      header: L10N.getStr("xhrBreakpoints.header"),
-      className: "xhr-breakpoints-pane",
-      buttons: this.xhrBreakpointsHeaderButtons(),
-      component: (
-        <XHRBreakpoints showInput={this.state.showXHRInput} onXHRAdded={this.onXHRAdded} />
-      ),
-      opened: prefs.xhrBreakpointsVisible,
-      onToggle: opened => {
-        prefs.xhrBreakpointsVisible = opened;
       },
     };
   }
@@ -240,12 +203,11 @@ class SecondaryPanes extends Component {
   }
 
   render() {
-    const { skipPausing } = this.props;
     return (
       <div className="secondary-panes-wrapper">
         <CommandBar horizontal={this.props.horizontal} />
         <FrameTimeline />
-        <div className={classnames("secondary-panes", skipPausing && "skip-pausing")}>
+        <div className={classnames("secondary-panes")}>
           {this.props.horizontal ? this.renderHorizontalLayout() : this.renderVerticalLayout()}
         </div>
       </div>
@@ -278,7 +240,6 @@ const mapStateToProps = state => {
     renderWhyPauseDelay: getRenderWhyPauseDelay(state),
     selectedFrame,
     shouldLogExceptions: getShouldLogExceptions(state),
-    skipPausing: getSkipPausing(state),
     source: selectedFrame && getSourceFromId(state, selectedFrame.location.sourceId),
   };
 };

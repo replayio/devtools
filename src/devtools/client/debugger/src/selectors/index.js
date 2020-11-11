@@ -34,23 +34,6 @@ export { isSelectedFrameVisible } from "./isSelectedFrameVisible";
 export { getCallStackFrames } from "./getCallStackFrames";
 export { getBreakpointSources } from "./breakpointSources";
 export { isLineInScope } from "./isLineInScope";
-export { getXHRBreakpoints, shouldPauseOnAnyXHR } from "./breakpoints";
+export { shouldPauseOnAnyXHR } from "./breakpoints";
 export * from "./visibleColumnBreakpoints";
 export { getSelectedFrame, getVisibleSelectedFrame, getFramePositions } from "./pause";
-
-/*
-
-import { objectInspector } from "devtools-reps";
-
-const { reducer } = objectInspector;
-
-Object.keys(reducer).forEach(function(key) {
-  if (key === "default" || key === "__esModule") {
-    return;
-  }
-  Object.defineProperty(module.exports, key, {
-    enumerable: true,
-    get: reducer[key],
-  });
-});
-*/

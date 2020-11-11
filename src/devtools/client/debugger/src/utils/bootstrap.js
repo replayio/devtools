@@ -61,10 +61,8 @@ let currentTabs;
 
 export function updatePrefs(state) {
   const previousPendingBreakpoints = currentPendingBreakpoints;
-  const previousXHRBreakpoints = currentXHRBreakpoints;
   const previousTabs = currentTabs;
   currentPendingBreakpoints = selectors.getPendingBreakpoints(state);
-  currentXHRBreakpoints = selectors.getXHRBreakpoints(state);
   currentTabs = selectors.getTabs(state);
 
   if (previousPendingBreakpoints && currentPendingBreakpoints !== previousPendingBreakpoints) {
@@ -73,9 +71,5 @@ export function updatePrefs(state) {
 
   if (previousTabs && previousTabs !== currentTabs) {
     asyncStore.tabs = persistTabs(currentTabs);
-  }
-
-  if (currentXHRBreakpoints !== previousXHRBreakpoints) {
-    asyncStore.xhrBreakpoints = currentXHRBreakpoints;
   }
 }
