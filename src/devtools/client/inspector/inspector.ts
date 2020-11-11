@@ -823,11 +823,11 @@ export class Inspector {
         const ChangesView = require("devtools/client/inspector/changes/ChangesView");
         panel = new ChangesView(this, this.panelWin);
         break;
-      case "computedview":
+      case "oldcomputedview":
         const { ComputedViewTool } = require("devtools/client/inspector/computed/computed");
         panel = new ComputedViewTool(this, this.panelWin);
         break;
-      case "wrappedcomputedview":
+      case "computedview":
         panel = new ComputedPanel(this);
         break;
       case "layoutview":
