@@ -45,7 +45,7 @@ function BoxModel(inspector, window) {
   this.onSidebarSelect = this.onSidebarSelect.bind(this);
 
   this.inspector.selection.on("new-node-front", this.onNewSelection);
-//  this.inspector.sidebar.on("select", this.onSidebarSelect);
+  // this.inspector.sidebar.on("select", this.onSidebarSelect);
 }
 
 BoxModel.prototype = {
@@ -55,7 +55,7 @@ BoxModel.prototype = {
    */
   destroy() {
     this.inspector.selection.off("new-node-front", this.onNewSelection);
-    this.inspector.sidebar.off("select", this.onSidebarSelect);
+    // this.inspector.sidebar.off("select", this.onSidebarSelect);
 
     if (this._tooltip) {
       this._tooltip.destroy();

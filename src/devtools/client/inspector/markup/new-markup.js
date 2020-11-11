@@ -67,7 +67,7 @@ class MarkupView {
   }
 
   destroy() {
-    this.inspector.sidebar.off("markupview-selected", this.update);
+    // this.inspector.sidebar.off("markupview-selected", this.update);
     this.selection.off("new-node-front", this.update);
 
     if (this._eventTooltip) {

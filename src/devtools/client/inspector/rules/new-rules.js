@@ -66,7 +66,7 @@ class RulesView {
     this.updateClassList = this.updateClassList.bind(this);
     this.updateRules = this.updateRules.bind(this);
 
-//    this.inspector.sidebar.on("select", this.onSelection);
+    // this.inspector.sidebar.on("select", this.onSelection);
     this.selection.on("detached-front", this.onSelection);
     this.selection.on("new-node-front", this.onSelection);
 
@@ -111,7 +111,7 @@ class RulesView {
   }
 
   destroy() {
-    this.inspector.sidebar.off("select", this.onSelection);
+    // this.inspector.sidebar.off("select", this.onSelection);
     this.selection.off("detached-front", this.onSelection);
     this.selection.off("new-node-front", this.onSelection);
 
@@ -272,9 +272,10 @@ class RulesView {
    * Returns true if the rules panel is visible, and false otherwise.
    */
   isPanelVisible() {
-    return this.inspector.is3PaneModeEnabled
-      ? true
-      : this.inspector?.sidebar?.getCurrentTabID() === "newruleview";
+    return this.inspector?.toolbox?.currentTool === "inspector";
+    // return this.inspector.is3PaneModeEnabled
+    //   ? true
+    //   : this.inspector?.sidebar?.getCurrentTabID() === "newruleview";
   }
 
   /**
