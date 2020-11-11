@@ -13,6 +13,7 @@ export interface InspectorPanel {
   id: string;
   title: string;
   panel: ReactElement;
+  destroy(): void;
 }
 
 interface Panels {
