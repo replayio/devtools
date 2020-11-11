@@ -1412,8 +1412,8 @@ function ComputedViewTool(inspector, window) {
   this.inspector.selection.on("detached-front", this.onDetachedFront);
   this.inspector.selection.on("new-node-front", this.onSelected);
   this.inspector.selection.on("pseudoclass", this.refresh);
-  this.inspector.sidebar.on("computedview-selected", this.onPanelSelected);
-  this.inspector.styleChangeTracker.on("style-changed", this.refresh);
+  // this.inspector.sidebar.on("computedview-selected", this.onPanelSelected);
+  // this.inspector.styleChangeTracker.on("style-changed", this.refresh);
 
   this.computedView.selectElement(null);
 
@@ -1452,9 +1452,9 @@ ComputedViewTool.prototype = {
     }
 
     if (selectElement) {
-      const done = this.inspector.updating("computed-view");
+      // const done = this.inspector.updating("computed-view");
       await this.computedView.selectElement(this.inspector.selection.nodeFront);
-      done();
+      // done();
     }
   },
 
@@ -1473,12 +1473,12 @@ ComputedViewTool.prototype = {
   },
 
   destroy: function () {
-    this.inspector.styleChangeTracker.off("style-changed", this.refresh);
-    this.inspector.sidebar.off("computedview-selected", this.refresh);
+    // this.inspector.styleChangeTracker.off("style-changed", this.refresh);
+    // this.inspector.sidebar.off("computedview-selected", this.refresh);
     this.inspector.selection.off("pseudoclass", this.refresh);
     this.inspector.selection.off("new-node-front", this.onSelected);
     this.inspector.selection.off("detached-front", this.onDetachedFront);
-    this.inspector.sidebar.off("computedview-selected", this.onPanelSelected);
+    // this.inspector.sidebar.off("computedview-selected", this.onPanelSelected);
 
     this.computedView.destroy();
 

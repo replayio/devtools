@@ -912,7 +912,7 @@ HTMLBreadcrumbs.prototype = {
       this.setCursor(idx);
     }
 
-    const doneUpdating = this.inspector.updating("breadcrumbs");
+    // const doneUpdating = this.inspector.updating("breadcrumbs");
 
     this.updateSelectors();
 
@@ -921,7 +921,7 @@ HTMLBreadcrumbs.prototype = {
       try {
         this.scroll();
         this.inspector.emit("breadcrumbs-updated", this.selection.nodeFront);
-        doneUpdating();
+        // doneUpdating();
       } catch (e) {
         // Only log this as an error if we haven't been destroyed in the meantime.
         if (!this.isDestroyed) {

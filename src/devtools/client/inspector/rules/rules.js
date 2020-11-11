@@ -1689,9 +1689,9 @@ function RuleViewTool(inspector, window) {
   this.inspector.selection.on("detached-front", this.onDetachedFront);
   this.inspector.selection.on("new-node-front", this.onSelected);
   this.inspector.selection.on("pseudoclass", this.refresh);
-  this.inspector.ruleViewSideBar.on("ruleview-selected", this.onPanelSelected);
-  this.inspector.sidebar.on("ruleview-selected", this.onPanelSelected);
-  this.inspector.styleChangeTracker.on("style-changed", this.refresh);
+  // this.inspector.ruleViewSideBar.on("ruleview-selected", this.onPanelSelected);
+  // this.inspector.sidebar.on("ruleview-selected", this.onPanelSelected);
+  // this.inspector.styleChangeTracker.on("style-changed", this.refresh);
 
   this.onSelected();
 }
@@ -1728,8 +1728,8 @@ RuleViewTool.prototype = {
     }
 
     if (selectElement) {
-      const done = this.inspector.updating("rule-view");
-      this.view.selectElement(this.inspector.selection.nodeFront).then(done, done);
+      // const done = this.inspector.updating("rule-view");
+      this.view.selectElement(this.inspector.selection.nodeFront); //.then(done, done);
     }
   },
 
@@ -1758,11 +1758,11 @@ RuleViewTool.prototype = {
   },
 
   destroy: function () {
-    this.inspector.styleChangeTracker.off("style-changed", this.refresh);
+    // this.inspector.styleChangeTracker.off("style-changed", this.refresh);
     this.inspector.selection.off("detached-front", this.onDetachedFront);
     this.inspector.selection.off("pseudoclass", this.refresh);
     this.inspector.selection.off("new-node-front", this.onSelected);
-    this.inspector.sidebar.off("ruleview-selected", this.onPanelSelected);
+    // this.inspector.sidebar.off("ruleview-selected", this.onPanelSelected);
 
     this.view.off("ruleview-refreshed", this.onViewRefreshed);
 
