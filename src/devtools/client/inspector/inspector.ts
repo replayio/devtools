@@ -299,7 +299,7 @@ export class Inspector {
     // All the components are initialized. Take care of the remaining initialization
     // and setup.
     this.breadcrumbs = new HTMLBreadcrumbs(this);
-    // this.setupSearchBox();
+    this.setupSearchBox();
     // await this.setupToolbar();
 
     // this.onNewSelection();
