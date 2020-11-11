@@ -20,6 +20,7 @@ interface Panels {
   markupView?: ReactElement;
   rulesPanel?: InspectorPanel;
   layoutPanel?: InspectorPanel;
+  computedPanel?: InspectorPanel;
 }
 
 class InspectorApp extends Component<PropsFromRedux & Panels> {
@@ -125,7 +126,14 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
   }
 
   renderSidebar() {
-    const { rulesPanel, layoutPanel, is3PaneModeEnabled, activeTab, setActiveTab } = this.props;
+    const {
+      rulesPanel,
+      layoutPanel,
+      computedPanel,
+      is3PaneModeEnabled,
+      activeTab,
+      setActiveTab,
+    } = this.props;
 
     const panels: InspectorPanel[] = [];
     if (rulesPanel && !is3PaneModeEnabled) {
@@ -134,7 +142,9 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
     if (layoutPanel) {
       panels.push(layoutPanel);
     }
-
+    if (computedPanel) {
+      panels.push(computedPanel);
+    }
     let activePanel: ReactElement | undefined;
 
     const tabs = panels.map(panel => {
@@ -181,7 +191,7 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
               {tabs}
             </ul>
           </nav>
-          {activePanel}
+          <div className="panels">{activePanel}</div>
         </div>
       </div>
     );

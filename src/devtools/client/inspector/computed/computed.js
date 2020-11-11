@@ -499,12 +499,13 @@ CssComputedView.prototype = {
   },
 
   isPanelVisible: function () {
-    return (
-      this.inspector.toolbox &&
-      this.inspector.sidebar &&
-      this.inspector.toolbox.currentTool === "inspector" &&
-      this.inspector.sidebar.getCurrentTabID() == "computedview"
-    );
+    return this.inspector?.toolbox?.currentTool === "inspector";
+    // return (
+    //   this.inspector.toolbox &&
+    //   this.inspector.sidebar &&
+    //   this.inspector.toolbox.currentTool === "inspector" &&
+    //   this.inspector.sidebar.getCurrentTabID() == "computedview"
+    // );
   },
 
   /**

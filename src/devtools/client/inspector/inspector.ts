@@ -47,6 +47,7 @@ const { InspectorSearch } = require("devtools/client/inspector/inspector-search"
 // const { ToolSidebar } = require("devtools/client/inspector/toolsidebar");
 const MarkupView = require("devtools/client/inspector/markup/markup");
 const NewMarkupView = require("devtools/client/inspector/markup/new-markup");
+const { ComputedPanel } = require("devtools/client/inspector/computed/panel");
 const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");
 
 const CSSProperties = require("./css-properties");
@@ -825,6 +826,9 @@ export class Inspector {
       case "computedview":
         const { ComputedViewTool } = require("devtools/client/inspector/computed/computed");
         panel = new ComputedViewTool(this, this.panelWin);
+        break;
+      case "wrappedcomputedview":
+        panel = new ComputedPanel(this);
         break;
       case "layoutview":
         const LayoutView = require("devtools/client/inspector/layout/layout");
