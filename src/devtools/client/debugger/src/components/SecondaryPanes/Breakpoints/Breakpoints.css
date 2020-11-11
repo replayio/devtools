@@ -122,7 +122,7 @@
   align-items: center;
 }
 
-.breakpoints-list .breakpoint-navigation-commands  {
+.breakpoints-list .breakpoint-navigation-commands {
   display: flex;
   flex-direction: row;
 }
@@ -163,10 +163,6 @@
 .breakpoints-exceptions-options {
   padding-top: 4px;
   padding-bottom: 4px;
-}
-
-.xhr-breakpoints-pane .breakpoints-exceptions-options {
-  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 .breakpoints-exceptions-options:not(.empty) {

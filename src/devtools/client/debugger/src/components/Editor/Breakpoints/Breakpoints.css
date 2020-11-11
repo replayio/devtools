@@ -32,7 +32,8 @@
   pointer-events: none;
 }
 
-.editor-wrapper :not(.empty-line):not(.new-breakpoint)
+.editor-wrapper
+  :not(.empty-line):not(.new-breakpoint)
   > .CodeMirror-gutter-wrapper
   > .CodeMirror-linenumber:hover::after {
   content: "";
@@ -76,10 +77,6 @@
   stroke-opacity: var(--breakpoint-disabled-opacity);
 }
 
-.editor-wrapper.skip-pausing .editor.new-breakpoint svg {
-  fill-opacity: var(--breakpoint-skipped-opacity);
-}
-
 /* Columnn breakpoints */
 .column-breakpoint {
   display: inline;
@@ -113,8 +110,4 @@
 .column-breakpoint.disabled svg {
   fill-opacity: var(--breakpoint-disabled-opacity);
   stroke-opacity: var(--breakpoint-disabled-opacity);
-}
-
-.editor-wrapper.skip-pausing .column-breakpoint svg {
-  fill-opacity: var(--breakpoint-skipped-opacity);
 }

@@ -28,22 +28,11 @@ async function syncBreakpoints() {
   });
 }
 
-function syncXHRBreakpoints() {
-  asyncStore.xhrBreakpoints.then(bps => {
-    bps.forEach(({ path, method, disabled }) => {
-      if (!disabled) {
-        clientCommands.setXHRBreakpoint(path, method);
-      }
-    });
-  });
-}
-
 export async function loadInitialState() {
   const pendingBreakpoints = await asyncStore.pendingBreakpoints;
   const tabs = { tabs: await asyncStore.tabs };
-  const xhrBreakpoints = await asyncStore.xhrBreakpoints;
 
-  const breakpoints = initialBreakpointsState(xhrBreakpoints);
+  const breakpoints = initialBreakpointsState();
 
   return {
     pendingBreakpoints,
@@ -79,6 +68,5 @@ export async function onConnect() {
   );
 
   await syncBreakpoints();
-  syncXHRBreakpoints();
   return { store, actions: boundActions, selectors, client: clientCommands };
 }

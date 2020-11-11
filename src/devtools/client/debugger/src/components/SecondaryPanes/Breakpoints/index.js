@@ -5,10 +5,7 @@
 //
 
 import React, { Component } from "react";
-import classnames from "classnames";
 import { connect } from "../../../utils/connect";
-
-import ExceptionOption from "./ExceptionOption";
 
 import Breakpoint from "./Breakpoint";
 
@@ -41,27 +38,6 @@ class Breakpoints extends Component {
     }
     this.headlessEditor.destroy();
     this.headlessEditor = null;
-  }
-
-  renderExceptionsOptions() {
-    const { breakpointSources, shouldLogExceptions, logExceptions } = this.props;
-
-    const isEmpty = breakpointSources.length == 0;
-
-    return (
-      <div
-        className={classnames("breakpoints-exceptions-options", {
-          empty: isEmpty,
-        })}
-      >
-        <ExceptionOption
-          className="breakpoints-exceptions"
-          label={L10N.getStr("logExceptionsItem")}
-          isChecked={shouldLogExceptions}
-          onChange={() => logExceptions(!shouldLogExceptions)}
-        />
-      </div>
-    );
   }
 
   renderBreakpoints() {
