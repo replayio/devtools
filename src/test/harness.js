@@ -479,10 +479,7 @@ async function pickNode(x, y) {
 }
 
 async function selectMarkupNode(node) {
-  const container = node.closest(".child");
-  const { x, y } = boundsCenter(container.getBoundingClientRect());
-  const event = new MouseEvent("mousedown", { clientX: x, clientY: y });
-  container.dispatchEvent(event);
+  node.click();
 }
 
 async function checkComputedStyle(style, value) {
