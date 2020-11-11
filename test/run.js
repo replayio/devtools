@@ -136,7 +136,7 @@ async function runMatchingTests() {
 }
 
 function tmpFile() {
-  return os.tmpdir() + ((Math.random() * 1e9) | 0);
+  return os.tmpdir() + "/" + ((Math.random() * 1e9) | 0);
 }
 
 function createTestScript({ path }) {
@@ -156,6 +156,21 @@ function createTestScript({ path }) {
   return generatedScriptPath;
 }
 
+const GeckoSuffixes = [
+  "Contents/MacOS/replay", // macOS
+  "bin/replay", // linux
+];
+
+function findGeckoPath() {
+  for (const suffix of GeckoSuffixes) {
+    const path = `${gInstallDir}/${suffix}`;
+    if (fs.existsSync(path)) {
+      return path;
+    }
+  }
+  console.error("Can't find Gecko!");
+}
+
 let failures = [];
 
 async function runTest(path, local, timeout = 60, env = {}) {
@@ -173,10 +188,13 @@ async function runTest(path, local, timeout = 60, env = {}) {
   const profileArgs = [];
   if (!process.env.NORMAL_PROFILE) {
     const profile = tmpFile();
+    fs.mkdirSync(profile);
     profileArgs.push("-profile", profile);
   }
 
-  const gecko = spawn(`${gInstallDir}/Contents/MacOS/replay`, ["-foreground", ...profileArgs], {
+  const geckoPath = findGeckoPath();
+
+  const gecko = spawn(geckoPath, ["-foreground", ...profileArgs], {
     env: {
       ...process.env,
       ...env,
