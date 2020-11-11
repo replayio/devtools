@@ -1,4 +1,3 @@
-import ReactDOM from "react-dom";
 import React from "react";
 
 import { LocalizationHelper } from "devtools/shared/l10n";
@@ -25,7 +24,7 @@ function sameLocation(m1, m2) {
 // If you do modify this, make sure you change EVERY single reference to this 11px width in
 // the codebase. This includes, but is not limited to, the Timeline component, Message component,
 // the timeline utilities, and the timeline styling.
-function Marker({ message, onMarkerClick, onMarkerMouseEnter, onMarkerMouseLeave }) {
+export function Marker({ message, onMarkerClick, onMarkerMouseEnter, onMarkerMouseLeave }) {
   // The stroke path element here has `pointer-events: none` enabled, so that it defers the event
   // handling to the fill path element. Without that property, we'd have to set the event handlers
   // on the stroke path element as well.
@@ -59,7 +58,6 @@ class Message extends React.Component {
       zoomRegion,
       overlayWidth,
       visibleIndex,
-      index,
       onMarkerClick,
       onMarkerMouseEnter,
       onMarkerMouseLeave,

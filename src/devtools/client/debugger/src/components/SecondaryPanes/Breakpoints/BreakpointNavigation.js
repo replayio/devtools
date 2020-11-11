@@ -7,7 +7,15 @@ const { getAnalysisPointsForLocation } = selectors;
 import actions from "../../../actions";
 import { findLast, find } from "lodash";
 
-function BreakpointNavigation({ executionPoint, seekToPosition, analysisPoints }) {
+import BreakpointTimeline from "./BreakpointTimeline";
+
+function BreakpointNavigation({
+  executionPoint,
+  breakpoint,
+  seekToPosition,
+  analysisPoints,
+  setZoomedBreakpoint,
+}) {
   const navigateToPoint = point => {
     if (point) {
       seekToPosition(point.point, point.time);
@@ -19,11 +27,11 @@ function BreakpointNavigation({ executionPoint, seekToPosition, analysisPoints }
       return "No hits";
     }
 
-    const pastPoints = analysisPoints
-      ? analysisPoints.filter(point => BigInt(point.point) < BigInt(executionPoint))
+    const points = analysisPoints
+      ? analysisPoints.filter(point => BigInt(point.point) <= BigInt(executionPoint))
       : [];
 
-    return `${pastPoints.length} of ${analysisPoints ? analysisPoints.length : 0} hits`;
+    return `${points.length} of ${analysisPoints ? analysisPoints.length : 0} hits`;
   };
 
   let prev, next;
@@ -55,6 +63,9 @@ function BreakpointNavigation({ executionPoint, seekToPosition, analysisPoints }
           <div className="img resume" />
         </button>
       </div>
+      {analysisPoints?.length ? (
+        <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
+      ) : null}
       {executionPoint ? <div className="breakpoint-navigation-status">{getStatus()}</div> : null}
     </div>
   );

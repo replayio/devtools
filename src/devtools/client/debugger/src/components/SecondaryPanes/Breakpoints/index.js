@@ -20,6 +20,13 @@ import "./Breakpoints.css";
 
 class Breakpoints extends Component {
   headlessEditor;
+  state = {
+    zoomedBreakpoint: null,
+  };
+
+  setZoomedBreakpoint = breakpoint => {
+    this.setState({ zoomedBreakpoint: breakpoint });
+  };
 
   componentWillUnmount() {
     this.removeEditor();
@@ -42,6 +49,7 @@ class Breakpoints extends Component {
 
   renderBreakpoints() {
     const { breakpointSources } = this.props;
+    const { zoomedBreakpoint } = this.state;
     if (!breakpointSources.length) {
       return null;
     }
@@ -53,15 +61,21 @@ class Breakpoints extends Component {
         {breakpointSources.map(({ source, breakpoints, i }) => {
           const sortedBreakpoints = sortSelectedBreakpoints(breakpoints);
 
-          return sortedBreakpoints.map(breakpoint => (
-            <Breakpoint
-              breakpoint={breakpoint}
-              source={source}
-              sources={sources}
-              editor={this.getEditor()}
-              key={makeBreakpointId(breakpoint.location)}
-            />
-          ));
+          return sortedBreakpoints.map(breakpoint => {
+            const zoomed = breakpoint.id === zoomedBreakpoint?.id;
+
+            return (
+              <Breakpoint
+                breakpoint={breakpoint}
+                source={source}
+                sources={sources}
+                editor={this.getEditor()}
+                key={makeBreakpointId(breakpoint.location)}
+                setZoomedBreakpoint={this.setZoomedBreakpoint}
+                zoomed={zoomed}
+              />
+            );
+          });
         })}
       </div>
     );

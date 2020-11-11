@@ -29,6 +29,10 @@
 
 .breakpoints-list {
   padding: 8px 0px;
+  --replaying-marker-fill: #3a8edb;
+  --replaying-marker-stroke: #266fb1;
+  --replaying-paused-marker-fill: #5b41ff;
+  --replaying-paused-marker-stroke: #3d23e2;
 }
 
 .breakpoints-list .breakpoint {
@@ -37,7 +41,6 @@
   overflow: hidden;
   color: var(--theme-text-color-strong);
   position: relative;
-  cursor: pointer;
   margin: 0px 8px;
   border: 1px solid var(--theme-splitter-color);
   border-radius: 4px;
@@ -80,6 +83,10 @@
   padding: 0px 8px;
   border-radius: 8px;
   font-size: 0.8rem;
+}
+
+.breakpoints-list .breakpoint-heading-status.focused {
+  background-color: var(--dark-blue);
 }
 
 .breakpoints-list .breakpoint-heading-actions {
@@ -146,6 +153,60 @@
 
 .breakpoints-list .breakpoint-navigation-status {
   color: var(--theme-comment);
+  min-width: 70px;
+  text-align: end;
+}
+
+.breakpoints-list .breakpoint-navigation-timeline-container {
+  overflow-x: hidden;
+  padding: 0px 4px;
+  margin: 0px 12px;
+  flex-grow: 1;
+  display: flex;
+}
+
+.breakpoints-list .breakpoint-navigation-timeline {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  background: #e4eaf5;
+  position: relative;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.breakpoints-list .breakpoint-navigation-timeline-point {
+  transition: 200ms;
+  cursor: pointer;
+  position: absolute;
+}
+
+.breakpoints-list .breakpoint-navigation-timeline-point .fill {
+  fill: var(--replaying-marker-fill);
+}
+
+.breakpoints-list .breakpoint-navigation-timeline-point .stroke {
+  stroke: var(--replaying-marker-stroke);
+}
+
+.breakpoints-list .breakpoint-navigation-timeline-point.future .fill {
+  fill: #88b4fa;
+}
+
+.breakpoints-list .breakpoint-navigation-timeline-point.future .stroke {
+  stroke: #7ba6ea;
+}
+
+.breakpoints-list .breakpoint-navigation-timeline-point.pause {
+  z-index: var(--z-index-1--paused-message);
+}
+
+.breakpoints-list .breakpoint-navigation-timeline-point.pause .fill {
+  fill: var(--replaying-paused-marker-fill);
+}
+
+.breakpoints-list .breakpoint-navigation-timeline-point.pause .stroke {
+  stroke: var(--replaying-paused-marker-stroke);
 }
 
 .breakpoints-exceptions {

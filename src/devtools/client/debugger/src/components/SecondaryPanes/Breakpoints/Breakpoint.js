@@ -50,7 +50,7 @@ class Breakpoint extends PureComponent {
   }
 
   render() {
-    const { breakpoint, source, editor } = this.props;
+    const { breakpoint, source, editor, setZoomedBreakpoint, zoomed } = this.props;
 
     return (
       <div
@@ -61,9 +61,9 @@ class Breakpoint extends PureComponent {
         onClick={this.selectBreakpoint}
         onContextMenu={this.onContextMenu}
       >
-        <BreakpointHeading source={source} breakpoint={breakpoint} />
+        <BreakpointHeading source={source} breakpoint={breakpoint} zoomed={zoomed} />
         <BreakpointOptions editor={editor} breakpoint={breakpoint} />
-        <BreakpointNavigation breakpoint={breakpoint} />
+        <BreakpointNavigation breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
       </div>
     );
   }
