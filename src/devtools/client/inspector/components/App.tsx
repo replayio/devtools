@@ -1,5 +1,6 @@
 import React, { Component, ReactElement } from "react";
 import { connect, ConnectedProps } from "react-redux";
+const classnames = require("classnames");
 import { UIState } from "ui/state";
 import * as InspectorActions from "../actions";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
@@ -157,10 +158,7 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
         );
       }
 
-      let className = "tabs-menu-item";
-      if (isPanelSelected) {
-        className += " is-active";
-      }
+      const className = classnames("tabs-menu-item", isPanelSelected ? "is-active" : undefined);
 
       return (
         <li key={panel.id} className={className} role="presentation">
