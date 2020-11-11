@@ -837,11 +837,11 @@ export class Inspector {
       case "markupview":
         panel = new NewMarkupView(this, this.panelWin);
         break;
-      case "newruleview":
+      case "ruleview":
         const RulesView = require("devtools/client/inspector/rules/new-rules");
         panel = new RulesView(this, this.panelWin);
         break;
-      case "ruleview":
+      case "oldruleview":
         const { RuleViewTool } = require("devtools/client/inspector/rules/rules");
         panel = new RuleViewTool(this, this.panelWin);
         break;

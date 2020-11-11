@@ -227,6 +227,10 @@ class RulesView {
     return this.inspector.highlighters;
   }
 
+  get view() {
+    return this;
+  }
+
   /**
    * Get the type of a given node in the Rules view.
    *
