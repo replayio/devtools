@@ -45,7 +45,7 @@ function BoxModel(inspector, window) {
   this.onSidebarSelect = this.onSidebarSelect.bind(this);
 
   this.inspector.selection.on("new-node-front", this.onNewSelection);
-  this.inspector.sidebar.on("select", this.onSidebarSelect);
+//  this.inspector.sidebar.on("select", this.onSidebarSelect);
 }
 
 BoxModel.prototype = {
@@ -136,7 +136,7 @@ BoxModel.prototype = {
     const lastRequest = async function () {
       if (
         !this.inspector ||
-        !this.isPanelVisible() ||
+        // !this.isPanelVisible() ||
         !this.inspector.selection.isConnected() ||
         !this.inspector.selection.isElementNode()
       ) {
@@ -226,9 +226,9 @@ BoxModel.prototype = {
    * Selection 'new-node-front' event handler.
    */
   onNewSelection() {
-    if (!this.isPanelVisibleAndNodeValid()) {
-      return;
-    }
+    // if (!this.isPanelVisibleAndNodeValid()) {
+    //   return;
+    // }
 
     this.updateBoxModel("new-selection");
   },

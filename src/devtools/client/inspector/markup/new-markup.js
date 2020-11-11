@@ -29,7 +29,7 @@ class MarkupView {
     this.onMouseLeaveNode = this.onMouseLeaveNode.bind(this);
     this.update = this.update.bind(this);
 
-    this.inspector.sidebar.on("markupview-selected", this.update);
+    // this.inspector.sidebar.on("markupview-selected", this.update);
     this.selection.on("new-node-front", this.update);
 
     this.init();
