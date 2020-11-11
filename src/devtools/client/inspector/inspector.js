@@ -6,7 +6,6 @@
 
 const Services = require("Services");
 const EventEmitter = require("devtools/shared/event-emitter");
-const createStore = require("devtools/client/inspector/store");
 const InspectorStyleChangeTracker = require("devtools/client/inspector/shared/style-change-tracker");
 const { log } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
@@ -137,7 +136,7 @@ class Inspector {
     this.panelWin = window;
     this.panelWin.inspector = this;
     this.telemetry = toolbox.telemetry;
-    this.store = createStore();
+    this.store = window.app.store;
 
     // Map [panel id => panel instance]
     // Stores all the instances of sidebar panels like rule view, computed view, ...
