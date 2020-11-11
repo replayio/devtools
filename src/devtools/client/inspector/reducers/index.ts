@@ -4,8 +4,8 @@
 
 "use strict";
 
-import { InspectorAction } from "./actions";
-import { initialInspectorState, InspectorState } from "./state";
+import { InspectorAction } from "../actions";
+import { initialInspectorState, InspectorState } from "../state";
 
 export const boxModel = require("devtools/client/inspector/boxmodel/reducers/box-model");
 export const changes = require("devtools/client/inspector/changes/reducers/changes");
