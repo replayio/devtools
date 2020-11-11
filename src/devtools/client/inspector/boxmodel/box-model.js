@@ -46,6 +46,8 @@ function BoxModel(inspector, window) {
 
   this.inspector.selection.on("new-node-front", this.onNewSelection);
   // this.inspector.sidebar.on("select", this.onSidebarSelect);
+
+  this.onNewSelection();
 }
 
 BoxModel.prototype = {

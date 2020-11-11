@@ -73,6 +73,8 @@ class RulesView {
     this.init();
 
     EventEmitter.decorate(this);
+
+    this.onSelection();
   }
 
   init() {
