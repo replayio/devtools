@@ -154,11 +154,11 @@ export function createPendingBreakpoint(bp) {
   };
 }
 
-export function getSelectedText(breakpoint, selectedSource) {
+export function getSelectedText(breakpoint) {
   return breakpoint.text;
 }
 
-export function sortSelectedBreakpoints(breakpoints, selectedSource) {
+export function sortSelectedBreakpoints(breakpoints) {
   return sortBy(breakpoints, [
     // Priority: line number, undefined column, column number
     breakpoint => breakpoint.location.line,

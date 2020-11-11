@@ -393,8 +393,8 @@ function addEventListenerLogpoints(logpoints) {
 }
 
 async function toggleExceptionLogging() {
-  const elem = await waitUntil(() => document.querySelector(".breakpoints-exceptions input"));
-  elem.click();
+  const shouldLogExceptions = app.selectors.getShouldLogExceptions();
+  app.actions.logExceptions(!shouldLogExceptions);
 }
 
 async function toggleMappedSources() {

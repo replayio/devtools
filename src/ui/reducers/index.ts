@@ -5,6 +5,7 @@ import * as eventListenerBreakpointsSelectors from "devtools/client/debugger/src
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import consoleReducers from "devtools/client/webconsole/reducers";
 import * as consoleSelectors from "devtools/client/webconsole/selectors";
+import * as debuggerSelectors from "devtools/client/debugger/src/selectors";
 
 export const reducers = {
   app,
@@ -20,4 +21,5 @@ export const selectors = {
   ...metadataSelectors,
   ...eventListenerBreakpointsSelectors,
   ...consoleSelectors,
+  ...debuggerSelectors,
 };

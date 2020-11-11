@@ -6,8 +6,9 @@
   overflow-x: auto;
 }
 
-.breakpoints-toggle {
-  margin: 2px 3px;
+.breakpoints-list *:focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
 }
 
 .breakpoints-exceptions-options *,
@@ -15,40 +16,6 @@
   user-select: none;
 }
 
-.breakpoints-list {
-  padding: 4px 0;
-}
-
-.breakpoints-list .breakpoint-heading {
-  text-overflow: ellipsis;
-  width: 100%;
-  font-size: 12px;
-  line-height: 16px;
-}
-
-.breakpoint-heading:not(:first-child) {
-  margin-top: 2px;
-}
-
-.breakpoints-list .breakpoint-heading .filename {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.breakpoints-list .breakpoint-heading .filename span {
-  opacity: 0.7;
-  padding-left: 4px;
-}
-
-.breakpoints-list .breakpoint-heading,
-.breakpoints-list .breakpoint {
-  color: var(--theme-text-color-strong);
-  position: relative;
-  cursor: pointer;
-}
-
-.breakpoints-list .breakpoint-heading,
-.breakpoints-list .breakpoint,
 .breakpoints-exceptions,
 .breakpoints-exceptions-caught {
   display: flex;
@@ -58,6 +25,127 @@
   padding-bottom: 2px;
   padding-inline-start: 16px;
   padding-inline-end: 12px;
+}
+
+.breakpoints-list {
+  padding: 8px 0px;
+}
+
+.breakpoints-list .breakpoint {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--theme-text-color-strong);
+  position: relative;
+  cursor: pointer;
+  margin: 0px 8px;
+  border: 1px solid var(--theme-splitter-color);
+  border-radius: 4px;
+}
+
+.breakpoints-list .breakpoint:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+.breakpoints-list .breakpoint > *:not(:last-child) {
+  border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.breakpoints-list .breakpoint-heading {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 4px 4px 4px 8px;
+  justify-content: space-between;
+  background-color: var(--theme-toolbar-background);
+  color: var(--theme-text-color-strong);
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.breakpoints-list .breakpoint-heading-label {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.breakpoints-list .breakpoint-heading-status {
+  background-color: #5b41ff;
+  color: white;
+  margin-left: 8px;
+  padding: 0px 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.breakpoints-list .breakpoint-heading-actions {
+  display: flex;
+  flex-direction: row;
+}
+
+.breakpoints-list .breakpoint-options {
+  padding: 4px 8px 4px;
+}
+
+.breakpoints-list .breakpoint-options > * {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.breakpoints-list .breakpoint-options > *:not(:last-child) {
+  margin-bottom: 4px;
+}
+
+.breakpoints-list .breakpoint-options .img {
+  width: 12px;
+  margin-right: 4px;
+  color: var(--theme-splitter-color);
+}
+
+.breakpoints-list .breakpoint-options .condition-icon {
+  width: 12px;
+  margin-right: 4px;
+  text-align: center;
+}
+
+.breakpoints-list .breakpoint-navigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0px 8px 0px 0px;
+  background-color: var(--theme-toolbar-background);
+  align-items: center;
+}
+
+.breakpoints-list .breakpoint-navigation-commands  {
+  display: flex;
+  flex-direction: row;
+}
+
+.breakpoints-list .breakpoint-navigation-commands > * {
+  cursor: pointer;
+  padding: 4px;
+}
+
+.breakpoints-list .breakpoint-navigation-commands .img {
+  width: 14px;
+}
+
+.breakpoints-list .breakpoint-navigation-commands .disabled .img {
+  background: var(--theme-splitter-color);
+}
+
+.breakpoints-list .breakpoint-navigation-commands .disabled:hover {
+  background: inherit;
+}
+
+.breakpoints-list .breakpoint-navigation-status {
+  color: var(--theme-comment);
 }
 
 .breakpoints-exceptions {
@@ -103,19 +191,16 @@
   text-overflow: ellipsis;
 }
 
-html .breakpoints-list .breakpoint,
-html .breakpoints-list .breakpoint-heading,
 html .breakpoints-exceptions {
   border-left: 4px solid transparent;
 }
 
 html .breakpoints-list .breakpoint.paused {
-  background-color: var(--theme-toolbar-background-alt);
-  border-color: var(--breakpoint-active-color);
+  border-color: #5b41ff;
 }
 
-.breakpoints-list .breakpoint:hover {
-  background-color: var(--search-overlays-semitransparent);
+html .breakpoints-list .breakpoint.paused .breakpoint-heading {
+  background-color: var(--theme-toolbar-background-alt);
 }
 
 .breakpoint-line-close {
@@ -131,15 +216,6 @@ html .breakpoints-list .breakpoint.paused {
   padding-bottom: 1px;
 }
 
-.breakpoints-list .breakpoint:hover .breakpoint-line,
-.breakpoints-list .breakpoint-line-close:focus-within .breakpoint-line {
-  color: transparent;
-}
-
-.breakpoints-list .breakpoint.paused:hover {
-  border-color: var(--breakpoint-active-color-hover);
-}
-
 .breakpoints-list .breakpoint-label {
   display: inline-block;
   cursor: pointer;
@@ -147,6 +223,7 @@ html .breakpoints-list .breakpoint.paused {
   text-overflow: ellipsis;
   overflow: hidden;
   font-size: 11px;
+  margin-top: 1px;
 }
 
 .breakpoints-list .breakpoint-label span,
@@ -155,44 +232,12 @@ html .breakpoints-list .breakpoint.paused {
   line-height: 14px;
 }
 
-.breakpoint-checkbox {
-  margin-inline-start: 0px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  vertical-align: text-bottom;
-}
-
-.breakpoint-label .location {
-  width: 100%;
-  display: inline-block;
-  overflow-x: hidden;
-  text-overflow: ellipsis;
-  padding: 1px 0;
-  vertical-align: bottom;
-}
-
-.breakpoints-list .pause-indicator {
-  flex: 0 1 content;
-  order: 3;
-}
-
 .breakpoint .close-btn {
-  position: absolute;
-  /* hide button outside of row until hovered or focused */
-  top: -100px;
-  right: 12px;
-}
-
-/* Reveal the remove button on hover/focus */
-.breakpoint:hover .close-btn,
-.breakpoint .close-btn:focus {
-  top: calc(50% - 8px);
-}
-
-/* Hide the line number when revealing the remove button (since they're overlayed) */
-.breakpoint-line-close:focus-within .breakpoint-line,
-.breakpoint:hover .breakpoint-line {
   visibility: hidden;
+}
+
+.breakpoint:hover .close-btn {
+  visibility: visible;
 }
 
 .CodeMirror.cm-s-mozilla-breakpoint {
@@ -229,9 +274,4 @@ html .breakpoints-list .breakpoint.paused {
 
 .CodeMirror.cm-s-mozilla-breakpoint {
   padding-top: 1px;
-}
-
-.button-prev {
-  transform: rotate(180deg);
-  cursor: pointer;
 }

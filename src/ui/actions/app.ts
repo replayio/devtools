@@ -152,7 +152,10 @@ export function hideModal(): SetModalAction {
   };
 }
 
-export function setAnalysisPoints(points: PointDescription[], location: Location) {
+export function setAnalysisPoints(
+  points: PointDescription[],
+  location: Location
+): SetAnalysisPointsAction {
   return {
     type: "set_analysis_points",
     analysisPoints: points,
