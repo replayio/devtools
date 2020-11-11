@@ -11,14 +11,13 @@ import { connect } from "../../../utils/connect";
 import ExceptionOption from "./ExceptionOption";
 
 import Breakpoint from "./Breakpoint";
-import BreakpointHeading from "./BreakpointHeading";
 
 import actions from "../../../actions";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 
 import { makeBreakpointId, sortSelectedBreakpoints } from "../../../utils/breakpoint";
 
-import { getSelectedSource, getBreakpointSources } from "../../../selectors";
+import { getBreakpointSources } from "../../../selectors";
 
 import "./Breakpoints.css";
 
@@ -66,30 +65,27 @@ class Breakpoints extends Component {
   }
 
   renderBreakpoints() {
-    const { breakpointSources, selectedSource } = this.props;
+    const { breakpointSources } = this.props;
     if (!breakpointSources.length) {
       return null;
     }
 
-    const sources = [...breakpointSources.map(({ source, breakpoints }) => source)];
+    const sources = [...breakpointSources.map(({ source }) => source)];
 
     return (
       <div className="pane breakpoints-list">
         {breakpointSources.map(({ source, breakpoints, i }) => {
-          const sortedBreakpoints = sortSelectedBreakpoints(breakpoints, selectedSource);
+          const sortedBreakpoints = sortSelectedBreakpoints(breakpoints);
 
-          return [
-            <BreakpointHeading key={source.id} source={source} sources={sources} />,
-            ...sortedBreakpoints.map(breakpoint => (
-              <Breakpoint
-                breakpoint={breakpoint}
-                source={source}
-                selectedSource={selectedSource}
-                editor={this.getEditor()}
-                key={makeBreakpointId(breakpoint.location)}
-              />
-            )),
-          ];
+          return sortedBreakpoints.map(breakpoint => (
+            <Breakpoint
+              breakpoint={breakpoint}
+              source={source}
+              sources={sources}
+              editor={this.getEditor()}
+              key={makeBreakpointId(breakpoint.location)}
+            />
+          ));
         })}
       </div>
     );
@@ -98,7 +94,7 @@ class Breakpoints extends Component {
   render() {
     return (
       <div className="pane">
-        {this.renderExceptionsOptions()}
+        {/* {this.renderExceptionsOptions()} */}
         {this.renderBreakpoints()}
       </div>
     );
@@ -107,7 +103,6 @@ class Breakpoints extends Component {
 
 const mapStateToProps = state => ({
   breakpointSources: getBreakpointSources(state),
-  selectedSource: getSelectedSource(state),
 });
 
 export default connect(mapStateToProps, {

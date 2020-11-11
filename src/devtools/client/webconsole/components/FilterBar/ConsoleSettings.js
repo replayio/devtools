@@ -10,10 +10,9 @@ const { connect } = require("react-redux");
 const { createFactory } = require("react");
 const PropTypes = require("prop-types");
 
-const actions = require("devtools/client/webconsole/actions/index");
+const { actions } = require("ui/actions");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
-const { getFilteredMessagesCount } = require("devtools/client/webconsole/selectors/messages");
-const { getAllFilters } = require("devtools/client/webconsole/selectors/filters");
+const { selectors } = require("ui/reducers");
 
 // Additional Components
 const MenuButton = createFactory(require("devtools/client/shared/components/menu/MenuButton"));
@@ -41,8 +40,25 @@ class ConsoleSettings extends Component {
   }
 
   renderMenuItems() {
-    const { timestampsVisible, filters, filterToggle, timestampsToggle } = this.props;
+    const {
+      timestampsVisible,
+      filters,
+      filterToggle,
+      timestampsToggle,
+      shouldLogExceptions,
+      logExceptions,
+    } = this.props;
     const items = [];
+
+    items.push(
+      MenuItem({
+        key: "webconsole-console-settings-filter-errors",
+        checked: shouldLogExceptions,
+        className: "menu-item",
+        label: "Show Exceptions",
+        onClick: () => logExceptions(!shouldLogExceptions),
+      })
+    );
 
     items.push(
       MenuItem({
@@ -145,11 +161,13 @@ class ConsoleSettings extends Component {
 
 module.exports = connect(
   state => ({
-    filters: getAllFilters(state),
-    filteredMessagesCount: getFilteredMessagesCount(state),
+    filters: selectors.getAllFilters(state),
+    filteredMessagesCount: selectors.getFilteredMessagesCount(state),
+    shouldLogExceptions: selectors.getShouldLogExceptions(state),
   }),
   {
     filterToggle: actions.filterToggle,
     timestampsToggle: actions.timestampsToggle,
+    logExceptions: actions.logExceptions,
   }
 )(ConsoleSettings);

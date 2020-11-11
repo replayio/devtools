@@ -128,6 +128,7 @@ const gMaskImages = {
   ".img.link": require("devtools/client/debugger/images/link.svg"),
   ".img.invite": require("devtools/client/debugger/images/invite.svg"),
   ".img.expand": require("devtools/client/debugger/images/expand.svg"),
+  ".img.log": require("devtools/client/debugger/images/webconsole-logpoint.svg"),
   "#toolbox-toolbar-console .toolbar-panel-icon": require("devtools/client/themes/images/tool-webconsole.svg"),
   "#toolbox-toolbar-debugger .toolbar-panel-icon": require("devtools/client/themes/images/tool-debugger.svg"),
   "#toolbox-toolbar-inspector .toolbar-panel-icon": require("devtools/client/themes/images/tool-inspector.svg"),

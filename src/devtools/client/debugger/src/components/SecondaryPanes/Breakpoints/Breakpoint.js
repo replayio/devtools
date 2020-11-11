@@ -8,34 +8,19 @@ import React, { PureComponent } from "react";
 import { connect } from "../../../utils/connect";
 import { createSelector } from "reselect";
 import classnames from "classnames";
+
 import actions from "../../../actions";
-import { find, findLast, memoize } from "lodash";
-
-import showContextMenu from "./BreakpointsContextMenu";
-import { CloseButton } from "../../shared/Button";
-
-import {
-  getLocationWithoutColumn,
-  getSelectedText,
-  makeBreakpointId,
-} from "../../../utils/breakpoint";
+import { getLocationWithoutColumn, makeBreakpointId } from "../../../utils/breakpoint";
 import { features } from "../../../utils/prefs";
+import { getBreakpointsList, getSelectedFrame, getContext } from "../../../selectors";
 
-import {
-  getBreakpointsList,
-  getSelectedFrame,
-  getSelectedSource,
-  getContext,
-} from "../../../selectors";
-import { selectors } from "../../../../../../../ui/reducers";
-const { getAnalysisPointsForLocation } = selectors;
-
-import { getThreadExecutionPoint } from "../../../reducers/pause";
-import { compareNumericStrings } from "../../../../../../../protocol/utils";
+import BreakpointNavigation from "./BreakpointNavigation";
+import BreakpointHeading from "./BreakpointHeading";
+import BreakpointOptions from "./BreakpointOptions";
 
 class Breakpoint extends PureComponent {
   onContextMenu = e => {
-    showContextMenu({ ...this.props, contextMenuEvent: e });
+    return;
   };
 
   get selectedLocation() {
@@ -47,21 +32,6 @@ class Breakpoint extends PureComponent {
     event.preventDefault();
     const { cx, selectSpecificLocation } = this.props;
     selectSpecificLocation(cx, this.selectedLocation);
-  };
-
-  removeBreakpoint = event => {
-    const { cx, removeBreakpoint, breakpoint } = this.props;
-    event.stopPropagation();
-    removeBreakpoint(cx, breakpoint);
-  };
-
-  handleBreakpointCheckbox = () => {
-    const { cx, breakpoint, enableBreakpoint, disableBreakpoint } = this.props;
-    if (breakpoint.disabled) {
-      enableBreakpoint(cx, breakpoint);
-    } else {
-      disableBreakpoint(cx, breakpoint);
-    }
   };
 
   isCurrentlyPausedAtBreakpoint() {
@@ -79,107 +49,21 @@ class Breakpoint extends PureComponent {
     return bpId == frameId;
   }
 
-  getBreakpointLocation() {
-    const { source } = this.props;
-    const { column, line } = this.selectedLocation;
-
-    const columnVal = features.columnBreakpoints && column ? `:${column}` : "";
-    const bpLocation = `${line}${columnVal}`;
-
-    return bpLocation;
-  }
-
-  getBreakpointText() {
-    const { breakpoint, selectedSource } = this.props;
-    const { condition, logValue } = breakpoint.options;
-    return logValue || condition || getSelectedText(breakpoint, selectedSource);
-  }
-
-  highlightText = memoize(
-    (text = "", editor) => {
-      const node = document.createElement("div");
-      editor.CodeMirror.runMode(text, "application/javascript", node);
-      return { __html: node.innerHTML };
-    },
-    text => text
-  );
-
-  navigateToPrev(point) {
-    if (point) {
-      this.props.seekToPosition(point.point, point.time);
-    }
-  }
-
   render() {
-    const { breakpoint, editor, executionPoint, analysisPoints } = this.props;
-    const text = this.getBreakpointText();
-    const labelId = `${breakpoint.id}-label`;
-
-    let prev;
-    let next;
-
-    if (executionPoint && analysisPoints?.length > 0) {
-      prev = findLast(analysisPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
-      next = find(analysisPoints, p => compareNumericStrings(p.point, executionPoint) > 0);
-    }
+    const { breakpoint, source, editor } = this.props;
 
     return (
       <div
         className={classnames({
           breakpoint,
           paused: this.isCurrentlyPausedAtBreakpoint(),
-          disabled: breakpoint.disabled,
         })}
         onClick={this.selectBreakpoint}
-        onDoubleClick={this.onDoubleClick}
         onContextMenu={this.onContextMenu}
       >
-        <input
-          id={breakpoint.id}
-          type="checkbox"
-          className="breakpoint-checkbox"
-          checked={!breakpoint.disabled}
-          onChange={this.handleBreakpointCheckbox}
-          onClick={ev => ev.stopPropagation()}
-          aria-labelledby={labelId}
-        />
-        <span
-          id={labelId}
-          className="breakpoint-label cm-s-mozilla devtools-monospace"
-          onClick={this.selectBreakpoint}
-          title={text}
-        >
-          <span dangerouslySetInnerHTML={this.highlightText(text, editor)} />
-        </span>
-
-        <div>
-          Hits: {analysisPoints ? analysisPoints.length : 0} |
-          <button
-            className="button-prev"
-            disabled={!prev}
-            onClick={() => {
-              this.navigateToPrev(prev);
-            }}
-          >
-            ►
-          </button>{" "}
-          <button
-            className="button-next"
-            disabled={!next}
-            onClick={() => {
-              this.navigateToPrev(next);
-            }}
-          >
-            ►
-          </button>
-        </div>
-        <div className="breakpoint-line-close">
-          <div className="breakpoint-line devtools-monospace">{this.getBreakpointLocation()}</div>
-          <CloseButton
-            handleClick={e => this.removeBreakpoint(e)}
-            tooltip={L10N.getStr("breakpoints.removeBreakpointTooltip")}
-          />
-        </div>
+        <BreakpointHeading source={source} breakpoint={breakpoint} />
+        <BreakpointOptions editor={editor} breakpoint={breakpoint} />
+        <BreakpointNavigation breakpoint={breakpoint} />
       </div>
     );
   }
@@ -196,24 +80,12 @@ const getFormattedFrame = createSelector(getSelectedFrame, frame => {
   };
 });
 
-const mapStateToProps = (state, p) => ({
+const mapStateToProps = state => ({
   cx: getContext(state),
   breakpoints: getBreakpointsList(state),
   frame: getFormattedFrame(state),
-  analysisPoints: getAnalysisPointsForLocation(state, p.breakpoint.location),
-  executionPoint: getThreadExecutionPoint(state),
 });
 
 export default connect(mapStateToProps, {
-  enableBreakpoint: actions.enableBreakpoint,
-  removeBreakpoint: actions.removeBreakpoint,
-  removeBreakpoints: actions.removeBreakpoints,
-  removeAllBreakpoints: actions.removeAllBreakpoints,
-  disableBreakpoint: actions.disableBreakpoint,
   selectSpecificLocation: actions.selectSpecificLocation,
-  setBreakpointOptions: actions.setBreakpointOptions,
-  toggleAllBreakpoints: actions.toggleAllBreakpoints,
-  toggleBreakpoints: actions.toggleBreakpoints,
-  toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
-  seekToPosition: actions.seekToPosition,
 })(Breakpoint);
