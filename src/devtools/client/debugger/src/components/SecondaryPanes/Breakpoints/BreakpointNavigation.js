@@ -8,30 +8,19 @@ import actions from "../../../actions";
 import { findLast, find } from "lodash";
 
 import BreakpointTimeline from "./BreakpointTimeline";
+import "./BreakpointNavigation.css";
 
 function BreakpointNavigation({
   executionPoint,
   breakpoint,
   seekToPosition,
   analysisPoints,
-  setZoomedBreakpoint,
+  setZoomedBreakpoint = () => {},
 }) {
   const navigateToPoint = point => {
     if (point) {
       seekToPosition(point.point, point.time);
     }
-  };
-
-  const getStatus = () => {
-    if (!analysisPoints?.length) {
-      return "No hits";
-    }
-
-    const points = analysisPoints
-      ? analysisPoints.filter(point => BigInt(point.point) <= BigInt(executionPoint))
-      : [];
-
-    return `${points.length} of ${analysisPoints ? analysisPoints.length : 0} hits`;
   };
 
   let prev, next;
@@ -51,7 +40,8 @@ function BreakpointNavigation({
             navigateToPoint(prev);
           }}
         >
-          <div className="img rewind" />
+          {/* <div className="img rewind" /> */}
+          <div className="img play-circle" style={{ transform: "rotate(180deg)" }} />
         </button>{" "}
         <button
           className={`breakpoint-navigation-command-next ${!next ? " disabled" : ""}`}
@@ -60,19 +50,45 @@ function BreakpointNavigation({
             navigateToPoint(next);
           }}
         >
-          <div className="img resume" />
+          {/* <div className="img resume" /> */}
+          <div className="img play-circle" />
         </button>
       </div>
       {analysisPoints?.length ? (
         <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
       ) : null}
-      {executionPoint ? <div className="breakpoint-navigation-status">{getStatus()}</div> : null}
+      {executionPoint ? (
+        <BreakpointNavigationStatus
+          executionPoint={executionPoint}
+          analysisPoints={analysisPoints}
+        />
+      ) : null}
     </div>
   );
 }
 
-const mapStateToProps = (state, p) => ({
-  analysisPoints: getAnalysisPointsForLocation(state, p.breakpoint.location),
+function BreakpointNavigationStatus({ executionPoint, analysisPoints }) {
+  let status = "";
+
+  if (!analysisPoints?.length) {
+    status = "No hits";
+  } else {
+    const points = analysisPoints
+      ? analysisPoints.filter(point => BigInt(point.point) <= BigInt(executionPoint))
+      : [];
+
+    status = `${points.length}/${analysisPoints.length}`;
+  }
+
+  return (
+    <div className="breakpoint-navigation-status-container">
+      <div className="breakpoint-navigation-status">{status}</div>
+    </div>
+  );
+}
+
+const mapStateToProps = (state, { breakpoint }) => ({
+  analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
   executionPoint: getThreadExecutionPoint(state),
 });
 

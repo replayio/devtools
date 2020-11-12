@@ -162,7 +162,7 @@ class PanelEditor extends PureComponent {
   }
 
   render() {
-    const { conditionValue, logValue } = this.state;
+    const { conditionValue } = this.state;
     const hasCondition = conditionValue !== null;
 
     return (

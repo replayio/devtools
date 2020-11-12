@@ -29,10 +29,6 @@
 
 .breakpoints-list {
   padding: 8px 0px;
-  --replaying-marker-fill: #3a8edb;
-  --replaying-marker-stroke: #266fb1;
-  --replaying-paused-marker-fill: #5b41ff;
-  --replaying-paused-marker-stroke: #3d23e2;
 }
 
 .breakpoints-list .breakpoint {
@@ -118,95 +114,6 @@
   width: 12px;
   margin-right: 4px;
   text-align: center;
-}
-
-.breakpoints-list .breakpoint-navigation {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 0px 8px 0px 0px;
-  background-color: var(--theme-toolbar-background);
-  align-items: center;
-}
-
-.breakpoints-list .breakpoint-navigation-commands {
-  display: flex;
-  flex-direction: row;
-}
-
-.breakpoints-list .breakpoint-navigation-commands > * {
-  cursor: pointer;
-  padding: 4px;
-}
-
-.breakpoints-list .breakpoint-navigation-commands .img {
-  width: 14px;
-}
-
-.breakpoints-list .breakpoint-navigation-commands .disabled .img {
-  background: var(--theme-splitter-color);
-}
-
-.breakpoints-list .breakpoint-navigation-commands .disabled:hover {
-  background: inherit;
-}
-
-.breakpoints-list .breakpoint-navigation-status {
-  color: var(--theme-comment);
-  min-width: 70px;
-  text-align: end;
-}
-
-.breakpoints-list .breakpoint-navigation-timeline-container {
-  overflow-x: hidden;
-  padding: 0px 4px;
-  margin: 0px 12px;
-  flex-grow: 1;
-  display: flex;
-}
-
-.breakpoints-list .breakpoint-navigation-timeline {
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  background: #e4eaf5;
-  position: relative;
-  border-radius: 5px;
-  width: 100%;
-}
-
-.breakpoints-list .breakpoint-navigation-timeline-point {
-  transition: 200ms;
-  cursor: pointer;
-  position: absolute;
-}
-
-.breakpoints-list .breakpoint-navigation-timeline-point .fill {
-  fill: var(--replaying-marker-fill);
-}
-
-.breakpoints-list .breakpoint-navigation-timeline-point .stroke {
-  stroke: var(--replaying-marker-stroke);
-}
-
-.breakpoints-list .breakpoint-navigation-timeline-point.future .fill {
-  fill: #88b4fa;
-}
-
-.breakpoints-list .breakpoint-navigation-timeline-point.future .stroke {
-  stroke: #7ba6ea;
-}
-
-.breakpoints-list .breakpoint-navigation-timeline-point.pause {
-  z-index: var(--z-index-1--paused-message);
-}
-
-.breakpoints-list .breakpoint-navigation-timeline-point.pause .fill {
-  fill: var(--replaying-paused-marker-fill);
-}
-
-.breakpoints-list .breakpoint-navigation-timeline-point.pause .stroke {
-  stroke: var(--replaying-paused-marker-stroke);
 }
 
 .breakpoints-exceptions {

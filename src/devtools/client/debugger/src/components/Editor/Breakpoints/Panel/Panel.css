@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   margin: 8px 0 8px 12px;
-  padding: 8px 12px;
+  /* padding: 8px 12px; */
   background: var(--theme-toolbar-background);
   border-top: 1px solid var(--theme-splitter-color);
   border-bottom: 1px solid var(--theme-splitter-color);
@@ -18,6 +18,11 @@
   font-family: sans-serif;
   line-height: 16px;
   color: var(--theme-toolbar-color);
+}
+
+.breakpoint-panel *:focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
 }
 
 .breakpoint-panel.editing {
@@ -42,6 +47,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* padding: 4px 8px 0px 8px; */
+  padding: 8px;
+  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 .breakpoint-panel .summary .options {
@@ -58,6 +66,10 @@
 
 .breakpoint-panel:hover .summary .action {
   display: block;
+}
+
+.breakpoint-panel:hover .summary .img {
+  background: var(--theme-comment);
 }
 
 .breakpoint-panel .summary button {
@@ -174,4 +186,42 @@
 
 .panel-editor.conditional .edit-actions {
   margin-top: 8px;
+}
+
+/* Brekapoint Navigation */
+
+.breakpoint-panel .breakpoint-navigation {
+  padding: 8px;
+}
+
+.breakpoint-panel .breakpoint-navigation-timeline-container {
+  margin: 0 4px;
+}
+
+.breakpoint-panel .breakpoint-navigation-timeline {
+  background: white;
+  border-radius: 0px;
+  border: 1px solid var(--theme-splitter-color);
+}
+
+.breakpoint-panel .breakpoint-navigation-status-container {
+  min-width: 40px;
+}
+
+.breakpoint-panel .breakpoint-navigation-status {
+  background: #E8E8E8;
+}
+
+.breakpoint-panel .breakpoint-navigation-commands .img {
+  width: 20px;
+  height: 20px;
+  background: var(--theme-comment);
+}
+
+.breakpoint-panel .breakpoint-navigation-commands .disabled .img {
+  background: var(--theme-splitter-color);
+}
+
+.breakpoint-panel .breakpoint-navigation-commands button {
+  padding: 0px;
 }
