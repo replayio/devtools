@@ -5,7 +5,7 @@ import Recording from "./Recording";
 import { useAuth0 } from "@auth0/auth0-react";
 import { sortBy } from "lodash";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import Loader from "../shared/Loader.js";
+import LeftSidebar from "./LeftSidebar";
 
 import "./Recordings.css";
 
@@ -39,7 +39,8 @@ const DELETE_RECORDING = gql`
 
 const Recordings = props => {
   const { user } = useAuth0();
-  const { data, refetch } = useQuery(GET_MY_RECORDINGS, {
+  const [filter, setFilter] = useState("");
+  const { data } = useQuery(GET_MY_RECORDINGS, {
     variables: { authId: user.sub },
   });
   const [deleteRecording] = useMutation(DELETE_RECORDING, {
@@ -50,15 +51,23 @@ const Recordings = props => {
     await deleteRecording({ variables: { recordingId } });
   };
 
-  const sortedRecordings = sortBy(data.recordings, recording => -new Date(recording.date));
+  const visibleRecordings = [...data.recordings].filter(recording =>
+    recording.url.includes(filter)
+  );
+  const sortedRecordings = sortBy(visibleRecordings, recording => -new Date(recording.date));
 
   return (
-    <div className="recordings">
-      {sortedRecordings &&
-        sortedRecordings.map((recording, i) => (
-          <Recording data={recording} key={i} onDeleteRecording={onDeleteRecording} />
-        ))}
-    </div>
+    <main className="recordings">
+      <LeftSidebar recordings={data.recordings} setFilter={setFilter} filter={filter} />
+      <div className="recordings-list-container">
+        <div className="recordings-list">
+          {sortedRecordings &&
+            sortedRecordings.map((recording, i) => (
+              <Recording data={recording} key={i} onDeleteRecording={onDeleteRecording} />
+            ))}
+        </div>
+      </div>
+    </main>
   );
 };
 
