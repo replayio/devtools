@@ -27,7 +27,6 @@
   --tick-future-background: #bfc9d2;
   --tick-background: var(--blue-50);
   --tick-recording-background: #d0021b;
-  --replay-head-background: var(--purple-50);
 }
 
 .replay-player .overlay-container {

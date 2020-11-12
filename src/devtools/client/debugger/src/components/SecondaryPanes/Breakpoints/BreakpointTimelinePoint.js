@@ -7,9 +7,14 @@ import actions from "../../../actions";
 import { Marker } from "../../../../../../../ui/components/Timeline/Message";
 import { getThreadExecutionPoint } from "../../../reducers/pause";
 import { timelineMarkerWidth as pointWidth } from "../../../../../../../ui/constants";
+import { executeSync } from "graphql";
 
 function getClassnameObject(point, executionPoint) {
   const classObj = { past: false, pause: false, future: false };
+
+  if (!executionPoint) {
+    return classObj;
+  }
 
   if (BigInt(point) < BigInt(executionPoint)) {
     classObj.past = true;
@@ -22,21 +27,18 @@ function getClassnameObject(point, executionPoint) {
   return classObj;
 }
 
-function getLeftPercentOffset({ point, timelineNode, zoomRegion }) {
+export function getLeftPercentOffset({ point, timelineNode, zoomRegion, markerWidth }) {
   const timelineWidth = timelineNode.getBoundingClientRect().width;
 
-  const pointTimeAdjustment =
-    (pointWidth / 2 / timelineWidth) * (zoomRegion.endTime - zoomRegion.startTime);
-  const startTime = zoomRegion.startTime - pointTimeAdjustment;
-  const endTime = zoomRegion.endTime + pointTimeAdjustment;
+  const startTime = zoomRegion.startTime;
+  const endTime = zoomRegion.endTime;
 
   // Percent offset values are [0, 100].
   const unadjustedLeftPercentOffset = ((point.time - startTime) / (endTime - startTime)) * 100;
   const unadjustedLeftPixelOffset = (unadjustedLeftPercentOffset / 100) * timelineWidth;
-  const leftPixelOffset = unadjustedLeftPixelOffset - pointWidth / 2;
+  const leftPixelOffset = unadjustedLeftPixelOffset - markerWidth / 2;
   const leftPercentOffset = (leftPixelOffset * 100) / timelineWidth;
-  const roundedLeftPercentOffset = Math.round(leftPercentOffset);
-  return roundedLeftPercentOffset;
+  return leftPercentOffset;
 }
 
 function BreakpointTimelinePoint({
@@ -51,13 +53,17 @@ function BreakpointTimelinePoint({
 }) {
   const [leftPercentOffset, setLeftPercentOffset] = useState(0);
   const classnameObj = getClassnameObject(point.point, executionPoint);
-  const opacity = leftPercentOffset > 100 || leftPercentOffset < 0 ? "0" : "1";
+
+  // Hide the point if there is no execution point, which happens in between pauses when using the
+  // command bar's resume button.
+  const opacity = executionPoint ? "1" : "0";
 
   useEffect(() => {
     const offset = getLeftPercentOffset({
       point,
       timelineNode,
       zoomRegion,
+      markerWidth: pointWidth,
     });
 
     setLeftPercentOffset(offset);
@@ -73,7 +79,7 @@ function BreakpointTimelinePoint({
         opacity: opacity,
       }}
     >
-      <Marker />
+      <Marker onMarkerClick={() => {}} />
     </div>
   );
 }

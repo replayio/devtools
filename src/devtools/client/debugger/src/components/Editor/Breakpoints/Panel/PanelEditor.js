@@ -14,7 +14,7 @@ class PanelEditor extends PureComponent {
 
     this.state = {
       logValue: breakpoint.options.logValue,
-      conditionValue: breakpoint.options.condition || null,
+      conditionValue: breakpoint.options.condition || "",
     };
   }
 
@@ -61,9 +61,6 @@ class PanelEditor extends PureComponent {
   };
 
   renderActions() {
-    const { conditionValue } = this.state;
-    const hasCondition = conditionValue !== null;
-
     const saveButton = (
       <button className="save" type="button" onClick={this.handleSave}>
         Save
@@ -74,15 +71,6 @@ class PanelEditor extends PureComponent {
         Cancel
       </button>
     );
-
-    if (hasCondition) {
-      return (
-        <div className="edit-actions">
-          {saveButton}
-          {cancelButton}
-        </div>
-      );
-    }
 
     return (
       <div className="edit-actions">
@@ -95,12 +83,11 @@ class PanelEditor extends PureComponent {
   renderForm() {
     const { logValue, conditionValue } = this.state;
     const { inputToFocus } = this.props;
-    const hasCondition = conditionValue !== null;
 
     return (
       <form>
-        <label htmlFor="logpoint">{`Log message (e.g. "x is", x)`}</label>
-        <div className="input-container">
+        <div className="form-row">
+          <label htmlFor="logpoint">{`Log message`}</label>
           <PanelInput
             id="logpoint"
             autofocus={inputToFocus == "logValue"}
@@ -110,54 +97,23 @@ class PanelEditor extends PureComponent {
             onEnter={this.onEnter}
             onEscape={this.onEscape}
           />
-          {hasCondition ? (
-            <>
-              <label htmlFor="condition">Condition (e.g. x === true)</label>
-              <PanelInput
-                id="condition"
-                autofocus={inputToFocus == "condition"}
-                defaultValue={conditionValue}
-                onChange={cm => this.setState({ conditionValue: cm.getValue().trim() })}
-                onBlur={this.handleInputBlur}
-                onEnter={this.onEnter}
-                onEscape={this.onEscape}
-              />
-            </>
-          ) : null}
-          {this.renderActions()}
+        </div>
+        <div className="form-row">
+          <label htmlFor="condition">Condition</label>
+          <div className="input-container">
+            <PanelInput
+              id="condition"
+              autofocus={inputToFocus == "condition"}
+              defaultValue={conditionValue}
+              onChange={cm => this.setState({ conditionValue: cm.getValue().trim() })}
+              onBlur={this.handleInputBlur}
+              onEnter={this.onEnter}
+              onEscape={this.onEscape}
+            />
+            {conditionValue == "" ? <div className="placeholder-text">e.g. x === true</div> : null}
+          </div>
         </div>
       </form>
-    );
-  }
-
-  renderHeader() {
-    const { breakpoint } = this.props;
-    const { conditionValue } = this.state;
-    const hasCondition = conditionValue !== null;
-
-    const addCondition = () => {
-      this.props.setInputToFocus("condition");
-      this.setState({ conditionValue: "" });
-    };
-    const removeCondition = () => {
-      this.props.setInputToFocus("logValue");
-      this.setState({ conditionValue: null });
-    };
-
-    return (
-      <div className="header">
-        <div className="type">Logpoint:</div>
-        <div className="line">Line {breakpoint.location.line}</div>
-        {hasCondition ? (
-          <div className="action" tabIndex="0" onClick={removeCondition}>
-            Remove Condition
-          </div>
-        ) : (
-          <div className="action" tabIndex="0" onClick={addCondition}>
-            Add Condition
-          </div>
-        )}
-      </div>
     );
   }
 
@@ -170,7 +126,7 @@ class PanelEditor extends PureComponent {
         className={classnames("panel-editor", { conditional: hasCondition })}
         ref={node => (this.panelEditorNode = node)}
       >
-        {this.renderHeader()}
+        {this.renderActions()}
         {this.renderForm()}
       </div>
     );

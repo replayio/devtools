@@ -40,7 +40,6 @@ function BreakpointNavigation({
             navigateToPoint(prev);
           }}
         >
-          {/* <div className="img rewind" /> */}
           <div className="img play-circle" style={{ transform: "rotate(180deg)" }} />
         </button>{" "}
         <button
@@ -50,7 +49,6 @@ function BreakpointNavigation({
             navigateToPoint(next);
           }}
         >
-          {/* <div className="img resume" /> */}
           <div className="img play-circle" />
         </button>
       </div>
