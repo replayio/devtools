@@ -287,6 +287,12 @@ class Editor extends PureComponent {
       return continueToHere(cx, { line: sourceLine });
     }
 
+    // Don't add a breakpoint if the user clicked on something other than the gutter line number,
+    // e.g., the blank gutter space caused by adding a CodeMirror widget.
+    if (![...ev.target.classList].includes("CodeMirror-linenumber")) {
+      return;
+    }
+
     return addBreakpointAtLine(cx, sourceLine, ev.altKey, ev.shiftKey);
   };
 
