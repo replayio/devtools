@@ -146,7 +146,7 @@ class Message extends Component {
       frame,
     } = this.props;
 
-    if (inWarningGroup || !pausedExecutionPoint || !executionPoint) {
+    if (inWarningGroup || !pausedExecutionPoint || !executionPoint || !frame) {
       return undefined;
     }
 
