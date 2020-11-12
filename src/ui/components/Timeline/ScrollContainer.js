@@ -25,8 +25,19 @@ function ScrollContainer({ hoverTime, zoomRegion, setZoomRegion, recordingDurati
     gToolbox.getPanel("console").setZoomedRegion(newZoomRegion);
   };
 
+  const handleClick = e => {
+    if (e.metaKey) {
+      const newZoomRegion = {
+        startTime: 0,
+        endTime: recordingDuration,
+        scale: 1,
+      };
+      setZoomRegion(newZoomRegion);
+    }
+  };
+
   return (
-    <div className="scroll-container" onScroll={onScroll}>
+    <div className="scroll-container" onScroll={onScroll} onClick={handleClick}>
       <div className="scroll-content" style={{ height: `${contentHeight}` }} />
     </div>
   );

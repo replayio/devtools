@@ -39,29 +39,8 @@ class BreakpointHeading extends PureComponent {
     removeBreakpoint(cx, breakpoint);
   };
 
-  renderStatus() {
-    const { analysisPoints, executionPoint } = this.props;
-    if (
-      !executionPoint ||
-      !analysisPoints?.length ||
-      !analysisPoints.find(p => BigInt(p.point) === BigInt(executionPoint))
-    ) {
-      return null;
-    }
-
-    const index = analysisPoints.indexOf(
-      analysisPoints.find(p => BigInt(p.point) === BigInt(executionPoint))
-    );
-
-    return (
-      <div className="breakpoint-heading-status">
-        PAUSED {index + 1}/{analysisPoints.length}
-      </div>
-    );
-  }
-
   render() {
-    const { source } = this.props;
+    const { source, zoomed } = this.props;
 
     return (
       <div
@@ -71,7 +50,7 @@ class BreakpointHeading extends PureComponent {
       >
         <div className="breakpoint-heading-label">
           <div>{this.getLabel()}</div>
-          {this.renderStatus()}
+          {zoomed ? <div className="breakpoint-heading-status focused">ZOOMED</div> : null}
         </div>
         <div className="breakpoint-heading-actions">
           <CloseButton
