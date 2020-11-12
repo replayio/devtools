@@ -49,53 +49,6 @@ const mdnLink =
   "https://developer.mozilla.org/docs/Tools/Debugger/Using_the_Debugger_map_scopes_feature?utm_source=devtools&utm_medium=debugger-map-scopes";
 
 class SecondaryPanes extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      showXHRInput: false,
-    };
-  }
-
-  onXHRAdded = () => {
-    this.setState({ showXHRInput: false });
-  };
-
-  renderBreakpointsToggle() {
-    const { cx, toggleAllBreakpoints, breakpoints, breakpointsDisabled } = this.props;
-    const isIndeterminate = !breakpointsDisabled && breakpoints.some(x => x.disabled);
-
-    if (breakpoints.length === 0) {
-      return null;
-    }
-
-    const inputProps = {
-      type: "checkbox",
-      "aria-label": breakpointsDisabled
-        ? L10N.getStr("breakpoints.enable")
-        : L10N.getStr("breakpoints.disable"),
-      className: "breakpoints-toggle",
-      disabled: false,
-      key: "breakpoints-toggle",
-      onChange: e => {
-        e.stopPropagation();
-        toggleAllBreakpoints(cx, !breakpointsDisabled);
-      },
-      onClick: e => e.stopPropagation(),
-      checked: !breakpointsDisabled && !isIndeterminate,
-      ref: input => {
-        if (input) {
-          input.indeterminate = isIndeterminate;
-        }
-      },
-      title: breakpointsDisabled
-        ? L10N.getStr("breakpoints.enable")
-        : L10N.getStr("breakpoints.disable"),
-    };
-
-    return <input {...inputProps} />;
-  }
-
   getScopeItem() {
     return {
       header: L10N.getStr("scopes.header"),
@@ -126,7 +79,6 @@ class SecondaryPanes extends Component {
     return {
       header: L10N.getStr("breakpoints.header"),
       className: "breakpoints-pane",
-      buttons: [this.renderBreakpointsToggle()],
       component: (
         <Breakpoints shouldLogExceptions={shouldLogExceptions} logExceptions={logExceptions} />
       ),
@@ -244,9 +196,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, {
-  toggleAllBreakpoints: actions.toggleAllBreakpoints,
-  logExceptions: actions.logExceptions,
-  breakOnNext: actions.breakOnNext,
-  toggleEventLogging: actions.toggleEventLogging,
-})(SecondaryPanes);
+export default connect(mapStateToProps)(SecondaryPanes);

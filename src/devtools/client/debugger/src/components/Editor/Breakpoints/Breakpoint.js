@@ -49,14 +49,7 @@ class Breakpoint extends PureComponent {
   }
 
   onClick = event => {
-    const {
-      cx,
-      breakpoint,
-      selectedSource,
-      toggleBreakpointsAtLine,
-      toggleDisabledBreakpoint,
-      removeBreakpointsAtLine,
-    } = this.props;
+    const { cx, breakpoint, removeBreakpointsAtLine } = this.props;
 
     // ignore right clicks
     if ((event.ctrlKey && event.button === 0) || event.button === 2) {
@@ -67,14 +60,6 @@ class Breakpoint extends PureComponent {
     event.preventDefault();
 
     const selectedLocation = breakpoint.location;
-
-    if (event.shiftKey) {
-      if (features.columnBreakpoints) {
-        return toggleBreakpointsAtLine(cx, !breakpoint.disabled, selectedLocation.line);
-      }
-
-      return toggleDisabledBreakpoint(cx, breakpoint);
-    }
 
     return removeBreakpointsAtLine(cx, selectedLocation.sourceId, selectedLocation.line);
   };
@@ -135,7 +120,5 @@ class Breakpoint extends PureComponent {
 }
 
 export default connect(null, {
-  toggleBreakpointsAtLine: actions.toggleBreakpointsAtLine,
-  toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
   removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
 })(Breakpoint);

@@ -19,7 +19,7 @@ import { appinfo } from "devtools-services";
 
 const isMacOS = appinfo.OS === "Darwin";
 
-// NOTE: the "resume" command will call either the resume or breakOnNext action
+// NOTE: the "resume" command will call either the resume
 // depending on whether or not the debugger is paused or running
 const COMMANDS = ["resume", "stepOver", "stepIn", "stepOut"];
 
@@ -92,7 +92,7 @@ class CommandBar extends Component {
     e.preventDefault();
     e.stopPropagation();
     if (action === "resume") {
-      this.props.cx.isPaused ? this.props.resume(cx) : this.props.breakOnNext(cx);
+      this.props.resume(cx);
     } else {
       this.props[action](cx);
     }
@@ -178,9 +178,6 @@ export default connect(mapStateToProps, {
   stepIn: actions.stepIn,
   stepOut: actions.stepOut,
   stepOver: actions.stepOver,
-  breakOnNext: actions.breakOnNext,
   rewind: actions.rewind,
   reverseStepOver: actions.reverseStepOver,
-  pauseOnExceptions: actions.pauseOnExceptions,
-  toggleSkipPausing: actions.toggleSkipPausing,
 })(CommandBar);
