@@ -4,7 +4,7 @@ import { timelineMarkerWidth as pointWidth } from "../../../../../../../ui/const
 import { connect } from "../../../utils/connect";
 import { selectors } from "../../../../../../../ui/reducers";
 const { getAnalysisPointsForLocation } = selectors;
-import BreakpointTimelinePoint from "./BreakpointTimelinePoint";
+import BreakpointTimelinePoint, { getLeftPercentOffset } from "./BreakpointTimelinePoint";
 
 function getNewZoomRegion(zoomRegion, analysisPoints) {
   let newZoomRegion = {
@@ -43,6 +43,7 @@ function BreakpointTimeline({
   zoomRegion,
   setZoomRegion,
   setZoomedBreakpoint,
+  currentTime,
 }) {
   const timelineNode = useRef();
   const [mounted, setMounted] = useState(false);
@@ -66,7 +67,7 @@ function BreakpointTimeline({
         ref={timelineNode}
         onClick={handleClick}
         title={title}
-        style={{ height: `${pointWidth + 2}px` }} // Add 2 to adjust for the 1px border
+        style={{ height: `${pointWidth + 2}px` }} // 2px to account for the 1px top+bottom border
       >
         {timelineNode.current
           ? analysisPoints.map((p, i) => (
@@ -79,8 +80,40 @@ function BreakpointTimeline({
               />
             ))
           : null}
+        {timelineNode.current ? (
+          <PauseLine
+            point={{ time: currentTime }}
+            timelineNode={timelineNode.current}
+            zoomRegion={zoomRegion}
+          />
+        ) : null}
       </div>
     </div>
+  );
+}
+
+function PauseLine({ point, timelineNode, zoomRegion }) {
+  const [leftPercentOffset, setLeftPercentOffset] = useState(0);
+  const markerWidth = 1;
+
+  useEffect(() => {
+    const offset = getLeftPercentOffset({
+      point,
+      timelineNode,
+      zoomRegion,
+      markerWidth,
+    });
+
+    setLeftPercentOffset(offset);
+  });
+
+  return (
+    <div
+      className="breakpoint-navigation-timeline-pause-marker"
+      style={{
+        left: `${leftPercentOffset}%`,
+      }}
+    />
   );
 }
 
@@ -88,6 +121,7 @@ export default connect(
   (state, { breakpoint }) => ({
     analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
     zoomRegion: selectors.getZoomRegion(state),
+    currentTime: selectors.getCurrentTime(state),
   }),
   {
     setZoomRegion: UIActions.setZoomRegion,

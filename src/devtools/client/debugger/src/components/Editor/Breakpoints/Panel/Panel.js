@@ -32,15 +32,13 @@ function PanelSummary({ breakpoint, toggleEditingOn, setInputToFocus }) {
             </button>
           ) : null}
           <button className="log" type="button" onClick={e => handleClick(e, "logValue")}>
-            console.log(<span className="expression">{logValue}</span>);
+            log(<span className="expression">{logValue}</span>)
           </button>
         </div>
         <div className="action" tabIndex="0" onClick={e => handleClick(e, "logValue")}>
-          {/* Edit */}
-          <div className="img cog" />
+          Edit
         </div>
       </div>
-      <BreakpointNavigation breakpoint={breakpoint} />
     </>
   );
 }
@@ -96,6 +94,7 @@ function Panel({ breakpoint, editor, insertAt }) {
             setInputToFocus={setInputToFocus}
           />
         )}
+        <BreakpointNavigation breakpoint={breakpoint} />
       </div>
     </Widget>
   );

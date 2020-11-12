@@ -221,6 +221,7 @@
   --replaying-marker-future-stroke: #7ba6ea;
   --replaying-paused-marker-fill: #5b41ff;
   --replaying-paused-marker-stroke: #3d23e2;
+  --replay-head-background: var(--purple-50);
 }
 
 /*

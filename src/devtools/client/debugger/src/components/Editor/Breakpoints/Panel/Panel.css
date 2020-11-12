@@ -7,11 +7,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  margin: 8px 0 8px 12px;
-  /* padding: 8px 12px; */
+  margin: 8px 12px;
   background: var(--theme-toolbar-background);
-  border-top: 1px solid var(--theme-splitter-color);
-  border-bottom: 1px solid var(--theme-splitter-color);
   border-radius: 4px;
   border: 1px solid var(--theme-splitter-color);
   width: 500px;
@@ -20,13 +17,13 @@
   color: var(--theme-toolbar-color);
 }
 
+.breakpoint-panel.editing {
+  padding: 8px;
+}
+
 .breakpoint-panel *:focus:not(:focus-visible) {
   outline: none;
   background: inherit;
-}
-
-.breakpoint-panel.editing {
-  padding: 12px;
 }
 
 .breakpoint-panel button {
@@ -47,7 +44,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* padding: 4px 8px 0px 8px; */
   padding: 8px;
   border-bottom: 1px solid var(--theme-splitter-color);
 }
@@ -60,15 +56,15 @@
 }
 
 .breakpoint-panel .summary .action {
-  display: none;
+  visibility: hidden;
   padding: 4px 4px 4px 8px;
 }
 
-.breakpoint-panel:hover .summary .action {
-  display: block;
+.breakpoint-panel .summary:hover .action {
+  visibility: visible;
 }
 
-.breakpoint-panel:hover .summary .img {
+.breakpoint-panel .summary:hover .img {
   background: var(--theme-comment);
 }
 
@@ -77,11 +73,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 4px;
-  color: var(--theme-comment);
+  color: var(--blue-80);
 }
 
 .breakpoint-panel .summary button:hover .expression {
   color: var(--dark-blue);
+}
+
+.breakpoint-panel .panel-editor {
+  display: flex;
+  flex-direction: column;
 }
 
 .breakpoint-panel .panel-editor > *:not(:last-child) {
@@ -105,21 +106,40 @@
   flex-direction: column;
 }
 
-.breakpoint-panel form label {
-  color: var(--theme-comment);
+.breakpoint-panel form > *:not(:last-child) {
+  margin-bottom: 4px;
 }
 
-.breakpoint-panel form label:not(:first-child) {
-  margin-top: 4px;
+.breakpoint-panel form label {
+  color: var(--theme-comment);
+  min-width: 75px;
+  margin-right: 8px;
+  text-align: end;
 }
 
 .brekapoint-panel form label .expression {
   font-family: var(--monospace-font-family);
 }
 
-.breakpoint-panel form .input-container {
+.breakpoint-panel form .form-row {
   display: flex;
   flex-direction: row;
+  align-items: center;
+}
+
+.breakpoint-panel form .input-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.breakpoint-panel form .input-container .placeholder-text {
+  position: absolute;
+  color: var(--theme-comment);
+  left: 8px;
+  font-style: italic;
+  color: var(--grey-40);
 }
 
 .breakpoint-panel form .CodeMirror {
@@ -148,14 +168,11 @@
   flex-grow: 1;
 }
 
-.breakpoint-panel .input-container > *:not(:last-child) {
-  margin-right: 8px;
-}
-
 .breakpoint-panel .edit-actions {
   display: flex;
   flex-grow: 1;
   align-items: center;
+  align-self: flex-end;
 }
 
 .breakpoint-panel .edit-actions > *:not(:last-child) {
@@ -177,21 +194,14 @@
   color: var(--theme-comment);
 }
 
-/* Conditional Logpoint Panel styling */
-
-.panel-editor.conditional .input-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.panel-editor.conditional .edit-actions {
-  margin-top: 8px;
-}
-
 /* Brekapoint Navigation */
 
 .breakpoint-panel .breakpoint-navigation {
-  padding: 8px;
+  padding: 6px 8px 6px 6px;
+}
+
+.breakpoint-panel.editing .breakpoint-navigation {
+  display: none;
 }
 
 .breakpoint-panel .breakpoint-navigation-timeline-container {
@@ -200,21 +210,23 @@
 
 .breakpoint-panel .breakpoint-navigation-timeline {
   background: white;
+  box-sizing: content-box;
   border-radius: 0px;
+  padding: 2px 0px;
   border: 1px solid var(--theme-splitter-color);
 }
 
 .breakpoint-panel .breakpoint-navigation-status-container {
-  min-width: 40px;
+  min-width: 50px;
 }
 
 .breakpoint-panel .breakpoint-navigation-status {
   background: #E8E8E8;
+  border-radius: 10px;
+  padding: 2px 8px;
 }
 
 .breakpoint-panel .breakpoint-navigation-commands .img {
-  width: 20px;
-  height: 20px;
   background: var(--theme-comment);
 }
 
@@ -223,5 +235,9 @@
 }
 
 .breakpoint-panel .breakpoint-navigation-commands button {
-  padding: 0px;
+  padding: 2px;
+}
+
+.breakpoint-panel .breakpoint-navigation-commands button:not(.disabled):hover {
+  background-color: var(--theme-toolbar-background-hover);
 }
