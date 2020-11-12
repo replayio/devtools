@@ -67,10 +67,6 @@ function reverseStepOver(point) {
   return ThreadFront.reverseStepOver(point);
 }
 
-function breakOnNext(thread) {
-  return ThreadFront.breakOnNext();
-}
-
 async function sourceContents({ actor }) {
   const threadFront = ThreadFront;
   const { contents, contentType } = await threadFront.getSourceContents(actor);
@@ -361,7 +357,6 @@ const clientCommands = {
   stepOver,
   rewind,
   reverseStepOver,
-  breakOnNext,
   sourceContents,
   getSourceForActor,
   getSourceActorBreakpointPositions,

@@ -72,19 +72,7 @@ class ColumnBreakpoint extends Component {
   onClick = event => {
     event.stopPropagation();
     event.preventDefault();
-    const {
-      cx,
-      columnBreakpoint,
-      toggleDisabledBreakpoint,
-      addBreakpointAtColumn,
-      removeBreakpoint,
-    } = this.props;
-
-    // disable column breakpoint on shift-click.
-    if (event.shiftKey) {
-      const breakpoint = columnBreakpoint.breakpoint;
-      return toggleDisabledBreakpoint(cx, breakpoint);
-    }
+    const { cx, columnBreakpoint, addBreakpointAtColumn, removeBreakpoint } = this.props;
 
     if (columnBreakpoint.breakpoint) {
       removeBreakpoint(cx, columnBreakpoint.breakpoint);
@@ -131,5 +119,4 @@ class ColumnBreakpoint extends Component {
 export default connect(null, {
   addBreakpointAtColumn: actions.addBreakpointAtColumn,
   removeBreakpoint: actions.removeBreakpoint,
-  toggleDisabledBreakpoint: actions.toggleDisabledBreakpoint,
 })(ColumnBreakpoint);
