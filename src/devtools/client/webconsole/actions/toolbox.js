@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 "use strict";
-const { openDocLink } = require("devtools/client/shared/link");
 
 export function highlightDomElement(grip) {
   return ({ toolbox }) => {

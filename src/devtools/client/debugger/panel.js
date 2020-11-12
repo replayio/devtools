@@ -6,35 +6,34 @@ import { defer, assert } from "protocol/utils";
 import { resizeBreakpointGutter } from "./src/utils/ui";
 import { openDocLink } from "devtools/client/shared/link";
 import { onConnect } from "devtools/client/debugger/src/client";
+import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 
 export class DebuggerPanel {
   constructor(toolbox) {
     this.toolbox = toolbox;
-    this.readyWaiter = defer();
   }
 
   async open() {
-    const { actions, store, selectors, client } = await onConnect();
+    const { actions, store, selectors, client } = onConnect();
 
     this._actions = actions;
     this._store = store;
     this._selectors = selectors;
     this._client = client;
     this.isReady = true;
-    this.readyWaiter.resolve();
 
     return this;
   }
 
   refresh() {
-    if (!this.editor) {
-      return;
-    }
-
     // CodeMirror does not update properly when it is hidden. This method has
     // a few workarounds to get the editor to behave as expected when switching
     // to the debugger from another panel and the selected location has changed.
-    const { codeMirror } = this.editor.state.editor;
+    const codeMirror = getCodeMirror();
+
+    if (!codeMirror) {
+      return;
+    }
 
     // Update CodeMirror by dispatching a resize event to the window. CodeMirror
     // also has a refresh() method but it did not work as expected when testing.

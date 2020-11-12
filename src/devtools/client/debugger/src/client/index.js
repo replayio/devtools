@@ -44,17 +44,7 @@ export async function loadInitialState() {
 let boundActions;
 let store;
 
-export function bootstrap(_store) {
-  store = _store;
-  boundActions = bindActionCreators(actions, store.dispatch);
-
-  verifyPrefSchema();
-  setupCommands();
-  setupEvents({ actions: boundActions });
-  store.subscribe(() => updatePrefs(store.getState()));
-}
-
-export async function onConnect() {
+function setupDebugger() {
   store.dispatch(actions.connect("", ThreadFront.actor, {}, false));
 
   ThreadFront.findSources(({ sourceId, url, sourceMapURL }) =>
@@ -67,6 +57,21 @@ export async function onConnect() {
     })
   );
 
-  await syncBreakpoints();
+  syncBreakpoints();
+}
+
+export function bootstrap(_store) {
+  store = _store;
+  boundActions = bindActionCreators(actions, store.dispatch);
+
+  setupDebugger();
+
+  verifyPrefSchema();
+  setupCommands();
+  setupEvents({ actions: boundActions });
+  store.subscribe(() => updatePrefs(store.getState()));
+}
+
+export function onConnect() {
   return { store, actions: boundActions, selectors, client: clientCommands };
 }
