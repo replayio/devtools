@@ -66,7 +66,7 @@ function BreakpointTimeline({
         ref={timelineNode}
         onClick={handleClick}
         title={title}
-        style={{ height: `${pointWidth}px` }}
+        style={{ height: `${pointWidth + 2}px` }} // Add 2 to adjust for the 1px border
       >
         {timelineNode.current
           ? analysisPoints.map((p, i) => (

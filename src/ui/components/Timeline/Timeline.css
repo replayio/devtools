@@ -16,10 +16,6 @@
   --progress-recording-background: hsl(0, 100%, 97%);
   --progress-playing-background: #d4ebff;
   --recording-marker-background: hsl(14.9, 100%, 67%);
-  --replaying-marker-fill: #3a8edb;
-  --replaying-marker-stroke: #266fb1;
-  --replaying-paused-marker-fill: #5b41ff;
-  --replaying-paused-marker-stroke: #3d23e2;
   --replaying-marker-highlighted-background: var(--blue-60);
   --recording-marker-background-hover: hsl(14.9, 100%, 47%);
   --replaying-marker-fill-hover: var(--blue-60);
@@ -32,29 +28,6 @@
   --tick-background: var(--blue-50);
   --tick-recording-background: #d0021b;
   --replay-head-background: var(--purple-50);
-}
-
-.theme-dark .replay-player {
-  --commandbar-button-hover-background: #1a1a1a;
-  --progress-recording-background: #310707;
-  --progress-playing-background: #071a2b;
-  --progress-recording-line: #ff2038;
-  --recording-marker-background: #9b3131;
-  --recording-marker-background-hover: #a82323;
-  --replaying-marker-fill: var(--blue-40);
-  --replaying-marker-stroke: var(--blue-40);
-  --replaying-paused-marker-fill: #5b41ff;
-  --replaying-paused-marker-stroke: #1a72dc;
-  --replaying-marker-highlighted-background: #3084d0;
-  --replaying-marker-fill-hover: #3a8edb;
-  --hover-scrubber-line-background: var(--blue-50);
-  --progressbar-background: #0c0c0d;
-  --proggressbar-border-color: var(--theme-splitter-color);
-  --progressbar-line-color: #0a4786;
-  --tick-future-background: #bfc9d2;
-  --tick-background: var(--blue-50);
-  --tick-recording-background: #e77884;
-  --replay-head-background: var(--theme-highlight-purple);
 }
 
 .replay-player .overlay-container {

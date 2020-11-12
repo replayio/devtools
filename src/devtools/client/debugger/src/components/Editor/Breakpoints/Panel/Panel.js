@@ -8,6 +8,7 @@ import ReactDOM from "react-dom";
 import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import { toEditorLine } from "devtools/client/debugger/src/utils/editor";
+import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
 
 import "./Panel.css";
 
@@ -22,21 +23,25 @@ function PanelSummary({ breakpoint, toggleEditingOn, setInputToFocus }) {
   };
 
   return (
-    <div className="summary" onClick={e => handleClick(e, "logValue")}>
-      <div className="options">
-        {conditionValue ? (
-          <button className="condition" type="button" onClick={e => handleClick(e, "condition")}>
-            if (<span className="expression">{conditionValue}</span>)
+    <>
+      <div className="summary" onClick={e => handleClick(e, "logValue")}>
+        <div className="options">
+          {conditionValue ? (
+            <button className="condition" type="button" onClick={e => handleClick(e, "condition")}>
+              if (<span className="expression">{conditionValue}</span>)
+            </button>
+          ) : null}
+          <button className="log" type="button" onClick={e => handleClick(e, "logValue")}>
+            console.log(<span className="expression">{logValue}</span>);
           </button>
-        ) : null}
-        <button className="log" type="button" onClick={e => handleClick(e, "logValue")}>
-          console.log(<span className="expression">{logValue}</span>);
-        </button>
+        </div>
+        <div className="action" tabIndex="0" onClick={e => handleClick(e, "logValue")}>
+          {/* Edit */}
+          <div className="img cog" />
+        </div>
       </div>
-      <div className="action" tabIndex="0" onClick={e => handleClick(e, "logValue")}>
-        Edit
-      </div>
-    </div>
+      <BreakpointNavigation breakpoint={breakpoint} />
+    </>
   );
 }
 

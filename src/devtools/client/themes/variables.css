@@ -213,6 +213,14 @@
   --theme-contrast-background-alpha: rgba(255, 233, 0, 0.4); /* Yellow 50-a40 */
   --theme-contrast-color: black;
   --theme-contrast-border: var(--yellow-60);
+
+  /* Timeline Navigation */
+  --replaying-marker-fill: #3a8edb;
+  --replaying-marker-stroke: #266fb1;
+  --replaying-marker-future-fill: #88b4fa;
+  --replaying-marker-future-stroke: #7ba6ea;
+  --replaying-paused-marker-fill: #5b41ff;
+  --replaying-paused-marker-stroke: #3d23e2;
 }
 
 /*
