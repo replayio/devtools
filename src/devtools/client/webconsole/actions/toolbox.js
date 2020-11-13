@@ -31,17 +31,10 @@ export function openNodeInInspector(valueFront) {
       ThreadFront.timeWarpToPause(pause);
     }
 
-    const onSelectInspector = toolbox.selectTool("inspector", "inspect_dom");
+    toolbox.selectTool("inspector", "inspect_dom");
 
-    const onNodeFront = valueFront
-      .getPause()
-      .ensureDOMFrontAndParents(valueFront._object.objectId)
-      .then(async nf => {
-        await nf.ensureParentsLoaded();
-        return nf;
-      });
-
-    const [nodeFront] = await Promise.all([onNodeFront, onSelectInspector]);
+    const nodeFront = await pause.ensureDOMFrontAndParents(valueFront._object.objectId);
+    await nodeFront.ensureLoaded();
 
     await toolbox.selection.setNodeFront(nodeFront, {
       reason: "console",
