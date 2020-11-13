@@ -160,6 +160,13 @@ Pause.prototype = {
   async getFrames() {
     assert(this.createWaiter);
     await this.createWaiter;
+
+    if (this.hasFrames && !this.stack) {
+      const { frames, data } = await client.Pause.getAllFrames({}, this.sessionId, this.pauseId);
+      this.addData(data);
+      this.stack = frames.map(id => this.frames.get(id));
+    }
+
     return this.stack;
   },
 
