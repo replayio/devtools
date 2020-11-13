@@ -19,6 +19,7 @@ export const ThreadFront = {
   actor: "MainThreadId",
 
   currentPoint: "0",
+  currentTime: 0,
   currentPointHasFrames: false,
 
   // Any pause for the current point.
@@ -140,8 +141,23 @@ export const ThreadFront = {
     }
 
     this.currentPoint = point;
+    this.currentTime = time;
     this.currentPointHasFrames = hasFrames;
     this.currentPause = null;
+    this.asyncPauses.length = 0;
+    this.emit("paused", { point, hasFrames, time });
+
+    this._precacheResumeTargets();
+  },
+
+  timeWarpToPause(pause) {
+    log(`TimeWarp ${pause.point} using existing pause`);
+
+    const { point, time, hasFrames } = pause;
+    this.currentPoint = point;
+    this.currentTime = time;
+    this.currentPointHasFrames = hasFrames;
+    this.currentPause = pause;
     this.asyncPauses.length = 0;
     this.emit("paused", { point, hasFrames, time });
 
@@ -282,20 +298,20 @@ export const ThreadFront = {
     );
   },
 
-  ensurePause(point) {
+  ensurePause(point, time) {
     let pause = this.allPauses.get(point);
     if (pause) {
       return pause;
     }
     pause = new Pause(this.sessionId);
-    pause.create(point);
+    pause.create(point, time);
     this.allPauses.set(point, pause);
     return pause;
   },
 
   ensureCurrentPause() {
     if (!this.currentPause) {
-      this.currentPause = this.ensurePause(this.currentPoint);
+      this.currentPause = this.ensurePause(this.currentPoint, this.currentTime);
     }
   },
 
@@ -325,7 +341,7 @@ export const ThreadFront = {
     if (basePause != this.lastAsyncPause()) {
       return [];
     }
-    const entryPause = this.ensurePause(steps[0].point);
+    const entryPause = this.ensurePause(steps[0].point, steps[0].time);
     this.asyncPauses.push(entryPause);
     const frames = await entryPause.getFrames();
     if (entryPause != this.lastAsyncPause()) {
@@ -395,7 +411,7 @@ export const ThreadFront = {
       }
 
       // Precache pause data for the point.
-      this.ensurePause(target.point);
+      this.ensurePause(target.point, target.time);
 
       if (point != this.currentPoint) {
         return;
@@ -411,7 +427,7 @@ export const ThreadFront = {
         ) {
           return;
         }
-        this.ensurePause(transitiveTarget.point);
+        this.ensurePause(transitiveTarget.point, transitiveTarget.time);
       });
     });
   },
@@ -535,7 +551,13 @@ export const ThreadFront = {
     sendMessage("Console.findMessages", {}, sessionId);
     addEventListener("Console.newMessage", ({ message }) => {
       const pause = new Pause(this.sessionId);
-      pause.instantiate(message.pauseId, message.data);
+      pause.instantiate(
+        message.pauseId,
+        message.point.point,
+        message.point.time,
+        !!message.point.frame,
+        message.data
+      );
       if (message.argumentValues) {
         message.argumentValues = message.argumentValues.map(v => new ValueFront(pause, v));
       }
