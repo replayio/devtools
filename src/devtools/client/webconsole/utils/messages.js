@@ -162,6 +162,7 @@ function transformConsoleAPICallPacket(message) {
     executionPointTime: message.executionPointTime,
     executionPointHasFrames: message.executionPointHasFrames,
     logpointId: message.logpointId,
+    pauseId: message.pauseId,
   });
 }
 
@@ -223,6 +224,7 @@ function transformPageErrorPacket(pageError) {
     executionPoint: pageError.executionPoint,
     executionPointTime: pageError.executionPointTime,
     executionPointHasFrames: pageError.executionPointHasFrames,
+    pauseId: pageError.pauseId,
   });
 }
 
@@ -266,6 +268,7 @@ function transformEvaluationResultPacket(packet) {
     notes,
     private: packet.private,
     allowRepeating: false,
+    pauseId: result?._pause?.pauseId,
   });
 }
 
