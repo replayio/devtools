@@ -1,16 +1,245 @@
-main.recordings {
+main.dashboard {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
-.recordings-list-container {
-  overflow: auto;
+.dashboard-viewer {
+  /* overflow: auto; */
   width: 100%;
+  height: 100%;
+  font-size: 14px;
+}
+
+.dashboard-viewer *:focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
+}
+
+/* Viewer Header styling */
+
+.dashboard-viewer-header {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px 40px;
+}
+
+.dashboard-viewer-header-actions {
+  display: flex;
+  flex-direction: row;
+}
+
+.dashboard-viewer-header-actions .dropdown-button {
+  width: inherit;
+  margin-right: 12px;
+  padding: 0px;
+}
+
+.dashboard-viewer-header-actions .batch-action {
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 16px;
+  border: 1px solid var(--dark-blue);
+  color: var(--dark-blue);
+}
+
+.dashboard-viewer-header-actions .batch-action .img {
+  margin-right: 4px;
+  background: var(--dark-blue);
+}
+
+.dashboard-viewer-header-actions .batch-action.disabled {
+  border: 1px solid var(--theme-icon-dimmed-color);
+  color: var(--theme-icon-dimmed-color);
+}
+
+.dashboard-viewer-header-actions .batch-action.disabled .img {
+  background: var(--theme-icon-dimmed-color);
+}
+
+.dashboard-viewer-header-actions button.toggle-editing {
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 16px;
+  border: 1px solid var(--dark-blue);
+  color: var(--dark-blue);
+  margin-right: 12px;
+}
+
+.editing .dashboard-viewer-header-actions button.toggle-editing {
+  color: white;
+  background-color: var(--dark-blue);
+}
+
+.dashboard-viewer-header-views {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 4px;
+}
+
+.dashboard-viewer-header-views button {
+  padding: 4px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 16px;
+  border: 1px solid var(--theme-splitter-color);
+}
+
+.dashboard-viewer-header-views button.selected {
+  border: 1px solid var(--theme-icon-color);
+}
+
+.dashboard-viewer-header-views button .img {
+  width: 20px;
+  height: 20px;
+  background: var(--theme-icon-dimmed-color);
+}
+
+.dashboard-viewer-header-views button.selected .img {
+  background: var(--theme-icon-color);
+}
+
+/* List styling */
+
+.recording-list.list {
+  overflow: auto;
+  height: 100%;
+  /* display: grid; */
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  margin: 0 auto;
+  /* max-width: 1040px; */
+  font-size: 14px;
+  color: var(--theme-body-color);
+}
+
+.recording-list.list > * {
+  display: grid;
+  grid-template-columns: auto 100px 2fr 2fr 0.5fr 0.5fr 0.5fr 40px 24px;
+  gap: 40px;
+  padding: 20px 40px 20px 20px;
+  border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.recording-list.list > * > * {
+  align-self: center
+}
+
+.recording-list.list > .dashboard-viewer-content-header {
+  font-size: 1rem;
+  font-weight: 700;
+  border-top: 1px solid var(--theme-splitter-color);
+  color: var(--theme-text-color-inactive);
+  position: sticky;
+  top: 0px;
+  background: white;
+}
+
+.recording-list.list .recording-item .screenshot {
+  background: var(--theme-toolbar-background);
   height: 100%;
 }
 
-.recordings-list {
+.recording-list.list .recording-item {
+  transition-duration: 200ms;
+  cursor: pointer;
+}
+
+.recording-list.list .recording-item:hover {
+  background-color: var(--theme-toolbarbutton-hover-background);
+}
+
+.recording-list.list .recording-item.selected {
+  background-color: hsl(201, 88%, 95%);
+  border-bottom: 1px solid hsl(201, 88%, 95%);
+}
+
+.recording-list.list .recording-item.selected:hover {
+  background-color: hsl(201, 80%, 90%);
+}
+
+.recording-list.list .recording-item .screenshot img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  height: 60px;
+}
+
+.recording-list.list .recording-item .page,
+.recording-list.list .recording-item .item-title {
+  display: grid;
+  gap: 8px;
+}
+
+.recording-list.list .recording-item .page > *,
+.recording-list.list .recording-item .item-title > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recording-list.list .recording-item .page > :not(:first-child),
+.recording-list.list .recording-item .item-title > :not(:first-child) {
+  color: var(--theme-text-color-inactive);
+}
+
+.recording-list.list .recording-item.selected .page > :not(:first-child),
+.recording-list.list .recording-item.selected .item-title > :not(:first-child) {
+  color: var(--theme-text-color-alt);
+}
+
+.recording-list.list > * input[type="checkbox"] {
+  visibility: hidden;
+}
+
+.editing .recording-list.list > * input[type="checkbox"] {
+  visibility: visible;
+}
+
+.recording-list.list .recording-item .owner {
+  justify-self: center;
+}
+
+.recording-list.list .recording-item .owner img {
+  margin-right: 0px;
+}
+
+.recording-list.list .recording-item .more button {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  visibility: hidden;
+}
+
+.recording-list.list .recording-item:hover .more button {
+  visibility: visible;
+}
+
+.recording-list.list .recording-item:hover .more button:hover {
+  background: var(--theme-toolbarbutton-checked-hover-background);
+}
+
+.recording-list.list .recording-item .more .img {
+  background: var(--theme-body-color);
+  margin: auto;
+}
+
+/* Grid styling */
+
+.recording-list.grid {
   margin: 0 auto;
   padding-top: 40px;
   display: flex;
@@ -18,18 +247,18 @@ main.recordings {
   justify-content: center;
 }
 
-.recordings .recording:hover {
+.recording-list.grid .recording:hover {
   cursor: pointer;
 }
 
-.recordings .recording {
+.recording-list.grid .recording-item {
   max-width: 420px;
   min-width: 300px;
   padding: 10px;
   margin: 20px;
 }
 
-.recordings .recording .title {
+.recording-list.grid .recording-item .title {
   font-size: 16px;
   overflow: hidden;
   margin-top: 12px;
@@ -44,22 +273,22 @@ main.recordings {
   border: none;
 }
 
-.recordings .recording input.title {
+.recording-list.grid .recording-item input.title {
   width: 100%;
 }
 
-.recordings .recording .secondary {
+.recording-list.grid .recording-item .secondary {
   color: var(--secondary-color);
   line-height: 20px;
   font-size: 14px;
   font-weight: 400;
 }
 
-.recordings .recording .permissions {
+.recording-list.grid .recording-item .permissions {
   line-height: 2em;
 }
 
-.recordings .recording .screenshot {
+.recording-list.grid .recording-item .screenshot {
   width: 100%;
   height: 240px;
   background: #ccc;
@@ -68,16 +297,16 @@ main.recordings {
   position: relative;
 }
 
-.recordings .recording .screenshot img {
+.recording-list.grid .recording-item .screenshot img {
   object-fit: contain;
   width: 100%;
 }
 
-.recordings .recording:hover .overlay {
+.recording-list.grid .recording:hover .overlay {
   visibility: visible;
 }
 
-.recordings .recording .overlay {
+.recording-list.grid .recording-item .overlay {
   display: none;
   position: absolute;
   top: 0;
@@ -91,7 +320,7 @@ main.recordings {
   background-color: rgba(0, 0, 0, 0.15);
 }
 
-.recordings .recording .dropdown-block {
+.recording-list.grid .recording-item .dropdown-block {
   display: none;
   position: absolute;
   height: 28px;
@@ -99,28 +328,28 @@ main.recordings {
   top: 20px;
 }
 
-.recordings .recording:hover .dropdown-block {
+.recording-list.grid .recording:hover .dropdown-block {
   display: block;
 }
 
-.recordings .recording .dropdown-button {
+.recording-list.grid .recording-item .dropdown-button {
   color: white;
   background-color: rgba(0, 0, 0, 0.3);
 }
-.recordings .recording .dropdown-button:hover {
+.recording-list.grid .recording-item .dropdown-button:hover {
   background-color: rgba(0, 0, 0, 0.5);
   cursor: pointer;
 }
 
-.recordings .recording .open .dropdown-button {
+.recording-list.grid .recording-item .open .dropdown-button {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.recordings .recording .dropdown-button:focus {
+.recording-list.grid .recording-item .dropdown-button:focus {
   outline: none;
 }
 
-.recordings .recording button.link {
+.recording-list.grid .recording-item button.link {
   width: 50px;
   height: 50px;
   background: white;

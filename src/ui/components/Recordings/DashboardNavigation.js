@@ -10,7 +10,7 @@ function getUniqueHosts(recordings) {
   return uniqueUrls.filter(url => url != "").sort();
 }
 
-export default function LeftSidebar({ recordings, filter, setFilter }) {
+export default function DashboardNavigation({ recordings, filter, setFilter }) {
   const hosts = getUniqueHosts(recordings);
 
   return (
