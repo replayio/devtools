@@ -144,6 +144,7 @@ class Message extends Component {
       pausedExecutionPoint = Number.POSITIVE_INFINITY,
       type,
       frame,
+      message,
     } = this.props;
 
     if (inWarningGroup || !pausedExecutionPoint || !executionPoint || !frame) {
@@ -153,7 +154,12 @@ class Message extends Component {
     let overlayType, label, onClick;
     let onRewindClick = () => {
       dispatch(
-        actions.jumpToExecutionPoint(executionPoint, executionPointTime, executionPointHasFrames)
+        actions.jumpToExecutionPoint(
+          executionPoint,
+          executionPointTime,
+          executionPointHasFrames,
+          message.pauseId
+        )
       );
     };
 

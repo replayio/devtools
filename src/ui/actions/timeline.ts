@@ -1,5 +1,5 @@
-import { ExecutionPoint, RecordingId, ScreenShot, TimeStampedPoint } from "record-replay-protocol";
-import { ThreadFront } from "protocol/thread";
+import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "record-replay-protocol";
+import { Pause, ThreadFront } from "protocol/thread";
 import { selectors } from "../reducers";
 import {
   screenshotCache,
@@ -174,8 +174,18 @@ export function setZoomRegion(region: ZoomRegion): SetZoomRegionAction {
   return { type: "set_zoom", region };
 }
 
-export function seek(point: ExecutionPoint, time: number, hasFrames: boolean): UIThunkAction {
+export function seek(
+  point: ExecutionPoint,
+  time: number,
+  hasFrames: boolean,
+  pauseId?: PauseId
+): UIThunkAction {
   return () => {
-    ThreadFront.timeWarp(point, time, hasFrames);
+    const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
+    if (pause) {
+      ThreadFront.timeWarpToPause(pause);
+    } else {
+      ThreadFront.timeWarp(point, time, hasFrames);
+    }
   };
 }

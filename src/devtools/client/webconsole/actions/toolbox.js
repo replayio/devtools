@@ -4,6 +4,8 @@
 
 "use strict";
 
+import { ThreadFront, Pause } from "protocol/thread";
+
 export function highlightDomElement(grip) {
   return ({ toolbox }) => {
     const highlighter = toolbox.getHighlighter();
@@ -24,6 +26,11 @@ export function unHighlightDomElement(grip) {
 
 export function openNodeInInspector(valueFront) {
   return async ({ toolbox }) => {
+    const pause = valueFront.getPause();
+    if (ThreadFront.currentPause !== pause) {
+      ThreadFront.timeWarpToPause(pause);
+    }
+
     const onSelectInspector = toolbox.selectTool("inspector", "inspect_dom");
 
     const onNodeFront = valueFront
@@ -48,9 +55,14 @@ export function onMessageHover(type, message) {
   };
 }
 
-export function jumpToExecutionPoint(point, time, hasFrames) {
+export function jumpToExecutionPoint(point, time, hasFrames, pauseId) {
   return ({ toolbox }) => {
-    toolbox.threadFront.timeWarp(point, time, hasFrames);
+    const pause = Pause.getById(pauseId);
+    if (pause) {
+      toolbox.threadFront.timeWarpToPause(pause);
+    } else {
+      toolbox.threadFront.timeWarp(point, time, hasFrames);
+    }
   };
 }
 

@@ -114,6 +114,7 @@ function onConsoleMessage(msg) {
       executionPoint: msg.point.point,
       executionPointTime: msg.point.time,
       executionPointHasFrames: !!stacktrace,
+      pauseId: msg.pauseId,
     };
 
     dispatch(dispatchMessageAdd(packet));
@@ -140,7 +141,7 @@ function onLogpointLoading(logGroupId, point, time, { sourceId, line, column }) 
   };
 }
 
-function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, _, values) {
+function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, pause, values) {
   return async ({ dispatch }) => {
     const packet = {
       errorMessage: "",
@@ -155,6 +156,7 @@ function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, _
       executionPointTime: time,
       executionPointHasFrames: true,
       logpointId: logGroupId,
+      pauseId: pause.pauseId,
     };
 
     dispatch(dispatchMessageAdd(packet));

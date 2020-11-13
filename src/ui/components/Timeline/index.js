@@ -175,8 +175,8 @@ export class Timeline extends Component {
   onMarkerClick = (e, message) => {
     e.preventDefault();
     e.stopPropagation();
-    const { executionPoint, executionPointTime, executionPointHasFrames } = message;
-    this.seek(executionPoint, executionPointTime, executionPointHasFrames);
+    const { executionPoint, executionPointTime, executionPointHasFrames, pauseId } = message;
+    this.seek(executionPoint, executionPointTime, executionPointHasFrames, pauseId);
     this.showMessage(message);
   };
 
@@ -242,11 +242,11 @@ export class Timeline extends Component {
     }
   };
 
-  seek(point, time, hasFrames) {
+  seek(point, time, hasFrames, pauseId) {
     if (!point) {
       return null;
     }
-    return this.props.seek(point, time, hasFrames);
+    return this.props.seek(point, time, hasFrames, pauseId);
   }
 
   seekTime(targetTime) {
