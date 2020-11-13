@@ -96,6 +96,7 @@ export declare class Pause {
   loadMouseTargetsWaiter: Deferred<void> | undefined;
   mouseTargets: NodeBounds[] | undefined;
   constructor(sessionId: SessionId);
+  static getById(pauseId: PauseId): Pause | undefined;
   create(point: ExecutionPoint, time: number): void;
   instantiate(
     pauseId: PauseId,

@@ -8,6 +8,8 @@ const { StyleFront } = require("./style");
 const { StyleSheetFront } = require("./styleSheet");
 const { NodeBoundsFront } = require("./bounds");
 
+const pausesById = new Map();
+
 // Information about a protocol pause.
 export function Pause(sessionId) {
   this.sessionId = sessionId;
@@ -28,6 +30,10 @@ export function Pause(sessionId) {
   this.domFronts = new Map();
 }
 
+Pause.getById = pauseId => {
+  return pausesById.get(pauseId);
+};
+
 Pause.prototype = {
   create(point, time) {
     assert(!this.createWaiter);
@@ -42,6 +48,7 @@ Pause.prototype = {
         if (stack) {
           this.stack = stack.map(id => this.frames.get(id));
         }
+        pausesById.set(pauseId, this);
       }
     );
   },
@@ -55,6 +62,7 @@ Pause.prototype = {
     this.time = time;
     this.hasFrames = hasFrames;
     this.addData(data);
+    pausesById.set(pauseId, this);
   },
 
   addData(...datas) {
