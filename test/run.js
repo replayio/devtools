@@ -315,7 +315,7 @@ function addTestRecordingId(recordingId) {
   try {
     const options = {
       hostname: "test-inbox.replay.io",
-      port: 8004,
+      port: 443,
       path: `/${recordingId}`,
       method: "GET",
     };
