@@ -2,6 +2,9 @@ const { createEnum } = require("devtools/client/shared/enum");
 
 createEnum(
   [
+    // Clears the tree.
+    "RESET",
+
     // Clears the tree and adds a new root node.
     "NEW_ROOT",
 

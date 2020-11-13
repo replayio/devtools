@@ -8,4 +8,5 @@ export interface UIState {
   metadata: MetadataState;
   app: AppState;
   inspector: InspectorState;
+  markup: any;
 }
