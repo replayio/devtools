@@ -92,17 +92,11 @@ export class DebuggerPanel {
   }
 
   async openElementInInspector(valueFront) {
-    const onSelectInspector = this.toolbox.selectTool("inspector");
+    this.toolbox.selectTool("inspector");
 
-    const onNodeFront = valueFront
-      .getPause()
-      .ensureDOMFrontAndParents(valueFront._object.objectId)
-      .then(async nf => {
-        await nf.ensureParentsLoaded();
-        return nf;
-      });
-
-    const [nodeFront] = await Promise.all([onNodeFront, onSelectInspector]);
+    const pause = valueFront.getPause();
+    const nodeFront = await pause.ensureDOMFrontAndParents(valueFront._object.objectId);
+    await nodeFront.ensureLoaded();
 
     await this.toolbox.selection.setNodeFront(nodeFront, {
       reason: "debugger",
