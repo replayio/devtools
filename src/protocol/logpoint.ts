@@ -64,17 +64,20 @@ client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
 
   if (LogpointHandlers.onResult) {
     results.forEach(
-      async ({ key, value: { time, pauseId, location, values, data, frameworkListeners } }) => {
+      async ({
+        key: point,
+        value: { time, pauseId, location, values, data, frameworkListeners },
+      }) => {
         const pause = new Pause(ThreadFront.sessionId!);
-        pause.instantiate(pauseId, key, time, true);
+        pause.instantiate(pauseId, point, time, /* hasFrames */ true);
         pause.addData(data);
         const valueFronts = values.map((v: any) => new ValueFront(pause, v));
         const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
-        LogpointHandlers.onResult!(logGroupId, key, time, mappedLocation, pause, valueFronts);
+        LogpointHandlers.onResult!(logGroupId, point, time, mappedLocation, pause, valueFronts);
 
         if (frameworkListeners) {
           const frameworkListenersFront = new ValueFront(pause, frameworkListeners);
-          eventLogpointOnFrameworkListeners(logGroupId, key, frameworkListenersFront);
+          eventLogpointOnFrameworkListeners(logGroupId, point, frameworkListenersFront);
         }
       }
     );
