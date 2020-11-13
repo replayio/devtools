@@ -1,6 +1,7 @@
 const { assert } = require("protocol/utils");
 const Services = require("Services");
 const {
+  RESET,
   NEW_ROOT,
   ADD_CHILDREN,
   UPDATE_NODE_EXPANDED,
@@ -26,6 +27,10 @@ const INITIAL_MARKUP = {
 };
 
 const reducers = {
+  [RESET]() {
+    return { ...INITIAL_MARKUP };
+  },
+
   [NEW_ROOT](markup, { rootNode }) {
     return {
       ...markup,

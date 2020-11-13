@@ -1,7 +1,16 @@
 import { assert } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
 import { DOCUMENT_TYPE_NODE } from "devtools/shared/dom-node-constants";
-import { NEW_ROOT, ADD_CHILDREN, UPDATE_NODE_EXPANDED, UPDATE_SELECTED_NODE } from "./index";
+import { RESET, NEW_ROOT, ADD_CHILDREN, UPDATE_NODE_EXPANDED, UPDATE_SELECTED_NODE } from "./index";
+
+/**
+ * Clears the tree
+ */
+export function reset() {
+  return {
+    type: RESET,
+  };
+}
 
 /**
  * Clears the tree and adds the new root node.
@@ -55,6 +64,10 @@ export function expandNode(nodeId) {
     const node = tree[nodeId];
     assert(node);
 
+    if (node.isExpanded) {
+      return;
+    }
+
     if (node.hasChildren && node.children.length === 0) {
       const pause = ThreadFront.currentPause;
       const node = pause.getNodeFront(nodeId);
@@ -77,6 +90,9 @@ export function selectionChanged(selection, expandSelectedNode) {
       dispatch(updateSelectedNode(null));
       return;
     }
+
+    await selectedNode.ensureParentsLoaded();
+    if (selection.nodeFront !== selectedNode) return;
 
     dispatch(updateSelectedNode(selectedNode.objectId()));
 

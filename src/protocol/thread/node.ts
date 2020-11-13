@@ -53,6 +53,10 @@ export class NodeFront {
     this._bounds = null;
   }
 
+  get pause() {
+    return this._pause;
+  }
+
   objectId() {
     return this._object.objectId;
   }

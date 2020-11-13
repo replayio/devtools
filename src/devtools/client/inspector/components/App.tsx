@@ -63,15 +63,11 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
   };
 
   renderMarkupPanel() {
-    const { markupView } = this.props;
+    const { markupView, markupRootNode } = this.props;
 
     return (
       <div className="devtools-inspector-tab-panel">
-        <div
-          id="inspector-main-content"
-          className="devtools-main-content"
-          style={{ visibility: "hidden" }}
-        >
+        <div id="inspector-main-content" className="devtools-main-content">
           <div id="inspector-toolbar" className="devtools-toolbar devtools-input-toolbar">
             <div id="inspector-search" className="devtools-searchbox">
               <input
@@ -110,7 +106,9 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
                 {markupView}
               </div>
             </div>
-            <a id="markup-loading">Loading…</a>
+            <a id="markup-loading" hidden={markupRootNode?.children.length > 0}>
+              Loading…
+            </a>
           </div>
           <div id="inspector-breadcrumbs-toolbar" className="devtools-toolbar">
             <div
@@ -253,6 +251,7 @@ const connector = connect(
   (state: UIState) => ({
     is3PaneModeEnabled: state.inspector.is3PaneModeEnabled,
     activeTab: state.inspector.activeTab,
+    markupRootNode: state.markup.tree[state.markup.rootNode],
   }),
   InspectorActions
 );
