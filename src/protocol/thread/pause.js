@@ -12,6 +12,9 @@ const { NodeBoundsFront } = require("./bounds");
 export function Pause(sessionId) {
   this.sessionId = sessionId;
   this.pauseId = null;
+  this.point = null;
+  this.time = null;
+  this.hasFrames = null;
 
   this.createWaiter = null;
 
@@ -26,12 +29,15 @@ export function Pause(sessionId) {
 }
 
 Pause.prototype = {
-  create(point) {
+  create(point, time) {
     assert(!this.createWaiter);
     assert(!this.pauseId);
     this.createWaiter = client.Session.createPause({ point }, this.sessionId).then(
       ({ pauseId, stack, data }) => {
         this.pauseId = pauseId;
+        this.point = point;
+        this.time = time;
+        this.hasFrames = !!stack;
         this.addData(data);
         if (stack) {
           this.stack = stack.map(id => this.frames.get(id));
@@ -40,10 +46,14 @@ Pause.prototype = {
     );
   },
 
-  instantiate(pauseId, data = {}) {
+  instantiate(pauseId, point, time, hasFrames, data = {}) {
     assert(!this.createWaiter);
     assert(!this.pauseId);
+    this.createWaiter = Promise.resolve();
     this.pauseId = pauseId;
+    this.point = point;
+    this.time = time;
+    this.hasFrames = hasFrames;
     this.addData(data);
   },
 

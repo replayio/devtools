@@ -82,6 +82,9 @@ export interface EvaluationResult {
 export declare class Pause {
   sessionId: SessionId;
   pauseId: PauseId | null;
+  point: ExecutionPoint | null;
+  time: number | null;
+  hasFrames: boolean | null;
   createWaiter: Promise<void> | null;
   frames: Map<FrameId, WiredFrame>;
   scopes: Map<ScopeId, WiredScope>;
@@ -93,8 +96,14 @@ export declare class Pause {
   loadMouseTargetsWaiter: Deferred<void> | undefined;
   mouseTargets: NodeBounds[] | undefined;
   constructor(sessionId: SessionId);
-  create(point: ExecutionPoint): void;
-  instantiate(pauseId: PauseId, data?: PauseData): void;
+  create(point: ExecutionPoint, time: number): void;
+  instantiate(
+    pauseId: PauseId,
+    point: ExecutionPoint,
+    time: number,
+    hasFrames: boolean,
+    data?: PauseData
+  ): void;
   addData(...datas: PauseData[]): void;
   getFrames(): Promise<WiredFrame[] | undefined>;
   ensureScopeChain(scopeChain: ScopeId[]): Promise<WiredScope[]>;

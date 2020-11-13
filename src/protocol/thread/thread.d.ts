@@ -86,6 +86,7 @@ export declare const ThreadFront: {
     onUnprocessedRegions: ((parameters: unprocessedRegions) => void) | undefined
   ): Promise<void>;
   timeWarp(point: ExecutionPoint, time?: number, hasFrames?: boolean, force?: boolean): void;
+  timeWarpToPause(pause: Pause): void;
   findSources(onSource: (source: newSource) => void): Promise<void>;
   getSourceKind(sourceId: SourceId): SourceKind | null;
   ensureSource(sourceId: SourceId): Promise<Source>;
@@ -112,7 +113,7 @@ export declare const ThreadFront: {
   ): Promise<void[]> | undefined;
   removeBreakpoint(sourceId: SourceId, line: number, column: number): Promise<void>;
   removeBreakpointByURL(url: string, line: number, column: number): Promise<void[]> | undefined;
-  ensurePause(point: ExecutionPoint): Pause;
+  ensurePause(point: ExecutionPoint, time: number): Pause;
   ensureCurrentPause(): void;
   getFrames(): Promise<WiredFrame[] | undefined>;
   lastAsyncPause(): Pause;

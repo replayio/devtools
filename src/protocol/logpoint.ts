@@ -66,7 +66,7 @@ client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
     results.forEach(
       async ({ key, value: { time, pauseId, location, values, data, frameworkListeners } }) => {
         const pause = new Pause(ThreadFront.sessionId!);
-        pause.instantiate(pauseId);
+        pause.instantiate(pauseId, key, time, true);
         pause.addData(data);
         const valueFronts = values.map((v: any) => new ValueFront(pause, v));
         const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
