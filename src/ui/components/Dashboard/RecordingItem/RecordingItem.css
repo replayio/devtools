@@ -1,0 +1,196 @@
+.recording-list.list {
+  overflow: auto;
+  height: 100%;
+  /* display: grid; */
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  margin: 0 auto;
+  /* max-width: 1040px; */
+  font-size: 14px;
+  color: var(--theme-body-color);
+}
+
+.recording-list.list > * {
+  display: grid;
+  grid-template-columns: auto 100px 2fr 2fr 0.5fr 0.5fr 0.5fr 40px 24px;
+  gap: 40px;
+  padding: 20px 40px 20px 20px;
+  border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.recording-list.list > * > * {
+  align-self: center
+}
+
+.recording-list.list > .dashboard-viewer-content-header {
+  font-size: 1rem;
+  font-weight: 700;
+  border-top: 1px solid var(--theme-splitter-color);
+  color: var(--theme-text-color-inactive);
+  position: sticky;
+  top: 0px;
+  background: white;
+}
+
+.recording-list.list > .dashboard-viewer-content-header > * {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 20px;
+}
+
+.recording-list.list > .dashboard-viewer-content-header > * .img {
+  background: var(--theme-text-color-inactive);
+}
+
+.recording-list.list > .dashboard-viewer-content-header .sorter {
+  cursor: pointer;
+}
+
+.recording-list.list > .dashboard-viewer-content-header .sorter.label {
+  margin-right: 2px;
+}
+
+.recording-list.list > .dashboard-viewer-content-header .sorter:hover .label {
+  color: var(--theme-text-color-alt);
+}
+
+.recording-list.list > .dashboard-viewer-content-header .sorter:hover .img {
+  background: var(--theme-text-color-alt);
+}
+
+.recording-list.list .recording-item .screenshot {
+  background: var(--theme-toolbar-background);
+  height: 100%;
+}
+
+.recording-list.list .recording-item {
+  transition-duration: 200ms;
+  cursor: pointer;
+}
+
+.recording-list.list .recording-item:hover {
+  background-color: var(--theme-toolbarbutton-hover-background);
+}
+
+.recording-list.list .recording-item.selected {
+  background-color: hsl(201, 88%, 95%);
+  border-bottom: 1px solid hsl(201, 88%, 95%);
+}
+
+.recording-list.list .recording-item.selected:hover {
+  background-color: hsl(201, 80%, 90%);
+}
+
+.recording-list.list .recording-item .screenshot img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  height: 60px;
+}
+
+.recording-list.list .recording-item .page,
+.recording-list.list .recording-item .item-title {
+  display: grid;
+  gap: 8px;
+}
+
+.recording-list.list .recording-item .page > *,
+.recording-list.list .recording-item .item-title > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recording-list.list .recording-item .page > :not(:first-child),
+.recording-list.list .recording-item .item-title > :not(:first-child) {
+  color: var(--theme-text-color-inactive);
+}
+
+.recording-list.list .recording-item.selected .page > :not(:first-child),
+.recording-list.list .recording-item.selected .item-title > :not(:first-child) {
+  color: var(--theme-text-color-alt);
+}
+
+.recording-list.list > * input[type="checkbox"] {
+  visibility: hidden;
+}
+
+.editing .recording-list.list > * input[type="checkbox"] {
+  visibility: visible;
+}
+
+.recording-list.list .recording-item .item-title-label {
+  display: flex;
+  flex-direction: row;
+}
+
+.recording-list.list .recording-item .item-title-label .title {
+  line-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recording-list.list .recording-item .item-title-label-actions button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 2px 8px 2px 6px;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-left: 8px;
+  visibility: hidden;
+  color: var(--dark-blue);
+  cursor: pointer;
+}
+
+.recording-list.list .recording-item .item-title-label-actions button .img {
+  background: var(--dark-blue);
+  margin-right: 4px;
+}
+
+.recording-list.list .recording-item:hover .item-title-label-actions button,
+.recording-list.list .recording-item .item-title-label-actions button.clicked {
+  visibility: visible;
+}
+
+.recording-list.list .recording-item .item-title-label-actions button:hover,
+.recording-list.list .recording-item .item-title-label-actions button.clicked {
+  background: var(--dark-blue);
+  color: white;
+}
+
+.recording-list.list .recording-item .item-title-label-actions button:hover .img,
+.recording-list.list .recording-item .item-title-label-actions button.clicked .img {
+  background-color: white;
+}
+
+.recording-list.list .recording-item .owner {
+  justify-self: center;
+}
+
+.recording-list.list .recording-item .owner img {
+  margin-right: 0px;
+}
+
+.recording-list.list .recording-item .more button {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  visibility: hidden;
+}
+
+.recording-list.list .recording-item:hover .more button {
+  visibility: visible;
+}
+
+.recording-list.list .recording-item:hover .more button:hover {
+  background: var(--theme-toolbarbutton-checked-hover-background);
+}
+
+.recording-list.list .recording-item .more .img {
+  background: var(--theme-body-color);
+  margin: auto;
+}

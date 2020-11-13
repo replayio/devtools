@@ -1,0 +1,92 @@
+.dashboard-viewer-header {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px 40px;
+}
+
+.dashboard-viewer-header-actions {
+  display: flex;
+  flex-direction: row;
+}
+
+.dashboard-viewer-header-actions .dropdown-button {
+  width: inherit;
+  margin-right: 12px;
+  padding: 0px;
+}
+
+.dashboard-viewer-header-actions .batch-action {
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 16px;
+  border: 1px solid var(--dark-blue);
+  color: var(--dark-blue);
+}
+
+.dashboard-viewer-header-actions .batch-action .img {
+  margin-right: 4px;
+  background: var(--dark-blue);
+}
+
+.dashboard-viewer-header-actions .batch-action.disabled {
+  border: 1px solid var(--theme-icon-dimmed-color);
+  color: var(--theme-icon-dimmed-color);
+}
+
+.dashboard-viewer-header-actions .batch-action.disabled .img {
+  background: var(--theme-icon-dimmed-color);
+}
+
+.dashboard-viewer-header-actions button.toggle-editing {
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 16px;
+  border: 1px solid var(--dark-blue);
+  color: var(--dark-blue);
+  margin-right: 12px;
+}
+
+.editing .dashboard-viewer-header-actions button.toggle-editing {
+  color: white;
+  background-color: var(--dark-blue);
+}
+
+.dashboard-viewer-header-views {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 4px;
+}
+
+.dashboard-viewer-header-views button {
+  padding: 4px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 16px;
+  border: 1px solid var(--theme-splitter-color);
+}
+
+.dashboard-viewer-header-views button.selected {
+  border: 1px solid var(--theme-icon-color);
+}
+
+.dashboard-viewer-header-views button .img {
+  width: 20px;
+  height: 20px;
+  background: var(--theme-icon-dimmed-color);
+}
+
+.dashboard-viewer-header-views button.selected .img {
+  background: var(--theme-icon-color);
+}

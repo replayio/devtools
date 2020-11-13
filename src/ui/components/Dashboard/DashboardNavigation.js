@@ -1,5 +1,6 @@
 import React from "react";
 import classnames from "classnames";
+import "./DashboardNavigation.css";
 
 function getUniqueHosts(recordings) {
   const uniqueUrls = recordings.reduce(
@@ -10,7 +11,7 @@ function getUniqueHosts(recordings) {
   return uniqueUrls.filter(url => url != "").sort();
 }
 
-export default function LeftSidebar({ recordings, filter, setFilter }) {
+export default function DashboardNavigation({ recordings, filter, setFilter }) {
   const hosts = getUniqueHosts(recordings);
 
   return (
