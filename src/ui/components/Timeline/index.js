@@ -150,8 +150,8 @@ export class Timeline extends Component {
   }
 
   unhighlightConsoleMessage() {
-    if (this.props.highlightedMessage) {
-      this.props.setTimelineState({ highlightedMessage: null });
+    if (this.props.highlightedMessageId) {
+      this.props.setTimelineState({ highlightedMessageId: null });
     }
   }
 
@@ -473,7 +473,7 @@ export class Timeline extends Component {
   }
 
   renderMessages() {
-    const { messages, currentTime, highlightedMessage, zoomRegion } = this.props;
+    const { messages, currentTime, highlightedMessageId, zoomRegion } = this.props;
     let visibleIndex;
 
     return messages.map((message, index) => {
@@ -484,7 +484,7 @@ export class Timeline extends Component {
           index={index}
           messages={messages}
           currentTime={currentTime}
-          highlightedMessage={highlightedMessage}
+          highlightedMessageId={highlightedMessageId}
           zoomRegion={zoomRegion}
           overlayWidth={this.overlayWidth}
           onMarkerClick={this.onMarkerClick}
@@ -659,7 +659,7 @@ export default connect(
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
     playback: selectors.getPlayback(state),
-    highlightedMessage: selectors.getHighlightedMessage(state),
+    highlightedMessageId: selectors.getHighlightedMessageId(state),
     hoveredMessage: selectors.getHoveredMessage(state),
     unprocessedRegions: selectors.getUnprocessedRegions(state),
     recordingDuration: selectors.getRecordingDuration(state),

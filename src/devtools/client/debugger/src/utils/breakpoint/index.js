@@ -30,7 +30,7 @@ export function getLocationKey(location) {
 }
 
 export function isMatchingLocation(location1, location2) {
-  return isEqual(location1, location2);
+  return location1 && location2 && isEqual(location1, location2);
 }
 
 export function getLocationWithoutColumn(location) {

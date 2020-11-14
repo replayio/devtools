@@ -144,14 +144,14 @@ export function setTimelineToMessage({
   return async ({ dispatch, getState }) => {
     try {
       dispatch(updateTooltip({ left: offset }));
-      dispatch(setTimelineState({ highlightedMessage: message.id }));
+      dispatch(setTimelineState({ highlightedMessageId: message.id }));
 
       const paintPoint = getMostRecentPaintPoint(message.executionPointTime);
       if (!paintPoint) return;
       const { point, paintHash } = paintPoint;
       const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
 
-      const currentMessageId = selectors.getHighlightedMessage(getState());
+      const currentMessageId = selectors.getHighlightedMessageId(getState());
       if (currentMessageId === message.id) {
         dispatch(updateTooltip({ screen, left: offset }));
       }
@@ -162,7 +162,7 @@ export function setTimelineToMessage({
 export function hideTooltip(): UIThunkAction {
   return ({ dispatch }) => {
     dispatch(updateTooltip(null));
-    dispatch(setTimelineState({ hoverTime: null, highlightedMessage: null }));
+    dispatch(setTimelineState({ hoverTime: null, highlightedMessageId: null }));
   };
 }
 
@@ -188,4 +188,12 @@ export function seek(
       ThreadFront.timeWarp(point, time, hasFrames);
     }
   };
+}
+
+export function highlightLocation(location: Location) {
+  return { type: "set_timeline_state", state: { highlightedLocation: location } };
+}
+
+export function unhighlightLocation() {
+  return { type: "set_timeline_state", state: { highlightedLocation: null } };
 }

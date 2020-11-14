@@ -5,15 +5,19 @@ import { getPixelOffset, getPixelDistance, getLeftOffset } from "../../utils/tim
 import { connect } from "react-redux";
 import classnames from "classnames";
 import { timelineMarkerWidth } from "../../constants";
+import { selectors } from "ui/reducers";
 
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
 const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
 
-function sameLocation(m1, m2) {
-  const f1 = m1.frame;
-  const f2 = m2.frame;
-
-  return f1.source === f2.source && f1.line === f2.line && f1.column === f2.column;
+function sameLocation(highlightedLocation, messageFrame) {
+  return (
+    highlightedLocation &&
+    messageFrame &&
+    highlightedLocation.sourceId === messageFrame.sourceId &&
+    highlightedLocation.line === messageFrame.line &&
+    highlightedLocation.column === messageFrame.column
+  );
 }
 
 // Don't change this haphazardly. This marker is intentionally 11px x 11px, so that it
@@ -54,7 +58,8 @@ class Message extends React.Component {
       message,
       messages,
       currentTime,
-      highlightedMessage,
+      highlightedMessageId,
+      highlightedLocation,
       zoomRegion,
       overlayWidth,
       visibleIndex,
@@ -97,7 +102,9 @@ class Message extends React.Component {
       }) >
       timelineMarkerWidth / 2;
 
-    const isHighlighted = highlightedMessage == message.id;
+    // A marker is highlighted if either the message or its location is highlighted
+    const isHighlighted =
+      highlightedMessageId == message.id || sameLocation(highlightedLocation, message.frame);
 
     const isPauseLocation = message.executionPointTime === currentTime;
 
@@ -138,4 +145,6 @@ class Message extends React.Component {
     );
   }
 }
-export default connect(state => ({}), {})(Message);
+export default connect(state => ({
+  highlightedLocation: selectors.getHighlightedLocation(state),
+}))(Message);
