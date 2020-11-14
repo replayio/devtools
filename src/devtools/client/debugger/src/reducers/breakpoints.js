@@ -9,9 +9,7 @@
  * @module reducers/breakpoints
  */
 
-import { isEqual } from "lodash";
-
-import { makeBreakpointId } from "../utils/breakpoint";
+import { getLocationKey, isMatchingLocation } from "../utils/breakpoint";
 
 // eslint-disable-next-line max-len
 import { getBreakpointsList as getBreakpointsListSelector } from "../selectors/breakpoints";
@@ -66,20 +64,16 @@ function update(state = initialBreakpointsState(), action) {
 }
 
 function setBreakpoint(state, { breakpoint }) {
-  const id = makeBreakpointId(breakpoint.location);
+  const id = getLocationKey(breakpoint.location);
   const breakpoints = { ...state.breakpoints, [id]: breakpoint };
   return { ...state, breakpoints };
 }
 
 function removeBreakpoint(state, { location }) {
-  const id = makeBreakpointId(location);
+  const id = getLocationKey(location);
   const breakpoints = { ...state.breakpoints };
   delete breakpoints[id];
   return { ...state, breakpoints };
-}
-
-function isMatchingLocation(location1, location2) {
-  return isEqual(location1, location2);
 }
 
 // Selectors
@@ -103,7 +97,7 @@ export function getBreakpoint(state, location) {
   }
 
   const breakpoints = getBreakpointsMap(state);
-  return breakpoints[makeBreakpointId(location)];
+  return breakpoints[getLocationKey(location)];
 }
 
 export function getBreakpointsDisabled(state) {

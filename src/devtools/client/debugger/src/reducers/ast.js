@@ -9,7 +9,7 @@
  * @module reducers/ast
  */
 
-import { makeBreakpointId } from "../utils/breakpoint";
+import { getLocationKey } from "../utils/breakpoint";
 
 export function initialASTState() {
   return {
@@ -41,7 +41,7 @@ function update(state = initialASTState(), action) {
         ...state,
         inScopeLines: {
           ...state.inScopeLines,
-          [makeBreakpointId(action.location)]: action.lines,
+          [getLocationKey(action.location)]: action.lines,
         },
       };
     }
@@ -103,7 +103,7 @@ export function isSymbolsLoading(state, source) {
 
 export function getInScopeLines(state, location) {
   const inScopeLines = state.ast.inScopeLines;
-  return inScopeLines[makeBreakpointId(location)];
+  return inScopeLines[getLocationKey(location)];
 }
 
 export function hasInScopeLines(state, location) {

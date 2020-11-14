@@ -10,7 +10,7 @@ import {
   getSelectedSource,
   getFirstVisibleBreakpoints,
 } from "devtools/client/debugger/src/selectors";
-import { makeBreakpointId } from "devtools/client/debugger/src/utils/breakpoint";
+import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 
 class Breakpoints extends Component {
@@ -27,7 +27,7 @@ class Breakpoints extends Component {
           return (
             <Breakpoint
               cx={cx}
-              key={makeBreakpointId(bp.location)}
+              key={getLocationKey(bp.location)}
               breakpoint={bp}
               selectedSource={selectedSource}
               editor={editor}
