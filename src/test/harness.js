@@ -480,6 +480,8 @@ async function pickNode(x, y) {
 
 async function selectMarkupNode(node) {
   node.click();
+  // the rules view updates asynchronously, so we wait one tick
+  await new Promise(resolve => setTimeout(resolve, 0));
 }
 
 async function checkComputedStyle(style, value) {
