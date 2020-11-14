@@ -23,9 +23,19 @@
   position: relative;
 }
 
+.collapsed-toolbox {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 #graphics {
   position: relative;
   transform-origin: top left;
+}
+
+.collapsed-toolbox #graphics {
+  position: absolute;
 }
 
 .command-button {

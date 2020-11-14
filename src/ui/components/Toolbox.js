@@ -199,53 +199,55 @@ class Toolbox extends React.Component {
           <Timeline />
         </div>
         {this.renderToolbar()}
-        <div
-          id="toolbox-contents"
-          className={classnames("", {
-            splitConsole: selectedPanel != "console" && splitConsoleOpen,
-          })}
-        >
-          <SplitBox
-            style={{ width: "100vw", overflow: "hidden" }}
-            {...this.getSplitBoxDimensions()}
-            splitterSize={1}
-            vert={false}
-            onResizeEnd={num => {}}
-            startPanel={
-              <div className="toolbox-top-panels">
-                <div
-                  className={classnames("toolbox-panel", {
-                    active: selectedPanel == "debugger",
-                  })}
-                  id="toolbox-content-debugger"
-                >
-                  <DebuggerApp />
+        {this.props.showToolbox && (
+          <div
+            id="toolbox-contents"
+            className={classnames("", {
+              splitConsole: selectedPanel != "console" && splitConsoleOpen,
+            })}
+          >
+            <SplitBox
+              style={{ width: "100vw", overflow: "hidden" }}
+              {...this.getSplitBoxDimensions()}
+              splitterSize={1}
+              vert={false}
+              onResizeEnd={num => {}}
+              startPanel={
+                <div className="toolbox-top-panels">
+                  <div
+                    className={classnames("toolbox-panel", {
+                      active: selectedPanel == "debugger",
+                    })}
+                    id="toolbox-content-debugger"
+                  >
+                    <DebuggerApp />
+                  </div>
+                  <div
+                    className={classnames("toolbox-panel theme-body", {
+                      active: selectedPanel == "inspector",
+                    })}
+                    id="toolbox-content-inspector"
+                  >
+                    {this.renderInspector()}
+                  </div>
                 </div>
-                <div
-                  className={classnames("toolbox-panel theme-body", {
-                    active: selectedPanel == "inspector",
-                  })}
-                  id="toolbox-content-inspector"
-                >
-                  {this.renderInspector()}
+              }
+              endPanelControl={false}
+              endPanel={
+                <div className="toolbox-bottom-panels" style={{ overflow: "hidden" }}>
+                  <div
+                    className={classnames("toolbox-panel", {
+                      active: selectedPanel == "console" || splitConsoleOpen,
+                    })}
+                    id="toolbox-content-console"
+                  >
+                    <WebConsoleApp />
+                  </div>
                 </div>
-              </div>
-            }
-            endPanelControl={false}
-            endPanel={
-              <div className="toolbox-bottom-panels" style={{ overflow: "hidden" }}>
-                <div
-                  className={classnames("toolbox-panel", {
-                    active: selectedPanel == "console" || splitConsoleOpen,
-                  })}
-                  id="toolbox-content-console"
-                >
-                  <WebConsoleApp />
-                </div>
-              </div>
-            }
-          />
-        </div>
+              }
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -255,6 +257,7 @@ export default connect(
     initializedPanels: selectors.getInitializedPanels(state),
     selectedPanel: selectors.getSelectedPanel(state),
     splitConsoleOpen: selectors.isSplitConsoleOpen(state),
+    showToolbox: selectors.getShowToolbox(state),
   }),
   {
     setSplitConsole: actions.setSplitConsole,

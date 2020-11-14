@@ -174,3 +174,13 @@ export function setPendingNotification(location: any): SetPendingNotificationAct
     location: location,
   };
 }
+
+export function setAppState(state) {
+  return { type: "set_app_state", state };
+}
+
+export function toggleToolbox() {
+  return ({ getState, dispatch }) => {
+    dispatch(setAppState({ showToolbox: !selectors.getShowToolbox(getState()) }));
+  };
+}

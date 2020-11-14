@@ -10,6 +10,7 @@ function initialAppState(): AppState {
     expectedError: null,
     unexpectedError: null,
     theme: "theme-light",
+    showToolbox: true,
     // Whether or not the developer tools toolbox is opened.
     isToolboxOpen: prefs.isToolboxOpen,
     splitConsoleOpen: prefs.splitConsole,
@@ -28,6 +29,10 @@ export default function update(state = initialAppState(), action: AppAction) {
   switch (action.type) {
     case "setup_app": {
       return { ...state, recordingId: action.recordingId };
+    }
+
+    case "set_app_state": {
+      return { ...state, ...action.state };
     }
 
     case "set_uploading": {
@@ -97,6 +102,7 @@ export default function update(state = initialAppState(), action: AppAction) {
 }
 
 export const getTheme = (state: UIState) => state.app.theme;
+export const getShowToolbox = (state: UIState) => state.app.showToolbox;
 export const isSplitConsoleOpen = (state: UIState) => state.app.splitConsoleOpen;
 export const isToolboxOpen = (state: UIState) => state.app.isToolboxOpen;
 export const getSelectedPanel = (state: UIState) => state.app.selectedPanel;

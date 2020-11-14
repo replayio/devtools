@@ -22,6 +22,7 @@ export interface AppState {
   recordingId: RecordingId | null;
   sessionId: SessionId | null;
   theme: string;
+  showToolbox: boolean;
   splitConsoleOpen: boolean;
   isToolboxOpen: boolean;
   loading: number;
