@@ -4,7 +4,7 @@
 
 //
 
-import { makeBreakpointLocation, makeBreakpointId, getASTLocation } from "../../utils/breakpoint";
+import { makeBreakpointLocation, getLocationKey, getASTLocation } from "../../utils/breakpoint";
 
 import {
   getBreakpoint,
@@ -113,7 +113,7 @@ export function addBreakpoint(
     const content = getSourceContent(getState(), source.id);
     const text = getTextAtPosition(source.id, content, location);
 
-    const id = makeBreakpointId(location);
+    const id = getLocationKey(location);
     const breakpoint = {
       id,
       disabled,

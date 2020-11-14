@@ -9,7 +9,7 @@ import ColumnBreakpoint from "./ColumnBreakpoint";
 
 import { getSelectedSource, visibleColumnBreakpoints, getContext } from "../../selectors";
 import { connect } from "../../utils/connect";
-import { makeBreakpointId } from "../../utils/breakpoint";
+import { getLocationKey } from "../../utils/breakpoint";
 
 // eslint-disable-next-line max-len
 
@@ -28,7 +28,7 @@ class ColumnBreakpoints extends Component {
       breakpoints = columnBreakpoints.map((breakpoint, i) => (
         <ColumnBreakpoint
           cx={cx}
-          key={makeBreakpointId(breakpoint.location)}
+          key={getLocationKey(breakpoint.location)}
           columnBreakpoint={breakpoint}
           editor={editor}
           source={selectedSource}

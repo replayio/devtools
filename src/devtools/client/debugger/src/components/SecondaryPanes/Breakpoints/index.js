@@ -12,7 +12,7 @@ import Breakpoint from "./Breakpoint";
 import actions from "../../../actions";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 
-import { makeBreakpointId, sortSelectedBreakpoints } from "../../../utils/breakpoint";
+import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoint";
 
 import { getBreakpointSources } from "../../../selectors";
 
@@ -70,7 +70,7 @@ class Breakpoints extends Component {
                 source={source}
                 sources={sources}
                 editor={this.getEditor()}
-                key={makeBreakpointId(breakpoint.location)}
+                key={getLocationKey(breakpoint.location)}
                 setZoomedBreakpoint={this.setZoomedBreakpoint}
                 zoomed={zoomed}
               />

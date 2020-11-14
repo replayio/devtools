@@ -13,13 +13,13 @@ import {
   getSourceActorsForSource,
 } from "../../selectors";
 
-import { makeBreakpointId } from "../../utils/breakpoint";
+import { getLocationKey } from "../../utils/breakpoint";
 import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
 import { loadSourceActorBreakpointColumns } from "../source-actors";
 
 function filterByUniqLocation(positions) {
-  return uniqBy(positions, makeBreakpointId);
+  return uniqBy(positions, getLocationKey);
 }
 
 function convertToList(results, source) {
