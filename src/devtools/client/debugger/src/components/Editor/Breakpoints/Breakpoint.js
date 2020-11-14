@@ -6,7 +6,7 @@
 
 import React, { PureComponent } from "react";
 import classnames from "classnames";
-import actions from "devtools/client/debugger/src/actions";
+import { actions } from "ui/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
@@ -41,11 +41,22 @@ class Breakpoint extends PureComponent {
     });
 
     bp.onmousedown = this.onClick;
+    bp.onmouseenter = this.onMouseEnter;
+    bp.onmouseleave = this.onMouseLeave;
+
     // NOTE: flow does not know about oncontextmenu
     bp.oncontextmenu = this.onContextMenu;
 
     return bp;
   }
+
+  onMouseEnter = event => {
+    this.props.highlightLocation(this.props.breakpoint.location);
+  };
+
+  onMouseLeave = () => {
+    this.props.unhighlightLocation();
+  };
 
   onClick = event => {
     const { cx, breakpoint, removeBreakpointsAtLine } = this.props;
@@ -120,4 +131,6 @@ class Breakpoint extends PureComponent {
 
 export default connect(null, {
   removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
+  highlightLocation: actions.highlightLocation,
+  unhighlightLocation: actions.unhighlightLocation,
 })(Breakpoint);
