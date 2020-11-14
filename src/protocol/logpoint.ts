@@ -417,8 +417,6 @@ export function removeLogpoint(logGroupId: string) {
   }
   gLogpoints.delete(logGroupId);
   info.analysisWaiters.forEach(async (waiter: Promise<{ analysisId: string }>) => {
-    const test = await waiter;
-    console.log(test);
     const { analysisId } = await waiter;
     client.Analysis.releaseAnalysis({ analysisId });
   });
