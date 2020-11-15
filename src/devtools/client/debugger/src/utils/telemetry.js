@@ -45,7 +45,6 @@
 //
 
 import { Telemetry } from "devtools-modules";
-import { isFirefoxPanel } from "devtools-environment";
 
 const telemetry = new Telemetry();
 
@@ -69,13 +68,4 @@ export function recordEvent(eventName, fields = {}) {
     session_id: sessionId,
     ...fields,
   });
-  /* eslint-enable camelcase */
-
-  if (!isFirefoxPanel() && window.dbg) {
-    const events = window.dbg._telemetry.events;
-    if (!events[eventName]) {
-      events[eventName] = [];
-    }
-    events[eventName].push(fields);
-  }
 }

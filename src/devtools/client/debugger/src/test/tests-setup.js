@@ -28,9 +28,6 @@ import { start as startSearchWorker, stop as stopSearchWorker } from "../workers
 import { clearDocuments } from "../utils/editor";
 import { clearHistory } from "./utils/history";
 
-import env from "devtools-environment/test-flag";
-env.testing = true;
-
 const rootPath = path.join(__dirname, "../../");
 
 function getL10nBundle() {
