@@ -6,7 +6,6 @@
 const { combineReducers, createStore, applyMiddleware } = require("redux");
 const { thunk } = require("devtools/client/shared/redux/middleware/thunk");
 const { thunkWithOptions } = require("devtools/client/shared/redux/middleware/thunk-with-options");
-const { waitUntilService } = require("devtools/client/shared/redux/middleware/wait-service");
 const { task } = require("devtools/client/shared/redux/middleware/task");
 const { promise } = require("devtools/client/shared/redux/middleware/promise");
 const flags = require("devtools/shared/flags");
@@ -47,13 +46,7 @@ const createStoreWithMiddleware = (opts = {}) => {
   middleware.push(
     opts.thunkOptions ? thunkWithOptions.bind(null, opts.thunkOptions) : thunk,
     thunk,
-    promise,
-
-    // Order is important: services must go last as they always
-    // operate on "already transformed" actions. Actions going through
-    // them shouldn't have any special fields like promises, they
-    // should just be normal JSON objects.
-    waitUntilService
+    promise
   );
 
   if (opts.history) {
