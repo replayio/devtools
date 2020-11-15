@@ -15,39 +15,19 @@ const highlightText = memoize(
 
 function BreakpointOptions({ breakpoint, editor, cx, selectSpecificLocation }) {
   const { logValue, condition } = breakpoint.options;
-  // const lineText = breakpoint.text;
-
-  // const selectBreakpoint = event => {
-  //   event.preventDefault();
-  //   selectSpecificLocation(cx, breakpoint.location);
-  // };
 
   return (
     <div className="breakpoint-options">
-      {/* <div className="breakpoint-content-line">
-        <div className="img file" />
-        <span
-          className="breakpoint-label cm-s-mozilla devtools-monospace"
-          onClick={selectBreakpoint}
-          title={lineText}
-        >
-          <span dangerouslySetInnerHTML={highlightText(lineText, editor)} />
-        </span>
-      </div> */}
-      <div className="breakpoint-content-log" title="Log Message">
-        <div className="img log" />
-        <span className="breakpoint-label cm-s-mozilla devtools-monospace">
-          <span dangerouslySetInnerHTML={highlightText(logValue, editor)} />
-        </span>
-      </div>
       {condition ? (
-        <div className="breakpoint-content-condition" title="Condition">
-          <div className="condition-icon">?</div>
-          <span className="breakpoint-label cm-s-mozilla devtools-monospace">
-            <span dangerouslySetInnerHTML={highlightText(condition, editor)} />
-          </span>
-        </div>
+        <span className="breakpoint-label cm-s-mozilla devtools-monospace">
+          if(
+          <span dangerouslySetInnerHTML={highlightText(condition, editor)} />)
+        </span>
       ) : null}
+      <span className="breakpoint-label cm-s-mozilla devtools-monospace">
+        log(
+        <span dangerouslySetInnerHTML={highlightText(logValue, editor)} />)
+      </span>
     </div>
   );
 }
