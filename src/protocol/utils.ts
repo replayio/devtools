@@ -1,3 +1,5 @@
+import "ui/utils/environment";
+
 export function makeInfallible(fn: (...args: any[]) => void, thisv?: any) {
   return (...args: any[]) => {
     try {
@@ -68,7 +70,9 @@ export function binarySearch(start: number, end: number, callback: (mid: number)
 }
 
 function NotAllowed() {
-  console.error("Not allowed");
+  if (isDevopment()) {
+    console.error("Not allowed");
+  }
 }
 
 export const DisallowEverythingProxyHandler: ProxyHandler<object> = {

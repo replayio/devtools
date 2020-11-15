@@ -13,15 +13,9 @@ import LogRocket from "ui/utils/logrocket";
 import { createApolloClient } from "ui/utils/apolloClient";
 import { ApolloProvider } from "@apollo/client";
 import { bootstrapStore } from "./bootstrapStore";
+import { isDevelopment, isTest } from "../environment";
 
-const url = new URL(window.location.href);
-const test = url.searchParams.get("test") != null;
-
-export function isTest() {
-  return url.searchParams.get("test");
-}
-
-const skipTelemetry = test || url.hostname == "localhost";
+const skipTelemetry = isTest() || isDevelopment();
 
 function setupLogRocket() {
   if (skipTelemetry) {

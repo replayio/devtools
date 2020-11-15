@@ -4,7 +4,6 @@
 
 //
 
-import { isTesting } from "devtools-environment";
 import { prefs } from "../../../utils/prefs";
 
 const blacklist = [
@@ -98,12 +97,7 @@ export function log({ dispatch, getState }) {
     const asyncMsg = !action.status ? "" : `[${action.status}]`;
 
     if (prefs.logActions) {
-      if (isTesting()) {
-        // $FlowIgnore
-        console.log(`[ACTION] ${action.type} ${asyncMsg} - ${serializeAction(action)}\n`);
-      } else {
-        console.log(action, asyncMsg);
-      }
+      console.log(action, asyncMsg);
     }
 
     next(action);
