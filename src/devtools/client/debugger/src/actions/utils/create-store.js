@@ -12,12 +12,8 @@
  */
 
 import { createStore, applyMiddleware } from "redux";
-import { waitUntilService } from "./middleware/wait-service";
-import { log } from "./middleware/log";
-import { history } from "./middleware/history";
 import { promise } from "./middleware/promise";
 import { thunk } from "./middleware/thunk";
-import { timing } from "./middleware/timing";
 import { context } from "./middleware/context";
 
 /**
@@ -39,32 +35,10 @@ import { context } from "./middleware/context";
  * @static
  */
 const configureStore = (opts = {}) => {
-  const middleware = [
-    thunk(opts.makeThunkArgs),
-    context,
-    promise,
-
-    // Order is important: services must go last as they always
-    // operate on "already transformed" actions. Actions going through
-    // them shouldn't have any special fields like promises, they
-    // should just be normal JSON objects.
-    waitUntilService,
-  ];
-
-  if (opts.history) {
-    middleware.push(history(opts.history));
-  }
+  const middleware = [thunk(opts.makeThunkArgs), context, promise];
 
   if (opts.middleware) {
     opts.middleware.forEach(fn => middleware.push(fn));
-  }
-
-  if (opts.log) {
-    middleware.push(log);
-  }
-
-  if (opts.timing) {
-    middleware.push(timing);
   }
 
   // Hook in the redux devtools browser extension if it exists
