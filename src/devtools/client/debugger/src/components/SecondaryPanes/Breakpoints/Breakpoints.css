@@ -11,7 +11,6 @@
   background: inherit;
 }
 
-.breakpoints-exceptions-options *,
 .breakpoints-list * {
   user-select: none;
 }
@@ -92,6 +91,10 @@
 
 .breakpoints-list .breakpoint-options {
   padding: 4px 8px 4px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
 }
 
 .breakpoints-list .breakpoint-options > * {
@@ -102,61 +105,6 @@
 
 .breakpoints-list .breakpoint-options > *:not(:last-child) {
   margin-bottom: 4px;
-}
-
-.breakpoints-list .breakpoint-options .img {
-  width: 12px;
-  margin-right: 4px;
-  color: var(--theme-splitter-color);
-}
-
-.breakpoints-list .breakpoint-options .condition-icon {
-  width: 12px;
-  margin-right: 4px;
-  text-align: center;
-}
-
-.breakpoints-exceptions {
-  padding-bottom: 3px;
-  padding-top: 3px;
-  user-select: none;
-}
-
-.breakpoints-exceptions-caught {
-  padding-bottom: 3px;
-  padding-top: 3px;
-  padding-inline-start: 36px;
-}
-
-.breakpoints-exceptions-options {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-.breakpoints-exceptions-options:not(.empty) {
-  border-bottom: 1px solid var(--theme-splitter-color);
-}
-
-.breakpoints-exceptions input,
-.breakpoints-exceptions-caught input {
-  padding-inline-start: 2px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  margin-inline-start: 0;
-  margin-inline-end: 2px;
-  vertical-align: text-bottom;
-}
-
-.breakpoint-exceptions-label {
-  line-height: 14px;
-  padding-inline-end: 8px;
-  cursor: default;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-html .breakpoints-exceptions {
-  border-left: 4px solid transparent;
 }
 
 html .breakpoints-list .breakpoint.paused {
@@ -183,11 +131,13 @@ html .breakpoints-list .breakpoint.paused .breakpoint-heading {
 .breakpoints-list .breakpoint-label {
   display: inline-block;
   cursor: pointer;
-  flex-grow: 1;
   text-overflow: ellipsis;
   overflow: hidden;
   font-size: 11px;
   margin-top: 1px;
+  margin-right: 1em;
+  font-family: Menlo, Consolas, monospace;
+  color: var(--blue-80);
 }
 
 .breakpoints-list .breakpoint-label span,

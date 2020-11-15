@@ -14,7 +14,6 @@ import { getLocationWithoutColumn, getLocationKey } from "../../../utils/breakpo
 import { features } from "../../../utils/prefs";
 import { getBreakpointsList, getSelectedFrame, getContext } from "../../../selectors";
 
-import BreakpointNavigation from "./BreakpointNavigation";
 import BreakpointHeading from "./BreakpointHeading";
 import BreakpointOptions from "./BreakpointOptions";
 
@@ -63,7 +62,6 @@ class Breakpoint extends PureComponent {
       >
         <BreakpointHeading source={source} breakpoint={breakpoint} zoomed={zoomed} />
         <BreakpointOptions editor={editor} breakpoint={breakpoint} />
-        <BreakpointNavigation breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
       </div>
     );
   }

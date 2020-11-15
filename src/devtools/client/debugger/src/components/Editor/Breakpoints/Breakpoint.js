@@ -10,7 +10,6 @@ import actions from "devtools/client/debugger/src/actions";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
-import Panel from "./Panel/index";
 
 import "./Breakpoints.css";
 
