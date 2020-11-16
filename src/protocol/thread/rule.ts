@@ -8,7 +8,7 @@ export class RuleFront {
   private _object: WiredObject;
   private _rule: Rule;
 
-  constructor(pause: Pause, data: WiredObject & { preview: { rule: Rule } }) {
+  constructor(pause: Pause, data: WiredObject) {
     this._pause = pause;
 
     assert(data && data.preview && data.preview.rule);

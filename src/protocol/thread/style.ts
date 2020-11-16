@@ -17,7 +17,7 @@ export class StyleFront {
   private _object: WiredObject;
   private _style: StyleDeclaration;
 
-  constructor(pause: Pause, data: WiredObject & { preview: { style: StyleDeclaration } }) {
+  constructor(pause: Pause, data: WiredObject) {
     this._pause = pause;
 
     assert(data && data.preview && data.preview.style);

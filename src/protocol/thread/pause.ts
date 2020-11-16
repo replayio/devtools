@@ -1,41 +1,123 @@
-const { client } = require("../socket");
-const { defer, assert } = require("../utils");
-const { ValueFront } = require("./value");
+import {
+  ExecutionPoint,
+  Frame,
+  FrameId,
+  ObjectId,
+  Object as ObjectDescription,
+  PauseId,
+  Scope,
+  ScopeId,
+  SessionId,
+  ObjectPreview,
+  PointDescription,
+  NodeBounds,
+  PauseData,
+} from "record-replay-protocol";
+import { client } from "../socket";
+import { defer, assert, Deferred } from "../utils";
+import { ValueFront } from "./value";
 import { ThreadFront } from "./thread";
-const { NodeFront } = require("./node");
-const { RuleFront } = require("./rule");
-const { StyleFront } = require("./style");
-const { StyleSheetFront } = require("./styleSheet");
-const { NodeBoundsFront } = require("./bounds");
+import { NodeFront } from "./node";
+import { RuleFront } from "./rule";
+import { StyleFront } from "./style";
+import { StyleSheetFront } from "./styleSheet";
+import { NodeBoundsFront } from "./bounds";
 
-const pausesById = new Map();
+const pausesById = new Map<PauseId, Pause>();
 
-// Information about a protocol pause.
-export function Pause(sessionId) {
-  this.sessionId = sessionId;
-  this.pauseId = null;
-  this.point = null;
-  this.time = null;
-  this.hasFrames = null;
+export type DOMFront = NodeFront | RuleFront | StyleFront | StyleSheetFront;
 
-  this.createWaiter = null;
-
-  this.frames = new Map();
-  this.scopes = new Map();
-  this.objects = new Map();
-
-  this.frameSteps = new Map();
-
-  this.documentNode = undefined;
-  this.domFronts = new Map();
-}
-
-Pause.getById = pauseId => {
-  return pausesById.get(pauseId);
+export type WiredObject = Omit<ObjectDescription, "preview"> & {
+  preview?: WiredObjectPreview;
 };
 
-Pause.prototype = {
-  create(point, time) {
+export type WiredObjectPreview = Omit<
+  ObjectPreview,
+  "properties" | "containerEntries" | "getterValues"
+> & {
+  properties: WiredProperty[];
+  containerEntries: WiredContainerEntry[];
+  getterValues: WiredNamedValue[];
+  prototypeValue: ValueFront;
+};
+
+export interface WiredContainerEntry {
+  key?: ValueFront;
+  value: ValueFront;
+}
+
+export interface WiredProperty {
+  name: string;
+  value: ValueFront;
+  writable: boolean;
+  configurable: boolean;
+  enumerable: boolean;
+  get?: ValueFront;
+  set?: ValueFront;
+}
+
+export interface WiredNamedValue {
+  name: string;
+  value: ValueFront;
+}
+
+export type WiredFrame = Omit<Frame, "this"> & {
+  this: ValueFront;
+};
+
+export type WiredScope = Omit<Scope, "bindings" | "object"> & {
+  bindings?: { name: string; value: ValueFront };
+  object?: ValueFront;
+};
+
+export interface EvaluationResult {
+  returned?: ValueFront;
+  exception?: ValueFront;
+  failed?: boolean;
+}
+
+// Information about a protocol pause.
+export class Pause {
+  sessionId: SessionId;
+  pauseId: PauseId | null;
+  point: ExecutionPoint | null;
+  time: number | null;
+  hasFrames: boolean | null;
+  createWaiter: Promise<void> | null;
+  frames: Map<FrameId, WiredFrame>;
+  scopes: Map<ScopeId, WiredScope>;
+  objects: Map<ObjectId, WiredObject>;
+  frameSteps: Map<string, PointDescription[]>;
+  documentNode: NodeFront | undefined;
+  domFronts: Map<string, DOMFront>;
+  stack: WiredFrame[] | undefined;
+  loadMouseTargetsWaiter: Deferred<void> | undefined;
+  mouseTargets: NodeBounds[] | undefined;
+
+  constructor(sessionId: SessionId) {
+    this.sessionId = sessionId;
+    this.pauseId = null;
+    this.point = null;
+    this.time = null;
+    this.hasFrames = null;
+
+    this.createWaiter = null;
+
+    this.frames = new Map();
+    this.scopes = new Map();
+    this.objects = new Map();
+
+    this.frameSteps = new Map();
+
+    this.documentNode = undefined;
+    this.domFronts = new Map();
+  }
+
+  static getById(pauseId: PauseId) {
+    return pausesById.get(pauseId);
+  }
+
+  create(point: ExecutionPoint, time: number) {
     assert(!this.createWaiter);
     assert(!this.pauseId);
     this.createWaiter = client.Session.createPause({ point }, this.sessionId).then(
@@ -46,14 +128,20 @@ Pause.prototype = {
         this.hasFrames = !!stack;
         this.addData(data);
         if (stack) {
-          this.stack = stack.map(id => this.frames.get(id));
+          this.stack = stack.map(id => this.frames.get(id)!);
         }
         pausesById.set(pauseId, this);
       }
     );
-  },
+  }
 
-  instantiate(pauseId, point, time, hasFrames, data = {}) {
+  instantiate(
+    pauseId: PauseId,
+    point: ExecutionPoint,
+    time: number,
+    hasFrames: boolean,
+    data: PauseData = {}
+  ) {
     assert(!this.createWaiter);
     assert(!this.pauseId);
     this.createWaiter = Promise.resolve();
@@ -63,39 +151,43 @@ Pause.prototype = {
     this.hasFrames = hasFrames;
     this.addData(data);
     pausesById.set(pauseId, this);
-  },
+  }
 
-  addData(...datas) {
+  addData(...datas: PauseData[]) {
     datas.forEach(d => this._addDataObjects(d));
     datas.forEach(d => this._updateDataFronts(d));
-  },
+  }
 
-  _addDataObjects({ frames, scopes, objects }) {
+  // we're cheating Typescript here: the objects that we add are of type Frame/Scope/ObjectDescription
+  // but we pretend they are of type WiredFrame/WiredScope/WiredObject. These objects will be changed
+  // in _updateDataFronts() so that they have the correct type afterwards.
+  // This cheat is necessary because Typescript doesn't support objects changing their types over time.
+  private _addDataObjects({ frames, scopes, objects }: PauseData) {
     (frames || []).forEach(f => {
       if (!this.frames.has(f.frameId)) {
-        this.frames.set(f.frameId, f);
+        this.frames.set(f.frameId, f as WiredFrame);
       }
     });
     (scopes || []).forEach(s => {
       if (!this.scopes.has(s.scopeId)) {
-        this.scopes.set(s.scopeId, s);
+        this.scopes.set(s.scopeId, s as WiredScope);
       }
     });
     (objects || []).forEach(o => {
       if (!this.objects.has(o.objectId)) {
-        this.objects.set(o.objectId, o);
+        this.objects.set(o.objectId, o as WiredObject);
       }
     });
-  },
+  }
 
-  _updateDataFronts({ frames, scopes, objects }) {
+  private _updateDataFronts({ frames, scopes, objects }: PauseData) {
     (frames || []).forEach(frame => {
-      frame.this = new ValueFront(this, frame.this);
+      (frame as WiredFrame).this = new ValueFront(this, frame.this);
     });
 
     (scopes || []).forEach(scope => {
       if (scope.bindings) {
-        const newBindings = [];
+        const newBindings: WiredNamedValue[] = [];
         for (const v of scope.bindings) {
           newBindings.push({
             name: v.name,
@@ -105,7 +197,7 @@ Pause.prototype = {
         scope.bindings = newBindings;
       }
       if (scope.object) {
-        scope.object = new ValueFront(this, { object: scope.object });
+        (scope as WiredScope).object = new ValueFront(this, { object: scope.object });
       }
     });
 
@@ -115,7 +207,7 @@ Pause.prototype = {
 
         const newProperties = [];
         for (const p of properties || []) {
-          const flags = "flags" in p ? p.flags : 7;
+          const flags = "flags" in p ? p.flags! : 7;
           newProperties.push({
             name: p.name,
             value: new ValueFront(this, p),
@@ -126,7 +218,7 @@ Pause.prototype = {
             set: p.set ? new ValueFront(this, { object: p.set }) : undefined,
           });
         }
-        object.preview.properties = newProperties;
+        (object as WiredObject).preview!.properties = newProperties;
 
         const newEntries = [];
         for (const { key, value } of containerEntries || []) {
@@ -135,9 +227,9 @@ Pause.prototype = {
             value: new ValueFront(this, value),
           });
         }
-        object.preview.containerEntries = newEntries;
+        (object as WiredObject).preview!.containerEntries = newEntries;
 
-        const newGetterValues = [];
+        const newGetterValues: WiredNamedValue[] = [];
         for (const v of getterValues || []) {
           newGetterValues.push({
             name: v.name,
@@ -147,30 +239,30 @@ Pause.prototype = {
         object.preview.getterValues = newGetterValues;
 
         const { prototypeId } = object.preview;
-        object.preview.prototypeValue = new ValueFront(
+        (object.preview as WiredObjectPreview).prototypeValue = new ValueFront(
           this,
           prototypeId ? { object: prototypeId } : { value: null }
         );
       }
 
-      this.objects.get(object.objectId).preview = object.preview;
+      this.objects.get(object.objectId)!.preview = object.preview as WiredObjectPreview;
     });
-  },
+  }
 
   async getFrames() {
     assert(this.createWaiter);
     await this.createWaiter;
 
     if (this.hasFrames && !this.stack) {
-      const { frames, data } = await client.Pause.getAllFrames({}, this.sessionId, this.pauseId);
+      const { frames, data } = await client.Pause.getAllFrames({}, this.sessionId, this.pauseId!);
       this.addData(data);
-      this.stack = frames.map(id => this.frames.get(id));
+      this.stack = frames.map(id => this.frames.get(id)!);
     }
 
     return this.stack;
-  },
+  }
 
-  ensureScopeChain(scopeChain) {
+  ensureScopeChain(scopeChain: ScopeId[]) {
     return Promise.all(
       scopeChain.map(async id => {
         if (!this.scopes.has(id)) {
@@ -184,10 +276,11 @@ Pause.prototype = {
         return scope;
       })
     );
-  },
+  }
 
-  async getScopes(frameId) {
+  async getScopes(frameId: FrameId) {
     const frame = this.frames.get(frameId);
+    assert(frame);
 
     // Normally we use the original scope chain for the frame if there is one,
     // but when a generated source is marked as preferred we use the generated
@@ -201,21 +294,24 @@ Pause.prototype = {
     }
 
     return scopeChain;
-  },
+  }
 
-  sendMessage(method, params) {
-    return method(params, this.sessionId, this.pauseId);
-  },
+  sendMessage<P, R>(
+    method: (parameters: P, sessionId?: SessionId, pauseId?: PauseId) => R,
+    params: P
+  ) {
+    return method(params, this.sessionId, this.pauseId!);
+  }
 
-  async getObjectPreview(object) {
+  async getObjectPreview(object: ObjectId) {
     const { data } = await this.sendMessage(client.Pause.getObjectPreview, {
       object,
     });
     this.addData(data);
-    return this.objects.get(object);
-  },
+    return this.objects.get(object)!;
+  }
 
-  async evaluate(frameId, expression) {
+  async evaluate(frameId: FrameId | undefined, expression: string) {
     assert(this.createWaiter);
     await this.createWaiter;
     const { result } = frameId
@@ -227,11 +323,11 @@ Pause.prototype = {
       : await this.sendMessage(client.Pause.evaluateInGlobal, { expression });
     const { returned, exception, failed, data } = result;
     this.addData(data);
-    return { returned, exception, failed };
-  },
+    return { returned, exception, failed } as EvaluationResult;
+  }
 
   // Synchronously get a DOM front for an object whose preview is known.
-  getDOMFront(objectId) {
+  getDOMFront(objectId: ObjectId) {
     // Make sure we don't create multiple node fronts for the same object.
     if (!objectId) {
       return null;
@@ -255,35 +351,35 @@ Pause.prototype = {
     }
     this.domFronts.set(objectId, front);
     return front;
-  },
+  }
 
-  getNodeFront(objectId) {
+  getNodeFront(objectId: ObjectId) {
     const front = this.getDOMFront(objectId);
     assert(front instanceof NodeFront);
     return front;
-  },
+  }
 
-  getRuleFront(objectId) {
+  getRuleFront(objectId: ObjectId) {
     const front = this.getDOMFront(objectId);
     assert(front instanceof RuleFront);
     return front;
-  },
+  }
 
-  getStyleFront(objectId) {
+  getStyleFront(objectId: ObjectId) {
     const front = this.getDOMFront(objectId);
     assert(front instanceof StyleFront);
     return front;
-  },
+  }
 
-  getStyleSheetFront(objectId) {
+  getStyleSheetFront(objectId: ObjectId) {
     const front = this.getDOMFront(objectId);
     assert(front instanceof StyleSheetFront);
     return front;
-  },
+  }
 
   // Asynchronously get a DOM front for an object which might not have a preview.
-  async ensureDOMFrontAndParents(nodeId) {
-    let parentId = nodeId;
+  async ensureDOMFrontAndParents(nodeId: ObjectId) {
+    let parentId: ObjectId | undefined = nodeId;
     while (parentId) {
       const data = this.objects.get(parentId);
       if (!data || !data.preview) {
@@ -291,10 +387,11 @@ Pause.prototype = {
         this.addData(data);
         break;
       }
+      assert(data.preview.node);
       parentId = data.preview.node.parentNode;
     }
-    return this.getDOMFront(nodeId);
-  },
+    return this.getNodeFront(nodeId)!;
+  }
 
   async loadDocument() {
     if (this.documentNode) {
@@ -302,45 +399,45 @@ Pause.prototype = {
     }
     assert(this.createWaiter);
     await this.createWaiter;
-    const { document, data } = await this.sendMessage(client.DOM.getDocument);
+    const { document, data } = await this.sendMessage(client.DOM.getDocument, {});
     this.addData(data);
-    this.documentNode = this.getDOMFront(document);
-  },
+    this.documentNode = this.getNodeFront(document);
+  }
 
-  async searchDOM(query) {
+  async searchDOM(query: string) {
     const { nodes, data } = await this.sendMessage(client.DOM.performSearch, { query });
     this.addData(data);
-    return nodes.map(node => this.getDOMFront(node));
-  },
+    return nodes.map(node => this.getNodeFront(node));
+  }
 
   async loadMouseTargets() {
     if (this.loadMouseTargetsWaiter) {
       return this.loadMouseTargetsWaiter.promise;
     }
     this.loadMouseTargetsWaiter = defer();
-    const { elements } = await this.sendMessage(client.DOM.getAllBoundingClientRects);
+    const { elements } = await this.sendMessage(client.DOM.getAllBoundingClientRects, {});
     this.mouseTargets = elements;
     this.loadMouseTargetsWaiter.resolve();
-  },
+  }
 
-  async getMouseTarget(x, y) {
+  async getMouseTarget(x: number, y: number) {
     await this.loadMouseTargets();
-    for (const { node, rect } of this.mouseTargets) {
+    for (const { node, rect } of this.mouseTargets!) {
       const [left, top, right, bottom] = rect;
       if (x >= left && x <= right && y >= top && y <= bottom) {
         return new NodeBoundsFront(this, node, rect);
       }
     }
     return null;
-  },
+  }
 
-  async getFrameSteps(frameId) {
+  async getFrameSteps(frameId: FrameId) {
     if (!this.frameSteps.has(frameId)) {
       const { steps } = await this.sendMessage(client.Pause.getFrameSteps, {
         frameId,
       });
       this.frameSteps.set(frameId, steps);
     }
-    return this.frameSteps.get(frameId);
-  },
-};
+    return this.frameSteps.get(frameId)!;
+  }
+}

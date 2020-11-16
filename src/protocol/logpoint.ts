@@ -14,7 +14,7 @@ import {
   PointDescription,
 } from "record-replay-protocol";
 import { client, log } from "./socket";
-import { defer } from "./utils";
+import { assert, defer } from "./utils";
 import { ThreadFront, ValueFront, Pause } from "./thread";
 const { logpointGetFrameworkEventListeners } = require("./event-listeners");
 
@@ -73,6 +73,7 @@ client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
         pause.addData(data);
         const valueFronts = values.map((v: any) => new ValueFront(pause, v));
         const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
+        assert(mappedLocation);
         LogpointHandlers.onResult!(logGroupId, point, time, mappedLocation, pause, valueFronts);
 
         if (frameworkListeners) {
@@ -106,6 +107,7 @@ client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
     points.forEach(async ({ point, time, frame }) => {
       if (!frame) return;
       const location = await ThreadFront.getPreferredLocation(frame);
+      assert(location);
       LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
     });
   }
