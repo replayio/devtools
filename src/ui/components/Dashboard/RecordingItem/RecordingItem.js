@@ -22,7 +22,14 @@ const UPDATE_IS_PRIVATE = gql`
   }
 `;
 
-const RecordingItem = ({ data, setSharingModal, viewType, selectedIds, setSelectedIds }) => {
+const RecordingItem = ({
+  data,
+  setSharingModal,
+  viewType,
+  selectedIds,
+  setSelectedIds,
+  editing,
+}) => {
   const [editingTitle, setEditingTitle] = useState(false);
   const [isPrivate, setIsPrivate] = useState(data.is_private);
   const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE);
@@ -60,6 +67,7 @@ const RecordingItem = ({ data, setSharingModal, viewType, selectedIds, setSelect
         toggleIsPrivate={toggleIsPrivate}
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
+        editing={editing}
       />
     );
   }

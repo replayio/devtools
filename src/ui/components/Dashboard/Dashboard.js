@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { sortBy } from "lodash";
 import { gql, useQuery } from "@apollo/client";
 import DashboardNavigation from "./DashboardNavigation";
 import DashboardViewer from "./DashboardViewer";
@@ -31,15 +30,14 @@ const Dashboard = props => {
     variables: { authId: user.sub },
   });
 
-  const visibleRecordings = [...data.recordings].filter(recording =>
+  const filteredRecordings = [...data.recordings].filter(recording =>
     recording.url.includes(filter)
   );
-  const sortedRecordings = sortBy(visibleRecordings, recording => -new Date(recording.date));
 
   return (
     <main className="dashboard">
       <DashboardNavigation recordings={data.recordings} setFilter={setFilter} filter={filter} />
-      <DashboardViewer recordings={sortedRecordings} filter={filter} />
+      <DashboardViewer recordings={filteredRecordings} filter={filter} />
     </main>
   );
 };

@@ -11,10 +11,6 @@ function getDurationString(durationMs) {
   return `${seconds} sec`;
 }
 
-function formatDate(date) {
-  return moment(date).format("M/D/YYYY");
-}
-
 function CopyLinkButton({ recordingId }) {
   const [clicked, setClicked] = useState(false);
   const linkUrl = `${window.location.href}view?id=${recordingId}`;
@@ -43,6 +39,7 @@ export default function RecordingListItem({
   toggleIsPrivate,
   setSelectedIds,
   selectedIds,
+  editing,
 }) {
   const { user } = useAuth0();
   const { recording_id: recordingId } = data;
@@ -56,10 +53,16 @@ export default function RecordingListItem({
     }
   };
 
-  console.log(data);
+  const handleClick = () => {
+    if (editing) {
+      toggleChecked();
+    } else {
+      onNavigate();
+    }
+  };
 
   return (
-    <li className={classnames("recording-item", { selected })} onClick={onNavigate}>
+    <li className={classnames("recording-item", { selected })} onClick={handleClick}>
       <input
         type="checkbox"
         onClick={e => e.stopPropagation()}
@@ -77,9 +80,11 @@ export default function RecordingListItem({
             editingTitle={editingTitle}
             setEditingTitle={setEditingTitle}
           />
-          <div className="item-title-label-actions">
-            <CopyLinkButton recordingId={data.recording_id} />
-          </div>
+          {!editing ? (
+            <div className="item-title-label-actions">
+              <CopyLinkButton recordingId={data.recording_id} />
+            </div>
+          ) : null}
         </div>
         <div className="page-url">Created {moment(data.date).fromNow()}</div>
       </div>
@@ -88,20 +93,22 @@ export default function RecordingListItem({
         <div className="page-url">{data.url}</div>
       </div>
       <div>{getDurationString(data.duration)}</div>
-      <div className="secondary">{formatDate(data.date)}</div>
+      <div className="secondary">{moment(data.date).format("M/D/YYYY")}</div>
       <div className="permissions" onClick={toggleIsPrivate}>
         {data.is_private ? "Private" : "Public"}
       </div>
       <div className="owner">
         <Avatar player={user} isFirstPlayer={true} />
       </div>
-      <div className="more" onClick={e => e.stopPropagation()}>
-        <Dropdown
-          panel={Panel}
-          icon={<div className="img dots-horizontal" />}
-          panelStyles={{ top: "28px", right: "0px" }}
-        />
-      </div>
+      {!editing ? (
+        <div className="more" onClick={e => e.stopPropagation()}>
+          <Dropdown
+            panel={Panel}
+            icon={<div className="img dots-horizontal" />}
+            panelStyles={{ top: "28px", right: "0px" }}
+          />
+        </div>
+      ) : null}
     </li>
   );
 }

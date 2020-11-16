@@ -14,20 +14,20 @@ const DELETE_RECORDING = gql`
   }
 `;
 
-function ViewsToggle({ viewType, setViewType }) {
+function ViewsToggle({ viewType, toggleViewType }) {
   return (
     <div className="dashboard-viewer-header-views">
       <button
         className={classnames({ selected: viewType == "grid" })}
         disabled={viewType == "grid"}
-        onClick={() => setViewType("grid")}
+        onClick={toggleViewType}
       >
         <div className="img view-grid" />
       </button>
       <button
         className={classnames({ selected: viewType == "list" })}
         disabled={viewType == "list"}
-        onClick={() => setViewType("list")}
+        onClick={toggleViewType}
       >
         <div className="img view-list" />
       </button>
@@ -72,17 +72,21 @@ function HeaderActions({
   editing,
   toggleEditing,
   viewType,
-  setViewType,
+  toggleViewType,
 }) {
   return (
     <div className="dashboard-viewer-header-actions">
       {editing ? (
         <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />
       ) : null}
-      <button className="toggle-editing" onClick={toggleEditing}>
+      <button
+        className="toggle-editing"
+        onClick={toggleEditing}
+        style={{ visibility: viewType == "list" ? "visible" : "hidden" }}
+      >
         {editing ? "Done" : "Edit"}
       </button>
-      <ViewsToggle viewType={viewType} setViewType={setViewType} />
+      <ViewsToggle viewType={viewType} toggleViewType={toggleViewType} />
     </div>
   );
 }
@@ -94,7 +98,7 @@ export default function DashboardViewerHeader({
   editing,
   toggleEditing,
   viewType,
-  setViewType,
+  toggleViewType,
 }) {
   return (
     <header className="dashboard-viewer-header">
@@ -105,7 +109,7 @@ export default function DashboardViewerHeader({
         editing={editing}
         toggleEditing={toggleEditing}
         viewType={viewType}
-        setViewType={setViewType}
+        toggleViewType={toggleViewType}
       />
     </header>
   );

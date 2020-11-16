@@ -14,6 +14,13 @@ export default function DashboardViewer({ recordings, filter }) {
     }
     setEditing(!editing);
   };
+  const toggleViewType = () => {
+    if (editing) {
+      setEditing(false);
+    }
+
+    setViewType(viewType == "list" ? "grid" : "list");
+  };
 
   return (
     <div className={classnames("dashboard-viewer", { editing })}>
@@ -24,13 +31,14 @@ export default function DashboardViewer({ recordings, filter }) {
         editing={editing}
         toggleEditing={toggleEditing}
         viewType={viewType}
-        setViewType={setViewType}
+        toggleViewType={toggleViewType}
       />
       <DashboardViewerContent
         recordings={recordings}
         viewType={viewType}
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
+        editing={editing}
       />
     </div>
   );

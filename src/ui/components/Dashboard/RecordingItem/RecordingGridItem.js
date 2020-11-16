@@ -1,5 +1,6 @@
 import React from "react";
 import Title from "../../shared/Title";
+import moment from "moment";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import "./RecordingGridItem.css";
 
@@ -25,7 +26,7 @@ export default function RecordingGridItem({
           editingTitle={editingTitle}
           setEditingTitle={setEditingTitle}
         />
-        <div className="secondary">{formatDate(data.date)}</div>
+        <div className="secondary">{moment(data.date).format("MMM Do, h:mm a")}</div>
         <div className="permissions" onClick={toggleIsPrivate}>
           {data.is_private ? "Private" : "Public"}
         </div>

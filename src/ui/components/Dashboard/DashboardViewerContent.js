@@ -1,13 +1,21 @@
 import React, { useState } from "react";
 import classnames from "classnames";
 import Recording from "./RecordingItem/index";
+import { sortBy } from "lodash";
 
 export default function DashboardViewerContent({
   recordings,
   viewType,
   selectedIds,
   setSelectedIds,
+  editing,
 }) {
+  const [ascOrder, setAscOrder] = useState(false);
+  const sortedRecordings = sortBy(recordings, recording => {
+    const order = ascOrder ? 1 : -1;
+    return order * new Date(recording.date);
+  });
+
   return (
     <section className="dashboard-viewer-content">
       <ul className={classnames("recording-list", viewType)}>
@@ -16,16 +24,19 @@ export default function DashboardViewerContent({
             recordings={recordings}
             setSelectedIds={setSelectedIds}
             selectedIds={selectedIds}
+            ascOrder={ascOrder}
+            setAscOrder={setAscOrder}
           />
         ) : null}
-        {recordings &&
-          recordings.map((recording, i) => (
+        {sortedRecordings &&
+          sortedRecordings.map((recording, i) => (
             <Recording
               data={recording}
               key={i}
               viewType={viewType}
               selectedIds={selectedIds}
               setSelectedIds={setSelectedIds}
+              editing={editing}
             />
           ))}
       </ul>
@@ -33,9 +44,13 @@ export default function DashboardViewerContent({
   );
 }
 
-function DashboardViewerContentHeader({ selectedIds, setSelectedIds, recordings }) {
-  const [ascOrder, setAscOrder] = useState(false);
-
+function DashboardViewerContentHeader({
+  recordings,
+  selectedIds,
+  setSelectedIds,
+  ascOrder,
+  setAscOrder,
+}) {
   const handleHeaderCheckboxClick = () => {
     if (selectedIds.length) {
       setSelectedIds([]);
