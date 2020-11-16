@@ -8,7 +8,7 @@ export class StyleSheetFront {
   private _object: WiredObject;
   private _styleSheet: StyleSheet;
 
-  constructor(pause: Pause, data: WiredObject & { preview: { styleSheet: StyleSheet } }) {
+  constructor(pause: Pause, data: WiredObject) {
     this._pause = pause;
 
     assert(data && data.preview && data.preview.styleSheet);

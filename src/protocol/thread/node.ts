@@ -34,7 +34,7 @@ export class NodeFront {
   private _quads: BoxModel | null;
   private _bounds: Rect | null;
 
-  constructor(pause: Pause, data: WiredObject & { preview: { node: NodeDescription } }) {
+  constructor(pause: Pause, data: WiredObject) {
     this._pause = pause;
 
     // The contents of the Node must already be available.

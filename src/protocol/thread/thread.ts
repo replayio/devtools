@@ -7,92 +7,170 @@
 // performed on the state at different points in the recording. This layer
 // helps with adapting the devtools to the WRP.
 
-const { sendMessage, addEventListener, log } = require("../socket");
-const { defer, assert, EventEmitter, ArrayMap } = require("../utils");
-const { MappedLocationCache } = require("../mapped-location-cache");
-const { ValueFront } = require("./value");
-const { Pause } = require("./pause");
+import {
+  BreakpointId,
+  ExecutionPoint,
+  FrameId,
+  Location,
+  MappedLocation,
+  Message,
+  missingRegions,
+  newSource,
+  ObjectId,
+  PauseDescription,
+  RecordingId,
+  ScreenShot,
+  SessionId,
+  SourceId,
+  SourceKind,
+  SourceLocation,
+  TimeStamp,
+  unprocessedRegions,
+} from "record-replay-protocol";
+import { client, log } from "../socket";
+import { defer, assert, EventEmitter, ArrayMap } from "../utils";
+import { MappedLocationCache } from "../mapped-location-cache";
+import { ValueFront } from "./value";
+import { Pause } from "./pause";
 
-export const ThreadFront = {
+export interface RecordingDescription {
+  duration: TimeStamp;
+  length?: number;
+  lastScreen?: ScreenShot;
+  commandLineArguments?: string[];
+}
+
+export interface Source {
+  kind: SourceKind;
+  url?: string;
+  generatedSourceIds?: SourceId[];
+}
+
+export interface PauseEventArgs {
+  point: ExecutionPoint;
+  time: number;
+  hasFrames: boolean;
+}
+
+interface FindTargetParameters {
+  point: ExecutionPoint;
+}
+interface FindTargetResult {
+  target: PauseDescription;
+}
+type FindTargetCommand = (
+  p: FindTargetParameters,
+  sessionId: SessionId
+) => Promise<FindTargetResult>;
+
+export type WiredMessage = Omit<Message, "argumentValues"> & {
+  argumentValues?: ValueFront[];
+};
+
+declare global {
+  interface Window {
+    Test?: any;
+  }
+}
+
+class _ThreadFront {
   // When replaying there is only a single thread currently. Use this thread ID
   // everywhere needed throughout the devtools client.
-  actor: "MainThreadId",
+  actor: string = "MainThreadId";
 
-  currentPoint: "0",
-  currentTime: 0,
-  currentPointHasFrames: false,
+  currentPoint: ExecutionPoint = "0";
+  currentTime: number = 0;
+  currentPointHasFrames: boolean = false;
 
   // Any pause for the current point.
-  currentPause: null,
+  currentPause: Pause | null = null;
 
   // Pauses created for async parent frames of the current point.
-  asyncPauses: [],
+  asyncPauses: Pause[] = [];
 
   // Recording ID being examined.
-  recordingId: null,
+  recordingId: RecordingId | null = null;
 
   // Waiter for the associated session ID.
-  sessionId: null,
-  sessionWaiter: defer(),
+  sessionId: SessionId | null = null;
+  sessionWaiter = defer<SessionId>();
 
   // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
-  initializedWaiter: defer(),
+  initializedWaiter = defer<void>();
 
   // Map sourceId to info about the source.
-  sources: new Map(),
+  sources = new Map<string, Source>();
 
   // Resolve hooks for promises waiting on a source ID to be known.
-  sourceWaiters: new ArrayMap(),
+  sourceWaiters = new ArrayMap<string, () => void>();
 
   // Map URL to sourceId[].
-  urlSources: new ArrayMap(),
+  urlSources = new ArrayMap<string, SourceId>();
 
   // Map sourceId to sourceId[], reversing the generatedSourceIds map.
-  originalSources: new ArrayMap(),
+  originalSources = new ArrayMap<SourceId, SourceId>();
 
   // Source IDs for generated sources which should be preferred over any
   // original source.
-  preferredGeneratedSources: new Set(),
+  preferredGeneratedSources = new Set<SourceId>();
 
-  mappedLocations: new MappedLocationCache(),
+  onSource: ((source: newSource) => void) | undefined;
 
-  skipPausing: false,
+  mappedLocations = new MappedLocationCache();
+
+  skipPausing = false;
 
   // Points which will be reached when stepping in various directions from a point.
-  resumeTargets: new Map(),
+  resumeTargets = new Map<string, PauseDescription>();
 
   // Epoch which invalidates step targets when advanced.
-  resumeTargetEpoch: 0,
+  resumeTargetEpoch = 0;
 
   // How many in flight commands can change resume targets we get from the server.
-  numPendingInvalidateCommands: 0,
+  numPendingInvalidateCommands = 0;
 
   // Resolve hooks for promises waiting for pending invalidate commands to finish. wai
-  invalidateCommandWaiters: [],
+  invalidateCommandWaiters: (() => void)[] = [];
 
   // Pauses for each point we have stopped or might stop at.
-  allPauses: new Map(),
+  allPauses = new Map<ExecutionPoint, Pause>();
 
   // Map breakpointId to information about the breakpoint, for all installed breakpoints.
-  breakpoints: new Map(),
+  breakpoints = new Map<BreakpointId, { location: Location }>();
 
   // Any callback to invoke to adjust the point which we zoom to.
-  warpCallback: null,
+  warpCallback:
+    | ((
+        point: ExecutionPoint,
+        time: number,
+        hasFrames?: boolean
+      ) => { point: ExecutionPoint; time: number; hasFrames?: boolean } | null)
+    | null = null;
 
-  async setSessionId(sessionId) {
+  metadataListeners: { key: string; callback: (newValue: any) => void }[] | undefined;
+
+  testName: string | undefined;
+
+  // added by EventEmitter.decorate(ThreadFront)
+  eventListeners!: Map<string, ((value?: any) => void)[]>;
+  on!: (name: string, handler: (value?: any) => void) => void;
+  off!: (name: string, handler: (value?: any) => void) => void;
+  emit!: (name: string, value?: any) => void;
+
+  async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
     this.mappedLocations.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
 
     log(`GotSessionId ${sessionId}`);
 
-    const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
+    const { endpoint } = await client.Session.getEndpoint({}, sessionId);
     this.emit("endpoint", endpoint);
-  },
+  }
 
   async initializeToolbox() {
     const sessionId = await this.waitForSession();
-    const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
+    const { endpoint } = await client.Session.getEndpoint({}, sessionId);
 
     // Make sure the debugger has added a pause listener before warping to the endpoint.
     await gToolbox.startPanel("debugger");
@@ -100,33 +178,40 @@ export const ThreadFront = {
     this.initializedWaiter.resolve();
 
     if (this.testName) {
-      sendMessage("Internal.labelTestSession", { sessionId });
+      client.Internal.labelTestSession({ sessionId });
       await gToolbox.selectTool("debugger");
       window.Test = require("test/harness");
       const script = document.createElement("script");
       script.src = `/test?${this.testName}`;
       document.head.appendChild(script);
     }
-  },
+  }
 
-  setTest(test) {
+  setTest(test: string) {
     this.testName = test;
-  },
+  }
 
   waitForSession() {
     return this.sessionWaiter.promise;
-  },
+  }
 
-  async ensureProcessed(onMissingRegions, onUnprocessedRegions) {
+  async ensureProcessed(
+    onMissingRegions: ((parameters: missingRegions) => void) | undefined,
+    onUnprocessedRegions: ((parameters: unprocessedRegions) => void) | undefined
+  ) {
     const sessionId = await this.waitForSession();
 
-    addEventListener("Session.missingRegions", onMissingRegions);
-    addEventListener("Session.unprocessedRegions", onUnprocessedRegions);
+    if (onMissingRegions) {
+      client.Session.addMissingRegionsListener(onMissingRegions);
+    }
+    if (onUnprocessedRegions) {
+      client.Session.addUnprocessedRegionsListener(onUnprocessedRegions);
+    }
 
-    await sendMessage("Session.ensureProcessed", {}, sessionId);
-  },
+    await client.Session.ensureProcessed({}, sessionId);
+  }
 
-  timeWarp(point, time, hasFrames, force) {
+  timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, force?: boolean) {
     log(`TimeWarp ${point}`);
 
     // The warp callback is used to change the locations where the thread is
@@ -142,18 +227,19 @@ export const ThreadFront = {
 
     this.currentPoint = point;
     this.currentTime = time;
-    this.currentPointHasFrames = hasFrames;
+    this.currentPointHasFrames = !!hasFrames;
     this.currentPause = null;
     this.asyncPauses.length = 0;
     this.emit("paused", { point, hasFrames, time });
 
     this._precacheResumeTargets();
-  },
+  }
 
-  timeWarpToPause(pause) {
+  timeWarpToPause(pause: Pause) {
     log(`TimeWarp ${pause.point} using existing pause`);
 
     const { point, time, hasFrames } = pause;
+    assert(point && time && typeof hasFrames === "boolean");
     this.currentPoint = point;
     this.currentTime = time;
     this.currentPointHasFrames = hasFrames;
@@ -162,14 +248,14 @@ export const ThreadFront = {
     this.emit("paused", { point, hasFrames, time });
 
     this._precacheResumeTargets();
-  },
+  }
 
-  async findSources(onSource) {
+  async findSources(onSource: (source: newSource) => void) {
     const sessionId = await this.waitForSession();
     this.onSource = onSource;
 
-    sendMessage("Debugger.findSources", {}, sessionId);
-    addEventListener("Debugger.newSource", source => {
+    client.Debugger.findSources({}, sessionId);
+    client.Debugger.addNewSourceListener(source => {
       let { sourceId, kind, url, generatedSourceIds } = source;
       this.sources.set(sourceId, { kind, url, generatedSourceIds });
       if (url) {
@@ -183,33 +269,33 @@ export const ThreadFront = {
       this.sourceWaiters.map.delete(sourceId);
       onSource(source);
     });
-  },
+  }
 
-  getSourceKind(sourceId) {
+  getSourceKind(sourceId: SourceId) {
     const info = this.sources.get(sourceId);
     return info ? info.kind : null;
-  },
+  }
 
-  async ensureSource(sourceId) {
+  async ensureSource(sourceId: SourceId) {
     if (!this.sources.has(sourceId)) {
-      const { promise, resolve } = defer();
-      this.sourceWaiters.add(sourceId, resolve);
+      const { promise, resolve } = defer<void>();
+      this.sourceWaiters.add(sourceId, resolve as () => void);
       await promise;
     }
-    return this.sources.get(sourceId);
-  },
+    return this.sources.get(sourceId)!;
+  }
 
-  getSourceURLRaw(sourceId) {
+  getSourceURLRaw(sourceId: SourceId) {
     const info = this.sources.get(sourceId);
     return info && info.url;
-  },
+  }
 
-  async getSourceURL(sourceId) {
+  async getSourceURL(sourceId: SourceId) {
     const info = await this.ensureSource(sourceId);
     return info.url;
-  },
+  }
 
-  getSourceIdsForURL(url) {
+  getSourceIdsForURL(url: string) {
     // Ignore IDs which are generated versions of another ID with the same URL.
     // This happens with inline sources for HTML pages, in which case we only
     // want the ID for the HTML itself.
@@ -218,38 +304,41 @@ export const ThreadFront = {
       const originalIds = this.originalSources.map.get(id);
       return (originalIds || []).every(originalId => !ids.includes(originalId));
     });
-  },
+  }
 
-  async getSourceContents(sourceId) {
-    const { contents, contentType } = await sendMessage(
-      "Debugger.getSourceContents",
+  async getSourceContents(sourceId: SourceId) {
+    assert(this.sessionId);
+    const { contents, contentType } = await client.Debugger.getSourceContents(
       { sourceId },
       this.sessionId
     );
     return { contents, contentType };
-  },
+  }
 
-  async getBreakpointPositionsCompressed(sourceId, range) {
+  async getBreakpointPositionsCompressed(
+    sourceId: SourceId,
+    range?: { start: SourceLocation; end: SourceLocation }
+  ) {
+    assert(this.sessionId);
     const begin = range ? range.start : undefined;
     const end = range ? range.end : undefined;
-    const { lineLocations } = await sendMessage(
-      "Debugger.getPossibleBreakpoints",
+    const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
       { sourceId, begin, end },
       this.sessionId
     );
     return lineLocations;
-  },
+  }
 
-  setSkipPausing(skip) {
+  setSkipPausing(skip: boolean) {
     this.skipPausing = skip;
-  },
+  }
 
-  async setBreakpoint(sourceId, line, column, condition) {
+  async setBreakpoint(sourceId: SourceId, line: number, column: number, condition?: string) {
     const location = { sourceId, line, column };
     try {
       this._invalidateResumeTargets(async () => {
-        const { breakpointId } = await sendMessage(
-          "Debugger.setBreakpoint",
+        assert(this.sessionId);
+        const { breakpointId } = await client.Debugger.setBreakpoint(
           { location, condition },
           this.sessionId
         );
@@ -263,9 +352,9 @@ export const ThreadFront = {
       // for which inline sources in an HTML file (which share the same URL),
       // so ignore these errors.
     }
-  },
+  }
 
-  setBreakpointByURL(url, line, column, condition) {
+  setBreakpointByURL(url: string, line: number, column: number, condition?: string) {
     const sources = this.getSourceIdsForURL(url);
     if (!sources) {
       return;
@@ -274,20 +363,21 @@ export const ThreadFront = {
     return Promise.all(
       sourceIds.map(({ sourceId }) => this.setBreakpoint(sourceId, line, column, condition))
     );
-  },
+  }
 
-  async removeBreakpoint(sourceId, line, column) {
+  async removeBreakpoint(sourceId: SourceId, line: number, column: number) {
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
       if (location.sourceId == sourceId && location.line == line && location.column == column) {
         this.breakpoints.delete(breakpointId);
         this._invalidateResumeTargets(async () => {
-          await sendMessage("Debugger.removeBreakpoint", { breakpointId }, this.sessionId);
+          assert(this.sessionId);
+          await client.Debugger.removeBreakpoint({ breakpointId }, this.sessionId);
         });
       }
     }
-  },
+  }
 
-  removeBreakpointByURL(url, line, column) {
+  removeBreakpointByURL(url: string, line: number, column: number) {
     const sources = this.getSourceIdsForURL(url);
     if (!sources) {
       return;
@@ -296,9 +386,10 @@ export const ThreadFront = {
     return Promise.all(
       sourceIds.map(({ sourceId }) => this.removeBreakpoint(sourceId, line, column))
     );
-  },
+  }
 
-  ensurePause(point, time) {
+  ensurePause(point: ExecutionPoint, time: number) {
+    assert(this.sessionId);
     let pause = this.allPauses.get(point);
     if (pause) {
       return pause;
@@ -307,13 +398,13 @@ export const ThreadFront = {
     pause.create(point, time);
     this.allPauses.set(point, pause);
     return pause;
-  },
+  }
 
   ensureCurrentPause() {
     if (!this.currentPause) {
       this.currentPause = this.ensurePause(this.currentPoint, this.currentTime);
     }
-  },
+  }
 
   getFrames() {
     if (!this.currentPointHasFrames) {
@@ -321,18 +412,19 @@ export const ThreadFront = {
     }
 
     this.ensureCurrentPause();
-    return this.currentPause.getFrames();
-  },
+    return this.currentPause!.getFrames();
+  }
 
   lastAsyncPause() {
     this.ensureCurrentPause();
     return this.asyncPauses.length
       ? this.asyncPauses[this.asyncPauses.length - 1]
       : this.currentPause;
-  },
+  }
 
   async loadAsyncParentFrames() {
     const basePause = this.lastAsyncPause();
+    assert(basePause);
     const baseFrames = await basePause.getFrames();
     if (!baseFrames) {
       return [];
@@ -347,20 +439,24 @@ export const ThreadFront = {
     if (entryPause != this.lastAsyncPause()) {
       return [];
     }
+    assert(frames);
     return frames.slice(1);
-  },
+  }
 
-  pauseForAsyncIndex(asyncIndex) {
+  pauseForAsyncIndex(asyncIndex: number) {
     this.ensureCurrentPause();
     return asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.currentPause;
-  },
+  }
 
-  getScopes(asyncIndex, frameId) {
-    return this.pauseForAsyncIndex(asyncIndex).getScopes(frameId);
-  },
-
-  async evaluate(asyncIndex, frameId, text) {
+  getScopes(asyncIndex: number, frameId: FrameId) {
     const pause = this.pauseForAsyncIndex(asyncIndex);
+    assert(pause);
+    return pause.getScopes(frameId);
+  }
+
+  async evaluate(asyncIndex: number, frameId: FrameId, text: string) {
+    const pause = this.pauseForAsyncIndex(asyncIndex);
+    assert(pause);
     const rv = await pause.evaluate(frameId, text);
     if (rv.returned) {
       rv.returned = new ValueFront(pause, rv.returned);
@@ -368,10 +464,10 @@ export const ThreadFront = {
       rv.exception = new ValueFront(pause, rv.exception);
     }
     return rv;
-  },
+  }
 
   // Preload step target information and pause data for nearby points.
-  async _precacheResumeTargets() {
+  private async _precacheResumeTargets() {
     if (!this.currentPointHasFrames) {
       return;
     }
@@ -382,24 +478,24 @@ export const ThreadFront = {
     // Each step command, and the transitive steps to queue up after that step is known.
     const stepCommands = [
       {
-        command: "Debugger.findReverseStepOverTarget",
-        transitive: ["Debugger.findReverseStepOverTarget", "Debugger.findStepInTarget"],
+        command: client.Debugger.findReverseStepOverTarget,
+        transitive: [client.Debugger.findReverseStepOverTarget, client.Debugger.findStepInTarget],
       },
       {
-        command: "Debugger.findStepOverTarget",
-        transitive: ["Debugger.findStepOverTarget", "Debugger.findStepInTarget"],
+        command: client.Debugger.findStepOverTarget,
+        transitive: [client.Debugger.findStepOverTarget, client.Debugger.findStepInTarget],
       },
       {
-        command: "Debugger.findStepInTarget",
-        transitive: ["Debugger.findStepOutTarget", "Debugger.findStepInTarget"],
+        command: client.Debugger.findStepInTarget,
+        transitive: [client.Debugger.findStepOutTarget, client.Debugger.findStepInTarget],
       },
       {
-        command: "Debugger.findStepOutTarget",
+        command: client.Debugger.findStepOutTarget,
         transitive: [
-          "Debugger.findReverseStepOverTarget",
-          "Debugger.findStepOverTarget",
-          "Debugger.findStepInTarget",
-          "Debugger.findStepOutTarget",
+          client.Debugger.findReverseStepOverTarget,
+          client.Debugger.findStepOverTarget,
+          client.Debugger.findStepInTarget,
+          client.Debugger.findStepOutTarget,
         ],
       },
     ];
@@ -430,11 +526,11 @@ export const ThreadFront = {
         this.ensurePause(transitiveTarget.point, transitiveTarget.time);
       });
     });
-  },
+  }
 
   // Perform an operation that will change our cached targets about where resume
   // operations will finish.
-  async _invalidateResumeTargets(callback) {
+  private async _invalidateResumeTargets(callback: () => Promise<void>) {
     this.resumeTargets.clear();
     this.resumeTargetEpoch++;
     this.numPendingInvalidateCommands++;
@@ -448,7 +544,7 @@ export const ThreadFront = {
         this._precacheResumeTargets();
       }
     }
-  },
+  }
 
   // Wait for any in flight invalidation commands to finish. Note: currently
   // this is only used during tests. Uses could be expanded to ensure that we
@@ -459,38 +555,40 @@ export const ThreadFront = {
     if (!this.numPendingInvalidateCommands) {
       return;
     }
-    const { promise, resolve } = defer();
-    this.invalidateCommandWaiters.push(resolve);
+    const { promise, resolve } = defer<void>();
+    this.invalidateCommandWaiters.push(resolve as () => void);
     return promise;
-  },
+  }
 
-  async _findResumeTarget(point, command) {
+  private async _findResumeTarget(point: ExecutionPoint, command: FindTargetCommand) {
+    assert(this.sessionId);
+
     // Check already-known resume targets.
-    const key = `${point}:${command}`;
+    const key = `${point}:${command.name}`;
     const knownTarget = this.resumeTargets.get(key);
     if (knownTarget) {
       return knownTarget;
     }
 
     const epoch = this.resumeTargetEpoch;
-    const { target } = await sendMessage(command, { point }, this.sessionId);
+    const { target } = await command({ point }, this.sessionId);
     if (epoch == this.resumeTargetEpoch) {
       this.resumeTargets.set(key, target);
     }
 
     return target;
-  },
+  }
 
-  async _resumeOperation(command, selectedPoint) {
+  private async _resumeOperation(command: FindTargetCommand, selectedPoint: ExecutionPoint) {
     // Don't allow resumes until we've finished loading and did the initial
     // warp to the endpoint.
     await this.initializedWaiter.promise;
 
     let resumeEmitted = false;
-    let resumeTarget = null;
+    let resumeTarget: PauseDescription | null = null;
 
     const warpToTarget = () => {
-      const { point, time, frame } = resumeTarget;
+      const { point, time, frame } = resumeTarget!;
       this.timeWarp(point, time, !!frame);
     };
 
@@ -507,50 +605,52 @@ export const ThreadFront = {
     if (resumeEmitted) {
       warpToTarget();
     }
-  },
+  }
 
-  rewind(point) {
-    this._resumeOperation("Debugger.findRewindTarget", point);
-  },
-  resume(point) {
-    this._resumeOperation("Debugger.findResumeTarget", point);
-  },
-  reverseStepOver(point) {
-    this._resumeOperation("Debugger.findReverseStepOverTarget", point);
-  },
-  stepOver(point) {
-    this._resumeOperation("Debugger.findStepOverTarget", point);
-  },
-  stepIn(point) {
-    this._resumeOperation("Debugger.findStepInTarget", point);
-  },
-  stepOut(point) {
-    this._resumeOperation("Debugger.findStepOutTarget", point);
-  },
+  rewind(point: ExecutionPoint) {
+    this._resumeOperation(client.Debugger.findRewindTarget, point);
+  }
+  resume(point: ExecutionPoint) {
+    this._resumeOperation(client.Debugger.findResumeTarget, point);
+  }
+  reverseStepOver(point: ExecutionPoint) {
+    this._resumeOperation(client.Debugger.findReverseStepOverTarget, point);
+  }
+  stepOver(point: ExecutionPoint) {
+    this._resumeOperation(client.Debugger.findStepOverTarget, point);
+  }
+  stepIn(point: ExecutionPoint) {
+    this._resumeOperation(client.Debugger.findStepInTarget, point);
+  }
+  stepOut(point: ExecutionPoint) {
+    this._resumeOperation(client.Debugger.findStepOutTarget, point);
+  }
 
-  async resumeTarget(point) {
+  async resumeTarget(point: ExecutionPoint) {
     await this.initializedWaiter.promise;
-    return this._findResumeTarget(point, "Debugger.findResumeTarget");
-  },
+    return this._findResumeTarget(point, client.Debugger.findResumeTarget);
+  }
 
-  blackbox(sourceId, begin, end) {
+  blackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation) {
     return this._invalidateResumeTargets(async () => {
-      await sendMessage("Debugger.blackboxSource", { sourceId, begin, end }, this.sessionId);
+      assert(this.sessionId);
+      await client.Debugger.blackboxSource({ sourceId, begin, end }, this.sessionId);
     });
-  },
+  }
 
-  unblackbox(sourceId, begin, end) {
+  unblackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation) {
     return this._invalidateResumeTargets(async () => {
-      await sendMessage("Debugger.unblackboxSource", { sourceId, begin, end }, this.sessionId);
+      assert(this.sessionId);
+      await client.Debugger.unblackboxSource({ sourceId, begin, end }, this.sessionId);
     });
-  },
+  }
 
-  async findConsoleMessages(onConsoleMessage) {
+  async findConsoleMessages(onConsoleMessage: (pause: Pause, message: Message) => void) {
     const sessionId = await this.waitForSession();
 
-    sendMessage("Console.findMessages", {}, sessionId);
-    addEventListener("Console.newMessage", ({ message }) => {
-      const pause = new Pause(this.sessionId);
+    client.Console.findMessages({}, sessionId);
+    client.Console.addNewMessageListener(({ message }) => {
+      const pause = new Pause(sessionId);
       pause.instantiate(
         message.pauseId,
         message.point.point,
@@ -559,11 +659,13 @@ export const ThreadFront = {
         message.data
       );
       if (message.argumentValues) {
-        message.argumentValues = message.argumentValues.map(v => new ValueFront(pause, v));
+        (message as WiredMessage).argumentValues = message.argumentValues.map(
+          v => new ValueFront(pause, v)
+        );
       }
       onConsoleMessage(pause, message);
     });
-  },
+  }
 
   async getRootDOMNode() {
     if (!this.sessionId) {
@@ -571,24 +673,24 @@ export const ThreadFront = {
     }
     this.ensureCurrentPause();
     const pause = this.currentPause;
-    await this.currentPause.loadDocument();
+    await this.currentPause!.loadDocument();
     return pause == this.currentPause ? this.getKnownRootDOMNode() : null;
-  },
+  }
 
   getKnownRootDOMNode() {
-    assert(this.currentPause.documentNode !== undefined);
+    assert(this.currentPause?.documentNode !== undefined);
     return this.currentPause.documentNode;
-  },
+  }
 
-  async searchDOM(query) {
+  async searchDOM(query: string) {
     if (!this.sessionId) {
       return [];
     }
     this.ensureCurrentPause();
     const pause = this.currentPause;
-    const nodes = await this.currentPause.searchDOM(query);
+    const nodes = await this.currentPause!.searchDOM(query);
     return pause == this.currentPause ? nodes : null;
-  },
+  }
 
   async loadMouseTargets() {
     if (!this.sessionId) {
@@ -596,21 +698,22 @@ export const ThreadFront = {
     }
     const pause = this.currentPause;
     this.ensureCurrentPause();
-    await this.currentPause.loadMouseTargets();
+    await this.currentPause!.loadMouseTargets();
     return pause == this.currentPause;
-  },
+  }
 
-  async getMouseTarget(x, y) {
+  async getMouseTarget(x: number, y: number) {
     if (!this.sessionId) {
       return null;
     }
     const pause = this.currentPause;
     this.ensureCurrentPause();
-    const nodeBounds = await this.currentPause.getMouseTarget(x, y);
+    const nodeBounds = await this.currentPause!.getMouseTarget(x, y);
     return pause == this.currentPause ? nodeBounds : null;
-  },
+  }
 
-  async ensureNodeLoaded(objectId) {
+  async ensureNodeLoaded(objectId: ObjectId) {
+    assert(this.currentPause);
     const pause = this.currentPause;
     const node = await pause.ensureDOMFrontAndParents(objectId);
     if (pause != this.currentPause) {
@@ -618,16 +721,18 @@ export const ThreadFront = {
     }
     await node.ensureParentsLoaded();
     return pause == this.currentPause ? node : null;
-  },
+  }
 
-  getFrameSteps(asyncIndex, frameId) {
-    return this.pauseForAsyncIndex(asyncIndex).getFrameSteps(frameId);
-  },
+  getFrameSteps(asyncIndex: number, frameId: FrameId) {
+    const pause = this.pauseForAsyncIndex(asyncIndex);
+    assert(pause);
+    return pause.getFrameSteps(frameId);
+  }
 
-  getPreferredLocationRaw(locations) {
+  getPreferredLocationRaw(locations: MappedLocation) {
     const { sourceId } = this._chooseSourceId(locations.map(l => l.sourceId));
     return locations.find(l => l.sourceId == sourceId);
-  },
+  }
 
   // Given an RRP MappedLocation array with locations in different sources
   // representing the same generated location (i.e. a generated location plus
@@ -635,25 +740,25 @@ export const ThreadFront = {
   // choose the location which we should be using within the devtools. Normally
   // this is the most original location, except when preferSource has been used
   // to prefer a generated source instead.
-  async getPreferredLocation(locations) {
+  async getPreferredLocation(locations: MappedLocation) {
     await Promise.all(locations.map(({ sourceId }) => this.ensureSource(sourceId)));
     return this.getPreferredLocationRaw(locations);
-  },
+  }
 
-  async getAlternateLocation(locations) {
+  async getAlternateLocation(locations: MappedLocation) {
     await Promise.all(locations.map(({ sourceId }) => this.ensureSource(sourceId)));
     const { alternateId } = this._chooseSourceId(locations.map(l => l.sourceId));
     if (alternateId) {
       return locations.find(l => l.sourceId == alternateId);
     }
     return null;
-  },
+  }
 
   // Get the source which should be used in the devtools from an array of
   // sources representing the same location. If the chosen source is an
   // original or generated source and there is an alternative which users
   // can switch to, also returns that alternative.
-  _chooseSourceId(sourceIds) {
+  private _chooseSourceId(sourceIds: SourceId[]) {
     // Ignore inline sources if we have an HTML source containing them.
     if (sourceIds.some(id => this.getSourceKind(id) == "html")) {
       sourceIds = sourceIds.filter(id => this.getSourceKind(id) != "inlineScript");
@@ -673,7 +778,9 @@ export const ThreadFront = {
       // Determine the kind of this source, or its minified version.
       let kind = info.kind;
       if (kind == "prettyPrinted") {
-        const minifiedInfo = this.sources.get(info.generatedSourceIds[0]);
+        const minifiedInfo = info.generatedSourceIds
+          ? this.sources.get(info.generatedSourceIds[0])
+          : undefined;
         if (!minifiedInfo) {
           return { sourceId: id };
         }
@@ -703,18 +810,18 @@ export const ThreadFront = {
       return { sourceId: generatedId, alternateId: originalId };
     }
     return { sourceId: originalId, alternateId: generatedId };
-  },
+  }
 
   // Get the set of chosen sources from a list of source IDs which might
   // represent different generated locations.
-  _chooseSourceIdList(sourceIds) {
+  private _chooseSourceIdList(sourceIds: SourceId[]) {
     const groups = this._groupSourceIds(sourceIds);
     return groups.map(ids => this._chooseSourceId(ids));
-  },
+  }
 
   // Group together a set of source IDs according to whether they are generated
   // or original versions of each other.
-  _groupSourceIds(sourceIds) {
+  private _groupSourceIds(sourceIds: SourceId[]) {
     const groups = [];
     while (sourceIds.length) {
       const id = sourceIds[0];
@@ -723,43 +830,45 @@ export const ThreadFront = {
       sourceIds = sourceIds.filter(id => !group.includes(id));
     }
     return groups;
-  },
+  }
 
   // Get all original/generated IDs which can represent a location in sourceId.
-  _getAlternateSourceIds(sourceId) {
-    const rv = new Set();
+  private _getAlternateSourceIds(sourceId: SourceId) {
+    const rv = new Set<SourceId>();
     const worklist = [sourceId];
     while (worklist.length) {
-      sourceId = worklist.pop();
+      sourceId = worklist.pop()!;
       if (rv.has(sourceId)) {
         continue;
       }
       rv.add(sourceId);
-      const { generatedSourceIds } = this.sources.get(sourceId);
+      const sources = this.sources.get(sourceId);
+      assert(sources);
+      const { generatedSourceIds } = sources;
       (generatedSourceIds || []).forEach(id => worklist.push(id));
       const originalSourceIds = this.originalSources.map.get(sourceId);
       (originalSourceIds || []).forEach(id => worklist.push(id));
     }
     return [...rv];
-  },
+  }
 
   // Return whether sourceId is minified and has a pretty printed alternate.
-  isMinifiedSource(sourceId) {
+  isMinifiedSource(sourceId: SourceId) {
     const originalIds = this.originalSources.map.get(sourceId) || [];
     return originalIds.some(id => {
       const info = this.sources.get(id);
       return info && info.kind == "prettyPrinted";
     });
-  },
+  }
 
-  isSourceMappedSource(sourceId) {
+  isSourceMappedSource(sourceId: SourceId) {
     const info = this.sources.get(sourceId);
     if (!info) {
       return false;
     }
     let kind = info.kind;
     if (kind == "prettyPrinted") {
-      const minifiedInfo = this.sources.get(info.generatedSourceIds[0]);
+      const minifiedInfo = this.sources.get(info.generatedSourceIds![0]);
       if (!minifiedInfo) {
         return false;
       }
@@ -767,53 +876,54 @@ export const ThreadFront = {
       assert(kind != "prettyPrinted");
     }
     return kind == "sourceMapped";
-  },
+  }
 
-  preferSource(sourceId, value) {
+  preferSource(sourceId: SourceId, value: SourceId) {
     assert(!this.isSourceMappedSource(sourceId));
     if (value) {
       this.preferredGeneratedSources.add(sourceId);
     } else {
       this.preferredGeneratedSources.delete(sourceId);
     }
-  },
+  }
 
-  hasPreferredGeneratedSource(location) {
+  hasPreferredGeneratedSource(location: MappedLocation) {
     return location.some(({ sourceId }) => {
       return this.preferredGeneratedSources.has(sourceId);
     });
-  },
+  }
 
   // Given a location in a generated source, get the preferred location to use.
   // This has to query the server to get the original / pretty printed locations
   // corresponding to this generated location, so getPreferredLocation is
   // better to use when possible.
-  async getPreferredMappedLocation(location) {
+  async getPreferredMappedLocation(location: Location) {
     const mappedLocation = await this.mappedLocations.getMappedLocation(location);
     return this.getPreferredLocation(mappedLocation);
-  },
+  }
 
   async getRecordingDescription() {
+    assert(this.recordingId);
     let description;
     try {
-      description = await sendMessage("Recording.getDescription", {
+      description = await client.Recording.getDescription({
         recordingId: this.recordingId,
       });
     } catch (e) {
       // Getting the description will fail if it was never set. For now we don't
       // set the last screen in this case.
       const sessionId = await this.waitForSession();
-      const { endpoint } = await sendMessage("Session.getEndpoint", {}, sessionId);
+      const { endpoint } = await client.Session.getEndpoint({}, sessionId);
       description = { duration: endpoint.time };
     }
 
     return description;
-  },
+  }
 
-  async watchMetadata(key, callback) {
+  async watchMetadata(key: string, callback: (args: any) => any) {
     if (!this.metadataListeners) {
-      addEventListener("Recording.metadataChange", ({ key, newValue }) => {
-        this.metadataListeners.forEach(entry => {
+      client.Recording.addMetadataChangeListener(({ key, newValue }) => {
+        this.metadataListeners!.forEach(entry => {
           if (entry.key == key) {
             entry.callback(newValue ? JSON.parse(newValue) : undefined);
           }
@@ -823,18 +933,20 @@ export const ThreadFront = {
     }
     this.metadataListeners.push({ key, callback });
 
-    const { value } = await sendMessage("Recording.metadataStartListening", {
+    assert(this.recordingId);
+    const { value } = await client.Recording.metadataStartListening({
       recordingId: this.recordingId,
       key,
     });
     callback(value ? JSON.parse(value) : undefined);
-  },
+  }
 
-  async updateMetadata(key, callback) {
+  async updateMetadata(key: string, callback: (args: any) => any) {
     // Keep trying to update the metadata until it succeeds --- we updated it
     // before anyone else did. Use the callback to compute the new value in
     // terms of the old value. The callback can return null to cancel the update.
-    let { value } = await sendMessage("Recording.getMetadata", {
+    assert(this.recordingId);
+    let { value } = await client.Recording.getMetadata({
       recordingId: this.recordingId,
       key,
     });
@@ -845,7 +957,7 @@ export const ThreadFront = {
         return;
       }
       const newValue = JSON.stringify(newValueRaw);
-      const { updated, currentValue } = await sendMessage("Recording.setMetadata", {
+      const { updated, currentValue } = await client.Recording.setMetadata({
         recordingId: this.recordingId,
         key,
         newValue,
@@ -858,7 +970,8 @@ export const ThreadFront = {
       // Retry with the value that was written by another client.
       value = currentValue;
     }
-  },
-};
+  }
+}
 
+export const ThreadFront = new _ThreadFront();
 EventEmitter.decorate(ThreadFront);
