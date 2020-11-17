@@ -175,11 +175,14 @@ let failures = [];
 
 async function runTest(path, local, timeout = 60, env = {}) {
   const testURL = env.RECORD_REPLAY_TEST_URL || "";
-  for (const pattern of patterns) {
-    if (!path.includes(pattern) && !testURL.includes(pattern) && !local.includes(pattern)) {
-      console.log(`Skipping test ${path} ${testURL} ${local}`);
-      return;
-    }
+  if (
+    patterns.length &&
+    patterns.every(
+      pattern => !path.includes(pattern) && !testURL.includes(pattern) && !local.includes(pattern)
+    )
+  ) {
+    console.log(`Skipping test ${path} ${testURL} ${local}`);
+    return;
   }
 
   console.log(`[${elapsedTime()}] Starting test ${path} ${testURL} ${local}`);
