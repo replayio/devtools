@@ -33,6 +33,7 @@ class Node extends PureComponent {
     this.onSelectNodeClick = this.onSelectNodeClick.bind(this);
     this.onMouseEnter = this.onMouseEnter.bind(this);
     this.onMouseLeave = this.onMouseLeave.bind(this);
+    this.scrollIntoView = this.scrollIntoView.bind(this);
   }
 
   onExpanderToggle(event) {
@@ -60,6 +61,10 @@ class Node extends PureComponent {
 
   onMouseLeave() {
     this.props.onMouseLeaveNode(this.props.node.id);
+  }
+
+  scrollIntoView(el) {
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   /**
@@ -143,7 +148,7 @@ class Node extends PureComponent {
 
   render() {
     const { markup, node } = this.props;
-    const { rootNode, selectedNode } = markup;
+    const { rootNode, selectedNode, scrollIntoViewNode } = markup;
 
     const isWhitespaceTextNode = node.type === TEXT_NODE && !/[^\s]/.exec(node.value);
     if (isWhitespaceTextNode && !features.showWhitespaceNodes) {
@@ -157,6 +162,7 @@ class Node extends PureComponent {
     // node is not the root node.
     const showExpander = canExpand && node.parentNodeId !== rootNode;
     const isSelected = node.id === selectedNode;
+    const shouldScrollIntoView = node.id === scrollIntoViewNode;
 
     return dom.li(
       {
@@ -174,6 +180,7 @@ class Node extends PureComponent {
           role: "treeitem",
           onMouseEnter: this.onMouseEnter,
           onMouseLeave: this.onMouseLeave,
+          ref: shouldScrollIntoView ? this.scrollIntoView : undefined,
         },
         dom.span({
           className: "tag-state" + (isSelected ? " theme-selected" : ""),

@@ -6,6 +6,7 @@ const {
   ADD_CHILDREN,
   UPDATE_NODE_EXPANDED,
   UPDATE_SELECTED_NODE,
+  UPDATE_SCROLL_INTO_VIEW_NODE,
 } = require("../actions/index");
 
 const ATTR_COLLAPSE_ENABLED_PREF = "devtools.markup.collapseAttributes";
@@ -20,6 +21,8 @@ const INITIAL_MARKUP = {
   rootNode: null,
   // The selected node to display in the DOM view.
   selectedNode: null,
+  // A node that should be scrolled into view.
+  scrollIntoViewNode: null,
   // An object representing the markup tree. The key to the object represents the object
   // ID of a NodeFront of a given node. The value of each item in the object contains
   // an object representing the properties of the given node.
@@ -38,6 +41,8 @@ const reducers = {
         [rootNode.id]: rootNode,
       },
       rootNode: rootNode.id,
+      selectedNode: null,
+      scrollIntoViewNode: null,
     };
   },
 
@@ -87,6 +92,13 @@ const reducers = {
     return {
       ...markup,
       selectedNode,
+    };
+  },
+
+  [UPDATE_SCROLL_INTO_VIEW_NODE](markup, { scrollIntoViewNode }) {
+    return {
+      ...markup,
+      scrollIntoViewNode,
     };
   },
 };
