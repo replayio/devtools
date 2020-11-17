@@ -45,14 +45,6 @@ class Toolbox extends React.Component {
     this.props.setSplitConsole(open);
   }
 
-  renderTimeline() {
-    if (!gToolbox.getPanel("console")) {
-      return null;
-    }
-
-    return <Timeline />;
-  }
-
   renderInspector() {
     const inspector = gToolbox.getPanel("inspector");
     let markupView;
@@ -204,7 +196,9 @@ class Toolbox extends React.Component {
     const { selectedPanel, splitConsoleOpen } = this.props;
     return (
       <div id="toolbox" className={`${selectedPanel}`}>
-        <div id="toolbox-timeline">{this.renderTimeline()}</div>
+        <div id="toolbox-timeline">
+          <Timeline />
+        </div>
         {this.renderToolbar()}
         <div
           id="toolbox-contents"
