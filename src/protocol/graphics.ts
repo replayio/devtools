@@ -360,7 +360,7 @@ export function refreshGraphics() {
 }
 
 // Install an observer to refresh graphics whenever the content canvas is resized.
-function installObserver() {
+export function installObserver() {
   const canvas = document.getElementById("viewer");
   if (canvas) {
     const observer = new ResizeObserverPolyfill(() => {
@@ -371,4 +371,3 @@ function installObserver() {
     setTimeout(installObserver, 100);
   }
 }
-installObserver();
