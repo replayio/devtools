@@ -16,6 +16,9 @@ createEnum(
 
     // Updates the selected node to display in the markup tree.
     "UPDATE_SELECTED_NODE",
+
+    // Updates the node that should be scrolled into view.
+    "UPDATE_SCROLL_INTO_VIEW_NODE",
   ],
   module.exports
 );

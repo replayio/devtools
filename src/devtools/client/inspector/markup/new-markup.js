@@ -174,7 +174,9 @@ class MarkupView {
    *         The NodeFront object id to select.
    */
   onSelectNode(nodeId) {
-    this.selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
+    this.selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId), {
+      reason: "markup",
+    });
   }
 
   /**
@@ -268,7 +270,9 @@ class MarkupView {
       return;
     }
 
-    this.store?.dispatch(selectionChanged(this.selection, reason === "navigateaway"));
+    this.store?.dispatch(
+      selectionChanged(this.selection, reason === "navigateaway", reason !== "markup")
+    );
   }
 }
 

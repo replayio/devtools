@@ -1,7 +1,14 @@
 import { assert } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
 import { DOCUMENT_TYPE_NODE } from "devtools/shared/dom-node-constants";
-import { RESET, NEW_ROOT, ADD_CHILDREN, UPDATE_NODE_EXPANDED, UPDATE_SELECTED_NODE } from "./index";
+import {
+  RESET,
+  NEW_ROOT,
+  ADD_CHILDREN,
+  UPDATE_NODE_EXPANDED,
+  UPDATE_SELECTED_NODE,
+  UPDATE_SCROLL_INTO_VIEW_NODE,
+} from "./index";
 
 /**
  * Clears the tree
@@ -56,6 +63,16 @@ export function updateSelectedNode(selectedNode) {
 }
 
 /**
+ * Set the node that should be scrolled into view
+ */
+export function scrollIntoView(scrollIntoViewNode) {
+  return {
+    type: UPDATE_SCROLL_INTO_VIEW_NODE,
+    scrollIntoViewNode,
+  };
+}
+
+/**
  * Expand the given node after ensuring its child nodes are loaded and added to the tree.
  */
 export function expandNode(nodeId) {
@@ -83,7 +100,7 @@ export function expandNode(nodeId) {
 /**
  * Update the tree to show the currently selected node.
  */
-export function selectionChanged(selection, expandSelectedNode) {
+export function selectionChanged(selection, expandSelectedNode, shouldScrollIntoView) {
   return async ({ dispatch }) => {
     const selectedNode = selection.nodeFront;
     if (!selectedNode) {
@@ -106,8 +123,16 @@ export function selectionChanged(selection, expandSelectedNode) {
 
     // expand each ancestor, loading its children if necessary
     for (const ancestor of ancestors) {
+      if (shouldScrollIntoView) {
+        dispatch(scrollIntoView(ancestor.objectId()));
+      }
+
       await dispatch(expandNode(ancestor.objectId()));
       if (selection.nodeFront !== selectedNode) return;
+    }
+
+    if (shouldScrollIntoView) {
+      dispatch(scrollIntoView(selectedNode.objectId()));
     }
   };
 }
