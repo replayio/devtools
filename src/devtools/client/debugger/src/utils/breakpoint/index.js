@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
+import { isEqual } from "lodash";
 import { getBreakpoint, getSource, getSourceActorsForSource } from "../../selectors";
 import assert from "../assert";
 import { features } from "../prefs";
@@ -24,10 +23,14 @@ export function firstString(...args) {
 }
 
 // The ID for a Breakpoint is derived from its location in its Source.
-export function makeBreakpointId(location) {
+export function getLocationKey(location) {
   const { sourceId, line, column } = location;
   const columnString = column || "";
   return `${sourceId || location.scriptId}:${line}:${columnString}`;
+}
+
+export function isMatchingLocation(location1, location2) {
+  return isEqual(location1, location2);
 }
 
 export function getLocationWithoutColumn(location) {

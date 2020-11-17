@@ -53,7 +53,6 @@ import WelcomeBox from "./WelcomeBox";
 import EditorTabs from "./Editor/Tabs";
 import EditorFooter from "./Editor/Footer";
 import QuickOpenModal from "./QuickOpenModal";
-import WhyPaused from "./SecondaryPanes/WhyPaused";
 
 class Debugger extends Component {
   onLayoutChange;
@@ -193,7 +192,6 @@ class Debugger extends Component {
             horizontal={horizontal}
           />
           <Editor startPanelSize={startPanelSize} endPanelSize={endPanelSize} />
-          {this.props.endPanelCollapsed ? <WhyPaused /> : null}
           {!this.props.selectedSource ? (
             <WelcomeBox
               horizontal={horizontal}

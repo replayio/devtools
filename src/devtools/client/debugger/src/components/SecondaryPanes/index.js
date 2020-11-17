@@ -30,7 +30,6 @@ import SplitBox from "devtools-splitter";
 import Frames from "./Frames";
 import Accordion from "../shared/Accordion";
 import CommandBar from "./CommandBar";
-import WhyPaused from "./WhyPaused";
 import FrameTimeline from "./FrameTimeline";
 
 import Scopes from "./Scopes";
@@ -130,7 +129,6 @@ class SecondaryPanes extends Component {
 
     return (
       <div>
-        <WhyPaused delay={renderWhyPauseDelay} />
         <Accordion items={this.getItems()} />
       </div>
     );
@@ -145,7 +143,6 @@ class SecondaryPanes extends Component {
         splitterSize={1}
         startPanel={
           <div style={{ width: "inherit" }}>
-            <WhyPaused delay={this.props.renderWhyPauseDelay} />
             <Accordion items={this.getStartItems()} />
           </div>
         }

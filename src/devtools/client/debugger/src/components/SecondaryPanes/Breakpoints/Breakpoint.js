@@ -10,7 +10,7 @@ import { createSelector } from "reselect";
 import classnames from "classnames";
 
 import actions from "../../../actions";
-import { getLocationWithoutColumn, makeBreakpointId } from "../../../utils/breakpoint";
+import { getLocationWithoutColumn, getLocationKey } from "../../../utils/breakpoint";
 import { features } from "../../../utils/prefs";
 import { getBreakpointsList, getSelectedFrame, getContext } from "../../../selectors";
 
@@ -41,10 +41,10 @@ class Breakpoint extends PureComponent {
     }
 
     const bpId = features.columnBreakpoints
-      ? makeBreakpointId(this.selectedLocation)
+      ? getLocationKey(this.selectedLocation)
       : getLocationWithoutColumn(this.selectedLocation);
     const frameId = features.columnBreakpoints
-      ? makeBreakpointId(frame.selectedLocation)
+      ? getLocationKey(frame.selectedLocation)
       : getLocationWithoutColumn(frame.selectedLocation);
     return bpId == frameId;
   }
