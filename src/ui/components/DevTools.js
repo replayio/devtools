@@ -14,6 +14,7 @@ import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { gql, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
+import { prefs } from "../utils/prefs";
 
 const GET_RECORDING = gql`
   query GetRecording($recordingId: String) {
@@ -30,15 +31,20 @@ function DevtoolsSplitBox({ updateTimelineDimensions, tooltip }) {
   const toolbox = <Toolbox />;
   const viewer = <Viewer tooltip={tooltip} />;
 
+  const handleMove = num => {
+    updateTimelineDimensions();
+    prefs.toolboxHeight = `${num}px`;
+  };
+
   return (
     <SplitBox
       style={{ width: "100vw", overflow: "hidden" }}
       splitterSize={1}
-      initialSize="50%"
+      initialSize={prefs.toolboxHeight}
       minSize="20%"
       maxSize="80%"
       vert={false}
-      onMove={num => updateTimelineDimensions()}
+      onMove={handleMove}
       startPanel={viewer}
       endPanel={toolbox}
       endPanelControl={false}
