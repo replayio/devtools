@@ -40,3 +40,22 @@ Everybody's welcome to join us [on Slack](https://replayio.slack.com/archives/C0
 
 ```
 node test/run.js [--pattern pat]
+```
+
+#### Running tests against local builds of the browser
+If you want to run the tests against a local build of the browser, you'll need to invoke the tests like so:
+
+```
+RECORD_REPLAY_PATH=~/devel/gecko-dev/rr-opt/dist/Replay.app RECORD_REPLAY_BUILD_PATH=~/devel/gecko-dev node test/run.js
+```
+
+Replace the paths with the appropriate paths to and within `gecko-dev` as appropriate in your environment.
+
+#### Running tests against local builds of the backend
+If you want to run the tests against a local build of the backend, you'll need to invoke the tests like so:
+
+```
+RECORD_REPLAY_SERVER=ws://localhost:8000 RECORD_REPLAY_DRIVER=~/devel/backend/out/macOS-recordreplay.so node test/run.js
+```
+
+Replace the paths with the appropriate paths within the `backend` repo as appropriate in your environment.
