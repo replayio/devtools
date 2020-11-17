@@ -160,11 +160,7 @@ class MarkupView {
    * Returns true if the markup panel is visisble, and false otherwise.
    */
   isPanelVisible() {
-    if (features.oldMarkupView) {
-      return this.inspector?.sidebar?.getCurrentTabID() === "markupview";
-    } else {
-      return this.inspector?.toolbox?.currentTool === "inspector";
-    }
+    return this.inspector?.toolbox?.currentTool === "inspector";
   }
 
   /**
