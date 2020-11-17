@@ -37,7 +37,7 @@ const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
 const { InspectorSearch } = require("devtools/client/inspector/inspector-search");
 
-const NewMarkupView = require("devtools/client/inspector/markup/new-markup");
+import MarkupView from "devtools/client/inspector/markup/markup";
 const { ComputedPanel } = require("devtools/client/inspector/computed/panel");
 const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");
 
@@ -301,7 +301,7 @@ export class Inspector {
         panel = new LayoutView(this, this.panelWin);
         break;
       case "markupview":
-        panel = new NewMarkupView(this, this.panelWin);
+        panel = new MarkupView(this);
         break;
       case "ruleview":
         const RulesView = require("devtools/client/inspector/rules/new-rules");
