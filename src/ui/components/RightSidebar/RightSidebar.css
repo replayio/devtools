@@ -19,6 +19,11 @@
   flex-direction: column;
 }
 
+.right-sidebar .bottom-buttons {
+  display: flex;
+  justify-content: center;
+}
+
 .right-sidebar .drawer-buttons button {
   border: 4px solid transparent;
   border-radius: 8px;

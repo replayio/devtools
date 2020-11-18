@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import EventsTimeline from "./EventsTimeline";
 import classnames from "classnames";
+import { connect } from "react-redux";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
+
 import "./RightSidebar.css";
 
 function Tooltip({ tooltip, drawerNode }) {
@@ -15,7 +19,6 @@ function Tooltip({ tooltip, drawerNode }) {
 
 function Buttons({ setExpanded, expanded, tooltip, setTooltip }) {
   const [commentButtonNode, setCommentButtonNode] = useState(null);
-  const [eventButtonNode, setEventButtonNode] = useState(null);
   const [nextAction, setNextAction] = useState(null);
 
   const handleMouseEnter = (node, name) => {
@@ -51,10 +54,10 @@ function Buttons({ setExpanded, expanded, tooltip, setTooltip }) {
   );
 }
 
-function Drawer({ setExpanded, expanded }) {
+function _Drawer({ toggleToolbox, toolboxExpanded, setExpanded, expanded }) {
   const [tooltip, setTooltip] = useState(null);
   const [drawerNode, setDrawerNode] = useState(null);
-
+  const dir = toolboxExpanded ? "up" : "down";
   return (
     <div className="drawer" ref={node => setDrawerNode(node)}>
       <Buttons
@@ -64,9 +67,16 @@ function Drawer({ setExpanded, expanded }) {
         setTooltip={setTooltip}
       />
       {tooltip ? <Tooltip tooltip={tooltip} drawerNode={drawerNode} /> : null}
+      <div className="bottom-buttons">
+        <div className={`img arrow-${dir}`} onClick={toggleToolbox}></div>
+      </div>
     </div>
   );
 }
+
+const Drawer = connect(state => ({ toolboxExpanded: selectors.getToolboxExpanded(state) }), {
+  toggleToolbox: actions.toggleToolbox,
+})(_Drawer);
 
 export default function RightSidebar({}) {
   const [expanded, setExpanded] = useState(true);

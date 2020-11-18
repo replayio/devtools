@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 
 import Toolbox from "./Toolbox";
 import Comments from "./Comments";
-import Recordings from "./Recordings/index";
 import Header from "./Header/index";
 import Viewer from "./Viewer";
 import Loader from "./shared/Loader";
@@ -27,9 +26,17 @@ const GET_RECORDING = gql`
   }
 `;
 
-function DevtoolsSplitBox({ updateTimelineDimensions, tooltip }) {
+function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }) {
   const toolbox = <Toolbox />;
   const viewer = <Viewer tooltip={tooltip} />;
+
+  if (!toolboxExpanded) {
+    return (
+      <div className="collapsed-toolbox">
+        {viewer} {toolbox}
+      </div>
+    );
+  }
 
   const handleMove = num => {
     updateTimelineDimensions();
@@ -92,6 +99,7 @@ function DevTools({
   recordingId,
   expectedError,
   setExpectedError,
+  toolboxExpanded,
 }) {
   const { user, isAuthenticated } = useAuth0();
   const { data, error, loading: queryIsLoading } = useQuery(GET_RECORDING, {
@@ -130,7 +138,11 @@ function DevTools({
   return (
     <>
       <Header />
-      <DevtoolsSplitBox tooltip={tooltip} updateTimelineDimensions={updateTimelineDimensions} />
+      <DevtoolsSplitBox
+        toolboxExpanded={toolboxExpanded}
+        tooltip={tooltip}
+        updateTimelineDimensions={updateTimelineDimensions}
+      />
       {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
       <Comments />
     </>
@@ -147,6 +159,7 @@ export default connect(
     sessionId: selectors.getSessionId(state),
     recordingId: selectors.getRecordingId(state),
     expectedError: selectors.getExpectedError(state),
+    toolboxExpanded: selectors.getToolboxExpanded(state),
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,

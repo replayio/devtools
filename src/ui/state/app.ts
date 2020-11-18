@@ -22,14 +22,15 @@ export interface AppState {
   recordingId: RecordingId | null;
   sessionId: SessionId | null;
   theme: string;
+  toolboxExpanded: boolean;
   splitConsoleOpen: boolean;
-  isToolboxOpen: boolean;
   loading: number;
   uploading: UploadInfo | null;
   expectedError: ExpectedError | null;
   unexpectedError: sessionError | null;
   modal: Modal | null;
   selectedPanel: PanelName;
+  initializedPanels: PanelName[];
   pendingNotification: any;
   analysisPoints: AnalysisPoints;
 }

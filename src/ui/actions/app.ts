@@ -14,12 +14,13 @@ import { ExpectedError, Modal, PanelName } from "ui/state/app";
 const { PointHandlers } = require("protocol/logpoint");
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
+export type SetToolboxExpanded = Action<"set_toolbox_expanded"> & { toolboxExpanded: boolean };
 export type LoadingAction = Action<"loading"> & { loading: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
-export type SetToolboxOpenAction = Action<"set_toolbox_open"> & { isToolboxOpen: boolean };
 export type SetSplitConsoleAction = Action<"set_split_console"> & { splitConsole: boolean };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: PanelName };
+export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & { error: sessionError };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: boolean };
@@ -33,12 +34,13 @@ export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
 };
 export type AppAction =
   | SetupAppAction
+  | SetToolboxExpanded
   | LoadingAction
   | SetSessionIdAction
   | UpdateThemeAction
-  | SetToolboxOpenAction
   | SetSplitConsoleAction
   | SetSelectedPanelAction
+  | SetInitializedPanelsAction
   | SetExpectedErrorAction
   | SetUnexpectedErrorAction
   | SetUploadingAction
@@ -109,16 +111,16 @@ export function updateTheme(theme: string): UpdateThemeAction {
   return { type: "update_theme", theme };
 }
 
-export function setToolboxOpen(isToolboxOpen: boolean): SetToolboxOpenAction {
-  return { type: "set_toolbox_open", isToolboxOpen };
-}
-
 export function setSplitConsole(open: boolean): SetSplitConsoleAction {
   return { type: "set_split_console", splitConsole: open };
 }
 
 export function setSelectedPanel(panel: PanelName): SetSelectedPanelAction {
   return { type: "set_selected_panel", panel };
+}
+
+export function setInitializedPanels(panel: PanelName): SetInitializedPanelsAction {
+  return { type: "set_initialized_panels", panel };
 }
 
 export function setExpectedError(error: ExpectedError): SetExpectedErrorAction {
@@ -166,5 +168,16 @@ export function setPendingNotification(location: any): SetPendingNotificationAct
   return {
     type: "set_pending_notification",
     location: location,
+  };
+}
+
+export function setToolboxExpanded(toolboxExpanded: boolean): SetToolboxExpanded {
+  return { type: "set_toolbox_expanded", toolboxExpanded };
+}
+
+export function toggleToolbox(): UIThunkAction {
+  return ({ getState, dispatch }) => {
+    // dispatch(setAppState({ toolboxExpanded: !selectors.getToolboxExpanded(getState()) }));
+    dispatch(setToolboxExpanded(!selectors.getToolboxExpanded(getState())));
   };
 }

@@ -23,7 +23,7 @@ button:focus {
   background-color: var(--theme-toolbar-hover);
 }
 
-.debugger {
+.split-box .debugger {
   display: flex;
   flex: 1;
   height: 100%;
