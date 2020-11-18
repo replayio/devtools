@@ -1382,7 +1382,7 @@ SelectorView.prototype = {
     const { href, line, column } = this.currentLocation;
     const target = inspector.currentTarget;
     if (ToolDefinitions.styleEditor.isTargetSupported(target)) {
-      gDevTools.showToolbox(target, "styleeditor").then(function (toolbox) {
+      gDevTools.toolboxExpanded(target, "styleeditor").then(function (toolbox) {
         toolbox.getCurrentPanel().selectStyleSheet(href, line, column);
       });
     }

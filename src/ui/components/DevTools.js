@@ -26,11 +26,11 @@ const GET_RECORDING = gql`
   }
 `;
 
-function DevtoolsSplitBox({ showToolbox, updateTimelineDimensions, tooltip }) {
+function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }) {
   const toolbox = <Toolbox />;
   const viewer = <Viewer tooltip={tooltip} />;
 
-  if (!showToolbox) {
+  if (!toolboxExpanded) {
     return (
       <div className="collapsed-toolbox">
         {viewer} {toolbox}
@@ -99,7 +99,7 @@ function DevTools({
   recordingId,
   expectedError,
   setExpectedError,
-  showToolbox,
+  toolboxExpanded,
 }) {
   const { user, isAuthenticated } = useAuth0();
   const { data, error, loading: queryIsLoading } = useQuery(GET_RECORDING, {
@@ -139,7 +139,7 @@ function DevTools({
     <>
       <Header />
       <DevtoolsSplitBox
-        showToolbox={showToolbox}
+        toolboxExpanded={toolboxExpanded}
         tooltip={tooltip}
         updateTimelineDimensions={updateTimelineDimensions}
       />
@@ -159,7 +159,7 @@ export default connect(
     sessionId: selectors.getSessionId(state),
     recordingId: selectors.getRecordingId(state),
     expectedError: selectors.getExpectedError(state),
-    showToolbox: selectors.getShowToolbox(state),
+    toolboxExpanded: selectors.getToolboxExpanded(state),
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,

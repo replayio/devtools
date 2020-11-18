@@ -10,9 +10,7 @@ function initialAppState(): AppState {
     expectedError: null,
     unexpectedError: null,
     theme: "theme-light",
-    showToolbox: true,
-    // Whether or not the developer tools toolbox is opened.
-    isToolboxOpen: prefs.isToolboxOpen,
+    toolboxExpanded: true,
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
     initializedPanels: [],
@@ -31,8 +29,8 @@ export default function update(state = initialAppState(), action: AppAction) {
       return { ...state, recordingId: action.recordingId };
     }
 
-    case "set_app_state": {
-      return { ...state, ...action.state };
+    case "set_toolbox_expanded": {
+      return { ...state, toolboxExpanded: action.toolboxExpanded };
     }
 
     case "set_uploading": {
@@ -61,10 +59,6 @@ export default function update(state = initialAppState(), action: AppAction) {
 
     case "set_split_console": {
       return { ...state, splitConsoleOpen: action.splitConsole };
-    }
-
-    case "set_toolbox_open": {
-      return { ...state, isToolboxOpen: action.isToolboxOpen };
     }
 
     case "loading": {
@@ -102,9 +96,8 @@ export default function update(state = initialAppState(), action: AppAction) {
 }
 
 export const getTheme = (state: UIState) => state.app.theme;
-export const getShowToolbox = (state: UIState) => state.app.showToolbox;
+export const getToolboxExpanded = (state: UIState) => state.app.toolboxExpanded;
 export const isSplitConsoleOpen = (state: UIState) => state.app.splitConsoleOpen;
-export const isToolboxOpen = (state: UIState) => state.app.isToolboxOpen;
 export const getSelectedPanel = (state: UIState) => state.app.selectedPanel;
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
 export const getLoading = (state: UIState) => state.app.loading;

@@ -22,9 +22,8 @@ export interface AppState {
   recordingId: RecordingId | null;
   sessionId: SessionId | null;
   theme: string;
-  showToolbox: boolean;
+  toolboxExpanded: boolean;
   splitConsoleOpen: boolean;
-  isToolboxOpen: boolean;
   loading: number;
   uploading: UploadInfo | null;
   expectedError: ExpectedError | null;

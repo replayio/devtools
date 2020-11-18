@@ -44,7 +44,6 @@ function updatePrefs(state, oldState) {
     }
   }
 
-  updatePref("isToolboxOpen", selectors.isToolboxOpen);
   updatePref("splitConsole", selectors.isSplitConsoleOpen);
   updatePref("user", selectors.getUser);
   updatePref("selectedPanel", selectors.getSelectedPanel);

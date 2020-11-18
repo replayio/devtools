@@ -54,10 +54,10 @@ function Buttons({ setExpanded, expanded, tooltip, setTooltip }) {
   );
 }
 
-function _Drawer({ toggleToolbox, showToolbox, setExpanded, expanded }) {
+function _Drawer({ toggleToolbox, toolboxExpanded, setExpanded, expanded }) {
   const [tooltip, setTooltip] = useState(null);
   const [drawerNode, setDrawerNode] = useState(null);
-  const dir = showToolbox ? "up" : "down";
+  const dir = toolboxExpanded ? "up" : "down";
   return (
     <div className="drawer" ref={node => setDrawerNode(node)}>
       <Buttons
@@ -74,7 +74,7 @@ function _Drawer({ toggleToolbox, showToolbox, setExpanded, expanded }) {
   );
 }
 
-const Drawer = connect(state => ({ showToolbox: selectors.getShowToolbox(state) }), {
+const Drawer = connect(state => ({ toolboxExpanded: selectors.getToolboxExpanded(state) }), {
   toggleToolbox: actions.toggleToolbox,
 })(_Drawer);
 

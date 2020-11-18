@@ -199,7 +199,7 @@ class Toolbox extends React.Component {
           <Timeline />
         </div>
         {this.renderToolbar()}
-        {this.props.showToolbox && (
+        {this.props.toolboxExpanded && (
           <div
             id="toolbox-contents"
             className={classnames("", {
@@ -257,7 +257,7 @@ export default connect(
     initializedPanels: selectors.getInitializedPanels(state),
     selectedPanel: selectors.getSelectedPanel(state),
     splitConsoleOpen: selectors.isSplitConsoleOpen(state),
-    showToolbox: selectors.getShowToolbox(state),
+    toolboxExpanded: selectors.getToolboxExpanded(state),
   }),
   {
     setSplitConsole: actions.setSplitConsole,
