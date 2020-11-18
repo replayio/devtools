@@ -61,7 +61,7 @@ function BatchActionDropdown({ selectedIds, setSelectedIds }) {
 
   return (
     <div className="dashboard-viewer-header-batch-action">
-      <Dropdown panel={panel} icon={icon} />
+      <Dropdown panel={panel} icon={icon} panelStyles={{ top: "36px" }} />
     </div>
   );
 }

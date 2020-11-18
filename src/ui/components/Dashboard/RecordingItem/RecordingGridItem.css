@@ -1,14 +1,19 @@
 /* Grid styling */
 
-.recording-list.grid {
-  margin: 0 auto;
-  padding-top: 40px;
+.recording-list.grid  {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.recording-list.grid ul {
+  padding-top: 20px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  height: 100%;
 }
 
-.recording-list.grid .recording:hover {
+.recording-list.grid .recording-item:hover {
   cursor: pointer;
 }
 
@@ -63,7 +68,7 @@
   width: 100%;
 }
 
-.recording-list.grid .recording:hover .overlay {
+.recording-list.grid .recording-item:hover .overlay {
   visibility: visible;
 }
 
@@ -89,7 +94,7 @@
   top: 20px;
 }
 
-.recording-list.grid .recording:hover .dropdown-block {
+.recording-list.grid .recording-item:hover .dropdown-block {
   display: block;
 }
 

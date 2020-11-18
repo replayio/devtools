@@ -5,7 +5,6 @@ main.dashboard {
 }
 
 .dashboard-viewer {
-  /* overflow: auto; */
   width: 100%;
   height: 100%;
   font-size: 14px;
@@ -14,4 +13,8 @@ main.dashboard {
 .dashboard-viewer *:focus:not(:focus-visible) {
   outline: none;
   background: inherit;
+}
+
+.dashboard-viewer .dashboard-viewer-content *:focus:not(:focus-visible) {
+  overflow: auto;
 }

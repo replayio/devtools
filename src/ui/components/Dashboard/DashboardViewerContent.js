@@ -11,25 +11,67 @@ export default function DashboardViewerContent({
   editing,
 }) {
   const [ascOrder, setAscOrder] = useState(false);
-  const sortedRecordings = sortBy(recordings, recording => {
+  let sortedRecordings = sortBy(recordings, recording => {
     const order = ascOrder ? 1 : -1;
     return order * new Date(recording.date);
   });
 
   return (
     <section className="dashboard-viewer-content">
-      <ul className={classnames("recording-list", viewType)}>
+      <div className={classnames("recording-list", viewType)}>
         {viewType == "list" ? (
-          <DashboardViewerContentHeader
-            recordings={recordings}
-            setSelectedIds={setSelectedIds}
+          <RecordingsList
+            recordings={sortedRecordings}
+            viewType={viewType}
             selectedIds={selectedIds}
+            setSelectedIds={setSelectedIds}
+            editing={editing}
             ascOrder={ascOrder}
             setAscOrder={setAscOrder}
           />
-        ) : null}
-        {sortedRecordings &&
-          sortedRecordings.map((recording, i) => (
+        ) : (
+          <ul>
+            {sortedRecordings &&
+              sortedRecordings.map((recording, i) => (
+                <Recording
+                  data={recording}
+                  key={i}
+                  viewType={viewType}
+                  selectedIds={selectedIds}
+                  setSelectedIds={setSelectedIds}
+                  editing={editing}
+                />
+              ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function RecordingsList({
+  recordings,
+  viewType,
+  selectedIds,
+  setSelectedIds,
+  editing,
+  ascOrder,
+  setAscOrder,
+}) {
+  return (
+    <table className="dashboard-viewer-content-table">
+      <thead className="dashboard-viewer-content-header">
+        <DashboardViewerContentHeader
+          recordings={recordings}
+          selectedIds={selectedIds}
+          setSelectedIds={setSelectedIds}
+          ascOrder={ascOrder}
+          setAscOrder={setAscOrder}
+        />
+      </thead>
+      <tbody className="dashboard-viewer-content-body">
+        {recordings &&
+          recordings.map((recording, i) => (
             <Recording
               data={recording}
               key={i}
@@ -39,8 +81,8 @@ export default function DashboardViewerContent({
               editing={editing}
             />
           ))}
-      </ul>
-    </section>
+      </tbody>
+    </table>
   );
 }
 
@@ -60,18 +102,21 @@ function DashboardViewerContentHeader({
   };
 
   return (
-    <header className="dashboard-viewer-content-header">
-      <input type="checkbox" onChange={handleHeaderCheckboxClick} checked={selectedIds.length} />
-      <div>PREVIEW</div>
-      <div>TITLE</div>
-      <div>PAGE TITLE</div>
-      <div>DURATION</div>
-      <div className="sorter" onClick={() => setAscOrder(!ascOrder)}>
+    <tr>
+      <th>
+        <input type="checkbox" onChange={handleHeaderCheckboxClick} checked={selectedIds.length} />
+      </th>
+      <th>PREVIEW</th>
+      <th>TITLE</th>
+      <th>PAGE TITLE</th>
+      <th>DURATION</th>
+      <th className="sorter" onClick={() => setAscOrder(!ascOrder)}>
         <span className="label">CREATED</span>
         {ascOrder ? <div className="img arrow-up-2" /> : <div className="img arrow-down-2" />}
-      </div>
-      <div>PRIVACY</div>
-      <div>OWNER</div>
-    </header>
+      </th>
+      <th>PRIVACY</th>
+      <th>OWNER</th>
+      <th></th>
+    </tr>
   );
 }

@@ -4,6 +4,7 @@
   flex-direction: row;
   justify-content: space-between;
   padding: 20px 40px;
+  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 .dashboard-viewer-header-actions {
@@ -41,6 +42,10 @@
 
 .dashboard-viewer-header-actions .batch-action.disabled .img {
   background: var(--theme-icon-dimmed-color);
+}
+
+.dashboard-viewer-header-actions .menu-item {
+  padding: 12px;
 }
 
 .dashboard-viewer-header-actions button.toggle-editing {
