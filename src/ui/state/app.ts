@@ -30,6 +30,7 @@ export interface AppState {
   unexpectedError: sessionError | null;
   modal: Modal | null;
   selectedPanel: PanelName;
+  initializedPanels: PanelName[];
   pendingNotification: any;
   analysisPoints: AnalysisPoints;
 }

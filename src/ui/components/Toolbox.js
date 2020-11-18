@@ -46,12 +46,11 @@ class Toolbox extends React.Component {
   }
 
   renderInspector() {
+    const { initializedPanels } = this.props;
     const inspector = gToolbox.getPanel("inspector");
-    let markupView;
-    let rulesPanel;
-    let layoutPanel;
-    let computedPanel;
-    if (inspector) {
+    let markupView, rulesPanel, layoutPanel, computedPanel;
+
+    if (inspector && initializedPanels.includes("inspector")) {
       markupView = inspector._inspector.getPanel("markupview").provider;
       rulesPanel = {
         id: "ruleview",
@@ -253,6 +252,7 @@ class Toolbox extends React.Component {
 }
 export default connect(
   state => ({
+    initializedPanels: selectors.getInitializedPanels(state),
     selectedPanel: selectors.getSelectedPanel(state),
     splitConsoleOpen: selectors.isSplitConsoleOpen(state),
   }),

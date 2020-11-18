@@ -14,6 +14,7 @@ function initialAppState(): AppState {
     isToolboxOpen: prefs.isToolboxOpen,
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
+    initializedPanels: [],
     loading: 4,
     uploading: null,
     sessionId: null,
@@ -47,6 +48,10 @@ export default function update(state = initialAppState(), action: AppAction) {
 
     case "set_selected_panel": {
       return { ...state, selectedPanel: action.panel };
+    }
+
+    case "set_initialized_panels": {
+      return { ...state, initializedPanels: [...state.initializedPanels, action.panel] };
     }
 
     case "set_split_console": {
@@ -95,6 +100,7 @@ export const getTheme = (state: UIState) => state.app.theme;
 export const isSplitConsoleOpen = (state: UIState) => state.app.splitConsoleOpen;
 export const isToolboxOpen = (state: UIState) => state.app.isToolboxOpen;
 export const getSelectedPanel = (state: UIState) => state.app.selectedPanel;
+export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
 export const getLoading = (state: UIState) => state.app.loading;
 export const getUploading = (state: UIState) => state.app.uploading;
 export const getRecordingId = (state: UIState) => state.app.recordingId;

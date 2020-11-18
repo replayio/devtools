@@ -59,6 +59,9 @@ export class DevToolsToolbox {
     await panel.open();
 
     this.panels[name] = panel;
+    store.dispatch(actions.setSelectedPanel(name));
+    store.dispatch(actions.setInitializedPanels(name));
+
     resolve(panel);
     return panel;
   };

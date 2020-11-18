@@ -20,6 +20,7 @@ export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
 export type SetToolboxOpenAction = Action<"set_toolbox_open"> & { isToolboxOpen: boolean };
 export type SetSplitConsoleAction = Action<"set_split_console"> & { splitConsole: boolean };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: PanelName };
+export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & { error: sessionError };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: boolean };
@@ -39,6 +40,7 @@ export type AppAction =
   | SetToolboxOpenAction
   | SetSplitConsoleAction
   | SetSelectedPanelAction
+  | SetInitializedPanelsAction
   | SetExpectedErrorAction
   | SetUnexpectedErrorAction
   | SetUploadingAction
@@ -119,6 +121,10 @@ export function setSplitConsole(open: boolean): SetSplitConsoleAction {
 
 export function setSelectedPanel(panel: PanelName): SetSelectedPanelAction {
   return { type: "set_selected_panel", panel };
+}
+
+export function setInitializedPanels(panel: PanelName): SetInitializedPanelsAction {
+  return { type: "set_initialized_panels", panel };
 }
 
 export function setExpectedError(error: ExpectedError): SetExpectedErrorAction {
