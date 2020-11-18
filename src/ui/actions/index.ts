@@ -9,9 +9,10 @@ import type { MetadataAction } from "./metadata";
 import type { TimelineAction } from "./timeline";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
+import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
 const consoleActions = require("devtools/client/webconsole/actions");
 
-export type UIAction = AppAction | MetadataAction | TimelineAction;
+export type UIAction = AppAction | MetadataAction | TimelineAction | MarkupAction;
 
 interface ThunkExtraArgs {
   client: any;

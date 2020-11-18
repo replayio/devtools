@@ -10,7 +10,8 @@ import { initialInspectorState, InspectorState } from "../state";
 export const boxModel = require("devtools/client/inspector/boxmodel/reducers/box-model");
 export const changes = require("devtools/client/inspector/changes/reducers/changes");
 export const classList = require("devtools/client/inspector/rules/reducers/class-list");
-export const markup = require("devtools/client/inspector/markup/reducers/markup");
+import _markup from "devtools/client/inspector/markup/reducers/markup";
+export const markup = _markup;
 export const pseudoClasses = require("devtools/client/inspector/rules/reducers/pseudo-classes");
 export const rules = require("devtools/client/inspector/rules/reducers/rules");
 
