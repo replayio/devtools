@@ -40,7 +40,7 @@ class BreakpointHeading extends PureComponent {
   };
 
   render() {
-    const { source, zoomed } = this.props;
+    const { source } = this.props;
 
     return (
       <div
@@ -50,7 +50,6 @@ class BreakpointHeading extends PureComponent {
       >
         <div className="breakpoint-heading-label">
           <div>{this.getLabel()}</div>
-          {zoomed ? <div className="breakpoint-heading-status focused">ZOOMED</div> : null}
         </div>
         <div className="breakpoint-heading-actions">
           <CloseButton
