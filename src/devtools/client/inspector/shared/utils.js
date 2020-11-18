@@ -83,21 +83,6 @@ function appendText(parent, text) {
 }
 
 /**
- * Event handler that causes a blur on the target if the input has
- * multiple CSS properties as the value.
- */
-function blurOnMultipleProperties(cssProperties) {
-  return e => {
-    setTimeout(() => {
-      const props = parseDeclarations(cssProperties.isKnown, e.target.value);
-      if (props.length > 1) {
-        e.target.blur();
-      }
-    }, 0);
-  };
-}
-
-/**
  * Create a child element with a set of attributes.
  *
  * @param {Element} parent
@@ -228,7 +213,6 @@ function translateNodeFrontToGrip(nodeFront) {
 
 exports.advanceValidate = advanceValidate;
 exports.appendText = appendText;
-exports.blurOnMultipleProperties = blurOnMultipleProperties;
 exports.createChild = createChild;
 exports.getLongString = getLongString;
 exports.getSelectorFromGrip = getSelectorFromGrip;
