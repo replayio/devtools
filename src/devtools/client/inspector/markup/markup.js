@@ -160,7 +160,7 @@ class MarkupView {
    * Returns true if the markup panel is visisble, and false otherwise.
    */
   isPanelVisible() {
-    return this.inspector?.toolbox?.currentTool === "inspector";
+    return this.toolbox.currentTool === "inspector";
   }
 
   /**

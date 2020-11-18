@@ -17,6 +17,7 @@ export class DevToolsToolbox {
     this.panelWaiters = {};
     this.threadFront = ThreadFront;
     this.selection = new Selection();
+    this.currentTool = null;
 
     EventEmitter.decorate(this);
   }
@@ -69,8 +70,10 @@ export class DevToolsToolbox {
       panel.refresh();
     }
 
-    store.dispatch(actions.setSelectedPanel(name));
     this.emit("select", name);
+
+    store.dispatch(actions.setSelectedPanel(name));
+    this.currentTool = name;
     return panel;
   }
 
