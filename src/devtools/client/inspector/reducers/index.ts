@@ -6,6 +6,7 @@
 
 import { InspectorAction } from "../actions";
 import { initialInspectorState, InspectorState } from "../state";
+const { prefs } = require("devtools/client/inspector/prefs");
 
 export const boxModel = require("devtools/client/inspector/boxmodel/reducers/box-model");
 export const changes = require("devtools/client/inspector/changes/reducers/changes");
@@ -27,9 +28,12 @@ export function inspector(
 ): InspectorState {
   switch (action.type) {
     case "set_inspector_3_pane_mode":
+      prefs.is3PaneModeEnabled = action.is3PaneModeEnabled;
       let activeTab = state.activeTab === "ruleview" ? "layoutview" : state.activeTab;
+      prefs.activeTab = activeTab;
       return { ...state, is3PaneModeEnabled: action.is3PaneModeEnabled, activeTab };
     case "set_active_inspector_tab":
+      prefs.activeTab = action.activeTab;
       return { ...state, activeTab: action.activeTab };
     default:
       return state;
