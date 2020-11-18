@@ -868,7 +868,9 @@ class _ThreadFront {
     }
     let kind = info.kind;
     if (kind == "prettyPrinted") {
-      const minifiedInfo = this.sources.get(info.generatedSourceIds![0]);
+      const minifiedInfo = info.generatedSourceIds
+        ? this.sources.get(info.generatedSourceIds[0])
+        : undefined;
       if (!minifiedInfo) {
         return false;
       }
