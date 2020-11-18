@@ -60,7 +60,7 @@ class Breakpoint extends PureComponent {
         onClick={this.selectBreakpoint}
         onContextMenu={this.onContextMenu}
       >
-        <BreakpointHeading source={source} breakpoint={breakpoint} zoomed={zoomed} />
+        <BreakpointHeading source={source} breakpoint={breakpoint} />
         <BreakpointOptions editor={editor} breakpoint={breakpoint} />
       </div>
     );
