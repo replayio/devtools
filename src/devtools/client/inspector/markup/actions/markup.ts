@@ -1,30 +1,51 @@
+import { Action } from "redux";
 import { assert } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
-import { DOCUMENT_TYPE_NODE } from "devtools/shared/dom-node-constants";
-import {
-  RESET,
-  NEW_ROOT,
-  ADD_CHILDREN,
-  UPDATE_NODE_EXPANDED,
-  UPDATE_SELECTED_NODE,
-  UPDATE_SCROLL_INTO_VIEW_NODE,
-} from "./index";
+import { NodeFront } from "protocol/thread/node";
+import Selection from "devtools/client/framework/selection";
+import { NodeInfo } from "../state/markup";
+import { UIThunkAction } from "ui/actions";
+const { DOCUMENT_TYPE_NODE } = require("devtools/shared/dom-node-constants");
+
+export type ResetAction = Action<"RESET">;
+export type NewRootAction = Action<"NEW_ROOT"> & { rootNode: NodeInfo };
+export type AddChildrenAction = Action<"ADD_CHILDREN"> & {
+  parentNodeId: string;
+  children: NodeInfo[];
+};
+export type UpdateNodeExpandedAction = Action<"UPDATE_NODE_EXPANDED"> & {
+  nodeId: string;
+  isExpanded: boolean;
+};
+export type UpdateSelectedNodeAction = Action<"UPDATE_SELECTED_NODE"> & {
+  selectedNode: string | null;
+};
+export type UpdateScrollIntoViewNodeAction = Action<"UPDATE_SCROLL_INTO_VIEW_NODE"> & {
+  scrollIntoViewNode: string;
+};
+export type MarkupAction =
+  | ResetAction
+  | NewRootAction
+  | AddChildrenAction
+  | UpdateNodeExpandedAction
+  | UpdateSelectedNodeAction
+  | UpdateScrollIntoViewNodeAction;
 
 /**
  * Clears the tree
  */
-export function reset() {
+export function reset(): ResetAction {
   return {
-    type: RESET,
+    type: "RESET",
   };
 }
 
 /**
  * Clears the tree and adds the new root node.
  */
-export function newRoot(rootNodeFront) {
+export function newRoot(rootNodeFront: NodeFront): NewRootAction {
   return {
-    type: NEW_ROOT,
+    type: "NEW_ROOT",
     rootNode: convertNode(rootNodeFront),
   };
 }
@@ -32,11 +53,11 @@ export function newRoot(rootNodeFront) {
 /**
  * Adds the children of a node to the tree and updates the parent's `children` property.
  */
-export function addChildren(parentFront, childFronts) {
+export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): AddChildrenAction {
   return {
-    type: ADD_CHILDREN,
+    type: "ADD_CHILDREN",
     parentNodeId: parentFront.objectId(),
-    children: childFronts.map(convertNode),
+    children: childFronts.map(node => convertNode(node)),
   };
 }
 
@@ -44,9 +65,9 @@ export function addChildren(parentFront, childFronts) {
  * Updates the expanded state for a given node. If isExpanded is true,
  * all child nodes must already be in the tree. Use expandNode() otherwise.
  */
-export function updateNodeExpanded(nodeId, isExpanded) {
+export function updateNodeExpanded(nodeId: string, isExpanded: boolean): UpdateNodeExpandedAction {
   return {
-    type: UPDATE_NODE_EXPANDED,
+    type: "UPDATE_NODE_EXPANDED",
     nodeId,
     isExpanded,
   };
@@ -55,9 +76,9 @@ export function updateNodeExpanded(nodeId, isExpanded) {
 /**
  * Updates the selected node to display in the markup tree.
  */
-export function updateSelectedNode(selectedNode) {
+export function updateSelectedNode(selectedNode: string | null): UpdateSelectedNodeAction {
   return {
-    type: UPDATE_SELECTED_NODE,
+    type: "UPDATE_SELECTED_NODE",
     selectedNode,
   };
 }
@@ -65,9 +86,9 @@ export function updateSelectedNode(selectedNode) {
 /**
  * Set the node that should be scrolled into view
  */
-export function scrollIntoView(scrollIntoViewNode) {
+export function scrollIntoView(scrollIntoViewNode: string): UpdateScrollIntoViewNodeAction {
   return {
-    type: UPDATE_SCROLL_INTO_VIEW_NODE,
+    type: "UPDATE_SCROLL_INTO_VIEW_NODE",
     scrollIntoViewNode,
   };
 }
@@ -75,7 +96,7 @@ export function scrollIntoView(scrollIntoViewNode) {
 /**
  * Expand the given node after ensuring its child nodes are loaded and added to the tree.
  */
-export function expandNode(nodeId) {
+export function expandNode(nodeId: string): UIThunkAction {
   return async ({ dispatch, getState }) => {
     const tree = getState().markup.tree;
     const node = tree[nodeId];
@@ -87,6 +108,7 @@ export function expandNode(nodeId) {
 
     if (node.hasChildren && node.children.length === 0) {
       const pause = ThreadFront.currentPause;
+      assert(pause);
       const node = pause.getNodeFront(nodeId);
       const childNodes = await node.childNodes();
       if (ThreadFront.currentPause !== pause) return;
@@ -100,7 +122,11 @@ export function expandNode(nodeId) {
 /**
  * Update the tree to show the currently selected node.
  */
-export function selectionChanged(selection, expandSelectedNode, shouldScrollIntoView) {
+export function selectionChanged(
+  selection: Selection,
+  expandSelectedNode: boolean,
+  shouldScrollIntoView = false
+): UIThunkAction {
   return async ({ dispatch }) => {
     const selectedNode = selection.nodeFront;
     if (!selectedNode) {
@@ -145,46 +171,27 @@ export function selectionChanged(selection, expandSelectedNode, shouldScrollInto
  * @param  {Boolean} isExpanded
  *         Whether or not the node is expanded.
  */
-function convertNode(node, { isExpanded = false } = {}) {
+function convertNode(node: NodeFront, { isExpanded = false } = {}): NodeInfo {
   const parentNode = node.parentNode();
   const id = node.objectId();
 
   return {
-    // A list of the node's attributes.
     attributes: node.attributes,
-    // Array of child node object ids.
     children: [],
-    // The display name for the UI. This is either the lower casee of the node's tag
-    // name or the doctype string for a document type node.
     displayName: node.nodeType === DOCUMENT_TYPE_NODE ? node.doctypeString : node.displayName,
-    // The computed display style property value of the node.
     displayType: node.displayType,
-    // Whether or not the node has child nodes.
-    hasChildren: node.hasChildren,
-    // Whether or not the node has event listeners.
+    hasChildren: !!node.hasChildren,
     hasEventListeners: node.hasEventListeners,
-    // An unique NodeFront object id.
     id,
-    // Whether or not the node is displayed. If a node has the attribute
-    // `display: none`, it is not displayed (faded in the markup view).
     isDisplayed: node.isDisplayed,
-    // Whether or not the node is expanded.
     isExpanded,
-    // Whether or not the node is an inline text child. NYI
     isInlineTextChild: !!node.inlineTextChild,
-    // Whether or not the node is scrollable. NYI
     isScrollable: node.isScrollable,
-    // The namespace URI of the node. NYI
     namespaceURI: node.namespaceURI,
-    // The object id of the parent node.
     parentNodeId: parentNode?.objectId(),
-    // The pseudo element type.
     pseudoType: node.pseudoType,
-    // The name of the current node.
     tagName: node.tagName,
-    // The node's `nodeType` which identifies what the node is.
     type: node.nodeType,
-    // The node's `nodeValue` which identifies the value of the current node.
     value: node.getNodeValue(),
   };
 }

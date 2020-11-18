@@ -1,40 +1,27 @@
-const { assert } = require("protocol/utils");
+import { assert } from "protocol/utils";
+import { createReducer, ReducerObject } from "../../shared/reducer-object";
+import { MarkupAction } from "../actions/markup";
+import { MarkupState, MarkupTree } from "../state/markup";
 const Services = require("Services");
-const {
-  RESET,
-  NEW_ROOT,
-  ADD_CHILDREN,
-  UPDATE_NODE_EXPANDED,
-  UPDATE_SELECTED_NODE,
-  UPDATE_SCROLL_INTO_VIEW_NODE,
-} = require("../actions/index");
 
 const ATTR_COLLAPSE_ENABLED_PREF = "devtools.markup.collapseAttributes";
 const ATTR_COLLAPSE_LENGTH_PREF = "devtools.markup.collapseAttributeLength";
 
-const INITIAL_MARKUP = {
-  // Whether or not to collapse the attributes for nodes.
+const INITIAL_MARKUP: MarkupState = {
   collapseAttributes: Services.prefs.getBoolPref(ATTR_COLLAPSE_ENABLED_PREF),
-  // The max length of the attribute value prior to truncating the attributes.
   collapseAttributeLength: Services.prefs.getIntPref(ATTR_COLLAPSE_LENGTH_PREF),
-  // The root node to display in the DOM view.
   rootNode: null,
-  // The selected node to display in the DOM view.
   selectedNode: null,
-  // A node that should be scrolled into view.
   scrollIntoViewNode: null,
-  // An object representing the markup tree. The key to the object represents the object
-  // ID of a NodeFront of a given node. The value of each item in the object contains
-  // an object representing the properties of the given node.
   tree: {},
 };
 
-const reducers = {
-  [RESET]() {
+const reducers: ReducerObject<MarkupState, MarkupAction> = {
+  ["RESET"]() {
     return { ...INITIAL_MARKUP };
   },
 
-  [NEW_ROOT](markup, { rootNode }) {
+  ["NEW_ROOT"](markup, { rootNode }) {
     return {
       ...markup,
       tree: {
@@ -46,10 +33,10 @@ const reducers = {
     };
   },
 
-  [ADD_CHILDREN](markup, { parentNodeId, children }) {
+  ["ADD_CHILDREN"](markup, { parentNodeId, children }) {
     assert(markup.tree[parentNodeId]);
 
-    const newNodes = {};
+    const newNodes: MarkupTree = {};
     let hasNewNodes = false;
     for (const node of children) {
       if (!(node.id in markup.tree)) {
@@ -75,7 +62,7 @@ const reducers = {
     }
   },
 
-  [UPDATE_NODE_EXPANDED](markup, { nodeId, isExpanded }) {
+  ["UPDATE_NODE_EXPANDED"](markup, { nodeId, isExpanded }) {
     return {
       ...markup,
       tree: {
@@ -88,14 +75,14 @@ const reducers = {
     };
   },
 
-  [UPDATE_SELECTED_NODE](markup, { selectedNode }) {
+  ["UPDATE_SELECTED_NODE"](markup, { selectedNode }) {
     return {
       ...markup,
       selectedNode,
     };
   },
 
-  [UPDATE_SCROLL_INTO_VIEW_NODE](markup, { scrollIntoViewNode }) {
+  ["UPDATE_SCROLL_INTO_VIEW_NODE"](markup, { scrollIntoViewNode }) {
     return {
       ...markup,
       scrollIntoViewNode,
@@ -103,10 +90,4 @@ const reducers = {
   },
 };
 
-module.exports = function (markup = INITIAL_MARKUP, action) {
-  const reducer = reducers[action.type];
-  if (!reducer) {
-    return markup;
-  }
-  return reducer(markup, action);
-};
+export default createReducer(INITIAL_MARKUP, reducers);
