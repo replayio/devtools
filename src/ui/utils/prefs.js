@@ -15,6 +15,7 @@ pref("devtools.recording-id", "");
 pref("devtools.event-listeners-breakpoints", true);
 // Whether or not the developer tools toolbox is opened by default.
 pref("devtools.toolbox-opened", true);
+pref("devtools.toolbox-height", "50%");
 
 // app features
 pref("devtools.features.comments", true);
@@ -28,6 +29,7 @@ export const prefs = new PrefsHelper("devtools", {
   user: ["Json", "user"],
   recordingId: ["Json", "recording-id"],
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
+  toolboxHeight: ["String", "toolbox-height"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
