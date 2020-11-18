@@ -4,7 +4,7 @@ import Services from "devtools-services";
 
 const { pref } = Services;
 
-pref("devtools.inspector.is-three-pane-mode-enabled", false);
+pref("devtools.inspector.is-three-pane-mode-enabled", true);
 pref("devtools.inspector.sidebar-size", 700);
 pref("devtools.inspector.split-sidebar-size", 350);
 pref("devtools.inspector.active-tab", "layoutview");
