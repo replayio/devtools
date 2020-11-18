@@ -5,8 +5,7 @@ import { UIState } from "ui/state";
 import * as InspectorActions from "../actions";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import SidebarToggle from "devtools/client/shared/components/SidebarToggle";
-// const InspectorTabPanel = require("devtools/client/inspector/components/InspectorTabPanel");
-// import InspectorTabs from "./InspectorTabs";
+const { prefs } = require("devtools/client/inspector/prefs");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
@@ -36,21 +35,36 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
     const sidebarSplitbox = this.sidebarSplitboxRef.current;
 
     if (containerElement && splitBox && sidebarSplitbox) {
-      const toolboxWidth = containerElement.clientWidth;
-      const sidebarWidth = splitBox.state.width;
-      const canDoubleSidebarWidth = sidebarWidth * 2 < toolboxWidth / 2;
-
       if (is3PaneMode) {
+        // In 2 pane mode, the size of the sidebar is stored in splitSidebarSize.
+        // In 3 pane mode, it is stored in sidebarSize and the size of the right-most panel in splitSidebarSize.
+        // The right-most panel's width should be at most 80% of the sidebar width.
+        // The sidebar width should be at most 80% of the toolbar width.
+        // We may have to make some adjustments to satisfy these constraints:
+        if (prefs.splitSidebarSize > prefs.sidebarSize * 0.8) {
+          // The right-most panel would occupy more than 80% of the sidebar...
+          const toolboxWidth = containerElement.clientWidth;
+          if (prefs.splitSidebarSize * 1.25 <= toolboxWidth * 0.8) {
+            // Grow the sidebar so that the right-most panel will occupy exactly 80% of it
+            prefs.sidebarSize = prefs.splitSidebarSize * 1.25;
+          } else {
+            // Growing the sidebar as above would make it bigger than 80% of the toolbar,
+            // so we make it as big as possible and shrink the right-most panel to 80% of the sidebar
+            prefs.sidebarSize = toolboxWidth * 0.8;
+            prefs.splitSidebarSize = prefs.sidebarSize * 0.8;
+          }
+        }
+
         splitBox.setState({
-          width: canDoubleSidebarWidth ? sidebarWidth * 2 : (toolboxWidth * 2) / 3,
+          width: prefs.sidebarSize,
         });
         sidebarSplitbox.setState({
           endPanelControl: true,
           splitterSize: 1,
-          width: canDoubleSidebarWidth ? sidebarWidth : toolboxWidth / 3,
+          width: prefs.splitSidebarSize,
         });
       } else {
-        splitBox.setState({ width: sidebarSplitbox.state.width });
+        splitBox.setState({ width: prefs.splitSidebarSize });
         sidebarSplitbox.setState({
           endPanelControl: false,
           splitterSize: 0,
@@ -60,6 +74,19 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
 
       this.props.set3PaneMode(is3PaneMode);
     }
+  };
+
+  private onSplitboxResize = (width: number) => {
+    const { is3PaneModeEnabled } = this.props;
+    if (is3PaneModeEnabled) {
+      prefs.sidebarSize = width;
+    } else {
+      prefs.splitSidebarSize = width;
+    }
+  };
+
+  private onSidebarSplitboxResize = (width: number) => {
+    prefs.splitSidebarSize = width;
   };
 
   renderMarkupPanel() {
@@ -206,18 +233,20 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
           <SplitBox
             ref={this.splitBoxRef}
             className="inspector-sidebar-splitter"
-            initialSize="700"
+            initialSize={`${is3PaneModeEnabled ? prefs.sidebarSize : prefs.splitSidebarSize}`}
             minSize="10%"
             maxSize="80%"
+            onMove={this.onSplitboxResize}
             splitterSize={1}
             endPanelControl={true}
             startPanel={this.renderMarkupPanel()}
             endPanel={
               <SplitBox
                 ref={this.sidebarSplitboxRef}
-                initialSize="350"
-                minSize={is3PaneModeEnabled ? 10 : 0}
+                initialSize={`${is3PaneModeEnabled ? prefs.splitSidebarSize : 0}`}
+                minSize={is3PaneModeEnabled ? "20%" : "0"}
                 maxSize="80%"
+                onMove={this.onSidebarSplitboxResize}
                 splitterSize={is3PaneModeEnabled ? 1 : 0}
                 endPanelControl={is3PaneModeEnabled}
                 startPanel={
