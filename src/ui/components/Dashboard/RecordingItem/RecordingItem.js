@@ -6,7 +6,6 @@ import { selectors } from "ui/reducers";
 import RecordingGridItem from "./RecordingGridItem";
 import RecordingListItem from "./RecordingListItem";
 import RecordingItemDropdown from "./RecordingItemDropdown";
-import "./RecordingItem.css";
 
 const UPDATE_IS_PRIVATE = gql`
   mutation SetRecordingIsPrivate($recordingId: String, $isPrivate: Boolean) {

@@ -7,6 +7,11 @@
   border-bottom: 1px solid var(--theme-splitter-color);
 }
 
+.dashboard-viewer-header .count {
+  color: var(--theme-text-color-inactive);
+  margin-left: 4px;
+}
+
 .dashboard-viewer-header-actions {
   display: flex;
   flex-direction: row;

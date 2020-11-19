@@ -32,6 +32,7 @@ export default function DashboardViewer({ recordings, filter }) {
         toggleEditing={toggleEditing}
         viewType={viewType}
         toggleViewType={toggleViewType}
+        recordings={recordings}
       />
       <DashboardViewerContent
         recordings={recordings}

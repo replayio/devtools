@@ -99,10 +99,14 @@ export default function DashboardViewerHeader({
   toggleEditing,
   viewType,
   toggleViewType,
+  recordings,
 }) {
   return (
     <header className="dashboard-viewer-header">
-      <div className="dashboard-viewer-header-title">{filter == "" ? "All" : filter}</div>
+      <div className="dashboard-viewer-header-title">
+        {filter == "" ? "All" : filter}
+        <span className="count">{`(${recordings.length})`}</span>
+      </div>
       <HeaderActions
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
