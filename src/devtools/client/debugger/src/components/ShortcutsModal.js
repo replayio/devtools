@@ -32,17 +32,6 @@ export class ShortcutsModal extends Component {
     );
   }
 
-  renderEditorShortcuts() {
-    return (
-      <ul className="shortcuts-list">
-        {this.renderShorcutItem(
-          L10N.getStr("shortcuts.toggleBreakpoint"),
-          formatKeyShortcut(L10N.getStr("toggleBreakpoint.key"))
-        )}
-      </ul>
-    );
-  }
-
   renderSteppingShortcuts() {
     return (
       <ul className="shortcuts-list">
@@ -70,7 +59,7 @@ export class ShortcutsModal extends Component {
         )}
         {this.renderShorcutItem(
           L10N.getStr("shortcuts.projectSearch2"),
-          formatKeyShortcut(L10N.getStr("projectTextSearch.key"))
+          formatKeyShortcut("CmdOrCtrl+Shift+F")
         )}
         {this.renderShorcutItem(
           L10N.getStr("shortcuts.functionSearch2"),
@@ -87,10 +76,6 @@ export class ShortcutsModal extends Component {
   renderShortcutsContent() {
     return (
       <div className={classnames("shortcuts-content", this.props.additionalClass)}>
-        <div className="shortcuts-section">
-          <h2>{L10N.getStr("shortcuts.header.editor")}</h2>
-          {this.renderEditorShortcuts()}
-        </div>
         <div className="shortcuts-section">
           <h2>{L10N.getStr("shortcuts.header.stepping")}</h2>
           {this.renderSteppingShortcuts()}
