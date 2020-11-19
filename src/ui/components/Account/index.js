@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import { connect } from "react-redux";
-import Recordings from "../Recordings/index";
+import Dashboard from "../Dashboard/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import Header from "../Header/index";
 import Loader from "../shared/Loader";
@@ -77,7 +76,7 @@ function AccountPage() {
     return <FirstRecordingPrompt />;
   }
 
-  return <Recordings />;
+  return <Dashboard />;
 }
 
 function WelcomePage() {
