@@ -11,6 +11,9 @@ import LogRocket from "ui/utils/logrocket";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
 
+import { isDevelopment, isTest } from "../environment";
+const skipTelemetry = isTest() || isDevelopment();
+
 async function getInitialState() {
   const eventListenerBreakpoints = await asyncStore.eventListenerBreakpoints;
   const initialDebuggerState = await dbgClient.loadInitialState();
@@ -50,7 +53,7 @@ function updatePrefs(state, oldState) {
   updateAsyncPref("eventListenerBreakpoints", state => state.eventListenerBreakpoints);
 }
 
-export const bootstrapStore = async function bootstrapStore(skipTelemetry) {
+export const bootstrapStore = async function bootstrapStore() {
   const debuggerWorkers = bootstrapWorkers();
 
   // TODO; manage panels outside of the Toolbox componenet
