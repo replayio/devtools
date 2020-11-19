@@ -23,9 +23,15 @@ export class DevToolsToolbox {
   }
 
   async init(selectedPanel) {
-    // Open the console so that the timeline gets events
     await this.threadFront.initializeToolbox();
+
+    // The console has to be started immediately on init so that messages appear on the
+    // timeline. The debugger has to be started immediately on init so that when we click
+    // on any of those messages, either on the console or the timeline, the debugger panel
+    // is ready to be opened.
     await this.startPanel("console");
+    await this.startPanel("debugger");
+
     await this.selectTool(selectedPanel);
   }
 

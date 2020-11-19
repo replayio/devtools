@@ -33,8 +33,11 @@ export function setupMessages(store) {
   LogpointHandlers.onResult = (logGroupId, point, time, location, pause, values) =>
     store.dispatch(onLogpointResult(logGroupId, point, time, location, pause, values));
   LogpointHandlers.clearLogpoint = logGroupId => store.dispatch(messagesClearLogpoint(logGroupId));
-  ThreadFront.findConsoleMessages((_, msg) => store.dispatch(onConsoleMessage(msg)));
 
+  ThreadFront.findConsoleMessages((_, msg) => store.dispatch(onConsoleMessage(msg)));
+}
+
+export function setupThreadEventListeners(store) {
   ThreadFront.on("paused", ({ point, time }) =>
     store.dispatch(setPauseExecutionPoint(point, time))
   );

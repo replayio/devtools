@@ -172,8 +172,6 @@ class _ThreadFront {
     const sessionId = await this.waitForSession();
     const { endpoint } = await client.Session.getEndpoint({}, sessionId);
 
-    // Make sure the debugger has added a pause listener before warping to the endpoint.
-    await gToolbox.startPanel("debugger");
     this.timeWarp(endpoint.point, endpoint.time, /* hasFrames */ false, /* force */ true);
     this.initializedWaiter.resolve();
 

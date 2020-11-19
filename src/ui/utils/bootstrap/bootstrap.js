@@ -12,9 +12,8 @@ import Auth0ProviderWithHistory from "ui/utils/auth0";
 import LogRocket from "ui/utils/logrocket";
 import { createApolloClient } from "ui/utils/apolloClient";
 import { ApolloProvider } from "@apollo/client";
-import { bootstrapStore } from "./bootstrapStore";
-import { isDevelopment, isTest } from "../environment";
 
+import { isDevelopment, isTest } from "../environment";
 const skipTelemetry = isTest() || isDevelopment();
 
 function setupLogRocket() {
@@ -56,8 +55,7 @@ export function setupSentry(context) {
   Sentry.setContext("recording", { ...context, url: window.location.href });
 }
 
-export async function bootstrapApp(props, context) {
-  const store = await bootstrapStore(skipTelemetry);
+export async function bootstrapApp(props, context, store) {
   setupSentry(context);
   setupLogRocket();
 
@@ -77,6 +75,4 @@ export async function bootstrapApp(props, context) {
     </Router>,
     document.querySelector("#app")
   );
-
-  return store;
 }

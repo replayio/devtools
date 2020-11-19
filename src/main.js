@@ -23,6 +23,7 @@ const { initSocket, sendMessage, setStatus, addEventListener } = require("protoc
 const { ThreadFront } = require("protocol/thread");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap/bootstrap");
+const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
 const {
   setupTimeline,
   setupMetadata,
@@ -36,6 +37,7 @@ const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { DevToolsToolbox } = require("ui/utils/devtools-toolbox");
 const { prefs } = require("ui/utils/prefs");
+const { setupThreadEventListeners } = require("devtools/client/webconsole/actions/messages");
 
 // Create a session to use while debugging.
 async function createSession() {
@@ -102,7 +104,10 @@ async function initialize() {
 
 (async () => {
   window.gToolbox = new DevToolsToolbox();
-  store = await bootstrapApp({}, { recordingId });
+  store = await bootstrapStore();
+  setupThreadEventListeners(store);
+
+  await bootstrapApp({}, { recordingId }, store);
 
   if (!initialized) {
     initialized = true;
