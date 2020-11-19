@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { defer, assert } from "protocol/utils";
-import { resizeBreakpointGutter } from "./src/utils/ui";
+import { assert } from "protocol/utils";
 import { openDocLink } from "devtools/client/shared/link";
 import { onConnect } from "devtools/client/debugger/src/client";
 import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
@@ -23,41 +22,6 @@ export class DebuggerPanel {
     this.isReady = true;
 
     return this;
-  }
-
-  refresh() {
-    // CodeMirror does not update properly when it is hidden. This method has
-    // a few workarounds to get the editor to behave as expected when switching
-    // to the debugger from another panel and the selected location has changed.
-    const codeMirror = getCodeMirror();
-
-    if (!codeMirror) {
-      return;
-    }
-
-    // Update CodeMirror by dispatching a resize event to the window. CodeMirror
-    // also has a refresh() method but it did not work as expected when testing.
-    window.dispatchEvent(new Event("resize"));
-
-    // After CodeMirror refreshes, scroll it to the selected location, unless
-    // the user explicitly scrolled the editor since the location was selected.
-    // In this case the editor will already be in the correct state, and we
-    // don't want to undo the scrolling which the user did.
-    const handler = () => {
-      codeMirror.off("refresh", handler);
-      setTimeout(() => {
-        if (!this._selectors.selectedLocationHasScrolled(this._getState())) {
-          const location = this._selectors.getSelectedLocation(this._getState());
-          if (location) {
-            const cx = this._selectors.getContext(this._getState());
-            this._actions.selectLocation(cx, location);
-          }
-        }
-        resizeBreakpointGutter(codeMirror);
-        codeMirror.refresh();
-      }, 0);
-    };
-    codeMirror.on("refresh", handler);
   }
 
   getVarsForTests() {
