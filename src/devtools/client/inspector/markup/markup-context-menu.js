@@ -362,7 +362,7 @@ class MarkupContextMenu {
 
     const showA11YPropsItem = new MenuItem({
       id: "node-menu-showaccessibilityproperties",
-      label: INSPECTOR_L10N.getStr("inspectorShowAccessibilityProperties.label"),
+      label: "Show Accessibility Properties",
       click: () => this._showAccessibilityProperties(),
       disabled: true,
     });
@@ -384,8 +384,8 @@ class MarkupContextMenu {
     attributesSubmenu.append(
       new MenuItem({
         id: "node-menu-add-attribute",
-        label: INSPECTOR_L10N.getStr("inspectorAddAttribute.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorAddAttribute.accesskey"),
+        label: "Add Attribute",
+        accesskey: "A",
         disabled: !isEditableElement,
         click: () => this._onAddAttribute(),
       })
@@ -393,11 +393,11 @@ class MarkupContextMenu {
     attributesSubmenu.append(
       new MenuItem({
         id: "node-menu-copy-attribute",
-        label: INSPECTOR_L10N.getFormatStr(
+        label: L10N.getFormatStr(
           "inspectorCopyAttributeValue.label",
           isAttributeClicked ? `${nodeInfo.value}` : ""
         ),
-        accesskey: INSPECTOR_L10N.getStr("inspectorCopyAttributeValue.accesskey"),
+        accesskey: "V",
         disabled: !isAttributeClicked,
         click: () => this._onCopyAttributeValue(),
       })
@@ -405,11 +405,11 @@ class MarkupContextMenu {
     attributesSubmenu.append(
       new MenuItem({
         id: "node-menu-edit-attribute",
-        label: INSPECTOR_L10N.getFormatStr(
+        label: L10N.getFormatStr(
           "inspectorEditAttribute.label",
           isAttributeClicked ? `${nodeInfo.name}` : ""
         ),
-        accesskey: INSPECTOR_L10N.getStr("inspectorEditAttribute.accesskey"),
+        accesskey: "E",
         disabled: !isAttributeClicked,
         click: () => this._onEditAttribute(),
       })
@@ -417,11 +417,11 @@ class MarkupContextMenu {
     attributesSubmenu.append(
       new MenuItem({
         id: "node-menu-remove-attribute",
-        label: INSPECTOR_L10N.getFormatStr(
+        label: L10N.getFormatStr(
           "inspectorRemoveAttribute.label",
           isAttributeClicked ? `${nodeInfo.name}` : ""
         ),
-        accesskey: INSPECTOR_L10N.getStr("inspectorRemoveAttribute.accesskey"),
+        accesskey: "R",
         disabled: !isAttributeClicked,
         click: () => this._onRemoveAttribute(),
       })
@@ -447,8 +447,8 @@ class MarkupContextMenu {
     copySubmenu.append(
       new MenuItem({
         id: "node-menu-copyinner",
-        label: INSPECTOR_L10N.getStr("inspectorCopyInnerHTML.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorCopyInnerHTML.accesskey"),
+        label: "Inner HTML",
+        accesskey: "I",
         disabled: !isElement && !isFragment,
         click: () => this._copyInnerHTML(),
       })
@@ -456,8 +456,8 @@ class MarkupContextMenu {
     copySubmenu.append(
       new MenuItem({
         id: "node-menu-copyouter",
-        label: INSPECTOR_L10N.getStr("inspectorCopyOuterHTML.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorCopyOuterHTML.accesskey"),
+        label: "Outer HTML",
+        accesskey: "O",
         disabled: !isElement,
         click: () => this._copyOuterHTML(),
       })
@@ -465,8 +465,8 @@ class MarkupContextMenu {
     copySubmenu.append(
       new MenuItem({
         id: "node-menu-copyuniqueselector",
-        label: INSPECTOR_L10N.getStr("inspectorCopyCSSSelector.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorCopyCSSSelector.accesskey"),
+        label: "CSS Selector",
+        accesskey: "S",
         disabled: !isElement,
         click: () => this._copyUniqueSelector(),
       })
@@ -474,8 +474,8 @@ class MarkupContextMenu {
     copySubmenu.append(
       new MenuItem({
         id: "node-menu-copycsspath",
-        label: INSPECTOR_L10N.getStr("inspectorCopyCSSPath.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorCopyCSSPath.accesskey"),
+        label: "CSS Path",
+        accesskey: "P",
         disabled: !isElement,
         click: () => this._copyCssPath(),
       })
@@ -483,8 +483,8 @@ class MarkupContextMenu {
     copySubmenu.append(
       new MenuItem({
         id: "node-menu-copyxpath",
-        label: INSPECTOR_L10N.getStr("inspectorCopyXPath.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorCopyXPath.accesskey"),
+        label: "XPath",
+        accesskey: "X",
         disabled: !isElement,
         click: () => this._copyXPath(),
       })
@@ -492,7 +492,7 @@ class MarkupContextMenu {
     copySubmenu.append(
       new MenuItem({
         id: "node-menu-copyimagedatauri",
-        label: INSPECTOR_L10N.getStr("inspectorImageDataUri.label"),
+        label: "Image Data-URL",
         disabled: !isElement || !markupContainer || !markupContainer.isPreviewable(),
         click: () => this._copyImageDataUri(),
       })
@@ -511,7 +511,7 @@ class MarkupContextMenu {
         checked: mutationBreakpoints.subtree,
         click: () => this.markup.toggleMutationBreakpoint("subtree"),
         disabled: !isElement,
-        label: INSPECTOR_L10N.getStr("inspectorSubtreeModification.label"),
+        label: "Subtree Modification",
         type: "checkbox",
       })
     );
@@ -522,7 +522,7 @@ class MarkupContextMenu {
         checked: mutationBreakpoints.attribute,
         click: () => this.markup.toggleMutationBreakpoint("attribute"),
         disabled: !isElement,
-        label: INSPECTOR_L10N.getStr("inspectorAttributeModification.label"),
+        label: "Attribute Modification",
         type: "checkbox",
       })
     );
@@ -532,7 +532,7 @@ class MarkupContextMenu {
         checked: mutationBreakpoints.removal,
         click: () => this.markup.toggleMutationBreakpoint("removal"),
         disabled: !isElement,
-        label: INSPECTOR_L10N.getStr("inspectorNodeRemoval.label"),
+        label: "Node Removal",
         type: "checkbox",
       })
     );
@@ -569,17 +569,17 @@ class MarkupContextMenu {
       // Links can't be opened in new tabs in the browser toolbox.
       if (type === "uri" && !this.target.chrome) {
         linkFollow.visible = true;
-        linkFollow.label = INSPECTOR_L10N.getStr("inspector.menu.openUrlInNewTab.label");
+        linkFollow.label = "Open Link in New Tab";
       } else if (type === "cssresource") {
         linkFollow.visible = true;
-        linkFollow.label = TOOLBOX_L10N.getStr("toolbox.viewCssSourceInStyleEditor.label");
+        linkFollow.label = "Open File in Style-Editor";
       } else if (type === "jsresource") {
         linkFollow.visible = true;
-        linkFollow.label = TOOLBOX_L10N.getStr("toolbox.viewJsSourceInDebugger.label");
+        linkFollow.label = "Open File in Debugger";
       }
 
       linkCopy.visible = true;
-      linkCopy.label = INSPECTOR_L10N.getStr("inspector.menu.copyUrlToClipboard.label");
+      linkCopy.label = "Copy Link Address";
     } else if (type === "idref") {
       linkFollow.visible = true;
       linkFollow.label = INSPECTOR_L10N.getFormatStr(
@@ -607,8 +607,8 @@ class MarkupContextMenu {
     pasteSubmenu.append(
       new MenuItem({
         id: "node-menu-pasteinnerhtml",
-        label: INSPECTOR_L10N.getStr("inspectorPasteInnerHTML.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorPasteInnerHTML.accesskey"),
+        label: "Inner HTML",
+        accesskey: "I",
         disabled: !isPasteable,
         click: () => this._pasteInnerHTML(),
       })
@@ -616,8 +616,8 @@ class MarkupContextMenu {
     pasteSubmenu.append(
       new MenuItem({
         id: "node-menu-pasteouterhtml",
-        label: INSPECTOR_L10N.getStr("inspectorPasteOuterHTML.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorPasteOuterHTML.accesskey"),
+        label: "Outer HTML",
+        accesskey: "O",
         disabled: !isPasteable || !isElement,
         click: () => this._pasteOuterHTML(),
       })
@@ -625,8 +625,8 @@ class MarkupContextMenu {
     pasteSubmenu.append(
       new MenuItem({
         id: "node-menu-pastebefore",
-        label: INSPECTOR_L10N.getStr("inspectorHTMLPasteBefore.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorHTMLPasteBefore.accesskey"),
+        label: "Before",
+        accesskey: "B",
         disabled: disableAdjacentPaste,
         click: () => this._pasteAdjacentHTML("beforeBegin"),
       })
@@ -634,8 +634,8 @@ class MarkupContextMenu {
     pasteSubmenu.append(
       new MenuItem({
         id: "node-menu-pasteafter",
-        label: INSPECTOR_L10N.getStr("inspectorHTMLPasteAfter.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorHTMLPasteAfter.accesskey"),
+        label: "After",
+        accesskey: "A",
         disabled: disableAdjacentPaste,
         click: () => this._pasteAdjacentHTML("afterEnd"),
       })
@@ -643,8 +643,8 @@ class MarkupContextMenu {
     pasteSubmenu.append(
       new MenuItem({
         id: "node-menu-pastefirstchild",
-        label: INSPECTOR_L10N.getStr("inspectorHTMLPasteFirstChild.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorHTMLPasteFirstChild.accesskey"),
+        label: "As First Child",
+        accesskey: "F",
         disabled: disableFirstLastPaste,
         click: () => this._pasteAdjacentHTML("afterBegin"),
       })
@@ -652,8 +652,8 @@ class MarkupContextMenu {
     pasteSubmenu.append(
       new MenuItem({
         id: "node-menu-pastelastchild",
-        label: INSPECTOR_L10N.getStr("inspectorHTMLPasteLastChild.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorHTMLPasteLastChild.accesskey"),
+        label: "As Last Child",
+        accesskey: "L",
         disabled: disableFirstLastPaste,
         click: () => this._pasteAdjacentHTML("beforeEnd"),
       })
@@ -708,8 +708,8 @@ class MarkupContextMenu {
     menu.append(
       new MenuItem({
         id: "node-menu-edithtml",
-        label: INSPECTOR_L10N.getStr("inspectorHTMLEdit.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorHTMLEdit.accesskey"),
+        label: "Edit As HTML",
+        accesskey: "E",
         disabled: isAnonymous || (!isElement && !isFragment),
         click: () => this._editHTML(),
       })
@@ -717,8 +717,8 @@ class MarkupContextMenu {
     menu.append(
       new MenuItem({
         id: "node-menu-add",
-        label: INSPECTOR_L10N.getStr("inspectorAddNode.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorAddNode.accesskey"),
+        label: "Create New Node",
+        accesskey: "C",
         disabled: !this.inspector.canAddHTMLChild(),
         click: () => this.inspector.addNode(),
       })
@@ -726,7 +726,7 @@ class MarkupContextMenu {
     menu.append(
       new MenuItem({
         id: "node-menu-duplicatenode",
-        label: INSPECTOR_L10N.getStr("inspectorDuplicateNode.label"),
+        label: "Duplicate Node",
         disabled: !isDuplicatableElement,
         click: () => this._duplicateNode(),
       })
@@ -734,8 +734,8 @@ class MarkupContextMenu {
     menu.append(
       new MenuItem({
         id: "node-menu-delete",
-        label: INSPECTOR_L10N.getStr("inspectorHTMLDelete.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorHTMLDelete.accesskey"),
+        label: "Delete Node",
+        accesskey: "D",
         disabled: !this.markup.isDeletable(this.selection.nodeFront),
         click: () => this._deleteNode(),
       })
@@ -743,8 +743,8 @@ class MarkupContextMenu {
 
     menu.append(
       new MenuItem({
-        label: INSPECTOR_L10N.getStr("inspectorAttributesSubmenu.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorAttributesSubmenu.accesskey"),
+        label: "Attributes",
+        accesskey: "A",
         submenu: this._getAttributesSubmenu(isElement && !isAnonymous),
       })
     );
@@ -761,7 +761,7 @@ class MarkupContextMenu {
     ) {
       menu.append(
         new MenuItem({
-          label: INSPECTOR_L10N.getStr("inspectorBreakpointSubmenu.label"),
+          label: "Break on…",
           // FIXME(bug 1598952): This doesn't work in shadow trees at all, but
           // we still display the active menu. Also, this should probably be
           // enabled for ShadowRoot, at least the non-attribute breakpoints.
@@ -774,7 +774,7 @@ class MarkupContextMenu {
     menu.append(
       new MenuItem({
         id: "node-menu-useinconsole",
-        label: INSPECTOR_L10N.getStr("inspectorUseInConsole.label"),
+        label: "Use in Console",
         click: () => this._useInConsole(),
       })
     );
@@ -782,7 +782,7 @@ class MarkupContextMenu {
     menu.append(
       new MenuItem({
         id: "node-menu-showdomproperties",
-        label: INSPECTOR_L10N.getStr("inspectorShowDOMProperties.label"),
+        label: "Show DOM Properties",
         click: () => this._showDOMProperties(),
       })
     );
@@ -793,7 +793,7 @@ class MarkupContextMenu {
       menu.append(
         new MenuItem({
           id: "node-menu-jumptodefinition",
-          label: INSPECTOR_L10N.getStr("inspectorCustomElementDefinition.label"),
+          label: "Show Custom Element",
           click: () => this._jumpToCustomElementDefinition(),
         })
       );
@@ -807,7 +807,7 @@ class MarkupContextMenu {
 
     menu.append(
       new MenuItem({
-        label: INSPECTOR_L10N.getStr("inspectorPseudoClassSubmenu.label"),
+        label: "Change Pseudo-class",
         submenu: this._getPseudoClassSubmenu(isElement),
       })
     );
@@ -815,7 +815,7 @@ class MarkupContextMenu {
     menu.append(
       new MenuItem({
         id: "node-menu-screenshotnode",
-        label: INSPECTOR_L10N.getStr("inspectorScreenshotNode.label"),
+        label: "Screenshot Node",
         disabled: !isScreenshotable,
         click: () => this.inspector.screenshotNode().catch(console.error),
       })
@@ -824,8 +824,8 @@ class MarkupContextMenu {
     menu.append(
       new MenuItem({
         id: "node-menu-scrollnodeintoview",
-        label: INSPECTOR_L10N.getStr("inspectorScrollNodeIntoView.label"),
-        accesskey: INSPECTOR_L10N.getStr("inspectorScrollNodeIntoView.accesskey"),
+        label: "Scroll Into View",
+        accesskey: "S",
         disabled: !isElement,
         click: () => this.markup.scrollNodeIntoView(),
       })
@@ -839,14 +839,14 @@ class MarkupContextMenu {
 
     menu.append(
       new MenuItem({
-        label: INSPECTOR_L10N.getStr("inspectorCopyHTMLSubmenu.label"),
+        label: "Copy",
         submenu: this._getCopySubmenu(markupContainer, isElement, isFragment),
       })
     );
 
     menu.append(
       new MenuItem({
-        label: INSPECTOR_L10N.getStr("inspectorPasteHTMLSubmenu.label"),
+        label: "Paste",
         submenu: this._getPasteSubmenu(isElement, isFragment, isAnonymous),
       })
     );
@@ -861,7 +861,7 @@ class MarkupContextMenu {
     menu.append(
       new MenuItem({
         id: "node-menu-expand",
-        label: INSPECTOR_L10N.getStr("inspectorExpandNode.label"),
+        label: "Expand All",
         disabled: !isNodeWithChildren,
         click: () => this.markup.expandAll(this.selection.nodeFront),
       })
@@ -869,7 +869,7 @@ class MarkupContextMenu {
     menu.append(
       new MenuItem({
         id: "node-menu-collapse",
-        label: INSPECTOR_L10N.getStr("inspectorCollapseAll.label"),
+        label: "Collapse All",
         disabled: !isNodeWithChildren || !markupContainer.expanded,
         click: () => this.markup.collapseAll(this.selection.nodeFront),
       })

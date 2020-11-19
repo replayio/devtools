@@ -32,7 +32,7 @@ class RulePreviewTooltip {
 
     this.message = doc.createElementNS(XHTML_NS, "span");
     this.message.className = "rule-preview-tooltip-message";
-    this.message.textContent = L10N.getStr("rulePreviewTooltip.noAssociatedRule");
+    this.message.textContent = "No associated rule";
     this.container.appendChild(this.message);
 
     // TODO: Implement structure for showing the source CSS rule.

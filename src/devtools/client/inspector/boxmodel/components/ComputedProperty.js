@@ -56,7 +56,7 @@ class ComputedProperty extends PureComponent {
       dom.span(
         {
           className: "reference-element-type",
-          title: BOXMODEL_L10N.getStr("boxmodel.offsetParent.title"),
+          title: "Offset parent of the selected element",
         },
         referenceElementType
       ),

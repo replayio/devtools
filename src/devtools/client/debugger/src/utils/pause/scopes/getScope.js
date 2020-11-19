@@ -27,10 +27,10 @@ function getScopeTitle(type, scope) {
     if (name) {
       return simplifyDisplayName(name);
     } else {
-      return L10N.getStr("anonymousFunction");
+      return "<anonymous>";
     }
   }
-  return L10N.getStr("scopes.block");
+  return "Block";
 }
 
 export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {

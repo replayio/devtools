@@ -211,7 +211,7 @@ export class Inspector {
       // Use the chromeEventHandler as the target to catch events from all frames.
       //target: this.toolbox.getChromeEventHandler(),
     });
-    const key = INSPECTOR_L10N.getStr("inspector.searchHTML.key");
+    const key = "CmdOrCtrl+F";
     this.searchboxShortcuts.on(key, (event: any) => {
       // Prevent overriding same shortcut from the computed/rule views
       if (
@@ -250,7 +250,7 @@ export class Inspector {
           result.resultsLength
         );
       } else {
-        str = INSPECTOR_L10N.getStr("inspector.searchResultsNone");
+        str = "No matches";
       }
 
       this.searchResultsContainer!.hidden = false;

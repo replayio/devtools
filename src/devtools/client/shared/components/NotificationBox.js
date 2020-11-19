@@ -83,7 +83,7 @@ class NotificationBox extends Component {
 
   static get defaultProps() {
     return {
-      closeButtonTooltip: l10n.getStr("notificationBox.closeTooltip"),
+      closeButtonTooltip: "Close this message",
       displayBorderTop: false,
       displayBorderBottom: true,
     };

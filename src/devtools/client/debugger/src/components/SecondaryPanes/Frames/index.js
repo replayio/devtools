@@ -151,9 +151,7 @@ class Frames extends Component {
 
   renderToggleButton(frames) {
     const { l10n } = this.context;
-    const buttonMessage = this.state.showAllFrames
-      ? l10n.getStr("callStack.collapse")
-      : l10n.getStr("callStack.expand");
+    const buttonMessage = this.state.showAllFrames ? "Collapse rows" : "Expand rows";
 
     frames = this.collapseFrames(frames);
     if (frames.length <= NUM_FRAMES_SHOWN) {

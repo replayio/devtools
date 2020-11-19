@@ -340,9 +340,9 @@ export class QuickOpenModal extends Component {
   getSummaryMessage() {
     let summaryMsg = "";
     if (this.isGotoQuery()) {
-      summaryMsg = L10N.getStr("shortcuts.gotoLine");
+      summaryMsg = "Go to line";
     } else if (this.isFunctionQuery() && this.props.symbolsLoading) {
-      summaryMsg = L10N.getStr("loadingText");
+      summaryMsg = "Loading\u2026";
     }
     return summaryMsg;
   }
@@ -363,7 +363,7 @@ export class QuickOpenModal extends Component {
           query={query}
           hasPrefix={true}
           count={this.getResultCount()}
-          placeholder={L10N.getStr("sourceSearch.search2")}
+          placeholder={"Go to file…"}
           summaryMsg={this.getSummaryMessage()}
           showErrorEmoji={this.shouldShowErrorEmoji()}
           isLoading={false}

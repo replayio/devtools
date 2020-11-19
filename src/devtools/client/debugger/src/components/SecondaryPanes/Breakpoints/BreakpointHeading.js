@@ -52,10 +52,7 @@ class BreakpointHeading extends PureComponent {
           <div>{this.getLabel()}</div>
         </div>
         <div className="breakpoint-heading-actions">
-          <CloseButton
-            handleClick={e => this.removeBreakpoint(e)}
-            tooltip={L10N.getStr("breakpoints.removeBreakpointTooltip")}
-          />
+          <CloseButton handleClick={e => this.removeBreakpoint(e)} tooltip={"Remove breakpoint"} />
         </div>
       </div>
     );

@@ -58,7 +58,7 @@ class Scopes extends PureComponent {
     }
 
     if (!item.contents || item.contents.watchpoint) {
-      const removeWatchpointLabel = L10N.getStr("watchpoints.removeWatchpoint");
+      const removeWatchpointLabel = "Remove watchpoint";
 
       const removeWatchpointItem = {
         id: "node-menu-remove-watchpoint",
@@ -71,9 +71,9 @@ class Scopes extends PureComponent {
       return showMenu(event, menuItems);
     }
 
-    const addSetWatchpointLabel = L10N.getStr("watchpoints.setWatchpoint");
-    const addGetWatchpointLabel = L10N.getStr("watchpoints.getWatchpoint");
-    const watchpointsSubmenuLabel = L10N.getStr("watchpoints.submenu");
+    const addSetWatchpointLabel = "Property set";
+    const addGetWatchpointLabel = "Property get";
+    const watchpointsSubmenuLabel = "Break on…";
 
     const addSetWatchpointItem = {
       id: "node-menu-add-set-watchpoint",
@@ -114,7 +114,7 @@ class Scopes extends PureComponent {
     return (
       <button
         className={`remove-${watchpoint}-watchpoint`}
-        title={L10N.getStr("watchpoints.removeWatchpointTooltip")}
+        title={"Remove watchpoint"}
         onClick={() => removeWatchpoint(item)}
       />
     );
@@ -165,12 +165,12 @@ class Scopes extends PureComponent {
       );
     }
 
-    let stateText = L10N.getStr("scopes.notPaused");
+    let stateText = "Not paused";
     if (cx.isPaused) {
       if (isLoading) {
-        stateText = L10N.getStr("loadingText");
+        stateText = "Loadingu2026";
       } else {
-        stateText = L10N.getStr("scopes.notAvailable");
+        stateText = "Scopes unavailable";
       }
     }
 

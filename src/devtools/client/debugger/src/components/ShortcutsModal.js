@@ -35,13 +35,9 @@ export class ShortcutsModal extends Component {
   renderSteppingShortcuts() {
     return (
       <ul className="shortcuts-list">
-        {this.renderShorcutItem(L10N.getStr("shortcuts.pauseOrResume"), "F8")}
-        {this.renderShorcutItem(L10N.getStr("shortcuts.stepOver"), "F10")}
-        {this.renderShorcutItem(L10N.getStr("shortcuts.stepIn"), "F11")}
-        {this.renderShorcutItem(
-          L10N.getStr("shortcuts.stepOut"),
-          formatKeyShortcut(L10N.getStr("stepOut.key"))
-        )}
+        {this.renderShorcutItem("Step Over", "F10")}
+        {this.renderShorcutItem("Step In", "F11")}
+        {this.renderShorcutItem("Step Out", formatKeyShortcut("Shift+F11"))}
       </ul>
     );
   }
@@ -49,26 +45,11 @@ export class ShortcutsModal extends Component {
   renderSearchShortcuts() {
     return (
       <ul className="shortcuts-list">
-        {this.renderShorcutItem(
-          L10N.getStr("shortcuts.fileSearch2"),
-          formatKeyShortcut(L10N.getStr("sources.search.key2"))
-        )}
-        {this.renderShorcutItem(
-          L10N.getStr("shortcuts.searchAgain2"),
-          formatKeyShortcut(L10N.getStr("sourceSearch.search.again.key3"))
-        )}
-        {this.renderShorcutItem(
-          L10N.getStr("shortcuts.projectSearch2"),
-          formatKeyShortcut("CmdOrCtrl+Shift+F")
-        )}
-        {this.renderShorcutItem(
-          L10N.getStr("shortcuts.functionSearch2"),
-          formatKeyShortcut(L10N.getStr("functionSearch.key"))
-        )}
-        {this.renderShorcutItem(
-          L10N.getStr("shortcuts.gotoLine"),
-          formatKeyShortcut(L10N.getStr("gotoLineModal.key3"))
-        )}
+        {this.renderShorcutItem("Go to file", formatKeyShortcut("CmdOrCtrl+P"))}
+        {this.renderShorcutItem("Find next", formatKeyShortcut("Cmd+G"))}
+        {this.renderShorcutItem("Find in files", formatKeyShortcut("CmdOrCtrl+Shift+F"))}
+        {this.renderShorcutItem("Find function", formatKeyShortcut("CmdOrCtrl+Shift+O"))}
+        {this.renderShorcutItem("Go to line", formatKeyShortcut("Ctrl+G"))}
       </ul>
     );
   }
@@ -77,11 +58,11 @@ export class ShortcutsModal extends Component {
     return (
       <div className={classnames("shortcuts-content", this.props.additionalClass)}>
         <div className="shortcuts-section">
-          <h2>{L10N.getStr("shortcuts.header.stepping")}</h2>
+          <h2>{"Stepping"}</h2>
           {this.renderSteppingShortcuts()}
         </div>
         <div className="shortcuts-section">
-          <h2>{L10N.getStr("shortcuts.header.search")}</h2>
+          <h2>{"Search"}</h2>
           {this.renderSearchShortcuts()}
         </div>
       </div>

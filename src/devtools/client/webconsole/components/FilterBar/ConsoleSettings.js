@@ -123,8 +123,8 @@ class ConsoleSettings extends Component {
         key: "webconsole-console-settings-add-node-module-messages",
         checked: !filters[FILTERS.NODEMODULES],
         className: "menu-item webconsole-console-settings-add-node-module-messages",
-        label: l10n.getStr("webconsole.console.settings.menu.item.nodeModuleMessages.label"),
-        tooltip: l10n.getStr("webconsole.console.settings.menu.item.nodeModuleMessages.tooltip"),
+        label: "Hide Node Module Messages",
+        tooltip: "While enabled, messages from the node_modules directory are hidden",
         onClick: () => filterToggle(FILTERS.NODEMODULES),
       })
     );
@@ -135,8 +135,9 @@ class ConsoleSettings extends Component {
         key: "webconsole-console-settings-menu-item-timestamps",
         checked: timestampsVisible,
         className: "menu-item webconsole-console-settings-menu-item-timestamps",
-        label: l10n.getStr("webconsole.console.settings.menu.item.timestamps.label"),
-        tooltip: l10n.getStr("webconsole.console.settings.menu.item.timestamps.tooltip"),
+        label: "Show Timestamps",
+        tooltip:
+          "If you enable this option commands and output in the Web Console will display a timestamp",
         onClick: timestampsToggle,
       })
     );
@@ -150,7 +151,7 @@ class ConsoleSettings extends Component {
         menuId: "webconsole-console-settings-menu-button",
         toolboxDoc: document,
         className: "devtools-button webconsole-console-settings-menu-button",
-        title: l10n.getStr("webconsole.console.settings.menu.button.tooltip"),
+        title: "Console Settings",
       },
       // We pass the children in a function so we don't require the MenuItem and MenuList
       // components until we need to display them (i.e. when the button is clicked).

@@ -53,9 +53,9 @@ class DOMMutationBreakpointsContents extends Component<Props> {
     } = this.props;
     const { enabled, id: breakpointId, nodeFront, mutationType } = breakpoint;
     const localizationTerms = {
-      subtree: L10N.getStr("domMutationTypes.subtree"),
-      attribute: L10N.getStr("domMutationTypes.attribute"),
-      removal: L10N.getStr("domMutationTypes.removal"),
+      subtree: "Subtree Modification",
+      attribute: "Attribute Modification",
+      removal: "Node Removal",
     };
 
     return (
@@ -86,10 +86,7 @@ class DOMMutationBreakpointsContents extends Component<Props> {
   /* eslint-disable react/no-danger */
   renderEmpty() {
     const { openInspector } = this.props;
-    const text = L10N.getFormatStr(
-      "noDomMutationBreakpoints",
-      `<a>${L10N.getStr("inspectorTool")}</a>`
-    );
+    const text = L10N.getFormatStr("noDomMutationBreakpoints", `<a>${"Inspector"}</a>`);
 
     return (
       <div className="dom-mutation-empty">

@@ -63,7 +63,7 @@ class MarkupView {
         id: "markupview",
         key: "markupview",
         store: this.store,
-        title: INSPECTOR_L10N.getStr("inspector.panelLabel.markupView"),
+        title: "Markup View",
       },
       markupApp
     );

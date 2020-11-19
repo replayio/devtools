@@ -16,35 +16,35 @@ import { isFulfilled } from "../../../utils/async-value";
 import actions from "../../../actions";
 
 export const continueToHereItem = (cx, location, disabled, editorActions) => ({
-  accesskey: L10N.getStr("editor.continueToHere.accesskey"),
+  accesskey: "H",
   disabled,
   click: () => editorActions.continueToHere(cx, location),
   id: "node-menu-continue-to-here",
-  label: L10N.getStr("editor.continueToHere.label"),
+  label: "Continue to here",
 });
 
 // menu items
 
 const copyToClipboardItem = (selectedContent, editorActions) => ({
   id: "node-menu-copy-to-clipboard",
-  label: L10N.getStr("copyToClipboard.label"),
-  accesskey: L10N.getStr("copyToClipboard.accesskey"),
+  label: "Copy to clipboard",
+  accesskey: "C",
   disabled: false,
   click: () => selectedContent.type === "text" && copyToTheClipboard(selectedContent.value),
 });
 
 const copySourceItem = (selectedSource, selectionText, editorActions) => ({
   id: "node-menu-copy-source",
-  label: L10N.getStr("copySource.label"),
-  accesskey: L10N.getStr("copySource.accesskey"),
+  label: "Copy source text",
+  accesskey: "y",
   disabled: selectionText.length === 0,
   click: () => copyToTheClipboard(selectionText),
 });
 
 const copySourceUri2Item = (selectedSource, editorActions) => ({
   id: "node-menu-copy-source-url",
-  label: L10N.getStr("copySourceUri2"),
-  accesskey: L10N.getStr("copySourceUri2.accesskey"),
+  label: "Copy source URI",
+  accesskey: "u",
   disabled: !selectedSource.url,
   click: () => copyToTheClipboard(getRawSourceURL(selectedSource.url)),
 });
@@ -59,43 +59,39 @@ const jumpToMappedLocationItem = (
   id: "node-menu-jump",
   label: L10N.getFormatStr(
     "editor.jumpToMappedLocation1",
-    selectedSource.isOriginal ? L10N.getStr("generated") : L10N.getStr("original")
+    selectedSource.isOriginal ? "generated" : "original"
   ),
-  accesskey: L10N.getStr("editor.jumpToMappedLocation1.accesskey"),
+  accesskey: "m",
   disabled: !hasMappedLocation,
   click: () => editorActions.jumpToMappedLocation(cx, location),
 });
 
 const showSourceMenuItem = (cx, selectedSource, editorActions) => ({
   id: "node-menu-show-source",
-  label: L10N.getStr("sourceTabs.revealInTree"),
-  accesskey: L10N.getStr("sourceTabs.revealInTree.accesskey"),
+  label: "Reveal in tree",
+  accesskey: "r",
   disabled: !selectedSource.url,
   click: () => editorActions.showSource(cx, selectedSource.id),
 });
 
 const blackBoxMenuItem = (cx, selectedSource, editorActions) => ({
   id: "node-menu-blackbox",
-  label: selectedSource.isBlackBoxed
-    ? L10N.getStr("blackboxContextItem.unblackbox")
-    : L10N.getStr("blackboxContextItem.blackbox"),
-  accesskey: selectedSource.isBlackBoxed
-    ? L10N.getStr("blackboxContextItem.unblackbox.accesskey")
-    : L10N.getStr("blackboxContextItem.blackbox.accesskey"),
+  label: selectedSource.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
+  accesskey: selectedSource.isBlackBoxed ? "U" : "B",
   disabled: !shouldBlackbox(selectedSource),
   click: () => editorActions.toggleBlackBox(cx, selectedSource),
 });
 
 const evaluateInConsoleItem = (selectedSource, selectionText, editorActions) => ({
   id: "node-menu-evaluate-in-console",
-  label: L10N.getStr("evaluateInConsole.label"),
+  label: "Evaluate in console",
   click: () => editorActions.evaluateInConsole(selectionText),
 });
 
 const downloadFileItem = (selectedSource, selectedContent, editorActions) => ({
   id: "node-menu-download-file",
-  label: L10N.getStr("downloadFile.label"),
-  accesskey: L10N.getStr("downloadFile.accesskey"),
+  label: "Download file",
+  accesskey: "d",
   click: () => downloadFile(selectedContent, getFilename(selectedSource)),
 });
 

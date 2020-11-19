@@ -54,8 +54,8 @@ class PrimaryPanes extends Component {
       return;
     }
 
-    const sources = formatKeyShortcut(L10N.getStr("sources.header"));
-    const outline = formatKeyShortcut(L10N.getStr("outline.header"));
+    const sources = formatKeyShortcut("Sources");
+    const outline = formatKeyShortcut("Outline");
     const isSources = this.props.selectedTab === "sources";
     const isOutline = this.props.selectedTab === "outline";
 

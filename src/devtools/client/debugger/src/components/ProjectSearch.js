@@ -55,13 +55,13 @@ export class ProjectSearch extends Component {
   componentDidMount() {
     const { shortcuts } = this.context;
 
-    shortcuts.on(L10N.getStr("projectTextSearch.key"), this.toggleProjectTextSearch);
+    shortcuts.on("CmdOrCtrl+Shift+F", this.toggleProjectTextSearch);
     shortcuts.on("Enter", this.onEnterPress);
   }
 
   componentWillUnmount() {
     const { shortcuts } = this.context;
-    shortcuts.off(L10N.getStr("projectTextSearch.key"), this.toggleProjectTextSearch);
+    shortcuts.off("CmdOrCtrl+Shift+F", this.toggleProjectTextSearch);
     shortcuts.off("Enter", this.onEnterPress);
   }
 
@@ -209,16 +209,13 @@ export class ProjectSearch extends Component {
         />
       );
     }
-    const msg =
-      status === statusType.fetching
-        ? L10N.getStr("loadingText")
-        : L10N.getStr("projectTextSearch.noResults");
+    const msg = status === statusType.fetching ? "Loadingu2026" : "No results found";
     return <div className="no-result-msg absolute-center">{msg}</div>;
   };
 
   renderSummary = () => {
     if (this.props.query !== "") {
-      const resultsSummaryString = L10N.getStr("sourceSearch.resultsSummary2");
+      const resultsSummaryString = "#1 result;#1 results";
       const count = this.getResultCount();
       return PluralForm.get(count, resultsSummaryString).replace("#1", count);
     }
@@ -235,7 +232,7 @@ export class ProjectSearch extends Component {
       <SearchInput
         query={this.state.inputValue}
         count={this.getResultCount()}
-        placeholder={L10N.getStr("projectTextSearch.placeholder")}
+        placeholder={"Find in files…"}
         size="big"
         showErrorEmoji={this.shouldShowErrorEmoji()}
         summaryMsg={this.renderSummary()}

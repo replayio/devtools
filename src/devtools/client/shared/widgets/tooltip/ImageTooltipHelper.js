@@ -130,7 +130,7 @@ function setImageTooltip(tooltip, doc, imageUrl, options) {
 function setBrokenImageTooltip(tooltip, doc) {
   const div = doc.createElementNS(XHTML_NS, "div");
   div.className = "theme-comment devtools-tooltip-image-broken";
-  const message = L10N.getStr("previewTooltip.image.brokenImage");
+  const message = "Could not load the image";
   div.textContent = message;
 
   tooltip.panel.innerHTML = "";

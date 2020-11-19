@@ -6,19 +6,24 @@ import NodeAttribute from "./NodeAttribute";
 import TextNode from "./TextNode";
 import { assert } from "protocol/utils";
 
-const { getStr } = require("../utils/l10n");
 const { HTML_VOID_ELEMENTS } = require("../constants");
 
 // Contains only valid computed display property types of the node to display in the
 // element markup and their respective title tooltip text.
 const DISPLAY_TYPES: { [key: string]: string | undefined } = {
-  flex: getStr("markupView.display.flex.tooltiptext2"),
-  "inline-flex": getStr("markupView.display.inlineFlex.tooltiptext2"),
-  grid: getStr("markupView.display.grid.tooltiptext2"),
-  "inline-grid": getStr("markupView.display.inlineGrid.tooltiptext2"),
-  subgrid: getStr("markupView.display.subgrid.tooltiptiptext"),
-  "flow-root": getStr("markupView.display.flowRoot.tooltiptext"),
-  contents: getStr("markupView.display.contents.tooltiptext2"),
+  flex:
+    "This element behaves like a block element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
+  "inline-flex":
+    "This element behaves like an inline element and lays out its content according to the flexbox model. Click to toggle the flexbox overlay for this element.",
+  grid:
+    "This element behaves like a block element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
+  "inline-grid":
+    "This element behaves like an inline element and lays out its content according to the grid model. Click to toggle the grid overlay for this element.",
+  subgrid:
+    "This element lays out its content according to the grid model but defers the definition of its rows and/or columns to its parent grid container.",
+  "flow-root":
+    "This element generates a block element box that establishes a new block formatting context.",
+  contents: "This element doesn’t produce a specific box by itself, but renders its contents.",
 };
 
 interface ElementNodeProps {
@@ -87,7 +92,7 @@ class ElementNode extends PureComponent<ElementNodeProps> {
     return (
       <div
         className="inspector-badge interactive"
-        title={getStr("markupView.event.tooltiptext")}
+        title={"Event listener"}
         onClick={this.onEventBadgeClick}
       >
         event
@@ -143,9 +148,9 @@ class ElementNode extends PureComponent<ElementNodeProps> {
     return (
       <div
         className="inspector-badge scrollable-badge"
-        title={getStr("markupView.scrollableBadge.tooltip")}
+        title="This element has scrollable overflow"
       >
-        {getStr("markupView.scrollableBadge.label")}
+        Scroll
       </div>
     );
   }

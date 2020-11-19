@@ -117,7 +117,7 @@ export class Popup extends Component {
     if (properties.length == 0) {
       return (
         <div className="preview-popup">
-          <span className="label">{L10N.getStr("preview.noProperties")}</span>
+          <span className="label">{"No properties"}</span>
         </div>
       );
     }

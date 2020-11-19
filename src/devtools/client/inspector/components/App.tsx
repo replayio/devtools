@@ -208,8 +208,8 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
             <SidebarToggle
               collapsed={!is3PaneModeEnabled}
               onClick={this.toggle3PaneMode}
-              collapsePaneTitle={INSPECTOR_L10N.getStr("inspector.hideThreePaneMode")}
-              expandPaneTitle={INSPECTOR_L10N.getStr("inspector.showThreePaneMode")}
+              collapsePaneTitle={"Toggle off the 3-pane inspector"}
+              expandPaneTitle={"Toggle on the 3-pane inspector"}
             />
             <ul className="tabs-menu" role="tablist">
               {tabs}

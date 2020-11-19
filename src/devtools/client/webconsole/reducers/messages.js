@@ -1001,7 +1001,7 @@ function isTextInStackTrace(matchStr, stacktrace) {
   // order they are rendered in the Frame component.
   return stacktrace.some(frame =>
     isTextInFrame(matchStr, {
-      functionName: frame.functionName || l10n.getStr("stacktrace.anonymousFunction"),
+      functionName: frame.functionName || "<anonymous>",
       source: frame.filename,
       lineNumber: frame.lineNumber,
       columnNumber: frame.columnNumber,

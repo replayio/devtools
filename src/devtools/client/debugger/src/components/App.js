@@ -81,18 +81,14 @@ class Debugger extends Component {
     verticalLayoutBreakpoint.addListener(this.onLayoutChange);
     this.setOrientation();
 
-    shortcuts.on(L10N.getStr("symbolSearch.search.key1"), (_, e) =>
-      this.toggleQuickOpenModal(_, e)
-    );
+    shortcuts.on("CmdOrCtrl+Shift+P", (_, e) => this.toggleQuickOpenModal(_, e));
 
-    shortcuts.on(L10N.getStr("symbolSearch.search.key2"), (_, e) =>
-      this.toggleQuickOpenModal(_, e, "@")
-    );
+    shortcuts.on("CmdOrCtrl+Shift+O", (_, e) => this.toggleQuickOpenModal(_, e, "@"));
 
-    const searchKeys = [L10N.getStr("sources.search.key2"), L10N.getStr("sources.search.alt.key")];
+    const searchKeys = ["CmdOrCtrl+P", "CmdOrCtrl+O"];
     searchKeys.forEach(key => shortcuts.on(key, this.toggleQuickOpenModal));
 
-    shortcuts.on(L10N.getStr("gotoLineModal.key3"), (_, e) => this.toggleQuickOpenModal(_, e, ":"));
+    shortcuts.on("Ctrl+G", (_, e) => this.toggleQuickOpenModal(_, e, ":"));
 
     shortcuts.on("Escape", this.onEscape);
     shortcuts.on("Cmd+/", this.onCommandSlash);
@@ -104,14 +100,14 @@ class Debugger extends Component {
     horizontalLayoutBreakpoint.removeListener(this.onLayoutChange);
     verticalLayoutBreakpoint.removeListener(this.onLayoutChange);
 
-    shortcuts.off(L10N.getStr("symbolSearch.search.key1"), this.toggleQuickOpenModal);
+    shortcuts.off("CmdOrCtrl+Shift+P", this.toggleQuickOpenModal);
 
-    shortcuts.off(L10N.getStr("symbolSearch.search.key2"), this.toggleQuickOpenModal);
+    shortcuts.off("CmdOrCtrl+Shift+O", this.toggleQuickOpenModal);
 
-    const searchKeys = [L10N.getStr("sources.search.key2"), L10N.getStr("sources.search.alt.key")];
+    const searchKeys = ["CmdOrCtrl+P", "CmdOrCtrl+O"];
     searchKeys.forEach(key => shortcuts.off(key, this.toggleQuickOpenModal));
 
-    shortcuts.off(L10N.getStr("gotoLineModal.key3"), this.toggleQuickOpenModal);
+    shortcuts.off("Ctrl+G", this.toggleQuickOpenModal);
 
     shortcuts.off("Escape", this.onEscape);
   }

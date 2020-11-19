@@ -102,7 +102,7 @@ class EventListeners extends Component {
 
   renderSearchInput() {
     const { focused, searchText } = this.state;
-    const placeholder = L10N.getStr("eventListenersHeader1.placeholder");
+    const placeholder = "Filter by event type";
 
     return (
       <form className="event-search-form" onSubmit={e => e.preventDefault()}>

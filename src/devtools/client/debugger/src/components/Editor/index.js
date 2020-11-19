@@ -142,8 +142,8 @@ class Editor extends PureComponent {
   componentDidMount() {
     const { shortcuts } = this.context;
 
-    shortcuts.on(L10N.getStr("toggleBreakpoint.key"), this.onToggleBreakpoint);
-    shortcuts.on(L10N.getStr("sourceTabs.closeTab.key"), this.onClosePress);
+    shortcuts.on("CmdOrCtrl+B", this.onToggleBreakpoint);
+    shortcuts.on("CmdOrCtrl+W", this.onClosePress);
     shortcuts.on("Esc", this.onEscape);
   }
 
@@ -164,8 +164,8 @@ class Editor extends PureComponent {
     }
 
     const shortcuts = this.context.shortcuts;
-    shortcuts.off(L10N.getStr("sourceTabs.closeTab.key"));
-    shortcuts.off(L10N.getStr("toggleBreakpoint.key"));
+    shortcuts.off("CmdOrCtrl+W");
+    shortcuts.off("CmdOrCtrl+B");
   }
 
   getCurrentLine() {

@@ -3602,7 +3602,7 @@
         /* This Source Code Form is subject to the terms of the Mozilla Public
          * License, v. 2.0. If a copy of the MPL was not distributed with this
          * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-        // TODO : Localize this (was l10n.getStr("frame.unknownSource"))
+        // TODO : Localize this (was "(unknown)")
         const UNKNOWN_SOURCE_STRING = "(unknown)"; // Character codes used in various parsing helper functions.
 
         const CHAR_CODE_A = "a".charCodeAt(0);

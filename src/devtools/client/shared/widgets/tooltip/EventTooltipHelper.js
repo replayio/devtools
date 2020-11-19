@@ -60,8 +60,8 @@ EventTooltip.prototype = {
     this.container = doc.createElementNS(XHTML_NS, "div");
     this.container.className = "devtools-tooltip-events-container";
 
-    const Bubbling = L10N.getStr("eventsTooltip.Bubbling");
-    const Capturing = L10N.getStr("eventsTooltip.Capturing");
+    const Bubbling = "Bubbling";
+    const Capturing = "Capturing";
     for (const listener of this._eventListenerInfos) {
       const phase = listener.capturing ? Capturing : Bubbling;
       const level = listener.DOM0 ? "DOM0" : "DOM2";
@@ -91,8 +91,9 @@ EventTooltip.prototype = {
       let text = listener.origin;
       let title = text;
       if (listener.hide.filename) {
-        text = L10N.getStr("eventsTooltip.unknownLocation");
-        title = L10N.getStr("eventsTooltip.unknownLocationExplanation");
+        text = "Unknown location";
+        title =
+          "The original location of this listener cannot be detected. Maybe the code is transpiled by a utility such as Babel.";
       } else {
         const location = this._parseLocation(text);
         if (location) {
@@ -128,7 +129,7 @@ EventTooltip.prototype = {
       if (!listener.hide.debugger) {
         const debuggerIcon = doc.createElementNS(XHTML_NS, "div");
         debuggerIcon.className = "event-tooltip-debugger-icon";
-        const openInDebugger = L10N.getStr("eventsTooltip.openInDebugger");
+        const openInDebugger = "Open in Debugger";
         debuggerIcon.setAttribute("title", openInDebugger);
         header.appendChild(debuggerIcon);
       }

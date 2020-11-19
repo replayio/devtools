@@ -147,7 +147,7 @@ class FilterBar extends Component {
 
     return dom.button({
       className: "devtools-button devtools-clear-icon",
-      title: l10n.getStr("webconsole.clearButton.tooltip"),
+      title: "Clear the Web Console output",
       onClick: messagesClearEvaluations,
     });
   }
@@ -158,13 +158,13 @@ class FilterBar extends Component {
     let searchBoxSummary;
     let searchBoxSummaryTooltip;
     if (filteredMessagesCount.text > 0) {
-      searchBoxSummary = l10n.getStr("webconsole.filteredMessagesByText.label");
+      searchBoxSummary = "#1 hidden;#1 hidden";
       searchBoxSummary = PluralForm.get(filteredMessagesCount.text, searchBoxSummary).replace(
         "#1",
         filteredMessagesCount.text
       );
 
-      searchBoxSummaryTooltip = l10n.getStr("webconsole.filteredMessagesByText.tooltip");
+      searchBoxSummaryTooltip = "#1 item hidden by text filter;#1 items hidden by text filter";
       searchBoxSummaryTooltip = PluralForm.get(
         filteredMessagesCount.text,
         searchBoxSummaryTooltip
@@ -173,8 +173,8 @@ class FilterBar extends Component {
 
     return SearchBox({
       type: "filter",
-      placeholder: l10n.getStr("webconsole.filterInput.placeholder"),
-      keyShortcut: l10n.getStr("webconsole.find.key"),
+      placeholder: "Filter Output",
+      keyShortcut: "CmdOrCtrl+F",
       onChange: text => filterTextSet(text),
       summary: searchBoxSummary,
       summaryTooltip: searchBoxSummaryTooltip,
@@ -201,7 +201,7 @@ class FilterBar extends Component {
         id: "split-console-close-button",
         key: "split-console-close-button",
         className: "devtools-button",
-        title: l10n.getStr("webconsole.closeSplitConsoleButton.tooltip"),
+        title: "Close Split Console (Esc)",
         onClick: () => closeSplitConsole(),
       })
     );

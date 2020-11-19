@@ -2,7 +2,7 @@ import { assert } from "protocol/utils";
 import React, { PureComponent } from "react";
 const { COMMENT_NODE } = require("devtools/shared/dom-node-constants");
 
-const { getStr, getFormatStr } = require("../utils/l10n");
+const { getFormatStr } = require("../utils/l10n");
 
 interface TextNodeProps {
   type: number;
@@ -34,7 +34,7 @@ class TextNode extends PureComponent<TextNodeProps> {
                 )
               : ""
           }
-          data-label={getStr("markupView.whitespaceOnly.label")}
+          data-label="whitespace"
         >
           {value}
         </pre>

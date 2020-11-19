@@ -49,7 +49,7 @@ class LayoutApp extends PureComponent {
       component: BoxModel,
       componentProps: this.props,
       contentClassName: "layout-content",
-      header: BOXMODEL_L10N.getStr("boxmodel.title"),
+      header: "Box Model",
       id: "layout-section-boxmodel",
       opened: Services.prefs.getBoolPref(BOXMODEL_OPENED_PREF),
       onToggle: opened => {
@@ -63,7 +63,7 @@ class LayoutApp extends PureComponent {
       component: Grid,
       componentProps: this.props,
       contentClassName: "layout-content",
-      header: LAYOUT_L10N.getStr("layout.header"),
+      header: "Grid",
       id: "layout-grid-section",
       opened: Services.prefs.getBoolPref(GRID_OPENED_PREF),
       onToggle: opened => {

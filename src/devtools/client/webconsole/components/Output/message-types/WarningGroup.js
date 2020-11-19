@@ -13,7 +13,7 @@ const Message = createFactory(require("devtools/client/webconsole/components/Out
 
 const { PluralForm } = require("devtools/shared/plural-form");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
-const messageCountTooltip = l10n.getStr("webconsole.warningGroup.messageCount.tooltip");
+const messageCountTooltip = "#1 message;#1 messages";
 
 WarningGroup.displayName = "WarningGroup";
 

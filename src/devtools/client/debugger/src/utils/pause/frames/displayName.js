@@ -76,7 +76,7 @@ export function formatDisplayName(frame, { shouldMapDisplayName = true } = {}, l
     displayName = mapDisplayNames(frame, library);
   }
 
-  return simplifyDisplayName(displayName) || l10n.getStr("anonymousFunction");
+  return simplifyDisplayName(displayName) || "<anonymous>";
 }
 
 export function formatCopyName(frame, l10n) {
