@@ -65,7 +65,6 @@ export class DevToolsToolbox {
     await panel.open();
 
     this.panels[name] = panel;
-    store.dispatch(actions.setSelectedPanel(name));
     store.dispatch(actions.setInitializedPanels(name));
 
     resolve(panel);
@@ -75,13 +74,9 @@ export class DevToolsToolbox {
   async selectTool(name) {
     let panel = await this.getOrStartPanel(name);
 
-    if (panel.refresh) {
-      panel.refresh();
-    }
-
     this.emit("select", name);
-
     store.dispatch(actions.setSelectedPanel(name));
+
     this.currentTool = name;
     return panel;
   }

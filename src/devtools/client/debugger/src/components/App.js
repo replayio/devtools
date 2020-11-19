@@ -5,7 +5,6 @@
 //
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import classnames from "classnames";
 
 import { connect } from "../utils/connect";
 import { prefs, features } from "../utils/prefs";
@@ -20,6 +19,7 @@ import {
   getQuickOpenEnabled,
   getOrientation,
 } from "../selectors";
+import { getSelectedPanel } from "ui/reducers/app.ts";
 
 import { KeyShortcuts } from "devtools-modules";
 import Services from "devtools-services";
@@ -96,6 +96,8 @@ class Debugger extends Component {
 
     shortcuts.on("Escape", this.onEscape);
     shortcuts.on("Cmd+/", this.onCommandSlash);
+
+    this.props.refreshCodeMirror();
   }
 
   componentWillUnmount() {
@@ -112,6 +114,17 @@ class Debugger extends Component {
     shortcuts.off(L10N.getStr("gotoLineModal.key3"), this.toggleQuickOpenModal);
 
     shortcuts.off("Escape", this.onEscape);
+  }
+
+  componentDidUpdate(prevProps) {
+    const { selectedPanel, refreshCodeMirror } = this.props;
+
+    // Only refresh CodeMirror when moving from a non-debugger panel to the debugger panel. Otherwise,
+    // the gutter will keep errantly resizing between refreshes.
+    if (selectedPanel == "debugger" && prevProps.selectedPanel != selectedPanel) {
+      console.log(actions);
+      refreshCodeMirror();
+    }
   }
 
   onEscape = (_, e) => {
@@ -305,6 +318,7 @@ const mapStateToProps = state => ({
   activeSearch: getActiveSearch(state),
   quickOpenEnabled: getQuickOpenEnabled(state),
   orientation: getOrientation(state),
+  selectedPanel: getSelectedPanel(state),
 });
 
 export default connect(mapStateToProps, {
@@ -314,4 +328,5 @@ export default connect(mapStateToProps, {
   openQuickOpen: actions.openQuickOpen,
   closeQuickOpen: actions.closeQuickOpen,
   setOrientation: actions.setOrientation,
+  refreshCodeMirror: actions.refreshCodeMirror,
 })(Debugger);
