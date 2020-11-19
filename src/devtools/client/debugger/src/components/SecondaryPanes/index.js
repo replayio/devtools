@@ -50,7 +50,7 @@ const mdnLink =
 class SecondaryPanes extends Component {
   getScopeItem() {
     return {
-      header: L10N.getStr("scopes.header"),
+      header: "Scopes",
       className: "scopes-pane",
       component: <Scopes />,
       opened: prefs.scopesVisible,
@@ -62,7 +62,7 @@ class SecondaryPanes extends Component {
 
   getCallStackItem() {
     return {
-      header: L10N.getStr("callStack.header"),
+      header: "Call stack",
       className: "call-stack-pane",
       component: <Frames panel="debugger" />,
       opened: prefs.callStackVisible,
@@ -76,7 +76,7 @@ class SecondaryPanes extends Component {
     const { shouldLogExceptions, logExceptions } = this.props;
 
     return {
-      header: L10N.getStr("breakpoints.header"),
+      header: "Breakpoints",
       className: "breakpoints-pane",
       component: (
         <Breakpoints shouldLogExceptions={shouldLogExceptions} logExceptions={logExceptions} />

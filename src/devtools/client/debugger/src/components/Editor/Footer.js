@@ -83,7 +83,7 @@ class SourceFooter extends PureComponent {
       return;
     }
 
-    const tooltip = L10N.getStr("sourceTabs.prettyPrint");
+    const tooltip = "Pretty print source";
     const sourceLoaded = !!selectedSource.content;
 
     const type = "prettyPrint";
@@ -118,9 +118,7 @@ class SourceFooter extends PureComponent {
 
     const blackboxed = selectedSource.isBlackBoxed;
 
-    const tooltip = blackboxed
-      ? L10N.getStr("sourceFooter.unblackbox")
-      : L10N.getStr("sourceFooter.blackbox");
+    const tooltip = blackboxed ? "Unblackbox source" : "Blackbox source";
 
     const type = "black-box";
 

@@ -125,9 +125,7 @@ class Tab extends PureComponent {
       {
         item: {
           ...tabMenuItems.toggleBlackBox,
-          label: source.isBlackBoxed
-            ? L10N.getStr("blackboxContextItem.unblackbox")
-            : L10N.getStr("blackboxContextItem.blackbox"),
+          label: source.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
           disabled: !shouldBlackbox(source),
           click: () => toggleBlackBox(cx, source),
         },
@@ -213,10 +211,7 @@ class Tab extends PureComponent {
           {getTruncatedFileName(source, query)}
           {path && <span>{`../${path}/..`}</span>}
         </div>
-        <CloseButton
-          handleClick={onClickClose}
-          tooltip={L10N.getStr("sourceTabs.closeTabButtonTooltip")}
-        />
+        <CloseButton handleClick={onClickClose} tooltip={"Close tab"} />
       </div>
     );
   }

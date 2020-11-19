@@ -134,7 +134,7 @@ class SwatchColorPickerTooltip extends SwatchBasedEditorTooltip {
       eyeButton.addEventListener("click", this._openEyeDropper);
     } else {
       eyeButton.disabled = true;
-      eyeButton.title = L10N.getStr("eyedropper.disabled.title");
+      eyeButton.title = "Unavailable in non-HTML documents";
     }
 
     const learnMoreButton = this.tooltip.container.querySelector("#learn-more-button");

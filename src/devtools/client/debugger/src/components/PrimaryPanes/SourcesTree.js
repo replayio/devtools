@@ -230,7 +230,7 @@ class SourcesTree extends Component {
   render() {
     return this.renderPane(
       this.isEmpty() ? (
-        this.renderEmptyElement(L10N.getStr("noSourcesText"))
+        this.renderEmptyElement("This page has no sources.")
       ) : (
         <div key="tree" className="sources-list">
           {this.renderTree()}

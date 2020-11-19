@@ -21,12 +21,12 @@ export default function showContextMenu(props) {
 
   contextMenuEvent.preventDefault();
 
-  const enableInSourceLabel = L10N.getStr("breakpointHeadingsMenuItem.enableInSource.label");
-  const disableInSourceLabel = L10N.getStr("breakpointHeadingsMenuItem.disableInSource.label");
-  const removeInSourceLabel = L10N.getStr("breakpointHeadingsMenuItem.removeInSource.label");
-  const enableInSourceKey = L10N.getStr("breakpointHeadingsMenuItem.enableInSource.accesskey");
-  const disableInSourceKey = L10N.getStr("breakpointHeadingsMenuItem.disableInSource.accesskey");
-  const removeInSourceKey = L10N.getStr("breakpointHeadingsMenuItem.removeInSource.accesskey");
+  const enableInSourceLabel = "Enable breakpoints";
+  const disableInSourceLabel = "Disable breakpoints";
+  const removeInSourceLabel = "Remove breakpoints";
+  const enableInSourceKey = "E";
+  const disableInSourceKey = "D";
+  const removeInSourceKey = "R";
 
   const disableInSourceItem = {
     id: "node-menu-disable-in-source",

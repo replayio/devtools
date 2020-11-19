@@ -21,7 +21,6 @@ const { LocalizationHelper } = require("devtools/shared/l10n");
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
 
 const l10n = new LocalizationHelper("devtools/client/locales/components.properties");
-const webl10n = new LocalizationHelper("devtools/client/locales/webconsole.properties");
 
 class Frame extends Component {
   static get propTypes() {
@@ -158,7 +157,7 @@ class Frame extends Component {
     if (showFunctionName) {
       let functionDisplayName = frame.functionDisplayName;
       if (!functionDisplayName && showAnonymousFunctionName) {
-        functionDisplayName = webl10n.getStr("stacktrace.anonymousFunction");
+        functionDisplayName = "<anonymous>";
       }
 
       if (functionDisplayName) {

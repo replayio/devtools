@@ -13,10 +13,6 @@ import { connect } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 
-import { LocalizationHelper } from "devtools/shared/l10n";
-const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
-const Services = require("Services");
-
 import "./Toolbox.css";
 
 const shortcuts = new KeyShortcuts({ window, target: document });
@@ -54,17 +50,17 @@ class Toolbox extends React.Component {
       markupView = inspector._inspector.getPanel("markupview").provider;
       rulesPanel = {
         id: "ruleview",
-        title: INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
+        title: "Rules",
         panel: inspector._inspector.getPanel("ruleview").provider,
       };
       layoutPanel = {
         id: "layoutview",
-        title: INSPECTOR_L10N.getStr("inspector.sidebar.layoutViewTitle2"),
+        title: "Layout",
         panel: inspector._inspector.getPanel("layoutview").provider,
       };
       computedPanel = {
         id: "computedview",
-        title: INSPECTOR_L10N.getStr("inspector.sidebar.computedViewTitle"),
+        title: "Computed",
         panel: inspector._inspector.getPanel("computedview").provider,
       };
     }

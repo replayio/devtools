@@ -56,20 +56,20 @@ exports.register = function (window, shortcuts) {
   // Set zoom to whatever the last setting was.
   setZoom(zoomValue);
 
-  shortcuts.on(L10N.getStr("toolbox.zoomIn.key"), zoomIn);
-  const zoomIn2 = L10N.getStr("toolbox.zoomIn2.key");
+  shortcuts.on("CmdOrCtrl+Plus", zoomIn);
+  const zoomIn2 = "CmdOrCtrl+=";
   if (zoomIn2) {
     shortcuts.on(zoomIn2, zoomIn);
   }
 
-  shortcuts.on(L10N.getStr("toolbox.zoomOut.key"), zoomOut);
-  const zoomOut2 = L10N.getStr("toolbox.zoomOut2.key");
+  shortcuts.on("CmdOrCtrl+-", zoomOut);
+  const zoomOut2 = "";
   if (zoomOut2) {
     shortcuts.on(zoomOut2, zoomOut);
   }
 
-  shortcuts.on(L10N.getStr("toolbox.zoomReset.key"), zoomReset);
-  const zoomReset2 = L10N.getStr("toolbox.zoomReset2.key");
+  shortcuts.on("CmdOrCtrl+0", zoomReset);
+  const zoomReset2 = "";
   if (zoomReset2) {
     shortcuts.on(zoomReset2, zoomReset);
   }

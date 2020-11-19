@@ -261,7 +261,7 @@ class Message extends Component {
                     )
                   ),
               },
-              l10n.getStr("webconsole.message.componentDidCatch.copyButton.label")
+              "Copy message metadata to clipboard"
             )
           )
         )
@@ -385,7 +385,7 @@ class Message extends Component {
           title: exceptionDocURL.split("?")[0],
           onClick: this.onLearnMoreClick,
         },
-        `[${l10n.getStr("webConsoleMoreInfoLabel")}]`
+        `[${"Learn More"}]`
       );
     }
 

@@ -18,9 +18,11 @@ class PaneToggleButton extends PureComponent {
   label(position, collapsed) {
     switch (position) {
       case "start":
-        return L10N.getStr(collapsed ? "expandSources" : "collapseSources");
+        return collapsed
+          ? "Expand Sources and Outline panes"
+          : "Collapse Sources and Outline panes";
       case "end":
-        return L10N.getStr(collapsed ? "expandBreakpoints" : "collapseBreakpoints");
+        return collapsed ? "Expand Breakpoints pane" : "Collapse Breakpoints pane";
     }
   }
 

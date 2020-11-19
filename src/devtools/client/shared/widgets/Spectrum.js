@@ -76,7 +76,7 @@ class Spectrum {
       <div class="spectrum-color spectrum-box"
            tabindex="0"
            role="slider"
-           title="${L10N.getStr("colorPickerTooltip.spectrumDraggerTitle")}"
+           title="${"Spectrum"}"
            aria-describedby="spectrum-dragger">
         <div class="spectrum-sat">
           <div class="spectrum-val">
@@ -130,7 +130,7 @@ class Spectrum {
     eyedropper.id = "eyedropper-button";
     eyedropper.className = "devtools-button";
     eyedropper.style.pointerEvents = "auto";
-    eyedropper.setAttribute("aria-label", L10N.getStr("colorPickerTooltip.eyedropperTitle"));
+    eyedropper.setAttribute("aria-label", "Pick color on page");
     this.controls.insertBefore(eyedropper, this.colorPreview);
 
     // Hue slider and alpha slider
@@ -151,7 +151,7 @@ class Spectrum {
     const learnMore = this.document.createElementNS(XHTML_NS, "button");
     learnMore.id = "learn-more-button";
     learnMore.className = "learn-more";
-    learnMore.title = L10N.getStr("accessibility.learnMore");
+    learnMore.title = "Learn more";
     this.element.querySelector(".contrast-ratio-header-and-single-ratio").appendChild(learnMore);
 
     if (rgb) {
@@ -308,7 +308,7 @@ class Spectrum {
       this.contrastLabel.firstChild.remove();
     }
 
-    const largeTextStr = L10N.getStr("accessibility.contrast.large.text");
+    const largeTextStr = "large text";
     const contrastLabelStr = L10N.getFormatStr(
       "colorPickerTooltip.contrast.large.title",
       largeTextStr
@@ -321,7 +321,7 @@ class Spectrum {
     const largeTextIndicator = this.document.createElementNS(XHTML_NS, "span");
     largeTextIndicator.className = "accessibility-color-contrast-large-text";
     largeTextIndicator.textContent = largeTextStr;
-    largeTextIndicator.title = L10N.getStr("accessibility.contrast.large.title");
+    largeTextIndicator.title = "Text is 14 point and bold or larger, or 18 point or larger.";
     contents.splice(1, 0, largeTextIndicator);
 
     // Append children to contrast label
@@ -472,8 +472,8 @@ class Spectrum {
       // If current background color is a range, show the error text in the contrast range
       // span. Otherwise, show it in the single contrast span.
       const contrastValEl = isRange ? this.contrastValueMin : this.contrastValue;
-      contrastValEl.textContent = L10N.getStr("accessibility.contrast.error");
-      contrastValEl.title = L10N.getStr("accessibility.contrast.annotation.transparent.error");
+      contrastValEl.textContent = "Unable to calculate";
+      contrastValEl.title = "Pick a color that is not transparent.";
 
       return;
     }

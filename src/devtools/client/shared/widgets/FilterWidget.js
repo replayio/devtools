@@ -53,7 +53,7 @@ const filterList = [
   },
   {
     name: "drop-shadow",
-    placeholder: L10N.getStr("dropShadowPlaceholder"),
+    placeholder: "x y radius color",
     type: "string",
   },
   {
@@ -189,18 +189,18 @@ CSSFilterEditorWidget.prototype = {
 
     const filterListPlaceholder = this.doc.createElementNS(XHTML_NS, "option");
     filterListPlaceholder.setAttribute("value", "");
-    filterListPlaceholder.textContent = L10N.getStr("filterListSelectPlaceholder");
+    filterListPlaceholder.textContent = "Select a Filter";
     this.filterSelect.appendChild(filterListPlaceholder);
 
     const addFilter = this.doc.createElementNS(XHTML_NS, "button");
     addFilter.setAttribute("id", "add-filter");
     addFilter.classList.add("add");
-    addFilter.textContent = L10N.getStr("addNewFilterButton");
+    addFilter.textContent = "Add";
     filterListFooter.appendChild(addFilter);
 
     this.togglePresets = this.doc.createElementNS(XHTML_NS, "button");
     this.togglePresets.setAttribute("id", "toggle-presets");
-    this.togglePresets.textContent = L10N.getStr("presetsToggleButton");
+    this.togglePresets.textContent = "Presets";
     filterListFooter.appendChild(this.togglePresets);
 
     const presetListWrapper = this.doc.createElementNS(XHTML_NS, "div");
@@ -218,12 +218,12 @@ CSSFilterEditorWidget.prototype = {
     this.addPresetInput = this.doc.createElementNS(XHTML_NS, "input");
     this.addPresetInput.setAttribute("value", "");
     this.addPresetInput.classList.add("devtools-textinput");
-    this.addPresetInput.setAttribute("placeholder", L10N.getStr("newPresetPlaceholder"));
+    this.addPresetInput.setAttribute("placeholder", "Preset Name");
     presetListFooter.appendChild(this.addPresetInput);
 
     this.addPresetButton = this.doc.createElementNS(XHTML_NS, "button");
     this.addPresetButton.classList.add("add");
-    this.addPresetButton.textContent = L10N.getStr("savePresetButton");
+    this.addPresetButton.textContent = "Save";
     presetListFooter.appendChild(this.addPresetButton);
 
     this.el.appendChild(content);
@@ -272,7 +272,7 @@ CSSFilterEditorWidget.prototype = {
     value.className = "filter-value";
 
     const drag = this.doc.createElementNS(XHTML_NS, "i");
-    drag.title = L10N.getStr("dragHandleTooltipText");
+    drag.title = "Drag up or down to re-order filter";
 
     const label = this.doc.createElementNS(XHTML_NS, "label");
 
@@ -662,8 +662,8 @@ CSSFilterEditorWidget.prototype = {
   render: function () {
     if (!this.filters.length) {
       // eslint-disable-next-line
-      this.filterList.innerHTML = `<p> ${L10N.getStr("emptyFilterList")} <br />
-                                 ${L10N.getStr("addUsingList")} </p>`;
+      this.filterList.innerHTML = `<p> ${"No filter specified"} <br />
+                                 ${"Add a filter using the list below"} </p>`;
       this.emit("render");
       return;
     }
@@ -712,7 +712,7 @@ CSSFilterEditorWidget.prototype = {
         unitPreview.textContent = filter.unit;
 
         label.classList.add("devtools-draglabel");
-        label.title = L10N.getStr("labelDragTooltipText");
+        label.title = "Drag left or right to decrease or increase the value";
       } else {
         // string-type filters have no unit
         unitPreview.remove();
@@ -743,7 +743,7 @@ CSSFilterEditorWidget.prototype = {
 
       if (!presets || !presets.length) {
         // eslint-disable-next-line
-        this.presetList.innerHTML = `<p>${L10N.getStr("emptyPresetList")}</p>`;
+        this.presetList.innerHTML = `<p>${"You don’t have any saved presets. "}</p>`;
         this.emit("render");
         return;
       }

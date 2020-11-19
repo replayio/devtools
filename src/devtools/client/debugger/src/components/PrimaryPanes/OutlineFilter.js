@@ -44,7 +44,7 @@ export default class OutlineFilter extends Component {
             })}
             onFocus={() => this.setFocus(true)}
             onBlur={() => this.setFocus(false)}
-            placeholder={L10N.getStr("outline.placeholder")}
+            placeholder={"Filter functions"}
             value={this.props.filter}
             type="text"
             onChange={this.onChange}

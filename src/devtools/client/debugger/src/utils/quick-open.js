@@ -85,18 +85,18 @@ export function formatSymbols(symbols) {
 export function formatShortcutResults() {
   return [
     {
-      value: L10N.getStr("symbolSearch.search.functionsPlaceholder.title"),
-      title: `@ ${L10N.getStr("symbolSearch.search.functionsPlaceholder")}`,
+      value: "Search for a function in a file",
+      title: `@ ${"Search functions…"}`,
       id: "@",
     },
     {
-      value: L10N.getStr("symbolSearch.search.variablesPlaceholder.title"),
-      title: `# ${L10N.getStr("symbolSearch.search.variablesPlaceholder")}`,
+      value: "Search for a variable in a file",
+      title: `# ${"Search variables…"}`,
       id: "#",
     },
     {
-      value: L10N.getStr("gotoLineModal.title"),
-      title: `: ${L10N.getStr("gotoLineModal.placeholder")}`,
+      value: "Go to a line number in a file",
+      title: `: ${"Go to line…"}`,
       id: ":",
     },
   ];

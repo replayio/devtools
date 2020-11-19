@@ -58,7 +58,7 @@ class LayoutView {
         id: "layoutview",
         key: "layoutview",
         store: this.store,
-        title: INSPECTOR_L10N.getStr("inspector.sidebar.layoutViewTitle2"),
+        title: "Layout",
       },
       layoutApp
     );

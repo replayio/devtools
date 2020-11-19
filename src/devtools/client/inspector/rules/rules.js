@@ -103,7 +103,7 @@ class RulesView {
         id: "ruleview",
         key: "ruleview",
         store: this.store,
-        title: INSPECTOR_L10N.getStr("inspector.sidebar.ruleViewTitle"),
+        title: "Rules",
       },
       rulesApp
     );

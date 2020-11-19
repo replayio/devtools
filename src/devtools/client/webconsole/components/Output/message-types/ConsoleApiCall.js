@@ -123,7 +123,7 @@ function ConsoleApiCall(props) {
 
   let collapseTitle = null;
   if (isGroupType(type)) {
-    collapseTitle = l10n.getStr("groupToggle");
+    collapseTitle = "Show/hide group";
   }
 
   const collapsible = isGroupType(type) || (type === "error" && Array.isArray(stacktrace));

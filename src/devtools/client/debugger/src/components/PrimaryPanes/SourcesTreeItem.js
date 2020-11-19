@@ -52,11 +52,11 @@ class SourceTreeItem extends Component {
   };
 
   onContextMenu = (event, item) => {
-    const copySourceUri2Label = L10N.getStr("copySourceUri2");
-    const copySourceUri2Key = L10N.getStr("copySourceUri2.accesskey");
-    const setDirectoryRootLabel = L10N.getStr("setDirectoryRoot.label");
-    const setDirectoryRootKey = L10N.getStr("setDirectoryRoot.accesskey");
-    const removeDirectoryRootLabel = L10N.getStr("removeDirectoryRoot.label");
+    const copySourceUri2Label = "Copy source URI";
+    const copySourceUri2Key = "u";
+    const setDirectoryRootLabel = "Set directory root";
+    const setDirectoryRootKey = "r";
+    const removeDirectoryRootLabel = "Remove directory root";
 
     event.stopPropagation();
     event.preventDefault();
@@ -80,19 +80,15 @@ class SourceTreeItem extends Component {
         if (source) {
           const blackBoxMenuItem = {
             id: "node-menu-blackbox",
-            label: source.isBlackBoxed
-              ? L10N.getStr("blackboxContextItem.unblackbox")
-              : L10N.getStr("blackboxContextItem.blackbox"),
-            accesskey: source.isBlackBoxed
-              ? L10N.getStr("blackboxContextItem.unblackbox.accesskey")
-              : L10N.getStr("blackboxContextItem.blackbox.accesskey"),
+            label: source.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
+            accesskey: source.isBlackBoxed ? "U" : "B",
             disabled: !shouldBlackbox(source),
             click: () => this.props.toggleBlackBox(cx, source),
           };
           const downloadFileItem = {
             id: "node-menu-download-file",
-            label: L10N.getStr("downloadFile.label"),
-            accesskey: L10N.getStr("downloadFile.accesskey"),
+            label: "Download file",
+            accesskey: "d",
             disabled: false,
             click: () => this.handleDownloadFile(cx, source, item),
           };
@@ -128,14 +124,14 @@ class SourceTreeItem extends Component {
 
     menuOptions.push({
       id: "node-menu-collapse-all",
-      label: L10N.getStr("collapseAll.label"),
+      label: "Collapse all",
       disabled: false,
       click: () => setExpanded(item, false, true),
     });
 
     menuOptions.push({
       id: "node-menu-expand-all",
-      label: L10N.getStr("expandAll.label"),
+      label: "Expand all",
       disabled: false,
       click: () => setExpanded(item, true, true),
     });

@@ -31,9 +31,9 @@ import "./SearchBar.css";
 import { PluralForm } from "devtools-modules";
 
 function getShortcuts() {
-  const searchAgainKey = L10N.getStr("sourceSearch.search.again.key3");
-  const searchAgainPrevKey = L10N.getStr("sourceSearch.search.againPrev.key3");
-  const searchKey = L10N.getStr("sourceSearch.search.key2");
+  const searchAgainKey = "Cmd+G";
+  const searchAgainPrevKey = "Cmd+Shift+G";
+  const searchKey = "CmdOrCtrl+F";
 
   return {
     shiftSearchAgainShortcut: searchAgainPrevKey,
@@ -195,15 +195,15 @@ class SearchBar extends Component {
     }
 
     if (count == 0) {
-      return L10N.getStr("editor.noResultsFound");
+      return "No results found";
     }
 
     if (index == -1) {
-      const resultsSummaryString = L10N.getStr("sourceSearch.resultsSummary1");
+      const resultsSummaryString = "#1 result;#1 results";
       return PluralForm.get(count, resultsSummaryString).replace("#1", count);
     }
 
-    const searchResultsString = L10N.getStr("editor.searchResults1");
+    const searchResultsString = "%d of #1 result;%d of #1 results";
     return PluralForm.get(count, searchResultsString)
       .replace("#1", count)
       .replace("%d", matchIndex + 1);
@@ -240,26 +240,24 @@ class SearchBar extends Component {
     return (
       <div className="search-modifiers">
         <span className="pipe-divider" />
-        <span className="search-type-name">
-          {L10N.getStr("symbolSearch.searchModifier.modifiersLabel")}
-        </span>
+        <span className="search-type-name">{"Modifiers:"}</span>
         <SearchModBtn
           modVal="regexMatch"
           className="regex-match-btn"
           svgName="regex-match"
-          tooltip={L10N.getStr("symbolSearch.searchModifier.regex")}
+          tooltip={"Regex"}
         />
         <SearchModBtn
           modVal="caseSensitive"
           className="case-sensitive-btn"
           svgName="case-match"
-          tooltip={L10N.getStr("symbolSearch.searchModifier.caseSensitive")}
+          tooltip={"Case sensitive"}
         />
         <SearchModBtn
           modVal="wholeWord"
           className="whole-word-btn"
           svgName="whole-word-match"
-          tooltip={L10N.getStr("symbolSearch.searchModifier.wholeWord")}
+          tooltip={"Whole word"}
         />
       </div>
     );
@@ -290,7 +288,7 @@ class SearchBar extends Component {
         <SearchInput
           query={this.state.query}
           count={count}
-          placeholder={L10N.getStr("sourceSearch.search.placeholder2")}
+          placeholder={"Find in file…"}
           summaryMsg={this.buildSummaryMsg()}
           isLoading={false}
           onChange={this.onChange}

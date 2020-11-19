@@ -125,8 +125,8 @@ export class Outline extends Component {
 
     const { selectedSource, getFunctionText, flashLineRange } = this.props;
 
-    const copyFunctionKey = L10N.getStr("copyFunction.accesskey");
-    const copyFunctionLabel = L10N.getStr("copyFunction.label");
+    const copyFunctionKey = "F";
+    const copyFunctionLabel = "Copy function";
 
     if (!selectedSource) {
       return;
@@ -158,15 +158,13 @@ export class Outline extends Component {
   };
 
   renderPlaceholder() {
-    const placeholderMessage = this.props.selectedSource
-      ? L10N.getStr("outline.noFunctions")
-      : L10N.getStr("outline.noFileSelected");
+    const placeholderMessage = this.props.selectedSource ? "No functions" : "No file selected";
 
     return <div className="outline-pane-info">{placeholderMessage}</div>;
   }
 
   renderLoading() {
-    return <div className="outline-pane-info">{L10N.getStr("loadingText")}</div>;
+    return <div className="outline-pane-info">{"Loadingu2026"}</div>;
   }
 
   renderFunction(func) {
@@ -272,7 +270,7 @@ export class Outline extends Component {
             this.props.alphabetizeOutline ? "sort-button sort-button--active" : "sort-button"
           }
         >
-          {L10N.getStr("outline.sortLabel")}
+          {"Sort by name"}
         </button>
       </div>
     );

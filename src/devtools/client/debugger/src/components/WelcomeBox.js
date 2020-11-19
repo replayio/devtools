@@ -15,15 +15,15 @@ import "./WelcomeBox.css";
 
 export class WelcomeBox extends Component {
   render() {
-    const searchSourcesShortcut = formatKeyShortcut(L10N.getStr("sources.search.key2"));
+    const searchSourcesShortcut = formatKeyShortcut("CmdOrCtrl+P");
 
-    const searchProjectShortcut = formatKeyShortcut(L10N.getStr("projectTextSearch.key"));
+    const searchProjectShortcut = formatKeyShortcut("CmdOrCtrl+Shift+F");
 
-    const allShortcutsShortcut = formatKeyShortcut(L10N.getStr("allShortcut.key"));
+    const allShortcutsShortcut = formatKeyShortcut("CmdOrCtrl+/");
 
-    const allShortcutsLabel = L10N.getStr("welcome.allShortcuts");
-    const searchSourcesLabel = L10N.getStr("welcome.search2").substring(2);
-    const searchProjectLabel = L10N.getStr("welcome.findInFiles2").substring(2);
+    const allShortcutsLabel = "Show all shortcuts";
+    const searchSourcesLabel = "%S Go to file".substring(2);
+    const searchProjectLabel = "%S Find in files".substring(2);
     const { setActiveSearch, openQuickOpen, toggleShortcutsModal } = this.props;
 
     return (
