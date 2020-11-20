@@ -215,7 +215,14 @@ export class NodeFront {
       this._pause
         .sendMessage(client.CSS.getAppliedRules, { node: this._object.objectId })
         .then(({ rules, data }) => {
-          this._rules = rules;
+          this._rules = [];
+          for (const rule of rules) {
+            if (
+              !this._rules.some(r => rule.rule === r.rule && rule.pseudoElement === r.pseudoElement)
+            ) {
+              this._rules.push(rule);
+            }
+          }
           this._pause.addData(data);
         }),
       this._pause
