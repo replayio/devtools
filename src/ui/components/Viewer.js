@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import RightSidebar from "./RightSidebar";
-import Tooltip from "./Tooltip";
 import Toast from "./Toast";
 import { installObserver } from "../../protocol/graphics";
 
-export default function Viewer({ tooltip }) {
+export default function Viewer() {
   useEffect(() => {
     installObserver();
   }, []);
@@ -17,7 +16,6 @@ export default function Viewer({ tooltip }) {
         <div id="highlighter-root"></div>
       </div>
       <RightSidebar />
-      <Tooltip tooltip={tooltip} />
     </div>
   );
 }
