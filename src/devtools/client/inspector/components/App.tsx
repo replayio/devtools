@@ -280,7 +280,7 @@ const connector = connect(
   (state: UIState) => ({
     is3PaneModeEnabled: state.inspector.is3PaneModeEnabled,
     activeTab: state.inspector.activeTab,
-    markupRootNode: state.markup.tree[state.markup.rootNode],
+    markupRootNode: state.markup.tree[state.markup.rootNode!],
   }),
   InspectorActions
 );
