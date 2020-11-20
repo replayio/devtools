@@ -52,7 +52,7 @@
   text-decoration: none;
 }
 
-#header .user-options button {
+#header .user-options .dropdown-wrapper button {
   padding: 8px;
   width: 100%;
   color: var(--theme-toolbar-color);
