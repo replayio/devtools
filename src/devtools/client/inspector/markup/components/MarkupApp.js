@@ -3,6 +3,8 @@ const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
 
+const { getNode, getRootNodeId } = require("../reducers/markup");
+
 const Node = createFactory(require("./Node"));
 
 const Types = require("../types");
@@ -10,18 +12,19 @@ const Types = require("../types");
 class MarkupApp extends PureComponent {
   static get propTypes() {
     return {
-      markup: PropTypes.shape(Types.markup).isRequired,
+      node: PropTypes.shape(Types.node).isRequired,
       onSelectNode: PropTypes.func.isRequired,
       onShowEventTooltip: PropTypes.func.isRequired,
       onToggleNodeExpanded: PropTypes.func.isRequired,
+      onMouseEnterNode: PropTypes.func.isRequired,
+      onMouseLeaveNode: PropTypes.func.isRequired,
     };
   }
 
   render() {
-    const { markup } = this.props;
-    const { rootNode, tree } = markup;
+    const { node } = this.props;
 
-    if (!rootNode || !tree[rootNode]) {
+    if (!node) {
       return null;
     }
 
@@ -31,11 +34,10 @@ class MarkupApp extends PureComponent {
         role: "tree",
         tabIndex: 0,
       },
-      tree[rootNode].children.map(nodeId => {
+      node.children.map(nodeId => {
         return Node({
           key: nodeId,
-          markup,
-          node: tree[nodeId],
+          nodeId,
           onSelectNode: this.props.onSelectNode,
           onShowEventTooltip: this.props.onShowEventTooltip,
           onToggleNodeExpanded: this.props.onToggleNodeExpanded,
@@ -47,4 +49,8 @@ class MarkupApp extends PureComponent {
   }
 }
 
-module.exports = connect(state => state)(MarkupApp);
+const mapStateToProps = state => ({
+  node: getNode(state, getRootNodeId(state)),
+});
+
+module.exports = connect(mapStateToProps)(MarkupApp);
