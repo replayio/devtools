@@ -10,6 +10,7 @@ import { Pause, WiredObject } from "./pause";
 import { defer, assert, DisallowEverythingProxyHandler, Deferred } from "../utils";
 const { getFrameworkEventListeners } = require("../event-listeners");
 import { ValueFront } from "./value";
+const { uniqBy } = require("lodash");
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 export interface WiredEventListener {
@@ -215,14 +216,7 @@ export class NodeFront {
       this._pause
         .sendMessage(client.CSS.getAppliedRules, { node: this._object.objectId })
         .then(({ rules, data }) => {
-          this._rules = [];
-          for (const rule of rules) {
-            if (
-              !this._rules.some(r => rule.rule === r.rule && rule.pseudoElement === r.pseudoElement)
-            ) {
-              this._rules.push(rule);
-            }
-          }
+          this._rules = uniqBy(rules, (rule: AppliedRule) => `${rule.rule}|${rule.pseudoElement}`);
           this._pause.addData(data);
         }),
       this._pause
