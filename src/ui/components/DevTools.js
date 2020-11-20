@@ -8,6 +8,8 @@ import Viewer from "./Viewer";
 import Loader from "./shared/Loader";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import RecordingLoadingScreen from "./RecordingLoadingScreen";
+import Timeline from "./Timeline";
+import Tooltip from "./Tooltip";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
@@ -44,18 +46,24 @@ function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }
   };
 
   return (
-    <SplitBox
-      style={{ width: "100%", overflow: "hidden" }}
-      splitterSize={1}
-      initialSize={prefs.toolboxHeight}
-      minSize="20%"
-      maxSize="80%"
-      vert={true}
-      onMove={handleMove}
-      startPanel={viewer}
-      endPanel={toolbox}
-      endPanelControl={false}
-    />
+    <>
+      <SplitBox
+        style={{ width: "100%", overflow: "hidden" }}
+        splitterSize={1}
+        initialSize={prefs.toolboxHeight}
+        minSize="20%"
+        maxSize="80%"
+        vert={true}
+        onMove={handleMove}
+        startPanel={toolbox}
+        endPanel={viewer}
+        endPanelControl={false}
+      />
+      <div id="toolbox-timeline">
+        <Timeline />
+        <Tooltip tooltip={tooltip} />
+      </div>
+    </>
   );
 }
 

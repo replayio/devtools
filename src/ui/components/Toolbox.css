@@ -82,12 +82,12 @@
   position: absolute;
   height: 180px;
   border: 1px solid rgb(204, 204, 204);
-  box-shadow: 2px 1px 1px rgb(227, 227, 227);
-  bottom: 10px;
+  bottom: 100px;
   border-radius: 4px;
   background: #ececec;
   align-items: center;
   justify-content: center;
+  z-index: var(--z-index-1--timeline-tooltip);
 }
 
 .timeline-tooltip-image {

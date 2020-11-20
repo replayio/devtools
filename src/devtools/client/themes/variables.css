@@ -370,6 +370,7 @@ custom variable for it below so we can keep track of everything in one place. */
 #app {
   --z-index-1--paused-comment: var(--z-index-1);
   --z-index-1--paused-message: var(--z-index-1);
+  --z-index-1--timeline-tooltip: var(--z-index-1);
 
   --z-index-2--name: var(--z-index-2);
   --z-index-3--name: var(--z-index-3);
