@@ -45,12 +45,12 @@ function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }
 
   return (
     <SplitBox
-      style={{ width: "100vw", overflow: "hidden" }}
+      style={{ width: "100%", overflow: "hidden" }}
       splitterSize={1}
       initialSize={prefs.toolboxHeight}
       minSize="20%"
       maxSize="80%"
-      vert={false}
+      vert={true}
       onMove={handleMove}
       startPanel={viewer}
       endPanel={toolbox}
