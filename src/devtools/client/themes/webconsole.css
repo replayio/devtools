@@ -55,6 +55,9 @@
   --console-indent-border-color: var(--theme-highlight-blue);
   --console-repeat-bubble-background: var(--theme-highlight-blue);
 
+  --toolbox-background: #f9f9fa;
+  --paused-background-color: #5b41ff;
+
   /* TODO in bug 1549195: colors used in shared components (e.g. Reps) should
      be renamed and/or moved to variables.css so they work everywhere */
   --error-color: var(--red-70);

@@ -1,0 +1,55 @@
+.secondary-toolbox {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  background: white;
+  height: 100%;
+  width: 100%;
+}
+
+.secondary-toolbox-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background: var(--theme-toolbar-background);
+  border-top: 1px solid var(--theme-splitter-color);
+  border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.secondary-toolbox-header .tabs {
+  display: flex;
+  flex-direction: row;
+}
+
+.secondary-toolbox-header button {
+  font-size: 1.1rem;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: color 200ms;
+}
+
+.secondary-toolbox-header button:focus {
+  outline: none;
+  background-color: inherit;
+}
+
+.secondary-toolbox-header button:hover,
+.secondary-toolbox-header button.expanded {
+  background: inherit;
+  color: var(--theme-toolbar-selected-color);
+}
+
+.secondary-toolbox-header .action-buttons button {
+  color: var(--theme-text-color-inactive);
+  cursor: auto;
+}
+
+/* .secondary-toolbox-header .action-buttons button:hover {
+  color: var(--theme-body-color)
+} */
+
+/* Collapsed secondary toolbox styling */
+
+.secondary-toolbox.collapsed .secondary-toolbox-content {
+  display: none;
+}
