@@ -95,8 +95,9 @@ export function scrollIntoView(scrollIntoViewNode: string): UpdateScrollIntoView
 
 /**
  * Expand the given node after ensuring its child nodes are loaded and added to the tree.
+ * If shouldScrollIntoView is true, the node is scrolled into view if its children need to be loaded.
  */
-export function expandNode(nodeId: string): UIThunkAction {
+export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThunkAction {
   return async ({ dispatch, getState }) => {
     const tree = getState().markup.tree;
     const node = tree[nodeId];
@@ -107,12 +108,16 @@ export function expandNode(nodeId: string): UIThunkAction {
     }
 
     if (node.hasChildren && node.children.length === 0) {
+      if (shouldScrollIntoView) {
+        dispatch(scrollIntoView(node.id));
+      }
+
       const pause = ThreadFront.currentPause;
       assert(pause);
-      const node = pause.getNodeFront(nodeId);
-      const childNodes = await node.childNodes();
+      const nodeFront = pause.getNodeFront(nodeId);
+      const childNodes = await nodeFront.childNodes();
       if (ThreadFront.currentPause !== pause) return;
-      dispatch(addChildren(node, childNodes));
+      dispatch(addChildren(nodeFront, childNodes));
     }
 
     dispatch(updateNodeExpanded(nodeId, true));
@@ -121,6 +126,9 @@ export function expandNode(nodeId: string): UIThunkAction {
 
 /**
  * Update the tree to show the currently selected node.
+ * If shouldScrollIntoView is true, the selected node is scrolled into view. If any of its
+ * ancestors' children haven't been loaded yet, those ancestors will also be scrolled into view
+ * while their children are loaded.
  */
 export function selectionChanged(
   selection: Selection,
@@ -149,11 +157,7 @@ export function selectionChanged(
 
     // expand each ancestor, loading its children if necessary
     for (const ancestor of ancestors) {
-      if (shouldScrollIntoView) {
-        dispatch(scrollIntoView(ancestor.objectId()));
-      }
-
-      await dispatch(expandNode(ancestor.objectId()));
+      await dispatch(expandNode(ancestor.objectId(), shouldScrollIntoView));
       if (selection.nodeFront !== selectedNode) return;
     }
 
