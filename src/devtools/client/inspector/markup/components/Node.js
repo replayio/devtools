@@ -1,5 +1,6 @@
 const { createElement, createFactory, PureComponent } = require("react");
 const dom = require("react-dom-factories");
+const { connect } = require("react-redux");
 const PropTypes = require("prop-types");
 const {
   COMMENT_NODE,
@@ -8,6 +9,12 @@ const {
   TEXT_NODE,
 } = require("devtools/shared/dom-node-constants");
 const { features } = require("devtools/client/inspector/prefs");
+const {
+  getNode,
+  getRootNodeId,
+  getSelectedNodeId,
+  getScrollIntoViewNodeId,
+} = require("../reducers/markup");
 
 const ElementNode = createFactory(require("./ElementNode"));
 const ReadOnlyNode = createFactory(require("./ReadOnlyNode"));
@@ -15,14 +22,18 @@ const TextNode = createFactory(require("./TextNode"));
 
 const Types = require("../types");
 
-class Node extends PureComponent {
+class _Node extends PureComponent {
   static get propTypes() {
     return {
-      markup: PropTypes.shape(Types.markup).isRequired,
       node: PropTypes.shape(Types.node).isRequired,
+      rootNodeId: PropTypes.string.isRequired,
+      isSelectedNode: PropTypes.bool.isRequired,
+      isScrollIntoViewNode: PropTypes.bool.isRequired,
       onSelectNode: PropTypes.func.isRequired,
       onShowEventTooltip: PropTypes.func.isRequired,
       onToggleNodeExpanded: PropTypes.func.isRequired,
+      onMouseEnterNode: PropTypes.func.isRequired,
+      onMouseLeaveNode: PropTypes.func.isRequired,
     };
   }
 
@@ -45,10 +56,10 @@ class Node extends PureComponent {
   onSelectNodeClick(event) {
     event.stopPropagation();
 
-    const { markup, node } = this.props;
+    const { node, isSelectedNode } = this.props;
 
     // Don't reselect the same selected node.
-    if (markup.selectedNode === node.id) {
+    if (isSelectedNode) {
       return;
     }
 
@@ -71,9 +82,8 @@ class Node extends PureComponent {
    * Renders the children of the current node.
    */
   renderChildren() {
-    const { markup, node } = this.props;
-    const { tree } = markup;
-    const children = tree[node.id].children || [];
+    const { node } = this.props;
+    const children = node.children || [];
 
     if (!children.length || node.isInlineTextChild) {
       return null;
@@ -84,11 +94,10 @@ class Node extends PureComponent {
         className: "children",
         role: node.hasChildren ? "group" : "",
       },
-      children.map(childId => {
+      children.map(nodeId => {
         return createElement(Node, {
-          key: childId,
-          markup,
-          node: tree[childId],
+          key: nodeId,
+          nodeId,
           onSelectNode: this.props.onSelectNode,
           onShowEventTooltip: this.props.onShowEventTooltip,
           onToggleNodeExpanded: this.props.onToggleNodeExpanded,
@@ -147,8 +156,7 @@ class Node extends PureComponent {
   }
 
   render() {
-    const { markup, node } = this.props;
-    const { rootNode, selectedNode, scrollIntoViewNode } = markup;
+    const { node, rootNodeId, isSelectedNode, isScrollIntoViewNode } = this.props;
 
     const isWhitespaceTextNode = node.type === TEXT_NODE && !/[^\s]/.exec(node.value);
     if (isWhitespaceTextNode && !features.showWhitespaceNodes) {
@@ -160,9 +168,7 @@ class Node extends PureComponent {
     const canExpand = node.hasChildren && !node.isInlineTextChild;
     // Whether or not to the show the expanded - True if node can expand and the parent
     // node is not the root node.
-    const showExpander = canExpand && node.parentNodeId !== rootNode;
-    const isSelected = node.id === selectedNode;
-    const shouldScrollIntoView = node.id === scrollIntoViewNode;
+    const showExpander = canExpand && node.parentNodeId !== rootNodeId;
 
     return dom.li(
       {
@@ -176,14 +182,14 @@ class Node extends PureComponent {
       },
       dom.div(
         {
-          className: "tag-line" + (isSelected ? " selected" : ""),
+          className: "tag-line" + (isSelectedNode ? " selected" : ""),
           role: "treeitem",
           onMouseEnter: this.onMouseEnter,
           onMouseLeave: this.onMouseLeave,
-          ref: shouldScrollIntoView ? this.scrollIntoView : undefined,
+          ref: isScrollIntoViewNode ? this.scrollIntoView : undefined,
         },
         dom.span({
-          className: "tag-state" + (isSelected ? " theme-selected" : ""),
+          className: "tag-state" + (isSelectedNode ? " theme-selected" : ""),
           role: "presentation",
         }),
         showExpander
@@ -199,5 +205,13 @@ class Node extends PureComponent {
     );
   }
 }
+
+const mapStateToProps = (state, { nodeId }) => ({
+  node: getNode(state, nodeId),
+  rootNodeId: getRootNodeId(state),
+  isSelectedNode: nodeId === getSelectedNodeId(state),
+  isScrollIntoViewNode: nodeId === getScrollIntoViewNodeId(state),
+});
+const Node = connect(mapStateToProps)(_Node);
 
 module.exports = Node;
