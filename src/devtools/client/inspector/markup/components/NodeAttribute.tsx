@@ -1,26 +1,22 @@
-const { PureComponent } = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const { connect } = require("react-redux");
+import React, { PureComponent } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { UIState } from "ui/state";
+import { Attr } from "record-replay-protocol";
+import { NodeInfo } from "../state/markup";
+
 const { truncateString } = require("devtools/shared/inspector/utils");
 const { parseAttribute } = require("devtools/client/shared/node-attribute-parser");
-
-const Types = require("../types");
 
 const COLLAPSE_DATA_URL_REGEX = /^data.+base64/;
 const COLLAPSE_DATA_URL_LENGTH = 60;
 
-class NodeAttribute extends PureComponent {
-  static get propTypes() {
-    return {
-      attribute: PropTypes.shape(Types.attribute).isRequired,
-      attributes: PropTypes.arrayOf(PropTypes.shape(Types.attribute)).isRequired,
-      collapseAttributeLength: PropTypes.number.isRequired,
-      collapseAttributes: PropTypes.bool.isRequired,
-      node: PropTypes.shape(Types.node).isRequired,
-    };
-  }
+interface NodeAttributeProps {
+  attribute: Attr;
+  attributes: Attr[];
+  node: NodeInfo;
+}
 
+class NodeAttribute extends PureComponent<NodeAttributeProps & PropsFromRedux> {
   /**
    * Truncates the given attribute value if it is a base65 data URL or the
    * collapse attributes pref is enabled.
@@ -29,7 +25,7 @@ class NodeAttribute extends PureComponent {
    *         Attribute value.
    * @return {String} truncated attribute value.
    */
-  truncateValue(value) {
+  truncateValue(value: string) {
     if (value && value.match(COLLAPSE_DATA_URL_REGEX)) {
       return truncateString(value, COLLAPSE_DATA_URL_LENGTH);
     }
@@ -55,42 +51,34 @@ class NodeAttribute extends PureComponent {
         values.push(this.truncateValue(token.value));
       } else {
         values.push(
-          dom.span(
-            {
-              key: token.value,
-              className: "link",
-              "data-link": token.value,
-              "data-type": token.type,
-            },
-            this.truncateValue(token.value)
-          )
+          <span key={token.value} className="link" data-link={token.value} data-type={token.type}>
+            {this.truncateValue(token.value)}
+          </span>
         );
       }
     }
 
-    return dom.span(
-      {
-        className: "attreditor",
-        "data-attr": attribute.name,
-        "data-value": attribute.value,
-      },
-      " ",
-      dom.span(
-        { className: "editable", tabIndex: 0 },
-        dom.span({ className: "attr-name theme-fg-color1" }, attribute.name),
-        '="',
-        dom.span({ className: "attr-value theme-fg-color2" }, values),
-        '"'
-      )
+    return (
+      <span className="attreditor" data-attr={attribute.name} data-value={attribute.value}>
+        {" "}
+        <span className="editable" tabIndex={0}>
+          <span className="attr-name theme-fg-color1">{attribute.name}</span>
+          {'="'}
+          <span className="attr-value theme-fg-color2">{values}</span>
+          {'"'}
+        </span>
+      </span>
     );
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state: UIState) => {
   return {
     collapseAttributes: state.markup.collapseAttributes,
     collapseAttributeLength: state.markup.collapseAttributeLength,
   };
 };
+const connector = connect(mapStateToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-module.exports = connect(mapStateToProps)(NodeAttribute);
+export default connector(NodeAttribute);

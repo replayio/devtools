@@ -13,7 +13,7 @@ const {
   selectionChanged,
 } = require("./actions/markup");
 
-const MarkupApp = createFactory(require("./components/MarkupApp"));
+const MarkupApp = createFactory(require("./components/MarkupApp").default);
 
 const { features } = require("../prefs");
 const { LocalizationHelper } = require("devtools/shared/l10n");
