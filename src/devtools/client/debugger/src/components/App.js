@@ -235,7 +235,7 @@ class Debugger extends Component {
 
     return (
       <SplitBox
-        style={{ width: "100vw" }}
+        style={{ width: "100%" }}
         initialSize={prefs.endPanelSize}
         minSize={30}
         maxSize="70%"
@@ -247,7 +247,7 @@ class Debugger extends Component {
         }}
         startPanel={
           <SplitBox
-            style={{ width: "100vw" }}
+            style={{ width: "100%" }}
             initialSize={prefs.startPanelSize}
             minSize={30}
             maxSize="85%"
