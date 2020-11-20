@@ -18,6 +18,8 @@
 #outer-viewer {
   overflow: hidden;
   display: flex;
+  /* jaril1 */
+  flex-direction: column;
   background-color: #ececec;
   flex-grow: 1;
   position: relative;

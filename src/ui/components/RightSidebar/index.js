@@ -4,6 +4,7 @@ import classnames from "classnames";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
+import WebConsoleApp from "devtools/client/webconsole/components/App";
 
 import "./RightSidebar.css";
 
@@ -17,7 +18,7 @@ function Tooltip({ tooltip, drawerNode }) {
   );
 }
 
-function Buttons({ setExpanded, expanded, tooltip, setTooltip }) {
+function Buttons({ tooltip, setTooltip }) {
   const [commentButtonNode, setCommentButtonNode] = useState(null);
   const [nextAction, setNextAction] = useState(null);
 
@@ -42,8 +43,18 @@ function Buttons({ setExpanded, expanded, tooltip, setTooltip }) {
   return (
     <div className="drawer-buttons">
       <button
-        className={classnames({ expanded: expanded === "comments" })}
-        onClick={() => setExpanded(expanded === "comments" ? null : "comments")}
+        className="expanded"
+        style={{ marginRight: "12px" }}
+        // onClick={() => setExpanded(expanded === "comments" ? null : "comments")}
+        ref={node => setCommentButtonNode(node)}
+        onMouseEnter={() => handleMouseEnter(commentButtonNode, "Comments")}
+        onMouseLeave={handleMouseLeave}
+      >
+        Console
+      </button>
+      <button
+        className="expanded"
+        // onClick={() => setExpanded(expanded === "comments" ? null : "comments")}
         ref={node => setCommentButtonNode(node)}
         onMouseEnter={() => handleMouseEnter(commentButtonNode, "Comments")}
         onMouseLeave={handleMouseLeave}
@@ -54,22 +65,19 @@ function Buttons({ setExpanded, expanded, tooltip, setTooltip }) {
   );
 }
 
-function _Drawer({ toggleToolbox, toolboxExpanded, setExpanded, expanded }) {
+function _Drawer({ toggleToolbox, toolboxExpanded }) {
   const [tooltip, setTooltip] = useState(null);
   const [drawerNode, setDrawerNode] = useState(null);
   const dir = toolboxExpanded ? "up" : "down";
+
   return (
     <div className="drawer" ref={node => setDrawerNode(node)}>
-      <Buttons
-        setExpanded={setExpanded}
-        expanded={expanded}
-        tooltip={tooltip}
-        setTooltip={setTooltip}
-      />
-      {tooltip ? <Tooltip tooltip={tooltip} drawerNode={drawerNode} /> : null}
-      <div className="bottom-buttons">
+      <Buttons tooltip={tooltip} setTooltip={setTooltip} />
+      {/* {tooltip ? <Tooltip tooltip={tooltip} drawerNode={drawerNode} /> : null} */}
+      {/* <div className="bottom-buttons">
         <div className={`img arrow-${dir}`} onClick={toggleToolbox}></div>
-      </div>
+      </div> */}
+      {/* jaril1 */}
     </div>
   );
 }
@@ -79,13 +87,21 @@ const Drawer = connect(state => ({ toolboxExpanded: selectors.getToolboxExpanded
 })(_Drawer);
 
 export default function RightSidebar({}) {
-  const [expanded, setExpanded] = useState(true);
+  const selectedPanel = useState("console");
+  const bottomPanel = (
+    <div className="toolbox-bottom-panels" style={{ overflow: "hidden" }}>
+      <div className={classnames("toolbox-panel")} id="toolbox-content-console">
+        <WebConsoleApp />
+      </div>
+    </div>
+  );
 
   return (
     <div className="right-sidebar">
-      {expanded === "comments" && <EventsTimeline expanded={expanded} />}
+      <Drawer />
+      {bottomPanel}
+      {/* <EventsTimeline /> */}
       {/* {expanded === "event-logpoints" && <EventListeners />} */}
-      <Drawer setExpanded={setExpanded} expanded={expanded} />
     </div>
   );
 }

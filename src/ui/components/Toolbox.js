@@ -148,16 +148,6 @@ class Toolbox extends React.Component {
           <div className="toolbar-panel-icon"></div>
           Sources
         </div>
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPanel == "console",
-          })}
-          id="toolbox-toolbar-console"
-          onClick={() => gToolbox.selectTool("console")}
-        >
-          <div className="toolbar-panel-icon"></div>
-          Console
-        </div>
       </div>
     );
   }
@@ -193,6 +183,41 @@ class Toolbox extends React.Component {
 
   render() {
     const { selectedPanel, splitConsoleOpen } = this.props;
+
+    const topPanels = (
+      <div className="toolbox-top-panels">
+        <div
+          className={classnames("toolbox-panel", {
+            active: selectedPanel == "debugger",
+          })}
+          id="toolbox-content-debugger"
+        >
+          <DebuggerApp />
+        </div>
+        <div
+          className={classnames("toolbox-panel theme-body", {
+            active: selectedPanel == "inspector",
+          })}
+          id="toolbox-content-inspector"
+        >
+          {this.renderInspector()}
+        </div>
+      </div>
+    );
+
+    const bottomPanel = (
+      <div className="toolbox-bottom-panels" style={{ overflow: "hidden" }}>
+        <div
+          className={classnames("toolbox-panel", {
+            active: selectedPanel == "console" || splitConsoleOpen,
+          })}
+          id="toolbox-content-console"
+        >
+          <WebConsoleApp />
+        </div>
+      </div>
+    );
+
     return (
       <div id="toolbox" className={`${selectedPanel}`}>
         {this.renderToolbar()}
@@ -203,50 +228,45 @@ class Toolbox extends React.Component {
               splitConsole: selectedPanel != "console" && splitConsoleOpen,
             })}
           >
-            <SplitBox
+            {topPanels}
+            {/* <SplitBox
               style={{ width: "100%", overflow: "hidden" }}
               {...this.getSplitBoxDimensions()}
               splitterSize={1}
               vert={false}
               onResizeEnd={num => {}}
-              startPanel={
-                <div className="toolbox-top-panels">
-                  <div
-                    className={classnames("toolbox-panel", {
-                      active: selectedPanel == "debugger",
-                    })}
-                    id="toolbox-content-debugger"
-                  >
-                    <DebuggerApp />
-                  </div>
-                  <div
-                    className={classnames("toolbox-panel theme-body", {
-                      active: selectedPanel == "inspector",
-                    })}
-                    id="toolbox-content-inspector"
-                  >
-                    {this.renderInspector()}
-                  </div>
-                </div>
-              }
+              startPanel={}
               endPanelControl={false}
-              endPanel={
-                <div className="toolbox-bottom-panels" style={{ overflow: "hidden" }}>
-                  <div
-                    className={classnames("toolbox-panel", {
-                      active: selectedPanel == "console" || splitConsoleOpen,
-                    })}
-                    id="toolbox-content-console"
-                  >
-                    <WebConsoleApp />
-                  </div>
-                </div>
-              }
-            />
+              endPanel={}
+            /> */}
           </div>
         )}
       </div>
     );
+    // return (
+    //   <div id="toolbox" className={`${selectedPanel}`}>
+    //     {this.renderToolbar()}
+    //     {this.props.toolboxExpanded && (
+    //       <div
+    //         id="toolbox-contents"
+    //         className={classnames("", {
+    //           splitConsole: selectedPanel != "console" && splitConsoleOpen,
+    //         })}
+    //       >
+    //         <SplitBox
+    //           style={{ width: "100%", overflow: "hidden" }}
+    //           {...this.getSplitBoxDimensions()}
+    //           splitterSize={1}
+    //           vert={false}
+    //           onResizeEnd={num => {}}
+    //           startPanel={}
+    //           endPanelControl={false}
+    //           endPanel={}
+    //         />
+    //       </div>
+    //     )}
+    //   </div>
+    // );
   }
 }
 export default connect(
