@@ -58,6 +58,14 @@
   background: white;
 }
 
+.recording-list.list thead.dashboard-viewer-content-header th:first-child {
+  padding-left: 40px;
+}
+
+.recording-list.list thead.dashboard-viewer-content-header th:last-child {
+  padding-right: 40px;
+}
+
 .recording-list.list thead.dashboard-viewer-content-header .img {
   background: var(--theme-text-color-inactive);
 }
