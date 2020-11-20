@@ -5,6 +5,7 @@
 .comments-container {
   position: relative;
   top: 26px;
+  z-index: var(--z-index-1--comment-container);
 }
 
 .comment-marker {

@@ -1,10 +1,13 @@
 .right-sidebar {
   background: var(--grey-10);
   border-left: 1px solid var(--theme-splitter-color);
-  height: 100%;
+  /* height: 100%; */
+  /* jaril1 */
   background: var(--grey-10);
   display: flex;
+  flex-direction: column;
   flex-shrink: 0;
+  height: 50%;
 }
 
 .right-sidebar .drawer {
@@ -16,7 +19,7 @@
 
 .right-sidebar .drawer-buttons {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 .right-sidebar .bottom-buttons {
