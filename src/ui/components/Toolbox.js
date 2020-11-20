@@ -123,7 +123,7 @@ class Toolbox extends React.Component {
 
     return (
       <div id="toolbox-toolbar">
-        <NodePicker />
+        {/* <NodePicker /> */}
         <div
           className={classnames("toolbar-panel-button", {
             active: selectedPanel == "inspector",

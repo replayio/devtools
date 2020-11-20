@@ -4,11 +4,13 @@ import classnames from "classnames";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 
 import "./SecondaryToolbox.css";
+import NodePicker from "../NodePicker";
 
 function PanelButtons({ selectedPanel, setSelectedPanel, collapsed }) {
   // Remove comment-icon from image.js. -jaril
   return (
     <div className="panel-buttons">
+      <NodePicker />
       <button
         className={classnames({ expanded: selectedPanel === "console" && !collapsed })}
         onClick={() => setSelectedPanel("console")}
@@ -29,7 +31,7 @@ function ActionButtons({ setCollapsed, collapsed }) {
   // Implement a toggle collapse button
   return (
     <div className="action-buttons">
-      <button disabled className="collapse-tabs-content" onClick={() => setCollapsed(!collapsed)}>
+      <button disabled className="collapse-panels" onClick={() => setCollapsed(!collapsed)}>
         Toggle Secondary Toolbox
       </button>
     </div>

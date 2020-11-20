@@ -16,9 +16,10 @@
   border-bottom: 1px solid var(--theme-splitter-color);
 }
 
-.secondary-toolbox-header .tabs {
+.secondary-toolbox-header .panel-buttons {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .secondary-toolbox-header button {
