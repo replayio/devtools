@@ -1,4 +1,5 @@
 import { assert } from "protocol/utils";
+import { UIState } from "ui/state";
 import { createReducer, ReducerObject } from "../../shared/reducer-object";
 import { MarkupAction } from "../actions/markup";
 import { MarkupState, MarkupTree } from "../state/markup";
@@ -91,3 +92,8 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
 };
 
 export default createReducer(INITIAL_MARKUP, reducers);
+
+export const getNode = (state: UIState, nodeId: string) => state.markup.tree[nodeId];
+export const getRootNodeId = (state: UIState) => state.markup.rootNode;
+export const getSelectedNodeId = (state: UIState) => state.markup.selectedNode;
+export const getScrollIntoViewNodeId = (state: UIState) => state.markup.scrollIntoViewNode;
