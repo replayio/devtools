@@ -250,7 +250,7 @@ class Debugger extends Component {
         startPanelCollapsed={startPanelCollapsed}
         startPanel={
           <div className="panes" style={{ width: "100%" }}>
-            <PrimaryPanes horizontal={horizontal} />
+            {/* <PrimaryPanes horizontal={horizontal} /> */}
             <SecondaryPanes horizontal={horizontal} />
           </div>
         }

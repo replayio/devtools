@@ -136,7 +136,6 @@ class Toolbox extends React.Component {
           onClick={() => gToolbox.selectTool("inspector")}
         >
           <div className="toolbar-panel-icon"></div>
-          Elements
         </div>
         <div
           className={classnames("toolbar-panel-button", {
@@ -146,7 +145,6 @@ class Toolbox extends React.Component {
           onClick={() => gToolbox.selectTool("debugger")}
         >
           <div className="toolbar-panel-icon"></div>
-          Sources
         </div>
       </div>
     );
@@ -229,44 +227,10 @@ class Toolbox extends React.Component {
             })}
           >
             {topPanels}
-            {/* <SplitBox
-              style={{ width: "100%", overflow: "hidden" }}
-              {...this.getSplitBoxDimensions()}
-              splitterSize={1}
-              vert={false}
-              onResizeEnd={num => {}}
-              startPanel={}
-              endPanelControl={false}
-              endPanel={}
-            /> */}
           </div>
         )}
       </div>
     );
-    // return (
-    //   <div id="toolbox" className={`${selectedPanel}`}>
-    //     {this.renderToolbar()}
-    //     {this.props.toolboxExpanded && (
-    //       <div
-    //         id="toolbox-contents"
-    //         className={classnames("", {
-    //           splitConsole: selectedPanel != "console" && splitConsoleOpen,
-    //         })}
-    //       >
-    //         <SplitBox
-    //           style={{ width: "100%", overflow: "hidden" }}
-    //           {...this.getSplitBoxDimensions()}
-    //           splitterSize={1}
-    //           vert={false}
-    //           onResizeEnd={num => {}}
-    //           startPanel={}
-    //           endPanelControl={false}
-    //           endPanel={}
-    //         />
-    //       </div>
-    //     )}
-    //   </div>
-    // );
   }
 }
 export default connect(
