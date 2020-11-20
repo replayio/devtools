@@ -93,7 +93,8 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
 
 export default createReducer(INITIAL_MARKUP, reducers);
 
-export const getNode = (state: UIState, nodeId: string) => state.markup.tree[nodeId];
+export const getNode = (state: UIState, nodeId: string | null) =>
+  typeof nodeId === "string" ? state.markup.tree[nodeId] : undefined;
 export const getRootNodeId = (state: UIState) => state.markup.rootNode;
 export const getSelectedNodeId = (state: UIState) => state.markup.selectedNode;
 export const getScrollIntoViewNodeId = (state: UIState) => state.markup.scrollIntoViewNode;
