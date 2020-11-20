@@ -278,8 +278,6 @@ class Tabs extends PureComponent {
         {this.renderStartPanelToggleButton()}
         {this.renderTabs()}
         {this.renderDropdown()}
-        {this.renderEndPanelToggleButton()}
-        {this.renderCommandBar()}
       </div>
     );
   }

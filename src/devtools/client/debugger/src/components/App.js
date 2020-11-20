@@ -236,33 +236,21 @@ class Debugger extends Component {
     return (
       <SplitBox
         style={{ width: "100%" }}
-        initialSize={prefs.endPanelSize}
+        initialSize={prefs.startPanelSize}
         minSize={30}
-        maxSize="70%"
+        maxSize="85%"
         splitterSize={1}
-        vert={horizontal}
         onResizeEnd={num => {
-          prefs.endPanelSize = num;
-          this.triggerEditorPaneResize();
+          prefs.startPanelSize = num;
         }}
+        startPanelCollapsed={startPanelCollapsed}
         startPanel={
-          <SplitBox
-            style={{ width: "100%" }}
-            initialSize={prefs.startPanelSize}
-            minSize={30}
-            maxSize="85%"
-            splitterSize={1}
-            onResizeEnd={num => {
-              prefs.startPanelSize = num;
-            }}
-            startPanelCollapsed={startPanelCollapsed}
-            startPanel={<PrimaryPanes horizontal={horizontal} />}
-            endPanel={this.renderEditorPane()}
-          />
+          <div className="panes" style={{ width: "100%" }}>
+            <PrimaryPanes horizontal={horizontal} />
+            <SecondaryPanes horizontal={horizontal} />
+          </div>
         }
-        endPanelControl={true}
-        endPanel={<SecondaryPanes horizontal={horizontal} />}
-        endPanelCollapsed={endPanelCollapsed}
+        endPanel={this.renderEditorPane()}
       />
     );
   };
