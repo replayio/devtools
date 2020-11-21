@@ -230,7 +230,7 @@ class Debugger extends Component {
   }
 
   renderLayout = () => {
-    const { startPanelCollapsed, endPanelCollapsed } = this.props;
+    const { startPanelCollapsed, endPanelCollapsed, debuggerMode } = this.props;
     const horizontal = this.isHorizontal();
 
     return (
@@ -246,8 +246,11 @@ class Debugger extends Component {
         startPanelCollapsed={startPanelCollapsed}
         startPanel={
           <div className="panes" style={{ width: "100%" }}>
-            {/* <PrimaryPanes horizontal={horizontal} /> */}
-            <SecondaryPanes horizontal={horizontal} />
+            {debuggerMode == "explorer" ? (
+              <PrimaryPanes horizontal={horizontal} />
+            ) : (
+              <SecondaryPanes horizontal={horizontal} />
+            )}
           </div>
         }
         endPanel={this.renderEditorPane()}

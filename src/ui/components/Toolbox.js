@@ -18,6 +18,10 @@ import "./Toolbox.css";
 const shortcuts = new KeyShortcuts({ window, target: document });
 
 class Toolbox extends React.Component {
+  state = {
+    debuggerMode: "explorer",
+  };
+
   async componentDidMount() {
     const { selectedPanel } = this.props;
     await gToolbox.init(selectedPanel);
@@ -142,6 +146,28 @@ class Toolbox extends React.Component {
         >
           <div className="toolbar-panel-icon"></div>
         </div>
+        {selectedPanel == "debugger" ? (
+          <>
+            <div
+              className="toolbar-panel-button toolbar-panel-button-sub"
+              onClick={() => this.setState({ debuggerMode: "explorer" })}
+            >
+              <div
+                className="img document toolbar-panel-icon"
+                style={{ background: "#c9c9cb", height: "20px", width: "20px" }}
+              />
+            </div>
+            <div
+              className="toolbar-panel-button toolbar-panel-button-sub"
+              onClick={() => this.setState({ debuggerMode: "debug" })}
+            >
+              <div
+                style={{ height: "20px", width: "20px" }}
+                className="img log toolbar-panel-icon"
+              />
+            </div>
+          </>
+        ) : null}
       </div>
     );
   }
@@ -177,6 +203,7 @@ class Toolbox extends React.Component {
 
   render() {
     const { selectedPanel, splitConsoleOpen } = this.props;
+    const { debuggerMode } = this.state;
 
     const topPanels = (
       <div className="toolbox-top-panels">
@@ -186,7 +213,7 @@ class Toolbox extends React.Component {
           })}
           id="toolbox-content-debugger"
         >
-          <DebuggerApp />
+          <DebuggerApp debuggerMode={debuggerMode} />
         </div>
         <div
           className={classnames("toolbox-panel theme-body", {
@@ -195,19 +222,6 @@ class Toolbox extends React.Component {
           id="toolbox-content-inspector"
         >
           {this.renderInspector()}
-        </div>
-      </div>
-    );
-
-    const bottomPanel = (
-      <div className="toolbox-bottom-panels" style={{ overflow: "hidden" }}>
-        <div
-          className={classnames("toolbox-panel", {
-            active: selectedPanel == "console" || splitConsoleOpen,
-          })}
-          id="toolbox-content-console"
-        >
-          <WebConsoleApp />
         </div>
       </div>
     );
