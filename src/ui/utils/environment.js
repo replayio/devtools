@@ -11,3 +11,7 @@ export function isFirefox() {
 export function isTest() {
   return url.searchParams.get("test") != null;
 }
+
+export function isDeployPreview() {
+  return url.hostname.includes("replay-devtools.netlify.app");
+}

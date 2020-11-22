@@ -5,6 +5,7 @@ import Account from "./Account";
 import Loader from "./shared/Loader";
 import { AppErrors, PopupBlockedError } from "./shared/Error";
 import SharingModal from "./shared/SharingModal";
+import { isDeployPreview } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 import { useApolloClient, ApolloProvider } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -39,7 +40,7 @@ function useGetApolloClient() {
 }
 
 function App({ theme, recordingId, sessionError, modal }) {
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isLoading } = useAuth0();
   const { apolloClient, consentPopupBlocked } = useGetApolloClient();
 
   useEffect(() => {
@@ -50,7 +51,7 @@ function App({ theme, recordingId, sessionError, modal }) {
     return <PopupBlockedError />;
   }
 
-  if (isLoading || !apolloClient) {
+  if ((!isDeployPreview() && isLoading) || !apolloClient) {
     return <Loader />;
   }
 
