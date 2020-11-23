@@ -11,7 +11,6 @@
   left: 0;
   right: 0;
   opacity: 1;
-  z-index: 1;
   width: calc(100% - 1px);
   user-select: none;
   height: var(--editor-footer-height);

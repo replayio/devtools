@@ -85,16 +85,18 @@
 .timeline-tooltip {
   display: flex;
   position: absolute;
-  height: 180px;
   border: 1px solid rgb(204, 204, 204);
-  bottom: 100px;
+  bottom: 64px;
   border-radius: 4px;
   background: #ececec;
   align-items: center;
   justify-content: center;
   z-index: var(--z-index-1--timeline-tooltip);
+  background: var(--theme-toolbar-background);
 }
 
 .timeline-tooltip-image {
   height: 100%;
+  object-fit: contain;
+  width: 180px;
 }
