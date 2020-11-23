@@ -85,4 +85,8 @@ class LayoutApp extends PureComponent {
   }
 }
 
-module.exports = connect(state => state)(LayoutApp);
+const mapStateToProps = state => ({
+  boxModel: state.boxModel,
+});
+
+module.exports = connect(mapStateToProps)(LayoutApp);
