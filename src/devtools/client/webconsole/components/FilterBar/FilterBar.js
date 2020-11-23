@@ -36,7 +36,6 @@ const PropTypes = require("prop-types");
 class FilterBar extends Component {
   static get propTypes() {
     return {
-      closeButtonVisible: PropTypes.bool,
       displayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)]).isRequired,
       filteredMessagesCount: PropTypes.object.isRequired,
       timestampsVisible: PropTypes.bool.isRequired,
@@ -67,15 +66,9 @@ class FilterBar extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const {
-      closeButtonVisible,
-      displayMode,
-      filteredMessagesCount,
-      timestampsVisible,
-    } = this.props;
+    const { displayMode, filteredMessagesCount, timestampsVisible } = this.props;
 
     if (
-      nextProps.closeButtonVisible !== closeButtonVisible ||
       nextProps.displayMode !== displayMode ||
       nextProps.timestampsVisible !== timestampsVisible
     ) {
@@ -189,26 +182,8 @@ class FilterBar extends Component {
     });
   }
 
-  renderCloseButton() {
-    const { closeSplitConsole } = this.props;
-
-    return dom.div(
-      {
-        className: "devtools-toolbar split-console-close-button-wrapper",
-        key: "wrapper",
-      },
-      dom.button({
-        id: "split-console-close-button",
-        key: "split-console-close-button",
-        className: "devtools-button",
-        title: "Close Split Console (Esc)",
-        onClick: () => closeSplitConsole(),
-      })
-    );
-  }
-
   render() {
-    const { closeButtonVisible, displayMode } = this.props;
+    const { displayMode } = this.props;
 
     const isNarrow = displayMode === FILTERBAR_DISPLAY_MODES.NARROW;
     const isWide = displayMode === FILTERBAR_DISPLAY_MODES.WIDE;
@@ -234,10 +209,6 @@ class FilterBar extends Component {
       ),
     ];
 
-    if (closeButtonVisible) {
-      children.push(this.renderCloseButton());
-    }
-
     return dom.div(
       {
         className: `webconsole-filteringbar-wrapper ${displayMode}`,
@@ -254,7 +225,6 @@ class FilterBar extends Component {
 function mapStateToProps(state) {
   const uiState = getAllUi(state);
   return {
-    closeButtonVisible: uiState.closeButtonVisible,
     filteredMessagesCount: getFilteredMessagesCount(state),
     timestampsVisible: uiState.timestampsVisible,
   };
