@@ -21,79 +21,28 @@ body {
   overflow-anchor: none;
   user-select: text;
   position: relative;
+  flex-grow: 1;
 }
 
 .webconsole-app {
   --object-inspector-hover-background: transparent;
   --attachment-margin-block-end: 3px;
   --primary-toolbar-height: 29px;
-  display: grid;
-  /*
-    * Here's the design we want in in-line mode
-    * +----------------------------------------------+
-    * |    Filter bar primary      ↔                 |
-    * +----------------------------↔                 |
-    * |   [Filter bar secondary]   ↔                 |
-    * +----------------------------↔                 |
-    * |                            ↔                 |
-    * +  +----------------------+  ↔                 |
-    * |  |                      |  ↔                 |
-    * |  |        Output        |  ↔    [sidebar]    |
-    * |  |                      |  ↔                 |
-    * |  +----------------------+  ↔                 |
-    * |  |   [NotificationBox]  |  ↔                 |
-    * |  +----------------------+  ↔                 |
-    * |  |                      |  ↔                 |
-    * |  |        JSTerm        |  ↔                 |
-    * |  |                      |  ↔                 |
-    * |  +----------------------+  ↔                 |
-    * |  |  [EagerEvaluation]   |  ↔                 |
-    * |  +----------------------+  ↔                 |
-    * |                            ↔                 |
-    * +----------------------------↔                 |
-    * |  [Reverse search input]    ↔                 |
-    * +----------------------------------------------+
-    *
-     * - ↔ are width resizers
-     * - Elements inside brackets may not be visible, so we set
-     *   rows/columns to "auto" to make them collapse when the element
-     *   they contain is hidden.
-     */
-  grid-template-areas:
-    "filter-toolbar           sidebar"
-    "filter-toolbar-secondary sidebar"
-    "output-input             sidebar"
-    "reverse-search           sidebar";
-  grid-template-rows: var(--primary-toolbar-height) auto 1fr auto;
-  grid-template-columns: minmax(200px, 1fr) minmax(0, auto);
   width: 100vw;
   overflow: hidden;
   color: var(--console-output-color);
   -moz-user-focus: normal;
-}
-
-.webconsole-filteringbar-wrapper {
-  grid-column: filter-toolbar;
-  grid-row: filter-toolbar / filter-toolbar-secondary;
-  grid-template-rows: subgrid;
-}
-
-.webconsole-filterbar-primary {
-  grid-row: filter-toolbar;
-}
-
-/* Only put the filter buttons toolbar on its own row in narrow filterbar layout  */
-.narrow .devtools-toolbar.webconsole-filterbar-secondary {
-  grid-row: filter-toolbar-secondary;
+  display: flex;
+  flex-direction: column;
 }
 
 .flexible-output-input {
   display: flex;
   flex-direction: column;
-  grid-area: output-input;
   /* Don't take more height than the grid allows to */
   max-height: 100%;
   overflow: hidden;
+  flex-grow: 1;
 }
 
 .flexible-output-input .webconsole-output {
@@ -118,13 +67,6 @@ body {
 .webconsole-app .jsterm-input-container {
   overflow-y: auto;
   overflow-x: hidden;
-  /* We display the open editor button at the end of the input */
-  display: grid;
-  grid-template-columns: 1fr auto;
-  /* This allows us to not define a column for the CodeMirror container */
-  grid-auto-flow: column;
-  /* This element has tabindex="-1" and can briefly show a focus outline when
-   * clicked, before we move the focus to CodeMirror. */
   outline: none;
 }
 
@@ -153,7 +95,6 @@ body {
 .webconsole-app:not(.jsterm-editor):not(.eager-evaluation)
   .jsterm-input-container {
   /* The input should be full-height when eager evaluation is disabled. */
-  flex-grow: 1;
   --jsterm-padding-top: var(--console-input-extra-padding);
   --jsterm-padding-bottom: var(--console-input-extra-padding);
 }
@@ -169,7 +110,6 @@ body {
 }
 
 .webconsole-input-buttons {
-  grid-column: -1 / -2;
   display: flex;
   align-items: flex-start;
 }
@@ -179,9 +119,6 @@ body {
 }
 
 .webconsole-app .reverse-search {
-  grid-area: reverse-search;
-  /* Those 2 next lines make it so the element isn't impacting the grid column size, but
-     will still take the whole available space. */
   width: 0;
   min-width: 100%;
   /* Let the reverse search buttons wrap to the next line */
@@ -189,44 +126,6 @@ body {
   justify-content: end;
   border-top: 1px solid var(--theme-splitter-color);
   border-inline-end: 1px solid var(--theme-splitter-color);
-}
-
-.sidebar {
-  display: grid;
-  grid-area: sidebar;
-  grid-template-rows: subgrid;
-  border-inline-start: 1px solid var(--theme-splitter-color);
-  background-color: var(--theme-sidebar-background);
-  width: 200px;
-  min-width: 150px;
-  max-width: 100%;
-}
-
-.sidebar-resizer {
-  grid-row: 1 / -1;
-  grid-column: -1 / -2;
-}
-
-.webconsole-sidebar-toolbar {
-  grid-row: 1 / 2;
-  min-height: 100%;
-  display: flex;
-  justify-content: end;
-  margin: 0;
-  padding: 0;
-}
-
-.sidebar-contents {
-  grid-row: 2 / -1;
-  overflow: auto;
-}
-
-.webconsole-sidebar-toolbar .sidebar-close-button {
-  margin: 0;
-}
-
-.sidebar-contents .object-inspector {
-  min-width: 100%;
 }
 
 /** EDITOR MODE */

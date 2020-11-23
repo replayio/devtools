@@ -5,6 +5,7 @@
   background: white;
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 .secondary-toolbox-header {
@@ -43,6 +44,13 @@
 .secondary-toolbox-header .action-buttons button {
   color: var(--theme-text-color-inactive);
   cursor: auto;
+}
+
+/* It's important to set min-height: 0 here, otherwise the console output
+overflows its container (https://drafts.csswg.org/css-flexbox-1/#min-size-auto) */
+.secondary-toolbox .secondary-toolbox-content {
+  height: 100%;
+  min-height: 0;
 }
 
 /* .secondary-toolbox-header .action-buttons button:hover {

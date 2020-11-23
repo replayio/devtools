@@ -115,6 +115,7 @@ class JSTerm extends React.Component {
   }
 
   render() {
+    // return null;
     return (
       <div
         className="jsterm-input-container devtools-input"
