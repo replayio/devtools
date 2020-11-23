@@ -234,4 +234,8 @@ class RulesApp extends PureComponent {
   }
 }
 
-module.exports = connect(state => state)(RulesApp);
+const mapStateToProps = state => ({
+  rules: state.rules,
+});
+
+module.exports = connect(mapStateToProps)(RulesApp);
