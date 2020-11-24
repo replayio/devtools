@@ -13,6 +13,8 @@ export const changes = require("devtools/client/inspector/changes/reducers/chang
 export const classList = require("devtools/client/inspector/rules/reducers/class-list");
 import _markup from "devtools/client/inspector/markup/reducers/markup";
 export const markup = _markup;
+import _eventTooltip from "devtools/client/inspector/markup/reducers/eventTooltip";
+export const eventTooltip = _eventTooltip;
 export const pseudoClasses = require("devtools/client/inspector/rules/reducers/pseudo-classes");
 export const rules = require("devtools/client/inspector/rules/reducers/rules");
 

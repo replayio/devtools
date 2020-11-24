@@ -8,7 +8,7 @@ import {
 import { client } from "../socket";
 import { Pause, WiredObject } from "./pause";
 import { defer, assert, DisallowEverythingProxyHandler, Deferred } from "../utils";
-const { getFrameworkEventListeners } = require("../event-listeners");
+import { FrameworkEventListener, getFrameworkEventListeners } from "../event-listeners";
 import { ValueFront } from "./value";
 const { uniqBy } = require("lodash");
 const HTML_NS = "http://www.w3.org/1999/xhtml";
@@ -31,7 +31,7 @@ export class NodeFront {
   private _computedStyle: Map<string, string> | null;
   private _rules: AppliedRule[] | null;
   private _listeners: WiredEventListener[] | null;
-  private _frameworkListenersWaiter: Deferred<void> | null;
+  private _frameworkListenersWaiter: Deferred<FrameworkEventListener[]> | null;
   private _quads: BoxModel | null;
   private _bounds: Rect | null;
 
@@ -288,8 +288,8 @@ export class NodeFront {
     if (this._frameworkListenersWaiter) {
       return this._frameworkListenersWaiter.promise;
     }
-    this._frameworkListenersWaiter = defer<void>();
-    const listeners = getFrameworkEventListeners(this);
+    this._frameworkListenersWaiter = defer<FrameworkEventListener[]>();
+    const listeners = await getFrameworkEventListeners(this);
     this._frameworkListenersWaiter.resolve(listeners);
     return listeners;
   }

@@ -4,6 +4,7 @@ import { Attr } from "record-replay-protocol";
 
 import NodeAttribute from "./NodeAttribute";
 import TextNode from "./TextNode";
+import EventTooltip from "./EventTooltip";
 import { assert } from "protocol/utils";
 
 const { HTML_VOID_ELEMENTS } = require("../constants");
@@ -89,15 +90,7 @@ class ElementNode extends PureComponent<ElementNodeProps> {
       return null;
     }
 
-    return (
-      <div
-        className="inspector-badge interactive"
-        title={"Event listener"}
-        onClick={this.onEventBadgeClick}
-      >
-        event
-      </div>
-    );
+    return <EventTooltip nodeId={this.props.node.id} />;
   }
 
   renderDisplayBadge() {

@@ -1,8 +1,17 @@
-import React from "react";
-import classnames from "classnames";
+import React, { CSSProperties, ReactNode } from "react";
 import "./Dropdown.css";
 
-function Dropdown({
+export interface DropdownProps {
+  buttonContent: string;
+  children: ReactNode;
+  setExpanded: (expanded: boolean) => void;
+  expanded: boolean;
+  position?: string;
+  buttonStyle?: string;
+  style?: CSSProperties;
+}
+
+export default function Dropdown({
   buttonContent,
   children,
   setExpanded,
@@ -10,7 +19,7 @@ function Dropdown({
   position = "bottom-left",
   buttonStyle = "primary",
   style,
-}) {
+}: DropdownProps) {
   return (
     <div className="dropdown-wrapper">
       <button className={`expand-dropdown ${buttonStyle}`} onClick={() => setExpanded(true)}>
@@ -27,5 +36,3 @@ function Dropdown({
     </div>
   );
 }
-
-export default Dropdown;

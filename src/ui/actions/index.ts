@@ -10,9 +10,15 @@ import type { TimelineAction } from "./timeline";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
 import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
+import { EventTooltipAction } from "devtools/client/inspector/markup/actions/eventTooltip";
 const consoleActions = require("devtools/client/webconsole/actions");
 
-export type UIAction = AppAction | MetadataAction | TimelineAction | MarkupAction;
+export type UIAction =
+  | AppAction
+  | MetadataAction
+  | TimelineAction
+  | MarkupAction
+  | EventTooltipAction;
 
 interface ThunkExtraArgs {
   client: any;
