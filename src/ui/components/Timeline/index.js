@@ -118,16 +118,10 @@ export class Timeline extends Component {
 
   // Called when hovering over a message in the console.
   onConsoleMessageHover = async (type, message) => {
-    const { highlightedMessage, setTimelineToMessage, hideTooltip } = this.props;
-
-    if (type == "mouseleave") {
-      hideTooltip();
-    }
+    const { setTimelineState } = this.props;
 
     if (type == "mouseenter") {
-      const time = message.executionPointTime;
-      const offset = this.getPixelOffset(time);
-      setTimelineToMessage({ message, offset });
+      setTimelineState({ highlightedMessage: message.id });
     }
 
     return null;
@@ -665,7 +659,6 @@ export default connect(
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,
-    setTimelineToMessage: actions.setTimelineToMessage,
     hideTooltip: actions.hideTooltip,
     setTimelineState: actions.setTimelineState,
     updateTimelineDimensions: actions.updateTimelineDimensions,
