@@ -1,16 +1,15 @@
 import React from "react";
-import ReactDOM from "react-dom";
 
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { sortBy } from "lodash";
 
-import Comment from "ui/components/RightSidebar/Comment";
+import Comment from "ui/components/SecondaryToolbox/Comment";
 
-import "./EventsTimeline.css";
+import "./CommentsPanel.css";
 
-class EventsTimeline extends React.Component {
+class CommentsPanel extends React.Component {
   state = {
     editingComment: false,
   };
@@ -43,7 +42,7 @@ class EventsTimeline extends React.Component {
 
     if (!comments.length) {
       return (
-        <div className="events-timeline-comments">
+        <div className="comments-panel">
           <p>There is nothing here yet. Try adding a comment in the timeline below.</p>
           {this.renderAddCommentButton()}
         </div>
@@ -51,7 +50,7 @@ class EventsTimeline extends React.Component {
     }
 
     return (
-      <div className="events-timeline-comments">
+      <div className="comments-panel">
         {sortBy(comments, comment => comment.time).map(comment => (
           <Comment
             comment={comment}
@@ -72,4 +71,4 @@ export default connect(
     focusedCommentId: selectors.getFocusedCommentId(state),
   }),
   { createComment: actions.createComment }
-)(EventsTimeline);
+)(CommentsPanel);

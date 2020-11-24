@@ -3,7 +3,7 @@
   width: 100%;
   font-family: sans-serif;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   --toolbox-background: #f9f9fa;
   --paused-background-color: #5b41ff;
 }
@@ -16,29 +16,17 @@
 }
 
 #toolbox-toolbar {
-  height: 35px;
-  border-top: 0px;
-  background: var(--theme-toolbar-background);
-  border-bottom: 1px solid var(--theme-splitter-color);
-}
-
-#toolbox-contents {
-  height: 100%;
-  position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  border-top: 0px;
+  background: var(--theme-toolbar-background);
+  border-right: 1px solid var(--theme-splitter-color);
 }
 
 /* Split Console styles */
 .toolbox-top-panels {
   width: 100%;
-}
-.toolbox-top-panels .toolbox-panel.active {
-  display: block;
-}
-.toolbox-top-panels .toolbox-panel {
-  display: none;
+  height: 100%;
 }
 
 /* Toolbar Styles */
@@ -60,9 +48,11 @@
 }
 
 .toolbar-panel-icon {
-  width: 16px;
-  height: 16px;
-  margin-right: 5px;
+  width: 24px;
+  height: 24px;
+  mask-repeat: no-repeat;
+  mask-size: cover;
+  margin: 8px 4px;
 }
 
 .toolbar-panel-button.active {
@@ -80,16 +70,18 @@
 .timeline-tooltip {
   display: flex;
   position: absolute;
-  height: 180px;
   border: 1px solid rgb(204, 204, 204);
-  box-shadow: 2px 1px 1px rgb(227, 227, 227);
-  bottom: 10px;
+  bottom: 64px;
   border-radius: 4px;
   background: #ececec;
   align-items: center;
   justify-content: center;
+  z-index: var(--z-index-1--timeline-tooltip);
+  background: var(--theme-toolbar-background);
 }
 
 .timeline-tooltip-image {
   height: 100%;
+  object-fit: contain;
+  width: 180px;
 }

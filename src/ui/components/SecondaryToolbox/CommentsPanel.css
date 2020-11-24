@@ -1,13 +1,14 @@
-.events-timeline-comments {
+.comments-panel {
   flex-grow: 1;
   overflow: auto;
-  width: 300px;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  background: white;
 }
 
-.events-timeline-comments .comment {
+.comments-panel .comment {
   padding: 20px 16px 20px;
   line-height: 1.25rem;
   font-size: 1rem;
@@ -15,14 +16,15 @@
   flex-direction: row;
   cursor: pointer;
   border-bottom: 1px solid var(--grey-20);
+  width: 100%;
 }
 
-.events-timeline-comments .comment:hover {
+.comments-panel .comment:hover {
   border-left: 4px solid #7ed8c8;
   padding-left: 12px;
 }
 
-.events-timeline-comments .comment.selected {
+.comments-panel .comment.selected {
   border-left: 4px solid #5ea3f8;
   padding-left: 12px;
 }
@@ -61,13 +63,13 @@
   margin-inline-end: 4px;
 }
 
-.events-timeline-comments p {
+.comments-panel p {
   color: var(--theme-comment);
   padding: 16px;
   line-height: 1.5em;
 }
 
-.events-timeline-comments .comment-avatar {
+.comments-panel .comment-avatar {
   width: 24px;
   height: 24px;
   margin-inline-end: 12px;
@@ -78,32 +80,32 @@
   flex-shrink: 0;
 }
 
-.events-timeline-comments .comment-avatar img {
+.comments-panel .comment-avatar img {
   width: inherit;
   height: inherit;
   border-radius: 50%;
 }
 
-.events-timeline-comments .comment-body {
+.comments-panel .comment-body {
   align-self: center;
   flex-grow: 1;
 }
 
-.events-timeline-comments .dropdown-block {
+.comments-panel .dropdown-block {
   align-self: flex-start;
   flex-shrink: 0;
 }
 
-.events-timeline-comments .dropdown {
+.comments-panel .dropdown {
   left: -150px;
 }
 
-.events-timeline-comments .dropdown-button {
+.comments-panel .dropdown-button {
   height: 28px;
   width: 28px;
 }
 
-.events-timeline-comments .add-comment {
+.comments-panel .add-comment {
   padding: 12px;
   color: white;
   background-color: #5ea3f8;

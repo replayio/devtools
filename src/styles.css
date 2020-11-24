@@ -18,6 +18,7 @@
 #outer-viewer {
   overflow: hidden;
   display: flex;
+  flex-direction: column;
   background-color: #ececec;
   flex-grow: 1;
   position: relative;
@@ -60,6 +61,7 @@
 
 .webconsole-app {
   height: 100%;
+  width: 100%;
   background-color: var(--theme-body-background);
 }
 

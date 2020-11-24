@@ -118,16 +118,10 @@ export class Timeline extends Component {
 
   // Called when hovering over a message in the console.
   onConsoleMessageHover = async (type, message) => {
-    const { highlightedMessage, setTimelineToMessage, hideTooltip } = this.props;
-
-    if (type == "mouseleave") {
-      hideTooltip();
-    }
+    const { setTimelineState } = this.props;
 
     if (type == "mouseenter") {
-      const time = message.executionPointTime;
-      const offset = this.getPixelOffset(time);
-      setTimelineToMessage({ message, offset });
+      setTimelineState({ highlightedMessage: message.id });
     }
 
     return null;
@@ -210,7 +204,7 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseMove = async e => {
-    const { hoverTime, recordingDuration, setTimelineToTime } = this.props;
+    const { hoverTime, recordingDuration, setTimelineToTime, timelineDimensions } = this.props;
     if (!recordingDuration) {
       return;
     }
@@ -218,7 +212,17 @@ export class Timeline extends Component {
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != mouseTime) {
-      const offset = this.getPixelOffset(mouseTime);
+      const { width, left } = timelineDimensions;
+      let horizontalPadding = 12;
+      let tooltipWidth = 180;
+      let offset = this.getPixelOffset(mouseTime) + left - tooltipWidth / 2;
+
+      offset = offset < horizontalPadding ? horizontalPadding : offset;
+      offset =
+        offset > width - tooltipWidth / 2 - horizontalPadding
+          ? width - tooltipWidth / 2 - horizontalPadding
+          : offset;
+
       setTimelineToTime({ time: mouseTime, offset });
     }
   };
@@ -665,7 +669,6 @@ export default connect(
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,
-    setTimelineToMessage: actions.setTimelineToMessage,
     hideTooltip: actions.hideTooltip,
     setTimelineState: actions.setTimelineState,
     updateTimelineDimensions: actions.updateTimelineDimensions,

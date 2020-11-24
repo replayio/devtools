@@ -75,7 +75,6 @@ export class DevToolsToolbox {
     let panel = await this.getOrStartPanel(name);
 
     this.emit("select", name);
-    store.dispatch(actions.setSelectedPanel(name));
 
     this.currentTool = name;
     return panel;
@@ -89,7 +88,6 @@ export class DevToolsToolbox {
     const dbg = this.getPanel("debugger");
     const source = id ? dbg.getSourceByActorId(id) : dbg.getSourceByURL(url);
     if (source) {
-      store.dispatch(actions.setSelectedPanel("debugger"));
       dbg.selectSource(source.id, line, column);
     }
   }

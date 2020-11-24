@@ -26,7 +26,6 @@ const UiState = overrides =>
         persistLogs: false,
         timestampsVisible: true,
         frontInSidebar: null,
-        closeButtonVisible: true,
         reverseSearchInputVisible: false,
         reverseSearchInitialValue: "",
         editor: false,
@@ -53,8 +52,6 @@ function ui(state = UiState(), action) {
       };
     case MESSAGES_CLEAR:
       return { ...state, frontInSidebar: null };
-    case SPLIT_CONSOLE_CLOSE_BUTTON_TOGGLE:
-      return { ...state, closeButtonVisible: action.shouldDisplayButton };
     case REVERSE_SEARCH_INPUT_TOGGLE:
       return {
         ...state,
