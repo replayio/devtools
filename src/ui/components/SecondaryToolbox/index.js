@@ -16,7 +16,6 @@ function PanelButtons({ selectedPanel, setSelectedPanel }) {
     gToolbox.selectTool("inspector");
   };
 
-  // Remove comment-icon from image.js. -jaril
   return (
     <div className="panel-buttons">
       <NodePicker />
@@ -55,8 +54,6 @@ function ConsolePanel() {
 function InspectorPanel({ initializedPanels }) {
   const inspector = gToolbox.getPanel("inspector");
   let markupView, rulesPanel, layoutPanel, computedPanel;
-
-  console.log(initializedPanels);
 
   if (inspector && initializedPanels.includes("inspector")) {
     markupView = inspector._inspector.getPanel("markupview").provider;
@@ -130,8 +127,6 @@ function InspectorPanel({ initializedPanels }) {
   );
 }
 
-// This component re-renders every time you hover on a message in the console. Find
-// out why. -jaril
 function SecondaryToolbox({ initializedPanels }) {
   const [selectedPanel, setSelectedPanel] = useState("console");
 

@@ -14,7 +14,7 @@ const shortcuts = new KeyShortcuts({ window, target: document });
 
 class Toolbox extends React.Component {
   state = {
-    debuggerMode: "explorer",
+    debuggerMode: "debug",
   };
 
   async componentDidMount() {

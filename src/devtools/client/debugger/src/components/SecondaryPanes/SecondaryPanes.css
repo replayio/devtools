@@ -26,9 +26,6 @@
 */
 
 .secondary-panes-wrapper {
-  /* this shows a scrollbar in the sidebar even though the content
-  doesn't need it jaril2 */
-  /* height: 100%; */
   width: 100%;
   display: flex;
   flex-direction: column;
