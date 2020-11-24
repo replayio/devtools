@@ -8,7 +8,6 @@ import React, { Component } from "react";
 import classnames from "classnames";
 import { connect } from "../../utils/connect";
 
-import actions from "../../actions";
 import {
   getTopFrame,
   getBreakpointsList,
@@ -23,7 +22,7 @@ import {
 } from "../../selectors";
 
 import AccessibleImage from "../shared/AccessibleImage";
-import { prefs, features } from "../../utils/prefs";
+import { prefs } from "../../utils/prefs";
 
 import Breakpoints from "./Breakpoints";
 import SplitBox from "devtools-splitter";
@@ -125,8 +124,6 @@ class SecondaryPanes extends Component {
   }
 
   renderHorizontalLayout() {
-    const { renderWhyPauseDelay } = this.props;
-
     return (
       <div>
         <Accordion items={this.getItems()} />
