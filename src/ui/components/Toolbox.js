@@ -3,6 +3,7 @@ import classnames from "classnames";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 import DebuggerApp from "devtools/client/debugger/src/components/App";
+import UserOptions from "ui/components/Header/UserOptions";
 
 import { connect } from "react-redux";
 import { actions } from "../actions";
@@ -43,23 +44,26 @@ class Toolbox extends React.Component {
     const { selectedPrimaryPanel } = this.props;
 
     return (
-      <div id="toolbox-toolbar">
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPrimaryPanel == "explorer",
-          })}
-          onClick={() => this.selectPanel("explorer")}
-        >
-          <div className="img explorer-panel toolbar-panel-icon"></div>
+      <div className="toolbox-toolbar-container">
+        <div id="toolbox-toolbar">
+          <div
+            className={classnames("toolbar-panel-button", {
+              active: selectedPrimaryPanel == "explorer",
+            })}
+            onClick={() => this.selectPanel("explorer")}
+          >
+            <div className="img explorer-panel toolbar-panel-icon"></div>
+          </div>
+          <div
+            className={classnames("toolbar-panel-button", {
+              active: selectedPrimaryPanel == "debug",
+            })}
+            onClick={() => this.selectPanel("debug")}
+          >
+            <div className="img debugger-panel toolbar-panel-icon"></div>
+          </div>
         </div>
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPrimaryPanel == "debug",
-          })}
-          onClick={() => this.selectPanel("debug")}
-        >
-          <div className="img debugger-panel toolbar-panel-icon"></div>
-        </div>
+        <UserOptions />
       </div>
     );
   }
