@@ -6,16 +6,17 @@ import { actions } from "ui/actions";
 import Avatar from "ui/components/Avatar";
 import Title from "ui/components/shared/Title";
 import ShareDropdown from "ui/components/Header/ShareDropdown";
-import UserOptions from "ui/components/Header/UserOptions";
 import "./Header.css";
 
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
+import moment from "moment";
 
 const GET_RECORDING_TITLE = gql`
   query RecordingTitle($recordingId: String) {
     recordings(where: { recording_id: { _eq: $recordingId } }) {
       id
       title
+      date
       recordingTitle
     }
   }
@@ -41,9 +42,9 @@ function Avatars({ user, getActiveUsers }) {
 function Links({ user, getActiveUsers, recordingId, setSharingModal }) {
   return (
     <div className="links">
-      <Avatars user={user} getActiveUsers={getActiveUsers} />
+      {/* <Avatars user={user} getActiveUsers={getActiveUsers} /> */}
       {recordingId ? <ShareDropdown /> : null}
-      <UserOptions />
+      {/* <UserOptions /> */}
     </div>
   );
 }
@@ -58,15 +59,18 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
   }
 
   const recording = data.recordings[0];
-  const { recordingTitle, title } = recording || {};
+  const { recordingTitle, title, date } = recording || {};
 
   return (
-    <Title
-      defaultTitle={recordingTitle || title}
-      setEditingTitle={setEditingTitle}
-      editingTitle={editingTitle}
-      recordingId={recordingId}
-    />
+    <div className="title-container">
+      <Title
+        defaultTitle={recordingTitle || title}
+        setEditingTitle={setEditingTitle}
+        editingTitle={editingTitle}
+        recordingId={recordingId}
+      />
+      <div className="subtitle">{moment(date).format("MMM D, YYYY")}</div>
+    </div>
   );
 }
 
@@ -86,12 +90,14 @@ function Header({ user, getActiveUsers, recordingId, setSharingModal }) {
 
   return (
     <div id="header">
-      <Logo />
-      <HeaderTitle
-        recordingId={recordingId}
-        setEditingTitle={setEditingTitle}
-        editingTitle={editingTitle}
-      />
+      <div className="header-left">
+        <div className="img menu" />
+        <HeaderTitle
+          recordingId={recordingId}
+          setEditingTitle={setEditingTitle}
+          editingTitle={editingTitle}
+        />
+      </div>
       <Links
         user={user}
         getActiveUsers={getActiveUsers}

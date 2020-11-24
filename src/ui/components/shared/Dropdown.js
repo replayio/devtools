@@ -9,6 +9,7 @@ function Dropdown({
   expanded,
   position = "bottom-left",
   buttonStyle = "primary",
+  style,
 }) {
   return (
     <div className="dropdown-wrapper">
@@ -18,7 +19,9 @@ function Dropdown({
       {expanded ? (
         <div className="dropdown-container">
           <div className="mask" onClick={() => setExpanded(false)} />
-          <div className={`content ${position}`}>{children}</div>
+          <div className={`content ${position}`} style={style}>
+            {children}
+          </div>
         </div>
       ) : null}
     </div>

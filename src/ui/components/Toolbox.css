@@ -19,6 +19,13 @@
   display: flex;
   flex-direction: column;
   border-top: 0px;
+}
+
+.toolbox-toolbar-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-top: 0px;
   background: var(--theme-toolbar-background);
   border-right: 1px solid var(--theme-splitter-color);
 }

@@ -21,13 +21,18 @@ export default function UserOptions() {
   const buttonContent = (
     <>
       <Avatar player={user} isFirstPlayer={true} />
-      <div className="img expand" />
+      {/* <div className="img expand" /> */}
     </>
   );
 
   return (
     <div className="user-options">
-      <Dropdown buttonContent={buttonContent} setExpanded={setExpanded} expanded={expanded}>
+      <Dropdown
+        buttonContent={buttonContent}
+        setExpanded={setExpanded}
+        expanded={expanded}
+        style={{ bottom: "10px", left: "50px", right: "auto", top: "auto" }}
+      >
         <div className="user row">
           <div className="user-avatar">
             <Avatar player={user} isFirstPlayer={true} />

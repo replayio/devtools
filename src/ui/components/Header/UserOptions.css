@@ -1,62 +1,99 @@
-#header .user-options button.expand-dropdown {
+.user-options *:focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
+}
+
+.user-options button.expand-dropdown {
   background: none;
   padding: 0px 4px;
 }
 
-#header .user-options button.expand-dropdown .avatar.first-player img {
+.user-options button.expand-dropdown .avatar.first-player img {
   height: 32px;
   width: 32px;
 }
 
-#header .user-options button.expand-dropdown .img {
+.user-options button.expand-dropdown .img {
   background: var(--theme-comment);
 }
 
-#header .user-options .dropdown-container .content {
+.user-options .dropdown-container .content {
   width: 240px;
   right: -8px;
 }
 
-#header .user-options .user.row {
+.user-options .user.row {
   margin-bottom: 12px;
   overflow: hidden;
   background-color: inherit;
 }
 
-#header .user-options .user-avatar {
+.user-options .user-avatar {
   flex-shrink: 0;
 }
 
-#header .user-options .user-avatar img {
+.user-options .user-avatar img {
   height: 36px;
   width: 36px;
+  margin-right: 8px;
 }
 
-#header .user-options .user-info {
+.user-options .user-info {
   overflow: hidden;
 }
 
-#header .user-options .user-info > * {
+.user-options .user-info > * {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
 }
 
-#header .user-options .user-email {
+.user-options .user-email {
   color: var(--theme-comment);
   line-height: 16px;
 }
 
-#header .user-options a.changelog {
+.user-options a.changelog {
   width: 100%;
   text-decoration: none;
 }
 
-#header .user-options .dropdown-wrapper button {
+.user-options .dropdown-wrapper button {
   padding: 8px;
   width: 100%;
   color: var(--theme-toolbar-color);
   background: transparent;
   align-items: center;
   line-height: 16px;
+}
+
+.dropdown-container .content {
+  top: 48px;
+  animation: dropdownFadeIn ease 200ms;
+}
+
+.dropdown-wrapper button {
+  border-radius: 4px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: white;
+  display: flex;
+  align-items: center;
+  background: var(--dark-blue);
+  cursor: pointer;
+  line-height: 16px;
+}
+
+.dropdown-wrapper button .img {
+  background: white;
+}
+
+.avatar img {
+  height: 28px;
+  width: 28px;
+  border-radius: 50%;
+}
+
+.avatar .user-name {
+  margin-right: 8px;
 }
