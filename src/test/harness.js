@@ -42,7 +42,7 @@ function finish() {
 }
 
 function selectConsole() {
-  return gToolbox.selectTool("console");
+  return document.querySelector("button.console-panel-button").click();
 }
 
 function selectDebugger() {
@@ -50,7 +50,7 @@ function selectDebugger() {
 }
 
 function selectInspector() {
-  return gToolbox.selectTool("inspector");
+  return document.querySelector("button.inspector-panel-button").click();
 }
 
 function getContext() {

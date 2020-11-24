@@ -20,19 +20,21 @@ function PanelButtons({ selectedPanel, setSelectedPanel }) {
     <div className="panel-buttons">
       <NodePicker />
       <button
-        className={classnames({ expanded: selectedPanel === "console" })}
+        className={classnames("console-panel-button", { expanded: selectedPanel === "console" })}
         onClick={() => setSelectedPanel("console")}
       >
         Console
       </button>
       <button
-        className={classnames({ expanded: selectedPanel === "inspector" })}
+        className={classnames("inspector-panel-button", {
+          expanded: selectedPanel === "inspector",
+        })}
         onClick={handleInspectorClick}
       >
         Elements
       </button>
       <button
-        className={classnames({ expanded: selectedPanel === "comments" })}
+        className={classnames("comments-panel-button", { expanded: selectedPanel === "comments" })}
         onClick={() => setSelectedPanel("comments")}
       >
         Comments
