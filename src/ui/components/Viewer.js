@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import SecondaryToolbox from "./SecondaryToolbox";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import Toast from "./Toast";
 import { installObserver } from "../../protocol/graphics";
 
 export default function Viewer() {
@@ -11,7 +10,6 @@ export default function Viewer() {
 
   return (
     <div id="outer-viewer">
-      <Toast />
       <SplitBox
         style={{ width: "100%", overflow: "hidden" }}
         splitterSize={1}
