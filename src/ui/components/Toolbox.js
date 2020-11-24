@@ -1,4 +1,5 @@
 import React from "react";
+import classnames from "classnames";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 import DebuggerApp from "devtools/client/debugger/src/components/App";
@@ -36,29 +37,20 @@ class Toolbox extends React.Component {
   }
 
   renderToolbar() {
+    const { debuggerMode } = this.state;
     return (
       <div id="toolbox-toolbar">
         <div
-          className={"toolbar-panel-button active"}
-          id="toolbox-toolbar-debugger"
-          onClick={() => gToolbox.selectTool("debugger")}
-        >
-          <div className="toolbar-panel-icon"></div>
-        </div>
-        <div
-          className="toolbar-panel-button toolbar-panel-button-sub"
-          onClick={() => this.setState({ debuggerMode: "explorer" })}
-        >
-          <div
-            className="img document toolbar-panel-icon"
-            style={{ background: "#c9c9cb", height: "20px", width: "20px" }}
-          />
-        </div>
-        <div
-          className="toolbar-panel-button toolbar-panel-button-sub"
+          className={classnames("toolbar-panel-button", { active: debuggerMode == "debug" })}
           onClick={() => this.setState({ debuggerMode: "debug" })}
         >
-          <div style={{ height: "20px", width: "20px" }} className="img log toolbar-panel-icon" />
+          <div className="img debugger-panel toolbar-panel-icon"></div>
+        </div>
+        <div
+          className={classnames("toolbar-panel-button", { active: debuggerMode == "explorer" })}
+          onClick={() => this.setState({ debuggerMode: "explorer" })}
+        >
+          <div className="img explorer-panel toolbar-panel-icon"></div>
         </div>
       </div>
     );

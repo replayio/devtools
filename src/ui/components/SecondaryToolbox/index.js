@@ -10,7 +10,7 @@ import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
 
-function PanelButtons({ selectedPanel, setSelectedPanel, collapsed }) {
+function PanelButtons({ selectedPanel, setSelectedPanel }) {
   const handleInspectorClick = () => {
     setSelectedPanel("inspector");
     gToolbox.selectTool("inspector");
@@ -21,33 +21,22 @@ function PanelButtons({ selectedPanel, setSelectedPanel, collapsed }) {
     <div className="panel-buttons">
       <NodePicker />
       <button
-        className={classnames({ expanded: selectedPanel === "console" && !collapsed })}
+        className={classnames({ expanded: selectedPanel === "console" })}
         onClick={() => setSelectedPanel("console")}
       >
         Console
       </button>
       <button
-        className={classnames({ expanded: selectedPanel === "inspector" && !collapsed })}
+        className={classnames({ expanded: selectedPanel === "inspector" })}
         onClick={handleInspectorClick}
       >
         Elements
       </button>
       <button
-        className={classnames({ expanded: selectedPanel === "comments" && !collapsed })}
+        className={classnames({ expanded: selectedPanel === "comments" })}
         onClick={() => setSelectedPanel("comments")}
       >
         Comments
-      </button>
-    </div>
-  );
-}
-
-function ActionButtons({ setCollapsed, collapsed }) {
-  // Implement a toggle collapse button
-  return (
-    <div className="action-buttons">
-      <button disabled className="collapse-panels" onClick={() => setCollapsed(!collapsed)}>
-        Toggle Secondary Toolbox
       </button>
     </div>
   );
@@ -145,17 +134,11 @@ function InspectorPanel({ initializedPanels }) {
 // out why. -jaril
 function SecondaryToolbox({ initializedPanels }) {
   const [selectedPanel, setSelectedPanel] = useState("console");
-  const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className={classnames("secondary-toolbox", { collapsed })}>
+    <div className="secondary-toolbox">
       <header className="secondary-toolbox-header">
-        <PanelButtons
-          selectedPanel={selectedPanel}
-          setSelectedPanel={setSelectedPanel}
-          collapsed={collapsed}
-        />
-        <ActionButtons setCollapsed={setCollapsed} collapsed={collapsed} />
+        <PanelButtons selectedPanel={selectedPanel} setSelectedPanel={setSelectedPanel} />
       </header>
       <div className="secondary-toolbox-content">
         {selectedPanel == "console" ? <ConsolePanel /> : null}

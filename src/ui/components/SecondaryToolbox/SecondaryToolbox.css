@@ -52,13 +52,3 @@ overflows its container (https://drafts.csswg.org/css-flexbox-1/#min-size-auto) 
   height: 100%;
   min-height: 0;
 }
-
-/* .secondary-toolbox-header .action-buttons button:hover {
-  color: var(--theme-body-color)
-} */
-
-/* Collapsed secondary toolbox styling */
-
-.secondary-toolbox.collapsed .secondary-toolbox-content {
-  display: none;
-}
