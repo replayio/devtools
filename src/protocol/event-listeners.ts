@@ -1,6 +1,16 @@
 // Routines for finding framework-specific event listeners within a pause.
 
-async function getFrameworkEventListeners(node) {
+import { ValueFront } from "./thread";
+import { NodeFront } from "./thread/node";
+
+export interface FrameworkEventListener {
+  handler: ValueFront;
+  type: string;
+  capture: boolean;
+  tags: string;
+}
+
+export async function getFrameworkEventListeners(node: NodeFront) {
   const obj = node.getObjectFront();
   const props = await obj.loadChildren();
   const reactProp = props.find(v => v.name.startsWith("__reactEventHandlers$"));
@@ -18,7 +28,7 @@ async function getFrameworkEventListeners(node) {
     });
 }
 
-function logpointGetFrameworkEventListeners(frameId, frameworkListeners) {
+export function logpointGetFrameworkEventListeners(frameId: string, frameworkListeners: string) {
   const evalText = `
 (array => {
   const rv = [];
@@ -55,8 +65,3 @@ addPauseData(frameworkResult.data);
 ${frameworkListeners} = frameworkResult.returned;
 `;
 }
-
-module.exports = {
-  getFrameworkEventListeners,
-  logpointGetFrameworkEventListeners,
-};
