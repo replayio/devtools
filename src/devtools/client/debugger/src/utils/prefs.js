@@ -18,7 +18,8 @@ pref("devtools.browsertoolbox.fission", false);
 pref("devtools.debugger.logging", false);
 pref("devtools.debugger.timing", false);
 pref("devtools.debugger.alphabetize-outline", false);
-pref("devtools.debugger.auto-pretty-print", false);
+pref("devtools.debugger.outline-expanded", false);
+pref("devtools.debugger.sources-expanded", false);
 pref("devtools.source-map.client-service.enabled", true);
 pref("devtools.chrome.enabled", false);
 pref("devtools.debugger.log-exceptions", false);
@@ -53,7 +54,6 @@ pref("devtools.debugger.features.map-scopes", true);
 pref("devtools.debugger.features.remove-command-bar-options", true);
 pref("devtools.debugger.features.code-folding", false);
 pref("devtools.debugger.features.command-click", false);
-pref("devtools.debugger.features.outline", true);
 pref("devtools.debugger.features.column-breakpoints", true);
 pref("devtools.debugger.features.component-pane", false);
 pref("devtools.debugger.features.autocomplete-expressions", false);
@@ -107,7 +107,8 @@ export const prefs = new PrefsHelper("devtools", {
   timing: ["Bool", "debugger.timing"],
   editorWrapping: ["Bool", "debugger.ui.editor-wrapping"],
   alphabetizeOutline: ["Bool", "debugger.alphabetize-outline"],
-  autoPrettyPrint: ["Bool", "debugger.auto-pretty-print"],
+  outlineExpanded: ["Bool", "debugger.outline-expanded"],
+  sourcesExpanded: ["Bool", "debugger.sources-expanded"],
   clientSourceMapsEnabled: ["Bool", "source-map.client-service.enabled"],
   chromeAndExtensionsEnabled: ["Bool", "chrome.enabled"],
   logExceptions: ["Bool", "debugger.log-exceptions"],
@@ -150,7 +151,6 @@ export const features = new PrefsHelper("devtools.debugger.features", {
   removeCommandBarOptions: ["Bool", "remove-command-bar-options"],
   workers: ["Bool", "workers"],
   windowlessWorkers: ["Bool", "windowless-workers"],
-  outline: ["Bool", "outline"],
   codeFolding: ["Bool", "code-folding"],
   autocompleteExpression: ["Bool", "autocomplete-expressions"],
   mapExpressionBindings: ["Bool", "map-expression-bindings"],
