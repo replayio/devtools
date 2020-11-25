@@ -293,7 +293,6 @@ ul.children + .tag-line::before {
   /* Display an ellipsis character in collapsed nodes that can be expanded. */
   content: "";
   background-color: var(--badge-interactive-background-color);
-  background-image: url(chrome://devtools/skin/images/more.svg);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 8px;
