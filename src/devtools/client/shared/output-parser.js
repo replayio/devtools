@@ -8,7 +8,6 @@ const Services = require("Services");
 const { angleUtils } = require("devtools/client/shared/css-angle");
 const { colorUtils } = require("devtools/shared/css/color");
 const { getCSSLexer } = require("devtools/shared/css/lexer");
-const EventEmitter = require("devtools/shared/event-emitter");
 const { appendText } = require("devtools/client/inspector/shared/utils");
 
 const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
@@ -83,10 +82,6 @@ function OutputParser(document, { supportsType, supportsCssColor4ColorFunction }
   this.parsed = [];
   this.doc = document;
   this.supportsType = supportsType;
-  this.colorSwatches = new WeakMap();
-  this.angleSwatches = new WeakMap();
-  this._onColorSwatchMouseDown = this._onColorSwatchMouseDown.bind(this);
-  this._onAngleSwatchMouseDown = this._onAngleSwatchMouseDown.bind(this);
 
   this.cssColor4 = supportsCssColor4ColorFunction();
 }
@@ -1284,32 +1279,9 @@ OutputParser.prototype = {
    *        _mergeOptions()
    */
   _appendAngle: function (angle, options) {
-    const angleObj = new angleUtils.CssAngle(angle);
     const container = this._createNode("span", {
       "data-angle": angle,
     });
-
-    if (options.angleSwatchClass) {
-      const swatch = this._createNode("span", {
-        class: options.angleSwatchClass,
-        tabindex: "0",
-        role: "button",
-      });
-      this.angleSwatches.set(swatch, angleObj);
-      swatch.addEventListener("mousedown", this._onAngleSwatchMouseDown);
-
-      // Add click listener to stop event propagation when shift key is pressed
-      // in order to prevent the value input to be focused.
-      // Bug 711942 will add a tooltip to edit angle values and we should
-      // be able to move this listener to Tooltip.js when it'll be implemented.
-      swatch.addEventListener("click", function (event) {
-        if (event.shiftKey) {
-          event.stopPropagation();
-        }
-      });
-      EventEmitter.decorate(swatch);
-      container.appendChild(swatch);
-    }
 
     const value = this._createNode(
       "span",
@@ -1362,28 +1334,6 @@ OutputParser.prototype = {
       const container = this._createNode("span", {
         "data-color": color,
       });
-
-      if (options.colorSwatchClass) {
-        let attributes = {
-          class: options.colorSwatchClass,
-          style: "background-color:" + color,
-        };
-
-        // Color swatches next to values trigger the color editor everywhere aside from
-        // the Computed panel where values are read-only.
-        if (!options.colorSwatchClass.startsWith("computed-")) {
-          attributes = { ...attributes, tabindex: "0", role: "button" };
-        }
-
-        // The swatch is a <span> instead of a <button> intentionally. See Bug 1597125.
-        // It is made keyboard accessbile via `tabindex` and has keydown handlers
-        // attached for pressing SPACE and RETURN in SwatchBasedEditorTooltip.js
-        const swatch = this._createNode("span", attributes);
-        this.colorSwatches.set(swatch, colorObj);
-        swatch.addEventListener("mousedown", this._onColorSwatchMouseDown);
-        EventEmitter.decorate(swatch);
-        container.appendChild(swatch);
-      }
 
       if (!options.defaultColorType) {
         // If we're not being asked to convert the color to the default color type
@@ -1444,37 +1394,6 @@ OutputParser.prototype = {
     container.appendChild(value);
 
     return container;
-  },
-
-  _onColorSwatchMouseDown: function (event) {
-    if (!event.shiftKey) {
-      return;
-    }
-
-    // Prevent click event to be fired to not show the tooltip
-    event.stopPropagation();
-
-    const swatch = event.target;
-    const color = this.colorSwatches.get(swatch);
-    const val = color.nextColorUnit();
-
-    swatch.nextElementSibling.textContent = val;
-    swatch.emit("unit-change", val);
-  },
-
-  _onAngleSwatchMouseDown: function (event) {
-    if (!event.shiftKey) {
-      return;
-    }
-
-    event.stopPropagation();
-
-    const swatch = event.target;
-    const angle = this.angleSwatches.get(swatch);
-    const val = angle.nextAngleUnit();
-
-    swatch.nextElementSibling.textContent = val;
-    swatch.emit("unit-change", val);
   },
 
   /**
@@ -1701,13 +1620,11 @@ OutputParser.prototype = {
    *                                    // selected in the options panel.
    *           - angleClass: ""         // The class to use for the angle value
    *                                    // that follows the swatch.
-   *           - angleSwatchClass: ""   // The class to use for angle swatches.
    *           - bezierClass: ""        // The class to use for the bezier value
    *                                    // that follows the swatch.
    *           - bezierSwatchClass: ""  // The class to use for bezier swatches.
    *           - colorClass: ""         // The class to use for the color value
    *                                    // that follows the swatch.
-   *           - colorSwatchClass: ""   // The class to use for color swatches.
    *           - filterSwatch: false    // A special case for parsing a
    *                                    // "filter" property, causing the
    *                                    // parser to skip the call to
@@ -1738,11 +1655,9 @@ OutputParser.prototype = {
     const defaults = {
       defaultColorType: true,
       angleClass: "",
-      angleSwatchClass: "",
       bezierClass: "",
       bezierSwatchClass: "",
       colorClass: "",
-      colorSwatchClass: "",
       filterSwatch: false,
       flexClass: "",
       gridClass: "",
