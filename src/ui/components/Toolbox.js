@@ -14,7 +14,7 @@ const shortcuts = new KeyShortcuts({ window, target: document });
 
 class Toolbox extends React.Component {
   state = {
-    debuggerMode: "debug",
+    debuggerMode: "explorer",
   };
 
   async componentDidMount() {
@@ -41,16 +41,16 @@ class Toolbox extends React.Component {
     return (
       <div id="toolbox-toolbar">
         <div
-          className={classnames("toolbar-panel-button", { active: debuggerMode == "debug" })}
-          onClick={() => this.setState({ debuggerMode: "debug" })}
-        >
-          <div className="img debugger-panel toolbar-panel-icon"></div>
-        </div>
-        <div
           className={classnames("toolbar-panel-button", { active: debuggerMode == "explorer" })}
           onClick={() => this.setState({ debuggerMode: "explorer" })}
         >
           <div className="img explorer-panel toolbar-panel-icon"></div>
+        </div>
+        <div
+          className={classnames("toolbar-panel-button", { active: debuggerMode == "debug" })}
+          onClick={() => this.setState({ debuggerMode: "debug" })}
+        >
+          <div className="img debugger-panel toolbar-panel-icon"></div>
         </div>
       </div>
     );
