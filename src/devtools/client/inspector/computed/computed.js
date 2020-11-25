@@ -7,7 +7,7 @@
 const promise = Promise;
 const flags = require("devtools/shared/flags");
 const CssLogic = require("devtools/shared/inspector/css-logic");
-const OutputParser = require("devtools/client/shared/output-parser");
+const OutputParser = require("devtools/client/shared/old-output-parser");
 const { PrefObserver } = require("devtools/client/shared/prefs");
 const { createChild } = require("devtools/client/inspector/shared/utils");
 const { openDocLink } = require("devtools/client/shared/link");
