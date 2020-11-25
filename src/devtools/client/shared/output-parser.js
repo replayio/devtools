@@ -577,15 +577,6 @@ OutputParser.prototype = {
       "data-bezier": bezier,
     });
 
-    if (options.bezierSwatchClass) {
-      const swatch = this._createNode("span", {
-        class: options.bezierSwatchClass,
-        tabindex: "0",
-        role: "button",
-      });
-      container.appendChild(swatch);
-    }
-
     const value = this._createNode(
       "span",
       {
@@ -654,12 +645,6 @@ OutputParser.prototype = {
 
     const container = this._createNode("span", {});
 
-    const toggle = this._createNode("span", {
-      class: options.shapeSwatchClass,
-      tabindex: "0",
-      role: "button",
-    });
-
     for (const { prefix, coordParser } of shapeTypes) {
       if (shape.includes(prefix)) {
         const coordsBegin = prefix.length;
@@ -667,8 +652,6 @@ OutputParser.prototype = {
         let valContainer = this._createNode("span", {
           class: options.shapeClass,
         });
-
-        container.appendChild(toggle);
 
         appendText(valContainer, shape.substring(0, coordsBegin));
 
@@ -1613,7 +1596,6 @@ OutputParser.prototype = {
    *                                    // that follows the swatch.
    *           - bezierClass: ""        // The class to use for the bezier value
    *                                    // that follows the swatch.
-   *           - bezierSwatchClass: ""  // The class to use for bezier swatches.
    *           - colorClass: ""         // The class to use for the color value
    *                                    // that follows the swatch.
    *           - filterSwatch: false    // A special case for parsing a
@@ -1625,7 +1607,6 @@ OutputParser.prototype = {
    *           - gridClass: ""          // The class to use for the grid icon.
    *           - shapeClass: ""         // The class to use for the shape value
    *                                    // that follows the swatch.
-   *           - shapeSwatchClass: ""   // The class to use for the shape swatch.
    *           - supportsColor: false   // Does the CSS property support colors?
    *           - urlClass: ""           // The class to be used for url() links.
    *           - fontFamilyClass: ""    // The class to be used for font families.
@@ -1647,13 +1628,11 @@ OutputParser.prototype = {
       defaultColorType: true,
       angleClass: "",
       bezierClass: "",
-      bezierSwatchClass: "",
       colorClass: "",
       filterSwatch: false,
       flexClass: "",
       gridClass: "",
       shapeClass: "",
-      shapeSwatchClass: "",
       supportsColor: false,
       urlClass: "",
       fontFamilyClass: "",
