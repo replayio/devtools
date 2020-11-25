@@ -63,14 +63,10 @@ class Debugger extends Component {
   onEscape;
   onCommandSlash;
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      shortcutsModalEnabled: false,
-      startPanelSize: 0,
-      endPanelSize: 0,
-    };
-  }
+  state = {
+    shortcutsModalEnabled: false,
+    startPanelSize: 0,
+  };
 
   getChildContext = () => {
     return { shortcuts, l10n: L10N };
@@ -188,19 +184,14 @@ class Debugger extends Component {
   }
 
   renderEditorPane = () => {
-    const { startPanelCollapsed, endPanelCollapsed } = this.props;
-    const { endPanelSize, startPanelSize } = this.state;
+    const { startPanelSize } = this.state;
     const horizontal = this.isHorizontal();
 
     return (
       <div className="editor-pane">
         <div className="editor-container">
-          <EditorTabs
-            startPanelCollapsed={startPanelCollapsed}
-            endPanelCollapsed={endPanelCollapsed}
-            horizontal={horizontal}
-          />
-          <Editor startPanelSize={startPanelSize} endPanelSize={endPanelSize} />
+          <EditorTabs horizontal={horizontal} />
+          <Editor startPanelSize={startPanelSize} />
           {!this.props.selectedSource ? (
             <WelcomeBox
               horizontal={horizontal}
@@ -230,7 +221,7 @@ class Debugger extends Component {
   }
 
   renderLayout = () => {
-    const { startPanelCollapsed, endPanelCollapsed, debuggerMode } = this.props;
+    const { startPanelCollapsed, debuggerMode } = this.props;
     const horizontal = this.isHorizontal();
 
     return (
@@ -300,8 +291,7 @@ Debugger.childContextTypes = {
 
 const mapStateToProps = state => ({
   selectedSource: getSelectedSource(state),
-  startPanelCollapsed: getPaneCollapse(state, "start"),
-  endPanelCollapsed: getPaneCollapse(state, "end"),
+  startPanelCollapsed: getPaneCollapse(state),
   activeSearch: getActiveSearch(state),
   quickOpenEnabled: getQuickOpenEnabled(state),
   orientation: getOrientation(state),

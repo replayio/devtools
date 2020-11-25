@@ -355,10 +355,7 @@ class Editor extends PureComponent {
       return;
     }
 
-    if (
-      nextProps.startPanelSize !== this.props.startPanelSize ||
-      nextProps.endPanelSize !== this.props.endPanelSize
-    ) {
+    if (nextProps.startPanelSize !== this.props.startPanelSize) {
       editor.codeMirror.setSize();
     }
   }

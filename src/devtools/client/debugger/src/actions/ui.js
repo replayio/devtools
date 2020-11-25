@@ -80,7 +80,7 @@ export function showSource(cx, sourceId) {
       return;
     }
 
-    if (getPaneCollapse(getState(), "start")) {
+    if (getPaneCollapse(getState())) {
       dispatch({
         type: "TOGGLE_PANE",
         position: "start",
@@ -96,25 +96,13 @@ export function showSource(cx, sourceId) {
   };
 }
 
-export function togglePaneCollapse(position, paneCollapsed) {
+export function togglePaneCollapse() {
   return ({ dispatch, getState }) => {
-    const prevPaneCollapse = getPaneCollapse(getState(), position);
-    if (prevPaneCollapse === paneCollapsed) {
-      return;
-    }
-
-    dispatch({
-      type: "TOGGLE_PANE",
-      position,
-      paneCollapsed,
-    });
+    const paneCollapsed = getPaneCollapse(getState());
+    dispatch({ type: "TOGGLE_PANE", paneCollapsed: !paneCollapsed });
   };
 }
 
-/**
- * @memberof actions/sources
- * @static
- */
 export function highlightLineRange(location) {
   return {
     type: "HIGHLIGHT_LINES",
@@ -129,10 +117,6 @@ export function flashLineRange(location) {
   };
 }
 
-/**
- * @memberof actions/sources
- * @static
- */
 export function clearHighlightLineRange() {
   return {
     type: "CLEAR_HIGHLIGHT_LINES",

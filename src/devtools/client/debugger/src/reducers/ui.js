@@ -44,13 +44,8 @@ function update(state = createUIState(), action) {
     }
 
     case "TOGGLE_PANE": {
-      if (action.position == "start") {
-        prefs.startPanelCollapsed = action.paneCollapsed;
-        return { ...state, startPanelCollapsed: action.paneCollapsed };
-      }
-
-      prefs.endPanelCollapsed = action.paneCollapsed;
-      return { ...state, endPanelCollapsed: action.paneCollapsed };
+      prefs.startPanelCollapsed = action.paneCollapsed;
+      return { ...state, startPanelCollapsed: action.paneCollapsed };
     }
 
     case "HIGHLIGHT_LINES":
@@ -114,12 +109,8 @@ export function getShownSource(state) {
   return state.ui.shownSource;
 }
 
-export function getPaneCollapse(state, position) {
-  if (position == "start") {
-    return state.ui.startPanelCollapsed;
-  }
-
-  return state.ui.endPanelCollapsed;
+export function getPaneCollapse(state) {
+  return state.ui.startPanelCollapsed;
 }
 
 export function getHighlightedLineRange(state) {

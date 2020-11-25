@@ -138,22 +138,6 @@ class SourceFooter extends PureComponent {
     );
   }
 
-  renderToggleButton() {
-    if (this.props.horizontal) {
-      return;
-    }
-
-    return (
-      <PaneToggleButton
-        key="toggle"
-        collapsed={this.props.endPanelCollapsed}
-        horizontal={this.props.horizontal}
-        handleClick={this.props.togglePaneCollapse}
-        position="end"
-      />
-    );
-  }
-
   renderCommands() {
     const commands = [this.blackBoxButton(), this.prettyPrintButton()].filter(Boolean);
 
@@ -220,7 +204,6 @@ class SourceFooter extends PureComponent {
         <div className="source-footer-end">
           {this.renderSourceSummary()}
           {this.renderCursorPosition()}
-          {this.renderToggleButton()}
         </div>
       </div>
     );
@@ -237,7 +220,6 @@ const mapStateToProps = state => {
     selectedSource,
     alternateSource,
     prettySource: getPrettySource(state, selectedSource ? selectedSource.id : null),
-    endPanelCollapsed: getPaneCollapse(state, "end"),
     canPrettyPrint: selectedSource ? canPrettyPrintSource(state, selectedSource.id) : false,
   };
 };
