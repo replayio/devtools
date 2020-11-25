@@ -6,6 +6,8 @@ import { clearEventTooltip, showEventTooltip } from "../actions/eventTooltip";
 import { getEventTooltipContent, getEventTooltipNodeId } from "../reducers/eventTooltip";
 import { EventInfo } from "../state/eventTooltip";
 
+import "./EventTooltip.css";
+
 interface EventTooltipProps {
   nodeId: string;
 }
@@ -60,11 +62,12 @@ class EventTooltip extends PureComponent<EventTooltipProps & PropsFromRedux> {
     return (
       <Dropdown
         buttonContent="event"
+        buttonStyle="inspector-badge interactive"
+        position="bottom-right"
         expanded={!!events}
         setExpanded={this.setExpanded}
-        buttonStyle="inspector-badge interactive"
       >
-        {this.renderEvents(events)}
+        <div className="devtools-tooltip-events-container">{this.renderEvents(events)}</div>
       </Dropdown>
     );
   }
