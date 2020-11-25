@@ -77,29 +77,6 @@ pref("devtools.editor.keymap", "default");
 pref("ui.caretBlinkTime", 530);
 pref("devtools.popup.disable_autohide", false);
 pref("devtools.styleeditor.enabled", true);
-pref("devtools.gridinspector.showGridAreas", false);
-pref("devtools.gridinspector.showGridLineNumbers", false);
-pref("devtools.gridinspector.showInfiniteLines", false);
-pref("devtools.toolsidebar-width.inspector", 700);
-pref("devtools.toolsidebar-height.inspector", 350);
-pref("devtools.toolsidebar-width.inspector.splitsidebar", 350);
-pref("devtools.inspector.three-pane-enabled", true);
-pref("devtools.inspector.activeSidebar", "layoutview");
-pref("layout.css.backdrop-filter.enabled", false);
-pref("devtools.gridinspector.maxHighlighters", 3);
-pref("devtools.markup.collapseAttributes", true);
-pref("devtools.markup.collapseAttributeLength", 120);
-pref("devtools.markup.pagesize", 100);
-pref("devtools.inspector.showUserAgentStyles", false);
-pref("devtools.inspector.new-rulesview.enabled", false);
-pref("devtools.inspector.compatibility.enabled", false);
-pref("devtools.layout.boxmodel.highlightProperty", false);
-pref("devtools.layout.flexbox.opened", true);
-pref("devtools.layout.grid.opened", true);
-pref("devtools.layout.boxmodel.opened", true);
-pref("dom.input_events.beforeinput.enabled", false);
-pref("devtools.defaultColorUnit", "authored");
-pref("devtools.inspector.show_pseudo_elements", false);
 
 export const prefs = new PrefsHelper("devtools", {
   fission: ["Bool", "browsertoolbox.fission"],
