@@ -101,7 +101,7 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
                 id="inspector-searchbox"
                 className="devtools-searchinput"
                 type="search"
-                data-localization="placeholder=inspectorSearchHTML.label3"
+                placeholder="Search HTML"
               />
               <button
                 id="inspector-searchinput-clear"
