@@ -1378,15 +1378,6 @@ OutputParser.prototype = {
       "data-filters": filters,
     });
 
-    if (options.filterSwatchClass) {
-      const swatch = this._createNode("span", {
-        class: options.filterSwatchClass,
-        tabindex: "0",
-        role: "button",
-      });
-      container.appendChild(swatch);
-    }
-
     const value = this._createNode("span", {
       class: options.filterClass,
     });
