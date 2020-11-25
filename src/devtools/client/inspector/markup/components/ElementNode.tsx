@@ -4,7 +4,6 @@ import { Attr } from "record-replay-protocol";
 
 import NodeAttribute from "./NodeAttribute";
 import TextNode from "./TextNode";
-import EventTooltip from "./EventTooltip";
 import { assert } from "protocol/utils";
 
 const { HTML_VOID_ELEMENTS } = require("../constants");
@@ -85,14 +84,6 @@ class ElementNode extends PureComponent<ElementNodeProps> {
     );
   }
 
-  renderEventBadge() {
-    if (!this.props.node.hasEventListeners) {
-      return null;
-    }
-
-    return <EventTooltip nodeId={this.props.node.id} />;
-  }
-
   renderDisplayBadge() {
     const { displayType } = this.props.node;
     assert(displayType);
@@ -155,7 +146,6 @@ class ElementNode extends PureComponent<ElementNodeProps> {
         <span className="markup-expand-badge" onClick={this.onExpandBadgeClick}></span>
         {this.renderInlineTextChild()}
         {this.renderCloseTag()}
-        {this.renderEventBadge()}
         {this.renderDisplayBadge()}
         {this.renderScrollableBadge()}
       </span>

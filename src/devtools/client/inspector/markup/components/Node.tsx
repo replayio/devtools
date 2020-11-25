@@ -18,6 +18,7 @@ import { UIState } from "ui/state";
 import ElementNode from "./ElementNode";
 import ReadOnlyNode from "./ReadOnlyNode";
 import TextNode from "./TextNode";
+import EventTooltip from "./EventTooltip";
 
 interface NodeProps {
   nodeId: string;
@@ -150,6 +151,14 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
     return component;
   }
 
+  renderEventBadge() {
+    if (!this.props.node.hasEventListeners) {
+      return null;
+    }
+
+    return <EventTooltip nodeId={this.props.node.id} />;
+  }
+
   render() {
     const { node, rootNodeId, isSelectedNode, isScrollIntoViewNode } = this.props;
 
@@ -194,6 +203,7 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
             ></span>
           ) : null}
           {this.renderComponent()}
+          {this.renderEventBadge()}
         </div>
         {this.renderChildren()}
         {this.renderClosingTag()}
