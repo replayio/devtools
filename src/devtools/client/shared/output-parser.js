@@ -120,7 +120,7 @@ OutputParser.prototype = {
     if (options.expectFilter || this._cssPropertySupportsValue(name, value)) {
       return this._parse(value, options);
     }
-    this._appendTextNode(value);
+    this._appendText(value);
 
     return this._toDOM();
   },
@@ -352,7 +352,7 @@ OutputParser.prototype = {
             // it isn't special in some other way. So, we let it
             // through to the ordinary parsing loop so that the value
             // can be handled in a single place.
-            this._appendTextNode(text.substring(token.startOffset, token.endOffset));
+            this._appendText(text.substring(token.startOffset, token.endOffset));
             if (parenDepth === 0) {
               outerMostFunctionTakesColor = COLOR_TAKING_FUNCTIONS.includes(token.text);
             }
@@ -372,15 +372,15 @@ OutputParser.prototype = {
             if (sawVariable) {
               // If function contains variable, we need to add both strings
               // and nodes.
-              this._appendTextNode(functionName);
+              this._appendText(functionName);
               for (const data of functionData) {
                 if (typeof data === "string") {
-                  this._appendTextNode(data);
+                  this._appendText(data);
                 } else if (data) {
                   this.parsed.push(data);
                 }
               }
-              this._appendTextNode(")");
+              this._appendText(")");
             } else {
               // If no variable in function, join the text together and add
               // to DOM accordingly.
@@ -393,7 +393,7 @@ OutputParser.prototype = {
               } else if (options.expectShape && BASIC_SHAPE_FUNCTIONS.includes(token.text)) {
                 this._appendShape(functionText, options);
               } else {
-                this._appendTextNode(functionText);
+                this._appendText(functionText);
               }
             }
           }
@@ -417,7 +417,7 @@ OutputParser.prototype = {
             // identifier to be equal to 'important'.
             fontFamilyNameParts.push(token.text);
           } else {
-            this._appendTextNode(text.substring(token.startOffset, token.endOffset));
+            this._appendText(text.substring(token.startOffset, token.endOffset));
           }
           break;
 
@@ -428,11 +428,11 @@ OutputParser.prototype = {
             if (spaceNeeded) {
               // Insert a space to prevent token pasting when a #xxx
               // color is changed to something like rgb(...).
-              this._appendTextNode(" ");
+              this._appendText(" ");
             }
             this._appendColor(original, options);
           } else {
-            this._appendTextNode(original);
+            this._appendText(original);
           }
           break;
         }
@@ -441,7 +441,7 @@ OutputParser.prototype = {
           if (angleOK(value)) {
             this._appendAngle(value, options);
           } else {
-            this._appendTextNode(value);
+            this._appendText(value);
           }
           break;
         case "url":
@@ -453,7 +453,7 @@ OutputParser.prototype = {
           if (options.expectFont) {
             fontFamilyNameParts.push(text.substring(token.startOffset, token.endOffset));
           } else {
-            this._appendTextNode(text.substring(token.startOffset, token.endOffset));
+            this._appendText(text.substring(token.startOffset, token.endOffset));
           }
           break;
 
@@ -461,7 +461,7 @@ OutputParser.prototype = {
           if (options.expectFont) {
             fontFamilyNameParts.push(" ");
           } else {
-            this._appendTextNode(text.substring(token.startOffset, token.endOffset));
+            this._appendText(text.substring(token.startOffset, token.endOffset));
           }
           break;
 
@@ -489,7 +489,7 @@ OutputParser.prototype = {
           }
         // falls through
         default:
-          this._appendTextNode(text.substring(token.startOffset, token.endOffset));
+          this._appendText(text.substring(token.startOffset, token.endOffset));
           break;
       }
 
@@ -1339,7 +1339,7 @@ OutputParser.prototype = {
       container.appendChild(value);
       this.parsed.push(container);
     } else {
-      this._appendTextNode(color);
+      this._appendText(color);
     }
   },
 
@@ -1411,13 +1411,13 @@ OutputParser.prototype = {
 
       // Bail out if that didn't match anything.
       if (!urlParts) {
-        this._appendTextNode(match);
+        this._appendText(match);
         return;
       }
 
       const [, leader, , body, trailer] = urlParts;
 
-      this._appendTextNode(leader);
+      this._appendText(leader);
 
       let href = url;
       if (options.baseURI) {
@@ -1438,9 +1438,9 @@ OutputParser.prototype = {
         body
       );
 
-      this._appendTextNode(trailer);
+      this._appendText(trailer);
     } else {
-      this._appendTextNode(match);
+      this._appendText(match);
     }
   },
 
@@ -1465,7 +1465,7 @@ OutputParser.prototype = {
     // not inside the span element.
 
     if (spanContents[0] === " ") {
-      this._appendTextNode(" ");
+      this._appendText(" ");
       spanContents = spanContents.slice(1);
     }
 
@@ -1479,7 +1479,7 @@ OutputParser.prototype = {
     }
 
     if (quoteChar) {
-      this._appendTextNode(quoteChar);
+      this._appendText(quoteChar);
       spanContents = spanContents.slice(1, -1);
     }
 
@@ -1492,11 +1492,11 @@ OutputParser.prototype = {
     );
 
     if (quoteChar) {
-      this._appendTextNode(quoteChar);
+      this._appendText(quoteChar);
     }
 
     if (trailingWhitespace) {
-      this._appendTextNode(" ");
+      this._appendText(" ");
     }
   },
 
@@ -1547,13 +1547,13 @@ OutputParser.prototype = {
   },
 
   /**
-   * Append a text node to the output. If the previously output item was a text
-   * node then we append the text to that node.
+   * Append the given text to the `this.parsed` array. If the last item is a string,
+   * join the 2 strings together.
    *
    * @param  {String} text
    *         Text to append
    */
-  _appendTextNode: function (text) {
+  _appendText: function (text) {
     const lastItem = this.parsed[this.parsed.length - 1];
     if (typeof lastItem === "string") {
       this.parsed[this.parsed.length - 1] = lastItem + text;
