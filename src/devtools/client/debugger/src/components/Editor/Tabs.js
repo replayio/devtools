@@ -47,7 +47,6 @@ class Tabs extends PureComponent {
   renderTabs;
   renderDropDown;
   renderStartPanelToggleButton;
-  renderEndPanelToggleButton;
   onResize;
   _draggedSource;
   _draggedSourceIndex;
@@ -246,36 +245,9 @@ class Tabs extends PureComponent {
     return <CommandBar horizontal={horizontal} />;
   }
 
-  renderStartPanelToggleButton() {
-    return (
-      <PaneToggleButton
-        position="start"
-        collapsed={this.props.startPanelCollapsed}
-        handleClick={this.props.togglePaneCollapse}
-      />
-    );
-  }
-
-  renderEndPanelToggleButton() {
-    const { horizontal, endPanelCollapsed, togglePaneCollapse } = this.props;
-    if (!horizontal) {
-      return;
-    }
-
-    return (
-      <PaneToggleButton
-        position="end"
-        collapsed={endPanelCollapsed}
-        handleClick={togglePaneCollapse}
-        horizontal={horizontal}
-      />
-    );
-  }
-
   render() {
     return (
       <div className="source-header">
-        {this.renderStartPanelToggleButton()}
         {this.renderTabs()}
         {this.renderDropdown()}
       </div>
@@ -295,6 +267,5 @@ export default connect(mapStateToProps, {
   moveTab: actions.moveTab,
   moveTabBySourceId: actions.moveTabBySourceId,
   closeTab: actions.closeTab,
-  togglePaneCollapse: actions.togglePaneCollapse,
   showSource: actions.showSource,
 })(Tabs);

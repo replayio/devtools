@@ -2,13 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
 import React, { Component } from "react";
-
 import { connect } from "../utils/connect";
-
 import actions from "../actions";
-import { getPaneCollapse } from "../selectors";
 import { formatKeyShortcut } from "../utils/text";
 
 import "./WelcomeBox.css";
@@ -64,12 +60,9 @@ export class WelcomeBox extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  endPanelCollapsed: getPaneCollapse(state, "end"),
-});
+const mapStateToProps = state => ({});
 
 export default connect(mapStateToProps, {
-  togglePaneCollapse: actions.togglePaneCollapse,
   setActiveSearch: actions.setActiveSearch,
   openQuickOpen: actions.openQuickOpen,
 })(WelcomeBox);
