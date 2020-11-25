@@ -62,12 +62,7 @@ window {
 }
 
 #inspector-splitter-box .sidebar-toggle::before {
-  background-image: url("chrome://devtools/skin/images/close-3-pane.svg");
   transform: unset;
-}
-
-#inspector-splitter-box .sidebar-toggle.pane-collapsed::before {
-  background-image: url("chrome://devtools/skin/images/open-3-pane.svg");
 }
 
 /* Flip the icon horizontally when in RTL mode */

@@ -67,6 +67,8 @@ const gBackgroundImages = {
   ".create-comment": require("devtools/client/themes/images/comment-add.svg"),
   ".comment-marker": require("devtools/client/themes/images/comment-marker.svg"),
   ".comment-marker.paused.expanded": require("devtools/client/themes/images/comment-marker-filled-blue.svg"),
+  "#inspector-splitter-box .sidebar-toggle::before": require("devtools/client/themes/images/close-3-pane.svg"),
+  "#inspector-splitter-box .sidebar-toggle.pane-collapsed::before": require("devtools/client/themes/images/open-3-pane.svg"),
 };
 
 const gMaskImages = {
