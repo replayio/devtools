@@ -9,11 +9,17 @@ import InspectorApp from "devtools/client/inspector/components/App";
 import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
+import { actions } from "../../actions";
 
 function PanelButtons({ selectedPanel, setSelectedPanel }) {
-  const handleInspectorClick = () => {
-    setSelectedPanel("inspector");
-    gToolbox.selectTool("inspector");
+  const onClick = panel => {
+    setSelectedPanel(panel);
+
+    // The comments panel doesn't have to be initialized by the toolbox,
+    // only the console and the inspector.
+    if (panel !== "comments") {
+      gToolbox.selectTool(panel);
+    }
   };
 
   return (
@@ -21,7 +27,7 @@ function PanelButtons({ selectedPanel, setSelectedPanel }) {
       <NodePicker />
       <button
         className={classnames("console-panel-button", { expanded: selectedPanel === "console" })}
-        onClick={() => setSelectedPanel("console")}
+        onClick={() => onClick("console")}
       >
         Console
       </button>
@@ -29,13 +35,13 @@ function PanelButtons({ selectedPanel, setSelectedPanel }) {
         className={classnames("inspector-panel-button", {
           expanded: selectedPanel === "inspector",
         })}
-        onClick={handleInspectorClick}
+        onClick={() => onClick("inspector")}
       >
         Elements
       </button>
       <button
         className={classnames("comments-panel-button", { expanded: selectedPanel === "comments" })}
-        onClick={() => setSelectedPanel("comments")}
+        onClick={() => onClick("comments")}
       >
         Comments
       </button>
@@ -129,9 +135,7 @@ function InspectorPanel({ initializedPanels }) {
   );
 }
 
-function SecondaryToolbox({ initializedPanels }) {
-  const [selectedPanel, setSelectedPanel] = useState("console");
-
+function SecondaryToolbox({ initializedPanels, selectedPanel, setSelectedPanel }) {
   return (
     <div className="secondary-toolbox">
       <header className="secondary-toolbox-header">
@@ -148,6 +152,10 @@ function SecondaryToolbox({ initializedPanels }) {
   );
 }
 
-export default connect(state => ({
-  initializedPanels: selectors.getInitializedPanels(state),
-}))(SecondaryToolbox);
+export default connect(
+  state => ({
+    initializedPanels: selectors.getInitializedPanels(state),
+    selectedPanel: selectors.getSelectedPanel(state),
+  }),
+  { setSelectedPanel: actions.setSelectedPanel }
+)(SecondaryToolbox);

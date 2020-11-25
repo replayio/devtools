@@ -131,7 +131,6 @@ export class Inspector {
   async init() {
     // We need to listen to changes in the target's pause state.
     await this._toolbox.getOrStartPanel("debugger");
-
     await this._deferredOpen();
 
     await this.onNewRoot();
