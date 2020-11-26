@@ -10,10 +10,6 @@ const { colorUtils } = require("devtools/shared/css/color");
 const { getCSSLexer } = require("devtools/shared/css/lexer");
 const { appendText } = require("devtools/client/inspector/shared/utils");
 
-const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const STYLE_INSPECTOR_L10N = new LocalizationHelper(STYLE_INSPECTOR_PROPERTIES);
-
 // Functions that accept an angle argument.
 const ANGLE_TAKING_FUNCTIONS = [
   "linear-gradient",
@@ -52,11 +48,13 @@ const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 const ANGLE = "angle";
 const COLOR = "color";
+const CUSTOM_PROPERTY = "custom-property";
 const FLEX = "flex";
 const FONT_FAMILY = "font-family";
 const GRID = "grid";
 const TIMING_FUNCTION = "timing-function";
 const URI = "url";
+const VARIABLE_FUNCTION = "variable-function";
 
 /**
  * This module is used to process CSS text declarations and output DOM fragments (to be
@@ -188,19 +186,14 @@ OutputParser.prototype = {
             break;
           }
         }
-      } else if (
-        token.tokenType === "function" &&
-        token.text === "var" &&
-        options.isVariableInUse
-      ) {
+      } else if (token.tokenType === "function" && token.text === "var") {
         sawVariable = true;
-        const variableNode = this._parseVariable(token, text, tokenStream, options);
-        functionData.push(variableNode);
+        functionData.push(this._parseVariable(token, text, tokenStream, options));
       } else if (token.tokenType === "function") {
         ++depth;
       }
 
-      if (token.tokenType !== "function" || token.text !== "var" || !options.isVariableInUse) {
+      if (token.tokenType !== "function" || token.text !== "var") {
         functionData.push(text.substring(token.startOffset, token.endOffset));
       }
 
@@ -226,79 +219,55 @@ OutputParser.prototype = {
    * @param  {Object} options
    *         The options object in use; @see _mergeOptions.
    * @return {Object}
-   *         A node for the variable, with the appropriate text and
-   *         title. Eg. a span with "var(--var1)" as the textContent
-   *         and a title for --var1 like "--var1 = 10" or
-   *         "--var1 is not set".
+   *         An object containing the parsed values within the var() function.
    */
   _parseVariable: function (initialToken, text, tokenStream, options) {
+    const result = {
+      type: VARIABLE_FUNCTION,
+      // Arguments within the var() function will be parsed and appended to `values`.
+      // This could include an object with `type: CUSTOM_PROPERTY` to indicate a
+      // custom property, a string such as a comma or property value, and nested objects
+      // representing nested var() functions within the var() function.
+      values: [],
+    };
+
     // Handle the "var(".
-    const varText = text.substring(initialToken.startOffset, initialToken.endOffset);
-    const variableNode = this._createNode("span", {}, varText);
+    result.values.push(text.substring(initialToken.startOffset, initialToken.endOffset));
 
-    // Parse the first variable name within the parens of var().
-    const { tokens, functionData, sawComma, sawVariable } = this._parseMatchingParens(
-      text,
-      tokenStream,
-      options,
-      true
-    );
+    // Parse the first argument within the parens of var().
+    const { functionData, sawComma } = this._parseMatchingParens(text, tokenStream, options, true);
+    const firstArgument = functionData[0];
 
-    const result = sawVariable ? "" : functionData.join("");
-
-    // Display options for the first and second argument in the var().
-    const firstOpts = {};
-    const secondOpts = {};
-
-    let varValue;
-
-    // Get the variable value if it is in use.
-    if (tokens && tokens.length === 1) {
-      varValue = options.isVariableInUse(tokens[0].text);
-    }
-
-    // Get the variable name.
-    const varName = text.substring(tokens[0].startOffset, tokens[0].endOffset);
-
-    if (typeof varValue === "string") {
-      // The variable value is valid, set the variable name's title of the first argument
-      // in var() to display the variable name and value.
-      firstOpts["data-variable"] = STYLE_INSPECTOR_L10N.getFormatStr(
-        "rule.variableValue",
-        varName,
-        varValue
-      );
-      firstOpts.class = options.matchedVariableClass;
-      secondOpts.class = options.unmatchedVariableClass;
+    if (firstArgument.startsWith("--")) {
+      result.values.push({
+        type: CUSTOM_PROPERTY,
+        value: firstArgument,
+      });
     } else {
-      // The variable name is not valid, mark it unmatched.
-      firstOpts.class = options.unmatchedVariableClass;
-      firstOpts["data-variable"] = STYLE_INSPECTOR_L10N.getFormatStr("rule.variableUnset", varName);
+      // The first argument is not a custom property, append the argument into the
+      // array of values.
+      result.values.push(firstArgument);
     }
-
-    variableNode.appendChild(this._createNode("span", firstOpts, result));
 
     // If we saw a ",", then append it and show the remainder using
     // the correct highlighting.
     if (sawComma) {
-      variableNode.appendChild(this.doc.createTextNode(","));
+      result.values.push(",");
 
-      // Parse the text up until the close paren, being sure to
-      // disable the special case for filter.
+      // Parse the text up until the close paren, being sure to disable the special case
+      // for filter. The remaining text could be CSS property values, custom properties
+      // or nested var() functions. We send the remaining text through the main parser
+      // `_doParse`.
       const subOptions = Object.assign({}, options);
       subOptions.expectFilter = false;
       const saveParsed = this.parsed;
       this.parsed = [];
-      const rest = this._doParse(text, subOptions, tokenStream, true);
+      result.values.push(...this._doParse(text, subOptions, tokenStream, true));
       this.parsed = saveParsed;
-
-      const span = this._createNode("span", secondOpts);
-      span.appendChild(rest);
-      variableNode.appendChild(span);
     }
-    variableNode.appendChild(this.doc.createTextNode(")"));
 
-    return variableNode;
+    result.values.push(")");
+    return result;
   },
 
   /**
@@ -369,9 +338,8 @@ OutputParser.prototype = {
               outerMostFunctionTakesColor = COLOR_TAKING_FUNCTIONS.includes(token.text);
             }
             ++parenDepth;
-          } else if (token.text === "var" && options.isVariableInUse) {
-            const variableNode = this._parseVariable(token, text, tokenStream, options);
-            this.parsed.push(variableNode);
+          } else if (token.text === "var") {
+            this.parsed.push(this._parseVariable(token, text, tokenStream, options));
           } else {
             const { functionData, sawVariable } = this._parseMatchingParens(
               text,
@@ -1467,14 +1435,6 @@ OutputParser.prototype = {
    *           - supportsColor: false   // Does the CSS property support colors?
    *           - baseURI: undefined     // A string used to resolve
    *                                    // relative links.
-   *           - isVariableInUse        // A function taking a single
-   *                                    // argument, the name of a variable.
-   *                                    // This should return the variable's
-   *                                    // value, if it is in use; or null.
-   *           - unmatchedVariableClass: ""
-   *                                    // The class to use for a component
-   *                                    // of a "var(...)" that is not in
-   *                                    // use.
    * @return {Object}
    *         Overridden options object
    */
@@ -1485,8 +1445,6 @@ OutputParser.prototype = {
       shapeClass: "",
       supportsColor: false,
       baseURI: undefined,
-      isVariableInUse: null,
-      unmatchedVariableClass: null,
     };
 
     for (const item in overrides) {
