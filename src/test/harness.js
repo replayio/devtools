@@ -190,6 +190,7 @@ function waitForPausedLine(line) {
 
 function resumeThenPauseAtLineFunctionFactory(method) {
   return async function (lineno, waitForLine) {
+    document.querySelector(".toolbar-panel-button .debugger-panel").click();
     console.log(`Starting ${method} to ${lineno}...`, new Date());
     await dbg.actions[method](getThreadContext());
     if (lineno !== undefined) {
