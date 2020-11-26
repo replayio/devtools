@@ -97,7 +97,7 @@ function InspectorPanel({ initializedPanels }) {
                 id="computed-searchbox"
                 className="devtools-filterinput"
                 type="search"
-                data-localization="placeholder=inspector.filterStyles.placeholder"
+                placeholder="Filter Styles"
               />
               <button
                 id="computed-searchinput-clear"
@@ -106,11 +106,9 @@ function InspectorPanel({ initializedPanels }) {
             </div>
             <div className="devtools-separator"></div>
             <input id="browser-style-checkbox" type="checkbox" className="includebrowserstyles" />
-            <label
-              id="browser-style-checkbox-label"
-              htmlFor="browser-style-checkbox"
-              data-localization="content=inspector.browserStyles.label"
-            ></label>
+            <label id="browser-style-checkbox-label" htmlFor="browser-style-checkbox">
+              Browser Styles
+            </label>
           </div>
 
           <div id="computed-container">
