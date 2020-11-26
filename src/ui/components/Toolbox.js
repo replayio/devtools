@@ -74,9 +74,10 @@ export default connect(
     initializedPanels: selectors.getInitializedPanels(state),
     toolboxExpanded: selectors.getToolboxExpanded(state),
     panelCollapsed: selectors.getPaneCollapse(state),
+    selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
   }),
   {
-    setSelectedPanel: actions.setSelectedPanel,
+    setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
     togglePaneCollapse: actions.togglePaneCollapse,
   }
 )(Toolbox);

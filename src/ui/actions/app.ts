@@ -10,7 +10,7 @@ import {
 } from "record-replay-protocol";
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
-import { ExpectedError, Modal, PanelName } from "ui/state/app";
+import { ExpectedError, Modal, PanelName, PrimaryPanelName } from "ui/state/app";
 const { PointHandlers } = require("protocol/logpoint");
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
@@ -20,6 +20,9 @@ export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: Session
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
 export type SetSplitConsoleAction = Action<"set_split_console"> & { splitConsole: boolean };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: PanelName };
+export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {
+  panel: PrimaryPanelName;
+};
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & { error: sessionError };
@@ -40,6 +43,7 @@ export type AppAction =
   | UpdateThemeAction
   | SetSplitConsoleAction
   | SetSelectedPanelAction
+  | SetSelectedPrimaryPanelAction
   | SetInitializedPanelsAction
   | SetExpectedErrorAction
   | SetUnexpectedErrorAction
@@ -117,6 +121,10 @@ export function setSplitConsole(open: boolean): SetSplitConsoleAction {
 
 export function setSelectedPanel(panel: PanelName): SetSelectedPanelAction {
   return { type: "set_selected_panel", panel };
+}
+
+export function setSelectedPrimaryPanel(panel: PrimaryPanelName): SetSelectedPrimaryPanelAction {
+  return { type: "set_selected_primary_panel", panel };
 }
 
 export function setInitializedPanels(panel: PanelName): SetInitializedPanelsAction {

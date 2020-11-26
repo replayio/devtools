@@ -13,6 +13,7 @@ function initialAppState(): AppState {
     toolboxExpanded: true,
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
+    selectedPrimaryPanel: "explorer",
     initializedPanels: [],
     loading: 4,
     uploading: null,
@@ -51,6 +52,10 @@ export default function update(state = initialAppState(), action: AppAction) {
 
     case "set_selected_panel": {
       return { ...state, selectedPanel: action.panel };
+    }
+
+    case "set_selected_primary_panel": {
+      return { ...state, selectedPrimaryPanel: action.panel };
     }
 
     case "set_initialized_panels": {
@@ -99,6 +104,7 @@ export const getTheme = (state: UIState) => state.app.theme;
 export const getToolboxExpanded = (state: UIState) => state.app.toolboxExpanded;
 export const isSplitConsoleOpen = (state: UIState) => state.app.splitConsoleOpen;
 export const getSelectedPanel = (state: UIState) => state.app.selectedPanel;
+export const getSelectedPrimaryPanel = (state: UIState) => state.app.selectedPrimaryPanel;
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
 export const getLoading = (state: UIState) => state.app.loading;
 export const getUploading = (state: UIState) => state.app.uploading;
