@@ -30,8 +30,8 @@ const ANGLE_TAKING_FUNCTIONS = [
   "skewY",
   "hue-rotate",
 ];
-// All cubic-bezier CSS timing-function names.
-const BEZIER_KEYWORDS = ["linear", "ease-in-out", "ease-in", "ease-out", "ease"];
+// All CSS timing-function values.
+const TIMING_FUNCTION_VALUES = ["linear", "ease-in-out", "ease-in", "ease-out", "ease"];
 // Functions that accept a color argument.
 const COLOR_TAKING_FUNCTIONS = [
   "linear-gradient",
@@ -49,6 +49,11 @@ const BASIC_SHAPE_FUNCTIONS = ["polygon", "circle", "ellipse", "inset"];
 
 const BACKDROP_FILTER_ENABLED = Services.prefs.getBoolPref("layout.css.backdrop-filter.enabled");
 const HTML_NS = "http://www.w3.org/1999/xhtml";
+
+const ANGLE = "angle";
+const FLEX = "flex";
+const GRID = "grid";
+const TIMING_FUNCTION = "timing-function";
 
 /**
  * This module is used to process CSS text declarations and output DOM fragments (to be
@@ -103,7 +108,7 @@ OutputParser.prototype = {
   parseCssProperty: function (name, value, options = {}) {
     options = this._mergeOptions(options);
 
-    options.expectCubicBezier = this.supportsType(name, "timing-function");
+    options.expectTimingFunction = this.supportsType(name, "timing-function");
     options.expectDisplay = name === "display";
     options.expectFilter =
       name === "filter" || (BACKDROP_FILTER_ENABLED && name === "backdrop-filter");
@@ -386,8 +391,11 @@ OutputParser.prototype = {
               // to DOM accordingly.
               const functionText = functionName + functionData.join("") + ")";
 
-              if (options.expectCubicBezier && token.text === "cubic-bezier") {
-                this._appendCubicBezier(functionText, options);
+              if (options.expectTimingFunction && token.text === "cubic-bezier") {
+                this.parsed.push({
+                  type: TIMING_FUNCTION,
+                  value: functionText,
+                });
               } else if (colorOK() && colorUtils.isValidCSSColor(functionText, this.cssColor4)) {
                 this._appendColor(functionText, options);
               } else if (options.expectShape && BASIC_SHAPE_FUNCTIONS.includes(token.text)) {
@@ -401,16 +409,25 @@ OutputParser.prototype = {
         }
 
         case "ident":
-          if (options.expectCubicBezier && BEZIER_KEYWORDS.includes(token.text)) {
-            this._appendCubicBezier(token.text, options);
+          if (options.expectTimingFunction && TIMING_FUNCTION_VALUES.includes(token.text)) {
+            this.parsed.push({
+              type: TIMING_FUNCTION,
+              value: token.text,
+            });
           } else if (this._isDisplayFlex(text, token, options)) {
-            this._appendHighlighterToggle(token.text, options.flexClass);
+            this.parsed.push({
+              type: FLEX,
+              value: token.text,
+            });
           } else if (this._isDisplayGrid(text, token, options)) {
-            this._appendHighlighterToggle(token.text, options.gridClass);
+            this.parsed.push({
+              type: GRID,
+              value: token.text,
+            });
           } else if (colorOK() && colorUtils.isValidCSSColor(token.text, this.cssColor4)) {
             this._appendColor(token.text, options);
           } else if (angleOK(token.text)) {
-            this._appendAngle(token.text, options);
+            this._appendAngle(token.text);
           } else if (options.expectFont && !previousWasBang) {
             // We don't append the identifier if the previous token
             // was equal to '!', since in that case we expect the
@@ -439,7 +456,7 @@ OutputParser.prototype = {
         case "dimension":
           const value = text.substring(token.startOffset, token.endOffset);
           if (angleOK(value)) {
-            this._appendAngle(value, options);
+            this._appendAngle(value);
           } else {
             this._appendText(value);
           }
@@ -561,56 +578,6 @@ OutputParser.prototype = {
    */
   _isDisplayGrid: function (text, token, options) {
     return options.expectDisplay && (token.text === "grid" || token.text === "inline-grid");
-  },
-
-  /**
-   * Append a cubic-bezier timing function value to the output
-   *
-   * @param {String} bezier
-   *        The cubic-bezier timing function
-   * @param {Object} options
-   *        Options object. For valid options and default values see
-   *        _mergeOptions()
-   */
-  _appendCubicBezier: function (bezier, options) {
-    const container = this._createNode("span", {
-      "data-bezier": bezier,
-    });
-
-    const value = this._createNode(
-      "span",
-      {
-        class: options.bezierClass,
-      },
-      bezier
-    );
-
-    container.appendChild(value);
-    this.parsed.push(container);
-  },
-
-  /**
-   * Append a Flexbox|Grid highlighter toggle icon next to the value in a
-   * "display: [inline-]flex" or "display: [inline-]grid" declaration.
-   *
-   * @param {String} text
-   *        The text value to append
-   * @param {String} className
-   *        The class name for the toggle span
-   */
-  _appendHighlighterToggle: function (text, className) {
-    const container = this._createNode("span", {});
-
-    const toggle = this._createNode("span", {
-      class: className,
-    });
-
-    const value = this._createNode("span", {});
-    value.textContent = text;
-
-    container.appendChild(toggle);
-    container.appendChild(value);
-    this.parsed.push(container);
   },
 
   /**
@@ -1253,29 +1220,18 @@ OutputParser.prototype = {
   },
 
   /**
-   * Append a angle value to the output
+   * Append an angle value to the output.
    *
    * @param {String} angle
-   *        angle to append
-   * @param {Object} options
-   *        Options object. For valid options and default values see
-   *        _mergeOptions()
+   *        Angle to append.
    */
   _appendAngle: function (angle, options) {
-    const container = this._createNode("span", {
-      "data-angle": angle,
+    const angleObj = new angleUtils.CssAngle(angle);
+    this.parsed.push({
+      type: ANGLE,
+      angleObj,
+      value: angleObj.toString(),
     });
-
-    const value = this._createNode(
-      "span",
-      {
-        class: options.angleClass,
-      },
-      angle
-    );
-
-    container.appendChild(value);
-    this.parsed.push(container);
   },
 
   /**
@@ -1592,10 +1548,6 @@ OutputParser.prototype = {
    *         Valid options are:
    *           - defaultColorType: true // Convert colors to the default type
    *                                    // selected in the options panel.
-   *           - angleClass: ""         // The class to use for the angle value
-   *                                    // that follows the swatch.
-   *           - bezierClass: ""        // The class to use for the bezier value
-   *                                    // that follows the swatch.
    *           - colorClass: ""         // The class to use for the color value
    *                                    // that follows the swatch.
    *           - filterSwatch: false    // A special case for parsing a
@@ -1603,8 +1555,6 @@ OutputParser.prototype = {
    *                                    // parser to skip the call to
    *                                    // _wrapFilter.  Used only for
    *                                    // previewing with the filter swatch.
-   *           - flexClass: ""          // The class to use for the flex icon.
-   *           - gridClass: ""          // The class to use for the grid icon.
    *           - shapeClass: ""         // The class to use for the shape value
    *                                    // that follows the swatch.
    *           - supportsColor: false   // Does the CSS property support colors?
@@ -1626,12 +1576,8 @@ OutputParser.prototype = {
   _mergeOptions: function (overrides) {
     const defaults = {
       defaultColorType: true,
-      angleClass: "",
-      bezierClass: "",
       colorClass: "",
       filterSwatch: false,
-      flexClass: "",
-      gridClass: "",
       shapeClass: "",
       supportsColor: false,
       urlClass: "",
