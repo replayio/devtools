@@ -55,6 +55,7 @@ const COLOR = "color";
 const FLEX = "flex";
 const GRID = "grid";
 const TIMING_FUNCTION = "timing-function";
+const URI = "url";
 
 /**
  * This module is used to process CSS text declarations and output DOM fragments (to be
@@ -1335,52 +1336,44 @@ OutputParser.prototype = {
    *         _mergeOptions().
    */
   _appendURL: function (match, url, options) {
-    if (options.urlClass) {
-      // Sanitize the URL.  Note that if we modify the URL, we just
-      // leave the termination characters.  This isn't strictly
-      // "as-authored", but it makes a bit more sense.
-      match = this._sanitizeURL(match);
-      // This regexp matches a URL token.  It puts the "url(", any
-      // leading whitespace, and any opening quote into |leader|; the
-      // URL text itself into |body|, and any trailing quote, trailing
-      // whitespace, and the ")" into |trailer|.  We considered adding
-      // functionality for this to CSSLexer, in some way, but this
-      // seemed simpler on the whole.
-      const urlParts = /^(url\([ \t\r\n\f]*(["']?))(.*?)(\2[ \t\r\n\f]*\))$/i.exec(match);
+    // Sanitize the URL.  Note that if we modify the URL, we just
+    // leave the termination characters.  This isn't strictly
+    // "as-authored", but it makes a bit more sense.
+    match = this._sanitizeURL(match);
+    // This regexp matches a URL token.  It puts the "url(", any
+    // leading whitespace, and any opening quote into |leader|; the
+    // URL text itself into |body|, and any trailing quote, trailing
+    // whitespace, and the ")" into |trailer|.  We considered adding
+    // functionality for this to CSSLexer, in some way, but this
+    // seemed simpler on the whole.
+    const urlParts = /^(url\([ \t\r\n\f]*(["']?))(.*?)(\2[ \t\r\n\f]*\))$/i.exec(match);
 
-      // Bail out if that didn't match anything.
-      if (!urlParts) {
-        this._appendText(match);
-        return;
-      }
-
-      const [, leader, , body, trailer] = urlParts;
-
-      this._appendText(leader);
-
-      let href = url;
-      if (options.baseURI) {
-        try {
-          href = new URL(url, options.baseURI).href;
-        } catch (e) {
-          // Ignore.
-        }
-      }
-
-      this._appendNode(
-        "a",
-        {
-          target: "_blank",
-          class: options.urlClass,
-          href: href,
-        },
-        body
-      );
-
-      this._appendText(trailer);
-    } else {
+    // Bail out if that didn't match anything.
+    if (!urlParts) {
       this._appendText(match);
+      return;
     }
+
+    const [, leader, , body, trailer] = urlParts;
+
+    this._appendText(leader);
+
+    let href = url;
+    if (options.baseURI) {
+      try {
+        href = new URL(url, options.baseURI).href;
+      } catch (e) {
+        // Ignore.
+      }
+    }
+
+    this.parsed.push({
+      type: URI,
+      href,
+      value: body,
+    });
+
+    this._appendText(trailer);
   },
 
   /**
@@ -1539,7 +1532,6 @@ OutputParser.prototype = {
    *           - shapeClass: ""         // The class to use for the shape value
    *                                    // that follows the swatch.
    *           - supportsColor: false   // Does the CSS property support colors?
-   *           - urlClass: ""           // The class to be used for url() links.
    *           - fontFamilyClass: ""    // The class to be used for font families.
    *           - baseURI: undefined     // A string used to resolve
    *                                    // relative links.
@@ -1560,7 +1552,6 @@ OutputParser.prototype = {
       filterSwatch: false,
       shapeClass: "",
       supportsColor: false,
-      urlClass: "",
       fontFamilyClass: "",
       baseURI: undefined,
       isVariableInUse: null,
