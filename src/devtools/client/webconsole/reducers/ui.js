@@ -25,7 +25,6 @@ const UiState = overrides =>
       {
         persistLogs: false,
         timestampsVisible: true,
-        frontInSidebar: null,
         reverseSearchInputVisible: false,
         reverseSearchInitialValue: "",
         editor: false,
@@ -45,38 +44,12 @@ function ui(state = UiState(), action) {
       return { ...state, persistLogs: !state.persistLogs };
     case TIMESTAMPS_TOGGLE:
       return { ...state, timestampsVisible: !state.timestampsVisible };
-    case SIDEBAR_CLOSE:
-      return {
-        ...state,
-        frontInSidebar: null,
-      };
     case MESSAGES_CLEAR:
-      return { ...state, frontInSidebar: null };
-    case REVERSE_SEARCH_INPUT_TOGGLE:
-      return {
-        ...state,
-        reverseSearchInputVisible: !state.reverseSearchInputVisible,
-        reverseSearchInitialValue: action.initialValue || "",
-      };
+      return { ...state };
     case FILTERBAR_DISPLAY_MODE_SET:
       return {
         ...state,
         filterBarDisplayMode: action.displayMode,
-      };
-    case EDITOR_TOGGLE:
-      return {
-        ...state,
-        editor: !state.editor,
-      };
-    case EDITOR_ONBOARDING_DISMISS:
-      return {
-        ...state,
-        showEditorOnboarding: false,
-      };
-    case EDITOR_SET_WIDTH:
-      return {
-        ...state,
-        editorWidth: action.width,
       };
     case SET_ZOOMED_REGION:
       return {

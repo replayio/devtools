@@ -28,7 +28,6 @@ pref("devtools.debugger.component-visible", false);
 pref("devtools.debugger.workers-visible", false);
 pref("devtools.debugger.breakpoints-visible", true);
 pref("devtools.debugger.event-listeners-visible", false);
-pref("devtools.debugger.dom-mutation-breakpoints-visible", false);
 pref("devtools.debugger.start-panel-collapsed", false);
 pref("devtools.debugger.end-panel-collapsed", false);
 pref("devtools.debugger.start-panel-size", 300);
@@ -60,7 +59,6 @@ pref("devtools.debugger.features.autocomplete-expressions", false);
 pref("devtools.debugger.features.map-expression-bindings", true);
 pref("devtools.debugger.features.map-await-expression", true);
 pref("devtools.debugger.features.original-blackbox", true);
-pref("devtools.debugger.features.dom-mutation-breakpoints", true);
 pref("devtools.debugger.features.log-points", true);
 pref("devtools.debugger.features.overlay-step-buttons", true);
 pref("devtools.debugger.features.watchpoints", true);
@@ -117,7 +115,6 @@ export const prefs = new PrefsHelper("devtools", {
   workersVisible: ["Bool", "debugger.workers-visible"],
   breakpointsVisible: ["Bool", "debugger.breakpoints-visible"],
   eventListenersVisible: ["Bool", "debugger.event-listeners-visible"],
-  domMutationBreakpointsVisible: ["Bool", "debugger.dom-mutation-breakpoints-visible"],
   startPanelCollapsed: ["Bool", "debugger.start-panel-collapsed"],
   endPanelCollapsed: ["Bool", "debugger.end-panel-collapsed"],
   startPanelSize: ["Int", "debugger.start-panel-size"],
@@ -157,7 +154,6 @@ export const features = new PrefsHelper("devtools.debugger.features", {
   mapAwaitExpression: ["Bool", "map-await-expression"],
   componentPane: ["Bool", "component-pane"],
   originalBlackbox: ["Bool", "original-blackbox"],
-  domMutationBreakpoints: ["Bool", "dom-mutation-breakpoints"],
   logPoints: ["Bool", "log-points"],
   commandClick: ["Bool", "command-click"],
   showOverlay: ["Bool", "overlay"],
