@@ -51,6 +51,7 @@ const BACKDROP_FILTER_ENABLED = Services.prefs.getBoolPref("layout.css.backdrop-
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 const ANGLE = "angle";
+const COLOR = "color";
 const FLEX = "flex";
 const GRID = "grid";
 const TIMING_FUNCTION = "timing-function";
@@ -1249,15 +1250,6 @@ OutputParser.prototype = {
   },
 
   /**
-   * Tests if a given colorObject output by CssColor is valid for parsing.
-   * Valid means it's really a color, not any of the CssColor SPECIAL_VALUES
-   * except transparent
-   */
-  _isValidColor: function (colorObj) {
-    return colorObj.valid && (!colorObj.specialValue || colorObj.specialValue === "transparent");
-  },
-
-  /**
    * Append a color to the output.
    *
    * @param  {String} color
@@ -1269,11 +1261,9 @@ OutputParser.prototype = {
   _appendColor: function (color, options = {}) {
     const colorObj = new colorUtils.CssColor(color, this.cssColor4);
 
-    if (this._isValidColor(colorObj)) {
-      const container = this._createNode("span", {
-        "data-color": color,
-      });
-
+    // A color is valid if it's really a color and not any of the CssColor SPECIAL_VALUES
+    // except transparent.
+    if (colorObj.valid && (!colorObj.specialValue || colorObj.specialValue === "transparent")) {
       if (!options.defaultColorType) {
         // If we're not being asked to convert the color to the default color type
         // specified by the user, then force the CssColor instance to be set to the type
@@ -1281,19 +1271,12 @@ OutputParser.prototype = {
         // Not having a type means that the default color type will be automatically used.
         colorObj.colorUnit = colorUtils.classifyColor(color);
       }
-      color = colorObj.toString();
-      container.dataset.color = color;
 
-      const value = this._createNode(
-        "span",
-        {
-          class: options.colorClass,
-        },
-        color
-      );
-
-      container.appendChild(value);
-      this.parsed.push(container);
+      this.parsed.push({
+        colorObj,
+        type: COLOR,
+        value: colorObj.toString(),
+      });
     } else {
       this._appendText(color);
     }
@@ -1548,8 +1531,6 @@ OutputParser.prototype = {
    *         Valid options are:
    *           - defaultColorType: true // Convert colors to the default type
    *                                    // selected in the options panel.
-   *           - colorClass: ""         // The class to use for the color value
-   *                                    // that follows the swatch.
    *           - filterSwatch: false    // A special case for parsing a
    *                                    // "filter" property, causing the
    *                                    // parser to skip the call to
@@ -1576,7 +1557,6 @@ OutputParser.prototype = {
   _mergeOptions: function (overrides) {
     const defaults = {
       defaultColorType: true,
-      colorClass: "",
       filterSwatch: false,
       shapeClass: "",
       supportsColor: false,
