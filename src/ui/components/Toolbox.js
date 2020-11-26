@@ -22,30 +22,39 @@ class Toolbox extends React.Component {
   }
 
   selectPanel(panel) {
-    if (
-      this.props.panelCollapsed ||
-      (this.state.debuggerMode == panel && !this.props.panelCollapsed)
-    ) {
-      this.props.togglePaneCollapse();
+    const {
+      selectedPrimaryPanel,
+      setSelectedPrimaryPanel,
+      togglePaneCollapse,
+      panelCollapsed,
+    } = this.props;
+
+    if (panelCollapsed || (selectedPrimaryPanel == panel && !panelCollapsed)) {
+      togglePaneCollapse();
     }
 
-    if (this.state.debuggerMode != panel) {
-      this.setState({ debuggerMode: panel });
+    if (selectedPrimaryPanel != panel) {
+      setSelectedPrimaryPanel(panel);
     }
   }
 
   renderToolbar() {
-    const { debuggerMode } = this.state;
+    const { selectedPrimaryPanel } = this.props;
+
     return (
       <div id="toolbox-toolbar">
         <div
-          className={classnames("toolbar-panel-button", { active: debuggerMode == "explorer" })}
+          className={classnames("toolbar-panel-button", {
+            active: selectedPrimaryPanel == "explorer",
+          })}
           onClick={() => this.selectPanel("explorer")}
         >
           <div className="img explorer-panel toolbar-panel-icon"></div>
         </div>
         <div
-          className={classnames("toolbar-panel-button", { active: debuggerMode == "debug" })}
+          className={classnames("toolbar-panel-button", {
+            active: selectedPrimaryPanel == "debug",
+          })}
           onClick={() => this.selectPanel("debug")}
         >
           <div className="img debugger-panel toolbar-panel-icon"></div>
@@ -55,14 +64,12 @@ class Toolbox extends React.Component {
   }
 
   render() {
-    const { debuggerMode } = this.state;
-
     return (
       <div id="toolbox">
         {this.renderToolbar()}
         <div className="toolbox-top-panels">
           <div className="toolbox-panel" id="toolbox-content-debugger">
-            <DebuggerApp debuggerMode={debuggerMode} />
+            <DebuggerApp />
           </div>
         </div>
       </div>

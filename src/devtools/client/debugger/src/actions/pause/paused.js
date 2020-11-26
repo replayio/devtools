@@ -32,6 +32,10 @@ export function paused({ executionPoint }) {
     const frame = getSelectedFrame(getState());
     if (frame) {
       dispatch(selectLocation(cx, frame.location, { remap: true }));
+
+      // If the user is paused on a frame, make sure to open up the
+      // debug primary panel.
+      dispatch({ type: "set_selected_primary_panel", panel: "debug" });
     }
 
     const promises = [];

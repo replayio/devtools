@@ -19,7 +19,7 @@ import {
   getQuickOpenEnabled,
   getOrientation,
 } from "../selectors";
-import { getSelectedPanel } from "ui/reducers/app.ts";
+import { getSelectedPanel, getSelectedPrimaryPanel } from "ui/reducers/app.ts";
 
 import { KeyShortcuts } from "devtools-modules";
 import Services from "devtools-services";
@@ -114,7 +114,6 @@ class Debugger extends Component {
     // Only refresh CodeMirror when moving from a non-debugger panel to the debugger panel. Otherwise,
     // the gutter will keep errantly resizing between refreshes.
     if (selectedPanel == "debugger" && prevProps.selectedPanel != selectedPanel) {
-      console.log(actions);
       refreshCodeMirror();
     }
   }
@@ -221,7 +220,7 @@ class Debugger extends Component {
   }
 
   renderLayout = () => {
-    const { startPanelCollapsed, debuggerMode } = this.props;
+    const { startPanelCollapsed, selectedPrimaryPanel } = this.props;
     const horizontal = this.isHorizontal();
 
     return (
@@ -237,7 +236,7 @@ class Debugger extends Component {
         startPanelCollapsed={startPanelCollapsed}
         startPanel={
           <div className="panes" style={{ width: "100%" }}>
-            {debuggerMode == "explorer" ? (
+            {selectedPrimaryPanel == "explorer" ? (
               <PrimaryPanes horizontal={horizontal} />
             ) : (
               <SecondaryPanes horizontal={horizontal} />
@@ -296,6 +295,7 @@ const mapStateToProps = state => ({
   quickOpenEnabled: getQuickOpenEnabled(state),
   orientation: getOrientation(state),
   selectedPanel: getSelectedPanel(state),
+  selectedPrimaryPanel: getSelectedPrimaryPanel(state),
 });
 
 export default connect(mapStateToProps, {
