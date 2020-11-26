@@ -6,6 +6,7 @@
 
 const Services = require("Services");
 const ElementStyle = require("devtools/client/inspector/rules/models/element-style");
+const { OutputParser } = require("devtools/client/shared/output-parser");
 const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 const EventEmitter = require("devtools/shared/event-emitter");
@@ -20,21 +21,13 @@ const {
   updateClasses,
   updateClassPanelExpanded,
 } = require("devtools/client/inspector/rules/actions/class-list");
+const { togglePseudoClass } = require("devtools/client/inspector/rules/actions/pseudo-classes");
 const {
-  disableAllPseudoClasses,
-  setPseudoClassLocks,
-  togglePseudoClass,
-} = require("devtools/client/inspector/rules/actions/pseudo-classes");
-const {
-  updateAddRuleEnabled,
   updateHighlightedSelector,
   updateRules,
 } = require("devtools/client/inspector/rules/actions/rules");
 
 const RulesApp = createFactory(require("devtools/client/inspector/rules/components/RulesApp"));
-
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
 const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
 
@@ -48,6 +41,7 @@ class RulesView {
     this.toolbox = inspector.toolbox;
     this.isNewRulesView = true;
 
+    this.outputParser = new OutputParser(this.doc, this.cssProperties);
     this.showUserAgentStyles = Services.prefs.getBoolPref(PREF_UA_STYLES);
 
     this.onAddClass = this.onAddClass.bind(this);
@@ -147,6 +141,7 @@ class RulesView {
     this.cssProperties = null;
     this.doc = null;
     this.inspector = null;
+    this.outputParser = null;
     this.pageStyle = null;
     this.selection = null;
     this.showUserAgentStyles = null;

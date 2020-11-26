@@ -40,15 +40,15 @@ const COLOR_TAKING_FUNCTIONS = [
   "drop-shadow",
 ];
 
-const ANGLE = "angle";
-const COLOR = "color";
-const CUSTOM_PROPERTY = "custom-property";
-const FLEX = "flex";
-const FONT_FAMILY = "font-family";
-const GRID = "grid";
-const TIMING_FUNCTION = "timing-function";
-const URI = "url";
-const VARIABLE_FUNCTION = "variable-function";
+const ANGLE = (exports.ANGLE = "angle");
+const COLOR = (exports.COLOR = "color");
+const CUSTOM_PROPERTY = (exports.CUSTOM_PROPERTY = "custom-property");
+const FLEX = (exports.FLEX = "flex");
+const FONT_FAMILY = (exports.FONT_FAMILY = "font-family");
+const GRID = (exports.GRID = "grid");
+const TIMING_FUNCTION = (exports.TIMING_FUNCTION = "timing-function");
+const URI = (exports.URI = "url");
+const VARIABLE_FUNCTION = (exports.VARIABLE_FUNCTION = "variable-function");
 
 /**
  * This module is used to process CSS text declarations and output DOM fragments (to be
@@ -111,11 +111,15 @@ OutputParser.prototype = {
       // A special case for parsing a "filter" property, causing the parser to skip the
       // wrapping the "filter" property. Used only for previewing with the filter swatch.
       filterSwatch: false,
-      expectTimingFunction: this.supportsType(name, "timing-function"),
+      // expectTimingFunction: this.supportsType(name, "timing-function"),
       expectDisplay: name === "display",
-      expectFilter: name === "filter" || name === "backdrop-filter",
-      expectShape: name === "clip-path" || name === "shape-outside",
+      // expectFilter: name === "filter" || name === "backdrop-filter",
+      // expectShape: name === "clip-path" || name === "shape-outside",
       expectFont: name === "font-family",
+      supportsColor:
+        this.supportsType(name, "color") ||
+        this.supportsType(name, "gradient") ||
+        (name.startsWith("--") && colorUtils.isValidCSSColor(value)),
     };
 
     // The filter property is special in that we want to show the
@@ -182,9 +186,9 @@ OutputParser.prototype = {
             break;
           }
         }
-      } else if (token.tokenType === "function" && token.text === "var") {
-        sawVariable = true;
-        functionData.push(this._parseVariable(token, text, tokenStream));
+        // } else if (token.tokenType === "function" && token.text === "var") {
+        //   sawVariable = true;
+        //   functionData.push(this._parseVariable(token, text, tokenStream));
       } else if (token.tokenType === "function") {
         ++depth;
       }
@@ -287,7 +291,7 @@ OutputParser.prototype = {
     let fontFamilyNameParts = [];
     let previousWasBang = false;
 
-    const colorOK = function () {
+    const colorOK = () => {
       return (
         this.options.supportsColor ||
         (this.options.expectFilter && parenDepth === 1 && outerMostFunctionTakesColor)
@@ -331,8 +335,8 @@ OutputParser.prototype = {
               outerMostFunctionTakesColor = COLOR_TAKING_FUNCTIONS.includes(token.text);
             }
             ++parenDepth;
-          } else if (token.text === "var") {
-            this.parsed.push(this._parseVariable(token, text, tokenStream));
+            // } else if (token.text === "var") {
+            //   this.parsed.push(this._parseVariable(token, text, tokenStream));
           } else {
             const { functionData, sawVariable } = this._parseMatchingParens(text, tokenStream);
 
@@ -388,8 +392,8 @@ OutputParser.prototype = {
             });
           } else if (colorOK() && colorUtils.isValidCSSColor(token.text, this.cssColor4)) {
             this._appendColor(token.text);
-          } else if (angleOK(token.text)) {
-            this._appendAngle(token.text);
+            // } else if (angleOK(token.text)) {
+            //   this._appendAngle(token.text);
           } else if (this.options.expectFont && !previousWasBang) {
             // We don't append the identifier if the previous token
             // was equal to '!', since in that case we expect the
@@ -417,11 +421,11 @@ OutputParser.prototype = {
         }
         case "dimension":
           const value = text.substring(token.startOffset, token.endOffset);
-          if (angleOK(value)) {
-            this._appendAngle(value);
-          } else {
-            this._appendText(value);
-          }
+          // if (angleOK(value)) {
+          //   this._appendAngle(value);
+          // } else {
+          this._appendText(value);
+          // }
           break;
         case "url":
         case "bad_url":
@@ -733,4 +737,4 @@ OutputParser.prototype = {
   },
 };
 
-module.exports = OutputParser;
+exports.OutputParser = OutputParser;
