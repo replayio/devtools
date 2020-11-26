@@ -1,6 +1,7 @@
 import { RecordingId, sessionError, SessionId, PointDescription } from "record-replay-protocol";
 
 export type PanelName = "console" | "debugger" | "inspector";
+export type PrimaryPanelName = "explorer" | "debug";
 
 export interface Modal {
   type: string;
@@ -30,6 +31,7 @@ export interface AppState {
   unexpectedError: sessionError | null;
   modal: Modal | null;
   selectedPanel: PanelName;
+  selectedPrimaryPanel: PrimaryPanelName;
   initializedPanels: PanelName[];
   pendingNotification: any;
   analysisPoints: AnalysisPoints;
