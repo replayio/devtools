@@ -53,6 +53,7 @@ const HTML_NS = "http://www.w3.org/1999/xhtml";
 const ANGLE = "angle";
 const COLOR = "color";
 const FLEX = "flex";
+const FONT_FAMILY = "font-family";
 const GRID = "grid";
 const TIMING_FUNCTION = "timing-function";
 const URI = "url";
@@ -338,7 +339,7 @@ OutputParser.prototype = {
       const token = tokenStream.nextToken();
       if (!token) {
         if (options.expectFont && fontFamilyNameParts.length !== 0) {
-          this._appendFontFamily(fontFamilyNameParts.join(""), options);
+          this._appendFontFamily(fontFamilyNameParts.join(""));
         }
         break;
       }
@@ -503,7 +504,7 @@ OutputParser.prototype = {
             options.expectFont &&
             fontFamilyNameParts.length !== 0
           ) {
-            this._appendFontFamily(fontFamilyNameParts.join(""), options);
+            this._appendFontFamily(fontFamilyNameParts.join(""));
             fontFamilyNameParts = [];
           }
         // falls through
@@ -1380,13 +1381,9 @@ OutputParser.prototype = {
    * Append a font family to the output.
    *
    * @param  {String} fontFamily
-   *         Font family to append
-   * @param  {Object} options
-   *         Options object. For valid options and default values see
-   *         _mergeOptions().
+   *         Font family to append.
    */
-  _appendFontFamily: function (fontFamily, options) {
-    let spanContents = fontFamily;
+  _appendFontFamily: function (fontFamily) {
     let quoteChar = null;
     let trailingWhitespace = false;
 
@@ -1396,32 +1393,29 @@ OutputParser.prototype = {
     // such characters are preserved in the actual output, but just
     // not inside the span element.
 
-    if (spanContents[0] === " ") {
+    if (fontFamily[0] === " ") {
       this._appendText(" ");
-      spanContents = spanContents.slice(1);
+      fontFamily = fontFamily.slice(1);
     }
 
-    if (spanContents[spanContents.length - 1] === " ") {
-      spanContents = spanContents.slice(0, -1);
+    if (fontFamily[fontFamily.length - 1] === " ") {
+      fontFamily = fontFamily.slice(0, -1);
       trailingWhitespace = true;
     }
 
-    if (spanContents[0] === "'" || spanContents[0] === '"') {
-      quoteChar = spanContents[0];
+    if (fontFamily[0] === "'" || fontFamily[0] === '"') {
+      quoteChar = fontFamily[0];
     }
 
     if (quoteChar) {
       this._appendText(quoteChar);
-      spanContents = spanContents.slice(1, -1);
+      fontFamily = fontFamily.slice(1, -1);
     }
 
-    this._appendNode(
-      "span",
-      {
-        class: options.fontFamilyClass,
-      },
-      spanContents
-    );
+    this.parsed.push({
+      type: FONT_FAMILY,
+      value: fontFamily,
+    });
 
     if (quoteChar) {
       this._appendText(quoteChar);
@@ -1460,22 +1454,6 @@ OutputParser.prototype = {
     }
 
     return node;
-  },
-
-  /**
-   * Append a node to the output.
-   *
-   * @param  {String} tagName
-   *         Tag type e.g. "div"
-   * @param  {Object} attributes
-   *         e.g. {class: "someClass", style: "cursor:pointer"};
-   * @param  {String} [value]
-   *         If a value is included it will be appended as a text node inside
-   *         the tag. This is useful e.g. for span tags.
-   */
-  _appendNode: function (tagName, attributes, value = "") {
-    const node = this._createNode(tagName, attributes, value);
-    this.parsed.push(node);
   },
 
   /**
@@ -1532,7 +1510,6 @@ OutputParser.prototype = {
    *           - shapeClass: ""         // The class to use for the shape value
    *                                    // that follows the swatch.
    *           - supportsColor: false   // Does the CSS property support colors?
-   *           - fontFamilyClass: ""    // The class to be used for font families.
    *           - baseURI: undefined     // A string used to resolve
    *                                    // relative links.
    *           - isVariableInUse        // A function taking a single
@@ -1552,7 +1529,6 @@ OutputParser.prototype = {
       filterSwatch: false,
       shapeClass: "",
       supportsColor: false,
-      fontFamilyClass: "",
       baseURI: undefined,
       isVariableInUse: null,
       unmatchedVariableClass: null,
