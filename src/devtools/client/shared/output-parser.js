@@ -95,8 +95,7 @@ OutputParser.prototype = {
    * @param  {String} value
    *         CSS Property value
    * @param  {Object} [options]
-   *         Options object. For valid options and default values see
-   *         _mergeOptions().
+   *         Optional options object.
    * @return {Array<Object|String>}
    *         An array containing a mix of objects and plain strings. The object contains
    *         parsed information about the type and value.
@@ -104,22 +103,28 @@ OutputParser.prototype = {
   parseCssProperty: function (name, value, options = {}) {
     this.parsed = [];
 
-    options = this._mergeOptions(options);
-    options.expectTimingFunction = this.supportsType(name, "timing-function");
-    options.expectDisplay = name === "display";
-    options.expectFilter = name === "filter" || name === "backdrop-filter";
-    options.expectShape = name === "clip-path" || name === "shape-outside";
-    options.expectFont = name === "font-family";
-    options.supportsColor =
-      this.supportsType(name, "color") ||
-      this.supportsType(name, "gradient") ||
-      (name.startsWith("--") && colorUtils.isValidCSSColor(value));
+    this.options = {
+      // A string used to resolve relative links.
+      baseURI: null,
+      // Convert colors to the default type selected in the options panel.
+      defaultColorType: true,
+      // A special case for parsing a "filter" property, causing the parser to skip the
+      // wrapping the "filter" property. Used only for previewing with the filter swatch.
+      filterSwatch: false,
+      expectTimingFunction: this.supportsType(name, "timing-function"),
+      expectDisplay: name === "display",
+      expectFilter: name === "filter" || name === "backdrop-filter",
+      expectShape: name === "clip-path" || name === "shape-outside",
+      expectFont: name === "font-family",
+    };
 
     // The filter property is special in that we want to show the
     // swatch even if the value is invalid, because this way the user
     // can easily use the editor to fix it.
-    if (options.expectFilter || this._cssPropertySupportsValue(name, value)) {
-      return this._parse(value, options);
+    if (this.options.expectFilter || this._cssPropertySupportsValue(name, value)) {
+      value = value.trim();
+      const tokenStream = getCSSLexer(value);
+      return this._doParse(value, tokenStream, false);
     }
 
     this._appendText(value);
@@ -138,8 +143,6 @@ OutputParser.prototype = {
    *         The original source text.
    * @param  {CSSLexer} tokenStream
    *         The token stream from which to read.
-   * @param  {Object} options
-   *         The options object in use; @see _mergeOptions.
    * @param  {Boolean} stopAtComma
    *         If true, stop at a comma.
    * @return {Object}
@@ -153,7 +156,7 @@ OutputParser.prototype = {
    *         |sawComma| is true if the stop was due to a comma, or false otherwise.
    *         |sawVariable| is true if a variable was seen while parsing the text.
    */
-  _parseMatchingParens: function (text, tokenStream, options, stopAtComma) {
+  _parseMatchingParens: function (text, tokenStream, stopAtComma = false) {
     let depth = 1;
     const functionData = [];
     const tokens = [];
@@ -181,7 +184,7 @@ OutputParser.prototype = {
         }
       } else if (token.tokenType === "function" && token.text === "var") {
         sawVariable = true;
-        functionData.push(this._parseVariable(token, text, tokenStream, options));
+        functionData.push(this._parseVariable(token, text, tokenStream));
       } else if (token.tokenType === "function") {
         ++depth;
       }
@@ -209,12 +212,10 @@ OutputParser.prototype = {
    *         The original input text.
    * @param  {CSSLexer} tokenStream
    *         The token stream from which to read.
-   * @param  {Object} options
-   *         The options object in use; @see _mergeOptions.
    * @return {Object}
    *         An object containing the parsed values within the var() function.
    */
-  _parseVariable: function (initialToken, text, tokenStream, options) {
+  _parseVariable: function (initialToken, text, tokenStream) {
     const result = {
       type: VARIABLE_FUNCTION,
       // Arguments within the var() function will be parsed and appended to `values`.
@@ -228,7 +229,7 @@ OutputParser.prototype = {
     result.values.push(text.substring(initialToken.startOffset, initialToken.endOffset));
 
     // Parse the first argument within the parens of var().
-    const { functionData, sawComma } = this._parseMatchingParens(text, tokenStream, options, true);
+    const { functionData, sawComma } = this._parseMatchingParens(text, tokenStream, true);
     const firstArgument = functionData[0];
 
     if (firstArgument.startsWith("--")) {
@@ -251,11 +252,12 @@ OutputParser.prototype = {
       // for filter. The remaining text could be CSS property values, custom properties
       // or nested var() functions. We send the remaining text through the main parser
       // `_doParse`.
-      const subOptions = Object.assign({}, options);
-      subOptions.expectFilter = false;
+      const savedExpectFilter = this.options.expectFilter;
       const saveParsed = this.parsed;
+      this.options.expectFilter = false;
       this.parsed = [];
-      result.values.push(...this._doParse(text, subOptions, tokenStream, true));
+      result.values.push(...this._doParse(text, tokenStream, true));
+      this.options.expectFilter = savedExpectFilter;
       this.parsed = saveParsed;
     }
 
@@ -270,8 +272,6 @@ OutputParser.prototype = {
    *
    * @param  {String} text
    *         The original input text.
-   * @param  {Object} options
-   *         The options object in use; @see _mergeOptions.
    * @param  {CSSLexer} tokenStream
    *         The token stream from which to read
    * @param  {Boolean} stopAtCloseParen
@@ -281,7 +281,7 @@ OutputParser.prototype = {
    *         parsed information about the type and value.
    */
   // eslint-disable-next-line complexity
-  _doParse: function (text, options, tokenStream, stopAtCloseParen) {
+  _doParse: function (text, tokenStream, stopAtCloseParen) {
     let parenDepth = stopAtCloseParen ? 1 : 0;
     let outerMostFunctionTakesColor = false;
     let fontFamilyNameParts = [];
@@ -289,8 +289,8 @@ OutputParser.prototype = {
 
     const colorOK = function () {
       return (
-        options.supportsColor ||
-        (options.expectFilter && parenDepth === 1 && outerMostFunctionTakesColor)
+        this.options.supportsColor ||
+        (this.options.expectFilter && parenDepth === 1 && outerMostFunctionTakesColor)
       );
     };
 
@@ -304,7 +304,7 @@ OutputParser.prototype = {
     while (!done) {
       const token = tokenStream.nextToken();
       if (!token) {
-        if (options.expectFont && fontFamilyNameParts.length !== 0) {
+        if (this.options.expectFont && fontFamilyNameParts.length !== 0) {
           this._appendFontFamily(fontFamilyNameParts.join(""));
         }
         break;
@@ -332,13 +332,9 @@ OutputParser.prototype = {
             }
             ++parenDepth;
           } else if (token.text === "var") {
-            this.parsed.push(this._parseVariable(token, text, tokenStream, options));
+            this.parsed.push(this._parseVariable(token, text, tokenStream));
           } else {
-            const { functionData, sawVariable } = this._parseMatchingParens(
-              text,
-              tokenStream,
-              options
-            );
+            const { functionData, sawVariable } = this._parseMatchingParens(text, tokenStream);
 
             const functionName = text.substring(token.startOffset, token.endOffset);
 
@@ -359,13 +355,13 @@ OutputParser.prototype = {
               // to DOM accordingly.
               const functionText = functionName + functionData.join("") + ")";
 
-              if (options.expectTimingFunction && token.text === "cubic-bezier") {
+              if (this.options.expectTimingFunction && token.text === "cubic-bezier") {
                 this.parsed.push({
                   type: TIMING_FUNCTION,
                   value: functionText,
                 });
               } else if (colorOK() && colorUtils.isValidCSSColor(functionText, this.cssColor4)) {
-                this._appendColor(functionText, options);
+                this._appendColor(functionText);
               } else {
                 this._appendText(functionText);
               }
@@ -375,26 +371,26 @@ OutputParser.prototype = {
         }
 
         case "ident":
-          if (options.expectTimingFunction && TIMING_FUNCTION_VALUES.includes(token.text)) {
+          if (this.options.expectTimingFunction && TIMING_FUNCTION_VALUES.includes(token.text)) {
             this.parsed.push({
               type: TIMING_FUNCTION,
               value: token.text,
             });
-          } else if (this._isDisplayFlex(text, token, options)) {
+          } else if (this._isDisplayFlex(token)) {
             this.parsed.push({
               type: FLEX,
               value: token.text,
             });
-          } else if (this._isDisplayGrid(text, token, options)) {
+          } else if (this._isDisplayGrid(token)) {
             this.parsed.push({
               type: GRID,
               value: token.text,
             });
           } else if (colorOK() && colorUtils.isValidCSSColor(token.text, this.cssColor4)) {
-            this._appendColor(token.text, options);
+            this._appendColor(token.text);
           } else if (angleOK(token.text)) {
             this._appendAngle(token.text);
-          } else if (options.expectFont && !previousWasBang) {
+          } else if (this.options.expectFont && !previousWasBang) {
             // We don't append the identifier if the previous token
             // was equal to '!', since in that case we expect the
             // identifier to be equal to 'important'.
@@ -413,7 +409,7 @@ OutputParser.prototype = {
               // color is changed to something like rgb(...).
               this._appendText(" ");
             }
-            this._appendColor(original, options);
+            this._appendColor(original);
           } else {
             this._appendText(original);
           }
@@ -429,11 +425,11 @@ OutputParser.prototype = {
           break;
         case "url":
         case "bad_url":
-          this._appendURL(text.substring(token.startOffset, token.endOffset), token.text, options);
+          this._appendURL(text.substring(token.startOffset, token.endOffset), token.text);
           break;
 
         case "string":
-          if (options.expectFont) {
+          if (this.options.expectFont) {
             fontFamilyNameParts.push(text.substring(token.startOffset, token.endOffset));
           } else {
             this._appendText(text.substring(token.startOffset, token.endOffset));
@@ -441,7 +437,7 @@ OutputParser.prototype = {
           break;
 
         case "whitespace":
-          if (options.expectFont) {
+          if (this.options.expectFont) {
             fontFamilyNameParts.push(" ");
           } else {
             this._appendText(text.substring(token.startOffset, token.endOffset));
@@ -464,7 +460,7 @@ OutputParser.prototype = {
             }
           } else if (
             (token.text === "," || token.text === "!") &&
-            options.expectFont &&
+            this.options.expectFont &&
             fontFamilyNameParts.length !== 0
           ) {
             this._appendFontFamily(fontFamilyNameParts.join(""));
@@ -492,7 +488,7 @@ OutputParser.prototype = {
 
     let result = this.parsed;
 
-    // if (options.expectFilter && !options.filterSwatch) {
+    // if (this.options.expectFilter && !this.options.filterSwatch) {
     //   result = [{ type: FILTER, values: result }];
     // }
 
@@ -500,49 +496,23 @@ OutputParser.prototype = {
   },
 
   /**
-   * Parse a string.
-   *
-   * @param  {String} text
-   *         Text to parse.
-   * @param  {Object} [options]
-   *         Options object. For valid options and default values see
-   *         _mergeOptions().
-   * @return {Array<Object|String>}
-   *         An array containing a mix of objects and plain strings. The object contains
-   *         parsed information about the type and value.
-   */
-  _parse: function (text, options = {}) {
-    text = text.trim();
-    const tokenStream = getCSSLexer(text);
-    return this._doParse(text, options, tokenStream, false);
-  },
-
-  /**
    * Returns true if it's a "display: [inline-]flex" token.
    *
-   * @param  {String} text
-   *         The parsed text.
    * @param  {Object} token
    *         The parsed token.
-   * @param  {Object} options
-   *         The options given to _parse.
    */
-  _isDisplayFlex: function (text, token, options) {
-    return options.expectDisplay && (token.text === "flex" || token.text === "inline-flex");
+  _isDisplayFlex: function (token) {
+    return this.options.expectDisplay && (token.text === "flex" || token.text === "inline-flex");
   },
 
   /**
    * Returns true if it's a "display: [inline-]grid" token.
    *
-   * @param  {String} text
-   *         The parsed text.
    * @param  {Object} token
    *         The parsed token.
-   * @param  {Object} options
-   *         The options given to _parse.
    */
-  _isDisplayGrid: function (text, token, options) {
-    return options.expectDisplay && (token.text === "grid" || token.text === "inline-grid");
+  _isDisplayGrid: function (token) {
+    return this.options.expectDisplay && (token.text === "grid" || token.text === "inline-grid");
   },
 
   /**
@@ -551,7 +521,7 @@ OutputParser.prototype = {
    * @param {String} angle
    *        Angle to append.
    */
-  _appendAngle: function (angle, options) {
+  _appendAngle: function (angle) {
     const angleObj = new angleUtils.CssAngle(angle);
     this.parsed.push({
       type: ANGLE,
@@ -579,17 +549,14 @@ OutputParser.prototype = {
    *
    * @param  {String} color
    *         Color to append
-   * @param  {Object} [options]
-   *         Options object. For valid options and default values see
-   *         _mergeOptions().
    */
-  _appendColor: function (color, options = {}) {
+  _appendColor: function (color) {
     const colorObj = new colorUtils.CssColor(color, this.cssColor4);
 
     // A color is valid if it's really a color and not any of the CssColor SPECIAL_VALUES
     // except transparent.
     if (colorObj.valid && (!colorObj.specialValue || colorObj.specialValue === "transparent")) {
-      if (!options.defaultColorType) {
+      if (!this.options.defaultColorType) {
         // If we're not being asked to convert the color to the default color type
         // specified by the user, then force the CssColor instance to be set to the type
         // of the current color.
@@ -628,11 +595,8 @@ OutputParser.prototype = {
    *         Complete match that may include "url(xxx)"
    * @param  {String} url
    *         Actual URL
-   * @param  {Object} [options]
-   *         Options object. For valid options and default values see
-   *         _mergeOptions().
    */
-  _appendURL: function (match, url, options) {
+  _appendURL: function (match, url) {
     // Sanitize the URL.  Note that if we modify the URL, we just
     // leave the termination characters.  This isn't strictly
     // "as-authored", but it makes a bit more sense.
@@ -656,9 +620,9 @@ OutputParser.prototype = {
     this._appendText(leader);
 
     let href = url;
-    if (options.baseURI) {
+    if (this.options.baseURI) {
       try {
-        href = new URL(url, options.baseURI).href;
+        href = new URL(url, this.options.baseURI).href;
       } catch (e) {
         // Ignore.
       }
@@ -766,40 +730,6 @@ OutputParser.prototype = {
     } else {
       this.parsed.push(text);
     }
-  },
-
-  /**
-   * Merges options objects. Default values are set here.
-   *
-   * @param  {Object} overrides
-   *         The option values to override e.g. _mergeOptions({colors: false})
-   *
-   *         Valid options are:
-   *           - defaultColorType: true // Convert colors to the default type
-   *                                    // selected in the options panel.
-   *           - filterSwatch: false    // A special case for parsing a
-   *                                    // "filter" property, causing the
-   *                                    // parser to skip the call to
-   *                                    // _wrapFilter.  Used only for
-   *                                    // previewing with the filter swatch.
-   *           - supportsColor: false   // Does the CSS property support colors?
-   *           - baseURI: undefined     // A string used to resolve
-   *                                    // relative links.
-   * @return {Object}
-   *         Overridden options object
-   */
-  _mergeOptions: function (overrides) {
-    const defaults = {
-      defaultColorType: true,
-      filterSwatch: false,
-      supportsColor: false,
-      baseURI: undefined,
-    };
-
-    for (const item in overrides) {
-      defaults[item] = overrides[item];
-    }
-    return defaults;
   },
 };
 
