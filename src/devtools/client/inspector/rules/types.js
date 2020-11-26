@@ -64,6 +64,9 @@ const declaration = (exports.declaration = {
   // The declaration's property name.
   name: PropTypes.string,
 
+  // The declaration's parsed property value.
+  parsedValue: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.object])),
+
   // The declaration's priority (either "important" or an empty string).
   priority: PropTypes.string,
 

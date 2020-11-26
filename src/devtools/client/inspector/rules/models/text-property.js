@@ -46,6 +46,7 @@ class TextProperty {
     this.invisible = invisible;
     this.elementStyle = this.rule.elementStyle;
     this.cssProperties = this.elementStyle.ruleView.cssProperties;
+    this.outputParser = this.elementStyle.ruleView.outputParser;
     this.panelDoc = this.elementStyle.ruleView.inspector.panelDoc;
     this.userProperties = this.elementStyle.store.userProperties;
 
@@ -82,6 +83,21 @@ class TextProperty {
    */
   get isPropertyChanged() {
     return this.userProperties.contains(this.rule.domRule, this.name);
+  }
+
+  /**
+   * Returns the declaration's parsed property value.
+   */
+  get parsedValue() {
+    let value = this.value;
+
+    if (this.priority) {
+      value += " !" + this.priority;
+    }
+
+    return this.outputParser.parseCssProperty(this.name, value, {
+      baseURI: this.rule.ruleHref,
+    });
   }
 
   /**

@@ -4,10 +4,14 @@
 
 "use strict";
 
-const { createRef, PureComponent } = require("react");
+const { createFactory, createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
 // const { editableItem } = require("devtools/client/shared/inplace-editor");
+
+const DeclarationValue = createFactory(
+  require("devtools/client/inspector/rules/components/DeclarationValue")
+);
 
 const { getStr } = require("devtools/client/inspector/rules/utils/l10n");
 const Types = require("devtools/client/inspector/rules/types");
@@ -200,8 +204,7 @@ class Declaration extends PureComponent {
       isOverridden,
       isPropertyChanged,
       name,
-      priority,
-      value,
+      parsedValue,
     } = this.props.declaration;
 
     let declarationClassName = "ruleview-property";
@@ -257,7 +260,12 @@ class Declaration extends PureComponent {
               ref: this.valueSpanRef,
               tabIndex: 0,
             },
-            value + (priority ? ` !${priority}` : "")
+            DeclarationValue({
+              colorSpanClassName: "ruleview-color",
+              colorSwatchClassName: "ruleview-colorswatch ruleview-swatch",
+              fontFamilySpanClassName: "ruleview-font-family",
+              values: parsedValue,
+            })
           ),
           ";"
         ),
