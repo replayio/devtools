@@ -105,12 +105,14 @@ OutputParser.prototype = {
    * @param  {Object} [options]
    *         Options object. For valid options and default values see
    *         _mergeOptions().
-   * @return {DocumentFragment}
-   *         A document fragment containing color swatches etc.
+   * @return {Array<Object|String>}
+   *         An array containing a mix of objects and plain strings. The object contains
+   *         parsed information about the type and value.
    */
   parseCssProperty: function (name, value, options = {}) {
-    options = this._mergeOptions(options);
+    this.parsed = [];
 
+    options = this._mergeOptions(options);
     options.expectTimingFunction = this.supportsType(name, "timing-function");
     options.expectDisplay = name === "display";
     options.expectFilter =
@@ -128,9 +130,10 @@ OutputParser.prototype = {
     if (options.expectFilter || this._cssPropertySupportsValue(name, value)) {
       return this._parse(value, options);
     }
+
     this._appendText(value);
 
-    return this._toDOM();
+    return this.parsed;
   },
 
   /**
@@ -311,8 +314,9 @@ OutputParser.prototype = {
    *         The token stream from which to read
    * @param  {Boolean} stopAtCloseParen
    *         If true, stop at an umatched close paren.
-   * @return {DocumentFragment}
-   *         A document fragment.
+   * @return {Array<Object|String>}
+   *         An array containing a mix of objects and plain strings. The object contains
+   *         parsed information about the type and value.
    */
   // eslint-disable-next-line complexity
   _doParse: function (text, options, tokenStream, stopAtCloseParen) {
@@ -527,11 +531,11 @@ OutputParser.prototype = {
       previousWasBang = token.tokenType === "symbol" && token.text === "!";
     }
 
-    let result = this._toDOM();
+    let result = this.parsed;
 
-    if (options.expectFilter && !options.filterSwatch) {
-      result = this._wrapFilter(text, options, result);
-    }
+    // if (options.expectFilter && !options.filterSwatch) {
+    //   result = [{ type: FILTER, values: result }];
+    // }
 
     return result;
   },
@@ -544,13 +548,12 @@ OutputParser.prototype = {
    * @param  {Object} [options]
    *         Options object. For valid options and default values see
    *         _mergeOptions().
-   * @return {DocumentFragment}
-   *         A document fragment.
+   * @return {Array<Object|String>}
+   *         An array containing a mix of objects and plain strings. The object contains
+   *         parsed information about the type and value.
    */
   _parse: function (text, options = {}) {
     text = text.trim();
-    this.parsed.length = 0;
-
     const tokenStream = getCSSLexer(text);
     return this._doParse(text, options, tokenStream, false);
   },
@@ -1285,33 +1288,6 @@ OutputParser.prototype = {
   },
 
   /**
-   * Wrap some existing nodes in a filter editor.
-   *
-   * @param {String} filters
-   *        The full text of the "filter" property.
-   * @param {object} options
-   *        The options object passed to parseCssProperty().
-   * @param {object} nodes
-   *        Nodes created by _toDOM().
-   *
-   * @returns {object}
-   *        A new node that supplies a filter swatch and that wraps |nodes|.
-   */
-  _wrapFilter: function (filters, options, nodes) {
-    const container = this._createNode("span", {
-      "data-filters": filters,
-    });
-
-    const value = this._createNode("span", {
-      class: options.filterClass,
-    });
-    value.appendChild(nodes);
-    container.appendChild(value);
-
-    return container;
-  },
-
-  /**
    * A helper function that sanitizes a possibly-unterminated URL.
    */
   _sanitizeURL: function (url) {
@@ -1470,27 +1446,6 @@ OutputParser.prototype = {
     } else {
       this.parsed.push(text);
     }
-  },
-
-  /**
-   * Take all output and append it into a single DocumentFragment.
-   *
-   * @return {DocumentFragment}
-   *         Document Fragment
-   */
-  _toDOM: function () {
-    const frag = this.doc.createDocumentFragment();
-
-    for (const item of this.parsed) {
-      if (typeof item === "string") {
-        frag.appendChild(this.doc.createTextNode(item));
-      } else {
-        frag.appendChild(item);
-      }
-    }
-
-    this.parsed.length = 0;
-    return frag;
   },
 
   /**
