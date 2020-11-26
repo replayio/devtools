@@ -22,6 +22,7 @@
   background-color: #ececec;
   flex-grow: 1;
   position: relative;
+  padding-left: 1px;
 }
 
 .collapsed-toolbox {
