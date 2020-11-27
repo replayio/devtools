@@ -18,7 +18,8 @@ class Toolbox extends React.Component {
   };
 
   async componentDidMount() {
-    await gToolbox.init("debugger");
+    const { selectedPanel } = this.props;
+    await gToolbox.init(selectedPanel);
   }
 
   selectPanel(panel) {
@@ -82,6 +83,7 @@ export default connect(
     toolboxExpanded: selectors.getToolboxExpanded(state),
     panelCollapsed: selectors.getPaneCollapse(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
+    selectedPanel: selectors.getSelectedPanel(state),
   }),
   {
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,

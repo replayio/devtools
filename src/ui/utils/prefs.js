@@ -9,7 +9,7 @@ const { pref } = Services;
 
 // app prefs.
 pref("devtools.split-console", false);
-pref("devtools.selected-panel", "debugger");
+pref("devtools.selected-panel", "console");
 pref("devtools.user", "{}");
 pref("devtools.recording-id", "");
 pref("devtools.event-listeners-breakpoints", true);
