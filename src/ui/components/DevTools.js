@@ -46,7 +46,11 @@ function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }
   };
 
   return (
-    <>
+    <>      
+      <div id="toolbox-timeline">
+        <Timeline />
+        <Tooltip tooltip={tooltip} />
+      </div>
       <SplitBox
         style={{ width: "100%", overflow: "hidden" }}
         splitterSize={1}
@@ -59,10 +63,6 @@ function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }
         endPanel={viewer}
         endPanelControl={false}
       />
-      <div id="toolbox-timeline">
-        <Timeline />
-        <Tooltip tooltip={tooltip} />
-      </div>
     </>
   );
 }
