@@ -10,6 +10,7 @@ import { clientCommands } from "devtools/client/debugger/src/client/commands";
 import LogRocket from "ui/utils/logrocket";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
+import { sanityCheckMiddleware } from "../sanitize";
 
 import { isDevelopment, isTest } from "../environment";
 const skipTelemetry = isTest() || isDevelopment();
@@ -75,7 +76,11 @@ export const bootstrapStore = async function bootstrapStore() {
   });
 
   const initialState = await getInitialState();
-  const middleware = skipTelemetry ? undefined : applyMiddleware(LogRocket.reduxMiddleware());
+  const middleware = skipTelemetry
+    ? isDevelopment()
+      ? applyMiddleware(sanityCheckMiddleware)
+      : undefined
+    : applyMiddleware(LogRocket.reduxMiddleware());
 
   const store = createStore(combineReducers(reducers), initialState, middleware);
 

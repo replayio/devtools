@@ -72,10 +72,10 @@ function NotAllowed() {
 }
 
 export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
-  getPrototypeOf() {
-    NotAllowed();
-    return null;
-  },
+  // getPrototypeOf() {
+  //   NotAllowed();
+  //   return null;
+  // },
   //has() {
   //  NotAllowed();
   //  return false;
