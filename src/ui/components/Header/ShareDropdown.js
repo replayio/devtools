@@ -170,7 +170,7 @@ function ShareDropdown({ recordingId, setSharingModal }) {
     <div className="share">
       <Dropdown
         buttonContent={buttonContent}
-        buttonStyle={isAuthenticated ? "primary" : "secondary"}
+        buttonStyle="secondary"
         setExpanded={setExpanded}
         expanded={expanded}
       >

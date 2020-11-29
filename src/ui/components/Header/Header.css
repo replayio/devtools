@@ -1,7 +1,7 @@
 #header {
   background-color: var(--theme-toolbar-background);
   border-bottom: 1px solid var(--theme-splitter-color);
-  height: 52px;
+  height: 40px;
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -22,6 +22,7 @@
 #header .header-left {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 #header .img.menu {
@@ -34,12 +35,14 @@
 
 #header .title-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   margin-left: 8px;
 }
 
 #header .subtitle {
   color: var(--theme-text-color-inactive);
+  font-style: italic;
 }
 
 #status {
@@ -93,10 +96,11 @@
   cursor: text;
   font-weight: 700;
   line-height: 18px;
+  margin-right: 0.5em;
 }
 
 #header .title:not(input):hover {
-  color: #2D7EFF;
+  color: #2d7eff;
 }
 
 #header input.title:focus {
@@ -124,8 +128,12 @@ button.login {
 }
 
 @keyframes dropdownFadeIn {
-  0% {opacity:0;}
-  100% {opacity:1;}
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 760px) {
