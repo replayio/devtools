@@ -5,7 +5,7 @@
 .dropdown-wrapper button.secondary {
   color: var(--dark-blue);
   border: 1px solid var(--dark-blue);
-  padding: 7px 11px;
+  padding: 5px 10px 5px 5px;
   background: none;
 }
 
@@ -34,10 +34,11 @@
   flex-direction: column;
   border-radius: 4px;
   position: absolute;
-  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px,
+    rgba(15, 15, 15, 0.2) 0px 9px 24px;
   background: var(--theme-toolbar-background);
   color: var(--theme-toolbar-color);
-  z-index: var(--z-index-8--dropdown)
+  z-index: var(--z-index-8--dropdown);
 }
 
 .dropdown-container .content.top-right {
@@ -74,5 +75,5 @@
 }
 
 .dropdown-container .row:hover {
-  background-color: #EEE;
+  background-color: #eee;
 }

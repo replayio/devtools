@@ -42,9 +42,8 @@ function Avatars({ user, getActiveUsers }) {
 function Links({ user, getActiveUsers, recordingId, setSharingModal }) {
   return (
     <div className="links">
-      {/* <Avatars user={user} getActiveUsers={getActiveUsers} /> */}
+      <Avatars user={user} getActiveUsers={getActiveUsers} />
       {recordingId ? <ShareDropdown /> : null}
-      {/* <UserOptions /> */}
     </div>
   );
 }
@@ -69,7 +68,7 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
         editingTitle={editingTitle}
         recordingId={recordingId}
       />
-      <div className="subtitle">{moment(date).format("MMM D, YYYY")}</div>
+      {!editingTitle && <div className="subtitle">{moment(date).fromNow()}</div>}
     </div>
   );
 }

@@ -9,8 +9,8 @@
 }
 
 .user-options button.expand-dropdown .avatar.first-player img {
-  height: 32px;
-  width: 32px;
+  height: 28px;
+  width: 28px;
 }
 
 .user-options button.expand-dropdown .img {
@@ -59,7 +59,7 @@
 }
 
 .user-options .dropdown-wrapper button {
-  padding: 8px;
+  padding: 10px;
   width: 100%;
   color: var(--theme-toolbar-color);
   background: transparent;
