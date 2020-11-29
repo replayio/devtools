@@ -29,9 +29,9 @@ const GET_RECORDING = gql`
   }
 `;
 
-function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }) {
+function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions }) {
   const toolbox = <Toolbox />;
-  const viewer = <Viewer tooltip={tooltip} />;
+  const viewer = <Viewer />;
 
   if (!toolboxExpanded) {
     return (
@@ -47,24 +47,18 @@ function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }
   };
 
   return (
-    <>
-      <SplitBox
-        style={{ width: "100%", overflow: "hidden" }}
-        splitterSize={1}
-        initialSize={prefs.toolboxHeight}
-        minSize="20%"
-        maxSize="80%"
-        vert={true}
-        onMove={handleMove}
-        startPanel={toolbox}
-        endPanel={viewer}
-        endPanelControl={false}
-      />
-      <div id="toolbox-timeline">
-        <Timeline />
-        <Tooltip tooltip={tooltip} />
-      </div>
-    </>
+    <SplitBox
+      style={{ width: "100%", overflow: "hidden" }}
+      splitterSize={1}
+      initialSize={prefs.toolboxHeight}
+      minSize="20%"
+      maxSize="80%"
+      vert={true}
+      onMove={handleMove}
+      startPanel={toolbox}
+      endPanel={viewer}
+      endPanelControl={false}
+    />
   );
 }
 
@@ -147,6 +141,10 @@ function DevTools({
   return (
     <>
       <Header />
+      <div id="toolbox-timeline">
+        <Timeline />
+        <Tooltip tooltip={tooltip} />
+      </div>
       <DevtoolsSplitBox
         toolboxExpanded={toolboxExpanded}
         tooltip={tooltip}

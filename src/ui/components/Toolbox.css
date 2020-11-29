@@ -78,7 +78,7 @@
   display: flex;
   position: absolute;
   border: 1px solid rgb(204, 204, 204);
-  bottom: 64px;
+  top: 100px;
   border-radius: 4px;
   background: #ececec;
   align-items: center;
