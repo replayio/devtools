@@ -31,15 +31,19 @@
   align-items: center;
 }
 
-.event-listener-expand {
+button.event-listener-expand {
   border: none;
   background: none;
   padding: 4px 5px;
   line-height: 12px;
 }
 
-.event-listener-expand:hover {
+button.event-listener-expand:hover {
   background: transparent;
+}
+
+button.event-listener-expand .img {
+  background: var(--theme-icon-dimmed-color);
 }
 
 .event-listener-group input[type="checkbox"] {
