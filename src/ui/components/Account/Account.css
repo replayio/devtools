@@ -49,3 +49,14 @@
   background: #f0f2f5;
   height: 100%;
 }
+
+#header .title-label {
+  color: var(--theme-toolbar-color);
+  font-size: 1.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: none;
+  line-height: 18px;
+  margin-left: 8px;
+}

@@ -5,6 +5,7 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import Avatar from "ui/components/Avatar";
 import Title from "ui/components/shared/Title";
+import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import ShareDropdown from "ui/components/Header/ShareDropdown";
 import "./Header.css";
 
@@ -73,24 +74,26 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
   );
 }
 
-function Logo() {
-  return (
-    <>
-      <a href="/view">
-        <div className="logo" />
-      </a>
-      <div id="status" />
-    </>
-  );
-}
-
 function Header({ user, getActiveUsers, recordingId, setSharingModal }) {
   const [editingTitle, setEditingTitle] = useState(false);
+  const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
+  const dashboardUrl = `${window.location.origin}/view`;
+
+  const onNavigateBack = event => {
+    if (event.metaKey) {
+      return window.open(dashboardUrl);
+    }
+    window.location = dashboardUrl;
+  };
 
   return (
     <div id="header">
       <div className="header-left">
-        <div className="img menu" />
+        <IconWithTooltip
+          icon={backIcon}
+          content={"Back to Dashboard"}
+          handleClick={e => onNavigateBack(e)}
+        />
         <HeaderTitle
           recordingId={recordingId}
           setEditingTitle={setEditingTitle}

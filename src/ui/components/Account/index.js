@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import Dashboard from "../Dashboard/index";
 import { useAuth0 } from "@auth0/auth0-react";
-import Header from "../Header/index";
 import Loader from "../shared/Loader";
 import Prompt from "../shared/Prompt";
 import { gql, useQuery } from "@apollo/client";
 import { setUserInBrowserPrefs } from "../../utils/browser";
+import UserOptions from "ui/components/Header/UserOptions";
 
 import "./Account.css";
 
@@ -97,6 +97,18 @@ function WelcomePage() {
   );
 }
 
+function AccountHeader() {
+  return (
+    <div id="header">
+      <div className="header-left">
+        <div className="logo" />
+        <div className="title-label">Dashboard</div>
+      </div>
+      <UserOptions />
+    </div>
+  );
+}
+
 export default function Account() {
   const { isAuthenticated } = useAuth0();
 
@@ -106,7 +118,7 @@ export default function Account() {
 
   return (
     <>
-      <Header />
+      <AccountHeader />
       <AccountPage />
     </>
   );

@@ -19,6 +19,7 @@
   display: flex;
   flex-direction: column;
   border-top: 0px;
+  padding: 8px;
 }
 
 .toolbox-toolbar-container {
@@ -43,11 +44,15 @@
   display: flex;
   cursor: default;
   line-height: 35px;
-  font-size: 1.1rem;
   color: var(--theme-toolbar-color);
   align-items: center;
-  padding-left: 8px;
-  padding-right: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition-duration: 200ms;
+}
+
+.toolbar-panel-button:not(:last-child) {
+  margin-bottom: 4px;
 }
 
 .toolbar-panel-button:hover {
@@ -59,7 +64,7 @@
   height: 24px;
   mask-repeat: no-repeat;
   mask-size: cover;
-  margin: 8px 4px;
+  margin: 4px;
 }
 
 .toolbar-panel-button.active {
