@@ -1,3 +1,9 @@
 #markup-root .dropdown-wrapper {
   display: inline;
 }
+
+#markup-root .dropdown-wrapper button {
+  display: inline-block;
+  padding: 0px 2px;
+  line-height: 10px;
+}
