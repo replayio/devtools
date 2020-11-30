@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 
 import Toolbox from "./Toolbox";
@@ -10,12 +10,14 @@ import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import RecordingLoadingScreen from "./RecordingLoadingScreen";
 import Timeline from "./Timeline";
 import Tooltip from "./Tooltip";
+import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { gql, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 import { prefs } from "../utils/prefs";
+import { installObserver } from "../../protocol/graphics";
 
 const GET_RECORDING = gql`
   query GetRecording($recordingId: String) {
@@ -68,6 +70,54 @@ function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }
   );
 }
 
+function NonDevtoolsSplitBox({
+  hasFocusedComment,
+  toolboxExpanded,
+  updateTimelineDimensions,
+  tooltip,
+}) {
+  useEffect(() => {
+    installObserver();
+    gToolbox.init("console");
+  }, []);
+
+  const viewer = (
+    <div id="outer-viewer">
+      <div id="viewer">
+        <canvas id="graphics"></canvas>
+        <div id="highlighter-root"></div>
+      </div>
+      <div id="toolbox-timeline">
+        <Timeline />
+        <Tooltip tooltip={tooltip} />
+      </div>
+      {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
+      <Comments />
+    </div>
+  );
+  const handleMove = num => {
+    updateTimelineDimensions();
+    prefs.toolboxHeight = `${num}px`;
+  };
+
+  return (
+    <>
+      <SplitBox
+        style={{ width: "100%", overflow: "hidden" }}
+        splitterSize={1}
+        initialSize={prefs.toolboxHeight}
+        minSize="20%"
+        onMove={handleMove}
+        maxSize="80%"
+        vert={true}
+        startPanel={viewer}
+        endPanel={<CommentsPanel />}
+        endPanelControl={false}
+      />
+    </>
+  );
+}
+
 function getUploadingMessage(uploading) {
   if (!uploading) {
     return "";
@@ -111,9 +161,11 @@ function DevTools({
   toolboxExpanded,
 }) {
   const { user, isAuthenticated } = useAuth0();
+  const [viewMode, setViewMode] = useState("dev");
   const { data, error, loading: queryIsLoading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
   });
+  const toggleViewMode = () => setViewMode(viewMode == "dev" ? "non-dev" : "dev");
 
   if (expectedError) {
     return null;
@@ -144,16 +196,30 @@ function DevTools({
     return <RecordingLoadingScreen />;
   }
 
+  if (viewMode == "dev") {
+    return (
+      <>
+        <Header toggleViewMode={toggleViewMode} viewMode={viewMode} />
+        <DevtoolsSplitBox
+          toolboxExpanded={toolboxExpanded}
+          tooltip={tooltip}
+          updateTimelineDimensions={updateTimelineDimensions}
+        />
+        {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
+        <Comments />
+      </>
+    );
+  }
+
   return (
     <>
-      <Header />
-      <DevtoolsSplitBox
+      <Header toggleViewMode={toggleViewMode} viewMode={viewMode} />
+      <NonDevtoolsSplitBox
+        hasFocusedComment={hasFocusedComment}
         toolboxExpanded={toolboxExpanded}
         tooltip={tooltip}
         updateTimelineDimensions={updateTimelineDimensions}
       />
-      {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
-      <Comments />
     </>
   );
 }
