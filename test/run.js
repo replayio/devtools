@@ -1,4 +1,5 @@
 /* Copyright 2020 Record Replay Inc. */
+
 // Harness for end-to-end tests. Run this from the devtools root directory.
 const fs = require("fs");
 const http = require("http");
@@ -7,6 +8,7 @@ const os = require("os");
 const { spawnSync, spawn } = require("child_process");
 const url = require("url");
 const Manifest = require("./manifest.json");
+const { findGeckoPath } = require("./utils");
 
 const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
   ? JSON.parse(fs.readFileSync("./test/example-recordings.json"))
@@ -14,7 +16,7 @@ const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
 
 let count = 1;
 const patterns = [];
-let stripeIndex, stripeCount, dispatchServer, gInstallDir;
+let stripeIndex, stripeCount, dispatchServer;
 const startTime = Date.now();
 let shouldRecordExamples = false;
 let shouldRecordViewer = false;
@@ -75,8 +77,6 @@ function processEnvironmentVariables() {
     shouldRecordViewer = true;
     shouldRecordExample = true;
   }
-
-  gInstallDir = process.env.RECORD_REPLAY_PATH || "/Applications/Replay.app";
 
   // Get the address to use for the dispatch server.
   dispatchServer = process.env.RECORD_REPLAY_SERVER || DefaultDispatchServer;
@@ -154,21 +154,6 @@ function createTestScript({ path }) {
   }
 
   return generatedScriptPath;
-}
-
-const GeckoSuffixes = [
-  "Contents/MacOS/replay", // macOS
-  "bin/replay", // linux
-];
-
-function findGeckoPath() {
-  for (const suffix of GeckoSuffixes) {
-    const path = `${gInstallDir}/${suffix}`;
-    if (fs.existsSync(path)) {
-      return path;
-    }
-  }
-  console.error("Can't find Gecko!");
 }
 
 let failures = [];
