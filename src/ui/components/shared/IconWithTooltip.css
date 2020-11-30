@@ -1,0 +1,44 @@
+.icon-with-tooltip {
+  position: relative;
+  --icon-margin: 4px;
+}
+
+.icon-with-tooltip button {
+  cursor: pointer;
+  border-radius: 4px;
+  cursor: pointer;
+  transition-duration: 200ms;
+}
+
+.icon-with-tooltip .img {
+  width: 24px;
+  height: 24px;
+  mask-repeat: no-repeat;
+  mask-size: cover;
+  margin: var(--icon-margin);
+}
+
+.icon-with-tooltip .icon-tooltip {
+  width: max-content;
+  background: var(--theme-popup-color);
+  color: var(--theme-popup-background);
+  border-radius: 4px;
+  padding: 4px 8px;
+  line-height: 16px;
+  position: absolute;
+  display: inline-block;
+  top: var(--icon-margin);
+  margin-left: 8px;
+  animation: tooltip-pop-up 200ms ease;
+}
+
+@keyframes tooltip-pop-up {
+  0% {
+    transform: scale(0.5, 0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+}

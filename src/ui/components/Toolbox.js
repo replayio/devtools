@@ -4,6 +4,7 @@ import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 import DebuggerApp from "devtools/client/debugger/src/components/App";
 import UserOptions from "ui/components/Header/UserOptions";
+import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 
 import { connect } from "react-redux";
 import { actions } from "../actions";
@@ -50,17 +51,23 @@ class Toolbox extends React.Component {
             className={classnames("toolbar-panel-button", {
               active: selectedPrimaryPanel == "explorer",
             })}
-            onClick={() => this.selectPanel("explorer")}
           >
-            <div className="img explorer-panel toolbar-panel-icon"></div>
+            <IconWithTooltip
+              icon={<div className="img explorer-panel toolbar-panel-icon" />}
+              content={"Source Explorer"}
+              handleClick={() => this.selectPanel("explorer")}
+            />
           </div>
           <div
             className={classnames("toolbar-panel-button", {
               active: selectedPrimaryPanel == "debug",
             })}
-            onClick={() => this.selectPanel("debug")}
           >
-            <div className="img debugger-panel toolbar-panel-icon"></div>
+            <IconWithTooltip
+              icon={<div className="img debugger-panel toolbar-panel-icon" />}
+              content={"Pause Information"}
+              handleClick={() => this.selectPanel("debug")}
+            />
           </div>
         </div>
         <UserOptions />

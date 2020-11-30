@@ -23,17 +23,11 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-
-#header .img.menu {
-  width: 24px;
-  height: 24px;
-  mask-repeat: no-repeat;
-  mask-size: cover;
-  margin: 4px;
+  position: relative;
 }
 
 #header .title-container {
+  color: var(--theme-toolbar-color);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -94,12 +88,8 @@
   white-space: nowrap;
   background: none;
   cursor: text;
-  font-weight: 700;
   line-height: 18px;
   margin-right: 0.5em;
-}
-
-#header .title:not(input):hover {
   color: #2d7eff;
 }
 
