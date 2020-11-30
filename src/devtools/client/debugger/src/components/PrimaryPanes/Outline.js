@@ -13,6 +13,7 @@ const classnames = require("classnames");
 import { containsPosition, positionAfter } from "../../utils/ast";
 import { copyToTheClipboard } from "../../utils/clipboard";
 import { findFunctionText } from "../../utils/function";
+import { getTruncatedFileName } from "../../utils/source";
 
 import actions from "../../actions";
 import {
@@ -164,7 +165,9 @@ export class Outline extends Component {
   }
 
   renderLoading() {
-    return <div className="outline-pane-info">{"Loadingu2026"}</div>;
+    return (
+      <div className="outline-pane-info">{this.props.selectedSource ? getTruncatedFileName(this.props.selectedSource, "") : "Loading..."}</div>
+    );
   }
 
   renderFunction(func) {
