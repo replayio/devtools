@@ -516,6 +516,7 @@ strong {
 
 .devtools-tooltip-events-container {
   border-radius: var(--theme-arrowpanel-border-radius);
+  width: 400px;
   height: 100%;
   overflow-y: auto;
 }
