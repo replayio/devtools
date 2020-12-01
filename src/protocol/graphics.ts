@@ -298,7 +298,6 @@ function drawClick(cx: CanvasRenderingContext2D, x: number, y: number) {
 }
 
 export function refreshGraphics() {
-  console.log("refreshGraphics");
   const viewer = document.getElementById("viewer");
   if (!viewer) {
     return;

@@ -13,8 +13,6 @@ function ViewToggle({ viewMode, setViewMode, clearSelectedLocation, cx }) {
     setViewMode(viewMode == "dev" ? "non-dev" : "dev");
   };
 
-  console.log(cx);
-
   return (
     <button className="view-toggle">
       <div

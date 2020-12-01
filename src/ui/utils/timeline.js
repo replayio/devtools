@@ -43,7 +43,6 @@ export function getCommentLeftOffset({ overlayWidth, time, zoom, commentWidth })
 export function getMarkerLeftOffset({ overlayWidth, time, zoom, markerWidth }) {
   const position = getVisiblePosition({ time, zoom }) * 100;
   const commentMarkerWidth = (markerWidth / overlayWidth) * 100;
-  // const pausedLocationMarkerWidth = (1 / overlayWidth) * 100;
 
   return position - commentMarkerWidth / 2;
 }

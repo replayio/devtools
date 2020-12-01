@@ -34,20 +34,18 @@ function NonDevView({ updateTimelineDimensions }) {
   };
 
   return (
-    <>
-      <SplitBox
-        style={{ width: "100%", overflow: "hidden" }}
-        splitterSize={1}
-        initialSize={prefs.nonDevSidePanelWidth}
-        minSize="20%"
-        onMove={handleMove}
-        maxSize="80%"
-        vert={true}
-        startPanel={viewer}
-        endPanel={<CommentsPanel />}
-        endPanelControl={false}
-      />
-    </>
+    <SplitBox
+      style={{ width: "100%", overflow: "hidden" }}
+      splitterSize={1}
+      initialSize={prefs.nonDevSidePanelWidth}
+      minSize="20%"
+      onMove={handleMove}
+      maxSize="80%"
+      vert={true}
+      startPanel={viewer}
+      endPanel={<CommentsPanel />}
+      endPanelControl={false}
+    />
   );
 }
 

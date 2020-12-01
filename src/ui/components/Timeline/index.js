@@ -73,7 +73,6 @@ export class Timeline extends Component {
     // Used in the test harness for starting playback recording.
     gToolbox.timeline = this;
 
-    console.log(`this.props.updateTimelineDimensions();`);
     this.props.updateTimelineDimensions();
 
     this.toolbox.on("message-hover", this.onConsoleMessageHover);
