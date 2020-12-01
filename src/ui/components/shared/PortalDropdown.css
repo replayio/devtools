@@ -1,0 +1,42 @@
+.portal-dropdown-wrapper {
+  position: relative;
+}
+
+.portal-dropdown-wrapper button.secondary {
+  color: var(--dark-blue);
+  border: 1px solid var(--dark-blue);
+  padding: 5px 10px 5px 5px;
+  background: none;
+}
+
+.portal-dropdown-wrapper button.secondary .img {
+  background: var(--dark-blue);
+}
+
+.portal-dropdown-wrapper button .img:not(:last-child) {
+  margin-right: 4px;
+}
+
+.portal-dropdown-container .mask {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1001;
+}
+
+.portal-dropdown-container .content {
+  background: white;
+  width: max-content;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+  position: absolute;
+  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px,
+    rgba(15, 15, 15, 0.2) 0px 9px 24px;
+  background: var(--theme-toolbar-background);
+  color: var(--theme-toolbar-color);
+  z-index: 1001;
+}
