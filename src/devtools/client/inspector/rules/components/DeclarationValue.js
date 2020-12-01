@@ -13,6 +13,7 @@ class DeclarationValue extends PureComponent {
     return {
       colorSpanClassName: PropTypes.string,
       colorSwatchClassName: PropTypes.string,
+      fontFamilySpanClassName: PropTypes.string,
       values: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.object]))
         .isRequired,
     };
