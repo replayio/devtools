@@ -209,7 +209,7 @@ export class ProjectSearch extends Component {
         />
       );
     }
-    const msg = status === statusType.fetching ? "Loadingu2026" : "No results found";
+    const msg = status === statusType.fetching ? "Loadingu\2026" : "No results found";
     return <div className="no-result-msg absolute-center">{msg}</div>;
   };
 

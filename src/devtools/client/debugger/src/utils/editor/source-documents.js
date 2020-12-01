@@ -55,7 +55,7 @@ export function showLoading(editor) {
   } else {
     doc = editor.createDocument();
     setDocument("loading", doc);
-    doc.setValue("Loadingu2026");
+    doc.setValue("Loading\u2026");
     editor.replaceDocument(doc);
     editor.setMode({ name: "text" });
   }

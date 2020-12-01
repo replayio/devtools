@@ -168,7 +168,7 @@ class Scopes extends PureComponent {
     let stateText = "Not paused";
     if (cx.isPaused) {
       if (isLoading) {
-        stateText = "Loadingu2026";
+        stateText = "Loading\u2026";
       } else {
         stateText = "Scopes unavailable";
       }
