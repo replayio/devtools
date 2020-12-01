@@ -166,7 +166,11 @@ export class Outline extends Component {
 
   renderLoading() {
     return (
-      <div className="outline-pane-info">{this.props.selectedSource ? getTruncatedFileName(this.props.selectedSource, "") : "Loading..."}</div>
+      <div className="outline-pane-info">
+        {this.props.selectedSource
+          ? getTruncatedFileName(this.props.selectedSource, "")
+          : "Loading..."}
+      </div>
     );
   }
 
