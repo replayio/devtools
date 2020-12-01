@@ -1,15 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { connect } from "react-redux";
 import classnames from "classnames";
 import "./ViewToggle.css";
+import { clearSelectedLocation } from "../../../devtools/client/debugger/src/actions/sources";
+import { getContext } from "../../../devtools/client/debugger/src/reducers/pause";
 
-export default function ViewToggle({ viewMode, toggleViewMode }) {
+function ViewToggle({ viewMode, toggleViewMode, clearSelectedLocation, cx }) {
+  const handleClick = () => {
+    clearSelectedLocation(cx);
+    toggleViewMode();
+  };
+
+  console.log(cx);
+
   return (
     <button className="view-toggle">
       <div
         className={classnames("view-toggle-item view-toggle-non-dev", {
           active: viewMode === "non-dev",
         })}
-        onClick={toggleViewMode}
+        onClick={handleClick}
       >
         PLAY
       </div>
@@ -17,10 +27,19 @@ export default function ViewToggle({ viewMode, toggleViewMode }) {
         className={classnames("view-toggle-item view-toggle-dev", {
           active: viewMode === "dev",
         })}
-        onClick={toggleViewMode}
+        onClick={handleClick}
       >
         DEBUG
       </div>
     </button>
   );
 }
+
+export default connect(
+  state => ({
+    cx: getContext(state),
+  }),
+  {
+    clearSelectedLocation: clearSelectedLocation,
+  }
+)(ViewToggle);
