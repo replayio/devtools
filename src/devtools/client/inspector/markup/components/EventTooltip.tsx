@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import Dropdown from "ui/components/shared/Dropdown";
 import { UIState } from "ui/state";
-import { clearEventTooltip, showEventTooltip } from "../actions/eventTooltip";
+import { clearEventTooltip, showEventTooltip, viewSourceInDebugger } from "../actions/eventTooltip";
 import { getEventTooltipContent, getEventTooltipNodeId } from "../reducers/eventTooltip";
 import { EventInfo } from "../state/eventTooltip";
 
@@ -32,6 +32,8 @@ class EventTooltip extends PureComponent<EventTooltipProps & PropsFromRedux> {
   renderEvents(events: EventInfo[] | null) {
     if (!events) return null;
 
+    const { viewSourceInDebugger } = this.props;
+
     return events.map((event, index) => {
       const phase = event.capturing ? "Capturing" : "Bubbling";
 
@@ -43,7 +45,11 @@ class EventTooltip extends PureComponent<EventTooltipProps & PropsFromRedux> {
           <span className="event-tooltip-filename devtools-monospace" title={event.origin}>
             {event.origin}
           </span>
-          <div className="event-tooltip-debugger-icon" title="Open in Debugger"></div>
+          <div
+            className="event-tooltip-debugger-icon"
+            title="Open in Debugger"
+            onClick={() => viewSourceInDebugger(event)}
+          ></div>
           <div className="event-tooltip-attributes-container">
             <div className="event-tooltip-attributes-box">
               <span className="event-tooltip-attributes" title={phase}>
@@ -76,7 +82,11 @@ class EventTooltip extends PureComponent<EventTooltipProps & PropsFromRedux> {
 const mapStateToProps = (state: UIState, { nodeId }: EventTooltipProps) => ({
   events: getEventTooltipNodeId(state) === nodeId ? getEventTooltipContent(state) : null,
 });
-const connector = connect(mapStateToProps, { showEventTooltip, clearEventTooltip });
+const connector = connect(mapStateToProps, {
+  showEventTooltip,
+  clearEventTooltip,
+  viewSourceInDebugger,
+});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(EventTooltip);

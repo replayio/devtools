@@ -62,3 +62,9 @@ export function showEventTooltip(nodeId: string): UIThunkAction {
     dispatch(setEventTooltip(nodeId, listenerInfo));
   };
 }
+
+export function viewSourceInDebugger(event: EventInfo): UIThunkAction {
+  return ({ toolbox }) => {
+    toolbox.viewSourceInDebugger(event.url, event.line, event.column, event.sourceId);
+  };
+}
