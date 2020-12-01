@@ -78,7 +78,7 @@ function NonDevtoolsSplitBox({
 }) {
   useEffect(() => {
     installObserver();
-    gToolbox.init("console");
+    // gToolbox.init("console");
   }, []);
 
   const viewer = (
@@ -158,6 +158,7 @@ function DevTools({
   expectedError,
   setExpectedError,
   toolboxExpanded,
+  selectedPanel,
 }) {
   const { user, isAuthenticated } = useAuth0();
   const [viewMode, setViewMode] = useState("dev");
@@ -165,6 +166,10 @@ function DevTools({
     variables: { recordingId },
   });
   const toggleViewMode = () => setViewMode(viewMode == "dev" ? "non-dev" : "dev");
+
+  useEffect(() => {
+    gToolbox.init(selectedPanel);
+  }, []);
 
   if (expectedError) {
     return null;
@@ -232,6 +237,7 @@ export default connect(
     recordingId: selectors.getRecordingId(state),
     expectedError: selectors.getExpectedError(state),
     toolboxExpanded: selectors.getToolboxExpanded(state),
+    selectedPanel: selectors.getSelectedPanel(state),
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,

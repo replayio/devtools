@@ -19,11 +19,6 @@ class Toolbox extends React.Component {
     debuggerMode: "explorer",
   };
 
-  async componentDidMount() {
-    const { selectedPanel } = this.props;
-    await gToolbox.init(selectedPanel);
-  }
-
   selectPanel(panel) {
     const {
       selectedPrimaryPanel,
