@@ -1,8 +1,8 @@
-#markup-root .dropdown-wrapper {
+#markup-root .portal-dropdown-wrapper {
   display: inline;
 }
 
-#markup-root .dropdown-wrapper button {
+#markup-root .portal-dropdown-wrapper button {
   display: inline-block;
   padding: 0px 2px;
   line-height: 10px;
