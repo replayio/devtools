@@ -19,13 +19,11 @@ class Comments extends React.Component {
     const sortedComments = comments.sort((a, b) => a.time - b.time);
 
     return (
-      <div className="comments" style={timelineDimensions}>
-        <div className="comments-container">
-          {comments.map((comment, index) => (
-            <Comment key={comment.id} comment={comment} index={index} />
-          ))}
-          {!playback ? this.renderAddCommentButton() : null}
-        </div>
+      <div className="comments-container">
+        {comments.map((comment, index) => (
+          <Comment key={comment.id} comment={comment} index={index} />
+        ))}
+        {!playback ? this.renderAddCommentButton() : null}
       </div>
     );
   }

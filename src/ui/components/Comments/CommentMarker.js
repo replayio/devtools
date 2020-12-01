@@ -4,16 +4,9 @@ import classnames from "classnames";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import {
-  getPixelOffset,
-  getCommentLeftOffset,
-  getMarkerLeftOffset,
-  getTimeMidpoint,
-} from "ui/utils/timeline";
-import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
+import { getMarkerLeftOffset, getTimeMidpoint } from "ui/utils/timeline";
 
 const markerWidth = 19;
-const tolerance = 2;
 
 class CommentMarker extends React.Component {
   calculateLeftOffset(time) {
@@ -34,23 +27,6 @@ class CommentMarker extends React.Component {
     return comments[index];
   }
 
-  getIsCloseToHover(commentTime, hoverTime, tolerance) {
-    const { timelineDimensions, zoomRegion } = this.props;
-
-    const commentMidpoint = getTimeMidpoint({
-      time: commentTime,
-      overlayWidth: timelineDimensions.width,
-      zoom: zoomRegion,
-    });
-    const hoverMidpoint = getTimeMidpoint({
-      time: hoverTime,
-      overlayWidth: timelineDimensions.width,
-      zoom: zoomRegion,
-    });
-
-    return Math.abs(commentMidpoint - hoverMidpoint) < tolerance;
-  }
-
   renderCreateCommentButton() {
     const { createComment, currentTime, zoomRegion, focusedCommentId } = this.props;
 
@@ -69,19 +45,12 @@ class CommentMarker extends React.Component {
           left: `${this.calculateLeftOffset(currentTime)}%`,
         }}
         onClick={() => createComment()}
-      ></button>
+      />
     );
   }
 
   render() {
-    const {
-      comment,
-      focusComment,
-      currentTime,
-      hoverTime,
-      zoomRegion,
-      focusedCommentId,
-    } = this.props;
+    const { comment, focusComment, currentTime, zoomRegion, focusedCommentId } = this.props;
 
     if (!comment) {
       return this.renderCreateCommentButton();
@@ -93,15 +62,10 @@ class CommentMarker extends React.Component {
 
     const { time, id } = comment;
     const pausedAtComment = currentTime == time;
-    // If a comment is close enough to the hovered time, we give
-    // it the same hovered styling as a comment with exact time match.
-    // The tolerance here is +/- 2% relative to the timeline's width.
-    const isCloseToHover = this.getIsCloseToHover(time, hoverTime, tolerance);
 
     return (
       <button
         className={classnames("img comment-marker", {
-          hovered: isCloseToHover,
           expanded: id === focusedCommentId,
           paused: pausedAtComment,
         })}
@@ -109,7 +73,7 @@ class CommentMarker extends React.Component {
           left: `${this.calculateLeftOffset(time)}%`,
         }}
         onClick={() => focusComment(comment)}
-      ></button>
+      />
     );
   }
 }
@@ -119,7 +83,6 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
-    hoverTime: selectors.getHoverTime(state),
     comments: selectors.getComments(state),
     focusedCommentId: selectors.getFocusedCommentId(state),
   }),

@@ -15,6 +15,7 @@ import { log } from "protocol/socket";
 
 import CommandButton from "./CommandButton";
 import ScrollContainer from "./ScrollContainer";
+import Comments from "../Comments";
 
 const {
   mostRecentPaintOrMouseEvent,
@@ -608,6 +609,15 @@ export class Timeline extends Component {
     });
   }
 
+  renderComments() {
+    return (
+      <>
+        {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
+        <Comments />
+      </>
+    );
+  }
+
   render() {
     const { loaded, currentTime } = this.props;
     const percent = this.getVisiblePosition(currentTime) * 100;
@@ -647,7 +657,8 @@ export class Timeline extends Component {
           <ScrollContainer />
         ),
         this.renderHoverScrubber(),
-        this.renderPausedScrubber()
+        this.renderPausedScrubber(),
+        <Comments />
       )
     );
   }

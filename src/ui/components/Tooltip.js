@@ -1,9 +1,10 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
+import React from "react";
+import { connect } from "react-redux";
+import { selectors } from "../reducers";
 
 let screen;
 
-export default function Tooltip({ tooltip }) {
+export function Tooltip({ tooltip }) {
   if (!tooltip) {
     return null;
   }
@@ -24,3 +25,7 @@ export default function Tooltip({ tooltip }) {
     </div>
   );
 }
+
+export default connect(state => ({
+  tooltip: selectors.getTooltip(state),
+}))(Tooltip);

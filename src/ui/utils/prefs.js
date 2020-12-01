@@ -14,6 +14,7 @@ pref("devtools.user", "{}");
 pref("devtools.recording-id", "");
 pref("devtools.event-listeners-breakpoints", true);
 pref("devtools.toolbox-height", "50%");
+pref("devtools.non-dev-side-panel-width", "75%");
 
 // app features
 pref("devtools.features.comments", true);
@@ -27,6 +28,7 @@ export const prefs = new PrefsHelper("devtools", {
   recordingId: ["Json", "recording-id"],
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
   toolboxHeight: ["String", "toolbox-height"],
+  nonDevSidePanelWidth: ["String", "non-dev-side-panel-width"],
 });
 
 export const features = new PrefsHelper("devtools.features", {

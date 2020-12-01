@@ -103,7 +103,14 @@ class Comment extends React.Component {
   }
 
   render() {
-    const { comment, zoomRegion, index, timelineDimensions, focusedCommentId } = this.props;
+    const {
+      comment,
+      zoomRegion,
+      index,
+      timelineDimensions,
+      focusedCommentId,
+      unfocusComment,
+    } = this.props;
     const { description } = this.state;
     const commentWidth = 280;
     const shouldCollapse = focusedCommentId !== comment.id;
@@ -131,6 +138,7 @@ class Comment extends React.Component {
     return (
       <div>
         <CommentMarker comment={comment} />
+        <div className="app-mask" onClick={unfocusComment} />
         <div
           className={classnames("comment")}
           style={{

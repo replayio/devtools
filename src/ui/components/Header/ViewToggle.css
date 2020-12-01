@@ -1,0 +1,29 @@
+.view-toggle {
+  border-radius: 4px;
+  border-radius: 4px;
+  border: 1px solid var(--dark-blue);
+  color: var(--dark-blue);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 16px;
+}
+
+.view-toggle:hover {
+  background: inherit;
+}
+
+.view-toggle:focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
+}
+
+.view-toggle .view-toggle-item {
+  padding: 2px 14px;
+  font-weight: 700;
+}
+
+.view-toggle .view-toggle-item.active {
+  background: var(--dark-blue);
+  color: var(--theme-body-background);
+}

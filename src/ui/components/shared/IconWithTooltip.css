@@ -3,6 +3,11 @@
   --icon-margin: 4px;
 }
 
+.icon-with-tooltip *:focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
+}
+
 .icon-with-tooltip button {
   cursor: pointer;
   border-radius: 4px;
@@ -30,6 +35,7 @@
   top: var(--icon-margin);
   margin-left: 8px;
   animation: tooltip-pop-up 200ms ease;
+  z-index: var(--z-index-1--icon-tooltip);
 }
 
 @keyframes tooltip-pop-up {

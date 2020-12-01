@@ -10,11 +10,10 @@ import {
 } from "record-replay-protocol";
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
-import { ExpectedError, Modal, PanelName, PrimaryPanelName } from "ui/state/app";
+import { ExpectedError, Modal, PanelName, PrimaryPanelName, ViewMode } from "ui/state/app";
 const { PointHandlers } = require("protocol/logpoint");
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
-export type SetToolboxExpanded = Action<"set_toolbox_expanded"> & { toolboxExpanded: boolean };
 export type LoadingAction = Action<"loading"> & { loading: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
@@ -35,9 +34,9 @@ export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   analysisPoints: PointDescription[] | null;
   location: Location;
 };
+export type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type AppAction =
   | SetupAppAction
-  | SetToolboxExpanded
   | LoadingAction
   | SetSessionIdAction
   | UpdateThemeAction
@@ -50,7 +49,8 @@ export type AppAction =
   | SetUploadingAction
   | SetModalAction
   | SetPendingNotificationAction
-  | SetAnalysisPointsAction;
+  | SetAnalysisPointsAction
+  | SetViewMode;
 
 export function setupApp(recordingId: RecordingId, store: UIStore) {
   store.dispatch({ type: "setup_app", recordingId });
@@ -179,13 +179,6 @@ export function setPendingNotification(location: any): SetPendingNotificationAct
   };
 }
 
-export function setToolboxExpanded(toolboxExpanded: boolean): SetToolboxExpanded {
-  return { type: "set_toolbox_expanded", toolboxExpanded };
-}
-
-export function toggleToolbox(): UIThunkAction {
-  return ({ getState, dispatch }) => {
-    // dispatch(setAppState({ toolboxExpanded: !selectors.getToolboxExpanded(getState()) }));
-    dispatch(setToolboxExpanded(!selectors.getToolboxExpanded(getState())));
-  };
+export function setViewMode(viewMode: ViewMode): SetViewMode {
+  return { type: "set_view_mode", viewMode };
 }
