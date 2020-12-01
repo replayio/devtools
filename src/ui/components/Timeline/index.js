@@ -15,6 +15,7 @@ import { log } from "protocol/socket";
 
 import CommandButton from "./CommandButton";
 import ScrollContainer from "./ScrollContainer";
+import Comments from "../Comments";
 
 const {
   mostRecentPaintOrMouseEvent,
@@ -72,6 +73,7 @@ export class Timeline extends Component {
     // Used in the test harness for starting playback recording.
     gToolbox.timeline = this;
 
+    console.log(`this.props.updateTimelineDimensions();`);
     this.props.updateTimelineDimensions();
 
     this.toolbox.on("message-hover", this.onConsoleMessageHover);
@@ -656,7 +658,8 @@ export class Timeline extends Component {
           <ScrollContainer />
         ),
         this.renderHoverScrubber(),
-        this.renderPausedScrubber()
+        this.renderPausedScrubber(),
+        <Comments />
       )
     );
   }

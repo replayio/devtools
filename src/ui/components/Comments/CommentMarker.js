@@ -4,13 +4,7 @@ import classnames from "classnames";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import {
-  getPixelOffset,
-  getCommentLeftOffset,
-  getMarkerLeftOffset,
-  getTimeMidpoint,
-} from "ui/utils/timeline";
-import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
+import { getMarkerLeftOffset, getTimeMidpoint } from "ui/utils/timeline";
 
 const markerWidth = 19;
 const tolerance = 2;
@@ -69,7 +63,7 @@ class CommentMarker extends React.Component {
           left: `${this.calculateLeftOffset(currentTime)}%`,
         }}
         onClick={() => createComment()}
-      ></button>
+      />
     );
   }
 
@@ -109,7 +103,7 @@ class CommentMarker extends React.Component {
           left: `${this.calculateLeftOffset(time)}%`,
         }}
         onClick={() => focusComment(comment)}
-      ></button>
+      />
     );
   }
 }

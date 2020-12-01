@@ -3,9 +3,11 @@
 }
 
 .comments-container {
-  position: relative;
-  top: 26px;
+  position: absolute;
   z-index: var(--z-index-1--comment-container);
+  width: 100%;
+  bottom: 4px; /* Arbitrary value to push the markers away from the bottom of the overlay container */
+  height: 18px; /* Corresponds with the height of the comment marker */
 }
 
 .comment-marker {

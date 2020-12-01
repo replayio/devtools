@@ -91,8 +91,7 @@ function NonDevtoolsSplitBox({
         <Timeline />
         <Tooltip tooltip={tooltip} />
       </div>
-      {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
-      <Comments />
+      {/* {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />} */}
     </div>
   );
   const handleMove = num => {
@@ -205,8 +204,6 @@ function DevTools({
           tooltip={tooltip}
           updateTimelineDimensions={updateTimelineDimensions}
         />
-        {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
-        <Comments />
       </>
     );
   }

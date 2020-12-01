@@ -42,7 +42,7 @@
   background: #d4ebff;
   border: 1px solid var(--proggressbar-border-color);
   overflow: hidden;
-  margin: 6px 5px 2px 0;
+  margin-top: 8px;
 }
 
 .replay-player .progress {
@@ -117,6 +117,7 @@
   position: absolute;
   height: 30px;
   width: 1px;
+  top: 0px;
   pointer-events: none;
   background: transparent;
 }
@@ -127,6 +128,7 @@
 
 .replay-player .scrubber.hovered {
   background: var(--hover-scrubber-line-background);
+  height: 32px;
 }
 
 /* The scrubber is 9px wide, so shifting it 4px to the left
