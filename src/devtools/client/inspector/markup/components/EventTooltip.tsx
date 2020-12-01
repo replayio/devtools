@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import Dropdown from "ui/components/shared/Dropdown";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { UIState } from "ui/state";
 import { clearEventTooltip, showEventTooltip } from "../actions/eventTooltip";
 import { getEventTooltipContent, getEventTooltipNodeId } from "../reducers/eventTooltip";
@@ -60,15 +60,15 @@ class EventTooltip extends PureComponent<EventTooltipProps & PropsFromRedux> {
     const { events } = this.props;
 
     return (
-      <Dropdown
+      <PortalDropdown
         buttonContent="event"
         buttonStyle="inspector-badge interactive"
-        position="bottom-right"
+        position="top-left"
         expanded={!!events}
         setExpanded={this.setExpanded}
       >
         <div className="devtools-tooltip-events-container">{this.renderEvents(events)}</div>
-      </Dropdown>
+      </PortalDropdown>
     );
   }
 }
