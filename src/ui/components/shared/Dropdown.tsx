@@ -6,7 +6,7 @@ export interface DropdownProps {
   children: ReactNode;
   setExpanded: (expanded: boolean) => void;
   expanded: boolean;
-  position?: string;
+  position?: "top-right" | "bottom-right" | "top-left" | "bottom-left";
   buttonStyle?: string;
   style?: CSSProperties;
 }
