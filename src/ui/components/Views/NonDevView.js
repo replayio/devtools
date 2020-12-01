@@ -5,13 +5,13 @@ import Timeline from "../Timeline";
 import Tooltip from "../Tooltip";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
-const EventListeners = require("devtools/client/debugger/src/components/SecondaryPanes/EventListeners")
-  .default;
-const Dropdown = require("ui/components/shared/Dropdown").default;
+import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
+import Dropdown from "ui/components/shared/Dropdown";
 
 import { installObserver } from "../../../protocol/graphics";
 import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
+import { selectors } from "../../reducers";
 import "./NonDevView.css";
 
 export function EventsFilter() {
@@ -33,7 +33,7 @@ export function EventsFilter() {
   );
 }
 
-function NonDevView({ updateTimelineDimensions }) {
+function NonDevView({ updateTimelineDimensions, narrowMode }) {
   useEffect(() => {
     installObserver();
   }, []);
@@ -65,6 +65,36 @@ function NonDevView({ updateTimelineDimensions }) {
     prefs.nonDevSidePanelWidth = `${num}px`;
   };
 
+  if (narrowMode) {
+    return (
+      <>
+        <SplitBox
+          style={{ width: "100%", overflow: "hidden" }}
+          splitterSize={1}
+          initialSize={prefs.nonDevSidePanelWidth}
+          minSize="20%"
+          onMove={handleMove}
+          maxSize="80%"
+          vert={false}
+          startPanel={
+            <div id="outer-viewer">
+              <div id="viewer">
+                <canvas id="graphics"></canvas>
+                <div id="highlighter-root"></div>
+              </div>
+            </div>
+          }
+          endPanel={rightSidebar}
+          endPanelControl={false}
+        />
+        <div id="toolbox-timeline">
+          <Timeline />
+          <Tooltip />
+        </div>
+      </>
+    );
+  }
+
   return (
     <SplitBox
       style={{ width: "100%", overflow: "hidden" }}
@@ -81,6 +111,11 @@ function NonDevView({ updateTimelineDimensions }) {
   );
 }
 
-export default connect(null, {
-  updateTimelineDimensions,
-})(NonDevView);
+export default connect(
+  state => ({
+    narrowMode: selectors.getNarrowMode(state),
+  }),
+  {
+    updateTimelineDimensions,
+  }
+)(NonDevView);
