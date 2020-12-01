@@ -9,8 +9,8 @@
 }
 
 #toolbox-timeline {
-  min-height: 58px;
-  background: var(--theme-toolbar-background);
+  min-height: 72px;
+  background: var(--theme-body-background);
   border-top: 1px solid var(--theme-splitter-color);
   border-bottom: 1px solid var(--theme-splitter-color);
 }
@@ -83,7 +83,7 @@
   display: flex;
   position: absolute;
   border: 1px solid rgb(204, 204, 204);
-  bottom: 64px;
+  bottom: 72px;
   border-radius: 4px;
   background: #ececec;
   align-items: center;
