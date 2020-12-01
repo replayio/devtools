@@ -14,7 +14,6 @@ import { ExpectedError, Modal, PanelName, PrimaryPanelName, ViewMode } from "ui/
 const { PointHandlers } = require("protocol/logpoint");
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
-export type SetToolboxExpanded = Action<"set_toolbox_expanded"> & { toolboxExpanded: boolean };
 export type LoadingAction = Action<"loading"> & { loading: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
@@ -38,7 +37,6 @@ export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
 export type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type AppAction =
   | SetupAppAction
-  | SetToolboxExpanded
   | LoadingAction
   | SetSessionIdAction
   | UpdateThemeAction
@@ -181,17 +179,6 @@ export function setPendingNotification(location: any): SetPendingNotificationAct
   };
 }
 
-export function setToolboxExpanded(toolboxExpanded: boolean): SetToolboxExpanded {
-  return { type: "set_toolbox_expanded", toolboxExpanded };
-}
-
 export function setViewMode(viewMode: ViewMode): SetViewMode {
   return { type: "set_view_mode", viewMode };
-}
-
-export function toggleToolbox(): UIThunkAction {
-  return ({ getState, dispatch }) => {
-    // dispatch(setAppState({ toolboxExpanded: !selectors.getToolboxExpanded(getState()) }));
-    dispatch(setToolboxExpanded(!selectors.getToolboxExpanded(getState())));
-  };
 }

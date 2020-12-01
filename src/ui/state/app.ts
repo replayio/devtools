@@ -24,7 +24,6 @@ export interface AppState {
   recordingId: RecordingId | null;
   sessionId: SessionId | null;
   theme: string;
-  toolboxExpanded: boolean;
   splitConsoleOpen: boolean;
   loading: number;
   uploading: UploadInfo | null;

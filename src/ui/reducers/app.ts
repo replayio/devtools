@@ -10,7 +10,6 @@ function initialAppState(): AppState {
     expectedError: null,
     unexpectedError: null,
     theme: "theme-light",
-    toolboxExpanded: true,
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
     selectedPrimaryPanel: "explorer",
@@ -29,10 +28,6 @@ export default function update(state = initialAppState(), action: AppAction) {
   switch (action.type) {
     case "setup_app": {
       return { ...state, recordingId: action.recordingId };
-    }
-
-    case "set_toolbox_expanded": {
-      return { ...state, toolboxExpanded: action.toolboxExpanded };
     }
 
     case "set_uploading": {
@@ -106,7 +101,6 @@ export default function update(state = initialAppState(), action: AppAction) {
 }
 
 export const getTheme = (state: UIState) => state.app.theme;
-export const getToolboxExpanded = (state: UIState) => state.app.toolboxExpanded;
 export const isSplitConsoleOpen = (state: UIState) => state.app.splitConsoleOpen;
 export const getSelectedPanel = (state: UIState) => state.app.selectedPanel;
 export const getSelectedPrimaryPanel = (state: UIState) => state.app.selectedPrimaryPanel;

@@ -86,7 +86,6 @@ class Toolbox extends React.Component {
 export default connect(
   state => ({
     initializedPanels: selectors.getInitializedPanels(state),
-    toolboxExpanded: selectors.getToolboxExpanded(state),
     panelCollapsed: selectors.getPaneCollapse(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
     selectedPanel: selectors.getSelectedPanel(state),
