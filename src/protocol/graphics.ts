@@ -363,6 +363,7 @@ export function refreshGraphics() {
 export function installObserver() {
   const canvas = document.getElementById("viewer");
   if (canvas) {
+    refreshGraphics();
     const observer = new ResizeObserverPolyfill(() => {
       refreshGraphics();
     });

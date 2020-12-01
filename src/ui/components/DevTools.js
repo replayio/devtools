@@ -63,14 +63,17 @@ function DevTools({
   selectedPanel,
   viewMode,
 }) {
+  const [recordingLoaded, setRecordingLoaded] = useState(false);
   const { isAuthenticated } = useAuth0();
   const { data, error, loading: queryIsLoading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
   });
 
   useEffect(() => {
-    gToolbox.init(selectedPanel);
-  }, []);
+    if (recordingLoaded) {
+      gToolbox.init(selectedPanel);
+    }
+  }, [recordingLoaded]);
 
   if (expectedError) {
     return null;
@@ -99,6 +102,10 @@ function DevTools({
 
   if (loading < 100) {
     return <RecordingLoadingScreen />;
+  }
+
+  if (!recordingLoaded) {
+    setRecordingLoaded(true);
   }
 
   return (
