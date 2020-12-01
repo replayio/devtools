@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 
 import Toolbox from "./Toolbox";
-import Comments from "./Comments";
 import Header from "./Header/index";
 import Viewer from "./Viewer";
 import Loader from "./shared/Loader";
@@ -31,9 +30,9 @@ const GET_RECORDING = gql`
   }
 `;
 
-function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }) {
+function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions }) {
   const toolbox = <Toolbox />;
-  const viewer = <Viewer tooltip={tooltip} />;
+  const viewer = <Viewer />;
 
   if (!toolboxExpanded) {
     return (
@@ -64,21 +63,15 @@ function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions, tooltip }
       />
       <div id="toolbox-timeline">
         <Timeline />
-        <Tooltip tooltip={tooltip} />
+        <Tooltip />
       </div>
     </>
   );
 }
 
-function NonDevtoolsSplitBox({
-  hasFocusedComment,
-  toolboxExpanded,
-  updateTimelineDimensions,
-  tooltip,
-}) {
+function NonDevtoolsSplitBox({ hasFocusedComment, toolboxExpanded, updateTimelineDimensions }) {
   useEffect(() => {
     installObserver();
-    // gToolbox.init("console");
   }, []);
 
   const viewer = (
@@ -89,9 +82,8 @@ function NonDevtoolsSplitBox({
       </div>
       <div id="toolbox-timeline">
         <Timeline />
-        <Tooltip tooltip={tooltip} />
+        <Tooltip />
       </div>
-      {/* {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />} */}
     </div>
   );
   const handleMove = num => {
@@ -150,7 +142,6 @@ function DevTools({
   unfocusComment,
   loading,
   uploading,
-  tooltip,
   hasFocusedComment,
   updateTimelineDimensions,
   recordingDuration,
@@ -169,7 +160,12 @@ function DevTools({
 
   useEffect(() => {
     gToolbox.init(selectedPanel);
+    console.log("mount");
   }, []);
+
+  useEffect(() => {
+    console.log("re-render");
+  });
 
   if (expectedError) {
     return null;
@@ -206,7 +202,6 @@ function DevTools({
         <Header toggleViewMode={toggleViewMode} viewMode={viewMode} />
         <DevtoolsSplitBox
           toolboxExpanded={toolboxExpanded}
-          tooltip={tooltip}
           updateTimelineDimensions={updateTimelineDimensions}
         />
       </>
@@ -219,7 +214,6 @@ function DevTools({
       <NonDevtoolsSplitBox
         hasFocusedComment={hasFocusedComment}
         toolboxExpanded={toolboxExpanded}
-        tooltip={tooltip}
         updateTimelineDimensions={updateTimelineDimensions}
       />
     </>
@@ -230,7 +224,6 @@ export default connect(
   state => ({
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
-    tooltip: selectors.getTooltip(state),
     hasFocusedComment: selectors.hasFocusedComment(state),
     recordingDuration: selectors.getRecordingDuration(state),
     sessionId: selectors.getSessionId(state),

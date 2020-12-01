@@ -1,7 +1,3 @@
-.comments {
-  position: absolute;
-}
-
 .comments-container {
   position: absolute;
   z-index: var(--z-index-1--comment-container);
@@ -45,7 +41,7 @@
   background-color: transparent;
 }
 
-.comments .comment {
+.comments-container .comment {
   position: absolute;
   background: white;
   bottom: 4rem;
