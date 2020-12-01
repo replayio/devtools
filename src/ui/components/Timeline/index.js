@@ -265,7 +265,7 @@ export class Timeline extends Component {
     }
   }
 
-  doPrevious() {
+  goToNextPaint() {
     const { currentTime } = this.props;
     if (currentTime == this.zoomStartTime) {
       return;
@@ -279,7 +279,7 @@ export class Timeline extends Component {
     this.seekTime(Math.max(previous.time, this.zoomStartTime));
   }
 
-  doNext() {
+  goToPrevPaint() {
     const { currentTime } = this.props;
     if (currentTime == this.zoomEndTime) {
       return;
@@ -410,28 +410,13 @@ export class Timeline extends Component {
   renderCommands() {
     const { playback } = this.props;
 
-    return [
-      CommandButton({
-        className: "",
-        active: !playback,
-        img: "previous",
-        onClick: () => this.doPrevious(),
-      }),
-
-      CommandButton({
-        className: "primary ",
-        active: true,
-        img: playback ? "pause" : "play",
-        onClick: () => (playback ? this.stopPlayback() : this.startPlayback()),
-      }),
-
-      CommandButton({
-        className: "",
-        active: !playback,
-        img: "next",
-        onClick: () => this.doNext(),
-      }),
-    ];
+    return (
+      <div className="commands">
+        <button onClick={() => this.startPlayback()}>
+          <div className="img play-circle-lg" />
+        </button>
+      </div>
+    );
   }
 
   // calculate pixel distance from two times
@@ -541,45 +526,6 @@ export class Timeline extends Component {
     return comments.map(comment => this.renderCommentMarker(comment));
   }
 
-  renderHoverScrubber() {
-    const { hoverTime, hoveredMessage, currentTime } = this.props;
-
-    if (hoverTime == null || hoveredMessage) {
-      return [];
-    }
-
-    let offset = this.getPixelOffset(hoverTime);
-
-    return dom.span(
-      {
-        className: "scrubber hovered",
-        style: {
-          left: `${Math.max(offset, 0)}px`,
-        },
-      },
-      <svg width="9" height="10" viewBox="0 0 9 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 0H9V6L4.5 10L0 6V0Z" fill="#9400FF" />
-      </svg>
-    );
-  }
-
-  renderPausedScrubber() {
-    const { hoverTime, hoveredMessage, currentTime } = this.props;
-    let offset = this.getPixelOffset(currentTime);
-
-    return dom.span(
-      {
-        className: "scrubber",
-        style: {
-          left: `${Math.max(offset, 0)}px`,
-        },
-      },
-      <svg width="9" height="10" viewBox="0 0 9 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 0H9V6L4.5 10L0 6V0Z" fill="#9400FF" />
-      </svg>
-    );
-  }
-
   renderUnprocessedRegions() {
     return this.props.unprocessedRegions.map(this.renderUnprocessedRegion.bind(this));
   }
@@ -626,7 +572,7 @@ export class Timeline extends Component {
       {
         className: "replay-player",
       },
-      div({ className: "commands" }, ...this.renderCommands()),
+      this.renderCommands(),
       div(
         {
           className: classname("overlay-container", { paused: true }),
@@ -641,10 +587,6 @@ export class Timeline extends Component {
             onMouseUp: this.onPlayerMouseUp,
           },
           div({
-            className: "progress",
-            style: { width: `${percent}%` },
-          }),
-          div({
             className: "progress-line",
             style: { width: `${percent}%` },
           }),
@@ -656,8 +598,6 @@ export class Timeline extends Component {
           ...this.renderUnprocessedRegions(),
           <ScrollContainer />
         ),
-        this.renderHoverScrubber(),
-        this.renderPausedScrubber(),
         <Comments />
       )
     );

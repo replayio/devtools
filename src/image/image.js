@@ -135,6 +135,7 @@ const gMaskImages = {
   ".img.expand": require("devtools/client/debugger/images/expand.svg"),
   ".img.log": require("devtools/client/debugger/images/webconsole-logpoint.svg"),
   ".img.play-circle": require("devtools/client/debugger/images/play-circle.svg"),
+  ".img.play-circle-lg": require("devtools/client/debugger/images/play-circle-24x24.svg"),
   ".img.document": require("devtools/client/debugger/images/document.svg"),
   ".img.document-text": require("devtools/client/debugger/images/document-text.svg"),
   ".img.dots-horizontal": require("devtools/client/debugger/images/dots-horizontal.svg"),
