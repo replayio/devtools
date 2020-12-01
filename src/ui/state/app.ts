@@ -2,6 +2,7 @@ import { RecordingId, sessionError, SessionId, PointDescription } from "record-r
 
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug";
+export type ViewMode = "dev" | "non-dev";
 
 export interface Modal {
   type: string;
@@ -35,6 +36,7 @@ export interface AppState {
   initializedPanels: PanelName[];
   pendingNotification: any;
   analysisPoints: AnalysisPoints;
+  viewMode: ViewMode;
 }
 
 export interface AnalysisPoints {

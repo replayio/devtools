@@ -41,12 +41,12 @@ function Avatars({ user, getActiveUsers }) {
   );
 }
 
-function Links({ user, getActiveUsers, recordingId, viewMode, toggleViewMode }) {
+function Links({ user, getActiveUsers, recordingId }) {
   return (
     <div className="links">
       <Avatars user={user} getActiveUsers={getActiveUsers} />
       {recordingId ? <ShareDropdown /> : null}
-      <ViewToggle viewMode={viewMode} toggleViewMode={toggleViewMode} />
+      <ViewToggle />
     </div>
   );
 }
@@ -76,7 +76,7 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
   );
 }
 
-function Header({ user, getActiveUsers, recordingId, viewMode, toggleViewMode }) {
+function Header({ user, getActiveUsers, recordingId }) {
   const [editingTitle, setEditingTitle] = useState(false);
   const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
   const dashboardUrl = `${window.location.origin}/view`;
@@ -102,13 +102,7 @@ function Header({ user, getActiveUsers, recordingId, viewMode, toggleViewMode })
           editingTitle={editingTitle}
         />
       </div>
-      <Links
-        user={user}
-        getActiveUsers={getActiveUsers}
-        recordingId={recordingId}
-        viewMode={viewMode}
-        toggleViewMode={toggleViewMode}
-      />
+      <Links user={user} getActiveUsers={getActiveUsers} recordingId={recordingId} />
     </div>
   );
 }

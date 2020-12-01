@@ -69,7 +69,7 @@ function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions }) {
   );
 }
 
-function NonDevtoolsSplitBox({ hasFocusedComment, toolboxExpanded, updateTimelineDimensions }) {
+function NonDevtoolsSplitBox({ updateTimelineDimensions }) {
   useEffect(() => {
     installObserver();
   }, []);
@@ -139,7 +139,6 @@ function getIsAuthorized({ data, error, isAuthenticated }) {
 }
 
 function DevTools({
-  unfocusComment,
   loading,
   uploading,
   hasFocusedComment,
@@ -150,22 +149,16 @@ function DevTools({
   setExpectedError,
   toolboxExpanded,
   selectedPanel,
+  viewMode,
 }) {
   const { user, isAuthenticated } = useAuth0();
-  const [viewMode, setViewMode] = useState("dev");
   const { data, error, loading: queryIsLoading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
   });
-  const toggleViewMode = () => setViewMode(viewMode == "dev" ? "non-dev" : "dev");
 
   useEffect(() => {
     gToolbox.init(selectedPanel);
-    console.log("mount");
   }, []);
-
-  useEffect(() => {
-    console.log("re-render");
-  });
 
   if (expectedError) {
     return null;
@@ -199,7 +192,7 @@ function DevTools({
   if (viewMode == "dev") {
     return (
       <>
-        <Header toggleViewMode={toggleViewMode} viewMode={viewMode} />
+        <Header />
         <DevtoolsSplitBox
           toolboxExpanded={toolboxExpanded}
           updateTimelineDimensions={updateTimelineDimensions}
@@ -210,7 +203,7 @@ function DevTools({
 
   return (
     <>
-      <Header toggleViewMode={toggleViewMode} viewMode={viewMode} />
+      <Header />
       <NonDevtoolsSplitBox
         hasFocusedComment={hasFocusedComment}
         toolboxExpanded={toolboxExpanded}
@@ -231,6 +224,7 @@ export default connect(
     expectedError: selectors.getExpectedError(state),
     toolboxExpanded: selectors.getToolboxExpanded(state),
     selectedPanel: selectors.getSelectedPanel(state),
+    viewMode: selectors.getViewMode(state),
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,

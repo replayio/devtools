@@ -4,11 +4,13 @@ import classnames from "classnames";
 import "./ViewToggle.css";
 import { clearSelectedLocation } from "../../../devtools/client/debugger/src/actions/sources";
 import { getContext } from "../../../devtools/client/debugger/src/reducers/pause";
+import { setViewMode } from "../../actions/app";
+import { getViewMode } from "../../reducers/app";
 
-function ViewToggle({ viewMode, toggleViewMode, clearSelectedLocation, cx }) {
+function ViewToggle({ viewMode, setViewMode, clearSelectedLocation, cx }) {
   const handleClick = () => {
     clearSelectedLocation(cx);
-    toggleViewMode();
+    setViewMode(viewMode == "dev" ? "non-dev" : "dev");
   };
 
   console.log(cx);
@@ -38,8 +40,10 @@ function ViewToggle({ viewMode, toggleViewMode, clearSelectedLocation, cx }) {
 export default connect(
   state => ({
     cx: getContext(state),
+    viewMode: getViewMode(state),
   }),
   {
-    clearSelectedLocation: clearSelectedLocation,
+    clearSelectedLocation,
+    setViewMode,
   }
 )(ViewToggle);

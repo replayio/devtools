@@ -21,6 +21,7 @@ function initialAppState(): AppState {
     modal: null,
     pendingNotification: null,
     analysisPoints: {},
+    viewMode: "dev",
   };
 }
 
@@ -94,6 +95,10 @@ export default function update(state = initialAppState(), action: AppAction) {
       return { ...state, pendingNotification: action.location };
     }
 
+    case "set_view_mode": {
+      return { ...state, viewMode: action.viewMode };
+    }
+
     default: {
       return state;
     }
@@ -117,3 +122,4 @@ export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
 export const getPendingNotification = (state: UIState) => state.app.pendingNotification;
 export const getAnalysisPointsForLocation = (state: UIState, location: any) =>
   location && state.app.analysisPoints[getLocationKey(location)];
+export const getViewMode = (state: UIState) => state.app.viewMode;
