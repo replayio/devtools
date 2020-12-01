@@ -3,6 +3,11 @@
   --icon-margin: 4px;
 }
 
+.icon-with-tooltip *:focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
+}
+
 .icon-with-tooltip button {
   cursor: pointer;
   border-radius: 4px;
