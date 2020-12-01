@@ -1,22 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 
-import Toolbox from "./Toolbox";
 import Header from "./Header/index";
-import Viewer from "./Viewer";
 import Loader from "./shared/Loader";
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import RecordingLoadingScreen from "./RecordingLoadingScreen";
-import Timeline from "./Timeline";
-import Tooltip from "./Tooltip";
-import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
+import NonDevView from "./Views/NonDevView";
+import DevView from "./Views/DevView";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { gql, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
-import { prefs } from "../utils/prefs";
-import { installObserver } from "../../protocol/graphics";
 
 const GET_RECORDING = gql`
   query GetRecording($recordingId: String) {
@@ -29,85 +23,6 @@ const GET_RECORDING = gql`
     }
   }
 `;
-
-function DevtoolsSplitBox({ toolboxExpanded, updateTimelineDimensions }) {
-  const toolbox = <Toolbox />;
-  const viewer = <Viewer />;
-
-  if (!toolboxExpanded) {
-    return (
-      <div className="collapsed-toolbox">
-        {viewer} {toolbox}
-      </div>
-    );
-  }
-
-  const handleMove = num => {
-    updateTimelineDimensions();
-    prefs.toolboxHeight = `${num}px`;
-  };
-
-  return (
-    <>
-      <SplitBox
-        style={{ width: "100%", overflow: "hidden" }}
-        splitterSize={1}
-        initialSize={prefs.toolboxHeight}
-        minSize="20%"
-        maxSize="80%"
-        vert={true}
-        onMove={handleMove}
-        startPanel={toolbox}
-        endPanel={viewer}
-        endPanelControl={false}
-      />
-      <div id="toolbox-timeline">
-        <Timeline />
-        <Tooltip />
-      </div>
-    </>
-  );
-}
-
-function NonDevtoolsSplitBox({ updateTimelineDimensions }) {
-  useEffect(() => {
-    installObserver();
-  }, []);
-
-  const viewer = (
-    <div id="outer-viewer">
-      <div id="viewer">
-        <canvas id="graphics"></canvas>
-        <div id="highlighter-root"></div>
-      </div>
-      <div id="toolbox-timeline">
-        <Timeline />
-        <Tooltip />
-      </div>
-    </div>
-  );
-  const handleMove = num => {
-    updateTimelineDimensions();
-    prefs.toolboxHeight = `${num}px`;
-  };
-
-  return (
-    <>
-      <SplitBox
-        style={{ width: "100%", overflow: "hidden" }}
-        splitterSize={1}
-        initialSize={prefs.toolboxHeight}
-        minSize="20%"
-        onMove={handleMove}
-        maxSize="80%"
-        vert={true}
-        startPanel={viewer}
-        endPanel={<CommentsPanel />}
-        endPanelControl={false}
-      />
-    </>
-  );
-}
 
 function getUploadingMessage(uploading) {
   if (!uploading) {
@@ -141,17 +56,14 @@ function getIsAuthorized({ data, error, isAuthenticated }) {
 function DevTools({
   loading,
   uploading,
-  hasFocusedComment,
-  updateTimelineDimensions,
   recordingDuration,
   recordingId,
   expectedError,
   setExpectedError,
-  toolboxExpanded,
   selectedPanel,
   viewMode,
 }) {
-  const { user, isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth0();
   const { data, error, loading: queryIsLoading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
   });
@@ -189,26 +101,10 @@ function DevTools({
     return <RecordingLoadingScreen />;
   }
 
-  if (viewMode == "dev") {
-    return (
-      <>
-        <Header />
-        <DevtoolsSplitBox
-          toolboxExpanded={toolboxExpanded}
-          updateTimelineDimensions={updateTimelineDimensions}
-        />
-      </>
-    );
-  }
-
   return (
     <>
       <Header />
-      <NonDevtoolsSplitBox
-        hasFocusedComment={hasFocusedComment}
-        toolboxExpanded={toolboxExpanded}
-        updateTimelineDimensions={updateTimelineDimensions}
-      />
+      {viewMode == "dev" ? <DevView /> : <NonDevView />}
     </>
   );
 }
@@ -222,7 +118,6 @@ export default connect(
     sessionId: selectors.getSessionId(state),
     recordingId: selectors.getRecordingId(state),
     expectedError: selectors.getExpectedError(state),
-    toolboxExpanded: selectors.getToolboxExpanded(state),
     selectedPanel: selectors.getSelectedPanel(state),
     viewMode: selectors.getViewMode(state),
   }),

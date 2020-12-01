@@ -6,7 +6,7 @@
   height: 18px; /* Corresponds with the height of the comment marker */
 }
 
-.comment-marker {
+.img.comment-marker {
   width: 19px;
   height: 19px;
   position: absolute;
@@ -14,9 +14,9 @@
   outline: none;
 }
 
-.comment-marker:hover,
-.comment-marker.hovered,
-.comment-marker.expanded,
+.img.comment-marker:hover,
+.img.comment-marker.hovered,
+.img.comment-marker.expanded,
 .create-comment:hover {
   margin-top: -1px;
   animation-duration: 200ms;
@@ -24,7 +24,7 @@
   cursor: pointer;
 }
 
-.comment-marker.paused {
+.img.comment-marker.paused {
   z-index: var(--z-index-1--paused-comment);
 }
 
