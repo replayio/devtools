@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import Avatar from "ui/components/Avatar";
@@ -18,12 +18,7 @@ export default function UserOptions() {
     return <LoginButton />;
   }
 
-  const buttonContent = (
-    <>
-      <Avatar player={user} isFirstPlayer={true} />
-      {/* <div className="img expand" /> */}
-    </>
-  );
+  const buttonContent = <Avatar player={user} isFirstPlayer={true} />;
 
   return (
     <div className="user-options">

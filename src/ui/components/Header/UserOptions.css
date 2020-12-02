@@ -59,7 +59,7 @@
 }
 
 .user-options .dropdown-wrapper button {
-  padding: 10px;
+  padding: 15px 10px;
   width: 100%;
   color: var(--theme-toolbar-color);
   background: transparent;
