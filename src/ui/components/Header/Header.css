@@ -87,7 +87,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   background: none;
-  cursor: text;
+  cursor: pointer;
   line-height: 18px;
   margin-right: 0.5em;
   color: #2d7eff;
@@ -126,7 +126,7 @@ button.login {
   }
 }
 
-@media (max-width: 760px) {
+/* @media (max-width: 760px) {
   #header .title {
     width: 140px;
   }
@@ -136,4 +136,4 @@ button.login {
   #header .title {
     display: none;
   }
-}
+} */
