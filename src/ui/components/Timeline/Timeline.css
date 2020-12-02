@@ -6,7 +6,8 @@
   box-sizing: border-box;
   --progressbar-transition: 200ms;
   display: flex;
-  padding: 16px 28px 0px;
+  padding: 0px 20px;
+  align-items: center;
 }
 
 .theme-light .replay-player {
@@ -134,7 +135,7 @@
 .replay-player .commands {
   display: flex;
   flex-direction: row;
-  margin: 11px 20px;
+  margin: 11px 20px 11px 0px;
 }
 
 .replay-player .commands *:focus:not(:focus-visible) {
