@@ -13,7 +13,7 @@ function Toolbar({
   togglePaneCollapse,
   panelCollapsed,
 }) {
-  const onClick = () => {
+  const onClick = panel => {
     if (panelCollapsed || (selectedPrimaryPanel == panel && !panelCollapsed)) {
       togglePaneCollapse();
     }

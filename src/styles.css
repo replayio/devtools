@@ -110,6 +110,21 @@
   margin: auto;
 }
 
+.dev-view-outer {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  overflow: hidden;
+}
+
+.dev-view-inner {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
 @import url("devtools/client/themes/components-frame.css");
