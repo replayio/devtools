@@ -7,7 +7,6 @@ const { Component, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
 const actions = require("devtools/client/webconsole/actions/index");
-const ReactDOM = require("react-dom");
 
 const {
   getAllMessagesById,
@@ -24,12 +23,6 @@ const {
   MessageContainer,
 } = require("devtools/client/webconsole/components/Output/MessageContainer");
 const { pointPrecedes } = require("protocol/execution-point-utils");
-
-const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
-const {
-  getInitialMessageCountForViewport,
-} = require("devtools/client/webconsole/utils/messages.js");
-const { bindActionCreators } = require("redux");
 
 function messageExecutionPoint(msg) {
   const { executionPoint, lastExecutionPoint } = msg;
@@ -76,52 +69,8 @@ class ConsoleOutput extends Component {
     };
   }
 
-  constructor(props) {
-    super(props);
-    this.maybeScrollToBottom = this.maybeScrollToBottom.bind(this);
-    // gToolbox.consoleOutput = this;
-  }
-
   componentDidMount() {
     if (this.props.visibleMessages.length > 0) {
-      scrollToBottom(this.outputNode);
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    const messagesDelta = this.props.messages.size - prevProps.messages.size;
-
-    // When evaluation results are added, scroll to them.
-    this.shouldScrollMessageId = null;
-    this.shouldScrollMessageNode = null;
-
-    if (messagesDelta > 0) {
-      const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
-      if (lastMessage.type === MESSAGE_TYPE.RESULT) {
-        this.shouldScrollMessageId = lastMessage.id;
-      }
-    }
-
-    if (this.shouldScrollMessageId) {
-      const node = ReactDOM.findDOMNode(this);
-      this.shouldScrollMessageNode = node.querySelector(
-        `div[data-message-id='${this.shouldScrollMessageId}']`
-      );
-    }
-
-    if (this.shouldScrollMessageNode) {
-      // Scroll to the previous message node if it exists. It should be the
-      // input which triggered the evaluation result we're scrolling to.
-      const previous = this.shouldScrollMessageNode.previousSibling;
-      (previous || this.shouldScrollMessageNode).scrollIntoView();
-      this.shouldScrollMessageNode = null;
-    } else {
-      this.maybeScrollToBottom();
-    }
-  }
-
-  maybeScrollToBottom() {
-    if (this.outputNode && this.shouldScrollBottom) {
       scrollToBottom(this.outputNode);
     }
   }
