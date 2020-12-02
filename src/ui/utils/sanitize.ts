@@ -43,12 +43,22 @@ export function sanitize(obj: any, path: string, category: string, logSanitized:
   return obj;
 }
 
+export function sanitizeState(state: any, logSanitized: boolean) {
+  return sanitize({ ...state, ast: undefined }, "", "state", logSanitized);
+}
+
+export function sanitizeAction(action: any, logSanitized: boolean) {
+  return action.type === "SET_SYMBOLS"
+    ? { type: action.type }
+    : sanitize(action, "", `action[${action.type}]`, logSanitized);
+}
+
 export const sanityCheckMiddleware: Middleware<
   {},
   UIState,
   Dispatch<UIAction>
 > = store => next => action => {
-  sanitize(store.getState(), "", "state", true);
-  sanitize(action, "", `action[type=${action.type}]`, true);
+  sanitizeState(store.getState(), true);
+  sanitizeAction(action, true);
   return next(action);
 };
