@@ -52,7 +52,7 @@ class ConsoleSettings extends Component {
 
     items.push(
       MenuItem({
-        key: "webconsole-console-settings-filter-errors",
+        key: "webconsole-console-settings-log-exceptions",
         checked: shouldLogExceptions,
         className: "menu-item",
         label: "Show Exceptions",
