@@ -101,14 +101,13 @@
 
 button.login {
   border-radius: 4px;
-  padding: 8px 12px;
+  padding: 8px;
   border-radius: 4px;
-  color: white;
   display: flex;
   align-items: center;
-  background: var(--dark-blue);
   cursor: pointer;
   line-height: 16px;
+  margin-bottom: 20px;
 }
 
 .loading-bar {
