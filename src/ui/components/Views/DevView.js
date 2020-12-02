@@ -5,6 +5,7 @@ import Timeline from "../Timeline";
 import Viewer from "../Viewer";
 import Tooltip from "../Tooltip";
 import Toolbox from "../Toolbox";
+import Toolbar from "../Toolbar";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 
 import { installObserver } from "../../../protocol/graphics";
@@ -22,24 +23,27 @@ function DevView({ updateTimelineDimensions }) {
   }, []);
 
   return (
-    <>
-      <SplitBox
-        style={{ width: "100%", overflow: "hidden" }}
-        splitterSize={1}
-        initialSize={prefs.toolboxHeight}
-        minSize="20%"
-        maxSize="80%"
-        vert={true}
-        onMove={handleMove}
-        startPanel={<Toolbox />}
-        endPanel={<Viewer />}
-        endPanelControl={false}
-      />
-      <div id="toolbox-timeline">
-        <Timeline />
-        <Tooltip />
+    <div className="dev-view-outer">
+      <Toolbar />
+      <div className="dev-view-inner">
+        <SplitBox
+          style={{ width: "100%", overflow: "hidden" }}
+          splitterSize={1}
+          initialSize={prefs.toolboxHeight}
+          minSize="20%"
+          maxSize="80%"
+          vert={true}
+          onMove={handleMove}
+          startPanel={<Toolbox />}
+          endPanel={<Viewer />}
+          endPanelControl={false}
+        />
+        <div id="toolbox-timeline">
+          <Timeline />
+          <Tooltip />
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 

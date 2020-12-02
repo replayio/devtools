@@ -9,6 +9,7 @@
 }
 
 #toolbox-timeline {
+  height: 72px;
   min-height: 72px;
   background: var(--theme-body-background);
   border-top: 1px solid var(--theme-splitter-color);
