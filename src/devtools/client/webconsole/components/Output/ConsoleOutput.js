@@ -75,8 +75,60 @@ class ConsoleOutput extends Component {
     };
   }
 
+  constructor(props) {
+    super(props);
+    this.maybeScrollToBottom = this.maybeScrollToBottom.bind(this);
+    gToolbox.consoleOutput = this;
+  }
+
   componentDidMount() {
     if (this.props.visibleMessages.length > 0) {
+      scrollToBottom(this.outputNode);
+    }
+  }
+
+  //KY do i need this?
+  UNSAFE_componentWillUpdate(nextProps, nextState) {
+    console.log("willupdate nextProps", nextProps)
+    console.log("willupdate nextState", nextState)
+  }
+
+  //KY could we not use gtoolbox?
+  componentDidUpdate(prevProps) {
+    console.log("didupdate", prevProps)
+
+    //was willupdate
+    const messagesDelta = this.props.messages.size - prevProps.messages.size;
+
+
+    // When evaluation results are added, scroll to them.
+    this.shouldScrollMessageId = null;
+    // this.shouldScrollMessageNode = null;
+    if (messagesDelta > 0) {
+      const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
+      if (lastMessage.type == MESSAGE_TYPE.RESULT) {
+        this.shouldScrollMessageId = lastMessage.id;
+      }
+    }
+
+
+
+
+    //was didupdate
+    // this.maybeScrollToBottom();
+
+    if (this.shouldScrollMessageNode) {
+      // Scroll to the previous message node if it exists. It should be the
+      // input which triggered the evaluation result we're scrolling to.
+      const previous = this.shouldScrollMessageNode.previousSibling;
+      (previous || this.shouldScrollMessageNode).scrollIntoView();
+      this.shouldScrollMessageNode = null;
+    }
+
+  }
+
+  maybeScrollToBottom() {
+    if (this.outputNode && this.shouldScrollBottom) {
       scrollToBottom(this.outputNode);
     }
   }

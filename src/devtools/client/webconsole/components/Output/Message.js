@@ -399,6 +399,12 @@ class Message extends Component {
       {
         className: topLevelClasses.join(" "),
         ...mouseEvents,
+        ref: node => {
+          this.messageNode = node;
+          if (messageId == gToolbox.consoleOutput.shouldScrollMessageId) {
+            gToolbox.consoleOutput.shouldScrollMessageNode = node;
+          }
+        },
         "data-message-id": messageId,
         "aria-live": type === MESSAGE_TYPE.COMMAND ? "off" : "polite",
       },
