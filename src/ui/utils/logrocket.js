@@ -14,7 +14,7 @@ export default {
   getSessionURL: callback => setup && LogRocket.getSessionURL(callback),
   reduxMiddleware: () =>
     LogRocket.reduxMiddleware({
-      actionSanitizer: action => sanitizeAction(action, false),
-      stateSanitizer: state => sanitizeState(state, false),
+      actionSanitizer: action => ({ type: action.type }),
+      stateSanitizer: () => ({}),
     }),
 };
