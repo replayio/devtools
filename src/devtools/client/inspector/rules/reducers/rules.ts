@@ -2,16 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+import { createReducer, ReducerObject } from "../../shared/reducer-object";
+import { RulesAction } from "../actions/rules";
+import { RulesState } from "../state/rules";
 
-const {
-  UPDATE_ADD_RULE_ENABLED,
-  UPDATE_HIGHLIGHTED_SELECTOR,
-  UPDATE_RULES,
-  UPDATE_SOURCE_LINK,
-} = require("devtools/client/inspector/rules/actions/index");
-
-const INITIAL_RULES = {
+const INITIAL_RULES: RulesState = {
   // The selector of the node that is highlighted by the selector highlighter.
   highlightedSelector: "",
   // Whether or not the add new rule button should be enabled.
@@ -20,29 +15,29 @@ const INITIAL_RULES = {
   rules: [],
 };
 
-const reducers = {
-  [UPDATE_ADD_RULE_ENABLED](rules, { enabled }) {
+const reducers: ReducerObject<RulesState, RulesAction> = {
+  ["UPDATE_ADD_RULE_ENABLED"](rules, { enabled }) {
     return {
       ...rules,
       isAddRuleEnabled: enabled,
     };
   },
 
-  [UPDATE_HIGHLIGHTED_SELECTOR](rules, { highlightedSelector }) {
+  ["UPDATE_HIGHLIGHTED_SELECTOR"](rules, { highlightedSelector }) {
     return {
       ...rules,
       highlightedSelector,
     };
   },
 
-  [UPDATE_RULES](rules, { rules: newRules }) {
+  ["UPDATE_RULES"](rules, { rules: newRules }) {
     return {
       ...rules,
       rules: newRules,
     };
   },
 
-  [UPDATE_SOURCE_LINK](rules, { ruleId, sourceLink }) {
+  ["UPDATE_SOURCE_LINK"](rules, { ruleId, sourceLink }) {
     return {
       highlightedSelector: rules.highlightedSelector,
       isAddRuleEnabled: rules.isAddRuleEnabled,
@@ -60,10 +55,4 @@ const reducers = {
   },
 };
 
-module.exports = function (rules = INITIAL_RULES, action) {
-  const reducer = reducers[action.type];
-  if (!reducer) {
-    return rules;
-  }
-  return reducer(rules, action);
-};
+export default createReducer(INITIAL_RULES, reducers);

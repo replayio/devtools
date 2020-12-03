@@ -2,12 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
-
 /**
  * All CSS <angle> types that properties can support.
  */
-exports.CSS_ANGLEUNIT = {
+export const CSS_ANGLEUNIT = {
   deg: "deg",
   rad: "rad",
   grad: "grad",
@@ -18,7 +16,7 @@ exports.CSS_ANGLEUNIT = {
  * Mapping of InspectorPropertyType to old type ID.
  * Kept for backwards compatibility. Remove after Firefox 70.
  */
-exports.CSS_TYPES = {
+export const CSS_TYPES = {
   color: 2,
   gradient: 4,
   "timing-function": 10,
@@ -28,4 +26,11 @@ exports.CSS_TYPES = {
  * Supported pseudo-class locks in the order in which they appear in the pseudo-class
  * panel in the Rules sidebar panel of the Inspector.
  */
-exports.PSEUDO_CLASSES = [":hover", ":active", ":focus", ":focus-within", ":visited"];
+export type PseudoClass = ":hover" | ":active" | ":focus" | ":focus-within" | ":visited";
+export const PSEUDO_CLASSES: PseudoClass[] = [
+  ":hover",
+  ":active",
+  ":focus",
+  ":focus-within",
+  ":visited",
+];
