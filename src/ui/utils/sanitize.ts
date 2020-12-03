@@ -18,6 +18,8 @@ const forbiddenClasses: Record<string, any> = {
   NodeBoundsFront,
 };
 
+const excludedActions = ["SET_SYMBOLS"];
+
 const loggedCategories = new Set<string>();
 
 export function sanitize(obj: any, path: string, category: string, logSanitized: boolean): any {
@@ -43,14 +45,11 @@ export function sanitize(obj: any, path: string, category: string, logSanitized:
   return obj;
 }
 
-export function sanitizeState(state: any, logSanitized: boolean) {
-  return sanitize({ ...state, ast: undefined }, "", "state", logSanitized);
-}
-
 export function sanitizeAction(action: any, logSanitized: boolean) {
-  return action.type === "SET_SYMBOLS"
-    ? { type: action.type }
-    : sanitize(action, "", `action[${action.type}]`, logSanitized);
+  if (excludedActions.includes(action.type)) {
+    return { type: action.type };
+  }
+  return sanitize(action, "", `action[${action.type}]`, logSanitized);
 }
 
 export const sanityCheckMiddleware: Middleware<
@@ -58,7 +57,6 @@ export const sanityCheckMiddleware: Middleware<
   UIState,
   Dispatch<UIAction>
 > = store => next => action => {
-  sanitizeState(store.getState(), true);
   sanitizeAction(action, true);
   return next(action);
 };
