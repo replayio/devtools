@@ -123,10 +123,6 @@ export class DebuggerPanel {
     return this._actions.selectSourceURL(cx, url, { line, column });
   }
 
-  previewPausedLocation(location) {
-    return this._actions.previewPausedLocation(location);
-  }
-
   clearPreviewPausedLocation() {
     return this._actions.clearPreviewPausedLocation();
   }
