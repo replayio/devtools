@@ -15,7 +15,6 @@
   display: flex;
   flex-direction: row;
   cursor: pointer;
-  border-bottom: 1px solid var(--grey-20);
   width: 100%;
 }
 
@@ -118,4 +117,22 @@
   mask-repeat: no-repeat;
   background-color: #969696;
   mask-position: center;
+}
+
+.comments-panel .item-label {
+  font-size: 1.25rem;
+  color: var(--theme-body-color);
+  margin-bottom: 4px;
+}
+
+.comments-panel .item-content {
+  font-size: 1.25rem;
+  color: var(--theme-comment);
+}
+
+.comments-panel .img {
+  margin-right: 8px;
+  margin-top: 2px;
+  width: 24px;
+  height: 24px;
 }

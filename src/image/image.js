@@ -155,6 +155,8 @@ const gMaskImages = {
   ".img.new-panel-console": require("devtools/client/debugger/images/new-panel-console.svg"),
   ".img.new-panel-transcript": require("devtools/client/debugger/images/new-panel-transcript.svg"),
   ".img.new-panel-elements": require("devtools/client/debugger/images/new-panel-elements.svg"),
+  ".img.event-click": require("devtools/client/themes/images/event-click.svg"),
+  ".img.event-comment": require("devtools/client/themes/images/event-comment.svg"),
   ".tree-node button.arrow": require("devtools/client/debugger/images/arrow.svg"),
   "#command-button-pick::before": require("devtools/client/themes/images/command-pick.svg"),
   "button.open-inspector": require("devtools/client/themes/images/open-inspector.svg"),

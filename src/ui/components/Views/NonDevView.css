@@ -1,0 +1,26 @@
+.right-sidebar {
+  background: #f9f9fa;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.right-sidebar-toolbar {
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px 20px;
+  background: white;
+  border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.right-sidebar-toolbar-item {
+  font-size: 1.25rem;
+  color: var(--dark-blue);
+}
+
+.right-sidebar .comments-panel {
+  background: #f9f9fa;
+  flex-grow: 1;
+}

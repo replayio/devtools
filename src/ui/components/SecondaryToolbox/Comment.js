@@ -108,6 +108,22 @@ class Comment extends React.Component {
     );
   }
 
+  renderNewComment() {
+    const { comment } = this.props;
+    const lines = comment.contents.split("\n");
+
+    return (
+      <div className="comment-body">
+        <div className="item-label">Comment</div>
+        <div className="item-content" onDoubleClick={this.startEditing}>
+          {lines.map((line, i) => (
+            <div key={i}>{line}</div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const { comment, id, currentTime } = this.props;
     const selected = currentTime === comment.time;
@@ -118,8 +134,8 @@ class Comment extends React.Component {
         onClick={this.seekToComment}
         onDoubleClick={this.startEditing}
       >
-        {this.renderAvatar()}
-        {this.renderBody()}
+        <div className="img event-comment" />
+        {this.renderNewComment()}
         <div onClick={e => e.stopPropagation()}>
           <Dropdown panel={this.renderDropdownPanel()} icon={<div>⋯</div>} />
         </div>
