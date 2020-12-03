@@ -11,6 +11,7 @@ import * as eventListeners from "devtools/client/debugger/src/actions/event-list
 import debuggerActions from "devtools/client/debugger/src/actions";
 import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
 import { EventTooltipAction } from "devtools/client/inspector/markup/actions/eventTooltip";
+import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 const consoleActions = require("devtools/client/webconsole/actions");
 
 export type UIAction =
@@ -31,7 +32,9 @@ interface ThunkExtraArgs {
 
 export type UIThunkAction<TReturn = void> = ThunkAction<TReturn, UIState, ThunkExtraArgs, UIAction>;
 
-export type UIStore = Store<UIState, UIAction>;
+export type UIStore = Store<UIState, UIAction> & {
+  userProperties?: UserProperties;
+};
 
 export const actions = {
   ...appActions,

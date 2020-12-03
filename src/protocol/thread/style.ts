@@ -10,7 +10,7 @@ export class StyleFront {
   mediaText = undefined;
   line = undefined;
   column = undefined;
-  selectors = undefined;
+  selectors: string[] = [];
   href = undefined;
   isSystem = false;
   private _pause: Pause;
