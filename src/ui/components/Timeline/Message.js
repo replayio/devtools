@@ -33,21 +33,19 @@ export function Marker({ message, onMarkerClick, onMarkerMouseEnter, onMarkerMou
   // handling to the fill path element. Without that property, we'd have to set the event handlers
   // on the stroke path element as well.
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none">
-      <path
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle
         className="fill"
-        d="M11 5.5L5.5 0 0 5.5 5.5 11 11 5.5Z"
+        cx="5.5"
+        cy="5.5"
+        r="5.5"
         fill="black"
         onClick={e => onMarkerClick(e, message)}
         onMouseEnter={onMarkerMouseEnter}
         onMouseLeave={onMarkerMouseLeave}
       />
-      {/* <path
-        className="inner-stroke"
-        d="M1.4 5.5L5.5 1.4 9.6 5.5 5.5 9.6 1.4 5.5Z"
-        style="stroke-width:2;stroke:black"
-      /> */}
-      <path className="stroke" d="M0.7 5.5L5.5 0.7 10.3 5.5 5.5 10.3 0.7 5.5Z" stroke="black" />
+      {/* <circle cx="5.5" cy="5.5" r="4.5" stroke="black" strokeWidth="2" /> */}
+      <circle className="stroke" cx="5.5" cy="5.5" r="5" stroke="black" />
     </svg>
   );
 }
