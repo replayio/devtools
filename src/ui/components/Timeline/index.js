@@ -8,12 +8,12 @@
 // graphics are currently being rendered.
 
 import { connect } from "react-redux";
+import classnames from "classnames";
 import { Component } from "react";
 import React from "react";
 import dom from "react-dom-factories";
 import { log } from "protocol/socket";
 
-import CommandButton from "./CommandButton";
 import ScrollContainer from "./ScrollContainer";
 import Comments from "../Comments";
 
@@ -412,8 +412,8 @@ export class Timeline extends Component {
 
     return (
       <div className="commands">
-        <button onClick={() => this.startPlayback()}>
-          <div className="img play-circle-lg" />
+        <button onClick={() => (playback ? this.stopPlayback() : this.startPlayback())}>
+          {playback ? <div className="img pause-circle" /> : <div className="img play-circle-lg" />}
         </button>
       </div>
     );
