@@ -7,6 +7,7 @@ const { Component, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
 const actions = require("devtools/client/webconsole/actions/index");
+const ReactDOM = require("react-dom");
 
 const {
   getAllMessagesById,
@@ -23,6 +24,8 @@ const {
   MessageContainer,
 } = require("devtools/client/webconsole/components/Output/MessageContainer");
 const { pointPrecedes } = require("protocol/execution-point-utils");
+
+const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 
 function messageExecutionPoint(msg) {
   const { executionPoint, lastExecutionPoint } = msg;
@@ -73,6 +76,35 @@ class ConsoleOutput extends Component {
     if (this.props.visibleMessages.length > 0) {
       scrollToBottom(this.outputNode);
     }
+  }
+
+  componentDidUpdate(prevProps) {
+    this.maybeScrollToMessage(prevProps);
+  }
+
+  maybeScrollToMessage(prevProps) {
+    const messagesDelta = this.props.messages.size - prevProps.messages.size;
+
+    // [...this.props.messages.values()] seems slow
+    // we should have a separate messageList somewhere we can check OR
+    // use a memoization function to be able to get the last message quickly
+    const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
+
+    if (messagesDelta <= 0 || lastMessage.type != MESSAGE_TYPE.RESULT) {
+      return;
+    }
+
+    const node = ReactDOM.findDOMNode(this);
+    const resultNode = node.querySelector(`div[data-message-id='${lastMessage.id}']`);
+
+    if (!resultNode) {
+      return;
+    }
+
+    // Scroll to the previous message node if it exists. It should be the
+    // input which triggered the evaluation result we're scrolling to.
+    const previous = resultNode.previousSibling;
+    (previous || resultNode).scrollIntoView();
   }
 
   render() {
