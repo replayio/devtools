@@ -20,7 +20,7 @@ function initialAppState(): AppState {
     modal: null,
     pendingNotification: null,
     analysisPoints: {},
-    viewMode: "dev",
+    viewMode: prefs.viewMode,
   };
 }
 
