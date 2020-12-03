@@ -587,12 +587,11 @@ export class Timeline extends Component {
             onMouseUp: this.onPlayerMouseUp,
           },
           div({
-            className: "progress-line",
-            style: { width: `${percent}%` },
+            className: "progress-line end",
           }),
           div({
-            className: "progress-line end",
-            style: { left: `${percent}%`, width: `${100 - percent}%` },
+            className: "progress-line",
+            style: { width: `${percent}%` },
           }),
           div({ className: "message-container" }, ...this.renderMessages()),
           ...this.renderUnprocessedRegions(),

@@ -209,6 +209,7 @@
 }
 
 .replay-player .progress-line.end {
+  width: 100%;
   background: var(--progressbar-background);
 }
 
