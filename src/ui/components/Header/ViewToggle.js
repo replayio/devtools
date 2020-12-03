@@ -9,8 +9,8 @@ import { getViewMode } from "../../reducers/app";
 
 function ViewToggle({ viewMode, setViewMode, clearSelectedLocation, cx }) {
   const handleClick = () => {
-    // clearSelectedLocation(cx);
-    setViewMode(viewMode == "dev" ? "non-dev" : "dev");
+    const newMode = viewMode == "dev" ? "non-dev" : "dev";
+    setViewMode(newMode);
   };
 
   return (
