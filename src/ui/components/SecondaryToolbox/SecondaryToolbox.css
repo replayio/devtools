@@ -28,6 +28,13 @@
   padding: 8px 12px;
   cursor: pointer;
   transition: color 200ms;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.secondary-toolbox-header button > *:not(:last-child) {
+  margin-right: 8px;
 }
 
 .secondary-toolbox-header button:focus {
@@ -39,6 +46,11 @@
 .secondary-toolbox-header button.expanded {
   background: inherit;
   color: var(--theme-toolbar-selected-color);
+}
+
+.secondary-toolbox-header button.hover .img,
+.secondary-toolbox-header button.expanded .img {
+  background: var(--theme-toolbar-selected-color);
 }
 
 .secondary-toolbox-header .action-buttons button {

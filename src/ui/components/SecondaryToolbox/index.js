@@ -29,7 +29,8 @@ function PanelButtons({ selectedPanel, setSelectedPanel }) {
         className={classnames("console-panel-button", { expanded: selectedPanel === "console" })}
         onClick={() => onClick("console")}
       >
-        Console
+        <div className="img new-panel-console" />
+        <div className="label">Console</div>
       </button>
       <button
         className={classnames("inspector-panel-button", {
@@ -37,13 +38,15 @@ function PanelButtons({ selectedPanel, setSelectedPanel }) {
         })}
         onClick={() => onClick("inspector")}
       >
-        Elements
+        <div className="img new-panel-elements" />
+        <div className="label">Elements</div>
       </button>
       <button
         className={classnames("comments-panel-button", { expanded: selectedPanel === "comments" })}
         onClick={() => onClick("comments")}
       >
-        Comments
+        <div className="img new-panel-transcript" />
+        <div className="label">Transcript and Comments</div>
       </button>
     </div>
   );
