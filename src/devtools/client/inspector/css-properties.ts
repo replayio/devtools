@@ -7442,8 +7442,7 @@ function isCssVariable(input: string) {
 
 const CSSProperties = {
   supportsType(property: string, type: string) {
-    const prop = properties[property];
-    return prop && prop.supports.includes(type);
+    return properties[property]?.supports.includes(type) || false;
   },
 
   supportsCssColor4ColorFunction() {
@@ -7454,9 +7453,8 @@ const CSSProperties = {
     // Custom Property Names (aka CSS Variables) are case-sensitive; do not lowercase.
     name = name.startsWith("--") ? name : name.toLowerCase();
     if (this.isKnown(name)) {
-      const prop = properties[name];
-      if (prop && prop.subproperties) {
-        return prop.subproperties;
+      if (properties[name]?.subproperties) {
+        return properties[name]!.subproperties;
       }
       return [name];
     }
@@ -7470,8 +7468,7 @@ const CSSProperties = {
   },
 
   isInherited(property: string) {
-    const prop = properties[property];
-    return (prop && prop.isInherited) || isCssVariable(property);
+    return properties[property]?.isInherited || isCssVariable(property);
   },
 };
 
