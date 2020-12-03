@@ -1,6 +1,6 @@
 import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
-import { sanitize } from "./sanitize";
+import { sanitizeAction, sanitizeState } from "./sanitize";
 
 let setup = false;
 
@@ -14,7 +14,7 @@ export default {
   getSessionURL: callback => setup && LogRocket.getSessionURL(callback),
   reduxMiddleware: () =>
     LogRocket.reduxMiddleware({
-      actionSanitizer: action => sanitize(action, "", `action[type=${action.type}]`, false),
-      stateSanitizer: state => sanitize(state, "", "state", false),
+      actionSanitizer: action => ({ type: action.type }),
+      stateSanitizer: () => ({}),
     }),
 };

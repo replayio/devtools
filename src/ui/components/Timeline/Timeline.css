@@ -2,13 +2,11 @@
 
 .replay-player {
   -moz-appearance: none;
-  background: var(--theme-tab-toolbar-background);
+  background: var(--theme-body-background);
   box-sizing: border-box;
-  min-height: 29px;
   --progressbar-transition: 200ms;
   display: flex;
-  height: 100%;
-  padding-right: 10px;
+  padding: 16px 28px 0px;
 }
 
 .theme-light .replay-player {
@@ -21,7 +19,7 @@
   --replaying-marker-fill-hover: var(--blue-60);
   --hover-scrubber-line-background: var(--blue-50);
   --progress-recording-line: #d0021b;
-  --progressbar-background: #fff;
+  --progressbar-background: var(--grey-30);
   --progressbar-line-color: var(--blue-40);
   --proggressbar-border-color: var(--theme-splitter-color);
   --tick-future-background: #bfc9d2;
@@ -38,18 +36,14 @@
 .replay-player .progressBar {
   position: relative;
   width: 100%;
-  height: 25px;
-  background: #d4ebff;
-  border: 1px solid var(--proggressbar-border-color);
+  height: 32px;
   overflow: hidden;
-  margin-top: 8px;
 }
 
 .replay-player .progress {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: #c0e2ff;
   pointer-events: none;
   border-right-color: var(--replay-head-background);
   border-right-width: 1px;
@@ -93,7 +87,7 @@
 }
 
 .replay-player .message .stroke {
-  stroke: var(--replaying-marker-stroke);
+  stroke: var(--theme-body-background);
   pointer-events: none;
 }
 
@@ -107,6 +101,7 @@
 
 .replay-player .message.paused .stroke {
   stroke: var(--replaying-paused-marker-stroke);
+  stroke: var(--theme-body-background);
 }
 
 .replay-player .message:focus {
@@ -117,7 +112,7 @@
   position: absolute;
   height: 30px;
   width: 1px;
-  top: 0px;
+  top: -8px;
   pointer-events: none;
   background: transparent;
 }
@@ -128,31 +123,35 @@
 
 .replay-player .scrubber.hovered {
   background: var(--hover-scrubber-line-background);
-  height: 32px;
+  height: 40px;
 }
 
-/* The scrubber is 9px wide, so shifting it 4px to the left
-gets the scrubber's center position (5px) right on top of the
-pause line or the hover preview line */
+/* The scrubber is 9px wide */
 .replay-player .scrubber svg {
-  margin-left: -4px;
+  margin-left: -4.5px;
 }
 
 .replay-player .commands {
   display: flex;
-  margin: 0 4px;
+  flex-direction: row;
+  margin-right: 20px;
+  margin-left: 24px;
 }
 
-.replay-player .command-button {
-  display: flex;
-  min-width: 20px;
-  opacity: 0.4;
-  height: 29px;
-  margin-top: 4px;
+.replay-player .commands *:focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
 }
 
-.replay-player .command-button.primary {
-  min-width: 22px;
+.replay-player .commands > button {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.replay-player .commands > button .img {
+  width: 24px;
+  height: 24px;
 }
 
 .replay-player .btn {
@@ -194,7 +193,8 @@ pause line or the hover preview line */
 
 .replay-player .progress-line {
   width: 0%;
-  height: 1px;
+  height: 5px;
+  border-radius: 4px;
   background: var(--progressbar-line-color);
   position: absolute;
   pointer-events: none;
@@ -205,7 +205,7 @@ pause line or the hover preview line */
 }
 
 .replay-player .progress-line.end {
-  opacity: 0.3;
+  background: var(--progressbar-background);
 }
 
 .replay-player .tick {

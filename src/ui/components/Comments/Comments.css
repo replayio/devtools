@@ -2,7 +2,7 @@
   position: absolute;
   z-index: var(--z-index-1--comment-container);
   width: 100%;
-  bottom: 4px; /* Arbitrary value to push the markers away from the bottom of the overlay container */
+  top: 28px; /* Arbitrary value to push the markers away from the bottom of the overlay container */
   height: 18px; /* Corresponds with the height of the comment marker */
 }
 
@@ -44,7 +44,7 @@
 .comments-container .comment {
   position: absolute;
   background: white;
-  bottom: 64px;
+  bottom: 84px;
   border: 1px solid #ccc;
   box-shadow: 0px 3px 4px #eaeaea;
   border-radius: 3px;

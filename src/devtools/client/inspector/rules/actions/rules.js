@@ -102,6 +102,8 @@ function getDeclarationState(declaration, ruleId) {
     isPropertyChanged: declaration.isPropertyChanged,
     // The declaration's property name.
     name: declaration.name,
+    // The declaration's parsed property value.
+    parsedValue: declaration.parsedValue,
     // The declaration's priority (either "important" or an empty string).
     priority: declaration.priority,
     // The CSS rule id that is associated with this CSS declaration.

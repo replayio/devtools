@@ -21,6 +21,7 @@ Replay's DevTools is a React app built on top of the Replay [protocol](https://w
 
 ```
 git clone git@github.com:RecordReplay/devtools.git
+cd devtools
 npm install 
 npm start
 ```
