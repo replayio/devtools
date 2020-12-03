@@ -24,12 +24,6 @@ const {
 } = require("devtools/client/webconsole/components/Output/MessageContainer");
 const { pointPrecedes } = require("protocol/execution-point-utils");
 
-const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
-const {
-  getInitialMessageCountForViewport,
-} = require("devtools/client/webconsole/utils/messages.js");
-const { bindActionCreators } = require("redux");
-
 function messageExecutionPoint(msg) {
   const { executionPoint, lastExecutionPoint } = msg;
   return executionPoint || (lastExecutionPoint && lastExecutionPoint.point);
