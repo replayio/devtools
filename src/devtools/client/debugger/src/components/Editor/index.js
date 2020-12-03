@@ -19,18 +19,6 @@ import { getIndentation } from "../../utils/indentation";
 import { showMenu } from "devtools-contextmenu";
 import { continueToHereItem, editorItemActions } from "./menus/editor";
 
-import {
-  getActiveSearch,
-  getSelectedLocation,
-  getSelectedSourceWithContent,
-  getSymbols,
-  getIsPaused,
-  getThreadContext,
-  getSkipPausing,
-  getSelectedFrame,
-  getFramePositions,
-} from "../../selectors";
-
 // Redux actions
 import actions from "../../actions";
 
@@ -60,11 +48,13 @@ import {
   onMouseOver,
   startOperation,
   endOperation,
+  clearDocuments,
 } from "../../utils/editor";
 
 import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
 
 import "./Editor.css";
+import { selectors } from "ui/reducers";
 
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
@@ -82,20 +72,33 @@ class Editor extends PureComponent {
     };
   }
 
+  componentDidMount() {
+    const { shortcuts } = this.context;
+
+    shortcuts.on("CmdOrCtrl+B", this.onToggleBreakpoint);
+    shortcuts.on("CmdOrCtrl+W", this.onClosePress);
+    shortcuts.on("Esc", this.onEscape);
+    this.updateEditor(this.props);
+  }
+
   UNSAFE_componentWillReceiveProps(nextProps) {
+    this.updateEditor(nextProps);
+  }
+
+  updateEditor(props) {
     let editor = this.state.editor;
 
-    if (!this.state.editor && nextProps.selectedSource) {
+    if (!this.state.editor && props.selectedSource) {
       editor = this.setupEditor();
     }
 
     startOperation();
-    this.setText(nextProps, editor);
-    this.setSize(nextProps, editor);
-    this.scrollToLocation(nextProps, editor);
+    this.setText(props, editor);
+    this.setSize(props, editor);
+    this.scrollToLocation(props, editor);
     endOperation();
 
-    if (this.props.selectedSource != nextProps.selectedSource) {
+    if (this.props.selectedSource != props.selectedSource) {
       this.props.updateViewport();
       resizeBreakpointGutter(editor.codeMirror);
       resizeToggleButton(editor.codeMirror);
@@ -139,14 +142,6 @@ class Editor extends PureComponent {
     return editor;
   }
 
-  componentDidMount() {
-    const { shortcuts } = this.context;
-
-    shortcuts.on("CmdOrCtrl+B", this.onToggleBreakpoint);
-    shortcuts.on("CmdOrCtrl+W", this.onClosePress);
-    shortcuts.on("Esc", this.onEscape);
-  }
-
   onClosePress = (key, e) => {
     const { cx, selectedSource } = this.props;
     if (selectedSource) {
@@ -159,6 +154,7 @@ class Editor extends PureComponent {
   componentWillUnmount() {
     if (this.state.editor) {
       this.state.editor.destroy();
+      clearDocuments();
       this.state.editor.codeMirror.off("scroll", this.onEditorScroll);
       this.setState({ editor: null });
     }
@@ -362,10 +358,7 @@ class Editor extends PureComponent {
 
   setText(props, editor) {
     const { selectedSource, symbols } = props;
-
-    if (!editor) {
-      return;
-    }
+    if (!editor) return;
 
     // check if we previously had a selected source
     if (!selectedSource) {
@@ -482,18 +475,19 @@ Editor.contextTypes = {
 };
 
 const mapStateToProps = state => {
-  const selectedSource = getSelectedSourceWithContent(state);
+  const selectedSource = selectors.getSelectedSourceWithContent(state);
 
   return {
-    cx: getThreadContext(state),
-    selectedLocation: getSelectedLocation(state),
+    cx: selectors.getThreadContext(state),
+    selectedLocation: selectors.getSelectedLocation(state),
     selectedSource,
-    searchOn: getActiveSearch(state) === "file",
-    symbols: getSymbols(state, selectedSource),
-    isPaused: getIsPaused(state),
-    skipPausing: getSkipPausing(state),
-    selectedFrame: getSelectedFrame(state),
-    framePositions: getFramePositions(state),
+    searchOn: selectors.getActiveSearch(state) === "file",
+    symbols: selectors.getSymbols(state, selectedSource),
+    isPaused: selectors.getIsPaused(state),
+    skipPausing: selectors.getSkipPausing(state),
+    selectedFrame: selectors.getSelectedFrame(state),
+    framePositions: selectors.getFramePositions(state),
+    mode: selectors.getViewMode(state),
   };
 };
 
