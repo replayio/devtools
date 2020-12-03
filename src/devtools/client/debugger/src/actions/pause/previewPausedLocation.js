@@ -8,6 +8,7 @@ import { selectLocation } from "../sources";
 import { getContext, getSourceByURL } from "../../selectors";
 
 export function previewPausedLocation(location) {
+  console.log("previewPausedLocation")
   return ({ dispatch, getState }) => {
     const cx = getContext(getState());
     const source = getSourceByURL(getState(), location.sourceUrl);
