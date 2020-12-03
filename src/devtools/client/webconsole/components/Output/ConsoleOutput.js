@@ -72,11 +72,6 @@ class ConsoleOutput extends Component {
     };
   }
 
-  constructor(props) {
-    super(props);
-    this.maybeScrollToBottom = this.maybeScrollToBottom.bind(this);
-  }
-
   componentDidMount() {
     if (this.props.visibleMessages.length > 0) {
       scrollToBottom(this.outputNode);
@@ -87,37 +82,29 @@ class ConsoleOutput extends Component {
     const messagesDelta = this.props.messages.size - prevProps.messages.size;
 
     // When evaluation results are added, scroll to them.
-    this.shouldScrollMessageId = null;
-    this.shouldScrollMessageNode = null;
+    let shouldScrollMessageId;
+    let shouldScrollMessageNode;
 
     if (messagesDelta > 0) {
       const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
       if (lastMessage.type === MESSAGE_TYPE.RESULT) {
-        this.shouldScrollMessageId = lastMessage.id;
+        shouldScrollMessageId = lastMessage.id;
       }
     }
 
-    if (this.shouldScrollMessageId) {
+    if (shouldScrollMessageId) {
       const node = ReactDOM.findDOMNode(this);
-      this.shouldScrollMessageNode = node.querySelector(
-        `div[data-message-id='${this.shouldScrollMessageId}']`
+      shouldScrollMessageNode = node.querySelector(
+        `div[data-message-id='${shouldScrollMessageId}']`
       );
     }
 
-    if (this.shouldScrollMessageNode) {
+    if (shouldScrollMessageNode) {
       // Scroll to the previous message node if it exists. It should be the
       // input which triggered the evaluation result we're scrolling to.
-      const previous = this.shouldScrollMessageNode.previousSibling;
-      (previous || this.shouldScrollMessageNode).scrollIntoView();
-      this.shouldScrollMessageNode = null;
-    } else {
-      this.maybeScrollToBottom();
-    }
-  }
-
-  maybeScrollToBottom() {
-    if (this.outputNode && this.shouldScrollBottom) {
-      scrollToBottom(this.outputNode);
+      const previous = shouldScrollMessageNode.previousSibling;
+      (previous || shouldScrollMessageNode).scrollIntoView();
+      shouldScrollMessageNode = null;
     }
   }
 
