@@ -79,33 +79,32 @@ class ConsoleOutput extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    this.maybeScrollToMessage(prevProps);
+  }
+
+  maybeScrollToMessage(prevProps) {
     const messagesDelta = this.props.messages.size - prevProps.messages.size;
 
-    // When evaluation results are added, scroll to them.
-    let shouldScrollMessageId;
-    let shouldScrollMessageNode;
+    // [...this.props.messages.values()] seems slow
+    // we should have a separate messageList somewhere we can check OR
+    // use a memoization function to be able to get the last message quickly
+    const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
 
-    if (messagesDelta > 0) {
-      const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
-      if (lastMessage.type === MESSAGE_TYPE.RESULT) {
-        shouldScrollMessageId = lastMessage.id;
-      }
+    if (messagesDelta <= 0 || lastMessage.type != MESSAGE_TYPE.RESULT) {
+      return;
     }
 
-    if (shouldScrollMessageId) {
-      const node = ReactDOM.findDOMNode(this);
-      shouldScrollMessageNode = node.querySelector(
-        `div[data-message-id='${shouldScrollMessageId}']`
-      );
+    const node = ReactDOM.findDOMNode(this);
+    const resultNode = node.querySelector(`div[data-message-id='${lastMessage.id}']`);
+
+    if (!resultNode) {
+      return;
     }
 
-    if (shouldScrollMessageNode) {
-      // Scroll to the previous message node if it exists. It should be the
-      // input which triggered the evaluation result we're scrolling to.
-      const previous = shouldScrollMessageNode.previousSibling;
-      (previous || shouldScrollMessageNode).scrollIntoView();
-      shouldScrollMessageNode = null;
-    }
+    // Scroll to the previous message node if it exists. It should be the
+    // input which triggered the evaluation result we're scrolling to.
+    const previous = resultNode.previousSibling;
+    (previous || resultNode).scrollIntoView();
   }
 
   render() {
