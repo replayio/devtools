@@ -7,7 +7,7 @@ import { assert } from "protocol/utils";
 import { Inspector } from "../../inspector";
 const EventEmitter = require("devtools/shared/event-emitter");
 
-interface ClassInfo {
+export interface ClassInfo {
   name: string;
   isApplied: boolean;
 }

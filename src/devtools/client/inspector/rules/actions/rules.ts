@@ -2,71 +2,82 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+import { Action } from "redux";
+import Rule, { SourceLink } from "../models/rule";
+import TextProperty from "../models/text-property";
+import { DeclarationState, RuleState } from "../state/rules";
 
-const {
-  UPDATE_ADD_RULE_ENABLED,
-  UPDATE_HIGHLIGHTED_SELECTOR,
-  UPDATE_RULES,
-  UPDATE_SOURCE_LINK,
-} = require("devtools/client/inspector/rules/actions/index");
-
-module.exports = {
-  /**
-   * Updates whether or not the add new rule button should be enabled.
-   *
-   * @param  {Boolean} enabled
-   *         Whether or not the add new rule button is enabled.
-   */
-  updateAddRuleEnabled(enabled) {
-    return {
-      type: UPDATE_ADD_RULE_ENABLED,
-      enabled,
-    };
-  },
-
-  /**
-   * Updates the highlighted selector.
-   *
-   * @param  {String} highlightedSelector
-   *         The selector of the element to be highlighted by the selector highlighter.
-   */
-  updateHighlightedSelector(highlightedSelector) {
-    return {
-      type: UPDATE_HIGHLIGHTED_SELECTOR,
-      highlightedSelector,
-    };
-  },
-
-  /**
-   * Updates the rules state with the new list of CSS rules for the selected element.
-   *
-   * @param  {Array} rules
-   *         Array of Rule objects containing the selected element's CSS rules.
-   */
-  updateRules(rules) {
-    return {
-      type: UPDATE_RULES,
-      rules: rules.map(rule => getRuleState(rule)),
-    };
-  },
-
-  /**
-   * Updates the source link information for a given rule.
-   *
-   * @param  {String} ruleId
-   *         The Rule id of the target rule.
-   * @param  {Object} sourceLink
-   *         New source link data.
-   */
-  updateSourceLink(ruleId, sourceLink) {
-    return {
-      type: UPDATE_SOURCE_LINK,
-      ruleId,
-      sourceLink,
-    };
-  },
+type UpdateAddRuleEnabledAction = Action<"UPDATE_ADD_RULE_ENABLED"> & { enabled: boolean };
+type UpdateHighlightedSelectorAction = Action<"UPDATE_HIGHLIGHTED_SELECTOR"> & {
+  highlightedSelector: string;
 };
+type UpdateRulesAction = Action<"UPDATE_RULES"> & { rules: RuleState[] };
+type UpdateSourceLinkAction = Action<"UPDATE_SOURCE_LINK"> & {
+  ruleId: string;
+  sourceLink: SourceLink;
+};
+export type RulesAction =
+  | UpdateAddRuleEnabledAction
+  | UpdateHighlightedSelectorAction
+  | UpdateRulesAction
+  | UpdateSourceLinkAction;
+
+/**
+ * Updates whether or not the add new rule button should be enabled.
+ *
+ * @param  {Boolean} enabled
+ *         Whether or not the add new rule button is enabled.
+ */
+export function updateAddRuleEnabled(enabled: boolean): UpdateAddRuleEnabledAction {
+  return {
+    type: "UPDATE_ADD_RULE_ENABLED",
+    enabled,
+  };
+}
+
+/**
+ * Updates the highlighted selector.
+ *
+ * @param  {String} highlightedSelector
+ *         The selector of the element to be highlighted by the selector highlighter.
+ */
+export function updateHighlightedSelector(
+  highlightedSelector: string
+): UpdateHighlightedSelectorAction {
+  return {
+    type: "UPDATE_HIGHLIGHTED_SELECTOR",
+    highlightedSelector,
+  };
+}
+
+/**
+ * Updates the rules state with the new list of CSS rules for the selected element.
+ *
+ * @param  {Array} rules
+ *         Array of Rule objects containing the selected element's CSS rules.
+ */
+export function updateRules(rules: Rule[]): UpdateRulesAction {
+  return {
+    type: "UPDATE_RULES",
+    rules: rules.map(rule => getRuleState(rule)),
+  };
+}
+
+/**
+ * Updates the source link information for a given rule.
+ *
+ * @param  {String} ruleId
+ *         The Rule id of the target rule.
+ * @param  {Object} sourceLink
+ *         New source link data.
+ */
+export function updateSourceLink(ruleId: string, sourceLink: SourceLink): UpdateSourceLinkAction {
+  return {
+    type: "UPDATE_SOURCE_LINK",
+    ruleId,
+    sourceLink,
+  };
+}
 
 /**
  * Given a rule's TextProperty, returns the properties that are needed to render a
@@ -78,7 +89,7 @@ module.exports = {
  *         The rule id that is associated with the given CSS declaration.
  * @return {Object} containing the properties needed to render a CSS declaration.
  */
-function getDeclarationState(declaration, ruleId) {
+function getDeclarationState(declaration: TextProperty, ruleId: string): DeclarationState {
   return {
     // Array of the computed properties for a CSS declaration.
     computedProperties: declaration.computedProperties,
@@ -120,7 +131,7 @@ function getDeclarationState(declaration, ruleId) {
  *         A Rule object containing information about a CSS rule.
  * @return {Object} containing the properties needed to render a CSS rule.
  */
-function getRuleState(rule) {
+function getRuleState(rule: Rule): RuleState {
   return {
     // Array of CSS declarations.
     declarations: rule.declarations.map(declaration =>

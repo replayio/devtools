@@ -10,13 +10,12 @@ const { prefs } = require("devtools/client/inspector/prefs");
 
 export const boxModel = require("devtools/client/inspector/boxmodel/reducers/box-model");
 export const changes = require("devtools/client/inspector/changes/reducers/changes");
-export const classList = require("devtools/client/inspector/rules/reducers/class-list");
-import _markup from "devtools/client/inspector/markup/reducers/markup";
-export const markup = _markup;
-import _eventTooltip from "devtools/client/inspector/markup/reducers/eventTooltip";
-export const eventTooltip = _eventTooltip;
-export const pseudoClasses = require("devtools/client/inspector/rules/reducers/pseudo-classes");
-export const rules = require("devtools/client/inspector/rules/reducers/rules");
+import classList from "devtools/client/inspector/rules/reducers/class-list";
+import markup from "devtools/client/inspector/markup/reducers/markup";
+import eventTooltip from "devtools/client/inspector/markup/reducers/eventTooltip";
+import pseudoClasses from "devtools/client/inspector/rules/reducers/pseudo-classes";
+import rules from "devtools/client/inspector/rules/reducers/rules";
+export { classList, markup, eventTooltip, pseudoClasses, rules };
 
 // This ObjectInspector reducer is needed for the Extension Sidebar.
 const {

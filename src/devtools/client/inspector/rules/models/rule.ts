@@ -39,6 +39,25 @@ const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.prope
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const STYLE_INSPECTOR_L10N = new LocalizationHelper(STYLE_INSPECTOR_PROPERTIES);
 
+export interface RuleInheritance {
+  // The NodeFront object id for the element in which the rule is inherited from.
+  inheritedNodeId: string;
+  // The display name for the element in which the rule is inherited from.
+  inheritedSource: string | undefined;
+}
+
+export interface RuleSelector {
+  getUniqueSelector: () => Promise<string>;
+  matchedSelectors: string[] | undefined;
+  selectors: string[];
+  selectorText: string;
+}
+
+export interface SourceLink {
+  label: string | null | undefined;
+  title: string | null | undefined;
+}
+
 interface RuleOptions {
   rule: RuleFront | StyleFront;
   matchedSelectors?: string[];
@@ -128,7 +147,7 @@ export default class Rule {
    * If this is an inherited rule, return an object containing information about the
    * element in which the rule is inherited from and the element source name to display.
    */
-  get inheritance() {
+  get inheritance(): RuleInheritance | null {
     if (!this.inherited) {
       return null;
     }
@@ -160,7 +179,7 @@ export default class Rule {
     return this._inheritedSource;
   }
 
-  get selector() {
+  get selector(): RuleSelector {
     return {
       getUniqueSelector: this.getUniqueSelector,
       matchedSelectors: this.matchedSelectors,
@@ -169,7 +188,7 @@ export default class Rule {
     };
   }
 
-  get sourceLink() {
+  get sourceLink(): SourceLink {
     return {
       label: this.getSourceText(CssLogic.shortSource({ href: this.sourceLocation.url })),
       title: this.getSourceText(this.sourceLocation.url),

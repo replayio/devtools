@@ -22,6 +22,13 @@ export interface ComputedProperty {
   _overriddenDirty?: boolean;
 }
 
+export interface ComputedPropertyInfo {
+  isOverridden: undefined;
+  name: string;
+  priority: Priority;
+  value: string;
+}
+
 /**
  * TextProperty is responsible for the following:
  *   Manages a single property from the authoredText attribute of the
@@ -89,7 +96,7 @@ export default class TextProperty {
     this.updateComputed();
   }
 
-  get computedProperties() {
+  get computedProperties(): ComputedPropertyInfo[] {
     return this.computed!.filter(computed => computed.name !== this.name).map(computed => {
       return {
         isOverridden: undefined, //computed.overridden,
