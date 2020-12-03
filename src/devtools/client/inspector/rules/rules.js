@@ -5,12 +5,12 @@
 "use strict";
 
 const Services = require("Services");
-const ElementStyle = require("devtools/client/inspector/rules/models/element-style");
+const ElementStyle = require("devtools/client/inspector/rules/models/element-style").default;
 const { OutputParser } = require("devtools/client/shared/output-parser");
 const { createFactory, createElement } = require("react");
 const { Provider } = require("react-redux");
 const EventEmitter = require("devtools/shared/event-emitter");
-const ClassList = require("devtools/client/inspector/rules/models/class-list");
+const ClassList = require("devtools/client/inspector/rules/models/class-list").default;
 const { getNodeInfo } = require("devtools/client/inspector/rules/utils/utils");
 const StyleInspectorMenu = require("devtools/client/inspector/shared/style-inspector-menu");
 const { advanceValidate } = require("devtools/client/inspector/shared/utils");

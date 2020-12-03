@@ -2,11 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
-
 const { generateUUID } = require("devtools/shared/generate-uuid");
 const { hasCSSVariable } = require("devtools/client/inspector/rules/utils/utils");
 const { escapeCSSComment } = require("devtools/shared/css/parsing-utils");
+import Rule from "./rule";
+import ElementStyle from "./element-style";
+import CSSProperties from "../../css-properties";
+import UserProperties from "./user-properties";
+import { assert } from "protocol/utils";
+
+export type Priority = "" | "important" | undefined;
+
+export interface ComputedProperty {
+  textProp: TextProperty;
+  name: string;
+  value: string;
+  priority: Priority;
+  overridden?: boolean;
+  _overriddenDirty?: boolean;
+}
 
 /**
  * TextProperty is responsible for the following:
@@ -17,7 +31,22 @@ const { escapeCSSComment } = require("devtools/shared/css/parsing-utils");
  *   Changes to the TextProperty are sent to its related Rule for
  *     application.
  */
-class TextProperty {
+export default class TextProperty {
+  id: string;
+  rule: Rule;
+  name: string;
+  value: string;
+  priority: Priority;
+  enabled: boolean;
+  invisible: boolean | null;
+  elementStyle: ElementStyle;
+  cssProperties: typeof CSSProperties;
+  outputParser: any;
+  panelDoc: Document | null;
+  computed: ComputedProperty[] | undefined;
+  overridden?: boolean;
+  userProperties?: UserProperties;
+
   /**
    * @param {Rule} rule
    *        The rule this TextProperty came from.
@@ -36,7 +65,14 @@ class TextProperty {
    *        the index of a property in Rule.textProps is the same as the index
    *        coming from parseDeclarations.
    */
-  constructor(rule, name, value, priority, enabled = true, invisible = false) {
+  constructor(
+    rule: Rule,
+    name: string,
+    value: string,
+    priority: Priority,
+    enabled = true,
+    invisible: boolean | null = false
+  ) {
     this.id = name + "_" + generateUUID().toString();
     this.rule = rule;
     this.name = name;
@@ -54,16 +90,14 @@ class TextProperty {
   }
 
   get computedProperties() {
-    return this.computed
-      .filter(computed => computed.name !== this.name)
-      .map(computed => {
-        return {
-          isOverridden: computed.overridden,
-          name: computed.name,
-          priority: computed.priority,
-          value: computed.value,
-        };
-      });
+    return this.computed!.filter(computed => computed.name !== this.name).map(computed => {
+      return {
+        isOverridden: undefined, //computed.overridden,
+        name: computed.name,
+        priority: computed.priority,
+        value: computed.value,
+      };
+    });
   }
 
   /**
@@ -82,6 +116,7 @@ class TextProperty {
    * otherwise.
    */
   get isPropertyChanged() {
+    assert(this.userProperties);
     return this.userProperties.contains(this.rule.domRule, this.name);
   }
 
@@ -105,9 +140,9 @@ class TextProperty {
    * if any.
    */
   updateEditor() {
-    if (this.editor) {
-      this.editor.update();
-    }
+    // if (this.editor) {
+    //   this.editor.update();
+    // }
   }
 
   /**
@@ -138,7 +173,7 @@ class TextProperty {
         textProp: this,
         name: prop,
         value: dummyStyle.getPropertyValue(prop),
-        priority: dummyStyle.getPropertyPriority(prop),
+        priority: dummyStyle.getPropertyPriority(prop) as Priority,
       });
     }
   }
@@ -150,27 +185,27 @@ class TextProperty {
    * @param {TextProperty} prop
    *        The other TextProperty instance.
    */
-  set(prop) {
-    let changed = false;
-    for (const item of ["name", "value", "priority", "enabled"]) {
-      if (this[item] !== prop[item]) {
-        this[item] = prop[item];
-        changed = true;
-      }
-    }
+  // set(prop) {
+  //   let changed = false;
+  //   for (const item of ["name", "value", "priority", "enabled"]) {
+  //     if (this[item] !== prop[item]) {
+  //       this[item] = prop[item];
+  //       changed = true;
+  //     }
+  //   }
 
-    if (changed) {
-      this.updateEditor();
-    }
-  }
+  //   if (changed) {
+  //     this.updateEditor();
+  //   }
+  // }
 
-  setValue(value, priority, force = false) {
-    if (value !== this.value || force) {
-      this.userProperties.setProperty(this.rule.domRule, this.name, value);
-    }
+  // setValue(value, priority, force = false) {
+  //   if (value !== this.value || force) {
+  //     this.userProperties.setProperty(this.rule.domRule, this.name, value);
+  //   }
 
-    return this.rule.setPropertyValue(this, value, priority).then(() => this.updateEditor());
-  }
+  //   return this.rule.setPropertyValue(this, value, priority).then(() => this.updateEditor());
+  // }
 
   /**
    * Called when the property's value has been updated externally, and
@@ -179,30 +214,30 @@ class TextProperty {
    * @param {String} value
    *        Property value
    */
-  updateValue(value) {
-    if (value !== this.value) {
-      this.value = value;
-      this.updateEditor();
-    }
-  }
+  // updateValue(value) {
+  //   if (value !== this.value) {
+  //     this.value = value;
+  //     this.updateEditor();
+  //   }
+  // }
 
-  async setName(name) {
-    if (name !== this.name) {
-      this.userProperties.setProperty(this.rule.domRule, name, this.value);
-    }
+  // async setName(name) {
+  //   if (name !== this.name) {
+  //     this.userProperties.setProperty(this.rule.domRule, name, this.value);
+  //   }
 
-    await this.rule.setPropertyName(this, name);
-    this.updateEditor();
-  }
+  //   await this.rule.setPropertyName(this, name);
+  //   this.updateEditor();
+  // }
 
-  setEnabled(value) {
-    this.rule.setPropertyEnabled(this, value);
-    this.updateEditor();
-  }
+  // setEnabled(value) {
+  //   this.rule.setPropertyEnabled(this, value);
+  //   this.updateEditor();
+  // }
 
-  remove() {
-    this.rule.removeProperty(this);
-  }
+  // remove() {
+  //   this.rule.removeProperty(this);
+  // }
 
   /**
    * Return a string representation of the rule property.
@@ -298,9 +333,7 @@ class TextProperty {
    *        CSS variable name (e.g. "--color")
    * @return {Boolean}
    */
-  hasCSSVariable(name) {
+  hasCSSVariable(name: string) {
     return hasCSSVariable(this.value, name);
   }
 }
-
-module.exports = TextProperty;

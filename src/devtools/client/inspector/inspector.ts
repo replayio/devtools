@@ -41,7 +41,7 @@ import MarkupView from "devtools/client/inspector/markup/markup";
 const { ComputedPanel } = require("devtools/client/inspector/computed/panel");
 const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");
 
-const CSSProperties = require("./css-properties");
+import CSSProperties from "./css-properties";
 
 const Highlighter = require("highlighter/highlighter");
 

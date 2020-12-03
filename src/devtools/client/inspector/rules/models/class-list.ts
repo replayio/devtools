@@ -2,9 +2,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
-
+import { NodeFront } from "protocol/thread/node";
+import { assert } from "protocol/utils";
+import { Inspector } from "../../inspector";
 const EventEmitter = require("devtools/shared/event-emitter");
+
+interface ClassInfo {
+  name: string;
+  isApplied: boolean;
+}
+
+// Typescript's DOMTokenList declaration is incomplete - we fix this by adding the property we need
+declare global {
+  interface DOMTokenList {
+    [Symbol.iterator](): Iterator<string>;
+  }
+}
 
 // This serves as a local cache for the classes applied to each of the node we care about
 // here.
@@ -13,7 +26,7 @@ const EventEmitter = require("devtools/shared/event-emitter");
 // The value for each entry is an array of each of the class this node has. Items of this
 // array are objects like: { name, isApplied } where the name is the class itself, and
 // isApplied is a Boolean indicating if the class is applied on the node or not.
-const CLASSES = new WeakMap();
+const CLASSES = new WeakMap<NodeFront, ClassInfo[]>();
 
 /**
  * Manages the list classes per DOM elements we care about.
@@ -28,22 +41,32 @@ const CLASSES = new WeakMap();
  * @param {Inspector} inspector
  *        The current inspector instance.
  */
-class ClassList {
-  constructor(inspector) {
+export default class ClassList {
+  inspector: Inspector;
+  classListProxyNode: HTMLDivElement;
+
+  // added by EventEmitter.decorate(this)
+  eventListeners!: Map<string, ((value?: any) => void)[]>;
+  on!: (name: string, handler: (value?: any) => void) => void;
+  off!: (name: string, handler: (value?: any) => void) => void;
+  emit!: (name: string, value?: any) => void;
+
+  constructor(inspector: Inspector) {
     EventEmitter.decorate(this);
 
     this.inspector = inspector;
 
-    this.onMutations = this.onMutations.bind(this);
-    this.inspector.on("markupmutation", this.onMutations);
+    // this.onMutations = this.onMutations.bind(this);
+    // this.inspector.on("markupmutation", this.onMutations);
 
+    assert(this.inspector.panelDoc);
     this.classListProxyNode = this.inspector.panelDoc.createElement("div");
   }
 
   destroy() {
-    this.inspector.off("markupmutation", this.onMutations);
-    this.inspector = null;
-    this.classListProxyNode = null;
+    // this.inspector.off("markupmutation", this.onMutations);
+    this.inspector = null as any;
+    this.classListProxyNode = null as any;
   }
 
   /**
@@ -79,7 +102,7 @@ class ClassList {
       CLASSES.set(this.currentNode, nodeClasses);
     }
 
-    return CLASSES.get(this.currentNode);
+    return CLASSES.get(this.currentNode)!;
   }
 
   /**
@@ -102,13 +125,13 @@ class ClassList {
    *        True if the class should be enabled, false otherwise.
    * @return {Promise} Resolves when the change has been made in the DOM.
    */
-  setClassState(name, isApplied) {
-    // Do the change in our local model.
-    const nodeClasses = this.currentClasses;
-    nodeClasses.find(({ name: cName }) => cName === name).isApplied = isApplied;
+  // setClassState(name, isApplied) {
+  //   // Do the change in our local model.
+  //   const nodeClasses = this.currentClasses;
+  //   nodeClasses.find(({ name: cName }) => cName === name).isApplied = isApplied;
 
-    return this.applyClassState();
-  }
+  //   return this.applyClassState();
+  // }
 
   /**
    * Add several classes to the current node at once.
@@ -117,14 +140,14 @@ class ClassList {
    *        The string that contains all classes.
    * @return {Promise} Resolves when the change has been made in the DOM.
    */
-  addClassName(classNameString) {
-    this.classListProxyNode.className = classNameString;
-    return Promise.all(
-      [...new Set([...this.classListProxyNode.classList])].map(name => {
-        return this.addClass(name);
-      })
-    );
-  }
+  // addClassName(classNameString) {
+  //   this.classListProxyNode.className = classNameString;
+  //   return Promise.all(
+  //     [...new Set([...this.classListProxyNode.classList])].map(name => {
+  //       return this.addClass(name);
+  //     })
+  //   );
+  // }
 
   /**
    * Add a class to the current node at once.
@@ -133,17 +156,17 @@ class ClassList {
    *        The class to be added.
    * @return {Promise} Resolves when the change has been made in the DOM.
    */
-  addClass(name) {
-    // Avoid adding the same class again.
-    if (this.currentClasses.some(({ name: cName }) => cName === name)) {
-      return Promise.resolve();
-    }
+  // addClass(name) {
+  //   // Avoid adding the same class again.
+  //   if (this.currentClasses.some(({ name: cName }) => cName === name)) {
+  //     return Promise.resolve();
+  //   }
 
-    // Change the local model, so we retain the state of the existing classes.
-    this.currentClasses.push({ name, isApplied: true });
+  //   // Change the local model, so we retain the state of the existing classes.
+  //   this.currentClasses.push({ name, isApplied: true });
 
-    return this.applyClassState();
-  }
+  //   return this.applyClassState();
+  // }
 
   /**
    * Used internally by other functions like addClass or setClassState. Actually applies
@@ -151,46 +174,44 @@ class ClassList {
    *
    * @return {Promise} Resolves when the change has been made in the DOM.
    */
-  applyClassState() {
-    // If there is no valid inspector selection, bail out silently. No need to report an
-    // error here.
-    if (!this.currentNode) {
-      return Promise.resolve();
-    }
+  // applyClassState() {
+  //   // If there is no valid inspector selection, bail out silently. No need to report an
+  //   // error here.
+  //   if (!this.currentNode) {
+  //     return Promise.resolve();
+  //   }
 
-    // Remember which node we changed and the className we applied, so we can filter out
-    // dom mutations that are caused by us in onMutations.
-    this.lastStateChange = {
-      node: this.currentNode,
-      className: this.currentClassesPreview,
-    };
+  //   // Remember which node we changed and the className we applied, so we can filter out
+  //   // dom mutations that are caused by us in onMutations.
+  //   this.lastStateChange = {
+  //     node: this.currentNode,
+  //     className: this.currentClassesPreview,
+  //   };
 
-    // Apply the change to the node.
-    const mod = this.currentNode.startModifyingAttributes();
-    mod.setAttribute("class", this.currentClassesPreview);
-    return mod.apply();
-  }
+  //   // Apply the change to the node.
+  //   const mod = this.currentNode.startModifyingAttributes();
+  //   mod.setAttribute("class", this.currentClassesPreview);
+  //   return mod.apply();
+  // }
 
-  onMutations(mutations) {
-    for (const { type, target, attributeName } of mutations) {
-      // Only care if this mutation is for the class attribute.
-      if (type !== "attributes" || attributeName !== "class") {
-        continue;
-      }
+  // onMutations(mutations) {
+  //   for (const { type, target, attributeName } of mutations) {
+  //     // Only care if this mutation is for the class attribute.
+  //     if (type !== "attributes" || attributeName !== "class") {
+  //       continue;
+  //     }
 
-      const isMutationForOurChange =
-        this.lastStateChange &&
-        target === this.lastStateChange.node &&
-        target.className === this.lastStateChange.className;
+  //     const isMutationForOurChange =
+  //       this.lastStateChange &&
+  //       target === this.lastStateChange.node &&
+  //       target.className === this.lastStateChange.className;
 
-      if (!isMutationForOurChange) {
-        CLASSES.delete(target);
-        if (target === this.currentNode) {
-          this.emit("current-node-class-changed");
-        }
-      }
-    }
-  }
+  //     if (!isMutationForOurChange) {
+  //       CLASSES.delete(target);
+  //       if (target === this.currentNode) {
+  //         this.emit("current-node-class-changed");
+  //       }
+  //     }
+  //   }
+  // }
 }
-
-module.exports = ClassList;
