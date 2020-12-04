@@ -71,12 +71,6 @@ export class Outline extends Component {
     ) {
       this.setFocus(this.props.cursorPosition);
     }
-
-    if (this.focusedElRef) {
-      if (!isVisible(this.focusedElRef, this.refs.outlineList)) {
-        this.focusedElRef.scrollIntoView({ block: "center" });
-      }
-    }
   }
 
   setFocus(cursorPosition) {
