@@ -1,5 +1,6 @@
 // Test stepping in async frames and async call stacks.
 (async function() {
+  Test.start();
   await Test.warpToMessage("baz 2");
 
   await Test.checkFrames(5);

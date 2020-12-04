@@ -1,6 +1,7 @@
 // Test that logpoints appear and disappear as expected as breakpoints are
 // modified. Also test that conditional logpoints work.
 (async function() {
+  Test.start();
   const { assert } = Test;
 
   await Test.selectSource("doc_rr_basic.html");

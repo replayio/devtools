@@ -1,5 +1,6 @@
 // Test fixes for some simple stepping bugs.
 (async function() {
+  Test.start();
   await Test.addBreakpoint("doc_rr_basic.html", 21);
 
   await Test.rewindToLine(21);

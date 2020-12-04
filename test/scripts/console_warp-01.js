@@ -1,5 +1,6 @@
 // Test basic console time warping functionality.
 (async function() {
+  Test.start();
   await Test.selectConsole();
   await Test.warpToMessage("Number 5");
 

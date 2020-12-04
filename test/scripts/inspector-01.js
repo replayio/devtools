@@ -1,6 +1,7 @@
 // Test basic inspector functionality: the inspector is able to
 // show contents when paused according to the child's current position.
 (async function() {
+  Test.start();
   await Test.selectInspector();
 
   let node;

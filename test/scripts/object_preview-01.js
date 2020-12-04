@@ -1,6 +1,7 @@
 // Test the objects produced by console.log() calls and by evaluating various
 // expressions in the console after time warping.
 (async function() {
+  Test.start();
   await Test.selectConsole();
 
   await Test.waitForMessage("Array(20) [ 0, 1, 2, 3, 4, 5,");

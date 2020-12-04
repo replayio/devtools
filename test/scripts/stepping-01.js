@@ -1,5 +1,6 @@
 // Test basic step-over/back functionality.
 (async function() {
+  Test.start();
   await Test.addBreakpoint("doc_rr_basic.html", 20);
 
   await Test.rewindToLine(20);
