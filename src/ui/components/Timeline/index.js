@@ -176,10 +176,6 @@ export class Timeline extends Component {
     this.setState({ hoveringOverMarker: false });
   };
 
-  async clearPreviewLocation() {
-    this.debugger?.clearPreviewPausedLocation();
-  }
-
   hoverTimer = () => {
     const { hideTooltip } = this.props;
     const isHovered = window.elementIsHovered(this.$progressBar);

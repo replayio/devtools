@@ -5,7 +5,6 @@
 import { assert } from "protocol/utils";
 import { openDocLink } from "devtools/client/shared/link";
 import { onConnect } from "devtools/client/debugger/src/client";
-import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 
 export class DebuggerPanel {
   constructor(toolbox) {
@@ -36,10 +35,6 @@ export class DebuggerPanel {
 
   _getState() {
     return this._store.getState();
-  }
-
-  getToolboxStore() {
-    return this.toolbox.store;
   }
 
   openLink(url) {
@@ -118,24 +113,11 @@ export class DebuggerPanel {
     return this._selectors.getIsPaused(this._getState());
   }
 
-  selectSourceURL(url, line, column) {
-    const cx = this._selectors.getContext(this._getState());
-    return this._actions.selectSourceURL(cx, url, { line, column });
-  }
-
-  clearPreviewPausedLocation() {
-    return this._actions.clearPreviewPausedLocation();
-  }
-
   async selectSource(sourceId, line, column) {
     const cx = this._selectors.getContext(this._getState());
     const location = { sourceId, line, column };
 
     await this._actions.selectSource(cx, sourceId, location);
-  }
-
-  canLoadSource(sourceId) {
-    return this._selectors.canLoadSource(this._getState(), sourceId);
   }
 
   getSourceByActorId(sourceId) {
