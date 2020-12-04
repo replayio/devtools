@@ -146,3 +146,10 @@
   right: 0px;
   margin-inline-end: 8px;
 }
+
+.event-listeners-content .status {
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

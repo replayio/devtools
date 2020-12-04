@@ -154,6 +154,12 @@ class EventListeners extends Component {
   renderSearchResultsList() {
     const searchResults = this.getSearchResults();
 
+    if (!searchResults.length) {
+      return (
+        <div className="status no-results">{`No search results for "${this.state.searchText}"`}</div>
+      );
+    }
+
     return (
       <ul className="event-search-results-list">
         {Object.keys(searchResults).map(category => {
@@ -233,10 +239,7 @@ class EventListeners extends Component {
 
     return (
       <div className="event-listeners">
-        <div className="event-search-container">
-          {this.renderSearchInput()}
-          {this.renderClearSearchButton()}
-        </div>
+        <div className="event-search-container">{this.renderSearchInput()}</div>
         <div className="event-listeners-content">
           {searchText ? this.renderSearchResultsList() : this.renderCategoriesList()}
         </div>

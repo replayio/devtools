@@ -159,12 +159,7 @@ function ShareDropdown({ recordingId, setSharingModal }) {
   const { isAuthenticated } = useAuth0();
   const [expanded, setExpanded] = useState(false);
   const isOwner = useIsOwner(recordingId);
-  const buttonContent = (
-    <>
-      <div className="img share" />
-      <span className="label">Share</span>
-    </>
-  );
+  const buttonContent = <div className="img share" />;
 
   return (
     <div className="share">
