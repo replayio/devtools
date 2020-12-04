@@ -30,6 +30,7 @@ const { setupEventListeners } = require("devtools/client/debugger/src/actions/ev
 const { DevToolsToolbox } = require("ui/utils/devtools-toolbox");
 const { setupThreadEventListeners } = require("devtools/client/webconsole/actions/messages");
 const { createSession } = require("ui/actions/session");
+const { setupMessages } = require("devtools/client/webconsole/actions/messages");
 
 let initialized = false;
 async function initialize() {
@@ -74,6 +75,7 @@ async function initialize() {
 
   if (recordingId) {
     setupApp(recordingId, store);
+    setupMessages(store);
     setupTimeline(recordingId, store);
     setupMetadata(recordingId, store);
     setupEventListeners(recordingId, store);

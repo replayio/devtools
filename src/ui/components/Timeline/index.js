@@ -462,6 +462,7 @@ export class Timeline extends Component {
 
   renderMessages() {
     const { messages, currentTime, highlightedMessageId, zoomRegion } = this.props;
+    console.log(messages);
     let visibleIndex;
 
     return messages.map((message, index) => {

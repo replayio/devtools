@@ -6,7 +6,6 @@
 
 import EventEmitter from "devtools/shared/event-emitter";
 import actions from "devtools/client/webconsole/actions/index";
-import { setupMessages } from "devtools/client/webconsole/actions/messages";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
 
 export class WebConsolePanel {
@@ -23,7 +22,6 @@ export class WebConsolePanel {
     initOutputSyntaxHighlighting();
 
     // TODO: the store should be associated with the toolbox
-    setupMessages(store);
     this.store = store;
     return this;
   }
