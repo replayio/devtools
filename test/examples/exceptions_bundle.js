@@ -95,7 +95,7 @@
 
 // webpack input for exceptions_bundle.js
 function recordingFinished() {
-  dump(`RecReplaySendAsyncMessage RecordingFinished`);
+  dump(`RecReplaySendAsyncMessage Example__Finished`);
 }
 setTimeout(foo, 0);
 function foo() {

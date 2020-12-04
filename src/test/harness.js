@@ -32,6 +32,10 @@ async function waitUntil(fn) {
   throw new Error("waitUntil() timed out");
 }
 
+function start() {
+  app.actions.setViewMode("dev");
+}
+
 function finish() {
   console.log("TestFinished");
   localStorage.clear();
@@ -544,6 +548,7 @@ const testCommands = {
   selectDebugger,
   selectInspector,
   assert,
+  start,
   finish,
   waitForTime,
   waitForElapsedTime,

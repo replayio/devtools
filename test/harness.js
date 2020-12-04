@@ -17,7 +17,7 @@ const recordViewer = env.get("RECORD_REPLAY_DONT_RECORD_VIEWER") == "false";
   if (recordExample) {
     clickRecordingButton();
     dump(`TestHarnessExampleRecordingTabStarted\n`);
-    await waitForMessage("RecordingFinished");
+    await waitForMessage("Example__Finished");
     clickRecordingButton();
     dump(`TestHarnessExampleRecordingTabFinished\n`);
   } else {

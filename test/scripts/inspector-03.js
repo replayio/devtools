@@ -1,5 +1,6 @@
 // Test that styles for elements can be viewed.
 (async function() {
+  Test.start();
   await Test.selectInspector();
 
   let node;

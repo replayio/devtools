@@ -1,5 +1,6 @@
 // Test exception logpoints.
 (async function() {
+  Test.start();
   await Test.toggleExceptionLogging();
   await Test.selectConsole();
 
