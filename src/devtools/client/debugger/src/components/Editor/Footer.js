@@ -9,19 +9,13 @@ import classnames from "classnames";
 import actions from "../../actions";
 import {
   getSelectedSourceWithContent,
-  getPrettySource,
-  getPaneCollapse,
   getContext,
   getAlternateSourceId,
   getSource,
 } from "../../selectors";
 
-import { isPretty, getFilename, shouldBlackbox } from "../../utils/source";
-import { canPrettyPrintSource } from "../../reducers/sources";
-
-import { PaneToggleButton } from "../shared/Button";
+import { getFilename, shouldBlackbox } from "../../utils/source";
 import AccessibleImage from "../shared/AccessibleImage";
-
 import { ThreadFront } from "protocol/thread";
 
 import "./Footer.css";
@@ -55,53 +49,6 @@ class SourceFooter extends PureComponent {
     } else {
       eventDoc.CodeMirror.off("cursorActivity", this.onCursorChange);
     }
-  }
-
-  prettyPrintButton() {
-    return;
-    /*
-    const {
-      cx,
-      selectedSource,
-      canPrettyPrint,
-      togglePrettyPrint,
-    } = this.props;
-
-    if (!selectedSource) {
-      return;
-    }
-
-    if (!selectedSource.content && selectedSource.isPrettyPrinted) {
-      return (
-        <div className="action" key="pretty-loader">
-          <AccessibleImage className="loader spin" />
-        </div>
-      );
-    }
-
-    if (!canPrettyPrint) {
-      return;
-    }
-
-    const tooltip = "Pretty print source";
-    const sourceLoaded = !!selectedSource.content;
-
-    const type = "prettyPrint";
-    return (
-      <button
-        onClick={() => togglePrettyPrint(cx, selectedSource.id)}
-        className={classnames("action", type, {
-          active: sourceLoaded,
-          pretty: isPretty(selectedSource),
-        })}
-        key={type}
-        title={tooltip}
-        aria-label={tooltip}
-      >
-        <AccessibleImage className={type} />
-      </button>
-    );
-    */
   }
 
   blackBoxButton() {
@@ -139,7 +86,7 @@ class SourceFooter extends PureComponent {
   }
 
   renderCommands() {
-    const commands = [this.blackBoxButton(), this.prettyPrintButton()].filter(Boolean);
+    const commands = [this.blackBoxButton()].filter(Boolean);
 
     return commands.length ? <div className="commands">{commands}</div> : null;
   }
@@ -219,13 +166,10 @@ const mapStateToProps = state => {
     cx: getContext(state),
     selectedSource,
     alternateSource,
-    prettySource: getPrettySource(state, selectedSource ? selectedSource.id : null),
-    canPrettyPrint: selectedSource ? canPrettyPrintSource(state, selectedSource.id) : false,
   };
 };
 
 export default connect(mapStateToProps, {
-  togglePrettyPrint: actions.togglePrettyPrint,
   toggleBlackBox: actions.toggleBlackBox,
   showAlternateSource: actions.showAlternateSource,
   togglePaneCollapse: actions.togglePaneCollapse,
