@@ -6,6 +6,7 @@
   flex-direction: column;
   align-items: center;
   background: white;
+  height: 100%;
 }
 
 .comments-panel .comment {
@@ -26,12 +27,6 @@
 .comments-panel .comment.selected {
   border-left: 4px solid #5ea3f8;
   padding-left: 12px;
-}
-
-.comment .label {
-  color: var(--theme-comment);
-  overflow-wrap: anywhere;
-  line-height: 1.75em;
 }
 
 .comment .editor {
