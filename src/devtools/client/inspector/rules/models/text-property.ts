@@ -23,7 +23,7 @@ export interface ComputedProperty {
 }
 
 export interface ComputedPropertyInfo {
-  isOverridden: undefined;
+  isOverridden: boolean;
   name: string;
   priority: Priority;
   value: string;
@@ -99,7 +99,7 @@ export default class TextProperty {
   get computedProperties(): ComputedPropertyInfo[] {
     return this.computed!.filter(computed => computed.name !== this.name).map(computed => {
       return {
-        isOverridden: undefined, //computed.overridden,
+        isOverridden: !!computed.overridden,
         name: computed.name,
         priority: computed.priority,
         value: computed.value,

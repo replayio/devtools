@@ -245,3 +245,8 @@
   bottom: 0;
   z-index: -1;
 }
+
+.computed-overridden .rule-text, .computed-overridden .computed-other-property-value {
+  text-decoration: line-through;
+  color: var(--rule-overridden-name-text-color);
+}

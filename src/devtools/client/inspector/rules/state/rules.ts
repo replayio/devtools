@@ -45,9 +45,9 @@ export interface RuleState {
   isUnmatched: boolean;
   /* Whether or not the rule is an user agent style. */
   isUserAgentStyle: boolean | null;
-  /** An object containing information about the CSS keyframes rules.
-   * keyframesRule: rule.keyframesRule,
-   * The pseudo-element keyword used in the rule. */
+  /** An object containing information about the CSS keyframes rules. */
+  // keyframesRule: rule.keyframesRule,
+  /** The pseudo-element keyword used in the rule. */
   pseudoElement: string;
   /** An object containing information about the CSS rule's selector. */
   selector: RuleSelector;
