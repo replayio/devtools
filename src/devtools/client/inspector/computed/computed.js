@@ -11,6 +11,7 @@ const OutputParser = require("devtools/client/shared/old-output-parser");
 const { PrefObserver } = require("devtools/client/shared/prefs");
 const { createChild } = require("devtools/client/inspector/shared/utils");
 const { openDocLink } = require("devtools/client/shared/link");
+const { ElementPageStyle } = require("./elementPageStyle");
 
 const {
   VIEW_NODE_SELECTOR_TYPE,
@@ -233,6 +234,8 @@ function CssComputedView(inspector, document) {
 
   // Add the tooltips and highlightersoverlay
   this.tooltips = new TooltipsOverlay(this);
+
+  this.viewedElementPageStyle = new ElementPageStyle(inspector.store);
 }
 
 /**
@@ -1109,20 +1112,15 @@ PropertyView.prototype = {
     }
 
     if (this.matchedExpanded && hasMatchedSelectors) {
-      return this.tree.viewedElementPageStyle
-        .getMatchedSelectors(this.tree._viewedElement, this.name)
-        .then(matched => {
-          if (!this.matchedExpanded) {
-            return;
-          }
+      this._matchedSelectorResponse = this.tree.viewedElementPageStyle.getMatchedSelectors(
+        this.name
+      );
 
-          this._matchedSelectorResponse = matched;
+      this._buildMatchedSelectors();
+      this.matchedExpander.setAttribute("open", "");
+      this.tree.inspector.emit("computed-view-property-expanded");
 
-          this._buildMatchedSelectors();
-          this.matchedExpander.setAttribute("open", "");
-          this.tree.inspector.emit("computed-view-property-expanded");
-        })
-        .catch(console.error);
+      return;
     }
 
     this.matchedSelectorsContainer.innerHTML = "";
@@ -1139,7 +1137,8 @@ PropertyView.prototype = {
     const frag = this.element.ownerDocument.createDocumentFragment();
 
     for (const selector of this.matchedSelectorViews) {
-      const p = createChild(frag, "p");
+      const overridden = selector.selectorInfo.overridden;
+      const p = createChild(frag, "p", overridden ? { class: "computed-overridden" } : {});
       const span = createChild(p, "span", {
         class: "rule-link",
       });
@@ -1255,7 +1254,7 @@ function SelectorView(tree, selectorInfo) {
   this._cacheStatusNames();
 
   this.openStyleEditor = this.openStyleEditor.bind(this);
-  this._updateLocation = this._updateLocation.bind(this);
+  // this._updateLocation = this._updateLocation.bind(this);
 
   const rule = this.selectorInfo.rule;
   if (!rule || !rule.parentStyleSheet || rule.type == ELEMENT_STYLE) {
@@ -1263,7 +1262,7 @@ function SelectorView(tree, selectorInfo) {
   } else {
     // This always refers to the generated location.
     const sheet = rule.parentStyleSheet;
-    this.source = CssLogic.shortSource(sheet) + ":" + rule.line;
+    this.source = CssLogic.shortSource(sheet);
 
     const url = sheet.href || sheet.nodeHref;
     this.currentLocation = {
@@ -1365,27 +1364,25 @@ SelectorView.prototype = {
    *   style editor.
    */
   openStyleEditor: function () {
-    const inspector = this.tree.inspector;
-    const rule = this.selectorInfo.rule;
-
-    // The style editor can only display stylesheets coming from content because
-    // chrome stylesheets are not listed in the editor's stylesheet selector.
-    //
-    // If the stylesheet is a content stylesheet we send it to the style
-    // editor else we display it in the view source window.
-    const parentStyleSheet = rule.parentStyleSheet;
-    if (!parentStyleSheet || parentStyleSheet.isSystem) {
-      inspector.toolbox.viewSource(rule.href, rule.line);
-      return;
-    }
-
-    const { href, line, column } = this.currentLocation;
-    const target = inspector.currentTarget;
-    if (ToolDefinitions.styleEditor.isTargetSupported(target)) {
-      gDevTools.toolboxExpanded(target, "styleeditor").then(function (toolbox) {
-        toolbox.getCurrentPanel().selectStyleSheet(href, line, column);
-      });
-    }
+    // const inspector = this.tree.inspector;
+    // const rule = this.selectorInfo.rule;
+    // // The style editor can only display stylesheets coming from content because
+    // // chrome stylesheets are not listed in the editor's stylesheet selector.
+    // //
+    // // If the stylesheet is a content stylesheet we send it to the style
+    // // editor else we display it in the view source window.
+    // const parentStyleSheet = rule.parentStyleSheet;
+    // if (!parentStyleSheet || parentStyleSheet.isSystem) {
+    //   inspector.toolbox.viewSource(rule.href, rule.line);
+    //   return;
+    // }
+    // const { href, line, column } = this.currentLocation;
+    // const target = inspector.currentTarget;
+    // if (ToolDefinitions.styleEditor.isTargetSupported(target)) {
+    //   gDevTools.toolboxExpanded(target, "styleeditor").then(function (toolbox) {
+    //     toolbox.getCurrentPanel().selectStyleSheet(href, line, column);
+    //   });
+    // }
   },
 
   /**
