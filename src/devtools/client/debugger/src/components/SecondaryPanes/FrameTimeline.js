@@ -94,12 +94,12 @@ class FrameTimeline extends Component {
   }
 
   displayPreview(progress) {
-    const { previewLocation } = this.props;
+    const { setPreviewPausedLocation } = this.props;
 
     const position = this.getPosition(progress);
 
     if (position) {
-      previewLocation(position.location);
+      setPreviewPausedLocation(position.location);
     }
   }
 
@@ -109,7 +109,7 @@ class FrameTimeline extends Component {
   };
 
   onMouseUp = event => {
-    const { seekToPosition, selectedLocation } = this.props;
+    const { seekToPosition, clearPreviewPausedLocation } = this.props;
 
     const progress = this.getProgress(event.clientX);
     const position = this.getPosition(progress);
@@ -117,6 +117,7 @@ class FrameTimeline extends Component {
 
     if (position) {
       seekToPosition(position.point, position.time);
+      clearPreviewPausedLocation();
     }
   };
 
@@ -209,5 +210,6 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   seekToPosition: actions.seekToPosition,
-  previewLocation: actions.previewPausedLocationBySourceId,
+  setPreviewPausedLocation: actions.setPreviewPausedLocation,
+  clearPreviewPausedLocation: actions.clearPreviewPausedLocation,
 })(FrameTimeline);

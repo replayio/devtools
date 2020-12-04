@@ -110,7 +110,6 @@ export class DebugLine extends PureComponent {
 
 const mapStateToProps = state => {
   const frame = getVisibleSelectedFrame(state);
-  //test removing line below, make sure scrubber works properly (otp left timeline)
   const previewLocation = getPausePreviewLocation(state);
   const location = previewLocation || (frame && frame.location);
   return {

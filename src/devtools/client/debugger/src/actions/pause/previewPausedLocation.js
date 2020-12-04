@@ -5,19 +5,21 @@
 import { selectLocation } from "../sources";
 import { getContext } from "../../selectors";
 
-export function previewPausedLocationBySourceId(location) {
+//sets pause preview location for frame timeline scrubber
+export function setPreviewPausedLocation(location) {
   return ({ dispatch, getState }) => {
     const cx = getContext(getState());
 
     dispatch(selectLocation(cx, location));
 
     dispatch({
-      type: "PREVIEW_PAUSED_LOCATION",
+      type: "SET_PREVIEW_PAUSED_LOCATION",
       location,
     });
   };
 }
 
+//clears pause location that is set by the frame timeline scrubber
 export function clearPreviewPausedLocation() {
   return {
     type: "CLEAR_PREVIEW_PAUSED_LOCATION",

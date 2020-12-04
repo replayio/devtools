@@ -25,7 +25,7 @@ function createPauseState() {
       isPaused: false,
       pauseCounter: 0,
     },
-    previewLocation: null,
+    pausePreviewLocation: null,
     ...resumedPauseState,
     isWaitingOnBreak: false,
     command: null,
@@ -54,7 +54,6 @@ function update(state = createPauseState(), action) {
 
       state = {
         ...state,
-        previewLocation: null,
         threadcx: {
           ...state.threadcx,
           pauseCounter: state.threadcx.pauseCounter + 1,
@@ -89,12 +88,12 @@ function update(state = createPauseState(), action) {
       return { ...state, frames: [...state.frames, ...asyncFrames] };
     }
 
-    case "PREVIEW_PAUSED_LOCATION": {
-      return { ...state, previewLocation: action.location };
+    case "SET_PREVIEW_PAUSED_LOCATION": {
+      return { ...state, pausePreviewLocation: action.location };
     }
 
     case "CLEAR_PREVIEW_PAUSED_LOCATION": {
-      return { ...state, previewLocation: null };
+      return { ...state, pausePreviewLocation: null };
     }
 
     case "ADD_SCOPES": {
@@ -359,7 +358,7 @@ export function getLastExpandedScopes(state) {
 }
 
 export function getPausePreviewLocation(state) {
-  return state.pause.previewLocation;
+  return state.pause.pausePreviewLocation;
 }
 
 export function getResumePoint(state, type) {
