@@ -55,6 +55,8 @@ export type AppAction =
   | SetViewMode
   | SetNarrowMode;
 
+const NARROW_MODE_WIDTH = 800;
+
 export function setupApp(recordingId: RecordingId, store: UIStore) {
   store.dispatch({ type: "setup_app", recordingId });
   setupPointHandlers(store);
@@ -193,13 +195,10 @@ function setNarrowMode(narrowMode: boolean): SetNarrowMode {
 export function updateNarrowMode(viewportWidth: number): UIThunkAction {
   return ({ dispatch, getState }) => {
     const narrowMode = selectors.getNarrowMode(getState());
+    const newNarrowMode = viewportWidth <= NARROW_MODE_WIDTH;
 
-    if (viewportWidth < 700 && !narrowMode) {
-      dispatch(setNarrowMode(true));
-    }
-
-    if (viewportWidth > 700 && narrowMode) {
-      dispatch(setNarrowMode(false));
+    if (newNarrowMode != narrowMode) {
+      dispatch(setNarrowMode(newNarrowMode));
     }
   };
 }

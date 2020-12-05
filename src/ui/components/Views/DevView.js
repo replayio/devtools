@@ -7,7 +7,7 @@ import Tooltip from "../Tooltip";
 import Toolbox from "../Toolbox";
 import Toolbar from "../Toolbar";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import NarrowSecondaryToolbox from "../SecondaryToolbox/NarrowSecondaryToolbox";
+import SecondaryToolbox from "../SecondaryToolbox";
 
 import { installObserver } from "../../../protocol/graphics";
 import { updateTimelineDimensions } from "../../actions/timeline";
@@ -41,7 +41,7 @@ function DevView({ updateTimelineDimensions, narrowMode }) {
               <Toolbox />
             </div>
           }
-          endPanel={<NarrowSecondaryToolbox />}
+          endPanel={<SecondaryToolbox />}
           endPanelControl={false}
         />
         <div id="toolbox-timeline">

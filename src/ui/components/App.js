@@ -11,10 +11,6 @@ import { useApolloClient, ApolloProvider } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { actions } from "../actions";
-
-import { clearSelectedLocation } from "../../devtools/client/debugger/src/actions/sources";
-import { getContext } from "../../devtools/client/debugger/src/reducers/pause";
-
 import "styles.css";
 
 function useGetApolloClient() {
@@ -44,7 +40,7 @@ function useGetApolloClient() {
   return { apolloClient, consentPopupBlocked };
 }
 
-function installViewportObserver({ updateNarrowMode, cx, clearSelectedLocation, narrowMode }) {
+function installViewportObserver({ updateNarrowMode }) {
   const viewport = document.querySelector("body");
 
   const observer = new ResizeObserverPolyfill(function maybeUpdateNarrowMode() {
@@ -55,21 +51,13 @@ function installViewportObserver({ updateNarrowMode, cx, clearSelectedLocation, 
   observer.observe(viewport);
 }
 
-function App({
-  theme,
-  recordingId,
-  modal,
-  updateNarrowMode,
-  narrowMode,
-  cx,
-  clearSelectedLocation,
-}) {
+function App({ theme, recordingId, modal, updateNarrowMode }) {
   const { isLoading } = useAuth0();
   const { apolloClient, consentPopupBlocked } = useGetApolloClient();
 
   useEffect(() => {
     document.body.parentElement.className = theme;
-    installViewportObserver({ updateNarrowMode, cx, clearSelectedLocation, narrowMode });
+    installViewportObserver({ updateNarrowMode });
   }, [theme]);
 
   if (consentPopupBlocked) {
@@ -94,11 +82,8 @@ export default connect(
     theme: selectors.getTheme(state),
     recordingId: selectors.getRecordingId(state),
     modal: selectors.getModal(state),
-    narrowMode: selectors.getNarrowMode(state),
-    cx: getContext(state),
   }),
   {
     updateNarrowMode: actions.updateNarrowMode,
-    clearSelectedLocation,
   }
 )(App);

@@ -19,7 +19,6 @@ function ViewToggle({ viewMode, setViewMode, clearSelectedLocation, cx }) {
         className={classnames("view-toggle-item view-toggle-non-dev", {
           active: viewMode === "non-dev",
         })}
-        onClick={handleClick}
       >
         PLAY
       </div>
