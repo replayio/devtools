@@ -1,20 +1,16 @@
 // Test the objects produced by console.log() calls and by evaluating various
 // expressions in the console after time warping.
-(async function() {
-  Test.start();
+(async function () {
+  await Test.start();
   await Test.selectConsole();
 
   await Test.waitForMessage("Array(20) [ 0, 1, 2, 3, 4, 5,");
   await Test.waitForMessage("Uint8Array(20) [ 0, 1, 2, 3, 4, 5,");
   await Test.waitForMessage("Set(22) [ {…}, {…}, 0, 1, 2, 3, 4, 5,");
-  await Test.waitForMessage(
-    "Map(21) { {…} → {…}, 0 → 1, 1 → 2, 2 → 3, 3 → 4, 4 → 5,"
-  );
+  await Test.waitForMessage("Map(21) { {…} → {…}, 0 → 1, 1 → 2, 2 → 3, 3 → 4, 4 → 5,");
   await Test.waitForMessage("WeakSet(20) [ {…}, {…}, {…},");
   await Test.waitForMessage("WeakMap(20) { {…} → {…}, {…} → {…},");
-  await Test.waitForMessage(
-    "Object { a: 0, a0: 0, a1: 1, a2: 2, a3: 3, a4: 4,"
-  );
+  await Test.waitForMessage("Object { a: 0, a0: 0, a1: 1, a2: 2, a3: 3, a4: 4,");
   await Test.waitForMessage("/abc/gi");
   await Test.waitForMessage("Date");
 
@@ -48,13 +44,7 @@ f();
 
   await Test.executeInConsole("new Uint8Array([1, 2, 3, 4])");
   msg = await Test.waitForMessage("Uint8Array(4) [ 1, 2, 3, 4 ]");
-  await Test.checkMessageObjectContents(msg, [
-    "0: 1",
-    "1: 2",
-    "2: 3",
-    "3: 4",
-    "length: 4",
-  ]);
+  await Test.checkMessageObjectContents(msg, ["0: 1", "1: 2", "2: 3", "3: 4", "length: 4"]);
 
   await Test.executeInConsole(`RegExp("abd", "g")`);
   msg = await Test.waitForMessage("/abd/g");
@@ -62,11 +52,7 @@ f();
 
   await Test.executeInConsole("new Set([1, 2, 3])");
   msg = await Test.waitForMessage("Set(3) [ 1, 2, 3 ]");
-  await Test.checkMessageObjectContents(
-    msg,
-    ["0: 1", "1: 2", "2: 3", "size: 3"],
-    ["<entries>"]
-  );
+  await Test.checkMessageObjectContents(msg, ["0: 1", "1: 2", "2: 3", "size: 3"], ["<entries>"]);
 
   await Test.executeInConsole("new Map([[1, {a:1}], [2, {b:2}]])");
   msg = await Test.waitForMessage("Map { 1 → {…}, 2 → {…} }");
@@ -78,11 +64,7 @@ f();
 
   await Test.executeInConsole("new WeakSet([{a:1}, {b:2}])");
   msg = await Test.waitForMessage("WeakSet(2) [ {…}, {…} ]");
-  await Test.checkMessageObjectContents(
-    msg,
-    ["Object { a: 1 }", "Object { b: 2 }"],
-    ["<entries>"]
-  );
+  await Test.checkMessageObjectContents(msg, ["Object { a: 1 }", "Object { b: 2 }"], ["<entries>"]);
 
   await Test.executeInConsole("new WeakMap([[{a:1},{b:1}], [{a:2},{b:2}]])");
   msg = await Test.waitForMessage("WeakMap { {…} → {…}, {…} → {…} }");

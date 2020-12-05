@@ -198,11 +198,10 @@ async function runTest(path, local, timeout = 60, env = {}) {
     }
     if (match && match[2].startsWith("http://localhost:8080/test/examples/")) {
       const exampleRecordingId = match[1];
-      const example = url.parse(match[2]).pathname.slice(1);
-      console.log(`example`, exampleRecordingId, example, url.parse(match[2]));
+      const path = url.parse(match[2]).pathname.slice(1);
+      const filename = path.split("/")[path.split("/").length - 1];
 
-      const newExampleRecordings = { ...ExampleRecordings, [example]: exampleRecordingId };
-
+      const newExampleRecordings = { ...ExampleRecordings, [filename]: exampleRecordingId };
       fs.writeFileSync(
         "./test/example-recordings.json",
         JSON.stringify(newExampleRecordings, null, 2)
@@ -222,7 +221,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
     // Log an error which github will recognize.
     let msg = `::error ::Failure ${local}`;
     if (recordingId) {
-      msg += ` https://replay.io/view?id=${recordingId}`;
+      msg += ` https://replay.io/view?id=${recordingId}&test=${local}`;
     }
     spawnChecked("echo", [msg], { stdio: "inherit" });
   }

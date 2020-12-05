@@ -1,9 +1,11 @@
 // Test that the element highlighter works, and iframe behavior.
-(async function() {
-  Test.start();
+(async function () {
+  await Test.start();
   // Events within the iframe should show up.
   await Test.addEventListenerLogpoints(["event.mouse.click"]);
-  await Test.waitForMessage("click { target: div#iframediv, clientX: 0, clientY: 0, layerX: 0, layerY: 0 }");
+  await Test.waitForMessage(
+    "click { target: div#iframediv, clientX: 0, clientY: 0, layerX: 0, layerY: 0 }"
+  );
 
   await Test.addBreakpoint("doc_inspector_basic.html", 9);
   await Test.rewindToLine(9);

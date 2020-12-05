@@ -1,6 +1,6 @@
 // Test global console evaluation.
-(async function() {
-  Test.start();
+(async function () {
+  await Test.start();
   await Test.selectConsole();
 
   await Test.executeInConsole("number");

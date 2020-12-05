@@ -1,7 +1,7 @@
 // Test hitting breakpoints when rewinding past the point where the breakpoint
 // script was created.
-(async function() {
-  Test.start();
+(async function () {
+  await Test.start();
   await Test.rewindToLine(undefined);
 
   await Test.addBreakpoint("doc_rr_basic.html", 21);

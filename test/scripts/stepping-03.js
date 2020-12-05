@@ -1,6 +1,6 @@
 // Stepping past the beginning or end of a frame should act like a step-out.
-(async function() {
-  Test.start();
+(async function () {
+  await Test.start();
   await Test.addBreakpoint("doc_rr_basic.html", 20);
   await Test.rewindToLine(20);
   await Test.checkEvaluateInTopFrame("number", 10);

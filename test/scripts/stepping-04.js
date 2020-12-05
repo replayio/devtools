@@ -1,6 +1,6 @@
 // Test stepping in blackboxed sources.
-(async function() {
-  Test.start();
+(async function () {
+  await Test.start();
   // Stepping forward while in a blackboxed source should act like a step out.
   await Test.addBreakpoint("blackbox.js", 3);
   await Test.rewindToLine(3);

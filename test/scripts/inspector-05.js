@@ -1,6 +1,6 @@
 // Test showing rules in source mapped style sheets.
 (async function () {
-  Test.start();
+  await Test.start();
   await Test.selectInspector();
 
   const node = await Test.findMarkupNode("maindiv");

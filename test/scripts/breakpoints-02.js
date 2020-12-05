@@ -1,6 +1,6 @@
 // Test unhandled divergence while evaluating at a breakpoint.
-(async function() {
-  Test.start();
+(async function () {
+  await Test.start();
   await Test.addBreakpoint("doc_rr_basic.html", 21);
 
   await Test.rewindToLine(21);

@@ -1,7 +1,7 @@
 // Test basic logpoint functionality. When logpoints are added,
 // new messages should appear in the correct order and allow time warping.
-(async function() {
-  Test.start();
+(async function () {
+  await Test.start();
   const { assert } = Test;
 
   await Test.selectSource("doc_rr_basic.html");

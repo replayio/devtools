@@ -34,6 +34,7 @@ async function waitUntil(fn) {
 
 function start() {
   app.actions.setViewMode("dev");
+  return waitUntil(() => document.querySelector(".view-toggle-dev.active"));
 }
 
 function finish() {
