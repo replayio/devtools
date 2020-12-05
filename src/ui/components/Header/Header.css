@@ -53,8 +53,8 @@
 }
 
 #header .avatar:not(.authenticated) {
-  height: 28px;
-  width: 28px;
+  height: 24px;
+  width: 24px;
   border-radius: 50%;
   box-shadow: 0 0 0 2px var(--theme-toolbar-background);
 }

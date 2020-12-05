@@ -1,3 +1,13 @@
+#header .share .dropdown-wrapper > button {
+  border: none;
+  padding: 4px;
+}
+
+#header .share .dropdown-wrapper > button .img {
+  height: 20px;
+  width: 20px;
+}
+
 #header .share .dropdown-container .content {
   width: 360px;
   right: -20px;

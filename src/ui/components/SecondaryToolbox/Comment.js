@@ -79,31 +79,18 @@ class Comment extends React.Component {
     );
   }
 
-  renderLabel() {
+  renderNewComment() {
     const { comment } = this.props;
     const lines = comment.contents.split("\n");
 
     return (
-      <div className="label" onDoubleClick={this.startEditing}>
-        {lines.map((line, i) => (
-          <div key={i}>{line}</div>
-        ))}
-      </div>
-    );
-  }
-
-  renderBody() {
-    return (
       <div className="comment-body">
-        {this.state.editing ? (
-          <CommentEditor
-            comment={this.props.comment}
-            stopEditing={this.stopEditing}
-            location="rightSidebar"
-          />
-        ) : (
-          this.renderLabel()
-        )}
+        <div className="item-label">Comment</div>
+        <div className="item-content" onDoubleClick={this.startEditing}>
+          {lines.map((line, i) => (
+            <div key={i}>{line}</div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -118,8 +105,8 @@ class Comment extends React.Component {
         onClick={this.seekToComment}
         onDoubleClick={this.startEditing}
       >
-        {this.renderAvatar()}
-        {this.renderBody()}
+        <div className="img event-comment" />
+        {this.renderNewComment()}
         <div onClick={e => e.stopPropagation()}>
           <Dropdown panel={this.renderDropdownPanel()} icon={<div>⋯</div>} />
         </div>

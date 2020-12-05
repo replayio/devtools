@@ -22,21 +22,6 @@ class CommentsPanel extends React.Component {
     this.setState({ editingComment: false });
   };
 
-  renderAddCommentButton() {
-    const { createComment, focusedCommentId } = this.props;
-    const { editingComment } = this.state;
-
-    if (focusedCommentId || editingComment) {
-      return null;
-    }
-
-    return (
-      <button className="add-comment" onClick={() => createComment()}>
-        Add a comment
-      </button>
-    );
-  }
-
   render() {
     const { comments } = this.props;
 
@@ -44,7 +29,6 @@ class CommentsPanel extends React.Component {
       return (
         <div className="comments-panel">
           <p>There is nothing here yet. Try adding a comment in the timeline below.</p>
-          {this.renderAddCommentButton()}
         </div>
       );
     }
@@ -59,7 +43,6 @@ class CommentsPanel extends React.Component {
             toggleEditingCommentOn={this.toggleEditingCommentOn}
           />
         ))}
-        {this.renderAddCommentButton()}
       </div>
     );
   }

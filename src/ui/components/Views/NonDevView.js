@@ -1,14 +1,37 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 
 import Timeline from "../Timeline";
 import Tooltip from "../Tooltip";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
+const EventListeners = require("devtools/client/debugger/src/components/SecondaryPanes/EventListeners")
+  .default;
+const Dropdown = require("ui/components/shared/Dropdown").default;
 
 import { installObserver } from "../../../protocol/graphics";
 import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
+import "./NonDevView.css";
+
+export function EventsFilter() {
+  const [expanded, setExpanded] = useState(false);
+
+  const buttonContent = <div className="img settings" />;
+
+  return (
+    <div className="event-breakpoints">
+      <Dropdown
+        buttonContent={buttonContent}
+        setExpanded={setExpanded}
+        expanded={expanded}
+        buttonStyle={"secondary"}
+      >
+        <EventListeners />
+      </Dropdown>
+    </div>
+  );
+}
 
 function NonDevView({ updateTimelineDimensions }) {
   useEffect(() => {
@@ -27,6 +50,15 @@ function NonDevView({ updateTimelineDimensions }) {
       </div>
     </div>
   );
+  const rightSidebar = (
+    <div className="right-sidebar">
+      <div className="right-sidebar-toolbar">
+        <div className="right-sidebar-toolbar-item">Transcript and Comments</div>
+        <EventsFilter />
+      </div>
+      <CommentsPanel />
+    </div>
+  );
 
   const handleMove = num => {
     updateTimelineDimensions();
@@ -43,7 +75,7 @@ function NonDevView({ updateTimelineDimensions }) {
       maxSize="80%"
       vert={true}
       startPanel={viewer}
-      endPanel={<CommentsPanel />}
+      endPanel={rightSidebar}
       endPanelControl={false}
     />
   );
