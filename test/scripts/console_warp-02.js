@@ -1,5 +1,5 @@
 // Test which message is the paused one after warping, stepping, and evaluating.
-(async function() {
+(async function () {
   Test.start();
   await Test.selectConsole();
 

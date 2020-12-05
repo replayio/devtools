@@ -1,5 +1,5 @@
 // Test stepping in pretty-printed code.
-(async function() {
+(async function () {
   Test.start();
   await Test.addBreakpoint("bundle_input.js", 4);
   await Test.rewindToLine(4);

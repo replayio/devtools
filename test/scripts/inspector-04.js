@@ -1,5 +1,6 @@
 // Test the rule view.
 (async function () {
+  Test.start();
   await Test.selectInspector();
 
   let node;
