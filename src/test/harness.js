@@ -195,26 +195,23 @@ function getVisibleSelectedFrameLine() {
   return frame && frame.location.line;
 }
 
-function waitForPausedLine(line) {
-  return waitUntil(() => line == getVisibleSelectedFrameLine());
+async function waitForPausedLine(line) {
+  const pauseLine = await waitUntil(() => {
+    const pauseLine = getVisibleSelectedFrameLine();
+    return pauseLine == line ? line : false;
+  });
+  assert(pauseLine == line, `Expected line ${line} got ${pauseLine}`);
 }
 
 function resumeThenPauseAtLineFunctionFactory(method) {
-  return async function (lineno, waitForLine) {
-    console.log(`Starting ${method} to ${lineno}...`, new Date());
+  return async function (line) {
     await dbg.actions[method](getThreadContext());
-    if (lineno !== undefined) {
+    if (line !== undefined) {
       await waitForPaused();
     } else {
       await waitForPausedNoSource();
     }
-    if (waitForLine) {
-      await waitForPausedLine(lineno);
-    } else {
-      const pauseLine = getVisibleSelectedFrameLine();
-      assert(pauseLine == lineno, `Expected line ${lineno} got ${pauseLine}`);
-    }
-    console.log(`Finished ${method} to ${lineno}!`, new Date());
+    await waitForPausedLine(line);
   };
 }
 
@@ -548,8 +545,6 @@ const testCommands = {
   selectDebugger,
   selectInspector,
   assert,
-  start,
-  finish,
   waitForTime,
   waitForElapsedTime,
   waitUntil,
@@ -609,9 +604,13 @@ const testCommands = {
 
 const commands = mapValues(testCommands, (command, name) => {
   return (...args) => {
-    console.log(name, ...args);
-    return command(...args);
+    console.log(`Starting ${name}`, ...args);
+    const startTime = new Date();
+    const result = command(...args);
+    const duration = new Date() - startTime;
+    console.log(`Finished ${name} in ${duration}ms`);
+    return result;
   };
 });
 
-module.exports = { ...commands, dbg, dbgSelectors, app };
+module.exports = { ...commands, dbg, dbgSelectors, app, start, finish };

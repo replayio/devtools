@@ -82,22 +82,6 @@ function processEnvironmentVariables() {
   dispatchServer = process.env.RECORD_REPLAY_SERVER || DefaultDispatchServer;
 }
 
-function startExampleServer() {
-  // Server for content in the examples directory.
-  console.log(`Starting example server on port 7998`);
-  const exampleServer = http.createServer((request, response) => {
-    try {
-      const content = fs.readFileSync(`test/examples/${request.url}`);
-      response.writeHead(200, { "Content-Type": getContentType(request.url) });
-      response.end(content);
-    } catch (e) {
-      response.writeHead(404);
-      response.end();
-    }
-  });
-  exampleServer.listen(7998);
-}
-
 function elapsedTime() {
   return (Date.now() - startTime) / 1000;
 }
@@ -127,7 +111,7 @@ async function runMatchingTests() {
       RECORD_REPLAY_DONT_PROCESS_RECORDINGS: true,
       RECORD_REPLAY_TEST_URL:
         shouldRecordExamples || !exampleRecordingId
-          ? `http://localhost:7998/${example}`
+          ? `http://localhost:8080/test/examples/${example}`
           : `http://localhost:8080/view?id=${exampleRecordingId}&test=${test}`,
     };
 
@@ -212,7 +196,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
         addTestRecordingId(recordingId);
       }
     }
-    if (match && match[2].startsWith("http://localhost:7998")) {
+    if (match && match[2].startsWith("http://localhost:8080/test/examples/")) {
       const exampleRecordingId = match[1];
       const example = url.parse(match[2]).pathname.slice(1);
       console.log(`example`, exampleRecordingId, example, url.parse(match[2]));
@@ -276,7 +260,6 @@ async function runTest(path, local, timeout = 60, env = {}) {
 (async function () {
   processArgs();
   processEnvironmentVariables();
-  startExampleServer();
 
   for (let i = 0; i < count; i++) {
     await runMatchingTests();

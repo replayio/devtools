@@ -1,6 +1,6 @@
 // Test hitting breakpoints when using tricky control flow constructs:
 // catch, finally, generators, and async/await.
-(async function() {
+(async function () {
   Test.start();
   await rewindToBreakpoint(10);
   await resumeToBreakpoint(12);
