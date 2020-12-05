@@ -1,6 +1,4 @@
-// Test that the element highlighter works, and iframe behavior.
-(async function () {
-  await Test.start();
+Test.describe(`Test that the element highlighter works, and iframe behavior.`, async () => {
   // Events within the iframe should show up.
   await Test.addEventListenerLogpoints(["event.mouse.click"]);
   await Test.waitForMessage(
@@ -21,6 +19,4 @@
   const framepoint = await Test.getMarkupCanvasCoordinate("iframediv", ["myiframe"]);
   await Test.pickNode(framepoint.x, framepoint.y);
   await Test.waitForSelectedMarkupNode(`id="iframediv"`);
-
-  Test.finish();
-})();
+});

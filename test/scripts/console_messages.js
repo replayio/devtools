@@ -1,7 +1,5 @@
 // Test expanding console objects that were logged by console messages,
-// logpoints, and evaluations when the debugger is somewhere else.
-(async function () {
-  await Test.start();
+Test.describe(`logpoints, and evaluations when the debugger is somewhere else.`, async () => {
   await Test.selectConsole();
 
   let msg;
@@ -56,6 +54,4 @@
     ["subobj: Object { subvalue: 0 }"],
     ["obj: Object { value: 0, subobj: {…} }"]
   );
-
-  Test.finish();
-})();
+});

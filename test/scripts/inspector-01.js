@@ -1,7 +1,5 @@
 // Test basic inspector functionality: the inspector is able to
-// show contents when paused according to the child's current position.
-(async function () {
-  await Test.start();
+Test.describe(`show contents when paused according to the child's current position.`, async () => {
   await Test.selectInspector();
 
   let node;
@@ -22,6 +20,4 @@
 
   await Test.searchMarkup();
   await Test.waitForSelectedMarkupNode(`div id="div4" some-attribute="STUFF"`);
-
-  Test.finish();
-})();
+});

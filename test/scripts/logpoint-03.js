@@ -1,6 +1,4 @@
-// Test event logpoints when replaying.
-(async function () {
-  await Test.start();
+Test.describe(`Test event logpoints when replaying.`, async () => {
   await Test.selectConsole();
   await Test.addEventListenerLogpoints(["event.mouse.click"]);
 
@@ -20,6 +18,4 @@
 
   // When expanded, other properties should be visible.
   await Test.checkMessageObjectContents(msg, ["altKey: false", "bubbles: true"]);
-
-  Test.finish();
-})();
+});

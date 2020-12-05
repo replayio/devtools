@@ -1,7 +1,5 @@
 // Test that logpoints appear and disappear as expected as breakpoints are
-// modified. Also test that conditional logpoints work.
-(async function () {
-  await Test.start();
+Test.describe(`modified. Also test that conditional logpoints work.`, async () => {
   const { assert } = Test;
 
   await Test.selectSource("doc_rr_basic.html");
@@ -28,6 +26,4 @@
     condition: `number % 2 == 0`,
   });
   await Test.waitForMessageCount("Logpoint", 6);
-
-  Test.finish();
-})();
+});

@@ -1,6 +1,4 @@
-// Test basic console time warping functionality.
-(async function () {
-  await Test.start();
+Test.describe(`Test basic console time warping functionality.`, async () => {
   await Test.selectConsole();
   await Test.warpToMessage("Number 5");
 
@@ -19,6 +17,4 @@
 
   await Test.warpToMessage("window.foo is undefined");
   await Test.reverseStepOverToLine(7);
-
-  Test.finish();
-})();
+});

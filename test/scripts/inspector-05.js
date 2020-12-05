@@ -1,6 +1,4 @@
-// Test showing rules in source mapped style sheets.
-(async function () {
-  await Test.start();
+Test.describe(`Test showing rules in source mapped style sheets.`, async () => {
   await Test.selectInspector();
 
   const node = await Test.findMarkupNode("maindiv");
@@ -14,6 +12,4 @@
       properties: [{ text: "background-color: blue;", overridden: false }],
     },
   ]);
-
-  Test.finish();
-})();
+});

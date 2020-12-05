@@ -1,6 +1,4 @@
-// Test fixes for some simple stepping bugs.
-(async function () {
-  await Test.start();
+Test.describe(`Test fixes for some simple stepping bugs.`, async () => {
   await Test.addBreakpoint("doc_rr_basic.html", 21);
 
   await Test.rewindToLine(21);
@@ -20,6 +18,4 @@
   await Test.stepOutToLine(26);
   await Test.reverseStepOverToLine(25);
   await Test.reverseStepOverToLine(24);
-
-  Test.finish();
-})();
+});

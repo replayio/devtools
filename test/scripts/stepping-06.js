@@ -1,6 +1,4 @@
-// Test stepping in async frames and async call stacks.
-(async function () {
-  await Test.start();
+Test.describe(`Test stepping in async frames and async call stacks.`, async () => {
   await Test.warpToMessage("baz 2");
 
   await Test.checkFrames(5);
@@ -35,6 +33,4 @@
   await Test.checkEvaluateInTopFrame("n", 4);
   await Test.stepOutToLine(13);
   await Test.reverseStepOverToLine(12);
-
-  Test.finish();
-})();
+});

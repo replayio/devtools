@@ -610,4 +610,16 @@ const commands = mapValues(testCommands, (command, name) => {
   };
 });
 
-module.exports = { ...commands, dbg, dbgSelectors, app, start, finish };
+async function describe(description, cbk) {
+  console.log(`# Test ${description}`);
+  start();
+  await cbk();
+  finish();
+}
+
+async function it(description, cbk) {
+  console.log(`## ${description}`);
+  await cbk();
+}
+
+module.exports = { ...commands, dbg, dbgSelectors, app, start, finish, describe, it };

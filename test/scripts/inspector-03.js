@@ -1,6 +1,4 @@
-// Test that styles for elements can be viewed.
-(async function () {
-  await Test.start();
+Test.describe(`Test that styles for elements can be viewed.`, async () => {
   await Test.selectInspector();
 
   let node;
@@ -19,6 +17,4 @@
   node = await Test.findMarkupNode("maindiv");
   await Test.selectMarkupNode(node);
   await Test.checkComputedStyle("background-color", "rgb(255, 0, 0)");
-
-  Test.finish();
-})();
+});

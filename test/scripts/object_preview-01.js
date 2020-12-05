@@ -1,7 +1,5 @@
 // Test the objects produced by console.log() calls and by evaluating various
-// expressions in the console after time warping.
-(async function () {
-  await Test.start();
+Test.describe(`expressions in the console after time warping.`, async () => {
   await Test.selectConsole();
 
   await Test.waitForMessage("Array(20) [ 0, 1, 2, 3, 4, 5,");
@@ -77,6 +75,4 @@ f();
   await Test.executeInConsole("baz");
   msg = await Test.waitForMessage("function baz()");
   Test.checkJumpIcon(msg);
-
-  Test.finish();
-})();
+});
