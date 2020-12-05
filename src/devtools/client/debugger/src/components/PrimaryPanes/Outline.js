@@ -63,13 +63,28 @@ export class Outline extends Component {
     this.state = { filter: "", focusedItem: null };
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (
       this.props.cursorPosition &&
       this.props.symbols &&
       this.props.cursorPosition !== prevProps.cursorPosition
     ) {
       this.setFocus(this.props.cursorPosition);
+    }
+
+    //confirm we aren't rescrolling back up the outline panel unnecessarily
+    const isUniqueEvent =
+      JSON.stringify(this.state.focusedItem?.location.end) !==
+        JSON.stringify(prevState.focusedItem?.location.end) &&
+      JSON.stringify(this.state.focusedItem?.location.start) !==
+        JSON.stringify(prevState.focusedItem?.location.start);
+
+    if (
+      this.focusedElRef &&
+      isUniqueEvent &&
+      !isVisible(this.focusedElRef, this.refs.outlineList)
+    ) {
+      this.focusedElRef.scrollIntoView({ block: "center" });
     }
   }
 
