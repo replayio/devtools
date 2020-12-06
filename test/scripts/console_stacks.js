@@ -1,8 +1,9 @@
 // Test source mapping of logpoint errors.
 (async function () {
+  await Test.start();
   await Test.toggleExceptionLogging();
   await Test.selectConsole();
-  Test.app.actions.filterToggle('warn')
+  Test.app.actions.filterToggle("warn");
 
   // These tests should be more exhaustive...
   await Test.waitForMessage("console.trace() ConsoleTrace");

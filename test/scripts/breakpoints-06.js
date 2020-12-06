@@ -1,22 +1,25 @@
-
 // Test breakpoints in a sourcemapped file.
 async function checkMessageLocation(text, location) {
-  const msg = await Test.waitForMessage(text)
-  Test.assert(Test.getMessageLocationLink(msg).innerText == location, `Message location should be ${location}`);
+  const msg = await Test.waitForMessage(text);
+  Test.assert(
+    Test.getMessageLocationLink(msg).innerText == location,
+    `Message location should be ${location}`
+  );
 }
 
 (async function () {
-  console.log('Test that the breakpoint added to line 15 maps to line 15')
+  await Test.start();
+  console.log("Test that the breakpoint added to line 15 maps to line 15");
   await Test.addBreakpoint("bundle_input.js", 15, undefined, {
     logValue: "'line 15'",
   });
-  await checkMessageLocation('line 15', "bundle_input.js:15");
+  await checkMessageLocation("line 15", "bundle_input.js:15");
 
-  console.log('Test that the breakpoint added to line 17 maps to line 17')
+  console.log("Test that the breakpoint added to line 17 maps to line 17");
   await Test.addBreakpoint("bundle_input.js", 17, undefined, {
     logValue: "'line 17'",
   });
-  await checkMessageLocation('line 17', "bundle_input.js:17");
+  await checkMessageLocation("line 17", "bundle_input.js:17");
 
   Test.finish();
 })();

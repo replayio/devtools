@@ -1,6 +1,6 @@
 // Test basic breakpoint functionality.
-(async function() {
-  Test.start();
+(async function () {
+  await Test.start();
   const { addBreakpoint, rewindToLine, resumeToLine, checkEvaluateInTopFrame } = Test;
 
   await addBreakpoint("doc_rr_basic.html", 21);

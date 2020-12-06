@@ -1,6 +1,6 @@
 // Test interaction of breakpoints with debugger statements.
-(async function() {
-  Test.start();
+(async function () {
+  await Test.start();
   await Test.rewindToLine(9);
   await Test.addBreakpoint("doc_debugger_statements.html", 8);
   await Test.rewindToLine(8);
