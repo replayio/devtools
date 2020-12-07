@@ -197,11 +197,7 @@ function getVisibleSelectedFrameLine() {
 }
 
 async function waitForPausedLine(line) {
-  const pauseLine = await waitUntil(() => {
-    const pauseLine = getVisibleSelectedFrameLine();
-    return pauseLine == line ? line : false;
-  });
-  assert(pauseLine == line, `Expected line ${line} got ${pauseLine}`);
+  await waitUntil(() => line == getVisibleSelectedFrameLine());
 }
 
 function resumeThenPauseAtLineFunctionFactory(method) {

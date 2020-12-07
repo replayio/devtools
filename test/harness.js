@@ -21,7 +21,7 @@ const recordViewer = env.get("RECORD_REPLAY_DONT_RECORD_VIEWER") == "false";
     clickRecordingButton();
     dump(`TestHarnessExampleRecordingTabFinished\n`);
   } else {
-    dump(`TestHarnessRetrievingExampleFromRecordings`);
+    dump(`TestHarnessRetrievingExampleFromRecordings\n`);
   }
 
   await waitForDevtools();
