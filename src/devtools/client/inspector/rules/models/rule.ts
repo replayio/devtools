@@ -49,7 +49,7 @@ export interface RuleInheritance {
 export interface RuleSelector {
   getUniqueSelector: () => Promise<string>;
   matchedSelectors: string[] | undefined;
-  selectors: string[];
+  selectors: string[] | undefined;
   selectorText: string;
 }
 
@@ -321,17 +321,17 @@ export default class Rule {
   async getUniqueSelector() {
     let selector = "";
 
-    // if (this.domRule.selectors) {
-    //   // This is a style rule with a selector.
-    selector = this.domRule.selectors.join(", ");
-    // } else if (this.inherited) {
-    //   // This is an inline style from an inherited rule. Need to resolve the unique
-    //   // selector from the node which rule this is inherited from.
-    //   selector = await this.inherited.getUniqueSelector();
-    // } else {
-    //   // This is an inline style from the current node.
-    //   selector = this.inspector.selectionCssSelector;
-    // }
+    if (this.domRule.selectors) {
+      // This is a style rule with a selector.
+      selector = this.domRule.selectors.join(", ");
+      // } else if (this.inherited) {
+      //   // This is an inline style from an inherited rule. Need to resolve the unique
+      //   // selector from the node which rule this is inherited from.
+      //   selector = await this.inherited.getUniqueSelector();
+      // } else {
+      //   // This is an inline style from the current node.
+      // selector = this.inspector.selectionCssSelector;
+    }
 
     return selector;
   }
