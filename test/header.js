@@ -143,7 +143,17 @@ function waitForMessage(msg) {
   log(`WaitingForMessage ${msg}`);
   const { resolve, promise } = defer();
   const listener = {
-    receiveMessage() {
+    receiveMessage(evt) {
+      const { remoteTab } = window.gBrowser.selectedBrowser.frameLoader;
+
+      // Test fixtures load into a process before the record button is
+      // pressed, so we need to make sure that the message we are listening
+      // for actually came from the current tab, and not the initial page-load
+      // process that is not being recorded.
+      if (!remoteTab || evt.target.osPid != remoteTab.osPid) {
+        return;
+      }
+
       resolve();
       Services.ppmm.removeMessageListener(msg, listener);
     },
