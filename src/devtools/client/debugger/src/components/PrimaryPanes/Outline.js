@@ -73,8 +73,7 @@ export class Outline extends Component {
     }
 
     //confirm we aren't rescrolling back up the outline panel unnecessarily
-    const isUniqueEvent =
-      JSON.stringify(prevState.focusedItem) !== JSON.stringify(this.state.focusedItem);
+    const isUniqueEvent = prevState.focusedItem !== this.state.focusedItem;
 
     if (
       this.focusedElRef &&
