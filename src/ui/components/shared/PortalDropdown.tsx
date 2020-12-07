@@ -58,7 +58,7 @@ function getContentPosition(
     const { width, height } = document.body.getBoundingClientRect();
     const distance = props.distance || 5;
 
-    switch (props.position) {
+    switch (props.position || "bottom-left") {
       case "top-right":
         return { bottom: height - top + distance + "px", left: left + "px" };
       case "bottom-right":
