@@ -48,13 +48,13 @@
   display: block;
 }
 
-.dropdown ul {
+.dropdown ul, .portal-dropdown-container ul {
   margin: 0;
   padding: 4px 0;
   list-style: none;
 }
 
-.dropdown li {
+.dropdown li, .portal-dropdown-container li {
   display: flex;
   align-items: center;
   padding: 6px 8px;
@@ -63,7 +63,7 @@
   transition: all 0.25s ease;
 }
 
-.dropdown li:hover {
+.dropdown li:hover, .portal-dropdown-container li:hover {
   background-color: var(--search-overlays-semitransparent);
 }
 

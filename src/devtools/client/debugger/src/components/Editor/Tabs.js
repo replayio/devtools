@@ -19,8 +19,7 @@ import { debounce } from "lodash";
 import "./Tabs.css";
 
 import Tab from "./Tab";
-import { PaneToggleButton } from "../shared/Button";
-import Dropdown from "../shared/Dropdown";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
 import AccessibleImage from "../shared/AccessibleImage";
 import CommandBar from "../SecondaryPanes/CommandBar";
 
@@ -129,6 +128,12 @@ class Tabs extends PureComponent {
     }));
   }
 
+  setSourcesDropdownShown = dropdownShown => {
+    this.setState(() => ({
+      dropdownShown,
+    }));
+  };
+
   getIconClass(source) {
     if (isPretty(source)) {
       return "prettyPrint";
@@ -143,7 +148,11 @@ class Tabs extends PureComponent {
     const { cx, selectSource } = this.props;
     const filename = getFilename(source);
 
-    const onClick = () => selectSource(cx, source.id);
+    const onClick = () => {
+      this.setState({ dropdownShown: false });
+      selectSource(cx, source.id);
+    };
+
     return (
       <li key={source.id} onClick={onClick} title={getFileURL(source, false)}>
         <AccessibleImage className={`dropdown-icon ${this.getIconClass(source)}`} />
@@ -233,7 +242,17 @@ class Tabs extends PureComponent {
     const Panel = <ul>{hiddenTabs.map(this.renderDropdownSource)}</ul>;
     const icon = <AccessibleImage className="more-tabs" />;
 
-    return <Dropdown panel={Panel} icon={icon} />;
+    return (
+      <PortalDropdown
+        buttonContent={icon}
+        buttonStyle="dropdown-button"
+        position="bottom-right"
+        expanded={this.state.dropdownShown}
+        setExpanded={this.setSourcesDropdownShown}
+      >
+        {Panel}
+      </PortalDropdown>
+    );
   }
 
   renderCommandBar() {
