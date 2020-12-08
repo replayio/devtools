@@ -1099,7 +1099,6 @@ function ensureExecutionPoint(state, newMessage) {
     const lastMessage = getLastMessageWithPoint(state, point);
     if (lastMessage.lastExecutionPoint) {
       messageCount = lastMessage.lastExecutionPoint.messageCount + 1;
-      console.log("messageCount", messageCount)
     }
   } else if (state.visibleMessages.length) {
     const lastId = state.visibleMessages[state.visibleMessages.length - 1];
