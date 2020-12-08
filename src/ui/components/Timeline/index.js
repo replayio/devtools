@@ -158,7 +158,6 @@ export class Timeline extends Component {
 
   showMessage(message) {
     this.scrollToMessage(message);
-    this.previewLocation(message);
   }
 
   onMarkerClick = (e, message) => {
@@ -176,17 +175,6 @@ export class Timeline extends Component {
   onMarkerMouseLeave = () => {
     this.setState({ hoveringOverMarker: false });
   };
-
-  async previewLocation(closestMessage) {
-    const location = getMessageLocation(closestMessage);
-    if (location) {
-      this.debugger?.previewPausedLocation(location);
-    }
-  }
-
-  async clearPreviewLocation() {
-    this.debugger?.clearPreviewPausedLocation();
-  }
 
   hoverTimer = () => {
     const { hideTooltip } = this.props;
