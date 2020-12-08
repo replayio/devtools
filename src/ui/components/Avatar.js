@@ -1,19 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-
-import { connect } from "react-redux";
-import { actions } from "ui/actions";
 import { getAvatarColor } from "ui/utils/user";
-import { setUserInBrowserPrefs } from "../utils/browser";
 
 const Avatar = props => {
-  let { player, isFirstPlayer, updateUser } = props;
+  let { player, isFirstPlayer } = props;
   let auth = useAuth0();
-
-  useEffect(() => {
-    setUserInBrowserPrefs(auth.user);
-    updateUser(auth.user);
-  }, [auth.user]);
 
   if (auth.isAuthenticated && isFirstPlayer) {
     return (
@@ -31,6 +22,4 @@ const Avatar = props => {
   );
 };
 
-export default connect(null, {
-  updateUser: actions.updateUser,
-})(Avatar);
+export default Avatar;

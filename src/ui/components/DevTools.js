@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
+import { gql, useQuery, useMutation } from "@apollo/client";
+import { useAuth0 } from "@auth0/auth0-react";
 
 import Header from "./Header/index";
 import Loader from "./shared/Loader";
@@ -9,8 +11,7 @@ import DevView from "./Views/DevView";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
-import { gql, useQuery } from "@apollo/client";
-import { useAuth0 } from "@auth0/auth0-react";
+import { setUserInBrowserPrefs } from "../utils/browser";
 
 const GET_RECORDING = gql`
   query GetRecording($recordingId: String) {
@@ -20,6 +21,16 @@ const GET_RECORDING = gql`
       recordingTitle
       is_private
       date
+    }
+  }
+`;
+
+const CREATE_SESSION = gql`
+  mutation CreateSession($object: sessions_insert_input!) {
+    insert_sessions_one(object: $object) {
+      id
+      controller_id
+      recording_id
     }
   }
 `;
@@ -37,7 +48,7 @@ function getUploadingMessage(uploading) {
   return `Waiting for upload… ${amount} MB`;
 }
 
-function getIsAuthorized({ data, error, isAuthenticated }) {
+function getIsAuthorized({ data }) {
   const test = new URL(window.location.href).searchParams.get("test");
 
   // Ideally, test recordings should be inserted into Hasura. However, test recordings are currently
@@ -62,13 +73,31 @@ function DevTools({
   setExpectedError,
   selectedPanel,
   viewMode,
-  narrowMode,
+  updateUser,
+  sessionId,
 }) {
   const [recordingLoaded, setRecordingLoaded] = useState(false);
-  const { isAuthenticated } = useAuth0();
-  const { data, error, loading: queryIsLoading } = useQuery(GET_RECORDING, {
+  const auth = useAuth0();
+  const { data, loading: queryIsLoading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
   });
+  const [CreateSession] = useMutation(CREATE_SESSION);
+
+  useEffect(() => {
+    setUserInBrowserPrefs(auth.user);
+    updateUser(auth.user);
+  }, [auth.user]);
+
+  useEffect(() => {
+    if (auth.user && sessionId) {
+      const object = {
+        id: sessionId,
+        recording_id: recordingId,
+        controller_id: sessionId.split("/")[0],
+      };
+      CreateSession({ variables: { object } });
+    }
+  }, [auth.user, sessionId]);
 
   useEffect(() => {
     if (recordingLoaded) {
@@ -87,10 +116,10 @@ function DevTools({
     return <Loader message={message} />;
   }
 
-  const isAuthorized = getIsAuthorized({ data, error, isAuthenticated });
+  const isAuthorized = getIsAuthorized({ data });
 
   if (!isAuthorized) {
-    if (isAuthenticated) {
+    if (auth.isAuthenticated) {
       setExpectedError({ message: "You don't have permission to view this recording." });
     } else {
       setExpectedError({
@@ -134,5 +163,6 @@ export default connect(
     updateTimelineDimensions: actions.updateTimelineDimensions,
     unfocusComment: actions.unfocusComment,
     setExpectedError: actions.setExpectedError,
+    updateUser: actions.updateUser,
   }
 )(DevTools);
