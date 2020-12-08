@@ -1122,10 +1122,7 @@ function getLastMessageWithPoint(state, point) {
   const filteredMessageId = state.visibleMessages.filter(function (p) {
     const currentMessage = state.messagesById.get(p);
 
-    if (!point) {
-      console.log("khjlkh", point)
-    }
-    if (currentMessage.executionPoint || !point) {
+    if (currentMessage.executionPoint) {
       return false;
     }
 
