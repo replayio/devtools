@@ -1068,14 +1068,8 @@ function getDefaultFiltersCounter() {
 
 //get the point for the corresponding command, regardless of where we're currently paused
 function getPausePoint(newMessage, state) {
-  if (
-    newMessage.type === constants.MESSAGE_TYPE.RESULT &&
-    newMessage.parameters &&
-    newMessage.parameters.length > 0 &&
-    newMessage.parameters[0]._pause &&
-    newMessage.parameters[0]._pause.point
-  ) {
-    return newMessage.parameters[0]._pause.point;
+  if (newMessage.type === constants.MESSAGE_TYPE.RESULT && newMessage.parameters[0]) {
+    return newMessage.parameters[0].getExecutionPoint();
   } else {
     return state.pausedExecutionPoint;
   }
