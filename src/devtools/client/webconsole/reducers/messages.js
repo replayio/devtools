@@ -1069,7 +1069,7 @@ function getDefaultFiltersCounter() {
 //get the point for the corresponding command, regardless of where we're currently paused
 function getPausePoint(newMessage, state) {
   if (newMessage.type === constants.MESSAGE_TYPE.RESULT && newMessage.parameters[0]) {
-    return newMessage.parameters[0].getExecutionPoint();
+    return newMessage.parameters[0].getExecutionPoint() || state.pausedExecutionPoint;
   } else {
     return state.pausedExecutionPoint;
   }
@@ -1121,7 +1121,11 @@ function getLastMessageWithPoint(state, point) {
   // value as the given point.
   const filteredMessageId = state.visibleMessages.filter(function (p) {
     const currentMessage = state.messagesById.get(p);
-    if (currentMessage.executionPoint) {
+
+    if (!point) {
+      console.log("khjlkh", point)
+    }
+    if (currentMessage.executionPoint || !point) {
       return false;
     }
 
