@@ -16,6 +16,7 @@ pref("devtools.event-listeners-breakpoints", true);
 pref("devtools.toolbox-height", "50%");
 pref("devtools.non-dev-side-panel-width", "75%");
 pref("devtools.view-mode", "non-dev");
+pref("devtools.dev-secondary-panel-height", "50%");
 
 // app features
 pref("devtools.features.comments", true);
@@ -31,6 +32,7 @@ export const prefs = new PrefsHelper("devtools", {
   toolboxHeight: ["String", "toolbox-height"],
   nonDevSidePanelWidth: ["String", "non-dev-side-panel-width"],
   viewMode: ["String", "view-mode"],
+  secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
