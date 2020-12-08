@@ -1071,7 +1071,9 @@ function getPausePoint(newMessage, state) {
   if (
     newMessage.type === constants.MESSAGE_TYPE.RESULT &&
     newMessage.parameters &&
-    newMessage.parameters.length > 0
+    newMessage.parameters.length > 0 &&
+    newMessage.parameters[0]._pause &&
+    newMessage.parameters[0]._pause.point
   ) {
     return newMessage.parameters[0]._pause.point;
   } else {
