@@ -5,6 +5,7 @@
 "use strict";
 
 const { Component, createFactory, createElement } = require("react");
+const React  = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
 const actions = require("devtools/client/webconsole/actions/index");
