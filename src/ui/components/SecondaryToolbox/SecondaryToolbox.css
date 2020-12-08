@@ -56,7 +56,7 @@
   color: var(--theme-toolbar-selected-color);
 }
 
-.secondary-toolbox-header button.hover .img,
+.secondary-toolbox-header button:hover .img,
 .secondary-toolbox-header button.expanded .img {
   background: var(--theme-toolbar-selected-color);
 }

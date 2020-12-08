@@ -14,12 +14,11 @@ function ViewToggle({ viewMode, setViewMode, clearSelectedLocation, cx }) {
   };
 
   return (
-    <button className="view-toggle">
+    <button className="view-toggle" onClick={handleClick}>
       <div
         className={classnames("view-toggle-item view-toggle-non-dev", {
           active: viewMode === "non-dev",
         })}
-        onClick={handleClick}
       >
         PLAY
       </div>
@@ -27,7 +26,6 @@ function ViewToggle({ viewMode, setViewMode, clearSelectedLocation, cx }) {
         className={classnames("view-toggle-item view-toggle-dev", {
           active: viewMode === "dev",
         })}
-        onClick={handleClick}
       >
         DEBUG
       </div>

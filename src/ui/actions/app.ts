@@ -35,6 +35,8 @@ export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   location: Location;
 };
 export type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
+export type SetNarrowMode = Action<"set_narrow_mode"> & { narrowMode: boolean };
+
 export type AppAction =
   | SetupAppAction
   | LoadingAction
@@ -50,7 +52,10 @@ export type AppAction =
   | SetModalAction
   | SetPendingNotificationAction
   | SetAnalysisPointsAction
-  | SetViewMode;
+  | SetViewMode
+  | SetNarrowMode;
+
+const NARROW_MODE_WIDTH = 800;
 
 export function setupApp(recordingId: RecordingId, store: UIStore) {
   store.dispatch({ type: "setup_app", recordingId });
@@ -181,4 +186,19 @@ export function setPendingNotification(location: any): SetPendingNotificationAct
 
 export function setViewMode(viewMode: ViewMode): SetViewMode {
   return { type: "set_view_mode", viewMode };
+}
+
+function setNarrowMode(narrowMode: boolean): SetNarrowMode {
+  return { type: "set_narrow_mode", narrowMode };
+}
+
+export function updateNarrowMode(viewportWidth: number): UIThunkAction {
+  return ({ dispatch, getState }) => {
+    const narrowMode = selectors.getNarrowMode(getState());
+    const newNarrowMode = viewportWidth <= NARROW_MODE_WIDTH;
+
+    if (newNarrowMode != narrowMode) {
+      dispatch(setNarrowMode(newNarrowMode));
+    }
+  };
 }

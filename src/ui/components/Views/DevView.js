@@ -7,12 +7,14 @@ import Tooltip from "../Tooltip";
 import Toolbox from "../Toolbox";
 import Toolbar from "../Toolbar";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
+import SecondaryToolbox from "../SecondaryToolbox";
 
 import { installObserver } from "../../../protocol/graphics";
 import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
+import { selectors } from "../../reducers";
 
-function DevView({ updateTimelineDimensions }) {
+function DevView({ updateTimelineDimensions, narrowMode }) {
   const handleMove = num => {
     updateTimelineDimensions();
     prefs.toolboxHeight = `${num}px`;
@@ -22,10 +24,38 @@ function DevView({ updateTimelineDimensions }) {
     installObserver();
   }, []);
 
+  if (narrowMode) {
+    return (
+      <>
+        <SplitBox
+          style={{ width: "100%", overflow: "hidden" }}
+          splitterSize={1}
+          initialSize={prefs.toolboxHeight}
+          minSize="20%"
+          maxSize="80%"
+          vert={false}
+          onMove={handleMove}
+          startPanel={
+            <div className="horizontal-panels">
+              <Toolbar />
+              <Toolbox />
+            </div>
+          }
+          endPanel={<SecondaryToolbox />}
+          endPanelControl={false}
+        />
+        <div id="toolbox-timeline">
+          <Timeline />
+          <Tooltip />
+        </div>
+      </>
+    );
+  }
+
   return (
-    <div className="dev-view-outer">
+    <div className="horizontal-panels">
       <Toolbar />
-      <div className="dev-view-inner">
+      <div className="vertical-panels">
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={1}
@@ -47,6 +77,11 @@ function DevView({ updateTimelineDimensions }) {
   );
 }
 
-export default connect(null, {
-  updateTimelineDimensions,
-})(DevView);
+export default connect(
+  state => ({
+    narrowMode: selectors.getNarrowMode(state),
+  }),
+  {
+    updateTimelineDimensions,
+  }
+)(DevView);

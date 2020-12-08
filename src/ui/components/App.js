@@ -9,7 +9,8 @@ import { isDeployPreview } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 import { useApolloClient, ApolloProvider } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
-
+import ResizeObserverPolyfill from "resize-observer-polyfill";
+import { actions } from "../actions";
 import "styles.css";
 
 function useGetApolloClient() {
@@ -39,12 +40,24 @@ function useGetApolloClient() {
   return { apolloClient, consentPopupBlocked };
 }
 
-function App({ theme, recordingId, sessionError, modal }) {
+function installViewportObserver({ updateNarrowMode }) {
+  const viewport = document.querySelector("body");
+
+  const observer = new ResizeObserverPolyfill(function maybeUpdateNarrowMode() {
+    const viewportWidth = viewport.getBoundingClientRect().width;
+    updateNarrowMode(viewportWidth);
+  });
+
+  observer.observe(viewport);
+}
+
+function App({ theme, recordingId, modal, updateNarrowMode }) {
   const { isLoading } = useAuth0();
   const { apolloClient, consentPopupBlocked } = useGetApolloClient();
 
   useEffect(() => {
     document.body.parentElement.className = theme;
+    installViewportObserver({ updateNarrowMode });
   }, [theme]);
 
   if (consentPopupBlocked) {
@@ -70,5 +83,7 @@ export default connect(
     recordingId: selectors.getRecordingId(state),
     modal: selectors.getModal(state),
   }),
-  {}
+  {
+    updateNarrowMode: actions.updateNarrowMode,
+  }
 )(App);

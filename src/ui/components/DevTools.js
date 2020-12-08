@@ -62,6 +62,7 @@ function DevTools({
   setExpectedError,
   selectedPanel,
   viewMode,
+  narrowMode,
 }) {
   const [recordingLoaded, setRecordingLoaded] = useState(false);
   const { isAuthenticated } = useAuth0();
@@ -127,6 +128,7 @@ export default connect(
     expectedError: selectors.getExpectedError(state),
     selectedPanel: selectors.getSelectedPanel(state),
     viewMode: selectors.getViewMode(state),
+    narrowMode: selectors.getNarrowMode(state),
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,

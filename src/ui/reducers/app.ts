@@ -21,6 +21,7 @@ function initialAppState(): AppState {
     pendingNotification: null,
     analysisPoints: {},
     viewMode: prefs.viewMode,
+    narrowMode: false,
   };
 }
 
@@ -94,6 +95,13 @@ export default function update(state = initialAppState(), action: AppAction) {
       return { ...state, viewMode: action.viewMode };
     }
 
+    case "set_narrow_mode": {
+      return {
+        ...state,
+        narrowMode: action.narrowMode,
+      };
+    }
+
     default: {
       return state;
     }
@@ -117,3 +125,4 @@ export const getPendingNotification = (state: UIState) => state.app.pendingNotif
 export const getAnalysisPointsForLocation = (state: UIState, location: any) =>
   location && state.app.analysisPoints[getLocationKey(location)];
 export const getViewMode = (state: UIState) => state.app.viewMode;
+export const getNarrowMode = (state: UIState) => state.app.narrowMode;

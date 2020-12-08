@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
 
@@ -10,8 +10,9 @@ import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
 import { actions } from "../../actions";
+import { installObserver } from "../../../protocol/graphics";
 
-function PanelButtons({ selectedPanel, setSelectedPanel }) {
+function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
   const onClick = panel => {
     setSelectedPanel(panel);
 
@@ -48,6 +49,15 @@ function PanelButtons({ selectedPanel, setSelectedPanel }) {
         <div className="img new-panel-transcript" />
         <div className="label">Transcript and Comments</div>
       </button>
+      {narrowMode ? (
+        <button
+          className={classnames("viewer-panel-button", { expanded: selectedPanel === "viewer" })}
+          onClick={() => onClick("viewer")}
+        >
+          <div className="img new-panel-viewer" />
+          <div className="label">Viewer</div>
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -136,11 +146,30 @@ function InspectorPanel({ initializedPanels }) {
   );
 }
 
-function SecondaryToolbox({ initializedPanels, selectedPanel, setSelectedPanel }) {
+function ViewerPanel() {
+  useEffect(() => {
+    installObserver();
+  }, []);
+
+  return (
+    <div id="outer-viewer" style={{ height: "100%" }}>
+      <div id="viewer">
+        <canvas id="graphics"></canvas>
+        <div id="highlighter-root"></div>
+      </div>
+    </div>
+  );
+}
+
+function SecondaryToolbox({ initializedPanels, selectedPanel, setSelectedPanel, narrowMode }) {
   return (
     <div className="secondary-toolbox">
       <header className="secondary-toolbox-header">
-        <PanelButtons selectedPanel={selectedPanel} setSelectedPanel={setSelectedPanel} />
+        <PanelButtons
+          narrowMode={narrowMode}
+          electedPanel={selectedPanel}
+          setSelectedPanel={setSelectedPanel}
+        />
       </header>
       <div className="secondary-toolbox-content">
         {selectedPanel == "console" ? <ConsolePanel /> : null}
@@ -148,6 +177,7 @@ function SecondaryToolbox({ initializedPanels, selectedPanel, setSelectedPanel }
         {selectedPanel == "inspector" ? (
           <InspectorPanel initializedPanels={initializedPanels} />
         ) : null}
+        {selectedPanel == "viewer" && narrowMode ? <ViewerPanel /> : null}
       </div>
     </div>
   );
@@ -157,6 +187,7 @@ export default connect(
   state => ({
     initializedPanels: selectors.getInitializedPanels(state),
     selectedPanel: selectors.getSelectedPanel(state),
+    narrowMode: selectors.getNarrowMode(state),
   }),
   { setSelectedPanel: actions.setSelectedPanel }
 )(SecondaryToolbox);

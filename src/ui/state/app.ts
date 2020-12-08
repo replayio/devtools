@@ -36,6 +36,7 @@ export interface AppState {
   pendingNotification: any;
   analysisPoints: AnalysisPoints;
   viewMode: ViewMode;
+  narrowMode: boolean;
 }
 
 export interface AnalysisPoints {

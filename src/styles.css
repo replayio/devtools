@@ -111,14 +111,15 @@
   margin: auto;
 }
 
-.dev-view-outer {
+.horizontal-panels {
   display: flex;
   flex-direction: row;
   height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 
-.dev-view-inner {
+.vertical-panels {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
