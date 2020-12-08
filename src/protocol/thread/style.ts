@@ -45,6 +45,10 @@ export class StyleFront {
   get type() {
     return ELEMENT_STYLE;
   }
+
+  get cssText() {
+    return this._style.cssText;
+  }
 }
 
 Object.setPrototypeOf(StyleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));

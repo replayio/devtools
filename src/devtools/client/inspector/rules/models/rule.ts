@@ -10,6 +10,7 @@ import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
 import CSSProperties from "../../css-properties";
+import { parseNamedDeclarations } from "devtools/shared/css/parsing-utils";
 import { Inspector } from "../../inspector";
 import ElementStyle from "./element-style";
 const Services = require("Services");
@@ -645,7 +646,11 @@ export default class Rule {
     const store = this.elementStyle.store;
 
     assert(this.domRule.style);
-    for (const prop of this.domRule.style.properties) {
+    const properties = parseNamedDeclarations(
+      this.cssProperties.isKnown,
+      this.domRule.style.cssText
+    );
+    for (const prop of properties) {
       const name = prop.name;
       // In an inherited rule, we only show inherited properties.
       // However, we must keep all properties in order for rule
@@ -658,7 +663,7 @@ export default class Rule {
         this,
         name,
         value,
-        prop.important ? "important" : undefined,
+        prop.priority ? "important" : undefined,
         !("commentOffsets" in prop),
         invisible
       );
