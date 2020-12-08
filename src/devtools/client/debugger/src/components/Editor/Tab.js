@@ -51,7 +51,6 @@ class Tab extends PureComponent {
       tabSources,
       showSource,
       toggleBlackBox,
-      togglePrettyPrint,
       selectedSource,
       source,
     } = this.props;
@@ -130,15 +129,6 @@ class Tab extends PureComponent {
           click: () => toggleBlackBox(cx, source),
         },
       },
-      /*
-      {
-        item: {
-          ...tabMenuItems.prettyPrint,
-          click: () => togglePrettyPrint(cx, tab),
-          disabled: isPretty(sourceTab),
-        },
-      },
-      */
     ];
 
     showMenu(e, buildMenu(items));
@@ -236,7 +226,6 @@ export default connect(
     copyToClipboard: actions.copyToClipboard,
     closeTab: actions.closeTab,
     closeTabs: actions.closeTabs,
-    togglePrettyPrint: actions.togglePrettyPrint,
     showSource: actions.showSource,
     toggleBlackBox: actions.toggleBlackBox,
   },

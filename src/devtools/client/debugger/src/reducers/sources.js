@@ -600,21 +600,6 @@ export function isSourceWithMap(state, id) {
   return getSourceActorsForSource(state, id).some(soureActor => soureActor.sourceMapURL);
 }
 
-export function canPrettyPrintSource(state, id) {
-  const source = getSourceWithContent(state, id);
-  if (!source || isPretty(source)) {
-    return false;
-  }
-
-  const sourceContent = source.content && isFulfilled(source.content) ? source.content.value : null;
-
-  if (!sourceContent || !isJavaScript(source, sourceContent)) {
-    return false;
-  }
-
-  return true;
-}
-
 export function getBreakpointPositions(state) {
   return state.sources.breakpointPositions;
 }
