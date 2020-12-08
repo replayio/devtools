@@ -1,6 +1,4 @@
-// Test stepping in pretty-printed code.
-(async function () {
-  await Test.start();
+Test.describe(`Test stepping in pretty-printed code.`, async () => {
   await Test.addBreakpoint("bundle_input.js", 4);
   await Test.rewindToLine(4);
   await Test.stepInToLine(1);
@@ -22,6 +20,4 @@
   await Test.stepOutToLine(15);
   await Test.stepInToLine(5);
   await Test.stepOutToLine(15);
-
-  Test.finish();
-})();
+});

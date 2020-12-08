@@ -1,6 +1,4 @@
-// Test previews when switching between frames and stepping.
-(async function () {
-  await Test.start();
+Test.describe(`Test previews when switching between frames and stepping.`, async () => {
   await Test.addBreakpoint("doc_rr_preview.html", 17);
   await Test.rewindToLine(17);
 
@@ -52,6 +50,4 @@
 
   await Test.selectFrame(2);
   await Test.waitForFrameTimeline("66%");
-
-  Test.finish();
-})();
+});

@@ -20,6 +20,4 @@ async function checkMessageLocation(text, location) {
     logValue: "'line 17'",
   });
   await checkMessageLocation("line 17", "bundle_input.js:17");
-
-  Test.finish();
-})();
+});

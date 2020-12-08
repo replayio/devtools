@@ -1,6 +1,4 @@
-// Test scope mapping and switching between generated/original sources.
-(async function () {
-  await Test.start();
+Test.describe(`Test scope mapping and switching between generated/original sources.`, async () => {
   await Test.addBreakpoint("bundle_input.js", 15, undefined, {
     logValue: "barobj.barprop1 * 10",
   });
@@ -17,6 +15,4 @@
   await Test.waitForPausedLine(57);
   await Test.waitForScopeValue("n", "Array(3) […]");
   await Test.waitForScopeValue("e", "{…}");
-
-  Test.finish();
-})();
+});

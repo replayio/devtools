@@ -1,6 +1,4 @@
-// Test source mapping of logpoint errors.
-(async function () {
-  await Test.start();
+Test.describe(`Test source mapping of logpoint errors.`, async () => {
   await Test.toggleExceptionLogging();
   await Test.selectConsole();
   Test.app.actions.filterToggle("warn");
@@ -14,6 +12,4 @@
   await Test.waitForMessage("Object { number: 42 }");
   await Test.waitForMessage("Object { number: 12 }");
   await Test.waitForMessage("uncaught exception: [object Object]");
-
-  Test.finish();
-})();
+});

@@ -1,6 +1,4 @@
-// Test exception logpoints.
-(async function () {
-  await Test.start();
+Test.describe(`Test exception logpoints.`, async () => {
   await Test.toggleExceptionLogging();
   await Test.selectConsole();
 
@@ -12,6 +10,4 @@
 
   await Test.reverseStepOverToLine(15);
   await Test.waitForFrameTimeline("0%");
-
-  Test.finish();
-})();
+});

@@ -1,6 +1,4 @@
-// Test global console evaluation.
-(async function () {
-  await Test.start();
+Test.describe(`Test global console evaluation.`, async () => {
   await Test.selectConsole();
 
   await Test.executeInConsole("number");
@@ -8,6 +6,4 @@
 
   await Test.executeInConsole("window.updateNumber");
   await Test.waitForMessage("function updateNumber");
-
-  Test.finish();
-})();
+});
