@@ -61,6 +61,10 @@ export class ValueFront {
     }
   }
 
+  getExecutionPoint() {
+    return this._pause?.point;
+  }
+
   getPause() {
     return this._pause;
   }

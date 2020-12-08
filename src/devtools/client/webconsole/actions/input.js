@@ -100,6 +100,7 @@ function onExpressionEvaluated(response) {
     }
 
     dispatch(messagesActions.messagesAdd([response]));
+
     return;
   };
 }

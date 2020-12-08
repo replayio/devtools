@@ -1066,6 +1066,15 @@ function getDefaultFiltersCounter() {
   return count;
 }
 
+//get the point for the corresponding command, regardless of where we're currently paused
+function getPausePoint(newMessage, state) {
+  if (newMessage.type === constants.MESSAGE_TYPE.RESULT && newMessage.parameters[0]) {
+    return newMessage.parameters[0].getExecutionPoint() || state.pausedExecutionPoint;
+  } else {
+    return state.pausedExecutionPoint;
+  }
+}
+
 // Make sure that message has an execution point which can be used for sorting
 // if other messages with real execution points appear later.
 function ensureExecutionPoint(state, newMessage) {
@@ -1081,7 +1090,7 @@ function ensureExecutionPoint(state, newMessage) {
     time = 0,
     messageCount = 1;
   if (state.pausedExecutionPoint) {
-    point = state.pausedExecutionPoint;
+    point = getPausePoint(newMessage, state);
     time = state.pausedExecutionPointTime;
     const lastMessage = getLastMessageWithPoint(state, point);
     if (lastMessage.lastExecutionPoint) {
@@ -1112,6 +1121,7 @@ function getLastMessageWithPoint(state, point) {
   // value as the given point.
   const filteredMessageId = state.visibleMessages.filter(function (p) {
     const currentMessage = state.messagesById.get(p);
+
     if (currentMessage.executionPoint) {
       return false;
     }
@@ -1144,7 +1154,7 @@ function messageCountSinceLastExecutionPoint(state, id) {
  * @param {Boolean} timeStampSort: set to true to sort messages by their timestamps.
  */
 function maybeSortVisibleMessages(state, sortWarningGroupMessage = false, timeStampSort = false) {
-  // When using log points while replaying, messages can be added out of order
+  // When using log points while replaying, messages can be added out of order˜
   // with respect to how they originally executed. Use the execution point
   // information in the messages to sort visible messages according to how
   // they originally executed. This isn't necessary if we haven't seen any
