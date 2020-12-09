@@ -10,6 +10,11 @@
   align-items: center;
 }
 
+.replay-player :focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
+}
+
 .theme-light .replay-player {
   --commandbar-button-hover-background: #efefef;
   --progress-recording-background: hsl(0, 100%, 97%);
@@ -138,15 +143,14 @@
   margin: 11px 20px 11px 0px;
 }
 
-.replay-player .commands *:focus:not(:focus-visible) {
-  outline: none;
-  background: inherit;
-}
-
 .replay-player .commands > button {
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
+}
+
+.replay-player .commands > button:hover {
+  background: var(--theme-toolbar-background-hover);
 }
 
 .replay-player .commands > button .img {
