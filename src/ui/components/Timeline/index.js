@@ -30,6 +30,9 @@ const { assert } = require("protocol/utils");
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
+
+const { getLocationKey } = require("devtools/client/debugger/src/utils/breakpoint");
+
 import Message from "./Message";
 import { timelineMarkerWidth } from "../../constants";
 
@@ -457,20 +460,16 @@ export class Timeline extends Component {
   }
 
   renderMessages() {
-    const { messages, currentTime, highlightedMessageId, zoomRegion } = this.props;
+    const { messages, currentTime, hoveredLineNumberPoints } = this.props;
     let visibleIndex;
 
-    return messages.map((message, index) => {
+    const consoleMessages = messages.map((message, index) => {
       const messageEl = (
         <Message
           message={message}
           visibleIndex={visibleIndex}
           index={index}
           messages={messages}
-          currentTime={currentTime}
-          highlightedMessageId={highlightedMessageId}
-          zoomRegion={zoomRegion}
-          overlayWidth={this.overlayWidth}
           onMarkerClick={this.onMarkerClick}
           onMarkerMouseEnter={this.onMarkerMouseEnter}
           onMarkerMouseLeave={this.onMarkerMouseLeave}
@@ -482,6 +481,12 @@ export class Timeline extends Component {
       }
       return messageEl;
     });
+
+    const hoveredLineNumberMessages = hoveredLineNumberPoints.map((message, index) => {
+      return <Message message={message} key={index} temporary />;
+    });
+
+    return [...consoleMessages, ...hoveredLineNumberMessages];
   }
 
   getNearbyComments(comment) {
@@ -601,6 +606,36 @@ export class Timeline extends Component {
   }
 }
 
+const getHoveredLineNumberPoints = state => {
+  const lineNumberLocation = selectors.getHoveredLineNumber(state);
+
+  if (!lineNumberLocation) {
+    return [];
+  }
+
+  const analysisPoints = selectors.getAnalysisPoints(state);
+  console.log("points", analysisPoints);
+  console.log(getLocationKey(lineNumberLocation));
+
+  const markers = getAllMarkersForLocation(analysisPoints, lineNumberLocation);
+
+  return markers;
+};
+
+const getAllMarkersForLocation = (analysisPoints, location) => {
+  const locationKey = getLocationKey(location);
+  const arr = [];
+
+  Object.keys(analysisPoints).forEach(point => {
+    if (point.includes(locationKey)) {
+      arr.push(...analysisPoints[point]);
+    }
+  });
+
+  console.log({ arr });
+  return arr;
+};
+
 export default connect(
   state => ({
     zoomRegion: selectors.getZoomRegion(state),
@@ -614,6 +649,8 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     loaded: selectors.getTimelineLoaded(state),
     messages: selectors.getMessagesForTimeline(state),
+    hoveredLineNumber: selectors.getHoveredLineNumber(state),
+    hoveredLineNumberPoints: getHoveredLineNumberPoints(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,

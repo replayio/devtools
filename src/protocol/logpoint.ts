@@ -64,6 +64,7 @@ client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
   }
 
   const info = gLogpoints.get(logGroupId);
+  console.log(info);
   if (!info || !info.showInConsole) {
     return;
   }
@@ -190,6 +191,7 @@ export async function setLogpoint(
   condition: string,
   showInConsole: boolean = true
 ) {
+  console.log(showInConsole);
   let conditionSection = "";
   if (condition) {
     // When there is a condition, don't add a message if it returns undefined
@@ -266,6 +268,7 @@ export function setLogpointByURL(
   condition: string,
   showInConsole: boolean = true
 ) {
+  console.log(showInConsole);
   const sourceIds = ThreadFront.getSourceIdsForURL(url);
   (sourceIds || []).forEach((sourceId: string) => {
     setLogpoint(logGroupId, sourceId, line, column, text, condition, showInConsole);

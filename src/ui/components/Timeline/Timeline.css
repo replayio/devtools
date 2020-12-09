@@ -88,6 +88,10 @@
   transition-duration: 100ms;
 }
 
+.replay-player .message.temporary .fill {
+  fill: red;
+}
+
 .replay-player .message .fill {
   fill: var(--replaying-marker-fill);
 }

@@ -59,18 +59,43 @@ class Message extends React.Component {
       highlightedMessageId,
       highlightedLocation,
       zoomRegion,
-      overlayWidth,
       visibleIndex,
       onMarkerClick,
       onMarkerMouseEnter,
       onMarkerMouseLeave,
+      temporary,
+      timelineDimensions,
     } = this.props;
 
+    const overlayWidth = timelineDimensions.width;
     const offset = getPixelOffset({
       time: message.executionPointTime,
       overlayWidth,
       zoom: zoomRegion,
     });
+
+    if (temporary) {
+      return (
+        <a
+          tabIndex={0}
+          className="message temporary"
+          style={{
+            left: `${getLeftOffset({
+              time: message.time,
+              overlayWidth,
+              zoom: zoomRegion,
+            })}%`,
+          }}
+        >
+          <Marker
+            message={message}
+            // onMarkerClick={onMarkerClick}
+            // onMarkerMouseEnter={onMarkerMouseEnter}
+            // onMarkerMouseLeave={onMarkerMouseLeave}
+          />
+        </a>
+      );
+    }
 
     const previousVisibleMessage = messages[visibleIndex];
 
@@ -144,5 +169,9 @@ class Message extends React.Component {
   }
 }
 export default connect(state => ({
+  currentTime: selectors.getCurrentTime(state),
+  zoomRegion: selectors.getZoomRegion(state),
   highlightedLocation: selectors.getHighlightedLocation(state),
+  highlightedMessageId: selectors.getHighlightedMessageId(state),
+  timelineDimensions: selectors.getTimelineDimensions(state),
 }))(Message);

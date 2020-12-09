@@ -2,7 +2,7 @@ import { AppState } from "ui/state/app";
 import { AppAction } from "ui/actions/app";
 import { UIState } from "ui/state";
 const { prefs } = require("../utils/prefs");
-const { getLocationKey } = require("../../devtools/client/debugger/src/utils/breakpoint");
+const { getLocationKey } = require("devtools/client/debugger/src/utils/breakpoint");
 
 function initialAppState(): AppState {
   return {
@@ -22,6 +22,7 @@ function initialAppState(): AppState {
     analysisPoints: {},
     viewMode: prefs.viewMode,
     narrowMode: false,
+    hoveredLineNumber: null,
   };
 }
 
@@ -102,6 +103,10 @@ export default function update(state = initialAppState(), action: AppAction) {
       };
     }
 
+    case "set_hovered_line_number": {
+      return { ...state, hoveredLineNumber: action.hoveredLineNumber };
+    }
+
     default: {
       return state;
     }
@@ -126,3 +131,4 @@ export const getAnalysisPointsForLocation = (state: UIState, location: any) =>
   location && state.app.analysisPoints[getLocationKey(location)];
 export const getViewMode = (state: UIState) => state.app.viewMode;
 export const getNarrowMode = (state: UIState) => state.app.narrowMode;
+export const getHoveredLineNumber = (state: UIState) => state.app.hoveredLineNumber;

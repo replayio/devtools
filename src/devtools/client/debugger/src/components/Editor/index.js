@@ -22,6 +22,9 @@ import { continueToHereItem, editorItemActions } from "./menus/editor";
 // Redux actions
 import actions from "../../actions";
 
+import { actions as uiActions } from "ui/actions";
+import { selectors as uiSelectors } from "ui/reducers";
+
 import SearchBar from "./SearchBar";
 import Preview from "./Preview";
 import Breakpoints from "./Breakpoints/Breakpoints";
@@ -148,11 +151,13 @@ class Editor extends PureComponent {
 
   onGutterMouseOver = (e, setHoveredLineNumberNode) => {
     let target = e.target;
+    let shouldRunAnalysis = true;
 
     const isBreakpointMarker = target.closest(".new-breakpoint");
 
     // If hovered on a breakpoint marker, get the corresponding linenumber element.
     if (isBreakpointMarker) {
+      shouldRunAnalysis = false;
       target = target.closest(".Codemirror-gutter-elt")?.previousSibling;
     }
 
@@ -173,15 +178,17 @@ class Editor extends PureComponent {
     };
 
     e.target.addEventListener("mouseleave", onMouseLeave);
-    setHoveredLineNumberNode(target);
+    setHoveredLineNumberNode(target, shouldRunAnalysis);
   };
 
-  setHoveredLineNumberNode = target => {
+  setHoveredLineNumberNode = (target, shouldRunAnalysis) => {
     const { cx, selectedSource, runAnalysisOnLine } = this.props;
 
     if (!target) {
-      return this.setState({ targetNode: null, location: null });
+      this.props.setHoveredLineNumber(null);
+      return this.setState({ targetNode: null });
     }
+
     const line = JSON.parse(target.childNodes[0].textContent);
     const location = {
       sourceId: selectedSource.id,
@@ -190,8 +197,12 @@ class Editor extends PureComponent {
       line,
     };
 
-    runAnalysisOnLine(cx, line);
-    this.setState({ targetNode: target, location });
+    if (shouldRunAnalysis) {
+      runAnalysisOnLine(cx, line);
+    }
+
+    this.props.setHoveredLineNumber(location);
+    this.setState({ targetNode: target });
   };
 
   onClosePress = (key, e) => {
@@ -468,7 +479,7 @@ class Editor extends PureComponent {
   renderItems() {
     const { cx, selectedSource, isPaused } = this.props;
     const { editor, contextMenu } = this.state;
-    const { targetNode, location } = this.state;
+    const { targetNode } = this.state;
 
     if (!selectedSource || !editor || !getDocument(selectedSource.id)) {
       return null;
@@ -482,7 +493,7 @@ class Editor extends PureComponent {
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
-        {location ? <LineNumberPortal targetNode={targetNode} location={location} /> : null}
+        {targetNode ? <LineNumberPortal targetNode={targetNode} /> : null}
         {/* <HighlightLines editor={editor} /> */}
         {
           <EditorMenu
@@ -542,6 +553,7 @@ const mapStateToProps = state => {
     selectedFrame: selectors.getSelectedFrame(state),
     framePositions: selectors.getFramePositions(state),
     mode: selectors.getViewMode(state),
+    hoveredLineNumber: uiSelectors.getHoveredLineNumber(state),
   };
 };
 
@@ -558,6 +570,7 @@ const mapDispatchToProps = dispatch => ({
       updateCursorPosition: actions.updateCursorPosition,
       closeTab: actions.closeTab,
       toggleBlackBox: actions.toggleBlackBox,
+      setHoveredLineNumber: uiActions.setHoveredLineNumber,
     },
     dispatch
   ),
