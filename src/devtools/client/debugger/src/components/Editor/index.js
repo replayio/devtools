@@ -30,7 +30,7 @@ import DebugLine from "./DebugLine";
 import ReplayLines from "./ReplayLines";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
-import LineNumberTooltip from "./LineNumberTooltip";
+import LineNumberPortal from "./LineNumberPortal";
 
 import {
   showSourceText,
@@ -127,7 +127,7 @@ class Editor extends PureComponent {
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
     codeMirrorWrapper.addEventListener("mouseover", onMouseOver(codeMirror));
     codeMirrorWrapper.addEventListener("mouseover", e =>
-      this.onLineNumberMouseOver(e, this.setHoveredLineNumberNode)
+      this.onGutterMouseOver(e, this.setHoveredLineNumberNode)
     );
 
     if (!isFirefox()) {
@@ -146,8 +146,20 @@ class Editor extends PureComponent {
     return editor;
   }
 
-  onLineNumberMouseOver = (e, setHoveredLineNumberNode) => {
-    const { target } = e;
+  onGutterMouseOver = (e, setHoveredLineNumberNode) => {
+    let target = e.target;
+
+    const isBreakpointMarker = target.closest(".new-breakpoint");
+
+    // If hovered on a breakpoint marker, get the corresponding linenumber element.
+    if (isBreakpointMarker) {
+      target = target.closest(".Codemirror-gutter-elt")?.previousSibling;
+    }
+
+    if (!target || !target.classList) {
+      return;
+    }
+
     const isValidLineNumber =
       target.classList.contains("CodeMirror-linenumber") && !target.closest(".empty-line");
 
@@ -156,11 +168,11 @@ class Editor extends PureComponent {
     }
 
     const onMouseLeave = () => {
-      target.removeEventListener("mouseleave", onMouseLeave);
+      e.target.removeEventListener("mouseleave", onMouseLeave);
       setHoveredLineNumberNode(null);
     };
 
-    target.addEventListener("mouseleave", onMouseLeave);
+    e.target.addEventListener("mouseleave", onMouseLeave);
     setHoveredLineNumberNode(target);
   };
 
@@ -170,8 +182,7 @@ class Editor extends PureComponent {
     if (!target) {
       return this.setState({ targetNode: null, location: null });
     }
-
-    const line = JSON.parse(target.innerText);
+    const line = JSON.parse(target.childNodes[0].textContent);
     const location = {
       sourceId: selectedSource.id,
       sourceUrl: selectedSource.url,
@@ -471,7 +482,7 @@ class Editor extends PureComponent {
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
-        {location ? <LineNumberTooltip targetNode={targetNode} location={location} /> : null}
+        {location ? <LineNumberPortal targetNode={targetNode} location={location} /> : null}
         {/* <HighlightLines editor={editor} /> */}
         {
           <EditorMenu

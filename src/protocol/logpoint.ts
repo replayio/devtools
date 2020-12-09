@@ -190,7 +190,6 @@ export async function setLogpoint(
   condition: string,
   showInConsole: boolean = true
 ) {
-  console.log(`setLogpoint`, { showInConsole });
   let conditionSection = "";
   if (condition) {
     // When there is a condition, don't add a message if it returns undefined

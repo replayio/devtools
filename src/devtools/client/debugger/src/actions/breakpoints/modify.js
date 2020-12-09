@@ -170,8 +170,6 @@ export function runAnalysis(cx, initialLocation, options) {
       return;
     }
 
-    console.log(">>>", location);
-
     const analysisLocation = makeBreakpointLocation(getState(), location);
     client.runAnalysis(analysisLocation, options);
   };

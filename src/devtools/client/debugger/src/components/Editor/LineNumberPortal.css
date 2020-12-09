@@ -1,18 +1,19 @@
 .line-number-tooltip {
   position: fixed;
-  margin-left: -64px;
-  margin-top: -23px;
   line-height: 16px;
   background: var(--grey-30);
   text-align: right;
-  padding: 8px;
+  margin-top: -4px;
+  margin-right: 8px;
+  padding: 4px 8px;
   border-radius: 4px;
-  animation: line-tooltip 200ms ease;
+  animation: line-number-tooltip 200ms ease;
   background: var(--theme-popup-color);
   color: var(--theme-popup-background);
+  font-family: sans-serif;
 }
 
-@keyframes line-tooltip {
+@keyframes line-number-tooltip {
   0% {
     transform: scale(0.5, 0.5);
     opacity: 0;
