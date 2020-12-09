@@ -138,6 +138,19 @@ function setBreakpoint(location, options) {
   return Promise.all(promises);
 }
 
+function runAnalysis(location, options) {
+  maybeClearLogpoint(location);
+  options = maybeGenerateLogGroupId(options);
+  const { condition, logValue, logGroupId, showInConsole } = options;
+  const { line, column, sourceUrl, sourceId } = location;
+
+  if (sourceId) {
+    setLogpoint(logGroupId, sourceId, line, column, logValue, condition, showInConsole);
+  } else {
+    setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition, showInConsole);
+  }
+}
+
 function removeBreakpoint(location) {
   maybeClearLogpoint(location);
   delete breakpoints[locationKey(location)];
@@ -386,6 +399,7 @@ const clientCommands = {
   getFrontByID,
   fetchAncestorFramePositions,
   pickExecutionPoints,
+  runAnalysis,
 };
 
 export { setupCommands, clientCommands };

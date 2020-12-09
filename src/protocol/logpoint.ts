@@ -23,6 +23,7 @@ interface LogpointInfo {
   points: PointDescription[];
   pointsWaiter?: (value: void) => void;
   location: Location | null;
+  showInConsole: boolean;
 }
 
 // Map log group ID to information about the logpoint.
@@ -59,6 +60,11 @@ client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
 
   const logGroupId = gAnalysisLogGroupIDs.get(analysisId)!;
   if (!gLogpoints.has(logGroupId)) {
+    return;
+  }
+
+  const info = gLogpoints.get(logGroupId);
+  if (!info || !info.showInConsole) {
     return;
   }
 
@@ -103,6 +109,10 @@ client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
     PointHandlers.onPoints(points, info);
   }
 
+  if (!info.showInConsole) {
+    return;
+  }
+
   if (LogpointHandlers.onPointLoading) {
     points.forEach(async ({ point, time, frame }) => {
       if (!frame) return;
@@ -116,10 +126,11 @@ client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
 async function createLogpointAnalysis(
   logGroupId: string,
   mapper: string,
-  location: Location | null
+  location: Location | null,
+  showInConsole: boolean
 ) {
   if (!gLogpoints.has(logGroupId)) {
-    gLogpoints.set(logGroupId, { analysisWaiters: [], points: [], location });
+    gLogpoints.set(logGroupId, { analysisWaiters: [], points: [], location, showInConsole });
   }
 
   const waiter = client.Analysis.createAnalysis({
@@ -176,8 +187,10 @@ export async function setLogpoint(
   line: number,
   column: number,
   text: string,
-  condition: string
+  condition: string,
+  showInConsole: boolean = true
 ) {
+  console.log(`setLogpoint`, { showInConsole });
   let conditionSection = "";
   if (condition) {
     // When there is a condition, don't add a message if it returns undefined
@@ -229,7 +242,7 @@ export async function setLogpoint(
   `;
 
   const location = { line, column, sourceId };
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper, location);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper, location, showInConsole);
 
   client.Analysis.addLocation({
     analysisId,
@@ -251,11 +264,12 @@ export function setLogpointByURL(
   line: number,
   column: number,
   text: string,
-  condition: string
+  condition: string,
+  showInConsole: boolean = true
 ) {
   const sourceIds = ThreadFront.getSourceIdsForURL(url);
   (sourceIds || []).forEach((sourceId: string) => {
-    setLogpoint(logGroupId, sourceId, line, column, text, condition);
+    setLogpoint(logGroupId, sourceId, line, column, text, condition, showInConsole);
   });
 }
 
@@ -300,7 +314,7 @@ function eventLogpointMapper(getFrameworkListeners: boolean) {
 
 export async function setEventLogpoint(logGroupId: string, eventTypes: string[]) {
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ true);
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null, false);
 
   for (const eventType of eventTypes) {
     client.Analysis.addEventHandlerEntryPoints({
@@ -331,7 +345,7 @@ async function eventLogpointOnFrameworkListeners(
   }
 
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ false);
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null, false);
 
   for (const location of locations) {
     client.Analysis.addLocation({
@@ -360,7 +374,7 @@ export async function setExceptionLogpoint(logGroupId: string) {
     }];
   `;
 
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null, false);
 
   client.Analysis.addExceptionPoints({
     analysisId,
@@ -388,7 +402,7 @@ export async function setRandomLogpoint(numLogs: number) {
   `;
 
   const logGroupId = Math.random().toString();
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null);
+  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null, false);
 
   client.Analysis.addRandomPoints({
     analysisId,

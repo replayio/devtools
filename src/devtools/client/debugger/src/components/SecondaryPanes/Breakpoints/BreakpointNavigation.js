@@ -41,7 +41,7 @@ function BreakpointNavigation({
           }}
         >
           <div className="img play-circle" style={{ transform: "rotate(180deg)" }} />
-        </button>{" "}
+        </button>
         <button
           className={`breakpoint-navigation-command-next ${!next ? " disabled" : ""}`}
           disabled={!next}

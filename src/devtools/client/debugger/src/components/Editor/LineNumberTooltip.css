@@ -1,0 +1,24 @@
+.line-number-tooltip {
+  position: fixed;
+  margin-left: -64px;
+  margin-top: -23px;
+  line-height: 16px;
+  background: var(--grey-30);
+  text-align: right;
+  padding: 8px;
+  border-radius: 4px;
+  animation: line-tooltip 200ms ease;
+  background: var(--theme-popup-color);
+  color: var(--theme-popup-background);
+}
+
+@keyframes line-tooltip {
+  0% {
+    transform: scale(0.5, 0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+}

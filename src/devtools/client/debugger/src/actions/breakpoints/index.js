@@ -15,9 +15,14 @@ import {
   getSelectedSource,
   getBreakpointAtLocation,
   getBreakpointsForSource,
-  getBreakpointsAtLine,
 } from "../../selectors";
-import { addBreakpoint, removeBreakpoint, enableBreakpoint, disableBreakpoint } from "./modify";
+import {
+  addBreakpoint,
+  runAnalysis,
+  removeBreakpoint,
+  enableBreakpoint,
+  disableBreakpoint,
+} from "./modify";
 import remapLocations from "./remapLocations";
 
 // this will need to be changed so that addCLientBreakpoint is removed
@@ -163,6 +168,28 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
     options.logValue = `"${file}:${line}"`;
 
     return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled));
+  };
+}
+
+export function runAnalysisOnLine(cx, line) {
+  return ({ dispatch, getState }) => {
+    const state = getState();
+    const source = getSelectedSource(state);
+
+    if (!source) {
+      return;
+    }
+    const location = {
+      sourceId: source.id,
+      sourceUrl: source.url,
+      column: undefined,
+      line,
+    };
+
+    const file = source.url.split("/").pop();
+    const options = { logValue: "dummyValue", showInConsole: false };
+
+    return dispatch(runAnalysis(cx, location, options));
   };
 }
 

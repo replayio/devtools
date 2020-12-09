@@ -30,6 +30,7 @@ import DebugLine from "./DebugLine";
 import ReplayLines from "./ReplayLines";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
+import LineNumberTooltip from "./LineNumberTooltip";
 
 import {
   showSourceText,
@@ -125,6 +126,9 @@ class Editor extends PureComponent {
     codeMirrorWrapper.addEventListener("keydown", e => this.onKeyDown(e));
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
     codeMirrorWrapper.addEventListener("mouseover", onMouseOver(codeMirror));
+    codeMirrorWrapper.addEventListener("mouseover", e =>
+      this.onLineNumberMouseOver(e, this.setHoveredLineNumberNode)
+    );
 
     if (!isFirefox()) {
       codeMirror.on("gutterContextMenu", (cm, line, eventName, event) =>
@@ -141,6 +145,43 @@ class Editor extends PureComponent {
 
     return editor;
   }
+
+  onLineNumberMouseOver = (e, setHoveredLineNumberNode) => {
+    const { target } = e;
+    const isValidLineNumber =
+      target.classList.contains("CodeMirror-linenumber") && !target.closest(".empty-line");
+
+    if (!isValidLineNumber) {
+      return;
+    }
+
+    const onMouseLeave = () => {
+      target.removeEventListener("mouseleave", onMouseLeave);
+      setHoveredLineNumberNode(null);
+    };
+
+    target.addEventListener("mouseleave", onMouseLeave);
+    setHoveredLineNumberNode(target);
+  };
+
+  setHoveredLineNumberNode = target => {
+    const { cx, selectedSource, runAnalysisOnLine } = this.props;
+
+    if (!target) {
+      return this.setState({ targetNode: null, location: null });
+    }
+
+    const line = JSON.parse(target.innerText);
+    const location = {
+      sourceId: selectedSource.id,
+      sourceUrl: selectedSource.url,
+      column: undefined,
+      line,
+    };
+
+    runAnalysisOnLine(cx, line);
+    this.setState({ targetNode: target, location });
+  };
 
   onClosePress = (key, e) => {
     const { cx, selectedSource } = this.props;
@@ -416,6 +457,7 @@ class Editor extends PureComponent {
   renderItems() {
     const { cx, selectedSource, isPaused } = this.props;
     const { editor, contextMenu } = this.state;
+    const { targetNode, location } = this.state;
 
     if (!selectedSource || !editor || !getDocument(selectedSource.id)) {
       return null;
@@ -429,6 +471,7 @@ class Editor extends PureComponent {
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
+        {location ? <LineNumberTooltip targetNode={targetNode} location={location} /> : null}
         {/* <HighlightLines editor={editor} /> */}
         {
           <EditorMenu
@@ -497,6 +540,7 @@ const mapDispatchToProps = dispatch => ({
       continueToHere: actions.continueToHere,
       toggleBreakpointAtLine: actions.toggleBreakpointAtLine,
       addBreakpointAtLine: actions.addBreakpointAtLine,
+      runAnalysisOnLine: actions.runAnalysisOnLine,
       jumpToMappedLocation: actions.jumpToMappedLocation,
       traverseResults: actions.traverseResults,
       updateViewport: actions.updateViewport,

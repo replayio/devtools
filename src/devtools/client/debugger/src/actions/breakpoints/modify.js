@@ -153,6 +153,30 @@ export function addBreakpoint(
   };
 }
 
+export function runAnalysis(cx, initialLocation, options) {
+  return async ({ dispatch, getState, client }) => {
+    recordEvent("add_breakpoint");
+
+    const { sourceId, line } = initialLocation;
+    await dispatch(setBreakpointPositions({ cx, sourceId, line }));
+    const location = getFirstBreakpointPosition(getState(), initialLocation);
+
+    if (!location) {
+      return;
+    }
+
+    const source = getSource(getState(), location.sourceId);
+    if (!source) {
+      return;
+    }
+
+    console.log(">>>", location);
+
+    const analysisLocation = makeBreakpointLocation(getState(), location);
+    client.runAnalysis(analysisLocation, options);
+  };
+}
+
 /**
  * Remove a single breakpoint
  *
