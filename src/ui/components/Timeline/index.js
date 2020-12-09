@@ -395,8 +395,25 @@ export class Timeline extends Component {
     this.props.setTimelineState({ playback: null });
   }
 
+  renderReplayButton() {
+    return (
+      <button
+        onClick={() => {
+          this.seekTime(0);
+          this.startPlayback();
+        }}
+      >
+        <div className="img replay-lg" />
+      </button>
+    );
+  }
+
   renderCommands() {
-    const { playback } = this.props;
+    const { playback, recordingDuration, currentTime } = this.props;
+
+    if (currentTime == recordingDuration) {
+      return <div className="commands">{this.renderReplayButton()}</div>;
+    }
 
     return (
       <div className="commands">
