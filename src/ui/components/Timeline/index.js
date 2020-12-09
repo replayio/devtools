@@ -47,16 +47,13 @@ function classname(name, bools) {
   return name;
 }
 
-function getMessageLocation(message) {
-  if (!message.frame) {
-    return null;
-  }
-  const {
-    frame: { source, line, column },
-  } = message;
-  return { sourceUrl: source, line, column };
+function ReplayButton({ onClick }) {
+  return (
+    <button onClick={onClick}>
+      <div className="img replay-lg" />
+    </button>
+  );
 }
-
 // When viewing a recording, we add a comment and move it around to indicate the
 // point we are currently looking at. Since we don't have user accounts, make up
 // a short name to identify us when other people view the recording.
@@ -395,8 +392,21 @@ export class Timeline extends Component {
     this.props.setTimelineState({ playback: null });
   }
 
+  replayPlayback = () => {
+    this.seekTime(0);
+    this.startPlayback();
+  };
+
   renderCommands() {
-    const { playback } = this.props;
+    const { playback, recordingDuration, currentTime } = this.props;
+
+    if (currentTime == recordingDuration) {
+      return (
+        <div className="commands">
+          <ReplayButton onClick={this.replayPlayback} />
+        </div>
+      );
+    }
 
     return (
       <div className="commands">

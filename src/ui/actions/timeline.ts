@@ -58,8 +58,12 @@ function onEndpoint({ point, time }: TimeStampedPoint): UIThunkAction {
     // These two methods should be commoned up.
     const screenshot = selectors.getScreenShot(getState());
     addLastScreen(screenshot, point, time);
+    const zoomRegion = selectors.getZoomRegion(getState());
+    const newZoomRegion = { ...zoomRegion, endTime: time };
 
-    dispatch(setTimelineState({ currentTime: time }));
+    dispatch(
+      setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
+    );
   };
 }
 
