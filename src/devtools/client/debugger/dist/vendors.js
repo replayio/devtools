@@ -1017,7 +1017,8 @@
                   return closestScrolledParent(node.parentNode);
                 };
 
-                const scrolledParent = closestScrolledParent(treeElement);
+                //check if our element is currently in view of the tree pane
+                const scrolledParent = treeElement;
                 const scrolledParentRect = scrolledParent
                   ? scrolledParent.getBoundingClientRect()
                   : null;
