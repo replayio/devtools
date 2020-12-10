@@ -10,8 +10,8 @@ const actions = require("../actions");
 
 const selectors = require("../reducer");
 
-import Components from "devtools-components";
-const Tree = createFactory(Components.Tree);
+import { Tree as _Tree } from "devtools-components";
+const Tree = createFactory(_Tree);
 require("./ObjectInspector.css");
 
 const ObjectInspectorItem = createFactory(require("./ObjectInspectorItem").default);
