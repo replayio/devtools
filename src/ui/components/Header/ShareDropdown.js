@@ -46,11 +46,13 @@ function useIsOwner(recordingId) {
     variables: { recordingId },
   });
 
-  if (!isAuthenticated || loading) {
+  console.log({ data, loading });
+
+  if (!isAuthenticated || loading || (!loading && !data)) {
     return false;
   }
 
-  return user.sub === data.recordings[0]?.user.auth_id;
+  return user.sub === data.recordings?.[0]?.user.auth_id;
 }
 
 function CopyUrl({ recordingId }) {
