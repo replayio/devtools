@@ -752,10 +752,10 @@ class Tree extends Component {
           }
           return closestScrolledParent(node.parentNode);
         };
-        const scrolledParent = closestScrolledParent(treeElement);
-        const scrolledParentRect = scrolledParent ? scrolledParent.getBoundingClientRect() : null;
+
+        const scrolledParentRect = treeElement ? treeElement.getBoundingClientRect() : null;
         const isVisible =
-          !scrolledParent || (top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom);
+          !treeElement || (top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom);
 
         if (!isVisible) {
           const { alignTo } = options;
