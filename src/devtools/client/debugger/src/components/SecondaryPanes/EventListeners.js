@@ -153,8 +153,9 @@ class EventListeners extends Component {
 
   renderSearchResultsList() {
     const searchResults = this.getSearchResults();
+    const searchResultsCount = Object.values(searchResults).flat().length;
 
-    if (!searchResults.length) {
+    if (searchResultsCount == 0) {
       return (
         <div className="status no-results">{`No search results for "${this.state.searchText}"`}</div>
       );
