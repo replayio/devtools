@@ -1,0 +1,9 @@
+.parent {
+  margin-left: 10px;
+  font: italic small-caps bold 24px courier;
+}
+
+.child {
+  font-size: 20px;
+  font-family: sans-serif;
+}

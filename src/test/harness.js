@@ -506,15 +506,31 @@ async function checkComputedStyle(style, value) {
   });
 }
 
+function setLonghandsExpanded(expanded) {
+  document.querySelectorAll(".ruleview-expander").forEach(expander => {
+    if (expander.style.display !== "none" && expander.classList.contains("open") !== expanded) {
+      expander.click();
+    }
+  });
+}
+
 function getAppliedRulesJSON() {
   const rules = document.querySelectorAll(".ruleview-rule");
   return [...rules].map(rule => {
     const selector = rule.querySelector(".ruleview-selectorcontainer").innerText.trim();
     const source = rule.querySelector(".ruleview-rule-source").innerText.trim();
-    const properties = [...rule.querySelectorAll(".ruleview-property")].map(prop => {
+    const properties = [...rule.querySelectorAll(".ruleview-propertycontainer")].map(prop => {
+      let longhandProps;
+      if (prop.nextSibling) {
+        longhandProps = [...prop.nextSibling.querySelectorAll("li")].map(longhand => ({
+          text: longhand.innerText,
+          overridden: longhand.classList.contains("ruleview-overridden"),
+        }));
+      }
       return {
         text: prop.innerText.trim(),
-        overridden: prop.className.includes("overridden"),
+        overridden: prop.parentNode.className.includes("overridden"),
+        longhandProps,
       };
     });
     return { selector, source, properties };
@@ -595,6 +611,7 @@ const testCommands = {
   pickNode,
   selectMarkupNode,
   checkComputedStyle,
+  setLonghandsExpanded,
   getAppliedRulesJSON,
   checkAppliedRules,
 };
