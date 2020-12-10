@@ -1,2 +1,1 @@
-const { vendored } = require("./vendors");
-module.exports = vendored["devtools-components"];
+export * from "devtools/client/debugger/packages/devtools-components";
