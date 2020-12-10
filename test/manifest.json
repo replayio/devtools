@@ -29,5 +29,6 @@
   ["inspector-02.js", "doc_inspector_basic.html"],
   ["inspector-03.js", "doc_inspector_styles.html"],
   ["inspector-04.js", "doc_inspector_styles.html"],
-  ["inspector-05.js", "doc_inspector_sourcemapped.html"]
+  ["inspector-05.js", "doc_inspector_sourcemapped.html"],
+  ["inspector-06.js", "doc_inspector_shorthand.html"]
 ]
