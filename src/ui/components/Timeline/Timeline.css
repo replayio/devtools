@@ -76,6 +76,7 @@
 
 .replay-player .message:hover {
   cursor: pointer;
+  transform: scale(1.2);
 }
 
 .replay-player .message.highlighted .fill {
@@ -88,8 +89,12 @@
   transition-duration: 100ms;
 }
 
+.replay-player .message.temporary {
+  z-index: var(--z-index-2--preview-message);
+}
+
 .replay-player .message.temporary .fill {
-  fill: red;
+  fill: var(--replay-orange);
 }
 
 .replay-player .message .fill {

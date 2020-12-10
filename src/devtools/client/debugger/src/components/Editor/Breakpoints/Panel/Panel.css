@@ -208,14 +208,6 @@
   margin: 0 4px;
 }
 
-.breakpoint-panel .breakpoint-navigation-timeline {
-  background: white;
-  box-sizing: content-box;
-  border-radius: 0px;
-  padding: 2px 0px;
-  border: 1px solid var(--theme-splitter-color);
-}
-
 .breakpoint-panel .breakpoint-navigation-status-container {
   min-width: 50px;
 }

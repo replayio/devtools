@@ -3,7 +3,7 @@
   flex-direction: row;
   justify-content: space-between;
   padding: 0px 8px 0px 0px;
-  background-color: var(--theme-toolbar-background);
+  background-color: var(--theme-body-background);
   align-items: center;
 }
 
@@ -50,10 +50,13 @@
 }
 
 .breakpoint-navigation-timeline {
+  background: var(--theme-body-background);
+  box-sizing: content-box;
+  border-radius: 0px;
+  padding: 2px 0px;
   display: flex;
   flex-direction: row;
   flex-grow: 1;
-  background: #e4eaf5;
   position: relative;
   width: 100%;
   align-items: center;
@@ -66,12 +69,23 @@
   position: absolute;
 }
 
+.breakpoint-navigation-timeline-point {
+  transition: 200ms;
+  cursor: pointer;
+  position: absolute;
+}
+
+.breakpoint-navigation-timeline-point:hover {
+  cursor: pointer;
+  transform: scale(1.2);
+}
+
 .breakpoint-navigation-timeline-point .fill {
   fill: var(--replaying-marker-fill);
 }
 
 .breakpoint-navigation-timeline-point .stroke {
-  stroke: var(--replaying-marker-stroke);
+  stroke: var(--theme-body-background);
 }
 
 .breakpoint-navigation-timeline-point.future .fill {
@@ -79,7 +93,7 @@
 }
 
 .breakpoint-navigation-timeline-point.future .stroke {
-  stroke: var(--replaying-marker-future-stroke);
+  stroke: var(--theme-body-background);
 }
 
 .breakpoint-navigation-timeline-point.pause {
@@ -91,7 +105,7 @@
 }
 
 .breakpoint-navigation-timeline-point.pause .stroke {
-  stroke: var(--replaying-paused-marker-stroke);
+  stroke: var(--theme-body-background);
 }
 
 .breakpoint-navigation-timeline-pause-marker {
@@ -100,4 +114,17 @@
   background: var(--replay-head-background);
   width: 1px;
   z-index: var(--z-index-1--paused-message);
+}
+
+.breakpoint-navigation-timeline .pause-progress-container {
+  height: 5px;
+  background: var(--progressbar-background);
+  border-radius: 4px;
+  width: 100%;
+}
+
+.breakpoint-navigation-timeline .pause-progress {
+  height: 5px;
+  background: var(--progressbar-line-color);
+  border-radius: 4px;
 }

@@ -67,7 +67,8 @@ function BreakpointTimeline({
         ref={timelineNode}
         onClick={handleClick}
         title={title}
-        style={{ height: `${pointWidth + 2}px` }} // 2px to account for the 1px top+bottom border
+        // style={{ height: `${pointWidth + 2}px` }} // 2px to account for the 1px top+bottom border
+        style={{ height: `${pointWidth}px` }} // 2px to account for the 1px top+bottom border
       >
         {timelineNode.current
           ? analysisPoints.map((p, i) => (
@@ -81,13 +82,39 @@ function BreakpointTimeline({
             ))
           : null}
         {timelineNode.current ? (
-          <PauseLine
-            point={{ time: currentTime }}
+          <ProgressBar
+            currentTime={currentTime}
             timelineNode={timelineNode.current}
             zoomRegion={zoomRegion}
           />
         ) : null}
       </div>
+    </div>
+  );
+}
+
+function ProgressBar({ currentTime, timelineNode, zoomRegion }) {
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const offset = getLeftPercentOffset({
+      point: { time: currentTime },
+      timelineNode,
+      zoomRegion,
+      markerWidth: 0,
+    });
+
+    setWidth(offset);
+  });
+
+  return (
+    <div className="pause-progress-container">
+      <div
+        className="pause-progress"
+        style={{
+          width: `${width}%`,
+        }}
+      />
     </div>
   );
 }

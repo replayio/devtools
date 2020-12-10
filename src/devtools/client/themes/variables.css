@@ -222,6 +222,8 @@
   --replaying-paused-marker-fill: #5b41ff;
   --replaying-paused-marker-stroke: #3d23e2;
   --replay-head-background: var(--purple-50);
+  --progressbar-background: var(--grey-30);
+  --progressbar-line-color: var(--blue-40);
 }
 
 /*
@@ -374,7 +376,8 @@ custom variable for it below so we can keep track of everything in one place. */
   --z-index-1--timeline-tooltip: var(--z-index-1);
   --z-index-1--icon-tooltip: var(--z-index-1);
 
-  --z-index-2--name: var(--z-index-2);
+  --z-index-2--preview-message: var(--z-index-2);
+
   --z-index-3--name: var(--z-index-3);
   --z-index-4--name: var(--z-index-4);
   --z-index-5--name: var(--z-index-5);
