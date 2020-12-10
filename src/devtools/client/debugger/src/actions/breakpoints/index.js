@@ -14,7 +14,9 @@ import {
   getSelectedSource,
   getBreakpointAtLocation,
   getBreakpointsForSource,
+  getSymbols,
 } from "../../selectors";
+import { findClosestEnclosedSymbol } from "../../utils/ast";
 import {
   addBreakpoint,
   removeBreakpoint,
@@ -176,6 +178,7 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
     if (!source) {
       return;
     }
+
     const breakpointLocation = {
       sourceId: source.id,
       sourceUrl: source.url,
@@ -185,7 +188,9 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
 
     const options = {};
     const file = source.url.split("/").pop();
-    options.logValue = `"${file}:${line}"`;
+    const symbols = getSymbols(state, source);
+    const closestSymbol = findClosestEnclosedSymbol(symbols, { line });
+    options.logValue = closestSymbol ? `"${closestSymbol.name}"` : `"${file}:${line}"`;
 
     return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled));
   };
@@ -209,7 +214,9 @@ export function addBreakpointAtColumn(cx, location) {
 
     const options = {};
     const file = source.url.split("/").pop();
-    options.logValue = `"${file}:${line}:${column}"`;
+    const symbols = getSymbols(state, source);
+    const closestSymbol = findClosestEnclosedSymbol(symbols, location);
+    options.logValue = closestSymbol ? `"${closestSymbol.name}"` : `"${file}:${line}:${column}"`;
 
     return dispatch(addBreakpoint(cx, breakpointLocation, options));
   };
