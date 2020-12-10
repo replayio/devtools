@@ -102,9 +102,9 @@ function AccountHeader() {
     <div id="header">
       <div className="header-left">
         <div className="logo" />
-        <div className="title-label">Dashboard</div>
+        <div className="title-label">Replay</div>
       </div>
-      <UserOptions />
+      <UserOptions mode="account" />
     </div>
   );
 }

@@ -49,7 +49,7 @@ function Toolbar({
           />
         </div>
       </div>
-      <UserOptions />
+      <UserOptions mode="devtools" />
     </div>
   );
 }
