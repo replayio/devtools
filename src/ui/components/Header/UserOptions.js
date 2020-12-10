@@ -6,7 +6,7 @@ import { isDeployPreview } from "ui/utils/environment";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./UserOptions.css";
 
-export default function UserOptions() {
+export default function UserOptions({ mode }) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated, user } = useAuth0();
 
@@ -26,7 +26,7 @@ export default function UserOptions() {
         buttonContent={buttonContent}
         setExpanded={setExpanded}
         expanded={expanded}
-        style={{ bottom: "10px", left: "50px", right: "auto", top: "auto" }}
+        orientation={mode == "devtools" ? "right" : "bottom"}
       >
         <div className="user row">
           <div className="user-avatar">

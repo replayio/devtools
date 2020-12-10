@@ -5,6 +5,7 @@ import "./PortalDropdown.css";
 
 interface PortalDropdownProps extends DropdownProps {
   distance?: number;
+  style?: CSSProperties;
 }
 
 export default function PortalDropdown(props: PortalDropdownProps) {
