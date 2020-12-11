@@ -23,7 +23,7 @@ export default function Dropdown({
   expanded,
   position = "bottom-left",
   buttonStyle = "primary",
-  orientation = "right",
+  orientation = "bottom",
 }: DropdownProps) {
   return (
     <div className="dropdown-wrapper">
