@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import Header from "./Header/index";
@@ -11,7 +11,6 @@ import DevView from "./Views/DevView";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
-import { setUserInBrowserPrefs } from "../utils/browser";
 
 const GET_RECORDING = gql`
   query GetRecording($recordingId: String) {
@@ -21,16 +20,6 @@ const GET_RECORDING = gql`
       recordingTitle
       is_private
       date
-    }
-  }
-`;
-
-const CREATE_SESSION = gql`
-  mutation CreateSession($object: sessions_insert_input!) {
-    insert_sessions_one(object: $object) {
-      id
-      controller_id
-      recording_id
     }
   }
 `;
@@ -73,31 +62,12 @@ function DevTools({
   setExpectedError,
   selectedPanel,
   viewMode,
-  updateUser,
-  sessionId,
 }) {
   const [recordingLoaded, setRecordingLoaded] = useState(false);
   const auth = useAuth0();
   const { data, loading: queryIsLoading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
   });
-  const [CreateSession] = useMutation(CREATE_SESSION);
-
-  useEffect(() => {
-    setUserInBrowserPrefs(auth.user);
-    updateUser(auth.user);
-  }, [auth.user]);
-
-  useEffect(() => {
-    if (auth.user && sessionId) {
-      const object = {
-        id: sessionId,
-        recording_id: recordingId,
-        controller_id: sessionId.split("/")[0],
-      };
-      CreateSession({ variables: { object } });
-    }
-  }, [auth.user, sessionId]);
 
   useEffect(() => {
     if (recordingLoaded) {
@@ -163,6 +133,5 @@ export default connect(
     updateTimelineDimensions: actions.updateTimelineDimensions,
     unfocusComment: actions.unfocusComment,
     setExpectedError: actions.setExpectedError,
-    updateUser: actions.updateUser,
   }
 )(DevTools);
