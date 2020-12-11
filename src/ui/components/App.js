@@ -9,6 +9,7 @@ import { isDeployPreview } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 import { useApolloClient, ApolloProvider } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
+import { hasLoadingParam } from "ui/utils/environment";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { actions } from "../actions";
 import "styles.css";
@@ -64,7 +65,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }) {
     return <PopupBlockedError />;
   }
 
-  if ((!isDeployPreview() && isLoading) || !apolloClient) {
+  if ((!isDeployPreview() && isLoading) || !apolloClient || hasLoadingParam()) {
     return <Loader />;
   }
 

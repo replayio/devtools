@@ -15,3 +15,9 @@ export function isTest() {
 export function isDeployPreview() {
   return url.hostname.includes("replay-devtools.netlify.app");
 }
+
+// The loading param is currently used to wait for resources
+// such as sourcemaps to load
+export function hasLoadingParam() {
+  return url.searchParams.get("loading") != null;
+}
