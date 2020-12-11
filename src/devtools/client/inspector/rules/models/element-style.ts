@@ -193,6 +193,10 @@ export default class ElementStyle {
     // Show relevant rules applied to parent elements.
     for (let elem = this.element.parentNode(); elem; elem = elem.parentNode()) {
       if (elem.nodeType == Node.ELEMENT_NODE) {
+        const parentInline = elem.getInlineStyle();
+        if (parentInline && parentInline.properties.length > 0) {
+          this._maybeAddRule(parentInline, elem);
+        }
         const parentApplied = elem.getAppliedRules();
         for (const { rule, pseudoElement } of parentApplied) {
           if (!pseudoElement) {
