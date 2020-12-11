@@ -51,7 +51,7 @@
 }
 
 #header .title-label {
-  color: var(--theme-toolbar-color);
+  color: var(--dark-blue);
   font-size: 1.25rem;
   overflow: hidden;
   text-overflow: ellipsis;
