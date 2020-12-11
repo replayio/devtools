@@ -192,7 +192,7 @@ export default class Rule {
   get sourceLink(): SourceLink {
     return {
       label: this.getSourceText(CssLogic.shortSource({ href: this.sourceLocation.url })),
-      title: this.getSourceText(this.sourceLocation.url),
+      title: this.sourceLocation.url,
     };
   }
 

@@ -26,6 +26,7 @@ const {
   updateHighlightedSelector,
   updateRules,
 } = require("devtools/client/inspector/rules/actions/rules");
+const { setComputedProperties } = require("devtools/client/inspector/computed/actions");
 
 const RulesApp = createFactory(require("devtools/client/inspector/rules/components/RulesApp"));
 
@@ -614,6 +615,7 @@ class RulesView {
    */
   updateRules() {
     this.store.dispatch(updateRules(this.elementStyle.rules));
+    this.store.dispatch(setComputedProperties(this.elementStyle));
   }
 }
 

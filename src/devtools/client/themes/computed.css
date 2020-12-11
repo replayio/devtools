@@ -120,7 +120,6 @@
   width: 8px;
   height: 8px;
   margin: 0 1px;
-  background-image: url(images/arrow-e.svg);
   background-repeat: no-repeat;
   background-size: contain;
   -moz-context-properties: fill;
@@ -247,6 +246,5 @@
 }
 
 .computed-overridden .rule-text, .computed-overridden .computed-other-property-value {
-  text-decoration: line-through;
-  color: var(--rule-overridden-name-text-color);
+  text-decoration: line-through solid var(--theme-text-color-alt);
 }

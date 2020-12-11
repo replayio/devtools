@@ -70,6 +70,7 @@ const gBackgroundImages = {
   "#inspector-splitter-box .sidebar-toggle::before": require("devtools/client/themes/images/close-3-pane.svg"),
   "#inspector-splitter-box .sidebar-toggle.pane-collapsed::before": require("devtools/client/themes/images/open-3-pane.svg"),
   ".expandable.collapsed .markup-expand-badge::before": require("devtools/client/themes/images/more.svg"),
+  ".computed-other-property-value::before": require("devtools/client/themes/images/arrow-e.svg"),
 };
 
 const gMaskImages = {
