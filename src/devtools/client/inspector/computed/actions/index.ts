@@ -46,6 +46,7 @@ function createComputedProperties(elementStyle: ElementStyle): ComputedPropertyS
 
   const properties: ComputedPropertyState[] = [];
   for (const [name, value] of computed) {
+    let inheritanceCounter = 1;
     const selectors: MatchedSelectorState[] = [];
     for (const rule of elementStyle.rules) {
       if (rule.isUnmatched) continue;
@@ -64,7 +65,8 @@ function createComputedProperties(elementStyle: ElementStyle): ComputedPropertyS
           if (rule.inherited.id) {
             selector = `#${rule.inherited.id}.style`;
           } else {
-            selector = `${rule.inherited.displayName.toUpperCase()}[${rule.inherited.objectId()}].style`;
+            selector = `${rule.inherited.displayName.toUpperCase()}[${inheritanceCounter}].style`;
+            inheritanceCounter++;
           }
         } else {
           // this is the selected element's own inline style

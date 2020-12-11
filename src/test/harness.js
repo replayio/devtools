@@ -489,8 +489,9 @@ async function selectMarkupNode(node) {
   await new Promise(resolve => setTimeout(resolve, 0));
 }
 
-async function checkComputedStyle(style, value) {
+async function checkComputedStyle(style, value, matchedSelectors = undefined) {
   document.getElementById("computedview-tab").click();
+  const matchedSelectorsJSON = matchedSelectors ? JSON.stringify(matchedSelectors) : undefined;
   await waitUntil(() => {
     const names = document.querySelectorAll(".computed-property-name");
     const propertyName = [...names].find(n => n.textContent.includes(style));
@@ -502,8 +503,29 @@ async function checkComputedStyle(style, value) {
       return false;
     }
     const propertyValue = container.querySelector(".computed-property-value");
-    return propertyValue.textContent.includes(value);
+    const selectors = matchedSelectors ? JSON.stringify(getMatchedSelectors(style)) : undefined;
+    return propertyValue.textContent.includes(value) && selectors === matchedSelectorsJSON;
   });
+}
+
+function getMatchedSelectors(property) {
+  const propertyNodes = document.querySelectorAll(".computed-property-view");
+  for (const propertyNode of propertyNodes) {
+    const name = propertyNode.querySelector(".computed-property-name").childNodes[0].textContent;
+    if (name !== property) {
+      continue;
+    }
+    const selectorNodes = propertyNode.nextSibling.querySelectorAll(".rule-text");
+    return [...selectorNodes].map(selectorNode => {
+      const selector = selectorNode.children[0].innerText;
+      const value = selectorNode.children[1].innerText;
+      const label = selectorNode.previousSibling.innerText;
+      const url = selectorNode.previousSibling.children[0].title;
+      const overridden = selectorNode.parentNode.classList.contains("computed-overridden");
+      return { selector, value, label, url, overridden };
+    });
+  }
+  return [];
 }
 
 function setLonghandsExpanded(expanded) {
@@ -611,6 +633,7 @@ const testCommands = {
   pickNode,
   selectMarkupNode,
   checkComputedStyle,
+  getMatchedSelectors,
   setLonghandsExpanded,
   getAppliedRulesJSON,
   checkAppliedRules,
