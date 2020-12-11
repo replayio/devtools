@@ -15,7 +15,8 @@ import markup from "devtools/client/inspector/markup/reducers/markup";
 import eventTooltip from "devtools/client/inspector/markup/reducers/eventTooltip";
 import pseudoClasses from "devtools/client/inspector/rules/reducers/pseudo-classes";
 import rules from "devtools/client/inspector/rules/reducers/rules";
-export { classList, markup, eventTooltip, pseudoClasses, rules };
+import computed from "devtools/client/inspector/computed/reducers";
+export { classList, markup, eventTooltip, pseudoClasses, rules, computed };
 
 // This ObjectInspector reducer is needed for the Extension Sidebar.
 const {

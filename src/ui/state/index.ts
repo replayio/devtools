@@ -7,6 +7,7 @@ import { EventTooltipState } from "devtools/client/inspector/markup/state/eventT
 import { ClassListState } from "devtools/client/inspector/rules/state/class-list";
 import { PseudoClassesState } from "devtools/client/inspector/rules/state/pseudo-classes";
 import { RulesState } from "devtools/client/inspector/rules/state/rules";
+import { ComputedState } from "devtools/client/inspector/computed/state";
 
 export interface UIState {
   timeline: TimelineState;
@@ -18,4 +19,5 @@ export interface UIState {
   classList: ClassListState;
   pseudoClasses: PseudoClassesState;
   rules: RulesState;
+  computed: ComputedState;
 }
