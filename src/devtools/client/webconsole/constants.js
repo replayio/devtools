@@ -159,6 +159,7 @@ const chromeRDPEnums = {
     // output anything (e.g. `console.time()` calls).
     NULL_MESSAGE: "nullMessage",
     NAVIGATION_MARKER: "navigationMarker",
+    LOG_POINT: "logPoint",
   },
   MESSAGE_LEVEL: {
     LOG: "log",

@@ -52,6 +52,8 @@ function getClosestMessage(visibleMessages, messages, executionPoint) {
     const point = messageExecutionPoint(msg);
     if (point && pointPrecedes(executionPoint, point)) {
       break;
+    } else if (point === executionPoint && msg.type === MESSAGE_TYPE.LOG_POINT) {
+      last = msg;
     }
     last = msg;
   }
