@@ -1,8 +1,8 @@
 .view-toggle {
   border-radius: 4px;
   border-radius: 4px;
-  border: 1px solid var(--dark-blue);
-  color: var(--dark-blue);
+  border: 1px solid var(--primary-accent);
+  color: var(--primary-accent);
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -24,6 +24,6 @@
 }
 
 .view-toggle .view-toggle-item.active {
-  background: var(--dark-blue);
+  background: var(--primary-accent);
   color: var(--theme-body-background);
 }

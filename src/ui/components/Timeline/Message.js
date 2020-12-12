@@ -45,7 +45,7 @@ export function Marker({ message, onMarkerClick, onMarkerMouseEnter, onMarkerMou
         onMouseLeave={onMarkerMouseLeave}
       />
       {/* <circle cx="5.5" cy="5.5" r="4.5" stroke="black" strokeWidth="2" /> */}
-      <circle className="stroke" cx="5.5" cy="5.5" r="5" stroke="black" />
+      <circle className="stroke" cx="5.5" cy="5.5" r="7" stroke="none" />
     </svg>
   );
 }

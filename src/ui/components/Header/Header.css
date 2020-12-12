@@ -80,8 +80,7 @@
 }
 
 #header .title {
-  max-width: 320px;
-  color: var(--grey-90);
+  max-width: 320px;  
   font-size: 1.25rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -90,7 +89,7 @@
   cursor: pointer;
   line-height: 18px;
   margin-right: 0.5em;
-  color: #2d7eff;
+  color: var(--primary-accent);
 }
 
 #header input.title:focus {

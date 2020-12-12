@@ -77,7 +77,7 @@
 }
 
 .toolbar-panel-button.active .toolbar-panel-icon {
-  background: var(--theme-toolbar-selected-color);
+  background: var(--primary-accent);
 }
 
 .timeline-tooltip {
