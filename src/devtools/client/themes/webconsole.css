@@ -56,7 +56,7 @@
   --console-repeat-bubble-background: var(--theme-highlight-blue);
 
   --toolbox-background: #f9f9fa;
-  --paused-background-color: #5b41ff;
+  --paused-background-color: var(--secondary-accent);
 
   /* TODO in bug 1549195: colors used in shared components (e.g. Reps) should
      be renamed and/or moved to variables.css so they work everywhere */
@@ -938,7 +938,9 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-app .message.paused:not(.paused-before) {
   /* always show the border, even for the last child */
-  border-top: 2px solid #5b41ff;
+  border-top: 1px solid var(--secondary-accent);
+  border-bottom: 1px solid var(--secondary-accent);
+  background-color: #FFFCFC;
 }
 
 .webconsole-app .message.paused.paused-before .message-body-wrapper,
@@ -1069,14 +1071,17 @@ a.learn-more-link.webconsole-learn-more-link {
   opacity: 100%;
 }
 
+/*
 .webconsole-output .overlay-container:hover .button {
   background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
   box-shadow: 1px 0px 3px rgb(0, 0, 0, 0.3);
 }
 
+
 .webconsole-output .overlay-container.debug:hover .button {
   background: linear-gradient(152.2deg, #5b41ff 6.75%, #b043ff 93.14%);
 }
+*/
 
 .webconsole-output .overlay-container:hover .info {
   padding-left: 16px;

@@ -43,7 +43,9 @@
    *   and lighter variants for the dark theme (e.g. Red 20, Red 40).
    */
   
-  --primary-accent: #0A84FF; 
+  --primary-accent: #0A84FF;
+  --secondary-accent: #EB5757;
+  --secondary-accent-stroke: #9E0505;
    
   --magenta-50: #ff1ad9;
   --magenta-65: #dd00a9;
@@ -222,8 +224,8 @@
   --replaying-marker-stroke: var(--primary-accent);
   --replaying-marker-future-fill: var(--primary-accent);
   --replaying-marker-future-stroke: var(--primary-accent);
-  --replaying-paused-marker-fill: #5b41ff;
-  --replaying-paused-marker-stroke: #3d23e2;
+  --replaying-paused-marker-fill: var(--secondary-accent);
+  --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
 }
 

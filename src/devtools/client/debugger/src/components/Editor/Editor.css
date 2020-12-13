@@ -139,7 +139,8 @@ html[dir="rtl"] .editor-mount {
 
 .new-debug-line > .CodeMirror-line {
   background-color: transparent !important;
-  outline: var(--debug-line-border) solid 1px;
+  outline: #EB5757 solid 1px;
+  background-color: #FFFCFC !important;
 }
 
 /* Don't display the highlight color since the debug line

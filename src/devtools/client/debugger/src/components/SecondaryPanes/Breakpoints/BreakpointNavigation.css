@@ -94,6 +94,7 @@
   stroke: var(--replaying-paused-marker-stroke);
 }
 
+/* removing for now -- this is covered by the red color
 .breakpoint-navigation-timeline-pause-marker {
   position: absolute;
   height: 100%;
@@ -101,3 +102,4 @@
   width: 1px;
   z-index: var(--z-index-1--paused-message);
 }
+*/
