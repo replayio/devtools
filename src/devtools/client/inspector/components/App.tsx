@@ -91,6 +91,7 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
 
   renderMarkupPanel() {
     const { markupView, markupRootNode } = this.props;
+    const isMarkupEmpty = (markupRootNode?.children?.length || 0) > 0;
 
     return (
       <div className="devtools-inspector-tab-panel">
@@ -133,7 +134,7 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
                 {markupView}
               </div>
             </div>
-            <a id="markup-loading" hidden={markupRootNode?.children.length > 0}>
+            <a id="markup-loading" hidden={isMarkupEmpty}>
               Loading…
             </a>
           </div>

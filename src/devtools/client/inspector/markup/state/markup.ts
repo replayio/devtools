@@ -40,7 +40,7 @@ export interface NodeInfo {
   value: string | undefined;
 }
 
-export type MarkupTree = { [key: string]: NodeInfo };
+export type MarkupTree = { [key: string]: NodeInfo | undefined };
 
 export interface MarkupState {
   // Whether or not to collapse the attributes for nodes.
