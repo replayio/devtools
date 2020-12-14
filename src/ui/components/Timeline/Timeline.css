@@ -6,7 +6,7 @@
   box-sizing: border-box;
   --progressbar-transition: 200ms;
   display: flex;
-  padding: 0px 20px;
+  padding: 0px 20px 0px 20px;
   align-items: center;
 }
 
@@ -26,7 +26,7 @@
   --hover-scrubber-line-background: var(--blue-50);
   --progress-recording-line: #d0021b;
   --progressbar-background: var(--grey-30);
-  --progressbar-line-color: var(--blue-40);
+  --progressbar-line-color: var(--primary-accent);
   --proggressbar-border-color: var(--theme-splitter-color);
   --tick-future-background: #bfc9d2;
   --tick-background: var(--blue-50);
@@ -201,9 +201,9 @@
 
 .replay-player .progress-line {
   width: 0%;
-  height: 5px;
+  height: 3px;
   border-radius: 4px;
-  background: var(--progressbar-line-color);
+  background: var(--primary-accent);
   position: absolute;
   pointer-events: none;
   margin-top: auto;

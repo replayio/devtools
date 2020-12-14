@@ -42,6 +42,11 @@
    * - We added a few unofficial colors: a few intermediary values (e.g. Blue 45),
    *   and lighter variants for the dark theme (e.g. Red 20, Red 40).
    */
+  
+  --primary-accent: #1B7FE3;
+  --secondary-accent: #8330F4;
+  --secondary-accent-stroke: #F9F5FF;
+   
   --magenta-50: #ff1ad9;
   --magenta-65: #dd00a9;
   --magenta-70: #b5007f;
@@ -215,12 +220,12 @@
   --theme-contrast-border: var(--yellow-60);
 
   /* Timeline Navigation */
-  --replaying-marker-fill: #3a8edb;
-  --replaying-marker-stroke: #266fb1;
-  --replaying-marker-future-fill: #88b4fa;
-  --replaying-marker-future-stroke: #7ba6ea;
-  --replaying-paused-marker-fill: #5b41ff;
-  --replaying-paused-marker-stroke: #3d23e2;
+  --replaying-marker-fill: var(--primary-accent);
+  --replaying-marker-stroke: var(--primary-accent);
+  --replaying-marker-future-fill: var(--primary-accent);
+  --replaying-marker-future-stroke: var(--primary-accent);
+  --replaying-paused-marker-fill: var(--secondary-accent);
+  --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
   --replay-head-background: var(--purple-50);
 }
 
