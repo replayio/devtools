@@ -35,7 +35,8 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
   },
 
   ["ADD_CHILDREN"](markup, { parentNodeId, children }) {
-    assert(markup.tree[parentNodeId]);
+    const parentNodeInfo = markup.tree[parentNodeId];
+    assert(parentNodeInfo);
 
     const newNodes: MarkupTree = {};
     let hasNewNodes = false;
@@ -53,7 +54,7 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
           ...markup.tree,
           ...newNodes,
           [parentNodeId]: {
-            ...markup.tree[parentNodeId],
+            ...parentNodeInfo,
             children: children.map(child => child.id),
           },
         },
@@ -64,12 +65,15 @@ const reducers: ReducerObject<MarkupState, MarkupAction> = {
   },
 
   ["UPDATE_NODE_EXPANDED"](markup, { nodeId, isExpanded }) {
+    const nodeInfo = markup.tree[nodeId];
+    assert(nodeInfo);
+
     return {
       ...markup,
       tree: {
         ...markup.tree,
         [nodeId]: {
-          ...markup.tree[nodeId],
+          ...nodeInfo,
           isExpanded,
         },
       },
