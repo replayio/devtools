@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 
 import { getNode, getRootNodeId } from "../reducers/markup";
@@ -14,30 +14,27 @@ interface MarkupAppProps {
   onMouseLeaveNode: (nodeId: string) => void;
 }
 
-class MarkupApp extends PureComponent<MarkupAppProps & PropsFromRedux> {
-  render() {
-    const { node } = this.props;
-
-    if (!node) {
-      return null;
-    }
-
-    return (
-      <ul aria-dropeffect="none" role="tree" tabIndex={0}>
-        {node.children.map(nodeId => (
-          <Node
-            key={nodeId}
-            nodeId={nodeId}
-            onSelectNode={this.props.onSelectNode}
-            onShowEventTooltip={this.props.onShowEventTooltip}
-            onToggleNodeExpanded={this.props.onToggleNodeExpanded}
-            onMouseEnterNode={this.props.onMouseEnterNode}
-            onMouseLeaveNode={this.props.onMouseLeaveNode}
-          />
-        ))}
-      </ul>
-    );
+function MarkupApp(props: MarkupAppProps & PropsFromRedux) {
+  const { node } = props;
+  if (!node) {
+    return null;
   }
+
+  return (
+    <ul aria-dropeffect="none" role="tree" tabIndex={0}>
+      {node.children.map(nodeId => (
+        <Node
+          key={nodeId}
+          nodeId={nodeId}
+          onSelectNode={props.onSelectNode}
+          onShowEventTooltip={props.onShowEventTooltip}
+          onToggleNodeExpanded={props.onToggleNodeExpanded}
+          onMouseEnterNode={props.onMouseEnterNode}
+          onMouseLeaveNode={props.onMouseLeaveNode}
+        />
+      ))}
+    </ul>
+  );
 }
 
 const mapStateToProps = (state: UIState) => ({
