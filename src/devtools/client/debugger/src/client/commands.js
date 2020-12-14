@@ -149,6 +149,20 @@ function removeBreakpoint(location) {
   return ThreadFront.removeBreakpointByURL(sourceUrl, line, column);
 }
 
+function runAnalysis(location, options) {
+  maybeClearLogpoint(location);
+  options = maybeGenerateLogGroupId(options);
+  const { condition, logValue, logGroupId } = options;
+  const { line, column, sourceUrl, sourceId } = location;
+  const showInConsole = false;
+
+  if (sourceId) {
+    setLogpoint(logGroupId, sourceId, line, column, logValue, condition, showInConsole);
+  } else {
+    setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition, showInConsole);
+  }
+}
+
 async function evaluateExpressions(sources, options) {
   return Promise.all(sources.map(source => evaluate(source, options)));
 }
@@ -368,6 +382,7 @@ const clientCommands = {
   addWatchpoint,
   removeWatchpoint,
   removeBreakpoint,
+  runAnalysis,
   evaluate,
   evaluateExpressions,
   navigate,

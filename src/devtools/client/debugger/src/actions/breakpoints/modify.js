@@ -16,6 +16,7 @@ import {
   getBreakpointsList,
   getPendingBreakpointList,
 } from "../../selectors";
+import { actions } from "ui/actions";
 
 import { setBreakpointPositions } from "./breakpointPositions";
 import { setSkipPausing } from "../pause/skipPausing";
@@ -150,6 +151,30 @@ export function addBreakpoint(
     } else {
       await clientSetBreakpoint(client, getState(), breakpoint);
     }
+  };
+}
+
+export function runAnalysis(cx, initialLocation, options) {
+  return async ({ dispatch, getState, client }) => {
+    recordEvent("add_breakpoint");
+
+    const { sourceId, line } = initialLocation;
+    await dispatch(setBreakpointPositions({ cx, sourceId, line }));
+    const location = getFirstBreakpointPosition(getState(), initialLocation);
+
+    if (!location) {
+      return;
+    }
+
+    const source = getSource(getState(), location.sourceId);
+    if (!source) {
+      return;
+    }
+
+    const analysisLocation = makeBreakpointLocation(getState(), location);
+
+    dispatch(actions.setHoveredLineNumberLocation(location));
+    client.runAnalysis(analysisLocation, options);
   };
 }
 

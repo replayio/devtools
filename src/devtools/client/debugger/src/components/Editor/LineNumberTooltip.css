@@ -1,0 +1,27 @@
+.static-tooltip {
+  position: fixed;
+  line-height: 16px;
+  background: var(--grey-30);
+  text-align: right;
+  margin-top: -5px;
+  margin-right: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  animation: static-tooltip 200ms ease 500ms;
+  background: var(--theme-popup-color);
+  color: var(--theme-popup-background);
+  font-family: sans-serif;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+@keyframes static-tooltip {
+  from {
+    transform: scale(0.5, 0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+}

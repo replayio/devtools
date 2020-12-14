@@ -1,4 +1,10 @@
-import { RecordingId, sessionError, SessionId, PointDescription } from "record-replay-protocol";
+import {
+  RecordingId,
+  sessionError,
+  SessionId,
+  PointDescription,
+  Location,
+} from "record-replay-protocol";
 
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug";
@@ -37,6 +43,7 @@ export interface AppState {
   analysisPoints: AnalysisPoints;
   viewMode: ViewMode;
   narrowMode: boolean;
+  hoveredLineNumberLocation: Location | null;
 }
 
 export interface AnalysisPoints {

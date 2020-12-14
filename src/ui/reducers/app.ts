@@ -22,6 +22,7 @@ function initialAppState(): AppState {
     analysisPoints: {},
     viewMode: prefs.viewMode,
     narrowMode: false,
+    hoveredLineNumberLocation: null,
   };
 }
 
@@ -102,6 +103,13 @@ export default function update(state = initialAppState(), action: AppAction) {
       };
     }
 
+    case "set_hovered_line_number_location": {
+      return {
+        ...state,
+        hoveredLineNumberLocation: action.location,
+      };
+    }
+
     default: {
       return state;
     }
@@ -126,3 +134,8 @@ export const getAnalysisPointsForLocation = (state: UIState, location: any) =>
   location && state.app.analysisPoints[getLocationKey(location)];
 export const getViewMode = (state: UIState) => state.app.viewMode;
 export const getNarrowMode = (state: UIState) => state.app.narrowMode;
+export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
+export const getPointsForHoveredLineNumber = (state: UIState) => {
+  const location = getHoveredLineNumberLocation(state);
+  return getAnalysisPointsForLocation(state, location);
+};

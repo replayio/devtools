@@ -30,6 +30,7 @@ import DebugLine from "./DebugLine";
 import ReplayLines from "./ReplayLines";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
+import LineNumberTooltip from "./LineNumberTooltip";
 
 import {
   showSourceText,
@@ -120,7 +121,6 @@ class Editor extends PureComponent {
     const codeMirrorWrapper = codeMirror.getWrapperElement();
 
     codeMirror.on("gutterClick", this.onGutterClick);
-    codeMirror.on("gutterLineEnter", () => console.log("BUTTS"));
 
     // Set code editor wrapper to be focusable
     codeMirrorWrapper.tabIndex = 0;
@@ -432,6 +432,7 @@ class Editor extends PureComponent {
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
+        <LineNumberTooltip editor={editor} />
         {/* <HighlightLines editor={editor} /> */}
         {
           <EditorMenu
