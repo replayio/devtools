@@ -90,7 +90,7 @@
   cursor: pointer;
   line-height: 18px;
   margin-right: 0.5em;
-  color: #2d7eff;
+  color: var(--primary-accent);
 }
 
 #header input.title:focus {

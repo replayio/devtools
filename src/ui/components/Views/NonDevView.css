@@ -18,7 +18,7 @@
 
 .right-sidebar-toolbar-item {
   font-size: 1.25rem;
-  color: var(--dark-blue);
+  color: var(--primary-accent);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
