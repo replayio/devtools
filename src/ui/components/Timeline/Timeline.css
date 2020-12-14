@@ -6,7 +6,7 @@
   box-sizing: border-box;
   --progressbar-transition: 200ms;
   display: flex;
-  padding: 0px 20px 0px 4px;
+  padding: 0px 20px 0px 20px;
   align-items: center;
 }
 
@@ -140,7 +140,7 @@
 .replay-player .commands {
   display: flex;
   flex-direction: row;
-  margin: 5px 8px 6px 2px;
+  margin: 11px 20px 11px 0px;
 }
 
 .replay-player .commands > button {
@@ -154,8 +154,8 @@
 }
 
 .replay-player .commands > button .img {
-  width: 32px;
-  height: 32px;
+  width: 20px;
+  height: 20px;
 }
 
 .replay-player .commands > button:hover .img {
