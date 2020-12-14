@@ -3,8 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 .editor-wrapper {
-  --debug-line-border: rgb(145, 188, 219);
-  --debug-expression-background: rgba(202, 227, 255, 0.5);
+  --debug-expression-background: rgba(131, 48, 244, 0.10);
   --debug-line-error-border: rgb(255, 0, 0);
   --debug-expression-error-background: rgba(231, 116, 113, 0.3);
   --highlight-line-duration: 5000ms;
@@ -104,17 +103,15 @@ html[dir="rtl"] .editor-mount {
   background-color: var(--debug-expression-background);
   border-style: solid;
   border-color: var(--debug-expression-background);
-  border-width: 1px 0px 1px 0px;
+  border-width: 0px;
   position: relative;
 }
 
 .debug-expression::before {
   content: "";
   line-height: 1px;
-  border-top: 1px solid var(--blue-50);
   background: transparent;
   position: absolute;
-  top: -2px;
   left: 0px;
   width: 100%;
 }
@@ -122,9 +119,7 @@ html[dir="rtl"] .editor-mount {
 .debug-expression::after {
   content: "";
   line-height: 1px;
-  border-bottom: 1px solid var(--blue-50);
   position: absolute;
-  bottom: -2px;
   left: 0px;
   width: 100%;
 }
@@ -139,7 +134,7 @@ html[dir="rtl"] .editor-mount {
 
 .new-debug-line > .CodeMirror-line {
   background-color: transparent !important;
-  outline: #EB5757 solid 1px;
+  outline: var(--secondary-accent-stroke) solid 1px;
   background-color: #FFFCFC !important;
 }
 

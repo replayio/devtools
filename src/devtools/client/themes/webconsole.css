@@ -938,8 +938,6 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-app .message.paused:not(.paused-before) {
   /* always show the border, even for the last child */
-  border-top: 1px solid var(--secondary-accent);
-  border-bottom: 1px solid var(--secondary-accent);
   background-color: #FFFCFC;
 }
 
