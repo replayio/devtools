@@ -16,7 +16,7 @@ export interface MatchedSelectorState {
 
 export interface ComputedState {
   properties: ComputedPropertyState[];
-  expandedProperties: string[];
+  expandedProperties: Set<string>;
   search: string;
   showBrowserStyles: boolean;
 }

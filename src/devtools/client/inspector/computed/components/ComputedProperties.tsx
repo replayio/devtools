@@ -39,7 +39,7 @@ function ComputedProperties(props: PropsFromRedux) {
       dark = !dark;
       allPropertiesHidden = false;
     }
-    const isExpanded = expandedProperties.indexOf(property.name) >= 0;
+    const isExpanded = expandedProperties.has(property.name);
     const toggleExpanded = () => setComputedPropertyExpanded(property.name, !isExpanded);
 
     return (

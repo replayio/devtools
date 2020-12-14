@@ -6,7 +6,7 @@ const INITIAL_COMPUTED: ComputedState = {
   properties: [],
   search: "",
   showBrowserStyles: false,
-  expandedProperties: [],
+  expandedProperties: new Set<string>(),
 };
 
 const reducers: ReducerObject<ComputedState, ComputedAction> = {
@@ -23,17 +23,12 @@ const reducers: ReducerObject<ComputedState, ComputedAction> = {
   },
 
   set_computed_property_expanded(state, { property, expanded }) {
-    const expandedProperties = [...state.expandedProperties];
+    const expandedProperties = new Set(state.expandedProperties);
 
     if (expanded) {
-      if (expandedProperties.indexOf(property) < 0) {
-        expandedProperties.push(property);
-      }
+      expandedProperties.add(property);
     } else {
-      const index = expandedProperties.indexOf(property);
-      if (index >= 0) {
-        expandedProperties.splice(index, 1);
-      }
+      expandedProperties.delete(property);
     }
 
     return { ...state, expandedProperties };
