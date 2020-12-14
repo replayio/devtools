@@ -8,7 +8,8 @@ export * from "./source-documents";
 export * from "./get-token-location";
 export * from "./source-search";
 export * from "../ui";
-export { onMouseOver } from "./token-events";
+export { onTokenMouseOver } from "./token-events";
+export { onGutterMouseOver } from "./gutter-events";
 
 import { createEditor } from "./create-editor";
 import { findNext, findPrev } from "./source-search";

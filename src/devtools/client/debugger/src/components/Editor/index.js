@@ -45,7 +45,8 @@ import {
   toEditorPosition,
   getSourceLocationFromMouseEvent,
   hasDocument,
-  onMouseOver,
+  onTokenMouseOver,
+  onGutterMouseOver,
   startOperation,
   endOperation,
   clearDocuments,
@@ -119,12 +120,14 @@ class Editor extends PureComponent {
     const codeMirrorWrapper = codeMirror.getWrapperElement();
 
     codeMirror.on("gutterClick", this.onGutterClick);
+    codeMirror.on("gutterLineEnter", () => console.log("BUTTS"));
 
     // Set code editor wrapper to be focusable
     codeMirrorWrapper.tabIndex = 0;
     codeMirrorWrapper.addEventListener("keydown", e => this.onKeyDown(e));
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
-    codeMirrorWrapper.addEventListener("mouseover", onMouseOver(codeMirror));
+    codeMirrorWrapper.addEventListener("mouseover", onTokenMouseOver(codeMirror));
+    codeMirrorWrapper.addEventListener("mouseover", onGutterMouseOver(codeMirror));
 
     if (!isFirefox()) {
       codeMirror.on("gutterContextMenu", (cm, line, eventName, event) =>
