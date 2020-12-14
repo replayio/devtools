@@ -12,7 +12,7 @@ import {
   getRootNodeId,
   getSelectedNodeId,
   getScrollIntoViewNodeId,
-} from "../reducers/markup";
+} from "../selectors/markup";
 import { UIState } from "ui/state";
 
 import ElementNode from "./ElementNode";

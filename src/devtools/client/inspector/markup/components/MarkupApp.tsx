@@ -1,7 +1,7 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 
-import { getNode, getRootNodeId } from "../reducers/markup";
+import { getNode, getRootNodeId } from "../selectors/markup";
 
 import Node from "./Node";
 import { UIState } from "ui/state";
