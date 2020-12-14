@@ -7,6 +7,7 @@
 import {
   getActiveSearch,
   getPaneCollapse,
+  getSourcesCollapse,
   getQuickOpenEnabled,
   getSource,
   getSourceContent,
@@ -23,6 +24,7 @@ import { isFulfilled } from "../utils/async-value";
 
 import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 import { resizeBreakpointGutter } from "../utils/ui";
+import { prefs } from "../utils/prefs";
 
 export function setPrimaryPaneTab(tabName) {
   return { type: "SET_PRIMARY_PANE_TAB", tabName };
@@ -74,6 +76,7 @@ export function toggleFrameworkGrouping(toggleValue) {
 }
 
 export function showSource(cx, sourceId) {
+
   return ({ dispatch, getState }) => {
     const source = getSource(getState(), sourceId);
     if (!source) {
@@ -83,13 +86,19 @@ export function showSource(cx, sourceId) {
     if (getPaneCollapse(getState())) {
       dispatch({
         type: "TOGGLE_PANE",
-        position: "start",
         paneCollapsed: false,
       });
     }
 
-    dispatch(setPrimaryPaneTab("sources"));
+    //is the sources panel itself open?
+    if (getSourcesCollapse(getState())) {
+      dispatch({
+        type: "TOGGLE_SOURCES",
+        sourcesCollapsed: false,
+      });
+    }
 
+    dispatch(setPrimaryPaneTab("sources"));
     dispatch({ type: "SHOW_SOURCE", source: null });
     dispatch(selectSource(cx, source.id));
     dispatch({ type: "SHOW_SOURCE", source });
@@ -100,6 +109,13 @@ export function togglePaneCollapse() {
   return ({ dispatch, getState }) => {
     const paneCollapsed = getPaneCollapse(getState());
     dispatch({ type: "TOGGLE_PANE", paneCollapsed: !paneCollapsed });
+  };
+}
+
+export function toggleSourcesCollapse() {
+  return ({ dispatch, getState }) => {
+    const sourcesCollapsed = getSourcesCollapse(getState());
+    dispatch({ type: "TOGGLE_SOURCES", sourcesCollapsed: !sourcesCollapsed });
   };
 }
 

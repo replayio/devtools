@@ -16,6 +16,7 @@ import SourcesTree from "./SourcesTree";
 import Accordion from "../shared/Accordion";
 
 import "./Sources.css";
+import { selectors } from "../../../../../../ui/reducers";
 
 class PrimaryPanes extends Component {
   state = {
@@ -50,9 +51,10 @@ class PrimaryPanes extends Component {
       header: "Sources",
       className: "sources-pane",
       component: <SourcesTree />,
-      opened: prefs.sourcesExpanded,
+      opened: !prefs.sourcesCollapsed,
       onToggle: opened => {
-        prefs.sourcesExpanded = opened;
+        // prefs.sourcesExpanded = opened;
+        this.props.toggleSourcesCollapse();
       },
     };
   }
@@ -73,6 +75,7 @@ const mapStateToProps = state => {
     cx: getContext(state),
     selectedTab: getSelectedPrimaryPaneTab(state),
     sourceSearchOn: getActiveSearch(state) === "source",
+    sourcesCollapsed: selectors.getSourcesCollapse(state),
   };
 };
 
@@ -80,6 +83,7 @@ const connector = connect(mapStateToProps, {
   setPrimaryPaneTab: actions.setPrimaryPaneTab,
   setActiveSearch: actions.setActiveSearch,
   closeActiveSearch: actions.closeActiveSearch,
+  toggleSourcesCollapse: actions.toggleSourcesCollapse,
 });
 
 export default connector(PrimaryPanes);
