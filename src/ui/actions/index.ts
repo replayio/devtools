@@ -11,6 +11,7 @@ import * as eventListeners from "devtools/client/debugger/src/actions/event-list
 import debuggerActions from "devtools/client/debugger/src/actions";
 import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
 import { EventTooltipAction } from "devtools/client/inspector/markup/actions/eventTooltip";
+import { SessionAction } from "ui/actions/session";
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 const consoleActions = require("devtools/client/webconsole/actions");
 
@@ -19,7 +20,8 @@ export type UIAction =
   | MetadataAction
   | TimelineAction
   | MarkupAction
-  | EventTooltipAction;
+  | EventTooltipAction
+  | SessionAction;
 
 interface ThunkExtraArgs {
   client: any;
