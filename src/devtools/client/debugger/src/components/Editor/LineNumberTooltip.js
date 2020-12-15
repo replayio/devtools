@@ -17,23 +17,18 @@ export function StaticTooltip({ targetNode, children }) {
   );
 }
 
-export function LineNumberTooltip({ editor, cx, runAnalysisOnLine, analysisPoints }) {
+export function LineNumberTooltip({
+  editor,
+  cx,
+  runAnalysisOnLine,
+  analysisPoints,
+  setHoveredLineNumberLocation,
+}) {
   const [lineNumberNode, setLineNumberNode] = useState(null);
 
-  const setHoveredLineNumber = event => {
-    let target = event.target;
-    const isBreakpointMarkerNode = target.closest(".new-breakpoint");
-
-    // If hovered on a breakpoint marker, get the corresponding linenumber element.
-    if (isBreakpointMarkerNode) {
-      const gutterNode = target.closest(".Codemirror-gutter-elt");
-      target = gutterNode?.previousElementSibling;
-    }
-
-    const line = JSON.parse(target.firstChild.textContent);
-    runAnalysisOnLine(cx, line);
-
-    setLineNumberNode(target);
+  const setHoveredLineNumber = ({ targetNode, lineNumber }) => {
+    setLineNumberNode(targetNode);
+    runAnalysisOnLine(cx, lineNumber);
   };
   const clearHoveredLineNumber = () => {
     setLineNumberNode(null);
@@ -61,5 +56,8 @@ export default connect(
     cx: selectors.getThreadContext(state),
     analysisPoints: selectors.getPointsForHoveredLineNumber(state),
   }),
-  { runAnalysisOnLine: actions.runAnalysisOnLine }
+  {
+    runAnalysisOnLine: actions.runAnalysisOnLine,
+    setHoveredLineNumberLocation: actions.setHoveredLineNumberLocation,
+  }
 )(LineNumberTooltip);

@@ -2,7 +2,19 @@ function dispatch(codeMirror, eventName, data) {
   codeMirror.constructor.signal(codeMirror, eventName, data);
 }
 
-export function isValidTarget(target) {
+function getLineNumberNode(target) {
+  const isBreakpointMarkerNode = target.closest(".new-breakpoint");
+
+  // If hovered on a breakpoint marker, get the corresponding linenumber element.
+  if (isBreakpointMarkerNode) {
+    const gutterNode = target.closest(".Codemirror-gutter-elt");
+    target = gutterNode?.previousElementSibling;
+  }
+
+  return target;
+}
+
+function isValidTarget(target) {
   const isGutterNode = target.closest(".CodeMirror-gutter-wrapper");
 
   if (!isGutterNode) {
@@ -28,11 +40,18 @@ export function onGutterMouseOver(codeMirror) {
       return;
     }
 
-    target.addEventListener("mouseleave", event => dispatch(codeMirror, "gutterLineLeave", event), {
-      capture: true,
-      once: true,
-    });
+    const lineNumberNode = getLineNumberNode(target);
+    const lineNumber = JSON.parse(lineNumberNode.firstChild.textContent);
 
-    dispatch(codeMirror, "gutterLineEnter", event);
+    target.addEventListener(
+      "mouseleave",
+      event => dispatch(codeMirror, "gutterLineLeave", { targetNode: lineNumberNode, lineNumber }),
+      {
+        capture: true,
+        once: true,
+      }
+    );
+
+    dispatch(codeMirror, "gutterLineEnter", { targetNode: lineNumberNode, lineNumber });
   };
 }
