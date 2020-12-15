@@ -5,6 +5,13 @@ import { NodeFront } from "protocol/thread/node";
 import Selection from "devtools/client/framework/selection";
 import { NodeInfo } from "../state/markup";
 import { UIThunkAction } from "ui/actions";
+import {
+  getNodeInfo,
+  getParentNodeId,
+  getSelectedNodeId,
+  isNodeExpanded,
+} from "../selectors/markup";
+import { UIState } from "ui/state";
 const { DOCUMENT_TYPE_NODE } = require("devtools/shared/dom-node-constants");
 
 export type ResetAction = Action<"RESET">;
@@ -164,6 +171,186 @@ export function selectionChanged(
     if (shouldScrollIntoView) {
       dispatch(scrollIntoView(selectedNode.objectId()));
     }
+  };
+}
+
+export function selectNode(nodeId: string): UIThunkAction {
+  return ({ toolbox }) => {
+    const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
+    if (nodeFront) {
+      toolbox.selection.setNodeFront(nodeFront);
+    }
+  };
+}
+
+/**
+ * Find the node that is
+ * - a descendant of the specified node or that node itself
+ * - displayed in the markup tree
+ * - visually the last of all such nodes
+ * and return its ID
+ */
+function getLastNodeId(state: UIState, nodeId: string) {
+  while (true) {
+    const nodeInfo = getNodeInfo(state, nodeId);
+    if (!nodeInfo?.isExpanded || nodeInfo.children.length === 0) {
+      return nodeId;
+    }
+    nodeId = nodeInfo.children[nodeInfo.children.length - 1];
+  }
+}
+
+/**
+ * Find the node that is displayed in the markup tree
+ * immediately before the specified node and return its ID.
+ */
+function getPreviousNodeId(state: UIState, nodeId: string) {
+  const parentNodeId = getParentNodeId(state, nodeId);
+  if (!parentNodeId) {
+    return nodeId;
+  }
+  const parentNodeInfo = getNodeInfo(state, parentNodeId);
+  assert(parentNodeInfo);
+  if (parentNodeInfo.type === DOCUMENT_TYPE_NODE) {
+    return nodeId;
+  }
+  const index = parentNodeInfo.children.indexOf(nodeId);
+  if (index >= 1) {
+    return getLastNodeId(state, parentNodeInfo.children[index - 1]);
+  }
+  return parentNodeId;
+}
+
+/**
+ * Find the node that is displayed in the markup tree
+ * immediately after the specified node and return its ID.
+ */
+function getNextNodeId(state: UIState, nodeId: string) {
+  if (isNodeExpanded(state, nodeId)) {
+    const nodeInfo = getNodeInfo(state, nodeId);
+    if (nodeInfo && nodeInfo.children.length > 0) {
+      return nodeInfo.children[0];
+    }
+  }
+
+  let currentNodeId = nodeId;
+  let parentNodeId = getParentNodeId(state, currentNodeId);
+  while (parentNodeId) {
+    const siblingIds = getNodeInfo(state, parentNodeId)?.children;
+    assert(siblingIds);
+    const index = siblingIds.indexOf(currentNodeId);
+    assert(index >= 0);
+    if (index + 1 < siblingIds.length) {
+      return siblingIds[index + 1];
+    }
+    currentNodeId = parentNodeId;
+    parentNodeId = getParentNodeId(state, currentNodeId);
+  }
+
+  return nodeId;
+}
+
+export function onLeftKey(): UIThunkAction {
+  return ({ getState, dispatch }) => {
+    const state = getState();
+    const selectedNodeId = getSelectedNodeId(state);
+    if (selectedNodeId == null) {
+      return;
+    }
+
+    if (isNodeExpanded(state, selectedNodeId)) {
+      dispatch(updateNodeExpanded(selectedNodeId, false));
+    } else {
+      const parentNodeId = getParentNodeId(state, selectedNodeId);
+      if (parentNodeId != null) {
+        const parentNodeInfo = getNodeInfo(state, parentNodeId);
+        if (parentNodeInfo && parentNodeInfo.type !== DOCUMENT_TYPE_NODE) {
+          dispatch(selectNode(parentNodeId));
+        }
+      }
+    }
+  };
+}
+
+export function onRightKey(): UIThunkAction {
+  return ({ getState, dispatch }) => {
+    const state = getState();
+    const selectedNodeId = getSelectedNodeId(state);
+    if (selectedNodeId == null) {
+      return;
+    }
+
+    const selectedNodeInfo = getNodeInfo(state, selectedNodeId);
+    assert(selectedNodeInfo);
+    if (!selectedNodeInfo.isExpanded) {
+      dispatch(expandNode(selectedNodeId, true));
+    } else {
+      const firstChildId = selectedNodeInfo.children[0];
+      if (firstChildId != null) {
+        dispatch(selectNode(firstChildId));
+        return;
+      }
+      const nextNodeId = getNextNodeId(state, selectedNodeId);
+      dispatch(selectNode(nextNodeId));
+    }
+  };
+}
+
+export function onUpKey(): UIThunkAction {
+  return ({ getState, dispatch }) => {
+    const state = getState();
+    const selectedNodeId = getSelectedNodeId(state);
+    if (selectedNodeId == null) {
+      return;
+    }
+
+    const previousNodeId = getPreviousNodeId(state, selectedNodeId);
+    dispatch(selectNode(previousNodeId));
+  };
+}
+
+export function onDownKey(): UIThunkAction {
+  return ({ getState, dispatch }) => {
+    const state = getState();
+    const selectedNodeId = getSelectedNodeId(state);
+    if (selectedNodeId == null) {
+      return;
+    }
+
+    const nextNodeId = getNextNodeId(state, selectedNodeId);
+    dispatch(selectNode(nextNodeId));
+  };
+}
+
+export function onPageUpKey(): UIThunkAction {
+  return ({ getState, dispatch }) => {
+    const state = getState();
+    const selectedNodeId = getSelectedNodeId(state);
+    if (selectedNodeId == null) {
+      return;
+    }
+
+    let previousNodeId = selectedNodeId;
+    for (let i = 0; i < 10; i++) {
+      previousNodeId = getPreviousNodeId(state, previousNodeId);
+    }
+    dispatch(selectNode(previousNodeId));
+  };
+}
+
+export function onPageDownKey(): UIThunkAction {
+  return ({ getState, dispatch }) => {
+    const state = getState();
+    const selectedNodeId = getSelectedNodeId(state);
+    if (selectedNodeId == null) {
+      return;
+    }
+
+    let nextNodeId: string | undefined = selectedNodeId;
+    for (let i = 0; i < 10; i++) {
+      nextNodeId = getNextNodeId(state, nextNodeId);
+    }
+    dispatch(selectNode(nextNodeId));
   };
 }
 
