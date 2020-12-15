@@ -25,6 +25,7 @@ import { isFulfilled } from "../utils/async-value";
 import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 import { resizeBreakpointGutter } from "../utils/ui";
 import { prefs } from "../utils/prefs";
+import { getSelectedPrimaryPanel } from "../../../../../ui/reducers/app";
 
 export function setPrimaryPaneTab(tabName) {
   return { type: "SET_PRIMARY_PANE_TAB", tabName };
@@ -76,13 +77,13 @@ export function toggleFrameworkGrouping(toggleValue) {
 }
 
 export function showSource(cx, sourceId) {
-
   return ({ dispatch, getState }) => {
     const source = getSource(getState(), sourceId);
     if (!source) {
       return;
     }
 
+    //is the toolbar panel open?
     if (getPaneCollapse(getState())) {
       dispatch({
         type: "TOGGLE_PANE",
@@ -90,7 +91,15 @@ export function showSource(cx, sourceId) {
       });
     }
 
-    //is the sources panel itself open?
+    //is the sources panel selected?
+    if (getSelectedPrimaryPanel(getState()) !== "explorer") {
+      dispatch({
+        type: "set_selected_primary_panel",
+        panel: "explorer",
+      });
+    }
+
+    //is the sources panel collapsed?
     if (getSourcesCollapse(getState())) {
       dispatch({
         type: "TOGGLE_SOURCES",
