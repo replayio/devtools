@@ -5,7 +5,6 @@
 //
 
 import React, { Component } from "react";
-import { isEqual } from "lodash";
 
 import { connect } from "../../utils/connect";
 import {
@@ -21,19 +20,6 @@ import actions from "../../actions";
 
 import classnames from "classnames";
 import "./FrameTimeline.css";
-import { compareNumericStrings } from "protocol/utils";
-
-function isSameLocation(frameLocation, selectedLocation) {
-  if (!frameLocation || !selectedLocation) {
-    return;
-  }
-
-  return (
-    frameLocation.line === selectedLocation.line &&
-    frameLocation.column === selectedLocation.column &&
-    frameLocation.sourceId == selectedLocation.sourceId
-  );
-}
 
 function getBoundingClientRect(element) {
   if (!element) {
@@ -54,6 +40,7 @@ class FrameTimeline extends Component {
   state = {
     scrubbing: false,
     scrubbingProgress: 0,
+    lastDisplayIndex: 0,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -88,9 +75,17 @@ class FrameTimeline extends Component {
       return;
     }
 
-    const displayIndex = Math.floor((progress / 100) * framePositions.positions.length);
+    const numberOfPositions = framePositions.positions.length;
+    const displayIndex = Math.floor((progress / 100) * numberOfPositions);
 
-    return framePositions.positions[displayIndex];
+    // We cap the index to the actual existing indices in framePositions.
+    // This way, we don't let the index reference an element that doesn't exist.
+    // e.g. displayIndex = 3, framePositions.length = 3 => framePositions[3] is undefined
+    const adjustedDisplayIndex = Math.min(displayIndex, numberOfPositions - 1);
+
+    this.setState({ lastDisplayIndex: adjustedDisplayIndex });
+
+    return framePositions.positions[adjustedDisplayIndex];
   }
 
   displayPreview(progress) {
@@ -129,26 +124,36 @@ class FrameTimeline extends Component {
   };
 
   getVisibleProgress() {
-    const { scrubbing, scrubbingProgress } = this.state;
-    const { framePositions, selectedLocation, selectedFrame, executionPoint } = this.props;
+    const { scrubbing, scrubbingProgress, lastDisplayIndex } = this.state;
+    const { framePositions, selectedLocation, executionPoint } = this.props;
 
     if (!framePositions) {
       return 0;
     }
 
-    if (scrubbing || !selectedLocation || !executionPoint) {
+    if (scrubbing || !selectedLocation) {
       return scrubbingProgress;
     }
 
-    let index = 0;
-    for (let i = 0; i < framePositions.positions.length; i++, index++) {
-      const { location, point } = framePositions.positions[i];
-      if (compareNumericStrings(executionPoint, point) <= 0) {
-        break;
-      }
+    // If we stepped using the debugger commands and the executionPoint is null
+    // because it's being loaded, just show the last progress.
+    if (!executionPoint) {
+      return;
     }
 
-    return Math.floor((index / framePositions.positions.length) * 100);
+    const filteredPositions = framePositions.positions.filter(
+      position => BigInt(position.point) <= BigInt(executionPoint)
+    );
+
+    // Check if the current executionPoint's corresponding index is similar to the
+    // last index that we stopped scrubbing on. If it is, just use the same progress
+    // value that we had while scrubbing so instead of snapping to the executionPoint's
+    // progress.
+    if (lastDisplayIndex == filteredPositions.length - 1) {
+      return scrubbingProgress;
+    }
+
+    return Math.floor((filteredPositions.length / framePositions.positions.length) * 100);
   }
 
   renderMarker() {
