@@ -82,7 +82,8 @@ export function showSource(cx, sourceId) {
       return;
     }
 
-    // Is the toolbar panel open?
+    // Make sure the explorer/pause information panel is open so that the user
+    // sees those panels
     if (getPaneCollapse(getState())) {
       dispatch({
         type: "TOGGLE_PANE",
@@ -90,7 +91,8 @@ export function showSource(cx, sourceId) {
       });
     }
 
-    // Is the sources panel selected?
+    // Make sure the explorer panel is selected so that the user
+    // sees the sources panel.
     if (getSelectedPrimaryPanel(getState()) !== "explorer") {
       dispatch({
         type: "set_selected_primary_panel",
@@ -98,7 +100,8 @@ export function showSource(cx, sourceId) {
       });
     }
 
-    // Is the sources panel collapsed?
+    // Make sure the sources panel is expanded so that the user
+    // sees the source.
     if (getSourcesCollapsed(getState())) {
       dispatch({
         type: "TOGGLE_SOURCES",
