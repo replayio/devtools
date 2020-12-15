@@ -3,7 +3,7 @@ Test.describe(`Test exception logpoints.`, async () => {
   await Test.selectConsole();
 
   await Test.warpToMessage("Object { number: 4 }");
-  await Test.waitForFrameTimeline("50%");
+  await Test.waitForFrameTimeline("100%");
 
   await Test.executeInConsole("number * 10");
   await Test.waitForMessage("40");

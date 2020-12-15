@@ -378,7 +378,7 @@ async function executeInConsole(value) {
 function waitForFrameTimeline(width) {
   return waitUntil(() => {
     const elem = document.querySelector(".frame-timeline-progress");
-    return elem && elem.style.width == width;
+    return elem.style?.width == width;
   });
 }
 async function checkFrames(count) {
@@ -640,10 +640,10 @@ const testCommands = {
 };
 
 const commands = mapValues(testCommands, (command, name) => {
-  return (...args) => {
+  return async (...args) => {
     console.log(`Starting ${name}`, ...args);
     const startTime = new Date();
-    const result = command(...args);
+    const result = await command(...args);
     const duration = new Date() - startTime;
     console.log(`Finished ${name} in ${duration}ms`);
     return result;
