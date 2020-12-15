@@ -4,11 +4,10 @@
 
 //
 import { getSelectedFrame, getThreadContext } from "../../selectors";
+import { actions } from "ui/actions";
 
 import { fetchFrames } from ".";
-import { removeBreakpoint } from "../breakpoints";
 import { selectLocation } from "../sources";
-import assert from "../../utils/assert";
 
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
@@ -47,6 +46,7 @@ export function paused({ executionPoint }) {
       })()
     );
 
+    dispatch(actions.setSelectedPrimaryPanel("debug"));
     await Promise.all(promises);
   };
 }
