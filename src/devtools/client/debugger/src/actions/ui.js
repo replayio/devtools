@@ -7,6 +7,7 @@
 import {
   getActiveSearch,
   getPaneCollapse,
+  getSourcesCollapsed,
   getQuickOpenEnabled,
   getSource,
   getSourceContent,
@@ -15,6 +16,7 @@ import {
   getSelectedLocation,
   getContext,
 } from "../selectors";
+import { getSelectedPrimaryPanel } from "ui/reducers/app";
 import { selectSource, selectLocation } from "../actions/sources/select";
 import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { searchContents } from "./file-search";
@@ -80,16 +82,34 @@ export function showSource(cx, sourceId) {
       return;
     }
 
+    // Make sure the explorer/pause information panel is open so that the user
+    // sees those panels
     if (getPaneCollapse(getState())) {
       dispatch({
         type: "TOGGLE_PANE",
-        position: "start",
         paneCollapsed: false,
       });
     }
 
-    dispatch(setPrimaryPaneTab("sources"));
+    // Make sure the explorer panel is selected so that the user
+    // sees the sources panel.
+    if (getSelectedPrimaryPanel(getState()) !== "explorer") {
+      dispatch({
+        type: "set_selected_primary_panel",
+        panel: "explorer",
+      });
+    }
 
+    // Make sure the sources panel is expanded so that the user
+    // sees the source.
+    if (getSourcesCollapsed(getState())) {
+      dispatch({
+        type: "TOGGLE_SOURCES",
+        sourcesCollapsed: false,
+      });
+    }
+
+    dispatch(setPrimaryPaneTab("sources"));
     dispatch({ type: "SHOW_SOURCE", source: null });
     dispatch(selectSource(cx, source.id));
     dispatch({ type: "SHOW_SOURCE", source });
@@ -100,6 +120,13 @@ export function togglePaneCollapse() {
   return ({ dispatch, getState }) => {
     const paneCollapsed = getPaneCollapse(getState());
     dispatch({ type: "TOGGLE_PANE", paneCollapsed: !paneCollapsed });
+  };
+}
+
+export function toggleSourcesCollapse() {
+  return ({ dispatch, getState }) => {
+    const sourcesCollapsed = getSourcesCollapsed(getState());
+    dispatch({ type: "TOGGLE_SOURCES", sourcesCollapsed: !sourcesCollapsed });
   };
 }
 

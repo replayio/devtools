@@ -19,7 +19,7 @@ pref("devtools.debugger.logging", false);
 pref("devtools.debugger.timing", false);
 pref("devtools.debugger.alphabetize-outline", false);
 pref("devtools.debugger.outline-expanded", false);
-pref("devtools.debugger.sources-expanded", false);
+pref("devtools.debugger.sources-collapsed", false);
 pref("devtools.source-map.client-service.enabled", true);
 pref("devtools.chrome.enabled", false);
 pref("devtools.debugger.log-exceptions", false);
@@ -83,7 +83,7 @@ export const prefs = new PrefsHelper("devtools", {
   editorWrapping: ["Bool", "debugger.ui.editor-wrapping"],
   alphabetizeOutline: ["Bool", "debugger.alphabetize-outline"],
   outlineExpanded: ["Bool", "debugger.outline-expanded"],
-  sourcesExpanded: ["Bool", "debugger.sources-expanded"],
+  sourcesCollapsed: ["Bool", "debugger.sources-collapsed"],
   clientSourceMapsEnabled: ["Bool", "source-map.client-service.enabled"],
   chromeAndExtensionsEnabled: ["Bool", "chrome.enabled"],
   logExceptions: ["Bool", "debugger.log-exceptions"],

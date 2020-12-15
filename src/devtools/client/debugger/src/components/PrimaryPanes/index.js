@@ -7,7 +7,12 @@
 import React, { Component } from "react";
 
 import actions from "../../actions";
-import { getActiveSearch, getSelectedPrimaryPaneTab, getContext } from "../../selectors";
+import {
+  getActiveSearch,
+  getSelectedPrimaryPaneTab,
+  getContext,
+  getSourcesCollapsed,
+} from "../../selectors";
 import { connect } from "../../utils/connect";
 import { prefs } from "../../utils/prefs";
 
@@ -50,9 +55,9 @@ class PrimaryPanes extends Component {
       header: "Sources",
       className: "sources-pane",
       component: <SourcesTree />,
-      opened: prefs.sourcesExpanded,
+      opened: !prefs.sourcesCollapsed,
       onToggle: opened => {
-        prefs.sourcesExpanded = opened;
+        this.props.toggleSourcesCollapse();
       },
     };
   }
@@ -73,6 +78,7 @@ const mapStateToProps = state => {
     cx: getContext(state),
     selectedTab: getSelectedPrimaryPaneTab(state),
     sourceSearchOn: getActiveSearch(state) === "source",
+    sourcesCollapsed: getSourcesCollapsed(state),
   };
 };
 
@@ -80,6 +86,7 @@ const connector = connect(mapStateToProps, {
   setPrimaryPaneTab: actions.setPrimaryPaneTab,
   setActiveSearch: actions.setActiveSearch,
   closeActiveSearch: actions.closeActiveSearch,
+  toggleSourcesCollapse: actions.toggleSourcesCollapse,
 });
 
 export default connector(PrimaryPanes);

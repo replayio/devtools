@@ -17,6 +17,7 @@ export const createUIState = () => ({
   shownSource: null,
   startPanelCollapsed: prefs.startPanelCollapsed,
   endPanelCollapsed: prefs.endPanelCollapsed,
+  sourcesCollapsed: prefs.sourcesCollapsed,
   frameworkGroupingOn: prefs.frameworkGroupingOn,
   highlightedLineRange: undefined,
   orientation: "horizontal",
@@ -46,6 +47,11 @@ function update(state = createUIState(), action) {
     case "TOGGLE_PANE": {
       prefs.startPanelCollapsed = action.paneCollapsed;
       return { ...state, startPanelCollapsed: action.paneCollapsed };
+    }
+
+    case "TOGGLE_SOURCES": {
+      prefs.sourcesCollapsed = action.sourcesCollapsed;
+      return { ...state, sourcesCollapsed: action.sourcesCollapsed };
     }
 
     case "HIGHLIGHT_LINES":
@@ -111,6 +117,10 @@ export function getShownSource(state) {
 
 export function getPaneCollapse(state) {
   return state.ui.startPanelCollapsed;
+}
+
+export function getSourcesCollapsed(state) {
+  return state.ui.sourcesCollapsed;
 }
 
 export function getHighlightedLineRange(state) {
