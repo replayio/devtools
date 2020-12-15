@@ -20,6 +20,7 @@ const Auth0ProviderWithHistory = ({ children }) => {
       redirectUri={origin + pathname}
       onRedirectCallback={onRedirectCallback}
       cacheLocation="localstorage"
+      prompt="select_account"
     >
       {children}
     </Auth0Provider>
