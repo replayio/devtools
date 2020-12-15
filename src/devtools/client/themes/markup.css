@@ -456,3 +456,7 @@ ul.children + .tag-line::before {
   font-size: large;
   color: var(--theme-contrast-color);
 }
+
+#markup-root ul {
+  outline: none;
+}
