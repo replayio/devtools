@@ -101,7 +101,7 @@ class ConsoleOutput extends Component {
       return;
     }
 
-    //check if node is already in view
+    // Don't scroll to the evaluation result if it's already in view.
     const { top, bottom } = resultNode.getBoundingClientRect();
     const scrolledParentRect = node.getBoundingClientRect();
     const isVisible = top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom;
