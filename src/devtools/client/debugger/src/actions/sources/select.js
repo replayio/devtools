@@ -122,6 +122,11 @@ export function selectLocation(cx, location, { keepContext = true } = {}) {
     await dispatch(loadSourceText({ source }));
     await dispatch(setBreakableLines(cx, source.id));
 
+    // Set shownSource to null first, then the actual source to trigger
+    // a proper re-render in the SourcesTree component
+    dispatch({ type: "SHOW_SOURCE", source: null });
+    dispatch({ type: "SHOW_SOURCE", source });
+
     const loadedSource = getSource(getState(), source.id);
 
     if (!loadedSource) {
