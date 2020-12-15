@@ -4,7 +4,7 @@ Test.describe(`Test stepping in async frames and async call stacks.`, async () =
   await Test.checkFrames(5);
 
   await Test.waitForScopeValue("n", "2");
-  await Test.waitForFrameTimeline("12%");
+  await Test.waitForFrameTimeline("25%");
 
   await Test.selectFrame(1);
   await Test.waitForScopeValue("n", "3");
