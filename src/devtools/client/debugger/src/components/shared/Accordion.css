@@ -8,6 +8,8 @@
   list-style-type: none;
   padding: 0px;
   margin-top: 0px;
+  display: flex;
+  flex-direction: column;
 }
 
 .accordion ._header {
