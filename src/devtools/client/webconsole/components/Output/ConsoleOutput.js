@@ -55,7 +55,6 @@ function getClosestMessage(visibleMessages, messages, executionPoint) {
     } else if (point === executionPoint && msg.type === MESSAGE_TYPE.LOG_POINT) {
       last = msg;
     }
-    last = msg;
   }
 
   return last;
