@@ -374,7 +374,7 @@ async function executeInConsole(value) {
 function waitForFrameTimeline(width) {
   return waitUntil(() => {
     const elem = document.querySelector(".frame-timeline-progress");
-    return elem.style?.width == width;
+    return elem?.style.width == width;
   });
 }
 async function checkFrames(count) {
