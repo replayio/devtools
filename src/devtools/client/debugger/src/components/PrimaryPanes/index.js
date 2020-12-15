@@ -7,7 +7,12 @@
 import React, { Component } from "react";
 
 import actions from "../../actions";
-import { getActiveSearch, getSelectedPrimaryPaneTab, getContext, getSourcesCollapsed } from "../../selectors";
+import {
+  getActiveSearch,
+  getSelectedPrimaryPaneTab,
+  getContext,
+  getSourcesCollapsed,
+} from "../../selectors";
 import { connect } from "../../utils/connect";
 import { prefs } from "../../utils/prefs";
 
