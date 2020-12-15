@@ -753,7 +753,6 @@ class Tree extends Component {
           return closestScrolledParent(node.parentNode);
         };
 
-        //this is the one that contains the scrollable contents without expanding its height past what is visible
         const parentElem = document.querySelector(".debugger .controlled");
         const scrolledParentRect = parentElem.getBoundingClientRect();
         const isVisible = top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom;
