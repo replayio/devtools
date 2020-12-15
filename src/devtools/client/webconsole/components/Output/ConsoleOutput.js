@@ -90,7 +90,7 @@ class ConsoleOutput extends Component {
     // use a memoization function to be able to get the last message quickly
     const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
 
-    if (messagesDelta <= 0) {
+    if (messagesDelta <= 0 || lastMessage.type !== MESSAGE_TYPE.RESULT) {
       return;
     }
 
