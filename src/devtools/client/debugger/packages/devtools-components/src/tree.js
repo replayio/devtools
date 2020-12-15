@@ -753,17 +753,16 @@ class Tree extends Component {
           return closestScrolledParent(node.parentNode);
         };
 
-        const scrolledParentRect = treeElement?.getBoundingClientRect();
-        const isVisible =
-          !treeElement || (top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom);
+        //this is the one that contains the scrollable contents without expanding its height past what is visible
+        const parentElem = document.querySelector(".debugger .controlled");
+        const scrolledParentRect = parentElem.getBoundingClientRect();
+        const isVisible = top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom;
 
-        if (!isVisible) {
-          const { alignTo } = options;
-          const scrollToTop = alignTo
-            ? alignTo === "top"
-            : !scrolledParentRect || top < scrolledParentRect.top;
-          element.scrollIntoView(scrollToTop);
+        if (isVisible) {
+          return;
         }
+
+        element.scrollIntoView({ block: "center" });
       }
     }
   }
