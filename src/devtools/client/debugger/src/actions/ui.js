@@ -7,7 +7,7 @@
 import {
   getActiveSearch,
   getPaneCollapse,
-  getSourcesCollapse,
+  getSourcesCollapsed,
   getQuickOpenEnabled,
   getSource,
   getSourceContent,
@@ -16,6 +16,7 @@ import {
   getSelectedLocation,
   getContext,
 } from "../selectors";
+import { getSelectedPrimaryPanel } from "ui/reducers/app";
 import { selectSource, selectLocation } from "../actions/sources/select";
 import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { searchContents } from "./file-search";
@@ -24,8 +25,6 @@ import { isFulfilled } from "../utils/async-value";
 
 import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 import { resizeBreakpointGutter } from "../utils/ui";
-import { prefs } from "../utils/prefs";
-import { getSelectedPrimaryPanel } from "../../../../../ui/reducers/app";
 
 export function setPrimaryPaneTab(tabName) {
   return { type: "SET_PRIMARY_PANE_TAB", tabName };
@@ -83,7 +82,7 @@ export function showSource(cx, sourceId) {
       return;
     }
 
-    //is the toolbar panel open?
+    // Is the toolbar panel open?
     if (getPaneCollapse(getState())) {
       dispatch({
         type: "TOGGLE_PANE",
@@ -91,7 +90,7 @@ export function showSource(cx, sourceId) {
       });
     }
 
-    //is the sources panel selected?
+    // Is the sources panel selected?
     if (getSelectedPrimaryPanel(getState()) !== "explorer") {
       dispatch({
         type: "set_selected_primary_panel",
@@ -99,8 +98,8 @@ export function showSource(cx, sourceId) {
       });
     }
 
-    //is the sources panel collapsed?
-    if (getSourcesCollapse(getState())) {
+    // Is the sources panel collapsed?
+    if (getSourcesCollapsed(getState())) {
       dispatch({
         type: "TOGGLE_SOURCES",
         sourcesCollapsed: false,
@@ -123,7 +122,7 @@ export function togglePaneCollapse() {
 
 export function toggleSourcesCollapse() {
   return ({ dispatch, getState }) => {
-    const sourcesCollapsed = getSourcesCollapse(getState());
+    const sourcesCollapsed = getSourcesCollapsed(getState());
     dispatch({ type: "TOGGLE_SOURCES", sourcesCollapsed: !sourcesCollapsed });
   };
 }

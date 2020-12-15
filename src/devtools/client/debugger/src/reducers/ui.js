@@ -119,7 +119,7 @@ export function getPaneCollapse(state) {
   return state.ui.startPanelCollapsed;
 }
 
-export function getSourcesCollapse(state) {
+export function getSourcesCollapsed(state) {
   return state.ui.sourcesCollapsed;
 }
 

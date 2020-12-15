@@ -7,7 +7,7 @@
 import React, { Component } from "react";
 
 import actions from "../../actions";
-import { getActiveSearch, getSelectedPrimaryPaneTab, getContext } from "../../selectors";
+import { getActiveSearch, getSelectedPrimaryPaneTab, getContext, getSourcesCollapsed } from "../../selectors";
 import { connect } from "../../utils/connect";
 import { prefs } from "../../utils/prefs";
 
@@ -16,7 +16,6 @@ import SourcesTree from "./SourcesTree";
 import Accordion from "../shared/Accordion";
 
 import "./Sources.css";
-import { selectors } from "../../../../../../ui/reducers";
 
 class PrimaryPanes extends Component {
   state = {
@@ -53,7 +52,6 @@ class PrimaryPanes extends Component {
       component: <SourcesTree />,
       opened: !prefs.sourcesCollapsed,
       onToggle: opened => {
-        // prefs.sourcesExpanded = opened;
         this.props.toggleSourcesCollapse();
       },
     };
@@ -75,7 +73,7 @@ const mapStateToProps = state => {
     cx: getContext(state),
     selectedTab: getSelectedPrimaryPaneTab(state),
     sourceSearchOn: getActiveSearch(state) === "source",
-    sourcesCollapsed: selectors.getSourcesCollapse(state),
+    sourcesCollapsed: getSourcesCollapsed(state),
   };
 };
 
