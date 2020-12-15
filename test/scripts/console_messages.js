@@ -25,7 +25,7 @@ Test.describe(`logpoints, and evaluations when the debugger is somewhere else.`,
     ["obj: Object { value: 14, subobj: {…} }"]
   );
 
-  Test.getMessageLocationLink(msg).click();
+  msg.querySelector(".frame-link a").click();
   await Test.waitUntil(() => Test.dbgSelectors.getSelectedLocation()?.line == 15);
 
   await Test.addBreakpoint("doc_rr_console.html", 16, undefined, {

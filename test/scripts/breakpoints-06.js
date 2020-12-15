@@ -1,7 +1,7 @@
 async function checkMessageLocation(text, location) {
   const msg = await Test.waitForMessage(text);
   Test.assert(
-    Test.getMessageLocationLink(msg).innerText == location,
+    msg.querySelector(".frame-link a").innerText == location,
     `Message location should be ${location}`
   );
 }

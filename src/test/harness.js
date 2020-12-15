@@ -274,10 +274,6 @@ function waitForMessage(text, extraSelector) {
   });
 }
 
-function getMessageLocationLink(msg) {
-  return msg.querySelector(".frame-link a");
-}
-
 async function warpToMessage(text) {
   const msg = await waitForMessage(text);
   const warpButton = msg.querySelector(".rewind") || msg.querySelector(".fast-forward");
@@ -604,7 +600,6 @@ const testCommands = {
   checkEvaluateInTopFrame,
   waitForScopeValue,
   toggleBlackboxSelectedSource,
-  getMessageLocationLink,
   findMessages,
   waitForMessage,
   warpToMessage,
