@@ -91,7 +91,7 @@ class ConsoleOutput extends Component {
     // use a memoization function to be able to get the last message quickly
     const lastMessage = [...this.props.messages.values()][this.props.messages.size - 1];
 
-    if (messagesDelta <= 0 || lastMessage.type != MESSAGE_TYPE.RESULT) {
+    if (messagesDelta <= 0 || lastMessage.type !== MESSAGE_TYPE.RESULT) {
       return;
     }
 
@@ -99,6 +99,15 @@ class ConsoleOutput extends Component {
     const resultNode = node.querySelector(`div[data-message-id='${lastMessage.id}']`);
 
     if (!resultNode) {
+      return;
+    }
+
+    // Don't scroll to the evaluation result if it's already in view.
+    const { top, bottom } = resultNode.getBoundingClientRect();
+    const scrolledParentRect = node.getBoundingClientRect();
+    const isVisible = top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom;
+
+    if (isVisible) {
       return;
     }
 
