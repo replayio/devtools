@@ -1,19 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "./IconWithTooltip.css";
 
 // This component is designed only for the primary toolbox icons (24x24) to the left
 // of the viewport. The tooltip appears to the immediate right of the provided icon.
 export default function IconWithTooltip({ icon, content, handleClick }) {
+  const timeoutKey = useRef(null);
   const [hovered, setHovered] = useState(false);
-  const debounce = (fn, ms) => setTimeout(fn, ms);
+
+  const handleMouseEnter = () => {
+    timeoutKey.current = setTimeout(() => setHovered(true), 1000);
+  };
+  const handleMouseLeave = () => {
+    setHovered(false);
+    clearTimeout(timeoutKey.current);
+  };
 
   return (
     <div className="icon-with-tooltip">
-      <button
-        onMouseEnter={() => debounce(() => setHovered(true), 200)}
-        onMouseLeave={() => debounce(() => setHovered(false), 200)}
-        onClick={handleClick}
-      >
+      <button onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleClick}>
         {icon}
       </button>
       {hovered ? <div className="icon-tooltip">{content}</div> : null}
