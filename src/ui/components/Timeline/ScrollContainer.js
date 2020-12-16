@@ -21,8 +21,6 @@ function ScrollContainer({ hoverTime, zoomRegion, setZoomRegion, recordingDurati
       scrollTop: e.target.scrollTop,
     });
     setZoomRegion(newZoomRegion);
-
-    gToolbox.getPanel("console").setZoomedRegion(newZoomRegion);
   };
 
   const handleClick = e => {

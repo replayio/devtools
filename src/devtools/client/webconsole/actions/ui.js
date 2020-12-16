@@ -22,7 +22,6 @@ const {
   EDITOR_ONBOARDING_DISMISS,
   EAGER_EVALUATION_TOGGLE,
   AUTOCOMPLETE_TOGGLE,
-  SET_ZOOMED_REGION,
 } = require("devtools/client/webconsole/constants");
 const { getAllFilters } = require("../selectors/filters");
 
@@ -140,15 +139,6 @@ function timeWarp(executionPoint) {
   };
 }
 
-function setZoomedRegion(zoomStartTime, zoomEndTime, scale) {
-  return {
-    type: SET_ZOOMED_REGION,
-    zoomStartTime,
-    zoomEndTime,
-    scale,
-  };
-}
-
 module.exports = {
   eagerEvaluationToggle,
   editorOnboardingDismiss,
@@ -162,6 +152,5 @@ module.exports = {
   timestampsToggle,
   warningGroupsToggle,
   timeWarp,
-  setZoomedRegion,
   autocompleteToggle,
 };

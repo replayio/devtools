@@ -30,9 +30,10 @@ const { setupEventListeners } = require("devtools/client/debugger/src/actions/ev
 const { DevToolsToolbox } = require("ui/utils/devtools-toolbox");
 const { setupThreadEventListeners } = require("devtools/client/webconsole/actions/messages");
 const { createSession } = require("ui/actions/session");
+const { setupMessages } = require("devtools/client/webconsole/actions/messages");
 
 let initialized = false;
-async function initialize() {
+async function initialize(store) {
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
   loadImages();
 
@@ -69,7 +70,7 @@ async function initialize() {
 
   if (!initialized) {
     initialized = true;
-    await initialize();
+    await initialize(store);
   }
 
   if (recordingId) {
@@ -77,5 +78,6 @@ async function initialize() {
     setupTimeline(recordingId, store);
     setupMetadata(recordingId, store);
     setupEventListeners(recordingId, store);
+    setupMessages(store);
   }
 })();

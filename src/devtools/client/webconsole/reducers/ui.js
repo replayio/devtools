@@ -6,17 +6,9 @@
 const {
   MESSAGES_CLEAR,
   PERSIST_TOGGLE,
-  REVERSE_SEARCH_INPUT_TOGGLE,
-  SHOW_OBJECT_IN_SIDEBAR,
-  SIDEBAR_CLOSE,
-  SPLIT_CONSOLE_CLOSE_BUTTON_TOGGLE,
   TIMESTAMPS_TOGGLE,
   FILTERBAR_DISPLAY_MODE_SET,
   FILTERBAR_DISPLAY_MODES,
-  EDITOR_ONBOARDING_DISMISS,
-  EDITOR_TOGGLE,
-  EDITOR_SET_WIDTH,
-  SET_ZOOMED_REGION,
 } = require("devtools/client/webconsole/constants");
 
 const UiState = overrides =>
@@ -51,11 +43,11 @@ function ui(state = UiState(), action) {
         ...state,
         filterBarDisplayMode: action.displayMode,
       };
-    case SET_ZOOMED_REGION:
+    case "set_zoom":
       return {
         ...state,
-        zoomStartTime: action.zoomStartTime,
-        zoomEndTime: action.zoomEndTime,
+        zoomStartTime: action.region.startTime,
+        zoomEndTime: action.region.endTime,
       };
   }
 
