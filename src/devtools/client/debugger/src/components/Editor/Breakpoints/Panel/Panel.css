@@ -140,6 +140,7 @@
   left: 8px;
   font-style: italic;
   color: var(--grey-40);
+  pointer-events: none;
 }
 
 .breakpoint-panel form .CodeMirror {
