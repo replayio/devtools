@@ -8,8 +8,12 @@ export function isFirefox() {
   return /firefox/i.test(navigator.userAgent);
 }
 
+export function getTest() {
+  return url.searchParams.get("test");
+}
+
 export function isTest() {
-  return url.searchParams.get("test") != null;
+  return getTest() != null;
 }
 
 export function isDeployPreview() {

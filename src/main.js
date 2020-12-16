@@ -19,59 +19,16 @@ if (test) {
 // be good if this was less fragile...
 //
 
-const { initSocket, sendMessage, setStatus, addEventListener } = require("protocol/socket");
-const { ThreadFront } = require("protocol/thread");
+const { initSocket } = require("protocol/socket");
 const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap/bootstrap");
 const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
-const {
-  setupTimeline,
-  setupMetadata,
-  setUploading,
-  setupApp,
-  setUnexpectedError,
-  setExpectedError,
-} = require("ui/actions").actions;
+const { setupTimeline, setupMetadata, setupApp } = require("ui/actions").actions;
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { DevToolsToolbox } = require("ui/utils/devtools-toolbox");
-const { prefs } = require("ui/utils/prefs");
 const { setupThreadEventListeners } = require("devtools/client/webconsole/actions/messages");
-
-// Create a session to use while debugging.
-async function createSession() {
-  addEventListener("Recording.uploadedData", onUploadedData);
-  addEventListener("Recording.sessionError", onSessionError);
-
-  try {
-    ThreadFront.setTest(test);
-    ThreadFront.recordingId = recordingId;
-    const { sessionId } = await sendMessage("Recording.createSession", {
-      recordingId,
-    });
-    window.sessionId = sessionId;
-    ThreadFront.setSessionId(sessionId);
-    store.dispatch(setUploading(null));
-    prefs.recordingId = recordingId;
-  } catch (e) {
-    if (e.code == 9 || e.code == 31) {
-      store.dispatch(setExpectedError(e));
-    } else {
-      throw e;
-    }
-  }
-}
-
-function onUploadedData({ uploaded, length }) {
-  const uploadedMB = (uploaded / (1024 * 1024)).toFixed(2);
-  const lengthMB = length ? (length / (1024 * 1024)).toFixed(2) : undefined;
-  store.dispatch(setUploading({ total: lengthMB, amount: uploadedMB }));
-}
-
-function onSessionError(error) {
-  store.dispatch(setUnexpectedError(error));
-}
 
 let initialized = false;
 async function initialize() {

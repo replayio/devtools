@@ -2,7 +2,6 @@ import { Action } from "redux";
 import { UIStore, UIThunkAction } from ".";
 import {
   RecordingId,
-  sessionError,
   SessionId,
   unprocessedRegions,
   PointDescription,
@@ -10,7 +9,8 @@ import {
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
-import { ExpectedError, Modal, PanelName, PrimaryPanelName, ViewMode } from "ui/state/app";
+import { Modal, PanelName, PrimaryPanelName, ViewMode } from "ui/state/app";
+
 const { PointHandlers } = require("protocol/logpoint");
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
@@ -23,8 +23,6 @@ export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel">
   panel: PrimaryPanelName;
 };
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
-export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
-export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & { error: sessionError };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: boolean };
 export type SetModalAction = Action<"set_modal"> & { modal: Modal | null };
 export type SetPendingNotificationAction = Action<"set_pending_notification"> & {
@@ -49,8 +47,6 @@ export type AppAction =
   | SetSelectedPanelAction
   | SetSelectedPrimaryPanelAction
   | SetInitializedPanelsAction
-  | SetExpectedErrorAction
-  | SetUnexpectedErrorAction
   | SetUploadingAction
   | SetModalAction
   | SetPendingNotificationAction
@@ -138,14 +134,6 @@ export function setSelectedPrimaryPanel(panel: PrimaryPanelName): SetSelectedPri
 
 export function setInitializedPanels(panel: PanelName): SetInitializedPanelsAction {
   return { type: "set_initialized_panels", panel };
-}
-
-export function setExpectedError(error: ExpectedError): SetExpectedErrorAction {
-  return { type: "set_expected_error", error };
-}
-
-export function setUnexpectedError(error: sessionError): SetUnexpectedErrorAction {
-  return { type: "set_unexpected_error", error };
 }
 
 export function setUploading(uploading: boolean): SetUploadingAction {

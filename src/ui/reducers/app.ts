@@ -1,6 +1,7 @@
 import { AppState } from "ui/state/app";
 import { AppAction } from "ui/actions/app";
 import { UIState } from "ui/state";
+import { SessionAction } from "ui/actions/session";
 const { prefs } = require("../utils/prefs");
 const { getLocationKey } = require("../../devtools/client/debugger/src/utils/breakpoint");
 
@@ -26,7 +27,7 @@ function initialAppState(): AppState {
   };
 }
 
-export default function update(state = initialAppState(), action: AppAction) {
+export default function update(state = initialAppState(), action: AppAction | SessionAction) {
   switch (action.type) {
     case "setup_app": {
       return { ...state, recordingId: action.recordingId };

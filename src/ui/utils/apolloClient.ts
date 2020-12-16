@@ -1,14 +1,34 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  NormalizedCacheObject,
+  ApolloClientOptions,
+} from "@apollo/client";
 import { HttpLink } from "apollo-link-http";
 import { isDeployPreview } from "./environment";
+import { DocumentNode } from "graphql";
+import { assert } from "protocol/utils";
+import { Auth0ContextInterface } from "@auth0/auth0-react";
 
-export const createApolloClient = async auth0Client => {
+let apolloClient: ApolloClient<NormalizedCacheObject> | null = null;
+
+export function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
+  assert(apolloClient);
+  return apolloClient.query({ variables, query });
+}
+
+export function mutate({ variables = {}, mutation }: { variables: any; mutation: DocumentNode }) {
+  assert(apolloClient);
+  return apolloClient.mutate({ variables, mutation });
+}
+
+export const createApolloClient = async (auth0Client: Auth0ContextInterface) => {
   // NOTE: we do not support auth0 for preview builds
   if (!isDeployPreview() && auth0Client.isLoading) {
     return;
   }
 
-  const options = !auth0Client.isAuthenticated
+  const options: any = !auth0Client.isAuthenticated
     ? {
         cache: new InMemoryCache(),
         uri: "https://graphql.replay.io/v1/graphql",
@@ -18,10 +38,11 @@ export const createApolloClient = async auth0Client => {
         link: await createHttpLink(auth0Client),
       };
 
-  return new ApolloClient(options);
+  apolloClient = new ApolloClient(options);
+  return apolloClient;
 };
 
-async function createHttpLink(auth0Client) {
+async function createHttpLink(auth0Client: Auth0ContextInterface) {
   let hasuraToken = await getToken(auth0Client);
 
   return new HttpLink({
@@ -33,7 +54,7 @@ async function createHttpLink(auth0Client) {
   });
 }
 
-async function getToken(auth0Client) {
+async function getToken(auth0Client: Auth0ContextInterface) {
   try {
     return await auth0Client.getAccessTokenSilently({
       audience: "hasura-api",
