@@ -977,7 +977,6 @@ a.learn-more-link.webconsole-learn-more-link {
   z-index: 1;
   border-top-right-radius: var(--border-radius);
   border-bottom-right-radius: var(--border-radius);
-  transition-duration: var(--slide-in-duration);
   --rewind-button-width: 28px;
   --message-left-padding: 4px;
   --slide-in-duration: 200ms;
@@ -986,6 +985,10 @@ a.learn-more-link.webconsole-learn-more-link {
   --rewind-info-button-width: 64px;
   --fast-forward-info-button-width: 92px;
   --debug-info-button-width: 60px;
+}
+
+.webconsole-output .overlay-container:not(.debug) > * {
+  transition-duration: var(--slide-in-duration);
 }
 
 .webconsole-output .overlay-container .button {
@@ -998,6 +1001,7 @@ a.learn-more-link.webconsole-learn-more-link {
 }
 
 .webconsole-output .overlay-container.debug .button {
+  cursor: auto;
   margin-left: calc(0px - var(--message-left-padding));
   background: linear-gradient(
     0deg,
@@ -1020,12 +1024,6 @@ a.learn-more-link.webconsole-learn-more-link {
 .webconsole-output .overlay-container.fast-forward .info {
   width: var(--fast-forward-info-button-width);
   margin-left: calc(0px - var(--message-left-padding) - var(--fast-forward-info-button-width));
-}
-
-.webconsole-output .overlay-container.debug .info {
-  width: var(--debug-info-button-width);
-  margin-left: calc(0px - var(--message-left-padding) - var(--debug-info-button-width));
-  background-color: var(--paused-background-color);
 }
 
 .webconsole-output .overlay-container .info .label {
@@ -1072,10 +1070,6 @@ a.learn-more-link.webconsole-learn-more-link {
 .webconsole-output .overlay-container:hover .button {
   background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
   box-shadow: 1px 0px 3px rgb(0, 0, 0, 0.3);
-}
-
-.webconsole-output .overlay-container.debug:hover .button {
-  background: linear-gradient(152.2deg, #5b41ff 6.75%, #b043ff 93.14%);
 }
 
 .webconsole-output .overlay-container:hover .info {
