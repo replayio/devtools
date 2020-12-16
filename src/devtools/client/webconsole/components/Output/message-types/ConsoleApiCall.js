@@ -41,6 +41,7 @@ function ConsoleApiCall(props) {
     pausedExecutionPoint,
     isPaused,
     maybeScrollToBottom,
+    isFirstMessageForPoint,
   } = props;
   const {
     id: messageId,
@@ -154,6 +155,7 @@ function ConsoleApiCall(props) {
     parameters,
     message,
     maybeScrollToBottom,
+    isFirstMessageForPoint,
   });
 }
 
