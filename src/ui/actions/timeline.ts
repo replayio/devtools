@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "record-replay-protocol";
+import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
 import { selectors } from "../reducers";
 import {

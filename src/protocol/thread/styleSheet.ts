@@ -1,4 +1,4 @@
-import { StyleSheet } from "record-replay-protocol";
+import { StyleSheet } from "@recordreplay/protocol";
 import { Pause, WiredObject } from "./pause";
 import { assert, DisallowEverythingProxyHandler } from "../utils";
 

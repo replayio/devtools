@@ -1,6 +1,6 @@
 import React, { PureComponent, MouseEvent } from "react";
 import { NodeInfo } from "../state/markup";
-import { Attr } from "record-replay-protocol";
+import { Attr } from "@recordreplay/protocol";
 
 import NodeAttribute from "./NodeAttribute";
 import TextNode from "./TextNode";

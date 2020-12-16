@@ -1,4 +1,4 @@
-import { PauseDescription, ScreenShot, TimeRange, Location } from "record-replay-protocol";
+import { PauseDescription, ScreenShot, TimeRange, Location } from "@recordreplay/protocol";
 import { MouseAndClickPosition } from "../../protocol/graphics";
 
 export interface Tooltip {

@@ -4,7 +4,7 @@ import {
   BoxModel,
   Rect,
   Quads,
-} from "record-replay-protocol";
+} from "@recordreplay/protocol";
 import { client } from "../socket";
 import { Pause, WiredObject } from "./pause";
 import { defer, assert, DisallowEverythingProxyHandler, Deferred } from "../utils";

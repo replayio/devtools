@@ -1,4 +1,4 @@
-import { ObjectId, Rect } from "record-replay-protocol";
+import { ObjectId, Rect } from "@recordreplay/protocol";
 import { DisallowEverythingProxyHandler } from "../utils";
 import { Pause } from "./pause";
 

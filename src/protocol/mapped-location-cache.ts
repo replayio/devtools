@@ -1,6 +1,6 @@
 import { client } from "./socket";
 import { defer } from "./utils";
-import { Location, MappedLocation } from "record-replay-protocol/js/protocol";
+import { Location, MappedLocation } from "@recordreplay/protocol";
 
 export class MappedLocationCache {
   // Map locations encoded as strings to the corresponding MappedLocations

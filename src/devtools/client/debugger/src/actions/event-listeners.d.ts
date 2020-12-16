@@ -1,4 +1,4 @@
-import { RecordingId } from "record-replay-protocol";
+import { RecordingId } from "@recordreplay/protocol";
 import { UIStore, UIThunkAction } from "ui/actions";
 
 export declare function setupEventListeners(

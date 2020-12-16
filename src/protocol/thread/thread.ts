@@ -26,7 +26,7 @@ import {
   SourceLocation,
   TimeStamp,
   unprocessedRegions,
-} from "record-replay-protocol";
+} from "@recordreplay/protocol";
 import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 import { MappedLocationCache } from "../mapped-location-cache";

@@ -7,7 +7,7 @@ import {
   unprocessedRegions,
   PointDescription,
   Location,
-} from "record-replay-protocol";
+} from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
 import { ExpectedError, Modal, PanelName, PrimaryPanelName, ViewMode } from "ui/state/app";

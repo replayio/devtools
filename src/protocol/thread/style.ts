@@ -1,4 +1,4 @@
-import { StyleDeclaration } from "record-replay-protocol";
+import { StyleDeclaration } from "@recordreplay/protocol";
 import { Pause, WiredObject } from "./pause";
 import { assert, DisallowEverythingProxyHandler } from "../utils";
 const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");

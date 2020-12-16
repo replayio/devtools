@@ -12,7 +12,7 @@ import {
   PointDescription,
   NodeBounds,
   PauseData,
-} from "record-replay-protocol";
+} from "@recordreplay/protocol";
 import { client } from "../socket";
 import { defer, assert, Deferred } from "../utils";
 import { ValueFront } from "./value";

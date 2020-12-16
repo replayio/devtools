@@ -1,7 +1,7 @@
 import { ThreadFront } from "./thread";
 import { defer } from "./utils";
 import { client } from "./socket";
-import { ScreenShot } from "record-replay-protocol/js/protocol";
+import { ScreenShot } from "@recordreplay/protocol";
 
 const resizeHeightForTooltip = 180;
 
