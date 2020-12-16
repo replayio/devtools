@@ -79,18 +79,20 @@ class Tabs extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
+    const { selectedSource, tabSources } = this.props;
     if (
-      this.props.selectedSource !== prevProps.selectedSource ||
-      haveTabSourcesChanged(this.props.tabSources, prevProps.tabSources)
+      selectedSource !== prevProps.selectedSource ||
+      haveTabSourcesChanged(tabSources, prevProps.tabSources)
     ) {
       this.updateHiddenTabs();
     }
 
+    console.log(selectedSource);
     // Newly-selected sources are added to the end of the tabs order. This becomes a problem
     // if we have hidden tabs, because the source text would be shown but the tab is hidden.
     // This makes sure that in cases where we have hidden tabs, we add the newly-selected source
     // so that it's the last visible tab to the right.
-    if (this.props.selectedSource !== prevProps.selectedSource) {
+    if (selectedSource && selectedSource !== prevProps.selectedSource) {
       this.ensureSelectedSourceIsVisible();
     }
   }
