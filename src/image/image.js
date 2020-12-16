@@ -71,6 +71,7 @@ const gBackgroundImages = {
   "#inspector-splitter-box .sidebar-toggle.pane-collapsed::before": require("devtools/client/themes/images/open-3-pane.svg"),
   ".expandable.collapsed .markup-expand-badge::before": require("devtools/client/themes/images/more.svg"),
   ".computed-other-property-value::before": require("devtools/client/themes/images/arrow-e.svg"),
+  ".scrollbutton-up > .toolbarbutton-icon, .scrollbutton-down > .toolbarbutton-icon": require("devtools/client/themes/images/breadcrumbs-scrollbutton.svg"),
 };
 
 const gMaskImages = {
