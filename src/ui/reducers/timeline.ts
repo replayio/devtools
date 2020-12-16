@@ -19,6 +19,7 @@ function initialTimelineState(): TimelineState {
     mouse: null,
     loaded: false,
     tooltip: null,
+    autoplay: false,
   };
 }
 
@@ -59,3 +60,4 @@ export const getMouse = (state: UIState) => state.timeline.mouse;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getTimelineLoaded = (state: UIState) => state.timeline.loaded;
 export const getTooltip = (state: UIState) => state.timeline.tooltip;
+export const getAutoplay = (state: UIState) => state.timeline.autoplay;

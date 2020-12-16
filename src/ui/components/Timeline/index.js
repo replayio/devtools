@@ -79,6 +79,10 @@ export class Timeline extends Component {
     if (prevState.closestMessage != this.props.closestMessage) {
       this.scrollToMessage(this.props.closestMessage);
     }
+
+    if (this.props.autoplay && !prevProps.autoplay) {
+      this.startPlayback();
+    }
   }
 
   get toolbox() {
@@ -389,7 +393,7 @@ export class Timeline extends Component {
     if (this.props.playback) {
       this.seekTime(this.props.playback.time);
     }
-    this.props.setTimelineState({ playback: null });
+    this.props.setTimelineState({ playback: null, autoplay: false });
   }
 
   replayPlayback = () => {
@@ -614,6 +618,7 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     loaded: selectors.getTimelineLoaded(state),
     messages: selectors.getMessagesForTimeline(state),
+    autoplay: selectors.getAutoplay(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,

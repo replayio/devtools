@@ -69,7 +69,7 @@ function onEndpoint({ point, time }: TimeStampedPoint): UIThunkAction {
 
 function onPaused({ time }: PauseEventArgs): UIThunkAction {
   return async ({ dispatch, getState }) => {
-    dispatch(setTimelineState({ currentTime: time, playback: null }));
+    dispatch(setTimelineState({ currentTime: time, playback: null, autoplay: true }));
 
     const { screen, mouse } = await getGraphicsAtTime(time);
 

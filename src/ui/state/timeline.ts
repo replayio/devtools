@@ -33,4 +33,5 @@ export interface TimelineState {
   shouldAnimate: boolean;
   loaded: boolean;
   tooltip: Tooltip | null;
+  autoplay: boolean;
 }
