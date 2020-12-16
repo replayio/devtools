@@ -189,8 +189,35 @@ export class Timeline extends Component {
     }
   };
 
+  onPlayerMouseLeave = async e => {
+    const { currentTime } = this.props;
+    const { screen, mouse } = await getGraphicsAtTime(currentTime);
+
+    if (!screen) {
+      return;
+    }
+
+    paintGraphics(screen, mouse);
+  };
+
+  showPlaybackPreview = async time => {
+    const { screen, mouse } = await getGraphicsAtTime(time);
+
+    if (!screen) {
+      return;
+    }
+
+    paintGraphics(screen, mouse);
+  };
+
   onPlayerMouseMove = async e => {
-    const { hoverTime, recordingDuration, setTimelineToTime, timelineDimensions } = this.props;
+    const {
+      hoverTime,
+      recordingDuration,
+      setTimelineToTime,
+      timelineDimensions,
+      viewMode,
+    } = this.props;
     if (!recordingDuration) {
       return;
     }
@@ -210,6 +237,10 @@ export class Timeline extends Component {
           : offset;
 
       setTimelineToTime({ time: mouseTime, offset });
+    }
+
+    if (viewMode == "non-dev") {
+      this.showPlaybackPreview(mouseTime);
     }
   };
 
@@ -582,6 +613,7 @@ export class Timeline extends Component {
             ref: a => (this.$progressBar = a),
             onMouseEnter: this.onPlayerMouseEnter,
             onMouseMove: this.onPlayerMouseMove,
+            onMouseLeave: this.onPlayerMouseLeave,
             onMouseUp: this.onPlayerMouseUp,
           },
           div({
@@ -614,6 +646,7 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     loaded: selectors.getTimelineLoaded(state),
     messages: selectors.getMessagesForTimeline(state),
+    viewMode: selectors.getViewMode(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,

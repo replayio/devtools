@@ -17,9 +17,9 @@
 
 .sources-pane {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  overflow-x: auto;
+  overflow: auto;
+  min-height: 25px;
 }
 
 .sources-list .img.blackBox {

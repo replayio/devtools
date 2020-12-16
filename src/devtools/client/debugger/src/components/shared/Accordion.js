@@ -55,7 +55,13 @@ class Accordion extends Component {
     );
   };
   render() {
-    return <ul className="accordion">{this.props.items.map(this.renderContainer)}</ul>;
+    const isOpened = this.props.items.some(item => item.opened);
+
+    return (
+      <ul className={`accordion${isOpened ? " opened" : ""}`}>
+        {this.props.items.map(this.renderContainer)}
+      </ul>
+    );
   }
 }
 

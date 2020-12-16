@@ -189,9 +189,14 @@ class Accordion extends Component {
   }
 
   render() {
+    const { opened } = this.state;
+    console.log(">>");
+    console.log(">>", opened);
+    const somethingIsOpened = Object.keys(opened).filter(id => opened[id]);
+
     return ul(
       {
-        className: "accordion",
+        className: `accordion${somethingIsOpened[2] ? " opened" : ""}`,
         tabIndex: -1,
       },
       this.props.items.map(item => this.renderItem(item))

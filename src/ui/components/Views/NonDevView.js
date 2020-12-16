@@ -46,7 +46,6 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
       </div>
       <div id="toolbox-timeline">
         <Timeline />
-        <Tooltip />
       </div>
     </div>
   );
@@ -89,7 +88,6 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
         />
         <div id="toolbox-timeline">
           <Timeline />
-          <Tooltip />
         </div>
       </>
     );
