@@ -172,10 +172,8 @@ class Message extends Component {
       overlayType = "rewind";
       label = "Rewind";
       onClick = onRewindClick;
-    }
-
-    // Handle cases where executionPoint is the same as pauseExecutionPoint.
-    if (!isFirstMessageForPoint) {
+    } else if (!isFirstMessageForPoint) {
+      // Handle cases where executionPoint is the same as pauseExecutionPoint.
       return;
     } else if (!["command", "result"].includes(type)) {
       overlayType = "debug";
