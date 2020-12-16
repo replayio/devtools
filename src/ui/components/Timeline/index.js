@@ -50,7 +50,7 @@ function classname(name, bools) {
 function ReplayButton({ onClick }) {
   return (
     <button onClick={onClick}>
-      <div className="img replay-lg" />
+      <div className="img replay-lg" style={{ transform: "scaleX(-1)" }} />
     </button>
   );
 }
