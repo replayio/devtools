@@ -77,6 +77,7 @@ to the maximum of `min-height` specific to the `scrollbar[orient="horizontal"]`
 selector in floating-scrollbar-light.css across all platforms. */
 .CodeMirror-hscrollbar {
   min-height: 10px;
+  cursor: auto;
 }
 
 /* This is to avoid the fake vertical scrollbar div of codemirror to go 0
@@ -85,6 +86,7 @@ to the maximum of `min-width` specific to the `scrollbar[orient="vertical"]`
 selector in floating-scrollbar-light.css across all platforms. */
 .CodeMirror-vscrollbar {
   min-width: 10px;
+  cursor: auto;
 }
 
 .cm-trailingspace {
