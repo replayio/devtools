@@ -1067,7 +1067,7 @@ a.learn-more-link.webconsole-learn-more-link {
   opacity: 100%;
 }
 
-.webconsole-output .overlay-container:hover .button {
+.webconsole-output .overlay-container:not(.debug):hover .button {
   background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
   box-shadow: 1px 0px 3px rgb(0, 0, 0, 0.3);
 }
