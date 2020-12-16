@@ -30,6 +30,7 @@ import DebugLine from "./DebugLine";
 import ReplayLines from "./ReplayLines";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
+import LineNumberTooltip from "./LineNumberTooltip";
 
 import {
   showSourceText,
@@ -45,7 +46,8 @@ import {
   toEditorPosition,
   getSourceLocationFromMouseEvent,
   hasDocument,
-  onMouseOver,
+  onTokenMouseOver,
+  onGutterMouseOver,
   startOperation,
   endOperation,
   clearDocuments,
@@ -124,7 +126,8 @@ class Editor extends PureComponent {
     codeMirrorWrapper.tabIndex = 0;
     codeMirrorWrapper.addEventListener("keydown", e => this.onKeyDown(e));
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
-    codeMirrorWrapper.addEventListener("mouseover", onMouseOver(codeMirror));
+    codeMirrorWrapper.addEventListener("mouseover", onTokenMouseOver(codeMirror));
+    codeMirrorWrapper.addEventListener("mouseover", onGutterMouseOver(codeMirror));
 
     if (!isFirefox()) {
       codeMirror.on("gutterContextMenu", (cm, line, eventName, event) =>
@@ -429,6 +432,7 @@ class Editor extends PureComponent {
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
+        <LineNumberTooltip editor={editor} />
         {/* <HighlightLines editor={editor} /> */}
         {
           <EditorMenu

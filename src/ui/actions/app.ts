@@ -36,6 +36,9 @@ export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
 };
 export type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type SetNarrowMode = Action<"set_narrow_mode"> & { narrowMode: boolean };
+export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_location"> & {
+  location: Location | null;
+};
 
 export type AppAction =
   | SetupAppAction
@@ -53,7 +56,8 @@ export type AppAction =
   | SetPendingNotificationAction
   | SetAnalysisPointsAction
   | SetViewMode
-  | SetNarrowMode;
+  | SetNarrowMode
+  | SetHoveredLineNumberLocation;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -201,4 +205,8 @@ export function updateNarrowMode(viewportWidth: number): UIThunkAction {
       dispatch(setNarrowMode(newNarrowMode));
     }
   };
+}
+
+export function setHoveredLineNumberLocation(location: Location): SetHoveredLineNumberLocation {
+  return { type: "set_hovered_line_number_location", location };
 }

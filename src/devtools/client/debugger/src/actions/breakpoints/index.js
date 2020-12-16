@@ -9,15 +9,19 @@
  * @module actions/breakpoints
  */
 
-import { PROMISE } from "../utils/middleware/promise";
 import {
   getBreakpointsList,
   getSelectedSource,
   getBreakpointAtLocation,
   getBreakpointsForSource,
-  getBreakpointsAtLine,
 } from "../../selectors";
-import { addBreakpoint, removeBreakpoint, enableBreakpoint, disableBreakpoint } from "./modify";
+import {
+  addBreakpoint,
+  removeBreakpoint,
+  enableBreakpoint,
+  disableBreakpoint,
+  runAnalysis,
+} from "./modify";
 import remapLocations from "./remapLocations";
 
 // this will need to be changed so that addCLientBreakpoint is removed
@@ -140,6 +144,27 @@ export function toggleBreakpointAtLine(cx, line) {
         line,
       })
     );
+  };
+}
+
+export function runAnalysisOnLine(cx, line) {
+  return ({ dispatch, getState }) => {
+    const state = getState();
+    const source = getSelectedSource(state);
+
+    if (!source) {
+      return;
+    }
+
+    const options = { logValue: "dummyValue" };
+    const location = {
+      sourceId: source.id,
+      sourceUrl: source.url,
+      column: undefined,
+      line,
+    };
+
+    return dispatch(runAnalysis(cx, location, options));
   };
 }
 
