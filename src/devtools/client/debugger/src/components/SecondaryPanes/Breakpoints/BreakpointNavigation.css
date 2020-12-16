@@ -95,9 +95,9 @@
 }
 
 .breakpoint-navigation-timeline-pause-marker {
-   position: absolute;
-   height: 100%;
-   background: var(--secondary-accent);
-   width: 1px;
-   z-index: var(--z-index-1--paused-message);
+  position: absolute;
+  height: 100%;
+  background: var(--secondary-accent);
+  width: 1px;
+  z-index: var(--z-index-1--paused-message);
  }
