@@ -6,6 +6,6 @@
 import React from "react";
 import "./Badge.css";
 
-const Badge = ({ children }) => <span className="badge text-white text-center">{children}</span>;
+const Badge = ({ children }) => <span className="badge text-center">{children}</span>;
 
 export default Badge;
