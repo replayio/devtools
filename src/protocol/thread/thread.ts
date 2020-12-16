@@ -170,9 +170,10 @@ class _ThreadFront {
 
   async initializeToolbox() {
     const sessionId = await this.waitForSession();
-    const { endpoint } = await client.Session.getEndpoint({}, sessionId);
+    const time = 0;
+    const point = "0";
+    this.timeWarp(point, time, /* hasFrames */ false, /* force */ true);
 
-    this.timeWarp(endpoint.point, endpoint.time, /* hasFrames */ false, /* force */ true);
     this.initializedWaiter.resolve();
 
     if (this.testName) {
