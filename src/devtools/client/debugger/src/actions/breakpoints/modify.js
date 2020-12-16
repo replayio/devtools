@@ -17,6 +17,7 @@ import {
   getPendingBreakpointList,
 } from "../../selectors";
 import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 
 import { setBreakpointPositions } from "./breakpointPositions";
 import { setSkipPausing } from "../pause/skipPausing";
@@ -156,7 +157,7 @@ export function addBreakpoint(
 
 export function runAnalysis(cx, initialLocation, options) {
   return async ({ dispatch, getState, client }) => {
-    recordEvent("add_breakpoint");
+    recordEvent("run_analysis");
 
     const { sourceId, line } = initialLocation;
     await dispatch(setBreakpointPositions({ cx, sourceId, line }));
@@ -166,14 +167,16 @@ export function runAnalysis(cx, initialLocation, options) {
       return;
     }
 
-    const source = getSource(getState(), location.sourceId);
-    if (!source) {
+    dispatch(actions.setHoveredLineNumberLocation(location));
+
+    // Don't run the analysis if we already have the analysis points for that
+    // location.
+    const analysisPoints = selectors.getAnalysisPoints(getState());
+    if (analysisPoints[getLocationKey(location)]) {
       return;
     }
 
     const analysisLocation = makeBreakpointLocation(getState(), location);
-
-    dispatch(actions.setHoveredLineNumberLocation(location));
     client.runAnalysis(analysisLocation, options);
   };
 }
