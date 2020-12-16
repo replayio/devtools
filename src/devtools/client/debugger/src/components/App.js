@@ -29,9 +29,6 @@ const { appinfo } = Services;
 
 const isMacOS = appinfo.OS === "Darwin";
 
-const horizontalLayoutBreakpoint = window.matchMedia("(min-width: 800px)");
-const verticalLayoutBreakpoint = window.matchMedia("(min-width: 10px) and (max-width: 799px)");
-
 import "./variables.css";
 import "./App.css";
 
@@ -73,10 +70,6 @@ class Debugger extends Component {
   };
 
   componentDidMount() {
-    horizontalLayoutBreakpoint.addListener(this.onLayoutChange);
-    verticalLayoutBreakpoint.addListener(this.onLayoutChange);
-    this.setOrientation();
-
     shortcuts.on("CmdOrCtrl+Shift+P", (_, e) => this.toggleQuickOpenModal(_, e));
 
     shortcuts.on("CmdOrCtrl+Shift+O", (_, e) => this.toggleQuickOpenModal(_, e, "@"));
@@ -93,9 +86,6 @@ class Debugger extends Component {
   }
 
   componentWillUnmount() {
-    horizontalLayoutBreakpoint.removeListener(this.onLayoutChange);
-    verticalLayoutBreakpoint.removeListener(this.onLayoutChange);
-
     shortcuts.off("CmdOrCtrl+Shift+P", this.toggleQuickOpenModal);
 
     shortcuts.off("CmdOrCtrl+Shift+O", this.toggleQuickOpenModal);
@@ -167,21 +157,6 @@ class Debugger extends Component {
     openQuickOpen();
   };
 
-  onLayoutChange = () => {
-    this.setOrientation();
-  };
-
-  setOrientation() {
-    // If the orientation does not match (if it is not visible) it will
-    // not setOrientation, or if it is the same as before, calling
-    // setOrientation will not cause a rerender.
-    if (horizontalLayoutBreakpoint.matches) {
-      this.props.setOrientation("horizontal");
-    } else if (verticalLayoutBreakpoint.matches) {
-      this.props.setOrientation("vertical");
-    }
-  }
-
   renderEditorPane = () => {
     const { startPanelSize } = this.state;
     const horizontal = this.isHorizontal();
@@ -221,7 +196,6 @@ class Debugger extends Component {
 
   renderLayout = () => {
     const { startPanelCollapsed, selectedPrimaryPanel } = this.props;
-    const horizontal = this.isHorizontal();
 
     return (
       <SplitBox
@@ -236,11 +210,7 @@ class Debugger extends Component {
         startPanelCollapsed={startPanelCollapsed}
         startPanel={
           <div className="panes" style={{ width: "100%" }}>
-            {selectedPrimaryPanel == "explorer" ? (
-              <PrimaryPanes horizontal={horizontal} />
-            ) : (
-              <SecondaryPanes horizontal={horizontal} />
-            )}
+            {selectedPrimaryPanel == "explorer" ? <PrimaryPanes /> : <SecondaryPanes />}
           </div>
         }
         endPanel={this.renderEditorPane()}
@@ -304,6 +274,5 @@ export default connect(mapStateToProps, {
   closeProjectSearch: actions.closeProjectSearch,
   openQuickOpen: actions.openQuickOpen,
   closeQuickOpen: actions.closeQuickOpen,
-  setOrientation: actions.setOrientation,
   refreshCodeMirror: actions.refreshCodeMirror,
 })(Debugger);

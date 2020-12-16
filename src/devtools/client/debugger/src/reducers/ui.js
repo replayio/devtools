@@ -20,7 +20,6 @@ export const createUIState = () => ({
   sourcesCollapsed: prefs.sourcesCollapsed,
   frameworkGroupingOn: prefs.frameworkGroupingOn,
   highlightedLineRange: undefined,
-  orientation: "horizontal",
   viewport: null,
   cursorPosition: null,
 });
@@ -34,10 +33,6 @@ function update(state = createUIState(), action) {
     case "TOGGLE_FRAMEWORK_GROUPING": {
       prefs.frameworkGroupingOn = action.value;
       return { ...state, frameworkGroupingOn: action.value };
-    }
-
-    case "SET_ORIENTATION": {
-      return { ...state, orientation: action.orientation };
     }
 
     case "SHOW_SOURCE": {

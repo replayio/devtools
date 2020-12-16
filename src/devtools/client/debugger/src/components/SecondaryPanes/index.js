@@ -123,38 +123,13 @@ class SecondaryPanes extends Component {
     return [...this.getStartItems(), ...this.getEndItems()];
   }
 
-  renderHorizontalLayout() {
-    return (
-      <div>
-        <Accordion items={this.getItems()} />
-      </div>
-    );
-  }
-
-  renderVerticalLayout() {
-    return (
-      <SplitBox
-        initialSize="300px"
-        minSize={10}
-        maxSize="50%"
-        splitterSize={1}
-        startPanel={
-          <div style={{ width: "inherit" }}>
-            <Accordion items={this.getStartItems()} />
-          </div>
-        }
-        endPanel={<Accordion items={this.getEndItems()} />}
-      />
-    );
-  }
-
   render() {
     return (
       <div className="secondary-panes-wrapper">
         <CommandBar horizontal={this.props.horizontal} />
         <FrameTimeline />
         <div className={classnames("secondary-panes")}>
-          {this.props.horizontal ? this.renderHorizontalLayout() : this.renderVerticalLayout()}
+          <Accordion items={this.getItems()} />
         </div>
       </div>
     );
