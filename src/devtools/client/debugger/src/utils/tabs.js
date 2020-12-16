@@ -14,8 +14,31 @@
  * @returns Array
  */
 
+export function getLastVisibleTab(sourceTabEls) {
+  sourceTabEls = [...sourceTabEls];
+
+  const topOffsets = sourceTabEls.map(el => el.getBoundingClientRect().top);
+  const visibleTabsTopOffset = Math.min(...topOffsets);
+
+  const visibleTabs = sourceTabEls.filter(
+    el => el.getBoundingClientRect().top < visibleTabsTopOffset + 10
+  );
+
+  return visibleTabs.pop();
+}
+
+export function getSelectedSourceIsVisible(sourceTabEls) {
+  sourceTabEls = [...sourceTabEls];
+
+  const selectedSourceTab = sourceTabEls.find(elem => elem.classList.contains("active"));
+  const topOffsets = sourceTabEls.map(el => el.getBoundingClientRect().top);
+  const visibleTabsTopOffset = Math.min(...topOffsets);
+
+  return selectedSourceTab.getBoundingClientRect().top < visibleTabsTopOffset + 10;
+}
+
 export function getHiddenTabs(sourceTabs, sourceTabEls) {
-  sourceTabEls = [].slice.call(sourceTabEls);
+  sourceTabEls = [...sourceTabEls];
   function getTopOffset() {
     const topOffsets = sourceTabEls.map(t => t.getBoundingClientRect().top);
     return Math.min(...topOffsets);
