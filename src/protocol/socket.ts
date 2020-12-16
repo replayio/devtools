@@ -1,5 +1,5 @@
 import { defer, makeInfallible } from "./utils";
-import { ProtocolClient } from "record-replay-protocol/js/client";
+import { ProtocolClient } from "@recordreplay/protocol";
 
 interface Message {
   id: number;

@@ -10,7 +10,7 @@ import {
   paintPoints,
   mouseEvents,
   ScreenShot,
-} from "record-replay-protocol";
+} from "@recordreplay/protocol";
 import { client } from "./socket";
 
 export const screenshotCache = new ScreenshotCache();

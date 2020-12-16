@@ -12,7 +12,7 @@ import {
   ExecutionPoint,
   Location,
   PointDescription,
-} from "record-replay-protocol";
+} from "@recordreplay/protocol";
 import { client, log } from "./socket";
 import { assert, defer } from "./utils";
 import { ThreadFront, ValueFront, Pause } from "./thread";

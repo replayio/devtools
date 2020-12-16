@@ -4,7 +4,7 @@ import {
   SessionId,
   PointDescription,
   Location,
-} from "record-replay-protocol";
+} from "@recordreplay/protocol";
 
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug";

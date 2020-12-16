@@ -1,4 +1,4 @@
-import { ExecutionPoint, SessionId } from "record-replay-protocol";
+import { ExecutionPoint, SessionId } from "@recordreplay/protocol";
 
 export interface User {
   id: string;
