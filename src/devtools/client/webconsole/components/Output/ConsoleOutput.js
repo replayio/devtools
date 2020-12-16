@@ -117,6 +117,23 @@ class ConsoleOutput extends Component {
     (previous || resultNode).scrollIntoView();
   }
 
+  getIsFirstMessageForPoint(index, visibleMessages) {
+    const { messages } = this.props;
+
+    if (index == 0) {
+      return true;
+    }
+
+    let previousMessage = messages.get(visibleMessages[index - 1]);
+    let currentMessage = messages.get(visibleMessages[index]);
+
+    if (!previousMessage || !currentMessage) {
+      return false;
+    }
+
+    return previousMessage.executionPoint !== currentMessage.executionPoint;
+  }
+
   render() {
     let {
       dispatch,
@@ -138,7 +155,7 @@ class ConsoleOutput extends Component {
     });
 
     const pausedMessage = getClosestMessage(visibleMessages, messages, pausedExecutionPoint);
-    const messageNodes = visibleMessages.map(messageId =>
+    const messageNodes = visibleMessages.map((messageId, i) =>
       createElement(MessageContainer, {
         dispatch,
         key: messageId,
@@ -154,6 +171,7 @@ class ConsoleOutput extends Component {
         pausedExecutionPoint,
         getMessage: () => messages.get(messageId),
         isPaused: !!pausedMessage && pausedMessage.id == messageId,
+        isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
       })
     );
 

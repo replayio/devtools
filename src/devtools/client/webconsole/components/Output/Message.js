@@ -145,6 +145,7 @@ class Message extends Component {
       type,
       frame,
       message,
+      isFirstMessageForPoint,
     } = this.props;
 
     if (inWarningGroup || !pausedExecutionPoint || !executionPoint || !frame) {
@@ -171,6 +172,11 @@ class Message extends Component {
       overlayType = "rewind";
       label = "Rewind";
       onClick = onRewindClick;
+    }
+
+    // Handle cases where executionPoint is the same as pauseExecutionPoint.
+    if (!isFirstMessageForPoint) {
+      return;
     } else if (!["command", "result"].includes(type)) {
       overlayType = "debug";
       label = "Debug";
