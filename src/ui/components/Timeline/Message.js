@@ -78,18 +78,6 @@ class Message extends React.Component {
       return null;
     }
 
-    // Check to see if two messages overlay each other on the timeline
-    const distance = getPixelDistance({
-      to: message.executionPointTime,
-      from: previousVisibleMessage?.executionPointTime,
-      overlayWidth,
-      zoom: zoomRegion,
-    });
-
-    if (distance < 2.5) {
-      return null;
-    }
-
     // Check to see if a message appears after the current execution point
     const isFuture =
       getPixelDistance({
