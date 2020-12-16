@@ -167,7 +167,7 @@ function SecondaryToolbox({ initializedPanels, selectedPanel, setSelectedPanel, 
       <header className="secondary-toolbox-header">
         <PanelButtons
           narrowMode={narrowMode}
-          electedPanel={selectedPanel}
+          selectedPanel={selectedPanel}
           setSelectedPanel={setSelectedPanel}
         />
       </header>
