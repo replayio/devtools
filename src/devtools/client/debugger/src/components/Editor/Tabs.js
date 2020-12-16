@@ -87,7 +87,6 @@ class Tabs extends PureComponent {
       this.updateHiddenTabs();
     }
 
-    console.log(selectedSource);
     // Newly-selected sources are added to the end of the tabs order. This becomes a problem
     // if we have hidden tabs, because the source text would be shown but the tab is hidden.
     // This makes sure that in cases where we have hidden tabs, we add the newly-selected source
