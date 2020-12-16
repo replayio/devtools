@@ -11,7 +11,7 @@ import { connect } from "../../utils/connect";
 import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
 import { isVisible } from "../../utils/ui";
 
-import { getHiddenTabs } from "../../utils/tabs";
+import { getHiddenTabs, getLastVisibleTab, getSelectedSourceIsVisible } from "../../utils/tabs";
 import { getFilename, isPretty, getFileURL } from "../../utils/source";
 import actions from "../../actions";
 
@@ -85,6 +85,14 @@ class Tabs extends PureComponent {
     ) {
       this.updateHiddenTabs();
     }
+
+    // Newly-selected sources are added to the end of the tabs order. This becomes a problem
+    // if we have hidden tabs, because the source text would be shown but the tab is hidden.
+    // This makes sure that in cases where we have hidden tabs, we add the newly-selected source
+    // so that it's the last visible tab to the right.
+    if (this.props.selectedSource !== prevProps.selectedSource) {
+      this.ensureSelectedSourceIsVisible();
+    }
   }
 
   componentDidMount() {
@@ -92,8 +100,7 @@ class Tabs extends PureComponent {
       window.requestIdleCallback(this.updateHiddenTabs);
     }
 
-    document.addEventListener("resize", this.onResize);
-
+    window.addEventListener("resize", this.onResize);
     document.querySelector(".editor-pane").addEventListener("resizeend", this.onResize);
   }
 
@@ -101,6 +108,22 @@ class Tabs extends PureComponent {
     document.removeEventListener("resize", this.onResize);
 
     document.querySelector(".editor-pane").removeEventListener("resizeend", this.onResize);
+  }
+
+  ensureSelectedSourceIsVisible() {
+    const { selectedSource, moveTabBySourceId } = this.props;
+    const sourceTabEls = this.refs.sourceTabs.children;
+
+    if (getSelectedSourceIsVisible(sourceTabEls)) {
+      return;
+    }
+
+    const lastVisibleTab = getLastVisibleTab(sourceTabEls);
+    const lastVisibleTabIndex = [...sourceTabEls].findIndex(elem => elem === lastVisibleTab);
+
+    // Place the newly-selected source right before the last visible tab. This way, the last visible
+    // tab in the editor tabs becomes the newly-selected source.
+    moveTabBySourceId(selectedSource.id, lastVisibleTabIndex);
   }
 
   /*
