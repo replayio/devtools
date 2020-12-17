@@ -73,7 +73,9 @@ function ItemPageDetails({ title, url, handleClickUrl }) {
   return (
     <div className="page">
       <div className="page-title">{title || "No page title found"}</div>
-      <div className="page-url" onClick={handleClickUrl}>{url}</div>
+      <div className="page-url" onClick={handleClickUrl}>
+        {url}
+      </div>
     </div>
   );
 }
