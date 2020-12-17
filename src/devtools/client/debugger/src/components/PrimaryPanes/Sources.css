@@ -20,11 +20,15 @@
   flex-direction: column;
   overflow-x: auto;
   overflow-y: hidden;
+}
+
+div.sources-pane {
   height: 100%;
 }
 
 .sources-pane.expanded {
   flex: 1;
+  height: 100%;
 }
 
 .sources-list .img.blackBox {
