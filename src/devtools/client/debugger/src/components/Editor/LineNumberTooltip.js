@@ -25,10 +25,19 @@ export function LineNumberTooltip({
   setHoveredLineNumberLocation,
 }) {
   const [lineNumberNode, setLineNumberNode] = useState(null);
+  const lastHoveredLineNumber = useRef(null);
 
   const setHoveredLineNumber = ({ targetNode, lineNumber }) => {
+    // The gutter re-renders when we click the line number to add
+    // a breakpoint. That triggers a second gutterLineEnter event
+    // for the same line number. In that case, we shouldn't run
+    // the analysis again.
+    if (lineNumber !== lastHoveredLineNumber.current) {
+      runAnalysisOnLine(cx, lineNumber);
+      lastHoveredLineNumber.current = lineNumber;
+    }
+
     setLineNumberNode(targetNode);
-    runAnalysisOnLine(cx, lineNumber);
   };
   const clearHoveredLineNumber = () => {
     setLineNumberNode(null);
