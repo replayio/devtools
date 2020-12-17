@@ -26,9 +26,13 @@
 }
 
 .outlines-pane {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  overflow-y: hidden;
+}
+
+.outlines-pane.expanded {
+  flex: 1;
 }
 
 .outline-pane-info {
