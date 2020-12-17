@@ -231,3 +231,7 @@
   background: var(--theme-body-color);
   margin: auto;
 }
+
+.page-url:hover {
+  color: var(--dark-blue) !important;
+}

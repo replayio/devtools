@@ -107,8 +107,8 @@ function DashboardViewerContentHeader({
         <input type="checkbox" onChange={handleHeaderCheckboxClick} checked={selectedIds.length} />
       </th>
       <th>PREVIEW</th>
-      <th>TITLE</th>
       <th>PAGE TITLE</th>
+      <th>REPLAY</th>
       <th>DURATION</th>
       <th className="sorter" onClick={() => setAscOrder(!ascOrder)}>
         <span className="label">CREATED</span>
