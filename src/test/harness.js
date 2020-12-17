@@ -279,6 +279,7 @@ async function warpToMessage(text) {
   const warpButton = msg.querySelector(".rewind") || msg.querySelector(".fast-forward");
   warpButton.click();
   await waitForPaused();
+  assert(msg.classList.contains("paused"));
 }
 
 function checkPausedMessage(text) {

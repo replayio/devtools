@@ -8,7 +8,6 @@ const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
 const actions = require("devtools/client/webconsole/actions/index");
 const ReactDOM = require("react-dom");
-
 const {
   getAllMessagesById,
   getAllMessagesUiById,
@@ -49,12 +48,19 @@ function getClosestMessage(visibleMessages, messages, executionPoint) {
 
   for (const id of visibleMessages) {
     const msg = messages.get(id);
+
+    // Skip evaluations, which will always occur at the same evaluation point as
+    // a logpoint or log
+    if (msg.type == MESSAGE_TYPE.COMMAND || msg.type == MESSAGE_TYPE.RESULT) {
+      continue;
+    }
+
     const point = messageExecutionPoint(msg);
     if (point && pointPrecedes(executionPoint, point)) {
       break;
-    } else if (point === executionPoint && msg.type === MESSAGE_TYPE.LOG_POINT) {
-      last = msg;
     }
+
+    last = msg;
   }
 
   return last;
