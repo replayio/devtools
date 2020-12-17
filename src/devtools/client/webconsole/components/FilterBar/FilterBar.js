@@ -5,7 +5,7 @@
 
 // React & Redux
 const React = require("react");
-const { Component, createFactory, useState } = React;
+const { Component, createFactory } = React;
 const { connect } = require("react-redux");
 const dom = require("react-dom-factories");
 
@@ -13,16 +13,15 @@ const dom = require("react-dom-factories");
 const actions = require("devtools/client/webconsole/actions/index");
 
 // Selectors
-const { getAllFilters } = require("devtools/client/webconsole/selectors/filters");
 const { getFilteredMessagesCount } = require("devtools/client/webconsole/selectors/messages");
 const { getAllUi } = require("devtools/client/webconsole/selectors/ui");
+const { getAllMessagesById } = require("devtools/client/webconsole/selectors/messages");
 
 // Utilities
-const { l10n } = require("devtools/client/webconsole/utils/messages");
 const { PluralForm } = require("devtools/shared/plural-form");
 
 // Constants
-const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
+const { FILTERBAR_DISPLAY_MODES, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 
 // Additional Components
 const { Events } = require("devtools/client/webconsole/components/FilterBar/Events");
@@ -39,6 +38,7 @@ class FilterBar extends Component {
       displayMode: PropTypes.oneOf([...Object.values(FILTERBAR_DISPLAY_MODES)]).isRequired,
       filteredMessagesCount: PropTypes.object.isRequired,
       timestampsVisible: PropTypes.bool.isRequired,
+      allMessagesById: PropTypes.object,
     };
   }
 
@@ -66,7 +66,7 @@ class FilterBar extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const { displayMode, filteredMessagesCount, timestampsVisible } = this.props;
+    const { displayMode, filteredMessagesCount, timestampsVisible, allMessagesById } = this.props;
 
     if (
       nextProps.displayMode !== displayMode ||
@@ -76,6 +76,10 @@ class FilterBar extends Component {
     }
 
     if (JSON.stringify(nextProps.filteredMessagesCount) !== JSON.stringify(filteredMessagesCount)) {
+      return true;
+    }
+
+    if (nextProps.allMessagesById !== allMessagesById) {
       return true;
     }
 
@@ -136,11 +140,22 @@ class FilterBar extends Component {
   }
 
   renderClearButton() {
-    const { messagesClearEvaluations } = this.props;
+    const { messagesClearEvaluations, allMessagesById } = this.props;
+    let messagesExist = false;
+
+    // Get all messages related to evaluations and determine whether or not we
+    // have any, if we don't we want to disable the trash button
+    for (const [id, message] of allMessagesById) {
+      if (message.type === MESSAGE_TYPE.COMMAND || message.type === MESSAGE_TYPE.RESULT) {
+        messagesExist = true;
+        break;
+      }
+    }
 
     return dom.button({
       className: "devtools-button devtools-clear-icon",
-      title: "Clear the Web Console output",
+      title: messagesExist ? "Clear the Web Console output" : "No outputs to clear",
+      disabled: !messagesExist,
       onClick: messagesClearEvaluations,
     });
   }
@@ -185,7 +200,6 @@ class FilterBar extends Component {
   render() {
     const { displayMode } = this.props;
 
-    const isNarrow = displayMode === FILTERBAR_DISPLAY_MODES.NARROW;
     const isWide = displayMode === FILTERBAR_DISPLAY_MODES.WIDE;
 
     const separator = this.renderSeparator();
@@ -227,6 +241,7 @@ function mapStateToProps(state) {
   return {
     filteredMessagesCount: getFilteredMessagesCount(state),
     timestampsVisible: uiState.timestampsVisible,
+    allMessagesById: getAllMessagesById(state),
   };
 }
 

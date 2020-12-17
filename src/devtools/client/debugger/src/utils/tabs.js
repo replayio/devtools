@@ -34,7 +34,7 @@ export function getSelectedSourceIsVisible(sourceTabEls) {
   const topOffsets = sourceTabEls.map(el => el.getBoundingClientRect().top);
   const visibleTabsTopOffset = Math.min(...topOffsets);
 
-  return selectedSourceTab.getBoundingClientRect().top < visibleTabsTopOffset + 10;
+  return selectedSourceTab?.getBoundingClientRect().top < visibleTabsTopOffset + 10;
 }
 
 export function getHiddenTabs(sourceTabs, sourceTabEls) {
@@ -58,7 +58,7 @@ export function getHiddenTabs(sourceTabs, sourceTabEls) {
 }
 
 export function getFramework(tabs, url) {
-  const tab = tabs.find(t => t.url === url);
+  const tab = tabs.find(t => t?.url === url);
 
   if (tab) {
     return tab.framework;
@@ -127,12 +127,12 @@ export function getTabMenuItems() {
 }
 
 export function isSimilarTab(tab, url, isOriginal) {
-  return tab.url === url && tab.isOriginal === isOriginal;
+  return tab?.url === url && tab.isOriginal === isOriginal;
 }
 
 export function persistTabs(tabs) {
   return [...tabs]
-    .filter(tab => tab.url)
+    .filter(tab => tab?.url)
     .map(tab => {
       const newTab = { ...tab };
       newTab.sourceId = null;

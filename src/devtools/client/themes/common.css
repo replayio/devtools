@@ -493,6 +493,18 @@ checkbox:-moz-focusring {
   right: 0;
 }
 
+.devtools-clear-icon {
+  cursor: pointer;
+}
+
+.devtools-clear-icon[disabled] {
+  cursor: auto;
+}
+
+.devtools-clear-icon[disabled]:hover {
+  cursor: auto;
+  background-color: transparent;
+}
 /* Text input */
 
 .devtools-textinput,
