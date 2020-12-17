@@ -78,7 +78,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
           vert={false}
           startPanel={
             <div id="outer-viewer">
-              <div id="viewer">
+              <div id="viewer" onClick={() => {}}>
                 <canvas id="graphics"></canvas>
                 <div id="highlighter-root"></div>
               </div>

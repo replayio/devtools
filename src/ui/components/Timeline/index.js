@@ -8,25 +8,18 @@
 // graphics are currently being rendered.
 
 import { connect } from "react-redux";
-import classnames from "classnames";
 import { Component } from "react";
 import React from "react";
 import dom from "react-dom-factories";
-import { log } from "protocol/socket";
 
 import ScrollContainer from "./ScrollContainer";
 import Comments from "../Comments";
 
 const {
   mostRecentPaintOrMouseEvent,
-  nextPaintOrMouseEvent,
   nextPaintEvent,
   previousPaintEvent,
-  getGraphicsAtTime,
-  paintGraphics,
 } = require("protocol/graphics");
-
-const { assert } = require("protocol/utils");
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
@@ -158,10 +151,13 @@ export class Timeline extends Component {
   }
 
   onMarkerClick = (e, message) => {
+    const { seek } = this.props;
+    const { executionPoint, executionPointTime, executionPointHasFrames, pauseId } = message;
+
     e.preventDefault();
     e.stopPropagation();
-    const { executionPoint, executionPointTime, executionPointHasFrames, pauseId } = message;
-    this.seek(executionPoint, executionPointTime, executionPointHasFrames, pauseId);
+
+    seek(executionPoint, executionPointTime, executionPointHasFrames, pauseId);
     this.showMessage(message);
   };
 
@@ -214,44 +210,20 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseUp = e => {
-    const { hoverTime } = this.props;
+    const { hoverTime, seek } = this.props;
     const { hoveringOverMarker } = this.state;
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != null && !hoveringOverMarker) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
       if (event) {
-        this.seek(event.point, mouseTime);
+        seek(event.point, mouseTime);
       }
     }
   };
 
-  seek(point, time, hasFrames, pauseId) {
-    if (!point) {
-      return null;
-    }
-    return this.props.seek(point, time, hasFrames, pauseId);
-  }
-
-  seekTime(targetTime) {
-    if (targetTime == null) {
-      return null;
-    }
-
-    const event = mostRecentPaintOrMouseEvent(targetTime);
-
-    if (event) {
-      // Seek to the exact time provided, even if it does not match up with a
-      // paint event. This can cause some slight UI weirdness: resumes done in
-      // the debugger will be relative to the point instead of the time,
-      // so e.g. running forward could land at a point before the time itself.
-      // This could be fixed but doesn't seem worth worrying about for now.
-      this.seek(event.point, targetTime);
-    }
-  }
-
   goToNextPaint() {
-    const { currentTime } = this.props;
+    const { currentTime, seekTime } = this.props;
     if (currentTime == this.zoomStartTime) {
       return;
     }
@@ -261,11 +233,11 @@ export class Timeline extends Component {
       return;
     }
 
-    this.seekTime(Math.max(previous.time, this.zoomStartTime));
+    seekTime(Math.max(previous.time, this.zoomStartTime));
   }
 
   goToPrevPaint() {
-    const { currentTime } = this.props;
+    const { currentTime, seekTime } = this.props;
     if (currentTime == this.zoomEndTime) {
       return;
     }
@@ -275,130 +247,18 @@ export class Timeline extends Component {
       return;
     }
 
-    this.seekTime(Math.min(next.time, this.zoomEndTime));
-  }
-
-  /**
-   * Playback the recording segment from `startTime` to `endTime`.
-   * Optionally a `pauseTarget` may be given that will be seeked to after finishing playback.
-   */
-  async playback(startTime, endTime, pauseTarget) {
-    if (pauseTarget) {
-      assert(endTime <= pauseTarget.time);
-    }
-
-    let startDate = Date.now();
-    let currentDate = startDate;
-    let currentTime = startTime;
-    let nextGraphicsTime;
-    let nextGraphicsPromise;
-
-    const prepareNextGraphics = () => {
-      nextGraphicsTime = nextPaintOrMouseEvent(currentTime)?.time || this.zoomEndTime;
-      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
-    };
-
-    prepareNextGraphics();
-
-    while (this.props.playback) {
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      if (!this.props.playback) {
-        return;
-      }
-
-      currentDate = Date.now();
-      currentTime = startTime + (currentDate - startDate);
-
-      if (currentTime > endTime) {
-        log(`FinishPlayback`);
-        if (pauseTarget) {
-          this.seek(pauseTarget.point, pauseTarget.time, !!pauseTarget.frame);
-        } else {
-          this.seekTime(endTime);
-        }
-        this.props.setTimelineState({ currentTime: endTime, playback: null });
-        return;
-      }
-
-      this.props.setTimelineState({
-        currentTime,
-        playback: { startTime, startDate, pauseTarget, time: currentTime },
-      });
-
-      if (currentTime >= nextGraphicsTime) {
-        const { screen, mouse } = await nextGraphicsPromise;
-        if (!this.props.playback) {
-          return;
-        }
-
-        // playback may have stalled waiting for `nextGraphicsPromise` and would jump
-        // in the next iteration in order to catch up. To avoid jumps of more than
-        // 100 milliseconds, we reset `startTime` and `startDate` as if playback had
-        // been started right now
-        if (Date.now() - currentDate > 100) {
-          startTime = currentTime;
-          startDate = Date.now();
-          this.props.setTimelineState({
-            currentTime,
-            playback: { startTime, startDate, pauseTarget, time: currentTime },
-          });
-        }
-
-        if (screen) {
-          paintGraphics(screen, mouse);
-        }
-        prepareNextGraphics();
-      }
-    }
-  }
-
-  async startPlayback() {
-    log(`StartPlayback`);
-
-    const { currentTime } = this.props;
-
-    const startDate = Date.now();
-
-    let startTime = currentTime;
-    let startPoint = this.threadFront.currentPoint;
-
-    if (currentTime == this.zoomEndTime) {
-      startTime = this.zoomStartTime;
-      const startEvent = mostRecentPaintOrMouseEvent(startTime);
-      startPoint = startEvent ? startEvent.point : "0";
-    }
-
-    this.props.setTimelineState({
-      playback: { startTime, startDate },
-      currentTime: startTime,
-    });
-
-    const pauseTarget = await this.threadFront.resumeTarget(startPoint);
-
-    if (!this.props.playback) {
-      return;
-    }
-
-    const endTime = pauseTarget ? Math.min(pauseTarget.time, this.zoomEndTime) : this.zoomEndTime;
-    this.playback(startTime, endTime, pauseTarget);
-  }
-
-  stopPlayback() {
-    log(`StopPlayback`);
-
-    if (this.props.playback) {
-      this.seekTime(this.props.playback.time);
-    }
-    this.props.setTimelineState({ playback: null });
+    seekTime(Math.min(next.time, this.zoomEndTime));
   }
 
   replayPlayback = () => {
-    this.seekTime(0);
-    this.startPlayback();
+    const { startPlayback, seekTime } = this.props;
+
+    seekTime(0);
+    startPlayback();
   };
 
   renderCommands() {
-    const { playback, recordingDuration, currentTime } = this.props;
+    const { playback, recordingDuration, currentTime, startPlayback, stopPlayback } = this.props;
 
     if (currentTime == recordingDuration) {
       return (
@@ -410,7 +270,7 @@ export class Timeline extends Component {
 
     return (
       <div className="commands">
-        <button onClick={() => (playback ? this.stopPlayback() : this.startPlayback())}>
+        <button onClick={() => (playback ? stopPlayback() : startPlayback())}>
           {playback ? <div className="img pause-circle" /> : <div className="img play-circle-lg" />}
         </button>
       </div>
@@ -621,5 +481,8 @@ export default connect(
     setTimelineState: actions.setTimelineState,
     updateTimelineDimensions: actions.updateTimelineDimensions,
     seek: actions.seek,
+    seekTime: actions.seekTime,
+    startPlayback: actions.startPlayback,
+    stopPlayback: actions.stopPlayback,
   }
 )(Timeline);

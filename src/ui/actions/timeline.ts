@@ -1,4 +1,10 @@
-import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
+import {
+  ExecutionPoint,
+  PauseId,
+  RecordingId,
+  TimeStampedPoint,
+  PauseDescription,
+} from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
 import { selectors } from "../reducers";
 import {
@@ -7,12 +13,16 @@ import {
   getGraphicsAtTime,
   paintGraphics,
   mostRecentPaintOrMouseEvent,
+  nextPaintOrMouseEvent,
   getMostRecentPaintPoint,
 } from "protocol/graphics";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion } from "ui/state/timeline";
+
+const { assert } = require("protocol/utils");
+import { log } from "protocol/socket";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -181,7 +191,7 @@ export function setZoomRegion(region: ZoomRegion): SetZoomRegionAction {
 export function seek(
   point: ExecutionPoint,
   time: number,
-  hasFrames: boolean,
+  hasFrames?: boolean,
   pauseId?: PauseId
 ): UIThunkAction {
   return () => {
@@ -200,4 +210,157 @@ export function highlightLocation(location: Location) {
 
 export function unhighlightLocation() {
   return { type: "set_timeline_state", state: { highlightedLocation: null } };
+}
+
+/**
+ * Playback the recording segment from `startTime` to `endTime`.
+ * Optionally a `pauseTarget` may be given that will be seeked to after finishing playback.
+ */
+function playback(
+  startTime: number,
+  endTime: number,
+  pauseTarget: PauseDescription
+): UIThunkAction {
+  return async ({ dispatch, getState }) => {
+    if (pauseTarget) {
+      assert(endTime <= pauseTarget.time);
+    }
+
+    let startDate = Date.now();
+    let currentDate = startDate;
+    let currentTime = startTime;
+    let nextGraphicsTime;
+    let nextGraphicsPromise;
+
+    const prepareNextGraphics = () => {
+      const { endTime } = selectors.getZoomRegion(getState());
+      nextGraphicsTime = nextPaintOrMouseEvent(currentTime)?.time || endTime;
+      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
+    };
+
+    prepareNextGraphics();
+
+    while (playback) {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+
+      let playback = selectors.getPlayback(getState());
+      if (!playback) {
+        return;
+      }
+
+      currentDate = Date.now();
+      currentTime = startTime + (currentDate - startDate);
+
+      if (currentTime > endTime) {
+        log(`FinishPlayback`);
+        if (pauseTarget) {
+          const { point, time, frame } = pauseTarget;
+          dispatch(seek(point, time, !!frame));
+        } else {
+          dispatch(seekTime(endTime));
+        }
+        dispatch(setTimelineState({ currentTime: endTime, playback: null }));
+        return;
+      }
+
+      dispatch(
+        setTimelineState({
+          currentTime,
+          playback: { startTime, startDate, pauseTarget, time: currentTime },
+        })
+      );
+
+      if (nextGraphicsTime && currentTime >= nextGraphicsTime) {
+        await nextGraphicsPromise;
+
+        if (!nextGraphicsPromise) {
+          return;
+        }
+
+        const { screen, mouse } = nextGraphicsPromise;
+
+        if (!playback) {
+          return;
+        }
+
+        // Playback may have stalled waiting for `nextGraphicsPromise` and would jump
+        // in the next iteration in order to catch up. To avoid jumps of more than
+        // 100 milliseconds, we reset `startTime` and `startDate` as if playback had
+        // been started right now
+        if (Date.now() - currentDate > 100) {
+          startTime = currentTime;
+          startDate = Date.now();
+          dispatch(
+            setTimelineState({
+              currentTime,
+              playback: { startTime, startDate, pauseTarget, time: currentTime },
+            })
+          );
+        }
+
+        if (screen) {
+          paintGraphics(screen, mouse);
+        }
+        prepareNextGraphics();
+      }
+    }
+  };
+}
+
+export function startPlayback(): UIThunkAction {
+  return async ({ dispatch, getState }) => {
+    log(`StartPlayback`);
+
+    const currentTime = selectors.getCurrentTime(getState());
+    const startDate = Date.now();
+    let startTime = currentTime;
+    let startPoint = ThreadFront.currentPoint;
+
+    dispatch(
+      setTimelineState({
+        playback: { startTime, startDate },
+        currentTime: startTime,
+      })
+    );
+
+    const pauseTarget = await ThreadFront.resumeTarget(startPoint);
+
+    const zoomRegion = selectors.getZoomRegion(getState());
+    const zoomEndTime = zoomRegion.endTime;
+    const endTime = pauseTarget ? Math.min(pauseTarget.time, zoomEndTime) : zoomEndTime;
+
+    dispatch(playback(startTime, endTime, pauseTarget));
+  };
+}
+
+export function stopPlayback(): UIThunkAction {
+  return ({ dispatch, getState }) => {
+    log(`StopPlayback`);
+    const playback = selectors.getPlayback(getState());
+
+    if (playback) {
+      dispatch(seekTime(playback.time));
+    }
+
+    dispatch(setTimelineState({ playback: null }));
+  };
+}
+
+export function seekTime(targetTime: number): UIThunkAction {
+  return ({ dispatch }) => {
+    if (targetTime == null) {
+      return null;
+    }
+
+    const event = mostRecentPaintOrMouseEvent(targetTime);
+
+    if (event) {
+      // Seek to the exact time provided, even if it does not match up with a
+      // paint event. This can cause some slight UI weirdness: resumes done in
+      // the debugger will be relative to the point instead of the time,
+      // so e.g. running forward could land at a point before the time itself.
+      // This could be fixed but doesn't seem worth worrying about for now.
+      dispatch(seek(event.point, targetTime));
+    }
+  };
 }
