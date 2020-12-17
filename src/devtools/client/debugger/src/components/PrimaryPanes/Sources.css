@@ -20,6 +20,7 @@
   flex-direction: column;
   overflow-x: auto;
   overflow-y: hidden;
+  height: 100%;
 }
 
 .sources-pane.expanded {
@@ -34,11 +35,14 @@
 .sources-list {
   flex: 1;
   display: flex;
+  height: 100%;
 }
 
 .sources-list .managed-tree {
   flex: 1;
   display: flex;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .sources-list .managed-tree .tree {
