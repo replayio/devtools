@@ -3,11 +3,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const { Component, createElement } = require("react");
-const dom = require("react-dom-factories");
-const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
-const actions = require("devtools/client/webconsole/actions/index");
-const ReactDOM = require("react-dom");
+import { Component, createElement } from "react";
+import dom from "react-dom-factories";
+import PropTypes from "prop-types";
+
+import { connect } from "react-redux";
+import ReactDOM from "react-dom";
+import { actions } from "ui/actions/index";
+import { selectors } from "ui/reducers";
+
+import { MessageContainer } from "devtools/client/webconsole/components/Output/MessageContainer";
+import { pointPrecedes } from "protocol/execution-point-utils";
+import { MESSAGE_TYPE } from "devtools/client/webconsole/constants";
+
 const {
   getAllMessagesById,
   getAllMessagesUiById,
@@ -16,15 +24,7 @@ const {
   getPausedExecutionPoint,
   getAllWarningGroupsById,
   isMessageInWarningGroup,
-} = require("devtools/client/webconsole/selectors/messages");
-
-const PropTypes = require("prop-types");
-const {
-  MessageContainer,
-} = require("devtools/client/webconsole/components/Output/MessageContainer");
-const { pointPrecedes } = require("protocol/execution-point-utils");
-
-const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
+} = selectors;
 
 function messageExecutionPoint(msg) {
   const { executionPoint, lastExecutionPoint } = msg;
@@ -218,4 +218,4 @@ const mapDispatchToProps = dispatch => ({
   dispatch,
 });
 
-module.exports = connect(mapStateToProps, mapDispatchToProps)(ConsoleOutput);
+export default connect(mapStateToProps, mapDispatchToProps)(ConsoleOutput);

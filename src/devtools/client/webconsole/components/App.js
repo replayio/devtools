@@ -5,11 +5,11 @@
 
 const React = require("react");
 const PropTypes = require("prop-types");
-const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
+const { connect } = require("react-redux");
 const { FILTERBAR_DISPLAY_MODES } = require("devtools/client/webconsole/constants");
 
 // We directly require Components that we know are going to be used right away
-const ConsoleOutput = require("devtools/client/webconsole/components/Output/ConsoleOutput");
+const ConsoleOutput = require("devtools/client/webconsole/components/Output/ConsoleOutput").default;
 const FilterBar = require("devtools/client/webconsole/components/FilterBar/FilterBar").default;
 const JSTerm = require("devtools/client/webconsole/components/Input/JSTerm").default;
 
