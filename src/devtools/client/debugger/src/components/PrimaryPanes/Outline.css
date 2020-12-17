@@ -25,6 +25,12 @@
   height: 28px;
 }
 
+.outlines-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .outline-pane-info {
   padding: 0.5em;
   width: 100%;

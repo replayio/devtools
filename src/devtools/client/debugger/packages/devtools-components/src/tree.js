@@ -753,9 +753,9 @@ class Tree extends Component {
           return closestScrolledParent(node.parentNode);
         };
 
-        const parentElem = document.querySelector(".debugger .controlled");
-        const scrolledParentRect = parentElem.getBoundingClientRect();
-        const isVisible = top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom;
+        const scrolledParentRect = treeElement?.getBoundingClientRect();
+        const isVisible =
+          !treeElement || (top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom);
 
         if (isVisible) {
           return;
