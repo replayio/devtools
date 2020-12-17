@@ -44,14 +44,6 @@ class PanelEditor extends PureComponent {
     toggleEditingOff();
   };
 
-  handleInputBlur = () => {
-    setTimeout(() => {
-      if (this.panelEditorNode && !this.panelEditorNode.contains(document.activeElement)) {
-        this.handleCancel();
-      }
-    }, 500);
-  };
-
   onEnter = () => {
     this.handleSave();
   };
@@ -93,7 +85,6 @@ class PanelEditor extends PureComponent {
             autofocus={inputToFocus == "logValue"}
             defaultValue={logValue}
             onChange={cm => this.setState({ logValue: cm.getValue().trim() })}
-            onBlur={this.handleInputBlur}
             onEnter={this.onEnter}
             onEscape={this.onEscape}
           />
@@ -106,7 +97,6 @@ class PanelEditor extends PureComponent {
               autofocus={inputToFocus == "condition"}
               defaultValue={conditionValue}
               onChange={cm => this.setState({ conditionValue: cm.getValue().trim() })}
-              onBlur={this.handleInputBlur}
               onEnter={this.onEnter}
               onEscape={this.onEscape}
             />
