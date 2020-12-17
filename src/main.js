@@ -29,6 +29,7 @@ const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { DevToolsToolbox } = require("ui/utils/devtools-toolbox");
 const { setupThreadEventListeners } = require("devtools/client/webconsole/actions/messages");
+const { createSession } = require("ui/actions/session");
 
 let initialized = false;
 async function initialize() {
@@ -39,7 +40,7 @@ async function initialize() {
   initSocket(dispatch);
 
   if (recordingId) {
-    createSession();
+    createSession(store, recordingId);
   }
 
   document.body.addEventListener("contextmenu", e => e.preventDefault());
