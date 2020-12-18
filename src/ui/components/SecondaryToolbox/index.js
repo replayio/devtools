@@ -7,6 +7,7 @@ import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 const RulesApp = require("devtools/client/inspector/rules/components/RulesApp");
+import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
 
 import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
@@ -93,7 +94,7 @@ function InspectorPanel({ initializedPanels }) {
     computedPanel = {
       id: "computedview",
       title: "Computed",
-      panel: inspector._inspector.getPanel("computedview").provider,
+      panel: <ComputedApp />,
     };
   }
   return (
