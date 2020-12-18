@@ -17,4 +17,7 @@ Test.describe(`Test basic console time warping functionality.`, async () => {
 
   await Test.warpToMessage("window.foo is undefined");
   await Test.reverseStepOverToLine(7);
+
+  await Test.warpToMessage("superclass");
+  await Test.reverseStepOverToLine(40);
 });
