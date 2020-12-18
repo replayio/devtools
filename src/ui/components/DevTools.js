@@ -23,19 +23,6 @@ const GET_RECORDING = gql`
     }
   }
 `;
-// const GET_COMMENTS = gql`
-//   query GetCommentsBig($recordingId: uuid) {
-//     comments(where: { recording_id: { _eq: $recordingId } }) {
-//       id
-//       content
-//       created_at
-//       recording_id
-//       user_id
-//       updated_at
-//       time
-//     }
-//   }
-// `;
 
 function getUploadingMessage(uploading) {
   if (!uploading) {
@@ -81,9 +68,6 @@ function DevTools({
   const { data, loading: queryIsLoading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
   });
-  // const { data: data2, loading: commentsIsLoading } = useQuery(GET_COMMENTS, {
-  //   variables: { recordingId },
-  // });
 
   useEffect(() => {
     if (recordingLoaded) {
@@ -137,7 +121,6 @@ export default connect(
   state => ({
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
-    hasFocusedComment: selectors.hasFocusedComment(state),
     recordingDuration: selectors.getRecordingDuration(state),
     sessionId: selectors.getSessionId(state),
     recordingId: selectors.getRecordingId(state),
@@ -148,7 +131,6 @@ export default connect(
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,
-    unfocusComment: actions.unfocusComment,
     setExpectedError: actions.setExpectedError,
   }
 )(DevTools);

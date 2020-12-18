@@ -25,7 +25,7 @@ const DELETE_COMMENT = gql`
   }
 `;
 
-function CommentEditor({ comment, stopEditing, unfocusComment, setFocusedCommentId }) {
+function CommentEditor({ comment, stopEditing, setFocusedCommentId }) {
   const [inputValue, setInputValue] = useState(comment.content);
   const textareaNode = useRef(null);
   const [updateCommentContent] = useMutation(UPDATE_COMMENT_CONTENT, {

@@ -45,8 +45,8 @@ class Comment extends React.Component {
   };
 
   deleteComment = () => {
-    const { removeComment, unfocusComment, comment } = this.props;
-    unfocusComment();
+    const { removeComment, setFocusedCommentId, comment } = this.props;
+    setFocusedCommentId(null);
     removeComment(comment);
   };
 
@@ -108,7 +108,7 @@ class Comment extends React.Component {
       zoomRegion,
       timelineDimensions,
       focusedCommentId,
-      unfocusComment,
+      setFocusedCommentId,
     } = this.props;
     const commentWidth = 280;
     const shouldCollapse = focusedCommentId !== comment.id;
@@ -136,7 +136,7 @@ class Comment extends React.Component {
     return (
       <div>
         <CommentMarker comment={comment} />
-        <div className="app-mask" onClick={unfocusComment} />
+        <div className="app-mask" onClick={() => setFocusedCommentId(null)} />
         <div
           className={classnames("comment")}
           style={{
@@ -160,6 +160,6 @@ export default connect(
   }),
   {
     removeComment: actions.removeComment,
-    unfocusComment: actions.unfocusComment,
+    setFocusedCommentId: actions.setFocusedCommentId,
   }
 )(Comment);

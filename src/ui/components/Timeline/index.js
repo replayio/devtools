@@ -553,15 +553,6 @@ export class Timeline extends Component {
     });
   }
 
-  renderComments() {
-    return (
-      <>
-        {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
-        <Comments />
-      </>
-    );
-  }
-
   render() {
     const { loaded, currentTime } = this.props;
     const percent = this.getVisiblePosition(currentTime) * 100;

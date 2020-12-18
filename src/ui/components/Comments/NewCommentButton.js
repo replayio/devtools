@@ -35,7 +35,6 @@ function NewCommentButton({
   const [addComment] = useMutation(ADD_COMMENT, {
     onCompleted: data => {
       const id = getId(data);
-      console.log("done!", { data, id });
       setFocusedCommentId(id);
     },
     refetchQueries: ["GetComments"],
