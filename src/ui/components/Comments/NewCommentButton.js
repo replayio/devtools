@@ -5,24 +5,9 @@ import { connect } from "react-redux";
 import { getMarkerLeftOffset } from "ui/utils/timeline";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { gql, useMutation } from "@apollo/client";
+import hooks from "ui/hooks";
 
 const markerWidth = 19;
-
-const ADD_COMMENT = gql`
-  mutation MyMutation($object: comments_insert_input! = {}) {
-    insert_comments_one(object: $object) {
-      id
-    }
-  }
-`;
-
-function getId(data) {
-  const keysArray = Object.keys(data);
-  const actualData = keysArray.reduce((acc, key) => [...acc, data[key]], []);
-
-  return actualData[0].id;
-}
 
 function NewCommentButton({
   timelineDimensions,
@@ -33,13 +18,7 @@ function NewCommentButton({
   setFocusedCommentId,
   comments,
 }) {
-  const [addComment] = useMutation(ADD_COMMENT, {
-    onCompleted: data => {
-      const id = getId(data);
-      setFocusedCommentId(id);
-    },
-    refetchQueries: ["GetComments"],
-  });
+  const addComment = hooks.useAddComment(setFocusedCommentId);
 
   // Skip rendering the button if any of the following applies:
   // - There is already a comment at that time.
@@ -51,17 +30,6 @@ function NewCommentButton({
   }
 
   const handleClick = () => {
-    // const logger = {
-    //   point: ThreadFront.currentPoint,
-    //   hasFrames: ThreadFront.currentPointHasFrames,
-    // };
-    const logger = {
-      point: typeof ThreadFront.currentPoint,
-      hasFrames: typeof ThreadFront.currentPointHasFrames,
-    };
-
-    console.log(logger);
-
     const newComment = {
       content: "",
       recording_id: recordingId,
@@ -69,6 +37,7 @@ function NewCommentButton({
       point: ThreadFront.currentPoint,
       has_frames: ThreadFront.currentPointHasFrames,
     };
+
     addComment({
       variables: { object: newComment },
     });
@@ -99,7 +68,6 @@ export default connect(
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
     focusedCommentId: selectors.getFocusedCommentId(state),
-    // comments: selectors.getComments(state),
   }),
   {
     setFocusedCommentId: actions.setFocusedCommentId,

@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
-import { sortBy } from "lodash";
-// import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import hooks from "ui/hooks";
+import { sortBy } from "lodash";
 
 import Comment from "ui/components/SecondaryToolbox/Comment";
 import "./CommentsPanel.css";
@@ -13,22 +11,12 @@ import "./CommentsPanel.css";
 function CommentsPanel({ recordingId }) {
   const { comments, loading, error } = hooks.useGetComments(recordingId);
 
-  if (loading) {
-    console.log("nope, still loading");
-    return (
-      <div className="comments-panel">
-        <p>Comments are loading</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    console.log("nope, still loading");
-    return (
-      <div className="comments-panel">
-        <p>WOMP WOMP</p>
-      </div>
-    );
+  // Don't render anything if the comments are loading. For now, we fail silently
+  // if there happens to be an error while fetching the comments. In the future, we
+  // should do something to alert the user that the query has failed and provide next
+  // steps for fixing that by refetching/refreshing.
+  if (loading || error) {
+    return null;
   }
 
   if (!comments.length) {

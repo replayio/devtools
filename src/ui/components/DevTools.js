@@ -79,7 +79,6 @@ function DevTools({
     return null;
   }
 
-  // if (queryIsLoading || commentsIsLoading) {
   if (queryIsLoading) {
     return <Loader />;
   } else if (recordingDuration === null || uploading) {

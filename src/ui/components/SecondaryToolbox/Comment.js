@@ -1,33 +1,15 @@
 import React, { useState } from "react";
-
 import { connect } from "react-redux";
 import classnames from "classnames";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { gql, useMutation } from "@apollo/client";
 
-import CommentEditor from "ui/components/Comments/CommentEditor";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
-
-const DELETE_COMMENT = gql`
-  mutation DeleteComment($commentId: uuid) {
-    delete_comments(where: { id: { _eq: $commentId } }) {
-      returning {
-        id
-      }
-    }
-  }
-`;
+import CommentEditor from "ui/components/Comments/CommentEditor";
+import CommentDropdownPanel from "ui/components/Comments/CommentDropdownPanel";
 
 function Comment({ comment, currentTime, seek }) {
   const [editing, setEditing] = useState(false);
-  const [deleteComment] = useMutation(DELETE_COMMENT, {
-    refetchQueries: ["GetComments"],
-  });
-
-  const removeComment = () => {
-    deleteComment({ variables: { commentId: comment.id } });
-  };
   const seekToComment = () => {
     const { point, time, has_frames } = comment;
 
@@ -52,13 +34,7 @@ function Comment({ comment, currentTime, seek }) {
       )}
       <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
         <Dropdown
-          panel={
-            <CommentDropdownPanel
-              comment={comment}
-              removeComment={removeComment}
-              startEditing={() => setEditing(true)}
-            />
-          }
+          panel={<CommentDropdownPanel comment={comment} startEditing={() => setEditing(true)} />}
           icon={<div>⋯</div>}
         />
       </div>
@@ -76,19 +52,6 @@ function CommentBody({ comment, startEditing }) {
         {lines.map((line, i) => (
           <div key={i}>{line}</div>
         ))}
-      </div>
-    </div>
-  );
-}
-
-function CommentDropdownPanel({ comment, removeComment, startEditing }) {
-  return (
-    <div className="dropdown-panel">
-      <div className="menu-item" onClick={startEditing}>
-        Edit Comment
-      </div>
-      <div className="menu-item" onClick={() => removeComment(comment)}>
-        Delete Comment
       </div>
     </div>
   );

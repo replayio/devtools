@@ -1,30 +1,20 @@
 import React from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
-import { gql, useMutation } from "@apollo/client";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import hooks from "ui/hooks";
 import { getPixelOffset, getCommentLeftOffset } from "ui/utils/timeline";
 
 import CommentMarker from "./CommentMarker";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import CommentEditor from "./CommentEditor";
+import CommentDropdownPanel from "./CommentDropdownPanel";
 
-const DELETE_COMMENT = gql`
-  mutation DeleteComment($commentId: uuid) {
-    delete_comments(where: { id: { _eq: $commentId } }) {
-      returning {
-        id
-      }
-    }
-  }
-`;
+function Mask({ setFocusedCommentId, comment }) {
+  const deleteComment = hooks.useDeleteComment();
 
-function Mask({ setFocusedCommentId, comment, editing }) {
-  const [deleteComment] = useMutation(DELETE_COMMENT, {
-    refetchQueries: ["GetComments"],
-  });
   const onClick = () => {
     // If a comment doesn't have any content, it means it's a newly-added
     // comment. If the user clicks outside the comment editor, we should
@@ -75,23 +65,12 @@ class Comment extends React.Component {
   deleteComment = () => {
     const { setFocusedCommentId, comment } = this.props;
     setFocusedCommentId(null);
-    // Before shipping this PR, fix this removeComment because it's broken
     removeComment(comment);
   };
 
   renderDropdownPanel() {
-    return (
-      <div className="dropdown-panel">
-        {!this.state.editing ? (
-          <div className="menu-item" onClick={this.startEditing}>
-            Edit Comment
-          </div>
-        ) : null}
-        <div className="menu-item" onClick={this.deleteComment}>
-          Delete Comment
-        </div>
-      </div>
-    );
+    const { comment } = this.props;
+    return <CommentDropdownPanel startEditing={this.startEditing} comment={comment} />;
   }
 
   renderLabel() {

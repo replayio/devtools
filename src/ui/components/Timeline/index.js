@@ -8,7 +8,6 @@
 // graphics are currently being rendered.
 
 import { connect } from "react-redux";
-import classnames from "classnames";
 import { Component } from "react";
 import React from "react";
 import dom from "react-dom-factories";

@@ -2,41 +2,19 @@ import React, { useState, useRef, useEffect } from "react";
 
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
-import { gql, useMutation } from "@apollo/client";
-
-const UPDATE_COMMENT_CONTENT = gql`
-  mutation UpdateCommentContent($newContent: String, $commentId: uuid) {
-    update_comments(_set: { content: $newContent }, where: { id: { _eq: $commentId } }) {
-      returning {
-        id
-        content
-      }
-    }
-  }
-`;
-
-const DELETE_COMMENT = gql`
-  mutation DeleteComment($commentId: uuid) {
-    delete_comments(where: { id: { _eq: $commentId } }) {
-      returning {
-        id
-      }
-    }
-  }
-`;
+import hooks from "ui/hooks";
 
 function CommentEditor({ comment, stopEditing, setFocusedCommentId }) {
   const [inputValue, setInputValue] = useState(comment.content);
   const textareaNode = useRef(null);
-  const [updateCommentContent] = useMutation(UPDATE_COMMENT_CONTENT, {
-    onCompleted: () => {
-      stopEditing();
-      setFocusedCommentId(null);
-    },
-  });
-  const [deleteComment] = useMutation(DELETE_COMMENT, {
-    refetchQueries: ["GetComments"],
-  });
+
+  const closeEditor = () => {
+    stopEditing();
+    setFocusedCommentId(null);
+  };
+
+  const updateComment = hooks.useUpdateComment(closeEditor);
+  const deleteComment = hooks.useDeleteComment();
 
   useEffect(function focusText() {
     const { length } = textareaNode.current.value;
@@ -46,22 +24,27 @@ function CommentEditor({ comment, stopEditing, setFocusedCommentId }) {
 
   const onKeyDown = e => {
     if (e.key == "Escape") {
-      stopEditingComment(e);
+      cancelEditingComment(e);
     } else if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) {
       saveEditedComment();
     }
   };
   const saveEditedComment = () => {
-    updateCommentContent({
+    closeEditor();
+    // If there's no input value, delete the comment
+    if (!inputValue) {
+      deleteComment({ variables: { commentId: comment.id } });
+      return;
+    }
+
+    updateComment({
       variables: { newContent: inputValue, commentId: comment.id },
     });
   };
-  const stopEditingComment = e => {
-    stopEditing();
-    setFocusedCommentId(null);
-
+  const cancelEditingComment = e => {
+    closeEditor();
     // If this was a new comment and it was left empty, delete it.
-    if (!comment.content && !inputValue) {
+    if (!comment.content) {
       deleteComment({ variables: { commentId: comment.id } });
     }
   };
@@ -75,7 +58,7 @@ function CommentEditor({ comment, stopEditing, setFocusedCommentId }) {
         ref={textareaNode}
       />
       <div className="buttons">
-        <button className="cancel" onClick={stopEditingComment}>
+        <button className="cancel" onClick={cancelEditingComment}>
           Cancel
         </button>
         <button className="save" onClick={saveEditedComment}>
