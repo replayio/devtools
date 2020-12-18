@@ -11,7 +11,6 @@ const EventEmitter = require("devtools/shared/event-emitter");
 import { ThreadFront } from "protocol/thread";
 import { NodeFront } from "protocol/thread/node";
 import { UIStore } from "ui/actions";
-import { InspectorPanel } from "./components/App";
 
 require("devtools/client/themes/breadcrumbs.css");
 require("devtools/client/themes/inspector.css");
@@ -33,12 +32,7 @@ require("devtools/client/inspector/components/InspectorTabPanel.css");
 require("devtools/client/shared/components/splitter/SplitBox.css");
 require("devtools/client/shared/components/Accordion.css");
 
-const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
-const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
-const { InspectorSearch } = require("devtools/client/inspector/inspector-search");
-
 import MarkupView from "devtools/client/inspector/markup/markup";
-const { ComputedPanel } = require("devtools/client/inspector/computed/panel");
 const BoxModel = require("devtools/client/inspector/boxmodel/box-model");
 const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");
 
@@ -95,9 +89,7 @@ export class Inspector {
   boxModel: any;
 
   private _toolbox: any;
-  private _panels: Map<string, InspectorPanel>;
   private _highlighters?: any;
-  private _search?: any;
   private _hasNewRoot?: boolean;
   private _destroyed?: boolean;
 
@@ -115,10 +107,6 @@ export class Inspector {
     this.panelWin = window;
     (this.panelWin as any).inspector = this;
     this.store = (window as any).app.store;
-
-    // Map [panel id => panel instance]
-    // Stores all the instances of sidebar panels like rule view, computed view, ...
-    this._panels = new Map();
 
     this.highlighter = Highlighter;
 
@@ -177,55 +165,6 @@ export class Inspector {
    */
   useLandscapeMode() {
     return true;
-  }
-
-  /**
-   * Returns a boolean indicating whether a sidebar panel instance exists.
-   */
-  hasPanel(id: string) {
-    return this._panels.has(id);
-  }
-
-  /**
-   * Lazily get and create panel instances displayed in the sidebar
-   */
-  getPanel(id: string) {
-    if (this._panels.has(id)) {
-      return this._panels.get(id);
-    }
-
-    let panel;
-    switch (id) {
-      case "boxmodel":
-        // box-model isn't a panel on its own, it used to, now it is being used by
-        // the layout view which retrieves an instance via getPanel.
-        const BoxModel = require("devtools/client/inspector/boxmodel/box-model");
-        panel = new BoxModel(this, this.panelWin);
-        break;
-      case "computedview":
-        panel = new ComputedPanel(this);
-        break;
-      case "layoutview":
-        const LayoutView = require("devtools/client/inspector/layout/layout");
-        panel = new LayoutView(this, this.panelWin);
-        break;
-      case "markupview":
-        panel = new MarkupView(this);
-        break;
-      case "ruleview":
-        const RulesView = require("devtools/client/inspector/rules/rules");
-        panel = new RulesView(this, this.panelWin);
-        break;
-      default:
-        // This is a custom panel or a non lazy-loaded one.
-        return null;
-    }
-
-    if (panel) {
-      this._panels.set(id, panel);
-    }
-
-    return panel;
   }
 
   /**
@@ -293,19 +232,9 @@ export class Inspector {
     ThreadFront.off("paused", this.handleThreadPaused);
     ThreadFront.off("resumed", this.handleThreadResumed);
 
-    for (const [, panel] of this._panels) {
-      panel.destroy();
-    }
-    this._panels.clear();
-
     if (this._highlighters) {
       this._highlighters.destroy();
       this._highlighters = null;
-    }
-
-    if (this._search) {
-      this._search.destroy();
-      this._search = null;
     }
 
     this._toolbox = null;

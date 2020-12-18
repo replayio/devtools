@@ -49,28 +49,6 @@ class MarkupView {
       return;
     }
 
-    const markupApp = MarkupApp({
-      onSelectNode: this.onSelectNode,
-      onShowEventTooltip: this.onShowEventTooltip,
-      onToggleNodeExpanded: this.onToggleNodeExpanded,
-      onMouseEnterNode: this.onMouseEnterNode,
-      onMouseLeaveNode: this.onMouseLeaveNode,
-    });
-
-    const provider = createElement(
-      Provider,
-      {
-        id: "markupview",
-        key: "markupview",
-        store: this.store,
-        title: "Markup View",
-      },
-      markupApp
-    );
-
-    // Expose the provider to let inspector.js use it in setupSidebar.
-    this.provider = provider;
-
     if (ThreadFront.currentPause) {
       await this.onPaused();
     } else {
