@@ -31,12 +31,10 @@ class Comment extends React.Component {
 
   startEditing = () => {
     this.setState({ editing: true });
-    this.props.toggleEditingCommentOn();
   };
 
   stopEditing = () => {
     this.setState({ editing: false });
-    this.props.toggleEditingCommentOff();
   };
 
   seekToComment = e => {
@@ -79,7 +77,7 @@ class Comment extends React.Component {
     );
   }
 
-  renderNewComment() {
+  renderComment() {
     const { comment } = this.props;
     const lines = comment.content.split("\n");
 
@@ -96,7 +94,8 @@ class Comment extends React.Component {
   }
 
   render() {
-    const { comment, id, currentTime } = this.props;
+    const { comment, currentTime } = this.props;
+    const { editing } = this.state;
     const selected = currentTime === comment.time;
 
     return (
@@ -106,7 +105,11 @@ class Comment extends React.Component {
         onDoubleClick={this.startEditing}
       >
         <div className="img event-comment" />
-        {this.renderNewComment()}
+        {editing ? (
+          <CommentEditor comment={comment} stopEditing={this.stopEditing} />
+        ) : (
+          this.renderComment()
+        )}
         <div onClick={e => e.stopPropagation()}>
           <Dropdown panel={this.renderDropdownPanel()} icon={<div>⋯</div>} />
         </div>

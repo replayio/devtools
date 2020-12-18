@@ -92,7 +92,7 @@ class Comment extends React.Component {
           </div>
           <div className="comment-description">
             {editing ? (
-              <CommentEditor comment={comment} stopEditing={this.stopEditing} location="timeline" />
+              <CommentEditor comment={comment} stopEditing={this.stopEditing} />
             ) : (
               this.renderLabel()
             )}

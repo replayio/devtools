@@ -25,7 +25,6 @@ const GET_COMMENTS = gql`
 `;
 
 function CommentsPanel({ recordingId }) {
-  const [editingComment, setEditingComment] = useState(false);
   const { data, loading } = useQuery(GET_COMMENTS, {
     variables: { recordingId },
   });
@@ -35,8 +34,6 @@ function CommentsPanel({ recordingId }) {
   }
 
   const { comments } = data;
-  const toggleEditingCommentOn = () => setEditingComment(true);
-  const toggleEditingCommentOff = () => setEditingComment(false);
 
   if (!comments.length) {
     return (
@@ -49,12 +46,7 @@ function CommentsPanel({ recordingId }) {
   return (
     <div className="comments-panel">
       {sortBy(comments, comment => comment.time).map(comment => (
-        <Comment
-          comment={comment}
-          key={comment.id}
-          toggleEditingCommentOff={toggleEditingCommentOff}
-          toggleEditingCommentOn={toggleEditingCommentOn}
-        />
+        <Comment comment={comment} key={comment.id} />
       ))}
     </div>
   );
@@ -62,6 +54,4 @@ function CommentsPanel({ recordingId }) {
 
 export default connect(state => ({
   recordingId: selectors.getRecordingId(state),
-  // comments: selectors.getComments(state),
-  // focusedCommentId: selectors.getFocusedCommentId(state),
 }))(CommentsPanel);
