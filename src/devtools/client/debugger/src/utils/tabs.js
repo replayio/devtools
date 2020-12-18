@@ -2,63 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-/*
- * Finds the hidden tabs by comparing the tabs' top offset.
- * hidden tabs will have a great top offset.
- *
- * @param sourceTabs Array
- * @param sourceTabEls HTMLCollection
- *
- * @returns Array
- */
-
-export function getLastVisibleTab(sourceTabEls) {
-  sourceTabEls = [...sourceTabEls];
-
-  const topOffsets = sourceTabEls.map(el => el.getBoundingClientRect().top);
-  const visibleTabsTopOffset = Math.min(...topOffsets);
-
-  const visibleTabs = sourceTabEls.filter(
-    el => el.getBoundingClientRect().top < visibleTabsTopOffset + 10
-  );
-
-  return visibleTabs.pop();
-}
-
-export function getSelectedSourceIsVisible(sourceTabEls) {
-  sourceTabEls = [...sourceTabEls];
-
-  const selectedSourceTab = sourceTabEls.find(elem => elem.classList.contains("active"));
-  const topOffsets = sourceTabEls.map(el => el.getBoundingClientRect().top);
-  const visibleTabsTopOffset = Math.min(...topOffsets);
-
-  return selectedSourceTab?.getBoundingClientRect().top < visibleTabsTopOffset + 10;
-}
-
-export function getHiddenTabs(sourceTabs, sourceTabEls) {
-  sourceTabEls = [...sourceTabEls];
-  function getTopOffset() {
-    const topOffsets = sourceTabEls.map(t => t.getBoundingClientRect().top);
-    return Math.min(...topOffsets);
-  }
-
-  function hasTopOffset(el) {
-    // adding 10px helps account for cases where the tab might be offset by
-    // styling such as selected tabs which don't have a border.
-    const tabTopOffset = getTopOffset();
-    return el.getBoundingClientRect().top > tabTopOffset + 10;
-  }
-
-  return sourceTabs.filter((tab, index) => {
-    const element = sourceTabEls[index];
-    return element && hasTopOffset(element);
-  });
-}
-
 export function getFramework(tabs, url) {
-  const tab = tabs.find(t => t?.url === url);
+  const tab = tabs.find(t => t.url === url);
 
   if (tab) {
     return tab.framework;
@@ -127,12 +72,12 @@ export function getTabMenuItems() {
 }
 
 export function isSimilarTab(tab, url, isOriginal) {
-  return tab?.url === url && tab.isOriginal === isOriginal;
+  return tab.url === url && tab.isOriginal === isOriginal;
 }
 
 export function persistTabs(tabs) {
   return [...tabs]
-    .filter(tab => tab?.url)
+    .filter(tab => tab.url)
     .map(tab => {
       const newTab = { ...tab };
       newTab.sourceId = null;

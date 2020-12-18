@@ -8,6 +8,9 @@
   height: var(--editor-header-height);
   border-bottom: 1px solid var(--theme-splitter-color);
   background-color: var(--theme-toolbar-background);
+  overflow-x: overlay;
+  overflow-y: hidden;
+  scrollbar-width: thin;
 }
 
 .source-header * {
@@ -22,15 +25,18 @@
 }
 
 .source-tabs {
-  flex: auto;
   align-self: flex-start;
   align-items: flex-start;
-  /* Reserve space for the overflow button (even if not visible) */
-  padding-inline-end: 28px;
+  display: flex;
+}
+
+.source-header::-webkit-scrollbar {
+  height: 4px;
+  background: var(--theme-toolbar-background);
 }
 
 .source-tab {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   position: relative;
   min-width: 40px;
