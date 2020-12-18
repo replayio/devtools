@@ -5,10 +5,6 @@ import classnames from "classnames";
 import CommentsPanel from "./CommentsPanel";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
-import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
-const RulesApp = require("devtools/client/inspector/rules/components/RulesApp");
-import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
-const LayoutApp = require("devtools/client/inspector/layout/components/LayoutApp");
 
 import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
@@ -76,41 +72,10 @@ function ConsolePanel() {
   );
 }
 
-function InspectorPanel({ initializedPanels }) {
-  const inspector = gToolbox.getPanel("inspector");
-  let markupView, rulesPanel, layoutPanel, computedPanel;
-
-  if (inspector && initializedPanels.includes("inspector")) {
-    markupView = <MarkupApp inspector={inspector._inspector} />;
-    rulesPanel = {
-      id: "ruleview",
-      title: "Rules",
-      panel: <RulesApp {...inspector._inspector.rules.getRulesProps()} />,
-    };
-    const layoutProps = {
-      ...inspector._inspector.getCommonComponentProps(),
-      ...inspector._inspector.boxModel.getComponentProps(),
-      showBoxModelProperties: true,
-    };
-    layoutPanel = {
-      id: "layoutview",
-      title: "Layout",
-      panel: <LayoutApp {...layoutProps} />,
-    };
-    computedPanel = {
-      id: "computedview",
-      title: "Computed",
-      panel: <ComputedApp />,
-    };
-  }
+function InspectorPanel() {
   return (
     <div className={classnames("toolbox-panel theme-body")} id="toolbox-content-inspector">
-      <InspectorApp
-        markupView={markupView}
-        rulesPanel={rulesPanel}
-        layoutPanel={layoutPanel}
-        computedPanel={computedPanel}
-      />
+      <InspectorApp />
     </div>
   );
 }
@@ -130,7 +95,7 @@ function ViewerPanel() {
   );
 }
 
-function SecondaryToolbox({ initializedPanels, selectedPanel, setSelectedPanel, narrowMode }) {
+function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
   return (
     <div className="secondary-toolbox">
       <header className="secondary-toolbox-header">
@@ -143,9 +108,7 @@ function SecondaryToolbox({ initializedPanels, selectedPanel, setSelectedPanel, 
       <div className="secondary-toolbox-content">
         {selectedPanel == "console" ? <ConsolePanel /> : null}
         {selectedPanel == "comments" ? <CommentsPanel /> : null}
-        {selectedPanel == "inspector" ? (
-          <InspectorPanel initializedPanels={initializedPanels} />
-        ) : null}
+        {selectedPanel == "inspector" ? <InspectorPanel /> : null}
         {selectedPanel == "viewer" && narrowMode ? <ViewerPanel /> : null}
       </div>
     </div>
@@ -154,7 +117,6 @@ function SecondaryToolbox({ initializedPanels, selectedPanel, setSelectedPanel, 
 
 export default connect(
   state => ({
-    initializedPanels: selectors.getInitializedPanels(state),
     selectedPanel: selectors.getSelectedPanel(state),
     narrowMode: selectors.getNarrowMode(state),
   }),
