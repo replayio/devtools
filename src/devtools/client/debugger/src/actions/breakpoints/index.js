@@ -160,8 +160,8 @@ export function runAnalysisOnLine(cx, line) {
 
     const options = { logValue: "dummyValue" };
     const location = {
-      sourceId: source.id,
-      sourceUrl: source.url,
+      sourceId: source?.id,
+      sourceUrl: source?.url,
       column: undefined,
       line,
     };
