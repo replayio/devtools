@@ -89,69 +89,6 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
     prefs.splitSidebarSize = width;
   };
 
-  renderMarkupPanel() {
-    const { markupView, markupRootNode } = this.props;
-    const isMarkupEmpty = (markupRootNode?.children?.length || 0) > 0;
-
-    return (
-      <div className="devtools-inspector-tab-panel">
-        <div id="inspector-main-content" className="devtools-main-content">
-          <div id="inspector-toolbar" className="devtools-toolbar devtools-input-toolbar">
-            <div id="inspector-search" className="devtools-searchbox">
-              <input
-                id="inspector-searchbox"
-                className="devtools-searchinput"
-                type="search"
-                placeholder="Search HTML"
-              />
-              <button
-                id="inspector-searchinput-clear"
-                className="devtools-searchinput-clear"
-                hidden={true}
-                tabIndex={-1}
-              ></button>
-            </div>
-            <div id="inspector-searchlabel-container" hidden={true}>
-              <div className="devtools-separator"></div>
-              <span id="inspector-searchlabel"></span>
-            </div>
-            <div className="devtools-separator" hidden={true}></div>
-            <button
-              id="inspector-element-add-button"
-              className="devtools-button"
-              data-localization="title=inspectorAddNode.label"
-              hidden={true}
-            ></button>
-            <button
-              id="inspector-eyedropper-toggle"
-              className="devtools-button"
-              hidden={true}
-            ></button>
-          </div>
-          <div id="markup-box" className="theme-body devtools-monospace">
-            <div id="markup-root-wrapper" role="presentation">
-              <div id="markup-root" role="presentation">
-                {markupView}
-              </div>
-            </div>
-            <a id="markup-loading" hidden={isMarkupEmpty}>
-              Loading…
-            </a>
-          </div>
-          <div id="inspector-breadcrumbs-toolbar" className="devtools-toolbar">
-            <div
-              id="inspector-breadcrumbs"
-              className="breadcrumbs-widget-container"
-              role="toolbar"
-              data-localization="aria-label=inspector.breadcrumbs.label"
-              tabIndex={0} //TODO breadcrumbs
-            ></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   renderSidebar() {
     const {
       rulesPanel,
