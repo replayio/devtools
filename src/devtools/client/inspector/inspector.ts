@@ -87,12 +87,6 @@ export class Inspector {
   panelWin: Window | null;
   store: UIStore | null;
   highlighter: any;
-  searchBox?: HTMLElement | null;
-  searchClearButton?: HTMLElement | null;
-  searchResultsContainer?: HTMLElement | null;
-  searchResultsLabel?: HTMLElement | null;
-  searchboxShortcuts?: any;
-  breadcrumbs?: any;
 
   private _toolbox: any;
   private _panels: Map<string, InspectorPanel>;
@@ -150,14 +144,6 @@ export class Inspector {
     return this._highlighters;
   }
 
-  get search() {
-    if (!this._search) {
-      this._search = new InspectorSearch(this, this.searchBox, this.searchClearButton);
-    }
-
-    return this._search;
-  }
-
   get selection() {
     return this.toolbox.selection;
   }
@@ -167,97 +153,11 @@ export class Inspector {
   }
 
   _deferredOpen = async () => {
-    // All the components are initialized. Take care of the remaining initialization
-    // and setup.
-    this.breadcrumbs = new HTMLBreadcrumbs(this);
-    this.setupSearchBox();
-
     this.toolbox.on("select", this.handleToolSelected);
     ThreadFront.on("paused", this.handleThreadPaused);
     ThreadFront.on("resumed", this.handleThreadResumed);
 
     this.emit("ready");
-  };
-
-  /**
-   * Hooks the searchbar to show result and auto completion suggestions.
-   */
-  setupSearchBox() {
-    if (!this.panelDoc) return;
-
-    this.searchBox = this.panelDoc.getElementById("inspector-searchbox");
-    this.searchClearButton = this.panelDoc.getElementById("inspector-searchinput-clear");
-    this.searchResultsContainer = this.panelDoc.getElementById("inspector-searchlabel-container");
-    this.searchResultsLabel = this.panelDoc.getElementById("inspector-searchlabel");
-
-    this.searchBox!.addEventListener(
-      "focus",
-      () => {
-        this.search.on("search-cleared", this._clearSearchResultsLabel);
-        this.search.on("search-result", this._updateSearchResultsLabel);
-      },
-      { once: true }
-    );
-
-    this.createSearchBoxShortcuts();
-  }
-
-  createSearchBoxShortcuts() {
-    this.searchboxShortcuts = new KeyShortcuts({
-      window: this.panelDoc!.defaultView,
-      // The inspector search shortcuts need to be available from everywhere in the
-      // inspector, and the inspector uses iframes (markupview, sidepanel webextensions).
-      // Use the chromeEventHandler as the target to catch events from all frames.
-      //target: this.toolbox.getChromeEventHandler(),
-    });
-    const key = "CmdOrCtrl+F";
-    this.searchboxShortcuts.on(key, (event: any) => {
-      // Prevent overriding same shortcut from the computed/rule views
-      if (
-        event.originalTarget.closest("#sidebar-panel-ruleview") ||
-        event.originalTarget.closest("#sidebar-panel-computedview")
-      ) {
-        return;
-      }
-
-      const win = event.originalTarget.ownerGlobal;
-      // Check if the event is coming from an inspector window to avoid catching
-      // events from other panels. Note, we are testing both win and win.parent
-      // because the inspector uses iframes.
-      if (win === this.panelWin || win.parent === this.panelWin) {
-        event.preventDefault();
-        this.searchBox!.focus();
-      }
-    });
-  }
-
-  get searchSuggestions() {
-    return this.search.autocompleter;
-  }
-
-  _clearSearchResultsLabel = (result: any) => {
-    return this._updateSearchResultsLabel(result, true);
-  };
-
-  _updateSearchResultsLabel = (result: any, clear = false) => {
-    let str = "";
-    if (!clear) {
-      if (result) {
-        str = INSPECTOR_L10N.getFormatStr(
-          "inspector.searchResultsCount2",
-          result.resultsIndex + 1,
-          result.resultsLength
-        );
-      } else {
-        str = "No matches";
-      }
-
-      this.searchResultsContainer!.hidden = false;
-    } else {
-      this.searchResultsContainer!.hidden = true;
-    }
-
-    this.searchResultsLabel!.textContent = str;
   };
 
   /**
@@ -398,15 +298,10 @@ export class Inspector {
       this._search = null;
     }
 
-    this.breadcrumbs.destroy();
-    this.searchboxShortcuts.destroy();
-
     this._toolbox = null;
-    this.breadcrumbs = null;
     this.panelDoc = null;
     (this.panelWin as any).inspector = null;
     this.panelWin = null;
-    this.searchBox = null;
     this.store = null;
   }
 
