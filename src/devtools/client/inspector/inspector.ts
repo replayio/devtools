@@ -88,6 +88,8 @@ export class Inspector {
   store: UIStore | null;
   highlighter: any;
 
+  markup: MarkupView;
+
   private _toolbox: any;
   private _panels: Map<string, InspectorPanel>;
   private _highlighters?: any;
@@ -115,6 +117,8 @@ export class Inspector {
     this._panels = new Map();
 
     this.highlighter = Highlighter;
+
+    this.markup = new MarkupView(this);
   }
 
   /**

@@ -12,16 +12,9 @@ import {
 } from "../actions/markup";
 import useKeyShortcuts from "ui/utils/use-key-shortcuts";
 import Node from "./Node";
+import { MarkupProps } from "./MarkupApp";
 
-interface NodesProps {
-  onSelectNode: (nodeId: string) => void;
-  onShowEventTooltip: (nodeId: string, element: EventTarget) => void;
-  onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
-  onMouseEnterNode: (nodeId: string) => void;
-  onMouseLeaveNode: (nodeId: string) => void;
-}
-
-function Nodes(props: NodesProps & PropsFromRedux) {
+function Nodes(props: MarkupProps & PropsFromRedux) {
   const { node, onUpKey, onDownKey, onLeftKey, onRightKey, onPageUpKey, onPageDownKey } = props;
 
   const ref = useRef<HTMLUListElement>(null);
