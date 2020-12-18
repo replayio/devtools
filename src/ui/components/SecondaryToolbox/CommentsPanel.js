@@ -4,38 +4,32 @@ import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { sortBy } from "lodash";
-import { gql, useQuery, useLazyQuery } from "@apollo/client";
+// import { gql, useQuery, useLazyQuery } from "@apollo/client";
+import hooks from "ui/hooks";
 
 import Comment from "ui/components/SecondaryToolbox/Comment";
-
 import "./CommentsPanel.css";
 
-const GET_COMMENTS = gql`
-  query GetComments($recordingId: uuid) {
-    comments(where: { recording_id: { _eq: $recordingId } }) {
-      id
-      content
-      created_at
-      recording_id
-      user_id
-      updated_at
-      time
-      point
-      has_frames
-    }
-  }
-`;
-
 function CommentsPanel({ recordingId }) {
-  const { data, loading } = useQuery(GET_COMMENTS, {
-    variables: { recordingId },
-  });
+  const { comments, loading, error } = hooks.useGetComments(recordingId);
 
-  if (!data || loading) {
-    return null;
+  if (loading) {
+    console.log("nope, still loading");
+    return (
+      <div className="comments-panel">
+        <p>Comments are loading</p>
+      </div>
+    );
   }
 
-  const { comments } = data;
+  if (error) {
+    console.log("nope, still loading");
+    return (
+      <div className="comments-panel">
+        <p>WOMP WOMP</p>
+      </div>
+    );
+  }
 
   if (!comments.length) {
     return (
