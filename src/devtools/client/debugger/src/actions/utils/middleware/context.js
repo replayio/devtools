@@ -27,7 +27,6 @@ function validateActionContext(getState, action) {
         // Validate using all available information in the context.
         validateContext(getState(), action.cx);
       } catch (e) {
-        console.log(`ActionContextFailure ${action.type}`);
         throw e;
       }
   }
