@@ -39,6 +39,7 @@ const { InspectorSearch } = require("devtools/client/inspector/inspector-search"
 
 import MarkupView from "devtools/client/inspector/markup/markup";
 const { ComputedPanel } = require("devtools/client/inspector/computed/panel");
+const BoxModel = require("devtools/client/inspector/boxmodel/box-model");
 const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");
 
 import CSSProperties from "./css-properties";
@@ -91,6 +92,7 @@ export class Inspector {
 
   markup: MarkupView;
   rules: RulesView;
+  boxModel: any;
 
   private _toolbox: any;
   private _panels: Map<string, InspectorPanel>;
@@ -122,6 +124,7 @@ export class Inspector {
 
     this.markup = new MarkupView(this);
     this.rules = new RulesView(this, window);
+    this.boxModel = new BoxModel(this, window);
   }
 
   /**

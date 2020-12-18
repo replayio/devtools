@@ -8,6 +8,7 @@ import InspectorApp from "devtools/client/inspector/components/App";
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 const RulesApp = require("devtools/client/inspector/rules/components/RulesApp");
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
+const LayoutApp = require("devtools/client/inspector/layout/components/LayoutApp");
 
 import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
@@ -86,10 +87,15 @@ function InspectorPanel({ initializedPanels }) {
       title: "Rules",
       panel: <RulesApp {...inspector._inspector.rules.getRulesProps()} />,
     };
+    const layoutProps = {
+      ...inspector._inspector.getCommonComponentProps(),
+      ...inspector._inspector.boxModel.getComponentProps(),
+      showBoxModelProperties: true,
+    };
     layoutPanel = {
       id: "layoutview",
       title: "Layout",
-      panel: inspector._inspector.getPanel("layoutview").provider,
+      panel: <LayoutApp {...layoutProps} />,
     };
     computedPanel = {
       id: "computedview",
