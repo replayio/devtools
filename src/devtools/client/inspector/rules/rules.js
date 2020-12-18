@@ -107,6 +107,23 @@ class RulesView {
     this.provider = provider;
   }
 
+  getRulesProps() {
+    return {
+      onAddClass: this.onAddClass,
+      onAddRule: this.onAddRule,
+      onSetClassState: this.onSetClassState,
+      onToggleClassPanelExpanded: this.onToggleClassPanelExpanded,
+      onToggleDeclaration: this.onToggleDeclaration,
+      onTogglePseudoClass: this.onTogglePseudoClass,
+      onToggleSelectorHighlighter: this.onToggleSelectorHighlighter,
+      showContextMenu: this.showContextMenu,
+      showDeclarationNameEditor: this.showDeclarationNameEditor,
+      showDeclarationValueEditor: this.showDeclarationValueEditor,
+      showNewDeclarationEditor: this.showNewDeclarationEditor,
+      showSelectorEditor: this.showSelectorEditor,
+    };
+  }
+
   destroy() {
     // this.inspector.sidebar.off("select", this.onSelection);
     this.selection.off("detached-front", this.onSelection);
