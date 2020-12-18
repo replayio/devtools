@@ -29,13 +29,13 @@ function Comment({ comment, currentTime, seek }) {
     deleteComment({ variables: { commentId: comment.id } });
   };
   const seekToComment = () => {
-    const { point, time, hasFrames } = comment;
+    const { point, time, has_frames } = comment;
 
     if (editing) {
       return;
     }
 
-    return seek(point, time, hasFrames);
+    return seek(point, time, has_frames);
   };
 
   return (

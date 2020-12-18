@@ -20,6 +20,8 @@ const GET_COMMENTS = gql`
       user_id
       updated_at
       time
+      point
+      has_frames
     }
   }
 `;

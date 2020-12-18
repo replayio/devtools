@@ -1,11 +1,12 @@
 import React from "react";
+import { ThreadFront } from "protocol/thread";
 import { connect } from "react-redux";
 
 import { getMarkerLeftOffset } from "ui/utils/timeline";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { gql, useMutation } from "@apollo/client";
-import { getDirectiveNames } from "@apollo/client/utilities";
+
 const markerWidth = 19;
 
 const ADD_COMMENT = gql`
@@ -45,15 +46,28 @@ function NewCommentButton({
   // - That time is not currently visible in the timeline
   // - There is a timeline comment that is currently focused.
   const isOnExistingComment = comments.some(comment => comment.time == currentTime);
-  if (isOnExistingComment || focusedCommentId || zoomRegion.endTime <= currentTime) {
+  if (isOnExistingComment || focusedCommentId || zoomRegion.endTime < currentTime) {
     return null;
   }
 
   const handleClick = () => {
+    // const logger = {
+    //   point: ThreadFront.currentPoint,
+    //   hasFrames: ThreadFront.currentPointHasFrames,
+    // };
+    const logger = {
+      point: typeof ThreadFront.currentPoint,
+      hasFrames: typeof ThreadFront.currentPointHasFrames,
+    };
+
+    console.log(logger);
+
     const newComment = {
       content: "",
       recording_id: recordingId,
       time: currentTime,
+      point: ThreadFront.currentPoint,
+      has_frames: ThreadFront.currentPointHasFrames,
     };
     addComment({
       variables: { object: newComment },

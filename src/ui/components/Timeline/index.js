@@ -158,11 +158,16 @@ export class Timeline extends Component {
   }
 
   onMarkerClick = (e, message) => {
+    const { selectedPanel, viewMode } = this.props;
+
     e.preventDefault();
     e.stopPropagation();
     const { executionPoint, executionPointTime, executionPointHasFrames, pauseId } = message;
     this.seek(executionPoint, executionPointTime, executionPointHasFrames, pauseId);
-    this.showMessage(message);
+
+    if (viewMode == "dev" && selectedPanel == "console") {
+      this.showMessage(message);
+    }
   };
 
   onMarkerMouseEnter = () => {
@@ -605,6 +610,8 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     loaded: selectors.getTimelineLoaded(state),
     messages: selectors.getMessagesForTimeline(state),
+    viewMode: selectors.getViewMode(state),
+    selectedPanel: selectors.getSelectedPanel(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,
