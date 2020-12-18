@@ -7,7 +7,7 @@ Test.describe(`Test previews when switching between frames and stepping.`, async
   await Test.findScopeNode("barprop2");
   await Test.waitForScopeValue("barprop1", "2");
 
-  await Test.waitForFrameTimeline("28%");
+  await Test.waitForFrameTimeline("42%");
 
   await Test.checkFrames(2);
   await Test.selectFrame(1);
@@ -21,7 +21,7 @@ Test.describe(`Test previews when switching between frames and stepping.`, async
   //await Test.waitForInstantStep("stepOver");
   await Test.stepOverToLine(18);
 
-  await Test.waitForFrameTimeline("57%");
+  await Test.waitForFrameTimeline("71%");
 
   // barobj is already expanded.
   await Test.toggleScopeNode("barobj");
@@ -41,7 +41,7 @@ Test.describe(`Test previews when switching between frames and stepping.`, async
   //await Test.waitForInstantStep("stepOver");
   await Test.stepOverToLine(22);
 
-  await Test.waitForFrameTimeline("25%");
+  await Test.waitForFrameTimeline("50%");
 
   await Test.checkFrames(3);
 
