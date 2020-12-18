@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import classnames from "classnames";
 import Title from "../../shared/Title";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
-import Avatar from "ui/components/Avatar";
+import { AuthAvatar } from "ui/components/Avatar";
 import moment from "moment";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./RecordingListItem.css";
@@ -39,16 +39,6 @@ function ItemOptions({ Panel }) {
         icon={<div className="img dots-horizontal" />}
         panelStyles={{ top: "28px", right: "0px" }}
       />
-    </div>
-  );
-}
-
-function ItemOwner() {
-  const { user } = useAuth0();
-
-  return (
-    <div className="owner">
-      <Avatar player={user} isFirstPlayer={true} />
     </div>
   );
 }
@@ -177,7 +167,9 @@ export default function RecordingListItem({
         <ItemPrivacy isPrivate={data.is_private} toggleIsPrivate={toggleIsPrivate} />
       </td>
       <td>
-        <ItemOwner />
+        <div className="owner">
+          <AuthAvatar user={data.user} />
+        </div>
       </td>
       <td>
         <ItemOptions Panel={Panel} />
