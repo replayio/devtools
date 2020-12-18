@@ -5,6 +5,7 @@ import classnames from "classnames";
 import CommentsPanel from "./CommentsPanel";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
+import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 
 import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
@@ -74,10 +75,9 @@ function ConsolePanel() {
 
 function InspectorPanel({ initializedPanels }) {
   const inspector = gToolbox.getPanel("inspector");
-  let markupView, rulesPanel, layoutPanel, computedPanel;
+  let rulesPanel, layoutPanel, computedPanel;
 
   if (inspector && initializedPanels.includes("inspector")) {
-    markupView = inspector._inspector.getPanel("markupview").provider;
     rulesPanel = {
       id: "ruleview",
       title: "Rules",
@@ -97,7 +97,7 @@ function InspectorPanel({ initializedPanels }) {
   return (
     <div className={classnames("toolbox-panel theme-body")} id="toolbox-content-inspector">
       <InspectorApp
-        markupView={markupView}
+        markupView={inspector ? <MarkupApp inspector={inspector._inspector} /> : null}
         rulesPanel={rulesPanel}
         layoutPanel={layoutPanel}
         computedPanel={computedPanel}

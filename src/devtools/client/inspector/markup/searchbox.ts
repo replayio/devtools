@@ -1,9 +1,12 @@
+import { Inspector } from "../inspector";
+
 const { InspectorSearch } = require("devtools/client/inspector/inspector-search");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
 export default class MarkupSearchbox {
+  private inspector: Inspector;
   private markupPanel!: HTMLElement;
   private searchBox!: HTMLElement;
   private searchClearButton!: HTMLElement;
@@ -12,9 +15,13 @@ export default class MarkupSearchbox {
   private _search: any;
   private searchboxShortcuts: any;
 
+  constructor(inspector: Inspector) {
+    this.inspector = inspector;
+  }
+
   get search() {
     if (!this._search) {
-      this._search = new InspectorSearch(this, this.searchBox, this.searchClearButton);
+      this._search = new InspectorSearch(this.inspector, this.searchBox, this.searchClearButton);
     }
 
     return this._search;

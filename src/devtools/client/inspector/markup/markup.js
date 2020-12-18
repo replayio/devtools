@@ -78,6 +78,16 @@ class MarkupView {
     }
   }
 
+  getMarkupProps() {
+    return {
+      onSelectNode: this.onSelectNode,
+      onShowEventTooltip: this.onShowEventTooltip,
+      onToggleNodeExpanded: this.onToggleNodeExpanded,
+      onMouseEnterNode: this.onMouseEnterNode,
+      onMouseLeaveNode: this.onMouseLeaveNode,
+    };
+  }
+
   async onPaused() {
     this.store.dispatch(reset());
 

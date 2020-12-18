@@ -160,7 +160,7 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
   }
 
   render() {
-    const { rulesPanel, is3PaneModeEnabled } = this.props;
+    const { markupView, rulesPanel, is3PaneModeEnabled } = this.props;
 
     return (
       <div
@@ -177,7 +177,7 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
             onMove={this.onSplitboxResize}
             splitterSize={1}
             endPanelControl={true}
-            startPanel={this.renderMarkupPanel()}
+            startPanel={markupView}
             endPanel={
               <SplitBox
                 ref={this.sidebarSplitboxRef}

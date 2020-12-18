@@ -3,10 +3,19 @@ import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
 import { Inspector } from "../../inspector";
 import MarkupSearchbox from "../searchbox";
+import Nodes from "./Nodes";
 const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
 
-const searchbox = new MarkupSearchbox();
+export interface MarkupProps {
+  onSelectNode: (nodeId: string) => void;
+  onShowEventTooltip: (nodeId: string, element: EventTarget) => void;
+  onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
+  onMouseEnterNode: (nodeId: string) => void;
+  onMouseLeaveNode: (nodeId: string) => void;
+}
+
 function setupLegacyComponents(inspector: Inspector) {
+  const searchbox = new MarkupSearchbox(inspector);
   searchbox.setupSearchBox();
   new HTMLBreadcrumbs(inspector);
 }
@@ -54,7 +63,7 @@ function MarkupApp(props: PropsFromRedux & { inspector: Inspector }) {
         <div id="markup-box" className="theme-body devtools-monospace">
           <div id="markup-root-wrapper" role="presentation">
             <div id="markup-root" role="presentation">
-              {/* markupView */}
+              {<Nodes {...props.inspector.markup.getMarkupProps()} />}
             </div>
           </div>
           <a id="markup-loading" hidden={isMarkupEmpty}>
