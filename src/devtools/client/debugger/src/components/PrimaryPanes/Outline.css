@@ -25,6 +25,16 @@
   height: 28px;
 }
 
+.outlines-pane {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+}
+
+.outlines-pane.expanded {
+  flex: 1;
+}
+
 .outline-pane-info {
   padding: 0.5em;
   width: 100%;

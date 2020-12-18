@@ -757,13 +757,11 @@ class Tree extends Component {
         const isVisible =
           !treeElement || (top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom);
 
-        if (!isVisible) {
-          const { alignTo } = options;
-          const scrollToTop = alignTo
-            ? alignTo === "top"
-            : !scrolledParentRect || top < scrolledParentRect.top;
-          element.scrollIntoView(scrollToTop);
+        if (isVisible) {
+          return;
         }
+
+        element.scrollIntoView({ block: "center" });
       }
     }
   }

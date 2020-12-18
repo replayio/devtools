@@ -33,7 +33,7 @@ class Accordion extends Component {
     const { opened } = item;
 
     return (
-      <li className={item.className} key={i}>
+      <li className={`${item.className} ${item.opened ? "expanded" : "collapsed"}`} key={i}>
         <h2
           className="_header"
           tabIndex="0"
