@@ -10,7 +10,7 @@
   align-items: center;
 }
 
-.replay-player :focus:not(:focus-visible) {
+.replay-player .commands :focus:not(:focus-visible) {
   outline: none;
   background: inherit;
 }

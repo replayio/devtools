@@ -81,7 +81,7 @@ class Comment extends React.Component {
 
   renderNewComment() {
     const { comment } = this.props;
-    const lines = comment.contents.split("\n");
+    const lines = comment.content.split("\n");
 
     return (
       <div className="comment-body">

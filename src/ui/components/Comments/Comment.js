@@ -67,7 +67,7 @@ class Comment extends React.Component {
 
   renderLabel() {
     const { comment } = this.props;
-    const lines = comment.contents.split("\n");
+    const lines = comment.content.split("\n");
 
     return (
       <div className="label" onDoubleClick={this.startEditing}>
@@ -106,12 +106,10 @@ class Comment extends React.Component {
     const {
       comment,
       zoomRegion,
-      index,
       timelineDimensions,
       focusedCommentId,
       unfocusComment,
     } = this.props;
-    const { description } = this.state;
     const commentWidth = 280;
     const shouldCollapse = focusedCommentId !== comment.id;
 

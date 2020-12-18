@@ -161,7 +161,7 @@ export function unfocusComment(comment: Comment): UIThunkAction {
   };
 }
 
-function setFocusedCommentId(id: number): SetFocusedCommentAction {
+export function setFocusedCommentId(id: number): SetFocusedCommentAction {
   return { type: "set_focused_comment_id", id };
 }
 

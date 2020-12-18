@@ -11,7 +11,7 @@ class CommentEditor extends React.Component {
     super(props);
 
     this.state = {
-      inputValue: props.comment.contents,
+      inputValue: props.comment.content,
     };
   }
 
@@ -36,7 +36,7 @@ class CommentEditor extends React.Component {
   };
 
   saveEditedComment = e => {
-    const { comment, stopEditing, location, saveComment } = this.props;
+    const { comment, stopEditing, location } = this.props;
     const { inputValue } = this.state;
     e.stopPropagation();
     stopEditing();
@@ -73,7 +73,7 @@ class CommentEditor extends React.Component {
     return (
       <div className="editor">
         <textarea
-          defaultValue={comment.contents}
+          defaultValue={comment.content}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
           ref={c => (this._textarea = c)}
@@ -86,5 +86,4 @@ class CommentEditor extends React.Component {
 
 export default connect(() => ({}), {
   unfocusComment: actions.unfocusComment,
-  saveComment: actions.saveComment,
 })(CommentEditor);

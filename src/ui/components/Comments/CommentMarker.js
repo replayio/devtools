@@ -4,7 +4,8 @@ import classnames from "classnames";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getMarkerLeftOffset, getTimeMidpoint } from "ui/utils/timeline";
+import { getMarkerLeftOffset } from "ui/utils/timeline";
+import NewCommentButton from "./NewCommentButton";
 
 const markerWidth = 19;
 
@@ -27,33 +28,18 @@ class CommentMarker extends React.Component {
     return comments[index];
   }
 
-  renderCreateCommentButton() {
-    const { createComment, currentTime, zoomRegion, focusedCommentId } = this.props;
-
-    if (
-      this.getCommentAtTime(currentTime) ||
-      currentTime > zoomRegion.endTime ||
-      focusedCommentId
-    ) {
-      return null;
-    }
-
-    return (
-      <button
-        className="create-comment"
-        style={{
-          left: `${this.calculateLeftOffset(currentTime)}%`,
-        }}
-        onClick={() => createComment()}
-      />
-    );
-  }
-
   render() {
-    const { comment, focusComment, currentTime, zoomRegion, focusedCommentId } = this.props;
+    const {
+      comment,
+      comments,
+      focusComment,
+      currentTime,
+      zoomRegion,
+      focusedCommentId,
+    } = this.props;
 
     if (!comment) {
-      return this.renderCreateCommentButton();
+      return <NewCommentButton comments={comments} />;
     }
 
     if (comment.time > zoomRegion.endTime) {
@@ -83,7 +69,6 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
-    comments: selectors.getComments(state),
     focusedCommentId: selectors.getFocusedCommentId(state),
   }),
   {
