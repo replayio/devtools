@@ -42,6 +42,7 @@ const { ComputedPanel } = require("devtools/client/inspector/computed/panel");
 const HighlightersOverlay = require("devtools/client/inspector/shared/highlighters-overlay");
 
 import CSSProperties from "./css-properties";
+import RulesView from "./rules/rules";
 
 const Highlighter = require("highlighter/highlighter");
 
@@ -89,6 +90,7 @@ export class Inspector {
   highlighter: any;
 
   markup: MarkupView;
+  rules: RulesView;
 
   private _toolbox: any;
   private _panels: Map<string, InspectorPanel>;
@@ -119,6 +121,7 @@ export class Inspector {
     this.highlighter = Highlighter;
 
     this.markup = new MarkupView(this);
+    this.rules = new RulesView(this, window);
   }
 
   /**
