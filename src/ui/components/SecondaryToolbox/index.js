@@ -111,46 +111,6 @@ function InspectorPanel({ initializedPanels }) {
         layoutPanel={layoutPanel}
         computedPanel={computedPanel}
       />
-      <div id="tabpanels" style={{ display: "none" }}>
-        <div id="sidebar-panel-computedview" className="theme-sidebar inspector-tabpanel">
-          <div id="computed-toolbar" className="devtools-toolbar devtools-input-toolbar">
-            <div className="devtools-searchbox">
-              <input
-                id="computed-searchbox"
-                className="devtools-filterinput"
-                type="search"
-                placeholder="Filter Styles"
-              />
-              <button
-                id="computed-searchinput-clear"
-                className="devtools-searchinput-clear"
-              ></button>
-            </div>
-            <div className="devtools-separator"></div>
-            <input id="browser-style-checkbox" type="checkbox" className="includebrowserstyles" />
-            <label id="browser-style-checkbox-label" htmlFor="browser-style-checkbox">
-              Browser Styles
-            </label>
-          </div>
-
-          <div id="computed-container">
-            <div id="computed-container-focusable" tabIndex="-1">
-              <div
-                id="computed-property-container"
-                className="devtools-monospace"
-                tabIndex="0"
-                dir="ltr"
-              ></div>
-              <div
-                id="computed-no-results"
-                className="devtools-sidepanel-no-result"
-                hidden=""
-                data-localization="content=inspector.noProperties"
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

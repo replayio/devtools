@@ -65,46 +65,9 @@ class RulesView {
     this.selection.on("detached-front", this.onSelection);
     this.selection.on("new-node-front", this.onSelection);
 
-    this.init();
-
     EventEmitter.decorate(this);
 
     this.onSelection();
-  }
-
-  init() {
-    if (!this.inspector) {
-      return;
-    }
-
-    const rulesApp = RulesApp({
-      onAddClass: this.onAddClass,
-      onAddRule: this.onAddRule,
-      onSetClassState: this.onSetClassState,
-      onToggleClassPanelExpanded: this.onToggleClassPanelExpanded,
-      onToggleDeclaration: this.onToggleDeclaration,
-      onTogglePseudoClass: this.onTogglePseudoClass,
-      onToggleSelectorHighlighter: this.onToggleSelectorHighlighter,
-      showContextMenu: this.showContextMenu,
-      showDeclarationNameEditor: this.showDeclarationNameEditor,
-      showDeclarationValueEditor: this.showDeclarationValueEditor,
-      showNewDeclarationEditor: this.showNewDeclarationEditor,
-      showSelectorEditor: this.showSelectorEditor,
-    });
-
-    const provider = createElement(
-      Provider,
-      {
-        id: "ruleview",
-        key: "ruleview",
-        store: this.store,
-        title: "Rules",
-      },
-      rulesApp
-    );
-
-    // Exposes the provider to let inspector.js use it in setupSidebar.
-    this.provider = provider;
   }
 
   getRulesProps() {
