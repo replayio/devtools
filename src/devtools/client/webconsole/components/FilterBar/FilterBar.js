@@ -141,21 +141,21 @@ class FilterBar extends Component {
 
   renderClearButton() {
     const { messagesClearEvaluations, allMessagesById } = this.props;
-    let messagesExist = false;
+    let evaluationsExist = false;
 
     // Get all messages related to evaluations and determine whether or not we
     // have any, if we don't we want to disable the trash button
     for (const [id, message] of allMessagesById) {
       if (message.type === MESSAGE_TYPE.COMMAND || message.type === MESSAGE_TYPE.RESULT) {
-        messagesExist = true;
+        evaluationsExist = true;
         break;
       }
     }
 
     return dom.button({
       className: "devtools-button devtools-clear-icon",
-      title: messagesExist ? "Clear the Web Console output" : "No outputs to clear",
-      disabled: !messagesExist,
+      title: evaluationsExist ? "Clear console evaluations" : "No console evaluations to clear",
+      disabled: !evaluationsExist,
       onClick: messagesClearEvaluations,
     });
   }
