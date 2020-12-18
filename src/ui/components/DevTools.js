@@ -23,19 +23,19 @@ const GET_RECORDING = gql`
     }
   }
 `;
-const GET_COMMENTS = gql`
-  query GetComments($recordingId: uuid) {
-    comments(where: { recording_id: { _eq: $recordingId } }) {
-      id
-      content
-      created_at
-      recording_id
-      user_id
-      updated_at
-      time
-    }
-  }
-`;
+// const GET_COMMENTS = gql`
+//   query GetCommentsBig($recordingId: uuid) {
+//     comments(where: { recording_id: { _eq: $recordingId } }) {
+//       id
+//       content
+//       created_at
+//       recording_id
+//       user_id
+//       updated_at
+//       time
+//     }
+//   }
+// `;
 
 function getUploadingMessage(uploading) {
   if (!uploading) {
@@ -81,9 +81,9 @@ function DevTools({
   const { data, loading: queryIsLoading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
   });
-  const { data: data2, loading: commentsIsLoading } = useQuery(GET_COMMENTS, {
-    variables: { recordingId },
-  });
+  // const { data: data2, loading: commentsIsLoading } = useQuery(GET_COMMENTS, {
+  //   variables: { recordingId },
+  // });
 
   useEffect(() => {
     if (recordingLoaded) {
@@ -95,14 +95,13 @@ function DevTools({
     return null;
   }
 
-  if (queryIsLoading || commentsIsLoading) {
+  // if (queryIsLoading || commentsIsLoading) {
+  if (queryIsLoading) {
     return <Loader />;
   } else if (recordingDuration === null || uploading) {
     const message = getUploadingMessage(uploading);
     return <Loader message={message} />;
   }
-
-  console.log(data2);
 
   const isAuthorized = getIsAuthorized({ data });
 

@@ -49,11 +49,18 @@ class CommentMarker extends React.Component {
     const { time, id } = comment;
     const pausedAtComment = currentTime == time;
 
+    // If a comment is newly added and doesn't have any content yet,
+    // hide it until the user saves it with new content. This way
+    // we avoid flickering in the UI in case they press cancel and
+    // we have to delete the comment.
+    const hidden = !comment.content;
+
     return (
       <button
         className={classnames("img comment-marker", {
           expanded: id === focusedCommentId,
           paused: pausedAtComment,
+          hidden,
         })}
         style={{
           left: `${this.calculateLeftOffset(time)}%`,

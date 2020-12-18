@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import Comment from "./Comment";
 import CommentMarker from "./CommentMarker";
 import { selectors } from "../../reducers";
@@ -24,9 +24,13 @@ const GET_COMMENTS = gql`
 `;
 
 function Comments({ playback, recordingId }) {
-  const { data } = useQuery(GET_COMMENTS, {
+  const { data, loading } = useQuery(GET_COMMENTS, {
     variables: { recordingId },
   });
+
+  if (!data || loading) {
+    return null;
+  }
 
   const { comments } = data;
   const sortedComments = sortBy(comments, comment => comment.time);

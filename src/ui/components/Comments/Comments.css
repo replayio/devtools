@@ -19,6 +19,13 @@
   outline: none;
 }
 
+/* This avoids flickering in the UI when a user adds a new comment
+that starts off as empty, and then proceeds to press cancel which
+deletes the comment */
+.img.comment-marker.hidden:not(.expanded) {
+  display: none;
+}
+
 .img.comment-marker:hover,
 .img.comment-marker.hovered,
 .img.comment-marker.expanded,

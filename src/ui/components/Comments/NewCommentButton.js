@@ -28,6 +28,7 @@ function NewCommentButton({
   currentTime,
   zoomRegion,
   recordingId,
+  focusedCommentId,
   setFocusedCommentId,
   comments,
 }) {
@@ -40,18 +41,18 @@ function NewCommentButton({
     refetchQueries: ["GetComments"],
   });
 
-  // Don't render this if any of the following applies: (JVV)
-  // 1. There is already a comment at that time.
-  // 2. That time is not currently visible in the timeline
-  // 3. There is a timeline comment that is currently focused.
-
-  if (comments.some(comment => comment.time == currentTime)) {
+  // Skip rendering the button if any of the following applies:
+  // - There is already a comment at that time.
+  // - That time is not currently visible in the timeline
+  // - There is a timeline comment that is currently focused.
+  const isOnExistingComment = comments.some(comment => comment.time == currentTime);
+  if (isOnExistingComment || focusedCommentId || zoomRegion.endTime <= currentTime) {
     return null;
   }
 
   const handleClick = () => {
     const newComment = {
-      content: "new butts before",
+      content: "",
       recording_id: recordingId,
       time: currentTime,
     };
@@ -84,7 +85,7 @@ export default connect(
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
-    // focusedCommentId: selectors.getFocusedCommentId(state),
+    focusedCommentId: selectors.getFocusedCommentId(state),
     // comments: selectors.getComments(state),
   }),
   {

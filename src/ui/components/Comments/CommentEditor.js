@@ -1,89 +1,91 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { connect } from "react-redux";
-import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getAvatarColor } from "ui/utils/user";
-import classnames from "classnames";
+import { gql, useMutation } from "@apollo/client";
 
-class CommentEditor extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      inputValue: props.comment.content,
-    };
+const UPDATE_COMMENT_CONTENT = gql`
+  mutation UpdateCommentContent($newContent: String, $commentId: uuid) {
+    update_comments(_set: { content: $newContent }, where: { id: { _eq: $commentId } }) {
+      returning {
+        id
+        content
+      }
+    }
   }
+`;
 
-  componentDidMount() {
-    const { inputValue } = this.state;
-    const textarea = this._textarea;
-
-    textarea.focus();
-    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+const DELETE_COMMENT = gql`
+  mutation DeleteComment($commentId: uuid) {
+    delete_comments(where: { id: { _eq: $commentId } }) {
+      returning {
+        id
+      }
+    }
   }
+`;
 
-  onChange = e => {
-    this.setState({ inputValue: e.target.value });
-  };
+function CommentEditor({ comment, stopEditing, unfocusComment, setFocusedCommentId }) {
+  const [inputValue, setInputValue] = useState(comment.content);
+  const textareaNode = useRef(null);
+  const [updateCommentContent] = useMutation(UPDATE_COMMENT_CONTENT, {
+    onCompleted: () => {
+      stopEditing();
+      setFocusedCommentId(null);
+    },
+  });
+  const [deleteComment] = useMutation(DELETE_COMMENT, {
+    refetchQueries: ["GetComments"],
+  });
 
-  onKeyDown = e => {
+  useEffect(function focusText() {
+    const { length } = textareaNode.current.value;
+    textareaNode.current.focus();
+    textareaNode.current.setSelectionRange(length, length);
+  }, []);
+
+  const onKeyDown = e => {
     if (e.key == "Escape") {
-      this.stopEditingComment(e);
+      stopEditingComment(e);
     } else if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) {
-      this.saveEditedComment(e);
+      saveEditedComment();
+    }
+  };
+  const saveEditedComment = () => {
+    updateCommentContent({
+      variables: { newContent: inputValue, commentId: comment.id },
+    });
+  };
+  const stopEditingComment = e => {
+    stopEditing();
+    setFocusedCommentId(null);
+
+    // If this was a new comment and it was left empty, delete it.
+    if (!comment.content && !inputValue) {
+      deleteComment({ variables: { commentId: comment.id } });
     }
   };
 
-  saveEditedComment = e => {
-    const { comment, stopEditing, location } = this.props;
-    const { inputValue } = this.state;
-    e.stopPropagation();
-    stopEditing();
-
-    saveComment(inputValue, location, comment);
-  };
-
-  stopEditingComment = e => {
-    const { comment, stopEditing, unfocusComment } = this.props;
-    const { inputValue } = this.state;
-    e.stopPropagation();
-    stopEditing();
-    this.setState({ inputValue: comment.contents });
-
-    unfocusComment(comment);
-  };
-
-  renderButtons() {
-    return (
+  return (
+    <div className="editor">
+      <textarea
+        defaultValue={comment.content}
+        onChange={e => setInputValue(e.target.value)}
+        onKeyDown={onKeyDown}
+        ref={textareaNode}
+      />
       <div className="buttons">
-        <button className="cancel" onClick={this.stopEditingComment}>
+        <button className="cancel" onClick={stopEditingComment}>
           Cancel
         </button>
-        <button className="save" onClick={this.saveEditedComment}>
+        <button className="save" onClick={saveEditedComment}>
           Save
         </button>
       </div>
-    );
-  }
-
-  render() {
-    const { comment } = this.props;
-
-    return (
-      <div className="editor">
-        <textarea
-          defaultValue={comment.content}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          ref={c => (this._textarea = c)}
-        />
-        {this.renderButtons()}
-      </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default connect(() => ({}), {
-  unfocusComment: actions.unfocusComment,
+  setFocusedCommentId: actions.setFocusedCommentId,
 })(CommentEditor);

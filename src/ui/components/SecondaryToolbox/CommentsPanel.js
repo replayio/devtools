@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { sortBy } from "lodash";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useLazyQuery } from "@apollo/client";
 
 import Comment from "ui/components/SecondaryToolbox/Comment";
 
@@ -26,9 +26,13 @@ const GET_COMMENTS = gql`
 
 function CommentsPanel({ recordingId }) {
   const [editingComment, setEditingComment] = useState(false);
-  const { data } = useQuery(GET_COMMENTS, {
+  const { data, loading } = useQuery(GET_COMMENTS, {
     variables: { recordingId },
   });
+
+  if (!data || loading) {
+    return null;
+  }
 
   const { comments } = data;
   const toggleEditingCommentOn = () => setEditingComment(true);
