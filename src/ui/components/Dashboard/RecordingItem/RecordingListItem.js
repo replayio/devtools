@@ -69,11 +69,13 @@ function ItemDuration({ duration }) {
   return <div>{getDurationString(duration)}</div>;
 }
 
-function ItemPageDetails({ title, url }) {
+function ItemPageDetails({ title, url, handleClickUrl }) {
   return (
     <div className="page">
       <div className="page-title">{title || "No page title found"}</div>
-      <div className="page-url">{url}</div>
+      <div className="page-url" onClick={handleClickUrl}>
+        {url}
+      </div>
     </div>
   );
 }
@@ -148,6 +150,11 @@ export default function RecordingListItem({
     }
   };
 
+  const handleClickUrl = e => {
+    e.stopPropagation();
+    window.open(data.url, "_blank");
+  };
+
   return (
     <tr className={classnames("recording-item", { selected })} onClick={handleClick}>
       <td>
@@ -165,7 +172,7 @@ export default function RecordingListItem({
         />
       </td>
       <td>
-        <ItemPageDetails title={data.title} url={data.url} />
+        <ItemPageDetails title={data.title} url={data.url} handleClickUrl={handleClickUrl} />
       </td>
       <td>
         <ItemDuration duration={data.duration} />
