@@ -234,4 +234,5 @@
 
 .page-url:hover {
   color: var(--dark-blue) !important;
+  text-decoration: underline;
 }
