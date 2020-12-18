@@ -8,22 +8,19 @@ import SidebarToggle from "devtools/client/shared/components/SidebarToggle";
 const { prefs } = require("devtools/client/inspector/prefs");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
+import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
+const RulesApp = require("devtools/client/inspector/rules/components/RulesApp");
+import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
+const LayoutApp = require("devtools/client/inspector/layout/components/LayoutApp");
+import { selectors } from "ui/reducers";
 
 export interface InspectorPanel {
   id: string;
   title: string;
   panel: ReactElement;
-  destroy(): void;
 }
 
-interface Panels {
-  markupView?: ReactElement;
-  rulesPanel?: InspectorPanel;
-  layoutPanel?: InspectorPanel;
-  computedPanel?: InspectorPanel;
-}
-
-class InspectorApp extends Component<PropsFromRedux & Panels> {
+class InspectorApp extends Component<PropsFromRedux> {
   private sidebarContainerRef = React.createRef<HTMLDivElement>();
   private splitBoxRef = React.createRef<SplitBox>();
   private sidebarSplitboxRef = React.createRef<SplitBox>();
@@ -89,15 +86,12 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
     prefs.splitSidebarSize = width;
   };
 
-  renderSidebar() {
-    const {
-      rulesPanel,
-      layoutPanel,
-      computedPanel,
-      is3PaneModeEnabled,
-      activeTab,
-      setActiveTab,
-    } = this.props;
+  renderSidebar(
+    rulesPanel: InspectorPanel | undefined,
+    layoutPanel: InspectorPanel | undefined,
+    computedPanel: InspectorPanel | undefined
+  ) {
+    const { is3PaneModeEnabled, activeTab, setActiveTab } = this.props;
 
     const panels: InspectorPanel[] = [];
     if (rulesPanel && !is3PaneModeEnabled) {
@@ -160,7 +154,37 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
   }
 
   render() {
-    const { markupView, rulesPanel, is3PaneModeEnabled } = this.props;
+    const { initializedPanels, is3PaneModeEnabled } = this.props;
+
+    const inspector = gToolbox.getPanel("inspector");
+    let markupView, rulesPanel, layoutPanel, computedPanel;
+
+    if (inspector && initializedPanels.includes("inspector")) {
+      markupView = <MarkupApp inspector={inspector._inspector} />;
+
+      rulesPanel = {
+        id: "ruleview",
+        title: "Rules",
+        panel: <RulesApp {...inspector._inspector.rules.getRulesProps()} />,
+      };
+
+      const layoutProps = {
+        ...inspector._inspector.getCommonComponentProps(),
+        ...inspector._inspector.boxModel.getComponentProps(),
+        showBoxModelProperties: true,
+      };
+      layoutPanel = {
+        id: "layoutview",
+        title: "Layout",
+        panel: <LayoutApp {...layoutProps} />,
+      };
+
+      computedPanel = {
+        id: "computedview",
+        title: "Computed",
+        panel: <ComputedApp />,
+      };
+    }
 
     return (
       <div
@@ -200,7 +224,7 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
                   <div className="devtools-inspector-tab-panel">
                     <div id="inspector-sidebar-container">
                       <div id="inspector-sidebar" hidden={false}>
-                        {this.renderSidebar()}
+                        {this.renderSidebar(rulesPanel, layoutPanel, computedPanel)}
                       </div>
                     </div>
                   </div>
@@ -216,6 +240,7 @@ class InspectorApp extends Component<PropsFromRedux & Panels> {
 
 const connector = connect(
   (state: UIState) => ({
+    initializedPanels: selectors.getInitializedPanels(state),
     is3PaneModeEnabled: state.inspector.is3PaneModeEnabled,
     activeTab: state.inspector.activeTab,
     markupRootNode: state.markup.tree[state.markup.rootNode!],
