@@ -1,14 +1,42 @@
-import ReactDOM from "react-dom";
 import React from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
-import CommentMarker from "./CommentMarker";
+import { gql, useMutation } from "@apollo/client";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getPixelOffset, getCommentLeftOffset, getMarkerLeftOffset } from "ui/utils/timeline";
+import { getPixelOffset, getCommentLeftOffset } from "ui/utils/timeline";
+
+import CommentMarker from "./CommentMarker";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import CommentEditor from "./CommentEditor";
+
+const DELETE_COMMENT = gql`
+  mutation DeleteComment($commentId: uuid) {
+    delete_comments(where: { id: { _eq: $commentId } }) {
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+function Mask({ setFocusedCommentId, comment, editing }) {
+  const [deleteComment] = useMutation(DELETE_COMMENT, {
+    refetchQueries: ["GetComments"],
+  });
+  const onClick = () => {
+    // If a comment doesn't have any content, it means it's a newly-added
+    // comment. If the user clicks outside the comment editor, we should
+    // just delete that comment.
+    if (!comment.content) {
+      deleteComment({ variables: { commentId: comment.id } });
+    }
+    setFocusedCommentId(null);
+  };
+
+  return <div className="app-mask" onClick={onClick} />;
+}
 
 class Comment extends React.Component {
   state = {
@@ -45,8 +73,9 @@ class Comment extends React.Component {
   };
 
   deleteComment = () => {
-    const { removeComment, setFocusedCommentId, comment } = this.props;
+    const { setFocusedCommentId, comment } = this.props;
     setFocusedCommentId(null);
+    // Before shipping this PR, fix this removeComment because it's broken
     removeComment(comment);
   };
 
@@ -110,6 +139,8 @@ class Comment extends React.Component {
       focusedCommentId,
       setFocusedCommentId,
     } = this.props;
+    const { editing } = this.state;
+
     const commentWidth = 280;
     const shouldCollapse = focusedCommentId !== comment.id;
 
@@ -136,7 +167,7 @@ class Comment extends React.Component {
     return (
       <div>
         <CommentMarker comment={comment} />
-        <div className="app-mask" onClick={() => setFocusedCommentId(null)} />
+        <Mask setFocusedCommentId={setFocusedCommentId} comment={comment} editing={editing} />
         <div
           className={classnames("comment")}
           style={{

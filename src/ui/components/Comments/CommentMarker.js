@@ -28,15 +28,14 @@ class CommentMarker extends React.Component {
     return comments[index];
   }
 
+  onClick = () => {
+    const { setFocusedCommentId, comment, seek } = this.props;
+
+    setFocusedCommentId(comment.id);
+  };
+
   render() {
-    const {
-      comment,
-      comments,
-      focusComment,
-      currentTime,
-      zoomRegion,
-      focusedCommentId,
-    } = this.props;
+    const { comment, comments, currentTime, zoomRegion, focusedCommentId } = this.props;
 
     if (!comment) {
       return <NewCommentButton comments={comments} />;
@@ -65,7 +64,7 @@ class CommentMarker extends React.Component {
         style={{
           left: `${this.calculateLeftOffset(time)}%`,
         }}
-        onClick={() => focusComment(comment)}
+        onClick={this.onClick}
       />
     );
   }
@@ -80,6 +79,7 @@ export default connect(
   }),
   {
     createComment: actions.createComment,
-    focusComment: actions.focusComment,
+    setFocusedCommentId: actions.setFocusedCommentId,
+    seek: actions.seek,
   }
 )(CommentMarker);
