@@ -16,7 +16,6 @@ import { copyToTheClipboard } from "../../utils/clipboard";
 import actions from "../../actions";
 
 import {
-  getDisplayPath,
   getFileURL,
   getRawSourceURL,
   getSourceQueryString,
@@ -179,7 +178,6 @@ class Tab extends PureComponent {
       pretty: isPrettyCode,
     });
 
-    const path = getDisplayPath(source, tabSources);
     const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
 
     return (
@@ -197,10 +195,7 @@ class Tab extends PureComponent {
         title={getFileURL(source, false)}
       >
         <SourceIcon source={source} shouldHide={icon => ["file", "javascript"].includes(icon)} />
-        <div className="filename">
-          {getTruncatedFileName(source, query)}
-          {path && <span>{`../${path}/..`}</span>}
-        </div>
+        <div className="filename">{getTruncatedFileName(source, query)}</div>
         <CloseButton handleClick={onClickClose} tooltip={"Close tab"} />
       </div>
     );
