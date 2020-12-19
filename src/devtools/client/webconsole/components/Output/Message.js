@@ -162,6 +162,8 @@ class Message extends Component {
           message.pauseId
         )
       );
+
+      this.onViewSourceInDebugger({ ...frame, url: frame.source });
     };
 
     if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {
