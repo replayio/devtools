@@ -10,19 +10,40 @@ import UserOptions from "ui/components/Header/UserOptions";
 import "./Account.css";
 
 const GET_MY_RECORDINGS = gql`
-  query GetMyRecordings($authId: String) {
-    recordings(where: { user: { auth_id: { _eq: $authId } } }) {
-      id
-      url
-      title
-      recording_id
-      recordingTitle
-      last_screen_mime_type
-      duration
-      description
-      date
-      last_screen_data
-      is_private
+  fragment recordingFields on recordings {
+    id
+    url
+    title
+    recording_id
+    recordingTitle
+    last_screen_mime_type
+    duration
+    description
+    date
+    last_screen_data
+    is_private
+  }
+
+  fragment avatarFields on users {
+    name
+    email
+    picture
+  }
+
+  query MyRecordings($authId: String) {
+    users(where: { auth_id: { _eq: $authId } }) {
+      ...avatarFields
+      collaborators {
+        recording {
+          ...recordingFields
+          user {
+            ...avatarFields
+          }
+        }
+      }
+      recordings {
+        ...recordingFields
+      }
     }
   }
 `;
@@ -56,6 +77,20 @@ function FirstRecordingPrompt() {
   );
 }
 
+function getRecordings(data) {
+  if (!data.users.length) {
+    return [];
+  }
+
+  const user = data.users[0];
+  const { recordings, collaborators, name, email, picture } = user;
+
+  return [
+    ...recordings.map(r => ({ ...r, user: { name, email, picture } })),
+    ...collaborators.map(({ recording }) => ({ ...recording })),
+  ];
+}
+
 function AccountPage() {
   const { user } = useAuth0();
   const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
@@ -72,11 +107,13 @@ function AccountPage() {
     throw new Error(error);
   }
 
-  if (data.recordings && !data.recordings.length) {
+  const recordings = getRecordings(data);
+
+  if (recordings.length == 0) {
     return <FirstRecordingPrompt />;
   }
 
-  return <Dashboard />;
+  return <Dashboard recordings={recordings} />;
 }
 
 function WelcomePage() {
