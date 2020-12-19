@@ -120,7 +120,6 @@ export default connect(
   state => ({
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
-    hasFocusedComment: selectors.hasFocusedComment(state),
     recordingDuration: selectors.getRecordingDuration(state),
     sessionId: selectors.getSessionId(state),
     recordingId: selectors.getRecordingId(state),
@@ -131,7 +130,6 @@ export default connect(
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,
-    unfocusComment: actions.unfocusComment,
     setExpectedError: actions.setExpectedError,
   }
 )(DevTools);

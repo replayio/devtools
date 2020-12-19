@@ -4,7 +4,8 @@ import classnames from "classnames";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getMarkerLeftOffset, getTimeMidpoint } from "ui/utils/timeline";
+import { getMarkerLeftOffset } from "ui/utils/timeline";
+import NewCommentButton from "./NewCommentButton";
 
 const markerWidth = 19;
 
@@ -27,33 +28,17 @@ class CommentMarker extends React.Component {
     return comments[index];
   }
 
-  renderCreateCommentButton() {
-    const { createComment, currentTime, zoomRegion, focusedCommentId } = this.props;
+  onClick = () => {
+    const { setFocusedCommentId, comment, seek } = this.props;
 
-    if (
-      this.getCommentAtTime(currentTime) ||
-      currentTime > zoomRegion.endTime ||
-      focusedCommentId
-    ) {
-      return null;
-    }
-
-    return (
-      <button
-        className="create-comment"
-        style={{
-          left: `${this.calculateLeftOffset(currentTime)}%`,
-        }}
-        onClick={() => createComment()}
-      />
-    );
-  }
+    setFocusedCommentId(comment.id);
+  };
 
   render() {
-    const { comment, focusComment, currentTime, zoomRegion, focusedCommentId } = this.props;
+    const { comment, comments, currentTime, zoomRegion, focusedCommentId } = this.props;
 
     if (!comment) {
-      return this.renderCreateCommentButton();
+      return <NewCommentButton comments={comments} />;
     }
 
     if (comment.time > zoomRegion.endTime) {
@@ -63,16 +48,23 @@ class CommentMarker extends React.Component {
     const { time, id } = comment;
     const pausedAtComment = currentTime == time;
 
+    // If a comment is newly added and doesn't have any content yet,
+    // hide it until the user saves it with new content. This way
+    // we avoid flickering in the UI in case they press cancel and
+    // we have to delete the comment.
+    const hidden = !comment.content;
+
     return (
       <button
         className={classnames("img comment-marker", {
           expanded: id === focusedCommentId,
           paused: pausedAtComment,
+          hidden,
         })}
         style={{
           left: `${this.calculateLeftOffset(time)}%`,
         }}
-        onClick={() => focusComment(comment)}
+        onClick={this.onClick}
       />
     );
   }
@@ -83,11 +75,11 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
-    comments: selectors.getComments(state),
     focusedCommentId: selectors.getFocusedCommentId(state),
   }),
   {
     createComment: actions.createComment,
-    focusComment: actions.focusComment,
+    setFocusedCommentId: actions.setFocusedCommentId,
+    seek: actions.seek,
   }
 )(CommentMarker);

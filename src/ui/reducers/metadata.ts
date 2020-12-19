@@ -17,10 +17,6 @@ export default function update(
   action: MetadataAction
 ): MetadataState {
   switch (action.type) {
-    case "set_comments": {
-      return { ...state, comments: action.comments };
-    }
-
     case "register_user": {
       return { ...state, user: action.user };
     }
@@ -39,10 +35,6 @@ export default function update(
   }
 }
 
-export function getComments(state: UIState) {
-  return state.metadata.comments;
-}
-
 export function getUser(state: UIState) {
   return state.metadata.user;
 }
@@ -53,10 +45,6 @@ export function getUsers(state: UIState) {
 
 export function getFocusedCommentId(state: UIState) {
   return state.metadata.focusedCommentId;
-}
-
-export function getFocusedComment(state: UIState) {
-  return state.metadata.comments.find(c => c.id === getFocusedCommentId(state));
 }
 
 export function hasFocusedComment(state: UIState) {

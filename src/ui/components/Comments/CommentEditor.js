@@ -1,90 +1,74 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { connect } from "react-redux";
-import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getAvatarColor } from "ui/utils/user";
-import classnames from "classnames";
+import hooks from "ui/hooks";
 
-class CommentEditor extends React.Component {
-  constructor(props) {
-    super(props);
+function CommentEditor({ comment, stopEditing, setFocusedCommentId }) {
+  const [inputValue, setInputValue] = useState(comment.content);
+  const textareaNode = useRef(null);
 
-    this.state = {
-      inputValue: props.comment.contents,
-    };
-  }
-
-  componentDidMount() {
-    const { inputValue } = this.state;
-    const textarea = this._textarea;
-
-    textarea.focus();
-    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
-  }
-
-  onChange = e => {
-    this.setState({ inputValue: e.target.value });
+  const closeEditor = () => {
+    stopEditing();
+    setFocusedCommentId(null);
   };
 
-  onKeyDown = e => {
+  const updateComment = hooks.useUpdateComment(closeEditor);
+  const deleteComment = hooks.useDeleteComment();
+
+  useEffect(function focusText() {
+    const { length } = textareaNode.current.value;
+    textareaNode.current.focus();
+    textareaNode.current.setSelectionRange(length, length);
+  }, []);
+
+  const onKeyDown = e => {
     if (e.key == "Escape") {
-      this.stopEditingComment(e);
+      cancelEditingComment(e);
     } else if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) {
-      this.saveEditedComment(e);
+      saveEditedComment();
+    }
+  };
+  const saveEditedComment = () => {
+    closeEditor();
+    // If there's no input value, delete the comment
+    if (!inputValue) {
+      deleteComment({ variables: { commentId: comment.id } });
+      return;
+    }
+
+    updateComment({
+      variables: { newContent: inputValue, commentId: comment.id },
+    });
+  };
+  const cancelEditingComment = e => {
+    closeEditor();
+    // If this was a new comment and it was left empty, delete it.
+    if (!comment.content) {
+      deleteComment({ variables: { commentId: comment.id } });
     }
   };
 
-  saveEditedComment = e => {
-    const { comment, stopEditing, location, saveComment } = this.props;
-    const { inputValue } = this.state;
-    e.stopPropagation();
-    stopEditing();
-
-    saveComment(inputValue, location, comment);
-  };
-
-  stopEditingComment = e => {
-    const { comment, stopEditing, unfocusComment } = this.props;
-    const { inputValue } = this.state;
-    e.stopPropagation();
-    stopEditing();
-    this.setState({ inputValue: comment.contents });
-
-    unfocusComment(comment);
-  };
-
-  renderButtons() {
-    return (
+  return (
+    <div className="editor">
+      <textarea
+        defaultValue={comment.content}
+        onChange={e => setInputValue(e.target.value)}
+        onKeyDown={onKeyDown}
+        ref={textareaNode}
+      />
       <div className="buttons">
-        <button className="cancel" onClick={this.stopEditingComment}>
+        <button className="cancel" onClick={cancelEditingComment}>
           Cancel
         </button>
-        <button className="save" onClick={this.saveEditedComment}>
+        <button className="save" onClick={saveEditedComment}>
           Save
         </button>
       </div>
-    );
-  }
-
-  render() {
-    const { comment } = this.props;
-
-    return (
-      <div className="editor">
-        <textarea
-          defaultValue={comment.contents}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          ref={c => (this._textarea = c)}
-        />
-        {this.renderButtons()}
-      </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default connect(() => ({}), {
-  unfocusComment: actions.unfocusComment,
-  saveComment: actions.saveComment,
+  setFocusedCommentId: actions.setFocusedCommentId,
 })(CommentEditor);

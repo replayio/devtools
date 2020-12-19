@@ -1,14 +1,32 @@
-import ReactDOM from "react-dom";
 import React from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
-import CommentMarker from "./CommentMarker";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getPixelOffset, getCommentLeftOffset, getMarkerLeftOffset } from "ui/utils/timeline";
+import hooks from "ui/hooks";
+import { getPixelOffset, getCommentLeftOffset } from "ui/utils/timeline";
+
+import CommentMarker from "./CommentMarker";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import CommentEditor from "./CommentEditor";
+import CommentDropdownPanel from "./CommentDropdownPanel";
+
+function Mask({ setFocusedCommentId, comment }) {
+  const deleteComment = hooks.useDeleteComment();
+
+  const onClick = () => {
+    // If a comment doesn't have any content, it means it's a newly-added
+    // comment. If the user clicks outside the comment editor, we should
+    // just delete that comment.
+    if (!comment.content) {
+      deleteComment({ variables: { commentId: comment.id } });
+    }
+    setFocusedCommentId(null);
+  };
+
+  return <div className="app-mask" onClick={onClick} />;
+}
 
 class Comment extends React.Component {
   state = {
@@ -45,29 +63,19 @@ class Comment extends React.Component {
   };
 
   deleteComment = () => {
-    const { removeComment, unfocusComment, comment } = this.props;
-    unfocusComment();
+    const { setFocusedCommentId, comment } = this.props;
+    setFocusedCommentId(null);
     removeComment(comment);
   };
 
   renderDropdownPanel() {
-    return (
-      <div className="dropdown-panel">
-        {!this.state.editing ? (
-          <div className="menu-item" onClick={this.startEditing}>
-            Edit Comment
-          </div>
-        ) : null}
-        <div className="menu-item" onClick={this.deleteComment}>
-          Delete Comment
-        </div>
-      </div>
-    );
+    const { comment } = this.props;
+    return <CommentDropdownPanel startEditing={this.startEditing} comment={comment} />;
   }
 
   renderLabel() {
     const { comment } = this.props;
-    const lines = comment.contents.split("\n");
+    const lines = comment.content.split("\n");
 
     return (
       <div className="label" onDoubleClick={this.startEditing}>
@@ -92,7 +100,7 @@ class Comment extends React.Component {
           </div>
           <div className="comment-description">
             {editing ? (
-              <CommentEditor comment={comment} stopEditing={this.stopEditing} location="timeline" />
+              <CommentEditor comment={comment} stopEditing={this.stopEditing} />
             ) : (
               this.renderLabel()
             )}
@@ -106,12 +114,12 @@ class Comment extends React.Component {
     const {
       comment,
       zoomRegion,
-      index,
       timelineDimensions,
       focusedCommentId,
-      unfocusComment,
+      setFocusedCommentId,
     } = this.props;
-    const { description } = this.state;
+    const { editing } = this.state;
+
     const commentWidth = 280;
     const shouldCollapse = focusedCommentId !== comment.id;
 
@@ -138,7 +146,7 @@ class Comment extends React.Component {
     return (
       <div>
         <CommentMarker comment={comment} />
-        <div className="app-mask" onClick={unfocusComment} />
+        <Mask setFocusedCommentId={setFocusedCommentId} comment={comment} editing={editing} />
         <div
           className={classnames("comment")}
           style={{
@@ -162,6 +170,6 @@ export default connect(
   }),
   {
     removeComment: actions.removeComment,
-    unfocusComment: actions.unfocusComment,
+    setFocusedCommentId: actions.setFocusedCommentId,
   }
 )(Comment);

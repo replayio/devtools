@@ -8,7 +8,6 @@
 // graphics are currently being rendered.
 
 import { connect } from "react-redux";
-import classnames from "classnames";
 import { Component } from "react";
 import React from "react";
 import dom from "react-dom-factories";
@@ -158,11 +157,16 @@ export class Timeline extends Component {
   }
 
   onMarkerClick = (e, message) => {
+    const { selectedPanel, viewMode } = this.props;
+
     e.preventDefault();
     e.stopPropagation();
     const { executionPoint, executionPointTime, executionPointHasFrames, pauseId } = message;
     this.seek(executionPoint, executionPointTime, executionPointHasFrames, pauseId);
-    this.showMessage(message);
+
+    if (viewMode == "dev" && selectedPanel == "console") {
+      this.showMessage(message);
+    }
   };
 
   onMarkerMouseEnter = () => {
@@ -553,15 +557,6 @@ export class Timeline extends Component {
     });
   }
 
-  renderComments() {
-    return (
-      <>
-        {hasFocusedComment && <div className="app-mask" onClick={unfocusComment} />}
-        <Comments />
-      </>
-    );
-  }
-
   render() {
     const { loaded, currentTime } = this.props;
     const percent = this.getVisiblePosition(currentTime) * 100;
@@ -614,6 +609,8 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     loaded: selectors.getTimelineLoaded(state),
     messages: selectors.getMessagesForTimeline(state),
+    viewMode: selectors.getViewMode(state),
+    selectedPanel: selectors.getSelectedPanel(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,
