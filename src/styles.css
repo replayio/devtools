@@ -13,7 +13,7 @@
   position: relative;
   overflow: hidden;
   flex-grow: 1;
-  background: #000;
+  background-image: url("/images/playbackBG.png");
 }
 
 #outer-viewer {
