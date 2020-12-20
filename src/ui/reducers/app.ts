@@ -50,7 +50,7 @@ export default function update(state = initialAppState(), action: AppAction | Se
     }
 
     case "set_selected_panel": {
-      return { ...state, selectedPanel: action.panel };
+      return { ...state, viewMode: 'dev', selectedPanel: action.panel };
     }
 
     case "set_selected_primary_panel": {

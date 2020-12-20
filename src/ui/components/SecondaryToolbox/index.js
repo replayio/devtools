@@ -14,13 +14,7 @@ import { installObserver } from "../../../protocol/graphics";
 
 function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
   const onClick = panel => {
-    setSelectedPanel(panel);
-
-    // The comments panel doesn't have to be initialized by the toolbox,
-    // only the console and the inspector.
-    if (panel !== "comments") {
-      gToolbox.selectTool(panel);
-    }
+    gToolbox.selectTool(panel);
   };
 
   return (
