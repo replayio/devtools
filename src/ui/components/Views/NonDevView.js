@@ -7,6 +7,7 @@ import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
 import Dropdown from "ui/components/shared/Dropdown";
+import NodePicker from "ui/components/NodePicker.js";
 
 import { installObserver } from "../../../protocol/graphics";
 import { updateTimelineDimensions } from "../../actions/timeline";
@@ -40,6 +41,9 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
 
   const viewer = (
     <div id="outer-viewer">
+      <nav className="viewer-toolbar">
+        <NodePicker />
+      </nav>
       <div id="viewer">
         <canvas id="graphics"></canvas>
         <div id="highlighter-root"></div>

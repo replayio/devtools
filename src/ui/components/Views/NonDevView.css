@@ -1,3 +1,11 @@
+/* TODO: make more flexible without depending on outside defined id */
+#outer-viewer .viewer-toolbar {
+  flex: 0;
+  background: var(--theme-toolbar-background);
+  height: 40px;
+  border-bottom: solid var(--theme-splitter-color);
+}
+
 .right-sidebar {
   background: var(--theme-body-background);
   display: flex;
@@ -48,8 +56,8 @@
 }
 
 .right-sidebar .event-listeners .event-listeners-content {
-    height: 300px;
-    overflow-y: auto;
+  height: 300px;
+  overflow-y: auto;
 }
 
 .right-sidebar .comments-panel {
