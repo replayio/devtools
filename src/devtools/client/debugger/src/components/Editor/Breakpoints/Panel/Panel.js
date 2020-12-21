@@ -55,7 +55,6 @@ function Widget({ location, children, editor, insertAt }) {
     }
     const editorLine = toEditorLine(location.sourceId, location.line || 0);
     const _widget = editor.codeMirror.addLineWidget(editorLine, node, {
-      noHScroll: true,
       insertAt,
     });
     return () => {
