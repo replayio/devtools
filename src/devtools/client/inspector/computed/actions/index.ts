@@ -46,6 +46,8 @@ function createComputedProperties(elementStyle: ElementStyle): ComputedPropertyS
 
   const properties: ComputedPropertyState[] = [];
   for (const [name, value] of computed) {
+    // the computed style also contains CSS variables, which we don't want to show
+    // as properties in the computed view
     if (name.startsWith("--")) continue;
 
     let inheritanceCounter = 1;
