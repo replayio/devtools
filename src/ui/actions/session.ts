@@ -23,8 +23,12 @@ declare global {
 
 // Create a session to use while debugging.
 export async function createSession(store: UIStore, recordingId: string) {
-  addEventListener("Recording.uploadedData", onUploadedData);
-  addEventListener("Recording.sessionError", onSessionError);
+  addEventListener("Recording.uploadedData", (data: uploadedData) =>
+    store.dispatch(onUploadedData(data))
+  );
+  addEventListener("Recording.sessionError", (err: sessionError) =>
+    store.dispatch(onSessionError(err))
+  );
   try {
     ThreadFront.setTest(getTest());
     ThreadFront.recordingId = recordingId;
