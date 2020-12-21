@@ -10,7 +10,7 @@ export default function MatchedSelector(props: MatchedSelectorProps) {
   const { selector } = props;
 
   return (
-    <p className={selector.overridden ? "computed-overridden" : ""}>
+    <div className={selector.overridden ? "computed-overridden" : ""}>
       <span className="rule-link">
         <a
           target="_blank"
@@ -32,6 +32,6 @@ export default function MatchedSelector(props: MatchedSelectorProps) {
           />
         </div>
       </span>
-    </p>
+    </div>
   );
 }
