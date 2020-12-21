@@ -227,7 +227,7 @@ export const getTabs = state => state.tabs.tabs;
 
 export const getSourceTabs = createSelector(
   state => state.tabs,
-  ({ tabs }) => tabs.filter(tab => tab?.sourceId)
+  ({ tabs }) => tabs.filter(tab => tab.sourceId)
 );
 
 export const getSourcesForTabs = state => {

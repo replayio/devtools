@@ -8,58 +8,59 @@ import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
 
-import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
-import { isVisible } from "../../utils/ui";
+import Tab from "./Tab";
 
-import { getHiddenTabs, getLastVisibleTab, getSelectedSourceIsVisible } from "../../utils/tabs";
-import { getFilename, isPretty, getFileURL } from "../../utils/source";
+import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
+import { isPretty } from "../../utils/source";
 import actions from "../../actions";
 
-import { debounce } from "lodash";
 import "./Tabs.css";
-
-import Tab from "./Tab";
-import PortalDropdown from "ui/components/shared/PortalDropdown";
-import AccessibleImage from "../shared/AccessibleImage";
-import CommandBar from "../SecondaryPanes/CommandBar";
-
-function haveTabSourcesChanged(tabSources, prevTabSources) {
-  if (tabSources.length !== prevTabSources.length) {
-    return true;
-  }
-
-  for (let i = 0; i < tabSources.length; ++i) {
-    if (tabSources[i].id !== prevTabSources[i].id) {
-      return true;
-    }
-  }
-
-  return false;
-}
 
 class Tabs extends PureComponent {
   onTabContextMenu;
   showContextMenu;
-  updateHiddenTabs;
-  toggleSourcesDropdown;
-  renderDropdownSource;
   renderTabs;
   renderDropDown;
   renderStartPanelToggleButton;
-  onResize;
   _draggedSource;
   _draggedSourceIndex;
 
   constructor(props) {
     super(props);
-    this.state = {
-      dropdownShown: false,
-      hiddenTabs: [],
-    };
+  }
 
-    this.onResize = debounce(() => {
-      this.updateHiddenTabs();
-    });
+  componentDidUpdate(prevProps) {
+    const { selectedSource } = this.props;
+
+    if (selectedSource && selectedSource != prevProps.selectedSource) {
+      const sourceNodes = [...this.refs.sourceTabs.children];
+      const selectedSourceNode = sourceNodes.find(node => node.classList.contains("active"));
+
+      const isSelectedSourceNodeVisible = this.getIsSelectedSourceNodeVisible();
+
+      if (!isSelectedSourceNodeVisible) {
+        selectedSourceNode.scrollIntoView({ block: "center" });
+      }
+    }
+  }
+
+  getIsSelectedSourceNodeVisible() {
+    const containerNode = this.refs.sourceTabs.parentElement;
+    const sourceNodes = [...this.refs.sourceTabs.children];
+    const selectedSourceNode = sourceNodes.find(node => node.classList.contains("active"));
+
+    const { x: containerX, width: containerWidth } = containerNode.getBoundingClientRect();
+    const { x: childX, width: childWidth } = selectedSourceNode.getBoundingClientRect();
+
+    const visibleLeft = containerX;
+    const visibleRight = containerX + containerWidth;
+    const selectedSourceNodeLeft = childX;
+    const selectedSourceNodeRight = childX + childWidth;
+
+    const leftIsVisible = visibleLeft < selectedSourceNodeLeft;
+    const rightIsVisible = visibleRight > selectedSourceNodeRight;
+
+    return leftIsVisible && rightIsVisible;
   }
 
   get draggedSource() {
@@ -78,86 +79,6 @@ class Tabs extends PureComponent {
     this._draggedSourceIndex = index;
   }
 
-  componentDidUpdate(prevProps) {
-    const { selectedSource, tabSources } = this.props;
-    if (
-      selectedSource !== prevProps.selectedSource ||
-      haveTabSourcesChanged(tabSources, prevProps.tabSources)
-    ) {
-      this.updateHiddenTabs();
-    }
-
-    // Newly-selected sources are added to the end of the tabs order. This becomes a problem
-    // if we have hidden tabs, because the source text would be shown but the tab is hidden.
-    // This makes sure that in cases where we have hidden tabs, we add the newly-selected source
-    // so that it's the last visible tab to the right.
-    if (selectedSource && selectedSource !== prevProps.selectedSource) {
-      this.ensureSelectedSourceIsVisible();
-    }
-  }
-
-  componentDidMount() {
-    if (window.requestIdleCallback) {
-      window.requestIdleCallback(this.updateHiddenTabs);
-    }
-
-    window.addEventListener("resize", this.onResize);
-    document.querySelector(".editor-pane").addEventListener("resizeend", this.onResize);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener("resize", this.onResize);
-
-    document.querySelector(".editor-pane").removeEventListener("resizeend", this.onResize);
-  }
-
-  ensureSelectedSourceIsVisible() {
-    const { selectedSource, moveTabBySourceId } = this.props;
-    const sourceTabEls = this.refs.sourceTabs.children;
-
-    if (getSelectedSourceIsVisible(sourceTabEls)) {
-      return;
-    }
-
-    const lastVisibleTab = getLastVisibleTab(sourceTabEls);
-    const lastVisibleTabIndex = [...sourceTabEls].findIndex(elem => elem === lastVisibleTab);
-
-    // Place the newly-selected source right before the last visible tab. This way, the last visible
-    // tab in the editor tabs becomes the newly-selected source.
-    moveTabBySourceId(selectedSource.id, lastVisibleTabIndex);
-  }
-
-  /*
-   * Updates the hiddenSourceTabs state, by
-   * finding the source tabs which are wrapped and are not on the top row.
-   */
-  updateHiddenTabs = () => {
-    if (!this.refs.sourceTabs) {
-      return;
-    }
-    const { selectedSource, tabSources, moveTab } = this.props;
-    const sourceTabEls = this.refs.sourceTabs.children;
-    const hiddenTabs = getHiddenTabs(tabSources, sourceTabEls);
-
-    if (selectedSource && isVisible() && hiddenTabs.find(tab => tab.id == selectedSource.id)) {
-      return moveTab(selectedSource.url, 0);
-    }
-
-    this.setState({ hiddenTabs });
-  };
-
-  toggleSourcesDropdown() {
-    this.setState(prevState => ({
-      dropdownShown: !prevState.dropdownShown,
-    }));
-  }
-
-  setSourcesDropdownShown = dropdownShown => {
-    this.setState(() => ({
-      dropdownShown,
-    }));
-  };
-
   getIconClass(source) {
     if (isPretty(source)) {
       return "prettyPrint";
@@ -167,23 +88,6 @@ class Tabs extends PureComponent {
     }
     return "file";
   }
-
-  renderDropdownSource = source => {
-    const { cx, selectSource } = this.props;
-    const filename = getFilename(source);
-
-    const onClick = () => {
-      this.setState({ dropdownShown: false });
-      selectSource(cx, source.id);
-    };
-
-    return (
-      <li key={source.id} onClick={onClick} title={getFileURL(source, false)}>
-        <AccessibleImage className={`dropdown-icon ${this.getIconClass(source)}`} />
-        <span className="dropdown-label">{filename}</span>
-      </li>
-    );
-  };
 
   onTabDragStart = (source, index) => {
     this.draggedSource = source;
@@ -257,58 +161,17 @@ class Tabs extends PureComponent {
     );
   }
 
-  renderDropdown() {
-    const hiddenTabs = this.state.hiddenTabs;
-    if (!hiddenTabs || hiddenTabs.length == 0) {
-      return null;
-    }
-
-    const Panel = <ul>{hiddenTabs.map(this.renderDropdownSource)}</ul>;
-    const icon = <AccessibleImage className="more-tabs" />;
-
-    return (
-      <PortalDropdown
-        buttonContent={icon}
-        buttonStyle="dropdown-button"
-        position="bottom-right"
-        expanded={this.state.dropdownShown}
-        setExpanded={this.setSourcesDropdownShown}
-      >
-        {Panel}
-      </PortalDropdown>
-    );
-  }
-
-  renderCommandBar() {
-    const { horizontal, endPanelCollapsed, isPaused } = this.props;
-    if (!endPanelCollapsed || !isPaused) {
-      return;
-    }
-
-    return <CommandBar horizontal={horizontal} />;
-  }
-
   render() {
-    return (
-      <div className="source-header">
-        {this.renderTabs()}
-        {this.renderDropdown()}
-      </div>
-    );
+    return <div className="source-header">{this.renderTabs()}</div>;
   }
 }
 
 const mapStateToProps = state => ({
-  cx: getContext(state),
   selectedSource: getSelectedSource(state),
   tabSources: getSourcesForTabs(state),
   isPaused: getIsPaused(state),
 });
 
 export default connect(mapStateToProps, {
-  selectSource: actions.selectSource,
-  moveTab: actions.moveTab,
   moveTabBySourceId: actions.moveTabBySourceId,
-  closeTab: actions.closeTab,
-  showSource: actions.showSource,
 })(Tabs);
