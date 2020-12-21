@@ -162,6 +162,8 @@ class Message extends Component {
           message.pauseId
         )
       );
+
+      this.onViewSourceInDebugger({ ...frame, url: frame.source });
     };
 
     if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {
@@ -178,13 +180,11 @@ class Message extends Component {
     } else if (!["command", "result"].includes(type)) {
       overlayType = "debug";
       label = "Debug";
-      onClick = () =>
-        this.onViewSourceInDebugger({
-          line: frame.line,
-          column: frame.column,
-          sourceId: frame.sourceId,
-          url: frame.source,
-        });
+
+      return dom.div(
+        { className: `overlay-container debug` },
+        dom.div({ className: "button" }, dom.div({ className: "img" }))
+      );
     }
 
     return dom.div(
