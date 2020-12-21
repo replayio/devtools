@@ -6,20 +6,20 @@ const classnames = require("classnames");
 
 interface ComputedPropertyProps {
   property: ComputedPropertyState;
-  hidden: boolean;
+  hidden?: boolean;
   dark: boolean;
   isExpanded: boolean;
   toggleExpanded(): void;
 }
 
-function getHeaderClassName(hidden: boolean, dark: boolean) {
+function getHeaderClassName(hidden: boolean | undefined, dark: boolean) {
   if (!hidden) {
     return dark ? "computed-property-view row-striped" : "computed-property-view";
   }
   return "computed-property-hidden";
 }
 
-function getContentClassName(hidden: boolean, dark: boolean) {
+function getContentClassName(hidden: boolean | undefined, dark: boolean) {
   if (!hidden) {
     return dark ? "computed-property-content row-striped" : "computed-property-content";
   }
@@ -68,11 +68,13 @@ export default function ComputedProperty(props: ComputedPropertyProps) {
           <span className="visually-hidden">;</span>
         </span>
       </div>
-      <div className={contentClassName} hidden={!isExpanded}>
+      <div className={contentClassName}>
         <div className="matchedselectors">
-          {property.selectors.map((selector, index) => (
-            <MatchedSelector key={index} selector={selector} />
-          ))}
+          {isExpanded
+            ? property.selectors.map((selector, index) => (
+                <MatchedSelector key={index} selector={selector} />
+              ))
+            : null}
         </div>
       </div>
     </>

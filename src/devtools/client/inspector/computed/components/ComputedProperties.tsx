@@ -33,20 +33,18 @@ function ComputedProperties(props: PropsFromRedux) {
 
   let dark = false;
   let allPropertiesHidden = true;
-  const renderedProperties = properties.map((property, index) => {
+  const renderedProperties = properties.map(property => {
     const hidden = isHidden(property, search, showBrowserStyles);
-    if (!hidden) {
-      dark = !dark;
-      allPropertiesHidden = false;
-    }
+    if (hidden) return null;
+    dark = !dark;
+    allPropertiesHidden = false;
     const isExpanded = expandedProperties.has(property.name);
     const toggleExpanded = () => setComputedPropertyExpanded(property.name, !isExpanded);
 
     return (
       <ComputedProperty
-        key={index}
+        key={property.name}
         property={property}
-        hidden={hidden}
         dark={dark}
         isExpanded={isExpanded}
         toggleExpanded={toggleExpanded}
