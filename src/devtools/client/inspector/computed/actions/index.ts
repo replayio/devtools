@@ -46,6 +46,8 @@ function createComputedProperties(elementStyle: ElementStyle): ComputedPropertyS
 
   const properties: ComputedPropertyState[] = [];
   for (const [name, value] of computed) {
+    if (name.startsWith("--")) continue;
+
     let inheritanceCounter = 1;
     const selectors: MatchedSelectorState[] = [];
     for (const rule of elementStyle.rules) {
