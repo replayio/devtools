@@ -24,7 +24,7 @@ const recordViewer = env.get("RECORD_REPLAY_DONT_RECORD_VIEWER") == "false";
     dump(`TestHarnessRetrievingExampleFromRecordings\n`);
   }
 
-  await waitForDevtools();
+  await waitForViewRecording();
   const exampleReplayUrl = getCurrentUrl();
 
   if (recordViewer) {
