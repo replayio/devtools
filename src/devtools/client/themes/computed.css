@@ -166,7 +166,7 @@
   visibility: hidden;
 }
 
-.matchedselectors > p {
+.matchedselectors > * {
   clear: both;
   margin: 0;
   margin-inline-end: 2px;
@@ -177,7 +177,7 @@
   border-width: 1px 1px 0 1px;
 }
 
-.matchedselectors > p:last-of-type {
+.matchedselectors > :last-of-type {
   border-bottom-width: 1px;
 }
 
