@@ -92,11 +92,11 @@ export default class NodePicker extends React.Component {
 
   nodePickerMouseClick = e => {
     const canvasPosition = this.mouseEventCanvasPosition(e);
-    
+
     // If the click is outside of the canvas,
     // there is no need for any other action
     if (!canvasPosition) {
-      return
+      return;
     }
 
     this.nodePickerMouseClickInCanvas(canvasPosition);

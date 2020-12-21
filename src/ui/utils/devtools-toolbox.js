@@ -78,12 +78,12 @@ export class DevToolsToolbox {
 
     // The comments panel doesn't have to be initialized by the toolbox,
     // only the console and the inspector.
-    if (name === 'comments') {
-      return 
+    if (name === "comments") {
+      return;
     }
-    
+
     let panel = await this.getOrStartPanel(name);
-    
+
     this.emit("select", name);
 
     this.currentTool = name;
