@@ -20,14 +20,14 @@ function ViewToggle({ viewMode, setViewMode, clearSelectedLocation, cx }) {
           active: viewMode === "non-dev",
         })}
       >
-        PLAY
+        VIEWER
       </div>
       <div
         className={classnames("view-toggle-item view-toggle-dev", {
           active: viewMode === "dev",
         })}
       >
-        DEBUG
+        DEBUGGER
       </div>
     </button>
   );
