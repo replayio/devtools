@@ -33,97 +33,13 @@ export function EventsFilter() {
   );
 }
 
-function getTypeValue(valueFront) {
-  const getters = valueFront._object.preview.getterValues;
+function NonDevView({ updateTimelineDimensions, eventMessages, narrowMode }) {
+  // const eventMessages = getEventMessages(messages);
+  // const noModulesMessages = eventMessages.filter(
+  //   msg => !msg.message.frame.source.includes("node_modules")
+  // );
 
-  const typeGetter = getters.find(getter => getter.name == "type");
-  const typeValue = typeGetter.value._primitive;
-
-  return typeValue;
-}
-
-function isEventMessage(message) {
-  // Bail if there are no parameters in the first place.
-  if (!message.parameters) {
-    return false;
-  }
-
-  const valueFront = [...message.parameters].shift();
-
-  // Bail if this is a primitive since we're looking for event objects.
-  if (!valueFront._object) {
-    return false;
-  }
-
-  return true;
-}
-
-function getNativeEvent(valueFront) {
-  const objectPreview = valueFront._object.preview;
-  const objectProperties = objectPreview.properties;
-
-  if (!objectProperties) {
-    return;
-  }
-
-  const nativeEvent = objectProperties.find(property => property.name == "nativeEvent");
-
-  return nativeEvent;
-}
-
-function isSameEvent(newMessage, lastMessage) {
-  if (!lastMessage) {
-    return false;
-  }
-
-  const newX = newMessage.parameters[0]._object.preview.getterValues.find(e => e.name == "x");
-  const newXValue = newX.value._primitive;
-  const lastX = lastMessage.parameters[0]._object.preview.getterValues.find(e => e.name == "x");
-  const lastXValue = lastX.value._primitive;
-
-  return newXValue === lastXValue;
-}
-
-function getEventMessages(messages) {
-  const returnArray = [];
-  messages.forEach(message => {
-    if (!isEventMessage(message)) {
-      return;
-    }
-
-    let valueFront = [...message.parameters].shift();
-    let isMouseEvent;
-
-    if (getNativeEvent(valueFront)) {
-      const nativeEvent = getNativeEvent(valueFront);
-      valueFront = nativeEvent.value;
-      isMouseEvent = valueFront._object.className === "MouseEvent";
-    } else {
-      isMouseEvent = valueFront._object.className === "MouseEvent";
-    }
-
-    if (
-      isMouseEvent &&
-      !isSameEvent(message, returnArray[returnArray.length - 1]?.message || null)
-    ) {
-      const type = getTypeValue(valueFront);
-      returnArray.push({
-        message,
-        type,
-        className: message.parameters[0]._object.preview.getterValues.find(e => e.name == "target")
-          .value._object.className,
-      });
-    }
-  });
-
-  return returnArray;
-}
-
-function NonDevView({ updateTimelineDimensions, messages, narrowMode }) {
-  const eventMessages = getEventMessages(messages);
-  const noModulesMessages = eventMessages.filter(
-    msg => !msg.message.frame.source.includes("node_modules")
-  );
+  console.log({ eventMessages });
 
   useEffect(() => {
     installObserver();
@@ -147,7 +63,7 @@ function NonDevView({ updateTimelineDimensions, messages, narrowMode }) {
         <div className="right-sidebar-toolbar-item">Transcript and Comments</div>
         <EventsFilter />
       </div>
-      <CommentsPanel eventMessages={noModulesMessages} />
+      <CommentsPanel eventMessages={eventMessages} />
     </div>
   );
 
@@ -205,7 +121,7 @@ function NonDevView({ updateTimelineDimensions, messages, narrowMode }) {
 export default connect(
   state => ({
     narrowMode: selectors.getNarrowMode(state),
-    messages: selectors.getMessagesForTimeline(state),
+    eventMessages: selectors.getEventMessages(state),
   }),
   {
     updateTimelineDimensions,

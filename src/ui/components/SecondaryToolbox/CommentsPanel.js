@@ -10,7 +10,10 @@ import { sortBy } from "lodash";
 import Comment from "ui/components/SecondaryToolbox/Comment";
 import "./CommentsPanel.css";
 import moment from "moment";
-import { seek } from "../../actions/timeline";
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 function CommentsPanel({ recordingId, eventMessages, currentTime, seek }) {
   const { comments, loading, error } = hooks.useGetComments(recordingId);
@@ -43,7 +46,6 @@ function CommentsPanel({ recordingId, eventMessages, currentTime, seek }) {
       if (item.type != "click") {
         return <Comment comment={item} key={item.id} />;
       } else {
-        const duration = moment.duration(item.message.executionPointTime);
         return (
           <div
             key={i}
@@ -54,13 +56,13 @@ function CommentsPanel({ recordingId, eventMessages, currentTime, seek }) {
           >
             <div className="img event-click" />
             <div>
-              <div className="item-label">Event</div>
-              <div className="item-content">
-                {(window.moment = moment)}
-                {/* {item.type} on {item.className} at {item.message.executionPointTime / 1000} */}
-                {item.type} on {item.className} at{" "}
-                {moment.utc(item.message.executionPointTime).format("mm:ss")}
+              <div className="item-label">
+                <span style={{ marginRight: "8px", color: "var(--theme-comment)" }}>
+                  {moment.utc(item.message.executionPointTime).format("mm:ss")}
+                </span>
+                {capitalize(item.type)}
               </div>
+              <div className="item-content">{`Event "${item.type}" on ${item.className}`}</div>
             </div>
           </div>
         );
