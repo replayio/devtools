@@ -55,3 +55,21 @@
 .right-sidebar .comments-panel {
   flex-grow: 1;
 }
+
+.right-sidebar .toolbar-options {
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.right-sidebar .toolbar-options > :first-child {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.right-sidebar .toolbar-options label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

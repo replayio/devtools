@@ -12,6 +12,7 @@ import {
   ScreenShot,
 } from "@recordreplay/protocol";
 import { client } from "./socket";
+import { actions, UIStore } from "ui/actions";
 
 export const screenshotCache = new ScreenshotCache();
 
@@ -108,26 +109,30 @@ function onPaints({ paints }: paintPoints) {
   });
 }
 
-function onMouseEvents({ events }: mouseEvents) {
+function onMouseEvents(events: MouseEvent[], store: UIStore) {
   events.forEach(entry => {
     insertEntrySorted(gMouseEvents, entry);
     if (entry.kind == "mousedown") {
       insertEntrySorted(gMouseClickEvents, entry);
     }
   });
+
+  store.dispatch(actions.setEventsForType(gMouseClickEvents, "mousedown"));
 }
 
-ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
-  client.Graphics.findPaints({}, sessionId);
-  client.Graphics.addPaintPointsListener(onPaints);
+export function setupGraphics(store: UIStore) {
+  ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
+    client.Graphics.findPaints({}, sessionId);
+    client.Graphics.addPaintPointsListener(onPaints);
 
-  client.Session.findMouseEvents({}, sessionId);
-  client.Session.addMouseEventsListener(onMouseEvents);
+    client.Session.findMouseEvents({}, sessionId);
+    client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events, store));
 
-  client.Graphics.getDevicePixelRatio({}, sessionId).then(({ ratio }) => {
-    gDevicePixelRatio = ratio;
+    client.Graphics.getDevicePixelRatio({}, sessionId).then(({ ratio }) => {
+      gDevicePixelRatio = ratio;
+    });
   });
-});
+}
 
 export function addLastScreen(screen: ScreenShot | null, point: string, time: number) {
   if (screen) {

@@ -24,6 +24,7 @@ const loadImages = require("image/image");
 const { bootstrapApp } = require("ui/utils/bootstrap/bootstrap");
 const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
 const { setupTimeline, setupMetadata, setupApp } = require("ui/actions").actions;
+const { setupGraphics } = require("protocol/graphics");
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
@@ -77,5 +78,6 @@ async function initialize() {
     setupTimeline(recordingId, store);
     setupMetadata(recordingId, store);
     setupEventListeners(recordingId, store);
+    setupGraphics(store);
   }
 })();

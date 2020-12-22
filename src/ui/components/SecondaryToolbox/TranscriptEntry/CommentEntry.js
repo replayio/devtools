@@ -8,7 +8,7 @@ import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import CommentEditor from "ui/components/Comments/CommentEditor";
 import CommentDropdownPanel from "ui/components/Comments/CommentDropdownPanel";
 
-function Comment({ comment, currentTime, seek }) {
+function CommentEntry({ comment, currentTime, seek }) {
   const [editing, setEditing] = useState(false);
   const seekToComment = () => {
     const { point, time, has_frames } = comment;
@@ -59,4 +59,4 @@ function CommentBody({ comment, startEditing }) {
 
 export default connect(state => ({ currentTime: selectors.getCurrentTime(state) }), {
   seek: actions.seek,
-})(Comment);
+})(CommentEntry);
