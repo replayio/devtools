@@ -507,22 +507,31 @@ async function checkComputedStyle(style, value, matchedSelectors = undefined) {
 
 function getMatchedSelectors(property) {
   const propertyNodes = document.querySelectorAll(".computed-property-view");
-  for (const propertyNode of propertyNodes) {
-    const name = propertyNode.querySelector(".computed-property-name").childNodes[0].textContent;
-    if (name !== property) {
-      continue;
-    }
-    const selectorNodes = propertyNode.nextSibling.querySelectorAll(".rule-text");
-    return [...selectorNodes].map(selectorNode => {
-      const selector = selectorNode.children[0].innerText;
-      const value = selectorNode.children[1].innerText;
-      const label = selectorNode.previousSibling.innerText;
-      const url = selectorNode.previousSibling.children[0].title;
-      const overridden = selectorNode.parentNode.classList.contains("computed-overridden");
-      return { selector, value, label, url, overridden };
-    });
+
+  const propertyNode = [...propertyNodes].find(
+    node => node.querySelector(".computed-property-name").childNodes[0].textContent === property
+  );
+
+  if (!propertyNode) {
+    return [];
   }
-  return [];
+
+  const expander = propertyNode.querySelector(".computed-expander");
+  if (!expander.matches(".open")) {
+    expander.click();
+  }
+
+  assert(propertyNode.nextSibling.matches(".computed-property-content"));
+
+  const selectorNodes = propertyNode.nextSibling.querySelectorAll(".rule-text");
+  return [...selectorNodes].map(selectorNode => {
+    const selector = selectorNode.children[0].innerText;
+    const value = selectorNode.children[1].innerText;
+    const label = selectorNode.previousSibling.innerText;
+    const url = selectorNode.previousSibling.children[0].title;
+    const overridden = selectorNode.parentNode.classList.contains("computed-overridden");
+    return { selector, value, label, url, overridden };
+  });
 }
 
 function setLonghandsExpanded(expanded) {
