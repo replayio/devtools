@@ -65,7 +65,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
         <canvas id="graphics"></canvas>
         <div id="highlighter-root"></div>
       </div>
-      <div id="toolbox-timeline">
+      <div id="timeline-container">
         <Timeline />
         <Tooltip />
       </div>
@@ -112,7 +112,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
           endPanel={rightSidebar}
           endPanelControl={false}
         />
-        <div id="toolbox-timeline">
+        <div id="timeline-container">
           <Timeline />
           <Tooltip />
         </div>

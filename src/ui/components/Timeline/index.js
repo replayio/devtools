@@ -417,7 +417,11 @@ export class Timeline extends Component {
     return (
       <div className="commands">
         <button onClick={() => (playback ? this.stopPlayback() : this.startPlayback())}>
-          {playback ? <div className="img pause-circle" /> : <div className="img play-circle-lg" />}
+          {playback ? (
+            <div className="img pause-circle-lg" />
+          ) : (
+            <div className="img play-circle-lg" />
+          )}
         </button>
       </div>
     );
@@ -537,12 +541,12 @@ export class Timeline extends Component {
 
     return div(
       {
-        className: "replay-player",
+        className: "timeline",
       },
       this.renderCommands(),
       div(
         {
-          className: classname("overlay-container", { paused: true }),
+          className: classname("progress-bar-container", { paused: true }),
         },
         div(
           {
