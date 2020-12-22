@@ -12,7 +12,13 @@ const contentHeight = "200vh";
 // scrolling to increase scale by 1.
 const sensitivity = "200";
 
-function ScrollContainer({ hoverTime, zoomRegion, setZoomRegion, setZoomedRegion, recordingDuration }) {
+function ScrollContainer({
+  hoverTime,
+  zoomRegion,
+  setZoomRegion,
+  setZoomedRegion,
+  recordingDuration,
+}) {
   const onScroll = e => {
     const newZoomRegion = getZoomRegion({
       hoverTime,
