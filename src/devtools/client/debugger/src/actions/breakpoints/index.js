@@ -25,6 +25,7 @@ import {
   runAnalysis,
 } from "./modify";
 import remapLocations from "./remapLocations";
+import { getFilename } from "devtools/client/debugger/src/utils/source";
 
 // this will need to be changed so that addCLientBreakpoint is removed
 
@@ -186,11 +187,9 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
       line,
     };
 
-    const options = {};
-    const file = source.url.split("/").pop();
-    const symbols = getSymbols(state, source);
-    const closestSymbol = findClosestEnclosedSymbol(symbols, { line });
-    options.logValue = closestSymbol ? `"${closestSymbol.name}"` : `"${file}:${line}"`;
+    const options = {
+      logValue: getLogValue(source, state, breakpointLocation),
+    };
 
     return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled));
   };
@@ -212,11 +211,9 @@ export function addBreakpointAtColumn(cx, location) {
       line: line,
     };
 
-    const options = {};
-    const file = source.url.split("/").pop();
-    const symbols = getSymbols(state, source);
-    const closestSymbol = findClosestEnclosedSymbol(symbols, location);
-    options.logValue = closestSymbol ? `"${closestSymbol.name}"` : `"${file}:${line}:${column}"`;
+    const options = {
+      logValue: getLogValue(source, state, location),
+    };
 
     return dispatch(addBreakpoint(cx, breakpointLocation, options));
   };
@@ -227,4 +224,18 @@ export function removeBreakpointsAtLine(cx, sourceId, line) {
     const breakpointsAtLine = getBreakpointsForSource(getState(), sourceId, line);
     return dispatch(removeBreakpoints(cx, breakpointsAtLine));
   };
+}
+
+function getLogValue(source, state, location) {
+  const file = getFilename(source);
+  const symbols = getSymbols(state, source);
+  const { line, column } = location;
+
+  if (!column) {
+    const closestSymbol = findClosestEnclosedSymbol(symbols, { line });
+    return closestSymbol ? `"${closestSymbol.name}"` : `"${file}:${line}"`;
+  } else {
+    const closestSymbol = findClosestEnclosedSymbol(symbols, location);
+    return closestSymbol ? `"${closestSymbol.name}"` : `"${file}:${line}:${column}"`;
+  }
 }
