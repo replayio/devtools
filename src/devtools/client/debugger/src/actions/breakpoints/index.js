@@ -230,12 +230,15 @@ function getLogValue(source, state, location) {
   const file = getFilename(source);
   const symbols = getSymbols(state, source);
   const { line, column } = location;
+  const symbol = findClosestEnclosedSymbol(symbols, location);
 
-  if (!column) {
-    const closestSymbol = findClosestEnclosedSymbol(symbols, { line });
-    return closestSymbol ? `"${closestSymbol.name}"` : `"${file}:${line}"`;
-  } else {
-    const closestSymbol = findClosestEnclosedSymbol(symbols, location);
-    return closestSymbol ? `"${closestSymbol.name}"` : `"${file}:${line}:${column}"`;
+  if (symbol) {
+    return `"${symbol.name}"`;
   }
+
+  let logValue = `${file}:${line}`;
+  if (column) {
+    logValue += `:${column}`;
+  }
+  return `"${logValue}"`;
 }
