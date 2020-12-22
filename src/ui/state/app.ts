@@ -4,6 +4,7 @@ import {
   SessionId,
   PointDescription,
   Location,
+  MouseEvent,
 } from "@recordreplay/protocol";
 
 export type PanelName = "console" | "debugger" | "inspector";
@@ -44,8 +45,15 @@ export interface AppState {
   viewMode: ViewMode;
   narrowMode: boolean;
   hoveredLineNumberLocation: Location | null;
+  events: Events;
 }
 
 export interface AnalysisPoints {
   [key: string]: PointDescription;
 }
+
+interface Events {
+  [key: string]: MouseEvent[];
+}
+
+export type Event = "mousedown";

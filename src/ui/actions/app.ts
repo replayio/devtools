@@ -6,10 +6,11 @@ import {
   unprocessedRegions,
   PointDescription,
   Location,
+  MouseEvent,
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
-import { Modal, PanelName, PrimaryPanelName, ViewMode } from "ui/state/app";
+import { Modal, PanelName, PrimaryPanelName, ViewMode, Event } from "ui/state/app";
 
 const { PointHandlers } = require("protocol/logpoint");
 
@@ -32,6 +33,10 @@ export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   analysisPoints: PointDescription[] | null;
   location: Location;
 };
+export type SetEventsForType = Action<"set_events"> & {
+  events: MouseEvent[];
+  eventType: Event;
+};
 export type SetViewMode = Action<"set_view_mode"> & { viewMode: ViewMode };
 export type SetNarrowMode = Action<"set_narrow_mode"> & { narrowMode: boolean };
 export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_location"> & {
@@ -51,6 +56,7 @@ export type AppAction =
   | SetModalAction
   | SetPendingNotificationAction
   | SetAnalysisPointsAction
+  | SetEventsForType
   | SetViewMode
   | SetNarrowMode
   | SetHoveredLineNumberLocation;
@@ -166,6 +172,14 @@ export function setAnalysisPoints(
     type: "set_analysis_points",
     analysisPoints: points,
     location,
+  };
+}
+
+export function setEventsForType(events: MouseEvent[], eventType: Event): SetEventsForType {
+  return {
+    type: "set_events",
+    eventType,
+    events,
   };
 }
 

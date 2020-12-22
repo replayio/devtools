@@ -9,7 +9,8 @@
   height: 100%;
 }
 
-.comments-panel .comment {
+.comments-panel .comment,
+.comments-panel .event {
   padding: 20px 16px 20px;
   line-height: 1.25rem;
   font-size: 1rem;
@@ -114,10 +115,16 @@
   mask-position: center;
 }
 
-.comments-panel .item-label {
+.comments-panel .comment .item-label {
   font-size: 1.25rem;
   color: var(--theme-body-color);
   margin-bottom: 4px;
+}
+
+.comments-panel .event .item-label {
+  font-size: 1.25rem;
+  color: var(--theme-body-color);
+  align-self: center;
 }
 
 .comments-panel .item-content {

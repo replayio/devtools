@@ -15,7 +15,7 @@ import { selectors } from "../../reducers";
 import "./NonDevView.css";
 
 export function EventsFilter() {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(TextTrackCueList);
 
   const buttonContent = <div className="img settings" />;
 
@@ -33,7 +33,28 @@ export function EventsFilter() {
   );
 }
 
-function NonDevView({ updateTimelineDimensions, narrowMode }) {
+export function TranscriptOptions({ showClicks, setShowClicks, clickEvents }) {
+  const count = clickEvents.length;
+
+  return (
+    <div className="toolbar-options">
+      <label htmlFor="show-clicks">
+        <span>Show clicks</span>
+        {!showClicks ? <span>{` (${count})`}</span> : null}
+      </label>
+      <input
+        type="checkbox"
+        id="show-clicks"
+        checked={showClicks}
+        onChange={() => setShowClicks(!showClicks)}
+      />
+    </div>
+  );
+}
+
+function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
+  const [showClicks, setShowClicks] = useState(true);
+
   useEffect(() => {
     installObserver();
   }, []);
@@ -54,9 +75,13 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
     <div className="right-sidebar">
       <div className="right-sidebar-toolbar">
         <div className="right-sidebar-toolbar-item">Transcript and Comments</div>
-        <EventsFilter />
+        <TranscriptOptions
+          showClicks={showClicks}
+          setShowClicks={setShowClicks}
+          clickEvents={clickEvents}
+        />
       </div>
-      <CommentsPanel />
+      <CommentsPanel showClicks={showClicks} />
     </div>
   );
 
@@ -114,6 +139,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
 export default connect(
   state => ({
     narrowMode: selectors.getNarrowMode(state),
+    clickEvents: selectors.getEventsForType(state, "mousedown"),
   }),
   {
     updateTimelineDimensions,

@@ -21,6 +21,7 @@ function initialAppState(): AppState {
     modal: null,
     pendingNotification: null,
     analysisPoints: {},
+    events: {},
     viewMode: prefs.viewMode,
     narrowMode: false,
     hoveredLineNumberLocation: null,
@@ -89,6 +90,16 @@ export default function update(state = initialAppState(), action: AppAction | Se
       };
     }
 
+    case "set_events": {
+      return {
+        ...state,
+        events: {
+          ...state.events,
+          [action.eventType]: action.events,
+        },
+      };
+    }
+
     case "set_pending_notification": {
       return { ...state, pendingNotification: action.location };
     }
@@ -140,3 +151,4 @@ export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);
   return getAnalysisPointsForLocation(state, location);
 };
+export const getEventsForType = (state: UIState, type: string) => state.app.events[type] || [];

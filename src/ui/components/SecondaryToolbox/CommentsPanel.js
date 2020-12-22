@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import { sortBy } from "lodash";
 
-import Comment from "ui/components/SecondaryToolbox/Comment";
+import TranscriptEntry from "./TranscriptEntry/index";
 import "./CommentsPanel.css";
 
-function CommentsPanel({ recordingId }) {
+function CommentsPanel({ recordingId, clickEvents, showClicks }) {
   const { comments, loading, error } = hooks.useGetComments(recordingId);
 
   // Don't render anything if the comments are loading. For now, we fail silently
@@ -19,7 +19,7 @@ function CommentsPanel({ recordingId }) {
     return null;
   }
 
-  if (!comments.length) {
+  if (!comments.length && !clickEvents.length) {
     return (
       <div className="comments-panel">
         <p>There is nothing here yet. Try adding a comment in the timeline below.</p>
@@ -27,10 +27,15 @@ function CommentsPanel({ recordingId }) {
     );
   }
 
+  let entries = comments;
+  if (showClicks) {
+    entries = [...comments, ...clickEvents];
+  }
+
   return (
     <div className="comments-panel">
-      {sortBy(comments, comment => comment.time).map(comment => (
-        <Comment comment={comment} key={comment.id} />
+      {sortBy(entries, entry => entry.time).map((entry, i) => (
+        <TranscriptEntry entry={entry} key={i} />
       ))}
     </div>
   );
@@ -38,4 +43,5 @@ function CommentsPanel({ recordingId }) {
 
 export default connect(state => ({
   recordingId: selectors.getRecordingId(state),
+  clickEvents: selectors.getEventsForType(state, "mousedown"),
 }))(CommentsPanel);
