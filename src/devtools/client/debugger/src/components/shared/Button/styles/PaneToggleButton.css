@@ -3,26 +3,24 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 .toggle-button {
-  padding: 4px 6px;
+  padding: 4px;
+  height: max-content;
+  border-radius: 4px;
+  align-self: center;
+  margin: 0px 6px;
+  cursor: pointer;
 }
 
-.toggle-button .img {
-  vertical-align: middle;
+.toggle-button:focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
 }
 
-.toggle-button.end {
-  margin-inline-end: 0px;
-  margin-inline-start: auto;
+.toggle-button:hover,
+.toggle-button:focus:hover {
+  background: var(--theme-toolbar-background-hover);
 }
 
-.toggle-button.start {
-  margin-inline-start: 0px;
-}
-
-.toggle-button.end:not(.vertical) .img {
+.toggle-button.collapsed .img {
   transform: scaleX(-1);
-}
-
-.toggle-button.end.vertical .img {
-  transform: rotate(-90deg);
 }

@@ -3,45 +3,22 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import React, { PureComponent } from "react";
+import React from "react";
 import classnames from "classnames";
-import AccessibleImage from "../AccessibleImage";
-import { CommandBarButton } from "./";
 import "./styles/PaneToggleButton.css";
 
-class PaneToggleButton extends PureComponent {
-  static defaultProps = {
-    horizontal: false,
-    position: "start",
-  };
+export default function PaneToggleButton({ collapsed, handleClick }) {
+  const title = collapsed ? "Expand the sidebar" : "Collapse the sidebar";
 
-  label(position, collapsed) {
-    switch (position) {
-      case "start":
-        return collapsed
-          ? "Expand Sources and Outline panes"
-          : "Collapse Sources and Outline panes";
-      case "end":
-        return collapsed ? "Expand Breakpoints pane" : "Collapse Breakpoints pane";
-    }
-  }
-
-  render() {
-    const { position, collapsed, horizontal, handleClick } = this.props;
-
-    return (
-      <CommandBarButton
-        className={classnames("toggle-button", position, {
-          collapsed,
-          vertical: !horizontal,
-        })}
-        onClick={() => handleClick(position, !collapsed)}
-        title={this.label(position, collapsed)}
-      >
-        <AccessibleImage className={collapsed ? "pane-expand" : "pane-collapse"} />
-      </CommandBarButton>
-    );
-  }
+  return (
+    <button
+      className={classnames("toggle-button", {
+        collapsed,
+      })}
+      onClick={handleClick}
+      title={title}
+    >
+      <div className="img chevron-double-left" />
+    </button>
+  );
 }
-
-export default PaneToggleButton;

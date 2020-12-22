@@ -9,8 +9,9 @@ import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
 
 import Tab from "./Tab";
+import { PaneToggleButton } from "../shared/Button";
 
-import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
+import { selectors } from "ui/reducers";
 import { isPretty } from "../../utils/source";
 import actions from "../../actions";
 
@@ -134,6 +135,12 @@ class Tabs extends PureComponent {
     }
   };
 
+  renderStartPanelToggleButton() {
+    const { startPanelCollapsed, togglePaneCollapse } = this.props;
+
+    return <PaneToggleButton collapsed={startPanelCollapsed} handleClick={togglePaneCollapse} />;
+  }
+
   renderTabs() {
     const { tabSources } = this.props;
     if (!tabSources) {
@@ -162,16 +169,23 @@ class Tabs extends PureComponent {
   }
 
   render() {
-    return <div className="source-header">{this.renderTabs()}</div>;
+    return (
+      <div className="source-header">
+        {this.renderStartPanelToggleButton()}
+        {this.renderTabs()}
+      </div>
+    );
   }
 }
 
 const mapStateToProps = state => ({
-  selectedSource: getSelectedSource(state),
-  tabSources: getSourcesForTabs(state),
-  isPaused: getIsPaused(state),
+  selectedSource: selectors.getSelectedSource(state),
+  tabSources: selectors.getSourcesForTabs(state),
+  isPaused: selectors.getIsPaused(state),
+  startPanelCollapsed: selectors.getPaneCollapse(state),
 });
 
 export default connect(mapStateToProps, {
+  togglePaneCollapse: actions.togglePaneCollapse,
   moveTabBySourceId: actions.moveTabBySourceId,
 })(Tabs);

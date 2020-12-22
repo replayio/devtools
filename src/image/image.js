@@ -145,6 +145,7 @@ const gMaskImages = {
   ".img.view-grid": require("devtools/client/debugger/images/view-grid.svg"),
   ".img.view-list": require("devtools/client/debugger/images/view-list.svg"),
   ".img.chevron-down": require("devtools/client/debugger/images/chevron-down.svg"),
+  ".img.chevron-double-left": require("devtools/client/debugger/images/chevron-double-left.svg"),
   ".img.link-horizontal": require("devtools/client/debugger/images/link-horizontal.svg"),
   ".img.arrow-down-2": require("devtools/client/debugger/images/arrow-down-2.svg"),
   ".img.arrow-up-2": require("devtools/client/debugger/images/arrow-up-2.svg"),
