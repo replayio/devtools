@@ -79,5 +79,6 @@ async function initialize() {
     setupMetadata(recordingId, store);
     setupEventListeners(recordingId, store);
     setupGraphics(store);
+    gToolbox.init("console");
   }
 })();

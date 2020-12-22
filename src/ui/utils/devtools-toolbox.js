@@ -4,9 +4,11 @@ import { defer, EventEmitter } from "protocol/utils";
 import { actions } from "ui/actions";
 
 import { DebuggerPanel } from "devtools/client/debugger/panel";
-import { WebConsolePanel } from "devtools/client/webconsole/panel";
 import { InspectorPanel } from "devtools/client/inspector/panel";
 import Selection from "devtools/client/framework/selection";
+
+import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
+import { setupMessages } from "devtools/client/webconsole/actions/messages";
 
 /**
  * Manages the panels that initialization of the developer tools toolbox.
@@ -25,16 +27,19 @@ export class DevToolsToolbox {
   async init(selectedPanel) {
     await this.threadFront.initializeToolbox();
 
-    // The console has to be started immediately on init so that messages appear
-    // on the timeline.
-    await this.startPanel("console");
-
     // The debugger has to be started immediately on init so that when we click
     // on any of those messages, either on the console or the timeline, the debugger
     // panel is ready to be opened.
     await this.startPanel("debugger");
 
     await this.selectTool(selectedPanel);
+  }
+
+  initConsole() {
+    initOutputSyntaxHighlighting();
+
+    // TODO: the store should be associated with the toolbox
+    setupMessages(store);
   }
 
   getHighlighter() {
@@ -59,7 +64,6 @@ export class DevToolsToolbox {
 
     const panels = {
       debugger: DebuggerPanel,
-      console: WebConsolePanel,
       inspector: InspectorPanel,
     };
 
@@ -74,6 +78,11 @@ export class DevToolsToolbox {
   };
 
   async selectTool(name) {
+    if (name === "console") {
+      this.initConsole();
+      return;
+    }
+
     let panel = await this.getOrStartPanel(name);
     this.emit("select", name);
 
