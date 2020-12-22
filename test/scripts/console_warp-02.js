@@ -25,19 +25,29 @@ Test.describe(
 
     await Test.warpToMessage("number: 2");
     await Test.checkPausedMessage("number: 2");
+
     await Test.stepOverToLine(20);
+    await Test.checkPausedMessage("number: 2");
 
     await Test.executeInConsole("1 << 5");
-    await Test.checkPausedMessage("32");
+    await Test.checkPausedMessage("number: 2");
 
     await Test.stepOverToLine(21);
+    await Test.checkPausedMessage("number: 2");
+
     await Test.executeInConsole("1 << 7");
-    await Test.checkPausedMessage("128");
+    await Test.checkPausedMessage("number: 2");
 
     await Test.reverseStepOverToLine(20);
-    await Test.checkPausedMessage("32");
+    await Test.checkPausedMessage("number: 2");
 
     await Test.executeInConsole("1 << 6");
-    await Test.checkPausedMessage("64");
+    await Test.checkPausedMessage("number: 2");
+
+    await Test.stepOverToLine(21);
+    await Test.checkPausedMessage("number: 2");
+
+    await Test.stepOverToLine(22);
+    await Test.checkPausedMessage("number: 3");
   }
 );
