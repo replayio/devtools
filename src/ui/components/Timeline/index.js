@@ -558,8 +558,9 @@ export class Timeline extends Component {
   }
 
   render() {
-    const { loaded, currentTime } = this.props;
+    const { loaded, currentTime, hoverTime } = this.props;
     const percent = this.getVisiblePosition(currentTime) * 100;
+    const hoverPercent = this.getVisiblePosition(hoverTime) * 100;
 
     return div(
       {
@@ -580,7 +581,11 @@ export class Timeline extends Component {
             onMouseUp: this.onPlayerMouseUp,
           },
           div({
-            className: "progress-line end",
+            className: "progress-line full",
+          }),
+          div({
+            className: "progress-line preview",
+            style: { width: `${hoverPercent}%` },
           }),
           div({
             className: "progress-line",

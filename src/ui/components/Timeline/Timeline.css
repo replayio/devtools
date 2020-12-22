@@ -212,9 +212,28 @@
   bottom: 0;
 }
 
-.replay-player .progress-line.end {
+.replay-player .overlay-container:hover .progress-line {
+  height: 5px;
+}
+
+.replay-player .progress-line.full {
   width: 100%;
   background: var(--progressbar-background);
+}
+
+.replay-player .progress-line.preview {
+  --blue-500: hsl(210,80%,55%,1);
+  --blue-600: hsl(210,85%,45%,1);
+  --blue-700: hsl(210,90%,35%,1);
+  --blue-800: hsl(210,95%,25%,1);
+  --blue-900: hsl(210,100%,15%,1);
+  --grey-500: hsl(210,0%,55%,1);
+  --grey-600: hsl(210,0%,45%,1);
+  --grey-700: hsl(210,0%,35%,1);
+  --grey-800: hsl(210,0%,25%,1);
+  --grey-900: hsl(210,0%,15%,1);
+  background: var(--blue-800);
+  /* background: var(--blue-900); */
 }
 
 .replay-player .tick {
