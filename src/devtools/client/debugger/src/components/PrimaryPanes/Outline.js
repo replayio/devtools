@@ -10,7 +10,7 @@ import { connect } from "../../utils/connect";
 import { score as fuzzaldrinScore } from "fuzzaldrin-plus";
 const classnames = require("classnames");
 
-import { containsPosition, positionAfter } from "../../utils/ast";
+import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { copyToTheClipboard } from "../../utils/clipboard";
 import { findFunctionText } from "../../utils/function";
 import { getTruncatedFileName } from "../../utils/source";
@@ -86,26 +86,7 @@ export class Outline extends Component {
 
   setFocus(cursorPosition) {
     const { symbols } = this.props;
-    let classes = [];
-    let functions = [];
-
-    if (symbols && !symbols.loading) {
-      ({ classes, functions } = symbols);
-    }
-
-    // Find items that enclose the selected location
-    const enclosedItems = [...functions, ...classes].filter(
-      item => item.name != "anonymous" && containsPosition(item.location, cursorPosition)
-    );
-
-    if (enclosedItems.length == 0) {
-      return this.setState({ focusedItem: null });
-    }
-
-    // Find the closest item to the selected location to focus
-    const closestItem = enclosedItems.reduce((item, closest) =>
-      positionAfter(item.location, closest.location) ? item : closest
-    );
+    const closestItem = findClosestEnclosedSymbol(symbols, cursorPosition);
 
     this.setState({ focusedItem: closestItem });
   }

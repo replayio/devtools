@@ -50,6 +50,7 @@ function findClosestofSymbol(declarations, location) {
   }
 
   return declarations.reduce((found, currNode) => {
+    // Find a symbol that encloses the location
     if (
       currNode.name === "anonymous" ||
       !containsPosition(currNode.location, {
@@ -64,6 +65,7 @@ function findClosestofSymbol(declarations, location) {
       return currNode;
     }
 
+    // If two symbols enclose the location, get the closer symbol
     if (found.location.start.line > currNode.location.start.line) {
       return found;
     }
@@ -92,4 +94,15 @@ export function findClosestClass(symbols, location) {
   }
 
   return findClosestofSymbol(symbols.classes, location);
+}
+
+export function findClosestEnclosedSymbol(symbols, location) {
+  let classes = [];
+  let functions = [];
+
+  if (symbols && !symbols.loading) {
+    ({ classes, functions } = symbols);
+  }
+
+  return findClosestofSymbol([...functions, ...classes], location);
 }
