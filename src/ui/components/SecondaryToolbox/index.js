@@ -30,7 +30,6 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
         className={classnames("console-panel-button", { expanded: selectedPanel === "console" })}
         onClick={() => onClick("console")}
       >
-        <div className="img new-panel-console" />
         <div className="label">Console</div>
       </button>
       <button
@@ -39,14 +38,12 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
         })}
         onClick={() => onClick("inspector")}
       >
-        <div className="img new-panel-elements" />
         <div className="label">Elements</div>
       </button>
       <button
         className={classnames("comments-panel-button", { expanded: selectedPanel === "comments" })}
         onClick={() => onClick("comments")}
       >
-        <div className="img new-panel-transcript" />
         <div className="label">Transcript and Comments</div>
       </button>
       {narrowMode ? (
@@ -54,7 +51,6 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
           className={classnames("viewer-panel-button", { expanded: selectedPanel === "viewer" })}
           onClick={() => onClick("viewer")}
         >
-          <div className="img new-panel-viewer" />
           <div className="label">Viewer</div>
         </button>
       ) : null}
