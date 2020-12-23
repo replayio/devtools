@@ -10,8 +10,9 @@ import { Integrations } from "@sentry/apm";
 import App from "ui/components/App";
 import Auth0ProviderWithHistory from "ui/utils/auth0";
 import LogRocket from "ui/utils/logrocket";
-import { createApolloClient } from "ui/utils/apolloClient";
+import { createApolloClient, getToken } from "ui/utils/apolloClient";
 import { ApolloProvider } from "@apollo/client";
+import { defer } from "protocol/utils";
 
 import { isDevelopment, isTest } from "../environment";
 const skipTelemetry = isTest() || isDevelopment();
@@ -59,11 +60,26 @@ export async function bootstrapApp(props, context, store) {
   setupSentry(context);
   setupLogRocket();
 
+  const deferredToken = defer();
+  let isTokenReceived = false;
+  async function checkForToken(auth0Client) {
+    if (!isTokenReceived && !auth0Client.isLoading) {
+      if (auth0Client.isAuthenticated) {
+        const token = await getToken(auth0Client);
+        deferredToken.resolve(token);
+      } else {
+        deferredToken.resolve(undefined);
+      }
+      isTokenReceived = true;
+    }
+  }
+
   ReactDOM.render(
     <Router>
       <Auth0ProviderWithHistory>
         <Auth0Context.Consumer>
           {auth0Client => {
+            checkForToken(auth0Client);
             return (
               <ApolloProvider client={createApolloClient(auth0Client)}>
                 <Provider store={store}>{React.createElement(App, props)}</Provider>
@@ -75,4 +91,6 @@ export async function bootstrapApp(props, context, store) {
     </Router>,
     document.querySelector("#app")
   );
+
+  return deferredToken.promise;
 }

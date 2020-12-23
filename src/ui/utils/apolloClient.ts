@@ -54,7 +54,7 @@ async function createHttpLink(auth0Client: Auth0ContextInterface) {
   });
 }
 
-async function getToken(auth0Client: Auth0ContextInterface) {
+export async function getToken(auth0Client: Auth0ContextInterface) {
   try {
     return await auth0Client.getAccessTokenSilently({
       audience: "hasura-api",
