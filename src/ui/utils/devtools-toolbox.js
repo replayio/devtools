@@ -27,6 +27,10 @@ export class DevToolsToolbox {
   async init(selectedPanel) {
     await this.threadFront.initializeToolbox();
 
+    // The console has to be started immediately on init so that messages appear
+    // on the timeline.
+    await this.startPanel("console");
+
     // The debugger has to be started immediately on init so that when we click
     // on any of those messages, either on the console or the timeline, the debugger
     // panel is ready to be opened.
@@ -55,6 +59,10 @@ export class DevToolsToolbox {
   }
 
   startPanel = async name => {
+    if (name === "console") {
+      return this.initConsole();
+    }
+
     if (this.panelWaiters[name]) {
       return this.panelWaiters[name];
     }
@@ -78,8 +86,12 @@ export class DevToolsToolbox {
   };
 
   async selectTool(name) {
-    if (name === "console") {
-      this.initConsole();
+    // See comments at gToolbox.init(selectedPanel) in DevTools.js
+    // for more context. The toolbox needs to be initialized on
+    // recordingLoaded however if we start at the "Comments"
+    // tab it runs and throws an error at startPanel() above
+    // because the comments panel isn't handled by the toolbox
+    if (name === "console" || name === "comments") {
       return;
     }
 
