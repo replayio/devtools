@@ -9,27 +9,25 @@ import TranscriptEntry from "./TranscriptEntry/index";
 import "./CommentsPanel.css";
 
 function CommentsPanel({ recordingId, clickEvents, showClicks }) {
-  const { comments, loading, error } = hooks.useGetComments(recordingId);
+  const { comments } = hooks.useGetComments(recordingId);
 
-  // Don't render anything if the comments are loading. For now, we fail silently
-  // if there happens to be an error while fetching the comments. In the future, we
-  // should do something to alert the user that the query has failed and provide next
-  // steps for fixing that by refetching/refreshing.
-  if (loading || error) {
-    return null;
+  // We allow the panel to render its entries whether or not the
+  // comments have loaded yet. This optimistically assumes that eventually the
+  // comments will finish loading and we'll re-render then. This fails silently
+  // if the query returns an erro and we should add error handling that provides
+  // next steps for fixing the error by refetching/refreshing.
+  let entries = comments || [];
+
+  if (showClicks) {
+    entries = [...entries, ...clickEvents];
   }
 
-  if (!comments.length && !clickEvents.length) {
+  if (!entries.length) {
     return (
       <div className="comments-panel">
         <p>There is nothing here yet. Try adding a comment in the timeline below.</p>
       </div>
     );
-  }
-
-  let entries = comments;
-  if (showClicks) {
-    entries = [...comments, ...clickEvents];
   }
 
   return (
