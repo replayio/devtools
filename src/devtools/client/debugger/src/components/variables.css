@@ -3,8 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 :root {
-  /* header height is 36px + 1px for its border */
-  --editor-header-height: 37px;
+  /* header height is 28px + 1px for its border */
+  --editor-header-height: 29px;
   /* footer height is 29px + 1px for its border */
   --editor-footer-height: 29px;
   /* searchbar height is 29px + 1px for its top border */

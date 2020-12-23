@@ -8,9 +8,8 @@
   height: var(--editor-header-height);
   border-bottom: 1px solid var(--theme-splitter-color);
   background-color: var(--theme-toolbar-background);
-  overflow-x: overlay;
-  overflow-y: hidden;
-  scrollbar-width: thin;
+  overflow: scroll;
+  scrollbar-width: none;
 }
 
 .source-header * {
@@ -31,8 +30,7 @@
 }
 
 .source-header::-webkit-scrollbar {
-  height: 4px;
-  background: var(--theme-toolbar-background);
+  display: none;
 }
 
 .source-tab {
