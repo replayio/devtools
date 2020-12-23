@@ -83,7 +83,7 @@
   transition-duration: 100ms;
 }
 
-.replay-player .message.highlighted  {
+.replay-player .message.highlighted {
   transform: scale(1.2);
   transition-duration: 100ms;
 }
@@ -124,7 +124,7 @@
 }
 
 .replay-player .scrubber.hovered path {
-  fill: var(--hover-scrubber-line-background)
+  fill: var(--hover-scrubber-line-background);
 }
 
 .replay-player .scrubber.hovered {
@@ -212,71 +212,18 @@
   bottom: 0;
 }
 
-.replay-player .progress-line.end {
+.replay-player .overlay-container:hover .progress-line {
+  height: 5px;
+}
+
+.replay-player .progress-line.full {
   width: 100%;
   background: var(--progressbar-background);
 }
 
-.replay-player .tick {
-  position: absolute;
-  height: 100%;
+.replay-player .progress-line.preview {
+  background: #bbbbc1;
 }
-
-.replay-player .tick::before,
-.replay-player .tick::after {
-  height: 1.5px;
-  width: 1px;
-  right: 0;
-  position: absolute;
-  content: "";
-  display: block;
-}
-
-.replay-player .tick.future::before,
-.replay-player .tick.future::after {
-  background: var(--tick-future-background);
-}
-
-.replay-player .tick::before,
-.replay-player .tick::after {
-  background: var(--tick-background);
-}
-
-.replay-player .tick::after {
-  bottom: 0;
-}
-
-.replay-player .tick::before {
-  top: 0;
-}
-
-.replay-player .overlay-container:hover .tick {
-  opacity: 1;
-}
-
-.replay-player .overlay-container .tick {
-  opacity: 0.5;
-}
-
-.replay-player .overlay-container .tick:hover ~ .tick,
-.replay-player .overlay-container .tick.highlight ~ .tick:not(.highlight) {
-  opacity: 0.5;
-}
-
-.replay-player .untraversed {
-  position: absolute;
-  height: 100%;
-  background: #000000;
-  opacity: 0.2;
-}
-
-.replay-player .unscanned {
-  position: absolute;
-  height: 100%;
-  background: #000000;
-  opacity: 0.1;
-}
-
 .replay-player .zoomboundary {
   padding-top: 7px;
   padding-right: 4px;

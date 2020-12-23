@@ -528,38 +528,10 @@ export class Timeline extends Component {
     return comments.map(comment => this.renderCommentMarker(comment));
   }
 
-  renderUnprocessedRegions() {
-    return this.props.unprocessedRegions.map(this.renderUnprocessedRegion.bind(this));
-  }
-
-  renderUnprocessedRegion({ begin, end }) {
-    let startOffset = this.getPixelOffset(begin);
-    let endOffset = this.getPixelOffset(end);
-
-    if (startOffset >= this.overlayWidth || endOffset <= 0) {
-      return null;
-    }
-
-    if (startOffset < 0) {
-      startOffset = 0;
-    }
-
-    if (endOffset > this.overlayWidth) {
-      endOffset = this.overlayWidth;
-    }
-
-    return dom.span({
-      className: "unscanned",
-      style: {
-        left: `${startOffset}px`,
-        width: `${endOffset - startOffset}px`,
-      },
-    });
-  }
-
   render() {
-    const { loaded, currentTime } = this.props;
+    const { loaded, currentTime, hoverTime } = this.props;
     const percent = this.getVisiblePosition(currentTime) * 100;
+    const hoverPercent = this.getVisiblePosition(hoverTime) * 100;
 
     return div(
       {
@@ -580,14 +552,17 @@ export class Timeline extends Component {
             onMouseUp: this.onPlayerMouseUp,
           },
           div({
-            className: "progress-line end",
+            className: "progress-line full",
+          }),
+          div({
+            className: "progress-line preview",
+            style: { width: `${hoverPercent}%` },
           }),
           div({
             className: "progress-line",
             style: { width: `${percent}%` },
           }),
           div({ className: "message-container" }, ...this.renderMessages()),
-          ...this.renderUnprocessedRegions(),
           <ScrollContainer />
         ),
         <Comments />
