@@ -240,5 +240,6 @@ function getLogValue(source, state, location) {
   if (column) {
     logValue += `:${column}`;
   }
-  return `"${logValue}"`;
+
+  return logValue;
 }
