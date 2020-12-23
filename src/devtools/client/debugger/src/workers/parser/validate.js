@@ -7,6 +7,10 @@
 import { parseScript } from "./utils/ast";
 
 export function hasSyntaxError(input) {
+  if (!input) {
+    return false;
+  }
+
   try {
     parseScript(input);
     return false;

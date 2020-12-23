@@ -1,9 +1,10 @@
-import React, { useEffect, useState, PureComponent } from "react";
+import React, { PureComponent } from "react";
 import classnames from "classnames";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import { getContext } from "devtools/client/debugger/src/selectors";
 import { PanelInput } from "./PanelInput";
 import actions from "devtools/client/debugger/src/actions";
+import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 
 class PanelEditor extends PureComponent {
   panelEditorNode;
@@ -14,21 +15,24 @@ class PanelEditor extends PureComponent {
 
     this.state = {
       logValue: breakpoint.options.logValue,
-      conditionValue: breakpoint.options.condition || "",
+      condition: breakpoint.options.condition || "",
+      syntaxErrors: { logValue: null, condition: null },
     };
   }
 
-  setBreakpoint = () => {
-    const { breakpoint, setBreakpointOptions, cx } = this.props;
-    const { logValue, conditionValue } = this.state;
+  setBreakpoint = async () => {
+    const { breakpoint, setBreakpointOptions, toggleEditingOff, cx } = this.props;
+    const { logValue, condition } = this.state;
 
     const newOptions = { logValue };
 
-    if (conditionValue) {
-      newOptions.condition = conditionValue;
+    if (condition) {
+      newOptions.condition = condition;
     }
 
-    setBreakpointOptions(cx, breakpoint.location, newOptions);
+    await setBreakpointOptions(cx, breakpoint.location, newOptions);
+
+    return toggleEditingOff();
   };
 
   handleCancel = e => {
@@ -38,14 +42,19 @@ class PanelEditor extends PureComponent {
   };
 
   handleSave = () => {
-    const { toggleEditingOff } = this.props;
-
     this.setBreakpoint();
-    toggleEditingOff();
   };
 
   onEnter = () => {
     this.handleSave();
+  };
+
+  onChange = async (key, value) => {
+    const { logValue, condition, syntaxErrors } = this.state;
+    this.setState({ [key]: value });
+
+    const syntaxError = await parser.hasSyntaxError(value);
+    this.setState({ syntaxErrors: { ...syntaxErrors, [key]: syntaxError } });
   };
 
   onEscape = () => {
@@ -53,54 +62,50 @@ class PanelEditor extends PureComponent {
   };
 
   renderActions() {
-    const saveButton = (
-      <button className="save" type="button" onClick={this.handleSave}>
-        Save
-      </button>
-    );
-    const cancelButton = (
-      <button className="cancel" type="button" onClick={this.handleCancel}>
-        Cancel
-      </button>
-    );
+    const { syntaxErrors } = this.state;
+    const hasError = syntaxErrors.logValue || syntaxErrors.condition;
 
     return (
       <div className="edit-actions">
-        {cancelButton}
-        {saveButton}
+        <button disabled={hasError} className="save" type="button" onClick={this.handleSave}>
+          Save
+        </button>
+        <button className="cancel" type="button" onClick={this.handleCancel}>
+          Cancel
+        </button>
       </div>
     );
   }
 
   renderForm() {
-    const { logValue, conditionValue } = this.state;
+    const { syntaxErrors, logValue, condition } = this.state;
     const { inputToFocus } = this.props;
 
     return (
       <form>
-        <div className="form-row">
+        <div className={classnames("form-row", { invalid: syntaxErrors.logValue })}>
           <label htmlFor="logpoint">{`Log message`}</label>
           <PanelInput
             id="logpoint"
             autofocus={inputToFocus == "logValue"}
             defaultValue={logValue}
-            onChange={cm => this.setState({ logValue: cm.getValue().trim() })}
+            onChange={cm => this.onChange("logValue", cm.getValue().trim())}
             onEnter={this.onEnter}
             onEscape={this.onEscape}
           />
         </div>
-        <div className="form-row">
+        <div className={classnames("form-row", { invalid: syntaxErrors.condition })}>
           <label htmlFor="condition">Condition</label>
           <div className="input-container">
             <PanelInput
               id="condition"
               autofocus={inputToFocus == "condition"}
-              defaultValue={conditionValue}
-              onChange={cm => this.setState({ conditionValue: cm.getValue().trim() })}
+              defaultValue={condition}
+              onChange={cm => this.onChange("condition", cm.getValue().trim())}
               onEnter={this.onEnter}
               onEscape={this.onEscape}
             />
-            {conditionValue == "" ? <div className="placeholder-text">e.g. x === true</div> : null}
+            {condition == "" ? <div className="placeholder-text">e.g. x === true</div> : null}
           </div>
         </div>
       </form>
@@ -108,8 +113,8 @@ class PanelEditor extends PureComponent {
   }
 
   render() {
-    const { conditionValue } = this.state;
-    const hasCondition = conditionValue !== null;
+    const { condition } = this.state;
+    const hasCondition = condition !== null;
 
     return (
       <div
@@ -125,4 +130,5 @@ class PanelEditor extends PureComponent {
 
 export default connect(state => ({ cx: getContext(state) }), {
   setBreakpointOptions: actions.setBreakpointOptions,
+  validateSyntax: actions.validateSyntax,
 })(PanelEditor);

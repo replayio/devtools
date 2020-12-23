@@ -19,7 +19,7 @@ import App from "../components/App";
 import { asyncStore, prefs } from "./prefs";
 import { persistTabs } from "../utils/tabs";
 
-let parser;
+export let parser;
 
 export function bootstrapStore(client, workers, panel, initialState) {
   const createStore = configureStore({
