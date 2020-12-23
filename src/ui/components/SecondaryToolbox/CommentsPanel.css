@@ -20,12 +20,14 @@
   width: 100%;
 }
 
-.comments-panel .comment:hover {
+.comments-panel .comment:hover,
+.comments-panel .event:hover {
   border-left: 4px solid #7ed8c8;
   padding-left: 12px;
 }
 
-.comments-panel .comment.selected {
+.comments-panel .comment.selected,
+.comments-panel .event.selected {
   border-left: 4px solid #5ea3f8;
   padding-left: 12px;
 }
