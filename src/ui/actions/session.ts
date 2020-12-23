@@ -21,7 +21,7 @@ declare global {
 }
 
 // Create a session to use while debugging.
-export async function createSession(store: UIStore, recordingId: string) {
+export async function createSession(store: UIStore, recordingId: string, accessToken?: string) {
   addEventListener("Recording.uploadedData", (data: uploadedData) =>
     store.dispatch(onUploadedData(data))
   );
@@ -31,6 +31,9 @@ export async function createSession(store: UIStore, recordingId: string) {
   try {
     ThreadFront.setTest(getTest());
     ThreadFront.recordingId = recordingId;
+    if (accessToken) {
+      await sendMessage("Internal.setAccessToken", { accessToken });
+    }
     const { sessionId } = await sendMessage("Recording.createSession", {
       recordingId,
     });
