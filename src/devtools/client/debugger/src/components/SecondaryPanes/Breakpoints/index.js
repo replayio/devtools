@@ -8,6 +8,7 @@ import React, { Component } from "react";
 import { connect } from "../../../utils/connect";
 
 import Breakpoint from "./Breakpoint";
+import BreakpointHeading from "./BreakpointHeading";
 
 import actions from "../../../actions";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
@@ -42,6 +43,7 @@ class Breakpoints extends Component {
 
   renderBreakpoints() {
     const { breakpointSources } = this.props;
+
     if (!breakpointSources.length) {
       return null;
     }
@@ -52,8 +54,7 @@ class Breakpoints extends Component {
       <div className="pane breakpoints-list">
         {breakpointSources.map(({ source, breakpoints, i }) => {
           const sortedBreakpoints = sortSelectedBreakpoints(breakpoints);
-
-          return sortedBreakpoints.map(breakpoint => {
+          const renderedBreakpoints = sortedBreakpoints.map(breakpoint => {
             return (
               <Breakpoint
                 breakpoint={breakpoint}
@@ -64,18 +65,20 @@ class Breakpoints extends Component {
               />
             );
           });
+
+          return (
+            <div className="breakpoints-list-source" key={i}>
+              <BreakpointHeading source={source} />
+              {renderedBreakpoints}
+            </div>
+          );
         })}
       </div>
     );
   }
 
   render() {
-    return (
-      <div className="pane">
-        {/* {this.renderExceptionsOptions()} */}
-        {this.renderBreakpoints()}
-      </div>
-    );
+    return <div className="pane">{this.renderBreakpoints()}</div>;
   }
 }
 

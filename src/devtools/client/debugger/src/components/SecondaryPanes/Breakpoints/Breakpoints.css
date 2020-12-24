@@ -30,23 +30,30 @@
   padding: 8px 0px;
 }
 
-.breakpoints-list .breakpoint {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  color: var(--theme-text-color-strong);
-  position: relative;
+.breakpoints-list-source {
   margin: 0px 8px;
   border: 1px solid var(--theme-splitter-color);
   border-radius: 4px;
 }
 
-.breakpoints-list .breakpoint:not(:last-child) {
+.breakpoints-list-source:not(:last-child) {
   margin-bottom: 8px;
 }
 
-.breakpoints-list .breakpoint > *:not(:last-child) {
-  border-bottom: 1px solid var(--theme-splitter-color);
+.breakpoints-list .breakpoint {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  color: var(--theme-text-color-strong);
+  position: relative;
+  padding: 4px 8px;
+  line-height: 16px;
+}
+
+.breakpoints-list .breakpoint:hover {
+  background: var(--grey-20);
 }
 
 .breakpoints-list .breakpoint-heading {
@@ -55,13 +62,14 @@
   width: 100%;
   font-size: 12px;
   line-height: 16px;
-  padding: 4px 4px 4px 8px;
+  padding: 4px 8px;
   justify-content: space-between;
   background-color: var(--theme-toolbar-background);
   color: var(--theme-text-color-strong);
   position: relative;
   cursor: pointer;
   overflow: hidden;
+  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 .breakpoints-list .breakpoint-heading-label {
@@ -71,26 +79,7 @@
   text-overflow: ellipsis;
 }
 
-.breakpoints-list .breakpoint-heading-status {
-  background-color: #5b41ff;
-  color: white;
-  margin-left: 8px;
-  padding: 0px 8px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-}
-
-.breakpoints-list .breakpoint-heading-status.focused {
-  background-color: var(--dark-blue);
-}
-
-.breakpoints-list .breakpoint-heading-actions {
-  display: flex;
-  flex-direction: row;
-}
-
 .breakpoints-list .breakpoint-options {
-  padding: 4px 8px 4px;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -107,25 +96,12 @@
   margin-bottom: 4px;
 }
 
-html .breakpoints-list .breakpoint.paused {
-  border-color: #5b41ff;
-}
-
-html .breakpoints-list .breakpoint.paused .breakpoint-heading {
-  background-color: var(--theme-toolbar-background-alt);
-}
-
-.breakpoint-line-close {
-  margin-inline-start: 4px;
-}
-
 .breakpoints-list .breakpoint .breakpoint-line {
-  font-size: 11px;
   color: var(--theme-comment);
-  min-width: 16px;
-  text-align: end;
-  padding-top: 1px;
-  padding-bottom: 1px;
+}
+
+.breakpoints-list .breakpoint:hover .breakpoint-line {
+  display: none;
 }
 
 .breakpoints-list .breakpoint-label {
@@ -140,18 +116,14 @@ html .breakpoints-list .breakpoint.paused .breakpoint-heading {
   color: var(--blue-80);
 }
 
-.breakpoints-list .breakpoint-label span,
-.breakpoint-line-close {
-  display: inline;
-  line-height: 14px;
+.breakpoint .close-btn,
+.breakpoint-heading .close-btn {
+  display: none;
 }
 
-.breakpoint .close-btn {
-  visibility: hidden;
-}
-
-.breakpoint:hover .close-btn {
-  visibility: visible;
+.breakpoint:hover .close-btn,
+.breakpoint-heading:hover .close-btn {
+  display: block;
 }
 
 .CodeMirror.cm-s-mozilla-breakpoint {

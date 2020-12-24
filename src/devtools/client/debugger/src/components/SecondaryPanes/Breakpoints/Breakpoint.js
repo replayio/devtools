@@ -14,23 +14,28 @@ import { getLocationWithoutColumn, getLocationKey } from "../../../utils/breakpo
 import { features } from "../../../utils/prefs";
 import { getBreakpointsList, getSelectedFrame, getContext } from "../../../selectors";
 
-import BreakpointHeading from "./BreakpointHeading";
 import BreakpointOptions from "./BreakpointOptions";
+import { CloseButton } from "../../shared/Button";
 
 class Breakpoint extends PureComponent {
-  onContextMenu = e => {
-    return;
-  };
-
   get selectedLocation() {
     const { breakpoint } = this.props;
+
     return breakpoint.location;
   }
 
   selectBreakpoint = event => {
-    event.preventDefault();
     const { cx, selectSpecificLocation } = this.props;
+    event.preventDefault();
+
     selectSpecificLocation(cx, this.selectedLocation);
+  };
+
+  removeBreakpoint = event => {
+    const { cx, removeBreakpoint, breakpoint } = this.props;
+    event.stopPropagation();
+
+    removeBreakpoint(cx, breakpoint);
   };
 
   isCurrentlyPausedAtBreakpoint() {
@@ -48,8 +53,18 @@ class Breakpoint extends PureComponent {
     return bpId == frameId;
   }
 
+  renderSourceLocation() {
+    const { breakpoint } = this.props;
+    const { column, line } = breakpoint.location;
+
+    const columnVal = column ? `:${column}` : "";
+    const location = `${line}${columnVal}`;
+
+    return <div className="breakpoint-line">{location}</div>;
+  }
+
   render() {
-    const { breakpoint, source, editor } = this.props;
+    const { breakpoint, editor } = this.props;
 
     return (
       <div
@@ -58,10 +73,13 @@ class Breakpoint extends PureComponent {
           paused: this.isCurrentlyPausedAtBreakpoint(),
         })}
         onClick={this.selectBreakpoint}
-        onContextMenu={this.onContextMenu}
       >
-        <BreakpointHeading source={source} breakpoint={breakpoint} />
         <BreakpointOptions editor={editor} breakpoint={breakpoint} />
+        {this.renderSourceLocation()}
+        <CloseButton
+          handleClick={e => this.removeBreakpoint(e)}
+          tooltip={"Remove this breakpoint"}
+        />
       </div>
     );
   }
@@ -86,4 +104,5 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   selectSpecificLocation: actions.selectSpecificLocation,
+  removeBreakpoint: actions.removeBreakpoint,
 })(Breakpoint);
