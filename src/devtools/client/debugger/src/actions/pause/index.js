@@ -9,20 +9,11 @@
  * @module actions/pause
  */
 
-export {
-  stepIn,
-  stepOver,
-  stepOut,
-  resume,
-  rewind,
-  reverseStepOver,
-  seekToPosition,
-} from "./commands";
+export { stepIn, stepOver, stepOut, resume, rewind, reverseStepOver } from "./commands";
 export { fetchFrames } from "./fetchFrames";
 export { fetchScopes } from "./fetchScopes";
 export { paused } from "./paused";
 export { resumed } from "./resumed";
-export { continueToHere } from "./continueToHere";
 export { selectFrame } from "./selectFrame";
 export { setExpandedScope } from "./expandScopes";
 export * from "./previewPausedLocation";

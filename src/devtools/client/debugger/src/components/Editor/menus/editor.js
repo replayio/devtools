@@ -4,24 +4,12 @@
 
 //
 
-import { bindActionCreators } from "redux";
-
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import { getRawSourceURL, getFilename, shouldBlackbox } from "../../../utils/source";
 
 import { downloadFile } from "../../../utils/utils";
-import { features } from "../../../utils/prefs";
 
 import { isFulfilled } from "../../../utils/async-value";
-import actions from "../../../actions";
-
-export const continueToHereItem = (cx, location, disabled, editorActions) => ({
-  accesskey: "H",
-  disabled,
-  click: () => editorActions.continueToHere(cx, location),
-  id: "node-menu-continue-to-here",
-  label: "Continue to here",
-});
 
 // menu items
 
@@ -99,11 +87,8 @@ export function editorMenuItems({
   cx,
   editorActions,
   selectedSource,
-  location,
   selectionText,
-  hasMappedLocation,
   isTextSelected,
-  isPaused,
 }) {
   const items = [];
 
@@ -130,18 +115,4 @@ export function editorMenuItems({
   }
 
   return items;
-}
-
-export function editorItemActions(dispatch) {
-  return bindActionCreators(
-    {
-      continueToHere: actions.continueToHere,
-      evaluateInConsole: actions.evaluateInConsole,
-      flashLineRange: actions.flashLineRange,
-      jumpToMappedLocation: actions.jumpToMappedLocation,
-      showSource: actions.showSource,
-      toggleBlackBox: actions.toggleBlackBox,
-    },
-    dispatch
-  );
 }
