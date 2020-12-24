@@ -42,8 +42,7 @@ export class DebuggerPanel {
   }
 
   async openConsoleAndEvaluate(input) {
-    const consolePanel = await this.toolbox.selectTool("console");
-    consolePanel.evaluateExpression(input);
+    this._actions.evaluateExpression(input);
   }
 
   async openInspector() {

@@ -12,7 +12,13 @@ const contentHeight = "200vh";
 // scrolling to increase scale by 1.
 const sensitivity = "200";
 
-function ScrollContainer({ hoverTime, zoomRegion, setZoomRegion, recordingDuration }) {
+function ScrollContainer({
+  hoverTime,
+  zoomRegion,
+  setZoomRegion,
+  setZoomedRegion,
+  recordingDuration,
+}) {
   const onScroll = e => {
     const newZoomRegion = getZoomRegion({
       hoverTime,
@@ -21,8 +27,8 @@ function ScrollContainer({ hoverTime, zoomRegion, setZoomRegion, recordingDurati
       scrollTop: e.target.scrollTop,
     });
     setZoomRegion(newZoomRegion);
-
-    gToolbox.getPanel("console").setZoomedRegion(newZoomRegion);
+    const { startTime, endTime, scale } = newZoomRegion;
+    setZoomedRegion(startTime, endTime, scale);
   };
 
   const handleClick = e => {
@@ -51,6 +57,7 @@ export default connect(
   }),
   {
     setZoomRegion: actions.setZoomRegion,
+    setZoomedRegion: actions.setZoomedRegion,
   }
 )(ScrollContainer);
 

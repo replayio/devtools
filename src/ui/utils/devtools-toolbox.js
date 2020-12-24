@@ -4,7 +4,6 @@ import { defer, EventEmitter } from "protocol/utils";
 import { actions } from "ui/actions";
 
 import { DebuggerPanel } from "devtools/client/debugger/panel";
-import { WebConsolePanel } from "devtools/client/webconsole/panel";
 import { InspectorPanel } from "devtools/client/inspector/panel";
 import Selection from "devtools/client/framework/selection";
 
@@ -24,10 +23,6 @@ export class DevToolsToolbox {
 
   async init(selectedPanel) {
     await this.threadFront.initializeToolbox();
-
-    // The console has to be started immediately on init so that messages appear
-    // on the timeline.
-    await this.startPanel("console");
 
     // The debugger has to be started immediately on init so that when we click
     // on any of those messages, either on the console or the timeline, the debugger
@@ -59,7 +54,6 @@ export class DevToolsToolbox {
 
     const panels = {
       debugger: DebuggerPanel,
-      console: WebConsolePanel,
       inspector: InspectorPanel,
     };
 
@@ -74,6 +68,15 @@ export class DevToolsToolbox {
   };
 
   async selectTool(name) {
+    // See comments at gToolbox.init(selectedPanel) in DevTools.js
+    // for more context. The toolbox needs to be initialized on
+    // recordingLoaded however if we start at the "Comments"
+    // tab it runs and throws an error at startPanel() above
+    // because the comments panel isn't handled by the toolbox
+    if (name === "console" || name === "comments") {
+      return;
+    }
+
     let panel = await this.getOrStartPanel(name);
     this.emit("select", name);
 

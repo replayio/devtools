@@ -70,6 +70,10 @@ function DevTools({
   });
 
   useEffect(() => {
+    // This shouldn't hit when the selectedPanel is "comments"
+    // as that's not dealt with in toolbox, however we still
+    // need to init the toolbox so we're not checking for
+    // that in the if statement here.
     if (recordingLoaded) {
       gToolbox.init(selectedPanel);
     }
