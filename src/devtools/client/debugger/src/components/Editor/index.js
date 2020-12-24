@@ -13,11 +13,7 @@ import classnames from "classnames";
 import { debounce } from "lodash";
 
 import { isFirefox } from "ui/utils/environment";
-import { features } from "../../utils/prefs";
 import { getIndentation } from "../../utils/indentation";
-
-import { showMenu } from "devtools-contextmenu";
-import { continueToHereItem, editorItemActions } from "./menus/editor";
 
 // Redux actions
 import actions from "../../actions";
@@ -27,7 +23,6 @@ import Preview from "./Preview";
 import Breakpoints from "./Breakpoints/Breakpoints";
 import ColumnBreakpoints from "./ColumnBreakpoints";
 import DebugLine from "./DebugLine";
-import ReplayLines from "./ReplayLines";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
 import LineNumberTooltip from "./LineNumberTooltip";
@@ -231,7 +226,7 @@ class Editor extends PureComponent {
     event.stopPropagation();
     event.preventDefault();
 
-    const { cx, selectedSource, editorActions, isPaused, framePositions } = this.props;
+    const { selectedSource } = this.props;
     const { editor } = this.state;
     if (!selectedSource || !editor) {
       return;
@@ -245,12 +240,8 @@ class Editor extends PureComponent {
       return;
     }
 
-    const location = { line, column: undefined, sourceId };
-
     if (target.classList.contains("CodeMirror-linenumber")) {
-      const disabled = !isPaused || !framePositions;
-
-      return showMenu(event, [continueToHereItem(cx, location, disabled, editorActions)]);
+      return;
     }
 
     if (target.getAttribute("id") === "columnmarker") {
@@ -265,7 +256,7 @@ class Editor extends PureComponent {
   };
 
   onGutterClick = (cm, line, gutter, ev) => {
-    const { cx, selectedSource, addBreakpointAtLine, continueToHere, toggleBlackBox } = this.props;
+    const { cx, selectedSource, addBreakpointAtLine, toggleBlackBox } = this.props;
 
     // ignore right clicks in the gutter
     if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !selectedSource) {
@@ -280,10 +271,6 @@ class Editor extends PureComponent {
     const sourceLine = toSourceLine(selectedSource.id, line);
     if (typeof sourceLine !== "number") {
       return;
-    }
-
-    if (ev.metaKey) {
-      return continueToHere(cx, { line: sourceLine });
     }
 
     // Don't add a breakpoint if the user clicked on something other than the gutter line number,
@@ -417,7 +404,7 @@ class Editor extends PureComponent {
   }
 
   renderItems() {
-    const { cx, selectedSource, isPaused } = this.props;
+    const { cx, selectedSource } = this.props;
     const { editor, contextMenu } = this.state;
 
     if (!selectedSource || !editor || !getDocument(selectedSource.id)) {
@@ -428,7 +415,6 @@ class Editor extends PureComponent {
       <div>
         <DebugLine />
         {/* <HighlightLine /> */}
-        {features.jumpLine ? <ReplayLines /> : null}
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
@@ -487,10 +473,8 @@ const mapStateToProps = state => {
     selectedSource,
     searchOn: selectors.getActiveSearch(state) === "file",
     symbols: selectors.getSymbols(state, selectedSource),
-    isPaused: selectors.getIsPaused(state),
     skipPausing: selectors.getSkipPausing(state),
     selectedFrame: selectors.getSelectedFrame(state),
-    framePositions: selectors.getFramePositions(state),
     mode: selectors.getViewMode(state),
   };
 };
@@ -498,7 +482,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   ...bindActionCreators(
     {
-      continueToHere: actions.continueToHere,
       toggleBreakpointAtLine: actions.toggleBreakpointAtLine,
       addBreakpointAtLine: actions.addBreakpointAtLine,
       jumpToMappedLocation: actions.jumpToMappedLocation,
@@ -510,7 +493,6 @@ const mapDispatchToProps = dispatch => ({
     },
     dispatch
   ),
-  editorActions: editorItemActions(dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Editor);
