@@ -7,7 +7,7 @@
 const { Component, createFactory, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
-const actions = require("devtools/client/webconsole/actions/index");
+const { actions } = require("ui/actions/index");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const MessageIcon = require("devtools/client/webconsole/components/Output/MessageIcon");
@@ -155,12 +155,7 @@ class Message extends Component {
     let overlayType, label, onClick;
     let onRewindClick = () => {
       dispatch(
-        actions.jumpToExecutionPoint(
-          executionPoint,
-          executionPointTime,
-          executionPointHasFrames,
-          message.pauseId
-        )
+        actions.seek(executionPoint, executionPointTime, executionPointHasFrames, message.pauseId)
       );
 
       this.onViewSourceInDebugger({ ...frame, url: frame.source });

@@ -104,14 +104,14 @@ class FrameTimeline extends Component {
   };
 
   onMouseUp = event => {
-    const { seekToPosition, clearPreviewPausedLocation } = this.props;
+    const { seek, clearPreviewPausedLocation } = this.props;
 
     const progress = this.getProgress(event.clientX);
     const position = this.getPosition(progress);
     this.setState({ scrubbing: false });
 
     if (position) {
-      seekToPosition(position.point, position.time);
+      seek(position.point, position.time);
       clearPreviewPausedLocation();
     }
   };
@@ -214,7 +214,7 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps, {
-  seekToPosition: actions.seekToPosition,
+  seek: actions.seek,
   setPreviewPausedLocation: actions.setPreviewPausedLocation,
   clearPreviewPausedLocation: actions.clearPreviewPausedLocation,
 })(FrameTimeline);

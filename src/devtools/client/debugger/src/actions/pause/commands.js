@@ -51,13 +51,6 @@ export function command(cx, type) {
   };
 }
 
-export function seekToPosition(point, time) {
-  return ({ getState }) => {
-    const cx = getThreadContext(getState());
-    ThreadFront.timeWarp(point, time, /* hasFrames */ true);
-  };
-}
-
 /**
  * StepIn
  * @memberof actions/pause

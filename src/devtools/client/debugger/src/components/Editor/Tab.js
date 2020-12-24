@@ -13,7 +13,7 @@ import SourceIcon from "../shared/SourceIcon";
 import { CloseButton } from "../shared/Button";
 import { copyToTheClipboard } from "../../utils/clipboard";
 
-import actions from "../../actions";
+import { actions } from "ui/actions";
 
 import {
   getFileURL,
@@ -52,6 +52,7 @@ class Tab extends PureComponent {
       toggleBlackBox,
       selectedSource,
       source,
+      ensureSourcesIsVisible,
     } = this.props;
 
     const tabCount = tabSources.length;
@@ -117,7 +118,10 @@ class Tab extends PureComponent {
         item: {
           ...tabMenuItems.showSource,
           disabled: !selectedSource.url,
-          click: () => showSource(cx, tab),
+          click: () => {
+            ensureSourcesIsVisible();
+            showSource(cx, tab);
+          },
         },
       },
       {
@@ -222,6 +226,7 @@ export default connect(
     closeTab: actions.closeTab,
     closeTabs: actions.closeTabs,
     showSource: actions.showSource,
+    ensureSourcesIsVisible: actions.ensureSourcesIsVisible,
     toggleBlackBox: actions.toggleBlackBox,
   },
   null,

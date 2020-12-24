@@ -9,6 +9,7 @@ import {
   mostRecentPaintOrMouseEvent,
   getMostRecentPaintPoint,
 } from "protocol/graphics";
+import { actions } from "ui/actions";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
@@ -184,8 +185,12 @@ export function seek(
   hasFrames: boolean,
   pauseId?: PauseId
 ): UIThunkAction {
-  return () => {
+  return ({ dispatch }) => {
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
+
+    // Make sure the pause information sidebar panel is visible.
+    dispatch(actions.setSelectedPrimaryPanel("debug"));
+
     if (pause) {
       ThreadFront.timeWarpToPause(pause);
     } else {

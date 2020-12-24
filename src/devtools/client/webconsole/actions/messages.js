@@ -273,9 +273,3 @@ export function messageUpdatePayload(id, data) {
     data,
   };
 }
-
-export function jumpToExecutionPoint(executionPoint) {
-  return () => {
-    ThreadFront.timeWarp(executionPoint);
-  };
-}
