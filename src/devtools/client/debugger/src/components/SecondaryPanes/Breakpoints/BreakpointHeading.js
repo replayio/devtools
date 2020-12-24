@@ -11,8 +11,6 @@ import { getHasSiblingOfSameName, getContext } from "../../../selectors";
 import { features } from "../../../utils/prefs";
 import { getThreadExecutionPoint } from "../../../reducers/pause";
 import { selectors } from "../../../../../../../ui/reducers";
-const { getAnalysisPointsForLocation } = selectors;
-
 import { CloseButton } from "../../shared/Button";
 
 class BreakpointHeading extends PureComponent {
@@ -34,25 +32,37 @@ class BreakpointHeading extends PureComponent {
   }
 
   removeBreakpoint = event => {
-    const { cx, removeBreakpoint, breakpoint } = this.props;
+    const { cx, source, removeBreakpointsInSource } = this.props;
     event.stopPropagation();
-    removeBreakpoint(cx, breakpoint);
+
+    removeBreakpointsInSource(cx, source);
+  };
+
+  onClick = () => {
+    const { cx, source, selectSource } = this.props;
+
+    selectSource(cx, source.id);
   };
 
   render() {
-    const { source } = this.props;
+    const { source, hasSiblingOfSameName } = this.props;
+
+    const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
+    const fileName = getTruncatedFileName(source, query);
 
     return (
       <div
         className="breakpoint-heading"
         title={getFileURL(source, false)}
         onContextMenu={this.onContextMenu}
+        onClick={this.onClick}
       >
-        <div className="breakpoint-heading-label">
-          <div>{this.getLabel()}</div>
-        </div>
+        <div className="breakpoint-heading-label">{fileName}</div>
         <div className="breakpoint-heading-actions">
-          <CloseButton handleClick={e => this.removeBreakpoint(e)} tooltip={"Remove breakpoint"} />
+          <CloseButton
+            handleClick={e => this.removeBreakpoint(e)}
+            tooltip={"Remove all breakpoint from this source"}
+          />
         </div>
       </div>
     );
@@ -63,9 +73,9 @@ const mapStateToProps = (state, { source, breakpoint }) => ({
   cx: getContext(state),
   hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
   executionPoint: getThreadExecutionPoint(state),
-  analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
 });
 
 export default connect(mapStateToProps, {
-  removeBreakpoint: actions.removeBreakpoint,
+  removeBreakpointsInSource: actions.removeBreakpointsInSource,
+  selectSource: actions.selectSource,
 })(BreakpointHeading);
