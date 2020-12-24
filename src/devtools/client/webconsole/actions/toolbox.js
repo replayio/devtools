@@ -48,17 +48,6 @@ export function onMessageHover(type, message) {
   };
 }
 
-export function jumpToExecutionPoint(point, time, hasFrames, pauseId) {
-  return ({ toolbox }) => {
-    const pause = Pause.getById(pauseId);
-    if (pause) {
-      toolbox.threadFront.timeWarpToPause(pause);
-    } else {
-      toolbox.threadFront.timeWarp(point, time, hasFrames);
-    }
-  };
-}
-
 export function onViewSourceInDebugger(frame) {
   return ({ toolbox }) => {
     toolbox.viewSourceInDebugger(frame.url, frame.line, frame.column, frame.sourceId);

@@ -134,12 +134,6 @@ function filterBarDisplayModeSet(displayMode) {
   };
 }
 
-function timeWarp(executionPoint) {
-  return () => {
-    ThreadFront.timeWarp(executionPoint);
-  };
-}
-
 function setZoomedRegion(zoomStartTime, zoomEndTime, scale) {
   return {
     type: SET_ZOOMED_REGION,
@@ -161,7 +155,6 @@ module.exports = {
   splitConsoleCloseButtonToggle,
   timestampsToggle,
   warningGroupsToggle,
-  timeWarp,
   setZoomedRegion,
   autocompleteToggle,
 };

@@ -75,13 +75,8 @@ export function toggleFrameworkGrouping(toggleValue) {
   };
 }
 
-export function showSource(cx, sourceId) {
+export function ensureSourcesIsVisible() {
   return ({ dispatch, getState }) => {
-    const source = getSource(getState(), sourceId);
-    if (!source) {
-      return;
-    }
-
     // Make sure the explorer/pause information panel is open so that the user
     // sees those panels
     if (getPaneCollapse(getState())) {
@@ -100,13 +95,20 @@ export function showSource(cx, sourceId) {
       });
     }
 
-    // Make sure the sources panel is expanded so that the user
-    // sees the source.
     if (getSourcesCollapsed(getState())) {
       dispatch({
         type: "TOGGLE_SOURCES",
         sourcesCollapsed: false,
       });
+    }
+  };
+}
+
+export function showSource(cx, sourceId) {
+  return ({ dispatch, getState }) => {
+    const source = getSource(getState(), sourceId);
+    if (!source) {
+      return;
     }
 
     dispatch(setPrimaryPaneTab("sources"));

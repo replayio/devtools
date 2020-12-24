@@ -2,9 +2,9 @@ import React from "react";
 import { compareNumericStrings } from "../../../../../../../protocol/utils";
 import { getThreadExecutionPoint } from "../../../reducers/pause";
 import { connect } from "../../../utils/connect";
-import { selectors } from "../../../../../../../ui/reducers";
+import { selectors } from "ui/reducers";
 const { getAnalysisPointsForLocation } = selectors;
-import actions from "../../../actions";
+import { actions } from "ui/actions";
 import { findLast, find } from "lodash";
 
 import BreakpointTimeline from "./BreakpointTimeline";
@@ -13,13 +13,13 @@ import "./BreakpointNavigation.css";
 function BreakpointNavigation({
   executionPoint,
   breakpoint,
-  seekToPosition,
+  seek,
   analysisPoints,
   setZoomedBreakpoint = () => {},
 }) {
   const navigateToPoint = point => {
     if (point) {
-      seekToPosition(point.point, point.time);
+      seek(point.point, point.time, true);
     }
   };
 
@@ -91,5 +91,5 @@ const mapStateToProps = (state, { breakpoint }) => ({
 });
 
 export default connect(mapStateToProps, {
-  seekToPosition: actions.seekToPosition,
+  seek: actions.seek,
 })(BreakpointNavigation);

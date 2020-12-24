@@ -3,11 +3,10 @@ import { connect } from "../../../utils/connect";
 import classnames from "classnames";
 import { selectors } from "../../../../../../../ui/reducers";
 const { getAnalysisPointsForLocation } = selectors;
-import actions from "../../../actions";
-import { Marker } from "../../../../../../../ui/components/Timeline/Message";
+import { actions } from "ui/actions";
+import { Marker } from "ui/components/Timeline/Message";
 import { getThreadExecutionPoint } from "../../../reducers/pause";
 import { timelineMarkerWidth as pointWidth } from "../../../../../../../ui/constants";
-import { executeSync } from "graphql";
 
 function getClassnameObject(point, executionPoint) {
   const classObj = { past: false, pause: false, future: false };
@@ -48,8 +47,7 @@ function BreakpointTimelinePoint({
   analysisPoints,
   executionPoint,
   zoomRegion,
-  recordingDuration,
-  seekToPosition,
+  seek,
 }) {
   const [leftPercentOffset, setLeftPercentOffset] = useState(0);
   const classnameObj = getClassnameObject(point.point, executionPoint);
@@ -73,7 +71,7 @@ function BreakpointTimelinePoint({
     <div
       className={classnames("breakpoint-navigation-timeline-point", classnameObj)}
       title={`${index + 1}/${analysisPoints.length}`}
-      onClick={() => seekToPosition(point.point, point.time)}
+      onClick={() => seek(point.point, point.time, true)}
       style={{
         left: `${leftPercentOffset}%`,
         opacity: opacity,
@@ -92,6 +90,6 @@ export default connect(
     recordingDuration: selectors.getRecordingDuration(state),
   }),
   {
-    seekToPosition: actions.seekToPosition,
+    seek: actions.seek,
   }
 )(BreakpointTimelinePoint);

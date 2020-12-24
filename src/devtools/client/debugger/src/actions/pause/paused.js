@@ -4,7 +4,6 @@
 
 //
 import { getSelectedFrame, getThreadContext } from "../../selectors";
-import { actions } from "ui/actions";
 
 import { fetchFrames } from ".";
 import { selectLocation } from "../sources";
@@ -46,7 +45,6 @@ export function paused({ executionPoint }) {
       })()
     );
 
-    dispatch(actions.setSelectedPrimaryPanel("debug"));
     await Promise.all(promises);
   };
 }
