@@ -17,8 +17,13 @@ function NewCommentButton({
   focusedCommentId,
   setFocusedCommentId,
   comments,
+  hideTooltip,
 }) {
-  const addComment = hooks.useAddComment(setFocusedCommentId);
+  const addCommentCallback = id => {
+    setFocusedCommentId(id);
+    hideTooltip();
+  };
+  const addComment = hooks.useAddComment(addCommentCallback);
 
   // Skip rendering the button if any of the following applies:
   // - There is already a comment at that time.
@@ -71,5 +76,6 @@ export default connect(
   }),
   {
     setFocusedCommentId: actions.setFocusedCommentId,
+    hideTooltip: actions.hideTooltip,
   }
 )(NewCommentButton);
