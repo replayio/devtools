@@ -174,6 +174,7 @@ class _ThreadFront {
 
     this.timeWarp(endpoint.point, endpoint.time, /* hasFrames */ false, /* force */ true);
     this.initializedWaiter.resolve();
+    this.ensureCurrentPause();
 
     if (this.testName) {
       client.Internal.labelTestSession({ sessionId });
