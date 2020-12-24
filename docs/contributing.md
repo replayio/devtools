@@ -37,64 +37,19 @@ git push jaril readme-changes
 
 ## Issue Labeling Guide
 
-### **Parent Categories**
+All issues have labels according to what category they fall into. We do this for ease of organizing and assigning issues as well as to keep track of high priority bugs that need to be fixed immediately.
+Refer to the examples list below to see what some issues might be labeled.
+You can find descriptions for each label in this [list](https://github.com/RecordReplay/devtools/issues/labels).
 
-Every issue will have at least a parent category and may have a more granular child category.
-
-The more granular categories would be labeled according to this list. Underlined is the name of the label and below it is the list of what that label encompasses.
-
-### **Overarching category labels:**
-*Color code for these labels are #D876E3*
-
-<u>Bug</u>
-- All bugs
-
-<u>Feature</u>
-- New feature requests
-
-<u>Tooling</u>
-- Tests
-- Logrocket
-
-<u>UI Polish</u>
-- Anything UI that isn't broken or functionality related
-
-<u>Performance</u>
-- Lagging and other performance issues
-
-
-### **Labels for Bug or Feature:**
-*Color code for these labels are #CCEBFF*
-
-<u>Debugger</u>
-- Sidebar Panel and all its contents
-- Accordions
-- Editor
-
-<u>Viewer</u>
-- Issues related *specifically* to the viewer that don't carry over to Debug mode
-
-<u>Comments</u>
-- Comments / Transcripts in both View and Debug mode
-
-<u>Elements</u>
-- Anything within the Elements panel
-- Inspector
-
-<u>Console</u>
-- Anything within the Console Panel
-
-<u>Timeline</u>
-- The Timeline in both View and Debug mode
-
-<u>Video</u>
-- The Video player in both View and Debug mode
-
-<u>Account</u>
-- User's dashboard and profile
+Every issue will have at least a parent category (pink labels) and may have a more granular child category (blue labels).
+The more granular categories would be labeled according to what specific feature of the app is having an issue.
 
 ### **Examples:**
-- Jack can't expand a node in the sources tree: ["bug", "debugger"]
-- Jill can't fastforward the timeline on play mode: ["bug", "timeline"]
-- The hill wants to make it rain glitter from the screen when it hovers over comments in play mode: ["feature", "comments"]
-- Jack would like to right click and inspect on Viewer mode: ["feature", "viewer"]
+- Ron can't expand a node in the sources tree: ["bug", "debugger"]
+- Anne can't fastforward the timeline on play mode: ["bug", "timeline"]
+- Leslie wants to make it rain glitter from the screen when she hovers over comments in play mode: ["feature", "comments"]
+- Andy would like to right click and inspect on Viewer mode: ["feature", "viewer"]
+- Donna notices an error in the console every time she hovers over the source code: ["bug", "editor"]
+- Tom wants to custom theme his Replay just like he would his IDE: ["feature", "UI Polish"]
+- April's browser crashes when she tries to play a video': ["bug", "P1", "browser", "video"]
+- Garry's recording list on his dashboard won't show him all of his recordings: ["bug", "account"]
