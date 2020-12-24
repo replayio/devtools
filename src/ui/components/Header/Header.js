@@ -71,9 +71,23 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
         editingTitle={editingTitle}
         recordingId={recordingId}
       />
-      {!editingTitle && <div className="subtitle">{moment(date).fromNow()}</div>}
+      {!editingTitle && <Subtitle date={date} />}
     </div>
   );
+}
+
+function Subtitle({ date }) {
+  const [time, setTime] = useState(Date.now());
+
+  // Update the "Created at" time every 30s.
+  useEffect(() => {
+    const interval = setInterval(() => setTime(Date.now()), 10000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  return <div className="subtitle">Created {moment(date).fromNow()}</div>;
 }
 
 function Header({ user, getActiveUsers, recordingId }) {
