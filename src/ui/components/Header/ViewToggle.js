@@ -8,26 +8,23 @@ import { setViewMode } from "../../actions/app";
 import { getViewMode } from "../../reducers/app";
 
 function ViewToggle({ viewMode, setViewMode, clearSelectedLocation, cx }) {
-  const handleClick = () => {
-    const newMode = viewMode == "dev" ? "non-dev" : "dev";
-    setViewMode(newMode);
-  };
-
   return (
-    <button className="view-toggle" onClick={handleClick}>
+    <button className="view-toggle">
       <div
+        onClick={() => setViewMode("non-dev")}
         className={classnames("view-toggle-item view-toggle-non-dev", {
           active: viewMode === "non-dev",
         })}
       >
-        PLAY
+        VIEWER
       </div>
       <div
+        onClick={() => setViewMode("dev")}
         className={classnames("view-toggle-item view-toggle-dev", {
           active: viewMode === "dev",
         })}
       >
-        DEBUG
+        DEVTOOLS
       </div>
     </button>
   );
