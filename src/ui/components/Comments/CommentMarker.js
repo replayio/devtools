@@ -30,8 +30,10 @@ class CommentMarker extends React.Component {
 
   onClick = () => {
     const { setFocusedCommentId, comment, seek } = this.props;
+    const { id, time, point, has_frames } = comment;
 
     setFocusedCommentId(comment.id);
+    seek(point, time, has_frames);
   };
 
   render() {
