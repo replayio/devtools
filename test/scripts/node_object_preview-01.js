@@ -1,4 +1,4 @@
-Test.describe(`basic node console behavior.`, async () => {
+Test.describe(`showing console objects in node.`, async () => {
   await Test.selectConsole();
 
   await Test.waitForMessage("Array(20) [ 0, 1, 2, 3, 4, 5,");
