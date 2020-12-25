@@ -25,7 +25,7 @@ const sourceOptions = {
     tokens: true,
     plugins: [
       "jsx",
-      "flow",
+      "typescript",
       "doExpressions",
       "optionalChaining",
       "nullishCoaliescingOperator",
@@ -43,7 +43,7 @@ const sourceOptions = {
     tokens: true,
     plugins: [
       "jsx",
-      "flow",
+      "typescript",
       "doExpressions",
       "optionalChaining",
       "nullishCoaliescingOperator",
