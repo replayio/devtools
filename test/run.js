@@ -2,13 +2,11 @@
 
 // Harness for end-to-end tests. Run this from the devtools root directory.
 const fs = require("fs");
-const http = require("http");
 const https = require("https");
-const os = require("os");
 const { spawnSync, spawn } = require("child_process");
 const url = require("url");
 const Manifest = require("./manifest.json");
-const { findGeckoPath } = require("./utils");
+const { findGeckoPath, createTestScript, tmpFile } = require("./utils");
 
 const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
   ? JSON.parse(fs.readFileSync("./test/example-recordings.json"))
@@ -117,27 +115,6 @@ async function runMatchingTests() {
 
     await runTest("test/harness.js", test, 240, env);
   }
-}
-
-function tmpFile() {
-  return os.tmpdir() + "/" + ((Math.random() * 1e9) | 0);
-}
-
-function createTestScript({ path }) {
-  const generatedScriptPath = tmpFile();
-  const generatedScriptFd = fs.openSync(generatedScriptPath, "w");
-  spawnSync("clang", ["-C", "-E", "-P", "-nostdinc", "-undef", "-x", "c++", path], {
-    stdio: [, generatedScriptFd, generatedScriptFd],
-  });
-  fs.closeSync(generatedScriptFd);
-
-  // print test file
-  if (false) {
-    const testFile = fs.readFileSync(generatedScriptPath, { encoding: "utf-8" });
-    console.log(testFile);
-  }
-
-  return generatedScriptPath;
 }
 
 let failures = [];

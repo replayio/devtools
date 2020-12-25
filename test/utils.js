@@ -1,6 +1,8 @@
 /* Copyright 2020 Record Replay Inc. */
 
 const fs = require("fs");
+const os = require("os");
+const { spawnSync } = require("child_process");
 
 const GeckoInstallDirectories = [
   "/Applications/Replay.app", // macOS
@@ -36,4 +38,25 @@ function findGeckoPath() {
   console.error("Can't find Gecko!");
 }
 
-module.exports = { findGeckoPath };
+function createTestScript({ path }) {
+  const generatedScriptPath = tmpFile();
+  const generatedScriptFd = fs.openSync(generatedScriptPath, "w");
+  spawnSync("clang", ["-C", "-E", "-P", "-nostdinc", "-undef", "-x", "c++", path], {
+    stdio: [, generatedScriptFd, generatedScriptFd],
+  });
+  fs.closeSync(generatedScriptFd);
+
+  // print test file
+  if (false) {
+    const testFile = fs.readFileSync(generatedScriptPath, { encoding: "utf-8" });
+    console.log(testFile);
+  }
+
+  return generatedScriptPath;
+}
+
+function tmpFile() {
+  return os.tmpdir() + "/" + ((Math.random() * 1e9) | 0);
+}
+
+module.exports = { findGeckoPath, createTestScript, tmpFile };
