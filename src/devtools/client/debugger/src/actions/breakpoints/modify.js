@@ -181,12 +181,6 @@ export function runAnalysis(cx, initialLocation, options) {
   };
 }
 
-/**
- * Remove a single breakpoint
- *
- * @memberof actions/breakpoints
- * @static
- */
 export function removeBreakpoint(cx, initialBreakpoint) {
   return async ({ dispatch, getState, client }) => {
     recordEvent("remove_breakpoint");
@@ -210,13 +204,6 @@ export function removeBreakpoint(cx, initialBreakpoint) {
   };
 }
 
-/**
- * Remove all installed, pending, and client breakpoints associated with a
- * target generated location.
- *
- * @memberof actions/breakpoints
- * @static
- */
 export function removeBreakpointAtGeneratedLocation(cx, target) {
   return async ({ dispatch, getState, client }) => {
     // Remove any breakpoints matching the generated location.
@@ -248,12 +235,6 @@ export function removeBreakpointAtGeneratedLocation(cx, target) {
   };
 }
 
-/**
- * Disable a single breakpoint
- *
- * @memberof actions/breakpoints
- * @static
- */
 export function disableBreakpoint(cx, initialBreakpoint) {
   return async ({ dispatch, getState, client }) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
@@ -272,19 +253,8 @@ export function disableBreakpoint(cx, initialBreakpoint) {
   };
 }
 
-/**
- * Update the options of a breakpoint.
- *
- * @throws {Error} "not implemented"
- * @memberof actions/breakpoints
- * @static
- * @param {SourceLocation} location
- *        @see DebuggerController.Breakpoints.addBreakpoint
- * @param {Object} options
- *        Any options to set on the breakpoint
- */
 export function setBreakpointOptions(cx, location, options = {}) {
-  return async ({ dispatch, getState, client, sourceMaps }) => {
+  return async ({ dispatch, getState, client }) => {
     let breakpoint = getBreakpoint(getState(), location);
     if (!breakpoint) {
       return dispatch(addBreakpoint(cx, location, options));

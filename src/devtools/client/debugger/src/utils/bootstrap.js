@@ -9,7 +9,7 @@ import * as selectors from "../selectors";
 import { asyncStore } from "./prefs";
 import { persistTabs } from "../utils/tabs";
 
-let parser;
+export let parser;
 
 export function bootstrapWorkers(panelWorkers) {
   const workerPath = "dist";

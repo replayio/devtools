@@ -1,5 +1,4 @@
 import React, { useRef, useEffect } from "react";
-import ReactDOM from "react-dom";
 import CodeMirror from "codemirror";
 
 export function PanelInput({

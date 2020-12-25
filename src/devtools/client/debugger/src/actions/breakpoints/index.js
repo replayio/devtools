@@ -172,7 +172,7 @@ export function runAnalysisOnLine(cx, line) {
 }
 
 export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = false) {
-  return ({ dispatch, getState, client, sourceMaps }) => {
+  return ({ dispatch, getState }) => {
     const state = getState();
     const source = getSelectedSource(state);
 

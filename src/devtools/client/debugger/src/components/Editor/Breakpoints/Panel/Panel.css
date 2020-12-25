@@ -127,6 +127,10 @@
   align-items: center;
 }
 
+.breakpoint-panel .form-row.invalid .CodeMirror {
+  border-color: var(--red-50);
+}
+
 .breakpoint-panel form .input-container {
   position: relative;
   width: 100%;
@@ -222,7 +226,7 @@
 }
 
 .breakpoint-panel .breakpoint-navigation-status {
-  background: #E8E8E8;
+  background: #e8e8e8;
   border-radius: 10px;
   padding: 2px 8px;
 }
