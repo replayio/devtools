@@ -12,6 +12,10 @@ import BreakpointNavigation from "devtools/client/debugger/src/components/Second
 
 import "./Panel.css";
 
+function getEditorWidth({ editor }) {
+  return Math.max(editor.getScrollInfo().clientWidth - 60, 300);
+}
+
 function PanelSummary({ breakpoint, toggleEditingOn, setInputToFocus }) {
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
@@ -71,14 +75,21 @@ function Widget({ location, children, editor, insertAt }) {
 
 function Panel({ breakpoint, editor, insertAt }) {
   const [editing, setEditing] = useState(false);
+  const [width, setWidth] = useState(getEditorWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
 
   const toggleEditingOn = () => setEditing(true);
   const toggleEditingOff = () => setEditing(false);
+  const setEditorWidth = () => setWidth(getEditorWidth(editor));
+
+  useEffect(() => {
+    editor.editor.on("refresh", setEditorWidth);
+    return () => editor.editor.off("refresh", setEditorWidth);
+  }, []);
 
   return (
     <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
-      <div className={classnames("breakpoint-panel", { editing })}>
+      <div style={{ width: `${width}px` }} className={classnames("breakpoint-panel", { editing })}>
         {editing ? (
           <PanelEditor
             breakpoint={breakpoint}
