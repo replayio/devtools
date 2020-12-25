@@ -67,8 +67,8 @@ class Breakpoints extends Component {
           });
 
           return (
-            <div className="breakpoints-list-source" key={i}>
-              <BreakpointHeading source={source} />
+            <div className="breakpoints-list-source" key={source.id}>
+              <BreakpointHeading source={source} key="header" />
               {renderedBreakpoints}
             </div>
           );
