@@ -38,7 +38,7 @@ class Tabs extends PureComponent {
 
       const isSelectedSourceNodeVisible = this.getIsSelectedSourceNodeVisible();
 
-      if (!isSelectedSourceNodeVisible) {
+      if (selectedSourceNode && !isSelectedSourceNodeVisible) {
         selectedSourceNode.scrollIntoView({ block: "center" });
       }
     }
@@ -48,6 +48,10 @@ class Tabs extends PureComponent {
     const containerNode = this.refs.sourceTabs.parentElement;
     const sourceNodes = [...this.refs.sourceTabs.children];
     const selectedSourceNode = sourceNodes.find(node => node.classList.contains("active"));
+
+    if (!selectedSourceNode) {
+      return false;
+    }
 
     const { x: containerX, width: containerWidth } = containerNode.getBoundingClientRect();
     const { x: childX, width: childWidth } = selectedSourceNode.getBoundingClientRect();
