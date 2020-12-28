@@ -39,11 +39,12 @@ export function Marker({ message, onMarkerClick, onMarkerMouseEnter, onMarkerMou
   );
 }
 
-class Message extends React.Component {
+export default class Message extends React.Component {
   render() {
     const {
       message,
       currentTime,
+      hoveredMessageId,
       zoomRegion,
       overlayWidth,
       onMarkerClick,
@@ -61,6 +62,9 @@ class Message extends React.Component {
       return null;
     }
 
+    // A marker is highlighted if its corresponding message is hovered on
+    // in the console
+    const isHighlighted = hoveredMessageId == message.id;
     const isPauseLocation = message.executionPointTime === currentTime;
 
     let frameLocation = "";
@@ -77,6 +81,7 @@ class Message extends React.Component {
       <a
         tabIndex={0}
         className={classnames("message", {
+          highlighted: isHighlighted,
           paused: isPauseLocation,
         })}
         style={{
@@ -116,7 +121,3 @@ export function MessagePreview({ message, overlayWidth, zoomRegion }) {
     </a>
   );
 }
-export default connect(state => ({
-  highlightedLocation: selectors.getHighlightedLocation(state),
-  hoveredLineNumberLocation: selectors.getHoveredLineNumberLocation(state),
-}))(Message);

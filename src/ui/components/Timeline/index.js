@@ -118,10 +118,11 @@ export class Timeline extends Component {
     const { setTimelineState } = this.props;
 
     if (type == "mouseenter") {
-      setTimelineState({ highlightedMessage: message.id });
+      setTimelineState({ hoveredMessageId: message.id });
     }
-
-    return null;
+    if (type == "mouseleave") {
+      setTimelineState({ hoveredMessageId: null });
+    }
   };
 
   findMessage(message) {
@@ -145,12 +146,6 @@ export class Timeline extends Component {
     const elementTop = element.getBoundingClientRect().top;
     if (elementTop < 30 || elementTop + 50 > consoleHeight) {
       element.scrollIntoView({ block: "center", behavior: "smooth" });
-    }
-  }
-
-  unhighlightConsoleMessage() {
-    if (this.props.highlightedMessageId) {
-      this.props.setTimelineState({ highlightedMessageId: null });
     }
   }
 
@@ -467,7 +462,7 @@ export class Timeline extends Component {
   }
 
   renderMessages() {
-    const { messages, currentTime, highlightedMessageId, zoomRegion } = this.props;
+    const { messages, currentTime, hoveredMessageId, zoomRegion } = this.props;
 
     return messages.map((message, index) => {
       const messageEl = (
@@ -476,7 +471,7 @@ export class Timeline extends Component {
           index={index}
           messages={messages}
           currentTime={currentTime}
-          highlightedMessageId={highlightedMessageId}
+          hoveredMessageId={hoveredMessageId}
           zoomRegion={zoomRegion}
           overlayWidth={this.overlayWidth}
           onMarkerClick={this.onMarkerClick}
@@ -606,8 +601,7 @@ export default connect(
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
     playback: selectors.getPlayback(state),
-    highlightedMessageId: selectors.getHighlightedMessageId(state),
-    hoveredMessage: selectors.getHoveredMessage(state),
+    hoveredMessageId: selectors.getHoveredMessageId(state),
     unprocessedRegions: selectors.getUnprocessedRegions(state),
     recordingDuration: selectors.getRecordingDuration(state),
     timelineDimensions: selectors.getTimelineDimensions(state),
