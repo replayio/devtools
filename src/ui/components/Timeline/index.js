@@ -557,13 +557,13 @@ export class Timeline extends Component {
   }
 
   render() {
-    const { loaded, currentTime, hoverTime } = this.props;
+    const { loaded, currentTime, hoverTime, hoveredLineNumber } = this.props;
     const percent = this.getVisiblePosition(currentTime) * 100;
     const hoverPercent = this.getVisiblePosition(hoverTime) * 100;
 
     return div(
       {
-        className: "timeline",
+        className: classname("timeline", { dimmed: hoveredLineNumber }),
       },
       this.renderCommands(),
       div(
@@ -617,6 +617,7 @@ export default connect(
     messages: selectors.getMessagesForTimeline(state),
     viewMode: selectors.getViewMode(state),
     selectedPanel: selectors.getSelectedPanel(state),
+    hoveredLineNumber: selectors.hasHoveredLineNumber(state),
     pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
   }),
   {

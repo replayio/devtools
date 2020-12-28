@@ -77,22 +77,28 @@
   pointer-events: all;
 }
 
+.timeline .message-preview {
+  z-index: var(--z-index-2--hovered-message);
+}
+
 .timeline .message:hover {
   cursor: pointer;
 }
 
 .timeline .message.highlighted .fill {
   fill: var(--replaying-marker-stroke);
-  transition-duration: 100ms;
 }
 
 .timeline .message.highlighted  {
   transform: scale(1.2);
-  transition-duration: 100ms;
 }
 
 .timeline .message .fill {
   fill: var(--replaying-marker-fill);
+}
+
+.timeline.dimmed .message .fill {
+  fill: var(--grey-40);
 }
 
 .timeline .message .stroke {
@@ -111,6 +117,10 @@
 .timeline .message.paused .stroke {
   stroke: var(--replaying-paused-marker-stroke);
   stroke: var(--theme-body-background);
+}
+
+.timeline.dimmed .message-preview .fill {
+  fill: var(--replaying-marker-fill);
 }
 
 .timeline .message:focus {
@@ -167,6 +177,10 @@
   margin-bottom: auto;
   top: 0;
   bottom: 0;
+}
+
+.timeline.dimmed .progress-line {
+  background-color: var(--grey-40);
 }
 
 .timeline .overlay-container:hover .progress-line {
