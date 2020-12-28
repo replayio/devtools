@@ -126,7 +126,7 @@ export class Timeline extends Component {
 
   findMessage(message) {
     const outputNode = document.getElementById("toolbox-content-console");
-    return outputNode.querySelector(`.message[data-message-id="${message.id}"]`);
+    return outputNode?.querySelector(`.message[data-message-id="${message.id}"]`);
   }
 
   scrollToMessage(message) {
@@ -135,14 +135,16 @@ export class Timeline extends Component {
     }
 
     const element = this.findMessage(message);
-    const outputNode = document.getElementById("toolbox-content-console");
 
-    if (element) {
-      const consoleHeight = outputNode.getBoundingClientRect().height;
-      const elementTop = element.getBoundingClientRect().top;
-      if (elementTop < 30 || elementTop + 50 > consoleHeight) {
-        element.scrollIntoView({ block: "center", behavior: "smooth" });
-      }
+    if (!element) {
+      return;
+    }
+
+    const outputNode = document.getElementById("toolbox-content-console");
+    const consoleHeight = outputNode.getBoundingClientRect().height;
+    const elementTop = element.getBoundingClientRect().top;
+    if (elementTop < 30 || elementTop + 50 > consoleHeight) {
+      element.scrollIntoView({ block: "center", behavior: "smooth" });
     }
   }
 
