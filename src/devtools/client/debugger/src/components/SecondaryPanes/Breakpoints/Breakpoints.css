@@ -6,6 +6,11 @@
   overflow-x: auto;
 }
 
+.no-breakpoints {
+  padding: 8px;
+  white-space: pre-wrap;
+}
+
 .breakpoints-list *:focus:not(:focus-visible) {
   outline: none;
   background: inherit;

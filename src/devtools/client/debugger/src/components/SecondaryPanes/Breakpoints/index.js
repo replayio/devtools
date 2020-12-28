@@ -45,7 +45,11 @@ class Breakpoints extends Component {
     const { breakpointSources } = this.props;
 
     if (!breakpointSources.length) {
-      return null;
+      return (
+        <div className="no-breakpoints">
+          There is nothing here yet. Try adding a breakpoint in a source file.
+        </div>
+      );
     }
 
     const sources = [...breakpointSources.map(({ source }) => source)];
