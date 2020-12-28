@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import classnames from "classnames";
 import { timelineMarkerWidth } from "../../constants";
 import { selectors } from "ui/reducers";
+import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
 const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
@@ -18,6 +19,14 @@ function sameLocation(highlightedLocation, messageFrame) {
     highlightedLocation.line === messageFrame.line &&
     highlightedLocation.column === messageFrame.column
   );
+}
+
+function isHoveredInGutter(hoveredLocation, messageLocation) {
+  if (!hoveredLocation || !messageLocation) {
+    return false;
+  }
+
+  return getLocationKey(hoveredLocation) === getLocationKey(messageLocation);
 }
 
 // Don't change this haphazardly. This marker is intentionally 11px x 11px, so that it
@@ -54,16 +63,15 @@ class Message extends React.Component {
   render() {
     const {
       message,
-      messages,
       currentTime,
       highlightedMessageId,
       highlightedLocation,
       zoomRegion,
       overlayWidth,
-      visibleIndex,
       onMarkerClick,
       onMarkerMouseEnter,
       onMarkerMouseLeave,
+      hoveredLineNumberLocation,
     } = this.props;
 
     const offset = getPixelOffset({
@@ -71,8 +79,6 @@ class Message extends React.Component {
       overlayWidth,
       zoom: zoomRegion,
     });
-
-    const previousVisibleMessage = messages[visibleIndex];
 
     if (offset < 0) {
       return null;
@@ -90,7 +96,9 @@ class Message extends React.Component {
 
     // A marker is highlighted if either the message or its location is highlighted
     const isHighlighted =
-      highlightedMessageId == message.id || sameLocation(highlightedLocation, message.frame);
+      highlightedMessageId == message.id ||
+      sameLocation(highlightedLocation, message.frame) ||
+      isHoveredInGutter(hoveredLineNumberLocation, message.frame);
 
     const isPauseLocation = message.executionPointTime === currentTime;
 
@@ -131,6 +139,25 @@ class Message extends React.Component {
     );
   }
 }
+
+export function MessagePreview({ message, overlayWidth, zoomRegion }) {
+  return (
+    <a
+      tabIndex={0}
+      className={classnames("message message-preview")}
+      style={{
+        left: `${getLeftOffset({
+          time: message.time,
+          overlayWidth,
+          zoom: zoomRegion,
+        })}%`,
+      }}
+    >
+      <Marker />
+    </a>
+  );
+}
 export default connect(state => ({
   highlightedLocation: selectors.getHighlightedLocation(state),
+  hoveredLineNumberLocation: selectors.getHoveredLineNumberLocation(state),
 }))(Message);

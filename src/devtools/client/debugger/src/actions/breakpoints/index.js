@@ -14,6 +14,7 @@ import {
   getSelectedSource,
   getBreakpointAtLocation,
   getBreakpointsForSource,
+  getFirstBreakpointPosition,
   getSymbols,
 } from "../../selectors";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
@@ -24,6 +25,8 @@ import {
   disableBreakpoint,
   runAnalysis,
 } from "./modify";
+import { setBreakpointPositions } from "./breakpointPositions";
+import { actions } from "ui/actions";
 import remapLocations from "./remapLocations";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
 
@@ -168,6 +171,25 @@ export function runAnalysisOnLine(cx, line) {
     };
 
     return dispatch(runAnalysis(cx, location, options));
+  };
+}
+
+export function updateHoveredLineNumber(cx, line) {
+  return async ({ dispatch, getState }) => {
+    const state = getState();
+    const source = getSelectedSource(state);
+
+    const initialLocation = {
+      sourceId: source.id,
+      sourceUrl: source.url,
+      column: undefined,
+      line,
+    };
+
+    await dispatch(setBreakpointPositions({ cx, sourceId: source.id, line }));
+    const location = getFirstBreakpointPosition(getState(), initialLocation);
+
+    dispatch(actions.setHoveredLineNumberLocation(location));
   };
 }
 

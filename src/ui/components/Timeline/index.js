@@ -29,7 +29,7 @@ const { assert } = require("protocol/utils");
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
-import Message from "./Message";
+import Message, { MessagePreview } from "./Message";
 import { timelineMarkerWidth } from "../../constants";
 
 const { div } = dom;
@@ -468,13 +468,11 @@ export class Timeline extends Component {
 
   renderMessages() {
     const { messages, currentTime, highlightedMessageId, zoomRegion } = this.props;
-    let visibleIndex;
 
     return messages.map((message, index) => {
       const messageEl = (
         <Message
           message={message}
-          visibleIndex={visibleIndex}
           index={index}
           messages={messages}
           currentTime={currentTime}
@@ -487,9 +485,33 @@ export class Timeline extends Component {
         />
       );
 
-      if (messageEl) {
-        visibleIndex = index;
-      }
+      return messageEl;
+    });
+  }
+
+  renderPreviewMessages() {
+    const {
+      pointsForHoveredLineNumber,
+      currentTime,
+      highlightedMessageId,
+      zoomRegion,
+    } = this.props;
+
+    if (!pointsForHoveredLineNumber) {
+      return [];
+    }
+
+    return pointsForHoveredLineNumber.map((message, index) => {
+      const messageEl = (
+        <MessagePreview
+          message={message}
+          index={index}
+          currentTime={currentTime}
+          highlightedMessageId={highlightedMessageId}
+          zoomRegion={zoomRegion}
+          overlayWidth={this.overlayWidth}
+        />
+      );
       return messageEl;
     });
   }
@@ -568,7 +590,10 @@ export class Timeline extends Component {
             className: "progress-line",
             style: { width: `${percent}%` },
           }),
-          div({ className: "message-container" }, ...this.renderMessages()),
+          div({ className: "message-container" }, [
+            ...this.renderMessages(),
+            ...this.renderPreviewMessages(),
+          ]),
           <ScrollContainer />
         ),
         <Comments />
@@ -592,6 +617,7 @@ export default connect(
     messages: selectors.getMessagesForTimeline(state),
     viewMode: selectors.getViewMode(state),
     selectedPanel: selectors.getSelectedPanel(state),
+    pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,

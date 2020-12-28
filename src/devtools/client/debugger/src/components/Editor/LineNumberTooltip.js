@@ -23,6 +23,7 @@ export function LineNumberTooltip({
   runAnalysisOnLine,
   analysisPoints,
   setHoveredLineNumberLocation,
+  updateHoveredLineNumber,
 }) {
   const [lineNumberNode, setLineNumberNode] = useState(null);
   const lastHoveredLineNumber = useRef(null);
@@ -37,6 +38,7 @@ export function LineNumberTooltip({
       lastHoveredLineNumber.current = lineNumber;
     }
 
+    updateHoveredLineNumber(cx, lineNumber);
     setLineNumberNode(targetNode);
   };
   const clearHoveredLineNumber = () => {
@@ -68,5 +70,6 @@ export default connect(
   {
     runAnalysisOnLine: actions.runAnalysisOnLine,
     setHoveredLineNumberLocation: actions.setHoveredLineNumberLocation,
+    updateHoveredLineNumber: actions.updateHoveredLineNumber,
   }
 )(LineNumberTooltip);
