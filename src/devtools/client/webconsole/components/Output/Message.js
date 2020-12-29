@@ -212,14 +212,6 @@ class Message extends Component {
     );
   }
 
-  renderDeleteButton() {
-    const { dispatch, message, type } = this.props;
-
-    return createElement(CloseButton, {
-      handleClick: () => dispatch(actions.messagesClearEvaluation(message.id, type)),
-    });
-  }
-
   renderErrorState() {
     const newBugUrl =
       "https://bugzilla.mozilla.org/enter_bug.cgi?product=DevTools&component=Console";
@@ -422,8 +414,7 @@ class Message extends Component {
           repeat ? " " : null,
           repeat,
           " ",
-          location,
-          this.renderDeleteButton()
+          location
         ),
         attachment,
         ...notesNodes
