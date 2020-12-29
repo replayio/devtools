@@ -81,7 +81,7 @@ function Widget({ location, children, editor, insertAt }) {
   return ReactDOM.createPortal(<>{children}</>, node);
 }
 
-function Panel({ breakpoint, editor, insertAt }) {
+export default function Panel({ breakpoint, editor, insertAt }) {
   const [editing, setEditing] = useState(false);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
@@ -117,5 +117,3 @@ function Panel({ breakpoint, editor, insertAt }) {
     </Widget>
   );
 }
-
-export default Panel;
