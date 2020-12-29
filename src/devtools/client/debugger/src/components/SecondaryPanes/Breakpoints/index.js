@@ -46,7 +46,7 @@ class Breakpoints extends Component {
 
     if (!breakpointSources.length) {
       return (
-        <div className="no-breakpoints">
+        <div className="empty-state-content">
           There is nothing here yet. Try adding a breakpoint in a source file.
         </div>
       );
