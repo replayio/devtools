@@ -146,7 +146,6 @@ export const getAnalysisPointsForLocation = (state: UIState, location: any) =>
   location && state.app.analysisPoints[getLocationKey(location)];
 export const getViewMode = (state: UIState) => state.app.viewMode;
 export const getNarrowMode = (state: UIState) => state.app.narrowMode;
-export const hasHoveredLineNumber = (state: UIState) => !!state.app.hoveredLineNumberLocation;
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
 export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);

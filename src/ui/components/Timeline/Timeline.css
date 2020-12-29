@@ -59,7 +59,8 @@
   border-right-style: solid;
 }
 
-.timeline .message-container {
+.timeline .message-container,
+.timeline .preview-message-container {
   position: absolute;
   width: 100%;
   height: 100%;

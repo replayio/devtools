@@ -557,13 +557,13 @@ export class Timeline extends Component {
   }
 
   render() {
-    const { loaded, currentTime, hoverTime, hoveredLineNumber } = this.props;
+    const { loaded, currentTime, hoverTime, hoveredLineNumberLocation } = this.props;
     const percent = this.getVisiblePosition(currentTime) * 100;
     const hoverPercent = this.getVisiblePosition(hoverTime) * 100;
 
     return div(
       {
-        className: classname("timeline", { dimmed: hoveredLineNumber }),
+        className: classname("timeline", { dimmed: !!hoveredLineNumberLocation }),
       },
       this.renderCommands(),
       div(
@@ -590,10 +590,8 @@ export class Timeline extends Component {
             className: "progress-line",
             style: { width: `${percent}%` },
           }),
-          div({ className: "message-container" }, [
-            ...this.renderMessages(),
-            ...this.renderPreviewMessages(),
-          ]),
+          div({ className: "message-container" }, ...this.renderMessages()),
+          div({ className: "preview-message-container" }, ...this.renderPreviewMessages()),
           <ScrollContainer />
         ),
         <Comments />
@@ -617,7 +615,7 @@ export default connect(
     messages: selectors.getMessagesForTimeline(state),
     viewMode: selectors.getViewMode(state),
     selectedPanel: selectors.getSelectedPanel(state),
-    hoveredLineNumber: selectors.hasHoveredLineNumber(state),
+    hoveredLineNumberLocation: selectors.getHoveredLineNumberLocation(state),
     pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
   }),
   {
