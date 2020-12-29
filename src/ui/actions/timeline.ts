@@ -102,7 +102,7 @@ function setRecordingDescription({ duration, lastScreen }: RecordingDescription)
 
 export function updateTimelineDimensions(): UIThunkAction {
   return ({ dispatch }) => {
-    const el = document.querySelector(".progressBar");
+    const el = document.querySelector(".progress-bar");
     const width = el ? el.clientWidth : 1;
     const left = el ? el.getBoundingClientRect().left : 1;
     const top = el ? el.getBoundingClientRect().top : 1;

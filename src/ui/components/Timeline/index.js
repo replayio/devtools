@@ -572,7 +572,7 @@ export class Timeline extends Component {
         },
         div(
           {
-            className: classname("progressBar", { loaded }),
+            className: classname("progress-bar", { loaded }),
             ["data-progress"]: Math.ceil(percent),
             ref: a => (this.$progressBar = a),
             onMouseEnter: this.onPlayerMouseEnter,
