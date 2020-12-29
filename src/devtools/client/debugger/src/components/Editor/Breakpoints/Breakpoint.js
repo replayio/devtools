@@ -50,14 +50,6 @@ class Breakpoint extends PureComponent {
     return bp;
   }
 
-  onMouseEnter = event => {
-    this.props.highlightLocation(this.props.breakpoint.location);
-  };
-
-  onMouseLeave = () => {
-    this.props.unhighlightLocation();
-  };
-
   onClick = event => {
     const { cx, breakpoint, removeBreakpointsAtLine } = this.props;
 
@@ -131,6 +123,4 @@ class Breakpoint extends PureComponent {
 
 export default connect(null, {
   removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
-  highlightLocation: actions.highlightLocation,
-  unhighlightLocation: actions.unhighlightLocation,
 })(Breakpoint);

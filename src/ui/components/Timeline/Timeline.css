@@ -120,6 +120,11 @@
   outline: none;
 }
 
+.timeline .message.highlighted {
+  transform: scale(1.3);
+  z-index: var(--z-index-2--hovered-message);
+}
+
 .timeline .commands {
   display: flex;
   flex-direction: row;

@@ -26,9 +26,7 @@ export interface TimelineState {
   zoomRegion: ZoomRegion;
   timelineDimensions: { width: number; left: number; top: number };
   hoverTime: number | null;
-  highlightedMessageId: string | null;
-  highlightedLocation: Location | null;
-  hoveredMessage: number | null;
+  hoveredMessageId: string | null;
   unprocessedRegions: TimeRange[];
   shouldAnimate: boolean;
   loaded: boolean;
