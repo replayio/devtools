@@ -1,33 +1,13 @@
 import React from "react";
 
 import { LocalizationHelper } from "devtools/shared/l10n";
-import { getPixelOffset, getPixelDistance, getLeftOffset } from "../../utils/timeline";
+import { getPixelOffset, getLeftOffset } from "../../utils/timeline";
 import { connect } from "react-redux";
 import classnames from "classnames";
-import { timelineMarkerWidth } from "../../constants";
 import { selectors } from "ui/reducers";
-import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
 const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
-
-function sameLocation(highlightedLocation, messageFrame) {
-  return (
-    highlightedLocation &&
-    messageFrame &&
-    highlightedLocation.sourceId === messageFrame.sourceId &&
-    highlightedLocation.line === messageFrame.line &&
-    highlightedLocation.column === messageFrame.column
-  );
-}
-
-function isHoveredInGutter(hoveredLocation, messageLocation) {
-  if (!hoveredLocation || !messageLocation) {
-    return false;
-  }
-
-  return getLocationKey(hoveredLocation) === getLocationKey(messageLocation);
-}
 
 // Don't change this haphazardly. This marker is intentionally 11px x 11px, so that it
 // can be center aligned perfectly with a 1px timeline scrubber line. This means that
