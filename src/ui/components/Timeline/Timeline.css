@@ -1,21 +1,17 @@
 /*. replay */
 
-.replay-player {
+.timeline {
   -moz-appearance: none;
   background: var(--theme-body-background);
   box-sizing: border-box;
+  border-top: 1px solid var(--theme-splitter-color);
   --progressbar-transition: 200ms;
   display: flex;
-  padding: 0px 20px 0px 20px;
+  padding: 8px 24px 12px 20px;
   align-items: center;
 }
 
-.replay-player .commands :focus:not(:focus-visible) {
-  outline: none;
-  background: inherit;
-}
-
-.theme-light .replay-player {
+.theme-light .timeline {
   --commandbar-button-hover-background: #efefef;
   --progress-recording-background: hsl(0, 100%, 97%);
   --progress-playing-background: #d4ebff;
@@ -33,20 +29,27 @@
   --tick-recording-background: #d0021b;
 }
 
-.replay-player .overlay-container {
+.timeline .commands :focus:not(:focus-visible) {
+  outline: none;
+  background: inherit;
+}
+
+.timeline .progress-bar-container {
   display: flex;
   position: relative;
   flex-grow: 1;
 }
 
-.replay-player .progressBar {
+.timeline .progress-bar {
+  display: flex;
   position: relative;
+  flex-grow: 1;
   width: 100%;
   height: 32px;
   overflow: hidden;
 }
 
-.replay-player .progress {
+.timeline .progress {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -56,14 +59,14 @@
   border-right-style: solid;
 }
 
-.replay-player .message-container {
+.timeline .message-container {
   position: absolute;
   width: 100%;
   height: 100%;
   pointer-events: none;
 }
 
-.replay-player .message {
+.timeline .message {
   height: 11px;
   width: 11px;
   position: absolute;
@@ -74,132 +77,86 @@
   pointer-events: all;
 }
 
-.replay-player .message:hover {
+.timeline .message:hover {
   cursor: pointer;
 }
 
-.replay-player .message.highlighted .fill {
+.timeline .message.highlighted .fill {
   fill: var(--replaying-marker-stroke);
   transition-duration: 100ms;
 }
 
-.replay-player .message.highlighted {
+.timeline .message.highlighted  {
   transform: scale(1.2);
   transition-duration: 100ms;
 }
 
-.replay-player .message .fill {
+.timeline .message .fill {
   fill: var(--replaying-marker-fill);
 }
 
-.replay-player .message .stroke {
+.timeline .message .stroke {
   stroke: var(--theme-body-background);
   pointer-events: none;
 }
 
-.replay-player .message.paused {
+.timeline .message.paused {
   z-index: var(--z-index-1--paused-message);
 }
 
-.replay-player .message.paused .fill {
+.timeline .message.paused .fill {
   fill: var(--replaying-paused-marker-fill);
 }
 
-.replay-player .message.paused .stroke {
+.timeline .message.paused .stroke {
   stroke: var(--replaying-paused-marker-stroke);
   stroke: var(--theme-body-background);
 }
 
-.replay-player .message:focus {
+.timeline .message:focus {
   outline: none;
 }
 
-.replay-player .scrubber {
-  position: absolute;
-  height: 30px;
-  width: 1px;
-  top: -8px;
-  pointer-events: none;
-  background: transparent;
-}
-
-.replay-player .scrubber.hovered path {
-  fill: var(--hover-scrubber-line-background);
-}
-
-.replay-player .scrubber.hovered {
-  background: var(--hover-scrubber-line-background);
-  height: 40px;
-}
-
-/* The scrubber is 9px wide */
-.replay-player .scrubber svg {
-  margin-left: -4.5px;
-}
-
-.replay-player .commands {
+.timeline .commands {
   display: flex;
   flex-direction: row;
-  margin: 11px 20px 11px 0px;
+  margin-right: 20px;
 }
 
-.replay-player .commands > button {
+.timeline .commands > button {
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
 }
 
-.replay-player .commands > button:hover {
+.timeline .commands > button:hover,
+.timeline .commands > button:hover:focus {
   background: var(--theme-toolbar-background-hover);
 }
 
-.replay-player .commands > button .img {
-  width: 20px;
-  height: 20px;
+.timeline .commands > button .img {
+  width: 28px;
+  height: 28px;
 }
 
-.replay-player .commands > button:hover .img {
+.timeline .commands > button:hover .img {
   background: var(--dark-blue);
 }
 
-.replay-player .btn {
-  width: 14px;
-  height: 14px;
-  mask-size: 14px;
-  background: var(--theme-icon-color);
-  align-self: center;
-  margin: 0 auto;
-}
-
-.replay-player .primary .btn {
-  width: 18px;
-  height: 17px;
-  mask-size: 18px;
-}
-
-.replay-player .command-button.active:hover {
+.timeline .command-button.active:hover {
   background: var(--commandbar-button-hover-background);
   cursor: pointer;
 }
 
-.replay-player .command-button.active {
+.timeline .command-button.active {
   opacity: 1;
 }
 
-.replay-player div.command-button .rewind {
+.timeline div.command-button .rewind {
   transform: scaleX(-1);
 }
 
-.replay-player div.command-button .previous {
-  transform: scaleX(-1);
-  margin-left: 8px;
-}
-
-.replay-player div.command-button .next {
-  margin-right: 8px;
-}
-
-.replay-player .progress-line {
+.timeline .progress-line {
   width: 0%;
   height: 3px;
   border-radius: 4px;
@@ -212,19 +169,19 @@
   bottom: 0;
 }
 
-.replay-player .overlay-container:hover .progress-line {
+.timeline .overlay-container:hover .progress-line {
   height: 5px;
 }
 
-.replay-player .progress-line.full {
+.timeline .progress-line.full {
   width: 100%;
   background: var(--progressbar-background);
 }
 
-.replay-player .progress-line.preview {
+.timeline .progress-line.preview {
   background: #bbbbc1;
 }
-.replay-player .zoomboundary {
+.timeline .zoomboundary {
   padding-top: 7px;
   padding-right: 4px;
 }

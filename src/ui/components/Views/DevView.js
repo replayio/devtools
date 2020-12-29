@@ -44,7 +44,7 @@ function DevView({ updateTimelineDimensions, narrowMode }) {
           endPanel={<SecondaryToolbox />}
           endPanelControl={false}
         />
-        <div id="toolbox-timeline">
+        <div id="timeline-container">
           <Timeline />
           <Tooltip />
         </div>
@@ -68,7 +68,7 @@ function DevView({ updateTimelineDimensions, narrowMode }) {
           endPanel={<Viewer />}
           endPanelControl={false}
         />
-        <div id="toolbox-timeline">
+        <div id="timeline-container">
           <Timeline />
           <Tooltip />
         </div>

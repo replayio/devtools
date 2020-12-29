@@ -66,6 +66,12 @@ export function useGetComments(
     variables: { recordingId },
   });
 
+  // This gives us some basic logging for when there's a problem
+  // while fetching the comments.
+  if (error) {
+    console.error("Apollo error while fetching comments:", error);
+  }
+
   return { comments: data?.comments, loading, error };
 }
 
