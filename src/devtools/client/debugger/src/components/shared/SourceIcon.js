@@ -16,10 +16,10 @@ import { getSymbols, getTabs } from "../../selectors";
 
 import "./SourceIcon.css";
 
-class SourceIcon extends PureComponent {
+export default class SourceIcon extends PureComponent {
   render() {
-    const { shouldHide, source, symbols, framework } = this.props;
-    const iconClass = framework ? framework.toLowerCase() : getSourceClassnames(source, symbols);
+    const { shouldHide, source } = this.props;
+    const iconClass = getSourceClassnames(source);
 
     if (shouldHide && shouldHide(iconClass)) {
       return null;
@@ -28,8 +28,3 @@ class SourceIcon extends PureComponent {
     return <AccessibleImage className={`source-icon ${iconClass}`} />;
   }
 }
-
-export default connect((state, props) => ({
-  symbols: getSymbols(state, props.source),
-  framework: getFramework(getTabs(state), props.source.url),
-}))(SourceIcon);

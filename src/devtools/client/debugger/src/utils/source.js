@@ -384,7 +384,7 @@ export function getTextAtPosition(sourceId, asyncContent, location) {
   return lineText.slice(column, column + 100).trim();
 }
 
-export function getSourceClassnames(source, symbols) {
+export function getSourceClassnames(source) {
   // Conditionals should be ordered by priority of icon!
   const defaultClassName = "file";
 
@@ -398,10 +398,6 @@ export function getSourceClassnames(source, symbols) {
 
   if (source.isBlackBoxed) {
     return "blackBox";
-  }
-
-  if (symbols && !symbols.loading && symbols.framework) {
-    return symbols.framework.toLowerCase();
   }
 
   if (isUrlExtension(source.url)) {
