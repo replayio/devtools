@@ -37,6 +37,23 @@ function getNewZoomRegion(zoomRegion, analysisPoints) {
   return newZoomRegion;
 }
 
+function getProgressPercent(time, zoomRegion) {
+  const { startTime, endTime } = zoomRegion;
+  if (!time) {
+    return 0;
+  }
+
+  if (time <= startTime) {
+    return 0;
+  }
+
+  if (time >= endTime) {
+    return 1;
+  }
+
+  return (time - startTime) / (endTime - startTime);
+}
+
 function BreakpointTimeline({
   breakpoint,
   analysisPoints,
@@ -60,6 +77,8 @@ function BreakpointTimeline({
     }
   };
 
+  const percent = getProgressPercent(currentTime, zoomRegion) * 100;
+
   return (
     <div className="breakpoint-navigation-timeline-container">
       <div
@@ -69,6 +88,8 @@ function BreakpointTimeline({
         title={title}
         style={{ height: `${pointWidth + 2}px` }} // 2px to account for the 1px top+bottom border
       >
+        <div className="progress-line full" />
+        <div className="progress-line" style={{ width: `${percent}%` }} />
         {timelineNode.current
           ? analysisPoints.map((p, i) => (
               <BreakpointTimelinePoint
@@ -80,40 +101,8 @@ function BreakpointTimeline({
               />
             ))
           : null}
-        {timelineNode.current ? (
-          <PauseLine
-            point={{ time: currentTime }}
-            timelineNode={timelineNode.current}
-            zoomRegion={zoomRegion}
-          />
-        ) : null}
       </div>
     </div>
-  );
-}
-
-function PauseLine({ point, timelineNode, zoomRegion }) {
-  const [leftPercentOffset, setLeftPercentOffset] = useState(0);
-  const markerWidth = 1;
-
-  useEffect(() => {
-    const offset = getLeftPercentOffset({
-      point,
-      timelineNode,
-      zoomRegion,
-      markerWidth,
-    });
-
-    setLeftPercentOffset(offset);
-  });
-
-  return (
-    <div
-      className="breakpoint-navigation-timeline-pause-marker"
-      style={{
-        left: `${leftPercentOffset}%`,
-      }}
-    />
   );
 }
 
