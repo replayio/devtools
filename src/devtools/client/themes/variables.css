@@ -44,9 +44,10 @@
    */
   
   --primary-accent: #1B7FE3;
+  --primary-accent-light: #86BFF9;
   --secondary-accent: #8330F4;
   --secondary-accent-stroke: #F9F5FF;
-   
+
   --magenta-50: #ff1ad9;
   --magenta-65: #dd00a9;
   --magenta-70: #b5007f;
@@ -379,7 +380,8 @@ custom variable for it below so we can keep track of everything in one place. */
   --z-index-1--timeline-tooltip: var(--z-index-1);
   --z-index-1--icon-tooltip: var(--z-index-1);
 
-  --z-index-2--name: var(--z-index-2);
+  --z-index-2--hovered-message: var(--z-index-2);
+
   --z-index-3--name: var(--z-index-3);
   --z-index-4--name: var(--z-index-4);
   --z-index-5--name: var(--z-index-5);

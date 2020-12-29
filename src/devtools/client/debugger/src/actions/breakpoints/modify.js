@@ -167,8 +167,6 @@ export function runAnalysis(cx, initialLocation, options) {
       return;
     }
 
-    dispatch(actions.setHoveredLineNumberLocation(location));
-
     // Don't run the analysis if we already have the analysis points for that
     // location.
     const analysisPoints = selectors.getAnalysisPoints(getState());
