@@ -8,6 +8,7 @@ import Title from "ui/components/shared/Title";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import ShareDropdown from "ui/components/Header/ShareDropdown";
 import ViewToggle from "ui/components/Header/ViewToggle";
+import UserOptions from "ui/components/Header/UserOptions";
 import "./Header.css";
 
 import { gql, useQuery } from "@apollo/client";
@@ -47,6 +48,7 @@ function Links({ user, getActiveUsers, recordingId }) {
       <Avatars user={user} getActiveUsers={getActiveUsers} />
       {recordingId ? <ShareDropdown /> : null}
       <ViewToggle />
+      <UserOptions />
     </div>
   );
 }
