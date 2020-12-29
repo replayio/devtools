@@ -62,12 +62,9 @@ function Widget({ location, children, editor, insertAt }) {
       return;
     }
     const editorLine = toEditorLine(location.sourceId, location.line || 0);
-    const _widget = editor.codeMirror.addLineWidget(editorLine, node, {
+    editor.codeMirror.addLineWidget(editorLine, node, {
       insertAt,
     });
-    return () => {
-      _widget.clear();
-    };
   }, [loading]);
 
   if (!node) {
