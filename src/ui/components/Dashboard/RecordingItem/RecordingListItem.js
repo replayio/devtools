@@ -86,7 +86,7 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle }) {
           </div>
         ) : null}
       </div>
-      <div className="page-url">Created {moment(data.date).fromNow()}</div>
+      <div>Created {moment(data.date).fromNow()}</div>
     </div>
   );
 }
