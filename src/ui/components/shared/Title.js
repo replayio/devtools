@@ -58,7 +58,7 @@ export default function Title({ defaultTitle, recordingId, setEditingTitle, edit
   }
 
   return (
-    <div className="title" onDoubleClick={handleClick}>
+    <div className="title" onClick={handleClick} title="Click to edit the title.">
       {title}
     </div>
   );
