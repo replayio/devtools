@@ -12,8 +12,12 @@ import BreakpointNavigation from "devtools/client/debugger/src/components/Second
 
 import "./Panel.css";
 
-function getEditorWidth({ editor }) {
-  return Math.max(editor.getScrollInfo().clientWidth - 60, 300);
+function getPanelWidth({ editor }) {
+  // The indent value is an adjustment for the distance from the gutter's left edge
+  // to the panel's left edge, which is approximately ~60.
+  const panelIndent = 60;
+
+  return editor.getScrollInfo().clientWidth - panelIndent;
 }
 
 function PanelSummary({ breakpoint, toggleEditingOn, setInputToFocus }) {
@@ -75,16 +79,16 @@ function Widget({ location, children, editor, insertAt }) {
 
 function Panel({ breakpoint, editor, insertAt }) {
   const [editing, setEditing] = useState(false);
-  const [width, setWidth] = useState(getEditorWidth(editor));
+  const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
 
   const toggleEditingOn = () => setEditing(true);
   const toggleEditingOff = () => setEditing(false);
-  const setEditorWidth = () => setWidth(getEditorWidth(editor));
+  const updateWidth = () => setWidth(getPanelWidth(editor));
 
   useEffect(() => {
-    editor.editor.on("refresh", setEditorWidth);
-    return () => editor.editor.off("refresh", setEditorWidth);
+    editor.editor.on("refresh", updateWidth);
+    return () => editor.editor.off("refresh", updateWidth);
   }, []);
 
   return (
