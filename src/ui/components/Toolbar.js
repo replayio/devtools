@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 
-import UserOptions from "ui/components/Header/UserOptions";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 
 function Toolbar({
@@ -49,7 +48,6 @@ function Toolbar({
           />
         </div>
       </div>
-      <UserOptions mode="devtools" />
     </div>
   );
 }
