@@ -25,6 +25,7 @@ export default function RecordingGridItem({
           recordingId={data.recording_id}
           editingTitle={editingTitle}
           setEditingTitle={setEditingTitle}
+          allowEditOnTitleClick={false}
         />
         <div className="secondary">{moment(data.date).format("MMM Do, h:mm a")}</div>
         <div className="permissions" onClick={toggleIsPrivate}>

@@ -16,7 +16,13 @@ const UPDATE_RECORDING = gql`
   }
 `;
 
-export default function Title({ defaultTitle, recordingId, setEditingTitle, editingTitle }) {
+export default function Title({
+  defaultTitle,
+  recordingId,
+  setEditingTitle,
+  editingTitle,
+  allowEditOnTitleClick,
+}) {
   const { isAuthenticated } = useAuth0();
   const [updateRecordingTitle] = useMutation(UPDATE_RECORDING);
   const [title, setTitle] = useState(defaultTitle);
@@ -57,9 +63,13 @@ export default function Title({ defaultTitle, recordingId, setEditingTitle, edit
     );
   }
 
-  return (
-    <div className="title" onClick={handleClick} title="Click to edit the title.">
-      {title}
-    </div>
-  );
+  if (allowEditOnTitleClick) {
+    return (
+      <div className="title" onClick={handleClick} title="Click to edit the title.">
+        {title}
+      </div>
+    );
+  }
+
+  return <div className="title">{title}</div>;
 }

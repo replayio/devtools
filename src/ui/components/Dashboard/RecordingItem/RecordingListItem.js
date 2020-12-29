@@ -79,6 +79,7 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle }) {
           recordingId={data.recording_id}
           editingTitle={editingTitle}
           setEditingTitle={setEditingTitle}
+          allowEditOnTitleClick={false}
         />
         {!editing ? (
           <div className="item-title-label-actions">

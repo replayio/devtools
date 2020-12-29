@@ -62,7 +62,6 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
 
   const recording = data.recordings[0];
   const { recordingTitle, title, date } = recording || {};
-
   return (
     <div className="title-container">
       <Title
@@ -70,6 +69,7 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
         setEditingTitle={setEditingTitle}
         editingTitle={editingTitle}
         recordingId={recordingId}
+        allowEditOnTitleClick={true}
       />
       {!editingTitle && <Subtitle date={date} />}
     </div>
