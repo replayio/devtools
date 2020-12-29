@@ -81,13 +81,12 @@
 
 #header .title {
   max-width: 320px;
-  color: var(--grey-90);
   font-size: 1.25rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   background: none;
-  cursor: pointer;
+  cursor: text;
   line-height: 18px;
   margin-right: 0.5em;
   color: var(--primary-accent);
