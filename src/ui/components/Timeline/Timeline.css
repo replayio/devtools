@@ -85,20 +85,12 @@
   cursor: pointer;
 }
 
-.timeline .message.highlighted .fill {
-  fill: var(--replaying-marker-stroke);
-}
-
-.timeline .message.highlighted  {
-  transform: scale(1.2);
-}
-
 .timeline .message .fill {
   fill: var(--replaying-marker-fill);
 }
 
 .timeline.dimmed .message .fill {
-  fill: var(--grey-40);
+  fill: var(--primary-accent-light);
 }
 
 .timeline .message .stroke {
@@ -180,7 +172,7 @@
 }
 
 .timeline.dimmed .progress-line {
-  background-color: var(--grey-40);
+  background: var(--primary-accent-light);
 }
 
 .timeline .overlay-container:hover .progress-line {

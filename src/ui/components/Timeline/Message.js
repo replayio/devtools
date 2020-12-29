@@ -64,14 +64,11 @@ class Message extends React.Component {
     const {
       message,
       currentTime,
-      highlightedMessageId,
-      highlightedLocation,
       zoomRegion,
       overlayWidth,
       onMarkerClick,
       onMarkerMouseEnter,
       onMarkerMouseLeave,
-      hoveredLineNumberLocation,
     } = this.props;
 
     const offset = getPixelOffset({
@@ -83,22 +80,6 @@ class Message extends React.Component {
     if (offset < 0) {
       return null;
     }
-
-    // Check to see if a message appears after the current execution point
-    const isFuture =
-      getPixelDistance({
-        to: message.executionPointTime,
-        from: currentTime,
-        overlayWidth,
-        zoom: zoomRegion,
-      }) >
-      timelineMarkerWidth / 2;
-
-    // A marker is highlighted if either the message or its location is highlighted
-    const isHighlighted =
-      highlightedMessageId == message.id ||
-      sameLocation(highlightedLocation, message.frame) ||
-      isHoveredInGutter(hoveredLineNumberLocation, message.frame);
 
     const isPauseLocation = message.executionPointTime === currentTime;
 
@@ -116,8 +97,6 @@ class Message extends React.Component {
       <a
         tabIndex={0}
         className={classnames("message", {
-          future: isFuture,
-          highlighted: isHighlighted,
           paused: isPauseLocation,
         })}
         style={{
