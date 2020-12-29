@@ -15,7 +15,7 @@ import { connect } from "devtools/client/debugger/src/utils/connect";
 
 class Breakpoints extends Component {
   render() {
-    const { cx, breakpoints, selectedSource, editor, editorActions } = this.props;
+    const { cx, breakpoints, selectedSource, editor } = this.props;
 
     if (!selectedSource || !breakpoints || selectedSource.isBlackBoxed) {
       return null;
