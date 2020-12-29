@@ -6,6 +6,11 @@
   overflow-x: auto;
 }
 
+.empty-state-content {
+  padding: 8px;
+  white-space: pre-wrap;
+}
+
 .breakpoints-list *:focus:not(:focus-visible) {
   outline: none;
   background: inherit;
