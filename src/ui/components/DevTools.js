@@ -11,6 +11,7 @@ import DevView from "./Views/DevView";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
+import CreateRecordingSession from "./CreateRecordingSession";
 
 const GET_RECORDING = gql`
   query GetRecording($recordingId: String) {
@@ -114,6 +115,7 @@ function DevTools({
 
   return (
     <>
+      <CreateRecordingSession />
       <Header />
       {viewMode == "dev" ? <DevView /> : <NonDevView />}
     </>
