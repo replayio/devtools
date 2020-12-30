@@ -3,7 +3,7 @@ import { AppAction } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionAction } from "ui/actions/session";
 const { prefs } = require("../utils/prefs");
-const { getLocationKey } = require("../../devtools/client/debugger/src/utils/breakpoint");
+const { getLocationKeyWithUrl } = require("../../devtools/client/debugger/src/utils/breakpoint");
 
 function initialAppState(): AppState {
   return {
@@ -79,13 +79,11 @@ export default function update(state = initialAppState(), action: AppAction | Se
     }
 
     case "set_analysis_points": {
-      const id = getLocationKey(action.location);
-
       return {
         ...state,
         analysisPoints: {
           ...state.analysisPoints,
-          [id]: action.analysisPoints,
+          [action.key]: action.analysisPoints,
         },
       };
     }
@@ -142,8 +140,9 @@ export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getModal = (state: UIState) => state.app.modal;
 export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
 export const getPendingNotification = (state: UIState) => state.app.pendingNotification;
-export const getAnalysisPointsForLocation = (state: UIState, location: any) =>
-  location && state.app.analysisPoints[getLocationKey(location)];
+export const getAnalysisPointsForLocation = (state: UIState, location: any) => {
+  return location && state.app.analysisPoints[getLocationKeyWithUrl(location)];
+};
 export const getViewMode = (state: UIState) => state.app.viewMode;
 export const getNarrowMode = (state: UIState) => state.app.narrowMode;
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;

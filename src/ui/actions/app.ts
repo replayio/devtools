@@ -11,6 +11,7 @@ import {
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
 import { Modal, PanelName, PrimaryPanelName, ViewMode, Event } from "ui/state/app";
+import { getLocationKeyWithUrl } from "devtools/client/debugger/src/utils/breakpoint/index.js";
 
 const { PointHandlers } = require("protocol/logpoint");
 
@@ -31,7 +32,7 @@ export type SetPendingNotificationAction = Action<"set_pending_notification"> & 
 };
 export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   analysisPoints: PointDescription[] | null;
-  location: Location;
+  key: string;
 };
 export type SetEventsForType = Action<"set_events"> & {
   events: MouseEvent[];
@@ -85,7 +86,7 @@ function setupPointHandlers(store: UIStore) {
   PointHandlers.onPoints = (points: PointDescription[], info: any) => {
     const { location } = info;
     if (location) {
-      store.dispatch(setAnalysisPoints(points, location));
+      store.dispatch(setAnalysisPoints(points, location, store.getState()));
     }
   };
 
@@ -166,12 +167,14 @@ export function hideModal(): SetModalAction {
 
 export function setAnalysisPoints(
   points: PointDescription[],
-  location: Location
+  location: Location,
+  state: any
 ): SetAnalysisPointsAction {
+  const key = getLocationKeyWithUrl(location, state);
   return {
     type: "set_analysis_points",
     analysisPoints: points,
-    location,
+    key,
   };
 }
 

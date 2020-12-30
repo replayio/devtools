@@ -7,6 +7,7 @@ import { getBreakpoint, getSource, getSourceActorsForSource } from "../../select
 import assert from "../assert";
 import { features } from "../prefs";
 import { sortBy } from "lodash";
+import { selectors } from "ui/reducers";
 
 export * from "./astBreakpointLocation";
 export * from "./breakpointPositions";
@@ -27,6 +28,15 @@ export function getLocationKey(location) {
   const { sourceId, line, column } = location;
   const columnString = column || "";
   return `${sourceId || location.scriptId}:${line}:${columnString}`;
+}
+
+// The ID for analysis points that use its URL instead of the source ID.
+export function getLocationKeyWithUrl(location, state) {
+  const { sourceId, line, column } = location;
+  const url = location.sourceUrl || selectors.getSourceFromId(state, sourceId).url;
+
+  const columnString = column || "";
+  return `${url}:${line}:${columnString}`;
 }
 
 export function isMatchingLocation(location1, location2) {
