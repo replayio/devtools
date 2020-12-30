@@ -15,9 +15,9 @@ import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
 
 function DevView({ updateTimelineDimensions, narrowMode }) {
-  const handleMove = num => {
+  const handleMove = percent => {
     updateTimelineDimensions();
-    prefs.toolboxHeight = `${num}px`;
+    prefs.toolboxHeight = percent;
   };
 
   useEffect(() => {

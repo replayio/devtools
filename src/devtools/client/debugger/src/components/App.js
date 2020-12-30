@@ -41,7 +41,7 @@ import "devtools/client/themes/common.css";
 
 import "./shared/menu.css";
 
-import SplitBox from "devtools-splitter";
+import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import ProjectSearch from "./ProjectSearch";
 import PrimaryPanes from "./PrimaryPanes";
 import Editor from "./Editor";
@@ -201,7 +201,7 @@ class Debugger extends Component {
       <SplitBox
         style={{ width: "100%" }}
         initialSize={prefs.startPanelSize}
-        minSize={30}
+        minSize="50"
         maxSize="85%"
         splitterSize={1}
         onResizeEnd={num => {

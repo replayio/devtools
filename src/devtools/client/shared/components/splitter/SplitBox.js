@@ -124,6 +124,21 @@ class SplitBox extends Component {
     }
   }
 
+  componentDidMount() {
+    this.ensurePercentageSize();
+  }
+
+  ensurePercentageSize() {
+    const { initialSize, vert } = this.props;
+
+    // Bail if the relevant size value is already a percent.
+    if ((vert && this.state.width.includes("%")) || (!vert && this.state.height.includes("%"))) {
+      return;
+    }
+
+    this.onMove(initialSize, initialSize);
+  }
+
   // Dragging Events
 
   /**
@@ -158,7 +173,7 @@ class SplitBox extends Component {
   onMove(x, y) {
     const nodeBounds = this.splitBox.getBoundingClientRect();
 
-    let size;
+    let sizePercent;
     let { endPanelControl, vert } = this.state;
 
     if (vert) {
@@ -172,16 +187,20 @@ class SplitBox extends Component {
         endPanelControl = !endPanelControl;
       }
 
-      size = endPanelControl ? nodeBounds.left + nodeBounds.width - x : x - nodeBounds.left;
+      const size = endPanelControl ? nodeBounds.left + nodeBounds.width - x : x - nodeBounds.left;
+      const sizePx = this.getConstrainedSizeInPx(size, nodeBounds.width);
+      sizePercent = `${(sizePx / nodeBounds.width) * 100}%`;
 
       this.setState({
-        width: this.getConstrainedSizeInPx(size, nodeBounds.width),
+        width: sizePercent,
       });
     } else {
-      size = endPanelControl ? nodeBounds.top + nodeBounds.height - y : y - nodeBounds.top;
+      const size = endPanelControl ? nodeBounds.top + nodeBounds.height - y : y - nodeBounds.top;
+      const sizePx = this.getConstrainedSizeInPx(size, nodeBounds.height);
+      sizePercent = `${(sizePx / nodeBounds.height) * 100}%`;
 
       this.setState({
-        height: this.getConstrainedSizeInPx(size, nodeBounds.height),
+        height: sizePercent,
       });
     }
 
@@ -189,7 +208,7 @@ class SplitBox extends Component {
     // CodeMirror instance can respond to the update.
     this.dispatchResize();
     if (this.props.onMove) {
-      this.props.onMove(size);
+      this.props.onMove(sizePercent);
     }
   }
 
