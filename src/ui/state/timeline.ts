@@ -17,7 +17,6 @@ export interface TimelineState {
   playback: {
     startTime: number;
     startDate: number;
-    pauseTarget: PauseDescription;
     time: number;
   } | null;
   screenShot: ScreenShot | null;
