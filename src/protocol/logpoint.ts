@@ -22,7 +22,7 @@ interface LogpointInfo {
   analysisWaiters: Promise<createAnalysisResult>[];
   points: PointDescription[];
   pointsWaiter?: (value: void) => void;
-  location: Location | null;
+  locations: Location[] | null;
   showInConsole: boolean;
 }
 
@@ -130,7 +130,12 @@ async function createLogpointAnalysis(
   showInConsole: boolean
 ) {
   if (!gLogpoints.has(logGroupId)) {
-    gLogpoints.set(logGroupId, { analysisWaiters: [], points: [], location, showInConsole });
+    gLogpoints.set(logGroupId, { analysisWaiters: [], points: [], locations: [], showInConsole });
+  }
+
+  // To avoid duplication, only add the location if this logGroupId's info doesn't have it yet
+  if (gLogpoints.get(logGroupId)!.locations!.every(loc => loc.sourceId != location!.sourceId)) {
+    gLogpoints.get(logGroupId)!.locations!.push(location!);
   }
 
   const waiter = client.Analysis.createAnalysis({
