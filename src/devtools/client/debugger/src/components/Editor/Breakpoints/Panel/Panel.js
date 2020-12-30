@@ -62,9 +62,16 @@ function Widget({ location, children, editor, insertAt }) {
       return;
     }
     const editorLine = toEditorLine(location.sourceId, location.line || 0);
-    editor.codeMirror.addLineWidget(editorLine, node, {
+    const _widget = editor.codeMirror.addLineWidget(editorLine, node, {
       insertAt,
     });
+
+    // We are clearing the widget here because without
+    // doing so causes breakpoints to show up on the
+    // wrong line number when clicking in the gutter.
+    return () => {
+      _widget.clear();
+    };
   }, [loading]);
 
   if (!node) {
