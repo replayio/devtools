@@ -1,4 +1,12 @@
-<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M11 18.4594V9.5406C11 9.10955 11.4947 8.85245 11.8641 9.09155L18.7526 13.551C19.0825 13.7646 19.0825 14.2354 18.7526 14.449L11.8641 18.9085C11.4947 19.1475 11 18.8904 11 18.4594Z" fill="black" stroke="black"/>
-<path d="M26 14C26 20.6276 20.6276 26 14 26C7.37259 26 2 20.6275 2 14C2 7.3726 7.3726 2 14 2C20.6275 2 26 7.37259 26 14Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61 (89581) - https://sketch.com -->
+    <title>play-circle-28x28 copy</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="play-circle-28x28-copy" transform="translate(1.000000, 1.000000)">
+            <path d="M9,16.4594 L9,7.5406 C9,7.10955 9.4947,6.85245 9.8641,7.09155 L16.7526,11.551 C17.0825,11.7646 17.0825,12.2354 16.7526,12.449 L9.8641,16.9085 C9.4947,17.1475 9,16.8904 9,16.4594 Z" id="Path" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M24,12 C24,18.6276 18.6276,24 12,24 C5.37259,24 0,18.6275 0,12 C0,5.3726 5.3726,0 12,0 C18.6275,0 24,5.37259 24,12 Z" id="Path" stroke="#000000" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
 </svg>
