@@ -65,27 +65,27 @@ function formatKey(action) {
 }
 
 class CommandBar extends Component {
-  componentWillUnmount() {
-    const shortcuts = this.context.shortcuts;
-    COMMANDS.forEach(action => shortcuts.off(getKey(action)));
-    if (isMacOS) {
-      COMMANDS.forEach(action => shortcuts.off(getKeyForOS("WINNT", action)));
-    }
-  }
+  // componentWillUnmount() {
+  //   const shortcuts = this.context.shortcuts;
+  //   COMMANDS.forEach(action => shortcuts.off(getKey(action)));
+  //   if (isMacOS) {
+  //     COMMANDS.forEach(action => shortcuts.off(getKeyForOS("WINNT", action)));
+  //   }
+  // }
 
-  componentDidMount() {
-    const shortcuts = this.context.shortcuts;
+  // componentDidMount() {
+  //   const shortcuts = this.context.shortcuts;
 
-    COMMANDS.forEach(action => shortcuts.on(getKey(action), (_, e) => this.handleEvent(e, action)));
+  //   COMMANDS.forEach(action => shortcuts.on(getKey(action), (_, e) => this.handleEvent(e, action)));
 
-    if (isMacOS) {
-      // The Mac supports both the Windows Function keys
-      // as well as the Mac non-Function keys
-      COMMANDS.forEach(action =>
-        shortcuts.on(getKeyForOS("WINNT", action), (_, e) => this.handleEvent(e, action))
-      );
-    }
-  }
+  //   if (isMacOS) {
+  //     // The Mac supports both the Windows Function keys
+  //     // as well as the Mac non-Function keys
+  //     COMMANDS.forEach(action =>
+  //       shortcuts.on(getKeyForOS("WINNT", action), (_, e) => this.handleEvent(e, action))
+  //     );
+  //   }
+  // }
 
   handleEvent(e, action) {
     const { cx } = this.props;

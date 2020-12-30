@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import SecondaryToolbox from "./SecondaryToolbox";
-// import SplitBox from "devtools-splitter";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { installObserver } from "../../protocol/graphics";
 import { prefs } from "ui/utils/prefs";

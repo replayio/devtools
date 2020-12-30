@@ -70,7 +70,6 @@ function Widget({ location, children, editor, insertAt }) {
 }
 
 function Panel({ breakpoint, editor, insertAt }) {
-  console.log(">>PANEL");
   const [editing, setEditing] = useState(false);
   const [inputToFocus, setInputToFocus] = useState("logValue");
 

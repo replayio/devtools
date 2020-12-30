@@ -43,9 +43,7 @@ import "./shared/menu.css";
 
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import ProjectSearch from "./ProjectSearch";
-import PrimaryPanes from "./PrimaryPanes";
 import Editor from "./Editor";
-import SecondaryPanes from "./SecondaryPanes";
 import WelcomeBox from "./WelcomeBox";
 import EditorTabs from "./Editor/Tabs";
 import EditorFooter from "./Editor/Footer";
@@ -197,25 +195,27 @@ class Debugger extends Component {
   renderLayout = () => {
     const { startPanelCollapsed, selectedPrimaryPanel } = this.props;
 
-    return (
-      <SplitBox
-        style={{ width: "100%" }}
-        initialSize={prefs.startPanelSize}
-        minSize="50"
-        maxSize="85%"
-        splitterSize={1}
-        onResizeEnd={num => {
-          prefs.startPanelSize = num;
-        }}
-        startPanelCollapsed={startPanelCollapsed}
-        startPanel={
-          <div className="panes" style={{ width: "100%" }}>
-            {selectedPrimaryPanel == "explorer" ? <PrimaryPanes /> : <SecondaryPanes />}
-          </div>
-        }
-        endPanel={this.renderEditorPane()}
-      />
-    );
+    return this.renderEditorPane();
+
+    // return (
+    //   <SplitBox
+    //     style={{ width: "100%" }}
+    //     initialSize={prefs.startPanelSize}
+    //     minSize="50"
+    //     maxSize="85%"
+    //     splitterSize={1}
+    //     onResizeEnd={num => {
+    //       prefs.startPanelSize = num;
+    //     }}
+    //     startPanelCollapsed={startPanelCollapsed}
+    //     startPanel={
+    //       <div className="panes" style={{ width: "100%" }}>
+    //         {selectedPrimaryPanel == "explorer" ? <PrimaryPanes /> : <SecondaryPanes />}
+    //       </div>
+    //     }
+    //     endPanel={this.renderEditorPane()}
+    //   />
+    // );
   };
 
   renderShortcutsModal() {

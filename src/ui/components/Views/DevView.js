@@ -6,6 +6,7 @@ import Viewer from "../Viewer";
 import Tooltip from "../Tooltip";
 import Toolbox from "../Toolbox";
 import Toolbar from "../Toolbar";
+import Sidebar from "../Sidebar";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import SecondaryToolbox from "../SecondaryToolbox";
 
@@ -52,20 +53,35 @@ function DevView({ updateTimelineDimensions, narrowMode }) {
     );
   }
 
+  const endPanelViewer = (
+    <SplitBox
+      style={{ width: "100%", overflow: "hidden" }}
+      splitterSize={1}
+      initialSize={"50%"}
+      minSize="20%"
+      maxSize="80%"
+      vert={true}
+      onMove={handleMove}
+      startPanel={<Toolbox />}
+      endPanel={<Viewer />}
+      endPanelControl={false}
+    />
+  );
+
   return (
     <div className="horizontal-panels">
-      <Toolbar />
+      {/* <Toolbar /> */}
       <div className="vertical-panels">
         <SplitBox
           style={{ width: "100%", overflow: "hidden" }}
           splitterSize={1}
           initialSize={prefs.toolboxHeight}
-          minSize="20%"
+          minSize="200px"
           maxSize="80%"
           vert={true}
           onMove={handleMove}
-          startPanel={<Toolbox />}
-          endPanel={<Viewer />}
+          startPanel={<Sidebar />}
+          endPanel={endPanelViewer}
           endPanelControl={false}
         />
         <div id="timeline-container">

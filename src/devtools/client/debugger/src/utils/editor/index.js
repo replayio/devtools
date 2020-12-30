@@ -151,11 +151,11 @@ export function getLocationsInViewport(
 
   return {
     start: {
-      line: 0,
+      line: topVisibleLine || 0,
       column: leftColumn || 0,
     },
     end: {
-      line: 725,
+      line: bottomVisibleLine || 0,
       column: rightCharacter,
     },
   };
