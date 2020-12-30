@@ -5,6 +5,7 @@ Test.describe(`Test stepping in pretty-printed code.`, async () => {
 
   await Test.addBreakpoint("doc_minified.html", 8);
   await Test.resumeToLine(8);
+
   await Test.stepOverToLine(8);
   await Test.stepOverToLine(9);
 

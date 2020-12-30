@@ -8,7 +8,7 @@ const { createFactory, createElement } = require("react");
 
 const reps = require("devtools/client/debugger/packages/devtools-reps/src");
 const { REPS, MODE } = reps;
-const actions = require("devtools/client/webconsole/actions/index");
+const { actions } = require("ui/actions");
 
 const ObjectInspector = createFactory(reps.objectInspector.ObjectInspector.default);
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
