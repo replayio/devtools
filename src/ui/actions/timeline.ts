@@ -1,5 +1,6 @@
 import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
+import { log } from "protocol/socket";
 import {
   screenshotCache,
   addLastScreen,
@@ -201,6 +202,8 @@ export function seekToTime(targetTime: number): UIThunkAction {
 
 export function startPlayback(): UIThunkAction {
   return ({ dispatch, getState }) => {
+    log(`StartPlayback`);
+
     const state = getState();
     const currentTime = selectors.getCurrentTime(state);
     const { endTime } = selectors.getZoomRegion(state);
@@ -221,6 +224,8 @@ export function startPlayback(): UIThunkAction {
 
 export function stopPlayback(): UIThunkAction {
   return ({ dispatch, getState }) => {
+    log(`StopPlayback`);
+
     const playback = selectors.getPlayback(getState());
 
     if (playback) {
@@ -263,6 +268,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
       currentTime = startTime + (currentDate - startDate);
 
       if (currentTime > endTime) {
+        log(`FinishPlayback`);
         seekToTime(endTime);
         dispatch(setTimelineState({ currentTime: endTime, playback: null }));
         return;

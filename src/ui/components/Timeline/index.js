@@ -10,7 +10,6 @@
 import { connect } from "react-redux";
 import { Component } from "react";
 import React from "react";
-import { log } from "protocol/socket";
 
 import ScrollContainer from "./ScrollContainer";
 import Comments from "../Comments";
