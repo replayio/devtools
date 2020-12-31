@@ -44,10 +44,6 @@ function ReplayButton({ onClick }) {
     </button>
   );
 }
-// When viewing a recording, we add a comment and move it around to indicate the
-// point we are currently looking at. Since we don't have user accounts, make up
-// a short name to identify us when other people view the recording.
-//const UserComment = `User #${(Math.random() * 100) | 0}`;
 
 export class Timeline extends Component {
   state = {
@@ -336,46 +332,6 @@ export class Timeline extends Component {
       );
       return messageEl;
     });
-  }
-
-  getNearbyComments(comment) {
-    const pos = this.getVisiblePosition(comment.time);
-    return this.state.comments.filter(c => {
-      const npos = this.getVisiblePosition(c.time);
-      return Math.abs(npos - pos) < 0.01;
-    });
-  }
-
-  renderCommentMarker(comment) {
-    if (comment.time < this.zoomStartTime || comment.time > this.zoomEndTime) {
-      return;
-    }
-
-    const middlePercent = this.getVisiblePosition(comment.time) * 100;
-    const widthPercent = (timelineMarkerWidth / this.overlayWidth) * 100;
-    const percent = Math.max(middlePercent - widthPercent / 2, 0);
-
-    return dom.a({
-      className: classname("comment-marker"),
-      style: {
-        left: `${percent}%`,
-        zIndex: 100000, // Render comments in front of other markers
-      },
-      title: "Show comment",
-      onClick: e => {
-        // We don't have a way to separately click on comments that are at
-        // the same location on the timeline, so open up all comments that
-        // are sufficiently close.
-        this.setCommentsVisible(this.getNearbyComments(comment), true);
-      },
-      onMouseEnter: () => this.onMarkerMouseEnter(),
-      onMouseLeave: () => this.onMarkerMouseLeave(),
-    });
-  }
-
-  renderCommentMarkers() {
-    const comments = this.state.comments;
-    return comments.map(comment => this.renderCommentMarker(comment));
   }
 
   render() {
