@@ -281,13 +281,8 @@ export class Timeline extends Component {
 
   /**
    * Playback the recording segment from `startTime` to `endTime`.
-   * Optionally a `pauseTarget` may be given that will be seeked to after finishing playback.
    */
-  async playback(startTime, endTime, pauseTarget) {
-    if (pauseTarget) {
-      assert(endTime <= pauseTarget.time);
-    }
-
+  async playback(startTime, endTime) {
     let startDate = Date.now();
     let currentDate = startDate;
     let currentTime = startTime;
@@ -298,10 +293,12 @@ export class Timeline extends Component {
       nextGraphicsTime = nextPaintOrMouseEvent(currentTime)?.time || this.zoomEndTime;
       nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
     };
-
     prepareNextGraphics();
 
-    while (this.props.playback) {
+    // This is a `do ... while` instead of `while` because startPlayback is synchronous.
+    // It's possible that the playback in state hasn't been updated yet by the time
+    // this is first called. So we just force it to run the first time.
+    do {
       await new Promise(resolve => requestAnimationFrame(resolve));
       if (!this.props.playback) {
         return;
@@ -312,22 +309,19 @@ export class Timeline extends Component {
 
       if (currentTime > endTime) {
         log(`FinishPlayback`);
-        if (pauseTarget) {
-          this.seek(pauseTarget.point, pauseTarget.time, !!pauseTarget.frame);
-        } else {
-          this.seekTime(endTime);
-        }
+        this.seekTime(endTime);
         this.props.setTimelineState({ currentTime: endTime, playback: null });
         return;
       }
 
       this.props.setTimelineState({
         currentTime,
-        playback: { startTime, startDate, pauseTarget, time: currentTime },
+        playback: { startTime, startDate, time: currentTime },
       });
 
       if (currentTime >= nextGraphicsTime) {
         const { screen, mouse } = await nextGraphicsPromise;
+
         if (!this.props.playback) {
           return;
         }
@@ -341,7 +335,7 @@ export class Timeline extends Component {
           startDate = Date.now();
           this.props.setTimelineState({
             currentTime,
-            playback: { startTime, startDate, pauseTarget, time: currentTime },
+            playback: { startTime, startDate, time: currentTime },
           });
         }
 
@@ -350,38 +344,22 @@ export class Timeline extends Component {
         }
         prepareNextGraphics();
       }
-    }
+    } while (this.props.playback);
   }
 
-  async startPlayback() {
+  startPlayback() {
     log(`StartPlayback`);
-
-    const { currentTime } = this.props;
+    const { currentTime, setTimelineState } = this.props;
 
     const startDate = Date.now();
+    const startTime = currentTime >= this.zoomEndTime ? 0 : currentTime;
 
-    let startTime = currentTime;
-    let startPoint = this.threadFront.currentPoint;
-
-    if (currentTime == this.zoomEndTime) {
-      startTime = this.zoomStartTime;
-      const startEvent = mostRecentPaintOrMouseEvent(startTime);
-      startPoint = startEvent ? startEvent.point : "0";
-    }
-
-    this.props.setTimelineState({
+    setTimelineState({
       playback: { startTime, startDate },
       currentTime: startTime,
     });
 
-    const pauseTarget = await this.threadFront.resumeTarget(startPoint);
-
-    if (!this.props.playback) {
-      return;
-    }
-
-    const endTime = pauseTarget ? Math.min(pauseTarget.time, this.zoomEndTime) : this.zoomEndTime;
-    this.playback(startTime, endTime, pauseTarget);
+    this.playback(startTime, this.zoomEndTime);
   }
 
   stopPlayback() {
@@ -390,6 +368,7 @@ export class Timeline extends Component {
     if (this.props.playback) {
       this.seekTime(this.props.playback.time);
     }
+
     this.props.setTimelineState({ playback: null });
   }
 
