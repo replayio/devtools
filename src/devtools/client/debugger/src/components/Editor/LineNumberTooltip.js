@@ -49,6 +49,10 @@ export function LineNumberTooltip({
   useEffect(() => {
     editor.codeMirror.on("gutterLineEnter", setHoveredLineNumber);
     editor.codeMirror.on("gutterLineLeave", clearHoveredLineNumber);
+    return () => {
+      editor.codeMirror.off("gutterLineEnter", setHoveredLineNumber);
+      editor.codeMirror.off("gutterLineLeave", clearHoveredLineNumber);
+    };
   }, []);
 
   if (!lineNumberNode || !analysisPoints) {
