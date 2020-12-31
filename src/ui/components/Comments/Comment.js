@@ -69,8 +69,8 @@ class Comment extends React.Component {
   };
 
   renderDropdownPanel() {
-    const { comment } = this.props;
-    return <CommentDropdownPanel startEditing={this.startEditing} comment={comment} />;
+    const { comment, user } = this.props;
+    return <CommentDropdownPanel startEditing={this.startEditing} user={user} comment={comment} />;
   }
 
   renderLabel() {
@@ -167,6 +167,7 @@ export default connect(
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     focusedCommentId: selectors.getFocusedCommentId(state),
+    user: selectors.getUser(state),
   }),
   {
     removeComment: actions.removeComment,

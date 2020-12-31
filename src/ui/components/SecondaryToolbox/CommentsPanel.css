@@ -95,11 +95,18 @@
 
 .comments-panel .dropdown {
   left: -150px;
+  top: 34px;
+  width: 16em;
 }
 
 .comments-panel .dropdown-button {
   height: 28px;
   width: 28px;
+  display: none;
+}
+
+.comment:hover .dropdown-button {
+  display: block;
 }
 
 .comments-panel .add-comment {
