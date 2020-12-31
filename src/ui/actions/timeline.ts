@@ -270,8 +270,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
       if (currentTime > endTime) {
         log(`FinishPlayback`);
         seekToTime(endTime);
-        dispatch(setTimelineState({ currentTime: endTime, playback: null }));
-        return;
+        return dispatch(setTimelineState({ currentTime: endTime, playback: null }));
       }
 
       dispatch(
