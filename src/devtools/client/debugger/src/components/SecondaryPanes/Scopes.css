@@ -97,4 +97,5 @@ html[dir="rtl"] .scopes-content .object-node {
 
 .scopes-list .tree {
   line-height: 15px;
+  min-width: fit-content;
 }
