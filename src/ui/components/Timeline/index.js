@@ -44,8 +44,6 @@ export class Timeline extends Component {
     gToolbox.timeline = this;
 
     this.props.updateTimelineDimensions();
-
-    this.toolbox.on("message-hover", this.onConsoleMessageHover);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -87,50 +85,6 @@ export class Timeline extends Component {
     return Math.ceil(this.zoomStartTime + (this.zoomEndTime - this.zoomStartTime) * clickPosition);
   }
 
-  // Called when hovering over a message in the console.
-  onConsoleMessageHover = async (type, message) => {
-    const { setTimelineState, currentTime } = this.props;
-
-    if (type == "mouseenter") {
-      setTimelineState({ hoveredMessageId: message.id });
-      const { screen, mouse } = await getGraphicsAtTime(message.executionPointTime);
-      paintGraphics(screen, mouse);
-    }
-    if (type == "mouseleave") {
-      setTimelineState({ hoveredMessageId: null });
-      const { screen, mouse } = await getGraphicsAtTime(currentTime);
-      paintGraphics(screen, mouse);
-    }
-  };
-
-  findMessage(message) {
-    const outputNode = document.getElementById("toolbox-content-console");
-    return outputNode?.querySelector(`.message[data-message-id="${message.id}"]`);
-  }
-
-  scrollToMessage(message) {
-    if (!message) {
-      return;
-    }
-
-    const element = this.findMessage(message);
-
-    if (!element) {
-      return;
-    }
-
-    const outputNode = document.getElementById("toolbox-content-console");
-    const consoleHeight = outputNode.getBoundingClientRect().height;
-    const elementTop = element.getBoundingClientRect().top;
-    if (elementTop < 30 || elementTop + 50 > consoleHeight) {
-      element.scrollIntoView({ block: "center", behavior: "smooth" });
-    }
-  }
-
-  showMessage(message) {
-    this.scrollToMessage(message);
-  }
-
   onMarkerClick = (e, message) => {
     const { selectedPanel, viewMode, seek } = this.props;
 
@@ -138,10 +92,6 @@ export class Timeline extends Component {
     e.stopPropagation();
     const { executionPoint, executionPointTime, executionPointHasFrames, pauseId } = message;
     seek(executionPoint, executionPointTime, executionPointHasFrames, pauseId);
-
-    if (viewMode == "dev" && selectedPanel == "console") {
-      this.showMessage(message);
-    }
   };
 
   onMarkerMouseEnter = () => {

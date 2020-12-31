@@ -4,13 +4,7 @@ import { ThreadFront } from "./thread";
 import { assert, binarySearch } from "./utils";
 import { ScreenshotCache } from "./screenshot-cache";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
-import {
-  TimeStampedPoint,
-  MouseEvent,
-  paintPoints,
-  mouseEvents,
-  ScreenShot,
-} from "@recordreplay/protocol";
+import { TimeStampedPoint, MouseEvent, paintPoints, ScreenShot } from "@recordreplay/protocol";
 import { client } from "./socket";
 import { actions, UIStore } from "ui/actions";
 
@@ -265,6 +259,11 @@ export function paintGraphics(screenShot?: ScreenShot, mouse?: MouseAndClickPosi
   gDrawImage.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
   gDrawMouse = mouse || null;
   refreshGraphics();
+}
+
+export async function paintGraphicsAtTime(time: number) {
+  const { screen, mouse } = await getGraphicsAtTime(time);
+  paintGraphics(screen, mouse);
 }
 
 function clearGraphics() {
