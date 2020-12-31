@@ -6,6 +6,7 @@ import { getMarkerLeftOffset } from "ui/utils/timeline";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const markerWidth = 19;
 
@@ -18,7 +19,9 @@ function NewCommentButton({
   setFocusedCommentId,
   comments,
   hideTooltip,
+  setExpectedError,
 }) {
+  const { isAuthenticated } = useAuth0();
   const addCommentCallback = id => {
     setFocusedCommentId(id);
     hideTooltip();
@@ -35,6 +38,13 @@ function NewCommentButton({
   }
 
   const handleClick = () => {
+    if (!isAuthenticated) {
+      return setExpectedError({
+        message: "You need to sign in to leave a comment.",
+        action: "sign-in",
+      });
+    }
+
     const newComment = {
       content: "",
       recording_id: recordingId,
@@ -77,5 +87,6 @@ export default connect(
   {
     setFocusedCommentId: actions.setFocusedCommentId,
     hideTooltip: actions.hideTooltip,
+    setExpectedError: actions.setExpectedError,
   }
 )(NewCommentButton);
