@@ -154,12 +154,12 @@ export class Timeline extends Component {
   }
 
   onMarkerClick = (e, message) => {
-    const { selectedPanel, viewMode } = this.props;
+    const { selectedPanel, viewMode, seek } = this.props;
 
     e.preventDefault();
     e.stopPropagation();
     const { executionPoint, executionPointTime, executionPointHasFrames, pauseId } = message;
-    this.seek(executionPoint, executionPointTime, executionPointHasFrames, pauseId);
+    seek(executionPoint, executionPointTime, executionPointHasFrames, pauseId);
 
     if (viewMode == "dev" && selectedPanel == "console") {
       this.showMessage(message);
@@ -215,44 +215,20 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseUp = e => {
-    const { hoverTime } = this.props;
+    const { hoverTime, seek } = this.props;
     const { hoveringOverMarker } = this.state;
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != null && !hoveringOverMarker) {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
-      if (event) {
-        this.seek(event.point, mouseTime);
+      if (event && event.point) {
+        seek(event.point, mouseTime, false);
       }
     }
   };
 
-  seek(point, time, hasFrames, pauseId) {
-    if (!point) {
-      return null;
-    }
-    return this.props.seek(point, time, hasFrames, pauseId);
-  }
-
-  seekTime(targetTime) {
-    if (targetTime == null) {
-      return null;
-    }
-
-    const event = mostRecentPaintOrMouseEvent(targetTime);
-
-    if (event) {
-      // Seek to the exact time provided, even if it does not match up with a
-      // paint event. This can cause some slight UI weirdness: resumes done in
-      // the debugger will be relative to the point instead of the time,
-      // so e.g. running forward could land at a point before the time itself.
-      // This could be fixed but doesn't seem worth worrying about for now.
-      this.seek(event.point, targetTime);
-    }
-  }
-
   goToNextPaint() {
-    const { currentTime } = this.props;
+    const { currentTime, seekToTime } = this.props;
     if (currentTime == this.zoomStartTime) {
       return;
     }
@@ -262,11 +238,11 @@ export class Timeline extends Component {
       return;
     }
 
-    this.seekTime(Math.max(previous.time, this.zoomStartTime));
+    seekToTime(Math.max(previous.time, this.zoomStartTime));
   }
 
   goToPrevPaint() {
-    const { currentTime } = this.props;
+    const { currentTime, seekToTime } = this.props;
     if (currentTime == this.zoomEndTime) {
       return;
     }
@@ -276,13 +252,14 @@ export class Timeline extends Component {
       return;
     }
 
-    this.seekTime(Math.min(next.time, this.zoomEndTime));
+    seekToTime(Math.min(next.time, this.zoomEndTime));
   }
 
   /**
    * Playback the recording segment from `startTime` to `endTime`.
    */
   async playback(startTime, endTime) {
+    const { seekToTime } = this.props;
     let startDate = Date.now();
     let currentDate = startDate;
     let currentTime = startTime;
@@ -309,7 +286,7 @@ export class Timeline extends Component {
 
       if (currentTime > endTime) {
         log(`FinishPlayback`);
-        this.seekTime(endTime);
+        seekToTime(endTime);
         this.props.setTimelineState({ currentTime: endTime, playback: null });
         return;
       }
@@ -363,17 +340,21 @@ export class Timeline extends Component {
   }
 
   stopPlayback() {
+    const { seekToTime } = this.props;
     log(`StopPlayback`);
 
+    console.log("stopPlayback", this.props.playback);
     if (this.props.playback) {
-      this.seekTime(this.props.playback.time);
+      seekToTime(this.props.playback.time);
     }
 
     this.props.setTimelineState({ playback: null });
   }
 
   replayPlayback = () => {
-    this.seekTime(0);
+    const { seekToTime } = this.props;
+
+    seekToTime(0);
     this.startPlayback();
   };
 
@@ -597,5 +578,6 @@ export default connect(
     setTimelineState: actions.setTimelineState,
     updateTimelineDimensions: actions.updateTimelineDimensions,
     seek: actions.seek,
+    seekToTime: actions.seekToTime,
   }
 )(Timeline);

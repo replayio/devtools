@@ -176,3 +176,22 @@ export function seek(
     }
   };
 }
+
+export function seekToTime(targetTime: number): UIThunkAction {
+  return () => {
+    if (targetTime == null) {
+      return;
+    }
+
+    const event = mostRecentPaintOrMouseEvent(targetTime);
+
+    if (event) {
+      // Seek to the exact time provided, even if it does not match up with a
+      // paint event. This can cause some slight UI weirdness: resumes done in
+      // the debugger will be relative to the point instead of the time,
+      // so e.g. running forward could land at a point before the time itself.
+      // This could be fixed but doesn't seem worth worrying about for now.
+      seek(event.point, targetTime, false);
+    }
+  };
+}
