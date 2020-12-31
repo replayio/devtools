@@ -19,6 +19,7 @@ import {
   getContext,
   getExtensionNameBySourceUrl,
   getSourceContent,
+  getFocusedSourceItem,
 } from "../../selectors";
 import actions from "../../actions";
 
@@ -30,15 +31,32 @@ import {
 } from "../../utils/source";
 import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
 import { copyToTheClipboard } from "../../utils/clipboard";
-import { features } from "../../utils/prefs";
 import { downloadFile } from "../../utils/utils";
 import { isFulfilled } from "../../utils/async-value";
 
 class SourceTreeItem extends Component {
+  _node;
+
   componentDidMount() {
-    const { autoExpand, item } = this.props;
+    const { autoExpand, item, focused } = this.props;
     if (autoExpand) {
       this.props.setExpanded(item, true, false);
+    }
+    if (focused) {
+      this._node.parentElement.classList.add("focused");
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { focused } = this.props;
+
+    // Make sure that the entire row has a focused styling.
+    // Without this, other parts of the row like he indentation
+    // doesn't look like it's highlighted.
+    if (!prevProps.focused && focused) {
+      this._node.parentElement.classList.add("focused");
+    } else if (prevProps.focused && !focused) {
+      this._node.parentElement.classList.remove("focused");
     }
   }
 
@@ -54,9 +72,6 @@ class SourceTreeItem extends Component {
   onContextMenu = (event, item) => {
     const copySourceUri2Label = "Copy source URI";
     const copySourceUri2Key = "u";
-    const setDirectoryRootLabel = "Set directory root";
-    const setDirectoryRootKey = "r";
-    const removeDirectoryRootLabel = "Remove directory root";
 
     event.stopPropagation();
     event.preventDefault();
@@ -208,14 +223,7 @@ class SourceTreeItem extends Component {
   }
 
   render() {
-    const {
-      item,
-      depth,
-      source,
-      focused,
-      hasMatchingGeneratedSource,
-      hasSiblingOfSameName,
-    } = this.props;
+    const { item, depth, source, focused, hasSiblingOfSameName } = this.props;
 
     const suffix = null;
 
@@ -234,6 +242,7 @@ class SourceTreeItem extends Component {
         onClick={this.onClick}
         onContextMenu={e => this.onContextMenu(e, item)}
         title={this.renderItemTooltip()}
+        ref={el => (this._node = el)}
       >
         {this.renderItemArrow()}
         {this.renderIcon(item, depth)}
@@ -264,13 +273,14 @@ function isExtensionDirectory(depth, extensionName) {
 }
 
 const mapStateToProps = (state, props) => {
-  const { source, item } = props;
+  const { source, item, focused } = props;
   return {
     cx: getContext(state),
     hasMatchingGeneratedSource: getHasMatchingGeneratedSource(state, source),
     hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
     hasPrettySource: source ? checkHasPrettySource(state, source.id) : false,
     sourceContent: source ? getSourceContentValue(state, source) : null,
+    focused: source ? focused || getFocusedSourceItem(state)?.contents.id == source.id : false,
     extensionName:
       (isUrlExtension(item.name) && getExtensionNameBySourceUrl(state, item.name)) || null,
   };
