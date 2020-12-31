@@ -28,6 +28,5 @@ export interface TimelineState {
   hoveredMessageId: string | null;
   unprocessedRegions: TimeRange[];
   shouldAnimate: boolean;
-  loaded: boolean;
   tooltip: Tooltip | null;
 }
