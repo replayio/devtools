@@ -84,7 +84,9 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
 function setupPointHandlers(store: UIStore) {
   PointHandlers.onPoints = (points: PointDescription[], info: any) => {
     const { locations } = info;
-    locations.forEach((location: Location) => store.dispatch(setAnalysisPoints(points, location)));
+    locations.forEach(
+      (location: Location | null) => location && store.dispatch(setAnalysisPoints(points, location))
+    );
   };
 
   PointHandlers.addPendingNotification = (location: any) => {
