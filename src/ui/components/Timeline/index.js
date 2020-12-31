@@ -255,123 +255,27 @@ export class Timeline extends Component {
     seekToTime(Math.min(next.time, this.zoomEndTime));
   }
 
-  /**
-   * Playback the recording segment from `startTime` to `endTime`.
-   */
-  async playback(startTime, endTime) {
-    const { seekToTime } = this.props;
-    let startDate = Date.now();
-    let currentDate = startDate;
-    let currentTime = startTime;
-    let nextGraphicsTime;
-    let nextGraphicsPromise;
-
-    const prepareNextGraphics = () => {
-      nextGraphicsTime = nextPaintOrMouseEvent(currentTime)?.time || this.zoomEndTime;
-      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
-    };
-    prepareNextGraphics();
-
-    // This is a `do ... while` instead of `while` because startPlayback is synchronous.
-    // It's possible that the playback in state hasn't been updated yet by the time
-    // this is first called. So we just force it to run the first time.
-    do {
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      if (!this.props.playback) {
-        return;
-      }
-
-      currentDate = Date.now();
-      currentTime = startTime + (currentDate - startDate);
-
-      if (currentTime > endTime) {
-        log(`FinishPlayback`);
-        seekToTime(endTime);
-        this.props.setTimelineState({ currentTime: endTime, playback: null });
-        return;
-      }
-
-      this.props.setTimelineState({
-        currentTime,
-        playback: { startTime, startDate, time: currentTime },
-      });
-
-      if (currentTime >= nextGraphicsTime) {
-        const { screen, mouse } = await nextGraphicsPromise;
-
-        if (!this.props.playback) {
-          return;
-        }
-
-        // playback may have stalled waiting for `nextGraphicsPromise` and would jump
-        // in the next iteration in order to catch up. To avoid jumps of more than
-        // 100 milliseconds, we reset `startTime` and `startDate` as if playback had
-        // been started right now
-        if (Date.now() - currentDate > 100) {
-          startTime = currentTime;
-          startDate = Date.now();
-          this.props.setTimelineState({
-            currentTime,
-            playback: { startTime, startDate, time: currentTime },
-          });
-        }
-
-        if (screen) {
-          paintGraphics(screen, mouse);
-        }
-        prepareNextGraphics();
-      }
-    } while (this.props.playback);
-  }
-
-  startPlayback() {
-    log(`StartPlayback`);
-    const { currentTime, setTimelineState } = this.props;
-
-    const startDate = Date.now();
-    const startTime = currentTime >= this.zoomEndTime ? 0 : currentTime;
-
-    setTimelineState({
-      playback: { startTime, startDate },
-      currentTime: startTime,
-    });
-
-    this.playback(startTime, this.zoomEndTime);
-  }
-
-  stopPlayback() {
-    const { seekToTime } = this.props;
-    log(`StopPlayback`);
-
-    console.log("stopPlayback", this.props.playback);
-    if (this.props.playback) {
-      seekToTime(this.props.playback.time);
-    }
-
-    this.props.setTimelineState({ playback: null });
-  }
-
-  replayPlayback = () => {
-    const { seekToTime } = this.props;
-
-    seekToTime(0);
-    this.startPlayback();
-  };
-
   renderCommands() {
-    const { playback, recordingDuration, currentTime } = this.props;
+    const {
+      playback,
+      recordingDuration,
+      currentTime,
+      startPlayback,
+      stopPlayback,
+      replayPlayback,
+    } = this.props;
 
     if (currentTime == recordingDuration) {
       return (
         <div className="commands">
-          <ReplayButton onClick={this.replayPlayback} />
+          <ReplayButton onClick={replayPlayback} />
         </div>
       );
     }
 
     return (
       <div className="commands">
-        <button onClick={() => (playback ? this.stopPlayback() : this.startPlayback())}>
+        <button onClick={() => (playback ? stopPlayback() : startPlayback())}>
           {playback ? (
             <div className="img pause-circle-lg" />
           ) : (
@@ -579,5 +483,8 @@ export default connect(
     updateTimelineDimensions: actions.updateTimelineDimensions,
     seek: actions.seek,
     seekToTime: actions.seekToTime,
+    startPlayback: actions.startPlayback,
+    stopPlayback: actions.stopPlayback,
+    replayPlayback: actions.replayPlayback,
   }
 )(Timeline);
