@@ -165,13 +165,9 @@ class Scopes extends PureComponent {
       );
     }
 
-    let stateText = "Not paused";
-    if (cx.isPaused) {
-      if (isLoading) {
-        stateText = "Loading\u2026";
-      } else {
-        stateText = "Scopes unavailable";
-      }
+    let stateText = "";
+    if (isLoading) {
+      stateText = "Loading\u2026";
     }
 
     return (
@@ -189,8 +185,8 @@ class Scopes extends PureComponent {
 const mapStateToProps = state => {
   const cx = getThreadContext(state);
   const selectedFrame = getSelectedFrame(state);
-
-  const { scope, pending } = getFrameScope(state, selectedFrame?.id) || {
+  const frameScope = getFrameScope(state, selectedFrame?.id);
+  const { scope, pending } = frameScope || {
     scope: null,
     pending: false,
   };
