@@ -22,7 +22,7 @@ interface LogpointInfo {
   analysisWaiters: Promise<createAnalysisResult>[];
   points: PointDescription[];
   pointsWaiter?: (value: void) => void;
-  locations: Location[] | null;
+  locations: Location[];
   showInConsole: boolean;
 }
 
@@ -105,7 +105,9 @@ client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
     info.pointsWaiter();
   }
 
-  if (PointHandlers.onPoints) {
+  // Skip saving analysis points for event breakpoint analyses. We can tell
+  // event breakpoint analyses apart because their only location is null.
+  if (PointHandlers.onPoints && info.locations[0] !== null) {
     PointHandlers.onPoints(points, info);
   }
 
@@ -134,8 +136,8 @@ async function createLogpointAnalysis(
   }
 
   // To avoid duplication, only add the location if this logGroupId's info doesn't have it yet
-  if (gLogpoints.get(logGroupId)!.locations!.every(loc => loc.sourceId != location!.sourceId)) {
-    gLogpoints.get(logGroupId)!.locations!.push(location!);
+  if (gLogpoints.get(logGroupId)!.locations.every(loc => loc.sourceId != location!.sourceId)) {
+    gLogpoints.get(logGroupId)!.locations.push(location!);
   }
 
   const waiter = client.Analysis.createAnalysis({
