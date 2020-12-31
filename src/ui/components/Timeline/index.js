@@ -10,7 +10,6 @@
 import { connect } from "react-redux";
 import { Component } from "react";
 import React from "react";
-import dom from "react-dom-factories";
 import { log } from "protocol/socket";
 
 import ScrollContainer from "./ScrollContainer";
@@ -22,8 +21,6 @@ import { actions } from "../../actions";
 import { selectors } from "../../reducers";
 import Message, { MessagePreview } from "./Message";
 import { getVisiblePosition } from "ui/utils/timeline";
-
-const { div } = dom;
 
 import "./Timeline.css";
 
@@ -256,24 +253,25 @@ export class Timeline extends Component {
   renderMessages() {
     const { messages, currentTime, hoveredMessageId, zoomRegion } = this.props;
 
-    return messages.map((message, index) => {
-      const messageEl = (
-        <Message
-          message={message}
-          index={index}
-          messages={messages}
-          currentTime={currentTime}
-          hoveredMessageId={hoveredMessageId}
-          zoomRegion={zoomRegion}
-          overlayWidth={this.overlayWidth}
-          onMarkerClick={this.onMarkerClick}
-          onMarkerMouseEnter={this.onMarkerMouseEnter}
-          onMarkerMouseLeave={this.onMarkerMouseLeave}
-        />
-      );
-
-      return messageEl;
-    });
+    return (
+      <div className="message-container">
+        {messages.map((message, index) => (
+          <Message
+            message={message}
+            index={index}
+            key={index}
+            messages={messages}
+            currentTime={currentTime}
+            hoveredMessageId={hoveredMessageId}
+            zoomRegion={zoomRegion}
+            overlayWidth={this.overlayWidth}
+            onMarkerClick={this.onMarkerClick}
+            onMarkerMouseEnter={this.onMarkerMouseEnter}
+            onMarkerMouseLeave={this.onMarkerMouseLeave}
+          />
+        ))}
+      </div>
+    );
   }
 
   renderPreviewMessages() {
@@ -288,19 +286,21 @@ export class Timeline extends Component {
       return [];
     }
 
-    return pointsForHoveredLineNumber.map((message, index) => {
-      const messageEl = (
-        <MessagePreview
-          message={message}
-          index={index}
-          currentTime={currentTime}
-          highlightedMessageId={highlightedMessageId}
-          zoomRegion={zoomRegion}
-          overlayWidth={this.overlayWidth}
-        />
-      );
-      return messageEl;
-    });
+    return (
+      <div className="preview-message-container">
+        {pointsForHoveredLineNumber.map((message, index) => (
+          <MessagePreview
+            message={message}
+            index={index}
+            key={index}
+            currentTime={currentTime}
+            highlightedMessageId={highlightedMessageId}
+            zoomRegion={zoomRegion}
+            overlayWidth={this.overlayWidth}
+          />
+        ))}
+      </div>
+    );
   }
 
   render() {
@@ -308,41 +308,27 @@ export class Timeline extends Component {
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
 
-    return div(
-      {
-        className: classname("timeline", { dimmed: !!hoveredLineNumberLocation }),
-      },
-      this.renderCommands(),
-      div(
-        {
-          className: classname("progress-bar-container", { paused: true }),
-        },
-        div(
-          {
-            className: classname("progress-bar", { loaded }),
-            ["data-progress"]: Math.ceil(percent),
-            ref: a => (this.$progressBar = a),
-            onMouseEnter: this.onPlayerMouseEnter,
-            onMouseMove: this.onPlayerMouseMove,
-            onMouseUp: this.onPlayerMouseUp,
-          },
-          div({
-            className: "progress-line full",
-          }),
-          div({
-            className: "progress-line preview",
-            style: { width: `${hoverPercent}%` },
-          }),
-          div({
-            className: "progress-line",
-            style: { width: `${percent}%` },
-          }),
-          div({ className: "message-container" }, ...this.renderMessages()),
-          div({ className: "preview-message-container" }, ...this.renderPreviewMessages()),
-          <ScrollContainer />
-        ),
-        <Comments />
-      )
+    return (
+      <div className={classname("timeline", { dimmed: !!hoveredLineNumberLocation })}>
+        {this.renderCommands()}
+        <div className={classname("progress-bar-container", { paused: true })}>
+          <div
+            className={classname("progress-bar", { loaded })}
+            ref={node => (this.$progressBar = node)}
+            onMouseEnter={this.onPlayerMouseEnter}
+            onMouseMove={this.onPlayerMouseMove}
+            onMouseUp={this.onPlayerMouseUp}
+          >
+            <div className="progress-line full" />
+            <div className="progress-line preview" style={{ width: `${hoverPercent}%` }} />
+            <div className="progress-line" style={{ width: `${percent}%` }} />
+            {this.renderMessages()}
+            {this.renderPreviewMessages()}
+            <ScrollContainer />
+          </div>
+          <Comments />
+        </div>
+      </div>
     );
   }
 }
