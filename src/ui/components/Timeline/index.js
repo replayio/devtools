@@ -16,16 +16,7 @@ import { log } from "protocol/socket";
 import ScrollContainer from "./ScrollContainer";
 import Comments from "../Comments";
 
-const {
-  mostRecentPaintOrMouseEvent,
-  nextPaintOrMouseEvent,
-  nextPaintEvent,
-  previousPaintEvent,
-  getGraphicsAtTime,
-  paintGraphics,
-} = require("protocol/graphics");
-
-const { assert } = require("protocol/utils");
+const { mostRecentPaintOrMouseEvent } = require("protocol/graphics");
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
@@ -226,34 +217,6 @@ export class Timeline extends Component {
       }
     }
   };
-
-  goToNextPaint() {
-    const { currentTime, seekToTime } = this.props;
-    if (currentTime == this.zoomStartTime) {
-      return;
-    }
-
-    const previous = previousPaintEvent(currentTime);
-    if (!previous) {
-      return;
-    }
-
-    seekToTime(Math.max(previous.time, this.zoomStartTime));
-  }
-
-  goToPrevPaint() {
-    const { currentTime, seekToTime } = this.props;
-    if (currentTime == this.zoomEndTime) {
-      return;
-    }
-
-    const next = nextPaintEvent(currentTime);
-    if (!next) {
-      return;
-    }
-
-    seekToTime(Math.min(next.time, this.zoomEndTime));
-  }
 
   renderCommands() {
     const {

@@ -1,10 +1,4 @@
-import {
-  ExecutionPoint,
-  PauseId,
-  RecordingId,
-  TimeStampedPoint,
-  ScreenShot,
-} from "@recordreplay/protocol";
+import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
 import {
   screenshotCache,
@@ -14,7 +8,8 @@ import {
   mostRecentPaintOrMouseEvent,
   getMostRecentPaintPoint,
   nextPaintOrMouseEvent,
-  MouseAndClickPosition,
+  nextPaintEvent,
+  previousPaintEvent,
 } from "protocol/graphics";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
@@ -309,5 +304,45 @@ function playback(startTime: number, endTime: number): UIThunkAction {
         prepareNextGraphics();
       }
     }
+  };
+}
+
+export function goToNextPaint(): UIThunkAction {
+  return ({ dispatch, getState }) => {
+    const state = getState();
+    const currentTime = selectors.getCurrentTime(state);
+    const { startTime } = selectors.getZoomRegion(state);
+
+    if (currentTime == startTime) {
+      return;
+    }
+
+    const previous = previousPaintEvent(currentTime);
+
+    if (!previous) {
+      return;
+    }
+
+    dispatch(seekToTime(Math.max(previous.time, startTime)));
+  };
+}
+
+export function goToPrevPaint(): UIThunkAction {
+  return ({ dispatch, getState }) => {
+    const state = getState();
+    const currentTime = selectors.getCurrentTime(state);
+    const { endTime } = selectors.getZoomRegion(state);
+
+    if (currentTime == endTime) {
+      return;
+    }
+
+    const next = nextPaintEvent(currentTime);
+
+    if (!next) {
+      return;
+    }
+
+    dispatch(seekToTime(Math.min(next.time, endTime)));
   };
 }
