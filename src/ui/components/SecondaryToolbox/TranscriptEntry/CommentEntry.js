@@ -8,7 +8,7 @@ import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import CommentEditor from "ui/components/Comments/CommentEditor";
 import CommentDropdownPanel from "ui/components/Comments/CommentDropdownPanel";
 
-function CommentEntry({ comment, currentTime, seek }) {
+function CommentEntry({ comment, user, currentTime, seek }) {
   const [editing, setEditing] = useState(false);
   const seekToComment = () => {
     const { point, time, has_frames } = comment;
@@ -24,17 +24,22 @@ function CommentEntry({ comment, currentTime, seek }) {
     <div
       className={classnames("comment", { selected: currentTime === comment.time })}
       onClick={seekToComment}
-      onDoubleClick={() => setEditing(true)}
     >
-      <div className="img event-comment" />
+      <img src={comment.user.picture} className="comment-picture" />
       {editing ? (
         <CommentEditor comment={comment} stopEditing={() => setEditing(false)} />
       ) : (
-        <CommentBody comment={comment} startEditing={() => setEditing(true)} />
+        <CommentBody comment={comment} user={user} startEditing={() => setEditing(true)} />
       )}
       <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
         <Dropdown
-          panel={<CommentDropdownPanel comment={comment} startEditing={() => setEditing(true)} />}
+          panel={
+            <CommentDropdownPanel
+              user={user}
+              comment={comment}
+              startEditing={() => setEditing(true)}
+            />
+          }
           icon={<div>⋯</div>}
         />
       </div>
@@ -42,13 +47,19 @@ function CommentEntry({ comment, currentTime, seek }) {
   );
 }
 
-function CommentBody({ comment, startEditing }) {
+function CommentBody({ comment, user, startEditing }) {
   const lines = comment.content.split("\n");
+
+  const onDoubleClick = () => {
+    if (user?.loggedIn && comment.user_id == user?.id) {
+      startEditing();
+    }
+  };
 
   return (
     <div className="comment-body">
-      <div className="item-label">Comment</div>
-      <div className="item-content" onDoubleClick={startEditing}>
+      <div className="item-label">{comment.user.name}</div>
+      <div className="item-content" onDoubleClick={onDoubleClick}>
         {lines.map((line, i) => (
           <div key={i}>{line}</div>
         ))}
@@ -57,6 +68,12 @@ function CommentBody({ comment, startEditing }) {
   );
 }
 
-export default connect(state => ({ currentTime: selectors.getCurrentTime(state) }), {
-  seek: actions.seek,
-})(CommentEntry);
+export default connect(
+  state => ({
+    currentTime: selectors.getCurrentTime(state),
+    user: selectors.getUser(state),
+  }),
+  {
+    seek: actions.seek,
+  }
+)(CommentEntry);

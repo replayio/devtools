@@ -80,7 +80,6 @@ export default connect(
     focusedCommentId: selectors.getFocusedCommentId(state),
   }),
   {
-    createComment: actions.createComment,
     setFocusedCommentId: actions.setFocusedCommentId,
     seek: actions.seek,
   }
