@@ -8,63 +8,14 @@ const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
 const actions = require("devtools/client/webconsole/actions/index");
 const ReactDOM = require("react-dom");
-const {
-  getAllMessagesById,
-  getAllMessagesUiById,
-  getAllMessagesPayloadById,
-  getVisibleMessages,
-  getPausedExecutionPoint,
-  getAllWarningGroupsById,
-  isMessageInWarningGroup,
-} = require("devtools/client/webconsole/selectors/messages");
+const selectors = require("devtools/client/webconsole/selectors/messages");
 
 const PropTypes = require("prop-types");
 const {
   MessageContainer,
 } = require("devtools/client/webconsole/components/Output/MessageContainer");
-const { pointPrecedes } = require("protocol/execution-point-utils");
 
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
-
-function messageExecutionPoint(msg) {
-  const { executionPoint, lastExecutionPoint } = msg;
-  return executionPoint || (lastExecutionPoint && lastExecutionPoint.point);
-}
-
-function messageTime(msg) {
-  const { executionPointTime, lastExecutionPoint } = msg;
-  return executionPointTime || (lastExecutionPoint && lastExecutionPoint.time) || 0;
-}
-
-function getClosestMessage(visibleMessages, messages, executionPoint) {
-  if (!executionPoint || !visibleMessages || !visibleMessages.length) {
-    return null;
-  }
-
-  // If the pause location is before the first message, the first message is
-  // marked as the paused one. This allows later messages to be grayed out but
-  // isn't consistent with behavior for those other messages.
-  let last = messages.get(visibleMessages[0]);
-
-  for (const id of visibleMessages) {
-    const msg = messages.get(id);
-
-    // Skip evaluations, which will always occur at the same evaluation point as
-    // a logpoint or log
-    if (msg.type == MESSAGE_TYPE.COMMAND || msg.type == MESSAGE_TYPE.RESULT) {
-      continue;
-    }
-
-    const point = messageExecutionPoint(msg);
-    if (point && pointPrecedes(executionPoint, point)) {
-      break;
-    }
-
-    last = msg;
-  }
-
-  return last;
-}
 
 class ConsoleOutput extends Component {
   static get propTypes() {
@@ -86,10 +37,35 @@ class ConsoleOutput extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    this.maybeScrollToMessage(prevProps);
+    if (this.props.closestMessage != prevProps.closestMessage) {
+      return this.scrollToClosestMessage();
+    }
+
+    this.maybeScrollToResult(prevProps);
   }
 
-  maybeScrollToMessage(prevProps) {
+  scrollToClosestMessage() {
+    const { closestMessage } = this.props;
+
+    if (!closestMessage) {
+      return;
+    }
+
+    const outputNode = ReactDOM.findDOMNode(this);
+    const element = outputNode.querySelector(`.message[data-message-id="${closestMessage.id}"]`);
+
+    if (!element) {
+      return;
+    }
+
+    const consoleHeight = outputNode.getBoundingClientRect().height;
+    const elementTop = element.getBoundingClientRect().top;
+    if (elementTop < 30 || elementTop + 50 > consoleHeight) {
+      element.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  }
+
+  maybeScrollToResult(prevProps) {
     const messagesDelta = this.props.messages.size - prevProps.messages.size;
 
     // [...this.props.messages.values()] seems slow
@@ -150,17 +126,9 @@ class ConsoleOutput extends Component {
       warningGroups,
       timestampsVisible,
       pausedExecutionPoint,
-      zoomStartTime,
-      zoomEndTime,
+      closestMessage,
     } = this.props;
 
-    visibleMessages = visibleMessages.filter(id => {
-      const msg = messages.get(id);
-      const time = messageTime(msg);
-      return time >= zoomStartTime && time <= zoomEndTime;
-    });
-
-    const pausedMessage = getClosestMessage(visibleMessages, messages, pausedExecutionPoint);
     const messageNodes = visibleMessages.map((messageId, i) =>
       createElement(MessageContainer, {
         dispatch,
@@ -176,7 +144,7 @@ class ConsoleOutput extends Component {
             : false,
         pausedExecutionPoint,
         getMessage: () => messages.get(messageId),
-        isPaused: !!pausedMessage && pausedMessage.id == messageId,
+        isPaused: closestMessage?.id == messageId,
         isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
       })
     );
@@ -202,15 +170,14 @@ function scrollToBottom(node) {
 
 function mapStateToProps(state, props) {
   return {
-    pausedExecutionPoint: getPausedExecutionPoint(state),
-    messages: getAllMessagesById(state),
-    visibleMessages: getVisibleMessages(state),
-    messagesUi: getAllMessagesUiById(state),
-    messagesPayload: getAllMessagesPayloadById(state),
-    warningGroups: getAllWarningGroupsById(state),
+    pausedExecutionPoint: selectors.getPausedExecutionPoint(state),
+    closestMessage: selectors.getClosestMessage(state),
+    messages: selectors.getAllMessagesById(state),
+    visibleMessages: selectors.getVisibleMessages(state),
+    messagesUi: selectors.getAllMessagesUiById(state),
+    messagesPayload: selectors.getAllMessagesPayloadById(state),
+    warningGroups: selectors.getAllWarningGroupsById(state),
     timestampsVisible: state.consoleUI.timestampsVisible,
-    zoomStartTime: state.consoleUI.zoomStartTime,
-    zoomEndTime: state.consoleUI.zoomEndTime,
   };
 }
 const mapDispatchToProps = dispatch => ({
