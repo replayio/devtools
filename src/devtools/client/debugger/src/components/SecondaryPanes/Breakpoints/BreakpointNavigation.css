@@ -7,6 +7,12 @@
   align-items: center;
 }
 
+.breakpoint-navigation.empty .breakpoint-navigation-status-container,
+.breakpoint-navigation.empty .breakpoint-navigation-status {
+  width: 100%;
+  text-align: center;
+}
+
 .breakpoint-navigation-commands {
   display: flex;
   flex-direction: row;

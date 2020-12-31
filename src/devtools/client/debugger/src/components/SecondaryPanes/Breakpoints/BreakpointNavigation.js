@@ -1,4 +1,5 @@
 import React from "react";
+import classnames from "classnames";
 import { compareNumericStrings } from "../../../../../../../protocol/utils";
 import { getThreadExecutionPoint } from "../../../reducers/pause";
 import { connect } from "../../../utils/connect";
@@ -22,6 +23,7 @@ function BreakpointNavigation({
       seek(point.point, point.time, true);
     }
   };
+  const isEmpty = analysisPoints && analysisPoints?.length == 0;
 
   let prev, next;
 
@@ -31,27 +33,10 @@ function BreakpointNavigation({
   }
 
   return (
-    <div className="breakpoint-navigation">
-      <div className="breakpoint-navigation-commands">
-        <button
-          className={`breakpoint-navigation-command-prev ${!prev ? " disabled" : ""}`}
-          disabled={!prev}
-          onClick={() => {
-            navigateToPoint(prev);
-          }}
-        >
-          <div className="img play-circle" style={{ transform: "rotate(180deg)" }} />
-        </button>{" "}
-        <button
-          className={`breakpoint-navigation-command-next ${!next ? " disabled" : ""}`}
-          disabled={!next}
-          onClick={() => {
-            navigateToPoint(next);
-          }}
-        >
-          <div className="img play-circle" />
-        </button>
-      </div>
+    <div className={classnames("breakpoint-navigation", { empty: isEmpty })}>
+      {!isEmpty ? (
+        <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
+      ) : null}
       {analysisPoints?.length ? (
         <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
       ) : null}
@@ -65,10 +50,37 @@ function BreakpointNavigation({
   );
 }
 
+function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
+  return (
+    <div className="breakpoint-navigation-commands">
+      <button
+        className={`breakpoint-navigation-command-prev ${!prev ? " disabled" : ""}`}
+        disabled={!prev}
+        onClick={() => {
+          navigateToPoint(prev);
+        }}
+      >
+        <div className="img play-circle" style={{ transform: "rotate(180deg)" }} />
+      </button>{" "}
+      <button
+        className={`breakpoint-navigation-command-next ${!next ? " disabled" : ""}`}
+        disabled={!next}
+        onClick={() => {
+          navigateToPoint(next);
+        }}
+      >
+        <div className="img play-circle" />
+      </button>
+    </div>
+  );
+}
+
 function BreakpointNavigationStatus({ executionPoint, analysisPoints }) {
   let status = "";
 
-  if (!analysisPoints?.length) {
+  if (!analysisPoints) {
+    status = "Loading";
+  } else if (analysisPoints.length == 0) {
     status = "No hits";
   } else {
     const points = analysisPoints
