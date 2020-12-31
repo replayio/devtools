@@ -2355,7 +2355,6 @@
         // !!! Should remain synchronized with .babel/transform-mc.js !!!
         const vendored = {
           classnames: _classnames.default,
-          "devtools-components": devtoolsComponents,
           "devtools-config": devtoolsConfig,
           "devtools-contextmenu": devtoolsContextmenu,
           "devtools-environment": devtoolsEnvironment,

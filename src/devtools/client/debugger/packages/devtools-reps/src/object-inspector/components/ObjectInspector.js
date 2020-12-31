@@ -10,7 +10,7 @@ const actions = require("../actions");
 
 const selectors = require("../reducer");
 
-import { Tree as _Tree } from "devtools-components";
+import { Tree as _Tree } from "devtools/client/debugger/src/components/shared/tree";
 const Tree = createFactory(_Tree);
 require("./ObjectInspector.css");
 

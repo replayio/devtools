@@ -4,9 +4,8 @@
 
 //
 import React, { Component } from "react";
+import { Tree } from "./tree";
 import "./ManagedTree.css";
-
-const { Tree } = require("devtools-components");
 
 class ManagedTree extends Component {
   constructor(props) {

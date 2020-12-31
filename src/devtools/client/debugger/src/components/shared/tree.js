@@ -317,7 +317,7 @@ function oncePerAnimationFrame(fn, { getDocument }) {
  *       }
  *     }
  */
-class Tree extends Component {
+export class Tree extends Component {
   static get propTypes() {
     return {
       // Required props
@@ -1022,5 +1022,3 @@ class Tree extends Component {
     );
   }
 }
-
-export default Tree;
