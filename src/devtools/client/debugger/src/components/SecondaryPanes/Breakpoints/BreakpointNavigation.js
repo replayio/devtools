@@ -23,7 +23,7 @@ function BreakpointNavigation({
       seek(point.point, point.time, true);
     }
   };
-  const isEmpty = analysisPoints && !analysisPoints.length;
+  const isEmpty = analysisPoints && analysisPoints?.length == 0;
 
   let prev, next;
 
@@ -80,7 +80,7 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints }) {
 
   if (!analysisPoints) {
     status = "Loading";
-  } else if (!analysisPoints.length) {
+  } else if (analysisPoints.length == 0) {
     status = "No hits";
   } else {
     const points = analysisPoints
