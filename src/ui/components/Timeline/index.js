@@ -21,7 +21,7 @@ const { mostRecentPaintOrMouseEvent } = require("protocol/graphics");
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
 import Message, { MessagePreview } from "./Message";
-import { timelineMarkerWidth } from "../../constants";
+import { getVisiblePosition } from "ui/utils/timeline";
 
 const { div } = dom;
 
@@ -178,7 +178,13 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseMove = async e => {
-    const { hoverTime, recordingDuration, setTimelineToTime, timelineDimensions } = this.props;
+    const {
+      zoomRegion,
+      hoverTime,
+      recordingDuration,
+      setTimelineToTime,
+      timelineDimensions,
+    } = this.props;
     if (!recordingDuration) {
       return;
     }
@@ -189,7 +195,9 @@ export class Timeline extends Component {
       const { width, left } = timelineDimensions;
       let horizontalPadding = 12;
       let tooltipWidth = 180;
-      let offset = this.getPixelOffset(mouseTime) + left - tooltipWidth / 2;
+      let pixelOffset =
+        getVisiblePosition({ time: mouseTime, zoom: zoomRegion }) * this.overlayWidth;
+      let offset = pixelOffset + left - tooltipWidth / 2;
 
       offset = offset < horizontalPadding ? horizontalPadding : offset;
       offset =
@@ -245,45 +253,6 @@ export class Timeline extends Component {
     );
   }
 
-  // calculate pixel distance from two times
-  getPixelDistance(to, from) {
-    const toPos = this.getVisiblePosition(to);
-    const fromPos = this.getVisiblePosition(from);
-
-    return Math.abs((toPos - fromPos) * this.overlayWidth);
-  }
-
-  // Get the position of a time on the visible part of the timeline,
-  // in the range [0, 1].
-  getVisiblePosition(time) {
-    if (!time) {
-      return 0;
-    }
-
-    if (time <= this.zoomStartTime) {
-      return 0;
-    }
-
-    if (time >= this.zoomEndTime) {
-      return 1;
-    }
-
-    return (time - this.zoomStartTime) / (this.zoomEndTime - this.zoomStartTime);
-  }
-
-  // Get the pixel offset for a time.
-  getPixelOffset(time) {
-    return this.getVisiblePosition(time) * this.overlayWidth;
-  }
-
-  // Get the percent value for the left offset of a message.
-  getLeftOffset(message) {
-    const messagePosition = this.getVisiblePosition(message.executionPointTime) * 100;
-    const messageWidth = (timelineMarkerWidth / this.overlayWidth) * 100;
-
-    return Math.max(messagePosition - messageWidth / 2, 0);
-  }
-
   renderMessages() {
     const { messages, currentTime, hoveredMessageId, zoomRegion } = this.props;
 
@@ -335,9 +304,9 @@ export class Timeline extends Component {
   }
 
   render() {
-    const { loaded, currentTime, hoverTime, hoveredLineNumberLocation } = this.props;
-    const percent = this.getVisiblePosition(currentTime) * 100;
-    const hoverPercent = this.getVisiblePosition(hoverTime) * 100;
+    const { loaded, zoomRegion, currentTime, hoverTime, hoveredLineNumberLocation } = this.props;
+    const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
+    const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
 
     return div(
       {
