@@ -10,6 +10,7 @@
 import { connect } from "react-redux";
 import { Component } from "react";
 import React from "react";
+import classnames from "classnames";
 
 import ScrollContainer from "./ScrollContainer";
 import Comments from "../Comments";
@@ -22,16 +23,6 @@ import Message, { MessagePreview } from "./Message";
 import { getVisiblePosition } from "ui/utils/timeline";
 
 import "./Timeline.css";
-
-function classname(name, bools) {
-  for (const key in bools) {
-    if (bools[key]) {
-      name += ` ${key}`;
-    }
-  }
-
-  return name;
-}
 
 function ReplayButton({ onClick }) {
   return (
@@ -174,16 +165,7 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseMove = async e => {
-    const {
-      zoomRegion,
-      hoverTime,
-      recordingDuration,
-      setTimelineToTime,
-      timelineDimensions,
-    } = this.props;
-    if (!recordingDuration) {
-      return;
-    }
+    const { zoomRegion, hoverTime, setTimelineToTime, timelineDimensions } = this.props;
 
     const mouseTime = this.getMouseTime(e);
 
@@ -308,11 +290,11 @@ export class Timeline extends Component {
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
 
     return (
-      <div className={classname("timeline", { dimmed: !!hoveredLineNumberLocation })}>
+      <div className={classnames("timeline", { dimmed: !!hoveredLineNumberLocation })}>
         {this.renderCommands()}
-        <div className={classname("progress-bar-container", { paused: true })}>
+        <div className={classnames("progress-bar-container", { paused: true })}>
           <div
-            className={classname("progress-bar", { loaded })}
+            className="progress-bar"
             ref={node => (this.$progressBar = node)}
             onMouseEnter={this.onPlayerMouseEnter}
             onMouseMove={this.onPlayerMouseMove}
@@ -339,10 +321,8 @@ export default connect(
     hoverTime: selectors.getHoverTime(state),
     playback: selectors.getPlayback(state),
     hoveredMessageId: selectors.getHoveredMessageId(state),
-    unprocessedRegions: selectors.getUnprocessedRegions(state),
     recordingDuration: selectors.getRecordingDuration(state),
     timelineDimensions: selectors.getTimelineDimensions(state),
-    loaded: selectors.getTimelineLoaded(state),
     messages: selectors.getMessagesForTimeline(state),
     viewMode: selectors.getViewMode(state),
     selectedPanel: selectors.getSelectedPanel(state),
