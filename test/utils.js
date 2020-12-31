@@ -59,4 +59,20 @@ function tmpFile() {
   return os.tmpdir() + "/" + ((Math.random() * 1e9) | 0);
 }
 
-module.exports = { findGeckoPath, createTestScript, tmpFile };
+function spawnChecked(...args) {
+  const rv = spawnSync.apply(this, args);
+  if (rv.status != 0 || rv.error) {
+    throw new Error("Spawned process failed");
+  }
+}
+
+function defer() {
+  let resolve, reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
+module.exports = { findGeckoPath, createTestScript, tmpFile, spawnChecked, defer };

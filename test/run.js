@@ -3,10 +3,16 @@
 // Harness for end-to-end tests. Run this from the devtools root directory.
 const fs = require("fs");
 const https = require("https");
-const { spawnSync, spawn } = require("child_process");
+const { spawn } = require("child_process");
 const url = require("url");
 const Manifest = require("./manifest.json");
-const { findGeckoPath, createTestScript, tmpFile } = require("./utils");
+const {
+  findGeckoPath,
+  createTestScript,
+  tmpFile,
+  spawnChecked,
+  defer,
+} = require("./utils");
 
 const ExampleRecordings = fs.existsSync("./test/example-recordings.json")
   ? JSON.parse(fs.readFileSync("./test/example-recordings.json"))
@@ -18,6 +24,7 @@ let stripeIndex, stripeCount, dispatchServer;
 const startTime = Date.now();
 let shouldRecordExamples = false;
 let shouldRecordViewer = false;
+let recordExamplesSeparately = false;
 
 function processArgs() {
   const usage = `
@@ -28,6 +35,7 @@ function processArgs() {
       --record-examples: Record the example and save the recordings locally for testing
       --record-viewer: Record the viewer while the test is running
       --record-all: Record examples and save the recordings locally, and record the viewer
+      --separate: Record examples in a separate browser instance.
   `;
   for (let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
@@ -48,6 +56,10 @@ function processArgs() {
         shouldRecordViewer = true;
         shouldRecordExamples = true;
         break;
+      case "--separate":
+        shouldRecordExamples = true;
+        recordExamplesSeparately = true;
+        break;
       case "--help":
       case "-h":
       default:
@@ -60,10 +72,6 @@ function processArgs() {
 const DefaultDispatchServer = "wss://dispatch.replay.io";
 
 function processEnvironmentVariables() {
-  /*
-   * RECORD_REPLAY_DONT_RECORD_VIEWER  Disables recording the viewer
-   */
-
   // The INPUT_STRIPE environment variable is set when running as a Github action.
   // This splits testing across multiple machines by having each only do every
   // other stripeCount tests, staggered so that all tests run on some machine.
@@ -73,7 +81,7 @@ function processEnvironmentVariables() {
     stripeCount = +match[2];
 
     shouldRecordViewer = true;
-    shouldRecordExample = true;
+    shouldRecordExamples = true;
   }
 
   // Get the address to use for the dispatch server.
@@ -84,76 +92,90 @@ function elapsedTime() {
   return (Date.now() - startTime) / 1000;
 }
 
-function getContentType(url) {
-  return url.endsWith(".js") ? "text/javascript" : "";
-}
-
 async function runMatchingTests() {
   for (let i = 0; i < Manifest.length; i++) {
     const [test, example] = Manifest[i];
-    const exampleRecordingId = ExampleRecordings[example];
     if (stripeCount && i % stripeCount != stripeIndex) {
       continue;
     }
 
-    // To make tests run faster, we save recordings of the examples locally. This happens just once -
-    // when the test is first run. In subsequent tests that require that example, we simply use the
-    // saved recording of the example instead of making another recording. To re-record an example,
-    // the user can pass in the `--record-examples` or `--record-all` flag to the test runner.
-    const env = {
-      RECORD_REPLAY_RECORD_EXAMPLE: shouldRecordExamples || !exampleRecordingId,
-      RECORD_REPLAY_DONT_RECORD_VIEWER: !shouldRecordViewer,
-      // Don't start processing recordings when they are created while we are
-      // running tests. This reduces server load if we are recording the viewer
-      // itself.
-      RECORD_REPLAY_DONT_PROCESS_RECORDINGS: true,
-      RECORD_REPLAY_TEST_URL:
-        shouldRecordExamples || !exampleRecordingId
-          ? `http://localhost:8080/test/examples/${example}`
-          : `http://localhost:8080/view?id=${exampleRecordingId}&test=${test}`,
-    };
-
-    await runTest("test/harness.js", test, 240, env);
+    await runTest(test, example);
   }
 }
 
 let failures = [];
 
-async function runTest(path, local, timeout = 60, env = {}) {
-  const testURL = env.RECORD_REPLAY_TEST_URL || "";
-  if (
-    patterns.length &&
-    patterns.every(
-      pattern => !path.includes(pattern) && !testURL.includes(pattern) && !local.includes(pattern)
-    )
-  ) {
-    console.log(`Skipping test ${path} ${testURL} ${local}`);
+async function runTest(test, example) {
+  if (patterns.length && patterns.every(pattern => !test.includes(pattern))) {
+    console.log(`Skipping test ${test}`);
     return;
   }
 
-  console.log(`[${elapsedTime()}] Starting test ${path} ${testURL} ${local}`);
-  const testScript = createTestScript({ path });
+  console.log(`[${elapsedTime()}] Starting test ${test}`);
 
-  const profileArgs = [];
+  let exampleRecordingId = ExampleRecordings[example];
+
+  let recordExample = shouldRecordExamples || !exampleRecordingId;
+  if (recordExamplesSeparately) {
+    recordExample = false;
+    exampleRecordingId = await createExampleRecording(
+      `http://localhost:8080/test/examples/${example}`
+    );
+    if (!exampleRecordingId) {
+      failures.push(`Failed test: ${local} no recording created`);
+      console.log(`[${elapsedTime()}] Test failed: no recording created`);
+      return;
+    }
+  }
+
+  // To make tests run faster, we save recordings of the examples locally. This happens just once -
+  // when the test is first run. In subsequent tests that require that example, we simply use the
+  // saved recording of the example instead of making another recording. To re-record an example,
+  // the user can pass in the `--record-examples` or `--record-all` flag to the test runner.
+  const env = {
+    RECORD_REPLAY_RECORD_EXAMPLE: recordExample,
+    RECORD_REPLAY_DONT_RECORD_VIEWER: !shouldRecordViewer,
+    // Don't start processing recordings when they are created while we are
+    // running tests. This reduces server load if we are recording the viewer
+    // itself.
+    RECORD_REPLAY_DONT_PROCESS_RECORDINGS: true,
+    RECORD_REPLAY_TEST_URL:
+      recordExample
+        ? `http://localhost:8080/test/examples/${example}`
+        : `http://localhost:8080/view?id=${exampleRecordingId}&test=${test}&dispatch=${dispatchServer}`,
+  };
+
+  await runTestViewer("test/harness.js", test, 240, env);
+}
+
+function spawnGecko(url, env) {
+  const args = ["-foreground"];
+
   if (!process.env.NORMAL_PROFILE) {
     const profile = tmpFile();
     fs.mkdirSync(profile);
-    profileArgs.push("-profile", profile);
+    args.push("-profile", profile);
+  }
+
+  if (url) {
+    args.push(url);
   }
 
   const geckoPath = findGeckoPath();
+  return spawn(geckoPath, args, { env });
+}
 
-  const gecko = spawn(geckoPath, ["-foreground", ...profileArgs], {
-    env: {
-      ...process.env,
-      ...env,
-      MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
-      RECORD_REPLAY_TEST_SCRIPT: testScript,
-      RECORD_REPLAY_LOCAL_TEST: local,
-      RECORD_REPLAY_NO_UPDATE: "1",
-      RECORD_REPLAY_SERVER: dispatchServer,
-      RECORD_REPLAY_VIEW_HOST: "http://localhost:8080",
-    },
+async function runTestViewer(path, local, timeout = 60, env = {}) {
+  const testScript = createTestScript({ path });
+
+  const gecko = spawnGecko(null, {
+    ...process.env,
+    ...env,
+    MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
+    RECORD_REPLAY_TEST_SCRIPT: testScript,
+    RECORD_REPLAY_LOCAL_TEST: local,
+    RECORD_REPLAY_SERVER: dispatchServer,
+    RECORD_REPLAY_VIEW_HOST: "http://localhost:8080",
   });
 
   let passed = false;
@@ -161,8 +183,7 @@ async function runTest(path, local, timeout = 60, env = {}) {
   // Recording ID of any viewer recording we've detected.
   let recordingId;
 
-  let resolve;
-  const promise = new Promise(r => (resolve = r));
+  const { promise, resolve } = defer();
 
   function processOutput(data) {
     const match = /CreateRecording (.*?) (.*)/.exec(data.toString());
@@ -233,6 +254,40 @@ async function runTest(path, local, timeout = 60, env = {}) {
   await promise;
 }
 
+async function createExampleRecording(url) {
+  console.log(`CREATE_EXAMPLE_RECORDING ${url}`);
+
+  const testScript = createTestScript({ path: `${__dirname}/exampleHarness.js` });
+  const recordingIdFile = tmpFile();
+  const gecko = spawnGecko(url, {
+    ...process.env,
+    MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
+    RECORD_REPLAY_TEST_SCRIPT: testScript,
+    RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
+    RECORD_REPLAY_MATCHING_URL: "localhost",
+    RECORD_REPLAY_SERVER: dispatchServer,
+  });
+
+  if (!process.env.RECORD_REPLAY_NO_TIMEOUT) {
+    setTimeout(() => gecko.kill(), 30 * 1000);
+  };
+
+  gecko.stdout.on("data", data => process.stderr.write(data));
+  gecko.stderr.on("data", data => process.stderr.write(data));
+
+  const { promise, resolve } = defer();
+  gecko.on("close", resolve);
+
+  await promise;
+
+  try {
+    const contents = fs.readFileSync(recordingIdFile).toString().trim();
+    return contents.length ? contents : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 (async function () {
   processArgs();
   processEnvironmentVariables();
@@ -250,13 +305,6 @@ async function runTest(path, local, timeout = 60, env = {}) {
 
   process.exit(failures.length ? 1 : 0);
 })();
-
-function spawnChecked(...args) {
-  const rv = spawnSync.apply(this, args);
-  if (rv.status != 0 || rv.error) {
-    throw new Error("Spawned process failed");
-  }
-}
 
 function addTestRecordingId(recordingId) {
   try {
