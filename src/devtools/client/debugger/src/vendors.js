@@ -17,7 +17,6 @@
  */
 
 // Modules imported with destructuring
-import * as devtoolsComponents from "devtools-components";
 // $FlowIgnore
 import * as devtoolsConfig from "devtools-config";
 import * as devtoolsContextmenu from "devtools-contextmenu";
@@ -39,7 +38,6 @@ import move from "lodash-move";
 // !!! Should remain synchronized with .babel/transform-mc.js !!!
 export const vendored = {
   classnames,
-  "devtools-components": devtoolsComponents,
   "devtools-config": devtoolsConfig,
   "devtools-contextmenu": devtoolsContextmenu,
   "devtools-environment": devtoolsEnvironment,
