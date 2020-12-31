@@ -115,13 +115,17 @@ export class Timeline extends Component {
 
   // Called when hovering over a message in the console.
   onConsoleMessageHover = async (type, message) => {
-    const { setTimelineState } = this.props;
+    const { setTimelineState, currentTime } = this.props;
 
     if (type == "mouseenter") {
       setTimelineState({ hoveredMessageId: message.id });
+      const { screen, mouse } = await getGraphicsAtTime(message.executionPointTime);
+      paintGraphics(screen, mouse);
     }
     if (type == "mouseleave") {
       setTimelineState({ hoveredMessageId: null });
+      const { screen, mouse } = await getGraphicsAtTime(currentTime);
+      paintGraphics(screen, mouse);
     }
   };
 
