@@ -1,12 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 61 (89581) - https://sketch.com -->
-    <title>play-circle-28x28 copy</title>
-    <desc>Created with Sketch.</desc>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="play-circle-28x28-copy" transform="translate(1.000000, 1.000000)">
-            <path d="M9,16.4594 L9,7.5406 C9,7.10955 9.4947,6.85245 9.8641,7.09155 L16.7526,11.551 C17.0825,11.7646 17.0825,12.2354 16.7526,12.449 L9.8641,16.9085 C9.4947,17.1475 9,16.8904 9,16.4594 Z" id="Path" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M24,12 C24,18.6276 18.6276,24 12,24 C5.37259,24 0,18.6275 0,12 C0,5.3726 5.3726,0 12,0 C18.6275,0 24,5.37259 24,12 Z" id="Path" stroke="#000000" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path>
-        </g>
-    </g>
+<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.7692 18.8024V9.19757C10.7692 8.73336 11.302 8.45648 11.6998 8.71398L19.1182 13.5165C19.4735 13.7465 19.4735 14.2535 19.1182 14.4835L11.6998 19.2861C11.302 19.5435 10.7692 19.2666 10.7692 18.8024Z" fill="black"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M26.9231 14C26.9231 21.1374 21.1374 26.9231 14 26.9231C6.86279 26.9231 1.07692 21.1373 1.07692 14C1.07692 6.8628 6.8628 1.07692 14 1.07692C21.1373 1.07692 26.9231 6.86279 26.9231 14Z" stroke="black" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
