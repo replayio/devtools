@@ -22,7 +22,7 @@ export function mutate({ variables = {}, mutation }: { variables: any; mutation:
   return apolloClient.mutate({ variables, mutation });
 }
 
-export const createApolloClient = async (auth0Client: Auth0ContextInterface) => {
+export const createApolloClient = async (auth0Client: Auth0ContextInterface, context: Object) => {
   // NOTE: we do not support auth0 for preview builds
   if (!isDeployPreview() && auth0Client.isLoading) {
     return;
@@ -35,20 +35,21 @@ export const createApolloClient = async (auth0Client: Auth0ContextInterface) => 
       }
     : {
         cache: new InMemoryCache(),
-        link: await createHttpLink(auth0Client),
+        link: await createHttpLink(auth0Client, context),
       };
 
   apolloClient = new ApolloClient(options);
   return apolloClient;
 };
 
-async function createHttpLink(auth0Client: Auth0ContextInterface) {
+async function createHttpLink(auth0Client: Auth0ContextInterface, context) {
   let hasuraToken = await getToken(auth0Client);
 
   return new HttpLink({
     uri: "https://graphql.replay.io/v1/graphql",
     headers: {
       Authorization: `Bearer ${hasuraToken}`,
+      "X-Hasura-Recording-Id": context.recordingId,
     },
     fetch,
   });

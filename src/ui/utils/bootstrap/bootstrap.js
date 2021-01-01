@@ -65,7 +65,7 @@ export async function bootstrapApp(props, context, store) {
         <Auth0Context.Consumer>
           {auth0Client => {
             return (
-              <ApolloProvider client={createApolloClient(auth0Client)}>
+              <ApolloProvider client={createApolloClient(auth0Client, context)}>
                 <Provider store={store}>{React.createElement(App, props)}</Provider>
               </ApolloProvider>
             );
