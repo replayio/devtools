@@ -7,5 +7,5 @@
 // quit the browser.
 (async function() {
   await waitForMessage("Example__Finished");
-  Services.startup.quit(Ci.nsIAppStartup.eForceQuit);
+  Services.startup.quit(Ci.nsIAppStartup.eAttemptQuit);
 })();
