@@ -22,6 +22,10 @@ const GET_COMMENTS = gql`
       created_at
       recording_id
       user_id
+      user {
+        picture
+        name
+      }
       updated_at
       time
       point
