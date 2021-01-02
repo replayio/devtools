@@ -3,7 +3,7 @@
 // Harness for end-to-end tests. Run this from the devtools root directory.
 const fs = require("fs");
 const https = require("https");
-const { spawn } = require("child_process");
+const { spawn, spawnSync } = require("child_process");
 const url = require("url");
 const Manifest = require("./manifest.json");
 const {
@@ -25,6 +25,7 @@ const startTime = Date.now();
 let shouldRecordExamples = false;
 let shouldRecordViewer = false;
 let recordExamplesSeparately = false;
+let nodePath;
 
 function processArgs() {
   const usage = `
@@ -36,6 +37,7 @@ function processArgs() {
       --record-viewer: Record the viewer while the test is running
       --record-all: Record examples and save the recordings locally, and record the viewer
       --separate: Record examples in a separate browser instance.
+      --node: Specify node path to use when recording.
   `;
   for (let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
@@ -59,6 +61,9 @@ function processArgs() {
       case "--separate":
         shouldRecordExamples = true;
         recordExamplesSeparately = true;
+        break;
+      case "--node":
+        nodePath = process.argv[++i];
         break;
       case "--help":
       case "-h":
@@ -113,16 +118,34 @@ async function runTest(test, example) {
 
   console.log(`[${elapsedTime()}] Starting test ${test}`);
 
-  let exampleRecordingId = ExampleRecordings[example];
+  // Recording ID to load in the viewer. If not set, we will record the example
+  // in the browser before stopping and switching to the viewer.
+  let exampleRecordingId = shouldRecordExamples ? null : ExampleRecordings[example];
 
-  let recordExample = shouldRecordExamples || !exampleRecordingId;
-  if (recordExamplesSeparately) {
-    recordExample = false;
-    exampleRecordingId = await createExampleRecording(
+  if (example.endsWith(".js")) {
+    // Node test.
+    if (!exampleRecordingId) {
+      if (!nodePath) {
+        console.log(`Skipping test ${test}: node path not specified`);
+        return;
+      }
+      if (!process.env.RECORD_REPLAY_DRIVER) {
+        console.log(`Skipping test ${test}: RECORD_REPLAY_DRIVER not set`);
+        return;
+      }
+      exampleRecordingId = await createExampleNodeRecording(example);
+      if (!exampleRecordingId) {
+        failures.push(`Failed test: ${example} no node recording created`);
+        console.log(`[${elapsedTime()}] Test failed: no node recording created`);
+        return;
+      }
+    }
+  } else if (recordExamplesSeparately) {
+    exampleRecordingId = await createExampleBrowserRecording(
       `http://localhost:8080/test/examples/${example}`
     );
     if (!exampleRecordingId) {
-      failures.push(`Failed test: ${local} no recording created`);
+      failures.push(`Failed test: ${example} no recording created`);
       console.log(`[${elapsedTime()}] Test failed: no recording created`);
       return;
     }
@@ -133,16 +156,16 @@ async function runTest(test, example) {
   // saved recording of the example instead of making another recording. To re-record an example,
   // the user can pass in the `--record-examples` or `--record-all` flag to the test runner.
   const env = {
-    RECORD_REPLAY_RECORD_EXAMPLE: recordExample,
-    RECORD_REPLAY_DONT_RECORD_VIEWER: !shouldRecordViewer,
+    RECORD_REPLAY_RECORD_EXAMPLE: exampleRecordingId ? undefined : "1",
+    RECORD_REPLAY_RECORD_VIEWER: shouldRecordViewer ? "1" : undefined,
     // Don't start processing recordings when they are created while we are
     // running tests. This reduces server load if we are recording the viewer
     // itself.
     RECORD_REPLAY_DONT_PROCESS_RECORDINGS: true,
     RECORD_REPLAY_TEST_URL:
-      recordExample
-        ? `http://localhost:8080/test/examples/${example}`
-        : `http://localhost:8080/view?id=${exampleRecordingId}&test=${test}&dispatch=${dispatchServer}`,
+      exampleRecordingId
+        ? `http://localhost:8080/view?id=${exampleRecordingId}&test=${test}&dispatch=${dispatchServer}`
+        : `http://localhost:8080/test/examples/${example}`,
   };
 
   await runTestViewer("test/harness.js", test, 240, env);
@@ -254,9 +277,33 @@ async function runTestViewer(path, local, timeout = 60, env = {}) {
   await promise;
 }
 
-async function createExampleRecording(url) {
-  console.log(`CREATE_EXAMPLE_RECORDING ${url}`);
+function getRecordingId(file) {
+  try {
+    const contents = fs.readFileSync(file).toString().trim();
+    return contents.length ? contents : null;
+  } catch (e) {
+    return null;
+  }
+}
 
+async function createExampleNodeRecording(example) {
+  const recordingIdFile = tmpFile();
+  spawnSync(
+    nodePath,
+    [`${__dirname}/examples/node/${example}`],
+    {
+      env: {
+        ...process.env,
+        RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
+        RECORD_REPLAY_DISPATCH: dispatchServer,
+      },
+      stdio: "inherit",
+    },
+  );
+  return getRecordingId(recordingIdFile);
+}
+
+async function createExampleBrowserRecording(url) {
   const testScript = createTestScript({ path: `${__dirname}/exampleHarness.js` });
   const recordingIdFile = tmpFile();
   const gecko = spawnGecko(url, {
@@ -279,13 +326,7 @@ async function createExampleRecording(url) {
   gecko.on("close", resolve);
 
   await promise;
-
-  try {
-    const contents = fs.readFileSync(recordingIdFile).toString().trim();
-    return contents.length ? contents : null;
-  } catch (e) {
-    return null;
-  }
+  return getRecordingId(recordingIdFile);
 }
 
 (async function () {

@@ -8,8 +8,8 @@ dump(`TestHarnessStart\n`);
 
 // env is declared in the scope this is evaluated in.
 const url = env.get("RECORD_REPLAY_TEST_URL");
-const recordExample = env.get("RECORD_REPLAY_RECORD_EXAMPLE") == "true";
-const recordViewer = env.get("RECORD_REPLAY_DONT_RECORD_VIEWER") == "false";
+const recordExample = env.get("RECORD_REPLAY_RECORD_EXAMPLE");
+const recordViewer = env.get("RECORD_REPLAY_RECORD_VIEWER");
 
 (async function() {
   await openUrlInTab(url, "localhost");
