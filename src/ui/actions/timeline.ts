@@ -273,6 +273,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
         return dispatch(setTimelineState({ currentTime: endTime, playback: null }));
       }
 
+      dispatch({ type: "RESUME" });
       dispatch(
         setTimelineState({
           currentTime,

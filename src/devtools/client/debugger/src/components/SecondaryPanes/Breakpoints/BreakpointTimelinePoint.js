@@ -1,29 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { connect } from "../../../utils/connect";
+import { connect } from "devtools/client/debugger/src/utils/connect";
 import classnames from "classnames";
-import { selectors } from "../../../../../../../ui/reducers";
+import { selectors } from "ui/reducers";
+import { timelineMarkerWidth as pointWidth } from "ui/constants";
 const { getAnalysisPointsForLocation } = selectors;
 import { actions } from "ui/actions";
 import { Marker } from "ui/components/Timeline/Message";
-import { getThreadExecutionPoint } from "../../../reducers/pause";
-import { timelineMarkerWidth as pointWidth } from "../../../../../../../ui/constants";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 
-function getClassnameObject(point, executionPoint) {
-  const classObj = { past: false, pause: false, future: false };
-
-  if (!executionPoint) {
-    return classObj;
-  }
-
-  if (BigInt(point) < BigInt(executionPoint)) {
-    classObj.past = true;
-  } else if (BigInt(point) > BigInt(executionPoint)) {
-    classObj.future = true;
-  } else {
-    classObj.pause = true;
-  }
-
-  return classObj;
+function toBigInt(num) {
+  return num ? BigInt(num) : undefined;
 }
 
 export function getLeftPercentOffset({ point, timelineNode, zoomRegion, markerWidth }) {
@@ -50,32 +36,28 @@ function BreakpointTimelinePoint({
   seek,
 }) {
   const [leftPercentOffset, setLeftPercentOffset] = useState(0);
-  const classnameObj = getClassnameObject(point.point, executionPoint);
-
-  // Hide the point if there is no execution point, which happens in between pauses when using the
-  // command bar's resume button.
-  const opacity = executionPoint ? "1" : "0";
 
   useEffect(() => {
-    const offset = getLeftPercentOffset({
-      point,
-      timelineNode,
-      zoomRegion,
-      markerWidth: pointWidth,
-    });
-
-    setLeftPercentOffset(offset);
-  });
+    setLeftPercentOffset(
+      getLeftPercentOffset({
+        point,
+        timelineNode,
+        zoomRegion,
+        markerWidth: pointWidth,
+      })
+    );
+  }, [point, timelineNode, zoomRegion]);
 
   return (
     <div
-      className={classnames("breakpoint-navigation-timeline-point", classnameObj)}
+      className={classnames("breakpoint-navigation-timeline-point", {
+        past: toBigInt(point.point) < toBigInt(executionPoint),
+        future: toBigInt(point.point) > toBigInt(executionPoint),
+        pause: toBigInt(point.point) == toBigInt(executionPoint),
+      })}
       title={`${index + 1}/${analysisPoints.length}`}
       onClick={() => seek(point.point, point.time, true)}
-      style={{
-        left: `${leftPercentOffset}%`,
-        opacity: opacity,
-      }}
+      style={{ left: `${leftPercentOffset}%` }}
     >
       <Marker onMarkerClick={() => {}} />
     </div>
@@ -85,7 +67,7 @@ function BreakpointTimelinePoint({
 export default connect(
   (state, { breakpoint }) => ({
     analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
-    executionPoint: getThreadExecutionPoint(state),
+    executionPoint: getExecutionPoint(state),
     zoomRegion: selectors.getZoomRegion(state),
     recordingDuration: selectors.getRecordingDuration(state),
   }),

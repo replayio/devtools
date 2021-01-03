@@ -13,14 +13,8 @@ import { inDebuggerEval } from "../../utils/pause";
  * @memberof actions/pause
  * @static
  */
-export function resumed(thread) {
-  return async ({ dispatch, client, getState }) => {
-    const why = getPauseReason(getState(), thread);
-    const wasPausedInEval = inDebuggerEval(why);
-    const wasStepping = isStepping(getState(), thread);
-
-    dispatch({ type: "RESUME", thread, wasStepping });
-
-    const cx = getThreadContext(getState());
+export function resumed() {
+  return async ({ dispatch }) => {
+    dispatch({ type: "RESUME" });
   };
 }

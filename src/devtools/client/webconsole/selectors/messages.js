@@ -10,6 +10,8 @@ const {
 } = require("devtools/client/webconsole/utils/messages");
 const { pointPrecedes } = require("protocol/execution-point-utils");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
+const { getCurrentTime } = require("ui/reducers/timeline");
+const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 import { createSelector } from "reselect";
 
@@ -20,8 +22,6 @@ export const getCurrentGroup = state => state.messages.currentGroup;
 export const getFilteredMessagesCount = state => state.messages.filteredMessagesCount;
 export const getAllRepeatById = state => state.messages.repeatById;
 export const getGroupsById = state => state.messages.groupsById;
-export const getPausedExecutionPoint = state => state.messages.pausedExecutionPoint;
-export const getPausedExecutionPointTime = state => state.messages.pausedExecutionPointTime;
 export const getAllWarningGroupsById = state => state.messages.warningGroupsById;
 
 function messageTime(msg) {
@@ -65,9 +65,10 @@ function messageExecutionPoint(msg) {
 export const getClosestMessage = createSelector(
   getVisibleMessages,
   getAllMessagesById,
-  getPausedExecutionPoint,
-  (visibleMessages, messages, executionPoint) => {
-    if (!executionPoint || !visibleMessages || !visibleMessages.length) {
+  getExecutionPoint,
+  getCurrentTime,
+  (visibleMessages, messages, executionPoint, currentTime) => {
+    if ((!executionPoint && !currentTime) || !visibleMessages || !visibleMessages.length) {
       return null;
     }
 
@@ -86,8 +87,15 @@ export const getClosestMessage = createSelector(
       }
 
       const point = messageExecutionPoint(msg);
-      if (point && pointPrecedes(executionPoint, point)) {
-        break;
+      const time = msg.executionPointTime;
+      if (executionPoint) {
+        if (point && pointPrecedes(executionPoint, point)) {
+          break;
+        }
+      } else {
+        if (time && currentTime < time) {
+          break;
+        }
       }
 
       last = msg;

@@ -1,4 +1,5 @@
-import { Store } from "redux";
+import { Action, Store } from "redux";
+
 import * as appActions from "./app";
 import * as timelineActions from "./timeline";
 import * as metadataActions from "./metadata";
@@ -15,13 +16,16 @@ import { SessionAction } from "ui/actions/session";
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 const consoleActions = require("devtools/client/webconsole/actions");
 
+type DebuggerAction = Action<"RESUME">;
+
 export type UIAction =
   | AppAction
   | MetadataAction
   | TimelineAction
   | MarkupAction
   | EventTooltipAction
-  | SessionAction;
+  | SessionAction
+  | DebuggerAction;
 
 interface ThunkExtraArgs {
   client: any;
