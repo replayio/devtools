@@ -4,7 +4,7 @@ import { defer, EventEmitter } from "protocol/utils";
 import { actions } from "ui/actions";
 
 import { DebuggerPanel } from "devtools/client/debugger/panel";
-import { InspectorPanel } from "devtools/client/inspector/panel";
+import { Inspector } from "devtools/client/inspector/inspector";
 import Selection from "devtools/client/framework/selection";
 
 /**
@@ -54,11 +54,14 @@ export class DevToolsToolbox {
 
     const panels = {
       debugger: DebuggerPanel,
-      inspector: InspectorPanel,
+      inspector: Inspector,
     };
 
     const panel = new panels[name](this);
-    await panel.open();
+
+    if (name !== "inspector") {
+      await panel.open();
+    }
 
     this.panels[name] = panel;
     store.dispatch(actions.setInitializedPanels(name));
