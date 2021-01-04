@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 
 import Timeline from "../Timeline";
 import Tooltip from "../Tooltip";
+import Video from "../Video";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
@@ -57,14 +58,11 @@ function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
 
   useEffect(() => {
     installObserver();
-  }, []);
+  }, [narrowMode]);
 
   const viewer = (
-    <div id="outer-viewer">
-      <div id="viewer">
-        <canvas id="graphics"></canvas>
-        <div id="highlighter-root"></div>
-      </div>
+    <div className="vertical-panels">
+      <Video />
       <div id="timeline-container">
         <Timeline />
         <Tooltip />
@@ -101,14 +99,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
           onMove={handleMove}
           maxSize="80%"
           vert={false}
-          startPanel={
-            <div id="outer-viewer">
-              <div id="viewer">
-                <canvas id="graphics"></canvas>
-                <div id="highlighter-root"></div>
-              </div>
-            </div>
-          }
+          startPanel={<Video />}
           endPanel={rightSidebar}
           endPanelControl={false}
         />

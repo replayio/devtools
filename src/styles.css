@@ -76,6 +76,7 @@
 #command-button-pick::before {
   background: var(--theme-icon-color);
 }
+
 #command-button-pick::after {
   width: 1px;
   position: absolute;
