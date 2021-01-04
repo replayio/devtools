@@ -9,7 +9,7 @@ function Video({ togglePlayback }) {
   }, []);
 
   return (
-    <div id="viewer" onClick={togglePlayback}>
+    <div id="video" onClick={togglePlayback}>
       <canvas id="graphics"></canvas>
       <div id="highlighter-root"></div>
     </div>
