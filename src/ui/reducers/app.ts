@@ -25,6 +25,7 @@ function initialAppState(): AppState {
     viewMode: prefs.viewMode,
     narrowMode: false,
     hoveredLineNumberLocation: null,
+    isNodePickerActive: false,
   };
 }
 
@@ -122,6 +123,13 @@ export default function update(state = initialAppState(), action: AppAction | Se
       };
     }
 
+    case "set_is_node_picker_active": {
+      return {
+        ...state,
+        isNodePickerActive: action.active,
+      };
+    }
+
     default: {
       return state;
     }
@@ -152,3 +160,4 @@ export const getPointsForHoveredLineNumber = (state: UIState) => {
   return getAnalysisPointsForLocation(state, location);
 };
 export const getEventsForType = (state: UIState, type: string) => state.app.events[type] || [];
+export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;

@@ -42,6 +42,7 @@ export type SetNarrowMode = Action<"set_narrow_mode"> & { narrowMode: boolean };
 export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_location"> & {
   location: Location | null;
 };
+export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
 
 export type AppAction =
   | SetupAppAction
@@ -59,7 +60,8 @@ export type AppAction =
   | SetEventsForType
   | SetViewMode
   | SetNarrowMode
-  | SetHoveredLineNumberLocation;
+  | SetHoveredLineNumberLocation
+  | SetIsNodePickerActive;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -211,4 +213,8 @@ export function updateNarrowMode(viewportWidth: number): UIThunkAction {
 
 export function setHoveredLineNumberLocation(location: Location): SetHoveredLineNumberLocation {
   return { type: "set_hovered_line_number_location", location };
+}
+
+export function setIsNodePickerActive(active: boolean): SetIsNodePickerActive {
+  return { type: "set_is_node_picker_active", active };
 }

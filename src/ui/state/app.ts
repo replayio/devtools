@@ -46,6 +46,7 @@ export interface AppState {
   narrowMode: boolean;
   hoveredLineNumberLocation: Location | null;
   events: Events;
+  isNodePickerActive: boolean;
 }
 
 export interface AnalysisPoints {

@@ -1,4 +1,7 @@
 import React from "react";
+import { connect } from "react-redux";
+import { actions } from "ui/actions";
+
 import { EventEmitter } from "protocol/utils";
 import classnames from "classnames";
 import { ThreadFront } from "protocol/thread";
@@ -7,7 +10,7 @@ import Highlighter from "highlighter/highlighter";
 
 export const nodePicker = {};
 
-export default class NodePicker extends React.Component {
+class NodePicker extends React.Component {
   state = {};
   lastPickerPosition = null;
 
@@ -41,16 +44,17 @@ export default class NodePicker extends React.Component {
 
     ThreadFront.loadMouseTargets();
     this.addNodePickerListeners();
+    this.props.setIsNodePickerActive(true);
   }
 
   addNodePickerListeners() {
     document.body.addEventListener("mousemove", this.nodePickerMouseMove);
-    document.body.addEventListener("mousedown", this.nodePickerMouseClick);
+    document.body.addEventListener("mouseup", this.nodePickerMouseClick);
   }
 
   removeNodePickerListeners() {
     document.body.removeEventListener("mousemove", this.nodePickerMouseMove);
-    document.body.removeEventListener("mousedown", this.nodePickerMouseClick);
+    document.body.removeEventListener("mouseup", this.nodePickerMouseClick);
   }
 
   // Get the x/y coordinate of a mouse event wrt the recording's DOM.
@@ -91,6 +95,7 @@ export default class NodePicker extends React.Component {
   };
 
   nodePickerMouseClick = e => {
+    this.props.setIsNodePickerActive(false);
     this.nodePickerMouseClickInCanvas(this.mouseEventCanvasPosition(e));
     gToolbox.selectTool("inspector");
   };
@@ -127,3 +132,7 @@ export default class NodePicker extends React.Component {
     );
   }
 }
+
+export default connect(null, {
+  setIsNodePickerActive: actions.setIsNodePickerActive,
+})(NodePicker);
