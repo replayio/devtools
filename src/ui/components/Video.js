@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
+import { installObserver } from "../../protocol/graphics";
 
 function Video({ togglePlayback }) {
+  useEffect(() => {
+    installObserver();
+  }, []);
+
   return (
     <div id="viewer" onClick={togglePlayback}>
       <canvas id="graphics"></canvas>

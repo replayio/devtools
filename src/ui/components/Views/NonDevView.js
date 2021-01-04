@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { connect } from "react-redux";
 
 import Timeline from "../Timeline";
@@ -9,7 +9,6 @@ import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
 import Dropdown from "ui/components/shared/Dropdown";
 
-import { installObserver } from "../../../protocol/graphics";
 import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
@@ -55,10 +54,6 @@ export function TranscriptOptions({ showClicks, setShowClicks, clickEvents }) {
 
 function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
   const [showClicks, setShowClicks] = useState(true);
-
-  useEffect(() => {
-    installObserver();
-  }, [narrowMode]);
 
   const viewer = (
     <div className="vertical-panels">
