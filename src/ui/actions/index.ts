@@ -3,6 +3,7 @@ import { Action, Store } from "redux";
 import * as appActions from "./app";
 import * as timelineActions from "./timeline";
 import * as metadataActions from "./metadata";
+import * as sessionActions from "./session";
 import { ThunkAction } from "ui/utils/thunk";
 import { UIState } from "ui/state";
 import type { AppAction } from "./app";
@@ -49,4 +50,5 @@ export const actions = {
   ...eventListeners,
   ...debuggerActions,
   ...consoleActions,
+  ...sessionActions,
 };

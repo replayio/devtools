@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import Header from "./Header/index";
@@ -20,6 +20,16 @@ const GET_RECORDING = gql`
       recordingTitle
       is_private
       date
+    }
+  }
+`;
+
+const CREATE_SESSION = gql`
+  mutation CreateSession($object: sessions_insert_input!) {
+    insert_sessions_one(object: $object) {
+      id
+      controller_id
+      recording_id
     }
   }
 `;
@@ -61,6 +71,7 @@ function DevTools({
   expectedError,
   setExpectedError,
   selectedPanel,
+  sessionId,
   viewMode,
 }) {
   const [recordingLoaded, setRecordingLoaded] = useState(false);
@@ -68,6 +79,7 @@ function DevTools({
   const { data, loading: queryIsLoading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
   });
+  const [CreateSession] = useMutation(CREATE_SESSION);
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -78,6 +90,17 @@ function DevTools({
       gToolbox.init(selectedPanel);
     }
   }, [recordingLoaded]);
+
+  useEffect(() => {
+    if (recordingLoaded && auth.user && sessionId) {
+      const object = {
+        id: sessionId,
+        recording_id: recordingId,
+        controller_id: sessionId.split("/")[0],
+      };
+      CreateSession({ variables: { object } });
+    }
+  }, [recordingLoaded, auth.user, sessionId]);
 
   if (expectedError) {
     return null;

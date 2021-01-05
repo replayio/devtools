@@ -6,7 +6,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 import DevTools from "./DevTools";
 import Account from "./Account";
 import Loader from "./shared/Loader";
-import UserAuthentication from "./UserAuthentication";
 import { AppErrors, PopupBlockedError } from "./shared/Error";
 import SharingModal from "./shared/SharingModal";
 import { isDeployPreview } from "ui/utils/environment";
@@ -16,6 +15,7 @@ import { hasLoadingParam } from "ui/utils/environment";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 
 import "styles.css";
+import { setUserInBrowserPrefs } from "ui/utils/browser";
 
 function useGetApolloClient() {
   const [apolloClient, setApolloClient] = useState(null);
@@ -55,7 +55,7 @@ function installViewportObserver({ updateNarrowMode }) {
   observer.observe(viewport);
 }
 
-function App({ theme, recordingId, modal, updateNarrowMode, updateUser, sessionId }) {
+function App({ theme, recordingId, modal, updateNarrowMode, updateUser }) {
   const { apolloClient, consentPopupBlocked } = useGetApolloClient();
   const auth = useAuth0();
 
@@ -63,6 +63,11 @@ function App({ theme, recordingId, modal, updateNarrowMode, updateUser, sessionI
     document.body.parentElement.className = theme;
     installViewportObserver({ updateNarrowMode });
   }, [theme]);
+
+  useEffect(() => {
+    setUserInBrowserPrefs(auth.user);
+    updateUser(auth.user);
+  }, [auth.user]);
 
   if (consentPopupBlocked) {
     return <PopupBlockedError />;
@@ -74,7 +79,6 @@ function App({ theme, recordingId, modal, updateNarrowMode, updateUser, sessionI
 
   return (
     <ApolloProvider client={apolloClient}>
-      <UserAuthentication />
       {recordingId ? <DevTools /> : <Account />}
       {modal?.type === "sharing" ? <SharingModal /> : null}
       <AppErrors />
