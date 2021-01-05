@@ -1,7 +1,7 @@
 import React from "react";
 import classnames from "classnames";
 import { compareNumericStrings } from "../../../../../../../protocol/utils";
-import { getThreadExecutionPoint } from "../../../reducers/pause";
+import { getExecutionPoint } from "../../../reducers/pause";
 import { connect } from "../../../utils/connect";
 import { selectors } from "ui/reducers";
 const { getAnalysisPointsForLocation } = selectors;
@@ -99,7 +99,7 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints }) {
 
 const mapStateToProps = (state, { breakpoint }) => ({
   analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
-  executionPoint: getThreadExecutionPoint(state),
+  executionPoint: getExecutionPoint(state),
 });
 
 export default connect(mapStateToProps, {

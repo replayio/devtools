@@ -11,7 +11,7 @@ import {
   getFramePositions,
   getSelectedFrame,
   getThreadContext,
-  getThreadExecutionPoint,
+  getExecutionPoint,
 } from "../../selectors";
 
 import { getSelectedLocation } from "../../reducers/sources";
@@ -203,7 +203,7 @@ class FrameTimeline extends Component {
 const mapStateToProps = state => {
   const thread = getThreadContext(state).thread;
   const selectedFrame = getSelectedFrame(state, thread);
-  const executionPoint = getThreadExecutionPoint(state, thread);
+  const executionPoint = getExecutionPoint(state, thread);
 
   return {
     framePositions: getFramePositions(state),

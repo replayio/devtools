@@ -37,15 +37,6 @@ export function setupMessages(store) {
   ThreadFront.findConsoleMessages((_, msg) => store.dispatch(onConsoleMessage(msg)));
 }
 
-export function setupThreadEventListeners(store) {
-  ThreadFront.on("paused", ({ point, time }) =>
-    store.dispatch(setPauseExecutionPoint(point, time))
-  );
-  ThreadFront.on("instantWarp", ({ point, time }) =>
-    store.dispatch(setPauseExecutionPoint(point, time))
-  );
-}
-
 function convertStack(stack, { frames }) {
   if (!stack) {
     return null;

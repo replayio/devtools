@@ -183,7 +183,6 @@ function update(state = createPauseState(), action) {
       return {
         ...state,
         ...resumedPauseState,
-        wasStepping: !!action.wasStepping,
         expandedScopes: new Set(),
         lastExpandedScopes: [state.expandedScopes],
       };
@@ -272,10 +271,6 @@ export function getPauseCommand(state) {
   return state.pause.command;
 }
 
-export function wasStepping(state) {
-  return state.pause.wasStepping;
-}
-
 export function isStepping(state) {
   return ["stepIn", "stepOver", "stepOut"].includes(getPauseCommand(state));
 }
@@ -345,7 +340,7 @@ export function isTopFrame(state) {
   return topFrame == selectedFrame;
 }
 
-export function getThreadExecutionPoint(state) {
+export function getExecutionPoint(state) {
   return state.pause.executionPoint;
 }
 
@@ -363,7 +358,7 @@ export function getPausePreviewLocation(state) {
 
 export function getResumePoint(state, type) {
   const framePoints = getFramePositions(state)?.positions.map(p => p.point);
-  const executionPoint = getThreadExecutionPoint(state);
+  const executionPoint = getExecutionPoint(state);
 
   if (!framePoints || isTopFrame(state)) {
     return null;

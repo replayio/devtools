@@ -8,7 +8,7 @@ const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
 const actions = require("devtools/client/webconsole/actions/index");
 const ReactDOM = require("react-dom");
-const selectors = require("devtools/client/webconsole/selectors/messages");
+const { selectors } = require("ui/reducers");
 
 const PropTypes = require("prop-types");
 const {
@@ -170,7 +170,7 @@ function scrollToBottom(node) {
 
 function mapStateToProps(state, props) {
   return {
-    pausedExecutionPoint: selectors.getPausedExecutionPoint(state),
+    pausedExecutionPoint: selectors.getExecutionPoint(state),
     closestMessage: selectors.getClosestMessage(state),
     messages: selectors.getAllMessagesById(state),
     visibleMessages: selectors.getVisibleMessages(state),

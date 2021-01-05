@@ -30,7 +30,7 @@ import {
   getSourceByURL,
   getActiveSearch,
   getSelectedSource,
-  getThreadExecutionPoint,
+  getExecutionPoint,
 } from "../../selectors";
 
 export const setSelectedLocation = (cx, source, location) => ({
@@ -168,7 +168,7 @@ export function showAlternateSource(oldSource, newSource) {
       ThreadFront.preferSource(oldSource.id, false);
     }
 
-    const executionPoint = getThreadExecutionPoint(getState());
+    const executionPoint = getExecutionPoint(getState());
     await dispatch(paused({ executionPoint }));
   };
 }

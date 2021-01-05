@@ -6,7 +6,7 @@
 
 import {
   getThreadContext,
-  getThreadExecutionPoint,
+  getExecutionPoint,
   getResumePoint,
   getFramePositions,
 } from "../../selectors";
@@ -30,7 +30,7 @@ export function command(cx, type) {
     const { dispatch, getState, client } = thunkArgs;
     log(`Debugger CommandStart ${type}`);
 
-    const point = getThreadExecutionPoint(getState());
+    const point = getExecutionPoint(getState());
 
     if (!type) {
       return;

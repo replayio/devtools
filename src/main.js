@@ -30,7 +30,6 @@ const { setupMessages } = require("devtools/client/webconsole/actions/messages")
 const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { DevToolsToolbox } = require("ui/utils/devtools-toolbox");
-const { setupThreadEventListeners } = require("devtools/client/webconsole/actions/messages");
 const { createSession } = require("ui/actions/session");
 const {
   initOutputSyntaxHighlighting,
@@ -68,8 +67,6 @@ async function initialize() {
 (async () => {
   window.gToolbox = new DevToolsToolbox();
   store = await bootstrapStore();
-  setupThreadEventListeners(store);
-
   await bootstrapApp({}, { recordingId }, store);
 
   if (!initialized) {

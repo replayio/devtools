@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { actions as UIActions } from "../../../../../../../ui/actions";
-import { timelineMarkerWidth as pointWidth } from "../../../../../../../ui/constants";
-import { connect } from "../../../utils/connect";
-import { selectors } from "../../../../../../../ui/reducers";
-const { getAnalysisPointsForLocation } = selectors;
-import BreakpointTimelinePoint, { getLeftPercentOffset } from "./BreakpointTimelinePoint";
+import { actions as UIActions } from "ui/actions";
+import { selectors } from "ui/reducers";
+import { timelineMarkerWidth as pointWidth } from "ui/constants";
+import { connect } from "devtools/client/debugger/src/utils/connect";
+import BreakpointTimelinePoint from "./BreakpointTimelinePoint";
 
 function getNewZoomRegion(zoomRegion, analysisPoints) {
   let newZoomRegion = {
@@ -63,7 +62,7 @@ function BreakpointTimeline({
   currentTime,
 }) {
   const timelineNode = useRef();
-  const [mounted, setMounted] = useState(false);
+  const [, setMounted] = useState(false);
   const title = "Cmd + click to zoom into these points";
 
   // Trigger a re-render on mount so that we can pass down the correct timelineNode.
@@ -108,7 +107,7 @@ function BreakpointTimeline({
 
 export default connect(
   (state, { breakpoint }) => ({
-    analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
+    analysisPoints: selectors.getAnalysisPointsForLocation(state, breakpoint.location),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
   }),

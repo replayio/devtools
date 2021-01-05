@@ -9,7 +9,7 @@ import actions from "../../../actions";
 import { getTruncatedFileName, getSourceQueryString, getFileURL } from "../../../utils/source";
 import { getHasSiblingOfSameName, getContext } from "../../../selectors";
 import { features } from "../../../utils/prefs";
-import { getThreadExecutionPoint } from "../../../reducers/pause";
+import { getExecutionPoint } from "../../../reducers/pause";
 import { selectors } from "../../../../../../../ui/reducers";
 import { CloseButton } from "../../shared/Button";
 
@@ -72,7 +72,7 @@ class BreakpointHeading extends PureComponent {
 const mapStateToProps = (state, { source, breakpoint }) => ({
   cx: getContext(state),
   hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
-  executionPoint: getThreadExecutionPoint(state),
+  executionPoint: getExecutionPoint(state),
 });
 
 export default connect(mapStateToProps, {
