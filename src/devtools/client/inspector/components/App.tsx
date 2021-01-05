@@ -4,10 +4,7 @@ const classnames = require("classnames");
 import { UIState } from "ui/state";
 import * as InspectorActions from "../actions";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import SidebarToggle from "devtools/client/shared/components/SidebarToggle";
 const { prefs } = require("devtools/client/inspector/prefs");
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 const RulesApp = require("devtools/client/inspector/rules/components/RulesApp");
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
@@ -95,12 +92,12 @@ class InspectorApp extends Component<PropsFromRedux> {
       rulesPanel = {
         id: "ruleview",
         title: "Rules",
-        panel: <RulesApp {...inspector._inspector.rules.getRulesProps()} />,
+        panel: <RulesApp {...inspector.rules.getRulesProps()} />,
       };
 
       const layoutProps = {
-        ...inspector._inspector.getCommonComponentProps(),
-        ...inspector._inspector.boxModel.getComponentProps(),
+        ...inspector.getCommonComponentProps(),
+        ...inspector.boxModel.getComponentProps(),
         showBoxModelProperties: true,
       };
       layoutPanel = {
@@ -182,9 +179,9 @@ class InspectorApp extends Component<PropsFromRedux> {
     const inspector = gToolbox.getPanel("inspector");
     let markupView, rulesView;
     if (inspector && initializedPanels.includes("inspector")) {
-      markupView = <MarkupApp inspector={inspector._inspector} />;
+      markupView = <MarkupApp inspector={inspector} />;
       if (is3PaneModeEnabled) {
-        rulesView = <RulesApp {...inspector._inspector.rules.getRulesProps()} />;
+        rulesView = <RulesApp {...inspector.rules.getRulesProps()} />;
       }
     }
 
