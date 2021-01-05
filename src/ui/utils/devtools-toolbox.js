@@ -76,7 +76,7 @@ export class DevToolsToolbox {
     // recordingLoaded however if we start at the "Comments"
     // tab it runs and throws an error at startPanel() above
     // because the comments panel isn't handled by the toolbox
-    if (name === "console" || name === "comments") {
+    if (["console", "comments", "viewer"].includes(name)) {
       return;
     }
 

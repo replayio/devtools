@@ -200,6 +200,18 @@ export function seekToTime(targetTime: number): UIThunkAction {
   };
 }
 
+export function togglePlayback(): UIThunkAction {
+  return ({ dispatch, getState }) => {
+    const playback = selectors.getPlayback(getState());
+
+    if (playback) {
+      dispatch(stopPlayback());
+    } else {
+      dispatch(startPlayback());
+    }
+  };
+}
+
 export function startPlayback(): UIThunkAction {
   return ({ dispatch, getState }) => {
     log(`StartPlayback`);

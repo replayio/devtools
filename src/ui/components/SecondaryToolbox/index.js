@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import classnames from "classnames";
 
 import CommentsPanel from "./CommentsPanel";
+import Video from "../Video";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
 
@@ -10,7 +11,6 @@ import "./SecondaryToolbox.css";
 import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
 import { actions } from "../../actions";
-import { installObserver } from "../../../protocol/graphics";
 
 function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
   const onClick = panel => {
@@ -76,21 +76,6 @@ function InspectorPanel() {
   );
 }
 
-function ViewerPanel() {
-  useEffect(() => {
-    installObserver();
-  }, []);
-
-  return (
-    <div id="outer-viewer" style={{ height: "100%" }}>
-      <div id="viewer">
-        <canvas id="graphics"></canvas>
-        <div id="highlighter-root"></div>
-      </div>
-    </div>
-  );
-}
-
 function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
   return (
     <div className="secondary-toolbox">
@@ -105,7 +90,7 @@ function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
         {selectedPanel == "console" ? <ConsolePanel /> : null}
         {selectedPanel == "comments" ? <CommentsPanel /> : null}
         {selectedPanel == "inspector" ? <InspectorPanel /> : null}
-        {selectedPanel == "viewer" && narrowMode ? <ViewerPanel /> : null}
+        {selectedPanel == "viewer" && narrowMode ? <Video /> : null}
       </div>
     </div>
   );

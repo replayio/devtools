@@ -302,12 +302,12 @@ function drawClick(cx: CanvasRenderingContext2D, x: number, y: number) {
 }
 
 export function refreshGraphics() {
-  const viewer = document.getElementById("viewer");
-  if (!viewer) {
+  const video = document.getElementById("video");
+  if (!video) {
     return;
   }
 
-  const bounds = viewer.getBoundingClientRect();
+  const bounds = video.getBoundingClientRect();
   const canvas = document.getElementById("graphics") as HTMLCanvasElement;
 
   // Find an image to draw.
@@ -365,7 +365,7 @@ export function refreshGraphics() {
 
 // Install an observer to refresh graphics whenever the content canvas is resized.
 export function installObserver() {
-  const canvas = document.getElementById("viewer");
+  const canvas = document.getElementById("video");
   if (canvas) {
     refreshGraphics();
     const observer = new ResizeObserverPolyfill(() => {

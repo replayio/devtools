@@ -9,21 +9,12 @@
   --faint-red: rgba(255, 0, 0, 0.5);
 }
 
-#viewer {
+#video {
+  height: 100%;
   position: relative;
   overflow: hidden;
   flex-grow: 1;
   background-image: url("/images/playbackBG.png");
-}
-
-#outer-viewer {
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background-color: #ececec;
-  flex-grow: 1;
-  position: relative;
-  padding-left: 1px;
 }
 
 .collapsed-toolbox {
@@ -76,6 +67,7 @@
 #command-button-pick::before {
   background: var(--theme-icon-color);
 }
+
 #command-button-pick::after {
   width: 1px;
   position: absolute;
