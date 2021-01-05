@@ -1,5 +1,6 @@
 import { defer, makeInfallible } from "./utils";
 import { ProtocolClient } from "@recordreplay/protocol";
+import { setExpectedError } from "ui/actions/session";
 
 interface Message {
   id: number;
@@ -113,6 +114,12 @@ function onSocketMessage(evt: MessageEvent<any>) {
 function onSocketClose() {
   setStatus("Disconnected.");
   log("Socket Closed");
+
+  store.dispatch(
+    setExpectedError({
+      message: "Session has closed due to inactivity, please refresh the page.",
+    })
+  );
 }
 
 function onSocketError() {
