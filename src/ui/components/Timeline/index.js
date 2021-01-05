@@ -186,7 +186,7 @@ export class Timeline extends Component {
   }
 
   renderMessages() {
-    const { messages, currentTime, hoveredMessageId, zoomRegion } = this.props;
+    const { messages, currentTime, hoveredMessage, zoomRegion } = this.props;
 
     return (
       <div className="message-container">
@@ -197,7 +197,7 @@ export class Timeline extends Component {
             key={index}
             messages={messages}
             currentTime={currentTime}
-            hoveredMessageId={hoveredMessageId}
+            hoveredMessage={hoveredMessage}
             zoomRegion={zoomRegion}
             overlayWidth={this.overlayWidth}
             onMarkerClick={this.onMarkerClick}
@@ -239,12 +239,20 @@ export class Timeline extends Component {
   }
 
   render() {
-    const { loaded, zoomRegion, currentTime, hoverTime, hoveredLineNumberLocation } = this.props;
+    const {
+      loaded,
+      zoomRegion,
+      currentTime,
+      hoverTime,
+      hoveredLineNumberLocation,
+      hoveredMessage,
+    } = this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
+    const shouldDim = hoveredLineNumberLocation || hoveredMessage;
 
     return (
-      <div className={classnames("timeline", { dimmed: !!hoveredLineNumberLocation })}>
+      <div className={classnames("timeline", { dimmed: shouldDim })}>
         {this.renderCommands()}
         <div className={classnames("progress-bar-container", { paused: true })}>
           <div
@@ -274,7 +282,7 @@ export default connect(
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
     playback: selectors.getPlayback(state),
-    hoveredMessageId: selectors.getHoveredMessageId(state),
+    hoveredMessage: selectors.getHoveredMessage(state),
     recordingDuration: selectors.getRecordingDuration(state),
     timelineDimensions: selectors.getTimelineDimensions(state),
     messages: selectors.getMessagesForTimeline(state),
@@ -282,6 +290,7 @@ export default connect(
     selectedPanel: selectors.getSelectedPanel(state),
     hoveredLineNumberLocation: selectors.getHoveredLineNumberLocation(state),
     pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
+    hoveredMessage: selectors.getHoveredMessage(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,

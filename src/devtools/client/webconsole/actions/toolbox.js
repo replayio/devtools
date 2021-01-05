@@ -5,9 +5,9 @@
 "use strict";
 
 import { ThreadFront } from "protocol/thread";
-import { setTimelineState } from "ui/actions/timeline";
 import { paintGraphicsAtTime } from "protocol/graphics";
 import { selectors } from "ui/reducers";
+import { actions } from "ui/actions";
 
 export function highlightDomElement(grip) {
   return ({ toolbox }) => {
@@ -48,11 +48,18 @@ export function openNodeInInspector(valueFront) {
 export function onMessageHover(type, message) {
   return ({ dispatch, getState }) => {
     if (type == "mouseenter") {
-      dispatch(setTimelineState({ hoveredMessageId: message.id }));
+      const hoveredMessage = {
+        point: message.executionPoint,
+        time: message.executionPointTime,
+        location: message.frame,
+      };
+
+      dispatch(actions.setHoveredMessage(hoveredMessage));
       paintGraphicsAtTime(message.executionPointTime);
     }
+
     if (type == "mouseleave") {
-      dispatch(setTimelineState({ hoveredMessageId: null }));
+      dispatch(actions.setHoveredMessage(null));
       paintGraphicsAtTime(selectors.getCurrentTime(getState()));
     }
   };

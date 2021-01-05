@@ -2,9 +2,9 @@ import React from "react";
 
 import { LocalizationHelper } from "devtools/shared/l10n";
 import { getPixelOffset, getLeftOffset } from "../../utils/timeline";
-import { connect } from "react-redux";
 import classnames from "classnames";
-import { selectors } from "ui/reducers";
+import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
+import "./Message.css";
 
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
 const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
@@ -39,12 +39,22 @@ export function Marker({ message, onMarkerClick, onMarkerMouseEnter, onMarkerMou
   );
 }
 
+function getIsSecondaryHighlighted(hoveredMessage, message) {
+  if (!message?.frame || !hoveredMessage?.location) {
+    return false;
+  }
+
+  const keyOne = getLocationKey(hoveredMessage.location);
+  const keyTwo = getLocationKey(message.frame);
+  return keyOne == keyTwo;
+}
+
 export default class Message extends React.Component {
   render() {
     const {
       message,
       currentTime,
-      hoveredMessageId,
+      hoveredMessage,
       zoomRegion,
       overlayWidth,
       onMarkerClick,
@@ -62,9 +72,8 @@ export default class Message extends React.Component {
       return null;
     }
 
-    // A marker is highlighted if its corresponding message is hovered on
-    // in the console
-    const isHighlighted = hoveredMessageId == message.id;
+    const isPrimaryHighlighted = hoveredMessage?.point === message.executionPoint;
+    const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredMessage, message);
     const isPauseLocation = message.executionPointTime === currentTime;
 
     let frameLocation = "";
@@ -81,7 +90,8 @@ export default class Message extends React.Component {
       <a
         tabIndex={0}
         className={classnames("message", {
-          highlighted: isHighlighted,
+          "primary-highlight": isPrimaryHighlighted,
+          "secondary-highlight": isSecondaryHighlighted,
           paused: isPauseLocation,
         })}
         style={{
