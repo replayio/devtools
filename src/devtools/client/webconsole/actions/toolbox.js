@@ -48,7 +48,6 @@ export function openNodeInInspector(valueFront) {
 export function onMessageHover(type, message) {
   return ({ dispatch, getState }) => {
     if (type == "mouseenter") {
-      console.log("ENTER");
       dispatch(setTimelineState({ hoveredMessageId: message.id }));
       paintGraphicsAtTime(message.executionPointTime);
     }
