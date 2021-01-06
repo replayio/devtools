@@ -7,6 +7,7 @@
 // messages associated with the logpoint atomically.
 
 import {
+  AnalysisEntry,
   AnalysisId,
   createAnalysisResult,
   ExecutionPoint,
@@ -55,7 +56,7 @@ export const PointHandlers: {
   onPoints?: (points: PointDescription[], info: LogpointInfo) => void;
 } = {};
 
-client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
+const onAnalysisResult = (analysisId: string, results: AnalysisEntry[]) => {
   log(`AnalysisResults ${results.length}`);
 
   const logGroupId = gAnalysisLogGroupIDs.get(analysisId)!;
@@ -89,9 +90,9 @@ client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
       }
     );
   }
-});
+};
 
-client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
+const onAnalysisPoints = (analysisId: string, points: PointDescription[]) => {
   log(`AnalysisPoints ${points.length}`);
 
   const logGroupId = gAnalysisLogGroupIDs.get(analysisId)!;
@@ -123,7 +124,17 @@ client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
       LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
     });
   }
-});
+};
+
+export function setupLogpoints() {
+  client.Analysis.addAnalysisResultListener(({ analysisId, results }) =>
+    onAnalysisResult(analysisId, results)
+  );
+
+  client.Analysis.addAnalysisPointsListener(({ analysisId, points }) =>
+    onAnalysisPoints(analysisId, points)
+  );
+}
 
 async function createLogpointAnalysis(
   logGroupId: string,

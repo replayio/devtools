@@ -21,6 +21,7 @@ if (test) {
 
 const { initSocket } = require("protocol/socket");
 const loadImages = require("image/image");
+const { setupLogpoints } = require("./protocol/logpoint");
 const { bootstrapApp } = require("ui/utils/bootstrap/bootstrap");
 const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
 const { setupTimeline, setupMetadata, setupApp } = require("ui/actions").actions;
@@ -41,7 +42,7 @@ async function initialize() {
   loadImages();
 
   // Initialize the socket so we can communicate with the server
-  initSocket(dispatch);
+  initSocket(store, dispatch);
 
   if (recordingId) {
     createSession(store, recordingId);
@@ -82,5 +83,6 @@ async function initialize() {
     setupGraphics(store);
     initOutputSyntaxHighlighting();
     setupMessages(store);
+    setupLogpoints();
   }
 })();
