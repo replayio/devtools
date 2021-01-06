@@ -8,6 +8,7 @@ interface Comment {
   id: "string";
   point: "string";
   recording_id: "string";
+  parent_id: "string";
   time: "number";
   updated_at: "string";
   user_id: "string";
@@ -21,6 +22,7 @@ const GET_COMMENTS = gql`
       content
       created_at
       recording_id
+      parent_id
       user_id
       user {
         picture
@@ -42,6 +44,14 @@ const ADD_COMMENT = gql`
   }
 `;
 
+const ADD_COMMENT_REPLY = gql`
+  mutation AddCommentReply($object: comments_insert_input! = {}) {
+    insert_comments_one(object: $object) {
+      id
+    }
+  }
+`;
+
 const UPDATE_COMMENT_CONTENT = gql`
   mutation UpdateCommentContent($newContent: String, $commentId: uuid) {
     update_comments(_set: { content: $newContent }, where: { id: { _eq: $commentId } }) {
@@ -56,6 +66,16 @@ const UPDATE_COMMENT_CONTENT = gql`
 const DELETE_COMMENT = gql`
   mutation DeleteComment($commentId: uuid) {
     delete_comments(where: { id: { _eq: $commentId } }) {
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+const DELETE_COMMENT_REPLIES = gql`
+  mutation DeleteCommentReplies($parentId: uuid) {
+    delete_comments(where: { parent_id: { _eq: $parentId } }) {
       returning {
         id
       }
@@ -91,6 +111,18 @@ export function useAddComment(callback: Function) {
   return addComment;
 }
 
+export function useAddCommentReply(callback: Function) {
+  const [addCommentReply] = useMutation(ADD_COMMENT_REPLY, {
+    onCompleted: data => {
+      const { id } = data.insert_comments_one;
+      callback(id);
+    },
+    refetchQueries: ["GetComments"],
+  });
+
+  return addCommentReply;
+}
+
 export function useUpdateComment(callback: Function) {
   const [updateCommentContent] = useMutation(UPDATE_COMMENT_CONTENT, {
     onCompleted: () => callback(),
@@ -105,4 +137,12 @@ export function useDeleteComment(callback: Function) {
   });
 
   return deleteComment;
+}
+
+export function useDeleteCommentReplies(callback: Function) {
+  const [deleteCommentReplies] = useMutation(DELETE_COMMENT_REPLIES, {
+    refetchQueries: ["GetComments"],
+  });
+
+  return deleteCommentReplies;
 }

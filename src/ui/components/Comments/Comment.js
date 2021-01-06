@@ -73,7 +73,14 @@ class Comment extends React.Component {
 
   renderDropdownPanel() {
     const { comment, user } = this.props;
-    return <CommentDropdownPanel startEditing={this.startEditing} user={user} comment={comment} />;
+    return (
+      <CommentDropdownPanel
+        startEditing={this.startEditing}
+        allowReply={false}
+        user={user}
+        comment={comment}
+      />
+    );
   }
 
   renderLabel() {
