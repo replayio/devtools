@@ -7,6 +7,7 @@ import React, { Component } from "react";
 import classnames from "classnames";
 import { connect } from "../../utils/connect";
 import actions from "../../actions";
+import { selectors } from "ui/reducers";
 
 import { getDocument } from "../../utils/editor";
 // import Panel from "../Breakpoints/Panel/index";
@@ -102,21 +103,31 @@ class ColumnBreakpoint extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    return this.props.columnBreakpoint.breakpoint != nextProps.columnBreakpoint.breakpoint;
+    return (
+      this.props.columnBreakpoint.breakpoint != nextProps.columnBreakpoint.breakpoint ||
+      this.props.hoveredMessage != nextProps.hoveredMessage
+    );
   }
 
   render() {
-    const { editor, columnBreakpoint, insertAt } = this.props;
+    const { editor, columnBreakpoint, insertAt, hoveredMessage } = this.props;
 
     if (!columnBreakpoint.breakpoint) {
       return null;
     }
 
-    return <Panel breakpoint={columnBreakpoint.breakpoint} editor={editor} insertAt={insertAt} />;
+    return (
+      <Panel
+        breakpoint={columnBreakpoint.breakpoint}
+        editor={editor}
+        insertAt={insertAt}
+        hoveredMessage={hoveredMessage}
+      />
+    );
   }
 }
 
-export default connect(null, {
+export default connect(state => ({ hoveredMessage: selectors.getHoveredMessage(state) }), {
   addBreakpointAtColumn: actions.addBreakpointAtColumn,
   removeBreakpoint: actions.removeBreakpoint,
 })(ColumnBreakpoint);

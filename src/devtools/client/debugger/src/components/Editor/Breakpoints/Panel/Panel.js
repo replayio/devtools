@@ -9,6 +9,7 @@ import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import { toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
+import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 import "./Panel.css";
 
@@ -81,10 +82,14 @@ function Widget({ location, children, editor, insertAt }) {
   return ReactDOM.createPortal(<>{children}</>, node);
 }
 
-export default function Panel({ breakpoint, editor, insertAt }) {
+export default function Panel({ breakpoint, editor, insertAt, hoveredMessage }) {
   const [editing, setEditing] = useState(false);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
+  const focused =
+    hoveredMessage?.location &&
+    breakpoint?.location &&
+    getLocationKey(hoveredMessage.location) == getLocationKey(breakpoint.location);
 
   const toggleEditingOn = () => setEditing(true);
   const toggleEditingOff = () => setEditing(false);
@@ -97,7 +102,10 @@ export default function Panel({ breakpoint, editor, insertAt }) {
 
   return (
     <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
-      <div style={{ width: `${width}px` }} className={classnames("breakpoint-panel", { editing })}>
+      <div
+        style={{ width: `${width}px` }}
+        className={classnames("breakpoint-panel", { editing, focused })}
+      >
         {editing ? (
           <PanelEditor
             breakpoint={breakpoint}
