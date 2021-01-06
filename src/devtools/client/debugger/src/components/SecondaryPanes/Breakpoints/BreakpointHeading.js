@@ -10,7 +10,6 @@ import { getTruncatedFileName, getSourceQueryString, getFileURL } from "../../..
 import { getHasSiblingOfSameName, getContext } from "../../../selectors";
 import { features } from "../../../utils/prefs";
 import { getExecutionPoint } from "../../../reducers/pause";
-import { selectors } from "../../../../../../../ui/reducers";
 import { CloseButton } from "../../shared/Button";
 
 class BreakpointHeading extends PureComponent {

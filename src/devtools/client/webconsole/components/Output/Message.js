@@ -11,7 +11,6 @@ const { actions } = require("ui/actions/index");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const MessageIcon = require("devtools/client/webconsole/components/Output/MessageIcon");
-const { CloseButton } = require("devtools/client/debugger/src/components/shared/Button");
 const FrameView = createFactory(require("devtools/client/shared/components/Frame"));
 
 const CollapseButton = require("devtools/client/webconsole/components/Output/CollapseButton");

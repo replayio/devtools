@@ -15,7 +15,12 @@
   line-height: 16px;
   color: var(--theme-toolbar-color);
   max-width: 500px;
-  min-width: 300px
+  min-width: 300px;
+  overflow: hidden;
+}
+
+.breakpoint-panel.focused {
+  border: 1px solid var(--primary-accent);
 }
 
 .breakpoint-panel.editing {

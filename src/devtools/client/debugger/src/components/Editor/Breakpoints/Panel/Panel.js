@@ -9,8 +9,11 @@ import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import { toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
+import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 import "./Panel.css";
+import { connect } from "react-redux";
+import { selectors } from "ui/reducers";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -81,10 +84,14 @@ function Widget({ location, children, editor, insertAt }) {
   return ReactDOM.createPortal(<>{children}</>, node);
 }
 
-export default function Panel({ breakpoint, editor, insertAt }) {
+function Panel({ breakpoint, editor, insertAt, hoveredPoint }) {
   const [editing, setEditing] = useState(false);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
+  const focused =
+    hoveredPoint?.location &&
+    breakpoint?.location &&
+    getLocationKey(hoveredPoint.location) == getLocationKey(breakpoint.location);
 
   const toggleEditingOn = () => setEditing(true);
   const toggleEditingOff = () => setEditing(false);
@@ -97,7 +104,10 @@ export default function Panel({ breakpoint, editor, insertAt }) {
 
   return (
     <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
-      <div style={{ width: `${width}px` }} className={classnames("breakpoint-panel", { editing })}>
+      <div
+        style={{ width: `${width}px` }}
+        className={classnames("breakpoint-panel", { editing, focused })}
+      >
         {editing ? (
           <PanelEditor
             breakpoint={breakpoint}
@@ -117,3 +127,7 @@ export default function Panel({ breakpoint, editor, insertAt }) {
     </Widget>
   );
 }
+
+export default connect(state => ({
+  hoveredPoint: selectors.getHoveredPoint(state),
+}))(Panel);
