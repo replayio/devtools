@@ -18,6 +18,7 @@ import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredPoint } from "ui/state/timeline";
+import { paintGraphicsAtTime } from "protocol/graphics";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -374,7 +375,13 @@ export function goToPrevPaint(): UIThunkAction {
 }
 
 export function setHoveredWidgetMarker(marker: HoveredPoint): UIThunkAction {
-  return ({ dispatch }) => {
+  return ({ dispatch, getState }) => {
+    if (marker === null) {
+      paintGraphicsAtTime(selectors.getCurrentTime(getState()));
+    } else {
+      paintGraphicsAtTime(marker.time);
+    }
+
     dispatch({ type: "set_hovered_widget_marker", marker });
   };
 }
