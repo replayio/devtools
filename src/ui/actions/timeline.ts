@@ -17,14 +17,22 @@ import { selectors } from "ui/reducers";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
-import { TimelineState, Tooltip, ZoomRegion } from "ui/state/timeline";
+import { TimelineState, Tooltip, ZoomRegion, HoveredPoint } from "ui/state/timeline";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
 };
 export type UpdateTooltipAction = Action<"update_tooltip"> & { tooltip: Tooltip | null };
 export type SetZoomRegionAction = Action<"set_zoom"> & { region: ZoomRegion };
-export type TimelineAction = SetTimelineStateAction | UpdateTooltipAction | SetZoomRegionAction;
+export type SetHoveredWidgetMarker = Action<"set_hovered_widget_marker"> & {
+  marker: HoveredPoint;
+};
+
+export type TimelineAction =
+  | SetTimelineStateAction
+  | UpdateTooltipAction
+  | SetZoomRegionAction
+  | SetHoveredWidgetMarker;
 
 export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   const { dispatch } = store;
@@ -362,5 +370,11 @@ export function goToPrevPaint(): UIThunkAction {
     }
 
     dispatch(seekToTime(Math.min(next.time, endTime)));
+  };
+}
+
+export function setHoveredWidgetMarker(marker: HoveredPoint): UIThunkAction {
+  return ({ dispatch }) => {
+    dispatch({ type: "set_hovered_widget_marker", marker });
   };
 }

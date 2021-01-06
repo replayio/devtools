@@ -127,6 +127,7 @@ class ConsoleOutput extends Component {
       timestampsVisible,
       pausedExecutionPoint,
       closestMessage,
+      hoveredWidgetMarker,
     } = this.props;
 
     const messageNodes = visibleMessages.map((messageId, i) =>
@@ -146,6 +147,7 @@ class ConsoleOutput extends Component {
         getMessage: () => messages.get(messageId),
         isPaused: closestMessage?.id == messageId,
         isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
+        hoveredWidgetMarker,
       })
     );
 
@@ -178,6 +180,7 @@ function mapStateToProps(state, props) {
     messagesPayload: selectors.getAllMessagesPayloadById(state),
     warningGroups: selectors.getAllWarningGroupsById(state),
     timestampsVisible: state.consoleUI.timestampsVisible,
+    hoveredWidgetMarker: selectors.getHoveredWidgetMarker(state),
   };
 }
 const mapDispatchToProps = dispatch => ({

@@ -16,6 +16,7 @@ function initialTimelineState(): TimelineState {
     timelineDimensions: { left: 1, top: 1, width: 1 },
     mouse: null,
     tooltip: null,
+    hoveredWidgetMarker: null,
   };
 }
 
@@ -36,6 +37,10 @@ export default function update(
       return { ...state, tooltip: action.tooltip };
     }
 
+    case "set_hovered_widget_marker": {
+      return { ...state, hoveredWidgetMarker: action.marker };
+    }
+
     default: {
       return state;
     }
@@ -53,3 +58,4 @@ export const getScreenShot = (state: UIState) => state.timeline.screenShot;
 export const getMouse = (state: UIState) => state.timeline.mouse;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getTooltip = (state: UIState) => state.timeline.tooltip;
+export const getHoveredWidgetMarker = (state: UIState) => state.timeline.hoveredWidgetMarker;

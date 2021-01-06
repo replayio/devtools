@@ -1,4 +1,4 @@
-import { PauseDescription, ScreenShot, TimeRange, Location } from "@recordreplay/protocol";
+import { ScreenShot, TimeRange, Location } from "@recordreplay/protocol";
 import { MouseAndClickPosition } from "../../protocol/graphics";
 
 export interface Tooltip {
@@ -29,4 +29,16 @@ export interface TimelineState {
   unprocessedRegions: TimeRange[];
   shouldAnimate: boolean;
   tooltip: Tooltip | null;
+  hoveredWidgetMarker: HoveredPoint | null;
+}
+
+export interface HoveredPoint {
+  point: string;
+  time: number;
+  location: HoveredLocation;
+}
+
+interface HoveredLocation extends Location {
+  line: number;
+  column: number;
 }

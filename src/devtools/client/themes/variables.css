@@ -48,6 +48,18 @@
   --secondary-accent: #8330F4;
   --secondary-accent-stroke: #F9F5FF;
 
+  --new-blue-50: #EFF7FF;
+  --new-blue-100: #DBEDFF;
+  --new-blue-200: #B9DBFD;
+  --new-blue-300: #94C6FA;
+  --new-blue-400: #76B5F4;
+  --new-blue-500: #55A1EC;
+  --new-blue-600: #3B8FE3;
+  --new-blue-700: #257AD0;
+  --new-blue-800: #2569AD;
+  --new-blue-900: #215487;
+
+
   --magenta-50: #ff1ad9;
   --magenta-65: #dd00a9;
   --magenta-70: #b5007f;
