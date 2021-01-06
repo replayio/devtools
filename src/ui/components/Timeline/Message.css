@@ -1,0 +1,72 @@
+.timeline .message {
+  height: 11px;
+  width: 11px;
+  position: absolute;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: 0;
+  bottom: 0;
+  pointer-events: all;
+}
+
+.timeline .message-preview {
+  z-index: var(--z-index-2--hovered-message);
+}
+
+.timeline .message:hover {
+  cursor: pointer;
+}
+
+.timeline .message .fill {
+  fill: var(--replaying-marker-fill);
+}
+
+.timeline .message .stroke {
+  stroke: var(--theme-body-background);
+  pointer-events: none;
+}
+
+.timeline .message.paused {
+  z-index: var(--z-index-1--paused-message);
+}
+
+.timeline .message.paused .fill {
+  fill: var(--replaying-paused-marker-fill);
+}
+
+.timeline .message.paused .stroke {
+  stroke: var(--replaying-paused-marker-stroke);
+  stroke: var(--theme-body-background);
+}
+
+.timeline .message:focus {
+  outline: none;
+}
+
+/* Dimmed styles */
+
+.timeline.dimmed .message .fill {
+  fill: var(--primary-accent-light);
+}
+
+.timeline.dimmed .message-preview .fill {
+  fill: var(--replaying-marker-fill);
+}
+
+.timeline.dimmed .message.secondary-highlight {
+  transform: scale(1.3);
+  z-index: var(--z-index-2--hovered-point-secondary);
+}
+
+.timeline.dimmed .message.secondary-highlight .fill {
+  fill: var(--replaying-marker-fill);
+}
+
+.timeline.dimmed .message.primary-highlight {
+  transform: scale(1.3);
+  z-index: var(--z-index-3--hovered-point-primary);
+}
+
+.timeline.dimmed .message.primary-highlight .fill {
+  fill: var(--new-blue-900);
+}

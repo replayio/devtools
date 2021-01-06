@@ -36,7 +36,6 @@ export class Timeline extends Component {
   state = {
     comments: [],
     numResizes: 0,
-    hoveringOverMarker: false,
   };
 
   async componentDidMount() {
@@ -52,55 +51,19 @@ export class Timeline extends Component {
     }
   }
 
-  get toolbox() {
-    return gToolbox;
-  }
-
-  get debugger() {
-    return this.toolbox.getPanel("debugger");
-  }
-
-  get threadFront() {
-    return this.toolbox.threadFront;
-  }
-
   get overlayWidth() {
     return this.props.timelineDimensions.width;
   }
 
-  get zoomStartTime() {
-    return this.props.zoomRegion.startTime;
-  }
-
-  get zoomEndTime() {
-    return this.props.zoomRegion.endTime;
-  }
-
   // Get the time for a mouse event within the recording.
   getMouseTime(e) {
+    const { startTime, endTime } = this.props.zoomRegion;
     const { left, width } = e.currentTarget.getBoundingClientRect();
     const clickLeft = e.clientX;
 
     const clickPosition = (clickLeft - left) / width;
-    return Math.ceil(this.zoomStartTime + (this.zoomEndTime - this.zoomStartTime) * clickPosition);
+    return Math.ceil(startTime + (endTime - startTime) * clickPosition);
   }
-
-  onMarkerClick = (e, message) => {
-    const { selectedPanel, viewMode, seek } = this.props;
-
-    e.preventDefault();
-    e.stopPropagation();
-    const { executionPoint, executionPointTime, executionPointHasFrames, pauseId } = message;
-    seek(executionPoint, executionPointTime, executionPointHasFrames, pauseId);
-  };
-
-  onMarkerMouseEnter = () => {
-    this.setState({ hoveringOverMarker: true });
-  };
-
-  onMarkerMouseLeave = () => {
-    this.setState({ hoveringOverMarker: false });
-  };
 
   hoverTimer = () => {
     const { hideTooltip } = this.props;
@@ -142,8 +105,8 @@ export class Timeline extends Component {
   };
 
   onPlayerMouseUp = e => {
-    const { hoverTime, seek } = this.props;
-    const { hoveringOverMarker } = this.state;
+    const { hoverTime, seek, hoveredPoint } = this.props;
+    const hoveringOverMarker = hoveredPoint?.target === "timeline";
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != null && !hoveringOverMarker) {
@@ -186,7 +149,7 @@ export class Timeline extends Component {
   }
 
   renderMessages() {
-    const { messages, currentTime, hoveredMessageId, zoomRegion } = this.props;
+    const { messages, currentTime, hoveredPoint, zoomRegion } = this.props;
 
     return (
       <div className="message-container">
@@ -197,12 +160,9 @@ export class Timeline extends Component {
             key={index}
             messages={messages}
             currentTime={currentTime}
-            hoveredMessageId={hoveredMessageId}
+            hoveredPoint={hoveredPoint}
             zoomRegion={zoomRegion}
             overlayWidth={this.overlayWidth}
-            onClick={this.onMarkerClick}
-            onMouseEnter={this.onMarkerMouseEnter}
-            onMouseLeave={this.onMarkerMouseLeave}
           />
         ))}
       </div>
@@ -239,12 +199,19 @@ export class Timeline extends Component {
   }
 
   render() {
-    const { loaded, zoomRegion, currentTime, hoverTime, hoveredLineNumberLocation } = this.props;
+    const {
+      zoomRegion,
+      currentTime,
+      hoverTime,
+      hoveredLineNumberLocation,
+      hoveredPoint,
+    } = this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
+    const shouldDim = hoveredLineNumberLocation || hoveredPoint;
 
     return (
-      <div className={classnames("timeline", { dimmed: !!hoveredLineNumberLocation })}>
+      <div className={classnames("timeline", { dimmed: shouldDim })}>
         {this.renderCommands()}
         <div className={classnames("progress-bar-container", { paused: true })}>
           <div
@@ -274,7 +241,6 @@ export default connect(
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
     playback: selectors.getPlayback(state),
-    hoveredMessageId: selectors.getHoveredMessageId(state),
     recordingDuration: selectors.getRecordingDuration(state),
     timelineDimensions: selectors.getTimelineDimensions(state),
     messages: selectors.getMessagesForTimeline(state),
@@ -282,6 +248,7 @@ export default connect(
     selectedPanel: selectors.getSelectedPanel(state),
     hoveredLineNumberLocation: selectors.getHoveredLineNumberLocation(state),
     pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
+    hoveredPoint: selectors.getHoveredPoint(state),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,
