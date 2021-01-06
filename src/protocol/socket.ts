@@ -1,6 +1,8 @@
 import { defer, makeInfallible } from "./utils";
 import { ProtocolClient } from "@recordreplay/protocol";
 import { setExpectedError } from "ui/actions/session";
+import { UIStore } from "ui/actions";
+import { Action, Dispatch } from "redux";
 
 interface Message {
   id: number;
@@ -29,12 +31,12 @@ const gStartTime = Date.now();
 let gSentBytes = 0;
 let gReceivedBytes = 0;
 
-export function initSocket(address?: string) {
+export function initSocket(store: UIStore, address?: string) {
   socket = new WebSocket(address || "wss://dispatch.replay.io");
 
   socket.onopen = makeInfallible(onSocketOpen);
   socket.onclose = makeInfallible(onSocketClose);
-  socket.onerror = makeInfallible(onSocketError);
+  socket.onerror = makeInfallible(() => store.dispatch(onSocketError()));
   socket.onmessage = makeInfallible(onSocketMessage);
 }
 
@@ -114,16 +116,17 @@ function onSocketMessage(evt: MessageEvent<any>) {
 function onSocketClose() {
   setStatus("Disconnected.");
   log("Socket Closed");
-
-  store.dispatch(
-    setExpectedError({
-      message: "Session has closed due to inactivity, please refresh the page.",
-    })
-  );
 }
 
 function onSocketError() {
-  log("Socket Error");
+  return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
+    log("Socket Error");
+    dispatch(
+      setExpectedError({
+        message: "Session has closed due to inactivity, please refresh the page.",
+      })
+    );
+  };
 }
 
 export function log(text: string) {

@@ -7,6 +7,7 @@
 // messages associated with the logpoint atomically.
 
 import {
+  AnalysisEntry,
   AnalysisId,
   createAnalysisResult,
   ExecutionPoint,
@@ -55,76 +56,80 @@ export const PointHandlers: {
   onPoints?: (points: PointDescription[], info: LogpointInfo) => void;
 } = {};
 
-export function setupLogpoints() {
-  client.Analysis.addAnalysisResultListener(({ analysisId, results }) => {
-    log(`AnalysisResults ${results.length}`);
+const onAnalysisResult = (analysisId: string, results: AnalysisEntry[]) => {
+  log(`AnalysisResults ${results.length}`);
 
-    const logGroupId = gAnalysisLogGroupIDs.get(analysisId)!;
-    if (!gLogpoints.has(logGroupId)) {
-      return;
-    }
+  const logGroupId = gAnalysisLogGroupIDs.get(analysisId)!;
+  if (!gLogpoints.has(logGroupId)) {
+    return;
+  }
 
-    const info = gLogpoints.get(logGroupId);
-    if (!info?.showInConsole) {
-      return;
-    }
+  const info = gLogpoints.get(logGroupId);
+  if (!info?.showInConsole) {
+    return;
+  }
 
-    if (LogpointHandlers.onResult) {
-      results.forEach(
-        async ({
-          key: point,
-          value: { time, pauseId, location, values, data, frameworkListeners },
-        }) => {
-          const pause = new Pause(ThreadFront.sessionId!);
-          pause.instantiate(pauseId, point, time, /* hasFrames */ true);
-          pause.addData(data);
-          const valueFronts = values.map((v: any) => new ValueFront(pause, v));
-          const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
-          assert(mappedLocation);
-          LogpointHandlers.onResult!(logGroupId, point, time, mappedLocation, pause, valueFronts);
+  if (LogpointHandlers.onResult) {
+    results.forEach(
+      async ({
+        key: point,
+        value: { time, pauseId, location, values, data, frameworkListeners },
+      }) => {
+        const pause = new Pause(ThreadFront.sessionId!);
+        pause.instantiate(pauseId, point, time, /* hasFrames */ true);
+        pause.addData(data);
+        const valueFronts = values.map((v: any) => new ValueFront(pause, v));
+        const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
+        assert(mappedLocation);
+        LogpointHandlers.onResult!(logGroupId, point, time, mappedLocation, pause, valueFronts);
 
-          if (frameworkListeners) {
-            const frameworkListenersFront = new ValueFront(pause, frameworkListeners);
-            eventLogpointOnFrameworkListeners(logGroupId, point, frameworkListenersFront);
-          }
+        if (frameworkListeners) {
+          const frameworkListenersFront = new ValueFront(pause, frameworkListeners);
+          eventLogpointOnFrameworkListeners(logGroupId, point, frameworkListenersFront);
         }
-      );
-    }
-  });
+      }
+    );
+  }
+};
 
-  client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => {
-    log(`AnalysisPoints ${points.length}`);
+const onAnalysisPoints = (analysisId: string, points: PointDescription[]) => {
+  log(`AnalysisPoints ${points.length}`);
 
-    const logGroupId = gAnalysisLogGroupIDs.get(analysisId)!;
-    const info = gLogpoints.get(logGroupId);
-    if (!info) {
-      return;
-    }
+  const logGroupId = gAnalysisLogGroupIDs.get(analysisId)!;
+  const info = gLogpoints.get(logGroupId);
+  if (!info) {
+    return;
+  }
 
-    info.points.push(...points);
-    if (info.pointsWaiter) {
-      info.pointsWaiter();
-    }
+  info.points.push(...points);
+  if (info.pointsWaiter) {
+    info.pointsWaiter();
+  }
 
-    // Skip saving analysis points for event breakpoint analyses. We can tell
-    // event breakpoint analyses apart because their only location is null.
-    if (PointHandlers.onPoints && info.locations[0] !== null) {
-      PointHandlers.onPoints(points, info);
-    }
+  // Skip saving analysis points for event breakpoint analyses. We can tell
+  // event breakpoint analyses apart because their only location is null.
+  if (PointHandlers.onPoints && info.locations[0] !== null) {
+    PointHandlers.onPoints(points, info);
+  }
 
-    if (!info.showInConsole) {
-      return;
-    }
+  if (!info.showInConsole) {
+    return;
+  }
 
-    if (LogpointHandlers.onPointLoading) {
-      points.forEach(async ({ point, time, frame }) => {
-        if (!frame) return;
-        const location = await ThreadFront.getPreferredLocation(frame);
-        assert(location);
-        LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
-      });
-    }
-  });
+  if (LogpointHandlers.onPointLoading) {
+    points.forEach(async ({ point, time, frame }) => {
+      if (!frame) return;
+      const location = await ThreadFront.getPreferredLocation(frame);
+      assert(location);
+      LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
+    });
+  }
+};
+
+export function setupLogpoints() {
+  client.Analysis.addAnalysisResultListener(({ analysisId, results }) => onAnalysisResult);
+
+  client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => onAnalysisPoints);
 }
 
 async function createLogpointAnalysis(

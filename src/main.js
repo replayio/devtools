@@ -42,7 +42,7 @@ async function initialize() {
   loadImages();
 
   // Initialize the socket so we can communicate with the server
-  initSocket(dispatch);
+  initSocket(store, dispatch);
 
   if (recordingId) {
     createSession(store, recordingId);
