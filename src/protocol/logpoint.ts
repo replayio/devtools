@@ -127,9 +127,13 @@ const onAnalysisPoints = (analysisId: string, points: PointDescription[]) => {
 };
 
 export function setupLogpoints() {
-  client.Analysis.addAnalysisResultListener(({ analysisId, results }) => onAnalysisResult);
+  client.Analysis.addAnalysisResultListener(({ analysisId, results }) =>
+    onAnalysisResult(analysisId, results)
+  );
 
-  client.Analysis.addAnalysisPointsListener(({ analysisId, points }) => onAnalysisPoints);
+  client.Analysis.addAnalysisPointsListener(({ analysisId, points }) =>
+    onAnalysisPoints(analysisId, points)
+  );
 }
 
 async function createLogpointAnalysis(
