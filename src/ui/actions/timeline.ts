@@ -26,7 +26,7 @@ export type UpdateTooltipAction = Action<"update_tooltip"> & { tooltip: Tooltip 
 export type SetZoomRegionAction = Action<"set_zoom"> & { region: ZoomRegion };
 export type TimelineAction = SetTimelineStateAction | UpdateTooltipAction | SetZoomRegionAction;
 
-export async function setupTimeline(recordingId: RecordingId, store: F) {
+export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   const { dispatch } = store;
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
   ThreadFront.on("endpoint", args => dispatch(onEndpoint(args)));
