@@ -9,6 +9,11 @@ import { selectors } from "ui/reducers";
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
 const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
 
+const onMarkerClick = e => {
+  e.preventDefault();
+  e.stopPropagation();
+};
+
 // Don't change this haphazardly. This marker is intentionally 11px x 11px, so that it
 // can be center aligned perfectly with a 1px timeline scrubber line. This means that
 // it can also center aligned with other elements so long as those other elements have
@@ -17,7 +22,7 @@ const getFormatStr = (key, a) => L10N.getFormatStr(`toolbox.replay.${key}`, a);
 // If you do modify this, make sure you change EVERY single reference to this 11px width in
 // the codebase. This includes, but is not limited to, the Timeline component, Message component,
 // the timeline utilities, and the timeline styling.
-export function Marker({ message, onMarkerClick, onMarkerMouseEnter, onMarkerMouseLeave }) {
+export function Marker({ message, onClick = onMarkerClick, onMouseEnter, onMouseLeave }) {
   // The stroke path element here has `pointer-events: none` enabled, so that it defers the event
   // handling to the fill path element. Without that property, we'd have to set the event handlers
   // on the stroke path element as well.
@@ -29,9 +34,9 @@ export function Marker({ message, onMarkerClick, onMarkerMouseEnter, onMarkerMou
         cy="5.5"
         r="5.5"
         fill="black"
-        onClick={e => onMarkerClick(e, message)}
-        onMouseEnter={onMarkerMouseEnter}
-        onMouseLeave={onMarkerMouseLeave}
+        onClick={e => onClick(e, message)}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       />
       {/* <circle cx="5.5" cy="5.5" r="4.5" stroke="black" strokeWidth="2" /> */}
       <circle className="stroke" cx="5.5" cy="5.5" r="5" stroke="black" strokeWidth="0" />
@@ -47,9 +52,9 @@ export default class Message extends React.Component {
       hoveredMessageId,
       zoomRegion,
       overlayWidth,
-      onMarkerClick,
-      onMarkerMouseEnter,
-      onMarkerMouseLeave,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
     } = this.props;
 
     const offset = getPixelOffset({
@@ -95,9 +100,9 @@ export default class Message extends React.Component {
       >
         <Marker
           message={message}
-          onMarkerClick={onMarkerClick}
-          onMarkerMouseEnter={onMarkerMouseEnter}
-          onMarkerMouseLeave={onMarkerMouseLeave}
+          onClick={onClick}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
         />
       </a>
     );
