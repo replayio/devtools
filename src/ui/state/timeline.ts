@@ -25,11 +25,21 @@ export interface TimelineState {
   zoomRegion: ZoomRegion;
   timelineDimensions: { width: number; left: number; top: number };
   hoverTime: number | null;
-  hoveredMessageId: string | null;
   unprocessedRegions: TimeRange[];
   shouldAnimate: boolean;
   tooltip: Tooltip | null;
   hoveredWidgetMarker: HoveredPoint | null;
+}
+
+export interface HoveredPoint {
+  point: string;
+  time: number;
+  location: HoveredLocation;
+}
+
+interface HoveredLocation extends Location {
+  line: number;
+  column: number;
 }
 
 export interface HoveredPoint {

@@ -42,7 +42,7 @@
    * - We added a few unofficial colors: a few intermediary values (e.g. Blue 45),
    *   and lighter variants for the dark theme (e.g. Red 20, Red 40).
    */
-  
+
   --primary-accent: #1B7FE3;
   --primary-accent-light: #86BFF9;
   --secondary-accent: #8330F4;
