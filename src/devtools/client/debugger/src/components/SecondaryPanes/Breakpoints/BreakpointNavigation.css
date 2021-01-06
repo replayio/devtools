@@ -67,7 +67,6 @@
 }
 
 .breakpoint-navigation-timeline-point {
-  transition: 200ms;
   cursor: pointer;
   position: absolute;
 }
@@ -76,16 +75,8 @@
   fill: var(--replaying-marker-fill);
 }
 
-.breakpoint-navigation-timeline-point .stroke {
-  stroke: var(--replaying-marker-stroke);
-}
-
 .breakpoint-navigation-timeline-point.future .fill {
   fill: var(--replaying-marker-future-fill);
-}
-
-.breakpoint-navigation-timeline-point.future .stroke {
-  stroke: var(--replaying-marker-future-stroke);
 }
 
 .breakpoint-navigation-timeline-point.pause {
@@ -94,10 +85,6 @@
 
 .breakpoint-navigation-timeline-point.pause .fill {
   fill: var(--replaying-paused-marker-fill);
-}
-
-.breakpoint-navigation-timeline-point.pause .stroke {
-  stroke: var(--replaying-paused-marker-stroke);
 }
 
 .breakpoint-navigation-timeline-pause-marker {
@@ -124,4 +111,30 @@
 .breakpoint-navigation-timeline .progress-line.full {
   width: 100%;
   background: var(--grey-30);
+}
+
+/* Dimmed styles */
+.breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point .fill {
+  fill: var(--primary-accent-light);
+}
+
+.breakpoint-navigation-timeline.dimmed .progress-line {
+  background: var(--primary-accent-light);
+}
+
+.breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.secondary-highlight {
+  transform: scale(1.3);
+}
+
+.breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.secondary-highlight .fill {
+  fill: var(--primary-accent);
+}
+
+.breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.primary-highlight {
+  z-index: var(--z-index-1--paused-message);
+  transform: scale(1.3);
+}
+
+.breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.primary-highlight .fill {
+  fill: var(--new-blue-900);
 }

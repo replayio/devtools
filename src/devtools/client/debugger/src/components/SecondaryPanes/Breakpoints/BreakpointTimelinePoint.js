@@ -7,9 +7,20 @@ const { getAnalysisPointsForLocation } = selectors;
 import { actions } from "ui/actions";
 import { Marker } from "ui/components/Timeline/Message";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 function toBigInt(num) {
   return num ? BigInt(num) : undefined;
+}
+
+function getIsSecondaryHighlighted(hoveredWidgetMarker, message) {
+  if (!message?.frame?.[0] || !hoveredWidgetMarker?.location) {
+    return false;
+  }
+
+  const keyOne = getLocationKey(hoveredWidgetMarker.location);
+  const keyTwo = getLocationKey(message.frame[0]);
+  return keyOne == keyTwo;
 }
 
 export function getLeftPercentOffset({ point, timelineNode, zoomRegion, markerWidth }) {
@@ -35,8 +46,11 @@ function BreakpointTimelinePoint({
   zoomRegion,
   seek,
   setHoveredWidgetMarker,
+  hoveredWidgetMarker,
 }) {
   const [leftPercentOffset, setLeftPercentOffset] = useState(0);
+  const isPrimaryHighlighted = hoveredWidgetMarker?.point === point.point;
+  const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredWidgetMarker, point);
 
   useEffect(() => {
     setLeftPercentOffset(
@@ -66,6 +80,8 @@ function BreakpointTimelinePoint({
         past: toBigInt(point.point) < toBigInt(executionPoint),
         future: toBigInt(point.point) > toBigInt(executionPoint),
         pause: toBigInt(point.point) == toBigInt(executionPoint),
+        "primary-highlight": isPrimaryHighlighted,
+        "secondary-highlight": isSecondaryHighlighted,
       })}
       title={`${index + 1}/${analysisPoints.length}`}
       onClick={() => seek(point.point, point.time, true)}

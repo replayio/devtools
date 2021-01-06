@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import classnames from "classnames";
+
 import { actions as UIActions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
@@ -60,10 +62,12 @@ function BreakpointTimeline({
   setZoomRegion,
   setZoomedBreakpoint,
   currentTime,
+  hoveredWidgetMarker,
 }) {
   const timelineNode = useRef();
   const [, setMounted] = useState(false);
   const title = "Cmd + click to zoom into these points";
+  const shouldDim = hoveredWidgetMarker;
 
   // Trigger a re-render on mount so that we can pass down the correct timelineNode.
   useEffect(() => setMounted(true), []);
@@ -81,7 +85,7 @@ function BreakpointTimeline({
   return (
     <div className="breakpoint-navigation-timeline-container">
       <div
-        className="breakpoint-navigation-timeline"
+        className={classnames("breakpoint-navigation-timeline", { dimmed: shouldDim })}
         ref={timelineNode}
         onClick={handleClick}
         title={title}
@@ -97,6 +101,7 @@ function BreakpointTimeline({
                 key={i}
                 index={i}
                 timelineNode={timelineNode.current}
+                hoveredWidgetMarker={hoveredWidgetMarker}
               />
             ))
           : null}
@@ -110,6 +115,7 @@ export default connect(
     analysisPoints: selectors.getAnalysisPointsForLocation(state, breakpoint.location),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
+    hoveredWidgetMarker: selectors.getHoveredWidgetMarker(state),
   }),
   {
     setZoomRegion: UIActions.setZoomRegion,
