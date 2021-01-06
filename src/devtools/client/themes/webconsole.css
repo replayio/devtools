@@ -146,6 +146,10 @@
   overflow: hidden;
 }
 
+.webconsole-app .message.secondary-highlight {
+  background: var(--primary-accent-very-light);
+}
+
 .webconsole-app .message.error {
   z-index: 2;
   color: var(--console-error-color);

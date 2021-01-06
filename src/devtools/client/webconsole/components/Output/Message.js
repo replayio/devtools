@@ -17,6 +17,7 @@ const CollapseButton = require("devtools/client/webconsole/components/Output/Col
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
 const PropTypes = require("prop-types");
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
+const { getLocationKey } = require("devtools/client/debugger/src/utils/breakpoint");
 
 class Message extends Component {
   static get propTypes() {
@@ -284,6 +285,7 @@ class Message extends Component {
       executionPoint,
       messageId,
       notes,
+      hoveredMessage,
     } = this.props;
 
     topLevelClasses.push("message", source, type, level);
@@ -293,6 +295,15 @@ class Message extends Component {
 
     if (isPaused) {
       topLevelClasses.push("paused");
+    }
+
+    const isSecondaryHighlighted =
+      hoveredMessage?.location &&
+      frame &&
+      getLocationKey(hoveredMessage.location) == getLocationKey(frame);
+
+    if (isSecondaryHighlighted) {
+      topLevelClasses.push("secondary-highlight");
     }
 
     const timestampEl = this.renderTimestamp();

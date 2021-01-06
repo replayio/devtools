@@ -42,6 +42,7 @@ function ConsoleApiCall(props) {
     isPaused,
     maybeScrollToBottom,
     isFirstMessageForPoint,
+    hoveredMessage,
   } = props;
   const {
     id: messageId,
@@ -156,6 +157,7 @@ function ConsoleApiCall(props) {
     message,
     maybeScrollToBottom,
     isFirstMessageForPoint,
+    hoveredMessage,
   });
 }
 

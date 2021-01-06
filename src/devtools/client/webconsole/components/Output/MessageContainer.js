@@ -68,6 +68,7 @@ class MessageContainer extends Component {
       "pausedExecutionPoint",
       "badge",
       "inWarningGroup",
+      "hoveredMessage",
     ];
 
     return triggeringUpdateProps.some(prop => this.props[prop] !== nextProps[prop]);

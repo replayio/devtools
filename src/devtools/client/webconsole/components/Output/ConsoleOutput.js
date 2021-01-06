@@ -127,10 +127,12 @@ class ConsoleOutput extends Component {
       timestampsVisible,
       pausedExecutionPoint,
       closestMessage,
+      hoveredMessage,
     } = this.props;
 
     const messageNodes = visibleMessages.map((messageId, i) =>
       createElement(MessageContainer, {
+        hoveredMessage,
         dispatch,
         key: messageId,
         messageId,
@@ -177,6 +179,7 @@ function mapStateToProps(state, props) {
     messagesUi: selectors.getAllMessagesUiById(state),
     messagesPayload: selectors.getAllMessagesPayloadById(state),
     warningGroups: selectors.getAllWarningGroupsById(state),
+    hoveredMessage: selectors.getHoveredMessage(state),
     timestampsVisible: state.consoleUI.timestampsVisible,
   };
 }
