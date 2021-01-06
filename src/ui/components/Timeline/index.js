@@ -200,9 +200,9 @@ export class Timeline extends Component {
             hoveredMessageId={hoveredMessageId}
             zoomRegion={zoomRegion}
             overlayWidth={this.overlayWidth}
-            onMarkerClick={this.onMarkerClick}
-            onMarkerMouseEnter={this.onMarkerMouseEnter}
-            onMarkerMouseLeave={this.onMarkerMouseLeave}
+            onClick={this.onMarkerClick}
+            onMouseEnter={this.onMarkerMouseEnter}
+            onMouseLeave={this.onMarkerMouseLeave}
           />
         ))}
       </div>
