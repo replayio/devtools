@@ -66,7 +66,9 @@ function App({ theme, recordingId, modal, updateNarrowMode, updateUser }) {
 
   useEffect(() => {
     setUserInBrowserPrefs(auth.user);
-    updateUser(auth.user);
+    if (!auth.isLoading && auth.user) {
+      updateUser(auth.user);
+    }
   }, [auth.user]);
 
   if (consentPopupBlocked) {
