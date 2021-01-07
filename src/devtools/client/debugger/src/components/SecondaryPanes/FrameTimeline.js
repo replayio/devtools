@@ -7,16 +7,8 @@
 import React, { Component } from "react";
 
 import { connect } from "../../utils/connect";
-import {
-  getFramePositions,
-  getSelectedFrame,
-  getThreadContext,
-  getExecutionPoint,
-} from "../../selectors";
-
-import { getSelectedLocation } from "../../reducers/sources";
-
-import actions from "../../actions";
+import { selectors } from "ui/reducers";
+import { actions } from "ui/actions";
 
 import classnames from "classnames";
 import "./FrameTimeline.css";
@@ -200,21 +192,16 @@ class FrameTimeline extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  const thread = getThreadContext(state).thread;
-  const selectedFrame = getSelectedFrame(state, thread);
-  const executionPoint = getExecutionPoint(state, thread);
-
-  return {
-    framePositions: getFramePositions(state),
-    selectedLocation: getSelectedLocation(state),
-    selectedFrame,
-    executionPoint,
-  };
-};
-
-export default connect(mapStateToProps, {
-  seek: actions.seek,
-  setPreviewPausedLocation: actions.setPreviewPausedLocation,
-  clearPreviewPausedLocation: actions.clearPreviewPausedLocation,
-})(FrameTimeline);
+export default connect(
+  state => ({
+    framePositions: selectors.getFramePositions(state),
+    selectedLocation: selectors.getSelectedLocation(state),
+    selectedFrame: selectors.getSelectedFrame(state),
+    executionPoint: selectors.getExecutionPoint(state),
+  }),
+  {
+    seek: actions.seek,
+    setPreviewPausedLocation: actions.setPreviewPausedLocation,
+    clearPreviewPausedLocation: actions.clearPreviewPausedLocation,
+  }
+)(FrameTimeline);
