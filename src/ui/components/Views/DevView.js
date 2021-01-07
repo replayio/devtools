@@ -46,7 +46,6 @@ function DevView({ updateTimelineDimensions, narrowMode }) {
         />
         <div id="timeline-container">
           <Timeline />
-          <Tooltip />
         </div>
       </>
     );
@@ -70,7 +69,6 @@ function DevView({ updateTimelineDimensions, narrowMode }) {
         />
         <div id="timeline-container">
           <Timeline />
-          <Tooltip />
         </div>
       </div>
     </div>

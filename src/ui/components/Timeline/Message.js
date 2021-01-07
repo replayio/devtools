@@ -97,7 +97,9 @@ class Message extends React.Component {
       const { executionPoint, executionPointTime, executionPointHasFrames, pauseId } = message;
       seek(executionPoint, executionPointTime, executionPointHasFrames, pauseId);
     };
-    const onMouseLeave = () => setHoveredPoint(null);
+    const onMouseLeave = () => {
+      setHoveredPoint(null);
+    };
     const onMouseEnter = () => {
       const hoveredPoint = {
         target: "timeline",

@@ -15,7 +15,7 @@ import classnames from "classnames";
 import ScrollContainer from "./ScrollContainer";
 import Comments from "../Comments";
 
-const { mostRecentPaintOrMouseEvent } = require("protocol/graphics");
+const { mostRecentPaintOrMouseEvent, paintGraphicsAtTime } = require("protocol/graphics");
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
@@ -66,10 +66,11 @@ export class Timeline extends Component {
   }
 
   hoverTimer = () => {
-    const { hideTooltip } = this.props;
+    const { hideTooltip, currentTime } = this.props;
     const isHovered = window.elementIsHovered(this.$progressBar);
     if (!isHovered) {
       clearInterval(this.hoverInterval);
+      paintGraphicsAtTime(currentTime);
       this.hoverInterval = null;
       hideTooltip();
     }
@@ -100,6 +101,7 @@ export class Timeline extends Component {
           ? width - tooltipWidth / 2 - horizontalPadding
           : offset;
 
+      paintGraphicsAtTime(mouseTime);
       setTimelineToTime({ time: mouseTime, offset });
     }
   };
