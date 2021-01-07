@@ -57,7 +57,7 @@ function CommentEditor({ comment, stopEditing, setFocusedCommentId, stopReplying
     if (e.key == "Escape") {
       cancelEditingComment(e);
     } else if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) {
-      saveEditedComment();
+      replying ? replyToComment() : saveEditedComment();
     }
   };
   const saveEditedComment = () => {
