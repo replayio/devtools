@@ -4,12 +4,16 @@ import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 
-function CommentEditor({ comment, stopEditing, setFocusedCommentId }) {
-  const [inputValue, setInputValue] = useState(comment.content);
+function CommentEditor({ comment, stopEditing, setFocusedCommentId, stopReplying, replying }) {
+  const [inputValue, setInputValue] = useState(replying ? null : comment.content);
   const textareaNode = useRef(null);
 
   const closeEditor = () => {
-    stopEditing();
+    if (replying) {
+      stopReplying();
+    } else {
+      stopEditing();
+    }
     setFocusedCommentId(null);
   };
 
@@ -22,11 +26,38 @@ function CommentEditor({ comment, stopEditing, setFocusedCommentId }) {
     textareaNode.current.setSelectionRange(length, length);
   }, []);
 
+  const replyToCommentCallback = id => {
+    setFocusedCommentId(id);
+    closeEditor();
+  };
+
+  const addCommentReply = hooks.useAddCommentReply(replyToCommentCallback);
+
+  const replyToComment = () => {
+    if (!inputValue) {
+      closeEditor();
+      return;
+    }
+
+    const newReply = {
+      parent_id: comment.id,
+      content: inputValue,
+      recording_id: comment.recording_id,
+      time: comment.time,
+      point: comment.point,
+      has_frames: comment.has_frames,
+    };
+
+    addCommentReply({
+      variables: { object: newReply },
+    });
+  };
+
   const onKeyDown = e => {
     if (e.key == "Escape") {
       cancelEditingComment(e);
     } else if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) {
-      saveEditedComment();
+      replying ? replyToComment() : saveEditedComment();
     }
   };
   const saveEditedComment = () => {
@@ -52,7 +83,7 @@ function CommentEditor({ comment, stopEditing, setFocusedCommentId }) {
   return (
     <div className="editor">
       <textarea
-        defaultValue={comment.content}
+        defaultValue={inputValue}
         onChange={e => setInputValue(e.target.value)}
         onKeyDown={onKeyDown}
         ref={textareaNode}
@@ -61,7 +92,7 @@ function CommentEditor({ comment, stopEditing, setFocusedCommentId }) {
         <button className="cancel" onClick={cancelEditingComment}>
           Cancel
         </button>
-        <button className="save" onClick={saveEditedComment}>
+        <button className="save" onClick={replying ? replyToComment : saveEditedComment}>
           Save
         </button>
       </div>

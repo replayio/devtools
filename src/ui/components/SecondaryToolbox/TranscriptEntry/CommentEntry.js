@@ -10,6 +10,7 @@ import CommentDropdownPanel from "ui/components/Comments/CommentDropdownPanel";
 
 function CommentEntry({ comment, user, currentTime, seek }) {
   const [editing, setEditing] = useState(false);
+  const [replying, setReplying] = useState(false);
   const seekToComment = () => {
     const { point, time, has_frames } = comment;
 
@@ -21,28 +22,46 @@ function CommentEntry({ comment, user, currentTime, seek }) {
   };
 
   return (
-    <div
-      className={classnames("comment", { selected: currentTime === comment.time })}
-      onClick={seekToComment}
-    >
-      <img src={comment.user.picture} className="comment-picture" />
-      {editing ? (
-        <CommentEditor comment={comment} stopEditing={() => setEditing(false)} />
-      ) : (
-        <CommentBody comment={comment} user={user} startEditing={() => setEditing(true)} />
-      )}
-      <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
-        <Dropdown
-          panel={
-            <CommentDropdownPanel
-              user={user}
-              comment={comment}
-              startEditing={() => setEditing(true)}
-            />
-          }
-          icon={<div>⋯</div>}
-        />
+    <div className="comment-container">
+      <div
+        className={classnames(
+          "comment",
+          { selected: currentTime === comment.time },
+          { reply: replying },
+          { "child-comment": comment.parent_id }
+        )}
+        onClick={seekToComment}
+      >
+        <img src={comment.user.picture} className="comment-picture" />
+        {editing ? (
+          <CommentEditor replying={false} comment={comment} stopEditing={() => setEditing(false)} />
+        ) : (
+          <CommentBody comment={comment} user={user} startEditing={() => setEditing(true)} />
+        )}
+        <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
+          <Dropdown
+            panel={
+              <CommentDropdownPanel
+                user={user}
+                comment={comment}
+                allowReply={true}
+                startEditing={() => setEditing(true)}
+                startReplying={() => setReplying(true)}
+              />
+            }
+            icon={<div>⋯</div>}
+          />
+        </div>
       </div>
+      {replying && (
+        <div className="comment">
+          <CommentEditor
+            replying={true}
+            comment={comment}
+            stopReplying={() => setReplying(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }

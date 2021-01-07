@@ -43,6 +43,12 @@ class CommentMarker extends React.Component {
       return <NewCommentButton comments={comments} />;
     }
 
+    // We don't want to show the replies on the timeline
+    // just the parent comment.
+    if (comment.parent_id) {
+      return null;
+    }
+
     if (comment.time > zoomRegion.endTime) {
       return null;
     }

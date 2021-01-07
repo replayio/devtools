@@ -32,6 +32,14 @@
   padding-left: 12px;
 }
 
+.comments-panel .comment.child-comment.selected {
+  border-color: #9ac7ff;
+}
+
+.comments-panel .comment-container {
+  width: 100%;
+}
+
 .comment .editor {
   flex-grow: 1;
 }
