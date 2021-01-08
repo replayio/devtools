@@ -182,7 +182,7 @@ export function seek(
 }
 
 export function seekToTime(targetTime: number): UIThunkAction {
-  return () => {
+  return ({ dispatch }) => {
     if (targetTime == null) {
       return;
     }
@@ -195,7 +195,7 @@ export function seekToTime(targetTime: number): UIThunkAction {
       // the debugger will be relative to the point instead of the time,
       // so e.g. running forward could land at a point before the time itself.
       // This could be fixed but doesn't seem worth worrying about for now.
-      seek(event.point, targetTime, false);
+      dispatch(seek(event.point, targetTime, false));
     }
   };
 }
@@ -241,7 +241,7 @@ export function stopPlayback(): UIThunkAction {
     const playback = selectors.getPlayback(getState());
 
     if (playback) {
-      seekToTime(playback.time);
+      dispatch(seekToTime(playback.time));
     }
 
     dispatch(setTimelineState({ playback: null }));
@@ -281,7 +281,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
 
       if (currentTime > endTime) {
         log(`FinishPlayback`);
-        seekToTime(endTime);
+        dispatch(seekToTime(endTime));
         return dispatch(setTimelineState({ currentTime: endTime, playback: null }));
       }
 
