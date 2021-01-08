@@ -146,12 +146,12 @@
   overflow: hidden;
 }
 
-.webconsole-app .message.primary-highlight {
-  background: var(--new-blue-200);
+.webconsole-app .message.primary-highlight .icon.logpoint {
+  background: var(--new-blue-900);
 }
 
-.webconsole-app .message.secondary-highlight {
-  background: var(--new-blue-50);
+.webconsole-app .message.secondary-highlight .icon.logpoint {
+  background: var(--replaying-marker-fill);
 }
 
 .webconsole-app .message.error {
@@ -269,7 +269,9 @@
 }
 
 .webconsole-app .message > .icon.logpoint {
-  color: var(--theme-graphs-purple);
+  background: var(--theme-emphasized-splitter-color);
+  mask-position: center;
+  mask-repeat: no-repeat;
 }
 
 .webconsole-app .message > .message-body-wrapper {
