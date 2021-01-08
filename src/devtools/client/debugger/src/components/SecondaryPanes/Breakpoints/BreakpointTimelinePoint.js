@@ -13,14 +13,12 @@ function toBigInt(num) {
   return num ? BigInt(num) : undefined;
 }
 
-function getIsSecondaryHighlighted(hoveredPoint, point) {
-  if (!point?.frame?.[0] || !hoveredPoint?.location) {
+function getIsSecondaryHighlighted(hoveredPoint, breakpoint) {
+  if (!breakpoint.id || !hoveredPoint?.location) {
     return false;
   }
 
-  const keyOne = getLocationKey(hoveredPoint.location);
-  const keyTwo = getLocationKey(point.frame[0]);
-  return keyOne == keyTwo;
+  return breakpoint.id == getLocationKey(hoveredPoint.location);
 }
 
 export function getLeftPercentOffset({ point, timelineNode, zoomRegion, markerWidth }) {
@@ -38,6 +36,7 @@ export function getLeftPercentOffset({ point, timelineNode, zoomRegion, markerWi
 }
 
 function BreakpointTimelinePoint({
+  breakpoint,
   point,
   index,
   timelineNode,
@@ -50,7 +49,9 @@ function BreakpointTimelinePoint({
 }) {
   const [leftPercentOffset, setLeftPercentOffset] = useState(0);
   const isPrimaryHighlighted = hoveredPoint?.point === point.point;
-  const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, point);
+  const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, breakpoint);
+
+  console.log(breakpoint);
 
   useEffect(() => {
     setLeftPercentOffset(
@@ -68,7 +69,7 @@ function BreakpointTimelinePoint({
       target: "widget",
       point: point.point,
       time: point.time,
-      location: point.frame[0],
+      location: breakpoint.location,
     };
     setHoveredPoint(hoveredPoint);
   };
@@ -97,14 +98,14 @@ function BreakpointTimelinePoint({
 const MemoizedBreakpointTimelinePoint = React.memo(
   BreakpointTimelinePoint,
   (prevProps, nextProps) => {
-    const { hoveredPoint, point } = prevProps;
+    const { hoveredPoint, point, breakpoint } = prevProps;
 
     const hoveredPointChanged = hoveredPoint !== nextProps.hoveredPoint;
     const isHighlighted =
-      hoveredPoint?.point == point.point || getIsSecondaryHighlighted(hoveredPoint, point);
+      hoveredPoint?.point == point.point || getIsSecondaryHighlighted(hoveredPoint, breakpoint);
     const willBeHighlighted =
       nextProps.hoveredPoint?.point == point.point ||
-      getIsSecondaryHighlighted(nextProps.hoveredPoint, point);
+      getIsSecondaryHighlighted(nextProps.hoveredPoint, breakpoint);
 
     if (hoveredPointChanged && !isHighlighted && !willBeHighlighted) {
       return true;
