@@ -6,7 +6,7 @@
 const { Component, createElement } = require("react");
 const dom = require("react-dom-factories");
 const { connect } = require("devtools/client/shared/redux/visibility-handler-connect");
-const actions = require("devtools/client/webconsole/actions/index");
+const { actions } = require("ui/actions");
 const ReactDOM = require("react-dom");
 const { selectors } = require("ui/reducers");
 
@@ -178,6 +178,7 @@ function mapStateToProps(state, props) {
     messagesPayload: selectors.getAllMessagesPayloadById(state),
     warningGroups: selectors.getAllWarningGroupsById(state),
     timestampsVisible: state.consoleUI.timestampsVisible,
+    playback: selectors.getPlayback(state),
   };
 }
 const mapDispatchToProps = dispatch => ({
