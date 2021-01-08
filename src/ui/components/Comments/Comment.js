@@ -99,15 +99,18 @@ class Comment extends React.Component {
   renderCommentBody() {
     const { editing } = this.state;
     const { comment } = this.props;
+    const isNewComment = comment.content === "";
 
     return (
       <div className="comment-body">
         <div className="comment-content">
-          <div className="comment-header">
-            <div className="actions">
-              <Dropdown panel={this.renderDropdownPanel()} icon={<div>⋯</div>} />
+          {!isNewComment ? (
+            <div className="comment-header">
+              <div className="actions">
+                <Dropdown panel={this.renderDropdownPanel()} icon={<div>⋯</div>} />
+              </div>
             </div>
-          </div>
+          ) : null}
           <div className="comment-description">
             {editing ? (
               <CommentEditor comment={comment} stopEditing={this.stopEditing} />
