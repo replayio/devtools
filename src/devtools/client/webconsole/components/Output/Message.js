@@ -101,7 +101,11 @@ class Message extends Component {
   componentDidUpdate() {
     const { hoveredPoint, executionPoint } = this.props;
 
-    if (hoveredPoint && hoveredPoint.point === executionPoint) {
+    if (
+      hoveredPoint &&
+      hoveredPoint.point === executionPoint &&
+      hoveredPoint.target !== "console"
+    ) {
       this.messageNode.scrollIntoView({ block: "center", behavior: "smooth" });
     }
   }
