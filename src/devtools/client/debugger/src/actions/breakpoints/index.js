@@ -27,6 +27,7 @@ import {
 } from "./modify";
 import { setBreakpointPositions } from "./breakpointPositions";
 import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 import remapLocations from "./remapLocations";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
 
@@ -186,8 +187,18 @@ export function updateHoveredLineNumber(cx, line) {
       line,
     };
 
+    // Set the initial location here as a placeholder to be checked after any async activity.
+    dispatch(actions.setHoveredLineNumberLocation(initialLocation));
+
     await dispatch(setBreakpointPositions({ cx, sourceId: source.id, line }));
     const location = getFirstBreakpointPosition(getState(), initialLocation);
+
+    // It's possible that after the `await` above the user is either 1) hovered off of the
+    // original line number, or 2) hovered on a different line number altogether. In that
+    // case, we should bail.
+    if (selectors.getHoveredLineNumberLocation(getState()) !== initialLocation) {
+      return;
+    }
 
     dispatch(actions.setHoveredLineNumberLocation(location));
   };
