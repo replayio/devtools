@@ -79,11 +79,11 @@ function getContentPosition(
     const dropdownRect = dropdownNode?.getBoundingClientRect();
 
     const { left, right, top, bottom } = buttonRect;
-    const { width: docWidth, height: docHeight } = docRect;
+    const { width, height } = docRect;
     const distance = props.distance || 5;
 
     let position = props.position || "bottom-left";
-    let viewportOverflows = getViewportOverflows(docRect, dropdownRect);
+    const viewportOverflows = getViewportOverflows(docRect, dropdownRect);
 
     viewportOverflows.forEach(overflow => {
       if (position.includes(overflow)) {
@@ -93,13 +93,13 @@ function getContentPosition(
 
     switch (position) {
       case "top-right":
-        return { bottom: docHeight - top + distance + "px", left: left + "px" };
+        return { bottom: height - top + distance + "px", left: left + "px" };
       case "bottom-right":
         return { top: bottom + distance + "px", left: left + "px" };
       case "top-left":
-        return { bottom: docHeight - top + distance + "px", right: docWidth - right + "px" };
+        return { bottom: height - top + distance + "px", right: width - right + "px" };
       case "bottom-left":
-        return { top: bottom + distance + "px", right: docWidth - right + "px" };
+        return { top: bottom + distance + "px", right: width - right + "px" };
     }
   }
 

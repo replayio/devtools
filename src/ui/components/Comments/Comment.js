@@ -79,7 +79,7 @@ class Comment extends React.Component {
         allowReply={false}
         user={user}
         comment={comment}
-        onItemClick={() => this.setState({ editing: false })}
+        onItemClick={() => this.setState({ menuExpanded: false })}
       />
     );
   }
