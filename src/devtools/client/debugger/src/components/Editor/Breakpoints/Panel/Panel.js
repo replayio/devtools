@@ -88,10 +88,6 @@ function Panel({ breakpoint, editor, insertAt, hoveredPoint }) {
   const [editing, setEditing] = useState(false);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
-  const focused =
-    hoveredPoint?.location &&
-    breakpoint?.location &&
-    getLocationKey(hoveredPoint.location) == getLocationKey(breakpoint.location);
 
   const toggleEditingOn = () => setEditing(true);
   const toggleEditingOff = () => setEditing(false);
@@ -104,10 +100,7 @@ function Panel({ breakpoint, editor, insertAt, hoveredPoint }) {
 
   return (
     <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
-      <div
-        style={{ width: `${width}px` }}
-        className={classnames("breakpoint-panel", { editing, focused })}
-      >
+      <div style={{ width: `${width}px` }} className={classnames("breakpoint-panel", { editing })}>
         {editing ? (
           <PanelEditor
             breakpoint={breakpoint}

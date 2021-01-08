@@ -13,7 +13,11 @@ function toBigInt(num) {
   return num ? BigInt(num) : undefined;
 }
 
-function getIsSecondaryHighlighted(hoveredPoint, breakpoint) {
+function hasPrimaryHighlight({ hoveredPoint, point }) {
+  return hoveredPoint?.point === point?.point;
+}
+
+function hasSecondaryHighlighted({ hoveredPoint, breakpoint }) {
   if (!breakpoint.id || !hoveredPoint?.location) {
     return false;
   }
@@ -48,10 +52,6 @@ function BreakpointTimelinePoint({
   setHoveredPoint,
 }) {
   const [leftPercentOffset, setLeftPercentOffset] = useState(0);
-  const isPrimaryHighlighted = hoveredPoint?.point === point.point;
-  const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, breakpoint);
-
-  console.log(breakpoint);
 
   useEffect(() => {
     setLeftPercentOffset(
@@ -64,15 +64,14 @@ function BreakpointTimelinePoint({
     );
   }, [point, timelineNode, zoomRegion]);
 
-  const onMouseEnter = () => {
-    const hoveredPoint = {
+  const onMouseEnter = () =>
+    setHoveredPoint({
       target: "widget",
       point: point.point,
       time: point.time,
       location: breakpoint.location,
-    };
-    setHoveredPoint(hoveredPoint);
-  };
+    });
+
   const onMouseLeave = () => setHoveredPoint(null);
 
   return (
@@ -81,8 +80,8 @@ function BreakpointTimelinePoint({
         past: toBigInt(point.point) < toBigInt(executionPoint),
         future: toBigInt(point.point) > toBigInt(executionPoint),
         pause: toBigInt(point.point) == toBigInt(executionPoint),
-        "primary-highlight": isPrimaryHighlighted,
-        "secondary-highlight": isSecondaryHighlighted,
+        "primary-highlight": hasPrimaryHighlight({ hoveredPoint, point }),
+        "secondary-highlight": hasSecondaryHighlighted({ hoveredPoint, breakpoint }),
       })}
       title={`${index + 1}/${analysisPoints.length}`}
       onClick={() => seek(point.point, point.time, true)}
@@ -98,20 +97,24 @@ function BreakpointTimelinePoint({
 const MemoizedBreakpointTimelinePoint = React.memo(
   BreakpointTimelinePoint,
   (prevProps, nextProps) => {
-    const { hoveredPoint, point, breakpoint } = prevProps;
-
-    const hoveredPointChanged = hoveredPoint !== nextProps.hoveredPoint;
-    const isHighlighted =
-      hoveredPoint?.point == point.point || getIsSecondaryHighlighted(hoveredPoint, breakpoint);
-    const willBeHighlighted =
-      nextProps.hoveredPoint?.point == point.point ||
-      getIsSecondaryHighlighted(nextProps.hoveredPoint, breakpoint);
-
-    if (hoveredPointChanged && !isHighlighted && !willBeHighlighted) {
-      return true;
+    function selectorChanged(selector) {
+      return selector(nextProps) !== selector(prevProps);
     }
 
-    return false;
+    function hasChanged(key) {
+      return nextProps[key] !== prevProps[key];
+    }
+
+    if (
+      selectorChanged(hasPrimaryHighlight) ||
+      selectorChanged(hasSecondaryHighlighted) ||
+      hasChanged("zoomRegion") ||
+      hasChanged("executionPoint")
+    ) {
+      return false;
+    }
+
+    return true;
   }
 );
 
@@ -120,7 +123,6 @@ export default connect(
     analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
     executionPoint: getExecutionPoint(state),
     zoomRegion: selectors.getZoomRegion(state),
-    recordingDuration: selectors.getRecordingDuration(state),
   }),
   {
     seek: actions.seek,

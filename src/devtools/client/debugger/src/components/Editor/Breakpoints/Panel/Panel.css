@@ -19,10 +19,6 @@
   overflow: hidden;
 }
 
-.breakpoint-panel.focused {
-  border: 1px solid var(--primary-accent);
-}
-
 .breakpoint-panel.editing {
   padding: 8px;
 }
