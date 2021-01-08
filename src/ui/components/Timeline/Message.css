@@ -43,6 +43,11 @@
   outline: none;
 }
 
+/* Enlarge all timeline markers when hovering on the timeline */
+.timeline:hover .message {
+  transform: scale(1.3);
+}
+
 /* Dimmed styles */
 
 .timeline.dimmed .message .fill {
@@ -54,7 +59,6 @@
 }
 
 .timeline.dimmed .message.secondary-highlight {
-  transform: scale(1.3);
   z-index: var(--z-index-2--hovered-point-secondary);
 }
 
@@ -63,7 +67,6 @@
 }
 
 .timeline.dimmed .message.primary-highlight {
-  transform: scale(1.3);
   z-index: var(--z-index-3--hovered-point-primary);
 }
 

@@ -113,7 +113,13 @@
   background: var(--grey-30);
 }
 
+/* Enlarge all timeline markers when hovering on the widget timeline */
+.breakpoint-navigation-timeline:hover .breakpoint-navigation-timeline-point {
+  transform: scale(1.3);
+}
+
 /* Dimmed styles */
+
 .breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point .fill {
   fill: var(--primary-accent-light);
 }
@@ -124,7 +130,6 @@
 
 .breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.secondary-highlight {
   z-index: var(--z-index-2--hovered-point-secondary);
-  transform: scale(1.3);
 }
 
 .breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.secondary-highlight .fill {
@@ -133,7 +138,6 @@
 
 .breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.primary-highlight {
   z-index: var(--z-index-3--hovered-point-primary);
-  transform: scale(1.3);
 }
 
 .breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.primary-highlight .fill {
