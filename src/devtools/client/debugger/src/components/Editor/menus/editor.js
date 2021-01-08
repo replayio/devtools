@@ -3,12 +3,11 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-
+import { bindActionCreators } from "redux";
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import { getRawSourceURL, getFilename, shouldBlackbox } from "../../../utils/source";
-
 import { downloadFile } from "../../../utils/utils";
-
+import actions from "../../../actions";
 import { isFulfilled } from "../../../utils/async-value";
 
 // menu items
@@ -115,4 +114,17 @@ export function editorMenuItems({
   }
 
   return items;
+}
+
+export function editorItemActions(dispatch) {
+  return bindActionCreators(
+    {
+      evaluateInConsole: actions.evaluateInConsole,
+      flashLineRange: actions.flashLineRange,
+      jumpToMappedLocation: actions.jumpToMappedLocation,
+      showSource: actions.showSource,
+      toggleBlackBox: actions.toggleBlackBox,
+    },
+    dispatch
+  );
 }

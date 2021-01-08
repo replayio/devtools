@@ -12,7 +12,7 @@ import { getSourceLocationFromMouseEvent } from "../../utils/editor";
 import { isPretty } from "../../utils/source";
 import { getPrettySource, getIsPaused, getThreadContext, isSourceWithMap } from "../../selectors";
 
-import { editorMenuItems } from "./menus/editor";
+import { editorMenuItems, editorItemActions } from "./menus/editor";
 
 class EditorMenu extends Component {
   UNSAFE_componentWillUpdate(nextProps) {
@@ -70,4 +70,8 @@ const mapStateToProps = (state, props) => ({
     !getPrettySource(state, props.selectedSource.id),
 });
 
-export default connect(mapStateToProps)(EditorMenu);
+const mapDispatchToProps = dispatch => ({
+  editorActions: editorItemActions(dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditorMenu);
