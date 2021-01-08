@@ -7,9 +7,22 @@ const { getAnalysisPointsForLocation } = selectors;
 import { actions } from "ui/actions";
 import { Marker } from "ui/components/Timeline/Message";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 function toBigInt(num) {
   return num ? BigInt(num) : undefined;
+}
+
+function hasPrimaryHighlight({ hoveredPoint, point }) {
+  return hoveredPoint?.point === point?.point;
+}
+
+function hasSecondaryHighlighted({ hoveredPoint, breakpoint }) {
+  if (!breakpoint.id || !hoveredPoint?.location) {
+    return false;
+  }
+
+  return breakpoint.id == getLocationKey(hoveredPoint.location);
 }
 
 export function getLeftPercentOffset({ point, timelineNode, zoomRegion, markerWidth }) {
@@ -27,6 +40,7 @@ export function getLeftPercentOffset({ point, timelineNode, zoomRegion, markerWi
 }
 
 function BreakpointTimelinePoint({
+  breakpoint,
   point,
   index,
   timelineNode,
@@ -34,6 +48,8 @@ function BreakpointTimelinePoint({
   executionPoint,
   zoomRegion,
   seek,
+  hoveredPoint,
+  setHoveredPoint,
 }) {
   const [leftPercentOffset, setLeftPercentOffset] = useState(0);
 
@@ -48,30 +64,68 @@ function BreakpointTimelinePoint({
     );
   }, [point, timelineNode, zoomRegion]);
 
+  const onMouseEnter = () =>
+    setHoveredPoint({
+      target: "widget",
+      point: point.point,
+      time: point.time,
+      location: breakpoint.location,
+    });
+
+  const onMouseLeave = () => setHoveredPoint(null);
+
   return (
     <div
       className={classnames("breakpoint-navigation-timeline-point", {
         past: toBigInt(point.point) < toBigInt(executionPoint),
         future: toBigInt(point.point) > toBigInt(executionPoint),
         pause: toBigInt(point.point) == toBigInt(executionPoint),
+        "primary-highlight": hasPrimaryHighlight({ hoveredPoint, point }),
+        "secondary-highlight": hasSecondaryHighlighted({ hoveredPoint, breakpoint }),
       })}
       title={`${index + 1}/${analysisPoints.length}`}
       onClick={() => seek(point.point, point.time, true)}
       style={{ left: `${leftPercentOffset}%` }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <Marker onMarkerClick={() => {}} />
     </div>
   );
 }
 
+const MemoizedBreakpointTimelinePoint = React.memo(
+  BreakpointTimelinePoint,
+  (prevProps, nextProps) => {
+    function selectorChanged(selector) {
+      return selector(nextProps) !== selector(prevProps);
+    }
+
+    function hasChanged(key) {
+      return nextProps[key] !== prevProps[key];
+    }
+
+    if (
+      selectorChanged(hasPrimaryHighlight) ||
+      selectorChanged(hasSecondaryHighlighted) ||
+      hasChanged("zoomRegion") ||
+      hasChanged("executionPoint")
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+);
+
 export default connect(
   (state, { breakpoint }) => ({
     analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
     executionPoint: getExecutionPoint(state),
     zoomRegion: selectors.getZoomRegion(state),
-    recordingDuration: selectors.getRecordingDuration(state),
   }),
   {
     seek: actions.seek,
+    setHoveredPoint: actions.setHoveredPoint,
   }
-)(BreakpointTimelinePoint);
+)(MemoizedBreakpointTimelinePoint);

@@ -15,7 +15,8 @@
   line-height: 16px;
   color: var(--theme-toolbar-color);
   max-width: 500px;
-  min-width: 300px
+  min-width: 300px;
+  overflow: hidden;
 }
 
 .breakpoint-panel.editing {

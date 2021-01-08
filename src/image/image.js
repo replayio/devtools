@@ -48,7 +48,6 @@ const gBackgroundImages = {
   ".message.error > .icon": require("devtools/client/themes/images/error-small.svg"),
   ".message.warn > .icon": require("devtools/client/themes/images/alert-small.svg"),
   ".message.navigationMarker > .icon": require("devtools/client/themes/images/webconsole/navigation.svg"),
-  ".message > .icon.logpoint": require("devtools/client/debugger/images/webconsole-logpoint.svg"),
   //".jsterm-input-container > .CodeMirror": require("devtools/client/themes/images/webconsole/input.svg"),
   "#split-console-close-button::before": require("devtools/client/themes/images/close.svg"),
   '.menuitem > .command[aria-checked="true"]': require("devtools/client/themes/images/check.svg"),
@@ -165,6 +164,7 @@ const gMaskImages = {
   ".overlay-container.rewind .img": require("devtools/client/debugger/images/rewind-button.svg"),
   ".overlay-container.fast-forward .img": require("devtools/client/debugger/images/rewind-button.svg"),
   ".overlay-container.debug .img": require("devtools/client/debugger/images/diamond-pause.svg"),
+  ".message > .icon.logpoint": require("devtools/client/debugger/images/webconsole-logpoint.svg"),
 };
 
 const gContentImages = {

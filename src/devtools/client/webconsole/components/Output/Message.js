@@ -11,13 +11,23 @@ const { actions } = require("ui/actions/index");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const MessageIcon = require("devtools/client/webconsole/components/Output/MessageIcon");
-const { CloseButton } = require("devtools/client/debugger/src/components/shared/Button");
 const FrameView = createFactory(require("devtools/client/shared/components/Frame"));
 
 const CollapseButton = require("devtools/client/webconsole/components/Output/CollapseButton");
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
 const PropTypes = require("prop-types");
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
+const { getLocationKey } = require("devtools/client/debugger/src/utils/breakpoint");
+
+function getIsSecondaryHighlighted(hoveredPoint, message) {
+  if (!message?.frame || !hoveredPoint?.location) {
+    return false;
+  }
+
+  const keyOne = getLocationKey(hoveredPoint.location);
+  const keyTwo = getLocationKey(message.frame);
+  return keyOne == keyTwo;
+}
 
 class Message extends Component {
   static get propTypes() {
@@ -86,6 +96,36 @@ class Message extends Component {
 
   componentDidCatch(e) {
     this.setState({ error: e });
+  }
+
+  componentDidUpdate() {
+    const { hoveredPoint, executionPoint } = this.props;
+
+    if (
+      hoveredPoint &&
+      hoveredPoint.point === executionPoint &&
+      hoveredPoint.target !== "console"
+    ) {
+      this.messageNode.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const { hoveredPoint, message } = this.props;
+
+    const hoveredPointChanged = hoveredPoint !== nextProps.hoveredPoint;
+    const isHighlighted =
+      hoveredPoint?.point == message.executionPoint ||
+      getIsSecondaryHighlighted(hoveredPoint, message);
+    const willBeHighlighted =
+      nextProps.hoveredPoint?.point == message.executionPoint ||
+      getIsSecondaryHighlighted(nextProps.hoveredPoint, message);
+
+    if (hoveredPointChanged && !isHighlighted && !willBeHighlighted) {
+      return false;
+    }
+
+    return true;
   }
 
   // Event used in tests. Some message types don't pass it in because existing tests
@@ -285,6 +325,7 @@ class Message extends Component {
       executionPoint,
       messageId,
       notes,
+      hoveredPoint,
     } = this.props;
 
     topLevelClasses.push("message", source, type, level);
@@ -294,6 +335,15 @@ class Message extends Component {
 
     if (isPaused) {
       topLevelClasses.push("paused");
+    }
+
+    const isPrimaryHighlighted = hoveredPoint?.point === executionPoint;
+    const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, { frame });
+
+    if (isPrimaryHighlighted) {
+      topLevelClasses.push("primary-highlight");
+    } else if (isSecondaryHighlighted) {
+      topLevelClasses.push("secondary-highlight");
     }
 
     const timestampEl = this.renderTimestamp();
@@ -392,6 +442,7 @@ class Message extends Component {
         ...mouseEvents,
         "data-message-id": messageId,
         "aria-live": type === MESSAGE_TYPE.COMMAND ? "off" : "polite",
+        ref: node => (this.messageNode = node),
       },
       overlayButton,
       timestampEl,
