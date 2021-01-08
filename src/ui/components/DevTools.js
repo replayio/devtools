@@ -127,6 +127,10 @@ function DevTools({
     return null;
   }
 
+  if (document.title != data.recordings[0].title) {
+    document.title = data.recordings[0].title;
+  }
+
   if (loading < 100) {
     return <RecordingLoadingScreen />;
   }
