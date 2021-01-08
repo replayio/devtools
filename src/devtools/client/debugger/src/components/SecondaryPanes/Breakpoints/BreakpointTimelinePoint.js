@@ -46,6 +46,7 @@ function BreakpointTimelinePoint({
   zoomRegion,
   seek,
   hoveredPoint,
+  setHoveredPoint,
 }) {
   const [leftPercentOffset, setLeftPercentOffset] = useState(0);
   const isPrimaryHighlighted = hoveredPoint?.point === point.point;
@@ -62,6 +63,17 @@ function BreakpointTimelinePoint({
     );
   }, [point, timelineNode, zoomRegion]);
 
+  const onMouseEnter = () => {
+    const hoveredPoint = {
+      target: "widget",
+      point: point.point,
+      time: point.time,
+      location: point.frame[0],
+    };
+    setHoveredPoint(hoveredPoint);
+  };
+  const onMouseLeave = () => setHoveredPoint(null);
+
   return (
     <div
       className={classnames("breakpoint-navigation-timeline-point", {
@@ -74,6 +86,8 @@ function BreakpointTimelinePoint({
       title={`${index + 1}/${analysisPoints.length}`}
       onClick={() => seek(point.point, point.time, true)}
       style={{ left: `${leftPercentOffset}%` }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <Marker onMarkerClick={() => {}} />
     </div>
@@ -109,5 +123,6 @@ export default connect(
   }),
   {
     seek: actions.seek,
+    setHoveredPoint: actions.setHoveredPoint,
   }
 )(MemoizedBreakpointTimelinePoint);
