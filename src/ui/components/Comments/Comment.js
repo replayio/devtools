@@ -8,7 +8,7 @@ import hooks from "ui/hooks";
 import { getPixelOffset, getCommentLeftOffset } from "ui/utils/timeline";
 
 import CommentMarker from "./CommentMarker";
-import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
 import CommentEditor from "./CommentEditor";
 import CommentDropdownPanel from "./CommentDropdownPanel";
 
@@ -79,6 +79,7 @@ class Comment extends React.Component {
         allowReply={false}
         user={user}
         comment={comment}
+        onItemClick={() => this.setState({ menuExpanded: false })}
       />
     );
   }
@@ -97,7 +98,7 @@ class Comment extends React.Component {
   }
 
   renderCommentBody() {
-    const { editing } = this.state;
+    const { editing, menuExpanded } = this.state;
     const { comment } = this.props;
     const isNewComment = comment.content === "";
 
@@ -107,7 +108,13 @@ class Comment extends React.Component {
           {!isNewComment ? (
             <div className="comment-header">
               <div className="actions">
-                <Dropdown panel={this.renderDropdownPanel()} icon={<div>⋯</div>} />
+                <PortalDropdown
+                  buttonContent={<div className="dropdown-button">⋯</div>}
+                  expanded={menuExpanded}
+                  setExpanded={value => this.setState({ menuExpanded: value })}
+                >
+                  {this.renderDropdownPanel()}
+                </PortalDropdown>
               </div>
             </div>
           ) : null}

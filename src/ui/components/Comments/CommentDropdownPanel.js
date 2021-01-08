@@ -10,6 +10,7 @@ export function CommentDropdownPanel({
   startEditing,
   startReplying,
   setFocusedCommentId,
+  onItemClick,
 }) {
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
@@ -29,7 +30,7 @@ export function CommentDropdownPanel({
   }
 
   return (
-    <div className="dropdown-panel">
+    <div className="dropdown-panel" onClick={onItemClick}>
       {isAuthor && (
         <div className="menu-item" onClick={startEditing}>
           Edit Comment

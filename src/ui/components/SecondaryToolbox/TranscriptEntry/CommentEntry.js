@@ -4,13 +4,14 @@ import classnames from "classnames";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 
-import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import CommentEditor from "ui/components/Comments/CommentEditor";
 import CommentDropdownPanel from "ui/components/Comments/CommentDropdownPanel";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
 
 function CommentEntry({ comment, user, currentTime, seek }) {
   const [editing, setEditing] = useState(false);
   const [replying, setReplying] = useState(false);
+  const [menuExpanded, setMenuExpanded] = useState(false);
   const seekToComment = () => {
     const { point, time, has_frames } = comment;
 
@@ -39,18 +40,20 @@ function CommentEntry({ comment, user, currentTime, seek }) {
           <CommentBody comment={comment} user={user} startEditing={() => setEditing(true)} />
         )}
         <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
-          <Dropdown
-            panel={
-              <CommentDropdownPanel
-                user={user}
-                comment={comment}
-                allowReply={true}
-                startEditing={() => setEditing(true)}
-                startReplying={() => setReplying(true)}
-              />
-            }
-            icon={<div>⋯</div>}
-          />
+          <PortalDropdown
+            buttonContent={<div className="dropdown-button">⋯</div>}
+            expanded={menuExpanded}
+            setExpanded={setMenuExpanded}
+          >
+            <CommentDropdownPanel
+              user={user}
+              comment={comment}
+              allowReply={true}
+              startEditing={() => setEditing(true)}
+              startReplying={() => setReplying(true)}
+              onItemClick={() => setMenuExpanded(false)}
+            />
+          </PortalDropdown>
         </div>
       </div>
       {replying && (
