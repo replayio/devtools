@@ -103,7 +103,7 @@ class FrameTimeline extends Component {
     this.setState({ scrubbing: false });
 
     if (position) {
-      seek(position.point, position.time);
+      seek(position.point, position.time, true);
       clearPreviewPausedLocation();
     }
   };
