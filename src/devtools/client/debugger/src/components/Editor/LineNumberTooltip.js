@@ -55,8 +55,14 @@ export function LineNumberTooltip({
     };
   }, []);
 
-  if (!lineNumberNode || !analysisPoints) {
+  if (!lineNumberNode) {
     return null;
+  }
+
+  // Show a loading state immediately while we wait for the analysis points
+  // to be generated.
+  if (!analysisPoints) {
+    return <StaticTooltip targetNode={lineNumberNode}>...</StaticTooltip>;
   }
 
   return (
