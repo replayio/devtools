@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 
 import Timeline from "../Timeline";
 import Viewer from "../Viewer";
-import Tooltip from "../Tooltip";
 import Toolbox from "../Toolbox";
 import Toolbar from "../Toolbar";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
