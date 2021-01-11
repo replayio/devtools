@@ -27,7 +27,6 @@ function Comments({ playback, recordingId, pendingComment }) {
 
   const sortedComments = sortBy(displayedComments, comment => comment.time);
 
-  console.log(sortedComments);
   return (
     <div className="comments-container">
       {sortedComments.map((comment, index) => (

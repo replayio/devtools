@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import classnames from "classnames";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import { useAuth0 } from "@auth0/auth0-react";
 
 import CommentEditor from "ui/components/Comments/CommentEditor";
 import CommentDropdownPanel from "ui/components/Comments/CommentDropdownPanel";
@@ -10,7 +11,6 @@ import PortalDropdown from "ui/components/shared/PortalDropdown";
 
 function Comment({ comment, user, currentTime, seek }) {
   const [editing, setEditing] = useState(false);
-  const [replying, setReplying] = useState(false);
   const commentEl = useRef(null);
   const [menuExpanded, setMenuExpanded] = useState(false);
   const seekToComment = () => {
@@ -46,14 +46,13 @@ function Comment({ comment, user, currentTime, seek }) {
         className={classnames(
           "comment",
           { selected: currentTime === comment.time },
-          { reply: replying },
           { "child-comment": comment.parent_id }
         )}
         onClick={seekToComment}
       >
         <img src={comment.user.picture} className="comment-picture" />
         {editing ? (
-          <CommentEditor replying={false} comment={comment} stopEditing={() => setEditing(false)} />
+          <CommentEditor comment={comment} stopEditing={() => setEditing(false)} />
         ) : (
           <CommentBody comment={comment} user={user} startEditing={() => setEditing(true)} />
         )}
@@ -67,34 +66,25 @@ function Comment({ comment, user, currentTime, seek }) {
               <CommentDropdownPanel
                 user={user}
                 comment={comment}
-                allowReply={true}
                 startEditing={() => setEditing(true)}
-                startReplying={() => setReplying(true)}
                 onItemClick={() => setMenuExpanded(false)}
               />
             </PortalDropdown>
           </div>
         ) : null}
       </div>
-      {replying && (
-        <div className="comment">
-          <CommentEditor
-            replying={true}
-            comment={comment}
-            stopReplying={() => setReplying(false)}
-          />
-        </div>
-      )}
     </div>
   );
 }
 
 function NewComment({ comment, currentTime, commentEl, setEditing }) {
+  const { user } = useAuth0();
+
   return (
     <div className="comment-container" ref={commentEl}>
       <div className={classnames("comment", { selected: currentTime === comment.time })}>
-        {/* <img src={comment.user.picture} className="comment-picture" /> */}
-        <CommentEditor replying={false} comment={comment} stopEditing={() => setEditing(false)} />
+        <img src={user.picture} className="comment-picture" />
+        <CommentEditor comment={comment} stopEditing={() => setEditing(false)} />
       </div>
     </div>
   );

@@ -31,14 +31,6 @@ const ADD_COMMENT = gql`
   }
 `;
 
-const ADD_COMMENT_REPLY = gql`
-  mutation AddCommentReply($object: comments_insert_input! = {}) {
-    insert_comments_one(object: $object) {
-      id
-    }
-  }
-`;
-
 const UPDATE_COMMENT_CONTENT = gql`
   mutation UpdateCommentContent($newContent: String, $commentId: uuid) {
     update_comments(_set: { content: $newContent }, where: { id: { _eq: $commentId } }) {
@@ -96,18 +88,6 @@ export function useAddComment(callback: Function = () => {}) {
   });
 
   return addComment;
-}
-
-export function useAddCommentReply(callback: Function) {
-  const [addCommentReply] = useMutation(ADD_COMMENT_REPLY, {
-    onCompleted: data => {
-      const { id } = data.insert_comments_one;
-      callback(id);
-    },
-    refetchQueries: ["GetComments"],
-  });
-
-  return addCommentReply;
 }
 
 export function useUpdateComment(callback: Function) {

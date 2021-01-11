@@ -1,13 +1,18 @@
 import React from "react";
 import hooks from "ui/hooks";
+import { connect } from "react-redux";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
+import { ThreadFront } from "protocol/thread";
 
-export default function CommentDropdownPanel({
+function CommentDropdownPanel({
   user,
   comment,
   allowReply,
   startEditing,
-  startReplying,
   onItemClick,
+  setPendingComment,
+  recordingId,
 }) {
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
@@ -19,6 +24,18 @@ export default function CommentDropdownPanel({
     if (!comment.parent_id) {
       deleteCommentReplies({ variables: { parentId: comment.id } });
     }
+  };
+  const addReply = () => {
+    const pendingComment = {
+      content: "",
+      recording_id: recordingId,
+      time: comment.time,
+      point: ThreadFront.currentPoint,
+      has_frames: ThreadFront.currentPointHasFrames,
+      parent_id: comment.id,
+    };
+
+    setPendingComment(pendingComment);
   };
 
   if (!user?.loggedIn) {
@@ -38,7 +55,7 @@ export default function CommentDropdownPanel({
             Delete Comment
           </div>
           {!comment.parent_id && allowReply && (
-            <div className="menu-item" onClick={startReplying}>
+            <div className="menu-item" onClick={addReply}>
               Reply to Comment
             </div>
           )}
@@ -47,3 +64,12 @@ export default function CommentDropdownPanel({
     </div>
   );
 }
+
+export default connect(
+  state => ({
+    recordingId: selectors.getRecordingId(state),
+  }),
+  {
+    setPendingComment: actions.setPendingComment,
+  }
+)(CommentDropdownPanel);
