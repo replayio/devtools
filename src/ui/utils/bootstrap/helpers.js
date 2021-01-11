@@ -5,7 +5,7 @@ import { prefs, features } from "ui/utils/prefs";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
-
+import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
 import {
   prefs as inspectorPrefs,
   features as inspectorFeatures,
@@ -13,13 +13,21 @@ import {
 
 export function setupAppHelper(store) {
   window.app = {
-    store,
     actions: bindActionCreators(actions, store.dispatch),
     selectors: bindSelectors({ store, selectors }),
-    consolePrefs,
+    threadFront: ThreadFront,
+    store,
     prefs,
     features,
-    threadFront: ThreadFront,
+    console: {
+      prefs: consolePrefs,
+    },
+    debugger: setupDebuggerHelper(),
+    inspector: {
+      prefs: inspectorPrefs,
+      features: inspectorFeatures,
+    },
+
     dumpPrefs: () =>
       JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
     local: () => {
@@ -40,15 +48,6 @@ export function setupAppHelper(store) {
         window.location = "http://replay.io/view";
       }
     },
-  };
-}
-
-export function setupInspectorHelper(inspector) {
-  window.app.inspector = {
-    store: inspector.store,
-
-    prefs: inspectorPrefs,
-    features: inspectorFeatures,
   };
 }
 

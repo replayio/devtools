@@ -13,7 +13,7 @@ import { readFileSync } from "fs";
 import Enzyme from "enzyme";
 // $FlowIgnore
 import Adapter from "enzyme-adapter-react-16";
-import { setupHelper } from "../utils/dbg";
+import { setupDebuggerHelper } from "../utils/dbg";
 import { prefs } from "../utils/prefs";
 
 import { startSourceMapWorker, stopSourceMapWorker } from "devtools-source-map";
@@ -87,7 +87,7 @@ beforeEach(async () => {
   clearDocuments();
 
   // Ensures window.dbg is there to track telemetry
-  setupHelper({ selectors: {} });
+  setupDebuggerHelper({ selectors: {} });
 });
 
 function mockIndexeddDB() {

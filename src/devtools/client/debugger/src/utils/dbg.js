@@ -9,13 +9,12 @@ function getCM() {
   return cm && cm.CodeMirror;
 }
 
-export function setupHelper() {
+export function setupDebuggerHelper() {
   const dbg = {
     prefs,
     asyncStore,
     features,
     getCM,
   };
-
-  window.dbg = dbg;
+  return dbg;
 }
