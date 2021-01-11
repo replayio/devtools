@@ -22,5 +22,4 @@ export interface MetadataState {
   comments: Comment[];
   user: User;
   users: User[];
-  focusedCommentId: number | null;
 }

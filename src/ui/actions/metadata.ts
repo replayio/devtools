@@ -31,10 +31,6 @@ export function setupMetadata(_: any, store: UIStore) {
   }
 }
 
-export function setFocusedCommentId(id: number): SetFocusedCommentAction {
-  return { type: "set_focused_comment_id", id };
-}
-
 export function registerUser(): RegisterUserAction {
   const user = prefs.user?.id
     ? prefs.user

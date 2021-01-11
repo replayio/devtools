@@ -15,12 +15,12 @@ function NewCommentButton({
   zoomRegion,
   recordingId,
   focusedCommentId,
-  setFocusedCommentId,
   comments,
   hideTooltip,
+  setSelectedPanel,
+  viewMode,
 }) {
   const addCommentCallback = id => {
-    setFocusedCommentId(id);
     hideTooltip();
   };
   const addComment = hooks.useAddComment(addCommentCallback);
@@ -35,6 +35,10 @@ function NewCommentButton({
   }
 
   const handleClick = () => {
+    if (viewMode === "dev") {
+      setSelectedPanel("comments");
+    }
+
     const newComment = {
       content: "",
       recording_id: recordingId,
@@ -73,9 +77,10 @@ export default connect(
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
     focusedCommentId: selectors.getFocusedCommentId(state),
+    viewMode: selectors.getViewMode(state),
   }),
   {
-    setFocusedCommentId: actions.setFocusedCommentId,
     hideTooltip: actions.hideTooltip,
+    setSelectedPanel: actions.setSelectedPanel,
   }
 )(NewCommentButton);

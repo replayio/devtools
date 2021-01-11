@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-
-import { connect } from "react-redux";
-import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 
-function CommentEditor({ comment, stopEditing, setFocusedCommentId, stopReplying, replying }) {
+export default function CommentEditor({ comment, stopEditing, stopReplying, replying }) {
   const [inputValue, setInputValue] = useState(replying ? null : comment.content);
   const textareaNode = useRef(null);
+  const editorNode = useRef(null);
+  const intervalKey = useRef(null);
 
   const closeEditor = () => {
     if (replying) {
@@ -14,20 +13,30 @@ function CommentEditor({ comment, stopEditing, setFocusedCommentId, stopReplying
     } else {
       stopEditing();
     }
-    setFocusedCommentId(null);
   };
 
   const updateComment = hooks.useUpdateComment(closeEditor);
   const deleteComment = hooks.useDeleteComment();
 
-  useEffect(function focusText() {
+  useEffect(() => {
     const { length } = textareaNode.current.value;
     textareaNode.current.focus();
     textareaNode.current.setSelectionRange(length, length);
+
+    intervalKey.current = setInterval(function checkFocusInEditor() {
+      if (!editorNode.current.contains(document.activeElement)) {
+        cancelEditingComment();
+      }
+    }, 500);
+
+    window.addEventListener("beforeunload", () => {
+      cancelEditingComment();
+    });
+
+    return () => clearInterval(intervalKey.current);
   }, []);
 
-  const replyToCommentCallback = id => {
-    setFocusedCommentId(id);
+  const replyToCommentCallback = () => {
     closeEditor();
   };
 
@@ -81,7 +90,7 @@ function CommentEditor({ comment, stopEditing, setFocusedCommentId, stopReplying
   };
 
   return (
-    <div className="editor">
+    <div className="editor" ref={editorNode}>
       <textarea
         defaultValue={inputValue}
         onChange={e => setInputValue(e.target.value)}
@@ -99,7 +108,3 @@ function CommentEditor({ comment, stopEditing, setFocusedCommentId, stopReplying
     </div>
   );
 }
-
-export default connect(() => ({}), {
-  setFocusedCommentId: actions.setFocusedCommentId,
-})(CommentEditor);

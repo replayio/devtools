@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
 import { selectors } from "ui/reducers";
@@ -11,6 +11,7 @@ import PortalDropdown from "ui/components/shared/PortalDropdown";
 function CommentEntry({ comment, user, currentTime, seek }) {
   const [editing, setEditing] = useState(false);
   const [replying, setReplying] = useState(false);
+  const commentEl = useRef(null);
   const [menuExpanded, setMenuExpanded] = useState(false);
   const seekToComment = () => {
     const { point, time, has_frames } = comment;
@@ -22,8 +23,23 @@ function CommentEntry({ comment, user, currentTime, seek }) {
     return seek(point, time, has_frames);
   };
 
+  useEffect(() => {
+    // A newly-added comment, which is initialized as empty, should go directly
+    // into editing mode.
+    if (!comment.content) {
+      setEditing(true);
+    }
+  }, [comment]);
+
+  useEffect(() => {
+    if (comment.time === currentTime) {
+      console.log(commentEl);
+      commentEl.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [currentTime]);
+
   return (
-    <div className="comment-container">
+    <div className="comment-container" ref={commentEl}>
       <div
         className={classnames(
           "comment",
