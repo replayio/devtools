@@ -42,23 +42,22 @@
    * - We added a few unofficial colors: a few intermediary values (e.g. Blue 45),
    *   and lighter variants for the dark theme (e.g. Red 20, Red 40).
    */
-  
-  --primary-accent: #1B7FE3;
-  --primary-accent-light: #86BFF9;
-  --secondary-accent: #8330F4;
-  --secondary-accent-stroke: #F9F5FF;
 
-  --new-blue-50: #EFF7FF;
-  --new-blue-100: #DBEDFF;
-  --new-blue-200: #B9DBFD;
-  --new-blue-300: #94C6FA;
-  --new-blue-400: #76B5F4;
-  --new-blue-500: #55A1EC;
-  --new-blue-600: #3B8FE3;
-  --new-blue-700: #257AD0;
-  --new-blue-800: #2569AD;
+  --primary-accent: #1b7fe3;
+  --primary-accent-light: #86bff9;
+  --secondary-accent: #8330f4;
+  --secondary-accent-stroke: #f9f5ff;
+
+  --new-blue-50: #eff7ff;
+  --new-blue-100: #dbedff;
+  --new-blue-200: #b9dbfd;
+  --new-blue-300: #94c6fa;
+  --new-blue-400: #76b5f4;
+  --new-blue-500: #55a1ec;
+  --new-blue-600: #3b8fe3;
+  --new-blue-700: #257ad0;
+  --new-blue-800: #2569ad;
   --new-blue-900: #215487;
-
 
   --magenta-50: #ff1ad9;
   --magenta-65: #dd00a9;
@@ -389,13 +388,12 @@ custom variable for it below so we can keep track of everything in one place. */
   --z-index-1--paused-comment: var(--z-index-1);
   --z-index-1--paused-message: var(--z-index-1);
   --z-index-1--comment-container: var(--z-index-1);
-  --z-index-1--timeline-tooltip: var(--z-index-1);
   --z-index-1--icon-tooltip: var(--z-index-1);
-  
+
   --z-index-2--hovered-point-secondary: var(--z-index-2);
-  
+
   --z-index-3--hovered-point-primary: var(--z-index-3);
-  
+
   --z-index-4--name: var(--z-index-4);
   --z-index-5--name: var(--z-index-5);
   --z-index-6--name: var(--z-index-6);

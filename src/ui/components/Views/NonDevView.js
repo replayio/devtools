@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { connect } from "react-redux";
 
 import Timeline from "../Timeline";
-import Tooltip from "../Tooltip";
 import Video from "../Video";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
@@ -60,7 +59,6 @@ function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
       <Video />
       <div id="timeline-container">
         <Timeline />
-        <Tooltip />
       </div>
     </div>
   );
@@ -100,7 +98,6 @@ function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
         />
         <div id="timeline-container">
           <Timeline />
-          <Tooltip />
         </div>
       </>
     );
