@@ -8,7 +8,6 @@ import { ThreadFront } from "protocol/thread";
 function CommentDropdownPanel({
   user,
   comment,
-  allowReply,
   startEditing,
   onItemClick,
   setPendingComment,
@@ -54,7 +53,7 @@ function CommentDropdownPanel({
           <div className="menu-item" onClick={() => removeComment(comment)}>
             Delete Comment
           </div>
-          {!comment.parent_id && allowReply && (
+          {!comment.parent_id && (
             <div className="menu-item" onClick={addReply}>
               Reply to Comment
             </div>
