@@ -3,7 +3,7 @@ import Comment from "ui/components/Comments/Comment";
 import EventEntry from "./EventEntry";
 
 export default function TranscriptEntry({ entry }) {
-  if (entry.__typename === "comments") {
+  if ("content" in entry) {
     return <Comment comment={entry} />;
   } else {
     return <EventEntry entry={entry} />;

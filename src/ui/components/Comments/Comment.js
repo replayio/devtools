@@ -24,18 +24,21 @@ function Comment({ comment, user, currentTime, seek }) {
   };
 
   useEffect(() => {
-    // A newly-added comment, which is initialized as empty, should go directly
-    // into editing mode.
-    if (!comment.content) {
-      setEditing(true);
-    }
-  }, [comment]);
-
-  useEffect(() => {
     if (comment.time === currentTime) {
       commentEl.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, [currentTime]);
+
+  if (comment.content === "") {
+    return (
+      <NewComment
+        comment={comment}
+        commentEl={commentEl}
+        setEditing={setEditing}
+        currentTime={currentTime}
+      />
+    );
+  }
 
   return (
     <div className="comment-container" ref={commentEl}>
@@ -82,6 +85,17 @@ function Comment({ comment, user, currentTime, seek }) {
           />
         </div>
       )}
+    </div>
+  );
+}
+
+function NewComment({ comment, currentTime, commentEl, setEditing }) {
+  return (
+    <div className="comment-container" ref={commentEl}>
+      <div className={classnames("comment", { selected: currentTime === comment.time })}>
+        {/* <img src={comment.user.picture} className="comment-picture" /> */}
+        <CommentEditor replying={false} comment={comment} stopEditing={() => setEditing(false)} />
+      </div>
     </div>
   );
 }

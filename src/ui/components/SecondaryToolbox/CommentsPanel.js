@@ -8,7 +8,7 @@ import { sortBy } from "lodash";
 import TranscriptEntry from "./TranscriptEntry/index";
 import "./CommentsPanel.css";
 
-function CommentsPanel({ recordingId, clickEvents, showClicks }) {
+function CommentsPanel({ recordingId, clickEvents, showClicks, pendingComment }) {
   const { comments } = hooks.useGetComments(recordingId);
 
   // We allow the panel to render its entries whether or not the
@@ -17,6 +17,10 @@ function CommentsPanel({ recordingId, clickEvents, showClicks }) {
   // if the query returns an erro and we should add error handling that provides
   // next steps for fixing the error by refetching/refreshing.
   let entries = comments || [];
+
+  if (pendingComment) {
+    entries = [...entries, pendingComment];
+  }
 
   if (showClicks) {
     entries = [...entries, ...clickEvents];
@@ -42,4 +46,5 @@ function CommentsPanel({ recordingId, clickEvents, showClicks }) {
 export default connect(state => ({
   recordingId: selectors.getRecordingId(state),
   clickEvents: selectors.getEventsForType(state, "mousedown"),
+  pendingComment: selectors.getPendingComment(state),
 }))(CommentsPanel);

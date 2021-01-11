@@ -1,19 +1,6 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
-
-interface Comment {
-  content: "string";
-  created_at: "string";
-  has_frames: "boolean";
-  id: "string";
-  point: "string";
-  recording_id: "string";
-  parent_id: "string";
-  time: "number";
-  updated_at: "string";
-  user_id: "string";
-  __typename: "string";
-}
+import { Comment } from "ui/state/app";
 
 const GET_COMMENTS = gql`
   query GetComments($recordingId: uuid) {
@@ -85,7 +72,7 @@ const DELETE_COMMENT_REPLIES = gql`
 
 export function useGetComments(
   recordingId: RecordingId
-): { comments: [Comment]; loading: boolean; error?: ApolloError } {
+): { comments: Comment[]; loading: boolean; error?: ApolloError } {
   const { data, loading, error } = useQuery(GET_COMMENTS, {
     variables: { recordingId },
   });
@@ -99,7 +86,7 @@ export function useGetComments(
   return { comments: data?.comments, loading, error };
 }
 
-export function useAddComment(callback: Function) {
+export function useAddComment(callback: Function = () => {}) {
   const [addComment] = useMutation(ADD_COMMENT, {
     onCompleted: data => {
       const { id } = data.insert_comments_one;

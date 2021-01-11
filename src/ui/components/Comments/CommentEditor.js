@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
+import { connect } from "react-redux";
 import hooks from "ui/hooks";
+import { actions } from "ui/actions";
 
-export default function CommentEditor({ comment, stopEditing, stopReplying, replying }) {
+function CommentEditor({ comment, stopEditing, stopReplying, replying, clearPendingComment }) {
   const [inputValue, setInputValue] = useState(replying ? null : comment.content);
   const textareaNode = useRef(null);
   const editorNode = useRef(null);
@@ -15,6 +17,7 @@ export default function CommentEditor({ comment, stopEditing, stopReplying, repl
     }
   };
 
+  const addComment = hooks.useAddComment(() => clearPendingComment());
   const updateComment = hooks.useUpdateComment(closeEditor);
   const deleteComment = hooks.useDeleteComment();
 
@@ -23,17 +26,14 @@ export default function CommentEditor({ comment, stopEditing, stopReplying, repl
     textareaNode.current.focus();
     textareaNode.current.setSelectionRange(length, length);
 
-    window.addEventListener("beforeunload", cancelEditingComment);
     intervalKey.current = setInterval(function checkFocusInEditor() {
       if (!editorNode.current.contains(document.activeElement)) {
         cancelEditingComment();
+        clearInterval(intervalKey.current);
       }
     }, 1000);
 
-    return () => {
-      window.removeEventListener("beforeunload", cancelEditingComment);
-      clearInterval(intervalKey.current);
-    };
+    return () => clearInterval(intervalKey.current);
   }, []);
 
   const replyToCommentCallback = () => {
@@ -71,23 +71,29 @@ export default function CommentEditor({ comment, stopEditing, stopReplying, repl
   };
   const saveEditedComment = () => {
     closeEditor();
-    // If there's no input value, delete the comment
+    // If there's no input value, delete the comment.
     if (!inputValue) {
-      deleteComment({ variables: { commentId: comment.id } });
-      return;
+      return deleteComment({ variables: { commentId: comment.id } });
     }
 
-    updateComment({
-      variables: { newContent: inputValue, commentId: comment.id },
-    });
+    // If this is a pending comment, clear it from store and save
+    // it to Hasura. Otherwise, update the existing comment.
+    if (comment.content === "") {
+      comment.content = inputValue;
+      return addComment({
+        variables: { object: comment },
+      });
+    } else {
+      updateComment({
+        variables: { newContent: inputValue, commentId: comment.id },
+      });
+    }
   };
   const cancelEditingComment = e => {
-    closeEditor();
-    // If this was a new comment and it was left empty, delete it.
-    if (!comment.content) {
-      console.log("test", comment.id);
-      deleteComment({ variables: { commentId: comment.id } });
+    if (comment.content === "") {
+      clearPendingComment();
     }
+    closeEditor();
   };
 
   return (
@@ -109,3 +115,5 @@ export default function CommentEditor({ comment, stopEditing, stopReplying, repl
     </div>
   );
 }
+
+export default connect(null, { clearPendingComment: actions.clearPendingComment })(CommentEditor);

@@ -10,7 +10,7 @@ import {
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
-import { Modal, PanelName, PrimaryPanelName, ViewMode, Event } from "ui/state/app";
+import { Modal, PanelName, PrimaryPanelName, ViewMode, Event, PendingComment } from "ui/state/app";
 
 const { PointHandlers } = require("protocol/logpoint");
 
@@ -43,6 +43,7 @@ export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_locat
   location: Location | null;
 };
 export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
+export type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment };
 
 export type AppAction =
   | SetupAppAction
@@ -61,7 +62,8 @@ export type AppAction =
   | SetViewMode
   | SetNarrowMode
   | SetHoveredLineNumberLocation
-  | SetIsNodePickerActive;
+  | SetIsNodePickerActive
+  | SetPendingComment;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -217,4 +219,12 @@ export function setHoveredLineNumberLocation(location: Location): SetHoveredLine
 
 export function setIsNodePickerActive(active: boolean): SetIsNodePickerActive {
   return { type: "set_is_node_picker_active", active };
+}
+
+export function setPendingComment(comment: PendingComment): SetPendingComment {
+  return { type: "set_pending_comment", comment };
+}
+
+export function clearPendingComment() {
+  return { type: "set_pending_comment", comment: null };
 }

@@ -9,7 +9,7 @@ import { sortBy } from "lodash";
 
 import "./Comments.css";
 
-function Comments({ playback, recordingId }) {
+function Comments({ playback, recordingId, pendingComment }) {
   const { comments, loading, error } = hooks.useGetComments(recordingId);
 
   // Don't render anything if the comments are loading. For now, we fail silently
@@ -19,12 +19,19 @@ function Comments({ playback, recordingId }) {
   if (loading || error) {
     return null;
   }
-  const sortedComments = sortBy(comments, comment => comment.time);
 
+  const displayedComments = [...comments];
+  if (pendingComment) {
+    displayedComments.push(pendingComment);
+  }
+
+  const sortedComments = sortBy(displayedComments, comment => comment.time);
+
+  console.log(sortedComments);
   return (
     <div className="comments-container">
       {sortedComments.map((comment, index) => (
-        <CommentMarker key={comment.id} comment={comment} comments={sortedComments} index={index} />
+        <CommentMarker key={index} comment={comment} comments={sortedComments} index={index} />
       ))}
       {!playback ? <CommentMarker comments={sortedComments} /> : null}
     </div>
@@ -34,4 +41,5 @@ function Comments({ playback, recordingId }) {
 export default connect(state => ({
   playback: selectors.getPlayback(state),
   recordingId: selectors.getRecordingId(state),
+  pendingComment: selectors.getPendingComment(state),
 }))(Comments);

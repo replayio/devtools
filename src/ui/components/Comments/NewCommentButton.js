@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import { getMarkerLeftOffset } from "ui/utils/timeline";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import hooks from "ui/hooks";
 
 const markerWidth = 19;
 
@@ -16,15 +15,10 @@ function NewCommentButton({
   recordingId,
   focusedCommentId,
   comments,
-  hideTooltip,
   setSelectedPanel,
   viewMode,
+  setPendingComment,
 }) {
-  const addCommentCallback = id => {
-    hideTooltip();
-  };
-  const addComment = hooks.useAddComment(addCommentCallback);
-
   // Skip rendering the button if any of the following applies:
   // - There is already a comment at that time.
   // - That time is not currently visible in the timeline
@@ -39,7 +33,7 @@ function NewCommentButton({
       setSelectedPanel("comments");
     }
 
-    const newComment = {
+    const pendingComment = {
       content: "",
       recording_id: recordingId,
       time: currentTime,
@@ -47,9 +41,7 @@ function NewCommentButton({
       has_frames: ThreadFront.currentPointHasFrames,
     };
 
-    addComment({
-      variables: { object: newComment },
-    });
+    setPendingComment(pendingComment);
   };
 
   const leftOffset = getMarkerLeftOffset({
@@ -79,7 +71,7 @@ export default connect(
     viewMode: selectors.getViewMode(state),
   }),
   {
-    hideTooltip: actions.hideTooltip,
     setSelectedPanel: actions.setSelectedPanel,
+    setPendingComment: actions.setPendingComment,
   }
 )(NewCommentButton);
