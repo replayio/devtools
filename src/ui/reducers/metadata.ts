@@ -8,7 +8,6 @@ function initialMetadataState(): MetadataState {
     comments: [],
     user: prefs.user,
     users: [],
-    focusedCommentId: null,
   };
 }
 
@@ -25,10 +24,6 @@ export default function update(
       return { ...state, users: action.users };
     }
 
-    case "set_focused_comment_id": {
-      return { ...state, focusedCommentId: action.id };
-    }
-
     default: {
       return state;
     }
@@ -41,12 +36,4 @@ export function getUser(state: UIState) {
 
 export function getUsers(state: UIState) {
   return state.metadata.users;
-}
-
-export function getFocusedCommentId(state: UIState) {
-  return state.metadata.focusedCommentId;
-}
-
-export function hasFocusedComment(state: UIState) {
-  return state.metadata.focusedCommentId !== null;
 }

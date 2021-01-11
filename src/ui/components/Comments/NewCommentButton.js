@@ -30,7 +30,7 @@ function NewCommentButton({
   // - That time is not currently visible in the timeline
   // - There is a timeline comment that is currently focused.
   const isOnExistingComment = comments.some(comment => comment.time == currentTime);
-  if (isOnExistingComment || focusedCommentId || zoomRegion.endTime < currentTime) {
+  if (isOnExistingComment || zoomRegion.endTime < currentTime) {
     return null;
   }
 
@@ -76,7 +76,6 @@ export default connect(
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
-    focusedCommentId: selectors.getFocusedCommentId(state),
     viewMode: selectors.getViewMode(state),
   }),
   {

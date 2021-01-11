@@ -54,7 +54,7 @@ function Comment({ comment, user, currentTime, seek }) {
         ) : (
           <CommentBody comment={comment} user={user} startEditing={() => setEditing(true)} />
         )}
-        {comment.content ? (
+        {!editing ? (
           <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
             <PortalDropdown
               buttonContent={<div className="dropdown-button">⋯</div>}

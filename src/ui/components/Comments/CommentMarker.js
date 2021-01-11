@@ -36,7 +36,7 @@ class CommentMarker extends React.Component {
   };
 
   render() {
-    const { comment, comments, currentTime, zoomRegion, focusedCommentId } = this.props;
+    const { comment, comments, currentTime, zoomRegion } = this.props;
 
     if (!comment) {
       return <NewCommentButton comments={comments} />;
@@ -58,7 +58,6 @@ class CommentMarker extends React.Component {
     return (
       <button
         className={classnames("img comment-marker", {
-          expanded: id === focusedCommentId,
           paused: pausedAtComment,
         })}
         style={{
@@ -75,10 +74,8 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
-    focusedCommentId: selectors.getFocusedCommentId(state),
   }),
   {
-    setFocusedCommentId: actions.setFocusedCommentId,
     seek: actions.seek,
   }
 )(CommentMarker);

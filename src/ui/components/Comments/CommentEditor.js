@@ -28,7 +28,7 @@ export default function CommentEditor({ comment, stopEditing, stopReplying, repl
       if (!editorNode.current.contains(document.activeElement)) {
         cancelEditingComment();
       }
-    }, 500);
+    }, 1000);
 
     return () => {
       window.removeEventListener("beforeunload", cancelEditingComment);

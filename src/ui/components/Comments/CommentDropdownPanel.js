@@ -1,15 +1,12 @@
 import React from "react";
-import { connect } from "react-redux";
-import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 
-export function CommentDropdownPanel({
+export default function CommentDropdownPanel({
   user,
   comment,
   allowReply,
   startEditing,
   startReplying,
-  setFocusedCommentId,
   onItemClick,
 }) {
   const deleteComment = hooks.useDeleteComment();
@@ -22,7 +19,6 @@ export function CommentDropdownPanel({
     if (!comment.parent_id) {
       deleteCommentReplies({ variables: { parentId: comment.id } });
     }
-    setFocusedCommentId(null);
   };
 
   if (!user?.loggedIn) {
@@ -51,7 +47,3 @@ export function CommentDropdownPanel({
     </div>
   );
 }
-
-export default connect(null, {
-  setFocusedCommentId: actions.setFocusedCommentId,
-})(CommentDropdownPanel);
