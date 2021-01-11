@@ -24,7 +24,7 @@ function Comments({ playback, recordingId }) {
   return (
     <div className="comments-container">
       {sortedComments.map((comment, index) => (
-        <Comment key={comment.id} comment={comment} comments={sortedComments} index={index} />
+        <CommentMarker key={comment.id} comment={comment} comments={sortedComments} index={index} />
       ))}
       {!playback ? <CommentMarker comments={sortedComments} /> : null}
     </div>
