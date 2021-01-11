@@ -54,22 +54,24 @@ function Comment({ comment, user, currentTime, seek }) {
         ) : (
           <CommentBody comment={comment} user={user} startEditing={() => setEditing(true)} />
         )}
-        <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
-          <PortalDropdown
-            buttonContent={<div className="dropdown-button">⋯</div>}
-            expanded={menuExpanded}
-            setExpanded={setMenuExpanded}
-          >
-            <CommentDropdownPanel
-              user={user}
-              comment={comment}
-              allowReply={true}
-              startEditing={() => setEditing(true)}
-              startReplying={() => setReplying(true)}
-              onItemClick={() => setMenuExpanded(false)}
-            />
-          </PortalDropdown>
-        </div>
+        {comment.content ? (
+          <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
+            <PortalDropdown
+              buttonContent={<div className="dropdown-button">⋯</div>}
+              expanded={menuExpanded}
+              setExpanded={setMenuExpanded}
+            >
+              <CommentDropdownPanel
+                user={user}
+                comment={comment}
+                allowReply={true}
+                startEditing={() => setEditing(true)}
+                startReplying={() => setReplying(true)}
+                onItemClick={() => setMenuExpanded(false)}
+              />
+            </PortalDropdown>
+          </div>
+        ) : null}
       </div>
       {replying && (
         <div className="comment">

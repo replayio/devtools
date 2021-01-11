@@ -23,17 +23,17 @@ export default function CommentEditor({ comment, stopEditing, stopReplying, repl
     textareaNode.current.focus();
     textareaNode.current.setSelectionRange(length, length);
 
+    window.addEventListener("beforeunload", cancelEditingComment);
     intervalKey.current = setInterval(function checkFocusInEditor() {
       if (!editorNode.current.contains(document.activeElement)) {
         cancelEditingComment();
       }
     }, 500);
 
-    window.addEventListener("beforeunload", () => {
-      cancelEditingComment();
-    });
-
-    return () => clearInterval(intervalKey.current);
+    return () => {
+      window.removeEventListener("beforeunload", cancelEditingComment);
+      clearInterval(intervalKey.current);
+    };
   }, []);
 
   const replyToCommentCallback = () => {
@@ -85,6 +85,7 @@ export default function CommentEditor({ comment, stopEditing, stopReplying, repl
     closeEditor();
     // If this was a new comment and it was left empty, delete it.
     if (!comment.content) {
+      console.log("test", comment.id);
       deleteComment({ variables: { commentId: comment.id } });
     }
   };
