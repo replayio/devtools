@@ -60,7 +60,7 @@ export default class ElementStyle {
   pageStyle: undefined;
   pseudoElements: string[];
   showUserAgentStyles: boolean;
-  rules: Rule[];
+  rules: Rule[] | null;
   cssProperties: typeof CSSProperties;
   variablesMap: Map<string, Map<string, string>>;
   destroyed?: boolean;
@@ -133,7 +133,7 @@ export default class ElementStyle {
     this.destroyed = true;
     this.pseudoElements = [];
 
-    for (const rule of this.rules) {
+    for (const rule of this.rules || []) {
       // if (rule.editor) {
       //   rule.editor.destroy();
       // }
@@ -169,6 +169,10 @@ export default class ElementStyle {
     this.rules = [];
 
     const applied = this.element.getAppliedRules();
+    if (applied === null) {
+      this.rules = null;
+      return;
+    }
 
     // Show rules applied to pseudo-elements first.
     for (const { rule, pseudoElement } of applied) {
@@ -198,6 +202,10 @@ export default class ElementStyle {
           this._maybeAddRule(parentInline, elem);
         }
         const parentApplied = elem.getAppliedRules();
+        if (parentApplied === null) {
+          this.rules = null;
+          return;
+        }
         for (const { rule, pseudoElement } of parentApplied) {
           if (!pseudoElement) {
             this._maybeAddRule(rule, /* inherited */ elem);
@@ -225,7 +233,7 @@ export default class ElementStyle {
    * @return {Rule|undefined} of the given rule id or undefined if it cannot be found.
    */
   getRule(id: string | null) {
-    return id ? this.rules.find(rule => rule.domRule.objectId() === id) : undefined;
+    return id ? this.rules?.find(rule => rule.domRule.objectId() === id) : undefined;
   }
 
   /**
@@ -268,7 +276,7 @@ export default class ElementStyle {
       return false;
     }
 
-    this.rules.push(new Rule(this, { rule: ruleFront, inherited, pseudoElement }));
+    this.rules?.push(new Rule(this, { rule: ruleFront, inherited, pseudoElement }));
     return true;
   }
 
@@ -448,7 +456,7 @@ export default class ElementStyle {
   private _getDeclarations(pseudo = "") {
     const textProps: TextProperty[] = [];
 
-    for (const rule of this.rules) {
+    for (const rule of this.rules || []) {
       // Skip @keyframes rules
       // if (rule.keyframes) {
       //   continue;

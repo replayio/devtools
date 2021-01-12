@@ -11,7 +11,7 @@ type UpdateAddRuleEnabledAction = Action<"UPDATE_ADD_RULE_ENABLED"> & { enabled:
 type UpdateHighlightedSelectorAction = Action<"UPDATE_HIGHLIGHTED_SELECTOR"> & {
   highlightedSelector: string;
 };
-type UpdateRulesAction = Action<"UPDATE_RULES"> & { rules: RuleState[] };
+type UpdateRulesAction = Action<"UPDATE_RULES"> & { rules: RuleState[] | undefined };
 type UpdateSourceLinkAction = Action<"UPDATE_SOURCE_LINK"> & {
   ruleId: string;
   sourceLink: SourceLink;
@@ -56,10 +56,10 @@ export function updateHighlightedSelector(
  * @param  {Array} rules
  *         Array of Rule objects containing the selected element's CSS rules.
  */
-export function updateRules(rules: Rule[]): UpdateRulesAction {
+export function updateRules(rules: Rule[] | null): UpdateRulesAction {
   return {
     type: "UPDATE_RULES",
-    rules: rules.map(rule => getRuleState(rule)),
+    rules: rules?.map(rule => getRuleState(rule)),
   };
 }
 

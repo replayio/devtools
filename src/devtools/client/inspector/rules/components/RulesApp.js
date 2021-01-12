@@ -183,7 +183,7 @@ class RulesApp extends PureComponent {
     const pseudoElementRules = [];
     const styleRules = [];
 
-    for (const rule of rules) {
+    for (const rule of rules || []) {
       if (rule.inheritance) {
         inheritedRules.push(rule);
         // } else if (rule.keyframesRule) {
@@ -218,16 +218,18 @@ class RulesApp extends PureComponent {
             onContextMenu: this.onContextMenu,
             tabIndex: -1,
           },
-          rules.length > 0
-            ? createElement(
-                Fragment,
-                null,
-                this.renderPseudoElementRules(pseudoElementRules),
-                this.renderStyleRules(styleRules),
-                this.renderInheritedRules(inheritedRules)
-                // this.renderKeyframesRules(keyframesRules)
-              )
-            : dom.div({ className: "devtools-sidepanel-no-result" }, getStr("rule.empty"))
+          rules
+            ? rules.length > 0
+              ? createElement(
+                  Fragment,
+                  null,
+                  this.renderPseudoElementRules(pseudoElementRules),
+                  this.renderStyleRules(styleRules),
+                  this.renderInheritedRules(inheritedRules)
+                  // this.renderKeyframesRules(keyframesRules)
+                )
+              : dom.div({ className: "devtools-sidepanel-no-result" }, getStr("rule.empty"))
+            : dom.div({ className: "devtools-sidepanel-no-result" }, getStr("rule.notAvailable"))
         )
       )
     );
