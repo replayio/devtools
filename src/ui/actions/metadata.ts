@@ -11,10 +11,9 @@ import { gql } from "@apollo/client";
 const LogRocket = require("ui/utils/logrocket").default;
 
 export type SetCommentsAction = Action<"set_comments"> & { comments: Comment[] };
-export type SetFocusedCommentAction = Action<"set_focused_comment_id"> & { id: number | null };
 export type RegisterUserAction = Action<"register_user"> & { user: User };
 export type UpdateUsersAction = Action<"update_users"> & { users: User[] };
-export type MetadataAction = SetFocusedCommentAction | RegisterUserAction | UpdateUsersAction;
+export type MetadataAction = RegisterUserAction | UpdateUsersAction;
 
 // Metadata key used to store comments.
 const CommentsMetadata = "devtools-comments";
@@ -29,10 +28,6 @@ export function setupMetadata(_: any, store: UIStore) {
     store.dispatch(registerUser());
     setInterval(() => store.dispatch(userHeartbeat()), 5000);
   }
-}
-
-export function setFocusedCommentId(id: number): SetFocusedCommentAction {
-  return { type: "set_focused_comment_id", id };
 }
 
 export function registerUser(): RegisterUserAction {

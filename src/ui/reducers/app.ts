@@ -26,6 +26,7 @@ function initialAppState(): AppState {
     narrowMode: false,
     hoveredLineNumberLocation: null,
     isNodePickerActive: false,
+    pendingComment: null,
   };
 }
 
@@ -130,6 +131,13 @@ export default function update(state = initialAppState(), action: AppAction | Se
       };
     }
 
+    case "set_pending_comment": {
+      return {
+        ...state,
+        pendingComment: action.comment,
+      };
+    }
+
     default: {
       return state;
     }
@@ -161,3 +169,4 @@ export const getPointsForHoveredLineNumber = (state: UIState) => {
 };
 export const getEventsForType = (state: UIState, type: string) => state.app.events[type] || [];
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
+export const getPendingComment = (state: UIState) => state.app.pendingComment;

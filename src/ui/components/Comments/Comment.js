@@ -1,196 +1,122 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
-
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import hooks from "ui/hooks";
-import { getPixelOffset, getCommentLeftOffset } from "ui/utils/timeline";
+import { useAuth0 } from "@auth0/auth0-react";
 
-import CommentMarker from "./CommentMarker";
+import CommentEditor from "ui/components/Comments/CommentEditor";
+import CommentDropdownPanel from "ui/components/Comments/CommentDropdownPanel";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
-import CommentEditor from "./CommentEditor";
-import CommentDropdownPanel from "./CommentDropdownPanel";
 
-function Mask({ setFocusedCommentId, comment }) {
-  const deleteComment = hooks.useDeleteComment();
+function Comment({ comment, user, currentTime, seek }) {
+  const [editing, setEditing] = useState(false);
+  const commentEl = useRef(null);
+  const [menuExpanded, setMenuExpanded] = useState(false);
+  const seekToComment = () => {
+    const { point, time, has_frames } = comment;
 
-  const onClick = () => {
-    // If a comment doesn't have any content, it means it's a newly-added
-    // comment. If the user clicks outside the comment editor, we should
-    // just delete that comment.
-    if (!comment.content) {
-      deleteComment({ variables: { commentId: comment.id } });
+    if (editing) {
+      return;
     }
-    setFocusedCommentId(null);
+
+    return seek(point, time, has_frames);
   };
 
-  return <div className="app-mask" onClick={onClick} />;
-}
-
-class Comment extends React.Component {
-  state = {
-    editing: false,
-  };
-
-  componentDidMount() {
-    const { comment } = this.props;
-
-    // A newly-added comment, which is initialized as empty, should go directly
-    // into editing mode.
-    if (!comment.contents) {
-      this.startEditing();
+  useEffect(() => {
+    if (comment.time === currentTime) {
+      commentEl.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-  }
+  }, [currentTime]);
 
-  componentDidUpdate() {
-    const { comment, focusedCommentId } = this.props;
-    const notFocused = focusedCommentId !== comment.id;
-
-    // We make sure that all unfocused comments are not in their editing state.
-    // This way when a user focuses on a comment, the editor is not displayed.
-    if (notFocused && this.state.editing) {
-      this.stopEditing();
-    }
-  }
-
-  startEditing = () => {
-    const { user, comment } = this.props;
-    if (user?.loggedIn && comment.user_id == user?.id) {
-      this.setState({ editing: true });
-    }
-  };
-
-  stopEditing = () => {
-    this.setState({ editing: false });
-  };
-
-  deleteComment = () => {
-    const { setFocusedCommentId, comment } = this.props;
-    setFocusedCommentId(null);
-    removeComment(comment);
-  };
-
-  renderDropdownPanel() {
-    const { comment, user } = this.props;
+  if (comment.content === "") {
     return (
-      <CommentDropdownPanel
-        startEditing={this.startEditing}
-        allowReply={false}
-        user={user}
+      <NewComment
         comment={comment}
-        onItemClick={() => this.setState({ menuExpanded: false })}
+        commentEl={commentEl}
+        setEditing={setEditing}
+        currentTime={currentTime}
       />
     );
   }
 
-  renderLabel() {
-    const { comment } = this.props;
-    const lines = comment.content.split("\n");
+  return (
+    <div className="comment-container" ref={commentEl}>
+      <div
+        className={classnames(
+          "comment",
+          { selected: currentTime === comment.time },
+          { "child-comment": comment.parent_id }
+        )}
+        onClick={seekToComment}
+      >
+        <img src={comment.user.picture} className="comment-picture" />
+        {editing ? (
+          <CommentEditor comment={comment} stopEditing={() => setEditing(false)} />
+        ) : (
+          <CommentBody comment={comment} user={user} startEditing={() => setEditing(true)} />
+        )}
+        {!editing ? (
+          <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
+            <PortalDropdown
+              buttonContent={<div className="dropdown-button">⋯</div>}
+              expanded={menuExpanded}
+              setExpanded={setMenuExpanded}
+            >
+              <CommentDropdownPanel
+                user={user}
+                comment={comment}
+                startEditing={() => setEditing(true)}
+                onItemClick={() => setMenuExpanded(false)}
+              />
+            </PortalDropdown>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
-    return (
-      <div className="label" onDoubleClick={this.startEditing}>
+function NewComment({ comment, currentTime, commentEl, setEditing }) {
+  const { user } = useAuth0();
+
+  return (
+    <div className="comment-container" ref={commentEl}>
+      <div className={classnames("comment", { selected: currentTime === comment.time })}>
+        <img src={user.picture} className="comment-picture" />
+        <CommentEditor comment={comment} stopEditing={() => setEditing(false)} />
+      </div>
+    </div>
+  );
+}
+
+function CommentBody({ comment, user, startEditing }) {
+  const lines = comment.content.split("\n");
+
+  const onDoubleClick = () => {
+    if (user?.loggedIn && comment.user_id == user?.id) {
+      startEditing();
+    }
+  };
+
+  return (
+    <div className="comment-body">
+      <div className="item-label">{comment.user.name}</div>
+      <div className="item-content" onDoubleClick={onDoubleClick}>
         {lines.map((line, i) => (
           <div key={i}>{line}</div>
         ))}
       </div>
-    );
-  }
-
-  renderCommentBody() {
-    const { editing, menuExpanded } = this.state;
-    const { comment } = this.props;
-    const isNewComment = comment.content === "";
-
-    return (
-      <div className="comment-body">
-        <div className="comment-content">
-          {!isNewComment ? (
-            <div className="comment-header">
-              <div className="actions">
-                <PortalDropdown
-                  buttonContent={<div className="dropdown-button">⋯</div>}
-                  expanded={menuExpanded}
-                  setExpanded={value => this.setState({ menuExpanded: value })}
-                >
-                  {this.renderDropdownPanel()}
-                </PortalDropdown>
-              </div>
-            </div>
-          ) : null}
-          <div className="comment-description">
-            {editing ? (
-              <CommentEditor comment={comment} stopEditing={this.stopEditing} />
-            ) : (
-              this.renderLabel()
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  render() {
-    const {
-      comment,
-      zoomRegion,
-      timelineDimensions,
-      focusedCommentId,
-      setFocusedCommentId,
-    } = this.props;
-    const { editing } = this.state;
-
-    const commentWidth = 280;
-    const shouldCollapse = focusedCommentId !== comment.id;
-
-    if (shouldCollapse) {
-      return <CommentMarker comment={comment} />;
-    }
-
-    const offset = getPixelOffset({
-      time: comment.time,
-      overlayWidth: timelineDimensions.width,
-      zoom: zoomRegion,
-    });
-    const commentLeftOffset = getCommentLeftOffset({
-      time: comment.time,
-      overlayWidth: timelineDimensions.width,
-      zoom: zoomRegion,
-      commentWidth: commentWidth,
-    });
-
-    if (offset < 0) {
-      return null;
-    }
-
-    return (
-      <div>
-        <CommentMarker comment={comment} />
-        <Mask setFocusedCommentId={setFocusedCommentId} comment={comment} editing={editing} />
-        <div
-          className={classnames("comment")}
-          style={{
-            left: `${commentLeftOffset}%`,
-            width: `${commentWidth}px`,
-          }}
-        >
-          {this.renderCommentBody()}
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default connect(
   state => ({
-    timelineDimensions: selectors.getTimelineDimensions(state),
-    zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
-    focusedCommentId: selectors.getFocusedCommentId(state),
     user: selectors.getUser(state),
   }),
   {
-    removeComment: actions.removeComment,
-    setFocusedCommentId: actions.setFocusedCommentId,
+    seek: actions.seek,
   }
 )(Comment);

@@ -21,7 +21,7 @@ class CommentMarker extends React.Component {
     });
   }
 
-  getCommentAtTime(time) {
+  getCommentAtTime() {
     const { comments, currentTime } = this.props;
     const index = comments.findIndex(comment => comment.time === currentTime);
 
@@ -29,15 +29,14 @@ class CommentMarker extends React.Component {
   }
 
   onClick = () => {
-    const { setFocusedCommentId, comment, seek } = this.props;
-    const { id, time, point, has_frames } = comment;
+    const { comment, seek } = this.props;
+    const { time, point, has_frames } = comment;
 
-    setFocusedCommentId(comment.id);
     seek(point, time, has_frames);
   };
 
   render() {
-    const { comment, comments, currentTime, zoomRegion, focusedCommentId } = this.props;
+    const { comment, comments, currentTime, zoomRegion } = this.props;
 
     if (!comment) {
       return <NewCommentButton comments={comments} />;
@@ -56,18 +55,10 @@ class CommentMarker extends React.Component {
     const { time, id } = comment;
     const pausedAtComment = currentTime == time;
 
-    // If a comment is newly added and doesn't have any content yet,
-    // hide it until the user saves it with new content. This way
-    // we avoid flickering in the UI in case they press cancel and
-    // we have to delete the comment.
-    const hidden = !comment.content;
-
     return (
       <button
         className={classnames("img comment-marker", {
-          expanded: id === focusedCommentId,
           paused: pausedAtComment,
-          hidden,
         })}
         style={{
           left: `${this.calculateLeftOffset(time)}%`,
@@ -83,10 +74,8 @@ export default connect(
     timelineDimensions: selectors.getTimelineDimensions(state),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
-    focusedCommentId: selectors.getFocusedCommentId(state),
   }),
   {
-    setFocusedCommentId: actions.setFocusedCommentId,
     seek: actions.seek,
   }
 )(CommentMarker);

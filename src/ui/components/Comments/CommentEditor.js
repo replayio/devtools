@@ -1,87 +1,79 @@
 import React, { useState, useRef, useEffect } from "react";
-
 import { connect } from "react-redux";
-import { actions } from "ui/actions";
 import hooks from "ui/hooks";
+import { actions } from "ui/actions";
 
-function CommentEditor({ comment, stopEditing, setFocusedCommentId, stopReplying, replying }) {
-  const [inputValue, setInputValue] = useState(replying ? null : comment.content);
+function CommentEditor({ comment, stopEditing, clearPendingComment }) {
+  const [inputValue, setInputValue] = useState(comment.content);
   const textareaNode = useRef(null);
+  const editorNode = useRef(null);
+  const intervalKey = useRef(null);
 
-  const closeEditor = () => {
-    if (replying) {
-      stopReplying();
-    } else {
-      stopEditing();
-    }
-    setFocusedCommentId(null);
-  };
-
-  const updateComment = hooks.useUpdateComment(closeEditor);
+  const addComment = hooks.useAddComment(() => clearPendingComment());
+  const updateComment = hooks.useUpdateComment(stopEditing);
   const deleteComment = hooks.useDeleteComment();
 
-  useEffect(function focusText() {
+  useEffect(() => {
     const { length } = textareaNode.current.value;
     textareaNode.current.focus();
     textareaNode.current.setSelectionRange(length, length);
+
+    // To avoid open editors from lingering without the user realizing,
+    // we close editing mode once they shift focus from the comment editor.
+    intervalKey.current = setInterval(function checkFocusInEditor() {
+      if (!editorNode.current.contains(document.activeElement)) {
+        handleCancel();
+        clearInterval(intervalKey.current);
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalKey.current);
   }, []);
-
-  const replyToCommentCallback = id => {
-    setFocusedCommentId(id);
-    closeEditor();
-  };
-
-  const addCommentReply = hooks.useAddCommentReply(replyToCommentCallback);
-
-  const replyToComment = () => {
-    if (!inputValue) {
-      closeEditor();
-      return;
-    }
-
-    const newReply = {
-      parent_id: comment.id,
-      content: inputValue,
-      recording_id: comment.recording_id,
-      time: comment.time,
-      point: comment.point,
-      has_frames: comment.has_frames,
-    };
-
-    addCommentReply({
-      variables: { object: newReply },
-    });
-  };
 
   const onKeyDown = e => {
     if (e.key == "Escape") {
-      cancelEditingComment(e);
+      handleCancel(e);
     } else if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) {
-      replying ? replyToComment() : saveEditedComment();
+      handleSave();
     }
   };
-  const saveEditedComment = () => {
-    closeEditor();
-    // If there's no input value, delete the comment
+  const handleSave = () => {
+    if (comment.content === "") {
+      handleNewSave();
+    } else {
+      handleExistingSave();
+    }
+  };
+  const handleNewSave = () => {
+    if (inputValue) {
+      comment.content = inputValue;
+      addComment({
+        variables: { object: comment },
+      });
+    } else {
+      clearPendingComment();
+    }
+  };
+  const handleExistingSave = () => {
     if (!inputValue) {
       deleteComment({ variables: { commentId: comment.id } });
-      return;
+    } else {
+      updateComment({
+        variables: { newContent: inputValue, commentId: comment.id },
+      });
     }
 
-    updateComment({
-      variables: { newContent: inputValue, commentId: comment.id },
-    });
+    stopEditing();
   };
-  const cancelEditingComment = e => {
-    closeEditor();
-    // If this was a new comment and it was left empty, delete it.
-    if (!comment.content) {
-      deleteComment({ variables: { commentId: comment.id } });
+  const handleCancel = () => {
+    if (comment.content === "") {
+      clearPendingComment();
     }
+    stopEditing();
   };
 
   return (
-    <div className="editor">
+    <div className="editor" ref={editorNode}>
       <textarea
         defaultValue={inputValue}
         onChange={e => setInputValue(e.target.value)}
@@ -89,17 +81,15 @@ function CommentEditor({ comment, stopEditing, setFocusedCommentId, stopReplying
         ref={textareaNode}
       />
       <div className="buttons">
-        <button className="cancel" onClick={cancelEditingComment}>
+        <button className="cancel" onClick={handleCancel}>
           Cancel
         </button>
-        <button className="save" onClick={replying ? replyToComment : saveEditedComment}>
-          Save
+        <button className="save" onClick={handleSave}>
+          {comment.parent_id ? "Reply" : "Save"}
         </button>
       </div>
     </div>
   );
 }
 
-export default connect(() => ({}), {
-  setFocusedCommentId: actions.setFocusedCommentId,
-})(CommentEditor);
+export default connect(null, { clearPendingComment: actions.clearPendingComment })(CommentEditor);

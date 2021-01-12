@@ -1,19 +1,6 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
-
-interface Comment {
-  content: "string";
-  created_at: "string";
-  has_frames: "boolean";
-  id: "string";
-  point: "string";
-  recording_id: "string";
-  parent_id: "string";
-  time: "number";
-  updated_at: "string";
-  user_id: "string";
-  __typename: "string";
-}
+import { Comment } from "ui/state/app";
 
 const GET_COMMENTS = gql`
   query GetComments($recordingId: uuid) {
@@ -38,14 +25,6 @@ const GET_COMMENTS = gql`
 
 const ADD_COMMENT = gql`
   mutation MyMutation($object: comments_insert_input! = {}) {
-    insert_comments_one(object: $object) {
-      id
-    }
-  }
-`;
-
-const ADD_COMMENT_REPLY = gql`
-  mutation AddCommentReply($object: comments_insert_input! = {}) {
     insert_comments_one(object: $object) {
       id
     }
@@ -85,7 +64,7 @@ const DELETE_COMMENT_REPLIES = gql`
 
 export function useGetComments(
   recordingId: RecordingId
-): { comments: [Comment]; loading: boolean; error?: ApolloError } {
+): { comments: Comment[]; loading: boolean; error?: ApolloError } {
   const { data, loading, error } = useQuery(GET_COMMENTS, {
     variables: { recordingId },
   });
@@ -99,7 +78,7 @@ export function useGetComments(
   return { comments: data?.comments, loading, error };
 }
 
-export function useAddComment(callback: Function) {
+export function useAddComment(callback: Function = () => {}) {
   const [addComment] = useMutation(ADD_COMMENT, {
     onCompleted: data => {
       const { id } = data.insert_comments_one;
@@ -109,18 +88,6 @@ export function useAddComment(callback: Function) {
   });
 
   return addComment;
-}
-
-export function useAddCommentReply(callback: Function) {
-  const [addCommentReply] = useMutation(ADD_COMMENT_REPLY, {
-    onCompleted: data => {
-      const { id } = data.insert_comments_one;
-      callback(id);
-    },
-    refetchQueries: ["GetComments"],
-  });
-
-  return addCommentReply;
 }
 
 export function useUpdateComment(callback: Function) {

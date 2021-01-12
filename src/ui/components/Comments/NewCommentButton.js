@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import { getMarkerLeftOffset } from "ui/utils/timeline";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import hooks from "ui/hooks";
 
 const markerWidth = 19;
 
@@ -15,27 +14,26 @@ function NewCommentButton({
   zoomRegion,
   recordingId,
   focusedCommentId,
-  setFocusedCommentId,
   comments,
-  hideTooltip,
+  setSelectedPanel,
+  viewMode,
+  setPendingComment,
 }) {
-  const addCommentCallback = id => {
-    setFocusedCommentId(id);
-    hideTooltip();
-  };
-  const addComment = hooks.useAddComment(addCommentCallback);
-
   // Skip rendering the button if any of the following applies:
   // - There is already a comment at that time.
   // - That time is not currently visible in the timeline
   // - There is a timeline comment that is currently focused.
   const isOnExistingComment = comments.some(comment => comment.time == currentTime);
-  if (isOnExistingComment || focusedCommentId || zoomRegion.endTime < currentTime) {
+  if (isOnExistingComment || zoomRegion.endTime < currentTime) {
     return null;
   }
 
   const handleClick = () => {
-    const newComment = {
+    if (viewMode === "dev") {
+      setSelectedPanel("comments");
+    }
+
+    const pendingComment = {
       content: "",
       recording_id: recordingId,
       time: currentTime,
@@ -43,9 +41,7 @@ function NewCommentButton({
       has_frames: ThreadFront.currentPointHasFrames,
     };
 
-    addComment({
-      variables: { object: newComment },
-    });
+    setPendingComment(pendingComment);
   };
 
   const leftOffset = getMarkerLeftOffset({
@@ -72,10 +68,10 @@ export default connect(
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
-    focusedCommentId: selectors.getFocusedCommentId(state),
+    viewMode: selectors.getViewMode(state),
   }),
   {
-    setFocusedCommentId: actions.setFocusedCommentId,
-    hideTooltip: actions.hideTooltip,
+    setSelectedPanel: actions.setSelectedPanel,
+    setPendingComment: actions.setPendingComment,
   }
 )(NewCommentButton);
