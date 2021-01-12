@@ -271,7 +271,7 @@ function messages(state = MessageState(), action) {
 
   let newState;
   switch (action.type) {
-    case constants.PAUSED_EXECUTION_POINT:
+    case "PAUSED":
       if (
         state.pausedExecutionPoint &&
         action.executionPoint &&
@@ -280,6 +280,7 @@ function messages(state = MessageState(), action) {
       ) {
         return state;
       }
+
       return {
         ...state,
         pausedExecutionPoint: action.executionPoint,

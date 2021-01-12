@@ -223,14 +223,6 @@ export function messagesClearLogpoint(logpointId) {
   };
 }
 
-export function setPauseExecutionPoint(executionPoint, time) {
-  return {
-    type: PAUSED_EXECUTION_POINT,
-    executionPoint,
-    time,
-  };
-}
-
 export function messageOpen(id) {
   return ({ dispatch, getState }) => {
     const filtersState = getAllFilters(getState());
