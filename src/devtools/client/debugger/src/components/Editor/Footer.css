@@ -25,6 +25,7 @@
 
 .source-footer-end {
   display: flex;
+  align-items: center;
   margin-left: auto;
 }
 
