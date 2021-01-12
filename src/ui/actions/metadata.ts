@@ -5,8 +5,7 @@ import { UIStore, UIThunkAction } from ".";
 import { Comment } from "ui/state/metadata";
 const { prefs, features } = require("ui/utils/prefs");
 import { User } from "ui/state/metadata";
-import { query } from "ui/utils/apolloClient";
-import { gql } from "@apollo/client";
+import hooks from "ui/hooks";
 
 const LogRocket = require("ui/utils/logrocket").default;
 
@@ -80,25 +79,10 @@ export function getActiveUsers(): UIThunkAction {
   };
 }
 
-async function fetchUserId(authId: string) {
-  const response = await query({
-    query: gql`
-      query GetUserId($authId: String) {
-        users(where: { auth_id: { _eq: $authId } }) {
-          id
-        }
-      }
-    `,
-    variables: { authId },
-  });
-
-  return response.data?.users[0].id;
-}
-
 export function updateUser(authUser: any = {}): UIThunkAction {
   return async ({ dispatch, getState }) => {
     const user = selectors.getUser(getState());
-    const userId = await fetchUserId(authUser.sub);
+    const userId = await hooks.fetchUserId(authUser.sub);
 
     // NOTE: the user coming from redux is likely a guest account with a
     // simple id and avatar ID for the color

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { gql, useMutation, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import Header from "./Header/index";
@@ -8,31 +7,10 @@ import Loader from "./shared/Loader";
 import RecordingLoadingScreen from "./RecordingLoadingScreen";
 import NonDevView from "./Views/NonDevView";
 import DevView from "./Views/DevView";
+import hooks from "../hooks";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
-
-const GET_RECORDING = gql`
-  query GetRecording($recordingId: String) {
-    recordings(where: { recording_id: { _eq: $recordingId } }) {
-      id
-      title
-      recordingTitle
-      is_private
-      date
-    }
-  }
-`;
-
-const CREATE_SESSION = gql`
-  mutation CreateSession($object: sessions_insert_input!) {
-    insert_sessions_one(object: $object) {
-      id
-      controller_id
-      recording_id
-    }
-  }
-`;
 
 function getUploadingMessage(uploading) {
   if (!uploading) {
@@ -76,10 +54,8 @@ function DevTools({
 }) {
   const [recordingLoaded, setRecordingLoaded] = useState(false);
   const auth = useAuth0();
-  const { data, loading: queryIsLoading } = useQuery(GET_RECORDING, {
-    variables: { recordingId },
-  });
-  const [CreateSession] = useMutation(CREATE_SESSION);
+  const AddSessionUser = hooks.useAddSessionUser();
+  const { data, queryIsLoading } = hooks.useGetRecording(recordingId);
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -93,12 +69,9 @@ function DevTools({
 
   useEffect(() => {
     if (recordingLoaded && auth.user && sessionId) {
-      const object = {
-        id: sessionId,
-        recording_id: recordingId,
-        controller_id: sessionId.split("/")[0],
-      };
-      CreateSession({ variables: { object } });
+      hooks.fetchUserId(auth.user.sub).then(userId => {
+        AddSessionUser({ variables: { id: sessionId, user_id: userId } });
+      });
     }
   }, [recordingLoaded, auth.user, sessionId]);
 
