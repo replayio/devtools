@@ -1,13 +1,12 @@
 const { sendMessage, addEventListener } = require("protocol/socket");
 import { sessionError, uploadedData } from "@recordreplay/protocol";
 import { Action } from "redux";
-import { mutate } from "ui/utils/apolloClient";
-import { gql } from "@apollo/client";
 
 import { UIStore, actions, UIThunkAction } from "ui/actions";
 const { ThreadFront } = require("protocol/thread");
 const { prefs } = require("ui/utils/prefs");
 const { getTest } = require("ui/utils/environment");
+const hooks = require("ui/hooks");
 
 import { ExpectedError } from "ui/state/app";
 
@@ -59,7 +58,7 @@ function onUploadedData({ uploaded, length }: uploadedData): UIThunkAction {
 
 function onSessionError(error: sessionError): UIThunkAction {
   return ({ dispatch }) => {
-    setSessionError(error);
+    hooks.setSessionError(error);
     dispatch(setUnexpectedError(error));
   };
 }
@@ -70,20 +69,4 @@ export function setExpectedError(error: ExpectedError): SetExpectedErrorAction {
 
 export function setUnexpectedError(error: sessionError): SetUnexpectedErrorAction {
   return { type: "set_unexpected_error", error };
-}
-
-function setSessionError({ sessionId, code }: { sessionId: string; code: number }) {
-  return mutate({
-    mutation: gql`
-      mutation AddSessionError($sessionId: String, $error: String) {
-        update_sessions(where: { id: { _eq: $sessionId } }, _set: { error: $error }) {
-          returning {
-            id
-            error
-          }
-        }
-      }
-    `,
-    variables: { sessionId, error: `${code}` },
-  });
 }

@@ -15,8 +15,8 @@ import { gql, useQuery } from "@apollo/client";
 import moment from "moment";
 
 const GET_RECORDING_TITLE = gql`
-  query RecordingTitle($recordingId: String) {
-    recordings(where: { recording_id: { _eq: $recordingId } }) {
+  query RecordingTitle($id: uuid!) {
+    recordings(where: { id: { _eq: $id } }) {
       id
       title
       date
@@ -54,16 +54,15 @@ function Links({ user, getActiveUsers, recordingId }) {
 }
 
 function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
-  const { data } = useQuery(GET_RECORDING_TITLE, {
-    variables: { recordingId },
+  const { data, loading } = useQuery(GET_RECORDING_TITLE, {
+    variables: { id: recordingId },
   });
 
   if (!recordingId) {
     return <div className="title">Recordings</div>;
   }
 
-  const recording = data.recordings[0];
-  const { recordingTitle, title, date } = recording || {};
+  const { recordingTitle, title, date } = data.recordings?.[0] || {};
   return (
     <div className="title-container">
       <Title
