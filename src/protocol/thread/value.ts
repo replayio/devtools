@@ -270,6 +270,14 @@ export class ValueFront {
       contents,
     }));
     rv.sort((a, b) => {
+      // if both element names are numbers, sort them numerically instead of
+      // alphabetically.
+      const aN = Number.parseInt(a.name);
+      const bN = Number.parseInt(b.name);
+      if (!isNaN(aN) && !isNaN(bN)) {
+        return aN - bN;
+      }
+
       const _a = a.name?.toUpperCase();
       const _b = b.name?.toUpperCase();
       return _a < _b ? -1 : _a > _b ? 1 : 0;
