@@ -5,28 +5,10 @@
 //
 import { bindActionCreators } from "redux";
 import { copyToTheClipboard } from "../../../utils/clipboard";
-import { getRawSourceURL, getFilename, shouldBlackbox } from "../../../utils/source";
-import { downloadFile } from "../../../utils/utils";
 import actions from "../../../actions";
-import { isFulfilled } from "../../../utils/async-value";
+import { getRawSourceURL, shouldBlackbox } from "../../../utils/source";
 
 // menu items
-
-const copyToClipboardItem = (selectedContent, editorActions) => ({
-  id: "node-menu-copy-to-clipboard",
-  label: "Copy to clipboard",
-  accesskey: "C",
-  disabled: false,
-  click: () => selectedContent.type === "text" && copyToTheClipboard(selectedContent.value),
-});
-
-const copySourceItem = (selectedSource, selectionText, editorActions) => ({
-  id: "node-menu-copy-source",
-  label: "Copy source text",
-  accesskey: "y",
-  disabled: selectionText.length === 0,
-  click: () => copyToTheClipboard(selectionText),
-});
 
 const copySourceUri2Item = (selectedSource, editorActions) => ({
   id: "node-menu-copy-source-url",
@@ -75,13 +57,6 @@ const evaluateInConsoleItem = (selectedSource, selectionText, editorActions) => 
   click: () => editorActions.evaluateInConsole(selectionText),
 });
 
-const downloadFileItem = (selectedSource, selectedContent, editorActions) => ({
-  id: "node-menu-download-file",
-  label: "Download file",
-  accesskey: "d",
-  click: () => downloadFile(selectedContent, getFilename(selectedSource)),
-});
-
 export function editorMenuItems({
   cx,
   editorActions,
@@ -91,16 +66,8 @@ export function editorMenuItems({
 }) {
   const items = [];
 
-  const content =
-    selectedSource.content && isFulfilled(selectedSource.content)
-      ? selectedSource.content.value
-      : null;
-
   items.push(
-    ...(content ? [copyToClipboardItem(content, editorActions)] : []),
-    copySourceItem(selectedSource, selectionText, editorActions),
     copySourceUri2Item(selectedSource, editorActions),
-    ...(content ? [downloadFileItem(selectedSource, content, editorActions)] : []),
     { type: "separator" },
     showSourceMenuItem(cx, selectedSource, editorActions),
     blackBoxMenuItem(cx, selectedSource, editorActions)
