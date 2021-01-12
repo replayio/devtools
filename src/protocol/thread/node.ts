@@ -213,12 +213,15 @@ export class NodeFront {
             this._computedStyle.set(name, value);
           }
         }),
-      this._pause
-        .sendMessage(client.CSS.getAppliedRules, { node: this._object.objectId })
-        .then(({ rules, data }) => {
+      this._pause.sendMessage(client.CSS.getAppliedRules, { node: this._object.objectId }).then(
+        ({ rules, data }) => {
           this._rules = uniqBy(rules, (rule: AppliedRule) => `${rule.rule}|${rule.pseudoElement}`);
           this._pause.addData(data);
-        }),
+        },
+        () => {
+          this._rules = null;
+        }
+      ),
       this._pause
         .sendMessage(client.DOM.getEventListeners, { node: this._object.objectId })
         .then(({ listeners, data }) => {
@@ -296,7 +299,10 @@ export class NodeFront {
 
   getAppliedRules() {
     assert(this._loaded);
-    return this._rules!.map(({ rule, pseudoElement }) => {
+    if (this._rules === null) {
+      return null;
+    }
+    return this._rules.map(({ rule, pseudoElement }) => {
       return { rule: this._pause.getRuleFront(rule), pseudoElement };
     });
   }

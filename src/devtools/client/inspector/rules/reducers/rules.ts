@@ -41,7 +41,7 @@ const reducers: ReducerObject<RulesState, RulesAction> = {
     return {
       highlightedSelector: rules.highlightedSelector,
       isAddRuleEnabled: rules.isAddRuleEnabled,
-      rules: rules.rules.map(rule => {
+      rules: rules.rules?.map(rule => {
         if (rule.id !== ruleId) {
           return rule;
         }

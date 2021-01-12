@@ -52,7 +52,7 @@ function createComputedProperties(elementStyle: ElementStyle): ComputedPropertyS
 
     let inheritanceCounter = 1;
     const selectors: MatchedSelectorState[] = [];
-    for (const rule of elementStyle.rules) {
+    for (const rule of elementStyle.rules || []) {
       if (rule.isUnmatched) continue;
 
       let selector: string;

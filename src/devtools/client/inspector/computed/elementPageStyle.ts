@@ -19,7 +19,7 @@ export class ElementPageStyle {
   getMatchedSelectors(property: string) {
     const selectorInfos: SelectorInfo[] = [];
 
-    for (const rule of this.store.getState().rules.rules) {
+    for (const rule of this.store.getState().rules.rules || []) {
       if (rule.isUnmatched) continue;
 
       for (const declaration of rule.declarations) {

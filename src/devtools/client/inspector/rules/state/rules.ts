@@ -60,5 +60,5 @@ export interface RuleState {
 export interface RulesState {
   highlightedSelector: string;
   isAddRuleEnabled: boolean;
-  rules: RuleState[];
+  rules: RuleState[] | undefined;
 }
