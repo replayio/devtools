@@ -324,16 +324,14 @@
 }
 
 .webconsole-app .message-location {
-  max-width: 40vw;
-  flex-shrink: 0;
+  float: right;
   color: var(--frame-link-source);
-  margin: 0 1ch;
   /* Makes the file name truncated (and ellipsis shown) on the left side */
   direction: rtl;
+  margin-inline-end: 1ch;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: end;
 }
 
 .message-location a {
@@ -350,10 +348,6 @@
   unicode-bidi: embed;
 }
 
-.webconsole-app .message-flex-body {
-  display: flex;
-}
-
 .webconsole-app .message-body {
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -362,6 +356,7 @@
 .webconsole-app .message-flex-body > .message-body {
   display: block;
   flex: 1;
+  word-break: break-all;
 }
 
 /* Network styles */
