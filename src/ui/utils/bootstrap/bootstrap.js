@@ -63,15 +63,16 @@ export async function bootstrapApp(props, context, store) {
   const deferredToken = defer();
   let isTokenReceived = false;
   async function checkForToken(auth0Client) {
-    if (!isTokenReceived && !auth0Client.isLoading) {
-      if (auth0Client.isAuthenticated) {
-        const token = await getToken(auth0Client);
-        deferredToken.resolve(token);
-      } else {
-        deferredToken.resolve(undefined);
-      }
-      isTokenReceived = true;
+    if (isTokenReceived || auth0Client.isLoading) {
+      return;
     }
+    if (auth0Client.isAuthenticated) {
+      const token = await getToken(auth0Client);
+      deferredToken.resolve(token);
+    } else {
+      deferredToken.resolve(undefined);
+    }
+    isTokenReceived = true;
   }
 
   ReactDOM.render(
