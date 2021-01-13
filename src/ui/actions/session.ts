@@ -32,7 +32,7 @@ export async function createSession(store: UIStore, recordingId: string, accessT
     ThreadFront.setTest(getTest());
     ThreadFront.recordingId = recordingId;
     if (accessToken) {
-      await sendMessage("Internal.setAccessToken", { accessToken });
+      await sendMessage("Authentication.setAccessToken", { accessToken });
     }
     const { sessionId } = await sendMessage("Recording.createSession", {
       recordingId,
