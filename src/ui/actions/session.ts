@@ -3,10 +3,10 @@ import { sessionError, uploadedData } from "@recordreplay/protocol";
 import { Action } from "redux";
 
 import { UIStore, actions, UIThunkAction } from "ui/actions";
+import hooks from "ui/hooks";
 const { ThreadFront } = require("protocol/thread");
 const { prefs } = require("ui/utils/prefs");
 const { getTest } = require("ui/utils/environment");
-const hooks = require("ui/hooks");
 
 import { ExpectedError } from "ui/state/app";
 
