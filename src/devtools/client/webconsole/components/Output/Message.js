@@ -461,11 +461,15 @@ class Message extends Component {
           },
           // Add whitespaces for formatting when copying to the clipboard.
           timestampEl ? " " : null,
-          dom.span({ className: "message-body devtools-monospace" }, ...bodyElements, learnMore),
+          dom.span(
+            { className: "message-body devtools-monospace" },
+            location,
+            " ",
+            ...bodyElements,
+            learnMore
+          ),
           repeat ? " " : null,
-          repeat,
-          " ",
-          location
+          repeat
         ),
         attachment,
         ...notesNodes
