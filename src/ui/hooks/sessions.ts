@@ -41,11 +41,9 @@ export async function fetchUserId(authId: string) {
 export function useAddSessionUser() {
   const [AddSessionUser] = useMutation(gql`
     mutation AddSessionUser($id: String!, $user_id: uuid!) {
-      update_sessions(_set: { user_id: $user_id }, where: { id: { _eq: $id } }) {
-        returning {
-          id
-          user_id
-        }
+      update_sessions_by_pk(pk_columns: { id: $id }, _set: { user_id: $user_id }) {
+        id
+        user_id
       }
     }
   `);
@@ -55,15 +53,13 @@ export function useAddSessionUser() {
 export function setSessionError({ sessionId, code }: { sessionId: string; code: number }) {
   return mutate({
     mutation: gql`
-      mutation AddSessionError($sessionId: String, $error: String) {
-        update_sessions(where: { id: { _eq: $sessionId } }, _set: { error: $error }) {
-          returning {
-            id
-            error
-          }
+      mutation AddSessionError($id: String!, $error: String!) {
+        update_sessions_by_pk(pk_columns: { id: $id }, _set: { error: $error }) {
+          id
+          error
         }
       }
     `,
-    variables: { sessionId, error: `${code}` },
+    variables: { id: sessionId, error: `${code}` },
   });
 }
