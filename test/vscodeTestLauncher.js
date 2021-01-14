@@ -21,7 +21,7 @@ process.on("message", args => {
     );
 
     const processOutput = output => {
-      const match = /Starting test .* .* (.*)/.exec(output);
+      const match = /Starting test (.*)/.exec(output);
       if (match) {
         if (currentTest) {
           process.send({ type: "test", test: currentTest, state: "failed" });
