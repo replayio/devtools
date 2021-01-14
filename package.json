@@ -60,6 +60,7 @@
     "resize-observer-polyfill": "^1.5.1",
     "style-loader": "^1.2.1",
     "url-loader": "^4.1.0",
+    "utf-8-validate": "^5.0.4",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.11",
     "whatwg-url": "^8.1.0"
