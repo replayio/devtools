@@ -1,4 +1,5 @@
 import { UIStore } from "ui/actions";
+import { getRules } from "../rules/selectors/rules";
 
 interface SelectorInfo {
   name: string;
@@ -19,7 +20,8 @@ export class ElementPageStyle {
   getMatchedSelectors(property: string) {
     const selectorInfos: SelectorInfo[] = [];
 
-    for (const rule of this.store.getState().rules.rules || []) {
+    const rules = getRules(this.store.getState()) || [];
+    for (const rule of rules) {
       if (rule.isUnmatched) continue;
 
       for (const declaration of rule.declarations) {
