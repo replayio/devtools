@@ -61,7 +61,6 @@ function onUploadedData({ uploaded, length }: uploadedData): UIThunkAction {
 
 function onSessionError(error: sessionError): UIThunkAction {
   return ({ dispatch }) => {
-    hooks.setSessionError(error);
     dispatch(setUnexpectedError(error));
   };
 }

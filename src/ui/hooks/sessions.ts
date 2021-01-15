@@ -49,17 +49,3 @@ export function useAddSessionUser() {
   `);
   return AddSessionUser;
 }
-
-export function setSessionError({ sessionId, code }: { sessionId: string; code: number }) {
-  return mutate({
-    mutation: gql`
-      mutation AddSessionError($id: String!, $error: String!) {
-        update_sessions_by_pk(pk_columns: { id: $id }, _set: { error: $error }) {
-          id
-          error
-        }
-      }
-    `,
-    variables: { id: sessionId, error: `${code}` },
-  });
-}
