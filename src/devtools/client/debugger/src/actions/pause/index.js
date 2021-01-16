@@ -10,7 +10,6 @@
  */
 
 export { stepIn, stepOver, stepOut, resume, rewind, reverseStepOver } from "./commands";
-export { fetchFrames } from "./fetchFrames";
 export { fetchScopes } from "./fetchScopes";
 export { paused } from "./paused";
 export { resumed } from "./resumed";
