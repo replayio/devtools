@@ -5,11 +5,40 @@
 //
 import { getSelectedFrame, getThreadContext } from "../../selectors";
 
-import { fetchFrames } from ".";
 import { selectLocation } from "../sources";
 
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
+
+// How many times to fetch an async set of parent frames.
+const MaxAsyncFrames = 5;
+
+export function fetchFrames(cx) {
+  return async function ({ dispatch, client }) {
+    let frames;
+    try {
+      frames = await client.getFrames();
+    } catch (e) {}
+    dispatch({ type: "FETCHED_FRAMES", frames, cx });
+  };
+}
+
+function fetchAsyncFrames(cx) {
+  return async ({ dispatch, client }) => {
+    for (let i = 0; i < MaxAsyncFrames; i++) {
+      let asyncFrames;
+      try {
+        asyncFrames = await client.loadAsyncParentFrames(i + 1);
+      } catch (e) {
+        break;
+      }
+      if (!asyncFrames.length) {
+        break;
+      }
+      dispatch({ type: "ADD_ASYNC_FRAMES", asyncFrames, cx });
+    }
+  };
+}
 
 /**
  * Debugger has just paused
@@ -30,21 +59,11 @@ export function paused({ executionPoint }) {
     const frame = getSelectedFrame(getState());
     if (frame) {
       dispatch(selectLocation(cx, frame.location, { remap: true }));
+      await Promise.all([
+        dispatch(fetchAsyncFrames(cx)),
+        dispatch(setFramePositions()),
+        dispatch(fetchScopes(cx)),
+      ]);
     }
-
-    const promises = [];
-    promises.push(
-      (async () => {
-        dispatch(setFramePositions());
-      })()
-    );
-
-    promises.push(
-      (async () => {
-        await dispatch(fetchScopes(cx));
-      })()
-    );
-
-    await Promise.all(promises);
   };
 }
