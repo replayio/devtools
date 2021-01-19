@@ -37,28 +37,22 @@ function CommentDropdownPanel({
     setPendingComment(pendingComment);
   };
 
-  if (!user?.loggedIn) {
-    return null;
-  }
-
   return (
     <div className="dropdown-panel" onClick={onItemClick}>
       {isAuthor && (
-        <div className="menu-item" onClick={startEditing}>
-          Edit Comment
-        </div>
-      )}
-      {user?.loggedIn && (
         <>
+          <div className="menu-item" onClick={startEditing}>
+            Edit Comment
+          </div>
           <div className="menu-item" onClick={() => removeComment(comment)}>
             Delete Comment
           </div>
-          {!comment.parent_id && (
-            <div className="menu-item" onClick={addReply}>
-              Reply to Comment
-            </div>
-          )}
         </>
+      )}
+      {user?.loggedIn && !comment.parent_id && (
+        <div className="menu-item" onClick={addReply}>
+          Reply to Comment
+        </div>
       )}
     </div>
   );
