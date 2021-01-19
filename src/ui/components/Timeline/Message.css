@@ -43,11 +43,6 @@
   outline: none;
 }
 
-/* Enlarge all timeline markers when hovering on the timeline */
-.timeline:hover .message {
-  transform: scale(1.2);
-}
-
 /* Dimmed styles */
 
 .timeline.dimmed .message .fill {
