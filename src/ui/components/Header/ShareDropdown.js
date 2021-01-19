@@ -8,11 +8,8 @@ import Dropdown from "ui/components/shared/Dropdown";
 import "./ShareDropdown.css";
 
 const UPDATE_IS_PRIVATE = gql`
-  mutation SetRecordingIsPrivate($recordingId: String, $isPrivate: Boolean) {
-    update_recordings(
-      where: { recording_id: { _eq: $recordingId } }
-      _set: { is_private: $isPrivate }
-    ) {
+  mutation SetRecordingIsPrivate($recordingId: uuid!, $isPrivate: Boolean) {
+    update_recordings(where: { id: { _eq: $recordingId } }, _set: { is_private: $isPrivate }) {
       returning {
         is_private
         id
@@ -22,8 +19,8 @@ const UPDATE_IS_PRIVATE = gql`
 `;
 
 const GET_RECORDING_PRIVACY = gql`
-  query GetRecordingPrivacy($recordingId: String) {
-    recordings(where: { recording_id: { _eq: $recordingId } }) {
+  query GetRecordingPrivacy($recordingId: uuid!) {
+    recordings(where: { id: { _eq: $recordingId } }) {
       id
       is_private
     }
@@ -31,8 +28,8 @@ const GET_RECORDING_PRIVACY = gql`
 `;
 
 const GET_OWNER_AUTH_ID = gql`
-  query GetOwnerAuthId($recordingId: String) {
-    recordings(where: { recording_id: { _eq: $recordingId } }) {
+  query GetOwnerAuthId($recordingId: uuid!) {
+    recordings(where: { id: { _eq: $recordingId } }) {
       user {
         auth_id
       }
