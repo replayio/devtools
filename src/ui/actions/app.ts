@@ -78,11 +78,8 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
   ThreadFront.ensureProcessed(undefined, regions =>
     store.dispatch(onUnprocessedRegions(regions))
   ).then(() => {
-    clearInterval(loadingInterval);
     store.dispatch({ type: "loading", loading: 100 });
   });
-
-  const loadingInterval = setInterval(() => store.dispatch(bumpLoading()), 1000);
 }
 
 function setupPointHandlers(store: UIStore) {
@@ -95,15 +92,6 @@ function setupPointHandlers(store: UIStore) {
 
   PointHandlers.addPendingNotification = (location: any) => {
     store.dispatch(setPendingNotification(location));
-  };
-}
-
-function bumpLoading(): UIThunkAction {
-  return ({ dispatch, getState }) => {
-    const loading = selectors.getLoading(getState());
-    const increment = Math.random() * 4;
-
-    dispatch({ type: "loading", loading: Math.min(loading + increment, 99) });
   };
 }
 

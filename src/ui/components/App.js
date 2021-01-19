@@ -5,7 +5,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 import DevTools from "./DevTools";
 import Account from "./Account";
-import Loader from "./shared/Loader";
 import { AppErrors, PopupBlockedError } from "./shared/Error";
 import SharingModal from "./shared/SharingModal";
 import { isDeployPreview } from "ui/utils/environment";
@@ -76,7 +75,7 @@ function App({ theme, recordingId, modal, updateNarrowMode, updateUser }) {
   }
 
   if ((!isDeployPreview() && auth.isLoading) || !apolloClient || hasLoadingParam()) {
-    return <Loader />;
+    return null;
   }
 
   return (

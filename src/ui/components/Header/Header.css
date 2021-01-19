@@ -85,7 +85,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  background: none;
   cursor: text;
   line-height: 18px;
   margin-right: 0.5em;
@@ -95,6 +94,7 @@
 #header input.title:focus {
   border: none;
   outline: none;
+  background: none;
   width: 400px;
 }
 
