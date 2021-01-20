@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import classnames from "classnames";
 
 import { connect } from "react-redux";
@@ -6,6 +6,14 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 
 function EventEntry({ event, currentTime, index, seek, hoveredPoint, setHoveredPoint }) {
+  const eventNode = useRef(null);
+
+  useEffect(() => {
+    if (hoveredPoint?.point == event.point && hoveredPoint?.target !== "transcript") {
+      eventNode.current.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  }, [hoveredPoint]);
+
   const seekToEvent = () => {
     const { point, time } = event;
     seek(point, time, false);
@@ -35,6 +43,7 @@ function EventEntry({ event, currentTime, index, seek, hoveredPoint, setHoveredP
         "primary-highlight": hoveredPoint?.point === event.point,
       })}
       key={index}
+      ref={eventNode}
     >
       <div className="img event-click" />
       <div className="item-label">Mouse Click</div>
