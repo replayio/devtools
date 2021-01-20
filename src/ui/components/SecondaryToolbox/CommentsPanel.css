@@ -21,7 +21,8 @@
 }
 
 .comments-panel .comment:hover,
-.comments-panel .event:hover {
+.comments-panel .event:hover,
+.comments-panel .event.primary-highlight {
   border-left: 4px solid #7ed8c8;
   padding-left: 12px;
 }

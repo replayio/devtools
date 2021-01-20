@@ -5,17 +5,34 @@ import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 
-function EventEntry({ entry, currentTime, index, seek }) {
+function EventEntry({ event, currentTime, index, seek, hoveredPoint, setHoveredPoint }) {
   const seekToEvent = () => {
-    const { point, time } = entry;
+    const { point, time } = event;
     seek(point, time, false);
+  };
+  const onMouseLeave = () => {
+    setHoveredPoint(null);
+  };
+  const onMouseEnter = () => {
+    const { point, time, location } = event;
+    const hoveredPoint = {
+      point,
+      time,
+      location,
+      target: "transcript",
+    };
+
+    setHoveredPoint(hoveredPoint);
   };
 
   return (
     <div
       onClick={seekToEvent}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       className={classnames("event", {
-        selected: currentTime === entry.time,
+        selected: currentTime === event.time,
+        "primary-highlight": hoveredPoint?.point === event.point,
       })}
       key={index}
     >
@@ -28,6 +45,7 @@ function EventEntry({ entry, currentTime, index, seek }) {
 export default connect(
   state => ({
     currentTime: selectors.getCurrentTime(state),
+    hoveredPoint: selectors.getHoveredPoint(state),
   }),
-  { seek: actions.seek }
+  { setHoveredPoint: actions.setHoveredPoint, seek: actions.seek }
 )(EventEntry);
