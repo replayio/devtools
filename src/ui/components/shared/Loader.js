@@ -13,8 +13,8 @@ export default function Loader({ message }) {
   };
 
   return (
-    <div className="loader">
-      <Lottie options={defaultOptions} height={50} width={200} />
+    <div className="old-loader">
+      <Lottie options={defaultOptions} height={50} width={200} margin={"auto"} />
       <div className="loading-message">{message}</div>
     </div>
   );

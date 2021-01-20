@@ -3,8 +3,7 @@ import { connect } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import Header from "./Header/index";
-import Loader from "./shared/Loader";
-import RecordingLoadingScreen from "./RecordingLoadingScreen";
+import SkeletonLoader from "./SkeletonLoader";
 import NonDevView from "./Views/NonDevView";
 import DevView from "./Views/DevView";
 import hooks from "../hooks";
@@ -46,13 +45,12 @@ function DevTools({
   uploading,
   recordingDuration,
   recordingId,
-  expectedError,
   setExpectedError,
   selectedPanel,
   sessionId,
   viewMode,
 }) {
-  const [recordingLoaded, setRecordingLoaded] = useState(false);
+  const [finishedLoading, setFinishedLoading] = useState(false);
   const auth = useAuth0();
   const AddSessionUser = hooks.useAddSessionUser();
   const { data, queryIsLoading } = hooks.useGetRecording(recordingId);
@@ -62,28 +60,26 @@ function DevTools({
     // as that's not dealt with in toolbox, however we still
     // need to init the toolbox so we're not checking for
     // that in the if statement here.
-    if (recordingLoaded) {
+    if (loading == 100) {
       gToolbox.init(selectedPanel);
     }
-  }, [recordingLoaded]);
+  }, [loading]);
 
   useEffect(() => {
-    if (recordingLoaded && auth.user && sessionId) {
+    if (loading == 100 && auth.user && sessionId) {
       hooks.fetchUserId(auth.user.sub).then(userId => {
         AddSessionUser({ variables: { id: sessionId, user_id: userId } });
       });
     }
-  }, [recordingLoaded, auth.user, sessionId]);
-
-  if (expectedError) {
-    return null;
-  }
+  }, [loading, auth.user, sessionId]);
 
   if (queryIsLoading) {
-    return <Loader />;
-  } else if (recordingDuration === null || uploading) {
+    return <SkeletonLoader content={"Fetching the recording information"} />;
+  } else if (recordingDuration === null) {
+    return <SkeletonLoader content={"Fetching the recording description"} />;
+  } else if (uploading) {
     const message = getUploadingMessage(uploading);
-    return <Loader message={message} />;
+    return <SkeletonLoader content={message} />;
   }
 
   const isAuthorized = getIsAuthorized({ data });
@@ -100,12 +96,14 @@ function DevTools({
     return null;
   }
 
-  if (loading < 100) {
-    return <RecordingLoadingScreen />;
-  }
-
-  if (!recordingLoaded) {
-    setRecordingLoaded(true);
+  if (!finishedLoading) {
+    return (
+      <SkeletonLoader
+        setFinishedLoading={setFinishedLoading}
+        progress={loading}
+        content={"Scanning the recording"}
+      />
+    );
   }
 
   return (
@@ -123,7 +121,6 @@ export default connect(
     recordingDuration: selectors.getRecordingDuration(state),
     sessionId: selectors.getSessionId(state),
     recordingId: selectors.getRecordingId(state),
-    expectedError: selectors.getExpectedError(state),
     selectedPanel: selectors.getSelectedPanel(state),
     viewMode: selectors.getViewMode(state),
     narrowMode: selectors.getNarrowMode(state),
