@@ -59,8 +59,8 @@
   border-right-style: solid;
 }
 
-.timeline .message-container,
-.timeline .preview-message-container {
+.timeline .markers-container,
+.timeline .preview-markers-container {
   position: absolute;
   width: 100%;
   height: 100%;

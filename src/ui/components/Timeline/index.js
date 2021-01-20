@@ -19,7 +19,8 @@ const { mostRecentPaintOrMouseEvent, paintGraphicsAtTime } = require("protocol/g
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
-import Message, { MessagePreview } from "./Message";
+import Marker from "./Marker";
+import MessageMarker from "./MessageMarker";
 import { getVisiblePosition } from "ui/utils/timeline";
 
 import "./Timeline.css";
@@ -154,13 +155,11 @@ export class Timeline extends Component {
     const { messages, currentTime, hoveredPoint, zoomRegion } = this.props;
 
     return (
-      <div className="message-container">
+      <div className="markers-container">
         {messages.map((message, index) => (
-          <Message
+          <MessageMarker
             message={message}
-            index={index}
             key={index}
-            messages={messages}
             currentTime={currentTime}
             hoveredPoint={hoveredPoint}
             zoomRegion={zoomRegion}
@@ -171,27 +170,45 @@ export class Timeline extends Component {
     );
   }
 
-  renderPreviewMessages() {
-    const {
-      pointsForHoveredLineNumber,
-      currentTime,
-      highlightedMessageId,
-      zoomRegion,
-    } = this.props;
+  renderEvents() {
+    const { clickEvents, currentTime, hoveredPoint, zoomRegion } = this.props;
+
+    return (
+      <div className="markers-container">
+        {clickEvents.map((point, index) => (
+          <Marker
+            key={index}
+            point={point.point}
+            time={point.time}
+            hasFrames={"false"}
+            currentTime={currentTime}
+            hoveredPoint={hoveredPoint}
+            zoomRegion={zoomRegion}
+            overlayWidth={this.overlayWidth}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  renderPreviewMarkers() {
+    const { pointsForHoveredLineNumber, currentTime, hoveredPoint, zoomRegion } = this.props;
 
     if (!pointsForHoveredLineNumber) {
       return [];
     }
 
     return (
-      <div className="preview-message-container">
-        {pointsForHoveredLineNumber.map((message, index) => (
-          <MessagePreview
-            message={message}
-            index={index}
+      <div className="preview-markers-container">
+        {pointsForHoveredLineNumber.map((point, index) => (
+          <Marker
             key={index}
+            point={point.point}
+            time={point.time}
+            hasFrames={point.hasFrames}
+            location={point.frame[0]}
             currentTime={currentTime}
-            highlightedMessageId={highlightedMessageId}
+            hoveredPoint={hoveredPoint}
             zoomRegion={zoomRegion}
             overlayWidth={this.overlayWidth}
           />
@@ -207,6 +224,7 @@ export class Timeline extends Component {
       hoverTime,
       hoveredLineNumberLocation,
       hoveredPoint,
+      viewMode,
     } = this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
@@ -226,8 +244,8 @@ export class Timeline extends Component {
             <div className="progress-line full" />
             <div className="progress-line preview" style={{ width: `${hoverPercent}%` }} />
             <div className="progress-line" style={{ width: `${percent}%` }} />
-            {this.renderMessages()}
-            {this.renderPreviewMessages()}
+            {viewMode == "dev" ? this.renderMessages() : this.renderEvents()}
+            {this.renderPreviewMarkers()}
             <ScrollContainer />
           </div>
           <Comments />
@@ -251,6 +269,7 @@ export default connect(
     hoveredLineNumberLocation: selectors.getHoveredLineNumberLocation(state),
     pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
     hoveredPoint: selectors.getHoveredPoint(state),
+    clickEvents: selectors.getEventsForType(state, "mousedown"),
   }),
   {
     setTimelineToTime: actions.setTimelineToTime,

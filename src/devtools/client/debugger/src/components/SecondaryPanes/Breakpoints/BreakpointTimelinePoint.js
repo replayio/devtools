@@ -5,7 +5,7 @@ import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
 const { getAnalysisPointsForLocation } = selectors;
 import { actions } from "ui/actions";
-import { Marker } from "ui/components/Timeline/Message";
+import { Circle } from "ui/components/Timeline/Marker";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
@@ -89,7 +89,7 @@ function BreakpointTimelinePoint({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <Marker onMarkerClick={() => {}} />
+      <Circle />
     </div>
   );
 }
