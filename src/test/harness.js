@@ -46,16 +46,18 @@ function finish() {
   dump(`RecReplaySendAsyncMessage TestFinished`);
 }
 
-function selectConsole() {
-  return document.querySelector("button.console-panel-button").click();
+async function selectConsole() {
+  const button = await waitUntil(() => document.querySelector("button.console-panel-button"));
+  return button.click();
 }
 
 function selectDebugger() {
   return gToolbox.selectTool("debugger");
 }
 
-function selectInspector() {
-  return document.querySelector("button.inspector-panel-button").click();
+async function selectInspector() {
+  const button = await waitUntil(() => document.querySelector("button.inspector-panel-button"));
+  return button.click();
 }
 
 function getContext() {
