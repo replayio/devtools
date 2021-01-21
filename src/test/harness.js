@@ -46,9 +46,16 @@ function finish() {
   dump(`RecReplaySendAsyncMessage TestFinished`);
 }
 
-async function selectConsole() {
-  const button = await waitUntil(() => document.querySelector("button.console-panel-button"));
-  return button.click();
+async function clickElement(selector) {
+  const element = await waitUntil(() => document.querySelector(selector));
+  if (!element) {
+    console.log(`Could not find element with selector ${selector}`);
+  }
+  return element.click();
+}
+
+function selectConsole() {
+  return clickElement("button.console-panel-button");
 }
 
 function selectDebugger() {
@@ -56,8 +63,7 @@ function selectDebugger() {
 }
 
 async function selectInspector() {
-  const button = await waitUntil(() => document.querySelector("button.inspector-panel-button"));
-  return button.click();
+  return clickElement("button.inspector-panel-button");
 }
 
 function getContext() {
@@ -244,7 +250,7 @@ async function checkEvaluateInTopFrame(text, expected) {
     return node?.innerText == `${expected}`;
   });
 
-  document.querySelector(".devtools-clear-icon").click();
+  await clickElement(".devtools-clear-icon");
   selectDebugger();
 }
 
@@ -259,7 +265,7 @@ async function waitForScopeValue(name, value) {
 async function toggleBlackboxSelectedSource() {
   const { getSelectedSource } = dbgSelectors;
   const blackboxed = getSelectedSource().isBlackBoxed;
-  document.querySelector(".black-box").click();
+  await clickElement(".black-box");
   await waitUntil(() => getSelectedSource().isBlackBoxed != blackboxed);
   await ThreadFront.waitForInvalidateCommandsToFinish();
 }
@@ -402,8 +408,7 @@ async function toggleExceptionLogging() {
 }
 
 async function toggleMappedSources() {
-  const elem = await waitUntil(() => document.querySelector(".mapped-source"));
-  elem.click();
+  return clickElement(".mapped-source");
 }
 
 async function playbackRecording() {
@@ -489,7 +494,7 @@ async function selectMarkupNode(node) {
 }
 
 async function checkComputedStyle(style, value, matchedSelectors = undefined) {
-  document.getElementById("computedview-tab").click();
+  await clickElement("#computedview-tab");
   const matchedSelectorsJSON = matchedSelectors ? JSON.stringify(matchedSelectors) : undefined;
   await waitUntil(() => {
     const names = document.querySelectorAll(".computed-property-name");
