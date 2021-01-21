@@ -321,7 +321,7 @@ export class NodeFront {
 
   getBoundingClientRect() {
     assert(this._loaded);
-    const [left, top, right, bottom] = this._bounds;
+    const [left, top, right, bottom] = this._bounds!;
     return new DOMRect(left, top, right - left, bottom - top);
   }
 
