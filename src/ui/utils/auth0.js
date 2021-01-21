@@ -21,6 +21,7 @@ const Auth0ProviderWithHistory = ({ children }) => {
       onRedirectCallback={onRedirectCallback}
       cacheLocation="localstorage"
       prompt="select_account"
+      audience="hasura-api"
     >
       {children}
     </Auth0Provider>
