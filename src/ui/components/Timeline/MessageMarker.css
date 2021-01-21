@@ -1,4 +1,4 @@
-.timeline .message {
+.timeline .marker {
   height: 11px;
   width: 11px;
   position: absolute;
@@ -9,62 +9,62 @@
   pointer-events: all;
 }
 
-.timeline .message-preview {
+.timeline .preview-markers-container .marker {
   z-index: var(--z-index-2--hovered-message);
 }
 
-.timeline .message:hover {
+.timeline .marker:hover {
   cursor: pointer;
 }
 
-.timeline .message .fill {
+.timeline .marker .fill {
   fill: var(--replaying-marker-fill);
 }
 
-.timeline .message .stroke {
+.timeline .marker .stroke {
   stroke: var(--theme-body-background);
   pointer-events: none;
 }
 
-.timeline .message.paused {
+.timeline .marker.paused {
   z-index: var(--z-index-1--paused-message);
 }
 
-.timeline .message.paused .fill {
+.timeline .marker.paused .fill {
   fill: var(--replaying-paused-marker-fill);
 }
 
-.timeline .message.paused .stroke {
+.timeline .marker.paused .stroke {
   stroke: var(--replaying-paused-marker-stroke);
   stroke: var(--theme-body-background);
 }
 
-.timeline .message:focus {
+.timeline .marker:focus {
   outline: none;
 }
 
 /* Dimmed styles */
 
-.timeline.dimmed .message .fill {
+.timeline.dimmed .marker .fill {
   fill: var(--primary-accent-light);
 }
 
-.timeline.dimmed .message-preview .fill {
+.timeline.dimmed .preview-markers-container .marker .fill {
   fill: var(--replaying-marker-fill);
 }
 
-.timeline.dimmed .message.secondary-highlight {
+.timeline.dimmed .marker.secondary-highlight {
   z-index: var(--z-index-2--hovered-point-secondary);
 }
 
-.timeline.dimmed .message.secondary-highlight .fill {
+.timeline.dimmed .marker.secondary-highlight .fill {
   fill: var(--replaying-marker-fill);
 }
 
-.timeline.dimmed .message.primary-highlight {
+.timeline.dimmed .marker.primary-highlight {
   z-index: var(--z-index-3--hovered-point-primary);
 }
 
-.timeline.dimmed .message.primary-highlight .fill {
+.timeline.dimmed .marker.primary-highlight .fill {
   fill: var(--new-blue-900);
 }

@@ -6,6 +6,6 @@ export default function TranscriptEntry({ entry }) {
   if ("content" in entry) {
     return <Comment comment={entry} />;
   } else {
-    return <EventEntry entry={entry} />;
+    return <EventEntry event={entry} />;
   }
 }
