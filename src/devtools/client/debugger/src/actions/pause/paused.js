@@ -6,7 +6,6 @@
 import { getSelectedFrame, getThreadContext } from "../../selectors";
 
 import { selectLocation } from "../sources";
-
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
 
@@ -47,9 +46,9 @@ function fetchAsyncFrames(cx) {
  * @memberof actions/pause
  * @static
  */
-export function paused({ executionPoint }) {
+export function paused({ executionPoint, time }) {
   return async function ({ dispatch, getState }) {
-    dispatch({ type: "PAUSED", executionPoint });
+    dispatch({ type: "PAUSED", executionPoint, time });
 
     // Get a context capturing the newly paused and selected thread.
     const cx = getThreadContext(getState());
