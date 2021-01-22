@@ -32,28 +32,7 @@ export function EventsFilter() {
   );
 }
 
-export function TranscriptOptions({ showClicks, setShowClicks, clickEvents }) {
-  const count = clickEvents.length;
-
-  return (
-    <div className="toolbar-options">
-      <label htmlFor="show-clicks">
-        <span>Show clicks</span>
-        {!showClicks ? <span>{` (${count})`}</span> : null}
-      </label>
-      <input
-        type="checkbox"
-        id="show-clicks"
-        checked={showClicks}
-        onChange={() => setShowClicks(!showClicks)}
-      />
-    </div>
-  );
-}
-
 function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
-  const [showClicks, setShowClicks] = useState(true);
-
   const viewer = (
     <div className="vertical-panels">
       <Video />
@@ -66,13 +45,8 @@ function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
     <div className="right-sidebar">
       <div className="right-sidebar-toolbar">
         <div className="right-sidebar-toolbar-item">Transcript and Comments</div>
-        <TranscriptOptions
-          showClicks={showClicks}
-          setShowClicks={setShowClicks}
-          clickEvents={clickEvents}
-        />
       </div>
-      <CommentsPanel showClicks={showClicks} />
+      <CommentsPanel />
     </div>
   );
 

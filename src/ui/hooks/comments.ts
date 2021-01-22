@@ -75,7 +75,7 @@ export function useGetComments(
     console.error("Apollo error while fetching comments:", error);
   }
 
-  return { comments: data?.comments, loading, error };
+  return { comments: data?.comments || [], loading, error };
 }
 
 export function useAddComment(callback: Function = () => {}) {

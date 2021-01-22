@@ -8,22 +8,18 @@ import { sortBy } from "lodash";
 import TranscriptEntry from "./TranscriptEntry/index";
 import "./CommentsPanel.css";
 
-function CommentsPanel({ recordingId, clickEvents, showClicks, pendingComment }) {
+function CommentsPanel({ recordingId, clickEvents, pendingComment }) {
   const { comments } = hooks.useGetComments(recordingId);
 
   // We allow the panel to render its entries whether or not the
   // comments have loaded yet. This optimistically assumes that eventually the
   // comments will finish loading and we'll re-render then. This fails silently
-  // if the query returns an erro and we should add error handling that provides
+  // if the query returns an error and we should add error handling that provides
   // next steps for fixing the error by refetching/refreshing.
-  let entries = comments || [];
+  let entries = [...comments, ...clickEvents] || [];
 
   if (pendingComment) {
     entries = [...entries, pendingComment];
-  }
-
-  if (showClicks) {
-    entries = [...entries, ...clickEvents];
   }
 
   if (!entries.length) {
