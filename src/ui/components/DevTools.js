@@ -74,7 +74,7 @@ function DevTools({
   }, [loading, auth.user, sessionId]);
 
   useEffect(() => {
-    if (data?.recordings?.[0].title) {
+    if (data?.recordings?.[0]?.title) {
       document.title = `${data.recordings[0].title} - Replay`;
     }
   }, [data]);
