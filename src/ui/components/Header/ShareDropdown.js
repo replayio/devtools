@@ -47,7 +47,12 @@ function useIsOwner(recordingId) {
     return false;
   }
 
-  return user.sub === data.recordings[0]?.user.auth_id;
+  const recording = data.recordings[0];
+  if (!recording?.user) {
+    return false;
+  }
+
+  return user.sub === recording.user?.auth_id;
 }
 
 function CopyUrl({ recordingId }) {
