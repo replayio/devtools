@@ -35,6 +35,7 @@
   ["node_console-01.js", "basic.js"],
   ["node_object_preview-01.js", "objects.js"],
   ["node_logpoint-01.js", "basic.js"],
+  ["node_spawn-01.js", "spawn.js"],
   ["node_worker-01.js", "run_worker.js"],
   ["node_napi.js", "napi.js"]
 ]
