@@ -24,6 +24,7 @@ jobs:
   deploy:
     name: Deploy to S3
     runs-on: ubuntu-latest
+    needs: [build]
     timeout-minutes: 15
     steps:
       - name: Checkout
