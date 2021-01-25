@@ -1,0 +1,36 @@
+name: Manual Deploy
+
+jobs:
+  build:
+    name: Build webpack
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: npm install
+      - name: Build webpack
+        run: ./node_modules/.bin/webpack --mode=production
+      - name: Tar up output files
+        run: tar -czf dist.tgz index.html dist node_modules
+      - name: Create artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist.tgz
+  deploy:
+    name: Deploy to S3
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Deploy to S3
+        uses: ./.github/actions/deploy
