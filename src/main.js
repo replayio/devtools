@@ -37,7 +37,7 @@ const {
 } = require("./devtools/client/webconsole/utils/syntax-highlighted");
 
 let initialized = false;
-async function initialize(accessToken) {
+async function initialize() {
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
   loadImages();
 
@@ -45,7 +45,7 @@ async function initialize(accessToken) {
   initSocket(store, dispatch);
 
   if (recordingId) {
-    createSession(store, recordingId, accessToken);
+    createSession(store, recordingId);
   }
 
   document.body.addEventListener("contextmenu", e => e.preventDefault());
@@ -68,11 +68,10 @@ async function initialize(accessToken) {
 (async () => {
   window.gToolbox = new DevToolsToolbox();
   store = await bootstrapStore();
-  const accessToken = await bootstrapApp({}, { recordingId }, store);
 
   if (!initialized) {
     initialized = true;
-    await initialize(accessToken);
+    await initialize();
   }
 
   if (recordingId) {
@@ -84,4 +83,6 @@ async function initialize(accessToken) {
     setupMessages(store);
     setupLogpoints();
   }
+
+  bootstrapApp({}, { recordingId }, store);
 })();
