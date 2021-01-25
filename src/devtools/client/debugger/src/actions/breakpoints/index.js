@@ -190,7 +190,7 @@ export function updateHoveredLineNumber(cx, line) {
     // Set the initial location here as a placeholder to be checked after any async activity.
     dispatch(actions.setHoveredLineNumberLocation(initialLocation));
 
-    await dispatch(setBreakpointPositions({ cx, sourceId: source.id, line }));
+    await dispatch(setBreakpointPositions({ sourceId: source.id, line }));
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
     // It's possible that after the `await` above the user is either 1) hovered off of the
