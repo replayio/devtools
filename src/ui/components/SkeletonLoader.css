@@ -30,7 +30,7 @@
 .loader main .timeline {
   position: relative;
   box-sizing: content-box;
-  height: 36px;
+  height: 28px;
 }
 
 .loader main .timeline .loading-container {
@@ -64,7 +64,7 @@
 /* Loading elements */
 
 .loader .loading-placeholder {
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--theme-splitter-color);
   overflow: hidden;
   position: relative;
@@ -87,10 +87,12 @@
 }
 
 .loader header .message {
-  color: var(--theme-comment);
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  color: var(--primary-accent);
+  font-size: 1.25rem;
+  line-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;  
 }
 
 .loader .header-left > *,
@@ -116,12 +118,12 @@
 }
 
 .loader header .view {
-  width: 160px;
+  width: 166px;
 }
 
 .loader main .comments .loading-placeholder {
   width: 100%;
-  height: 44px;
+  height: 28px;
   margin-bottom: 20px;
 }
 
