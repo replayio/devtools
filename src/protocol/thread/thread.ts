@@ -184,7 +184,7 @@ class _ThreadFront {
     }
   }
 
-  setTest(test: string) {
+  setTest(test: string | undefined) {
     this.testName = test;
   }
 

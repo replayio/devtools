@@ -1,12 +1,12 @@
-const { sendMessage, addEventListener } = require("protocol/socket");
+import { sendMessage, addEventListener } from "protocol/socket";
 import { sessionError, uploadedData } from "@recordreplay/protocol";
 import { Action } from "redux";
 
+import tokenManager from "ui/utils/tokenManager";
 import { UIStore, actions, UIThunkAction } from "ui/actions";
-import hooks from "ui/hooks";
-const { ThreadFront } = require("protocol/thread");
+import { ThreadFront } from "protocol/thread";
 const { prefs } = require("ui/utils/prefs");
-const { getTest } = require("ui/utils/environment");
+import { getTest } from "ui/utils/environment";
 
 import { ExpectedError } from "ui/state/app";
 
@@ -21,7 +21,7 @@ declare global {
 }
 
 // Create a session to use while debugging.
-export async function createSession(store: UIStore, recordingId: string, accessToken?: string) {
+export async function createSession(store: UIStore, recordingId: string) {
   addEventListener("Recording.uploadedData", (data: uploadedData) =>
     store.dispatch(onUploadedData(data))
   );
@@ -29,11 +29,16 @@ export async function createSession(store: UIStore, recordingId: string, accessT
     store.dispatch(onSessionError(err))
   );
   try {
-    ThreadFront.setTest(getTest());
+    ThreadFront.setTest(getTest() || undefined);
     ThreadFront.recordingId = recordingId;
-    if (accessToken) {
-      await sendMessage("Authentication.setAccessToken", { accessToken });
-    }
+
+    tokenManager.addListener(({ token }) => {
+      if (token) {
+        sendMessage("Authentication.setAccessToken", { accessToken: token });
+      }
+    });
+    await tokenManager.getToken();
+
     const { sessionId } = await sendMessage("Recording.createSession", {
       recordingId,
     });
