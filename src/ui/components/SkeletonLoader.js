@@ -50,12 +50,9 @@ function Header({ progress, content }) {
     <header id="header">
       <div className="header-left">
         <div className="loading-placeholder back" />
-        <div className="loading-placeholder title" />
-        <div className="loading-placeholder subtitle" />
       </div>
       <div className="message">{progress == 100 ? "Ready" : content}</div>
       <div className="links">
-        <div className="loading-placeholder share" />
         <div className="loading-placeholder view" />
         <div className="loading-placeholder avatar" />
       </div>
@@ -72,9 +69,6 @@ function NonDevMain({ backgroundColor, displayedProgress }) {
           <div className="loading-container">
             <div className="progress-line full" />
             <div className="progress-line" style={{ width: `${displayedProgress}%` }} />
-            <div className="tooltip" style={{ left: `${displayedProgress}%` }}>
-              Loading...
-            </div>
           </div>
         </div>
       </section>
