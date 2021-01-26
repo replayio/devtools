@@ -25,27 +25,9 @@ const GET_RECORDING_TITLE = gql`
   }
 `;
 
-function Avatars({ user, getActiveUsers }) {
-  const activeUsers = getActiveUsers();
-  const firstPlayer = user;
-  const otherPlayers = activeUsers.filter(user => user.id != firstPlayer.id);
-
-  // We sort the other players by ID here to prevent them from shuffling.
-  const sortedOtherPlayers = otherPlayers.sort((a, b) => a.id - b.id);
-
-  return (
-    <div className="avatars">
-      {sortedOtherPlayers.map(player => (
-        <Avatar player={player} isFirstPlayer={false} key={player.id} />
-      ))}
-    </div>
-  );
-}
-
-function Links({ user, getActiveUsers, recordingId }) {
+function Links({ recordingId }) {
   return (
     <div className="links">
-      <Avatars user={user} getActiveUsers={getActiveUsers} />
       {recordingId ? <ShareDropdown /> : null}
       <ViewToggle />
       <UserOptions />
@@ -54,7 +36,7 @@ function Links({ user, getActiveUsers, recordingId }) {
 }
 
 function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
-  const { data, loading } = useQuery(GET_RECORDING_TITLE, {
+  const { data } = useQuery(GET_RECORDING_TITLE, {
     variables: { id: recordingId },
   });
 
@@ -91,7 +73,7 @@ function Subtitle({ date }) {
   return <div className="subtitle">Created {moment(date).fromNow()}</div>;
 }
 
-function Header({ user, getActiveUsers, recordingId }) {
+function Header({ recordingId }) {
   const [editingTitle, setEditingTitle] = useState(false);
   const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
   const dashboardUrl = `${window.location.origin}/view`;
@@ -117,17 +99,11 @@ function Header({ user, getActiveUsers, recordingId }) {
           editingTitle={editingTitle}
         />
       </div>
-      <Links user={user} getActiveUsers={getActiveUsers} recordingId={recordingId} />
+      <Links recordingId={recordingId} />
     </div>
   );
 }
 
-export default connect(
-  state => ({
-    user: selectors.getUser(state),
-    recordingId: selectors.getRecordingId(state),
-  }),
-  {
-    getActiveUsers: actions.getActiveUsers,
-  }
-)(Header);
+export default connect(state => ({
+  recordingId: selectors.getRecordingId(state),
+}))(Header);

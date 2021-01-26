@@ -2,12 +2,10 @@ import { Action, Store } from "redux";
 
 import * as appActions from "./app";
 import * as timelineActions from "./timeline";
-import * as metadataActions from "./metadata";
 import * as sessionActions from "./session";
 import { ThunkAction } from "ui/utils/thunk";
 import { UIState } from "ui/state";
 import type { AppAction } from "./app";
-import type { MetadataAction } from "./metadata";
 import type { TimelineAction } from "./timeline";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
@@ -21,7 +19,6 @@ type DebuggerAction = Action<"RESUME">;
 
 export type UIAction =
   | AppAction
-  | MetadataAction
   | TimelineAction
   | MarkupAction
   | EventTooltipAction
@@ -46,7 +43,6 @@ export type UIStore = Store<UIState, UIAction> & {
 export const actions = {
   ...appActions,
   ...timelineActions,
-  ...metadataActions,
   ...eventListeners,
   ...debuggerActions,
   ...consoleActions,

@@ -24,7 +24,7 @@ const loadImages = require("image/image");
 const { setupLogpoints } = require("./protocol/logpoint");
 const { bootstrapApp } = require("ui/utils/bootstrap/bootstrap");
 const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
-const { setupTimeline, setupMetadata, setupApp } = require("ui/actions").actions;
+const { setupTimeline, setupApp } = require("ui/actions").actions;
 const { setupGraphics } = require("protocol/graphics");
 const { setupMessages } = require("devtools/client/webconsole/actions/messages");
 
@@ -78,7 +78,6 @@ async function initialize(accessToken) {
   if (recordingId) {
     setupApp(recordingId, store);
     setupTimeline(recordingId, store);
-    setupMetadata(recordingId, store);
     setupEventListeners(recordingId, store);
     setupGraphics(store);
     initOutputSyntaxHighlighting();
