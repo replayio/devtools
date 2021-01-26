@@ -147,8 +147,6 @@ class _ThreadFront {
       ) => { point: ExecutionPoint; time: number; hasFrames?: boolean } | null)
     | null = null;
 
-  metadataListeners: { key: string; callback: (newValue: any) => void }[] | undefined;
-
   testName: string | undefined;
 
   // added by EventEmitter.decorate(ThreadFront)
@@ -919,58 +917,6 @@ class _ThreadFront {
     }
 
     return description;
-  }
-
-  async watchMetadata(key: string, callback: (args: any) => any) {
-    if (!this.metadataListeners) {
-      client.Recording.addMetadataChangeListener(({ key, newValue }) => {
-        this.metadataListeners!.forEach(entry => {
-          if (entry.key == key) {
-            entry.callback(newValue ? JSON.parse(newValue) : undefined);
-          }
-        });
-      });
-      this.metadataListeners = [];
-    }
-    this.metadataListeners.push({ key, callback });
-
-    assert(this.recordingId);
-    const { value } = await client.Recording.metadataStartListening({
-      recordingId: this.recordingId,
-      key,
-    });
-    callback(value ? JSON.parse(value) : undefined);
-  }
-
-  async updateMetadata(key: string, callback: (args: any) => any) {
-    // Keep trying to update the metadata until it succeeds --- we updated it
-    // before anyone else did. Use the callback to compute the new value in
-    // terms of the old value. The callback can return null to cancel the update.
-    assert(this.recordingId);
-    let { value } = await client.Recording.getMetadata({
-      recordingId: this.recordingId,
-      key,
-    });
-    while (true) {
-      const newValueRaw = callback(value ? JSON.parse(value) : undefined);
-      if (!newValueRaw) {
-        // The update was cancelled.
-        return;
-      }
-      const newValue = JSON.stringify(newValueRaw);
-      const { updated, currentValue } = await client.Recording.setMetadata({
-        recordingId: this.recordingId,
-        key,
-        newValue,
-        oldValue: value,
-      });
-      if (updated) {
-        // It worked! Hooray!
-        break;
-      }
-      // Retry with the value that was written by another client.
-      value = currentValue;
-    }
   }
 }
 

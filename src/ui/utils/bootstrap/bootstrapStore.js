@@ -50,7 +50,6 @@ function updatePrefs(state, oldState) {
 
   updatePref("viewMode", selectors.getViewMode);
   updatePref("splitConsole", selectors.isSplitConsoleOpen);
-  updatePref("user", selectors.getUser);
   updatePref("selectedPanel", selectors.getSelectedPanel);
   updateAsyncPref("eventListenerBreakpoints", state => state.eventListenerBreakpoints);
 }

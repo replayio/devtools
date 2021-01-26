@@ -12,6 +12,8 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { hasLoadingParam } from "ui/utils/environment";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
+import hooks from "ui/hooks";
+import LogRocket from "ui/utils/logrocket";
 
 import "styles.css";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
@@ -54,7 +56,7 @@ function installViewportObserver({ updateNarrowMode }) {
   observer.observe(viewport);
 }
 
-function App({ theme, recordingId, modal, updateNarrowMode, updateUser }) {
+function App({ theme, recordingId, modal, updateNarrowMode }) {
   const { apolloClient, consentPopupBlocked } = useGetApolloClient();
   const auth = useAuth0();
 
@@ -64,10 +66,19 @@ function App({ theme, recordingId, modal, updateNarrowMode, updateUser }) {
   }, [theme]);
 
   useEffect(() => {
+    const setUserInLogRocket = async () => {
+      if (auth.user) {
+        const userId = await hooks.fetchUserId(auth.user.sub);
+        LogRocket.identify(auth.user.sub, {
+          name: auth.user.name,
+          email: auth.user.email,
+          id: userId,
+        });
+      }
+    };
+
     setUserInBrowserPrefs(auth.user);
-    if (!auth.isLoading && auth.user) {
-      updateUser(auth.user);
-    }
+    setUserInLogRocket();
   }, [auth.user]);
 
   if (consentPopupBlocked) {
@@ -96,6 +107,5 @@ export default connect(
   }),
   {
     updateNarrowMode: actions.updateNarrowMode,
-    updateUser: actions.updateUser,
   }
 )(App);
