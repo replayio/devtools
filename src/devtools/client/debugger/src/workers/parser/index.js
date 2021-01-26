@@ -14,11 +14,6 @@ export class ParserDispatcher extends WorkerDispatcher {
     return this.invoke("findOutOfScopeLocations", sourceId, position);
   }
 
-  async getNextStep(sourceId, pausedPosition) {
-    log(`WorkerDispatch Parser getNextStep`);
-    return this.invoke("getNextStep", sourceId, pausedPosition);
-  }
-
   async clearState() {
     log(`WorkerDispatch Parser clearState`);
     return this.invoke("clearState");

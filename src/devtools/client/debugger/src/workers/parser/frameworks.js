@@ -10,9 +10,7 @@ export function getFramework(symbols) {
   if (isReactComponent(symbols)) {
     return "React";
   }
-  if (isAngularComponent(symbols)) {
-    return "Angular";
-  }
+
   if (isVueComponent(symbols)) {
     return "Vue";
   }
@@ -49,12 +47,6 @@ function extendsReactComponent(classes) {
       t.isIdentifier(classObj.parent, { name: "PureComponent" }) ||
       (t.isMemberExpression(classObj.parent, { computed: false }) &&
         t.isIdentifier(classObj.parent, { name: "Component" }))
-  );
-}
-
-function isAngularComponent({ memberExpressions }) {
-  return memberExpressions.some(
-    item => item.expression == "angular.controller" || item.expression == "angular.module"
   );
 }
 

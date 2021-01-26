@@ -30,15 +30,6 @@ export function isYieldExpression(path) {
   );
 }
 
-export function isObjectShorthand(parent) {
-  return (
-    t.isObjectProperty(parent) &&
-    parent.value &&
-    parent.key.start == parent.value.start &&
-    parent.key.loc.identifierName === parent.value.loc.identifierName
-  );
-}
-
 export function getObjectExpressionValue(node) {
   const { value } = node;
 
