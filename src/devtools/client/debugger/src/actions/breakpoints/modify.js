@@ -91,7 +91,7 @@ export function addBreakpoint(
 
     const { sourceId, column, line } = initialLocation;
 
-    await dispatch(setBreakpointPositions({ cx, sourceId, line }));
+    await dispatch(setBreakpointPositions({ sourceId, line }));
 
     const location = column
       ? getBreakpointPositionsForLocation(getState(), initialLocation)
@@ -160,7 +160,7 @@ export function runAnalysis(cx, initialLocation, options) {
     recordEvent("run_analysis");
 
     const { sourceId, line } = initialLocation;
-    await dispatch(setBreakpointPositions({ cx, sourceId, line }));
+    await dispatch(setBreakpointPositions({ sourceId, line }));
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
     if (!location) {

@@ -59,7 +59,7 @@ function groupByLine(results, sourceId, line) {
   return positions;
 }
 
-async function _setBreakpointPositions(cx, sourceId, line, thunkArgs) {
+async function _setBreakpointPositions(sourceId, line, thunkArgs) {
   const { client, dispatch, getState, sourceMaps } = thunkArgs;
   let generatedSource = getSource(getState(), sourceId);
   if (!generatedSource) {
@@ -72,7 +72,7 @@ async function _setBreakpointPositions(cx, sourceId, line, thunkArgs) {
 
   const actorColumns = await Promise.all(
     getSourceActorsForSource(getState(), generatedSource.id).map(actor =>
-      dispatch(loadSourceActorBreakpointColumns({ id: actor.id, line, cx }))
+      dispatch(loadSourceActorBreakpointColumns({ id: actor.id, line }))
     )
   );
 
@@ -93,7 +93,6 @@ async function _setBreakpointPositions(cx, sourceId, line, thunkArgs) {
 
   dispatch({
     type: "ADD_BREAKPOINT_POSITIONS",
-    cx,
     source,
     positions,
   });
@@ -124,6 +123,6 @@ export const setBreakpointPositions = memoizeableAction("setBreakpointPositions"
     const key = generatedSourceActorKey(getState(), sourceId);
     return line ? `${key}-${line}` : key;
   },
-  action: async ({ cx, sourceId, line }, thunkArgs) =>
-    _setBreakpointPositions(cx, sourceId, line, thunkArgs),
+  action: async ({ sourceId, line }, thunkArgs) =>
+    _setBreakpointPositions(sourceId, line, thunkArgs),
 });
