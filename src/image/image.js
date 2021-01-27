@@ -156,6 +156,7 @@ const gMaskImages = {
   ".img.arrowhead-right": require("devtools/client/themes/images/arrowhead-right.svg"),
   ".img.event-click": require("devtools/client/themes/images/event-click.svg"),
   ".img.event-comment": require("devtools/client/themes/images/event-comment.svg"),
+  ".img.login": require("devtools/client/themes/images/login.svg"),
   ".img.settings": require("devtools/client/themes/images/settings.svg"),
   ".tree-node button.arrow": require("devtools/client/debugger/images/arrow.svg"),
   "#command-button-pick::before": require("devtools/client/themes/images/command-pick.svg"),
