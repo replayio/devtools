@@ -33,8 +33,10 @@ export function openInspector(grip) {
 }
 
 export function highlightDomElement(grip) {
-  return ({ toolbox }) => {
-    toolbox.getPanel("debugger")?.highlightDomElement(grip);
+  return async ({ toolbox }) => {
+    const nodeFront = grip.getNodeFront();
+    await nodeFront.ensureLoaded();
+    toolbox.getPanel("debugger")?.highlightDomElement(nodeFront);
   };
 }
 
