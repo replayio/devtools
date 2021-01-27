@@ -10,12 +10,7 @@ import {
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug";
 export type ViewMode = "dev" | "non-dev";
-
-export interface Modal {
-  type: string;
-  recordingId: RecordingId;
-  opaque: boolean;
-}
+export type ModalType = "sharing" | "login";
 
 export interface ExpectedError {
   message: string;

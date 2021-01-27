@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { getMarkerLeftOffset } from "ui/utils/timeline";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const markerWidth = 19;
 
@@ -13,12 +14,13 @@ function NewCommentButton({
   currentTime,
   zoomRegion,
   recordingId,
-  focusedCommentId,
   comments,
   setSelectedPanel,
   viewMode,
   setPendingComment,
+  setModal,
 }) {
+  const { isAuthenticated } = useAuth0();
   // Skip rendering the button if any of the following applies:
   // - There is already a comment at that time.
   // - That time is not currently visible in the timeline
@@ -29,6 +31,10 @@ function NewCommentButton({
   }
 
   const handleClick = () => {
+    if (!isAuthenticated) {
+      return setModal("login");
+    }
+
     if (viewMode === "dev") {
       setSelectedPanel("comments");
     }
@@ -71,6 +77,7 @@ export default connect(
     viewMode: selectors.getViewMode(state),
   }),
   {
+    setModal: actions.setModal,
     setSelectedPanel: actions.setSelectedPanel,
     setPendingComment: actions.setPendingComment,
   }

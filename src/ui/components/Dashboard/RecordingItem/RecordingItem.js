@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import { connect } from "react-redux";
 import { gql, useMutation } from "@apollo/client";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
 import RecordingGridItem from "./RecordingGridItem";
 import RecordingListItem from "./RecordingListItem";
 import RecordingItemDropdown from "./RecordingItemDropdown";
@@ -21,14 +18,7 @@ const UPDATE_IS_PRIVATE = gql`
   }
 `;
 
-const RecordingItem = ({
-  data,
-  setSharingModal,
-  viewType,
-  selectedIds,
-  setSelectedIds,
-  editing,
-}) => {
+export default function RecordingItem({ data, viewType, selectedIds, setSelectedIds, editing }) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [isPrivate, setIsPrivate] = useState(data.is_private);
   const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE);
@@ -51,7 +41,6 @@ const RecordingItem = ({
       recordingId={data.recording_id}
       toggleIsPrivate={toggleIsPrivate}
       isPrivate={isPrivate}
-      setSharingModal={setSharingModal}
     />
   );
 
@@ -81,13 +70,4 @@ const RecordingItem = ({
       toggleIsPrivate={toggleIsPrivate}
     />
   );
-};
-
-export default connect(
-  state => ({
-    modal: selectors.getModal(state),
-  }),
-  {
-    setSharingModal: actions.setSharingModal,
-  }
-)(RecordingItem);
+}

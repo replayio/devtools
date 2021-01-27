@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -112,9 +112,9 @@ function Privacy({ isPrivate, toggleIsPrivate }) {
   );
 }
 
-function Collaborators({ recordingId, setExpanded, setSharingModal }) {
+function Collaborators({ setExpanded, setModal }) {
   const handleClick = () => {
-    setSharingModal(recordingId);
+    setModal("sharing");
     setExpanded(null);
   };
 
@@ -132,7 +132,7 @@ function Collaborators({ recordingId, setExpanded, setSharingModal }) {
   );
 }
 
-function OwnerSettings({ recordingId, setSharingModal, setExpanded }) {
+function OwnerSettings({ recordingId, setModal, setExpanded }) {
   const { data } = useQuery(GET_RECORDING_PRIVACY, {
     variables: { recordingId },
   });
@@ -147,18 +147,13 @@ function OwnerSettings({ recordingId, setSharingModal, setExpanded }) {
     <>
       <Privacy isPrivate={isPrivate} toggleIsPrivate={updateIsPrivate} />
       {isPrivate ? (
-        <Collaborators
-          recordingId={recordingId}
-          setExpanded={setExpanded}
-          setSharingModal={setSharingModal}
-        />
+        <Collaborators recordingId={recordingId} setExpanded={setExpanded} setModal={setModal} />
       ) : null}
     </>
   );
 }
 
-function ShareDropdown({ recordingId, setSharingModal }) {
-  const { isAuthenticated } = useAuth0();
+function ShareDropdown({ recordingId, setModal }) {
   const [expanded, setExpanded] = useState(false);
   const isOwner = useIsOwner(recordingId);
   const buttonContent = <div className="img share" />;
@@ -173,11 +168,7 @@ function ShareDropdown({ recordingId, setSharingModal }) {
       >
         <CopyUrl recordingId={recordingId} />
         {isOwner ? (
-          <OwnerSettings
-            recordingId={recordingId}
-            setExpanded={setExpanded}
-            setSharingModal={setSharingModal}
-          />
+          <OwnerSettings recordingId={recordingId} setExpanded={setExpanded} setModal={setModal} />
         ) : null}
       </Dropdown>
     </div>
@@ -189,6 +180,6 @@ export default connect(
     recordingId: selectors.getRecordingId(state),
   }),
   {
-    setSharingModal: actions.setSharingModal,
+    setModal: actions.setModal,
   }
 )(ShareDropdown);

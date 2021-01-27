@@ -10,7 +10,15 @@ import {
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
-import { Modal, PanelName, PrimaryPanelName, ViewMode, Event, PendingComment } from "ui/state/app";
+import {
+  Modal,
+  PanelName,
+  PrimaryPanelName,
+  ViewMode,
+  Event,
+  PendingComment,
+  ModalType,
+} from "ui/state/app";
 
 const { PointHandlers } = require("protocol/logpoint");
 
@@ -25,7 +33,7 @@ export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel">
 };
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: boolean };
-export type SetModalAction = Action<"set_modal"> & { modal: Modal | null };
+export type SetModalAction = Action<"set_modal"> & { modal: ModalType | null };
 export type SetPendingNotificationAction = Action<"set_pending_notification"> & {
   location: Location;
 };
@@ -138,14 +146,10 @@ export function setUploading(uploading: boolean): SetUploadingAction {
   return { type: "set_uploading", uploading };
 }
 
-export function setSharingModal(recordingId: RecordingId): SetModalAction {
+export function setModal(modalType: ModalType): SetModalAction {
   return {
     type: "set_modal",
-    modal: {
-      type: "sharing",
-      recordingId,
-      opaque: false,
-    },
+    modal: modalType,
   };
 }
 

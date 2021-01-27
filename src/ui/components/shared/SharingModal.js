@@ -206,9 +206,9 @@ function EmailForm({ data, recordingId }) {
   );
 }
 
-function Sharing({ modal, hideModal }) {
+function Sharing({ modal, hideModal, recordingId }) {
   const { data, loading, error } = useQuery(GET_OWNER_AND_COLLABORATORS, {
-    variables: { recordingId: modal.recordingId },
+    variables: { recordingId },
   });
 
   if (loading) {
@@ -228,8 +228,8 @@ function Sharing({ modal, hideModal }) {
         <div className="img invite" />
         <p>Add collaborators</p>
       </div>
-      <EmailForm data={data} recordingId={modal.recordingId} />
-      <PermissionsList data={data} recordingId={modal.recordingId} />
+      <EmailForm data={data} recordingId={recordingId} />
+      <PermissionsList data={data} recordingId={recordingId} />
       <div className="bottom">
         <div className="spacer" />
         <button className="done" onClick={hideModal}>
@@ -243,6 +243,7 @@ function Sharing({ modal, hideModal }) {
 export default connect(
   state => ({
     modal: selectors.getModal(state),
+    recordingId: selectors.getRecordingId(state),
   }),
   { hideModal: actions.hideModal }
 )(Sharing);

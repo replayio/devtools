@@ -1,4 +1,6 @@
 import React from "react";
+import { actions } from "ui/actions";
+import { connect } from "react-redux";
 import { gql, useMutation } from "@apollo/client";
 
 const DELETE_RECORDING = gql`
@@ -17,7 +19,7 @@ const DropdownPanel = ({
   recordingId,
   toggleIsPrivate,
   isPrivate,
-  setSharingModal,
+  setModal,
 }) => {
   const [deleteRecording] = useMutation(DELETE_RECORDING, {
     refetchQueries: ["GetMyRecordings"],
@@ -46,11 +48,13 @@ const DropdownPanel = ({
           Make private
         </div>
       )}
-      <div className="menu-item" onClick={() => setSharingModal(recordingId)}>
+      <div className="menu-item" onClick={() => setModal("sharing")}>
         Open sharing preferences
       </div>
     </div>
   );
 };
 
-export default DropdownPanel;
+export default connect(null, {
+  setModal: actions.setModal,
+})(DropdownPanel);

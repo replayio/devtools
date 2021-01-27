@@ -7,6 +7,7 @@ import DevTools from "./DevTools";
 import Account from "./Account";
 import { AppErrors, PopupBlockedError } from "./shared/Error";
 import SharingModal from "./shared/SharingModal";
+import LoginModal from "./shared/LoginModal";
 import { isDeployPreview } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -17,6 +18,20 @@ import LogRocket from "ui/utils/logrocket";
 
 import "styles.css";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
+
+function AppModal({ modal }) {
+  switch (modal) {
+    case "sharing": {
+      return <SharingModal />;
+    }
+    case "login": {
+      return <LoginModal />;
+    }
+    default: {
+      return null;
+    }
+  }
+}
 
 function useGetApolloClient() {
   const [apolloClient, setApolloClient] = useState(null);
@@ -92,7 +107,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }) {
   return (
     <ApolloProvider client={apolloClient}>
       {recordingId ? <DevTools /> : <Account />}
-      {modal?.type === "sharing" ? <SharingModal /> : null}
+      {modal ? <AppModal modal={modal} /> : null}
       <AppErrors />
     </ApolloProvider>
   );

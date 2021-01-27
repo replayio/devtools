@@ -114,7 +114,6 @@ function CommentBody({ comment, user, startEditing }) {
 export default connect(
   state => ({
     currentTime: selectors.getCurrentTime(state),
-    user: selectors.getUser(state),
   }),
   {
     seek: actions.seek,

@@ -1,0 +1,21 @@
+.login-modal {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.login-modal .modal-content {
+  height: min-content
+}
+
+.login-modal .modal-content > * {
+  margin-bottom: 20px;
+}
+
+.login-modal .modal-content .description {
+  text-align: center;
+}
+
+.login-modal .modal-content .bottom {
+  justify-content: space-around;
+}
