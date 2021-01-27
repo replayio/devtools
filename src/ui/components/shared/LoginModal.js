@@ -10,12 +10,8 @@ import "./LoginModal.css";
 function LoginModal() {
   return (
     <div className="login-modal">
-      <Modal>
-        <div className="row title">
-          <div className="img login" />
-          <p>Login</p>
-        </div>
-        <div className="row description">You need to be logged in to add a comment.</div>
+      <Modal showClose={false}>
+        <div className="row title">Login to Replay</div>
         <div className="bottom">
           <LoginButton />
         </div>

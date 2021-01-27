@@ -5,15 +5,17 @@
 }
 
 .login-modal .modal-content {
-  height: min-content
+  height: min-content;
 }
 
 .login-modal .modal-content > * {
   margin-bottom: 20px;
 }
 
-.login-modal .modal-content .description {
-  text-align: center;
+.login-modal .title {
+  font-size: 16px;
+  font-weight: bold;
+  justify-content: center;
 }
 
 .login-modal .modal-content .bottom {
