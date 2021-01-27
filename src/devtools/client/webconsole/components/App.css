@@ -28,7 +28,7 @@ body {
   --object-inspector-hover-background: transparent;
   --attachment-margin-block-end: 3px;
   --primary-toolbar-height: 29px;
-  width: 100vw;
+  width: 100%;
   overflow: hidden;
   color: var(--console-output-color);
   -moz-user-focus: normal;
