@@ -10,10 +10,16 @@ import { paintGraphicsAtTime } from "protocol/graphics";
 import { selectors } from "ui/reducers";
 
 export function highlightDomElement(grip) {
-  return ({ toolbox }) => {
+  return async ({ toolbox }) => {
+    if (grip.getPause() !== ThreadFront.currentPause) {
+      return;
+    }
+
     const highlighter = toolbox.getHighlighter();
-    if (highlighter) {
-      highlighter.highlight(grip);
+    const nodeFront = grip.getNodeFront();
+    if (highlighter && nodeFront) {
+      await nodeFront.ensureLoaded();
+      highlighter.highlight(nodeFront);
     }
   };
 }

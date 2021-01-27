@@ -251,6 +251,12 @@ export class ValueFront {
     //return this.isObject();
   }
 
+  getNodeFront() {
+    if (this._pause && this._object?.preview?.node) {
+      return this._pause.getNodeFront(this._object.objectId);
+    }
+  }
+
   getChildren(): ValueFronts {
     if (this._elements) {
       return this._elements;
