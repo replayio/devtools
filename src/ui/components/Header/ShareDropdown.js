@@ -146,9 +146,6 @@ function OwnerSettings({ recordingId, setModal, setExpanded }) {
   return (
     <>
       <Privacy isPrivate={isPrivate} toggleIsPrivate={updateIsPrivate} />
-      {isPrivate ? (
-        <Collaborators recordingId={recordingId} setExpanded={setExpanded} setModal={setModal} />
-      ) : null}
     </>
   );
 }
@@ -170,6 +167,7 @@ function ShareDropdown({ recordingId, setModal }) {
         {isOwner ? (
           <OwnerSettings recordingId={recordingId} setExpanded={setExpanded} setModal={setModal} />
         ) : null}
+        <Collaborators recordingId={recordingId} setExpanded={setExpanded} setModal={setModal} />
       </Dropdown>
     </div>
   );
