@@ -11,7 +11,6 @@ import {
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
 import {
-  Modal,
   PanelName,
   PrimaryPanelName,
   ViewMode,

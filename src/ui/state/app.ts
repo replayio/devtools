@@ -31,7 +31,7 @@ export interface AppState {
   uploading: UploadInfo | null;
   expectedError: ExpectedError | null;
   unexpectedError: sessionError | null;
-  modal: Modal | null;
+  modal: ModalType | null;
   selectedPanel: PanelName;
   selectedPrimaryPanel: PrimaryPanelName;
   initializedPanels: PanelName[];
