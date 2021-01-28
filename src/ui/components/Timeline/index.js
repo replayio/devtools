@@ -14,6 +14,7 @@ import classnames from "classnames";
 
 import ScrollContainer from "./ScrollContainer";
 import Comments from "../Comments";
+import AddCommentButton from "./AddCommentButton";
 
 const { mostRecentPaintOrMouseEvent, paintGraphicsAtTime } = require("protocol/graphics");
 
@@ -250,6 +251,7 @@ export class Timeline extends Component {
           </div>
           <Comments />
         </div>
+        <AddCommentButton />
       </div>
     );
   }

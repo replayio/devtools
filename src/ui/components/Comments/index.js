@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 
 import hooks from "ui/hooks";
-import Comment from "./Comment";
 import CommentMarker from "./CommentMarker";
 import { selectors } from "../../reducers";
 import { sortBy } from "lodash";
@@ -32,7 +31,6 @@ function Comments({ playback, recordingId, pendingComment }) {
       {sortedComments.map((comment, index) => (
         <CommentMarker key={index} comment={comment} comments={sortedComments} index={index} />
       ))}
-      {!playback ? <CommentMarker comments={sortedComments} /> : null}
     </div>
   );
 }

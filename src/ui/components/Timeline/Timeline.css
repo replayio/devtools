@@ -29,6 +29,10 @@
   --tick-recording-background: #d0021b;
 }
 
+.timeline > *:not(:last-child) {
+  margin-right: 20px;
+}
+
 .timeline .commands :focus:not(:focus-visible) {
   outline: none;
   background: inherit;
@@ -70,7 +74,6 @@
 .timeline .commands {
   display: flex;
   flex-direction: row;
-  margin-right: 20px;
 }
 
 .timeline .commands > button {
@@ -139,4 +142,22 @@
 .timeline .zoomboundary {
   padding-top: 7px;
   padding-right: 4px;
+}
+
+/* Add Comment Button */
+
+.timeline button.add-comment {
+  background: var(--dark-blue);
+  color: var(--theme-body-background);
+  padding: 8px 12px;
+  line-height: 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.timeline button.add-comment .img {
+  margin-right: 4px;
+  background: var(--theme-body-background);
 }

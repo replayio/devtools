@@ -5,7 +5,6 @@ import classnames from "classnames";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { getMarkerLeftOffset } from "ui/utils/timeline";
-import NewCommentButton from "./NewCommentButton";
 
 const markerWidth = 19;
 
@@ -37,10 +36,6 @@ class CommentMarker extends React.Component {
 
   render() {
     const { comment, comments, currentTime, zoomRegion } = this.props;
-
-    if (!comment) {
-      return <NewCommentButton comments={comments} />;
-    }
 
     // We don't want to show the replies on the timeline
     // just the parent comment.

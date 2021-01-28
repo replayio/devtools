@@ -140,6 +140,7 @@ button.jump-definition { background-image: url(~devtools/client/shared/component
 .img.event-comment { mask: url(~devtools/client/themes/images/event-comment.svg) center / cover; }
 .img.login { mask: url(~devtools/client/themes/images/login.svg) center / cover; }
 .img.settings { mask: url(~devtools/client/themes/images/settings.svg) center / cover; }
+.img.plus-circle { mask: url(~devtools/client/themes/images/plus-circle.svg) center / cover; }
 .tree-node button.arrow { mask: url(~devtools/client/debugger/images/arrow.svg) center / cover; }
 #command-button-pick::before { mask: url(~devtools/client/themes/images/command-pick.svg) center / cover; }
 button.open-inspector { mask: url(~devtools/client/themes/images/open-inspector.svg) center / cover; }
