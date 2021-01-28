@@ -5,15 +5,8 @@
 //
 
 import React, { PureComponent } from "react";
-
-import { connect } from "../../utils/connect";
-
 import AccessibleImage from "./AccessibleImage";
-
 import { getSourceClassnames } from "../../utils/source";
-import { getFramework } from "../../utils/tabs";
-import { getSymbols, getTabs } from "../../selectors";
-
 import "./SourceIcon.css";
 
 export default class SourceIcon extends PureComponent {

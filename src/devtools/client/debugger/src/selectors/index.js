@@ -29,7 +29,6 @@ export { getQuickOpenEnabled, getQuickOpenQuery, getQuickOpenType } from "../red
 
 export { getBreakpointAtLocation, getBreakpointsAtLine } from "./breakpointAtLocation";
 export { getVisibleBreakpoints, getFirstVisibleBreakpoints } from "./visibleBreakpoints";
-export { inComponent } from "./inComponent";
 export { isSelectedFrameVisible } from "./isSelectedFrameVisible";
 export { getCallStackFrames } from "./getCallStackFrames";
 export { getBreakpointSources } from "./breakpointSources";
