@@ -23,11 +23,6 @@ async function doSetSymbols(cx, source, { dispatch, getState, parser }) {
     sourceId,
     [PROMISE]: parser.getSymbols(sourceId),
   });
-
-  const symbols = getSymbols(getState(), source);
-  if (symbols && symbols.framework) {
-    dispatch(updateTab(source, symbols.framework));
-  }
 }
 
 export const setSymbols = memoizeableAction("setSymbols", {

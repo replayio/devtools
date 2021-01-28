@@ -187,21 +187,15 @@ function removeSourcesFromTabList(state, { sources }) {
  * @memberof reducers/tabs
  * @static
  */
-function updateTabList(state, { url, framework = null, sourceId }) {
+function updateTabList(state, { url, sourceId }) {
   let { tabs } = state;
   // Set currentIndex to -1 for URL-less tabs so that they aren't
   // filtered by isSimilarTab
   const currentIndex = url ? tabs.findIndex(tab => isSimilarTab(tab, url)) : -1;
 
   if (currentIndex === -1) {
-    const newTab = {
-      url,
-      framework,
-      sourceId,
-    };
+    const newTab = { url, sourceId };
     tabs = [newTab, ...tabs];
-  } else if (framework) {
-    tabs[currentIndex].framework = framework;
   }
 
   return { ...state, tabs };
