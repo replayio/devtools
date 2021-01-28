@@ -34,8 +34,12 @@ export function LineNumberTooltip({
     // for the same line number. In that case, we shouldn't run
     // the analysis again.
     if (lineNumber !== lastHoveredLineNumber.current) {
-      runAnalysisOnLine(cx, lineNumber);
       lastHoveredLineNumber.current = lineNumber;
+      setTimeout(() => {
+        if (lineNumber === lastHoveredLineNumber.current) {
+          runAnalysisOnLine(cx, lineNumber);
+        }
+      }, 100);
     }
 
     updateHoveredLineNumber(cx, lineNumber);
