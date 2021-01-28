@@ -9,24 +9,9 @@ import { WorkerDispatcher } from "devtools-utils/src/worker-utils";
 const { log } = require("protocol/socket");
 
 export class ParserDispatcher extends WorkerDispatcher {
-  async findOutOfScopeLocations(sourceId, position) {
-    log(`WorkerDispatch Parser findOutOfScopeLocations`);
-    return this.invoke("findOutOfScopeLocations", sourceId, position);
-  }
-
-  async getNextStep(sourceId, pausedPosition) {
-    log(`WorkerDispatch Parser getNextStep`);
-    return this.invoke("getNextStep", sourceId, pausedPosition);
-  }
-
   async clearState() {
     log(`WorkerDispatch Parser clearState`);
     return this.invoke("clearState");
-  }
-
-  async getScopes(location) {
-    log(`WorkerDispatch Parser getScopes`);
-    return this.invoke("getScopes", location);
   }
 
   async getSymbols(sourceId) {
@@ -48,18 +33,6 @@ export class ParserDispatcher extends WorkerDispatcher {
   async hasSyntaxError(input) {
     log(`WorkerDispatch Parser hasSyntaxError`);
     return this.invoke("hasSyntaxError", input);
-  }
-
-  async mapExpression(expression, mappings, bindings, shouldMapBindings, shouldMapAwait) {
-    log(`WorkerDispatch Parser mapExpression`);
-    return this.invoke(
-      "mapExpression",
-      expression,
-      mappings,
-      bindings,
-      shouldMapBindings,
-      shouldMapAwait
-    );
   }
 
   async clear() {

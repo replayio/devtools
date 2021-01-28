@@ -10,11 +10,7 @@ import createSimplePath from "./utils/simple-path";
 import { traverseAst } from "./utils/ast";
 import {
   isFunction,
-  isObjectShorthand,
-  getObjectExpressionValue,
-  getPatternIdentifiers,
   getComments,
-  getSpecifiers,
   getCode,
   nodeLocationKey,
   getFunctionParameterNames,
@@ -22,23 +18,8 @@ import {
 
 import { inferClassName } from "./utils/inferClassName";
 import getFunctionName from "./utils/getFunctionName";
-import { getFramework } from "./frameworks";
 
 let symbolDeclarations = new Map();
-
-function getUniqueIdentifiers(identifiers) {
-  const newIdentifiers = [];
-  const locationKeys = new Set();
-  for (const newId of identifiers) {
-    const key = nodeLocationKey(newId);
-    if (!locationKeys.has(key)) {
-      locationKeys.add(key);
-      newIdentifiers.push(newId);
-    }
-  }
-
-  return newIdentifiers;
-}
 
 // eslint-disable-next-line complexity
 function extractSymbol(path, symbols, state) {
@@ -84,141 +65,22 @@ function extractSymbol(path, symbols, state) {
       location: loc,
     });
   }
-
-  if (t.isImportDeclaration(path)) {
-    symbols.imports.push({
-      source: path.node.source.value,
-      location: path.node.loc,
-      specifiers: getSpecifiers(path.node.specifiers),
-    });
-  }
-
-  if (t.isObjectProperty(path)) {
-    const { start, end, identifierName } = path.node.key.loc;
-    symbols.objectProperties.push({
-      name: identifierName,
-      location: { start, end },
-    });
-  }
-
-  if (t.isMemberExpression(path)) {
-    const { start, end } = path.node.property.loc;
-    symbols.memberExpressions.push({
-      name: path.node.property.name,
-      location: { start, end },
-      computed: path.node.computed,
-    });
-  }
-
-  if (
-    (t.isStringLiteral(path) || t.isNumericLiteral(path)) &&
-    t.isMemberExpression(path.parentPath)
-  ) {
-    // We only need literals that are part of computed memeber expressions
-    const { start, end } = path.node.loc;
-    symbols.literals.push({
-      name: path.node.value,
-      location: { start, end },
-    });
-  }
-
-  if (t.isCallExpression(path)) {
-    const callee = path.node.callee;
-    const args = path.node.arguments;
-    if (t.isMemberExpression(callee)) {
-      const {
-        property: { name, loc },
-      } = callee;
-      symbols.callExpressions.push({
-        name,
-        values: args.filter(arg => arg.value).map(arg => arg.value),
-        location: loc,
-      });
-    } else {
-      const { start, end, identifierName } = callee.loc;
-      symbols.callExpressions.push({
-        name: identifierName,
-        values: args.filter(arg => arg.value).map(arg => arg.value),
-        location: { start, end },
-      });
-    }
-  }
-
-  if (t.isStringLiteral(path) && t.isProperty(path.parentPath)) {
-    const { start, end } = path.node.loc;
-    return symbols.identifiers.push({
-      name: path.node.value,
-      expression: getObjectExpressionValue(path.parent),
-      location: { start, end },
-    });
-  }
-
-  if (t.isIdentifier(path) && !t.isGenericTypeAnnotation(path.parent)) {
-    let { start, end } = path.node.loc;
-
-    // We want to include function params, but exclude the function name
-    if (t.isClassMethod(path.parent) && !path.inList) {
-      return;
-    }
-
-    if (t.isProperty(path.parentPath) && !isObjectShorthand(path.parent)) {
-      return symbols.identifiers.push({
-        name: path.node.name,
-        expression: getObjectExpressionValue(path.parent),
-        location: { start, end },
-      });
-    }
-
-    if (path.node.typeAnnotation) {
-      const column = path.node.typeAnnotation.loc.start.column;
-      end = { ...end, column };
-    }
-
-    symbols.identifiers.push({
-      name: path.node.name,
-      expression: path.node.name,
-      location: { start, end },
-    });
-  }
-
-  if (t.isThisExpression(path.node)) {
-    const { start, end } = path.node.loc;
-    symbols.identifiers.push({
-      name: "this",
-      location: { start, end },
-      expression: "this",
-    });
-  }
-
-  if (t.isVariableDeclarator(path)) {
-    const nodeId = path.node.id;
-
-    symbols.identifiers.push(...getPatternIdentifiers(nodeId));
-  }
 }
 
 function extractSymbols(sourceId) {
   const symbols = {
     functions: [],
-    callExpressions: [],
-    memberExpressions: [],
-    objectProperties: [],
-    comments: [],
-    identifiers: [],
     classes: [],
-    imports: [],
-    literals: [],
     hasJsx: false,
     hasTypes: false,
     loading: false,
-    framework: undefined,
   };
 
   const state = {
     fnCounts: Object.create(null),
   };
 
-  const ast = traverseAst(sourceId, {
+  traverseAst(sourceId, {
     enter(node, ancestors) {
       try {
         const path = createSimplePath(ancestors);
@@ -230,11 +92,6 @@ function extractSymbols(sourceId) {
       }
     },
   });
-
-  // comments are extracted separately from the AST
-  symbols.comments = getComments(ast);
-  symbols.identifiers = getUniqueIdentifiers(symbols.identifiers);
-  symbols.framework = getFramework(symbols);
 
   return symbols;
 }

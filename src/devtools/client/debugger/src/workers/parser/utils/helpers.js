@@ -30,31 +30,6 @@ export function isYieldExpression(path) {
   );
 }
 
-export function isObjectShorthand(parent) {
-  return (
-    t.isObjectProperty(parent) &&
-    parent.value &&
-    parent.key.start == parent.value.start &&
-    parent.key.loc.identifierName === parent.value.loc.identifierName
-  );
-}
-
-export function getObjectExpressionValue(node) {
-  const { value } = node;
-
-  if (t.isIdentifier(value)) {
-    return value.name;
-  }
-
-  if (t.isCallExpression(value) || t.isFunctionExpression(value)) {
-    return "";
-  }
-  const code = generate(value).code;
-
-  const shouldWrap = t.isObjectExpression(value);
-  return shouldWrap ? `(${code})` : code;
-}
-
 export function getCode(node) {
   return generate(node).code;
 }
