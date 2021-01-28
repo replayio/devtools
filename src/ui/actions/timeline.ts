@@ -133,20 +133,10 @@ export function setTimelineToTime({
   time: number;
   offset: number;
 }): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async ({ dispatch }) => {
     try {
       dispatch(updateTooltip({ left: offset }));
       dispatch(setTimelineState({ hoverTime: time }));
-
-      const paintPoint = getMostRecentPaintPoint(time);
-      if (!paintPoint) return;
-      const { point, paintHash } = paintPoint;
-      const screen = await screenshotCache.getScreenshotForTooltip(point, paintHash);
-
-      const currentTime = selectors.getHoverTime(getState());
-      if (currentTime === time) {
-        dispatch(updateTooltip({ screen, left: offset }));
-      }
     } catch {}
   };
 }
