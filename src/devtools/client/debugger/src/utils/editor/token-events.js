@@ -17,25 +17,38 @@ function isValidToken(target) {
 
   // exclude literal tokens where it does not make sense to show a preview
   const invalidType = ["cm-atom", ""].includes(target.className);
+  if (invalidType) {
+    return false;
+  }
 
   // exclude syntax where the expression would be a syntax error
   const invalidToken = tokenText === "" || tokenText.match(/^[(){}\|&%,.;=<>\+-/\*\s](?=)/);
+  if (invalidToken) {
+    return false;
+  }
 
   // exclude codemirror elements that are not tokens
   const invalidTarget =
     (target.parentElement && !target.parentElement.closest(".CodeMirror-line")) ||
     cursorPos.top == 0;
+  if (invalidTarget) {
+    return false;
+  }
 
-  const invalidClasses = ["editor-mount"];
+  const invalidClasses = ["editor-mount", "CodeMirror-line", "cm-tag"];
   if (invalidClasses.some(className => target.classList.contains(className))) {
-    return true;
+    return false;
+  }
+
+  if (target.attributes.role?.value == "presentation") {
+    return false;
   }
 
   if (target.closest(".popover")) {
-    return true;
+    return false;
   }
 
-  return invalidTarget || invalidToken || invalidType;
+  return true;
 }
 
 function dispatch(codeMirror, eventName, data) {
