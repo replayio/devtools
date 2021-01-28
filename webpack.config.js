@@ -70,7 +70,7 @@ module.exports = {
             loader: "css-loader",
             options: {
               importLoaders: 1,
-              url: false,
+              url: (url, resourcePath) => resourcePath.endsWith("/src/image/image.css"),
             },
           },
           "postcss-loader",
