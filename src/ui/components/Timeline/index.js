@@ -13,6 +13,7 @@ import React from "react";
 import classnames from "classnames";
 
 import ScrollContainer from "./ScrollContainer";
+import Tooltip from "./Tooltip";
 import Comments from "../Comments";
 import AddCommentButton from "./AddCommentButton";
 
@@ -63,7 +64,7 @@ export class Timeline extends Component {
     const { left, width } = e.currentTarget.getBoundingClientRect();
     const clickLeft = e.clientX;
 
-    const clickPosition = (clickLeft - left) / width;
+    const clickPosition = Math.max((clickLeft - left) / width, 0);
     return Math.ceil(startTime + (endTime - startTime) * clickPosition);
   }
 
@@ -84,26 +85,12 @@ export class Timeline extends Component {
     }
   };
 
-  onPlayerMouseMove = async e => {
-    const { zoomRegion, hoverTime, setTimelineToTime, timelineDimensions } = this.props;
-
+  onPlayerMouseMove = e => {
+    const { zoomRegion, hoverTime, setTimelineToTime } = this.props;
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != mouseTime) {
-      const { width, left } = timelineDimensions;
-      let horizontalPadding = 12;
-      let tooltipWidth = 180;
-      let pixelOffset =
-        getVisiblePosition({ time: mouseTime, zoom: zoomRegion }) * this.overlayWidth;
-      let offset = pixelOffset + left - tooltipWidth / 2;
-
-      offset = offset < horizontalPadding ? horizontalPadding : offset;
-      offset =
-        offset > width - tooltipWidth / 2 - horizontalPadding
-          ? width - tooltipWidth / 2 - horizontalPadding
-          : offset;
-
-      paintGraphicsAtTime(mouseTime);
+      let offset = getVisiblePosition({ time: mouseTime, zoom: zoomRegion }) * this.overlayWidth;
       setTimelineToTime({ time: mouseTime, offset });
     }
   };
@@ -250,6 +237,7 @@ export class Timeline extends Component {
             <ScrollContainer />
           </div>
           <Comments />
+          <Tooltip />
         </div>
         <AddCommentButton />
       </div>

@@ -30,7 +30,7 @@
 .loader main .timeline {
   position: relative;
   box-sizing: content-box;
-  height: 28px;
+  min-height: 36px;
 }
 
 .loader main .timeline .loading-container {
