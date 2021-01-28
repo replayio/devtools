@@ -103,8 +103,9 @@ class ObjectInspector extends Component {
       return;
     }
 
-    for (const [path, properties] of nextProps.loadedProperties) {
-      if (properties !== this.props.loadedProperties.get(path)) {
+    for (const path of this.cachedNodes.keys()) {
+      const existing = this.props.loadedProperties.get(path);
+      if (!existing || existing !== nextProps.loadedProperties.get(path)) {
         this.cachedNodes.delete(path);
       }
     }

@@ -83,10 +83,8 @@ function reducer(state = initialState(), action = {}) {
     });
   }
 
-  // NOTE: we clear the state on resume because otherwise the scopes pane
-  // would be out of date. Bug 1514760
-  if (type === "RESUME" || type == "NAVIGATE") {
-    return initialState({ watchpoints: state.watchpoints });
+  if (type == "PAUSED") {
+    return cloneState({ loadedProperties: new Map() });
   }
 
   return state;
