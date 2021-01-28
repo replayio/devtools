@@ -20,6 +20,7 @@ if (test) {
 //
 
 const { initSocket } = require("protocol/socket");
+const loadImages = require("image/image");
 const { setupLogpoints } = require("./protocol/logpoint");
 const { bootstrapApp } = require("ui/utils/bootstrap/bootstrap");
 const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
@@ -35,11 +36,10 @@ const {
   initOutputSyntaxHighlighting,
 } = require("./devtools/client/webconsole/utils/syntax-highlighted");
 
-require("image/image.css");
-
 let initialized = false;
 async function initialize() {
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
+  loadImages();
 
   // Initialize the socket so we can communicate with the server
   initSocket(store, dispatch);
