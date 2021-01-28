@@ -2,49 +2,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import { isConsole } from "../utils/preview";
-import { findBestMatchExpression } from "../utils/ast";
 import { getExpressionFromCoords } from "../utils/editor/get-expression";
 import { createPrimitiveValueFront } from "protocol/thread";
 
 import {
   getPreview,
-  isLineInScope,
   isSelectedFrameVisible,
   getSelectedSource,
   getSelectedFrame,
-  getSymbols,
   getPreviewCount,
 } from "../selectors";
 
-function findExpressionMatch(state, codeMirror, tokenPos) {
-  const source = getSelectedSource(state);
-  if (!source) {
-    return;
-  }
-
-  const symbols = getSymbols(state, source);
-
-  let match;
-  if (!symbols || symbols.loading) {
-    match = getExpressionFromCoords(codeMirror, tokenPos);
-  } else {
-    match = findBestMatchExpression(symbols, tokenPos);
-  }
-  return match;
-}
-
 export function updatePreview(cx, target, tokenPos, codeMirror) {
-  return ({ dispatch, getState, client, sourceMaps }) => {
+  return ({ dispatch, getState }) => {
     const cursorPos = target.getBoundingClientRect();
 
-    if (!isSelectedFrameVisible(getState()) || !isLineInScope(getState(), tokenPos.line)) {
+    if (!isSelectedFrameVisible(getState())) {
       return;
     }
 
-    const match = findExpressionMatch(getState(), codeMirror, tokenPos);
+    const match = getExpressionFromCoords(codeMirror, tokenPos);
     if (!match) {
       return;
     }
