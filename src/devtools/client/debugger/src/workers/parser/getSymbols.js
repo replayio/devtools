@@ -11,7 +11,6 @@ import { traverseAst } from "./utils/ast";
 import {
   isFunction,
   isObjectShorthand,
-  isComputedExpression,
   getObjectExpressionValue,
   getPatternIdentifiers,
   getComments,
@@ -99,7 +98,6 @@ function extractSymbol(path, symbols, state) {
     symbols.objectProperties.push({
       name: identifierName,
       location: { start, end },
-      expression: getSnippet(path),
     });
   }
 
@@ -108,7 +106,6 @@ function extractSymbol(path, symbols, state) {
     symbols.memberExpressions.push({
       name: path.node.property.name,
       location: { start, end },
-      expression: getSnippet(path),
       computed: path.node.computed,
     });
   }
@@ -122,7 +119,6 @@ function extractSymbol(path, symbols, state) {
     symbols.literals.push({
       name: path.node.value,
       location: { start, end },
-      expression: getSnippet(path.parentPath),
     });
   }
 
@@ -241,154 +237,6 @@ function extractSymbols(sourceId) {
   symbols.framework = getFramework(symbols);
 
   return symbols;
-}
-
-function extendSnippet(name, expression, path, prevPath) {
-  const computed = path && path.node.computed;
-  const prevComputed = prevPath && prevPath.node.computed;
-  const prevArray = t.isArrayExpression(prevPath);
-  const array = t.isArrayExpression(path);
-  const value =
-    (path && path.node.property && path.node.property.extra && path.node.property.extra.raw) || "";
-
-  if (expression === "") {
-    if (computed) {
-      return name === undefined ? `[${value}]` : `[${name}]`;
-    }
-    return name;
-  }
-
-  if (computed || array) {
-    if (prevComputed || prevArray) {
-      return `[${name}]${expression}`;
-    }
-    return `[${name === undefined ? value : name}].${expression}`;
-  }
-
-  if (prevComputed || prevArray) {
-    return `${name}${expression}`;
-  }
-
-  if (isComputedExpression(expression) && name !== undefined) {
-    return `${name}${expression}`;
-  }
-
-  return `${name}.${expression}`;
-}
-
-function getMemberSnippet(node, expression = "") {
-  if (t.isMemberExpression(node)) {
-    const name = node.property.name;
-    const snippet = getMemberSnippet(node.object, extendSnippet(name, expression, { node }));
-    return snippet;
-  }
-
-  if (t.isCallExpression(node)) {
-    return "";
-  }
-
-  if (t.isThisExpression(node)) {
-    return `this.${expression}`;
-  }
-
-  if (t.isIdentifier(node)) {
-    if (isComputedExpression(expression)) {
-      return `${node.name}${expression}`;
-    }
-    return `${node.name}.${expression}`;
-  }
-
-  return expression;
-}
-
-function getObjectSnippet(path, prevPath, expression = "") {
-  if (!path) {
-    return expression;
-  }
-
-  const name = path.node.key.name;
-
-  const extendedExpression = extendSnippet(name, expression, path, prevPath);
-
-  const nextPrevPath = path;
-  const nextPath = path.parentPath && path.parentPath.parentPath;
-
-  return getSnippet(nextPath, nextPrevPath, extendedExpression);
-}
-
-function getArraySnippet(path, prevPath, expression) {
-  if (!prevPath.parentPath) {
-    throw new Error("Assertion failure - path should exist");
-  }
-
-  const index = `${prevPath.parentPath.containerIndex}`;
-  const extendedExpression = extendSnippet(index, expression, path, prevPath);
-
-  const nextPrevPath = path;
-  const nextPath = path.parentPath && path.parentPath.parentPath;
-
-  return getSnippet(nextPath, nextPrevPath, extendedExpression);
-}
-
-function getSnippet(path, prevPath, expression = "") {
-  if (!path) {
-    return expression;
-  }
-
-  if (t.isVariableDeclaration(path)) {
-    const node = path.node.declarations[0];
-    const name = node.id.name;
-    return extendSnippet(name, expression, path, prevPath);
-  }
-
-  if (t.isVariableDeclarator(path)) {
-    const node = path.node.id;
-    if (t.isObjectPattern(node)) {
-      return expression;
-    }
-
-    const prop = extendSnippet(node.name, expression, path, prevPath);
-    return prop;
-  }
-
-  if (t.isAssignmentExpression(path)) {
-    const node = path.node.left;
-    const name = t.isMemberExpression(node) ? getMemberSnippet(node) : node.name;
-
-    const prop = extendSnippet(name, expression, path, prevPath);
-    return prop;
-  }
-
-  if (isFunction(path)) {
-    return expression;
-  }
-
-  if (t.isIdentifier(path)) {
-    return `${path.node.name}.${expression}`;
-  }
-
-  if (t.isObjectProperty(path)) {
-    return getObjectSnippet(path, prevPath, expression);
-  }
-
-  if (t.isObjectExpression(path)) {
-    const parentPath = prevPath && prevPath.parentPath;
-    return getObjectSnippet(parentPath, prevPath, expression);
-  }
-
-  if (t.isMemberExpression(path)) {
-    return getMemberSnippet(path.node, expression);
-  }
-
-  if (t.isArrayExpression(path)) {
-    if (!prevPath) {
-      throw new Error("Assertion failure - path should exist");
-    }
-
-    return getArraySnippet(path, prevPath, expression);
-  }
-
-  return "";
 }
 
 export function clearSymbols() {
