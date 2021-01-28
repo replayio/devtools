@@ -1,6 +1,30 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { mutate, query } from "ui/utils/apolloClient";
+import { query } from "ui/utils/apolloClient";
+
+export function useGetActiveSessions(recordingId: RecordingId) {
+  const { data, loading } = useQuery(
+    gql`
+      query GetActiveSessions($recordingId: uuid!) {
+        sessions(where: { recording_id: { _eq: $recordingId }, destroyed_at: { _is_null: true } }) {
+          id
+          destroyed_at
+          user {
+            name
+            picture
+            auth_id
+          }
+        }
+      }
+    `,
+    {
+      variables: { recordingId },
+      pollInterval: 5000,
+    }
+  );
+
+  return { data, loading };
+}
 
 export function useGetRecording(recordingId: RecordingId) {
   const { data, loading: queryIsLoading } = useQuery(
