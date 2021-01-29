@@ -213,6 +213,7 @@ export class Timeline extends Component {
       hoveredLineNumberLocation,
       hoveredPoint,
       viewMode,
+      selectedPanel,
     } = this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
@@ -232,7 +233,9 @@ export class Timeline extends Component {
             <div className="progress-line full" />
             <div className="progress-line preview" style={{ width: `${hoverPercent}%` }} />
             <div className="progress-line" style={{ width: `${percent}%` }} />
-            {viewMode == "dev" ? this.renderMessages() : this.renderEvents()}
+            {viewMode == "dev" && selectedPanel == "console"
+              ? this.renderMessages()
+              : this.renderEvents()}
             {this.renderPreviewMarkers()}
             <ScrollContainer />
           </div>
