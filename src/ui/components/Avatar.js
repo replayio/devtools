@@ -10,20 +10,26 @@ export const AuthAvatar = ({ user }) => {
   );
 };
 
-const Avatar = props => {
-  let { player, isFirstPlayer } = props;
+export default function Avatar({ player, isFirstPlayer, index }) {
   let auth = useAuth0();
 
   if (auth.isAuthenticated && isFirstPlayer) {
     return <AuthAvatar user={auth.user} />;
   }
 
+  if (player.name) {
+    return (
+      <div className={`avatar`} title={player.name}>
+        <img src={player.picture} alt={player.name} />
+      </div>
+    );
+  }
+
   return (
     <div
-      className={`avatar ${isFirstPlayer ? "first-player" : ""}`}
-      style={{ background: getAvatarColor(player?.avatarID) }}
+      className={`avatar`}
+      title={"Anonymous User"}
+      style={{ background: getAvatarColor(index) }}
     />
   );
-};
-
-export default Avatar;
+}
