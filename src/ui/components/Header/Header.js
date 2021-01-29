@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
 import Avatar from "ui/components/Avatar";
-import { groupBy } from "lodash";
 import { useGetActiveSessions } from "ui/hooks/sessions";
 import Title from "ui/components/shared/Title";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
@@ -28,26 +26,15 @@ const GET_RECORDING_TITLE = gql`
 `;
 
 function Avatars({ recordingId }) {
-  const { data, loading } = useGetActiveSessions(recordingId);
+  const { users, loading } = useGetActiveSessions(recordingId);
 
   if (loading) {
     return null;
   }
 
-  const uniqueUsers = groupBy(data.sessions, session => session.user?.auth_id);
-  const displayedSessions = Object.keys(uniqueUsers).reduce((acc, key) => {
-    if (key == "undefined") {
-      return [...acc, ...uniqueUsers[key]];
-    }
-
-    return [...acc, uniqueUsers[key][0]];
-  }, []);
-  const displayedUsers = displayedSessions.map(session => session.user);
-  displayedUsers.sort((a, b) => a?.id - b?.id);
-
   return (
     <div className="avatars">
-      {displayedUsers.map((player, i) => (
+      {users.map((player, i) => (
         <Avatar player={player} isFirstPlayer={false} key={i} index={i} />
       ))}
     </div>

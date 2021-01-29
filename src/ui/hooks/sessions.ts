@@ -1,6 +1,20 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
+import { groupBy } from "lodash";
+
+interface User {
+  name: string;
+  picture: string;
+  auth_id: string;
+  id: string;
+}
+interface Session {
+  id: string;
+  destroyed_at: string | null;
+  user: User | null;
+}
+type Sessions = Session[];
 
 export function useGetActiveSessions(recordingId: RecordingId) {
   const { data, loading } = useQuery(
@@ -10,6 +24,7 @@ export function useGetActiveSessions(recordingId: RecordingId) {
           id
           destroyed_at
           user {
+            id
             name
             picture
             auth_id
@@ -23,7 +38,21 @@ export function useGetActiveSessions(recordingId: RecordingId) {
     }
   );
 
-  return { data, loading };
+  if (loading) {
+    return { loading };
+  }
+
+  const uniqueUsers = groupBy(data.sessions, session => session.user?.auth_id);
+  const displayedSessions = Object.keys(uniqueUsers).reduce((acc: Sessions, key) => {
+    if (key == "undefined") {
+      return [...acc, ...uniqueUsers[key]];
+    }
+
+    return [...acc, uniqueUsers[key][0]];
+  }, []);
+  const displayedUsers = displayedSessions.map(session => session.user);
+
+  return { users: displayedUsers, loading };
 }
 
 export function useGetRecording(recordingId: RecordingId) {
