@@ -8,19 +8,25 @@ interface User {
   picture: string;
   auth_id: string;
   id: string;
+  sessionId?: string;
 }
 interface Session {
   id: string;
   destroyed_at: string | null;
   user: User | null;
 }
-type Sessions = Session[];
 
-export function useGetActiveSessions(recordingId: RecordingId) {
+export function useGetActiveSessions(recordingId: RecordingId, sessionId: string) {
   const { data, loading } = useQuery(
     gql`
-      query GetActiveSessions($recordingId: uuid!) {
-        sessions(where: { recording_id: { _eq: $recordingId }, destroyed_at: { _is_null: true } }) {
+      query GetActiveSessions($recordingId: uuid!, $sessionId: String!) {
+        sessions(
+          where: {
+            recording_id: { _eq: $recordingId }
+            destroyed_at: { _is_null: true }
+            _and: { id: { _neq: $sessionId } }
+          }
+        ) {
           id
           destroyed_at
           user {
@@ -33,7 +39,7 @@ export function useGetActiveSessions(recordingId: RecordingId) {
       }
     `,
     {
-      variables: { recordingId },
+      variables: { recordingId, sessionId },
       pollInterval: 5000,
     }
   );
@@ -42,15 +48,14 @@ export function useGetActiveSessions(recordingId: RecordingId) {
     return { loading };
   }
 
-  const uniqueUsers = groupBy(data.sessions, session => session.user?.auth_id);
-  const displayedSessions = Object.keys(uniqueUsers).reduce((acc: Sessions, key) => {
-    if (key == "undefined") {
-      return [...acc, ...uniqueUsers[key]];
-    }
-
-    return [...acc, uniqueUsers[key][0]];
-  }, []);
-  const displayedUsers = displayedSessions.map(session => session.user);
+  // This includes the sessionId with the user. Otherwise, all
+  // anonymous users look the same (null) and we can't maintain some order.
+  const displayedUsers = data.sessions.map((session: Session) => {
+    const user = { ...session.user };
+    user.sessionId = session.id;
+    return user;
+  });
+  displayedUsers.sort();
 
   return { users: displayedUsers, loading };
 }

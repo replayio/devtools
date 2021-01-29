@@ -25,8 +25,8 @@ const GET_RECORDING_TITLE = gql`
   }
 `;
 
-function Avatars({ recordingId }) {
-  const { users, loading } = useGetActiveSessions(recordingId);
+function Avatars({ recordingId, sessionId }) {
+  const { users, loading } = useGetActiveSessions(recordingId, sessionId);
 
   if (loading) {
     return null;
@@ -41,10 +41,10 @@ function Avatars({ recordingId }) {
   );
 }
 
-function Links({ recordingId }) {
+function Links({ recordingId, sessionId }) {
   return (
     <div className="links">
-      <Avatars recordingId={recordingId} />
+      <Avatars recordingId={recordingId} sessionId={sessionId} />
       {recordingId ? <ShareDropdown /> : null}
       <ViewToggle />
       <UserOptions />
@@ -116,11 +116,12 @@ function Header({ recordingId, sessionId }) {
           editingTitle={editingTitle}
         />
       </div>
-      <Links recordingId={recordingId} />
+      <Links recordingId={recordingId} sessionId={sessionId} />
     </div>
   );
 }
 
 export default connect(state => ({
   recordingId: selectors.getRecordingId(state),
+  sessionId: selectors.getSessionId(state),
 }))(Header);

@@ -17,7 +17,7 @@ export default function Avatar({ player, isFirstPlayer, index }) {
     return <AuthAvatar user={auth.user} />;
   }
 
-  if (player) {
+  if (player.name) {
     return (
       <div className={`avatar`} title={player.name}>
         <img src={player.picture} alt={player.name} />
