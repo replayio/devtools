@@ -588,6 +588,28 @@ async function ensurePseudoElementRulesExpanded() {
   }
 }
 
+function dispatchMouseEvent(element, eventName) {
+  element.dispatchEvent(
+    new MouseEvent(eventName, { view: window, bubbles: true, cancelable: true })
+  );
+}
+
+async function checkHighlighterVisible(visible) {
+  await waitUntil(() => {
+    const highlighterNode = document.getElementById("box-model-elements");
+    const isVisible = highlighterNode?.attributes["hidden"]?.textContent !== "true";
+    return isVisible === visible;
+  });
+}
+
+async function checkHighlighterShape(svgPath) {
+  await waitUntil(() => {
+    const highlighterNode = document.getElementById("box-model-content");
+    const highlighterPath = highlighterNode?.attributes["d"].textContent;
+    return highlighterPath === svgPath;
+  });
+}
+
 const testCommands = {
   selectConsole,
   selectDebugger,
@@ -649,6 +671,9 @@ const testCommands = {
   setLonghandsExpanded,
   getAppliedRulesJSON,
   checkAppliedRules,
+  dispatchMouseEvent,
+  checkHighlighterVisible,
+  checkHighlighterShape,
 };
 
 const commands = mapValues(testCommands, (command, name) => {
