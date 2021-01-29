@@ -35,7 +35,7 @@ export function initSocket(store: UIStore, address?: string) {
   socket = new WebSocket(address || "wss://dispatch.replay.io");
 
   socket.onopen = makeInfallible(onSocketOpen);
-  socket.onclose = makeInfallible(onSocketClose);
+  socket.onclose = makeInfallible(() => store.dispatch(onSocketClose()));
   socket.onerror = makeInfallible(() => store.dispatch(onSocketError()));
   socket.onmessage = makeInfallible(onSocketMessage);
 }
@@ -114,13 +114,10 @@ function onSocketMessage(evt: MessageEvent<any>) {
 }
 
 function onSocketClose() {
-  setStatus("Disconnected.");
-  log("Socket Closed");
-}
-
-function onSocketError() {
   return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
-    log("Socket Error");
+    log("Socket Closed");
+    gSocketOpen = false;
+
     dispatch(
       setExpectedError({
         message: "Session has closed due to inactivity, please refresh the page.",
@@ -129,15 +126,20 @@ function onSocketError() {
   };
 }
 
+function onSocketError() {
+  return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
+    log("Socket Error");
+    dispatch(
+      setExpectedError({
+        message: "Session has closed due to an error, please refresh the page.",
+      })
+    );
+  };
+}
+
 export function log(text: string) {
   // Don't actually log anything. This is a convenient place to add a logpoint
   // when reviewing recordings of the viewer.
-}
-
-export function setStatus(text: string) {
-  if (document.getElementById("status")) {
-    document.getElementById("status")!.innerText = text;
-  }
 }
 
 // Debugging methods.
