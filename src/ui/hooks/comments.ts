@@ -14,6 +14,7 @@ const GET_COMMENTS = gql`
       user {
         picture
         name
+        auth_id
       }
       updated_at
       time

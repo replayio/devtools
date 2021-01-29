@@ -9,7 +9,9 @@ import CommentEditor from "ui/components/Comments/CommentEditor";
 import CommentDropdownPanel from "ui/components/Comments/CommentDropdownPanel";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 
-function Comment({ comment, user, currentTime, seek }) {
+function Comment({ comment, currentTime, seek }) {
+  const { isAuthenticated } = useAuth0();
+
   const [editing, setEditing] = useState(false);
   const commentEl = useRef(null);
   const [menuExpanded, setMenuExpanded] = useState(false);
@@ -54,9 +56,9 @@ function Comment({ comment, user, currentTime, seek }) {
         {editing ? (
           <CommentEditor comment={comment} stopEditing={() => setEditing(false)} />
         ) : (
-          <CommentBody comment={comment} user={user} startEditing={() => setEditing(true)} />
+          <CommentBody comment={comment} startEditing={() => setEditing(true)} />
         )}
-        {!editing && user?.loggedIn ? (
+        {!editing && isAuthenticated ? (
           <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
             <PortalDropdown
               buttonContent={<div className="dropdown-button">⋯</div>}
@@ -64,7 +66,6 @@ function Comment({ comment, user, currentTime, seek }) {
               setExpanded={setMenuExpanded}
             >
               <CommentDropdownPanel
-                user={user}
                 comment={comment}
                 startEditing={() => setEditing(true)}
                 onItemClick={() => setMenuExpanded(false)}
@@ -90,11 +91,12 @@ function NewComment({ comment, currentTime, commentEl, setEditing }) {
   );
 }
 
-function CommentBody({ comment, user, startEditing }) {
+function CommentBody({ comment, startEditing }) {
   const lines = comment.content.split("\n");
+  const { isAuthenticated, user } = useAuth0();
 
   const onDoubleClick = () => {
-    if (user?.loggedIn && comment.user_id == user?.id) {
+    if (isAuthenticated && comment.user.auth_id == user.sub) {
       startEditing();
     }
   };

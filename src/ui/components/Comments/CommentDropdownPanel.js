@@ -4,18 +4,19 @@ import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { ThreadFront } from "protocol/thread";
+import { useAuth0 } from "@auth0/auth0-react";
 
 function CommentDropdownPanel({
-  user,
   comment,
   startEditing,
   onItemClick,
   setPendingComment,
   recordingId,
 }) {
+  const { user } = useAuth0();
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
-  const isAuthor = comment.user_id === user?.id;
+  const isAuthor = comment.user.auth_id == user.sub;
 
   const removeComment = () => {
     deleteComment({ variables: { commentId: comment.id } });
@@ -49,7 +50,7 @@ function CommentDropdownPanel({
           </div>
         </>
       )}
-      {user?.loggedIn && !comment.parent_id && (
+      {!comment.parent_id && (
         <div className="menu-item" onClick={addReply}>
           Reply to Comment
         </div>
