@@ -118,6 +118,12 @@ function AccountPage() {
 
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
+  const forceOpenAuth = new URLSearchParams(window.location.search).get("force-open-auth");
+
+  if (forceOpenAuth) {
+    loginWithRedirect();
+    return null;
+  }
 
   useEffect(() => {
     setUserInBrowserPrefs(null);
