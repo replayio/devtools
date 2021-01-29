@@ -118,7 +118,7 @@ function AccountPage() {
 
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
-  const forceOpenAuth = new URLSearchParams(window.location.search).get("force-open-auth");
+  const forceOpenAuth = new URLSearchParams(window.location.search).get("signin");
 
   if (forceOpenAuth) {
     loginWithRedirect();
