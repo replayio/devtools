@@ -1,0 +1,8 @@
+.loading-progress-bar {
+  height: 2px;
+  background: var(--primary-accent);
+  position: absolute;
+  z-index: var(--z-index-1--progress-bar);
+  transition-duration: 200ms;
+  top: 0px;
+}

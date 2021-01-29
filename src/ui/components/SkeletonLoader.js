@@ -11,6 +11,10 @@ function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode })
   const backgroundColor = `hsl(0, 0%, ${35 - displayedProgress * 0.35}%)`;
 
   useEffect(() => {
+    return () => clearTimeout(key.current);
+  }, []);
+
+  useEffect(() => {
     if (displayedProgress == 100) {
       // This gives the Loader component some time (300ms) to bring the progress
       // bar to 100% before unmounting this loader and showing the application.
@@ -22,15 +26,13 @@ function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode })
     // underlying progress is higher than the artificial progress, we update to use
     // the underlying progress. Expected behavior assuming no underlying progress is:
     // 10s (50%) 20s (70%) 30s (85%) 45s (95%) 60s (98%)
-    useRef.current = setTimeout(() => {
+    key.current = setTimeout(() => {
       const increment = Math.random();
       const decayed = increment * ((100 - displayedProgress) / 40);
       const newDisplayedProgress = Math.max(displayedProgress + decayed, progress);
 
       setDisplayedProgress(newDisplayedProgress);
     }, 200);
-
-    return () => clearTimeout(key.current);
   }, [displayedProgress]);
 
   return (

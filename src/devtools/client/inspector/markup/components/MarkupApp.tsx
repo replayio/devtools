@@ -5,6 +5,7 @@ import { Inspector } from "../../inspector";
 import MarkupSearchbox from "../searchbox";
 import Nodes from "./Nodes";
 const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
+const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").default;
 
 export interface MarkupProps {
   onSelectNode: (nodeId: string) => void;
@@ -21,7 +22,7 @@ function setupLegacyComponents(inspector: Inspector) {
 }
 
 function MarkupApp(props: PropsFromRedux & { inspector: Inspector }) {
-  const isMarkupEmpty = (props.markupRootNode?.children?.length || 0) > 0;
+  const isMarkupEmpty = (props.markupRootNode?.children?.length || 0) == 0;
 
   useEffect(() => setupLegacyComponents(props.inspector), []);
 
@@ -66,9 +67,7 @@ function MarkupApp(props: PropsFromRedux & { inspector: Inspector }) {
               {<Nodes {...props.inspector.markup.getMarkupProps()} />}
             </div>
           </div>
-          <a id="markup-loading" hidden={isMarkupEmpty}>
-            Loading…
-          </a>
+          {isMarkupEmpty ? <LoadingProgressBar /> : null}
         </div>
         <div id="inspector-breadcrumbs-toolbar" className="devtools-toolbar">
           <div

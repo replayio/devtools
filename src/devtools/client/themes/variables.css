@@ -390,6 +390,7 @@ custom variable for it below so we can keep track of everything in one place. */
   --z-index-1--comment-container: var(--z-index-1);
   --z-index-1--icon-tooltip: var(--z-index-1);
   --z-index-1--timeline-tooltip: var(--z-index-1);
+  --z-index-1--progress-bar: var(--z-index-1);
 
   --z-index-2--hovered-point-secondary: var(--z-index-2);
 

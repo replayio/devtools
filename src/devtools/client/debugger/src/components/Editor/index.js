@@ -28,6 +28,7 @@ import EditorMenu from "./EditorMenu";
 import LineNumberTooltip from "./LineNumberTooltip";
 import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
+import EditorLoadingBar from "./EditorLoadingBar";
 
 import {
   showSourceText,
@@ -409,8 +410,12 @@ class Editor extends PureComponent {
     const { cx, selectedSource } = this.props;
     const { editor, contextMenu } = this.state;
 
-    if (!selectedSource || !editor || !getDocument(selectedSource.id)) {
+    if (!selectedSource || !editor) {
       return null;
+    }
+
+    if (!getDocument(selectedSource.id)) {
+      return <EditorLoadingBar />;
     }
 
     return (
