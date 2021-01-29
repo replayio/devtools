@@ -50,14 +50,14 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
 
   // This includes the sessionId with the user. Otherwise, all
   // anonymous users look the same (null) and we can't maintain some order.
-  const displayedUsers = data.sessions.map((session: Session) => {
-    const user = { ...session.user };
-    user.sessionId = session.id;
-    return user;
-  });
-  displayedUsers.sort();
+  const users = data.sessions
+    .map((session: Session) => ({
+      ...session.user,
+      sessionId: session.id,
+    }))
+    .sort();
 
-  return { users: displayedUsers, loading };
+  return { users, loading };
 }
 
 export function useGetRecording(recordingId: RecordingId) {
