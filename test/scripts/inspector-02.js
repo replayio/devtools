@@ -1,4 +1,4 @@
-Test.describe(`Test that the element highlighter works, and iframe behavior.`, async () => {
+Test.describe(`Test that the element picker works, and iframe behavior.`, async () => {
   // Events within the iframe should show up.
   await Test.addEventListenerLogpoints(["event.mouse.click"]);
   await Test.waitForMessage(
