@@ -7,11 +7,12 @@
   align-items: center;
   background: white;
   height: 100%;
+  padding-top: 10px;
 }
 
 .comments-panel .comment,
 .comments-panel .event {
-  padding: 20px 16px 20px;
+  padding: 10px 16px 10px;
   line-height: 1.25rem;
   font-size: 1rem;
   display: flex;
