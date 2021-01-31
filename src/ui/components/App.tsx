@@ -12,7 +12,6 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { hasLoadingParam } from "ui/utils/environment";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
-import hooks from "ui/hooks";
 import LogRocket from "ui/utils/logrocket";
 
 import "styles.css";
@@ -55,19 +54,10 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   }, [theme]);
 
   useEffect(() => {
-    const setUserInLogRocket = async () => {
-      if (auth.user) {
-        const userId = await hooks.fetchUserId(auth.user.sub);
-        LogRocket.identify(auth.user.sub, {
-          name: auth.user.name,
-          email: auth.user.email,
-          id: userId,
-        });
-      }
-    };
-
     setUserInBrowserPrefs(auth.user);
-    setUserInLogRocket();
+    if (auth.user) {
+      LogRocket.createSession(auth);
+    }
   }, [auth.user]);
 
   if (hasLoadingParam()) {
