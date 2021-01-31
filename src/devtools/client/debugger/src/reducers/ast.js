@@ -2,15 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-/**
- * Ast reducer
- * @module reducers/ast
- */
-
-import { getLocationKey } from "../utils/breakpoint";
-
 export function initialASTState() {
   return {
     symbols: {},
@@ -33,16 +24,6 @@ function update(state = initialASTState(), action) {
       return {
         ...state,
         symbols: { ...state.symbols, [sourceId]: value },
-      };
-    }
-
-    case "IN_SCOPE_LINES": {
-      return {
-        ...state,
-        inScopeLines: {
-          ...state.inScopeLines,
-          [getLocationKey(action.location)]: action.lines,
-        },
       };
     }
 
@@ -92,15 +73,6 @@ export function isSymbolsLoading(state, source) {
   }
 
   return symbols.loading;
-}
-
-export function getInScopeLines(state, location) {
-  const inScopeLines = state.ast.inScopeLines;
-  return inScopeLines[getLocationKey(location)];
-}
-
-export function hasInScopeLines(state, location) {
-  return !!getInScopeLines(state, location);
 }
 
 export default update;

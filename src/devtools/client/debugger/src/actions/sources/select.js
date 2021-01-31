@@ -9,17 +9,14 @@
  * @module actions/sources
  */
 
-import { getSourceFromId, getSourceWithContent } from "../../reducers/sources";
+import { getSourceWithContent } from "../../reducers/sources";
 import { tabExists } from "../../reducers/tabs";
 import { setSymbols } from "./symbols";
-import { setInScopeLines } from "../ast";
 import { closeActiveSearch, updateActiveFileSearch } from "../ui";
 import { addTab, closeTab } from "../tabs";
 import { loadSourceText } from "./loadSourceText";
 import { setBreakableLines } from ".";
 
-import { prefs } from "../../utils/prefs";
-import { isMinified } from "../../utils/source";
 import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
 
@@ -134,10 +131,7 @@ export function selectLocation(cx, location, { keepContext = true } = {}) {
       return;
     }
 
-    const sourceWithContent = getSourceWithContent(getState(), source.id);
-
     dispatch(setSymbols({ cx, source: loadedSource }));
-    dispatch(setInScopeLines(cx));
 
     // If a new source is selected update the file search results
     const newSource = getSelectedSource(getState());
