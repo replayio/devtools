@@ -2,9 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-import * as ast from "./ast";
 import * as breakpoints from "./breakpoints";
 import * as logExceptions from "./logExceptions";
 import * as pause from "./pause";
@@ -23,7 +20,6 @@ import * as preview from "./preview";
 import { objectInspector } from "devtools-reps";
 
 export default {
-  ...ast,
   ...navigation,
   ...breakpoints,
   ...logExceptions,
