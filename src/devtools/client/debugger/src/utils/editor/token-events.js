@@ -35,7 +35,15 @@ function isValidToken(target) {
     return false;
   }
 
-  const invalidClasses = ["editor-mount", "CodeMirror-line", "cm-tag"];
+  const invalidClasses = [
+    "editor-mount",
+    "CodeMirror-gutter-wrapper",
+    "CodeMirror-line",
+    "CodeMirror-gutter-elt",
+    "cm-tag",
+    "cm-string",
+    "cm-keyword",
+  ];
   if (invalidClasses.some(className => target.classList.contains(className))) {
     return false;
   }
