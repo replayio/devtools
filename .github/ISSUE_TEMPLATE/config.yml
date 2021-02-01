@@ -1,8 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: GitHub Community Support
-    url: https://github.community/
-    about: Please ask and answer questions here.
-  - name: GitHub Security Bug Bounty
-    url: https://bounty.github.com/
-    about: Please report security vulnerabilities here.
+  - name: Feature requests
+    url: https://www.notion.so/replayio/5667ebc74ac74db5aecc7fd78939023c?v=bec5bd4f5765478eb99ff76b536c77d7
+    about: Share suggestions so we can plan accordingly.
+  - name: Product feedback
+    url: https://www.notion.so/replayio/620167e02f754e89b38e5c566fa125e3?v=31e2ffeb26654eedbb142c53e8ada14d
+    about: Share feedback so we can incorporate your use cases.
+  - name: Comments + Questions
+    url: https://discord.gg/hw3eDwvChz
+    about: Join our Discord community so we can get to know you!
