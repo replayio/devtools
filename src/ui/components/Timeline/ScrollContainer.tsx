@@ -1,16 +1,18 @@
-import React from "react";
-import { connect } from "react-redux";
+import React, { MouseEventHandler, UIEventHandler } from "react";
+import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 
 import "./ScrollContainer.css";
+import { UIState } from "ui/state";
+import { ZoomRegion } from "ui/state/timeline";
 
 // Give the user ~2 screen viewport height's worth of scroll zooming.
 const contentHeight = "200vh";
 // Default scale value is 1. For every multiple of the sensitivity constant
 // below, scale is increased by 1. In this case, it takes 200pixels of
 // scrolling to increase scale by 1.
-const sensitivity = "200";
+const sensitivity = 200;
 
 function ScrollContainer({
   hoverTime,
@@ -18,24 +20,24 @@ function ScrollContainer({
   setZoomRegion,
   setZoomedRegion,
   recordingDuration,
-}) {
-  const onScroll = e => {
+}: PropsFromRedux) {
+  const onScroll: UIEventHandler = e => {
     const newZoomRegion = getZoomRegion({
-      hoverTime,
+      hoverTime: hoverTime || 0,
       zoomRegion,
-      recordingDuration,
-      scrollTop: e.target.scrollTop,
+      recordingDuration: recordingDuration || 0,
+      scrollTop: (e.target as Element).scrollTop,
     });
     setZoomRegion(newZoomRegion);
     const { startTime, endTime, scale } = newZoomRegion;
     setZoomedRegion(startTime, endTime, scale);
   };
 
-  const handleClick = e => {
+  const handleClick: MouseEventHandler = e => {
     if (e.metaKey) {
       const newZoomRegion = {
         startTime: 0,
-        endTime: recordingDuration,
+        endTime: recordingDuration || 0,
         scale: 1,
       };
       setZoomRegion(newZoomRegion);
@@ -49,8 +51,8 @@ function ScrollContainer({
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     recordingDuration: selectors.getRecordingDuration(state),
     zoomRegion: selectors.getZoomRegion(state),
     hoverTime: selectors.getHoverTime(state),
@@ -59,9 +61,22 @@ export default connect(
     setZoomRegion: actions.setZoomRegion,
     setZoomedRegion: actions.setZoomedRegion,
   }
-)(ScrollContainer);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-function getZoomRegion({ hoverTime, zoomRegion, recordingDuration, scrollTop }) {
+export default connector(ScrollContainer);
+
+function getZoomRegion({
+  hoverTime,
+  zoomRegion,
+  recordingDuration,
+  scrollTop,
+}: {
+  hoverTime: number;
+  zoomRegion: ZoomRegion;
+  recordingDuration: number;
+  scrollTop: number;
+}) {
   const newScale = 1 + scrollTop / sensitivity;
   const length = zoomRegion.endTime - zoomRegion.startTime;
   const leftToHover = hoverTime - zoomRegion.startTime;

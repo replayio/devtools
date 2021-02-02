@@ -7,27 +7,29 @@
 // React component which renders the devtools timeline and manages which
 // graphics are currently being rendered.
 
-import { connect } from "react-redux";
-import { Component } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { Component, MouseEventHandler } from "react";
 import React from "react";
 import classnames from "classnames";
 
 import ScrollContainer from "./ScrollContainer";
 import Tooltip from "./Tooltip";
-import Comments from "../Comments";
+const Comments = require("../Comments").default;
 import AddCommentButton from "./AddCommentButton";
 
-const { mostRecentPaintOrMouseEvent, paintGraphicsAtTime } = require("protocol/graphics");
+import { mostRecentPaintOrMouseEvent, paintGraphicsAtTime } from "protocol/graphics";
 
 import { actions } from "../../actions";
 import { selectors } from "../../reducers";
 import Marker from "./Marker";
 import MessageMarker from "./MessageMarker";
-import { getVisiblePosition } from "ui/utils/timeline";
+const { getVisiblePosition } = require("ui/utils/timeline");
 
 import "./Timeline.css";
+import { UIState } from "ui/state";
+import { assert } from "protocol/utils";
 
-function ReplayButton({ onClick }) {
+function ReplayButton({ onClick }: { onClick: MouseEventHandler }) {
   return (
     <button onClick={onClick}>
       <div className="img replay-lg" style={{ transform: "scaleX(-1)" }} />
@@ -35,11 +37,9 @@ function ReplayButton({ onClick }) {
   );
 }
 
-export class Timeline extends Component {
-  state = {
-    comments: [],
-    numResizes: 0,
-  };
+class Timeline extends Component<PropsFromRedux> {
+  $progressBar: HTMLDivElement | null = null;
+  hoverInterval: number | undefined;
 
   async componentDidMount() {
     // Used in the test harness for starting playback recording.
@@ -48,18 +48,12 @@ export class Timeline extends Component {
     this.props.updateTimelineDimensions();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.closestMessage != this.props.closestMessage) {
-      this.scrollToMessage(this.props.closestMessage);
-    }
-  }
-
   get overlayWidth() {
     return this.props.timelineDimensions.width;
   }
 
   // Get the time for a mouse event within the recording.
-  getMouseTime(e) {
+  getMouseTime(e: React.MouseEvent) {
     const { startTime, endTime } = this.props.zoomRegion;
     const { left, width } = e.currentTarget.getBoundingClientRect();
     const clickLeft = e.clientX;
@@ -69,23 +63,26 @@ export class Timeline extends Component {
   }
 
   hoverTimer = () => {
+    if (!this.$progressBar) {
+      return;
+    }
     const { hideTooltip, currentTime } = this.props;
     const isHovered = window.elementIsHovered(this.$progressBar);
     if (!isHovered) {
-      clearInterval(this.hoverInterval);
+      window.clearInterval(this.hoverInterval);
       paintGraphicsAtTime(currentTime);
-      this.hoverInterval = null;
+      this.hoverInterval = undefined;
       hideTooltip();
     }
   };
 
-  onPlayerMouseEnter = async e => {
+  onPlayerMouseEnter: MouseEventHandler = async e => {
     if (!this.hoverInterval) {
-      this.hoverInterval = setInterval(this.hoverTimer, 100);
+      this.hoverInterval = window.setInterval(this.hoverTimer, 100);
     }
   };
 
-  onPlayerMouseMove = e => {
+  onPlayerMouseMove: MouseEventHandler = e => {
     const { zoomRegion, hoverTime, setTimelineToTime } = this.props;
     const mouseTime = this.getMouseTime(e);
 
@@ -96,7 +93,7 @@ export class Timeline extends Component {
     }
   };
 
-  onPlayerMouseUp = e => {
+  onPlayerMouseUp: MouseEventHandler = e => {
     const { hoverTime, seek, hoveredPoint } = this.props;
     const hoveringOverMarker = hoveredPoint?.target === "timeline";
     const mouseTime = this.getMouseTime(e);
@@ -169,7 +166,7 @@ export class Timeline extends Component {
             key={index}
             point={point.point}
             time={point.time}
-            hasFrames={"false"}
+            hasFrames={false}
             currentTime={currentTime}
             hoveredPoint={hoveredPoint}
             zoomRegion={zoomRegion}
@@ -194,8 +191,8 @@ export class Timeline extends Component {
             key={index}
             point={point.point}
             time={point.time}
-            hasFrames={point.hasFrames}
-            location={point.frame[0]}
+            hasFrames={!!point.frame}
+            location={point.frame?.[0]}
             currentTime={currentTime}
             hoveredPoint={hoveredPoint}
             zoomRegion={zoomRegion}
@@ -249,8 +246,8 @@ export class Timeline extends Component {
   }
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
@@ -276,4 +273,7 @@ export default connect(
     stopPlayback: actions.stopPlayback,
     replayPlayback: actions.replayPlayback,
   }
-)(Timeline);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(Timeline);

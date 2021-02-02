@@ -9,7 +9,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 // FIXME remove this and integrate with image.js
 
-exports.SVG = {
+export const SVG = {
   NextButton: `
 <svg version="1.1" xmlns:svg="http://www.w3.org/2000/svg"
      xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16">

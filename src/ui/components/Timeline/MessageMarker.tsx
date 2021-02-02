@@ -1,6 +1,7 @@
 import React from "react";
 import "./MessageMarker.css";
-import Marker from "./Marker.js";
+import Marker from "./Marker";
+import { HoveredPoint, ZoomRegion } from "ui/state/timeline";
 
 export default function MessageMarker({
   message,
@@ -8,6 +9,12 @@ export default function MessageMarker({
   hoveredPoint,
   zoomRegion,
   overlayWidth,
+}: {
+  message: any;
+  currentTime: number;
+  hoveredPoint: HoveredPoint | null;
+  zoomRegion: ZoomRegion;
+  overlayWidth: number;
 }) {
   const { executionPoint, executionPointTime, frame, pauseId, executionPointHasFrames } = message;
 

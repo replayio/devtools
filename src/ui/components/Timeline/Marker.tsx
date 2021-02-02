@@ -1,9 +1,10 @@
-import React from "react";
-import { getLeftOffset } from "../../utils/timeline";
-import { connect } from "react-redux";
+import React, { MouseEventHandler } from "react";
+const { getLeftOffset } = require("../../utils/timeline");
+import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import { actions } from "../../actions";
-import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
+import { HoveredPoint, ZoomRegion } from "ui/state/timeline";
+import { Location, PauseId } from "@recordreplay/protocol";
 
 // If you do modify this, make sure you change EVERY single reference to this 11px width in
 // the codebase. This includes, but is not limited to, the Timeline component, Message component,
@@ -18,16 +19,25 @@ export function Circle() {
   );
 }
 
-class Marker extends React.Component {
-  shouldComponentUpdate(nextProps) {
+type MarkerProps = PropsFromRedux & {
+  point: string;
+  time: number;
+  location?: Location;
+  hasFrames: boolean;
+  currentTime: number;
+  hoveredPoint: HoveredPoint | null;
+  zoomRegion: ZoomRegion;
+  overlayWidth: number;
+  pauseId?: PauseId;
+};
+
+class Marker extends React.Component<MarkerProps> {
+  shouldComponentUpdate(nextProps: Readonly<MarkerProps>) {
     const { hoveredPoint, point } = this.props;
 
     const hoveredPointChanged = hoveredPoint !== nextProps.hoveredPoint;
-    const isHighlighted =
-      hoveredPoint?.point == point || this.getIsSecondaryHighlighted(hoveredPoint);
-    const willBeHighlighted =
-      nextProps.hoveredPoint?.point == point ||
-      this.getIsSecondaryHighlighted(nextProps.hoveredPoint);
+    const isHighlighted = hoveredPoint?.point == point;
+    const willBeHighlighted = nextProps.hoveredPoint?.point == point;
 
     if (hoveredPointChanged && !isHighlighted && !willBeHighlighted) {
       return false;
@@ -36,17 +46,7 @@ class Marker extends React.Component {
     return true;
   }
 
-  getIsSecondaryHighlighted(hoveredPoint) {
-    const { frame } = this.props;
-
-    if (!frame || !hoveredPoint?.location) {
-      return false;
-    }
-
-    return getLocationKey(hoveredPoint.location) == getLocationKey(frame);
-  }
-
-  onClick = e => {
+  onClick: MouseEventHandler = e => {
     const { seek, point, time, hasFrames, pauseId } = this.props;
 
     e.preventDefault();
@@ -65,7 +65,7 @@ class Marker extends React.Component {
       point,
       time,
       location,
-      target: "timeline",
+      target: "timeline" as "timeline",
     };
 
     setHoveredPoint(hoveredPoint);
@@ -79,7 +79,6 @@ class Marker extends React.Component {
         tabIndex={0}
         className={classnames("marker", {
           "primary-highlight": hoveredPoint?.point === point,
-          "secondary-highlight": this.getIsSecondaryHighlighted(),
           paused: time === currentTime,
         })}
         style={{
@@ -99,7 +98,10 @@ class Marker extends React.Component {
   }
 }
 
-export default connect(null, {
+const connector = connect(null, {
   setHoveredPoint: actions.setHoveredPoint,
   seek: actions.seek,
-})(Marker);
+});
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(Marker);
