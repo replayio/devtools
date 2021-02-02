@@ -95,6 +95,7 @@ const gMouseClickEvents: MouseEvent[] = [];
 
 // Device pixel ratio used by recording screen shots.
 let gDevicePixelRatio: number;
+let gStore: UIStore;
 
 function onPaints({ paints }: paintPoints) {
   paints.forEach(({ point, time, screenShots }) => {
@@ -115,6 +116,8 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
 }
 
 export function setupGraphics(store: UIStore) {
+  gStore = store;
+
   ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
     client.Graphics.findPaints({}, sessionId);
     client.Graphics.addPaintPointsListener(onPaints);
@@ -352,7 +355,7 @@ export function refreshGraphics() {
     }
   }
 
-  store.dispatch(
+  gStore.dispatch(
     actions.setCanvas({
       scale,
       gDevicePixelRatio,

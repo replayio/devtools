@@ -9,7 +9,5 @@ button.comment-tool:focus {
 }
 
 #video.location-marker {
-  /* background: red; */
   cursor: url("https://svgshare.com/i/TfA.svg"), auto;
-  /* cursor: url('http://anuary.com/dev/hp/pad3/public/images/hand-cursor.png'), auto; */
 }
