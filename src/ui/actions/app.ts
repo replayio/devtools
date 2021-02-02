@@ -219,7 +219,6 @@ export function setIsNodePickerActive(active: boolean): SetIsNodePickerActive {
 }
 
 export function setPendingComment(comment: PendingComment): SetPendingComment {
-  console.log("setpendingcomment", comment);
   return { type: "set_pending_comment", comment };
 }
 

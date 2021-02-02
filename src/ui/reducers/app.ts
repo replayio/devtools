@@ -138,7 +138,6 @@ export default function update(
     }
 
     case "set_pending_comment": {
-      console.log("set_pending_comment", action.comment);
       return {
         ...state,
         pendingComment: action.comment,
@@ -146,7 +145,6 @@ export default function update(
     }
 
     case "set_canvas": {
-      console.log(action.canvas);
       return {
         ...state,
         canvas: action.canvas,

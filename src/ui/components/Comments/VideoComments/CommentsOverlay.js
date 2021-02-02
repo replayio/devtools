@@ -6,7 +6,6 @@ import "./CommentsOverlay.css";
 
 function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime }) {
   const { comments } = hooks.useGetComments(recordingId);
-  console.log({ canvas, comments, pendingComment });
 
   if (!canvas) {
     return null;
@@ -16,8 +15,6 @@ function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime }) {
   const commentsWithPosition = [...comments, pendingComment].filter(
     comment => comment?.position && comment.time == currentTime
   );
-
-  console.log({ commentsWithPosition });
 
   return (
     <div

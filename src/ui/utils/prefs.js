@@ -52,7 +52,7 @@ export const features = new PrefsHelper("devtools.features", {
   comments: ["Bool", "comments"],
   users: ["Bool", "users"],
   auth0: ["Bool", "auth0"],
-  auth0: ["Bool", "videoComments"],
+  videoComments: ["Bool", "videoComments"],
   private: ["Bool", "private"],
 });
 

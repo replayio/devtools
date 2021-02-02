@@ -42,23 +42,19 @@ function CommentTool({
 }) {
   const addListeners = () => {
     setCommentPointer(true);
-    console.log("add");
     document.getElementById("video").classList.add("location-marker");
     document.getElementById("video").addEventListener("mouseup", onClickInCanvas);
   };
   const removeListeners = () => {
     setCommentPointer(false);
-    console.log("remove");
     document.getElementById("video").classList.remove("location-marker");
     document.getElementById("video").removeEventListener("mouseup", onClickInCanvas);
   };
 
   const onClickInCanvas = async e => {
     removeListeners();
-    console.log("onClick", { e }, e.target);
 
     if (e.target !== document.querySelector(".canvas-overlay")) {
-      console.log("setting pending");
       return;
     }
 
@@ -75,7 +71,6 @@ function CommentTool({
       position: JSON.stringify(mouseEventCanvasPosition(e)),
     };
 
-    console.log("setting pending");
     setPendingComment(pendingComment);
   };
 

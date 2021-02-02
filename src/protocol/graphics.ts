@@ -352,14 +352,6 @@ export function refreshGraphics() {
     }
   }
 
-  // const myX = 63,
-  //   myY = 759;
-  // const mult = scale * gDevicePixelRatio;
-  // const newX = myX * gDevicePixelRatio,
-  //   newY = myY * gDevicePixelRatio;
-  // console.log({ myX, myY, newX, newY, mult, gDevicePixelRatio });
-  // drawCursor(cx, newX, newY);
-
   store.dispatch(
     actions.setCanvas({
       scale,
