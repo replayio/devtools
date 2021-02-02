@@ -31,6 +31,11 @@ const gStartTime = Date.now();
 let gSentBytes = 0;
 let gReceivedBytes = 0;
 
+let willClose = false;
+window.addEventListener("beforeunload", () => {
+  willClose = true;
+});
+
 export function initSocket(store: UIStore, address?: string) {
   socket = new WebSocket(address || "wss://dispatch.replay.io");
 
@@ -118,11 +123,13 @@ function onSocketClose() {
     log("Socket Closed");
     gSocketOpen = false;
 
-    dispatch(
-      setExpectedError({
-        message: "Session has closed due to inactivity, please refresh the page.",
-      })
-    );
+    if (!willClose) {
+      dispatch(
+        setExpectedError({
+          message: "Session has closed due to inactivity, please refresh the page.",
+        })
+      );
+    }
   };
 }
 
