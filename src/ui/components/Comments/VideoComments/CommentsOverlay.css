@@ -1,10 +1,12 @@
 .canvas-overlay {
   z-index: 100;
   position: absolute;
+  pointer-events: none;
 }
 
 .canvas-overlay .canvas-comments {
   position: relative;
+  pointer-events: all;
 }
 
 .canvas-overlay .canvas-comment {

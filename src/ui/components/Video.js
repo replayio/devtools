@@ -24,9 +24,9 @@ function Video({ togglePlayback, isNodePickerActive, commentPointer }) {
   };
 
   return (
-    <div id="video" onMouseDown={onMouseDown}>
+    <div id="video">
+      <canvas id="graphics" onMouseDown={onMouseDown} />
       {features.videoComments ? <CommentsOverlay /> : null}
-      <canvas id="graphics"></canvas>
       <div id="highlighter-root"></div>
     </div>
   );

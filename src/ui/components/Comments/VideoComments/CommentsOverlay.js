@@ -39,12 +39,10 @@ function VideoComment({ comment, scale, pixelRatio }) {
   const position = JSON.parse(comment.position);
   const [focused, setFocused] = useState(false);
 
-  const onMarkerClick = e => {
-    e.stopPropagation();
+  const onMarkerClick = () => {
     setFocused(true);
   };
-  const onMaskClick = e => {
-    e.stopPropagation();
+  const onMaskClick = () => {
     setFocused(false);
   };
 
@@ -56,8 +54,8 @@ function VideoComment({ comment, scale, pixelRatio }) {
         left: position.x * scale * pixelRatio,
       }}
     >
-      <div className="canvas-comment-marker">
-        <div className="img location-marker" onClick={onMarkerClick} />
+      <div className="canvas-comment-marker" onClick={onMarkerClick}>
+        <div className="img location-marker" />
       </div>
       {focused ? (
         <>

@@ -54,7 +54,7 @@ function CommentTool({
   const onClickInCanvas = async e => {
     removeListeners();
 
-    if (e.target !== document.querySelector(".canvas-overlay")) {
+    if (e.target !== document.querySelector("canvas#graphics")) {
       return;
     }
 
