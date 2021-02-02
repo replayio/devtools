@@ -43,6 +43,7 @@ export interface AppState {
   events: Events;
   isNodePickerActive: boolean;
   pendingComment: PendingComment | null;
+  canvas: any;
 }
 
 export interface AnalysisPoints {

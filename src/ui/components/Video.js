@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { installObserver } from "../../protocol/graphics";
 import { selectors } from "../reducers";
+import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 
 function Video({ togglePlayback, isNodePickerActive }) {
   useEffect(() => {
@@ -21,7 +22,8 @@ function Video({ togglePlayback, isNodePickerActive }) {
   };
 
   return (
-    <div id="video" onMouseDown={onMouseDown}>
+    <div id="video" onMouseDown={() => {}}>
+      <CommentsOverlay />
       <canvas id="graphics"></canvas>
       <div id="highlighter-root"></div>
     </div>

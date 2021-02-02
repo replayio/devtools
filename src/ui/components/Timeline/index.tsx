@@ -16,6 +16,7 @@ import ScrollContainer from "./ScrollContainer";
 import Tooltip from "./Tooltip";
 const Comments = require("../Comments").default;
 import AddCommentButton from "./AddCommentButton";
+import CommentTool from "../shared/CommentTool";
 
 import { mostRecentPaintOrMouseEvent, paintGraphicsAtTime } from "protocol/graphics";
 
@@ -240,6 +241,7 @@ class Timeline extends Component<PropsFromRedux> {
           <Comments />
           <Tooltip />
         </div>
+        <CommentTool />
         <AddCommentButton />
       </div>
     );
