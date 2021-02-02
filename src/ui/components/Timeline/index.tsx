@@ -25,6 +25,7 @@ import { selectors } from "../../reducers";
 import Marker from "./Marker";
 import MessageMarker from "./MessageMarker";
 const { getVisiblePosition } = require("ui/utils/timeline");
+const { features } = require("ui/utils/prefs");
 
 import "./Timeline.css";
 import { UIState } from "ui/state";
@@ -241,7 +242,7 @@ class Timeline extends Component<PropsFromRedux> {
           <Comments />
           <Tooltip />
         </div>
-        <CommentTool />
+        {features.videoComments ? <CommentTool /> : null}
         <AddCommentButton />
       </div>
     );
