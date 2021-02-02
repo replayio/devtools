@@ -5,6 +5,7 @@ import classnames from "classnames";
 import { actions } from "../../actions";
 import { HoveredPoint, ZoomRegion } from "ui/state/timeline";
 import { Location, PauseId } from "@recordreplay/protocol";
+import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 // If you do modify this, make sure you change EVERY single reference to this 11px width in
 // the codebase. This includes, but is not limited to, the Timeline component, Message component,
@@ -36,14 +37,27 @@ class Marker extends React.Component<MarkerProps> {
     const { hoveredPoint, point } = this.props;
 
     const hoveredPointChanged = hoveredPoint !== nextProps.hoveredPoint;
-    const isHighlighted = hoveredPoint?.point == point;
-    const willBeHighlighted = nextProps.hoveredPoint?.point == point;
+    const isHighlighted =
+      hoveredPoint?.point == point || this.getIsSecondaryHighlighted(hoveredPoint);
+    const willBeHighlighted =
+      nextProps.hoveredPoint?.point == point ||
+      this.getIsSecondaryHighlighted(nextProps.hoveredPoint);
 
     if (hoveredPointChanged && !isHighlighted && !willBeHighlighted) {
       return false;
     }
 
     return true;
+  }
+
+  getIsSecondaryHighlighted(hoveredPoint: HoveredPoint | null) {
+    const { location } = this.props;
+
+    if (!location || !hoveredPoint?.location) {
+      return false;
+    }
+
+    return getLocationKey(hoveredPoint.location) == getLocationKey(location);
   }
 
   onClick: MouseEventHandler = e => {
@@ -79,6 +93,7 @@ class Marker extends React.Component<MarkerProps> {
         tabIndex={0}
         className={classnames("marker", {
           "primary-highlight": hoveredPoint?.point === point,
+          "secondary-highlight": this.getIsSecondaryHighlighted(hoveredPoint),
           paused: time === currentTime,
         })}
         style={{
