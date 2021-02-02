@@ -32,26 +32,35 @@ const mouseEventCanvasPosition = e => {
   };
 };
 
-function CommentTool({ currentTime, recordingId, viewMode, setPendingComment, setSelectedPanel }) {
+function CommentTool({
+  currentTime,
+  recordingId,
+  viewMode,
+  setPendingComment,
+  setSelectedPanel,
+  setCommentPointer,
+}) {
   const addListeners = () => {
+    setCommentPointer(true);
+    console.log("add");
     document.getElementById("video").classList.add("location-marker");
     document.getElementById("video").addEventListener("mouseup", onClickInCanvas);
   };
   const removeListeners = () => {
+    setCommentPointer(false);
+    console.log("remove");
     document.getElementById("video").classList.remove("location-marker");
     document.getElementById("video").removeEventListener("mouseup", onClickInCanvas);
   };
 
   const onClickInCanvas = async e => {
     removeListeners();
+    console.log("onClick", { e }, e.target);
 
-    if (e.target.value == document.querySelector("canvas-overlay")) {
+    if (e.target !== document.querySelector(".canvas-overlay")) {
+      console.log("setting pending");
       return;
     }
-
-    const position = mouseEventCanvasPosition(e);
-
-    console.log(e.target);
 
     if (viewMode === "dev") {
       setSelectedPanel("comments");
@@ -63,9 +72,10 @@ function CommentTool({ currentTime, recordingId, viewMode, setPendingComment, se
       time: currentTime,
       point: ThreadFront.currentPoint,
       has_frames: ThreadFront.currentPointHasFrames,
-      position: JSON.stringify(position),
+      position: JSON.stringify(mouseEventCanvasPosition(e)),
     };
 
+    console.log("setting pending");
     setPendingComment(pendingComment);
   };
 
@@ -82,5 +92,9 @@ export default connect(
     recordingId: selectors.getRecordingId(state),
     viewMode: selectors.getViewMode(state),
   }),
-  { setSelectedPanel: actions.setSelectedPanel, setPendingComment: actions.setPendingComment }
+  {
+    setSelectedPanel: actions.setSelectedPanel,
+    setPendingComment: actions.setPendingComment,
+    setCommentPointer: actions.setCommentPointer,
+  }
 )(CommentTool);

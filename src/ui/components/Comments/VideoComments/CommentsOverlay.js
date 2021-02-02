@@ -6,17 +6,19 @@ import "./CommentsOverlay.css";
 
 function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime }) {
   const { comments } = hooks.useGetComments(recordingId);
+  console.log({ canvas, comments, pendingComment });
 
-  if (!canvas || (!comments.length && !pendingComment)) {
+  if (!canvas) {
     return null;
   }
 
   const { top, left, width, height, scale, gDevicePixelRatio } = canvas;
-
   const commentsWithPosition = [...comments, pendingComment].filter(
     comment => comment?.position && comment.time == currentTime
   );
-  console.log({ comments, commentsWithPosition });
+
+  console.log({ commentsWithPosition });
+
   return (
     <div
       className="canvas-overlay"
@@ -39,7 +41,15 @@ function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime }) {
 function VideoComment({ comment, scale, pixelRatio }) {
   const position = JSON.parse(comment.position);
   const [focused, setFocused] = useState(false);
-  const { name, content } = comment;
+
+  const onMarkerClick = e => {
+    e.stopPropagation();
+    setFocused(true);
+  };
+  const onMaskClick = e => {
+    e.stopPropagation();
+    setFocused(false);
+  };
 
   return (
     <div
@@ -50,11 +60,11 @@ function VideoComment({ comment, scale, pixelRatio }) {
       }}
     >
       <div className="canvas-comment-marker">
-        <div className="img location-marker" onClick={() => setFocused(true)} />
+        <div className="img location-marker" onClick={onMarkerClick} />
       </div>
       {focused ? (
         <>
-          <div className="mask" onClick={() => setFocused(false)} />
+          <div className="mask" onClick={onMaskClick} />
           <CommentContainer comment={comment} />
         </>
       ) : null}
@@ -65,8 +75,11 @@ function VideoComment({ comment, scale, pixelRatio }) {
 function CommentContainer({ comment }) {
   return (
     <div className="canvas-comment-container">
-      <div className="item-label">{comment.user.name}</div>
-      <div className="item-content">{comment.content}</div>
+      <img src={comment.user.picture} className="comment-picture" />
+      <div className="comment-body">
+        <div className="item-label">{comment.user.name}</div>
+        <div className="item-content">{comment.content}</div>
+      </div>
     </div>
   );
 }

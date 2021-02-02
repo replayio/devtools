@@ -5,7 +5,7 @@ import { installObserver } from "../../protocol/graphics";
 import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 
-function Video({ togglePlayback, isNodePickerActive }) {
+function Video({ togglePlayback, isNodePickerActive, commentPointer }) {
   useEffect(() => {
     installObserver();
   }, []);
@@ -14,7 +14,7 @@ function Video({ togglePlayback, isNodePickerActive }) {
   // first. This updates the isNodePickerActive value and makes it look like the node picker is
   // inactive when we check it here.
   const onMouseDown = () => {
-    if (isNodePickerActive) {
+    if (isNodePickerActive || commentPointer) {
       return;
     }
 
@@ -22,7 +22,7 @@ function Video({ togglePlayback, isNodePickerActive }) {
   };
 
   return (
-    <div id="video" onMouseDown={() => {}}>
+    <div id="video" onMouseDown={onMouseDown}>
       <CommentsOverlay />
       <canvas id="graphics"></canvas>
       <div id="highlighter-root"></div>
@@ -30,6 +30,12 @@ function Video({ togglePlayback, isNodePickerActive }) {
   );
 }
 
-export default connect(state => ({ isNodePickerActive: selectors.getIsNodePickerActive(state) }), {
-  togglePlayback: actions.togglePlayback,
-})(Video);
+export default connect(
+  state => ({
+    isNodePickerActive: selectors.getIsNodePickerActive(state),
+    commentPointer: selectors.getCommentPointer(state),
+  }),
+  {
+    togglePlayback: actions.togglePlayback,
+  }
+)(Video);

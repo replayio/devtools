@@ -33,15 +33,24 @@
 
 .canvas-comment-container {
   position: absolute;
+  display: flex;
   transform: translateY(-50%);
   left: 36px;
-  width: 324px;
+  width: 320px;
   background: white;
   border-radius: 4px;
   padding: 16px;
   box-shadow: 0 1px 4px 0 rgba(0,0,0,0.2);
   font-size: 1.25rem;
   z-index: var(--z-index-8--modal);
+}
+
+.canvas-comment-container img {
+  margin-right: 8px;
+  margin-top: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
 }
 
 .canvas-comment-container .item-label {

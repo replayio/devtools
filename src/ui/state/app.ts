@@ -43,7 +43,8 @@ export interface AppState {
   events: Events;
   isNodePickerActive: boolean;
   pendingComment: PendingComment | null;
-  canvas: any;
+  canvas: Canvas | null;
+  commentPointer: false;
 }
 
 export interface AnalysisPoints {
@@ -75,4 +76,13 @@ export interface PendingComment {
   time: number;
   point: string;
   has_frames: boolean;
+}
+
+export interface Canvas {
+  gDevicePixelRatio: "number";
+  height: "number";
+  left: "number";
+  scale: "number";
+  top: "number";
+  width: "number";
 }
