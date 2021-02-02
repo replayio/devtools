@@ -10,7 +10,7 @@
 import { connect, ConnectedProps } from "react-redux";
 import { Component, MouseEventHandler } from "react";
 import React from "react";
-import classnames from "classnames";
+const classnames = require("classnames");
 
 import ScrollContainer from "./ScrollContainer";
 import Tooltip from "./Tooltip";

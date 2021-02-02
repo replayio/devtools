@@ -1,6 +1,6 @@
 import React, { MouseEventHandler } from "react";
-import classnames from "classnames";
 import { SVG } from "image/svg";
+const classnames = require("classnames");
 const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
