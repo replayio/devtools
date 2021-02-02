@@ -17,6 +17,7 @@ import {
   Event,
   PendingComment,
   ModalType,
+  UploadInfo,
 } from "ui/state/app";
 
 const { PointHandlers } = require("protocol/logpoint");
@@ -31,13 +32,13 @@ export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel">
   panel: PrimaryPanelName;
 };
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
-export type SetUploadingAction = Action<"set_uploading"> & { uploading: boolean };
+export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
 export type SetModalAction = Action<"set_modal"> & { modal: ModalType | null };
 export type SetPendingNotificationAction = Action<"set_pending_notification"> & {
   location: Location;
 };
 export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
-  analysisPoints: PointDescription[] | null;
+  analysisPoints: PointDescription[];
   location: Location;
 };
 export type SetEventsForType = Action<"set_events"> & {
@@ -141,7 +142,7 @@ export function setInitializedPanels(panel: PanelName): SetInitializedPanelsActi
   return { type: "set_initialized_panels", panel };
 }
 
-export function setUploading(uploading: boolean): SetUploadingAction {
+export function setUploading(uploading: UploadInfo | null): SetUploadingAction {
   return { type: "set_uploading", uploading };
 }
 

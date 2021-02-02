@@ -36,7 +36,7 @@ export interface HoveredPoint {
   target: "timeline" | "console" | "widget";
   point: string;
   time: number;
-  location: HoveredLocation;
+  location?: HoveredLocation;
 }
 
 interface HoveredLocation extends Location {

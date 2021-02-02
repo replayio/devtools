@@ -3,7 +3,8 @@ import { AppAction } from "ui/actions/app";
 import { UIState } from "ui/state";
 import { SessionAction } from "ui/actions/session";
 const { prefs } = require("../utils/prefs");
-const { getLocationKey } = require("../../devtools/client/debugger/src/utils/breakpoint");
+import { Location } from "@recordreplay/protocol";
+import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 function initialAppState(): AppState {
   return {
@@ -30,7 +31,10 @@ function initialAppState(): AppState {
   };
 }
 
-export default function update(state = initialAppState(), action: AppAction | SessionAction) {
+export default function update(
+  state = initialAppState(),
+  action: AppAction | SessionAction
+): AppState {
   switch (action.type) {
     case "setup_app": {
       return { ...state, recordingId: action.recordingId };
@@ -158,7 +162,7 @@ export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getModal = (state: UIState) => state.app.modal;
 export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
 export const getPendingNotification = (state: UIState) => state.app.pendingNotification;
-export const getAnalysisPointsForLocation = (state: UIState, location: any) =>
+export const getAnalysisPointsForLocation = (state: UIState, location: Location | null) =>
   location && state.app.analysisPoints[getLocationKey(location)];
 export const getViewMode = (state: UIState) => state.app.viewMode;
 export const getNarrowMode = (state: UIState) => state.app.narrowMode;

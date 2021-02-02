@@ -25,7 +25,7 @@ export type SetTimelineStateAction = Action<"set_timeline_state"> & {
 export type UpdateTooltipAction = Action<"update_tooltip"> & { tooltip: Tooltip | null };
 export type SetZoomRegionAction = Action<"set_zoom"> & { region: ZoomRegion };
 export type SetHoveredPoint = Action<"set_hovered_point"> & {
-  hoveredPoint: HoveredPoint;
+  hoveredPoint: HoveredPoint | null;
 };
 
 export type TimelineAction =
@@ -363,7 +363,7 @@ export function goToPrevPaint(): UIThunkAction {
   };
 }
 
-export function setHoveredPoint(hoveredPoint: HoveredPoint): UIThunkAction {
+export function setHoveredPoint(hoveredPoint: HoveredPoint | null): UIThunkAction {
   return ({ dispatch }) => {
     dispatch({ type: "set_hovered_point", hoveredPoint });
   };

@@ -1,10 +1,12 @@
 import React from "react";
 import { ThreadFront } from "protocol/thread";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import { UIState } from "ui/state";
+import { assert } from "protocol/utils";
 
 function AddCommentButton({
   currentTime,
@@ -13,7 +15,8 @@ function AddCommentButton({
   setModal,
   setSelectedPanel,
   setPendingComment,
-}) {
+}: PropsFromRedux) {
+  assert(recordingId);
   const { isAuthenticated } = useAuth0();
 
   const onClick = () => {
@@ -44,8 +47,8 @@ function AddCommentButton({
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
     viewMode: selectors.getViewMode(state),
@@ -55,4 +58,7 @@ export default connect(
     setSelectedPanel: actions.setSelectedPanel,
     setPendingComment: actions.setPendingComment,
   }
-)(AddCommentButton);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(AddCommentButton);

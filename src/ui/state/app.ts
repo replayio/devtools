@@ -7,7 +7,7 @@ import {
   MouseEvent,
 } from "@recordreplay/protocol";
 
-export type PanelName = "console" | "debugger" | "inspector";
+export type PanelName = "console" | "debugger" | "inspector" | "comments";
 export type PrimaryPanelName = "explorer" | "debug";
 export type ViewMode = "dev" | "non-dev";
 export type ModalType = "sharing" | "login";
@@ -46,7 +46,7 @@ export interface AppState {
 }
 
 export interface AnalysisPoints {
-  [key: string]: PointDescription;
+  [key: string]: PointDescription[];
 }
 
 interface Events {

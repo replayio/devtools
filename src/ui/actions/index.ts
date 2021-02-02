@@ -13,7 +13,7 @@ import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
 import { EventTooltipAction } from "devtools/client/inspector/markup/actions/eventTooltip";
 import { SessionAction } from "ui/actions/session";
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
-const consoleActions = require("devtools/client/webconsole/actions");
+import consoleActions from "devtools/client/webconsole/actions";
 
 type DebuggerAction = Action<"RESUME">;
 
