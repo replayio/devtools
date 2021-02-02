@@ -7,6 +7,7 @@ import SkeletonLoader from "./SkeletonLoader";
 import NonDevView from "./Views/NonDevView";
 import DevView from "./Views/DevView";
 import hooks from "../hooks";
+import { prefs } from "ui/utils/prefs";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
@@ -115,7 +116,7 @@ function DevTools({
   return (
     <>
       <Header />
-      {viewMode == "dev" ? <DevView /> : <NonDevView />}
+      {!prefs.video && viewMode == "dev" ? <DevView /> : <NonDevView />}
     </>
   );
 }
