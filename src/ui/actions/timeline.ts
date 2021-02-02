@@ -84,12 +84,14 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
   return async ({ dispatch, getState }) => {
     dispatch(setTimelineState({ currentTime: time, playback: null }));
 
-    const { screen, mouse } = await getGraphicsAtTime(time);
+    try {
+      const { screen, mouse } = await getGraphicsAtTime(time);
 
-    if (screen && selectors.getCurrentTime(getState()) == time) {
-      dispatch(setTimelineState({ screenShot: screen, mouse }));
-      paintGraphics(screen, mouse);
-    }
+      if (screen && selectors.getCurrentTime(getState()) == time) {
+        dispatch(setTimelineState({ screenShot: screen, mouse }));
+        paintGraphics(screen, mouse);
+      }
+    } catch (e) {}
   };
 }
 
@@ -259,11 +261,11 @@ function playback(startTime: number, endTime: number): UIThunkAction {
     let currentDate = startDate;
     let currentTime = startTime;
     let nextGraphicsTime = nextPaintOrMouseEvent(currentTime)?.time || endTime;
-    let nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
+    let nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
 
     const prepareNextGraphics = () => {
       nextGraphicsTime = nextPaintOrMouseEvent(currentTime)?.time || endTime;
-      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime);
+      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
     };
     const shouldContinuePlayback = () => selectors.getPlayback(getState());
     prepareNextGraphics();
@@ -292,30 +294,32 @@ function playback(startTime: number, endTime: number): UIThunkAction {
       );
 
       if (currentTime >= nextGraphicsTime) {
-        const { screen, mouse } = await nextGraphicsPromise;
+        try {
+          const { screen, mouse } = await nextGraphicsPromise;
 
-        if (!shouldContinuePlayback()) {
-          return;
-        }
+          if (!shouldContinuePlayback()) {
+            return;
+          }
 
-        // Playback may have stalled waiting for `nextGraphicsPromise` and would jump
-        // in the next iteration in order to catch up. To avoid jumps of more than
-        // 100 milliseconds, we reset `startTime` and `startDate` as if playback had
-        // been started right now.
-        if (Date.now() - currentDate > 100) {
-          startTime = currentTime;
-          startDate = Date.now();
-          dispatch(
-            setTimelineState({
-              currentTime,
-              playback: { startTime, startDate, time: currentTime },
-            })
-          );
-        }
+          // Playback may have stalled waiting for `nextGraphicsPromise` and would jump
+          // in the next iteration in order to catch up. To avoid jumps of more than
+          // 100 milliseconds, we reset `startTime` and `startDate` as if playback had
+          // been started right now.
+          if (Date.now() - currentDate > 100) {
+            startTime = currentTime;
+            startDate = Date.now();
+            dispatch(
+              setTimelineState({
+                currentTime,
+                playback: { startTime, startDate, time: currentTime },
+              })
+            );
+          }
 
-        if (screen) {
-          paintGraphics(screen, mouse);
-        }
+          if (screen) {
+            paintGraphics(screen, mouse);
+          }
+        } catch (e) {}
 
         prepareNextGraphics();
       }
