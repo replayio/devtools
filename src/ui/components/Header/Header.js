@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { connect } from "react-redux";
+import { useAuth0 } from "@auth0/auth0-react";
 import { selectors } from "ui/reducers";
 import Avatar from "ui/components/Avatar";
 import { useGetActiveSessions } from "ui/hooks/sessions";
@@ -92,6 +93,8 @@ function Subtitle({ date }) {
 
 function Header({ recordingId, sessionId }) {
   const [editingTitle, setEditingTitle] = useState(false);
+  const { isAuthenticated } = useAuth0();
+
   const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
   const dashboardUrl = `${window.location.origin}/view`;
 
@@ -105,11 +108,16 @@ function Header({ recordingId, sessionId }) {
   return (
     <div id="header">
       <div className="header-left">
-        <IconWithTooltip
-          icon={backIcon}
-          content={"Back to Dashboard"}
-          handleClick={e => onNavigateBack(e)}
-        />
+        {isAuthenticated ? (
+          <IconWithTooltip
+            icon={backIcon}
+            content={"Back to Dashboard"}
+            handleClick={e => onNavigateBack(e)}
+          />
+        ) : (
+          <img className="logo" src="images/logo.svg" />
+        )}
+
         <HeaderTitle
           recordingId={recordingId}
           setEditingTitle={setEditingTitle}

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
+import { useAuth0 } from "@auth0/auth0-react";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { useAuth0 } from "@auth0/auth0-react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import Dropdown from "ui/components/shared/Dropdown";
 import "./ShareDropdown.css";
@@ -113,10 +113,16 @@ function Privacy({ isPrivate, toggleIsPrivate }) {
 }
 
 function Collaborators({ setExpanded, setModal }) {
+  const { isAuthenticated } = useAuth0();
+
   const handleClick = () => {
     setModal("sharing");
     setExpanded(null);
   };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="row collaborators">
