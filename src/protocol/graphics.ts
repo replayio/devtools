@@ -200,7 +200,8 @@ export interface MouseAndClickPosition {
 }
 
 export async function getGraphicsAtTime(
-  time: number
+  time: number,
+  forPlayback = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
   const paintIndex = mostRecentIndex(gPaintPoints, time);
   if (paintIndex === undefined) {
@@ -213,12 +214,16 @@ export async function getGraphicsAtTime(
     return {};
   }
 
-  const screenPromise = screenshotCache.getScreenshotForPlayback(point, paintHash);
+  const screenPromise = forPlayback
+    ? screenshotCache.getScreenshotForPlayback(point, paintHash)
+    : screenshotCache.getScreenshotForPreview(point, paintHash);
 
-  // Start loading graphics at nearby points.
-  for (let i = paintIndex; i < paintIndex + 5 && i < gPaintPoints.length; i++) {
-    const { point, paintHash } = gPaintPoints[i];
-    screenshotCache.getScreenshotForPlayback(point, paintHash);
+  if (forPlayback) {
+    // Start loading graphics at nearby points.
+    for (let i = paintIndex; i < paintIndex + 5 && i < gPaintPoints.length; i++) {
+      const { point, paintHash } = gPaintPoints[i];
+      screenshotCache.getScreenshotForPlayback(point, paintHash);
+    }
   }
 
   const screen = await screenPromise;
@@ -269,8 +274,10 @@ export function paintGraphics(screenShot?: ScreenShot, mouse?: MouseAndClickPosi
 }
 
 export async function paintGraphicsAtTime(time: number) {
-  const { screen, mouse } = await getGraphicsAtTime(time);
-  paintGraphics(screen, mouse);
+  try {
+    const { screen, mouse } = await getGraphicsAtTime(time);
+    paintGraphics(screen, mouse);
+  } catch (e) {}
 }
 
 function clearGraphics() {

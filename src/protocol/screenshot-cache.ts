@@ -3,8 +3,6 @@ import { defer } from "./utils";
 import { client } from "./socket";
 import { ScreenShot } from "@recordreplay/protocol";
 
-const resizeHeightForTooltip = 180;
-
 export class DownloadCancelledError extends Error {}
 
 export interface QueuedScreenshotDownload {
@@ -17,45 +15,42 @@ export interface QueuedScreenshotDownload {
 
 /**
  * This class manages the screenshot downloads and caches downloaded screenshots.
- * It throttles the screenshot downloads for the tooltip, only starting
- * one download at a time and queueing one more download at most.
- * When a tooltip download is requested while another tooltip download is queued,
+ * It throttles the screenshot downloads for preview (during the initial scan and
+ * when the user hovers over the timeline or a console message), only starting one
+ * download at a time and queueing one more download at most.
+ * When a preview download is requested while another preview download is queued,
  * the queued download is cancelled and the requested download is queued instead.
- * Downloads for playback are run independently of those for the tooltip.
+ * Downloads for playback are run independently of those for preview.
  */
 export class ScreenshotCache {
   // Map paint hashes to a promise that resolves with the associated screenshot.
-  private fullsizeCache = new Map<string, Promise<ScreenShot>>();
-  private resizedCache = new Map<string, Promise<ScreenShot>>();
+  private cache = new Map<string, Promise<ScreenShot>>();
 
-  private queuedDownloadForTooltip: QueuedScreenshotDownload | undefined;
-  private runningDownloadForTooltip = false;
+  private queuedDownloadForPreview: QueuedScreenshotDownload | undefined;
+  private runningDownloadForPreview = false;
 
   /**
    * Returns a promise for the requested screenshot. The promise may be rejected
-   * if another tooltip screenshot is requested before this download was started.
+   * if another preview screenshot is requested before this download was started.
    */
-  async getScreenshotForTooltip(point: string, paintHash: string): Promise<ScreenShot | undefined> {
+  async getScreenshotForPreview(point: string, paintHash: string): Promise<ScreenShot | undefined> {
     if (!paintHash) {
       return undefined;
     }
-    if (this.resizedCache.has(paintHash)) {
-      return this.resizedCache.get(paintHash)!;
+    if (this.cache.has(paintHash)) {
+      return this.cache.get(paintHash)!;
     }
-    if (this.fullsizeCache.has(paintHash)) {
-      return this.fullsizeCache.get(paintHash)!;
-    }
-    if (this.queuedDownloadForTooltip && this.queuedDownloadForTooltip.point === point) {
-      return this.queuedDownloadForTooltip.promise;
+    if (this.queuedDownloadForPreview && this.queuedDownloadForPreview.point === point) {
+      return this.queuedDownloadForPreview.promise;
     }
 
-    if (this.queuedDownloadForTooltip) {
-      this.queuedDownloadForTooltip.reject(new DownloadCancelledError());
-      this.queuedDownloadForTooltip = undefined;
+    if (this.queuedDownloadForPreview) {
+      this.queuedDownloadForPreview.reject(new DownloadCancelledError());
+      this.queuedDownloadForPreview = undefined;
     }
 
     const { promise, resolve, reject } = defer<ScreenShot>();
-    this.queuedDownloadForTooltip = { point, paintHash, promise, resolve, reject };
+    this.queuedDownloadForPreview = { point, paintHash, promise, resolve, reject };
 
     this.startQueuedDownloadIfPossible();
 
@@ -73,44 +68,44 @@ export class ScreenshotCache {
     if (!paintHash) {
       return undefined;
     }
-    if (this.fullsizeCache.has(paintHash)) {
-      return this.fullsizeCache.get(paintHash)!;
+    if (this.cache.has(paintHash)) {
+      return this.cache.get(paintHash)!;
     }
 
     const promise = this.download(point);
 
-    this.fullsizeCache.set(paintHash, promise);
+    this.cache.set(paintHash, promise);
     return promise;
   }
 
   private async startQueuedDownloadIfPossible() {
-    if (this.queuedDownloadForTooltip && !this.runningDownloadForTooltip) {
+    if (this.queuedDownloadForPreview && !this.runningDownloadForPreview) {
       this.downloadQueued();
     }
   }
 
   addScreenshot(screenshot: ScreenShot) {
-    this.fullsizeCache.set(screenshot.hash, Promise.resolve(screenshot));
+    this.cache.set(screenshot.hash, Promise.resolve(screenshot));
   }
 
   private async downloadQueued() {
-    if (!this.queuedDownloadForTooltip) return;
+    if (!this.queuedDownloadForPreview) return;
 
-    const { point, paintHash, promise, resolve, reject } = this.queuedDownloadForTooltip;
+    const { point, paintHash, promise, resolve, reject } = this.queuedDownloadForPreview;
 
-    this.queuedDownloadForTooltip = undefined;
-    this.runningDownloadForTooltip = true;
+    this.queuedDownloadForPreview = undefined;
+    this.runningDownloadForPreview = true;
 
-    this.resizedCache.set(paintHash, promise);
+    this.cache.set(paintHash, promise);
 
     try {
-      const screen = await this.download(point, resizeHeightForTooltip);
+      const screen = await this.download(point);
       resolve(screen);
     } catch (e) {
       reject(e);
     }
 
-    this.runningDownloadForTooltip = false;
+    this.runningDownloadForPreview = false;
 
     this.startQueuedDownloadIfPossible();
   }

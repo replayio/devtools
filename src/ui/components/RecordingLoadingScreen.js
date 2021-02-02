@@ -11,7 +11,7 @@ async function getScreenshotSafely(paintPoint) {
   }
   const { point, paintHash } = paintPoint;
   try {
-    return await screenshotCache.getScreenshotForTooltip(point, paintHash);
+    return await screenshotCache.getScreenshotForPreview(point, paintHash);
   } catch (e) {}
 }
 
