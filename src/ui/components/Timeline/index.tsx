@@ -29,7 +29,6 @@ const { features } = require("ui/utils/prefs");
 
 import "./Timeline.css";
 import { UIState } from "ui/state";
-import { assert } from "protocol/utils";
 
 function ReplayButton({ onClick }: { onClick: MouseEventHandler }) {
   return (

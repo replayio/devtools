@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
@@ -12,8 +12,8 @@ function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime }) {
   }
 
   const { top, left, width, height, scale, gDevicePixelRatio } = canvas;
-  const commentsWithPosition = [...comments, pendingComment].filter(
-    comment => comment?.position && comment.time == currentTime
+  const commentsWithPosition = [...comments].filter(
+    comment => comment?.position && JSON.parse(comment.position) && comment.time == currentTime
   );
 
   return (
@@ -28,15 +28,24 @@ function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime }) {
     >
       <div className="canvas-comments">
         {commentsWithPosition.map((comment, i) => (
-          <VideoComment comment={comment} scale={scale} pixelRatio={gDevicePixelRatio} key={i} />
+          <VideoComment
+            comment={comment}
+            scale={scale}
+            pixelRatio={gDevicePixelRatio}
+            key={i}
+            shouldParsePosition
+          />
         ))}
+        {pendingComment?.position ? (
+          <VideoComment comment={pendingComment} scale={scale} pixelRatio={gDevicePixelRatio} />
+        ) : null}
       </div>
     </div>
   );
 }
 
-function VideoComment({ comment, scale, pixelRatio }) {
-  const position = JSON.parse(comment.position);
+function VideoComment({ comment, scale, pixelRatio, shouldParsePosition = false }) {
+  const position = shouldParsePosition ? JSON.parse(comment.position) : comment.position;
   const [focused, setFocused] = useState(false);
 
   const onMarkerClick = () => {

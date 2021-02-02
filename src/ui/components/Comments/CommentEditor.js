@@ -46,9 +46,13 @@ function CommentEditor({ comment, stopEditing, clearPendingComment }) {
   };
   const handleNewSave = () => {
     if (inputValue) {
-      comment.content = inputValue;
+      const newComment = {
+        ...comment,
+        content: inputValue,
+        position: JSON.stringify(comment.position),
+      };
       addComment({
-        variables: { object: comment },
+        variables: { object: newComment },
       });
     } else {
       clearPendingComment();

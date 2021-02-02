@@ -7,6 +7,7 @@ import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { TimeStampedPoint, MouseEvent, paintPoints, ScreenShot } from "@recordreplay/protocol";
 import { client } from "./socket";
 import { actions, UIStore } from "ui/actions";
+import { Canvas } from "ui/state/app";
 
 export const screenshotCache = new ScreenshotCache();
 
@@ -95,7 +96,6 @@ const gMouseClickEvents: MouseEvent[] = [];
 
 // Device pixel ratio used by recording screen shots.
 let gDevicePixelRatio: number;
-let gStore: UIStore;
 
 function onPaints({ paints }: paintPoints) {
   paints.forEach(({ point, time, screenShots }) => {
@@ -115,8 +115,12 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
   store.dispatch(actions.setEventsForType(gMouseClickEvents, "mousedown"));
 }
 
+let onRefreshGraphics: (canvas: Canvas) => void;
+
 export function setupGraphics(store: UIStore) {
-  gStore = store;
+  onRefreshGraphics = (canvas: Canvas) => {
+    store.dispatch(actions.setCanvas(canvas));
+  };
 
   ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
     client.Graphics.findPaints({}, sessionId);
@@ -355,16 +359,14 @@ export function refreshGraphics() {
     }
   }
 
-  gStore.dispatch(
-    actions.setCanvas({
-      scale,
-      gDevicePixelRatio,
-      width: image.width,
-      height: image.height,
-      left: offsetLeft,
-      top: offsetTop,
-    })
-  );
+  onRefreshGraphics({
+    scale,
+    gDevicePixelRatio,
+    width: image.width,
+    height: image.height,
+    left: offsetLeft,
+    top: offsetTop,
+  });
 
   // Apply the same transforms to any displayed highlighter.
   const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;

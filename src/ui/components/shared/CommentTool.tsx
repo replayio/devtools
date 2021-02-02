@@ -1,15 +1,16 @@
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import React from "react";
 import { getDevicePixelRatio } from "protocol/graphics";
 import { ThreadFront } from "protocol/thread";
 import "./CommentTool.css";
 
+import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 
-const mouseEventCanvasPosition = e => {
+const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
-  const bounds = canvas.getBoundingClientRect();
+  const bounds = canvas!.getBoundingClientRect();
   if (
     e.clientX < bounds.left ||
     e.clientX > bounds.right ||
@@ -20,7 +21,7 @@ const mouseEventCanvasPosition = e => {
     return null;
   }
 
-  const scale = bounds.width / canvas.offsetWidth;
+  const scale = bounds.width / canvas!.offsetWidth;
   const pixelRatio = getDevicePixelRatio();
   if (!pixelRatio) {
     return null;
@@ -39,19 +40,19 @@ function CommentTool({
   setPendingComment,
   setSelectedPanel,
   setCommentPointer,
-}) {
+}: PropsFromRedux) {
   const addListeners = () => {
     setCommentPointer(true);
-    document.getElementById("video").classList.add("location-marker");
-    document.getElementById("video").addEventListener("mouseup", onClickInCanvas);
+    document.getElementById("video")!.classList.add("location-marker");
+    document.getElementById("video")!.addEventListener("mouseup", onClickInCanvas);
   };
   const removeListeners = () => {
     setCommentPointer(false);
-    document.getElementById("video").classList.remove("location-marker");
-    document.getElementById("video").removeEventListener("mouseup", onClickInCanvas);
+    document.getElementById("video")!.classList.remove("location-marker");
+    document.getElementById("video")!.removeEventListener("mouseup", onClickInCanvas);
   };
 
-  const onClickInCanvas = async e => {
+  const onClickInCanvas = async (e: MouseEvent) => {
     removeListeners();
 
     if (e.target !== document.querySelector("canvas#graphics")) {
@@ -68,7 +69,7 @@ function CommentTool({
       time: currentTime,
       point: ThreadFront.currentPoint,
       has_frames: ThreadFront.currentPointHasFrames,
-      position: JSON.stringify(mouseEventCanvasPosition(e)),
+      position: mouseEventCanvasPosition(e),
     };
 
     setPendingComment(pendingComment);
@@ -81,8 +82,8 @@ function CommentTool({
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
     viewMode: selectors.getViewMode(state),
@@ -92,4 +93,8 @@ export default connect(
     setPendingComment: actions.setPendingComment,
     setCommentPointer: actions.setCommentPointer,
   }
-)(CommentTool);
+);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(CommentTool);
