@@ -9,6 +9,8 @@ import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import ShareDropdown from "ui/components/Header/ShareDropdown";
 import ViewToggle from "ui/components/Header/ViewToggle";
 import UserOptions from "ui/components/Header/UserOptions";
+import { prefs } from "ui/utils/prefs";
+
 import "./Header.css";
 
 import { gql, useQuery } from "@apollo/client";
@@ -46,7 +48,7 @@ function Links({ recordingId, sessionId }) {
     <div className="links">
       <Avatars recordingId={recordingId} sessionId={sessionId} />
       {recordingId ? <ShareDropdown /> : null}
-      <ViewToggle />
+      {!prefs.video && <ViewToggle />}
       <UserOptions />
     </div>
   );

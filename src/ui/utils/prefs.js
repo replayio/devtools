@@ -7,6 +7,16 @@ import Services from "devtools-services";
 // and old stores should be cleared.
 const { pref } = Services;
 
+// Get prefs from the URL with the format
+// &prefs=<key>:<value>,<key>:<value> e.g. &prefs=video:true
+function getUrlPrefs() {
+  const url = new URL(window.location.href);
+  const urlPrefs = url.searchParams.get("prefs") || "";
+  return Object.fromEntries(urlPrefs.split(",").map(pref => pref.split(":")));
+}
+
+const urlPrefs = getUrlPrefs();
+
 // app prefs.
 pref("devtools.split-console", false);
 pref("devtools.selected-panel", "console");
@@ -17,6 +27,7 @@ pref("devtools.toolbox-height", "50%");
 pref("devtools.non-dev-side-panel-width", "75%");
 pref("devtools.view-mode", "non-dev");
 pref("devtools.dev-secondary-panel-height", "50%");
+pref("devtools.video", !!urlPrefs.video);
 
 // app features
 pref("devtools.features.comments", true);
@@ -33,6 +44,7 @@ export const prefs = new PrefsHelper("devtools", {
   nonDevSidePanelWidth: ["String", "non-dev-side-panel-width"],
   viewMode: ["String", "view-mode"],
   secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
+  video: ["Bool", "video"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
