@@ -153,3 +153,33 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+.event-listeners-modes {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 12px;
+}
+
+.event-listeners-modes > :not(:last-child) {
+  margin-right: 8px;
+}
+
+.event-listeners-modes button {
+  background: transparent;
+  color: var(--theme-body-color);
+  padding: 0px;
+}
+
+.event-listeners-modes button.selected {
+  color: var(--primary-accent);
+}
+
+.event-listeners-modes button:hover {
+  background: transparent;
+  color: var(--primary-accent);
+  text-decoration: underline;
+}
+
+.event-listeners-content label {
+  user-select: none;
+}

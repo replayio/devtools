@@ -19,6 +19,7 @@ class EventListeners extends Component {
   state = {
     searchText: "",
     focused: false,
+    mode: "simple",
   };
 
   hasMatch(eventOrCategoryName, searchText) {
@@ -235,15 +236,72 @@ class EventListeners extends Component {
     );
   }
 
-  render() {
+  renderAdvanced() {
     const { searchText } = this.state;
 
     return (
-      <div className="event-listeners">
+      <>
         <div className="event-search-container">{this.renderSearchInput()}</div>
         <div className="event-listeners-content">
           {searchText ? this.renderSearchResultsList() : this.renderCategoriesList()}
         </div>
+      </>
+    );
+  }
+
+  renderSimple() {
+    const simpleCategories = ["Mouse", "Keyboard"];
+
+    return (
+      <div className="event-listeners-content">
+        {simpleCategories.map((category, i) => this.renderSimpleEvent(category, i))}
+      </div>
+    );
+  }
+
+  renderSimpleEvent(categoryName, index) {
+    const { categories, activeEventListeners } = this.props;
+    const category = categories.find(cat => cat.name == categoryName);
+    const isAllActive = category.events.every(event => activeEventListeners.includes(event.id));
+    const indeterminate =
+      !isAllActive && category.events.some(event => activeEventListeners.includes(event.id));
+
+    return (
+      <div className="event-listener-event" key={index}>
+        <input
+          id={`${categoryName.toLowerCase()}-events`}
+          type="checkbox"
+          checked={isAllActive}
+          onChange={() => this.onCategoryClick(category, !isAllActive)}
+          ref={el => el && (el.indeterminate = indeterminate)}
+        />
+        <label className="event-listener-name" htmlFor={`${categoryName.toLowerCase()}-events`}>
+          {categoryName}
+        </label>
+      </div>
+    );
+  }
+
+  render() {
+    const { mode } = this.state;
+
+    return (
+      <div className="event-listeners">
+        <div className="event-listeners-modes">
+          <button
+            className={mode == "simple" ? "selected" : ""}
+            onClick={() => this.setState({ mode: "simple" })}
+          >
+            Simple
+          </button>
+          <button
+            className={mode == "advanced" ? "advanced" : ""}
+            onClick={() => this.setState({ mode: "advanced" })}
+          >
+            Advanced
+          </button>
+        </div>
+        {mode == "simple" ? this.renderSimple() : this.renderAdvanced()}
       </div>
     );
   }
