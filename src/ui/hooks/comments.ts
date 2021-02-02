@@ -20,6 +20,7 @@ const GET_COMMENTS = gql`
       time
       point
       has_frames
+      position
     }
   }
 `;

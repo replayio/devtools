@@ -1,7 +1,7 @@
 import React, { MouseEventHandler } from "react";
 const { getLeftOffset } = require("../../utils/timeline");
 import { connect, ConnectedProps } from "react-redux";
-import classnames from "classnames";
+const classnames = require("classnames");
 import { actions } from "../../actions";
 import { HoveredPoint, ZoomRegion } from "ui/state/timeline";
 import { Location, PauseId } from "@recordreplay/protocol";

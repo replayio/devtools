@@ -7,6 +7,7 @@ import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { TimeStampedPoint, MouseEvent, paintPoints, ScreenShot } from "@recordreplay/protocol";
 import { client } from "./socket";
 import { actions, UIStore } from "ui/actions";
+import { Canvas } from "ui/state/app";
 
 export const screenshotCache = new ScreenshotCache();
 
@@ -114,7 +115,13 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
   store.dispatch(actions.setEventsForType(gMouseClickEvents, "mousedown"));
 }
 
+let onRefreshGraphics: (canvas: Canvas) => void;
+
 export function setupGraphics(store: UIStore) {
+  onRefreshGraphics = (canvas: Canvas) => {
+    store.dispatch(actions.setCanvas(canvas));
+  };
+
   ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
     client.Graphics.findPaints({}, sessionId);
     client.Graphics.addPaintPointsListener(onPaints);
@@ -351,6 +358,15 @@ export function refreshGraphics() {
       drawClick(cx, x, y);
     }
   }
+
+  onRefreshGraphics({
+    scale,
+    gDevicePixelRatio,
+    width: image.width,
+    height: image.height,
+    left: offsetLeft,
+    top: offsetTop,
+  });
 
   // Apply the same transforms to any displayed highlighter.
   const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;

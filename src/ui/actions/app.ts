@@ -18,6 +18,7 @@ import {
   PendingComment,
   ModalType,
   UploadInfo,
+  Canvas,
 } from "ui/state/app";
 
 const { PointHandlers } = require("protocol/logpoint");
@@ -52,6 +53,8 @@ export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_locat
 };
 export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
 export type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment };
+export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
+export type SetCommentPointer = Action<"set_comment_pointer"> & { value: boolean };
 
 export type AppAction =
   | SetupAppAction
@@ -71,7 +74,9 @@ export type AppAction =
   | SetNarrowMode
   | SetHoveredLineNumberLocation
   | SetIsNodePickerActive
-  | SetPendingComment;
+  | SetPendingComment
+  | SetCanvas
+  | SetCommentPointer;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -219,4 +224,12 @@ export function setPendingComment(comment: PendingComment): SetPendingComment {
 
 export function clearPendingComment() {
   return { type: "set_pending_comment", comment: null };
+}
+
+export function setCanvas(canvas: Canvas): SetCanvas {
+  return { type: "set_canvas", canvas };
+}
+
+export function setCommentPointer(value: boolean): SetCommentPointer {
+  return { type: "set_comment_pointer", value };
 }

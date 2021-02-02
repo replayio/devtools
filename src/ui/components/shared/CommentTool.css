@@ -1,0 +1,13 @@
+button.comment-tool {
+  padding: 8px 12px;
+  background: var(--grey-30);
+}
+
+button.comment-tool:focus {
+  background: var(--primary-accent);
+  color: var(--theme-body-background);
+}
+
+#video.location-marker {
+  cursor: url("https://svgshare.com/i/TfA.svg"), auto;
+}

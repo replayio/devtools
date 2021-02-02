@@ -43,6 +43,8 @@ export interface AppState {
   events: Events;
   isNodePickerActive: boolean;
   pendingComment: PendingComment | null;
+  canvas: Canvas | null;
+  commentPointer: boolean;
 }
 
 export interface AnalysisPoints {
@@ -70,8 +72,23 @@ export interface Comment {
 }
 
 export interface PendingComment {
-  recording_id: RecordingId;
+  recording_id: RecordingId | null;
   time: number;
   point: string;
   has_frames: boolean;
+  position: CommentPosition | null;
+}
+
+interface CommentPosition {
+  x: number;
+  y: number;
+}
+
+export interface Canvas {
+  gDevicePixelRatio: number;
+  height: number;
+  left: number;
+  scale: number;
+  top: number;
+  width: number;
 }

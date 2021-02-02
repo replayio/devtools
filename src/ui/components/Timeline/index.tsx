@@ -10,12 +10,13 @@
 import { connect, ConnectedProps } from "react-redux";
 import { Component, MouseEventHandler } from "react";
 import React from "react";
-import classnames from "classnames";
+const classnames = require("classnames");
 
 import ScrollContainer from "./ScrollContainer";
 import Tooltip from "./Tooltip";
 const Comments = require("../Comments").default;
 import AddCommentButton from "./AddCommentButton";
+import CommentTool from "../shared/CommentTool";
 
 import { mostRecentPaintOrMouseEvent, paintGraphicsAtTime } from "protocol/graphics";
 
@@ -24,10 +25,10 @@ import { selectors } from "../../reducers";
 import Marker from "./Marker";
 import MessageMarker from "./MessageMarker";
 const { getVisiblePosition } = require("ui/utils/timeline");
+const { features } = require("ui/utils/prefs");
 
 import "./Timeline.css";
 import { UIState } from "ui/state";
-import { assert } from "protocol/utils";
 
 function ReplayButton({ onClick }: { onClick: MouseEventHandler }) {
   return (
@@ -240,6 +241,7 @@ class Timeline extends Component<PropsFromRedux> {
           <Comments />
           <Tooltip />
         </div>
+        {features.videoComments ? <CommentTool /> : null}
         <AddCommentButton />
       </div>
     );

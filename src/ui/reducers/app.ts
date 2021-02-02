@@ -28,6 +28,8 @@ function initialAppState(): AppState {
     hoveredLineNumberLocation: null,
     isNodePickerActive: false,
     pendingComment: null,
+    canvas: null,
+    commentPointer: false,
   };
 }
 
@@ -142,6 +144,20 @@ export default function update(
       };
     }
 
+    case "set_canvas": {
+      return {
+        ...state,
+        canvas: action.canvas,
+      };
+    }
+
+    case "set_comment_pointer": {
+      return {
+        ...state,
+        commentPointer: action.value,
+      };
+    }
+
     default: {
       return state;
     }
@@ -174,3 +190,5 @@ export const getPointsForHoveredLineNumber = (state: UIState) => {
 export const getEventsForType = (state: UIState, type: string) => state.app.events[type] || [];
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getPendingComment = (state: UIState) => state.app.pendingComment;
+export const getCanvas = (state: UIState) => state.app.canvas;
+export const getCommentPointer = (state: UIState) => state.app.commentPointer;

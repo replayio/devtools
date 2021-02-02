@@ -34,6 +34,7 @@ function AddCommentButton({
       time: currentTime,
       point: ThreadFront.currentPoint,
       has_frames: ThreadFront.currentPointHasFrames,
+      position: null,
     };
 
     setPendingComment(pendingComment);

@@ -33,6 +33,7 @@ pref("devtools.video", !!urlPrefs.video);
 pref("devtools.features.comments", true);
 pref("devtools.features.users", true);
 pref("devtools.features.auth0", true);
+pref("devtools.features.videoComments", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -51,6 +52,7 @@ export const features = new PrefsHelper("devtools.features", {
   comments: ["Bool", "comments"],
   users: ["Bool", "users"],
   auth0: ["Bool", "auth0"],
+  videoComments: ["Bool", "videoComments"],
   private: ["Bool", "private"],
 });
 

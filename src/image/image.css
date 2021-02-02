@@ -141,6 +141,7 @@ button.jump-definition { background-image: url(~devtools/client/shared/component
 .img.login { -webkit-mask-image: url(~devtools/client/themes/images/login.svg); }
 .img.settings { -webkit-mask-image: url(~devtools/client/themes/images/settings.svg); }
 .img.plus-circle { -webkit-mask-image: url(~devtools/client/themes/images/plus-circle.svg); }
+.img.location-marker { -webkit-mask-image: url(~devtools/client/themes/images/location-marker.svg); }
 .tree-node button.arrow { -webkit-mask-image: url(~devtools/client/debugger/images/arrow.svg); }
 #command-button-pick::before { -webkit-mask-image: url(~devtools/client/themes/images/command-pick.svg); }
 button.open-inspector { -webkit-mask-image: url(~devtools/client/themes/images/open-inspector.svg); }
