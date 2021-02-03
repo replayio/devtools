@@ -241,7 +241,6 @@ class Timeline extends Component<PropsFromRedux> {
           <Comments />
           <Tooltip />
         </div>
-        {/* {features.videoComments ? <CommentTool /> : null} */}
         <AddCommentButton />
       </div>
     );

@@ -9,8 +9,6 @@ import "./CommentsOverlay.css";
 function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime, setHoveredComment }) {
   const { comments: hasuraComments } = hooks.useGetComments(recordingId);
 
-  console.log({ hasuraComments });
-
   if (!canvas) {
     return null;
   }

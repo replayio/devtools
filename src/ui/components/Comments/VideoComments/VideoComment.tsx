@@ -23,6 +23,8 @@ function VideoComment({
   pendingComment,
   hoveredComment,
 }: PropsFromRedux) {
+  // const [focused, setFocused] = useState(false);
+
   if (!canvas) {
     return null;
   }
@@ -30,17 +32,12 @@ function VideoComment({
   const { scale } = canvas;
   const position =
     typeof comment.position == "string" ? JSON.parse(comment.position) : comment.position;
-
-  const [focused, setFocused] = useState(false);
-
-  const onMarkerClick = () => {
-    setFocused(true);
-  };
-  const onMaskClick = () => {
-    setFocused(false);
-  };
-
-  console.log({ comment, hoveredComment }, hoveredComment?.id == comment.id);
+  // const onMarkerClick = () => {
+  //   setFocused(true);
+  // };
+  // const onMaskClick = () => {
+  //   setFocused(false);
+  // };
 
   return (
     <div
@@ -56,16 +53,15 @@ function VideoComment({
         }`}
         onMouseEnter={() => setHoveredComment(comment.id)}
         onMouseLeave={() => setHoveredComment(null)}
-        onClick={onMarkerClick}
       >
         <div className="img location-marker" />
       </div>
-      {focused ? (
+      {/* {focused ? (
         <>
           <div className="mask" onClick={onMaskClick} />
           <CommentContainer comment={comment} />
         </>
-      ) : null}
+      ) : null} */}
     </div>
   );
 }
@@ -82,6 +78,5 @@ const connector = connect(
 );
 type PropsFromRedux = ConnectedProps<typeof connector> & {
   comment: any;
-  shouldParsePosition: boolean;
 };
 export default connector(VideoComment);

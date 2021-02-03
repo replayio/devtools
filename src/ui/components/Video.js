@@ -5,8 +5,6 @@ import { installObserver } from "../../protocol/graphics";
 import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 
-import { features } from "ui/utils/prefs";
-
 function Video({ togglePlayback, isNodePickerActive, commentPointer }) {
   useEffect(() => {
     installObserver();
@@ -26,7 +24,7 @@ function Video({ togglePlayback, isNodePickerActive, commentPointer }) {
   return (
     <div id="video">
       <canvas id="graphics" onMouseDown={onMouseDown} />
-      {features.videoComments ? <CommentsOverlay /> : null}
+      <CommentsOverlay />
       <div id="highlighter-root"></div>
     </div>
   );

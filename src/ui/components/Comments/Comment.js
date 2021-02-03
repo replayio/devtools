@@ -38,7 +38,6 @@ function Comment({
   setHoveredComment,
   clearPendingComment,
 }) {
-  // const [editing, setEditing] = useState(false);
   const commentEl = useRef(null);
   const [menuExpanded, setMenuExpanded] = useState(false);
   const seekToComment = () => {
@@ -49,10 +48,10 @@ function Comment({
   };
 
   useEffect(() => {
-    if (comment.time === currentTime) {
+    if (comment.time === currentTime || pendingComment?.id == comment.id) {
       commentEl.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-  }, [currentTime]);
+  }, [currentTime, pendingComment]);
 
   if (comment.content === "") {
     return <NewComment comment={comment} commentEl={commentEl} currentTime={currentTime} />;
@@ -64,11 +63,11 @@ function Comment({
   return (
     <div className="comment-container" ref={commentEl}>
       <div
-        className={classnames(
-          "comment",
-          { selected: currentTime === comment.time, highlighted: comment.id == hoveredComment },
-          { "child-comment": comment.parent_id }
-        )}
+        className={classnames("comment", {
+          selected: currentTime === comment.time,
+          highlighted: comment.id === hoveredComment || isEditing,
+          "child-comment": comment.parent_id,
+        })}
         onClick={seekToComment}
         onMouseEnter={() => setHoveredComment(comment.id)}
         onMouseLeave={() => setHoveredComment(null)}
