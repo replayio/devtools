@@ -9,7 +9,7 @@ import { isEqual } from "lodash";
 
 function isValidToken(target) {
   if (!target || !target.innerText) {
-    return true;
+    return false;
   }
 
   const tokenText = target.innerText.trim();
