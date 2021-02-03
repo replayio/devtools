@@ -44,6 +44,10 @@ function CommentDropdownPanel({ comment, onItemClick, setPendingComment, recordi
       position: comment.position,
     };
 
+    if (comment.parent_id) {
+      pendingComment.parent_id = comment.parent_id;
+    }
+
     setPendingComment(pendingComment);
   };
 
