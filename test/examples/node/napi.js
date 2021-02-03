@@ -13,3 +13,12 @@ async function testSharp() {
   console.log(resized.toString("base64"));
 }
 testSharp();
+
+const bufferutil = require("bufferutil");
+function testBufferUtil() {
+  const buf = Buffer.from([1,2,3,4]);
+  const mask = Buffer.from([5,6,7,8]);
+  bufferutil.unmask(buf, mask);
+  console.log(`Unmasked ${JSON.stringify([...buf])}`);
+}
+testBufferUtil();
