@@ -30,6 +30,7 @@ function initialAppState(): AppState {
     pendingComment: null,
     canvas: null,
     commentPointer: false,
+    hoveredComment: null,
   };
 }
 
@@ -158,6 +159,13 @@ export default function update(
       };
     }
 
+    case "set_hovered_comment": {
+      return {
+        ...state,
+        hoveredComment: action.comment,
+      };
+    }
+
     default: {
       return state;
     }
@@ -192,3 +200,4 @@ export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerA
 export const getPendingComment = (state: UIState) => state.app.pendingComment;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getCommentPointer = (state: UIState) => state.app.commentPointer;
+export const getHoveredComment = (state: UIState) => state.app.hoveredComment;

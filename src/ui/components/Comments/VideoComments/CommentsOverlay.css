@@ -16,17 +16,21 @@
 
 .canvas-overlay .canvas-comment-marker {
   padding: 4px;
-  background: var(--primary-accent);
+  background: var(--theme-icon-color);
   border-radius: 100%;
   transform: translateX(-50%);
   transform: translateY(-50%);
   box-shadow: 0 1px 4px 0 rgba(0,0,0,0.2);
-  cursor: pointer;
 }
 
-.canvas-overlay .canvas-comment-marker:hover {
+.canvas-overlay .canvas-comment-marker:hover,
+.canvas-overlay .canvas-comment-marker.active,
+.canvas-overlay .canvas-comment-marker.highlighted {
   padding: 6px;
   margin-left: -2px;
+  background: var(--primary-accent);
+  transition: background 200ms;
+  z-index: var(--z-index-3--hovered-comment-primary);
 }
 
 .canvas-overlay .canvas-comment .img.location-marker {

@@ -18,7 +18,11 @@ function CommentsPanel({ recordingId, clickEvents, pendingComment }) {
   // next steps for fixing the error by refetching/refreshing.
   let entries = [...comments, ...clickEvents] || [];
 
-  if (pendingComment) {
+  // New comments that haven't been sent to Hasura will not have an associated ID.
+  // They're not included in the comments data from the query, so we have to insert
+  // them manually here. If a pending comment has an ID, it already exists in the
+  // comments data and we don't have to insert it.
+  if (pendingComment && !pendingComment.id) {
     entries = [...entries, pendingComment];
   }
 

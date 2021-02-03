@@ -15,6 +15,7 @@ function AddCommentButton({
   setModal,
   setSelectedPanel,
   setPendingComment,
+  canvas,
 }: PropsFromRedux) {
   assert(recordingId);
   const { isAuthenticated } = useAuth0();
@@ -34,7 +35,10 @@ function AddCommentButton({
       time: currentTime,
       point: ThreadFront.currentPoint,
       has_frames: ThreadFront.currentPointHasFrames,
-      position: null,
+      position: {
+        x: canvas!.width * 0.5,
+        y: canvas!.height * 0.5,
+      },
     };
 
     setPendingComment(pendingComment);
@@ -53,6 +57,7 @@ const connector = connect(
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
     viewMode: selectors.getViewMode(state),
+    canvas: selectors.getCanvas(state),
   }),
   {
     setModal: actions.setModal,

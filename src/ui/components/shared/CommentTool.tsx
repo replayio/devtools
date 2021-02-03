@@ -1,7 +1,5 @@
 import { connect, ConnectedProps } from "react-redux";
-import React from "react";
-import { getDevicePixelRatio } from "protocol/graphics";
-import { ThreadFront } from "protocol/thread";
+import { useEffect } from "react";
 import "./CommentTool.css";
 
 import { UIState } from "ui/state";
@@ -22,21 +20,16 @@ const mouseEventCanvasPosition = (e: MouseEvent) => {
   }
 
   const scale = bounds.width / canvas!.offsetWidth;
-  const pixelRatio = getDevicePixelRatio();
-  if (!pixelRatio) {
-    return null;
-  }
 
   return {
-    x: (e.clientX - bounds.left) / scale / pixelRatio,
-    y: (e.clientY - bounds.top) / scale / pixelRatio,
+    x: (e.clientX - bounds.left) / scale,
+    y: (e.clientY - bounds.top) / scale,
   };
 };
 
 function CommentTool({
-  currentTime,
-  recordingId,
   viewMode,
+  comment,
   setPendingComment,
   setSelectedPanel,
   setCommentPointer,
@@ -51,10 +44,7 @@ function CommentTool({
     document.getElementById("video")!.classList.remove("location-marker");
     document.getElementById("video")!.removeEventListener("mouseup", onClickInCanvas);
   };
-
   const onClickInCanvas = async (e: MouseEvent) => {
-    removeListeners();
-
     if (e.target !== document.querySelector("canvas#graphics")) {
       return;
     }
@@ -63,30 +53,21 @@ function CommentTool({
       setSelectedPanel("comments");
     }
 
-    const pendingComment = {
-      content: "",
-      recording_id: recordingId,
-      time: currentTime,
-      point: ThreadFront.currentPoint,
-      has_frames: ThreadFront.currentPointHasFrames,
-      position: mouseEventCanvasPosition(e),
-    };
-
-    setPendingComment(pendingComment);
+    setPendingComment({ ...comment, position: mouseEventCanvasPosition(e) });
   };
 
-  return (
-    <button className="comment-tool" onClick={addListeners}>
-      Comment Tool
-    </button>
-  );
+  useEffect(() => {
+    addListeners();
+    return () => removeListeners();
+  }, []);
+
+  return null;
 }
 
 const connector = connect(
   (state: UIState) => ({
-    currentTime: selectors.getCurrentTime(state),
-    recordingId: selectors.getRecordingId(state),
     viewMode: selectors.getViewMode(state),
+    pendingComment: selectors.getPendingComment(state),
   }),
   {
     setSelectedPanel: actions.setSelectedPanel,
@@ -94,7 +75,9 @@ const connector = connect(
     setCommentPointer: actions.setCommentPointer,
   }
 );
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
+type PropsFromParent = {
+  comment: any;
+};
+type PropsFromRedux = ConnectedProps<typeof connector> & PropsFromParent;
 
 export default connector(CommentTool);
