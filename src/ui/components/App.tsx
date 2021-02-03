@@ -19,6 +19,7 @@ import "styles.css";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
+import { Uploading } from "./Uploading";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -69,7 +70,11 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
     setUserInLogRocket();
   }, [auth.user]);
 
-  if ((!isDeployPreview() && auth.isLoading) || hasLoadingParam()) {
+  if (hasLoadingParam()) {
+    return <Uploading />;
+  }
+
+  if (!isDeployPreview() && auth.isLoading) {
     return null;
   }
 
