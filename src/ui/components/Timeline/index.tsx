@@ -9,8 +9,9 @@
 
 import { connect, ConnectedProps } from "react-redux";
 import { Component, MouseEventHandler } from "react";
+import type { Message, PointDescription } from "@recordreplay/protocol";
 import React from "react";
-const classnames = require("classnames");
+import classnames from "classnames";
 
 import ScrollContainer from "./ScrollContainer";
 import Tooltip from "./Tooltip";
@@ -20,8 +21,8 @@ import CommentTool from "../shared/CommentTool";
 
 import { mostRecentPaintOrMouseEvent, paintGraphicsAtTime } from "protocol/graphics";
 
-import { actions } from "../../actions";
-import { selectors } from "../../reducers";
+import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 import Marker from "./Marker";
 import MessageMarker from "./MessageMarker";
 const { getVisiblePosition } = require("ui/utils/timeline");
@@ -142,7 +143,7 @@ class Timeline extends Component<PropsFromRedux> {
 
     return (
       <div className="markers-container">
-        {messages.map((message, index) => (
+        {messages.map((message: Message, index: number) => (
           <MessageMarker
             message={message}
             key={index}
@@ -186,7 +187,7 @@ class Timeline extends Component<PropsFromRedux> {
 
     return (
       <div className="preview-markers-container">
-        {pointsForHoveredLineNumber.map((point, index) => (
+        {pointsForHoveredLineNumber.map((point: PointDescription, index: number) => (
           <Marker
             key={index}
             point={point.point}
