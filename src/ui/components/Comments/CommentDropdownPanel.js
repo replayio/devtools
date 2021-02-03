@@ -6,13 +6,7 @@ import { selectors } from "ui/reducers";
 import { ThreadFront } from "protocol/thread";
 import { useAuth0 } from "@auth0/auth0-react";
 
-function CommentDropdownPanel({
-  comment,
-  startEditing,
-  onItemClick,
-  setPendingComment,
-  recordingId,
-}) {
+function CommentDropdownPanel({ comment, onItemClick, setPendingComment, recordingId, canvas }) {
   const { user } = useAuth0();
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
@@ -33,6 +27,28 @@ function CommentDropdownPanel({
       point: ThreadFront.currentPoint,
       has_frames: ThreadFront.currentPointHasFrames,
       parent_id: comment.id,
+      position: {
+        x: canvas.width * 0.5,
+        y: canvas.height * 0.5,
+      },
+    };
+
+    setPendingComment(pendingComment);
+  };
+  const onEditClick = () => {
+    const pendingComment = {
+      id: comment.id,
+      content: comment.content,
+      recording_id: comment.recordingId,
+      content: comment.content,
+      time: comment.time,
+      point: comment.point,
+      has_frames: comment.has_frames,
+      user: comment.user,
+      position: {
+        x: canvas.width * 0.5,
+        y: canvas.height * 0.5,
+      },
     };
 
     setPendingComment(pendingComment);
@@ -42,7 +58,7 @@ function CommentDropdownPanel({
     <div className="dropdown-panel" onClick={onItemClick}>
       {isAuthor && (
         <>
-          <div className="menu-item" onClick={startEditing}>
+          <div className="menu-item" onClick={onEditClick}>
             Edit Comment
           </div>
           <div className="menu-item" onClick={() => removeComment(comment)}>
@@ -62,6 +78,7 @@ function CommentDropdownPanel({
 export default connect(
   state => ({
     recordingId: selectors.getRecordingId(state),
+    canvas: selectors.getCanvas(state),
   }),
   {
     setPendingComment: actions.setPendingComment,

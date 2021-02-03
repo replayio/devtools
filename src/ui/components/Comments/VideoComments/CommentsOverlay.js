@@ -14,20 +14,24 @@ function CommentsOverlay({
   currentTime,
   setHoveredComment,
 }) {
-  const { comments } = hooks.useGetComments(recordingId);
+  const { comments: hasuraComments } = hooks.useGetComments(recordingId);
 
   if (!canvas) {
     return null;
   }
 
   const { top, left, width, height, scale } = canvas;
-  const commentsWithPosition = [...comments]
-    .filter(
-      comment => comment?.position && JSON.parse(comment.position) && comment.time == currentTime
-    )
-    .filter(comment => comment.id !== activeComment?.id);
+  const comments = [...hasuraComments];
 
-  console.log({ commentsWithPosition, pendingComment, activeComment });
+  // New comments that haven't been sent to Hasura will not have an associated ID.
+  // They're not included in the comments data from the query, so we have to insert
+  // them manually here. If a pending comment has an ID, it already exists in the
+  // comments data and we don't have to insert it.
+  if (pendingComment && !pendingComment.id) {
+    comments.push(pendingComment);
+  }
+
+  const commentsAtTime = comments.filter(comment => comment && comment.time == currentTime);
 
   return (
     <div
@@ -40,26 +44,20 @@ function CommentsOverlay({
       }}
     >
       <div className="canvas-comments">
-        {commentsWithPosition.map((comment, i) => (
+        {commentsAtTime.map((comment, i) => (
           <VideoComment
             comment={comment}
             scale={scale}
             key={i}
             setHoveredComment={setHoveredComment}
-            shouldParsePosition
           />
         ))}
-        {pendingComment ? (
+        {/* {pendingComment ? (
           <VideoComment comment={pendingComment} scale={scale} setHoveredComment={() => {}} />
-        ) : null}
-        {activeComment ? (
-          <VideoComment
-            comment={activeComment}
-            scale={scale}
-            setHoveredComment={() => {}}
-            shouldParsePosition
-          />
-        ) : null}
+        ) : null} */}
+        {/* {activeComment ? (
+          <VideoComment comment={activeComment} scale={scale} setHoveredComment={() => {}} />
+        ) : null} */}
       </div>
     </div>
   );

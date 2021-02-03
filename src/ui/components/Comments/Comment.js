@@ -29,16 +29,21 @@ function getShowDropdown(comment, editing) {
   return true;
 }
 
-function Comment({ comment, currentTime, seek, hoveredComment, setHoveredComment }) {
-  const [editing, setEditing] = useState(false);
+function Comment({
+  comment,
+  pendingComment,
+  currentTime,
+  seek,
+  hoveredComment,
+  setHoveredComment,
+  clearPendingComment,
+}) {
+  // const [editing, setEditing] = useState(false);
   const commentEl = useRef(null);
   const [menuExpanded, setMenuExpanded] = useState(false);
   const seekToComment = () => {
     const { point, time, has_frames } = comment;
-
-    if (editing) {
-      return;
-    }
+    clearPendingComment();
 
     return seek(point, time, has_frames);
   };
@@ -50,17 +55,11 @@ function Comment({ comment, currentTime, seek, hoveredComment, setHoveredComment
   }, [currentTime]);
 
   if (comment.content === "") {
-    return (
-      <NewComment
-        comment={comment}
-        commentEl={commentEl}
-        setEditing={setEditing}
-        currentTime={currentTime}
-      />
-    );
+    return <NewComment comment={comment} commentEl={commentEl} currentTime={currentTime} />;
   }
 
-  const showDropdown = getShowDropdown(comment, editing);
+  const isEditing = pendingComment?.id == comment.id || comment.content == "";
+  const showDropdown = getShowDropdown(comment, isEditing);
 
   return (
     <div className="comment-container" ref={commentEl}>
@@ -75,11 +74,7 @@ function Comment({ comment, currentTime, seek, hoveredComment, setHoveredComment
         onMouseLeave={() => setHoveredComment(null)}
       >
         <img src={comment.user.picture} className="comment-picture" />
-        {editing ? (
-          <CommentEditor comment={comment} stopEditing={() => setEditing(false)} />
-        ) : (
-          <CommentBody comment={comment} startEditing={() => setEditing(true)} />
-        )}
+        {isEditing ? <CommentEditor comment={comment} /> : <CommentBody comment={comment} />}
         {showDropdown ? (
           <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
             <PortalDropdown
@@ -100,33 +95,27 @@ function Comment({ comment, currentTime, seek, hoveredComment, setHoveredComment
   );
 }
 
-function NewComment({ comment, currentTime, commentEl, setEditing }) {
+function NewComment({ comment, currentTime, commentEl }) {
   const { user } = useAuth0();
 
   return (
     <div className="comment-container" ref={commentEl}>
       <div className={classnames("comment", { selected: currentTime === comment.time })}>
         <img src={user.picture} className="comment-picture" />
-        <CommentEditor comment={comment} stopEditing={() => setEditing(false)} />
+        <CommentEditor comment={comment} />
       </div>
     </div>
   );
 }
 
-function CommentBody({ comment, startEditing }) {
+function CommentBody({ comment }) {
   const lines = comment.content.split("\n");
   const { isAuthenticated, user } = useAuth0();
-
-  const onDoubleClick = () => {
-    if (isAuthenticated && comment.user.auth_id == user.sub) {
-      startEditing();
-    }
-  };
 
   return (
     <div className="comment-body">
       <div className="item-label">{comment.user.name}</div>
-      <div className="item-content" onDoubleClick={onDoubleClick}>
+      <div className="item-content">
         {lines.map((line, i) => (
           <div key={i}>{line}</div>
         ))}
@@ -137,11 +126,13 @@ function CommentBody({ comment, startEditing }) {
 
 export default connect(
   state => ({
+    pendingComment: selectors.getPendingComment(state),
     currentTime: selectors.getCurrentTime(state),
     hoveredComment: selectors.getHoveredComment(state),
   }),
   {
     seek: actions.seek,
     setHoveredComment: actions.setHoveredComment,
+    clearPendingComment: actions.clearPendingComment,
   }
 )(Comment);

@@ -25,12 +25,6 @@ function CommentEditor({
     const { length } = textareaNode.current.value;
     textareaNode.current.focus();
     textareaNode.current.setSelectionRange(length, length);
-
-    if (!pendingComment) {
-      setActiveComment(comment);
-    }
-
-    return () => setActiveComment(null);
   }, []);
 
   const onKeyDown = e => {
@@ -60,6 +54,9 @@ function CommentEditor({
     } else {
       clearPendingComment();
     }
+
+    // Move this down here so it always happens
+    // clearPendingComment();
   };
   const handleExistingSave = () => {
     if (!inputValue) {
@@ -75,13 +72,10 @@ function CommentEditor({
       });
     }
 
-    stopEditing();
+    clearPendingComment();
   };
   const handleCancel = () => {
-    if (comment.content === "") {
-      clearPendingComment();
-    }
-    stopEditing();
+    clearPendingComment();
   };
 
   return (

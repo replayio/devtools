@@ -19,7 +19,6 @@ function CommentContainer({ comment }: { comment: any }) {
 function VideoComment({
   comment,
   canvas,
-  shouldParsePosition = false,
   setHoveredComment,
   activeComment,
   hoveredComment,
@@ -28,11 +27,11 @@ function VideoComment({
     return null;
   }
 
-  console.log("pos", comment.position, shouldParsePosition);
-
   const { scale } = canvas;
-  const position = shouldParsePosition ? JSON.parse(comment.position) : comment.position;
-  console.log(position);
+  const position =
+    typeof comment.position == "string" ? JSON.parse(comment.position) : comment.position;
+
+  console.log({ comment, position });
   const [focused, setFocused] = useState(false);
 
   const onMarkerClick = () => {
