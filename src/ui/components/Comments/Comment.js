@@ -9,6 +9,26 @@ import CommentEditor from "ui/components/Comments/CommentEditor";
 import CommentDropdownPanel from "ui/components/Comments/CommentDropdownPanel";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 
+function getShowDropdown(comment, editing) {
+  const { isAuthenticated, user } = useAuth0();
+  const {
+    parent_id,
+    user: { auth_id },
+  } = comment;
+
+  if (editing || !isAuthenticated) {
+    return false;
+  }
+
+  // Don't show the dropdown for replies that don't belong
+  // to the user, since there's no action for them to do then.
+  if (parent_id && auth_id != user.sub) {
+    return false;
+  }
+
+  return true;
+}
+
 function Comment({ comment, currentTime, seek }) {
   const { isAuthenticated } = useAuth0();
 
@@ -42,6 +62,8 @@ function Comment({ comment, currentTime, seek }) {
     );
   }
 
+  const showDropdown = getShowDropdown(comment, editing);
+
   return (
     <div className="comment-container" ref={commentEl}>
       <div
@@ -58,7 +80,7 @@ function Comment({ comment, currentTime, seek }) {
         ) : (
           <CommentBody comment={comment} startEditing={() => setEditing(true)} />
         )}
-        {!editing && isAuthenticated ? (
+        {showDropdown ? (
           <div className="comment-dropdown" onClick={e => e.stopPropagation()}>
             <PortalDropdown
               buttonContent={<div className="dropdown-button">⋯</div>}
