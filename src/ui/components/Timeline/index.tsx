@@ -88,7 +88,6 @@ class Timeline extends Component<PropsFromRedux> {
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != mouseTime) {
-      paintGraphicsAtTime(mouseTime);
       let offset = getVisiblePosition({ time: mouseTime, zoom: zoomRegion }) * this.overlayWidth;
       setTimelineToTime({ time: mouseTime, offset });
     }

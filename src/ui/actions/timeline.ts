@@ -2,14 +2,13 @@ import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "@recordr
 import { Pause, ThreadFront } from "protocol/thread";
 import { log } from "protocol/socket";
 import {
-  screenshotCache,
   addLastScreen,
   getGraphicsAtTime,
   paintGraphics,
   mostRecentPaintOrMouseEvent,
-  getMostRecentPaintPoint,
   nextPaintOrMouseEvent,
   nextPaintEvent,
+  paintGraphicsAtTime,
   previousPaintEvent,
 } from "protocol/graphics";
 import { actions } from "ui/actions";
@@ -137,6 +136,7 @@ export function setTimelineToTime({
 }): UIThunkAction {
   return async ({ dispatch }) => {
     try {
+      paintGraphicsAtTime(time);
       dispatch(updateTooltip({ left: offset }));
       dispatch(setTimelineState({ hoverTime: time }));
     } catch {}
@@ -329,9 +329,8 @@ function playback(startTime: number, endTime: number): UIThunkAction {
 
 export function goToNextPaint(): UIThunkAction {
   return ({ dispatch, getState }) => {
-    const state = getState();
-    const currentTime = selectors.getCurrentTime(state);
-    const { startTime } = selectors.getZoomRegion(state);
+    const currentTime = selectors.getCurrentTime(getState());
+    const { startTime } = selectors.getZoomRegion(getState());
 
     if (currentTime == startTime) {
       return;
@@ -349,9 +348,8 @@ export function goToNextPaint(): UIThunkAction {
 
 export function goToPrevPaint(): UIThunkAction {
   return ({ dispatch, getState }) => {
-    const state = getState();
-    const currentTime = selectors.getCurrentTime(state);
-    const { endTime } = selectors.getZoomRegion(state);
+    const currentTime = selectors.getCurrentTime(getState());
+    const { endTime } = selectors.getZoomRegion(getState());
 
     if (currentTime == endTime) {
       return;
@@ -368,7 +366,12 @@ export function goToPrevPaint(): UIThunkAction {
 }
 
 export function setHoveredPoint(hoveredPoint: HoveredPoint | null): UIThunkAction {
-  return ({ dispatch }) => {
+  return ({ dispatch, getState }) => {
+    if (hoveredPoint) {
+      paintGraphicsAtTime(hoveredPoint.time);
+    } else {
+      paintGraphicsAtTime(selectors.getCurrentTime(getState()));
+    }
     dispatch({ type: "set_hovered_point", hoveredPoint });
   };
 }

@@ -6,8 +6,6 @@
 
 import { ThreadFront } from "protocol/thread";
 import { setTimelineState, setHoveredPoint } from "ui/actions/timeline";
-import { paintGraphicsAtTime } from "protocol/graphics";
-import { selectors } from "ui/reducers";
 
 export function highlightDomElement(grip) {
   return async ({ toolbox }) => {
@@ -62,12 +60,10 @@ export function onMessageHover(type, message) {
       };
       dispatch(setTimelineState({ hoveredMessageId: message.id }));
       dispatch(setHoveredPoint(hoveredPoint));
-      paintGraphicsAtTime(message.executionPointTime);
     }
     if (type == "mouseleave") {
       dispatch(setTimelineState({ hoveredMessageId: null }));
       dispatch(setHoveredPoint(null));
-      paintGraphicsAtTime(selectors.getCurrentTime(getState()));
     }
   };
 }
