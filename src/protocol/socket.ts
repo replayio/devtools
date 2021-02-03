@@ -41,7 +41,7 @@ export function initSocket(store: UIStore, address?: string) {
 
   socket.onopen = makeInfallible(onSocketOpen);
   socket.onclose = makeInfallible(() => store.dispatch(onSocketClose()));
-  socket.onerror = makeInfallible(() => store.dispatch(onSocketError()));
+  socket.onerror = makeInfallible((evt: Event) => store.dispatch(onSocketError(evt)));
   socket.onmessage = makeInfallible(onSocketMessage);
 }
 
@@ -133,7 +133,9 @@ function onSocketClose() {
   };
 }
 
-function onSocketError() {
+function onSocketError(evt: Event) {
+  console.error("Socket Error", evt);
+  willClose = true;
   return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
     log("Socket Error");
     dispatch(
