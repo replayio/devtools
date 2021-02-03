@@ -238,10 +238,7 @@ export function addHighlightToTargetSiblings(target, props) {
     // properties like innerHTML can't be checked on nextSibling
     // without creating a flow error even if the node is an element type.
     while (
-      nextSibling &&
-      nextElementSibling &&
-      nextSibling.nodeType === 1 &&
-      nextElementSibling.className.includes(tokenType) &&
+      nextElementSibling?.className.includes(tokenType) &&
       previewExpression.includes(nextElementSibling.innerHTML)
     ) {
       // All checks passed, add highlight and continue the search.
@@ -255,11 +252,8 @@ export function addHighlightToTargetSiblings(target, props) {
     let previousElementSibling = target.previousElementSibling;
 
     while (
-      previousSibling &&
-      previousElementSibling &&
-      previousSibling.nodeType === 1 &&
-      previousElementSibling.className.includes(tokenType) &&
-      previewExpression.includes(previousElementSibling.innerHTML)
+      previousElementSibling?.className.includes(tokenType) &&
+      previewExpression?.includes(previousElementSibling.innerHTML)
     ) {
       // All checks passed, add highlight and continue the search.
       previousElementSibling.classList.add("preview-token");
@@ -275,12 +269,12 @@ export function removeHighlightForTargetSiblings(target) {
   // If they also have the highlight class 'preview-token',
   // remove that class.
   let nextSibling = target.nextElementSibling;
-  while (nextSibling && nextSibling.className.includes("preview-token")) {
+  while (nextSibling?.className.includes("preview-token")) {
     nextSibling.classList.remove("preview-token");
     nextSibling = nextSibling.nextElementSibling;
   }
   let previousSibling = target.previousElementSibling;
-  while (previousSibling && previousSibling.className.includes("preview-token")) {
+  while (previousSibling?.className.includes("preview-token")) {
     previousSibling.classList.remove("preview-token");
     previousSibling = previousSibling.previousElementSibling;
   }

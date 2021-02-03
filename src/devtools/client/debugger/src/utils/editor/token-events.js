@@ -52,7 +52,8 @@ function isValidToken(target) {
     return false;
   }
 
-  if (target.closest(".popover")) {
+  const invalidContainers = [".popover", ".breakpont-panel"];
+  if (invalidContainers.some(selector => target.closest(selector))) {
     return false;
   }
 
