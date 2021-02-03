@@ -57,6 +57,9 @@ async function initialize() {
     window.mouseClientY = e.clientY;
   });
   window.elementIsHovered = elem => {
+    if (!elem) {
+      return false;
+    }
     const { left, top, right, bottom } = elem.getBoundingClientRect();
     const { mouseClientX, mouseClientY } = window;
     return (
