@@ -47,9 +47,6 @@ function CommentEditor({ comment, clearPendingComment, pendingComment }) {
     } else {
       clearPendingComment();
     }
-
-    // Move this down here so it always happens
-    // clearPendingComment();
   };
   const handleExistingSave = () => {
     if (!inputValue) {
@@ -85,7 +82,7 @@ function CommentEditor({ comment, clearPendingComment, pendingComment }) {
           {comment.parent_id ? "Reply" : "Save"}
         </button>
       </div>
-      <CommentTool comment={comment} />
+      {pendingComment.parent_id ? null : <CommentTool comment={comment} />}
     </div>
   );
 }

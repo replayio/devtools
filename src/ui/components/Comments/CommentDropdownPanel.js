@@ -27,10 +27,6 @@ function CommentDropdownPanel({ comment, onItemClick, setPendingComment, recordi
       point: ThreadFront.currentPoint,
       has_frames: ThreadFront.currentPointHasFrames,
       parent_id: comment.id,
-      position: {
-        x: canvas.width * 0.5,
-        y: canvas.height * 0.5,
-      },
     };
 
     setPendingComment(pendingComment);

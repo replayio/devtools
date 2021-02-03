@@ -9,6 +9,8 @@ import "./CommentsOverlay.css";
 function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime, setHoveredComment }) {
   const { comments: hasuraComments } = hooks.useGetComments(recordingId);
 
+  console.log({ hasuraComments });
+
   if (!canvas) {
     return null;
   }
@@ -26,7 +28,9 @@ function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime, set
     comments.push(pendingComment);
   }
 
-  const commentsAtTime = comments.filter(comment => comment && comment.time == currentTime);
+  const commentsAtTime = comments.filter(
+    comment => comment && comment.position && comment.time == currentTime
+  );
 
   return (
     <div
