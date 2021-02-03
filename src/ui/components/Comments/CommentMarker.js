@@ -35,7 +35,7 @@ class CommentMarker extends React.Component {
   };
 
   render() {
-    const { comment, comments, currentTime, zoomRegion } = this.props;
+    const { comment, comments, currentTime, zoomRegion, setHoveredComment } = this.props;
 
     // We don't want to show the replies on the timeline
     // just the parent comment.
@@ -55,6 +55,8 @@ class CommentMarker extends React.Component {
         className={classnames("img comment-marker", {
           paused: pausedAtComment,
         })}
+        onMouseEnter={() => setHoveredComment(comment.id)}
+        onMouseLeave={() => setHoveredComment(null)}
         style={{
           left: `${this.calculateLeftOffset(time)}%`,
         }}
@@ -72,5 +74,6 @@ export default connect(
   }),
   {
     seek: actions.seek,
+    setHoveredComment: actions.setHoveredComment,
   }
 )(CommentMarker);

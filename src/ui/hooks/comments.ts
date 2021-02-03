@@ -34,11 +34,15 @@ const ADD_COMMENT = gql`
 `;
 
 const UPDATE_COMMENT_CONTENT = gql`
-  mutation UpdateCommentContent($newContent: String, $commentId: uuid) {
-    update_comments(_set: { content: $newContent }, where: { id: { _eq: $commentId } }) {
+  mutation UpdateCommentContent($newContent: String, $commentId: uuid, $position: String) {
+    update_comments(
+      _set: { content: $newContent, position: $position }
+      where: { id: { _eq: $commentId } }
+    ) {
       returning {
         id
         content
+        position
       }
     }
   }

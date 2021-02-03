@@ -1,13 +1,21 @@
 import React, { useState, useRef, useEffect } from "react";
 import { connect } from "react-redux";
+import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
+import CommentTool from "ui/components/shared/CommentTool";
 
-function CommentEditor({ comment, stopEditing, clearPendingComment }) {
+function CommentEditor({
+  comment,
+  stopEditing,
+  clearPendingComment,
+  pendingComment,
+  activeComment,
+  setActiveComment,
+}) {
   const [inputValue, setInputValue] = useState(comment.content);
   const textareaNode = useRef(null);
   const editorNode = useRef(null);
-  const intervalKey = useRef(null);
 
   const addComment = hooks.useAddComment(() => clearPendingComment());
   const updateComment = hooks.useUpdateComment(stopEditing);
@@ -18,16 +26,12 @@ function CommentEditor({ comment, stopEditing, clearPendingComment }) {
     textareaNode.current.focus();
     textareaNode.current.setSelectionRange(length, length);
 
-    // To avoid open editors from lingering without the user realizing,
-    // we close editing mode once they shift focus from the comment editor.
-    intervalKey.current = setInterval(function checkFocusInEditor() {
-      if (!editorNode.current.contains(document.activeElement)) {
-        handleCancel();
-        clearInterval(intervalKey.current);
-      }
-    }, 1000);
+    if (!pendingComment) {
+      console.log("is this running");
+      setActiveComment(comment);
+    }
 
-    return () => clearInterval(intervalKey.current);
+    return () => setActiveComment(null);
   }, []);
 
   const onKeyDown = e => {
@@ -62,8 +66,13 @@ function CommentEditor({ comment, stopEditing, clearPendingComment }) {
     if (!inputValue) {
       deleteComment({ variables: { commentId: comment.id } });
     } else {
+      console.log(">>", activeComment.position, JSON.stringify(activeComment.position));
       updateComment({
-        variables: { newContent: inputValue, commentId: comment.id },
+        variables: {
+          newContent: inputValue,
+          commentId: comment.id,
+          position: activeComment.position,
+        },
       });
     }
 
@@ -92,8 +101,18 @@ function CommentEditor({ comment, stopEditing, clearPendingComment }) {
           {comment.parent_id ? "Reply" : "Save"}
         </button>
       </div>
+      <CommentTool comment={comment} />
     </div>
   );
 }
 
-export default connect(null, { clearPendingComment: actions.clearPendingComment })(CommentEditor);
+export default connect(
+  state => ({
+    pendingComment: selectors.getPendingComment(state),
+    activeComment: selectors.getActiveComment(state),
+  }),
+  {
+    clearPendingComment: actions.clearPendingComment,
+    setActiveComment: actions.setActiveComment,
+  }
+)(CommentEditor);

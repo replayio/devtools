@@ -16,7 +16,7 @@
 
 .canvas-overlay .canvas-comment-marker {
   padding: 4px;
-  background: var(--primary-accent);
+  background: var(--theme-icon-color);
   border-radius: 100%;
   transform: translateX(-50%);
   transform: translateY(-50%);
@@ -24,9 +24,13 @@
   cursor: pointer;
 }
 
-.canvas-overlay .canvas-comment-marker:hover {
+.canvas-overlay .canvas-comment-marker:hover,
+.canvas-overlay .canvas-comment-marker.active,
+.canvas-overlay .canvas-comment-marker.highlighted {
   padding: 6px;
   margin-left: -2px;
+  background: var(--primary-accent);
+  transition: background 200ms;
 }
 
 .canvas-overlay .canvas-comment .img.location-marker {

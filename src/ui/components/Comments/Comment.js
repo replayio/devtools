@@ -9,7 +9,7 @@ import CommentEditor from "ui/components/Comments/CommentEditor";
 import CommentDropdownPanel from "ui/components/Comments/CommentDropdownPanel";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 
-function Comment({ comment, currentTime, seek }) {
+function Comment({ comment, currentTime, seek, hoveredComment, setHoveredComment }) {
   const { isAuthenticated } = useAuth0();
 
   const [editing, setEditing] = useState(false);
@@ -47,10 +47,12 @@ function Comment({ comment, currentTime, seek }) {
       <div
         className={classnames(
           "comment",
-          { selected: currentTime === comment.time },
+          { selected: currentTime === comment.time, highlighted: comment.id == hoveredComment },
           { "child-comment": comment.parent_id }
         )}
         onClick={seekToComment}
+        onMouseEnter={() => setHoveredComment(comment.id)}
+        onMouseLeave={() => setHoveredComment(null)}
       >
         <img src={comment.user.picture} className="comment-picture" />
         {editing ? (
@@ -116,8 +118,10 @@ function CommentBody({ comment, startEditing }) {
 export default connect(
   state => ({
     currentTime: selectors.getCurrentTime(state),
+    hoveredComment: selectors.getHoveredComment(state),
   }),
   {
     seek: actions.seek,
+    setHoveredComment: actions.setHoveredComment,
   }
 )(Comment);

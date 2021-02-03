@@ -55,6 +55,8 @@ export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { acti
 export type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment };
 export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
 export type SetCommentPointer = Action<"set_comment_pointer"> & { value: boolean };
+export type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
+export type SetActiveComment = Action<"set_active_comment"> & { comment: any };
 
 export type AppAction =
   | SetupAppAction
@@ -76,7 +78,9 @@ export type AppAction =
   | SetIsNodePickerActive
   | SetPendingComment
   | SetCanvas
-  | SetCommentPointer;
+  | SetCommentPointer
+  | SetHoveredComment
+  | SetActiveComment;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -232,4 +236,12 @@ export function setCanvas(canvas: Canvas): SetCanvas {
 
 export function setCommentPointer(value: boolean): SetCommentPointer {
   return { type: "set_comment_pointer", value };
+}
+
+export function setHoveredComment(comment: any): SetHoveredComment {
+  return { type: "set_hovered_comment", comment };
+}
+
+export function setActiveComment(comment: any): SetActiveComment {
+  return { type: "set_active_comment", comment };
 }

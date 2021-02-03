@@ -1,5 +1,5 @@
 import { connect, ConnectedProps } from "react-redux";
-import React from "react";
+import React, { useEffect } from "react";
 import { getDevicePixelRatio } from "protocol/graphics";
 import { ThreadFront } from "protocol/thread";
 import "./CommentTool.css";
@@ -22,14 +22,10 @@ const mouseEventCanvasPosition = (e: MouseEvent) => {
   }
 
   const scale = bounds.width / canvas!.offsetWidth;
-  const pixelRatio = getDevicePixelRatio();
-  if (!pixelRatio) {
-    return null;
-  }
 
   return {
-    x: (e.clientX - bounds.left) / scale / pixelRatio,
-    y: (e.clientY - bounds.top) / scale / pixelRatio,
+    x: (e.clientX - bounds.left) / scale,
+    y: (e.clientY - bounds.top) / scale,
   };
 };
 
@@ -37,6 +33,9 @@ function CommentTool({
   currentTime,
   recordingId,
   viewMode,
+  pendingComment,
+  comment,
+  setActiveComment,
   setPendingComment,
   setSelectedPanel,
   setCommentPointer,
@@ -51,10 +50,7 @@ function CommentTool({
     document.getElementById("video")!.classList.remove("location-marker");
     document.getElementById("video")!.removeEventListener("mouseup", onClickInCanvas);
   };
-
   const onClickInCanvas = async (e: MouseEvent) => {
-    removeListeners();
-
     if (e.target !== document.querySelector("canvas#graphics")) {
       return;
     }
@@ -63,23 +59,37 @@ function CommentTool({
       setSelectedPanel("comments");
     }
 
-    const pendingComment = {
-      content: "",
-      recording_id: recordingId,
-      time: currentTime,
-      point: ThreadFront.currentPoint,
-      has_frames: ThreadFront.currentPointHasFrames,
-      position: mouseEventCanvasPosition(e),
-    };
+    // setPosition(mouseEventCanvasPosition(e));
+    if (pendingComment) {
+      console.log("pendingComment");
+      setPendingComment({ ...comment, position: mouseEventCanvasPosition(e) });
+    } else {
+      const newActiveComment = {
+        ...comment,
+        position: JSON.stringify(mouseEventCanvasPosition(e)),
+      };
+      console.log("activeComment", newActiveComment);
+      setActiveComment(newActiveComment);
+    }
 
-    setPendingComment(pendingComment);
+    // const pendingComment = {
+    //   content: "",
+    //   recording_id: recordingId,
+    //   time: currentTime,
+    //   point: ThreadFront.currentPoint,
+    //   has_frames: ThreadFront.currentPointHasFrames,
+    //   position: mouseEventCanvasPosition(e),
+    // };
+
+    // setPendingComment({ ...pendingComment, position: mouseEventCanvasPosition(e) });
   };
 
-  return (
-    <button className="comment-tool" onClick={addListeners}>
-      Comment Tool
-    </button>
-  );
+  useEffect(() => {
+    addListeners();
+    return () => removeListeners();
+  }, []);
+
+  return null;
 }
 
 const connector = connect(
@@ -87,11 +97,13 @@ const connector = connect(
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
     viewMode: selectors.getViewMode(state),
+    pendingComment: selectors.getPendingComment(state),
   }),
   {
     setSelectedPanel: actions.setSelectedPanel,
     setPendingComment: actions.setPendingComment,
     setCommentPointer: actions.setCommentPointer,
+    setActiveComment: actions.setActiveComment,
   }
 );
 
