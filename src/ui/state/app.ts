@@ -45,6 +45,8 @@ export interface AppState {
   pendingComment: PendingComment | null;
   canvas: Canvas | null;
   commentPointer: boolean;
+  hoveredComment: any;
+  activeComment: any;
 }
 
 export interface AnalysisPoints {

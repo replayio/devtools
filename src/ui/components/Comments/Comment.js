@@ -29,9 +29,7 @@ function getShowDropdown(comment, editing) {
   return true;
 }
 
-function Comment({ comment, currentTime, seek }) {
-  const { isAuthenticated } = useAuth0();
-
+function Comment({ comment, currentTime, seek, hoveredComment, setHoveredComment }) {
   const [editing, setEditing] = useState(false);
   const commentEl = useRef(null);
   const [menuExpanded, setMenuExpanded] = useState(false);
@@ -69,10 +67,12 @@ function Comment({ comment, currentTime, seek }) {
       <div
         className={classnames(
           "comment",
-          { selected: currentTime === comment.time },
+          { selected: currentTime === comment.time, highlighted: comment.id == hoveredComment },
           { "child-comment": comment.parent_id }
         )}
         onClick={seekToComment}
+        onMouseEnter={() => setHoveredComment(comment.id)}
+        onMouseLeave={() => setHoveredComment(null)}
       >
         <img src={comment.user.picture} className="comment-picture" />
         {editing ? (
@@ -138,8 +138,10 @@ function CommentBody({ comment, startEditing }) {
 export default connect(
   state => ({
     currentTime: selectors.getCurrentTime(state),
+    hoveredComment: selectors.getHoveredComment(state),
   }),
   {
     seek: actions.seek,
+    setHoveredComment: actions.setHoveredComment,
   }
 )(Comment);

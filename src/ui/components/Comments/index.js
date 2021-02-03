@@ -8,7 +8,7 @@ import { sortBy } from "lodash";
 
 import "./Comments.css";
 
-function Comments({ playback, recordingId, pendingComment }) {
+function Comments({ recordingId, pendingComment }) {
   const { comments, loading, error } = hooks.useGetComments(recordingId);
 
   // Don't render anything if the comments are loading. For now, we fail silently
