@@ -29,9 +29,7 @@ const mouseEventCanvasPosition = (e: MouseEvent) => {
 
 function CommentTool({
   viewMode,
-  pendingComment,
   comment,
-  setActiveComment,
   setPendingComment,
   setSelectedPanel,
   setCommentPointer,
@@ -55,15 +53,7 @@ function CommentTool({
       setSelectedPanel("comments");
     }
 
-    if (pendingComment) {
-      setPendingComment({ ...comment, position: mouseEventCanvasPosition(e) });
-    } else {
-      const newActiveComment = {
-        ...comment,
-        position: JSON.stringify(mouseEventCanvasPosition(e)),
-      };
-      setActiveComment(newActiveComment);
-    }
+    setPendingComment({ ...comment, position: mouseEventCanvasPosition(e) });
   };
 
   useEffect(() => {

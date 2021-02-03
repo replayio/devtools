@@ -45,10 +45,7 @@ function CommentDropdownPanel({ comment, onItemClick, setPendingComment, recordi
       point: comment.point,
       has_frames: comment.has_frames,
       user: comment.user,
-      position: {
-        x: canvas.width * 0.5,
-        y: canvas.height * 0.5,
-      },
+      position: comment.position,
     };
 
     setPendingComment(pendingComment);

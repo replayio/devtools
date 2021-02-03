@@ -20,7 +20,7 @@ function VideoComment({
   comment,
   canvas,
   setHoveredComment,
-  activeComment,
+  pendingComment,
   hoveredComment,
 }: PropsFromRedux) {
   if (!canvas) {
@@ -31,7 +31,6 @@ function VideoComment({
   const position =
     typeof comment.position == "string" ? JSON.parse(comment.position) : comment.position;
 
-  console.log({ comment, position });
   const [focused, setFocused] = useState(false);
 
   const onMarkerClick = () => {
@@ -40,6 +39,8 @@ function VideoComment({
   const onMaskClick = () => {
     setFocused(false);
   };
+
+  console.log({ comment, hoveredComment }, hoveredComment?.id == comment.id);
 
   return (
     <div
@@ -50,8 +51,8 @@ function VideoComment({
       }}
     >
       <div
-        className={`canvas-comment-marker ${activeComment?.id == comment.id ? "active" : ""} ${
-          hoveredComment?.id == comment.id ? "highlighted" : ""
+        className={`canvas-comment-marker ${pendingComment?.id == comment.id ? "active" : ""} ${
+          hoveredComment == comment.id ? "highlighted" : ""
         }`}
         onMouseEnter={() => setHoveredComment(comment.id)}
         onMouseLeave={() => setHoveredComment(null)}
@@ -75,7 +76,6 @@ const connector = connect(
     pendingComment: selectors.getPendingComment(state),
     recordingId: selectors.getRecordingId(state),
     canvas: selectors.getCanvas(state),
-    activeComment: selectors.getActiveComment(state),
     hoveredComment: selectors.getHoveredComment(state),
   }),
   { setHoveredComment: actions.setHoveredComment }

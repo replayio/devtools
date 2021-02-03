@@ -79,6 +79,7 @@ export interface PendingComment {
   point: string;
   has_frames: boolean;
   position: CommentPosition | null;
+  id?: string;
 }
 
 interface CommentPosition {

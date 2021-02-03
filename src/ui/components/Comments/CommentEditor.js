@@ -17,8 +17,8 @@ function CommentEditor({
   const textareaNode = useRef(null);
   const editorNode = useRef(null);
 
-  const addComment = hooks.useAddComment(() => clearPendingComment());
-  const updateComment = hooks.useUpdateComment(stopEditing);
+  const addComment = hooks.useAddComment(clearPendingComment);
+  const updateComment = hooks.useUpdateComment(clearPendingComment);
   const deleteComment = hooks.useDeleteComment();
 
   useEffect(() => {
@@ -62,24 +62,22 @@ function CommentEditor({
     if (!inputValue) {
       deleteComment({ variables: { commentId: comment.id } });
     } else {
-      console.log(">>", activeComment.position, JSON.stringify(activeComment.position));
+      console.log(pendingComment.position);
       updateComment({
         variables: {
           newContent: inputValue,
           commentId: comment.id,
-          position: activeComment.position,
+          position: JSON.stringify(pendingComment.position),
         },
       });
     }
-
-    clearPendingComment();
   };
   const handleCancel = () => {
     clearPendingComment();
   };
 
   return (
-    <div className="editor" ref={editorNode}>
+    <div className="editor" ref={editorNode} onClick={e => e.stopPropagation()}>
       <textarea
         defaultValue={inputValue}
         onChange={e => setInputValue(e.target.value)}

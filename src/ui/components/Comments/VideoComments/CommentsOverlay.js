@@ -27,11 +27,12 @@ function CommentsOverlay({
   // They're not included in the comments data from the query, so we have to insert
   // them manually here. If a pending comment has an ID, it already exists in the
   // comments data and we don't have to insert it.
-  if (pendingComment && !pendingComment.id) {
-    comments.push(pendingComment);
-  }
+  // if (pendingComment && !pendingComment.id) {
+  const filteredComments = comments.filter(comment => pendingComment?.id != comment.id);
+  filteredComments.push(pendingComment);
+  // }
 
-  const commentsAtTime = comments.filter(comment => comment && comment.time == currentTime);
+  const commentsAtTime = filteredComments.filter(comment => comment && comment.time == currentTime);
 
   return (
     <div
