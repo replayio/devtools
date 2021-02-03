@@ -73,7 +73,6 @@ const connector = connect(
     setSelectedPanel: actions.setSelectedPanel,
     setPendingComment: actions.setPendingComment,
     setCommentPointer: actions.setCommentPointer,
-    setActiveComment: actions.setActiveComment,
   }
 );
 type PropsFromParent = {

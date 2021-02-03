@@ -6,14 +6,7 @@ import hooks from "ui/hooks";
 import VideoComment from "./VideoComment";
 import "./CommentsOverlay.css";
 
-function CommentsOverlay({
-  pendingComment,
-  activeComment,
-  canvas,
-  recordingId,
-  currentTime,
-  setHoveredComment,
-}) {
+function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime, setHoveredComment }) {
   const { comments: hasuraComments } = hooks.useGetComments(recordingId);
 
   if (!canvas) {
@@ -21,18 +14,19 @@ function CommentsOverlay({
   }
 
   const { top, left, width, height, scale } = canvas;
-  const comments = [...hasuraComments];
 
-  // New comments that haven't been sent to Hasura will not have an associated ID.
-  // They're not included in the comments data from the query, so we have to insert
-  // them manually here. If a pending comment has an ID, it already exists in the
-  // comments data and we don't have to insert it.
-  // if (pendingComment && !pendingComment.id) {
-  const filteredComments = comments.filter(comment => pendingComment?.id != comment.id);
-  filteredComments.push(pendingComment);
-  // }
+  let comments = [...hasuraComments];
 
-  const commentsAtTime = filteredComments.filter(comment => comment && comment.time == currentTime);
+  // We replace the hasuraComment that's currently being edited with our own
+  // pendingComment. This lets us update the pendingComment as the user
+  // move the location marker around the video and have it visually update
+  // the displayed comments.
+  if (pendingComment) {
+    comments = hasuraComments.filter(comment => pendingComment?.id != comment.id);
+    comments.push(pendingComment);
+  }
+
+  const commentsAtTime = comments.filter(comment => comment && comment.time == currentTime);
 
   return (
     <div
@@ -53,12 +47,6 @@ function CommentsOverlay({
             setHoveredComment={setHoveredComment}
           />
         ))}
-        {/* {pendingComment ? (
-          <VideoComment comment={pendingComment} scale={scale} setHoveredComment={() => {}} />
-        ) : null} */}
-        {/* {activeComment ? (
-          <VideoComment comment={activeComment} scale={scale} setHoveredComment={() => {}} />
-        ) : null} */}
       </div>
     </div>
   );
@@ -68,7 +56,6 @@ export default connect(
   state => ({
     currentTime: selectors.getCurrentTime(state),
     pendingComment: selectors.getPendingComment(state),
-    activeComment: selectors.getActiveComment(state),
     recordingId: selectors.getRecordingId(state),
     canvas: selectors.getCanvas(state),
   }),

@@ -46,7 +46,6 @@ export interface AppState {
   canvas: Canvas | null;
   commentPointer: boolean;
   hoveredComment: any;
-  activeComment: any;
 }
 
 export interface AnalysisPoints {

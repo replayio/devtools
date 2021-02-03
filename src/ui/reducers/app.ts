@@ -31,7 +31,6 @@ function initialAppState(): AppState {
     canvas: null,
     commentPointer: false,
     hoveredComment: null,
-    activeComment: null,
   };
 }
 
@@ -167,13 +166,6 @@ export default function update(
       };
     }
 
-    case "set_active_comment": {
-      return {
-        ...state,
-        activeComment: action.comment,
-      };
-    }
-
     default: {
       return state;
     }
@@ -209,4 +201,3 @@ export const getPendingComment = (state: UIState) => state.app.pendingComment;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getCommentPointer = (state: UIState) => state.app.commentPointer;
 export const getHoveredComment = (state: UIState) => state.app.hoveredComment;
-export const getActiveComment = (state: UIState) => state.app.activeComment;

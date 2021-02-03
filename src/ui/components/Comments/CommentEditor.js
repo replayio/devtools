@@ -5,14 +5,7 @@ import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import CommentTool from "ui/components/shared/CommentTool";
 
-function CommentEditor({
-  comment,
-  stopEditing,
-  clearPendingComment,
-  pendingComment,
-  activeComment,
-  setActiveComment,
-}) {
+function CommentEditor({ comment, clearPendingComment, pendingComment }) {
   const [inputValue, setInputValue] = useState(comment.content);
   const textareaNode = useRef(null);
   const editorNode = useRef(null);
@@ -100,10 +93,8 @@ function CommentEditor({
 export default connect(
   state => ({
     pendingComment: selectors.getPendingComment(state),
-    activeComment: selectors.getActiveComment(state),
   }),
   {
     clearPendingComment: actions.clearPendingComment,
-    setActiveComment: actions.setActiveComment,
   }
 )(CommentEditor);
