@@ -51,6 +51,7 @@
   width: 100%;
   height: 32px;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .timeline .progress {
@@ -157,7 +158,7 @@
   z-index: var(--z-index-1--timeline-tooltip);
   background: var(--theme-toolbar-background);
   transform: translateX(-50%);
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 /* Add Comment Button */
