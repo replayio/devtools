@@ -39,7 +39,7 @@ function CommentEditor({ comment, clearPendingComment, pendingComment }) {
       const newComment = {
         ...comment,
         content: inputValue,
-        position: comment.position ? JSON.stringify(comment.position) : null,
+        position: comment.position ? comment.position : null,
       };
       addComment({
         variables: { object: newComment },
@@ -56,7 +56,7 @@ function CommentEditor({ comment, clearPendingComment, pendingComment }) {
         variables: {
           newContent: inputValue,
           commentId: comment.id,
-          position: pendingComment.position ? JSON.stringify(pendingComment.position) : null,
+          position: pendingComment.position ? pendingComment.position : null,
         },
       });
     }
