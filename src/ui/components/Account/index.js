@@ -30,7 +30,7 @@ const GET_MY_RECORDINGS = gql`
     picture
   }
 
-  query MyRecordings($authId: String) {
+  query GetMyRecordings($authId: String) {
     users(where: { auth_id: { _eq: $authId } }) {
       ...avatarFields
       collaborators {
@@ -41,7 +41,7 @@ const GET_MY_RECORDINGS = gql`
           }
         }
       }
-      recordings {
+      recordings(where: { invalid: { _eq: false } }) {
         ...recordingFields
       }
     }

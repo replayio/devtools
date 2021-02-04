@@ -2,10 +2,14 @@ import React from "react";
 import { actions } from "ui/actions";
 import { connect } from "react-redux";
 import { gql, useMutation } from "@apollo/client";
+import moment from "moment";
 
-const DELETE_RECORDING = gql`
-  mutation DeleteRecording($recordingId: String) {
-    delete_recordings(where: { recording_id: { _eq: $recordingId } }) {
+const INVALIDATE_RECORDING = gql`
+  mutation InvalidateRecording($recordingId: uuid!, $deletedTime: timestamptz) {
+    update_recordings(
+      where: { id: { _eq: $recordingId } }
+      _set: { invalid: true, deleted_at: $deletedTime }
+    ) {
       returning {
         id
       }
@@ -21,12 +25,12 @@ const DropdownPanel = ({
   isPrivate,
   setModal,
 }) => {
-  const [deleteRecording] = useMutation(DELETE_RECORDING, {
+  const [deleteRecording] = useMutation(INVALIDATE_RECORDING, {
     refetchQueries: ["GetMyRecordings"],
   });
 
   const onDeleteRecording = async recordingId => {
-    await deleteRecording({ variables: { recordingId } });
+    await deleteRecording({ variables: { recordingId, deletedTime: moment().format() } });
   };
 
   return (
