@@ -41,7 +41,7 @@ const GET_MY_RECORDINGS = gql`
           }
         }
       }
-      recordings(where: { invalid: { _eq: false } }) {
+      recordings(where: { deleted_at: { _is_null: true } }) {
         ...recordingFields
       }
     }
