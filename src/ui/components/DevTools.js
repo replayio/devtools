@@ -89,6 +89,11 @@ function DevTools({
     return <SkeletonLoader content={message} />;
   }
 
+  if (data?.recordings?.[0]?.deleted_at) {
+    setExpectedError({ message: "This recording has been deleted." });
+    return null;
+  }
+
   const isAuthorized = getIsAuthorized({ data });
 
   if (!isAuthorized) {

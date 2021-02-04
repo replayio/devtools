@@ -4,8 +4,8 @@ import { connect } from "react-redux";
 import { gql, useMutation } from "@apollo/client";
 
 const DELETE_RECORDING = gql`
-  mutation DeleteRecording($recordingId: String) {
-    delete_recordings(where: { recording_id: { _eq: $recordingId } }) {
+  mutation DeleteRecording($recordingId: uuid!, $deletedAt: String) {
+    update_recordings(where: { id: { _eq: $recordingId } }, _set: { deleted_at: $deletedAt }) {
       returning {
         id
       }
@@ -26,7 +26,7 @@ const DropdownPanel = ({
   });
 
   const onDeleteRecording = async recordingId => {
-    await deleteRecording({ variables: { recordingId } });
+    await deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } });
   };
 
   return (

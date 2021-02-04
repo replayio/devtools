@@ -70,6 +70,7 @@ export function useGetRecording(recordingId: RecordingId) {
           recordingTitle
           is_private
           date
+          deleted_at
         }
       }
     `,
