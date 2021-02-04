@@ -3,26 +3,29 @@ import { Action, Store } from "redux";
 import * as appActions from "./app";
 import * as timelineActions from "./timeline";
 import * as sessionActions from "./session";
+import * as commentsActions from "./comments";
 import { ThunkAction } from "ui/utils/thunk";
 import { UIState } from "ui/state";
-import type { AppAction } from "./app";
-import type { TimelineAction } from "./timeline";
+import type { AppActions } from "./app";
+import type { TimelineActions } from "./timeline";
+import type { CommentsAction } from "./comments";
+import { SessionActions } from "./session";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
 import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
 import { EventTooltipAction } from "devtools/client/inspector/markup/actions/eventTooltip";
-import { SessionAction } from "ui/actions/session";
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 import consoleActions from "devtools/client/webconsole/actions";
 
 type DebuggerAction = Action<"RESUME">;
 
 export type UIAction =
-  | AppAction
-  | TimelineAction
+  | AppActions
+  | TimelineActions
+  | CommentsAction
   | MarkupAction
   | EventTooltipAction
-  | SessionAction
+  | SessionActions
   | DebuggerAction;
 
 interface ThunkExtraArgs {
@@ -43,6 +46,7 @@ export type UIStore = Store<UIState, UIAction> & {
 export const actions = {
   ...appActions,
   ...timelineActions,
+  ...commentsActions,
   ...eventListeners,
   ...debuggerActions,
   ...consoleActions,

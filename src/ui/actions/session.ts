@@ -12,7 +12,7 @@ import { ExpectedError } from "ui/state/app";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & { error: sessionError };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
-export type SessionAction = SetExpectedErrorAction | SetUnexpectedErrorAction;
+export type SessionActions = SetExpectedErrorAction | SetUnexpectedErrorAction;
 
 declare global {
   interface Window {

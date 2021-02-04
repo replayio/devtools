@@ -1,4 +1,4 @@
-import { TimelineAction } from "ui/actions/timeline";
+import { TimelineActions } from "ui/actions/timeline";
 import { UIState } from "ui/state";
 import { TimelineState } from "ui/state/timeline";
 
@@ -22,7 +22,7 @@ function initialTimelineState(): TimelineState {
 
 export default function update(
   state: TimelineState = initialTimelineState(),
-  action: TimelineAction
+  action: TimelineActions
 ): TimelineState {
   switch (action.type) {
     case "set_zoom": {

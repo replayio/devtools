@@ -42,10 +42,7 @@ export interface AppState {
   hoveredLineNumberLocation: Location | null;
   events: Events;
   isNodePickerActive: boolean;
-  pendingComment: PendingComment | null;
   canvas: Canvas | null;
-  commentPointer: boolean;
-  hoveredComment: any;
 }
 
 export interface AnalysisPoints {
@@ -70,20 +67,6 @@ export interface Comment {
   updated_at: string;
   user_id: string;
   __typename: string;
-}
-
-export interface PendingComment {
-  recording_id: RecordingId | null;
-  time: number;
-  point: string;
-  has_frames: boolean;
-  position: CommentPosition | null;
-  id?: string;
-}
-
-interface CommentPosition {
-  x: number;
-  y: number;
 }
 
 export interface Canvas {
