@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { gql, useMutation } from "@apollo/client";
 
 const DELETE_RECORDING = gql`
-  mutation InvalidateRecording($recordingId: uuid!, $deletedAt: String) {
+  mutation DeleteRecording($recordingId: uuid!, $deletedAt: String) {
     update_recordings(where: { id: { _eq: $recordingId } }, _set: { deleted_at: $deletedAt }) {
       returning {
         id
