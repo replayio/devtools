@@ -12,17 +12,23 @@
 import { getLocationKey, isMatchingLocation } from "../utils/breakpoint";
 
 // eslint-disable-next-line max-len
-import { getBreakpointsList as getBreakpointsListSelector } from "../selectors/breakpoints";
+import { getBreakpointsList } from "../selectors/breakpoints";
+import assert from "../utils/assert";
 
 export function initialBreakpointsState() {
   return {
     breakpoints: {},
+    requestedBreakpoints: {},
     breakpointsDisabled: false,
   };
 }
 
 function update(state = initialBreakpointsState(), action) {
   switch (action.type) {
+    case "SET_REQUESTED_BREAKPOINT": {
+      return setRequestedBreakpoint(state, action);
+    }
+
     case "SET_BREAKPOINT": {
       return setBreakpoint(state, action);
     }
@@ -31,8 +37,12 @@ function update(state = initialBreakpointsState(), action) {
       return removeBreakpoint(state, action);
     }
 
+    case "REMOVE_REQUESTED_BREAKPOINT": {
+      return removeRequestedBreakpoint(state, action);
+    }
+
     case "REMOVE_BREAKPOINTS": {
-      return { ...state, breakpoints: {} };
+      return { ...state, breakpoints: {}, requestedBreakpoints: {} };
     }
 
     case "NAVIGATE": {
@@ -63,10 +73,25 @@ function update(state = initialBreakpointsState(), action) {
   return state;
 }
 
+function setRequestedBreakpoint(state, { location }) {
+  assert(!location.column);
+  const requestedId = getLocationKey(location);
+  const requestedBreakpoints = { ...state.requestedBreakpoints, [requestedId]: location };
+  return { ...state, requestedBreakpoints };
+}
+
 function setBreakpoint(state, { breakpoint }) {
-  const id = getLocationKey(breakpoint.location);
+  const location = breakpoint.location;
+  const id = getLocationKey(location);
   const breakpoints = { ...state.breakpoints, [id]: breakpoint };
-  return { ...state, breakpoints };
+  return { ...removeRequestedBreakpoint(state, { location }), breakpoints };
+}
+
+function removeRequestedBreakpoint(state, { location }) {
+  const requestedId = getLocationKey({ ...location, column: undefined });
+  const requestedBreakpoints = { ...state.requestedBreakpoints };
+  delete requestedBreakpoints[requestedId];
+  return { ...state, requestedBreakpoints };
 }
 
 function removeBreakpoint(state, { location }) {
@@ -81,10 +106,6 @@ function removeBreakpoint(state, { location }) {
 
 export function getBreakpointsMap(state) {
   return state.breakpoints.breakpoints;
-}
-
-export function getBreakpointsList(state) {
-  return getBreakpointsListSelector(state);
 }
 
 export function getBreakpointCount(state) {

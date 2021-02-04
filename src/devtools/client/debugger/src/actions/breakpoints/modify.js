@@ -14,6 +14,7 @@ import {
   getSource,
   getSourceContent,
   getBreakpointsList,
+  getRequestedBreakpointLocations,
   getPendingBreakpointList,
 } from "../../selectors";
 import { actions } from "ui/actions";
@@ -86,12 +87,20 @@ export function addBreakpoint(
   disabled = false,
   shouldCancel = () => false
 ) {
-  return async ({ dispatch, getState, sourceMaps, client }) => {
+  return async ({ dispatch, getState, client }) => {
     recordEvent("add_breakpoint");
 
     const { sourceId, column, line } = initialLocation;
 
+    dispatch({ type: "SET_REQUESTED_BREAKPOINT", location: { sourceId, line } });
+
     await dispatch(setBreakpointPositions({ sourceId, line }));
+
+    // check if the user deleted the requested breakpoint in the meantime
+    const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
+    if (!(getLocationKey({ sourceId, line }) in requestedBreakpointLocations)) {
+      return;
+    }
 
     const location = column
       ? getBreakpointPositionsForLocation(getState(), initialLocation)
@@ -177,6 +186,10 @@ export function runAnalysis(cx, initialLocation, options) {
     const analysisLocation = makeBreakpointLocation(getState(), location);
     client.runAnalysis(analysisLocation, options);
   };
+}
+
+export function removeRequestedBreakpoint(location) {
+  return { type: "REMOVE_REQUESTED_BREAKPOINT", location };
 }
 
 export function removeBreakpoint(cx, initialBreakpoint) {

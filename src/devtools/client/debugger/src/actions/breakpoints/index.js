@@ -10,6 +10,7 @@
  */
 
 import {
+  getRequestedBreakpointLocations,
   getBreakpointsList,
   getSelectedSource,
   getBreakpointAtLocation,
@@ -21,6 +22,7 @@ import { findClosestEnclosedSymbol } from "../../utils/ast";
 import {
   addBreakpoint,
   removeBreakpoint,
+  removeRequestedBreakpoint,
   enableBreakpoint,
   disableBreakpoint,
   runAnalysis,
@@ -108,6 +110,12 @@ export function removeBreakpointsInSource(cx, source) {
     const breakpoints = getBreakpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
       dispatch(removeBreakpoint(cx, breakpoint));
+    }
+    const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
+    for (const location of Object.values(requestedBreakpointLocations)) {
+      if (location.sourceId === source.id) {
+        dispatch(removeRequestedBreakpoint(location));
+      }
     }
   };
 }
@@ -253,7 +261,8 @@ export function addBreakpointAtColumn(cx, location) {
 }
 
 export function removeBreakpointsAtLine(cx, sourceId, line) {
-  return ({ dispatch, getState, client, sourceMaps }) => {
+  return ({ dispatch, getState }) => {
+    dispatch(removeRequestedBreakpoint({ sourceId, line }));
     const breakpointsAtLine = getBreakpointsForSource(getState(), sourceId, line);
     return dispatch(removeBreakpoints(cx, breakpointsAtLine));
   };
