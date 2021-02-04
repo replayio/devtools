@@ -15,7 +15,6 @@ import {
   PrimaryPanelName,
   ViewMode,
   Event,
-  PendingComment,
   ModalType,
   UploadInfo,
   Canvas,
@@ -52,12 +51,9 @@ export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_locat
   location: Location | null;
 };
 export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
-export type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment };
 export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
-export type SetCommentPointer = Action<"set_comment_pointer"> & { value: boolean };
-export type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 
-export type AppAction =
+export type AppActions =
   | SetupAppAction
   | LoadingAction
   | SetSessionIdAction
@@ -75,10 +71,7 @@ export type AppAction =
   | SetNarrowMode
   | SetHoveredLineNumberLocation
   | SetIsNodePickerActive
-  | SetPendingComment
-  | SetCanvas
-  | SetCommentPointer
-  | SetHoveredComment;
+  | SetCanvas;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -220,22 +213,6 @@ export function setIsNodePickerActive(active: boolean): SetIsNodePickerActive {
   return { type: "set_is_node_picker_active", active };
 }
 
-export function setPendingComment(comment: PendingComment): SetPendingComment {
-  return { type: "set_pending_comment", comment };
-}
-
-export function clearPendingComment() {
-  return { type: "set_pending_comment", comment: null };
-}
-
 export function setCanvas(canvas: Canvas): SetCanvas {
   return { type: "set_canvas", canvas };
-}
-
-export function setCommentPointer(value: boolean): SetCommentPointer {
-  return { type: "set_comment_pointer", value };
-}
-
-export function setHoveredComment(comment: any): SetHoveredComment {
-  return { type: "set_hovered_comment", comment };
 }

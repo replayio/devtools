@@ -1,5 +1,6 @@
 import { TimelineState } from "./timeline";
 import { AppState } from "./app";
+import { CommentsState } from "./comments";
 import { InspectorState } from "devtools/client/inspector/state";
 import { MarkupState } from "devtools/client/inspector/markup/state/markup";
 import { EventTooltipState } from "devtools/client/inspector/markup/state/eventTooltip";
@@ -11,6 +12,7 @@ import { ComputedState } from "devtools/client/inspector/computed/state";
 export interface UIState {
   timeline: TimelineState;
   app: AppState;
+  comments: CommentsState;
   inspector: InspectorState;
   markup: MarkupState;
   eventTooltip: EventTooltipState;

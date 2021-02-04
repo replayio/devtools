@@ -27,7 +27,7 @@ export type SetHoveredPoint = Action<"set_hovered_point"> & {
   hoveredPoint: HoveredPoint | null;
 };
 
-export type TimelineAction =
+export type TimelineActions =
   | SetTimelineStateAction
   | UpdateTooltipAction
   | SetZoomRegionAction

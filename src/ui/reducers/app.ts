@@ -1,7 +1,7 @@
 import { AppState } from "ui/state/app";
-import { AppAction } from "ui/actions/app";
+import { AppActions } from "ui/actions/app";
 import { UIState } from "ui/state";
-import { SessionAction } from "ui/actions/session";
+import { SessionActions } from "ui/actions/session";
 const { prefs } = require("../utils/prefs");
 import { Location } from "@recordreplay/protocol";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
@@ -27,16 +27,13 @@ function initialAppState(): AppState {
     narrowMode: false,
     hoveredLineNumberLocation: null,
     isNodePickerActive: false,
-    pendingComment: null,
     canvas: null,
-    commentPointer: false,
-    hoveredComment: null,
   };
 }
 
 export default function update(
   state = initialAppState(),
-  action: AppAction | SessionAction
+  action: AppActions | SessionActions
 ): AppState {
   switch (action.type) {
     case "setup_app": {
@@ -138,31 +135,10 @@ export default function update(
       };
     }
 
-    case "set_pending_comment": {
-      return {
-        ...state,
-        pendingComment: action.comment,
-      };
-    }
-
     case "set_canvas": {
       return {
         ...state,
         canvas: action.canvas,
-      };
-    }
-
-    case "set_comment_pointer": {
-      return {
-        ...state,
-        commentPointer: action.value,
-      };
-    }
-
-    case "set_hovered_comment": {
-      return {
-        ...state,
-        hoveredComment: action.comment,
       };
     }
 
@@ -197,7 +173,4 @@ export const getPointsForHoveredLineNumber = (state: UIState) => {
 };
 export const getEventsForType = (state: UIState, type: string) => state.app.events[type] || [];
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
-export const getPendingComment = (state: UIState) => state.app.pendingComment;
 export const getCanvas = (state: UIState) => state.app.canvas;
-export const getCommentPointer = (state: UIState) => state.app.commentPointer;
-export const getHoveredComment = (state: UIState) => state.app.hoveredComment;
