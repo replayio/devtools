@@ -135,6 +135,8 @@ function onSocketClose() {
 
 function onSocketError(evt: Event) {
   console.error("Socket Error", evt);
+  // If the socket has errored, the connection will close. So let's set `willClose`
+  // so that we show _this_ error message, and not the `onSocketClose` error message
   willClose = true;
   return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
     log("Socket Error");
