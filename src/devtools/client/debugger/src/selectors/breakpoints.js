@@ -10,3 +10,25 @@ export const getBreakpointsList = createSelector(
   state => state.breakpoints.breakpoints,
   breakpoints => Object.values(breakpoints)
 );
+
+export const getRequestedBreakpointLocations = state => state.breakpoints.requestedBreakpoints;
+
+export const getRequestedBreakpointsList = createSelector(
+  getRequestedBreakpointLocations,
+  requestedBreakpoints =>
+    Object.entries(requestedBreakpoints).map(([id, location]) => {
+      return {
+        id,
+        disabled: true,
+        options: {},
+        location,
+        astLocation: {
+          name: undefined,
+          offset: location,
+          index: 0,
+        },
+        text: "",
+        originalText: "",
+      };
+    })
+);

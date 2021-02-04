@@ -4,8 +4,8 @@
 
 //
 
-import { getSelectedSource, getBreakpointPositionsForLine } from "../reducers/sources";
-import { getBreakpointsList } from "../reducers/breakpoints";
+import { getSelectedSource } from "../reducers/sources";
+import { getBreakpointsList } from "./breakpoints";
 
 function getColumn(column, selectedSource) {
   return column;
