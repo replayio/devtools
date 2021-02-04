@@ -30,8 +30,7 @@ function VideoComment({
   }
 
   const { scale } = canvas;
-  const position =
-    typeof comment.position == "string" ? JSON.parse(comment.position) : comment.position;
+  const position = comment.position;
   // const onMarkerClick = () => {
   //   setFocused(true);
   // };
