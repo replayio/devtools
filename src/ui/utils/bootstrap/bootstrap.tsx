@@ -10,31 +10,16 @@ import App, { AppProps } from "ui/components/App";
 const { PopupBlockedError } = require("ui/components/shared/Error");
 import tokenManager from "ui/utils/tokenManager";
 import useToken from "ui/utils/useToken";
-import LogRocket from "ui/utils/logrocket";
 import { createApolloClient } from "ui/utils/apolloClient";
 import { ApolloProvider } from "@apollo/client";
 
-import { isDevelopment, isTest } from "../environment";
+import { skipTelemetry } from "../environment";
 import { UIStore } from "ui/actions";
-const skipTelemetry = isTest() || isDevelopment();
-
-function setupLogRocket() {
-  if (skipTelemetry) {
-    return;
-  }
-
-  LogRocket.init();
-  LogRocket.getSessionURL(sessionURL => {
-    Sentry.configureScope(scope => {
-      scope.setExtra("sessionURL", sessionURL);
-    });
-  });
-}
 
 export function setupSentry(context: Record<string, any>) {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
 
-  if (skipTelemetry) {
+  if (skipTelemetry()) {
     return;
   }
 
@@ -79,7 +64,6 @@ function ApolloWrapper({ children }: { children: ReactNode }) {
 
 export function bootstrapApp(props: AppProps, context: Record<string, any>, store: UIStore) {
   setupSentry(context);
-  setupLogRocket();
 
   ReactDOM.render(
     <Router>

@@ -16,6 +16,10 @@ export function isTest() {
   return getTest() != null;
 }
 
+export function skipTelemetry() {
+  return isTest() || isDevelopment();
+}
+
 export function isDeployPreview() {
   return url.hostname.includes("replay-devtools.netlify.app");
 }
