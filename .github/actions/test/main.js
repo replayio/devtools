@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { spawnSync, spawn } = require("child_process");
 
 function spawnChecked(...args) {
@@ -8,10 +9,9 @@ function spawnChecked(...args) {
   }
 }
 
-function checkForFile(path: string) {
+function checkForFile(path) {
   if (!fs.existsSync(path)) {
-    log(`Required file/directory does not exist: ${path}`);
-    process.exit(1);
+    throw new Error(`Required file/directory does not exist: ${path}`);
   }
 }
 
