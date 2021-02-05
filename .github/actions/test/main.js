@@ -33,6 +33,8 @@ spawnChecked("hdiutil", ["detach", "/Volumes/Replay/"]);
 
 console.log(new Date(), "Installed replay browser");
 
+spawnChecked("chmod", ["+x", "replay-node/macOS-replay-node"]);
+
 // Set environment variables needed to replay node recordings.
 process.env.RECORD_REPLAY_NODE = "replay-node/macOS-replay-node";
 process.env.RECORD_REPLAY_DRIVER = "replay-driver/macOS-recordreplay.so";
