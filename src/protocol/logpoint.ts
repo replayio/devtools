@@ -402,44 +402,6 @@ export async function setExceptionLogpoint(logGroupId: string) {
   client.Analysis.findAnalysisPoints({ analysisId });
 }
 
-// Add logpoint messages at random function entry points, and returns text
-// patterns that will appear in the resulting messages. This is used by
-// automated tests.
-export async function setRandomLogpoint(numLogs: number) {
-  const mapper = `
-    const { point, time, pauseId} = input;
-    const { frameId, location } = getTopFrame();
-    const { result } = sendCommand("Pause.evaluateInFrame", {
-      frameId,
-      expression: "String([...arguments]).substring(0, 200)",
-    });
-    const v = result.returned ? String(result.returned.value) : "";
-    const values = [{ value: point + ": " + v }];
-    return [{ key: point, value: { time, pauseId, location, values, data: {} } }];
-  `;
-
-  const logGroupId = Math.random().toString();
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null, true);
-
-  client.Analysis.addRandomPoints({
-    analysisId,
-    sessionId: await ThreadFront.waitForSession(),
-    numPoints: numLogs,
-  });
-
-  client.Analysis.runAnalysis({ analysisId });
-  client.Analysis.findAnalysisPoints({ analysisId });
-
-  const info = gLogpoints.get(logGroupId)!;
-  while (info.points.length < numLogs) {
-    const { promise, resolve } = defer<void>();
-    info.pointsWaiter = resolve;
-    await promise;
-  }
-
-  return info.points.map(p => p.point);
-}
-
 export function removeLogpoint(logGroupId: string) {
   const info = gLogpoints.get(logGroupId);
   if (!info) {

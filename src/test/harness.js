@@ -2,7 +2,6 @@
 // test harnesses.
 
 const { ThreadFront } = require("protocol/thread");
-const { setRandomLogpoint } = require("protocol/logpoint");
 const { assert, waitForTime } = require("protocol/utils");
 const { mapValues } = require("lodash");
 
@@ -417,12 +416,6 @@ async function playbackRecording() {
   await waitUntil(() => !timeline.state.playback);
 }
 
-async function randomLog(numLogs) {
-  const messages = await setRandomLogpoint(numLogs);
-  await Promise.all(messages.map(text => waitForMessage(text)));
-  return messages;
-}
-
 async function findMarkupNode(text) {
   return waitUntil(() => {
     const nodes = document.querySelectorAll("#markup-box .editor");
@@ -658,7 +651,6 @@ const testCommands = {
   toggleExceptionLogging,
   toggleMappedSources,
   playbackRecording,
-  randomLog,
   findMarkupNode,
   toggleMarkupNode,
   searchMarkup,
