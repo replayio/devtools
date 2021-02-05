@@ -281,8 +281,17 @@ function getRecordingId(file) {
   }
 }
 
+function dumpFileInfo(file) {
+  console.log("FILE_INFO", file, fs.statSync(file).size);
+}
+
 async function createExampleNodeRecording(example) {
   const recordingIdFile = tmpFile();
+
+  dumpFileInfo(process.env.RECORD_REPLAY_NODE);
+  dumpFileInfo(process.env.RECORD_REPLAY_DRIVER);
+  dumpFileInfo(recordingIdFile);
+
   spawnSync(
     process.env.RECORD_REPLAY_NODE,
     [`${__dirname}/examples/node/${example}`],
