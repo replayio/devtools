@@ -45,10 +45,10 @@ jobs:
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
-          name: replay
-          path: node
+          name: replay-node
+          path: macOS-replay-node
   download-driver:
-    name: Download node
+    name: Download recording driver
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -57,7 +57,7 @@ jobs:
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
-          name: replay
+          name: replay-driver
           path: macOS-recordreplay.so
   test0:
     name: Test stripe 0

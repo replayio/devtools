@@ -17,8 +17,8 @@ function checkForFile(path) {
 
 checkForFile("dist/dist.tgz");
 checkForFile("replay/replay.dmg");
-checkForFile("replay/node");
-checkForFile("replay/macOS-recordreplay.so");
+checkForFile("replay-node/macOS-replay-node");
+checkForFile("replay-driver/macOS-recordreplay.so");
 
 console.log(new Date(), "Start");
 
@@ -34,8 +34,8 @@ spawnChecked("hdiutil", ["detach", "/Volumes/Replay/"]);
 console.log(new Date(), "Installed replay browser");
 
 // Set environment variables needed to replay node recordings.
-process.env.RECORD_REPLAY_NODE = "replay/node";
-process.env.RECORD_REPLAY_DRIVER = "replay/macOS-recordreplay.so";
+process.env.RECORD_REPLAY_NODE = "replay-node/macOS-replay-node";
+process.env.RECORD_REPLAY_DRIVER = "replay-driver/macOS-recordreplay.so";
 
 spawnChecked("ls", {
   cwd: "..",
