@@ -23,7 +23,7 @@ jobs:
         with:
           name: dist
           path: dist.tgz
-  download:
+  download-browser:
     name: Download replay browser
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -35,6 +35,30 @@ jobs:
         with:
           name: replay
           path: replay.dmg
+  download-node:
+    name: Download node
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download
+        run: wget https://replay.io/downloads/macOS-replay-node
+      - name: Create artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: replay
+          path: node
+  download-driver:
+    name: Download node
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download
+        run: wget https://replay.io/downloads/macOS-recordreplay.so
+      - name: Create artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: replay
+          path: macOS-recordreplay.so
   test0:
     name: Test stripe 0
     runs-on: macos-latest

@@ -25,7 +25,6 @@ const startTime = Date.now();
 let shouldRecordExamples = false;
 let shouldRecordViewer = false;
 let recordExamplesSeparately = false;
-let nodePath;
 
 function processArgs() {
   const usage = `
@@ -37,7 +36,6 @@ function processArgs() {
       --record-viewer: Record the viewer while the test is running
       --record-all: Record examples and save the recordings locally, and record the viewer
       --separate: Record examples in a separate browser instance.
-      --node: Specify node path to use when recording.
   `;
   for (let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
@@ -61,9 +59,6 @@ function processArgs() {
       case "--separate":
         shouldRecordExamples = true;
         recordExamplesSeparately = true;
-        break;
-      case "--node":
-        nodePath = process.argv[++i];
         break;
       case "--help":
       case "-h":
@@ -125,8 +120,8 @@ async function runTest(test, example) {
   if (example.endsWith(".js")) {
     // Node test.
     if (!exampleRecordingId) {
-      if (!nodePath) {
-        console.log(`Skipping test ${test}: node path not specified`);
+      if (!process.env.RECORD_REPLAY_NODE) {
+        console.log(`Skipping test ${test}: RECORD_REPLAY_NODE not set`);
         return;
       }
       if (!process.env.RECORD_REPLAY_DRIVER) {
@@ -289,7 +284,7 @@ function getRecordingId(file) {
 async function createExampleNodeRecording(example) {
   const recordingIdFile = tmpFile();
   spawnSync(
-    nodePath,
+    process.env.RECORD_REPLAY_NODE,
     [`${__dirname}/examples/node/${example}`],
     {
       env: {

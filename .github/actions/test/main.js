@@ -8,6 +8,18 @@ function spawnChecked(...args) {
   }
 }
 
+function checkForFile(path: string) {
+  if (!fs.existsSync(path)) {
+    log(`Required file/directory does not exist: ${path}`);
+    process.exit(1);
+  }
+}
+
+checkForFile("dist/dist.tgz");
+checkForFile("replay/replay.dmg");
+checkForFile("replay/node");
+checkForFile("replay/macOS-recordreplay.so");
+
 console.log(new Date(), "Start");
 
 spawnChecked("mv", ["dist/dist.tgz", "dist.tgz"]);
@@ -20,6 +32,10 @@ spawnChecked("cp", ["-R", "/Volumes/Replay/Replay.app", "/Applications"]);
 spawnChecked("hdiutil", ["detach", "/Volumes/Replay/"]);
 
 console.log(new Date(), "Installed replay browser");
+
+// Set environment variables needed to replay node recordings.
+process.env.RECORD_REPLAY_NODE = "replay/node";
+process.env.RECORD_REPLAY_DRIVER = "replay/macOS-recordreplay.so";
 
 spawnChecked("ls", {
   cwd: "..",
