@@ -6,6 +6,8 @@ import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import CommentTool from "ui/components/shared/CommentTool";
+import { Editor, EditorState, getDefaultKeyBinding } from "draft-js";
+
 import "draft-js/dist/Draft.css";
 
 function CommentEditor({
@@ -17,23 +19,8 @@ function CommentEditor({
   currentTime,
 }) {
   const { user } = useAuth0();
-  const [editorState, setEditorState] = useState(null);
-  const [DraftJS, setDraftJS] = useState();
-
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const addComment = hooks.useAddComment(clearPendingComment);
-
-  useEffect(() => {
-    import("draft-js").then(DraftJS => {
-      setEditorState(DraftJS.EditorState.createEmpty());
-      setDraftJS(DraftJS);
-    });
-  }, []);
-
-  if (!DraftJS) {
-    return null;
-  }
-
-  const { Editor, EditorState, getDefaultKeyBinding } = DraftJS;
 
   const isNewComment = comment.content === "";
 
