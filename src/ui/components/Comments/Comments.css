@@ -3,26 +3,28 @@
   z-index: var(--z-index-1--comment-container);
   pointer-events: none;
   width: 100%;
-  top: 18px; /* Arbitrary value to push the markers away from the bottom of the overlay container */
-  height: 18px; /* Corresponds with the height of the comment marker */
+  top: 27px; /* Arbitrary value to push the markers away from the bottom of the overlay container */
+  height: 17px; /* Corresponds with the height of the comment marker */
+  z-index: 1000;
 }
 
 .comments-container > * {
   pointer-events: auto;
 }
 
-.img.comment-marker {
-  width: 19px;
-  height: 19px;
+.comments-container .img.comment-marker {
+  width: 15px;
+  height: 15px;
   position: absolute;
-  background-color: transparent;
   outline: none;
+  background-color: var(--primary-accent);
+  border-radius: 8px;
 }
 
 /* This avoids flickering in the UI when a user adds a new comment
 that starts off as empty, and then proceeds to press cancel which
 deletes the comment */
-.img.comment-marker.hidden:not(.expanded) {
+.comments-container .img.comment-marker.hidden:not(.expanded) {
   display: none;
 }
 
@@ -30,19 +32,18 @@ deletes the comment */
 .img.comment-marker.hovered,
 .img.comment-marker.expanded,
 .create-comment:hover {
-  margin-top: -1px;
   animation-duration: 200ms;
-  background-color: transparent;
   cursor: pointer;
 }
 
-.img.comment-marker.paused {
+.comments-container .img.comment-marker.paused {
   z-index: var(--z-index-1--paused-comment);
+  background-color: var(--replaying-paused-marker-fill);
 }
 
 .create-comment {
-  width: 19px;
-  height: 19px;
+  width: 15px;
+  height: 15px;
   position: absolute;
   outline: none;
   background-position: center;
