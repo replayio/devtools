@@ -19,6 +19,12 @@
   border-radius: 8px;
 }
 
+.comments-panel .event {
+  padding: 16px ;
+  border: 2px solid var(--theme-splitter-color);
+  border-radius: 8px;
+}
+
 .comments-panel .comment,
 .comments-panel .event {
   line-height: 1.25rem;
