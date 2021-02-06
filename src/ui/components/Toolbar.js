@@ -47,6 +47,17 @@ function Toolbar({
             handleClick={() => onClick("debug")}
           />
         </div>
+        <div
+          className={classnames("toolbar-panel-button", {
+            active: selectedPrimaryPanel == "comments",
+          })}
+        >
+          <IconWithTooltip
+            icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
+            content={"Transcript and Comments"}
+            handleClick={() => onClick("comments")}
+          />
+        </div>
       </div>
     </div>
   );

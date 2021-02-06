@@ -1,10 +1,10 @@
 import React from "react";
-import Comment from "ui/components/Comments/Comment";
+import CommentThread from "ui/components/Comments/CommentThread";
 import EventEntry from "./EventEntry";
 
 export default function TranscriptEntry({ entry }) {
   if ("content" in entry) {
-    return <Comment comment={entry} />;
+    return <CommentThread comment={entry} />;
   } else {
     return <EventEntry event={entry} />;
   }

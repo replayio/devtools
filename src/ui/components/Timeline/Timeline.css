@@ -160,21 +160,3 @@
   transform: translateX(-50%);
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
 }
-
-/* Add Comment Button */
-
-.timeline button.add-comment {
-  background: var(--dark-blue);
-  color: var(--theme-body-background);
-  padding: 8px 12px;
-  line-height: 16px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.timeline button.add-comment .img {
-  margin-right: 4px;
-  background: var(--theme-body-background);
-}

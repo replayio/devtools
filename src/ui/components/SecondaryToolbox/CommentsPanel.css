@@ -7,31 +7,38 @@
   align-items: center;
   background: white;
   height: 100%;
-  padding-top: 10px;
+  padding: 16px;
+}
+.comments-panel > :not(:first-child) {
+  margin-top: 8px;
+}
+
+.comments-panel .comment-container {
+  padding: 0px 16px ;
+  border: 2px solid var(--theme-splitter-color);
+  border-radius: 8px;
 }
 
 .comments-panel .comment,
 .comments-panel .event {
-  padding: 10px 16px 10px;
   line-height: 1.25rem;
   font-size: 1rem;
   display: flex;
   flex-direction: row;
   cursor: pointer;
   width: 100%;
+  overflow: hidden;
 }
 
-.comments-panel .comment:hover,
+.comments-panel .comment-container:hover,
 .comments-panel .event:hover,
 .comments-panel .event.primary-highlight {
-  border-left: 4px solid #7ed8c8;
-  padding-left: 12px;
+  border: 2px solid var(--primary-accent);
 }
 
-.comments-panel .comment.selected,
+.comments-panel .comment-container.selected,
 .comments-panel .event.selected {
-  border-left: 4px solid #5ea3f8;
-  padding-left: 12px;
+  border: 2px solid var(--secondary-accent);
 }
 
 .comments-panel .comment.child-comment.selected {
@@ -95,7 +102,61 @@
 
 .comments-panel .comment-body {
   align-self: center;
+  padding: 16px 0px;
+  width: 100%;
+}
+
+.comments-panel .comment-body > :not(:first-child) {
+  margin-top: 4px;
+}
+
+.comments-panel .comment-body-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 32px;
+}
+
+.comments-panel .comment-body-header > :not(:first-child) {
+  margin-left: 16px;
+}
+
+.comments-panel .comment-body-header-label {
+  display: flex;
   flex-grow: 1;
+  flex-direction: row;
+  align-items: baseline;
+  overflow: hidden;
+}
+
+.comments-panel .comment-body-header-label > :not(:first-child) {
+  margin-left: 8px;
+}
+
+.comment-body-header-label-name {
+  color: var(--theme-body-color);
+  font-weight: bold;
+  font-size: 14px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.comment-body-header-label-date {
+  font-size: 12px;
+  color: var(--theme-comment);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.comment-body-header-timestamp {
+  font-size: 12px;
+  font-family: monospace;
+  background: var(--grey-20);
+  color: var(--theme-comment);
+  padding: 4px;
+  border-radius: 4px;
 }
 
 .comments-panel .dropdown-block {
@@ -112,15 +173,6 @@
   width: 28px;
 }
 
-.comments-panel .add-comment {
-  padding: 12px;
-  color: white;
-  background-color: #5ea3f8;
-  margin-top: 12px;
-  align-self: center;
-  cursor: pointer;
-}
-
 .right-sidebar button.comment {
   mask-repeat: no-repeat;
   background-color: #969696;
@@ -128,26 +180,25 @@
 }
 
 .comments-panel .comment .item-label {
-  font-size: 1.25rem;
+  font-size: 14px;
   color: var(--theme-body-color);
-  margin-bottom: 4px;
   font-weight: bold;
 }
 
 .comments-panel .event .item-label {
-  font-size: 1.25rem;
+  font-size: 14px;
   color: var(--theme-body-color);
   align-self: center;
 }
 
 .comments-panel .item-content {
-  font-size: 1.25rem;
+  font-size: 12px;
+  padding-left: 40px;
+  line-height: 18px;
   color: var(--theme-comment);
 }
 
 .comments-panel img {
-  margin-right: 8px;
-  margin-top: 2px;
   width: 24px;
   height: 24px;
   border-radius: 12px;
@@ -157,4 +208,73 @@
   margin-right: 8px;
   height: 24px;
   width: 24px;
+}
+
+/*  */
+
+.comments-panel .comment-input-container {
+  padding: 16px 0px;
+  border-top: 1px solid var(--theme-splitter-color);
+  display: flex;
+}
+
+.comments-panel .comment-input-container img {
+  opacity: 50%;
+  align-self: start;
+}
+
+.comments-panel .comment-input-container > :not(:first-child) {
+  margin-left: 16px;
+}
+
+.comments-panel .comment-input {
+  flex-grow: 1;
+  font-size: 12px;
+  line-height: 18px;
+  margin-top: 3px;
+  color: var(--theme-comment);
+}
+
+.comments-panel .responsive-textarea {
+  overflow-y: hidden;
+  resize: none;
+  font-family: sans-serif;
+  line-height: 18px;
+  border: none;
+}
+
+.comments-panel .responsive-textarea:focus {
+  outline: none;
+}
+
+.comments-panel .img.paper-airplane {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 2px;
+  color: var(--theme-icon-color);
+  transform: rotate(90deg);
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.comments-panel .img.paper-airplane:hover {
+  background: var(--primary-accent);
+}
+
+.comments-panel .comment-actions {
+  display: flex;
+  flex-direction: row;
+}
+
+.comments-panel .comment-actions button {
+  cursor: pointer;
+}
+
+.comments-panel .comment-actions .img {
+  width: 20px;
+  height: 20px;
+}
+
+.comments-panel .comment-actions .img:hover {
+  background: var(--primary-accent);
 }

@@ -16,8 +16,6 @@ import classnames from "classnames";
 import ScrollContainer from "./ScrollContainer";
 import Tooltip from "./Tooltip";
 const Comments = require("../Comments").default;
-import AddCommentButton from "./AddCommentButton";
-import CommentTool from "../shared/CommentTool";
 
 import { mostRecentPaintOrMouseEvent, paintGraphicsAtTime } from "protocol/graphics";
 
@@ -95,7 +93,7 @@ class Timeline extends Component<PropsFromRedux> {
   };
 
   onPlayerMouseUp: MouseEventHandler = e => {
-    const { hoverTime, seek, hoveredPoint } = this.props;
+    const { hoverTime, seek, hoveredPoint, clearPendingComment } = this.props;
     const hoveringOverMarker = hoveredPoint?.target === "timeline";
     const mouseTime = this.getMouseTime(e);
 
@@ -103,6 +101,7 @@ class Timeline extends Component<PropsFromRedux> {
       const event = mostRecentPaintOrMouseEvent(mouseTime);
       if (event && event.point) {
         seek(event.point, mouseTime, false);
+        clearPendingComment();
       }
     }
   };
@@ -115,19 +114,32 @@ class Timeline extends Component<PropsFromRedux> {
       startPlayback,
       stopPlayback,
       replayPlayback,
+      clearPendingComment,
     } = this.props;
+    const replay = () => {
+      clearPendingComment();
+      replayPlayback();
+    };
+    const togglePlayback = () => {
+      clearPendingComment();
+      if (playback) {
+        stopPlayback();
+      } else {
+        startPlayback();
+      }
+    };
 
     if (currentTime == recordingDuration) {
       return (
         <div className="commands">
-          <ReplayButton onClick={replayPlayback} />
+          <ReplayButton onClick={replay} />
         </div>
       );
     }
 
     return (
       <div className="commands">
-        <button onClick={() => (playback ? stopPlayback() : startPlayback())}>
+        <button onClick={togglePlayback}>
           {playback ? (
             <div className="img pause-circle-lg" />
           ) : (
@@ -241,7 +253,6 @@ class Timeline extends Component<PropsFromRedux> {
           <Comments />
           <Tooltip />
         </div>
-        <AddCommentButton />
       </div>
     );
   }
@@ -273,6 +284,7 @@ const connector = connect(
     startPlayback: actions.startPlayback,
     stopPlayback: actions.stopPlayback,
     replayPlayback: actions.replayPlayback,
+    clearPendingComment: actions.clearPendingComment,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

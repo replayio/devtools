@@ -32,7 +32,7 @@ export function EventsFilter() {
   );
 }
 
-function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
+function NonDevView({ updateTimelineDimensions, narrowMode }) {
   const viewer = (
     <div className="vertical-panels">
       <Video />
@@ -86,8 +86,8 @@ function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
       onMove={handleMove}
       maxSize="80%"
       vert={true}
-      startPanel={viewer}
-      endPanel={rightSidebar}
+      startPanel={rightSidebar}
+      endPanel={viewer}
       endPanelControl={false}
     />
   );
@@ -96,7 +96,6 @@ function NonDevView({ updateTimelineDimensions, narrowMode, clickEvents }) {
 export default connect(
   state => ({
     narrowMode: selectors.getNarrowMode(state),
-    clickEvents: selectors.getEventsForType(state, "mousedown"),
   }),
   {
     updateTimelineDimensions,

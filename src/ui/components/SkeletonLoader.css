@@ -58,6 +58,9 @@
 
 .loader main .comments {
   padding: 20px;
+}
+
+.loader main section {
   flex-grow: 1;
 }
 

@@ -4,23 +4,39 @@ import { Comment } from "ui/state/app";
 
 const GET_COMMENTS = gql`
   query GetComments($recordingId: uuid) {
-    comments(where: { recording_id: { _eq: $recordingId } }) {
+    comments(
+      where: { recording_id: { _eq: $recordingId }, _and: { parent_id: { _is_null: true } } }
+    ) {
       id
       content
       created_at
-      recording_id
-      parent_id
+      updated_at
       user_id
+      has_frames
+      time
+      point
+      position
       user {
         picture
         name
         auth_id
       }
-      updated_at
-      time
-      point
-      has_frames
-      position
+      replies(order_by: { created_at: asc }) {
+        id
+        content
+        created_at
+        updated_at
+        user_id
+        has_frames
+        time
+        point
+        position
+        user {
+          picture
+          name
+          auth_id
+        }
+      }
     }
   }
 `;
@@ -73,6 +89,7 @@ export function useGetComments(
 ): { comments: Comment[]; loading: boolean; error?: ApolloError } {
   const { data, loading, error } = useQuery(GET_COMMENTS, {
     variables: { recordingId },
+    pollInterval: 5000,
   });
 
   // This gives us some basic logging for when there's a problem
