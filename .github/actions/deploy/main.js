@@ -33,13 +33,7 @@ spawnChecked("npm", ["install"]);
 spawnChecked("./node_modules/.bin/webpack", ["--mode=production"]);
 
 upload("index.html", "view");
-upload("dist/main.js");
-upload("dist/main.js.map");
-upload("dist/parserWorker.js");
-upload("dist/parserWorker.js.map");
-upload("dist/searchWorker.js");
-upload("dist/searchWorker.js.map");
-
+uploadDir("dist");
 uploadDir("src/image/images", "images");
 
 invalidateCloudFront();
