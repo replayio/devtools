@@ -53,7 +53,7 @@ function VideoComment({
         onMouseEnter={() => setHoveredComment(comment.id)}
         onMouseLeave={() => setHoveredComment(null)}
       >
-        <div className="img location-marker" />
+        <div className="img comment-marker" />
       </div>
       {/* {focused ? (
         <>
