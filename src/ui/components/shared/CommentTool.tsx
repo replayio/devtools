@@ -49,10 +49,6 @@ function CommentTool({
       return;
     }
 
-    if (viewMode === "dev") {
-      setSelectedPanel("comments");
-    }
-
     setPendingComment({ ...comment, position: mouseEventCanvasPosition(e) });
   };
 

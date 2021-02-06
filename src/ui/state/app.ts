@@ -7,8 +7,8 @@ import {
   MouseEvent,
 } from "@recordreplay/protocol";
 
-export type PanelName = "console" | "debugger" | "inspector" | "comments";
-export type PrimaryPanelName = "explorer" | "debug";
+export type PanelName = "console" | "debugger" | "inspector";
+export type PrimaryPanelName = "explorer" | "debug" | "comments";
 export type ViewMode = "dev" | "non-dev";
 export type ModalType = "sharing" | "login";
 

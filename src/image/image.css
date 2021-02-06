@@ -132,6 +132,7 @@ button.jump-definition { background-image: url(~devtools/client/shared/component
 .img.arrow-up-2 { -webkit-mask-image: url(~devtools/client/debugger/images/arrow-up-2.svg); }
 .img.webconsole-panel { -webkit-mask-image: url(~devtools/client/themes/images/tool-webconsole.svg); }
 .img.explorer-panel { -webkit-mask-image: url(~devtools/client/themes/images/tool-explorer.svg); }
+.img.comments-panel-icon { -webkit-mask-image: url(~devtools/client/themes/images/tool-comments.svg); }
 .img.debugger-panel { -webkit-mask-image: url(~devtools/client/themes/images/tool-debugger.svg); }
 .img.inspector-panel { -webkit-mask-image: url(~devtools/client/themes/images/tool-inspector.svg); }
 .img.menu { -webkit-mask-image: url(~devtools/client/themes/images/menu.svg); }
@@ -141,6 +142,8 @@ button.jump-definition { background-image: url(~devtools/client/shared/component
 .img.login { -webkit-mask-image: url(~devtools/client/themes/images/login.svg); }
 .img.settings { -webkit-mask-image: url(~devtools/client/themes/images/settings.svg); }
 .img.plus-circle { -webkit-mask-image: url(~devtools/client/themes/images/plus-circle.svg); }
+.img.paper-airplane { -webkit-mask-image: url(~devtools/client/themes/images/paper-airplane.svg); }
+.img.trash { -webkit-mask-image: url(~devtools/client/themes/images/trash.svg); }
 .img.location-marker { -webkit-mask-image: url(~devtools/client/themes/images/location-marker.svg); }
 .tree-node button.arrow { -webkit-mask-image: url(~devtools/client/debugger/images/arrow.svg); }
 #command-button-pick::before { -webkit-mask-image: url(~devtools/client/themes/images/command-pick.svg); }

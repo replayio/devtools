@@ -6,6 +6,7 @@ import hooks from "ui/hooks";
 import { sortBy } from "lodash";
 
 import TranscriptEntry from "./TranscriptEntry/index";
+import AddCommentButton from "ui/components/Timeline/AddCommentButton";
 import "./CommentsPanel.css";
 
 function CommentsPanel({ recordingId, clickEvents, pendingComment }) {
@@ -26,16 +27,11 @@ function CommentsPanel({ recordingId, clickEvents, pendingComment }) {
     entries = [...entries, pendingComment];
   }
 
-  if (!entries.length) {
-    return (
-      <div className="comments-panel">
-        <p>There is nothing here yet. Try adding a comment in the timeline below.</p>
-      </div>
-    );
-  }
+  console.log(entries);
 
   return (
     <div className="comments-panel">
+      <AddCommentButton />
       {sortBy(entries, ["time", "created_at"]).map((entry, i) => (
         <TranscriptEntry entry={entry} key={i} />
       ))}

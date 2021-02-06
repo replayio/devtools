@@ -1,94 +1,121 @@
 import React, { useState, useRef, useEffect } from "react";
+import { ThreadFront } from "protocol/thread";
+import { useAuth0 } from "@auth0/auth0-react";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import CommentTool from "ui/components/shared/CommentTool";
+import "draft-js/dist/Draft.css";
 
-function CommentEditor({ comment, clearPendingComment, pendingComment }) {
-  const [inputValue, setInputValue] = useState(comment.content);
-  const textareaNode = useRef(null);
-  const editorNode = useRef(null);
+function CommentEditor({
+  comment,
+  clearPendingComment,
+  pendingComment,
+  recordingId,
+  canvas,
+  currentTime,
+}) {
+  const { user } = useAuth0();
+  const [editorState, setEditorState] = useState(null);
+  const [DraftJS, setDraftJS] = useState();
 
   const addComment = hooks.useAddComment(clearPendingComment);
-  const updateComment = hooks.useUpdateComment(clearPendingComment);
-  const deleteComment = hooks.useDeleteComment();
 
   useEffect(() => {
-    const { length } = textareaNode.current.value;
-    textareaNode.current.focus();
-    textareaNode.current.setSelectionRange(length, length);
+    import("draft-js").then(DraftJS => {
+      setEditorState(DraftJS.EditorState.createEmpty());
+      setDraftJS(DraftJS);
+    });
   }, []);
 
-  const onKeyDown = e => {
-    if (e.key == "Escape") {
-      handleCancel(e);
-    } else if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) {
-      handleSave();
-    }
-  };
+  if (!DraftJS) {
+    return null;
+  }
+
+  const { Editor, EditorState, getDefaultKeyBinding } = DraftJS;
+
+  const isNewComment = comment.content === "";
+
   const handleSave = () => {
-    if (comment.content === "") {
+    if (isNewComment) {
       handleNewSave();
     } else {
-      handleExistingSave();
+      handleReplySave();
     }
+  };
+  const handleReplySave = () => {
+    const inputValue = editorState.getCurrentContent().getPlainText();
+
+    // For now we can simply bail if the input happens to be empty. We should fix
+    // this in the next pass to handle and show an error prompt.
+    if (inputValue == "") {
+      return;
+    }
+
+    const reply = {
+      content: inputValue,
+      recording_id: recordingId,
+      time: currentTime,
+      point: ThreadFront.currentPoint,
+      has_frames: ThreadFront.currentPointHasFrames,
+      parent_id: comment.id,
+      position: {
+        x: canvas.width * 0.5,
+        y: canvas.height * 0.5,
+      },
+    };
+
+    addComment({
+      variables: { object: reply },
+    });
+    setEditorState(EditorState.createEmpty());
   };
   const handleNewSave = () => {
-    if (inputValue) {
-      const newComment = {
-        ...comment,
-        content: inputValue,
-        position: comment.position ? comment.position : null,
-      };
-      addComment({
-        variables: { object: newComment },
-      });
-    } else {
-      clearPendingComment();
+    const inputValue = editorState.getCurrentContent().getPlainText();
+
+    // For now we can simply bail if the input happens to be empty. We should fix
+    // this in the next pass to handle and show an error prompt.
+    if (inputValue == "") {
+      return;
     }
-  };
-  const handleExistingSave = () => {
-    if (!inputValue) {
-      deleteComment({ variables: { commentId: comment.id } });
-    } else {
-      updateComment({
-        variables: {
-          newContent: inputValue,
-          commentId: comment.id,
-          position: pendingComment.position ? pendingComment.position : null,
-        },
-      });
-    }
-  };
-  const handleCancel = () => {
-    clearPendingComment();
+
+    const newComment = {
+      ...comment,
+      content: inputValue,
+      position: {
+        x: pendingComment.position.x,
+        y: pendingComment.position.y,
+      },
+    };
+    addComment({
+      variables: { object: newComment },
+    });
   };
 
   return (
-    <div className="editor" ref={editorNode} onClick={e => e.stopPropagation()}>
-      <textarea
-        defaultValue={inputValue}
-        onChange={e => setInputValue(e.target.value)}
-        onKeyDown={onKeyDown}
-        ref={textareaNode}
-      />
-      <div className="buttons">
-        <button className="cancel" onClick={handleCancel}>
-          Cancel
-        </button>
-        <button className="save" onClick={handleSave}>
-          {comment.parent_id ? "Reply" : "Save"}
-        </button>
+    <div className="comment-input-container">
+      <img src={user.picture} className="comment-picture" />
+      <div className="comment-input">
+        <Editor
+          editorState={editorState}
+          onChange={setEditorState}
+          handleKeyCommand={e => getDefaultKeyBinding(e)}
+          placeholder={"Type a comment ..."}
+        />
       </div>
-      {pendingComment.parent_id ? null : <CommentTool comment={comment} />}
+      <button className="img paper-airplane" onClick={handleSave} />
+      {isNewComment && <CommentTool comment={comment} />}
     </div>
   );
 }
 
 export default connect(
   state => ({
+    recordingId: selectors.getRecordingId(state),
+    currentTime: selectors.getCurrentTime(state),
     pendingComment: selectors.getPendingComment(state),
+    canvas: selectors.getCanvas(state),
   }),
   {
     clearPendingComment: actions.clearPendingComment,

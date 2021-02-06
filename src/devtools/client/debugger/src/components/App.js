@@ -50,6 +50,7 @@ import WelcomeBox from "./WelcomeBox";
 import EditorTabs from "./Editor/Tabs";
 import EditorFooter from "./Editor/Footer";
 import QuickOpenModal from "./QuickOpenModal";
+import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
 
 class Debugger extends Component {
   onLayoutChange;
@@ -194,8 +195,27 @@ class Debugger extends Component {
     }
   }
 
+  getPanel = () => {
+    const { selectedPrimaryPanel } = this.props;
+
+    switch (selectedPrimaryPanel) {
+      case "explorer": {
+        return <PrimaryPanes />;
+      }
+      case "debug": {
+        return <SecondaryPanes />;
+      }
+      case "comments": {
+        return <CommentsPanel />;
+      }
+      default: {
+        return null;
+      }
+    }
+  };
+
   renderLayout = () => {
-    const { startPanelCollapsed, selectedPrimaryPanel } = this.props;
+    const { startPanelCollapsed } = this.props;
 
     return (
       <SplitBox
@@ -210,7 +230,7 @@ class Debugger extends Component {
         startPanelCollapsed={startPanelCollapsed}
         startPanel={
           <div className="panes" style={{ width: "100%" }}>
-            {selectedPrimaryPanel == "explorer" ? <PrimaryPanes /> : <SecondaryPanes />}
+            {this.getPanel()}
           </div>
         }
         endPanel={this.renderEditorPane()}

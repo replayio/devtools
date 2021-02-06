@@ -69,6 +69,6 @@ deletes the comment */
   align-items: center;
 }
 
-.comment.highlighted {
-  background: var(--new-blue-50);
+.comments-panel .comment.highlighted {
+  border-color: var(--new-blue-500);
 }

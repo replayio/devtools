@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
 
-import CommentsPanel from "./CommentsPanel";
 import Video from "../Video";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
@@ -39,12 +38,6 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
         onClick={() => onClick("inspector")}
       >
         <div className="label">Elements</div>
-      </button>
-      <button
-        className={classnames("comments-panel-button", { expanded: selectedPanel === "comments" })}
-        onClick={() => onClick("comments")}
-      >
-        <div className="label">Transcript and Comments</div>
       </button>
       {narrowMode ? (
         <button
@@ -88,7 +81,6 @@ function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
       </header>
       <div className="secondary-toolbox-content">
         {selectedPanel == "console" ? <ConsolePanel /> : null}
-        {selectedPanel == "comments" ? <CommentsPanel /> : null}
         {selectedPanel == "inspector" ? <InspectorPanel /> : null}
         {selectedPanel == "viewer" && narrowMode ? <Video /> : null}
       </div>

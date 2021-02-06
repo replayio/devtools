@@ -65,7 +65,12 @@ function Header({ progress, content }) {
 function NonDevMain({ backgroundColor, displayedProgress }) {
   return (
     <main>
-      <section style={{ width: prefs.nonDevSidePanelWidth }}>
+      <div className="comments" style={{ width: prefs.nonDevSidePanelWidth }}>
+        <div className="loading-placeholder" />
+        <div className="loading-placeholder" />
+        <div className="loading-placeholder" />
+      </div>
+      <section>
         <div className="video" style={{ background: backgroundColor }}></div>
         <div className="timeline">
           <div className="loading-container">
@@ -74,11 +79,6 @@ function NonDevMain({ backgroundColor, displayedProgress }) {
           </div>
         </div>
       </section>
-      <div className="comments">
-        <div className="loading-placeholder" />
-        <div className="loading-placeholder" />
-        <div className="loading-placeholder" />
-      </div>
     </main>
   );
 }

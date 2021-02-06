@@ -1,4 +1,5 @@
 import React from "react";
+import classnames from "classnames";
 import { ThreadFront } from "protocol/thread";
 import { connect, ConnectedProps } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -8,14 +9,17 @@ import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { assert } from "protocol/utils";
 
+import "./AddCommentButton.css";
+
 function AddCommentButton({
   currentTime,
   recordingId,
   viewMode,
+  pendingComment,
+  canvas,
   setModal,
   setSelectedPanel,
   setPendingComment,
-  canvas,
 }: PropsFromRedux) {
   assert(recordingId);
   const { isAuthenticated } = useAuth0();
@@ -23,10 +27,6 @@ function AddCommentButton({
   const onClick = () => {
     if (!isAuthenticated) {
       return setModal("login");
-    }
-
-    if (viewMode === "dev") {
-      setSelectedPanel("comments");
     }
 
     const pendingComment = {
@@ -45,9 +45,8 @@ function AddCommentButton({
   };
 
   return (
-    <button className="add-comment" onClick={onClick}>
-      <div className="img plus-circle" />
-      <span>Comment</span>
+    <button className={classnames("add-comment", { disabled: pendingComment })} onClick={onClick}>
+      <span>Add a Comment</span>
     </button>
   );
 }
@@ -56,6 +55,7 @@ const connector = connect(
   (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
+    pendingComment: selectors.getPendingComment(state),
     viewMode: selectors.getViewMode(state),
     canvas: selectors.getCanvas(state),
   }),

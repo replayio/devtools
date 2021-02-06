@@ -37,5 +37,6 @@ export default connect(
   }),
   {
     togglePlayback: actions.togglePlayback,
+    clearPendingComment: actions.clearPendingComment,
   }
 )(Video);
