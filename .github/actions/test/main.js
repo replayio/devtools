@@ -29,7 +29,9 @@ console.log(new Date(), "Unpackaged distribution");
 
 spawnChecked("hdiutil", ["attach", "replay/replay.dmg"]);
 spawnChecked("cp", ["-R", "/Volumes/Replay/Replay.app", "/Applications"]);
-spawnChecked("hdiutil", ["detach", "/Volumes/Replay/"]);
+try {
+  spawnChecked("hdiutil", ["detach", "/Volumes/Replay/"]);
+} catch (e) {}
 
 console.log(new Date(), "Installed replay browser");
 
