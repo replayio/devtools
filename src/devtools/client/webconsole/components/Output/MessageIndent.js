@@ -10,7 +10,6 @@ const INDENT_WIDTH = 12;
 
 // Store common indents so they can be used without recreating the element during render.
 const CONSTANT_INDENTS = [getIndentElement(0), getIndentElement(1)];
-const IN_WARNING_GROUP_INDENT = getIndentElement(1, "warning-indent");
 
 function getIndentElement(indent, className) {
   return dom.span({

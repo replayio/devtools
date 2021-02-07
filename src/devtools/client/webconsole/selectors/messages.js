@@ -12,12 +12,8 @@ const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pau
 import { createSelector } from "reselect";
 
 export const getAllMessagesUiById = state => state.messages.messagesUiById;
-export const getAllMessagesPayloadById = state => state.messages.messagesPayloadById;
-export const getAllGroupsById = state => state.messages.groupsById;
-export const getCurrentGroup = state => state.messages.currentGroup;
 export const getFilteredMessagesCount = state => state.messages.filteredMessagesCount;
 export const getAllRepeatById = state => state.messages.repeatById;
-export const getGroupsById = state => state.messages.groupsById;
 
 function messageTime(msg) {
   const { executionPointTime, lastExecutionPoint } = msg;

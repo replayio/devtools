@@ -24,21 +24,12 @@ const MessageState = overrides =>
       {
         // List of all the messages added to the console.
         messagesById: new Map(),
-        // List of additional data associated with messages (populated async or on-demand at a
-        // later time after the message is received).
-        messagesPayloadById: new Map(),
         // Array of the visible messages.
         visibleMessages: [],
         // Object for the filtered messages.
         filteredMessagesCount: getDefaultFiltersCounter(),
         // List of the message ids which are opened.
         messagesUiById: [],
-        // Map of the form {groupMessageId : groupArray},
-        // where groupArray is the list of of all the parent groups' ids of the groupMessageId.
-        // This handles console API groups.
-        groupsById: new Map(),
-        // Message id of the current console API group (no corresponding console.groupEnd yet).
-        currentGroup: null,
 
         // Map logpointId:pointString to messages.
         logpointMessages: new Map(),
@@ -62,9 +53,6 @@ function cloneState(state) {
     visibleMessages: [...state.visibleMessages],
     filteredMessagesCount: { ...state.filteredMessagesCount },
     messagesUiById: [...state.messagesUiById],
-    messagesPayloadById: new Map(state.messagesPayloadById),
-    groupsById: new Map(state.groupsById),
-    currentGroup: state.currentGroup,
     logpointMessages: new Map(state.logpointMessages),
     removedLogpointIds: new Set(state.removedLogpointIds),
     pausedExecutionPoint: state.pausedExecutionPoint,
@@ -84,8 +72,6 @@ function cloneState(state) {
  */
 // eslint-disable-next-line complexity
 function addMessage(newMessage, state, filtersState) {
-  const { messagesById, groupsById, currentGroup } = state;
-
   if (newMessage.type === constants.MESSAGE_TYPE.NULL_MESSAGE) {
     // When the message has a NULL type, we don't add it.
     return state;
@@ -101,19 +87,8 @@ function addMessage(newMessage, state, filtersState) {
     return state;
   }
 
-  if (newMessage.type === constants.MESSAGE_TYPE.END_GROUP) {
-    // Compute the new current group.
-    state.currentGroup = getNewCurrentGroup(currentGroup, groupsById);
-    return state;
-  }
-
   // Store the id of the message as being the last one being added.
   state.lastMessageId = newMessage.id;
-
-  // Add the new message with a reference to the parent group.
-  const parentGroups = getParentGroups(currentGroup, groupsById);
-  newMessage.groupId = currentGroup;
-  newMessage.indent = parentGroups.length;
 
   ensureExecutionPoint(state, newMessage);
 
@@ -140,19 +115,6 @@ function addMessage(newMessage, state, filtersState) {
   const addedMessage = Object.freeze(newMessage);
   state.messagesById.set(newMessage.id, addedMessage);
 
-  if (newMessage.type === "trace") {
-    // We want the stacktrace to be open by default.
-    state.messagesUiById.push(newMessage.id);
-  } else if (isGroupType(newMessage.type)) {
-    state.currentGroup = newMessage.id;
-    state.groupsById.set(newMessage.id, parentGroups);
-
-    if (newMessage.type === constants.MESSAGE_TYPE.START_GROUP) {
-      // We want the group to be open by default.
-      state.messagesUiById.push(newMessage.id);
-    }
-  }
-
   const { visible, cause } = getMessageVisibility(addedMessage, {
     messagesState: state,
     filtersState,
@@ -171,7 +133,7 @@ function addMessage(newMessage, state, filtersState) {
 
 // eslint-disable-next-line complexity
 function messages(state = MessageState(), action) {
-  const { messagesById, messagesPayloadById, messagesUiById, groupsById, visibleMessages } = state;
+  const { messagesById, messagesUiById, visibleMessages } = state;
   const { filtersState } = action;
 
   log(`WebConsole ${action.type}`);
@@ -198,15 +160,7 @@ function messages(state = MessageState(), action) {
       const list = [];
       for (let i = action.messages.length - 1; i >= 0; i--) {
         const message = action.messages[i];
-        if (
-          !message.groupId &&
-          !isGroupType(message.type) &&
-          message.type !== MESSAGE_TYPE.END_GROUP
-        ) {
-          list.unshift(action.messages[i]);
-        } else {
-          list.unshift(message);
-        }
+        list.unshift(message);
       }
 
       newState = cloneState(state);
@@ -272,43 +226,6 @@ function messages(state = MessageState(), action) {
       );
     }
 
-    case constants.MESSAGE_OPEN:
-      const openState = { ...state };
-      openState.messagesUiById = [...messagesUiById, action.id];
-      const currMessage = messagesById.get(action.id);
-
-      // If the message is a console.group/groupCollapsed or a warning group.
-      if (currMessage && isGroupType(currMessage.type)) {
-        // We want to make its children visible
-        const messagesToShow = [...messagesById].reduce((res, [id, message]) => {
-          if (
-            !visibleMessages.includes(message.id) &&
-            isGroupType(currMessage.type) &&
-            getParentGroups(message.groupId, groupsById).includes(action.id) &&
-            getMessageVisibility(message, {
-              messagesState: openState,
-              filtersState,
-              // We want to check if the message is in an open group
-              // only if it is not a direct child of the group we're opening.
-              checkGroup: message.groupId !== action.id,
-            }).visible
-          ) {
-            res.push(id);
-          }
-          return res;
-        }, []);
-
-        // We can then insert the messages ids right after the one of the group.
-        const insertIndex = visibleMessages.indexOf(action.id) + 1;
-        openState.visibleMessages = [
-          ...visibleMessages.slice(0, insertIndex),
-          ...messagesToShow,
-          ...visibleMessages.slice(insertIndex),
-        ];
-      }
-
-      return openState;
-
     case constants.FILTER_TOGGLE:
     case constants.FILTER_TEXT_SET:
     case constants.FILTERS_CLEAR:
@@ -354,60 +271,6 @@ function setVisibleMessages({ messagesState, filtersState, forceTimestampSort = 
 }
 
 /**
- * Returns the new current group id given the previous current group and the groupsById
- * state property.
- *
- * @param {String} currentGroup: id of the current group
- * @param {Map} groupsById
- * @param {Array} ignoredIds: An array of ids which can't be the new current group.
- * @returns {String|null} The new current group id, or null if there isn't one.
- */
-function getNewCurrentGroup(currentGroup, groupsById, ignoredIds = []) {
-  if (!currentGroup) {
-    return null;
-  }
-
-  // Retrieve the parent groups of the current group.
-  const parents = groupsById.get(currentGroup);
-
-  // If there's at least one parent, make the first one the new currentGroup.
-  if (Array.isArray(parents) && parents.length > 0) {
-    // If the found group must be ignored, let's search for its parent.
-    if (ignoredIds.includes(parents[0])) {
-      return getNewCurrentGroup(parents[0], groupsById, ignoredIds);
-    }
-
-    return parents[0];
-  }
-
-  return null;
-}
-
-function getParentGroups(currentGroup, groupsById) {
-  let groups = [];
-  if (currentGroup) {
-    // If there is a current group, we add it as a parent
-    groups = [currentGroup];
-
-    // As well as all its parents, if it has some.
-    const parentGroups = groupsById.get(currentGroup);
-    if (Array.isArray(parentGroups) && parentGroups.length > 0) {
-      groups = groups.concat(parentGroups);
-    }
-  }
-
-  return groups;
-}
-
-function getOutermostGroup(message, groupsById) {
-  const groups = getParentGroups(message.groupId, groupsById);
-  if (groups.length === 0) {
-    return null;
-  }
-  return groups[groups.length - 1];
-}
-
-/**
  * Clean the properties for a given state object and an array of removed messages ids.
  * Be aware that this function MUTATE the `state` argument.
  *
@@ -433,44 +296,17 @@ function removeMessagesFromState(state, removedMessagesIds) {
   }
 
   const isInRemovedId = id => removedMessagesIds.includes(id);
-  const mapHasRemovedIdKey = map => removedMessagesIds.some(id => map.has(id));
-  const objectHasRemovedIdKey = obj => Object.keys(obj).findIndex(isInRemovedId) !== -1;
 
   const cleanUpMap = map => {
     const clonedMap = new Map(map);
     removedMessagesIds.forEach(id => clonedMap.delete(id));
     return clonedMap;
   };
-  const cleanUpObject = object =>
-    [...Object.entries(object)].reduce((res, [id, value]) => {
-      if (!isInRemovedId(id)) {
-        res[id] = value;
-      }
-      return res;
-    }, {});
 
   state.messagesById = cleanUpMap(state.messagesById);
 
   if (state.messagesUiById.find(isInRemovedId)) {
     state.messagesUiById = state.messagesUiById.filter(id => !isInRemovedId(id));
-  }
-
-  if (isInRemovedId(state.currentGroup)) {
-    state.currentGroup = getNewCurrentGroup(
-      state.currentGroup,
-      state.groupsById,
-      removedMessagesIds
-    );
-  }
-
-  if (mapHasRemovedIdKey(state.messagesPayloadById)) {
-    state.messagesPayloadById = cleanUpMap(state.messagesPayloadById);
-  }
-  if (mapHasRemovedIdKey(state.groupsById)) {
-    state.groupsById = cleanUpMap(state.groupsById);
-  }
-  if (mapHasRemovedIdKey(state.groupsById)) {
-    state.groupsById = cleanUpMap(state.groupsById);
   }
 
   return state;
@@ -505,18 +341,7 @@ function getToplevelMessageCount(state) {
  *         - cause {String}: if visible is false, what causes the message to be hidden.
  */
 // eslint-disable-next-line complexity
-function getMessageVisibility(message, { messagesState, filtersState, checkGroup = true }) {
-  // Do not display the message if it's in closed group and not in a warning group.
-  if (
-    checkGroup &&
-    !isInOpenedGroup(message, messagesState.groupsById, messagesState.messagesUiById)
-  ) {
-    return {
-      visible: false,
-      cause: "closedGroup",
-    };
-  }
-
+function getMessageVisibility(message, { messagesState, filtersState }) {
   // Some messages can't be filtered out (e.g. groups).
   // So, always return visible: true for those.
   if (isUnfilterable(message)) {
@@ -556,29 +381,9 @@ function getMessageVisibility(message, { messagesState, filtersState, checkGroup
 }
 
 function isUnfilterable(message) {
-  return [
-    MESSAGE_TYPE.COMMAND,
-    MESSAGE_TYPE.RESULT,
-    MESSAGE_TYPE.START_GROUP,
-    MESSAGE_TYPE.START_GROUP_COLLAPSED,
-    MESSAGE_TYPE.NAVIGATION_MARKER,
-  ].includes(message.type);
-}
-
-function isInOpenedGroup(message, groupsById, messagesUI) {
-  return (
-    !message.groupId ||
-    (!isGroupClosed(message.groupId, messagesUI) &&
-      !hasClosedParentGroup(groupsById.get(message.groupId), messagesUI))
+  return [MESSAGE_TYPE.COMMAND, MESSAGE_TYPE.RESULT, MESSAGE_TYPE.NAVIGATION_MARKER].includes(
+    message.type
   );
-}
-
-function hasClosedParentGroup(group, messagesUI) {
-  return group.some(groupId => isGroupClosed(groupId, messagesUI));
-}
-
-function isGroupClosed(groupId, messagesUI) {
-  return messagesUI.includes(groupId) === false;
 }
 
 /**

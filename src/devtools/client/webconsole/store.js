@@ -9,12 +9,8 @@ import { UiState } from "devtools/client/webconsole/reducers/ui";
 import { prefs } from "devtools/client/webconsole/utils/prefs";
 
 export function getConsoleInitialState() {
-  const groupWarnings = prefs.groupWarningMessages;
-
   return {
-    prefs: PrefState({
-      groupWarnings,
-    }),
+    prefs: PrefState({}),
     filters: FilterState({
       error: prefs.filterError,
       warn: prefs.filterWarn,

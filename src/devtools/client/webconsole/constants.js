@@ -45,7 +45,6 @@ const actionTypes = {
   REVERSE_SEARCH_BACK: "REVERSE_SEARCH_BACK",
   PAUSED_EXECUTION_POINT: "PAUSED_EXECUTION_POINT",
   EAGER_EVALUATION_TOGGLE: "EAGER_EVALUATION_TOGGLE",
-  WARNING_GROUPS_TOGGLE: "WARNING_GROUPS_TOGGLE",
   WILL_NAVIGATE: "WILL_NAVIGATE",
   EDITOR_SET_WIDTH: "EDITOR_SET_WIDTH",
   TARGET_AVAILABLE: "TARGET_AVAILABLE",
@@ -123,8 +122,6 @@ const chromeRDPEnums = {
     JAVASCRIPT: "javascript",
     NETWORK: "network",
     CONSOLE_API: "console-api",
-    // Messages emitted by the console frontend itself (i.e. similar messages grouping
-    // header).
     CONSOLE_FRONTEND: "console-frontend",
     STORAGE: "storage",
     APPCACHE: "appcache",
@@ -139,9 +136,6 @@ const chromeRDPEnums = {
     TABLE: "table",
     TRACE: "trace",
     CLEAR: "clear",
-    START_GROUP: "startGroup",
-    START_GROUP_COLLAPSED: "startGroupCollapsed",
-    END_GROUP: "endGroup",
     ASSERT: "assert",
     DEBUG: "debug",
     PROFILE: "profile",

@@ -23,7 +23,6 @@ class ConsoleOutput extends Component {
       messages: PropTypes.object.isRequired,
       messagesUi: PropTypes.array.isRequired,
       timestampsVisible: PropTypes.bool,
-      messagesPayload: PropTypes.object.isRequired,
       visibleMessages: PropTypes.array.isRequired,
       pausedExecutionPoint: PropTypes.string,
     };
@@ -121,7 +120,6 @@ class ConsoleOutput extends Component {
       visibleMessages,
       messages,
       messagesUi,
-      messagesPayload,
       timestampsVisible,
       pausedExecutionPoint,
       closestMessage,
@@ -134,7 +132,6 @@ class ConsoleOutput extends Component {
         key: messageId,
         messageId,
         open: messagesUi.includes(messageId),
-        payload: messagesPayload.get(messageId),
         timestampsVisible,
 
         pausedExecutionPoint,
@@ -171,7 +168,6 @@ function mapStateToProps(state) {
     messages: selectors.getAllMessagesById(state),
     visibleMessages: selectors.getVisibleMessages(state),
     messagesUi: selectors.getAllMessagesUiById(state),
-    messagesPayload: selectors.getAllMessagesPayloadById(state),
     timestampsVisible: state.consoleUI.timestampsVisible,
     playback: selectors.getPlayback(state),
     hoveredPoint: selectors.getHoveredPoint(state),

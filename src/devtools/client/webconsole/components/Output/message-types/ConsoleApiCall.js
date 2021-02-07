@@ -12,7 +12,6 @@ const GripMessageBody = require("devtools/client/webconsole/components/Output/Gr
 const ConsoleTable = createFactory(
   require("devtools/client/webconsole/components/Output/ConsoleTable")
 );
-const { isGroupType, l10n } = require("devtools/client/webconsole/utils/messages");
 
 const Message = createFactory(require("devtools/client/webconsole/components/Output/Message"));
 
@@ -124,11 +123,8 @@ function ConsoleApiCall(props) {
   }
 
   let collapseTitle = null;
-  if (isGroupType(type)) {
-    collapseTitle = "Show/hide group";
-  }
 
-  const collapsible = isGroupType(type) || (type === "error" && Array.isArray(stacktrace));
+  const collapsible = type === "error" && Array.isArray(stacktrace);
   const topLevelClasses = ["cm-s-mozilla"];
   return Message({
     messageId,

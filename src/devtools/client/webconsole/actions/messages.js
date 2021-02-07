@@ -147,7 +147,6 @@ function onLogpointResult(logGroupId, point, time, { sourceId, line, column }, p
       executionPoint: point,
       executionPointTime: time,
       executionPointHasFrames: true,
-      logpointId: logGroupId,
       pauseId: pause.pauseId,
     };
 
