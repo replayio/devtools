@@ -17,8 +17,6 @@ const {
   MESSAGES_CLEAR_LOGPOINT,
   MESSAGE_OPEN,
   MESSAGE_CLOSE,
-  MESSAGE_UPDATE_PAYLOAD,
-  PAUSED_EXECUTION_POINT,
   MESSAGES_CLEAR_EVALUATIONS,
   MESSAGES_CLEAR_EVALUATION,
 } = require("devtools/client/webconsole/constants");
@@ -238,21 +236,5 @@ export function messageClose(id) {
   return {
     type: MESSAGE_CLOSE,
     id,
-  };
-}
-
-/**
- * Associate additional data with a message without mutating the original message object.
- *
- * @param {String} id
- *        Message ID
- * @param {Object} data
- *        Object with arbitrary data.
- */
-export function messageUpdatePayload(id, data) {
-  return {
-    type: MESSAGE_UPDATE_PAYLOAD,
-    id,
-    data,
   };
 }

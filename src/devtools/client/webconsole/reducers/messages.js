@@ -309,31 +309,6 @@ function messages(state = MessageState(), action) {
 
       return openState;
 
-    case constants.MESSAGE_CLOSE:
-      const closeState = { ...state };
-      const messageId = action.id;
-      const index = closeState.messagesUiById.indexOf(messageId);
-      closeState.messagesUiById.splice(index, 1);
-      closeState.messagesUiById = [...closeState.messagesUiById];
-
-      // If the message is a group
-      if (isGroupType(messagesById.get(messageId).type)) {
-        // Hide all its children
-        closeState.visibleMessages = visibleMessages.filter((id, i, arr) => {
-          const message = messagesById.get(id);
-
-          const parentGroups = getParentGroups(message.groupId, groupsById);
-          return parentGroups.includes(messageId) === false;
-        });
-      }
-      return closeState;
-
-    case constants.MESSAGE_UPDATE_PAYLOAD:
-      return {
-        ...state,
-        messagesPayloadById: new Map(messagesPayloadById).set(action.id, action.data),
-      };
-
     case constants.FILTER_TOGGLE:
     case constants.FILTER_TEXT_SET:
     case constants.FILTERS_CLEAR:
