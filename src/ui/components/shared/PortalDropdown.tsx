@@ -25,12 +25,12 @@ export default function PortalDropdown(props: PortalDropdownProps) {
     [props.expanded]
   );
 
-  const expand = (e: MouseEvent) => {
+  const expand = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     props.setExpanded(true);
   };
-  const collapse = (e: MouseEvent) => {
+  const collapse = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     props.setExpanded(false);
