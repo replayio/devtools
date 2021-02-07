@@ -53,9 +53,15 @@
   line-height: 16px;
 }
 
-.user-options a.changelog {
+.user-options .row.logout {
+  padding: 4px;
+}
+
+.user-options a.logout {
   width: 100%;
   text-decoration: none;
+  align-self: center;
+  height: 24px;
 }
 
 .user-options .dropdown-wrapper button {
@@ -70,8 +76,8 @@
   top: 48px;
   animation: dropdownFadeIn ease 200ms;
 }
-
-.dropdown-wrapper button {
+/* 
+.user-options .dropdown-wrapper button {
   border-radius: 4px;
   padding: 8px 12px;
   border-radius: 4px;
@@ -83,9 +89,9 @@
   line-height: 16px;
 }
 
-.dropdown-wrapper button .img {
+.user-options .dropdown-wrapper button .img {
   background: white;
-}
+} */
 
 .avatar img {
   height: 24px;

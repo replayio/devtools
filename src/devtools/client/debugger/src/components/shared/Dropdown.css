@@ -44,17 +44,23 @@
   width: 28px;
 }
 
+.dropdown-button:focus {
+  outline: none;
+}
+
 .dropdown-button .img {
   display: block;
 }
 
-.dropdown ul, .portal-dropdown-container ul {
+.dropdown ul,
+.portal-dropdown-container ul {
   margin: 0;
   padding: 4px 0;
   list-style: none;
 }
 
-.dropdown li, .portal-dropdown-container li {
+.dropdown li,
+.portal-dropdown-container li {
   display: flex;
   align-items: center;
   padding: 6px 8px;
@@ -63,7 +69,8 @@
   transition: all 0.25s ease;
 }
 
-.dropdown li:hover, .portal-dropdown-container li:hover {
+.dropdown li:hover,
+.portal-dropdown-container li:hover {
   background-color: var(--search-overlays-semitransparent);
 }
 

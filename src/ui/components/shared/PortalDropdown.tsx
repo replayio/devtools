@@ -19,17 +19,20 @@ export default function PortalDropdown(props: PortalDropdownProps) {
   const dropdownRef = useCallback(
     node => {
       if (node !== null) {
-        console.log(setDropdownNode);
         setDropdownNode(node);
       }
     },
     [props.expanded]
   );
 
-  const expand = () => {
+  const expand = (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     props.setExpanded(true);
   };
-  const collapse = () => {
+  const collapse = (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     props.setExpanded(false);
   };
 

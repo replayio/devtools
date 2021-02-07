@@ -1,7 +1,7 @@
 .portal-dropdown-wrapper {
   position: relative;
 }
-
+/* 
 .portal-dropdown-wrapper button.secondary {
   color: var(--dark-blue);
   border: 1px solid var(--dark-blue);
@@ -11,7 +11,7 @@
 
 .portal-dropdown-wrapper button.secondary .img {
   background: var(--dark-blue);
-}
+} */
 
 .portal-dropdown-wrapper button .img:not(:last-child) {
   margin-right: 4px;
@@ -29,7 +29,6 @@
 .portal-dropdown-container .content {
   background: white;
   width: max-content;
-  padding: 12px;
   display: flex;
   flex-direction: column;
   border-radius: 4px;
@@ -39,4 +38,8 @@
   background: var(--theme-toolbar-background);
   color: var(--theme-toolbar-color);
   z-index: 1001;
+}
+
+button.expand-dropdown:focus {
+  outline: none;
 }

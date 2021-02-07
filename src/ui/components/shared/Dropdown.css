@@ -2,6 +2,10 @@
   position: relative;
 }
 
+.dropdown-wrapper:hover {
+  cursor: pointer;
+}
+
 .dropdown-wrapper button.secondary {
   color: var(--primary-accent);
   border: 1px solid var(--primary-accent);

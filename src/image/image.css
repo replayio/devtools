@@ -441,6 +441,10 @@ button.jump-definition {
 .img.trash {
   -webkit-mask-image: url(~devtools/client/themes/images/trash.svg);
 }
+
+.img.pencil {
+  -webkit-mask-image: url(~devtools/client/themes/images/pen.svg);
+}
 .img.location-marker {
   -webkit-mask-image: url(~devtools/client/themes/images/location-marker.svg);
 }
