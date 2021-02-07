@@ -36,6 +36,10 @@ function findGeckoPath() {
     }
   }
   console.error("Can't find Gecko!");
+  for (const dir of installDirs) {
+    console.log(`Install directory ${dir} contents: ${fs.readdirSync(dir)}`);
+  }
+  throw new Error("Can't find Gecko!");
 }
 
 function createTestScript({ path }) {
