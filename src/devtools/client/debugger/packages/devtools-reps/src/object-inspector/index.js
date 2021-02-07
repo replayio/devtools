@@ -4,7 +4,5 @@
 
 const ObjectInspector = require("./components/ObjectInspector");
 const utils = require("./utils");
-const reducer = require("./reducer");
-const actions = require("./actions");
 
-module.exports = { ObjectInspector, utils, actions, reducer };
+module.exports = { ObjectInspector, utils };

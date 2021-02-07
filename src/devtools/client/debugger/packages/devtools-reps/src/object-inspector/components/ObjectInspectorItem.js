@@ -4,12 +4,8 @@
 
 //
 
-const { Component } = require("react");
+const { PureComponent } = require("react");
 const dom = require("react-dom-factories");
-
-import Services from "devtools-services";
-const { appinfo } = Services;
-const isMacOS = appinfo.OS === "Darwin";
 
 const classnames = require("classnames");
 const { MODE } = require("../../reps/constants");
@@ -17,7 +13,6 @@ const { MODE } = require("../../reps/constants");
 const Utils = require("../utils");
 
 const {
-  getValue,
   nodeHasAccessors,
   nodeHasProperties,
   nodeIsBlock,
@@ -25,7 +20,6 @@ const {
   nodeIsFunction,
   nodeIsGetter,
   nodeIsMapEntry,
-  nodeIsMissingArguments,
   nodeIsOptimizedOut,
   nodeIsPrimitive,
   nodeIsPrototype,
@@ -40,7 +34,7 @@ const {
   getNonPrototypeParentGripValue,
 } = Utils.node;
 
-class ObjectInspectorItem extends Component {
+class ObjectInspectorItem extends PureComponent {
   static get defaultProps() {
     return {
       onContextMenu: () => {},
@@ -120,14 +114,14 @@ class ObjectInspectorItem extends Component {
         };
       }
 
-      if (nodeHasGetter(item)) {
-        const receiverGrip = getNonPrototypeParentGripValue(item);
-        if (receiverGrip) {
-          Object.assign(repProps, {
-            onInvokeGetterButtonClick: () => this.props.invokeGetter(item, receiverGrip.actor),
-          });
-        }
-      }
+      // if (nodeHasGetter(item)) {
+      //   const receiverGrip = getNonPrototypeParentGripValue(item);
+      //   if (receiverGrip) {
+      //     Object.assign(repProps, {
+      //       onInvokeGetterButtonClick: () => this.props.invokeGetter(item, receiverGrip.actor),
+      //     });
+      //   }
+      // }
 
       return {
         label,

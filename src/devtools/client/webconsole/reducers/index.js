@@ -7,14 +7,10 @@ const { filters } = require("devtools/client/webconsole/reducers/filters");
 const { messages } = require("devtools/client/webconsole/reducers/messages");
 const { prefs } = require("devtools/client/webconsole/reducers/prefs");
 const { ui } = require("devtools/client/webconsole/reducers/ui");
-const {
-  default: objectInspector,
-} = require("devtools/client/debugger/packages/devtools-reps/src/object-inspector/reducer");
 
 exports.reducers = {
   filters,
   messages,
   prefs,
   consoleUI: ui,
-  objectInspector,
 };
