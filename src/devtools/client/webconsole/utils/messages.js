@@ -335,39 +335,6 @@ function isGroupType(type) {
   return [MESSAGE_TYPE.START_GROUP, MESSAGE_TYPE.START_GROUP_COLLAPSED].includes(type);
 }
 
-function createWarningGroupMessage(id, type, firstMessage) {
-  return new ConsoleMessage({
-    id,
-    level: MESSAGE_LEVEL.WARN,
-    source: MESSAGE_SOURCE.CONSOLE_FRONTEND,
-    type,
-    messageText: getWarningGroupLabel(firstMessage),
-    timeStamp: firstMessage.timeStamp,
-    innerWindowID: firstMessage.innerWindowID,
-  });
-}
-
-/**
- * Given the a regular warning message, compute the label of the warning group the message
- * could be in.
- * For example, if the message text is:
- * The resource at “http://evil.com” was blocked because content blocking is enabled
- *
- * it may be turned into
- *
- * The resource at “<URL>” was blocked because content blocking is enabled
- *
- * @param {ConsoleMessage} firstMessage
- * @returns {String} The computed label
- */
-function getWarningGroupLabel(firstMessage) {
-  if (isContentBlockingMessage(firstMessage) || isTrackingProtectionMessage(firstMessage)) {
-    return replaceURL(firstMessage.messageText, "<URL>");
-  }
-
-  return "";
-}
-
 /**
  * Replace any URL in the provided text by the provided replacement text, or an empty
  * string.
@@ -412,53 +379,6 @@ function replaceURL(text, replacementText = "") {
   }
 
   return result + text;
-}
-
-/**
- * Get the warningGroup type in which the message could be in.
- * @param {ConsoleMessage} message
- * @returns {String|null} null if the message can't be part of a warningGroup.
- */
-function getWarningGroupType(message) {
-  if (isContentBlockingMessage(message)) {
-    return MESSAGE_TYPE.CONTENT_BLOCKING_GROUP;
-  }
-
-  if (isTrackingProtectionMessage(message)) {
-    return MESSAGE_TYPE.TRACKING_PROTECTION_GROUP;
-  }
-
-  return null;
-}
-
-/**
- * Returns a computed id given a message
- *
- * @param {ConsoleMessage} type: the message type, from MESSAGE_TYPE.
- * @param {Integer} innerWindowID: the message innerWindowID.
- * @returns {String}
- */
-function getParentWarningGroupMessageId(message) {
-  const warningGroupType = getWarningGroupType(message);
-  if (!warningGroupType) {
-    return null;
-  }
-
-  return `${warningGroupType}-${message.innerWindowID}`;
-}
-
-/**
- * Returns true if the message is a warningGroup message (i.e. the "Header").
- * @param {ConsoleMessage} message
- * @returns {Boolean}
- */
-function isWarningGroup(message) {
-  return (
-    message.type === MESSAGE_TYPE.CONTENT_BLOCKING_GROUP ||
-    message.type === MESSAGE_TYPE.TRACKING_PROTECTION_GROUP ||
-    message.type === MESSAGE_TYPE.CORS_GROUP ||
-    message.type === MESSAGE_TYPE.CSP_GROUP
-  );
 }
 
 /**
@@ -527,14 +447,10 @@ function isError(message) {
 }
 
 module.exports = {
-  createWarningGroupMessage,
   getArrayTypeNames,
   getDescriptorValue,
-  getParentWarningGroupMessageId,
-  getWarningGroupType,
   isContentBlockingMessage,
   isGroupType,
-  isWarningGroup,
   isError,
   l10n,
   prepareMessage,

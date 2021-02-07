@@ -20,7 +20,6 @@ PageError.propTypes = {
   open: PropTypes.bool,
   timestampsVisible: PropTypes.bool.isRequired,
   maybeScrollToBottom: PropTypes.func,
-  inWarningGroup: PropTypes.bool.isRequired,
 };
 
 PageError.defaultProps = {
@@ -36,7 +35,6 @@ function PageError(props) {
     timestampsVisible,
     isPaused,
     maybeScrollToBottom,
-    inWarningGroup,
     pausedExecutionPoint,
   } = props;
   const {
@@ -77,7 +75,6 @@ function PageError(props) {
     level,
     topLevelClasses: [],
     indent: message.indent,
-    inWarningGroup,
     messageBody,
     repeat,
     frame,

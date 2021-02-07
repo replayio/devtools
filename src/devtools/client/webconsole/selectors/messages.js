@@ -3,11 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const { getWarningGroupType } = require("devtools/client/webconsole/utils/messages");
-const {
-  getParentWarningGroupMessageId,
-  isError,
-} = require("devtools/client/webconsole/utils/messages");
+const { isError } = require("devtools/client/webconsole/utils/messages");
 const { pointPrecedes } = require("protocol/execution-point-utils");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { getCurrentTime } = require("ui/reducers/timeline");
@@ -22,7 +18,6 @@ export const getCurrentGroup = state => state.messages.currentGroup;
 export const getFilteredMessagesCount = state => state.messages.filteredMessagesCount;
 export const getAllRepeatById = state => state.messages.repeatById;
 export const getGroupsById = state => state.messages.groupsById;
-export const getAllWarningGroupsById = state => state.messages.warningGroupsById;
 
 function messageTime(msg) {
   const { executionPointTime, lastExecutionPoint } = msg;
@@ -107,12 +102,4 @@ export const getClosestMessage = createSelector(
 
 export function getMessage(state, id) {
   return getAllMessagesById(state).get(id);
-}
-
-export function isMessageInWarningGroup(message, visibleMessages = []) {
-  if (!getWarningGroupType(message)) {
-    return false;
-  }
-
-  return visibleMessages.includes(getParentWarningGroupMessageId(message));
 }

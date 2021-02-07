@@ -40,7 +40,6 @@ class Message extends Component {
       type: PropTypes.string.isRequired,
       level: PropTypes.string.isRequired,
       indent: PropTypes.number.isRequired,
-      inWarningGroup: PropTypes.bool,
       topLevelClasses: PropTypes.array.isRequired,
       messageBody: PropTypes.any.isRequired,
       repeat: PropTypes.any,
@@ -180,7 +179,6 @@ class Message extends Component {
       executionPointTime,
       executionPointHasFrames,
       dispatch,
-      inWarningGroup,
       pausedExecutionPoint = Number.POSITIVE_INFINITY,
       type,
       frame,
@@ -188,7 +186,7 @@ class Message extends Component {
       isFirstMessageForPoint,
     } = this.props;
 
-    if (inWarningGroup || !pausedExecutionPoint || !executionPoint || !frame) {
+    if (!pausedExecutionPoint || !executionPoint || !frame) {
       return undefined;
     }
 
@@ -230,11 +228,7 @@ class Message extends Component {
   }
 
   renderIcon() {
-    const { level, inWarningGroup, type } = this.props;
-
-    if (inWarningGroup) {
-      return undefined;
-    }
+    const { level, type } = this.props;
 
     return MessageIcon({ level, type });
   }
@@ -316,7 +310,6 @@ class Message extends Component {
       isPaused,
       level,
       indent,
-      inWarningGroup,
       topLevelClasses,
       messageBody,
       frame,
@@ -448,7 +441,6 @@ class Message extends Component {
       timestampEl,
       MessageIndent({
         indent,
-        inWarningGroup,
       }),
       icon,
       collapse,
