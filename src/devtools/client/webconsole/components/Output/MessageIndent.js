@@ -23,11 +23,7 @@ function getIndentElement(indent, className) {
 }
 
 function MessageIndent(props) {
-  const { indent, inWarningGroup } = props;
-
-  if (inWarningGroup) {
-    return IN_WARNING_GROUP_INDENT;
-  }
+  const { indent } = props;
 
   return CONSTANT_INDENTS[indent] || getIndentElement(indent);
 }

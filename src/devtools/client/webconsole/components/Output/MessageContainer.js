@@ -7,7 +7,6 @@
 // React & Redux
 const { Component } = require("react");
 const PropTypes = require("prop-types");
-const { isWarningGroup } = require("devtools/client/webconsole/utils/messages");
 
 const { MESSAGE_SOURCE, MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 
@@ -29,10 +28,6 @@ const componentMap = new Map([
     require("devtools/client/webconsole/components/Output/message-types/EvaluationResult"),
   ],
   ["PageError", require("devtools/client/webconsole/components/Output/message-types/PageError")],
-  [
-    "WarningGroup",
-    require("devtools/client/webconsole/components/Output/message-types/WarningGroup"),
-  ],
 ]);
 
 class MessageContainer extends Component {
@@ -48,7 +43,6 @@ class MessageContainer extends Component {
       getMessage: PropTypes.func.isRequired,
       isPaused: PropTypes.bool.isRequired,
       pausedExecutionPoint: PropTypes.string,
-      inWarningGroup: PropTypes.bool,
     };
   }
 
@@ -67,7 +61,6 @@ class MessageContainer extends Component {
       "isPaused",
       "pausedExecutionPoint",
       "badge",
-      "inWarningGroup",
       "hoveredPoint",
     ];
 
@@ -104,11 +97,6 @@ function getMessageComponent(message) {
         default:
           return componentMap.get("DefaultRenderer");
       }
-    case MESSAGE_SOURCE.CONSOLE_FRONTEND:
-      if (isWarningGroup(message)) {
-        return componentMap.get("WarningGroup");
-      }
-      break;
   }
 
   return componentMap.get("DefaultRenderer");

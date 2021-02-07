@@ -24,7 +24,6 @@ class ConsoleOutput extends Component {
       messagesUi: PropTypes.array.isRequired,
       timestampsVisible: PropTypes.bool,
       messagesPayload: PropTypes.object.isRequired,
-      warningGroups: PropTypes.object.isRequired,
       visibleMessages: PropTypes.array.isRequired,
       pausedExecutionPoint: PropTypes.string,
     };
@@ -123,7 +122,6 @@ class ConsoleOutput extends Component {
       messages,
       messagesUi,
       messagesPayload,
-      warningGroups,
       timestampsVisible,
       pausedExecutionPoint,
       closestMessage,
@@ -138,11 +136,7 @@ class ConsoleOutput extends Component {
         open: messagesUi.includes(messageId),
         payload: messagesPayload.get(messageId),
         timestampsVisible,
-        badge: warningGroups.has(messageId) ? warningGroups.get(messageId).length : null,
-        inWarningGroup:
-          warningGroups && warningGroups.size > 0
-            ? isMessageInWarningGroup(messages.get(messageId), visibleMessages)
-            : false,
+
         pausedExecutionPoint,
         getMessage: () => messages.get(messageId),
         isPaused: closestMessage?.id == messageId,
@@ -178,7 +172,6 @@ function mapStateToProps(state) {
     visibleMessages: selectors.getVisibleMessages(state),
     messagesUi: selectors.getAllMessagesUiById(state),
     messagesPayload: selectors.getAllMessagesPayloadById(state),
-    warningGroups: selectors.getAllWarningGroupsById(state),
     timestampsVisible: state.consoleUI.timestampsVisible,
     playback: selectors.getPlayback(state),
     hoveredPoint: selectors.getHoveredPoint(state),
