@@ -18,12 +18,6 @@ import rules from "devtools/client/inspector/rules/reducers/rules";
 import computed from "devtools/client/inspector/computed/reducers";
 export { classList, markup, eventTooltip, pseudoClasses, rules, computed };
 
-// This ObjectInspector reducer is needed for the Extension Sidebar.
-const {
-  default: objectInspector,
-} = require("devtools/client/debugger/packages/devtools-reps/src/object-inspector/reducer");
-export { objectInspector };
-
 export function inspector(
   state: InspectorState = initialInspectorState(),
   action: InspectorAction

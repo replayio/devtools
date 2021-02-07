@@ -4,11 +4,8 @@
 
 //
 
-const { Component, createFactory, createElement } = require("react");
+const { PureComponent, Component, createFactory, createElement } = require("react");
 const { connect } = require("react-redux");
-const actions = require("../actions");
-
-const selectors = require("../reducer");
 
 import { Tree as _Tree } from "devtools/client/debugger/src/components/shared/tree";
 const Tree = createFactory(_Tree);
@@ -57,17 +54,21 @@ const {
 // fetched, and a primitive value that should be displayed with no
 // children.
 
-class ObjectInspector extends Component {
+class ObjectInspector extends PureComponent {
   static defaultProps;
+
+  state = {
+    expandedPaths: new Set(),
+    loadedProperties: new Map(),
+  };
+
   constructor(props) {
     super();
     this.cachedNodes = new Map();
 
     const self = this;
 
-    self.getItemChildren = this.getItemChildren.bind(this);
     self.isNodeExpandable = this.isNodeExpandable.bind(this);
-    self.setExpanded = this.setExpanded.bind(this);
     self.focusItem = this.focusItem.bind(this);
     self.activateItem = this.activateItem.bind(this);
     self.getRoots = this.getRoots.bind(this);
@@ -81,77 +82,29 @@ class ObjectInspector extends Component {
     this.activeItem = this.props.activeItem;
   }
 
-  UNSAFE_componentWillUpdate(nextProps) {
-    this.removeOutdatedNodesFromCache(nextProps);
+  // shouldComponentUpdate(nextProps) {
+  //   // We should update if:
 
-    if (this.roots !== nextProps.roots) {
-      // Since the roots changed, we assume the properties did as well,
-      // so we need to cleanup the component internal state.
-      this.roots = nextProps.roots;
-      this.focusedItem = nextProps.focusedItem;
-      this.activeItem = nextProps.activeItem;
-      if (this.props.rootsChanged) {
-        this.props.rootsChanged();
-      }
-    }
-  }
+  //   // - OR the focused node changed.
+  //   // - OR the active node changed.
+  //   return this.focusedItem !== nextProps.focusedItem || this.activeItem !== nextProps.activeItem;
+  // }
 
-  removeOutdatedNodesFromCache(nextProps) {
-    // When the roots changes, we can wipe out everything.
-    if (this.roots !== nextProps.roots) {
-      this.cachedNodes.clear();
-      return;
-    }
-
-    for (const path of this.cachedNodes.keys()) {
-      const existing = this.props.loadedProperties.get(path);
-      if (!existing || existing !== nextProps.loadedProperties.get(path)) {
-        this.cachedNodes.delete(path);
-      }
-    }
-  }
-
-  shouldComponentUpdate(nextProps) {
-    const { expandedPaths, loadedProperties } = this.props;
-
-    // We should update if:
-    // - there are new loaded properties
-    // - OR the expanded paths number changed, and all of them have properties
-    //      loaded
-    // - OR the expanded paths number did not changed, but old and new sets
-    //      differ
-    // - OR the focused node changed.
-    // - OR the active node changed.
-    return (
-      loadedProperties !== nextProps.loadedProperties ||
-      loadedProperties.size !== nextProps.loadedProperties.size ||
-      (expandedPaths.size !== nextProps.expandedPaths.size &&
-        [...nextProps.expandedPaths].every(path => nextProps.loadedProperties.has(path))) ||
-      (expandedPaths.size === nextProps.expandedPaths.size &&
-        [...nextProps.expandedPaths].some(key => !expandedPaths.has(key))) ||
-      this.focusedItem !== nextProps.focusedItem ||
-      this.activeItem !== nextProps.activeItem ||
-      this.roots !== nextProps.roots
-    );
-  }
-
-  componentWillUnmount() {
-    this.props.closeObjectInspector();
-  }
+  componentWillUnmount() {}
 
   props;
   cachedNodes;
 
-  getItemChildren(item) {
-    const { loadedProperties } = this.props;
-    const { cachedNodes } = this;
+  getItemChildren = item => {
+    if (this.cachedNodes.has(item.path)) {
+      const children = this.cachedNodes.get(item.path);
+      return children;
+    }
 
-    return getChildren({
-      loadedProperties,
-      cachedNodes,
-      item,
-    });
-  }
+    const children = getChildren({ item });
+    this.cachedNodes.set(item.path, children);
+    return children;
+  };
 
   getRoots() {
     return this.props.roots;
@@ -175,23 +128,28 @@ class ObjectInspector extends Component {
     return true;
   }
 
-  setExpanded(item, expand) {
+  setExpanded = (item, expand) => {
+    const { expandedPaths, loadedProperties } = this.state;
     if (!this.isNodeExpandable(item)) {
       return;
     }
-
-    const { nodeExpand, nodeCollapse, setExpanded, roots } = this.props;
-
-    if (expand === true) {
-      nodeExpand(item);
+    if (expand) {
+      expandedPaths.add(item.path);
     } else {
-      nodeCollapse(item);
+      expandedPaths.delete(item.path);
     }
 
-    if (setExpanded) {
-      setExpanded(item, expand);
+    this.setState({ expandedPaths });
+
+    if (!loadedProperties.has(item.path)) {
+      getValue(item)
+        .loadChildren()
+        .then(children => {
+          loadedProperties.set(item.path, children);
+          this.setState({ loadedProperties });
+        });
     }
-  }
+  };
 
   focusItem(item) {
     const { focusable = true, onFocus } = this.props;
@@ -224,15 +182,8 @@ class ObjectInspector extends Component {
   }
 
   render() {
-    const {
-      autoExpandAll = true,
-      autoExpandDepth = 1,
-      initiallyExpanded,
-      focusable = true,
-      disableWrap = false,
-      expandedPaths,
-      inline,
-    } = this.props;
+    const { focusable = true, disableWrap = false, inline } = this.props;
+    const { expandedPaths } = this.state;
 
     return Tree({
       className: classnames({
@@ -241,10 +192,7 @@ class ObjectInspector extends Component {
         "object-inspector": true,
       }),
 
-      autoExpandAll,
-      autoExpandDepth,
-      initiallyExpanded,
-      isExpanded: item => expandedPaths && expandedPaths.has(item.path),
+      isExpanded: item => expandedPaths.has(item.path),
       isExpandable: this.isNodeExpandable,
       focused: this.focusedItem,
       active: this.activeItem,
@@ -274,15 +222,6 @@ class ObjectInspector extends Component {
   }
 }
 
-function mapStateToProps(state, props) {
-  return {
-    expandedPaths: selectors.getExpandedPaths(state),
-    loadedProperties: selectors.getLoadedProperties(state),
-  };
-}
-
-const OI = connect(mapStateToProps, actions)(ObjectInspector);
-
 // eslint-disable-next-line
 export default props => {
   const { roots } = props;
@@ -295,5 +234,5 @@ export default props => {
     return renderRep(roots[0], props);
   }
 
-  return createElement(OI, props);
+  return createElement(ObjectInspector, props);
 };

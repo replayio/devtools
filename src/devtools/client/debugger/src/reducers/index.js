@@ -25,7 +25,6 @@ import quickOpen from "./quick-open";
 import sourceTree from "./source-tree";
 import threads from "./threads";
 import eventListenerBreakpoints from "./event-listeners";
-import { objectInspector } from "devtools-reps";
 
 export default {
   sourceActors,
@@ -43,6 +42,5 @@ export default {
   sourceTree,
   threads,
   eventListenerBreakpoints,
-  objectInspector: objectInspector.reducer.default,
   preview,
 };

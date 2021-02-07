@@ -680,22 +680,13 @@ function setNodeChildren(node, children) {
 }
 
 function getChildren(options) {
-  const { cachedNodes, item, loadedProperties = new Map() } = options;
-
-  const key = item.path;
-  if (cachedNodes && cachedNodes.has(key)) {
-    return cachedNodes.get(key);
-  }
+  const { item } = options;
 
   const children = getValue(item)
     .getChildren()
     .map(({ name, contents }) => {
       return { name, contents, path: `${item.path}/${name}` };
     });
-
-  if (cachedNodes) {
-    cachedNodes.set(key, children);
-  }
 
   return children;
 }
