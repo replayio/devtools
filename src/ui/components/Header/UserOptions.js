@@ -37,17 +37,8 @@ export default function UserOptions() {
             <div className="user-email">{user.email}</div>
           </div>
         </div>
-        <div className="row clickable">
-          <a
-            className="changelog"
-            href="https://headwayapp.co/replay-changelog"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <button>Changelog</button>
-          </a>
-        </div>
-        <div className="row clickable">
+
+        <div className="row clickable logout">
           <LoginButton />
         </div>
       </Dropdown>

@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import classnames from "classnames";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
+
 import { useAuth0 } from "@auth0/auth0-react";
 import moment from "moment";
 
@@ -83,9 +85,9 @@ function CommentBodyItem({ comment, isRoot, hoveredComment }) {
         <img src={comment.user.picture} className="comment-picture" />
         <div className="comment-body-header-label">
           <div className="comment-body-header-label-name">{comment.user.name}</div>
-          <div className="comment-body-header-label-date">{rel}</div>
+          {/* <div className="comment-body-header-label-date">{rel}</div> */}
         </div>
-        {isRoot && <TimestampOrAction {...{ comment, hoveredComment }} />}
+        {isRoot && <Actions {...{ comment, hoveredComment }} />}
       </div>
       <div className="item-content">
         {lines.map((line, i) => (
@@ -96,11 +98,13 @@ function CommentBodyItem({ comment, isRoot, hoveredComment }) {
   );
 }
 
-function TimestampOrAction({ comment, hoveredComment }) {
+function Actions({ comment, hoveredComment }) {
   const { user } = useAuth0();
-  const isHovered = hoveredComment == comment.id;
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
+  const [expanded, setExpanded] = useState(false);
+
+  const isHovered = hoveredComment == comment.id;
   const isThreadAuthor = user?.sub === comment.user.auth_id;
 
   const deleteThread = e => {
@@ -112,11 +116,28 @@ function TimestampOrAction({ comment, hoveredComment }) {
   if (isHovered && isThreadAuthor) {
     return (
       <div className="comment-actions">
-        <button className="img trash" title="Delete Thread" onClick={deleteThread} />
+        <PortalDropdown
+          buttonContent={<div className="dropdown-button">⋮</div>}
+          setExpanded={setExpanded}
+          expanded={expanded}
+          buttonStyle=""
+          position="bottom-right"
+        >
+          {/* <div className="comments-dropdown-item" title="Edit Comment" onClick={deleteThread}>
+            Edit comment
+          </div> */}
+          <div className="comments-dropdown-item" title="Delete Comment" onClick={deleteThread}>
+            Delete Comment
+          </div>
+        </PortalDropdown>
       </div>
     );
   }
 
+  return <Timestamp comment={comment} />;
+}
+
+function Timestamp({ comment }) {
   return (
     <div className="comment-body-header-timestamp">{`00:${Math.floor(comment.time / 1000)
       .toString()

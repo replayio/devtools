@@ -178,10 +178,10 @@
   left: -150px;
 }
 
-.comments-panel .dropdown-button {
+/* .comments-panel .dropdown-button {
   height: 28px;
   width: 28px;
-}
+} */
 
 .right-sidebar button.comment {
   mask-repeat: no-repeat;
@@ -276,13 +276,45 @@
   flex-direction: row;
 }
 
-.comments-panel .comment-actions button {
-  cursor: pointer;
+.comments-panel .comment-actions .dropdown-button {
+  font-size: 12px;
+  font-family: monospace;
+  background: var(--grey-20);
+  color: var(--theme-comment);
+  padding: 4px;
+  border-radius: 4px;
+  text-align: center;
+  width: 18px;
+  font-weight: bold;
+}
+
+.comments-panel .comment-actions .dropdown-button:hover {
+  background: var(--grey-30);
 }
 
 .comments-panel .comment-actions .img {
   width: 20px;
   height: 20px;
+}
+
+.comments-dropdown-item {
+  line-height: 20px;
+  padding: 4px 14px 4px 8px;
+}
+
+.comments-dropdown-item:first-child {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.comments-dropdown-item:last-child {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.comments-dropdown-item:hover {
+  background-color: var(--grey-20);
+  cursor: pointer;
 }
 
 .comments-panel .comment-actions .img:hover {
