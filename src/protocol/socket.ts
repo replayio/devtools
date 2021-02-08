@@ -1,5 +1,14 @@
 import { defer, makeInfallible } from "./utils";
-import { ProtocolClient } from "@recordreplay/protocol";
+import {
+  ProtocolClient,
+  EventMethods,
+  EventParams,
+  CommandMethods,
+  SessionId,
+  PauseId,
+  CommandParams,
+  CommandResult,
+} from "@recordreplay/protocol";
 import { setExpectedError } from "ui/actions/session";
 import { UIStore } from "ui/actions";
 import { Action, Dispatch } from "redux";
@@ -45,7 +54,12 @@ export function initSocket(store: UIStore, address?: string) {
   socket.onmessage = makeInfallible(onSocketMessage);
 }
 
-export function sendMessage(method: string, params: any, sessionId?: string, pauseId?: string) {
+export function sendMessage<M extends CommandMethods>(
+  method: M,
+  params: CommandParams<M>,
+  sessionId?: SessionId,
+  pauseId?: PauseId
+): Promise<CommandResult<M>> {
   const id = gNextMessageId++;
   const msg = { id, sessionId, pauseId, method, params };
 
@@ -77,15 +91,18 @@ function onSocketOpen() {
 
 const gEventListeners = new Map<string, (ev: any) => void>();
 
-export function addEventListener(method: string, handler: (ev: any) => void) {
-  if (gEventListeners.has(method)) {
-    throw new Error("Duplicate event listener: " + method);
+export function addEventListener<M extends EventMethods>(
+  event: M,
+  handler: (params: EventParams<M>) => void
+) {
+  if (gEventListeners.has(event)) {
+    throw new Error("Duplicate event listener: " + event);
   }
-  gEventListeners.set(method, handler);
+  gEventListeners.set(event, handler);
 }
 
-export function removeEventListener(method: string) {
-  gEventListeners.delete(method);
+export function removeEventListener<M extends EventMethods>(event: M) {
+  gEventListeners.delete(event);
 }
 
 export const client = new ProtocolClient({

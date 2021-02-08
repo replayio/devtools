@@ -22,7 +22,7 @@
     "@babel/plugin-transform-flow-strip-types": "^7.10.4",
     "@babel/preset-react": "^7.10.4",
     "@babel/types": "^7.12.0",
-    "@recordreplay/protocol": "^0.2.2",
+    "@recordreplay/protocol": "^0.3.0",
     "@sentry/apm": "^5.24.2",
     "@sentry/react": "^5.24.2",
     "apollo-link-http": "^1.5.17",
