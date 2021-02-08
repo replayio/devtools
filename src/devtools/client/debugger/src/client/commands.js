@@ -127,7 +127,7 @@ function setBreakpoint(location, options) {
   if (sourceId) {
     promises.push(ThreadFront.setBreakpoint(sourceId, line, column, condition));
     if (logValue) {
-      promises.push(setLogpoint(logGroupId, sourceId, line, column, logValue, condition));
+      promises.push(setLogpoint(logGroupId, { sourceId, line, column }, logValue, condition));
     }
   } else {
     promises.push(ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition));
@@ -157,7 +157,7 @@ function runAnalysis(location, options) {
   const showInConsole = false;
 
   if (sourceId) {
-    setLogpoint(logGroupId, sourceId, line, column, logValue, condition, showInConsole);
+    setLogpoint(logGroupId, { sourceId, line, column }, logValue, condition, showInConsole);
   } else {
     setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition, showInConsole);
   }
