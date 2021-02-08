@@ -6,32 +6,11 @@
 // Each logpoint has an associated log group ID, used to manipulate all the
 // messages associated with the logpoint atomically.
 
-import {
-  AnalysisEntry,
-  AnalysisId,
-  createAnalysisResult,
-  ExecutionPoint,
-  Location,
-  PointDescription,
-} from "@recordreplay/protocol";
-import { client, log } from "./socket";
-import { assert, defer } from "./utils";
+import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
+import { assert } from "./utils";
 import { ThreadFront, ValueFront, Pause } from "./thread";
-const { logpointGetFrameworkEventListeners } = require("./event-listeners");
-
-interface LogpointInfo {
-  analysisWaiters: Promise<createAnalysisResult>[];
-  points: PointDescription[];
-  pointsWaiter?: (value: void) => void;
-  locations: (Location | null)[];
-  showInConsole: boolean;
-}
-
-// Map log group ID to information about the logpoint.
-const gLogpoints = new Map<string, LogpointInfo>();
-
-// Map analysis ID to log group ID.
-const gAnalysisLogGroupIDs = new Map<AnalysisId, string>();
+import { logpointGetFrameworkEventListeners } from "./event-listeners";
+import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
 
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
@@ -53,24 +32,23 @@ export const LogpointHandlers: {
 } = {};
 
 export const PointHandlers: {
-  onPoints?: (points: PointDescription[], info: LogpointInfo) => void;
+  onPoints?: (points: PointDescription[], info: { locations: (Location | null)[] }) => void;
 } = {};
 
-const onAnalysisResult = (analysisId: string, results: AnalysisEntry[]) => {
-  log(`AnalysisResults ${results.length}`);
-
-  const logGroupId = gAnalysisLogGroupIDs.get(analysisId)!;
-  if (!gLogpoints.has(logGroupId)) {
-    return;
+function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
+  if (LogpointHandlers.onPointLoading) {
+    points.forEach(async ({ point, time, frame }) => {
+      if (!frame) return;
+      const location = await ThreadFront.getPreferredLocation(frame);
+      assert(location);
+      LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
+    });
   }
+}
 
-  const info = gLogpoints.get(logGroupId);
-  if (!info?.showInConsole) {
-    return;
-  }
-
+function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
   if (LogpointHandlers.onResult) {
-    results.forEach(
+    result.forEach(
       async ({
         key: point,
         value: { time, pauseId, location, values, data, frameworkListeners },
@@ -82,84 +60,19 @@ const onAnalysisResult = (analysisId: string, results: AnalysisEntry[]) => {
         const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
         assert(mappedLocation);
         LogpointHandlers.onResult!(logGroupId, point, time, mappedLocation, pause, valueFronts);
-
-        if (frameworkListeners) {
-          const frameworkListenersFront = new ValueFront(pause, frameworkListeners);
-          eventLogpointOnFrameworkListeners(logGroupId, point, frameworkListenersFront);
-        }
       }
     );
   }
-};
-
-const onAnalysisPoints = (analysisId: string, points: PointDescription[]) => {
-  log(`AnalysisPoints ${points.length}`);
-
-  const logGroupId = gAnalysisLogGroupIDs.get(analysisId)!;
-  const info = gLogpoints.get(logGroupId);
-  if (!info) {
-    return;
-  }
-
-  info.points.push(...points);
-  if (info.pointsWaiter) {
-    info.pointsWaiter();
-  }
-
-  // Skip saving analysis points for event breakpoint analyses. We can tell
-  // event breakpoint analyses apart because their only location is null.
-  if (PointHandlers.onPoints && info.locations[0] !== null) {
-    PointHandlers.onPoints(points, info);
-  }
-
-  if (!info.showInConsole) {
-    return;
-  }
-
-  if (LogpointHandlers.onPointLoading) {
-    points.forEach(async ({ point, time, frame }) => {
-      if (!frame) return;
-      const location = await ThreadFront.getPreferredLocation(frame);
-      assert(location);
-      LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
-    });
-  }
-};
-
-export function setupLogpoints() {
-  client.Analysis.addAnalysisResultListener(({ analysisId, results }) =>
-    onAnalysisResult(analysisId, results)
-  );
-
-  client.Analysis.addAnalysisPointsListener(({ analysisId, points }) =>
-    onAnalysisPoints(analysisId, points)
-  );
 }
 
-async function createLogpointAnalysis(
-  logGroupId: string,
-  mapper: string,
-  location: Location | null,
-  showInConsole: boolean
-) {
-  if (!gLogpoints.has(logGroupId)) {
-    gLogpoints.set(logGroupId, { analysisWaiters: [], points: [], locations: [], showInConsole });
+function saveLogpointHits(points: PointDescription[], locations: Location[]) {
+  if (PointHandlers.onPoints) {
+    PointHandlers.onPoints(points, { locations });
   }
+}
 
-  // To avoid duplication, only add the location if this logGroupId's info doesn't have it yet
-  if (gLogpoints.get(logGroupId)!.locations.every(loc => loc?.sourceId !== location?.sourceId)) {
-    gLogpoints.get(logGroupId)!.locations.push(location);
-  }
-
-  const waiter = client.Analysis.createAnalysis({
-    mapper,
-    effectful: true,
-  });
-  gLogpoints.get(logGroupId)!.analysisWaiters.push(waiter);
-
-  const { analysisId } = await waiter;
-  gAnalysisLogGroupIDs.set(analysisId, logGroupId);
-  return analysisId;
+export function setupLogpoints() {
+  analysisManager.init();
 }
 
 // Define some logpoint helpers to manage pause data.
@@ -201,9 +114,7 @@ function mapperExtractArrayContents(arrayPath: string, valuesPath: string) {
 
 export async function setLogpoint(
   logGroupId: string,
-  sourceId: string,
-  line: number,
-  column: number,
+  locations: Location[],
   text: string,
   condition: string,
   showInConsole: boolean = true
@@ -258,20 +169,33 @@ export async function setLogpoint(
     }];
   `;
 
-  const location = { line, column, sourceId };
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper, location, showInConsole);
+  const sessionId = await ThreadFront.waitForSession();
+  const params: AnalysisParams = {
+    sessionId,
+    mapper,
+    effectful: true,
+    locations: locations.map(location => ({ location })),
+  };
+  const points: PointDescription[] = [];
+  const handler: AnalysisHandler<void> = {};
 
-  client.Analysis.addLocation({
-    analysisId,
-    sessionId: await ThreadFront.waitForSession(),
-    location,
-  });
-  client.Analysis.runAnalysis({ analysisId });
-
-  // Don't add loading messages for conditional logpoints, as we don't know if
-  // analysis points will actually generate a message.
   if (!condition) {
-    client.Analysis.findAnalysisPoints({ analysisId });
+    handler.onAnalysisPoints = newPoints => {
+      points.push(...newPoints);
+      if (showInConsole) {
+        showLogpointsLoading(logGroupId, newPoints);
+      }
+    };
+  }
+
+  if (showInConsole) {
+    handler.onAnalysisResult = result => showLogpointsResult(logGroupId, result);
+  }
+
+  await analysisManager.runAnalysis(params, handler);
+
+  if (!condition) {
+    saveLogpointHits(points, locations);
   }
 }
 
@@ -285,9 +209,8 @@ export function setLogpointByURL(
   showInConsole: boolean = true
 ) {
   const sourceIds = ThreadFront.getSourceIdsForURL(url);
-  (sourceIds || []).forEach((sourceId: string) => {
-    setLogpoint(logGroupId, sourceId, line, column, text, condition, showInConsole);
-  });
+  const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));
+  setLogpoint(logGroupId, locations, text, condition, showInConsole);
 }
 
 // Event listener logpoints use a multistage analysis. First, the normal
@@ -331,50 +254,19 @@ function eventLogpointMapper(getFrameworkListeners: boolean) {
 
 export async function setEventLogpoint(logGroupId: string, eventTypes: string[]) {
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ true);
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null, true);
+  const sessionId = await ThreadFront.waitForSession();
+  const params: AnalysisParams = {
+    sessionId,
+    mapper,
+    effectful: true,
+    eventHandlerEntryPoints: eventTypes.map(eventType => ({ eventType })),
+  };
+  const handler: AnalysisHandler<void> = {
+    onAnalysisPoints: points => showLogpointsLoading(logGroupId, points),
+    onAnalysisResult: result => showLogpointsResult(logGroupId, result),
+  };
 
-  for (const eventType of eventTypes) {
-    client.Analysis.addEventHandlerEntryPoints({
-      analysisId,
-      sessionId: await ThreadFront.waitForSession(),
-      eventType,
-    });
-  }
-
-  client.Analysis.runAnalysis({ analysisId });
-  client.Analysis.findAnalysisPoints({ analysisId });
-}
-
-async function eventLogpointOnFrameworkListeners(
-  logGroupId: string,
-  point: ExecutionPoint,
-  frameworkListeners: any
-) {
-  const locations = [];
-  const children = await frameworkListeners.loadChildren();
-  for (const { contents } of children) {
-    if (contents.isObject() && contents.className() == "Function") {
-      locations.push(contents.functionLocationFromLogpoint());
-    }
-  }
-  if (!locations.length) {
-    return;
-  }
-
-  const mapper = eventLogpointMapper(/* getFrameworkListeners */ false);
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null, true);
-
-  for (const location of locations) {
-    client.Analysis.addLocation({
-      analysisId,
-      sessionId: await ThreadFront.waitForSession(),
-      location,
-      onStackFrame: point,
-    });
-  }
-
-  client.Analysis.runAnalysis({ analysisId });
-  client.Analysis.findAnalysisPoints({ analysisId });
+  await analysisManager.runAnalysis(params, handler);
 }
 
 export async function setExceptionLogpoint(logGroupId: string) {
@@ -391,28 +283,23 @@ export async function setExceptionLogpoint(logGroupId: string) {
     }];
   `;
 
-  const analysisId = await createLogpointAnalysis(logGroupId, mapper, null, true);
+  const sessionId = await ThreadFront.waitForSession();
+  const params: AnalysisParams = {
+    sessionId,
+    mapper,
+    effectful: true,
+    exceptionPoints: true,
+  };
+  const handler: AnalysisHandler<void> = {
+    onAnalysisPoints: points => showLogpointsLoading(logGroupId, points),
+    onAnalysisResult: result => showLogpointsResult(logGroupId, result),
+  };
 
-  client.Analysis.addExceptionPoints({
-    analysisId,
-    sessionId: await ThreadFront.waitForSession(),
-  });
-
-  client.Analysis.runAnalysis({ analysisId });
-  client.Analysis.findAnalysisPoints({ analysisId });
+  await analysisManager.runAnalysis(params, handler);
 }
 
 export function removeLogpoint(logGroupId: string) {
-  const info = gLogpoints.get(logGroupId);
-  if (!info) {
-    return;
-  }
   if (LogpointHandlers.clearLogpoint) {
     LogpointHandlers.clearLogpoint(logGroupId);
   }
-  gLogpoints.delete(logGroupId);
-  info.analysisWaiters.forEach(async (waiter: Promise<{ analysisId: string }>) => {
-    const { analysisId } = await waiter;
-    client.Analysis.releaseAnalysis({ analysisId });
-  });
 }
