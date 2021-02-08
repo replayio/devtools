@@ -603,6 +603,90 @@ async function checkHighlighterShape(svgPath) {
   });
 }
 
+function pickRandomItem(array) {
+  if (!array) {
+    return undefined;
+  }
+  const index = (Math.random() * array.length) | 0;
+  return array[index];
+}
+
+// Select a random source in the debugger.
+async function selectRandomSource() {
+  const sources = dbgSelectors.getSourceList();
+  const source = pickRandomItem(sources);
+  if (source && source.url) {
+    return selectSource(source.url);
+  }
+}
+
+// Add a logpoint to a random position in the selected source.
+// Removes any existing logpoints.
+async function addRandomLogpoint() {
+  await removeAllBreakpoints();
+
+  const source = dbgSelectors.getSelectedSourceWithContent();
+  if (!source || !source.url) {
+    return;
+  }
+
+  const lines = dbgSelectors.getBreakableLines(source.id);
+  if (!lines || !lines.length) {
+    return;
+  }
+
+  const line = pickRandomItem(lines);
+  const columns = await dbg.actions.loadSourceActorBreakpointColumns({ id: source.id, line });
+  if (!columns || !columns.length) {
+    return;
+  }
+
+  const column = pickRandomItem(columns);
+  return addBreakpoint(source.url, line, column, { logValue: "arguments" });
+}
+
+// Jump to a random message in the console.
+async function warpToRandomMessage() {
+  const messages = document.querySelectorAll(`.webconsole-output .message`);
+  const msg = pickRandomItem(messages);
+  if (!msg) {
+    return;
+  }
+  const warpButton = msg.querySelector(".rewind") || msg.querySelector(".fast-forward");
+  if (!warpButton) {
+    return;
+  }
+  warpButton.click();
+  await waitForPaused();
+}
+
+// Expand a random scope or object.
+async function toggleRandomScopeNode() {
+  const nodes = document.querySelectorAll(".scopes-list .node");
+  const node = pickRandomItem(nodes);
+  if (!node) {
+    return;
+  }
+  const arrow = node.querySelector(".arrow");
+  if (!arrow) {
+    return;
+  }
+  arrow.click();
+}
+
+// Perform a random action, for use by the random_walk test.
+function randomAction() {
+  const actions = [
+    selectRandomSource,
+    addRandomLogpoint,
+    warpToRandomMessage,
+    toggleRandomScopeNode,
+  ];
+  const action = pickRandomItem(actions);
+  console.log("Random action", action.name);
+  return action();
+}
+
 const testCommands = {
   selectConsole,
   selectDebugger,
@@ -666,6 +750,7 @@ const testCommands = {
   dispatchMouseEvent,
   checkHighlighterVisible,
   checkHighlighterShape,
+  randomAction,
 };
 
 const commands = mapValues(testCommands, (command, name) => {
