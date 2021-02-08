@@ -1,4 +1,4 @@
-import { ScreenShot, TimeRange, Location } from "@recordreplay/protocol";
+import { ScreenShot, TimeRange, Location, MouseEventKind } from "@recordreplay/protocol";
 import { MouseAndClickPosition } from "../../protocol/graphics";
 
 export interface Tooltip {
@@ -42,4 +42,12 @@ export interface HoveredPoint {
 interface HoveredLocation extends Location {
   line: number;
   column: number;
+}
+
+export interface RecordingEvent {
+  clientX: number;
+  clientY: number;
+  kind: MouseEventKind;
+  point: string;
+  time: number;
 }

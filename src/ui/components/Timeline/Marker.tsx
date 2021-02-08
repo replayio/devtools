@@ -30,6 +30,7 @@ type MarkerProps = PropsFromRedux & {
   zoomRegion: ZoomRegion;
   overlayWidth: number;
   pauseId?: PauseId;
+  onSeek: () => void;
 };
 
 class Marker extends React.Component<MarkerProps> {
@@ -61,12 +62,13 @@ class Marker extends React.Component<MarkerProps> {
   }
 
   onClick: MouseEventHandler = e => {
-    const { seek, point, time, hasFrames, pauseId } = this.props;
+    const { seek, point, time, hasFrames, pauseId, onSeek } = this.props;
 
     e.preventDefault();
     e.stopPropagation();
 
     seek(point, time, hasFrames, pauseId);
+    onSeek();
   };
 
   onMouseLeave = () => {
@@ -116,6 +118,7 @@ class Marker extends React.Component<MarkerProps> {
 const connector = connect(null, {
   setHoveredPoint: actions.setHoveredPoint,
   seek: actions.seek,
+  setActiveComment: actions.setActiveComment,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

@@ -4,6 +4,7 @@ export interface CommentsState {
   pendingComment: PendingComment | null;
   commentPointer: boolean;
   hoveredComment: any;
+  activeComment: any;
 }
 
 export interface PendingComment {

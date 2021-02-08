@@ -14,11 +14,9 @@ import "./AddCommentButton.css";
 function AddCommentButton({
   currentTime,
   recordingId,
-  viewMode,
   pendingComment,
   canvas,
   setModal,
-  setSelectedPanel,
   setPendingComment,
 }: PropsFromRedux) {
   assert(recordingId);

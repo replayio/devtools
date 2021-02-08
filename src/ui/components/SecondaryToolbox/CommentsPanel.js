@@ -32,7 +32,7 @@ function CommentsPanel({ recordingId, clickEvents, pendingComment }) {
   return (
     <div className="comments-panel">
       <AddCommentButton />
-      {sortBy(entries, ["time", "created_at"]).map((entry, i) => (
+      {sortBy(entries, ["time", "kind", "created_at"]).map((entry, i) => (
         <TranscriptEntry entry={entry} key={i} />
       ))}
     </div>

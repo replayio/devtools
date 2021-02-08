@@ -5,7 +5,16 @@ import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 
-function EventEntry({ event, currentTime, index, seek, hoveredPoint, setHoveredPoint }) {
+function EventEntry({
+  event,
+  currentTime,
+  index,
+  seek,
+  hoveredPoint,
+  setHoveredPoint,
+  activeComment,
+  setActiveComment,
+}) {
   const eventNode = useRef(null);
 
   useEffect(() => {
@@ -17,6 +26,7 @@ function EventEntry({ event, currentTime, index, seek, hoveredPoint, setHoveredP
   const seekToEvent = () => {
     const { point, time } = event;
     seek(point, time, false);
+    setActiveComment(event);
   };
   const onMouseLeave = () => {
     setHoveredPoint(null);
@@ -39,14 +49,18 @@ function EventEntry({ event, currentTime, index, seek, hoveredPoint, setHoveredP
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={classnames("event", {
-        selected: currentTime === event.time,
+        selected: activeComment === event,
         "primary-highlight": hoveredPoint?.point === event.point,
+        paused: currentTime == event.time,
       })}
       key={index}
       ref={eventNode}
     >
       <div className="img event-click" />
       <div className="item-label">Mouse Click</div>
+      <div className="event-timestamp">{`00:${Math.floor(event.time / 1000)
+        .toString()
+        .padStart(2, 0)}`}</div>
     </div>
   );
 }
@@ -55,6 +69,11 @@ export default connect(
   state => ({
     currentTime: selectors.getCurrentTime(state),
     hoveredPoint: selectors.getHoveredPoint(state),
+    activeComment: selectors.getActiveComment(state),
   }),
-  { setHoveredPoint: actions.setHoveredPoint, seek: actions.seek }
+  {
+    setHoveredPoint: actions.setHoveredPoint,
+    seek: actions.seek,
+    setActiveComment: actions.setActiveComment,
+  }
 )(EventEntry);
