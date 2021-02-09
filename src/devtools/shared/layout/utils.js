@@ -128,7 +128,7 @@ function getAdjustedQuads(boundaryWindow, node, region, { ignoreZoom, ignoreScro
 
   const quads = node.getBoxQuads(region);
 
-  if (!quads.length) {
+  if (!quads || !quads.length) {
     return [];
   }
 
