@@ -60,6 +60,11 @@ function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
         const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
         assert(mappedLocation);
         LogpointHandlers.onResult!(logGroupId, point, time, mappedLocation, pause, valueFronts);
+
+        if (frameworkListeners) {
+          const frameworkListenersFront = new ValueFront(pause, frameworkListeners);
+          findFrameworkListeners(logGroupId, point, frameworkListenersFront);
+        }
       }
     );
   }
@@ -260,6 +265,38 @@ export async function setEventLogpoint(logGroupId: string, eventTypes: string[])
     mapper,
     effectful: true,
     eventHandlerEntryPoints: eventTypes.map(eventType => ({ eventType })),
+  };
+  const handler: AnalysisHandler<void> = {
+    onAnalysisPoints: points => showLogpointsLoading(logGroupId, points),
+    onAnalysisResult: result => showLogpointsResult(logGroupId, result),
+  };
+
+  await analysisManager.runAnalysis(params, handler);
+}
+
+async function findFrameworkListeners(
+  logGroupId: string,
+  point: ExecutionPoint,
+  frameworkListeners: ValueFront
+) {
+  const locations = [];
+  const children = await frameworkListeners.loadChildren();
+  for (const { contents } of children) {
+    if (contents.isObject() && contents.className() == "Function") {
+      locations.push(contents.functionLocationFromLogpoint()!);
+    }
+  }
+  if (!locations.length) {
+    return;
+  }
+
+  const mapper = eventLogpointMapper(/* getFrameworkListeners */ false);
+  const sessionId = await ThreadFront.waitForSession();
+  const params: AnalysisParams = {
+    sessionId,
+    mapper,
+    effectful: true,
+    locations: locations.map(location => ({ location, onStackFrame: point })),
   };
   const handler: AnalysisHandler<void> = {
     onAnalysisPoints: points => showLogpointsLoading(logGroupId, points),
