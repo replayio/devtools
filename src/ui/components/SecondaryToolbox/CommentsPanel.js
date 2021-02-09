@@ -27,8 +27,6 @@ function CommentsPanel({ recordingId, clickEvents, pendingComment }) {
     entries = [...entries, pendingComment];
   }
 
-  console.log(entries);
-
   return (
     <div className="comments-panel">
       <AddCommentButton />
