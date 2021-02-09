@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { selectors } from "ui/reducers";
+import classnames from "classnames";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { connect, ConnectedProps } from "react-redux";
@@ -19,24 +20,17 @@ function CommentContainer({ comment }: { comment: any }) {
 function VideoComment({
   comment,
   canvas,
+  activeComment,
   setHoveredComment,
-  pendingComment,
+  setActiveComment,
   hoveredComment,
 }: PropsFromRedux) {
-  // const [focused, setFocused] = useState(false);
-
   if (!canvas) {
     return null;
   }
 
   const { scale } = canvas;
   const position = comment.position;
-  // const onMarkerClick = () => {
-  //   setFocused(true);
-  // };
-  // const onMaskClick = () => {
-  //   setFocused(false);
-  // };
 
   return (
     <div
@@ -47,20 +41,16 @@ function VideoComment({
       }}
     >
       <div
-        className={`canvas-comment-marker ${pendingComment?.id == comment.id ? "active" : ""} ${
-          hoveredComment == comment.id ? "highlighted" : ""
-        }`}
+        className={classnames("canvas-comment-marker", {
+          highlighted: hoveredComment == comment.id,
+          selected: comment == activeComment,
+        })}
         onMouseEnter={() => setHoveredComment(comment.id)}
         onMouseLeave={() => setHoveredComment(null)}
+        onClick={() => setActiveComment(comment)}
       >
         <div className="img comment-marker" />
       </div>
-      {/* {focused ? (
-        <>
-          <div className="mask" onClick={onMaskClick} />
-          <CommentContainer comment={comment} />
-        </>
-      ) : null} */}
     </div>
   );
 }
@@ -72,8 +62,9 @@ const connector = connect(
     recordingId: selectors.getRecordingId(state),
     canvas: selectors.getCanvas(state),
     hoveredComment: selectors.getHoveredComment(state),
+    activeComment: selectors.getActiveComment(state),
   }),
-  { setHoveredComment: actions.setHoveredComment }
+  { setHoveredComment: actions.setHoveredComment, setActiveComment: actions.setActiveComment }
 );
 type PropsFromRedux = ConnectedProps<typeof connector> & {
   comment: any;

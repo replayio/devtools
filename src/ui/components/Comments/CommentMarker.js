@@ -28,9 +28,10 @@ class CommentMarker extends React.Component {
   }
 
   onClick = () => {
-    const { comment, seek } = this.props;
+    const { comment, seek, setActiveComment } = this.props;
     const { time, point, has_frames } = comment;
 
+    setActiveComment(comment);
     seek(point, time, has_frames);
   };
 
@@ -75,5 +76,6 @@ export default connect(
   {
     seek: actions.seek,
     setHoveredComment: actions.setHoveredComment,
+    setActiveComment: actions.setActiveComment,
   }
 )(CommentMarker);

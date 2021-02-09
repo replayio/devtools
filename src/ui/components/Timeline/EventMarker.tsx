@@ -1,34 +1,29 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { RecordingEvent } from "ui/state/timeline";
 import { actions } from "ui/actions";
-import { setActiveComment } from "ui/actions/comments";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import Marker from "./Marker";
-import "./MessageMarker.css";
 
-function MessageMarker({
-  message,
+function EventMarker({
+  event,
   currentTime,
   hoveredPoint,
   zoomRegion,
   overlayWidth,
   setActiveComment,
-}: MessageMarkerProps) {
-  const { executionPoint, executionPointTime, frame, pauseId, executionPointHasFrames } = message;
-
+}: EventMarkerProps) {
   return (
     <Marker
-      point={executionPoint}
-      time={executionPointTime}
-      hasFrames={executionPointHasFrames}
-      location={frame}
-      pauseId={pauseId}
+      point={event.point}
+      time={event.time}
+      hasFrames={false}
       currentTime={currentTime}
       hoveredPoint={hoveredPoint}
       zoomRegion={zoomRegion}
       overlayWidth={overlayWidth}
-      onSeek={() => setActiveComment(message)}
+      onSeek={() => setActiveComment(event)}
     />
   );
 }
@@ -46,8 +41,8 @@ const connector = connect(
 );
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
-type MessageMarkerProps = PropsFromRedux & {
-  message: any;
+type EventMarkerProps = PropsFromRedux & {
+  event: RecordingEvent;
 };
 
-export default connector(MessageMarker);
+export default connector(EventMarker);

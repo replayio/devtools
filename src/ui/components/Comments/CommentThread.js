@@ -18,6 +18,8 @@ function CommentThread({
   seek,
   hoveredComment,
   setHoveredComment,
+  setActiveComment,
+  activeComment,
   clearPendingComment,
 }) {
   const commentEl = useRef(null);
@@ -25,6 +27,7 @@ function CommentThread({
   const seekToComment = () => {
     const { point, time, has_frames } = comment;
     clearPendingComment();
+    setActiveComment(comment);
 
     return seek(point, time, has_frames);
   };
@@ -35,23 +38,19 @@ function CommentThread({
     }
   }, [currentTime, pendingComment]);
 
-  const isEditing = pendingComment?.id == comment.id || comment.content == "";
-  const isPending = !comment.user;
+  const isPending = comment.content == "";
+  const isSelected = activeComment === comment || isPending;
 
   return (
     <div
       className={classnames("comment-container", {
-        selected: currentTime === comment.time,
+        selected: isSelected,
       })}
       ref={commentEl}
     >
       {!isPending && (
         <div
-          className={classnames("comment", {
-            selected: currentTime === comment.time,
-            highlighted: comment.id === hoveredComment || isEditing,
-            "child-comment": comment.parent_id,
-          })}
+          className="comment"
           onClick={seekToComment}
           onMouseEnter={() => setHoveredComment(comment.id)}
           onMouseLeave={() => setHoveredComment(null)}
@@ -59,7 +58,7 @@ function CommentThread({
           <CommentBody comment={comment} hoveredComment={hoveredComment} />
         </div>
       )}
-      {comment.time == currentTime && isAuthenticated && <CommentEditor comment={comment} />}
+      {isSelected && isAuthenticated && <CommentEditor comment={comment} />}
     </div>
   );
 }
@@ -150,10 +149,12 @@ export default connect(
     pendingComment: selectors.getPendingComment(state),
     currentTime: selectors.getCurrentTime(state),
     hoveredComment: selectors.getHoveredComment(state),
+    activeComment: selectors.getActiveComment(state),
   }),
   {
     seek: actions.seek,
     setHoveredComment: actions.setHoveredComment,
+    setActiveComment: actions.setActiveComment,
     clearPendingComment: actions.clearPendingComment,
   }
 )(CommentThread);

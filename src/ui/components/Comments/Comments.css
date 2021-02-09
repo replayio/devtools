@@ -69,7 +69,3 @@ deletes the comment */
   display: flex;
   align-items: center;
 }
-
-.comments-panel .comment.highlighted {
-  border-color: var(--new-blue-500);
-}

@@ -23,6 +23,7 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import Marker from "./Marker";
 import MessageMarker from "./MessageMarker";
+import EventMarker from "./EventMarker";
 const { getVisiblePosition } = require("ui/utils/timeline");
 const { features } = require("ui/utils/prefs");
 
@@ -151,40 +152,24 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   renderMessages() {
-    const { messages, currentTime, hoveredPoint, zoomRegion } = this.props;
+    const { messages } = this.props;
 
     return (
       <div className="markers-container">
         {messages.map((message: Message, index: number) => (
-          <MessageMarker
-            message={message}
-            key={index}
-            currentTime={currentTime}
-            hoveredPoint={hoveredPoint}
-            zoomRegion={zoomRegion}
-            overlayWidth={this.overlayWidth}
-          />
+          <MessageMarker key={index} message={message} />
         ))}
       </div>
     );
   }
 
   renderEvents() {
-    const { clickEvents, currentTime, hoveredPoint, zoomRegion } = this.props;
+    const { clickEvents } = this.props;
 
     return (
       <div className="markers-container">
         {clickEvents.map((point, index) => (
-          <Marker
-            key={index}
-            point={point.point}
-            time={point.time}
-            hasFrames={false}
-            currentTime={currentTime}
-            hoveredPoint={hoveredPoint}
-            zoomRegion={zoomRegion}
-            overlayWidth={this.overlayWidth}
-          />
+          <EventMarker key={index} event={point} />
         ))}
       </div>
     );
@@ -210,6 +195,7 @@ class Timeline extends Component<PropsFromRedux> {
             hoveredPoint={hoveredPoint}
             zoomRegion={zoomRegion}
             overlayWidth={this.overlayWidth}
+            onSeek={() => {}}
           />
         ))}
       </div>

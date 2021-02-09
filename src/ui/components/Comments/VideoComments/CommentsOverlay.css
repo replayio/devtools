@@ -24,7 +24,7 @@
 }
 
 .canvas-overlay .canvas-comment-marker:hover,
-.canvas-overlay .canvas-comment-marker.active,
+.canvas-overlay .canvas-comment-marker.selected,
 .canvas-overlay .canvas-comment-marker.highlighted {
   padding: 6px;
   margin-left: -2px;
