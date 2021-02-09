@@ -4,13 +4,14 @@
 "use strict";
 
 // React
+const React = require("react");
 const PropTypes = require("prop-types");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
-const { getObjectInspector } = require("devtools/client/webconsole/utils/object-inspector");
-const actions = require("devtools/client/webconsole/actions/index");
+const ObjectInspector = require("devtools/client/webconsole/utils/connected-object-inspector")
+  .default;
 
 const reps = require("devtools/client/debugger/packages/devtools-reps/src");
-const { objectInspector, MODE } = reps;
+const { MODE } = reps;
 
 GripMessageBody.displayName = "GripMessageBody";
 
@@ -59,7 +60,7 @@ function GripMessageBody(props) {
     });
   }
 
-  return getObjectInspector(grip, objectInspectorProps);
+  return <ObjectInspector value={grip} {...objectInspectorProps} />;
 }
 
 // Regular expression that matches the allowed CSS property names.
