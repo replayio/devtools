@@ -149,6 +149,10 @@ BoxModel.prototype = {
       const bounds = await nodeFront.getBoundingClientRect();
       const style = await nodeFront.getComputedStyle();
 
+      if (!bounds) {
+        return null;
+      }
+
       const layout = {
         width: parseFloat(bounds.width.toPrecision(6)),
         height: parseFloat(bounds.height.toPrecision(6)),

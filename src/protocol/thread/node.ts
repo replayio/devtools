@@ -232,18 +232,26 @@ export class NodeFront {
             node: this._pause.getNodeFront(listener.node),
           }));
         }),
-      this._pause
-        .sendMessage(client.DOM.getBoxModel, { node: this._object.objectId })
-        .then(({ model }) => {
+      this._pause.sendMessage(client.DOM.getBoxModel, { node: this._object.objectId }).then(
+        ({ model }) => {
           this._quads = model;
-        }),
+        },
+        () => {
+          this._quads = null;
+        }
+      ),
       this._pause
         .sendMessage(client.DOM.getBoundingClientRect, {
           node: this._object.objectId,
         })
-        .then(({ rect }) => {
-          this._bounds = rect;
-        }),
+        .then(
+          ({ rect }) => {
+            this._bounds = rect;
+          },
+          () => {
+            this._bounds = null;
+          }
+        ),
     ]);
     this._loaded = true;
     this._loadWaiter!.resolve();
@@ -316,12 +324,15 @@ export class NodeFront {
 
   getBoxQuads(box: "content" | "padding" | "border" | "margin") {
     assert(this._loaded);
-    return buildBoxQuads(this._quads![box]);
+    return this._quads ? buildBoxQuads(this._quads[box]) : null;
   }
 
   getBoundingClientRect() {
     assert(this._loaded);
-    const [left, top, right, bottom] = this._bounds!;
+    if (!this._bounds) {
+      return null;
+    }
+    const [left, top, right, bottom] = this._bounds;
     return new DOMRect(left, top, right - left, bottom - top);
   }
 
