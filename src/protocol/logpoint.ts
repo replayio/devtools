@@ -36,38 +36,42 @@ export const PointHandlers: {
 } = {};
 
 function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
-  if (LogpointHandlers.onPointLoading) {
-    points.forEach(async ({ point, time, frame }) => {
-      if (!frame) return;
-      const location = await ThreadFront.getPreferredLocation(frame);
-      assert(location);
-      LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
-    });
+  if (!LogpointHandlers.onPointLoading) {
+    return;
   }
+
+  points.forEach(async ({ point, time, frame }) => {
+    if (!frame) return;
+    const location = await ThreadFront.getPreferredLocation(frame);
+    assert(location);
+    LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
+  });
 }
 
 function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
-  if (LogpointHandlers.onResult) {
-    result.forEach(
-      async ({
-        key: point,
-        value: { time, pauseId, location, values, data, frameworkListeners },
-      }) => {
-        const pause = new Pause(ThreadFront.sessionId!);
-        pause.instantiate(pauseId, point, time, /* hasFrames */ true);
-        pause.addData(data);
-        const valueFronts = values.map((v: any) => new ValueFront(pause, v));
-        const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
-        assert(mappedLocation);
-        LogpointHandlers.onResult!(logGroupId, point, time, mappedLocation, pause, valueFronts);
-
-        if (frameworkListeners) {
-          const frameworkListenersFront = new ValueFront(pause, frameworkListeners);
-          findFrameworkListeners(logGroupId, point, frameworkListenersFront);
-        }
-      }
-    );
+  if (!LogpointHandlers.onResult) {
+    return;
   }
+
+  result.forEach(
+    async ({
+      key: point,
+      value: { time, pauseId, location, values, data, frameworkListeners },
+    }) => {
+      const pause = new Pause(ThreadFront.sessionId!);
+      pause.instantiate(pauseId, point, time, /* hasFrames */ true);
+      pause.addData(data);
+      const valueFronts = values.map((v: any) => new ValueFront(pause, v));
+      const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
+      assert(mappedLocation);
+      LogpointHandlers.onResult!(logGroupId, point, time, mappedLocation, pause, valueFronts);
+
+      if (frameworkListeners) {
+        const frameworkListenersFront = new ValueFront(pause, frameworkListeners);
+        findFrameworkListeners(logGroupId, point, frameworkListenersFront);
+      }
+    }
+  );
 }
 
 function saveLogpointHits(points: PointDescription[], locations: Location[]) {
@@ -117,13 +121,7 @@ function mapperExtractArrayContents(arrayPath: string, valuesPath: string) {
   }`;
 }
 
-export async function setLogpoint(
-  logGroupId: string,
-  locations: Location[],
-  text: string,
-  condition: string,
-  showInConsole: boolean = true
-) {
+function formatLogpoint({ text, condition }: { text: string; condition: string }) {
   let conditionSection = "";
   if (condition) {
     // When there is a condition, don't add a message if it returns undefined
@@ -173,7 +171,17 @@ export async function setLogpoint(
       value: { time, pauseId, location, values, data: finalData },
     }];
   `;
+  return mapper;
+}
 
+export async function setLogpoint(
+  logGroupId: string,
+  locations: Location[],
+  text: string,
+  condition: string,
+  showInConsole: boolean = true
+) {
+  const mapper = formatLogpoint({ text, condition });
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
     sessionId,
