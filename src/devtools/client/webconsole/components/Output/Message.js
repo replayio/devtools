@@ -55,9 +55,9 @@ class Message extends Component {
       isPaused: PropTypes.bool,
       maybeScrollToBottom: PropTypes.func,
       message: PropTypes.object.isRequired,
-      isPrimaryHighlighted: PropTypes.bool.isRequired,
-      isSecondaryHighlighted: PropTypes.bool.isRequired,
-      shouldScrollIntoView: PropTypes.bool.isRequired,
+      isPrimaryHighlighted: PropTypes.bool,
+      isSecondaryHighlighted: PropTypes.bool,
+      shouldScrollIntoView: PropTypes.bool,
     };
   }
 
@@ -99,7 +99,11 @@ class Message extends Component {
     const isHighlighted = this.props.isPrimaryHighlighted || this.props.isSecondaryHighlighted;
     const willBeHighlighted = nextProps.isPrimaryHighlighted || nextProps.isSecondaryHighlighted;
 
-    return isHighlighted !== willBeHighlighted;
+    return (
+      this.props.pausedExecutionPoint !== nextProps.pausedExecutionPoint ||
+      this.props.isPaused !== nextProps.isPaused ||
+      isHighlighted !== willBeHighlighted
+    );
   }
 
   // Event used in tests. Some message types don't pass it in because existing tests
