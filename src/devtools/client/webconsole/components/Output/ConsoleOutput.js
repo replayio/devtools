@@ -9,6 +9,7 @@ const { connect } = require("devtools/client/shared/redux/visibility-handler-con
 const { actions } = require("ui/actions");
 const ReactDOM = require("react-dom");
 const { selectors } = require("ui/reducers");
+const { getLocationKey } = require("devtools/client/debugger/src/utils/breakpoint");
 
 const PropTypes = require("prop-types");
 const {
@@ -16,6 +17,16 @@ const {
 } = require("devtools/client/webconsole/components/Output/MessageContainer");
 
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
+
+function getIsSecondaryHighlighted(hoveredPoint, message) {
+  if (!message?.frame || !hoveredPoint?.location) {
+    return false;
+  }
+
+  const keyOne = getLocationKey(hoveredPoint.location);
+  const keyTwo = getLocationKey(message.frame);
+  return keyOne == keyTwo;
+}
 
 class ConsoleOutput extends Component {
   static get propTypes() {
@@ -128,22 +139,29 @@ class ConsoleOutput extends Component {
       hoveredPoint,
     } = this.props;
 
-    const messageNodes = visibleMessages.map((messageId, i) =>
-      createElement(MessageContainer, {
+    const messageNodes = visibleMessages.map((messageId, i) => {
+      const message = messages.get(messageId);
+      const isPrimaryHighlighted = hoveredPoint?.point === message.executionPoint;
+      const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, message);
+      const shouldScrollIntoView = isPrimaryHighlighted && hoveredPoint?.target !== "console";
+
+      return createElement(MessageContainer, {
         dispatch,
         key: messageId,
         messageId,
+        message,
         open: messagesUi.includes(messageId),
         payload: messagesPayload.get(messageId),
         timestampsVisible,
 
         pausedExecutionPoint,
-        getMessage: () => messages.get(messageId),
         isPaused: closestMessage?.id == messageId,
         isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
-        hoveredPoint,
-      })
-    );
+        isPrimaryHighlighted,
+        isSecondaryHighlighted,
+        shouldScrollIntoView,
+      });
+    });
 
     return dom.div(
       {

@@ -17,17 +17,6 @@ const CollapseButton = require("devtools/client/webconsole/components/Output/Col
 const MessageRepeat = require("devtools/client/webconsole/components/Output/MessageRepeat");
 const PropTypes = require("prop-types");
 const SmartTrace = require("devtools/client/shared/components/SmartTrace");
-const { getLocationKey } = require("devtools/client/debugger/src/utils/breakpoint");
-
-function getIsSecondaryHighlighted(hoveredPoint, message) {
-  if (!message?.frame || !hoveredPoint?.location) {
-    return false;
-  }
-
-  const keyOne = getLocationKey(hoveredPoint.location);
-  const keyTwo = getLocationKey(message.frame);
-  return keyOne == keyTwo;
-}
 
 class Message extends Component {
   static get propTypes() {
@@ -66,6 +55,9 @@ class Message extends Component {
       isPaused: PropTypes.bool,
       maybeScrollToBottom: PropTypes.func,
       message: PropTypes.object.isRequired,
+      isPrimaryHighlighted: PropTypes.bool.isRequired,
+      isSecondaryHighlighted: PropTypes.bool.isRequired,
+      shouldScrollIntoView: PropTypes.bool.isRequired,
     };
   }
 
@@ -98,33 +90,16 @@ class Message extends Component {
   }
 
   componentDidUpdate() {
-    const { hoveredPoint, executionPoint } = this.props;
-
-    if (
-      hoveredPoint &&
-      hoveredPoint.point === executionPoint &&
-      hoveredPoint.target !== "console"
-    ) {
+    if (this.props.shouldScrollIntoView) {
       this.messageNode.scrollIntoView({ block: "center", behavior: "smooth" });
     }
   }
 
   shouldComponentUpdate(nextProps) {
-    const { hoveredPoint, message } = this.props;
+    const isHighlighted = this.props.isPrimaryHighlighted || this.props.isSecondaryHighlighted;
+    const willBeHighlighted = nextProps.isPrimaryHighlighted || nextProps.isSecondaryHighlighted;
 
-    const hoveredPointChanged = hoveredPoint !== nextProps.hoveredPoint;
-    const isHighlighted =
-      hoveredPoint?.point == message.executionPoint ||
-      getIsSecondaryHighlighted(hoveredPoint, message);
-    const willBeHighlighted =
-      nextProps.hoveredPoint?.point == message.executionPoint ||
-      getIsSecondaryHighlighted(nextProps.hoveredPoint, message);
-
-    if (hoveredPointChanged && !isHighlighted && !willBeHighlighted) {
-      return false;
-    }
-
-    return true;
+    return isHighlighted !== willBeHighlighted;
   }
 
   // Event used in tests. Some message types don't pass it in because existing tests
@@ -318,7 +293,8 @@ class Message extends Component {
       executionPoint,
       messageId,
       notes,
-      hoveredPoint,
+      isPrimaryHighlighted,
+      isSecondaryHighlighted,
     } = this.props;
 
     topLevelClasses.push("message", source, type, level);
@@ -329,9 +305,6 @@ class Message extends Component {
     if (isPaused) {
       topLevelClasses.push("paused");
     }
-
-    const isPrimaryHighlighted = hoveredPoint?.point === executionPoint;
-    const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, { frame });
 
     if (isPrimaryHighlighted) {
       topLevelClasses.push("primary-highlight");

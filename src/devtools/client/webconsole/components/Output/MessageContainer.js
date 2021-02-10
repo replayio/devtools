@@ -40,9 +40,11 @@ class MessageContainer extends Component {
       repeat: PropTypes.number,
       badge: PropTypes.number,
       indent: PropTypes.number,
-      getMessage: PropTypes.func.isRequired,
       isPaused: PropTypes.bool.isRequired,
       pausedExecutionPoint: PropTypes.string,
+      isPrimaryHighlighted: PropTypes.bool.isRequired,
+      isSecondaryHighlighted: PropTypes.bool.isRequired,
+      shouldScrollIntoView: PropTypes.bool.isRequired,
     };
   }
 
@@ -61,14 +63,16 @@ class MessageContainer extends Component {
       "isPaused",
       "pausedExecutionPoint",
       "badge",
-      "hoveredPoint",
+      "isPrimaryHighlighted",
+      "isSecondaryHighlighted",
+      "shouldScrollIntoView",
     ];
 
     return triggeringUpdateProps.some(prop => this.props[prop] !== nextProps[prop]);
   }
 
   render() {
-    const message = this.props.getMessage();
+    const message = this.props.message;
     const MessageComponent = getMessageComponent(message);
     return MessageComponent(Object.assign({ message }, this.props));
   }
