@@ -1,7 +1,7 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
-import { groupBy } from "lodash";
+import { useAuth0 } from "@auth0/auth0-react";
 
 interface User {
   name: string;
@@ -17,6 +17,7 @@ interface Session {
 }
 
 export function useGetActiveSessions(recordingId: RecordingId, sessionId: string) {
+  const { user } = useAuth0();
   const { data, loading } = useQuery(
     gql`
       query GetActiveSessions($recordingId: uuid!, $sessionId: String!) {
@@ -48,9 +49,14 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
     return { loading };
   }
 
+  // Don't show the user's own sessions.
+  const filteredSessions = data.sessions.filter(
+    (session: Session) => session.user?.auth_id !== user?.sub
+  );
+
   // This includes the sessionId with the user. Otherwise, all
   // anonymous users look the same (null) and we can't maintain some order.
-  const users = data.sessions
+  const users = filteredSessions
     .map((session: Session) => ({
       ...session.user,
       sessionId: session.id,
