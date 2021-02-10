@@ -38,7 +38,12 @@ class Marker extends React.Component<MarkerProps> {
     const isHighlighted = this.props.isPrimaryHighlighted || this.props.isSecondaryHighlighted;
     const willBeHighlighted = nextProps.isPrimaryHighlighted || nextProps.isSecondaryHighlighted;
 
-    return isHighlighted !== willBeHighlighted;
+    return (
+      this.props.time !== nextProps.time ||
+      this.props.overlayWidth !== nextProps.overlayWidth ||
+      this.props.zoomRegion !== nextProps.zoomRegion ||
+      isHighlighted !== willBeHighlighted
+    );
   }
 
   onClick: MouseEventHandler = e => {
