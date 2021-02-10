@@ -18,7 +18,7 @@
 }
 
 .transcript-entry-description > :not(:first-child) {
-  margin-left: 12px;
+  margin-left: 16px;
 }
 
 .transcript-entry-icon {
@@ -29,14 +29,14 @@
 }
 
 .transcript-entry:not(:last-child) .transcript-line {
-  width: 2px;
+  width: 3px;
   left: 22px;
   height: 100%;
   position: absolute;
   background: var(--cool-gray-200);
 }
 
-.transcript-entry-icon .event-click {
+.transcript-entry-icon .img {
   height: 20px;
   width: 20px;
   background: var(--theme-body-background);
@@ -55,22 +55,20 @@
   background: var(--secondary-accent);
 }
 
-.transcript-entry.primary-highlight .transcript-entry-icon {
+.transcript-entry.paused.selected .transcript-entry-icon {
   background: var(--primary-accent);
 }
 
-/* .comments-panel .event.primary-highlight .item-label {
-  color: var(--primary-accent);
+.transcript-entry.primary-highlight:not(.paused) .transcript-entry-icon {
+  background: var(--new-blue-900);
 }
 
-.comments-panel .event.primary-highlight .img {
-  background: var(--primary-accent);
+/* Fake timeline */
+
+.transcript-entry.before-paused .transcript-line {
+  background: var(--primary-accent)
 }
 
-.comments-panel .event.selected .item-label  {
-  color: var(--secondary-accent);
+.transcript-entry.before-paused .transcript-entry-icon {
+  background: var(--primary-accent)
 }
-
-.comments-panel .event.selected .img {
-  background: var(--secondary-accent);
-} */

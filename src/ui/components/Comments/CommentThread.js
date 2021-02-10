@@ -84,7 +84,7 @@ function CommentBodyItem({ comment, isRoot, hoveredComment }) {
         <img src={comment.user.picture} className="comment-picture" />
         <div className="comment-body-header-label">
           <div className="comment-body-header-label-name">{comment.user.name}</div>
-          {/* <div className="comment-body-header-label-date">{rel}</div> */}
+          <div className="comment-body-header-label-date">{rel}</div>
         </div>
         {isRoot && <Actions {...{ comment, hoveredComment }} />}
       </div>
@@ -112,28 +112,25 @@ function Actions({ comment, hoveredComment }) {
     deleteCommentReplies({ variables: { parentId: comment.id } });
   };
 
-  if (isHovered && isThreadAuthor) {
-    return (
-      <div className="comment-actions">
-        <PortalDropdown
-          buttonContent={<div className="dropdown-button">⋮</div>}
-          setExpanded={setExpanded}
-          expanded={expanded}
-          buttonStyle=""
-          position="bottom-right"
-        >
-          {/* <div className="comments-dropdown-item" title="Edit Comment" onClick={deleteThread}>
-            Edit comment
-          </div> */}
-          <div className="comments-dropdown-item" title="Delete Comment" onClick={deleteThread}>
-            Delete Comment
-          </div>
-        </PortalDropdown>
-      </div>
-    );
+  if (!isHovered || !isThreadAuthor) {
+    return null;
   }
 
-  return <Timestamp comment={comment} />;
+  return (
+    <div className="comment-actions">
+      <PortalDropdown
+        buttonContent={<div className="dropdown-button">⋮</div>}
+        setExpanded={setExpanded}
+        expanded={expanded}
+        buttonStyle=""
+        position="bottom-right"
+      >
+        <div className="comments-dropdown-item" title="Delete Comment" onClick={deleteThread}>
+          Delete Comment
+        </div>
+      </PortalDropdown>
+    </div>
+  );
 }
 
 function Timestamp({ comment }) {

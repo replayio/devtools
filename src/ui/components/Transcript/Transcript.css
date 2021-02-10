@@ -14,26 +14,18 @@
 }
 
 .comments-panel .comment-container {
-  padding: 0px 16px ;
+  margin-left: 40px;
+  margin-top: 20px;
+  padding: 0px 16px;
   border: 1px solid var(--theme-splitter-color);
   border-radius: 8px;
 }
-
 
 .comments-panel .comment {
   line-height: 1.25rem;
   font-size: 1rem;
   display: flex;
   flex-direction: row;
-  cursor: pointer;
-  width: 100%;
-}
-
-.comments-panel .comment-container.selected {
-  border: 1px solid var(--primary-accent);
-}
-
-.comments-panel .comment-container {
   width: 100%;
 }
 
@@ -99,7 +91,7 @@
 }
 
 .comments-panel .comment-body > :not(:first-child) {
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 .comments-panel .comment-body-header {

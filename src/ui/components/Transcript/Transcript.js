@@ -5,11 +5,12 @@ import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import { sortBy } from "lodash";
 
-import TranscriptEntry from "./TranscriptEntry/index";
 import AddCommentButton from "ui/components/Timeline/AddCommentButton";
-import "./CommentsPanel.css";
+import TranscriptItem from "ui/components/Transcript/TranscriptItem";
+import CommentThread from "ui/components/Comments/CommentThread.js";
+import "./Transcript.css";
 
-function CommentsPanel({ recordingId, clickEvents, pendingComment }) {
+function Transcript({ recordingId, clickEvents, pendingComment }) {
   const { comments } = hooks.useGetComments(recordingId);
 
   // We allow the panel to render its entries whether or not the
@@ -30,10 +31,28 @@ function CommentsPanel({ recordingId, clickEvents, pendingComment }) {
   return (
     <div className="comments-panel">
       <AddCommentButton />
-      {sortBy(entries, ["time", "kind", "created_at"]).map((entry, i) => (
-        <TranscriptEntry entry={entry} key={i} />
-      ))}
+      {sortBy(entries, ["time", "kind", "created_at"]).map((entry, i) => {
+        if ("content" in entry) {
+          return <CommentTranscriptItem comment={entry} key={i} />;
+        } else {
+          return <EventTranscriptItem event={entry} key={i} />;
+        }
+      })}
     </div>
+  );
+}
+
+function EventTranscriptItem({ event }) {
+  return (
+    <TranscriptItem item={event} icon={<div className="img event-click" />} label="Mouse Click" />
+  );
+}
+
+function CommentTranscriptItem({ comment }) {
+  return (
+    <TranscriptItem item={comment} icon={<div className="img chat-alt" />} label="Comment">
+      <CommentThread comment={comment} />
+    </TranscriptItem>
   );
 }
 
@@ -41,4 +60,4 @@ export default connect(state => ({
   recordingId: selectors.getRecordingId(state),
   clickEvents: selectors.getEventsForType(state, "mousedown"),
   pendingComment: selectors.getPendingComment(state),
-}))(CommentsPanel);
+}))(Transcript);

@@ -1,13 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import classnames from "classnames";
-
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import "./EventEntry.css";
+import "./TranscriptItem.css";
 
-function EventEntry({
-  event,
+function TranscriptItem({
+  item,
+  icon,
+  label,
+  children,
   currentTime,
   index,
   seek,
@@ -16,24 +18,25 @@ function EventEntry({
   activeComment,
   setActiveComment,
 }) {
-  const eventNode = useRef(null);
+  const itemNode = useRef(null);
 
   useEffect(() => {
-    if (hoveredPoint?.point == event.point && hoveredPoint?.target !== "transcript") {
-      eventNode.current.scrollIntoView({ block: "center", behavior: "smooth" });
+    if (hoveredPoint?.point == item.point && hoveredPoint?.target !== "transcript") {
+      itemNode.current.scrollIntoView({ block: "center", behavior: "smooth" });
     }
   }, [hoveredPoint]);
 
   const seekToEvent = () => {
-    const { point, time } = event;
-    seek(point, time, false);
-    setActiveComment(event);
+    const { point, time, hasFrames } = item;
+
+    seek(point, time, hasFrames);
+    setActiveComment(item);
   };
   const onMouseLeave = () => {
     setHoveredPoint(null);
   };
   const onMouseEnter = () => {
-    const { point, time, location } = event;
+    const { point, time, location } = item;
     const hoveredPoint = {
       point,
       time,
@@ -44,29 +47,31 @@ function EventEntry({
     setHoveredPoint(hoveredPoint);
   };
 
+  const { point, time } = item;
+
   return (
     <div
       onClick={seekToEvent}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={classnames("transcript-entry", {
-        selected: activeComment === event,
-        "primary-highlight": hoveredPoint?.point === event.point,
-        paused: currentTime == event.time,
+        selected: activeComment === item && activeComment.content == "",
+        "primary-highlight": hoveredPoint?.point === point,
+        paused: currentTime == time,
+        "before-paused": time < currentTime,
       })}
       key={index}
-      ref={eventNode}
+      ref={itemNode}
     >
       <span className="transcript-line" />
       <div className="transcript-entry-description">
-        <div className="transcript-entry-icon">
-          <div className="img event-click" />
-        </div>
-        <div className="transcript-entry-label">Mouse Click</div>
-        <div className="event-timestamp">{`00:${Math.floor(event.time / 1000)
+        <div className="transcript-entry-icon">{icon}</div>
+        <div className="transcript-entry-label">{label}</div>
+        <div className="event-timestamp">{`00:${Math.floor(time / 1000)
           .toString()
           .padStart(2, 0)}`}</div>
       </div>
+      {children}
     </div>
   );
 }
@@ -82,4 +87,4 @@ export default connect(
     seek: actions.seek,
     setActiveComment: actions.setActiveComment,
   }
-)(EventEntry);
+)(TranscriptItem);
