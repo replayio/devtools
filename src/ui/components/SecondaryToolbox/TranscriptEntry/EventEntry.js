@@ -4,6 +4,7 @@ import classnames from "classnames";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import "./EventEntry.css";
 
 function EventEntry({
   event,
@@ -48,7 +49,7 @@ function EventEntry({
       onClick={seekToEvent}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={classnames("event", {
+      className={classnames("transcript-entry", {
         selected: activeComment === event,
         "primary-highlight": hoveredPoint?.point === event.point,
         paused: currentTime == event.time,
@@ -56,11 +57,16 @@ function EventEntry({
       key={index}
       ref={eventNode}
     >
-      <div className="img event-click" />
-      <div className="item-label">Mouse Click</div>
-      <div className="event-timestamp">{`00:${Math.floor(event.time / 1000)
-        .toString()
-        .padStart(2, 0)}`}</div>
+      <span className="transcript-line" />
+      <div className="transcript-entry-description">
+        <div className="transcript-entry-icon">
+          <div className="img event-click" />
+        </div>
+        <div className="transcript-entry-label">Mouse Click</div>
+        <div className="event-timestamp">{`00:${Math.floor(event.time / 1000)
+          .toString()
+          .padStart(2, 0)}`}</div>
+      </div>
     </div>
   );
 }
