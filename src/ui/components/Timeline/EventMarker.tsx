@@ -9,7 +9,7 @@ import Marker from "./Marker";
 function EventMarker({
   event,
   currentTime,
-  hoveredPoint,
+  isPrimaryHighlighted,
   zoomRegion,
   overlayWidth,
   setActiveComment,
@@ -20,7 +20,8 @@ function EventMarker({
       time={event.time}
       hasFrames={false}
       currentTime={currentTime}
-      hoveredPoint={hoveredPoint}
+      isPrimaryHighlighted={isPrimaryHighlighted}
+      isSecondaryHighlighted={false}
       zoomRegion={zoomRegion}
       overlayWidth={overlayWidth}
       onSeek={() => setActiveComment(event)}
@@ -32,7 +33,6 @@ const connector = connect(
   (state: UIState) => ({
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
-    hoveredPoint: selectors.getHoveredPoint(state),
     overlayWidth: selectors.getTimelineDimensions(state).width,
   }),
   {
@@ -43,6 +43,7 @@ const connector = connect(
 type PropsFromRedux = ConnectedProps<typeof connector>;
 type EventMarkerProps = PropsFromRedux & {
   event: RecordingEvent;
+  isPrimaryHighlighted: boolean;
 };
 
 export default connector(EventMarker);
