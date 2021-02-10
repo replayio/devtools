@@ -9,7 +9,7 @@
 
 import { connect, ConnectedProps } from "react-redux";
 import { Component, MouseEventHandler } from "react";
-import type { Message, PointDescription } from "@recordreplay/protocol";
+import type { PointDescription, Location } from "@recordreplay/protocol";
 import React from "react";
 import classnames from "classnames";
 
@@ -25,10 +25,11 @@ import Marker from "./Marker";
 import MessageMarker from "./MessageMarker";
 import EventMarker from "./EventMarker";
 const { getVisiblePosition } = require("ui/utils/timeline");
-const { features } = require("ui/utils/prefs");
+import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 import "./Timeline.css";
 import { UIState } from "ui/state";
+import { HoveredPoint } from "ui/state/timeline";
 
 function ReplayButton({ onClick }: { onClick: MouseEventHandler }) {
   return (
@@ -36,6 +37,17 @@ function ReplayButton({ onClick }: { onClick: MouseEventHandler }) {
       <div className="img replay-lg" style={{ transform: "scaleX(-1)" }} />
     </button>
   );
+}
+
+function getIsSecondaryHighlighted(
+  hoveredPoint: HoveredPoint | null,
+  location: Location | undefined
+) {
+  if (!location || !hoveredPoint?.location) {
+    return false;
+  }
+
+  return getLocationKey(hoveredPoint.location) == getLocationKey(location);
 }
 
 class Timeline extends Component<PropsFromRedux> {
@@ -152,25 +164,38 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   renderMessages() {
-    const { messages } = this.props;
+    const { messages, hoveredPoint } = this.props;
 
     return (
       <div className="markers-container">
-        {messages.map((message: Message, index: number) => (
-          <MessageMarker key={index} message={message} />
-        ))}
+        {messages.map((message: any, index: number) => {
+          const isPrimaryHighlighted = hoveredPoint?.point === message.executionPoint;
+          const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, message.frame);
+
+          return (
+            <MessageMarker
+              key={index}
+              message={message}
+              isPrimaryHighlighted={isPrimaryHighlighted}
+              isSecondaryHighlighted={isSecondaryHighlighted}
+            />
+          );
+        })}
       </div>
     );
   }
 
   renderEvents() {
-    const { clickEvents } = this.props;
+    const { clickEvents, hoveredPoint } = this.props;
 
     return (
       <div className="markers-container">
-        {clickEvents.map((point, index) => (
-          <EventMarker key={index} event={point} />
-        ))}
+        {clickEvents.map((event, index) => {
+          const isPrimaryHighlighted = hoveredPoint?.point === event.point;
+          return (
+            <EventMarker key={index} event={event} isPrimaryHighlighted={isPrimaryHighlighted} />
+          );
+        })}
       </div>
     );
   }
@@ -184,20 +209,26 @@ class Timeline extends Component<PropsFromRedux> {
 
     return (
       <div className="preview-markers-container">
-        {pointsForHoveredLineNumber.map((point: PointDescription, index: number) => (
-          <Marker
-            key={index}
-            point={point.point}
-            time={point.time}
-            hasFrames={!!point.frame}
-            location={point.frame?.[0]}
-            currentTime={currentTime}
-            hoveredPoint={hoveredPoint}
-            zoomRegion={zoomRegion}
-            overlayWidth={this.overlayWidth}
-            onSeek={() => {}}
-          />
-        ))}
+        {pointsForHoveredLineNumber.map((point: PointDescription, index: number) => {
+          const isPrimaryHighlighted = hoveredPoint?.point === point.point;
+          const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, point.frame?.[0]);
+
+          return (
+            <Marker
+              key={index}
+              point={point.point}
+              time={point.time}
+              hasFrames={!!point.frame}
+              location={point.frame?.[0]}
+              currentTime={currentTime}
+              isPrimaryHighlighted={isPrimaryHighlighted}
+              isSecondaryHighlighted={isSecondaryHighlighted}
+              zoomRegion={zoomRegion}
+              overlayWidth={this.overlayWidth}
+              onSeek={() => {}}
+            />
+          );
+        })}
       </div>
     );
   }
