@@ -9,7 +9,7 @@ module.exports = {
   },
   devtool: "source-map",
   output: {
-    publicPath: "dist",
+    publicPath: "dist/",
   },
   devServer: {
     before: app => {
