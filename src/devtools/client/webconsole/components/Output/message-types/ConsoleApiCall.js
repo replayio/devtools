@@ -24,6 +24,9 @@ ConsoleApiCall.propTypes = {
   open: PropTypes.bool,
   timestampsVisible: PropTypes.bool.isRequired,
   maybeScrollToBottom: PropTypes.func,
+  isPrimaryHighlighted: PropTypes.bool.isRequired,
+  isSecondaryHighlighted: PropTypes.bool.isRequired,
+  shouldScrollIntoView: PropTypes.bool.isRequired,
 };
 
 ConsoleApiCall.defaultProps = {
@@ -42,7 +45,9 @@ function ConsoleApiCall(props) {
     isPaused,
     maybeScrollToBottom,
     isFirstMessageForPoint,
-    hoveredPoint,
+    isPrimaryHighlighted,
+    isSecondaryHighlighted,
+    shouldScrollIntoView,
   } = props;
   const {
     id: messageId,
@@ -157,7 +162,9 @@ function ConsoleApiCall(props) {
     message,
     maybeScrollToBottom,
     isFirstMessageForPoint,
-    hoveredPoint,
+    isPrimaryHighlighted,
+    isSecondaryHighlighted,
+    shouldScrollIntoView,
   });
 }
 
