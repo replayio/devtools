@@ -1,0 +1,74 @@
+.transcript-entry {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 16px 8px;
+  border: 1px transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+}
+
+.transcript-entry-description {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.transcript-entry-description > :not(:first-child) {
+  margin-left: 16px;
+}
+
+.transcript-entry-icon {
+  background: var(--cool-gray-400);
+  padding: 4px;
+  border-radius: 50%;
+  box-shadow: 0px 0px 0px 8px white;
+}
+
+.transcript-entry:not(:last-child) .transcript-line {
+  width: 2px;
+  left: 22px;
+  height: 100%;
+  position: absolute;
+  background: var(--cool-gray-200);
+}
+
+.transcript-entry-icon .img {
+  height: 16px;
+  width: 16px;
+  background: var(--theme-body-background);
+}
+
+.transcript-entry-label {
+  font-size: 14px;
+  color: var(--theme-body-color);
+  align-self: center;
+  flex-grow: 1;
+}
+
+/* Non-default states */
+
+.transcript-entry.paused .transcript-entry-icon {
+  background: var(--secondary-accent);
+}
+
+.transcript-entry.paused.selected .transcript-entry-icon {
+  background: var(--primary-accent);
+}
+
+.transcript-entry.primary-highlight:not(.paused) .transcript-entry-icon {
+  background: var(--new-blue-900);
+}
+
+/* Transcript timeline */
+
+.transcript-entry.before-paused .transcript-line {
+  background: var(--primary-accent)
+}
+
+.transcript-entry.before-paused .transcript-entry-icon {
+  background: var(--primary-accent)
+}

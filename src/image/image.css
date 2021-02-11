@@ -420,6 +420,9 @@ button.jump-definition {
 .img.arrowhead-right {
   -webkit-mask-image: url(~devtools/client/themes/images/arrowhead-right.svg);
 }
+.img.chat-alt {
+  -webkit-mask-image: url(~devtools/client/themes/images/chat-alt.svg);
+}
 .img.event-click {
   -webkit-mask-image: url(~devtools/client/themes/images/event-click.svg);
 }

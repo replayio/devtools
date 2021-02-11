@@ -10,6 +10,7 @@ import { UIState } from "ui/state";
 import { assert } from "protocol/utils";
 
 import "./AddCommentButton.css";
+import { PendingComment } from "ui/state/comments";
 
 function AddCommentButton({
   currentTime,
@@ -27,7 +28,7 @@ function AddCommentButton({
       return setModal("login");
     }
 
-    const pendingComment = {
+    const pendingComment: PendingComment = {
       content: "",
       recording_id: recordingId,
       time: currentTime,

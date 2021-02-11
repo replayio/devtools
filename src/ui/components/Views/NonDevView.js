@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import Timeline from "../Timeline";
 import Video from "../Video";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
+import Transcript from "ui/components/Transcript";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
 import Dropdown from "ui/components/shared/Dropdown";
 
@@ -46,7 +46,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
       <div className="right-sidebar-toolbar">
         <div className="right-sidebar-toolbar-item">Transcript and Comments</div>
       </div>
-      <CommentsPanel />
+      <Transcript />
     </div>
   );
 

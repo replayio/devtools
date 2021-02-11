@@ -50,7 +50,7 @@ import WelcomeBox from "./WelcomeBox";
 import EditorTabs from "./Editor/Tabs";
 import EditorFooter from "./Editor/Footer";
 import QuickOpenModal from "./QuickOpenModal";
-import CommentsPanel from "ui/components/SecondaryToolbox/CommentsPanel";
+import Transcript from "ui/components/Transcript";
 
 class Debugger extends Component {
   onLayoutChange;
@@ -206,7 +206,7 @@ class Debugger extends Component {
         return <SecondaryPanes />;
       }
       case "comments": {
-        return <CommentsPanel />;
+        return <Transcript />;
       }
       default: {
         return null;

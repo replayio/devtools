@@ -65,6 +65,10 @@
   z-index: var(--z-index-3--hovered-point-primary);
 }
 
-.timeline.dimmed .marker.primary-highlight .fill {
+.timeline.dimmed .marker.paused .fill {
+  fill: var(--secondary-accent);
+}
+
+.timeline.dimmed .marker.primary-highlight:not(.paused) .fill {
   fill: var(--new-blue-900);
 }
