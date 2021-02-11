@@ -18,7 +18,7 @@ interface Session {
 
 export function useGetActiveSessions(recordingId: RecordingId, sessionId: string) {
   const { user } = useAuth0();
-  const { data, loading } = useQuery(
+  const { data, error, loading } = useQuery(
     gql`
       query GetActiveSessions($recordingId: uuid!, $sessionId: String!) {
         sessions(
@@ -45,6 +45,10 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
     }
   );
 
+  if (error) {
+    console.error("Apollo error while getting active sessions", error);
+  }
+
   if (loading) {
     return { loading };
   }
@@ -67,7 +71,7 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
 }
 
 export function useGetRecording(recordingId: RecordingId) {
-  const { data, loading: queryIsLoading } = useQuery(
+  const { data, error, loading: queryIsLoading } = useQuery(
     gql`
       query GetRecording($recordingId: uuid!) {
         recordings(where: { id: { _eq: $recordingId } }) {
@@ -84,6 +88,10 @@ export function useGetRecording(recordingId: RecordingId) {
       variables: { recordingId },
     }
   );
+
+  if (error) {
+    console.error("Apollo error while getting the recording", error);
+  }
 
   return { data, queryIsLoading };
 }
@@ -104,7 +112,7 @@ export async function fetchUserId(authId: string) {
 }
 
 export function useAddSessionUser() {
-  const [AddSessionUser] = useMutation(gql`
+  const [AddSessionUser, { error }] = useMutation(gql`
     mutation AddSessionUser($id: String!, $user_id: uuid!) {
       update_sessions_by_pk(pk_columns: { id: $id }, _set: { user_id: $user_id }) {
         id
@@ -112,5 +120,10 @@ export function useAddSessionUser() {
       }
     }
   `);
+
+  if (error) {
+    console.error("Apollo error while adding a session user", error);
+  }
+
   return AddSessionUser;
 }

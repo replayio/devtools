@@ -92,8 +92,6 @@ export function useGetComments(
     pollInterval: 5000,
   });
 
-  // This gives us some basic logging for when there's a problem
-  // while fetching the comments.
   if (error) {
     console.error("Apollo error while fetching comments:", error);
   }
@@ -102,7 +100,7 @@ export function useGetComments(
 }
 
 export function useAddComment(callback: Function = () => {}) {
-  const [addComment] = useMutation(ADD_COMMENT, {
+  const [addComment, { error }] = useMutation(ADD_COMMENT, {
     onCompleted: data => {
       const { id } = data.insert_comments_one;
       callback(id);
@@ -110,29 +108,45 @@ export function useAddComment(callback: Function = () => {}) {
     refetchQueries: ["GetComments"],
   });
 
+  if (error) {
+    console.error("Apollo error while adding a comment:", error);
+  }
+
   return addComment;
 }
 
 export function useUpdateComment(callback: Function) {
-  const [updateCommentContent] = useMutation(UPDATE_COMMENT_CONTENT, {
+  const [updateCommentContent, { error }] = useMutation(UPDATE_COMMENT_CONTENT, {
     onCompleted: () => callback(),
   });
+
+  if (error) {
+    console.error("Apollo error while updating a comment:", error);
+  }
 
   return updateCommentContent;
 }
 
 export function useDeleteComment(callback: Function) {
-  const [deleteComment] = useMutation(DELETE_COMMENT, {
+  const [deleteComment, { error }] = useMutation(DELETE_COMMENT, {
     refetchQueries: ["GetComments"],
   });
+
+  if (error) {
+    console.error("Apollo error while deleting a comment:", error);
+  }
 
   return deleteComment;
 }
 
 export function useDeleteCommentReplies(callback: Function) {
-  const [deleteCommentReplies] = useMutation(DELETE_COMMENT_REPLIES, {
+  const [deleteCommentReplies, { error }] = useMutation(DELETE_COMMENT_REPLIES, {
     refetchQueries: ["GetComments"],
   });
+
+  if (error) {
+    console.error("Apollo error while deleting a comment's replies:", error);
+  }
 
   return deleteCommentReplies;
 }
