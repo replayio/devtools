@@ -179,5 +179,5 @@ const rule = (exports.rule = {
 exports.rules = {
   isAddRuleEnabled: PropTypes.bool.isRequired,
   highlightedSelector: PropTypes.string.isRequired,
-  rules: PropTypes.arrayOf(PropTypes.shape(rule)).isRequired,
+  rules: PropTypes.arrayOf(PropTypes.shape(rule)),
 };
