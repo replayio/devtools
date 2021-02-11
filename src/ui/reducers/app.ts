@@ -6,12 +6,9 @@ const { prefs } = require("../utils/prefs");
 import { Location } from "@recordreplay/protocol";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
-const url = new URL(window.location.href);
-const recordingId = url.searchParams.get("id");
-
 function initialAppState(): AppState {
   return {
-    recordingId: recordingId!,
+    recordingId: null,
     expectedError: null,
     unexpectedError: null,
     theme: "theme-light",

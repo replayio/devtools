@@ -14,7 +14,7 @@ import { PendingComment, Comment } from "ui/state/comments";
 import { MouseEvent } from "@recordreplay/protocol";
 
 function Transcript({ recordingId, clickEvents, pendingComment }: PropsFromRedux) {
-  const { comments } = hooks.useGetComments(recordingId);
+  const { comments } = hooks.useGetComments(recordingId!);
 
   // We allow the panel to render its entries whether or not the
   // comments have loaded yet. This optimistically assumes that eventually the
