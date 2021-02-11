@@ -40,6 +40,7 @@ class Marker extends React.Component<MarkerProps> {
 
     return (
       this.props.time !== nextProps.time ||
+      this.props.currentTime !== nextProps.currentTime ||
       this.props.overlayWidth !== nextProps.overlayWidth ||
       this.props.zoomRegion !== nextProps.zoomRegion ||
       isHighlighted !== willBeHighlighted
