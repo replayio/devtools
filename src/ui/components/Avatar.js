@@ -1,26 +1,27 @@
 import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { getAvatarColor } from "ui/utils/user";
+import { useUser } from "@clerk/clerk-react";
 
 export const AuthAvatar = ({ user }) => {
   return (
     <div className={`avatar authenticated first-player`}>
-      <img src={user.picture} alt={user.name} />
+      <img src={user.profileImageUrl} alt={user.fullName} />
     </div>
   );
 };
 
 export default function Avatar({ player, isFirstPlayer, index }) {
-  let auth = useAuth0();
+  const user = useUser();
 
-  if (auth.isAuthenticated && isFirstPlayer) {
-    return <AuthAvatar user={auth.user} />;
+  if (user && isFirstPlayer) {
+    return <AuthAvatar user={player} />;
   }
 
-  if (player.name) {
+  if (player.fullName) {
     return (
-      <div className={`avatar`} title={player.name}>
-        <img src={player.picture} alt={player.name} />
+      <div className={`avatar`} title={player.fullName}>
+        <img src={player.profileImageUrl} alt={player.fullName} />
       </div>
     );
   }

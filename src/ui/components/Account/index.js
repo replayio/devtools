@@ -8,6 +8,7 @@ import { setUserInBrowserPrefs } from "../../utils/browser";
 import UserOptions from "ui/components/Header/UserOptions";
 
 import "./Account.css";
+import { SignedIn, SignedOut, SignIn, SignUp, UserButton, useUser } from "@clerk/clerk-react";
 
 const GET_MY_RECORDINGS = gql`
   fragment recordingFields on recordings {
@@ -92,9 +93,10 @@ function getRecordings(data) {
 }
 
 function AccountPage() {
-  const { user } = useAuth0();
+  // const { user } = useAuth0();
+  const user = useUser();
   const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
-    variables: { authId: user.sub },
+    variables: { authId: user.id },
     pollInterval: 10000,
   });
 
@@ -134,7 +136,8 @@ function WelcomePage() {
       <div className="welcome-panel">
         <img className="logo" src="images/logo.svg" />
         <img className="atwork" src="images/computer-work.svg" />
-        <button onClick={() => loginWithRedirect()}>Sign In</button>
+        <SignUp />
+        {/* <button onClick={() => loginWithRedirect()}>Sign In</button> */}
       </div>
     </div>
   );
@@ -153,16 +156,21 @@ function AccountHeader() {
 }
 
 export default function Account() {
-  const { isAuthenticated } = useAuth0();
+  // const { isAuthenticated } = useAuth0();
 
-  if (!isAuthenticated) {
-    return <WelcomePage />;
-  }
+  // if (!isAuthenticated) {
+  //   return ;
+  // }
 
   return (
     <>
-      <AccountHeader />
-      <AccountPage />
+      <SignedOut>
+        <WelcomePage />
+      </SignedOut>
+      <SignedIn>
+        <AccountHeader />
+        {/* <AccountPage /> */}
+      </SignedIn>
     </>
   );
 }

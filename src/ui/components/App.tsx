@@ -46,25 +46,25 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
 }
 
 function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
-  const auth = useAuth0();
+  // const auth = useAuth0();
 
   useEffect(() => {
     document.body.parentElement!.className = theme || "";
     installViewportObserver({ updateNarrowMode });
   }, [theme]);
 
-  useEffect(() => {
-    setUserInBrowserPrefs(auth.user);
-    if (auth.user) {
-      LogRocket.createSession(auth);
-    }
-  }, [auth.user]);
+  // useEffect(() => {
+  //   setUserInBrowserPrefs(auth.user);
+  //   if (auth.user) {
+  //     LogRocket.createSession(auth);
+  //   }
+  // }, [auth.user]);
 
   if (hasLoadingParam()) {
     return <Uploading />;
   }
 
-  if (!isDeployPreview() && auth.isLoading) {
+  if (!isDeployPreview() && false /* auth?.isLoading */) {
     return null;
   }
 

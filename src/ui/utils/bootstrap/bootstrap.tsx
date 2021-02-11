@@ -15,6 +15,8 @@ import { ApolloProvider } from "@apollo/client";
 
 import { skipTelemetry } from "../environment";
 import { UIStore } from "ui/actions";
+import AuthProvider from "../AuthProvider";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
 
 export function setupSentry(context: Record<string, any>) {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
@@ -43,23 +45,23 @@ export function setupSentry(context: Record<string, any>) {
 }
 
 function ApolloWrapper({ children }: { children: ReactNode }) {
-  const tokenState = useToken();
+  // const tokenState = useToken();
 
-  if (tokenState === undefined) {
-    return null;
-  }
+  // if (tokenState === undefined) {
+  //   return null;
+  // }
 
-  const { token, error } = tokenState;
+  // const { token, error } = tokenState;
 
-  if (error) {
-    if (error.message === "Could not open popup") {
-      return <PopupBlockedError />;
-    } else {
-      return null;
-    }
-  }
+  // if (error) {
+  //   if (error.message === "Could not open popup") {
+  //     return <PopupBlockedError />;
+  //   } else {
+  //     return null;
+  //   }
+  // }
 
-  return <ApolloProvider client={createApolloClient(token)}>{children}</ApolloProvider>;
+  return <ApolloProvider client={createApolloClient(undefined)}>{children}</ApolloProvider>;
 }
 
 export function bootstrapApp(props: AppProps, context: Record<string, any>, store: UIStore) {
@@ -67,13 +69,15 @@ export function bootstrapApp(props: AppProps, context: Record<string, any>, stor
 
   ReactDOM.render(
     <Router>
-      <tokenManager.Auth0Provider>
+      {/* <tokenManager.Auth0Provider> */}
+      <AuthProvider>
         <ApolloWrapper>
           <Provider store={store}>
             <App {...props} />
           </Provider>
         </ApolloWrapper>
-      </tokenManager.Auth0Provider>
+      </AuthProvider>
+      {/* </tokenManager.Auth0Provider> */}
     </Router>,
     document.querySelector("#app")
   );

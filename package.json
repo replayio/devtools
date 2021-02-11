@@ -22,6 +22,7 @@
     "@babel/plugin-transform-flow-strip-types": "^7.10.4",
     "@babel/preset-react": "^7.10.4",
     "@babel/types": "^7.12.0",
+    "@clerk/clerk-react": "^1.1.1",
     "@recordreplay/protocol": "^0.3.0",
     "@sentry/apm": "^5.24.2",
     "@sentry/react": "^5.24.2",
