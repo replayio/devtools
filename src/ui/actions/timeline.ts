@@ -367,11 +367,17 @@ export function goToPrevPaint(): UIThunkAction {
 
 export function setHoveredPoint(hoveredPoint: HoveredPoint | null): UIThunkAction {
   return ({ dispatch, getState }) => {
+    dispatch({ type: "set_hovered_point", hoveredPoint });
+
+    // Don't update the video if user is adding a new comment.
+    if (selectors.getPendingComment(getState())) {
+      return;
+    }
+
     if (hoveredPoint) {
       paintGraphicsAtTime(hoveredPoint.time);
     } else {
       paintGraphicsAtTime(selectors.getCurrentTime(getState()));
     }
-    dispatch({ type: "set_hovered_point", hoveredPoint });
   };
 }
