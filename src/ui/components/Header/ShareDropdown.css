@@ -31,12 +31,16 @@
 
 #header .share .dropdown-container .row button {
   background: var(--dark-blue);
-  color: white;
+  color: var(--theme-toolbar-background);
   padding: 8px 12px;
   line-height: 16px;
   border-radius: 4px;
   display: flex;
   align-items: center;
+}
+
+#header .share .dropdown-container .row button .img {
+  background: var(--theme-toolbar-background);
 }
 
 #header .share .dropdown-container .row.link:not(:last-child) {
