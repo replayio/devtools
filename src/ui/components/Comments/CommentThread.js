@@ -85,7 +85,7 @@ function CommentBodyItem({ comment, isRoot, hoveredComment }) {
         <img src={comment.user.picture} className="comment-picture" />
         <div className="comment-body-header-label">
           <div className="comment-body-header-label-name">{comment.user.name}</div>
-          <div className="comment-body-header-label-date">{rel}</div>
+          {/* <div className="comment-body-header-label-date">{rel}</div> */}
         </div>
         {isRoot && <Actions {...{ comment, hoveredComment }} />}
       </div>
