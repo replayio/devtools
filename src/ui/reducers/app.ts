@@ -14,7 +14,7 @@ function initialAppState(): AppState {
     theme: "theme-light",
     splitConsoleOpen: prefs.splitConsole,
     selectedPanel: prefs.selectedPanel,
-    selectedPrimaryPanel: "explorer",
+    selectedPrimaryPanel: "comments",
     initializedPanels: [],
     loading: 4,
     uploading: null,

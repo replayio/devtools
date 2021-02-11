@@ -164,14 +164,8 @@ export function seek(
   hasFrames: boolean,
   pauseId?: PauseId
 ): UIThunkAction {
-  return ({ dispatch }) => {
+  return () => {
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
-
-    // Make sure the pause information sidebar panel is visible, but only if we
-    // have frames for that particular point.
-    if (hasFrames) {
-      dispatch(actions.setSelectedPrimaryPanel("debug"));
-    }
 
     if (pause) {
       ThreadFront.timeWarpToPause(pause);
