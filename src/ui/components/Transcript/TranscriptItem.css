@@ -23,7 +23,7 @@
 
 .transcript-entry-icon {
   background: var(--cool-gray-400);
-  padding: 6px;
+  padding: 4px;
   border-radius: 50%;
   box-shadow: 0px 0px 0px 8px white;
 }
@@ -37,8 +37,8 @@
 }
 
 .transcript-entry-icon .img {
-  height: 20px;
-  width: 20px;
+  height: 16px;
+  width: 16px;
   background: var(--theme-body-background);
 }
 
