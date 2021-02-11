@@ -1,6 +1,6 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
-import { Comment } from "ui/state/app";
+import { Comment } from "ui/state/comments";
 
 const GET_COMMENTS = gql`
   query GetComments($recordingId: uuid) {

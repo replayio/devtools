@@ -28,7 +28,7 @@ function AddCommentButton({
     }
 
     const pendingComment = {
-      content: "",
+      content: "" as "",
       recording_id: recordingId,
       time: currentTime,
       point: ThreadFront.currentPoint,

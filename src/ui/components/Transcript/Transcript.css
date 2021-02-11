@@ -183,57 +183,6 @@
   border-radius: 12px;
 }
 
-/*  */
-
-.comments-panel .comment-input-container {
-  padding: 16px 0px;
-  border-top: 1px solid var(--theme-splitter-color);
-  display: flex;
-}
-
-.comments-panel .comment-input-container img {
-  opacity: 50%;
-  align-self: start;
-}
-
-.comments-panel .comment-input-container > :not(:first-child) {
-  margin-left: 16px;
-}
-
-.comments-panel .comment-input {
-  flex-grow: 1;
-  font-size: 12px;
-  line-height: 18px;
-  margin-top: 3px;
-  color: var(--theme-comment);
-}
-
-.comments-panel .responsive-textarea {
-  overflow-y: hidden;
-  resize: none;
-  font-family: sans-serif;
-  line-height: 18px;
-  border: none;
-}
-
-.comments-panel .responsive-textarea:focus {
-  outline: none;
-}
-
-.comments-panel .img.paper-airplane {
-  width: 20px;
-  height: 20px;
-  margin-bottom: 2px;
-  color: var(--theme-icon-color);
-  transform: rotate(90deg);
-  cursor: pointer;
-  align-self: flex-end;
-}
-
-.comments-panel .img.paper-airplane:hover {
-  background: var(--primary-accent);
-}
-
 .comments-panel .comment-actions {
   display: flex;
   flex-direction: row;
@@ -281,5 +230,59 @@
 }
 
 .comments-panel .comment-actions .img:hover {
+  background: var(--primary-accent);
+}
+
+/* Comment Input */
+
+.comments-panel .comment-input-container {
+  padding: 16px 0px;
+  display: flex;
+}
+
+.comment-container:not(.pending) .comment-input-container {
+  border-top: 1px solid var(--theme-splitter-color);
+}
+
+.comments-panel .comment-input-container img {
+  opacity: 50%;
+  align-self: start;
+}
+
+.comments-panel .comment-input-container > :not(:first-child) {
+  margin-left: 16px;
+}
+
+.comments-panel .comment-input {
+  flex-grow: 1;
+  font-size: 12px;
+  line-height: 18px;
+  margin-top: 3px;
+  color: var(--theme-comment);
+}
+
+.comments-panel .responsive-textarea {
+  overflow-y: hidden;
+  resize: none;
+  font-family: sans-serif;
+  line-height: 18px;
+  border: none;
+}
+
+.comments-panel .responsive-textarea:focus {
+  outline: none;
+}
+
+.comments-panel .img.paper-airplane {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 2px;
+  color: var(--theme-icon-color);
+  transform: rotate(90deg);
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.comments-panel .img.paper-airplane:hover {
   background: var(--primary-accent);
 }

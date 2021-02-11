@@ -23,7 +23,7 @@ export interface UploadInfo {
 }
 
 export interface AppState {
-  recordingId: RecordingId | null;
+  recordingId: RecordingId;
   sessionId: SessionId | null;
   theme: string;
   splitConsoleOpen: boolean;
@@ -54,20 +54,6 @@ interface Events {
 }
 
 export type Event = "mousedown";
-
-export interface Comment {
-  content: string;
-  created_at: string;
-  has_frames: boolean;
-  id: string;
-  point: string;
-  recording_id: RecordingId;
-  parent_id: string;
-  time: number;
-  updated_at: string;
-  user_id: string;
-  __typename: string;
-}
 
 export interface Canvas {
   gDevicePixelRatio: number;

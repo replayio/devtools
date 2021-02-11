@@ -45,6 +45,7 @@ function CommentThread({
     <div
       className={classnames("comment-container", {
         selected: isSelected,
+        pending: isPending,
       })}
       ref={commentEl}
     >
@@ -130,14 +131,6 @@ function Actions({ comment, hoveredComment }) {
         </div>
       </PortalDropdown>
     </div>
-  );
-}
-
-function Timestamp({ comment }) {
-  return (
-    <div className="comment-body-header-timestamp">{`00:${Math.floor(comment.time / 1000)
-      .toString()
-      .padStart(2, 0)}`}</div>
   );
 }
 

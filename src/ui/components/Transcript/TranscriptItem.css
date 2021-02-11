@@ -29,7 +29,7 @@
 }
 
 .transcript-entry:not(:last-child) .transcript-line {
-  width: 3px;
+  width: 2px;
   left: 22px;
   height: 100%;
   position: absolute;
@@ -63,7 +63,7 @@
   background: var(--new-blue-900);
 }
 
-/* Fake timeline */
+/* Transcript timeline */
 
 .transcript-entry.before-paused .transcript-line {
   background: var(--primary-accent)

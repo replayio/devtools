@@ -1,5 +1,3 @@
-/* Add Comment Button */
-
 .comments-panel button.add-comment {
   border: 1px solid var(--dark-blue);
   color: var(--dark-blue);

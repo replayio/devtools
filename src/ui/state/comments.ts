@@ -8,6 +8,7 @@ export interface CommentsState {
 }
 
 export interface PendingComment {
+  content: "";
   recording_id: RecordingId | null;
   time: number;
   point: string;
@@ -19,4 +20,19 @@ export interface PendingComment {
 interface CommentPosition {
   x: number;
   y: number;
+}
+
+export interface Comment {
+  content: string;
+  created_at: string;
+  has_frames: boolean;
+  id: string;
+  point: string;
+  recording_id: RecordingId;
+  parent_id: string;
+  time: number;
+  updated_at: string;
+  user_id: string;
+  __typename: string;
+  position: CommentPosition;
 }
