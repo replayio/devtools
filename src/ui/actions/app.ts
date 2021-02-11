@@ -88,6 +88,8 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
   ).then(() => {
     store.dispatch({ type: "loading", loading: 100 });
   });
+
+  ThreadFront.listenForLoadChanges();
 }
 
 function setupPointHandlers(store: UIStore) {

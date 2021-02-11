@@ -26,6 +26,7 @@ import {
   SourceLocation,
   TimeStamp,
   unprocessedRegions,
+  loadedRegions,
 } from "@recordreplay/protocol";
 import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
@@ -206,6 +207,17 @@ class _ThreadFront {
     }
 
     await client.Session.ensureProcessed({}, sessionId);
+  }
+
+  async listenForLoadChanges() {
+    // This is a placeholder which logs loading changes to the console.
+    const sessionId = await this.waitForSession();
+
+    client.Session.addLoadedRegionsListener((parameters: loadedRegions) => {
+      console.log("LoadedRegions", parameters);
+    });
+
+    await client.Session.listenForLoadChanges({}, sessionId);
   }
 
   timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, force?: boolean) {
