@@ -222,6 +222,9 @@ export function setLogpointByURL(
   showInConsole: boolean = true
 ) {
   const sourceIds = ThreadFront.getSourceIdsForURL(url);
+  if (sourceIds.length === 0) {
+    return;
+  }
   const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));
   setLogpoint(logGroupId, locations, text, condition, showInConsole);
 }
