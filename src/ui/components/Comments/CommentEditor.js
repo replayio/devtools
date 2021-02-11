@@ -19,6 +19,7 @@ function CommentEditor({
   const { user } = useAuth0();
   const [editorState, setEditorState] = useState(null);
   const [DraftJS, setDraftJS] = useState();
+  const editorEl = useRef(null);
 
   const addComment = hooks.useAddComment(clearPendingComment);
 
@@ -29,11 +30,15 @@ function CommentEditor({
     });
   }, []);
 
+  useEffect(() => {
+    editorEl.current?.focus();
+  }, [editorEl.current]);
+
   if (!DraftJS) {
     return null;
   }
 
-  const { Editor, EditorState, getDefaultKeyBinding } = DraftJS;
+  const { Editor, EditorState, getDefaultKeyBinding, focus } = DraftJS;
 
   const isNewComment = comment.content === "";
 
@@ -98,6 +103,7 @@ function CommentEditor({
       <img src={user.picture} className="comment-picture" />
       <div className="comment-input">
         <Editor
+          ref={editorEl}
           editorState={editorState}
           onChange={setEditorState}
           handleKeyCommand={e => getDefaultKeyBinding(e)}
