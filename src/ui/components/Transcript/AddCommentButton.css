@@ -1,4 +1,4 @@
-.comments-panel button.add-comment {
+.transcript-panel button.add-comment {
   border: 1px solid var(--dark-blue);
   color: var(--dark-blue);
   padding: 8px 12px;
@@ -12,29 +12,29 @@
   flex-direction: column;
 }
 
-.comments-panel button.add-comment:hover {
+.transcript-panel button.add-comment:hover {
   background: var(--dark-blue);
   color: var(--theme-body-background);
   border: 1px solid var(--dark-blue);
 }
 
-.comments-panel button.add-comment.disabled {
+.transcript-panel button.add-comment.disabled {
   background: var(--grey-30);
   border: 1px solid var(--grey-30);
   color: var(--theme-body-color);
   cursor: auto;
 }
 
-.comments-panel button.add-comment.disabled:focus {
+.transcript-panel button.add-comment.disabled:focus {
   outline: none;
 }
 
-.comments-panel button.add-comment .img {
+.transcript-panel button.add-comment .img {
   margin-right: 4px;
   background: var(--theme-body-background);
 }
 
-.comments-panel .add-comment {
+.transcript-panel .add-comment {
   padding: 12px;
   color: white;
   align-self: center;

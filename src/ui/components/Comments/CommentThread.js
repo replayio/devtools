@@ -33,7 +33,7 @@ function CommentThread({
   };
 
   useEffect(() => {
-    if (comment.time === currentTime || pendingComment?.id == comment.id) {
+    if (comment.time === currentTime) {
       commentEl.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, [currentTime, pendingComment]);

@@ -8,7 +8,7 @@ import { actions } from "ui/actions";
 import CommentTool from "ui/components/shared/CommentTool";
 import "draft-js/dist/Draft.css";
 
-function DraftJSEditor({ editorState, setEditorState, DraftJS, setDraftJS }) {
+function DraftJSEditorLoader({ editorState, setEditorState, DraftJS, setDraftJS }) {
   useEffect(function importDraftJS() {
     import("draft-js").then(DraftJS => {
       setEditorState(DraftJS.EditorState.createEmpty());
@@ -20,15 +20,31 @@ function DraftJSEditor({ editorState, setEditorState, DraftJS, setDraftJS }) {
     return null;
   }
 
+  return <DraftJSEditor {...{ editorState, setEditorState, DraftJS }} />;
+}
+
+function DraftJSEditor({ editorState, setEditorState, DraftJS }) {
+  const editorNode = useRef(null);
+  const wrapperNode = useRef(null);
   const { Editor, getDefaultKeyBinding } = DraftJS;
 
+  useEffect(() => {
+    // The order is important here — we focus the editor first before scrolling the
+    // wrapper into view. Otherwise, the scrolling animation is interrupted by the focus.
+    editorNode.current.focus();
+    wrapperNode.current.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, []);
+
   return (
-    <Editor
-      editorState={editorState}
-      onChange={setEditorState}
-      handleKeyCommand={e => getDefaultKeyBinding(e)}
-      placeholder={"Type a comment ..."}
-    />
+    <div ref={wrapperNode}>
+      <Editor
+        editorState={editorState}
+        onChange={setEditorState}
+        handleKeyCommand={e => getDefaultKeyBinding(e)}
+        placeholder={"Type a comment ..."}
+        ref={editorNode}
+      />
+    </div>
   );
 }
 
@@ -107,7 +123,7 @@ function CommentEditor({
     <div className="comment-input-container">
       <img src={user.picture} className="comment-picture" />
       <div className="comment-input">
-        <DraftJSEditor {...{ editorState, setEditorState, DraftJS, setDraftJS }} />
+        <DraftJSEditorLoader {...{ editorState, setEditorState, DraftJS, setDraftJS }} />
       </div>
       <button className="img paper-airplane" onClick={handleSave} />
       {isNewComment && <CommentTool comment={comment} />}

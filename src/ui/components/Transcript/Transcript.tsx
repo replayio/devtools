@@ -32,15 +32,17 @@ function Transcript({ recordingId, clickEvents, pendingComment }: PropsFromRedux
   }
 
   return (
-    <div className="comments-panel">
+    <div className="transcript-panel">
       <AddCommentButton />
-      {sortBy(entries, ["time", "kind", "created_at"]).map((entry, i) => {
-        if ("content" in entry) {
-          return <CommentTranscriptItem comment={entry} key={i} />;
-        } else {
-          return <EventTranscriptItem event={entry} key={i} />;
-        }
-      })}
+      <div className="transcript-list">
+        {sortBy(entries, ["time", "kind", "created_at"]).map((entry, i) => {
+          if ("content" in entry) {
+            return <CommentTranscriptItem comment={entry} key={i} />;
+          } else {
+            return <EventTranscriptItem event={entry} key={i} />;
+          }
+        })}
+      </div>
     </div>
   );
 }
