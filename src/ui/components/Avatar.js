@@ -1,7 +1,6 @@
 import React from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import { getAvatarColor } from "ui/utils/user";
-import { useUser } from "@clerk/clerk-react";
+import useAuth from "ui/utils/auth/useAuth";
 
 export const AuthAvatar = ({ user }) => {
   return (
@@ -12,7 +11,7 @@ export const AuthAvatar = ({ user }) => {
 };
 
 export default function Avatar({ player, isFirstPlayer, index }) {
-  const user = useUser();
+  const { user } = useAuth();
 
   if (user && isFirstPlayer) {
     return <AuthAvatar user={player} />;

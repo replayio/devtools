@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { useAuth0 } from "@auth0/auth0-react";
 
 import Header from "./Header/index";
 import SkeletonLoader from "./SkeletonLoader";
@@ -8,6 +7,7 @@ import NonDevView from "./Views/NonDevView";
 import DevView from "./Views/DevView";
 import hooks from "../hooks";
 import { prefs } from "ui/utils/prefs";
+import useAuth from "ui/utils/auth/useAuth";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
@@ -52,7 +52,7 @@ function DevTools({
   viewMode,
 }) {
   const [finishedLoading, setFinishedLoading] = useState(false);
-  const auth = useAuth0();
+  const { user } = useAuth();
   const AddSessionUser = hooks.useAddSessionUser();
   const { data, queryIsLoading } = hooks.useGetRecording(recordingId);
 
@@ -67,12 +67,12 @@ function DevTools({
   }, [loading]);
 
   useEffect(() => {
-    if (loading == 100 && auth.user && sessionId) {
-      hooks.fetchUserId(auth.user.sub).then(userId => {
+    if (loading == 100 && user && sessionId) {
+      hooks.fetchUserId(user.id).then(userId => {
         AddSessionUser({ variables: { id: sessionId, user_id: userId } });
       });
     }
-  }, [loading, auth.user, sessionId]);
+  }, [loading, user, sessionId]);
 
   useEffect(() => {
     if (data?.recordings?.[0]?.title) {

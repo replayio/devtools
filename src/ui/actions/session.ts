@@ -2,7 +2,6 @@ import { sendMessage, addEventListener } from "protocol/socket";
 import { sessionError, uploadedData } from "@recordreplay/protocol";
 import { Action } from "redux";
 
-import tokenManager from "ui/utils/tokenManager";
 import { UIStore, actions, UIThunkAction } from "ui/actions";
 import { ThreadFront } from "protocol/thread";
 const { prefs } = require("ui/utils/prefs");
@@ -32,12 +31,13 @@ export async function createSession(store: UIStore, recordingId: string) {
     ThreadFront.setTest(getTest() || undefined);
     ThreadFront.recordingId = recordingId;
 
-    tokenManager.addListener(({ token }) => {
-      if (token) {
-        sendMessage("Authentication.setAccessToken", { accessToken: token });
-      }
-    });
-    await tokenManager.getToken();
+    // TODO: Clerk.dev
+    // tokenManager.addListener(({ token }) => {
+    //   if (token) {
+    //     sendMessage("Authentication.setAccessToken", { accessToken: token });
+    //   }
+    // });
+    // await tokenManager.getToken();
 
     const { sessionId } = await sendMessage("Recording.createSession", {
       recordingId,

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
-import { useAuth0 } from "@auth0/auth0-react";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import Dropdown from "ui/components/shared/Dropdown";
+import useAuth from "ui/utils/auth/useAuth";
 import "./ShareDropdown.css";
 
 const UPDATE_IS_PRIVATE = gql`
@@ -38,7 +38,7 @@ const GET_OWNER_AUTH_ID = gql`
 `;
 
 function useIsOwner(recordingId) {
-  const { user, isAuthenticated } = useAuth0();
+  const { user, isAuthenticated } = useAuth();
   const { data, loading } = useQuery(GET_OWNER_AUTH_ID, {
     variables: { recordingId },
   });
@@ -52,7 +52,7 @@ function useIsOwner(recordingId) {
     return false;
   }
 
-  return user.sub === recording.user?.auth_id;
+  return user.id === recording.user?.auth_id;
 }
 
 function CopyUrl({ recordingId }) {
@@ -113,7 +113,7 @@ function Privacy({ isPrivate, toggleIsPrivate }) {
 }
 
 function Collaborators({ setExpanded, setModal }) {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth();
 
   const handleClick = () => {
     setModal("sharing");

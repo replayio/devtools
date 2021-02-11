@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
 import classnames from "classnames";
-import { useAuth0 } from "@auth0/auth0-react";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
+import useAuth from "ui/utils/auth/useAuth";
 
 import "./Error.css";
 
@@ -23,7 +23,9 @@ function RefreshButton() {
 }
 
 function SignInButton() {
-  const { loginWithRedirect } = useAuth0();
+  // TODO: Clerk.dev
+  // const { loginWithRedirect } = useAuth();
+  const loginWithRedirect = () => console.log("not implemented");
 
   return <button onClick={loginWithRedirect}>Sign in</button>;
 }

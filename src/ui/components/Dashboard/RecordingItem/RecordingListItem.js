@@ -4,7 +4,6 @@ import Title from "../../shared/Title";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import { AuthAvatar } from "ui/components/Avatar";
 import moment from "moment";
-import { useAuth0 } from "@auth0/auth0-react";
 import "./RecordingListItem.css";
 
 function getDurationString(durationMs) {

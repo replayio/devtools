@@ -2,11 +2,11 @@ import React from "react";
 import classnames from "classnames";
 import { ThreadFront } from "protocol/thread";
 import { connect, ConnectedProps } from "react-redux";
-import { useAuth0 } from "@auth0/auth0-react";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
+import useAuth from "ui/utils/auth/useAuth";
 import { assert } from "protocol/utils";
 
 import "./AddCommentButton.css";
@@ -20,7 +20,7 @@ function AddCommentButton({
   setPendingComment,
 }: PropsFromRedux) {
   assert(recordingId);
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth();
 
   const onClick = () => {
     if (!isAuthenticated) {

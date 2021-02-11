@@ -6,10 +6,10 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 
-import { useAuth0 } from "@auth0/auth0-react";
 import moment from "moment";
 
 import CommentEditor from "ui/components/Comments/CommentEditor";
+import useAuth from "ui/utils/auth/useAuth";
 
 function CommentThread({
   comment,
@@ -23,7 +23,7 @@ function CommentThread({
   clearPendingComment,
 }) {
   const commentEl = useRef(null);
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth();
   const seekToComment = () => {
     const { point, time, has_frames } = comment;
     clearPendingComment();
@@ -98,13 +98,13 @@ function CommentBodyItem({ comment, isRoot, hoveredComment }) {
 }
 
 function Actions({ comment, hoveredComment }) {
-  const { user } = useAuth0();
+  const { user } = useAuth();
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
   const [expanded, setExpanded] = useState(false);
 
   const isHovered = hoveredComment == comment.id;
-  const isThreadAuthor = user?.sub === comment.user.auth_id;
+  const isThreadAuthor = user?.id === comment.user.auth_id;
 
   const deleteThread = e => {
     e.stopPropagation();

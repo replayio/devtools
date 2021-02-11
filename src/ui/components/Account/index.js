@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import Dashboard from "../Dashboard/index";
-import { useAuth0 } from "@auth0/auth0-react";
 import Loader from "../shared/Loader";
 import Prompt from "../shared/Prompt";
 import { gql, useQuery } from "@apollo/client";
@@ -93,7 +92,6 @@ function getRecordings(data) {
 }
 
 function AccountPage() {
-  // const { user } = useAuth0();
   const user = useUser();
   const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
     variables: { authId: user.id },
@@ -119,11 +117,11 @@ function AccountPage() {
 }
 
 function WelcomePage() {
-  const { loginWithRedirect } = useAuth0();
   const forceOpenAuth = new URLSearchParams(window.location.search).get("signin");
 
   if (forceOpenAuth) {
-    loginWithRedirect();
+    // TODO: Clerk.dev
+    // loginWithRedirect();
     return null;
   }
 
@@ -156,12 +154,6 @@ function AccountHeader() {
 }
 
 export default function Account() {
-  // const { isAuthenticated } = useAuth0();
-
-  // if (!isAuthenticated) {
-  //   return ;
-  // }
-
   return (
     <>
       <SignedOut>

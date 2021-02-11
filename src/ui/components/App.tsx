@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { useAuth0 } from "@auth0/auth0-react";
 
 const DevTools = require("./DevTools").default;
 const Account = require("./Account").default;
@@ -46,8 +45,6 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
 }
 
 function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
-  // const auth = useAuth0();
-
   useEffect(() => {
     document.body.parentElement!.className = theme || "";
     installViewportObserver({ updateNarrowMode });

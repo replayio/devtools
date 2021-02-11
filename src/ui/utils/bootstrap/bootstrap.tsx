@@ -3,20 +3,17 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 
+import { ApolloProvider } from "@apollo/client";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/apm";
 
+import { UIStore } from "ui/actions";
 import App, { AppProps } from "ui/components/App";
-const { PopupBlockedError } = require("ui/components/shared/Error");
-import tokenManager from "ui/utils/tokenManager";
-import useToken from "ui/utils/useToken";
+// const { PopupBlockedError } = require("ui/components/shared/Error");
 import { createApolloClient } from "ui/utils/apolloClient";
-import { ApolloProvider } from "@apollo/client";
 
 import { skipTelemetry } from "../environment";
-import { UIStore } from "ui/actions";
-import AuthProvider from "../AuthProvider";
-import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import AuthProvider from "../auth/AuthProvider";
 
 export function setupSentry(context: Record<string, any>) {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
@@ -69,7 +66,6 @@ export function bootstrapApp(props: AppProps, context: Record<string, any>, stor
 
   ReactDOM.render(
     <Router>
-      {/* <tokenManager.Auth0Provider> */}
       <AuthProvider>
         <ApolloWrapper>
           <Provider store={store}>
@@ -77,7 +73,6 @@ export function bootstrapApp(props: AppProps, context: Record<string, any>, stor
           </Provider>
         </ApolloWrapper>
       </AuthProvider>
-      {/* </tokenManager.Auth0Provider> */}
     </Router>,
     document.querySelector("#app")
   );

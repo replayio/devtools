@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
-import { gql, useQuery } from "@apollo/client";
 import DashboardNavigation from "./DashboardNavigation";
 import DashboardViewer from "./DashboardViewer";
 import "./Dashboard.css";

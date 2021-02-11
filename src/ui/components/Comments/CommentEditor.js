@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ThreadFront } from "protocol/thread";
-import { useAuth0 } from "@auth0/auth0-react";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import CommentTool from "ui/components/shared/CommentTool";
 import "draft-js/dist/Draft.css";
+import { useUser } from "@clerk/clerk-react";
 
 function CommentEditor({
   comment,
@@ -16,7 +16,7 @@ function CommentEditor({
   canvas,
   currentTime,
 }) {
-  const { user } = useAuth0();
+  const user = useUser();
   const [editorState, setEditorState] = useState(null);
   const [DraftJS, setDraftJS] = useState();
 
@@ -95,7 +95,7 @@ function CommentEditor({
 
   return (
     <div className="comment-input-container">
-      <img src={user.picture} className="comment-picture" />
+      <img src={user.profileImageUrl} className="comment-picture" />
       <div className="comment-input">
         <Editor
           editorState={editorState}
