@@ -29,8 +29,8 @@
 }
 
 .transcript-entry:not(:last-child) .transcript-line {
-  width: 2px;
-  left: 22px;
+  width: 1px;
+  left: 19px;
   height: 100%;
   position: absolute;
   background: var(--cool-gray-200);
