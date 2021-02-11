@@ -6,7 +6,7 @@ import { skipTelemetry } from "./environment";
 let setup = false;
 
 export default {
-  createSession: (auth: any) => {
+  createSession: (user: any) => {
     if (skipTelemetry()) {
       return;
     }
@@ -20,10 +20,10 @@ export default {
       });
     });
 
-    LogRocket.identify(auth.user.sub, {
-      name: auth.user.name,
-      email: auth.user.email,
-      id: auth.user.email,
+    LogRocket.identify(user.id, {
+      name: user.name,
+      email: user.email,
+      id: user.email,
     });
   },
 

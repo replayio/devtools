@@ -1,5 +1,5 @@
-export function setUserInBrowserPrefs(user: { sub: string } | null) {
-  const _user = user === null ? "" : user;
+export function setUserInBrowserPrefs(user?: { id: string } | null) {
+  const _user = user == null ? "" : user;
   window.dispatchEvent(
     new window.CustomEvent("WebChannelMessageToChrome", {
       detail: JSON.stringify({

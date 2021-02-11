@@ -18,6 +18,7 @@ import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import { Uploading } from "./Uploading";
+import useAuth from "ui/utils/auth/useAuth";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -45,25 +46,28 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
 }
 
 function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
+  const { user } = useAuth();
+
   useEffect(() => {
     document.body.parentElement!.className = theme || "";
     installViewportObserver({ updateNarrowMode });
   }, [theme]);
 
-  // useEffect(() => {
-  //   setUserInBrowserPrefs(auth.user);
-  //   if (auth.user) {
-  //     LogRocket.createSession(auth);
-  //   }
-  // }, [auth.user]);
+  useEffect(() => {
+    setUserInBrowserPrefs(user);
+    if (user) {
+      LogRocket.createSession(user);
+    }
+  }, [user]);
 
   if (hasLoadingParam()) {
     return <Uploading />;
   }
 
-  if (!isDeployPreview() && false /* auth?.isLoading */) {
-    return null;
-  }
+  // TODO: Clerk.dev
+  // if (!isDeployPreview() && auth?.isLoading) {
+  //   return null;
+  // }
 
   return (
     <>

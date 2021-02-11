@@ -1,11 +1,12 @@
 import React, { useState } from "react";
+import { UserButton } from "@clerk/clerk-react";
 import { isDeployPreview } from "ui/utils/environment";
+import useAuth from "ui/utils/auth/useAuth";
 import "./UserOptions.css";
-import { UserButton, useUser } from "@clerk/clerk-react";
 
 export default function UserOptions() {
   // const [expanded, setExpanded] = useState(false);
-  const user = useUser();
+  const { user } = useAuth();
 
   if (isDeployPreview()) {
     return null;

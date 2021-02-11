@@ -4,10 +4,10 @@ import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { ThreadFront } from "protocol/thread";
-import { useUser } from "@clerk/clerk-react";
+import useAuth from "ui/utils/auth/useAuth";
 
 function CommentDropdownPanel({ comment, onItemClick, setPendingComment, recordingId, canvas }) {
-  const user = useUser();
+  const { user } = useAuth();
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
   const isAuthor = comment.user.auth_id == user.id;

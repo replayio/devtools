@@ -5,8 +5,8 @@ import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import CommentTool from "ui/components/shared/CommentTool";
+import useAuth from "ui/utils/auth/useAuth";
 import "draft-js/dist/Draft.css";
-import { useUser } from "@clerk/clerk-react";
 
 function CommentEditor({
   comment,
@@ -16,7 +16,7 @@ function CommentEditor({
   canvas,
   currentTime,
 }) {
-  const user = useUser();
+  const { user } = useAuth();
   const [editorState, setEditorState] = useState(null);
   const [DraftJS, setDraftJS] = useState();
 

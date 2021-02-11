@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
+import { SignedIn, SignedOut, SignUp } from "@clerk/clerk-react";
 import Dashboard from "../Dashboard/index";
 import Loader from "../shared/Loader";
 import Prompt from "../shared/Prompt";
 import { gql, useQuery } from "@apollo/client";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 import UserOptions from "ui/components/Header/UserOptions";
+import useAuth from "ui/utils/auth/useAuth";
 
 import "./Account.css";
-import { SignedIn, SignedOut, SignIn, SignUp, UserButton, useUser } from "@clerk/clerk-react";
 
 const GET_MY_RECORDINGS = gql`
   fragment recordingFields on recordings {
@@ -92,7 +93,7 @@ function getRecordings(data) {
 }
 
 function AccountPage() {
-  const user = useUser();
+  const { user } = useAuth();
   const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
     variables: { authId: user.id },
     pollInterval: 10000,
@@ -135,6 +136,7 @@ function WelcomePage() {
         <img className="logo" src="images/logo.svg" />
         <img className="atwork" src="images/computer-work.svg" />
         <SignUp />
+        {/* TODO: Clerk.dev */}
         {/* <button onClick={() => loginWithRedirect()}>Sign In</button> */}
       </div>
     </div>
@@ -161,6 +163,7 @@ export default function Account() {
       </SignedOut>
       <SignedIn>
         <AccountHeader />
+        {/* TODO: Clerk.dev */}
         {/* <AccountPage /> */}
       </SignedIn>
     </>
