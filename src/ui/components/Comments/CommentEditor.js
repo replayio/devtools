@@ -8,6 +8,30 @@ import { actions } from "ui/actions";
 import CommentTool from "ui/components/shared/CommentTool";
 import "draft-js/dist/Draft.css";
 
+function DraftJSEditor({ editorState, setEditorState, DraftJS, setDraftJS }) {
+  useEffect(function importDraftJS() {
+    import("draft-js").then(DraftJS => {
+      setEditorState(DraftJS.EditorState.createEmpty());
+      setDraftJS(DraftJS);
+    });
+  }, []);
+
+  if (!DraftJS) {
+    return null;
+  }
+
+  const { Editor, getDefaultKeyBinding } = DraftJS;
+
+  return (
+    <Editor
+      editorState={editorState}
+      onChange={setEditorState}
+      handleKeyCommand={e => getDefaultKeyBinding(e)}
+      placeholder={"Type a comment ..."}
+    />
+  );
+}
+
 function CommentEditor({
   comment,
   clearPendingComment,
@@ -19,21 +43,7 @@ function CommentEditor({
   const { user } = useAuth0();
   const [editorState, setEditorState] = useState(null);
   const [DraftJS, setDraftJS] = useState();
-
   const addComment = hooks.useAddComment(clearPendingComment);
-
-  useEffect(() => {
-    import("draft-js").then(DraftJS => {
-      setEditorState(DraftJS.EditorState.createEmpty());
-      setDraftJS(DraftJS);
-    });
-  }, []);
-
-  if (!DraftJS) {
-    return null;
-  }
-
-  const { Editor, EditorState, getDefaultKeyBinding } = DraftJS;
 
   const isNewComment = comment.content === "";
 
@@ -69,7 +79,7 @@ function CommentEditor({
     addComment({
       variables: { object: reply },
     });
-    setEditorState(EditorState.createEmpty());
+    setEditorState(DraftJS.EditorState.createEmpty());
   };
   const handleNewSave = () => {
     const inputValue = editorState.getCurrentContent().getPlainText();
@@ -97,12 +107,7 @@ function CommentEditor({
     <div className="comment-input-container">
       <img src={user.picture} className="comment-picture" />
       <div className="comment-input">
-        <Editor
-          editorState={editorState}
-          onChange={setEditorState}
-          handleKeyCommand={e => getDefaultKeyBinding(e)}
-          placeholder={"Type a comment ..."}
-        />
+        <DraftJSEditor {...{ editorState, setEditorState, DraftJS, setDraftJS }} />
       </div>
       <button className="img paper-airplane" onClick={handleSave} />
       {isNewComment && <CommentTool comment={comment} />}
