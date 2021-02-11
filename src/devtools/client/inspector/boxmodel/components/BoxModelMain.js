@@ -54,7 +54,15 @@ class BoxModelMain extends PureComponent {
     this.setAriaActive = this.setAriaActive.bind(this);
   }
 
+  componentDidMount() {
+    this.updateLayouts();
+  }
+
   componentDidUpdate() {
+    this.updateLayouts();
+  }
+
+  updateLayouts() {
     const displayPosition = this.getDisplayPosition();
     const isContentBox = this.getContextBox();
 
