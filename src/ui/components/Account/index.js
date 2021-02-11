@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { SignedIn, SignedOut, SignIn } from "@clerk/clerk-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { SignedIn, SignedOut, SignIn, SignUp } from "@clerk/clerk-react";
 import Dashboard from "../Dashboard/index";
 import Loader from "../shared/Loader";
 import Prompt from "../shared/Prompt";
@@ -119,8 +119,18 @@ function AccountPage() {
 
 function WelcomePage() {
   const forceOpenAuth = new URLSearchParams(window.location.search).has("signin");
-  const renderedSignin = useRef(false);
-  const [modal, setModal] = useState(forceOpenAuth);
+  const [modal, setModal] = useState(forceOpenAuth ? 1 : 0);
+  const lastModal = useRef(modal);
+
+  const handleMouseUpCapture = useCallback(
+    ev => {
+      if (ev.target.nodeName === "A") {
+        setModal(m => (m % 2) + 1);
+        ev.preventDefault();
+      }
+    },
+    [setModal]
+  );
 
   useEffect(() => {
     setUserInBrowserPrefs(null);
@@ -128,27 +138,33 @@ function WelcomePage() {
 
   useEffect(() => {
     if (modal) {
-      renderedSignin.current = true;
+      lastModal.current = modal;
     }
     const clearModal = ev => {
-      if (ev.code === "Escape") setModal(false);
+      if (ev.code === "Escape") setModal(0);
     };
     document.addEventListener("keydown", clearModal);
 
     return () => document.removeEventListener("keydown", clearModal);
   }, [modal]);
 
+  // Ensures that the last form is shown when the odal is hidden
+  const currentModel = modal || lastModal.current;
+
   return (
     <div className="welcome-screen">
       <div className="welcome-panel">
         <img className="logo" src="images/logo.svg" />
         <img className="atwork" src="images/computer-work.svg" />
-        <div className="welcome-login-modal" hidden={!modal}>
-          <div className="welcome-login-modal-scrim" onClick={() => setModal(false)} />
-          {modal || renderedSignin.current ? <SignIn /> : null}
+        <div
+          className="welcome-login-modal"
+          hidden={!modal}
+          onMouseUpCapture={handleMouseUpCapture}
+        >
+          <div className="welcome-login-modal-scrim" onClick={() => setModal(0)} />
+          {currentModel ? currentModel === 1 ? <SignIn /> : <SignUp /> : null}
         </div>
-        {/* TODO: Clerk.dev */}
-        <button onClick={() => setModal(true)}>Sign In</button>
+        <button onClick={() => setModal(1)}>Sign In</button>
       </div>
     </div>
   );
