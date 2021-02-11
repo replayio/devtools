@@ -130,6 +130,12 @@ function WelcomePage() {
     if (modal) {
       renderedSignin.current = true;
     }
+    const clearModal = ev => {
+      if (ev.code === "Escape") setModal(false);
+    };
+    document.addEventListener("keydown", clearModal);
+
+    return () => document.removeEventListener("keydown", clearModal);
   }, [modal]);
 
   return (
