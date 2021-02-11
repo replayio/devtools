@@ -23,6 +23,7 @@ function TranscriptItem({
   currentTime,
   hoveredPoint,
   activeComment,
+  pendingComment,
   seek,
   setHoveredPoint,
   setActiveComment,
@@ -42,8 +43,13 @@ function TranscriptItem({
     [hoveredPoint]
   );
 
-  const seekToEvent = () => {
+  const onClick = () => {
     const { point, time } = item;
+
+    // Don't seek anywhere when clicking on a pending comment.
+    if (pendingComment == item) {
+      return;
+    }
 
     if ("has_frames" in item) {
       seek(point, time, item.has_frames);
@@ -71,7 +77,7 @@ function TranscriptItem({
 
   return (
     <div
-      onClick={seekToEvent}
+      onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={classnames("transcript-entry", {
@@ -100,6 +106,7 @@ const connector = connect(
     currentTime: selectors.getCurrentTime(state),
     hoveredPoint: selectors.getHoveredPoint(state),
     activeComment: selectors.getActiveComment(state),
+    pendingComment: selectors.getPendingComment(state),
   }),
   {
     setHoveredPoint: actions.setHoveredPoint,
