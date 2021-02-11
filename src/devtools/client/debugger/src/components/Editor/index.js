@@ -261,6 +261,11 @@ class Editor extends PureComponent {
   onGutterClick = (cm, line, gutter, ev) => {
     const { cx, selectedSource, addBreakpointAtLine, toggleBlackBox } = this.props;
 
+    // Bail if the user clicks on a non-breakable line.
+    if (ev.target.closest(".empty-line")) {
+      return;
+    }
+
     // ignore right clicks in the gutter
     if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !selectedSource) {
       return;
