@@ -27,6 +27,7 @@ function TranscriptItem({
   seek,
   setHoveredPoint,
   setActiveComment,
+  clearPendingComment,
 }: TranscriptItemProps) {
   const itemNode = useRef<HTMLDivElement>(null);
 
@@ -57,6 +58,7 @@ function TranscriptItem({
       seek(point, time, false);
     }
 
+    clearPendingComment();
     setActiveComment(item);
   };
   const onMouseLeave = () => {
@@ -112,6 +114,7 @@ const connector = connect(
     setHoveredPoint: actions.setHoveredPoint,
     seek: actions.seek,
     setActiveComment: actions.setActiveComment,
+    clearPendingComment: actions.clearPendingComment,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
