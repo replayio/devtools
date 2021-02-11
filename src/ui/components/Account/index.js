@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { SignedIn, SignedOut, SignUp } from "@clerk/clerk-react";
+import React, { useEffect, useRef, useState } from "react";
+import { SignedIn, SignedOut, SignIn } from "@clerk/clerk-react";
 import Dashboard from "../Dashboard/index";
 import Loader from "../shared/Loader";
 import Prompt from "../shared/Prompt";
@@ -118,26 +118,31 @@ function AccountPage() {
 }
 
 function WelcomePage() {
-  const forceOpenAuth = new URLSearchParams(window.location.search).get("signin");
-
-  if (forceOpenAuth) {
-    // TODO: Clerk.dev
-    // loginWithRedirect();
-    return null;
-  }
+  const forceOpenAuth = new URLSearchParams(window.location.search).has("signin");
+  const renderedSignin = useRef(false);
+  const [modal, setModal] = useState(forceOpenAuth);
 
   useEffect(() => {
     setUserInBrowserPrefs(null);
   }, []);
+
+  useEffect(() => {
+    if (modal) {
+      renderedSignin.current = true;
+    }
+  }, [modal]);
 
   return (
     <div className="welcome-screen">
       <div className="welcome-panel">
         <img className="logo" src="images/logo.svg" />
         <img className="atwork" src="images/computer-work.svg" />
-        <SignUp />
+        <div className="welcome-login-modal" hidden={!modal}>
+          <div className="welcome-login-modal-scrim" onClick={() => setModal(false)} />
+          {modal || renderedSignin.current ? <SignIn /> : null}
+        </div>
         {/* TODO: Clerk.dev */}
-        {/* <button onClick={() => loginWithRedirect()}>Sign In</button> */}
+        <button onClick={() => setModal(true)}>Sign In</button>
       </div>
     </div>
   );
