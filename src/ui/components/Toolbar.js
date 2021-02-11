@@ -11,6 +11,7 @@ function Toolbar({
   setSelectedPrimaryPanel,
   togglePaneCollapse,
   panelCollapsed,
+  isPaused,
 }) {
   const onClick = panel => {
     if (panelCollapsed || (selectedPrimaryPanel == panel && !panelCollapsed)) {
@@ -25,6 +26,17 @@ function Toolbar({
   return (
     <div className="toolbox-toolbar-container">
       <div id="toolbox-toolbar">
+        <div
+          className={classnames("toolbar-panel-button", {
+            active: selectedPrimaryPanel == "comments",
+          })}
+        >
+          <IconWithTooltip
+            icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
+            content={"Transcript and Comments"}
+            handleClick={() => onClick("comments")}
+          />
+        </div>
         <div
           className={classnames("toolbar-panel-button", {
             active: selectedPrimaryPanel == "explorer",
@@ -42,20 +54,15 @@ function Toolbar({
           })}
         >
           <IconWithTooltip
-            icon={<div className="img debugger-panel toolbar-panel-icon" />}
+            icon={
+              <div
+                className={classnames("img debugger-panel toolbar-panel-icon", {
+                  paused: isPaused,
+                })}
+              />
+            }
             content={"Pause Information"}
             handleClick={() => onClick("debug")}
-          />
-        </div>
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPrimaryPanel == "comments",
-          })}
-        >
-          <IconWithTooltip
-            icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
-            content={"Transcript and Comments"}
-            handleClick={() => onClick("comments")}
           />
         </div>
       </div>
@@ -69,6 +76,7 @@ export default connect(
     panelCollapsed: selectors.getPaneCollapse(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
     selectedPanel: selectors.getSelectedPanel(state),
+    isPaused: selectors.getIsPaused(state),
   }),
   {
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,

@@ -276,7 +276,7 @@ export function isStepping(state) {
 }
 
 export function getIsPaused(state) {
-  return !!state.pause.frames;
+  return state.pause.frames?.length > 0;
 }
 
 export function getPreviousPauseFrameLocation(state) {

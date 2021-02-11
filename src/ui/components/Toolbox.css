@@ -72,3 +72,7 @@
 .toolbar-panel-button.active .toolbar-panel-icon {
   background: var(--primary-accent);
 }
+
+.debugger-panel.toolbar-panel-icon.paused {
+  background-color: var(--secondary-accent);
+}
