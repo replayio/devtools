@@ -49,6 +49,26 @@
   flex-grow: 1;
 }
 
+.event-timestamp {
+  font-size: 12px;
+  background: var(--grey-20);
+  color: var(--theme-comment);
+  padding: 4px;
+  border-radius: 4px;
+  height: min-content;
+}
+
+.new-comment-cancel {
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  line-height: 16px;
+  border: 1px solid var(--theme-splitter-color);
+  color: var(--theme-comment);
+}
+
 /* Non-default states */
 
 .transcript-entry.paused .transcript-entry-icon {

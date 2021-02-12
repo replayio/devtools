@@ -54,6 +54,17 @@ function EventTranscriptItem({ event }: { event: MouseEvent }) {
 }
 
 function CommentTranscriptItem({ comment }: { comment: Comment | PendingComment }) {
+  if (comment.content == "") {
+    return (
+      <TranscriptItem
+        item={comment}
+        icon={<div className="img pencil-sm" />}
+        label="Adding comment"
+      >
+        <CommentThread comment={comment} />
+      </TranscriptItem>
+    );
+  }
   return (
     <TranscriptItem item={comment} icon={<div className="img chat-alt" />} label="Comment">
       <CommentThread comment={comment} />
