@@ -1,9 +1,8 @@
-const { createFactory, createElement } = require("react");
-const { Provider } = require("react-redux");
 const { ThreadFront } = require("protocol/thread");
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const { setEventTooltip } = require("devtools/client/shared/widgets/tooltip/EventTooltipHelper");
 const Highlighter = require("highlighter/highlighter.js");
+const { isInspectorVisible } = require("../selectors");
 
 const {
   reset,
@@ -13,19 +12,14 @@ const {
   selectionChanged,
 } = require("./actions/markup");
 
-const MarkupApp = createFactory(require("./components/MarkupApp").default);
-
-const { features } = require("../prefs");
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
-
 class MarkupView {
   constructor(inspector) {
     this.inspector = inspector;
     this.selection = inspector.selection;
     this.store = inspector.store;
     this.toolbox = inspector.toolbox;
-
+    this.isInspectorVisible = false;
+    this.isLoadingPostponed = false;
     this.hoveredNodeId = undefined;
 
     this.onSelectNode = this.onSelectNode.bind(this);
@@ -49,12 +43,25 @@ class MarkupView {
       return;
     }
 
+    this.updateIsInspectorVisible();
+    this.store?.subscribe(this.updateIsInspectorVisible);
+
     if (ThreadFront.currentPause) {
       await this.onPaused();
     } else {
       this.onResumed();
     }
   }
+
+  updateIsInspectorVisible = () => {
+    const visible = isInspectorVisible(this.store.getState());
+    if (visible !== this.isInspectorVisible) {
+      this.isInspectorVisible = visible;
+      if (this.isInspectorVisible && this.isLoadingPostponed) {
+        this.loadNewDocument();
+      }
+    }
+  };
 
   getMarkupProps() {
     return {
@@ -68,6 +75,15 @@ class MarkupView {
 
   async onPaused() {
     this.store.dispatch(reset());
+    if (this.isInspectorVisible) {
+      this.loadNewDocument();
+    } else {
+      this.isLoadingPostponed = true;
+    }
+  }
+
+  async loadNewDocument() {
+    this.isLoadingPostponed = false;
 
     ThreadFront.ensureCurrentPause();
     const pause = ThreadFront.currentPause;
@@ -142,13 +158,6 @@ class MarkupView {
    */
   async expandNode(nodeId) {
     this.store?.dispatch(expandNode(nodeId));
-  }
-
-  /**
-   * Returns true if the markup panel is visisble, and false otherwise.
-   */
-  isPanelVisible() {
-    return this.toolbox.currentTool === "inspector";
   }
 
   /**
@@ -250,7 +259,7 @@ class MarkupView {
    * Updates the markup tree based on the current node selection.
    */
   async update(_, reason) {
-    if (!this.isPanelVisible() || !this.selection.isNode()) {
+    if (!this.isInspectorVisible || !this.selection.isNode()) {
       return;
     }
 

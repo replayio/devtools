@@ -8,7 +8,6 @@
 const EventEmitter = require("devtools/shared/event-emitter");
 // const InspectorStyleChangeTracker = require("devtools/client/inspector/shared/style-change-tracker");
 // const { log } = require("protocol/socket");
-import { ThreadFront } from "protocol/thread";
 import { NodeFront } from "protocol/thread/node";
 import { UIStore } from "ui/actions";
 
@@ -40,9 +39,6 @@ import CSSProperties from "./css-properties";
 import RulesView from "./rules/rules";
 
 const Highlighter = require("highlighter/highlighter");
-
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
 /**
  * Represents an open instance of the Inspector for a tab.
@@ -90,7 +86,6 @@ export class Inspector {
 
   private _toolbox: any;
   private _highlighters?: any;
-  private _hasNewRoot?: boolean;
   private _destroyed?: boolean;
 
   // added by EventEmitter.decorate(ThreadFront)
@@ -115,21 +110,6 @@ export class Inspector {
     this.boxModel = new BoxModel(this, window);
   }
 
-  /**
-   * InspectorPanel.open() is effectively an asynchronous constructor.
-   * Set any attributes or listeners that rely on the document being loaded or fronts
-   * from the InspectorFront and Target here.
-   */
-  async init() {
-    // We need to listen to changes in the target's pause state.
-    await this._toolbox.getOrStartPanel("debugger");
-    await this._deferredOpen();
-
-    await this.onNewRoot();
-
-    return this;
-  }
-
   get toolbox() {
     return this._toolbox;
   }
@@ -150,71 +130,6 @@ export class Inspector {
     return CSSProperties;
   }
 
-  _deferredOpen = async () => {
-    this.toolbox.on("select", this.handleToolSelected);
-    ThreadFront.on("paused", this.handleThreadPaused);
-    ThreadFront.on("resumed", this.handleThreadResumed);
-
-    this.emit("ready");
-  };
-
-  /**
-   * Check if the inspector should use the landscape mode.
-   *
-   * @return {Boolean} true if the inspector should be in landscape mode.
-   */
-  useLandscapeMode() {
-    return true;
-  }
-
-  /**
-   * Reset the inspector on new root mutation. This is called every time the
-   * thread's position changes. This isn't super efficient, but we do things
-   * this way because at each point the thread is paused we will be operating
-   * on a different set of node fronts, which is essentially a new DOM tree
-   * from the inspector's perspective. Clearing out the markup, selection,
-   * and other state gives us a clean break from the previous pause point and
-   * makes it easier to keep state consistent.
-   */
-  onNewRoot = async (force?: boolean) => {
-    // Don't reload the inspector when not selected.
-    if (this.toolbox && this.toolbox.currentTool != "inspector" && !force) {
-      this._hasNewRoot = true;
-      return;
-    }
-    this._hasNewRoot = false;
-
-    // Restore the highlighter states prior to emitting "new-root".
-    if (this._highlighters) {
-      await Promise.all([
-        this.highlighters.restoreFlexboxState(),
-        this.highlighters.restoreGridState(),
-      ]);
-    }
-
-    this.emit("new-root");
-  };
-
-  handleToolSelected = (id: string) => {
-    if (id == "inspector" && this._hasNewRoot) {
-      this.onNewRoot(/* force */ true);
-    }
-  };
-
-  /**
-   * When replaying, reset the inspector whenever the target pauses.
-   */
-  handleThreadPaused = () => {
-    this.onNewRoot();
-  };
-
-  /**
-   * When replaying, reset the inspector whenever the target resumes.
-   */
-  handleThreadResumed = () => {
-    this.onNewRoot();
-  };
-
   get selectionCssSelector() {
     return null;
   }
@@ -227,10 +142,6 @@ export class Inspector {
       return;
     }
     this._destroyed = true;
-
-    this.toolbox.off("select", this.handleToolSelected);
-    ThreadFront.off("paused", this.handleThreadPaused);
-    ThreadFront.off("resumed", this.handleThreadResumed);
 
     if (this._highlighters) {
       this._highlighters.destroy();
