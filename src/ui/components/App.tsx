@@ -2,10 +2,11 @@ import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
 const DevTools = require("./DevTools").default;
-const { Account, WelcomePage } = require("./Account");
+const { Account } = require("./Account");
 const { AppErrors } = require("./shared/Error");
 const SharingModal = require("./shared/SharingModal").default;
 const LoginModal = require("./shared/LoginModal").default;
+import WelcomePage from "./Welcome";
 import { isDeployPreview } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -19,7 +20,10 @@ import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import { Uploading } from "./Uploading";
 import useAuth from "ui/utils/auth/useAuth";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, useHistory, useLocation } from "react-router-dom";
+import { Location } from "history";
+import { SignIn, withClerk, WithClerkProp } from "@clerk/clerk-react";
+import Auth from "./Auth";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -46,8 +50,13 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
   observer.observe(viewport!);
 }
 
-function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
-  const { user } = useAuth();
+interface HistoryState {
+  modal?: boolean;
+  previous?: Location<HistoryState>;
+}
+
+function App({ clerk, theme, recordingId, modal, updateNarrowMode }: WithClerkProp<AppProps>) {
+  const location = useLocation<HistoryState>();
 
   useEffect(() => {
     document.body.parentElement!.className = theme || "";
@@ -55,34 +64,46 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   }, [theme]);
 
   useEffect(() => {
-    setUserInBrowserPrefs(user);
-    if (user) {
-      LogRocket.createSession(user);
+    setUserInBrowserPrefs(clerk.user);
+    if (clerk.user) {
+      LogRocket.createSession(clerk.user);
     }
-  }, [user]);
+  }, [clerk.user]);
 
   if (hasLoadingParam()) {
     return <Uploading />;
   }
 
   // TODO: Clerk.dev
-  // if (!isDeployPreview() && auth?.isLoading) {
-  //   return null;
-  // }
+  if (!isDeployPreview() && !clerk) {
+    return null;
+  }
+
+  let switchLocation = location;
+  if (location.state?.modal && location.state?.previous) {
+    switchLocation = location.state.previous;
+  }
 
   return (
     <>
-      <Switch>
+      <Switch location={switchLocation}>
         <Route path="/view?id=:id" exact>
           <DevTools />
         </Route>
-        <Route path={["/view", "/sign-up", "/sign-in"]} exact>
+        <Route path="/view" exact>
           <WelcomePage />
         </Route>
         <Route path="*">
           <Account />
         </Route>
       </Switch>
+      {location.state?.modal ? (
+        <Switch>
+          <Route path={["/sign-in", "/sign-up"]}>
+            <Auth />
+          </Route>
+        </Switch>
+      ) : null}
       {modal ? <AppModal modal={modal} /> : null}
       <AppErrors />
     </>
@@ -102,4 +123,4 @@ const connector = connect(
 );
 export type AppProps = ConnectedProps<typeof connector>;
 
-export default connector(App);
+export default connector(withClerk(App));

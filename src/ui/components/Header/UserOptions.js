@@ -17,7 +17,7 @@ export default function UserOptions() {
     return "login"; // <LoginButton />;
   }
 
-  return <UserButton />;
+  return <UserButton frontendApi="/sign-in" />;
   // const buttonContent = <Avatar player={user} isFirstPlayer={true} />;
 
   // return (

@@ -1,11 +1,10 @@
-import React, { useEffect, useRef } from "react";
-import { Redirect, matchPath, useHistory, useLocation } from "react-router-dom";
-import { SignedIn, SignedOut, withClerk } from "@clerk/clerk-react";
+import React from "react";
+import { Redirect } from "react-router-dom";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Dashboard from "../Dashboard/index";
 import Loader from "../shared/Loader";
 import Prompt from "../shared/Prompt";
 import { gql, useQuery } from "@apollo/client";
-import { setUserInBrowserPrefs } from "../../utils/browser";
 import UserOptions from "ui/components/Header/UserOptions";
 import useAuth from "ui/utils/auth/useAuth";
 
@@ -118,66 +117,6 @@ function AccountPage() {
   return <Dashboard recordings={recordings} />;
 }
 
-function WelcomePageBase({ clerk }) {
-  const { push } = useHistory();
-  const location = useLocation();
-  const forceOpenAuth = new URLSearchParams(location.search).has("signin");
-
-  const match = matchPath(location.pathname, { path: ["/sign-in", "/sign-up", "/view"] });
-  const mode = match && match.path.substring(1);
-
-  useEffect(() => {
-    if (forceOpenAuth) {
-      push("/sign-in");
-    }
-  }, [forceOpenAuth]);
-
-  useEffect(() => {
-    setUserInBrowserPrefs(null);
-  }, []);
-
-  useEffect(() => {
-    if (!mode || !clerk) return;
-
-    if (mode === "sign-in") {
-      clerk.openSignIn();
-    } else if (mode === "sign-up") {
-      clerk.openSignUp();
-    }
-
-    const clearModal = ev => {
-      if (ev.code !== "Escape") return;
-
-      push("/view");
-    };
-    document.addEventListener("keydown", clearModal);
-
-    return () => {
-      if (mode === "sign-in") {
-        clerk.closeSignIn();
-      } else if (mode === "sign-up") {
-        clerk.closeSignUp();
-      }
-
-      document.removeEventListener("keydown", clearModal);
-    };
-  }, [mode, clerk]);
-
-  return (
-    <div className="welcome-screen">
-      <div className="welcome-panel">
-        <img className="logo" src="images/logo.svg" />
-        <img className="atwork" src="images/computer-work.svg" />
-        <button onClick={() => (mode === "sign-in" ? clerk.openSignIn() : push("/sign-in"))}>
-          Sign In
-        </button>
-      </div>
-    </div>
-  );
-}
-
-const WelcomePage = withClerk(WelcomePageBase);
-
 function AccountHeader() {
   return (
     <div id="header">
@@ -205,4 +144,4 @@ export default function Account() {
   );
 }
 
-export { Account, WelcomePage };
+export { Account };
