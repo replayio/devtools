@@ -22,14 +22,6 @@ class InspectorApp extends Component<PropsFromRedux> {
   private splitBoxRef = React.createRef<SplitBox>();
   private sidebarSplitboxRef = React.createRef<SplitBox>();
 
-  componentDidMount() {
-    this.props.setVisible(true);
-  }
-
-  componentWillUnmount() {
-    this.props.setVisible(false);
-  }
-
   private toggle3PaneMode = () => {
     const is3PaneMode = !this.props.is3PaneModeEnabled;
     const containerElement = this.sidebarContainerRef.current;
