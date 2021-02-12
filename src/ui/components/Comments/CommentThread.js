@@ -25,8 +25,9 @@ function CommentThread({
 }) {
   const commentEl = useRef(null);
   const { isAuthenticated } = useAuth0();
-  const seekToComment = () => {
+  const seekToComment = e => {
     const { point, time, has_frames } = comment;
+    e.stopPropagation();
     clearPendingComment();
     setActiveComment(comment);
 

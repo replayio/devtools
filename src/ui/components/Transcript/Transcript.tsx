@@ -10,18 +10,27 @@ const CommentThread = require("ui/components/Comments/CommentThread").default;
 import "./Transcript.css";
 
 import { UIState } from "ui/state";
-import { PendingComment, Comment } from "ui/state/comments";
-import { MouseEvent } from "@recordreplay/protocol";
+import { Event, PendingComment, Comment } from "ui/state/comments";
+
+function createEntries(comments: Comment[], clickEvents: Event[]) {
+  const entries = clickEvents.map(event => ({ ...event }));
+  const nonNestedComments = comments.reduce((acc: Comment[], comment: Comment) => {
+    const matchingEntryIndex = entries.findIndex(entry => entry.point == comment.point);
+    if (matchingEntryIndex >= 0) {
+      entries[matchingEntryIndex].comment = comment;
+      return acc;
+    } else {
+      return [...acc, comment];
+    }
+  }, []);
+
+  return [...entries, ...nonNestedComments];
+}
 
 function Transcript({ recordingId, clickEvents, pendingComment }: PropsFromRedux) {
   const { comments } = hooks.useGetComments(recordingId!);
 
-  // We allow the panel to render its entries whether or not the
-  // comments have loaded yet. This optimistically assumes that eventually the
-  // comments will finish loading and we'll re-render then. This fails silently
-  // if the query returns an error and we should add error handling that provides
-  // next steps for fixing the error by refetching/refreshing.
-  let entries: (Comment | MouseEvent | PendingComment)[] = [...comments, ...clickEvents] || [];
+  let entries: (Comment | Event | PendingComment)[] = createEntries(comments, clickEvents);
 
   // New comments that haven't been sent to Hasura will not have an associated ID.
   // They're not included in the comments data from the query, so we have to insert
@@ -47,9 +56,11 @@ function Transcript({ recordingId, clickEvents, pendingComment }: PropsFromRedux
   );
 }
 
-function EventTranscriptItem({ event }: { event: MouseEvent }) {
+function EventTranscriptItem({ event }: { event: Event }) {
   return (
-    <TranscriptItem item={event} icon={<div className="img event-click" />} label="Mouse Click" />
+    <TranscriptItem item={event} icon={<div className="img event-click" />} label="Mouse Click">
+      {event.comment ? <CommentThread comment={event.comment} /> : null}
+    </TranscriptItem>
   );
 }
 

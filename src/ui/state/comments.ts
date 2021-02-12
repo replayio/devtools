@@ -1,4 +1,4 @@
-import { RecordingId } from "@recordreplay/protocol";
+import { RecordingId, MouseEvent } from "@recordreplay/protocol";
 
 export interface CommentsState {
   pendingComment: PendingComment | null;
@@ -35,4 +35,8 @@ export interface Comment {
   user_id: string;
   __typename: string;
   position: CommentPosition;
+}
+
+export interface Event extends MouseEvent {
+  comment?: Comment;
 }
