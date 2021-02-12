@@ -444,7 +444,9 @@ button.jump-definition {
 .img.trash {
   -webkit-mask-image: url(~devtools/client/themes/images/trash.svg);
 }
-
+.img.pencil-sm {
+  -webkit-mask-image: url(~devtools/client/themes/images/pencil-sm.svg);
+}
 .img.pencil {
   -webkit-mask-image: url(~devtools/client/themes/images/pen.svg);
 }

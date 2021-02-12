@@ -10,6 +10,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import moment from "moment";
 
 import CommentEditor from "ui/components/Comments/CommentEditor";
+import "./CommentThread.css";
 
 function CommentThread({
   comment,
