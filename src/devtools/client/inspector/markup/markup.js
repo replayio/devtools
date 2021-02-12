@@ -2,7 +2,7 @@ const { ThreadFront } = require("protocol/thread");
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
 const { setEventTooltip } = require("devtools/client/shared/widgets/tooltip/EventTooltipHelper");
 const Highlighter = require("highlighter/highlighter.js");
-const { isInspectorVisible } = require("../selectors");
+const { selectors } = require("ui/reducers");
 
 const {
   reset,
@@ -54,7 +54,7 @@ class MarkupView {
   }
 
   updateIsInspectorVisible = () => {
-    const visible = isInspectorVisible(this.store.getState());
+    const visible = selectors.isInspectorSelected(this.store.getState());
     if (visible !== this.isInspectorVisible) {
       this.isInspectorVisible = visible;
       if (this.isInspectorVisible && this.isLoadingPostponed) {
