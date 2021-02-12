@@ -8,7 +8,14 @@ import { actions } from "ui/actions";
 import CommentTool from "ui/components/shared/CommentTool";
 import "draft-js/dist/Draft.css";
 
-function DraftJSEditorLoader({ editorState, setEditorState, DraftJS, setDraftJS }) {
+function DraftJSEditorLoader({
+  editorState,
+  setEditorState,
+  DraftJS,
+  setDraftJS,
+  handleSave,
+  handleCancel,
+}) {
   useEffect(function importDraftJS() {
     import("draft-js").then(DraftJS => {
       setEditorState(DraftJS.EditorState.createEmpty());
@@ -20,13 +27,13 @@ function DraftJSEditorLoader({ editorState, setEditorState, DraftJS, setDraftJS 
     return null;
   }
 
-  return <DraftJSEditor {...{ editorState, setEditorState, DraftJS }} />;
+  return <DraftJSEditor {...{ editorState, setEditorState, DraftJS, handleSave, handleCancel }} />;
 }
 
-function DraftJSEditor({ editorState, setEditorState, DraftJS }) {
+function DraftJSEditor({ editorState, setEditorState, DraftJS, handleSave, handleCancel }) {
   const editorNode = useRef(null);
   const wrapperNode = useRef(null);
-  const { Editor, getDefaultKeyBinding } = DraftJS;
+  const { Editor, getDefaultKeyBinding, KeyBindingUtil } = DraftJS;
 
   useEffect(() => {
     // The order is important here — we focus the editor first before scrolling the
@@ -35,12 +42,35 @@ function DraftJSEditor({ editorState, setEditorState, DraftJS }) {
     wrapperNode.current.scrollIntoView({ block: "center", behavior: "smooth" });
   }, []);
 
+  const keyBindingFn = e => {
+    if (e.keyCode == 13 && e.metaKey && KeyBindingUtil.hasCommandModifier(e)) {
+      return "save";
+    }
+    if (e.keyCode == 27) {
+      return "cancel";
+    }
+
+    return getDefaultKeyBinding(e);
+  };
+  const handleKeyCommand = command => {
+    if (command === "save") {
+      handleSave();
+      return "handled";
+    } else if (command === "cancel") {
+      handleCancel();
+      return "handled";
+    }
+
+    return "not-handled";
+  };
+
   return (
     <div ref={wrapperNode}>
       <Editor
         editorState={editorState}
         onChange={setEditorState}
-        handleKeyCommand={e => getDefaultKeyBinding(e)}
+        handleKeyCommand={handleKeyCommand}
+        keyBindingFn={keyBindingFn}
         placeholder={"Type a comment ..."}
         ref={editorNode}
       />
@@ -70,6 +100,7 @@ function CommentEditor({
       handleReplySave();
     }
   };
+  const handleCancel = () => clearPendingComment();
   const handleReplySave = () => {
     const inputValue = editorState.getCurrentContent().getPlainText();
 
@@ -123,7 +154,9 @@ function CommentEditor({
     <div className="comment-input-container">
       <img src={user.picture} className="comment-picture" />
       <div className="comment-input">
-        <DraftJSEditorLoader {...{ editorState, setEditorState, DraftJS, setDraftJS }} />
+        <DraftJSEditorLoader
+          {...{ editorState, setEditorState, DraftJS, setDraftJS, handleSave, handleCancel }}
+        />
       </div>
       <button className="img paper-airplane" onClick={handleSave} />
       {isNewComment && <CommentTool comment={comment} />}
