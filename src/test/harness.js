@@ -171,7 +171,7 @@ function waitForSelectedSource(url) {
 }
 
 async function waitForPaused(url) {
-  const { getSelectedScope, getCurrentFrames } = dbgSelectors;
+  const { getSelectedScope, getFrames } = dbgSelectors;
   // Make sure that the debug primary panel is selected so that the test can
   // interact with the pause navigation and info.
   store.dispatch({ type: "set_selected_primary_panel", panel: "debug" });
@@ -180,7 +180,7 @@ async function waitForPaused(url) {
     return isPaused() && !!getSelectedScope();
   });
 
-  await waitUntil(() => getCurrentFrames());
+  await waitUntil(() => getFrames());
   await waitForLoadedScopes();
   await waitForSelectedSource(url);
 }
@@ -194,7 +194,7 @@ async function waitForPausedNoSource() {
 }
 
 function hasFrames() {
-  const frames = dbgSelectors.getCurrentFrames();
+  const frames = dbgSelectors.getFrames();
   return frames.length > 0;
 }
 
