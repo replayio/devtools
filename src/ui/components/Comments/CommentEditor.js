@@ -35,12 +35,19 @@ function DraftJSEditor({ editorState, setEditorState, DraftJS }) {
     wrapperNode.current.scrollIntoView({ block: "center", behavior: "smooth" });
   }, []);
 
+  function onKeyBinding(e) {
+    if (e.keyCode === 13 /* `Enter` key */ && hasCommandModifier(e)) {
+      return "myeditor-save";
+    }
+    return getDefaultKeyBinding(e);
+  }
+
   return (
     <div ref={wrapperNode}>
       <Editor
         editorState={editorState}
         onChange={setEditorState}
-        handleKeyCommand={e => getDefaultKeyBinding(e)}
+        keyBindingFn={onKeyBinding}
         placeholder={"Type a comment ..."}
         ref={editorNode}
       />
