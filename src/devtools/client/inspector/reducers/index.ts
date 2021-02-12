@@ -29,6 +29,8 @@ export function inspector(
   action: InspectorAction
 ): InspectorState {
   switch (action.type) {
+    case "set_inspector_visible":
+      return { ...state, isVisible: action.visible };
     case "set_inspector_3_pane_mode":
       prefs.is3PaneModeEnabled = action.is3PaneModeEnabled;
       let activeTab = state.activeTab === "ruleview" ? "layoutview" : state.activeTab;
