@@ -13,15 +13,12 @@ module.exports = {
   },
   devServer: {
     before: app => {
-      app.get("/view", (req, res) => {
-        res.sendFile("index.html", { root: "." });
-      });
-
       app.get("/test", (req, res) => {
         const testFile = req.url.substring(6);
         res.sendFile(testFile, { root: "./test/scripts" });
       });
     },
+    historyApiFallback: true,
     contentBase: [".", "./src/image"],
     index: "index.html",
     liveReload: false,

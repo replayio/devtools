@@ -17,6 +17,7 @@ const useAuth = () => {
   return {
     user: clerk.user,
     isAuthenticated: !!clerk.session,
+    clerk: clerk as any,
   };
 };
 

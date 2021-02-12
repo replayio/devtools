@@ -60,30 +60,3 @@
   line-height: 18px;
   margin-left: 8px;
 }
-
-.welcome-login-modal {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 100ms ease-in, transform 100ms ease-in;
-
-  opacity: 1;
-  pointer-events: all;
-  transform: translateY(-5%);
-}
-
-.welcome-login-modal[hidden] {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(0);
-}
-
-.welcome-login-modal-scrim {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  z-index: -1;
-}

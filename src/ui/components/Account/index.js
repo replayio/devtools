@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { SignedIn, SignedOut, SignIn, SignUp } from "@clerk/clerk-react";
+import React, { useEffect, useRef } from "react";
+import { Redirect, matchPath, useHistory, useLocation } from "react-router-dom";
+import { SignedIn, SignedOut, withClerk } from "@clerk/clerk-react";
 import Dashboard from "../Dashboard/index";
 import Loader from "../shared/Loader";
 import Prompt from "../shared/Prompt";
@@ -117,58 +118,65 @@ function AccountPage() {
   return <Dashboard recordings={recordings} />;
 }
 
-function WelcomePage() {
-  const forceOpenAuth = new URLSearchParams(window.location.search).has("signin");
-  const [modal, setModal] = useState(forceOpenAuth ? 1 : 0);
-  const lastModal = useRef(modal);
+function WelcomePageBase({ clerk }) {
+  const { push } = useHistory();
+  const location = useLocation();
+  const forceOpenAuth = new URLSearchParams(location.search).has("signin");
 
-  const handleMouseUpCapture = useCallback(
-    ev => {
-      if (ev.target.nodeName === "A") {
-        setModal(m => (m % 2) + 1);
-        ev.preventDefault();
-      }
-    },
-    [setModal]
-  );
+  const match = matchPath(location.pathname, { path: ["/sign-in", "/sign-up", "/view"] });
+  const mode = match && match.path.substring(1);
+
+  useEffect(() => {
+    if (forceOpenAuth) {
+      push("/sign-in");
+    }
+  }, [forceOpenAuth]);
 
   useEffect(() => {
     setUserInBrowserPrefs(null);
   }, []);
 
   useEffect(() => {
-    if (modal) {
-      lastModal.current = modal;
+    if (!mode || !clerk) return;
+
+    if (mode === "sign-in") {
+      clerk.openSignIn();
+    } else if (mode === "sign-up") {
+      clerk.openSignUp();
     }
+
     const clearModal = ev => {
-      if (ev.code === "Escape") setModal(0);
+      if (ev.code !== "Escape") return;
+
+      push("/view");
     };
     document.addEventListener("keydown", clearModal);
 
-    return () => document.removeEventListener("keydown", clearModal);
-  }, [modal]);
+    return () => {
+      if (mode === "sign-in") {
+        clerk.closeSignIn();
+      } else if (mode === "sign-up") {
+        clerk.closeSignUp();
+      }
 
-  // Ensures that the last form is shown when the odal is hidden
-  const currentModel = modal || lastModal.current;
+      document.removeEventListener("keydown", clearModal);
+    };
+  }, [mode, clerk]);
 
   return (
     <div className="welcome-screen">
       <div className="welcome-panel">
         <img className="logo" src="images/logo.svg" />
         <img className="atwork" src="images/computer-work.svg" />
-        <div
-          className="welcome-login-modal"
-          hidden={!modal}
-          onMouseUpCapture={handleMouseUpCapture}
-        >
-          <div className="welcome-login-modal-scrim" onClick={() => setModal(0)} />
-          {currentModel ? currentModel === 1 ? <SignIn /> : <SignUp /> : null}
-        </div>
-        <button onClick={() => setModal(1)}>Sign In</button>
+        <button onClick={() => (mode === "sign-in" ? clerk.openSignIn() : push("/sign-in"))}>
+          Sign In
+        </button>
       </div>
     </div>
   );
 }
+
+const WelcomePage = withClerk(WelcomePageBase);
 
 function AccountHeader() {
   return (
@@ -186,7 +194,7 @@ export default function Account() {
   return (
     <>
       <SignedOut>
-        <WelcomePage />
+        <Redirect to="/view" />
       </SignedOut>
       <SignedIn>
         <AccountHeader />
@@ -196,3 +204,5 @@ export default function Account() {
     </>
   );
 }
+
+export { Account, WelcomePage };

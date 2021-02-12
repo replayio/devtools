@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
 const DevTools = require("./DevTools").default;
-const Account = require("./Account").default;
+const { Account, WelcomePage } = require("./Account");
 const { AppErrors } = require("./shared/Error");
 const SharingModal = require("./shared/SharingModal").default;
 const LoginModal = require("./shared/LoginModal").default;
@@ -19,6 +19,7 @@ import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import { Uploading } from "./Uploading";
 import useAuth from "ui/utils/auth/useAuth";
+import { Route, Switch } from "react-router-dom";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -71,7 +72,17 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
 
   return (
     <>
-      {recordingId ? <DevTools /> : <Account />}
+      <Switch>
+        <Route path="/view?id=:id" exact>
+          <DevTools />
+        </Route>
+        <Route path={["/view", "/sign-up", "/sign-in"]} exact>
+          <WelcomePage />
+        </Route>
+        <Route path="*">
+          <Account />
+        </Route>
+      </Switch>
       {modal ? <AppModal modal={modal} /> : null}
       <AppErrors />
     </>
