@@ -76,7 +76,7 @@ export default connect(
     panelCollapsed: selectors.getPaneCollapse(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
     selectedPanel: selectors.getSelectedPanel(state),
-    isPaused: selectors.getIsPaused(state),
+    isPaused: selectors.getFrames(state)?.length > 0,
   }),
   {
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,

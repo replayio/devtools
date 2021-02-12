@@ -276,7 +276,7 @@ export function isStepping(state) {
 }
 
 export function getIsPaused(state) {
-  return state.pause.frames?.length > 0;
+  return !!state.pause.frames;
 }
 
 export function getPreviousPauseFrameLocation(state) {
@@ -296,11 +296,6 @@ export function getShouldLogExceptions(state) {
 }
 
 export function getFrames(state) {
-  const { frames, framesLoading } = state.pause;
-  return framesLoading ? null : frames;
-}
-
-export function getCurrentFrames(state) {
   const { frames, framesLoading } = state.pause;
   return framesLoading ? null : frames;
 }
