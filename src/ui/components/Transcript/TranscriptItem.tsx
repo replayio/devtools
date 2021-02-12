@@ -12,7 +12,7 @@ type TranscriptItemProps = PropsFromRedux & {
   item: Comment | MouseEvent | PendingComment;
   label: string;
   icon: JSX.Element;
-  children?: JSX.Element;
+  children?: JSX.Element | null;
 };
 
 function TranscriptItem({
