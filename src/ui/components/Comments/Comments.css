@@ -41,6 +41,10 @@ deletes the comment */
   background-color: var(--replaying-paused-marker-fill);
 }
 
+.comments-container .img.comment-marker.primary-highlight {
+  background-color: var(--new-blue-800);
+}
+
 .create-comment {
   width: 15px;
   height: 15px;

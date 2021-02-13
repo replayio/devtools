@@ -8,7 +8,7 @@ import { sortBy } from "lodash";
 
 import "./Comments.css";
 
-function Comments({ recordingId, pendingComment }) {
+function Comments({ recordingId, pendingComment, hoveredPoint }) {
   const { comments: hasuraComments, loading, error } = hooks.useGetComments(recordingId);
 
   // Don't render anything if the comments are loading. For now, we fail silently
@@ -33,9 +33,18 @@ function Comments({ recordingId, pendingComment }) {
 
   return (
     <div className="comments-container">
-      {sortedComments.map((comment, index) => (
-        <CommentMarker key={index} comment={comment} comments={sortedComments} index={index} />
-      ))}
+      {sortedComments.map((comment, index) => {
+        const isPrimaryHighlighted = hoveredPoint?.point === comment.point;
+        return (
+          <CommentMarker
+            key={index}
+            comment={comment}
+            comments={sortedComments}
+            index={index}
+            isPrimaryHighlighted={isPrimaryHighlighted}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -44,4 +53,5 @@ export default connect(state => ({
   playback: selectors.getPlayback(state),
   recordingId: selectors.getRecordingId(state),
   pendingComment: selectors.getPendingComment(state),
+  hoveredPoint: selectors.getHoveredPoint(state),
 }))(Comments);

@@ -94,14 +94,10 @@ function TranscriptItem({
       <div className="transcript-entry-description">
         <div className="transcript-entry-icon">{icon}</div>
         <div className="transcript-entry-label">{label}</div>
-        {pendingComment == item ? (
+        {pendingComment == item && (
           <button className="new-comment-cancel" onClick={clearPendingComment}>
             Cancel
           </button>
-        ) : (
-          <div className="event-timestamp">{`00:${Math.floor(time / 1000)
-            .toString()
-            .padStart(2, "0")}`}</div>
         )}
       </div>
       {children}
