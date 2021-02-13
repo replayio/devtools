@@ -1,7 +1,8 @@
 main.dashboard {
   display: flex;
   width: 100%;
-  overflow: hidden
+  overflow: hidden;
+  flex-grow: 1;
 }
 
 .dashboard-viewer {
