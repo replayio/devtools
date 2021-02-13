@@ -15,6 +15,15 @@ import AccessibleImage from "../shared/AccessibleImage";
 
 import "./EventListeners.css";
 
+const mouseClicks = [
+  "event.mouse.auxclick",
+  "event.mouse.click",
+  "event.mouse.dblclick",
+  "event.mouse.mousedown",
+  "event.mouse.mouseup",
+  "event.mouse.contextmenu",
+];
+
 class EventListeners extends Component {
   state = {
     searchText: "",
@@ -63,14 +72,13 @@ class EventListeners extends Component {
     }
   }
 
-  onCategoryClick(category, isChecked) {
+  onCategoryClick(eventIds, isChecked) {
     const { addEventListeners, removeEventListeners } = this.props;
-    const eventsIds = category.events.map(event => event.id);
 
     if (isChecked) {
-      addEventListeners(eventsIds);
+      addEventListeners(eventIds);
     } else {
-      removeEventListeners(eventsIds);
+      removeEventListeners(eventIds);
     }
   }
 
@@ -261,10 +269,17 @@ class EventListeners extends Component {
 
   renderSimpleEvent(categoryName, index) {
     const { categories, activeEventListeners } = this.props;
+
     const category = categories.find(cat => cat.name == categoryName);
-    const isAllActive = category.events.every(event => activeEventListeners.includes(event.id));
+    let eventIds = category.events.map(event => event.id);
+
+    if (categoryName == "Mouse") {
+      eventIds = mouseClicks;
+    }
+
+    const isAllActive = eventIds.every(event => activeEventListeners.includes(event));
     const indeterminate =
-      !isAllActive && category.events.some(event => activeEventListeners.includes(event.id));
+      !isAllActive && eventIds.some(event => activeEventListeners.includes(event));
 
     return (
       <div className="event-listener-event" key={index}>
@@ -272,7 +287,7 @@ class EventListeners extends Component {
           id={`${categoryName.toLowerCase()}-events`}
           type="checkbox"
           checked={isAllActive}
-          onChange={() => this.onCategoryClick(category, !isAllActive)}
+          onChange={() => this.onCategoryClick(eventIds, !isAllActive)}
           ref={el => el && (el.indeterminate = indeterminate)}
         />
         <label className="event-listener-name" htmlFor={`${categoryName.toLowerCase()}-events`}>
