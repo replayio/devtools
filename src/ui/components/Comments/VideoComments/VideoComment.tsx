@@ -4,17 +4,11 @@ import classnames from "classnames";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { connect, ConnectedProps } from "react-redux";
+import { Canvas } from "ui/state/app";
+import { Comment } from "ui/state/comments";
 
-function CommentContainer({ comment }: { comment: any }) {
-  return (
-    <div className="canvas-comment-container">
-      <img src={comment.user.picture} className="comment-picture" />
-      <div className="comment-body">
-        <div className="item-label">{comment.user.name}</div>
-        <div className="item-content">{comment.content}</div>
-      </div>
-    </div>
-  );
+function inCenter(canvas: Canvas, { position }: Comment) {
+  return position.x / canvas.width == 0.5 && position.y / canvas.height;
 }
 
 function VideoComment({
@@ -31,6 +25,10 @@ function VideoComment({
 
   const { scale } = canvas;
   const position = comment.position;
+
+  if (inCenter(canvas, comment)) {
+    return null;
+  }
 
   return (
     <div
