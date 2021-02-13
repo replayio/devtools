@@ -100,8 +100,7 @@ class Timeline extends Component<PropsFromRedux> {
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != mouseTime) {
-      let offset = getVisiblePosition({ time: mouseTime, zoom: zoomRegion }) * this.overlayWidth;
-      setTimelineToTime({ time: mouseTime, offset });
+      setTimelineToTime(mouseTime);
     }
   };
 
@@ -268,7 +267,7 @@ class Timeline extends Component<PropsFromRedux> {
             <ScrollContainer />
           </div>
           <Comments />
-          <Tooltip />
+          <Tooltip timelineWidth={this.overlayWidth} />
         </div>
       </div>
     );

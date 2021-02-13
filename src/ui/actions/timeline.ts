@@ -11,7 +11,6 @@ import {
   paintGraphicsAtTime,
   previousPaintEvent,
 } from "protocol/graphics";
-import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
@@ -127,19 +126,17 @@ export function setTimelineState(state: Partial<TimelineState>): SetTimelineStat
   return { type: "set_timeline_state", state };
 }
 
-export function setTimelineToTime({
-  time,
-  offset,
-}: {
-  time: number;
-  offset: number;
-}): UIThunkAction {
+export function setTimelineToTime(time: number): UIThunkAction {
   return async ({ dispatch }) => {
     try {
       paintGraphicsAtTime(time);
-      dispatch(updateTooltip({ left: offset }));
-      dispatch(setTimelineState({ hoverTime: time }));
+      dispatch(setTimelineTooltip(time));
     } catch {}
+  };
+}
+export function setTimelineTooltip(time: number | null): UIThunkAction {
+  return async ({ dispatch }) => {
+    dispatch(setTimelineState({ hoverTime: time }));
   };
 }
 
@@ -362,6 +359,8 @@ export function goToPrevPaint(): UIThunkAction {
 export function setHoveredPoint(hoveredPoint: HoveredPoint | null): UIThunkAction {
   return ({ dispatch, getState }) => {
     dispatch({ type: "set_hovered_point", hoveredPoint });
+
+    dispatch(setTimelineTooltip(hoveredPoint ? hoveredPoint.time : null));
 
     // Don't update the video if user is adding a new comment.
     if (selectors.getPendingComment(getState())) {

@@ -2,7 +2,6 @@ import { ScreenShot, TimeRange, Location, MouseEventKind } from "@recordreplay/p
 import { MouseAndClickPosition } from "../../protocol/graphics";
 
 export interface Tooltip {
-  screen?: ScreenShot;
   left: number;
 }
 
