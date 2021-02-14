@@ -15,6 +15,8 @@ const playwright = require('playwright');
   // breakpoint element first leads to the logpoint being cleared out by the
   // devtools hover logic that runs afterwards.
   //
+  // See https://github.com/RecordReplay/devtools/issues/1814
+  //
   // There is a second problem where playwight sometimes hover/clicks on line 19
   // instead of line 20. If it hovers on line 19 and then clicks on line 20 then
   // the test will not finish.
