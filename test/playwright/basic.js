@@ -1,4 +1,5 @@
-// Playwright script for inspecting a simple recording. Playwright tests are currently experimental.
+// Playwright script for inspecting a simple recording.
+// This test is currently experimental.
 
 const playwright = require('playwright');
 
@@ -10,8 +11,13 @@ const playwright = require('playwright');
   await switchToDevtools(page);
   await selectSource(page, "doc_rr_basic.html");
 
-  // We have to hover and check for breakpoint hits first. Simulating a click directly on the
-  // breakpoint element leads to the logpoint being cleared out by the hover logic afterwards.
+  // We have to hover and check for breakpoint hits first. Clicking on the
+  // breakpoint element first leads to the logpoint being cleared out by the
+  // devtools hover logic that runs afterwards.
+  //
+  // There is a second problem where playwight sometimes hover/clicks on line 19
+  // instead of line 20. If it hovers on line 19 and then clicks on line 20 then
+  // the test will not finish.
   await checkBreakpointHits(page, 20, 10);
 
   await addBreakpoint(page, 20);
