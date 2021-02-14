@@ -101,7 +101,7 @@ function CommentEditor({
     }
   };
   const handleCancel = () => clearPendingComment();
-  const handleReplySave = () => {
+  const handleReplySave = async () => {
     const inputValue = editorState.getCurrentContent().getPlainText();
 
     // For now we can simply bail if the input happens to be empty. We should fix
@@ -117,18 +117,17 @@ function CommentEditor({
       point: ThreadFront.currentPoint,
       has_frames: ThreadFront.currentPointHasFrames,
       parent_id: comment.id,
+      source_location: await ThreadFront.getCurrentPauseSourceLocation(),
       position: {
         x: canvas.width * 0.5,
         y: canvas.height * 0.5,
       },
     };
 
-    addComment({
-      variables: { object: reply },
-    });
+    addComment({ variables: { object: reply } });
     setEditorState(DraftJS.EditorState.createEmpty());
   };
-  const handleNewSave = () => {
+  const handleNewSave = async () => {
     const inputValue = editorState.getCurrentContent().getPlainText();
 
     // For now we can simply bail if the input happens to be empty. We should fix
@@ -140,11 +139,13 @@ function CommentEditor({
     const newComment = {
       ...comment,
       content: inputValue,
+      source_location: await ThreadFront.getCurrentPauseSourceLocation(),
       position: {
         x: pendingComment.position.x,
         y: pendingComment.position.y,
       },
     };
+
     addComment({
       variables: { object: newComment },
     });

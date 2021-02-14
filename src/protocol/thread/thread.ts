@@ -743,6 +743,28 @@ class _ThreadFront {
     return locations.find(l => l.sourceId == sourceId);
   }
 
+  async getCurrentPauseSourceLocation() {
+    if (!this.currentPause?.frames) {
+      return;
+    }
+
+    const frame = this.currentPause.frames.get("0");
+    if (!frame) {
+      return;
+    }
+    const { location } = frame;
+    const preferredLocation = this.getPreferredLocationRaw(location);
+    if (!preferredLocation) {
+      return;
+    }
+
+    const sourceUrl = await this.getSourceURL(preferredLocation.sourceId);
+    if (!sourceUrl) {
+      return;
+    }
+    return { sourceUrl, line: preferredLocation.line, column: preferredLocation.column };
+  }
+
   // Given an RRP MappedLocation array with locations in different sources
   // representing the same generated location (i.e. a generated location plus
   // all the corresponding locations in original or pretty printed sources etc.),

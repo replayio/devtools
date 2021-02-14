@@ -2,53 +2,6 @@ import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
 import { Comment } from "ui/state/comments";
 
-const GET_COMMENTS = gql`
-  query GetComments($recordingId: uuid) {
-    comments(
-      where: { recording_id: { _eq: $recordingId }, _and: { parent_id: { _is_null: true } } }
-    ) {
-      id
-      content
-      created_at
-      updated_at
-      user_id
-      has_frames
-      time
-      point
-      position
-      user {
-        picture
-        name
-        auth_id
-      }
-      replies(order_by: { created_at: asc }) {
-        id
-        content
-        created_at
-        updated_at
-        user_id
-        has_frames
-        time
-        point
-        position
-        user {
-          picture
-          name
-          auth_id
-        }
-      }
-    }
-  }
-`;
-
-const ADD_COMMENT = gql`
-  mutation MyMutation($object: comments_insert_input! = {}) {
-    insert_comments_one(object: $object) {
-      id
-    }
-  }
-`;
-
 const UPDATE_COMMENT_CONTENT = gql`
   mutation UpdateCommentContent($newContent: String, $commentId: uuid, $position: jsonb) {
     update_comments(
@@ -87,10 +40,41 @@ const DELETE_COMMENT_REPLIES = gql`
 export function useGetComments(
   recordingId: RecordingId
 ): { comments: Comment[]; loading: boolean; error?: ApolloError } {
-  const { data, loading, error } = useQuery(GET_COMMENTS, {
-    variables: { recordingId },
-    pollInterval: 5000,
-  });
+  const { data, loading, error } = useQuery(
+    gql`
+      fragment commentFields on comments {
+        id
+        content
+        created_at
+        updated_at
+        user_id
+        has_frames
+        source_location
+        time
+        point
+        position
+        user {
+          picture
+          name
+          auth_id
+        }
+      }
+      query GetComments($recordingId: uuid) {
+        comments(
+          where: { recording_id: { _eq: $recordingId }, _and: { parent_id: { _is_null: true } } }
+        ) {
+          ...commentFields
+          replies(order_by: { created_at: asc }) {
+            ...commentFields
+          }
+        }
+      }
+    `,
+    {
+      variables: { recordingId },
+      pollInterval: 5000,
+    }
+  );
 
   if (error) {
     console.error("Apollo error while fetching comments:", error);
@@ -100,13 +84,22 @@ export function useGetComments(
 }
 
 export function useAddComment(callback: Function = () => {}) {
-  const [addComment, { error }] = useMutation(ADD_COMMENT, {
-    onCompleted: data => {
-      const { id } = data.insert_comments_one;
-      callback(id);
-    },
-    refetchQueries: ["GetComments"],
-  });
+  const [addComment, { error }] = useMutation(
+    gql`
+      mutation AddComment($object: comments_insert_input! = {}) {
+        insert_comments_one(object: $object) {
+          id
+        }
+      }
+    `,
+    {
+      onCompleted: data => {
+        const { id } = data.insert_comments_one;
+        callback(id);
+      },
+      refetchQueries: ["GetComments"],
+    }
+  );
 
   if (error) {
     console.error("Apollo error while adding a comment:", error);

@@ -7,6 +7,7 @@ import hooks from "ui/hooks";
 import AddCommentButton from "ui/components/Transcript/AddCommentButton";
 import TranscriptItem from "ui/components/Transcript/TranscriptItem";
 const CommentThread = require("ui/components/Comments/CommentThread").default;
+const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 import "./Transcript.css";
 
 import { UIState } from "ui/state";
@@ -58,7 +59,12 @@ function Transcript({ recordingId, clickEvents, pendingComment }: PropsFromRedux
 
 function EventTranscriptItem({ event }: { event: Event }) {
   return (
-    <TranscriptItem item={event} icon={<div className="img event-click" />} label="Mouse Click">
+    <TranscriptItem
+      item={event}
+      icon={<div className="img event-click" />}
+      label="Mouse Click"
+      secondaryLabel=""
+    >
       {event.comment ? <CommentThread comment={event.comment} /> : null}
     </TranscriptItem>
   );
@@ -71,13 +77,31 @@ function CommentTranscriptItem({ comment }: { comment: Comment | PendingComment 
         item={comment}
         icon={<div className="img pencil-sm" />}
         label="Adding comment"
+        secondaryLabel=""
       >
         <CommentThread comment={comment} />
       </TranscriptItem>
     );
   }
+
+  let icon = "chat-alt";
+  let label = "Comment";
+  let secondaryLabel = "";
+
+  if (comment.source_location) {
+    const filename = getFilenameFromURL(comment.source_location.sourceUrl);
+    icon = "document-text";
+    label = `${filename}: ${comment.source_location.line}`;
+    secondaryLabel = ``;
+  }
+
   return (
-    <TranscriptItem item={comment} icon={<div className="img chat-alt" />} label="Comment">
+    <TranscriptItem
+      item={comment}
+      icon={<div className={`img ${icon}`} />}
+      label={label}
+      secondaryLabel={secondaryLabel}
+    >
       <CommentThread comment={comment} />
     </TranscriptItem>
   );
