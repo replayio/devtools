@@ -4,18 +4,18 @@ import { withClerk, WithClerkProp } from "@clerk/clerk-react";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 
 import "./Welcome.css";
+import { pushModal } from "ui/utils/routing";
 
 interface WelcomeProps {}
 
 function WelcomePageBase({ clerk }: WithClerkProp<WelcomeProps>) {
-  const { push } = useHistory();
-  const location = useLocation();
+  const history = useHistory();
   const forceOpenAuth = new URLSearchParams(location.search).has("signin");
 
   const isSignIn = matchPath(location.pathname, { path: "/sign-in" });
   const signIn = useCallback(
-    () => (isSignIn ? clerk.openSignIn() : push("/sign-in", { modal: true, previous: location })),
-    [clerk, isSignIn, location]
+    () => (isSignIn ? clerk.openSignIn() : pushModal("/sign-in", history, history.location)),
+    [clerk, isSignIn, history]
   );
 
   useEffect(() => {

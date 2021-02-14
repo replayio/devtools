@@ -2,16 +2,9 @@ import React, { useRef } from "react";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { useHistory, useLocation } from "react-router-dom";
 
-const clerkFrontendApi = "clerk.xopvv.ianev.lcl.dev";
+import { pushModal } from "../routing";
 
-function pushModal(to: string, history: any, location: any) {
-  const previous = location?.state?.previous;
-  if (location.state?.modal) {
-    history.replace(to, { modal: true, previous });
-  } else {
-    history.push(to, { modal: true, previous: location });
-  }
-}
+const clerkFrontendApi = "clerk.xopvv.ianev.lcl.dev";
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const history = useHistory();
