@@ -7,14 +7,10 @@ export interface CommentsState {
   activeComment: any;
 }
 
-export interface PendingComment {
-  content: "";
-  recording_id: RecordingId | null;
-  time: number;
-  point: string;
-  has_frames: boolean;
-  position: CommentPosition | null;
-  id?: string;
+interface SourceLocation {
+  sourceUrl: string;
+  line: number;
+  column: number;
 }
 
 interface CommentPosition {
@@ -22,10 +18,22 @@ interface CommentPosition {
   y: number;
 }
 
+export interface PendingComment {
+  content: "";
+  recording_id: RecordingId | null;
+  time: number;
+  point: string;
+  has_frames: boolean;
+  source_location: SourceLocation | null;
+  position: CommentPosition | null;
+  id?: string;
+}
+
 export interface Comment {
   content: string;
   created_at: string;
   has_frames: boolean;
+  source_location: SourceLocation | null;
   id: string;
   point: string;
   recording_id: RecordingId;

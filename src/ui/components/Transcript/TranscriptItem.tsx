@@ -11,6 +11,7 @@ import "./TranscriptItem.css";
 type TranscriptItemProps = PropsFromRedux & {
   item: Comment | MouseEvent | PendingComment;
   label: string;
+  secondaryLabel: string;
   icon: JSX.Element;
   children?: JSX.Element | null;
 };

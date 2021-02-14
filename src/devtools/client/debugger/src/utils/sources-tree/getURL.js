@@ -7,6 +7,12 @@
 import { parse } from "../url";
 import { getUnicodeHostname, getUnicodeUrlPath } from "devtools-modules";
 
+export function getFilenameFromURL(url) {
+  const { pathname } = parse(url);
+  const filename = getUnicodeUrlPath(getFilenameFromPath(pathname));
+  return filename;
+}
+
 export function getFilenameFromPath(pathname) {
   let filename = "";
   if (pathname) {
