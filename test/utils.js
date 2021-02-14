@@ -11,8 +11,11 @@ const GeckoInstallDirectories = [
 
 const GeckoSuffixes = [
   "Contents/MacOS/replay", // macOS
+  "Contents/MacOS/firefox", // macOS unbranded
   "replay", // linux, using distribution.
+  "firefox", // linux unbranded
   "dist/bin/replay", // linux, testing with local build.
+  "dist/bin/firefox", // linux local unbranded
 ];
 
 // Get the executable to use when starting gecko.
