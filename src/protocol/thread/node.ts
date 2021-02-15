@@ -205,14 +205,17 @@ export class NodeFront {
     this._loadWaiter = defer();
 
     await Promise.all([
-      this._pause
-        .sendMessage(client.CSS.getComputedStyle, { node: this._object.objectId })
-        .then(({ computedStyle }) => {
+      this._pause.sendMessage(client.CSS.getComputedStyle, { node: this._object.objectId }).then(
+        ({ computedStyle }) => {
           this._computedStyle = new Map();
           for (const { name, value } of computedStyle) {
             this._computedStyle.set(name, value);
           }
-        }),
+        },
+        () => {
+          this._computedStyle = null;
+        }
+      ),
       this._pause.sendMessage(client.CSS.getAppliedRules, { node: this._object.objectId }).then(
         ({ rules, data }) => {
           this._rules = uniqBy(rules, (rule: AppliedRule) => `${rule.rule}|${rule.pseudoElement}`);
@@ -276,7 +279,7 @@ export class NodeFront {
   // The computed display style property value of the node.
   get displayType() {
     assert(this._loaded);
-    return this._computedStyle!.get("display");
+    return this._computedStyle?.get("display");
   }
 
   getComputedStyle() {
