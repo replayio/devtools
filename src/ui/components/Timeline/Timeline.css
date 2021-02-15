@@ -123,10 +123,6 @@
   bottom: 0;
 }
 
-.timeline.dimmed .progress-line {
-  background: var(--primary-accent-light);
-}
-
 .timeline .overlay-container:hover .progress-line {
   height: 5px;
 }
