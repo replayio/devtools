@@ -1,6 +1,6 @@
 import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
-import { log } from "protocol/socket";
+import { client, log } from "protocol/socket";
 import {
   addLastScreen,
   getGraphicsAtTime,
@@ -33,13 +33,25 @@ export type TimelineActions =
   | SetHoveredPoint;
 
 export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
-  const { dispatch } = store;
+  const { dispatch, getState } = store;
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
-  ThreadFront.on("endpoint", args => dispatch(onEndpoint(args)));
   ThreadFront.warpCallback = onWarp(store);
   const description = await ThreadFront.getRecordingDescription();
   dispatch(setRecordingDescription(description));
   window.addEventListener("resize", () => dispatch(updateTimelineDimensions()));
+
+  await ThreadFront.waitForSession();
+  const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
+  const { point, time } = endpoint;
+  if ("lastScreen" in description && description.lastScreen) {
+    addLastScreen(description.lastScreen, point, time);
+  }
+
+  const zoomRegion = selectors.getZoomRegion(getState());
+  const newZoomRegion = { ...zoomRegion, endTime: time };
+  dispatch(
+    setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
+  );
 }
 
 function onWarp(store: UIStore) {
@@ -60,21 +72,6 @@ function onWarp(store: UIStore) {
     }
 
     return null;
-  };
-}
-
-function onEndpoint({ point, time }: TimeStampedPoint): UIThunkAction {
-  return ({ getState, dispatch }) => {
-    // This could be called before setRecordingDescription.
-    // These two methods should be commoned up.
-    const screenshot = selectors.getScreenShot(getState());
-    addLastScreen(screenshot, point, time);
-    const zoomRegion = selectors.getZoomRegion(getState());
-    const newZoomRegion = { ...zoomRegion, endTime: time };
-
-    dispatch(
-      setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
-    );
   };
 }
 
@@ -99,7 +96,7 @@ function setRecordingDescription({ duration, lastScreen }: RecordingDescription)
 
     // Paint the last screen to get it up quickly, even though we don't know yet
     // which execution point this is and have warped here.
-    paintGraphics(lastScreen);
+    // paintGraphics(lastScreen);
 
     dispatch(
       setTimelineState({
