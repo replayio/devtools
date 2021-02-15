@@ -182,7 +182,7 @@ class MarkupView {
    */
   async onShowEventTooltip(nodeId, target) {
     const nodeFront = ThreadFront.currentPause.getNodeFront(nodeId);
-    const listenerRaw = nodeFront.getEventListeners();
+    const listenerRaw = nodeFront.getEventListeners() || [];
     const frameworkListeners = await nodeFront.getFrameworkEventListeners();
 
     const listenerInfo = [...listenerRaw, ...frameworkListeners].map(listener => {
