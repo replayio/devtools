@@ -156,7 +156,7 @@ function CommentEditor({
   };
 
   return (
-    <div className="comment-input-container">
+    <div className="comment-input-container" onClick={e => e.stopPropagation()}>
       <img src={user.picture} className="comment-picture" />
       <div className="comment-input">
         <DraftJSEditorLoader
