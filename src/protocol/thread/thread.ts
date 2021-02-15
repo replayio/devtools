@@ -156,15 +156,12 @@ class _ThreadFront {
   off!: (name: string, handler: (value?: any) => void) => void;
   emit!: (name: string, value?: any) => void;
 
-  async setSessionId(sessionId: SessionId) {
+  setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
     this.mappedLocations.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
 
     log(`GotSessionId ${sessionId}`);
-
-    const { endpoint } = await client.Session.getEndpoint({}, sessionId);
-    this.emit("endpoint", endpoint);
   }
 
   async initializeToolbox() {
