@@ -35,15 +35,16 @@ type MarkerProps = PropsFromRedux & {
 
 class Marker extends React.Component<MarkerProps> {
   shouldComponentUpdate(nextProps: Readonly<MarkerProps>) {
-    const isHighlighted = this.props.isPrimaryHighlighted || this.props.isSecondaryHighlighted;
-    const willBeHighlighted = nextProps.isPrimaryHighlighted || nextProps.isSecondaryHighlighted;
+    const highlightChanged =
+      this.props.isPrimaryHighlighted !== nextProps.isPrimaryHighlighted ||
+      this.props.isSecondaryHighlighted !== nextProps.isSecondaryHighlighted;
 
     return (
+      highlightChanged ||
       this.props.time !== nextProps.time ||
       this.props.currentTime !== nextProps.currentTime ||
       this.props.overlayWidth !== nextProps.overlayWidth ||
-      this.props.zoomRegion !== nextProps.zoomRegion ||
-      isHighlighted !== willBeHighlighted
+      this.props.zoomRegion !== nextProps.zoomRegion
     );
   }
 
