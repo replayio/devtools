@@ -105,7 +105,11 @@ function Panel({ breakpoint, editor, insertAt, setHoveredPoint }) {
 
     setHoveredPoint(hoveredPoint);
   };
-  const onMouseLeave = () => setHoveredPoint(null);
+  const onMouseLeave = e => {
+    if (!e.relatedTarget.closest(".breakpoint-panel")) {
+      setHoveredPoint(null);
+    }
+  };
 
   useEffect(() => {
     editor.editor.on("refresh", updateWidth);

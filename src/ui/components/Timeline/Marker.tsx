@@ -58,8 +58,10 @@ class Marker extends React.Component<MarkerProps> {
     onSeek();
   };
 
-  onMouseLeave = () => {
-    this.props.setHoveredPoint(null);
+  onMouseLeave: MouseEventHandler = (e: any) => {
+    if (!e.relatedTarget.closest(".breakpoint-panel")) {
+      this.props.setHoveredPoint(null);
+    }
   };
 
   onMouseEnter = () => {
