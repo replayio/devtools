@@ -10,6 +10,8 @@ import {
   nextPaintEvent,
   paintGraphicsAtTime,
   previousPaintEvent,
+  paintPointsWaiter,
+  gPaintPoints,
 } from "protocol/graphics";
 import { selectors } from "ui/reducers";
 import { UIStore, UIThunkAction } from ".";
@@ -52,6 +54,18 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   dispatch(
     setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
   );
+
+  await paintPointsWaiter;
+  for (const paintPoint of gPaintPoints) {
+    const { point, time } = paintPoint;
+    const { screen } = await getGraphicsAtTime(time, false);
+    if (screen && screen.data.length > 30000) {
+      ThreadFront.timeWarp(point, time);
+      return;
+    }
+  }
+
+  ThreadFront.timeWarp(point, time, /* hasFrames */ false, /* force */ true);
 }
 
 function onWarp(store: UIStore) {
