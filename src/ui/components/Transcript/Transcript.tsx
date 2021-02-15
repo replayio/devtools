@@ -91,7 +91,7 @@ function CommentTranscriptItem({ comment }: { comment: Comment | PendingComment 
   if (comment.source_location) {
     const filename = getFilenameFromURL(comment.source_location.sourceUrl);
     icon = "document-text";
-    label = `${filename}: ${comment.source_location.line}`;
+    label = `${filename}:${comment.source_location.line}`;
     secondaryLabel = ``;
   }
 

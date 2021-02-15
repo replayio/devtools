@@ -96,13 +96,14 @@ class Message extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const isHighlighted = this.props.isPrimaryHighlighted || this.props.isSecondaryHighlighted;
-    const willBeHighlighted = nextProps.isPrimaryHighlighted || nextProps.isSecondaryHighlighted;
+    const highlightChanged =
+      this.props.isPrimaryHighlighted !== nextProps.isPrimaryHighlighted ||
+      this.props.isSecondaryHighlighted !== nextProps.isSecondaryHighlighted;
 
     return (
+      highlightChanged ||
       this.props.pausedExecutionPoint !== nextProps.pausedExecutionPoint ||
-      this.props.isPaused !== nextProps.isPaused ||
-      isHighlighted !== willBeHighlighted
+      this.props.isPaused !== nextProps.isPaused
     );
   }
 
