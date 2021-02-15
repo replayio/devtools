@@ -58,21 +58,16 @@ function CommentThread({
           onMouseEnter={() => setHoveredComment(comment.id)}
           onMouseLeave={() => setHoveredComment(null)}
         >
-          <CommentBody comment={comment} hoveredComment={hoveredComment} />
+          <div className="comment-body">
+            <CommentBodyItem comment={comment} hoveredComment={hoveredComment} isRoot />
+            {comment.replies.map((reply, i) => (
+              <CommentBodyItem comment={reply} key={i} />
+            ))}
+
+            {isSelected && isAuthenticated && <CommentEditor comment={comment} />}
+          </div>
         </div>
       )}
-      {isSelected && isAuthenticated && <CommentEditor comment={comment} />}
-    </div>
-  );
-}
-
-function CommentBody({ comment, hoveredComment }) {
-  return (
-    <div className="comment-body">
-      <CommentBodyItem comment={comment} hoveredComment={hoveredComment} isRoot />
-      {comment.replies.map((reply, i) => (
-        <CommentBodyItem comment={reply} key={i} />
-      ))}
     </div>
   );
 }
