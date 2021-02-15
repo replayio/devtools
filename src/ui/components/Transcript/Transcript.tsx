@@ -12,9 +12,10 @@ import "./Transcript.css";
 
 import { UIState } from "ui/state";
 import { Event, PendingComment, Comment } from "ui/state/comments";
+import { ViewMode } from "ui/state/app";
 
-function createEntries(comments: Comment[], clickEvents: Event[]) {
-  const entries = clickEvents.map(event => ({ ...event }));
+function createEntries(comments: Comment[], clickEvents: Event[], viewMode: ViewMode) {
+  let entries = clickEvents.map(event => ({ ...event }));
   const nonNestedComments = comments.reduce((acc: Comment[], comment: Comment) => {
     const matchingEntryIndex = entries.findIndex(entry => entry.point == comment.point);
     if (matchingEntryIndex >= 0) {
@@ -25,13 +26,22 @@ function createEntries(comments: Comment[], clickEvents: Event[]) {
     }
   }, []);
 
+  // Don't show events with no comments in dev mode.
+  if (viewMode == "dev") {
+    entries = entries.filter(entry => entry.comment);
+  }
+
   return [...entries, ...nonNestedComments];
 }
 
-function Transcript({ recordingId, clickEvents, pendingComment }: PropsFromRedux) {
+function Transcript({ recordingId, clickEvents, pendingComment, viewMode }: PropsFromRedux) {
   const { comments } = hooks.useGetComments(recordingId!);
 
-  let entries: (Comment | Event | PendingComment)[] = createEntries(comments, clickEvents);
+  let entries: (Comment | Event | PendingComment)[] = createEntries(
+    comments,
+    clickEvents,
+    viewMode
+  );
 
   // New comments that haven't been sent to Hasura will not have an associated ID.
   // They're not included in the comments data from the query, so we have to insert
@@ -111,6 +121,7 @@ const connector = connect((state: UIState) => ({
   recordingId: selectors.getRecordingId(state),
   clickEvents: selectors.getEventsForType(state, "mousedown"),
   pendingComment: selectors.getPendingComment(state),
+  viewMode: selectors.getViewMode(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(Transcript);
