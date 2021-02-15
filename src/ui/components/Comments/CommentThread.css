@@ -1,9 +1,7 @@
 .transcript-list .comment-container {
-  margin-left: 40px;
-  margin-top: 20px;
+  margin-left: -16px;
   padding: 0px 16px;
-  border: 1px solid var(--theme-splitter-color);
-  border-radius: 8px;
+  z-index: 10;
 }
 
 .transcript-list .comment {
@@ -71,12 +69,8 @@
 
 .transcript-list .comment-body {
   align-self: center;
-  padding: 16px 0px;
+  padding-top: 16px;
   width: 100%;
-}
-
-.transcript-list .comment-body > :not(:first-child) {
-  margin-top: 8px;
 }
 
 .transcript-list .comment-body-header {
@@ -148,9 +142,9 @@
 }
 
 .transcript-list img {
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
 }
 
 .transcript-list .comment-actions {
@@ -206,16 +200,11 @@
 /* Comment Input */
 
 .transcript-list .comment-input-container {
-  padding: 16px 0px;
+  padding: 10px 0px 14px 0px;
   display: flex;
 }
 
-.comment-container:not(.pending) .comment-input-container {
-  border-top: 1px solid var(--theme-splitter-color);
-}
-
 .transcript-list .comment-input-container img {
-  opacity: 50%;
   align-self: start;
 }
 

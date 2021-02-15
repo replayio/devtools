@@ -19,7 +19,3 @@
   overflow: auto;
   width: 100%;
 }
-
-.transcript-list > :not(:first-child) {
-  margin-top: 8px;
-}
