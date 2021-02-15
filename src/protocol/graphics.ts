@@ -4,7 +4,13 @@ import { ThreadFront } from "./thread";
 import { assert, binarySearch } from "./utils";
 import { ScreenshotCache } from "./screenshot-cache";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
-import { TimeStampedPoint, MouseEvent, paintPoints, ScreenShot } from "@recordreplay/protocol";
+import {
+  TimeStampedPoint,
+  MouseEvent,
+  paintPoints,
+  ScreenShot,
+  findPaintsResult,
+} from "@recordreplay/protocol";
 import { client } from "./socket";
 import { actions, UIStore } from "ui/actions";
 import { Canvas } from "ui/state/app";
@@ -86,7 +92,9 @@ interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
 // All paints that have occurred in the recording, in order. Include the
 // beginning point of the recording as well, which is not painted and has
 // a known point and time.
-const gPaintPoints: TimeStampedPointWithPaintHash[] = [{ point: "0", time: 0, paintHash: "" }];
+export const gPaintPoints: TimeStampedPointWithPaintHash[] = [
+  { point: "0", time: 0, paintHash: "" },
+];
 
 // All mouse events that have occurred in the recording, in order.
 const gMouseEvents: MouseEvent[] = [];
@@ -116,6 +124,7 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
 }
 
 let onRefreshGraphics: (canvas: Canvas) => void;
+export let paintPointsWaiter: Promise<findPaintsResult>;
 
 export function setupGraphics(store: UIStore) {
   onRefreshGraphics = (canvas: Canvas) => {
@@ -123,7 +132,7 @@ export function setupGraphics(store: UIStore) {
   };
 
   ThreadFront.sessionWaiter.promise.then((sessionId: string) => {
-    client.Graphics.findPaints({}, sessionId);
+    paintPointsWaiter = client.Graphics.findPaints({}, sessionId);
     client.Graphics.addPaintPointsListener(onPaints);
 
     client.Session.findMouseEvents({}, sessionId);
