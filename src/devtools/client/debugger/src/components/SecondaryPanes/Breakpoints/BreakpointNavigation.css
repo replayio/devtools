@@ -114,18 +114,18 @@
 }
 
 /* Dimmed styles */
-
+/* 
 .breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point .fill {
   fill: var(--primary-accent-light);
 }
 
 .breakpoint-navigation-timeline.dimmed .progress-line:not(.full) {
   background: var(--primary-accent-light);
-}
-
+} */
+/* 
 .breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.secondary-highlight {
   z-index: var(--z-index-2--hovered-point-secondary);
-}
+} */
 
 .breakpoint-navigation-timeline.dimmed
   .breakpoint-navigation-timeline-point.secondary-highlight
