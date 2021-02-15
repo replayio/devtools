@@ -7,10 +7,12 @@
   top: 0;
   bottom: 0;
   pointer-events: all;
+  display: none;
 }
 
 .timeline .preview-markers-container .marker {
   z-index: var(--z-index-2--hovered-message);
+  display: block;
 }
 
 .timeline .marker:hover {
@@ -44,6 +46,11 @@
 }
 
 /* Dimmed styles */
+
+.timeline.dimmed .marker.primary-highlight,
+.timeline.dimmed .marker.secondary-highlight {
+  display: block;
+}
 
 .timeline.dimmed .marker .fill {
   fill: var(--primary-accent-light);
