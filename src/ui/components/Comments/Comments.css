@@ -41,7 +41,7 @@ deletes the comment */
   background-color: var(--replaying-paused-marker-fill);
 }
 
-.comments-container .img.comment-marker.primary-highlight {
+.comments-container .img.comment-marker.primary-highlight:not(.paused) {
   background-color: var(--new-blue-800);
 }
 

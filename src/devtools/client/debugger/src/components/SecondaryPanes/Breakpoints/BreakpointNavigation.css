@@ -113,20 +113,6 @@
   background: var(--grey-30);
 }
 
-/* Dimmed styles */
-/* 
-.breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point .fill {
-  fill: var(--primary-accent-light);
-}
-
-.breakpoint-navigation-timeline.dimmed .progress-line:not(.full) {
-  background: var(--primary-accent-light);
-} */
-/* 
-.breakpoint-navigation-timeline.dimmed .breakpoint-navigation-timeline-point.secondary-highlight {
-  z-index: var(--z-index-2--hovered-point-secondary);
-} */
-
 .breakpoint-navigation-timeline.dimmed
   .breakpoint-navigation-timeline-point.secondary-highlight
   .fill {
@@ -137,6 +123,8 @@
   z-index: var(--z-index-3--hovered-point-primary);
 }
 
-.breakpoint-navigation-timeline .breakpoint-navigation-timeline-point.primary-highlight .fill {
+.breakpoint-navigation-timeline
+  .breakpoint-navigation-timeline-point.primary-highlight:not(.pause)
+  .fill {
   fill: var(--new-blue-900);
 }
