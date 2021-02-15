@@ -95,11 +95,6 @@ function TranscriptItem({
       <div className="transcript-entry-description">
         <div className="transcript-entry-icon">{icon}</div>
         <div className="transcript-entry-label">{label}</div>
-        {pendingComment == item && (
-          <button className="new-comment-cancel" onClick={clearPendingComment}>
-            Cancel
-          </button>
-        )}
       </div>
       {children}
     </div>

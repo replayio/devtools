@@ -65,7 +65,7 @@ function DraftJSEditor({ editorState, setEditorState, DraftJS, handleSave, handl
   };
 
   return (
-    <div ref={wrapperNode}>
+    <div className="draft-editor-container" ref={wrapperNode}>
       <Editor
         editorState={editorState}
         onChange={setEditorState}
@@ -81,6 +81,7 @@ function DraftJSEditor({ editorState, setEditorState, DraftJS, handleSave, handl
 function CommentEditor({
   comment,
   clearPendingComment,
+  setActiveComment,
   pendingComment,
   recordingId,
   canvas,
@@ -100,7 +101,10 @@ function CommentEditor({
       handleReplySave();
     }
   };
-  const handleCancel = () => clearPendingComment();
+  const handleCancel = () => {
+    clearPendingComment();
+    setActiveComment(null);
+  };
   const handleReplySave = async () => {
     const inputValue = editorState.getCurrentContent().getPlainText();
 
@@ -158,8 +162,15 @@ function CommentEditor({
         <DraftJSEditorLoader
           {...{ editorState, setEditorState, DraftJS, setDraftJS, handleSave, handleCancel }}
         />
+        <div className="comment-input-actions">
+          <button className="action-cancel" onClick={handleCancel}>
+            Cancel
+          </button>
+          <button className="action-submit" onClick={handleSave}>
+            Submit
+          </button>
+        </div>
       </div>
-      <button className="img paper-airplane" onClick={handleSave} />
       {isNewComment && <CommentTool comment={comment} />}
     </div>
   );
@@ -174,5 +185,6 @@ export default connect(
   }),
   {
     clearPendingComment: actions.clearPendingComment,
+    setActiveComment: actions.setActiveComment,
   }
 )(CommentEditor);
