@@ -120,21 +120,21 @@
 .comment-body-item:not(:last-child)::after {
   content: "";
   width: 1px;
-  height: calc(100% - 30px);
-  background: #c5c5c5;
-  position: absolute;
+  height: calc(100% - 34px);
+  top: 34px;
   left: 12px;
-  top: 31px;
+  background: var(--theme-splitter-color);
+  position: absolute;
 }
 
 .comment-body-item:first-child::before {
   content: "";
   width: 1px;
-  height: 13px;
-  background: #c5c5c5;
+  height: 12px;
+  top: -12px;
+  background: var(--theme-splitter-color);
   position: absolute;
   left: 12px;
-  top: -13px;
 }
 .transcript-list .dropdown-block {
   align-self: flex-start;
@@ -241,6 +241,10 @@
   line-height: 18px;
   margin-top: 3px;
   color: var(--theme-comment);
+}
+
+.transcript-list .comment-input:hover {
+  cursor: text;
 }
 
 .transcript-list .responsive-textarea {
