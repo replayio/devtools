@@ -51,7 +51,7 @@ function CommentThread({
       })}
       ref={commentEl}
     >
-      {!isPending && (
+      {
         <div
           className="comment"
           onClick={seekToComment}
@@ -59,15 +59,17 @@ function CommentThread({
           onMouseLeave={() => setHoveredComment(null)}
         >
           <div className="comment-body">
-            <CommentBodyItem comment={comment} hoveredComment={hoveredComment} isRoot />
-            {comment.replies.map((reply, i) => (
+            {!isPending && (
+              <CommentBodyItem comment={comment} hoveredComment={hoveredComment} isRoot />
+            )}
+            {comment.replies?.map((reply, i) => (
               <CommentBodyItem comment={reply} key={i} />
             ))}
 
             {isSelected && isAuthenticated && <CommentEditor comment={comment} />}
           </div>
         </div>
-      )}
+      }
     </div>
   );
 }
