@@ -1,7 +1,8 @@
 // Playwright script for inspecting a simple recording.
-// This test is currently experimental.
+// Playwright tests are currently experimental.
 
-const playwright = require('playwright');
+require("dotenv").config({ path: "local.env" });
+const playwright = require("playwright");
 
 (async () => {
   const browser = await playwright.firefox.launch({ headless: false });
@@ -20,37 +21,47 @@ const playwright = require('playwright');
   // There is a second problem where playwight sometimes hover/clicks on line 19
   // instead of line 20. If it hovers on line 19 and then clicks on line 20 then
   // the test will not finish.
-  await checkBreakpointHits(page, 20, 10);
 
+  await checkBreakpointHits(page, 20, 10);
   await addBreakpoint(page, 20);
   await waitForMessageCount(page, "updateNumber", 10);
   await updateBreakpoint(page, "updateNumber", '"hello", number');
   await jumpToMessage(page, "hello 7");
   await selectPauseToolbar(page);
-  await waitForScopeNode(page, "<this>: Window");
-  await evaluateInConsole(page, "number * 6");
-  await waitForMessageCount(page, "42", 1);
 
+  // await waitForScopeNode(page, "<this>: Window");
+  // await evaluateInConsole(page, "number * 6");
+  // await waitForMessageCount(page, "42", 1);
+
+  console.log(`Saving Recording`);
   await browser.close();
 })();
 
 async function switchToDevtools(page) {
+  console.log(`switchToDevtools`, {});
+
   await page.click("text=devtools");
 }
 
 async function selectSource(page, url) {
+  console.log(`selectSource`, { url });
+
   await page.click("text=go to file");
   await page.fill(".search-field input", url);
   await page.press(".search-field input", "Enter");
 }
 
 async function checkBreakpointHits(page, line, count) {
-  await page.hover(`.CodeMirror-linenumber:text("${line}")`);
-  await page.waitForSelector(`.static-tooltip:text("${count} hits")`);
+  console.log(`checkBreakpointHits`, { line, count });
+  return waitUntil(async () => {
+    await page.hover(`.CodeMirror-linenumber:text("${line}")`);
+    return page.waitForSelector(`.static-tooltip:text("${count} hits")`);
+  });
 }
 
 async function addBreakpoint(page, line) {
-  await page.click(`.CodeMirror-linenumber:text("${line}")`);
+  console.log(`addBreakpoint`, { line });
+  return page.click(`.CodeMirror-linenumber:text("${line}")`);
 }
 
 async function waitForMessageCount(page, text, count) {
@@ -68,6 +79,8 @@ async function waitForMessageCount(page, text, count) {
 }
 
 async function jumpToMessage(page, text) {
+  console.log(`jumpToMessage`, { text });
+
   const msg = await waitUntil(async () => {
     const messages = await page.$$(".message");
     for (const msg of messages) {
@@ -86,6 +99,8 @@ async function jumpToMessage(page, text) {
 }
 
 async function updateBreakpoint(page, existingText, newText) {
+  console.log(`updateBreakpoint`, { existingText, newText });
+
   await page.dispatchEvent(`button:has(span:text("${existingText}"))`, "click");
   await waitForTime(200);
 
