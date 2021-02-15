@@ -149,7 +149,7 @@ BoxModel.prototype = {
       const bounds = await nodeFront.getBoundingClientRect();
       const style = await nodeFront.getComputedStyle();
 
-      if (!bounds) {
+      if (!bounds || !style) {
         return null;
       }
 

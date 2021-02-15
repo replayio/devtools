@@ -86,9 +86,8 @@ class ElementNode extends PureComponent<ElementNodeProps> {
 
   renderDisplayBadge() {
     const { displayType } = this.props.node;
-    assert(displayType);
 
-    if (!(displayType in DISPLAY_TYPES)) {
+    if (!displayType || !(displayType in DISPLAY_TYPES)) {
       return null;
     }
 

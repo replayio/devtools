@@ -531,6 +531,9 @@ CssComputedView.prototype = {
     }
 
     const computed = this._viewedElement.getComputedStyle();
+    if (!computed) {
+      return;
+    }
 
     this._matchedProperties = new Set([...computed.keys()]);
     /*
