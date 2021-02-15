@@ -9,11 +9,11 @@ import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import { toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
-import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 import "./Panel.css";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
+import { actions } from "ui/actions";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -84,7 +84,7 @@ function Widget({ location, children, editor, insertAt }) {
   return ReactDOM.createPortal(<>{children}</>, node);
 }
 
-function Panel({ breakpoint, editor, insertAt, hoveredPoint }) {
+function Panel({ breakpoint, editor, insertAt, setHoveredPoint }) {
   const [editing, setEditing] = useState(false);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
@@ -97,6 +97,16 @@ function Panel({ breakpoint, editor, insertAt, hoveredPoint }) {
   const toggleEditingOff = () => setEditing(false);
   const updateWidth = () => setWidth(getPanelWidth(editor));
 
+  const onMouseEnter = () => {
+    const hoveredPoint = {
+      location: breakpoint.location,
+      target: "widget",
+    };
+
+    setHoveredPoint(hoveredPoint);
+  };
+  const onMouseLeave = () => setHoveredPoint(null);
+
   useEffect(() => {
     editor.editor.on("refresh", updateWidth);
     return () => editor.editor.off("refresh", updateWidth);
@@ -104,7 +114,12 @@ function Panel({ breakpoint, editor, insertAt, hoveredPoint }) {
 
   return (
     <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
-      <div style={{ width: `${width}px` }} className={classnames("breakpoint-panel", { editing })}>
+      <div
+        style={{ width: `${width}px` }}
+        className={classnames("breakpoint-panel", { editing })}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
         {editing ? (
           <PanelEditor
             breakpoint={breakpoint}
@@ -125,6 +140,9 @@ function Panel({ breakpoint, editor, insertAt, hoveredPoint }) {
   );
 }
 
-export default connect(state => ({
-  hoveredPoint: selectors.getHoveredPoint(state),
-}))(Panel);
+export default connect(
+  state => ({
+    hoveredPoint: selectors.getHoveredPoint(state),
+  }),
+  { setHoveredPoint: actions.setHoveredPoint }
+)(Panel);
