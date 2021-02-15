@@ -225,16 +225,19 @@ export class NodeFront {
           this._rules = null;
         }
       ),
-      this._pause
-        .sendMessage(client.DOM.getEventListeners, { node: this._object.objectId })
-        .then(({ listeners, data }) => {
+      this._pause.sendMessage(client.DOM.getEventListeners, { node: this._object.objectId }).then(
+        ({ listeners, data }) => {
           this._pause.addData(data);
           this._listeners = listeners.map(listener => ({
             ...listener,
             handler: new ValueFront(this._pause, { object: listener.handler }),
             node: this._pause.getNodeFront(listener.node),
           }));
-        }),
+        },
+        () => {
+          this._listeners = null;
+        }
+      ),
       this._pause.sendMessage(client.DOM.getBoxModel, { node: this._object.objectId }).then(
         ({ model }) => {
           this._quads = model;
@@ -295,7 +298,7 @@ export class NodeFront {
 
   getEventListeners() {
     assert(this._loaded);
-    return this._listeners!;
+    return this._listeners;
   }
 
   async getFrameworkEventListeners() {
