@@ -17,12 +17,9 @@ import { makeShallowQuery } from "../utils/resource";
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
 
 function getBreakpointsForSource(source, selectedSource, breakpoints) {
-  return sortSelectedBreakpoints(breakpoints, selectedSource)
-    .filter(
-      bp =>
-        !bp.options.hidden && (bp.text || bp.originalText || bp.options.condition || bp.disabled)
-    )
-    .filter(bp => bp.location.sourceId == source.id);
+  return sortSelectedBreakpoints(breakpoints, selectedSource).filter(
+    bp => !bp.options.hidden && bp.location.sourceId == source.id
+  );
 }
 
 export const findBreakpointSources = state => {
