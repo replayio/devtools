@@ -17,7 +17,7 @@ import ScrollContainer from "./ScrollContainer";
 import Tooltip from "./Tooltip";
 const Comments = require("../Comments").default;
 
-import { mostRecentPaintOrMouseEvent, paintGraphicsAtTime } from "protocol/graphics";
+import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
 
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
@@ -83,7 +83,6 @@ class Timeline extends Component<PropsFromRedux> {
     const isHovered = window.elementIsHovered(this.$progressBar);
     if (!isHovered) {
       window.clearInterval(this.hoverInterval);
-      paintGraphicsAtTime(currentTime);
       this.hoverInterval = undefined;
       hideTooltip();
     }
