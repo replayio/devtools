@@ -32,8 +32,8 @@ export interface TimelineState {
 
 export interface HoveredPoint {
   target: "timeline" | "console" | "widget" | "transcript";
-  point: string;
-  time: number;
+  point?: string;
+  time?: number;
   location?: HoveredLocation;
 }
 
