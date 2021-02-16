@@ -14,5 +14,6 @@ Note: The test is configured to launch firefox in headful (not headless) mode, t
 ## Running the examples
 
 - **Facebook** `node examples/facebook.com`
-- **Facebook Homepage** `node examples/facebook.com --destination homepage`
-- **Facebook Marketplace** `node examples/facebook.com --destination marketplace`
+- **Facebook Homepage** `node examples/facebook.js --destination homepage`
+- **Facebook Marketplace** `node examples/facebook.js --destination marketplace`
+- **Cypress Dashboard** `node examples/cypress.js`
