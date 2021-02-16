@@ -151,7 +151,8 @@ export default function update(
 export const getTheme = (state: UIState) => state.app.theme;
 export const isSplitConsoleOpen = (state: UIState) => state.app.splitConsoleOpen;
 export const getSelectedPanel = (state: UIState) => state.app.selectedPanel;
-export const isInspectorSelected = (state: UIState) => getSelectedPanel(state) == "inspector";
+export const isInspectorSelected = (state: UIState) =>
+  getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getSelectedPrimaryPanel = (state: UIState) => state.app.selectedPrimaryPanel;
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
 export const getLoading = (state: UIState) => state.app.loading;
