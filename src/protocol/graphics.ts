@@ -280,13 +280,6 @@ export function paintGraphics(screenShot?: ScreenShot, mouse?: MouseAndClickPosi
   refreshGraphics();
 }
 
-export async function paintGraphicsAtTime(time: number) {
-  try {
-    const { screen, mouse } = await getGraphicsAtTime(time);
-    paintGraphics(screen, mouse);
-  } catch (e) {}
-}
-
 function clearGraphics() {
   gDrawImage = null;
   gLastImage = null;

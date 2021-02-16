@@ -8,7 +8,6 @@ import {
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
   nextPaintEvent,
-  paintGraphicsAtTime,
   previousPaintEvent,
   getFirstMeaningfulPaint,
 } from "protocol/graphics";
@@ -143,24 +142,31 @@ export function setTimelineState(state: Partial<TimelineState>): SetTimelineStat
   return { type: "set_timeline_state", state };
 }
 
-export function setTimelineToTime(time: number): UIThunkAction {
-  return async ({ dispatch }) => {
-    try {
-      paintGraphicsAtTime(time);
-      dispatch(setTimelineTooltip(time));
-    } catch {}
-  };
-}
-export function setTimelineTooltip(time: number | null): UIThunkAction {
-  return async ({ dispatch }) => {
+export function setTimelineToTime(time: number | null, updateGraphics = true): UIThunkAction {
+  return async ({ dispatch, getState }) => {
     dispatch(setTimelineState({ hoverTime: time }));
+
+    if (!updateGraphics) {
+      return;
+    }
+
+    try {
+      const screenshotTime = time || selectors.getCurrentTime(getState());
+      const { screen, mouse } = await getGraphicsAtTime(screenshotTime);
+
+      if (selectors.getHoverTime(getState()) !== time) {
+        return;
+      }
+
+      paintGraphics(screen, mouse);
+    } catch {}
   };
 }
 
 export function hideTooltip(): UIThunkAction {
   return ({ dispatch }) => {
     dispatch(updateTooltip(null));
-    dispatch(setTimelineState({ hoverTime: null }));
+    dispatch(setTimelineToTime(null));
   };
 }
 
@@ -377,17 +383,8 @@ export function setHoveredPoint(hoveredPoint: HoveredPoint | null): UIThunkActio
   return ({ dispatch, getState }) => {
     dispatch({ type: "set_hovered_point", hoveredPoint });
 
-    dispatch(setTimelineTooltip(hoveredPoint ? hoveredPoint.time : null));
-
     // Don't update the video if user is adding a new comment.
-    if (selectors.getPendingComment(getState())) {
-      return;
-    }
-
-    if (hoveredPoint) {
-      paintGraphicsAtTime(hoveredPoint.time);
-    } else {
-      paintGraphicsAtTime(selectors.getCurrentTime(getState()));
-    }
+    const updateGraphics = !selectors.getPendingComment(getState());
+    dispatch(setTimelineToTime(hoveredPoint ? hoveredPoint.time : null, updateGraphics));
   };
 }
