@@ -18,6 +18,8 @@ import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredPoint } from "ui/state/timeline";
+import { query } from "ui/utils/apolloClient";
+import { gql } from "@apollo/client";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -33,6 +35,20 @@ export type TimelineActions =
   | UpdateTooltipAction
   | SetZoomRegionAction
   | SetHoveredPoint;
+
+const GET_FIRST_COMMENT_POINT = gql`
+  query GetFirstCommentTime($recordingId: uuid) {
+    comments(
+      where: { recording_id: { _eq: $recordingId }, _and: { parent_id: { _is_null: true } } }
+      order_by: { time: asc }
+      limit: 1
+    ) {
+      time
+      point
+      has_frames
+    }
+  }
+`;
 
 export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   const { dispatch, getState } = store;
@@ -55,11 +71,22 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
     setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
   );
 
+  const firstCommentResult = await query({
+    query: GET_FIRST_COMMENT_POINT,
+    variables: { recordingId },
+  });
+  const firstComment = firstCommentResult?.data?.comments?.[0];
+  if (firstComment) {
+    const { point, time, has_frames } = firstComment;
+    ThreadFront.timeWarp(point, time, has_frames);
+    return;
+  }
+
   await paintPointsWaiter;
   for (const paintPoint of gPaintPoints) {
     const { point, time } = paintPoint;
     const { screen } = await getGraphicsAtTime(time, false);
-    if (screen && screen.data.length > 30000) {
+    if (screen && screen.data.length > 40000) {
       ThreadFront.timeWarp(point, time);
       return;
     }
