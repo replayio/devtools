@@ -385,6 +385,6 @@ export function setHoveredPoint(hoveredPoint: HoveredPoint | null): UIThunkActio
 
     // Don't update the video if user is adding a new comment.
     const updateGraphics = !selectors.getPendingComment(getState());
-    dispatch(setTimelineToTime(hoveredPoint ? hoveredPoint.time : null, updateGraphics));
+    dispatch(setTimelineToTime(hoveredPoint?.time || null, updateGraphics));
   };
 }
