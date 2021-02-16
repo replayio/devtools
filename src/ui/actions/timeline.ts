@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
+import { ExecutionPoint, PauseId, RecordingId, ScreenShot } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
 import { client, log } from "protocol/socket";
 import {
@@ -83,16 +83,28 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   }
 
   await paintPointsWaiter;
-  for (const paintPoint of gPaintPoints) {
+  for (const paintPoint of gPaintPoints.slice(0, 10)) {
     const { point, time } = paintPoint;
     const { screen } = await getGraphicsAtTime(time, false);
-    if (screen && screen.data.length > 40000) {
-      ThreadFront.timeWarp(point, time);
-      return;
+    if (screen) {
+      const { width, height } = await getScreenshotDimensions(screen);
+      if (screen.data.length > (width * height) / 40) {
+        ThreadFront.timeWarp(point, time);
+        return;
+      }
     }
   }
 
   ThreadFront.timeWarp(point, time, /* hasFrames */ false, /* force */ true);
+}
+
+async function getScreenshotDimensions(screen: ScreenShot) {
+  const img = new Image();
+  await new Promise(resolve => {
+    img.onload = resolve;
+    img.src = `data:${screen.mimeType};base64,${screen.data}`;
+  });
+  return { width: img.width, height: img.height };
 }
 
 function onWarp(store: UIStore) {
