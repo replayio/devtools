@@ -8,6 +8,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "arg": "^5.0.0",
     "dotenv": "^8.2.0",
     "playwright": "^1.8.1"
   }

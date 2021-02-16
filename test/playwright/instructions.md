@@ -10,3 +10,9 @@ Playwright scripts can run using replay-enabled versions of firefox on macOS and
 6. `cat recordings.log` to view the last recording
 
 Note: The test is configured to launch firefox in headful (not headless) mode, to make it easier to see what the test is doing. Things should work when launching in headless mode as well.
+
+## Running the examples
+
+- **Facebook** `node examples/facebook.com`
+- **Facebook Homepage** `node examples/facebook.com --destination homepage`
+- **Facebook Marketplace** `node examples/facebook.com --destination marketplace`
