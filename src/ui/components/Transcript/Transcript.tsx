@@ -6,6 +6,7 @@ import hooks from "ui/hooks";
 
 import AddCommentButton from "ui/components/Transcript/AddCommentButton";
 import TranscriptItem from "ui/components/Transcript/TranscriptItem";
+import TranscriptFilter from "ui/components/Transcript/TranscriptFilter";
 const CommentThread = require("ui/components/Comments/CommentThread").default;
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 import "./Transcript.css";
@@ -14,7 +15,12 @@ import { UIState } from "ui/state";
 import { Event, PendingComment, Comment } from "ui/state/comments";
 import { ViewMode } from "ui/state/app";
 
-function createEntries(comments: Comment[], clickEvents: Event[], viewMode: ViewMode) {
+function createEntries(
+  comments: Comment[],
+  clickEvents: Event[],
+  viewMode: ViewMode,
+  shouldShowLoneEvents: boolean
+) {
   let entries = clickEvents.map(event => ({ ...event }));
   const nonNestedComments = comments.reduce((acc: Comment[], comment: Comment) => {
     const matchingEntryIndex = entries.findIndex(entry => entry.point == comment.point);
@@ -26,42 +32,55 @@ function createEntries(comments: Comment[], clickEvents: Event[], viewMode: View
     }
   }, []);
 
-  // Don't show events with no comments in dev mode.
-  if (viewMode == "dev") {
+  // If lone events are supposed to be hidden, filter them out.
+  if (!shouldShowLoneEvents) {
     entries = entries.filter(entry => entry.comment);
   }
 
   return [...entries, ...nonNestedComments];
 }
 
-function Transcript({ recordingId, clickEvents, pendingComment, viewMode }: PropsFromRedux) {
+function Transcript({
+  recordingId,
+  clickEvents,
+  pendingComment,
+  viewMode,
+  shouldShowLoneEvents,
+}: PropsFromRedux) {
   const { comments } = hooks.useGetComments(recordingId!);
 
   let entries: (Comment | Event | PendingComment)[] = createEntries(
     comments,
     clickEvents,
-    viewMode
+    viewMode,
+    shouldShowLoneEvents
   );
 
-  // New comments that haven't been sent to Hasura will not have an associated ID.
-  // They're not included in the comments data from the query, so we have to insert
-  // them manually here. If a pending comment has an ID, it already exists in the
-  // comments data and we don't have to insert it.
   if (pendingComment && !pendingComment.id) {
+    // New comments that haven't been sent to Hasura will not have an associated ID.
+    // They're not included in the comments data from the query, so we have to insert
+    // them manually here. If a pending comment has an ID, it already exists in the
+    // comments data and we don't have to insert it.
     entries = [...entries, pendingComment];
   }
 
   return (
-    <div className="transcript-panel">
-      <AddCommentButton />
-      <div className="transcript-list">
-        {sortBy(entries, ["time", "kind", "created_at"]).map((entry, i) => {
-          if ("content" in entry) {
-            return <CommentTranscriptItem comment={entry} key={i} />;
-          } else {
-            return <EventTranscriptItem event={entry} key={i} />;
-          }
-        })}
+    <div className="right-sidebar">
+      <div className="right-sidebar-toolbar">
+        <div className="right-sidebar-toolbar-item">Transcript and Comments</div>
+        <TranscriptFilter />
+      </div>
+      <div className="transcript-panel">
+        <AddCommentButton />
+        <div className="transcript-list">
+          {sortBy(entries, ["time", "kind", "created_at"]).map((entry, i) => {
+            if ("content" in entry) {
+              return <CommentTranscriptItem comment={entry} key={i} />;
+            } else {
+              return <EventTranscriptItem event={entry} key={i} />;
+            }
+          })}
+        </div>
       </div>
     </div>
   );
@@ -122,6 +141,7 @@ const connector = connect((state: UIState) => ({
   clickEvents: selectors.getEventsForType(state, "mousedown"),
   pendingComment: selectors.getPendingComment(state),
   viewMode: selectors.getViewMode(state),
+  shouldShowLoneEvents: selectors.getShouldShowLoneEvents(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(Transcript);
