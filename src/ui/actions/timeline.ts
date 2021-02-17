@@ -18,9 +18,8 @@ import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredPoint } from "ui/state/timeline";
-import { query } from "ui/utils/apolloClient";
 import { gql } from "@apollo/client";
-import { getTest } from "ui/utils/environment";
+import { getFirstComent } from "ui/hooks/comments";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -72,29 +71,23 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
     setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
   );
 
-  if (!getTest()) {
-    const firstCommentResult = await query({
-      query: GET_FIRST_COMMENT_POINT,
-      variables: { recordingId },
-    });
-    const firstComment = firstCommentResult?.data?.comments?.[0];
-    if (firstComment) {
-      const { point, time, has_frames } = firstComment;
-      ThreadFront.timeWarp(point, time, has_frames);
-      return;
-    }
+  const firstComment = await getFirstComent(recordingId);
+  if (firstComment) {
+    const { point, time, has_frames } = firstComment;
+    ThreadFront.timeWarp(point, time, has_frames);
+    return;
+  }
 
-    await paintPointsWaiter;
-    for (const paintPoint of gPaintPoints.slice(0, 10)) {
-      const { point, time } = paintPoint;
-      const { screen } = await getGraphicsAtTime(time, false);
-      if (screen) {
-        const { width, height } = await getScreenshotDimensions(screen);
-        if (screen.data.length > (width * height) / 40) {
-          ThreadFront.timeWarp(point, time);
-          ThreadFront.initializedWaiter.resolve();
-          return;
-        }
+  await paintPointsWaiter;
+  for (const paintPoint of gPaintPoints.slice(0, 10)) {
+    const { point, time } = paintPoint;
+    const { screen } = await getGraphicsAtTime(time, false);
+    if (screen) {
+      const { width, height } = await getScreenshotDimensions(screen);
+      if (screen.data.length > (width * height) / 40) {
+        ThreadFront.timeWarp(point, time);
+        ThreadFront.initializedWaiter.resolve();
+        return;
       }
     }
   }
