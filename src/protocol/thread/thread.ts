@@ -169,7 +169,7 @@ class _ThreadFront {
     // const { endpoint } = await client.Session.getEndpoint({}, sessionId);
 
     // this.timeWarp(endpoint.point, endpoint.time, /* hasFrames */ false, /* force */ true);
-    this.initializedWaiter.resolve();
+    await this.initializedWaiter.promise;
     this.ensureCurrentPause();
 
     if (this.testName) {
