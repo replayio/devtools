@@ -2,6 +2,19 @@ function dispatch(codeMirror, eventName, data) {
   codeMirror.constructor.signal(codeMirror, eventName, data);
 }
 
+function safeJsonParse(text) {
+  let parsedJson;
+
+  try {
+    parsedJson = JSON.parse(text);
+  } catch (e) {
+    console.error("Error while parsing text", text, e);
+    throw Error(e);
+  }
+
+  return parsedJson;
+}
+
 function getLineNumberNode(target) {
   const isBreakpointMarkerNode = target.closest(".new-breakpoint");
 
@@ -41,7 +54,7 @@ export function onGutterMouseOver(codeMirror) {
     }
 
     const lineNumberNode = getLineNumberNode(target);
-    const lineNumber = JSON.parse(lineNumberNode.firstChild.textContent);
+    const lineNumber = safeJsonParse(lineNumberNode.firstChild.textContent);
 
     target.addEventListener(
       "mouseleave",
