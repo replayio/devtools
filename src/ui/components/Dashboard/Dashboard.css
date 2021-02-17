@@ -19,6 +19,7 @@ main.dashboard {
 
 .dashboard-viewer .dashboard-viewer-content {
   overflow: hidden;
+  flex-grow: 1;
 }
 
 .dashboard-viewer .dashboard-viewer-content *:focus:not(:focus-visible) {
