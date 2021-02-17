@@ -265,8 +265,8 @@ class Timeline extends Component<PropsFromRedux> {
               : this.renderEvents()}
             {this.renderPreviewMarkers()}
             <ScrollContainer />
+            <Comments />
           </div>
-          <Comments />
           <Tooltip timelineWidth={this.overlayWidth} />
         </div>
       </div>

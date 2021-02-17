@@ -2,6 +2,8 @@
   overflow-y: auto;
   scrollbar-width: none;
   height: 100%;
+  position: relative;
+  z-index: 2;
 }
 
 .timeline .scroll-content {
