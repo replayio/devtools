@@ -1,5 +1,6 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
+import { query } from "ui/utils/apolloClient";
 import { Comment } from "ui/state/comments";
 
 const UPDATE_COMMENT_CONTENT = gql`
@@ -142,4 +143,25 @@ export function useDeleteCommentReplies(callback: Function) {
   }
 
   return deleteCommentReplies;
+}
+
+export async function getFirstComent(recordingId: string) {
+  const firstCommentResult = await query({
+    query: gql`
+      query GetFirstCommentTime($recordingId: uuid) {
+        comments(
+          where: { recording_id: { _eq: $recordingId }, _and: { parent_id: { _is_null: true } } }
+          order_by: { time: asc }
+          limit: 1
+        ) {
+          time
+          point
+          has_frames
+        }
+      }
+    `,
+    variables: { recordingId },
+  });
+
+  return firstCommentResult?.data?.comments?.[0];
 }
