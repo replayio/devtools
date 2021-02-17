@@ -171,6 +171,10 @@
 }
 
 .transcript-list .comment-actions {
+  display: none;
+}
+
+.transcript-list .comment-body-item:hover .comment-actions {
   display: flex;
   flex-direction: row;
 }
