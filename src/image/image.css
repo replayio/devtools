@@ -438,6 +438,12 @@ button.jump-definition {
 .img.plus-circle {
   -webkit-mask-image: url(~devtools/client/themes/images/plus-circle.svg);
 }
+.img.filter-circle-fill {
+  -webkit-mask-image: url(~devtools/client/themes/images/filter-circle-fill.svg);
+}
+.img.filter-circle-outline {
+  -webkit-mask-image: url(~devtools/client/themes/images/filter-circle-outline.svg);
+}
 .img.paper-airplane {
   -webkit-mask-image: url(~devtools/client/themes/images/paper-airplane.svg);
 }

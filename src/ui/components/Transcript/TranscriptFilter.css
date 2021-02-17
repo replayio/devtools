@@ -1,0 +1,6 @@
+button.transcript-filter .img {
+  width: 20px;
+  height: 20px;
+  background: var(--primary-accent);
+  cursor: pointer;
+}

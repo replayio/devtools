@@ -5,6 +5,7 @@ export interface CommentsState {
   commentPointer: boolean;
   hoveredComment: any;
   activeComment: any;
+  shouldShowLoneEvents: boolean;
 }
 
 interface SourceLocation {

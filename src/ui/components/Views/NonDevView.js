@@ -41,14 +41,6 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
       </div>
     </div>
   );
-  const rightSidebar = (
-    <div className="right-sidebar">
-      <div className="right-sidebar-toolbar">
-        <div className="right-sidebar-toolbar-item">Transcript and Comments</div>
-      </div>
-      <Transcript />
-    </div>
-  );
 
   const handleMove = num => {
     updateTimelineDimensions();
@@ -67,7 +59,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
           maxSize="80%"
           vert={false}
           startPanel={<Video />}
-          endPanel={rightSidebar}
+          endPanel={<Transcript />}
           endPanelControl={false}
         />
         <div id="timeline-container">
@@ -86,7 +78,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
       onMove={handleMove}
       maxSize="80%"
       vert={true}
-      startPanel={rightSidebar}
+      startPanel={<Transcript />}
       endPanel={viewer}
       endPanelControl={false}
     />
