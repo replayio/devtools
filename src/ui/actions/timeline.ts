@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId, RecordingId, ScreenShot } from "@recordreplay/protocol";
+import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
 import { client, log } from "protocol/socket";
 import {
@@ -10,15 +10,13 @@ import {
   nextPaintEvent,
   paintGraphicsAtTime,
   previousPaintEvent,
-  paintPointsWaiter,
-  gPaintPoints,
+  getFirstMeaningfulPaint,
 } from "protocol/graphics";
 import { selectors } from "ui/reducers";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredPoint } from "ui/state/timeline";
-import { gql } from "@apollo/client";
 import { getFirstComent } from "ui/hooks/comments";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
@@ -36,20 +34,6 @@ export type TimelineActions =
   | SetZoomRegionAction
   | SetHoveredPoint;
 
-const GET_FIRST_COMMENT_POINT = gql`
-  query GetFirstCommentTime($recordingId: uuid) {
-    comments(
-      where: { recording_id: { _eq: $recordingId }, _and: { parent_id: { _is_null: true } } }
-      order_by: { time: asc }
-      limit: 1
-    ) {
-      time
-      point
-      has_frames
-    }
-  }
-`;
-
 export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   const { dispatch, getState } = store;
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
@@ -60,49 +44,35 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
 
   await ThreadFront.waitForSession();
   const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
-  const { point, time } = endpoint;
   if ("lastScreen" in description && description.lastScreen) {
-    addLastScreen(description.lastScreen, point, time);
+    addLastScreen(description.lastScreen, endpoint.point, endpoint.time);
   }
 
   const zoomRegion = selectors.getZoomRegion(getState());
-  const newZoomRegion = { ...zoomRegion, endTime: time };
+  const newZoomRegion = { ...zoomRegion, endTime: endpoint.time };
   dispatch(
-    setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
+    setTimelineState({
+      currentTime: endpoint.time,
+      recordingDuration: endpoint.time,
+      zoomRegion: newZoomRegion,
+    })
   );
+
+  let preferredPoint: TimeStampedPoint | HoveredPoint = endpoint;
 
   const firstComment = await getFirstComent(recordingId);
   if (firstComment) {
-    const { point, time, has_frames } = firstComment;
-    ThreadFront.timeWarp(point, time, has_frames);
-    return;
+    preferredPoint = firstComment;
   }
 
-  await paintPointsWaiter;
-  for (const paintPoint of gPaintPoints.slice(0, 10)) {
-    const { point, time } = paintPoint;
-    const { screen } = await getGraphicsAtTime(time, false);
-    if (screen) {
-      const { width, height } = await getScreenshotDimensions(screen);
-      if (screen.data.length > (width * height) / 40) {
-        ThreadFront.timeWarp(point, time);
-        ThreadFront.initializedWaiter.resolve();
-        return;
-      }
-    }
+  if (!firstComment) {
+    const firstMeaningfulPaint = await getFirstMeaningfulPaint(10);
+    preferredPoint = preferredPoint || firstMeaningfulPaint;
   }
 
-  ThreadFront.timeWarp(point, time, /* hasFrames */ false, /* force */ true);
+  const { point, time, hasFrames } = preferredPoint;
+  ThreadFront.timeWarp(point, time, /* hasFrames */ hasFrames, /* force */ true);
   ThreadFront.initializedWaiter.resolve();
-}
-
-async function getScreenshotDimensions(screen: ScreenShot) {
-  const img = new Image();
-  await new Promise(resolve => {
-    img.onload = resolve;
-    img.src = `data:${screen.mimeType};base64,${screen.data}`;
-  });
-  return { width: img.width, height: img.height };
 }
 
 function onWarp(store: UIStore) {
