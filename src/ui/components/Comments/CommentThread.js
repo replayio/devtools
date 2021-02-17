@@ -21,10 +21,11 @@ function CommentThread({
   setHoveredComment,
   setActiveComment,
   clearPendingComment,
+  setPendingComment,
   activeComment,
 }) {
-  const commentEl = useRef(null);
   const { isAuthenticated } = useAuth0();
+  const commentEl = useRef(null);
   const seekToComment = e => {
     const { point, time, has_frames } = comment;
     e.stopPropagation();
@@ -41,7 +42,8 @@ function CommentThread({
   }, [currentTime, pendingComment]);
 
   const isPending = comment.content == "";
-  const isSelected = activeComment === comment || isPending;
+  const isEditing = pendingComment && pendingComment.id;
+  const isSelected = (activeComment === comment && !isEditing) || isPending;
 
   return (
     <div
@@ -60,13 +62,20 @@ function CommentThread({
         >
           <div className="comment-body">
             {!isPending && (
-              <CommentBodyItem comment={comment} hoveredComment={hoveredComment} isRoot />
+              <Comment {...{ comment, hoveredComment, pendingComment, setPendingComment }} isRoot />
             )}
             {comment.replies?.map((reply, i) => (
-              <CommentBodyItem comment={reply} key={i} />
+              <Comment
+                comment={reply}
+                key={i}
+                pendingComment={pendingComment}
+                placeholder={reply.content}
+                setPendingComment={setPendingComment}
+              />
             ))}
-
-            {isSelected && isAuthenticated && <CommentEditor comment={comment} />}
+            {isAuthenticated && isSelected && (
+              <CommentEditor comment={comment} placeholder={"Type a comment ..."} />
+            )}
           </div>
         </div>
       }
@@ -74,9 +83,13 @@ function CommentThread({
   );
 }
 
-function CommentBodyItem({ comment, isRoot, hoveredComment }) {
+function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingComment }) {
   const lines = comment.content.split("\n");
-  const rel = moment(comment.created_at).fromNow();
+  const isBeingEdited = comment === pendingComment && comment.content !== "";
+
+  if (isBeingEdited) {
+    return <CommentEditor comment={comment} placeholder={comment.content} editing />;
+  }
 
   return (
     <div className="comment-body-item">
@@ -85,7 +98,7 @@ function CommentBodyItem({ comment, isRoot, hoveredComment }) {
         <div className="comment-body-header-label">
           <div className="comment-body-header-label-name">{comment.user.name}</div>
         </div>
-        {isRoot && <Actions {...{ comment, hoveredComment }} />}
+        <Actions {...{ comment, hoveredComment, setPendingComment, isRoot }} />
       </div>
       <div className="item-content">
         {lines.map((line, i) => (
@@ -96,27 +109,32 @@ function CommentBodyItem({ comment, isRoot, hoveredComment }) {
   );
 }
 
-function Actions({ comment, hoveredComment }) {
+function Actions({ comment, hoveredComment, setPendingComment, isRoot }) {
   const { user } = useAuth0();
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
   const [expanded, setExpanded] = useState(false);
 
   const isHovered = hoveredComment == comment.id;
-  const isThreadAuthor = user?.sub === comment.user.auth_id;
+  const isCommentAuthor = user?.sub === comment.user.auth_id;
 
-  const deleteThread = e => {
-    e.stopPropagation();
-    deleteComment({ variables: { commentId: comment.id } });
-    deleteCommentReplies({ variables: { parentId: comment.id } });
-  };
-
-  if (!isHovered || !isThreadAuthor) {
+  if (!isCommentAuthor) {
     return null;
   }
 
+  const handleDelete = () => {
+    deleteComment({ variables: { commentId: comment.id } });
+
+    if (isRoot) {
+      deleteCommentReplies({ variables: { parentId: comment.id } });
+    }
+  };
+  const editComment = () => {
+    setPendingComment(comment);
+  };
+
   return (
-    <div className="comment-actions">
+    <div className="comment-actions" onClick={e => e.stopPropagation()}>
       <PortalDropdown
         buttonContent={<div className="dropdown-button">⋮</div>}
         setExpanded={setExpanded}
@@ -124,8 +142,11 @@ function Actions({ comment, hoveredComment }) {
         buttonStyle=""
         position="bottom-right"
       >
-        <div className="comments-dropdown-item" title="Delete Comment" onClick={deleteThread}>
-          Delete Comment
+        <div className="comments-dropdown-item" title="Delete Comment" onClick={editComment}>
+          Edit comment
+        </div>
+        <div className="comments-dropdown-item" title="Delete Comment" onClick={handleDelete}>
+          {isRoot ? "Delete comment and replies" : "Delete comment"}
         </div>
       </PortalDropdown>
     </div>
@@ -144,5 +165,6 @@ export default connect(
     setHoveredComment: actions.setHoveredComment,
     setActiveComment: actions.setActiveComment,
     clearPendingComment: actions.clearPendingComment,
+    setPendingComment: actions.setPendingComment,
   }
 )(CommentThread);

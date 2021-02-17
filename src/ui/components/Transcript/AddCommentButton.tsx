@@ -6,6 +6,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import hooks from "ui/hooks";
 import { UIState } from "ui/state";
 import { assert } from "protocol/utils";
 
@@ -22,6 +23,8 @@ function AddCommentButton({
 }: PropsFromRedux) {
   assert(recordingId);
   const { isAuthenticated } = useAuth0();
+  const { comments } = hooks.useGetComments(recordingId!);
+  const isDisabled = !!comments.find(comment => comment.time === currentTime);
 
   const onClick = () => {
     if (!isAuthenticated) {
@@ -45,7 +48,11 @@ function AddCommentButton({
   };
 
   return (
-    <button className={classnames("add-comment", { disabled: pendingComment })} onClick={onClick}>
+    <button
+      className={classnames("add-comment", { disabled: isDisabled })}
+      disabled={isDisabled}
+      onClick={onClick}
+    >
       <span>Add a Comment</span>
     </button>
   );

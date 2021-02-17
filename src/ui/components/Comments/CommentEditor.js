@@ -8,6 +8,27 @@ import { actions } from "ui/actions";
 import CommentTool from "ui/components/shared/CommentTool";
 import "draft-js/dist/Draft.css";
 
+const moveSelectionToEnd = (editorState, DraftJS) => {
+  const { EditorState, SelectionState } = DraftJS;
+  const content = editorState.getCurrentContent();
+  const blockMap = content.getBlockMap();
+
+  const key = blockMap.last().getKey();
+  const length = blockMap.last().getLength();
+
+  // On Chrome and Safari, calling focus on contenteditable focuses the
+  // cursor at the first character. This is something you don't expect when
+  // you're clicking on an input element but not directly on a character.
+  // Put the cursor back where it was before the blur.
+  const selection = new SelectionState({
+    anchorKey: key,
+    anchorOffset: length,
+    focusKey: key,
+    focusOffset: length,
+  });
+  return EditorState.forceSelection(editorState, selection);
+};
+
 function DraftJSEditorLoader({
   editorState,
   setEditorState,
@@ -15,10 +36,13 @@ function DraftJSEditorLoader({
   setDraftJS,
   handleSave,
   handleCancel,
+  placeholder,
+  initialContent,
 }) {
   useEffect(function importDraftJS() {
     import("draft-js").then(DraftJS => {
-      setEditorState(DraftJS.EditorState.createEmpty());
+      const { EditorState, ContentState } = DraftJS;
+      setEditorState(EditorState.createWithContent(ContentState.createFromText(initialContent)));
       setDraftJS(DraftJS);
     });
   }, []);
@@ -27,10 +51,21 @@ function DraftJSEditorLoader({
     return null;
   }
 
-  return <DraftJSEditor {...{ editorState, setEditorState, DraftJS, handleSave, handleCancel }} />;
+  return (
+    <DraftJSEditor
+      {...{ editorState, setEditorState, DraftJS, handleSave, handleCancel, placeholder }}
+    />
+  );
 }
 
-function DraftJSEditor({ editorState, setEditorState, DraftJS, handleSave, handleCancel }) {
+function DraftJSEditor({
+  editorState,
+  setEditorState,
+  DraftJS,
+  handleSave,
+  handleCancel,
+  placeholder,
+}) {
   const editorNode = useRef(null);
   const wrapperNode = useRef(null);
   const { Editor, getDefaultKeyBinding, KeyBindingUtil } = DraftJS;
@@ -40,6 +75,9 @@ function DraftJSEditor({ editorState, setEditorState, DraftJS, handleSave, handl
     // wrapper into view. Otherwise, the scrolling animation is interrupted by the focus.
     editorNode.current.focus();
     wrapperNode.current.scrollIntoView({ block: "center", behavior: "smooth" });
+    // Move the cursor so that it's at the end of the selection instead of the beginning.
+    // Which DraftJS doesn't make easy: https://github.com/brijeshb42/medium-draft/issues/71
+    setEditorState(moveSelectionToEnd(editorState, DraftJS));
   }, []);
 
   const keyBindingFn = e => {
@@ -71,7 +109,7 @@ function DraftJSEditor({ editorState, setEditorState, DraftJS, handleSave, handl
         onChange={setEditorState}
         handleKeyCommand={handleKeyCommand}
         keyBindingFn={keyBindingFn}
-        placeholder={"Type a comment ..."}
+        placeholder={placeholder}
         ref={editorNode}
       />
     </div>
@@ -86,16 +124,20 @@ function CommentEditor({
   recordingId,
   canvas,
   currentTime,
+  editing,
+  placeholder,
 }) {
   const { user } = useAuth0();
   const [editorState, setEditorState] = useState(null);
   const [DraftJS, setDraftJS] = useState();
   const addComment = hooks.useAddComment(clearPendingComment);
-
-  const isNewComment = comment.content === "";
+  const updateComment = hooks.useUpdateComment(clearPendingComment);
+  const isNewComment = comment.content == "";
 
   const handleSave = () => {
-    if (isNewComment) {
+    if (editing) {
+      handleExistingSave();
+    } else if (isNewComment) {
       handleNewSave();
     } else {
       handleReplySave();
@@ -154,13 +196,29 @@ function CommentEditor({
       variables: { object: newComment },
     });
   };
+  const handleExistingSave = async () => {
+    const inputValue = editorState.getCurrentContent().getPlainText();
+
+    updateComment({
+      variables: { newContent: inputValue, commentId: comment.id, position: comment.position },
+    });
+  };
 
   return (
     <div className="comment-input-container" onClick={e => e.stopPropagation()}>
       <img src={user.picture} className="comment-picture" />
       <div className="comment-input">
         <DraftJSEditorLoader
-          {...{ editorState, setEditorState, DraftJS, setDraftJS, handleSave, handleCancel }}
+          {...{
+            editorState,
+            setEditorState,
+            DraftJS,
+            setDraftJS,
+            handleSave,
+            handleCancel,
+            placeholder,
+            initialContent: editing ? comment.content : "",
+          }}
         />
         <div className="comment-input-actions">
           <button className="action-cancel" onClick={handleCancel}>

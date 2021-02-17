@@ -19,9 +19,8 @@
 }
 
 .transcript-panel button.add-comment.disabled {
-  background: var(--grey-30);
-  border: 1px solid var(--grey-30);
-  color: var(--theme-body-color);
+  border: 1px solid var(--cool-gray-300);
+  color: var(--cool-gray-300);
   cursor: auto;
 }
 
