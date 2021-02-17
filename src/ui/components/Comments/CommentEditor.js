@@ -136,7 +136,6 @@ function CommentEditor({
 
   const handleSave = () => {
     if (editing) {
-      console.log("handleSave editing");
       handleExistingSave();
     } else if (isNewComment) {
       handleNewSave();
