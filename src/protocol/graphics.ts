@@ -408,3 +408,27 @@ export function installObserver() {
     setTimeout(installObserver, 100);
   }
 }
+
+async function getScreenshotDimensions(screen: ScreenShot) {
+  const img = new Image();
+  await new Promise(resolve => {
+    img.onload = resolve;
+    img.src = `data:${screen.mimeType};base64,${screen.data}`;
+  });
+  return { width: img.width, height: img.height };
+}
+
+export async function getFirstMeaningfulPaint(limit: number = 10) {
+  await paintPointsWaiter;
+  for (const paintPoint of gPaintPoints.slice(0, limit)) {
+    const { screen } = await getGraphicsAtTime(paintPoint.time, false);
+    if (!screen) {
+      continue;
+    }
+
+    const { width, height } = await getScreenshotDimensions(screen);
+    if (screen.data.length > (width * height) / 40) {
+      return paintPoint;
+    }
+  }
+}
