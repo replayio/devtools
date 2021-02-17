@@ -90,12 +90,14 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
       const { width, height } = await getScreenshotDimensions(screen);
       if (screen.data.length > (width * height) / 40) {
         ThreadFront.timeWarp(point, time);
+        ThreadFront.initializedWaiter.resolve();
         return;
       }
     }
   }
 
   ThreadFront.timeWarp(point, time, /* hasFrames */ false, /* force */ true);
+  ThreadFront.initializedWaiter.resolve();
 }
 
 async function getScreenshotDimensions(screen: ScreenShot) {
