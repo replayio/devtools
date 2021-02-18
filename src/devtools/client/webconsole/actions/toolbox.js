@@ -5,7 +5,7 @@
 "use strict";
 
 import { ThreadFront } from "protocol/thread";
-import { setTimelineState, setHoveredPoint } from "ui/actions/timeline";
+import { setHoveredPoint } from "ui/actions/timeline";
 
 export function highlightDomElement(grip) {
   return async ({ toolbox }) => {
@@ -58,11 +58,9 @@ export function onMessageHover(type, message) {
         time: message.executionPointTime,
         location: message.frame,
       };
-      dispatch(setTimelineState({ hoveredMessageId: message.id }));
       dispatch(setHoveredPoint(hoveredPoint));
     }
     if (type == "mouseleave") {
-      dispatch(setTimelineState({ hoveredMessageId: null }));
       dispatch(setHoveredPoint(null));
     }
   };

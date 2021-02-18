@@ -43,7 +43,7 @@ function getIsSecondaryHighlighted(
   hoveredPoint: HoveredPoint | null,
   location: Location | undefined
 ) {
-  if (!location || !hoveredPoint?.location) {
+  if (hoveredPoint?.target == "console" || !location || !hoveredPoint?.location) {
     return false;
   }
 
