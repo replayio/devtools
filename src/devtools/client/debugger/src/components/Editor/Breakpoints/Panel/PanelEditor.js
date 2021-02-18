@@ -84,7 +84,7 @@ class PanelEditor extends PureComponent {
     return (
       <form>
         <div className={classnames("form-row", { invalid: syntaxErrors.logValue })}>
-          <label htmlFor="logpoint">{`Log message`}</label>
+          <label htmlFor="logpoint">Log</label>
           <PanelInput
             id="logpoint"
             autofocus={inputToFocus == "logValue"}
