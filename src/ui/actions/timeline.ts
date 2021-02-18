@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId, RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
+import { ExecutionPoint, PauseId, RecordingId } from "@recordreplay/protocol";
 import { Pause, ThreadFront } from "protocol/thread";
 import { client, log } from "protocol/socket";
 import {
@@ -17,7 +17,8 @@ import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredPoint } from "ui/state/timeline";
-import { getFirstComent } from "ui/hooks/comments";
+import { getFirstComment } from "ui/hooks/comments";
+import { getTest } from "ui/utils/environment";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -44,34 +45,32 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
 
   await ThreadFront.waitForSession();
   const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
+  let { point, time } = endpoint;
   if ("lastScreen" in description && description.lastScreen) {
-    addLastScreen(description.lastScreen, endpoint.point, endpoint.time);
+    addLastScreen(description.lastScreen, point, time);
   }
 
   const zoomRegion = selectors.getZoomRegion(getState());
-  const newZoomRegion = { ...zoomRegion, endTime: endpoint.time };
+  const newZoomRegion = { ...zoomRegion, endTime: time };
   dispatch(
-    setTimelineState({
-      currentTime: endpoint.time,
-      recordingDuration: endpoint.time,
-      zoomRegion: newZoomRegion,
-    })
+    setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
   );
 
-  let preferredPoint: TimeStampedPoint | HoveredPoint = endpoint;
-
-  const firstComment = await getFirstComent(recordingId);
-  if (firstComment) {
-    preferredPoint = firstComment;
+  let hasFrames = false;
+  if (!getTest()) {
+    const firstComment = await getFirstComment(recordingId);
+    if (firstComment) {
+      ({ point, time } = firstComment);
+      hasFrames = firstComment.has_frames;
+    } else {
+      const firstMeaningfulPaint = await getFirstMeaningfulPaint(10);
+      if (firstMeaningfulPaint) {
+        ({ point, time } = firstMeaningfulPaint);
+      }
+    }
   }
 
-  if (!firstComment) {
-    const firstMeaningfulPaint = await getFirstMeaningfulPaint(10);
-    preferredPoint = preferredPoint || firstMeaningfulPaint;
-  }
-
-  const { point, time, hasFrames } = preferredPoint;
-  ThreadFront.timeWarp(point, time, /* hasFrames */ hasFrames, /* force */ true);
+  ThreadFront.timeWarp(point, time, hasFrames, /* force */ true);
   ThreadFront.initializedWaiter.resolve();
 }
 
