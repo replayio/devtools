@@ -11,10 +11,10 @@ import { Location, PauseId } from "@recordreplay/protocol";
 // the timeline utilities, and the timeline styling.
 export function Circle() {
   return (
-    <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle className="fill" cx="5.5" cy="5.5" r="5.5" fill="black" />
-      {/* <circle cx="5.5" cy="5.5" r="4.5" stroke="black" strokeWidth="2" /> */}
-      <circle className="stroke" cx="5.5" cy="5.5" r="5" stroke="black" strokeWidth="0" />
+    <svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle className="fill" cx="4.5" cy="4.5" r="4.5" fill="black" />
+      {/* <circle cx="4.5" cy="4.5" r="4.5" stroke="black" strokeWidth="2" /> */}
+      <circle className="stroke" cx="4.5" cy="4.5" r="5" stroke="black" strokeWidth="0" />
     </svg>
   );
 }
