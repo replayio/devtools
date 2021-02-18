@@ -2,14 +2,10 @@ import { ApolloClient, InMemoryCache, NormalizedCacheObject } from "@apollo/clie
 import { HttpLink } from "apollo-link-http";
 import { DocumentNode } from "graphql";
 import { assert } from "protocol/utils";
-import { getTest } from "ui/utils/environment";
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | null = null;
 
 export function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
-  if (!getTest()) {
-    return null;
-  }
   assert(apolloClient);
   return apolloClient.query({ variables, query });
 }

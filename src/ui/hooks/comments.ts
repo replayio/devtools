@@ -145,7 +145,9 @@ export function useDeleteCommentReplies(callback: Function) {
   return deleteCommentReplies;
 }
 
-export async function getFirstComent(recordingId: string) {
+export async function getFirstComment(
+  recordingId: string
+): Promise<{ time: number; point: string; has_frames: boolean } | undefined> {
   const firstCommentResult = await query({
     query: gql`
       query GetFirstCommentTime($recordingId: uuid) {
