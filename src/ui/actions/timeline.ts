@@ -10,6 +10,8 @@ import {
   nextPaintEvent,
   previousPaintEvent,
   getFirstMeaningfulPaint,
+  precacheScreenshots,
+  snapTimeForPlayback,
 } from "protocol/graphics";
 import { selectors } from "ui/reducers";
 import { UIStore, UIThunkAction } from ".";
@@ -30,13 +32,17 @@ export type SetZoomRegionAction = Action<"set_zoom"> & { region: ZoomRegion };
 export type SetHoveredItemAction = Action<"set_hovered_item"> & {
   hoveredItem: HoveredItem | null;
 };
+export type SetPlaybackPrecachedTimeAction = Action<"set_playback_precached_time"> & {
+  time: number;
+};
 
 export type TimelineActions =
   | SetTimelineStateAction
   | SetPlaybackStalledAction
   | UpdateTooltipAction
   | SetZoomRegionAction
-  | SetHoveredItemAction;
+  | SetHoveredItemAction
+  | SetPlaybackPrecachedTimeAction;
 
 export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   const { dispatch, getState } = store;
@@ -128,6 +134,8 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
         dispatch(setTimelineState({ screenShot: screen, mouse }));
         paintGraphics(screen, mouse);
       }
+
+      dispatch(precacheScreenshots(time));
     } catch (e) {}
   };
 }
@@ -319,12 +327,13 @@ function playback(startTime: number, endTime: number): UIThunkAction {
     let startDate = Date.now();
     let currentDate = startDate;
     let currentTime = startTime;
-    let nextGraphicsTime = nextPaintOrMouseEvent(currentTime)?.time || endTime;
-    let nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
+    let nextGraphicsTime!: number;
+    let nextGraphicsPromise!: ReturnType<typeof getGraphicsAtTime>;
 
     const prepareNextGraphics = () => {
-      nextGraphicsTime = nextPaintOrMouseEvent(currentTime)?.time || endTime;
+      nextGraphicsTime = snapTimeForPlayback(nextPaintOrMouseEvent(currentTime)?.time || endTime);
       nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
+      dispatch(precacheScreenshots(nextGraphicsTime));
     };
     const shouldContinuePlayback = () => selectors.getPlayback(getState());
     prepareNextGraphics();
@@ -337,8 +346,6 @@ function playback(startTime: number, endTime: number): UIThunkAction {
 
       currentDate = Date.now();
       currentTime = startTime + (currentDate - startDate);
-      // Snap currentTime to 50ms intervals, snapping up.
-      currentTime += 50 - (currentTime % 50);
 
       if (currentTime > endTime) {
         log(`FinishPlayback`);
@@ -454,4 +461,8 @@ export function clearHoveredItem(): UIThunkAction {
     dispatch({ type: "set_hovered_item", hoveredItem: null });
     dispatch(setTimelineToTime(null));
   };
+}
+
+export function setPlaybackPrecachedTime(time: number): SetPlaybackPrecachedTimeAction {
+  return { type: "set_playback_precached_time", time };
 }

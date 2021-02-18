@@ -12,8 +12,9 @@ import {
   findPaintsResult,
 } from "@recordreplay/protocol";
 import { client } from "./socket";
-import { actions, UIStore } from "ui/actions";
+import { actions, UIStore, UIThunkAction } from "ui/actions";
 import { Canvas } from "ui/state/app";
+import { selectors } from "ui/reducers";
 
 export const screenshotCache = new ScreenshotCache();
 
@@ -225,14 +226,6 @@ export async function getGraphicsAtTime(
     ? screenshotCache.getScreenshotForPlayback(point, paintHash)
     : screenshotCache.getScreenshotForPreview(point, paintHash);
 
-  if (forPlayback) {
-    // Start loading graphics at nearby points.
-    for (let i = paintIndex; i < paintIndex + 5 && i < gPaintPoints.length; i++) {
-      const { point, paintHash } = gPaintPoints[i];
-      screenshotCache.getScreenshotForPlayback(point, paintHash);
-    }
-  }
-
   const screen = await screenPromise;
 
   let mouse: MouseAndClickPosition | undefined;
@@ -422,4 +415,67 @@ export async function getFirstMeaningfulPaint(limit: number = 10) {
       return paintPoint;
     }
   }
+}
+
+// precache this many milliseconds
+const precacheTime = 5000;
+// startTime of the currently running precacheScreenshots() call
+let precacheStartTime = -1;
+
+export function precacheScreenshots(startTime: number): UIThunkAction {
+  return async ({ dispatch, getState }) => {
+    await paintPointsWaiter;
+
+    const recordingDuration = selectors.getRecordingDuration(getState());
+    if (!recordingDuration) {
+      return;
+    }
+
+    startTime = snapTimeForPlayback(startTime);
+    if (startTime === precacheStartTime) {
+      return;
+    }
+    if (startTime < precacheStartTime) {
+      dispatch(actions.setPlaybackPrecachedTime(startTime));
+    }
+    precacheStartTime = startTime;
+
+    const endTime = Math.min(startTime + precacheTime, recordingDuration);
+    for (let time = startTime; time < endTime; time += snapInterval) {
+      const index = mostRecentIndex(gPaintPoints, time);
+      if (index === undefined) {
+        return;
+      }
+
+      const paintHash = gPaintPoints[index].paintHash;
+      if (!screenshotCache.hasScreenshot(paintHash)) {
+        const graphicsPromise = getGraphicsAtTime(time, true);
+
+        const precachedTime = Math.max(time - snapInterval, startTime);
+        if (precachedTime > selectors.getPlaybackPrecachedTime(getState())) {
+          dispatch(actions.setPlaybackPrecachedTime(precachedTime));
+        }
+
+        await graphicsPromise;
+
+        if (precacheStartTime !== startTime) {
+          return;
+        }
+      }
+    }
+
+    let precachedTime = endTime;
+    if (mostRecentIndex(gPaintPoints, precachedTime) === gPaintPoints.length - 1) {
+      precachedTime = recordingDuration;
+    }
+    if (precachedTime > selectors.getPlaybackPrecachedTime(getState())) {
+      dispatch(actions.setPlaybackPrecachedTime(precachedTime));
+    }
+  };
+}
+
+// Snap time to 50ms intervals, snapping up.
+const snapInterval = 50;
+export function snapTimeForPlayback(time: number) {
+  return time + snapInterval - (time % snapInterval);
 }

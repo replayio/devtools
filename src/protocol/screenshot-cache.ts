@@ -25,6 +25,8 @@ export interface QueuedScreenshotDownload {
 export class ScreenshotCache {
   // Map paint hashes to a promise that resolves with the associated screenshot.
   private cache = new Map<string, Promise<ScreenShot>>();
+  // The set of paint hashes whose cache entry is resolved
+  private cacheResolved = new Set<string>();
 
   private queuedDownloadForPreview: QueuedScreenshotDownload | undefined;
   private runningDownloadForPreview = false;
@@ -75,7 +77,12 @@ export class ScreenshotCache {
     const promise = this.download(point);
 
     this.cache.set(paintHash, promise);
+    promise.then(() => this.cacheResolved.add(paintHash));
     return promise;
+  }
+
+  hasScreenshot(paintHash: string) {
+    return this.cacheResolved.has(paintHash);
   }
 
   private async startQueuedDownloadIfPossible() {
@@ -86,6 +93,7 @@ export class ScreenshotCache {
 
   addScreenshot(screenshot: ScreenShot) {
     this.cache.set(screenshot.hash, Promise.resolve(screenshot));
+    this.cacheResolved.add(screenshot.hash);
   }
 
   private async downloadQueued() {
@@ -101,6 +109,7 @@ export class ScreenshotCache {
     try {
       const screen = await this.download(point);
       resolve(screen);
+      this.cacheResolved.add(paintHash);
     } catch (e) {
       reject(e);
     }

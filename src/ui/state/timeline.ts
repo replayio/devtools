@@ -19,6 +19,7 @@ export interface TimelineState {
     time: number;
     stalled?: boolean;
   } | null;
+  playbackPrecachedTime: number;
   screenShot: ScreenShot | null;
   mouse: MouseAndClickPosition | null | undefined;
   recordingDuration: number | null;
