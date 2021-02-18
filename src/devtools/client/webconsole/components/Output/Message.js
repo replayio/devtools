@@ -56,7 +56,6 @@ class Message extends Component {
       maybeScrollToBottom: PropTypes.func,
       message: PropTypes.object.isRequired,
       isPrimaryHighlighted: PropTypes.bool,
-      isSecondaryHighlighted: PropTypes.bool,
       shouldScrollIntoView: PropTypes.bool,
     };
   }
@@ -96,12 +95,8 @@ class Message extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const highlightChanged =
-      this.props.isPrimaryHighlighted !== nextProps.isPrimaryHighlighted ||
-      this.props.isSecondaryHighlighted !== nextProps.isSecondaryHighlighted;
-
     return (
-      highlightChanged ||
+      this.props.isPrimaryHighlighted !== nextProps.isPrimaryHighlighted ||
       this.props.pausedExecutionPoint !== nextProps.pausedExecutionPoint ||
       this.props.isPaused !== nextProps.isPaused
     );
@@ -299,7 +294,6 @@ class Message extends Component {
       messageId,
       notes,
       isPrimaryHighlighted,
-      isSecondaryHighlighted,
     } = this.props;
 
     topLevelClasses.push("message", source, type, level);
@@ -313,8 +307,6 @@ class Message extends Component {
 
     if (isPrimaryHighlighted) {
       topLevelClasses.push("primary-highlight");
-    } else if (isSecondaryHighlighted) {
-      topLevelClasses.push("secondary-highlight");
     }
 
     const timestampEl = this.renderTimestamp();

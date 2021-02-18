@@ -150,10 +150,6 @@
   background: var(--new-blue-900);
 }
 
-.webconsole-app .message.secondary-highlight .icon.logpoint {
-  background: var(--replaying-marker-fill);
-}
-
 .webconsole-app .message.error {
   z-index: 2;
   color: var(--console-error-color);
@@ -282,7 +278,8 @@
 
 .webconsole-app .message.paused:not(.paused-before) > .message-body-wrapper {
   border-top-width: 2px;
-  margin: calc(var(--console-output-vertical-padding) - 1px) 0 var(--console-output-vertical-padding);
+  margin: calc(var(--console-output-vertical-padding) - 1px) 0
+    var(--console-output-vertical-padding);
 }
 
 .webconsole-app .message-body-wrapper .table-widget-body {
@@ -984,16 +981,12 @@ a.learn-more-link.webconsole-learn-more-link {
   border-bottom-right-radius: var(--border-radius);
   --rewind-button-width: 28px;
   --message-left-padding: 4px;
-  --slide-in-duration: 200ms;
+  --slide-in-duration: 50ms;
   --border-radius: 8px;
   --rewind-left-padding: 5px;
   --rewind-info-button-width: 64px;
   --fast-forward-info-button-width: 92px;
   --debug-info-button-width: 60px;
-}
-
-.webconsole-output .overlay-container:not(.debug) > * {
-  transition-duration: var(--slide-in-duration);
 }
 
 .webconsole-output .overlay-container .button {

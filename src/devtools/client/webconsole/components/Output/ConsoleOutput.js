@@ -18,16 +18,6 @@ const {
 
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 
-function getIsSecondaryHighlighted(hoveredPoint, message) {
-  if (!message?.frame || !hoveredPoint?.location) {
-    return false;
-  }
-
-  const keyOne = getLocationKey(hoveredPoint.location);
-  const keyTwo = getLocationKey(message.frame);
-  return keyOne == keyTwo;
-}
-
 class ConsoleOutput extends Component {
   static get propTypes() {
     return {
@@ -142,7 +132,6 @@ class ConsoleOutput extends Component {
     const messageNodes = visibleMessages.map((messageId, i) => {
       const message = messages.get(messageId);
       const isPrimaryHighlighted = hoveredPoint?.point === message.executionPoint;
-      const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, message);
       const shouldScrollIntoView = isPrimaryHighlighted && hoveredPoint?.target !== "console";
 
       return createElement(MessageContainer, {
@@ -158,7 +147,6 @@ class ConsoleOutput extends Component {
         isPaused: closestMessage?.id == messageId,
         isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
         isPrimaryHighlighted,
-        isSecondaryHighlighted,
         shouldScrollIntoView,
       });
     });
