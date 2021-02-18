@@ -166,9 +166,7 @@ class _ThreadFront {
 
   async initializeToolbox() {
     const sessionId = await this.waitForSession();
-    // const { endpoint } = await client.Session.getEndpoint({}, sessionId);
 
-    // this.timeWarp(endpoint.point, endpoint.time, /* hasFrames */ false, /* force */ true);
     await this.initializedWaiter.promise;
     this.ensureCurrentPause();
 
