@@ -241,6 +241,7 @@ class Timeline extends Component<PropsFromRedux> {
       zoomRegion,
       currentTime,
       hoverTime,
+      precachedTime,
       hoveredLineNumberLocation,
       hoveredItem,
       viewMode,
@@ -249,6 +250,7 @@ class Timeline extends Component<PropsFromRedux> {
     } = this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
+    const precachedPercent = getVisiblePosition({ time: precachedTime, zoom: zoomRegion }) * 100;
     const shouldDim = hoveredLineNumberLocation || hoveredItem;
 
     return (
@@ -265,7 +267,7 @@ class Timeline extends Component<PropsFromRedux> {
             <div className="progress-line full" />
             <div
               className="progress-line preview"
-              style={{ width: `${clamp(hoverPercent, 0, 100)}%` }}
+              style={{ width: `${clamp(precachedPercent, 0, 100)}%` }}
             />
             <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
             {percent >= 0 && percent <= 100 ? (
@@ -295,6 +297,7 @@ const connector = connect(
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     hoverTime: selectors.getHoverTime(state),
+    precachedTime: selectors.getPlaybackPrecachedTime(state),
     playback: selectors.getPlayback(state),
     recordingDuration: selectors.getRecordingDuration(state),
     timelineDimensions: selectors.getTimelineDimensions(state),

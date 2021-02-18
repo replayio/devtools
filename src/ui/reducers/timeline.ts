@@ -8,6 +8,7 @@ function initialTimelineState(): TimelineState {
     currentTime: 0,
     hoverTime: null,
     playback: null,
+    playbackPrecachedTime: 0,
     unprocessedRegions: [],
     shouldAnimate: true,
     recordingDuration: null,
@@ -45,6 +46,10 @@ export default function update(
       return { ...state, hoveredItem: action.hoveredItem };
     }
 
+    case "set_playback_precached_time": {
+      return { ...state, playbackPrecachedTime: action.time };
+    }
+
     default: {
       return state;
     }
@@ -63,3 +68,4 @@ export const getMouse = (state: UIState) => state.timeline.mouse;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getTooltip = (state: UIState) => state.timeline.tooltip;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
+export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
