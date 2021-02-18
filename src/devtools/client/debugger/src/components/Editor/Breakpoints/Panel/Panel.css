@@ -114,7 +114,7 @@
 
 .breakpoint-panel form label {
   color: var(--theme-comment);
-  min-width: 75px;
+  min-width: 48px;
   margin-right: 8px;
   text-align: end;
 }
