@@ -679,13 +679,32 @@ function setNodeChildren(node, children) {
   return node;
 }
 
+function needsToLoad(item) {
+  const value = getValue(item);
+  return value.isObject() && !value._elements && value.hasPreviewOverflow();
+}
+
+function needsToLoadChildren(item) {
+  if (needsToLoad(item)) {
+    return true;
+  }
+  const children = getValue(item).getChildren();
+  return children.some(child => needsToLoad(child));
+}
+
 function getChildren(options) {
   const { item } = options;
 
   const children = getValue(item)
     .getChildren()
-    .map(({ name, contents }) => {
-      return { name, contents, path: `${item.path}/${name}` };
+    .map(child => {
+      const { name, contents } = child;
+      return {
+        name,
+        contents,
+        path: `${item.path}/${name}`,
+        childrenLoaded: !needsToLoadChildren(child),
+      };
     });
 
   return children;
@@ -813,6 +832,8 @@ module.exports = {
   createGetterNode,
   createSetterNode,
   getActor,
+  needsToLoad,
+  needsToLoadChildren,
   getChildren,
   getClosestGripNode,
   getClosestNonBucketNode,
