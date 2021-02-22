@@ -4,14 +4,11 @@
 
 //
 
-const { PureComponent } = require("react");
-const dom = require("react-dom-factories");
-
-const classnames = require("classnames");
+import React, { HTMLProps, PureComponent, ReactNode } from "react";
+import classnames from "classnames";
 const { MODE } = require("../../reps/constants");
-
 const Utils = require("../utils");
-
+import { Item } from "./ObjectInspector";
 const {
   nodeHasAccessors,
   nodeHasProperties,
@@ -30,11 +27,35 @@ const {
   nodeIsWindow,
   nodeIsLongString,
   nodeHasFullText,
-  nodeHasGetter,
-  getNonPrototypeParentGripValue,
 } = Utils.node;
 
-class ObjectInspectorItem extends PureComponent {
+interface ObjectInspectorItemProps {
+  item: Item;
+  depth: number;
+  focused: boolean;
+  expanded: boolean;
+  arrow: ReactNode;
+  mode: Symbol;
+  setExpanded: (item: Item, expand: boolean) => void;
+  dimTopLevelWindow?: boolean;
+  onDoubleClick?: (
+    item: Item,
+    opts: { depth: number; focused: boolean; expanded: boolean }
+  ) => void;
+  onContextMenu: (e: React.MouseEvent, item: Item) => void;
+  onLabelClick?: (
+    item: Item,
+    opts: {
+      depth: number;
+      focused: boolean;
+      expanded: boolean;
+      setExpanded: (item: Item, expand: boolean) => void;
+    }
+  ) => void;
+  renderItemActions: (item: Item) => ReactNode;
+}
+
+class ObjectInspectorItem extends PureComponent<ObjectInspectorItemProps> {
   static get defaultProps() {
     return {
       onContextMenu: () => {},
@@ -52,30 +73,28 @@ class ObjectInspectorItem extends PureComponent {
     if (nodeIsOptimizedOut(item)) {
       // See getChildren() in protocol/thread.js
       const value =
-        label == "Loading…"
-          ? undefined
-          : dom.span({ className: "unavailable" }, "(optimized away)");
+        label == "Loading…" ? undefined : <span className="unavailable">(optimized away)</span>;
       return { label, value };
     }
 
     if (nodeIsUninitializedBinding(item)) {
       return {
         label,
-        value: dom.span({ className: "unavailable" }, "(uninitialized)"),
+        value: <span className="unavailable">(uninitialized)</span>,
       };
     }
 
     if (nodeIsUnmappedBinding(item)) {
       return {
         label,
-        value: dom.span({ className: "unavailable" }, "(unmapped)"),
+        value: <span className="unavailable">(unmapped)</span>,
       };
     }
 
     if (nodeIsUnscopedBinding(item)) {
       return {
         label,
-        value: dom.span({ className: "unavailable" }, "(unscoped)"),
+        value: <span className="unavailable">(unscoped)</span>,
       };
     }
 
@@ -100,7 +119,7 @@ class ObjectInspectorItem extends PureComponent {
       nodeIsLongString(item) ||
       isPrimitive
     ) {
-      const repProps = { ...this.props };
+      const repProps: any = { ...this.props };
       if (depth > 0) {
         repProps.mode = mode === MODE.LONG ? MODE.SHORT : MODE.TINY;
       }
@@ -145,7 +164,7 @@ class ObjectInspectorItem extends PureComponent {
       onContextMenu,
     } = this.props;
 
-    const parentElementProps = {
+    const parentElementProps: HTMLProps<HTMLDivElement> = {
       key: item.path,
       className: classnames("node object-node", {
         focused,
@@ -165,10 +184,11 @@ class ObjectInspectorItem extends PureComponent {
         // user clicked on the arrow itself. Indeed because the arrow is an
         // image, clicking on it does not remove any existing text selection.
         // So we need to also check if the arrow was clicked.
+        const target = e.target as Element;
         if (
-          e.target &&
-          Utils.selection.documentHasSelection(e.target.ownerDocument) &&
-          !(e.target.matches && e.target.matches(".arrow"))
+          target &&
+          Utils.selection.documentHasSelection(target.ownerDocument) &&
+          !(target.matches && target.matches(".arrow"))
         ) {
           e.stopPropagation();
         }
@@ -190,34 +210,37 @@ class ObjectInspectorItem extends PureComponent {
     return parentElementProps;
   }
 
-  renderLabel(label) {
+  renderLabel(label: string) {
     if (label === null || typeof label === "undefined") {
       return null;
     }
 
     const { item, depth, focused, expanded, onLabelClick } = this.props;
-    return dom.span(
-      {
-        className: "object-label",
-        onClick: onLabelClick
-          ? event => {
-              event.stopPropagation();
+    return (
+      <span
+        className="object-label"
+        onClick={
+          onLabelClick
+            ? (event: React.MouseEvent) => {
+                event.stopPropagation();
 
-              // If the user selected text, bail out.
-              if (Utils.selection.documentHasSelection(event.target.ownerDocument)) {
-                return;
+                // If the user selected text, bail out.
+                if (Utils.selection.documentHasSelection((event.target as Element).ownerDocument)) {
+                  return;
+                }
+
+                onLabelClick(item, {
+                  depth,
+                  focused,
+                  expanded,
+                  setExpanded: this.props.setExpanded,
+                });
               }
-
-              onLabelClick(item, {
-                depth,
-                focused,
-                expanded,
-                setExpanded: this.props.setExpanded,
-              });
-            }
-          : undefined,
-      },
-      label
+            : undefined
+        }
+      >
+        {label}
+      </span>
     );
   }
 
@@ -226,16 +249,16 @@ class ObjectInspectorItem extends PureComponent {
 
     const { label, value } = this.getLabelAndValue();
     const labelElement = this.renderLabel(label);
-    const delimiter =
-      value && labelElement ? dom.span({ className: "object-delimiter" }, ": ") : null;
+    const delimiter = value && labelElement ? <span className="object-delimiter">: </span> : null;
 
-    return dom.div(
-      this.getTreeItemProps(),
-      arrow,
-      labelElement,
-      delimiter,
-      value,
-      renderItemActions(item)
+    return (
+      <div {...this.getTreeItemProps()}>
+        {arrow}
+        {labelElement}
+        {delimiter}
+        {value}
+        {renderItemActions(item)}
+      </div>
     );
   }
 }
