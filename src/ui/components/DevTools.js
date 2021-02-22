@@ -81,9 +81,9 @@ function DevTools({
   }, [data]);
 
   if (queryIsLoading) {
-    return <SkeletonLoader content={"Fetching the recording information..."} />;
+    return <SkeletonLoader content={"Fetching the recording information."} />;
   } else if (recordingDuration === null) {
-    return <SkeletonLoader content={"Fetching the recording description..."} />;
+    return <SkeletonLoader content={"Fetching the recording description."} />;
   } else if (uploading) {
     const message = getUploadingMessage(uploading);
     return <SkeletonLoader content={message} />;
