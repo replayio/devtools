@@ -7,6 +7,7 @@ const Account = require("./Account").default;
 const { AppErrors } = require("./shared/Error");
 const SharingModal = require("./shared/SharingModal").default;
 const LoginModal = require("./shared/LoginModal").default;
+const SkeletonLoader = require("ui/components/SkeletonLoader").default;
 import { isDeployPreview } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -18,7 +19,6 @@ import "styles.css";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
-import { Uploading } from "./Uploading";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -61,7 +61,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   }, [auth.user]);
 
   if (hasLoadingParam()) {
-    return <Uploading />;
+    return <SkeletonLoader content={"Uploading resources"} />;
   }
 
   if (!isDeployPreview() && auth.isLoading) {
