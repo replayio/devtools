@@ -105,9 +105,15 @@ class AnalysisManager {
     }
 
     this.handlers.set(analysisId, handler);
-    const promise = sendMessage("Analysis.runAnalysis", { analysisId });
+    let promise: Promise<any> | undefined;
+    if (handler.onAnalysisResult) {
+      promise = sendMessage("Analysis.runAnalysis", { analysisId });
+    }
     if (handler.onAnalysisPoints) {
-      sendMessage("Analysis.findAnalysisPoints", { analysisId });
+      const pointsPromise = sendMessage("Analysis.findAnalysisPoints", { analysisId });
+      if (!promise) {
+        promise = pointsPromise;
+      }
     }
     await promise;
     await sendMessage("Analysis.releaseAnalysis", { analysisId });
