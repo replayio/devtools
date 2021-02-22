@@ -67,6 +67,7 @@ class TreeNode extends Component {
       item: PropTypes.any.isRequired,
       isExpandable: PropTypes.bool.isRequired,
       onClick: PropTypes.func,
+      areItemsEqual: PropTypes.func,
       shouldItemUpdate: PropTypes.func,
       renderItem: PropTypes.func.isRequired,
     };
@@ -98,12 +99,20 @@ class TreeNode extends Component {
 
   shouldComponentUpdate(nextProps) {
     return (
-      this.props.item !== nextProps.item ||
+      !this._areItemsEqual(this.props.item, nextProps.item) ||
       (this.props.shouldItemUpdate &&
         this.props.shouldItemUpdate(this.props.item, nextProps.item)) ||
       this.props.focused !== nextProps.focused ||
       this.props.expanded !== nextProps.expanded
     );
+  }
+
+  _areItemsEqual(prevItem, nextItem) {
+    if (this.props.areItemsEqual && prevItem && nextItem) {
+      return this.props.areItemsEqual(prevItem, nextItem);
+    } else {
+      return prevItem === nextItem;
+    }
   }
 
   /**
@@ -342,6 +351,11 @@ export class Tree extends Component {
       //     getChildren: item => item.children
       getChildren: PropTypes.func.isRequired,
 
+      // A function to check if two items should be considered equal.
+      //
+      // Type: areItemsEqual(prevItem: Item, nextItem: Item) -> Boolean
+      areItemsEqual: PropTypes.func,
+
       // A function to check if the tree node for the item should be updated.
       //
       // Type: shouldItemUpdate(prevItem: Item, nextItem: Item) -> Boolean
@@ -522,8 +536,16 @@ export class Tree extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.focused && prevProps.focused !== this.props.focused) {
+    if (this.props.focused && !this._areItemsEqual(prevProps.focused, this.props.focused)) {
       this._scrollNodeIntoView(this.props.focused);
+    }
+  }
+
+  _areItemsEqual(prevItem, nextItem) {
+    if (this.props.areItemsEqual && prevItem && nextItem) {
+      return this.props.areItemsEqual(prevItem, nextItem);
+    } else {
+      return prevItem === nextItem;
     }
   }
 
@@ -842,7 +864,7 @@ export class Tree extends Component {
       case " ":
         if (this.treeRef.current === doc.activeElement) {
           this._preventEvent(e);
-          if (this.props.active !== this.props.focused) {
+          if (!this._areItemsEqual(this.props.active, this.props.focused)) {
             this._activate(this.props.focused);
           }
         }
@@ -874,7 +896,7 @@ export class Tree extends Component {
     const length = traversal.length;
     for (let i = 0; i < length; i++) {
       const item = traversal[i].item;
-      if (item === this.props.focused) {
+      if (this._areItemsEqual(item, this.props.focused)) {
         break;
       }
       prev = item;
@@ -899,7 +921,7 @@ export class Tree extends Component {
     let i = 0;
 
     while (i < length) {
-      if (traversal[i].item === this.props.focused) {
+      if (this._areItemsEqual(traversal[i].item, this.props.focused)) {
         break;
       }
       i++;
@@ -952,15 +974,16 @@ export class Tree extends Component {
         // We make a key unique depending on whether the tree node is in active
         // or inactive state to make sure that it is actually replaced and the
         // tabbable state is reset.
-        key: `${key}-${active === item ? "active" : "inactive"}`,
+        key: `${key}-${this._areItemsEqual(active, item) ? "active" : "inactive"}`,
         id: key,
         index: i,
         item,
         depth,
+        areItemsEqual: this.props.areItemsEqual,
         shouldItemUpdate: this.props.shouldItemUpdate,
         renderItem: this.props.renderItem,
-        focused: focused?.path === item.path,
-        active: active === item,
+        focused: this._areItemsEqual(focused, item),
+        active: this._areItemsEqual(active, item),
         expanded: this.props.isExpanded(item),
         isExpandable: this._nodeIsExpandable(item),
         onExpand: this._onExpand,
