@@ -63,12 +63,12 @@ function BreakpointTimeline({
   setZoomRegion,
   setZoomedBreakpoint,
   currentTime,
-  hoveredPoint,
+  hoveredItem,
 }) {
   const timelineNode = useRef();
   const [, setMounted] = useState(false);
   const shouldDim =
-    hoveredPoint?.location && !isMatchingLocation(hoveredPoint?.location, breakpoint.location);
+    hoveredItem?.location && !isMatchingLocation(hoveredItem?.location, breakpoint.location);
 
   // Trigger a re-render on mount so that we can pass down the correct timelineNode.
   useEffect(() => setMounted(true), []);
@@ -101,7 +101,7 @@ function BreakpointTimeline({
                 key={i}
                 index={i}
                 timelineNode={timelineNode.current}
-                hoveredPoint={hoveredPoint}
+                hoveredItem={hoveredItem}
               />
             ))
           : null}
@@ -115,7 +115,7 @@ export default connect(
     analysisPoints: selectors.getAnalysisPointsForLocation(state, breakpoint.location),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
-    hoveredPoint: selectors.getHoveredPoint(state),
+    hoveredItem: selectors.getHoveredItem(state),
   }),
   {
     setZoomRegion: UIActions.setZoomRegion,

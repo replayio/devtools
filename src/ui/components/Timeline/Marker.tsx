@@ -3,7 +3,7 @@ const { getLeftOffset } = require("../../utils/timeline");
 import { connect, ConnectedProps } from "react-redux";
 const classnames = require("classnames");
 import { actions } from "../../actions";
-import { HoveredPoint, ZoomRegion } from "ui/state/timeline";
+import { HoveredItem, ZoomRegion } from "ui/state/timeline";
 import { Location, PauseId } from "@recordreplay/protocol";
 
 // If you do modify this, make sure you change EVERY single reference to this 11px width in
@@ -60,20 +60,20 @@ class Marker extends React.Component<MarkerProps> {
 
   onMouseLeave: MouseEventHandler = (e: any) => {
     if (!e.relatedTarget.closest(".breakpoint-panel")) {
-      this.props.setHoveredPoint(null);
+      this.props.setHoveredItem(null);
     }
   };
 
   onMouseEnter = () => {
-    const { point, time, location, setHoveredPoint } = this.props;
-    const hoveredPoint: HoveredPoint = {
+    const { point, time, location, setHoveredItem } = this.props;
+    const hoveredItem: HoveredItem = {
       point,
       time,
       location,
       target: "timeline",
     };
 
-    setHoveredPoint(hoveredPoint);
+    setHoveredItem(hoveredItem);
   };
 
   render() {
@@ -112,7 +112,7 @@ class Marker extends React.Component<MarkerProps> {
 }
 
 const connector = connect(null, {
-  setHoveredPoint: actions.setHoveredPoint,
+  setHoveredItem: actions.setHoveredItem,
   seek: actions.seek,
   setActiveComment: actions.setActiveComment,
 });

@@ -15,7 +15,7 @@ import { selectors } from "ui/reducers";
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
-import { TimelineState, Tooltip, ZoomRegion, HoveredPoint } from "ui/state/timeline";
+import { TimelineState, Tooltip, ZoomRegion, HoveredItem } from "ui/state/timeline";
 import { getFirstComment } from "ui/hooks/comments";
 import { getTest } from "ui/utils/environment";
 
@@ -24,15 +24,15 @@ export type SetTimelineStateAction = Action<"set_timeline_state"> & {
 };
 export type UpdateTooltipAction = Action<"update_tooltip"> & { tooltip: Tooltip | null };
 export type SetZoomRegionAction = Action<"set_zoom"> & { region: ZoomRegion };
-export type SetHoveredPoint = Action<"set_hovered_point"> & {
-  hoveredPoint: HoveredPoint | null;
+export type SetHoveredItemAction = Action<"set_hovered_item"> & {
+  hoveredItem: HoveredItem | null;
 };
 
 export type TimelineActions =
   | SetTimelineStateAction
   | UpdateTooltipAction
   | SetZoomRegionAction
-  | SetHoveredPoint;
+  | SetHoveredItemAction;
 
 export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   const { dispatch, getState } = store;
@@ -379,12 +379,12 @@ export function goToPrevPaint(): UIThunkAction {
   };
 }
 
-export function setHoveredPoint(hoveredPoint: HoveredPoint | null): UIThunkAction {
+export function setHoveredItem(hoveredItem: HoveredItem | null): UIThunkAction {
   return ({ dispatch, getState }) => {
-    dispatch({ type: "set_hovered_point", hoveredPoint });
+    dispatch({ type: "set_hovered_item", hoveredItem });
 
     // Don't update the video if user is adding a new comment.
     const updateGraphics = !selectors.getPendingComment(getState());
-    dispatch(setTimelineToTime(hoveredPoint?.time || null, updateGraphics));
+    dispatch(setTimelineToTime(hoveredItem?.time || null, updateGraphics));
   };
 }

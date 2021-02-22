@@ -13,16 +13,16 @@ function toBigInt(num) {
   return num ? BigInt(num) : undefined;
 }
 
-function hasPrimaryHighlight({ hoveredPoint, point }) {
-  return hoveredPoint?.point === point?.point;
+function hasPrimaryHighlight({ hoveredItem, point }) {
+  return hoveredItem?.point === point?.point;
 }
 
-function hasSecondaryHighlighted({ hoveredPoint, breakpoint }) {
-  if (!breakpoint.id || !hoveredPoint?.location) {
+function hasSecondaryHighlighted({ hoveredItem, breakpoint }) {
+  if (!breakpoint.id || !hoveredItem?.location) {
     return false;
   }
 
-  return breakpoint.id == getLocationKey(hoveredPoint.location);
+  return breakpoint.id == getLocationKey(hoveredItem.location);
 }
 
 export function getLeftPercentOffset({ point, timelineNode, zoomRegion, markerWidth }) {
@@ -48,8 +48,8 @@ function BreakpointTimelinePoint({
   executionPoint,
   zoomRegion,
   seek,
-  hoveredPoint,
-  setHoveredPoint,
+  hoveredItem,
+  setHoveredItem,
 }) {
   const [leftPercentOffset, setLeftPercentOffset] = useState(0);
 
@@ -65,7 +65,7 @@ function BreakpointTimelinePoint({
   }, [point, timelineNode, zoomRegion]);
 
   const onMouseEnter = () =>
-    setHoveredPoint({
+    setHoveredItem({
       target: "widget",
       point: point.point,
       time: point.time,
@@ -74,7 +74,7 @@ function BreakpointTimelinePoint({
 
   const onMouseLeave = e => {
     if (!e.relatedTarget.closest(".breakpoint-panel")) {
-      setHoveredPoint(null);
+      setHoveredItem(null);
     }
   };
 
@@ -84,8 +84,8 @@ function BreakpointTimelinePoint({
         past: toBigInt(point.point) < toBigInt(executionPoint),
         future: toBigInt(point.point) > toBigInt(executionPoint),
         pause: toBigInt(point.point) == toBigInt(executionPoint),
-        "primary-highlight": hasPrimaryHighlight({ hoveredPoint, point }),
-        "secondary-highlight": hasSecondaryHighlighted({ hoveredPoint, breakpoint }),
+        "primary-highlight": hasPrimaryHighlight({ hoveredItem, point }),
+        "secondary-highlight": hasSecondaryHighlighted({ hoveredItem, breakpoint }),
       })}
       title={`${index + 1}/${analysisPoints.length}`}
       onClick={() => seek(point.point, point.time, true)}
@@ -130,6 +130,6 @@ export default connect(
   }),
   {
     seek: actions.seek,
-    setHoveredPoint: actions.setHoveredPoint,
+    setHoveredItem: actions.setHoveredItem,
   }
 )(MemoizedBreakpointTimelinePoint);
