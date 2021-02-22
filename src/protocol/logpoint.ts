@@ -9,9 +9,9 @@
 import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
 import { assert } from "./utils";
 import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
+import { PrimitiveValue } from "./thread/value";
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
-
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
   onResult?: (
@@ -208,18 +208,16 @@ export async function setLogpoint(
     effectful: true,
     locations: locations.map(location => ({ location })),
   };
+  const primitives = primitiveValues(text);
   const points: PointDescription[] = [];
   const handler: AnalysisHandler<void> = {};
-  const primitives = primitiveValues(text);
-  const primitiveFronts = primitives
-    ? primitives.map(literal => createPrimitiveValueFront(literal))
-    : undefined;
 
   if (!condition) {
     handler.onAnalysisPoints = newPoints => {
       points.push(...newPoints);
       if (showInConsole) {
-        if (primitiveFronts) {
+        if (primitives) {
+          const primitiveFronts = primitives.map(literal => createPrimitiveValueFront(literal));
           showPrimitiveLogpoints(logGroupId, newPoints, primitiveFronts);
         } else {
           showLogpointsLoading(logGroupId, newPoints);
@@ -228,7 +226,7 @@ export async function setLogpoint(
     };
   }
 
-  if (showInConsole && (condition || !primitiveFronts)) {
+  if (showInConsole && (condition || !primitives)) {
     handler.onAnalysisResult = result => showLogpointsResult(logGroupId, result);
   }
 
@@ -241,7 +239,7 @@ export async function setLogpoint(
 
 function primitiveValues(text: string) {
   const values = text.split(",").map(s => s.trim());
-  const primitives: (string | number | boolean | null | undefined)[] = [];
+  const primitives: PrimitiveValue[] = [];
   for (const value of values) {
     if (value === "true") {
       primitives.push(true);
