@@ -344,7 +344,8 @@ export class ValueFront {
 
 Object.setPrototypeOf(ValueFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
-export function createPrimitiveValueFront(value: string | number | boolean | null | undefined) {
+export type PrimitiveValue = string | number | boolean | null | undefined;
+export function createPrimitiveValueFront(value: PrimitiveValue) {
   return new ValueFront(null, { value });
 }
 
