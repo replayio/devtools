@@ -27,10 +27,10 @@ export interface TimelineState {
   unprocessedRegions: TimeRange[];
   shouldAnimate: boolean;
   tooltip: Tooltip | null;
-  hoveredPoint: HoveredPoint | null;
+  hoveredItem: HoveredItem | null;
 }
 
-export interface HoveredPoint {
+export interface HoveredItem {
   target: "timeline" | "console" | "widget" | "transcript";
   point?: string;
   time?: number;

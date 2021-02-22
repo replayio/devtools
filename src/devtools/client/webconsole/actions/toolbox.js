@@ -5,7 +5,7 @@
 "use strict";
 
 import { ThreadFront } from "protocol/thread";
-import { setHoveredPoint } from "ui/actions/timeline";
+import { setHoveredItem } from "ui/actions/timeline";
 
 export function highlightDomElement(grip) {
   return async ({ toolbox }) => {
@@ -52,16 +52,16 @@ export function openNodeInInspector(valueFront) {
 export function onMessageHover(type, message) {
   return ({ dispatch, getState }) => {
     if (type == "mouseenter") {
-      const hoveredPoint = {
+      const hoveredItem = {
         target: "console",
         point: message.executionPoint,
         time: message.executionPointTime,
         location: message.frame,
       };
-      dispatch(setHoveredPoint(hoveredPoint));
+      dispatch(setHoveredItem(hoveredItem));
     }
     if (type == "mouseleave") {
-      dispatch(setHoveredPoint(null));
+      dispatch(setHoveredItem(null));
     }
   };
 }

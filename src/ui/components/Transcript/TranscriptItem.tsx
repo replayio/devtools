@@ -7,6 +7,7 @@ import { Comment, PendingComment } from "ui/state/comments";
 import { MouseEvent } from "@recordreplay/protocol";
 import { UIState } from "ui/state";
 import "./TranscriptItem.css";
+import { HoveredItem } from "ui/state/timeline";
 
 type TranscriptItemProps = PropsFromRedux & {
   item: Comment | MouseEvent | PendingComment;
@@ -22,11 +23,11 @@ function TranscriptItem({
   label,
   children,
   currentTime,
-  hoveredPoint,
+  hoveredItem,
   activeComment,
   pendingComment,
   seek,
-  setHoveredPoint,
+  setHoveredItem,
   setActiveComment,
   clearPendingComment,
 }: TranscriptItemProps) {
@@ -36,13 +37,13 @@ function TranscriptItem({
     function ScrollToHoveredItem() {
       if (
         itemNode.current &&
-        hoveredPoint?.point == item.point &&
-        hoveredPoint?.target !== "transcript"
+        hoveredItem?.point == item.point &&
+        hoveredItem?.target !== "transcript"
       ) {
         itemNode.current.scrollIntoView({ block: "center", behavior: "smooth" });
       }
     },
-    [hoveredPoint]
+    [hoveredItem]
   );
 
   const onClick = () => {
@@ -63,17 +64,17 @@ function TranscriptItem({
     setActiveComment(item);
   };
   const onMouseLeave = () => {
-    setHoveredPoint(null);
+    setHoveredItem(null);
   };
   const onMouseEnter = () => {
     const { point, time } = item;
-    const hoveredPoint = {
+    const hoveredItem: HoveredItem = {
       point,
       time,
-      target: "transcript" as "transcript",
+      target: "transcript",
     };
 
-    setHoveredPoint(hoveredPoint);
+    setHoveredItem(hoveredItem);
   };
 
   const { point, time } = item;
@@ -85,7 +86,7 @@ function TranscriptItem({
       onMouseLeave={onMouseLeave}
       className={classnames("transcript-entry", {
         selected: activeComment === item && activeComment.content == "",
-        "primary-highlight": hoveredPoint?.point === point && hoveredPoint?.time === time,
+        "primary-highlight": hoveredItem?.point === point && hoveredItem?.time === time,
         paused: currentTime == time,
         "before-paused": time < currentTime,
       })}
@@ -104,12 +105,12 @@ function TranscriptItem({
 const connector = connect(
   (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
-    hoveredPoint: selectors.getHoveredPoint(state),
+    hoveredItem: selectors.getHoveredItem(state),
     activeComment: selectors.getActiveComment(state),
     pendingComment: selectors.getPendingComment(state),
   }),
   {
-    setHoveredPoint: actions.setHoveredPoint,
+    setHoveredItem: actions.setHoveredItem,
     seek: actions.seek,
     setActiveComment: actions.setActiveComment,
     clearPendingComment: actions.clearPendingComment,

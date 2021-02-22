@@ -84,7 +84,7 @@ function Widget({ location, children, editor, insertAt }) {
   return ReactDOM.createPortal(<>{children}</>, node);
 }
 
-function Panel({ breakpoint, editor, insertAt, setHoveredPoint }) {
+function Panel({ breakpoint, editor, insertAt, setHoveredItem }) {
   const [editing, setEditing] = useState(false);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
@@ -98,16 +98,16 @@ function Panel({ breakpoint, editor, insertAt, setHoveredPoint }) {
   const updateWidth = () => setWidth(getPanelWidth(editor));
 
   const onMouseEnter = () => {
-    const hoveredPoint = {
+    const hoveredItem = {
       location: breakpoint.location,
       target: "widget",
     };
 
-    setHoveredPoint(hoveredPoint);
+    setHoveredItem(hoveredItem);
   };
   const onMouseLeave = e => {
     if (!e.relatedTarget.closest(".breakpoint-panel")) {
-      setHoveredPoint(null);
+      setHoveredItem(null);
     }
   };
 
@@ -144,9 +144,4 @@ function Panel({ breakpoint, editor, insertAt, setHoveredPoint }) {
   );
 }
 
-export default connect(
-  state => ({
-    hoveredPoint: selectors.getHoveredPoint(state),
-  }),
-  { setHoveredPoint: actions.setHoveredPoint }
-)(Panel);
+export default connect(null, { setHoveredItem: actions.setHoveredItem })(Panel);

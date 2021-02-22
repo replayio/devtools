@@ -29,7 +29,7 @@ import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 import "./Timeline.css";
 import { UIState } from "ui/state";
-import { HoveredPoint } from "ui/state/timeline";
+import { HoveredItem } from "ui/state/timeline";
 
 function ReplayButton({ onClick }: { onClick: MouseEventHandler }) {
   return (
@@ -40,14 +40,14 @@ function ReplayButton({ onClick }: { onClick: MouseEventHandler }) {
 }
 
 function getIsSecondaryHighlighted(
-  hoveredPoint: HoveredPoint | null,
+  hoveredItem: HoveredItem | null,
   location: Location | undefined
 ) {
-  if (hoveredPoint?.target == "console" || !location || !hoveredPoint?.location) {
+  if (hoveredItem?.target == "console" || !location || !hoveredItem?.location) {
     return false;
   }
 
-  return getLocationKey(hoveredPoint.location) == getLocationKey(location);
+  return getLocationKey(hoveredItem.location) == getLocationKey(location);
 }
 
 class Timeline extends Component<PropsFromRedux> {
@@ -104,8 +104,8 @@ class Timeline extends Component<PropsFromRedux> {
   };
 
   onPlayerMouseUp: MouseEventHandler = e => {
-    const { hoverTime, seek, hoveredPoint, clearPendingComment } = this.props;
-    const hoveringOverMarker = hoveredPoint?.target === "timeline";
+    const { hoverTime, seek, hoveredItem, clearPendingComment } = this.props;
+    const hoveringOverMarker = hoveredItem?.target === "timeline";
     const mouseTime = this.getMouseTime(e);
 
     if (hoverTime != null && !hoveringOverMarker) {
@@ -162,13 +162,13 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   renderMessages() {
-    const { messages, hoveredPoint } = this.props;
+    const { messages, hoveredItem } = this.props;
 
     return (
       <div className="markers-container">
         {messages.map((message: any, index: number) => {
-          const isPrimaryHighlighted = hoveredPoint?.point === message.executionPoint;
-          const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, message.frame);
+          const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
+          const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredItem, message.frame);
 
           return (
             <MessageMarker
@@ -184,12 +184,12 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   renderEvents() {
-    const { clickEvents, hoveredPoint } = this.props;
+    const { clickEvents, hoveredItem } = this.props;
 
     return (
       <div className="markers-container">
         {clickEvents.map((event, index) => {
-          const isPrimaryHighlighted = hoveredPoint?.point === event.point;
+          const isPrimaryHighlighted = hoveredItem?.point === event.point;
           return (
             <EventMarker key={index} event={event} isPrimaryHighlighted={isPrimaryHighlighted} />
           );
@@ -199,7 +199,7 @@ class Timeline extends Component<PropsFromRedux> {
   }
 
   renderPreviewMarkers() {
-    const { pointsForHoveredLineNumber, currentTime, hoveredPoint, zoomRegion } = this.props;
+    const { pointsForHoveredLineNumber, currentTime, hoveredItem, zoomRegion } = this.props;
 
     if (!pointsForHoveredLineNumber) {
       return [];
@@ -208,8 +208,8 @@ class Timeline extends Component<PropsFromRedux> {
     return (
       <div className="preview-markers-container">
         {pointsForHoveredLineNumber.map((point: PointDescription, index: number) => {
-          const isPrimaryHighlighted = hoveredPoint?.point === point.point;
-          const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredPoint, point.frame?.[0]);
+          const isPrimaryHighlighted = hoveredItem?.point === point.point;
+          const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredItem, point.frame?.[0]);
 
           return (
             <Marker
@@ -237,13 +237,13 @@ class Timeline extends Component<PropsFromRedux> {
       currentTime,
       hoverTime,
       hoveredLineNumberLocation,
-      hoveredPoint,
+      hoveredItem,
       viewMode,
       selectedPanel,
     } = this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
-    const shouldDim = hoveredLineNumberLocation || hoveredPoint;
+    const shouldDim = hoveredLineNumberLocation || hoveredItem;
 
     return (
       <div className={classnames("timeline", { dimmed: shouldDim })}>
@@ -286,7 +286,7 @@ const connector = connect(
     selectedPanel: selectors.getSelectedPanel(state),
     hoveredLineNumberLocation: selectors.getHoveredLineNumberLocation(state),
     pointsForHoveredLineNumber: selectors.getPointsForHoveredLineNumber(state),
-    hoveredPoint: selectors.getHoveredPoint(state),
+    hoveredItem: selectors.getHoveredItem(state),
     clickEvents: selectors.getEventsForType(state, "mousedown"),
   }),
   {

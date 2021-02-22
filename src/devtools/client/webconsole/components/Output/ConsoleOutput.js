@@ -126,13 +126,13 @@ class ConsoleOutput extends Component {
       timestampsVisible,
       pausedExecutionPoint,
       closestMessage,
-      hoveredPoint,
+      hoveredItem,
     } = this.props;
 
     const messageNodes = visibleMessages.map((messageId, i) => {
       const message = messages.get(messageId);
-      const isPrimaryHighlighted = hoveredPoint?.point === message.executionPoint;
-      const shouldScrollIntoView = isPrimaryHighlighted && hoveredPoint?.target !== "console";
+      const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
+      const shouldScrollIntoView = isPrimaryHighlighted && hoveredItem?.target !== "console";
 
       return createElement(MessageContainer, {
         dispatch,
@@ -180,7 +180,7 @@ function mapStateToProps(state) {
     messagesPayload: selectors.getAllMessagesPayloadById(state),
     timestampsVisible: state.consoleUI.timestampsVisible,
     playback: selectors.getPlayback(state),
-    hoveredPoint: selectors.getHoveredPoint(state),
+    hoveredItem: selectors.getHoveredItem(state),
   };
 }
 const mapDispatchToProps = dispatch => ({
