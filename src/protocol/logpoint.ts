@@ -8,7 +8,7 @@
 
 import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
 import { assert } from "./utils";
-import { ThreadFront, ValueFront, Pause } from "./thread";
+import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
 
@@ -72,6 +72,25 @@ function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
       }
     }
   );
+}
+
+async function showPrimitiveLogpoints(
+  logGroupId: string,
+  pointDescriptions: PointDescription[],
+  values: ValueFront[]
+) {
+  if (!LogpointHandlers.onResult) {
+    return;
+  }
+
+  for (const pointDescription of pointDescriptions) {
+    const { point, time, frame } = pointDescription;
+    assert(frame);
+    const location = await ThreadFront.getPreferredLocation(frame);
+    assert(location);
+    const pause = ThreadFront.ensurePause(point, time);
+    LogpointHandlers.onResult(logGroupId, point, time, location, pause, values);
+  }
 }
 
 function saveLogpointHits(points: PointDescription[], locations: Location[]) {
@@ -191,17 +210,25 @@ export async function setLogpoint(
   };
   const points: PointDescription[] = [];
   const handler: AnalysisHandler<void> = {};
+  const primitives = primitiveValues(text);
+  const primitiveFronts = primitives
+    ? primitives.map(literal => createPrimitiveValueFront(literal))
+    : undefined;
 
   if (!condition) {
     handler.onAnalysisPoints = newPoints => {
       points.push(...newPoints);
       if (showInConsole) {
-        showLogpointsLoading(logGroupId, newPoints);
+        if (primitiveFronts) {
+          showPrimitiveLogpoints(logGroupId, newPoints, primitiveFronts);
+        } else {
+          showLogpointsLoading(logGroupId, newPoints);
+        }
       }
     };
   }
 
-  if (showInConsole) {
+  if (showInConsole && (condition || !primitiveFronts)) {
     handler.onAnalysisResult = result => showLogpointsResult(logGroupId, result);
   }
 
@@ -210,6 +237,43 @@ export async function setLogpoint(
   if (!condition) {
     saveLogpointHits(points, locations);
   }
+}
+
+function primitiveValues(text: string) {
+  const values = text.split(",").map(s => s.trim());
+  const primitives: (string | number | boolean | null | undefined)[] = [];
+  for (const value of values) {
+    if (value === "true") {
+      primitives.push(true);
+      continue;
+    }
+    if (value === "false") {
+      primitives.push(false);
+      continue;
+    }
+    if (value === "null") {
+      primitives.push(null);
+      continue;
+    }
+    if (value === "undefined") {
+      primitives.push(undefined);
+      continue;
+    }
+    if (/^-?(\d+|\d*\.\d+)$/.test(value)) {
+      primitives.push(parseFloat(value));
+      continue;
+    }
+    if (
+      value.startsWith('"') &&
+      value.endsWith('"') &&
+      !value.substring(1, value.length - 1).includes('"')
+    ) {
+      primitives.push(value.substring(1, value.length - 1));
+      continue;
+    }
+    return undefined;
+  }
+  return primitives;
 }
 
 export function setLogpointByURL(
