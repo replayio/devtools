@@ -15,27 +15,24 @@ export function mutate({ variables = {}, mutation }: { variables: any; mutation:
   return apolloClient.mutate({ variables, mutation });
 }
 
-export function createApolloClient(token: string | undefined) {
-  const options: any = !token
-    ? {
-        cache: new InMemoryCache(),
-        uri: "https://graphql.replay.io/v1/graphql",
-      }
-    : {
-        cache: new InMemoryCache(),
-        link: createHttpLink(token),
-      };
+export function createApolloClient(token: string | undefined, recordingId: string | undefined) {
+  const options: any = {
+    cache: new InMemoryCache(),
+    link: createHttpLink(token, recordingId),
+  };
 
   apolloClient = new ApolloClient(options);
   return apolloClient;
 }
 
-function createHttpLink(token: string) {
+function createHttpLink(token: string | undefined, recordingId: string | undefined) {
+  const headers = token
+    ? { Authorization: `Bearer ${token}` }
+    : { "x-hasura-recording-id": recordingId };
+
   return new HttpLink({
     uri: "https://graphql.replay.io/v1/graphql",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers,
     fetch,
   });
 }

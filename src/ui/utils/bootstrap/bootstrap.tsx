@@ -42,7 +42,13 @@ export function setupSentry(context: Record<string, any>) {
   Sentry.setContext("recording", { ...context, url: window.location.href });
 }
 
-function ApolloWrapper({ children }: { children: ReactNode }) {
+function ApolloWrapper({
+  children,
+  recordingId,
+}: {
+  recordingId: string | undefined;
+  children: ReactNode;
+}) {
   const tokenState = useToken();
 
   if (tokenState === undefined) {
@@ -59,7 +65,9 @@ function ApolloWrapper({ children }: { children: ReactNode }) {
     }
   }
 
-  return <ApolloProvider client={createApolloClient(token)}>{children}</ApolloProvider>;
+  return (
+    <ApolloProvider client={createApolloClient(token, recordingId)}>{children}</ApolloProvider>
+  );
 }
 
 export function bootstrapApp(props: AppProps, context: Record<string, any>, store: UIStore) {
@@ -67,8 +75,8 @@ export function bootstrapApp(props: AppProps, context: Record<string, any>, stor
 
   ReactDOM.render(
     <Router>
-      <tokenManager.Auth0Provider>
-        <ApolloWrapper>
+      <tokenManager.Auth0Provider recordingId={context.recordingId}>
+        <ApolloWrapper recordingId={context.recordingId}>
           <Provider store={store}>
             <App {...props} />
           </Provider>

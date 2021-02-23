@@ -1,6 +1,7 @@
 const url = new URL(window.location.href);
 
-const recordingId = url.searchParams.get("id");
+// Coercing recordingId to undefined so that it is not passed to auth0
+const recordingId = url.searchParams.get("id") || undefined;
 const dispatch = url.searchParams.get("dispatch");
 const test = url.searchParams.get("test");
 
