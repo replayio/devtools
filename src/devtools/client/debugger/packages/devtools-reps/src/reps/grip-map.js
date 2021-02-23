@@ -118,6 +118,7 @@ function getEntries(props, entries, max) {
     rv.push(
       PropRep({
         name: key,
+        index: i,
         equal: " \u2192 ",
         object: value,
         mode: MODE.TINY,
