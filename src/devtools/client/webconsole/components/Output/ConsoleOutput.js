@@ -147,6 +147,7 @@ class ConsoleOutput extends Component {
         isPaused: closestMessage?.id == messageId,
         isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
         isPrimaryHighlighted,
+        isSecondaryHighlighted: false,
         shouldScrollIntoView,
       });
     });
