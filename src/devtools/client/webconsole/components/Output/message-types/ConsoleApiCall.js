@@ -25,7 +25,6 @@ ConsoleApiCall.propTypes = {
   timestampsVisible: PropTypes.bool.isRequired,
   maybeScrollToBottom: PropTypes.func,
   isPrimaryHighlighted: PropTypes.bool.isRequired,
-  isSecondaryHighlighted: PropTypes.bool.isRequired,
   shouldScrollIntoView: PropTypes.bool.isRequired,
 };
 
@@ -46,7 +45,6 @@ function ConsoleApiCall(props) {
     maybeScrollToBottom,
     isFirstMessageForPoint,
     isPrimaryHighlighted,
-    isSecondaryHighlighted,
     shouldScrollIntoView,
   } = props;
   const {
@@ -163,7 +161,6 @@ function ConsoleApiCall(props) {
     maybeScrollToBottom,
     isFirstMessageForPoint,
     isPrimaryHighlighted,
-    isSecondaryHighlighted,
     shouldScrollIntoView,
   });
 }
