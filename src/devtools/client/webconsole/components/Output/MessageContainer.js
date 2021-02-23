@@ -43,7 +43,6 @@ class MessageContainer extends Component {
       isPaused: PropTypes.bool.isRequired,
       pausedExecutionPoint: PropTypes.string,
       isPrimaryHighlighted: PropTypes.bool.isRequired,
-      isSecondaryHighlighted: PropTypes.bool.isRequired,
       shouldScrollIntoView: PropTypes.bool.isRequired,
     };
   }
@@ -64,7 +63,6 @@ class MessageContainer extends Component {
       "pausedExecutionPoint",
       "badge",
       "isPrimaryHighlighted",
-      "isSecondaryHighlighted",
       "shouldScrollIntoView",
     ];
 
