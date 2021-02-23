@@ -89,9 +89,11 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem }) {
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
 
-  // Force CodeMirror to refresh when changing the size of the breakpoint
-  // panel so that code selection works properly.
-  window.dispatchEvent(new Event("resize"));
+  useEffect(() => {
+    // Force CodeMirror to refresh when changing the size of the breakpoint
+    // panel so that code selection works properly.
+    window.dispatchEvent(new Event("resize"));
+  });
 
   const toggleEditingOn = () => setEditing(true);
   const toggleEditingOff = () => setEditing(false);
