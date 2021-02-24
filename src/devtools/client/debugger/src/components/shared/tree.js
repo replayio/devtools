@@ -351,7 +351,11 @@ export class Tree extends Component {
       //     getChildren: item => item.children
       getChildren: PropTypes.func.isRequired,
 
-      // A function to check if two items should be considered equal.
+      // A function to check if two items represent the same tree node.
+      // Use this if the item representing a tree node may be replaced by
+      // a new item and you don't want to rerender that node every time
+      // the item is replaced. Use shouldItemUpdate() to control when the
+      // node should be updated.
       //
       // Type: areItemsEqual(prevItem: Item, nextItem: Item) -> Boolean
       areItemsEqual: PropTypes.func,
