@@ -1,21 +1,20 @@
 # Running Playwright tests with replay
 
-Playwright scripts can run using replay-enabled versions of firefox on macOS and linux. These instructions describe how to run and record the attached basic.js test.
+Playwright scripts can run using replay-enabled versions of firefox on macOS and linux. These instructions describe how to run and record the attached basic.js test.  Run these instructions from the terminal in this directory.
 
 ## macOS installation
 
 1. `./install.sh` Install Replay
 2. `npm i` Install Playwright
-3. `cp local.env.sample local.env` Add environment variables and update paths
-4. `node basic.js` Run test without recording
-5. `RECORD_ALL_CONTENT=1 node basic.js`
-6. `cat recordings.log` to view the last recording
+3. `PLAYWRIGHT_BROWSERS_PATH=$PWD/browsers node basic.js` Run test without recording
+4. `PLAYWRIGHT_BROWSERS_PATH=$PWD/browsers RECORD_REPLAY_DRIVER=$PWD/browsers/firefox-1225/macOS-recordreplay.so RECORD_REPLAY_RECORDING_ID_FILE=$PWD/recordings.log RECORD_REPLAY_SERVER=wss://dispatch.replay.io RECORD_ALL_CONTENT=1 node basic.js`
+5. `cat recordings.log` to view the last recording
 
 ## Docker installation
 
 1. `docker image pull recordreplayinc/playwright:latest` download image
-2. `docker run -v /path/to/devtools/test/playwright:/test -it recordreplayinc/playwright:latest bash` start container
-3. `npm i playwright` install playwright package
+2. `docker run -v $PWD:/test -it recordreplayinc/playwright:latest bash` start container
+3. `npm i playwright@1.8.1` install playwright package
 4. `RECORD_REPLAY_RECORDING_ID_FILE=/recordings.log RECORD_REPLAY_SERVER=wss://dispatch.replay.io RECORD_ALL_CONTENT=1 node test/basic.js` run test
 5. `cat recordings.log` to view the last recording
 

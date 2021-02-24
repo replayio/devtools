@@ -1,7 +1,6 @@
 // Playwright script for inspecting a simple recording.
 // Playwright tests are currently experimental.
 
-require("dotenv").config({ path: "local.env" });
 const playwright = require("playwright");
 
 (async () => {
