@@ -32,7 +32,11 @@ export const LogpointHandlers: {
 } = {};
 
 export const PointHandlers: {
-  onPoints?: (points: PointDescription[], info: { locations: (Location | null)[] }) => void;
+  onPoints?: (
+    points: PointDescription[],
+    locations: (Location | null)[],
+    condition?: string
+  ) => void;
 } = {};
 
 function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
@@ -93,9 +97,19 @@ async function showPrimitiveLogpoints(
   }
 }
 
-function saveLogpointHits(points: PointDescription[], locations: Location[]) {
+function saveLogpointHits(
+  points: PointDescription[],
+  results: AnalysisEntry[],
+  locations: Location[],
+  condition: string
+) {
   if (PointHandlers.onPoints) {
-    PointHandlers.onPoints(points, { locations });
+    if (condition) {
+      points = points.filter(point =>
+        results.some(result => result.key === point.point && result.value.time === point.time)
+      );
+    }
+    PointHandlers.onPoints(points, locations, condition);
   }
 }
 
@@ -210,31 +224,33 @@ export async function setLogpoint(
   };
   const primitives = primitiveValues(text);
   const points: PointDescription[] = [];
+  const results: AnalysisEntry[] = [];
   const handler: AnalysisHandler<void> = {};
 
-  if (!condition) {
-    handler.onAnalysisPoints = newPoints => {
-      points.push(...newPoints);
-      if (showInConsole) {
-        if (primitives) {
-          const primitiveFronts = primitives.map(literal => createPrimitiveValueFront(literal));
-          showPrimitiveLogpoints(logGroupId, newPoints, primitiveFronts);
-        } else {
-          showLogpointsLoading(logGroupId, newPoints);
-        }
+  handler.onAnalysisPoints = newPoints => {
+    points.push(...newPoints);
+    if (showInConsole && !condition) {
+      if (primitives) {
+        const primitiveFronts = primitives.map(literal => createPrimitiveValueFront(literal));
+        showPrimitiveLogpoints(logGroupId, newPoints, primitiveFronts);
+      } else {
+        showLogpointsLoading(logGroupId, newPoints);
+      }
+    }
+  };
+
+  if (condition || (showInConsole && !primitives)) {
+    handler.onAnalysisResult = result => {
+      results.push(...result);
+      if (showInConsole && (condition || !primitives)) {
+        showLogpointsResult(logGroupId, result);
       }
     };
   }
 
-  if (showInConsole && (condition || !primitives)) {
-    handler.onAnalysisResult = result => showLogpointsResult(logGroupId, result);
-  }
-
   await analysisManager.runAnalysis(params, handler);
 
-  if (!condition) {
-    saveLogpointHits(points, locations);
-  }
+  saveLogpointHits(points, results, locations, condition);
 }
 
 function primitiveValues(text: string) {

@@ -112,7 +112,11 @@ function BreakpointTimeline({
 
 export default connect(
   (state, { breakpoint }) => ({
-    analysisPoints: selectors.getAnalysisPointsForLocation(state, breakpoint.location),
+    analysisPoints: selectors.getAnalysisPointsForLocation(
+      state,
+      breakpoint.location,
+      breakpoint.options.condition
+    ),
     zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     hoveredItem: selectors.getHoveredItem(state),

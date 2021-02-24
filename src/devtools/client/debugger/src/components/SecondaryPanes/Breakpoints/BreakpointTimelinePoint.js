@@ -113,7 +113,8 @@ const MemoizedBreakpointTimelinePoint = React.memo(
       selectorChanged(hasPrimaryHighlight) ||
       selectorChanged(hasSecondaryHighlighted) ||
       hasChanged("zoomRegion") ||
-      hasChanged("executionPoint")
+      hasChanged("executionPoint") ||
+      hasChanged("analysisPoints")
     ) {
       return false;
     }
@@ -124,7 +125,11 @@ const MemoizedBreakpointTimelinePoint = React.memo(
 
 export default connect(
   (state, { breakpoint }) => ({
-    analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
+    analysisPoints: getAnalysisPointsForLocation(
+      state,
+      breakpoint.location,
+      breakpoint.options.condition
+    ),
     executionPoint: getExecutionPoint(state),
     zoomRegion: selectors.getZoomRegion(state),
   }),
