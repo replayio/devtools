@@ -6,9 +6,8 @@ Playwright scripts can run using replay-enabled versions of firefox on macOS and
 
 1. `./install.sh` Install Replay
 2. `npm i` Install Playwright
-3. `PLAYWRIGHT_BROWSERS_PATH=$PWD/browsers node basic.js` Run test without recording
-4. `PLAYWRIGHT_BROWSERS_PATH=$PWD/browsers RECORD_REPLAY_DRIVER=$PWD/browsers/firefox-1225/macOS-recordreplay.so RECORD_REPLAY_RECORDING_ID_FILE=$PWD/recordings.log RECORD_REPLAY_SERVER=wss://dispatch.replay.io RECORD_ALL_CONTENT=1 node basic.js`
-5. `cat recordings.log` to view the last recording
+3. `PLAYWRIGHT_BROWSERS_PATH=$PWD/browsers RECORD_REPLAY_DRIVER=$PWD/browsers/firefox-1225/macOS-recordreplay.so RECORD_REPLAY_RECORDING_ID_FILE=$PWD/recordings.log RECORD_REPLAY_SERVER=wss://dispatch.replay.io RECORD_ALL_CONTENT=1 node basic.js` run test
+4. `cat recordings.log` to view the last recording
 
 ## Docker installation
 
