@@ -40,6 +40,7 @@ export type SetPendingNotificationAction = Action<"set_pending_notification"> & 
 export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   analysisPoints: PointDescription[];
   location: Location;
+  condition: string;
 };
 export type SetEventsForType = Action<"set_events"> & {
   events: MouseEvent[];
@@ -93,10 +94,10 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
 }
 
 function setupPointHandlers(store: UIStore) {
-  PointHandlers.onPoints = (points: PointDescription[], info: any) => {
-    const { locations } = info;
+  PointHandlers.onPoints = (points: PointDescription[], locations: Location[], condition = "") => {
     locations.forEach(
-      (location: Location | null) => location && store.dispatch(setAnalysisPoints(points, location))
+      (location: Location | null) =>
+        location && store.dispatch(setAnalysisPoints(points, location, condition))
     );
   };
 
@@ -164,12 +165,14 @@ export function hideModal(): SetModalAction {
 
 export function setAnalysisPoints(
   points: PointDescription[],
-  location: Location
+  location: Location,
+  condition = ""
 ): SetAnalysisPointsAction {
   return {
     type: "set_analysis_points",
     analysisPoints: points,
     location,
+    condition,
   };
 }
 

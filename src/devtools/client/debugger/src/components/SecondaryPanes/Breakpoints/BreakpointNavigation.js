@@ -98,7 +98,11 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints }) {
 }
 
 const mapStateToProps = (state, { breakpoint }) => ({
-  analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
+  analysisPoints: getAnalysisPointsForLocation(
+    state,
+    breakpoint.location,
+    breakpoint.options.condition
+  ),
   executionPoint: getExecutionPoint(state),
 });
 

@@ -4,7 +4,7 @@ import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
 const { prefs } = require("../utils/prefs");
 import { Location } from "@recordreplay/protocol";
-import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
+import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 function initialAppState(): AppState {
   return {
@@ -85,7 +85,7 @@ export default function update(
     }
 
     case "set_analysis_points": {
-      const id = getLocationKey(action.location);
+      const id = getLocationAndConditionKey(action.location, action.condition);
 
       return {
         ...state,
@@ -164,8 +164,14 @@ export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getModal = (state: UIState) => state.app.modal;
 export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
 export const getPendingNotification = (state: UIState) => state.app.pendingNotification;
-export const getAnalysisPointsForLocation = (state: UIState, location: Location | null) =>
-  location && state.app.analysisPoints[getLocationKey(location)];
+export const getAnalysisPointsForLocation = (
+  state: UIState,
+  location: Location | null,
+  condition = ""
+) => {
+  if (!location) return;
+  return state.app.analysisPoints[getLocationAndConditionKey(location, condition)];
+};
 export const getViewMode = (state: UIState) => state.app.viewMode;
 export const getNarrowMode = (state: UIState) => state.app.narrowMode;
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
