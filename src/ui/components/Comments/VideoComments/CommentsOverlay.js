@@ -4,6 +4,7 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import VideoComment from "./VideoComment";
+import Hud from "./Hud";
 import "./CommentsOverlay.css";
 
 function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime, setHoveredComment }) {
@@ -50,6 +51,7 @@ function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime, set
           />
         ))}
       </div>
+      <Hud />
     </div>
   );
 }

@@ -92,9 +92,6 @@ function DevMain({ displayedProgress }) {
           <div className="loading-container">
             <div className="progress-line full" />
             <div className="progress-line" style={{ width: `${displayedProgress}%` }} />
-            <div className="tooltip" style={{ left: `${displayedProgress}%` }}>
-              Loading...
-            </div>
           </div>
         </div>
       </section>
