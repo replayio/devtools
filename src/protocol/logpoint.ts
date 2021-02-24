@@ -14,6 +14,7 @@ import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
 import { UIStore } from "ui/actions";
 import { setAnalysisPoints } from "ui/actions/app";
+import { getAnalysisPointsForLocation } from "ui/reducers/app";
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
   onResult?: (
@@ -210,6 +211,17 @@ export async function setLogpoint(
   condition: string,
   showInConsole: boolean = true
 ) {
+  const primitives = primitiveValues(text);
+  const primitiveFronts = primitives?.map(literal => createPrimitiveValueFront(literal));
+
+  if (showInConsole && primitiveFronts) {
+    const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
+    if (points) {
+      showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
+      return;
+    }
+  }
+
   const mapper = formatLogpoint({ text, condition });
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
@@ -218,7 +230,6 @@ export async function setLogpoint(
     effectful: true,
     locations: locations.map(location => ({ location })),
   };
-  const primitives = primitiveValues(text);
   const points: PointDescription[] = [];
   const results: AnalysisEntry[] = [];
   const handler: AnalysisHandler<void> = {};
@@ -226,8 +237,7 @@ export async function setLogpoint(
   handler.onAnalysisPoints = newPoints => {
     points.push(...newPoints);
     if (showInConsole && !condition) {
-      if (primitives) {
-        const primitiveFronts = primitives.map(literal => createPrimitiveValueFront(literal));
+      if (primitiveFronts) {
         showPrimitiveLogpoints(logGroupId, newPoints, primitiveFronts);
       } else {
         showLogpointsLoading(logGroupId, newPoints);
