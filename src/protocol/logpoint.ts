@@ -12,6 +12,8 @@ import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thr
 import { PrimitiveValue } from "./thread/value";
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
+import { UIStore } from "ui/actions";
+import { setAnalysisPoints } from "ui/actions/app";
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
   onResult?: (
@@ -31,13 +33,11 @@ export const LogpointHandlers: {
   clearLogpoint?: (logGroupId: string) => void;
 } = {};
 
-export const PointHandlers: {
-  onPoints?: (
-    points: PointDescription[],
-    locations: (Location | null)[],
-    condition?: string
-  ) => void;
-} = {};
+let store: UIStore;
+export function setupLogpoints(_store: UIStore) {
+  store = _store;
+  analysisManager.init();
+}
 
 function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
   if (!LogpointHandlers.onPointLoading) {
@@ -103,18 +103,14 @@ function saveLogpointHits(
   locations: Location[],
   condition: string
 ) {
-  if (PointHandlers.onPoints) {
-    if (condition) {
-      points = points.filter(point =>
-        results.some(result => result.key === point.point && result.value.time === point.time)
-      );
-    }
-    PointHandlers.onPoints(points, locations, condition);
+  if (condition) {
+    points = points.filter(point =>
+      results.some(result => result.key === point.point && result.value.time === point.time)
+    );
   }
-}
-
-export function setupLogpoints() {
-  analysisManager.init();
+  for (const location of locations) {
+    store.dispatch(setAnalysisPoints(points, location, condition));
+  }
 }
 
 // Define some logpoint helpers to manage pause data.

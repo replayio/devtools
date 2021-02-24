@@ -20,8 +20,6 @@ import {
   Canvas,
 } from "ui/state/app";
 
-const { PointHandlers } = require("protocol/logpoint");
-
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
 export type LoadingAction = Action<"loading"> & { loading: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
@@ -78,7 +76,6 @@ const NARROW_MODE_WIDTH = 800;
 
 export function setupApp(recordingId: RecordingId, store: UIStore) {
   store.dispatch({ type: "setup_app", recordingId });
-  setupPointHandlers(store);
 
   ThreadFront.waitForSession().then(sessionId =>
     store.dispatch({ type: "set_session_id", sessionId })
@@ -91,19 +88,6 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
   });
 
   ThreadFront.listenForLoadChanges();
-}
-
-function setupPointHandlers(store: UIStore) {
-  PointHandlers.onPoints = (points: PointDescription[], locations: Location[], condition = "") => {
-    locations.forEach(
-      (location: Location | null) =>
-        location && store.dispatch(setAnalysisPoints(points, location, condition))
-    );
-  };
-
-  PointHandlers.addPendingNotification = (location: any) => {
-    store.dispatch(setPendingNotification(location));
-  };
 }
 
 function onUnprocessedRegions({ regions }: unprocessedRegions): UIThunkAction {
