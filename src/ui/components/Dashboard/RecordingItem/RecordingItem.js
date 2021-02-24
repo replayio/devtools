@@ -28,10 +28,17 @@ export default function RecordingItem({ data, viewType, selectedIds, setSelected
     updateIsPrivate({ variables: { recordingId: data.recording_id, isPrivate: !isPrivate } });
   };
   const onNavigate = event => {
-    if (event.metaKey) {
-      return window.open(`/view?id=${data.recording_id}`);
+    let url = `/view?id=${data.recording_id}`;
+    const isTesting = new URL(window.location.href).searchParams.get("e2etest");
+
+    if (isTesting) {
+      url += `&e2etest=true`;
     }
-    window.location = `/view?id=${data.recording_id}`;
+
+    if (event.metaKey) {
+      return window.open(url);
+    }
+    window.location = url;
   };
 
   const Panel = (

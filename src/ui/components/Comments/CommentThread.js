@@ -84,6 +84,7 @@ function CommentThread({
 }
 
 function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingComment }) {
+  const [isHovered, setIsHovered] = useState(false);
   const lines = comment.content.split("\n");
   const isBeingEdited = comment === pendingComment && comment.content !== "";
 
@@ -92,7 +93,14 @@ function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingCo
   }
 
   return (
-    <div className="comment-body-item">
+    <div
+      className={classnames("comment-body-item", { hover: isHovered })}
+      onMouseEnter={() => {
+        console.log("onmouseenter");
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="comment-body-header">
         <img src={comment.user.picture} className="comment-picture" />
         <div className="comment-body-header-label">
@@ -142,10 +150,18 @@ function Actions({ comment, hoveredComment, setPendingComment, isRoot }) {
         buttonStyle=""
         position="bottom-right"
       >
-        <div className="comments-dropdown-item" title="Delete Comment" onClick={editComment}>
+        <div
+          className="comments-dropdown-item edit-comment"
+          title="Edit Comment"
+          onClick={editComment}
+        >
           Edit comment
         </div>
-        <div className="comments-dropdown-item" title="Delete Comment" onClick={handleDelete}>
+        <div
+          className="comments-dropdown-item delete-comment"
+          title="Delete Comment"
+          onClick={handleDelete}
+        >
           {isRoot ? "Delete comment and replies" : "Delete comment"}
         </div>
       </PortalDropdown>

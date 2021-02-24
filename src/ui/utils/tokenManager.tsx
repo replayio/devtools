@@ -6,9 +6,19 @@ import { useHistory } from "react-router-dom";
 import { assert, defer, Deferred } from "protocol/utils";
 
 const domain = "webreplay.us.auth0.com";
-const clientId = "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
 const audience = "hasura-api";
 const tokenRefreshSecondsBeforeExpiry = 60;
+
+let clientId: string;
+const isTesting = new URL(window.location.href).searchParams.get("e2etest");
+
+if (isTesting) {
+  // Auth0 Application: Cypress E2E Testing
+  clientId = "uL3A8jxVqotF5Q6bmn5QTV46hU97MPQm";
+} else {
+  // Auth0 Application: Replay
+  clientId = "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
+}
 
 const {
   location: { origin, pathname },
@@ -114,6 +124,14 @@ class TokenManager {
 
       this.isTokenRequested = true;
       const deferredState = this.deferredState;
+
+      const item = window.localStorage.getItem("__cypress");
+      if (item) {
+        const token = JSON.parse(item).body.access_token;
+        this.setState({ token }, deferredState);
+        return;
+      }
+
       try {
         const token = await this.fetchToken(refresh);
 
@@ -138,7 +156,7 @@ class TokenManager {
       if (e.error !== "login_required" && e.error !== "consent_required") {
         throw e;
       }
-      console.error("Failed to fetch the access token silently - this shouldn't happen!");
+      console.error("Failed to fetch the access token silently - this shouldn't happen!", e);
 
       return await this.auth0Client.getAccessTokenWithPopup({ audience, ignoreCache: refresh });
     }
