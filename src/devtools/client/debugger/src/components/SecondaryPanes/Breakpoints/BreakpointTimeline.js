@@ -65,13 +65,8 @@ function BreakpointTimeline({
   currentTime,
   hoveredItem,
 }) {
-  const timelineNode = useRef();
-  const [, setMounted] = useState(false);
   const shouldDim =
     hoveredItem?.location && !isMatchingLocation(hoveredItem?.location, breakpoint.location);
-
-  // Trigger a re-render on mount so that we can pass down the correct timelineNode.
-  useEffect(() => setMounted(true), []);
 
   const handleClick = e => {
     if (e.metaKey && analysisPoints?.length) {
@@ -87,24 +82,20 @@ function BreakpointTimeline({
     <div className="breakpoint-navigation-timeline-container">
       <div
         className={classnames("breakpoint-navigation-timeline", { dimmed: shouldDim })}
-        ref={timelineNode}
         onClick={handleClick}
         style={{ height: `${pointWidth + 2}px` }} // 2px to account for the 1px top+bottom border
       >
         <div className="progress-line full" />
         <div className="progress-line" style={{ width: `${percent}%` }} />
-        {timelineNode.current
-          ? analysisPoints.map((p, i) => (
-              <BreakpointTimelinePoint
-                breakpoint={breakpoint}
-                point={p}
-                key={i}
-                index={i}
-                timelineNode={timelineNode.current}
-                hoveredItem={hoveredItem}
-              />
-            ))
-          : null}
+        {analysisPoints.map((p, i) => (
+          <BreakpointTimelinePoint
+            breakpoint={breakpoint}
+            point={p}
+            key={i}
+            index={i}
+            hoveredItem={hoveredItem}
+          />
+        ))}
       </div>
     </div>
   );

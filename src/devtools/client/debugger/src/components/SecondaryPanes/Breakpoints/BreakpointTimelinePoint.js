@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import classnames from "classnames";
 import { selectors } from "ui/reducers";
@@ -25,25 +25,10 @@ function hasSecondaryHighlighted({ hoveredItem, breakpoint }) {
   return breakpoint.id == getLocationKey(hoveredItem.location);
 }
 
-export function getLeftPercentOffset({ point, timelineNode, zoomRegion, markerWidth }) {
-  const timelineWidth = timelineNode.getBoundingClientRect().width;
-
-  const startTime = zoomRegion.startTime;
-  const endTime = zoomRegion.endTime;
-
-  // Percent offset values are [0, 100].
-  const unadjustedLeftPercentOffset = ((point.time - startTime) / (endTime - startTime)) * 100;
-  const unadjustedLeftPixelOffset = (unadjustedLeftPercentOffset / 100) * timelineWidth;
-  const leftPixelOffset = unadjustedLeftPixelOffset - markerWidth / 2;
-  const leftPercentOffset = (leftPixelOffset * 100) / timelineWidth;
-  return leftPercentOffset;
-}
-
 function BreakpointTimelinePoint({
   breakpoint,
   point,
   index,
-  timelineNode,
   analysisPoints,
   executionPoint,
   zoomRegion,
@@ -51,19 +36,6 @@ function BreakpointTimelinePoint({
   hoveredItem,
   setHoveredItem,
 }) {
-  const [leftPercentOffset, setLeftPercentOffset] = useState(0);
-
-  useEffect(() => {
-    setLeftPercentOffset(
-      getLeftPercentOffset({
-        point,
-        timelineNode,
-        zoomRegion,
-        markerWidth: pointWidth,
-      })
-    );
-  }, [point, timelineNode, zoomRegion]);
-
   const onMouseEnter = () =>
     setHoveredItem({
       target: "widget",
@@ -78,6 +50,9 @@ function BreakpointTimelinePoint({
     }
   };
 
+  const { startTime, endTime } = zoomRegion;
+  const leftPercentOffset = ((point.time - startTime) / (endTime - startTime)) * 100;
+
   return (
     <div
       className={classnames("breakpoint-navigation-timeline-point", {
@@ -89,7 +64,7 @@ function BreakpointTimelinePoint({
       })}
       title={`${index + 1}/${analysisPoints.length}`}
       onClick={() => seek(point.point, point.time, true)}
-      style={{ left: `${leftPercentOffset}%` }}
+      style={{ left: `calc(${leftPercentOffset}% - ${pointWidth / 2}px)` }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
