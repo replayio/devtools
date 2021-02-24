@@ -17,7 +17,7 @@ import {
   getRequestedBreakpointLocations,
   getPendingBreakpointList,
 } from "../../selectors";
-import { actions } from "ui/actions";
+import { setPendingNotification } from "ui/actions/app";
 import { selectors } from "ui/reducers";
 
 import { setBreakpointPositions } from "./breakpointPositions";
@@ -26,7 +26,6 @@ import { setSkipPausing } from "../pause/skipPausing";
 import { recordEvent } from "../../utils/telemetry";
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
-const { PointHandlers } = require("../../../../../../../src/protocol/logpoint");
 
 // This file has the primitive operations used to modify individual breakpoints
 // and keep them in sync with the breakpoints installed on server threads. These
@@ -151,7 +150,7 @@ export function addBreakpoint(
     // the user clicks on the gutter. Checking `isPaused` makes sure that we exclude all of the
     // synced breakpoints from displaying notifications.
     if (cx.isPaused) {
-      PointHandlers.addPendingNotification(location);
+      dispatch(setPendingNotification(location));
     }
 
     if (disabled) {
