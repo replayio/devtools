@@ -6,15 +6,7 @@ import hooks from "ui/hooks";
 import VideoComment from "./VideoComment";
 import "./CommentsOverlay.css";
 
-function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime, setHoveredComment }) {
-  const { comments: hasuraComments } = hooks.useGetComments(recordingId);
-
-  if (!canvas) {
-    return null;
-  }
-
-  const { top, left, width, height, scale } = canvas;
-
+function findComment({ hasuraComments, pendingComment, hoveredComment, currentTime }) {
   let comments = [...hasuraComments];
 
   // We replace the hasuraComment that's currently being edited with our own
@@ -26,9 +18,31 @@ function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime, set
     comments.push(pendingComment);
   }
 
-  const commentsAtTime = comments.filter(
-    comment => comment && comment.position && comment.time == currentTime
-  );
+  // Find the comment that matches the hoveredComment ID
+  if (hoveredComment) {
+    return comments.find(comment => comment.id == hoveredComment);
+  }
+
+  // Find the comment at the current position
+  return comments.find(comment => comment && comment.position && comment.time == currentTime);
+}
+
+function CommentsOverlay({
+  pendingComment,
+  canvas,
+  recordingId,
+  hoveredComment,
+  currentTime,
+  setHoveredComment,
+}) {
+  const { comments: hasuraComments } = hooks.useGetComments(recordingId);
+
+  if (!canvas) {
+    return null;
+  }
+
+  const { top, left, width, height, scale } = canvas;
+  const comment = findComment({ hasuraComments, pendingComment, currentTime, hoveredComment });
 
   return (
     <div
@@ -41,14 +55,7 @@ function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime, set
       }}
     >
       <div className="canvas-comments">
-        {commentsAtTime.map((comment, i) => (
-          <VideoComment
-            comment={comment}
-            scale={scale}
-            key={i}
-            setHoveredComment={setHoveredComment}
-          />
-        ))}
+        <VideoComment comment={comment} scale={scale} setHoveredComment={setHoveredComment} />
       </div>
     </div>
   );
@@ -56,6 +63,7 @@ function CommentsOverlay({ pendingComment, canvas, recordingId, currentTime, set
 
 export default connect(
   state => ({
+    hoveredComment: selectors.getHoveredComment(state),
     currentTime: selectors.getCurrentTime(state),
     pendingComment: selectors.getPendingComment(state),
     recordingId: selectors.getRecordingId(state),
