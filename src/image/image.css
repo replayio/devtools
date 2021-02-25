@@ -438,6 +438,9 @@ button.jump-definition {
 .img.plus-circle {
   -webkit-mask-image: url(~devtools/client/themes/images/plus-circle.svg);
 }
+.img.reply {
+  -webkit-mask-image: url(~devtools/client/themes/images/reply.svg);
+}
 .img.filter-circle-fill {
   -webkit-mask-image: url(~devtools/client/themes/images/filter-circle-fill.svg);
 }

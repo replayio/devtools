@@ -133,7 +133,7 @@ function CommentEditor({
   const [DraftJS, setDraftJS] = useState();
   const addComment = hooks.useAddComment(clearPendingComment);
   const updateComment = hooks.useUpdateComment(clearPendingComment);
-  const isNewComment = comment.content == "";
+  const isNewComment = comment.content == "" && !comment.parent_id;
 
   const handleSave = () => {
     if (editing) {
@@ -163,7 +163,7 @@ function CommentEditor({
       time: currentTime,
       point: ThreadFront.currentPoint,
       has_frames: ThreadFront.currentPointHasFrames,
-      parent_id: comment.id,
+      parent_id: comment.id || pendingComment.parent_id,
       source_location: await ThreadFront.getCurrentPauseSourceLocation(),
       position: {
         x: canvas.width * 0.5,

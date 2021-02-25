@@ -1,0 +1,15 @@
+.transcript-entry-action.img.reply {
+  display: none;
+  background: var(--cool-gray-400);
+  height: 22px;
+  width: 22px;
+  cursor: pointer;
+}
+
+.transcript-entry-action.img.reply:hover {
+  background: var(--cool-gray-600);
+}
+
+.transcript-entry:hover .transcript-entry-action.img.reply {
+  display: block;
+}
