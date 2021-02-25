@@ -45,7 +45,7 @@ function BreakpointTimelinePoint({
     });
 
   const onMouseLeave = e => {
-    if (!e.relatedTarget.closest(".breakpoint-panel")) {
+    if (!e.relatedTarget?.closest(".breakpoint-panel")) {
       setHoveredItem(null);
     }
   };
