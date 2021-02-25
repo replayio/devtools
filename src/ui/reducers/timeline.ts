@@ -32,6 +32,11 @@ export default function update(
       return { ...state, ...action.state };
     }
 
+    case "set_playback_stalled": {
+      const playback = state.playback ? { ...state.playback, stalled: action.stalled } : null;
+      return { ...state, playback };
+    }
+
     case "update_tooltip": {
       return { ...state, tooltip: action.tooltip };
     }
@@ -50,6 +55,7 @@ export const getZoomRegion = (state: UIState) => state.timeline.zoomRegion;
 export const getCurrentTime = (state: UIState) => state.timeline.currentTime;
 export const getHoverTime = (state: UIState) => state.timeline.hoverTime;
 export const getPlayback = (state: UIState) => state.timeline.playback;
+export const isPlaybackStalled = (state: UIState) => state.timeline.playback?.stalled || false;
 export const getUnprocessedRegions = (state: UIState) => state.timeline.unprocessedRegions;
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;
 export const getScreenShot = (state: UIState) => state.timeline.screenShot;

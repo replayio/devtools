@@ -17,6 +17,7 @@ export interface TimelineState {
     startTime: number;
     startDate: number;
     time: number;
+    stalled?: boolean;
   } | null;
   screenShot: ScreenShot | null;
   mouse: MouseAndClickPosition | null | undefined;
