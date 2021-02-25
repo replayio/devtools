@@ -32,9 +32,6 @@ export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel">
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
 export type SetModalAction = Action<"set_modal"> & { modal: ModalType | null };
-export type SetPendingNotificationAction = Action<"set_pending_notification"> & {
-  location: Location;
-};
 export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   analysisPoints: PointDescription[];
   location: Location;
@@ -63,7 +60,6 @@ export type AppActions =
   | SetInitializedPanelsAction
   | SetUploadingAction
   | SetModalAction
-  | SetPendingNotificationAction
   | SetAnalysisPointsAction
   | SetEventsForType
   | SetViewMode
@@ -165,13 +161,6 @@ export function setEventsForType(events: MouseEvent[], eventType: Event): SetEve
     type: "set_events",
     eventType,
     events,
-  };
-}
-
-export function setPendingNotification(location: any): SetPendingNotificationAction {
-  return {
-    type: "set_pending_notification",
-    location: location,
   };
 }
 
