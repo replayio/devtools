@@ -20,7 +20,6 @@ function initialAppState(): AppState {
     uploading: null,
     sessionId: null,
     modal: null,
-    pendingNotification: null,
     analysisPoints: {},
     events: {},
     viewMode: prefs.viewMode,
@@ -106,10 +105,6 @@ export default function update(
       };
     }
 
-    case "set_pending_notification": {
-      return { ...state, pendingNotification: action.location };
-    }
-
     case "set_view_mode": {
       return { ...state, viewMode: action.viewMode };
     }
@@ -163,7 +158,6 @@ export const getExpectedError = (state: UIState) => state.app.expectedError;
 export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getModal = (state: UIState) => state.app.modal;
 export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
-export const getPendingNotification = (state: UIState) => state.app.pendingNotification;
 export const getAnalysisPointsForLocation = (
   state: UIState,
   location: Location | null,

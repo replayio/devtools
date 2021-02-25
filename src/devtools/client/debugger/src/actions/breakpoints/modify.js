@@ -17,7 +17,6 @@ import {
   getRequestedBreakpointLocations,
   getPendingBreakpointList,
 } from "../../selectors";
-import { setPendingNotification } from "ui/actions/app";
 import { selectors } from "ui/reducers";
 
 import { setBreakpointPositions } from "./breakpointPositions";
@@ -144,14 +143,6 @@ export function addBreakpoint(
       cx,
       breakpoint,
     });
-
-    // We don't want notifications to show up for synced breakpoints that are added when we
-    // start up the devtools. We only want them to show up for breakpoints that are added when
-    // the user clicks on the gutter. Checking `isPaused` makes sure that we exclude all of the
-    // synced breakpoints from displaying notifications.
-    if (cx.isPaused) {
-      dispatch(setPendingNotification(location));
-    }
 
     if (disabled) {
       // If we just clobbered an enabled breakpoint with a disabled one, we need
