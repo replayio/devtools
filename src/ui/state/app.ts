@@ -32,6 +32,7 @@ export interface AppState {
   expectedError: ExpectedError | null;
   unexpectedError: sessionError | null;
   modal: ModalType | null;
+  modalOptions: { recordingId: string } | null;
   selectedPanel: PanelName;
   selectedPrimaryPanel: PrimaryPanelName;
   initializedPanels: PanelName[];

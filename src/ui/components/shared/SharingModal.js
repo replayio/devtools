@@ -7,7 +7,7 @@ import Modal from "ui/components/shared/Modal";
 import "./SharingModal.css";
 
 const GET_OWNER_AND_COLLABORATORS = gql`
-  query GetOwnerAndCollaborators($recordingId: uuid) {
+  query GetOwnerAndCollaborators($recordingId: uuid!) {
     collaborators(where: { recording_id: { _eq: $recordingId } }) {
       user {
         email
@@ -19,7 +19,7 @@ const GET_OWNER_AND_COLLABORATORS = gql`
       user_id
       recording_id
     }
-    recordings(where: { id: { _eq: $recordingId } }) {
+    recordings_by_pk(id: $recordingId) {
       user {
         email
         id
@@ -91,9 +91,8 @@ function Permission({ user, role, recordingId }) {
   );
 }
 
-function PermissionsList({ data, recordingId }) {
-  const owner = data.recordings[0].user;
-  const collaborators = data.collaborators;
+function PermissionsList({ recording, collaborators, recordingId }) {
+  const owner = recording.user;
 
   return (
     <div className="permissions-list">
@@ -146,7 +145,7 @@ function Submitter({ setStatus, userId, recordingId }) {
   return <div className="row status">{loading ? "Submitting" : "Submitted"}</div>;
 }
 
-function EmailForm({ data, recordingId }) {
+function EmailForm({ recordingId }) {
   const [inputValue, setInputValue] = useState("");
   const [status, setStatus] = useState({ type: "input" });
 
@@ -203,14 +202,16 @@ function EmailForm({ data, recordingId }) {
   );
 }
 
-function Sharing({ modal, hideModal, recordingId }) {
+function Sharing({ hideModal, modalOptions }) {
+  const { recordingId } = modalOptions;
   const { data, loading, error } = useQuery(GET_OWNER_AND_COLLABORATORS, {
     variables: { recordingId },
   });
 
+  console.log({ data, loading, error });
   if (loading) {
     return <Modal />;
-  } else if (error || data.recordings.length !== 1 || !data.recordings[0].user) {
+  } else if (error || !data.recordings_by_pk) {
     setTimeout(() => hideModal(), 2000);
     return (
       <Modal>
@@ -219,14 +220,19 @@ function Sharing({ modal, hideModal, recordingId }) {
     );
   }
 
+  const { collaborators, recordings_by_pk: recording } = data;
   return (
     <Modal>
       <div className="row title">
         <div className="img invite" />
         <p>Add collaborators</p>
       </div>
-      <EmailForm data={data} recordingId={recordingId} />
-      <PermissionsList data={data} recordingId={recordingId} />
+      <EmailForm recordingId={recordingId} />
+      <PermissionsList
+        recording={recording}
+        collaborators={collaborators}
+        recordingId={recordingId}
+      />
       <div className="bottom">
         <div className="spacer" />
         <button className="done" onClick={hideModal}>
@@ -240,7 +246,7 @@ function Sharing({ modal, hideModal, recordingId }) {
 export default connect(
   state => ({
     modal: selectors.getModal(state),
-    recordingId: selectors.getRecordingId(state),
+    modalOptions: selectors.getModalOptions(state),
   }),
   { hideModal: actions.hideModal }
 )(Sharing);

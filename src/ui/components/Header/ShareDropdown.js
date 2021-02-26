@@ -137,14 +137,14 @@ function PrivacyNote({ isPrivate, isOwner }) {
   );
 }
 
-function Collaborators({ setExpanded, setModal }) {
+function Collaborators({ setExpanded, recordingId, setModal }) {
   const { token } = useToken();
   if (!token) {
     return null;
   }
 
   const handleClick = () => {
-    setModal("sharing");
+    setModal("sharing", { recordingId });
     setExpanded(null);
   };
 
