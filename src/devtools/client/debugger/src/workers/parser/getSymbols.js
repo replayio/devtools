@@ -8,13 +8,7 @@ import * as t from "@babel/types";
 
 import createSimplePath from "./utils/simple-path";
 import { traverseAst } from "./utils/ast";
-import {
-  isFunction,
-  getComments,
-  getCode,
-  nodeLocationKey,
-  getFunctionParameterNames,
-} from "./utils/helpers";
+import { isFunction, getCode, getFunctionParameterNames } from "./utils/helpers";
 
 import { inferClassName } from "./utils/inferClassName";
 import getFunctionName from "./utils/getFunctionName";
@@ -42,6 +36,22 @@ function extractSymbol(path, symbols, state) {
       // in the file
       index,
     });
+  }
+
+  if (t.isCallExpression(path)) {
+    const name = path.node?.callee?.name;
+    if (name === "__d") {
+      const moduleName = path.node.arguments[0]?.value;
+      const loc = path.node.arguments[2]?.loc;
+      const location = {
+        start: { line: loc.start.line + 1, column: 0 },
+        end: loc.end,
+      };
+      symbols.functions.push({
+        name: moduleName,
+        location,
+      });
+    }
   }
 
   if (t.isJSXElement(path)) {
