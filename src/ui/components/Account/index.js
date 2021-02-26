@@ -93,7 +93,8 @@ function getRecordings(data) {
 }
 
 function AccountPage() {
-  const { userId } = useToken() || {};
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
   const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
     variables: { userId },
     pollInterval: 10000,

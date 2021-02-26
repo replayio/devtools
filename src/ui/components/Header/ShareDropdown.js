@@ -36,7 +36,8 @@ const GET_OWNER_USER_ID = gql`
 `;
 
 function useIsOwner(recordingId) {
-  const { userId } = useToken() || {};
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
   const { data, loading } = useQuery(GET_OWNER_USER_ID, {
     variables: { recordingId },
   });
@@ -111,8 +112,8 @@ function Privacy({ isPrivate, toggleIsPrivate }) {
 }
 
 function Collaborators({ setExpanded, setModal }) {
-  const tokenState = useToken();
-  if (!tokenState || !tokenState.userId) {
+  const { token } = useToken();
+  if (!token) {
     return null;
   }
 

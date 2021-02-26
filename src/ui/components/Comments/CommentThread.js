@@ -117,7 +117,8 @@ function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingCo
 }
 
 function Actions({ comment, hoveredComment, setPendingComment, isRoot }) {
-  const { userId } = useToken() || {};
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
   const [expanded, setExpanded] = useState(false);

@@ -52,7 +52,8 @@ function DevTools({
   viewMode,
 }) {
   const [finishedLoading, setFinishedLoading] = useState(false);
-  const { userId } = useToken() || {};
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
   const AddSessionUser = hooks.useAddSessionUser();
   const { data, queryIsLoading } = hooks.useGetRecording(recordingId);
 

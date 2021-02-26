@@ -15,7 +15,8 @@ interface Session {
 }
 
 export function useGetActiveSessions(recordingId: RecordingId, sessionId: string) {
-  const { userId } = useToken() || {};
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
   const { data, error, loading } = useQuery(
     gql`
       query GetActiveSessions($recordingId: uuid!, $sessionId: String!) {

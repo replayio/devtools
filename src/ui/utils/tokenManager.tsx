@@ -20,8 +20,13 @@ const {
 } = window;
 
 export interface TokenState {
+  loading?: boolean;
   token?: string;
-  userId?: string;
+  claims?: {
+    hasura: {
+      userId: string;
+    };
+  };
   error?: any;
 }
 
@@ -141,7 +146,7 @@ class TokenManager {
         const decodedToken = jwt_decode<any>(token);
         const userId = decodedToken?.["https://hasura.io/jwt/claims"]?.["x-hasura-user-id"];
 
-        this.setState({ token, userId }, deferredState);
+        this.setState({ token, claims: { hasura: { userId } } }, deferredState);
         if (deferredState === this.deferredState) {
           this.setupTokenRefresh(token);
         }
