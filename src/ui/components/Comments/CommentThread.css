@@ -174,7 +174,9 @@
   display: none;
 }
 
-.transcript-list .comment-body-item:hover .comment-actions {
+/* Added .hover class here for testing purposes */
+.transcript-list .comment-body-item:hover .comment-actions,
+.transcript-list .comment-body-item.hover .comment-actions {
   display: flex;
   flex-direction: row;
 }
