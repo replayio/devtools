@@ -45,7 +45,7 @@ export default function RecordingItem({ data, viewType, selectedIds, setSelected
     <RecordingItemDropdown
       editingTitle={editingTitle}
       setEditingTitle={setEditingTitle}
-      recordingId={data.recording_id}
+      recording={data}
       toggleIsPrivate={toggleIsPrivate}
       isPrivate={isPrivate}
     />

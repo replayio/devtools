@@ -4,7 +4,7 @@ import Title from "../../shared/Title";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import { AuthAvatar } from "ui/components/Avatar";
 import moment from "moment";
-import { useAuth0 } from "@auth0/auth0-react";
+import useToken from "ui/utils/useToken";
 import "./RecordingListItem.css";
 
 function getDurationString(durationMs) {
@@ -122,8 +122,12 @@ export default function RecordingListItem({
   selectedIds,
   editing,
 }) {
+  const { userId } = useToken();
+
   const { recording_id: recordingId } = data;
   const selected = selectedIds.includes(recordingId);
+
+  const isOwner = userId == data.user.id;
 
   const toggleChecked = () => {
     if (selected) {
@@ -179,9 +183,7 @@ export default function RecordingListItem({
           <AuthAvatar user={data.user} />
         </div>
       </td>
-      <td>
-        <ItemOptions Panel={Panel} />
-      </td>
+      <td>{isOwner && <ItemOptions Panel={Panel} />}</td>
     </tr>
   );
 }

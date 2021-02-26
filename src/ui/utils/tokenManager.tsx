@@ -7,6 +7,9 @@ import { assert, defer, Deferred } from "protocol/utils";
 
 const domain = "webreplay.us.auth0.com";
 const audience = "hasura-api";
+
+// Hasura requires a valid recording id when querying the recordings table directly.
+const defaultRecordingId = "5a080a89-580b-4b5b-8cbe-3c9995992a0d";
 const tokenRefreshSecondsBeforeExpiry = 60;
 
 // Auth0 E2E tests require a different clientId
@@ -64,7 +67,7 @@ class TokenManager {
         cacheLocation="localstorage"
         prompt="select_account"
         useRefreshTokens={true}
-        recordingId={recordingId}
+        recordingId={recordingId || defaultRecordingId}
       >
         <Auth0Context.Consumer>
           {auth0Client => {

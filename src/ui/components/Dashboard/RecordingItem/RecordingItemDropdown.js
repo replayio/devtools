@@ -13,10 +13,25 @@ const DELETE_RECORDING = gql`
   }
 `;
 
+function Privacy({ isPrivate, toggleIsPrivate }) {
+  if (isPrivate) {
+    return (
+      <div className="menu-item" onClick={toggleIsPrivate}>
+        Make public
+      </div>
+    );
+  }
+  return (
+    <div className="menu-item" onClick={toggleIsPrivate}>
+      Make private
+    </div>
+  );
+}
+
 const DropdownPanel = ({
   editingTitle,
   setEditingTitle,
-  recordingId,
+  recording,
   toggleIsPrivate,
   isPrivate,
   setModal,
@@ -29,6 +44,8 @@ const DropdownPanel = ({
     await deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } });
   };
 
+  const { recording_id } = recording;
+
   return (
     <div className="dropdown-panel">
       {!editingTitle ? (
@@ -36,18 +53,10 @@ const DropdownPanel = ({
           Edit Title
         </div>
       ) : null}
-      <div className="menu-item" onClick={() => onDeleteRecording(recordingId)}>
+      <div className="menu-item" onClick={() => onDeleteRecording(recording_id)}>
         Delete Recording
       </div>
-      {isPrivate ? (
-        <div className="menu-item" onClick={toggleIsPrivate}>
-          Make public
-        </div>
-      ) : (
-        <div className="menu-item" onClick={toggleIsPrivate}>
-          Make private
-        </div>
-      )}
+      <Privacy isPrivate={isPrivate} toggleIsPrivate={toggleIsPrivate} />
       <div className="menu-item" onClick={() => setModal("sharing")}>
         Open sharing preferences
       </div>
