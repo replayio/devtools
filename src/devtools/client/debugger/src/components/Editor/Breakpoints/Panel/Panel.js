@@ -12,8 +12,8 @@ import BreakpointNavigation from "devtools/client/debugger/src/components/Second
 
 import "./Panel.css";
 import { connect } from "react-redux";
-import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -108,7 +108,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem }) {
     setHoveredItem(hoveredItem);
   };
   const onMouseLeave = e => {
-    if (!e.relatedTarget?.closest(".breakpoint-panel")) {
+    if (!inBreakpointPanel(e)) {
       setHoveredItem(null);
     }
   };
