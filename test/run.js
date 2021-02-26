@@ -80,8 +80,12 @@ function processEnvironmentVariables() {
     stripeIndex = +match[1];
     stripeCount = +match[2];
 
-    shouldRecordViewer = true;
-    shouldRecordExamples = true;
+    // This is hacky, but on macOS we require() this script instead of starting
+    // it with specific command line arguments.
+    if (process.platform == "darwin") {
+      shouldRecordViewer = true;
+      shouldRecordExamples = true;
+    }
   }
 
   // Get the address to use for the dispatch server.
@@ -166,7 +170,7 @@ async function runTest(test, example) {
   await runTestViewer("test/harness.js", test, 240, env);
 }
 
-function spawnGecko(url, env) {
+function spawnGecko(env) {
   const args = ["-foreground"];
 
   if (!process.env.NORMAL_PROFILE) {
@@ -175,8 +179,8 @@ function spawnGecko(url, env) {
     args.push("-profile", profile);
   }
 
-  if (url) {
-    args.push(url);
+  if (process.env.HEADLESS) {
+    args.push("-headless");
   }
 
   const geckoPath = findGeckoPath();
@@ -186,7 +190,7 @@ function spawnGecko(url, env) {
 async function runTestViewer(path, local, timeout = 60, env = {}) {
   const testScript = createTestScript({ path });
 
-  const gecko = spawnGecko(null, {
+  const gecko = spawnGecko({
     ...process.env,
     ...env,
     MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
@@ -301,13 +305,14 @@ async function createExampleNodeRecording(example) {
 async function createExampleBrowserRecording(url) {
   const testScript = createTestScript({ path: `${__dirname}/exampleHarness.js` });
   const recordingIdFile = tmpFile();
-  const gecko = spawnGecko(url, {
+  const gecko = spawnGecko({
     ...process.env,
     MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
     RECORD_REPLAY_TEST_SCRIPT: testScript,
+    RECORD_REPLAY_TEST_URL: url,
     RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
-    RECORD_REPLAY_MATCHING_URL: "localhost",
     RECORD_REPLAY_SERVER: dispatchServer,
+    RECORD_ALL_CONTENT: "1",
   });
 
   if (!process.env.RECORD_REPLAY_NO_TIMEOUT) {
