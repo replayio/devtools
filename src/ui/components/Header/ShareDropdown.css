@@ -55,7 +55,7 @@
   flex-grow: 1;
   margin-right: 8px;
   border: none;
-  background-color: #EEE;
+  background-color: #eee;
   line-height: 16px;
   padding: 8px;
   border-radius: 4px;
@@ -88,6 +88,12 @@
   transition-duration: 200ms;
   padding: 0px;
   box-sizing: content-box;
+}
+
+#header .share .dropdown-container .row.privacy-note.is-public,
+#header .share .dropdown-container .row.privacy-note.is-public .label-description,
+#header .share .dropdown-container .row.privacy-note.is-public .label-description a:visited {
+  color: #7d000f;
 }
 
 #header .share .dropdown-container .row.privacy button.toggle:focus {

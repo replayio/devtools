@@ -112,6 +112,32 @@ function Privacy({ isPrivate, toggleIsPrivate }) {
   );
 }
 
+function PrivacyNote({ isPrivate, isOwner }) {
+  if (!isOwner) {
+    return null;
+  }
+
+  return (
+    <div className={`row privacy-note ${isPrivate ? "is-private" : "is-public"}`}>
+      <div style={{ width: "67px" }} />
+      <div className="label">
+        <div className="label-title">Note</div>
+        <div className="label-description">
+          Replay records everything including passwords you&#39;ve typed and sensitive data
+          you&#39;re viewing.{" "}
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://www.notion.so/replayio/Security-2af70ebdfb1c47e5b9246f25ca377ef2"
+          >
+            Learn more
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Collaborators({ setExpanded, setModal }) {
   const { isAuthenticated } = useAuth0();
 
@@ -138,16 +164,15 @@ function Collaborators({ setExpanded, setModal }) {
   );
 }
 
-function OwnerSettings({ recordingId, setModal, setExpanded }) {
-  const { data } = useQuery(GET_RECORDING_PRIVACY, {
-    variables: { recordingId },
-  });
-
-  const isPrivate = data.recordings[0]?.is_private;
+function OwnerSettings({ recordingId, isPrivate, isOwner }) {
   const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE, {
     variables: { recordingId, isPrivate: !isPrivate },
     refetchQueries: ["GetRecordingPrivacy"],
   });
+
+  if (!isOwner) {
+    return null;
+  }
 
   return (
     <>
@@ -159,6 +184,11 @@ function OwnerSettings({ recordingId, setModal, setExpanded }) {
 function ShareDropdown({ recordingId, setModal }) {
   const [expanded, setExpanded] = useState(false);
   const isOwner = useIsOwner(recordingId);
+  const { data } = useQuery(GET_RECORDING_PRIVACY, {
+    variables: { recordingId },
+  });
+
+  const isPrivate = data.recordings[0]?.is_private;
   const buttonContent = <div className="img share" />;
 
   return (
@@ -170,9 +200,8 @@ function ShareDropdown({ recordingId, setModal }) {
         expanded={expanded}
       >
         <CopyUrl recordingId={recordingId} />
-        {isOwner ? (
-          <OwnerSettings recordingId={recordingId} setExpanded={setExpanded} setModal={setModal} />
-        ) : null}
+        <OwnerSettings recordingId={recordingId} isPrivate={isPrivate} isOwner={isOwner} />
+        <PrivacyNote isPrivate={isPrivate} isOwner={isOwner} />
         <Collaborators recordingId={recordingId} setExpanded={setExpanded} setModal={setModal} />
       </Dropdown>
     </div>
