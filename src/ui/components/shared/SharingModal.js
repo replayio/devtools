@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import Loader from "./Loader";
 import Modal from "ui/components/shared/Modal";
 import "./SharingModal.css";
 
@@ -11,7 +10,6 @@ const GET_OWNER_AND_COLLABORATORS = gql`
   query GetOwnerAndCollaborators($recordingId: uuid) {
     collaborators(where: { recording_id: { _eq: $recordingId } }) {
       user {
-        auth_id
         email
         id
         name
@@ -23,7 +21,6 @@ const GET_OWNER_AND_COLLABORATORS = gql`
     }
     recordings(where: { id: { _eq: $recordingId } }) {
       user {
-        auth_id
         email
         id
         name

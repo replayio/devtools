@@ -21,6 +21,7 @@ const {
 
 export interface TokenState {
   token?: string;
+  userId?: string;
   error?: any;
 }
 
@@ -29,6 +30,7 @@ type TokenListener = (state: TokenState) => void;
 class TokenManager {
   private auth0Client: Auth0ContextInterface | undefined;
   private deferredState = defer<TokenState>();
+  private currentState?: TokenState;
   private isTokenRequested = false;
   private refreshTimeout: number | undefined;
   private listeners: TokenListener[] = [];
@@ -80,6 +82,9 @@ class TokenManager {
   };
 
   addListener(listener: TokenListener) {
+    if (this.currentState) {
+      listener(this.currentState);
+    }
     this.listeners.push(listener);
   }
 
@@ -133,7 +138,10 @@ class TokenManager {
       try {
         const token = await this.fetchToken(refresh);
 
-        this.setState({ token }, deferredState);
+        const decodedToken = jwt_decode<any>(token);
+        const userId = decodedToken?.["https://hasura.io/jwt/claims"]?.["x-hasura-user-id"];
+
+        this.setState({ token, userId }, deferredState);
         if (deferredState === this.deferredState) {
           this.setupTokenRefresh(token);
         }
@@ -161,6 +169,7 @@ class TokenManager {
   }
 
   private setState(state: TokenState, deferredState: Deferred<TokenState>) {
+    this.currentState = state;
     this.listeners.forEach(listener => listener(state));
     deferredState.resolve(state);
   }

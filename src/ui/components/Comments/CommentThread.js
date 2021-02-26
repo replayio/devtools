@@ -7,7 +7,7 @@ import { actions } from "ui/actions";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 
 import { useAuth0 } from "@auth0/auth0-react";
-import moment from "moment";
+import useToken from "ui/utils/useToken";
 
 import CommentEditor from "ui/components/Comments/CommentEditor";
 import "./CommentThread.css";
@@ -117,13 +117,13 @@ function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingCo
 }
 
 function Actions({ comment, hoveredComment, setPendingComment, isRoot }) {
-  const { user } = useAuth0();
+  const { userId } = useToken() || {};
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
   const [expanded, setExpanded] = useState(false);
 
   const isHovered = hoveredComment == comment.id;
-  const isCommentAuthor = user?.sub === comment.user.auth_id;
+  const isCommentAuthor = userId === comment.user.id;
 
   if (!isCommentAuthor) {
     return null;
