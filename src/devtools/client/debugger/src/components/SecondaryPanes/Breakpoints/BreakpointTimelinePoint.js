@@ -6,6 +6,7 @@ import { timelineMarkerWidth as pointWidth } from "ui/constants";
 const { getAnalysisPointsForLocation } = selectors;
 import { actions } from "ui/actions";
 import { Circle } from "ui/components/Timeline/Marker";
+import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
@@ -45,7 +46,7 @@ function BreakpointTimelinePoint({
     });
 
   const onMouseLeave = e => {
-    if (!e.relatedTarget?.closest(".breakpoint-panel")) {
+    if (!inBreakpointPanel(e)) {
       setHoveredItem(null);
     }
   };
