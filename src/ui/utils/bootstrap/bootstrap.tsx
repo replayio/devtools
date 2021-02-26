@@ -49,13 +49,11 @@ function ApolloWrapper({
   recordingId: string | undefined;
   children: ReactNode;
 }) {
-  const tokenState = useToken();
+  const { loading, token, error } = useToken();
 
-  if (tokenState === undefined) {
+  if (loading) {
     return null;
   }
-
-  const { token, error } = tokenState;
 
   if (error) {
     if (error.message === "Could not open popup") {

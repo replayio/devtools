@@ -7,7 +7,8 @@ import { ThreadFront } from "protocol/thread";
 import useToken from "ui/utils/useToken";
 
 function CommentDropdownPanel({ comment, onItemClick, setPendingComment, recordingId, canvas }) {
-  const { userId } = useToken() || {};
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
   const isAuthor = comment.user.id == userId;
