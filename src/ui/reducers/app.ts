@@ -20,6 +20,7 @@ function initialAppState(): AppState {
     uploading: null,
     sessionId: null,
     modal: null,
+    modalOptions: null,
     analysisPoints: {},
     events: {},
     viewMode: prefs.viewMode,
@@ -80,7 +81,7 @@ export default function update(
     }
 
     case "set_modal": {
-      return { ...state, modal: action.modal };
+      return { ...state, modal: action.modal, modalOptions: action.options };
     }
 
     case "set_analysis_points": {
@@ -157,6 +158,7 @@ export const getSessionId = (state: UIState) => state.app.sessionId;
 export const getExpectedError = (state: UIState) => state.app.expectedError;
 export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getModal = (state: UIState) => state.app.modal;
+export const getModalOptions = (state: UIState) => state.app.modalOptions;
 export const getAnalysisPoints = (state: UIState) => state.app.analysisPoints;
 export const getAnalysisPointsForLocation = (
   state: UIState,

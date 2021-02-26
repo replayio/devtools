@@ -57,7 +57,7 @@ const DropdownPanel = ({
         Delete Recording
       </div>
       <Privacy isPrivate={isPrivate} toggleIsPrivate={toggleIsPrivate} />
-      <div className="menu-item" onClick={() => setModal("sharing")}>
+      <div className="menu-item" onClick={() => setModal("sharing", { recordingId: recording_id })}>
         Open sharing preferences
       </div>
     </div>

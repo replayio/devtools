@@ -31,7 +31,11 @@ export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel">
 };
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
-export type SetModalAction = Action<"set_modal"> & { modal: ModalType | null };
+export type SetModalAction = Action<"set_modal"> & {
+  modal: ModalType | null;
+  options: { recordingId: string } | null;
+};
+
 export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   analysisPoints: PointDescription[];
   location: Location;
@@ -129,10 +133,14 @@ export function setUploading(uploading: UploadInfo | null): SetUploadingAction {
   return { type: "set_uploading", uploading };
 }
 
-export function setModal(modalType: ModalType): SetModalAction {
+export function setModal(
+  modalType: ModalType,
+  options: { recordingId: string } | null = null
+): SetModalAction {
   return {
     type: "set_modal",
     modal: modalType,
+    options,
   };
 }
 
@@ -140,6 +148,7 @@ export function hideModal(): SetModalAction {
   return {
     type: "set_modal",
     modal: null,
+    options: null,
   };
 }
 
