@@ -96,7 +96,6 @@ function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingCo
     <div
       className={classnames("comment-body-item", { hover: isHovered })}
       onMouseEnter={() => {
-        console.log("onmouseenter");
         setIsHovered(true);
       }}
       onMouseLeave={() => setIsHovered(false)}

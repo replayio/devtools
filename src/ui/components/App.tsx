@@ -47,9 +47,6 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
 
 function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   const auth = useAuth0();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     document.body.parentElement!.className = theme || "";

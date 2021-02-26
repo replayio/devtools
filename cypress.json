@@ -1,5 +1,11 @@
 {
   "baseUrl": "http://localhost:8080",
   "defaultCommandTimeout": 20000,
-  "chromeWebSecurity": false
+  "chromeWebSecurity": false,
+  "fixturesFolder": "test/cypress/fixtures",
+  "integrationFolder": "test/cypress/integration",
+  "pluginsFile": "test/cypress/plugins/index.js",
+  "screenshotsFolder": "test/cypress/screenshots",
+  "videosFolder": "test/cypress/videos",
+  "supportFile": "test/cypress/support/index.js"
 }

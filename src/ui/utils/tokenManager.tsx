@@ -9,16 +9,11 @@ const domain = "webreplay.us.auth0.com";
 const audience = "hasura-api";
 const tokenRefreshSecondsBeforeExpiry = 60;
 
-let clientId: string;
+// Auth0 E2E tests require a different clientId
 const isTesting = new URL(window.location.href).searchParams.get("e2etest");
-
-if (isTesting) {
-  // Auth0 Application: Cypress E2E Testing
-  clientId = "uL3A8jxVqotF5Q6bmn5QTV46hU97MPQm";
-} else {
-  // Auth0 Application: Replay
-  clientId = "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
-}
+const clientId: string = isTesting
+  ? "uL3A8jxVqotF5Q6bmn5QTV46hU97MPQm"
+  : "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
 
 const {
   location: { origin, pathname },
