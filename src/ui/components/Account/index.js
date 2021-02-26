@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import Dashboard from "../Dashboard/index";
 import { useAuth0 } from "@auth0/auth0-react";
+import useToken from "ui/utils/useToken";
 import Loader from "../shared/Loader";
 import Prompt from "../shared/Prompt";
 import { gql, useQuery } from "@apollo/client";
@@ -30,8 +31,8 @@ const GET_MY_RECORDINGS = gql`
     picture
   }
 
-  query GetMyRecordings($authId: String) {
-    users(where: { auth_id: { _eq: $authId } }) {
+  query GetMyRecordings($userId: uuid) {
+    users(where: { id: { _eq: $userId } }) {
       ...avatarFields
       collaborators {
         recording {
@@ -92,9 +93,9 @@ function getRecordings(data) {
 }
 
 function AccountPage() {
-  const { user } = useAuth0();
+  const { userId } = useToken() || {};
   const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
-    variables: { authId: user.sub },
+    variables: { userId },
     pollInterval: 10000,
   });
 

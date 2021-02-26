@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
-import { useAuth0 } from "@auth0/auth0-react";
+import useToken from "ui/utils/useToken";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { gql, useQuery, useMutation } from "@apollo/client";
@@ -27,32 +27,30 @@ const GET_RECORDING_PRIVACY = gql`
   }
 `;
 
-const GET_OWNER_AUTH_ID = gql`
-  query GetOwnerAuthId($recordingId: uuid!) {
+const GET_OWNER_USER_ID = gql`
+  query GetOwnerUserId($recordingId: uuid!) {
     recordings(where: { id: { _eq: $recordingId } }) {
-      user {
-        auth_id
-      }
+      user_id
     }
   }
 `;
 
 function useIsOwner(recordingId) {
-  const { user, isAuthenticated } = useAuth0();
-  const { data, loading } = useQuery(GET_OWNER_AUTH_ID, {
+  const { userId } = useToken() || {};
+  const { data, loading } = useQuery(GET_OWNER_USER_ID, {
     variables: { recordingId },
   });
 
-  if (!isAuthenticated || loading) {
+  if (loading) {
     return false;
   }
 
   const recording = data.recordings[0];
-  if (!recording?.user) {
+  if (!recording?.user_id) {
     return false;
   }
 
-  return user.sub === recording.user?.auth_id;
+  return userId === recording.user_id;
 }
 
 function CopyUrl({ recordingId }) {
@@ -113,16 +111,15 @@ function Privacy({ isPrivate, toggleIsPrivate }) {
 }
 
 function Collaborators({ setExpanded, setModal }) {
-  const { isAuthenticated } = useAuth0();
+  const tokenState = useToken();
+  if (!tokenState || !tokenState.userId) {
+    return null;
+  }
 
   const handleClick = () => {
     setModal("sharing");
     setExpanded(null);
   };
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   return (
     <div className="row collaborators">
