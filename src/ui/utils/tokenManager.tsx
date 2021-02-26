@@ -57,6 +57,9 @@ class TokenManager {
         <Auth0Context.Consumer>
           {auth0Client => {
             this.auth0Client = auth0Client;
+            if (!this.auth0Client || this.auth0Client.isLoading) {
+              return;
+            }
 
             setTimeout(() => {
               this.update(this.init);
