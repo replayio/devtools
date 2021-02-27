@@ -111,6 +111,11 @@ async function runTest(test, example) {
     return;
   }
 
+  if (process.env.SKIPPED_TESTS && process.env.SKIPPED_TESTS.includes(test)) {
+    console.log(`Skipping test ${test}, excluded by SKIPPED_TESTS`);
+    return;
+  }
+
   console.log(`[${elapsedTime()}] Starting test ${test}`);
 
   // Recording ID to load in the viewer. If not set, we will record the example
