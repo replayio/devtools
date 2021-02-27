@@ -5,6 +5,7 @@ const classnames = require("classnames");
 import { actions } from "../../actions";
 import { HoveredItem, ZoomRegion } from "ui/state/timeline";
 import { Location, PauseId } from "@recordreplay/protocol";
+import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 
 // If you do modify this, make sure you change EVERY single reference to this 11px width in
 // the codebase. This includes, but is not limited to, the Timeline component, Message component,
@@ -59,7 +60,7 @@ class Marker extends React.Component<MarkerProps> {
   };
 
   onMouseLeave: MouseEventHandler = (e: any) => {
-    if (!e.relatedTarget.closest(".breakpoint-panel")) {
+    if (!inBreakpointPanel(e)) {
       this.props.setHoveredItem(null);
     }
   };

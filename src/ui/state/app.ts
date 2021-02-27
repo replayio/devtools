@@ -35,7 +35,6 @@ export interface AppState {
   selectedPanel: PanelName;
   selectedPrimaryPanel: PrimaryPanelName;
   initializedPanels: PanelName[];
-  pendingNotification: any;
   analysisPoints: AnalysisPoints;
   viewMode: ViewMode;
   narrowMode: boolean;

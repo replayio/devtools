@@ -7,7 +7,7 @@ import { actions } from "ui/actions";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 
 import { useAuth0 } from "@auth0/auth0-react";
-import moment from "moment";
+import useToken from "ui/utils/useToken";
 
 import CommentEditor from "ui/components/Comments/CommentEditor";
 import "./CommentThread.css";
@@ -84,6 +84,7 @@ function CommentThread({
 }
 
 function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingComment }) {
+  const [isHovered, setIsHovered] = useState(false);
   const lines = comment.content.split("\n");
   const isBeingEdited = comment === pendingComment && comment.content !== "";
 
@@ -92,7 +93,13 @@ function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingCo
   }
 
   return (
-    <div className="comment-body-item">
+    <div
+      className={classnames("comment-body-item", { hover: isHovered })}
+      onMouseEnter={() => {
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="comment-body-header">
         <img src={comment.user.picture} className="comment-picture" />
         <div className="comment-body-header-label">
@@ -110,13 +117,14 @@ function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingCo
 }
 
 function Actions({ comment, hoveredComment, setPendingComment, isRoot }) {
-  const { user } = useAuth0();
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReplies = hooks.useDeleteCommentReplies();
   const [expanded, setExpanded] = useState(false);
 
   const isHovered = hoveredComment == comment.id;
-  const isCommentAuthor = user?.sub === comment.user.auth_id;
+  const isCommentAuthor = userId === comment.user.id;
 
   if (!isCommentAuthor) {
     return null;
@@ -142,10 +150,18 @@ function Actions({ comment, hoveredComment, setPendingComment, isRoot }) {
         buttonStyle=""
         position="bottom-right"
       >
-        <div className="comments-dropdown-item" title="Delete Comment" onClick={editComment}>
+        <div
+          className="comments-dropdown-item edit-comment"
+          title="Edit Comment"
+          onClick={editComment}
+        >
           Edit comment
         </div>
-        <div className="comments-dropdown-item" title="Delete Comment" onClick={handleDelete}>
+        <div
+          className="comments-dropdown-item delete-comment"
+          title="Delete Comment"
+          onClick={handleDelete}
+        >
           {isRoot ? "Delete comment and replies" : "Delete comment"}
         </div>
       </PortalDropdown>

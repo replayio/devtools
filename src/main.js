@@ -85,7 +85,7 @@ async function initialize() {
     setupGraphics(store);
     initOutputSyntaxHighlighting();
     setupMessages(store);
-    setupLogpoints();
+    setupLogpoints(store);
   }
 
   bootstrapApp({}, { recordingId }, store);

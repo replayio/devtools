@@ -111,6 +111,7 @@ function DraftJSEditor({
         keyBindingFn={keyBindingFn}
         placeholder={placeholder}
         ref={editorNode}
+        webDriverTestID="draftjs-editor"
       />
     </div>
   );

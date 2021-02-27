@@ -151,9 +151,11 @@ function waitForMessage(msg) {
       // for actually came from the current tab, and not the initial page-load
       // process that is not being recorded.
       if (!remoteTab || evt.target.osPid != remoteTab.osPid) {
+        log(`ReceivedMessageWrongTab ${msg}`);
         return;
       }
 
+      log(`ReceivedMessage ${msg}`);
       resolve();
       Services.ppmm.removeMessageListener(msg, listener);
     },

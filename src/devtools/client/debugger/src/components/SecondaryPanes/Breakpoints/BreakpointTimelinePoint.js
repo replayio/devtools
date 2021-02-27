@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import classnames from "classnames";
 import { selectors } from "ui/reducers";
@@ -6,6 +6,7 @@ import { timelineMarkerWidth as pointWidth } from "ui/constants";
 const { getAnalysisPointsForLocation } = selectors;
 import { actions } from "ui/actions";
 import { Circle } from "ui/components/Timeline/Marker";
+import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
@@ -25,25 +26,10 @@ function hasSecondaryHighlighted({ hoveredItem, breakpoint }) {
   return breakpoint.id == getLocationKey(hoveredItem.location);
 }
 
-export function getLeftPercentOffset({ point, timelineNode, zoomRegion, markerWidth }) {
-  const timelineWidth = timelineNode.getBoundingClientRect().width;
-
-  const startTime = zoomRegion.startTime;
-  const endTime = zoomRegion.endTime;
-
-  // Percent offset values are [0, 100].
-  const unadjustedLeftPercentOffset = ((point.time - startTime) / (endTime - startTime)) * 100;
-  const unadjustedLeftPixelOffset = (unadjustedLeftPercentOffset / 100) * timelineWidth;
-  const leftPixelOffset = unadjustedLeftPixelOffset - markerWidth / 2;
-  const leftPercentOffset = (leftPixelOffset * 100) / timelineWidth;
-  return leftPercentOffset;
-}
-
 function BreakpointTimelinePoint({
   breakpoint,
   point,
   index,
-  timelineNode,
   analysisPoints,
   executionPoint,
   zoomRegion,
@@ -51,19 +37,6 @@ function BreakpointTimelinePoint({
   hoveredItem,
   setHoveredItem,
 }) {
-  const [leftPercentOffset, setLeftPercentOffset] = useState(0);
-
-  useEffect(() => {
-    setLeftPercentOffset(
-      getLeftPercentOffset({
-        point,
-        timelineNode,
-        zoomRegion,
-        markerWidth: pointWidth,
-      })
-    );
-  }, [point, timelineNode, zoomRegion]);
-
   const onMouseEnter = () =>
     setHoveredItem({
       target: "widget",
@@ -73,10 +46,13 @@ function BreakpointTimelinePoint({
     });
 
   const onMouseLeave = e => {
-    if (!e.relatedTarget.closest(".breakpoint-panel")) {
+    if (!inBreakpointPanel(e)) {
       setHoveredItem(null);
     }
   };
+
+  const { startTime, endTime } = zoomRegion;
+  const leftPercentOffset = ((point.time - startTime) / (endTime - startTime)) * 100;
 
   return (
     <div
@@ -89,7 +65,7 @@ function BreakpointTimelinePoint({
       })}
       title={`${index + 1}/${analysisPoints.length}`}
       onClick={() => seek(point.point, point.time, true)}
-      style={{ left: `${leftPercentOffset}%` }}
+      style={{ left: `calc(${leftPercentOffset}% - ${pointWidth / 2}px)` }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
@@ -113,7 +89,8 @@ const MemoizedBreakpointTimelinePoint = React.memo(
       selectorChanged(hasPrimaryHighlight) ||
       selectorChanged(hasSecondaryHighlighted) ||
       hasChanged("zoomRegion") ||
-      hasChanged("executionPoint")
+      hasChanged("executionPoint") ||
+      hasChanged("analysisPoints")
     ) {
       return false;
     }
@@ -124,7 +101,11 @@ const MemoizedBreakpointTimelinePoint = React.memo(
 
 export default connect(
   (state, { breakpoint }) => ({
-    analysisPoints: getAnalysisPointsForLocation(state, breakpoint.location),
+    analysisPoints: getAnalysisPointsForLocation(
+      state,
+      breakpoint.location,
+      breakpoint.options.condition
+    ),
     executionPoint: getExecutionPoint(state),
     zoomRegion: selectors.getZoomRegion(state),
   }),

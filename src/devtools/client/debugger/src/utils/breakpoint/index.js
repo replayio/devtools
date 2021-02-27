@@ -29,6 +29,10 @@ export function getLocationKey(location) {
   return `${sourceId || location.scriptId}:${line}:${columnString}`;
 }
 
+export function getLocationAndConditionKey(location, condition) {
+  return `${getLocationKey(location)}:${condition}`;
+}
+
 export function isMatchingLocation(location1, location2) {
   return location1 && location2 && getLocationKey(location1) === getLocationKey(location2);
 }

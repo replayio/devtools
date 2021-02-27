@@ -18,15 +18,23 @@ function VideoComment({
   setHoveredComment,
   setActiveComment,
   hoveredComment,
+  currentTime,
+  hoverTime,
 }: PropsFromRedux) {
-  if (!canvas) {
+  if (!canvas || !comment) {
     return null;
   }
 
   const { scale } = canvas;
   const position = comment.position;
 
-  if (inCenter(canvas, comment)) {
+  // Hide pins while the user is hovering in the timeline
+  if (!hoveredComment && hoverTime && hoverTime != currentTime) {
+    return null;
+  }
+
+  // Hide pins that were never moved
+  if (comment.content != "" && inCenter(canvas, comment)) {
     return null;
   }
 
@@ -56,6 +64,7 @@ function VideoComment({
 const connector = connect(
   (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
+    hoverTime: selectors.getHoverTime(state),
     pendingComment: selectors.getPendingComment(state),
     recordingId: selectors.getRecordingId(state),
     canvas: selectors.getCanvas(state),

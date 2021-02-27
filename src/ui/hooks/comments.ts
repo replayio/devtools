@@ -57,7 +57,7 @@ export function useGetComments(
         user {
           picture
           name
-          auth_id
+          id
         }
       }
       query GetComments($recordingId: uuid) {

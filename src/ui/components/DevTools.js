@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { useAuth0 } from "@auth0/auth0-react";
+import useToken from "ui/utils/useToken";
 
 import Header from "./Header/index";
 import SkeletonLoader from "./SkeletonLoader";
@@ -52,7 +52,8 @@ function DevTools({
   viewMode,
 }) {
   const [finishedLoading, setFinishedLoading] = useState(false);
-  const auth = useAuth0();
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
   const AddSessionUser = hooks.useAddSessionUser();
   const { data, queryIsLoading } = hooks.useGetRecording(recordingId);
 
@@ -67,12 +68,10 @@ function DevTools({
   }, [loading]);
 
   useEffect(() => {
-    if (loading == 100 && auth.user && sessionId) {
-      hooks.fetchUserId(auth.user.sub).then(userId => {
-        AddSessionUser({ variables: { id: sessionId, user_id: userId } });
-      });
+    if (loading == 100 && userId && sessionId) {
+      AddSessionUser({ variables: { id: sessionId, user_id: userId } });
     }
-  }, [loading, auth.user, sessionId]);
+  }, [loading, userId, sessionId]);
 
   useEffect(() => {
     if (data?.recordings?.[0]?.title) {
@@ -97,7 +96,7 @@ function DevTools({
   const isAuthorized = getIsAuthorized({ data });
 
   if (!isAuthorized) {
-    if (auth.isAuthenticated) {
+    if (userId) {
       setExpectedError({ message: "You don't have permission to view this recording." });
     } else {
       setExpectedError({

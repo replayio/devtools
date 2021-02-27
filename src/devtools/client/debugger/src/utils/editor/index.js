@@ -228,3 +228,7 @@ export function getTokenEnd(codeMirror, line, column) {
 
   return tokenString === "{" || tokenString === "[" ? null : token.end;
 }
+
+export function inBreakpointPanel(e) {
+  return e.relatedTarget.closest?.(".breakpoint-panel");
+}

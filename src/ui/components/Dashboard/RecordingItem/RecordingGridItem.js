@@ -2,6 +2,8 @@ import React from "react";
 import Title from "../../shared/Title";
 import moment from "moment";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
+import useToken from "ui/utils/useToken";
+
 import "./RecordingGridItem.css";
 
 export default function RecordingGridItem({
@@ -12,12 +14,15 @@ export default function RecordingGridItem({
   setEditingTitle,
   toggleIsPrivate,
 }) {
+  const { userId } = useToken();
+  const isOwner = userId == data.user.auth_id;
+
   return (
     <div className="recording-item">
       <div className="screenshot">
         <img src={`data:image/png;base64, ${data.last_screen_data}`} alt="recording screenshot" />
         <div className="overlay" onClick={e => onNavigate(e)} />
-        <Dropdown panel={Panel} icon={<div>•••</div>} panelStyles={{ top: "28px" }} />
+        {isOwner && <Dropdown panel={Panel} icon={<div>•••</div>} panelStyles={{ top: "28px" }} />}
       </div>
       <div className="description">
         <Title

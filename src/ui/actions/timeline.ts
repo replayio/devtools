@@ -18,10 +18,12 @@ import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredItem } from "ui/state/timeline";
 import { getFirstComment } from "ui/hooks/comments";
 import { getTest } from "ui/utils/environment";
+import { waitForTime } from "protocol/utils";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
 };
+export type SetPlaybackStalledAction = Action<"set_playback_stalled"> & { stalled: boolean };
 export type UpdateTooltipAction = Action<"update_tooltip"> & { tooltip: Tooltip | null };
 export type SetZoomRegionAction = Action<"set_zoom"> & { region: ZoomRegion };
 export type SetHoveredItemAction = Action<"set_hovered_item"> & {
@@ -30,6 +32,7 @@ export type SetHoveredItemAction = Action<"set_hovered_item"> & {
 
 export type TimelineActions =
   | SetTimelineStateAction
+  | SetPlaybackStalledAction
   | UpdateTooltipAction
   | SetZoomRegionAction
   | SetHoveredItemAction;
@@ -161,6 +164,10 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
       paintGraphics(screen, mouse);
     } catch {}
   };
+}
+
+export function setPlaybackStalled(stalled: boolean): SetPlaybackStalledAction {
+  return { type: "set_playback_stalled", stalled };
 }
 
 export function hideTooltip(): UIThunkAction {
@@ -309,7 +316,13 @@ function playback(startTime: number, endTime: number): UIThunkAction {
 
       if (currentTime >= nextGraphicsTime) {
         try {
-          const { screen, mouse } = await nextGraphicsPromise;
+          let maybeNextGraphics = await Promise.race([nextGraphicsPromise, waitForTime(500)]);
+          if (!maybeNextGraphics) {
+            dispatch(setPlaybackStalled(true));
+            maybeNextGraphics = await nextGraphicsPromise;
+            dispatch(setPlaybackStalled(false));
+          }
+          const { screen, mouse } = maybeNextGraphics;
 
           if (!shouldContinuePlayback()) {
             return;

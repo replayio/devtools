@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import Dashboard from "../Dashboard/index";
 import { useAuth0 } from "@auth0/auth0-react";
+import useToken from "ui/utils/useToken";
 import Loader from "../shared/Loader";
-import Prompt from "../shared/Prompt";
 import { gql, useQuery } from "@apollo/client";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 import UserOptions from "ui/components/Header/UserOptions";
@@ -28,10 +28,11 @@ const GET_MY_RECORDINGS = gql`
     name
     email
     picture
+    id
   }
 
-  query GetMyRecordings($authId: String) {
-    users(where: { auth_id: { _eq: $authId } }) {
+  query GetMyRecordings($userId: uuid) {
+    users(where: { id: { _eq: $userId } }) {
       ...avatarFields
       collaborators {
         recording {
@@ -45,37 +46,15 @@ const GET_MY_RECORDINGS = gql`
         ...recordingFields
       }
     }
+
+    recordings(where: { example: { _eq: true } }) {
+      ...recordingFields
+      user {
+        ...avatarFields
+      }
+    }
   }
 `;
-
-function FirstRecordingPrompt() {
-  return (
-    <div className="first-recording-prompt">
-      <Prompt>
-        <h1>Your First Recording</h1>
-        <p>
-          You don&apos;t have any recordings yet, so we&apos;ll walk you through your first one.
-        </p>
-        <ol>
-          <li>Open a new tab</li>
-          <li>Navigate to the URL you would like to record</li>
-          <li>Click on the Record button</li>
-          <li>
-            When you&apos;re done recording, click on the Record button again to stop and save
-          </li>
-        </ol>
-        <p>
-          Once saved, the tab will automatically redirect you to that recording. The recording is
-          just a link which you are free to revisit by yourself or share with others. You can also
-          access any past recordings here in your <a href="https://replay.io/view">account</a>.
-        </p>
-        <hr />
-        <img src="images/record-screenshot.png" style={{ width: "80%" }} />
-        <p className="tip">The record button can be found to the right of the URL bar.</p>
-      </Prompt>
-    </div>
-  );
-}
 
 function getRecordings(data) {
   if (!data.users.length) {
@@ -83,18 +62,20 @@ function getRecordings(data) {
   }
 
   const user = data.users[0];
-  const { recordings, collaborators, name, email, picture } = user;
+  const { recordings, collaborators, name, email, picture, auth_id } = user;
 
   return [
-    ...recordings.map(r => ({ ...r, user: { name, email, picture } })),
-    ...collaborators.map(({ recording }) => ({ ...recording })),
+    ...recordings.map(recording => ({ ...recording, user: { name, email, picture, auth_id } })),
+    ...collaborators.map(({ recording }) => recording),
+    ...data.recordings,
   ];
 }
 
 function AccountPage() {
-  const { user } = useAuth0();
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
   const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
-    variables: { authId: user.sub },
+    variables: { userId },
     pollInterval: 10000,
   });
 
@@ -108,10 +89,6 @@ function AccountPage() {
   }
 
   const recordings = getRecordings(data);
-
-  if (recordings.length == 0) {
-    return <FirstRecordingPrompt />;
-  }
 
   return <Dashboard recordings={recordings} />;
 }

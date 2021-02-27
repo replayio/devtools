@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
-import { useAuth0 } from "@auth0/auth0-react";
+import useToken from "ui/utils/useToken";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { gql, useQuery, useMutation } from "@apollo/client";
@@ -27,32 +27,31 @@ const GET_RECORDING_PRIVACY = gql`
   }
 `;
 
-const GET_OWNER_AUTH_ID = gql`
-  query GetOwnerAuthId($recordingId: uuid!) {
+const GET_OWNER_USER_ID = gql`
+  query GetOwnerUserId($recordingId: uuid!) {
     recordings(where: { id: { _eq: $recordingId } }) {
-      user {
-        auth_id
-      }
+      user_id
     }
   }
 `;
 
 function useIsOwner(recordingId) {
-  const { user, isAuthenticated } = useAuth0();
-  const { data, loading } = useQuery(GET_OWNER_AUTH_ID, {
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
+  const { data, loading } = useQuery(GET_OWNER_USER_ID, {
     variables: { recordingId },
   });
 
-  if (!isAuthenticated || loading) {
+  if (loading) {
     return false;
   }
 
   const recording = data.recordings[0];
-  if (!recording?.user) {
+  if (!recording?.user_id) {
     return false;
   }
 
-  return user.sub === recording.user?.auth_id;
+  return userId === recording.user_id;
 }
 
 function CopyUrl({ recordingId }) {
@@ -112,17 +111,42 @@ function Privacy({ isPrivate, toggleIsPrivate }) {
   );
 }
 
+function PrivacyNote({ isPrivate, isOwner }) {
+  if (!isOwner) {
+    return null;
+  }
+
+  return (
+    <div className={`row privacy-note ${isPrivate ? "is-private" : "is-public"}`}>
+      <div style={{ width: "67px" }} />
+      <div className="label">
+        <div className="label-title">Note</div>
+        <div className="label-description">
+          Replay records everything including passwords you&#39;ve typed and sensitive data
+          you&#39;re viewing.{" "}
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://www.notion.so/replayio/Security-2af70ebdfb1c47e5b9246f25ca377ef2"
+          >
+            Learn more
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Collaborators({ setExpanded, setModal }) {
-  const { isAuthenticated } = useAuth0();
+  const { token } = useToken();
+  if (!token) {
+    return null;
+  }
 
   const handleClick = () => {
     setModal("sharing");
     setExpanded(null);
   };
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   return (
     <div className="row collaborators">
@@ -138,16 +162,15 @@ function Collaborators({ setExpanded, setModal }) {
   );
 }
 
-function OwnerSettings({ recordingId, setModal, setExpanded }) {
-  const { data } = useQuery(GET_RECORDING_PRIVACY, {
-    variables: { recordingId },
-  });
-
-  const isPrivate = data.recordings[0]?.is_private;
+function OwnerSettings({ recordingId, isPrivate, isOwner }) {
   const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE, {
     variables: { recordingId, isPrivate: !isPrivate },
     refetchQueries: ["GetRecordingPrivacy"],
   });
+
+  if (!isOwner) {
+    return null;
+  }
 
   return (
     <>
@@ -159,6 +182,11 @@ function OwnerSettings({ recordingId, setModal, setExpanded }) {
 function ShareDropdown({ recordingId, setModal }) {
   const [expanded, setExpanded] = useState(false);
   const isOwner = useIsOwner(recordingId);
+  const { data } = useQuery(GET_RECORDING_PRIVACY, {
+    variables: { recordingId },
+  });
+
+  const isPrivate = data.recordings[0]?.is_private;
   const buttonContent = <div className="img share" />;
 
   return (
@@ -170,9 +198,8 @@ function ShareDropdown({ recordingId, setModal }) {
         expanded={expanded}
       >
         <CopyUrl recordingId={recordingId} />
-        {isOwner ? (
-          <OwnerSettings recordingId={recordingId} setExpanded={setExpanded} setModal={setModal} />
-        ) : null}
+        <OwnerSettings recordingId={recordingId} isPrivate={isPrivate} isOwner={isOwner} />
+        <PrivacyNote isPrivate={isPrivate} isOwner={isOwner} />
         <Collaborators recordingId={recordingId} setExpanded={setExpanded} setModal={setModal} />
       </Dropdown>
     </div>

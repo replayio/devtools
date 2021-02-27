@@ -12,6 +12,9 @@ import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thr
 import { PrimitiveValue } from "./thread/value";
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
+import { UIStore } from "ui/actions";
+import { setAnalysisPoints } from "ui/actions/app";
+import { getAnalysisPointsForLocation } from "ui/reducers/app";
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
   onResult?: (
@@ -31,9 +34,11 @@ export const LogpointHandlers: {
   clearLogpoint?: (logGroupId: string) => void;
 } = {};
 
-export const PointHandlers: {
-  onPoints?: (points: PointDescription[], info: { locations: (Location | null)[] }) => void;
-} = {};
+let store: UIStore;
+export function setupLogpoints(_store: UIStore) {
+  store = _store;
+  analysisManager.init();
+}
 
 function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
   if (!LogpointHandlers.onPointLoading) {
@@ -93,14 +98,20 @@ async function showPrimitiveLogpoints(
   }
 }
 
-function saveLogpointHits(points: PointDescription[], locations: Location[]) {
-  if (PointHandlers.onPoints) {
-    PointHandlers.onPoints(points, { locations });
+function saveLogpointHits(
+  points: PointDescription[],
+  results: AnalysisEntry[],
+  locations: Location[],
+  condition: string
+) {
+  if (condition) {
+    points = points.filter(point =>
+      results.some(result => result.key === point.point && result.value.time === point.time)
+    );
   }
-}
-
-export function setupLogpoints() {
-  analysisManager.init();
+  for (const location of locations) {
+    store.dispatch(setAnalysisPoints(points, location, condition));
+  }
 }
 
 // Define some logpoint helpers to manage pause data.
@@ -200,6 +211,17 @@ export async function setLogpoint(
   condition: string,
   showInConsole: boolean = true
 ) {
+  const primitives = primitiveValues(text);
+  const primitiveFronts = primitives?.map(literal => createPrimitiveValueFront(literal));
+
+  if (showInConsole && primitiveFronts) {
+    const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
+    if (points) {
+      showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
+      return;
+    }
+  }
+
   const mapper = formatLogpoint({ text, condition });
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
@@ -208,33 +230,33 @@ export async function setLogpoint(
     effectful: true,
     locations: locations.map(location => ({ location })),
   };
-  const primitives = primitiveValues(text);
   const points: PointDescription[] = [];
+  const results: AnalysisEntry[] = [];
   const handler: AnalysisHandler<void> = {};
 
-  if (!condition) {
-    handler.onAnalysisPoints = newPoints => {
-      points.push(...newPoints);
-      if (showInConsole) {
-        if (primitives) {
-          const primitiveFronts = primitives.map(literal => createPrimitiveValueFront(literal));
-          showPrimitiveLogpoints(logGroupId, newPoints, primitiveFronts);
-        } else {
-          showLogpointsLoading(logGroupId, newPoints);
-        }
+  handler.onAnalysisPoints = newPoints => {
+    points.push(...newPoints);
+    if (showInConsole && !condition) {
+      if (primitiveFronts) {
+        showPrimitiveLogpoints(logGroupId, newPoints, primitiveFronts);
+      } else {
+        showLogpointsLoading(logGroupId, newPoints);
+      }
+    }
+  };
+
+  if (condition || (showInConsole && !primitives)) {
+    handler.onAnalysisResult = result => {
+      results.push(...result);
+      if (showInConsole && (condition || !primitives)) {
+        showLogpointsResult(logGroupId, result);
       }
     };
   }
 
-  if (showInConsole && (condition || !primitives)) {
-    handler.onAnalysisResult = result => showLogpointsResult(logGroupId, result);
-  }
-
   await analysisManager.runAnalysis(params, handler);
 
-  if (!condition) {
-    saveLogpointHits(points, locations);
-  }
+  saveLogpointHits(points, results, locations, condition);
 }
 
 function primitiveValues(text: string) {

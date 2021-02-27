@@ -1,12 +1,10 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { query } from "ui/utils/apolloClient";
-import { useAuth0 } from "@auth0/auth0-react";
+import useToken from "ui/utils/useToken";
 
 interface User {
   name: string;
   picture: string;
-  auth_id: string;
   id: string;
   sessionId?: string;
 }
@@ -17,7 +15,8 @@ interface Session {
 }
 
 export function useGetActiveSessions(recordingId: RecordingId, sessionId: string) {
-  const { user } = useAuth0();
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
   const { data, error, loading } = useQuery(
     gql`
       query GetActiveSessions($recordingId: uuid!, $sessionId: String!) {
@@ -34,7 +33,6 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
             id
             name
             picture
-            auth_id
           }
         }
       }
@@ -54,9 +52,7 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
   }
 
   // Don't show the user's own sessions.
-  const filteredSessions = data.sessions.filter(
-    (session: Session) => session.user?.auth_id !== user?.sub
-  );
+  const filteredSessions = data.sessions.filter((session: Session) => session.user?.id !== userId);
 
   // This includes the sessionId with the user. Otherwise, all
   // anonymous users look the same (null) and we can't maintain some order.
@@ -94,21 +90,6 @@ export function useGetRecording(recordingId: RecordingId) {
   }
 
   return { data, queryIsLoading };
-}
-
-export async function fetchUserId(authId: string) {
-  const response = await query({
-    query: gql`
-      query GetUserId($authId: String) {
-        users(where: { auth_id: { _eq: $authId } }) {
-          id
-        }
-      }
-    `,
-    variables: { authId },
-  });
-
-  return response.data?.users[0].id;
 }
 
 export function useAddSessionUser() {

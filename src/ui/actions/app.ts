@@ -20,8 +20,6 @@ import {
   Canvas,
 } from "ui/state/app";
 
-const { PointHandlers } = require("protocol/logpoint");
-
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
 export type LoadingAction = Action<"loading"> & { loading: number };
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
@@ -34,12 +32,10 @@ export type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel">
 export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
 export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
 export type SetModalAction = Action<"set_modal"> & { modal: ModalType | null };
-export type SetPendingNotificationAction = Action<"set_pending_notification"> & {
-  location: Location;
-};
 export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   analysisPoints: PointDescription[];
   location: Location;
+  condition: string;
 };
 export type SetEventsForType = Action<"set_events"> & {
   events: MouseEvent[];
@@ -64,7 +60,6 @@ export type AppActions =
   | SetInitializedPanelsAction
   | SetUploadingAction
   | SetModalAction
-  | SetPendingNotificationAction
   | SetAnalysisPointsAction
   | SetEventsForType
   | SetViewMode
@@ -77,7 +72,6 @@ const NARROW_MODE_WIDTH = 800;
 
 export function setupApp(recordingId: RecordingId, store: UIStore) {
   store.dispatch({ type: "setup_app", recordingId });
-  setupPointHandlers(store);
 
   ThreadFront.waitForSession().then(sessionId =>
     store.dispatch({ type: "set_session_id", sessionId })
@@ -90,19 +84,6 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
   });
 
   ThreadFront.listenForLoadChanges();
-}
-
-function setupPointHandlers(store: UIStore) {
-  PointHandlers.onPoints = (points: PointDescription[], info: any) => {
-    const { locations } = info;
-    locations.forEach(
-      (location: Location | null) => location && store.dispatch(setAnalysisPoints(points, location))
-    );
-  };
-
-  PointHandlers.addPendingNotification = (location: any) => {
-    store.dispatch(setPendingNotification(location));
-  };
 }
 
 function onUnprocessedRegions({ regions }: unprocessedRegions): UIThunkAction {
@@ -164,12 +145,14 @@ export function hideModal(): SetModalAction {
 
 export function setAnalysisPoints(
   points: PointDescription[],
-  location: Location
+  location: Location,
+  condition = ""
 ): SetAnalysisPointsAction {
   return {
     type: "set_analysis_points",
     analysisPoints: points,
     location,
+    condition,
   };
 }
 
@@ -178,13 +161,6 @@ export function setEventsForType(events: MouseEvent[], eventType: Event): SetEve
     type: "set_events",
     eventType,
     events,
-  };
-}
-
-export function setPendingNotification(location: any): SetPendingNotificationAction {
-  return {
-    type: "set_pending_notification",
-    location: location,
   };
 }
 

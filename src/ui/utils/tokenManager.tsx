@@ -6,16 +6,30 @@ import { useHistory } from "react-router-dom";
 import { assert, defer, Deferred } from "protocol/utils";
 
 const domain = "webreplay.us.auth0.com";
-const clientId = "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
 const audience = "hasura-api";
+
+// Hasura requires a valid recording id when querying the recordings table directly.
+const defaultRecordingId = "5a080a89-580b-4b5b-8cbe-3c9995992a0d";
 const tokenRefreshSecondsBeforeExpiry = 60;
+
+// Auth0 E2E tests require a different clientId
+const isTesting = new URL(window.location.href).searchParams.get("e2etest");
+const clientId: string = isTesting
+  ? "uL3A8jxVqotF5Q6bmn5QTV46hU97MPQm"
+  : "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
 
 const {
   location: { origin, pathname },
 } = window;
 
 export interface TokenState {
+  loading?: boolean;
   token?: string;
+  claims?: {
+    hasura: {
+      userId: string;
+    };
+  };
   error?: any;
 }
 
@@ -24,6 +38,7 @@ type TokenListener = (state: TokenState) => void;
 class TokenManager {
   private auth0Client: Auth0ContextInterface | undefined;
   private deferredState = defer<TokenState>();
+  private currentState?: TokenState;
   private isTokenRequested = false;
   private refreshTimeout: number | undefined;
   private listeners: TokenListener[] = [];
@@ -52,11 +67,14 @@ class TokenManager {
         cacheLocation="localstorage"
         prompt="select_account"
         useRefreshTokens={true}
-        recordingId={recordingId}
+        recordingId={recordingId || defaultRecordingId}
       >
         <Auth0Context.Consumer>
           {auth0Client => {
             this.auth0Client = auth0Client;
+            if (!this.auth0Client || this.auth0Client.isLoading) {
+              return;
+            }
 
             setTimeout(() => {
               this.update(this.init);
@@ -72,6 +90,9 @@ class TokenManager {
   };
 
   addListener(listener: TokenListener) {
+    if (this.currentState) {
+      listener(this.currentState);
+    }
     this.listeners.push(listener);
   }
 
@@ -114,10 +135,21 @@ class TokenManager {
 
       this.isTokenRequested = true;
       const deferredState = this.deferredState;
+
+      const item = window.localStorage.getItem("__cypress");
+      if (item) {
+        const token = JSON.parse(item).body.access_token;
+        this.setState({ token }, deferredState);
+        return;
+      }
+
       try {
         const token = await this.fetchToken(refresh);
 
-        this.setState({ token }, deferredState);
+        const decodedToken = jwt_decode<any>(token);
+        const userId = decodedToken?.["https://hasura.io/jwt/claims"]?.["x-hasura-user-id"];
+
+        this.setState({ token, claims: { hasura: { userId } } }, deferredState);
         if (deferredState === this.deferredState) {
           this.setupTokenRefresh(token);
         }
@@ -138,13 +170,14 @@ class TokenManager {
       if (e.error !== "login_required" && e.error !== "consent_required") {
         throw e;
       }
-      console.error("Failed to fetch the access token silently - this shouldn't happen!");
+      console.error("Failed to fetch the access token silently - this shouldn't happen!", e);
 
       return await this.auth0Client.getAccessTokenWithPopup({ audience, ignoreCache: refresh });
     }
   }
 
   private setState(state: TokenState, deferredState: Deferred<TokenState>) {
+    this.currentState = state;
     this.listeners.forEach(listener => listener(state));
     deferredState.resolve(state);
   }
