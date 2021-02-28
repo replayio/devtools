@@ -28,7 +28,7 @@ import classnames from "classnames";
 import SearchInput from "../shared/SearchInput";
 import { debounce } from "lodash";
 import "./SearchBar.css";
-import { PluralForm } from "devtools-modules";
+import { PluralForm } from "devtools/shared";
 
 function getShortcuts() {
   const searchAgainKey = "Cmd+G";

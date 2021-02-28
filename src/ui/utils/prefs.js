@@ -1,5 +1,5 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
-import { asyncStoreHelper } from "devtools-modules";
+import { asyncStoreHelper } from "src/devtools/shared";
 
 import Services from "devtools-services";
 

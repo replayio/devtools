@@ -9,7 +9,7 @@ const test = url.searchParams.get("test");
 // any code that might instantiate preferences from local storage.
 if (test) {
   localStorage.clear();
-  require("devtools-modules").asyncStorage.clear();
+  require("devtools/shared/async-storage").asyncStorage.clear();
 }
 
 // *** WARNING ***

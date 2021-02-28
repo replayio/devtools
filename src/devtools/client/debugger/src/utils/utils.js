@@ -4,8 +4,6 @@
 
 //
 
-import { DevToolsUtils } from "devtools-modules";
-
 /**
  * Utils for utils, by utils
  * @module utils/utils
@@ -49,13 +47,4 @@ export function endTruncateStr(str, size) {
 
 export function waitForMs(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-export function downloadFile(content, fileName) {
-  if (content.type !== "text") {
-    return;
-  }
-
-  const data = new TextEncoder().encode(content.value);
-  DevToolsUtils.saveAs(window, data, fileName);
 }

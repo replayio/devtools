@@ -21,7 +21,7 @@ import {
 } from "../selectors";
 import { getSelectedPanel, getSelectedPrimaryPanel } from "ui/reducers/app.ts";
 
-import { KeyShortcuts } from "devtools-modules";
+import { KeyShortcuts } from "ui/utils/key-shortcuts";
 import Services from "devtools-services";
 const shortcuts = new KeyShortcuts({ window, target: document });
 
