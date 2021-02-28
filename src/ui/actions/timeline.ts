@@ -167,6 +167,7 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
 }
 
 export function setPlaybackStalled(stalled: boolean): SetPlaybackStalledAction {
+  console.log("Stalled");
   return { type: "set_playback_stalled", stalled };
 }
 
