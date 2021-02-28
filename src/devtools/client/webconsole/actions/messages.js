@@ -30,8 +30,20 @@ let throttledDispatchPromise = null;
 export function setupMessages(store) {
   LogpointHandlers.onPointLoading = (logGroupId, point, time, location) =>
     store.dispatch(onLogpointLoading(logGroupId, point, time, location));
-  LogpointHandlers.onResult = (logGroupId, point, time, location, pause, values) =>
+
+  LogpointHandlers.onResult = (logGroupId, point, time, location, pause, values) => {
     store.dispatch(onLogpointResult(logGroupId, point, time, location, pause, values));
+
+    if (condition) {
+      points = points.filter(point =>
+        results.some(result => result.key === point.point && result.value.time === point.time)
+      );
+    }
+    for (const location of locations) {
+      store.dispatch(setAnalysisPoints(points, location, condition));
+    }
+  };
+
   LogpointHandlers.clearLogpoint = logGroupId => store.dispatch(messagesClearLogpoint(logGroupId));
 
   ThreadFront.findConsoleMessages((_, msg) => store.dispatch(onConsoleMessage(msg)));

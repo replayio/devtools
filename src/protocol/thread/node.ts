@@ -10,7 +10,7 @@ import { Pause, WiredObject } from "./pause";
 import { defer, assert, DisallowEverythingProxyHandler, Deferred } from "../utils";
 import { FrameworkEventListener, getFrameworkEventListeners } from "../event-listeners";
 import { ValueFront } from "./value";
-const { uniqBy } = require("lodash");
+const uniqBy = require("lodash/uniqby");
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 export interface WiredEventListener {

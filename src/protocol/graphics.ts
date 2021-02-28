@@ -13,9 +13,17 @@ import {
 } from "@recordreplay/protocol";
 import { client } from "./socket";
 import { actions, UIStore } from "ui/actions";
-import { Canvas } from "ui/state/app";
 
 export const screenshotCache = new ScreenshotCache();
+
+export interface Canvas {
+  gDevicePixelRatio: number;
+  height: number;
+  left: number;
+  scale: number;
+  top: number;
+  width: number;
+}
 
 interface Timed {
   time: number;

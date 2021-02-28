@@ -7,6 +7,8 @@ import {
   MouseEvent,
 } from "@recordreplay/protocol";
 
+import { Canvas } from "protocol/graphics";
+
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug" | "comments";
 export type ViewMode = "dev" | "non-dev";
@@ -53,12 +55,3 @@ interface Events {
 }
 
 export type Event = "mousedown";
-
-export interface Canvas {
-  gDevicePixelRatio: number;
-  height: number;
-  left: number;
-  scale: number;
-  top: number;
-  width: number;
-}

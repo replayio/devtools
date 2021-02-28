@@ -1,7 +1,11 @@
 import { StyleDeclaration } from "@recordreplay/protocol";
 import { Pause, WiredObject } from "./pause";
 import { assert, DisallowEverythingProxyHandler } from "../utils";
-const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
+
+// The PageStyle actor flattens the DOM CSS objects a little bit, merging
+// Rules and their Styles into one actor. For elements (which have a style
+// but no associated rule) we fake a rule with the following style id.
+const ELEMENT_STYLE = 100;
 
 // Manages interaction with a CSSStyleDeclaration. StyleFront represents an inline
 // element style.

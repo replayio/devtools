@@ -1,0 +1,14 @@
+{
+  "name": "@recordreplay/client",
+  "version": "1.0.0",
+  "description": "DevTools Client adds utilities for common tasks",
+  "main": "index.js",
+  "dependencies": {
+    "@recordreplay/protocol": "^0.4.0"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RecordReplay/devtools/issues"
+  },
+  "homepage": "https://github.com/RecordReplay/devtools#readme"
+}

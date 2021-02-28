@@ -12,9 +12,7 @@ import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thr
 import { PrimitiveValue } from "./thread/value";
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
-import { UIStore } from "ui/actions";
-import { setAnalysisPoints } from "ui/actions/app";
-import { getAnalysisPointsForLocation } from "ui/reducers/app";
+
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
   onResult?: (
@@ -34,9 +32,7 @@ export const LogpointHandlers: {
   clearLogpoint?: (logGroupId: string) => void;
 } = {};
 
-let store: UIStore;
-export function setupLogpoints(_store: UIStore) {
-  store = _store;
+export function setupLogpoints() {
   analysisManager.init();
 }
 
@@ -95,22 +91,6 @@ async function showPrimitiveLogpoints(
     assert(location);
     const pause = ThreadFront.ensurePause(point, time);
     LogpointHandlers.onResult(logGroupId, point, time, location, pause, values);
-  }
-}
-
-function saveLogpointHits(
-  points: PointDescription[],
-  results: AnalysisEntry[],
-  locations: Location[],
-  condition: string
-) {
-  if (condition) {
-    points = points.filter(point =>
-      results.some(result => result.key === point.point && result.value.time === point.time)
-    );
-  }
-  for (const location of locations) {
-    store.dispatch(setAnalysisPoints(points, location, condition));
   }
 }
 
@@ -214,14 +194,6 @@ export async function setLogpoint(
   const primitives = primitiveValues(text);
   const primitiveFronts = primitives?.map(literal => createPrimitiveValueFront(literal));
 
-  if (showInConsole && primitiveFronts) {
-    const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
-    if (points) {
-      showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
-      return;
-    }
-  }
-
   const mapper = formatLogpoint({ text, condition });
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
@@ -255,8 +227,6 @@ export async function setLogpoint(
   }
 
   await analysisManager.runAnalysis(params, handler);
-
-  saveLogpointHits(points, results, locations, condition);
 }
 
 function primitiveValues(text: string) {

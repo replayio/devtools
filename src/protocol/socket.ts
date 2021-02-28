@@ -9,9 +9,6 @@ import {
   CommandParams,
   CommandResult,
 } from "@recordreplay/protocol";
-import { setExpectedError } from "ui/actions/session";
-import { UIStore } from "ui/actions";
-import { Action, Dispatch } from "redux";
 
 interface Message {
   id: number;
@@ -45,12 +42,12 @@ window.addEventListener("beforeunload", () => {
   willClose = true;
 });
 
-export function initSocket(store: UIStore, address?: string) {
-  socket = new WebSocket(address || "wss://dispatch.replay.io");
+export function initSocket(address: string, { onClose = () => {}, onError = () => {} }) {
+  socket = new WebSocket(address);
 
   socket.onopen = makeInfallible(onSocketOpen);
-  socket.onclose = makeInfallible(() => store.dispatch(onSocketClose()));
-  socket.onerror = makeInfallible((evt: Event) => store.dispatch(onSocketError(evt)));
+  socket.onclose = makeInfallible(onClose);
+  socket.onerror = makeInfallible(onError);
   socket.onmessage = makeInfallible(onSocketMessage);
 }
 
@@ -133,36 +130,6 @@ function onSocketMessage(evt: MessageEvent<any>) {
   } else {
     console.error("Received unknown message", msg);
   }
-}
-
-function onSocketClose() {
-  return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
-    log("Socket Closed");
-    gSocketOpen = false;
-
-    if (!willClose) {
-      dispatch(
-        setExpectedError({
-          message: "Session has closed due to inactivity, please refresh the page.",
-        })
-      );
-    }
-  };
-}
-
-function onSocketError(evt: Event) {
-  console.error("Socket Error", evt);
-  // If the socket has errored, the connection will close. So let's set `willClose`
-  // so that we show _this_ error message, and not the `onSocketClose` error message
-  willClose = true;
-  return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
-    log("Socket Error");
-    dispatch(
-      setExpectedError({
-        message: "Session has closed due to an error, please refresh the page.",
-      })
-    );
-  };
 }
 
 export function log(text: string) {

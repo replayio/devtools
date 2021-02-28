@@ -2,7 +2,7 @@ const url = new URL(window.location.href);
 
 // Coercing recordingId to undefined so that it is not passed to auth0
 const recordingId = url.searchParams.get("id") || undefined;
-const dispatch = url.searchParams.get("dispatch");
+const dispatch = url.searchParams.get("dispatch") || "wss://dispatch.replay.io";
 const test = url.searchParams.get("test");
 
 // During testing, make sure we clear local storage before importing
@@ -32,6 +32,9 @@ const { LocalizationHelper } = require("devtools/shared/l10n");
 const { setupEventListeners } = require("devtools/client/debugger/src/actions/event-listeners");
 const { DevToolsToolbox } = require("ui/utils/devtools-toolbox");
 const { createSession } = require("ui/actions/session");
+import { setExpectedError } from "ui/actions/session";
+import { Action, Dispatch } from "redux";
+
 const {
   initOutputSyntaxHighlighting,
 } = require("./devtools/client/webconsole/utils/syntax-highlighted");
@@ -43,7 +46,10 @@ async function initialize() {
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
   // Initialize the socket so we can communicate with the server
-  initSocket(store, dispatch);
+  initSocket(dispatch, {
+    onClose: () => store.dispatch(onSocketClose()),
+    onError: (evt: Event) => store.dispatch(onSocketError(evt)),
+  });
 
   if (recordingId) {
     createSession(store, recordingId);
@@ -65,6 +71,36 @@ async function initialize() {
     const { mouseClientX, mouseClientY } = window;
     return (
       left <= mouseClientX && mouseClientX <= right && top <= mouseClientY && mouseClientY <= bottom
+    );
+  };
+}
+
+function onSocketClose() {
+  return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
+    log("Socket Closed");
+    gSocketOpen = false;
+
+    if (!willClose) {
+      dispatch(
+        setExpectedError({
+          message: "Session has closed due to inactivity, please refresh the page.",
+        })
+      );
+    }
+  };
+}
+
+function onSocketError(evt: Event) {
+  console.error("Socket Error", evt);
+  // If the socket has errored, the connection will close. So let's set `willClose`
+  // so that we show _this_ error message, and not the `onSocketClose` error message
+  willClose = true;
+  return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
+    log("Socket Error");
+    dispatch(
+      setExpectedError({
+        message: "Session has closed due to an error, please refresh the page.",
+      })
     );
   };
 }

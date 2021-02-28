@@ -78,6 +78,26 @@ export function enableBreakpoint(cx, initialBreakpoint) {
   };
 }
 
+function maybeShowPrimitiveLogPoint({ options, location, logGroupId }) {
+  return ({ store }) => {
+    const { logValue, condition } = options;
+    const primitives = primitiveValues(logValue);
+
+    if (!primitives) {
+      return false;
+    }
+
+    const primitiveFronts = primitives?.map(literal => createPrimitiveValueFront(literal));
+
+    const points = getAnalysisPointsForLocation(store.getState(), location, condition);
+    if (!points) {
+      return false;
+    }
+
+    return showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
+  };
+}
+
 export function addBreakpoint(
   cx,
   initialLocation,
@@ -112,6 +132,8 @@ export function addBreakpoint(
     if (!source) {
       return;
     }
+
+    const isPrimitive = dispatch(maybeShowPrimitiveLogPoint({ location, options }));
 
     const symbols = getSymbols(getState(), source);
     const astLocation = getASTLocation(source, symbols, location);
