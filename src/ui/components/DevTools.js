@@ -79,7 +79,7 @@ function DevTools({
     }
   }, [data]);
 
-  if (queryIsLoading) {
+  if (queryIsLoading || !data) {
     return <SkeletonLoader content={"Fetching the recording information."} />;
   } else if (recordingDuration === null) {
     return <SkeletonLoader content={"Fetching the recording description."} />;
