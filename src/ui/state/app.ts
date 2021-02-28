@@ -27,6 +27,7 @@ export interface AppState {
   sessionId: SessionId | null;
   theme: string;
   splitConsoleOpen: boolean;
+  indexed: boolean;
   loading: number;
   uploading: UploadInfo | null;
   expectedError: ExpectedError | null;

@@ -189,19 +189,21 @@ class _ThreadFront {
   }
 
   async ensureProcessed(
-    onMissingRegions: ((parameters: missingRegions) => void) | undefined,
-    onUnprocessedRegions: ((parameters: unprocessedRegions) => void) | undefined
+    level: "basic" | "executionIndexed",
+    onMissingRegions?: ((parameters: missingRegions) => void) | undefined,
+    onUnprocessedRegions?: ((parameters: unprocessedRegions) => void) | undefined
   ) {
     const sessionId = await this.waitForSession();
 
     if (onMissingRegions) {
       client.Session.addMissingRegionsListener(onMissingRegions);
     }
+
     if (onUnprocessedRegions) {
       client.Session.addUnprocessedRegionsListener(onUnprocessedRegions);
     }
 
-    await client.Session.ensureProcessed({}, sessionId);
+    await client.Session.ensureProcessed({ level }, sessionId);
   }
 
   async listenForLoadChanges() {

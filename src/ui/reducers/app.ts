@@ -16,6 +16,7 @@ function initialAppState(): AppState {
     selectedPanel: prefs.selectedPanel,
     selectedPrimaryPanel: "comments",
     initializedPanels: [],
+    indexed: false,
     loading: 4,
     uploading: null,
     sessionId: null,
@@ -73,6 +74,10 @@ export default function update(
 
     case "loading": {
       return { ...state, loading: action.loading };
+    }
+
+    case "indexed": {
+      return { ...state, indexed: true };
     }
 
     case "set_session_id": {
@@ -150,6 +155,7 @@ export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getSelectedPrimaryPanel = (state: UIState) => state.app.selectedPrimaryPanel;
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
+export const getIndexed = (state: UIState) => state.app.indexed;
 export const getLoading = (state: UIState) => state.app.loading;
 export const getUploading = (state: UIState) => state.app.uploading;
 export const getRecordingId = (state: UIState) => state.app.recordingId;

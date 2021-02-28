@@ -1,18 +1,17 @@
 import React from "react";
 import classnames from "classnames";
-import { compareNumericStrings } from "../../../../../../../protocol/utils";
-import { getExecutionPoint } from "../../../reducers/pause";
-import { connect } from "../../../utils/connect";
-import { selectors } from "ui/reducers";
-const { getAnalysisPointsForLocation } = selectors;
-import { actions } from "ui/actions";
 import { findLast, find } from "lodash";
+import { compareNumericStrings } from "protocol/utils";
+import { selectors } from "ui/reducers";
+import { actions } from "ui/actions";
+import { connect } from "devtools/client/debugger/src/utils/connect";
 
 import BreakpointTimeline from "./BreakpointTimeline";
 import "./BreakpointNavigation.css";
 
 function BreakpointNavigation({
   executionPoint,
+  indexed,
   breakpoint,
   seek,
   analysisPoints,
@@ -42,6 +41,7 @@ function BreakpointNavigation({
       ) : null}
       {executionPoint ? (
         <BreakpointNavigationStatus
+          indexed={indexed}
           executionPoint={executionPoint}
           analysisPoints={analysisPoints}
         />
@@ -75,10 +75,11 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
   );
 }
 
-function BreakpointNavigationStatus({ executionPoint, analysisPoints }) {
+function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed }) {
   let status = "";
-
-  if (!analysisPoints) {
+  if (!indexed) {
+    status = "Indexing";
+  } else if (!analysisPoints) {
     status = "Loading";
   } else if (analysisPoints.length == 0) {
     status = "No hits";
@@ -98,12 +99,13 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints }) {
 }
 
 const mapStateToProps = (state, { breakpoint }) => ({
-  analysisPoints: getAnalysisPointsForLocation(
+  analysisPoints: selectors.getAnalysisPointsForLocation(
     state,
     breakpoint.location,
     breakpoint.options.condition
   ),
-  executionPoint: getExecutionPoint(state),
+  indexed: selectors.getIndexed(state),
+  executionPoint: selectors.getExecutionPoint(state),
 });
 
 export default connect(mapStateToProps, {
