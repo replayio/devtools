@@ -22,6 +22,7 @@ import {
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
 export type LoadingAction = Action<"loading"> & { loading: number };
+export type IndexedAction = Action<"indexed">;
 export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
 export type UpdateThemeAction = Action<"update_theme"> & { theme: string };
 export type SetSplitConsoleAction = Action<"set_split_console"> & { splitConsole: boolean };
@@ -56,6 +57,7 @@ export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
 export type AppActions =
   | SetupAppAction
   | LoadingAction
+  | IndexedAction
   | SetSessionIdAction
   | UpdateThemeAction
   | SetSplitConsoleAction
@@ -81,10 +83,15 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
     store.dispatch({ type: "set_session_id", sessionId })
   );
 
-  ThreadFront.ensureProcessed(undefined, regions =>
+  ThreadFront.ensureProcessed("basic", undefined, regions =>
     store.dispatch(onUnprocessedRegions(regions))
   ).then(() => {
     store.dispatch({ type: "loading", loading: 100 });
+  });
+
+  ThreadFront.ensureProcessed("executionIndexed").then(() => {
+    console.log("indexed");
+    store.dispatch({ type: "indexed" });
   });
 
   ThreadFront.listenForLoadChanges();
