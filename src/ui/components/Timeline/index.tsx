@@ -24,6 +24,8 @@ import { selectors } from "ui/reducers";
 import Marker from "./Marker";
 import MessageMarker from "./MessageMarker";
 import EventMarker from "./EventMarker";
+import Hud from "ui/components/Comments/VideoComments/Hud.tsx";
+
 const { getVisiblePosition } = require("ui/utils/timeline");
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
@@ -267,6 +269,7 @@ class Timeline extends Component<PropsFromRedux> {
             <Comments />
           </div>
         </div>
+        <Hud />
       </div>
     );
   }
