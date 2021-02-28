@@ -31,8 +31,6 @@ const connector = connect((state: UIState) => ({
 }));
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
-type Props = PropsFromRedux & {
-  timelineWidth: number;
-};
+type Props = PropsFromRedux;
 
 export default connector(Hud);

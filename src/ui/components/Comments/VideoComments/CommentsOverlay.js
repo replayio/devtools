@@ -4,7 +4,6 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import VideoComment from "./VideoComment";
-import Hud from "./Hud";
 import "./CommentsOverlay.css";
 
 function findComment({ hasuraComments, pendingComment, hoveredComment, currentTime }) {
@@ -58,7 +57,6 @@ function CommentsOverlay({
       <div className="canvas-comments">
         <VideoComment comment={comment} scale={scale} setHoveredComment={setHoveredComment} />
       </div>
-      <Hud />
     </div>
   );
 }
