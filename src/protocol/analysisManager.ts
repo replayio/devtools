@@ -47,77 +47,68 @@ class AnalysisManager {
   }
 
   async runAnalysis<T>(params: AnalysisParams, handler: AnalysisHandler<T>) {
-    const { analysisId } = await sendMessage("Analysis.createAnalysis", {
-      mapper: params.mapper,
-      reducer: params.reducer,
-      effectful: params.effectful,
-    });
+    const { analysisId } = await sendMessage(
+      "Analysis.createAnalysis",
+      {
+        mapper: params.mapper,
+        reducer: params.reducer,
+        effectful: params.effectful,
+      },
+      params.sessionId
+    );
 
-    if (params.locations) {
-      await Promise.all(
-        params.locations.map(loc =>
-          sendMessage("Analysis.addLocation", {
-            sessionId: params.sessionId,
-            analysisId,
-            ...loc,
-          })
-        )
-      );
-    }
-
-    if (params.functionEntryPoints) {
-      await Promise.all(
-        params.functionEntryPoints.map(fep =>
-          sendMessage("Analysis.addFunctionEntryPoints", {
-            sessionId: params.sessionId,
-            analysisId,
-            ...fep,
-          })
-        )
-      );
-    }
-
-    if (params.eventHandlerEntryPoints) {
-      await Promise.all(
-        params.eventHandlerEntryPoints.map(ehep =>
-          sendMessage("Analysis.addEventHandlerEntryPoints", {
-            sessionId: params.sessionId,
-            analysisId,
-            ...ehep,
-          })
-        )
-      );
-    }
-
-    if (params.exceptionPoints) {
-      await sendMessage("Analysis.addExceptionPoints", {
-        sessionId: params.sessionId,
-        analysisId,
-      });
-    }
-
-    if (params.randomPoints) {
-      await sendMessage("Analysis.addRandomPoints", {
-        sessionId: params.sessionId,
-        analysisId,
-        numPoints: params.randomPoints,
-      });
-    }
-
-    this.handlers.set(analysisId, handler);
-    let promise: Promise<any> | undefined;
-    if (handler.onAnalysisResult) {
-      promise = sendMessage("Analysis.runAnalysis", { analysisId });
-    }
-    if (handler.onAnalysisPoints) {
-      const pointsPromise = sendMessage("Analysis.findAnalysisPoints", { analysisId });
-      if (!promise) {
-        promise = pointsPromise;
+    try {
+      if (params.locations) {
+        await Promise.all(
+          params.locations.map(loc =>
+            sendMessage("Analysis.addLocation", { analysisId, ...loc }, params.sessionId)
+          )
+        );
       }
+
+      if (params.functionEntryPoints) {
+        await Promise.all(
+          params.functionEntryPoints.map(fep =>
+            sendMessage("Analysis.addFunctionEntryPoints", { analysisId, ...fep }, params.sessionId)
+          )
+        );
+      }
+
+      if (params.eventHandlerEntryPoints) {
+        await Promise.all(
+          params.eventHandlerEntryPoints.map(ehep =>
+            sendMessage(
+              "Analysis.addEventHandlerEntryPoints",
+              { analysisId, ...ehep },
+              params.sessionId
+            )
+          )
+        );
+      }
+
+      if (params.exceptionPoints) {
+        await sendMessage("Analysis.addExceptionPoints", { analysisId }, params.sessionId);
+      }
+
+      if (params.randomPoints) {
+        await sendMessage(
+          "Analysis.addRandomPoints",
+          { analysisId, numPoints: params.randomPoints },
+          params.sessionId
+        );
+      }
+
+      this.handlers.set(analysisId, handler);
+      await Promise.all([
+        !handler.onAnalysisResult ||
+          sendMessage("Analysis.runAnalysis", { analysisId }, params.sessionId),
+        !handler.onAnalysisPoints ||
+          sendMessage("Analysis.findAnalysisPoints", { analysisId }, params.sessionId),
+      ]);
+    } finally {
+      this.handlers.delete(analysisId);
+      await sendMessage("Analysis.releaseAnalysis", { analysisId }, params.sessionId);
     }
-    await promise;
-    await sendMessage("Analysis.releaseAnalysis", { analysisId });
-    this.handlers.delete(analysisId);
 
     return handler.onFinished?.();
   }
