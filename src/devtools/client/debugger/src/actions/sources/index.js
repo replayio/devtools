@@ -8,4 +8,4 @@ export * from "./breakableLines";
 export * from "./loadSourceText";
 export * from "./newSources";
 export * from "./select";
-export { setSymbols } from "./symbols";
+export * from "./symbols";

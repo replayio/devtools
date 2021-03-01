@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
 import { endTruncateStr } from "./utils";
 import { isPretty, getFilename, getSourceClassnames, getSourceQueryString } from "./source";
+import memoizeOne from "memoize-one";
 
 export const MODIFIERS = {
   "@": "functions",
@@ -69,6 +69,23 @@ export function formatSymbol(symbol) {
     location: symbol.location,
   };
 }
+
+export const formatProjectSymbols = memoizeOne(function formatProjectSymbols(projectSymbols) {
+  const sourceFunctions = Object.entries(projectSymbols)
+    .map(([sourceId, symbols]) =>
+      symbols?.functions?.map(symbol => ({
+        id: `${symbol.name}:${symbol.location.start.line}`,
+        title: symbol.name,
+        subtitle: `${symbol.location.start.line}`,
+        value: symbol.name,
+        location: { end: symbol.location.end, start: { ...symbol.location.start, sourceId } },
+      }))
+    )
+    .flat()
+    .filter(i => i);
+
+  return { functions: sourceFunctions };
+});
 
 export function formatSymbols(symbols) {
   if (!symbols || symbols.loading) {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import { loadSymbols } from "./sources";
 
 export function setQuickOpenQuery(query) {
   return {
@@ -11,11 +11,14 @@ export function setQuickOpenQuery(query) {
   };
 }
 
-export function openQuickOpen(query) {
-  if (query != null) {
-    return { type: "OPEN_QUICK_OPEN", query };
-  }
-  return { type: "OPEN_QUICK_OPEN" };
+export function openQuickOpen(query, project) {
+  return ({ dispatch }) => {
+    if (project) {
+      dispatch(loadSymbols());
+    }
+
+    return dispatch({ type: "OPEN_QUICK_OPEN", query, project });
+  };
 }
 
 export function closeQuickOpen() {

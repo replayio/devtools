@@ -4,16 +4,8 @@
 
 //
 
-import { setBreakpointPositions } from "./breakpointPositions";
 import { setSymbols } from "../sources/symbols";
-import {
-  assertPendingBreakpoint,
-  findFunctionByName,
-  findPosition,
-  makeBreakpointLocation,
-} from "../../utils/breakpoint";
-
-import { comparePosition, createLocation } from "../../utils/location";
+import { assertPendingBreakpoint, findFunctionByName } from "../../utils/breakpoint";
 
 import { getSource } from "../../selectors";
 import { addBreakpoint } from ".";
@@ -48,13 +40,7 @@ export function syncBreakpoint(cx, sourceId, pendingBreakpoint) {
     }
 
     const { location, astLocation } = pendingBreakpoint;
-    const sourceLocation = createLocation({
-      ...location,
-      sourceId,
-    });
-
     const previousLocation = { ...location, sourceId };
-
     const newLocation = await findNewLocation(cx, astLocation, previousLocation, source, thunkArgs);
 
     return dispatch(

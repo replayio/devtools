@@ -10,14 +10,7 @@
  */
 
 import { createSelector } from "reselect";
-import {
-  getPrettySourceURL,
-  underRoot,
-  getRelativeUrl,
-  getPlainUrl,
-  isPretty,
-  isJavaScript,
-} from "../utils/source";
+import { getPrettySourceURL, getPlainUrl } from "../utils/source";
 import {
   createInitial,
   insertResources,
@@ -25,11 +18,8 @@ import {
   hasResource,
   getResource,
   getMappedResource,
-  getResourceIds,
   memoizeResourceShallow,
-  makeReduceQuery,
   makeReduceAllQuery,
-  makeMapWithArgs,
 } from "../utils/resource";
 
 import { findPosition } from "../utils/breakpoint/breakpointPositions";
