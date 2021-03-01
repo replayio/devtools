@@ -33,14 +33,6 @@ const GET_OWNER_AND_COLLABORATORS = gql`
   }
 `;
 
-const GET_COLLABORATOR_ID = gql`
-  query GetCollaboratorId($email: String = "") {
-    user_id_by_email(args: { email: $email }) {
-      id
-    }
-  }
-`;
-
 const ADD_COLLABORATOR = gql`
   mutation AddCollaborator($objects: [collaborators_insert_input!]! = {}) {
     insert_collaborators(objects: $objects) {
@@ -58,6 +50,25 @@ const DELETE_COLLABORATOR = gql`
     }
   }
 `;
+
+function useFetchCollaborateorId(email) {
+  const { data, loading, error } = useQuery(
+    gql`
+      query GetCollaboratorId($email: String = "") {
+        user_id_by_email(args: { email: $email }) {
+          id
+        }
+      }
+    `,
+    {
+      variables: { email },
+    }
+  );
+
+  const userId = data?.user_id_by_email[0]?.id;
+
+  return { userId, loading, error };
+}
 
 function Permission({ user, role, recordingId }) {
   const [deleteCollaborator, { error }] = useMutation(DELETE_COLLABORATOR, {
@@ -111,13 +122,11 @@ function PermissionsList({ recording, collaborators, recordingId }) {
 }
 
 function Fetcher({ setStatus, email }) {
-  const { data, loading, error } = useQuery(GET_COLLABORATOR_ID, {
-    variables: { email },
-  });
+  const { userId, loading, error } = useFetchCollaborateorId(email);
 
   useEffect(() => {
     if (!loading) {
-      setStatus({ type: "fetched-user", data, error });
+      setStatus({ type: "fetched-user", userId, error });
     }
   });
 
@@ -170,17 +179,11 @@ function EmailForm({ recordingId }) {
   if (status.type === "fetched-user") {
     if (status.error) {
       return <ErrorHandler message={"We can not fetch that collaborator right now."} />;
-    } else if (status.data.user_id_by_email.length === 0) {
+    } else if (!status.userId) {
       return <ErrorHandler message={"That e-mail address is not a valid Replay user."} />;
     }
 
-    return (
-      <Submitter
-        setStatus={setStatus}
-        userId={status.data.user_id_by_email[0].id}
-        recordingId={recordingId}
-      />
-    );
+    return <Submitter setStatus={setStatus} userId={status.userId} recordingId={recordingId} />;
   }
 
   if (status.type === "submitted-user") {
