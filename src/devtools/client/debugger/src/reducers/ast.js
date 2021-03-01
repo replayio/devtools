@@ -5,7 +5,6 @@
 export function initialASTState() {
   return {
     symbols: {},
-    inScopeLines: {},
   };
 }
 
@@ -28,7 +27,7 @@ function update(state = initialASTState(), action) {
     }
 
     case "RESUME": {
-      return { ...state, inScopeLines: {} };
+      return { ...state };
     }
 
     case "NAVIGATE": {
@@ -54,6 +53,10 @@ export function getSymbols(state, source) {
   }
 
   return state.ast.symbols[source.id] || null;
+}
+
+export function getProjectSymbols(state) {
+  return state.ast.symbols;
 }
 
 export function hasSymbols(state, source) {

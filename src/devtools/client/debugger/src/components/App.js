@@ -72,12 +72,9 @@ class Debugger extends Component {
 
   componentDidMount() {
     shortcuts.on("CmdOrCtrl+Shift+P", (_, e) => this.toggleQuickOpenModal(_, e));
-
     shortcuts.on("CmdOrCtrl+Shift+O", (_, e) => this.toggleQuickOpenModal(_, e, "@"));
-
-    const searchKeys = ["CmdOrCtrl+P", "CmdOrCtrl+O"];
-    searchKeys.forEach(key => shortcuts.on(key, this.toggleQuickOpenModal));
-
+    shortcuts.on("CmdOrCtrl+P", (_, e) => this.toggleQuickOpenModal(_, e));
+    shortcuts.on("CmdOrCtrl+O", (_, e) => this.toggleQuickOpenModal(_, e, "@", true));
     shortcuts.on("Ctrl+G", (_, e) => this.toggleQuickOpenModal(_, e, ":"));
 
     shortcuts.on("Escape", this.onEscape);
@@ -140,7 +137,7 @@ class Debugger extends Component {
     return this.props.orientation === "horizontal";
   }
 
-  toggleQuickOpenModal = (_, e, query) => {
+  toggleQuickOpenModal = (_, e, query, project = false) => {
     const { quickOpenEnabled, openQuickOpen, closeQuickOpen } = this.props;
 
     e.preventDefault();
@@ -151,11 +148,7 @@ class Debugger extends Component {
       return;
     }
 
-    if (query != null) {
-      openQuickOpen(query);
-      return;
-    }
-    openQuickOpen();
+    openQuickOpen(query, project);
   };
 
   renderEditorPane = () => {

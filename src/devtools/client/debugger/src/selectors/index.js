@@ -25,7 +25,7 @@ export {
   getSourceActorsForThread,
 } from "../reducers/source-actors";
 
-export { getQuickOpenEnabled, getQuickOpenQuery, getQuickOpenType } from "../reducers/quick-open";
+export * from "../reducers/quick-open";
 
 export * from "./breakpoints";
 export { getBreakpointAtLocation, getBreakpointsAtLine } from "./breakpointAtLocation";

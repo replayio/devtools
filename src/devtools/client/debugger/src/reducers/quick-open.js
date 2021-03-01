@@ -15,6 +15,7 @@ export const createQuickOpenState = () => ({
   enabled: false,
   query: "",
   searchType: "sources",
+  project: false,
 });
 
 export default function update(state = createQuickOpenState(), action) {
@@ -24,6 +25,7 @@ export default function update(state = createQuickOpenState(), action) {
         return {
           ...state,
           enabled: true,
+          project: action.project,
           query: action.query,
           searchType: parseQuickOpenQuery(action.query),
         };
@@ -44,6 +46,9 @@ export default function update(state = createQuickOpenState(), action) {
 
 export function getQuickOpenEnabled(state) {
   return state.quickOpen.enabled;
+}
+export function getQuickOpenProject(state) {
+  return state.quickOpen.project;
 }
 
 export function getQuickOpenQuery(state) {

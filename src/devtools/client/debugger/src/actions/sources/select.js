@@ -9,11 +9,10 @@
  * @module actions/sources
  */
 
-import { getSourceWithContent } from "../../reducers/sources";
 import { tabExists } from "../../reducers/tabs";
 import { setSymbols } from "./symbols";
 import { closeActiveSearch, updateActiveFileSearch } from "../ui";
-import { addTab, closeTab } from "../tabs";
+import { addTab } from "../tabs";
 import { loadSourceText } from "./loadSourceText";
 import { setBreakableLines } from ".";
 

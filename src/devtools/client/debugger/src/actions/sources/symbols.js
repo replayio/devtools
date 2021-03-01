@@ -2,20 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-import { getSymbols } from "../../selectors";
-
+import { selectors } from "ui/reducers";
 import { PROMISE } from "../utils/middleware/promise";
-import { updateTab } from "../tabs";
 import { loadSourceText } from "./loadSourceText";
 
 import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
 
-async function doSetSymbols(cx, source, { dispatch, getState, parser }) {
+async function doSetSymbols(source, { dispatch, parser }) {
   const sourceId = source.id;
-
   await dispatch(loadSourceText({ source }));
 
   await dispatch({
@@ -27,7 +22,7 @@ async function doSetSymbols(cx, source, { dispatch, getState, parser }) {
 
 export const setSymbols = memoizeableAction("setSymbols", {
   getValue: ({ source }, { getState }) => {
-    const symbols = getSymbols(getState(), source);
+    const symbols = selectors.getSymbols(getState(), source);
     if (!symbols || symbols.loading) {
       return null;
     }
@@ -35,5 +30,12 @@ export const setSymbols = memoizeableAction("setSymbols", {
     return fulfilled(symbols);
   },
   createKey: ({ source }) => source.id,
-  action: ({ cx, source }, thunkArgs) => doSetSymbols(cx, source, thunkArgs),
+  action: ({ source }, thunkArgs) => doSetSymbols(source, thunkArgs),
 });
+
+export function loadSymbols() {
+  return async ({ dispatch, getState }) => {
+    const sources = selectors.getSourceList(getState()).filter(source => source.url);
+    await Promise.all(sources.map(source => dispatch(setSymbols({ source }))));
+  };
+}

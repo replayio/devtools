@@ -15,8 +15,10 @@ import {
   getQuickOpenEnabled,
   getQuickOpenQuery,
   getQuickOpenType,
+  getQuickOpenProject,
   getSelectedSource,
   getSourceContent,
+  getProjectSymbols,
   getSymbols,
   getTabs,
   isSymbolsLoading,
@@ -29,6 +31,7 @@ import {
   parseLineColumn,
   formatShortcutResults,
   formatSources,
+  formatProjectSymbols,
 } from "../utils/quick-open";
 import Modal from "./shared/Modal";
 import SearchInput from "./shared/SearchInput";
@@ -111,12 +114,14 @@ export class QuickOpenModal extends Component {
   };
 
   searchSymbols = query => {
-    const {
-      symbols: { functions },
-    } = this.props;
+    const { project, projectSymbols, symbols } = this.props;
 
-    let results = functions;
+    let results = project ? projectSymbols.functions : symbols.functions;
     results = results.filter(result => result.title !== "anonymous");
+
+    if (query.length <= 3) {
+      results = results.slice(0, 10000);
+    }
 
     if (query === "@" || query === "#") {
       return this.setResults(results);
@@ -191,8 +196,10 @@ export class QuickOpenModal extends Component {
     }
 
     if (this.isSymbolSearch()) {
+      const start = item.location?.start;
       return this.gotoLocation({
-        line: item.location && item.location.start ? item.location.start.line : 0,
+        line: start?.line || 0,
+        sourceId: start?.sourceId,
       });
     }
 
@@ -200,12 +207,12 @@ export class QuickOpenModal extends Component {
   };
 
   onSelectResultItem = item => {
-    const { selectedSource, highlightLineRange } = this.props;
+    const { selectedSource, highlightLineRange, project } = this.props;
     if (selectedSource == null || !this.isSymbolSearch()) {
       return;
     }
 
-    if (this.isFunctionQuery()) {
+    if (this.isFunctionQuery() && !project) {
       return highlightLineRange({
         ...(item.location != null
           ? { start: item.location.start.line, end: item.location.end.line }
@@ -354,6 +361,7 @@ export class QuickOpenModal extends Component {
     if (!enabled) {
       return null;
     }
+
     const items = this.highlightMatching(query, results || []);
     const expanded = !!items && items.length > 0;
 
@@ -375,7 +383,7 @@ export class QuickOpenModal extends Component {
           selectedItemId={expanded && items[selectedIndex] ? items[selectedIndex].id : ""}
           {...(this.isSourceSearch() ? SIZE_BIG : SIZE_DEFAULT)}
         />
-        {results && (
+        {results && items && (
           <ResultList
             key="results"
             items={items}
@@ -400,12 +408,14 @@ function mapStateToProps(state) {
   return {
     cx: getContext(state),
     enabled: getQuickOpenEnabled(state),
+    project: getQuickOpenProject(state),
     displayedSources,
     selectedSource,
     selectedContentLoaded: selectedSource
       ? !!getSourceContent(state, selectedSource.id)
       : undefined,
     symbols: formatSymbols(getSymbols(state, selectedSource)),
+    projectSymbols: formatProjectSymbols(getProjectSymbols(state)),
     symbolsLoading: isSymbolsLoading(state, selectedSource),
     query: getQuickOpenQuery(state),
     searchType: getQuickOpenType(state),
