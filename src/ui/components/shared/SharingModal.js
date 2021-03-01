@@ -35,9 +35,8 @@ const GET_OWNER_AND_COLLABORATORS = gql`
 
 const GET_COLLABORATOR_ID = gql`
   query GetCollaboratorId($email: String = "") {
-    users(where: { email: { _eq: $email } }) {
+    user_id_by_email(args: { email: $email }) {
       id
-      email
     }
   }
 `;
@@ -171,12 +170,16 @@ function EmailForm({ recordingId }) {
   if (status.type === "fetched-user") {
     if (status.error) {
       return <ErrorHandler message={"We can not fetch that collaborator right now."} />;
-    } else if (status.data.users.length === 0) {
+    } else if (status.data.user_id_by_email.length === 0) {
       return <ErrorHandler message={"That e-mail address is not a valid Replay user."} />;
     }
 
     return (
-      <Submitter setStatus={setStatus} userId={status.data.users[0].id} recordingId={recordingId} />
+      <Submitter
+        setStatus={setStatus}
+        userId={status.data.user_id_by_email[0].id}
+        recordingId={recordingId}
+      />
     );
   }
 
