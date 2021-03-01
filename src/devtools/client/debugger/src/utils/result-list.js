@@ -41,8 +41,13 @@ function chromeScrollList(elem, index) {
   // https://nolanlawson.com/2018/09/25/accurately-measuring-layout-on-the-web/
   requestAnimationFrame(() => {
     setTimeout(() => {
+      if (!resultsEl) {
+        return;
+      }
+
       const resultsHeight = resultsEl.clientHeight;
       const itemHeight = resultsEl.children[0].clientHeight;
+
       const numVisible = resultsHeight / itemHeight;
       const positionsToScroll = index - numVisible + 1;
       const itemOffset = resultsHeight % itemHeight;
