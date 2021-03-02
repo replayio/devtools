@@ -20,7 +20,11 @@ export function setFramePositions() {
     const { sourceId: protocolSourceId } = await ThreadFront.getPreferredLocation(
       positions[0].frame
     );
-    const sourceId = getSourceByActorId(getState(), protocolSourceId).id;
+    const sourceId = getSourceByActorId(getState(), protocolSourceId)?.id;
+
+    if (!sourceId) {
+      return;
+    }
 
     const locations = await Promise.all(
       positions.map(async ({ frame }) => {
