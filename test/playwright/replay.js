@@ -29,7 +29,6 @@ const playwright = require("playwright");
   await selectPauseToolbar(page);
 
   // await waitForScopeNode(page, "<this>: Window");
-  // await evaluateInConsole(page, "number * 6");
   // await waitForMessageCount(page, "42", 1);
 
   console.log(`Saving Recording`);

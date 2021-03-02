@@ -41,10 +41,6 @@ export class DebuggerPanel {
     openDocLink(url);
   }
 
-  async openConsoleAndEvaluate(input) {
-    this._actions.evaluateExpression(input);
-  }
-
   async openInspector() {
     this.toolbox.selectTool("inspector");
   }
