@@ -14,8 +14,9 @@ export default function RecordingGridItem({
   setEditingTitle,
   toggleIsPrivate,
 }) {
-  const { userId } = useToken();
-  const isOwner = userId == data.user.auth_id;
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
+  const isOwner = userId == data.user.id;
 
   return (
     <div className="recording-item">

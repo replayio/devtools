@@ -62,10 +62,10 @@ function getRecordings(data) {
   }
 
   const user = data.users[0];
-  const { recordings, collaborators, name, email, picture, auth_id } = user;
+  const { recordings, collaborators, name, email, picture, id } = user;
 
   return [
-    ...recordings.map(recording => ({ ...recording, user: { name, email, picture, auth_id } })),
+    ...recordings.map(recording => ({ ...recording, user: { name, email, picture, id } })),
     ...collaborators.map(({ recording }) => recording),
     ...data.recordings,
   ];
