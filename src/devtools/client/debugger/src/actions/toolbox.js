@@ -14,12 +14,6 @@ export function openLink(url) {
   };
 }
 
-export function evaluateInConsole(inputString) {
-  return ({ toolbox }) => {
-    toolbox.getPanel("debugger")?.openConsoleAndEvaluate(inputString);
-  };
-}
-
 export function openElementInInspectorCommand(grip) {
   return ({ toolbox }) => {
     toolbox.getPanel("debugger")?.openElementInInspector(grip);

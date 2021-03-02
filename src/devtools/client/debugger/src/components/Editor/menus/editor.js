@@ -51,12 +51,6 @@ const blackBoxMenuItem = (cx, selectedSource, editorActions) => ({
   click: () => editorActions.toggleBlackBox(cx, selectedSource),
 });
 
-const evaluateInConsoleItem = (selectedSource, selectionText, editorActions) => ({
-  id: "node-menu-evaluate-in-console",
-  label: "Evaluate in console",
-  click: () => editorActions.evaluateInConsole(selectionText),
-});
-
 export function editorMenuItems({
   cx,
   editorActions,
@@ -73,20 +67,12 @@ export function editorMenuItems({
     blackBoxMenuItem(cx, selectedSource, editorActions)
   );
 
-  if (isTextSelected) {
-    items.push(
-      { type: "separator" },
-      evaluateInConsoleItem(selectedSource, selectionText, editorActions)
-    );
-  }
-
   return items;
 }
 
 export function editorItemActions(dispatch) {
   return bindActionCreators(
     {
-      evaluateInConsole: actions.evaluateInConsole,
       flashLineRange: actions.flashLineRange,
       jumpToMappedLocation: actions.jumpToMappedLocation,
       showSource: actions.showSource,
