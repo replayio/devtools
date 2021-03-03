@@ -9,60 +9,55 @@ import { formatKeyShortcut } from "../utils/text";
 
 import "./WelcomeBox.css";
 
-export class WelcomeBox extends Component {
-  render() {
-    const searchSourcesShortcut = formatKeyShortcut("CmdOrCtrl+P");
+function WelcomeBox({ setActiveSearch, openQuickOpen, toggleShortcutsModal }) {
+  return (
+    <div className="welcomebox">
+      <div className="alignlabel">
+        <div className="shortcutFunction">
+          <p
+            className="welcomebox__searchSources"
+            role="button"
+            tabIndex="0"
+            onClick={() => openQuickOpen()}
+          >
+            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+P")}</span>
+            <span className="shortcutLabel">{"%S Go to file".substring(2)}</span>
+          </p>
 
-    const searchProjectShortcut = formatKeyShortcut("CmdOrCtrl+Shift+F");
-
-    const allShortcutsShortcut = formatKeyShortcut("CmdOrCtrl+/");
-
-    const allShortcutsLabel = "Show all shortcuts";
-    const searchSourcesLabel = "%S Go to file".substring(2);
-    const searchProjectLabel = "%S Find in files".substring(2);
-    const { setActiveSearch, openQuickOpen, toggleShortcutsModal } = this.props;
-
-    return (
-      <div className="welcomebox">
-        <div className="alignlabel">
-          <div className="shortcutFunction">
-            <p
-              className="welcomebox__searchSources"
-              role="button"
-              tabIndex="0"
-              onClick={() => openQuickOpen()}
-            >
-              <span className="shortcutKey">{searchSourcesShortcut}</span>
-              <span className="shortcutLabel">{searchSourcesLabel}</span>
-            </p>
-            <p
-              className="welcomebox__searchProject"
-              role="button"
-              tabIndex="0"
-              onClick={setActiveSearch.bind(null, "project")}
-            >
-              <span className="shortcutKey">{searchProjectShortcut}</span>
-              <span className="shortcutLabel">{searchProjectLabel}</span>
-            </p>
-            <p
-              className="welcomebox__allShortcuts"
-              role="button"
-              tabIndex="0"
-              onClick={() => toggleShortcutsModal()}
-            >
-              <span className="shortcutKey">{allShortcutsShortcut}</span>
-              <span className="shortcutLabel">{allShortcutsLabel}</span>
-            </p>
-          </div>
+          <p
+            className="welcomebox__searchSources"
+            role="button"
+            tabIndex="0"
+            onClick={() => openQuickOpen("@", true)}
+          >
+            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+O")}</span>
+            <span className="shortcutLabel">{"%S Search functions".substring(2)}</span>
+          </p>
+          <p
+            className="welcomebox__searchProject"
+            role="button"
+            tabIndex="0"
+            onClick={setActiveSearch.bind(null, "project")}
+          >
+            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+Shift+F")}</span>
+            <span className="shortcutLabel">{"%S Find in files".substring(2)}</span>
+          </p>
+          <p
+            className="welcomebox__allShortcuts"
+            role="button"
+            tabIndex="0"
+            onClick={() => toggleShortcutsModal()}
+          >
+            <span className="shortcutKey">{formatKeyShortcut("CmdOrCtrl+/")}</span>
+            <span className="shortcutLabel">{"Show all shortcuts"}</span>
+          </p>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
-const mapStateToProps = state => ({});
-
-export default connect(mapStateToProps, {
+export default connect(() => ({}), {
   setActiveSearch: actions.setActiveSearch,
   openQuickOpen: actions.openQuickOpen,
 })(WelcomeBox);
