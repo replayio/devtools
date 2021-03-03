@@ -38,17 +38,25 @@ function ActionButton({ action }) {
   return null;
 }
 
-function Error({ children, refresh, expected, unexpected, error }) {
+function ErrorContainer({ children, unexpected, expected }) {
   return (
     <div className={classnames("error-container", { expected, unexpected })}>
       <div className="error-mask" />
-      <div className={"error-content"}>
+      {children}
+    </div>
+  );
+}
+
+function Error({ children, refresh, expected, unexpected, error }) {
+  return (
+    <ErrorContainer unexpected={unexpected} expected={expected}>
+      <div className="error-content">
         <h1>Whoops</h1>
         {children}
         {error.message ? <p className="error-message">{error.message}</p> : null}
         <ActionButton action={refresh ? "refresh" : error?.action} />
       </div>
-    </div>
+    </ErrorContainer>
   );
 }
 
@@ -57,6 +65,17 @@ function ExpectedError({ error }) {
   // 1) Happens before to the app's initial page load has successfully completed.
   // 2) Is deterministic (e.g. bad recording ID).
   // 3) Will not be fixed by a page refresh.
+
+  if (error.type == "timeout") {
+    return (
+      <ErrorContainer expected>
+        <div className="transparent-error-content">
+          <div className="img refresh"></div>
+          <div className="message">{error.message}</div>
+        </div>
+      </ErrorContainer>
+    );
+  }
 
   const isServerError = error.code;
   const content = isServerError ? "Looks like something went wrong with this page" : error.message;

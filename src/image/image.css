@@ -288,7 +288,7 @@ button.jump-definition {
 .img.prettyPrint {
   -webkit-mask-image: url(~devtools/client/debugger/images/prettyPrint.svg);
 }
-.img.refresh {
+.img.reload {
   -webkit-mask-image: url(~devtools/client/debugger/images/reload.svg);
 }
 .img.regex-match {
@@ -416,6 +416,9 @@ button.jump-definition {
 }
 .img.menu {
   -webkit-mask-image: url(~devtools/client/themes/images/menu.svg);
+}
+.img.refresh {
+  -webkit-mask-image: url(~devtools/client/themes/images/refresh.svg);
 }
 .img.arrowhead-right {
   -webkit-mask-image: url(~devtools/client/themes/images/arrowhead-right.svg);

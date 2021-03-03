@@ -143,7 +143,8 @@ function onSocketClose() {
     if (!willClose) {
       dispatch(
         setExpectedError({
-          message: "Session has closed due to inactivity, please refresh the page.",
+          type: "timeout",
+          message: "Apologies! A quick refresh should do the trick.",
         })
       );
     }

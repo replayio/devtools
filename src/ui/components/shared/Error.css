@@ -19,11 +19,15 @@
 }
 
 .error-container.unexpected .error-mask {
-  background: linear-gradient(152.2deg, rgba(103, 218, 255, 0.90) 6.75%, rgba(67, 130, 255, 0.90) 93.14%);
+  background: linear-gradient(
+    152.2deg,
+    rgba(103, 218, 255, 0.9) 6.75%,
+    rgba(67, 130, 255, 0.9) 93.14%
+  );
 }
 
 .error-container.expected .error-mask {
-  background: linear-gradient(152.2deg, #67DAFF 6.75%, #4382FF 93.14%);
+  background: linear-gradient(152.2deg, #67daff 6.75%, #4382ff 93.14%);
 }
 
 .error-content {
@@ -43,8 +47,39 @@
   right: 0;
   background: var(--theme-toolbar-background);
   color: var(--theme-toolbar-color);
-  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px,
+    rgba(15, 15, 15, 0.2) 0px 9px 24px;
   font-size: 1.25rem;
+}
+
+.transparent-error-content {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 640px;
+  height: 460px;
+  border-radius: 8px;
+  padding: 40px;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: white;
+  font-size: 1.25rem;
+}
+
+.transparent-error-content .img.refresh {
+  background-color: white;
+  width: 80px;
+  height: 80px;
+}
+
+.transparent-error-content .message {
+  font-size: 1.5rem;
+  margin-top: 30px;
 }
 
 .error-content {
@@ -89,11 +124,11 @@
   background: linear-gradient(152.34deg, #3398ff 25.66%, #007dfd 78.07%);
 }
 
-.error-content button.clicked .img.refresh {
-  animation: spin .7s linear infinite;
+.error-content button.clicked .img.reload {
+  animation: spin 0.7s linear infinite;
 }
 
-.error-content button .img.refresh {
-  margin-inline-end: .5em;
+.error-content button .img.reload {
+  margin-inline-end: 0.5em;
   background-color: white;
 }

@@ -35,7 +35,7 @@
 }
 
 .modal-container .permission:hover {
-  background: #EEE;
+  background: #eee;
   border-radius: 8px;
 }
 
@@ -65,7 +65,7 @@
 }
 
 .modal-container .permission .email {
-  color: var(--light-grey)
+  color: var(--light-grey);
 }
 
 .modal-container .permission:not(:first-child):hover .role {
@@ -108,15 +108,15 @@
   border: none;
 }
 
-.modal-container input[type=text] {
+.modal-container input[type="text"] {
   margin-right: 8px;
-  background-color: #EEE;
+  background-color: #eee;
   line-height: 16px;
   padding: 8px;
   flex-grow: 1;
 }
 
-.modal-container input[type=submit] {
+.modal-container input[type="submit"] {
   flex-shrink: 0;
   color: white;
   background: var(--dark-blue);
@@ -144,12 +144,12 @@
   border: none;
 }
 
-.modal-container .status .img.refresh {
+.modal-container .status .img.reload {
   height: 16px;
   padding-inline-end: 1em;
-  margin-inline-end: .5em;
+  margin-inline-end: 0.5em;
   background-color: var(--light-grey);
-  animation: spin .7s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 .modal-container .status.error {

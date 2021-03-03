@@ -15,6 +15,7 @@ export type ModalType = "sharing" | "login";
 export interface ExpectedError {
   message: string;
   action?: string;
+  type?: "timeout";
 }
 
 export interface UploadInfo {
