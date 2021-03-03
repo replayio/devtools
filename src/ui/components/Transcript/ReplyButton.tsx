@@ -2,6 +2,7 @@ import React from "react";
 import classnames from "classnames";
 import { connect, ConnectedProps } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
+import { ThreadFront } from "protocol/thread";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -31,7 +32,7 @@ function ReplyButton({
   const { comments } = hooks.useGetComments(recordingId!);
   const isDisabled = !!comments.find(comment => comment.time === currentTime);
 
-  const onClick = (e: React.MouseEvent) => {
+  const onClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
     if (!isAuthenticated) {
@@ -51,19 +52,22 @@ function ReplyButton({
       time,
       point,
       has_frames: false,
+      source_location: null,
+      position: null,
     };
 
     if ("comment" in item && item.comment) {
-      // Add a reply to an event.
+      // Add a reply to an event's root comment.
       pendingComment = { ...pendingComment, parent_id: item.comment.id };
     } else if ("id" in item) {
-      // Add a reply to an existing comment
+      // Add a reply to a non-event's root comment.
       pendingComment = {
         ...pendingComment,
         has_frames: "has_frames" in item && item.has_frames,
         parent_id: item.id,
       };
     } else {
+      // Add a root comment to an event.
       pendingComment = {
         ...pendingComment,
         position: {
@@ -76,14 +80,7 @@ function ReplyButton({
     setPendingComment(pendingComment);
   };
 
-  return (
-    <button
-      className={classnames("transcript-entry-action img reply")}
-      // className={classnames("transcript-entry-action img reply", { disabled: isDisabled })}
-      // disabled={isDisabled}
-      onClick={onClick}
-    />
-  );
+  return <button className={classnames("transcript-entry-action img reply")} onClick={onClick} />;
 }
 
 const connector = connect(
