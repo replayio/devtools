@@ -24,6 +24,10 @@ const libraryMap = [
     pattern: /(node_modules\/(?:react|react-dom)\/)|(react(-dom)?(\.[a-z]+)*\.js$)/,
   },
   {
+    label: "React",
+    pattern: /(node_modules\/scheduler)/,
+  },
+  {
     label: "Immutable",
     pattern: /immutable/i,
   },
