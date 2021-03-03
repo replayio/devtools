@@ -19,7 +19,6 @@ async function test() {
   await page.click("a.run-list-item");
   await page.click('[data-cy="test-overview-test-link"]');
   await page.click(".test-results__test-result-title-container");
-  // await sleep();
 
   await browser.close();
 }
