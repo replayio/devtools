@@ -26,6 +26,13 @@ function update(state = initialASTState(), action) {
       };
     }
 
+    case "LOADED_SYMBOLS": {
+      return {
+        ...state,
+        symbols: { ...state.symbols, ...action.symbols },
+      };
+    }
+
     case "RESUME": {
       return { ...state };
     }
