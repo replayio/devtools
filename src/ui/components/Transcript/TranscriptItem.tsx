@@ -4,13 +4,14 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { Comment, PendingComment } from "ui/state/comments";
-import { MouseEvent } from "@recordreplay/protocol";
 import { UIState } from "ui/state";
+import { Event } from "ui/state/comments";
 import "./TranscriptItem.css";
 import { HoveredItem } from "ui/state/timeline";
+import ReplyButton from "./ReplyButton";
 
 type TranscriptItemProps = PropsFromRedux & {
-  item: Comment | MouseEvent | PendingComment;
+  item: Comment | Event | PendingComment;
   label: string;
   secondaryLabel: string;
   icon: JSX.Element;
@@ -92,10 +93,10 @@ function TranscriptItem({
       })}
       ref={itemNode}
     >
-      {/* <span className="transcript-line" /> */}
       <div className="transcript-entry-description">
         <div className="transcript-entry-icon">{icon}</div>
         <div className="transcript-entry-label">{label}</div>
+        {!pendingComment && <ReplyButton item={item} />}
       </div>
       {children}
     </div>

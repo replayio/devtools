@@ -28,6 +28,7 @@ export interface PendingComment {
   source_location: SourceLocation | null;
   position: CommentPosition | null;
   id?: string;
+  parent_id?: string;
 }
 
 export interface Comment {
