@@ -141,19 +141,26 @@
   padding-right: 4px;
 }
 
-.timeline-tooltip {
-  display: flex;
+.timeline .progress-line-paused {
+  height: 9px;
+  width: 9px;
+  border-radius: 50%;
+  background: var(--secondary-accent);
   position: absolute;
-  border: 1px solid rgb(204, 204, 204);
-  padding: 8px 12px;
-  bottom: 28px;
-  border-radius: 4px;
-  background: #ececec;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-index-1--timeline-tooltip);
-  background: var(--theme-toolbar-background);
-  transform: translateX(-50%);
-  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
-  user-select: none;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Timeline timestamp */
+
+.timeline .timeline-time {
+  font-size: 12px;
+}
+
+.timeline .timeline-time > :not(:first-child) {
+  margin-left: 4px;
+}
+
+.timeline .timeline-time .time-total {
+  color: var(--theme-comment);
 }

@@ -3,6 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 const { getVisiblePosition } = require("ui/utils/timeline");
+import "./Tooltip.css";
 
 export function Tooltip({ hoverTime, zoomRegion, timelineWidth }: Props) {
   if (!hoverTime) {

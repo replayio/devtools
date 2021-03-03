@@ -1,0 +1,13 @@
+.timeline-tooltip {
+  font-size: 12px;
+  display: flex;
+  position: absolute;
+  bottom: 24px;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-index-1--timeline-tooltip);
+  background: var(--theme-toolbar-background);
+  transform: translateX(-50%);
+  user-select: none;
+}

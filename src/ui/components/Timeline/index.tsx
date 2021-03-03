@@ -24,9 +24,8 @@ import { selectors } from "ui/reducers";
 import Marker from "./Marker";
 import MessageMarker from "./MessageMarker";
 import EventMarker from "./EventMarker";
-import Hud from "ui/components/Comments/VideoComments/Hud.tsx";
 
-const { getVisiblePosition } = require("ui/utils/timeline");
+const { getVisiblePosition, getFormattedTime } = require("ui/utils/timeline");
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 import "./Timeline.css";
@@ -242,6 +241,7 @@ class Timeline extends Component<PropsFromRedux> {
       hoveredItem,
       viewMode,
       selectedPanel,
+      recordingDuration,
     } = this.props;
     const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
     const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;
@@ -261,6 +261,7 @@ class Timeline extends Component<PropsFromRedux> {
             <div className="progress-line full" />
             <div className="progress-line preview" style={{ width: `${hoverPercent}%` }} />
             <div className="progress-line" style={{ width: `${percent}%` }} />
+            <div className="progress-line-paused" style={{ left: `${percent}%` }} />
             {viewMode == "dev" && selectedPanel == "console"
               ? this.renderMessages()
               : this.renderEvents()}
@@ -268,8 +269,13 @@ class Timeline extends Component<PropsFromRedux> {
             <ScrollContainer />
             <Comments />
           </div>
+          <Tooltip timelineWidth={this.overlayWidth} />
         </div>
-        <Hud />
+        <div className="timeline-time">
+          <span className="time-current">{getFormattedTime(currentTime)}</span>
+          <span className="time-divider">/</span>
+          <span className="time-total">{getFormattedTime(recordingDuration)}</span>
+        </div>
       </div>
     );
   }
