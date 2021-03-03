@@ -1,18 +1,9 @@
 import React from "react";
 import classnames from "classnames";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
+import { DELETE_RECORDING } from "./RecordingItem/RecordingItemDropdown";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import "./DashboardViewerHeader.css";
-
-const DELETE_RECORDING = gql`
-  mutation DeleteRecording($recordingId: String) {
-    delete_recordings(where: { recording_id: { _eq: $recordingId } }) {
-      returning {
-        id
-      }
-    }
-  }
-`;
 
 function ViewsToggle({ viewType, toggleViewType }) {
   return (
@@ -41,7 +32,9 @@ function BatchActionDropdown({ selectedIds, setSelectedIds }) {
   });
 
   const deleteSelectedIds = () => {
-    selectedIds.forEach(recordingId => deleteRecording({ variables: { recordingId } }));
+    selectedIds.forEach(recordingId =>
+      deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } })
+    );
     setSelectedIds([]);
   };
 
