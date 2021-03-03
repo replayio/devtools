@@ -7,7 +7,7 @@
   align-items: center;
   background: white;
   height: 100%;
-  padding: 16px;
+  padding: 8px;
 }
 
 .transcript-panel > :not(:first-child) {
