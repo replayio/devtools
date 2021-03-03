@@ -67,37 +67,49 @@
 
 .transcript-list .comment-body {
   align-self: center;
-  padding-top: 16px;
   width: 100%;
+}
+
+.transcript-list .comment-body > :not(:last-child) {
+  padding-bottom: 24px;
+}
+
+.transcript-list .comment-body > :first-child {
+  padding-top: 24px;
 }
 
 .transcript-list .comment-body-header {
   display: flex;
   flex-direction: row;
   align-items: center;
-  height: 32px;
 }
 
 .transcript-list .comment-body-header > :not(:first-child) {
   margin-left: 16px;
 }
 
+.transcript-list .comment-body-header .comment-picture {
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  align-self: flex-start;
+  z-index: 10;
+}
+
 .transcript-list .comment-body-header-label {
   display: flex;
   flex-grow: 1;
-  flex-direction: row;
+  flex-direction: column;
   align-items: baseline;
   overflow: hidden;
 }
 
-.transcript-list .comment-body-header-label > :not(:first-child) {
-  margin-left: 8px;
-}
-
 .comment-body-header-label-name {
   color: var(--theme-body-color);
+  width: 100%;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 12px;
+  line-height: 14px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -115,25 +127,26 @@
   position: relative;
 }
 
-.comment-body-item:not(:last-child)::after {
+.comment-body-item:first-child::after {
   content: "";
   width: 1px;
-  height: calc(100% - 34px);
-  top: 34px;
-  left: 12px;
+  height: 24px;
+  top: 0px;
+  background: var(--theme-splitter-color);
+  position: absolute;
+  left: 13px;
+}
+
+.comment-body-item:not(:last-child)::before {
+  content: "";
+  width: 1px;
+  height: calc(100% - 24px);
+  top: 24px;
+  left: 13px;
   background: var(--theme-splitter-color);
   position: absolute;
 }
 
-.comment-body-item:first-child::before {
-  content: "";
-  width: 1px;
-  height: 12px;
-  top: -12px;
-  background: var(--theme-splitter-color);
-  position: absolute;
-  left: 12px;
-}
 .transcript-list .dropdown-block {
   align-self: flex-start;
   flex-shrink: 0;
@@ -157,14 +170,14 @@
 
 .transcript-list .item-content {
   font-size: 12px;
-  padding-left: 40px;
-  line-height: 18px;
+  line-height: 13px;
   color: var(--theme-comment);
+  width: 100%;
 }
 
 .transcript-list img {
-  width: 26px;
-  height: 26px;
+  width: 27px;
+  height: 27px;
   border-radius: 50%;
 }
 

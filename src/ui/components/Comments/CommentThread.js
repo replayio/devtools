@@ -104,13 +104,13 @@ function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingCo
         <img src={comment.user.picture} className="comment-picture" />
         <div className="comment-body-header-label">
           <div className="comment-body-header-label-name">{comment.user.name}</div>
+          <div className="item-content">
+            {lines.map((line, i) => (
+              <div key={i}>{line}</div>
+            ))}
+          </div>
         </div>
         <Actions {...{ comment, hoveredComment, setPendingComment, isRoot }} />
-      </div>
-      <div className="item-content">
-        {lines.map((line, i) => (
-          <div key={i}>{line}</div>
-        ))}
       </div>
     </div>
   );
