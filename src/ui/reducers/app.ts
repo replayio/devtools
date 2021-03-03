@@ -20,7 +20,7 @@ function initialAppState(): AppState {
     loading: 4,
     uploading: null,
     sessionId: null,
-    modal: null,
+    modal: "settings",
     modalOptions: null,
     analysisPoints: {},
     events: {},

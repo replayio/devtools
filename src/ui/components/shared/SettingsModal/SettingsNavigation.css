@@ -1,0 +1,44 @@
+.settings-modal nav {
+  padding: 24px 36px 24px 24px;
+  border-right: 1px solid var(--theme-splitter-color);
+  flex-shrink: 0;
+}
+
+.settings-modal nav > :not(:first-child) {
+  margin-top: 32px;
+}
+
+.settings-modal nav ul {
+  list-style-type: none;
+}
+
+.settings-modal nav ul > :not(:first-child) {
+  margin-top: 24px;
+}
+
+.settings-modal nav li {
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.settings-modal nav li.selected {
+  color: var(--primary-accent);
+}
+
+.settings-modal nav li.selected .img {
+  background: var(--primary-accent);
+}
+
+.settings-modal nav li > :not(:first-child) {
+  margin-left: 8px;
+}
+
+.settings-modal nav li .img {
+  height: 20px;
+  width: 20px;
+  background-color: var(--theme-icon-color);
+}
+
+.settings-modal nav li span {
+  vertical-align: bottom;
+}

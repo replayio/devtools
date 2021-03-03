@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { actions } from "ui/actions";
+
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import Avatar from "ui/components/Avatar";
@@ -6,7 +9,7 @@ import { isDeployPreview } from "ui/utils/environment";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./UserOptions.css";
 
-export default function UserOptions() {
+function UserOptions({ setModal }) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated, user } = useAuth0();
 
@@ -41,7 +44,12 @@ export default function UserOptions() {
         <div className="row clickable logout">
           <LoginButton />
         </div>
+        <button onClick={() => setModal("settings")}>Click</button>
       </Dropdown>
     </div>
   );
 }
+
+export default connect(null, {
+  setModal: actions.setModal,
+})(UserOptions);

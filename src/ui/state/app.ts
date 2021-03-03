@@ -10,7 +10,7 @@ import {
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug" | "comments";
 export type ViewMode = "dev" | "non-dev";
-export type ModalType = "sharing" | "login";
+export type ModalType = "sharing" | "login" | "settings";
 
 export interface ExpectedError {
   message: string;
