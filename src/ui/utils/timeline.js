@@ -75,3 +75,12 @@ export function getNewZoomRegion({ hoverTime, newScale, zoomRegion, recordingDur
 
   return { start: newStart, end: newEnd };
 }
+
+// Format a time value to mm:ss
+export function getFormattedTime(time) {
+  const date = new Date(time);
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+  const minutes = date.getMinutes();
+
+  return `${minutes}:${seconds}`;
+}
