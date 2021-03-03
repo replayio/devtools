@@ -34,8 +34,18 @@ export const setSymbols = memoizeableAction("setSymbols", {
 });
 
 export function loadSymbols() {
-  return async ({ dispatch, getState }) => {
+  return async ({ dispatch, getState, parser }) => {
     const sources = selectors.getSourceList(getState()).filter(source => source.url);
-    await Promise.all(sources.map(source => dispatch(setSymbols({ source }))));
+
+    const symbols = Object.fromEntries(
+      await Promise.all(
+        sources.map(async source => [source.id, await parser.getSymbols(source.id)])
+      )
+    );
+
+    dispatch({
+      type: "LOADED_SYMBOLS",
+      symbols,
+    });
   };
 }
