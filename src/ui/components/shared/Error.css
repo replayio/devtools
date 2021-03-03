@@ -124,11 +124,11 @@
   background: linear-gradient(152.34deg, #3398ff 25.66%, #007dfd 78.07%);
 }
 
-.error-content button.clicked .img.reload {
+.error-content button.clicked .img.refresh {
   animation: spin 0.7s linear infinite;
 }
 
-.error-content button .img.reload {
+.error-content button .img.refresh {
   margin-inline-end: 0.5em;
   background-color: white;
 }
