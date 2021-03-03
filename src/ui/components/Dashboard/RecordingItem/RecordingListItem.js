@@ -122,7 +122,8 @@ export default function RecordingListItem({
   selectedIds,
   editing,
 }) {
-  const { userId } = useToken();
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
 
   const { recording_id: recordingId } = data;
   const selected = selectedIds.includes(recordingId);
