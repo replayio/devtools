@@ -8,7 +8,7 @@ export default function IconWithTooltip({ icon, content, handleClick }) {
   const [hovered, setHovered] = useState(false);
 
   const handleMouseEnter = () => {
-    timeoutKey.current = setTimeout(() => setHovered(true), 1000);
+    timeoutKey.current = setTimeout(() => setHovered(true), 300);
   };
   const handleMouseLeave = () => {
     setHovered(false);
