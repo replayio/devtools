@@ -38,9 +38,17 @@ export function loadSymbols() {
     const sources = selectors.getSourceList(getState()).filter(source => source.url);
 
     const symbols = Object.fromEntries(
-      await Promise.all(
-        sources.map(async source => [source.id, await parser.getSymbols(source.id)])
-      )
+      (
+        await Promise.all(
+          sources.map(async source => {
+            try {
+              return [source.id, await parser.getSymbols(source.id)];
+            } catch (e) {
+              return null;
+            }
+          })
+        )
+      ).filter(Boolean)
     );
 
     dispatch({
