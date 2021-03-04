@@ -80,31 +80,10 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
 
 function Header({ recordingId, sessionId }) {
   const [editingTitle, setEditingTitle] = useState(false);
-  // const { isAuthenticated } = useAuth0();
-
-  // const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
-  // const dashboardUrl = `${window.location.origin}/view`;
-
-  // const onNavigateBack = event => {
-  //   if (event.metaKey) {
-  //     return window.open(dashboardUrl);
-  //   }
-  //   window.location = dashboardUrl;
-  // };
 
   return (
     <div id="header">
       <div className="header-left">
-        {/* {isAuthenticated ? (
-          <IconWithTooltip
-            icon={backIcon}
-            content={"Back to Dashboard"}
-            handleClick={e => onNavigateBack(e)}
-          />
-        ) : (
-          <img className="logo" src="images/logo.svg" />
-        )} */}
-
         <HeaderTitle
           recordingId={recordingId}
           setEditingTitle={setEditingTitle}
