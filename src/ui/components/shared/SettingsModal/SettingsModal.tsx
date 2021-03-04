@@ -13,7 +13,7 @@ const settings: Settings = [
     items: [
       {
         label: "Share Replays with your team",
-        key: "team-share",
+        key: "team.share",
         description: "Share Replays with others from your domain",
         disabled: false,
       },
@@ -24,7 +24,7 @@ const settings: Settings = [
     items: [
       {
         label: "Enable the Elements pane",
-        key: "experimental-elements",
+        key: "experimental.elements",
         description: "The Elements pane allows you to inspect the HTML markup and CSS styling",
         disabled: false,
       },
@@ -35,13 +35,13 @@ const settings: Settings = [
     items: [
       {
         label: "Replays are private by default",
-        key: "appearance-dark-mode",
+        key: "appearance.dark.mode",
         description: null,
         disabled: false,
       },
       {
         label: "Share Replays with others from your domain (replay.io)",
-        key: "appearance-accent-colors",
+        key: "appearance.accent.colors",
         description: null,
         disabled: false,
       },

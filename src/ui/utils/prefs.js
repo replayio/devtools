@@ -34,6 +34,7 @@ pref("devtools.features.comments", true);
 pref("devtools.features.users", true);
 pref("devtools.features.auth0", true);
 pref("devtools.features.videoComments", false);
+pref("devtools.features.settings", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -54,6 +55,7 @@ export const features = new PrefsHelper("devtools.features", {
   auth0: ["Bool", "auth0"],
   videoComments: ["Bool", "videoComments"],
   private: ["Bool", "private"],
+  settings: ["Bool", "settings"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

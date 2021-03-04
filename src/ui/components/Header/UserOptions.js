@@ -7,10 +7,11 @@ import Dropdown from "ui/components/shared/Dropdown";
 import { isDeployPreview } from "ui/utils/environment";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./UserOptions.css";
+import { features } from "ui/utils/prefs";
 
 function UserOptions({ setModal }) {
   const [expanded, setExpanded] = useState(false);
-  const { isAuthenticated, user } = useAuth0();
+  const { isAuthenticated } = useAuth0();
 
   if (isDeployPreview()) {
     return null;
@@ -20,16 +21,15 @@ function UserOptions({ setModal }) {
     return <LoginButton />;
   }
 
-  // const buttonContent = <Avatar player={user} isFirstPlayer={true} />;
   const buttonContent = (
     <button>
       <span className="material-icons">more_horiz</span>
     </button>
   );
 
-  const dashboardUrl = `${window.location.origin}/view`;
-
   const onLibraryClick = () => {
+    const dashboardUrl = `${window.location.origin}/view`;
+
     if (event.metaKey) {
       return window.open(dashboardUrl);
     }
@@ -48,23 +48,16 @@ function UserOptions({ setModal }) {
         expanded={expanded}
         orientation="bottom"
       >
-        {/* <div className="user row">
-          <div className="user-avatar">
-            <Avatar player={user} isFirstPlayer={true} />
-          </div>
-          <div className="user-info">
-            <div className="user-name">{user.name}</div>
-            <div className="user-email">{user.email}</div>
-          </div>
-        </div> */}
         <button className="row" onClick={onLibraryClick}>
           <span className="material-icons">home</span>
           <span>Library</span>
         </button>
-        <button className="row" onClick={onSettingsClick}>
-          <span className="material-icons">settings</span>
-          <span>Settings</span>
-        </button>
+        {features.settings && (
+          <button className="row" onClick={onSettingsClick}>
+            <span className="material-icons">settings</span>
+            <span>Settings</span>
+          </button>
+        )}
         <LoginButton />
       </Dropdown>
     </div>

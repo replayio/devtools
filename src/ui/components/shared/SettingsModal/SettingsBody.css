@@ -34,3 +34,9 @@
   max-width: 80%;
   color: var(--theme-comment)
 }
+
+/* Support */
+
+.settings-modal a {
+  color: var(--primary-accent);
+}
