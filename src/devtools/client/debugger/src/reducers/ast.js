@@ -5,6 +5,7 @@
 export function initialASTState() {
   return {
     symbols: {},
+    projectSymbolsLoading: null,
   };
 }
 
@@ -26,10 +27,15 @@ function update(state = initialASTState(), action) {
       };
     }
 
+    case "LOADING_SYMBOLS": {
+      return { ...state, projectSymbolsLoading: action.loading };
+    }
+
     case "LOADED_SYMBOLS": {
       return {
         ...state,
         symbols: { ...state.symbols, ...action.symbols },
+        projectSymbolsLoading: action.loading,
       };
     }
 
@@ -74,6 +80,10 @@ export function hasSymbols(state, source) {
   }
 
   return !symbols.loading;
+}
+
+export function getProjectSymbolsLoading(state) {
+  return state.ast.projectSymbolsLoading;
 }
 
 export function isSymbolsLoading(state, source) {

@@ -10,9 +10,7 @@ import {
   getSourceFromId,
   getSourceWithContent,
   getSourceContent,
-  getGeneratedSource,
   getSourcesEpoch,
-  getBreakpointsForSource,
   getSourceActorsForSource,
 } from "../../selectors";
 
@@ -27,7 +25,7 @@ import { Telemetry } from "devtools-modules";
 const loadSourceHistogram = "DEVTOOLS_DEBUGGER_LOAD_SOURCE_MS";
 const telemetry = new Telemetry();
 
-async function loadSource(state, source, { sourceMaps, client, getState }) {
+export async function loadSource(state, source, { parser, client }) {
   // We only need the source text from one actor, but messages sent to retrieve
   // the source might fail if the actor has or is about to shut down. Keep
   // trying with different actors until one request succeeds.
@@ -51,38 +49,22 @@ async function loadSource(state, source, { sourceMaps, client, getState }) {
     }
   }
 
-  return {
-    text: response.source,
-    contentType: response.contentType || "text/javascript",
-  };
+  const contentType = response.contentType || "text/javascript";
+  const text = response.source || "";
+
+  parser.setSource(source.id, { type: "text", value: text, contentType });
+
+  return { text, contentType };
 }
 
-async function loadSourceTextPromise(
-  cx,
-  source,
-  { dispatch, getState, client, sourceMaps, parser }
-) {
+async function loadSourceTextPromise(cx, source, { dispatch, getState, client, parser }) {
   const epoch = getSourcesEpoch(getState());
   await dispatch({
     type: "LOAD_SOURCE_TEXT",
     sourceId: source.id,
     epoch,
-    [PROMISE]: loadSource(getState(), source, { sourceMaps, client, getState }),
+    [PROMISE]: loadSource(getState(), source, { parser, client, getState }),
   });
-
-  const newSource = getSource(getState(), source.id);
-
-  if (!newSource) {
-    return;
-  }
-  const content = getSourceContent(getState(), newSource.id);
-
-  if (content) {
-    parser.setSource(
-      newSource.id,
-      isFulfilled(content) ? content.value : { type: "text", value: "", contentType: undefined }
-    );
-  }
 }
 
 export function loadSourceById(cx, sourceId) {
