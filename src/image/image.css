@@ -438,6 +438,21 @@ button.jump-definition {
 .img.settings {
   -webkit-mask-image: url(~devtools/client/themes/images/settings.svg);
 }
+.img.settings-appearance {
+  -webkit-mask-image: url(~devtools/client/themes/images/settings-appearance.svg);
+}
+.img.settings-team {
+  -webkit-mask-image: url(~devtools/client/themes/images/settings-team.svg);
+}
+.img.settings-privacy {
+  -webkit-mask-image: url(~devtools/client/themes/images/settings-privacy.svg);
+}
+.img.settings-experimental {
+  -webkit-mask-image: url(~devtools/client/themes/images/settings-experimental.svg);
+}
+.img.settings-support {
+  -webkit-mask-image: url(~devtools/client/themes/images/settings-support.svg);
+}
 .img.plus-circle {
   -webkit-mask-image: url(~devtools/client/themes/images/plus-circle.svg);
 }

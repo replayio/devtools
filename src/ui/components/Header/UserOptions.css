@@ -20,6 +20,11 @@
 .user-options .dropdown-container .content {
   width: 240px;
   right: -8px;
+  font-size: 12px;
+}
+
+.user-options .dropdown-container .content button {
+  cursor: pointer;
 }
 
 .user-options .user.row {
@@ -54,13 +59,21 @@
 }
 
 .user-options .row.logout {
-  padding: 4px;
+  padding: 8px;
+}
+
+.user-options .row.logout button {
+  display: flex;
+  align-items: center;
+}
+
+.user-options .row > :not(:first-child) {
+  margin-left: 8px;
 }
 
 .user-options a.logout {
   width: 100%;
   text-decoration: none;
-  align-self: center;
   height: 24px;
 }
 
@@ -68,7 +81,6 @@
   width: 100%;
   color: var(--theme-toolbar-color);
   background: transparent;
-  align-items: center;
   line-height: 16px;
 }
 
@@ -76,22 +88,6 @@
   top: 48px;
   animation: dropdownFadeIn ease 200ms;
 }
-/* 
-.user-options .dropdown-wrapper button {
-  border-radius: 4px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  color: white;
-  display: flex;
-  align-items: center;
-  background: var(--dark-blue);
-  cursor: pointer;
-  line-height: 16px;
-}
-
-.user-options .dropdown-wrapper button .img {
-  background: white;
-} */
 
 .avatar img {
   height: 24px;

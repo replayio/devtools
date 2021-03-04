@@ -1,14 +1,17 @@
 import React, { useState } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { actions } from "ui/actions";
+
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
-import Avatar from "ui/components/Avatar";
 import { isDeployPreview } from "ui/utils/environment";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./UserOptions.css";
+import { features } from "ui/utils/prefs";
 
-export default function UserOptions() {
+function UserOptions({ setModal }) {
   const [expanded, setExpanded] = useState(false);
-  const { isAuthenticated, user } = useAuth0();
+  const { isAuthenticated } = useAuth0();
 
   if (isDeployPreview()) {
     return null;
@@ -18,7 +21,24 @@ export default function UserOptions() {
     return <LoginButton />;
   }
 
-  const buttonContent = <Avatar player={user} isFirstPlayer={true} />;
+  const buttonContent = (
+    <button>
+      <span className="material-icons">more_horiz</span>
+    </button>
+  );
+
+  const onLibraryClick = () => {
+    const dashboardUrl = `${window.location.origin}/view`;
+
+    if (event.metaKey) {
+      return window.open(dashboardUrl);
+    }
+    window.location = dashboardUrl;
+  };
+  const onSettingsClick = () => {
+    setExpanded(false);
+    setModal("settings");
+  };
 
   return (
     <div className="user-options">
@@ -28,20 +48,22 @@ export default function UserOptions() {
         expanded={expanded}
         orientation="bottom"
       >
-        <div className="user row">
-          <div className="user-avatar">
-            <Avatar player={user} isFirstPlayer={true} />
-          </div>
-          <div className="user-info">
-            <div className="user-name">{user.name}</div>
-            <div className="user-email">{user.email}</div>
-          </div>
-        </div>
-
-        <div className="row clickable logout">
-          <LoginButton />
-        </div>
+        <button className="row" onClick={onLibraryClick}>
+          <span className="material-icons">home</span>
+          <span>Library</span>
+        </button>
+        {features.settings && (
+          <button className="row" onClick={onSettingsClick}>
+            <span className="material-icons">settings</span>
+            <span>Settings</span>
+          </button>
+        )}
+        <LoginButton />
       </Dropdown>
     </div>
   );
 }
+
+export default connect(null, {
+  setModal: actions.setModal,
+})(UserOptions);

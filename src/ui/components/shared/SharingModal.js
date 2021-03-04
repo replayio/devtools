@@ -214,7 +214,6 @@ function Sharing({ hideModal, modalOptions }) {
     variables: { recordingId },
   });
 
-  console.log({ data, loading, error });
   if (loading) {
     return <Modal />;
   } else if (error || !data.recordings_by_pk) {
