@@ -150,7 +150,6 @@ function removeBreakpoint(location) {
 }
 
 function runAnalysis(location, options) {
-  maybeClearLogpoint(location);
   options = maybeGenerateLogGroupId(options);
   const { condition, logValue, logGroupId } = options;
   const { line, column, sourceUrl, sourceId } = location;
