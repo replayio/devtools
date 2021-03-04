@@ -1,5 +1,5 @@
 .settings-modal nav {
-  padding: 24px 36px 24px 24px;
+  padding: 36px;
   border-right: 1px solid var(--theme-splitter-color);
   flex-shrink: 0;
 }

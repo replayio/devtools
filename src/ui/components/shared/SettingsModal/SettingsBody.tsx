@@ -23,8 +23,34 @@ function SettingsBodyItem({ item }: SettingsBodyItemProps) {
   );
 }
 
+function Support() {
+  return (
+    <li>
+      <label className="setting-item">
+        <div className="label">Join us on Discord</div>
+        <div className="description">
+          Come chat with us on our{" "}
+          <a href="https://discord.gg/Th7AwJsz" target="_blank" rel="noreferrer">
+            Discord server
+          </a>
+          . We’d love to hear your feedback!
+        </div>
+      </label>
+    </li>
+  );
+}
+
 export default function SettingsBody({ selectedSetting }: SettingsBodyProps) {
   const { title, items } = selectedSetting;
+
+  if (title == "Support") {
+    return (
+      <main>
+        <h1>{title}</h1>
+        <Support />
+      </main>
+    );
+  }
 
   return (
     <main>

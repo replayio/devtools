@@ -120,6 +120,10 @@
   overflow: hidden;
 }
 
+.material-icons {
+  color: var(--theme-icon-color);
+}
+
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
 @import url("devtools/client/themes/components-frame.css");
