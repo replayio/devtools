@@ -46,7 +46,13 @@ function chromeScrollList(elem, index) {
       }
 
       const resultsHeight = resultsEl.clientHeight;
-      const itemHeight = resultsEl.children[0].clientHeight;
+      const firstChild = resultsEl.children[0];
+
+      if (!firstChild) {
+        return;
+      }
+
+      const itemHeight = firstChild.clientHeight;
 
       const numVisible = resultsHeight / itemHeight;
       const positionsToScroll = index - numVisible + 1;

@@ -22,6 +22,7 @@ import {
   getSymbols,
   getTabs,
   isSymbolsLoading,
+  getProjectSymbolsLoading,
   getContext,
 } from "../selectors";
 import { memoizeLast } from "../utils/memoizeLast";
@@ -345,12 +346,18 @@ export class QuickOpenModal extends Component {
   }
 
   getSummaryMessage() {
+    const { symbolsLoading, projectSymbolsLoading } = this.props;
+
     let summaryMsg = "";
     if (this.isGotoQuery()) {
       summaryMsg = "Go to line";
-    } else if (this.isFunctionQuery() && this.props.symbolsLoading) {
+    } else if (projectSymbolsLoading) {
+      const { loaded, total } = projectSymbolsLoading;
+      summaryMsg = `Loading ${loaded} of ${total}\u2026`;
+    } else if (this.isFunctionQuery() && symbolsLoading) {
       summaryMsg = "Loading\u2026";
     }
+
     return summaryMsg;
   }
 
@@ -416,6 +423,7 @@ function mapStateToProps(state) {
       : undefined,
     symbols: formatSymbols(getSymbols(state, selectedSource)),
     projectSymbols: formatProjectSymbols(getProjectSymbols(state)),
+    projectSymbolsLoading: getProjectSymbolsLoading(state),
     symbolsLoading: isSymbolsLoading(state, selectedSource),
     query: getQuickOpenQuery(state),
     searchType: getQuickOpenType(state),

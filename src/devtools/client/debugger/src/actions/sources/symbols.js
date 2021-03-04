@@ -4,7 +4,7 @@
 
 import { selectors } from "ui/reducers";
 import { PROMISE } from "../utils/middleware/promise";
-import { loadSourceText } from "./loadSourceText";
+import { loadSourceText, loadSource } from "./loadSourceText";
 
 import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
@@ -34,26 +34,39 @@ export const setSymbols = memoizeableAction("setSymbols", {
 });
 
 export function loadSymbols() {
-  return async ({ dispatch, getState, parser }) => {
+  return async ({ dispatch, getState, parser, client }) => {
+    let loaded = 0;
+    const getSymbolsSafely = async source => {
+      try {
+        await loadSource(getState(), source, { parser, client });
+
+        const result = [source.url, await parser.getSymbols(source.id)];
+        loaded++;
+        return result;
+      } catch (e) {
+        loaded++;
+        return [];
+      }
+    };
+
+    if (selectors.getProjectSymbolsLoading(getState())) {
+      return;
+    }
+
     const sources = selectors.getSourceList(getState()).filter(source => source.url);
 
-    const symbols = Object.fromEntries(
-      (
-        await Promise.all(
-          sources.map(async source => {
-            try {
-              return [source.id, await parser.getSymbols(source.id)];
-            } catch (e) {
-              return null;
-            }
-          })
-        )
-      ).filter(Boolean)
-    );
+    const loadingInterval = setInterval(() => {
+      const loading = { loaded, total: sources.length };
+      dispatch({ type: "LOADING_SYMBOLS", loading });
+    }, 1000);
+
+    const symbols = Object.fromEntries(await Promise.all(sources.map(getSymbolsSafely)));
+    clearInterval(loadingInterval);
 
     dispatch({
       type: "LOADED_SYMBOLS",
       symbols,
+      loading: { loaded, total: sources.length },
     });
   };
 }
