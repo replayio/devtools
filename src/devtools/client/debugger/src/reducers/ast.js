@@ -28,7 +28,7 @@ function update(state = initialASTState(), action) {
     }
 
     case "LOADING_SYMBOLS": {
-      return { ...state, projectSymbolsLoading: action.loading };
+      return { ...state, projectSymbolsLoading: action.loading, symbols: action.symbols };
     }
 
     case "LOADED_SYMBOLS": {

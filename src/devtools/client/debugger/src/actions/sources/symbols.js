@@ -57,10 +57,22 @@ export function loadSymbols() {
 
     const loadingInterval = setInterval(() => {
       const loading = { loaded, total: sources.length };
-      dispatch({ type: "LOADING_SYMBOLS", loading });
+      const symbols = Object.fromEntries(entries);
+      dispatch({ type: "LOADING_SYMBOLS", loading, symbols });
     }, 1000);
 
-    const symbols = Object.fromEntries(await Promise.all(sources.map(getSymbolsSafely)));
+    const promises = [];
+    const entries = [];
+    for (const source of sources) {
+      promises.push(
+        getSymbolsSafely(source).then(entry => {
+          entries.push(entry);
+        })
+      );
+    }
+
+    await Promise.all(promises);
+    const symbols = Object.fromEntries(entries);
     clearInterval(loadingInterval);
 
     dispatch({

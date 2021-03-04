@@ -351,9 +351,11 @@ export class QuickOpenModal extends Component {
     let summaryMsg = "";
     if (this.isGotoQuery()) {
       summaryMsg = "Go to line";
-    } else if (projectSymbolsLoading && loaded != total) {
+    } else if (projectSymbolsLoading) {
       const { loaded, total } = projectSymbolsLoading;
-
+      if (loaded == total) {
+        return "";
+      }
       summaryMsg = `Loading ${loaded} of ${total}\u2026`;
     } else if (this.isFunctionQuery() && symbolsLoading) {
       summaryMsg = "Loading\u2026";
