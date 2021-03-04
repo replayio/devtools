@@ -2,11 +2,9 @@ import React from "react";
 import classnames from "classnames";
 import { connect, ConnectedProps } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
-import { ThreadFront } from "protocol/thread";
 
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import hooks from "ui/hooks";
 import { UIState } from "ui/state";
 import { assert } from "protocol/utils";
 
@@ -18,19 +16,18 @@ type ReplyButtonProps = PropsFromRedux & {
 };
 
 function ReplyButton({
-  currentTime,
   recordingId,
   canvas,
   item,
+  pendingComment,
+  activeComment,
   seek,
   setModal,
   setPendingComment,
-  clearPendingComment,
 }: ReplyButtonProps) {
   assert(recordingId);
   const { isAuthenticated } = useAuth0();
-  const { comments } = hooks.useGetComments(recordingId!);
-  const isDisabled = !!comments.find(comment => comment.time === currentTime);
+  const isDisabled = !!pendingComment || !!activeComment;
 
   const onClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -80,7 +77,13 @@ function ReplyButton({
     setPendingComment(pendingComment);
   };
 
-  return <button className={classnames("transcript-entry-action img reply")} onClick={onClick} />;
+  return (
+    <button
+      className={classnames("transcript-entry-action img reply", { disabled: isDisabled })}
+      onClick={onClick}
+      disabled={isDisabled}
+    />
+  );
 }
 
 const connector = connect(
@@ -89,6 +92,8 @@ const connector = connect(
     recordingId: selectors.getRecordingId(state),
     viewMode: selectors.getViewMode(state),
     canvas: selectors.getCanvas(state),
+    activeComment: selectors.getActiveComment(state),
+    pendingComment: selectors.getPendingComment(state),
   }),
   {
     setModal: actions.setModal,
