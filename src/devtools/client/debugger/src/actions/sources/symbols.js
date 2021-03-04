@@ -40,7 +40,7 @@ export function loadSymbols() {
       try {
         await loadSource(getState(), source, { parser, client });
 
-        const result = [source.url, await parser.getSymbols(source.id)];
+        const result = [source.id, await parser.getSymbols(source.id)];
         loaded++;
         return result;
       } catch (e) {
