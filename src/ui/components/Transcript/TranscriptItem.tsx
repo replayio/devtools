@@ -96,7 +96,7 @@ function TranscriptItem({
       <div className="transcript-entry-description">
         <div className="transcript-entry-icon">{icon}</div>
         <div className="transcript-entry-label">{label}</div>
-        {!pendingComment && !activeComment && <ReplyButton item={item} />}
+        <ReplyButton item={item} />
       </div>
       {children}
     </div>

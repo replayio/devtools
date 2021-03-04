@@ -46,11 +46,16 @@
 }
 
 .transcript-entry-label {
-  font-size: 14px;
+  font-size: 12px;
   margin-left: 16px;
   color: var(--theme-body-color);
   align-self: center;
   flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+  direction: rtl;
+  text-align: left;
 }
 
 .event-timestamp {

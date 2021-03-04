@@ -1,15 +1,16 @@
 .transcript-entry-action.img.reply {
-  display: none;
+  visibility:hidden;
   background: var(--cool-gray-400);
   height: 22px;
   width: 22px;
   cursor: pointer;
+  margin-left: 16px;
 }
 
 .transcript-entry-action.img.reply:hover {
   background: var(--cool-gray-600);
 }
 
-.transcript-entry:hover .transcript-entry-action.img.reply {
-  display: block;
+.transcript-entry:hover .transcript-entry-action.img.reply:not(.disabled) {
+  visibility: visible;
 }
