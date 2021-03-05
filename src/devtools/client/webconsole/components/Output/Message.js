@@ -98,7 +98,8 @@ class Message extends Component {
     return (
       this.props.isPrimaryHighlighted !== nextProps.isPrimaryHighlighted ||
       this.props.pausedExecutionPoint !== nextProps.pausedExecutionPoint ||
-      this.props.isPaused !== nextProps.isPaused
+      this.props.isPaused !== nextProps.isPaused ||
+      this.props.timestampsVisible !== nextProps.timestampsVisible
     );
   }
 
@@ -213,11 +214,15 @@ class Message extends Component {
       return null;
     }
 
+    const timestampString = this.props.executionPointTime
+      ? l10n.timestampString(this.props.executionPointTime)
+      : "";
+
     return dom.span(
       {
         className: "timestamp devtools-monospace",
       },
-      l10n.timestampString(this.props.timeStamp || Date.now())
+      timestampString
     );
   }
 
