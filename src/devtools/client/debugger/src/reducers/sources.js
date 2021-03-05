@@ -10,7 +10,7 @@
  */
 
 import { createSelector } from "reselect";
-import { getPrettySourceURL, getPlainUrl } from "../utils/source";
+import { getPrettySourceURL, getPlainUrl, getTextAtPosition } from "../utils/source";
 import {
   createInitial,
   insertResources,
@@ -647,6 +647,13 @@ export function isSourceLoadingOrLoaded(state, sourceId) {
 
 export function selectedLocationHasScrolled(state) {
   return state.sources.selectedLocationHasScrolled;
+}
+
+export function getTextAtLocation(state, id, location) {
+  const content = getSourceContent(state, id);
+  const text = getTextAtPosition(id, content, { ...location, column: 0 });
+
+  return text;
 }
 
 export default update;

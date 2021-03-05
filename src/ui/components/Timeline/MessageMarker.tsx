@@ -13,7 +13,6 @@ function MessageMarker({
   isSecondaryHighlighted,
   zoomRegion,
   overlayWidth,
-  setActiveComment,
 }: MessageMarkerProps) {
   const { executionPoint, executionPointTime, frame, pauseId, executionPointHasFrames } = message;
 
@@ -29,21 +28,15 @@ function MessageMarker({
       isSecondaryHighlighted={isSecondaryHighlighted}
       zoomRegion={zoomRegion}
       overlayWidth={overlayWidth}
-      onSeek={() => setActiveComment(message)}
     />
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    zoomRegion: selectors.getZoomRegion(state),
-    currentTime: selectors.getCurrentTime(state),
-    overlayWidth: selectors.getTimelineDimensions(state).width,
-  }),
-  {
-    setActiveComment: actions.setActiveComment,
-  }
-);
+const connector = connect((state: UIState) => ({
+  zoomRegion: selectors.getZoomRegion(state),
+  currentTime: selectors.getCurrentTime(state),
+  overlayWidth: selectors.getTimelineDimensions(state).width,
+}));
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 type MessageMarkerProps = PropsFromRedux & {

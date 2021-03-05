@@ -1,16 +1,27 @@
-.transcript-entry-action.img.reply {
-  visibility:hidden;
-  background: var(--cool-gray-400);
-  height: 22px;
-  width: 22px;
+.transcript-entry-action {
+  /* height: 22px;
+  width: 22px; */
   cursor: pointer;
   margin-left: 16px;
+  background: transparent;
 }
 
-.transcript-entry-action.img.reply:hover {
-  background: var(--cool-gray-600);
+.transcript-entry-action .material-icons {
+  color: var(--cool-gray-400);
 }
 
-.transcript-entry:hover .transcript-entry-action.img.reply:not(.disabled) {
+.transcript-entry:not(.paused) .transcript-entry-action {
+  visibility: hidden;
+}
+
+.transcript-entry-action:hover {
+  background: transparent;
+}
+
+.transcript-entry-action:hover .material-icons {
+  color: var(--cool-gray-600);
+}
+
+.transcript-entry:hover .transcript-entry-action:not(.disabled) {
   visibility: visible;
 }

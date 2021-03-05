@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import "./Dropdown.css";
 
 export interface DropdownProps {
-  buttonContent: string;
+  buttonContent: ReactNode;
   children: ReactNode;
   setExpanded: (expanded: boolean) => void;
   expanded: boolean;

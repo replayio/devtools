@@ -7,7 +7,6 @@ function initialCommentsState(): CommentsState {
     commentPointer: false,
     hoveredComment: null,
     pendingComment: null,
-    activeComment: null,
     shouldShowLoneEvents: true,
   };
 }
@@ -21,7 +20,6 @@ export default function update(
       return {
         ...state,
         pendingComment: action.comment,
-        activeComment: action.comment,
       };
     }
 
@@ -36,13 +34,6 @@ export default function update(
       return {
         ...state,
         hoveredComment: action.comment,
-      };
-    }
-
-    case "set_active_comment": {
-      return {
-        ...state,
-        activeComment: action.comment,
       };
     }
 
@@ -62,5 +53,4 @@ export default function update(
 export const getPendingComment = (state: UIState) => state.comments.pendingComment;
 export const getCommentPointer = (state: UIState) => state.comments.commentPointer;
 export const getHoveredComment = (state: UIState) => state.comments.hoveredComment;
-export const getActiveComment = (state: UIState) => state.comments.activeComment;
 export const getShouldShowLoneEvents = (state: UIState) => state.comments.shouldShowLoneEvents;

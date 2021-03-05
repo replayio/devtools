@@ -1,19 +1,26 @@
 import { Action } from "redux";
 import { selectors } from "ui/reducers";
-import { PendingComment } from "ui/state/comments";
+import { actions } from "ui/actions";
+import {
+  PendingComment,
+  PendingNewReply,
+  PendingNewComment,
+  Event,
+  Comment,
+  PauseItem,
+} from "ui/state/comments";
 import { UIThunkAction } from ".";
+import { ThreadFront } from "protocol/thread";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetCommentPointer = Action<"set_comment_pointer"> & { value: boolean };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
-type SetActiveComment = Action<"set_active_comment"> & { comment: any };
 type SetShouldShowLoneEvents = Action<"set_should_show_lone_events"> & { value: boolean };
 
 export type CommentsAction =
   | SetPendingComment
   | SetCommentPointer
   | SetHoveredComment
-  | SetActiveComment
   | SetShouldShowLoneEvents;
 
 export function setPendingComment(comment: PendingComment): SetPendingComment {
@@ -22,10 +29,6 @@ export function setPendingComment(comment: PendingComment): SetPendingComment {
 
 export function setCommentPointer(value: boolean): SetCommentPointer {
   return { type: "set_comment_pointer", value };
-}
-
-export function setActiveComment(comment: any): SetActiveComment {
-  return { type: "set_active_comment", comment };
 }
 
 export function setHoveredComment(comment: any): SetHoveredComment {
@@ -40,5 +43,70 @@ export function toggleShowLoneEvents(): UIThunkAction {
   return ({ dispatch, getState }) => {
     const newValue = !selectors.getShouldShowLoneEvents(getState());
     dispatch({ type: "set_should_show_lone_events", value: newValue });
+  };
+}
+
+export function replyToItem(item: Event | Comment | PauseItem): UIThunkAction {
+  return async ({ dispatch, getState }) => {
+    const { point, time } = item;
+    const state = getState();
+    const canvas = selectors.getCanvas(state);
+
+    if ("has_frames" in item) {
+      dispatch(actions.seek(point, time, item.has_frames));
+    } else {
+      dispatch(actions.seek(point, time, false));
+    }
+
+    if ("comment" in item && item.comment && "id" in item.comment) {
+      // Add a reply to an event's comment.
+      const pendingComment: PendingComment = {
+        type: "new_reply",
+        comment: {
+          content: "",
+          time,
+          point,
+          has_frames: false,
+          source_location: null,
+          parent_id: item.comment.id,
+        },
+      };
+
+      dispatch(setPendingComment(pendingComment));
+    } else if ("id" in item) {
+      // Add a reply to a non-event's comment.
+      const pendingComment: PendingComment = {
+        type: "new_reply",
+        comment: {
+          content: "",
+          time,
+          point,
+          has_frames: "has_frames" in item && item.has_frames,
+          source_location: null,
+          parent_id: item.id,
+        },
+      };
+
+      dispatch(setPendingComment(pendingComment));
+    } else {
+      // Add a new comment to an event or a temporary
+      // pause item.
+      const pendingComment: PendingComment = {
+        type: "new_comment",
+        comment: {
+          content: "",
+          time,
+          point,
+          has_frames: false,
+          source_location: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
+          position: {
+            x: canvas!.width * 0.5,
+            y: canvas!.height * 0.5,
+          },
+        },
+      };
+
+      dispatch(setPendingComment(pendingComment));
+    }
   };
 }
