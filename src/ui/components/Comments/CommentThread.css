@@ -71,11 +71,11 @@
 }
 
 .transcript-list .comment-body > :not(:last-child) {
-  padding-bottom: 24px;
+  padding-bottom: 12px;
 }
 
 .transcript-list .comment-body > :first-child {
-  padding-top: 24px;
+  padding-top: 12px;
 }
 
 .transcript-list .comment-body-header {
@@ -108,11 +108,12 @@
   color: var(--theme-body-color);
   width: 100%;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 14px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  margin-bottom: 4px;
 }
 
 .comment-body-header-label-date {
@@ -170,7 +171,7 @@
 
 .transcript-list .item-content {
   font-size: 12px;
-  line-height: 13px;
+  line-height: 12px;
   color: var(--theme-comment);
   width: 100%;
 }
