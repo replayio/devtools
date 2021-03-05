@@ -12,7 +12,6 @@ function EventMarker({
   isPrimaryHighlighted,
   zoomRegion,
   overlayWidth,
-  setActiveComment,
 }: EventMarkerProps) {
   return (
     <Marker
@@ -24,21 +23,15 @@ function EventMarker({
       isSecondaryHighlighted={false}
       zoomRegion={zoomRegion}
       overlayWidth={overlayWidth}
-      onSeek={() => setActiveComment(event)}
     />
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    zoomRegion: selectors.getZoomRegion(state),
-    currentTime: selectors.getCurrentTime(state),
-    overlayWidth: selectors.getTimelineDimensions(state).width,
-  }),
-  {
-    setActiveComment: actions.setActiveComment,
-  }
-);
+const connector = connect((state: UIState) => ({
+  zoomRegion: selectors.getZoomRegion(state),
+  currentTime: selectors.getCurrentTime(state),
+  overlayWidth: selectors.getTimelineDimensions(state).width,
+}));
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 type EventMarkerProps = PropsFromRedux & {

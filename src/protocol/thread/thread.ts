@@ -759,7 +759,13 @@ class _ThreadFront {
     if (!sourceUrl) {
       return;
     }
-    return { sourceUrl, line: preferredLocation.line, column: preferredLocation.column };
+
+    return {
+      sourceUrl,
+      sourceId: preferredLocation.sourceId,
+      line: preferredLocation.line,
+      column: preferredLocation.column,
+    };
   }
 
   // Given an RRP MappedLocation array with locations in different sources

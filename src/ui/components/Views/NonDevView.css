@@ -6,19 +6,17 @@
 }
 
 .right-sidebar-toolbar {
-  height: 40px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0px 20px;
-  background: var(--theme-toolbar-background);
-  border-bottom: 1px solid var(--theme-splitter-color);
+  padding: 24px 24px 12px 24px;
   justify-content: space-between;
 }
 
 .right-sidebar-toolbar-item {
-  font-size: 1.25rem;
-  color: var(--primary-accent);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--theme-body-color);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

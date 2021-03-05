@@ -11,36 +11,42 @@ import { UIState } from "ui/state";
 import { assert } from "protocol/utils";
 
 import "./AddCommentButton.css";
-import { PendingComment } from "ui/state/comments";
+import { PendingComment, PendingNewComment } from "ui/state/comments";
+
+type AddCommentButtonProps = PropsFromRedux & {
+  disabled: boolean;
+};
 
 function AddCommentButton({
   currentTime,
   recordingId,
-  pendingComment,
   canvas,
+  disabled,
   setModal,
   setPendingComment,
-}: PropsFromRedux) {
+}: AddCommentButtonProps) {
   assert(recordingId);
   const { isAuthenticated } = useAuth0();
   const { comments } = hooks.useGetComments(recordingId!);
-  const isDisabled = !!comments.find(comment => comment.time === currentTime);
+  const isDisabled = disabled || !!comments.find(comment => comment.time === currentTime);
 
-  const onClick = () => {
+  const onClick = async () => {
     if (!isAuthenticated) {
       return setModal("login");
     }
 
     const pendingComment: PendingComment = {
-      content: "",
-      recording_id: recordingId,
-      time: currentTime,
-      point: ThreadFront.currentPoint,
-      has_frames: ThreadFront.currentPointHasFrames,
-      source_location: null,
-      position: {
-        x: canvas!.width * 0.5,
-        y: canvas!.height * 0.5,
+      type: "new_comment",
+      comment: {
+        content: "",
+        time: currentTime,
+        point: ThreadFront.currentPoint,
+        has_frames: ThreadFront.currentPointHasFrames,
+        source_location: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
+        position: {
+          x: canvas!.width * 0.5,
+          y: canvas!.height * 0.5,
+        },
       },
     };
 

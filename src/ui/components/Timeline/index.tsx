@@ -224,7 +224,6 @@ class Timeline extends Component<PropsFromRedux> {
               isSecondaryHighlighted={isSecondaryHighlighted}
               zoomRegion={zoomRegion}
               overlayWidth={this.overlayWidth}
-              onSeek={() => {}}
             />
           );
         })}

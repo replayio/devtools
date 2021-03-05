@@ -14,9 +14,7 @@ function inCenter(canvas: Canvas, { position }: Comment) {
 function VideoComment({
   comment,
   canvas,
-  activeComment,
   setHoveredComment,
-  setActiveComment,
   hoveredComment,
   currentTime,
   hoverTime,
@@ -49,11 +47,9 @@ function VideoComment({
       <div
         className={classnames("canvas-comment-marker", {
           highlighted: hoveredComment == comment.id,
-          selected: comment == activeComment,
         })}
         onMouseEnter={() => setHoveredComment(comment.id)}
         onMouseLeave={() => setHoveredComment(null)}
-        onClick={() => setActiveComment(comment)}
       >
         <div className="img comment-marker" />
       </div>
@@ -69,9 +65,8 @@ const connector = connect(
     recordingId: selectors.getRecordingId(state),
     canvas: selectors.getCanvas(state),
     hoveredComment: selectors.getHoveredComment(state),
-    activeComment: selectors.getActiveComment(state),
   }),
-  { setHoveredComment: actions.setHoveredComment, setActiveComment: actions.setActiveComment }
+  { setHoveredComment: actions.setHoveredComment }
 );
 type PropsFromRedux = ConnectedProps<typeof connector> & {
   comment: any;

@@ -121,7 +121,7 @@ export function useUpdateComment(callback: Function) {
   return updateCommentContent;
 }
 
-export function useDeleteComment(callback: Function) {
+export function useDeleteComment() {
   const [deleteComment, { error }] = useMutation(DELETE_COMMENT, {
     refetchQueries: ["GetComments"],
   });
@@ -133,7 +133,7 @@ export function useDeleteComment(callback: Function) {
   return deleteComment;
 }
 
-export function useDeleteCommentReplies(callback: Function) {
+export function useDeleteCommentReplies() {
   const [deleteCommentReplies, { error }] = useMutation(DELETE_COMMENT_REPLIES, {
     refetchQueries: ["GetComments"],
   });
