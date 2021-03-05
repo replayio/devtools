@@ -230,6 +230,7 @@ function transformPageErrorPacket(pageError) {
 
 function transformEvaluationResultPacket(packet) {
   let {
+    evalId,
     exceptionMessage,
     errorMessageName,
     exceptionDocURL,
@@ -257,6 +258,7 @@ function transformEvaluationResultPacket(packet) {
   return new ConsoleMessage({
     source: MESSAGE_SOURCE.JAVASCRIPT,
     type: MESSAGE_TYPE.RESULT,
+    evalId,
     level,
     messageText: exceptionMessage,
     parameters: [parameter],
