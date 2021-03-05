@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import "./ViewToggle.css";
-import { motion, AnimateSharedLayout } from "framer-motion";
 import { setViewMode } from "../../actions/app";
 import { getViewMode } from "../../reducers/app";
 
-function Handle({ text, isOn }) {
+function Handle({ text, isOn, motion }) {
   return (
     <div className="option">
       <div className={`text ${isOn ? "active" : null}`}>{text}</div>
@@ -27,6 +26,19 @@ function Handle({ text, isOn }) {
 }
 
 function ViewToggle({ viewMode, setViewMode }) {
+  const [framerMotion, setFramerMotion] = useState(null);
+
+  useEffect(() => {
+    import("framer-motion").then(framerMotion => setFramerMotion(framerMotion));
+  });
+
+  // Don't show anything while waiting for framer-motion to be imported.
+  if (!framerMotion) {
+    return null;
+  }
+
+  const { motion, AnimateSharedLayout } = framerMotion;
+
   const onClick = () => {
     if (viewMode == "dev") {
       setViewMode("non-dev");
@@ -39,8 +51,8 @@ function ViewToggle({ viewMode, setViewMode }) {
     <AnimateSharedLayout type="crossfade">
       <button className="view-toggle" type="button" onClick={onClick}>
         <div className="inner">
-          <Handle text="Viewer" isOn={viewMode == "non-dev"} />
-          <Handle text="DevTools" isOn={viewMode == "dev"} />
+          <Handle text="Viewer" isOn={viewMode == "non-dev"} motion={motion} />
+          <Handle text="DevTools" isOn={viewMode == "dev"} motion={motion} />
         </div>
       </button>
     </AnimateSharedLayout>
