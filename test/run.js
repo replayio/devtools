@@ -188,6 +188,10 @@ function spawnGecko(env) {
     args.push("-headless");
   }
 
+  // Start on a blank page instead of replay.io/view so that we don't create
+  // a recording for the latter if RECORD_ALL_CONTENT is set.
+  args.push("about:blank");
+
   const geckoPath = findGeckoPath();
   return spawn(geckoPath, args, { env });
 }
