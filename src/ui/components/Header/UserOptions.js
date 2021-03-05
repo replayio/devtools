@@ -21,12 +21,6 @@ function UserOptions({ setModal }) {
     return <LoginButton />;
   }
 
-  const buttonContent = (
-    <button>
-      <span className="material-icons">more_horiz</span>
-    </button>
-  );
-
   const onLibraryClick = () => {
     const dashboardUrl = `${window.location.origin}/view`;
 
@@ -35,6 +29,7 @@ function UserOptions({ setModal }) {
     }
     window.location = dashboardUrl;
   };
+
   const onSettingsClick = () => {
     setExpanded(false);
     setModal("settings");
@@ -43,7 +38,7 @@ function UserOptions({ setModal }) {
   return (
     <div className="user-options">
       <Dropdown
-        buttonContent={buttonContent}
+        buttonContent={<span className="material-icons">more_horiz</span>}
         setExpanded={setExpanded}
         expanded={expanded}
         orientation="bottom"
