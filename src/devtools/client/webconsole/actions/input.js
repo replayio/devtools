@@ -15,6 +15,7 @@ const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
 const messagesActions = require("devtools/client/webconsole/actions/messages");
 const { ConsoleCommand } = require("devtools/client/webconsole/types");
 
+let nextEvalId = 1;
 function evaluateExpression(expression) {
   return async ({ dispatch, toolbox }) => {
     if (!expression) {
@@ -27,11 +28,13 @@ function evaluateExpression(expression) {
     }
 
     // We use the messages action as it's doing additional transformation on the message.
+    let evalId = nextEvalId++;
     dispatch(
       messagesActions.messagesAdd([
         new ConsoleCommand({
           messageText: expression,
           timeStamp: Date.now(),
+          evalId,
         }),
       ])
     );
@@ -47,6 +50,7 @@ function evaluateExpression(expression) {
       frameActor,
       forConsoleMessage: true,
     }).then(onSettled, onSettled);
+    response.evalId = evalId;
 
     return dispatch(onExpressionEvaluated(response));
   };

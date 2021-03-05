@@ -924,6 +924,20 @@ function maybeSortVisibleMessages(state, timeStampSort = false) {
       } else if (compared > 0) {
         return 1;
       } else {
+        const msgA = state.messagesById.get(a);
+        const msgB = state.messagesById.get(b);
+        if (msgA.evalId) {
+          if (!msgB.evalId) {
+            return 1;
+          }
+          if (msgA.evalId !== msgB.evalId) {
+            return msgA.evalId - msgB.evalId;
+          }
+          return msgA.type === "result" ? 1 : -1;
+        }
+        if (msgB.evalId) {
+          return -1;
+        }
         const _a = messageCountSinceLastExecutionPoint(state, a);
         const _b = messageCountSinceLastExecutionPoint(state, b);
         return _a < _b ? -1 : _a > _b ? 1 : 0;
