@@ -35,6 +35,7 @@ function evaluateExpression(expression) {
           messageText: expression,
           timeStamp: Date.now(),
           evalId,
+          executionPointTime: ThreadFront.currentTime,
         }),
       ])
     );

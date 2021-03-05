@@ -22,7 +22,7 @@ ConsoleCommand.propTypes = {
  */
 function ConsoleCommand(props) {
   const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch } = props;
-  const { indent, source, type, level, timeStamp } = message;
+  const { indent, source, type, level, timeStamp, executionPointTime } = message;
   const messageText = trimCode(message.messageText);
 
   // This uses a Custom Element to syntax highlight when possible. If it's not
@@ -38,6 +38,7 @@ function ConsoleCommand(props) {
     indent,
     timeStamp,
     timestampsVisible,
+    executionPointTime,
     maybeScrollToBottom,
     message,
     isPaused,

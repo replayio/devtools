@@ -37,6 +37,7 @@ function EvaluationResult(props) {
     stacktrace,
     frame,
     timeStamp,
+    executionPointTime,
     parameters,
     notes,
   } = message;
@@ -81,6 +82,7 @@ function EvaluationResult(props) {
     open,
     frame,
     timeStamp,
+    executionPointTime,
     parameters,
     notes,
     timestampsVisible,
