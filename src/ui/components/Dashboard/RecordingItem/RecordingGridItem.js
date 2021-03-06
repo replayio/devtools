@@ -21,7 +21,9 @@ export default function RecordingGridItem({
   return (
     <div className="recording-item">
       <div className="screenshot">
-        <img src={`data:image/png;base64, ${data.last_screen_data}`} alt="recording screenshot" />
+        {data.last_screen_data && (
+          <img src={`data:image/png;base64, ${data.last_screen_data}`} alt="recording screenshot" />
+        )}
         <div className="overlay" onClick={e => onNavigate(e)} />
         {isOwner && <Dropdown panel={Panel} icon={<div>•••</div>} panelStyles={{ top: "28px" }} />}
       </div>
