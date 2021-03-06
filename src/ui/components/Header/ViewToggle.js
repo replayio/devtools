@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
+import classnames from "classnames";
 import "./ViewToggle.css";
 import { setViewMode } from "../../actions/app";
 import { getViewMode } from "../../reducers/app";
@@ -7,13 +8,12 @@ import { getViewMode } from "../../reducers/app";
 function Handle({ text, isOn, motion }) {
   return (
     <div className="option">
-      <div className={`text ${isOn ? "active" : null}`}>{text}</div>
+      <div className={classnames("text", isOn && "active")}>{text}</div>
 
       {isOn && (
         <motion.div
           className="handle"
           layoutId="handle"
-          animate={{ borderRadius: "8px" }}
           transition={{
             type: "spring",
             stiffness: 600,
@@ -30,7 +30,7 @@ function ViewToggle({ viewMode, setViewMode }) {
 
   useEffect(() => {
     import("framer-motion").then(framerMotion => setFramerMotion(framerMotion));
-  });
+  }, []);
 
   // Don't show anything while waiting for framer-motion to be imported.
   if (!framerMotion) {
@@ -39,13 +39,7 @@ function ViewToggle({ viewMode, setViewMode }) {
 
   const { motion, AnimateSharedLayout } = framerMotion;
 
-  const onClick = () => {
-    if (viewMode == "dev") {
-      setViewMode("non-dev");
-    } else {
-      setViewMode("dev");
-    }
-  };
+  const onClick = () => setViewMode(viewMode === "dev" ? "non-dev" : "dev");
 
   return (
     <AnimateSharedLayout type="crossfade">
