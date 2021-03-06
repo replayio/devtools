@@ -4,6 +4,8 @@
   border-right: 1px solid var(--theme-splitter-color);
   padding: 40px 8px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .left-sidebar > * {
@@ -13,6 +15,10 @@
 
 .left-sidebar hr {
   margin: 20px;
+}
+
+.left-sidebar .recording-hosts {
+  overflow-y: auto;
 }
 
 .left-sidebar .left-sidebar-menu-item {
@@ -30,15 +36,15 @@
 }
 
 .left-sidebar .left-sidebar-menu-item:hover:not(.disabled) {
-  background: #E8E8E8
+  background: #e8e8e8;
 }
 
 .left-sidebar .left-sidebar-menu-item.active {
-  background: #E8E8E8;
+  background: #e8e8e8;
 }
 
 .left-sidebar .left-sidebar-menu-item.active:hover {
-  background: #E2E2E2;
+  background: #e2e2e2;
 }
 
 .left-sidebar .left-sidebar-menu-item > *:not(:last-child) {

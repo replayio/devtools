@@ -32,16 +32,18 @@ export default function DashboardNavigation({ recordings, filter, setFilter }) {
         <span>Shared with me</span>
       </div>
       <hr />
-      {hosts.map((hostUrl, i) => (
-        <div
-          className={classnames("left-sidebar-menu-item", { active: filter == hostUrl })}
-          key={i}
-          onClick={() => setFilter(hostUrl)}
-        >
-          <div className="img document" />
-          <span>{hostUrl}</span>
-        </div>
-      ))}
+      <div className="recording-hosts">
+        {hosts.map((hostUrl, i) => (
+          <div
+            className={classnames("left-sidebar-menu-item", { active: filter == hostUrl })}
+            key={i}
+            onClick={() => setFilter(hostUrl)}
+          >
+            <div className="img document" />
+            <span>{hostUrl}</span>
+          </div>
+        ))}
+      </div>
     </nav>
   );
 }
