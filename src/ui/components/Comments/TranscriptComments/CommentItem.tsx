@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import Markdown from "react-markdown";
+import emoji from "remark-emoji";
 import {
   Comment,
   PendingEditComment,
@@ -49,7 +50,9 @@ function CommentItem({ comment, pendingComment, isRoot }: CommentProps) {
         <div className="comment-body-header-label">
           <div className="comment-body-header-label-name">{name}</div>
           <div className="item-content">
-            <Markdown className="item-content">{comment.content}</Markdown>
+            <Markdown className="item-content" plugins={[[emoji, { emoticon: true }]]}>
+              {comment.content}
+            </Markdown>
           </div>
         </div>
         <CommentActions comment={comment as Comment} isRoot={isRoot} />

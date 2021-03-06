@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import CommentTool from "ui/components/shared/CommentTool";
-import DraftJSEditorLoader from "./DraftJSEditorLoader";
+import DraftJSEditor, { useEditor } from "./DraftJSEditor";
 import "./CommentEditor.css";
 import {
   Comment,
@@ -22,8 +22,8 @@ type CommentEditorProps = PropsFromRedux & {
 
 function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEditorProps) {
   const { user } = useAuth0();
-  const [editorState, setEditorState] = useState<any>(null);
-  const [DraftJS, setDraftJS] = useState();
+  const { DraftJS, Editor, emojiPlugin, editorState, setEditorState } = useEditor(comment.content);
+
   const isNewComment = comment.content == "" && !("parent_id" in comment);
 
   const inputValue = editorState ? editorState.getCurrentContent().getPlainText() : "";
@@ -36,18 +36,19 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
     <div className="comment-input-container" onClick={e => e.stopPropagation()}>
       <div className="comment-input">
         <img src={user.picture} className="comment-picture" />
-        <DraftJSEditorLoader
-          {...{
-            editorState,
-            setEditorState,
-            DraftJS,
-            setDraftJS,
-            handleSubmit,
-            handleCancel,
-            placeholder: comment.content == "" ? "Type a comment" : "",
-            initialContent: comment.content,
-          }}
-        />
+        {DraftJS && editorState ? (
+          <DraftJSEditor
+            DraftJS={DraftJS}
+            Editor={Editor}
+            editorState={editorState}
+            emojiPlugin={emojiPlugin}
+            handleCancel={handleCancel}
+            handleSubmit={handleSubmit}
+            initialContent={comment.content}
+            placeholder={comment.content == "" ? "Type a comment" : ""}
+            setEditorState={setEditorState}
+          />
+        ) : null}
       </div>
       <div className="comment-input-actions">
         <button className="action-cancel" onClick={handleCancel}>
