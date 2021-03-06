@@ -11,7 +11,7 @@ export function setQuickOpenQuery(query) {
   };
 }
 
-export function openQuickOpen(query, project) {
+export function openQuickOpen(query = "", project) {
   return ({ dispatch }) => {
     if (project) {
       dispatch(loadSymbols());
