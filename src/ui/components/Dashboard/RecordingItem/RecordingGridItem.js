@@ -3,6 +3,7 @@ import Title from "../../shared/Title";
 import moment from "moment";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import useToken from "ui/utils/useToken";
+import hooks from "ui/hooks";
 
 import "./RecordingGridItem.css";
 
@@ -15,14 +16,16 @@ export default function RecordingGridItem({
   toggleIsPrivate,
 }) {
   const { claims } = useToken();
+  const { screenData } = hooks.useGetRecordingPhoto(data.recording_id);
+
   const userId = claims?.hasura.userId;
   const isOwner = userId == data.user.id;
 
   return (
     <div className="recording-item">
       <div className="screenshot">
-        {data.last_screen_data && (
-          <img src={`data:image/png;base64, ${data.last_screen_data}`} alt="recording screenshot" />
+        {screenData && (
+          <img src={`data:image/png;base64, ${screenData}`} alt="recording screenshot" />
         )}
         <div className="overlay" onClick={e => onNavigate(e)} />
         {isOwner && <Dropdown panel={Panel} icon={<div>•••</div>} panelStyles={{ top: "28px" }} />}
