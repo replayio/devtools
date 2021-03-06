@@ -182,15 +182,15 @@ function spawnGecko(env) {
     const profile = tmpFile();
     fs.mkdirSync(profile);
     args.push("-profile", profile);
+
+    // Change the startup page from replay.io/view so that we don't create
+    // a recording for the latter if RECORD_ALL_CONTENT is set.
+    fs.writeFileSync(`${profile}/prefs.js`, `user_pref("browser.startup.homepage", "about:blank");\n`);
   }
 
   if (process.env.HEADLESS) {
     args.push("-headless");
   }
-
-  // Start on a blank page instead of replay.io/view so that we don't create
-  // a recording for the latter if RECORD_ALL_CONTENT is set.
-  args.push("about:blank");
 
   const geckoPath = findGeckoPath();
   return spawn(geckoPath, args, { env });
