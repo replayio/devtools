@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import Markdown from "react-markdown";
 import hooks from "ui/hooks";
 import { connect } from "react-redux";
 import classnames from "classnames";
@@ -85,7 +86,6 @@ function CommentThread({
 
 function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingComment }) {
   const [isHovered, setIsHovered] = useState(false);
-  const lines = comment.content.split("\n");
   const isBeingEdited = comment === pendingComment && comment.content !== "";
 
   if (isBeingEdited) {
@@ -104,11 +104,7 @@ function Comment({ comment, isRoot, hoveredComment, pendingComment, setPendingCo
         <img src={comment.user.picture} className="comment-picture" />
         <div className="comment-body-header-label">
           <div className="comment-body-header-label-name">{comment.user.name}</div>
-          <div className="item-content">
-            {lines.map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
-          </div>
+          <Markdown className="item-content">{comment.content}</Markdown>
         </div>
         <Actions {...{ comment, hoveredComment, setPendingComment, isRoot }} />
       </div>
