@@ -5,6 +5,7 @@ import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import { AuthAvatar } from "ui/components/Avatar";
 import moment from "moment";
 import useToken from "ui/utils/useToken";
+import hooks from "ui/hooks";
 import "./RecordingListItem.css";
 
 function getDurationString(durationMs) {
@@ -92,10 +93,13 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle }) {
   );
 }
 
-function ItemScreenshot({ screenData }) {
+function ItemScreenshot({ recordingId }) {
+  const { screenData } = hooks.useGetRecordingPhoto(recordingId);
   return (
     <div className="screenshot">
-      <img src={`data:image/png;base64, ${screenData}`} alt="recording screenshot" />
+      {screenData && (
+        <img src={`data:image/png;base64, ${screenData}`} alt="recording screenshot" />
+      )}
     </div>
   );
 }
@@ -157,7 +161,7 @@ export default function RecordingListItem({
         <ItemCheckbox toggleChecked={toggleChecked} selected={selected} />{" "}
       </td>
       <td>
-        <ItemScreenshot screenData={data.last_screen_data} />
+        <ItemScreenshot recordingId={data.recording_id} />
       </td>
       <td>
         <ItemTitle

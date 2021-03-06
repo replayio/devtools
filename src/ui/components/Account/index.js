@@ -20,7 +20,6 @@ const GET_MY_RECORDINGS = gql`
     duration
     description
     date
-    last_screen_data
     is_private
   }
 
