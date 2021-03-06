@@ -21,16 +21,13 @@ export const createQuickOpenState = () => ({
 export default function update(state = createQuickOpenState(), action) {
   switch (action.type) {
     case "OPEN_QUICK_OPEN":
-      if (action.query != null) {
-        return {
-          ...state,
-          enabled: true,
-          project: action.project,
-          query: action.query,
-          searchType: parseQuickOpenQuery(action.query),
-        };
-      }
-      return { ...state, enabled: true };
+      return {
+        ...state,
+        enabled: true,
+        project: action.project,
+        query: action.query,
+        searchType: parseQuickOpenQuery(action.query),
+      };
     case "CLOSE_QUICK_OPEN":
       return createQuickOpenState();
     case "SET_QUICK_OPEN_QUERY":
