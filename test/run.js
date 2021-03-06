@@ -287,8 +287,8 @@ async function runTestViewer(path, local, timeout = 60, env = {}) {
 
 function getRecordingId(file) {
   try {
-    const contents = fs.readFileSync(file).toString().trim();
-    return contents.length ? contents : null;
+    const contents = fs.readFileSync(file).toString().split("\n")[0];
+    return (contents && contents.length) ? contents : null;
   } catch (e) {
     return null;
   }
