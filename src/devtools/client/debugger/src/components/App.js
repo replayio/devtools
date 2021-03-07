@@ -72,7 +72,7 @@ class Debugger extends Component {
 
   componentDidMount() {
     shortcuts.on("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
-    shortcuts.on("CmdOrCtrl+Shift+O", this.toggleSourceQuickOpenModal);
+    shortcuts.on("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
     shortcuts.on("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
     shortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
     shortcuts.on("Ctrl+G", this.toggleLineQuickOpenModal);
@@ -135,7 +135,7 @@ class Debugger extends Component {
   }
 
   toggleFunctionQuickOpenModal = (_, e) => {
-    this.toggleQuickOpenModal(_, e, "@", false);
+    this.toggleQuickOpenModal(_, e, "@");
   };
 
   toggleProjectFunctionQuickOpenModal = (_, e) => {
@@ -143,7 +143,7 @@ class Debugger extends Component {
   };
 
   toggleLineQuickOpenModal = (_, e) => {
-    this.toggleQuickOpenModal(_, e, ":", false);
+    this.toggleQuickOpenModal(_, e, ":");
   };
 
   toggleSourceQuickOpenModal = (_, e) => {

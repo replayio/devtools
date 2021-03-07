@@ -119,10 +119,13 @@ export class QuickOpenModal extends Component {
     return this.setResults(results);
   };
 
-  searchSymbols = query => {
+  getFunctions() {
     const { project, projectSymbols, symbols } = this.props;
+    return project ? projectSymbols.functions : symbols.functions;
+  }
 
-    let results = project ? projectSymbols.functions : symbols.functions;
+  searchSymbols = query => {
+    let results = this.getFunctions();
     results = results.filter(result => result.title !== "anonymous");
 
     if (query.length <= 3) {
@@ -351,16 +354,17 @@ export class QuickOpenModal extends Component {
   }
 
   getSummaryMessage() {
-    const { symbolsLoading, projectSymbolsLoading, projectSymbols } = this.props;
+    const { symbolsLoading, projectSymbolsLoading, project } = this.props;
 
     if (this.isGotoQuery()) {
       return "Go to line";
     }
 
-    if (projectSymbolsLoading) {
+    if (project && projectSymbolsLoading) {
       const { loaded, total } = projectSymbolsLoading;
       if (loaded == total) {
-        return `${projectSymbols.functions.length} functions`;
+        const functions = this.getFunctions();
+        return `${functions.length} functions`;
       }
 
       return `Loading ${loaded} of ${total} files\u2026`;
