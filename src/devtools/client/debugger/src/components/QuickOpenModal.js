@@ -8,7 +8,7 @@ import { connect } from "../utils/connect";
 import fuzzyAldrin from "fuzzaldrin-plus";
 import { basename } from "../utils/path";
 import { throttle } from "lodash";
-
+import { createSelector } from "reselect";
 import actions from "../actions";
 import {
   getSourceList,
@@ -21,6 +21,7 @@ import {
   getProjectSymbols,
   getSymbols,
   getTabs,
+  getDisplayedSources,
   isSymbolsLoading,
   getProjectSymbolsLoading,
   getContext,
@@ -80,14 +81,18 @@ export class QuickOpenModal extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const nowEnabled = !prevProps.enabled && this.props.enabled;
-    const queryChanged = prevProps.query !== this.props.query;
+    const hasChanged = field => prevProps[field] !== this.props[field];
 
     if (this.refs.resultList && this.refs.resultList.refs) {
       scrollList(this.refs.resultList.refs, this.state.selectedIndex);
     }
 
-    if (nowEnabled || queryChanged) {
+    if (
+      hasChanged("enabled") ||
+      hasChanged("query") ||
+      hasChanged("symbols") ||
+      hasChanged("projectSymbols")
+    ) {
       this.updateResults(this.props.query);
     }
   }
@@ -101,15 +106,15 @@ export class QuickOpenModal extends Component {
     return index !== -1 ? query.slice(0, index) : query;
   };
 
-  formatSources = memoizeLast((displayedSources, tabs) => {
+  formatSources = memoizeLast((sourceList, tabs) => {
     const tabUrls = new Set(tabs.map(tab => tab.url));
-    return formatSources(displayedSources, tabUrls);
+    return formatSources(sourceList, tabUrls);
   });
 
   searchSources = query => {
-    const { displayedSources, tabs } = this.props;
+    const { sourceList, tabs } = this.props;
 
-    const sources = this.formatSources(displayedSources, tabs);
+    const sources = this.formatSources(sourceList, tabs);
     const results = query == "" ? sources : filter(sources, this.dropGoto(query));
     return this.setResults(results);
   };
@@ -141,18 +146,18 @@ export class QuickOpenModal extends Component {
   };
 
   showTopSources = () => {
-    const { displayedSources, tabs } = this.props;
+    const { sourceList, tabs } = this.props;
     const tabUrls = new Set(tabs.map(tab => tab.url));
 
     if (tabs.length > 0) {
       this.setResults(
         formatSources(
-          displayedSources.filter(source => !!source.url && tabUrls.has(source.url)),
+          sourceList.filter(source => !!source.url && tabUrls.has(source.url)),
           tabUrls
         )
       );
     } else {
-      this.setResults(formatSources(displayedSources, tabUrls));
+      this.setResults(formatSources(sourceList, tabUrls));
     }
   };
 
@@ -346,22 +351,26 @@ export class QuickOpenModal extends Component {
   }
 
   getSummaryMessage() {
-    const { symbolsLoading, projectSymbolsLoading } = this.props;
+    const { symbolsLoading, projectSymbolsLoading, projectSymbols } = this.props;
 
-    let summaryMsg = "";
     if (this.isGotoQuery()) {
-      summaryMsg = "Go to line";
-    } else if (projectSymbolsLoading) {
-      const { loaded, total } = projectSymbolsLoading;
-      if (loaded == total) {
-        return "";
-      }
-      summaryMsg = `Loading ${loaded} of ${total}\u2026`;
-    } else if (this.isFunctionQuery() && symbolsLoading) {
-      summaryMsg = "Loading\u2026";
+      return "Go to line";
     }
 
-    return summaryMsg;
+    if (projectSymbolsLoading) {
+      const { loaded, total } = projectSymbolsLoading;
+      if (loaded == total) {
+        return `${projectSymbols.functions.length} functions`;
+      }
+
+      return `Loading ${loaded} of ${total} files\u2026`;
+    }
+
+    if (this.isFunctionQuery() && symbolsLoading) {
+      return "Loading\u2026";
+    }
+
+    return "";
   }
 
   render() {
@@ -409,23 +418,29 @@ export class QuickOpenModal extends Component {
   }
 }
 
+const selectProjectSymbols = createSelector(
+  getDisplayedSources,
+  getProjectSymbols,
+  (displayedSources, symbols) => formatProjectSymbols(symbols, displayedSources)
+);
+
 /* istanbul ignore next: ignoring testing of redux connection stuff */
 function mapStateToProps(state) {
   const selectedSource = getSelectedSource(state);
-  const displayedSources = getSourceList(state);
   const tabs = getTabs(state);
 
   return {
     cx: getContext(state),
     enabled: getQuickOpenEnabled(state),
     project: getQuickOpenProject(state),
-    displayedSources,
+    sourceList: getSourceList(state),
+    displayedSources: getDisplayedSources(state),
     selectedSource,
     selectedContentLoaded: selectedSource
       ? !!getSourceContent(state, selectedSource.id)
       : undefined,
     symbols: formatSymbols(getSymbols(state, selectedSource)),
-    projectSymbols: formatProjectSymbols(getProjectSymbols(state)),
+    projectSymbols: selectProjectSymbols(state),
     projectSymbolsLoading: getProjectSymbolsLoading(state),
     symbolsLoading: isSymbolsLoading(state, selectedSource),
     query: getQuickOpenQuery(state),
