@@ -71,11 +71,11 @@ class Debugger extends Component {
   };
 
   componentDidMount() {
-    shortcuts.on("CmdOrCtrl+Shift+P", (_, e) => this.toggleQuickOpenModal(_, e));
-    shortcuts.on("CmdOrCtrl+Shift+O", (_, e) => this.toggleQuickOpenModal(_, e, "@"));
-    shortcuts.on("CmdOrCtrl+P", (_, e) => this.toggleQuickOpenModal(_, e));
-    shortcuts.on("CmdOrCtrl+O", (_, e) => this.toggleQuickOpenModal(_, e, "@", true));
-    shortcuts.on("Ctrl+G", (_, e) => this.toggleQuickOpenModal(_, e, ":"));
+    shortcuts.on("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
+    shortcuts.on("CmdOrCtrl+Shift+O", this.toggleSourceQuickOpenModal);
+    shortcuts.on("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
+    shortcuts.on("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
+    shortcuts.on("Ctrl+G", this.toggleLineQuickOpenModal);
 
     shortcuts.on("Escape", this.onEscape);
     shortcuts.on("Cmd+/", this.onCommandSlash);
@@ -84,14 +84,11 @@ class Debugger extends Component {
   }
 
   componentWillUnmount() {
-    shortcuts.off("CmdOrCtrl+Shift+P", this.toggleQuickOpenModal);
-
-    shortcuts.off("CmdOrCtrl+Shift+O", this.toggleQuickOpenModal);
-
-    const searchKeys = ["CmdOrCtrl+P", "CmdOrCtrl+O"];
-    searchKeys.forEach(key => shortcuts.off(key, this.toggleQuickOpenModal));
-
-    shortcuts.off("Ctrl+G", this.toggleQuickOpenModal);
+    shortcuts.off("CmdOrCtrl+Shift+P", this.toggleSourceQuickOpenModal);
+    shortcuts.off("CmdOrCtrl+Shift+O", this.toggleFunctionQuickOpenModal);
+    shortcuts.off("CmdOrCtrl+P", this.toggleSourceQuickOpenModal);
+    shortcuts.off("CmdOrCtrl+O", this.toggleProjectFunctionQuickOpenModal);
+    shortcuts.off("Ctrl+G", this.toggleLineQuickOpenModal);
 
     shortcuts.off("Escape", this.onEscape);
   }
@@ -136,6 +133,22 @@ class Debugger extends Component {
   isHorizontal() {
     return this.props.orientation === "horizontal";
   }
+
+  toggleFunctionQuickOpenModal = (_, e) => {
+    this.toggleQuickOpenModal(_, e, "@", false);
+  };
+
+  toggleProjectFunctionQuickOpenModal = (_, e) => {
+    this.toggleQuickOpenModal(_, e, "@", true);
+  };
+
+  toggleLineQuickOpenModal = (_, e) => {
+    this.toggleQuickOpenModal(_, e, ":", false);
+  };
+
+  toggleSourceQuickOpenModal = (_, e) => {
+    this.toggleQuickOpenModal(_, e, "");
+  };
 
   toggleQuickOpenModal = (_, e, query, project = false) => {
     const { quickOpenEnabled, openQuickOpen, closeQuickOpen } = this.props;
