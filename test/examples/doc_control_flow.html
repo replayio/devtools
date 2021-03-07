@@ -57,15 +57,40 @@ async function asyncerThrow() {
   }
 }
 
+async function customIterator() {
+  const obj = {
+    *[Symbol.iterator]() {
+      yield 1;
+      yield 2;
+      updateText("within iterator");
+      yield 3;
+    }
+  };
+  for (const a of obj) {
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
+  startNextCallback();
+}
+
 const callbacks = [
   trycatch,
   tryfinally,
   generator,
   asyncer,
   asyncerThrow,
+  customIterator,
 ];
 
 startNextCallback();
+
+function throw2() {
+  try {
+    throw new Error("Err");
+  } finally {
+    console.log("finally");
+  }
+}
+throw2();
 
 // Helpers
 
