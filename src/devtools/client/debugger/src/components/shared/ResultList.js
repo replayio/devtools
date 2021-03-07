@@ -46,7 +46,9 @@ export default class ResultList extends Component {
         )}
         <div id={`${item.id}-title`} className="title">
           {item.title}
+          {item.secondaryTitle && <div className="secondary-title">{item.secondaryTitle}</div>}
         </div>
+
         {item.subtitle != item.title ? (
           <div id={`${item.id}-subtitle`} className="subtitle">
             {item.subtitle}

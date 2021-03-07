@@ -3,8 +3,12 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { endTruncateStr } from "./utils";
-import { isPretty, getFilename, getSourceClassnames, getSourceQueryString } from "./source";
-import memoizeOne from "memoize-one";
+import {
+  isPretty,
+  getTruncatedFileName,
+  getSourceClassnames,
+  getSourceQueryString,
+} from "./source";
 
 export const MODIFIERS = {
   "@": "functions",
@@ -44,7 +48,7 @@ export function parseLineColumn(query) {
 }
 
 export function formatSourcesForList(source, tabUrls) {
-  const title = getFilename(source);
+  const title = getTruncatedFileName(source, 100);
   const relativeUrlWithQuery = `${source.relativeUrl}${getSourceQueryString(source) || ""}`;
   const subtitle = endTruncateStr(relativeUrlWithQuery, 100);
   const value = relativeUrlWithQuery;
@@ -70,32 +74,39 @@ export function formatSymbol(symbol) {
   };
 }
 
-export const formatProjectSymbols = memoizeOne(function formatProjectSymbols(projectSymbols) {
+export const formatProjectSymbols = function formatProjectSymbols(
+  projectSymbols,
+  displayedSources
+) {
   const sourceFunctions = Object.entries(projectSymbols)
-    .map(([sourceId, symbols]) =>
-      symbols?.functions?.map(symbol => ({
+    .map(([sourceId, symbols]) => {
+      const source = displayedSources[sourceId];
+      if (!source?.url) {
+        return [];
+      }
+
+      return symbols?.functions?.map(symbol => ({
         id: `${symbol.name}:${symbol.location.start.line}`,
         title: symbol.name,
-        subtitle: `${symbol.location.start.line}`,
+        subtitle: symbol.location.start.line,
+        secondaryTitle: getTruncatedFileName(source),
         value: symbol.name,
         location: { end: symbol.location.end, start: { ...symbol.location.start, sourceId } },
-      }))
-    )
+      }));
+    })
     .flat()
     .filter(i => i);
 
   return { functions: sourceFunctions };
-});
+};
 
 export function formatSymbols(symbols) {
-  if (!symbols || symbols.loading) {
+  if (!symbols?.functions || symbols.loading) {
     return { functions: [] };
   }
 
-  const { functions } = symbols;
-
   return {
-    functions: functions.map(formatSymbol),
+    functions: symbols.functions.map(formatSymbol),
   };
 }
 

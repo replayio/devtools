@@ -77,6 +77,7 @@
 }
 
 .result-list li .title {
+  display: flex;
   word-break: break-all;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -136,4 +137,13 @@
 
 .theme-dark .result-list {
   background-color: var(--theme-body-background);
+}
+
+.result-list .secondary-title {
+  color: var(--cool-gray-400);
+  margin-left: 6px;
+}
+
+.result-list li.selected .secondary-title {
+  color: white;
 }
