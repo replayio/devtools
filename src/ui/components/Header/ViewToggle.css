@@ -14,7 +14,7 @@
 
 .view-toggle .inner {
   background: var(--cool-gray-200);
-  border: 2px solid var(--cool-gray-200);
+  border: 4px solid var(--cool-gray-200);
   display: flex;
   align-items: stretch;
   border-radius: 8px;
@@ -27,13 +27,13 @@
 }
 
 .view-toggle .text {
-  font-size: 14px;
-  padding: 4px 24px;
+  font-size: 12px;
+  padding: 3px 12px;
   white-space: nowrap;
   color: rgba(0, 0, 0, 0.5);
   position: relative;
   z-index: 1;
-  transition: ease 200ms color;
+  transition: ease-in-out 80ms color;
 }
 .view-toggle .active {
   color: #000;
