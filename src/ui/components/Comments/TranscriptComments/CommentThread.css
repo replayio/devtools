@@ -82,19 +82,25 @@
   display: grid;
   grid-template-rows: auto min-content;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-gap: 16px;
+  grid-gap: normal 16px;
 }
 
 .transcript-list .comment-body-header .comment-picture {
   width: 27px;
   height: 27px;
   border-radius: 50%;
+  align-self: flex-start;
   grid-row: 1 / 2;
   z-index: 10;
 }
 
 .transcript-list .comment-body-header-label {
+  display: flex;
+  flex-grow: 1;
   grid-row: 1 / 3;
+  flex-direction: column;
+  align-items: baseline;
+  overflow: hidden;
 }
 
 .comment-body-header-label-name {

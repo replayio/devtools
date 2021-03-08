@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
+import Markdown from "react-markdown";
 import {
   Comment,
   PendingEditComment,
@@ -23,7 +24,6 @@ type CommentProps = PropsFromRedux & {
 function CommentItem({ comment, pendingComment, isRoot }: CommentProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { content } = comment;
-  const lines = content.split("\n");
   const isPending = pendingComment && pendingComment.comment === comment;
 
   if (pendingComment && isPending) {
@@ -49,9 +49,7 @@ function CommentItem({ comment, pendingComment, isRoot }: CommentProps) {
         <div className="comment-body-header-label">
           <div className="comment-body-header-label-name">{name}</div>
           <div className="item-content">
-            {lines.map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
+            <Markdown className="item-content">{comment.content}</Markdown>
           </div>
         </div>
         <CommentActions comment={comment as Comment} isRoot={isRoot} />

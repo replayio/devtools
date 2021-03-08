@@ -21,10 +21,6 @@
   color: var(--theme-comment);
 }
 
-.transcript-list .comment-input > :not(:first-child) {
-  margin-left: 16px;
-}
-
 .transcript-list .comment-input-actions {
   margin-left: 41px;
   display: flex;
@@ -64,6 +60,7 @@
   border: 1px solid var(--primary-accent);
   border-radius: 4px;
   flex-grow: 1;
+  margin-left: 16px;
 }
 
 .transcript-list .responsive-textarea {
