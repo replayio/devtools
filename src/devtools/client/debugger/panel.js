@@ -101,7 +101,7 @@ export class DebuggerPanel {
   getFrameId() {
     const state = this.getFrames();
     const frame = state?.frames[state?.selected];
-    return frame ? { asyncIndex: frame.asyncIndex, frameId: frame.protocolId } : undefined;
+    return frame ? { asyncIndex: frame.asyncIndex, frameId: frame.protocolId } : { asyncIndex: 0 };
   }
 
   isPaused() {
