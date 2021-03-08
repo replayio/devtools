@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
-import { Comment, PendingComment } from "ui/state/comments";
+import { Comment } from "ui/state/comments";
 import CommentItem from "./CommentItem";
 import "./CommentThread.css";
 
