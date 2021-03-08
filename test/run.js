@@ -169,7 +169,13 @@ async function runTest(test, example) {
     RECORD_REPLAY_TEST_URL:
       exampleRecordingId
         ? `http://localhost:8080/view?id=${exampleRecordingId}&test=${test}&dispatch=${dispatchServer}`
-        : `http://localhost:8080/test/examples/${example}`,
+      : `http://localhost:8080/test/examples/${example}`,
+    // If we need to record the example we have to use the target dispatch server.
+    // If we already have the example, use the default dispatch server. When running in CI
+    // against a local version of the backend, this allows us to record the viewer using the
+    // regular dispatch server and get recordings that are easier to inspect.
+    RECORD_REPLAY_SERVER: exampleRecordingId ? DefaultDispatchServer : dispatchServer,
+    RECORD_REPLAY_DRIVER: exampleRecordingId ? undefined : process.env.RECORD_REPLAY_DRIVER,
   };
 
   await runTestViewer("test/harness.js", test, 240, env);
@@ -196,7 +202,7 @@ function spawnGecko(env) {
   return spawn(geckoPath, args, { env });
 }
 
-async function runTestViewer(path, local, timeout = 60, env = {}) {
+async function runTestViewer(path, local, timeout, env) {
   const testScript = createTestScript({ path });
 
   const gecko = spawnGecko({
@@ -205,7 +211,6 @@ async function runTestViewer(path, local, timeout = 60, env = {}) {
     MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
     RECORD_REPLAY_TEST_SCRIPT: testScript,
     RECORD_REPLAY_LOCAL_TEST: local,
-    RECORD_REPLAY_SERVER: dispatchServer,
     RECORD_REPLAY_VIEW_HOST: "http://localhost:8080",
   });
 
@@ -221,7 +226,7 @@ async function runTestViewer(path, local, timeout = 60, env = {}) {
     if (match && match[2].startsWith("http://localhost:8080/view")) {
       recordingId = match[1];
 
-      if (dispatchServer == DefaultDispatchServer) {
+      if (env.RECORD_REPLAY_SERVER == DefaultDispatchServer) {
         addTestRecordingId(recordingId);
       }
     }
@@ -250,7 +255,7 @@ async function runTestViewer(path, local, timeout = 60, env = {}) {
     // Log an error which github will recognize.
     let msg = `::error ::Failure ${local}`;
     if (recordingId) {
-      msg += ` https://replay.io/view?id=${recordingId}&test=${local}`;
+      msg += ` https://replay.io/view?id=${recordingId}`;
     }
     spawnChecked("echo", [msg], { stdio: "inherit" });
   }
