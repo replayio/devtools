@@ -93,6 +93,9 @@ export class DevToolsToolbox {
 
   async viewSourceInDebugger(url, line, column, id) {
     const dbg = this.getPanel("debugger");
+    if (!dbg) {
+      return;
+    }
     const source = id ? dbg.getSourceByActorId(id) : dbg.getSourceByURL(url);
     if (source) {
       dbg.selectSource(source.id, line, column);
