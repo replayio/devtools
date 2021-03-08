@@ -11,6 +11,7 @@ const {
 } = require("devtools/client/webconsole/constants");
 const { getAllPrefs } = require("devtools/client/webconsole/selectors/prefs");
 const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
+const { assert } = require("protocol/utils");
 
 const messagesActions = require("devtools/client/webconsole/actions/messages");
 const { ConsoleCommand } = require("devtools/client/webconsole/types");
@@ -27,6 +28,10 @@ function evaluateExpression(expression) {
       return null;
     }
 
+    const { asyncIndex, frameId } = toolbox.getPanel("debugger").getFrameId();
+    const pause = ThreadFront.pauseForAsyncIndex(asyncIndex);
+    assert(pause);
+
     // We use the messages action as it's doing additional transformation on the message.
     let evalId = nextEvalId++;
     dispatch(
@@ -35,20 +40,20 @@ function evaluateExpression(expression) {
           messageText: expression,
           timeStamp: Date.now(),
           evalId,
-          executionPointTime: ThreadFront.currentTime,
+          executionPoint: pause.point,
+          executionPointTime: pause.time,
         }),
       ])
     );
     dispatch({ type: EVALUATE_EXPRESSION, expression });
-
-    const frameActor = toolbox.getPanel("debugger").getFrameId();
 
     // Even if the evaluation fails,
     // we still need to pass the error response to onExpressionEvaluated.
     const onSettled = res => res;
 
     const response = await evaluateJSAsync(expression, {
-      frameActor,
+      asyncIndex,
+      frameId,
       forConsoleMessage: true,
     }).then(onSettled, onSettled);
     response.evalId = evalId;
@@ -65,8 +70,8 @@ function evaluateExpression(expression) {
  *                          devtools/shared/fronts/webconsole.js
  */
 async function evaluateJSAsync(expression, options = {}) {
-  const { frameActor } = options;
-  const rv = await ThreadFront.evaluate(/* asyncIndex */ 0, frameActor, expression);
+  const { asyncIndex, frameId } = options;
+  const rv = await ThreadFront.evaluate(asyncIndex, frameId, expression);
   const { returned, exception, failed } = rv;
 
   let v;
