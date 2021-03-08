@@ -1,18 +1,24 @@
 import { ApolloClient, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
 import { HttpLink } from "apollo-link-http";
 import { DocumentNode } from "graphql";
-import { assert } from "protocol/utils";
+import { defer } from "protocol/utils";
 
-let apolloClient: ApolloClient<NormalizedCacheObject> | null = null;
+const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
-export function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
-  assert(apolloClient);
-  return apolloClient.query({ variables, query });
+export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
+  const apolloClient = await clientWaiter.promise;
+  return await apolloClient.query({ variables, query });
 }
 
-export function mutate({ variables = {}, mutation }: { variables: any; mutation: DocumentNode }) {
-  assert(apolloClient);
-  return apolloClient.mutate({ variables, mutation });
+export async function mutate({
+  variables = {},
+  mutation,
+}: {
+  variables: any;
+  mutation: DocumentNode;
+}) {
+  const apolloClient = await clientWaiter.promise;
+  return await apolloClient.mutate({ variables, mutation });
 }
 
 export function createApolloClient(token: string | undefined, recordingId: string | undefined) {
@@ -21,7 +27,8 @@ export function createApolloClient(token: string | undefined, recordingId: strin
     link: createHttpLink(token, recordingId),
   };
 
-  apolloClient = new ApolloClient(options);
+  const apolloClient = new ApolloClient<NormalizedCacheObject>(options);
+  clientWaiter.resolve(apolloClient);
   return apolloClient;
 }
 
