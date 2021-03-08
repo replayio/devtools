@@ -249,6 +249,16 @@ async function runTestViewer(path, local, timeout, env) {
   }
 
   function logFailure(why) {
+    // This can be used to dump the contents of additional files after test failures.
+    if (process.env.DUMP_FILE_ON_TEST_FAILURE) {
+      try {
+        const text = fs.readFileSync(process.env.DUMP_FILE_ON_TEST_FAILURE, "utf8");
+        console.log(`DumpFile ${process.env.DUMP_FILE_ON_TEST_FAILURE}:\n${text}\n`);
+      } catch (e) {
+        console.log(`DumpFileError ${e}`);
+      }
+    }
+
     failures.push(`Failed test: ${local} ${why}`);
     console.log(`[${elapsedTime()}] Test failed: ${why}`);
 
