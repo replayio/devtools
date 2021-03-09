@@ -130,6 +130,7 @@ class Scopes extends PureComponent {
       unHighlightDomElement,
       setExpandedScope,
       expandedScopes,
+      selectedFrame,
     } = this.props;
     const { scopes } = this.state;
 
@@ -139,7 +140,7 @@ class Scopes extends PureComponent {
 
     if (scopes && scopes.length > 0 && !isLoading) {
       const roots = scopes.map((s, i) => ({
-        path: `scope${i}`,
+        path: `scope${selectedFrame?.id}.${i}`,
         name: s.name,
         contents: s.contents,
       }));
