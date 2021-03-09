@@ -650,7 +650,15 @@ export function selectedLocationHasScrolled(state) {
 }
 
 export function getTextAtLocation(state, id, location) {
+  const source = getSource(state, id);
+  if (!source) {
+    return null;
+  }
+
   const content = getSourceContent(state, id);
+  if (!content) {
+    return null;
+  }
   const text = getTextAtPosition(id, content, { ...location, column: 0 });
 
   return text;
