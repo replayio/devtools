@@ -249,11 +249,17 @@ async function runTestViewer(path, local, timeout, env) {
   }
 
   function logFailure(why) {
-    // This can be used to dump the contents of additional files after test failures.
-    if (process.env.DUMP_FILE_ON_TEST_FAILURE) {
+    // This is used in backend CI to move dump files into a shared directory
+    // after test failures.
+    if (process.env.TEST_FAILURE_DUMP_SOURCE &&
+        process.env.TEST_FAILURE_DUMP_TARGET) {
       try {
-        const text = fs.readFileSync(process.env.DUMP_FILE_ON_TEST_FAILURE, "utf8");
-        console.log(`DumpFile ${process.env.DUMP_FILE_ON_TEST_FAILURE}:\n${text}\n`);
+        const source = process.env.TEST_FAILURE_DUMP_SOURCE;
+        const target = process.env.TEST_FAILURE_DUMP_TARGET;
+        for (const file of fs.readdirSync(source)) {
+          fs.renameSync(`${source}/${file}`, `${target}/${local}-${file}`);
+          console.log(`DumpFile ${file}`);
+        }
       } catch (e) {
         console.log(`DumpFileError ${e}`);
       }
