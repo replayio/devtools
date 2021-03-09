@@ -3,7 +3,7 @@
 
 const { ThreadFront } = require("protocol/thread");
 const { assert, waitForTime } = require("protocol/utils");
-const { mapValues } = require("lodash");
+const { mapValues, isEqual } = require("lodash");
 
 const dbg = gToolbox.getPanel("debugger").getVarsForTests();
 
@@ -272,6 +272,36 @@ async function toggleBlackboxSelectedSource() {
 function findMessages(text, extraSelector = "") {
   const messages = document.querySelectorAll(`.webconsole-output .message${extraSelector}`);
   return [...messages].filter(msg => msg.innerText.includes(text));
+}
+
+function getAllMessages() {
+  const messageNodes = document.querySelectorAll(`.webconsole-output .message`);
+  const messages = [];
+  for (const node of messageNodes) {
+    let type = "unknown";
+    if (node.className.includes("logPoint")) {
+      type = "logPoint";
+    } else if (node.className.includes("console-api")) {
+      type = "console-api";
+    } else if (node.className.includes("command")) {
+      type = "command";
+    } else if (node.className.includes("result")) {
+      type = "result";
+    }
+    messages.push({
+      type,
+      content: [
+        ...node.querySelectorAll(".objectBox, .objectBox-stackTrace, syntax-highlighted"),
+      ].map(n => n.innerText),
+    });
+  }
+  return messages;
+}
+
+function checkAllMessages(expected) {
+  return waitUntil(() => {
+    return isEqual(getAllMessages(), expected);
+  });
 }
 
 function waitForMessage(text, extraSelector) {
@@ -634,6 +664,8 @@ const testCommands = {
   waitForScopeValue,
   toggleBlackboxSelectedSource,
   findMessages,
+  getAllMessages,
+  checkAllMessages,
   waitForMessage,
   warpToMessage,
   checkPausedMessage,
