@@ -33,7 +33,7 @@ async function waitUntil(fn) {
 
 function start() {
   app.actions.setViewMode("dev");
-  return waitUntil(() => document.querySelector(".view-toggle-dev.active"));
+  return waitUntil(() => document.querySelector(".view-toggle .active")?.innerText === "DevTools");
 }
 
 function finish() {
@@ -714,7 +714,7 @@ const commands = mapValues(testCommands, (command, name) => {
 
 async function describe(description, cbk) {
   console.log(`# Test ${description}`);
-  start();
+  await start();
   await cbk();
   finish();
 }
