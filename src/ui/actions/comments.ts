@@ -97,7 +97,7 @@ export function replyToItem(item: Event | Comment | PauseItem): UIThunkAction {
           content: "",
           time,
           point,
-          has_frames: false,
+          has_frames: "has_frames" in item && item.has_frames,
           source_location: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
           position: {
             x: canvas!.width * 0.5,
