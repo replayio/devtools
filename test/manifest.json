@@ -17,6 +17,7 @@
   ["console_async_eval.js", "doc_async.html"],
   ["console_messages.js", "doc_rr_console.html"],
   ["console_stacks.js", "doc_exceptions_bundle.html"],
+  ["scopes_rerender.js", "doc_recursion.html"],
   ["logpoint-01.js", "doc_rr_basic.html"],
   ["logpoint-02.js", "doc_rr_basic.html"],
   ["logpoint-03.js", "doc_events.html"],
