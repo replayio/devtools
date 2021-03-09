@@ -25,6 +25,7 @@ const startTime = Date.now();
 let shouldRecordExamples = false;
 let shouldRecordViewer = false;
 let recordExamplesSeparately = false;
+let testTimeout = 240;
 
 function processArgs() {
   const usage = `
@@ -36,6 +37,7 @@ function processArgs() {
       --record-viewer: Record the viewer while the test is running
       --record-all: Record examples and save the recordings locally, and record the viewer
       --separate: Record examples in a separate browser instance.
+      --timeout N: Use a timeout of N seconds for tests (default 240).
   `;
   for (let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
@@ -59,6 +61,9 @@ function processArgs() {
       case "--separate":
         shouldRecordExamples = true;
         recordExamplesSeparately = true;
+        break;
+      case "--timeout":
+        testTimeout = +process.argv[++i];
         break;
       case "--help":
       case "-h":
@@ -178,7 +183,7 @@ async function runTest(test, example) {
     RECORD_REPLAY_DRIVER: exampleRecordingId ? undefined : process.env.RECORD_REPLAY_DRIVER,
   };
 
-  await runTestViewer("test/harness.js", test, 240, env);
+  await runTestViewer("test/harness.js", test, testTimeout, env);
 }
 
 function spawnGecko(env) {
