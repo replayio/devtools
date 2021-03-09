@@ -257,8 +257,9 @@ async function runTestViewer(path, local, timeout, env) {
         const source = process.env.TEST_FAILURE_DUMP_SOURCE;
         const target = process.env.TEST_FAILURE_DUMP_TARGET;
         for (const file of fs.readdirSync(source)) {
-          fs.renameSync(`${source}/${file}`, `${target}/${local}-${file}`);
-          console.log(`DumpFile ${file}`);
+          const targetFile = `${target}/${local}-${file}`;
+          fs.renameSync(`${source}/${file}`, targetFile);
+          console.log(`DumpFile ${targetFile}`);
         }
       } catch (e) {
         console.log(`DumpFileError ${e}`);
