@@ -74,6 +74,7 @@ function CommentThread({
               <CommentItem
                 {...{
                   comment: pendingComment.comment,
+                  type: pendingComment.type,
                   isRoot: pendingComment?.type == "new_comment",
                 }}
               />

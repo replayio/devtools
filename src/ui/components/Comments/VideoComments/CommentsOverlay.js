@@ -14,8 +14,8 @@ function findComment({ hasuraComments, pendingComment, hoveredComment, currentTi
   // move the location marker around the video and have it visually update
   // the displayed comments.
   if (pendingComment) {
-    comments = hasuraComments.filter(comment => pendingComment?.id != comment.id);
-    comments.push(pendingComment);
+    comments = hasuraComments.filter(comment => pendingComment?.comment.id != comment.id);
+    comments.push(pendingComment.comment);
   }
 
   // Find the comment that matches the hoveredComment ID

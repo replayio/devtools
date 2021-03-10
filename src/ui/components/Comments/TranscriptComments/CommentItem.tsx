@@ -24,14 +24,28 @@ type CommentProps = PropsFromRedux & {
 
 function CommentItem({ comment, pendingComment, isRoot }: CommentProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const { content } = comment;
-  const isPending = pendingComment && pendingComment.comment === comment;
 
-  if (pendingComment && isPending) {
-    if (pendingComment.type == "edit_reply" || pendingComment.type == "edit_comment") {
-      return <ExistingCommentEditor comment={pendingComment.comment} />;
+  const isPendingNew =
+    pendingComment &&
+    (pendingComment.type == "new_reply" || pendingComment.type == "new_comment") &&
+    pendingComment.comment == comment;
+  const isPendingEdit =
+    pendingComment &&
+    (pendingComment.type == "edit_reply" || pendingComment.type == "edit_comment") &&
+    "id" in comment &&
+    pendingComment.comment.id == comment.id;
+
+  // If this item matches the current pending comment, display the corresponding comment editor instead.
+  if (pendingComment && (isPendingNew || isPendingEdit)) {
+    if (isPendingNew) {
+      const commentType = pendingComment.type as "new_comment" | "new_reply";
+      const comment = pendingComment.comment as PendingNewComment | PendingNewReply;
+
+      return <NewCommentEditor comment={comment} type={commentType} />;
     } else {
-      return <NewCommentEditor comment={pendingComment.comment} type={pendingComment!.type} />;
+      const comment = pendingComment.comment as PendingEditComment | PendingEditReply;
+
+      return <ExistingCommentEditor comment={comment} />;
     }
   }
 

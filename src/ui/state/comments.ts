@@ -14,7 +14,7 @@ export interface SourceLocation {
   sourceId: string;
 }
 
-interface CommentPosition {
+export interface CommentPosition {
   x: number;
   y: number;
 }
@@ -33,17 +33,30 @@ export interface Comment {
   id: string;
   point: string;
   recording_id: RecordingId;
-  parent_id: string;
+  time: number;
+  updated_at: string;
+  user_id: string;
+  user: User;
+  replies: Reply[];
+  __typename: string;
+  position: CommentPosition;
+  parent_id: null;
+}
+
+export interface Reply {
+  content: string;
+  created_at: string;
+  has_frames: boolean;
+  source_location: SourceLocation | null;
+  id: string;
+  point: string;
+  recording_id: RecordingId;
   time: number;
   updated_at: string;
   user_id: string;
   user: User;
   __typename: string;
-  position: CommentPosition;
-  replies: Reply[];
-}
-
-export interface Reply extends Comment {
+  position: null;
   parent_id: string;
 }
 
@@ -88,9 +101,17 @@ export interface PendingNewReply extends PendingBlankComment {
   parent_id: string;
 }
 
-export interface PendingEditComment extends Comment {}
+export interface PendingEditComment extends PendingBlankComment {
+  position: CommentPosition;
+  parent_id: null;
+  id: string;
+}
 
-export interface PendingEditReply extends Comment {}
+export interface PendingEditReply extends PendingBlankComment {
+  position: null;
+  parent_id: string;
+  id: string;
+}
 
 export interface PendingBlankComment {
   content: string;

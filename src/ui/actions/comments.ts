@@ -1,14 +1,7 @@
 import { Action } from "redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import {
-  PendingComment,
-  PendingNewReply,
-  PendingNewComment,
-  Event,
-  Comment,
-  PauseItem,
-} from "ui/state/comments";
+import { PendingComment, Event, Comment, Reply, PauseItem } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 
@@ -89,8 +82,7 @@ export function replyToItem(item: Event | Comment | PauseItem): UIThunkAction {
 
       dispatch(setPendingComment(pendingComment));
     } else {
-      // Add a new comment to an event or a temporary
-      // pause item.
+      // Add a new comment to an event or a temporary pause item.
       const pendingComment: PendingComment = {
         type: "new_comment",
         comment: {
@@ -106,6 +98,38 @@ export function replyToItem(item: Event | Comment | PauseItem): UIThunkAction {
         },
       };
 
+      dispatch(setPendingComment(pendingComment));
+    }
+  };
+}
+
+export function editItem(item: Comment | Reply): UIThunkAction {
+  return async ({ dispatch }) => {
+    const { point, time, has_frames } = item;
+
+    if ("has_frames" in item) {
+      dispatch(actions.seek(point, time, item.has_frames));
+    } else {
+      dispatch(actions.seek(point, time, false));
+    }
+
+    if (item.parent_id !== null) {
+      const { content, source_location, parent_id, position, id } = item;
+
+      // Editing a reply.
+      const pendingComment: PendingComment = {
+        type: "edit_reply",
+        comment: { content, time, point, has_frames, source_location, parent_id, position, id },
+      };
+      dispatch(setPendingComment(pendingComment));
+    } else {
+      const { content, source_location, parent_id, position, id } = item;
+
+      // Editing a comment.
+      const pendingComment: PendingComment = {
+        type: "edit_comment",
+        comment: { content, time, point, has_frames, source_location, parent_id, position, id },
+      };
       dispatch(setPendingComment(pendingComment));
     }
   };

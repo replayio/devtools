@@ -52,6 +52,7 @@ export function useGetComments(
         has_frames
         source_location
         time
+        parent_id
         point
         position
         user {
