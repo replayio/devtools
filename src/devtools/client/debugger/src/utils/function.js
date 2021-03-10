@@ -4,7 +4,7 @@
 
 //
 import { isFulfilled } from "./async-value";
-import { findClosestFunction } from "./ast";
+import { findClosestFunction } from "../selectors";
 import { correctIndentation } from "./indentation";
 
 export function findFunctionText(line, source, symbols) {

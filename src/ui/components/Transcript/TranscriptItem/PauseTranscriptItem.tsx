@@ -5,6 +5,7 @@ import CommentThread from "ui/components/Comments/TranscriptComments/CommentThre
 import TranscriptItem from "./TranscriptItem";
 import { PendingComment, PauseItem, SourceLocation } from "ui/state/comments";
 import { ThreadFront } from "protocol/thread";
+import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
@@ -25,19 +26,20 @@ function PauseTranscriptItem({ item, pendingComment, state }: PauseTranscriptIte
   let label = "Point In Time";
   let secondaryLabel = getFormattedTime(item.time);
 
-  useEffect(() => {
-    const getSourceLocation = async () => {
-      const location = (await ThreadFront.getCurrentPauseSourceLocation()) || null;
-      setSourceLocation(location);
-    };
-    getSourceLocation();
-  }, [item]);
+  // This should be set when we create a comment pending or otherwise
+  // useEffect(() => {
+  //   const getSourceLocation = async () => {
+  //     const location = (await ThreadFront.getCurrentPauseSourceLocation()) || null;
+  //     setSourceLocation(location);
+  //   };
+  //   getSourceLocation();
+  // }, [item]);
 
   if (sourceLocation) {
     const filename = getFilenameFromURL(sourceLocation.sourceUrl);
     icon = "document-text";
     label = `${filename}:${sourceLocation.line}`;
-    secondaryLabel = getTextAtLocation(state, sourceLocation.sourceId, sourceLocation);
+    secondaryLabel = props.snippet;
   }
 
   return (
@@ -53,8 +55,13 @@ function PauseTranscriptItem({ item, pendingComment, state }: PauseTranscriptIte
 }
 
 const connector = connect(
-  (state: UIState) => ({
-    state,
+  (state: UIState, props) => ({
+    snippet: selectors.getTextAtLocation(
+      state,
+      props.sourceLocation.sourceId,
+      props.sourceLocation
+    ),
+    closestFunction: selectors.getClosestFunction(state, props.sourceLocation),
   }),
   {}
 );

@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { findClosestofSymbol } from "../utils/ast";
+
 export function initialASTState() {
   return {
     symbols: {},
@@ -93,6 +95,16 @@ export function isSymbolsLoading(state, source) {
   }
 
   return symbols.loading;
+}
+
+export function findClosestFunction(state, location) {
+  const symbols = getSymbols(state, source);
+
+  if (!symbols || symbols.loading) {
+    return null;
+  }
+
+  return findClosestofSymbol(symbols.functions, location);
 }
 
 export default update;

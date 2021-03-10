@@ -4,7 +4,7 @@
 
 //
 
-import { findClosestFunction } from "../ast";
+import { findClosestFunction } from "../../selectors";
 
 export function getASTLocation(source, symbols, location) {
   if (!symbols || symbols.loading) {

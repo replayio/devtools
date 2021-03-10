@@ -19,7 +19,7 @@ export function containsPosition(a, b) {
   return startsBefore && endsAfter;
 }
 
-function findClosestofSymbol(declarations, location) {
+export function findClosestofSymbol(declarations, location) {
   if (!declarations) {
     return null;
   }
@@ -53,14 +53,6 @@ function findClosestofSymbol(declarations, location) {
 
     return currNode;
   }, null);
-}
-
-export function findClosestFunction(symbols, location) {
-  if (!symbols || symbols.loading) {
-    return null;
-  }
-
-  return findClosestofSymbol(symbols.functions, location);
 }
 
 export function findClosestClass(symbols, location) {
