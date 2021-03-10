@@ -75,7 +75,7 @@ async function evaluateJSAsync(expression, options = {}) {
   const { returned, exception, failed } = rv;
 
   let v;
-  if (failed) {
+  if (failed || !(returned || exception)) {
     v = createPrimitiveValueFront("Error: Evaluation failed");
   } else if (returned) {
     v = returned;
