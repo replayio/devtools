@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 const Modal = require("ui/components/shared/Modal").default;
+import hooks from "ui/hooks";
 import SettingsNavigation from "./SettingsNavigation";
 import SettingsBody from "./SettingsBody";
 
@@ -13,7 +14,7 @@ const settings: Settings = [
     items: [
       {
         label: "Share Replays with your team",
-        key: "team.share",
+        key: "team_sharing",
         description: "Share Replays with others from your domain",
         disabled: false,
       },
@@ -24,7 +25,7 @@ const settings: Settings = [
     items: [
       {
         label: "Enable the Elements pane",
-        key: "experimental.elements",
+        key: "show_elements",
         description: "The Elements pane allows you to inspect the HTML markup and CSS styling",
         disabled: false,
       },
@@ -35,13 +36,13 @@ const settings: Settings = [
     items: [
       {
         label: "Replays are private by default",
-        key: "appearance.dark.mode",
+        key: "private_recordings",
         description: null,
         disabled: false,
       },
       {
         label: "Share Replays with others from your domain (replay.io)",
-        key: "appearance.accent.colors",
+        key: "team_sharing",
         description: null,
         disabled: false,
       },
@@ -54,6 +55,12 @@ const settings: Settings = [
 ];
 
 export default function SettingsModal() {
+  // No need to handle loading state here as it's already cached from the useGetUserSettings
+  // query in the DevTools component
+  const { data } = hooks.useGetUserSettings();
+  const userSettings = data.user_settings[0];
+  console.log({ userSettings });
+
   const [selectedTab, setSelectedTab] = useState<SelectedTab>(settings[0].title);
   const selectedSetting = settings.find(setting => setting.title === selectedTab)!;
 
@@ -61,7 +68,7 @@ export default function SettingsModal() {
     <div className="settings-modal">
       <Modal>
         <SettingsNavigation {...{ settings, selectedTab, setSelectedTab }} />
-        <SettingsBody {...{ selectedSetting }} />
+        <SettingsBody {...{ selectedSetting, userSettings }} />
       </Modal>
     </div>
   );

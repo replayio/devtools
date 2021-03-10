@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
 
-const DevTools = require("./DevTools").default;
+import DevTools from "./DevTools";
 const Account = require("./Account").default;
 const { AppErrors } = require("./shared/Error");
 const LoginModal = require("./shared/LoginModal").default;
@@ -74,7 +74,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
 
   return (
     <>
-      {recordingId ? <DevTools /> : <Account />}
+      {recordingId ? <DevTools recordingId={recordingId} /> : <Account />}
       {modal ? <AppModal modal={modal} /> : null}
       <AppErrors />
     </>
