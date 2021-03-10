@@ -8,7 +8,7 @@ import { prefs } from "../utils/prefs";
 
 export function initialEventListenerState() {
   return {
-    active: ["event.mouse.click"],
+    active: [],
     categories: [],
     expanded: [],
     logEventBreakpoints: prefs.logEventBreakpoints,
