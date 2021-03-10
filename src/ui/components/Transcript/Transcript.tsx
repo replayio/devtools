@@ -55,7 +55,7 @@ function Transcript({
   useEffect(
     function updateFloatingItem() {
       const isPlaying = playback;
-      const isFloatingPause = !entries.find(entry => entry.time == currentTime);
+      const isFloatingPause = !entries.some(entry => entry.time == currentTime);
 
       if (isFloatingPause && !isPlaying) {
         showFloatingItem();

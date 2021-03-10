@@ -35,8 +35,6 @@ function NonEventTranscriptItem({
     const { sourceUrl, line } = comment.source_location;
     const filename = getFilenameFromURL(sourceUrl);
 
-    console.log({ location: comment.source_location, closestFunction });
-
     icon = "document-text";
     label = closestFunction?.name || `${filename}:${line}`;
     secondaryLabel = snippet;

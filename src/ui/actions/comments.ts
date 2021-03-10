@@ -49,7 +49,9 @@ export function toggleShowLoneEvents(): UIThunkAction {
 
 export function showFloatingItem(): UIThunkAction {
   return async ({ dispatch, getState }) => {
-    const floatingItem: FloatingItem = {
+    const initialFloatingItem = selectors.getFloatingItem(getState());
+
+    const newFloatingItem: FloatingItem = {
       itemType: "pause",
       time: selectors.getCurrentTime(getState()),
       point: ThreadFront.currentPoint,
@@ -57,7 +59,15 @@ export function showFloatingItem(): UIThunkAction {
       location: await ThreadFront.getCurrentPauseSourceLocation(),
     };
 
-    dispatch(setFloatingItem(floatingItem));
+    const currentFloatingItem = selectors.getFloatingItem(getState());
+
+    // We should bail if the newFloatingItem is now stale. This happens in cases where
+    // the state's floatingItem changes while we wait for the newFloatingItem to resolve.
+    if (initialFloatingItem !== currentFloatingItem) {
+      return;
+    }
+
+    dispatch(setFloatingItem(newFloatingItem));
   };
 }
 
