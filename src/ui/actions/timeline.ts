@@ -17,7 +17,7 @@ import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredItem } from "ui/state/timeline";
 import { getFirstComment } from "ui/hooks/comments";
-import { getTest } from "ui/utils/environment";
+import { getPausePointParams, getTest } from "ui/utils/environment";
 import { waitForTime } from "protocol/utils";
 const { features } = require("ui/utils/prefs");
 
@@ -60,21 +60,40 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   );
 
   let hasFrames = false;
-  if (!getTest()) {
-    const firstComment = await getFirstComment(recordingId);
-    if (firstComment) {
-      ({ point, time } = firstComment);
-      hasFrames = firstComment.has_frames;
-    } else {
-      const firstMeaningfulPaint = await getFirstMeaningfulPaint(10);
-      if (firstMeaningfulPaint) {
-        ({ point, time } = firstMeaningfulPaint);
-      }
-    }
+  const initialPausePoint = await getInitialPausePoint(recordingId);
+  if (initialPausePoint) {
+    point = initialPausePoint.point;
+    hasFrames = initialPausePoint.hasFrames;
+    time = initialPausePoint.time;
   }
 
   ThreadFront.timeWarp(point, time, hasFrames, /* force */ true);
   ThreadFront.initializedWaiter.resolve();
+}
+
+async function getInitialPausePoint(recordingId: string) {
+  let hasFrames = false;
+  if (getTest()) {
+    return;
+  }
+
+  const pausePointParams = getPausePointParams();
+  if (pausePointParams) {
+    return pausePointParams;
+  }
+
+  const firstComment = await getFirstComment(recordingId);
+  if (firstComment) {
+    const { point, time } = firstComment;
+    hasFrames = firstComment.has_frames;
+    return { point, time, hasFrames };
+  }
+
+  const firstMeaningfulPaint = await getFirstMeaningfulPaint(10);
+  if (firstMeaningfulPaint) {
+    const { point, time } = firstMeaningfulPaint;
+    return { point, time, hasFrames: false };
+  }
 }
 
 function onWarp(store: UIStore) {
@@ -187,6 +206,22 @@ export function setZoomRegion(region: ZoomRegion): SetZoomRegionAction {
   return { type: "set_zoom", region };
 }
 
+function updateUrl({
+  point,
+  time,
+  hasFrames,
+}: {
+  point: ExecutionPoint;
+  time: number;
+  hasFrames: boolean;
+}) {
+  const url = new URL(window.location.toString());
+  url.searchParams.set("point", point);
+  url.searchParams.set("time", `${time}`);
+  url.searchParams.set("hasFrames", `${hasFrames}`);
+  window.history.pushState({}, "", url.toString());
+}
+
 export function seek(
   point: ExecutionPoint,
   time: number,
@@ -196,6 +231,7 @@ export function seek(
   return () => {
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
 
+    updateUrl({ point, time, hasFrames });
     if (pause) {
       ThreadFront.timeWarpToPause(pause);
     } else {
