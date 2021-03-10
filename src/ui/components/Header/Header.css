@@ -31,7 +31,6 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-left: 8px;
 }
 
 #status {
@@ -75,14 +74,16 @@
 }
 
 #header .title {
-  max-width: 320px;
-  font-size: 14px;
+  max-width: 640px;
+  font-size: 20px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  cursor: text;
-  line-height: 18px;
+  cursor: pointer;
+  line-height: 22px;
   margin-right: 0.5em;
+  margin-left: 8px;
+  font-weight: 600;
 }
 
 #header input.title:focus {
