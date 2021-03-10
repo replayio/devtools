@@ -7,10 +7,10 @@ import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 
 import "./ReplyButton.css";
-import { Comment, Event, PauseItem } from "ui/state/comments";
+import { Comment, Event, FloatingItem } from "ui/state/comments";
 
 type ReplyButtonProps = PropsFromRedux & {
-  item: Comment | Event | PauseItem;
+  item: Comment | Event | FloatingItem;
 };
 
 function ReplyButton({ item, setModal, replyToItem }: ReplyButtonProps) {

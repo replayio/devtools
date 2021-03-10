@@ -68,6 +68,8 @@
   font-size: 12px;
   color: var(--theme-comment);
   font-family: monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .event-timestamp {

@@ -3,7 +3,7 @@ import classnames from "classnames";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { Comment, PauseItem } from "ui/state/comments";
+import { Comment, FloatingItem } from "ui/state/comments";
 import { UIState } from "ui/state";
 import { Event } from "ui/state/comments";
 import "./TranscriptItem.css";
@@ -11,7 +11,7 @@ import { HoveredItem } from "ui/state/timeline";
 import ReplyButton from "ui/components/Transcript/ReplyButton";
 
 type TranscriptItemProps = PropsFromRedux & {
-  item: Comment | Event | PauseItem;
+  item: Comment | Event | FloatingItem;
   label: string;
   secondaryLabel: string;
   icon: JSX.Element;

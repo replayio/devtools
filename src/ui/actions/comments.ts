@@ -1,7 +1,7 @@
 import { Action } from "redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { PendingComment, Event, Comment, Reply, PauseItem } from "ui/state/comments";
+import { PendingComment, Event, Comment, Reply, FloatingItem } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 
@@ -9,12 +9,16 @@ type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComme
 type SetCommentPointer = Action<"set_comment_pointer"> & { value: boolean };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 type SetShouldShowLoneEvents = Action<"set_should_show_lone_events"> & { value: boolean };
+type SetFloatingItem = Action<"set_floating_item"> & {
+  floatingItem: FloatingItem | null;
+};
 
 export type CommentsAction =
   | SetPendingComment
   | SetCommentPointer
   | SetHoveredComment
-  | SetShouldShowLoneEvents;
+  | SetShouldShowLoneEvents
+  | SetFloatingItem;
 
 export function setPendingComment(comment: PendingComment): SetPendingComment {
   return { type: "set_pending_comment", comment };
@@ -32,6 +36,10 @@ export function clearPendingComment(): SetPendingComment {
   return { type: "set_pending_comment", comment: null };
 }
 
+export function setFloatingItem(floatingItem: FloatingItem | null): SetFloatingItem {
+  return { type: "set_floating_item", floatingItem };
+}
+
 export function toggleShowLoneEvents(): UIThunkAction {
   return ({ dispatch, getState }) => {
     const newValue = !selectors.getShouldShowLoneEvents(getState());
@@ -39,7 +47,27 @@ export function toggleShowLoneEvents(): UIThunkAction {
   };
 }
 
-export function replyToItem(item: Event | Comment | PauseItem): UIThunkAction {
+export function showFloatingItem(): UIThunkAction {
+  return async ({ dispatch, getState }) => {
+    const floatingItem: FloatingItem = {
+      itemType: "pause",
+      time: selectors.getCurrentTime(getState()),
+      point: ThreadFront.currentPoint,
+      has_frames: ThreadFront.currentPointHasFrames,
+      location: await ThreadFront.getCurrentPauseSourceLocation(),
+    };
+
+    dispatch(setFloatingItem(floatingItem));
+  };
+}
+
+export function hideFloatingItem(): UIThunkAction {
+  return async ({ dispatch }) => {
+    dispatch(setFloatingItem(null));
+  };
+}
+
+export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction {
   return async ({ dispatch, getState }) => {
     const { point, time } = item;
     const state = getState();
