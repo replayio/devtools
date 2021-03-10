@@ -29,3 +29,20 @@ export function isDeployPreview() {
 export function hasLoadingParam() {
   return url.searchParams.get("loading") != null;
 }
+
+export function getPausePointParams() {
+  const pointParam = url.searchParams.get("point");
+  const point = `${pointParam}`;
+
+  const timeParam = url.searchParams.get("time");
+  const time = timeParam ? +timeParam : 0;
+
+  const hasFramesParam = url.searchParams.get("hasFrames");
+  const hasFrames = hasFramesParam ? hasFramesParam == "true" : false;
+
+  if (pointParam && timeParam) {
+    return { point, time, hasFrames };
+  }
+
+  return null;
+}
