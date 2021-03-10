@@ -274,33 +274,38 @@ function findMessages(text, extraSelector = "") {
   return [...messages].filter(msg => msg.innerText.includes(text));
 }
 
-function getAllMessages() {
+function getAllMessages(opts) {
+  const { ignoreErrors } = opts || {};
   const messageNodes = document.querySelectorAll(`.webconsole-output .message`);
   const messages = [];
   for (const node of messageNodes) {
     let type = "unknown";
-    if (node.className.includes("logPoint")) {
+    if (node.classList.contains("logPoint")) {
       type = "logPoint";
-    } else if (node.className.includes("console-api")) {
+    } else if (node.classList.contains("console-api")) {
       type = "console-api";
-    } else if (node.className.includes("command")) {
+    } else if (node.classList.contains("command")) {
       type = "command";
-    } else if (node.className.includes("result")) {
+    } else if (node.classList.contains("result")) {
       type = "result";
+    } else if (node.classList.contains("error")) {
+      type = ignoreErrors ? undefined : "error";
     }
-    messages.push({
-      type,
-      content: [
-        ...node.querySelectorAll(".objectBox, .objectBox-stackTrace, syntax-highlighted"),
-      ].map(n => n.innerText),
-    });
+    if (type) {
+      messages.push({
+        type,
+        content: [
+          ...node.querySelectorAll(".objectBox, .objectBox-stackTrace, syntax-highlighted"),
+        ].map(n => n.innerText),
+      });
+    }
   }
   return messages;
 }
 
-function checkAllMessages(expected) {
+function checkAllMessages(expected, opts) {
   return waitUntil(() => {
-    return isEqual(getAllMessages(), expected);
+    return isEqual(getAllMessages(opts), expected);
   });
 }
 
