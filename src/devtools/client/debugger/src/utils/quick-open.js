@@ -48,7 +48,7 @@ export function parseLineColumn(query) {
 }
 
 export function formatSourcesForList(source, tabUrls) {
-  const title = getTruncatedFileName(source, 100);
+  const title = getTruncatedFileName(source);
   const relativeUrlWithQuery = `${source.relativeUrl}${getSourceQueryString(source) || ""}`;
   const subtitle = endTruncateStr(relativeUrlWithQuery, 100);
   const value = relativeUrlWithQuery;
