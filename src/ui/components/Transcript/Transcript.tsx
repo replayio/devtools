@@ -71,7 +71,7 @@ function Transcript({
         <div className="transcript-list">
           {sortBy(entries, ["time", "kind", "created_at"]).map((entry, i) => {
             if ("itemType" in entry) {
-              return <PauseTranscriptItem item={entry} pendingComment={pendingComment} />;
+              return <PauseTranscriptItem item={entry} pendingComment={pendingComment} key={i} />;
             } else if ("content" in entry) {
               return <NonEventTranscriptItem comment={entry} key={i} />;
             } else {

@@ -20,7 +20,12 @@ type CommentEditorProps = PropsFromRedux & {
   handleSubmit: (inputValue: string) => void;
 };
 
-function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEditorProps) {
+function CommentEditor({
+  pendingComment,
+  comment,
+  handleSubmit,
+  clearPendingComment,
+}: CommentEditorProps) {
   const { user } = useAuth0();
   const { DraftJS, Editor, emojiPlugin, editorState, setEditorState } = useEditor(comment.content);
 
@@ -58,7 +63,11 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
           Submit
         </button>
       </div>
-      {isNewComment && <CommentTool comment={comment} />}
+      {pendingComment &&
+        pendingComment.comment.time == comment.time &&
+        (pendingComment.type == "new_comment" || pendingComment.type == "edit_comment") && (
+          <CommentTool pendingComment={pendingComment} />
+        )}
     </div>
   );
 }
@@ -66,9 +75,7 @@ function CommentEditor({ comment, handleSubmit, clearPendingComment }: CommentEd
 const connector = connect(
   (state: UIState) => ({
     recordingId: selectors.getRecordingId(state),
-    currentTime: selectors.getCurrentTime(state),
     pendingComment: selectors.getPendingComment(state),
-    canvas: selectors.getCanvas(state),
   }),
   {
     clearPendingComment: actions.clearPendingComment,

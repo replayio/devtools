@@ -12,7 +12,7 @@ type CommentActionsProps = PropsFromRedux & {
   isRoot: boolean;
 };
 
-function CommentActions({ comment, setPendingComment, isRoot }: CommentActionsProps) {
+function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
   const deleteComment = hooks.useDeleteComment();
@@ -33,7 +33,7 @@ function CommentActions({ comment, setPendingComment, isRoot }: CommentActionsPr
     }
   };
   const editComment = () => {
-    setPendingComment({ type: "edit_reply", comment });
+    editItem(comment);
   };
 
   return (
@@ -65,8 +65,7 @@ function CommentActions({ comment, setPendingComment, isRoot }: CommentActionsPr
 }
 
 const connector = connect(null, {
-  setPendingComment: actions.setPendingComment,
-  replyToItem: actions.replyToItem,
+  editItem: actions.editItem,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(CommentActions);
