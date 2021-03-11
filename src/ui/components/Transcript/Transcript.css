@@ -7,7 +7,6 @@
   align-items: center;
   background: white;
   height: 100%;
-  padding: 0 24px;
 }
 
 .transcript-panel > :not(:first-child) {
@@ -18,4 +17,5 @@
   flex-grow: 1;
   overflow: auto;
   width: 100%;
+  padding: 0 24px;
 }

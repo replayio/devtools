@@ -8,6 +8,7 @@ function initialCommentsState(): CommentsState {
     hoveredComment: null,
     pendingComment: null,
     shouldShowLoneEvents: true,
+    floatingItem: null,
   };
 }
 
@@ -44,6 +45,13 @@ export default function update(
       };
     }
 
+    case "set_floating_item": {
+      return {
+        ...state,
+        floatingItem: action.floatingItem,
+      };
+    }
+
     default: {
       return state;
     }
@@ -54,3 +62,4 @@ export const getPendingComment = (state: UIState) => state.comments.pendingComme
 export const getCommentPointer = (state: UIState) => state.comments.commentPointer;
 export const getHoveredComment = (state: UIState) => state.comments.hoveredComment;
 export const getShouldShowLoneEvents = (state: UIState) => state.comments.shouldShowLoneEvents;
+export const getFloatingItem = (state: UIState) => state.comments.floatingItem;
