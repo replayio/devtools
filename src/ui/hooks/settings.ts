@@ -10,9 +10,7 @@ export function useGetUserSettings() {
     gql`
       query GetUserSettings {
         user_settings {
-          team_sharing
           show_elements
-          private_recordings
         }
       }
     `
@@ -37,7 +35,8 @@ export function useGetUserSettings() {
     addUserSettings();
   }
 
-  return { data, error, loading };
+  const userSettings = data?.user_settings?.[0];
+  return { userSettings, error, loading };
 }
 
 export function useAddUserSettings() {

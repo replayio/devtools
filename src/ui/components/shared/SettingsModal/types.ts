@@ -14,7 +14,7 @@ export interface SettingItem {
   disabled: boolean;
 }
 
-export type SettingItemKey = "team_sharing" | "show_elements" | "private_recordings";
+export type SettingItemKey = "show_elements";
 
 export interface UserSettings {
   [key: string]: boolean;
