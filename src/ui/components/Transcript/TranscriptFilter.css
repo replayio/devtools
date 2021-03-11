@@ -4,3 +4,9 @@ button.transcript-filter .img {
   background: var(--primary-accent);
   cursor: pointer;
 }
+
+button.transcript-filter:hover,
+button.transcript-filter:focus {
+  background-color: transparent;
+  outline: none;
+}

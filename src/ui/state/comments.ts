@@ -5,6 +5,7 @@ export interface CommentsState {
   commentPointer: boolean;
   hoveredComment: any;
   shouldShowLoneEvents: boolean;
+  floatingItem: FloatingItem | null;
 }
 
 export interface SourceLocation {
@@ -23,6 +24,14 @@ interface User {
   picture: string;
   name: string;
   id: string;
+}
+
+export interface FloatingItem {
+  itemType: "pause";
+  time: number;
+  point: string;
+  has_frames: boolean;
+  location?: SourceLocation;
 }
 
 export interface Comment {
@@ -63,13 +72,6 @@ export interface Reply {
 export interface Event extends MouseEvent {
   comment?: Comment;
 }
-
-export type PauseItem = {
-  time: number;
-  itemType: "pause";
-  point: string;
-  has_frames: boolean;
-};
 
 // Pending Comments
 

@@ -1,5 +1,5 @@
 import NonEventTranscriptItem from "./NonEventTranscriptItem";
 import EventTranscriptItem from "./EventTranscriptItem";
-import PauseTranscriptItem from "./PauseTranscriptItem";
+import FloatingTranscriptItem from "./FloatingTranscriptItem";
 
-export { NonEventTranscriptItem, EventTranscriptItem, PauseTranscriptItem };
+export { NonEventTranscriptItem, EventTranscriptItem, FloatingTranscriptItem };
