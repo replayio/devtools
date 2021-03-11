@@ -1,5 +1,7 @@
 import React from "react";
 import { SettingItem, Setting, UserSettings } from "./types";
+import useToken from "ui/utils/useToken";
+import hooks from "ui/hooks";
 import "./SettingsBody.css";
 
 interface SettingsBodyItemProps {
@@ -13,7 +15,21 @@ interface SettingsBodyProps {
 }
 
 function SettingsBodyItem({ item, userSettings }: SettingsBodyItemProps) {
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
+
   const { label, key, description } = item;
+  const value = userSettings[key];
+
+  const updateUserSetting = hooks.useUpdateUserSetting(key);
+  const toggleSetting = () => {
+    updateUserSetting({
+      variables: {
+        newValue: !value,
+        userId,
+      },
+    });
+  };
 
   return (
     <li>
@@ -21,7 +37,7 @@ function SettingsBodyItem({ item, userSettings }: SettingsBodyItemProps) {
         <div className="label">{label}</div>
         {description && <div className="description">{description}</div>}
       </label>
-      <input type="checkbox" id={key} checked={userSettings[key]} />
+      <input type="checkbox" id={key} checked={value} onChange={toggleSetting} />
     </li>
   );
 }

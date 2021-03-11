@@ -59,7 +59,6 @@ export default function SettingsModal() {
   // query in the DevTools component
   const { data } = hooks.useGetUserSettings();
   const userSettings = data.user_settings[0];
-  console.log({ userSettings });
 
   const [selectedTab, setSelectedTab] = useState<SelectedTab>(settings[0].title);
   const selectedSetting = settings.find(setting => setting.title === selectedTab)!;
