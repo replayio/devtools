@@ -4,6 +4,7 @@ import { actions } from "ui/actions";
 import { PendingComment, Event, Comment, Reply, FloatingItem } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
+import { isEqual } from "lodash";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetCommentPointer = Action<"set_comment_pointer"> & { value: boolean };
@@ -64,6 +65,10 @@ export function showFloatingItem(): UIThunkAction {
     // We should bail if the newFloatingItem is now stale. This happens in cases where
     // the state's floatingItem changes while we wait for the newFloatingItem to resolve.
     if (initialFloatingItem !== currentFloatingItem) {
+      return;
+    }
+
+    if (isEqual(currentFloatingItem, newFloatingItem)) {
       return;
     }
 
