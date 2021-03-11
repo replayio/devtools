@@ -6,29 +6,38 @@ import CommentThread from "ui/components/Comments/TranscriptComments/CommentThre
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
 const { getFormattedTime } = require("ui/utils/timeline");
+const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
+const { getSymbols } = require("devtools/client/debugger/src/reducers/ast");
 
 import { UIState } from "ui/state";
 import { Comment } from "ui/state/comments";
 
-type NonEventTranscriptItemProps = PropsFromRedux & {
+type PropsFromParent = {
   comment: Comment;
 };
+type NonEventTranscriptItemProps = PropsFromRedux & PropsFromParent;
 
 // Transcript item component for displaying non-events from the recording.
 //
 // Non-events refer to points that aren't associated with an Event (e.g. Mouse Click)
 // for which there is a comment or pending comment.
 
-function NonEventTranscriptItem({ comment, text }: NonEventTranscriptItemProps) {
+function NonEventTranscriptItem({
+  comment,
+  closestFunction,
+  snippet,
+}: NonEventTranscriptItemProps) {
   let icon = "location-marker";
   let label = "Point In Time";
   let secondaryLabel = getFormattedTime(comment.time);
 
   if (comment.source_location) {
-    const filename = getFilenameFromURL(comment.source_location.sourceUrl);
+    const { sourceUrl, line } = comment.source_location;
+    const filename = getFilenameFromURL(sourceUrl);
+
     icon = "document-text";
-    label = `${filename}:${comment.source_location.line}`;
-    secondaryLabel = text;
+    label = closestFunction?.name || `${filename}:${line}`;
+    secondaryLabel = snippet;
   }
 
   return (
@@ -44,14 +53,13 @@ function NonEventTranscriptItem({ comment, text }: NonEventTranscriptItemProps) 
 }
 
 const connector = connect(
-  (state: UIState, props: any) => ({
-    text: props.comment.source_location
-      ? getTextAtLocation(
-          state,
-          props.comment.source_location.sourceId,
-          props.comment.source_location
-        )
+  (state: UIState, { comment: { source_location } }: PropsFromParent) => ({
+    snippet: source_location
+      ? getTextAtLocation(state, source_location.sourceId, source_location)
       : "",
+    closestFunction: source_location
+      ? findClosestFunction(getSymbols(state, { id: source_location?.sourceId }), source_location)
+      : null,
   }),
   {}
 );
