@@ -9,12 +9,12 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 24px 24px 12px 24px;
+  padding: 24px;
   justify-content: space-between;
 }
 
 .right-sidebar-toolbar-item {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--theme-body-color);
   overflow: hidden;
@@ -46,8 +46,8 @@
 }
 
 .right-sidebar .event-listeners .event-listeners-content {
-    height: 300px;
-    overflow-y: auto;
+  height: 300px;
+  overflow-y: auto;
 }
 
 .right-sidebar .comments-panel {

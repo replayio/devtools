@@ -75,7 +75,7 @@
 
 #header .title {
   max-width: 640px;
-  font-size: 20px;
+  font-size: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
