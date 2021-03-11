@@ -35,6 +35,7 @@ const { createSession } = require("ui/actions/session");
 const {
   initOutputSyntaxHighlighting,
 } = require("./devtools/client/webconsole/utils/syntax-highlighted");
+const { setupExceptions } = require("devtools/client/debugger/src/actions/logExceptions");
 
 require("image/image.css");
 
@@ -86,6 +87,7 @@ async function initialize() {
     initOutputSyntaxHighlighting();
     setupMessages(store);
     setupLogpoints(store);
+    setupExceptions(store);
   }
 
   bootstrapApp({}, { recordingId }, store);
