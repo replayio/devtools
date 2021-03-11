@@ -1,10 +1,20 @@
 import { useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
+import { useAuth0 } from "@auth0/auth0-react";
+
+const anonymousSettings = {
+  show_elements: true,
+};
 
 export function useGetUserSettings() {
+  const { isAuthenticated } = useAuth0();
   const [mutationSent, setMutationSent] = useState(false);
   const addUserSettings = useAddUserSettings();
+
+  if (!isAuthenticated) {
+    return { userSettings: anonymousSettings, loading: false };
+  }
 
   const { data, error, loading } = useQuery(
     gql`
