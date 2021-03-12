@@ -27,33 +27,6 @@ const GET_RECORDING_PRIVACY = gql`
   }
 `;
 
-const GET_OWNER_USER_ID = gql`
-  query GetOwnerUserId($recordingId: uuid!) {
-    recordings(where: { id: { _eq: $recordingId } }) {
-      user_id
-    }
-  }
-`;
-
-function useIsOwner(recordingId) {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
-  const { data, loading } = useQuery(GET_OWNER_USER_ID, {
-    variables: { recordingId },
-  });
-
-  if (loading) {
-    return false;
-  }
-
-  const recording = data.recordings[0];
-  if (!recording?.user_id) {
-    return false;
-  }
-
-  return userId === recording.user_id;
-}
-
 function CopyUrl({ recordingId }) {
   const [copyClicked, setCopyClicked] = useState(false);
 
@@ -163,10 +136,22 @@ function Collaborators({ setExpanded, recordingId, setModal }) {
 }
 
 function OwnerSettings({ recordingId, isPrivate, isOwner }) {
-  const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE, {
-    variables: { recordingId, isPrivate: !isPrivate },
-    refetchQueries: ["GetRecordingPrivacy"],
-  });
+  const [updateIsPrivate] = useMutation(
+    gql`
+      mutation SetRecordingIsPrivate($recordingId: uuid!, $isPrivate: Boolean) {
+        update_recordings(where: { id: { _eq: $recordingId } }, _set: { is_private: $isPrivate }) {
+          returning {
+            is_private
+            id
+          }
+        }
+      }
+    `,
+    {
+      variables: { recordingId, isPrivate: !isPrivate },
+      refetchQueries: ["GetRecordingPrivacy"],
+    }
+  );
 
   if (!isOwner) {
     return null;
@@ -181,7 +166,7 @@ function OwnerSettings({ recordingId, isPrivate, isOwner }) {
 
 function ShareDropdown({ recordingId, setModal }) {
   const [expanded, setExpanded] = useState(false);
-  const isOwner = useIsOwner(recordingId);
+  const isOwner = hooks.useIsOwner(recordingId);
   const { data } = useQuery(GET_RECORDING_PRIVACY, {
     variables: { recordingId },
   });

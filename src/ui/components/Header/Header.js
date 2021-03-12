@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { connect } from "react-redux";
-import { useAuth0 } from "@auth0/auth0-react";
 import { selectors } from "ui/reducers";
 import Avatar from "ui/components/Avatar";
 import { useGetActiveSessions } from "ui/hooks/sessions";
 import Title from "ui/components/shared/Title";
-import IconWithTooltip from "ui/components/shared/IconWithTooltip";
-import ShareDropdown from "ui/components/Header/ShareDropdown";
 import ViewToggle from "ui/components/Header/ViewToggle";
 import UserOptions from "ui/components/Header/UserOptions";
 import { prefs } from "ui/utils/prefs";
@@ -48,7 +45,6 @@ function Links({ recordingId, sessionId }) {
   return (
     <div className="links">
       <Avatars recordingId={recordingId} sessionId={sessionId} />
-      {recordingId ? <ShareDropdown /> : null}
       {!prefs.video && <ViewToggle />}
       <UserOptions />
     </div>

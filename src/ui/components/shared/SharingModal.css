@@ -1,6 +1,6 @@
 .modal-container .modal-content {
   min-height: auto;
-  height: 320px;
+  height: 400px;
   min-width: 400px;
 }
 
@@ -166,4 +166,78 @@
   background: var(--dark-blue);
   cursor: pointer;
   line-height: 16px;
+}
+
+.modal-container .copy-link,
+.modal-container .privacy-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.modal-container .copy-link .img.link {
+  background: white;
+  margin-right: 4px;
+}
+
+.privacy-toggle {
+  cursor: pointer;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--theme-splitter-color);
+  margin-bottom: 20px;
+}
+
+.privacy-toggle > :not(:first-child) {
+  margin-left: 8px;
+}
+
+.privacy-toggle .label {
+  flex-grow: 1;
+}
+
+.privacy-toggle button.toggle {
+  position: relative;
+  height: 18px;
+  border-radius: 12px;
+  width: 28px;
+  align-items: center;
+  transition-duration: 200ms;
+  padding: 0px;
+  box-sizing: content-box;
+}
+
+.privacy-toggle .row.privacy-note.is-public,
+.privacy-toggle .row.privacy-note.is-public .label-description,
+.privacy-toggle .row.privacy-note.is-public .label-description a:visited {
+  color: #7d000f;
+}
+
+.privacy-toggle button.toggle:focus {
+  outline: none;
+}
+
+.privacy-toggle button.toggle.on {
+  border: 2px solid var(--dark-blue);
+  background: var(--dark-blue);
+}
+
+.privacy-toggle button.toggle.off {
+  border: 2px solid var(--light-grey);
+  background: var(--light-grey);
+}
+
+.privacy-toggle button.toggle.on .switch {
+  left: 10px;
+}
+
+.privacy-toggle button.toggle.off .switch {
+  left: 0px;
+}
+
+.privacy-toggle button .switch {
+  position: relative;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: white;
+  transition-duration: 200ms;
 }

@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import hooks from "ui/hooks";
 import Modal from "ui/components/shared/Modal";
 import "./SharingModal.css";
 
@@ -68,6 +69,91 @@ function useFetchCollaborateorId(email) {
   const userId = data?.user_id_by_email[0]?.id;
 
   return { userId, loading, error };
+}
+
+function CopyUrl({ recordingId }) {
+  const [copyClicked, setCopyClicked] = useState(false);
+
+  const handleCopyClick = () => {
+    navigator.clipboard.writeText(`https://replay.io/view?id=${recordingId}`);
+    setCopyClicked(true);
+    setTimeout(() => setCopyClicked(false), 2000);
+  };
+
+  if (copyClicked) {
+    return (
+      <div className="copy-link">
+        <div className="status">
+          <div className="success">Link copied</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="copy-link">
+      <input
+        type="text"
+        value={`https://replay.io/view?id=${recordingId}`}
+        onKeyPress={e => e.preventDefault()}
+        onChange={e => e.preventDefault()}
+      />
+      <button onClick={handleCopyClick}>
+        <div className="img link" />
+        <div className="label">Copy Link</div>
+      </button>
+    </div>
+  );
+}
+
+function Privacy({ isPrivate, recordingId }) {
+  const updateIsPrivate = hooks.useUpdateIsPrivate(recordingId, isPrivate);
+
+  return (
+    <div className="privacy-toggle" onClick={updateIsPrivate}>
+      <div className={`icon img ${isPrivate ? "locked" : "unlocked"}`} />
+      {isPrivate ? (
+        <div className="label">
+          <div className="label-title">Private</div>
+          <div className="label-description">Only you and your collaborators can view</div>
+        </div>
+      ) : (
+        <div className="label">
+          <div className="label-title">Public</div>
+          <div className="label-description">Anyone with this link can view</div>
+        </div>
+      )}
+      <button className={`toggle ${isPrivate ? "off" : "on"}`}>
+        <div className="switch" />
+      </button>
+    </div>
+  );
+}
+
+function PrivacyNote({ isPrivate, isOwner }) {
+  if (!isOwner) {
+    return null;
+  }
+
+  return (
+    <div className={`row privacy-note ${isPrivate ? "is-private" : "is-public"}`}>
+      <div style={{ width: "67px" }} />
+      <div className="label">
+        <div className="label-title">Note</div>
+        <div className="label-description">
+          Replay records everything including passwords you&#39;ve typed and sensitive data
+          you&#39;re viewing.{" "}
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://www.notion.so/replayio/Security-2af70ebdfb1c47e5b9246f25ca377ef2"
+          >
+            Learn more
+          </a>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function Permission({ user, role, recordingId }) {
@@ -210,13 +296,14 @@ function EmailForm({ recordingId }) {
 
 function Sharing({ hideModal, modalOptions }) {
   const { recordingId } = modalOptions;
-  const { data, loading, error } = useQuery(GET_OWNER_AND_COLLABORATORS, {
-    variables: { recordingId },
-  });
+  const { collaborators, recording, loading: usersLoading } = hooks.useGetOwnersAndCollaborators(
+    recordingId
+  );
+  const { isPrivate, loading: isPrivateLoading } = hooks.useGetIsPrivate(recordingId);
 
-  if (loading) {
+  if (usersLoading || isPrivateLoading) {
     return <Modal />;
-  } else if (error || !data.recordings_by_pk) {
+  } else if (!recording) {
     setTimeout(() => hideModal(), 2000);
     return (
       <Modal>
@@ -225,13 +312,15 @@ function Sharing({ hideModal, modalOptions }) {
     );
   }
 
-  const { collaborators, recordings_by_pk: recording } = data;
   return (
     <Modal>
       <div className="row title">
         <div className="img invite" />
-        <p>Add collaborators</p>
+        <p>Sharing</p>
       </div>
+      <CopyUrl recordingId={recordingId} />
+      <Privacy isPrivate={isPrivate} recordingId={recordingId} />
+      <PrivacyNote isPrivate={isPrivate} />
       <EmailForm recordingId={recordingId} />
       <PermissionsList
         recording={recording}
