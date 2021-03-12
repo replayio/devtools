@@ -14,6 +14,7 @@ import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
+import { displayedBreakpointMaxHits, editableBreakpointMaxHits } from "ui/constants";
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -92,8 +93,8 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem,
     return () => editor.editor.off("refresh", updateWidth);
   }, []);
 
-  const isHot = analysisPoints?.length > 250;
-  const isEditable = analysisPoints?.length > 100;
+  const isHot = analysisPoints?.length > displayedBreakpointMaxHits;
+  const isEditable = analysisPoints?.length > editableBreakpointMaxHits;
 
   if (isHot) {
     return (

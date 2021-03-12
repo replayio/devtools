@@ -4,6 +4,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+import { displayedBreakpointMaxHits } from "ui/constants";
 import "./LineNumberTooltip.css";
 
 const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
@@ -94,7 +95,7 @@ function LineNumberTooltip({
   }
 
   const points = analysisPoints.length;
-  const isHot = points > 250;
+  const isHot = points > displayedBreakpointMaxHits;
 
   return (
     <StaticTooltip targetNode={lineNumberNode} className={isHot ? "hot" : ""}>
