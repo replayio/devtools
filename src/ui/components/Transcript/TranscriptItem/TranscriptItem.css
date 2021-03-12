@@ -25,7 +25,7 @@
 }
 
 .transcript-entry-icon {
-  background: var(--primary-accent);
+  background: var(--cool-gray-100);
   padding: 4px;
   border-radius: 50%;
 }
@@ -42,7 +42,7 @@
   height: 14px;
   width: 14px;
   margin: 2px;
-  background: var(--theme-body-background);
+  background: var(--primary-accent);
 }
 
 .transcript-entry-label {
@@ -87,6 +87,10 @@
   background: var(--secondary-accent);
 }
 
+.transcript-entry.paused .img {
+  background: var(--theme-body-background);
+}
+
 .transcript-entry.primary-highlight:not(.paused) .transcript-entry-icon {
-  background: var(--new-blue-900);
+  background: var(--cool-gray-200);
 }
