@@ -41,7 +41,7 @@ export function setupLogpoints(_store: UIStore) {
 }
 
 function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
-  if (!LogpointHandlers.onPointLoading) {
+  if (!LogpointHandlers.onPointLoading || points.length > 250) {
     return;
   }
 
@@ -54,7 +54,7 @@ function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
 }
 
 function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
-  if (!LogpointHandlers.onResult) {
+  if (!LogpointHandlers.onResult || result.length > 250) {
     return;
   }
 
@@ -84,7 +84,7 @@ async function showPrimitiveLogpoints(
   pointDescriptions: PointDescription[],
   values: ValueFront[]
 ) {
-  if (!LogpointHandlers.onResult) {
+  if (!LogpointHandlers.onResult || pointDescriptions.length > 250) {
     return;
   }
 

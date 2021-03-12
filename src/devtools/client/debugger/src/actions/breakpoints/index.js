@@ -183,7 +183,7 @@ export function runAnalysisOnLine(cx, line) {
   };
 }
 
-export function updateHoveredLineNumber(cx, line) {
+export function updateHoveredLineNumber(line) {
   return async ({ dispatch, getState }) => {
     const state = getState();
     const source = getSelectedSource(state);

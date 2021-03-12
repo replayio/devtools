@@ -4,15 +4,15 @@
 
 //
 import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
 import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
-import { toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
+import Widget from "./Widget";
 
 import "./Panel.css";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 
 function getPanelWidth({ editor }) {
@@ -23,11 +23,15 @@ function getPanelWidth({ editor }) {
   return editor.getScrollInfo().clientWidth - panelIndent;
 }
 
-function PanelSummary({ breakpoint, toggleEditingOn, setInputToFocus }) {
+function PanelSummary({ breakpoint, toggleEditingOn, isEditable, setInputToFocus }) {
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
   const handleClick = (event, input) => {
+    if (!isEditable) {
+      return;
+    }
+
     event.stopPropagation();
     toggleEditingOn();
     setInputToFocus(input);
@@ -54,37 +58,7 @@ function PanelSummary({ breakpoint, toggleEditingOn, setInputToFocus }) {
   );
 }
 
-function Widget({ location, children, editor, insertAt }) {
-  const [node, setNode] = useState(null);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    if (loading) {
-      const _node = document.createElement("div");
-      setNode(_node);
-      setLoading(false);
-      return;
-    }
-    const editorLine = toEditorLine(location.line || 0);
-    const _widget = editor.codeMirror.addLineWidget(editorLine, node, {
-      insertAt,
-    });
-
-    // We are clearing the widget here because without
-    // doing so causes breakpoints to show up on the
-    // wrong line number when clicking in the gutter.
-    return () => {
-      _widget.clear();
-    };
-  }, [loading]);
-
-  if (!node) {
-    return null;
-  }
-
-  return ReactDOM.createPortal(<>{children}</>, node);
-}
-
-function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem }) {
+function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem, analysisPoints }) {
   const [editing, setEditing] = useState(false);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
@@ -118,6 +92,22 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
     return () => editor.editor.off("refresh", updateWidth);
   }, []);
 
+  const isHot = analysisPoints?.length > 250;
+  const isEditable = analysisPoints?.length > 100;
+
+  if (isHot) {
+    return (
+      <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
+        <div className="breakpoint-panel">
+          <div className="warning">
+            <span className="material-icons">warning</span>
+            <span className="warning-content">{`Sorry! We can't display this breakpoint because it has too many hits.`}</span>
+          </div>
+        </div>
+      </Widget>
+    );
+  }
+
   return (
     <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
       <div
@@ -136,6 +126,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
         ) : (
           <PanelSummary
             breakpoint={breakpoint}
+            editable={isEditable}
             toggleEditingOn={toggleEditingOn}
             setInputToFocus={setInputToFocus}
           />
@@ -146,7 +137,13 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
   );
 }
 
-export default connect(null, {
-  setHoveredItem: actions.setHoveredItem,
-  clearHoveredItem: actions.clearHoveredItem,
-})(Panel);
+export default connect(
+  (state, { breakpoint }) => ({
+    analysisPoints: selectors.getAnalysisPointsForLocation(
+      state,
+      breakpoint.location,
+      breakpoint.options.condition
+    ),
+  }),
+  { setHoveredItem: actions.setHoveredItem, clearHoveredItem: actions.clearHoveredItem }
+)(Panel);

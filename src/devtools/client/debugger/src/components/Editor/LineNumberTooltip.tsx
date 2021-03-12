@@ -1,34 +1,58 @@
 import React, { useRef, useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
+import { UIState } from "ui/state";
 import "./LineNumberTooltip.css";
 
-export function StaticTooltip({ targetNode, children }) {
+const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
+const {
+  updateHoveredLineNumber,
+} = require("devtools/client/debugger/src/actions/breakpoints/index");
+const { getThreadContext } = require("devtools/client/debugger/src/reducers/pause");
+
+type StaticTooltipProps = {
+  targetNode: HTMLElement;
+  children: JSX.Element | string;
+  className?: string;
+};
+
+export function StaticTooltip({ targetNode, children, className }: StaticTooltipProps) {
   const { top, left } = targetNode.getBoundingClientRect();
-  const docWidth = document.querySelector("html").getBoundingClientRect().width;
+  const docWidth = document.querySelector("html")!.getBoundingClientRect().width;
 
   return ReactDOM.createPortal(
-    <div className="static-tooltip" style={{ top: `${top}px`, right: `${docWidth - left}px` }}>
+    <div
+      className={`static-tooltip ${className}`}
+      style={{ top: `${top}px`, right: `${docWidth - left}px` }}
+    >
       {children}
     </div>,
     targetNode
   );
 }
 
-export function LineNumberTooltip({
+type LineNumberTooltipProps = PropsFromRedux & { editor: any };
+
+function LineNumberTooltip({
   editor,
   cx,
   runAnalysisOnLine,
   analysisPoints,
   setHoveredLineNumberLocation,
   updateHoveredLineNumber,
-}) {
-  const [lineNumberNode, setLineNumberNode] = useState(null);
-  const lastHoveredLineNumber = useRef(null);
+}: LineNumberTooltipProps) {
+  const [lineNumberNode, setLineNumberNode] = useState<HTMLElement | null>(null);
+  const lastHoveredLineNumber = useRef<number | null>(null);
 
-  const setHoveredLineNumber = ({ targetNode, lineNumber }) => {
+  const setHoveredLineNumber = ({
+    targetNode,
+    lineNumber,
+  }: {
+    targetNode: HTMLElement;
+    lineNumber: number;
+  }) => {
     // The gutter re-renders when we click the line number to add
     // a breakpoint. That triggers a second gutterLineEnter event
     // for the same line number. In that case, we shouldn't run
@@ -42,7 +66,7 @@ export function LineNumberTooltip({
       }, 100);
     }
 
-    updateHoveredLineNumber(cx, lineNumber);
+    updateHoveredLineNumber(lineNumber);
     setLineNumberNode(targetNode);
   };
   const clearHoveredLineNumber = () => {
@@ -69,21 +93,29 @@ export function LineNumberTooltip({
     return <StaticTooltip targetNode={lineNumberNode}>...</StaticTooltip>;
   }
 
+  const points = analysisPoints.length;
+  const isHot = points > 250;
+
   return (
-    <StaticTooltip targetNode={lineNumberNode}>
-      {`${analysisPoints.length} hit${analysisPoints.length == 1 ? "" : "s"}`}
+    <StaticTooltip targetNode={lineNumberNode} className={isHot ? "hot" : ""}>
+      <>
+        {isHot && <span className="material-icons">warning_amber</span>}
+        <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
+      </>
     </StaticTooltip>
   );
 }
 
-export default connect(
-  state => ({
-    cx: selectors.getThreadContext(state),
+const connector = connect(
+  (state: UIState) => ({
+    cx: getThreadContext(state),
     analysisPoints: selectors.getPointsForHoveredLineNumber(state),
   }),
   {
-    runAnalysisOnLine: actions.runAnalysisOnLine,
+    runAnalysisOnLine: runAnalysisOnLine,
     setHoveredLineNumberLocation: actions.setHoveredLineNumberLocation,
-    updateHoveredLineNumber: actions.updateHoveredLineNumber,
+    updateHoveredLineNumber: updateHoveredLineNumber,
   }
-)(LineNumberTooltip);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(LineNumberTooltip);

@@ -217,6 +217,7 @@
   /* Common popup styles(used by HTMLTooltip and autocomplete) */
   --theme-popup-background: white;
   --theme-popup-color: var(--grey-70);
+  --theme-errant-popup-color: #991B1B;
   --theme-popup-border-color: ThreeDShadow;
   --theme-popup-dimmed: hsla(0, 0%, 80%, 0.3);
 
