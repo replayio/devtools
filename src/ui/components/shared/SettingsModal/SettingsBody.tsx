@@ -1,24 +1,43 @@
 import React from "react";
-import { SettingItem, Setting } from "./types";
+import { SettingItem, Setting, UserSettings } from "./types";
+import useToken from "ui/utils/useToken";
+import hooks from "ui/hooks";
 import "./SettingsBody.css";
 
 interface SettingsBodyItemProps {
   item: SettingItem;
+  userSettings: UserSettings;
 }
 
 interface SettingsBodyProps {
   selectedSetting: Setting;
+  userSettings: UserSettings;
 }
 
-function SettingsBodyItem({ item }: SettingsBodyItemProps) {
+function SettingsBodyItem({ item, userSettings }: SettingsBodyItemProps) {
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
+
   const { label, key, description } = item;
+  const value = userSettings[key];
+
+  const updateUserSetting = hooks.useUpdateUserSetting(key);
+  const toggleSetting = () => {
+    updateUserSetting({
+      variables: {
+        newValue: !value,
+        userId,
+      },
+    });
+  };
+
   return (
     <li>
       <label className="setting-item" htmlFor={key}>
         <div className="label">{label}</div>
         {description && <div className="description">{description}</div>}
       </label>
-      <input type="checkbox" id={key} />
+      <input type="checkbox" id={key} checked={value} onChange={toggleSetting} />
     </li>
   );
 }
@@ -40,7 +59,7 @@ function Support() {
   );
 }
 
-export default function SettingsBody({ selectedSetting }: SettingsBodyProps) {
+export default function SettingsBody({ selectedSetting, userSettings }: SettingsBodyProps) {
   const { title, items } = selectedSetting;
 
   if (title == "Support") {
@@ -57,7 +76,7 @@ export default function SettingsBody({ selectedSetting }: SettingsBodyProps) {
       <h1>{title}</h1>
       <ul>
         {items.map((item, index) => (
-          <SettingsBodyItem {...{ item }} key={index} />
+          <SettingsBodyItem {...{ item, userSettings }} key={index} />
         ))}
       </ul>
     </main>

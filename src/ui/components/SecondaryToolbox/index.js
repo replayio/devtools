@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
-
+import hooks from "ui/hooks";
 import Video from "../Video";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
@@ -12,6 +12,10 @@ import { selectors } from "../../reducers";
 import { actions } from "../../actions";
 
 function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
+  const {
+    userSettings: { show_elements },
+  } = hooks.useGetUserSettings();
+
   const onClick = panel => {
     setSelectedPanel(panel);
 
@@ -31,14 +35,16 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
       >
         <div className="label">Console</div>
       </button>
-      <button
-        className={classnames("inspector-panel-button", {
-          expanded: selectedPanel === "inspector",
-        })}
-        onClick={() => onClick("inspector")}
-      >
-        <div className="label">Elements</div>
-      </button>
+      {show_elements && (
+        <button
+          className={classnames("inspector-panel-button", {
+            expanded: selectedPanel === "inspector",
+          })}
+          onClick={() => onClick("inspector")}
+        >
+          <div className="label">Elements</div>
+        </button>
+      )}
       {narrowMode ? (
         <button
           className={classnames("viewer-panel-button", { expanded: selectedPanel === "viewer" })}
@@ -70,6 +76,10 @@ function InspectorPanel() {
 }
 
 function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
+  const {
+    userSettings: { show_elements },
+  } = hooks.useGetUserSettings();
+
   return (
     <div className="secondary-toolbox">
       <header className="secondary-toolbox-header">
@@ -81,7 +91,7 @@ function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
       </header>
       <div className="secondary-toolbox-content">
         {selectedPanel == "console" ? <ConsolePanel /> : null}
-        {selectedPanel == "inspector" ? <InspectorPanel /> : null}
+        {selectedPanel == "inspector" && show_elements ? <InspectorPanel /> : null}
         {selectedPanel == "viewer" && narrowMode ? <Video /> : null}
       </div>
     </div>

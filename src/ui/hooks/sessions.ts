@@ -71,7 +71,7 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
 }
 
 export function useGetRecording(recordingId: RecordingId) {
-  const { data, error, loading: queryIsLoading } = useQuery(
+  const { data, error, loading } = useQuery(
     gql`
       query GetRecording($recordingId: uuid!) {
         recordings(where: { id: { _eq: $recordingId } }) {
@@ -93,7 +93,7 @@ export function useGetRecording(recordingId: RecordingId) {
     console.error("Apollo error while getting the recording", error);
   }
 
-  return { data, queryIsLoading };
+  return { data, loading };
 }
 
 export function useAddSessionUser() {

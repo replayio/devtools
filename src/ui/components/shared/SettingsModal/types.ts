@@ -9,7 +9,13 @@ export interface Setting {
 
 export interface SettingItem {
   label: string;
-  key: string;
+  key: SettingItemKey;
   description: string | null;
   disabled: boolean;
+}
+
+export type SettingItemKey = "show_elements";
+
+export interface UserSettings {
+  [key: string]: boolean;
 }

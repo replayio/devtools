@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import useToken from "ui/utils/useToken";
-
-import Header from "./Header/index";
-import SkeletonLoader from "./SkeletonLoader";
-import NonDevView from "./Views/NonDevView";
-import DevView from "./Views/DevView";
 import hooks from "../hooks";
-import { prefs } from "ui/utils/prefs";
+
+const Header = require("./Header/index").default;
+const SkeletonLoader = require("./SkeletonLoader").default;
+const NonDevView = require("./Views/NonDevView").default;
+const DevView = require("./Views/DevView").default;
+const { prefs } = require("ui/utils/prefs");
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
+import { UIState } from "ui/state";
+import { UploadInfo } from "ui/state/app";
+import { RecordingId } from "@recordreplay/protocol";
 
-function getUploadingMessage(uploading) {
+type DevToolsProps = PropsFromRedux & {
+  recordingId: RecordingId;
+};
+
+function getUploadingMessage(uploading: UploadInfo) {
   if (!uploading) {
     return "";
   }
@@ -25,7 +32,7 @@ function getUploadingMessage(uploading) {
   return `Waiting for upload… ${amount} MB`;
 }
 
-function getIsAuthorized({ data }) {
+function getIsAuthorized({ data }: any) {
   const test = new URL(window.location.href).searchParams.get("test");
 
   // Ideally, test recordings should be inserted into Hasura. However, test recordings are currently
@@ -50,12 +57,15 @@ function DevTools({
   selectedPanel,
   sessionId,
   viewMode,
-}) {
+}: DevToolsProps) {
   const [finishedLoading, setFinishedLoading] = useState(false);
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
+
   const AddSessionUser = hooks.useAddSessionUser();
-  const { data, queryIsLoading } = hooks.useGetRecording(recordingId);
+  const { data, loading: recordingQueryLoading } = hooks.useGetRecording(recordingId);
+  const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
+  const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -79,7 +89,7 @@ function DevTools({
     }
   }, [data]);
 
-  if (queryIsLoading || !data) {
+  if (queriesAreLoading || !data) {
     return <SkeletonLoader content={"Fetching the recording information."} />;
   } else if (recordingDuration === null) {
     return <SkeletonLoader content={"Fetching the recording description."} />;
@@ -125,13 +135,12 @@ function DevTools({
   );
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
     recordingDuration: selectors.getRecordingDuration(state),
     sessionId: selectors.getSessionId(state),
-    recordingId: selectors.getRecordingId(state),
     selectedPanel: selectors.getSelectedPanel(state),
     viewMode: selectors.getViewMode(state),
     narrowMode: selectors.getNarrowMode(state),
@@ -140,4 +149,6 @@ export default connect(
     updateTimelineDimensions: actions.updateTimelineDimensions,
     setExpectedError: actions.setExpectedError,
   }
-)(DevTools);
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(DevTools);
