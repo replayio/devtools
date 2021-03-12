@@ -59,7 +59,7 @@ class Marker extends React.Component<MarkerProps> {
 
   onMouseLeave: MouseEventHandler = (e: any) => {
     if (!inBreakpointPanel(e)) {
-      this.props.setHoveredItem(null);
+      this.props.clearHoveredItem();
     }
   };
 
@@ -113,6 +113,7 @@ class Marker extends React.Component<MarkerProps> {
 const connector = connect(null, {
   setHoveredItem: actions.setHoveredItem,
   seek: actions.seek,
+  clearHoveredItem: actions.clearHoveredItem,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

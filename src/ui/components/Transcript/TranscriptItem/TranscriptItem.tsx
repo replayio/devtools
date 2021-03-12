@@ -28,6 +28,7 @@ function TranscriptItem({
   clearPendingComment,
   seek,
   setHoveredItem,
+  clearHoveredItem,
   children,
 }: TranscriptItemProps) {
   const itemNode = useRef<HTMLDivElement>(null);
@@ -52,7 +53,7 @@ function TranscriptItem({
     clearPendingComment();
   };
   const onMouseLeave = () => {
-    setHoveredItem(null);
+    clearHoveredItem();
   };
   const onMouseEnter = () => {
     const hoveredItem: HoveredItem = {
@@ -96,6 +97,7 @@ const connector = connect(
   }),
   {
     setHoveredItem: actions.setHoveredItem,
+    clearHoveredItem: actions.clearHoveredItem,
     seek: actions.seek,
     clearPendingComment: actions.clearPendingComment,
   }
