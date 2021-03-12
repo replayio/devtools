@@ -65,8 +65,8 @@ function CommentThread({
             {comment && <CommentItem {...{ comment, hoveredComment, isRoot: true }} />}
             {comment &&
               "replies" in comment &&
-              comment.replies.map((reply, i) => (
-                <CommentItem comment={reply} key={i} isRoot={false} />
+              comment.replies.map(reply => (
+                <CommentItem comment={reply} key={reply.id} isRoot={false} />
               ))}
             {pendingComment &&
             pendingComment.comment.time == time &&
