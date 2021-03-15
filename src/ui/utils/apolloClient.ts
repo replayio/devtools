@@ -33,9 +33,13 @@ export function createApolloClient(token: string | undefined, recordingId: strin
 }
 
 function createHttpLink(token: string | undefined, recordingId: string | undefined) {
-  const headers = token
-    ? { Authorization: `Bearer ${token}` }
-    : { "x-hasura-recording-id": recordingId };
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  if (recordingId) {
+    headers["x-hasura-recording-id"] = recordingId;
+  }
 
   return new HttpLink({
     uri: "https://graphql.replay.io/v1/graphql",
