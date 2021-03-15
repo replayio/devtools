@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import Markdown from "react-markdown";
-import emoji from "remark-emoji";
+const emoji = require("remark-emoji");
 import {
   Comment,
   PendingEditComment,
