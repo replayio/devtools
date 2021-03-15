@@ -412,7 +412,7 @@ async function getScreenshotDimensions(screen: ScreenShot) {
 export async function getFirstMeaningfulPaint(limit: number = 10) {
   await paintPointsWaiter;
   for (const paintPoint of gPaintPoints.slice(0, limit)) {
-    const { screen } = await getGraphicsAtTime(paintPoint.time, false);
+    const { screen } = await getGraphicsAtTime(paintPoint.time, true);
     if (!screen) {
       continue;
     }
