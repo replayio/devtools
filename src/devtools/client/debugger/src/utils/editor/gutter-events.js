@@ -16,15 +16,8 @@ function safeJsonParse(text) {
 }
 
 function getLineNumberNode(target) {
-  const isBreakpointMarkerNode = target.closest(".new-breakpoint");
-
-  // If hovered on a breakpoint marker, get the corresponding linenumber element.
-  if (isBreakpointMarkerNode) {
-    const gutterNode = target.closest(".Codemirror-gutter-elt");
-    target = gutterNode?.previousElementSibling;
-  }
-
-  return target;
+  const wrapper = target.closest(".CodeMirror-gutter-wrapper");
+  return wrapper.querySelector(".CodeMirror-linenumber");
 }
 
 function isValidTarget(target) {
@@ -34,15 +27,10 @@ function isValidTarget(target) {
     return false;
   }
 
-  const isBreakpointMarkerNode = target.closest(".new-breakpoint");
-  const isLineNumberNode = target.closest(".CodeMirror-linenumber");
   const isNonBreakableLineNode = target.closest(".empty-line");
+  const isTooltip = target.closest(".static-tooltip");
 
-  if (isNonBreakableLineNode) {
-    return false;
-  }
-
-  return isBreakpointMarkerNode || isLineNumberNode;
+  return !isNonBreakableLineNode && !isTooltip;
 }
 
 export function onGutterMouseOver(codeMirror) {
