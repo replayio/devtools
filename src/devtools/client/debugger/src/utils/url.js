@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { memoize } from "lodash";
+import memoize from "lodash/memoize";
 import { URL } from "whatwg-url";
 
 const defaultUrl = {

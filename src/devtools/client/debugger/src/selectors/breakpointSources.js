@@ -4,7 +4,8 @@
 
 //
 
-import { sortBy, uniq } from "lodash";
+import sortBy from "lodash/sortBy";
+import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
 import {
   getSources,

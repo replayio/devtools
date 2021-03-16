@@ -5,7 +5,7 @@
 //
 
 import { createSelector } from "reselect";
-import { uniqBy } from "lodash";
+import uniqBy from "lodash/uniqBy";
 
 import { getBreakpointsList, getRequestedBreakpointsList } from "./breakpoints";
 import { getSelectedSource } from "../reducers/sources";

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import classnames from "classnames";
 import Recording from "./RecordingItem/index";
-import { sortBy } from "lodash";
+import sortBy from "lodash/sortBy";
 
 export default function DashboardViewerContent({
   recordings,

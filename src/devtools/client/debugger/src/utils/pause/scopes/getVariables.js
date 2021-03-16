@@ -5,8 +5,6 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { toPairs } from "lodash";
-
 // VarAndBindingsPair actually is [name: string, contents: BindingContents]
 
 // Scope's bindings field which holds variables and arguments

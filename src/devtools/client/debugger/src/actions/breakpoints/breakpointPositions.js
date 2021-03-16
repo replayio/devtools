@@ -4,7 +4,7 @@
 
 //
 
-import { uniqBy, zip } from "lodash";
+import uniqBy from "lodash/uniqBy";
 
 import {
   getSource,

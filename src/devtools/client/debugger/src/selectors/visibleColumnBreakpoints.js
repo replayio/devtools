@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 //
 
-import { groupBy } from "lodash";
+import groupBy from "lodash/groupBy";
 import { createSelector } from "reselect";
 
 import {

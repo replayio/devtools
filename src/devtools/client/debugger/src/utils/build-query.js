@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { escapeRegExp } from "lodash";
+import escapeRegExp from "lodash/escapeRegExp";
 
 /**
  * Ignore doing outline matches for less than 3 whitespaces

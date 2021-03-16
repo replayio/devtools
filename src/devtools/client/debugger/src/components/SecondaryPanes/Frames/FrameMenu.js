@@ -5,7 +5,7 @@
 //
 import { showMenu } from "devtools-contextmenu";
 import { copyToTheClipboard } from "../../../utils/clipboard";
-import { kebabCase } from "lodash";
+import kebabCase from "lodash/kebabCase";
 
 const blackboxString = "blackboxContextItem.blackbox";
 const unblackboxString = "blackboxContextItem.unblackbox";

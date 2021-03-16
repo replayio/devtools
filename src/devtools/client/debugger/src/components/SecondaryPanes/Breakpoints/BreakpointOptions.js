@@ -2,7 +2,7 @@ import React from "react";
 import actions from "../../../actions";
 import { getContext } from "../../../selectors";
 import { connect } from "../../../utils/connect";
-import { memoize } from "lodash";
+import memoize from "lodash/memoize";
 
 const highlightText = memoize(
   (text = "", editor) => {

@@ -4,7 +4,8 @@
 
 //
 
-import { fromPairs, toPairs } from "lodash";
+import fromPairs from "lodash/fromPairs";
+import toPairs from "lodash/toPairs";
 import { executeSoon } from "../../../utils/DevToolsUtils";
 
 import { pending, rejected, fulfilled } from "../../../utils/async-value";

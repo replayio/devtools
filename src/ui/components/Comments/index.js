@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import hooks from "ui/hooks";
 import CommentMarker from "./CommentMarker";
 import { selectors } from "../../reducers";
-import { sortBy } from "lodash";
+import sortBy from "lodash/sortBy";
 
 import "./Comments.css";
 

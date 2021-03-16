@@ -4,7 +4,8 @@
 
 //
 import { Component } from "react";
-import { range, isEmpty } from "lodash";
+import range from "lodash/range";
+import isEmpty from "lodash/isEmpty";
 import { connect } from "../../utils/connect";
 import { getHighlightedLineRange } from "../../selectors";
 

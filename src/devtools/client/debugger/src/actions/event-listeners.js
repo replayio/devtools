@@ -4,7 +4,8 @@
 
 //
 
-import { uniq, remove } from "lodash";
+import uniq from "lodash/uniq";
+import remove from "lodash/remove";
 
 const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
 import { getActiveEventListeners, getEventListenerExpanded } from "../selectors";

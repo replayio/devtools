@@ -9,7 +9,6 @@
  * @module reducers/threads
  */
 
-import { sortBy } from "lodash";
 import { createSelector } from "reselect";
 
 import { features } from "../utils/prefs";

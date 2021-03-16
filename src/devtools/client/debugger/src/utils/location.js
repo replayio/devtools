@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { sortBy } from "lodash";
+import sortBy from "lodash/sortBy";
 
 export function comparePosition(a, b) {
   return a && b && a.line == b.line && a.column == b.column;

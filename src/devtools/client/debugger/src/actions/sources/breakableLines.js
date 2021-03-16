@@ -6,7 +6,6 @@
 
 import { getSourceActorsForSource, getBreakableLines } from "../../selectors";
 import { setBreakpointPositions } from "../breakpoints/breakpointPositions";
-import { union } from "lodash";
 import { loadSourceActorBreakableLines } from "../source-actors";
 
 function calculateBreakableLines(positions) {

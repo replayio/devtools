@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { sortBy } from "lodash";
+import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
 
 import TranscriptFilter from "ui/components/Transcript/TranscriptFilter";

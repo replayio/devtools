@@ -5,7 +5,7 @@
 //
 
 import { getTokenLocation } from ".";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
 
 function isValidToken(target) {
   if (!target || !target.innerText) {
