@@ -66,7 +66,7 @@ export function toEditorLine(lineOrOffset) {
   return lineOrOffset ? lineOrOffset - 1 : 1;
 }
 
-export function fromEditorLine(sourceId, line) {
+export function fromEditorLine(line) {
   return line + 1;
 }
 
@@ -186,7 +186,7 @@ export function getSourceLocationFromMouseEvent({ codeMirror }, source, e) {
 
   return {
     sourceId,
-    line: fromEditorLine(sourceId, line),
+    line: fromEditorLine(line),
     column: ch + 1,
   };
 }
