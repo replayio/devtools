@@ -9,7 +9,6 @@ const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").de
 
 export interface MarkupProps {
   onSelectNode: (nodeId: string) => void;
-  onShowEventTooltip: (nodeId: string, element: EventTarget) => void;
   onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
   onMouseEnterNode: (nodeId: string) => void;
   onMouseLeaveNode: (nodeId: string) => void;

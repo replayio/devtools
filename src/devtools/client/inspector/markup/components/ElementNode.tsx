@@ -4,7 +4,6 @@ import { Attr } from "@recordreplay/protocol";
 
 import NodeAttribute from "./NodeAttribute";
 import TextNode from "./TextNode";
-import { assert } from "protocol/utils";
 
 const { HTML_VOID_ELEMENTS } = require("../constants");
 
@@ -28,7 +27,6 @@ const DISPLAY_TYPES: { [key: string]: string | undefined } = {
 
 interface ElementNodeProps {
   node: NodeInfo;
-  onShowEventTooltip: (nodeId: string, element: EventTarget) => void;
   onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
 }
 
@@ -36,13 +34,7 @@ class ElementNode extends PureComponent<ElementNodeProps> {
   constructor(props: ElementNodeProps) {
     super(props);
 
-    this.onEventBadgeClick = this.onEventBadgeClick.bind(this);
     this.onExpandBadgeClick = this.onExpandBadgeClick.bind(this);
-  }
-
-  onEventBadgeClick(event: MouseEvent) {
-    event.stopPropagation();
-    this.props.onShowEventTooltip(this.props.node.id, event.target);
   }
 
   onExpandBadgeClick(event: MouseEvent) {

@@ -1,6 +1,5 @@
 const { ThreadFront } = require("protocol/thread");
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
-const { setEventTooltip } = require("devtools/client/shared/widgets/tooltip/EventTooltipHelper");
 const Highlighter = require("highlighter/highlighter.js");
 const { selectors } = require("ui/reducers");
 
@@ -23,7 +22,6 @@ class MarkupView {
     this.hoveredNodeId = undefined;
 
     this.onSelectNode = this.onSelectNode.bind(this);
-    this.onShowEventTooltip = this.onShowEventTooltip.bind(this);
     this.onToggleNodeExpanded = this.onToggleNodeExpanded.bind(this);
     this.onMouseEnterNode = this.onMouseEnterNode.bind(this);
     this.onMouseLeaveNode = this.onMouseLeaveNode.bind(this);
@@ -66,7 +64,6 @@ class MarkupView {
   getMarkupProps() {
     return {
       onSelectNode: this.onSelectNode,
-      onShowEventTooltip: this.onShowEventTooltip,
       onToggleNodeExpanded: this.onToggleNodeExpanded,
       onMouseEnterNode: this.onMouseEnterNode,
       onMouseLeaveNode: this.onMouseLeaveNode,
@@ -170,56 +167,6 @@ class MarkupView {
     this.selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId), {
       reason: "markup",
     });
-  }
-
-  /**
-   * Shows the event tooltip for the given node.
-   *
-   * @param  {String} nodeId
-   *         The NodeFront object id to show the event tooltip.
-   * @param  {DOMNode} target
-   *         The anchor element for the tooltip.
-   */
-  async onShowEventTooltip(nodeId, target) {
-    const nodeFront = ThreadFront.currentPause.getNodeFront(nodeId);
-    const listenerRaw = nodeFront.getEventListeners() || [];
-    const frameworkListeners = await nodeFront.getFrameworkEventListeners();
-
-    const listenerInfo = [...listenerRaw, ...frameworkListeners].map(listener => {
-      const { handler, type, capture, tags = "" } = listener;
-      const location = handler.functionLocation();
-      const url = handler.functionLocationURL();
-      let origin, line, column;
-
-      if (location && url) {
-        line = location.line;
-        column = location.column;
-        origin = `${url}:${line}:${column}`;
-      } else {
-        // We end up here for DOM0 handlers...
-        origin = "[native code]";
-      }
-
-      return {
-        capturing: capture,
-        DOM0: false,
-        type,
-        origin,
-        url,
-        line,
-        column,
-        tags,
-        handler,
-        sourceId: url ? location.sourceId : undefined,
-        native: !url,
-        hide: {
-          debugger: !url,
-        },
-      };
-    });
-
-    setEventTooltip(this.eventTooltip, listenerInfo, this.toolbox);
-    this.eventTooltip.show(target);
   }
 
   /**
