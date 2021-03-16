@@ -9,7 +9,6 @@ import {
   toEditorLine,
   toEditorPosition,
   toEditorRange,
-  toSourceLine,
   scrollToColumn,
   markText,
   lineAtHeight,
@@ -78,14 +77,6 @@ describe("toEditorRange", () => {
       start: { line: 99, column: 25 },
       end: { line: 199, column: 0 },
     });
-  });
-});
-
-describe("toSourceLine", () => {
-  it("returns a source line", () => {
-    const testId = "test-123";
-    const line = 30;
-    expect(toSourceLine(testId, line)).toEqual(31);
   });
 });
 

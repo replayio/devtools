@@ -85,10 +85,6 @@ export function toEditorRange(sourceId, location) {
   };
 }
 
-export function toSourceLine(sourceId, line) {
-  return line + 1;
-}
-
 export function scrollToColumn(codeMirror, line, column) {
   const { top, left } = codeMirror.charCoords({ line, ch: column }, "local");
 
@@ -173,8 +169,8 @@ export function markText({ codeMirror }, className, { start, end }) {
 }
 
 export function lineAtHeight({ codeMirror }, sourceId, event) {
-  const _editorLine = codeMirror.lineAtHeight(event.clientY);
-  return toSourceLine(sourceId, _editorLine);
+  const editorLine = codeMirror.lineAtHeight(event.clientY);
+  return fromEditorLine(editorLine);
 }
 
 export function getSourceLocationFromMouseEvent({ codeMirror }, source, e) {

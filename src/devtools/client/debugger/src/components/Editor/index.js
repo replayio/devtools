@@ -38,7 +38,7 @@ import {
   clearEditor,
   getCursorLine,
   lineAtHeight,
-  toSourceLine,
+  fromEditorLine,
   getDocument,
   scrollToColumn,
   toEditorPosition,
@@ -173,7 +173,7 @@ class Editor extends PureComponent {
     }
 
     const line = getCursorLine(codeMirror);
-    return toSourceLine(selectedSource.id, line);
+    return fromEditorLine(line);
   }
 
   onToggleBreakpoint = (key, e) => {
@@ -276,10 +276,10 @@ class Editor extends PureComponent {
       toggleBlackBox(cx, selectedSource);
     }
 
-    const sourceLine = toSourceLine(selectedSource.id, line);
-    if (typeof sourceLine !== "number") {
+    if (typeof line !== "number") {
       return;
     }
+    const sourceLine = fromEditorLine(line);
 
     // Don't add a breakpoint if the user clicked on something other than the gutter line number,
     // e.g., the blank gutter space caused by adding a CodeMirror widget.
