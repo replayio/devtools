@@ -4,7 +4,7 @@
 
 //
 
-import { escapeRegExp } from "lodash";
+import escapeRegExp from "lodash/escapeRegExp";
 import buildQuery from "../build-query";
 
 describe("build-query", () => {

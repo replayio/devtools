@@ -3,7 +3,8 @@
 
 const { ThreadFront } = require("protocol/thread");
 const { assert, waitForTime } = require("protocol/utils");
-const { mapValues, isEqual } = require("lodash");
+const mapValues = require("lodash/mapValues");
+const isEqual = require("lodash/isEqual");
 
 const dbg = gToolbox.getPanel("debugger").getVarsForTests();
 

@@ -10,7 +10,7 @@ import { bindActionCreators } from "redux";
 import ReactDOM from "react-dom";
 import { connect } from "../../utils/connect";
 import classnames from "classnames";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 
 import { isFirefox } from "ui/utils/environment";
 import { getIndentation } from "../../utils/indentation";

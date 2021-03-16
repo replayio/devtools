@@ -7,7 +7,7 @@
 import { getSources, getSelectedSource, getSourceInSources } from "../reducers/sources";
 import { getFrames } from "../reducers/pause";
 import { annotateFrames } from "../utils/pause/frames";
-import { get } from "lodash";
+import get from "lodash/get";
 import { createSelector } from "reselect";
 
 function getLocation(frame) {

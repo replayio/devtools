@@ -26,7 +26,8 @@ import {
 import OutlineFilter from "./OutlineFilter";
 import "./Outline.css";
 import PreviewFunction from "../shared/PreviewFunction";
-import { uniq, sortBy } from "lodash";
+import uniq from "lodash/uniq";
+import sortBy from "lodash/sortBy";
 
 /**
  * Check whether the name argument matches the fuzzy filter argument

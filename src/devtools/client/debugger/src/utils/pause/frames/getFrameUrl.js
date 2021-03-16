@@ -4,7 +4,7 @@
 
 //
 
-import { get } from "lodash";
+import get from "lodash/get";
 
 export function getFrameUrl(frame) {
   return get(frame, "source.url", "") || "";

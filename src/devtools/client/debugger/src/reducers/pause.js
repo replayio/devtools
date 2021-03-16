@@ -12,7 +12,8 @@
 
 import { prefs } from "../utils/prefs";
 import { getSelectedFrame, getFramePositions } from "../selectors/pause";
-import { findLast, find } from "lodash";
+import find from "lodash/find";
+import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
 
 function createPauseState() {

@@ -33,7 +33,7 @@ import {
   getSourceActors,
   getBreakableLinesForSourceActors,
 } from "./source-actors";
-import { uniq } from "lodash";
+import uniq from "lodash/uniq";
 
 export function initialSourcesState() {
   return {

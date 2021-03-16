@@ -1,6 +1,7 @@
 import React from "react";
 import classnames from "classnames";
-import { findLast, find } from "lodash";
+import findLast from "lodash/findLast";
+import find from "lodash/find";
 import { compareNumericStrings } from "protocol/utils";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";

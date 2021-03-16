@@ -4,7 +4,8 @@
 
 //
 
-import { get, findIndex } from "lodash";
+import get from "lodash/get";
+import findIndex from "lodash/findIndex";
 
 // eslint-disable-next-line max-len
 import { getFrameUrl } from "./getFrameUrl";

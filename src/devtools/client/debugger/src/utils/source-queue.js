@@ -4,7 +4,7 @@
 
 //
 
-import { throttle } from "lodash";
+import throttle from "lodash/throttle";
 
 let newQueuedSources;
 let queuedSources;

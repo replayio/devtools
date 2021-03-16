@@ -2,11 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { isEqual } from "lodash";
 import { getBreakpoint, getSource, getSourceActorsForSource } from "../../selectors";
 import assert from "../assert";
 import { features } from "../prefs";
-import { sortBy } from "lodash";
+import sortBy from "lodash/sortBy";
 
 export * from "./astBreakpointLocation";
 export * from "./breakpointPositions";

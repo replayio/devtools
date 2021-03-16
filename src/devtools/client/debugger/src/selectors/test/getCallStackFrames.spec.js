@@ -5,7 +5,7 @@
 //
 
 import { getCallStackFrames } from "../getCallStackFrames";
-import { pullAt } from "lodash";
+import pullAt from "lodash/pullAt";
 import { insertResources, createInitial } from "../../utils/resource";
 
 describe("getCallStackFrames selector", () => {

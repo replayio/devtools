@@ -4,7 +4,7 @@
 
 //
 
-import { zip } from "lodash";
+import zip from "lodash/zip";
 
 export function getAsyncTimes(name) {
   return zip(

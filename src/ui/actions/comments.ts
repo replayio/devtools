@@ -4,7 +4,7 @@ import { actions } from "ui/actions";
 import { PendingComment, Event, Comment, Reply, FloatingItem } from "ui/state/comments";
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetCommentPointer = Action<"set_comment_pointer"> & { value: boolean };

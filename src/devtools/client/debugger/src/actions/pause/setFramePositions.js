@@ -5,7 +5,7 @@
 //
 
 import { getSourceByActorId, getSelectedFrame } from "../../selectors";
-import { zip } from "lodash";
+import zip from "lodash/zip";
 
 const { ThreadFront } = require("protocol/thread");
 

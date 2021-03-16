@@ -7,7 +7,7 @@ import React, { Component } from "react";
 import { connect } from "../utils/connect";
 import fuzzyAldrin from "fuzzaldrin-plus";
 import { basename } from "../utils/path";
-import { throttle } from "lodash";
+import throttle from "lodash/throttle";
 import { createSelector } from "reselect";
 import actions from "../actions";
 import {
