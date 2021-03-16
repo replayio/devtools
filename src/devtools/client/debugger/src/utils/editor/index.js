@@ -168,7 +168,7 @@ export function markText({ codeMirror }, className, { start, end }) {
   );
 }
 
-export function lineAtHeight({ codeMirror }, sourceId, event) {
+export function lineAtHeight({ codeMirror }, event) {
   const editorLine = codeMirror.lineAtHeight(event.clientY);
   return fromEditorLine(editorLine);
 }

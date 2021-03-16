@@ -236,8 +236,7 @@ class Editor extends PureComponent {
     }
 
     const target = event.target;
-    const { id: sourceId } = selectedSource;
-    const line = lineAtHeight(editor, sourceId, event);
+    const line = lineAtHeight(editor, event);
 
     if (typeof line != "number") {
       return;
