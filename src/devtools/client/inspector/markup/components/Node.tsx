@@ -23,7 +23,6 @@ import EventTooltip from "./EventTooltip";
 interface NodeProps {
   nodeId: string;
   onSelectNode: (nodeId: string) => void;
-  onShowEventTooltip: (nodeId: string, element: EventTarget) => void;
   onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
   onMouseEnterNode: (nodeId: string) => void;
   onMouseLeaveNode: (nodeId: string) => void;
@@ -89,7 +88,6 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
             key={nodeId}
             nodeId={nodeId}
             onSelectNode={this.props.onSelectNode}
-            onShowEventTooltip={this.props.onShowEventTooltip}
             onToggleNodeExpanded={this.props.onToggleNodeExpanded}
             onMouseEnterNode={this.props.onMouseEnterNode}
             onMouseLeaveNode={this.props.onMouseLeaveNode}
@@ -125,17 +123,11 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
   }
 
   renderComponent() {
-    const { node, onShowEventTooltip, onToggleNodeExpanded } = this.props;
+    const { node, onToggleNodeExpanded } = this.props;
 
     let component = null;
     if (node.type === ELEMENT_NODE) {
-      component = (
-        <ElementNode
-          node={node}
-          onShowEventTooltip={onShowEventTooltip}
-          onToggleNodeExpanded={onToggleNodeExpanded}
-        />
-      );
+      component = <ElementNode node={node} onToggleNodeExpanded={onToggleNodeExpanded} />;
     } else if (node.type === COMMENT_NODE || node.type === TEXT_NODE) {
       component = <TextNode type={node.type} value={node.value} />;
     } else {

@@ -41,7 +41,6 @@ function Nodes(props: MarkupProps & PropsFromRedux) {
           key={nodeId}
           nodeId={nodeId}
           onSelectNode={props.onSelectNode}
-          onShowEventTooltip={props.onShowEventTooltip}
           onToggleNodeExpanded={props.onToggleNodeExpanded}
           onMouseEnterNode={props.onMouseEnterNode}
           onMouseLeaveNode={props.onMouseLeaveNode}
