@@ -70,19 +70,30 @@ export function fromEditorLine(line) {
   return line + 1;
 }
 
-export function toEditorPosition(location) {
-  return {
-    line: toEditorLine(location.line),
-    column: !location.column ? 0 : location.column,
-  };
+export function toEditorColumn(lineText, column) {
+  let pointOffset = 0;
+  let unitOffset = 0;
+  for (const c of lineText) {
+    if (pointOffset >= column) {
+      break;
+    }
+    pointOffset += 1;
+    unitOffset += c.length;
+  }
+  return unitOffset;
 }
 
-export function toEditorRange(sourceId, location) {
-  const { start, end } = location;
-  return {
-    start: toEditorPosition({ ...start, sourceId }),
-    end: toEditorPosition({ ...end, sourceId }),
-  };
+export function fromEditorColumn(lineText, column) {
+  let pointOffset = 0;
+  let unitOffset = 0;
+  for (const c of lineText) {
+    if (unitOffset >= column) {
+      break;
+    }
+    pointOffset += 1;
+    unitOffset += c.length;
+  }
+  return pointOffset;
 }
 
 export function scrollToColumn(codeMirror, line, column) {
@@ -180,10 +191,12 @@ export function getSourceLocationFromMouseEvent({ codeMirror }, source, e) {
   });
   const sourceId = source.id;
 
+  const lineText = codeMirror.doc.getLine(line);
+
   return {
     sourceId,
     line: fromEditorLine(line),
-    column: ch + 1,
+    column: fromEditorColumn(lineText, ch),
   };
 }
 
@@ -218,7 +231,7 @@ export function getCursorColumn(codeMirror) {
 export function getTokenEnd(codeMirror, line, column) {
   const token = codeMirror.getTokenAt({
     line,
-    ch: column + 1,
+    ch: column,
   });
   const tokenString = token.string;
 

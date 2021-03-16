@@ -41,7 +41,8 @@ import {
   fromEditorLine,
   getDocument,
   scrollToColumn,
-  toEditorPosition,
+  toEditorLine,
+  toEditorColumn,
   getSourceLocationFromMouseEvent,
   hasDocument,
   onTokenMouseOver,
@@ -331,11 +332,13 @@ class Editor extends PureComponent {
     const { selectedLocation, selectedSource } = nextProps;
 
     if (selectedLocation && this.shouldScrollToLocation(nextProps, editor)) {
-      let { line, column } = toEditorPosition(selectedLocation);
+      const line = toEditorLine(selectedLocation.line);
+      let column;
 
       if (selectedSource && hasDocument(selectedSource.id)) {
         const doc = getDocument(selectedSource.id);
         const lineText = doc.getLine(line);
+        column = toEditorColumn(lineText, selectedLocation.column);
         column = Math.max(column, getIndentation(lineText));
       }
 
