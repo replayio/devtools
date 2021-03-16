@@ -86,7 +86,7 @@ export class DebugLine extends PureComponent {
       this.debugExpression.clear();
     }
 
-    const { line } = toEditorPosition(location);
+    const line = toEditorLine(location.line);
     const doc = getDocument(location.sourceId);
     const { lineClass } = this.getTextClasses(why);
     doc.removeLineClass(line, "line", lineClass);

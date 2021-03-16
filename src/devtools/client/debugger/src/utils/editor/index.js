@@ -62,7 +62,7 @@ export function traverseResults(e, ctx, query, dir, modifiers) {
   }
 }
 
-export function toEditorLine(sourceId, lineOrOffset) {
+export function toEditorLine(lineOrOffset) {
   return lineOrOffset ? lineOrOffset - 1 : 1;
 }
 
@@ -72,7 +72,7 @@ export function fromEditorLine(sourceId, line) {
 
 export function toEditorPosition(location) {
   return {
-    line: toEditorLine(location.sourceId, location.line),
+    line: toEditorLine(location.line),
     column: !location.column ? 0 : location.column,
   };
 }
