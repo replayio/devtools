@@ -15,7 +15,6 @@ import { prefs } from "ui/utils/prefs";
 import "./Header.css";
 
 import { gql, useQuery } from "@apollo/client";
-import moment from "moment";
 
 const GET_RECORDING_TITLE = gql`
   query RecordingTitle($id: uuid!) {

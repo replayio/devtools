@@ -3,7 +3,8 @@ import classnames from "classnames";
 import Title from "../../shared/Title";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import { AuthAvatar } from "ui/components/Avatar";
-import moment from "moment";
+import formatDate from "date-fns/format";
+import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import useToken from "ui/utils/useToken";
 import hooks from "ui/hooks";
 import "./RecordingListItem.css";
@@ -53,7 +54,7 @@ function ItemPrivacy({ isPrivate, toggleIsPrivate }) {
 }
 
 function ItemCreatedDate({ date }) {
-  return <div className="secondary">{moment(date).format("M/D/YYYY")}</div>;
+  return <div className="secondary">{formatDate(new Date(date), "M/d/yyyy")}</div>;
 }
 
 function ItemDuration({ duration }) {
@@ -88,7 +89,7 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle }) {
           </div>
         ) : null}
       </div>
-      <div>Created {moment(data.date).fromNow()}</div>
+      <div>Created {formatDistanceToNow(new Date(data.date), { addSuffix: true })}</div>
     </div>
   );
 }
