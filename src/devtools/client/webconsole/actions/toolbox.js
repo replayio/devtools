@@ -5,7 +5,7 @@
 "use strict";
 
 import { ThreadFront } from "protocol/thread";
-import { setHoveredItem } from "ui/actions/timeline";
+import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
 
 export function highlightDomElement(grip) {
   return async ({ toolbox }) => {
@@ -61,7 +61,7 @@ export function onMessageHover(type, message) {
       dispatch(setHoveredItem(hoveredItem));
     }
     if (type == "mouseleave") {
-      dispatch(setHoveredItem(null));
+      dispatch(clearHoveredItem);
     }
   };
 }

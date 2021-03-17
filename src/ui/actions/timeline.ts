@@ -19,6 +19,7 @@ import { TimelineState, Tooltip, ZoomRegion, HoveredItem } from "ui/state/timeli
 import { getFirstComment } from "ui/hooks/comments";
 import { getTest } from "ui/utils/environment";
 import { waitForTime } from "protocol/utils";
+const { features } = require("ui/utils/prefs");
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -393,12 +394,26 @@ export function goToPrevPaint(): UIThunkAction {
   };
 }
 
-export function setHoveredItem(hoveredItem: HoveredItem | null): UIThunkAction {
+export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
   return ({ dispatch, getState }) => {
+    const { target } = hoveredItem;
+
+    const hoverEnabledForTarget = features[`${target}Hover`];
+    if (!hoverEnabledForTarget) {
+      return;
+    }
+
     dispatch({ type: "set_hovered_item", hoveredItem });
 
     // Don't update the video if user is adding a new comment.
     const updateGraphics = !selectors.getPendingComment(getState());
     dispatch(setTimelineToTime(hoveredItem?.time || null, updateGraphics));
+  };
+}
+
+export function clearHoveredItem(): UIThunkAction {
+  return ({ dispatch }) => {
+    dispatch({ type: "set_hovered_item", hoveredItem: null });
+    dispatch(setTimelineToTime(null));
   };
 }

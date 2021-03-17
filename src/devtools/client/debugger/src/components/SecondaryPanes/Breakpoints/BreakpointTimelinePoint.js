@@ -36,6 +36,7 @@ function BreakpointTimelinePoint({
   seek,
   hoveredItem,
   setHoveredItem,
+  clearHoveredItem,
 }) {
   const onMouseEnter = () =>
     setHoveredItem({
@@ -47,7 +48,7 @@ function BreakpointTimelinePoint({
 
   const onMouseLeave = e => {
     if (!inBreakpointPanel(e)) {
-      setHoveredItem(null);
+      clearHoveredItem();
     }
   };
 
@@ -112,5 +113,6 @@ export default connect(
   {
     seek: actions.seek,
     setHoveredItem: actions.setHoveredItem,
+    clearHoveredItem: actions.clearHoveredItem,
   }
 )(MemoizedBreakpointTimelinePoint);
