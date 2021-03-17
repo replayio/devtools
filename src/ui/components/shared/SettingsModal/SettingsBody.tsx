@@ -49,7 +49,7 @@ function Support() {
         <div className="label">Join us on Discord</div>
         <div className="description">
           Come chat with us on our{" "}
-          <a href="https://discord.gg/Th7AwJsz" target="_blank" rel="noreferrer">
+          <a href="https://discord.gg/n2dTK6kcRX" target="_blank" rel="noreferrer">
             Discord server
           </a>
           . We’d love to hear your feedback!

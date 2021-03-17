@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect } from "react-redux";
 import { actions } from "ui/actions";
 
 import LoginButton from "ui/components/LoginButton";
@@ -7,7 +7,6 @@ import Dropdown from "ui/components/shared/Dropdown";
 import { isDeployPreview } from "ui/utils/environment";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./UserOptions.css";
-import { features } from "ui/utils/prefs";
 
 function UserOptions({ setModal }) {
   const [expanded, setExpanded] = useState(false);
@@ -47,12 +46,10 @@ function UserOptions({ setModal }) {
           <span className="material-icons">home</span>
           <span>Library</span>
         </button>
-        {features.settings && (
-          <button className="row" onClick={onSettingsClick}>
-            <span className="material-icons">settings</span>
-            <span>Settings</span>
-          </button>
-        )}
+        <button className="row" onClick={onSettingsClick}>
+          <span className="material-icons">settings</span>
+          <span>Settings</span>
+        </button>
         <LoginButton />
       </Dropdown>
     </div>
