@@ -121,15 +121,6 @@ function update(state = createPauseState(), action) {
       return { ...state, replayFramePositions: null };
     }
 
-    case "SET_FRAME_POSITIONS":
-      return {
-        ...state,
-        replayFramePositions: {
-          ...state.replayFramePositions,
-          [action.frame]: action.positions,
-        },
-      };
-
     case "BREAK_ON_NEXT":
       return { ...state, isWaitingOnBreak: true };
 

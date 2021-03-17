@@ -62,31 +62,38 @@ export function traverseResults(e, ctx, query, dir, modifiers) {
   }
 }
 
-export function toEditorLine(sourceId, lineOrOffset) {
+export function toEditorLine(lineOrOffset) {
   return lineOrOffset ? lineOrOffset - 1 : 1;
 }
 
-export function fromEditorLine(sourceId, line) {
+export function fromEditorLine(line) {
   return line + 1;
 }
 
-export function toEditorPosition(location) {
-  return {
-    line: toEditorLine(location.sourceId, location.line),
-    column: !location.column ? 0 : location.column,
-  };
+export function toEditorColumn(lineText, column) {
+  let pointOffset = 0;
+  let unitOffset = 0;
+  for (const c of lineText) {
+    if (pointOffset >= column) {
+      break;
+    }
+    pointOffset += 1;
+    unitOffset += c.length;
+  }
+  return unitOffset;
 }
 
-export function toEditorRange(sourceId, location) {
-  const { start, end } = location;
-  return {
-    start: toEditorPosition({ ...start, sourceId }),
-    end: toEditorPosition({ ...end, sourceId }),
-  };
-}
-
-export function toSourceLine(sourceId, line) {
-  return line + 1;
+export function fromEditorColumn(lineText, column) {
+  let pointOffset = 0;
+  let unitOffset = 0;
+  for (const c of lineText) {
+    if (unitOffset >= column) {
+      break;
+    }
+    pointOffset += 1;
+    unitOffset += c.length;
+  }
+  return pointOffset;
 }
 
 export function scrollToColumn(codeMirror, line, column) {
@@ -172,9 +179,9 @@ export function markText({ codeMirror }, className, { start, end }) {
   );
 }
 
-export function lineAtHeight({ codeMirror }, sourceId, event) {
-  const _editorLine = codeMirror.lineAtHeight(event.clientY);
-  return toSourceLine(sourceId, _editorLine);
+export function lineAtHeight({ codeMirror }, event) {
+  const editorLine = codeMirror.lineAtHeight(event.clientY);
+  return fromEditorLine(editorLine);
 }
 
 export function getSourceLocationFromMouseEvent({ codeMirror }, source, e) {
@@ -184,10 +191,12 @@ export function getSourceLocationFromMouseEvent({ codeMirror }, source, e) {
   });
   const sourceId = source.id;
 
+  const lineText = codeMirror.doc.getLine(line);
+
   return {
     sourceId,
-    line: fromEditorLine(sourceId, line),
-    column: ch + 1,
+    line: fromEditorLine(line),
+    column: fromEditorColumn(lineText, ch),
   };
 }
 
@@ -222,7 +231,7 @@ export function getCursorColumn(codeMirror) {
 export function getTokenEnd(codeMirror, line, column) {
   const token = codeMirror.getTokenAt({
     line,
-    ch: column + 1,
+    ch: column,
   });
   const tokenString = token.string;
 

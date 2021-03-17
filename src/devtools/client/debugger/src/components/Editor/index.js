@@ -38,10 +38,11 @@ import {
   clearEditor,
   getCursorLine,
   lineAtHeight,
-  toSourceLine,
+  fromEditorLine,
   getDocument,
   scrollToColumn,
-  toEditorPosition,
+  toEditorLine,
+  toEditorColumn,
   getSourceLocationFromMouseEvent,
   hasDocument,
   onTokenMouseOver,
@@ -173,7 +174,7 @@ class Editor extends PureComponent {
     }
 
     const line = getCursorLine(codeMirror);
-    return toSourceLine(selectedSource.id, line);
+    return fromEditorLine(line);
   }
 
   onToggleBreakpoint = (key, e) => {
@@ -236,8 +237,7 @@ class Editor extends PureComponent {
     }
 
     const target = event.target;
-    const { id: sourceId } = selectedSource;
-    const line = lineAtHeight(editor, sourceId, event);
+    const line = lineAtHeight(editor, event);
 
     if (typeof line != "number") {
       return;
@@ -276,10 +276,10 @@ class Editor extends PureComponent {
       toggleBlackBox(cx, selectedSource);
     }
 
-    const sourceLine = toSourceLine(selectedSource.id, line);
-    if (typeof sourceLine !== "number") {
+    if (typeof line !== "number") {
       return;
     }
+    const sourceLine = fromEditorLine(line);
 
     // Don't add a breakpoint if the user clicked on something other than the gutter line number,
     // e.g., the blank gutter space caused by adding a CodeMirror widget.
@@ -332,11 +332,13 @@ class Editor extends PureComponent {
     const { selectedLocation, selectedSource } = nextProps;
 
     if (selectedLocation && this.shouldScrollToLocation(nextProps, editor)) {
-      let { line, column } = toEditorPosition(selectedLocation);
+      const line = toEditorLine(selectedLocation.line);
+      let column;
 
       if (selectedSource && hasDocument(selectedSource.id)) {
         const doc = getDocument(selectedSource.id);
         const lineText = doc.getLine(line);
+        column = toEditorColumn(lineText, selectedLocation.column);
         column = Math.max(column, getIndentation(lineText));
       }
 

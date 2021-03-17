@@ -6,7 +6,7 @@
 
 import { connect } from "../../utils/connect";
 import { Component } from "react";
-import { getSelectedSource, getSelectedBreakableLines } from "../../selectors";
+import { getSelectedBreakableLines } from "../../selectors";
 import { fromEditorLine } from "../../utils/editor";
 
 class EmptyLines extends Component {
@@ -29,11 +29,11 @@ class EmptyLines extends Component {
   }
 
   disableEmptyLines() {
-    const { breakableLines, selectedSource, editor } = this.props;
+    const { breakableLines, editor } = this.props;
 
     editor.codeMirror.operation(() => {
       editor.codeMirror.eachLine(lineHandle => {
-        const line = fromEditorLine(selectedSource.id, editor.codeMirror.getLineNumber(lineHandle));
+        const line = fromEditorLine(editor.codeMirror.getLineNumber(lineHandle));
 
         if (breakableLines.has(line)) {
           editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
@@ -50,14 +50,9 @@ class EmptyLines extends Component {
 }
 
 const mapStateToProps = state => {
-  const selectedSource = getSelectedSource(state);
-  if (!selectedSource) {
-    throw new Error("no selectedSource");
-  }
   const breakableLines = getSelectedBreakableLines(state);
 
   return {
-    selectedSource,
     breakableLines,
   };
 };

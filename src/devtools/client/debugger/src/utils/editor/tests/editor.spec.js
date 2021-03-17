@@ -9,7 +9,6 @@ import {
   toEditorLine,
   toEditorPosition,
   toEditorRange,
-  toSourceLine,
   scrollToColumn,
   markText,
   lineAtHeight,
@@ -54,38 +53,6 @@ describe("toEditorLine", () => {
     const testId = "test-123";
     const line = 30;
     expect(toEditorLine(testId, line)).toEqual(29);
-  });
-});
-
-describe("toEditorPosition", () => {
-  it("returns an editor position", () => {
-    const loc = { sourceId: "source", line: 100, column: 25 };
-    expect(toEditorPosition(loc)).toEqual({
-      line: 99,
-      column: 25,
-    });
-  });
-});
-
-describe("toEditorRange", () => {
-  it("returns an editor range", () => {
-    const testId = "test-123";
-    const loc = {
-      start: { line: 100, column: 25 },
-      end: { line: 200, column: 0 },
-    };
-    expect(toEditorRange(testId, loc)).toEqual({
-      start: { line: 99, column: 25 },
-      end: { line: 199, column: 0 },
-    });
-  });
-});
-
-describe("toSourceLine", () => {
-  it("returns a source line", () => {
-    const testId = "test-123";
-    const line = 30;
-    expect(toSourceLine(testId, line)).toEqual(31);
   });
 });
 

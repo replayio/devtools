@@ -5,7 +5,8 @@
 //
 import { PureComponent } from "react";
 import {
-  toEditorPosition,
+  toEditorLine,
+  toEditorColumn,
   getDocument,
   hasDocument,
   startOperation,
@@ -55,11 +56,12 @@ export class DebugLine extends PureComponent {
     const { sourceId } = location;
     const doc = getDocument(sourceId);
 
-    let { line, column } = toEditorPosition(location);
+    const line = toEditorLine(location.line);
     let { markTextClass, lineClass } = this.getTextClasses(why);
     doc.addLineClass(line, "line", lineClass);
 
     const lineText = doc.getLine(line);
+    let column = toEditorColumn(lineText, location.column);
     column = Math.max(column, getIndentation(lineText));
 
     // If component updates because user clicks on
@@ -86,7 +88,7 @@ export class DebugLine extends PureComponent {
       this.debugExpression.clear();
     }
 
-    const { line } = toEditorPosition(location);
+    const line = toEditorLine(location.line);
     const doc = getDocument(location.sourceId);
     const { lineClass } = this.getTextClasses(why);
     doc.removeLineClass(line, "line", lineClass);

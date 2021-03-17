@@ -53,8 +53,8 @@ export class HighlightLine extends Component {
   }
 
   shouldSetHighlightLine(selectedLocation, selectedSource) {
-    const { sourceId, line } = selectedLocation;
-    const editorLine = toEditorLine(sourceId, line);
+    const { line } = selectedLocation;
+    const editorLine = toEditorLine(line);
 
     if (!isDocumentReady(selectedSource, selectedLocation)) {
       return false;
@@ -88,7 +88,7 @@ export class HighlightLine extends Component {
     }
 
     this.isStepping = false;
-    const editorLine = toEditorLine(sourceId, line);
+    const editorLine = toEditorLine(line);
     this.previousEditorLine = editorLine;
 
     if (!line || isDebugLine(selectedFrame, selectedLocation)) {
@@ -121,7 +121,7 @@ export class HighlightLine extends Component {
     }
 
     const { line, sourceId } = selectedLocation;
-    const editorLine = toEditorLine(sourceId, line);
+    const editorLine = toEditorLine(line);
     const doc = getDocument(sourceId);
     doc.removeLineClass(editorLine, "line", "highlight-line");
   }
