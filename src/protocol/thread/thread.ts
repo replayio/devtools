@@ -218,7 +218,7 @@ class _ThreadFront {
     await client.Session.listenForLoadChanges({}, sessionId);
   }
 
-  async getAnnotations(onAnnotations: ((annotations: annotations) => void)) {
+  async getAnnotations(onAnnotations: (annotations: annotations) => void) {
     const sessionId = await this.waitForSession();
 
     client.Session.addAnnotationsListener(onAnnotations);
