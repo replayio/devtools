@@ -133,18 +133,17 @@ class CommandBar extends Component {
       ),
       <div key="divider-3" className="divider" />,
       debugBtn(
-        () => this.props.stepOut(cx),
-        "stepOut",
-        className,
-        L10N.getFormatStr("stepOutTooltip", formatKey("stepOut")),
-        !cx.isPaused
-      ),
-
-      debugBtn(
         () => this.props.stepIn(cx),
         "stepIn",
         className,
         L10N.getFormatStr("stepInTooltip", formatKey("stepIn")),
+        !cx.isPaused
+      ),
+      debugBtn(
+        () => this.props.stepOut(cx),
+        "stepOut",
+        className,
+        L10N.getFormatStr("stepOutTooltip", formatKey("stepOut")),
         !cx.isPaused
       ),
     ];
