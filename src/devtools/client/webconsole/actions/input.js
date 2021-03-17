@@ -47,18 +47,29 @@ function evaluateExpression(expression) {
     );
     dispatch({ type: EVALUATE_EXPRESSION, expression });
 
-    // Even if the evaluation fails,
-    // we still need to pass the error response to onExpressionEvaluated.
-    const onSettled = res => res;
+    try {
+      const response = await evaluateJSAsync(expression, {
+        asyncIndex,
+        frameId,
+        forConsoleMessage: true,
+      });
+      response.evalId = evalId;
 
-    const response = await evaluateJSAsync(expression, {
-      asyncIndex,
-      frameId,
-      forConsoleMessage: true,
-    }).then(onSettled, onSettled);
-    response.evalId = evalId;
+      return dispatch(onExpressionEvaluated(response));
+    } catch (err) {
+      let msg = "Error: Evaluation failed";
+      if (err.message) {
+        msg += ` - ${err.message}`;
+      }
 
-    return dispatch(onExpressionEvaluated(response));
+      return dispatch(
+        onExpressionEvaluated({
+          type: "evaluationResult",
+          result: createPrimitiveValueFront(msg),
+          evalId,
+        })
+      );
+    }
   };
 }
 
@@ -98,11 +109,6 @@ async function evaluateJSAsync(expression, options = {}) {
  */
 function onExpressionEvaluated(response) {
   return async ({ dispatch }) => {
-    if (response.error) {
-      console.error(`Evaluation error`, response.error, ": ", response.message);
-      return;
-    }
-
     // If the evaluation was a top-level await expression that was rejected, there will
     // be an uncaught exception reported, so we don't need to do anything.
     if (response.topLevelAwaitRejected === true) {
