@@ -27,6 +27,7 @@ import {
   TimeStamp,
   unprocessedRegions,
   loadedRegions,
+  annotations,
 } from "@recordreplay/protocol";
 import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
@@ -215,6 +216,13 @@ class _ThreadFront {
     });
 
     await client.Session.listenForLoadChanges({}, sessionId);
+  }
+
+  async getAnnotations(onAnnotations: ((annotations: annotations) => void)) {
+    const sessionId = await this.waitForSession();
+
+    client.Session.addAnnotationsListener(onAnnotations);
+    await client.Session.findAnnotations({}, sessionId);
   }
 
   timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, force?: boolean) {
