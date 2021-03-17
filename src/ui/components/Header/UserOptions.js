@@ -14,7 +14,6 @@ function UserOptions({ recordingId, setModal }) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
 
-  const showSettings = features.settings;
   const showShare = hooks.useIsOwner(recordingId);
 
   if (isDeployPreview()) {
@@ -56,7 +55,7 @@ function UserOptions({ recordingId, setModal }) {
         </button>
         {showShare && (
           <button className="row" onClick={onShareClick}>
-            <span className="material-icons">home</span>
+            <span className="material-icons">share</span>
             <span>Share</span>
           </button>
         )}
