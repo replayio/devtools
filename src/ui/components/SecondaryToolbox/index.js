@@ -52,7 +52,7 @@ ThreadFront.getAnnotations(({ annotations }) => {
 });
 
 let currentTime = null;
-let rerenderComponentsTab;
+let rerenderComponentsTab = null;
 
 ThreadFront.on("paused", data => {
   if (currentTime === data.time) {
@@ -157,6 +157,10 @@ function Components() {
   rerenderComponentsTab = () => {
     setCount(count+1);
   };
+
+  React.useLayoutEffect(() => () => {
+    rerenderComponentsTab = null;
+  });
 
   return (
     <DevTools
