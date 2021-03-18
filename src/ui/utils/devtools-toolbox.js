@@ -45,6 +45,11 @@ export class DevToolsToolbox {
   }
 
   startPanel = async name => {
+    if (name === 'components') {
+      // TODO
+      return;
+    }
+
     if (this.panelWaiters[name]) {
       return this.panelWaiters[name];
     }
