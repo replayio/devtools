@@ -1,16 +1,16 @@
 import React from "react";
-import {flushSync} from "react-dom";
 import { connect } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
+import { features } from "ui/utils/prefs";
 import Video from "../Video";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
 import {
   createBridge,
   createStore,
-  initialize as createDevTools
-} from 'react-devtools-inline/frontend';
+  initialize as createDevTools,
+} from "react-devtools-inline/frontend";
 import { ThreadFront } from "protocol/thread";
 
 import "./SecondaryToolbox.css";
@@ -20,10 +20,12 @@ import { actions } from "../../actions";
 
 let bridge, store, wall, DevTools;
 
-function InitDevTools() {
+function InitReactDevTools() {
+  if (!features.reactDevtools) {
+    return null;
+  }
   const target = {
-    postMessage: function() {
-    },
+    postMessage: function () {},
   };
 
   wall = {
@@ -32,22 +34,22 @@ function InitDevTools() {
       wall._listener = listener;
     },
     send(event: string, payload: any, transferable?: Array<any>) {
-      wall._listener({event, payload});
+      wall._listener({ event, payload });
     },
   };
 
   bridge = createBridge(target, wall);
   store = createStore(bridge);
-  DevTools = createDevTools(target, {bridge, store});
+  DevTools = createDevTools(target, { bridge, store });
 }
 
-InitDevTools();
+InitReactDevTools();
 
 const messages = [];
 ThreadFront.getAnnotations(({ annotations }) => {
   for (const { point, time, kind, contents } of annotations) {
     const message = JSON.parse(contents);
-    messages.push({point, time, message});
+    messages.push({ point, time, message });
   }
 });
 
@@ -59,19 +61,19 @@ ThreadFront.on("paused", data => {
     return;
   }
 
-  InitDevTools()
+  InitReactDevTools();
 
   // TODO Use point AND time eventually
   messages
     .filter(({ time }) => time <= data.time)
-    .forEach(({message}) => {
-      if (message.event === 'operations') {
+    .forEach(({ message }) => {
+      if (message.event === "operations") {
         wall.send(message.event, message.payload);
       }
     });
 
   // HACK TODO This should use a subscription
-  if (typeof rerenderComponentsTab === 'function') {
+  if (typeof rerenderComponentsTab === "function") {
     rerenderComponentsTab();
   }
 });
@@ -118,12 +120,16 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
           <div className="label">Viewer</div>
         </button>
       ) : null}
-      <button
-        className={classnames("components-panel-button", { expanded: selectedPanel === "components" })}
-        onClick={() => onClick("components")}
-      >
-        <div className="label">⚛️ Components</div>
-      </button>
+      {features.reactDevtools && (
+        <button
+          className={classnames("components-panel-button", {
+            expanded: selectedPanel === "components",
+          })}
+          onClick={() => onClick("components")}
+        >
+          <div className="label">⚛️ Components</div>
+        </button>
+      )}
     </div>
   );
 }
@@ -149,13 +155,17 @@ function InspectorPanel() {
 // TODO Pass custom bridge
 // TODO Use portal containers for Profiler & Components
 function Components() {
+  if (!features.reactDevtools) {
+    return null;
+  }
+
   const [count, setCount] = React.useState(0);
 
   // HACK TODO This hack handles the fact that DevTools wasn't writen
   // with the expectation that a new Bridge or Store prop would be pasesd
   // and doens't handle that case properly.
   rerenderComponentsTab = () => {
-    setCount(count+1);
+    setCount(count + 1);
   };
 
   React.useLayoutEffect(() => () => {
