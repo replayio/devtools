@@ -13,21 +13,67 @@ let currentTime = null;
 let rerenderComponentsTab;
 const messages = [];
 
+async function frontToJSON(front) {
+  if (front.isPrimitive()) {
+    return front._primitive;
+  }
+
+  await front.loadChildren();
+  const children = (
+    await Promise.all(
+      front._object.preview.properties.map(async property => {
+        return [property.name, await frontToJSON(property.value)];
+      })
+    )
+  ).filter(([key]) => key != "length");
+
+  if (children.length == 0) {
+    return [];
+  }
+
+  if (Number.isInteger(parseInt(children[0][0]))) {
+    return children.map(([, value]) => value);
+  }
+
+  return Object.fromEntries(children);
+}
+
+let inspected = new Set();
+
 function InitReactDevTools() {
   if (!features.reactDevtools) {
     return null;
   }
 
   const target = {
-    postMessage: function () {},
+    postMessage() {},
   };
 
   wall = {
-    emit({ data }) {},
+    emit() {},
     listen(listener) {
       wall._listener = listener;
     },
-    send(event, payload, transferable) {
+    async send(event, payload) {
+      if (event == "inspectElement" && !inspected.has(payload.id)) {
+        inspected.add(payload.id);
+        console.log(event, payload);
+        let safePayload = {
+          ...payload,
+          path: payload.path || [],
+        };
+        window.response = await ThreadFront.evaluate(
+          0,
+          0,
+          ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
+            safePayload
+          )})`
+        );
+
+        const inspectedElement = await frontToJSON(response.returned);
+        wall._listener({ event: "inspectedElement", payload: inspectedElement.data });
+      }
+
       wall._listener({ event, payload });
     },
   };
