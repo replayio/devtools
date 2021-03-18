@@ -45,8 +45,7 @@ export class DevToolsToolbox {
   }
 
   startPanel = async name => {
-    if (name === 'components') {
-      // TODO
+    if (name === "react-components") {
       return;
     }
 
