@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import React, { Component } from "react";
+import React, { Component, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
 import { connect } from "../utils/connect";
@@ -51,6 +51,7 @@ import EditorTabs from "./Editor/Tabs";
 import EditorFooter from "./Editor/Footer";
 import QuickOpenModal from "./QuickOpenModal";
 import Transcript from "ui/components/Transcript";
+import { waitForEditor } from "../utils/editor/create-editor";
 
 class Debugger extends Component {
   onLayoutChange;
@@ -284,6 +285,20 @@ Debugger.childContextTypes = {
   l10n: PropTypes.object,
 };
 
+function DebuggerWaitingForEditor(props) {
+  const [hasEditor, setHasEditor] = useState(false);
+
+  useEffect(() => {
+    async function awaitEditor() {
+      await waitForEditor();
+      setHasEditor(true);
+    }
+    awaitEditor();
+  }, []);
+
+  return hasEditor ? <Debugger {...props} /> : null;
+}
+
 const mapStateToProps = state => ({
   selectedSource: getSelectedSource(state),
   startPanelCollapsed: getPaneCollapse(state),
@@ -301,4 +316,4 @@ export default connect(mapStateToProps, {
   openQuickOpen: actions.openQuickOpen,
   closeQuickOpen: actions.closeQuickOpen,
   refreshCodeMirror: actions.refreshCodeMirror,
-})(Debugger);
+})(DebuggerWaitingForEditor);

@@ -4,10 +4,25 @@
 
 //
 
-import SourceEditor from "./source-editor";
+import { assert } from "protocol/utils";
 import { features, prefs } from "../prefs";
 
+let editorWaiter;
+let SourceEditor;
+
+export async function waitForEditor() {
+  if (!editorWaiter) {
+    editorWaiter = import("./source-editor").then(imported => {
+      SourceEditor = imported.default;
+      return SourceEditor;
+    });
+  }
+
+  return await editorWaiter;
+}
+
 export function createEditor() {
+  assert(SourceEditor);
   const gutters = ["breakpoints", "hit-markers", "CodeMirror-linenumbers"];
 
   return new SourceEditor({

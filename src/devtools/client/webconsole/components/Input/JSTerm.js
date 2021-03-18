@@ -6,11 +6,11 @@
 
 import React from "react";
 import { connect } from "react-redux";
-import Editor from "devtools/client/debugger/src/utils/editor/source-editor";
 import PropTypes from "prop-types";
 import actions from "devtools/client/webconsole/actions/index";
 
-function createEditor({ execute }) {
+async function createEditor({ execute }) {
+  const Editor = (await import("devtools/client/debugger/src/utils/editor/source-editor")).default;
   const editor = new Editor({
     autofocus: true,
     enableCodeFolding: false,
@@ -51,8 +51,9 @@ class JSTerm extends React.Component {
     window.jsterm = this;
   }
 
-  componentDidMount() {
-    this.editor = createEditor({ execute: this.execute });
+  async componentDidMount() {
+    this.editorWaiter = createEditor({ execute: this.execute });
+    this.editor = await this.editorWaiter;
     this.editor.appendToLocalElement(this.node);
   }
 
