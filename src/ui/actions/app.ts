@@ -95,12 +95,6 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
   });
 
   ThreadFront.listenForLoadChanges();
-
-  // ThreadFront.getAnnotations(({ annotations }) => {
-  //   for (const { point, time, kind, contents } of annotations) {
-  //     console.log("FoundAnnotation", point, time, kind, contents);
-  //   }
-  // });
 }
 
 function onUnprocessedRegions({ regions }: unprocessedRegions): UIThunkAction {
