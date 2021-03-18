@@ -285,18 +285,17 @@ Debugger.childContextTypes = {
   l10n: PropTypes.object,
 };
 
-function DebuggerWaitingForEditor(props) {
-  const [hasEditor, setHasEditor] = useState(false);
+function DebuggerLoader(props) {
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function awaitEditor() {
+    (async () => {
       await waitForEditor();
-      setHasEditor(true);
-    }
-    awaitEditor();
+      setLoading(false);
+    })();
   }, []);
 
-  return hasEditor ? <Debugger {...props} /> : null;
+  return loading ? null : <Debugger {...props} />;
 }
 
 const mapStateToProps = state => ({
@@ -316,4 +315,4 @@ export default connect(mapStateToProps, {
   openQuickOpen: actions.openQuickOpen,
   closeQuickOpen: actions.closeQuickOpen,
   refreshCodeMirror: actions.refreshCodeMirror,
-})(DebuggerWaitingForEditor);
+})(DebuggerLoader);

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+import { getCodeMirror } from "devtools/client/debugger/src/utils/editor/create-editor";
 
 export function PanelInput({
   defaultValue,
@@ -16,9 +17,7 @@ export function PanelInput({
   const textAreaNode = useRef(null);
   const codeMirrorNode = useRef(null);
   useEffect(() => {
-    let unmounted = false;
-
-    requestAnimationFrame(async () => {
+    requestAnimationFrame(() => {
       let extraKeys = {
         Esc: false,
         "Cmd-F": false,
@@ -38,10 +37,7 @@ export function PanelInput({
         extraKeys.Esc = onEscape;
       }
 
-      const CodeMirror = await import("codemirror");
-      if (unmounted) {
-        return;
-      }
+      const CodeMirror = getCodeMirror();
       const codeMirror = CodeMirror.fromTextArea(textAreaNode.current, {
         mode: "javascript",
         theme: "mozilla",
@@ -90,7 +86,6 @@ export function PanelInput({
     });
 
     return () => {
-      unmounted = true;
       // Convert the editor's codeMirror node to a textarea so that CodeMirror
       // handles its cleanup for us. Without this, the editor sticks around.
       codeMirrorNode.current?.toTextArea();

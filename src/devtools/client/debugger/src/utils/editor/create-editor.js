@@ -9,16 +9,22 @@ import { features, prefs } from "../prefs";
 
 let editorWaiter;
 let SourceEditor;
+let CodeMirror;
 
 export async function waitForEditor() {
   if (!editorWaiter) {
     editorWaiter = import("./source-editor").then(imported => {
       SourceEditor = imported.default;
+      CodeMirror = imported.CodeMirror;
       return SourceEditor;
     });
   }
 
   return await editorWaiter;
+}
+
+export function getCodeMirror() {
+  return CodeMirror;
 }
 
 export function createEditor() {
