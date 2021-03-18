@@ -37,16 +37,7 @@ function InitReactDevTools() {
   DevTools = createDevTools(target, { bridge, store });
 }
 
-InitReactDevTools();
-
-ThreadFront.getAnnotations(({ annotations }) => {
-  for (const { point, time, kind, contents } of annotations) {
-    const message = JSON.parse(contents);
-    messages.push({ point, time, message });
-  }
-});
-
-ThreadFront.on("paused", data => {
+const onPaused = data => {
   if (currentTime === data.time) {
     return;
   }
@@ -66,7 +57,20 @@ ThreadFront.on("paused", data => {
   if (typeof rerenderComponentsTab === "function") {
     rerenderComponentsTab();
   }
-});
+};
+
+if (features.reactDevtools) {
+  ThreadFront.getAnnotations(({ annotations }) => {
+    for (const { point, time, kind, contents } of annotations) {
+      const message = JSON.parse(contents);
+      messages.push({ point, time, message });
+    }
+  });
+
+  ThreadFront.on("paused", onPaused);
+}
+
+InitReactDevTools();
 
 // TODO Pass custom bridge
 // TODO Use portal containers for Profiler & Components
