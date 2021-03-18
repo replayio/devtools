@@ -10,6 +10,7 @@
       require("react"),
       require("devtools-services"),
       require("react-dom"),
+      require("../src/utils/lodash-get-set"),
       require("devtools/client/framework/menu"),
       require("devtools/client/framework/menu-item")
     );
@@ -21,6 +22,7 @@
       "Services",
       "devtools/shared/flags",
       "react-dom",
+      "lodash",
       "devtools/client/framework/menu",
       "devtools/client/framework/menu-item",
     ], factory);
@@ -33,6 +35,7 @@
             require("react"),
             require("devtools/shared/flags"),
             require("react-dom"),
+            require("../src/utils/lodash-get-set"),
             require("devtools/client/framework/menu"),
             require("devtools/client/framework/menu-item")
           )
@@ -43,6 +46,7 @@
             root["Services"],
             root["devtools/shared/flags"],
             root["react-dom"],
+            root["lodash"],
             root["devtools/client/framework/menu"],
             root["devtools/client/framework/menu-item"]
           );
