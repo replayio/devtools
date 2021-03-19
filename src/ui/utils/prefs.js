@@ -38,6 +38,7 @@ pref("devtools.features.consoleHover", false);
 pref("devtools.features.transcriptHover", false);
 pref("devtools.features.widgetHover", false);
 pref("devtools.features.reactDevtools", false);
+pref("devtools.features.workspaces", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -62,6 +63,7 @@ export const features = new PrefsHelper("devtools.features", {
   transcriptHover: ["Bool", "transcriptHover"],
   widgetHover: ["Bool", "widgetHover"],
   reactDevtools: ["Bool", "reactDevtools"],
+  workspaces: ["Bool", "workspaces"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

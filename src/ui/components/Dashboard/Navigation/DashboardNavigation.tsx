@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction } from "react";
 import classnames from "classnames";
 import WorkspaceDropdown from "./WorkspaceDropdown";
-
+const { features } = require("ui/utils/prefs");
 import "./DashboardNavigation.css";
 
 interface Recording {
@@ -37,7 +37,7 @@ export default function DashboardNavigation({
 
   return (
     <nav className="left-sidebar">
-      <WorkspaceDropdown />
+      {features.workspaces ? <WorkspaceDropdown /> : null}
       <div className="replays">
         <div className="navigation-subheader">REPLAYS</div>
         <div

@@ -12,8 +12,6 @@ export default function WorkspaceDropdown() {
   const { workspaces } = hooks.useGetWorkspaces();
   const { user } = useAuth0();
 
-  console.log(workspaces);
-
   return (
     <div className="workspace-dropdown-container">
       <Dropdown
