@@ -37,8 +37,13 @@ export class DebuggerPanel {
     return this._store.getState();
   }
 
-  openLink(url) {
-    openDocLink(url);
+  async openLink(url) {
+    const source = this._selectors.getSourceByURL(this._store.getState(), url);
+    if (source?.id) {
+      this.selectSource(source.id);
+    } else {
+      openDocLink(url);
+    }
   }
 
   async openInspector() {
