@@ -10,6 +10,11 @@
   --faint-red: rgba(255, 0, 0, 0.5);
 }
 
+/* NOTE: this is added to protect against React DevTools */
+html {
+  font-size: 12px !important;
+}
+
 #video {
   height: 100%;
   position: relative;
