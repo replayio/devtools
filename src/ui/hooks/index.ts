@@ -3,6 +3,7 @@ import * as sessionHooks from "./sessions";
 import * as recordingHooks from "./recordings";
 import * as settingsHooks from "./settings";
 import * as collaboratorsHooks from "./collaborators";
+import * as workspacesHooks from "./workspaces";
 
 export default {
   ...commentsHooks,
@@ -10,4 +11,5 @@ export default {
   ...recordingHooks,
   ...settingsHooks,
   ...collaboratorsHooks,
+  ...workspacesHooks,
 };

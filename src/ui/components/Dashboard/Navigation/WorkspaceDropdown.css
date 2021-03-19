@@ -1,0 +1,62 @@
+.navigation-subheader {
+  font-weight: 600;
+  font-size: 12px;
+  margin: 4px 12px;
+  color: var(--theme-comment);
+  user-select: none;
+}
+
+.workspace-dropdown-container .expand-dropdown {
+  width: 100%;
+}
+
+.workspace-dropdown-button,
+.workspace-dropdown-container .content > * {
+  display: flex;
+  flex-direction: row;
+  padding: 12px;
+  align-items: center;
+  border-radius: 4px;
+}
+
+.workspace-dropdown-button .avatar img {
+  width: 16px;
+  height: 16px;
+}
+
+.workspace-profile-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+  margin: 0px 8px;
+  text-align: left;
+}
+
+.workspace-profile-content > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-profile-content .subtitle {
+  font-size: 10px;
+  color: var(--theme-comment);
+}
+
+.workspace-dropdown-container .dropdown-container .content {
+  padding: 0px;
+  width: 230px;
+}
+
+.workspace-item img,
+.workspace-dropdown-button img {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+}
+
+.workspace-dropdown-container .create-new-workspace:hover ,
+.workspace-dropdown-container .workspace-item:hover {
+  background: #e8e8e8;
+}

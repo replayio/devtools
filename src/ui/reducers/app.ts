@@ -29,6 +29,7 @@ function initialAppState(): AppState {
     hoveredLineNumberLocation: null,
     isNodePickerActive: false,
     canvas: null,
+    workspaceId: "personal",
   };
 }
 
@@ -143,6 +144,10 @@ export default function update(
       };
     }
 
+    case "set_workspace_id": {
+      return { ...state, workspaceId: action.workspaceId };
+    }
+
     default: {
       return state;
     }
@@ -184,3 +189,4 @@ export const getPointsForHoveredLineNumber = (state: UIState) => {
 export const getEventsForType = (state: UIState, type: string) => state.app.events[type] || [];
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;
+export const getWorkspaceId = (state: UIState) => state.app.workspaceId;

@@ -18,6 +18,7 @@ import {
   ModalType,
   UploadInfo,
   Canvas,
+  WorkspaceId,
 } from "ui/state/app";
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
@@ -53,6 +54,7 @@ export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_locat
 };
 export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
 export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
+export type SetWorkspaceId = Action<"set_workspace_id"> & { workspaceId: WorkspaceId };
 
 export type AppActions =
   | SetupAppAction
@@ -72,7 +74,8 @@ export type AppActions =
   | SetNarrowMode
   | SetHoveredLineNumberLocation
   | SetIsNodePickerActive
-  | SetCanvas;
+  | SetCanvas
+  | SetWorkspaceId;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -211,4 +214,8 @@ export function setIsNodePickerActive(active: boolean): SetIsNodePickerActive {
 
 export function setCanvas(canvas: Canvas): SetCanvas {
   return { type: "set_canvas", canvas };
+}
+
+export function setWorkspaceId(workspaceId: WorkspaceId): SetWorkspaceId {
+  return { type: "set_workspace_id", workspaceId };
 }

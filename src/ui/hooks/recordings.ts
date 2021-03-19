@@ -1,6 +1,82 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
+import { User, Recording } from "ui/types";
 import useToken from "ui/utils/useToken";
+import { WorkspaceId } from "ui/state/app";
+
+type PersonalRecordingsData = {
+  users: User[];
+  recordings: Recording[];
+};
+
+const GetMyRecordings = gql`
+  fragment recordingFields on recordings {
+    id
+    url
+    title
+    recording_id
+    recordingTitle
+    last_screen_mime_type
+    duration
+    description
+    date
+    is_private
+  }
+
+  fragment avatarFields on users {
+    name
+    email
+    picture
+    id
+  }
+
+  query GetMyRecordings($userId: uuid) {
+    users(where: { id: { _eq: $userId } }) {
+      ...avatarFields
+      collaborators {
+        recording {
+          ...recordingFields
+          user {
+            ...avatarFields
+          }
+        }
+      }
+      recordings(where: { deleted_at: { _is_null: true } }) {
+        ...recordingFields
+      }
+    }
+
+    recordings(where: { example: { _eq: true } }) {
+      ...recordingFields
+      user {
+        ...avatarFields
+      }
+    }
+  }
+`;
+
+const GetWorkspaceRecordings = gql`
+  query GetWorkspaceRecordings($workspaceId: uuid, $userId: uuid) {
+    recordings(where: { user: { workspaces_users: { workspace_id: { _eq: $workspaceId } } } }) {
+      id
+      url
+      title
+      recording_id
+      recordingTitle
+      last_screen_mime_type
+      duration
+      description
+      date
+      is_private
+      user {
+        name
+        email
+        picture
+        id
+      }
+    }
+  }
+`;
 
 export function useGetRecordingPhoto(
   recordingId: RecordingId
@@ -156,4 +232,57 @@ export function useIsOwner(recordingId: RecordingId) {
   }
 
   return userId === recording.user_id;
+}
+
+function getRecordings(data: PersonalRecordingsData) {
+  if (!data.users.length) {
+    return [];
+  }
+
+  const user = data.users[0];
+  const { recordings, collaborators, name, email, picture, id } = user;
+
+  return [
+    ...recordings.map(recording => ({ ...recording, user: { name, email, picture, id } })),
+    ...collaborators!.map(({ recording }) => recording),
+    ...data.recordings,
+  ];
+}
+
+export function useGetRecordings(
+  currentWorkspaceId: WorkspaceId
+): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
+
+  let query;
+
+  if (currentWorkspaceId === "personal") {
+    query = GetMyRecordings;
+  } else {
+    query = GetWorkspaceRecordings;
+  }
+
+  const { data, error, loading } = useQuery(query, {
+    variables: { userId },
+    pollInterval: 10000,
+  });
+
+  if (loading) {
+    return { recordings: null, loading };
+  }
+
+  if (error) {
+    console.error("Failed to fetch recordings:", error);
+  }
+
+  let recordings;
+
+  if (currentWorkspaceId === "personal") {
+    recordings = getRecordings(data);
+  } else {
+    recordings = data.recordings;
+  }
+
+  return { recordings, loading };
 }

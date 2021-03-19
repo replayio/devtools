@@ -8,6 +8,7 @@ const { AppErrors } = require("./shared/Error");
 const LoginModal = require("./shared/LoginModal").default;
 const SkeletonLoader = require("ui/components/SkeletonLoader").default;
 const SharingModal = require("./shared/SharingModal").default;
+import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import SettingsModal from "./shared/SettingsModal/index";
 import { isDeployPreview } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
@@ -31,6 +32,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "settings": {
       return <SettingsModal />;
+    }
+    case "new-workspace": {
+      return <NewWorkspaceModal />;
     }
     default: {
       return null;

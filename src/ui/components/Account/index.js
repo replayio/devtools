@@ -1,96 +1,10 @@
 import React, { useEffect } from "react";
 import Dashboard from "../Dashboard/index";
 import { useAuth0 } from "@auth0/auth0-react";
-import useToken from "ui/utils/useToken";
-import Loader from "../shared/Loader";
-import { gql, useQuery } from "@apollo/client";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 import UserOptions from "ui/components/Header/UserOptions";
 
 import "./Account.css";
-
-const GET_MY_RECORDINGS = gql`
-  fragment recordingFields on recordings {
-    id
-    url
-    title
-    recording_id
-    recordingTitle
-    last_screen_mime_type
-    duration
-    description
-    date
-    is_private
-  }
-
-  fragment avatarFields on users {
-    name
-    email
-    picture
-    id
-  }
-
-  query GetMyRecordings($userId: uuid) {
-    users(where: { id: { _eq: $userId } }) {
-      ...avatarFields
-      collaborators {
-        recording {
-          ...recordingFields
-          user {
-            ...avatarFields
-          }
-        }
-      }
-      recordings(where: { deleted_at: { _is_null: true } }) {
-        ...recordingFields
-      }
-    }
-
-    recordings(where: { example: { _eq: true } }) {
-      ...recordingFields
-      user {
-        ...avatarFields
-      }
-    }
-  }
-`;
-
-function getRecordings(data) {
-  if (!data.users.length) {
-    return [];
-  }
-
-  const user = data.users[0];
-  const { recordings, collaborators, name, email, picture, id } = user;
-
-  return [
-    ...recordings.map(recording => ({ ...recording, user: { name, email, picture, id } })),
-    ...collaborators.map(({ recording }) => recording),
-    ...data.recordings,
-  ];
-}
-
-function AccountPage() {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
-  const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
-    variables: { userId },
-    pollInterval: 10000,
-  });
-
-  if (loading) {
-    return <Loader />;
-  }
-
-  if (error) {
-    console.error("Failed to fetch recordings:", error);
-    throw new Error(error);
-  }
-
-  const recordings = getRecordings(data);
-
-  return <Dashboard recordings={recordings} />;
-}
 
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
@@ -138,7 +52,7 @@ export default function Account() {
   return (
     <>
       <AccountHeader />
-      <AccountPage />
+      <Dashboard />
     </>
   );
 }
