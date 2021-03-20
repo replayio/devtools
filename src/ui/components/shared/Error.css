@@ -77,6 +77,11 @@
   height: 80px;
 }
 
+.transparent-error-content .img.refresh:hover {
+  background: #ffffdd;
+  cursor: pointer;
+}
+
 .transparent-error-content .message {
   font-size: 1.5rem;
   margin-top: 30px;
