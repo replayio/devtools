@@ -10,8 +10,9 @@ import "./Error.css";
 function RefreshButton() {
   const [clicked, setClicked] = useState(false);
   const handleClick = () => {
+    console.log("CLICKED");
     setClicked(true);
-    window.location = window.location.href;
+    location.reload();
   };
 
   return (
@@ -70,7 +71,7 @@ function ExpectedError({ error }) {
     return (
       <ErrorContainer expected>
         <div className="transparent-error-content">
-          <div className="img refresh"></div>
+          <div className="img refresh" onClick={() => location.reload()}></div>
           <div className="message">{error.message}</div>
         </div>
       </ErrorContainer>
