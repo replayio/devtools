@@ -10,7 +10,6 @@ import "./Error.css";
 function RefreshButton() {
   const [clicked, setClicked] = useState(false);
   const handleClick = () => {
-    console.log("CLICKED");
     setClicked(true);
     location.reload();
   };
