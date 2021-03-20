@@ -75,7 +75,6 @@
   background-color: white;
   width: 80px;
   height: 80px;
-  z-index: 100;
 }
 
 .transparent-error-content .img.refresh:hover {
