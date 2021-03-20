@@ -14,7 +14,7 @@ export interface SettingItem {
   disabled: boolean;
 }
 
-export type SettingItemKey = "show_elements";
+export type SettingItemKey = "show_elements" | "show_react";
 
 export interface UserSettings {
   [key: string]: boolean;

@@ -5,6 +5,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 const anonymousSettings = {
   show_elements: true,
+  show_react: false,
 };
 
 export function useGetUserSettings() {
@@ -21,6 +22,7 @@ export function useGetUserSettings() {
       query GetUserSettings {
         user_settings {
           show_elements
+          show_react
         }
       }
     `

@@ -15,7 +15,7 @@ import { ReactDevtoolsPanel } from "./ReactDevTools";
 
 function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
   const {
-    userSettings: { show_elements },
+    userSettings: { show_elements, show_react },
   } = hooks.useGetUserSettings();
 
   const onClick = panel => {
@@ -55,7 +55,7 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
           <div className="label">Viewer</div>
         </button>
       ) : null}
-      {features.reactDevtools && (
+      {show_react && (
         <button
           className={classnames("components-panel-button", {
             expanded: selectedPanel === "react-components",
@@ -89,7 +89,7 @@ function InspectorPanel() {
 
 function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
   const {
-    userSettings: { show_elements },
+    userSettings: { show_elements, show_react },
   } = hooks.useGetUserSettings();
 
   return (
@@ -105,7 +105,7 @@ function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
         {selectedPanel == "console" ? <ConsolePanel /> : null}
         {selectedPanel == "inspector" && show_elements ? <InspectorPanel /> : null}
         {selectedPanel == "viewer" && narrowMode ? <Video /> : null}
-        {selectedPanel == "react-components" ? <ReactDevtoolsPanel /> : null}
+        {selectedPanel == "react-components" && show_react ? <ReactDevtoolsPanel /> : null}
       </div>
     </div>
   );

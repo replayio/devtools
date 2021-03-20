@@ -15,7 +15,13 @@ const settings: Settings = [
       {
         label: "Enable the Elements pane",
         key: "show_elements",
-        description: "The Elements pane allows you to inspect the HTML markup and CSS styling",
+        description: "Inspect HTML markup and CSS styling",
+        disabled: false,
+      },
+      {
+        label: "Enable React DevTools",
+        key: "show_react",
+        description: "Inspect the React component tree",
         disabled: false,
       },
     ],
