@@ -2,7 +2,6 @@ import React from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
 import hooks from "ui/hooks";
-import { features } from "ui/utils/prefs";
 import Video from "../Video";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
@@ -12,12 +11,14 @@ import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
 import { actions } from "../../actions";
 import { ReactDevtoolsPanel } from "./ReactDevTools";
+import { isTest } from "ui/utils/environment";
 
 function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
   const {
     userSettings: { show_elements, show_react },
   } = hooks.useGetUserSettings();
 
+  const showElements = show_elements || isTest();
   const onClick = panel => {
     setSelectedPanel(panel);
 
@@ -30,14 +31,14 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode }) {
 
   return (
     <div className="panel-buttons">
-      <NodePicker />
+      {showElements && <NodePicker />}
       <button
         className={classnames("console-panel-button", { expanded: selectedPanel === "console" })}
         onClick={() => onClick("console")}
       >
         <div className="label">Console</div>
       </button>
-      {show_elements && (
+      {showElements && (
         <button
           className={classnames("inspector-panel-button", {
             expanded: selectedPanel === "inspector",
@@ -88,10 +89,6 @@ function InspectorPanel() {
 }
 
 function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
-  const {
-    userSettings: { show_elements, show_react },
-  } = hooks.useGetUserSettings();
-
   return (
     <div className="secondary-toolbox">
       <header className="secondary-toolbox-header">
@@ -103,9 +100,9 @@ function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
       </header>
       <div className="secondary-toolbox-content">
         {selectedPanel == "console" ? <ConsolePanel /> : null}
-        {selectedPanel == "inspector" && show_elements ? <InspectorPanel /> : null}
+        {selectedPanel == "inspector" ? <InspectorPanel /> : null}
         {selectedPanel == "viewer" && narrowMode ? <Video /> : null}
-        {selectedPanel == "react-components" && show_react ? <ReactDevtoolsPanel /> : null}
+        {selectedPanel == "react-components" ? <ReactDevtoolsPanel /> : null}
       </div>
     </div>
   );

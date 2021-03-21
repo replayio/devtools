@@ -4,7 +4,7 @@ import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const anonymousSettings = {
-  show_elements: true,
+  show_elements: false,
   show_react: false,
 };
 
