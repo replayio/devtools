@@ -44,6 +44,12 @@ class ConsoleOutput extends Component {
     this.maybeScrollToResult(prevProps);
   }
 
+  isVisible(parent, child) {
+    const { top, bottom } = child.getBoundingClientRect();
+    const scrolledParentRect = parent.getBoundingClientRect();
+    return top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom;
+  }
+
   scrollToClosestMessage() {
     const { closestMessage } = this.props;
 
@@ -58,11 +64,12 @@ class ConsoleOutput extends Component {
       return;
     }
 
-    const consoleHeight = outputNode.getBoundingClientRect().height;
-    const elementTop = element.getBoundingClientRect().top;
-    if (elementTop < 30 || elementTop + 50 > consoleHeight) {
-      element.scrollIntoView({ block: "center", behavior: "smooth" });
+    // Don't scroll to the message if it's already in view.
+    if (this.isVisible(outputNode, element)) {
+      return;
     }
+
+    element.scrollIntoView({ block: "center", behavior: "smooth" });
   }
 
   maybeScrollToResult(prevProps) {
@@ -85,11 +92,7 @@ class ConsoleOutput extends Component {
     }
 
     // Don't scroll to the evaluation result if it's already in view.
-    const { top, bottom } = resultNode.getBoundingClientRect();
-    const scrolledParentRect = node.getBoundingClientRect();
-    const isVisible = top >= scrolledParentRect.top && bottom <= scrolledParentRect.bottom;
-
-    if (isVisible) {
+    if (this.isVisible(node, resultNode)) {
       return;
     }
 
