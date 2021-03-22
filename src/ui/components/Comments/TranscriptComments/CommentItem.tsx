@@ -18,11 +18,12 @@ import ExistingCommentEditor from "./CommentEditor/ExistingCommentEditor";
 import NewCommentEditor from "./CommentEditor/NewCommentEditor";
 
 type CommentProps = PropsFromRedux & {
+  collaborators: any;
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
   isRoot: boolean;
 };
 
-function CommentItem({ comment, pendingComment, isRoot }: CommentProps) {
+function CommentItem({ collaborators, comment, pendingComment, isRoot }: CommentProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const isPendingNew =
@@ -41,11 +42,13 @@ function CommentItem({ comment, pendingComment, isRoot }: CommentProps) {
       const commentType = pendingComment.type as "new_comment" | "new_reply";
       const comment = pendingComment.comment as PendingNewComment | PendingNewReply;
 
-      return <NewCommentEditor comment={comment} type={commentType} />;
+      return (
+        <NewCommentEditor collaborators={collaborators} comment={comment} type={commentType} />
+      );
     } else {
       const comment = pendingComment.comment as PendingEditComment | PendingEditReply;
 
-      return <ExistingCommentEditor comment={comment} />;
+      return <ExistingCommentEditor collaborators={collaborators} comment={comment} />;
     }
   }
 

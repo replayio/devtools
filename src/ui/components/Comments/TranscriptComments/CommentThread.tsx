@@ -9,11 +9,13 @@ import CommentItem from "./CommentItem";
 import "./CommentThread.css";
 
 type CommentThreadProps = PropsFromRedux & {
+  collaborators: any;
   comment?: Comment | null;
   time: number;
 };
 
 function CommentThread({
+  collaborators,
   comment,
   time,
   currentTime,
@@ -62,17 +64,25 @@ function CommentThread({
           onMouseLeave={() => setHoveredComment(null)}
         >
           <div className="comment-body">
-            {comment && <CommentItem {...{ comment, hoveredComment, isRoot: true }} />}
+            {comment && (
+              <CommentItem {...{ comment, collaborators, hoveredComment, isRoot: true }} />
+            )}
             {comment &&
               "replies" in comment &&
               comment.replies.map(reply => (
-                <CommentItem comment={reply} key={reply.id} isRoot={false} />
+                <CommentItem
+                  collaborators={collaborators}
+                  comment={reply}
+                  key={reply.id}
+                  isRoot={false}
+                />
               ))}
             {pendingComment &&
             pendingComment.comment.time == time &&
             pendingComment.type.includes("new") ? (
               <CommentItem
                 {...{
+                  collaborators,
                   comment: pendingComment.comment,
                   type: pendingComment.type,
                   isRoot: pendingComment?.type == "new_comment",

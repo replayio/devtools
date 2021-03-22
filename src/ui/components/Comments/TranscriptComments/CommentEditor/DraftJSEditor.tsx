@@ -1,11 +1,15 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { EditorState, KeyBindingUtil, getDefaultKeyBinding, Editor } from "draft-js";
-import PluginEditor from "@draft-js-plugins/editor";
+import React, { useEffect, useRef, useState } from "react";
+import { EditorState, KeyBindingUtil, getDefaultKeyBinding } from "draft-js";
+import PluginEditor, { EditorPlugin } from "@draft-js-plugins/editor";
 import { EmojiPlugin } from "@draft-js-plugins/emoji";
 import "draft-js/dist/Draft.css";
 import "@draft-js-plugins/emoji/lib/plugin.css";
+import "@draft-js-plugins/mention/lib/plugin.css";
+
+import { addMentions } from "./mention";
 
 import "./DraftJSEditor.css";
+import { User } from "ui/state/comments";
 
 interface UseEditorConfig {
   DraftJS: {
@@ -14,39 +18,65 @@ interface UseEditorConfig {
   };
   Editor: typeof PluginEditor;
   emojiPlugin: EmojiPlugin;
+  mentionPlugin: EditorPlugin;
 }
 
-export interface UseEditorResult extends Partial<UseEditorConfig> {
+export interface UseEditorResult {
+  config?: UseEditorConfig;
   editorState?: EditorState;
   setEditorState: React.Dispatch<React.SetStateAction<EditorState | undefined>>;
 }
 
-export function useEditor(initialContent = ""): UseEditorResult {
+export function useEditor({
+  content = "",
+  users,
+}: {
+  content: string;
+  users: User[];
+}): UseEditorResult {
   const [editorState, setEditorState] = useState<EditorState>();
   const [config, setConfig] = useState<UseEditorConfig>();
 
-  useEffect(function importDraftJS() {
-    Promise.all([
-      import("draft-js"),
-      import("@draft-js-plugins/editor"),
-      import("@draft-js-plugins/emoji"),
-    ]).then(([DraftJS, EditorModule, { default: createEmojiPlugin, defaultTheme }]) => {
-      setEditorState(EditorModule.createEditorStateWithText(initialContent));
-      setConfig({
-        DraftJS,
-        Editor: EditorModule.default,
-        emojiPlugin: createEmojiPlugin({
-          theme: {
-            ...defaultTheme,
-            emojiSuggestions: `${defaultTheme.emojiSuggestions} emojiSuggestions`,
-          },
-        }),
-      });
-    });
-  }, []);
+  useEffect(
+    function importDraftJS() {
+      if (!users) return;
+
+      Promise.all([
+        import("draft-js"),
+        import("@draft-js-plugins/editor"),
+        import("@draft-js-plugins/emoji"),
+        import("@draft-js-plugins/mention"),
+      ]).then(
+        ([
+          DraftJS,
+          EditorModule,
+          { default: createEmojiPlugin, defaultTheme },
+          { default: createMentionPlugin },
+        ]) => {
+          const es = addMentions(DraftJS, EditorModule.createEditorStateWithText(content), users);
+
+          setEditorState(es);
+          setConfig({
+            DraftJS,
+            Editor: EditorModule.default,
+            emojiPlugin: createEmojiPlugin({
+              theme: {
+                ...defaultTheme,
+                emojiSuggestions: `${defaultTheme.emojiSuggestions} emojiSuggestions`,
+              },
+            }),
+            mentionPlugin: createMentionPlugin({
+              entityMutability: "IMMUTABLE",
+            }),
+          });
+        }
+      );
+    },
+    [users]
+  );
 
   return {
-    ...config,
+    config,
     editorState,
     setEditorState,
   };
@@ -74,14 +104,16 @@ const moveSelectionToEnd = (editorState: any, DraftJS: any) => {
 
 interface DraftJSEditorProps {
   DraftJS: any;
-  Editor: any;
+  Editor: typeof PluginEditor;
   editorState: EditorState;
-  emojiPlugin: any;
+  emojiPlugin?: any;
   initialContent: string;
+  mentionPlugin?: any;
   placeholder: string;
   setEditorState: UseEditorResult["setEditorState"];
-  handleSubmit: (inputValue: string) => void;
+  handleSubmit: (editorState: EditorState) => void;
   handleCancel: () => void;
+  users: User[];
 }
 
 export default function DraftJSEditor({
@@ -91,11 +123,14 @@ export default function DraftJSEditor({
   emojiPlugin,
   handleCancel,
   handleSubmit,
+  mentionPlugin,
   placeholder,
   setEditorState,
+  users,
 }: DraftJSEditorProps) {
-  const editorNode = useRef<Editor>(null);
+  const editorNode = useRef<PluginEditor>(null);
   const wrapperNode = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
   const { getDefaultKeyBinding, KeyBindingUtil } = DraftJS;
 
   const decorator = editorState.getDecorator();
@@ -131,8 +166,7 @@ export default function DraftJSEditor({
   };
   const handleKeyCommand = (command: "save" | "cancel") => {
     if (command === "save") {
-      const inputValue = editorState.getCurrentContent().getPlainText();
-      handleSubmit(inputValue);
+      handleSubmit(editorState);
       return "handled";
     } else if (command === "cancel") {
       handleCancel();
@@ -143,6 +177,7 @@ export default function DraftJSEditor({
   };
 
   const { EmojiSuggestions } = emojiPlugin;
+  const { MentionSuggestions } = mentionPlugin;
 
   return (
     <div className="draft-editor-container" ref={wrapperNode}>
@@ -152,11 +187,18 @@ export default function DraftJSEditor({
         handleKeyCommand={handleKeyCommand}
         keyBindingFn={keyBindingFn}
         placeholder={placeholder}
-        plugins={[emojiPlugin]}
+        plugins={[emojiPlugin, mentionPlugin]}
         ref={editorNode}
         webDriverTestID="draftjs-editor"
       />
       <EmojiSuggestions />
+      <MentionSuggestions
+        suggestions={users}
+        onSearchChange={console.log}
+        onOpenChange={setOpen}
+        onAddMention={console.log}
+        open={open}
+      />
     </div>
   );
 }

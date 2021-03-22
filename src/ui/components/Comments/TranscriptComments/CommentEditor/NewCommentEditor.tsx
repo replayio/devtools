@@ -8,11 +8,13 @@ import { PendingNewComment, PendingNewReply } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
 
 interface NewCommentEditorProps extends PropsFromRedux {
+  collaborators: any;
   comment: PendingNewComment | PendingNewReply;
   type: "new_reply" | "new_comment";
 }
 
 function NewCommentEditor({
+  collaborators,
   comment,
   type,
   clearPendingComment,
@@ -82,7 +84,7 @@ function NewCommentEditor({
     });
   };
 
-  return <CommentEditor {...{ comment, handleSubmit }} />;
+  return <CommentEditor {...{ comment, collaborators, handleSubmit }} />;
 }
 
 const connector = connect(

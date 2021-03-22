@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -49,8 +49,22 @@ function Transcript({
   showFloatingItem,
   hideFloatingItem,
 }: PropsFromRedux) {
+  const data = hooks.useGetOwnersAndCollaborators(recordingId!);
   const { comments } = hooks.useGetComments(recordingId!);
   const entries: Entry[] = createEntries(comments, clickEvents, shouldShowLoneEvents);
+
+  const collaborators = useMemo(
+    () =>
+      data &&
+      data.collaborators &&
+      data.recording &&
+      [...data.collaborators.map((c: any) => c.user), data.recording.user].map(c => ({
+        name: c.name,
+        handle: c.nickname,
+        id: c.id,
+      })),
+    [data]
+  );
 
   useEffect(
     function updateFloatingItem() {
@@ -82,11 +96,13 @@ function Transcript({
         <div className="transcript-list">
           {sortBy(displayedEntries, ["time", "kind", "created_at"]).map((entry, i) => {
             if ("itemType" in entry) {
-              return <FloatingTranscriptItem item={entry} key={i} />;
+              return <FloatingTranscriptItem collaborators={collaborators} item={entry} key={i} />;
             } else if ("content" in entry) {
-              return <NonEventTranscriptItem comment={entry} key={i} />;
+              return (
+                <NonEventTranscriptItem comment={entry} collaborators={collaborators} key={i} />
+              );
             } else {
-              return <EventTranscriptItem event={entry} key={i} />;
+              return <EventTranscriptItem event={entry} collaborators={collaborators} key={i} />;
             }
           })}
         </div>

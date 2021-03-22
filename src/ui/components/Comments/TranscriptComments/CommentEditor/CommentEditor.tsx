@@ -14,24 +14,36 @@ import {
   PendingNewComment,
   PendingNewReply,
 } from "ui/state/comments";
+import { EditorState, convertToRaw } from "draft-js";
+import { convertToMarkdown } from "./mention";
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
   handleSubmit: (inputValue: string) => void;
+  collaborators: any;
 };
 
 function CommentEditor({
   pendingComment,
+  collaborators,
   comment,
   handleSubmit,
   clearPendingComment,
 }: CommentEditorProps) {
   const { user } = useAuth0();
-  const { DraftJS, Editor, emojiPlugin, editorState, setEditorState } = useEditor(comment.content);
+  const { editorState, setEditorState, config } = useEditor({
+    content: comment.content,
+    users: collaborators,
+  });
 
-  const isNewComment = comment.content == "" && !("parent_id" in comment);
+  const submit = (state?: EditorState) => {
+    if (!editorState) {
+      handleSubmit("");
+      return;
+    }
 
-  const inputValue = editorState ? editorState.getCurrentContent().getPlainText() : "";
+    handleSubmit(convertToMarkdown(editorState));
+  };
 
   const handleCancel = () => {
     clearPendingComment();
@@ -41,17 +53,16 @@ function CommentEditor({
     <div className="comment-input-container" onClick={e => e.stopPropagation()}>
       <div className="comment-input">
         <img src={user.picture} className="comment-picture" />
-        {DraftJS && editorState ? (
+        {config && editorState && collaborators ? (
           <DraftJSEditor
-            DraftJS={DraftJS}
-            Editor={Editor}
+            {...config}
             editorState={editorState}
-            emojiPlugin={emojiPlugin}
             handleCancel={handleCancel}
-            handleSubmit={handleSubmit}
+            handleSubmit={submit}
             initialContent={comment.content}
             placeholder={comment.content == "" ? "Type a comment" : ""}
             setEditorState={setEditorState}
+            users={collaborators}
           />
         ) : null}
       </div>
@@ -59,7 +70,7 @@ function CommentEditor({
         <button className="action-cancel" onClick={handleCancel}>
           Cancel
         </button>
-        <button className="action-submit" onClick={() => handleSubmit(inputValue)}>
+        <button className="action-submit" onClick={() => submit(editorState)}>
           Submit
         </button>
       </div>
