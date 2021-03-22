@@ -14,7 +14,8 @@ function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDr
   const { user } = useAuth0();
   let picture, title, subtitle;
 
-  if (!workspaces) {
+  // Just render the component if we're in the default personal state to avoid flickering.
+  if (!workspaces && currentWorkspaceId !== "personal") {
     return null;
   }
 
@@ -26,7 +27,8 @@ function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDr
     const displayedWorkspace = workspaces.find(workspace => workspace.id == currentWorkspaceId);
     picture = <div className="material-icons">workspaces</div>;
     title = displayedWorkspace!.name;
-    const count = displayedWorkspace?.workspaces_users_aggregate?.aggregate.count;
+    const count = displayedWorkspace?.workspaces_users.filter(wu => !wu.pending).length;
+    // const count = displayedWorkspace?.workspaces_users_aggregate?.aggregate.count;
     subtitle = `Workspace - ${count} member${count == 1 ? "" : "s"}`;
   }
 

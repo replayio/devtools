@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
-
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import { isDeployPreview } from "ui/utils/environment";

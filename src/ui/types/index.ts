@@ -4,7 +4,6 @@ export interface User {
   picture: string;
   id: string;
   nickname: string;
-
   collaborators?: Collaborator[];
   recordings: Recording[];
 }

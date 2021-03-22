@@ -6,11 +6,15 @@ import NewWorkspaceButton from "./NewWorkspaceButton";
 import WorkspaceItem from "./WorkspaceItem";
 import WorkspaceDropdownButton from "./WorkspaceDropdownButton";
 import hooks from "ui/hooks";
+import { Workspace } from "ui/hooks/workspaces";
+import useToken from "ui/utils/useToken";
 
 export default function WorkspaceDropdown() {
   const [expanded, setExpanded] = useState(false);
-  const { workspaces } = hooks.useGetWorkspaces();
+  const { workspaces } = hooks.useGetNonPendingWorkspaces();
   const { user } = useAuth0();
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
 
   return (
     <div className="workspace-dropdown-container">
@@ -28,8 +32,13 @@ export default function WorkspaceDropdown() {
           workspaceId="personal"
         />
         {workspaces &&
-          workspaces.map((workspace: any) => {
-            const count = workspace?.workspaces_users_aggregate?.aggregate.count;
+          workspaces.map((workspace: Workspace) => {
+            const count = workspace?.workspaces_users.filter(wu => !wu.pending).length;
+            const isPending = workspace?.workspaces_users.find(wu => wu.user_id == userId)?.pending;
+
+            if (isPending) {
+              return null;
+            }
 
             return (
               <WorkspaceItem

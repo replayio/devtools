@@ -10,7 +10,7 @@ import {
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug" | "comments";
 export type ViewMode = "dev" | "non-dev";
-export type ModalType = "sharing" | "login" | "settings" | "new-workspace";
+export type ModalType = "sharing" | "login" | "settings" | "new-workspace" | "workspace-settings";
 export type WorkspaceId = "personal" | string;
 
 export interface ExpectedError {
