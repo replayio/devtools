@@ -1,7 +1,7 @@
 .modal-container .modal-content {
   min-height: auto;
-  height: 320px;
-  min-width: 400px;
+  height: 400px;
+  width: 400px;
 }
 
 .modal-content > *:not(:last-child) {
@@ -166,4 +166,14 @@
   background: var(--dark-blue);
   cursor: pointer;
   line-height: 16px;
+}
+
+.modal-container .copy-link {
+  display: flex;
+  align-items: center;
+}
+
+.modal-container .copy-link .img.link {
+  background: white;
+  margin-right: 4px;
 }

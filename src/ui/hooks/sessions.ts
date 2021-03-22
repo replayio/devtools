@@ -1,11 +1,9 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import useToken from "ui/utils/useToken";
+import { User } from "ui/state/session";
 
-interface User {
-  name: string;
-  picture: string;
-  id: string;
+interface SessionUser extends User {
   sessionId?: string;
 }
 interface Session {
@@ -60,7 +58,7 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
 
   // This includes the sessionId with the user. Otherwise, all
   // anonymous users look the same (null) and we can't maintain some order.
-  const users = filteredSessions
+  const users: SessionUser[] = filteredSessions
     .map((session: Session) => ({
       ...session.user,
       sessionId: session.id,

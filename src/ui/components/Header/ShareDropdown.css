@@ -90,12 +90,6 @@
   box-sizing: content-box;
 }
 
-#header .share .dropdown-container .row.privacy-note.is-public,
-#header .share .dropdown-container .row.privacy-note.is-public .label-description,
-#header .share .dropdown-container .row.privacy-note.is-public .label-description a:visited {
-  color: #7d000f;
-}
-
 #header .share .dropdown-container .row.privacy button.toggle:focus {
   outline: none;
 }
