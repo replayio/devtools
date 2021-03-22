@@ -36,6 +36,7 @@ const {
   initOutputSyntaxHighlighting,
 } = require("./devtools/client/webconsole/utils/syntax-highlighted");
 const { setupExceptions } = require("devtools/client/debugger/src/actions/logExceptions");
+const { selectors } = require("ui/reducers");
 
 require("image/image.css");
 
@@ -78,6 +79,9 @@ async function initialize() {
     initialized = true;
     await initialize();
   }
+
+  const theme = selectors.getTheme(store.getState());
+  document.body.parentElement.className = theme || "";
 
   if (recordingId) {
     setupApp(recordingId, store);
