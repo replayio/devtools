@@ -199,7 +199,9 @@ export function updateNarrowMode(viewportWidth: number): UIThunkAction {
   };
 }
 
-export function setHoveredLineNumberLocation(location: Location): SetHoveredLineNumberLocation {
+export function setHoveredLineNumberLocation(
+  location: Location | null
+): SetHoveredLineNumberLocation {
   return { type: "set_hovered_line_number_location", location };
 }
 
