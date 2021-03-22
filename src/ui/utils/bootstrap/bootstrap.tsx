@@ -12,6 +12,7 @@ import tokenManager from "ui/utils/tokenManager";
 import useToken from "ui/utils/useToken";
 import { createApolloClient } from "ui/utils/apolloClient";
 import { ApolloProvider } from "@apollo/client";
+const SkeletonLoader = require("ui/components/SkeletonLoader").default;
 
 import { skipTelemetry } from "../environment";
 import { UIStore } from "ui/actions";
@@ -52,7 +53,7 @@ function ApolloWrapper({
   const { loading, token, error } = useToken();
 
   if (loading) {
-    return null;
+    return <SkeletonLoader content={"Initializing"} />;
   }
 
   if (error) {
@@ -74,11 +75,11 @@ export function bootstrapApp(props: AppProps, context: Record<string, any>, stor
   ReactDOM.render(
     <Router>
       <tokenManager.Auth0Provider recordingId={context.recordingId}>
-        <ApolloWrapper recordingId={context.recordingId}>
-          <Provider store={store}>
+        <Provider store={store}>
+          <ApolloWrapper recordingId={context.recordingId}>
             <App {...props} />
-          </Provider>
-        </ApolloWrapper>
+          </ApolloWrapper>
+        </Provider>
       </tokenManager.Auth0Provider>
     </Router>,
     document.querySelector("#app")
