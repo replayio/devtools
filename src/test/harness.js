@@ -633,10 +633,17 @@ async function checkHighlighterVisible(visible) {
 }
 
 async function checkHighlighterShape(svgPath) {
+  const expectedCoords = svgPath.substring(1).split(/ L|,/);
   await waitUntil(() => {
     const highlighterNode = document.getElementById("box-model-content");
     const highlighterPath = highlighterNode?.attributes["d"].textContent;
-    return highlighterPath === svgPath;
+    const highlighterCoords = highlighterPath.substring(1).split(/ L|,/);
+    for (let i = 0; i < 8; i++) {
+      if (Math.abs(highlighterCoords[i] - expectedCoords[i]) >= 1) {
+        return false;
+      }
+    }
+    return true;
   });
 }
 
