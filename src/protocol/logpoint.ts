@@ -7,7 +7,7 @@
 // messages associated with the logpoint atomically.
 
 import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
-import { assert } from "./utils";
+import { assert, compareNumericStrings } from "./utils";
 import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
 import { PrimitiveValue } from "./thread/value";
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
@@ -109,6 +109,7 @@ function saveLogpointHits(
       results.some(result => result.key === point.point && result.value.time === point.time)
     );
   }
+  points.sort((p1, p2) => compareNumericStrings(p1.point, p2.point));
   for (const location of locations) {
     store.dispatch(setAnalysisPoints(points, location, condition));
   }
