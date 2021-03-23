@@ -1,4 +1,5 @@
 import { EditorState, convertToRaw } from "draft-js";
+import { User } from "ui/components/shared/SharingModal/types";
 
 // Borrowed and slightly modified from
 // https://github.com/draft-js-plugins/draft-js-plugins/blob/master/packages/mention/src/defaultRegExp.ts
@@ -23,13 +24,13 @@ const defaultRegExp =
   "\xC0-\u1EF9" +
   "]";
 
-function addMentions(DraftJS: any, es: EditorState, users: any[]) {
+function addMentions(DraftJS: any, es: EditorState, users: User[]) {
   const blocks = es.getCurrentContent().getBlocksAsArray();
   blocks.forEach(b => {
     // @ts-ignore
     const matches = [...b.getText().matchAll(new RegExp(`@(${defaultRegExp}+)`, "ig"))].reverse();
     for (let match of matches) {
-      const mention = users.find(u => u.handle === match[1]);
+      const mention = users.find(u => u.nickname === match[1]);
 
       if (!mention) continue;
       const contentStateWithEntity = es.getCurrentContent().createEntity("mention", "IMMUTABLE", {
@@ -64,7 +65,7 @@ function convertToMarkdown(editorState: EditorState) {
         const e = raw.entityMap[er.key];
         if (e.type === "mention") {
           buffer.push(b.text.substring(i, er.offset));
-          buffer.push(`@${e.data.mention.handle}`);
+          buffer.push(`@${e.data.mention.nickname}`);
           i = er.offset + er.length;
         }
       });

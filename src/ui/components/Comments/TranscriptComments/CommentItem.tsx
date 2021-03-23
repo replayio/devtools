@@ -16,9 +16,10 @@ import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 import ExistingCommentEditor from "./CommentEditor/ExistingCommentEditor";
 import NewCommentEditor from "./CommentEditor/NewCommentEditor";
+import { User } from "ui/components/shared/SharingModal/types";
 
 type CommentProps = PropsFromRedux & {
-  collaborators: any;
+  collaborators?: User[];
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
   isRoot: boolean;
 };

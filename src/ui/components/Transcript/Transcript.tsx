@@ -15,6 +15,7 @@ import "./Transcript.css";
 
 import { UIState } from "ui/state";
 import { Event, Comment, FloatingItem } from "ui/state/comments";
+import { User } from "../shared/SharingModal/types";
 
 type Entry = Comment | Event;
 
@@ -55,14 +56,9 @@ function Transcript({
 
   const collaborators = useMemo(
     () =>
-      data &&
-      data.collaborators &&
-      data.recording &&
-      [...data.collaborators.map((c: any) => c.user), data.recording.user].map(c => ({
-        name: c.name,
-        handle: c.nickname,
-        id: c.id,
-      })),
+      data && data.collaborators && data.recording
+        ? [...data.collaborators.map(c => c.user), data.recording.user]
+        : undefined,
     [data]
   );
 

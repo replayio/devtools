@@ -9,7 +9,7 @@ import "@draft-js-plugins/mention/lib/plugin.css";
 import { addMentions } from "./mention";
 
 import "./DraftJSEditor.css";
-import { User } from "ui/state/comments";
+import { User } from "ui/components/shared/SharingModal/types";
 
 interface UseEditorConfig {
   DraftJS: {
@@ -32,7 +32,7 @@ export function useEditor({
   users,
 }: {
   content: string;
-  users: User[];
+  users?: User[];
 }): UseEditorResult {
   const [editorState, setEditorState] = useState<EditorState>();
   const [config, setConfig] = useState<UseEditorConfig>();

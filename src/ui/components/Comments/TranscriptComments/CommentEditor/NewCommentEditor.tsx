@@ -6,9 +6,10 @@ import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { PendingNewComment, PendingNewReply } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
+import { User } from "ui/components/shared/SharingModal/types";
 
 interface NewCommentEditorProps extends PropsFromRedux {
-  collaborators: any;
+  collaborators?: User[];
   comment: PendingNewComment | PendingNewReply;
   type: "new_reply" | "new_comment";
 }

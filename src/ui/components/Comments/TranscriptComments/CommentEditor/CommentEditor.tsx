@@ -16,11 +16,12 @@ import {
 } from "ui/state/comments";
 import { EditorState, convertToRaw } from "draft-js";
 import { convertToMarkdown } from "./mention";
+import { User } from "ui/components/shared/SharingModal/types";
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
   handleSubmit: (inputValue: string) => void;
-  collaborators: any;
+  collaborators?: User[];
 };
 
 function CommentEditor({

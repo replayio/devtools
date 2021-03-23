@@ -2,6 +2,7 @@ import React from "react";
 import CommentThread from "ui/components/Comments/TranscriptComments/CommentThread";
 import TranscriptItem from "./TranscriptItem";
 import { Event } from "ui/state/comments";
+import { User } from "ui/components/shared/SharingModal/types";
 
 // Transcript item component for displaying events (Mouse Clicks) from the recording.
 
@@ -10,7 +11,7 @@ export default function EventTranscriptItem({
   collaborators,
 }: {
   event: Event;
-  collaborators: any;
+  collaborators?: User[];
 }) {
   return (
     <TranscriptItem

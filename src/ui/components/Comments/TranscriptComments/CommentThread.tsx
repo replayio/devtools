@@ -7,9 +7,10 @@ import { UIState } from "ui/state";
 import { Comment } from "ui/state/comments";
 import CommentItem from "./CommentItem";
 import "./CommentThread.css";
+import { User } from "ui/components/shared/SharingModal/types";
 
 type CommentThreadProps = PropsFromRedux & {
-  collaborators: any;
+  collaborators?: User[];
   comment?: Comment | null;
   time: number;
 };
