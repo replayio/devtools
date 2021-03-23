@@ -59,12 +59,10 @@ function UserOptions({ recordingId, setModal }) {
             <span>Share</span>
           </button>
         )}
-        {recordingId ? (
-          <button className="row" onClick={onSettingsClick}>
-            <span className="material-icons">settings</span>
-            <span>Settings</span>
-          </button>
-        ) : null}
+        <button className="row" onClick={onSettingsClick}>
+          <span className="material-icons">settings</span>
+          <span>Settings</span>
+        </button>
         <LoginButton />
       </Dropdown>
     </div>
