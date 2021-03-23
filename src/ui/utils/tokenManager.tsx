@@ -8,8 +8,6 @@ import { assert, defer, Deferred } from "protocol/utils";
 const domain = "webreplay.us.auth0.com";
 const audience = "hasura-api";
 
-// Hasura requires a valid recording id when querying the recordings table directly.
-const defaultRecordingId = "5a080a89-580b-4b5b-8cbe-3c9995992a0d";
 const tokenRefreshSecondsBeforeExpiry = 60;
 
 // Auth0 E2E tests require a different clientId
@@ -42,15 +40,8 @@ class TokenManager {
   private isTokenRequested = false;
   private refreshTimeout: number | undefined;
   private listeners: TokenListener[] = [];
-  private init = true;
 
-  Auth0Provider = ({
-    recordingId,
-    children,
-  }: {
-    recordingId: string | undefined;
-    children: ReactNode;
-  }) => {
+  Auth0Provider = ({ children }: { children: ReactNode }) => {
     const history = useHistory();
 
     const onRedirectCallback = (appState: AppState) => {
@@ -67,7 +58,6 @@ class TokenManager {
         cacheLocation="localstorage"
         prompt="select_account"
         useRefreshTokens={true}
-        recordingId={recordingId || defaultRecordingId}
       >
         <Auth0Context.Consumer>
           {auth0Client => {
@@ -76,10 +66,7 @@ class TokenManager {
               return;
             }
 
-            setTimeout(() => {
-              this.update(this.init);
-              this.init = false;
-            }, 0);
+            setTimeout(() => this.update(false), 0);
 
             return null;
           }}
