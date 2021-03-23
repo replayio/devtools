@@ -1,3 +1,4 @@
+import { EditorState } from "draft-js";
 import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { connect, ConnectedProps } from "react-redux";
@@ -5,6 +6,8 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import CommentTool from "ui/components/shared/CommentTool";
+import { User } from "ui/types";
+
 import DraftJSEditor, { useEditor } from "./DraftJSEditor";
 import "./CommentEditor.css";
 import {
@@ -14,9 +17,7 @@ import {
   PendingNewComment,
   PendingNewReply,
 } from "ui/state/comments";
-import { EditorState, convertToRaw } from "draft-js";
 import { convertToMarkdown } from "./mention";
-import { User } from "ui/components/shared/SharingModal/types";
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;

@@ -15,7 +15,6 @@ import "./Transcript.css";
 
 import { UIState } from "ui/state";
 import { Event, Comment, FloatingItem } from "ui/state/comments";
-import { User } from "../shared/SharingModal/types";
 
 type Entry = Comment | Event;
 

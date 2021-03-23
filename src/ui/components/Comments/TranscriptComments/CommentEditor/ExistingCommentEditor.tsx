@@ -4,7 +4,7 @@ import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 import { PendingEditComment, PendingEditReply } from "ui/state/comments";
 import CommentEditor from "./CommentEditor";
-import { User } from "ui/components/shared/SharingModal/types";
+import { User } from "ui/types";
 
 type ExistingCommentEditorProps = PropsFromRedux & {
   collaborators?: User[];

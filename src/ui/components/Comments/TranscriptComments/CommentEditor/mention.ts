@@ -1,5 +1,5 @@
 import { EditorState, convertToRaw } from "draft-js";
-import { User } from "ui/components/shared/SharingModal/types";
+import { User } from "ui/types";
 
 // Borrowed and slightly modified from
 // https://github.com/draft-js-plugins/draft-js-plugins/blob/master/packages/mention/src/defaultRegExp.ts

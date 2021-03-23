@@ -6,10 +6,11 @@ import "draft-js/dist/Draft.css";
 import "@draft-js-plugins/emoji/lib/plugin.css";
 import "@draft-js-plugins/mention/lib/plugin.css";
 
+import { User } from "ui/types";
+
 import { addMentions } from "./mention";
 
 import "./DraftJSEditor.css";
-import { User } from "ui/components/shared/SharingModal/types";
 
 interface UseEditorConfig {
   DraftJS: {

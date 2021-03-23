@@ -1,7 +1,7 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
 import useToken from "ui/utils/useToken";
-import { User } from "ui/components/shared/SharingModal/types";
+import { User } from "ui/types";
 
 export function useGetRecordingPhoto(
   recordingId: RecordingId

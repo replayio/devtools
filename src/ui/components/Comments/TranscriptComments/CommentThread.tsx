@@ -7,7 +7,7 @@ import { UIState } from "ui/state";
 import { Comment } from "ui/state/comments";
 import CommentItem from "./CommentItem";
 import "./CommentThread.css";
-import { User } from "ui/components/shared/SharingModal/types";
+import { User } from "ui/types";
 
 type CommentThreadProps = PropsFromRedux & {
   collaborators?: User[];
