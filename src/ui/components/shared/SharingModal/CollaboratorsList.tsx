@@ -38,7 +38,7 @@ export default function CollaboratorsList({
   recordingId,
 }: {
   recording: RecordingDbData;
-  collaborators: CollaboratorDbData[];
+  collaborators: CollaboratorDbData[] | null;
   recordingId: string;
 }) {
   const owner = recording.user;

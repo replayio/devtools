@@ -27,12 +27,16 @@ const defaultRegExp =
 function addMentions(DraftJS: any, es: EditorState, users: User[]) {
   const blocks = es.getCurrentContent().getBlocksAsArray();
   blocks.forEach(b => {
+    // iterate in reverse order to avoid invalidating the match indices when changing the text
     // @ts-ignore
     const matches = [...b.getText().matchAll(new RegExp(`@(${defaultRegExp}+)`, "ig"))].reverse();
     for (let match of matches) {
       const mention = users.find(u => u.nickname === match[1]);
 
       if (!mention) continue;
+
+      // If we find a user for the mention (which we should), create a mention
+      // entity and replace the text with the new entity
       const contentStateWithEntity = es.getCurrentContent().createEntity("mention", "IMMUTABLE", {
         mention,
       });
