@@ -72,6 +72,18 @@ f();
     ["<entries>"]
   );
 
+  await Test.executeInConsole("new Promise(() => {})");
+  msg = await Test.waitForMessage("Promise {  }");
+  await Test.checkMessageObjectContents(msg, ['"pending"'], []);
+
+  await Test.executeInConsole("Promise.resolve({ a: 1 })");
+  msg = await Test.waitForMessage("Promise {  }");
+  await Test.checkMessageObjectContents(msg, ['"fulfilled"', "a: 1"], ["<value>"]);
+
+  await Test.executeInConsole("Promise.reject({ a: 1 })");
+  msg = await Test.waitForMessage("Promise {  }");
+  await Test.checkMessageObjectContents(msg, ['"rejected"', "a: 1"], ["<value>"]);
+
   await Test.executeInConsole("baz");
   msg = await Test.waitForMessage("function baz()");
   Test.checkJumpIcon(msg);

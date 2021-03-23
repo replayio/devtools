@@ -127,6 +127,11 @@ export class ValueFront {
     return [];
   }
 
+  previewPromiseState() {
+    // Older recordings did not set promiseState so this could be null.
+    return (this.hasPreview() && this._object!.preview!.promiseState) || null;
+  }
+
   className() {
     if (this._object) {
       return this._object.className;
@@ -306,6 +311,23 @@ export class ValueFront {
         name: "<entries>",
         contents: createElementsFront(elements),
       });
+    }
+    if (this.className() === "Promise") {
+      const result = this.previewPromiseState();
+      if (result) {
+        const { state, value } = result;
+
+        if (value) {
+          rv.unshift({
+            name: "<value>",
+            contents: value,
+          });
+        }
+        rv.unshift({
+          name: "<state>",
+          contents: state,
+        });
+      }
     }
     rv.push({
       name: "<prototype>",
