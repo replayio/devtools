@@ -9,6 +9,7 @@ const { prefs } = require("ui/utils/prefs");
 import { getTest } from "ui/utils/environment";
 
 import { ExpectedError } from "ui/state/app";
+import { waitForTime } from "protocol/utils";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & { error: sessionError };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
@@ -39,9 +40,17 @@ export async function createSession(store: UIStore, recordingId: string) {
     });
     await tokenManager.getToken();
 
-    const { sessionId } = await sendMessage("Recording.createSession", {
-      recordingId,
-    });
+    const createSessionResponse = await Promise.race([
+      sendMessage("Recording.createSession", { recordingId }),
+      waitForTime(10000),
+    ]);
+    if (!createSessionResponse) {
+      store.dispatch(
+        setExpectedError({ message: "Failed to create a session, please try again later." })
+      );
+      return;
+    }
+    const { sessionId } = createSessionResponse;
 
     window.sessionId = sessionId;
     ThreadFront.setSessionId(sessionId);
