@@ -7,7 +7,7 @@
 // messages associated with the logpoint atomically.
 
 import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
-import { assert } from "./utils";
+import { assert, compareNumericStrings } from "./utils";
 import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
 import { PrimitiveValue } from "./thread/value";
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
@@ -257,6 +257,10 @@ export async function setLogpoint(
   }
 
   await analysisManager.runAnalysis(params, handler);
+
+  // The analysis points may have arrived in any order, so we have to sort
+  // them after they arrive.
+  points.sort((a, b) => compareNumericStrings(a.point, b.point));
 
   saveLogpointHits(points, results, locations, condition);
 }
