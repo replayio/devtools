@@ -94,7 +94,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem,
   }, []);
 
   const isHot = analysisPoints?.length > displayedBreakpointMaxHits;
-  const isEditable = analysisPoints?.length > editableBreakpointMaxHits;
+  const isEditable = analysisPoints?.length < editableBreakpointMaxHits;
 
   if (isHot) {
     return (
@@ -127,7 +127,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem,
         ) : (
           <PanelSummary
             breakpoint={breakpoint}
-            editable={isEditable}
+            isEditable={isEditable}
             toggleEditingOn={toggleEditingOn}
             setInputToFocus={setInputToFocus}
           />
