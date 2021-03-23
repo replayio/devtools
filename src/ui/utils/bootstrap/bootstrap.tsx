@@ -74,7 +74,7 @@ export function bootstrapApp(props: AppProps, context: Record<string, any>, stor
 
   ReactDOM.render(
     <Router>
-      <tokenManager.Auth0Provider recordingId={context.recordingId}>
+      <tokenManager.Auth0Provider>
         <Provider store={store}>
           <ApolloWrapper recordingId={context.recordingId}>
             <App {...props} />
