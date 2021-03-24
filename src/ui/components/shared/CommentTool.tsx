@@ -33,13 +33,21 @@ interface CommentToolProps extends PropsFromRedux {
 function CommentTool({ pendingComment, setPendingComment, setCommentPointer }: CommentToolProps) {
   const addListeners = () => {
     setCommentPointer(true);
-    document.getElementById("video")!.classList.add("location-marker");
-    document.getElementById("video")!.addEventListener("mouseup", onClickInCanvas);
+    const videoNode = document.getElementById("video");
+
+    if (videoNode) {
+      videoNode.classList.add("location-marker");
+      videoNode.addEventListener("mouseup", onClickInCanvas);
+    }
   };
   const removeListeners = () => {
     setCommentPointer(false);
-    document.getElementById("video")!.classList.remove("location-marker");
-    document.getElementById("video")!.removeEventListener("mouseup", onClickInCanvas);
+    const videoNode = document.getElementById("video");
+
+    if (videoNode) {
+      videoNode.classList.remove("location-marker");
+      videoNode.removeEventListener("mouseup", onClickInCanvas);
+    }
   };
   const onClickInCanvas = async (e: MouseEvent) => {
     if (e.target !== document.querySelector("canvas#graphics") || !pendingComment) {
