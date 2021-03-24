@@ -54,7 +54,6 @@ const reps = [
   TextNode,
   Attribute,
   Func,
-  PromiseRep,
   ArrayRep,
   Document,
   DocumentType,
