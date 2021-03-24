@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { EditorState, KeyBindingUtil, getDefaultKeyBinding } from "draft-js";
 import PluginEditor, { EditorPlugin } from "@draft-js-plugins/editor";
 import { EmojiPlugin } from "@draft-js-plugins/emoji";
@@ -51,8 +51,8 @@ export function useEditor({
         ([
           DraftJS,
           EditorModule,
-          { default: createEmojiPlugin, defaultTheme },
-          { default: createMentionPlugin },
+          { default: createEmojiPlugin, defaultTheme: defaultEmojiTheme },
+          { default: createMentionPlugin, defaultTheme: defaultMentionTheme },
         ]) => {
           const es = addMentions(DraftJS, EditorModule.createEditorStateWithText(content), users);
 
@@ -62,12 +62,16 @@ export function useEditor({
             Editor: EditorModule.default,
             emojiPlugin: createEmojiPlugin({
               theme: {
-                ...defaultTheme,
-                emojiSuggestions: `${defaultTheme.emojiSuggestions} emojiSuggestions`,
+                ...defaultEmojiTheme,
+                emojiSuggestions: `${defaultEmojiTheme.emojiSuggestions} pluginPopover`,
               },
             }),
             mentionPlugin: createMentionPlugin({
               entityMutability: "IMMUTABLE",
+              theme: {
+                ...defaultMentionTheme,
+                mentionSuggestions: `${defaultMentionTheme.mentionSuggestions} pluginPopover`,
+              },
             }),
           });
         }
@@ -131,6 +135,7 @@ export default function DraftJSEditor({
 }: DraftJSEditorProps) {
   const editorNode = useRef<PluginEditor>(null);
   const wrapperNode = useRef<HTMLDivElement>(null);
+  const [mentionSearchText, setMentionSearchText] = useState("");
   const [open, setOpen] = useState(false);
   const { getDefaultKeyBinding, KeyBindingUtil } = DraftJS;
 
@@ -180,6 +185,15 @@ export default function DraftJSEditor({
   const { EmojiSuggestions } = emojiPlugin;
   const { MentionSuggestions } = mentionPlugin;
 
+  const filteredUsers = useMemo(
+    () =>
+      users &&
+      users.filter(
+        u => u.name.includes(mentionSearchText) || u.nickname.includes(mentionSearchText)
+      ),
+    [mentionSearchText, users]
+  );
+
   return (
     <div className="draft-editor-container" ref={wrapperNode}>
       <Editor
@@ -194,10 +208,11 @@ export default function DraftJSEditor({
       />
       <EmojiSuggestions />
       <MentionSuggestions
-        suggestions={users}
-        onSearchChange={console.log}
+        suggestions={filteredUsers}
+        onSearchChange={({ value }: { trigger: string; value: string }) =>
+          setMentionSearchText(value)
+        }
         onOpenChange={setOpen}
-        onAddMention={console.log}
         open={open}
       />
     </div>
