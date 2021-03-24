@@ -1,4 +1,5 @@
 import { ApolloError } from "@apollo/client";
+import { User } from "ui/types";
 
 export type Status =
   | {
@@ -30,12 +31,4 @@ export interface CollaboratorDbData {
   user_id: string;
   recording_id: string;
   user: User;
-}
-
-export interface User {
-  email: string;
-  id: string;
-  name: string;
-  nickname: string;
-  picture: string;
 }
