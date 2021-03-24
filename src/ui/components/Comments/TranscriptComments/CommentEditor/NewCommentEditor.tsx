@@ -9,13 +9,11 @@ import CommentEditor from "./CommentEditor";
 import { User } from "ui/types";
 
 interface NewCommentEditorProps extends PropsFromRedux {
-  collaborators?: User[];
   comment: PendingNewComment | PendingNewReply;
   type: "new_reply" | "new_comment";
 }
 
 function NewCommentEditor({
-  collaborators,
   comment,
   type,
   clearPendingComment,
@@ -85,7 +83,7 @@ function NewCommentEditor({
     });
   };
 
-  return <CommentEditor {...{ comment, collaborators, handleSubmit }} />;
+  return <CommentEditor {...{ comment, handleSubmit }} />;
 }
 
 const connector = connect(

@@ -7,16 +7,13 @@ import { UIState } from "ui/state";
 import { Comment } from "ui/state/comments";
 import CommentItem from "./CommentItem";
 import "./CommentThread.css";
-import { User } from "ui/types";
 
 type CommentThreadProps = PropsFromRedux & {
-  collaborators?: User[];
   comment?: Comment | null;
   time: number;
 };
 
 function CommentThread({
-  collaborators,
   comment,
   time,
   currentTime,
@@ -65,25 +62,17 @@ function CommentThread({
           onMouseLeave={() => setHoveredComment(null)}
         >
           <div className="comment-body">
-            {comment && (
-              <CommentItem {...{ comment, collaborators, hoveredComment, isRoot: true }} />
-            )}
+            {comment && <CommentItem {...{ comment, hoveredComment, isRoot: true }} />}
             {comment &&
               "replies" in comment &&
               comment.replies.map(reply => (
-                <CommentItem
-                  collaborators={collaborators}
-                  comment={reply}
-                  key={reply.id}
-                  isRoot={false}
-                />
+                <CommentItem comment={reply} key={reply.id} isRoot={false} />
               ))}
             {pendingComment &&
             pendingComment.comment.time == time &&
             pendingComment.type.includes("new") ? (
               <CommentItem
                 {...{
-                  collaborators,
                   comment: pendingComment.comment,
                   type: pendingComment.type,
                   isRoot: pendingComment?.type == "new_comment",
@@ -99,6 +88,7 @@ function CommentThread({
 
 const connector = connect(
   (state: UIState) => ({
+    recordingId: selectors.getRecordingId(state),
     pendingComment: selectors.getPendingComment(state),
     currentTime: selectors.getCurrentTime(state),
     hoveredComment: selectors.getHoveredComment(state),

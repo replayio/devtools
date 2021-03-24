@@ -16,7 +16,6 @@ const { getSymbols } = require("devtools/client/debugger/src/reducers/ast");
 
 type PropsFromParent = {
   item: FloatingItem;
-  collaborators?: User[];
 };
 
 type PauseTranscriptItemProps = PropsFromRedux & PropsFromParent;
@@ -25,7 +24,6 @@ type PauseTranscriptItemProps = PropsFromRedux & PropsFromParent;
 // accounted for by one of the displayed entries.
 
 function PauseTranscriptItem({
-  collaborators,
   item,
   pendingComment,
   snippet,
@@ -51,9 +49,7 @@ function PauseTranscriptItem({
       label={label}
       secondaryLabel={secondaryLabel}
     >
-      {pendingComment ? (
-        <CommentThread collaborators={collaborators} comment={null} time={item.time} />
-      ) : null}
+      {pendingComment ? <CommentThread comment={null} time={item.time} /> : null}
     </TranscriptItem>
   );
 }

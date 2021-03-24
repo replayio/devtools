@@ -1,12 +1,12 @@
 import { EditorState } from "draft-js";
-import React from "react";
+import React, { useMemo } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
+import hooks from "ui/hooks";
 import CommentTool from "ui/components/shared/CommentTool";
-import { User } from "ui/types";
 
 import DraftJSEditor, { useEditor } from "./DraftJSEditor";
 import "./CommentEditor.css";
@@ -22,29 +22,36 @@ import { convertToMarkdown } from "./mention";
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
   handleSubmit: (inputValue: string) => void;
-  collaborators?: User[];
 };
 
 function CommentEditor({
   pendingComment,
-  collaborators,
   comment,
   handleSubmit,
   clearPendingComment,
+  recordingId,
 }: CommentEditorProps) {
+  const { collaborators, recording } = hooks.useGetOwnersAndCollaborators(recordingId!);
+
+  const users = useMemo(
+    () =>
+      collaborators && recording ? [...collaborators.map(c => c.user), recording.user] : undefined,
+    [collaborators, recording]
+  );
+
   const { user } = useAuth0();
   const { editorState, setEditorState, config } = useEditor({
     content: comment.content,
-    users: collaborators,
+    users,
   });
 
   const submit = (state?: EditorState) => {
-    if (!editorState) {
+    if (!state) {
       handleSubmit("");
       return;
     }
 
-    handleSubmit(convertToMarkdown(editorState));
+    handleSubmit(convertToMarkdown(state));
   };
 
   const handleCancel = () => {
@@ -55,7 +62,7 @@ function CommentEditor({
     <div className="comment-input-container" onClick={e => e.stopPropagation()}>
       <div className="comment-input">
         <img src={user.picture} className="comment-picture" />
-        {config && editorState && collaborators ? (
+        {config && editorState && users ? (
           <DraftJSEditor
             {...config}
             editorState={editorState}
@@ -64,7 +71,7 @@ function CommentEditor({
             initialContent={comment.content}
             placeholder={comment.content == "" ? "Type a comment" : ""}
             setEditorState={setEditorState}
-            users={collaborators}
+            users={users}
           />
         ) : null}
       </div>

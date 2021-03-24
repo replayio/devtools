@@ -15,7 +15,6 @@ import { User } from "ui/types";
 
 type PropsFromParent = {
   comment: Comment;
-  collaborators?: User[];
 };
 type NonEventTranscriptItemProps = PropsFromRedux & PropsFromParent;
 
@@ -25,7 +24,6 @@ type NonEventTranscriptItemProps = PropsFromRedux & PropsFromParent;
 // for which there is a comment or pending comment.
 
 function NonEventTranscriptItem({
-  collaborators,
   comment,
   closestFunction,
   snippet,
@@ -50,7 +48,7 @@ function NonEventTranscriptItem({
       label={label}
       secondaryLabel={secondaryLabel}
     >
-      <CommentThread comment={comment} collaborators={collaborators} time={comment.time} />
+      <CommentThread comment={comment} time={comment.time} />
     </TranscriptItem>
   );
 }

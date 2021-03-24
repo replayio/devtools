@@ -7,15 +7,10 @@ import CommentEditor from "./CommentEditor";
 import { User } from "ui/types";
 
 type ExistingCommentEditorProps = PropsFromRedux & {
-  collaborators?: User[];
   comment: PendingEditComment | PendingEditReply;
 };
 
-function ExistingCommentEditor({
-  collaborators,
-  comment,
-  clearPendingComment,
-}: ExistingCommentEditorProps) {
+function ExistingCommentEditor({ comment, clearPendingComment }: ExistingCommentEditorProps) {
   const updateComment = hooks.useUpdateComment(clearPendingComment);
 
   const handleSubmit = (inputValue: string) => {
@@ -36,7 +31,7 @@ function ExistingCommentEditor({
     });
   };
 
-  return <CommentEditor {...{ comment, collaborators, handleSubmit }} />;
+  return <CommentEditor {...{ comment, handleSubmit }} />;
 }
 
 const connector = connect(null, { clearPendingComment: actions.clearPendingComment });

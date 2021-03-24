@@ -6,13 +6,7 @@ import { User } from "ui/types";
 
 // Transcript item component for displaying events (Mouse Clicks) from the recording.
 
-export default function EventTranscriptItem({
-  event,
-  collaborators,
-}: {
-  event: Event;
-  collaborators?: User[];
-}) {
+export default function EventTranscriptItem({ event }: { event: Event }) {
   return (
     <TranscriptItem
       item={event}
@@ -20,7 +14,7 @@ export default function EventTranscriptItem({
       label="Mouse Click"
       secondaryLabel=""
     >
-      <CommentThread collaborators={collaborators} comment={event.comment} time={event.time} />
+      <CommentThread comment={event.comment} time={event.time} />
     </TranscriptItem>
   );
 }
