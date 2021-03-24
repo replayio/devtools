@@ -4,6 +4,16 @@ import { ThreadFront } from "./thread";
 
 type ValueFronts = { name: string; path?: string; contents: ValueFront }[];
 
+// like JSON, but including `undefined`
+type JSONishValue =
+  | boolean
+  | string
+  | number
+  | null
+  | undefined
+  | JSONishValue[]
+  | { [key: string]: JSONishValue };
+
 // Manages interaction with a value from a pause.
 export class ValueFront {
   private _pause: Pause | null;
@@ -339,6 +349,51 @@ export class ValueFront {
     }
 
     return children;
+  }
+
+  /**
+   * Recursively create a representation of this value, similar to a JSON value
+   * but including `undefined`. If the object graph of this value contains a
+   * circular reference, it is replaced by `undefined`.
+   */
+  async getJSON(visitedObjectIds = new Set<string>()): Promise<JSONishValue> {
+    await this.loadChildren();
+
+    if (this.isPrimitive()) {
+      return this.primitive();
+    }
+
+    if (this.isObject()) {
+      const objectId = this._object!.objectId;
+      if (visitedObjectIds.has(objectId)) {
+        return undefined;
+      }
+
+      visitedObjectIds = new Set(visitedObjectIds);
+      visitedObjectIds.add(objectId);
+
+      const properties = await Promise.all(
+        Object.entries(this.previewValueMap()).map(async ([key, valueFront]) => {
+          const value = await valueFront.getJSON(visitedObjectIds);
+          return [key, value] as [string, JSONishValue];
+        })
+      );
+
+      if (this.className() === "Array") {
+        let result: JSONishValue[] = [];
+        for (const [key, value] of properties) {
+          const index = parseInt(key);
+          if (Number.isInteger(index)) {
+            result[index] = value;
+          }
+        }
+        return result;
+      } else {
+        return Object.fromEntries(properties);
+      }
+    }
+
+    return undefined;
   }
 }
 

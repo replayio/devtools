@@ -13,31 +13,6 @@ let currentTime = null;
 let rerenderComponentsTab;
 const messages = [];
 
-async function frontToJSON(front) {
-  if (front.isPrimitive()) {
-    return front._primitive;
-  }
-
-  await front.loadChildren();
-  const children = (
-    await Promise.all(
-      front._object.preview.properties.map(async property => {
-        return [property.name, await frontToJSON(property.value)];
-      })
-    )
-  ).filter(([key]) => key != "length");
-
-  if (children.length == 0) {
-    return [];
-  }
-
-  if (Number.isInteger(parseInt(children[0][0]))) {
-    return children.map(([, value]) => value);
-  }
-
-  return Object.fromEntries(children);
-}
-
 let inspected = new Set();
 
 function InitReactDevTools() {
@@ -70,7 +45,7 @@ function InitReactDevTools() {
           )})`
         );
 
-        const inspectedElement = await frontToJSON(response.returned);
+        const inspectedElement = await response.returned.getJSON();
         wall._listener({ event: "inspectedElement", payload: inspectedElement.data });
       }
 
