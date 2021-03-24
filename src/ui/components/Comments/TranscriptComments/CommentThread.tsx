@@ -88,7 +88,6 @@ function CommentThread({
 
 const connector = connect(
   (state: UIState) => ({
-    recordingId: selectors.getRecordingId(state),
     pendingComment: selectors.getPendingComment(state),
     currentTime: selectors.getCurrentTime(state),
     hoveredComment: selectors.getHoveredComment(state),
