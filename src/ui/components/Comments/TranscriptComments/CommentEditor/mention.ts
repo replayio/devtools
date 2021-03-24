@@ -24,7 +24,13 @@ const defaultRegExp =
   "\xC0-\u1EF9" +
   "]";
 
+function mentionsEnabled() {
+  return true;
+}
+
 function addMentions(DraftJS: any, es: EditorState, users: User[]) {
+  if (!mentionsEnabled()) return es;
+
   const blocks = es.getCurrentContent().getBlocksAsArray();
   blocks.forEach(b => {
     // iterate in reverse order to avoid invalidating the match indices when changing the text
@@ -60,6 +66,8 @@ function addMentions(DraftJS: any, es: EditorState, users: User[]) {
 }
 
 function convertToMarkdown(editorState: EditorState) {
+  if (!mentionsEnabled()) return editorState.getCurrentContent().getPlainText();
+
   const raw = convertToRaw(editorState.getCurrentContent());
   return raw.blocks
     .map(b => {
@@ -80,4 +88,4 @@ function convertToMarkdown(editorState: EditorState) {
     .join("\n");
 }
 
-export { addMentions, convertToMarkdown };
+export { addMentions, convertToMarkdown, mentionsEnabled };

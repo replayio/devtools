@@ -8,7 +8,7 @@ import "@draft-js-plugins/mention/lib/plugin.css";
 
 import { User } from "ui/types";
 
-import { addMentions } from "./mention";
+import { addMentions, mentionsEnabled } from "./mention";
 
 import "./DraftJSEditor.css";
 
@@ -202,7 +202,7 @@ export default function DraftJSEditor({
         handleKeyCommand={handleKeyCommand}
         keyBindingFn={keyBindingFn}
         placeholder={placeholder}
-        plugins={[emojiPlugin, mentionPlugin]}
+        plugins={[emojiPlugin, mentionsEnabled() && mentionPlugin]}
         ref={editorNode}
         webDriverTestID="draftjs-editor"
       />
