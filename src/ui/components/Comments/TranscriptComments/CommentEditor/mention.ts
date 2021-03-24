@@ -1,6 +1,9 @@
 import { EditorState, convertToRaw } from "draft-js";
 import { User } from "ui/types";
 
+// @ts-ignore-line
+import { features } from "ui/utils/prefs";
+
 // Borrowed and slightly modified from
 // https://github.com/draft-js-plugins/draft-js-plugins/blob/master/packages/mention/src/defaultRegExp.ts
 // for creating the entities on load
@@ -25,7 +28,7 @@ const defaultRegExp =
   "]";
 
 function mentionsEnabled() {
-  return true;
+  return features.commentMentions;
 }
 
 function addMentions(DraftJS: any, es: EditorState, users: User[]) {
