@@ -16,7 +16,10 @@ const LoginButton = () => {
   }
 
   return (
-    <button className="login" onClick={() => loginWithRedirect()}>
+    <button
+      className="login"
+      onClick={() => loginWithRedirect({ appState: { returnTo: window.location.href } })}
+    >
       Sign In
     </button>
   );

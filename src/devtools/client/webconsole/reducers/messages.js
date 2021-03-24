@@ -630,6 +630,7 @@ function passLevelFilters(message, filters) {
   return (
     (message.source !== MESSAGE_SOURCE.CONSOLE_API &&
       message.source !== MESSAGE_SOURCE.JAVASCRIPT) ||
+    message.type !== MESSAGE_TYPE.LOG ||
     filters[message.level] === true
   );
 }

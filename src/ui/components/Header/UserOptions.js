@@ -14,7 +14,7 @@ function UserOptions({ recordingId, setModal }) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
 
-  const showShare = hooks.useIsOwner(recordingId);
+  const showShare = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
 
   if (isDeployPreview()) {
     return null;
@@ -44,7 +44,7 @@ function UserOptions({ recordingId, setModal }) {
   return (
     <div className="user-options">
       <Dropdown
-        buttonContent={<span className="material-icons">more_horiz</span>}
+        buttonContent={<span className="material-icons more">more_horiz</span>}
         setExpanded={setExpanded}
         expanded={expanded}
         orientation="bottom"

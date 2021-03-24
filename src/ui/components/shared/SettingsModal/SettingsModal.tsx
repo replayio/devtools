@@ -35,10 +35,18 @@ const settings: Settings = [
 export default function SettingsModal() {
   // No need to handle loading state here as it's already cached from the useGetUserSettings
   // query in the DevTools component
-  const { userSettings } = hooks.useGetUserSettings();
+  const { userSettings, loading } = hooks.useGetUserSettings();
 
   const [selectedTab, setSelectedTab] = useState<SelectedTab>(settings[0].title);
   const selectedSetting = settings.find(setting => setting.title === selectedTab)!;
+
+  if (loading) {
+    return (
+      <div className="settings-modal">
+        <Modal></Modal>
+      </div>
+    );
+  }
 
   return (
     <div className="settings-modal">

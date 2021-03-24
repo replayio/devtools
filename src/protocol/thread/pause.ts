@@ -33,10 +33,14 @@ export type WiredObject = Omit<ObjectDescription, "preview"> & {
 
 export type WiredObjectPreview = Omit<
   ObjectPreview,
-  "properties" | "containerEntries" | "getterValues"
+  "properties" | "containerEntries" | "promiseState" | "getterValues"
 > & {
   properties: WiredProperty[];
   containerEntries: WiredContainerEntry[];
+  promiseState?: {
+    state: ValueFront;
+    value?: ValueFront;
+  };
   getterValues: WiredNamedValue[];
   prototypeValue: ValueFront;
 };
@@ -203,7 +207,7 @@ export class Pause {
 
     (objects || []).forEach(object => {
       if (object.preview) {
-        const { properties, containerEntries, getterValues } = object.preview;
+        const { properties, containerEntries, promiseState, getterValues } = object.preview;
 
         const newProperties = [];
         for (const p of properties || []) {
@@ -228,6 +232,15 @@ export class Pause {
           });
         }
         (object as WiredObject).preview!.containerEntries = newEntries;
+
+        if (promiseState) {
+          const { state, value } = promiseState;
+
+          (object as WiredObject).preview!.promiseState = {
+            state: new ValueFront(this, { value: state }),
+            value: value ? new ValueFront(this, value) : undefined,
+          };
+        }
 
         const newGetterValues: WiredNamedValue[] = [];
         for (const v of getterValues || []) {
