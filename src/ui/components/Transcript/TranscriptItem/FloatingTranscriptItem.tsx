@@ -6,7 +6,6 @@ import TranscriptItem from "./TranscriptItem";
 import { FloatingItem } from "ui/state/comments";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
-import { User } from "ui/types";
 
 const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
 const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");

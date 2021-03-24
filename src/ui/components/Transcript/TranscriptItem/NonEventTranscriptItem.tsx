@@ -11,7 +11,6 @@ const { getSymbols } = require("devtools/client/debugger/src/reducers/ast");
 
 import { UIState } from "ui/state";
 import { Comment } from "ui/state/comments";
-import { User } from "ui/types";
 
 type PropsFromParent = {
   comment: Comment;
