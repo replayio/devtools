@@ -287,6 +287,11 @@ module.exports = [
   //////////////////////////////////////////////////////////////////////////////
 
   {
+    example: "doc_rr_basic.html",
+    script: "settings.js",
+    targets: ["gecko", "chromium"],
+  },
+  {
     example: "doc_rr_worker.html",
     script: "worker-01.js",
     targets: ["gecko", "chromium"],
