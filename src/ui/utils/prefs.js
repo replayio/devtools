@@ -31,6 +31,7 @@ pref("devtools.video", !!urlPrefs.video);
 
 // app features
 pref("devtools.features.comments", true);
+pref("devtools.features.commentMentions", true);
 pref("devtools.features.users", true);
 pref("devtools.features.auth0", true);
 pref("devtools.features.videoComments", false);
@@ -55,6 +56,7 @@ export const prefs = new PrefsHelper("devtools", {
 
 export const features = new PrefsHelper("devtools.features", {
   comments: ["Bool", "comments"],
+  commentMentions: ["Bool", "commentMentions"],
   users: ["Bool", "users"],
   auth0: ["Bool", "auth0"],
   videoComments: ["Bool", "videoComments"],

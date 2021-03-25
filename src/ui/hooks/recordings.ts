@@ -39,7 +39,14 @@ export function useGetRecordingPhoto(
   return { error, loading, screenData };
 }
 
-export function useGetOwnersAndCollaborators(recordingId: RecordingId) {
+export function useGetOwnersAndCollaborators(
+  recordingId: RecordingId
+): {
+  collaborators: { user_id: string; recording_id: string; user: User }[] | null;
+  recording: { user: User; id: string; is_private: boolean } | null;
+  loading: boolean;
+  error?: ApolloError;
+} {
   const { data, loading, error } = useQuery(
     gql`
       query GetOwnerAndCollaborators($recordingId: uuid!) {
@@ -73,7 +80,7 @@ export function useGetOwnersAndCollaborators(recordingId: RecordingId) {
   );
 
   if (loading) {
-    return { collaborators: null, recording_by_pk: null, loading, error };
+    return { collaborators: null, recording: null, loading, error };
   }
 
   if (error) {

@@ -1,10 +1,13 @@
-import React from "react";
+import { EditorState } from "draft-js";
+import React, { useMemo } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
+import hooks from "ui/hooks";
 import CommentTool from "ui/components/shared/CommentTool";
+
 import DraftJSEditor, { useEditor } from "./DraftJSEditor";
 import "./CommentEditor.css";
 import {
@@ -14,6 +17,7 @@ import {
   PendingNewComment,
   PendingNewReply,
 } from "ui/state/comments";
+import { convertToMarkdown } from "./mention";
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
@@ -25,13 +29,30 @@ function CommentEditor({
   comment,
   handleSubmit,
   clearPendingComment,
+  recordingId,
 }: CommentEditorProps) {
+  const { collaborators, recording } = hooks.useGetOwnersAndCollaborators(recordingId!);
+
+  const users = useMemo(
+    () =>
+      collaborators && recording ? [...collaborators.map(c => c.user), recording.user] : undefined,
+    [collaborators, recording]
+  );
+
   const { user } = useAuth0();
-  const { DraftJS, Editor, emojiPlugin, editorState, setEditorState } = useEditor(comment.content);
+  const { editorState, setEditorState, config } = useEditor({
+    content: comment.content,
+    users,
+  });
 
-  const isNewComment = comment.content == "" && !("parent_id" in comment);
+  const submit = (state?: EditorState) => {
+    if (!state) {
+      handleSubmit("");
+      return;
+    }
 
-  const inputValue = editorState ? editorState.getCurrentContent().getPlainText() : "";
+    handleSubmit(convertToMarkdown(state));
+  };
 
   const handleCancel = () => {
     clearPendingComment();
@@ -41,17 +62,16 @@ function CommentEditor({
     <div className="comment-input-container" onClick={e => e.stopPropagation()}>
       <div className="comment-input">
         <img src={user.picture} className="comment-picture" />
-        {DraftJS && editorState ? (
+        {config && editorState && users ? (
           <DraftJSEditor
-            DraftJS={DraftJS}
-            Editor={Editor}
+            {...config}
             editorState={editorState}
-            emojiPlugin={emojiPlugin}
             handleCancel={handleCancel}
-            handleSubmit={handleSubmit}
+            handleSubmit={submit}
             initialContent={comment.content}
             placeholder={comment.content == "" ? "Type a comment" : ""}
             setEditorState={setEditorState}
+            users={users}
           />
         ) : null}
       </div>
@@ -59,7 +79,7 @@ function CommentEditor({
         <button className="action-cancel" onClick={handleCancel}>
           Cancel
         </button>
-        <button className="action-submit" onClick={() => handleSubmit(inputValue)}>
+        <button className="action-submit" onClick={() => submit(editorState)}>
           Submit
         </button>
       </div>
