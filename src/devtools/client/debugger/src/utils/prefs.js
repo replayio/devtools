@@ -19,7 +19,7 @@ pref("devtools.debugger.logging", false);
 pref("devtools.debugger.timing", false);
 pref("devtools.debugger.alphabetize-outline", false);
 pref("devtools.debugger.outline-expanded", true);
-pref("devtools.debugger.sources-collapsed", true);
+pref("devtools.debugger.sources-collapsed", false);
 pref("devtools.source-map.client-service.enabled", true);
 pref("devtools.chrome.enabled", false);
 pref("devtools.debugger.log-exceptions", false);
