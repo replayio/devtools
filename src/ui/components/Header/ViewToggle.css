@@ -28,6 +28,8 @@
 
 .view-toggle .text {
   font-size: 16px;
+  min-width: 145px;
+  text-align: center;
   padding: 3px 36px;
   white-space: nowrap;
   color: rgba(0, 0, 0, 0.5);

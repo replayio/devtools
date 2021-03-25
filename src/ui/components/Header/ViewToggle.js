@@ -1,16 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
 import "./ViewToggle.css";
 import { setViewMode } from "../../actions/app";
 import { getViewMode } from "../../reducers/app";
 
-function Handle({ text, isOn, motion }) {
-  return (
-    <div className="option">
-      <div className={classnames("text", isOn && "active")}>{text}</div>
+function Handle({ text, mode, localViewMode, handleToggle, motion }) {
+  const isActive = mode == localViewMode;
 
-      {isOn && (
+  const onClick = () => {
+    if (!isActive) {
+      handleToggle(mode);
+    }
+  };
+
+  return (
+    <div className="option" onClick={onClick}>
+      <div className={classnames("text", isActive && "active")}>{text}</div>
+
+      {isActive && (
         <motion.div
           className="handle"
           layoutId="handle"
@@ -27,6 +35,8 @@ function Handle({ text, isOn, motion }) {
 
 function ViewToggle({ viewMode, setViewMode }) {
   const [framerMotion, setFramerMotion] = useState(null);
+  const [localViewMode, setLocalViewMode] = useState(viewMode);
+  const toggleTimeoutKey = useRef(null);
 
   useEffect(() => {
     import("framer-motion").then(framerMotion => setFramerMotion(framerMotion));
@@ -39,14 +49,35 @@ function ViewToggle({ viewMode, setViewMode }) {
 
   const { motion, AnimateSharedLayout } = framerMotion;
 
-  const onClick = () => setViewMode(viewMode === "dev" ? "non-dev" : "dev");
+  const handleToggle = mode => {
+    setLocalViewMode(mode);
+
+    // Delay updating the viewMode in redux so that the toggle can fully animate
+    // before re-rendering all of devtools in the new viewMode.
+    clearTimeout(toggleTimeoutKey.current);
+    toggleTimeoutKey.current = setTimeout(() => {
+      setViewMode(mode);
+    }, 300);
+  };
 
   return (
     <AnimateSharedLayout type="crossfade">
-      <button className="view-toggle" type="button" onClick={onClick}>
+      <button className="view-toggle" type="button">
         <div className="inner">
-          <Handle text="Viewer" isOn={viewMode == "non-dev"} motion={motion} />
-          <Handle text="DevTools" isOn={viewMode == "dev"} motion={motion} />
+          <Handle
+            text="Viewer"
+            mode="non-dev"
+            localViewMode={localViewMode}
+            handleToggle={handleToggle}
+            motion={motion}
+          />
+          <Handle
+            text="DevTools"
+            mode="dev"
+            localViewMode={localViewMode}
+            handleToggle={handleToggle}
+            motion={motion}
+          />
         </div>
       </button>
     </AnimateSharedLayout>
