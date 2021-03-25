@@ -711,7 +711,7 @@ function isTextInParameters(matchStr, parameters) {
 /**
  * Returns true if given text is included in provided parameter.
  */
-function isTextInParameter(matchStr, parameter) {
+function isTextInParameter(matchStr, parameter, visitedObjectIds = new Set()) {
   if (parameter.isPrimitive()) {
     return matchStr(String(parameter.primitive()));
   }
@@ -724,9 +724,16 @@ function isTextInParameter(matchStr, parameter) {
     return true;
   }
 
+  const objectId = parameter.id();
+  if (visitedObjectIds.has(objectId)) {
+    return false;
+  }
+  visitedObjectIds = new Set(visitedObjectIds);
+  visitedObjectIds.add(objectId);
+
   const previewItems = getGripPreviewItems(parameter);
   for (const item of previewItems) {
-    if (isTextInParameter(matchStr, item)) {
+    if (isTextInParameter(matchStr, item, visitedObjectIds)) {
       return true;
     }
   }
