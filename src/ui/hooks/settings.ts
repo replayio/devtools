@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth0 from "ui/utils/useAuth0";
 
 const anonymousSettings = {
   show_elements: false,

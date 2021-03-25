@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import Dropdown from "ui/components/shared/Dropdown";
 import "./WorkspaceDropdown.css";
 import NewWorkspaceButton from "./NewWorkspaceButton";
 import WorkspaceItem from "./WorkspaceItem";
 import WorkspaceDropdownButton from "./WorkspaceDropdownButton";
 import hooks from "ui/hooks";
-import { Workspace } from "ui/types";
 import useToken from "ui/utils/useToken";
 
 export default function WorkspaceDropdown() {

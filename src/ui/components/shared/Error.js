@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import Modal from "./Modal";
 import classnames from "classnames";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth0 from "ui/utils/useAuth0";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 

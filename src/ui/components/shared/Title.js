@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { gql, useMutation } from "@apollo/client";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth0 from "ui/utils/useAuth0";
 
 const UPDATE_RECORDING = gql`
   mutation UpdateRecordingTitle($recordingId: String, $title: String) {

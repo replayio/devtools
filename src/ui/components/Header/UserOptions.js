@@ -6,7 +6,7 @@ import hooks from "ui/hooks";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import { isDeployPreview } from "ui/utils/environment";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth0 from "ui/utils/useAuth0";
 import "./UserOptions.css";
 
 function UserOptions({ recordingId, setModal }) {
