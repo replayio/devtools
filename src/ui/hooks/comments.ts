@@ -38,8 +38,6 @@ const DELETE_COMMENT_REPLIES = gql`
   }
 `;
 
-const NO_COMMENTS: Comment[] = [];
-
 export function useGetComments(
   recordingId: RecordingId
 ): { comments: Comment[]; loading: boolean; error?: ApolloError } {
@@ -84,7 +82,7 @@ export function useGetComments(
     console.error("Apollo error while fetching comments:", error);
   }
 
-  return { comments: data?.comments || NO_COMMENTS, loading, error };
+  return { comments: data?.comments || [], loading, error };
 }
 
 export function useAddComment(callback: Function = () => {}) {
