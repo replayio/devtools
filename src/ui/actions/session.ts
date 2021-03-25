@@ -6,7 +6,7 @@ import tokenManager from "ui/utils/tokenManager";
 import { UIStore, actions, UIThunkAction } from "ui/actions";
 import { ThreadFront } from "protocol/thread";
 const { prefs } = require("ui/utils/prefs");
-import { getTest } from "ui/utils/environment";
+import { getTest, isTest } from "ui/utils/environment";
 
 import { ExpectedError } from "ui/state/app";
 
@@ -32,12 +32,14 @@ export async function createSession(store: UIStore, recordingId: string) {
     ThreadFront.setTest(getTest() || undefined);
     ThreadFront.recordingId = recordingId;
 
-    tokenManager.addListener(({ token }) => {
-      if (token) {
-        sendMessage("Authentication.setAccessToken", { accessToken: token });
-      }
-    });
-    await tokenManager.getToken();
+    if (!isTest()) {
+      tokenManager.addListener(({ token }) => {
+        if (token) {
+          sendMessage("Authentication.setAccessToken", { accessToken: token });
+        }
+      });
+      await tokenManager.getToken();
+    }
 
     const { sessionId } = await sendMessage("Recording.createSession", {
       recordingId,

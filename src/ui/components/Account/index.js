@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth0 from "ui/utils/useAuth0";
 import { setUserInBrowserPrefs } from "../../utils/browser";
 import Library from "./Library";
 

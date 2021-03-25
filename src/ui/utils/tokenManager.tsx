@@ -4,6 +4,7 @@ import jwt_decode from "jwt-decode";
 import React, { ReactNode } from "react";
 import { useHistory } from "react-router-dom";
 import { assert, defer, Deferred } from "protocol/utils";
+import { isTest } from "./environment";
 
 const domain = "webreplay.us.auth0.com";
 const audience = "hasura-api";
@@ -41,6 +42,21 @@ class TokenManager {
   private refreshTimeout: number | undefined;
   private listeners: TokenListener[] = [];
 
+  constructor() {
+    if (isTest()) {
+      this.currentState = {
+        loading: false,
+        token: "E2E-TEST-TOKEN",
+        claims: {
+          hasura: {
+            userId: "e51d8408-edba-4b64-9d29-cb1b9fbf34db",
+          },
+        },
+      };
+      this.deferredState.resolve(this.currentState);
+    }
+  }
+
   Auth0Provider = ({ children }: { children: ReactNode }) => {
     const history = useHistory();
 
@@ -51,6 +67,10 @@ class TokenManager {
         history.push(window.location.pathname);
       }
     };
+
+    if (isTest()) {
+      return <>{children}</>;
+    }
 
     return (
       <Auth0Provider

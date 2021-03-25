@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth0 from "ui/utils/useAuth0";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";

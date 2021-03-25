@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth0 from "ui/utils/useAuth0";
 
 import DevTools from "./DevTools";
 const Account = require("./Account").default;
