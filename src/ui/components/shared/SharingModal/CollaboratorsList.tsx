@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { User } from "ui/types";
 import hooks from "ui/hooks";
-import { Role, RecordingDbData, CollaboratorDbData } from "./types";
+import { Role, RecordingDbData, CollaboratorDbData, User } from "./types";
 
 function Permission({ user, role, recordingId }: { user: User; role: Role; recordingId: string }) {
   const { deleteCollaborator, error } = hooks.useDeleteCollaborator();
@@ -39,7 +38,7 @@ export default function CollaboratorsList({
   recordingId,
 }: {
   recording: RecordingDbData;
-  collaborators: CollaboratorDbData[] | null;
+  collaborators: CollaboratorDbData[];
   recordingId: string;
 }) {
   const owner = recording.user;

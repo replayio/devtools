@@ -1,7 +1,7 @@
 
 /* These styles override the default emoji popover
    to constrain it to the narrow comment pane */
-.pluginPopover {
+.emojiSuggestions {
   position: absolute;
   top: calc(100% + 8px) !important;
   left: 0 !important;
@@ -15,7 +15,7 @@
   min-width: auto;
 }
 
-.flipPopup .pluginPopover {
+.flipPopup .emojiSuggestions {
   top: auto !important;
   bottom: calc(100% + 8px) !important;
 }
