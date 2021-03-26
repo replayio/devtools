@@ -8,11 +8,11 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import "./Dashboard.css";
+import { actions } from "ui/actions";
 
 function Dashboard({ currentWorkspaceId }: PropsFromRedux) {
   const [filter, setFilter] = useState("");
-
-  const { recordings, loading } = hooks.useGetRecordings(currentWorkspaceId);
+  const { recordings, loading } = hooks.useGetRecordings(currentWorkspaceId!);
 
   if (loading || recordings == null) {
     return <Loader />;
@@ -28,8 +28,11 @@ function Dashboard({ currentWorkspaceId }: PropsFromRedux) {
   );
 }
 
-const connector = connect((state: UIState) => ({
-  currentWorkspaceId: selectors.getWorkspaceId(state),
-}));
+const connector = connect(
+  (state: UIState) => ({
+    currentWorkspaceId: selectors.getWorkspaceId(state),
+  }),
+  { setWorkspaceId: actions.setWorkspaceId }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(Dashboard);

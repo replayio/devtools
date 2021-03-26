@@ -37,7 +37,7 @@ const DropdownPanel = ({
   setModal,
 }) => {
   const [deleteRecording] = useMutation(DELETE_RECORDING, {
-    refetchQueries: ["GetMyRecordings"],
+    refetchQueries: ["GetWorkspaceRecordings"],
   });
 
   const onDeleteRecording = async recordingId => {

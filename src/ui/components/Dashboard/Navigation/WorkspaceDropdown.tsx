@@ -6,52 +6,60 @@ import NewWorkspaceButton from "./NewWorkspaceButton";
 import WorkspaceItem from "./WorkspaceItem";
 import WorkspaceDropdownButton from "./WorkspaceDropdownButton";
 import hooks from "ui/hooks";
-import { Workspace } from "ui/hooks/workspaces";
+import { Workspace } from "ui/types";
 import useToken from "ui/utils/useToken";
 
 export default function WorkspaceDropdown() {
   const [expanded, setExpanded] = useState(false);
-  const { workspaces } = hooks.useGetNonPendingWorkspaces();
-  const { user } = useAuth0();
+  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
 
-  console.log("workspacedropdown");
+  if (loading) {
+    return null;
+  }
+
+  const sharedWorkspaces = workspaces.filter(workspace => !workspace.is_personal);
+  const personalWorkspace = workspaces.find(workspace => workspace.is_personal)!;
+
   return (
     <div className="workspace-dropdown-container">
       <Dropdown
-        buttonContent={<WorkspaceDropdownButton {...{ workspaces }} />}
+        buttonContent={
+          <WorkspaceDropdownButton
+            {...{ workspaces: workspaces!, personalWorkspaceId: personalWorkspace.id }}
+          />
+        }
         setExpanded={setExpanded}
         expanded={expanded}
         orientation="bottom"
       >
         <WorkspaceItem
-          icon={<img src={user.picture} />}
-          title="Personal"
-          subtitle={user.email}
+          icon={<div className="material-icons">workspaces</div>}
+          title={"Personal"}
+          subtitle={`Personal Workspace`}
           setExpanded={setExpanded}
-          workspaceId="personal"
+          workspaceId={personalWorkspace.id}
         />
-        {workspaces &&
-          workspaces.map((workspace: Workspace) => {
-            const count = workspace?.workspaces_users.filter(wu => !wu.pending).length;
-            const isPending = workspace?.workspaces_users.find(wu => wu.user_id == userId)?.pending;
+        {sharedWorkspaces.map(workspace => {
+          const count = workspace?.workspaces_users.filter(wu => !wu.pending).length;
+          const isPending = workspace?.workspaces_users.find(wu => wu.user_id == userId)?.pending;
 
-            if (isPending) {
-              return null;
-            }
+          if (isPending) {
+            return null;
+          }
 
-            return (
-              <WorkspaceItem
-                icon={<div className="material-icons">workspaces</div>}
-                title={workspace.name}
-                subtitle={`Workspace - ${count} member${count == 1 ? "" : "s"}`}
-                setExpanded={setExpanded}
-                workspaceId={workspace.id}
-                key={workspace.id}
-              />
-            );
-          })}
+          return (
+            <WorkspaceItem
+              icon={<div className="material-icons">workspaces</div>}
+              title={workspace.name}
+              subtitle={`Workspace - ${count} member${count == 1 ? "" : "s"}`}
+              setExpanded={setExpanded}
+              workspaceId={workspace.id}
+              key={workspace.id}
+            />
+          );
+        })}
         <NewWorkspaceButton setExpanded={setExpanded} />
       </Dropdown>
     </div>

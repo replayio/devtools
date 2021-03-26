@@ -55,29 +55,6 @@ const GetMyRecordings = gql`
   }
 `;
 
-const GetWorkspaceRecordings = gql`
-  query GetWorkspaceRecordings($workspaceId: uuid, $userId: uuid) {
-    recordings(where: { user: { workspaces_users: { workspace_id: { _eq: $workspaceId } } } }) {
-      id
-      url
-      title
-      recording_id
-      recordingTitle
-      last_screen_mime_type
-      duration
-      description
-      date
-      is_private
-      user {
-        name
-        email
-        picture
-        id
-      }
-    }
-  }
-`;
-
 export function useGetRecordingPhoto(
   recordingId: RecordingId
 ): {
@@ -252,21 +229,34 @@ function getRecordings(data: PersonalRecordingsData) {
 export function useGetRecordings(
   currentWorkspaceId: WorkspaceId
 ): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
-
-  let query;
-
-  if (currentWorkspaceId === "personal") {
-    query = GetMyRecordings;
-  } else {
-    query = GetWorkspaceRecordings;
-  }
-
-  const { data, error, loading } = useQuery(query, {
-    variables: { userId },
-    pollInterval: 10000,
-  });
+  const { data, error, loading } = useQuery(
+    gql`
+      query GetWorkspaceRecordings($workspaceId: uuid) {
+        recordings(where: { workspace_id: { _eq: $workspaceId } }) {
+          id
+          url
+          title
+          recording_id
+          recordingTitle
+          last_screen_mime_type
+          duration
+          description
+          date
+          is_private
+          user {
+            name
+            email
+            picture
+            id
+          }
+        }
+      }
+    `,
+    {
+      variables: { workspaceId: currentWorkspaceId },
+      pollInterval: 5000,
+    }
+  );
 
   if (loading) {
     return { recordings: null, loading };
@@ -276,34 +266,28 @@ export function useGetRecordings(
     console.error("Failed to fetch recordings:", error);
   }
 
-  let recordings;
-
-  if (currentWorkspaceId === "personal") {
-    recordings = getRecordings(data);
-  } else {
-    recordings = data.recordings;
-  }
-
+  let recordings = data?.recordings;
   return { recordings, loading };
 }
 
-// export function initializeRecordingWorkspace() {
-//   const [updateIsPrivate] = useMutation(
-//     gql`
-//       mutation SetRecordingIsPrivate($recordingId: uuid!, $isPrivate: Boolean) {
-//         update_recordings(where: { id: { _eq: $recordingId } }, _set: { is_private: $isPrivate }) {
-//           returning {
-//             is_private
-//             id
-//           }
-//         }
-//       }
-//     `,
-//     {
-//       variables: { recordingId, isPrivate: !isPrivate },
-//       refetchQueries: ["GetRecordingPrivacy"],
-//     }
-//   );
+export function useUpdateRecordingWorkspace() {
+  const [updateRecordingWorkspace] = useMutation(
+    gql`
+      mutation DeleteRecording($recordingId: uuid!, $workspaceId: uuid) {
+        update_recordings(
+          where: { id: { _eq: $recordingId } }
+          _set: { workspace_id: $workspaceId }
+        ) {
+          returning {
+            id
+          }
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetWorkspaceRecordings"],
+    }
+  );
 
-//   return updateIsPrivate;
-// }
+  return updateRecordingWorkspace;
+}

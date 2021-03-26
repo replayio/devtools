@@ -16,7 +16,6 @@
 }
 
 .new-workspace-modal .modal-container .modal-content {
-  height: max-content;
   width: 400px;
   padding: 0px;
   min-width: auto;

@@ -36,10 +36,9 @@ function AutocompleteAction({
 }) {
   const { members } = hooks.useGetWorkspaceMembers(workspaceId);
   const memberExists = members?.find(member => member.user.email == email);
-  const isRegistered = !!useGetRecording;
   const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember();
 
-  if (!isRegistered) {
+  if (!userId) {
     return <div>{`Can't invite`}</div>;
   } else if (memberExists) {
     return <div>{`User already invited`}</div>;
@@ -71,7 +70,7 @@ function Autocomplete({ workspaceId, inputValue }: AutocompleteProps) {
   return (
     <div className="autocomplete">
       <div className="content">{`${inputValue}`}</div>
-      <AutocompleteAction email={inputValue} workspaceId={workspaceId} userId={userId} />
+      <AutocompleteAction email={inputValue} workspaceId={workspaceId!} userId={userId} />
     </div>
   );
 }

@@ -4,10 +4,10 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
-import useToken from "ui/utils/useToken";
 
 import classnames from "classnames";
 import WorkspaceDropdown from "./WorkspaceDropdown";
+import Invitations from "./Invitations";
 const { features } = require("ui/utils/prefs");
 import "./DashboardNavigation.css";
 
@@ -42,12 +42,10 @@ function DashboardNavigation({
   setFilter,
   setModal,
 }: DashboardNavigationProps) {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
-  const { invitations, loading } = hooks.useGetPendingWorkspaceInvitations();
-  const acceptPendingInvitation = hooks.useAcceptPendingInvitation();
+  const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
   const hosts = getUniqueHosts(recordings);
 
+  const isPersonal = workspaces?.find(workspace => workspace.id == currentWorkspaceId)?.is_personal;
   const onSettingsClick = () => {
     setModal("workspace-settings");
   };
@@ -55,7 +53,7 @@ function DashboardNavigation({
   return (
     <nav className="left-sidebar">
       {features.workspaces ? <WorkspaceDropdown /> : null}
-      {features.workspaces && currentWorkspaceId !== "personal" ? (
+      {features.workspaces && workspaces && !isPersonal ? (
         <div className={classnames("left-sidebar-menu-item")} onClick={onSettingsClick}>
           <span className="material-icons">settings</span>
           <span>{`Settings & Members`}</span>
@@ -84,27 +82,7 @@ function DashboardNavigation({
           </div>
         ))}
       </div>
-      {!loading && invitations?.length > 0 ? (
-        <div className="workspace-invites">
-          <div className="navigation-subheader">INVITATIONS</div>
-          {invitations.map((workspace, i) => (
-            <div className={classnames("left-sidebar-menu-item")} key={i}>
-              <span className="material-icons">description</span>
-              <span>{workspace.workspace.name}</span>
-              <span>Refuse</span>
-              <span
-                onClick={() =>
-                  acceptPendingInvitation({
-                    variables: { workspaceId: workspace.workspace_id, userId: workspace.user_id },
-                  })
-                }
-              >
-                Accept
-              </span>
-            </div>
-          ))}
-        </div>
-      ) : null}
+      <Invitations />
     </nav>
   );
 }

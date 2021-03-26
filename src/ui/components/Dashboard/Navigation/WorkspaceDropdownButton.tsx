@@ -4,22 +4,27 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { selectors } from "ui/reducers";
 import "./WorkspaceDropdown.css";
 import { UIState } from "ui/state";
-import { Workspace } from "ui/hooks/workspaces";
+import { Workspace } from "ui/types";
 
 type WorkspaceDropdownButtonProps = PropsFromRedux & {
   workspaces: Workspace[];
+  personalWorkspaceId: string;
 };
 
-function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDropdownButtonProps) {
+function WorkspaceDropdownButton({
+  workspaces,
+  currentWorkspaceId,
+  personalWorkspaceId,
+}: WorkspaceDropdownButtonProps) {
   const { user } = useAuth0();
   let picture, title, subtitle;
 
   // Just render the component if we're in the default personal state to avoid flickering.
-  if (!workspaces && currentWorkspaceId !== "personal") {
+  if (!workspaces) {
     return null;
   }
 
-  if (currentWorkspaceId == "personal") {
+  if (currentWorkspaceId == personalWorkspaceId) {
     picture = <img src={user.picture} />;
     title = "Personal";
     subtitle = user.email;
@@ -28,7 +33,6 @@ function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDr
     picture = <div className="material-icons">workspaces</div>;
     title = displayedWorkspace!.name;
     const count = displayedWorkspace?.workspaces_users.filter(wu => !wu.pending).length;
-    // const count = displayedWorkspace?.workspaces_users_aggregate?.aggregate.count;
     subtitle = `Workspace - ${count} member${count == 1 ? "" : "s"}`;
   }
 

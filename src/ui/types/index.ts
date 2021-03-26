@@ -26,3 +26,20 @@ interface Collaborator {
   recording: Recording;
   user: User;
 }
+
+export interface Workspace {
+  name: string;
+  id: string;
+  workspaces_users: WorkspaceUser[];
+  is_personal: boolean;
+}
+
+export interface WorkspaceUser {
+  user: User;
+  workspace_id: string;
+  user_id: string;
+  pending: boolean;
+  workspace: {
+    name: string;
+  };
+}

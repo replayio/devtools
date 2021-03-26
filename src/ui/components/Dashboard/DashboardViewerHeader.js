@@ -4,6 +4,7 @@ import { useMutation } from "@apollo/client";
 import { DELETE_RECORDING } from "./RecordingItem/RecordingItemDropdown";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import "./DashboardViewerHeader.css";
+import hooks from "ui/hooks";
 
 function ViewsToggle({ viewType, toggleViewType }) {
   return (
@@ -27,13 +28,25 @@ function ViewsToggle({ viewType, toggleViewType }) {
 }
 
 function BatchActionDropdown({ selectedIds, setSelectedIds }) {
+  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
   const [deleteRecording] = useMutation(DELETE_RECORDING, {
     refetchQueries: ["GetMyRecordings"],
   });
 
+  if (loading) {
+    return null;
+  }
+
   const deleteSelectedIds = () => {
     selectedIds.forEach(recordingId =>
       deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } })
+    );
+    setSelectedIds([]);
+  };
+  const updateRecordings = workspaceId => {
+    selectedIds.forEach(recordingId =>
+      updateRecordingWorkspace({ variables: { recordingId, workspaceId: workspaceId } })
     );
     setSelectedIds([]);
   };
@@ -43,6 +56,11 @@ function BatchActionDropdown({ selectedIds, setSelectedIds }) {
       <div className="menu-item" onClick={deleteSelectedIds}>
         {`Delete ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""}`}
       </div>
+      {workspaces.map(({ id, name }) => (
+        <div className="menu-item" onClick={() => updateRecordings(id)} key={id}>
+          {`Move ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} to ${name}`}
+        </div>
+      ))}
     </div>
   );
   const icon = (

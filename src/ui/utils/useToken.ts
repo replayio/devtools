@@ -14,3 +14,8 @@ export default function useToken() {
 
   return tokenState;
 }
+
+export function getUserId() {
+  const { claims } = useToken();
+  return claims?.hasura.userId;
+}

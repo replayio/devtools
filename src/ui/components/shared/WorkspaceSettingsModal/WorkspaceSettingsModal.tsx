@@ -12,9 +12,8 @@ import "./WorkspaceSettingsModal.css";
 const content1 = `Manage members here so that everyone who belongs to this team can see each other's replays.`;
 
 function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
-  const { members, loading } = hooks.useGetWorkspaceMembers(workspaceId);
-
-  console.log({ members, loading });
+  const { members, loading } = hooks.useGetWorkspaceMembers(workspaceId!);
+  console.log({ members });
 
   return (
     <div className="workspace-settings-modal">

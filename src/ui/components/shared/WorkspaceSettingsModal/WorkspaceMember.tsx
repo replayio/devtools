@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import hooks from "ui/hooks";
-import { WorkspaceUser } from "ui/hooks/workspaces";
+import { WorkspaceUser } from "ui/types";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 import useToken from "ui/utils/useToken";
 import { connect, ConnectedProps } from "react-redux";
@@ -15,24 +15,32 @@ type WorkspaceMemberProps = { member: WorkspaceUser } & PropsFromRedux;
 function Role({
   member,
   setWorkspaceId,
+  workspaceId,
   hideModal,
 }: {
   member: WorkspaceUser;
   setWorkspaceId: any;
+  workspaceId: string;
   hideModal: any;
 }) {
   const [expanded, setExpanded] = useState(false);
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
+  const { personalWorkspaceId } = hooks.useGetPersonalWorkspace();
   const { claims } = useToken();
   const localUserId = claims?.hasura.userId;
-  const { user_id: userId, workspace_id: workspaceId } = member;
+  const { user_id: userId } = member;
 
   const handleDelete = () => {
-    setWorkspaceId("personal");
-    hideModal();
     deleteUserFromWorkspace({
       variables: { userId, workspaceId },
     });
+
+    // If the user is the member leaving, hide the modal and go back
+    // to the pesronal workspace.
+    if (localUserId == userId) {
+      hideModal();
+      setWorkspaceId(personalWorkspaceId);
+    }
   };
 
   let content = (
@@ -78,7 +86,7 @@ function Role({
   return <div className="member-permissions">{content}</div>;
 }
 
-function WorkspaceMember({ member, setWorkspaceId, hideModal }: WorkspaceMemberProps) {
+function WorkspaceMember({ member, setWorkspaceId, hideModal, workspaceId }: WorkspaceMemberProps) {
   return (
     <li className="workspace-member">
       <img src={member.user.picture} />
@@ -86,7 +94,12 @@ function WorkspaceMember({ member, setWorkspaceId, hideModal }: WorkspaceMemberP
         <div className="title">{member.user.name}</div>
         <div className="subtitle">{member.user.email}</div>
       </div>
-      <Role member={member} setWorkspaceId={setWorkspaceId} hideModal={hideModal} />
+      <Role
+        member={member}
+        setWorkspaceId={setWorkspaceId}
+        workspaceId={workspaceId!}
+        hideModal={hideModal}
+      />
     </li>
   );
 }

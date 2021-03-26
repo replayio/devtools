@@ -4,6 +4,7 @@ import * as recordingHooks from "./recordings";
 import * as settingsHooks from "./settings";
 import * as collaboratorsHooks from "./collaborators";
 import * as workspacesHooks from "./workspaces";
+import * as workspaceMembersHooks from "./workspaces_user";
 
 export default {
   ...commentsHooks,
@@ -12,4 +13,5 @@ export default {
   ...settingsHooks,
   ...collaboratorsHooks,
   ...workspacesHooks,
+  ...workspaceMembersHooks,
 };
