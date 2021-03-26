@@ -286,3 +286,24 @@ export function useGetRecordings(
 
   return { recordings, loading };
 }
+
+// export function initializeRecordingWorkspace() {
+//   const [updateIsPrivate] = useMutation(
+//     gql`
+//       mutation SetRecordingIsPrivate($recordingId: uuid!, $isPrivate: Boolean) {
+//         update_recordings(where: { id: { _eq: $recordingId } }, _set: { is_private: $isPrivate }) {
+//           returning {
+//             is_private
+//             id
+//           }
+//         }
+//       }
+//     `,
+//     {
+//       variables: { recordingId, isPrivate: !isPrivate },
+//       refetchQueries: ["GetRecordingPrivacy"],
+//     }
+//   );
+
+//   return updateIsPrivate;
+// }

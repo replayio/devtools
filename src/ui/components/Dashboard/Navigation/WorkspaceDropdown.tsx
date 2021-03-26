@@ -16,6 +16,7 @@ export default function WorkspaceDropdown() {
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
 
+  console.log("workspacedropdown");
   return (
     <div className="workspace-dropdown-container">
       <Dropdown

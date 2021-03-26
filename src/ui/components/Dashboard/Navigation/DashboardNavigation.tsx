@@ -52,8 +52,6 @@ function DashboardNavigation({
     setModal("workspace-settings");
   };
 
-  console.log(!loading && invitations?.length > 0, { loading, invitations });
-
   return (
     <nav className="left-sidebar">
       {features.workspaces ? <WorkspaceDropdown /> : null}

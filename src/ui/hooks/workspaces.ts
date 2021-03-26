@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import useToken from "ui/utils/useToken";
 import { User } from "ui/types";
@@ -6,6 +7,7 @@ export interface Workspace {
   name: string;
   id: string;
   workspaces_users: WorkspaceUser[];
+  is_personal: boolean;
 }
 
 export interface WorkspaceUser {
@@ -18,8 +20,73 @@ export interface WorkspaceUser {
   };
 }
 
-export function crapola() {
-  return null;
+export function useInitializePersonalWorkspace() {
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
+  const initializeRecordings = useInitializeRecordingsToPersonalWorkspace();
+
+  const onCompleted = (data: any) => {
+    const personalWorkspaceId = data.insert_workspaces.returning[0].id;
+    initializeRecordings({ variables: { workspaceId: personalWorkspaceId, userId } });
+  };
+  const [initializePersonalWorkspace, { error }] = useMutation(
+    gql`
+      mutation InitializePersonalWorkspace($userId: uuid) {
+        insert_workspaces(
+          objects: {
+            is_personal: true
+            name: "Personal"
+            workspaces_users: { data: { pending: false, user_id: $userId } }
+          }
+        ) {
+          affected_rows
+          returning {
+            id
+          }
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetWorkspaces"],
+      variables: { userId },
+      onCompleted,
+    }
+  );
+
+  if (error) {
+    console.error("Apollo error while initializing the user's workspace:", error);
+  }
+
+  return initializePersonalWorkspace;
+}
+
+export function useInitializeRecordingsToPersonalWorkspace() {
+  const [initializeRecordingsToPersonalWorkspace, { error }] = useMutation(
+    gql`
+      mutation InitializePersonalWorkspace($userId: uuid, $workspaceId: uuid) {
+        update_recordings(
+          where: { user_id: { _eq: $userId }, workspace_id: { _is_null: true } }
+          _set: { workspace_id: $workspaceId }
+        ) {
+          returning {
+            id
+          }
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetWorkspaceRecordings"],
+    }
+  );
+
+  if (error) {
+    console.error(
+      "Apollo error while initializing recordings to the user's personal workspace:",
+      error
+    );
+  }
+
+  return initializeRecordingsToPersonalWorkspace;
 }
 
 export function useCreateNewWorkspace() {
@@ -48,6 +115,7 @@ export function useCreateNewWorkspace() {
 export function useGetWorkspaces() {
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
+  const initializePersonalWorkspace = useInitializePersonalWorkspace();
 
   const { data, loading, error } = useQuery(
     gql`
@@ -55,6 +123,7 @@ export function useGetWorkspaces() {
         workspaces(where: { workspaces_users: { user_id: { _eq: $userId } } }) {
           name
           id
+          is_personal
           workspaces_users {
             pending
           }
@@ -71,11 +140,23 @@ export function useGetWorkspaces() {
     console.error("Apollo error while creating a new workspace:", error);
   }
 
-  const workspaces = data?.workspaces;
+  if (loading) {
+    return { workspaces: null, loading: true };
+  }
+
+  const workspaces: Workspace[] = data.workspaces;
+  const shouldInitialize = workspaces.find(workspace => workspace.is_personal);
+
+  if (shouldInitialize) {
+    initializePersonalWorkspace();
+  }
+
   return { workspaces, loading };
 }
 
 export function useGetNonPendingWorkspaces() {
+  const [mutationSent, setMutationSent] = useState(false);
+  const initializePersonalWorkspace = useInitializePersonalWorkspace();
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
 
@@ -89,6 +170,7 @@ export function useGetNonPendingWorkspaces() {
         ) {
           name
           id
+          is_personal
           workspaces_users {
             pending
           }
@@ -105,7 +187,18 @@ export function useGetNonPendingWorkspaces() {
     console.error("Apollo error while creating a new workspace:", error);
   }
 
-  const workspaces = data?.workspaces;
+  if (loading) {
+    return { workspaces: null, loading: true };
+  }
+
+  const workspaces: Workspace[] = data.workspaces;
+  const isInitialized = workspaces.find(workspace => workspace.is_personal);
+
+  if (!isInitialized && !mutationSent) {
+    setMutationSent(true);
+    initializePersonalWorkspace();
+  }
+
   return { workspaces, loading };
 }
 
@@ -189,13 +282,7 @@ export function useGetPendingWorkspaceInvitations() {
   const { data, loading, error } = useQuery(
     gql`
       query GetPendingWorkspaceInvitations($userId: uuid) {
-        workspaces_user(
-          where: {
-            user: {
-              _and: { workspaces_users: { pending: { _eq: true }, user_id: { _eq: $userId } } }
-            }
-          }
-        ) {
+        workspaces_user(where: { pending: { _eq: true }, user_id: { _eq: $userId } }) {
           user_id
           workspace_id
           pending
