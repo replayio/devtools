@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EditorState } from "draft-js";
+import type { EditorState } from "draft-js";
 
 import { User } from "ui/types";
 
@@ -36,6 +36,7 @@ export interface DraftJSAPI {
 
 interface InternalApi extends DraftJSAPI {
   state?: EditorState;
+  config?: LazyLoadDraftConfig;
 }
 
 interface DraftJSEditorProps {
@@ -64,10 +65,13 @@ export default function DraftJSEditor({
   const load = useDraftJS();
   const publicApi = useRef<InternalApi>({
     state: undefined,
+    config: undefined,
     focus: () => editorNode.current && editorNode.current.focus(),
     blur: () => editorNode.current && editorNode.current.blur(),
     getText: function () {
-      return this.state ? convertToMarkdown(this.state) : "";
+      return this.state && this.config
+        ? convertToMarkdown(this.state, this.config.modules.DraftJS)
+        : "";
     },
   });
 
@@ -97,6 +101,7 @@ export default function DraftJSEditor({
 
         setEditorState(es);
         setConfig(cfg);
+        publicApi.current.config = cfg;
       });
     },
     [users]
@@ -143,7 +148,7 @@ export default function DraftJSEditor({
   };
   const handleKeyCommand = (command: "save" | "cancel") => {
     if (command === "save") {
-      handleSubmit(editorState ? convertToMarkdown(editorState) : "");
+      handleSubmit(publicApi.current.getText());
       return "handled";
     } else if (command === "cancel") {
       handleCancel();
