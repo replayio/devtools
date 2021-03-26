@@ -25,6 +25,7 @@ const startTime = Date.now();
 let shouldRecordExamples = false;
 let shouldRecordViewer = false;
 let recordExamplesSeparately = false;
+let recordUsingChromium = false;
 let testTimeout = 240;
 
 function processArgs() {
@@ -38,6 +39,7 @@ function processArgs() {
       --record-all: Record examples and save the recordings locally, and record the viewer
       --separate: Record examples in a separate browser instance.
       --timeout N: Use a timeout of N seconds for tests (default 240).
+      --chromium: Record examples using chromium.
   `;
   for (let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
@@ -64,6 +66,11 @@ function processArgs() {
         break;
       case "--timeout":
         testTimeout = +process.argv[++i];
+        break;
+      case "--chromium":
+        shouldRecordExamples = true;
+        recordExamplesSeparately = true;
+        recordUsingChromium = true;
         break;
       case "--help":
       case "-h":
@@ -150,6 +157,10 @@ async function runTest(test, example) {
       }
     }
   } else if (recordExamplesSeparately) {
+    if (recordUsingChromium && !process.env.RECORD_REPLAY_CHROMIUM) {
+      console.log(`Skipping test ${test}: RECORD_REPLAY_CHROMIUM not set`);
+      return;
+    }
     exampleRecordingId = await createExampleBrowserRecording(
       `http://localhost:8080/test/examples/${example}`
     );
@@ -339,27 +350,50 @@ async function createExampleNodeRecording(example) {
 }
 
 async function createExampleBrowserRecording(url) {
-  const testScript = createTestScript({ path: `${__dirname}/exampleHarness.js` });
   const recordingIdFile = tmpFile();
-  const gecko = spawnGecko({
-    ...process.env,
-    MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
-    RECORD_REPLAY_TEST_SCRIPT: testScript,
-    RECORD_REPLAY_TEST_URL: url,
-    RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
-    RECORD_REPLAY_SERVER: dispatchServer,
-    RECORD_ALL_CONTENT: "1",
-  });
+
+  let browser;
+  if (recordUsingChromium) {
+    browser = spawn(process.env.RECORD_REPLAY_CHROMIUM, [url, "--no-sandbox"], {
+      env: {
+        ...process.env,
+        RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
+        RECORD_REPLAY_DISPATCH: dispatchServer,
+      },
+    });
+  } else {
+    const testScript = createTestScript({ path: `${__dirname}/exampleHarness.js` });
+    browser = spawnGecko({
+      ...process.env,
+      MOZ_CRASHREPORTER_AUTO_SUBMIT: "1",
+      RECORD_REPLAY_TEST_SCRIPT: testScript,
+      RECORD_REPLAY_TEST_URL: url,
+      RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
+      RECORD_REPLAY_SERVER: dispatchServer,
+      RECORD_ALL_CONTENT: "1",
+    });
+  }
 
   if (!process.env.RECORD_REPLAY_NO_TIMEOUT) {
-    setTimeout(() => gecko.kill(), 30 * 1000);
+    setTimeout(() => browser.kill(), 30 * 1000);
   };
 
-  gecko.stdout.on("data", data => process.stderr.write(data));
-  gecko.stderr.on("data", data => process.stderr.write(data));
+  function onOutput(data) {
+    data => process.stderr.write(data);
+
+    // When recording with chromium the recording process detects when the recording
+    // has finished, but we need to kill the browser outselves.
+    if (recordUsingChromium && data.toString().includes("Finished sending recording data")) {
+      spawnSync("pkill", ["-f", "Chromium"]);
+      resolve();
+    }
+  }
+
+  browser.stdout.on("data", onOutput);
+  browser.stderr.on("data", onOutput);
 
   const { promise, resolve } = defer();
-  gecko.on("close", resolve);
+  browser.on("close", resolve);
 
   await promise;
   return getRecordingId(recordingIdFile);
