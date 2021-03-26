@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorState } from "draft-js";
 
 import { User } from "ui/types";
@@ -28,7 +28,18 @@ const moveSelectionToEnd = (editorState: EditorState, DraftJS: any) => {
   return EditorState.forceSelection(editorState, selection);
 };
 
+export interface DraftJSAPI {
+  getText: () => string;
+  focus: () => void;
+  blur: () => void;
+}
+
+interface InternalApi extends DraftJSAPI {
+  state?: EditorState;
+}
+
 interface DraftJSEditorProps {
+  api: (api: DraftJSAPI) => void;
   initialContent: string;
   placeholder: string;
   handleSubmit: (text: string) => void;
@@ -37,6 +48,7 @@ interface DraftJSEditorProps {
 }
 
 export default function DraftJSEditor({
+  api,
   handleCancel,
   handleSubmit,
   initialContent,
@@ -50,6 +62,26 @@ export default function DraftJSEditor({
   const [editorState, setEditorState] = useState<EditorState>();
   const [config, setConfig] = useState<LazyLoadDraftConfig>();
   const load = useDraftJS();
+  const publicApi = useRef<InternalApi>({
+    state: undefined,
+    focus: () => editorNode.current && editorNode.current.focus(),
+    blur: () => editorNode.current && editorNode.current.blur(),
+    getText: function () {
+      return this.state ? convertToMarkdown(this.state) : "";
+    },
+  });
+
+  const handleChange = useCallback(
+    (updated: EditorState) => {
+      publicApi.current.state = updated;
+      setEditorState(updated);
+    },
+    [setEditorState]
+  );
+
+  useEffect(() => {
+    if (api) api(publicApi.current);
+  }, [api]);
 
   useEffect(
     function importDraftJS() {
@@ -123,10 +155,11 @@ export default function DraftJSEditor({
 
   const filteredUsers = useMemo(
     () =>
-      users &&
-      users.filter(
-        u => u.name.includes(mentionSearchText) || u.nickname.includes(mentionSearchText)
-      ),
+      users
+        ? users.filter(
+            u => u.name.includes(mentionSearchText) || u.nickname.includes(mentionSearchText)
+          )
+        : [],
     [mentionSearchText, users]
   );
 
@@ -146,7 +179,7 @@ export default function DraftJSEditor({
     <div className="draft-editor-container" ref={wrapperNode}>
       <Editor
         editorState={editorState}
-        onChange={setEditorState}
+        onChange={handleChange}
         handleKeyCommand={handleKeyCommand}
         keyBindingFn={keyBindingFn}
         placeholder={placeholder}
