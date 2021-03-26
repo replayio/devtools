@@ -8,7 +8,7 @@ import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import CommentTool from "ui/components/shared/CommentTool";
 
-import DraftJSEditor, { useEditor } from "./DraftJSEditor";
+import DraftJSEditor from "./DraftJSEditor";
 import "./CommentEditor.css";
 import {
   Comment,
@@ -40,19 +40,6 @@ function CommentEditor({
   );
 
   const { user } = useAuth0();
-  const { editorState, setEditorState, config } = useEditor({
-    content: comment.content,
-    users,
-  });
-
-  const submit = (state?: EditorState) => {
-    if (!state) {
-      handleSubmit("");
-      return;
-    }
-
-    handleSubmit(convertToMarkdown(state));
-  };
 
   const handleCancel = () => {
     clearPendingComment();
@@ -62,18 +49,13 @@ function CommentEditor({
     <div className="comment-input-container" onClick={e => e.stopPropagation()}>
       <div className="comment-input">
         <img src={user.picture} className="comment-picture" />
-        {config && editorState && users ? (
-          <DraftJSEditor
-            {...config}
-            editorState={editorState}
-            handleCancel={handleCancel}
-            handleSubmit={submit}
-            initialContent={comment.content}
-            placeholder={comment.content == "" ? "Type a comment" : ""}
-            setEditorState={setEditorState}
-            users={users}
-          />
-        ) : null}
+        <DraftJSEditor
+          handleCancel={handleCancel}
+          handleSubmit={handleSubmit}
+          initialContent={comment.content}
+          placeholder={comment.content == "" ? "Type a comment" : ""}
+          users={users}
+        />
       </div>
       <div className="comment-input-actions">
         <button className="action-cancel" onClick={handleCancel}>
