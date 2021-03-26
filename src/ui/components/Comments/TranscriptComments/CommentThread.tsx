@@ -8,6 +8,8 @@ import { Comment } from "ui/state/comments";
 import CommentItem from "./CommentItem";
 import "./CommentThread.css";
 
+import useDraftJS from "./CommentEditor/use-draftjs";
+
 type CommentThreadProps = PropsFromRedux & {
   comment?: Comment | null;
   time: number;
@@ -24,6 +26,17 @@ function CommentThread({
   clearPendingComment,
 }: CommentThreadProps) {
   const commentEl = useRef<HTMLDivElement>(null);
+  const load = useDraftJS();
+
+  useEffect(() => {
+    let idle: NodeJS.Timeout | undefined = setTimeout(() => {
+      load().then(() => {
+        idle = undefined;
+      });
+    }, 1000);
+
+    return () => idle && clearTimeout(idle);
+  }, []);
 
   const seekToComment = (e: React.MouseEvent) => {
     if (!comment) {
