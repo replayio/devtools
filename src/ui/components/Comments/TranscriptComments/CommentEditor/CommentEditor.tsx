@@ -6,9 +6,6 @@ import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import CommentTool from "ui/components/shared/CommentTool";
-
-import DraftJSEditor, { DraftJSAPI } from "./DraftJSEditor";
-import "./CommentEditor.css";
 import {
   Comment,
   PendingEditComment,
@@ -16,7 +13,9 @@ import {
   PendingNewComment,
   PendingNewReply,
 } from "ui/state/comments";
-import { convertToMarkdown } from "./mention";
+
+import DraftJSEditor, { DraftJSAPI } from "./DraftJSEditor";
+import "./CommentEditor.css";
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
