@@ -1,5 +1,4 @@
-import { EditorState } from "draft-js";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
@@ -8,7 +7,7 @@ import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import CommentTool from "ui/components/shared/CommentTool";
 
-import DraftJSEditor from "./DraftJSEditor";
+import DraftJSEditor, { DraftJSAPI } from "./DraftJSEditor";
 import "./CommentEditor.css";
 import {
   Comment,
@@ -32,6 +31,7 @@ function CommentEditor({
   recordingId,
 }: CommentEditorProps) {
   const { collaborators, recording } = hooks.useGetOwnersAndCollaborators(recordingId!);
+  const [api, setApi] = useState<DraftJSAPI>();
 
   const users = useMemo(
     () =>
@@ -54,6 +54,7 @@ function CommentEditor({
           handleSubmit={handleSubmit}
           initialContent={comment.content}
           placeholder={comment.content == "" ? "Type a comment" : ""}
+          api={setApi}
           users={users}
         />
       </div>
@@ -61,7 +62,7 @@ function CommentEditor({
         <button className="action-cancel" onClick={handleCancel}>
           Cancel
         </button>
-        <button className="action-submit" onClick={() => submit(editorState)}>
+        <button className="action-submit" onClick={() => api && handleSubmit(api.getText())}>
           Submit
         </button>
       </div>
