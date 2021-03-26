@@ -1,4 +1,4 @@
-import { EditorState, convertToRaw } from "draft-js";
+import type { EditorState } from "draft-js";
 import { User } from "ui/types";
 
 // @ts-ignore-line
@@ -68,10 +68,10 @@ function addMentions(DraftJS: any, es: EditorState, users: User[]) {
   return es;
 }
 
-function convertToMarkdown(editorState: EditorState) {
+function convertToMarkdown(editorState: EditorState, DraftJS: any) {
   if (!mentionsEnabled()) return editorState.getCurrentContent().getPlainText();
 
-  const raw = convertToRaw(editorState.getCurrentContent());
+  const raw = DraftJS.convertToRaw(editorState.getCurrentContent());
   return raw.blocks
     .map(b => {
       const buffer = [];
