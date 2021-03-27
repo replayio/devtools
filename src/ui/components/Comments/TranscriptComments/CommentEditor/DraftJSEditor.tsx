@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { EditorState } from "draft-js";
+import type Draft from "draft-js";
 
 import { User } from "ui/types";
 
@@ -8,7 +8,14 @@ import { addMentions, convertToMarkdown, mentionsEnabled } from "./mention";
 
 import "./DraftJSEditor.css";
 
-const moveSelectionToEnd = (editorState: EditorState, DraftJS: any) => {
+interface DraftJSModule {
+  convertToRaw: typeof Draft.convertToRaw;
+  SelectionState: typeof Draft.SelectionState;
+  Modifier: typeof Draft.Modifier;
+  EditorState: typeof Draft.EditorState;
+}
+
+const moveSelectionToEnd = (editorState: Draft.EditorState, DraftJS: DraftJSModule) => {
   const { EditorState, SelectionState } = DraftJS;
   const content = editorState.getCurrentContent();
   const blockMap = content.getBlockMap();
@@ -35,7 +42,7 @@ export interface DraftJSAPI {
 }
 
 interface InternalApi extends DraftJSAPI {
-  state?: EditorState;
+  state?: Draft.EditorState;
   config?: LazyLoadDraftConfig;
 }
 
@@ -56,11 +63,11 @@ export default function DraftJSEditor({
   placeholder,
   users,
 }: DraftJSEditorProps) {
-  const editorNode = useRef<any>(null);
+  const editorNode = useRef<Draft.Editor>(null);
   const wrapperNode = useRef<HTMLDivElement>(null);
   const [mentionSearchText, setMentionSearchText] = useState("");
   const [open, setOpen] = useState(false);
-  const [editorState, setEditorState] = useState<EditorState>();
+  const [editorState, setEditorState] = useState<Draft.EditorState>();
   const [config, setConfig] = useState<LazyLoadDraftConfig>();
   const load = useDraftJS();
   const publicApi = useRef<InternalApi>({
@@ -76,7 +83,7 @@ export default function DraftJSEditor({
   });
 
   const handleChange = useCallback(
-    (updated: EditorState) => {
+    (updated: Draft.EditorState) => {
       publicApi.current.state = updated;
       setEditorState(updated);
     },
