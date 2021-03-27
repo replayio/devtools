@@ -4,12 +4,7 @@ import { User } from "ui/types";
 // @ts-ignore-line
 import { features } from "ui/utils/prefs";
 
-interface DraftJSModule {
-  convertToRaw: typeof Draft.convertToRaw;
-  SelectionState: typeof Draft.SelectionState;
-  Modifier: typeof Draft.Modifier;
-  EditorState: typeof Draft.EditorState;
-}
+import { DraftJSModule } from "./use-draftjs";
 
 // Borrowed and slightly modified from
 // https://github.com/draft-js-plugins/draft-js-plugins/blob/master/packages/mention/src/defaultRegExp.ts

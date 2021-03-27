@@ -3,17 +3,10 @@ import type Draft from "draft-js";
 
 import { User } from "ui/types";
 
-import useDraftJS, { LazyLoadDraftConfig } from "./use-draftjs";
+import useDraftJS, { DraftJSModule, LazyLoadDraftConfig } from "./use-draftjs";
 import { addMentions, convertToMarkdown, mentionsEnabled } from "./mention";
 
 import "./DraftJSEditor.css";
-
-interface DraftJSModule {
-  convertToRaw: typeof Draft.convertToRaw;
-  SelectionState: typeof Draft.SelectionState;
-  Modifier: typeof Draft.Modifier;
-  EditorState: typeof Draft.EditorState;
-}
 
 const moveSelectionToEnd = (editorState: Draft.EditorState, DraftJS: DraftJSModule) => {
   const { EditorState, SelectionState } = DraftJS;
