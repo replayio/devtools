@@ -1,8 +1,15 @@
-import type { EditorState } from "draft-js";
+import type Draft from "draft-js";
 import { User } from "ui/types";
 
 // @ts-ignore-line
 import { features } from "ui/utils/prefs";
+
+interface DraftJSModule {
+  convertToRaw: typeof Draft.convertToRaw;
+  SelectionState: typeof Draft.SelectionState;
+  Modifier: typeof Draft.Modifier;
+  EditorState: typeof Draft.EditorState;
+}
 
 // Borrowed and slightly modified from
 // https://github.com/draft-js-plugins/draft-js-plugins/blob/master/packages/mention/src/defaultRegExp.ts
@@ -31,7 +38,7 @@ function mentionsEnabled() {
   return features.commentMentions;
 }
 
-function addMentions(DraftJS: any, es: EditorState, users: User[]) {
+function addMentions(DraftJS: DraftJSModule, es: Draft.EditorState, users: User[]) {
   if (!mentionsEnabled()) return es;
 
   const blocks = es.getCurrentContent().getBlocksAsArray();
@@ -68,7 +75,7 @@ function addMentions(DraftJS: any, es: EditorState, users: User[]) {
   return es;
 }
 
-function convertToMarkdown(editorState: EditorState, DraftJS: any) {
+function convertToMarkdown(editorState: Draft.EditorState, DraftJS: DraftJSModule) {
   if (!mentionsEnabled()) return editorState.getCurrentContent().getPlainText();
 
   const raw = DraftJS.convertToRaw(editorState.getCurrentContent());
