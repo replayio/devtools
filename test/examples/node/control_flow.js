@@ -81,6 +81,7 @@ const callbacks = [
   customIterator,
 ];
 
+debugger;
 startNextCallback();
 
 // Helpers

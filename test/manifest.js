@@ -15,11 +15,12 @@ module.exports = [
     script: "breakpoints-01.js",
     targets: ["gecko", "chromium"],
   },
-  // Not supported on chromium: this test uses dump() to trigger an evaluation
-  // failure, but dump() is not a standard function and isn't implemented in chromium.
   {
     example: "doc_rr_basic.html",
     script: "breakpoints-02.js",
+    // Not supported on chromium: this test uses dump() to trigger an evaluation
+    // failure, but dump() is not a standard function and isn't implemented
+    // in chromium.
     targets: ["gecko"],
   },
   {
@@ -30,16 +31,18 @@ module.exports = [
   {
     example: "doc_control_flow.html",
     script: "breakpoints-04.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_debugger_statements.html",
     script: "breakpoints-05.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_prod_bundle.html",
     script: "breakpoints-06.js",
+    // Not supported on chromium, this test needs source maps.
+    // https://github.com/RecordReplay/chromium/issues/5
     targets: ["gecko"],
   },
   {
@@ -55,7 +58,7 @@ module.exports = [
   {
     example: "doc_rr_basic.html",
     script: "stepping-01.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_rr_basic.html",
@@ -64,13 +67,23 @@ module.exports = [
   },
   {
     example: "doc_rr_basic.html",
+    script: "stepping-02-chromium.js",
+    targets: ["chromium"],
+  },
+  {
+    example: "doc_rr_basic.html",
     script: "stepping-03.js",
     targets: ["gecko"],
   },
   {
+    example: "doc_rr_basic.html",
+    script: "stepping-03-chromium.js",
+    targets: ["chromium"],
+  },
+  {
     example: "doc_rr_blackbox.html",
     script: "stepping-04.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_minified.html",

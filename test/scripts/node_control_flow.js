@@ -1,6 +1,7 @@
 // Test hitting breakpoints when using tricky control flow constructs:
 Test.describe(`catch, finally, generators, and async/await.`, async () => {
-  await rewindToBreakpoint(10);
+  await Test.rewindToLine(84);
+  await resumeToBreakpoint(10);
   await resumeToBreakpoint(12);
   await resumeToBreakpoint(18);
   await resumeToBreakpoint(20);
