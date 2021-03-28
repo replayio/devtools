@@ -15,6 +15,8 @@ module.exports = [
     script: "breakpoints-01.js",
     targets: ["gecko", "chromium"],
   },
+  // Not supported on chromium: this test uses dump() to trigger an evaluation
+  // failure, but dump() is not a standard function and isn't implemented in chromium.
   {
     example: "doc_rr_basic.html",
     script: "breakpoints-02.js",
@@ -23,7 +25,7 @@ module.exports = [
   {
     example: "doc_rr_basic.html",
     script: "breakpoints-03.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_control_flow.html",
@@ -39,6 +41,11 @@ module.exports = [
     example: "doc_prod_bundle.html",
     script: "breakpoints-06.js",
     targets: ["gecko"],
+  },
+  {
+    example: "node/control_flow.js",
+    script: "node_control_flow.js",
+    targets: ["node"],
   },
 
   //////////////////////////////////////////////////////////////////////////////
