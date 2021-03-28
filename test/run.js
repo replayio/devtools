@@ -5,7 +5,7 @@ const fs = require("fs");
 const https = require("https");
 const { spawn, spawnSync } = require("child_process");
 const url = require("url");
-const Manifest = require("./manifest.json");
+const Manifest = require("./manifest");
 const {
   findGeckoPath,
   createTestScript,
@@ -69,7 +69,6 @@ function processArgs() {
         break;
       case "--chromium":
         shouldRecordExamples = true;
-        recordExamplesSeparately = true;
         recordUsingChromium = true;
         break;
       case "--help":
@@ -110,61 +109,64 @@ function elapsedTime() {
 
 async function runMatchingTests() {
   for (let i = 0; i < Manifest.length; i++) {
-    const [test, example] = Manifest[i];
     if (stripeCount && i % stripeCount != stripeIndex) {
       continue;
     }
 
-    await runTest(test, example);
+    const { script, example, targets } = Manifest[i];
+    for (const target of targets) {
+      await runTest(script, example, target);
+    }
   }
 }
 
 let failures = [];
 
-async function runTest(test, example) {
+// Creating an example returns this constant if the test should be skipped.
+const SkipTest = "skipped";
+
+// Creating an example returns this constant if the test should be recorded
+// as part of the viewer process. The test will be recorded and then stopped to
+// switch to the viewer, as when using replay normally.
+const RecordExampleInViewer = "record-example-in-viewer";
+
+async function runTest(test, example, target) {
   if (patterns.length && patterns.every(pattern => !test.includes(pattern))) {
-    console.log(`Skipping test ${test}`);
+    console.log(`Skipping test ${test} target ${target}`);
     return;
   }
 
   if (process.env.SKIPPED_TESTS && process.env.SKIPPED_TESTS.includes(test)) {
-    console.log(`Skipping test ${test}, excluded by SKIPPED_TESTS`);
+    console.log(`Skipping test ${test} target ${target}, excluded by SKIPPED_TESTS`);
     return;
   }
 
-  console.log(`[${elapsedTime()}] Starting test ${test}`);
+  console.log(`[${elapsedTime()}] Starting test ${test} target ${target}`);
 
   // Recording ID to load in the viewer. If not set, we will record the example
   // in the browser before stopping and switching to the viewer.
   let exampleRecordingId = shouldRecordExamples ? null : ExampleRecordings[example];
 
-  if (example.endsWith(".js")) {
-    // Node test.
-    if (!exampleRecordingId) {
-      if (!process.env.RECORD_REPLAY_NODE) {
-        console.log(`Skipping test ${test}: RECORD_REPLAY_NODE not set`);
-        return;
-      }
-      if (!process.env.RECORD_REPLAY_DRIVER) {
-        console.log(`Skipping test ${test}: RECORD_REPLAY_DRIVER not set`);
-        return;
-      }
-      exampleRecordingId = await createExampleNodeRecording(example);
-      if (!exampleRecordingId) {
-        failures.push(`Failed test: ${example} no node recording created`);
-        console.log(`[${elapsedTime()}] Test failed: no node recording created`);
-        return;
-      }
+  if (!exampleRecordingId) {
+    switch (target) {
+      case "node":
+        exampleRecordingId = await createExampleNodeRecording(example);
+        break;
+      case "gecko":
+      case "chromium":
+        exampleRecordingId = await createExampleBrowserRecording(
+          `http://localhost:8080/test/examples/${example}`,
+          target
+        );
+        break;
+      default:
+        throw new Error(`Bad target ${target}`);
     }
-  } else if (recordExamplesSeparately) {
-    if (recordUsingChromium && !process.env.RECORD_REPLAY_CHROMIUM) {
-      console.log(`Skipping test ${test}: RECORD_REPLAY_CHROMIUM not set`);
+    if (exampleRecordingId == SkipTest) {
       return;
-    }
-    exampleRecordingId = await createExampleBrowserRecording(
-      `http://localhost:8080/test/examples/${example}`
-    );
-    if (!exampleRecordingId) {
+    } else if (exampleRecordingId == RecordExampleInViewer) {
+      exampleRecordingId = undefined;
+    } else if (!exampleRecordingId) {
       failures.push(`Failed test: ${example} no recording created`);
       console.log(`[${elapsedTime()}] Test failed: no recording created`);
       return;
@@ -185,7 +187,7 @@ async function runTest(test, example) {
     RECORD_REPLAY_TEST_URL:
       exampleRecordingId
         ? `http://localhost:8080/view?id=${exampleRecordingId}&test=${test}&dispatch=${dispatchServer}`
-      : `http://localhost:8080/test/examples/${example}`,
+        : `http://localhost:8080/test/examples/${example}`,
     // If we need to record the example we have to use the target dispatch server.
     // If we already have the example, use the default dispatch server. When running in CI
     // against a local version of the backend, this allows us to record the viewer using the
@@ -333,10 +335,19 @@ function getRecordingId(file) {
 }
 
 async function createExampleNodeRecording(example) {
+  if (!process.env.RECORD_REPLAY_NODE) {
+    console.log(`Skipping test ${test}: RECORD_REPLAY_NODE not set`);
+    return SkipTest;
+  }
+  if (!process.env.RECORD_REPLAY_DRIVER) {
+    console.log(`Skipping test ${test}: RECORD_REPLAY_DRIVER not set`);
+    return SkipTest;
+  }
+
   const recordingIdFile = tmpFile();
   spawnSync(
     process.env.RECORD_REPLAY_NODE,
-    [`${__dirname}/examples/node/${example}`],
+    [`${__dirname}/examples/${example}`],
     {
       env: {
         ...process.env,
@@ -349,11 +360,18 @@ async function createExampleNodeRecording(example) {
   return getRecordingId(recordingIdFile);
 }
 
-async function createExampleBrowserRecording(url) {
+async function createExampleBrowserRecording(url, target) {
   const recordingIdFile = tmpFile();
 
   let browser;
-  if (recordUsingChromium) {
+  if (target == "chromium") {
+    if (!recordUsingChromium) {
+      return SkipTest;
+    }
+    if (!process.env.RECORD_REPLAY_CHROMIUM) {
+      console.log(`Skipping test ${test}: RECORD_REPLAY_CHROMIUM not set`);
+      return SkipTest;
+    }
     browser = spawn(process.env.RECORD_REPLAY_CHROMIUM, [url, "--no-sandbox", "--disable-gpu"], {
       env: {
         ...process.env,
@@ -362,6 +380,12 @@ async function createExampleBrowserRecording(url) {
       },
     });
   } else {
+    if (recordUsingChromium) {
+      return SkipTest;
+    }
+    if (!recordExamplesSeparately) {
+      return RecordExampleInViewer;
+    }
     const testScript = createTestScript({ path: `${__dirname}/exampleHarness.js` });
     browser = spawnGecko({
       ...process.env,
@@ -383,7 +407,7 @@ async function createExampleBrowserRecording(url) {
 
     // When recording with chromium the recording process detects when the recording
     // has finished, but we need to kill the browser outselves.
-    if (recordUsingChromium && data.toString().includes("Finished sending recording data")) {
+    if (target == "chromium" && data.toString().includes("Finished sending recording data")) {
       spawnSync("pkill", ["-f", "Chromium"]);
       resolve();
     }
