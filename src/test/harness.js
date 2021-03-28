@@ -96,11 +96,21 @@ async function selectSource(url) {
   return waitForSelectedSource(url);
 }
 
-async function addBreakpoint(url, line, column, options = { logValue: "displayName" }) {
-  const source = await waitForSource(url);
-  const sourceId = source.id;
+async function addBreakpoint(url, line, column, options) {
   const bpCount = dbgSelectors.getBreakpointCount();
-  await dbg.actions.addBreakpoint(getContext(), { sourceId, line, column }, options);
+
+  if (options) {
+    const source = await waitForSource(url);
+    const sourceId = source.id;
+    await dbg.actions.addBreakpoint(getContext(), { sourceId, line, column }, options);
+  } else {
+    // If there are no options, use the default log value for adding new breakpoints,
+    // as if the user clicked on the line.
+    assert(!column);
+    await selectSource(url);
+    await dbg.actions.addBreakpointAtLine(getContext(), line);
+  }
+
   await waitUntil(() => {
     return dbgSelectors.getBreakpointCount() == bpCount + 1;
   });

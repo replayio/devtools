@@ -4,13 +4,13 @@ Test.describe(`modified. Also test that conditional logpoints work.`, async () =
 
   await Test.selectSource("doc_rr_basic.html");
   await Test.addBreakpoint("doc_rr_basic.html", 20, undefined, {
-    logValue: `displayName, "Logpoint Number", number`,
+    logValue: `"Logpoint Number", number`,
   });
   await Test.addBreakpoint("doc_rr_basic.html", 9, undefined, {
-    logValue: `displayName, "Logpoint Beginning"`,
+    logValue: `"Logpoint Beginning"`,
   });
   await Test.addBreakpoint("doc_rr_basic.html", 7, undefined, {
-    logValue: `displayName, " Logpoint Ending"`,
+    logValue: `"Logpoint Ending"`,
   });
 
   await Test.selectConsole();
@@ -18,7 +18,6 @@ Test.describe(`modified. Also test that conditional logpoints work.`, async () =
 
   await Test.disableBreakpoint("doc_rr_basic.html", 9);
   await Test.waitForMessageCount("Logpoint", 11);
-  await Test.waitForMessageCount("updateNumber", 10);
   await Test.waitForMessageCount("Logpoint Number", 10);
 
   await Test.setBreakpointOptions("doc_rr_basic.html", 20, undefined, {
