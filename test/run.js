@@ -354,7 +354,7 @@ async function createExampleBrowserRecording(url) {
 
   let browser;
   if (recordUsingChromium) {
-    browser = spawn(process.env.RECORD_REPLAY_CHROMIUM, [url, "--no-sandbox"], {
+    browser = spawn(process.env.RECORD_REPLAY_CHROMIUM, [url, "--no-sandbox", "--disable-gpu"], {
       env: {
         ...process.env,
         RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
