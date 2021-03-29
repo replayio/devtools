@@ -9,10 +9,22 @@ import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import "./Dashboard.css";
 import { actions } from "ui/actions";
+const { features } = require("ui/utils/prefs");
+
+// Short term fix to allow us to toggle workspaces on and off with a flag.
+function getRecordings(workspaceId: string) {
+  if (features.workspaces) {
+    const { recordings, loading } = hooks.useGetRecordings(workspaceId!);
+    return { recordings, loading };
+  } else {
+    const { recordings, loading } = hooks.useGetMyRecordings();
+    return { recordings, loading };
+  }
+}
 
 function Dashboard({ currentWorkspaceId }: PropsFromRedux) {
   const [filter, setFilter] = useState("");
-  const { recordings, loading } = hooks.useGetRecordings(currentWorkspaceId!);
+  const { recordings, loading } = getRecordings(currentWorkspaceId!);
 
   if (loading || recordings == null) {
     return <Loader />;

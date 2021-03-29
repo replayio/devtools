@@ -1,59 +1,13 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
 import { User, Recording } from "ui/types";
-import useToken from "ui/utils/useToken";
+import useToken, { getUserId } from "ui/utils/useToken";
 import { WorkspaceId } from "ui/state/app";
 
 type PersonalRecordingsData = {
   users: User[];
   recordings: Recording[];
 };
-
-const GetMyRecordings = gql`
-  fragment recordingFields on recordings {
-    id
-    url
-    title
-    recording_id
-    recordingTitle
-    last_screen_mime_type
-    duration
-    description
-    date
-    is_private
-  }
-
-  fragment avatarFields on users {
-    name
-    email
-    picture
-    id
-  }
-
-  query GetMyRecordings($userId: uuid) {
-    users(where: { id: { _eq: $userId } }) {
-      ...avatarFields
-      collaborators {
-        recording {
-          ...recordingFields
-          user {
-            ...avatarFields
-          }
-        }
-      }
-      recordings(where: { deleted_at: { _is_null: true } }) {
-        ...recordingFields
-      }
-    }
-
-    recordings(where: { example: { _eq: true } }) {
-      ...recordingFields
-      user {
-        ...avatarFields
-      }
-    }
-  }
-`;
 
 export function useGetRecordingPhoto(
   recordingId: RecordingId
@@ -290,4 +244,71 @@ export function useUpdateRecordingWorkspace() {
   );
 
   return updateRecordingWorkspace;
+}
+
+export function useGetMyRecordings() {
+  const userId = getUserId();
+  const { data, loading, error } = useQuery(
+    gql`
+      fragment recordingFields on recordings {
+        id
+        url
+        title
+        recording_id
+        recordingTitle
+        last_screen_mime_type
+        duration
+        description
+        date
+        is_private
+      }
+
+      fragment avatarFields on users {
+        name
+        email
+        picture
+        id
+      }
+
+      query GetMyRecordings($userId: uuid) {
+        users(where: { id: { _eq: $userId } }) {
+          ...avatarFields
+          collaborators {
+            recording {
+              ...recordingFields
+              user {
+                ...avatarFields
+              }
+            }
+          }
+          recordings(where: { deleted_at: { _is_null: true } }) {
+            ...recordingFields
+          }
+        }
+
+        recordings(where: { example: { _eq: true } }) {
+          ...recordingFields
+          user {
+            ...avatarFields
+          }
+        }
+      }
+    `,
+    {
+      variables: { userId },
+      pollInterval: 10000,
+    }
+  );
+
+  if (loading) {
+    return { loading };
+  }
+
+  if (error) {
+    console.error("Failed to fetch recordings:", error);
+  }
+
+  const recordings = getRecordings(data);
+
+  return { recordings, loading };
 }
