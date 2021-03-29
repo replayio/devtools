@@ -10,7 +10,8 @@ import {
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug" | "comments";
 export type ViewMode = "dev" | "non-dev";
-export type ModalType = "sharing" | "login" | "settings";
+export type ModalType = "sharing" | "login" | "settings" | "new-workspace" | "workspace-settings";
+export type WorkspaceId = string;
 
 export interface ExpectedError {
   message: string;
@@ -45,6 +46,7 @@ export interface AppState {
   events: Events;
   isNodePickerActive: boolean;
   canvas: Canvas | null;
+  workspaceId: WorkspaceId | null;
 }
 
 export interface AnalysisPoints {

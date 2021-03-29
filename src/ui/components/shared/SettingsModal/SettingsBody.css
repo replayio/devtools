@@ -26,11 +26,11 @@
 }
 
 .settings-modal main li .setting-item .label {
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .settings-modal main li .setting-item .description {
-  font-size: 15px;
+  font-size: 14px;
   max-width: 80%;
   color: var(--theme-comment)
 }

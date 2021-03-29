@@ -1,0 +1,12 @@
+.workspace-invites .actions {
+  text-decoration: underline;
+  display: flex;
+}
+
+.workspace-invites .label {
+  flex-grow: 1;
+}
+
+.workspace-invites .actions > :not(:first-child) {
+  margin-left: 8px;
+}
