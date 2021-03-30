@@ -1,5 +1,4 @@
 .left-sidebar {
-  width: 320px;
   background: var(--theme-toolbar-background);
   border-right: 1px solid var(--theme-splitter-color);
   padding: 8px 6px;

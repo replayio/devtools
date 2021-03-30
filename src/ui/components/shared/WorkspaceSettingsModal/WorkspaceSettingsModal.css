@@ -24,6 +24,7 @@
 
 .workspace-settings-modal .modal-container .modal-content {
   width: 480px;
+  max-height: 480px;
   padding: 0px;
   min-width: auto;
   display: flex;

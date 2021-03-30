@@ -56,6 +56,7 @@
   position: sticky;
   top: 0px;
   background: white;
+  z-index: 1;
 }
 
 .recording-list.list thead.dashboard-viewer-content-header th:first-child {

@@ -82,7 +82,7 @@ function DashboardNavigation({
           </div>
         ))}
       </div>
-      <Invitations />
+      {features.workspaces ? <Invitations /> : null}
     </nav>
   );
 }

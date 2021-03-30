@@ -2,6 +2,7 @@
   list-style-type: none;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 .workspace-settings-modal .workspace-members-container > :not(:first-child) {
@@ -10,6 +11,7 @@
 
 .workspace-settings-modal .workspace-members {
   list-style-type: none;
+  overflow: auto;
 }
 
 .workspace-settings-modal .workspace-members > :not(:first-child) {

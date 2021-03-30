@@ -1,8 +1,9 @@
 main.dashboard {
-  display: flex;
   width: 100%;
+  height: 100%;
   overflow: hidden;
-  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 280px auto;
 }
 
 .dashboard-viewer {
@@ -10,6 +11,7 @@ main.dashboard {
   font-size: 14px;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 .dashboard-viewer *:focus:not(:focus-visible) {
