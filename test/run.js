@@ -403,7 +403,7 @@ async function createExampleBrowserRecording(url, target) {
   };
 
   function onOutput(data) {
-    data => process.stderr.write(data);
+    process.stderr.write(data);
 
     // When recording with chromium the recording process detects when the recording
     // has finished, but we need to kill the browser outselves.

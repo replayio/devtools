@@ -88,11 +88,15 @@ module.exports = [
   {
     example: "doc_minified.html",
     script: "stepping-05.js",
+    // Not supported on chromium, needs event handling.
+    // https://github.com/RecordReplay/chromium/issues/7
     targets: ["gecko"],
   },
   {
     example: "doc_async.html",
     script: "stepping-06.js",
+    // Not supported on chromium, needs async stepping.
+    // Node issue: https://github.com/RecordReplay/node/issues/8
     targets: ["gecko"],
   },
 
@@ -106,9 +110,14 @@ module.exports = [
     targets: ["gecko"],
   },
   {
+    example: "doc_rr_error.html",
+    script: "console_warp-01-chromium.js",
+    targets: ["chromium"],
+  },
+  {
     example: "doc_rr_logs.html",
     script: "console_warp-02.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_rr_basic.html",
