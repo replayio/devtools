@@ -1,4 +1,7 @@
 Test.describe(`Test previews when switching between frames and stepping.`, async () => {
+  // Because stepping works differently between gecko and chromium, frame timeline
+  // percentages are different in this test.
+
   await Test.addBreakpoint("doc_rr_preview.html", 17);
   await Test.rewindToLine(17);
 
@@ -7,7 +10,7 @@ Test.describe(`Test previews when switching between frames and stepping.`, async
   await Test.findScopeNode("barprop2");
   await Test.waitForScopeValue("barprop1", "2");
 
-  await Test.waitForFrameTimeline("42%");
+  await Test.waitForFrameTimeline("75%");
 
   await Test.checkFrames(2);
   await Test.selectFrame(1);
@@ -20,7 +23,7 @@ Test.describe(`Test previews when switching between frames and stepping.`, async
 
   await Test.stepOverToLine(18);
 
-  await Test.waitForFrameTimeline("71%");
+  await Test.waitForFrameTimeline("100%");
 
   await Test.toggleScopeNode("barobj");
   await Test.findScopeNode("barprop1");
@@ -36,13 +39,13 @@ Test.describe(`Test previews when switching between frames and stepping.`, async
 
   await Test.stepOverToLine(22);
 
-  await Test.waitForFrameTimeline("50%");
+  await Test.waitForFrameTimeline("100%");
 
   await Test.checkFrames(3);
 
   await Test.selectFrame(1);
-  await Test.waitForFrameTimeline("57%");
+  await Test.waitForFrameTimeline("75%");
 
   await Test.selectFrame(2);
-  await Test.waitForFrameTimeline("66%");
+  await Test.waitForFrameTimeline("100%");
 });

@@ -41,7 +41,7 @@ module.exports = [
   {
     example: "doc_prod_bundle.html",
     script: "breakpoints-06.js",
-    // Not supported on chromium, this test needs source maps.
+    // Not supported on chromium, needs source maps.
     // https://github.com/RecordReplay/chromium/issues/5
     targets: ["gecko"],
   },
@@ -88,14 +88,14 @@ module.exports = [
   {
     example: "doc_minified.html",
     script: "stepping-05.js",
-    // Not supported on chromium, needs event handling.
+    // Not supported on chromium, needs event listener support.
     // https://github.com/RecordReplay/chromium/issues/7
     targets: ["gecko"],
   },
   {
     example: "doc_async.html",
     script: "stepping-06.js",
-    // Not supported on chromium, needs async stepping.
+    // Not supported on chromium, needs generator support.
     // Node issue: https://github.com/RecordReplay/node/issues/8
     targets: ["gecko"],
   },
@@ -122,11 +122,13 @@ module.exports = [
   {
     example: "doc_rr_basic.html",
     script: "console_eval.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_async.html",
     script: "console_async_eval.js",
+    // Not supported on chromium, needs generator support.
+    // Node issue: https://github.com/RecordReplay/node/issues/8
     targets: ["gecko"],
   },
   {
@@ -135,14 +137,21 @@ module.exports = [
     targets: ["gecko"],
   },
   {
+    example: "doc_rr_console.html",
+    script: "console_messages-chromium.js",
+    targets: ["chromium"],
+  },
+  {
     example: "doc_exceptions_bundle.html",
     script: "console_stacks.js",
+    // Not supported on chromium, needs source maps.
+    // https://github.com/RecordReplay/chromium/issues/5
     targets: ["gecko"],
   },
   {
     example: "doc_recursion.html",
     script: "scopes_rerender.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "node/basic.js",
@@ -157,21 +166,25 @@ module.exports = [
   {
     example: "doc_rr_basic.html",
     script: "logpoint-01.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_rr_basic.html",
     script: "logpoint-02.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_events.html",
     script: "logpoint-03.js",
+    // Not supported on chromium, needs event listener support.
+    // https://github.com/RecordReplay/chromium/issues/7
     targets: ["gecko"],
   },
   {
     example: "doc_exceptions.html",
     script: "logpoint-04.js",
+    // Not supported on chromium, needs exception support.
+    // https://github.com/RecordReplay/chromium/issues/10
     targets: ["gecko"],
   },
   {
@@ -191,8 +204,13 @@ module.exports = [
   },
   {
     example: "doc_rr_objects.html",
+    script: "object_preview-01-chromium.js",
+    targets: ["chromium"],
+  },
+  {
+    example: "doc_rr_objects.html",
     script: "object_preview-02.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_rr_preview.html",
@@ -200,8 +218,15 @@ module.exports = [
     targets: ["gecko"],
   },
   {
+    example: "doc_rr_preview.html",
+    script: "object_preview-03-chromium.js",
+    targets: ["chromium"],
+  },
+  {
     example: "doc_prod_bundle.html",
     script: "object_preview-05.js",
+    // Not supported on chromium, needs source maps.
+    // https://github.com/RecordReplay/chromium/issues/5
     targets: ["gecko"],
   },
   {
@@ -214,6 +239,8 @@ module.exports = [
   // DOM Inspection
   //////////////////////////////////////////////////////////////////////////////
 
+  // DOM inspection tests are not currently supported on chromium.
+  // https://github.com/RecordReplay/chromium/issues/11
   {
     example: "doc_inspector_basic.html",
     script: "inspector-01.js",
@@ -262,7 +289,7 @@ module.exports = [
   {
     example: "doc_rr_worker.html",
     script: "worker-01.js",
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "node/spawn.js",

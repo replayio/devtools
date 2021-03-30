@@ -1,4 +1,4 @@
-Test.describe(`Test source mapping of logpoint errors.`, async () => {
+Test.describe(`Test source mapping of console errors.`, async () => {
   await Test.toggleExceptionLogging();
   await Test.selectConsole();
   Test.app.actions.filterToggle("warn");

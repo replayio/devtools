@@ -336,11 +336,11 @@ function getRecordingId(file) {
 
 async function createExampleNodeRecording(example) {
   if (!process.env.RECORD_REPLAY_NODE) {
-    console.log(`Skipping test ${test}: RECORD_REPLAY_NODE not set`);
+    console.log(`Skipping test: RECORD_REPLAY_NODE not set`);
     return SkipTest;
   }
   if (!process.env.RECORD_REPLAY_DRIVER) {
-    console.log(`Skipping test ${test}: RECORD_REPLAY_DRIVER not set`);
+    console.log(`Skipping test: RECORD_REPLAY_DRIVER not set`);
     return SkipTest;
   }
 
@@ -369,7 +369,7 @@ async function createExampleBrowserRecording(url, target) {
       return SkipTest;
     }
     if (!process.env.RECORD_REPLAY_CHROMIUM) {
-      console.log(`Skipping test ${test}: RECORD_REPLAY_CHROMIUM not set`);
+      console.log(`Skipping test: RECORD_REPLAY_CHROMIUM not set`);
       return SkipTest;
     }
     browser = spawn(process.env.RECORD_REPLAY_CHROMIUM, [url, "--no-sandbox", "--disable-gpu"], {
