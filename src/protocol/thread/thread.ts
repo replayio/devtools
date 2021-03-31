@@ -69,6 +69,27 @@ export type WiredMessage = Omit<Message, "argumentValues"> & {
   argumentValues?: ValueFront[];
 };
 
+// Target applications which can create recordings.
+export enum RecordingTarget {
+  gecko = "gecko",
+  chromium = "chromium",
+  node = "node",
+  unknown = "unknown",
+}
+
+function getRecordingTarget(buildId: string): RecordingTarget {
+  if (buildId.includes("gecko")) {
+    return RecordingTarget.gecko;
+  }
+  if (buildId.includes("chromium")) {
+    return RecordingTarget.chromium;
+  }
+  if (buildId.includes("node")) {
+    return RecordingTarget.node;
+  }
+  return RecordingTarget.unknown;
+}
+
 declare global {
   interface Window {
     Test?: any;
@@ -96,6 +117,9 @@ class _ThreadFront {
   // Waiter for the associated session ID.
   sessionId: SessionId | null = null;
   sessionWaiter = defer<SessionId>();
+
+  // Waiter which resolves with the target used to create the recording.
+  recordingTargetWaiter = defer<RecordingTarget>();
 
   // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
   initializedWaiter = defer<void>();
@@ -157,12 +181,15 @@ class _ThreadFront {
   off!: (name: string, handler: (value?: any) => void) => void;
   emit!: (name: string, value?: any) => void;
 
-  setSessionId(sessionId: SessionId) {
+  async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
     this.mappedLocations.sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
 
     log(`GotSessionId ${sessionId}`);
+
+    const { buildId } = await client.Session.getBuildId({}, sessionId);
+    this.recordingTargetWaiter.resolve(getRecordingTarget(buildId));
   }
 
   async initializeToolbox() {

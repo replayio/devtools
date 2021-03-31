@@ -2,6 +2,9 @@
 Test.describe(`expressions in the console after time warping.`, async () => {
   await Test.selectConsole();
 
+  // Several objects currently show up differently in chromium.
+  const target = await Test.getRecordingTarget();
+
   await Test.waitForMessage("Array(20) [ 0, 1, 2, 3, 4, 5,");
   await Test.waitForMessage("Uint8Array(20) [ 0, 1, 2, 3, 4, 5,");
   await Test.waitForMessage("Set(22) [ {…}, {…}, 0, 1, 2, 3, 4, 5,");
@@ -13,7 +16,11 @@ Test.describe(`expressions in the console after time warping.`, async () => {
   await Test.waitForMessage("Date");
 
   await Test.waitForMessage('RangeError: "foo"');
-  await Test.waitForMessage('<div id="foo" class="bar" style="visibility: visible" blahblah="">');
+  await Test.waitForMessage(
+    target == "gecko"
+    ? '<div id="foo" class="bar" style="visibility: visible" blahblah="">'
+    : "HTMLDivElement"
+  );
 
   msg = await Test.waitForMessage("function bar()");
   Test.checkJumpIcon(msg);
@@ -25,16 +32,17 @@ Test.describe(`expressions in the console after time warping.`, async () => {
   await Test.executeInConsole("Error('helo')");
   await Test.waitForMessage('Error: "helo"');
 
-  await Test.executeInConsole(
-    `
-function f() {
-  throw Error("there");
-}
-f();
-`
-  );
-  // FIXME the first line in this stack isn't right.
-  await Test.waitForMessage('Error: "there"');
+  // Defining a new function like this doesn't currently work in chromium.
+  if (target == "gecko") {
+    await Test.executeInConsole(`
+      function f() {
+        throw Error("there");
+      }
+      f();
+    `);
+    // FIXME the first line in this stack isn't right.
+    await Test.waitForMessage('Error: "there"');
+  }
 
   Test.executeInConsole("Array(1, 2, 3)");
   msg = await Test.waitForMessage("Array(3) [ 1, 2, 3 ]");
@@ -46,7 +54,11 @@ f();
 
   await Test.executeInConsole(`RegExp("abd", "g")`);
   msg = await Test.waitForMessage("/abd/g");
-  await Test.checkMessageObjectContents(msg, ["global: true", `source: "abd"`]);
+
+  // RegExp object properties are not currently available in chromium.
+  if (target == "gecko") {
+    await Test.checkMessageObjectContents(msg, ["global: true", `source: "abd"`]);
+  }
 
   await Test.executeInConsole("new Set([1, 2, 3])");
   msg = await Test.waitForMessage("Set(3) [ 1, 2, 3 ]");
@@ -74,15 +86,25 @@ f();
 
   await Test.executeInConsole("new Promise(() => {})");
   msg = await Test.waitForMessage("Promise {  }");
-  await Test.checkMessageObjectContents(msg, ['"pending"'], []);
+
+  // Promise contents aren't currently available in chromium.
+  if (target == "gecko") {
+    await Test.checkMessageObjectContents(msg, ['"pending"'], []);
+  }
 
   await Test.executeInConsole("Promise.resolve({ a: 1 })");
   msg = await Test.waitForMessage("Promise {  }");
-  await Test.checkMessageObjectContents(msg, ['"fulfilled"', "a: 1"], ["<value>"]);
+
+  if (target == "gecko") {
+    await Test.checkMessageObjectContents(msg, ['"fulfilled"', "a: 1"], ["<value>"]);
+  }
 
   await Test.executeInConsole("Promise.reject({ a: 1 })");
   msg = await Test.waitForMessage("Promise {  }");
-  await Test.checkMessageObjectContents(msg, ['"rejected"', "a: 1"], ["<value>"]);
+
+  if (target == "gecko") {
+    await Test.checkMessageObjectContents(msg, ['"rejected"', "a: 1"], ["<value>"]);
+  }
 
   await Test.executeInConsole("baz");
   msg = await Test.waitForMessage("function baz()");

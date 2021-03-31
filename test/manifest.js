@@ -63,22 +63,12 @@ module.exports = [
   {
     example: "doc_rr_basic.html",
     script: "stepping-02.js",
-    targets: ["gecko"],
-  },
-  {
-    example: "doc_rr_basic.html",
-    script: "stepping-02-chromium.js",
-    targets: ["chromium"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_rr_basic.html",
     script: "stepping-03.js",
-    targets: ["gecko"],
-  },
-  {
-    example: "doc_rr_basic.html",
-    script: "stepping-03-chromium.js",
-    targets: ["chromium"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_rr_blackbox.html",
@@ -107,12 +97,7 @@ module.exports = [
   {
     example: "doc_rr_error.html",
     script: "console_warp-01.js",
-    targets: ["gecko"],
-  },
-  {
-    example: "doc_rr_error.html",
-    script: "console_warp-01-chromium.js",
-    targets: ["chromium"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_rr_logs.html",
@@ -134,12 +119,7 @@ module.exports = [
   {
     example: "doc_rr_console.html",
     script: "console_messages.js",
-    targets: ["gecko"],
-  },
-  {
-    example: "doc_rr_console.html",
-    script: "console_messages-chromium.js",
-    targets: ["chromium"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_exceptions_bundle.html",
@@ -200,12 +180,7 @@ module.exports = [
   {
     example: "doc_rr_objects.html",
     script: "object_preview-01.js",
-    targets: ["gecko"],
-  },
-  {
-    example: "doc_rr_objects.html",
-    script: "object_preview-01-chromium.js",
-    targets: ["chromium"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_rr_objects.html",
@@ -215,12 +190,7 @@ module.exports = [
   {
     example: "doc_rr_preview.html",
     script: "object_preview-03.js",
-    targets: ["gecko"],
-  },
-  {
-    example: "doc_rr_preview.html",
-    script: "object_preview-03-chromium.js",
-    targets: ["chromium"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_prod_bundle.html",

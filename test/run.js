@@ -25,7 +25,6 @@ const startTime = Date.now();
 let shouldRecordExamples = false;
 let shouldRecordViewer = false;
 let recordExamplesSeparately = false;
-let recordUsingChromium = false;
 let testTimeout = 240;
 let onlyTarget = undefined;
 
@@ -40,7 +39,6 @@ function processArgs() {
       --record-all: Record examples and save the recordings locally, and record the viewer
       --separate: Record examples in a separate browser instance.
       --timeout N: Use a timeout of N seconds for tests (default 240).
-      --chromium: Record examples using chromium.
       --target TARGET: Only run tests using given TARGET
   `;
   for (let i = 2; i < process.argv.length; i++) {
@@ -68,10 +66,6 @@ function processArgs() {
         break;
       case "--timeout":
         testTimeout = +process.argv[++i];
-        break;
-      case "--chromium":
-        shouldRecordExamples = true;
-        recordUsingChromium = true;
         break;
       case "--target":
         onlyTarget = process.argv[++i];
@@ -380,9 +374,6 @@ async function createExampleBrowserRecording(url, target) {
 
   let browser;
   if (target == "chromium") {
-    if (!recordUsingChromium) {
-      return SkipTest;
-    }
     if (!process.env.RECORD_REPLAY_CHROMIUM) {
       console.log(`Skipping test: RECORD_REPLAY_CHROMIUM not set`);
       return SkipTest;
@@ -395,9 +386,6 @@ async function createExampleBrowserRecording(url, target) {
       },
     });
   } else {
-    if (recordUsingChromium) {
-      return SkipTest;
-    }
     if (!recordExamplesSeparately) {
       return RecordExampleInViewer;
     }

@@ -2,27 +2,31 @@
 Test.describe(`logpoints, and evaluations when the debugger is somewhere else.`, async () => {
   await Test.selectConsole();
 
+  // Several objects in this test show less information when previewed in chromium vs. gecko.
+  // This would be nice to fix.
+  const target = await Test.getRecordingTarget();
+
   let msg;
 
   msg = await Test.waitForMessage("Iteration 3");
   await Test.checkMessageObjectContents(
     msg,
     ["subobj: Object { subvalue: 9 }"],
-    ["obj: Object { value: 6, subobj: {…} }"]
+    [target == "gecko" ? "obj: Object { value: 6, subobj: {…} }" : "obj: Object { … }"]
   );
 
   msg = await Test.waitForMessage("Iteration 5");
   await Test.checkMessageObjectContents(
     msg,
     ["subobj: Object { subvalue: 15 }"],
-    ["obj: Object { value: 10, subobj: {…} }"]
+    [target == "gecko" ? "obj: Object { value: 10, subobj: {…} }" : "obj: Object { … }"]
   );
 
   msg = await Test.waitForMessage("Iteration 7");
   await Test.checkMessageObjectContents(
     msg,
     ["subobj: Object { subvalue: 21 }"],
-    ["obj: Object { value: 14, subobj: {…} }"]
+    [target == "gecko" ? "obj: Object { value: 14, subobj: {…} }" : "obj: Object { … }"]
   );
 
   msg.querySelector(".frame-link a").click();
@@ -51,7 +55,7 @@ Test.describe(`logpoints, and evaluations when the debugger is somewhere else.`,
   msg = await Test.waitForMessage("Object { obj: {…}, value: 0 }");
   await Test.checkMessageObjectContents(
     msg,
-    ["subobj: Object { subvalue: 0 }"],
+    [target == "gecko" ? "subobj: Object { subvalue: 0 }" : "subobj: Object { … }"],
     ["obj: Object { value: 0, subobj: {…} }"]
   );
 });

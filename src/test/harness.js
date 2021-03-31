@@ -657,6 +657,10 @@ async function checkHighlighterShape(svgPath) {
   });
 }
 
+async function getRecordingTarget() {
+  return ThreadFront.recordingTargetWaiter.promise;
+}
+
 const testCommands = {
   selectConsole,
   selectDebugger,
@@ -723,6 +727,7 @@ const testCommands = {
   dispatchMouseEvent,
   checkHighlighterVisible,
   checkHighlighterShape,
+  getRecordingTarget,
 };
 
 const commands = mapValues(testCommands, (command, name) => {
