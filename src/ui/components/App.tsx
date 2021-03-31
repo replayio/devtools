@@ -17,6 +17,7 @@ import { actions } from "ui/actions";
 import { hasLoadingParam } from "ui/utils/environment";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import LogRocket from "ui/utils/logrocket";
+import hooks from "ui/hooks";
 
 import "styles.css";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
@@ -59,6 +60,7 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
 
 function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   const auth = useAuth0();
+  const { loading } = hooks.useMaybeClaimInvite();
 
   useEffect(() => {
     document.body.parentElement!.className = theme || "";
@@ -76,7 +78,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
     return <SkeletonLoader content={"Uploading resources"} />;
   }
 
-  if (!isDeployPreview() && auth.isLoading) {
+  if ((!isDeployPreview() && auth.isLoading) || loading) {
     return null;
   }
 

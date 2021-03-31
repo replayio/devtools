@@ -1,10 +1,17 @@
-export type SelectedTab = "Appearance" | "Team" | "Privacy" | "Experimental" | "Support";
+export type SelectedTab =
+  | "Appearance"
+  | "Team"
+  | "Privacy"
+  | "Experimental"
+  | "Support"
+  | "Invitations";
 
 export type Settings = Setting[];
 
 export interface Setting {
   title: SelectedTab;
   items: SettingItem[];
+  icon?: string;
 }
 
 export interface SettingItem {

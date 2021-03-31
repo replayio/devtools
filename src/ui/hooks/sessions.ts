@@ -68,6 +68,35 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
   return { users, loading };
 }
 
+export function useGetRecording(recordingId: RecordingId) {
+  const { data, error, loading } = useQuery(
+    gql`
+      query GetRecording($recordingId: uuid!) {
+        recordings(where: { id: { _eq: $recordingId } }) {
+          id
+          title
+          recordingTitle
+          is_private
+          date
+          deleted_at
+          user {
+            invited
+          }
+        }
+      }
+    `,
+    {
+      variables: { recordingId },
+    }
+  );
+
+  if (error) {
+    console.error("Apollo error while getting the recording", error);
+  }
+
+  return { data, loading };
+}
+
 export function useAddSessionUser() {
   const [AddSessionUser, { error }] = useMutation(gql`
     mutation AddSessionUser($id: String!, $user_id: uuid!) {

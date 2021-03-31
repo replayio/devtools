@@ -57,7 +57,7 @@ function DevTools({
   );
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
   const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
-  const { title, deleted_at, is_initialized, user_id } = recording || {};
+  const { title, deleted_at, is_initialized, user_id, user } = recording || {};
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -92,6 +92,11 @@ function DevTools({
 
   if (deleted_at) {
     setExpectedError({ message: "This replay has been deleted." });
+    return null;
+  }
+
+  if (user.invited == false) {
+    setExpectedError({ message: "The author of this Replay has not activated their account yet." });
     return null;
   }
 
