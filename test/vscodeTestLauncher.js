@@ -12,9 +12,10 @@ const { fork } = require("child_process");
 process.on("message", args => {
   if (args.action === "loadTests") {
     const manifest = require("./manifest");
+    const onlyTarget = process.env.TEST_ONLY_TARGET;
 
     const tests = manifest
-      .filter(({ targets }) => targets.includes("gecko"))
+      .filter(({ targets }) => !onlyTarget || targets.includes(onlyTarget))
       .map(({ script }) => {
         return { type: "test", id: script, label: script, debuggable: false };
       });

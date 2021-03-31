@@ -27,6 +27,7 @@ let shouldRecordViewer = false;
 let recordExamplesSeparately = false;
 let recordUsingChromium = false;
 let testTimeout = 240;
+let onlyTarget = undefined;
 
 function processArgs() {
   const usage = `
@@ -40,6 +41,7 @@ function processArgs() {
       --separate: Record examples in a separate browser instance.
       --timeout N: Use a timeout of N seconds for tests (default 240).
       --chromium: Record examples using chromium.
+      --target TARGET: Only run tests using given TARGET
   `;
   for (let i = 2; i < process.argv.length; i++) {
     const arg = process.argv[i];
@@ -71,6 +73,9 @@ function processArgs() {
         shouldRecordExamples = true;
         recordUsingChromium = true;
         break;
+      case "--target":
+        onlyTarget = process.argv[++i];
+        break;
       case "--help":
       case "-h":
       default:
@@ -101,6 +106,10 @@ function processEnvironmentVariables() {
 
   // Get the address to use for the dispatch server.
   dispatchServer = process.env.RECORD_REPLAY_SERVER || DefaultDispatchServer;
+
+  if (!onlyTarget) {
+    onlyTarget = process.env.TEST_ONLY_TARGET;
+  }
 }
 
 function elapsedTime() {
@@ -114,8 +123,14 @@ async function runMatchingTests() {
     }
 
     const { script, example, targets } = Manifest[i];
-    for (const target of targets) {
-      await runTest(script, example, target);
+    if (!onlyTarget) {
+      for (const target of targets) {
+        await runTest(script, example, target);
+      }
+    } else if (targets.includes(onlyTarget)) {
+      await runTest(script, example, onlyTarget);
+    } else {
+      console.log(`Skipping test ${script} because it doesn't run on target ${onlyTarget}`);
     }
   }
 }
