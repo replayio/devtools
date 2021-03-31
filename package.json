@@ -26,7 +26,7 @@
     "@draft-js-plugins/editor": "^4.1.0",
     "@draft-js-plugins/emoji": "^4.2.0",
     "@draft-js-plugins/mention": "^4.3.1",
-    "@recordreplay/protocol": "^0.6.1",
+    "@recordreplay/protocol": "^0.7.0",
     "@sentry/apm": "^5.27.1",
     "@sentry/react": "^5.30.0",
     "apollo-link-http": "^1.5.17",
