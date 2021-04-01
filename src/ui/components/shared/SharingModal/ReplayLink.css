@@ -1,0 +1,7 @@
+.copy-link input[type="text"] {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid var(--cool-gray-300);
+  border-radius: 8px;
+  width: 100%;
+}

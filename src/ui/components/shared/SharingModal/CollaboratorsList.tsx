@@ -1,7 +1,21 @@
 import React, { useState } from "react";
 import { User } from "ui/types";
 import hooks from "ui/hooks";
-import { Role, RecordingDbData, CollaboratorDbData } from "./types";
+import "./CollaboratorsList.css";
+
+export interface RecordingDbData {
+  user: User;
+  id: string;
+  is_private: boolean;
+}
+
+export interface CollaboratorDbData {
+  user_id: string;
+  recording_id: string;
+  user: User;
+}
+
+type Role = "owner" | "collaborator";
 
 function Permission({ user, role, recordingId }: { user: User; role: Role; recordingId: string }) {
   const { deleteCollaborator, error } = hooks.useDeleteCollaborator();
@@ -9,12 +23,6 @@ function Permission({ user, role, recordingId }: { user: User; role: Role; recor
   const handleDeleteClick = () => {
     deleteCollaborator({ variables: { recordingId, userId: user.id } });
   };
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-
-  if (error) {
-    setTimeout(() => setShowErrorMessage(false), 2000);
-    return <div className="permission">Could not delete this collaborator</div>;
-  }
 
   return (
     <div className="permission">
@@ -42,11 +50,9 @@ export default function CollaboratorsList({
   collaborators: CollaboratorDbData[] | null;
   recordingId: string;
 }) {
-  const owner = recording.user;
-
   return (
     <div className="permissions-list">
-      <Permission user={owner} role={"owner"} recordingId={recordingId} />
+      <Permission user={recording.user} role={"owner"} recordingId={recordingId} />
       {collaborators
         ? collaborators.map((collaborator, i) => (
             <Permission

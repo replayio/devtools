@@ -7,7 +7,7 @@ const Account = require("./Account").default;
 const { AppErrors } = require("./shared/Error");
 const LoginModal = require("./shared/LoginModal").default;
 const SkeletonLoader = require("ui/components/SkeletonLoader").default;
-const SharingModal = require("./shared/SharingModal").default;
+import SharingModal from "./shared/SharingModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import SettingsModal from "./shared/SettingsModal/index";
