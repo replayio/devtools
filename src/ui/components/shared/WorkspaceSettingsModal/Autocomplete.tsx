@@ -4,7 +4,6 @@ import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { gql, useQuery } from "@apollo/client";
-import { useGetRecording } from "ui/hooks/sessions";
 
 function useFetchCollaborateorId(email: string) {
   const { data, loading, error } = useQuery(

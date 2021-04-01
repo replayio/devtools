@@ -8,6 +8,7 @@ const SkeletonLoader = require("./SkeletonLoader").default;
 const NonDevView = require("./Views/NonDevView").default;
 const DevView = require("./Views/DevView").default;
 const { prefs } = require("ui/utils/prefs");
+import DraftScreen from "./DraftScreen";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
@@ -18,6 +19,10 @@ import { RecordingId } from "@recordreplay/protocol";
 type DevToolsProps = PropsFromRedux & {
   recordingId: RecordingId;
 };
+
+function isTest() {
+  return new URL(window.location.href).searchParams.get("test");
+}
 
 function getUploadingMessage(uploading: UploadInfo) {
   if (!uploading) {
@@ -30,22 +35,6 @@ function getUploadingMessage(uploading: UploadInfo) {
   }
 
   return `Waiting for upload… ${amount} MB`;
-}
-
-function getIsAuthorized({ data }: any) {
-  const test = new URL(window.location.href).searchParams.get("test");
-
-  // Ideally, test recordings should be inserted into Hasura. However, test recordings are currently
-  // not being inserted as a Hasura recordings row, so the GET_RECORDING query will respond with an
-  // empty recordings array. To temporarily work around this for now, we return `true` here so
-  // the test can proceed.
-  if (test) {
-    return true;
-  }
-
-  // We let Hasura decide whether or not the user can view a recording. The response to our query
-  // will have a recording if they're authorized to view the recording, and will be empty if not.
-  return data.recordings.length;
 }
 
 function DevTools({
@@ -63,9 +52,12 @@ function DevTools({
   const userId = claims?.hasura.userId;
 
   const AddSessionUser = hooks.useAddSessionUser();
-  const { data, loading: recordingQueryLoading } = hooks.useGetRecording(recordingId);
+  const { recording, isAuthorized, loading: recordingQueryLoading } = hooks.useGetRecording(
+    recordingId
+  );
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
   const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
+  const { title, deleted_at, is_initialized, user_id } = recording || {};
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -84,37 +76,45 @@ function DevTools({
   }, [loading, userId, sessionId]);
 
   useEffect(() => {
-    if (data?.recordings?.[0]?.title) {
-      document.title = `${data.recordings[0].title} - Replay`;
+    if (title) {
+      document.title = `${title} - Replay`;
     }
-  }, [data]);
+  }, [recording]);
 
-  if (queriesAreLoading || !data) {
-    return <SkeletonLoader content={"Fetching the recording information."} />;
+  if (queriesAreLoading || !recording) {
+    return <SkeletonLoader content={"Fetching the replay information."} />;
   } else if (recordingDuration === null) {
-    return <SkeletonLoader content={"Fetching the recording description."} />;
+    return <SkeletonLoader content={"Fetching the replay description."} />;
   } else if (uploading) {
     const message = getUploadingMessage(uploading);
     return <SkeletonLoader content={message} />;
   }
 
-  if (data?.recordings?.[0]?.deleted_at) {
-    setExpectedError({ message: "This recording has been deleted." });
+  if (deleted_at) {
+    setExpectedError({ message: "This replay has been deleted." });
     return null;
   }
 
-  const isAuthorized = getIsAuthorized({ data });
-
   if (!isAuthorized) {
     if (userId) {
-      setExpectedError({ message: "You don't have permission to view this recording." });
+      setExpectedError({ message: "You don't have permission to view this replay." });
     } else {
       setExpectedError({
-        message: "You need to sign in to view this recording.",
+        message: "You need to sign in to view this replay.",
         action: "sign-in",
       });
     }
     return null;
+  }
+
+  // Only show the initialization screen if the replay is not being opened
+  // for testing purposes.
+  if (!is_initialized && !isTest()) {
+    if (user_id == userId) {
+      return <DraftScreen />;
+    } else {
+      setExpectedError({ message: "This replay is still beinfg drafted." });
+    }
   }
 
   if (!finishedLoading) {

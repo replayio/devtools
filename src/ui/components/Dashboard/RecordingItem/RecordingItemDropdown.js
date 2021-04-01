@@ -2,16 +2,7 @@ import React from "react";
 import { actions } from "ui/actions";
 import { connect } from "react-redux";
 import { gql, useMutation } from "@apollo/client";
-
-export const DELETE_RECORDING = gql`
-  mutation DeleteRecording($recordingId: uuid!, $deletedAt: String) {
-    update_recordings(where: { id: { _eq: $recordingId } }, _set: { deleted_at: $deletedAt }) {
-      returning {
-        id
-      }
-    }
-  }
-`;
+import hooks from "ui/hooks";
 
 function Privacy({ isPrivate, toggleIsPrivate }) {
   if (isPrivate) {
@@ -36,9 +27,7 @@ const DropdownPanel = ({
   isPrivate,
   setModal,
 }) => {
-  const [deleteRecording] = useMutation(DELETE_RECORDING, {
-    refetchQueries: ["GetWorkspaceRecordings"],
-  });
+  const deleteRecording = hooks.useDeleteRecording(["GetWorkspaceRecordings", "GetMyRecordings"]);
 
   const onDeleteRecording = async recordingId => {
     await deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } });
