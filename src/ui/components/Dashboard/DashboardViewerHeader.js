@@ -1,7 +1,5 @@
 import React from "react";
 import classnames from "classnames";
-import { useMutation } from "@apollo/client";
-import { DELETE_RECORDING } from "./RecordingItem/RecordingItemDropdown";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import "./DashboardViewerHeader.css";
 import hooks from "ui/hooks";
@@ -30,9 +28,7 @@ function ViewsToggle({ viewType, toggleViewType }) {
 function BatchActionDropdown({ selectedIds, setSelectedIds }) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
-  const [deleteRecording] = useMutation(DELETE_RECORDING, {
-    refetchQueries: ["GetMyRecordings"],
-  });
+  const deleteRecording = hooks.useDeleteRecording(["GetWorkspaceRecordings", "GetMyRecordings"]);
 
   if (loading) {
     return null;

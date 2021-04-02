@@ -9,6 +9,41 @@ type PersonalRecordingsData = {
   recordings: Recording[];
 };
 
+function isTest() {
+  return new URL(window.location.href).searchParams.get("test");
+}
+
+export function useGetRecording(recordingId: RecordingId) {
+  const { data, error, loading } = useQuery(
+    gql`
+      query GetRecording($recordingId: uuid!) {
+        recordings(where: { id: { _eq: $recordingId } }) {
+          id
+          user_id
+          title
+          recordingTitle
+          is_private
+          is_initialized
+          date
+          deleted_at
+        }
+      }
+    `,
+    {
+      variables: { recordingId },
+    }
+  );
+
+  if (error) {
+    console.error("Apollo error while getting the recording", error);
+  }
+
+  const recording = data?.recordings[0];
+  // Tests don't have an associated user so we just let it bypass the check here.
+  const isAuthorized = isTest() || recording;
+  return { recording, isAuthorized, loading };
+}
+
 export function useGetRecordingPhoto(
   recordingId: RecordingId
 ): {
@@ -234,7 +269,7 @@ export function useGetRecordings(
 export function useUpdateRecordingWorkspace() {
   const [updateRecordingWorkspace] = useMutation(
     gql`
-      mutation DeleteRecording($recordingId: uuid!, $workspaceId: uuid) {
+      mutation UpdateRecordingWorkspace($recordingId: uuid!, $workspaceId: uuid) {
         update_recordings(
           where: { id: { _eq: $recordingId } }
           _set: { workspace_id: $workspaceId }
@@ -318,4 +353,46 @@ export function useGetMyRecordings() {
   const recordings = getRecordings(data);
 
   return { recordings, loading };
+}
+
+export function useDeleteRecording(refetchQueries?: string[], onCompleted?: () => void) {
+  const [deleteRecording] = useMutation(
+    gql`
+      mutation DeleteRecording($recordingId: uuid!, $deletedAt: String) {
+        update_recordings(where: { id: { _eq: $recordingId } }, _set: { deleted_at: $deletedAt }) {
+          returning {
+            id
+          }
+        }
+      }
+    `,
+    {
+      refetchQueries,
+      onCompleted: onCompleted || (() => {}),
+    }
+  );
+
+  return deleteRecording;
+}
+
+export function useInitializeRecording() {
+  const [initializeRecording] = useMutation(
+    gql`
+      mutation InitializeRecording($recordingId: uuid!, $title: String, $workspaceId: uuid) {
+        update_recordings_by_pk(
+          pk_columns: { id: $recordingId }
+          _set: { is_initialized: true, recordingTitle: $title, workspace_id: $workspaceId }
+        ) {
+          id
+          is_initialized
+          title
+          recordingTitle
+          workspace_id
+        }
+      }
+    `,
+    { refetchQueries: ["GetRecording"] }
+  );
+
+  return initializeRecording;
 }
