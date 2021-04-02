@@ -6,7 +6,7 @@ import "./ReplayInvitations.css";
 export default function ReplayInvitations() {
   const [inputValue, setInputValue] = useState("");
   const { invitations, loading: inviteLoading } = hooks.useGetInvitations();
-  const { isInternal, loading: userLoading } = hooks.useGetUserInfo();
+  const { isInternal, invited, loading: userLoading } = hooks.useGetUserInfo();
   const addInvitation = hooks.useAddInvitation();
   const userId = getUserId();
 
@@ -21,6 +21,16 @@ export default function ReplayInvitations() {
       <li className="replay-invitations">
         <label className="setting-item">
           <div className="label">Loading...</div>
+        </label>
+      </li>
+    );
+  }
+
+  if (!invited) {
+    return (
+      <li className="replay-invitations">
+        <label className="setting-item">
+          <div className="label">Sorry! Invitations are only available to invited users.</div>
         </label>
       </li>
     );

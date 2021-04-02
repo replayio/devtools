@@ -78,7 +78,11 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
     return <SkeletonLoader content={"Uploading resources"} />;
   }
 
-  if ((!isDeployPreview() && auth.isLoading) || loading) {
+  if (loading) {
+    return <SkeletonLoader content={"Loading"} />;
+  }
+
+  if (!isDeployPreview() && auth.isLoading) {
     return null;
   }
 
