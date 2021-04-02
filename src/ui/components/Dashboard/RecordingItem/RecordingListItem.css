@@ -5,7 +5,7 @@
 
 .recording-list.list table.dashboard-viewer-content-table {
   display: grid;
-  grid-template-columns: auto 140px 2fr 2fr 0.5fr 0.5fr 0.5fr auto auto;
+  grid-template-columns: auto 140px 2fr 0.5fr 0.75fr 0.5fr auto auto;
 }
 
 /* Table Body styling */
