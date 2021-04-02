@@ -16,13 +16,13 @@ import { UIState } from "ui/state";
 import { UploadInfo } from "ui/state/app";
 import { RecordingId } from "@recordreplay/protocol";
 
-type DevToolsProps = PropsFromRedux & {
-  recordingId: RecordingId;
-};
-
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
 }
+
+type DevToolsProps = PropsFromRedux & {
+  recordingId: RecordingId;
+};
 
 function getUploadingMessage(uploading: UploadInfo) {
   if (!uploading) {
@@ -95,7 +95,8 @@ function DevTools({
     return null;
   }
 
-  if (user.invited == false) {
+  // Test recordings don't have a user, so we skip this check in that case.
+  if (user && user.invited == false) {
     setExpectedError({ message: "The author of this Replay has not activated their account yet." });
     return null;
   }
