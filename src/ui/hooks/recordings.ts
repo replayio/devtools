@@ -26,6 +26,9 @@ export function useGetRecording(recordingId: RecordingId) {
           is_initialized
           date
           deleted_at
+          user {
+            invited
+          }
         }
       }
     `,

@@ -11,6 +11,7 @@ import "./SettingsModal.css";
 const settings: Settings = [
   {
     title: "Experimental",
+    icon: "biotech",
     items: [
       {
         label: "Enable the Elements pane",
@@ -27,7 +28,13 @@ const settings: Settings = [
     ],
   },
   {
+    title: "Invitations",
+    icon: "stars",
+    items: [],
+  },
+  {
     title: "Support",
+    icon: "support",
     items: [],
   },
 ];

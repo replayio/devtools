@@ -5,6 +5,8 @@ import * as settingsHooks from "./settings";
 import * as collaboratorsHooks from "./collaborators";
 import * as workspacesHooks from "./workspaces";
 import * as workspaceMembersHooks from "./workspaces_user";
+import * as invitationsHooks from "./invitations";
+import * as usersHooks from "./users";
 
 export default {
   ...commentsHooks,
@@ -14,4 +16,6 @@ export default {
   ...collaboratorsHooks,
   ...workspacesHooks,
   ...workspaceMembersHooks,
+  ...invitationsHooks,
+  ...usersHooks,
 };

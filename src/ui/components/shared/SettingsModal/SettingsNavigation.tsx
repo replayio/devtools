@@ -20,14 +20,14 @@ function SettingNavigationItem({
   selectedTab,
   setSelectedTab,
 }: SettingNavigationItemProps) {
-  const { title } = setting;
+  const { title, icon } = setting;
   const onClick = () => {
     setSelectedTab(title);
   };
 
   return (
     <li onClick={onClick} className={classnames({ selected: title === selectedTab })}>
-      <div className={`img settings-${title.toLowerCase()}`} />
+      <div className="material-icons">{icon}</div>
       <span>{title}</span>
     </li>
   );

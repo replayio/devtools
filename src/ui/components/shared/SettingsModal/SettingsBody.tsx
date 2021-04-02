@@ -2,6 +2,7 @@ import React from "react";
 import { SettingItem, Setting, UserSettings } from "./types";
 import useToken from "ui/utils/useToken";
 import hooks from "ui/hooks";
+import ReplayInvitations from "./ReplayInvitations";
 import "./SettingsBody.css";
 
 interface SettingsBodyItemProps {
@@ -67,6 +68,13 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
       <main>
         <h1>{title}</h1>
         <Support />
+      </main>
+    );
+  } else if (title == "Invitations") {
+    return (
+      <main>
+        <h1>{title}</h1>
+        <ReplayInvitations />
       </main>
     );
   }
