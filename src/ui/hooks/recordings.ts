@@ -47,6 +47,31 @@ export function useGetRecording(recordingId: RecordingId) {
   return { recording, isAuthorized, loading };
 }
 
+export function useGetAuthoredRecordings() {
+  const userId = getUserId();
+  const { data, error, loading } = useQuery(
+    gql`
+      query getAuthoredRecordings($userId: uuid) {
+        recordings_aggregate(where: { user_id: { _eq: $userId } }) {
+          aggregate {
+            count
+          }
+        }
+      }
+    `,
+    {
+      variables: { userId },
+    }
+  );
+
+  if (error) {
+    console.error("Apollo error while getting the recordings created by the user", error);
+  }
+
+  const recordingsCount = data?.recordings_aggregate.aggregate.count;
+  return { recordingsCount, loading };
+}
+
 export function useGetRecordingPhoto(
   recordingId: RecordingId
 ): {

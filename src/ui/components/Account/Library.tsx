@@ -4,6 +4,7 @@ import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 const UserOptions = require("ui/components/Header/UserOptions").default;
+import WelcomeScreen from "./WelcomeScreen";
 
 function Header() {
   return (
@@ -18,13 +19,18 @@ function Header() {
 }
 
 function Library({ setWorkspaceId }: PropsFromRedux) {
-  const { personalWorkspaceId, loading } = hooks.useGetPersonalWorkspace();
+  const { personalWorkspaceId, loading: workspaceLoading } = hooks.useGetPersonalWorkspace();
+  const { recordingsCount, loading: recordingsLoading } = hooks.useGetAuthoredRecordings();
 
-  if (loading || !personalWorkspaceId) {
+  if (recordingsLoading || workspaceLoading || !personalWorkspaceId || !recordingsCount) {
     return null;
   }
 
   setWorkspaceId(personalWorkspaceId);
+
+  if (recordingsCount == 0) {
+    return <WelcomeScreen />;
+  }
 
   return (
     <>
