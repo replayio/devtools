@@ -48,10 +48,12 @@ function UserOptions({ recordingId, setModal }) {
         expanded={expanded}
         orientation="bottom"
       >
-        <button className="row" onClick={onLibraryClick}>
-          <span className="material-icons">home</span>
-          <span>Library</span>
-        </button>
+        {recordingId ? (
+          <button className="row" onClick={onLibraryClick}>
+            <span className="material-icons">home</span>
+            <span>Library</span>
+          </button>
+        ) : null}
         {showShare && (
           <button className="row" onClick={onShareClick}>
             <span className="material-icons">share</span>

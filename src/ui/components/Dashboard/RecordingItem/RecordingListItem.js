@@ -54,25 +54,24 @@ function ItemPrivacy({ isPrivate, toggleIsPrivate }) {
 }
 
 function ItemCreatedDate({ date }) {
-  return <div className="secondary">{formatDate(new Date(date), "M/d/yyyy")}</div>;
+  let content = formatDistanceToNow(new Date(date), { addSuffix: true });
+
+  const daysSince = (new Date().getTime() - new Date(date).getTime()) / (1000 * 3600 * 24);
+  console.log({ daysSince });
+
+  // Show relative time if under 3 days, otherwise, use the template below.
+  if (daysSince > 3) {
+    content = formatDate(new Date(date), "M/d/yyyy");
+  }
+
+  return <div className="secondary">{content}</div>;
 }
 
 function ItemDuration({ duration }) {
   return <div>{getDurationString(duration)}</div>;
 }
 
-function ItemPageDetails({ title, url, handleClickUrl }) {
-  return (
-    <div className="page">
-      <div className="page-title">{title || "No page title found"}</div>
-      <div className="page-url" onClick={handleClickUrl}>
-        {url}
-      </div>
-    </div>
-  );
-}
-
-function ItemTitle({ data, editing, editingTitle, setEditingTitle }) {
+function ItemTitle({ data, editing, editingTitle, setEditingTitle, handleClickUrl }) {
   return (
     <div className="item-title">
       <div className="item-title-label">
@@ -89,7 +88,9 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle }) {
           </div>
         ) : null}
       </div>
-      <div>Created {formatDistanceToNow(new Date(data.date), { addSuffix: true })}</div>
+      <div className="page-url" onClick={handleClickUrl}>
+        {data.url}
+      </div>
     </div>
   );
 }
@@ -170,10 +171,8 @@ export default function RecordingListItem({
           editing={editing}
           editingTitle={editingTitle}
           setEditingTitle={setEditingTitle}
+          handleClickUrl={handleClickUrl}
         />
-      </td>
-      <td>
-        <ItemPageDetails title={data.title} url={data.url} handleClickUrl={handleClickUrl} />
       </td>
       <td>
         <ItemDuration duration={data.duration} />
