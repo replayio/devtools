@@ -1,4 +1,5 @@
 import { SettingsTabTitle } from "ui/state/app";
+import { UserSettings } from "ui/types";
 
 export type Settings = Setting[];
 
@@ -20,10 +21,3 @@ export interface SettingItem {
 }
 
 export type SettingItemKey = keyof UserSettings;
-
-export interface UserSettings {
-  showElements: boolean;
-  showReact: boolean;
-  enableTeams: boolean;
-  defaultWorkspaceId: string | null;
-}

@@ -182,7 +182,7 @@ export function setTimelineState(state: Partial<TimelineState>): SetTimelineStat
   return { type: "set_timeline_state", state };
 }
 
-export function setTimelineToTime(time: number | null, updateGraphics = true): UIThunkAction {
+export function setTimelineToTime(time: number | null, updateGraphics = false): UIThunkAction {
   return async ({ dispatch, getState }) => {
     dispatch(setTimelineState({ hoverTime: time }));
 
@@ -465,8 +465,8 @@ export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
     dispatch({ type: "set_hovered_item", hoveredItem });
 
     // Don't update the video if user is adding a new comment.
-    const updateGraphics = !selectors.getPendingComment(getState());
-    dispatch(setTimelineToTime(hoveredItem?.time || null, updateGraphics));
+    // const updateGraphics = !selectors.getPendingComment(getState());
+    dispatch(setTimelineToTime(hoveredItem?.time || null));
   };
 }
 

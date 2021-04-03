@@ -12,6 +12,7 @@ import {
   PointDescription,
   NodeBounds,
   PauseData,
+  repaintGraphicsResult,
 } from "@recordreplay/protocol";
 import { client } from "../socket";
 import { defer, assert, Deferred } from "../utils";
@@ -84,6 +85,7 @@ export interface EvaluationResult {
 export class Pause {
   sessionId: SessionId;
   pauseId: PauseId | null;
+  pauseIdWaiter: Deferred<PauseId>;
   point: ExecutionPoint | null;
   time: number | null;
   hasFrames: boolean | null;
@@ -96,11 +98,13 @@ export class Pause {
   domFronts: Map<string, DOMFront>;
   stack: WiredFrame[] | undefined;
   loadMouseTargetsWaiter: Deferred<void> | undefined;
+  repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
   constructor(sessionId: SessionId) {
     this.sessionId = sessionId;
     this.pauseId = null;
+    this.pauseIdWaiter = defer();
     this.point = null;
     this.time = null;
     this.hasFrames = null;
@@ -121,15 +125,20 @@ export class Pause {
     return pausesById.get(pauseId);
   }
 
+  private _setPauseId(pauseId: PauseId) {
+    this.pauseId = pauseId;
+    this.pauseIdWaiter.resolve(pauseId);
+  }
+
   create(point: ExecutionPoint, time: number) {
     assert(!this.createWaiter);
     assert(!this.pauseId);
     this.createWaiter = client.Session.createPause({ point }, this.sessionId).then(
       ({ pauseId, stack, data }) => {
-        this.pauseId = pauseId;
+        this._setPauseId(pauseId);
         this.point = point;
         this.time = time;
-        this.hasFrames = !!stack;
+        this.hasFrames = !!stack && stack.length > 0;
         this.addData(data);
         if (stack) {
           this.stack = stack.map(id => this.frames.get(id)!);
@@ -149,7 +158,7 @@ export class Pause {
     assert(!this.createWaiter);
     assert(!this.pauseId);
     this.createWaiter = Promise.resolve();
-    this.pauseId = pauseId;
+    this._setPauseId(pauseId);
     this.point = point;
     this.time = time;
     this.hasFrames = hasFrames;
@@ -442,6 +451,22 @@ export class Pause {
       }
     }
     return null;
+  }
+
+  async repaintGraphics() {
+    if (this.repaintGraphicsWaiter) {
+      return this.repaintGraphicsWaiter.promise;
+    }
+    this.repaintGraphicsWaiter = defer();
+    let rv = null;
+    try {
+      await this.pauseIdWaiter.promise;
+      rv = await this.sendMessage(client.DOM.repaintGraphics, {});
+    } catch (e) {
+      console.error("DOM.repaintGraphics failed", e);
+    }
+    this.repaintGraphicsWaiter.resolve(rv);
+    return rv;
   }
 
   async getFrameSteps(frameId: FrameId) {

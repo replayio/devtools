@@ -1,13 +1,37 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
+import { query } from "ui/utils/apolloClient";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
+import type { UserSettings } from "../types";
 
-const anonymousSettings = {
+const GET_USER_SETTINGS = gql`
+  query GetUserSettings {
+    viewer {
+      settings {
+        showElements
+        showReact
+        enableTeams
+        enableRepaint
+      }
+      defaultWorkspace {
+        id
+      }
+    }
+  }
+`;
+
+const anonymousSettings: UserSettings = {
   showElements: false,
   showReact: false,
   enableTeams: true,
+  enableRepaint: false,
   defaultWorkspaceId: null,
 };
+
+export async function getUserSettings(): Promise<UserSettings> {
+  const result = await query({ query: GET_USER_SETTINGS, variables: {} });
+  return convertUserSettings(result.data);
+}
 
 export function useGetUserSettings() {
   const { isAuthenticated } = useAuth0();
@@ -16,22 +40,7 @@ export function useGetUserSettings() {
     return { userSettings: anonymousSettings, loading: false };
   }
 
-  const { data, error, loading } = useQuery(
-    gql`
-      query GetUserSettings {
-        viewer {
-          settings {
-            showElements
-            showReact
-            enableTeams
-          }
-          defaultWorkspace {
-            id
-          }
-        }
-      }
-    `
-  );
+  const { data, error, loading } = useQuery(GET_USER_SETTINGS);
 
   if (loading) {
     return { userSettings: null, error, loading };
@@ -42,6 +51,10 @@ export function useGetUserSettings() {
     return { userSettings: null, error, loading };
   }
 
+  return { userSettings: convertUserSettings(data), error, loading };
+}
+
+function convertUserSettings(data: any): UserSettings {
   let userSettings = anonymousSettings;
   if (data?.viewer) {
     const settings = data.viewer.settings;
@@ -49,10 +62,11 @@ export function useGetUserSettings() {
       showElements: settings.showElements,
       showReact: settings.showReact,
       enableTeams: settings.enableTeams,
+      enableRepaint: settings.enableRepaint,
       defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
     };
   }
-  return { userSettings, error, loading };
+  return userSettings;
 }
 
 export function useUpdateUserSetting(key: SettingItemKey, type: "uuid" | "Boolean") {
