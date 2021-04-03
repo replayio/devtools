@@ -27,7 +27,7 @@ const { setupLogpoints } = require("./protocol/logpoint");
 const { bootstrapApp } = require("ui/utils/bootstrap/bootstrap");
 const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
 const { setupTimeline, setupApp } = require("ui/actions").actions;
-const { setupGraphics } = require("protocol/graphics");
+const { setupGraphics, updateEnableRepaint } = require("protocol/graphics");
 const { setupMessages } = require("devtools/client/webconsole/actions/messages");
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
@@ -39,6 +39,7 @@ const {
 } = require("./devtools/client/webconsole/utils/syntax-highlighted");
 const { setupExceptions } = require("devtools/client/debugger/src/actions/logExceptions");
 const { selectors } = require("ui/reducers");
+const { getUserSettings } = require("ui/hooks/settings");
 
 require("image/image.css");
 
@@ -97,4 +98,7 @@ async function initialize() {
   }
 
   bootstrapApp({}, { recordingId }, store);
+
+  const settings = await getUserSettings();
+  updateEnableRepaint(settings.enableRepaint);
 })();

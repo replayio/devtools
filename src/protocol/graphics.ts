@@ -17,9 +17,15 @@ import { Canvas } from "ui/state/app";
 import { selectors } from "ui/reducers";
 
 export const screenshotCache = new ScreenshotCache();
+const repaintedScreenshots: Map<string, ScreenShot> = new Map();
+let enableRepaint = false;
 
 interface Timed {
   time: number;
+}
+
+export function updateEnableRepaint(_enableRepaint: boolean) {
+  enableRepaint = _enableRepaint;
 }
 
 // Given a sorted array of items with "time" properties, find the index of
@@ -141,6 +147,32 @@ export function setupGraphics(store: UIStore) {
       gDevicePixelRatio = ratio;
     });
   });
+
+  ThreadFront.on("paused", async () => {
+    if (!enableRepaint) {
+      return;
+    }
+
+    ThreadFront.ensureCurrentPause();
+    const pause = ThreadFront.currentPause;
+    assert(pause);
+
+    const rv = await pause.repaintGraphics();
+    if (pause === ThreadFront.currentPause && rv) {
+      const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
+      let { description, screenShot } = rv;
+      if (screenShot) {
+        repaintedScreenshots.set(description.hash, screenShot);
+      } else {
+        screenShot = repaintedScreenshots.get(description.hash);
+        if (!screenShot) {
+          console.error("Missing repainted screenshot", description);
+          return;
+        }
+      }
+      paintGraphics(screenShot, mouse);
+    }
+  });
 }
 
 export function addLastScreen(screen: ScreenShot | null, point: string, time: number) {
@@ -211,6 +243,10 @@ export async function getGraphicsAtTime(
   time: number,
   forPlayback = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
+  if (enableRepaint) {
+    return {};
+  }
+
   const paintIndex = mostRecentIndex(gPaintPoints, time);
   if (paintIndex === undefined) {
     // There are no graphics to paint here.

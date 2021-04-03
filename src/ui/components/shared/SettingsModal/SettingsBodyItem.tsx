@@ -1,7 +1,9 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { SettingItem, UserSettings } from "./types";
+import { UserSettings } from "ui/types";
+import { SettingItem } from "./types";
 import hooks from "ui/hooks";
 import { SelectMenu } from "ui/components/shared/Forms";
+import { updateEnableRepaint } from "protocol/graphics";
 import "./SettingsBodyItem.css";
 
 interface SettingsBodyItemProps {
@@ -27,11 +29,12 @@ function Checkbox({
       setShowRefresh(true);
     }
 
-    updateUserSetting({
-      variables: {
-        newValue: !value,
-      },
-    });
+    const newValue = !value;
+    updateUserSetting({ variables: { newValue } });
+
+    if (key === "enableRepaint") {
+      updateEnableRepaint(newValue);
+    }
   };
 
   return <input type="checkbox" id={key} checked={value} onChange={toggleSetting} />;
