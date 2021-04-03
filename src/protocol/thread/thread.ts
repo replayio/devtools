@@ -34,7 +34,6 @@ import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 import { MappedLocationCache } from "../mapped-location-cache";
 import { ValueFront } from "./value";
 import { Pause } from "./pause";
-import { paintGraphics, getGraphicsAtTime } from "../graphics";
 
 export interface RecordingDescription {
   duration: TimeStamp;
@@ -275,7 +274,6 @@ class _ThreadFront {
     this.emit("paused", { point, hasFrames, time });
 
     this._precacheResumeTargets();
-    this._maybeRepaintGraphics();
   }
 
   timeWarpToPause(pause: Pause) {
@@ -291,7 +289,6 @@ class _ThreadFront {
     this.emit("paused", { point, hasFrames, time });
 
     this._precacheResumeTargets();
-    this._maybeRepaintGraphics();
   }
 
   async findSources(onSource: (source: newSource) => void) {
@@ -587,29 +584,6 @@ class _ThreadFront {
         this.invalidateCommandWaiters.length = 0;
         this._precacheResumeTargets();
       }
-    }
-  }
-
-  // Remember screenshots that have been repainted, indexed by hash.
-  _repaintedScreenshots: Map<string, ScreenShot> = new Map();
-
-  async _maybeRepaintGraphics() {
-    this.ensureCurrentPause();
-    const pause = this.currentPause;
-    const rv = await this.currentPause!.repaintGraphics();
-    if (pause == this.currentPause && rv) {
-      const { mouse } = await getGraphicsAtTime(this.currentTime);
-      let { description, screenShot } = rv;
-      if (screenShot) {
-        this._repaintedScreenshots.set(description.hash, screenShot);
-      } else {
-        screenShot = this._repaintedScreenshots.get(description.hash);
-        if (!screenShot) {
-          console.error("Missing repainted screenshot", description);
-          return;
-        }
-      }
-      paintGraphics(screenShot, mouse);
     }
   }
 
