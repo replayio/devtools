@@ -13,7 +13,7 @@ import {
   NodeBounds,
   PauseData,
 } from "@recordreplay/protocol";
-import { client } from "../socket";
+import { client, sendMessage } from "../socket";
 import { defer, assert, Deferred } from "../utils";
 import { ValueFront } from "./value";
 import { ThreadFront } from "./thread";
@@ -96,6 +96,7 @@ export class Pause {
   domFronts: Map<string, DOMFront>;
   stack: WiredFrame[] | undefined;
   loadMouseTargetsWaiter: Deferred<void> | undefined;
+  repaintGraphicsWaiter: Deferred<any> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
   constructor(sessionId: SessionId) {
@@ -442,6 +443,20 @@ export class Pause {
       }
     }
     return null;
+  }
+
+  async repaintGraphics() {
+    if (this.repaintGraphicsWaiter) {
+      return this.repaintGraphicsWaiter.promise;
+    }
+    this.repaintGraphicsWaiter = defer();
+    let rv = null;
+    try {
+      rv = await sendMessage("DOM.repaintGraphics", {}, this.sessionId, this.pauseId);
+    } catch (e) {
+      console.error(`DOM.repaintGraphics failed ${e}`);
+    }
+    this.repaintGraphicsWaiter.resolve(rv);
   }
 
   async getFrameSteps(frameId: FrameId) {
