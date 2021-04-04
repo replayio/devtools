@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
   createBridge,
@@ -6,20 +6,15 @@ import {
   initialize as createDevTools,
 } from "react-devtools-inline/frontend";
 import { ThreadFront } from "protocol/thread";
-import { features } from "ui/utils/prefs";
 
 let bridge, store, wall, DevTools;
 let currentTime = null;
 let rerenderComponentsTab;
 const messages = [];
-
 let inspected = new Set();
+InitReactDevTools();
 
 function InitReactDevTools() {
-  if (!features.reactDevtools) {
-    return null;
-  }
-
   const target = {
     postMessage() {},
   };
@@ -80,27 +75,25 @@ const onPaused = data => {
   }
 };
 
-if (features.reactDevtools) {
-  ThreadFront.getAnnotations(({ annotations }) => {
-    for (const { point, time, kind, contents } of annotations) {
-      const message = JSON.parse(contents);
-      messages.push({ point, time, message });
-    }
-  });
-
-  ThreadFront.on("paused", onPaused);
-}
-
-InitReactDevTools();
-
 // TODO Pass custom bridge
 // TODO Use portal containers for Profiler & Components
 export function ReactDevtoolsPanel() {
-  if (!features.reactDevtools) {
-    return null;
-  }
-
   const [count, setCount] = React.useState(0);
+
+  React.useLayoutEffect(() => () => {
+    rerenderComponentsTab = null;
+  });
+
+  useEffect(() => {
+    ThreadFront.on("paused", onPaused);
+
+    ThreadFront.getAnnotations(({ annotations }) => {
+      for (const { point, time, kind, contents } of annotations) {
+        const message = JSON.parse(contents);
+        messages.push({ point, time, message });
+      }
+    });
+  }, []);
 
   // HACK TODO This hack handles the fact that DevTools wasn't writen
   // with the expectation that a new Bridge or Store prop would be pasesd
@@ -108,10 +101,6 @@ export function ReactDevtoolsPanel() {
   rerenderComponentsTab = () => {
     setCount(count + 1);
   };
-
-  React.useLayoutEffect(() => () => {
-    rerenderComponentsTab = null;
-  });
 
   return (
     <DevTools

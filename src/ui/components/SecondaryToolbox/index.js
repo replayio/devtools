@@ -89,6 +89,9 @@ function InspectorPanel() {
 }
 
 function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
+  const {
+    userSettings: { show_react },
+  } = hooks.useGetUserSettings();
   return (
     <div className="secondary-toolbox">
       <header className="secondary-toolbox-header">
@@ -102,7 +105,7 @@ function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode }) {
         {selectedPanel == "console" ? <ConsolePanel /> : null}
         {selectedPanel == "inspector" ? <InspectorPanel /> : null}
         {selectedPanel == "viewer" && narrowMode ? <Video /> : null}
-        {selectedPanel == "react-components" ? <ReactDevtoolsPanel /> : null}
+        {show_react && selectedPanel == "react-components" ? <ReactDevtoolsPanel /> : null}
       </div>
     </div>
   );
