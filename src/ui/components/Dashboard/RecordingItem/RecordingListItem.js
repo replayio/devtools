@@ -57,7 +57,6 @@ function ItemCreatedDate({ date }) {
   let content = formatDistanceToNow(new Date(date), { addSuffix: true });
 
   const daysSince = (new Date().getTime() - new Date(date).getTime()) / (1000 * 3600 * 24);
-  console.log({ daysSince });
 
   // Show relative time if under 3 days, otherwise, use the template below.
   if (daysSince > 3) {
