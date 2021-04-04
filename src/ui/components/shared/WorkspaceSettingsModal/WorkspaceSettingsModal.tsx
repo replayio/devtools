@@ -13,7 +13,6 @@ const content1 = `Manage members here so that everyone who belongs to this team 
 
 function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
   const { members, loading } = hooks.useGetWorkspaceMembers(workspaceId!);
-  console.log({ members });
 
   return (
     <div className="workspace-settings-modal">
