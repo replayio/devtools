@@ -34,7 +34,9 @@ function CommentEditor({
 
   const users = useMemo(
     () =>
-      collaborators && recording ? [...collaborators.map(c => c.user), recording.user] : undefined,
+      collaborators && recording
+        ? [...collaborators.map(c => c.user), recording.user].filter(Boolean)
+        : undefined,
     [collaborators, recording]
   );
 
