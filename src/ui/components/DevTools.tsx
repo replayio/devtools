@@ -119,7 +119,7 @@ function DevTools({
     if (user_id == userId) {
       return <DraftScreen />;
     } else {
-      setExpectedError({ message: "This replay is still beinfg drafted." });
+      setExpectedError({ message: "This replay is being uploaded, try again in a moment" });
     }
   }
 
