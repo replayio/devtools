@@ -137,7 +137,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
     console.error("Apollo error while creating a new workspace:", error);
   }
 
-  const workspaces: Workspace[] = data?.workspaces;
+  const workspaces: Workspace[] = data?.workspaces || [];
   return { workspaces, loading };
 }
 

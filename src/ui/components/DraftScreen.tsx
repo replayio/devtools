@@ -23,7 +23,9 @@ function WorkspaceDropdownList({
   const displayedWorkspaces = [personalWorkspace, ...otherWorkspaces];
 
   useEffect(() => {
-    setSelectedWorkspaceId(personalWorkspace.id);
+    if (personalWorkspace) {
+      setSelectedWorkspaceId(personalWorkspace.id);
+    }
   }, [workspaces]);
 
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
