@@ -378,7 +378,7 @@ async function createExampleBrowserRecording(url, target) {
       console.log(`Skipping test: RECORD_REPLAY_CHROMIUM not set`);
       return SkipTest;
     }
-    browser = spawn(process.env.RECORD_REPLAY_CHROMIUM, [url, "--no-sandbox", "--disable-gpu"], {
+    browser = spawn(process.env.RECORD_REPLAY_CHROMIUM, [url], {
       env: {
         ...process.env,
         RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
