@@ -1,9 +1,9 @@
-.welcome-screen h1 {
+.full-screen-info h1 {
   font-size: 30px;
   font-weight: 800;
 }
 
-.welcome-screen {
+.full-screen-info {
   background: var(--cool-gray-100);
   height: 100%;
   width: 100%;
@@ -12,19 +12,19 @@
   align-items: center;
 }
 
-.welcome-screen main {
+.full-screen-info main {
   display: flex;
   flex-direction: row;
   border-radius: 8px;
   overflow: hidden;
 }
 
-.welcome-screen .filler {
+.full-screen-info .filler {
   background: linear-gradient(to bottom right, #64D4FB, #52A6F9);
   width: 560px;
 }
 
-.welcome-screen .content-container {
+.full-screen-info .content-container {
   background: var(--theme-body-background);
   margin: auto;
   padding: 64px 96px 80px 96px;
@@ -33,29 +33,29 @@
   font-size: 20px;
 }
 
-.welcome-screen .content-container > :not(:first-child) {
+.full-screen-info .content-container > :not(:first-child) {
   margin-top: 32px;
 }
 
-.welcome-screen .header > :not(:first-child) {
+.full-screen-info .header > :not(:first-child) {
   margin-top: 24px;
 }
 
-.welcome-screen .logo {
+.full-screen-info .logo {
   width: 48px;
   height: 48px;
 }
 
-.welcome-screen .content > :not(:first-child) {
+.full-screen-info .content > :not(:first-child) {
   width: 400px;
 }
 
-.welcome-screen .content > :not(:first-child) {
+.full-screen-info .content > :not(:first-child) {
   margin-top: 24px;
 }
 
 @media only screen and (max-width: 1280px) {
-  .welcome-screen .filler {
+  .full-screen-info .filler {
     display: none;
   }
 }

@@ -4,7 +4,7 @@ import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
 import { actions } from "ui/actions";
 const UserOptions = require("ui/components/Header/UserOptions").default;
-import WelcomeScreen from "./WelcomeScreen";
+import FullScreenInfo from "./FullScreenInfo";
 
 function Header() {
   return (
@@ -29,7 +29,20 @@ function Library({ setWorkspaceId }: PropsFromRedux) {
   setWorkspaceId(personalWorkspaceId);
 
   if (recordingsCount == 0) {
-    return <WelcomeScreen />;
+    return (
+      <FullScreenInfo header="All set">
+        <>
+          <p>{`Let's record your first Replay.`}</p>
+          <ol style={{ marginLeft: "36px" }}>
+            <li>{`Open the Replay browser`}</li>
+            <li>{`Go to the website you want to record`}</li>
+            <li>{`Press the Record button on the top right`}</li>
+            <li>{`Record for a minute or less for best results`}</li>
+          </ol>
+          <p>Enjoy!</p>
+        </>
+      </FullScreenInfo>
+    );
   }
 
   return (
