@@ -23,18 +23,19 @@ export function useGetUserSettings() {
         user_settings {
           show_elements
           show_react
+          enable_teams
         }
       }
     `
   );
 
   if (loading) {
-    return { data, error, loading };
+    return { userSettings: null, error, loading };
   }
 
   if (error) {
     console.error("Apollo error while getting user settings:", error);
-    return { data, error, loading };
+    return { userSettings: null, error, loading };
   }
 
   // This is for cases where the user doesn't have a record in the user_settings table.

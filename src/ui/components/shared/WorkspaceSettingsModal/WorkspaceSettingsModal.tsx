@@ -20,7 +20,7 @@ function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
         <main>
           <h1>
             <span className="material-icons">settings</span>
-            <span>Workspace Settings</span>
+            <span>Team Settings</span>
           </h1>
           <div className="new-workspace-content">
             <p>{content1}</p>

@@ -19,9 +19,10 @@ export interface SettingItem {
   key: SettingItemKey;
   description: string | null;
   disabled: boolean;
+  needsRefresh: boolean;
 }
 
-export type SettingItemKey = "show_elements" | "show_react";
+export type SettingItemKey = "show_elements" | "show_react" | "enable_teams";
 
 export interface UserSettings {
   [key: string]: boolean;
