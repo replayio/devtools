@@ -4,16 +4,15 @@
 
 ### Getting started
 
-DevTools is a React app built with webpack. Here are the steps for getting started, if you have any questions, you can always ask us in our #community slack channel.
+DevTools is a React app built with webpack. Here are the steps for getting started, if you have any questions, you can always ask us in our #community Discord channel.
 
 ```bash
 git clone git@github.com:RecordReplay/devtools.git
-npm install 
+npm install
 npm start
 ```
 
 Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/view?id=79f0cacd-727b-456d-8970-dbb4866ce6c7).
-
 
 ## Maintainers
 
@@ -45,6 +44,7 @@ Every issue will have at least a parent category (pink labels) and may have a mo
 The more granular categories would be labeled according to what specific feature of the app is having an issue.
 
 ### **Examples:**
+
 - Ron can't expand a node in the sources tree: ["bug", "debugger"]
 - Anne can't fastforward the timeline on play mode: ["bug", "timeline"]
 - Leslie wants to make it rain glitter from the screen when she hovers over comments in play mode: ["feature", "comments"]
