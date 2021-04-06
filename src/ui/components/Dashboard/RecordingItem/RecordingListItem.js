@@ -133,7 +133,7 @@ export default function RecordingListItem({
   const { recording_id: recordingId } = data;
   const selected = selectedIds.includes(recordingId);
 
-  const isOwner = userId == data.user.id;
+  const isOwner = userId == data.user?.id;
 
   const toggleChecked = () => {
     if (selected) {
@@ -183,9 +183,7 @@ export default function RecordingListItem({
         <ItemPrivacy isPrivate={data.is_private} toggleIsPrivate={toggleIsPrivate} />
       </td>
       <td>
-        <div className="owner">
-          <AuthAvatar user={data.user} />
-        </div>
+        <div className="owner">{data.user && <AuthAvatar user={data.user} />}</div>
       </td>
       <td>{isOwner && <ItemOptions Panel={Panel} />}</td>
     </tr>
