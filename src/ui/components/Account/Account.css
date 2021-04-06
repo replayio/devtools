@@ -51,7 +51,6 @@
 }
 
 #header .title-label {
-  color: var(--dark-blue);
   font-size: 20px;
   text-overflow: ellipsis;
   white-space: nowrap;

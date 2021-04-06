@@ -9,8 +9,15 @@
 }
 
 .user-options .material-icons.more {
-  border: 2px solid var(--theme-icon-color);
+  border: 2px solid var(--theme-icon-dimmed-color);
   border-radius: 50%;
+  cursor: pointer;
+  color: var(--theme-icon-dimmed-color);
+}
+
+.user-options .material-icons.more:hover {
+  color: var(--theme-icon-color);
+  border: 2px solid var(--theme-icon-color);
 }
 
 .user-options button.expand-dropdown .avatar.first-player img {
