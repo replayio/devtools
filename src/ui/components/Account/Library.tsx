@@ -9,8 +9,7 @@ function Header() {
   return (
     <div id="header">
       <div className="header-left">
-        <div className="logo" />
-        <div className="title-label">Replay</div>
+        <div className="title-label">Your Replay library</div>
       </div>
       <UserOptions mode="account" />
     </div>
