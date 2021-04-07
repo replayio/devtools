@@ -19,6 +19,7 @@ import {
   UploadInfo,
   Canvas,
   WorkspaceId,
+  SettingsTabTitle,
 } from "ui/state/app";
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
@@ -55,6 +56,9 @@ export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_locat
 export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
 export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
 export type SetWorkspaceId = Action<"set_workspace_id"> & { workspaceId: WorkspaceId };
+export type SetDefaultSettingsTab = Action<"set_default_settings_tab"> & {
+  tabTitle: SettingsTabTitle;
+};
 
 export type AppActions =
   | SetupAppAction
@@ -75,7 +79,8 @@ export type AppActions =
   | SetHoveredLineNumberLocation
   | SetIsNodePickerActive
   | SetCanvas
-  | SetWorkspaceId;
+  | SetWorkspaceId
+  | SetDefaultSettingsTab;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -218,4 +223,8 @@ export function setCanvas(canvas: Canvas): SetCanvas {
 
 export function setWorkspaceId(workspaceId: WorkspaceId): SetWorkspaceId {
   return { type: "set_workspace_id", workspaceId };
+}
+
+export function setDefaultSettingsTab(tabTitle: SettingsTabTitle): SetDefaultSettingsTab {
+  return { type: "set_default_settings_tab", tabTitle };
 }

@@ -95,7 +95,8 @@
 
 .workspace-settings-modal .new-workspace-form .autocomplete button.action-invite {
   cursor: pointer;
-  color: var(--theme-primary-accent);
+  background: var(--primary-accent);
   color: white;
   padding: 4px 8px;
+  border-radius: 4px;
 }

@@ -38,6 +38,33 @@
   color: var(--theme-comment)
 }
 
+.settings-modal form {
+  display: flex;
+  flex-direction: row;
+}
+
+.settings-modal input[type="text"] {
+  margin-right: 8px;
+  background-color: #eee;
+  line-height: 16px;
+  padding: 8px;
+  flex-grow: 1;
+  border-radius: 4px;
+  border: 0px;
+}
+
+.settings-modal input[type="submit"] {
+  flex-shrink: 0;
+  color: white;
+  background: var(--dark-blue);
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 0px;
+}
+
+/* Refresh Prompt */
+
 .settings-modal .refresh-prompt {
   background: var(--cool-gray-200);
   font-size: 14px;

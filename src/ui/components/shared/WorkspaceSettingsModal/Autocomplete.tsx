@@ -5,6 +5,8 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { gql, useQuery } from "@apollo/client";
 import { getUserId } from "ui/utils/useToken";
+import { actions } from "ui/actions";
+import { ModalType, SettingsTabTitle } from "ui/state/app";
 
 function useFetchCollaborateorId(email: string) {
   const { data, loading, error } = useQuery(
@@ -29,34 +31,52 @@ function AutocompleteAction({
   workspaceId,
   email,
   userId,
+  setModal,
+  setDefaultSettingsTab,
 }: {
   workspaceId: string;
   email: string;
   userId: string;
+  setModal: (modalType: ModalType) => void;
+  setDefaultSettingsTab: (tabTitle: SettingsTabTitle) => void;
 }) {
   const { members } = hooks.useGetWorkspaceMembers(workspaceId);
   const memberExists = members?.find(member => member.user.email == email);
   const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember();
   const inviterUserId = getUserId();
 
-  if (!userId) {
-    return <div>{`Can't invite`}</div>;
-  } else if (memberExists) {
+  if (memberExists) {
     return <div>{`User already invited`}</div>;
   }
 
-  const handleInvite = () => {
+  const handleTeamInvite = () => {
     inviteNewWorkspaceMember({
       variables: { userId, workspaceId, inviterUserId },
     });
   };
+  const handleReplayInvite = () => {
+    setDefaultSettingsTab("Invitations");
+    setModal("settings");
+  };
 
-  return <button className="action-invite" onClick={handleInvite}>{`Invite`}</button>;
+  // If the email doesn't already have an associated Replay account registered to it.
+  if (!userId) {
+    return (
+      <button className="action-invite" onClick={handleReplayInvite}>{`Invite to Replay`}</button>
+    );
+  }
+
+  return <button className="action-invite" onClick={handleTeamInvite}>{`Invite`}</button>;
 }
 
 type AutocompleteProps = PropsFromRedux & { inputValue: string };
 
-function Autocomplete({ workspaceId, inputValue }: AutocompleteProps) {
+function Autocomplete({
+  workspaceId,
+  inputValue,
+  setModal,
+  setDefaultSettingsTab,
+}: AutocompleteProps) {
   const { userId, loading } = useFetchCollaborateorId(inputValue);
 
   if (loading) {
@@ -71,12 +91,23 @@ function Autocomplete({ workspaceId, inputValue }: AutocompleteProps) {
   return (
     <div className="autocomplete">
       <div className="content">{`${inputValue}`}</div>
-      <AutocompleteAction email={inputValue} workspaceId={workspaceId!} userId={userId} />
+      <AutocompleteAction
+        email={inputValue}
+        workspaceId={workspaceId!}
+        userId={userId}
+        setModal={setModal}
+        setDefaultSettingsTab={setDefaultSettingsTab}
+      />
     </div>
   );
 }
 
-const connector = connect((state: UIState) => ({ workspaceId: selectors.getWorkspaceId(state) }));
+const connector = connect(
+  (state: UIState) => ({
+    workspaceId: selectors.getWorkspaceId(state),
+  }),
+  { setModal: actions.setModal, setDefaultSettingsTab: actions.setDefaultSettingsTab }
+);
 export type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(Autocomplete);

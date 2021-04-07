@@ -4,9 +4,14 @@ import hooks from "ui/hooks";
 import SettingsNavigation from "./SettingsNavigation";
 import SettingsBody from "./SettingsBody";
 
-import { Settings, SelectedTab } from "./types";
+import { Settings } from "./types";
 
 import "./SettingsModal.css";
+import { connect, ConnectedProps } from "react-redux";
+import { UIState } from "ui/state";
+import { selectors } from "ui/reducers";
+import { SettingsTabTitle } from "ui/state/app";
+import { actions } from "ui/actions";
 
 const settings: Settings = [
   {
@@ -48,12 +53,11 @@ const settings: Settings = [
   },
 ];
 
-export default function SettingsModal() {
+function SettingsModal({ defaultSettingsTab }: PropsFromRedux) {
   // No need to handle loading state here as it's already cached from the useGetUserSettings
   // query in the DevTools component
   const { userSettings, loading } = hooks.useGetUserSettings();
-
-  const [selectedTab, setSelectedTab] = useState<SelectedTab>(settings[0].title);
+  const [selectedTab, setSelectedTab] = useState<SettingsTabTitle>(defaultSettingsTab);
   const selectedSetting = settings.find(setting => setting.title === selectedTab)!;
 
   if (loading) {
@@ -73,3 +77,12 @@ export default function SettingsModal() {
     </div>
   );
 }
+
+const connector = connect(
+  (state: UIState) => ({
+    defaultSettingsTab: selectors.getDefaultSettingsTab(state),
+  }),
+  { setDefaultSettingsTab: actions.setDefaultSettingsTab }
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(SettingsModal);
