@@ -30,6 +30,7 @@ function initialAppState(): AppState {
     isNodePickerActive: false,
     canvas: null,
     workspaceId: null,
+    defaultSettingsTab: "Experimental",
   };
 }
 
@@ -148,6 +149,10 @@ export default function update(
       return { ...state, workspaceId: action.workspaceId };
     }
 
+    case "set_default_settings_tab": {
+      return { ...state, defaultSettingsTab: action.tabTitle };
+    }
+
     default: {
       return state;
     }
@@ -190,3 +195,4 @@ export const getEventsForType = (state: UIState, type: string) => state.app.even
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
+export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;

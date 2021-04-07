@@ -1,18 +1,19 @@
 import React from "react";
 import classnames from "classnames";
-import { Setting, Settings, SelectedTab } from "./types";
+import { Setting, Settings } from "./types";
 import "./SettingsNavigation.css";
+import { SettingsTabTitle } from "ui/state/app";
 
 interface SettingNavigationItemProps {
   setting: Setting;
-  selectedTab: SelectedTab;
-  setSelectedTab: (title: SelectedTab) => void;
+  selectedTab: SettingsTabTitle;
+  setSelectedTab: (title: SettingsTabTitle) => void;
 }
 
 interface SettingNavigationProps {
   settings: Settings;
-  selectedTab: SelectedTab;
-  setSelectedTab: (title: SelectedTab) => void;
+  selectedTab: SettingsTabTitle;
+  setSelectedTab: (title: SettingsTabTitle) => void;
 }
 
 function SettingNavigationItem({

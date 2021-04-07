@@ -12,6 +12,7 @@ export type PrimaryPanelName = "explorer" | "debug" | "comments";
 export type ViewMode = "dev" | "non-dev";
 export type ModalType = "sharing" | "login" | "settings" | "new-workspace" | "workspace-settings";
 export type WorkspaceId = string;
+export type SettingsTabTitle = "Experimental" | "Invitations" | "Support";
 
 export interface ExpectedError {
   message: string;
@@ -47,6 +48,7 @@ export interface AppState {
   isNodePickerActive: boolean;
   canvas: Canvas | null;
   workspaceId: WorkspaceId | null;
+  defaultSettingsTab: SettingsTabTitle;
 }
 
 export interface AnalysisPoints {

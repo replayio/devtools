@@ -1,15 +1,9 @@
-export type SelectedTab =
-  | "Appearance"
-  | "Team"
-  | "Privacy"
-  | "Experimental"
-  | "Support"
-  | "Invitations";
+import { SettingsTabTitle } from "ui/state/app";
 
 export type Settings = Setting[];
 
 export interface Setting {
-  title: SelectedTab;
+  title: SettingsTabTitle;
   items: SettingItem[];
   icon?: string;
 }
