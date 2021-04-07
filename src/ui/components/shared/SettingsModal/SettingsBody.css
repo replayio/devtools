@@ -11,6 +11,7 @@
 
 .settings-modal main ul {
   list-style-type: none;
+  overflow: auto;
 }
 
 .settings-modal main ul > :not(:first-child) {
@@ -35,6 +36,23 @@
   font-size: 14px;
   max-width: 80%;
   color: var(--theme-comment)
+}
+
+.settings-modal .refresh-prompt {
+  background: var(--cool-gray-200);
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.settings-modal .refresh-prompt > :not(:first-child) {
+  margin-top: 16px;
+}
+
+.settings-modal .refresh-prompt button {
+  font-size: 14px;
+  width: max-content;
 }
 
 /* Support */

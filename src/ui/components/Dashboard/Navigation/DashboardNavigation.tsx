@@ -43,6 +43,9 @@ function DashboardNavigation({
   setModal,
 }: DashboardNavigationProps) {
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
+  const {
+    userSettings: { enable_teams, loading },
+  } = hooks.useGetUserSettings();
   const hosts = getUniqueHosts(recordings);
 
   const isPersonal = workspaces?.find(workspace => workspace.id == currentWorkspaceId)?.is_personal;
@@ -52,8 +55,8 @@ function DashboardNavigation({
 
   return (
     <nav className="left-sidebar">
-      {features.workspaces ? <WorkspaceDropdown /> : null}
-      {features.workspaces && workspaces && !isPersonal ? (
+      {enable_teams ? <WorkspaceDropdown /> : null}
+      {enable_teams && workspaces && !isPersonal ? (
         <div className={classnames("left-sidebar-menu-item")} onClick={onSettingsClick}>
           <span className="material-icons">settings</span>
           <span>{`Settings & Members`}</span>

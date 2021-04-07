@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { SettingItem, Setting, UserSettings } from "./types";
 import useToken from "ui/utils/useToken";
 import hooks from "ui/hooks";
@@ -8,6 +8,7 @@ import "./SettingsBody.css";
 interface SettingsBodyItemProps {
   item: SettingItem;
   userSettings: UserSettings;
+  setShowRefresh: Dispatch<SetStateAction<boolean>>;
 }
 
 interface SettingsBodyProps {
@@ -15,15 +16,28 @@ interface SettingsBodyProps {
   userSettings: UserSettings;
 }
 
-function SettingsBodyItem({ item, userSettings }: SettingsBodyItemProps) {
+function RefreshPrompt() {
+  return (
+    <div className="refresh-prompt">
+      <span>You need to refresh this page for the changes to take effect.</span>
+      <button onClick={() => location.reload()}>Refresh</button>
+    </div>
+  );
+}
+
+function SettingsBodyItem({ item, userSettings, setShowRefresh }: SettingsBodyItemProps) {
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
 
-  const { label, key, description } = item;
+  const { label, key, description, needsRefresh } = item;
   const value = userSettings[key];
 
   const updateUserSetting = hooks.useUpdateUserSetting(key);
   const toggleSetting = () => {
+    if (needsRefresh) {
+      setShowRefresh(true);
+    }
+
     updateUserSetting({
       variables: {
         newValue: !value,
@@ -62,6 +76,7 @@ function Support() {
 
 export default function SettingsBody({ selectedSetting, userSettings }: SettingsBodyProps) {
   const { title, items } = selectedSetting;
+  const [showRefresh, setShowRefresh] = useState(false);
 
   if (title == "Support") {
     return (
@@ -84,9 +99,14 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
       <h1>{title}</h1>
       <ul>
         {items.map((item, index) => (
-          <SettingsBodyItem {...{ item, userSettings }} key={index} />
+          <SettingsBodyItem
+            {...{ item, userSettings }}
+            key={index}
+            setShowRefresh={setShowRefresh}
+          />
         ))}
       </ul>
+      {showRefresh ? <RefreshPrompt /> : null}
     </main>
   );
 }

@@ -18,9 +18,10 @@ function Header() {
 }
 
 function Library({ setWorkspaceId }: PropsFromRedux) {
-  const { personalWorkspaceId, loading } = hooks.useGetPersonalWorkspace();
+  const { personalWorkspaceId, loading: workspaceLoading } = hooks.useGetPersonalWorkspace();
+  const { userSettings, loading: settingsLoading } = hooks.useGetUserSettings();
 
-  if (loading || !personalWorkspaceId) {
+  if (workspaceLoading || settingsLoading || !personalWorkspaceId || !userSettings) {
     return null;
   }
 
