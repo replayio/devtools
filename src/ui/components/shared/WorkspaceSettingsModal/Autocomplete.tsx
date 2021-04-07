@@ -4,6 +4,7 @@ import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { gql, useQuery } from "@apollo/client";
+import { getUserId } from "ui/utils/useToken";
 
 function useFetchCollaborateorId(email: string) {
   const { data, loading, error } = useQuery(
@@ -36,6 +37,7 @@ function AutocompleteAction({
   const { members } = hooks.useGetWorkspaceMembers(workspaceId);
   const memberExists = members?.find(member => member.user.email == email);
   const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember();
+  const inviterUserId = getUserId();
 
   if (!userId) {
     return <div>{`Can't invite`}</div>;
@@ -45,7 +47,7 @@ function AutocompleteAction({
 
   const handleInvite = () => {
     inviteNewWorkspaceMember({
-      variables: { userId, workspaceId },
+      variables: { userId, workspaceId, inviterUserId },
     });
   };
 
