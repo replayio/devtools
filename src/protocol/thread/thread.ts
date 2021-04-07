@@ -594,6 +594,9 @@ class _ThreadFront {
   _repaintedScreenshots: Map<string, ScreenShot> = new Map();
 
   async _maybeRepaintGraphics() {
+    if (!this.currentPointHasFrames) {
+      return;
+    }
     this.ensureCurrentPause();
     const pause = this.currentPause;
     const rv = await this.currentPause!.repaintGraphics();
