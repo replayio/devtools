@@ -1,0 +1,38 @@
+.sharing-modal .private-settings .new-collaborator-form {
+  position: relative;
+}
+
+.sharing-modal .private-settings .new-collaborator-form input[type="textarea"] {
+  width: 100%;
+  font-size: 14px;
+  padding: 8px;
+  background: white;
+  border: 1px solid var(--cool-gray-300);
+  border-radius: 8px;
+}
+
+.sharing-modal .private-settings .new-collaborator-form .autocomplete {
+  position: absolute;
+  width: 100%;
+  top: 100%;
+  padding: 8px;
+  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px,
+  rgba(15, 15, 15, 0.2) 0px 9px 24px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  z-index: var(--z-index-8--dropdown);
+  border-radius: 4px;
+}
+
+.sharing-modal .private-settings .new-collaborator-form .autocomplete .content {
+  flex-grow: 1;
+}
+
+.sharing-modal .private-settings .new-collaborator-form .autocomplete button.action-add {
+  cursor: pointer;
+  background: var(--primary-accent);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+}

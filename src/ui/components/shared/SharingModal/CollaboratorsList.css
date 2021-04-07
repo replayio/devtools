@@ -1,0 +1,78 @@
+.sharing-modal .modal-content .private-settings .permissions-list {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: auto;
+  margin-top: 32px;
+}
+
+.sharing-modal .permission {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  transition: background 200ms ease-in-out;
+  border-radius: 4px;
+}
+
+.sharing-modal .permission:hover {
+  background: #eee;
+  border-radius: 8px;
+}
+
+.sharing-modal .permission:not(:last-child) {
+  margin-bottom: 4px;
+}
+
+.sharing-modal .permission .icon {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex-shrink: 0;
+  background: var(--dark-grey);
+  background-position: center;
+  background-size: contain;
+}
+
+.sharing-modal .permission .main {
+  flex-grow: 1;
+}
+
+.sharing-modal .permission .role {
+  flex-shrink: 0;
+  padding: 0px 8px;
+  color: var(--theme-comment);
+}
+
+.sharing-modal .permission .email {
+  color: var(--light-grey);
+}
+
+.sharing-modal .permission:not(:first-child):hover .role {
+  display: none;
+}
+
+.sharing-modal .permission button.delete {
+  display: none;
+  flex-shrink: 0;
+  padding: 4px;
+  border-radius: 4px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.sharing-modal .permission:hover button.delete {
+  display: block;
+}
+
+.sharing-modal .permission button.delete:hover {
+  background: var(--dark-blue);
+}
+
+.sharing-modal .permission button.delete .img {
+  background: var(--light-grey);
+}
+
+.sharing-modal .permission button.delete:hover .img {
+  background-color: white;
+}

@@ -3,6 +3,7 @@ import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
 import { User, Recording } from "ui/types";
 import useToken, { getUserId } from "ui/utils/useToken";
 import { WorkspaceId } from "ui/state/app";
+import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 
 type PersonalRecordingsData = {
   users: User[];
@@ -77,14 +78,7 @@ export function useGetRecordingPhoto(
   return { error, loading, screenData };
 }
 
-export function useGetOwnersAndCollaborators(
-  recordingId: RecordingId
-): {
-  collaborators: { user_id: string; recording_id: string; user: User }[] | null;
-  recording: { user: User; id: string; is_private: boolean } | null;
-  loading: boolean;
-  error?: ApolloError;
-} {
+export function useGetOwnersAndCollaborators(recordingId: RecordingId) {
   const { data, loading, error } = useQuery(
     gql`
       query GetOwnerAndCollaborators($recordingId: uuid!) {
@@ -125,7 +119,8 @@ export function useGetOwnersAndCollaborators(
     console.error("Apollo error while getting owners and collaborators", error);
   }
 
-  const { collaborators, recordings_by_pk: recording } = data;
+  const collaborators: CollaboratorDbData[] = data.collaborators;
+  const recording = data.recordings_by_pk;
   return { collaborators, recording, loading, error };
 }
 

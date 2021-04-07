@@ -1,62 +1,74 @@
-import React, { useState } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
-import hooks from "ui/hooks";
 const Modal = require("ui/components/shared/Modal").default;
-import { UIState } from "ui/state";
-import EmailForm from "./EmailForm";
-import CopyUrl from "./CopyUrl";
-import RecordingPrivacy from "./RecordingPrivacy";
-import CollaboratorsList from "./CollaboratorsList";
+import ReplayLink from "./ReplayLink";
+import hooks from "ui/hooks";
+
 import "./SharingModal.css";
+import { selectors } from "ui/reducers";
+import { UIState } from "ui/state";
+import { RecordingId } from "@recordreplay/protocol";
+import PrivateSettings from "./PrivateSettings";
 
-function Sharing({ modalOptions, hideModal }: PropsFromRedux) {
-  const { recordingId } = modalOptions!;
-  const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId);
+function SharingModal({ recordingId }: PropsFromRedux) {
+  const { isPrivate, loading } = hooks.useGetIsPrivate(recordingId!);
+  const updateIsPrivate = hooks.useUpdateIsPrivate(recordingId!, isPrivate);
 
-  if (loading) {
-    return <Modal />;
-  } else if (!recording) {
-    setTimeout(() => hideModal(), 2000);
-    return (
-      <Modal>
-        <div className="row status">Can&apos;t fetch your sharing permissions at this time</div>
-      </Modal>
-    );
-  }
+  const setPublic = () => {
+    if (isPrivate) {
+      updateIsPrivate();
+    }
+  };
+  const setPrivate = () => {
+    if (!isPrivate) {
+      updateIsPrivate();
+    }
+  };
 
   return (
-    <Modal>
-      <div className="row title">
-        <div className="img invite" />
-        <p>Sharing</p>
-      </div>
-      <CopyUrl recordingId={recordingId} />
-      <RecordingPrivacy recordingId={recordingId} />
-      <EmailForm recordingId={recordingId} />
-      <CollaboratorsList
-        recording={recording}
-        collaborators={collaborators}
-        recordingId={recordingId}
-      />
-      <div className="bottom">
-        <div className="spacer" />
-        <button className="done" onClick={hideModal}>
-          <div className="content">Done</div>
-        </button>
-      </div>
-    </Modal>
+    <div className="sharing-modal">
+      <Modal>
+        <section className="sharing-modal-content">
+          <h1>Share</h1>
+          <ReplayLink />
+          <div className="privacy-choices">
+            <div className={`privacy-choice ${!isPrivate ? "selected" : ""}`}>
+              <input
+                type="radio"
+                id="public"
+                name="privacy"
+                checked={!isPrivate}
+                onChange={setPublic}
+              />
+              <label htmlFor="public">
+                <div className="title">Public</div>
+                <div className="description">Available to anyone who has the link</div>
+              </label>
+            </div>
+            <div className={`privacy-choice ${isPrivate ? "selected" : ""}`}>
+              <input
+                type="radio"
+                id="private"
+                name="privacy"
+                checked={isPrivate}
+                onChange={setPrivate}
+              />
+              <label htmlFor="private">
+                <div className="title">Private</div>
+                <div className="description">Available to people you choose</div>
+              </label>
+            </div>
+          </div>
+          {!isPrivate && (
+            <div className="privacy-warning">{`Important note: Replay records everything that happens in the browser, including  passwords you’ve typed and everything visible on the screen. Learn more.`}</div>
+          )}
+        </section>
+        {isPrivate ? <PrivateSettings /> : <section className="filler" />}
+      </Modal>
+    </div>
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    modalOptions: selectors.getModalOptions(state),
-  }),
-  { hideModal: actions.hideModal }
-);
-
-export type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(Sharing);
+const connector = connect((state: UIState) => ({ recordingId: selectors.getRecordingId(state) }));
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(SharingModal);

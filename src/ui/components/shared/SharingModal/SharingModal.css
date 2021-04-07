@@ -1,179 +1,77 @@
-.modal-container .modal-content {
-  min-height: auto;
+.sharing-modal {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+
+.sharing-modal h1 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.sharing-modal .filler {
+  background: linear-gradient(to bottom right, #64D4FB, #52A6F9);
+}
+
+.sharing-modal .modal-container .modal-content {
   height: 400px;
-  width: 400px;
-}
-
-.modal-content > *:not(:last-child) {
-  margin-bottom: 12px;
-}
-
-.modal-container .row.title {
-  display: flex;
-  flex-direction: row;
-  line-height: 16px;
-  padding: 8px 0px;
-}
-
-.modal-container .row.title .img {
-  margin-right: 8px;
-}
-
-.modal-container .permissions-list {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  overflow: auto;
-}
-
-.modal-container .permission {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  transition: background 200ms ease-in-out;
-  border-radius: 4px;
-}
-
-.modal-container .permission:hover {
-  background: #eee;
+  padding: 0px;
+  min-width: auto;
+  display: grid;
+  grid-template-columns: 420px 420px;
+  background: var(--theme-body-background);
+  overflow: hidden;
   border-radius: 8px;
 }
 
-.modal-container .permission:not(:last-child) {
-  margin-bottom: 4px;
+.sharing-modal .sharing-modal-content {
+  background: var(--theme-body-background);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
 }
 
-.modal-container .permission .icon {
-  height: 32px;
-  width: 32px;
-  border-radius: 50%;
-  margin-right: 8px;
-  flex-shrink: 0;
-  background: var(--dark-grey);
-  background-position: center;
-  background-size: contain;
+.sharing-modal .sharing-modal-content > :not(:first-child) {
+  margin-top: 16px;
 }
 
-.modal-container .permission .main {
-  flex-grow: 1;
+.sharing-modal .privacy-choices {
+  border: 1px solid var(--cool-gray-300);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.modal-container .permission .role {
-  flex-shrink: 0;
-  padding: 0px 8px;
+.sharing-modal .privacy-choices > :not(:first-child) {
+  border-top: 1px solid var(--cool-gray-300);
+}
+
+.sharing-modal .privacy-choice {
+  display: grid;
+  grid-template-columns: min-content auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  cursor: pointer;
+}
+
+.sharing-modal .privacy-choice.selected {
+  background: var(--new-blue-50)
+}
+
+.sharing-modal .privacy-choice .title {
+  font-weight: 500;
+}
+
+.sharing-modal .privacy-choice .description {
   color: var(--theme-comment);
 }
 
-.modal-container .permission .email {
-  color: var(--light-grey);
+.sharing-modal .privacy-choice.selected .description {
+  color: var(--new-blue-700);
 }
 
-.modal-container .permission:not(:first-child):hover .role {
-  display: none;
-}
-
-.modal-container .permission button.delete {
-  display: none;
-  flex-shrink: 0;
-  padding: 4px;
-  border-radius: 4px;
-  background: transparent;
-  box-shadow: none;
-}
-
-.modal-container .permission:hover button.delete {
-  display: block;
-}
-
-.modal-container .permission button.delete:hover {
-  background: var(--dark-blue);
-}
-
-.modal-container .permission button.delete .img {
-  background: var(--light-grey);
-}
-
-.modal-container .permission button.delete:hover .img {
-  background-color: white;
-}
-
-.modal-container form {
-  display: flex;
-  flex-direction: row;
-}
-
-.modal-container input {
-  font-size: 1rem;
-  border-radius: 4px;
-  border: none;
-}
-
-.modal-container input[type="text"] {
-  margin-right: 8px;
-  background-color: #eee;
-  line-height: 16px;
-  padding: 8px;
-  flex-grow: 1;
-}
-
-.modal-container input[type="submit"] {
-  flex-shrink: 0;
-  color: white;
-  background: var(--dark-blue);
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
-.modal-container .bottom {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.modal-container .status {
-  display: flex;
-  line-height: 16px;
-  padding: 7px;
-  justify-content: center;
-  border: 1px solid var(--light-grey);
-  color: var(--light-grey);
-  border-radius: 4px;
-}
-
-.modal-container .status:last-child {
-  margin: auto;
-  border: none;
-}
-
-.modal-container .status .img.reload {
-  height: 16px;
-  padding-inline-end: 1em;
-  margin-inline-end: 0.5em;
-  background-color: var(--light-grey);
-  animation: spin 0.7s linear infinite;
-}
-
-.modal-container .status.error {
-  color: red;
-}
-
-.modal-container button:not(.modal-close) {
-  border-radius: 4px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  color: white;
-  display: flex;
-  align-items: center;
-  background: var(--dark-blue);
-  cursor: pointer;
-  line-height: 16px;
-}
-
-.modal-container .copy-link {
-  display: flex;
-  align-items: center;
-}
-
-.modal-container .copy-link .img.link {
-  background: white;
-  margin-right: 4px;
+.sharing-modal .privacy-warning {
+  color: var(--theme-comment);
 }
