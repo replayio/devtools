@@ -12,15 +12,15 @@ type PrivateSettingsProps = PropsFromRedux & {};
 function PrivateSettings({ recordingId }: PrivateSettingsProps) {
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
 
-  if (loading) {
+  if (loading || !collaborators || !recording) {
     return null;
   }
 
   return (
     <section className="private-settings">
       <h1>Collaborators</h1>
-      <EmailForm {...{ recording, collaborators }} />
-      <CollaboratorsList {...{ recording: recording!, collaborators, recordingId: recordingId! }} />
+      <EmailForm recording={recording} collaborators={collaborators} />
+      <CollaboratorsList {...{ recording: recording, collaborators, recordingId: recordingId! }} />
     </section>
   );
 }
