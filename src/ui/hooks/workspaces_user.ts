@@ -37,8 +37,10 @@ export function useGetWorkspaceMembers(workspaceId: string) {
 export function useInviteNewWorkspaceMember() {
   const [inviteNewWorkspaceMember] = useMutation(
     gql`
-      mutation InviteNewWorkspaceMember($userId: uuid, $workspaceId: uuid) {
-        insert_workspaces_user(objects: { user_id: $userId, workspace_id: $workspaceId }) {
+      mutation InviteNewWorkspaceMember($userId: uuid, $workspaceId: uuid, $inviterUserId: uuid) {
+        insert_workspaces_user(
+          objects: { user_id: $userId, workspace_id: $workspaceId, inviter_user_id: $inviterUserId }
+        ) {
           affected_rows
         }
       }
