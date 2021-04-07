@@ -57,7 +57,7 @@ function DevTools({
   );
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
   const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
-  const { title, deleted_at, is_initialized, user_id, user } = recording || {};
+  const { title, deleted_at, user } = recording || {};
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -111,16 +111,6 @@ function DevTools({
       });
     }
     return null;
-  }
-
-  // Only show the initialization screen if the replay is not being opened
-  // for testing purposes.
-  if (!is_initialized && !isTest()) {
-    if (user_id == userId) {
-      return <DraftScreen />;
-    } else {
-      setExpectedError({ message: "This replay is uploading, try again in a moment" });
-    }
   }
 
   if (!finishedLoading) {
