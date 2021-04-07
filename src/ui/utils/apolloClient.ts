@@ -1,7 +1,8 @@
-import { ApolloClient, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
-import { HttpLink } from "apollo-link-http";
+import { ApolloClient, InMemoryCache, NormalizedCacheObject, from, HttpLink } from "@apollo/client";
 import { DocumentNode } from "graphql";
 import { defer } from "protocol/utils";
+import { onError } from "@apollo/client/link/error";
+import { RetryLink } from "@apollo/client/link/retry";
 
 const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
@@ -22,13 +23,24 @@ export async function mutate({
 }
 
 export function createApolloClient(token: string | undefined, recordingId: string | undefined) {
+  const retryLink = new RetryLink();
+  const httpLink = createHttpLink(token, recordingId);
+  const errorLink = onError(({ graphQLErrors, networkError }) => {
+    if (graphQLErrors) {
+      console.log(`[Apollo GraphQL error]: ${graphQLErrors}`);
+    } else if (networkError) {
+      console.log(`[Apollo Network error]: ${networkError}`);
+    }
+  });
+
   const options: any = {
     cache: new InMemoryCache(),
-    link: createHttpLink(token, recordingId),
+    link: from([retryLink, errorLink, httpLink]),
   };
 
   const apolloClient = new ApolloClient<NormalizedCacheObject>(options);
   clientWaiter.resolve(apolloClient);
+
   return apolloClient;
 }
 
