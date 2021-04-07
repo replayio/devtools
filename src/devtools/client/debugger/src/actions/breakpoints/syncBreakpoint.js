@@ -43,6 +43,8 @@ export function syncBreakpoint(cx, sourceId, pendingBreakpoint) {
     const previousLocation = { ...location, sourceId };
     const newLocation = await findNewLocation(cx, astLocation, previousLocation, source, thunkArgs);
 
+    dispatch({ type: "REMOVE_PENDING_BREAKPOINT", location });
+
     return dispatch(
       addBreakpoint(cx, newLocation, pendingBreakpoint.options, pendingBreakpoint.disabled)
     );
