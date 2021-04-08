@@ -62,18 +62,7 @@ function DashboardNavigation({
           <span>{`Settings & Members`}</span>
         </div>
       ) : null}
-      <div className="replays">
-        <div className="navigation-subheader">REPLAYS</div>
-        <div
-          className={classnames("left-sidebar-menu-item", { active: filter == "" })}
-          onClick={() => setFilter("")}
-        >
-          <span className="material-icons">home</span>
-          <span>All</span>
-        </div>
-      </div>
-
-      {features.workspaces ? <Invitations /> : null}
+      {enable_teams ? <Invitations /> : null}
     </nav>
   );
 }

@@ -13,7 +13,7 @@ export default function ReplayInvitations() {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setInputValue("");
-    addInvitation({ variables: { userId, email: inputValue } });
+    addInvitation({ variables: { userId, email: inputValue, workspaceId: null } });
   };
 
   if (inviteLoading || userLoading) {

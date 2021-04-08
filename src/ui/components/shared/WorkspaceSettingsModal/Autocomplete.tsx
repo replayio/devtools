@@ -7,6 +7,7 @@ import { gql, useQuery } from "@apollo/client";
 import { getUserId } from "ui/utils/useToken";
 import { actions } from "ui/actions";
 import { ModalType, SettingsTabTitle } from "ui/state/app";
+import { RecordingId } from "@recordreplay/protocol";
 
 function useFetchCollaborateorId(email: string) {
   const { data, loading, error } = useQuery(
@@ -43,6 +44,7 @@ function AutocompleteAction({
   const { members } = hooks.useGetWorkspaceMembers(workspaceId);
   const memberExists = members?.find(member => member.user.email == email);
   const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember();
+  const addInvitation = hooks.useAddInvitation();
   const inviterUserId = getUserId();
 
   if (memberExists) {
@@ -55,8 +57,7 @@ function AutocompleteAction({
     });
   };
   const handleReplayInvite = () => {
-    setDefaultSettingsTab("Invitations");
-    setModal("settings");
+    addInvitation({ variables: { userId: inviterUserId, email, workspaceId } });
   };
 
   // If the email doesn't already have an associated Replay account registered to it.

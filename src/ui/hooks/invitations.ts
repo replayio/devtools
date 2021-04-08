@@ -13,6 +13,11 @@ export interface InvitedUser {
   invited: boolean;
 }
 
+export interface NonRegisteredTeamMember {
+  invited_email: string;
+  user_id: string;
+}
+
 export function useGetInvitations() {
   const userId = getUserId();
   const { data, loading, error } = useQuery(
@@ -44,14 +49,16 @@ export function useGetInvitations() {
 export function useAddInvitation() {
   const [addInvitation] = useMutation(
     gql`
-      mutation AddInvitation($userId: uuid, $email: String) {
-        insert_invitations(objects: { invited_email: $email, user_id: $userId }) {
+      mutation AddInvitation($userId: uuid, $email: String, $workspaceId: uuid) {
+        insert_invitations(
+          objects: { invited_email: $email, user_id: $userId, workspace_id: $workspaceId }
+        ) {
           affected_rows
         }
       }
     `,
     {
-      refetchQueries: ["GetInvitations"],
+      refetchQueries: ["GetInvitations", "GetNonRegisteredTeamMembers"],
     }
   );
 
@@ -97,4 +104,32 @@ export function useClaimInvitation() {
   );
 
   return claimInvitation;
+}
+
+export function useGetNonRegisteredTeamMembers(workspaceId: string) {
+  const { data, loading, error } = useQuery(
+    gql`
+      query GetNonRegisteredTeamMembers($workspaceId: uuid) {
+        invitations(
+          where: { workspace_id: { _is_null: false, _eq: $workspaceId }, pending: { _eq: true } }
+        ) {
+          user_id
+          invited_email
+        }
+      }
+    `,
+    {
+      variables: {
+        workspaceId,
+      },
+      pollInterval: 5000,
+    }
+  );
+
+  if (error) {
+    console.error("Apollo error while fetching non-registered team members:", error);
+  }
+
+  const nonRegisteredTeamMembers: NonRegisteredTeamMember[] = data?.invitations;
+  return { nonRegisteredTeamMembers, loading };
 }
