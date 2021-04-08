@@ -60,7 +60,17 @@ function SharingModal({ recordingId }: PropsFromRedux) {
             </div>
           </div>
           {!isPrivate && (
-            <div className="privacy-warning">{`Important note: Replay records everything that happens in the browser, including  passwords you’ve typed and everything visible on the screen. Learn more.`}</div>
+            <div className="privacy-warning">
+              <strong>Important note:</strong> Replay records everything that happens in the
+              browser, including passwords you’ve typed and everything visible on the screen.{" "}
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://www.notion.so/replayio/Security-2af70ebdfb1c47e5b9246f25ca377ef2"
+              >
+                Learn more
+              </a>
+            </div>
           )}
         </section>
         {isPrivate ? <PrivateSettings /> : <section className="filler" />}
