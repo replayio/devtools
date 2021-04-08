@@ -38,7 +38,6 @@ export function useGetInvitations() {
   }
 
   const invitations: Invitation[] = data?.invitations;
-  console.log({ invitations });
   return { invitations, loading };
 }
 
