@@ -19,7 +19,6 @@ function mapUrlDevelopment(url) {
 module.exports = ({ file, options, env }) => {
   return {
     plugins: [
-      require("tailwindcss"),
       require("autoprefixer")({
         flexbox: false,
         grid: false,
