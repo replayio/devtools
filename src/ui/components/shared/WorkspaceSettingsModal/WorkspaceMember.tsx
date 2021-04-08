@@ -25,7 +25,6 @@ function Role({
 }) {
   const [expanded, setExpanded] = useState(false);
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
-  const { personalWorkspaceId } = hooks.useGetPersonalWorkspace();
   const { claims } = useToken();
   const localUserId = claims?.hasura.userId;
   const { user_id: userId } = member;
@@ -39,7 +38,7 @@ function Role({
     // to the pesronal workspace.
     if (localUserId == userId) {
       hideModal();
-      setWorkspaceId(personalWorkspaceId);
+      setWorkspaceId(null);
     }
   };
 

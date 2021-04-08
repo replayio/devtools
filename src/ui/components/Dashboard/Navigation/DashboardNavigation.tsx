@@ -48,7 +48,7 @@ function DashboardNavigation({
   } = hooks.useGetUserSettings();
   const hosts = getUniqueHosts(recordings);
 
-  const isPersonal = workspaces?.find(workspace => workspace.id == currentWorkspaceId)?.is_personal;
+  const isPersonal = currentWorkspaceId == null;
   const onSettingsClick = () => {
     setModal("workspace-settings");
   };

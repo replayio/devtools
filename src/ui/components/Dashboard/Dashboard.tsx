@@ -66,7 +66,6 @@ function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
 
 function DashboardRouter(props: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
-  console.log(getUserId());
 
   if (!userSettings?.enable_teams) {
     return <OldDashboard />;

@@ -211,10 +211,14 @@ function getRecordings(data: PersonalRecordingsData) {
   }
 
   const user = data.users[0];
-  const { recordings, collaborators, name, email, picture, id } = user;
+  const { collaborators, name, email, picture, nickname, id } = user;
+  const recordings = user.recordings || [];
 
   return [
-    ...recordings.map(recording => ({ ...recording, user: { name, email, picture, id } })),
+    ...recordings.map(recording => ({
+      ...recording,
+      user: { name, email, picture, id, nickname },
+    })),
     ...collaborators!.map(({ recording }) => recording),
     ...data.recordings,
   ];
@@ -225,23 +229,47 @@ export function useGetPersonalRecordings():
   | { recordings: Recording[]; loading: false } {
   const { data, error, loading } = useQuery(
     gql`
-      query getPersonalRecordings($userId: uuid) {
-        recordings(where: { workspace_id: { _is_null: true }, user_id: { _eq: $userId } }) {
-          id
-          url
-          title
-          recording_id
-          recordingTitle
-          last_screen_mime_type
-          duration
-          description
-          date
-          is_private
+      fragment recordingFields on recordings {
+        id
+        url
+        title
+        recording_id
+        recordingTitle
+        last_screen_mime_type
+        duration
+        description
+        date
+        is_private
+      }
+
+      fragment avatarFields on users {
+        name
+        email
+        picture
+        id
+        nickname
+      }
+
+      query GetMyRecordings($userId: uuid) {
+        users(where: { id: { _eq: $userId } }) {
+          ...avatarFields
+          collaborators(where: { recording: { deleted_at: { _is_null: true } } }) {
+            recording {
+              ...recordingFields
+              user {
+                ...avatarFields
+              }
+            }
+          }
+          recordings(where: { deleted_at: { _is_null: true }, workspace_id: { _is_null: true } }) {
+            ...recordingFields
+          }
+        }
+
+        recordings(where: { _and: { example: { _eq: true }, deleted_at: { _is_null: true } } }) {
+          ...recordingFields
           user {
-            name
-            email
-            picture
-            id
+            ...avatarFields
           }
         }
       }
@@ -260,7 +288,7 @@ export function useGetPersonalRecordings():
     console.error("Failed to fetch recordings:", error);
   }
 
-  let recordings = data?.recordings;
+  const recordings = getRecordings(data);
   return { recordings, loading };
 }
 

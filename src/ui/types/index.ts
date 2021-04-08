@@ -5,7 +5,7 @@ export interface User {
   id: string;
   nickname: string;
   collaborators?: Collaborator[];
-  recordings: Recording[];
+  recordings?: Recording[];
 }
 
 export interface Recording {
