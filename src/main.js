@@ -1,5 +1,3 @@
-require("tailwindcss/tailwind.css");
-
 const url = new URL(window.location.href);
 
 // Coercing recordingId to undefined so that it is not passed to auth0
