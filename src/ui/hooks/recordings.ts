@@ -226,7 +226,9 @@ export function useGetRecordings(
   const { data, error, loading } = useQuery(
     gql`
       query GetWorkspaceRecordings($workspaceId: uuid) {
-        recordings(where: { workspace_id: { _eq: $workspaceId } }) {
+        recordings(
+          where: { _and: { workspace_id: { _eq: $workspaceId }, deleted_at: { _is_null: true } } }
+        ) {
           id
           url
           title
@@ -313,7 +315,7 @@ export function useGetMyRecordings() {
       query GetMyRecordings($userId: uuid) {
         users(where: { id: { _eq: $userId } }) {
           ...avatarFields
-          collaborators {
+          collaborators(where: { recording: { deleted_at: { _is_null: true } } }) {
             recording {
               ...recordingFields
               user {
@@ -326,7 +328,7 @@ export function useGetMyRecordings() {
           }
         }
 
-        recordings(where: { example: { _eq: true } }) {
+        recordings(where: { _and: { example: { _eq: true }, deleted_at: { _is_null: true } } }) {
           ...recordingFields
           user {
             ...avatarFields
