@@ -55,7 +55,7 @@ export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_locat
 };
 export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
 export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
-export type SetWorkspaceId = Action<"set_workspace_id"> & { workspaceId: WorkspaceId };
+export type SetWorkspaceId = Action<"set_workspace_id"> & { workspaceId: WorkspaceId | null };
 export type SetDefaultSettingsTab = Action<"set_default_settings_tab"> & {
   tabTitle: SettingsTabTitle;
 };
@@ -221,7 +221,7 @@ export function setCanvas(canvas: Canvas): SetCanvas {
   return { type: "set_canvas", canvas };
 }
 
-export function setWorkspaceId(workspaceId: WorkspaceId): SetWorkspaceId {
+export function setWorkspaceId(workspaceId: WorkspaceId | null): SetWorkspaceId {
   return { type: "set_workspace_id", workspaceId };
 }
 

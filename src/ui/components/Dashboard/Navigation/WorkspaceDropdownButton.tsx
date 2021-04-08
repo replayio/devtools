@@ -8,14 +8,9 @@ import { Workspace } from "ui/types";
 
 type WorkspaceDropdownButtonProps = PropsFromRedux & {
   workspaces: Workspace[];
-  personalWorkspaceId: string;
 };
 
-function WorkspaceDropdownButton({
-  workspaces,
-  currentWorkspaceId,
-  personalWorkspaceId,
-}: WorkspaceDropdownButtonProps) {
+function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDropdownButtonProps) {
   const { user } = useAuth0();
   let picture, title, subtitle;
 
@@ -24,7 +19,7 @@ function WorkspaceDropdownButton({
     return null;
   }
 
-  if (currentWorkspaceId == personalWorkspaceId) {
+  if (currentWorkspaceId == null) {
     picture = <img src={user.picture} />;
     title = "Personal";
     subtitle = user.email;
