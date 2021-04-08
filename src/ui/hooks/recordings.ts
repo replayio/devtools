@@ -220,7 +220,51 @@ function getRecordings(data: PersonalRecordingsData) {
   ];
 }
 
-export function useGetRecordings(
+export function useGetPersonalRecordings():
+  | { recordings: null; loading: true }
+  | { recordings: Recording[]; loading: false } {
+  const { data, error, loading } = useQuery(
+    gql`
+      query getPersonalRecordings($userId: uuid) {
+        recordings(where: { workspace_id: { _is_null: true }, user_id: { _eq: $userId } }) {
+          id
+          url
+          title
+          recording_id
+          recordingTitle
+          last_screen_mime_type
+          duration
+          description
+          date
+          is_private
+          user {
+            name
+            email
+            picture
+            id
+          }
+        }
+      }
+    `,
+    {
+      variables: { userId: getUserId() },
+      pollInterval: 5000,
+    }
+  );
+
+  if (loading) {
+    return { recordings: null, loading };
+  }
+
+  if (error) {
+    console.error("Failed to fetch recordings:", error);
+  }
+
+  let recordings = data?.recordings;
+  return { recordings, loading };
+}
+
+export function useGetWorkspaceRecordings(
   currentWorkspaceId: WorkspaceId
 ): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
   const { data, error, loading } = useQuery(

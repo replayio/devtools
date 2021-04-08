@@ -8,6 +8,7 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import "./Dashboard.css";
+import { getUserId } from "ui/utils/useToken";
 
 function OldDashboard() {
   const [filter, setFilter] = useState("");
@@ -27,9 +28,27 @@ function OldDashboard() {
   );
 }
 
-function Dashboard({ currentWorkspaceId }: PropsFromRedux) {
+function PersonalDashboard() {
   const [filter, setFilter] = useState("");
-  const { recordings, loading } = hooks.useGetRecordings(currentWorkspaceId!);
+  const { recordings, loading } = hooks.useGetPersonalRecordings();
+
+  if (loading || recordings == null) {
+    return <Loader />;
+  }
+
+  const filteredRecordings = recordings.filter(recording => recording.url.includes(filter));
+
+  return (
+    <main className="dashboard">
+      <DashboardNavigation recordings={recordings} setFilter={setFilter} filter={filter} />
+      <DashboardViewer recordings={filteredRecordings} filter={filter} />
+    </main>
+  );
+}
+
+function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
+  const [filter, setFilter] = useState("");
+  const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
 
   if (loading || recordings == null) {
     return <Loader />;
@@ -47,12 +66,17 @@ function Dashboard({ currentWorkspaceId }: PropsFromRedux) {
 
 function DashboardRouter(props: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
+  console.log(getUserId());
 
   if (!userSettings?.enable_teams) {
     return <OldDashboard />;
   }
 
-  return <Dashboard {...props} />;
+  if (props.currentWorkspaceId == null) {
+    return <PersonalDashboard />;
+  } else {
+    return <WorkspaceDashboard {...props} />;
+  }
 }
 
 const connector = connect((state: UIState) => ({

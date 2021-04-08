@@ -6,9 +6,11 @@ import WorkspaceItem from "./WorkspaceItem";
 import WorkspaceDropdownButton from "./WorkspaceDropdownButton";
 import hooks from "ui/hooks";
 import useToken from "ui/utils/useToken";
+import useAuth0 from "ui/utils/useAuth0";
 
 export default function WorkspaceDropdown() {
   const [expanded, setExpanded] = useState(false);
+  const { user } = useAuth0();
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
@@ -18,26 +20,21 @@ export default function WorkspaceDropdown() {
   }
 
   const sharedWorkspaces = workspaces.filter(workspace => !workspace.is_personal);
-  const personalWorkspace = workspaces.find(workspace => workspace.is_personal)!;
 
   return (
     <div className="workspace-dropdown-container">
       <Dropdown
-        buttonContent={
-          <WorkspaceDropdownButton
-            {...{ workspaces: workspaces!, personalWorkspaceId: personalWorkspace.id }}
-          />
-        }
+        buttonContent={<WorkspaceDropdownButton {...{ workspaces: workspaces! }} />}
         setExpanded={setExpanded}
         expanded={expanded}
         orientation="bottom"
       >
         <WorkspaceItem
-          icon={<div className="material-icons">workspaces</div>}
+          icon={<img src={user.picture} />}
           title={"Personal"}
           subtitle={`Personal Workspace`}
           setExpanded={setExpanded}
-          workspaceId={personalWorkspace.id}
+          workspaceId={null}
         />
         {sharedWorkspaces.map(workspace => {
           const count = workspace?.workspaces_users.filter(wu => !wu.pending).length;

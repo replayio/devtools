@@ -8,7 +8,7 @@ type WorkspaceItemProps = PropsFromRedux & {
   icon: JSX.Element;
   subtitle: string;
   title: string;
-  workspaceId: string;
+  workspaceId: string | null;
   setExpanded: Dispatch<SetStateAction<boolean>>;
 };
 
