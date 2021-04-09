@@ -48,7 +48,7 @@ function Invitation({ workspace }: { workspace: Workspace }) {
 function Invitations({}: PropsFromRedux) {
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
 
-  if (loading || pendingWorkspaces.length == 0) {
+  if (loading || pendingWorkspaces?.length == 0) {
     return null;
   }
 
