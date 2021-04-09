@@ -7,10 +7,25 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
+import { NonRegisteredTeamMember } from "ui/hooks/invitations";
 
 import "./WorkspaceMember.css";
 
 type WorkspaceMemberProps = { member: WorkspaceUser } & PropsFromRedux;
+
+export function NonRegisteredWorkspaceMember({ member }: { member: NonRegisteredTeamMember }) {
+  return (
+    <li className="workspace-member">
+      <span className="material-icons">mail_outline</span>
+      <div className="workspace-member-content">
+        <div className="title">{member.invited_email}</div>
+      </div>
+      <div className="permission-container">
+        <span>Pending</span>
+      </div>
+    </li>
+  );
+}
 
 function Role({
   member,

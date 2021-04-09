@@ -45,6 +45,10 @@
   color: var(--theme-comment);
 }
 
+.workspace-settings-modal .workspace-member .material-icons {
+  font-size: 28px;
+}
+
 /* Permissions dropdown */
 
 .workspace-settings-modal .member-permissions .expand-dropdown {

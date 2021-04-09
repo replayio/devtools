@@ -6,13 +6,17 @@ import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import WorkspaceForm from "./WorkspaceForm";
-import WorkspaceMember from "./WorkspaceMember";
+import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 import "./WorkspaceSettingsModal.css";
 
 const content1 = `Manage members here so that everyone who belongs to this team can see each other's replays.`;
 
 function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
-  const { members, loading } = hooks.useGetWorkspaceMembers(workspaceId!);
+  const { members, loading: registeredMembersLoading } = hooks.useGetWorkspaceMembers(workspaceId!);
+  const {
+    nonRegisteredTeamMembers,
+    loading: nonRegisteredMembersLoading,
+  } = hooks.useGetNonRegisteredTeamMembers(workspaceId!);
 
   return (
     <div className="workspace-settings-modal">
@@ -28,13 +32,21 @@ function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
           <WorkspaceForm />
           <div className="workspace-members-container">
             <div className="subheader">MEMBERS</div>
-            {members && !loading && (
-              <ul className="workspace-members">
-                {members.map((member, i) => (
-                  <WorkspaceMember member={member} key={i} />
+            <ul className="workspace-members">
+              {members &&
+                !registeredMembersLoading &&
+                members.map((member, i) => (
+                  <WorkspaceMember member={member} key={`registered-${member.user.email}`} />
                 ))}
-              </ul>
-            )}
+              {nonRegisteredTeamMembers &&
+                !nonRegisteredMembersLoading &&
+                nonRegisteredTeamMembers.map((member, i) => (
+                  <NonRegisteredWorkspaceMember
+                    member={member}
+                    key={`non-registered-${member.invited_email}`}
+                  />
+                ))}
+            </ul>
           </div>
         </main>
       </Modal>
