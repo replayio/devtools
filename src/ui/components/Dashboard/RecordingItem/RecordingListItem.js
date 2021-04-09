@@ -59,7 +59,7 @@ function ItemCreatedDate({ date }) {
   const daysSince = (new Date().getTime() - new Date(date).getTime()) / (1000 * 3600 * 24);
 
   // Show relative time if under 3 days, otherwise, use the template below.
-  if (daysSince > 3) {
+  if (daysSince > 2) {
     content = formatDate(new Date(date), "M/d/yyyy");
   }
 

@@ -72,19 +72,7 @@ function DashboardNavigation({
           <span>All</span>
         </div>
       </div>
-      <div className="recording-hosts">
-        <div className="navigation-subheader">BY URL</div>
-        {hosts.map((hostUrl, i) => (
-          <div
-            className={classnames("left-sidebar-menu-item", { active: filter == hostUrl })}
-            key={i}
-            onClick={() => setFilter(hostUrl)}
-          >
-            <span className="material-icons">description</span>
-            <span>{hostUrl}</span>
-          </div>
-        ))}
-      </div>
+
       {features.workspaces ? <Invitations /> : null}
     </nav>
   );

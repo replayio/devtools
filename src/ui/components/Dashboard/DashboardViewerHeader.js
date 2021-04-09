@@ -98,7 +98,6 @@ function HeaderActions({
       >
         {editing ? "Done" : "Edit"}
       </button>
-      <ViewsToggle viewType={viewType} toggleViewType={toggleViewType} />
     </div>
   );
 }
