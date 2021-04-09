@@ -61,6 +61,7 @@
   align-items: center;
   padding: 4px 4px 4px 0;
   border-bottom: 1px solid var(--theme-splitter-color);
+  background-color: white;
   position: sticky;
   top: 0px;
   z-index: 1;
@@ -115,7 +116,9 @@
 .recording-list.list .recording-item .screenshot {
   background: var(--theme-toolbar-background);
   height: 100%;
-  width: 85px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .recording-list.list .recording-item.selected {
@@ -126,7 +129,7 @@
 .recording-list.list .recording-item .screenshot img {
   width: 100%;
   object-fit: contain;
-  height: 60px;
+  height: 80px;
 }
 
 .recording-list.list .recording-item .page,

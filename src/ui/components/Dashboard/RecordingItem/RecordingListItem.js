@@ -83,7 +83,7 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle, handleClickUr
         />
         {!editing ? (
           <div className="item-title-label-actions">
-            <CopyLinkButton recordingId={data.recording_id} />
+            {/* <CopyLinkButton recordingId={data.recording_id} /> */}
           </div>
         ) : null}
       </div>
