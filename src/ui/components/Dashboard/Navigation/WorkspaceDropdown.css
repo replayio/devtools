@@ -31,6 +31,7 @@
   overflow: hidden;
   margin: 0px 8px;
   text-align: left;
+  font-size: 14px;
 }
 
 .workspace-profile-content > * {
@@ -40,7 +41,7 @@
 }
 
 .workspace-profile-content .subtitle {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--theme-comment);
 }
 
@@ -56,7 +57,7 @@
   border-radius: 50%;
 }
 
-.workspace-dropdown-container .create-new-workspace:hover ,
+.workspace-dropdown-container .create-new-workspace:hover,
 .workspace-dropdown-container .workspace-item:hover {
   background: #e8e8e8;
 }

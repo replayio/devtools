@@ -5,7 +5,15 @@
 
 .recording-list.list table.dashboard-viewer-content-table {
   display: grid;
-  grid-template-columns: auto 140px 2fr 0.5fr 0.75fr 0.5fr auto auto;
+  grid-template-columns: 30px 100px auto auto auto auto auto auto;
+}
+
+.dashboard-viewer-header-title {
+  visibility: hidden;
+}
+
+.replays {
+  visibility: hidden;
 }
 
 /* Table Body styling */
@@ -18,7 +26,7 @@
 .recording-list.list tbody.dashboard-viewer-content-body td {
   display: flex;
   align-items: center;
-  padding: 20px;
+  padding: 4px;
   border-bottom: 1px solid var(--theme-splitter-color);
   transition: background 200ms;
 }
@@ -28,11 +36,11 @@
 }
 
 .recording-list.list tbody.dashboard-viewer-content-body td:first-child {
-  padding-left: 40px;
+  padding-left: 10px;
 }
 
 .recording-list.list tbody.dashboard-viewer-content-body td:last-child {
-  padding-right: 40px;
+  padding-right: 10px;
 }
 
 /* Table Header styling */
@@ -51,7 +59,7 @@
 .recording-list.list thead.dashboard-viewer-content-header th {
   display: flex;
   align-items: center;
-  padding: 20px;
+  padding: 4px 4px 4px 0;
   border-bottom: 1px solid var(--theme-splitter-color);
   position: sticky;
   top: 0px;
@@ -60,7 +68,7 @@
 }
 
 .recording-list.list thead.dashboard-viewer-content-header th:first-child {
-  padding-left: 40px;
+  padding-left: 10px;
 }
 
 .recording-list.list thead.dashboard-viewer-content-header th:last-child {

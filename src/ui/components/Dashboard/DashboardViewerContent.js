@@ -108,7 +108,7 @@ function DashboardViewerContentHeader({
       </th>
       <th>PREVIEW</th>
       <th>TITLE</th>
-      <th>DURATION</th>
+      <th>LENGTH</th>
       <th className="sorter" onClick={() => setAscOrder(!ascOrder)}>
         <span className="label">CREATED</span>
         {ascOrder ? <div className="img arrow-up-2" /> : <div className="img arrow-down-2" />}
