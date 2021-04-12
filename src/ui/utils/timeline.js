@@ -9,7 +9,7 @@ export function getPixelDistance({ to, from, zoom, overlayWidth }) {
 }
 
 // Get the position of a time on the visible part of the timeline,
-// in the range [0, 1].
+// in the range [0, 1] if the timeline is fully zommed out.
 export function getVisiblePosition({ time, zoom }) {
   if (!time) {
     return 0;

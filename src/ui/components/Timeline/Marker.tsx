@@ -1,11 +1,12 @@
 import React, { MouseEventHandler } from "react";
-const { getLeftOffset } = require("../../utils/timeline");
+const { getVisiblePosition } = require("../../utils/timeline");
 import { connect, ConnectedProps } from "react-redux";
-const classnames = require("classnames");
+import classnames from "classnames";
 import { actions } from "../../actions";
 import { HoveredItem, ZoomRegion } from "ui/state/timeline";
 import { Location, PauseId } from "@recordreplay/protocol";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
+import { timelineMarkerWidth as pointWidth } from "../../constants";
 
 // If you do modify this, make sure you change EVERY single reference to this 11px width in
 // the codebase. This includes, but is not limited to, the Timeline component, Message component,
@@ -82,8 +83,12 @@ class Marker extends React.Component<MarkerProps> {
       isPrimaryHighlighted,
       isSecondaryHighlighted,
       zoomRegion,
-      overlayWidth,
     } = this.props;
+
+    const offsetPercent = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
+    if (offsetPercent < 0 || offsetPercent > 100) {
+      return null;
+    }
 
     return (
       <a
@@ -94,11 +99,7 @@ class Marker extends React.Component<MarkerProps> {
           paused: time === currentTime,
         })}
         style={{
-          left: `${getLeftOffset({
-            time: time,
-            overlayWidth,
-            zoom: zoomRegion,
-          })}%`,
+          left: `calc(${offsetPercent}% - ${pointWidth / 2}px)`,
         }}
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
