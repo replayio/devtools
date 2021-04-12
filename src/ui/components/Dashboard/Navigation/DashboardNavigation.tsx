@@ -15,20 +15,6 @@ interface Recording {
   url: string;
 }
 
-function getUniqueHosts(recordings: Recording[]) {
-  const uniqueUrls = recordings.reduce((acc, elem) => {
-    const hostUrl = new URL(elem.url).host;
-
-    if (acc.includes(hostUrl)) {
-      return acc;
-    } else {
-      return [...acc, hostUrl];
-    }
-  }, [] as string[]);
-
-  return uniqueUrls.filter(url => url != "").sort();
-}
-
 type DashboardNavigationProps = PropsFromRedux & {
   recordings: Recording[];
   filter: string;
@@ -39,11 +25,8 @@ type DashboardNavigationProps = PropsFromRedux & {
 
 function DashboardNavigation({
   currentWorkspaceId,
-  recordings,
-  filter,
   pendingWorkspaces,
   nonPendingWorkspaces,
-  setFilter,
   setModal,
 }: DashboardNavigationProps) {
   const {
@@ -68,7 +51,7 @@ function DashboardNavigation({
           <span>{`Settings & Members`}</span>
         </div>
       ) : null}
-      {pendingWorkspaces?.length && <Invitations {...{ pendingWorkspaces }} />}
+      {pendingWorkspaces?.length ? <Invitations {...{ pendingWorkspaces }} /> : null}
     </nav>
   );
 }
