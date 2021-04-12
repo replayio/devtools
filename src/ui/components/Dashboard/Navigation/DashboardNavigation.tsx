@@ -8,8 +8,8 @@ import hooks from "ui/hooks";
 import classnames from "classnames";
 import WorkspaceDropdown from "./WorkspaceDropdown";
 import Invitations from "./Invitations";
-const { features } = require("ui/utils/prefs");
 import "./DashboardNavigation.css";
+import { Workspace } from "ui/types";
 
 interface Recording {
   url: string;
@@ -42,27 +42,30 @@ function DashboardNavigation({
   setFilter,
   setModal,
 }: DashboardNavigationProps) {
-  const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
+  const { workspaces } = hooks.useGetNonPendingWorkspaces();
   const {
-    userSettings: { enable_teams, loading },
+    userSettings: { enable_teams },
   } = hooks.useGetUserSettings();
-  const hosts = getUniqueHosts(recordings);
 
   const isPersonal = currentWorkspaceId == null;
   const onSettingsClick = () => {
     setModal("workspace-settings");
   };
 
+  if (!enable_teams) {
+    return <nav className="left-sidebar"></nav>;
+  }
+
   return (
     <nav className="left-sidebar">
-      {enable_teams ? <WorkspaceDropdown /> : null}
-      {enable_teams && workspaces && !isPersonal ? (
+      <WorkspaceDropdown />
+      {workspaces && !isPersonal ? (
         <div className={classnames("left-sidebar-menu-item")} onClick={onSettingsClick}>
           <span className="material-icons">settings</span>
           <span>{`Settings & Members`}</span>
         </div>
       ) : null}
-      {enable_teams ? <Invitations /> : null}
+      <Invitations />
     </nav>
   );
 }

@@ -32,7 +32,13 @@ function PersonalDashboard() {
   const [filter, setFilter] = useState("");
   const { recordings, loading } = hooks.useGetPersonalRecordings();
 
-  if (loading || recordings == null) {
+  // Preload this for the Invitations component.
+  const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
+  const { loading: pendingLoading } = hooks.useGetPendingWorkspaces();
+
+  console.log({ pendingLoading });
+
+  if (loading || pendingLoading || nonPendingLoading || recordings == null) {
     return <Loader />;
   }
 
@@ -50,7 +56,13 @@ function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
   const [filter, setFilter] = useState("");
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
 
-  if (loading || recordings == null) {
+  // Preload this for the Invitations component.
+  const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
+  const { loading: pendingLoading } = hooks.useGetPendingWorkspaces();
+
+  console.log({ pendingLoading });
+
+  if (loading || pendingLoading || nonPendingLoading || recordings == null) {
     return <Loader />;
   }
 
