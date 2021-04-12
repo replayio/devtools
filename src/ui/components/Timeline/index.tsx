@@ -12,6 +12,7 @@ import { Component, MouseEventHandler } from "react";
 import type { PointDescription, Location } from "@recordreplay/protocol";
 import React from "react";
 import classnames from "classnames";
+import clamp from "lodash/clamp";
 
 import ScrollContainer from "./ScrollContainer";
 import Tooltip from "./Tooltip";
@@ -262,9 +263,14 @@ class Timeline extends Component<PropsFromRedux> {
             onMouseUp={this.onPlayerMouseUp}
           >
             <div className="progress-line full" />
-            <div className="progress-line preview" style={{ width: `${hoverPercent}%` }} />
-            <div className="progress-line" style={{ width: `${percent}%` }} />
-            <div className="progress-line-paused" style={{ left: `${percent}%` }} />
+            <div
+              className="progress-line preview"
+              style={{ width: `${clamp(hoverPercent, 0, 100)}%` }}
+            />
+            <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
+            {percent >= 0 && percent <= 100 ? (
+              <div className="progress-line-paused" style={{ left: `${percent}%` }} />
+            ) : null}
             {viewMode == "dev" && selectedPanel == "console"
               ? this.renderMessages()
               : this.renderEvents()}
