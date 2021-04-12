@@ -96,11 +96,15 @@ class Timeline extends Component<PropsFromRedux> {
   };
 
   onPlayerMouseMove: MouseEventHandler = e => {
-    const { zoomRegion, hoverTime, setTimelineToTime } = this.props;
+    const { hoverTime, setTimelineToTime, setTimelineState } = this.props;
     const mouseTime = this.getMouseTime(e);
+    const isDragging = e.buttons === 1;
 
     if (hoverTime != mouseTime) {
       setTimelineToTime(mouseTime);
+    }
+    if (isDragging) {
+      setTimelineState({ currentTime: mouseTime });
     }
   };
 
