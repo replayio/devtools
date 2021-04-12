@@ -31,6 +31,14 @@ function UserOptions({ recordingId, setModal }) {
     }
     window.location = dashboardUrl;
   };
+  const onLaunchClick = () => {
+    const launchUrl = `${window.location.origin}/welcome`;
+    if (event.metaKey) {
+      return window.open(launchUrl);
+    }
+    // right now we just send you to the download screen, but eventually this will launch Replay
+    window.location = launchUrl;
+  };
   const onShareClick = () => {
     setExpanded(false);
     setModal("sharing", { recordingId });
@@ -60,6 +68,10 @@ function UserOptions({ recordingId, setModal }) {
             <span>Share</span>
           </button>
         )}
+        <button className="row" onClick={onLaunchClick}>
+          <span className="material-icons">download</span>
+          <span>Download Replay</span>
+        </button>
         <button className="row" onClick={onSettingsClick}>
           <span className="material-icons">settings</span>
           <span>Settings</span>
