@@ -55,7 +55,7 @@ function Transcript({
   const { comments } = hooks.useGetComments(recordingId!);
   const { recording } = hooks.useGetRecording(recordingId!);
   const userId = getUserId();
-  const isAuthor = userId == recording.user_id;
+  const isAuthor = userId && userId == recording.user_id;
 
   const entries: Entry[] = createEntries(comments, clickEvents, shouldShowLoneEvents);
 

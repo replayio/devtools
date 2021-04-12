@@ -56,7 +56,7 @@ function Links({ recordingId, sessionId }) {
 function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
   const { recording } = hooks.useGetRecording(recordingId);
   const userId = getUserId();
-  const isAuthor = userId == recording.user_id;
+  const isAuthor = userId && userId == recording.user_id;
   const { data } = useQuery(GET_RECORDING_TITLE, {
     variables: { id: recordingId },
   });
