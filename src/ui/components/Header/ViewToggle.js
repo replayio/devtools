@@ -4,6 +4,10 @@ import classnames from "classnames";
 import "./ViewToggle.css";
 import { setViewMode } from "../../actions/app";
 import { getViewMode } from "../../reducers/app";
+import { getUserId } from "ui/utils/useToken";
+import hooks from "ui/hooks";
+import { selectors } from "ui/reducers";
+import { isTest } from "ui/utils/test";
 
 function Handle({ text, mode, localViewMode, handleToggle, motion }) {
   const isActive = mode == localViewMode;
@@ -33,7 +37,10 @@ function Handle({ text, mode, localViewMode, handleToggle, motion }) {
   );
 }
 
-function ViewToggle({ viewMode, setViewMode }) {
+function ViewToggle({ viewMode, recordingId, setViewMode }) {
+  const { recording } = hooks.useGetRecording(recordingId);
+  const userId = getUserId();
+  const isAuthor = userId == recording.user_id;
   const [framerMotion, setFramerMotion] = useState(null);
   const [localViewMode, setLocalViewMode] = useState(viewMode);
   const toggleTimeoutKey = useRef(null);
@@ -59,6 +66,10 @@ function ViewToggle({ viewMode, setViewMode }) {
       setViewMode(mode);
     }, 300);
   };
+
+  if (isAuthor && !recording.is_initialized && !isTest()) {
+    return null;
+  }
 
   return (
     <AnimateSharedLayout type="crossfade">
@@ -87,6 +98,7 @@ function ViewToggle({ viewMode, setViewMode }) {
 export default connect(
   state => ({
     viewMode: getViewMode(state),
+    recordingId: selectors.getRecordingId(state),
   }),
   {
     setViewMode,

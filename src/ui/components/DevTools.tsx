@@ -16,10 +16,6 @@ import { UIState } from "ui/state";
 import { UploadInfo } from "ui/state/app";
 import { RecordingId } from "@recordreplay/protocol";
 
-function isTest() {
-  return new URL(window.location.href).searchParams.get("test");
-}
-
 type DevToolsProps = PropsFromRedux & {
   recordingId: RecordingId;
 };

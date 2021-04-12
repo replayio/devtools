@@ -4,6 +4,8 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
+import { getUserId } from "ui/utils/useToken";
+import { isTest } from "ui/utils/test";
 
 import TranscriptFilter from "ui/components/Transcript/TranscriptFilter";
 import {
@@ -12,6 +14,7 @@ import {
   FloatingTranscriptItem,
 } from "./TranscriptItem";
 import "./Transcript.css";
+import DraftScreen from "../DraftScreen";
 
 import { UIState } from "ui/state";
 import { Event, Comment, FloatingItem } from "ui/state/comments";
@@ -50,6 +53,10 @@ function Transcript({
   hideFloatingItem,
 }: PropsFromRedux) {
   const { comments } = hooks.useGetComments(recordingId!);
+  const { recording } = hooks.useGetRecording(recordingId!);
+  const userId = getUserId();
+  const isAuthor = userId == recording.user_id;
+
   const entries: Entry[] = createEntries(comments, clickEvents, shouldShowLoneEvents);
 
   useEffect(
@@ -70,6 +77,12 @@ function Transcript({
 
   if (floatingItem) {
     displayedEntries.push(floatingItem);
+  }
+
+  // Only show the initialization screen if the replay is not being opened
+  // for testing purposes.
+  if (isAuthor && !recording.is_initialized && !isTest()) {
+    return <DraftScreen />;
   }
 
   return (

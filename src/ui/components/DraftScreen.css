@@ -1,155 +1,139 @@
-.initialization-screen {
+.initialization-panel {
   background: var(--cool-gray-100);
   height: 100%;
   width: 100%;
-  display: grid;
-  justify-content: center;
-  align-items: center;
+  min-width: 320px;
 }
 
-.initialization-screen main {
+.initialization-panel main {
   display: flex;
   flex-direction: row;
   border-radius: 8px;
   overflow: hidden;
 }
 
-.initialization-screen .filler {
-  background: linear-gradient(to bottom right, #64D4FB, #52A6F9);
-  width: 560px;
-}
-
-.initialization-screen .content {
+.initialization-panel {
   background: var(--theme-body-background);
   margin: auto;
-  padding: 48px 96px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   font-size: 14px;
 }
 
-.initialization-screen .content > :not(:first-child) {
+.initialization-panel > :not(:first-child) {
   margin-top: 32px;
 }
 
-.initialization-screen h1 {
+.initialization-panel h1 {
   font-size: 30px;
   font-weight: 800;
 }
 
-.initialization-screen h4 {
+.initialization-panel h4 {
   font-size: 14px;
   font-weight: 600;
 }
 
-.initialization-screen .header {
+.initialization-panel .header {
   display: flex;
   flex-direction: column;
   user-select: none;
 }
 
-.initialization-screen .header > :not(:first-child) {
+.initialization-panel .header > :not(:first-child) {
   margin-top: 24px;
 }
 
-.initialization-screen .logo {
-  width: 48px;
-  height: 48px;
-}
-
-.initialization-screen .content form.hidden {
+.initialization-panel form.hidden {
   visibility: hidden;
 }
 
-.initialization-screen .content form > :not(:first-child) {
-  margin-top: 32px;
+.initialization-panel form > :not(:first-child) {
+  margin-top: 16px;
 }
 
-.initialization-screen .replay-title {
+.initialization-panel .replay-title {
   display: flex;
   flex-direction: column;
 }
 
-.initialization-screen .replay-title > :not(:first-child) {
+.initialization-panel .replay-title > :not(:first-child) {
   margin-top: 8px;
 }
 
-.initialization-screen .replay-title label {
+.initialization-panel .replay-title label {
   user-select: none;
 }
 
-.initialization-screen .replay-title input {
-  width: 400px;
+.initialization-panel .replay-title input {
   font-size: 14px;
   padding: 8px;
   border: 1px solid var(--cool-gray-300);
   border-radius: 4px;
 }
 
-.initialization-screen .replay-privacy {
+.initialization-panel .replay-privacy {
   display: flex;
   flex-direction: row;
   align-items: center;
   user-select: none;
 }
 
-.initialization-screen .replay-privacy > :not(:first-child) {
+.initialization-panel .replay-privacy > :not(:first-child) {
   margin-left: 8px;
 }
 
-.initialization-screen .replay-workspace {
+.initialization-panel .replay-workspace {
   display: flex;
   flex-direction: column;
 }
 
-.initialization-screen .replay-workspace > :not(:first-child) {
+.initialization-panel .replay-workspace > :not(:first-child) {
   margin-top: 8px;
 }
 
-.initialization-screen .replay-workspace select {
+.initialization-panel .replay-workspace select {
   border: 1px solid var(--cool-gray-300);
   font-size: 14px;
   border-radius: 4px;
   padding: 8px 8px 8px 4px;
 }
 
-.initialization-screen .content form .actions {
+.initialization-panel form .actions {
   margin-top: 60px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  font-size: 20px;
+  font-size: 14px;
 }
 
-.initialization-screen .actions .submit {
-  padding: 8px 52px;
+.initialization-panel .actions > * {
+  padding: 8px 12px;
+}
+
+.initialization-panel .actions .submit {
   color: var(--theme-body-background);
   background: var(--new-blue-500);
   border: none;
-  font-size: 20px;
+  font-size: 14px;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.initialization-screen .actions .submit:hover {
+.initialization-panel .actions .submit:hover {
   background: var(--new-blue-600);
 }
 
-.initialization-screen .actions .cancel {
+.initialization-panel .actions .cancel {
   text-decoration: underline;
   background: transparent;
   color: var(--theme-comment);
   cursor: pointer;
 }
 
-.initialization-screen .actions .cancel:hover {
+.initialization-panel .actions .cancel:hover {
   background: transparent;
   color: var(--theme-toolbar-color);
-}
-
-@media only screen and (max-width: 1280px) {
-  .initialization-screen .filler {
-    display: none;
-  }
 }
