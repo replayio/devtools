@@ -65,9 +65,14 @@ function Support() {
         <div className="description">
           Come chat with us on our{" "}
           <a href="https://discord.gg/n2dTK6kcRX" target="_blank" rel="noreferrer">
-            Discord server
+            Discord server.
           </a>
-          . We’d love to hear your feedback!
+        </div>
+        <br />
+        <div className="label">Send us an email</div>
+        <div className="description">
+          You can also send an email at <a href="mailto:feedback@replay.io">feedback@replay.io</a>.
+          We’d love to hear your feedback!
         </div>
       </label>
     </li>
