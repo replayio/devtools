@@ -15,7 +15,7 @@ import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisMana
 import { UIStore } from "ui/actions";
 import { setAnalysisPoints } from "ui/actions/app";
 import { getAnalysisPointsForLocation } from "ui/reducers/app";
-import { displayedBreakpointMaxHits } from "ui/constants";
+const { prefs } = require("ui/utils/prefs");
 
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
@@ -43,7 +43,7 @@ export function setupLogpoints(_store: UIStore) {
 }
 
 function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
-  if (!LogpointHandlers.onPointLoading || points.length >= displayedBreakpointMaxHits) {
+  if (!LogpointHandlers.onPointLoading || points.length >= prefs.maxHitsDisplayed) {
     return;
   }
 
@@ -56,7 +56,7 @@ function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
 }
 
 function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
-  if (!LogpointHandlers.onResult || result.length >= displayedBreakpointMaxHits) {
+  if (!LogpointHandlers.onResult || result.length >= prefs.maxHitsDisplayed) {
     return;
   }
 
@@ -86,7 +86,7 @@ async function showPrimitiveLogpoints(
   pointDescriptions: PointDescription[],
   values: ValueFront[]
 ) {
-  if (!LogpointHandlers.onResult || pointDescriptions.length >= displayedBreakpointMaxHits) {
+  if (!LogpointHandlers.onResult || pointDescriptions.length >= prefs.maxHitsDisplayed) {
     return;
   }
 
