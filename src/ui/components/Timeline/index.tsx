@@ -101,7 +101,7 @@ class Timeline extends Component<PropsFromRedux> {
     const isDragging = e.buttons === 1;
 
     if (hoverTime != mouseTime) {
-      setTimelineToTime(mouseTime);
+      setTimelineToTime(mouseTime, isDragging);
     }
     if (isDragging) {
       setTimelineState({ currentTime: mouseTime });
