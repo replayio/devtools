@@ -45,13 +45,11 @@ function Invitation({ workspace }: { workspace: Workspace }) {
   );
 }
 
-function Invitations({}: PropsFromRedux) {
-  const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
+type InvitationsProps = PropsFromRedux & {
+  pendingWorkspaces: Workspace[];
+};
 
-  if (loading || pendingWorkspaces?.length == 0) {
-    return null;
-  }
-
+function Invitations({ pendingWorkspaces }: InvitationsProps) {
   return (
     <div className="workspace-invites">
       <div className="navigation-subheader">{`INVITATIONS (${pendingWorkspaces.length})`}</div>

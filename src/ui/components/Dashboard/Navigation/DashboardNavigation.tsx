@@ -32,6 +32,8 @@ function getUniqueHosts(recordings: Recording[]) {
 type DashboardNavigationProps = PropsFromRedux & {
   recordings: Recording[];
   filter: string;
+  nonPendingWorkspaces?: Workspace[];
+  pendingWorkspaces?: Workspace[];
   setFilter: Dispatch<SetStateAction<string>>;
 };
 
@@ -39,10 +41,11 @@ function DashboardNavigation({
   currentWorkspaceId,
   recordings,
   filter,
+  pendingWorkspaces,
+  nonPendingWorkspaces,
   setFilter,
   setModal,
 }: DashboardNavigationProps) {
-  const { workspaces } = hooks.useGetNonPendingWorkspaces();
   const {
     userSettings: { enable_teams },
   } = hooks.useGetUserSettings();
@@ -58,14 +61,14 @@ function DashboardNavigation({
 
   return (
     <nav className="left-sidebar">
-      <WorkspaceDropdown />
-      {workspaces && !isPersonal ? (
+      {nonPendingWorkspaces && <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />}
+      {nonPendingWorkspaces && !isPersonal ? (
         <div className={classnames("left-sidebar-menu-item")} onClick={onSettingsClick}>
           <span className="material-icons">settings</span>
           <span>{`Settings & Members`}</span>
         </div>
       ) : null}
-      <Invitations />
+      {pendingWorkspaces?.length && <Invitations {...{ pendingWorkspaces }} />}
     </nav>
   );
 }

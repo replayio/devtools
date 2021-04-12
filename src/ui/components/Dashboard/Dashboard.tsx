@@ -33,10 +33,11 @@ function PersonalDashboard() {
   const { recordings, loading } = hooks.useGetPersonalRecordings();
 
   // Preload this for the Invitations component.
-  const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
-  const { loading: pendingLoading } = hooks.useGetPendingWorkspaces();
-
-  console.log({ pendingLoading });
+  const {
+    workspaces: nonPendingWorkspaces,
+    loading: nonPendingLoading,
+  } = hooks.useGetNonPendingWorkspaces();
+  const { pendingWorkspaces, loading: pendingLoading } = hooks.useGetPendingWorkspaces();
 
   if (loading || pendingLoading || nonPendingLoading || recordings == null) {
     return <Loader />;
@@ -46,7 +47,13 @@ function PersonalDashboard() {
 
   return (
     <main className="dashboard">
-      <DashboardNavigation recordings={recordings} setFilter={setFilter} filter={filter} />
+      <DashboardNavigation
+        recordings={recordings}
+        setFilter={setFilter}
+        filter={filter}
+        nonPendingWorkspaces={nonPendingWorkspaces}
+        pendingWorkspaces={pendingWorkspaces}
+      />
       <DashboardViewer recordings={filteredRecordings} filter={filter} />
     </main>
   );
@@ -57,10 +64,11 @@ function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
 
   // Preload this for the Invitations component.
-  const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
-  const { loading: pendingLoading } = hooks.useGetPendingWorkspaces();
-
-  console.log({ pendingLoading });
+  const {
+    workspaces: nonPendingWorkspaces,
+    loading: nonPendingLoading,
+  } = hooks.useGetNonPendingWorkspaces();
+  const { pendingWorkspaces, loading: pendingLoading } = hooks.useGetPendingWorkspaces();
 
   if (loading || pendingLoading || nonPendingLoading || recordings == null) {
     return <Loader />;
@@ -70,7 +78,13 @@ function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
 
   return (
     <main className="dashboard">
-      <DashboardNavigation recordings={recordings} setFilter={setFilter} filter={filter} />
+      <DashboardNavigation
+        recordings={recordings}
+        setFilter={setFilter}
+        filter={filter}
+        nonPendingWorkspaces={nonPendingWorkspaces}
+        pendingWorkspaces={pendingWorkspaces}
+      />
       <DashboardViewer recordings={filteredRecordings} filter={filter} />
     </main>
   );
