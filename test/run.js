@@ -337,7 +337,15 @@ async function runTestViewer(path, local, timeout, env) {
 function getRecordingId(file) {
   try {
     const contents = fs.readFileSync(file).toString().split("\n")[0];
-    return (contents && contents.length) ? contents : null;
+    if (contents.length) {
+      // Ignore any trailing URL.
+      const spaceIndex = contents.indexOf(" ");
+      if (spaceIndex != -1) {
+        return contents.substr(0, spaceIndex);
+      }
+      return contents;
+    }
+    return null;
   } catch (e) {
     return null;
   }
