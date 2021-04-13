@@ -31,16 +31,16 @@ function Invitation({ workspace }: { workspace: Workspace }) {
 
   return (
     <div className={classnames("left-sidebar-menu-item")}>
-      <span className="material-icons">description</span>
-      <span className="label">{workspace.name}</span>
-      {isLoading ? (
-        <div>Loading</div>
-      ) : (
-        <div className="actions">
-          <span onClick={() => handleRefuse(workspace.id)}>Refuse</span>
-          <span onClick={() => handleAccept(workspace.id)}>Accept</span>
+      <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-2 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+        <div class="flex-1 min-w-0">
+          <span class="absolute inset-0" aria-hidden="true"></span>
+          <p class="text-lg font-medium text-gray-900">{workspace.name}</p>
+          <p class="text-lg text-gray-500 truncate">
+            <span onClick={() => handleRefuse(workspace.id)}>Refuse</span> /
+            <span onClick={() => handleAccept(workspace.id)}> Accept</span>
+          </p>
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -52,10 +52,12 @@ type InvitationsProps = PropsFromRedux & {
 function Invitations({ pendingWorkspaces }: InvitationsProps) {
   return (
     <div className="workspace-invites">
-      <div className="navigation-subheader">{`INVITATIONS (${pendingWorkspaces.length})`}</div>
-      {pendingWorkspaces.map(workspace => (
-        <Invitation workspace={workspace} key={workspace.id} />
-      ))}
+      <h2 class="text-gray-500 font-medium uppercase tracking-wide m-4 ml-12">{`PENDING INVITATIONS`}</h2>
+      <div class="grid m-12 mt-0 grid-cols-1 gap-4 sm:grid-cols-3">
+        {pendingWorkspaces.map(workspace => (
+          <Invitation workspace={workspace} key={workspace.id} />
+        ))}
+      </div>
     </div>
   );
 }
