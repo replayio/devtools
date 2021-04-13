@@ -115,10 +115,6 @@ export default function DashboardViewerHeader({
 }) {
   return (
     <header className="dashboard-viewer-header">
-      <div className="dashboard-viewer-header-title">
-        {filter == "" ? "All" : filter}
-        <span className="count">{`(${recordings.length})`}</span>
-      </div>
       <HeaderActions
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
@@ -127,6 +123,7 @@ export default function DashboardViewerHeader({
         viewType={viewType}
         toggleViewType={toggleViewType}
       />
+      <Invitations />
     </header>
   );
 }

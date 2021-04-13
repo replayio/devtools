@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import classnames from "classnames";
 import DashboardViewerHeader from "./DashboardViewerHeader";
 import DashboardViewerContent from "./DashboardViewerContent";
-import Invitations from "./Navigation/Invitations";
 
 export default function DashboardViewer({ recordings, filter }) {
   const [viewType, setViewType] = useState("list");
@@ -25,8 +24,6 @@ export default function DashboardViewer({ recordings, filter }) {
 
   return (
     <div className={classnames("dashboard-viewer", { editing })}>
-      <Invitations />
-
       <DashboardViewerHeader
         filter={filter}
         selectedIds={selectedIds}
