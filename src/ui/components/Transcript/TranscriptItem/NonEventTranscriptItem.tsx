@@ -30,6 +30,7 @@ function NonEventTranscriptItem({
   let icon = "location-marker";
   let label = "Point In Time";
   let secondaryLabel = getFormattedTime(comment.time);
+  let highlightSecondaryLabel = false;
 
   if (comment.source_location) {
     const { sourceUrl, line } = comment.source_location;
@@ -38,6 +39,7 @@ function NonEventTranscriptItem({
     icon = "document-text";
     label = closestFunction?.name || `${filename}:${line}`;
     secondaryLabel = snippet;
+    highlightSecondaryLabel = true;
   }
 
   return (
@@ -46,6 +48,7 @@ function NonEventTranscriptItem({
       icon={<div className={`img ${icon}`} />}
       label={label}
       secondaryLabel={secondaryLabel}
+      highlightSecondaryLabel={highlightSecondaryLabel}
     >
       <CommentThread comment={comment} time={comment.time} />
     </TranscriptItem>

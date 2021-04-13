@@ -9,11 +9,13 @@ import { Event } from "ui/state/comments";
 import "./TranscriptItem.css";
 import { HoveredItem } from "ui/state/timeline";
 import ReplyButton from "ui/components/Transcript/ReplyButton";
+const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/create-editor");
 
 type TranscriptItemProps = PropsFromRedux & {
   item: Comment | Event | FloatingItem;
   label: string;
   secondaryLabel: string;
+  highlightSecondaryLabel?: boolean;
   icon: JSX.Element;
   children?: JSX.Element | null;
 };
@@ -25,6 +27,7 @@ function TranscriptItem({
   icon,
   label,
   secondaryLabel,
+  highlightSecondaryLabel,
   clearPendingComment,
   seek,
   setHoveredItem,
@@ -32,6 +35,8 @@ function TranscriptItem({
   children,
 }: TranscriptItemProps) {
   const itemNode = useRef<HTMLDivElement>(null);
+  const secondaryLabelNode = useRef<HTMLDivElement>(null);
+  const CodeMirror = getCodeMirror();
   const { point, time } = item;
 
   useEffect(
@@ -42,6 +47,12 @@ function TranscriptItem({
     },
     [hoveredItem]
   );
+
+  useEffect(() => {
+    if (highlightSecondaryLabel && secondaryLabelNode.current && CodeMirror) {
+      CodeMirror.runMode(secondaryLabel, "javascript", secondaryLabelNode.current);
+    }
+  });
 
   const onClick = () => {
     if ("has_frames" in item) {
@@ -80,7 +91,9 @@ function TranscriptItem({
         <div className="transcript-entry-icon">{icon}</div>
         <div className="transcript-entry-label">
           <div className="label">{label}</div>
-          <div className="secondary-label">{secondaryLabel}</div>
+          <div className="secondary-label cm-s-mozilla" ref={secondaryLabelNode}>
+            {secondaryLabel}
+          </div>
         </div>
         <ReplyButton item={item} />
       </div>

@@ -31,6 +31,7 @@ function PauseTranscriptItem({
   let icon = "location-marker";
   let label = "Point In Time";
   let secondaryLabel = getFormattedTime(item.time);
+  let highlightSecondaryLabel = false;
 
   if (item.location) {
     const { sourceUrl, line } = item.location;
@@ -39,6 +40,7 @@ function PauseTranscriptItem({
     icon = "document-text";
     label = closestFunction?.name || `${filename}:${line}`;
     secondaryLabel = snippet;
+    highlightSecondaryLabel = true;
   }
 
   return (
@@ -47,6 +49,7 @@ function PauseTranscriptItem({
       icon={<div className={`img ${icon}`} />}
       label={label}
       secondaryLabel={secondaryLabel}
+      highlightSecondaryLabel={highlightSecondaryLabel}
     >
       {pendingComment ? <CommentThread comment={null} time={item.time} /> : null}
     </TranscriptItem>
