@@ -7,17 +7,18 @@ import WorkspaceDropdownButton from "./WorkspaceDropdownButton";
 import hooks from "ui/hooks";
 import useToken from "ui/utils/useToken";
 import useAuth0 from "ui/utils/useAuth0";
+import { Workspace } from "ui/types";
 
-export default function WorkspaceDropdown() {
+export default function WorkspaceDropdown({
+  nonPendingWorkspaces,
+}: {
+  nonPendingWorkspaces: Workspace[];
+}) {
   const [expanded, setExpanded] = useState(false);
+  const workspaces = nonPendingWorkspaces;
   const { user } = useAuth0();
-  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
-
-  if (loading) {
-    return null;
-  }
 
   const sharedWorkspaces = workspaces.filter(workspace => !workspace.is_personal);
 

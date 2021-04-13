@@ -8,61 +8,50 @@ import hooks from "ui/hooks";
 import classnames from "classnames";
 import WorkspaceDropdown from "./WorkspaceDropdown";
 import Invitations from "./Invitations";
-const { features } = require("ui/utils/prefs");
 import "./DashboardNavigation.css";
+import { Workspace } from "ui/types";
 
 interface Recording {
   url: string;
 }
 
-function getUniqueHosts(recordings: Recording[]) {
-  const uniqueUrls = recordings.reduce((acc, elem) => {
-    const hostUrl = new URL(elem.url).host;
-
-    if (acc.includes(hostUrl)) {
-      return acc;
-    } else {
-      return [...acc, hostUrl];
-    }
-  }, [] as string[]);
-
-  return uniqueUrls.filter(url => url != "").sort();
-}
-
 type DashboardNavigationProps = PropsFromRedux & {
   recordings: Recording[];
   filter: string;
+  nonPendingWorkspaces?: Workspace[];
+  pendingWorkspaces?: Workspace[];
   setFilter: Dispatch<SetStateAction<string>>;
 };
 
 function DashboardNavigation({
   currentWorkspaceId,
-  recordings,
-  filter,
-  setFilter,
+  pendingWorkspaces,
+  nonPendingWorkspaces,
   setModal,
 }: DashboardNavigationProps) {
-  const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
   const {
-    userSettings: { enable_teams, loading },
+    userSettings: { enable_teams },
   } = hooks.useGetUserSettings();
-  const hosts = getUniqueHosts(recordings);
 
   const isPersonal = currentWorkspaceId == null;
   const onSettingsClick = () => {
     setModal("workspace-settings");
   };
 
+  if (!enable_teams) {
+    return <nav className="left-sidebar"></nav>;
+  }
+
   return (
     <nav className="left-sidebar">
-      {enable_teams ? <WorkspaceDropdown /> : null}
-      {enable_teams && workspaces && !isPersonal ? (
+      {nonPendingWorkspaces && <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />}
+      {nonPendingWorkspaces && !isPersonal ? (
         <div className={classnames("left-sidebar-menu-item")} onClick={onSettingsClick}>
           <span className="material-icons">settings</span>
           <span>{`Settings & Members`}</span>
         </div>
       ) : null}
-      {enable_teams ? <Invitations /> : null}
+      {pendingWorkspaces?.length ? <Invitations {...{ pendingWorkspaces }} /> : null}
     </nav>
   );
 }
