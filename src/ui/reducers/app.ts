@@ -31,6 +31,7 @@ function initialAppState(): AppState {
     canvas: null,
     workspaceId: null,
     defaultSettingsTab: "Experimental",
+    recordingTarget: null,
   };
 }
 
@@ -153,6 +154,10 @@ export default function update(
       return { ...state, defaultSettingsTab: action.tabTitle };
     }
 
+    case "set_recording_target": {
+      return { ...state, recordingTarget: action.recordingTarget };
+    }
+
     default: {
       return state;
     }
@@ -196,3 +201,4 @@ export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerA
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
+export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;

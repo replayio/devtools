@@ -46,10 +46,7 @@ function NewCommentEditor({
       source_location,
       parent_id,
       recording_id: recordingId,
-      position: {
-        x: canvas!.width * 0.5,
-        y: canvas!.height * 0.5,
-      },
+      position: null,
     };
 
     addComment({ variables: { object: reply } });
@@ -72,8 +69,8 @@ function NewCommentEditor({
       recording_id: recordingId,
       parent_id: null,
       position: {
-        x: comment.position.x,
-        y: comment.position.y,
+        x: comment.position?.x,
+        y: comment.position?.y,
       },
     };
 

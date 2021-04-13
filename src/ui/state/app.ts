@@ -6,6 +6,7 @@ import {
   Location,
   MouseEvent,
 } from "@recordreplay/protocol";
+import { RecordingTarget } from "protocol/thread/thread";
 
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug" | "comments";
@@ -49,6 +50,7 @@ export interface AppState {
   canvas: Canvas | null;
   workspaceId: WorkspaceId | null;
   defaultSettingsTab: SettingsTabTitle;
+  recordingTarget: RecordingTarget | null;
 }
 
 export interface AnalysisPoints {

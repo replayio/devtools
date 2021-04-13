@@ -5,6 +5,8 @@ import "./CommentTool.css";
 
 import { actions } from "ui/actions";
 import { PendingEditComment, PendingNewComment } from "ui/state/comments";
+import { UIState } from "ui/state";
+import { selectors } from "ui/reducers";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
@@ -30,7 +32,16 @@ interface CommentToolProps extends PropsFromRedux {
       };
 }
 
-function CommentTool({ pendingComment, setPendingComment, setCommentPointer }: CommentToolProps) {
+function CommentTool({
+  pendingComment,
+  setPendingComment,
+  setCommentPointer,
+  recordingTarget,
+}: CommentToolProps) {
+  if (recordingTarget == "node") {
+    return null;
+  }
+
   const addListeners = () => {
     setCommentPointer(true);
     const videoNode = document.getElementById("video");
@@ -68,10 +79,15 @@ function CommentTool({ pendingComment, setPendingComment, setCommentPointer }: C
   return null;
 }
 
-const connector = connect(null, {
-  setPendingComment: actions.setPendingComment,
-  setCommentPointer: actions.setCommentPointer,
-});
+const connector = connect(
+  (state: UIState) => ({
+    recordingTarget: selectors.getRecordingTarget(state),
+  }),
+  {
+    setPendingComment: actions.setPendingComment,
+    setCommentPointer: actions.setCommentPointer,
+  }
+);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 export default connector(CommentTool);
