@@ -4,10 +4,8 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
-
 import classnames from "classnames";
 import WorkspaceDropdown from "./WorkspaceDropdown";
-import Invitations from "./Invitations";
 import "./DashboardNavigation.css";
 import { Workspace } from "ui/types";
 
@@ -19,13 +17,11 @@ type DashboardNavigationProps = PropsFromRedux & {
   recordings: Recording[];
   filter: string;
   nonPendingWorkspaces?: Workspace[];
-  pendingWorkspaces?: Workspace[];
   setFilter: Dispatch<SetStateAction<string>>;
 };
 
 function DashboardNavigation({
   currentWorkspaceId,
-  pendingWorkspaces,
   nonPendingWorkspaces,
   setModal,
 }: DashboardNavigationProps) {
@@ -51,7 +47,6 @@ function DashboardNavigation({
           <span>{`Settings & Members`}</span>
         </div>
       ) : null}
-      {pendingWorkspaces?.length ? <Invitations {...{ pendingWorkspaces }} /> : null}
     </nav>
   );
 }

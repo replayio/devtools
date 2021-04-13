@@ -1,6 +1,7 @@
 import React from "react";
 import classnames from "classnames";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
+import Invitations from "./Navigation/Invitations";
 import "./DashboardViewerHeader.css";
 import hooks from "ui/hooks";
 

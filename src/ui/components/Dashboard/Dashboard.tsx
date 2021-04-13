@@ -8,7 +8,6 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import "./Dashboard.css";
-import { getUserId } from "ui/utils/useToken";
 
 function OldDashboard() {
   const [filter, setFilter] = useState("");
@@ -31,15 +30,12 @@ function OldDashboard() {
 function PersonalDashboard() {
   const [filter, setFilter] = useState("");
   const { recordings, loading } = hooks.useGetPersonalRecordings();
-
-  // Preload this for the Invitations component.
   const {
     workspaces: nonPendingWorkspaces,
     loading: nonPendingLoading,
   } = hooks.useGetNonPendingWorkspaces();
-  const { pendingWorkspaces, loading: pendingLoading } = hooks.useGetPendingWorkspaces();
 
-  if (loading || pendingLoading || nonPendingLoading || recordings == null) {
+  if (loading || nonPendingLoading || recordings == null) {
     return <Loader />;
   }
 
@@ -52,7 +48,6 @@ function PersonalDashboard() {
         setFilter={setFilter}
         filter={filter}
         nonPendingWorkspaces={nonPendingWorkspaces}
-        pendingWorkspaces={pendingWorkspaces}
       />
       <DashboardViewer recordings={filteredRecordings} filter={filter} />
     </main>
@@ -62,15 +57,12 @@ function PersonalDashboard() {
 function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
   const [filter, setFilter] = useState("");
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
-
-  // Preload this for the Invitations component.
   const {
     workspaces: nonPendingWorkspaces,
     loading: nonPendingLoading,
   } = hooks.useGetNonPendingWorkspaces();
-  const { pendingWorkspaces, loading: pendingLoading } = hooks.useGetPendingWorkspaces();
 
-  if (loading || pendingLoading || nonPendingLoading || recordings == null) {
+  if (loading || nonPendingLoading || recordings == null) {
     return <Loader />;
   }
 
@@ -83,7 +75,6 @@ function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
         setFilter={setFilter}
         filter={filter}
         nonPendingWorkspaces={nonPendingWorkspaces}
-        pendingWorkspaces={pendingWorkspaces}
       />
       <DashboardViewer recordings={filteredRecordings} filter={filter} />
     </main>
