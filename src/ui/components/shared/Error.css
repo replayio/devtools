@@ -78,7 +78,7 @@
 }
 
 .transparent-error-content .img.refresh:hover {
-  background: #ffffdd;
+  opacity: 0.9;
   cursor: pointer;
 }
 
