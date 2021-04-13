@@ -1,7 +1,7 @@
 .dashboard-viewer-header {
   display: flex;
   align-items: center;
-  flex-direction: row;
+  flex-direction: row-reverse;
   justify-content: space-between;
   padding: 20px 40px;
   border-bottom: 1px solid var(--theme-splitter-color);
@@ -15,6 +15,7 @@
 .dashboard-viewer-header-actions {
   display: flex;
   flex-direction: row;
+  align-self: flex-end;
 }
 
 .dashboard-viewer-header-actions .dropdown-button {
