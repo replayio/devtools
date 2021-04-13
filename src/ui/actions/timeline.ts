@@ -187,7 +187,7 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
 }
 
 export function setPlaybackStalled(stalled: boolean): SetPlaybackStalledAction {
-  console.log("Stalled");
+  console.log(`Stalled: ${stalled}`);
   return { type: "set_playback_stalled", stalled };
 }
 
@@ -337,6 +337,8 @@ function playback(startTime: number, endTime: number): UIThunkAction {
 
       currentDate = Date.now();
       currentTime = startTime + (currentDate - startDate);
+      // Snap currentTime to 50ms intervals, snapping up.
+      currentTime += 50 - (currentTime % 50);
 
       if (currentTime > endTime) {
         log(`FinishPlayback`);
