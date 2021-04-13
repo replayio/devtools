@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactElement } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useToken from "ui/utils/useToken";
 import hooks from "../hooks";
@@ -13,7 +13,7 @@ import { isTest } from "ui/utils/environment";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
-import { UploadInfo } from "ui/state/app";
+import { ExpectedError, UploadInfo } from "ui/state/app";
 import { RecordingId } from "@recordreplay/protocol";
 
 type DevToolsProps = PropsFromRedux & {
@@ -88,36 +88,47 @@ function DevTools({
     }
   }, [recording]);
 
+  let loaderResult: ReactElement | undefined;
+  let expectedError: ExpectedError | undefined;
+
   if (queriesAreLoading || !recording) {
-    return <SkeletonLoader content={"Fetching the replay information."} />;
+    loaderResult = <SkeletonLoader content={"Fetching the replay information."} />;
   } else if (recordingDuration === null) {
-    return <SkeletonLoader content={"Fetching the replay description."} />;
+    loaderResult = <SkeletonLoader content={"Fetching the replay description."} />;
   } else if (uploading) {
     const message = getUploadingMessage(uploading);
-    return <SkeletonLoader content={message} />;
+    loaderResult = <SkeletonLoader content={message} />;
   }
 
-  if (deleted_at) {
-    setExpectedError({ message: "This replay has been deleted." });
-    return null;
-  }
-
-  // Test recordings don't have a user, so we skip this check in that case.
-  if (user && user.invited == false) {
-    setExpectedError({ message: "The author of this Replay has not activated their account yet." });
-    return null;
-  }
-
-  if (!isAuthorized) {
-    if (userId) {
-      setExpectedError({ message: "You don't have permission to view this replay." });
-    } else {
-      setExpectedError({
-        message: "You need to sign in to view this replay.",
-        action: "sign-in",
-      });
+  if (!loaderResult) {
+    if (deleted_at) {
+      expectedError = { message: "This replay has been deleted." };
     }
-    return null;
+
+    // Test recordings don't have a user, so we skip this check in that case.
+    if (user && user.invited == false) {
+      expectedError = { message: "The author of this Replay has not activated their account yet." };
+    }
+
+    if (!isAuthorized) {
+      if (userId) {
+        expectedError = { message: "You don't have permission to view this replay." };
+      } else {
+        expectedError = {
+          message: "You need to sign in to view this replay.",
+          action: "sign-in",
+        };
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (expectedError) {
+      setExpectedError(expectedError);
+    }
+  });
+  if (loaderResult || expectedError) {
+    return loaderResult || null;
   }
 
   if (!finishedLoading) {
