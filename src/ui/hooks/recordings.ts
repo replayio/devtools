@@ -450,10 +450,20 @@ export function useDeleteRecording(refetchQueries?: string[], onCompleted?: () =
 export function useInitializeRecording() {
   const [initializeRecording] = useMutation(
     gql`
-      mutation InitializeRecording($recordingId: uuid!, $title: String, $workspaceId: uuid) {
+      mutation InitializeRecording(
+        $recordingId: uuid!
+        $title: String
+        $workspaceId: uuid
+        $isPrivate: Boolean
+      ) {
         update_recordings_by_pk(
           pk_columns: { id: $recordingId }
-          _set: { is_initialized: true, recordingTitle: $title, workspace_id: $workspaceId }
+          _set: {
+            is_initialized: true
+            recordingTitle: $title
+            workspace_id: $workspaceId
+            is_private: $isPrivate
+          }
         ) {
           id
           is_initialized

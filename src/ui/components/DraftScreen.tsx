@@ -15,25 +15,20 @@ function WorkspaceDropdownList({
   setSelectedWorkspaceId,
 }: {
   workspaces: Workspace[];
-  selectedWorkspaceId: string | null;
-  setSelectedWorkspaceId: Dispatch<SetStateAction<string | null>>;
+  selectedWorkspaceId: string;
+  setSelectedWorkspaceId: Dispatch<SetStateAction<string>>;
 }) {
-  const personalWorkspace = workspaces.find(workspace => workspace.is_personal)!;
   const otherWorkspaces = workspaces.filter(workspace => !workspace.is_personal);
-  const displayedWorkspaces = [personalWorkspace, ...otherWorkspaces];
-
-  useEffect(() => {
-    if (personalWorkspace) {
-      setSelectedWorkspaceId(personalWorkspace.id);
-    }
-  }, [workspaces]);
+  const displayedWorkspaces = [{ id: "", key: "", name: "---" }, ...otherWorkspaces];
 
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = e.target.value;
     setSelectedWorkspaceId(selectedId);
   };
 
-  if (selectedWorkspaceId == null || displayedWorkspaces.length <= 1) {
+  // If there are no other workspaces apart from the personal "---" one,
+  // don't display the workspace dropdown.
+  if (displayedWorkspaces.length == 1) {
     return null;
   }
 
@@ -56,39 +51,46 @@ function WorkspaceDropdownList({
 function DraftScreen({ recordingId }: DraftScreenProps) {
   const {
     recording: { title },
+    loading: recordingLoading,
   } = hooks.useGetRecording(recordingId!);
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(title);
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null);
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>("");
   const textInputNode = useRef<HTMLInputElement>(null);
-  // const [isPublic, setIsPublic] = useState(true);
+  const [isPublic, setIsPublic] = useState(true);
 
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const { recording } = hooks.useGetRecording(recordingId!);
   const initializeRecording = hooks.useInitializeRecording();
   const deleteRecording = hooks.useDeleteRecording([], () => setStatus("deleted"));
 
   const isSaving = status == "saving";
-  // const isDeleting = status == "deleting";
+  const isDeleting = status == "deleting";
   const isDeleted = status == "deleted";
 
   useEffect(() => {
     if (textInputNode.current) {
       textInputNode.current.focus();
     }
+
+    setIsPublic(!recording.is_private);
   }, []);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const workspaceId = selectedWorkspaceId == "" ? null : selectedWorkspaceId;
+
     initializeRecording({
-      variables: { recordingId, title: inputValue, workspaceId: selectedWorkspaceId },
+      variables: { recordingId, title: inputValue, workspaceId, isPrivate: !isPublic },
     });
     setStatus("saving");
   };
-  // const onDiscard = (e: React.MouseEvent) => {
-  //   e.preventDefault();
-  //   deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } });
-  //   setStatus("deleting");
-  // };
+  const onDiscard = (e: React.MouseEvent) => {
+    e.preventDefault();
+    deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } });
+    setStatus("deleting");
+  };
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isSaving) {
       return;
@@ -97,61 +99,50 @@ function DraftScreen({ recordingId }: DraftScreenProps) {
     setInputValue(e.target.value);
   };
 
-  if (loading) {
+  if (loading || recordingLoading) {
     return null;
   }
 
   return (
-    <div className="initialization-screen">
-      <main>
-        <section className="content">
-          <div className="header">
-            <img className="logo" src="images/logo.svg" />
-            <h1>{isDeleted ? "Recording deleted" : "Recording complete"}</h1>
-          </div>
-          <form onSubmit={onSubmit} className={isDeleted ? "hidden" : ""}>
-            <div className="replay-title">
-              <label htmlFor="recordingTitle">
-                <h4>Replay Title</h4>
-              </label>
-              <input
-                id="recordingTitle"
-                type="text"
-                value={inputValue}
-                onChange={onChange}
-                ref={textInputNode}
-              />
-            </div>
-            {/* <div className="replay-privacy">
-              <input
-                id="replayPrivacy"
-                type="checkbox"
-                checked={isPublic}
-                onChange={() => setIsPublic(!isPublic)}
-              />
-              <label htmlFor="replayPrivacy">Publicly available</label>
-            </div> */}
-            <WorkspaceDropdownList
-              {...{ workspaces, selectedWorkspaceId, setSelectedWorkspaceId }}
-            />
-            <div className="actions">
-              <input
-                className="submit"
-                type="submit"
-                disabled={isSaving}
-                value={isSaving ? "Saving..." : `Save & Upload`}
-              />
-              {/* {!isSaving ? (
-                <button className="cancel" onClick={onDiscard}>
-                  {isDeleting ? "Discarding..." : "Or discard"}
-                </button>
-              ) : null} */}
-            </div>
-          </form>
-        </section>
-        <section className="filler" />
-      </main>
-    </div>
+    <section className="initialization-panel">
+      <form onSubmit={onSubmit} className={isDeleted ? "hidden" : ""}>
+        <div className="replay-title">
+          <label htmlFor="recordingTitle">
+            <h4>Replay Title</h4>
+          </label>
+          <input
+            id="recordingTitle"
+            type="text"
+            value={inputValue}
+            onChange={onChange}
+            ref={textInputNode}
+          />
+        </div>
+        <div className="replay-privacy">
+          <input
+            id="replayPrivacy"
+            type="checkbox"
+            checked={isPublic}
+            onChange={() => setIsPublic(!isPublic)}
+          />
+          <label htmlFor="replayPrivacy">Publicly available</label>
+        </div>
+        <WorkspaceDropdownList {...{ workspaces, selectedWorkspaceId, setSelectedWorkspaceId }} />
+        <div className="actions">
+          <input
+            className="submit"
+            type="submit"
+            disabled={isSaving}
+            value={isSaving ? "Continuing..." : `Continue`}
+          />
+          {!isSaving ? (
+            <button className="cancel" onClick={onDiscard}>
+              {isDeleting ? "Discarding..." : "Or discard"}
+            </button>
+          ) : null}
+        </div>
+      </form>
+    </section>
   );
 }
 

@@ -8,6 +8,9 @@ import Title from "ui/components/shared/Title";
 import ViewToggle from "ui/components/Header/ViewToggle";
 import UserOptions from "ui/components/Header/UserOptions";
 import { prefs } from "ui/utils/prefs";
+import hooks from "ui/hooks";
+import { getUserId } from "ui/utils/useToken";
+import { isTest } from "ui/utils/environment";
 
 import "./Header.css";
 
@@ -51,6 +54,9 @@ function Links({ recordingId, sessionId }) {
 }
 
 function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
+  const { recording, loading } = hooks.useGetRecording(recordingId);
+  const userId = getUserId();
+  const isAuthor = userId && userId == recording.user_id;
   const { data } = useQuery(GET_RECORDING_TITLE, {
     variables: { id: recordingId },
   });
@@ -59,7 +65,20 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
     return <div className="title">Recordings</div>;
   }
 
-  const { recordingTitle, title, date } = data.recordings?.[0] || {};
+  if (loading) {
+    return null;
+  }
+
+  if (isAuthor && !recording.is_initialized && !isTest()) {
+    return (
+      <div className="title-container">
+        <div className="title">New Recording</div>
+      </div>
+    );
+  }
+
+  const { recordingTitle, title } = data.recordings?.[0] || {};
+
   return (
     <div className="title-container">
       <Title

@@ -8,17 +8,13 @@ const SkeletonLoader = require("./SkeletonLoader").default;
 const NonDevView = require("./Views/NonDevView").default;
 const DevView = require("./Views/DevView").default;
 const { prefs } = require("ui/utils/prefs");
-import DraftScreen from "./DraftScreen";
+import { isTest } from "ui/utils/environment";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
 import { UploadInfo } from "ui/state/app";
 import { RecordingId } from "@recordreplay/protocol";
-
-function isTest() {
-  return new URL(window.location.href).searchParams.get("test");
-}
 
 type DevToolsProps = PropsFromRedux & {
   recordingId: RecordingId;
@@ -46,6 +42,7 @@ function DevTools({
   selectedPanel,
   sessionId,
   viewMode,
+  setViewMode,
 }: DevToolsProps) {
   const [finishedLoading, setFinishedLoading] = useState(false);
   const { claims } = useToken();
@@ -78,6 +75,16 @@ function DevTools({
   useEffect(() => {
     if (title) {
       document.title = `${title} - Replay`;
+    }
+  }, [recording]);
+
+  useEffect(() => {
+    const isAuthor = userId && userId == recording.user_id;
+
+    // Force switch to viewer mode if the recording is being initialized
+    // by the author.
+    if (isAuthor && !recording.is_initialized && !isTest()) {
+      setViewMode("non-dev");
     }
   }, [recording]);
 
@@ -144,6 +151,7 @@ const connector = connect(
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,
     setExpectedError: actions.setExpectedError,
+    setViewMode: actions.setViewMode,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
