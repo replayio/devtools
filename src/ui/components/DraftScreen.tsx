@@ -49,18 +49,14 @@ function WorkspaceDropdownList({
 }
 
 function DraftScreen({ recordingId }: DraftScreenProps) {
-  const {
-    recording: { title },
-    loading: recordingLoading,
-  } = hooks.useGetRecording(recordingId!);
+  const { recording, loading: recordingLoading } = hooks.useGetRecording(recordingId!);
   const [status, setStatus] = useState<Status>(null);
-  const [inputValue, setInputValue] = useState(title);
+  const [inputValue, setInputValue] = useState(recording?.title);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>("");
   const textInputNode = useRef<HTMLInputElement>(null);
   const [isPublic, setIsPublic] = useState(true);
 
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
-  const { recording } = hooks.useGetRecording(recordingId!);
   const initializeRecording = hooks.useInitializeRecording();
   const deleteRecording = hooks.useDeleteRecording([], () => setStatus("deleted"));
 
@@ -73,7 +69,7 @@ function DraftScreen({ recordingId }: DraftScreenProps) {
       textInputNode.current.focus();
     }
 
-    setIsPublic(!recording.is_private);
+    setIsPublic(!recording?.is_private);
   }, []);
 
   const onSubmit = (e: React.FormEvent) => {

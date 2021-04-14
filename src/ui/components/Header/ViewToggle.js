@@ -40,7 +40,7 @@ function Handle({ text, mode, localViewMode, handleToggle, motion }) {
 function ViewToggle({ viewMode, recordingId, setViewMode }) {
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const userId = getUserId();
-  const isAuthor = userId && userId == recording.user_id;
+  const isAuthor = userId && userId == recording?.user_id;
   const [framerMotion, setFramerMotion] = useState(null);
   const [localViewMode, setLocalViewMode] = useState(viewMode);
   const toggleTimeoutKey = useRef(null);
