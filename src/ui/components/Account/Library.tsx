@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Dashboard from "../Dashboard/index";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
@@ -18,6 +18,12 @@ function Header() {
 
 function Library({ setWorkspaceId }: PropsFromRedux) {
   const { userSettings, loading: settingsLoading } = hooks.useGetUserSettings();
+
+  useEffect(() => {
+    if (userSettings) {
+      setWorkspaceId(userSettings.default_workspace_id);
+    }
+  }, [userSettings]);
 
   if (settingsLoading || !userSettings) {
     return null;

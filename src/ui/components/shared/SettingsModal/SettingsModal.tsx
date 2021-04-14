@@ -15,11 +15,26 @@ import { actions } from "ui/actions";
 
 const settings: Settings = [
   {
+    title: "Personal",
+    icon: "person",
+    items: [
+      {
+        label: "Default workspace",
+        type: "dropdown",
+        key: "default_workspace_id",
+        description: "New replays will be saved here automatically",
+        disabled: false,
+        needsRefresh: false,
+      },
+    ],
+  },
+  {
     title: "Experimental",
     icon: "biotech",
     items: [
       {
         label: "Enable the Elements pane",
+        type: "checkbox",
         key: "show_elements",
         description: "Inspect HTML markup and CSS styling",
         disabled: false,
@@ -27,6 +42,7 @@ const settings: Settings = [
       },
       {
         label: "Enable React DevTools",
+        type: "checkbox",
         key: "show_react",
         description: "Inspect the React component tree",
         disabled: false,
@@ -34,6 +50,7 @@ const settings: Settings = [
       },
       {
         label: "Enable teams",
+        type: "checkbox",
         key: "enable_teams",
         description: "Add teams to your Replay library",
         disabled: false,

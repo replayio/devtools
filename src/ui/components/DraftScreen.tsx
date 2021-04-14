@@ -52,7 +52,10 @@ function DraftScreen({ recordingId }: DraftScreenProps) {
   const { recording, loading: recordingLoading } = hooks.useGetRecording(recordingId!);
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(recording?.title);
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>("");
+  const { userSettings } = hooks.useGetUserSettings();
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(
+    userSettings?.default_workspace_id
+  );
   const textInputNode = useRef<HTMLInputElement>(null);
   const [isPublic, setIsPublic] = useState(true);
 
