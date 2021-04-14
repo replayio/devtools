@@ -79,7 +79,7 @@ function DevTools({
   }, [recording]);
 
   useEffect(() => {
-    const isAuthor = userId && userId == recording.user_id;
+    const isAuthor = userId && userId == recording?.user_id;
 
     // Force switch to viewer mode if the recording is being initialized
     // by the author.
