@@ -95,7 +95,7 @@ export type PendingComment =
 
 export interface PendingNewComment extends PendingBlankComment {
   content: "";
-  position: CommentPosition;
+  position: CommentPosition | null;
 }
 
 export interface PendingNewReply extends PendingBlankComment {

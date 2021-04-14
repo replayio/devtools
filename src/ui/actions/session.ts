@@ -47,6 +47,8 @@ export async function createSession(store: UIStore, recordingId: string) {
 
     window.sessionId = sessionId;
     ThreadFront.setSessionId(sessionId);
+    const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
+    store.dispatch(actions.setRecordingTarget(recordingTarget));
     store.dispatch(actions.setUploading(null));
     prefs.recordingId = recordingId;
   } catch (e) {

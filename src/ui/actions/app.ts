@@ -21,6 +21,7 @@ import {
   WorkspaceId,
   SettingsTabTitle,
 } from "ui/state/app";
+import { RecordingTarget } from "protocol/thread/thread";
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -59,6 +60,9 @@ export type SetWorkspaceId = Action<"set_workspace_id"> & { workspaceId: Workspa
 export type SetDefaultSettingsTab = Action<"set_default_settings_tab"> & {
   tabTitle: SettingsTabTitle;
 };
+export type SetRecordingTargetAction = Action<"set_recording_target"> & {
+  recordingTarget: RecordingTarget;
+};
 
 export type AppActions =
   | SetupAppAction
@@ -80,7 +84,8 @@ export type AppActions =
   | SetIsNodePickerActive
   | SetCanvas
   | SetWorkspaceId
-  | SetDefaultSettingsTab;
+  | SetDefaultSettingsTab
+  | SetRecordingTargetAction;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -227,4 +232,8 @@ export function setWorkspaceId(workspaceId: WorkspaceId | null): SetWorkspaceId 
 
 export function setDefaultSettingsTab(tabTitle: SettingsTabTitle): SetDefaultSettingsTab {
   return { type: "set_default_settings_tab", tabTitle };
+}
+
+export function setRecordingTarget(recordingTarget: RecordingTarget): SetRecordingTargetAction {
+  return { type: "set_recording_target", recordingTarget };
 }

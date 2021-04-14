@@ -87,6 +87,7 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
     const { point, time } = item;
     const state = getState();
     const canvas = selectors.getCanvas(state);
+    const recordingTarget = selectors.getRecordingTarget(state);
 
     if ("has_frames" in item) {
       dispatch(actions.seek(point, time, item.has_frames));
@@ -125,6 +126,14 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
 
       dispatch(setPendingComment(pendingComment));
     } else {
+      const position =
+        recordingTarget == "node"
+          ? null
+          : {
+              x: canvas!.width * 0.5,
+              y: canvas!.height * 0.5,
+            };
+
       // Add a new comment to an event or a temporary pause item.
       const pendingComment: PendingComment = {
         type: "new_comment",
@@ -134,10 +143,7 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
           point,
           has_frames: "has_frames" in item && item.has_frames,
           source_location: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
-          position: {
-            x: canvas!.width * 0.5,
-            y: canvas!.height * 0.5,
-          },
+          position,
         },
       };
 
