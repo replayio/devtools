@@ -29,7 +29,7 @@ function NonEventTranscriptItem({
 }: NonEventTranscriptItemProps) {
   let icon = "location-marker";
   let label = "Point In Time";
-  let secondaryLabel = getFormattedTime(comment.time);
+  let secondaryLabel = getFormattedTime(comment.time) || "";
   let highlightSecondaryLabel = false;
 
   if (comment.source_location) {
