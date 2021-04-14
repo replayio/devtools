@@ -52,7 +52,7 @@ function TranscriptItem({
     if (highlightSecondaryLabel && secondaryLabelNode.current && CodeMirror) {
       CodeMirror.runMode(secondaryLabel, "javascript", secondaryLabelNode.current);
     }
-  });
+  }, [secondaryLabel]);
 
   const onClick = () => {
     if ("has_frames" in item) {
