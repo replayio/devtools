@@ -7,7 +7,7 @@ import { getViewMode } from "../../reducers/app";
 import { getUserId } from "ui/utils/useToken";
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
-import { isTest } from "ui/utils/test";
+import { isTest } from "ui/utils/environment";
 
 function Handle({ text, mode, localViewMode, handleToggle, motion }) {
   const isActive = mode == localViewMode;
@@ -38,7 +38,7 @@ function Handle({ text, mode, localViewMode, handleToggle, motion }) {
 }
 
 function ViewToggle({ viewMode, recordingId, setViewMode }) {
-  const { recording } = hooks.useGetRecording(recordingId);
+  const { recording, loading } = hooks.useGetRecording(recordingId);
   const userId = getUserId();
   const isAuthor = userId && userId == recording.user_id;
   const [framerMotion, setFramerMotion] = useState(null);
@@ -67,7 +67,9 @@ function ViewToggle({ viewMode, recordingId, setViewMode }) {
     }, 300);
   };
 
-  if (isAuthor && !recording.is_initialized && !isTest()) {
+  const shouldHide = isAuthor && !recording.is_initialized && !isTest();
+
+  if (loading | shouldHide) {
     return null;
   }
 

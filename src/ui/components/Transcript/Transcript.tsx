@@ -5,7 +5,7 @@ import { actions } from "ui/actions";
 import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
 import { getUserId } from "ui/utils/useToken";
-import { isTest } from "ui/utils/test";
+import { isTest } from "ui/utils/environment";
 
 import TranscriptFilter from "ui/components/Transcript/TranscriptFilter";
 import {
@@ -53,7 +53,7 @@ function Transcript({
   hideFloatingItem,
 }: PropsFromRedux) {
   const { comments } = hooks.useGetComments(recordingId!);
-  const { recording } = hooks.useGetRecording(recordingId!);
+  const { recording, loading } = hooks.useGetRecording(recordingId!);
   const userId = getUserId();
   const isAuthor = userId && userId == recording.user_id;
 
@@ -72,6 +72,10 @@ function Transcript({
     },
     [currentTime, comments]
   );
+
+  if (loading) {
+    return null;
+  }
 
   const displayedEntries: (Entry | FloatingItem)[] = [...entries];
 

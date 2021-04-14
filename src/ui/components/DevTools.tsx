@@ -8,7 +8,7 @@ const SkeletonLoader = require("./SkeletonLoader").default;
 const NonDevView = require("./Views/NonDevView").default;
 const DevView = require("./Views/DevView").default;
 const { prefs } = require("ui/utils/prefs");
-import { isTest } from "ui/utils/test";
+import { isTest } from "ui/utils/environment";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";

@@ -26,7 +26,9 @@ function WorkspaceDropdownList({
     setSelectedWorkspaceId(selectedId);
   };
 
-  if (displayedWorkspaces.length == 0) {
+  // If there are no other workspaces apart from the personal "---" one,
+  // don't display the workspace dropdown.
+  if (displayedWorkspaces.length == 1) {
     return null;
   }
 
@@ -49,6 +51,7 @@ function WorkspaceDropdownList({
 function DraftScreen({ recordingId }: DraftScreenProps) {
   const {
     recording: { title },
+    loading: recordingLoading,
   } = hooks.useGetRecording(recordingId!);
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(title);
@@ -96,7 +99,7 @@ function DraftScreen({ recordingId }: DraftScreenProps) {
     setInputValue(e.target.value);
   };
 
-  if (loading) {
+  if (loading || recordingLoading) {
     return null;
   }
 

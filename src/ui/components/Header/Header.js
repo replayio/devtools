@@ -10,7 +10,7 @@ import UserOptions from "ui/components/Header/UserOptions";
 import { prefs } from "ui/utils/prefs";
 import hooks from "ui/hooks";
 import { getUserId } from "ui/utils/useToken";
-import { isTest } from "ui/utils/test";
+import { isTest } from "ui/utils/environment";
 
 import "./Header.css";
 
@@ -54,7 +54,7 @@ function Links({ recordingId, sessionId }) {
 }
 
 function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
-  const { recording } = hooks.useGetRecording(recordingId);
+  const { recording, loading } = hooks.useGetRecording(recordingId);
   const userId = getUserId();
   const isAuthor = userId && userId == recording.user_id;
   const { data } = useQuery(GET_RECORDING_TITLE, {
@@ -63,6 +63,10 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
 
   if (!recordingId) {
     return <div className="title">Recordings</div>;
+  }
+
+  if (loading) {
+    return null;
   }
 
   if (isAuthor && !recording.is_initialized && !isTest()) {
