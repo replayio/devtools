@@ -5,7 +5,6 @@
   height: 100%;
 }
 
-
 .loader main {
   display: flex;
   flex-direction: row;
@@ -21,6 +20,7 @@
 .loader main .video {
   transition-duration: 100ms;
   flex-grow: 1;
+  background-image: url(/images/playbackBG.png);
 }
 
 .loader main .debugger {
@@ -43,12 +43,13 @@
   position: absolute;
   width: 80px;
   transform: translateX(-50%);
-  text-align: center;
+  text-align: left;
   padding: 8px 12px;
   bottom: 20px;
   border-radius: 8px;
   background: white;
-  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px,
+    rgba(15, 15, 15, 0.2) 0px 9px 24px;
 }
 
 .loader main .timeline .progress-line,
@@ -67,8 +68,8 @@
 /* Loading elements */
 
 .loader .loading-placeholder {
-  border-radius: 4px;
-  background: var(--theme-splitter-color);
+  border-radius: 8px;
+  background: #e5e7ea;
   overflow: hidden;
   position: relative;
 }
@@ -81,7 +82,7 @@
   width: 100px;
   left: -100px;
   content: "";
-  animation: skeleton-loading 1.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+  animation: skeleton-loading 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .loader header .header-left,
@@ -90,12 +91,17 @@
 }
 
 .loader header .message {
-  color: var(--primary-accent);
-  font-size: 1.25rem;
-  line-height: 18px;
+  max-width: 640px;
+  font-size: 20px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;  
+  white-space: nowrap;
+  cursor: pointer;
+  line-height: 22px;
+  margin-right: 0.5em;
+  margin-left: 8px;
+  font-weight: 600;
+  color: var(--grey-35);
 }
 
 .loader .header-left > *,
@@ -106,8 +112,13 @@
 .loader header .back,
 .loader header .share,
 .loader header .avatar {
-  width: 24px;
-  margin-left: 4px;
+  width: 36px;
+  height: 36px;
+}
+
+.loader header .avatar {
+  margin-right: 8px;
+  margin-left: 0;
 }
 
 .loader header .title {
@@ -121,15 +132,19 @@
 }
 
 .loader header .view {
-  width: 166px;
+  width: 300px;
+  height: 32px;
+  margin-right: 4px;
 }
 
 .loader main .comments .loading-placeholder {
   width: 100%;
-  height: 28px;
+  height: 32px;
   margin-bottom: 20px;
 }
 
 @keyframes skeleton-loading {
-  100% {left:100%;}
+  100% {
+    left: 100%;
+  }
 }
