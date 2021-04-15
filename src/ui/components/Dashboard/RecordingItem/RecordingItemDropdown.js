@@ -1,7 +1,6 @@
 import React from "react";
 import { actions } from "ui/actions";
 import { connect } from "react-redux";
-import { gql, useMutation } from "@apollo/client";
 import hooks from "ui/hooks";
 
 function Privacy({ isPrivate, toggleIsPrivate }) {

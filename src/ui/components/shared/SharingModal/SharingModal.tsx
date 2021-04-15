@@ -10,7 +10,8 @@ import { UIState } from "ui/state";
 import { RecordingId } from "@recordreplay/protocol";
 import PrivateSettings from "./PrivateSettings";
 
-function SharingModal({ recordingId }: PropsFromRedux) {
+function SharingModal({ modalOptions }: PropsFromRedux) {
+  const { recordingId } = modalOptions!;
   const { isPrivate, loading } = hooks.useGetIsPrivate(recordingId!);
   const updateIsPrivate = hooks.useUpdateIsPrivate(recordingId!, isPrivate);
 
@@ -30,7 +31,7 @@ function SharingModal({ recordingId }: PropsFromRedux) {
       <Modal>
         <section className="sharing-modal-content">
           <h1>Share</h1>
-          <ReplayLink />
+          <ReplayLink recordingId={recordingId} />
           <div className="privacy-choices">
             <div className={`privacy-choice ${!isPrivate ? "selected" : ""}`}>
               <input
@@ -74,12 +75,14 @@ function SharingModal({ recordingId }: PropsFromRedux) {
             </div>
           )}
         </section>
-        {isPrivate ? <PrivateSettings /> : <section className="filler" />}
+        {isPrivate ? <PrivateSettings recordingId={recordingId} /> : <section className="filler" />}
       </Modal>
     </div>
   );
 }
 
-const connector = connect((state: UIState) => ({ recordingId: selectors.getRecordingId(state) }));
+const connector = connect((state: UIState) => ({
+  modalOptions: selectors.getModalOptions(state),
+}));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(SharingModal);

@@ -1,15 +1,15 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
 import EmailForm from "./EmailForm";
 import CollaboratorsList from "./CollaboratorsList";
 import "./PrivateSettings.css";
+import { RecordingId } from "@recordreplay/protocol";
 
-type PrivateSettingsProps = PropsFromRedux & {};
+type PrivateSettingsProps = {
+  recordingId: RecordingId;
+};
 
-function PrivateSettings({ recordingId }: PrivateSettingsProps) {
+export default function PrivateSettings({ recordingId }: PrivateSettingsProps) {
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
 
   if (loading || !collaborators || !recording) {
@@ -24,7 +24,3 @@ function PrivateSettings({ recordingId }: PrivateSettingsProps) {
     </section>
   );
 }
-
-const connector = connect((state: UIState) => ({ recordingId: selectors.getRecordingId(state) }));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(PrivateSettings);

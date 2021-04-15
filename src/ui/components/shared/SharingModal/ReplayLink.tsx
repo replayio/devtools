@@ -1,10 +1,8 @@
-import React, { useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { UIState } from "ui/state";
-import { selectors } from "ui/reducers";
+import React from "react";
 import "./ReplayLink.css";
+import { RecordingId } from "@recordreplay/protocol";
 
-function ReplayLink({ recordingId }: PropsFromRedux) {
+export default function ReplayLink({ recordingId }: { recordingId: RecordingId }) {
   return (
     <div className="copy-link">
       <input
@@ -16,10 +14,3 @@ function ReplayLink({ recordingId }: PropsFromRedux) {
     </div>
   );
 }
-
-const connector = connect((state: UIState) => ({
-  recordingId: selectors.getRecordingId(state),
-}));
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(ReplayLink);
