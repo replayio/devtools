@@ -30,7 +30,7 @@ function initialAppState(): AppState {
     isNodePickerActive: false,
     canvas: null,
     workspaceId: null,
-    defaultSettingsTab: "Experimental",
+    defaultSettingsTab: "Personal",
     recordingTarget: null,
   };
 }
