@@ -24,6 +24,7 @@ export function useGetUserSettings() {
           show_elements
           show_react
           enable_teams
+          default_workspace_id
         }
       }
     `
@@ -67,10 +68,10 @@ export function useAddUserSettings() {
   return addUserSettings;
 }
 
-export function useUpdateUserSetting(key: SettingItemKey) {
+export function useUpdateUserSetting(key: SettingItemKey, type: "uuid" | "Boolean") {
   const [updateUserSetting, { error }] = useMutation(
     gql`
-      mutation UpdateCommentContent($newValue: Boolean, $userId: uuid!) {
+      mutation UpdateCommentContent($newValue: ${type}, $userId: uuid!) {
         update_user_settings(
           _set: { ${key}: $newValue },
           where: {user_id: {_eq: $userId}}

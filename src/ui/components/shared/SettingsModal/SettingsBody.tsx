@@ -1,15 +1,8 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { SettingItem, Setting, UserSettings } from "./types";
-import useToken from "ui/utils/useToken";
-import hooks from "ui/hooks";
+import React, { useState } from "react";
+import { Setting, UserSettings } from "./types";
 import ReplayInvitations from "./ReplayInvitations";
 import "./SettingsBody.css";
-
-interface SettingsBodyItemProps {
-  item: SettingItem;
-  userSettings: UserSettings;
-  setShowRefresh: Dispatch<SetStateAction<boolean>>;
-}
+import SettingsBodyItem from "./SettingsBodyItem";
 
 interface SettingsBodyProps {
   selectedSetting: Setting;
@@ -22,38 +15,6 @@ function RefreshPrompt() {
       <span>You need to refresh this page for the changes to take effect.</span>
       <button onClick={() => location.reload()}>Refresh</button>
     </div>
-  );
-}
-
-function SettingsBodyItem({ item, userSettings, setShowRefresh }: SettingsBodyItemProps) {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
-
-  const { label, key, description, needsRefresh } = item;
-  const value = userSettings[key];
-
-  const updateUserSetting = hooks.useUpdateUserSetting(key);
-  const toggleSetting = () => {
-    if (needsRefresh) {
-      setShowRefresh(true);
-    }
-
-    updateUserSetting({
-      variables: {
-        newValue: !value,
-        userId,
-      },
-    });
-  };
-
-  return (
-    <li>
-      <label className="setting-item" htmlFor={key}>
-        <div className="label">{label}</div>
-        {description && <div className="description">{description}</div>}
-      </label>
-      <input type="checkbox" id={key} checked={value} onChange={toggleSetting} />
-    </li>
   );
 }
 
@@ -83,6 +44,7 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
   const { title, items } = selectedSetting;
   const [showRefresh, setShowRefresh] = useState(false);
 
+  // Special screens that don't change anything in the settings table.
   if (title == "Support") {
     return (
       <main>
