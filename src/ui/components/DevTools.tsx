@@ -42,6 +42,7 @@ function DevTools({
   selectedPanel,
   sessionId,
   viewMode,
+  recordingTarget,
   setViewMode,
 }: DevToolsProps) {
   const [finishedLoading, setFinishedLoading] = useState(false);
@@ -133,7 +134,11 @@ function DevTools({
   return (
     <>
       <Header />
-      {!prefs.video && viewMode == "dev" ? <DevView /> : <NonDevView />}
+      {(!prefs.video && viewMode == "dev") || recordingTarget == "node" ? (
+        <DevView />
+      ) : (
+        <NonDevView />
+      )}
     </>
   );
 }
@@ -147,6 +152,7 @@ const connector = connect(
     selectedPanel: selectors.getSelectedPanel(state),
     viewMode: selectors.getViewMode(state),
     narrowMode: selectors.getNarrowMode(state),
+    recordingTarget: selectors.getRecordingTarget(state),
   }),
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,

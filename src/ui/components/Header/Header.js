@@ -43,11 +43,11 @@ function Avatars({ recordingId, sessionId }) {
   );
 }
 
-function Links({ recordingId, sessionId }) {
+function Links({ recordingId, sessionId, recordingTarget }) {
   return (
     <div className="links">
       <Avatars recordingId={recordingId} sessionId={sessionId} />
-      {!prefs.video && <ViewToggle />}
+      {!prefs.video && recordingTarget != "node" && <ViewToggle />}
       <UserOptions />
     </div>
   );
@@ -92,7 +92,7 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
   );
 }
 
-function Header({ recordingId, sessionId }) {
+function Header({ recordingId, sessionId, recordingTarget }) {
   const [editingTitle, setEditingTitle] = useState(false);
 
   return (
@@ -104,7 +104,7 @@ function Header({ recordingId, sessionId }) {
           editingTitle={editingTitle}
         />
       </div>
-      <Links recordingId={recordingId} sessionId={sessionId} />
+      <Links recordingId={recordingId} sessionId={sessionId} recordingTarget={recordingTarget} />
     </div>
   );
 }
@@ -112,4 +112,5 @@ function Header({ recordingId, sessionId }) {
 export default connect(state => ({
   recordingId: selectors.getRecordingId(state),
   sessionId: selectors.getSessionId(state),
+  recordingTarget: selectors.getRecordingTarget(state),
 }))(Header);
