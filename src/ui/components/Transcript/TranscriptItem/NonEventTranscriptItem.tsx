@@ -55,7 +55,7 @@ function NonEventTranscriptItem({
 const connector = connect(
   (state: UIState, { comment: { source_location } }: PropsFromParent) => ({
     snippet: source_location
-      ? getTextAtLocation(state, source_location.sourceId, source_location)
+      ? getTextAtLocation(state, source_location.sourceId, source_location) || ""
       : "",
     closestFunction: source_location
       ? findClosestFunction(getSymbols(state, { id: source_location?.sourceId }), source_location)
