@@ -8,7 +8,7 @@ import "./SkeletonLoader.css";
 function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode }) {
   const [displayedProgress, setDisplayedProgress] = useState(0);
   const key = useRef(null);
-  const backgroundColor = `hsl(0, 0%, ${35 - displayedProgress * 0.35}%)`;
+  const backgroundColor = `hsl(0, 0%, 98%)`;
 
   useEffect(() => {
     return () => clearTimeout(key.current);
@@ -39,7 +39,7 @@ function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode })
     <div className="loader">
       <Header content={content} progress={progress} />
       {viewMode == "non-dev" ? (
-        <NonDevMain backgroundColor={backgroundColor} displayedProgress={displayedProgress} />
+        <NonDevMain displayedProgress={displayedProgress} />
       ) : (
         <DevMain displayedProgress={displayedProgress} />
       )}
@@ -50,9 +50,7 @@ function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode })
 function Header({ progress, content }) {
   return (
     <header id="header">
-      <div className="header-left">
-        <div className="loading-placeholder back" />
-      </div>
+      <div className="header-left"></div>
       <div className="message">{progress == 100 ? "Ready" : content}</div>
       <div className="links">
         <div className="loading-placeholder view" />
@@ -65,13 +63,9 @@ function Header({ progress, content }) {
 function NonDevMain({ backgroundColor, displayedProgress }) {
   return (
     <main>
-      <div className="comments" style={{ width: prefs.nonDevSidePanelWidth }}>
-        <div className="loading-placeholder" />
-        <div className="loading-placeholder" />
-        <div className="loading-placeholder" />
-      </div>
+      <div className="comments" style={{ width: prefs.nonDevSidePanelWidth }}></div>
       <section>
-        <div className="video" style={{ background: backgroundColor }}></div>
+        <div className="video"></div>
         <div className="timeline">
           <div className="loading-container">
             <div className="progress-line full" />
