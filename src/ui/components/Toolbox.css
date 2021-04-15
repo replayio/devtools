@@ -1,6 +1,7 @@
 #toolbox {
   overflow: hidden;
   width: 100%;
+  height: 100%;
   font-family: sans-serif;
   display: flex;
   flex-direction: row;

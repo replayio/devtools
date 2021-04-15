@@ -13,7 +13,7 @@ import { updateTimelineDimensions } from "../../actions/timeline";
 import { prefs } from "../../utils/prefs";
 import { selectors } from "../../reducers";
 
-function DevView({ updateTimelineDimensions, narrowMode }) {
+function DevView({ updateTimelineDimensions, narrowMode, recordingTarget }) {
   const handleMove = num => {
     updateTimelineDimensions();
     prefs.toolboxHeight = `${num}px`;
@@ -50,6 +50,33 @@ function DevView({ updateTimelineDimensions, narrowMode }) {
     );
   }
 
+  if (recordingTarget == "node") {
+    return (
+      <div className="horizontal-panels">
+        <Toolbar />
+        <div style={{ flexDirection: "column", display: "flex", height: "100%", width: "100%" }}>
+          <div className="vertical-panels">
+            <SplitBox
+              style={{ width: "100%", overflow: "hidden" }}
+              splitterSize={1}
+              initialSize={prefs.toolboxHeight}
+              minSize="20%"
+              maxSize="80%"
+              vert={true}
+              onMove={handleMove}
+              startPanel={<Toolbox />}
+              endPanel={<SecondaryToolbox />}
+              endPanelControl={false}
+            />
+          </div>
+          <div id="timeline-container">
+            <Timeline />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="horizontal-panels">
       <Toolbar />
@@ -77,6 +104,7 @@ function DevView({ updateTimelineDimensions, narrowMode }) {
 export default connect(
   state => ({
     narrowMode: selectors.getNarrowMode(state),
+    recordingTarget: selectors.getRecordingTarget(state),
   }),
   {
     updateTimelineDimensions,

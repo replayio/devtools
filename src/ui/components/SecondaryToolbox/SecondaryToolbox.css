@@ -13,8 +13,11 @@
   flex-direction: row;
   justify-content: space-between;
   background: var(--theme-toolbar-background);
-  border-top: 1px solid var(--theme-splitter-color);
   border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.secondary-toolbox-header:not(.node) {
+  border-top: 1px solid var(--theme-splitter-color);
 }
 
 .secondary-toolbox-header .panel-buttons {
