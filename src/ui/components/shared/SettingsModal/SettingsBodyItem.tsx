@@ -81,7 +81,7 @@ function Dropdown({
     <select
       className="p-1 bg-gray-100 border border-gray-300 rounded"
       onChange={onChange}
-      value={value}
+      value={value == null ? "" : value}
     >
       {displayedWorkspaces.map(workspace => (
         <option value={workspace.id} key={workspace.id}>
