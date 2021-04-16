@@ -31,7 +31,6 @@ export interface Workspace {
   name: string;
   id: string;
   workspaces_users: WorkspaceUser[];
-  is_personal: boolean;
 }
 
 export interface WorkspaceUser {

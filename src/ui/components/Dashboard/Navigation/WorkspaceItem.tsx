@@ -1,41 +1,51 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, ReactElement, SetStateAction } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
+import { Menu } from "@headlessui/react";
+import { Workspace } from "ui/types";
+import { UserGroupIcon, UserIcon } from "@heroicons/react/solid";
+import classnames from "classnames";
+
+function classNames(...classes: any[]) {
+  return classes.filter(Boolean).join(" ");
+}
 
 type WorkspaceItemProps = PropsFromRedux & {
-  icon: JSX.Element;
-  subtitle: string;
-  title: string;
-  workspaceId: string | null;
-  setExpanded: Dispatch<SetStateAction<boolean>>;
+  workspace: Workspace | { id: null; name: string; workspaces_users: never[] };
 };
 
-function WorkspaceItem({
-  icon,
-  subtitle,
-  title,
-  workspaceId,
-  currentWorkspaceId,
-  setExpanded,
-  setWorkspaceId,
-}: WorkspaceItemProps) {
-  const isSelected = workspaceId == currentWorkspaceId;
+function WorkspaceItem({ workspace, currentWorkspaceId, setWorkspaceId }: WorkspaceItemProps) {
   const onClick = () => {
-    setExpanded(false);
-    setWorkspaceId(workspaceId);
+    setWorkspaceId(workspace.id);
   };
 
+  let icon: ReactElement;
+
+  if (workspace.id == null) {
+    icon = <UserIcon className="w-6 h-6" />;
+  } else {
+    icon = <UserGroupIcon className="w-6 h-6" />;
+  }
+
   return (
-    <div className="workspace-item" onClick={onClick}>
-      {icon}
-      <div className="workspace-profile-content">
-        <div className="title">{title}</div>
-        <div className="subtitle">{subtitle}</div>
-      </div>
-      {isSelected ? <div className="material-icons">check</div> : null}
-    </div>
+    <Menu.Item>
+      {({ active }) => (
+        <a
+          href="#"
+          className={classnames(
+            "flex flex-row px-4 py-2 text-md cursor-pointer space-x-3 items-center",
+            active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+            currentWorkspaceId == workspace.id ? "font-semibold" : ""
+          )}
+          onClick={onClick}
+        >
+          {icon}
+          <div>{workspace.name}</div>
+        </a>
+      )}
+    </Menu.Item>
   );
 }
 

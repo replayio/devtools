@@ -2,12 +2,13 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 import { selectors } from "ui/reducers";
-import "./WorkspaceDropdown.css";
 import { UIState } from "ui/state";
 import { Workspace } from "ui/types";
+import { ChevronDownIcon, LibraryIcon } from "@heroicons/react/solid";
+import { Menu } from "@headlessui/react";
 
 type WorkspaceDropdownButtonProps = PropsFromRedux & {
-  workspaces: Workspace[];
+  workspaces: (Workspace | { id: null; name: string; workspaces_users: never[] })[];
 };
 
 function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDropdownButtonProps) {
@@ -19,9 +20,11 @@ function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDr
     return null;
   }
 
+  console.log({ currentWorkspaceId, workspaces });
+
   if (currentWorkspaceId == null) {
     picture = <img src={user.picture} />;
-    title = "Personal";
+    title = "Your Library";
     subtitle = user.email;
   } else {
     const displayedWorkspace = workspaces.find(workspace => workspace.id == currentWorkspaceId);
@@ -32,14 +35,10 @@ function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDr
   }
 
   return (
-    <div className="workspace-dropdown-button">
-      {picture}
-      <div className="workspace-profile-content">
-        <div className="title">{title}</div>
-        <div className="subtitle">{subtitle}</div>
-      </div>
-      <div className="material-icons">unfold_more</div>
-    </div>
+    <Menu.Button className="inline-flex items-center justify-center w-full rounded-md px-4 py-2 bg-white text-lg font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500">
+      {title}
+      <ChevronDownIcon className="-mr-1 ml-2 h-6 w-6" aria-hidden="true" />
+    </Menu.Button>
   );
 }
 

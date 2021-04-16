@@ -62,7 +62,6 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
         ) {
           name
           id
-          is_personal
           workspaces_users {
             pending
           }

@@ -1,25 +1,33 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { Menu } from "@headlessui/react";
 import { actions } from "ui/actions";
+import { PlusIcon } from "@heroicons/react/solid";
+import classnames from "classnames";
 
-type NewWorkspaceButtonProps = PropsFromRedux & {
-  setExpanded: Dispatch<SetStateAction<boolean>>;
-};
+type NewWorkspaceButtonProps = PropsFromRedux & {};
 
-function NewWorkspaceButton({ setExpanded, setModal }: NewWorkspaceButtonProps) {
+function NewWorkspaceButton({ setModal }: NewWorkspaceButtonProps) {
   const onClick = () => {
-    setExpanded(false);
     setModal("new-workspace");
   };
 
   return (
-    <div className="create-new-workspace" onClick={onClick}>
-      <div className="material-icons">add_circle</div>
-      <div className="workspace-profile-content">
-        <div className="title">Create Workspace</div>
-        <div className="subtitle">Create a new workspace</div>
-      </div>
-    </div>
+    <Menu.Item>
+      {({ active }) => (
+        <a
+          href="#"
+          className={classnames(
+            "flex flex-row px-4 py-2 text-md cursor-pointer space-x-3 items-center",
+            active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+          )}
+          onClick={onClick}
+        >
+          <PlusIcon className="w-6 h-6" />
+          <div>Create a new team</div>
+        </a>
+      )}
+    </Menu.Item>
   );
 }
 const connector = connect(null, {

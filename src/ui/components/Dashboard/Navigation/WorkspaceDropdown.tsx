@@ -1,63 +1,54 @@
-import React, { useState } from "react";
-import Dropdown from "ui/components/shared/Dropdown";
-import "./WorkspaceDropdown.css";
+import React from "react";
 import NewWorkspaceButton from "./NewWorkspaceButton";
 import WorkspaceItem from "./WorkspaceItem";
 import WorkspaceDropdownButton from "./WorkspaceDropdownButton";
-import hooks from "ui/hooks";
-import useToken from "ui/utils/useToken";
-import useAuth0 from "ui/utils/useAuth0";
 import { Workspace } from "ui/types";
+import { Fragment } from "react";
+import { Menu, Transition } from "@headlessui/react";
 
 export default function WorkspaceDropdown({
   nonPendingWorkspaces,
 }: {
   nonPendingWorkspaces: Workspace[];
 }) {
-  const [expanded, setExpanded] = useState(false);
-  const workspaces = nonPendingWorkspaces;
-  const { user } = useAuth0();
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
-
-  const sharedWorkspaces = workspaces.filter(workspace => !workspace.is_personal);
+  const workspaces = [
+    { id: null, name: "Your Library", workspaces_users: [] },
+    ...nonPendingWorkspaces,
+  ];
 
   return (
-    <div className="workspace-dropdown-container">
-      <Dropdown
-        buttonContent={<WorkspaceDropdownButton {...{ workspaces: workspaces! }} />}
-        setExpanded={setExpanded}
-        expanded={expanded}
-        orientation="bottom"
-      >
-        <WorkspaceItem
-          icon={<img src={user.picture} />}
-          title={"Personal"}
-          subtitle={`Personal Workspace`}
-          setExpanded={setExpanded}
-          workspaceId={null}
-        />
-        {sharedWorkspaces.map(workspace => {
-          const count = workspace?.workspaces_users.filter(wu => !wu.pending).length;
-          const isPending = workspace?.workspaces_users.find(wu => wu.user_id == userId)?.pending;
-
-          if (isPending) {
-            return null;
-          }
-
-          return (
-            <WorkspaceItem
-              icon={<div className="material-icons">workspaces</div>}
-              title={workspace.name}
-              subtitle={`Workspace - ${count} member${count == 1 ? "" : "s"}`}
-              setExpanded={setExpanded}
-              workspaceId={workspace.id}
-              key={workspace.id}
-            />
-          );
-        })}
-        <NewWorkspaceButton setExpanded={setExpanded} />
-      </Dropdown>
-    </div>
+    <Menu as="div" className="relative inline-block text-left">
+      {({ open }) => (
+        <>
+          <div>
+            <WorkspaceDropdownButton workspaces={workspaces} />
+          </div>
+          <Transition
+            show={open}
+            as={Fragment}
+            enter="transition ease-out duration-100"
+            enterFrom="transform opacity-0 scale-95"
+            enterTo="transform opacity-100 scale-100"
+            leave="transition ease-in duration-75"
+            leaveFrom="transform opacity-100 scale-100"
+            leaveTo="transform opacity-0 scale-95"
+          >
+            <Menu.Items
+              static
+              className="origin-top-right absolute left-0 z-10 mt-2 w-72 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none select-none"
+            >
+              <div className="py-1">
+                {workspaces.map((workspace, i) => (
+                  <WorkspaceItem workspace={workspace} key={i} />
+                ))}
+              </div>
+              <div className="py-1">
+                <NewWorkspaceButton />
+              </div>
+            </Menu.Items>
+          </Transition>
+        </>
+      )}
+    </Menu>
   );
 }
