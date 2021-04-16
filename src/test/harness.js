@@ -34,7 +34,7 @@ async function waitUntil(fn) {
 
 function start() {
   app.actions.setViewMode("dev");
-  return waitUntil(() => document.querySelector(".view-toggle .active")?.innerText === "DevTools");
+  return waitUntil(() => app.selectors.getLoading() == 100 && app.selectors.getViewMode() == "dev");
 }
 
 function finish() {
