@@ -49,7 +49,7 @@ function TranscriptItem({
   );
 
   useEffect(() => {
-    if (highlightSecondaryLabel && secondaryLabelNode.current && CodeMirror) {
+    if (secondaryLabel && highlightSecondaryLabel && secondaryLabelNode.current && CodeMirror) {
       CodeMirror.runMode(secondaryLabel, "javascript", secondaryLabelNode.current);
     }
   }, [secondaryLabel]);
