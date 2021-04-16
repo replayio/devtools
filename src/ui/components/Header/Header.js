@@ -11,6 +11,7 @@ import { prefs } from "ui/utils/prefs";
 import hooks from "ui/hooks";
 import { getUserId } from "ui/utils/useToken";
 import { isTest } from "ui/utils/environment";
+import ShareButton from "./ShareButton";
 
 import "./Header.css";
 
@@ -44,8 +45,11 @@ function Avatars({ recordingId, sessionId }) {
 }
 
 function Links({ recordingId, sessionId, recordingTarget }) {
+  const showShare = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+
   return (
     <div className="links">
+      {showShare ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} sessionId={sessionId} />
       {!prefs.video && recordingTarget != "node" && <ViewToggle />}
       <UserOptions />
