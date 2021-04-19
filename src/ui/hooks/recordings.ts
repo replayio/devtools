@@ -48,7 +48,7 @@ export function useGetRecording(recordingId: RecordingId) {
   const recording = data?.recordings[0];
   // Tests don't have an associated user so we just let it bypass the check here.
   const isAuthorized = isTest() || recording;
-  const workspaceName: string | null = data?.workspace?.name;
+  const workspaceName: string | null = recording?.workspace?.name;
   return { recording, isAuthorized, loading, workspaceName };
 }
 
