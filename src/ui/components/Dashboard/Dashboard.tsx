@@ -43,12 +43,6 @@ function PersonalDashboard() {
 
   return (
     <main className="dashboard">
-      <DashboardNavigation
-        recordings={recordings}
-        setFilter={setFilter}
-        filter={filter}
-        nonPendingWorkspaces={nonPendingWorkspaces}
-      />
       <DashboardViewer recordings={filteredRecordings} filter={filter} />
     </main>
   );
@@ -70,12 +64,6 @@ function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
 
   return (
     <main className="dashboard">
-      <DashboardNavigation
-        recordings={recordings}
-        setFilter={setFilter}
-        filter={filter}
-        nonPendingWorkspaces={nonPendingWorkspaces}
-      />
       <DashboardViewer recordings={filteredRecordings} filter={filter} />
     </main>
   );

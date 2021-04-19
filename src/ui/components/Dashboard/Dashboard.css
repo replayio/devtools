@@ -3,7 +3,6 @@ main.dashboard {
   height: 100%;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 280px auto;
 }
 
 .dashboard-viewer {

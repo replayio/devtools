@@ -18,8 +18,7 @@ function WorkspaceDropdownList({
   selectedWorkspaceId: string;
   setSelectedWorkspaceId: Dispatch<SetStateAction<string>>;
 }) {
-  const otherWorkspaces = workspaces.filter(workspace => !workspace.is_personal);
-  const displayedWorkspaces = [{ id: "", key: "", name: "---" }, ...otherWorkspaces];
+  const displayedWorkspaces = [{ id: "", key: "", name: "---" }, ...workspaces];
 
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = e.target.value;
