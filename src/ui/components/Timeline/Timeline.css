@@ -21,7 +21,7 @@
   --replaying-marker-fill-hover: var(--blue-60);
   --hover-scrubber-line-background: var(--blue-50);
   --progress-recording-line: #d0021b;
-  --progressbar-background: var(--grey-30);
+  --progressbar-background: #eeeeee;
   --progressbar-line-color: var(--primary-accent);
   --proggressbar-border-color: var(--theme-splitter-color);
   --tick-future-background: #bfc9d2;
@@ -131,8 +131,12 @@
   background: var(--progressbar-background);
 }
 
-.timeline .progress-line.preview {
-  background: #bbbbc1;
+.timeline .progress-line.preview-min {
+  background: #c0c0c0;
+}
+
+.timeline .progress-line.preview-max {
+  background: #dadada;
 }
 
 .timeline .zoomboundary {

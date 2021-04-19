@@ -266,8 +266,12 @@ class Timeline extends Component<PropsFromRedux> {
           >
             <div className="progress-line full" />
             <div
-              className="progress-line preview"
-              style={{ width: `${clamp(precachedPercent, 0, 100)}%` }}
+              className="progress-line preview-max"
+              style={{ width: `${clamp(Math.max(hoverPercent, precachedPercent), 0, 100)}%` }}
+            />
+            <div
+              className="progress-line preview-min"
+              style={{ width: `${clamp(Math.min(hoverPercent, precachedPercent), 0, 100)}%` }}
             />
             <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
             {percent >= 0 && percent <= 100 ? (
