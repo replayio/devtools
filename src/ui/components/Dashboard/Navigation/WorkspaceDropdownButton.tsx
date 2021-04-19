@@ -20,8 +20,6 @@ function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDr
     return null;
   }
 
-  console.log({ currentWorkspaceId, workspaces });
-
   if (currentWorkspaceId == null) {
     picture = <img src={user.picture} />;
     title = "Your Library";
