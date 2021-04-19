@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import mixpanel from "mixpanel-browser";
 import * as Sentry from "@sentry/react";
 import { connect, ConnectedProps } from "react-redux";
@@ -20,12 +20,12 @@ import { hasLoadingParam } from "ui/utils/environment";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import LogRocket from "ui/utils/logrocket";
 import hooks from "ui/hooks";
-
-import "styles.css";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import useToken from "ui/utils/useToken";
+var FontFaceObserver = require("fontfaceobserver");
+import "styles.css";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -79,8 +79,18 @@ function setTelemetryContext(userId: string | undefined, userEmail: string | und
 function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   const auth = useAuth0();
   const { claims } = useToken();
+
   setTelemetryContext(claims?.hasura.userId, auth.user?.email);
   const { loading } = hooks.useMaybeClaimInvite();
+  const [fontLoading, setFontLoading] = useState(true);
+
+  useEffect(() => {
+    var font = new FontFaceObserver("Material Icons");
+
+    font.load().then(() => {
+      setFontLoading(false);
+    });
+  }, []);
 
   useEffect(() => {
     document.body.parentElement!.className = theme || "";
@@ -98,7 +108,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
     return <SkeletonLoader content={"Uploading resources"} />;
   }
 
-  if (loading) {
+  if (loading || fontLoading) {
     return <SkeletonLoader content={"Loading"} />;
   }
 
