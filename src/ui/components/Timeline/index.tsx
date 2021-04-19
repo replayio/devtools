@@ -123,6 +123,10 @@ class Timeline extends Component<PropsFromRedux> {
     }
   };
 
+  isHovering() {
+    return !!this.hoverInterval;
+  }
+
   renderCommands() {
     const {
       playback,
@@ -268,7 +272,7 @@ class Timeline extends Component<PropsFromRedux> {
               style={{ width: `${clamp(hoverPercent, 0, 100)}%` }}
             />
             <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
-            {percent >= 0 && percent <= 100 ? (
+            {this.isHovering() && percent >= 0 && percent <= 100 ? (
               <div className="progress-line-paused" style={{ left: `${percent}%` }} />
             ) : null}
             {viewMode == "dev" && selectedPanel == "console"
