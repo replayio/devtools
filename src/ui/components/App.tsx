@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import mixpanel from "mixpanel-browser";
+import * as Sentry from "@sentry/react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -11,7 +13,7 @@ import SharingModal from "./shared/SharingModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import SettingsModal from "./shared/SettingsModal/index";
-import { isDeployPreview } from "ui/utils/environment";
+import { isDeployPreview, skipTelemetry } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { hasLoadingParam } from "ui/utils/environment";
@@ -58,8 +60,14 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
   observer.observe(viewport!);
 }
 
+function setTelemetryContext(userEmail: string) {
+  mixpanel.register({ userEmail });
+  Sentry.setContext("user", { userEmail });
+}
+
 function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   const auth = useAuth0();
+  setTelemetryContext(auth.user?.email);
   const { loading } = hooks.useMaybeClaimInvite();
 
   useEffect(() => {

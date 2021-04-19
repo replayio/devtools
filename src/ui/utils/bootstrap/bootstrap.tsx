@@ -6,6 +6,8 @@ import { BrowserRouter as Router } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/apm";
 
+import mixpanel from "mixpanel-browser";
+
 import App, { AppProps } from "ui/components/App";
 const { PopupBlockedError } = require("ui/components/shared/Error");
 import tokenManager from "ui/utils/tokenManager";
@@ -17,10 +19,12 @@ const SkeletonLoader = require("ui/components/SkeletonLoader").default;
 import { skipTelemetry } from "../environment";
 import { UIStore } from "ui/actions";
 
-export function setupSentry(context: Record<string, any>) {
+export function setupTelemetry(context: Record<string, any>) {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
+  mixpanel.init("ffaeda9ef8fb976a520ca3a65bba5014");
 
   if (skipTelemetry()) {
+    mixpanel.disable();
     return;
   }
 
@@ -39,6 +43,8 @@ export function setupSentry(context: Record<string, any>) {
       return event;
     },
   });
+
+  mixpanel.register({ recordingId: context.recordingId });
 
   Sentry.setContext("recording", { ...context, url: window.location.href });
 }
@@ -70,7 +76,7 @@ function ApolloWrapper({
 }
 
 export function bootstrapApp(props: AppProps, context: Record<string, any>, store: UIStore) {
-  setupSentry(context);
+  setupTelemetry(context);
 
   ReactDOM.render(
     <Router>
