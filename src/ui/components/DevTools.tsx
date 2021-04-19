@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ReactElement } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import mixpanel from "mixpanel-browser";
 import useToken from "ui/utils/useToken";
 import hooks from "../hooks";
 
@@ -50,9 +51,13 @@ function DevTools({
   const userId = claims?.hasura.userId;
 
   const AddSessionUser = hooks.useAddSessionUser();
-  const { recording, isAuthorized, loading: recordingQueryLoading } = hooks.useGetRecording(
-    recordingId
-  );
+  const {
+    recording,
+    isAuthorized,
+    loading: recordingQueryLoading,
+    workspaceName,
+  } = hooks.useGetRecording(recordingId);
+  mixpanel.register({ workspaceName });
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
   const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
   const { title, deleted_at, user } = recording || {};

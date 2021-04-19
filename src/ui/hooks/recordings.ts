@@ -30,6 +30,9 @@ export function useGetRecording(recordingId: RecordingId) {
           user {
             invited
           }
+          workspace {
+            name
+          }
         }
       }
     `,
@@ -45,7 +48,8 @@ export function useGetRecording(recordingId: RecordingId) {
   const recording = data?.recordings[0];
   // Tests don't have an associated user so we just let it bypass the check here.
   const isAuthorized = isTest() || recording;
-  return { recording, isAuthorized, loading };
+  const workspaceName: string | null = data?.workspace?.name;
+  return { recording, isAuthorized, loading, workspaceName };
 }
 
 export function useGetRecordingPhoto(
