@@ -152,6 +152,28 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
   };
 }
 
+export function createComment(
+  time: number,
+  point: string,
+  position: { x: number; y: number }
+): UIThunkAction {
+  return async ({ dispatch, getState }) => {
+    const pendingComment: PendingComment = {
+      type: "new_comment",
+      comment: {
+        content: "",
+        time,
+        point,
+        has_frames: ThreadFront.currentPointHasFrames,
+        source_location: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
+        position,
+      },
+    };
+
+    dispatch(setPendingComment(pendingComment));
+  };
+}
+
 export function editItem(item: Comment | Reply): UIThunkAction {
   return async ({ dispatch }) => {
     const { point, time, has_frames } = item;

@@ -4,8 +4,25 @@ import { actions } from "ui/actions";
 import { installObserver } from "../../protocol/graphics";
 import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
+import CommentTool from "ui/components/shared/CommentTool";
+import hooks from "ui/hooks";
+import { useAuth0 } from "@auth0/auth0-react";
 
-function Video({ togglePlayback, isNodePickerActive, commentPointer, pendingComment }) {
+function CommentLoader({ recordingId }) {
+  const { comments, loading } = hooks.useGetComments(recordingId);
+
+  if (loading) {
+    return null;
+  }
+
+  return <CommentTool comments={comments} />;
+}
+
+function Video({ recordingId, playback, isNodePickerActive, pendingComment, recordingTarget }) {
+  const { isAuthenticated } = useAuth0();
+  const isPaused = !playback;
+  const isNodeTarget = recordingTarget == "node";
+
   useEffect(() => {
     installObserver();
   }, []);
@@ -13,21 +30,20 @@ function Video({ togglePlayback, isNodePickerActive, commentPointer, pendingComm
   // This is intentionally mousedown. Otherwise, the NodePicker's mouseup callback fires
   // first. This updates the isNodePickerActive value and makes it look like the node picker is
   // inactive when we check it here.
-
-  // We make it so that you can't resume playback by clicking on the video if you have an
-  // open comment editor.
   const onMouseDown = () => {
-    if (isNodePickerActive || commentPointer || pendingComment) {
+    if (isNodePickerActive || pendingComment) {
       return;
     }
-
-    togglePlayback();
   };
 
   return (
     <div id="video">
       <canvas id="graphics" onMouseDown={onMouseDown} />
-      <CommentsOverlay />
+      <CommentsOverlay>
+        {isPaused && !isNodeTarget && isAuthenticated ? (
+          <CommentLoader recordingId={recordingId} />
+        ) : null}
+      </CommentsOverlay>
       <div id="highlighter-root"></div>
     </div>
   );
@@ -37,7 +53,9 @@ export default connect(
   state => ({
     pendingComment: selectors.getPendingComment(state),
     isNodePickerActive: selectors.getIsNodePickerActive(state),
-    commentPointer: selectors.getCommentPointer(state),
+    playback: selectors.getPlayback(state),
+    recordingTarget: selectors.getRecordingTarget(state),
+    recordingId: selectors.getRecordingId(state),
   }),
   {
     togglePlayback: actions.togglePlayback,

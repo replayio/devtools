@@ -1,12 +1,12 @@
 import { connect, ConnectedProps } from "react-redux";
-import { useEffect } from "react";
-
-import "./CommentTool.css";
-
+import React, { useState, useEffect } from "react";
 import { actions } from "ui/actions";
-import { PendingEditComment, PendingNewComment } from "ui/state/comments";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
+const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
+import "./CommentTool.css";
+import { Comment, Reply } from "ui/state/comments";
+import { ChatIcon } from "@heroicons/react/solid";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
@@ -20,72 +20,128 @@ const mouseEventCanvasPosition = (e: MouseEvent) => {
   };
 };
 
-interface CommentToolProps extends PropsFromRedux {
-  pendingComment:
-    | {
-        type: "new_comment";
-        comment: PendingNewComment;
-      }
-    | {
-        type: "edit_comment";
-        comment: PendingEditComment;
-      };
-}
+type CommentToolProps = PropsFromRedux & {
+  comments: (Comment | Reply)[];
+};
+
+type Coordinates = {
+  x: number;
+  y: number;
+};
 
 function CommentTool({
   pendingComment,
+  currentTime,
+  executionPoint,
+  comments,
+  canvas,
   setPendingComment,
   setCommentPointer,
-  recordingTarget,
+  createComment,
 }: CommentToolProps) {
-  if (recordingTarget == "node") {
-    return null;
-  }
+  const [showHelper, setShowHelper] = useState(false);
+  const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
+  const isInvalidNewComment = comments.find(
+    comment => comment.point == executionPoint && comment.time == currentTime
+  );
 
   const addListeners = () => {
     setCommentPointer(true);
-    const videoNode = document.getElementById("video");
+    const videoNode = document.getElementById("graphics");
 
     if (videoNode) {
       videoNode.classList.add("location-marker");
       videoNode.addEventListener("mouseup", onClickInCanvas);
+      videoNode.addEventListener("mouseenter", onMouseEnter);
+      videoNode.addEventListener("mousemove", onMouseMove);
+      videoNode.addEventListener("mouseleave", onMouseLeave);
     }
   };
   const removeListeners = () => {
     setCommentPointer(false);
-    const videoNode = document.getElementById("video");
+    const videoNode = document.getElementById("graphics");
 
     if (videoNode) {
       videoNode.classList.remove("location-marker");
       videoNode.removeEventListener("mouseup", onClickInCanvas);
+      videoNode.removeEventListener("mouseenter", onMouseEnter);
+      videoNode.removeEventListener("mousemove", onMouseMove);
+      videoNode.removeEventListener("mouseleave", onMouseLeave);
     }
   };
   const onClickInCanvas = async (e: MouseEvent) => {
-    if (e.target !== document.querySelector("canvas#graphics") || !pendingComment) {
+    if (e.target !== document.querySelector("canvas#graphics")) {
       return;
     }
 
-    const newComment = { ...pendingComment };
-    newComment.comment.position = mouseEventCanvasPosition(e);
+    // If there's no pending comment at that point and time, create one
+    // with the mouse click as its position.
+    if (!pendingComment) {
+      const isInvalidNewComment = comments.find(
+        comment => comment.point == executionPoint && comment.time == currentTime
+      );
 
-    setPendingComment(newComment);
+      if (isInvalidNewComment) {
+        return;
+      }
+
+      createComment(currentTime, executionPoint, mouseEventCanvasPosition(e));
+      return;
+    }
+
+    // If there's a pending comment (not a reply), change its position.
+    if (pendingComment.type == "new_comment" || pendingComment.type == "edit_comment") {
+      const newComment = { ...pendingComment };
+      newComment.comment.position = mouseEventCanvasPosition(e);
+
+      setPendingComment(newComment);
+    }
+  };
+  const onMouseEnter = () => {
+    setShowHelper(true);
+  };
+  const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
+  const onMouseLeave = () => {
+    setShowHelper(false);
+    setMousePosition(null);
   };
 
+  // Re-register the listener on every update to prevent the props used by
+  // the handler functions from being stale.
   useEffect(() => {
     addListeners();
     return () => removeListeners();
-  }, []);
+  }, [currentTime, executionPoint, pendingComment, comments]);
 
-  return null;
+  if (!showHelper || !mousePosition || pendingComment || isInvalidNewComment) {
+    return null;
+  }
+
+  const { x, y } = mousePosition;
+
+  return (
+    <div
+      className="p-2 absolute bg-blue-500 text-white ml-2 mt-2 rounded-md w-max space-x-2 flex items-center"
+      style={{ top: y * canvas!.scale, left: x * canvas!.scale }}
+    >
+      <ChatIcon className="h-6 w-6" aria-hidden="true" />
+      <span>Add Comment</span>
+    </div>
+  );
 }
 
 const connector = connect(
   (state: UIState) => ({
     recordingTarget: selectors.getRecordingTarget(state),
+    pendingComment: selectors.getPendingComment(state),
+    executionPoint: getExecutionPoint(state),
+    currentTime: selectors.getCurrentTime(state),
+    canvas: selectors.getCanvas(state),
   }),
   {
     setPendingComment: actions.setPendingComment,
     setCommentPointer: actions.setCommentPointer,
+    createComment: actions.createComment,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

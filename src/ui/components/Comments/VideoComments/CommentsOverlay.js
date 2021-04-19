@@ -34,6 +34,7 @@ function CommentsOverlay({
   hoveredComment,
   currentTime,
   setHoveredComment,
+  children,
 }) {
   const { comments: hasuraComments } = hooks.useGetComments(recordingId);
 
@@ -56,6 +57,7 @@ function CommentsOverlay({
     >
       <div className="canvas-comments">
         <VideoComment comment={comment} scale={scale} setHoveredComment={setHoveredComment} />
+        {children}
       </div>
     </div>
   );
