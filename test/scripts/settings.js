@@ -1,5 +1,5 @@
 Test.describe(`Test changing the user's settings.`, async () => {
-  const menuBtn = document.querySelector(".expand-dropdown");
+  const menuBtn = await Test.waitUntil(() => document.querySelector(".expand-dropdown"));
   menuBtn.click();
 
   const settingsBtn = await Test.waitUntil(() => {
@@ -10,8 +10,18 @@ Test.describe(`Test changing the user's settings.`, async () => {
   });
   settingsBtn.click();
 
-  const elementsCheckbox = await Test.waitUntil(() => document.getElementById("show_elements"));
+  const sections = await Test.waitUntil(() => {
+    const spans = document.querySelectorAll(".settings-modal nav ul li span");
+    if (spans.length > 0) {
+      return spans;
+    }
+  });
+  const experimentalSection = [...sections].find(s => s.textContent === "Experimental");
+  experimentalSection.click();
+
+  let elementsCheckbox = await Test.waitUntil(() => document.getElementById("show_elements"));
   const initialState = elementsCheckbox.checked;
+  await new Promise(resolve => setTimeout(resolve, 0)); // otherwise the following click gets lost, but why?
   elementsCheckbox.click();
   await Test.waitUntil(() => elementsCheckbox.checked === !initialState);
   elementsCheckbox.click();
