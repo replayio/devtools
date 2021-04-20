@@ -26,7 +26,7 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
   }
 
   const handleDelete = () => {
-    deleteComment({ variables: { commentId: comment.id } });
+    deleteComment({ variables: { id: comment.id } });
 
     if (isRoot) {
       deleteCommentReplies({ variables: { parentId: comment.id } });
