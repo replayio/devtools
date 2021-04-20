@@ -36,7 +36,6 @@ function CommentTool({
   comments,
   canvas,
   setPendingComment,
-  setCommentPointer,
   createComment,
 }: CommentToolProps) {
   const [showHelper, setShowHelper] = useState(false);
@@ -46,7 +45,6 @@ function CommentTool({
   );
 
   const addListeners = () => {
-    setCommentPointer(true);
     const videoNode = document.getElementById("graphics");
 
     if (videoNode) {
@@ -58,7 +56,6 @@ function CommentTool({
     }
   };
   const removeListeners = () => {
-    setCommentPointer(false);
     const videoNode = document.getElementById("graphics");
 
     if (videoNode) {
@@ -140,7 +137,6 @@ const connector = connect(
   }),
   {
     setPendingComment: actions.setPendingComment,
-    setCommentPointer: actions.setCommentPointer,
     createComment: actions.createComment,
   }
 );

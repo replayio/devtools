@@ -7,7 +7,6 @@ import { ThreadFront } from "protocol/thread";
 import isEqual from "lodash/isEqual";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
-type SetCommentPointer = Action<"set_comment_pointer"> & { value: boolean };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 type SetShouldShowLoneEvents = Action<"set_should_show_lone_events"> & { value: boolean };
 type SetFloatingItem = Action<"set_floating_item"> & {
@@ -16,17 +15,12 @@ type SetFloatingItem = Action<"set_floating_item"> & {
 
 export type CommentsAction =
   | SetPendingComment
-  | SetCommentPointer
   | SetHoveredComment
   | SetShouldShowLoneEvents
   | SetFloatingItem;
 
 export function setPendingComment(comment: PendingComment): SetPendingComment {
   return { type: "set_pending_comment", comment };
-}
-
-export function setCommentPointer(value: boolean): SetCommentPointer {
-  return { type: "set_comment_pointer", value };
 }
 
 export function setHoveredComment(comment: any): SetHoveredComment {

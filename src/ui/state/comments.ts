@@ -2,7 +2,6 @@ import { RecordingId, MouseEvent } from "@recordreplay/protocol";
 
 export interface CommentsState {
   pendingComment: PendingComment | null;
-  commentPointer: boolean;
   hoveredComment: any;
   shouldShowLoneEvents: boolean;
   floatingItem: FloatingItem | null;
