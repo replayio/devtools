@@ -139,9 +139,6 @@ button.jump-definition {
 #header .logo {
   background-image: url(./images/logo.svg);
 }
-.computer-work {
-  background-image: url(./images/computer-work.svg);
-}
 .comment-close {
   background-image: url(~devtools/client/themes/images/close.svg);
 }
