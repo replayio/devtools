@@ -45,15 +45,24 @@ function Role({
   const { user_id: userId } = member;
 
   const handleDelete = () => {
-    deleteUserFromWorkspace({
-      variables: { userId, workspaceId },
-    });
+    setExpanded(false);
 
-    // If the user is the member leaving, hide the modal and go back
-    // to the pesronal workspace.
-    if (localUserId == userId) {
-      hideModal();
-      setWorkspaceId(null);
+    const leaveMsg = `Are you sure you want to leave this team?`;
+    const kickMsg = `Are you sure you want to remove ${member.user.name} from this team?`;
+    const isPersonal = localUserId == userId;
+    const message = isPersonal ? leaveMsg : kickMsg;
+
+    if (window.confirm(message)) {
+      deleteUserFromWorkspace({
+        variables: { userId, workspaceId },
+      });
+
+      // If the user is the member leaving, hide the modal and go back
+      // to the personal workspace.
+      if (isPersonal) {
+        hideModal();
+        setWorkspaceId(null);
+      }
     }
   };
 

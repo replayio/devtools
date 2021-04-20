@@ -36,10 +36,17 @@ function BatchActionDropdown({ selectedIds, setSelectedIds }) {
   }
 
   const deleteSelectedIds = () => {
-    selectedIds.forEach(recordingId =>
-      deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } })
-    );
-    setSelectedIds([]);
+    const count = selectedIds.length;
+    const message = `This action will permanently delete ${count == 1 ? "this" : count} replay${
+      count == 1 ? "" : "s"
+    }. \n\nAre you sure you want to proceed?`;
+
+    if (window.confirm(message)) {
+      selectedIds.forEach(recordingId =>
+        deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } })
+      );
+      setSelectedIds([]);
+    }
   };
   const updateRecordings = workspaceId => {
     selectedIds.forEach(recordingId =>
