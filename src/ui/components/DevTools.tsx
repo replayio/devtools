@@ -51,13 +51,12 @@ function DevTools({
   const userId = claims?.hasura.userId;
 
   const AddSessionUser = hooks.useAddSessionUser();
-  const {
-    recording,
-    isAuthorized,
-    loading: recordingQueryLoading,
-    workspaceName,
-  } = hooks.useGetRecording(recordingId);
-  mixpanel.register({ workspaceName });
+  const { recording, isAuthorized, loading: recordingQueryLoading } = hooks.useGetRecording(
+    recordingId
+  );
+  if (recording?.workspace) {
+    mixpanel.register({ workspaceName: recording.workspace.name });
+  }
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
   const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
   const { title, deleted_at, user } = recording || {};
