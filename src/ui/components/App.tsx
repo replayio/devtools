@@ -25,6 +25,7 @@ import "styles.css";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
+import useToken from "ui/utils/useToken";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -60,14 +61,25 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
   observer.observe(viewport!);
 }
 
-function setTelemetryContext(userEmail: string) {
-  mixpanel.register({ userEmail });
-  Sentry.setContext("user", { userEmail });
+function setTelemetryContext(userId: string | undefined, userEmail: string | undefined) {
+  let sentryContext: Record<string, string> = {};
+  if (userId) {
+    mixpanel.identify(userId);
+    sentryContext["userId"] = userId;
+  }
+
+  if (userEmail) {
+    mixpanel.register({ userEmail });
+    sentryContext["userEmail"] = userEmail;
+  }
+
+  Sentry.setContext("user", sentryContext);
 }
 
 function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   const auth = useAuth0();
-  setTelemetryContext(auth.user?.email);
+  const { claims } = useToken();
+  setTelemetryContext(claims?.hasura.userId, auth.user?.email);
   const { loading } = hooks.useMaybeClaimInvite();
 
   useEffect(() => {
