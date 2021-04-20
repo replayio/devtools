@@ -18,26 +18,6 @@ const UPDATE_COMMENT_CONTENT = gql`
   }
 `;
 
-const DELETE_COMMENT = gql`
-  mutation DeleteComment($commentId: uuid) {
-    delete_comments(where: { id: { _eq: $commentId } }) {
-      returning {
-        id
-      }
-    }
-  }
-`;
-
-const DELETE_COMMENT_REPLIES = gql`
-  mutation DeleteCommentReplies($parentId: uuid) {
-    delete_comments(where: { parent_id: { _eq: $parentId } }) {
-      returning {
-        id
-      }
-    }
-  }
-`;
-
 const NO_COMMENTS: Comment[] = [];
 
 export function useGetComments(
@@ -125,9 +105,18 @@ export function useUpdateComment(callback: Function) {
 }
 
 export function useDeleteComment() {
-  const [deleteComment, { error }] = useMutation(DELETE_COMMENT, {
-    refetchQueries: ["GetComments"],
-  });
+  const [deleteComment, { error }] = useMutation(
+    gql`
+      mutation DeleteComment($id: uuid!) {
+        update_comments_by_pk(pk_columns: { id: $id }, _set: { deleted_at: "now()" }) {
+          id
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetComments"],
+    }
+  );
 
   if (error) {
     console.error("Apollo error while deleting a comment:", error);
@@ -137,9 +126,18 @@ export function useDeleteComment() {
 }
 
 export function useDeleteCommentReplies() {
-  const [deleteCommentReplies, { error }] = useMutation(DELETE_COMMENT_REPLIES, {
-    refetchQueries: ["GetComments"],
-  });
+  const [deleteCommentReplies, { error }] = useMutation(
+    gql`
+      mutation DeleteCommentReplies($parentId: uuid) {
+        update_comments(where: { parent_id: { _eq: $parentId } }, _set: { deleted_at: "now()" }) {
+          affected_rows
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetComments"],
+    }
+  );
 
   if (error) {
     console.error("Apollo error while deleting a comment's replies:", error);
