@@ -7,10 +7,7 @@ import { Menu } from "@headlessui/react";
 import { Workspace } from "ui/types";
 import { UserGroupIcon, UserIcon } from "@heroicons/react/solid";
 import classnames from "classnames";
-
-function classNames(...classes: any[]) {
-  return classes.filter(Boolean).join(" ");
-}
+const { prefs } = require("ui/utils/prefs");
 
 type WorkspaceItemProps = PropsFromRedux & {
   workspace: Workspace | { id: null; name: string; workspaces_users: never[] };
@@ -19,6 +16,7 @@ type WorkspaceItemProps = PropsFromRedux & {
 function WorkspaceItem({ workspace, currentWorkspaceId, setWorkspaceId }: WorkspaceItemProps) {
   const onClick = () => {
     setWorkspaceId(workspace.id);
+    prefs.defaultLibraryTeam = JSON.stringify(workspace.id);
   };
 
   let icon: ReactElement;

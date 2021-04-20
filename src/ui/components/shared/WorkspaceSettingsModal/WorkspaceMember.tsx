@@ -8,6 +8,7 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { NonRegisteredTeamMember } from "ui/hooks/invitations";
+const { prefs } = require("ui/utils/prefs");
 
 import "./WorkspaceMember.css";
 
@@ -62,6 +63,7 @@ function Role({
       if (isPersonal) {
         hideModal();
         setWorkspaceId(null);
+        prefs.defaultLibraryTeam = JSON.stringify(null);
       }
     }
   };

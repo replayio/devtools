@@ -2,6 +2,8 @@ import { gql, useQuery, useMutation } from "@apollo/client";
 import { Workspace } from "ui/types";
 import { getUserId } from "ui/utils/useToken";
 
+const NO_WORKSPACES: Workspace[] = [];
+
 export function useCreateNewWorkspace() {
   const [createNewWorkspace, { error }] = useMutation(
     gql`
@@ -78,6 +80,6 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
     console.error("Apollo error while creating a new workspace:", error);
   }
 
-  const workspaces: Workspace[] = data?.workspaces || [];
+  const workspaces: Workspace[] = data?.workspaces || NO_WORKSPACES;
   return { workspaces, loading };
 }
