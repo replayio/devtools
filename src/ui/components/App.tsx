@@ -13,10 +13,9 @@ import SharingModal from "./shared/SharingModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import SettingsModal from "./shared/SettingsModal/index";
-import { isDeployPreview, skipTelemetry } from "ui/utils/environment";
+import { isDeployPreview, isTest, hasLoadingParam } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { hasLoadingParam } from "ui/utils/environment";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import LogRocket from "ui/utils/logrocket";
 import hooks from "ui/hooks";
@@ -90,6 +89,11 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
     font.load().then(() => {
       setFontLoading(false);
     });
+
+    // FontFaceObserver doesn't work in e2e tests.
+    if (isTest()) {
+      setFontLoading(false);
+    }
   }, []);
 
   useEffect(() => {
