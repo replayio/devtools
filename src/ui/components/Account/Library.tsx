@@ -44,26 +44,32 @@ function Header({
 }
 
 function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedux) {
-  const { userSettings, loading: settingsLoading } = hooks.useGetUserSettings();
-  const {
-    workspaces: nonPendingWorkspaces,
-    loading: nonPendingLoading,
-  } = hooks.useGetNonPendingWorkspaces();
+  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
 
   useEffect(() => {
-    if (userSettings) {
-      setWorkspaceId(userSettings.default_workspace_id);
+    // After rendering null, update the workspaceId to display the user's library
+    // instead of the non-existent team.
+    if (!loading && ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
+      setWorkspaceId(null);
     }
-  }, [userSettings]);
+  }, [workspaces, loading]);
 
-  if (settingsLoading || nonPendingLoading) {
+  if (loading) {
+    return null;
+  }
+
+  // Handle cases where the default workspace ID in prefs is for a team
+  // that the user is no longer a part of. This occurs when the user is removed
+  // from a team that is stored as their default library team in prefs. We return
+  // null here, and reset the currentWorkspaceId to the user's library in `useEffect`.
+  if (![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
     return null;
   }
 
   return (
     <>
       <Header
-        nonPendingWorkspaces={nonPendingWorkspaces}
+        nonPendingWorkspaces={workspaces}
         setModal={setModal}
         currentWorkspaceId={currentWorkspaceId}
       />

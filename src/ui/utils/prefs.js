@@ -30,6 +30,7 @@ pref("devtools.dev-secondary-panel-height", "50%");
 pref("devtools.video", !!urlPrefs.video);
 pref("devtools.maxHitsDisplayed", 250);
 pref("devtools.maxHitsEditable", 100);
+pref("devtools.defaultLibraryTeam", "null");
 
 // app features
 pref("devtools.features.comments", true);
@@ -55,6 +56,7 @@ export const prefs = new PrefsHelper("devtools", {
   video: ["Bool", "video"],
   maxHitsDisplayed: ["Int", "maxHitsDisplayed"],
   maxHitsEditable: ["Int", "maxHitsEditable"],
+  defaultLibraryTeam: ["String", "defaultLibraryTeam"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
