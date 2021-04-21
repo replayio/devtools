@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction } from "react";
 import { SettingItem, UserSettings } from "./types";
 import { getUserId } from "ui/utils/useToken";
 import hooks from "ui/hooks";
+import { SelectMenu } from "ui/components/shared/Forms";
 import "./SettingsBodyItem.css";
 
 interface SettingsBodyItemProps {
@@ -53,18 +54,18 @@ function Dropdown({
   const updateUserSetting = hooks.useUpdateUserSetting(key, "uuid");
   const userId = getUserId();
 
-  const displayedWorkspaces = [{ id: "", name: "---" }];
+  const displayedWorkspaces: { id: string | null; name: string }[] = [{ id: null, name: "---" }];
 
   if (workspaces) {
     displayedWorkspaces.push(...workspaces);
+    displayedWorkspaces.sort();
   }
 
-  const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onChange = (selectedValue: string | null) => {
     if (needsRefresh) {
       setShowRefresh(true);
     }
 
-    const selectedValue = e.target.value == "" ? null : e.target.value;
     updateUserSetting({
       variables: {
         newValue: selectedValue,
@@ -78,17 +79,9 @@ function Dropdown({
   }
 
   return (
-    <select
-      className="p-1 bg-gray-100 border border-gray-300 rounded"
-      onChange={onChange}
-      value={value == null ? "" : value}
-    >
-      {displayedWorkspaces.map(workspace => (
-        <option value={workspace.id} key={workspace.id}>
-          {workspace.name}
-        </option>
-      ))}
-    </select>
+    <div className="w-64">
+      <SelectMenu selected={value} setSelected={onChange} options={displayedWorkspaces} />
+    </div>
   );
 }
 
