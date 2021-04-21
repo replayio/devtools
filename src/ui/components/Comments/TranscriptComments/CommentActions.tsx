@@ -26,13 +26,24 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
   }
 
   const handleDelete = () => {
-    deleteComment({ variables: { id: comment.id } });
+    setExpanded(false);
 
-    if (isRoot) {
-      deleteCommentReplies({ variables: { parentId: comment.id } });
+    const replyCount = comment.replies?.length || 0;
+    const message = `Deleting this comment will permanently delete this comment${
+      replyCount ? ` and its ${replyCount} repl${replyCount == 1 ? "y" : "ies"}` : ""
+    }. \n\nAre you sure you want to proceed?`;
+
+    if (window.confirm(message)) {
+      deleteComment({ variables: { id: comment.id } });
+
+      if (isRoot) {
+        deleteCommentReplies({ variables: { parentId: comment.id } });
+      }
     }
   };
   const editComment = () => {
+    setExpanded(false);
+
     editItem(comment);
   };
 

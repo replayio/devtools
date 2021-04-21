@@ -28,8 +28,13 @@ const DropdownPanel = ({
 }) => {
   const deleteRecording = hooks.useDeleteRecording(["GetWorkspaceRecordings", "GetMyRecordings"]);
 
-  const onDeleteRecording = async recordingId => {
-    await deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } });
+  const onDeleteRecording = recordingId => {
+    const message =
+      "This action will permanently delete this replay. \n\nAre you sure you want to proceed?";
+
+    if (window.confirm(message)) {
+      deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } });
+    }
   };
 
   const { recording_id } = recording;
