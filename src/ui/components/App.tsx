@@ -68,7 +68,7 @@ function setTelemetryContext(userId: string | undefined, userEmail: string | und
   }
 
   if (userEmail) {
-    mixpanel.register({ userEmail });
+    mixpanel.people.set({ $email: userEmail });
     sentryContext["userEmail"] = userEmail;
   }
 
