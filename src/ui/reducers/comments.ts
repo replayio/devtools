@@ -4,7 +4,6 @@ import { UIState } from "ui/state";
 
 function initialCommentsState(): CommentsState {
   return {
-    commentPointer: false,
     hoveredComment: null,
     pendingComment: null,
     shouldShowLoneEvents: true,
@@ -21,13 +20,6 @@ export default function update(
       return {
         ...state,
         pendingComment: action.comment,
-      };
-    }
-
-    case "set_comment_pointer": {
-      return {
-        ...state,
-        commentPointer: action.value,
       };
     }
 
@@ -59,7 +51,6 @@ export default function update(
 }
 
 export const getPendingComment = (state: UIState) => state.comments.pendingComment;
-export const getCommentPointer = (state: UIState) => state.comments.commentPointer;
 export const getHoveredComment = (state: UIState) => state.comments.hoveredComment;
 export const getShouldShowLoneEvents = (state: UIState) => state.comments.shouldShowLoneEvents;
 export const getFloatingItem = (state: UIState) => state.comments.floatingItem;

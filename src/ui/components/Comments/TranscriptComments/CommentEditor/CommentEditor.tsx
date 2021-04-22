@@ -67,11 +67,6 @@ function CommentEditor({
           Submit
         </button>
       </div>
-      {pendingComment &&
-        pendingComment.comment.time == comment.time &&
-        (pendingComment.type == "new_comment" || pendingComment.type == "edit_comment") && (
-          <CommentTool pendingComment={pendingComment} />
-        )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { Workspace } from "ui/types";
-import { ChevronDownIcon, LibraryIcon } from "@heroicons/react/solid";
+import { ChevronDownIcon } from "@heroicons/react/solid";
 import { Menu } from "@headlessui/react";
 
 type WorkspaceDropdownButtonProps = PropsFromRedux & {
