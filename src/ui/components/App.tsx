@@ -3,6 +3,7 @@ import mixpanel from "mixpanel-browser";
 import * as Sentry from "@sentry/react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
+import { gql, useQuery } from "@apollo/client";
 
 import DevTools from "./DevTools";
 const Account = require("./Account").default;
@@ -75,11 +76,36 @@ function setTelemetryContext(userId: string | undefined, userEmail: string | und
   Sentry.setContext("user", sentryContext);
 }
 
+const GET_USER = gql`
+  query GetUserMetadata($userId: uuid!) {
+    users(where: { id: { _eq: $userId } }) {
+      email
+      internal
+      name
+    }
+  }
+`;
+
+type UserData = {
+  email: string;
+  internal: boolean;
+  name: string;
+};
+
 function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   const auth = useAuth0();
   const { claims } = useToken();
 
-  setTelemetryContext(claims?.hasura.userId, auth.user?.email);
+  const userId = claims?.hasura.userId;
+  let userData: UserData | null = null;
+
+  const { data } = useQuery<UserData>(GET_USER, {
+    variables: { userId },
+  });
+  if (data) {
+    userData = data;
+  }
+  setTelemetryContext(claims?.hasura.userId, userData?.email);
   const { loading } = hooks.useMaybeClaimInvite();
   const [fontLoading, setFontLoading] = useState(true);
 
@@ -103,7 +129,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
 
   useEffect(() => {
     setUserInBrowserPrefs(auth.user);
-    if (auth.user) {
+    if (auth.user && !userData?.internal) {
       LogRocket.createSession(auth);
     }
   }, [auth.user]);
