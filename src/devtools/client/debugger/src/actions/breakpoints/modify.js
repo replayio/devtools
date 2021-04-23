@@ -4,6 +4,8 @@
 
 //
 
+import mixpanel from "mixpanel-browser";
+
 import { makeBreakpointLocation, getLocationKey, getASTLocation } from "../../utils/breakpoint";
 
 import {
@@ -17,6 +19,8 @@ import {
   getRequestedBreakpointLocations,
   getPendingBreakpointList,
 } from "../../selectors";
+
+import { getRecordingWorkspace } from "ui/reducers/app";
 import { selectors } from "ui/reducers";
 
 import { setBreakpointPositions } from "./breakpointPositions";
@@ -78,6 +82,16 @@ export function enableBreakpoint(cx, initialBreakpoint) {
   };
 }
 
+async function trackBreakpoint(workspace) {
+  let context = {};
+  if (workspace?.name) {
+    context = { workspaceName: workspace.name };
+  }
+  mixpanel.track("breakpoint", context);
+}
+
+// TODO(dmiller): we should probably indicate via param if this action is run from
+// a user's click vs bootstrapping existing breakpoints in a recording on load
 export function addBreakpoint(
   cx,
   initialLocation,
@@ -87,6 +101,8 @@ export function addBreakpoint(
 ) {
   return async ({ dispatch, getState, client }) => {
     recordEvent("add_breakpoint");
+    const workspace = getRecordingWorkspace(getState());
+    trackBreakpoint(workspace);
 
     const { sourceId, column, line } = initialLocation;
 

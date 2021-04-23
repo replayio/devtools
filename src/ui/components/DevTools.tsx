@@ -44,6 +44,7 @@ function DevTools({
   viewMode,
   recordingTarget,
   setViewMode,
+  setRecordingWorkspace,
 }: DevToolsProps) {
   const [finishedLoading, setFinishedLoading] = useState(false);
   const { claims } = useToken();
@@ -71,11 +72,16 @@ function DevTools({
     if (loading == 100 && userId && sessionId) {
       AddSessionUser({ variables: { id: sessionId, user_id: userId } });
     }
+    // TODO(dmiller): maybe move the view recording event here
   }, [loading, userId, sessionId]);
 
   useEffect(() => {
     if (title) {
       document.title = `${title} - Replay`;
+    }
+    if (recording?.workspace) {
+      debugger;
+      setRecordingWorkspace(recording?.workspace);
     }
   }, [recording]);
 
@@ -169,6 +175,7 @@ const connector = connect(
     updateTimelineDimensions: actions.updateTimelineDimensions,
     setExpectedError: actions.setExpectedError,
     setViewMode: actions.setViewMode,
+    setRecordingWorkspace: actions.setRecordingWorkspace,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
