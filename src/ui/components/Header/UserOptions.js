@@ -49,7 +49,7 @@ function UserOptions({ recordingId, setModal }) {
   };
 
   return (
-    <div className="user-options">
+    <div className="user-options text-blue-400">
       <Dropdown
         buttonContent={<span className="material-icons more">more_horiz</span>}
         setExpanded={setExpanded}
