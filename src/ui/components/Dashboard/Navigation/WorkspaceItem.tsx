@@ -33,7 +33,7 @@ function WorkspaceItem({ workspace, currentWorkspaceId, setWorkspaceId }: Worksp
         <a
           href="#"
           className={classnames(
-            "flex flex-row px-4 py-2 text-md cursor-pointer space-x-3 items-center",
+            "flex flex-row px-4 py-2 text-md cursor-pointer space-x-3 text-lg items-center",
             active ? "bg-gray-100 text-gray-900" : "text-gray-700",
             currentWorkspaceId == workspace.id ? "font-semibold" : ""
           )}
