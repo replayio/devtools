@@ -26,6 +26,7 @@ import { ModalType } from "ui/state/app";
 import useToken from "ui/utils/useToken";
 var FontFaceObserver = require("fontfaceobserver");
 import "styles.css";
+import { useGetUserInfo } from "ui/hooks/users";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -76,36 +77,14 @@ function setTelemetryContext(userId: string | undefined, userEmail: string | und
   Sentry.setContext("user", sentryContext);
 }
 
-const GET_USER = gql`
-  query GetUserMetadata($userId: uuid!) {
-    users(where: { id: { _eq: $userId } }) {
-      email
-      internal
-      name
-    }
-  }
-`;
-
-type UserData = {
-  email: string;
-  internal: boolean;
-  name: string;
-};
-
 function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   const auth = useAuth0();
   const { claims } = useToken();
 
   const userId = claims?.hasura.userId;
-  let userData: UserData | null = null;
+  const { isInternal, email } = useGetUserInfo();
 
-  const { data } = useQuery<UserData>(GET_USER, {
-    variables: { userId },
-  });
-  if (data) {
-    userData = data;
-  }
-  setTelemetryContext(claims?.hasura.userId, userData?.email);
+  setTelemetryContext(userId, email);
   const { loading } = hooks.useMaybeClaimInvite();
   const [fontLoading, setFontLoading] = useState(true);
 
@@ -129,7 +108,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
 
   useEffect(() => {
     setUserInBrowserPrefs(auth.user);
-    if (auth.user && userData && !userData.internal) {
+    if (auth.user && !isInternal) {
       LogRocket.createSession(auth);
     }
   }, [auth.user]);
