@@ -20,13 +20,13 @@
   border-radius: 100%;
   transform: translateX(-50%);
   transform: translateY(-50%);
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 .canvas-overlay .canvas-comment-marker:hover,
 .canvas-overlay .canvas-comment-marker.selected,
 .canvas-overlay .canvas-comment-marker.highlighted {
-  padding: 6px;
+  padding: 2px;
   margin-left: -2px;
   background: var(--primary-accent);
   transition: background 200ms;
@@ -34,7 +34,9 @@
 }
 
 .canvas-overlay .canvas-comment .img.location-marker {
-  background: white
+  background: white;
+  width: 32px;
+  height: 32px;
 }
 
 .canvas-comment-container {
@@ -46,7 +48,7 @@
   background: white;
   border-radius: 4px;
   padding: 16px;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
   font-size: 1.25rem;
   z-index: var(--z-index-8--modal);
 }

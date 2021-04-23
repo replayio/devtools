@@ -118,7 +118,7 @@ function CommentTool({
 
   return (
     <div
-      className="p-2 absolute bg-blue-500 text-white ml-2 mt-2 rounded-md w-max space-x-2 flex items-center"
+      className="px-4 py-2 absolute bg-blue-500 text-white ml-2 mt-2 rounded-xl w-max space-x-2 flex items-center"
       style={{ top: y * canvas!.scale, left: x * canvas!.scale }}
     >
       <ChatIcon className="h-6 w-6" aria-hidden="true" />
