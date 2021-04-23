@@ -52,7 +52,7 @@ export interface AppState {
   workspaceId: WorkspaceId | null;
   defaultSettingsTab: SettingsTabTitle;
   recordingTarget: RecordingTarget | null;
-  recordingWorkspace: Workspace;
+  recordingWorkspace: Workspace | null;
 }
 
 export interface AnalysisPoints {
