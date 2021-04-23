@@ -32,7 +32,7 @@ function Header({
           <a
             href="#"
             onClick={onSettingsClick}
-            className="flex flex-row space-x-3 items-center text-gray-700 hover:text-gray-900"
+            className="flex flex-row space-x-3 ml-9 items-center text-gray-400 hover:text-gray-800"
           >
             <CogIcon className="h-8 w-8" />
           </a>
