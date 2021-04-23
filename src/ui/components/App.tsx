@@ -129,7 +129,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
 
   useEffect(() => {
     setUserInBrowserPrefs(auth.user);
-    if (auth.user && !userData?.internal) {
+    if (auth.user && userData && !userData.internal) {
       LogRocket.createSession(auth);
     }
   }, [auth.user]);
