@@ -15,6 +15,7 @@ import { selectors } from "../reducers";
 import { UIState } from "ui/state";
 import { ExpectedError, UploadInfo } from "ui/state/app";
 import { RecordingId } from "@recordreplay/protocol";
+import mixpanel from "mixpanel-browser";
 
 type DevToolsProps = PropsFromRedux & {
   recordingId: RecordingId;
@@ -72,7 +73,6 @@ function DevTools({
     if (loading == 100 && userId && sessionId) {
       AddSessionUser({ variables: { id: sessionId, user_id: userId } });
     }
-    // TODO(dmiller): maybe move the view recording event here
   }, [loading, userId, sessionId]);
 
   useEffect(() => {
@@ -80,7 +80,6 @@ function DevTools({
       document.title = `${title} - Replay`;
     }
     if (recording?.workspace) {
-      debugger;
       setRecordingWorkspace(recording?.workspace);
     }
   }, [recording]);

@@ -90,19 +90,20 @@ async function trackBreakpoint(workspace) {
   mixpanel.track("breakpoint", context);
 }
 
-// TODO(dmiller): we should probably indicate via param if this action is run from
-// a user's click vs bootstrapping existing breakpoints in a recording on load
 export function addBreakpoint(
   cx,
   initialLocation,
   options = {},
   disabled = false,
+  shouldTrack = false,
   shouldCancel = () => false
 ) {
   return async ({ dispatch, getState, client }) => {
     recordEvent("add_breakpoint");
     const workspace = getRecordingWorkspace(getState());
-    trackBreakpoint(workspace);
+    if (shouldTrack) {
+      trackBreakpoint(workspace);
+    }
 
     const { sourceId, column, line } = initialLocation;
 
