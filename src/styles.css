@@ -10,6 +10,10 @@
   --faint-red: rgba(255, 0, 0, 0.5);
 }
 
+.defaultfont {
+  font-family: system-ui, Arial, sans-serif;
+}
+
 /* NOTE: this is added to protect against React DevTools */
 html {
   font-size: 12px !important;
