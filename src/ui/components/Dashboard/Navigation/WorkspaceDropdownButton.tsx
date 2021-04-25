@@ -33,7 +33,7 @@ function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDr
   }
 
   return (
-    <Menu.Button className="inline-flex items-center justify-center w-full rounded-md px-4 py-2 bg-white text-lg font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500">
+    <Menu.Button className="inline-flex items-center justify-center w-full rounded-md px-4 py-2 text-2xl font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500">
       {title}
       <ChevronDownIcon className="-mr-1 ml-2 h-6 w-6" aria-hidden="true" />
     </Menu.Button>

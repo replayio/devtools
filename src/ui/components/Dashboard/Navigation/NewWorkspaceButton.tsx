@@ -24,7 +24,7 @@ function NewWorkspaceButton({ setModal }: NewWorkspaceButtonProps) {
           onClick={onClick}
         >
           <PlusIcon className="w-6 h-6" />
-          <div>Create a new team</div>
+          <div className="text-lg">Create a new team</div>
         </a>
       )}
     </Menu.Item>
