@@ -39,11 +39,9 @@ function PersonalDashboard() {
     return <Loader />;
   }
 
-  const filteredRecordings = recordings.filter(recording => recording.url.includes(filter));
-
   return (
     <main className="dashboard">
-      <DashboardViewer recordings={filteredRecordings} filter={filter} />
+      <DashboardViewer recordings={recordings} filter={filter} />
     </main>
   );
 }
