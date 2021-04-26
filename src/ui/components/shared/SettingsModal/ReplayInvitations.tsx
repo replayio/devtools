@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import hooks from "ui/hooks";
 import { getUserId } from "ui/utils/useToken";
 import "./ReplayInvitations.css";
+import { TextInput } from "ui/components/shared/Forms";
 
 export default function ReplayInvitations() {
   const [inputValue, setInputValue] = useState("");
@@ -53,14 +54,26 @@ export default function ReplayInvitations() {
         </div>
       </label>
       {inviteCount < maxInvites && (
-        <form onSubmit={onSubmit}>
-          <input
+        <form onSubmit={onSubmit} className="space-x-2">
+          {/* <input
             type="text"
             placeholder="Email Address"
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
-          ></input>
-          <input type="submit" value="Invite"></input>
+          ></input> */}
+          <TextInput
+            placeholder="Email Address"
+            value={inputValue}
+            onChange={e => setInputValue(e.target.value)}
+          />
+          {/* <input type="submit" value="Invite"></input> */}
+          <button
+            type="submit"
+            value="Invite"
+            className="inline-flex items-center px-3 py-2 border border-transparent text-lg leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Invite
+          </button>
         </form>
       )}
       <div className="invitations-list">

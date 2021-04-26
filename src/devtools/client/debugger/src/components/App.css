@@ -12,8 +12,8 @@ button {
   font-size: inherit;
 }
 
-button:hover,
-button:focus {
+.debugger button:hover,
+.debugger button:focus {
   background-color: var(--theme-toolbar-background-hover);
 }
 

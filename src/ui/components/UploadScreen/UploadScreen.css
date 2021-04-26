@@ -2,7 +2,6 @@
   background: var(--cool-gray-100);
   height: 100%;
   width: 100%;
-  min-width: 320px;
 }
 
 .initialization-panel main {
@@ -71,17 +70,6 @@
   padding: 8px;
   border: 1px solid var(--cool-gray-300);
   border-radius: 4px;
-}
-
-.initialization-panel .replay-privacy {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  user-select: none;
-}
-
-.initialization-panel .replay-privacy > :not(:first-child) {
-  margin-left: 8px;
 }
 
 .initialization-panel .replay-workspace {

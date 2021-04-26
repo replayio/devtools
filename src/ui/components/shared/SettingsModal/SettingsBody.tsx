@@ -49,14 +49,18 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
     return (
       <main>
         <h1>{title}</h1>
-        <Support />
+        <ul>
+          <Support />
+        </ul>
       </main>
     );
   } else if (title == "Invitations") {
     return (
       <main>
         <h1>{title}</h1>
-        <ReplayInvitations />
+        <ul>
+          <ReplayInvitations />
+        </ul>
       </main>
     );
   }

@@ -14,7 +14,7 @@ import {
   FloatingTranscriptItem,
 } from "./TranscriptItem";
 import "./Transcript.css";
-import DraftScreen from "../DraftScreen";
+import UploadScreen from "../UploadScreen";
 
 import { UIState } from "ui/state";
 import { Event, Comment, FloatingItem } from "ui/state/comments";
@@ -86,7 +86,7 @@ function Transcript({
   // Only show the initialization screen if the replay is not being opened
   // for testing purposes.
   if (isAuthor && !recording.is_initialized && !isTest()) {
-    return <DraftScreen />;
+    return <UploadScreen />;
   }
 
   return (

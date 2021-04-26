@@ -16,10 +16,7 @@
 
 .settings-modal .replay-invitations form {
   width: 100%;
-}
-
-.settings-modal .replay-invitations form input {
-  font-size: 14px;
+  padding: 1px;
 }
 
 .settings-modal .invitations-list {

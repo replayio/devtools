@@ -1,18 +1,18 @@
-.settings-modal main li {
+.settings-modal main > ul > li {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-.settings-modal main li .setting-item {
+.settings-modal main > ul > li .setting-item {
   flex-grow: 1
 }
 
-.settings-modal main li .setting-item .label {
+.settings-modal main > ul > li .setting-item .label {
   font-size: 16px;
 }
 
-.settings-modal main li .setting-item .description {
+.settings-modal main > ul > li .setting-item .description {
   font-size: 14px;
   max-width: 80%;
   color: var(--theme-comment)

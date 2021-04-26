@@ -31,6 +31,7 @@
     "@recordreplay/protocol": "^0.7.0",
     "@sentry/apm": "^5.27.1",
     "@sentry/react": "^5.30.0",
+    "@tailwindcss/forms": "^0.3.2",
     "apollo-link-http": "^1.5.17",
     "babel-loader": "^8.1.0",
     "bufferutil": "^4.0.3",

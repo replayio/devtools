@@ -1,58 +1,22 @@
-import React, { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { getRecordingId } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
-import "./DraftScreen.css";
-import { Workspace } from "ui/types";
+import "./UploadScreen.css";
+import TeamSelect from "./TeamSelect";
+import PrivacyToggle from "./PrivacyToggle";
+import ReplayTitle from "./ReplayTitle";
 
-type DraftScreenProps = PropsFromRedux & {};
+type UploadScreenProps = PropsFromRedux & {};
 type Status = "saving" | "deleting" | "deleted" | null;
 
-function WorkspaceDropdownList({
-  workspaces,
-  selectedWorkspaceId,
-  setSelectedWorkspaceId,
-}: {
-  workspaces: Workspace[];
-  selectedWorkspaceId: string;
-  setSelectedWorkspaceId: Dispatch<SetStateAction<string>>;
-}) {
-  const displayedWorkspaces = [{ id: "", key: "", name: "---" }, ...workspaces];
-
-  const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = e.target.value;
-    setSelectedWorkspaceId(selectedId);
-  };
-
-  // If there are no other workspaces apart from the personal "---" one,
-  // don't display the workspace dropdown.
-  if (displayedWorkspaces.length == 1) {
-    return null;
-  }
-
-  return (
-    <div className="replay-workspace">
-      <label>
-        <h4>Workspace</h4>
-      </label>
-      <select onChange={onChange} value={selectedWorkspaceId}>
-        {displayedWorkspaces.map(workspace => (
-          <option value={workspace.id} key={workspace.id}>
-            {workspace.name}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function DraftScreen({ recordingId }: DraftScreenProps) {
+function UploadScreen({ recordingId }: UploadScreenProps) {
   const { recording, loading: recordingLoading } = hooks.useGetRecording(recordingId!);
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(recording?.title);
   const { userSettings } = hooks.useGetUserSettings();
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
     userSettings?.default_workspace_id
   );
   const textInputNode = useRef<HTMLInputElement>(null);
@@ -104,28 +68,13 @@ function DraftScreen({ recordingId }: DraftScreenProps) {
   return (
     <section className="initialization-panel">
       <form onSubmit={onSubmit} className={isDeleted ? "hidden" : ""}>
-        <div className="replay-title">
-          <label htmlFor="recordingTitle">
-            <h4>Replay Title</h4>
-          </label>
-          <input
-            id="recordingTitle"
-            type="text"
-            value={inputValue}
-            onChange={onChange}
-            ref={textInputNode}
+        <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
+        {workspaces.length ? (
+          <TeamSelect
+            {...{ workspaces, selectedWorkspaceId, setSelectedWorkspaceId, label: "Team" }}
           />
-        </div>
-        <div className="replay-privacy">
-          <input
-            id="replayPrivacy"
-            type="checkbox"
-            checked={isPublic}
-            onChange={() => setIsPublic(!isPublic)}
-          />
-          <label htmlFor="replayPrivacy">Publicly available</label>
-        </div>
-        <WorkspaceDropdownList {...{ workspaces, selectedWorkspaceId, setSelectedWorkspaceId }} />
+        ) : null}
+        <PrivacyToggle isPublic={isPublic} setIsPublic={setIsPublic} />
         <div className="actions">
           <input
             className="submit"
@@ -146,4 +95,4 @@ function DraftScreen({ recordingId }: DraftScreenProps) {
 
 const connector = connect((state: UIState) => ({ recordingId: getRecordingId(state) }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(DraftScreen);
+export default connector(UploadScreen);
