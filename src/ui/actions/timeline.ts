@@ -91,7 +91,7 @@ async function getInitialPausePoint(recordingId: string) {
   const firstComment = await getFirstComment(recordingId);
   if (firstComment) {
     const { point, time } = firstComment;
-    hasFrames = firstComment.has_frames;
+    hasFrames = firstComment.hasFrames;
     return { point, time, hasFrames };
   }
 

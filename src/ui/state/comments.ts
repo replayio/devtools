@@ -29,43 +29,41 @@ export interface FloatingItem {
   itemType: "pause";
   time: number;
   point: string;
-  has_frames: boolean;
+  hasFrames: boolean;
   location?: SourceLocation;
 }
 
 export interface Comment {
   content: string;
-  created_at: string;
-  has_frames: boolean;
-  source_location: SourceLocation | null;
+  createdAt: string;
+  hasFrames: boolean;
+  sourceLocation: SourceLocation | null;
   id: string;
   point: string;
   recording_id: RecordingId;
   time: number;
-  updated_at: string;
-  user_id: string;
+  updatedAt: string;
   user: User;
   replies: Reply[];
   __typename: string;
   position: CommentPosition;
-  parent_id: null;
+  parentId: null;
 }
 
 export interface Reply {
   content: string;
-  created_at: string;
-  has_frames: boolean;
-  source_location: SourceLocation | null;
+  createdAt: string;
+  hasFrames: boolean;
+  sourceLocation: SourceLocation | null;
   id: string;
   point: string;
   recording_id: RecordingId;
   time: number;
-  updated_at: string;
-  user_id: string;
+  updatedAt: string;
   user: User;
   __typename: string;
   position: null;
-  parent_id: string;
+  parentId: string;
 }
 
 export interface Event extends MouseEvent {
@@ -99,18 +97,18 @@ export interface PendingNewComment extends PendingBlankComment {
 
 export interface PendingNewReply extends PendingBlankComment {
   content: "";
-  parent_id: string;
+  parentId: string;
 }
 
 export interface PendingEditComment extends PendingBlankComment {
-  position: CommentPosition;
-  parent_id: null;
+  position?: null;
+  parentId?: null;
   id: string;
 }
 
 export interface PendingEditReply extends PendingBlankComment {
   position: null;
-  parent_id: string;
+  parentId: string;
   id: string;
 }
 
@@ -118,6 +116,6 @@ export interface PendingBlankComment {
   content: string;
   time: number;
   point: string;
-  has_frames: boolean;
-  source_location: SourceLocation | null;
+  hasFrames: boolean;
+  sourceLocation: SourceLocation | null;
 }

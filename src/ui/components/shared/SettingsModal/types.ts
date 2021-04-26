@@ -19,12 +19,11 @@ export interface SettingItem {
   needsRefresh: boolean;
 }
 
-export type SettingItemKey =
-  | "show_elements"
-  | "show_react"
-  | "enable_teams"
-  | "default_workspace_id";
+export type SettingItemKey = keyof UserSettings;
 
 export interface UserSettings {
-  [key: string]: boolean;
+  showElements: boolean;
+  showReact: boolean;
+  enableTeams: boolean;
+  defaultWorkspaceId: string | null;
 }

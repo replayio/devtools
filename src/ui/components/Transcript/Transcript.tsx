@@ -4,7 +4,6 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
-import { getUserId } from "ui/utils/useToken";
 import { isTest } from "ui/utils/environment";
 
 import TranscriptFilter from "ui/components/Transcript/TranscriptFilter";
@@ -54,8 +53,8 @@ function Transcript({
 }: PropsFromRedux) {
   const { comments } = hooks.useGetComments(recordingId!);
   const { recording, loading } = hooks.useGetRecording(recordingId!);
-  const userId = getUserId();
-  const isAuthor = userId && userId == recording?.user_id;
+  const { userId } = hooks.useGetUserId();
+  const isAuthor = userId && userId == recording?.userId;
 
   const entries: Entry[] = createEntries(comments, clickEvents, shouldShowLoneEvents);
 
@@ -85,7 +84,7 @@ function Transcript({
 
   // Only show the initialization screen if the replay is not being opened
   // for testing purposes.
-  if (isAuthor && !recording.is_initialized && !isTest()) {
+  if (isAuthor && !recording?.isInitialized && !isTest()) {
     return <UploadScreen />;
   }
 
@@ -97,7 +96,7 @@ function Transcript({
       </div>
       <div className="transcript-panel">
         <div className="transcript-list">
-          {sortBy(displayedEntries, ["time", "kind", "created_at"]).map((entry, i) => {
+          {sortBy(displayedEntries, ["time", "kind", "createdAt"]).map((entry, i) => {
             if ("itemType" in entry) {
               return <FloatingTranscriptItem item={entry} key={i} />;
             } else if ("content" in entry) {
@@ -118,7 +117,6 @@ const connector = connect(
     currentTime: selectors.getCurrentTime(state),
     recordingId: selectors.getRecordingId(state),
     clickEvents: selectors.getEventsForType(state, "mousedown"),
-    pendingComment: selectors.getPendingComment(state),
     shouldShowLoneEvents: selectors.getShouldShowLoneEvents(state),
     floatingItem: selectors.getFloatingItem(state),
   }),

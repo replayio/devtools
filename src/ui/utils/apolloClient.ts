@@ -27,14 +27,35 @@ export function createApolloClient(token: string | undefined, recordingId: strin
   const httpLink = createHttpLink(token, recordingId);
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
-      console.log(`[Apollo GraphQL error]: ${graphQLErrors}`);
+      console.error("[Apollo GraphQL error]", graphQLErrors);
     } else if (networkError) {
-      console.log(`[Apollo Network error]: ${networkError}`);
+      console.warn("[Apollo Network error]", networkError);
     }
   });
 
   const options: any = {
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: {
+        AuthenticatedUser: {
+          keyFields: [],
+        },
+        Recording: {
+          keyFields: ["uuid"],
+          fields: {
+            comments: {
+              merge: false,
+            },
+          },
+        },
+        Comment: {
+          fields: {
+            replies: {
+              merge: false,
+            },
+          },
+        },
+      },
+    }),
     link: from([retryLink, errorLink, httpLink]),
   };
 

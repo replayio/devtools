@@ -14,16 +14,17 @@ type Status = "saving" | "deleting" | "deleted" | null;
 function UploadScreen({ recordingId }: UploadScreenProps) {
   const { recording, loading: recordingLoading } = hooks.useGetRecording(recordingId!);
   const [status, setStatus] = useState<Status>(null);
-  const [inputValue, setInputValue] = useState(recording?.title);
+  const [inputValue, setInputValue] = useState(recording?.title || "Untitled");
   const { userSettings } = hooks.useGetUserSettings();
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
-    userSettings?.default_workspace_id
+    userSettings?.defaultWorkspaceId || null
   );
   const textInputNode = useRef<HTMLInputElement>(null);
   const [isPublic, setIsPublic] = useState(true);
 
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const initializeRecording = hooks.useInitializeRecording();
+  const updateIsPrivate = hooks.useUpdateIsPrivate();
   const deleteRecording = hooks.useDeleteRecording([], () => setStatus("deleted"));
 
   const isSaving = status == "saving";
@@ -35,18 +36,20 @@ function UploadScreen({ recordingId }: UploadScreenProps) {
       textInputNode.current.focus();
     }
 
-    setIsPublic(!recording?.is_private);
+    setIsPublic(!recording?.private);
   }, []);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setStatus("saving");
 
     const workspaceId = selectedWorkspaceId == "" ? null : selectedWorkspaceId;
 
-    initializeRecording({
-      variables: { recordingId, title: inputValue, workspaceId, isPrivate: !isPublic },
+    await initializeRecording({
+      variables: { recordingId, title: inputValue, workspaceId },
     });
-    setStatus("saving");
+    updateIsPrivate({ variables: { recordingId, isPrivate: !isPublic } });
   };
   const onDiscard = (e: React.MouseEvent) => {
     e.preventDefault();

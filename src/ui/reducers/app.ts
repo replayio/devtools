@@ -201,7 +201,9 @@ export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);
   return getAnalysisPointsForLocation(state, location);
 };
-export const getEventsForType = (state: UIState, type: string) => state.app.events[type] || [];
+const NO_EVENTS: MouseEvent[] = [];
+export const getEventsForType = (state: UIState, type: string) =>
+  state.app.events[type] || NO_EVENTS;
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;

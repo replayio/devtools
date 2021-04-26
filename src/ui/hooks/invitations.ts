@@ -1,12 +1,10 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { getUserId } from "ui/utils/useToken";
 import { useGetUserInfo } from "./users";
 
 export interface Invitation {
-  created_at: string;
-  invited_email: string;
+  createdAt: string;
+  invitedEmail: string;
   pending: boolean;
-  invited_user: InvitedUser;
 }
 
 export interface InvitedUser {
@@ -14,46 +12,62 @@ export interface InvitedUser {
 }
 
 export interface NonRegisteredTeamMember {
-  invited_email: string;
-  user_id: string;
+  invitedEmail: string;
 }
 
 export function useGetInvitations() {
-  const userId = getUserId();
   const { data, loading, error } = useQuery(
     gql`
-      query GetInvitations($userId: uuid) {
-        invitations(where: { user_id: { _eq: $userId } }) {
-          created_at
-          invited_email
-          pending
-          invited_user {
-            invited
+      query GetInvitations {
+        viewer {
+          sentInvitations {
+            edges {
+              node {
+                createdAt
+                email
+              }
+            }
           }
         }
       }
-    `,
-    {
-      variables: { userId },
-    }
+    `
   );
 
   if (error) {
     console.error("Apollo error while fetching invitations:", error);
   }
 
-  const invitations: Invitation[] = data?.invitations;
+  let invitations: Invitation[] | undefined = undefined;
+  if (data?.viewer) {
+    invitations = data.viewer.sentInvitations.edges.map(({ node }: any) => ({
+      createdAt: node.createdAt,
+      invitedEmail: node.email,
+      pending: false,
+    }));
+  }
   return { invitations, loading };
+}
+
+export function useGetAvailableInvitations() {
+  const { data, loading, error } = useQuery(
+    gql`
+      query GetInvitations {
+        viewer {
+          availableInvitations
+        }
+      }
+    `
+  );
+
+  return { availableInvitations: data?.viewer?.availableInvitations, loading, error };
 }
 
 export function useAddInvitation() {
   const [addInvitation] = useMutation(
     gql`
-      mutation AddInvitation($userId: uuid, $email: String, $workspaceId: uuid) {
-        insert_invitations(
-          objects: { invited_email: $email, user_id: $userId, workspace_id: $workspaceId }
-        ) {
-          affected_rows
+      mutation AddInvitation($email: String!) {
+        sendUserInvitation(input: { email: $email }) {
+          success
         }
       }
     `,
@@ -104,32 +118,4 @@ export function useClaimInvitation() {
   );
 
   return claimInvitation;
-}
-
-export function useGetNonRegisteredTeamMembers(workspaceId: string) {
-  const { data, loading, error } = useQuery(
-    gql`
-      query GetNonRegisteredTeamMembers($workspaceId: uuid) {
-        invitations(
-          where: { workspace_id: { _is_null: false, _eq: $workspaceId }, pending: { _eq: true } }
-        ) {
-          user_id
-          invited_email
-        }
-      }
-    `,
-    {
-      variables: {
-        workspaceId,
-      },
-      pollInterval: 5000,
-    }
-  );
-
-  if (error) {
-    console.error("Apollo error while fetching non-registered team members:", error);
-  }
-
-  const nonRegisteredTeamMembers: NonRegisteredTeamMember[] = data?.invitations;
-  return { nonRegisteredTeamMembers, loading };
 }

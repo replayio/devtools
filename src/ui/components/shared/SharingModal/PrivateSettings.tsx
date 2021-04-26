@@ -20,7 +20,7 @@ export default function PrivateSettings({ recordingId }: PrivateSettingsProps) {
     <section className="private-settings">
       <h1>Collaborators</h1>
       <EmailForm recording={recording} collaborators={collaborators} />
-      <CollaboratorsList {...{ recording: recording, collaborators, recordingId: recordingId! }} />
+      <CollaboratorsList {...{ recording, collaborators, recordingId: recordingId! }} />
     </section>
   );
 }

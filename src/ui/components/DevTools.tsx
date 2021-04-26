@@ -55,7 +55,7 @@ function DevTools({
   );
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
   const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
-  const { title, deleted_at, user } = recording || {};
+  const { title, user } = recording || {};
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -80,11 +80,11 @@ function DevTools({
   }, [recording]);
 
   useEffect(() => {
-    const isAuthor = userId && userId == recording?.user_id;
+    const isAuthor = userId && userId == recording?.userId;
 
     // Force switch to viewer mode if the recording is being initialized
     // by the author.
-    if (isAuthor && !recording.is_initialized && !isTest()) {
+    if (isAuthor && !recording?.isInitialized && !isTest()) {
       setViewMode("non-dev");
     }
   }, [recording]);
@@ -102,15 +102,6 @@ function DevTools({
   }
 
   if (!loaderResult) {
-    if (deleted_at) {
-      expectedError = { message: "This replay has been deleted." };
-    }
-
-    // Test recordings don't have a user, so we skip this check in that case.
-    if (user && user.invited == false) {
-      expectedError = { message: "The author of this Replay has not activated their account yet." };
-    }
-
     if (!isAuthorized) {
       if (userId) {
         expectedError = { message: "You don't have permission to view this replay." };

@@ -1,23 +1,24 @@
 import React, { useState } from "react";
 import hooks from "ui/hooks";
-import { getUserId } from "ui/utils/useToken";
 import "./ReplayInvitations.css";
 import { TextInput } from "ui/components/shared/Forms";
 
 export default function ReplayInvitations() {
   const [inputValue, setInputValue] = useState("");
   const { invitations, loading: inviteLoading } = hooks.useGetInvitations();
-  const { isInternal, invited, loading: userLoading } = hooks.useGetUserInfo();
+  let {
+    availableInvitations,
+    loading: availableInvitationsLoading,
+  } = hooks.useGetAvailableInvitations();
   const addInvitation = hooks.useAddInvitation();
-  const userId = getUserId();
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setInputValue("");
-    addInvitation({ variables: { userId, email: inputValue, workspaceId: null } });
+    addInvitation({ variables: { email: inputValue } });
   };
 
-  if (inviteLoading || userLoading) {
+  if (inviteLoading || availableInvitationsLoading) {
     return (
       <li className="replay-invitations">
         <label className="setting-item">
@@ -27,7 +28,7 @@ export default function ReplayInvitations() {
     );
   }
 
-  if (!invited) {
+  if (availableInvitations === null) {
     return (
       <li className="replay-invitations">
         <label className="setting-item">
@@ -37,11 +38,12 @@ export default function ReplayInvitations() {
     );
   }
 
-  const inviteCount = invitations.length;
-  // Replay folks get unlimited invites.
-  const maxInvites = isInternal ? Number.POSITIVE_INFINITY : 5;
-  const label = `You have ${maxInvites - inviteCount} invite${
-    maxInvites - inviteCount == 1 ? "" : "s"
+  if (availableInvitations > 1000000) {
+    availableInvitations = Infinity;
+  }
+
+  const label = `You have ${availableInvitations} invite${
+    availableInvitations == 1 ? "" : "s"
   } left`;
 
   return (
@@ -53,7 +55,7 @@ export default function ReplayInvitations() {
           their own replays.
         </div>
       </label>
-      {inviteCount < maxInvites && (
+      {availableInvitations > 0 && (
         <form onSubmit={onSubmit} className="space-x-2">
           {/* <input
             type="text"
@@ -77,12 +79,12 @@ export default function ReplayInvitations() {
         </form>
       )}
       <div className="invitations-list">
-        {invitations.map((invite, i) => (
+        {invitations!.map((invite, i) => (
           <div className="invitations" key={i}>
-            <div className={`material-icons ${invite.invited_user?.invited && "finished"}`}>
-              {invite.invited_user?.invited ? "check_circle" : "pending"}
+            <div className={`material-icons ${invite.pending || "finished"}`}>
+              {invite.pending ? "pending" : "check_circle"}
             </div>
-            <div>{invite.invited_email}</div>
+            <div>{invite.invitedEmail}</div>
           </div>
         ))}
       </div>

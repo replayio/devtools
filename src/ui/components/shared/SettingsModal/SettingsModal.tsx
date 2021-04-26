@@ -21,7 +21,7 @@ const settings: Settings = [
       {
         label: "Default workspace",
         type: "dropdown",
-        key: "default_workspace_id",
+        key: "defaultWorkspaceId",
         description: "New replays will be saved here automatically",
         disabled: false,
         needsRefresh: false,
@@ -35,7 +35,7 @@ const settings: Settings = [
       {
         label: "Enable the Elements pane",
         type: "checkbox",
-        key: "show_elements",
+        key: "showElements",
         description: "Inspect HTML markup and CSS styling",
         disabled: false,
         needsRefresh: false,
@@ -43,7 +43,7 @@ const settings: Settings = [
       {
         label: "Enable React DevTools",
         type: "checkbox",
-        key: "show_react",
+        key: "showReact",
         description: "Inspect the React component tree",
         disabled: false,
         needsRefresh: false,
@@ -51,7 +51,7 @@ const settings: Settings = [
       {
         label: "Enable teams",
         type: "checkbox",
-        key: "enable_teams",
+        key: "enableTeams",
         description: "Add teams to your Replay library",
         disabled: false,
         needsRefresh: false,
@@ -89,7 +89,7 @@ function SettingsModal({ defaultSettingsTab }: PropsFromRedux) {
     <div className="settings-modal">
       <Modal>
         <SettingsNavigation {...{ settings, selectedTab, setSelectedTab }} />
-        <SettingsBody {...{ selectedSetting, userSettings }} />
+        <SettingsBody {...{ selectedSetting, userSettings: userSettings! }} />
       </Modal>
     </div>
   );

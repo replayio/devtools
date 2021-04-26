@@ -13,16 +13,16 @@ import PrivateSettings from "./PrivateSettings";
 function SharingModal({ modalOptions }: PropsFromRedux) {
   const { recordingId } = modalOptions!;
   const { isPrivate, loading } = hooks.useGetIsPrivate(recordingId!);
-  const updateIsPrivate = hooks.useUpdateIsPrivate(recordingId!, isPrivate);
+  const toggleIsPrivate = hooks.useToggleIsPrivate(recordingId!, isPrivate);
 
   const setPublic = () => {
     if (isPrivate) {
-      updateIsPrivate();
+      toggleIsPrivate();
     }
   };
   const setPrivate = () => {
     if (!isPrivate) {
-      updateIsPrivate();
+      toggleIsPrivate();
     }
   };
 

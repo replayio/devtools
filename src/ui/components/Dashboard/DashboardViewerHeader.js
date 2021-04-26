@@ -50,7 +50,7 @@ function BatchActionDropdown({ selectedIds, setSelectedIds }) {
   };
   const updateRecordings = workspaceId => {
     selectedIds.forEach(recordingId =>
-      updateRecordingWorkspace({ variables: { recordingId, workspaceId: workspaceId } })
+      updateRecordingWorkspace({ variables: { recordingId, workspaceId } })
     );
     setSelectedIds([]);
   };

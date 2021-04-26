@@ -43,11 +43,11 @@ function CommentThread({
       return;
     }
 
-    const { point, time, has_frames } = comment;
+    const { point, time, hasFrames } = comment;
     e.stopPropagation();
     clearPendingComment();
 
-    return seek(point, time, has_frames);
+    return seek(point, time, hasFrames);
   };
   const updatedHoveredComment = () => {
     if (!comment || !("id" in comment)) {

@@ -55,8 +55,8 @@ function TranscriptItem({
   }, [secondaryLabel]);
 
   const onClick = () => {
-    if ("has_frames" in item) {
-      seek(point, time, item.has_frames);
+    if ("hasFrames" in item) {
+      seek(point, time, item.hasFrames);
     } else {
       seek(point, time, false);
     }
