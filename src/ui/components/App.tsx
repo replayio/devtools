@@ -84,21 +84,11 @@ function setTelemetryContext(
 function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: AppProps) {
   const auth = useAuth0();
   const { claims } = useToken();
-  const { availableInvitations } = hooks.useGetAvailableInvitations();
-
-  const userId = claims?.hasura.userId;
   const userInfo = useGetUserInfo();
-  if (userInfo) {
-    const isInternal = userInfo.isInternal;
-    setTelemetryContext(userId, userInfo.email, isInternal);
-  }
 
   useEffect(() => {
     var font = new FontFaceObserver("Material Icons");
-
-    font.load().then(() => {
-      setFontLoading(false);
-    });
+    font.load().then(() => setFontLoading(false));
 
     // FontFaceObserver doesn't work in e2e tests.
     if (isTest()) {
@@ -107,13 +97,19 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
   }, []);
 
   useEffect(() => {
+    if (userInfo) {
+      setTelemetryContext(claims?.hasura.userId, userInfo.email, userInfo.isInternal);
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
     document.body.parentElement!.className = theme || "";
     installViewportObserver({ updateNarrowMode });
   }, [theme]);
 
   useEffect(() => {
     setUserInBrowserPrefs(auth.user);
-    if (auth.user && availableInvitations > 1000000) {
+    if (auth.user && !userInfo.isInternal) {
       LogRocket.createSession(auth);
     }
   }, [auth.user]);
