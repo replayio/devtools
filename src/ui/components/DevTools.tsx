@@ -15,7 +15,6 @@ import { selectors } from "../reducers";
 import { UIState } from "ui/state";
 import { ExpectedError, UploadInfo } from "ui/state/app";
 import { RecordingId } from "@recordreplay/protocol";
-import mixpanel from "mixpanel-browser";
 
 type DevToolsProps = PropsFromRedux & {
   recordingId: RecordingId;
@@ -45,7 +44,6 @@ function DevTools({
   viewMode,
   recordingTarget,
   setViewMode,
-  setRecordingWorkspace,
 }: DevToolsProps) {
   const [finishedLoading, setFinishedLoading] = useState(false);
   const { claims } = useToken();
@@ -78,9 +76,6 @@ function DevTools({
   useEffect(() => {
     if (title) {
       document.title = `${title} - Replay`;
-    }
-    if (recording?.workspace) {
-      setRecordingWorkspace(recording?.workspace);
     }
   }, [recording]);
 
@@ -174,7 +169,6 @@ const connector = connect(
     updateTimelineDimensions: actions.updateTimelineDimensions,
     setExpectedError: actions.setExpectedError,
     setViewMode: actions.setViewMode,
-    setRecordingWorkspace: actions.setRecordingWorkspace,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

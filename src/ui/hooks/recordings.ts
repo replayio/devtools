@@ -30,10 +30,6 @@ export function useGetRecording(recordingId: RecordingId) {
           user {
             invited
           }
-          workspace {
-            id
-            name
-          }
         }
       }
     `,

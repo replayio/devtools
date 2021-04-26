@@ -231,9 +231,8 @@ export function addBreakpointAtLine(cx, line, shouldLog = false, disabled = fals
     const options = {
       logValue: getLogValue(source, state, breakpointLocation),
     };
-    const shouldTrack = true;
 
-    return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled, shouldTrack));
+    return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled));
   };
 }
 
@@ -256,9 +255,8 @@ export function addBreakpointAtColumn(cx, location) {
     const options = {
       logValue: getLogValue(source, state, location),
     };
-    const shouldTrack = true;
 
-    return dispatch(addBreakpoint(cx, breakpointLocation, options, false, shouldTrack));
+    return dispatch(addBreakpoint(cx, breakpointLocation, options));
   };
 }
 

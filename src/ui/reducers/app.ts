@@ -32,7 +32,6 @@ function initialAppState(): AppState {
     workspaceId: JSON.parse(prefs.defaultLibraryTeam),
     defaultSettingsTab: "Personal",
     recordingTarget: null,
-    recordingWorkspace: null,
   };
 }
 
@@ -159,10 +158,6 @@ export default function update(
       return { ...state, recordingTarget: action.recordingTarget };
     }
 
-    case "set_recording_workspace": {
-      return { ...state, recordingWorkspace: action.workspace };
-    }
-
     default: {
       return state;
     }
@@ -207,4 +202,3 @@ export const getCanvas = (state: UIState) => state.app.canvas;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
-export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;

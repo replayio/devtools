@@ -27,9 +27,9 @@ export function createApolloClient(token: string | undefined, recordingId: strin
   const httpLink = createHttpLink(token, recordingId);
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
-      console.log("[Apollo GraphQL error]:", graphQLErrors);
+      console.log(`[Apollo GraphQL error]: ${graphQLErrors}`);
     } else if (networkError) {
-      console.log("[Apollo Network error]:", networkError);
+      console.log(`[Apollo Network error]: ${networkError}`);
     }
   });
 
