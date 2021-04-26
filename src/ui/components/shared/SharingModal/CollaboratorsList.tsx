@@ -1,27 +1,28 @@
 import React, { useState } from "react";
-import { User } from "ui/types";
+import { Recording, User } from "ui/types";
 import hooks from "ui/hooks";
 import "./CollaboratorsList.css";
 
-export interface RecordingDbData {
-  user: User;
-  id: string;
-  is_private: boolean;
-}
-
 export interface CollaboratorDbData {
-  user_id: string;
-  recording_id: string;
+  collaborationId: string;
   user: User;
 }
 
 type Role = "owner" | "collaborator";
 
-function Permission({ user, role, recordingId }: { user: User; role: Role; recordingId: string }) {
-  const { deleteCollaborator, error } = hooks.useDeleteCollaborator();
+function Permission({
+  user,
+  role,
+  collaborationId,
+}: {
+  user: User;
+  role: Role;
+  collaborationId?: string;
+}) {
+  const { deleteCollaborator } = hooks.useDeleteCollaborator();
 
   const handleDeleteClick = () => {
-    deleteCollaborator({ variables: { recordingId, userId: user.id } });
+    deleteCollaborator({ variables: { collaborationId } });
   };
 
   return (
@@ -29,7 +30,6 @@ function Permission({ user, role, recordingId }: { user: User; role: Role; recor
       <div className="icon" style={{ backgroundImage: `url(${user.picture})` }} />
       <div className="main">
         <div className="name">{user.name}</div>
-        <div className="email">{user.email}</div>
       </div>
       <div className="role">{role}</div>
       {role === "collaborator" ? (
@@ -46,20 +46,20 @@ export default function CollaboratorsList({
   collaborators,
   recordingId,
 }: {
-  recording: RecordingDbData;
+  recording: Recording;
   collaborators: CollaboratorDbData[] | null;
   recordingId: string;
 }) {
   return (
     <div className="permissions-list">
-      <Permission user={recording.user} role={"owner"} recordingId={recordingId} />
+      <Permission user={recording.user!} role={"owner"} />
       {collaborators
         ? collaborators.map((collaborator, i) => (
             <Permission
               user={collaborator.user}
               role={"collaborator"}
               key={i}
-              recordingId={recordingId}
+              collaborationId={collaborator.collaborationId}
             />
           ))
         : null}

@@ -3,21 +3,6 @@ import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
 import { Comment } from "ui/state/comments";
 
-const UPDATE_COMMENT_CONTENT = gql`
-  mutation UpdateCommentContent($newContent: String, $commentId: uuid, $position: jsonb) {
-    update_comments(
-      _set: { content: $newContent, position: $position }
-      where: { id: { _eq: $commentId } }
-    ) {
-      returning {
-        id
-        content
-        position
-      }
-    }
-  }
-`;
-
 const NO_COMMENTS: Comment[] = [];
 
 export function useGetComments(
@@ -25,31 +10,35 @@ export function useGetComments(
 ): { comments: Comment[]; loading: boolean; error?: ApolloError } {
   const { data, loading, error } = useQuery(
     gql`
-      fragment commentFields on comments {
-        id
-        content
-        created_at
-        updated_at
-        user_id
-        has_frames
-        source_location
-        time
-        parent_id
-        point
-        position
-        user {
-          picture
-          name
-          id
-        }
-      }
-      query GetComments($recordingId: uuid) {
-        comments(
-          where: { recording_id: { _eq: $recordingId }, _and: { parent_id: { _is_null: true } } }
-        ) {
-          ...commentFields
-          replies(order_by: { created_at: asc }) {
-            ...commentFields
+      query GetComments($recordingId: UUID!) {
+        recording(uuid: $recordingId) {
+          uuid
+          comments {
+            id
+            content
+            createdAt
+            updatedAt
+            hasFrames
+            sourceLocation
+            time
+            point
+            position
+            user {
+              id
+              name
+              picture
+            }
+            replies {
+              id
+              content
+              createdAt
+              updatedAt
+              user {
+                id
+                name
+                picture
+              }
+            }
           }
         }
       }
@@ -64,21 +53,36 @@ export function useGetComments(
     console.error("Apollo error while fetching comments:", error);
   }
 
-  return { comments: data?.comments || NO_COMMENTS, loading, error };
+  let comments = data?.recording?.comments || NO_COMMENTS;
+  comments = comments.map((comment: any) => ({
+    ...comment,
+    replies: comment.replies.map((reply: any) => ({
+      ...reply,
+      hasFrames: comment.hasFrames,
+      sourceLocation: comment.sourceLocation,
+      time: comment.time,
+      point: comment.point,
+      position: comment.position,
+    })),
+  }));
+  return { comments, loading, error };
 }
 
 export function useAddComment(callback: Function = () => {}) {
   const [addComment, { error }] = useMutation(
     gql`
-      mutation AddComment($object: comments_insert_input! = {}) {
-        insert_comments_one(object: $object) {
-          id
+      mutation AddComment($input: AddCommentInput!) {
+        addComment(input: $input) {
+          success
+          comment {
+            id
+          }
         }
       }
     `,
     {
       onCompleted: data => {
-        const { id } = data.insert_comments_one;
+        const { id } = data.addComment.comment;
         callback(id);
       },
       refetchQueries: ["GetComments"],
@@ -92,10 +96,47 @@ export function useAddComment(callback: Function = () => {}) {
   return addComment;
 }
 
+export function useAddCommentReply(callback: Function = () => {}) {
+  const [addCommentReply, { error }] = useMutation(
+    gql`
+      mutation AddCommentReply($input: AddCommentReplyInput!) {
+        addCommentReply(input: $input) {
+          success
+          commentReply {
+            id
+          }
+        }
+      }
+    `,
+    {
+      onCompleted: data => {
+        const { id } = data.addCommentReply.commentReply;
+        callback(id);
+      },
+      refetchQueries: ["GetComments"],
+    }
+  );
+
+  if (error) {
+    console.error("Apollo error while adding a comment:", error);
+  }
+
+  return addCommentReply;
+}
+
 export function useUpdateComment(callback: Function) {
-  const [updateCommentContent, { error }] = useMutation(UPDATE_COMMENT_CONTENT, {
-    onCompleted: () => callback(),
-  });
+  const [updateCommentContent, { error }] = useMutation(
+    gql`
+      mutation UpdateCommentContent($newContent: String!, $commentId: ID!, $position: JSONObject) {
+        updateComment(input: { id: $commentId, content: $newContent, position: $position }) {
+          success
+        }
+      }
+    `,
+    {
+      onCompleted: () => callback(),
+    }
+  );
 
   if (error) {
     console.error("Apollo error while updating a comment:", error);
@@ -104,12 +145,33 @@ export function useUpdateComment(callback: Function) {
   return updateCommentContent;
 }
 
+export function useUpdateCommentReply(callback: Function) {
+  const [updateCommentReplyContent, { error }] = useMutation(
+    gql`
+      mutation UpdateCommentReplyContent($newContent: String!, $commentId: ID!) {
+        updateCommentReply(input: { id: $commentId, content: $newContent }) {
+          success
+        }
+      }
+    `,
+    {
+      onCompleted: () => callback(),
+    }
+  );
+
+  if (error) {
+    console.error("Apollo error while updating a comment:", error);
+  }
+
+  return updateCommentReplyContent;
+}
+
 export function useDeleteComment() {
   const [deleteComment, { error }] = useMutation(
     gql`
-      mutation DeleteComment($id: uuid!) {
-        update_comments_by_pk(pk_columns: { id: $id }, _set: { deleted_at: "now()" }) {
-          id
+      mutation DeleteComment($commentId: ID!) {
+        deleteComment(input: { id: $commentId }) {
+          success
         }
       }
     `,
@@ -125,12 +187,12 @@ export function useDeleteComment() {
   return deleteComment;
 }
 
-export function useDeleteCommentReplies() {
-  const [deleteCommentReplies, { error }] = useMutation(
+export function useDeleteCommentReply() {
+  const [deleteCommentReply, { error }] = useMutation(
     gql`
-      mutation DeleteCommentReplies($parentId: uuid) {
-        update_comments(where: { parent_id: { _eq: $parentId } }, _set: { deleted_at: "now()" }) {
-          affected_rows
+      mutation DeleteCommentReply($commentReplyId: ID!) {
+        deleteCommentReply(input: { id: $commentReplyId }) {
+          success
         }
       }
     `,
@@ -140,31 +202,33 @@ export function useDeleteCommentReplies() {
   );
 
   if (error) {
-    console.error("Apollo error while deleting a comment's replies:", error);
+    console.error("Apollo error while deleting a comment's reply:", error);
   }
 
-  return deleteCommentReplies;
+  return deleteCommentReply;
 }
 
 export async function getFirstComment(
   recordingId: string
-): Promise<{ time: number; point: string; has_frames: boolean } | undefined> {
+): Promise<{ time: number; point: string; hasFrames: boolean } | undefined> {
   const firstCommentResult = await query({
     query: gql`
-      query GetFirstCommentTime($recordingId: uuid) {
-        comments(
-          where: { recording_id: { _eq: $recordingId }, _and: { parent_id: { _is_null: true } } }
-          order_by: { time: asc }
-          limit: 1
-        ) {
-          time
-          point
-          has_frames
+      query GetFirstCommentTime($recordingId: UUID!) {
+        recording(uuid: $recordingId) {
+          uuid
+          comments {
+            id
+            hasFrames
+            point
+            time
+          }
         }
       }
     `,
     variables: { recordingId },
   });
 
-  return firstCommentResult?.data?.comments?.[0];
+  const comments = [...firstCommentResult.data.recording.comments];
+  comments.sort((c1: any, c2: any) => c1.time - c2.time);
+  return comments[0];
 }

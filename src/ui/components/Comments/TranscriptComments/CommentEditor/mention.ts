@@ -42,7 +42,7 @@ function addMentions(DraftJS: DraftJSModule, es: Draft.EditorState, users: User[
     // @ts-ignore
     const matches = [...b.getText().matchAll(new RegExp(`@(${defaultRegExp}+)`, "ig"))].reverse();
     for (let match of matches) {
-      const mention = users.find(u => u.nickname === match[1]);
+      const mention = users.find(u => u.name === match[1]);
 
       if (!mention) continue;
 

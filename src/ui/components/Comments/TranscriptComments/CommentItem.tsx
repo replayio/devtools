@@ -43,9 +43,10 @@ function CommentItem({ comment, pendingComment, isRoot }: CommentProps) {
 
       return <NewCommentEditor comment={comment} type={commentType} />;
     } else {
+      const commentType = pendingComment.type as "edit_comment" | "edit_reply";
       const comment = pendingComment.comment as PendingEditComment | PendingEditReply;
 
-      return <ExistingCommentEditor comment={comment} />;
+      return <ExistingCommentEditor comment={comment} type={commentType} />;
     }
   }
 

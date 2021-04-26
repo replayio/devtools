@@ -4,18 +4,38 @@ import { WorkspaceUser } from "ui/types";
 export function useGetWorkspaceMembers(workspaceId: string) {
   const { data, loading, error } = useQuery(
     gql`
-      query GetWorkspaceMembers($workspaceId: uuid) {
-        workspaces(where: { workspaces_users: { workspace_id: { _eq: $workspaceId } } }) {
-          name
-          id
-          workspaces_users {
-            pending
-            user_id
-            user {
-              name
-              email
-              id
-              picture
+      query GetWorkspaceMembers($workspaceId: ID!) {
+        node(id: $workspaceId) {
+          ... on Workspace {
+            id
+            members {
+              edges {
+                node {
+                  ... on WorkspacePendingEmailMember {
+                    __typename
+                    id
+                    email
+                  }
+                  ... on WorkspacePendingUserMember {
+                    __typename
+                    id
+                    user {
+                      id
+                      name
+                      picture
+                    }
+                  }
+                  ... on WorkspaceUserMember {
+                    __typename
+                    id
+                    user {
+                      id
+                      name
+                      picture
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -30,18 +50,34 @@ export function useGetWorkspaceMembers(workspaceId: string) {
     console.error("Apollo error while fetching workspace members:", error);
   }
 
-  const workspaceUsers: WorkspaceUser[] = data?.workspaces[0].workspaces_users;
+  let workspaceUsers: WorkspaceUser[] | undefined = undefined;
+  if (data) {
+    workspaceUsers = data.node.members.edges.map(({ node }: any) => {
+      if (node.__typename === "WorkspacePendingEmailMember") {
+        return {
+          membershipId: node.id,
+          pending: true,
+          invitedEmail: node.email,
+        };
+      } else {
+        return {
+          membershipId: node.id,
+          userId: node.user.id,
+          pending: node.__typename === "WorkspacePendingUserMember",
+          user: node.user,
+        };
+      }
+    });
+  }
   return { members: workspaceUsers, loading };
 }
 
 export function useInviteNewWorkspaceMember() {
   const [inviteNewWorkspaceMember] = useMutation(
     gql`
-      mutation InviteNewWorkspaceMember($userId: uuid, $workspaceId: uuid, $inviterUserId: uuid) {
-        insert_workspaces_user(
-          objects: { user_id: $userId, workspace_id: $workspaceId, inviter_user_id: $inviterUserId }
-        ) {
-          affected_rows
+      mutation InviteNewWorkspaceMember($email: String!, $workspaceId: ID!) {
+        addWorkspaceMember(input: { email: $email, workspaceId: $workspaceId }) {
+          success
         }
       }
     `,
@@ -54,11 +90,9 @@ export function useInviteNewWorkspaceMember() {
 export function useDeleteUserFromWorkspace() {
   const [deleteUserFromWorkspace] = useMutation(
     gql`
-      mutation DeleteUserFromWorkspace($userId: uuid, $workspaceId: uuid) {
-        delete_workspaces_user(
-          where: { _and: { workspace_id: { _eq: $workspaceId }, user_id: { _eq: $userId } } }
-        ) {
-          affected_rows
+      mutation DeleteUserFromWorkspace($membershipId: ID!) {
+        removeWorkspaceMember(input: { id: $membershipId }) {
+          success
         }
       }
     `,
@@ -71,12 +105,9 @@ export function useDeleteUserFromWorkspace() {
 export function useAcceptPendingInvitation() {
   const [acceptPendingInvitation] = useMutation(
     gql`
-      mutation AcceptPendingInvitation($userId: uuid, $workspaceId: uuid) {
-        update_workspaces_user(
-          where: { user_id: { _eq: $userId }, workspace_id: { _eq: $workspaceId } }
-          _set: { pending: false }
-        ) {
-          affected_rows
+      mutation AcceptPendingInvitation($workspaceId: ID!) {
+        acceptWorkspaceMembership(input: { id: $workspaceId }) {
+          success
         }
       }
     `,
@@ -86,4 +117,21 @@ export function useAcceptPendingInvitation() {
   );
 
   return acceptPendingInvitation;
+}
+
+export function useRejectPendingInvitation() {
+  const [rejectPendingInvitation] = useMutation(
+    gql`
+      mutation RejectPendingInvitation($workspaceId: ID!) {
+        rejectWorkspaceMembership(input: { id: $workspaceId }) {
+          success
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetNonPendingWorkspaces", "GetPendingWorkspaces"],
+    }
+  );
+
+  return rejectPendingInvitation;
 }

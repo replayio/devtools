@@ -9,7 +9,7 @@ import { Menu } from "@headlessui/react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 type WorkspaceDropdownButtonProps = PropsFromRedux & {
-  workspaces: (Workspace | { id: null; name: string; workspaces_users: never[] })[];
+  workspaces: (Workspace | { id: null; name: string; members: never[] })[];
 };
 
 function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDropdownButtonProps) {
@@ -29,7 +29,7 @@ function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDr
     const displayedWorkspace = workspaces.find(workspace => workspace.id == currentWorkspaceId);
     picture = <MaterialIcon>workspaces</MaterialIcon>;
     title = displayedWorkspace!.name;
-    const count = displayedWorkspace?.workspaces_users.filter(wu => !wu.pending).length;
+    const count = displayedWorkspace?.members?.length || 0;
     subtitle = `Workspace - ${count} member${count == 1 ? "" : "s"}`;
   }
 

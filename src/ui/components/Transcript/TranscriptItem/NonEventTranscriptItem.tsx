@@ -32,8 +32,8 @@ function NonEventTranscriptItem({
   let secondaryLabel = getFormattedTime(comment.time) || "";
   let highlightSecondaryLabel = false;
 
-  if (comment.source_location) {
-    const { sourceUrl, line } = comment.source_location;
+  if (comment.sourceLocation) {
+    const { sourceUrl, line } = comment.sourceLocation;
     const filename = getFilenameFromURL(sourceUrl);
 
     icon = "document-text";
@@ -56,12 +56,12 @@ function NonEventTranscriptItem({
 }
 
 const connector = connect(
-  (state: UIState, { comment: { source_location } }: PropsFromParent) => ({
-    snippet: source_location
-      ? getTextAtLocation(state, source_location.sourceId, source_location) || ""
+  (state: UIState, { comment: { sourceLocation } }: PropsFromParent) => ({
+    snippet: sourceLocation
+      ? getTextAtLocation(state, sourceLocation.sourceId, sourceLocation) || ""
       : "",
-    closestFunction: source_location
-      ? findClosestFunction(getSymbols(state, { id: source_location?.sourceId }), source_location)
+    closestFunction: sourceLocation
+      ? findClosestFunction(getSymbols(state, { id: sourceLocation?.sourceId }), sourceLocation)
       : null,
   }),
   {}

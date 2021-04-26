@@ -16,6 +16,7 @@ import {
 
 import DraftJSEditor, { DraftJSAPI } from "./DraftJSEditor";
 import "./CommentEditor.css";
+import { User } from "ui/types";
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
@@ -29,15 +30,15 @@ function CommentEditor({
   clearPendingComment,
   recordingId,
 }: CommentEditorProps) {
-  const { collaborators, recording } = hooks.useGetOwnersAndCollaborators(recordingId!);
+  const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
   const [api, setApi] = useState<DraftJSAPI>();
 
   const users = useMemo(
     () =>
       collaborators && recording
-        ? [...collaborators.map(c => c.user), recording.user].filter(Boolean)
+        ? ([...collaborators.map(c => c.user), recording.user].filter(Boolean) as User[])
         : undefined,
-    [collaborators, recording]
+    [loading]
   );
 
   const { user } = useAuth0();

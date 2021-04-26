@@ -41,8 +41,8 @@ function AddCommentButton({
         content: "",
         time: currentTime,
         point: ThreadFront.currentPoint,
-        has_frames: ThreadFront.currentPointHasFrames,
-        source_location: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
+        hasFrames: ThreadFront.currentPointHasFrames,
+        sourceLocation: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
         position: {
           x: canvas!.width * 0.5,
           y: canvas!.height * 0.5,

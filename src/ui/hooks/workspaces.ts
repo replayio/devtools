@@ -1,17 +1,14 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { Workspace } from "ui/types";
-import { getUserId } from "ui/utils/useToken";
 
 const NO_WORKSPACES: Workspace[] = [];
 
 export function useCreateNewWorkspace() {
   const [createNewWorkspace, { error }] = useMutation(
     gql`
-      mutation CreateNewWorkspace($userId: uuid, $name: String) {
-        insert_workspaces(
-          objects: { name: $name, workspaces_users: { data: { user_id: $userId, pending: false } } }
-        ) {
-          affected_rows
+      mutation CreateNewWorkspace($name: String!) {
+        createWorkspace(input: { name: $name }) {
+          success
         }
       }
     `,
@@ -28,20 +25,24 @@ export function useCreateNewWorkspace() {
 }
 
 export function useGetPendingWorkspaces() {
-  const userId = getUserId();
   const { data, loading, error } = useQuery(
     gql`
-      query GetPendingWorkspaces($userId: uuid) {
-        workspaces(
-          where: { workspaces_users: { user_id: { _eq: $userId }, pending: { _eq: true } } }
-        ) {
-          id
-          name
+      query GetPendingWorkspaces {
+        viewer {
+          workspaceInvitations {
+            edges {
+              node {
+                workspace {
+                  id
+                  name
+                }
+              }
+            }
+          }
         }
       }
     `,
     {
-      variables: { userId },
       pollInterval: 5000,
     }
   );
@@ -50,28 +51,45 @@ export function useGetPendingWorkspaces() {
     console.error("Apollo error while fetching pending workspace invitations:", error);
   }
 
-  const pendingWorkspaces: Workspace[] = data?.workspaces;
+  let pendingWorkspaces: Workspace[] | undefined = undefined;
+  if (data?.viewer) {
+    pendingWorkspaces = data.viewer.workspaceInvitations.edges.map(
+      ({ node }: any) => node.workspace
+    );
+  }
   return { pendingWorkspaces, loading };
 }
 
 export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading: boolean } {
-  const userId = getUserId();
   const { data, loading, error } = useQuery(
     gql`
-      query GetNonPendingWorkspaces($userId: uuid) {
-        workspaces(
-          where: { workspaces_users: { user_id: { _eq: $userId }, pending: { _eq: false } } }
-        ) {
-          name
-          id
-          workspaces_users {
-            pending
+      query GetNonPendingWorkspaces {
+        viewer {
+          workspaces {
+            edges {
+              node {
+                id
+                name
+                members {
+                  edges {
+                    node {
+                      ... on WorkspaceUserMember {
+                        user {
+                          id
+                          name
+                          picture
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
     `,
     {
-      variables: { userId },
       pollInterval: 5000,
     }
   );
@@ -80,6 +98,13 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
     console.error("Apollo error while creating a new workspace:", error);
   }
 
-  const workspaces: Workspace[] = data?.workspaces || NO_WORKSPACES;
+  let workspaces: Workspace[] = NO_WORKSPACES;
+  if (data?.viewer) {
+    workspaces = data.viewer.workspaces.edges.map(({ node }: any) => {
+      const members = node.members.edges.map(({ node }: any) => node.user);
+      return { ...node, members };
+    });
+  }
+
   return { workspaces, loading };
 }

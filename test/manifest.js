@@ -250,11 +250,12 @@ module.exports = [
   // Miscellaneous
   //////////////////////////////////////////////////////////////////////////////
 
-  {
-    example: "doc_rr_basic.html",
-    script: "settings.js",
-    targets: ["gecko", "chromium"],
-  },
+  // Disabled for now because this test requires authentication
+  // {
+  //   example: "doc_rr_basic.html",
+  //   script: "settings.js",
+  //   targets: ["gecko", "chromium"],
+  // },
   {
     example: "doc_rr_worker.html",
     script: "worker-01.js",

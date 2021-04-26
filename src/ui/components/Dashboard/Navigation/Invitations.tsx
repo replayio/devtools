@@ -1,31 +1,20 @@
 import React, { useState } from "react";
-import classnames from "classnames";
-import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
-import { UIState } from "ui/state";
-import { getUserId } from "ui/utils/useToken";
 import "./Invitations.css";
 import { Workspace } from "ui/types";
 
 function Invitation({ workspace }: { workspace: Workspace }) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const userId = getUserId();
   const acceptPendingInvitation = hooks.useAcceptPendingInvitation();
-  const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
+  const rejectPendingInvitation = hooks.useRejectPendingInvitation();
 
   const handleAccept = (workspaceId: string) => {
-    acceptPendingInvitation({
-      variables: { workspaceId, userId },
-    });
+    acceptPendingInvitation({ variables: { workspaceId } });
     setIsLoading(true);
   };
   const handleRefuse = (workspaceId: string) => {
-    deleteUserFromWorkspace({
-      variables: { userId, workspaceId },
-    });
+    rejectPendingInvitation({ variables: { workspaceId } });
     setIsLoading(true);
   };
 
@@ -62,7 +51,7 @@ export default function Invitations() {
     <div className="workspace-invites space-y-4">
       <h2 className="text-gray-500 font-medium uppercase tracking-wide">{`PENDING INVITATIONS`}</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {pendingWorkspaces.map(workspace => (
+        {pendingWorkspaces!.map(workspace => (
           <Invitation workspace={workspace} key={workspace.id} />
         ))}
       </div>

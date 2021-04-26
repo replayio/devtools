@@ -7,10 +7,12 @@ import CommentEditor from "./CommentEditor";
 
 type ExistingCommentEditorProps = PropsFromRedux & {
   comment: PendingEditComment | PendingEditReply;
+  type: "edit_comment" | "edit_reply";
 };
 
-function ExistingCommentEditor({ comment, clearPendingComment }: ExistingCommentEditorProps) {
+function ExistingCommentEditor({ comment, type, clearPendingComment }: ExistingCommentEditorProps) {
   const updateComment = hooks.useUpdateComment(clearPendingComment);
+  const updateCommentReply = hooks.useUpdateCommentReply(clearPendingComment);
 
   const handleSubmit = (inputValue: string) => {
     handleExistingSave(comment, inputValue);
@@ -19,15 +21,24 @@ function ExistingCommentEditor({ comment, clearPendingComment }: ExistingComment
     pendingComment: PendingEditComment | PendingEditReply,
     inputValue: string
   ) => {
-    const { id, position } = pendingComment;
+    const { id } = pendingComment;
 
-    updateComment({
-      variables: {
-        newContent: inputValue,
-        commentId: id,
-        position,
-      },
-    });
+    if (type === "edit_comment") {
+      updateComment({
+        variables: {
+          newContent: inputValue,
+          commentId: id,
+          position: pendingComment.position,
+        },
+      });
+    } else {
+      updateCommentReply({
+        variables: {
+          newContent: inputValue,
+          commentId: id,
+        },
+      });
+    }
   };
 
   return <CommentEditor {...{ comment, handleSubmit }} />;

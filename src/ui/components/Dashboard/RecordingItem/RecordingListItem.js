@@ -5,7 +5,6 @@ import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
 import { AuthAvatar } from "ui/components/Avatar";
 import formatDate from "date-fns/format";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
-import useToken from "ui/utils/useToken";
 import hooks from "ui/hooks";
 import "./RecordingListItem.css";
 
@@ -75,15 +74,15 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle, handleClickUr
     <div className="item-title">
       <div className="item-title-label">
         <Title
-          defaultTitle={data.recordingTitle || data.title || "Untitled"}
-          recordingId={data.recording_id}
+          defaultTitle={data.title || "Untitled"}
+          recordingId={data.id}
           editingTitle={editingTitle}
           setEditingTitle={setEditingTitle}
           allowEditOnTitleClick={false}
         />
         {!editing ? (
           <div className="item-title-label-actions">
-            {/* <CopyLinkButton recordingId={data.recording_id} /> */}
+            {/* <CopyLinkButton recordingId={data.id} /> */}
           </div>
         ) : null}
       </div>
@@ -98,9 +97,7 @@ function ItemScreenshot({ recordingId }) {
   const { screenData } = hooks.useGetRecordingPhoto(recordingId);
   return (
     <div className="screenshot">
-      {screenData && (
-        <img src={`data:image/png;base64, ${screenData}`} alt="recording screenshot" />
-      )}
+      {screenData && <img src={screenData} alt="recording screenshot" />}
     </div>
   );
 }
@@ -127,10 +124,12 @@ export default function RecordingListItem({
   selectedIds,
   editing,
 }) {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
+  const { userId, loading } = hooks.useGetUserId();
+  if (loading) {
+    return null;
+  }
 
-  const { recording_id: recordingId } = data;
+  const { id: recordingId } = data;
   const selected = selectedIds.includes(recordingId);
 
   const isOwner = userId == data.user?.id;
@@ -162,7 +161,7 @@ export default function RecordingListItem({
         <ItemCheckbox toggleChecked={toggleChecked} selected={selected} />{" "}
       </td>
       <td>
-        <ItemScreenshot recordingId={data.recording_id} />
+        <ItemScreenshot recordingId={recordingId} />
       </td>
       <td>
         <ItemTitle
@@ -180,7 +179,7 @@ export default function RecordingListItem({
         <ItemCreatedDate date={data.date} />
       </td>
       <td>
-        <ItemPrivacy isPrivate={data.is_private} toggleIsPrivate={toggleIsPrivate} />
+        <ItemPrivacy isPrivate={data.private} toggleIsPrivate={toggleIsPrivate} />
       </td>
       <td>
         <div className="owner">{data.user && <AuthAvatar user={data.user} />}</div>

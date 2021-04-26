@@ -4,7 +4,6 @@ import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { Comment } from "ui/state/comments";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
-import useToken from "ui/utils/useToken";
 import "./CommentActions.css";
 
 type CommentActionsProps = PropsFromRedux & {
@@ -13,10 +12,9 @@ type CommentActionsProps = PropsFromRedux & {
 };
 
 function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
+  const { userId } = hooks.useGetUserId();
   const deleteComment = hooks.useDeleteComment();
-  const deleteCommentReplies = hooks.useDeleteCommentReplies();
+  const deleteCommentReply = hooks.useDeleteCommentReply();
   const [expanded, setExpanded] = useState(false);
 
   const isCommentAuthor = userId === comment.user.id;
@@ -34,10 +32,10 @@ function CommentActions({ comment, editItem, isRoot }: CommentActionsProps) {
     }. \n\nAre you sure you want to proceed?`;
 
     if (window.confirm(message)) {
-      deleteComment({ variables: { id: comment.id } });
-
       if (isRoot) {
-        deleteCommentReplies({ variables: { parentId: comment.id } });
+        deleteComment({ variables: { commentId: comment.id } });
+      } else {
+        deleteCommentReply({ variables: { commentReplyId: comment.id } });
       }
     }
   };

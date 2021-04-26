@@ -97,7 +97,7 @@ function DashboardViewerContentHeader({
     if (selectedIds.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(recordings.map(r => r.recording_id));
+      setSelectedIds(recordings.map(r => r.id));
     }
   };
 

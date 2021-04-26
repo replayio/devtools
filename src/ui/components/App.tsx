@@ -26,7 +26,6 @@ import { ModalType } from "ui/state/app";
 import useToken from "ui/utils/useToken";
 var FontFaceObserver = require("fontfaceobserver");
 import "styles.css";
-import { useGetUserInfo } from "ui/hooks/users";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -80,12 +79,10 @@ function setTelemetryContext(userId: string | undefined, userEmail: string | und
 function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: AppProps) {
   const auth = useAuth0();
   const { claims } = useToken();
+  const { availableInvitations } = hooks.useGetAvailableInvitations();
 
-  const userId = claims?.hasura.userId;
-  const { isInternal, email } = useGetUserInfo();
-
-  setTelemetryContext(userId, email);
-  const { loading } = hooks.useMaybeClaimInvite();
+  setTelemetryContext(claims?.hasura.userId, auth.user?.email);
+  // const { loading } = hooks.useMaybeClaimInvite();
 
   useEffect(() => {
     var font = new FontFaceObserver("Material Icons");
@@ -107,7 +104,7 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
 
   useEffect(() => {
     setUserInBrowserPrefs(auth.user);
-    if (auth.user && !isInternal) {
+    if (auth.user && availableInvitations > 1000000) {
       LogRocket.createSession(auth);
     }
   }, [auth.user]);
@@ -116,7 +113,7 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
     return <SkeletonLoader content={"Uploading resources"} />;
   }
 
-  if (loading) {
+  if (false /* loading */) {
     return <SkeletonLoader content={"Loading"} />;
   }
 

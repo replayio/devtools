@@ -29,9 +29,9 @@ class CommentMarker extends React.Component {
 
   onClick = () => {
     const { comment, seek } = this.props;
-    const { time, point, has_frames } = comment;
+    const { time, point, hasFrames } = comment;
 
-    seek(point, time, has_frames);
+    seek(point, time, hasFrames);
   };
 
   render() {
@@ -45,7 +45,7 @@ class CommentMarker extends React.Component {
 
     // We don't want to show the replies on the timeline
     // just the parent comment.
-    if (comment.parent_id) {
+    if (comment.parentId) {
       return null;
     }
 

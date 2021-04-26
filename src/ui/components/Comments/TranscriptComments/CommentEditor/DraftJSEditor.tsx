@@ -162,7 +162,7 @@ export default function DraftJSEditor({
     () =>
       users
         ? users.filter(
-            u => u.name.includes(mentionSearchText) || u.nickname.includes(mentionSearchText)
+            u => u.name.includes(mentionSearchText) || u.name.includes(mentionSearchText)
           )
         : [],
     [mentionSearchText, users]

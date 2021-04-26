@@ -1,44 +1,31 @@
 export interface User {
   name: string;
-  email: string;
   picture: string;
   id: string;
-  nickname: string;
-  collaborators?: Collaborator[];
-  recordings?: Recording[];
 }
 
 export interface Recording {
   id: string;
   url: string;
   title: string;
-  recording_id: string;
-  recordingTitle: string;
-  last_screen_mime_type: string;
   duration: number;
-  description: string;
   date: string;
-  is_private: boolean;
+  private: boolean;
   user?: User;
-}
-
-interface Collaborator {
-  recording: Recording;
-  user: User;
+  userId?: string;
+  isInitialized: boolean;
 }
 
 export interface Workspace {
   name: string;
   id: string;
-  workspaces_users: WorkspaceUser[];
+  members?: User[];
 }
 
 export interface WorkspaceUser {
-  user: User;
-  workspace_id: string;
-  user_id: string;
+  membershipId: string;
   pending: boolean;
-  workspace: {
-    name: string;
-  };
+  invitedEmail?: string;
+  user?: User;
+  userId?: string;
 }
