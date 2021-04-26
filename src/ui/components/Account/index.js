@@ -19,13 +19,25 @@ function WelcomePage() {
   }, []);
 
   return (
-    <div className="welcome-screen">
-      <div className="welcome-panel">
-        <img className="logo" src="images/logo.svg" />
-        <img className="atwork" src="images/computer-work.svg" />
-        <button onClick={() => loginWithRedirect()}>Sign In</button>
-      </div>
-    </div>
+    <main
+      className="w-full h-full bg-white grid"
+      style={{ background: "linear-gradient(to bottom right, #64D4FB, #52A6F9)" }}
+    >
+      <section className="max-w-md w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="p-16 h-84 space-y-12">
+          <div className="space-y-4 place-content-center">
+            <img className="w-16 h-16 mx-auto" src="images/logo.svg" />
+          </div>
+          <a
+            href="#"
+            onClick={loginWithRedirect}
+            className="w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-2xl font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+          >
+            Sign in to Replay
+          </a>
+        </div>
+      </section>
+    </main>
   );
 }
 
