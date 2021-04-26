@@ -21,7 +21,7 @@ function WelcomePage() {
   return (
     <main
       className="w-full h-full bg-white grid"
-      style={{ background: "linear-gradient(to bottom right, #64D4FB, #52A6F9)" }}
+      style={{ background: "linear-gradient(to bottom right, #68DCFC, #4689F8)" }}
     >
       <section className="max-w-md w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="p-16 h-84 space-y-12">
