@@ -265,8 +265,14 @@ export function useGetPersonalRecordings():
             ...recordingFields
           }
         }
-
-        recordings(where: { _and: { example: { _eq: true }, deleted_at: { _is_null: true } } }) {
+        recordings(
+          where: {
+            _or: [
+              { _and: { comments: { user_id: { _eq: $userId } }, deleted_at: { _is_null: true } } }
+              { _and: { example: { _eq: true }, deleted_at: { _is_null: true } } }
+            ]
+          }
+        ) {
           ...recordingFields
           user {
             ...avatarFields
