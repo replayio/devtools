@@ -85,9 +85,7 @@ module.exports = [
   {
     example: "doc_async.html",
     script: "stepping-06.js",
-    // Not supported on chromium, needs generator support.
-    // Node issue: https://github.com/RecordReplay/node/issues/8
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
 
   //////////////////////////////////////////////////////////////////////////////
@@ -112,9 +110,7 @@ module.exports = [
   {
     example: "doc_async.html",
     script: "console_async_eval.js",
-    // Not supported on chromium, needs generator support.
-    // Node issue: https://github.com/RecordReplay/node/issues/8
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_rr_console.html",
