@@ -95,6 +95,9 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
       setFontLoading(false);
     });
 
+    // Limit the time we wait for this font to 3s.
+    setTimeout(() => setFontLoading(true), 3000);
+
     // FontFaceObserver doesn't work in e2e tests.
     if (isTest()) {
       setFontLoading(false);
