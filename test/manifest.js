@@ -159,9 +159,7 @@ module.exports = [
   {
     example: "doc_exceptions.html",
     script: "logpoint-04.js",
-    // Not supported on chromium, needs exception support.
-    // https://github.com/RecordReplay/chromium/issues/10
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "node/basic.js",
