@@ -8,6 +8,7 @@ import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
 import Widget from "./Widget";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import "./Panel.css";
 import { connect } from "react-redux";
@@ -101,7 +102,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem,
       <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
         <div className="breakpoint-panel">
           <div className="warning">
-            <span className="material-icons">warning</span>
+            <MaterialIcon>warning</MaterialIcon>
             <span className="warning-content">{`Sorry! We can't display this breakpoint because it has too many hits.`}</span>
           </div>
         </div>

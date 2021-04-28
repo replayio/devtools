@@ -8,6 +8,7 @@ import { UIState } from "ui/state";
 
 import "./ReplyButton.css";
 import { Comment, Event, FloatingItem } from "ui/state/comments";
+import MaterialIcon from "../shared/MaterialIcon";
 
 type ReplyButtonProps = PropsFromRedux & {
   item: Comment | Event | FloatingItem;
@@ -28,7 +29,7 @@ function ReplyButton({ item, setModal, replyToItem }: ReplyButtonProps) {
 
   return (
     <button title="Add a comment" className="transcript-entry-action" onClick={onClick}>
-      <span className="material-icons">reply</span>
+      <MaterialIcon>reply</MaterialIcon>
     </button>
   );
 }

@@ -51,6 +51,7 @@ export interface AppState {
   workspaceId: WorkspaceId | null;
   defaultSettingsTab: SettingsTabTitle;
   recordingTarget: RecordingTarget | null;
+  fontLoading: boolean;
 }
 
 export interface AnalysisPoints {

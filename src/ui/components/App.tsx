@@ -77,7 +77,7 @@ function setTelemetryContext(userId: string | undefined, userEmail: string | und
   Sentry.setContext("user", sentryContext);
 }
 
-function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
+function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: AppProps) {
   const auth = useAuth0();
   const { claims } = useToken();
 
@@ -86,7 +86,6 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
 
   setTelemetryContext(userId, email);
   const { loading } = hooks.useMaybeClaimInvite();
-  const [fontLoading, setFontLoading] = useState(true);
 
   useEffect(() => {
     var font = new FontFaceObserver("Material Icons");
@@ -117,7 +116,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
     return <SkeletonLoader content={"Uploading resources"} />;
   }
 
-  if (loading || fontLoading) {
+  if (loading) {
     return <SkeletonLoader content={"Loading"} />;
   }
 
@@ -143,6 +142,7 @@ const connector = connect(
   }),
   {
     updateNarrowMode: actions.updateNarrowMode,
+    setFontLoading: actions.setFontLoading,
   }
 );
 export type AppProps = ConnectedProps<typeof connector>;

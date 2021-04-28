@@ -32,6 +32,7 @@ function initialAppState(): AppState {
     workspaceId: JSON.parse(prefs.defaultLibraryTeam),
     defaultSettingsTab: "Personal",
     recordingTarget: null,
+    fontLoading: true,
   };
 }
 
@@ -158,6 +159,10 @@ export default function update(
       return { ...state, recordingTarget: action.recordingTarget };
     }
 
+    case "set_material_icons_loaded": {
+      return { ...state, fontLoading: action.fontLoading };
+    }
+
     default: {
       return state;
     }
@@ -202,3 +207,4 @@ export const getCanvas = (state: UIState) => state.app.canvas;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
+export const getFontLoading = (state: UIState) => state.app.fontLoading;

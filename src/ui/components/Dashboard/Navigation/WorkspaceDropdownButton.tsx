@@ -6,6 +6,7 @@ import { UIState } from "ui/state";
 import { Workspace } from "ui/types";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import { Menu } from "@headlessui/react";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 type WorkspaceDropdownButtonProps = PropsFromRedux & {
   workspaces: (Workspace | { id: null; name: string; workspaces_users: never[] })[];
@@ -26,7 +27,7 @@ function WorkspaceDropdownButton({ workspaces, currentWorkspaceId }: WorkspaceDr
     subtitle = user.email;
   } else {
     const displayedWorkspace = workspaces.find(workspace => workspace.id == currentWorkspaceId);
-    picture = <div className="material-icons">workspaces</div>;
+    picture = <MaterialIcon>workspaces</MaterialIcon>;
     title = displayedWorkspace!.name;
     const count = displayedWorkspace?.workspaces_users.filter(wu => !wu.pending).length;
     subtitle = `Workspace - ${count} member${count == 1 ? "" : "s"}`;
