@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { gql, useMutation } from "@apollo/client";
-import RecordingGridItem from "./RecordingGridItem";
 import RecordingListItem from "./RecordingListItem";
 import RecordingItemDropdown from "./RecordingItemDropdown";
 
@@ -18,7 +17,7 @@ const UPDATE_IS_PRIVATE = gql`
   }
 `;
 
-export default function RecordingItem({ data, viewType, selectedIds, setSelectedIds, editing }) {
+export default function RecordingItem({ data, selectedIds, setSelectedIds, editing }) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [isPrivate, setIsPrivate] = useState(data.is_private);
   const [updateIsPrivate] = useMutation(UPDATE_IS_PRIVATE);
@@ -51,30 +50,17 @@ export default function RecordingItem({ data, viewType, selectedIds, setSelected
     />
   );
 
-  if (viewType == "list") {
-    return (
-      <RecordingListItem
-        data={data}
-        Panel={Panel}
-        onNavigate={onNavigate}
-        editingTitle={editingTitle}
-        setEditingTitle={setEditingTitle}
-        toggleIsPrivate={toggleIsPrivate}
-        selectedIds={selectedIds}
-        setSelectedIds={setSelectedIds}
-        editing={editing}
-      />
-    );
-  }
-
   return (
-    <RecordingGridItem
+    <RecordingListItem
       data={data}
       Panel={Panel}
       onNavigate={onNavigate}
       editingTitle={editingTitle}
       setEditingTitle={setEditingTitle}
       toggleIsPrivate={toggleIsPrivate}
+      selectedIds={selectedIds}
+      setSelectedIds={setSelectedIds}
+      editing={editing}
     />
   );
 }

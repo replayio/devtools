@@ -48,16 +48,18 @@ export default function SelectMenu({
   setSelected,
   options,
   label,
+  className,
 }: {
   selected: string | null;
   setSelected: (value: string | null) => void;
   options: MenuOption[];
+  className?: string;
   label?: string;
 }) {
   const selectedName = options.find(option => option.id === selected)!.name;
 
   return (
-    <div>
+    <div className={className}>
       <Listbox value={selected} onChange={setSelected}>
         {({ open }) => (
           <>
@@ -82,7 +84,7 @@ export default function SelectMenu({
               >
                 <Listbox.Options
                   static
-                  className="absolute mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none text-lg"
+                  className="absolute mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none text-lg"
                 >
                   {options.map(({ name, id }) => (
                     <Option name={name} id={id} key={id} />

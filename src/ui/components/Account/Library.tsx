@@ -44,17 +44,21 @@ function Header({
 }
 
 function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedux) {
-  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const { workspaces, loading: workspacesLoading } = hooks.useGetNonPendingWorkspaces();
+  const { loading: settingsLoading } = hooks.useGetUserSettings();
 
   useEffect(() => {
     // After rendering null, update the workspaceId to display the user's library
     // instead of the non-existent team.
-    if (!loading && ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
+    if (
+      !workspacesLoading &&
+      ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)
+    ) {
       setWorkspaceId(null);
     }
-  }, [workspaces, loading]);
+  }, [workspaces, workspacesLoading]);
 
-  if (loading) {
+  if (workspacesLoading || settingsLoading) {
     return null;
   }
 

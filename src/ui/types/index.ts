@@ -1,3 +1,5 @@
+import { Comment } from "ui/state/comments";
+
 export interface User {
   name: string;
   email: string;
@@ -19,12 +21,16 @@ export interface Recording {
   description: string;
   date: string;
   is_private: boolean;
+  user_id: string;
   user?: User;
+  collaborators?: Collaborator[];
+  comments?: Comment[];
 }
 
 interface Collaborator {
   recording: Recording;
   user: User;
+  user_id: string;
 }
 
 export interface Workspace {

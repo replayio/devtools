@@ -240,6 +240,13 @@ export function useGetPersonalRecordings():
         description
         date
         is_private
+        user_id
+        collaborators {
+          user_id
+        }
+        comments {
+          user_id
+        }
       }
 
       fragment avatarFields on users {
@@ -317,6 +324,7 @@ export function useGetWorkspaceRecordings(
           description
           date
           is_private
+          user_id
           user {
             name
             email

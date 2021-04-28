@@ -1,30 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import classnames from "classnames";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
-import Invitations from "./Navigation/Invitations";
 import "./DashboardViewerHeader.css";
 import hooks from "ui/hooks";
-
-function ViewsToggle({ viewType, toggleViewType }) {
-  return (
-    <div className="dashboard-viewer-header-views">
-      <button
-        className={classnames({ selected: viewType == "grid" })}
-        disabled={viewType == "grid"}
-        onClick={toggleViewType}
-      >
-        <div className="img view-grid" />
-      </button>
-      <button
-        className={classnames({ selected: viewType == "list" })}
-        disabled={viewType == "list"}
-        onClick={toggleViewType}
-      >
-        <div className="img view-list" />
-      </button>
-    </div>
-  );
-}
 
 function BatchActionDropdown({ selectedIds, setSelectedIds }) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
@@ -86,24 +64,13 @@ function BatchActionDropdown({ selectedIds, setSelectedIds }) {
   );
 }
 
-function HeaderActions({
-  selectedIds,
-  setSelectedIds,
-  editing,
-  toggleEditing,
-  viewType,
-  toggleViewType,
-}) {
+function HeaderActions({ selectedIds, setSelectedIds, editing, toggleEditing }) {
   return (
     <div className="dashboard-viewer-header-actions">
       {editing ? (
         <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />
       ) : null}
-      <button
-        className="toggle-editing"
-        onClick={toggleEditing}
-        style={{ visibility: viewType == "list" ? "visible" : "hidden" }}
-      >
+      <button className="toggle-editing" onClick={toggleEditing}>
         {editing ? "Done" : "Edit"}
       </button>
     </div>
@@ -111,14 +78,11 @@ function HeaderActions({
 }
 
 export default function DashboardViewerHeader({
-  filter,
   selectedIds,
   setSelectedIds,
   editing,
   toggleEditing,
-  viewType,
-  toggleViewType,
-  recordings,
+  filters,
 }) {
   return (
     <header className="dashboard-viewer-header">
@@ -127,10 +91,8 @@ export default function DashboardViewerHeader({
         setSelectedIds={setSelectedIds}
         editing={editing}
         toggleEditing={toggleEditing}
-        viewType={viewType}
-        toggleViewType={toggleViewType}
       />
-      <Invitations />
+      <div className="flex flex-row space-x-8">{filters}</div>
     </header>
   );
 }
