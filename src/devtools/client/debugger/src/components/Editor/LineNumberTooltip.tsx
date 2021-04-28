@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 const { prefs } = require("ui/utils/prefs");
@@ -100,7 +101,7 @@ function LineNumberTooltip({
   return (
     <StaticTooltip targetNode={lineNumberNode} className={isHot ? "hot" : ""}>
       <>
-        {isHot && <span className="material-icons">warning_amber</span>}
+        {isHot && <MaterialIcon>warning_amber</MaterialIcon>}
         <span>{`${points} hit${points == 1 ? "" : "s"}`}</span>
       </>
     </StaticTooltip>

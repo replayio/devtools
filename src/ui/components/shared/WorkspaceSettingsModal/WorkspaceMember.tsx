@@ -11,13 +11,14 @@ import { NonRegisteredTeamMember } from "ui/hooks/invitations";
 const { prefs } = require("ui/utils/prefs");
 
 import "./WorkspaceMember.css";
+import MaterialIcon from "../MaterialIcon";
 
 type WorkspaceMemberProps = { member: WorkspaceUser } & PropsFromRedux;
 
 export function NonRegisteredWorkspaceMember({ member }: { member: NonRegisteredTeamMember }) {
   return (
     <li className="workspace-member">
-      <span className="material-icons">mail_outline</span>
+      <MaterialIcon>mail_outline</MaterialIcon>
       <div className="workspace-member-content">
         <div className="title">{member.invited_email}</div>
       </div>
@@ -72,7 +73,7 @@ function Role({
     <PortalDropdown
       buttonContent={
         <div className="permission-container">
-          <span className="material-icons">expand_more</span>
+          <MaterialIcon>expand_more</MaterialIcon>
           <span>Admin</span>
         </div>
       }
@@ -92,7 +93,7 @@ function Role({
       <PortalDropdown
         buttonContent={
           <div className="permission-container">
-            <span className="material-icons">expand_more</span>
+            <MaterialIcon>expand_more</MaterialIcon>
             <span>Pending</span>
           </div>
         }

@@ -5,6 +5,7 @@ const Modal = require("ui/components/shared/Modal").default;
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+import MaterialIcon from "../MaterialIcon";
 import WorkspaceForm from "./WorkspaceForm";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 import "./WorkspaceSettingsModal.css";
@@ -23,7 +24,7 @@ function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
       <Modal>
         <main>
           <h1>
-            <span className="material-icons">settings</span>
+            <MaterialIcon>settings</MaterialIcon>
             <span>Team Settings</span>
           </h1>
           <div className="new-workspace-content">

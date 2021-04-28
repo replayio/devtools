@@ -63,6 +63,9 @@ export type SetDefaultSettingsTab = Action<"set_default_settings_tab"> & {
 export type SetRecordingTargetAction = Action<"set_recording_target"> & {
   recordingTarget: RecordingTarget;
 };
+export type SetFontLoading = Action<"set_material_icons_loaded"> & {
+  fontLoading: boolean;
+};
 
 export type AppActions =
   | SetupAppAction
@@ -85,7 +88,8 @@ export type AppActions =
   | SetCanvas
   | SetWorkspaceId
   | SetDefaultSettingsTab
-  | SetRecordingTargetAction;
+  | SetRecordingTargetAction
+  | SetFontLoading;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -236,4 +240,8 @@ export function setDefaultSettingsTab(tabTitle: SettingsTabTitle): SetDefaultSet
 
 export function setRecordingTarget(recordingTarget: RecordingTarget): SetRecordingTargetAction {
   return { type: "set_recording_target", recordingTarget };
+}
+
+export function setFontLoading(value: boolean): SetFontLoading {
+  return { type: "set_material_icons_loaded", fontLoading: value };
 }

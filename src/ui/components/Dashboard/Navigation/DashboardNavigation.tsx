@@ -8,6 +8,7 @@ import classnames from "classnames";
 import WorkspaceDropdown from "./WorkspaceDropdown";
 import "./DashboardNavigation.css";
 import { Workspace } from "ui/types";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 interface Recording {
   url: string;
@@ -43,7 +44,7 @@ function DashboardNavigation({
       {nonPendingWorkspaces && <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />}
       {nonPendingWorkspaces && !isPersonal ? (
         <div className={classnames("left-sidebar-menu-item")} onClick={onSettingsClick}>
-          <span className="material-icons">settings</span>
+          <MaterialIcon>settings</MaterialIcon>
           <span>{`Settings & Members`}</span>
         </div>
       ) : null}
