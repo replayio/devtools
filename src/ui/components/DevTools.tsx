@@ -92,7 +92,7 @@ function DevTools({
   let loaderResult: ReactElement | undefined;
   let expectedError: ExpectedError | undefined;
 
-  if (queriesAreLoading || !recording) {
+  if (queriesAreLoading) {
     loaderResult = <SkeletonLoader content={"Fetching the replay information."} />;
   } else if (recordingDuration === null) {
     loaderResult = <SkeletonLoader content={"Fetching the replay description."} />;

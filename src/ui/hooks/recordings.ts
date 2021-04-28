@@ -43,6 +43,7 @@ export function useGetRecording(
   const recording = convertRecording(data?.recording);
   // Tests don't have an associated user so we just let it bypass the check here.
   const isAuthorized = isTest() || recording;
+
   return { recording, isAuthorized: !!isAuthorized, loading };
 }
 
