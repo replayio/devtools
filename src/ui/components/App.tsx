@@ -26,6 +26,7 @@ import { ModalType } from "ui/state/app";
 import useToken from "ui/utils/useToken";
 var FontFaceObserver = require("fontfaceobserver");
 import "styles.css";
+import { useGetUserInfo } from "ui/hooks/users";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -81,8 +82,13 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
   const { claims } = useToken();
   const { availableInvitations } = hooks.useGetAvailableInvitations();
 
-  setTelemetryContext(claims?.hasura.userId, auth.user?.email);
-  // const { loading } = hooks.useMaybeClaimInvite();
+  const userId = claims?.hasura.userId;
+  const userInfo = useGetUserInfo();
+  let isInternal = false;
+  if (userInfo) {
+    isInternal = userInfo.isInternal;
+    setTelemetryContext(userId, userInfo.email);
+  }
 
   useEffect(() => {
     var font = new FontFaceObserver("Material Icons");
