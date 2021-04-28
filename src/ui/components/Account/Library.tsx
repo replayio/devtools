@@ -45,8 +45,8 @@ function Header({
 }
 
 function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedux) {
-  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const userInfo = useGetUserInfo();
+  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
 
   useEffect(() => {
     // After rendering null, update the workspaceId to display the user's library
