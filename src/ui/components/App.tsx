@@ -26,7 +26,6 @@ import { ModalType } from "ui/state/app";
 import useToken from "ui/utils/useToken";
 var FontFaceObserver = require("fontfaceobserver");
 import "styles.css";
-import { useGetUserInfo } from "ui/hooks/users";
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -62,12 +61,8 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
   observer.observe(viewport!);
 }
 
-function setTelemetryContext(
-  userId: string | undefined,
-  userEmail: string | undefined,
-  isInternal: boolean
-) {
-  let sentryContext: Record<string, string | boolean> = { isInternal };
+function setTelemetryContext(userId: string | undefined, userEmail: string | undefined) {
+  let sentryContext: Record<string, string> = {};
   if (userId) {
     mixpanel.identify(userId);
     sentryContext["userId"] = userId;
@@ -86,12 +81,8 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
   const { claims } = useToken();
   const { availableInvitations } = hooks.useGetAvailableInvitations();
 
-  const userId = claims?.hasura.userId;
-  const userInfo = useGetUserInfo();
-  if (userInfo) {
-    const isInternal = userInfo.isInternal;
-    setTelemetryContext(userId, userInfo.email, isInternal);
-  }
+  setTelemetryContext(claims?.hasura.userId, auth.user?.email);
+  // const { loading } = hooks.useMaybeClaimInvite();
 
   useEffect(() => {
     var font = new FontFaceObserver("Material Icons");
