@@ -8,6 +8,7 @@ import "./Account.css";
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
   const forceOpenAuth = new URLSearchParams(window.location.search).get("signin");
+  const openedFromEmail = new URLSearchParams(window.location.search).get("emailinvite");
 
   if (forceOpenAuth) {
     loginWithRedirect();
@@ -23,11 +24,17 @@ function WelcomePage() {
       className="w-full h-full bg-white grid"
       style={{ background: "linear-gradient(to bottom right, #68DCFC, #4689F8)" }}
     >
-      <section className="max-w-md w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden">
+      <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="p-16 h-84 space-y-12">
           <div className="space-y-4 place-content-center">
             <img className="w-16 h-16 mx-auto" src="images/logo.svg" />
           </div>
+          {openedFromEmail ? (
+            <div className="text-center space-y-2">
+              <div className="font-bold text-2xl">Almost there!</div>
+              <div className="font-medium text-xl">First we need you to sign in.</div>
+            </div>
+          ) : null}
           <a
             href="#"
             onClick={loginWithRedirect}
