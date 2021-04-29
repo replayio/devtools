@@ -62,8 +62,12 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
   observer.observe(viewport!);
 }
 
-function setTelemetryContext(userId: string | undefined, userEmail: string | undefined) {
-  let sentryContext: Record<string, string> = {};
+function setTelemetryContext(
+  userId: string | undefined,
+  userEmail: string | undefined,
+  isInternal: boolean
+) {
+  let sentryContext: Record<string, string | boolean> = { isInternal };
   if (userId) {
     mixpanel.identify(userId);
     sentryContext["userId"] = userId;
@@ -84,10 +88,9 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
 
   const userId = claims?.hasura.userId;
   const userInfo = useGetUserInfo();
-  let isInternal = false;
   if (userInfo) {
-    isInternal = userInfo.isInternal;
-    setTelemetryContext(userId, userInfo.email);
+    const isInternal = userInfo.isInternal;
+    setTelemetryContext(userId, userInfo.email, isInternal);
   }
 
   useEffect(() => {
