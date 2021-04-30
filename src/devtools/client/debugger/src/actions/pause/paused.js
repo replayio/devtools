@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { getSelectedFrame, getThreadContext } from "../../selectors";
+import { getSelectedFrame, getThreadContext, getSelectedLocation } from "../../selectors";
 
 import { selectLocation } from "../sources";
 import { fetchScopes } from "./fetchScopes";
@@ -57,7 +57,16 @@ export function paused({ executionPoint, time }) {
 
     const frame = getSelectedFrame(getState());
     if (frame) {
-      dispatch(selectLocation(cx, frame.location, { remap: true }));
+      const currentLocation = getSelectedLocation(getState());
+      if (
+        !currentLocation ||
+        currentLocation.sourceId !== frame.location.sourceId ||
+        currentLocation.line !== frame.location.line ||
+        currentLocation.column !== frame.location.column
+      ) {
+        dispatch(selectLocation(cx, frame.location, { remap: true }));
+      }
+
       await Promise.all([
         dispatch(fetchAsyncFrames(cx)),
         dispatch(setFramePositions()),

@@ -83,11 +83,7 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
     const canvas = selectors.getCanvas(state);
     const recordingTarget = selectors.getRecordingTarget(state);
 
-    if ("hasFrames" in item) {
-      dispatch(actions.seek(point, time, item.hasFrames));
-    } else {
-      dispatch(actions.seek(point, time, false));
-    }
+    dispatch(seekToComment(item));
 
     if ("comment" in item && item.comment && "id" in item.comment) {
       // Add a reply to an event's comment.
@@ -172,11 +168,7 @@ export function editItem(item: Comment | Reply): UIThunkAction {
   return async ({ dispatch }) => {
     const { point, time, hasFrames } = item;
 
-    if ("hasFrames" in item) {
-      dispatch(actions.seek(point, time, item.hasFrames));
-    } else {
-      dispatch(actions.seek(point, time, false));
-    }
+    dispatch(seekToComment(item));
 
     if (!("replies" in item)) {
       const { content, sourceLocation, parentId, position, id } = item;
@@ -203,6 +195,18 @@ export function editItem(item: Comment | Reply): UIThunkAction {
         },
       };
       dispatch(setPendingComment(pendingComment));
+    }
+  };
+}
+
+export function seekToComment(item: Comment | Reply | Event | FloatingItem): UIThunkAction {
+  return ({ dispatch, getState }) => {
+    let cx = selectors.getThreadContext(getState());
+    const hasFrames = "hasFrames" in item ? item.hasFrames : false;
+    dispatch(actions.seek(item.point, item.time, hasFrames));
+    if ("sourceLocation" in item && item.sourceLocation) {
+      cx = selectors.getThreadContext(getState());
+      dispatch(actions.selectLocation(cx, item.sourceLocation));
     }
   };
 }

@@ -28,10 +28,8 @@ class CommentMarker extends React.Component {
   }
 
   onClick = () => {
-    const { comment, seek } = this.props;
-    const { time, point, hasFrames } = comment;
-
-    seek(point, time, hasFrames);
+    const { comment, seekToComment } = this.props;
+    seekToComment(comment);
   };
 
   render() {
@@ -80,7 +78,7 @@ export default connect(
     currentTime: selectors.getCurrentTime(state),
   }),
   {
-    seek: actions.seek,
+    seekToComment: actions.seekToComment,
     setHoveredComment: actions.setHoveredComment,
   }
 )(CommentMarker);
