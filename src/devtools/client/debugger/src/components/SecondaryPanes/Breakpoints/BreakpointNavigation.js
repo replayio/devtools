@@ -94,7 +94,7 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed })
 
   return (
     <div className="breakpoint-navigation-status-container">
-      <div className="breakpoint-navigation-status">{status}</div>
+      <div className="px-3 py-0.5 rounded-2xl text-gray-500 bg-gray-200">{status}</div>
     </div>
   );
 }

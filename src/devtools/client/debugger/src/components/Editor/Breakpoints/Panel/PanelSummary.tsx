@@ -41,7 +41,6 @@ function PanelSummary({
   };
   const addComment = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log(">>add comment");
 
     createComment(currentTime, executionPoint, null);
   };
@@ -80,7 +79,7 @@ function PanelSummary({
             type="button"
             disabled={true}
             onClick={e => e.stopPropagation()}
-            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-gray-500 bg-gray-300"
+            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-gray-500 bg-gray-200"
             style={{ cursor: "auto" }}
           >
             Add a comment
