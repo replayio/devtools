@@ -20,9 +20,6 @@ export function useGetUserId() {
 
 export function useGetUserInfo() {
   const userId = getUserId();
-  if (!userId) {
-    return;
-  }
   const { data, loading, error } = useQuery(
     gql`
       query GetUser($userId: uuid!) {
@@ -37,6 +34,7 @@ export function useGetUserInfo() {
       }
     `,
     {
+      skip: !userId,
       variables: { userId },
     }
   );
