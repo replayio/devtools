@@ -4,9 +4,11 @@ import { Action } from "redux";
 
 import tokenManager from "ui/utils/tokenManager";
 import { UIStore, actions, UIThunkAction } from "ui/actions";
+import { selectors } from "ui/reducers";
 import { ThreadFront } from "protocol/thread";
 const { prefs } = require("ui/utils/prefs");
 import { getTest, isTest } from "ui/utils/environment";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import { ExpectedError } from "ui/state/app";
 import { getExpectedError } from "ui/reducers/app";
@@ -80,10 +82,29 @@ function onSessionError(error: sessionError): UIThunkAction {
   };
 }
 
-export function setExpectedError(error: ExpectedError): SetExpectedErrorAction {
-  return { type: "set_expected_error", error };
+export function setExpectedError(error: ExpectedError): UIThunkAction {
+  return ({ getState, dispatch }) => {
+    const state = getState();
+    sendTelemetryEvent("DevtoolsExpectedError", {
+      message: error.message,
+      action: error.action,
+      type: error.type,
+      stack: error.stack,
+      recordingId: selectors.getRecordingId(state),
+      sessionId: selectors.getSessionId(state),
+    });
+    dispatch({ type: "set_expected_error", error });
+  };
 }
 
-export function setUnexpectedError(error: sessionError): SetUnexpectedErrorAction {
-  return { type: "set_unexpected_error", error };
+export function setUnexpectedError(error: sessionError): UIThunkAction {
+  return ({ getState, dispatch }) => {
+    const state = getState();
+    sendTelemetryEvent("DevtoolsUnexpectedError", {
+      ...error,
+      recordingId: selectors.getRecordingId(state),
+      sessionId: selectors.getSessionId(state),
+    });
+    dispatch({ type: "set_unexpected_error", error });
+  };
 }
