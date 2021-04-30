@@ -29,7 +29,7 @@ function TranscriptItem({
   secondaryLabel,
   highlightSecondaryLabel,
   clearPendingComment,
-  seek,
+  seekToComment,
   setHoveredItem,
   clearHoveredItem,
   children,
@@ -55,12 +55,7 @@ function TranscriptItem({
   }, [secondaryLabel]);
 
   const onClick = () => {
-    if ("hasFrames" in item) {
-      seek(point, time, item.hasFrames);
-    } else {
-      seek(point, time, false);
-    }
-
+    seekToComment(item);
     clearPendingComment();
   };
   const onMouseLeave = () => {
@@ -111,7 +106,7 @@ const connector = connect(
   {
     setHoveredItem: actions.setHoveredItem,
     clearHoveredItem: actions.clearHoveredItem,
-    seek: actions.seek,
+    seekToComment: actions.seekToComment,
     clearPendingComment: actions.clearPendingComment,
   }
 );
