@@ -32,8 +32,8 @@ function Support() {
         <br />
         <div className="label">Send us an email</div>
         <div className="description">
-          You can also send an email at <a href="mailto:feedback@replay.io">feedback@replay.io</a>.
-          We’d love to hear your feedback!
+          You can also send an email at <a href="mailto:support@replay.io">support@replay.io</a>. It
+          goes straight to the people making the product, and we'd love to hear your feedback!
         </div>
       </label>
     </li>
