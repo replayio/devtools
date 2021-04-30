@@ -15,7 +15,6 @@ import { selectors } from "../reducers";
 import { UIState } from "ui/state";
 import { ExpectedError, UploadInfo } from "ui/state/app";
 import { RecordingId } from "@recordreplay/protocol";
-import mixpanel from "mixpanel-browser";
 
 type DevToolsProps = PropsFromRedux & {
   recordingId: RecordingId;
@@ -45,7 +44,6 @@ function DevTools({
   viewMode,
   recordingTarget,
   setViewMode,
-  setRecordingWorkspace,
 }: DevToolsProps) {
   const [finishedLoading, setFinishedLoading] = useState(false);
   const { claims } = useToken();
@@ -57,7 +55,7 @@ function DevTools({
   );
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
   const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
-  const { title, deleted_at, user } = recording || {};
+  const { title, user } = recording || {};
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -79,17 +77,14 @@ function DevTools({
     if (title) {
       document.title = `${title} - Replay`;
     }
-    if (recording?.workspace) {
-      setRecordingWorkspace(recording?.workspace);
-    }
   }, [recording]);
 
   useEffect(() => {
-    const isAuthor = userId && userId == recording?.user_id;
+    const isAuthor = userId && userId == recording?.userId;
 
     // Force switch to viewer mode if the recording is being initialized
     // by the author.
-    if (isAuthor && !recording.is_initialized && !isTest()) {
+    if (isAuthor && !recording?.isInitialized && !isTest()) {
       setViewMode("non-dev");
     }
   }, [recording]);
@@ -97,7 +92,7 @@ function DevTools({
   let loaderResult: ReactElement | undefined;
   let expectedError: ExpectedError | undefined;
 
-  if (queriesAreLoading || !recording) {
+  if (queriesAreLoading) {
     loaderResult = <SkeletonLoader content={"Fetching the replay information."} />;
   } else if (recordingDuration === null) {
     loaderResult = <SkeletonLoader content={"Fetching the replay description."} />;
@@ -107,18 +102,13 @@ function DevTools({
   }
 
   if (!loaderResult) {
-    if (deleted_at) {
-      expectedError = { message: "This replay has been deleted." };
-    }
-
-    // Test recordings don't have a user, so we skip this check in that case.
-    if (user && user.invited == false) {
-      expectedError = { message: "The author of this Replay has not activated their account yet." };
-    }
-
     if (!isAuthorized) {
       if (userId) {
-        expectedError = { message: "You don't have permission to view this replay." };
+        expectedError = {
+          message: "You don't have permission to view this replay.",
+          content:
+            "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
+        };
       } else {
         expectedError = {
           message: "You need to sign in to view this replay.",
@@ -174,7 +164,6 @@ const connector = connect(
     updateTimelineDimensions: actions.updateTimelineDimensions,
     setExpectedError: actions.setExpectedError,
     setViewMode: actions.setViewMode,
-    setRecordingWorkspace: actions.setRecordingWorkspace,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

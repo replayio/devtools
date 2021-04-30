@@ -62,8 +62,12 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
   observer.observe(viewport!);
 }
 
-function setTelemetryContext(userId: string | undefined, userEmail: string | undefined) {
-  let sentryContext: Record<string, string> = {};
+function setTelemetryContext(
+  userId: string | undefined,
+  userEmail: string | undefined,
+  isInternal: boolean
+) {
+  let sentryContext: Record<string, string | boolean> = { isInternal };
   if (userId) {
     mixpanel.identify(userId);
     sentryContext["userId"] = userId;
@@ -77,23 +81,14 @@ function setTelemetryContext(userId: string | undefined, userEmail: string | und
   Sentry.setContext("user", sentryContext);
 }
 
-function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
+function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: AppProps) {
   const auth = useAuth0();
   const { claims } = useToken();
-
-  const userId = claims?.hasura.userId;
-  const { isInternal, email } = useGetUserInfo();
-
-  setTelemetryContext(userId, email);
-  const { loading } = hooks.useMaybeClaimInvite();
-  const [fontLoading, setFontLoading] = useState(true);
+  const userInfo = useGetUserInfo();
 
   useEffect(() => {
     var font = new FontFaceObserver("Material Icons");
-
-    font.load().then(() => {
-      setFontLoading(false);
-    });
+    font.load().then(() => setFontLoading(false));
 
     // FontFaceObserver doesn't work in e2e tests.
     if (isTest()) {
@@ -102,13 +97,19 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
   }, []);
 
   useEffect(() => {
+    if (userInfo) {
+      setTelemetryContext(claims?.hasura.userId, userInfo.email, userInfo.isInternal);
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
     document.body.parentElement!.className = theme || "";
     installViewportObserver({ updateNarrowMode });
   }, [theme]);
 
   useEffect(() => {
     setUserInBrowserPrefs(auth.user);
-    if (auth.user && !isInternal) {
+    if (auth.user && !userInfo.isInternal) {
       LogRocket.createSession(auth);
     }
   }, [auth.user]);
@@ -117,7 +118,7 @@ function App({ theme, recordingId, modal, updateNarrowMode }: AppProps) {
     return <SkeletonLoader content={"Uploading resources"} />;
   }
 
-  if (loading || fontLoading) {
+  if (false /* loading */) {
     return <SkeletonLoader content={"Loading"} />;
   }
 
@@ -143,6 +144,7 @@ const connector = connect(
   }),
   {
     updateNarrowMode: actions.updateNarrowMode,
+    setFontLoading: actions.setFontLoading,
   }
 );
 export type AppProps = ConnectedProps<typeof connector>;

@@ -9,27 +9,14 @@ import ViewToggle from "ui/components/Header/ViewToggle";
 import UserOptions from "ui/components/Header/UserOptions";
 import { prefs } from "ui/utils/prefs";
 import hooks from "ui/hooks";
-import { getUserId } from "ui/utils/useToken";
 import { isTest } from "ui/utils/environment";
 import ShareButton from "./ShareButton";
+import useAuth0 from "ui/utils/useAuth0";
 
 import "./Header.css";
 
-import { gql, useQuery } from "@apollo/client";
-
-const GET_RECORDING_TITLE = gql`
-  query RecordingTitle($id: uuid!) {
-    recordings(where: { id: { _eq: $id } }) {
-      id
-      title
-      date
-      recordingTitle
-    }
-  }
-`;
-
 function Avatars({ recordingId, sessionId }) {
-  const { users, loading } = useGetActiveSessions(recordingId, sessionId);
+  const { users, loading } = useGetActiveSessions(recordingId);
 
   if (loading) {
     return null;
@@ -45,7 +32,12 @@ function Avatars({ recordingId, sessionId }) {
 }
 
 function Links({ recordingId, sessionId, recordingTarget }) {
-  const showShare = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+  const { isAuthenticated } = useAuth0();
+  const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+  const isCollaborator =
+    isAuthenticated &&
+    hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000");
+  const showShare = isOwner || isCollaborator;
 
   return (
     <div className="links">
@@ -59,11 +51,8 @@ function Links({ recordingId, sessionId, recordingTarget }) {
 
 function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
   const { recording, loading } = hooks.useGetRecording(recordingId);
-  const userId = getUserId();
-  const isAuthor = userId && userId == recording.user_id;
-  const { data } = useQuery(GET_RECORDING_TITLE, {
-    variables: { id: recordingId },
-  });
+  const { userId } = hooks.useGetUserId();
+  const isAuthor = userId && userId == recording.userId;
 
   if (!recordingId) {
     return <div className="title">Recordings</div>;
@@ -73,7 +62,7 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
     return null;
   }
 
-  if (isAuthor && !recording.is_initialized && !isTest()) {
+  if (isAuthor && !recording.isInitialized && !isTest()) {
     return (
       <div className="title-container">
         <div className="title">New Recording</div>
@@ -81,12 +70,12 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
     );
   }
 
-  const { recordingTitle, title } = data.recordings?.[0] || {};
+  const { title } = recording || {};
 
   return (
     <div className="title-container">
       <Title
-        defaultTitle={recordingTitle || title}
+        defaultTitle={title}
         setEditingTitle={setEditingTitle}
         editingTitle={editingTitle}
         recordingId={recordingId}

@@ -109,10 +109,6 @@ html {
   width: 100%;
 }
 
-.old-loader {
-  margin: auto;
-}
-
 .horizontal-panels {
   display: flex;
   flex-direction: row;
@@ -127,10 +123,6 @@ html {
   flex-grow: 1;
   width: 100%;
   overflow: hidden;
-}
-
-.material-icons {
-  color: var(--theme-icon-color);
 }
 
 @import url("devtools/client/themes/variables.css");

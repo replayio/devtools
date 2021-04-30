@@ -19,7 +19,7 @@ Test.describe(`Test changing the user's settings.`, async () => {
   const experimentalSection = [...sections].find(s => s.textContent === "Experimental");
   experimentalSection.click();
 
-  let elementsCheckbox = await Test.waitUntil(() => document.getElementById("show_elements"));
+  let elementsCheckbox = await Test.waitUntil(() => document.getElementById("showElements"));
   const initialState = elementsCheckbox.checked;
   await new Promise(resolve => setTimeout(resolve, 0)); // otherwise the following click gets lost, but why?
   elementsCheckbox.click();

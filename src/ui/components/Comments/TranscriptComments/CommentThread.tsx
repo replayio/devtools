@@ -21,7 +21,7 @@ function CommentThread({
   currentTime,
   pendingComment,
   hoveredComment,
-  seek,
+  seekToComment: jumpToComment,
   setHoveredComment,
   clearPendingComment,
 }: CommentThreadProps) {
@@ -43,11 +43,10 @@ function CommentThread({
       return;
     }
 
-    const { point, time, has_frames } = comment;
     e.stopPropagation();
     clearPendingComment();
 
-    return seek(point, time, has_frames);
+    return jumpToComment(comment);
   };
   const updatedHoveredComment = () => {
     if (!comment || !("id" in comment)) {
@@ -106,7 +105,7 @@ const connector = connect(
     hoveredComment: selectors.getHoveredComment(state),
   }),
   {
-    seek: actions.seek,
+    seekToComment: actions.seekToComment,
     setHoveredComment: actions.setHoveredComment,
     clearPendingComment: actions.clearPendingComment,
     setPendingComment: actions.setPendingComment,

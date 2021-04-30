@@ -8,12 +8,14 @@ import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
 import Widget from "./Widget";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import "./Panel.css";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
+import PanelSummary from "./PanelSummary";
 const { prefs } = require("ui/utils/prefs");
 
 function getPanelWidth({ editor }) {
@@ -22,41 +24,6 @@ function getPanelWidth({ editor }) {
   const panelIndent = 60;
 
   return editor.getScrollInfo().clientWidth - panelIndent;
-}
-
-function PanelSummary({ breakpoint, toggleEditingOn, isEditable, setInputToFocus }) {
-  const conditionValue = breakpoint.options.condition;
-  const logValue = breakpoint.options.logValue;
-
-  const handleClick = (event, input) => {
-    if (!isEditable) {
-      return;
-    }
-
-    event.stopPropagation();
-    toggleEditingOn();
-    setInputToFocus(input);
-  };
-
-  return (
-    <>
-      <div className="summary" onClick={e => handleClick(e, "logValue")}>
-        <div className="options">
-          {conditionValue ? (
-            <button className="condition" type="button" onClick={e => handleClick(e, "condition")}>
-              if (<span className="expression">{conditionValue}</span>)
-            </button>
-          ) : null}
-          <button className="log" type="button" onClick={e => handleClick(e, "logValue")}>
-            log(<span className="expression">{logValue}</span>)
-          </button>
-        </div>
-        <div className="action" tabIndex="0" onClick={e => handleClick(e, "logValue")}>
-          Edit
-        </div>
-      </div>
-    </>
-  );
 }
 
 function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem, analysisPoints }) {
@@ -101,7 +68,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem,
       <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
         <div className="breakpoint-panel">
           <div className="warning">
-            <span className="material-icons">warning</span>
+            <MaterialIcon>warning</MaterialIcon>
             <span className="warning-content">{`Sorry! We can't display this breakpoint because it has too many hits.`}</span>
           </div>
         </div>

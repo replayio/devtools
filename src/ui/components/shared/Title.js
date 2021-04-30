@@ -1,20 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { gql, useMutation } from "@apollo/client";
 import useAuth0 from "ui/utils/useAuth0";
-
-const UPDATE_RECORDING = gql`
-  mutation UpdateRecordingTitle($recordingId: String, $title: String) {
-    update_recordings(
-      _set: { recordingTitle: $title }
-      where: { recording_id: { _eq: $recordingId } }
-    ) {
-      returning {
-        id
-        recordingTitle
-      }
-    }
-  }
-`;
+import hooks from "ui/hooks";
 
 export default function Title({
   defaultTitle,
@@ -24,7 +10,7 @@ export default function Title({
   allowEditOnTitleClick,
 }) {
   const { isAuthenticated } = useAuth0();
-  const [updateRecordingTitle] = useMutation(UPDATE_RECORDING);
+  const updateRecordingTitle = hooks.useUpdateRecordingTitle();
   const [title, setTitle] = useState(defaultTitle);
   const test = new URL(window.location.href).searchParams.get("test");
 

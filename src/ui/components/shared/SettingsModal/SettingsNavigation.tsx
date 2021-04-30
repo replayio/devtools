@@ -3,6 +3,7 @@ import classnames from "classnames";
 import { Setting, Settings } from "./types";
 import "./SettingsNavigation.css";
 import { SettingsTabTitle } from "ui/state/app";
+import MaterialIcon from "../MaterialIcon";
 
 interface SettingNavigationItemProps {
   setting: Setting;
@@ -28,7 +29,7 @@ function SettingNavigationItem({
 
   return (
     <li onClick={onClick} className={classnames({ selected: title === selectedTab })}>
-      <div className="material-icons">{icon}</div>
+      <MaterialIcon>{icon!}</MaterialIcon>
       <span>{title}</span>
     </li>
   );

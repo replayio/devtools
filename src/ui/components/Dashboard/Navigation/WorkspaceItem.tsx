@@ -10,7 +10,7 @@ import classnames from "classnames";
 const { prefs } = require("ui/utils/prefs");
 
 type WorkspaceItemProps = PropsFromRedux & {
-  workspace: Workspace | { id: null; name: string; workspaces_users: never[] };
+  workspace: Workspace | { id: null; name: string; members: never[] };
 };
 
 function WorkspaceItem({ workspace, currentWorkspaceId, setWorkspaceId }: WorkspaceItemProps) {

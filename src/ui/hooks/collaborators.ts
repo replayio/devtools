@@ -1,13 +1,23 @@
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
+import { RecordingId } from "@recordreplay/protocol";
+import { useGetPersonalRecordings } from "./recordings";
+
+export function useIsCollaborator(recordingId: RecordingId) {
+  const { recordings } = useGetPersonalRecordings();
+
+  if (recordings) {
+    return !!recordings.find(recording => recording.id == recordingId);
+  }
+
+  return false;
+}
 
 export function useDeleteCollaborator() {
   const [deleteCollaborator, { error }] = useMutation(
     gql`
-      mutation DeleteCollaborator($recordingId: uuid, $userId: uuid) {
-        delete_collaborators(
-          where: { _and: { recording_id: { _eq: $recordingId } }, user_id: { _eq: $userId } }
-        ) {
-          affected_rows
+      mutation DeleteCollaborator($collaborationId: ID!) {
+        removeRecordingCollaborator(input: { id: $collaborationId }) {
+          success
         }
       }
     `,
@@ -26,9 +36,9 @@ export function useDeleteCollaborator() {
 export function useAddNewCollaborator() {
   const [addNewCollaborator, { loading, error }] = useMutation(
     gql`
-      mutation AddCollaborator($objects: [collaborators_insert_input!]! = {}) {
-        insert_collaborators(objects: $objects) {
-          affected_rows
+      mutation AddCollaborator($email: String!, $recordingId: ID!) {
+        addRecordingCollaborator(input: { email: $email, recordingId: $recordingId }) {
+          success
         }
       }
     `,
@@ -42,27 +52,4 @@ export function useAddNewCollaborator() {
   }
 
   return { addNewCollaborator, loading, error };
-}
-
-export function useFetchCollaboratorId(email: string) {
-  const { data, loading, error } = useQuery(
-    gql`
-      query GetCollaboratorId($email: String = "") {
-        user_id_by_email(args: { email: $email }) {
-          id
-        }
-      }
-    `,
-    {
-      variables: { email },
-    }
-  );
-
-  if (error) {
-    console.error("Apollo error while fetching collaborator ID for ", email, error);
-  }
-
-  const userId = data?.user_id_by_email[0]?.id;
-
-  return { userId, loading, error };
 }

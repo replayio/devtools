@@ -28,10 +28,8 @@ class CommentMarker extends React.Component {
   }
 
   onClick = () => {
-    const { comment, seek } = this.props;
-    const { time, point, has_frames } = comment;
-
-    seek(point, time, has_frames);
+    const { comment, seekToComment } = this.props;
+    seekToComment(comment);
   };
 
   render() {
@@ -45,7 +43,7 @@ class CommentMarker extends React.Component {
 
     // We don't want to show the replies on the timeline
     // just the parent comment.
-    if (comment.parent_id) {
+    if (comment.parentId) {
       return null;
     }
 
@@ -80,7 +78,7 @@ export default connect(
     currentTime: selectors.getCurrentTime(state),
   }),
   {
-    seek: actions.seek,
+    seekToComment: actions.seekToComment,
     setHoveredComment: actions.setHoveredComment,
   }
 )(CommentMarker);

@@ -85,9 +85,7 @@ module.exports = [
   {
     example: "doc_async.html",
     script: "stepping-06.js",
-    // Not supported on chromium, needs generator support.
-    // Node issue: https://github.com/RecordReplay/node/issues/8
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
 
   //////////////////////////////////////////////////////////////////////////////
@@ -112,9 +110,7 @@ module.exports = [
   {
     example: "doc_async.html",
     script: "console_async_eval.js",
-    // Not supported on chromium, needs generator support.
-    // Node issue: https://github.com/RecordReplay/node/issues/8
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "doc_rr_console.html",
@@ -163,9 +159,7 @@ module.exports = [
   {
     example: "doc_exceptions.html",
     script: "logpoint-04.js",
-    // Not supported on chromium, needs exception support.
-    // https://github.com/RecordReplay/chromium/issues/10
-    targets: ["gecko"],
+    targets: ["gecko", "chromium"],
   },
   {
     example: "node/basic.js",
@@ -256,11 +250,12 @@ module.exports = [
   // Miscellaneous
   //////////////////////////////////////////////////////////////////////////////
 
-  {
-    example: "doc_rr_basic.html",
-    script: "settings.js",
-    targets: ["gecko", "chromium"],
-  },
+  // Disabled for now because this test requires authentication
+  // {
+  //   example: "doc_rr_basic.html",
+  //   script: "settings.js",
+  //   targets: ["gecko", "chromium"],
+  // },
   {
     example: "doc_rr_worker.html",
     script: "worker-01.js",

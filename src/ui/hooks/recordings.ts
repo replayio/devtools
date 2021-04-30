@@ -1,38 +1,32 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
-import { User, Recording } from "ui/types";
-import useToken, { getUserId } from "ui/utils/useToken";
+import { Recording } from "ui/types";
 import { WorkspaceId } from "ui/state/app";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
-
-type PersonalRecordingsData = {
-  users: User[];
-  recordings: Recording[];
-};
+import { useGetUserId } from "./users";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
 }
 
-export function useGetRecording(recordingId: RecordingId) {
+export function useGetRecording(
+  recordingId: RecordingId
+): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {
   const { data, error, loading } = useQuery(
     gql`
-      query GetRecording($recordingId: uuid!) {
-        recordings(where: { id: { _eq: $recordingId } }) {
-          id
-          user_id
+      query GetRecording($recordingId: UUID!) {
+        recording(uuid: $recordingId) {
+          uuid
+          url
           title
-          recordingTitle
-          is_private
-          is_initialized
-          date
-          deleted_at
-          user {
-            invited
-          }
-          workspace {
+          duration
+          createdAt
+          private
+          isInitialized
+          owner {
             id
             name
+            picture
           }
         }
       }
@@ -46,10 +40,29 @@ export function useGetRecording(recordingId: RecordingId) {
     console.error("Apollo error while getting the recording", error);
   }
 
-  const recording = data?.recordings[0];
+  const recording = convertRecording(data?.recording);
   // Tests don't have an associated user so we just let it bypass the check here.
   const isAuthorized = isTest() || recording;
-  return { recording, isAuthorized, loading };
+
+  return { recording, isAuthorized: !!isAuthorized, loading };
+}
+
+function convertRecording(rec: any): Recording | undefined {
+  if (!rec) {
+    return undefined;
+  }
+
+  return {
+    id: rec.uuid,
+    user: rec.owner,
+    userId: rec.owner?.id,
+    url: rec.url,
+    title: rec.title,
+    duration: rec.duration,
+    private: rec.private,
+    isInitialized: rec.isInitialized,
+    date: rec.createdAt,
+  };
 }
 
 export function useGetRecordingPhoto(
@@ -61,9 +74,10 @@ export function useGetRecordingPhoto(
 } {
   const { data, loading, error } = useQuery(
     gql`
-      query getRecordingPhoto($recordingId: uuid!) {
-        recordings_by_pk(id: $recordingId) {
-          last_screen_data
+      query getRecordingPhoto($recordingId: UUID!) {
+        recording(uuid: $recordingId) {
+          uuid
+          thumbnail
         }
       }
     `,
@@ -78,35 +92,50 @@ export function useGetRecordingPhoto(
     console.error("Apollo error while getting user photo", error);
   }
 
-  const screenData = data.recordings_by_pk?.last_screen_data;
+  const screenData = data.recording?.thumbnail;
   return { error, loading, screenData };
 }
 
-export function useGetOwnersAndCollaborators(recordingId: RecordingId) {
+export function useGetOwnersAndCollaborators(
+  recordingId: RecordingId
+): {
+  error: ApolloError | undefined;
+  loading: boolean;
+  recording: Recording | undefined;
+  collaborators: CollaboratorDbData[] | null;
+} {
   const { data, loading, error } = useQuery(
     gql`
-      query GetOwnerAndCollaborators($recordingId: uuid!) {
-        collaborators(where: { recording_id: { _eq: $recordingId } }) {
-          user {
-            email
+      query GetOwnerAndCollaborators($recordingId: UUID!) {
+        recording(uuid: $recordingId) {
+          uuid
+          owner {
             id
             name
-            nickname
             picture
           }
-          user_id
-          recording_id
-        }
-        recordings_by_pk(id: $recordingId) {
-          user {
-            email
-            id
-            name
-            nickname
-            picture
+          collaborators {
+            edges {
+              node {
+                ... on RecordingPendingUserCollaborator {
+                  id
+                  user {
+                    id
+                    name
+                    picture
+                  }
+                }
+                ... on RecordingUserCollaborator {
+                  id
+                  user {
+                    id
+                    name
+                    picture
+                  }
+                }
+              }
+            }
           }
-          id
-          is_private
         }
       }
     `,
@@ -116,25 +145,31 @@ export function useGetOwnersAndCollaborators(recordingId: RecordingId) {
   );
 
   if (loading) {
-    return { collaborators: null, recording: null, loading, error };
+    return { collaborators: null, recording: undefined, loading, error };
   }
 
   if (error) {
     console.error("Apollo error while getting owners and collaborators", error);
   }
 
-  const collaborators: CollaboratorDbData[] = data.collaborators;
-  const recording = data.recordings_by_pk;
+  let collaborators: CollaboratorDbData[] = [];
+  if (data?.recording?.collaborators) {
+    collaborators = data.recording.collaborators.edges.map(({ node }: any) => ({
+      collaborationId: node.id,
+      user: node.user,
+    }));
+  }
+  const recording = convertRecording(data.recording);
   return { collaborators, recording, loading, error };
 }
 
 export function useGetIsPrivate(recordingId: RecordingId) {
   const { data, loading, error } = useQuery(
     gql`
-      query GetRecordingPrivacy($recordingId: uuid!) {
-        recordings(where: { id: { _eq: $recordingId } }) {
-          id
-          is_private
+      query GetRecordingPrivacy($recordingId: UUID!) {
+        recording(uuid: $recordingId) {
+          uuid
+          private
         }
       }
     `,
@@ -151,19 +186,20 @@ export function useGetIsPrivate(recordingId: RecordingId) {
     console.error("Apollo error while getting isPrivate", error);
   }
 
-  const isPrivate = data.recordings[0]?.is_private;
+  const isPrivate = data.recording?.private;
 
   return { isPrivate, loading, error };
 }
 
-export function useUpdateIsPrivate(recordingId: RecordingId, isPrivate: boolean) {
-  const [updateIsPrivate] = useMutation(
+export function useToggleIsPrivate(recordingId: RecordingId, isPrivate: boolean) {
+  const [toggleIsPrivate] = useMutation(
     gql`
-      mutation SetRecordingIsPrivate($recordingId: uuid!, $isPrivate: Boolean) {
-        update_recordings(where: { id: { _eq: $recordingId } }, _set: { is_private: $isPrivate }) {
-          returning {
-            is_private
-            id
+      mutation SetRecordingIsPrivate($recordingId: ID!, $isPrivate: Boolean!) {
+        updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
+          success
+          recording {
+            uuid
+            private
           }
         }
       }
@@ -174,17 +210,40 @@ export function useUpdateIsPrivate(recordingId: RecordingId, isPrivate: boolean)
     }
   );
 
+  return toggleIsPrivate;
+}
+
+export function useUpdateIsPrivate() {
+  const [updateIsPrivate] = useMutation(
+    gql`
+      mutation SetRecordingIsPrivate($recordingId: ID!, $isPrivate: Boolean!) {
+        updateRecordingPrivacy(input: { id: $recordingId, private: $isPrivate }) {
+          success
+          recording {
+            uuid
+            private
+          }
+        }
+      }
+    `,
+    {
+      refetchQueries: ["GetRecordingPrivacy"],
+    }
+  );
+
   return updateIsPrivate;
 }
 
 export function useIsOwner(recordingId: RecordingId) {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
+  const { userId } = useGetUserId();
   const { data, loading, error } = useQuery(
     gql`
-      query GetOwnerUserId($recordingId: uuid!) {
-        recordings(where: { id: { _eq: $recordingId } }) {
-          user_id
+      query GetOwnerUserId($recordingId: UUID!) {
+        recording(uuid: $recordingId) {
+          uuid
+          owner {
+            id
+          }
         }
       }
     `,
@@ -201,31 +260,12 @@ export function useIsOwner(recordingId: RecordingId) {
     console.error("Apollo error while getting isOwner", error);
   }
 
-  const recording = data.recordings[0];
-  if (!recording?.user_id) {
+  const recording = data.recording;
+  if (!recording?.owner) {
     return false;
   }
 
-  return userId === recording.user_id;
-}
-
-function getRecordings(data: PersonalRecordingsData) {
-  if (!data.users.length) {
-    return [];
-  }
-
-  const user = data.users[0];
-  const { collaborators, name, email, picture, nickname, id } = user;
-  const recordings = user.recordings || [];
-
-  return [
-    ...recordings.map(recording => ({
-      ...recording,
-      user: { name, email, picture, id, nickname },
-    })),
-    ...collaborators!.map(({ recording }) => recording),
-    ...data.recordings,
-  ];
+  return userId === recording.owner.id;
 }
 
 export function useGetPersonalRecordings():
@@ -233,53 +273,30 @@ export function useGetPersonalRecordings():
   | { recordings: Recording[]; loading: false } {
   const { data, error, loading } = useQuery(
     gql`
-      fragment recordingFields on recordings {
-        id
-        url
-        title
-        recording_id
-        recordingTitle
-        last_screen_mime_type
-        duration
-        description
-        date
-        is_private
-      }
-
-      fragment avatarFields on users {
-        name
-        email
-        picture
-        id
-        nickname
-      }
-
-      query GetMyRecordings($userId: uuid) {
-        users(where: { id: { _eq: $userId } }) {
-          ...avatarFields
-          collaborators(where: { recording: { deleted_at: { _is_null: true } } }) {
-            recording {
-              ...recordingFields
-              user {
-                ...avatarFields
+      query GetMyRecordings {
+        viewer {
+          recordings {
+            edges {
+              node {
+                uuid
+                url
+                title
+                duration
+                createdAt
+                private
+                isInitialized
+                owner {
+                  id
+                  name
+                  picture
+                }
               }
             }
-          }
-          recordings(where: { deleted_at: { _is_null: true }, workspace_id: { _is_null: true } }) {
-            ...recordingFields
-          }
-        }
-
-        recordings(where: { _and: { example: { _eq: true }, deleted_at: { _is_null: true } } }) {
-          ...recordingFields
-          user {
-            ...avatarFields
           }
         }
       }
     `,
     {
-      variables: { userId: getUserId() },
       pollInterval: 5000,
     }
   );
@@ -292,7 +309,10 @@ export function useGetPersonalRecordings():
     console.error("Failed to fetch recordings:", error);
   }
 
-  const recordings = getRecordings(data);
+  let recordings: any = [];
+  if (data?.viewer) {
+    recordings = data.viewer.recordings.edges.map(({ node }: any) => convertRecording(node));
+  }
   return { recordings, loading };
 }
 
@@ -301,25 +321,28 @@ export function useGetWorkspaceRecordings(
 ): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
   const { data, error, loading } = useQuery(
     gql`
-      query GetWorkspaceRecordings($workspaceId: uuid) {
-        recordings(
-          where: { _and: { workspace_id: { _eq: $workspaceId }, deleted_at: { _is_null: true } } }
-        ) {
-          id
-          url
-          title
-          recording_id
-          recordingTitle
-          last_screen_mime_type
-          duration
-          description
-          date
-          is_private
-          user {
-            name
-            email
-            picture
+      query GetWorkspaceRecordings($workspaceId: ID!) {
+        node(id: $workspaceId) {
+          ... on Workspace {
             id
+            recordings {
+              edges {
+                node {
+                  uuid
+                  url
+                  title
+                  duration
+                  createdAt
+                  private
+                  isInitialized
+                  owner {
+                    id
+                    name
+                    picture
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -338,20 +361,24 @@ export function useGetWorkspaceRecordings(
     console.error("Failed to fetch recordings:", error);
   }
 
-  let recordings = data?.recordings;
+  let recordings: Recording[] = [];
+  if (data?.node?.recordings) {
+    recordings = data.node.recordings.edges.map(({ node }: any) => convertRecording(node));
+  }
   return { recordings, loading };
 }
 
 export function useUpdateRecordingWorkspace() {
   const [updateRecordingWorkspace] = useMutation(
     gql`
-      mutation UpdateRecordingWorkspace($recordingId: uuid!, $workspaceId: uuid) {
-        update_recordings(
-          where: { id: { _eq: $recordingId } }
-          _set: { workspace_id: $workspaceId }
-        ) {
-          returning {
-            id
+      mutation UpdateRecordingWorkspace($recordingId: ID!, $workspaceId: ID) {
+        updateRecordingWorkspace(input: { id: $recordingId, workspaceId: $workspaceId }) {
+          success
+          recording {
+            uuid
+            workspace {
+              id
+            }
           }
         }
       }
@@ -365,80 +392,15 @@ export function useUpdateRecordingWorkspace() {
 }
 
 export function useGetMyRecordings() {
-  const userId = getUserId();
-  const { data, loading, error } = useQuery(
-    gql`
-      fragment recordingFields on recordings {
-        id
-        url
-        title
-        recording_id
-        recordingTitle
-        last_screen_mime_type
-        duration
-        description
-        date
-        is_private
-      }
-
-      fragment avatarFields on users {
-        name
-        email
-        picture
-        id
-      }
-
-      query GetMyRecordings($userId: uuid) {
-        users(where: { id: { _eq: $userId } }) {
-          ...avatarFields
-          collaborators(where: { recording: { deleted_at: { _is_null: true } } }) {
-            recording {
-              ...recordingFields
-              user {
-                ...avatarFields
-              }
-            }
-          }
-          recordings(where: { deleted_at: { _is_null: true } }) {
-            ...recordingFields
-          }
-        }
-
-        recordings(where: { _and: { example: { _eq: true }, deleted_at: { _is_null: true } } }) {
-          ...recordingFields
-          user {
-            ...avatarFields
-          }
-        }
-      }
-    `,
-    {
-      variables: { userId },
-      pollInterval: 10000,
-    }
-  );
-
-  if (loading) {
-    return { loading };
-  }
-
-  if (error) {
-    console.error("Failed to fetch recordings:", error);
-  }
-
-  const recordings = getRecordings(data);
-
-  return { recordings, loading };
+  return useGetPersonalRecordings();
 }
 
 export function useDeleteRecording(refetchQueries?: string[], onCompleted?: () => void) {
   const [deleteRecording] = useMutation(
     gql`
-      mutation DeleteRecording($recordingId: uuid!, $deletedAt: String) {
-        update_recordings(where: { id: { _eq: $recordingId } }, _set: { deleted_at: $deletedAt }) {
-          returning {
-            id
-          }
+      mutation DeleteRecording($recordingId: ID!) {
+        deleteRecording(input: { id: $recordingId }) {
+          success
         }
       }
     `,
@@ -454,26 +416,17 @@ export function useDeleteRecording(refetchQueries?: string[], onCompleted?: () =
 export function useInitializeRecording() {
   const [initializeRecording] = useMutation(
     gql`
-      mutation InitializeRecording(
-        $recordingId: uuid!
-        $title: String
-        $workspaceId: uuid
-        $isPrivate: Boolean
-      ) {
-        update_recordings_by_pk(
-          pk_columns: { id: $recordingId }
-          _set: {
-            is_initialized: true
-            recordingTitle: $title
-            workspace_id: $workspaceId
-            is_private: $isPrivate
+      mutation InitializeRecording($recordingId: ID!, $title: String!, $workspaceId: ID) {
+        initializeRecording(input: { id: $recordingId, title: $title, workspaceId: $workspaceId }) {
+          success
+          recording {
+            uuid
+            isInitialized
+            title
+            workspace {
+              id
+            }
           }
-        ) {
-          id
-          is_initialized
-          title
-          recordingTitle
-          workspace_id
         }
       }
     `,
@@ -481,4 +434,22 @@ export function useInitializeRecording() {
   );
 
   return initializeRecording;
+}
+
+export function useUpdateRecordingTitle() {
+  const [updateRecordingTitle] = useMutation(
+    gql`
+      mutation UpdateRecordingTitle($recordingId: ID!, $title: String!) {
+        updateRecordingTitle(input: { id: $recordingId, title: $title }) {
+          success
+          recording {
+            uuid
+            title
+          }
+        }
+      }
+    `
+  );
+
+  return updateRecordingTitle;
 }

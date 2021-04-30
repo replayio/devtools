@@ -8,6 +8,7 @@ import { Canvas } from "ui/state/app";
 import { Comment } from "ui/state/comments";
 
 function inCenter(canvas: Canvas, { position }: Comment) {
+  if (!position) return true;
   return position.x / canvas.width == 0.5 && position.y / canvas.height;
 }
 

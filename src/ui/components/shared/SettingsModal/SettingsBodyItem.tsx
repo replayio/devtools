@@ -1,6 +1,5 @@
 import React, { Dispatch, SetStateAction } from "react";
 import { SettingItem, UserSettings } from "./types";
-import { getUserId } from "ui/utils/useToken";
 import hooks from "ui/hooks";
 import { SelectMenu } from "ui/components/shared/Forms";
 import "./SettingsBodyItem.css";
@@ -21,7 +20,6 @@ function Checkbox({
   setShowRefresh: Dispatch<SetStateAction<boolean>>;
 }) {
   const { key, needsRefresh } = item;
-  const userId = getUserId();
 
   const updateUserSetting = hooks.useUpdateUserSetting(key, "Boolean");
   const toggleSetting = () => {
@@ -32,7 +30,6 @@ function Checkbox({
     updateUserSetting({
       variables: {
         newValue: !value,
-        userId,
       },
     });
   };
@@ -51,8 +48,7 @@ function Dropdown({
 }) {
   const { key, needsRefresh } = item;
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
-  const updateUserSetting = hooks.useUpdateUserSetting(key, "uuid");
-  const userId = getUserId();
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   const displayedWorkspaces: { id: string | null; name: string }[] = [{ id: null, name: "---" }];
 
@@ -66,10 +62,9 @@ function Dropdown({
       setShowRefresh(true);
     }
 
-    updateUserSetting({
+    updateDefaultWorkspace({
       variables: {
-        newValue: selectedValue,
-        userId,
+        workspaceId: selectedValue,
       },
     });
   };
@@ -91,7 +86,7 @@ function Input({
   setShowRefresh,
 }: {
   item: SettingItem;
-  value: boolean | string;
+  value: boolean | string | null;
   setShowRefresh: Dispatch<SetStateAction<boolean>>;
 }) {
   if (item.type == "checkbox") {

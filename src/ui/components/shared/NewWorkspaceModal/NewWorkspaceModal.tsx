@@ -4,6 +4,7 @@ import { actions } from "ui/actions";
 const Modal = require("ui/components/shared/Modal").default;
 import hooks from "ui/hooks";
 import useToken from "ui/utils/useToken";
+import MaterialIcon from "../MaterialIcon";
 import "./NewWorkspaceModal.css";
 
 const content1 = `Workspaces are another way for you to see other people's replays by default.`;
@@ -27,7 +28,7 @@ function NewWorkspaceModal({ hideModal }: PropsFromRedux) {
       <Modal>
         <main>
           <h1>
-            <span className="material-icons">add_circle</span>
+            <MaterialIcon>add_circle</MaterialIcon>
             <span>New Workspace</span>
           </h1>
           <div className="new-workspace-content">

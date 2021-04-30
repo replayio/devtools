@@ -3,29 +3,8 @@ import { connect } from "react-redux";
 import useToken from "ui/utils/useToken";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { gql, useQuery, useMutation } from "@apollo/client";
 import Dropdown from "ui/components/shared/Dropdown";
 import "./ShareDropdown.css";
-
-const UPDATE_IS_PRIVATE = gql`
-  mutation SetRecordingIsPrivate($recordingId: uuid!, $isPrivate: Boolean) {
-    update_recordings(where: { id: { _eq: $recordingId } }, _set: { is_private: $isPrivate }) {
-      returning {
-        is_private
-        id
-      }
-    }
-  }
-`;
-
-const GET_RECORDING_PRIVACY = gql`
-  query GetRecordingPrivacy($recordingId: uuid!) {
-    recordings(where: { id: { _eq: $recordingId } }) {
-      id
-      is_private
-    }
-  }
-`;
 
 function CopyUrl({ recordingId }) {
   const [copyClicked, setCopyClicked] = useState(false);
@@ -136,22 +115,7 @@ function Collaborators({ setExpanded, recordingId, setModal }) {
 }
 
 function OwnerSettings({ recordingId, isPrivate, isOwner }) {
-  const [updateIsPrivate] = useMutation(
-    gql`
-      mutation SetRecordingIsPrivate($recordingId: uuid!, $isPrivate: Boolean) {
-        update_recordings(where: { id: { _eq: $recordingId } }, _set: { is_private: $isPrivate }) {
-          returning {
-            is_private
-            id
-          }
-        }
-      }
-    `,
-    {
-      variables: { recordingId, isPrivate: !isPrivate },
-      refetchQueries: ["GetRecordingPrivacy"],
-    }
-  );
+  const updateIsPrivate = hooks.useToggleIsPrivate(recordingId, isPrivate);
 
   if (!isOwner) {
     return null;
@@ -167,11 +131,9 @@ function OwnerSettings({ recordingId, isPrivate, isOwner }) {
 function ShareDropdown({ recordingId, setModal }) {
   const [expanded, setExpanded] = useState(false);
   const isOwner = hooks.useIsOwner(recordingId);
-  const { data } = useQuery(GET_RECORDING_PRIVACY, {
-    variables: { recordingId },
-  });
+  const { recording } = hooks.useGetRecording(recordingId);
 
-  const isPrivate = data.recordings[0]?.is_private;
+  const isPrivate = recording.private;
   const buttonContent = <div className="img share" />;
 
   return (

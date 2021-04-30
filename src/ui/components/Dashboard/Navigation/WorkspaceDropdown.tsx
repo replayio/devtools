@@ -11,10 +11,7 @@ export default function WorkspaceDropdown({
 }: {
   nonPendingWorkspaces: Workspace[];
 }) {
-  const workspaces = [
-    { id: null, name: "Your Library", workspaces_users: [] },
-    ...nonPendingWorkspaces,
-  ];
+  const workspaces = [{ id: null, name: "Your Library", members: [] }, ...nonPendingWorkspaces];
 
   return (
     <Menu as="div" className="relative inline-block text-left">

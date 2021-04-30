@@ -1,7 +1,7 @@
 Test.describe(`Test global console evaluation in async frames.`, async () => {
   await Test.selectConsole();
 
-  await Test.addBreakpoint("doc_async.html", 20, 6, { logValue: '"qux", n' });
+  await Test.addBreakpoint("doc_async.html", 20, undefined, { logValue: '"qux", n' });
   await Test.warpToMessage("qux 2");
   await Test.checkFrames(5);
 

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { gql, useQuery, useMutation } from "@apollo/client";
 import Autocomplete from "./Autocomplete";
 
 function validateEmail(email: string) {

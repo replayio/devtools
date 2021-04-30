@@ -5,6 +5,7 @@ import { PendingComment, Event, Comment, Reply, FloatingItem } from "ui/state/co
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import isEqual from "lodash/isEqual";
+import { setSelectedPrimaryPanel } from "./app";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
@@ -50,7 +51,7 @@ export function showFloatingItem(): UIThunkAction {
       itemType: "pause",
       time: selectors.getCurrentTime(getState()),
       point: ThreadFront.currentPoint,
-      has_frames: ThreadFront.currentPointHasFrames,
+      hasFrames: ThreadFront.currentPointHasFrames,
       location: await ThreadFront.getCurrentPauseSourceLocation(),
     };
 
@@ -83,11 +84,7 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
     const canvas = selectors.getCanvas(state);
     const recordingTarget = selectors.getRecordingTarget(state);
 
-    if ("has_frames" in item) {
-      dispatch(actions.seek(point, time, item.has_frames));
-    } else {
-      dispatch(actions.seek(point, time, false));
-    }
+    dispatch(seekToComment(item));
 
     if ("comment" in item && item.comment && "id" in item.comment) {
       // Add a reply to an event's comment.
@@ -97,9 +94,9 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
           content: "",
           time,
           point,
-          has_frames: false,
-          source_location: null,
-          parent_id: item.comment.id,
+          hasFrames: false,
+          sourceLocation: null,
+          parentId: item.comment.id,
         },
       };
 
@@ -112,9 +109,9 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
           content: "",
           time,
           point,
-          has_frames: "has_frames" in item && item.has_frames,
-          source_location: null,
-          parent_id: item.id,
+          hasFrames: "hasFrames" in item && item.hasFrames,
+          sourceLocation: null,
+          parentId: item.id,
         },
       };
 
@@ -135,8 +132,8 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
           content: "",
           time,
           point,
-          has_frames: "has_frames" in item && item.has_frames,
-          source_location: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
+          hasFrames: "hasFrames" in item && item.hasFrames,
+          sourceLocation: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
           position,
         },
       };
@@ -149,17 +146,19 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
 export function createComment(
   time: number,
   point: string,
-  position: { x: number; y: number }
+  position: { x: number; y: number } | null
 ): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async ({ dispatch }) => {
+    dispatch(setSelectedPrimaryPanel("comments"));
+
     const pendingComment: PendingComment = {
       type: "new_comment",
       comment: {
         content: "",
         time,
         point,
-        has_frames: ThreadFront.currentPointHasFrames,
-        source_location: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
+        hasFrames: ThreadFront.currentPointHasFrames,
+        sourceLocation: (await ThreadFront.getCurrentPauseSourceLocation()) || null,
         position,
       },
     };
@@ -170,32 +169,47 @@ export function createComment(
 
 export function editItem(item: Comment | Reply): UIThunkAction {
   return async ({ dispatch }) => {
-    const { point, time, has_frames } = item;
+    const { point, time, hasFrames } = item;
 
-    if ("has_frames" in item) {
-      dispatch(actions.seek(point, time, item.has_frames));
-    } else {
-      dispatch(actions.seek(point, time, false));
-    }
+    dispatch(seekToComment(item));
 
-    if (item.parent_id !== null) {
-      const { content, source_location, parent_id, position, id } = item;
+    if (!("replies" in item)) {
+      const { content, sourceLocation, parentId, position, id } = item;
 
       // Editing a reply.
       const pendingComment: PendingComment = {
         type: "edit_reply",
-        comment: { content, time, point, has_frames, source_location, parent_id, position, id },
+        comment: { content, time, point, hasFrames, sourceLocation, parentId, position, id },
       };
       dispatch(setPendingComment(pendingComment));
     } else {
-      const { content, source_location, parent_id, position, id } = item;
+      const { content, sourceLocation, id } = item;
 
       // Editing a comment.
       const pendingComment: PendingComment = {
         type: "edit_comment",
-        comment: { content, time, point, has_frames, source_location, parent_id, position, id },
+        comment: {
+          content,
+          time,
+          point,
+          hasFrames,
+          sourceLocation,
+          id,
+        },
       };
       dispatch(setPendingComment(pendingComment));
+    }
+  };
+}
+
+export function seekToComment(item: Comment | Reply | Event | FloatingItem): UIThunkAction {
+  return ({ dispatch, getState }) => {
+    let cx = selectors.getThreadContext(getState());
+    const hasFrames = "hasFrames" in item ? item.hasFrames : false;
+    dispatch(actions.seek(item.point, item.time, hasFrames));
+    if ("sourceLocation" in item && item.sourceLocation) {
+      cx = selectors.getThreadContext(getState());
+      dispatch(actions.selectLocation(cx, item.sourceLocation));
     }
   };
 }

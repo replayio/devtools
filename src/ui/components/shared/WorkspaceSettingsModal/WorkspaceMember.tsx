@@ -11,15 +11,16 @@ import { NonRegisteredTeamMember } from "ui/hooks/invitations";
 const { prefs } = require("ui/utils/prefs");
 
 import "./WorkspaceMember.css";
+import MaterialIcon from "../MaterialIcon";
 
 type WorkspaceMemberProps = { member: WorkspaceUser } & PropsFromRedux;
 
 export function NonRegisteredWorkspaceMember({ member }: { member: NonRegisteredTeamMember }) {
   return (
     <li className="workspace-member">
-      <span className="material-icons">mail_outline</span>
+      <MaterialIcon>mail_outline</MaterialIcon>
       <div className="workspace-member-content">
-        <div className="title">{member.invited_email}</div>
+        <div className="title">{member.invitedEmail}</div>
       </div>
       <div className="permission-container">
         <span>Pending</span>
@@ -41,22 +42,19 @@ function Role({
 }) {
   const [expanded, setExpanded] = useState(false);
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
-  const { claims } = useToken();
-  const localUserId = claims?.hasura.userId;
-  const { user_id: userId } = member;
+  const { userId: localUserId } = hooks.useGetUserId();
+  const { userId, membershipId } = member;
 
   const handleDelete = () => {
     setExpanded(false);
 
     const leaveMsg = `Are you sure you want to leave this team?`;
-    const kickMsg = `Are you sure you want to remove ${member.user.name} from this team?`;
+    const kickMsg = `Are you sure you want to remove ${member.user!.name} from this team?`;
     const isPersonal = localUserId == userId;
     const message = isPersonal ? leaveMsg : kickMsg;
 
     if (window.confirm(message)) {
-      deleteUserFromWorkspace({
-        variables: { userId, workspaceId },
-      });
+      deleteUserFromWorkspace({ variables: { membershipId } });
 
       // If the user is the member leaving, hide the modal and go back
       // to the personal workspace.
@@ -72,7 +70,7 @@ function Role({
     <PortalDropdown
       buttonContent={
         <div className="permission-container">
-          <span className="material-icons">expand_more</span>
+          <MaterialIcon>expand_more</MaterialIcon>
           <span>Admin</span>
         </div>
       }
@@ -92,7 +90,7 @@ function Role({
       <PortalDropdown
         buttonContent={
           <div className="permission-container">
-            <span className="material-icons">expand_more</span>
+            <MaterialIcon>expand_more</MaterialIcon>
             <span>Pending</span>
           </div>
         }
@@ -114,10 +112,9 @@ function Role({
 function WorkspaceMember({ member, setWorkspaceId, hideModal, workspaceId }: WorkspaceMemberProps) {
   return (
     <li className="workspace-member">
-      <img src={member.user.picture} />
+      <img src={member.user!.picture} />
       <div className="workspace-member-content">
-        <div className="title">{member.user.name}</div>
-        <div className="subtitle">{member.user.email}</div>
+        <div className="title">{member.user!.name}</div>
       </div>
       <Role
         member={member}

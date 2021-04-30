@@ -16,7 +16,7 @@ export default function RecordingGridItem({
   toggleIsPrivate,
 }) {
   const { claims } = useToken();
-  const { screenData } = hooks.useGetRecordingPhoto(data.recording_id);
+  const { screenData } = hooks.useGetRecordingPhoto(data.id);
 
   const userId = claims?.hasura.userId;
   const isOwner = userId == data.user.id;
@@ -24,23 +24,21 @@ export default function RecordingGridItem({
   return (
     <div className="recording-item">
       <div className="screenshot">
-        {screenData && (
-          <img src={`data:image/png;base64, ${screenData}`} alt="recording screenshot" />
-        )}
+        {screenData && <img src={screenData} alt="recording screenshot" />}
         <div className="overlay" onClick={e => onNavigate(e)} />
         {isOwner && <Dropdown panel={Panel} icon={<div>•••</div>} panelStyles={{ top: "28px" }} />}
       </div>
       <div className="description">
         <Title
-          defaultTitle={data.recordingTitle || data.title || "Untitled"}
-          recordingId={data.recording_id}
+          defaultTitle={data.title || "Untitled"}
+          recordingId={data.id}
           editingTitle={editingTitle}
           setEditingTitle={setEditingTitle}
           allowEditOnTitleClick={false}
         />
         <div className="secondary">{formatDate(new Date(data.date), "MMM do, h:mm aaa")}</div>
         <div className="permissions" onClick={toggleIsPrivate}>
-          {data.is_private ? "Private" : "Public"}
+          {data.private ? "Private" : "Public"}
         </div>
       </div>
     </div>

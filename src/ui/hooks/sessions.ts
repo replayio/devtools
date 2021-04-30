@@ -1,42 +1,36 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import useToken from "ui/utils/useToken";
 import { User } from "ui/state/session";
+import { useGetUserId } from "./users";
 
 interface SessionUser extends User {
   sessionId?: string;
 }
 interface Session {
   id: string;
-  destroyed_at: string | null;
   user: User | null;
 }
 
-export function useGetActiveSessions(recordingId: RecordingId, sessionId: string) {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
+export function useGetActiveSessions(recordingId: RecordingId) {
+  const { userId, loading: userLoading } = useGetUserId();
   const { data, error, loading } = useQuery(
     gql`
-      query GetActiveSessions($recordingId: uuid!, $sessionId: String!) {
-        sessions(
-          where: {
-            recording_id: { _eq: $recordingId }
-            destroyed_at: { _is_null: true }
-            _and: { id: { _neq: $sessionId } }
-          }
-        ) {
-          id
-          destroyed_at
-          user {
+      query GetActiveSessions($recordingId: UUID!) {
+        recording(uuid: $recordingId) {
+          uuid
+          activeSessions {
             id
-            name
-            picture
+            user {
+              id
+              name
+              picture
+            }
           }
         }
       }
     `,
     {
-      variables: { recordingId, sessionId },
+      variables: { recordingId },
       pollInterval: 5000,
     }
   );
@@ -45,8 +39,8 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
     console.error("Apollo error while getting active sessions", error);
   }
 
-  if (loading) {
-    return { loading };
+  if (loading || userLoading) {
+    return { loading: true };
   }
 
   if (!data) {
@@ -54,7 +48,8 @@ export function useGetActiveSessions(recordingId: RecordingId, sessionId: string
   }
 
   // Don't show the user's own sessions.
-  const filteredSessions = data.sessions.filter((session: Session) => session.user?.id !== userId);
+  const activeSessions = data.recording?.activeSessions || [];
+  const filteredSessions = activeSessions.filter((session: Session) => session.user?.id !== userId);
 
   // This includes the sessionId with the user. Otherwise, all
   // anonymous users look the same (null) and we can't maintain some order.

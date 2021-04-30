@@ -5,6 +5,7 @@ const Modal = require("ui/components/shared/Modal").default;
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+import MaterialIcon from "../MaterialIcon";
 import WorkspaceForm from "./WorkspaceForm";
 import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
 import "./WorkspaceSettingsModal.css";
@@ -12,18 +13,14 @@ import "./WorkspaceSettingsModal.css";
 const content1 = `Manage members here so that everyone who belongs to this team can see each other's replays.`;
 
 function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
-  const { members, loading: registeredMembersLoading } = hooks.useGetWorkspaceMembers(workspaceId!);
-  const {
-    nonRegisteredTeamMembers,
-    loading: nonRegisteredMembersLoading,
-  } = hooks.useGetNonRegisteredTeamMembers(workspaceId!);
+  const { members, loading } = hooks.useGetWorkspaceMembers(workspaceId!);
 
   return (
     <div className="workspace-settings-modal">
       <Modal>
         <main>
           <h1>
-            <span className="material-icons">settings</span>
+            <MaterialIcon>settings</MaterialIcon>
             <span>Team Settings</span>
           </h1>
           <div className="new-workspace-content">
@@ -34,18 +31,17 @@ function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
             <div className="subheader">MEMBERS</div>
             <ul className="workspace-members">
               {members &&
-                !registeredMembersLoading &&
-                members.map((member, i) => (
-                  <WorkspaceMember member={member} key={`registered-${member.user.email}`} />
-                ))}
-              {nonRegisteredTeamMembers &&
-                !nonRegisteredMembersLoading &&
-                nonRegisteredTeamMembers.map((member, i) => (
-                  <NonRegisteredWorkspaceMember
-                    member={member}
-                    key={`non-registered-${member.invited_email}`}
-                  />
-                ))}
+                !loading &&
+                members.map((member, i) =>
+                  member.userId ? (
+                    <WorkspaceMember member={member} key={`registered-${member.userId}`} />
+                  ) : (
+                    <NonRegisteredWorkspaceMember
+                      member={member as any}
+                      key={`non-registered-${(member as any).invitedEmail}`}
+                    />
+                  )
+                )}
             </ul>
           </div>
         </main>

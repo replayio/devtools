@@ -32,7 +32,7 @@ function initialAppState(): AppState {
     workspaceId: JSON.parse(prefs.defaultLibraryTeam),
     defaultSettingsTab: "Personal",
     recordingTarget: null,
-    recordingWorkspace: null,
+    fontLoading: true,
   };
 }
 
@@ -159,8 +159,8 @@ export default function update(
       return { ...state, recordingTarget: action.recordingTarget };
     }
 
-    case "set_recording_workspace": {
-      return { ...state, recordingWorkspace: action.workspace };
+    case "set_material_icons_loaded": {
+      return { ...state, fontLoading: action.fontLoading };
     }
 
     default: {
@@ -201,10 +201,12 @@ export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);
   return getAnalysisPointsForLocation(state, location);
 };
-export const getEventsForType = (state: UIState, type: string) => state.app.events[type] || [];
+const NO_EVENTS: MouseEvent[] = [];
+export const getEventsForType = (state: UIState, type: string) =>
+  state.app.events[type] || NO_EVENTS;
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
-export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
+export const getFontLoading = (state: UIState) => state.app.fontLoading;

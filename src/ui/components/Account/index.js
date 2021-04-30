@@ -8,6 +8,7 @@ import "./Account.css";
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();
   const forceOpenAuth = new URLSearchParams(window.location.search).get("signin");
+  const openedFromEmail = new URLSearchParams(window.location.search).get("emailinvite");
 
   if (forceOpenAuth) {
     loginWithRedirect();
@@ -19,25 +20,29 @@ function WelcomePage() {
   }, []);
 
   return (
-    <main className="w-full h-full bg-white grid">
-      <section className="max-w-5xl w-full grid m-auto bg-white grid-cols-2 shadow-md rounded-lg overflow-hidden">
-        <div className="p-16 h-96 space-y-12">
-          <div className="space-y-4">
-            <img className="w-16 h-16" src="images/logo.svg" />
-            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Welcome to Replay</h2>
+    <main
+      className="w-full h-full bg-white grid"
+      style={{ background: "linear-gradient(to bottom right, #68DCFC, #4689F8)" }}
+    >
+      <section className="max-w-lg w-full m-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="p-16 h-84 space-y-12">
+          <div className="space-y-4 place-content-center">
+            <img className="w-16 h-16 mx-auto" src="images/logo.svg" />
           </div>
+          {openedFromEmail ? (
+            <div className="text-center space-y-2">
+              <div className="font-bold text-2xl">Almost there!</div>
+              <div className="font-medium text-xl">First we need you to sign in.</div>
+            </div>
+          ) : null}
           <a
             href="#"
             onClick={loginWithRedirect}
-            className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+            className="w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-2xl font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
           >
-            Sign in
+            Sign in to Replay
           </a>
         </div>
-        <div
-          className="h-96"
-          style={{ background: "linear-gradient(to bottom right, #64D4FB, #52A6F9)" }}
-        ></div>
       </section>
     </main>
   );

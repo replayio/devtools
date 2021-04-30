@@ -30,20 +30,15 @@ function OldDashboard() {
 function PersonalDashboard() {
   const [filter, setFilter] = useState("");
   const { recordings, loading } = hooks.useGetPersonalRecordings();
-  const {
-    workspaces: nonPendingWorkspaces,
-    loading: nonPendingLoading,
-  } = hooks.useGetNonPendingWorkspaces();
+  const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
   if (loading || nonPendingLoading || recordings == null) {
     return <Loader />;
   }
 
-  const filteredRecordings = recordings.filter(recording => recording.url.includes(filter));
-
   return (
     <main className="dashboard">
-      <DashboardViewer recordings={filteredRecordings} filter={filter} />
+      <DashboardViewer recordings={recordings} filter={filter} />
     </main>
   );
 }
@@ -51,10 +46,7 @@ function PersonalDashboard() {
 function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
   const [filter, setFilter] = useState("");
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
-  const {
-    workspaces: nonPendingWorkspaces,
-    loading: nonPendingLoading,
-  } = hooks.useGetNonPendingWorkspaces();
+  const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
   if (loading || nonPendingLoading || recordings == null) {
     return <Loader />;
@@ -72,7 +64,7 @@ function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
 function DashboardRouter(props: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
 
-  if (!userSettings?.enable_teams) {
+  if (!userSettings?.enableTeams) {
     return <OldDashboard />;
   }
 

@@ -5,6 +5,7 @@ import { selectors } from "ui/reducers";
 import hooks from "ui/hooks";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { isDeployPreview } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 import "./UserOptions.css";
@@ -13,7 +14,11 @@ function UserOptions({ recordingId, setModal }) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
 
-  const showShare = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+  const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+  const isCollaborator =
+    isAuthenticated &&
+    hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000");
+  const showShare = isOwner || isCollaborator;
 
   if (isDeployPreview()) {
     return null;
@@ -51,29 +56,29 @@ function UserOptions({ recordingId, setModal }) {
   return (
     <div className="user-options text-blue-400">
       <Dropdown
-        buttonContent={<span className="material-icons more">more_horiz</span>}
+        buttonContent={<MaterialIcon className="more">more_horiz</MaterialIcon>}
         setExpanded={setExpanded}
         expanded={expanded}
         orientation="bottom"
       >
         {recordingId ? (
           <button className="row" onClick={onLibraryClick}>
-            <span className="material-icons">home</span>
+            <MaterialIcon>home</MaterialIcon>
             <span>Library</span>
           </button>
         ) : null}
         {showShare && (
           <button className="row" onClick={onShareClick}>
-            <span className="material-icons">share</span>
+            <MaterialIcon>share</MaterialIcon>
             <span>Share</span>
           </button>
         )}
         <button className="row" onClick={onLaunchClick}>
-          <span className="material-icons">download</span>
+          <MaterialIcon>download</MaterialIcon>
           <span>Download Replay</span>
         </button>
         <button className="row" onClick={onSettingsClick}>
-          <span className="material-icons">settings</span>
+          <MaterialIcon>settings</MaterialIcon>
           <span>Settings</span>
         </button>
         <LoginButton />

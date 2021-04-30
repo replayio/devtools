@@ -43,18 +43,18 @@ class TokenManager {
   private listeners: TokenListener[] = [];
 
   constructor() {
-    if (isTest()) {
-      this.currentState = {
-        loading: false,
-        token: "E2E-TEST-TOKEN",
-        claims: {
-          hasura: {
-            userId: "e51d8408-edba-4b64-9d29-cb1b9fbf34db",
-          },
-        },
-      };
-      this.deferredState.resolve(this.currentState);
-    }
+    // if (isTest()) {
+    //   this.currentState = {
+    //     loading: false,
+    //     token: "E2E-TEST-TOKEN",
+    //     claims: {
+    //       hasura: {
+    //         userId: "e51d8408-edba-4b64-9d29-cb1b9fbf34db",
+    //       },
+    //     },
+    //   };
+    //   this.deferredState.resolve(this.currentState);
+    // }
   }
 
   Auth0Provider = ({ children }: { children: ReactNode }) => {
@@ -68,9 +68,9 @@ class TokenManager {
       }
     };
 
-    if (isTest()) {
-      return <>{children}</>;
-    }
+    // if (isTest()) {
+    //   return <>{children}</>;
+    // }
 
     return (
       <Auth0Provider

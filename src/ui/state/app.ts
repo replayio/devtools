@@ -7,7 +7,7 @@ import {
   MouseEvent,
 } from "@recordreplay/protocol";
 import { RecordingTarget } from "protocol/thread/thread";
-import { Workspace } from "ui/types";
+import { ReactElement } from "react";
 
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug" | "comments";
@@ -18,6 +18,7 @@ export type SettingsTabTitle = "Experimental" | "Invitations" | "Support" | "Per
 
 export interface ExpectedError {
   message: string;
+  content?: string | ReactElement | ReactElement[];
   action?: string;
   type?: "timeout";
 }
@@ -52,7 +53,7 @@ export interface AppState {
   workspaceId: WorkspaceId | null;
   defaultSettingsTab: SettingsTabTitle;
   recordingTarget: RecordingTarget | null;
-  recordingWorkspace: Workspace | null;
+  fontLoading: boolean;
 }
 
 export interface AnalysisPoints {
