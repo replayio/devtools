@@ -51,7 +51,7 @@ export function useGetWorkspaceMembers(workspaceId: string) {
   }
 
   let workspaceUsers: WorkspaceUser[] | undefined = undefined;
-  if (data) {
+  if (data?.node?.members) {
     workspaceUsers = data.node.members.edges.map(({ node }: any) => {
       if (node.__typename === "WorkspacePendingEmailMember") {
         return {

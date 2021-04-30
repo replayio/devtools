@@ -211,9 +211,9 @@ export function useDeleteCommentReply() {
 export async function getFirstComment(
   recordingId: string
 ): Promise<{ time: number; point: string; hasFrames: boolean } | undefined> {
-  const firstCommentResult = await query({
+  const commentsResult = await query({
     query: gql`
-      query GetFirstCommentTime($recordingId: UUID!) {
+      query GetCommentsTime($recordingId: UUID!) {
         recording(uuid: $recordingId) {
           uuid
           comments {
@@ -228,7 +228,10 @@ export async function getFirstComment(
     variables: { recordingId },
   });
 
-  const comments = [...firstCommentResult.data.recording.comments];
+  if (!commentsResult.data?.recording?.comments) {
+    return undefined;
+  }
+  const comments = [...commentsResult.data.recording.comments];
   comments.sort((c1: any, c2: any) => c1.time - c2.time);
   return comments[0];
 }

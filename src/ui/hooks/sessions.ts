@@ -48,7 +48,7 @@ export function useGetActiveSessions(recordingId: RecordingId) {
   }
 
   // Don't show the user's own sessions.
-  const activeSessions = data.recording.activeSessions || [];
+  const activeSessions = data.recording?.activeSessions || [];
   const filteredSessions = activeSessions.filter((session: Session) => session.user?.id !== userId);
 
   // This includes the sessionId with the user. Otherwise, all

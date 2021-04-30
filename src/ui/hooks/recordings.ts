@@ -360,7 +360,10 @@ export function useGetWorkspaceRecordings(
     console.error("Failed to fetch recordings:", error);
   }
 
-  const recordings = data.node.recordings.edges.map(({ node }: any) => convertRecording(node));
+  let recordings: Recording[] = [];
+  if (data?.node?.recordings) {
+    recordings = data.node.recordings.edges.map(({ node }: any) => convertRecording(node));
+  }
   return { recordings, loading };
 }
 
