@@ -11,6 +11,7 @@ import { prefs } from "ui/utils/prefs";
 import hooks from "ui/hooks";
 import { isTest } from "ui/utils/environment";
 import ShareButton from "./ShareButton";
+import useAuth0 from "ui/utils/useAuth0";
 
 import "./Header.css";
 
@@ -31,7 +32,12 @@ function Avatars({ recordingId, sessionId }) {
 }
 
 function Links({ recordingId, sessionId, recordingTarget }) {
-  const showShare = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+  const { isAuthenticated } = useAuth0();
+  const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+  const isCollaborator =
+    isAuthenticated &&
+    hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000");
+  const showShare = isOwner || isCollaborator;
 
   return (
     <div className="links">

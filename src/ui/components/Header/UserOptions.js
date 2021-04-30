@@ -14,7 +14,11 @@ function UserOptions({ recordingId, setModal }) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
 
-  const showShare = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+  const isOwner = hooks.useIsOwner(recordingId || "00000000-0000-0000-0000-000000000000");
+  const isCollaborator =
+    isAuthenticated &&
+    hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000");
+  const showShare = isOwner || isCollaborator;
 
   if (isDeployPreview()) {
     return null;

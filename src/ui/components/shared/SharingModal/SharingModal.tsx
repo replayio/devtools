@@ -7,12 +7,11 @@ import hooks from "ui/hooks";
 import "./SharingModal.css";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { RecordingId } from "@recordreplay/protocol";
 import PrivateSettings from "./PrivateSettings";
 
 function SharingModal({ modalOptions }: PropsFromRedux) {
   const { recordingId } = modalOptions!;
-  const { isPrivate, loading } = hooks.useGetIsPrivate(recordingId!);
+  const { isPrivate } = hooks.useGetIsPrivate(recordingId!);
   const toggleIsPrivate = hooks.useToggleIsPrivate(recordingId!, isPrivate);
 
   const setPublic = () => {
@@ -38,7 +37,7 @@ function SharingModal({ modalOptions }: PropsFromRedux) {
                 type="radio"
                 id="public"
                 name="privacy"
-                checked={!isPrivate}
+                checked={!isPrivate || false}
                 onChange={setPublic}
               />
               <label htmlFor="public">
@@ -51,7 +50,7 @@ function SharingModal({ modalOptions }: PropsFromRedux) {
                 type="radio"
                 id="private"
                 name="privacy"
-                checked={isPrivate}
+                checked={isPrivate || false}
                 onChange={setPrivate}
               />
               <label htmlFor="private">
@@ -75,7 +74,7 @@ function SharingModal({ modalOptions }: PropsFromRedux) {
             </div>
           )}
         </section>
-        {isPrivate ? <PrivateSettings recordingId={recordingId} /> : <section className="filler" />}
+        <PrivateSettings recordingId={recordingId} />
       </Modal>
     </div>
   );

@@ -1,4 +1,16 @@
 import { gql, useMutation } from "@apollo/client";
+import { RecordingId } from "@recordreplay/protocol";
+import { useGetPersonalRecordings } from "./recordings";
+
+export function useIsCollaborator(recordingId: RecordingId) {
+  const { recordings } = useGetPersonalRecordings();
+
+  if (recordings) {
+    return !!recordings.find(recording => recording.id == recordingId);
+  }
+
+  return false;
+}
 
 export function useDeleteCollaborator() {
   const [deleteCollaborator, { error }] = useMutation(
