@@ -12,6 +12,7 @@ import {
   getFirstMeaningfulPaint,
   precacheScreenshots,
   snapTimeForPlayback,
+  Video,
 } from "protocol/graphics";
 import { selectors } from "ui/reducers";
 import { UIStore, UIThunkAction } from ".";
@@ -140,6 +141,7 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
       if (screen && selectors.getCurrentTime(getState()) == time) {
         dispatch(setTimelineState({ screenShot: screen, mouse }));
         paintGraphics(screen, mouse);
+        Video.seek(time);
       }
 
       dispatch(precacheScreenshots(time));
@@ -189,7 +191,8 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
     }
 
     try {
-      const screenshotTime = time || selectors.getCurrentTime(getState());
+      const currentTime = selectors.getCurrentTime(getState());
+      const screenshotTime = time || currentTime;
       const { screen, mouse } = await getGraphicsAtTime(screenshotTime);
 
       if (selectors.getHoverTime(getState()) !== time) {
@@ -197,6 +200,7 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
       }
 
       paintGraphics(screen, mouse);
+      Video.seek(currentTime);
     } catch {}
   };
 }
@@ -348,6 +352,8 @@ function playback(startTime: number, endTime: number): UIThunkAction {
     const shouldContinuePlayback = () => selectors.getPlayback(getState());
     prepareNextGraphics();
 
+    Video.play();
+
     while (shouldContinuePlayback()) {
       await new Promise(resolve => requestAnimationFrame(resolve));
       if (!shouldContinuePlayback()) {
@@ -400,9 +406,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
             );
           }
 
-          if (screen) {
-            paintGraphics(screen, mouse);
-          }
+          paintGraphics(screen, mouse, true);
         } catch (e) {}
 
         prepareNextGraphics();
