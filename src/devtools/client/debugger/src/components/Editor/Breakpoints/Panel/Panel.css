@@ -23,11 +23,6 @@
   padding: 8px;
 }
 
-.breakpoint-panel *:focus:not(:focus-visible) {
-  outline: none;
-  background: inherit;
-}
-
 .breakpoint-panel button {
   height: 100%;
   border-radius: 4px;
@@ -70,12 +65,12 @@
   background: var(--theme-comment);
 }
 
-.breakpoint-panel .summary button {
+.breakpoint-panel .summary button.log,
+.breakpoint-panel .summary button.condition {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 4px;
-  color: var(--blue-80);
 }
 
 .breakpoint-panel .summary button:hover .expression {

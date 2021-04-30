@@ -5,6 +5,7 @@ import { PendingComment, Event, Comment, Reply, FloatingItem } from "ui/state/co
 import { UIThunkAction } from ".";
 import { ThreadFront } from "protocol/thread";
 import isEqual from "lodash/isEqual";
+import { setSelectedPrimaryPanel } from "./app";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
@@ -149,9 +150,11 @@ export function replyToItem(item: Event | Comment | FloatingItem): UIThunkAction
 export function createComment(
   time: number,
   point: string,
-  position: { x: number; y: number }
+  position: { x: number; y: number } | null
 ): UIThunkAction {
-  return async ({ dispatch, getState }) => {
+  return async ({ dispatch }) => {
+    dispatch(setSelectedPrimaryPanel("comments"));
+
     const pendingComment: PendingComment = {
       type: "new_comment",
       comment: {
