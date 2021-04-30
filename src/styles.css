@@ -109,10 +109,6 @@ html {
   width: 100%;
 }
 
-.old-loader {
-  margin: auto;
-}
-
 .horizontal-panels {
   display: flex;
   flex-direction: row;
