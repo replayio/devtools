@@ -80,22 +80,22 @@ export function useAddInvitation() {
 }
 
 export function useMaybeClaimInvite() {
-  const { invitations, invited, email, loading } = useGetUserInfo();
+  const userInfo = useGetUserInfo();
   const claimInvitation = useClaimInvitation();
 
-  if (loading) {
-    return { loading };
+  if (userInfo?.loading) {
+    return { loading: userInfo.loading };
   }
 
   // If the user is invited/activated already, bail.
-  if (invited) {
+  if (userInfo?.invited) {
     return { loading: false };
   }
 
   // Claim the existing invitations for that user's email, if they exist. This
   // also updated the user record to be invited/activated.
-  if (invitations) {
-    claimInvitation({ variables: { email } });
+  if (userInfo?.invitations) {
+    claimInvitation({ variables: { email: userInfo?.email } });
     return { loading: false };
   }
 
