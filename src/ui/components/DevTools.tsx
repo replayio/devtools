@@ -104,7 +104,11 @@ function DevTools({
   if (!loaderResult) {
     if (!isAuthorized) {
       if (userId) {
-        expectedError = { message: "You don't have permission to view this replay." };
+        expectedError = {
+          message: "You don't have permission to view this replay.",
+          content:
+            "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
+        };
       } else {
         expectedError = {
           message: "You need to sign in to view this replay.",

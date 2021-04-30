@@ -9,6 +9,7 @@ const { prefs } = require("ui/utils/prefs");
 import { getTest, isTest } from "ui/utils/environment";
 
 import { ExpectedError } from "ui/state/app";
+import { getExpectedError } from "ui/reducers/app";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & { error: sessionError };
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
@@ -53,7 +54,12 @@ export async function createSession(store: UIStore, recordingId: string) {
     prefs.recordingId = recordingId;
   } catch (e) {
     if (e.code == 9 || e.code == 31) {
-      store.dispatch(setExpectedError(e));
+      const currentExpectedError = getExpectedError(store.getState());
+
+      // Don't overwrite an existing error.
+      if (!currentExpectedError) {
+        store.dispatch(setExpectedError(e));
+      }
     } else {
       throw e;
     }

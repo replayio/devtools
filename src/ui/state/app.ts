@@ -7,6 +7,7 @@ import {
   MouseEvent,
 } from "@recordreplay/protocol";
 import { RecordingTarget } from "protocol/thread/thread";
+import { ReactElement } from "react";
 
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug" | "comments";
@@ -17,6 +18,7 @@ export type SettingsTabTitle = "Experimental" | "Invitations" | "Support" | "Per
 
 export interface ExpectedError {
   message: string;
+  content?: string | ReactElement | ReactElement[];
   action?: string;
   type?: "timeout";
 }

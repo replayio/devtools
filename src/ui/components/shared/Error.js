@@ -50,7 +50,7 @@ function Error({ children, refresh, expected, unexpected, error }) {
   return (
     <ErrorContainer unexpected={unexpected} expected={expected}>
       <div className="error-content">
-        <h1>Whoops</h1>
+        <h1 className="text-3xl font-semibold">Whoops</h1>
         {children}
         {error.message ? <p className="error-message">{error.message}</p> : null}
         <ActionButton action={refresh ? "refresh" : error?.action} />
@@ -77,11 +77,13 @@ function ExpectedError({ error }) {
   }
 
   const isServerError = error.code;
-  const content = isServerError ? "Looks like something went wrong with this page" : error.message;
+  const content = isServerError
+    ? "Looks like something went wrong with this page"
+    : error.content || error.message;
 
   return (
     <Error error={error} expected>
-      <p>{content}</p>
+      <p className="text-center">{content}</p>
     </Error>
   );
 }
