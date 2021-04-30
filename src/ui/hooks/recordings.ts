@@ -10,7 +10,7 @@ function isTest() {
 }
 
 export function useGetRecording(
-  recordingId: RecordingId
+  recordingId: RecordingId | null
 ): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {
   const { data, error, loading } = useQuery(
     gql`
@@ -27,12 +27,14 @@ export function useGetRecording(
             id
             name
             picture
+            internal
           }
         }
       }
     `,
     {
       variables: { recordingId },
+      skip: !recordingId,
     }
   );
 
