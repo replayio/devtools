@@ -331,7 +331,10 @@ function playback(startTime: number, endTime: number): UIThunkAction {
     let nextGraphicsPromise!: ReturnType<typeof getGraphicsAtTime>;
 
     const prepareNextGraphics = () => {
-      nextGraphicsTime = snapTimeForPlayback(nextPaintOrMouseEvent(currentTime)?.time || endTime);
+      nextGraphicsTime = nextPaintOrMouseEvent(currentTime)?.time || endTime;
+      if (features.smoothPlayback) {
+        nextGraphicsTime = snapTimeForPlayback(nextGraphicsTime);
+      }
       nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
       dispatch(precacheScreenshots(nextGraphicsTime));
     };
