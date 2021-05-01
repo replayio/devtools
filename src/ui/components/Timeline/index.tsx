@@ -33,6 +33,8 @@ import "./Timeline.css";
 import { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
 
+const { prefs } = require("ui/utils/prefs");
+
 function ReplayButton({ onClick }: { onClick: MouseEventHandler }) {
   return (
     <button onClick={onClick}>
@@ -173,6 +175,9 @@ class Timeline extends Component<PropsFromRedux> {
 
   renderMessages() {
     const { messages, hoveredItem } = this.props;
+    if (messages.length >= prefs.maxHitsDisplayed) {
+      return null;
+    }
 
     return (
       <div className="markers-container">

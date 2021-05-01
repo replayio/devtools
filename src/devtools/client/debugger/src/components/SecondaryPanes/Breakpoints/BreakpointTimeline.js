@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import classnames from "classnames";
 
 import { actions as UIActions } from "ui/actions";
@@ -7,6 +7,7 @@ import { timelineMarkerWidth as pointWidth } from "ui/constants";
 import { connect } from "devtools/client/debugger/src/utils/connect";
 import BreakpointTimelinePoint from "./BreakpointTimelinePoint";
 import { isMatchingLocation } from "devtools/client/debugger/src/utils/breakpoint";
+const { prefs } = require("ui/utils/prefs");
 
 function getNewZoomRegion(zoomRegion, analysisPoints) {
   let newZoomRegion = {
@@ -87,15 +88,17 @@ function BreakpointTimeline({
       >
         <div className="progress-line full" />
         <div className="progress-line" style={{ width: `${percent}%` }} />
-        {analysisPoints.map((p, i) => (
-          <BreakpointTimelinePoint
-            breakpoint={breakpoint}
-            point={p}
-            key={i}
-            index={i}
-            hoveredItem={hoveredItem}
-          />
-        ))}
+        {analysisPoints.length < prefs.maxHitsDisplayed
+          ? analysisPoints.map((p, i) => (
+              <BreakpointTimelinePoint
+                breakpoint={breakpoint}
+                point={p}
+                key={i}
+                index={i}
+                hoveredItem={hoveredItem}
+              />
+            ))
+          : null}
       </div>
     </div>
   );

@@ -42,7 +42,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px;
+  color: var(--grey-50);
   border-bottom: 1px solid var(--theme-splitter-color);
+}
+
+.breakpoint-panel .summary .material-icons {
+  color: var(--grey-50);
 }
 
 .breakpoint-panel .summary .options {
