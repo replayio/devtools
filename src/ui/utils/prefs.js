@@ -28,8 +28,8 @@ pref("devtools.non-dev-side-panel-width", "25%");
 pref("devtools.view-mode", "non-dev");
 pref("devtools.dev-secondary-panel-height", "50%");
 pref("devtools.video", !!urlPrefs.video);
-pref("devtools.maxHitsDisplayed", 250);
-pref("devtools.maxHitsEditable", 100);
+pref("devtools.maxHitsDisplayed", 500);
+pref("devtools.maxHitsEditable", 200);
 pref("devtools.defaultLibraryTeam", "null");
 
 // app features
