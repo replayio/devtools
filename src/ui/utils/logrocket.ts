@@ -2,11 +2,17 @@ import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
 import * as Sentry from "@sentry/react";
 import { skipTelemetry } from "./environment";
-
+import { Recording } from "ui/types";
+import { UserInfo } from "ui/hooks/users";
 let setup = false;
 
 export default {
-  createSession: (auth: any) => {
+  createSession: (recording: Recording, userInfo: UserInfo, auth: any) => {
+    // Skip if the recording was either created or viewed by an internal user
+    if (recording.user?.internal || userInfo.internal) {
+      return;
+    }
+
     if (skipTelemetry()) {
       return;
     }
@@ -20,11 +26,14 @@ export default {
       });
     });
 
-    LogRocket.identify(auth.user.sub, {
-      name: auth.user.name,
-      email: auth.user.email,
-      id: auth.user.email,
-    });
+    // only identify the session if there is a logged in user
+    if (auth.user) {
+      LogRocket.identify(auth.user.sub, {
+        name: auth.user.name,
+        email: auth.user.email,
+        id: auth.user.email,
+      });
+    }
   },
 
   getSessionURL: (callback: (sessionUrl: string) => void) =>

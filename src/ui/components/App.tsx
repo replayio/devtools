@@ -78,8 +78,8 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
   }, []);
 
   useEffect(() => {
-    if (userInfo) {
-      setTelemetryContext(claims?.hasura.userId, userInfo.email, userInfo.isInternal);
+    if (!userInfo.loading) {
+      setTelemetryContext(claims?.hasura.userId, userInfo.email, userInfo.internal);
     }
   }, [userInfo]);
 
@@ -93,11 +93,10 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
   }, [auth.user]);
 
   useEffect(() => {
-    const recordingUser = recordingInfo.recording?.user;
-    if ((recordingUser && !recordingUser?.internal) || (auth.user && !userInfo.isInternal)) {
-      LogRocket.createSession(auth);
+    if (!recordingInfo.loading && !userInfo.loading && recordingInfo.recording) {
+      LogRocket.createSession(recordingInfo.recording, userInfo, auth);
     }
-  }, [auth.user, recordingInfo]);
+  }, [auth, userInfo, recordingInfo]);
 
   if (hasLoadingParam()) {
     return <SkeletonLoader content={"Uploading resources"} />;

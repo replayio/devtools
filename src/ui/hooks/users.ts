@@ -18,6 +18,14 @@ export function useGetUserId() {
   return { userId: data?.viewer?.user.id, loading, error };
 }
 
+export type UserInfo = {
+  invitations: Invitation[];
+  invited: boolean;
+  email: string;
+  internal: boolean;
+  loading: boolean;
+};
+
 export function useGetUserInfo() {
   const userId = getUserId();
   const { data, loading, error } = useQuery(
@@ -46,7 +54,7 @@ export function useGetUserInfo() {
   const invited: boolean = data?.users_by_pk.invited;
   const email: string = data?.users_by_pk.email;
   const invitations: Invitation[] = data?.users_by_pk.invitations;
-  const isInternal: boolean = data?.users_by_pk.internal;
+  const internal: boolean = data?.users_by_pk.internal;
 
-  return { invitations, invited, email, isInternal, loading };
+  return { invitations, invited, email, internal, loading };
 }
