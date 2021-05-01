@@ -86,7 +86,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem 
   );
 }
 
-export default connect(() => {}, {
+export default connect(() => ({}), {
   setHoveredItem: actions.setHoveredItem,
   clearHoveredItem: actions.clearHoveredItem,
 })(Panel);
