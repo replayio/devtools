@@ -11,6 +11,7 @@ export default function EventTranscriptItem({ event }: { event: Event }) {
       item={event}
       icon={<div className="img event-click" />}
       label="Mouse Click"
+      type={"mouse"}
       secondaryLabel=""
     >
       <CommentThread comment={event.comment} time={event.time} />

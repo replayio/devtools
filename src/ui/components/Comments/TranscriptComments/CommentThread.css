@@ -58,6 +58,7 @@
 }
 
 .transcript-list .comment-body {
+  padding: 12px;
   align-self: center;
   width: 100%;
 }
@@ -118,7 +119,7 @@
 .comment-body-item {
   position: relative;
 }
-
+/* 
 .comment-body-item:first-child::after {
   content: "";
   width: 1px;
@@ -127,7 +128,7 @@
   background: var(--grey-40);
   position: absolute;
   left: 13px;
-}
+} */
 
 .comment-body-item:not(:last-child)::before {
   content: "";

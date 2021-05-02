@@ -56,7 +56,7 @@ function Transcript({
   const { userId } = hooks.useGetUserId();
   const isAuthor = userId && userId == recording?.userId;
 
-  const entries: Entry[] = createEntries(comments, clickEvents, shouldShowLoneEvents);
+  const entries: Entry[] = createEntries(comments, clickEvents, false);
 
   useEffect(
     function updateFloatingItem() {

@@ -14,6 +14,7 @@ const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/cre
 type TranscriptItemProps = PropsFromRedux & {
   item: Comment | Event | FloatingItem;
   label: string;
+  type: "time" | "code";
   secondaryLabel: string;
   highlightSecondaryLabel?: boolean;
   icon: JSX.Element;
@@ -26,6 +27,7 @@ function TranscriptItem({
   item,
   icon,
   label,
+  type,
   secondaryLabel,
   highlightSecondaryLabel,
   clearPendingComment,
@@ -70,6 +72,7 @@ function TranscriptItem({
 
     setHoveredItem(hoveredItem);
   };
+  console.log({ type });
 
   return (
     <div
@@ -82,16 +85,18 @@ function TranscriptItem({
       })}
       ref={itemNode}
     >
-      <div className="transcript-entry-description">
-        <div className="transcript-entry-icon">{icon}</div>
-        <div className="transcript-entry-label">
-          <div className="label">{label}</div>
-          <div className="secondary-label cm-s-mozilla" ref={secondaryLabelNode}>
-            {secondaryLabel}
+      {type == "code" ? (
+        <div className="transcript-entry-description">
+          <div className="transcript-entry-icon">{icon}</div>
+          <div className="transcript-entry-label">
+            <div className="label">{label}</div>
+            <div className="secondary-label cm-s-mozilla" ref={secondaryLabelNode}>
+              {secondaryLabel}
+            </div>
           </div>
+          {/* <ReplyButton item={item} /> */}
         </div>
-        <ReplyButton item={item} />
-      </div>
+      ) : null}
       {children}
     </div>
   );

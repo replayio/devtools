@@ -30,6 +30,7 @@ function PauseTranscriptItem({
 }: PauseTranscriptItemProps) {
   let icon = "location-marker";
   let label = "Point In Time";
+  let type = "time";
   let secondaryLabel = getFormattedTime(item.time);
   let highlightSecondaryLabel = false;
 
@@ -39,6 +40,7 @@ function PauseTranscriptItem({
 
     icon = "document-text";
     label = closestFunction?.name || `${filename}:${line}`;
+    type = "code";
     secondaryLabel = snippet;
     highlightSecondaryLabel = true;
   }
@@ -48,6 +50,7 @@ function PauseTranscriptItem({
       item={item}
       icon={<div className={`img ${icon}`} />}
       label={label}
+      type={type}
       secondaryLabel={secondaryLabel}
       highlightSecondaryLabel={highlightSecondaryLabel}
     >
