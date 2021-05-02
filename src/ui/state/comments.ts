@@ -101,7 +101,7 @@ export interface PendingNewReply extends PendingBlankComment {
 }
 
 export interface PendingEditComment extends PendingBlankComment {
-  position?: null;
+  position: CommentPosition;
   parentId?: null;
   id: string;
 }

@@ -45,6 +45,7 @@ interface DraftJSEditorProps {
   placeholder: string;
   handleSubmit: (text: string) => void;
   handleCancel: () => void;
+  onChangeCallback: () => void;
   users?: User[];
 }
 
@@ -52,6 +53,7 @@ export default function DraftJSEditor({
   api,
   handleCancel,
   handleSubmit,
+  onChangeCallback,
   initialContent,
   placeholder,
   users,
@@ -79,8 +81,9 @@ export default function DraftJSEditor({
     (updated: Draft.EditorState) => {
       publicApi.current.state = updated;
       setEditorState(updated);
+      onChangeCallback();
     },
-    [setEditorState]
+    [setEditorState, onChangeCallback]
   );
 
   useEffect(() => {
@@ -181,7 +184,11 @@ export default function DraftJSEditor({
   const { MentionSuggestions } = mentionPlugin;
 
   return (
-    <div className="draft-editor-container" ref={wrapperNode}>
+    <div
+      className="draft-editor-container"
+      ref={wrapperNode}
+      onClick={() => editorNode.current!.focus()}
+    >
       <Editor
         editorState={editorState}
         onChange={handleChange}

@@ -1,85 +1,25 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
 import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
 import { isTest } from "ui/utils/environment";
 
-import TranscriptFilter from "ui/components/Transcript/TranscriptFilter";
-import {
-  EventTranscriptItem,
-  NonEventTranscriptItem,
-  FloatingTranscriptItem,
-} from "./TranscriptItem";
 import "./Transcript.css";
 import UploadScreen from "../UploadScreen";
 
 import { UIState } from "ui/state";
-import { Event, Comment, FloatingItem } from "ui/state/comments";
+import { Comment, PendingNewComment } from "ui/state/comments";
+import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
 
-type Entry = Comment | Event;
-
-function createEntries(comments: Comment[], clickEvents: Event[], shouldShowLoneEvents: boolean) {
-  let entries = clickEvents.map(event => ({ ...event }));
-
-  let nonNestedComments = comments.reduce((acc: Comment[], comment: Comment) => {
-    const matchingEntryIndex = entries.findIndex(entry => entry.point == comment.point);
-    if (matchingEntryIndex >= 0) {
-      entries[matchingEntryIndex].comment = comment;
-      return acc;
-    } else {
-      return [...acc, comment];
-    }
-  }, []);
-
-  // If lone events are supposed to be hidden, filter them out.
-  if (!shouldShowLoneEvents) {
-    entries = entries.filter(entry => entry.comment);
-  }
-
-  return [...entries, ...nonNestedComments];
-}
-
-function Transcript({
-  clickEvents,
-  currentTime,
-  playback,
-  recordingId,
-  shouldShowLoneEvents,
-  floatingItem,
-  showFloatingItem,
-  hideFloatingItem,
-}: PropsFromRedux) {
+function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
   const { comments } = hooks.useGetComments(recordingId!);
   const { recording, loading } = hooks.useGetRecording(recordingId!);
   const { userId } = hooks.useGetUserId();
   const isAuthor = userId && userId == recording?.userId;
 
-  const entries: Entry[] = createEntries(comments, clickEvents, shouldShowLoneEvents);
-
-  useEffect(
-    function updateFloatingItem() {
-      const isPlaying = playback;
-      const isFloatingPause = !entries.some(entry => entry.time == currentTime);
-
-      if (isFloatingPause && !isPlaying) {
-        showFloatingItem();
-      } else {
-        hideFloatingItem();
-      }
-    },
-    [currentTime, comments]
-  );
-
   if (loading) {
     return null;
-  }
-
-  const displayedEntries: (Entry | FloatingItem)[] = [...entries];
-
-  if (floatingItem) {
-    displayedEntries.push(floatingItem);
   }
 
   // Only show the initialization screen if the replay is not being opened
@@ -88,22 +28,21 @@ function Transcript({
     return <UploadScreen />;
   }
 
+  const displayedComments: (Comment | PendingNewComment)[] = [...comments];
+
+  if (pendingComment?.type == "new_comment") {
+    displayedComments.push(pendingComment.comment);
+  }
+
   return (
     <div className="right-sidebar">
       <div className="right-sidebar-toolbar">
-        <div className="right-sidebar-toolbar-item">Transcript</div>
-        <TranscriptFilter />
+        <div className="right-sidebar-toolbar-item">Comments</div>
       </div>
       <div className="transcript-panel">
-        <div className="transcript-list">
-          {sortBy(displayedEntries, ["time", "kind", "createdAt"]).map((entry, i) => {
-            if ("itemType" in entry) {
-              return <FloatingTranscriptItem item={entry} key={i} />;
-            } else if ("content" in entry) {
-              return <NonEventTranscriptItem comment={entry} key={i} />;
-            } else {
-              return <EventTranscriptItem event={entry} key={i} />;
-            }
+        <div className="transcript-list space-y-4">
+          {sortBy(displayedComments, ["time"]).map(comment => {
+            return <CommentCard comment={comment} key={"id" in comment ? comment.id : 0} />;
           })}
         </div>
       </div>
@@ -111,19 +50,9 @@ function Transcript({
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    playback: selectors.getPlayback(state),
-    currentTime: selectors.getCurrentTime(state),
-    recordingId: selectors.getRecordingId(state),
-    clickEvents: selectors.getEventsForType(state, "mousedown"),
-    shouldShowLoneEvents: selectors.getShouldShowLoneEvents(state),
-    floatingItem: selectors.getFloatingItem(state),
-  }),
-  {
-    showFloatingItem: actions.showFloatingItem,
-    hideFloatingItem: actions.hideFloatingItem,
-  }
-);
+const connector = connect((state: UIState) => ({
+  recordingId: selectors.getRecordingId(state),
+  pendingComment: selectors.getPendingComment(state),
+}));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(Transcript);
