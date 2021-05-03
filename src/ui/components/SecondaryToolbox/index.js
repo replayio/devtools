@@ -14,7 +14,7 @@ import { ReactDevtoolsPanel } from "./ReactDevTools";
 import { isTest } from "ui/utils/environment";
 
 function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode, isNode }) {
-  const userSettings = hooks.useGetUserSettings();
+  const { userSettings } = hooks.useGetUserSettings();
 
   const showElements = userSettings.showElements || isTest();
   const onClick = panel => {
