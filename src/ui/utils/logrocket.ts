@@ -19,6 +19,9 @@ export default {
       return;
     }
 
+    if (setup) {
+      return;
+    }
     setup = true;
     setupLogRocketReact(LogRocket);
     LogRocket.init("4sdo4i/replay");
