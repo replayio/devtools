@@ -29,6 +29,10 @@ export function useGetRecording(
             picture
             internal
           }
+          workspace {
+            id
+            name
+          }
         }
       }
     `,

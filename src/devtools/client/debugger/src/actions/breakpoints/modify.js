@@ -4,6 +4,8 @@
 
 //
 
+import mixpanel from "mixpanel-browser";
+
 import { makeBreakpointLocation, getLocationKey, getASTLocation } from "../../utils/breakpoint";
 
 import {
@@ -17,6 +19,8 @@ import {
   getRequestedBreakpointLocations,
   getPendingBreakpointList,
 } from "../../selectors";
+
+import { getRecordingWorkspace } from "ui/reducers/app";
 import { selectors } from "ui/reducers";
 
 import { setBreakpointPositions } from "./breakpointPositions";
@@ -78,15 +82,28 @@ export function enableBreakpoint(cx, initialBreakpoint) {
   };
 }
 
+async function trackBreakpoint(workspace) {
+  let context = {};
+  if (workspace?.name) {
+    context = { workspaceName: workspace.name };
+  }
+  mixpanel.track("breakpoint", context);
+}
+
 export function addBreakpoint(
   cx,
   initialLocation,
   options = {},
   disabled = false,
+  shouldTrack = false,
   shouldCancel = () => false
 ) {
   return async ({ dispatch, getState, client }) => {
     recordEvent("add_breakpoint");
+    const workspace = getRecordingWorkspace(getState());
+    if (shouldTrack) {
+      trackBreakpoint(workspace);
+    }
 
     const { sourceId, column, line } = initialLocation;
 

@@ -9,8 +9,6 @@
  * @module reducers/breakpoints
  */
 
-import mixpanel from "mixpanel-browser";
-
 import { getLocationKey, isMatchingLocation } from "../utils/breakpoint";
 
 // eslint-disable-next-line max-len
@@ -82,12 +80,7 @@ function setRequestedBreakpoint(state, { location }) {
   return { ...state, requestedBreakpoints };
 }
 
-async function trackBreakpoint() {
-  mixpanel.track("breakpoint");
-}
-
 function setBreakpoint(state, { breakpoint }) {
-  trackBreakpoint();
   const location = breakpoint.location;
   const id = getLocationKey(location);
   const breakpoints = { ...state.breakpoints, [id]: breakpoint };

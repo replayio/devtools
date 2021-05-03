@@ -22,6 +22,7 @@ import {
   SettingsTabTitle,
 } from "ui/state/app";
 import { RecordingTarget } from "protocol/thread/thread";
+import { Workspace } from "ui/types";
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -66,6 +67,9 @@ export type SetRecordingTargetAction = Action<"set_recording_target"> & {
 export type SetFontLoading = Action<"set_material_icons_loaded"> & {
   fontLoading: boolean;
 };
+export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
+  workspace: Workspace;
+};
 
 export type AppActions =
   | SetupAppAction
@@ -89,7 +93,8 @@ export type AppActions =
   | SetWorkspaceId
   | SetDefaultSettingsTab
   | SetRecordingTargetAction
-  | SetFontLoading;
+  | SetFontLoading
+  | SetRecordingWorkspaceAction;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -244,4 +249,8 @@ export function setRecordingTarget(recordingTarget: RecordingTarget): SetRecordi
 
 export function setFontLoading(value: boolean): SetFontLoading {
   return { type: "set_material_icons_loaded", fontLoading: value };
+}
+
+export function setRecordingWorkspace(workspace: Workspace): SetRecordingWorkspaceAction {
+  return { type: "set_recording_workspace", workspace };
 }

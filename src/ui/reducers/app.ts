@@ -33,6 +33,7 @@ function initialAppState(): AppState {
     defaultSettingsTab: "Personal",
     recordingTarget: null,
     fontLoading: true,
+    recordingWorkspace: null,
   };
 }
 
@@ -163,6 +164,10 @@ export default function update(
       return { ...state, fontLoading: action.fontLoading };
     }
 
+    case "set_recording_workspace": {
+      return { ...state, recordingWorkspace: action.workspace };
+    }
+
     default: {
       return state;
     }
@@ -210,3 +215,4 @@ export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getFontLoading = (state: UIState) => state.app.fontLoading;
+export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
