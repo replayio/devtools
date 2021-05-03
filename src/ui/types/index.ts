@@ -15,6 +15,7 @@ export interface Recording {
   user?: User;
   userId?: string;
   isInitialized: boolean;
+  workspace?: Workspace;
 }
 
 export interface Workspace {
