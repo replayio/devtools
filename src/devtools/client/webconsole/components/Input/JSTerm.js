@@ -58,7 +58,7 @@ class JSTerm extends React.Component {
   }
 
   focus() {
-    this.editor.focus();
+    this.editor?.focus();
   }
 
   /**
