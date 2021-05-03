@@ -95,6 +95,7 @@
     "cypress": "^6.5.0",
     "cypress-localstorage-commands": "^1.4.0",
     "cypress-real-events": "^1.2.0",
+    "esbuild-loader": "^2.12.0",
     "eslint": "^7.9.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-prettier": "^6.11.0",

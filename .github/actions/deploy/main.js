@@ -30,7 +30,7 @@ function invalidateCloudFront() {
 
 spawnChecked("npm", ["install"]);
 
-spawnChecked("./node_modules/.bin/webpack", ["--mode=production"]);
+spawnChecked("earthly", ["--build-arg", "REPLAY_RELEASE=$GIT_SHA", "+dist"]);
 
 upload("index.html", "view");
 uploadDir("dist");
