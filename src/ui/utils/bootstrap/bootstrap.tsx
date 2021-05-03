@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import * as Sentry from "@sentry/react";
-import { Integrations } from "@sentry/apm";
+import { Integrations } from "@sentry/tracing";
 
 import mixpanel from "mixpanel-browser";
 
@@ -30,7 +30,7 @@ export function setupTelemetry(context: Record<string, any>) {
 
   Sentry.init({
     dsn: "https://41c20dff316f42fea692ef4f0d055261@o437061.ingest.sentry.io/5399075",
-    integrations: [new Integrations.Tracing()],
+    integrations: [new Integrations.BrowserTracing()],
     tracesSampleRate: 1.0,
     beforeSend(event) {
       if (event) {
