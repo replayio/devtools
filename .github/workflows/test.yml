@@ -10,12 +10,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install Dependencies
-        run: npm install
+      - name: Download earthly
+        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.5.10/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
       - name: Build webpack
-        run: ./node_modules/.bin/webpack --mode=development
-      - name: Tar up output files
-        run: tar -czf dist.tgz index.html dist node_modules
+        run: "earthly --ci --build-arg REPLAY_RELEASE=$GIT_SHA +dist"
+        with:
+          GIT_SHA: ${{ github.sha }}
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
