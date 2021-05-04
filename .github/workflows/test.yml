@@ -5,7 +5,7 @@ on: [pull_request, workflow_dispatch]
 jobs:
   build:
     name: Build webpack
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Checkout
