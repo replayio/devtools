@@ -22,8 +22,8 @@ export interface LazyLoadDraftConfig {
     DraftJS: DraftJSModule;
     Editor: any;
   };
-  emojiPlugin: EmojiPlugin;
-  mentionPlugin: EditorPlugin & {
+  emojiPlugin?: EmojiPlugin;
+  mentionPlugin?: EditorPlugin & {
     MentionSuggestions: React.ComponentType<any>;
   };
 }
@@ -50,20 +50,26 @@ function useDraftJS() {
             DraftJS,
             Editor,
           },
-          emojiPlugin: createEmojiPlugin({
+        };
+
+        if (defaultEmojiTheme) {
+          cfg.emojiPlugin = createEmojiPlugin({
             theme: {
               ...defaultEmojiTheme,
               emojiSuggestions: `${defaultEmojiTheme.emojiSuggestions} pluginPopover`,
             },
-          }),
-          mentionPlugin: createMentionPlugin({
+          });
+        }
+
+        if (defaultMentionTheme) {
+          cfg.mentionPlugin = createMentionPlugin({
             entityMutability: "IMMUTABLE",
             theme: {
               ...defaultMentionTheme,
               mentionSuggestions: `${defaultMentionTheme.mentionSuggestions} pluginPopover`,
             },
-          }),
-        };
+          });
+        }
 
         config = cfg;
 

@@ -177,8 +177,6 @@ export default function DraftJSEditor({
       Editor: { default: Editor },
     },
   } = config;
-  const { EmojiSuggestions } = emojiPlugin;
-  const { MentionSuggestions } = mentionPlugin;
 
   return (
     <div className="draft-editor-container" ref={wrapperNode}>
@@ -192,15 +190,17 @@ export default function DraftJSEditor({
         ref={editorNode}
         webDriverTestID="draftjs-editor"
       />
-      <EmojiSuggestions />
-      <MentionSuggestions
-        suggestions={filteredUsers}
-        onSearchChange={({ value }: { trigger: string; value: string }) =>
-          setMentionSearchText(value)
-        }
-        onOpenChange={setOpen}
-        open={open}
-      />
+      {emojiPlugin && <emojiPlugin.EmojiSuggestions />}
+      {mentionPlugin && (
+        <mentionPlugin.MentionSuggestions
+          suggestions={filteredUsers}
+          onSearchChange={({ value }: { trigger: string; value: string }) =>
+            setMentionSearchText(value)
+          }
+          onOpenChange={setOpen}
+          open={open}
+        />
+      )}
     </div>
   );
 }
