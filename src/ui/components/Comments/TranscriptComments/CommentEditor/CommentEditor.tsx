@@ -17,6 +17,7 @@ import {
 import DraftJSEditor, { DraftJSAPI } from "./DraftJSEditor";
 import "./CommentEditor.css";
 import { User } from "ui/types";
+import classNames from "classnames";
 
 type CommentEditorProps = PropsFromRedux & {
   comment: Comment | PendingNewComment | PendingNewReply | PendingEditReply | PendingEditComment;
@@ -24,7 +25,6 @@ type CommentEditorProps = PropsFromRedux & {
 };
 
 function CommentEditor({
-  pendingComment,
   comment,
   handleSubmit,
   clearPendingComment,
@@ -32,6 +32,7 @@ function CommentEditor({
 }: CommentEditorProps) {
   const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
   const [api, setApi] = useState<DraftJSAPI>();
+  const [submitEnabled, setSubmitEnabled] = useState<boolean>(false);
 
   const users = useMemo(
     () =>
@@ -41,31 +42,50 @@ function CommentEditor({
     [loading]
   );
 
-  const { user } = useAuth0();
-
   const handleCancel = () => {
     clearPendingComment();
   };
+  const onChangeCallback = () => {
+    setSubmitEnabled(!!api?.getText().length);
+  };
+
+  const onSubmit = () => {
+    if (api) {
+      handleSubmit(api.getText());
+    }
+  };
 
   return (
-    <div className="comment-input-container" onClick={e => e.stopPropagation()}>
-      <div className="comment-input">
-        <img src={user.picture} className="comment-picture" />
+    <div className="comment-input-container p-4" onClick={e => e.stopPropagation()}>
+      <div className="comment-input text-lg">
         <DraftJSEditor
           handleCancel={handleCancel}
           handleSubmit={handleSubmit}
           initialContent={comment.content}
           placeholder={comment.content == "" ? "Type a comment" : ""}
           api={setApi}
+          onChangeCallback={onChangeCallback}
           users={users}
         />
       </div>
-      <div className="comment-input-actions">
-        <button className="action-cancel" onClick={handleCancel}>
+      <div className="flex justify-end space-x-2">
+        <button
+          onClick={clearPendingComment}
+          className={classNames(
+            "justify-center py-2 px-4 rounded-md shadow-sm text-lg font-medium text-blue-700 bg-blue-50"
+          )}
+        >
           Cancel
         </button>
-        <button className="action-submit" onClick={() => api && handleSubmit(api.getText())}>
-          Submit
+        <button
+          onClick={onSubmit}
+          disabled={!submitEnabled}
+          className={classNames(
+            "justify-center py-2 px-4 rounded-md shadow-sm text-lg font-medium text-white",
+            submitEnabled ? "bg-blue-500" : "bg-gray-300"
+          )}
+        >
+          Post
         </button>
       </div>
     </div>

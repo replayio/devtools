@@ -13,12 +13,10 @@
 
 .transcript-list .comment-input {
   flex-grow: 1;
-  font-size: 12px;
-  line-height: 18px;
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  color: var(--theme-comment);
+  min-height: 80px;
 }
 
 .transcript-list .comment-input-actions {
@@ -62,7 +60,6 @@
   border: 1px solid var(--primary-accent);
   border-radius: 4px;
   flex-grow: 1;
-  margin-left: 16px;
 }
 
 .transcript-list .responsive-textarea {

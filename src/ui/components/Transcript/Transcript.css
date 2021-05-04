@@ -17,5 +17,5 @@
   flex-grow: 1;
   overflow: auto;
   width: 100%;
-  padding: 0 24px;
+  padding: 1px 24px 24px;
 }

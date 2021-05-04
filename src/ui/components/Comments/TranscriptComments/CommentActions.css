@@ -1,12 +1,5 @@
 .transcript-list .comment-actions {
-  visibility: hidden;
   align-self: center;
-}
-
-/* Added .hover class here for testing purposes */
-.transcript-list .comment-body-item:hover .comment-actions,
-.transcript-list .comment-body-item.hover .comment-actions {
-  visibility: visible;
 }
 
 .transcript-list .comment-actions .dropdown-button {
