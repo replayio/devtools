@@ -64,7 +64,7 @@ const onPaused = data => {
   messages
     .filter(({ time }) => time <= data.time)
     .forEach(({ message }) => {
-      if (message.event === "operations") {
+      if (message.event === "operations" || message.event === "getBridgeProtocol") {
         wall.send(message.event, message.payload);
       }
     });
