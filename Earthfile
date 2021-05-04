@@ -3,6 +3,7 @@ FROM node:14.15.0
 build:
     COPY package.json package-lock.json ./
     RUN npm install
+    SAVE ARTIFACT node_modules
     COPY src src
     RUN mkdir -p ./dist
     COPY webpack.config.js .
@@ -11,7 +12,7 @@ build:
     SAVE ARTIFACT dist /dist AS LOCAL ./dist
 
 dist:
-    COPY node_modules node_modules
+    COPY +build/node_modules node_modules
     COPY index.html .
     COPY +build/dist dist
     RUN tar -czf dist.tgz index.html dist node_modules
