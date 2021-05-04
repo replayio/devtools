@@ -45,6 +45,7 @@ function VideoComment({
         left: position.x * scale,
       }}
     >
+      <div className="animate-pulse absolute w-12 h-12 bg-blue-500 rounded-full transform -translate-y-1/2 -ml-2" />
       <div
         className={classnames("canvas-comment-marker", {
           highlighted: hoveredComment == comment.id,
