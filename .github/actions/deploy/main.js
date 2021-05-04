@@ -4,7 +4,7 @@ function spawnChecked(...args) {
   console.log(`spawnSync`, args[0], args[1].join(" "));
   const rv = spawnSync.apply(this, args);
   if (rv.status != 0 || rv.error) {
-    throw new Error("Spawned process failed");
+    throw new Error(`Spawned process failed: ${rv.error}`);
   }
 }
 
