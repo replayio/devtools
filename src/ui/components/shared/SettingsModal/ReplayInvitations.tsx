@@ -57,18 +57,11 @@ export default function ReplayInvitations() {
       </label>
       {availableInvitations > 0 && (
         <form onSubmit={onSubmit} className="space-x-2">
-          {/* <input
-            type="text"
-            placeholder="Email Address"
-            value={inputValue}
-            onChange={e => setInputValue(e.target.value)}
-          ></input> */}
           <TextInput
             placeholder="Email Address"
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
           />
-          {/* <input type="submit" value="Invite"></input> */}
           <button
             type="submit"
             value="Invite"

@@ -58,7 +58,7 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
     return (
       <main>
         <h1>{title}</h1>
-        <ul>
+        <ul className="overflow-hidden flex">
           <ReplayInvitations />
         </ul>
       </main>
