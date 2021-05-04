@@ -16,7 +16,7 @@ jobs:
         run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.5.10/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
       - name: Build webpack
         run: "earthly --ci --build-arg REPLAY_RELEASE=$GIT_SHA +dist"
-        with:
+        env:
           GIT_SHA: ${{ github.sha }}
       - name: Create artifact
         uses: actions/upload-artifact@v2
