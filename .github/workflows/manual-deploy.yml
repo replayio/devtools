@@ -21,4 +21,4 @@ jobs:
       - name: Deploy to S3
         uses: ./.github/actions/deploy
         with:
-          GIT_SHA: ${{ github.sha }}
+          git_sha: ${{ github.sha }}

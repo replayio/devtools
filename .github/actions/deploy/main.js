@@ -30,7 +30,7 @@ function invalidateCloudFront() {
 
 spawnChecked("npm", ["install"]);
 
-spawnChecked("earthly", ["--build-arg", "REPLAY_RELEASE=$GIT_SHA", "+dist"]);
+spawnChecked("earthly", ["--build-arg", "REPLAY_RELEASE=$INPUT_GIT_SHA", "+dist"]);
 
 upload("index.html", "view");
 uploadDir("dist");
