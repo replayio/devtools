@@ -32,7 +32,6 @@ export function setupTelemetry(context: Record<string, any>) {
     dsn: "https://41c20dff316f42fea692ef4f0d055261@o437061.ingest.sentry.io/5399075",
     integrations: [new Integrations.BrowserTracing()],
     tracesSampleRate: 1.0,
-    release: process.env.REPLAY_RELEASE ? process.env.REPLAY_RELEASE : "development",
     beforeSend(event) {
       if (event) {
         const exceptionValue = event?.exception?.values?.[0].value;

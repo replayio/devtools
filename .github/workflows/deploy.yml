@@ -7,17 +7,17 @@ on:
 jobs:
   build:
     name: Build webpack
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Download earthly
-        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.5.11/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
+      - name: Install Dependencies
+        run: npm install
       - name: Build webpack
-        run: "earthly --build-arg REPLAY_RELEASE=$GIT_SHA +dist"
-        env:
-          GIT_SHA: ${{ github.sha }}
+        run: ./node_modules/.bin/webpack --mode=production
+      - name: Tar up output files
+        run: tar -czf dist.tgz index.html dist node_modules
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
@@ -163,5 +163,3 @@ jobs:
           aws-region: us-east-2
       - name: Deploy to S3
         uses: ./.github/actions/deploy
-        with:
-          git_sha: ${{ github.sha }}
