@@ -29,6 +29,10 @@ export function useGetRecording(
             picture
             internal
           }
+          workspace {
+            id
+            name
+          }
         }
       }
     `,
@@ -64,6 +68,7 @@ function convertRecording(rec: any): Recording | undefined {
     private: rec.private,
     isInitialized: rec.isInitialized,
     date: rec.createdAt,
+    workspace: rec.workspace,
   };
 }
 
