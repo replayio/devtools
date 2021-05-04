@@ -23,11 +23,8 @@
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
-.canvas-overlay .canvas-comment-marker:hover,
 .canvas-overlay .canvas-comment-marker.selected,
 .canvas-overlay .canvas-comment-marker.highlighted {
-  padding: 2px;
-  margin-left: -2px;
   background: var(--primary-accent);
   transition: background 200ms;
   z-index: var(--z-index-3--hovered-comment-primary);
