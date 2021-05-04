@@ -9,7 +9,7 @@ import { Integrations } from "@sentry/tracing";
 import mixpanel from "mixpanel-browser";
 
 import App, { AppProps } from "ui/components/App";
-const { PopupBlockedError } = require("ui/components/shared/Error");
+import { PopupBlockedError } from "ui/components/shared/Error";
 import tokenManager from "ui/utils/tokenManager";
 import useToken from "ui/utils/useToken";
 import { createApolloClient } from "ui/utils/apolloClient";

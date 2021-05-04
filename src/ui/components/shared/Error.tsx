@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 
 import "./Error.css";
+import { UIState } from "ui/state";
 
 function RefreshButton() {
   const [clicked, setClicked] = useState(false);
@@ -27,7 +28,7 @@ function SignInButton() {
   return <button onClick={loginWithRedirect}>Sign in</button>;
 }
 
-function ActionButton({ action }) {
+function ActionButton({ action }: { action: string }) {
   if (action == "refresh") {
     return <RefreshButton />;
   } else if (action == "sign-in") {
@@ -37,7 +38,15 @@ function ActionButton({ action }) {
   return null;
 }
 
-function ErrorContainer({ children, unexpected, expected }) {
+function ErrorContainer({
+  children,
+  unexpected,
+  expected,
+}: {
+  children: React.ReactNode;
+  unexpected?: boolean;
+  expected?: boolean;
+}) {
   return (
     <div className={classnames("error-container", { expected, unexpected })}>
       <div className="error-mask" />
@@ -46,7 +55,27 @@ function ErrorContainer({ children, unexpected, expected }) {
   );
 }
 
-function Error({ children, refresh, expected, unexpected, error }) {
+type error = {
+  message: string;
+  action?: any;
+  type?: string;
+  code?: number;
+  content?: string;
+};
+
+function Error({
+  children,
+  refresh,
+  expected,
+  unexpected,
+  error,
+}: {
+  children: React.ReactNode;
+  refresh?: boolean;
+  expected?: boolean;
+  unexpected?: boolean;
+  error: error;
+}) {
   return (
     <ErrorContainer unexpected={unexpected} expected={expected}>
       <div className="error-content">
@@ -59,7 +88,7 @@ function Error({ children, refresh, expected, unexpected, error }) {
   );
 }
 
-function ExpectedError({ error }) {
+function ExpectedError({ error }: { error: error }) {
   // This is for the class of errors that:
   // 1) Happens before to the app's initial page load has successfully completed.
   // 2) Is deterministic (e.g. bad recording ID).
@@ -88,7 +117,7 @@ function ExpectedError({ error }) {
   );
 }
 
-function UnexpectedError({ error }) {
+function UnexpectedError({ error }: { error: error }) {
   // This is for the class of errors that:
   // 1) Happens after the app's initial page load has successfully completed.
   // 2) Is non-deterministic (e.g. an unexpected crash).
@@ -101,7 +130,13 @@ function UnexpectedError({ error }) {
   );
 }
 
-function _AppErrors({ expectedError, unexpectedError }) {
+function _AppErrors({
+  expectedError,
+  unexpectedError,
+}: {
+  expectedError?: error;
+  unexpectedError?: error;
+}) {
   return (
     <>
       {expectedError ? <ExpectedError error={expectedError} /> : null}
@@ -111,7 +146,7 @@ function _AppErrors({ expectedError, unexpectedError }) {
 }
 
 export const AppErrors = connect(
-  state => ({
+  (state: UIState) => ({
     expectedError: selectors.getExpectedError(state),
     unexpectedError: selectors.getUnexpectedError(state),
   }),
