@@ -4,7 +4,7 @@ function spawnChecked(...args) {
   console.log(`spawnSync`, args[0], args[1].join(" "));
   const rv = spawnSync.apply(this, args);
   if (rv.status != 0 || rv.error) {
-    throw new Error("Spawned process failed");
+    throw new Error(`Spawned process failed: ${rv.error}`);
   }
 }
 
@@ -30,7 +30,7 @@ function invalidateCloudFront() {
 
 spawnChecked("npm", ["install"]);
 
-spawnChecked("./node_modules/.bin/webpack", ["--mode=production"]);
+spawnChecked("earthly", ["--build-arg", "REPLAY_RELEASE=$INPUT_GIT_SHA", "+dist"]);
 
 upload("index.html", "view");
 uploadDir("dist");

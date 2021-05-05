@@ -1,4 +1,5 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const webpack = require("webpack");
 const Visualizer = require("webpack-visualizer-plugin");
 
 module.exports = {
@@ -30,6 +31,7 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin(),
     process.env.REPLAY_BUILD_VISUALIZE && new Visualizer(),
+    new webpack.EnvironmentPlugin({ REPLAY_RELEASE: undefined }),
   ].filter(Boolean),
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
