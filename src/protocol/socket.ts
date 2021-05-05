@@ -144,7 +144,8 @@ function onSocketClose() {
       dispatch(
         setExpectedError({
           type: "timeout",
-          message: "Apologies! A quick refresh should do the trick.",
+          message:
+            "Replays disconnect after five minutes to reduce server load. Ready when you are!",
         })
       );
     }
