@@ -7,7 +7,7 @@ import { UIStore, actions, UIThunkAction } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { ThreadFront } from "protocol/thread";
 const { prefs } = require("ui/utils/prefs");
-import { getTest, isTest } from "ui/utils/environment";
+import { getTest, isTest, isDevelopment } from "ui/utils/environment";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import { ExpectedError } from "ui/state/app";
@@ -92,6 +92,7 @@ export function setExpectedError(error: ExpectedError): UIThunkAction {
       stack: error.stack,
       recordingId: selectors.getRecordingId(state),
       sessionId: selectors.getSessionId(state),
+      environment: isDevelopment() ? "dev" : "prod",
     });
     dispatch({ type: "set_expected_error", error });
   };
@@ -104,6 +105,7 @@ export function setUnexpectedError(error: sessionError): UIThunkAction {
       ...error,
       recordingId: selectors.getRecordingId(state),
       sessionId: selectors.getSessionId(state),
+      environment: isDevelopment() ? "dev" : "prod",
     });
     dispatch({ type: "set_unexpected_error", error });
   };
