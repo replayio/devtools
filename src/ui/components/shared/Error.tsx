@@ -55,7 +55,7 @@ function ErrorContainer({
   );
 }
 
-type error = {
+type Error = {
   message: string;
   action?: any;
   type?: string;
@@ -74,7 +74,7 @@ function Error({
   refresh?: boolean;
   expected?: boolean;
   unexpected?: boolean;
-  error: error;
+  error: Error;
 }) {
   return (
     <ErrorContainer unexpected={unexpected} expected={expected}>
@@ -88,7 +88,7 @@ function Error({
   );
 }
 
-function ExpectedError({ error }: { error: error }) {
+function ExpectedError({ error }: { error: Error }) {
   // This is for the class of errors that:
   // 1) Happens before to the app's initial page load has successfully completed.
   // 2) Is deterministic (e.g. bad recording ID).
@@ -117,7 +117,7 @@ function ExpectedError({ error }: { error: error }) {
   );
 }
 
-function UnexpectedError({ error }: { error: error }) {
+function UnexpectedError({ error }: { error: Error }) {
   // This is for the class of errors that:
   // 1) Happens after the app's initial page load has successfully completed.
   // 2) Is non-deterministic (e.g. an unexpected crash).
@@ -134,8 +134,8 @@ function _AppErrors({
   expectedError,
   unexpectedError,
 }: {
-  expectedError?: error;
-  unexpectedError?: error;
+  expectedError?: Error;
+  unexpectedError?: Error;
 }) {
   return (
     <>
