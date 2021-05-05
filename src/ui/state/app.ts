@@ -8,6 +8,7 @@ import {
 } from "@recordreplay/protocol";
 import { RecordingTarget } from "protocol/thread/thread";
 import { ReactElement } from "react";
+import { Workspace } from "ui/types";
 
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug" | "comments";
@@ -54,6 +55,7 @@ export interface AppState {
   defaultSettingsTab: SettingsTabTitle;
   recordingTarget: RecordingTarget | null;
   fontLoading: boolean;
+  recordingWorkspace: Workspace | null;
 }
 
 export interface AnalysisPoints {

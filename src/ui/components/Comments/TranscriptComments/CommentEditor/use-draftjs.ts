@@ -33,18 +33,15 @@ let config: LazyLoadDraftConfig;
 function useDraftJS() {
   function load() {
     if (config) return Promise.resolve(config);
-    return Promise.all([
-      import("draft-js"),
-      import("@draft-js-plugins/editor"),
-      import("@draft-js-plugins/emoji"),
-      import("@draft-js-plugins/mention"),
-    ]).then(
-      ([
+    return import("./draftjs").then(
+      ({
         DraftJS,
         Editor,
-        { default: createEmojiPlugin, defaultTheme: defaultEmojiTheme },
-        { default: createMentionPlugin, defaultTheme: defaultMentionTheme },
-      ]) => {
+        createEmojiPlugin,
+        defaultEmojiTheme,
+        createMentionPlugin,
+        defaultMentionTheme,
+      }) => {
         const cfg: LazyLoadDraftConfig = {
           modules: {
             DraftJS,

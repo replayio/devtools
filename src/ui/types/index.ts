@@ -2,6 +2,7 @@ export interface User {
   name: string;
   picture: string;
   id: string;
+  internal: boolean;
 }
 
 export interface Recording {
@@ -14,6 +15,7 @@ export interface Recording {
   user?: User;
   userId?: string;
   isInitialized: boolean;
+  workspace?: Workspace;
 }
 
 export interface Workspace {

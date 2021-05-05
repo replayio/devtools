@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from "react";
-import mixpanel from "mixpanel-browser";
-import * as Sentry from "@sentry/react";
+import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
-import { gql, useQuery } from "@apollo/client";
 
 import DevTools from "./DevTools";
 const Account = require("./Account").default;
@@ -19,14 +16,16 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import LogRocket from "ui/utils/logrocket";
-import hooks from "ui/hooks";
+import { setTelemetryContext } from "ui/utils/telemetry";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import useToken from "ui/utils/useToken";
-var FontFaceObserver = require("fontfaceobserver");
-import "styles.css";
 import { useGetUserInfo } from "ui/hooks/users";
+import { useGetRecording } from "ui/hooks/recordings";
+
+import "styles.css";
+var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
   switch (modal) {
@@ -62,29 +61,11 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
   observer.observe(viewport!);
 }
 
-function setTelemetryContext(
-  userId: string | undefined,
-  userEmail: string | undefined,
-  isInternal: boolean
-) {
-  let sentryContext: Record<string, string | boolean> = { isInternal };
-  if (userId) {
-    mixpanel.identify(userId);
-    sentryContext["userId"] = userId;
-  }
-
-  if (userEmail) {
-    mixpanel.people.set({ $email: userEmail });
-    sentryContext["userEmail"] = userEmail;
-  }
-
-  Sentry.setContext("user", sentryContext);
-}
-
 function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: AppProps) {
   const auth = useAuth0();
   const { claims } = useToken();
   const userInfo = useGetUserInfo();
+  const recordingInfo = useGetRecording(recordingId);
 
   useEffect(() => {
     var font = new FontFaceObserver("Material Icons");
@@ -97,8 +78,8 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
   }, []);
 
   useEffect(() => {
-    if (userInfo) {
-      setTelemetryContext(claims?.hasura.userId, userInfo.email, userInfo.isInternal);
+    if (!userInfo.loading) {
+      setTelemetryContext(claims?.hasura.userId, userInfo.email, userInfo.internal);
     }
   }, [userInfo]);
 
@@ -109,10 +90,13 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
 
   useEffect(() => {
     setUserInBrowserPrefs(auth.user);
-    if (auth.user && !userInfo.isInternal) {
-      LogRocket.createSession(auth);
-    }
   }, [auth.user]);
+
+  useEffect(() => {
+    if (!recordingInfo.loading && !userInfo.loading && recordingInfo.recording) {
+      LogRocket.createSession(recordingInfo.recording, userInfo, auth);
+    }
+  }, [auth, userInfo, recordingInfo]);
 
   if (hasLoadingParam()) {
     return <SkeletonLoader content={"Uploading resources"} />;

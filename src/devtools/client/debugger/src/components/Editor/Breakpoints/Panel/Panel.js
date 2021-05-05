@@ -13,10 +13,8 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import "./Panel.css";
 import { connect } from "react-redux";
 import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import PanelSummary from "./PanelSummary";
-const { prefs } = require("ui/utils/prefs");
 
 function getPanelWidth({ editor }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -26,7 +24,7 @@ function getPanelWidth({ editor }) {
   return editor.getScrollInfo().clientWidth - panelIndent;
 }
 
-function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem, analysisPoints }) {
+function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem }) {
   const [editing, setEditing] = useState(false);
   const [width, setWidth] = useState(getPanelWidth(editor));
   const [inputToFocus, setInputToFocus] = useState("logValue");
@@ -60,22 +58,6 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem,
     return () => editor.editor.off("refresh", updateWidth);
   }, []);
 
-  const isHot = analysisPoints?.length > prefs.maxHitsDisplayed;
-  const isEditable = analysisPoints?.length < prefs.maxHitsEditable;
-
-  if (isHot) {
-    return (
-      <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
-        <div className="breakpoint-panel">
-          <div className="warning">
-            <MaterialIcon>warning</MaterialIcon>
-            <span className="warning-content">{`Sorry! We can't display this breakpoint because it has too many hits.`}</span>
-          </div>
-        </div>
-      </Widget>
-    );
-  }
-
   return (
     <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
       <div
@@ -94,7 +76,6 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem,
         ) : (
           <PanelSummary
             breakpoint={breakpoint}
-            isEditable={isEditable}
             toggleEditingOn={toggleEditingOn}
             setInputToFocus={setInputToFocus}
           />
@@ -105,13 +86,7 @@ function Panel({ breakpoint, editor, insertAt, setHoveredItem, clearHoveredItem,
   );
 }
 
-export default connect(
-  (state, { breakpoint }) => ({
-    analysisPoints: selectors.getAnalysisPointsForLocation(
-      state,
-      breakpoint.location,
-      breakpoint.options.condition
-    ),
-  }),
-  { setHoveredItem: actions.setHoveredItem, clearHoveredItem: actions.clearHoveredItem }
-)(Panel);
+export default connect(() => ({}), {
+  setHoveredItem: actions.setHoveredItem,
+  clearHoveredItem: actions.clearHoveredItem,
+})(Panel);

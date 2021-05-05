@@ -10,7 +10,7 @@ function isTest() {
 }
 
 export function useGetRecording(
-  recordingId: RecordingId
+  recordingId: RecordingId | null
 ): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {
   const { data, error, loading } = useQuery(
     gql`
@@ -27,12 +27,18 @@ export function useGetRecording(
             id
             name
             picture
+            internal
+          }
+          workspace {
+            id
+            name
           }
         }
       }
     `,
     {
       variables: { recordingId },
+      skip: !recordingId,
     }
   );
 
@@ -62,6 +68,7 @@ function convertRecording(rec: any): Recording | undefined {
     private: rec.private,
     isInitialized: rec.isInitialized,
     date: rec.createdAt,
+    workspace: rec.workspace,
   };
 }
 
