@@ -17,6 +17,7 @@ import CommentActions from "./CommentActions";
 import CommentSource from "./CommentSource";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import useAuth0 from "ui/utils/useAuth0";
+import { setModal } from "ui/actions/app";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 function CommentItem({
@@ -74,6 +75,7 @@ function CommentCard({
   currentTime,
   executionPoint,
   seekToComment,
+  setModal,
   replyToComment,
   pendingComment,
 }: CommentCardProps) {
@@ -87,6 +89,11 @@ function CommentCard({
 
   const onReply = (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (!isAuthenticated) {
+      setModal("login");
+      return;
+    }
 
     if ("id" in comment) {
       replyToComment(comment);
@@ -121,7 +128,7 @@ function CommentCard({
             <CommentItem comment={reply} pendingComment={pendingComment} />
           </div>
         ))}
-        {isPaused && !isEditing && isAuthenticated ? (
+        {isPaused && !isEditing ? (
           pendingComment && pendingComment.type.includes("new") ? (
             <div className="border-t border-gray-200">
               <NewCommentEditor
@@ -151,6 +158,7 @@ const connector = connect(
   }),
   {
     replyToComment: actions.replyToComment,
+    setModal: actions.setModal,
     seekToComment: actions.seekToComment,
     editItem: actions.editItem,
   }
