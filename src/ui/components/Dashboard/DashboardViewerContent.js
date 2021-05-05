@@ -58,6 +58,7 @@ function RecordingsList({
   ascOrder,
   setAscOrder,
 }) {
+  console.log("react", { recordings });
   return (
     <table className="dashboard-viewer-content-table">
       <thead className="dashboard-viewer-content-header">
@@ -74,7 +75,7 @@ function RecordingsList({
           recordings.map((recording, i) => (
             <Recording
               data={recording}
-              key={i}
+              key={recording.id}
               viewType={viewType}
               selectedIds={selectedIds}
               setSelectedIds={setSelectedIds}
