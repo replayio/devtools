@@ -16,7 +16,7 @@ export default function PrivacyToggle({
         onChange={() => setIsPublic(!isPublic)}
         id="privacy"
       />
-      <label htmlFor="privacy">Public</label>
+      <label htmlFor="privacy">Anyone with this link can view</label>
     </div>
   );
 }
