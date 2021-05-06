@@ -50,7 +50,9 @@ function Dropdown({
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
-  const displayedWorkspaces: { id: string | null; name: string }[] = [{ id: null, name: "---" }];
+  const displayedWorkspaces: { id: string | null; name: string }[] = [
+    { id: null, name: "My Library" },
+  ];
 
   if (workspaces) {
     displayedWorkspaces.push(...workspaces);
