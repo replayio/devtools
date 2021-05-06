@@ -10,8 +10,13 @@ export default function PrivacyToggle({
 }) {
   return (
     <div className="flex flex-row space-x-4 items-center">
-      <Toggle enabled={isPublic} setEnabled={setIsPublic} />
-      <div>Anyone with this link can view</div>
+      <input
+        type="checkbox"
+        checked={isPublic}
+        onChange={() => setIsPublic(!isPublic)}
+        id="privacy"
+      />
+      <label htmlFor="privacy">Anyone with this link can view</label>
     </div>
   );
 }

@@ -22,6 +22,7 @@ export interface ExpectedError {
   content?: string | ReactElement | ReactElement[];
   action?: string;
   type?: "timeout";
+  stack?: string;
 }
 
 export interface UploadInfo {

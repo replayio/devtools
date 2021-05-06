@@ -22,6 +22,7 @@ import { getFirstComment } from "ui/hooks/comments";
 import { getPausePointParams, getTest } from "ui/utils/environment";
 import { waitForTime } from "protocol/utils";
 const { features } = require("ui/utils/prefs");
+import KeyShortcuts from "ui/utils/key-shortcuts";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -75,6 +76,12 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
 
   ThreadFront.timeWarp(point, time, hasFrames, /* force */ true);
   ThreadFront.initializedWaiter.resolve();
+
+  const shortcuts = new KeyShortcuts({
+    Left: () => store.dispatch(goToPrevPaint()),
+    Right: () => store.dispatch(goToNextPaint()),
+  });
+  shortcuts.attach(window.document);
 }
 
 async function getInitialPausePoint(recordingId: string) {
@@ -404,7 +411,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
   };
 }
 
-export function goToNextPaint(): UIThunkAction {
+export function goToPrevPaint(): UIThunkAction {
   return ({ dispatch, getState }) => {
     const currentTime = selectors.getCurrentTime(getState());
     const { startTime } = selectors.getZoomRegion(getState());
@@ -423,7 +430,7 @@ export function goToNextPaint(): UIThunkAction {
   };
 }
 
-export function goToPrevPaint(): UIThunkAction {
+export function goToNextPaint(): UIThunkAction {
   return ({ dispatch, getState }) => {
     const currentTime = selectors.getCurrentTime(getState());
     const { endTime } = selectors.getZoomRegion(getState());

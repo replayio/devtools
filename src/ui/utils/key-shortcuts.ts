@@ -66,6 +66,13 @@ interface Shortcut {
 
 export type KeyboardEventListener = (event: KeyboardEvent) => void;
 
+export function cancelBubbling(listener: KeyboardEventListener): KeyboardEventListener {
+  return (event: KeyboardEvent) => {
+    event.cancelBubble = true;
+    listener(event);
+  };
+}
+
 export default class KeyShortcuts {
   private keys = new Map<string, Shortcut>();
   private eventEmitter = new EventEmitter();
