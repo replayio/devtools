@@ -28,9 +28,24 @@ function invalidateCloudFront() {
   );
 }
 
+function ensureEnv(env) {
+  const envIsSet = !!process.env[env];
+  if (!envIsSet) {
+    throw new Error(`Environment variable ${env} is not set`);
+  }
+
+  const val = process.env[env];
+  if (val === "") {
+    throw new Error(`${env} is empty`);
+  }
+
+  return val;
+}
+
 spawnChecked("npm", ["install"]);
 
-spawnChecked("earthly", ["--build-arg", "REPLAY_RELEASE=$INPUT_GIT_SHA", "+dist"]);
+const gitSha = ensureEnv("INPUT_GIT_SHA");
+spawnChecked("earthly", ["--build-arg", `GIT_SHA=${gitSha}`, "+dist"]);
 
 upload("index.html", "view");
 uploadDir("dist");
