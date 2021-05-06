@@ -43,7 +43,6 @@ function UploadScreen({ recordingId }: UploadScreenProps) {
     e.preventDefault();
 
     setStatus("saving");
-
     const workspaceId = selectedWorkspaceId == "" ? null : selectedWorkspaceId;
 
     await initializeRecording({
@@ -55,13 +54,6 @@ function UploadScreen({ recordingId }: UploadScreenProps) {
     e.preventDefault();
     deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } });
     setStatus("deleting");
-  };
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isSaving) {
-      return;
-    }
-
-    setInputValue(e.target.value);
   };
 
   if (loading || recordingLoading) {
