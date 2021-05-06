@@ -6,6 +6,7 @@ build:
     SAVE ARTIFACT node_modules
     COPY src src
     RUN mkdir -p ./dist
+    COPY postcss.config.js .
     COPY webpack.config.js .
     ARG GIT_SHA
     RUN ./node_modules/.bin/webpack --mode=production --env REPLAY_RELEASE=$GIT_SHA
