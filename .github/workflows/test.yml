@@ -13,7 +13,7 @@ jobs:
       - name: Download earthly
         run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.5.10/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
       - name: Build webpack
-        run: "earthly --build-arg REPLAY_RELEASE=$GIT_SHA +dist"
+        run: "earthly --build-arg GIT_SHA=$GIT_SHA +dist"
         env:
           GIT_SHA: ${{ github.sha }}
       - name: Create artifact
