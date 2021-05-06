@@ -11,7 +11,7 @@ export default function PrivacyToggle({
   return (
     <div className="flex flex-row space-x-4 items-center">
       <Toggle enabled={isPublic} setEnabled={setIsPublic} />
-      <div>Show publicly</div>
+      <div>Anyone with this link can view</div>
     </div>
   );
 }
