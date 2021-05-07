@@ -12,8 +12,9 @@ import {
   PointDescription,
   NodeBounds,
   PauseData,
+  repaintGraphicsResult,
 } from "@recordreplay/protocol";
-import { client, sendMessage } from "../socket";
+import { client } from "../socket";
 import { defer, assert, Deferred } from "../utils";
 import { ValueFront } from "./value";
 import { ThreadFront } from "./thread";
@@ -97,7 +98,7 @@ export class Pause {
   domFronts: Map<string, DOMFront>;
   stack: WiredFrame[] | undefined;
   loadMouseTargetsWaiter: Deferred<void> | undefined;
-  repaintGraphicsWaiter: Deferred<any> | undefined;
+  repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
   constructor(sessionId: SessionId) {
@@ -124,7 +125,7 @@ export class Pause {
     return pausesById.get(pauseId);
   }
 
-  _setPauseId(pauseId: PauseId) {
+  private _setPauseId(pauseId: PauseId) {
     this.pauseId = pauseId;
     this.pauseIdWaiter.resolve(pauseId);
   }
@@ -137,7 +138,7 @@ export class Pause {
         this._setPauseId(pauseId);
         this.point = point;
         this.time = time;
-        this.hasFrames = !!stack;
+        this.hasFrames = !!stack && stack.length > 0;
         this.addData(data);
         if (stack) {
           this.stack = stack.map(id => this.frames.get(id)!);
@@ -459,10 +460,10 @@ export class Pause {
     this.repaintGraphicsWaiter = defer();
     let rv = null;
     try {
-      const pauseId = await this.pauseIdWaiter.promise;
-      rv = await sendMessage("DOM.repaintGraphics", {}, this.sessionId, pauseId);
+      await this.pauseIdWaiter.promise;
+      rv = await this.sendMessage(client.DOM.repaintGraphics, {});
     } catch (e) {
-      console.error(`DOM.repaintGraphics failed ${e}`);
+      console.error("DOM.repaintGraphics failed", e);
     }
     this.repaintGraphicsWaiter.resolve(rv);
     return rv;

@@ -135,11 +135,16 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
     dispatch(setTimelineState({ currentTime: time, playback: null }));
 
     try {
-      const { screen, mouse } = await getGraphicsAtTime(time);
+      if (
+        !selectors.getUserSettings(getState()).enableRepaint ||
+        !ThreadFront.currentPointHasFrames
+      ) {
+        const { screen, mouse } = await getGraphicsAtTime(time);
 
-      if (screen && selectors.getCurrentTime(getState()) == time) {
-        dispatch(setTimelineState({ screenShot: screen, mouse }));
-        paintGraphics(screen, mouse);
+        if (screen && selectors.getCurrentTime(getState()) == time) {
+          dispatch(setTimelineState({ screenShot: screen, mouse }));
+          paintGraphics(screen, mouse);
+        }
       }
 
       dispatch(precacheScreenshots(time));
@@ -180,7 +185,7 @@ export function setTimelineState(state: Partial<TimelineState>): SetTimelineStat
   return { type: "set_timeline_state", state };
 }
 
-export function setTimelineToTime(time: number | null, updateGraphics = true): UIThunkAction {
+export function setTimelineToTime(time: number | null, updateGraphics = false): UIThunkAction {
   return async ({ dispatch, getState }) => {
     dispatch(setTimelineState({ hoverTime: time }));
 
@@ -461,8 +466,8 @@ export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
     dispatch({ type: "set_hovered_item", hoveredItem });
 
     // Don't update the video if user is adding a new comment.
-    const updateGraphics = !selectors.getPendingComment(getState());
-    dispatch(setTimelineToTime(hoveredItem?.time || null, updateGraphics));
+    // const updateGraphics = !selectors.getPendingComment(getState());
+    dispatch(setTimelineToTime(hoveredItem?.time || null));
   };
 }
 

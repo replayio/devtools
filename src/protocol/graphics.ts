@@ -15,8 +15,10 @@ import { client } from "./socket";
 import { actions, UIStore, UIThunkAction } from "ui/actions";
 import { Canvas } from "ui/state/app";
 import { selectors } from "ui/reducers";
+import { getUserSettings } from "ui/reducers/app";
 
 export const screenshotCache = new ScreenshotCache();
+const repaintedScreenshots: Map<string, ScreenShot> = new Map();
 
 interface Timed {
   time: number;
@@ -140,6 +142,35 @@ export function setupGraphics(store: UIStore) {
     client.Graphics.getDevicePixelRatio({}, sessionId).then(({ ratio }) => {
       gDevicePixelRatio = ratio;
     });
+  });
+
+  ThreadFront.on("paused", async () => {
+    if (!getUserSettings(store.getState()).enableRepaint) {
+      return;
+    }
+
+    ThreadFront.ensureCurrentPause();
+    const pause = ThreadFront.currentPause;
+    assert(pause);
+    if (!pause.hasFrames) {
+      return;
+    }
+
+    const rv = await pause.repaintGraphics();
+    if (pause === ThreadFront.currentPause && rv) {
+      const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
+      let { description, screenShot } = rv;
+      if (screenShot) {
+        repaintedScreenshots.set(description.hash, screenShot);
+      } else {
+        screenShot = repaintedScreenshots.get(description.hash);
+        if (!screenShot) {
+          console.error("Missing repainted screenshot", description);
+          return;
+        }
+      }
+      paintGraphics(screenShot, mouse);
+    }
   });
 }
 
