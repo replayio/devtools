@@ -7,11 +7,12 @@ import "./UploadScreen.css";
 import TeamSelect from "./TeamSelect";
 import PrivacyToggle from "./PrivacyToggle";
 import ReplayTitle from "./ReplayTitle";
+import { selectors } from "ui/reducers";
 
 type UploadScreenProps = PropsFromRedux & {};
 type Status = "saving" | "deleting" | "deleted" | null;
 
-function UploadScreen({ recordingId }: UploadScreenProps) {
+function UploadScreen({ recordingId, currentWorkspaceId }: UploadScreenProps) {
   const { recording, loading: recordingLoading } = hooks.useGetRecording(recordingId!);
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(recording?.title || "Untitled");
@@ -25,7 +26,7 @@ function UploadScreen({ recordingId }: UploadScreenProps) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const initializeRecording = hooks.useInitializeRecording();
   const updateIsPrivate = hooks.useUpdateIsPrivate();
-  const deleteRecording = hooks.useDeleteRecording([], () => setStatus("deleted"));
+  const deleteRecording = hooks.useDeleteRecording();
 
   const isSaving = status == "saving";
   const isDeleting = status == "deleting";
@@ -53,7 +54,7 @@ function UploadScreen({ recordingId }: UploadScreenProps) {
   };
   const onDiscard = (e: React.MouseEvent) => {
     e.preventDefault();
-    deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } });
+    deleteRecording(recordingId!, currentWorkspaceId);
     setStatus("deleting");
   };
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +97,9 @@ function UploadScreen({ recordingId }: UploadScreenProps) {
   );
 }
 
-const connector = connect((state: UIState) => ({ recordingId: getRecordingId(state) }));
+const connector = connect((state: UIState) => ({
+  recordingId: getRecordingId(state),
+  currentWorkspaceId: selectors.getWorkspaceId(state),
+}));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(UploadScreen);
