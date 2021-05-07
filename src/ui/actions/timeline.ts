@@ -135,10 +135,7 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
     dispatch(setTimelineState({ currentTime: time, playback: null }));
 
     try {
-      if (
-        !selectors.getUserSettings(getState()).enableRepaint ||
-        !ThreadFront.currentPointHasFrames
-      ) {
+      if (!selectors.getUserSettings(getState()).enableRepaint) {
         const { screen, mouse } = await getGraphicsAtTime(time);
 
         if (screen && selectors.getCurrentTime(getState()) == time) {

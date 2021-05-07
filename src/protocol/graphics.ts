@@ -152,9 +152,6 @@ export function setupGraphics(store: UIStore) {
     ThreadFront.ensureCurrentPause();
     const pause = ThreadFront.currentPause;
     assert(pause);
-    if (!pause.hasFrames) {
-      return;
-    }
 
     const rv = await pause.repaintGraphics();
     if (pause === ThreadFront.currentPause && rv) {
