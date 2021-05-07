@@ -13,6 +13,8 @@ const messages = [];
 const inspected = new Set();
 
 (async () => {
+  // TODO: re-enable with a feature flag
+  return;
   await ThreadFront.getAnnotations(({ annotations }) => {
     for (const { point, time, kind, contents } of annotations) {
       const message = JSON.parse(contents);
