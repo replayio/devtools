@@ -55,8 +55,6 @@ function DevTools({
   const { recording, isAuthorized, loading: recordingQueryLoading } = hooks.useGetRecording(
     recordingId
   );
-  const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
-  const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
   const { title, user } = recording || {};
 
   useEffect(() => {
@@ -97,7 +95,7 @@ function DevTools({
   let loaderResult: ReactElement | undefined;
   let expectedError: ExpectedError | undefined;
 
-  if (queriesAreLoading) {
+  if (recordingQueryLoading) {
     loaderResult = <SkeletonLoader content={"Fetching the replay information."} />;
   } else if (recordingDuration === null) {
     loaderResult = <SkeletonLoader content={"Fetching the replay description."} />;

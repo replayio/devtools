@@ -20,9 +20,11 @@ import {
   Canvas,
   WorkspaceId,
   SettingsTabTitle,
+  UserSettings,
 } from "ui/state/app";
 import { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
+import { getUserSettings, updateDefaultWorkspace, updateUserSetting } from "ui/hooks/settings";
 
 export type SetupAppAction = Action<"setup_app"> & { recordingId: RecordingId };
 export type LoadingAction = Action<"loading"> & { loading: number };
@@ -70,6 +72,9 @@ export type SetFontLoading = Action<"set_material_icons_loaded"> & {
 export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
   workspace: Workspace;
 };
+export type UpdateUserSettingsAction = Action<"update_user_settings"> & {
+  settings: Partial<UserSettings>;
+};
 
 export type AppActions =
   | SetupAppAction
@@ -94,7 +99,8 @@ export type AppActions =
   | SetDefaultSettingsTab
   | SetRecordingTargetAction
   | SetFontLoading
-  | SetRecordingWorkspaceAction;
+  | SetRecordingWorkspaceAction
+  | UpdateUserSettingsAction;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -117,6 +123,12 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
   });
 
   ThreadFront.listenForLoadChanges();
+}
+
+export async function fetchUserSettings(store: UIStore) {
+  getUserSettings().then(settings => {
+    store.dispatch(updateUserSettings(settings));
+  });
 }
 
 function onUnprocessedRegions({ regions }: unprocessedRegions): UIThunkAction {
@@ -253,4 +265,25 @@ export function setFontLoading(value: boolean): SetFontLoading {
 
 export function setRecordingWorkspace(workspace: Workspace): SetRecordingWorkspaceAction {
   return { type: "set_recording_workspace", workspace };
+}
+
+export function updateUserSettings(settings: Partial<UserSettings>): UIThunkAction {
+  return async ({ dispatch }) => {
+    dispatch({ type: "update_user_settings", settings });
+
+    try {
+      for (const key of ["enableTeams", "showElements", "showReact"] as (keyof UserSettings)[]) {
+        if (settings[key] !== undefined) {
+          await updateUserSetting(key, settings[key] as boolean);
+        }
+      }
+
+      if (settings.defaultWorkspaceId !== undefined) {
+        await updateDefaultWorkspace(settings.defaultWorkspaceId);
+      }
+    } catch (error) {
+      console.error("Apollo error while updating a user setting:", error);
+      dispatch({ type: "update_user_settings", settings: await getUserSettings() });
+    }
+  };
 }

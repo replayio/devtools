@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 const Modal = require("ui/components/shared/Modal").default;
-import hooks from "ui/hooks";
 import SettingsNavigation from "./SettingsNavigation";
 import SettingsBody from "./SettingsBody";
 
@@ -71,25 +70,14 @@ const settings: Settings = [
 ];
 
 function SettingsModal({ defaultSettingsTab }: PropsFromRedux) {
-  // No need to handle loading state here as it's already cached from the useGetUserSettings
-  // query in the DevTools component
-  const { userSettings, loading } = hooks.useGetUserSettings();
   const [selectedTab, setSelectedTab] = useState<SettingsTabTitle>(defaultSettingsTab);
   const selectedSetting = settings.find(setting => setting.title === selectedTab)!;
-
-  if (loading) {
-    return (
-      <div className="settings-modal">
-        <Modal></Modal>
-      </div>
-    );
-  }
 
   return (
     <div className="settings-modal">
       <Modal>
         <SettingsNavigation {...{ settings, selectedTab, setSelectedTab }} />
-        <SettingsBody {...{ selectedSetting, userSettings: userSettings! }} />
+        <SettingsBody selectedSetting={selectedSetting} />
       </Modal>
     </div>
   );

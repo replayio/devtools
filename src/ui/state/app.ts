@@ -30,7 +30,15 @@ export interface UploadInfo {
   total?: string;
 }
 
+export interface UserSettings {
+  showElements: boolean;
+  showReact: boolean;
+  enableTeams: boolean;
+  defaultWorkspaceId: string | null;
+}
+
 export interface AppState {
+  userSettings: UserSettings;
   recordingId: RecordingId | null;
   sessionId: SessionId | null;
   theme: string;

@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Setting, UserSettings } from "./types";
+import { Setting } from "./types";
 import ReplayInvitations from "./ReplayInvitations";
 import "./SettingsBody.css";
 import SettingsBodyItem from "./SettingsBodyItem";
 
 interface SettingsBodyProps {
   selectedSetting: Setting;
-  userSettings: UserSettings;
 }
 
 function RefreshPrompt() {
@@ -40,7 +39,7 @@ function Support() {
   );
 }
 
-export default function SettingsBody({ selectedSetting, userSettings }: SettingsBodyProps) {
+export default function SettingsBody({ selectedSetting }: SettingsBodyProps) {
   const { title, items } = selectedSetting;
   const [showRefresh, setShowRefresh] = useState(false);
 
@@ -70,11 +69,7 @@ export default function SettingsBody({ selectedSetting, userSettings }: Settings
       <h1>{title}</h1>
       <ul>
         {items.map((item, index) => (
-          <SettingsBodyItem
-            {...{ item, userSettings }}
-            key={index}
-            setShowRefresh={setShowRefresh}
-          />
+          <SettingsBodyItem item={item} key={index} setShowRefresh={setShowRefresh} />
         ))}
       </ul>
       {showRefresh ? <RefreshPrompt /> : null}

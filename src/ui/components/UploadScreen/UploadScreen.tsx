@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { getRecordingId } from "ui/reducers/app";
+import { getRecordingId, getUserSettings } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import "./UploadScreen.css";
@@ -12,11 +12,10 @@ import { selectors } from "ui/reducers";
 type UploadScreenProps = PropsFromRedux & {};
 type Status = "saving" | "deleting" | "deleted" | null;
 
-function UploadScreen({ recordingId, currentWorkspaceId }: UploadScreenProps) {
+function UploadScreen({ recordingId, userSettings, currentWorkspaceId }: UploadScreenProps) {
   const { recording, loading: recordingLoading } = hooks.useGetRecording(recordingId!);
   const [status, setStatus] = useState<Status>(null);
   const [inputValue, setInputValue] = useState(recording?.title || "Untitled");
-  const { userSettings } = hooks.useGetUserSettings();
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
     userSettings?.defaultWorkspaceId || null
   );
@@ -92,6 +91,7 @@ function UploadScreen({ recordingId, currentWorkspaceId }: UploadScreenProps) {
 const connector = connect((state: UIState) => ({
   recordingId: getRecordingId(state),
   currentWorkspaceId: selectors.getWorkspaceId(state),
+  userSettings: getUserSettings(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(UploadScreen);

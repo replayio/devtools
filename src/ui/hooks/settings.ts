@@ -1,23 +1,10 @@
-import { gql, useQuery, useMutation } from "@apollo/client";
-import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
-import useAuth0 from "ui/utils/useAuth0";
+import { gql } from "@apollo/client";
+import { query, mutate } from "ui/utils/apolloClient";
+import { anonymousSettings } from "ui/reducers/app";
 
-const anonymousSettings = {
-  showElements: false,
-  showReact: false,
-  enableTeams: true,
-  defaultWorkspaceId: null,
-};
-
-export function useGetUserSettings() {
-  const { isAuthenticated } = useAuth0();
-
-  if (!isAuthenticated) {
-    return { userSettings: anonymousSettings, loading: false };
-  }
-
-  const { data, error, loading } = useQuery(
-    gql`
+export async function getUserSettings() {
+  const result = await query({
+    query: gql`
       query GetUserSettings {
         viewer {
           settings {
@@ -30,67 +17,47 @@ export function useGetUserSettings() {
           }
         }
       }
-    `
-  );
+    `,
+    variables: {},
+  });
 
-  if (loading) {
-    return { userSettings: null, error, loading };
-  }
-
-  if (error) {
-    console.error("Apollo error while getting user settings:", error);
-    return { userSettings: null, error, loading };
-  }
-
-  let userSettings = anonymousSettings;
-  if (data?.viewer) {
-    const settings = data.viewer.settings;
-    userSettings = {
+  if (result.data?.viewer) {
+    const settings = result.data.viewer.settings;
+    return {
       showElements: settings.showElements,
       showReact: settings.showReact,
       enableTeams: settings.enableTeams,
-      defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
+      defaultWorkspaceId: result.data.viewer.defaultWorkspace?.id || null,
     };
+  } else {
+    return anonymousSettings;
   }
-  return { userSettings, error, loading };
 }
 
-export function useUpdateUserSetting(key: SettingItemKey, type: "uuid" | "Boolean") {
-  const [updateUserSetting, { error }] = useMutation(
-    gql`
-      mutation UpdateUserSettings($newValue: ${type}) {
+export function updateUserSetting(key: string, value: boolean) {
+  return mutate({
+    mutation: gql`
+      mutation UpdateUserSettings($value: Boolean!) {
         updateUserSettings(
-          input: { ${key}: $newValue },
+          input: { ${key}: $value },
         ) {
           success
         }
       }
     `,
-    { refetchQueries: ["GetUserSettings"] }
-  );
-
-  if (error) {
-    console.error("Apollo error while updating a user setting:", error);
-  }
-
-  return updateUserSetting;
+    variables: { value },
+  });
 }
 
-export function useUpdateDefaultWorkspace() {
-  const [updateUserSetting, { error }] = useMutation(
-    gql`
+export function updateDefaultWorkspace(workspaceId: string | null) {
+  return mutate({
+    mutation: gql`
       mutation UpdateUserDefaultWorkspace($workspaceId: ID) {
         updateUserDefaultWorkspace(input: { workspaceId: $workspaceId }) {
           success
         }
       }
     `,
-    { refetchQueries: ["GetUserSettings"] }
-  );
-
-  if (error) {
-    console.error("Apollo error while updating a user setting:", error);
-  }
-
-  return updateUserSetting;
+    variables: { workspaceId },
+  });
 }

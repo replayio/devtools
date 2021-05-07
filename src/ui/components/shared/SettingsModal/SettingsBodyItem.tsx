@@ -1,54 +1,55 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { SettingItem, UserSettings } from "./types";
+import { SettingItem } from "./types";
 import hooks from "ui/hooks";
 import { SelectMenu } from "ui/components/shared/Forms";
 import "./SettingsBodyItem.css";
+import { connect, ConnectedProps } from "react-redux";
+import { actions } from "ui/actions";
+import { getUserSettings } from "ui/reducers/app";
+import { UIState } from "ui/state";
 
 interface SettingsBodyItemProps {
   item: SettingItem;
-  userSettings: UserSettings;
   setShowRefresh: Dispatch<SetStateAction<boolean>>;
 }
 
-function Checkbox({
+function _Checkbox({
   item,
-  value,
   setShowRefresh,
+  userSettings,
+  updateUserSettings,
 }: {
   item: SettingItem;
-  value: boolean;
   setShowRefresh: Dispatch<SetStateAction<boolean>>;
-}) {
+} & PropsFromRedux) {
   const { key, needsRefresh } = item;
+  const value = userSettings[key] as boolean;
 
-  const updateUserSetting = hooks.useUpdateUserSetting(key, "Boolean");
   const toggleSetting = () => {
     if (needsRefresh) {
       setShowRefresh(true);
     }
 
-    updateUserSetting({
-      variables: {
-        newValue: !value,
-      },
+    updateUserSettings({
+      [key]: !value,
     });
   };
 
   return <input type="checkbox" id={key} checked={value} onChange={toggleSetting} />;
 }
 
-function Dropdown({
+function _Dropdown({
   item,
-  value,
   setShowRefresh,
+  userSettings,
+  updateUserSettings,
 }: {
   item: SettingItem;
-  value: string;
   setShowRefresh: Dispatch<SetStateAction<boolean>>;
-}) {
+} & PropsFromRedux) {
   const { key, needsRefresh } = item;
+  const value = userSettings[key] as string | null;
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
-  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   const displayedWorkspaces: { id: string | null; name: string }[] = [
     { id: null, name: "My Library" },
@@ -64,10 +65,8 @@ function Dropdown({
       setShowRefresh(true);
     }
 
-    updateDefaultWorkspace({
-      variables: {
-        workspaceId: selectedValue,
-      },
+    updateUserSettings({
+      [key]: selectedValue,
     });
   };
 
@@ -82,27 +81,33 @@ function Dropdown({
   );
 }
 
+const connector = connect(
+  (state: UIState) => ({
+    userSettings: getUserSettings(state),
+  }),
+  {
+    updateUserSettings: actions.updateUserSettings,
+  }
+);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+const Checkbox = connector(_Checkbox);
+const Dropdown = connector(_Dropdown);
+
 function Input({
   item,
-  value,
   setShowRefresh,
 }: {
   item: SettingItem;
-  value: boolean | string | null;
   setShowRefresh: Dispatch<SetStateAction<boolean>>;
 }) {
   if (item.type == "checkbox") {
-    return <Checkbox {...{ item, value: value as boolean, setShowRefresh }} />;
+    return <Checkbox {...{ item, setShowRefresh }} />;
   }
 
-  return <Dropdown {...{ item, value: value as string, setShowRefresh }} />;
+  return <Dropdown {...{ item, setShowRefresh }} />;
 }
 
-export default function SettingsBodyItem({
-  item,
-  userSettings,
-  setShowRefresh,
-}: SettingsBodyItemProps) {
+export default function SettingsBodyItem({ item, setShowRefresh }: SettingsBodyItemProps) {
   const { label, key, description } = item;
 
   return (
@@ -111,7 +116,7 @@ export default function SettingsBodyItem({
         <div className="label">{label}</div>
         {description && <div className="description">{description}</div>}
       </label>
-      <Input item={item} value={userSettings[key]} setShowRefresh={setShowRefresh} />
+      <Input item={item} setShowRefresh={setShowRefresh} />
     </li>
   );
 }

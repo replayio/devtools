@@ -5,9 +5,18 @@ import { SessionActions } from "ui/actions/session";
 const { prefs } = require("../utils/prefs");
 import { Location } from "@recordreplay/protocol";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
+import { UserSettings } from "ui/state/app";
+
+export const anonymousSettings: UserSettings = {
+  showElements: false,
+  showReact: false,
+  enableTeams: true,
+  defaultWorkspaceId: null,
+};
 
 function initialAppState(): AppState {
   return {
+    userSettings: anonymousSettings,
     recordingId: null,
     expectedError: null,
     unexpectedError: null,
@@ -168,6 +177,10 @@ export default function update(
       return { ...state, recordingWorkspace: action.workspace };
     }
 
+    case "update_user_settings": {
+      return { ...state, userSettings: { ...state.userSettings, ...action.settings } };
+    }
+
     default: {
       return state;
     }
@@ -216,3 +229,4 @@ export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettin
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getFontLoading = (state: UIState) => state.app.fontLoading;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
+export const getUserSettings = (state: UIState) => state.app.userSettings;

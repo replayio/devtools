@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import classnames from "classnames";
-import hooks from "ui/hooks";
 import Video from "../Video";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 import InspectorApp from "devtools/client/inspector/components/App";
@@ -13,10 +12,14 @@ import { actions } from "../../actions";
 import { ReactDevtoolsPanel } from "./ReactDevTools";
 import { isTest } from "ui/utils/environment";
 
-function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode, isNode }) {
-  const { userSettings } = hooks.useGetUserSettings();
-
-  const showElements = userSettings.showElements || isTest();
+function PanelButtons({
+  selectedPanel,
+  setSelectedPanel,
+  narrowMode,
+  isNode,
+  showReact,
+  showElements,
+}) {
   const onClick = panel => {
     setSelectedPanel(panel);
 
@@ -54,7 +57,7 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode, isNode }) {
           <div className="label">Viewer</div>
         </button>
       ) : null}
-      {userSettings.showReact && !isNode && (
+      {showReact && !isNode && (
         <button
           className={classnames("components-panel-button", {
             expanded: selectedPanel === "react-components",
@@ -86,10 +89,15 @@ function InspectorPanel() {
   );
 }
 
-function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode, recordingTarget }) {
-  const {
-    userSettings: { showReact },
-  } = hooks.useGetUserSettings();
+function SecondaryToolbox({
+  selectedPanel,
+  setSelectedPanel,
+  narrowMode,
+  recordingTarget,
+  userSettings,
+}) {
+  const { showReact } = userSettings;
+  const showElements = userSettings.showElements || isTest();
   const isNode = recordingTarget === "node";
   return (
     <div className={classnames(`secondary-toolbox`, { node: isNode })}>
@@ -99,6 +107,8 @@ function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode, recordi
           selectedPanel={selectedPanel}
           setSelectedPanel={setSelectedPanel}
           isNode={isNode}
+          showElements={showElements}
+          showReact={showReact}
         />
       </header>
       <div className="secondary-toolbox-content">
@@ -116,6 +126,7 @@ export default connect(
     selectedPanel: selectors.getSelectedPanel(state),
     narrowMode: selectors.getNarrowMode(state),
     recordingTarget: selectors.getRecordingTarget(state),
+    userSettings: selectors.getUserSettings(state),
   }),
   { setSelectedPanel: actions.setSelectedPanel }
 )(SecondaryToolbox);
