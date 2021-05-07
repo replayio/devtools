@@ -1,5 +1,6 @@
 import React from "react";
 import { actions } from "ui/actions";
+import { selectors } from "ui/reducers";
 import { connect } from "react-redux";
 import hooks from "ui/hooks";
 
@@ -19,6 +20,7 @@ function Privacy({ isPrivate, toggleIsPrivate }) {
 }
 
 const DropdownPanel = ({
+  currentWorkspaceId,
   editingTitle,
   setEditingTitle,
   recording,
@@ -26,14 +28,14 @@ const DropdownPanel = ({
   isPrivate,
   setModal,
 }) => {
-  const deleteRecording = hooks.useDeleteRecording(["GetWorkspaceRecordings", "GetMyRecordings"]);
+  const deleteRecording = hooks.useDeleteRecording();
 
   const onDeleteRecording = recordingId => {
     const message =
       "This action will permanently delete this replay. \n\nAre you sure you want to proceed?";
 
     if (window.confirm(message)) {
-      deleteRecording({ variables: { recordingId, deletedAt: new Date().toISOString() } });
+      deleteRecording(recordingId, currentWorkspaceId);
     }
   };
 
@@ -57,6 +59,6 @@ const DropdownPanel = ({
   );
 };
 
-export default connect(null, {
+export default connect(state => ({ currentWorkspaceId: selectors.getWorkspaceId(state) }), {
   setModal: actions.setModal,
 })(DropdownPanel);

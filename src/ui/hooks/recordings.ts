@@ -9,6 +9,59 @@ function isTest() {
   return new URL(window.location.href).searchParams.get("test");
 }
 
+const GET_WORKSPACE_RECORDINGS = gql`
+  query GetWorkspaceRecordings($workspaceId: ID!) {
+    node(id: $workspaceId) {
+      ... on Workspace {
+        id
+        recordings {
+          edges {
+            node {
+              uuid
+              url
+              title
+              duration
+              createdAt
+              private
+              isInitialized
+              owner {
+                id
+                name
+                picture
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const GET_MY_RECORDINGS = gql`
+  query GetMyRecordings {
+    viewer {
+      recordings {
+        edges {
+          node {
+            uuid
+            url
+            title
+            duration
+            createdAt
+            private
+            isInitialized
+            owner {
+              id
+              name
+              picture
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export function useGetRecording(
   recordingId: RecordingId | null
 ): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {
@@ -278,35 +331,9 @@ export function useIsOwner(recordingId: RecordingId) {
 export function useGetPersonalRecordings():
   | { recordings: null; loading: true }
   | { recordings: Recording[]; loading: false } {
-  const { data, error, loading } = useQuery(
-    gql`
-      query GetMyRecordings {
-        viewer {
-          recordings {
-            edges {
-              node {
-                uuid
-                url
-                title
-                duration
-                createdAt
-                private
-                isInitialized
-                owner {
-                  id
-                  name
-                  picture
-                }
-              }
-            }
-          }
-        }
-      }
-    `,
-    {
-      pollInterval: 5000,
-    }
-  );
+  const { data, error, loading } = useQuery(GET_MY_RECORDINGS, {
+    pollInterval: 5000,
+  });
 
   if (loading) {
     return { recordings: null, loading };
@@ -326,39 +353,10 @@ export function useGetPersonalRecordings():
 export function useGetWorkspaceRecordings(
   currentWorkspaceId: WorkspaceId
 ): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
-  const { data, error, loading } = useQuery(
-    gql`
-      query GetWorkspaceRecordings($workspaceId: ID!) {
-        node(id: $workspaceId) {
-          ... on Workspace {
-            id
-            recordings {
-              edges {
-                node {
-                  uuid
-                  url
-                  title
-                  duration
-                  createdAt
-                  private
-                  isInitialized
-                  owner {
-                    id
-                    name
-                    picture
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    `,
-    {
-      variables: { workspaceId: currentWorkspaceId },
-      pollInterval: 5000,
-    }
-  );
+  const { data, error, loading } = useQuery(GET_WORKSPACE_RECORDINGS, {
+    variables: { workspaceId: currentWorkspaceId },
+    pollInterval: 5000,
+  });
 
   if (loading) {
     return { recordings: null, loading };
@@ -389,20 +387,160 @@ export function useUpdateRecordingWorkspace() {
           }
         }
       }
-    `,
-    {
-      refetchQueries: ["GetWorkspaceRecordings"],
-    }
+    `
   );
 
-  return updateRecordingWorkspace;
+  return (
+    recordingId: RecordingId,
+    currentWorkspaceId: WorkspaceId | null,
+    targetWorkspaceId: WorkspaceId | null
+  ) => {
+    updateRecordingWorkspace({
+      variables: { recordingId, workspaceId: targetWorkspaceId },
+      update: store => {
+        const recordingsToTransfer = [];
+        // Immediately remove the recording from the current workspace
+        if (currentWorkspaceId) {
+          const data: any = store.readQuery({
+            query: GET_WORKSPACE_RECORDINGS,
+            variables: { workspaceId: currentWorkspaceId },
+          });
+
+          const newEdges = data.node.recordings.edges.filter(
+            (edge: any) => edge.node.uuid !== recordingId
+          );
+          const newData = {
+            ...data,
+            node: {
+              ...data.node,
+              recordings: {
+                ...data.node.recordings,
+                edges: newEdges,
+              },
+            },
+          };
+
+          recordingsToTransfer.push(
+            ...data.node.recordings.edges.filter((edge: any) => edge.node.uuid === recordingId)
+          );
+
+          store.writeQuery({
+            query: GET_WORKSPACE_RECORDINGS,
+            data: newData,
+            variables: { workspaceID: currentWorkspaceId },
+          });
+        } else {
+          const data: any = store.readQuery({
+            query: GET_MY_RECORDINGS,
+          });
+
+          const newEdges = data.viewer.recordings.edges.filter(
+            (edge: any) => edge.node.uuid !== recordingId
+          );
+          const newData = {
+            ...data,
+            viewer: {
+              ...data.viewer,
+              recordings: {
+                ...data.viewer.recordings,
+                edges: newEdges,
+              },
+            },
+          };
+
+          recordingsToTransfer.push(
+            ...data.viewer.recordings.edges.filter((edge: any) => edge.node.uuid === recordingId)
+          );
+
+          store.writeQuery({
+            query: GET_MY_RECORDINGS,
+            data: newData,
+          });
+        }
+
+        // Update the new targetWorkspace's associated query in the cache.
+        if (targetWorkspaceId) {
+          let data: any = null;
+
+          try {
+            data = store.readQuery({
+              query: GET_WORKSPACE_RECORDINGS,
+              variables: { workspaceId: targetWorkspaceId },
+            });
+          } catch (e) {}
+
+          // Bail if this query doesn't already exist in the cache
+          if (!data) {
+            return;
+          }
+
+          const newData = {
+            ...data,
+            node: {
+              ...data.node,
+              recordings: {
+                ...data.node.recordings,
+                edges: [...data.node.recordings.edges, ...recordingsToTransfer],
+              },
+            },
+          };
+
+          store.writeQuery({
+            query: GET_WORKSPACE_RECORDINGS,
+            data: newData,
+            variables: { workspaceID: targetWorkspaceId },
+          });
+        } else {
+          let data: any = null;
+
+          try {
+            data = store.readQuery({
+              query: GET_MY_RECORDINGS,
+            });
+          } catch (e) {}
+
+          // Bail if this query doesn't already exist in the cache
+          if (!data) {
+            return;
+          }
+
+          const newData = {
+            ...data,
+            viewer: {
+              ...data.viewer,
+              recordings: {
+                ...data.viewer.recordings,
+                edges: [...data.viewer.recordings.edges, ...recordingsToTransfer],
+              },
+            },
+          };
+
+          store.writeQuery({
+            query: GET_MY_RECORDINGS,
+            data: newData,
+          });
+        }
+      },
+      optimisticResponse: {
+        updateRecordingWorkspace: {
+          recording: {
+            uuid: recordingId,
+            __typename: "Recording",
+            workspace: { __typename: "Workspace", id: targetWorkspaceId },
+          },
+          success: true,
+          __typename: "UpdateRecordingWorkspace",
+        },
+      },
+    });
+  };
 }
 
 export function useGetMyRecordings() {
   return useGetPersonalRecordings();
 }
 
-export function useDeleteRecording(refetchQueries?: string[], onCompleted?: () => void) {
+export function useDeleteRecording() {
   const [deleteRecording] = useMutation(
     gql`
       mutation DeleteRecording($recordingId: ID!) {
@@ -410,14 +548,72 @@ export function useDeleteRecording(refetchQueries?: string[], onCompleted?: () =
           success
         }
       }
-    `,
-    {
-      refetchQueries,
-      onCompleted: onCompleted || (() => {}),
-    }
+    `
   );
 
-  return deleteRecording;
+  return (recordingId: RecordingId, workspaceId: WorkspaceId | null) => {
+    deleteRecording({
+      variables: { recordingId },
+      optimisticResponse: {
+        deleteRecording: {
+          success: true,
+          __typename: "DeleteRecording",
+        },
+      },
+      update: store => {
+        if (workspaceId) {
+          const data: any = store.readQuery({
+            query: GET_WORKSPACE_RECORDINGS,
+            variables: { workspaceId },
+          });
+
+          const newEdges = data.node.recordings.edges.filter(
+            (edge: any) => edge.node.uuid !== recordingId
+          );
+          const newData = {
+            ...data,
+            node: {
+              ...data.node,
+              recordings: {
+                ...data.node.recordings,
+                edges: newEdges,
+              },
+            },
+          };
+
+          store.writeQuery({
+            query: GET_WORKSPACE_RECORDINGS,
+            data: newData,
+          });
+
+          return;
+        }
+
+        const data: any = store.readQuery({
+          query: GET_MY_RECORDINGS,
+        });
+
+        const newEdges = data.viewer.recordings.edges.filter(
+          (edge: any) => edge.node.uuid !== recordingId
+        );
+        const newData = {
+          ...data,
+          viewer: {
+            ...data.viewer,
+            recordings: {
+              ...data.viewer.recordings,
+              edges: newEdges,
+            },
+          },
+        };
+
+        store.writeQuery({
+          query: GET_MY_RECORDINGS,
+          data: newData,
+        });
+      },
+    });
+  };
 }
 
 export function useInitializeRecording() {
