@@ -11,6 +11,7 @@ module.exports = {
   devtool: "source-map",
   output: {
     publicPath: "dist/",
+    filename: "[name].js?v=[contenthash]",
   },
   devServer: {
     before: app => {
