@@ -49,16 +49,20 @@ function BatchActionDropdown({
       <div className="menu-item" onClick={deleteSelectedIds}>
         {`Delete ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""}`}
       </div>
-      <div className="menu-item" onClick={() => updateRecordings(null)}>
-        {`Move ${selectedIds.length} item${
-          selectedIds.length > 1 ? "s" : ""
-        } to your personal workspace`}
-      </div>
-      {workspaces.map(({ id, name }) => (
-        <div className="menu-item" onClick={() => updateRecordings(id)} key={id}>
-          {`Move ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} to ${name}`}
+      {currentWorkspaceId ? (
+        <div className="menu-item" onClick={() => updateRecordings(null)}>
+          {`Move ${selectedIds.length} item${
+            selectedIds.length > 1 ? "s" : ""
+          } to your personal workspace`}
         </div>
-      ))}
+      ) : null}
+      {workspaces
+        .filter(w => w.id !== currentWorkspaceId)
+        .map(({ id, name }) => (
+          <div className="menu-item" onClick={() => updateRecordings(id)} key={id}>
+            {`Move ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} to ${name}`}
+          </div>
+        ))}
     </div>
   );
   const icon = (

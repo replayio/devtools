@@ -58,7 +58,6 @@ function RecordingsList({
   ascOrder,
   setAscOrder,
 }) {
-  console.log("react", { recordings });
   return (
     <table className="dashboard-viewer-content-table">
       <thead className="dashboard-viewer-content-header">
