@@ -11,6 +11,7 @@ export async function getUserSettings() {
             showElements
             showReact
             enableTeams
+            enableRepaint
           }
           defaultWorkspace {
             id
@@ -27,6 +28,7 @@ export async function getUserSettings() {
       showElements: settings.showElements,
       showReact: settings.showReact,
       enableTeams: settings.enableTeams,
+      enableRepaint: settings.enableRepaint,
       defaultWorkspaceId: result.data.viewer.defaultWorkspace?.id || null,
     };
   } else {

@@ -272,7 +272,12 @@ export function updateUserSettings(settings: Partial<UserSettings>): UIThunkActi
     dispatch({ type: "update_user_settings", settings });
 
     try {
-      for (const key of ["enableTeams", "showElements", "showReact"] as (keyof UserSettings)[]) {
+      for (const key of [
+        "enableTeams",
+        "showElements",
+        "showReact",
+        "enableRepaint",
+      ] as (keyof UserSettings)[]) {
         if (settings[key] !== undefined) {
           await updateUserSetting(key, settings[key] as boolean);
         }

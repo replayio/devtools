@@ -34,6 +34,7 @@ export interface UserSettings {
   showElements: boolean;
   showReact: boolean;
   enableTeams: boolean;
+  enableRepaint: boolean;
   defaultWorkspaceId: string | null;
 }
 

@@ -11,6 +11,7 @@ export const anonymousSettings: UserSettings = {
   showElements: false,
   showReact: false,
   enableTeams: true,
+  enableRepaint: false,
   defaultWorkspaceId: null,
 };
 
