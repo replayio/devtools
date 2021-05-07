@@ -102,6 +102,10 @@ export function ReactDevtoolsPanel() {
     setCount(count + 1);
   };
 
+  if (!DevTools) {
+    return null;
+  }
+
   return (
     <DevTools
       bridge={bridge}
