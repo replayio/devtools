@@ -18,11 +18,11 @@ import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs, RecordingDescription } from "protocol/thread/thread";
 import { TimelineState, Tooltip, ZoomRegion, HoveredItem } from "ui/state/timeline";
-import { getFirstComment } from "ui/hooks/comments";
 import { getPausePointParams, getTest } from "ui/utils/environment";
 import { waitForTime } from "protocol/utils";
 const { features } = require("ui/utils/prefs");
 import KeyShortcuts from "ui/utils/key-shortcuts";
+import { getFirstComment } from "ui/hooks/comments/comments";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
