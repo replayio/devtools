@@ -6,6 +6,8 @@ import "draft-js/dist/Draft.css";
 import "@draft-js-plugins/emoji/lib/plugin.css";
 import "@draft-js-plugins/mention/lib/plugin.css";
 
+import retryImport from "utils/retryImport";
+
 // Defining a partial interface for the module so consumers can use strongly
 // typed interfaces when using DraftJS returned from the hook
 export interface DraftJSModule {
@@ -33,7 +35,7 @@ let config: LazyLoadDraftConfig;
 function useDraftJS() {
   function load() {
     if (config) return Promise.resolve(config);
-    return import("./draftjs").then(
+    return retryImport(() => import("./draftjs")).then(
       ({
         DraftJS,
         Editor,

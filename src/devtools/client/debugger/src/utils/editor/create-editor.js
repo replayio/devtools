@@ -5,6 +5,7 @@
 //
 
 import { assert } from "protocol/utils";
+import retryImport from "utils/retryImport";
 import { features, prefs } from "../prefs";
 
 let editorWaiter;
@@ -13,7 +14,7 @@ let CodeMirror;
 
 export async function waitForEditor() {
   if (!editorWaiter) {
-    editorWaiter = import("./source-editor").then(imported => {
+    editorWaiter = retryImport(() => import("./source-editor")).then(imported => {
       SourceEditor = imported.default;
       CodeMirror = imported.CodeMirror;
       return SourceEditor;
