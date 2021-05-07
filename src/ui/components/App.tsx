@@ -11,6 +11,7 @@ import SharingModal from "./shared/SharingModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import SettingsModal from "./shared/SettingsModal/index";
+import OnboardingModal from "./shared/OnboardingModal/index";
 import { isDeployPreview, isTest, hasLoadingParam } from "ui/utils/environment";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
@@ -43,6 +44,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "workspace-settings": {
       return <WorkspaceSettingsModal />;
+    }
+    case "onboarding": {
+      return <OnboardingModal />;
     }
     default: {
       return null;
