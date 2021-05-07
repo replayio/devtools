@@ -2,19 +2,18 @@ import { gql, useQuery } from "@apollo/client";
 import { getUserId } from "ui/utils/useToken";
 import { Invitation } from "./invitations";
 
-export function useGetUserId() {
-  const { data, loading, error } = useQuery(
-    gql`
-      query GetUserId {
-        viewer {
-          user {
-            id
-          }
-        }
+export const GET_USER_ID = gql`
+  query GetUserId {
+    viewer {
+      user {
+        id
       }
-    `
-  );
+    }
+  }
+`;
 
+export function useGetUserId() {
+  const { data, loading, error } = useQuery(GET_USER_ID);
   return { userId: data?.viewer?.user.id, loading, error };
 }
 

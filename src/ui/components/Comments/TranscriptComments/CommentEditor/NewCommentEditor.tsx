@@ -19,8 +19,8 @@ function NewCommentEditor({
   recordingId,
   canvas,
 }: NewCommentEditorProps) {
-  const addComment = hooks.useAddComment(clearPendingComment);
-  const addCommentReply = hooks.useAddCommentReply(clearPendingComment);
+  const addComment = hooks.useAddComment();
+  const addCommentReply = hooks.useAddCommentReply();
 
   const handleSubmit = (inputValue: string) => {
     if (type == "new_reply") {
@@ -28,6 +28,8 @@ function NewCommentEditor({
     } else {
       handleNewSave(comment as PendingNewComment, inputValue);
     }
+
+    clearPendingComment();
   };
 
   const handleReplySave = async (comment: PendingNewReply, inputValue: string) => {
@@ -44,7 +46,7 @@ function NewCommentEditor({
       commentId: parentId,
     };
 
-    addCommentReply({ variables: { input: reply } });
+    addCommentReply(reply, recordingId!);
   };
   const handleNewSave = async (comment: PendingNewComment, inputValue: string) => {
     // For now we can simply bail if the input happens to be empty. We should fix
@@ -68,9 +70,7 @@ function NewCommentEditor({
       },
     };
 
-    addComment({
-      variables: { input: newComment },
-    });
+    addComment(newComment, recordingId!);
   };
 
   return <CommentEditor {...{ comment, handleSubmit }} />;
