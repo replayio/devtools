@@ -86,9 +86,11 @@ function InitReactDevTools() {
   DevTools = createDevTools(target, { bridge, store });
   inspected.clear();
 
-  // TODO Use point AND time eventually
-  for (const { message, time } of messages) {
-    if (message.event === "operations" && time <= ThreadFront.currentTime) {
+  for (const { message, point } of messages) {
+    if (
+      message.event === "operations" &&
+      compareNumericStrings(point, ThreadFront.currentPoint) <= 0
+    ) {
       wall._listener(message);
     }
   }
