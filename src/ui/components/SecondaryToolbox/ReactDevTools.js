@@ -112,8 +112,8 @@ async function sendRequest(event, payload) {
 // TODO Pass custom bridge
 // TODO Use portal containers for Profiler & Components
 export function ReactDevtoolsPanel() {
-  ensureIsSetup();
   const [count, setCount] = React.useState(0);
+  ensureIsSetup();
 
   // HACK TODO This hack handles the fact that DevTools wasn't writen
   // with the expectation that a new Bridge or Store prop would be pasesd
