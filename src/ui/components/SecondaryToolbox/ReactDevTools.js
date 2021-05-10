@@ -12,9 +12,13 @@ let rerenderComponentsTab;
 const messages = [];
 const inspected = new Set();
 
-(async () => {
-  // TODO: re-enable with a feature flag
-  return;
+let isSetup = false;
+async function ensureIsSetup() {
+  if (isSetup) {
+    return;
+  }
+  isSetup = true;
+
   await ThreadFront.getAnnotations(({ annotations }) => {
     for (const { point, time, kind, contents } of annotations) {
       const message = JSON.parse(contents);
@@ -23,7 +27,7 @@ const inspected = new Set();
   });
 
   ThreadFront.on("paused", onPaused);
-})();
+}
 
 function onPaused() {
   InitReactDevTools();
@@ -95,6 +99,7 @@ async function sendRequest(event, payload) {
 // TODO Pass custom bridge
 // TODO Use portal containers for Profiler & Components
 export function ReactDevtoolsPanel() {
+  ensureIsSetup();
   const [count, setCount] = React.useState(0);
 
   // HACK TODO This hack handles the fact that DevTools wasn't writen
