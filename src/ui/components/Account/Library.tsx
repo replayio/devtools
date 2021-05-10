@@ -9,6 +9,7 @@ import { CogIcon } from "@heroicons/react/solid";
 import { ModalType } from "ui/state/app";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
+import { useGetUserInfo } from "ui/hooks/users";
 const UserOptions = require("ui/components/Header/UserOptions").default;
 
 function Header({
@@ -45,6 +46,7 @@ function Header({
 
 function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedux) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const userInfo = useGetUserInfo();
 
   useEffect(() => {
     // After rendering null, update the workspaceId to display the user's library
@@ -53,6 +55,12 @@ function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedu
       setWorkspaceId(null);
     }
   }, [workspaces, loading]);
+
+  useEffect(() => {
+    if (userInfo && userInfo.authoredRecordingCount === 0) {
+      setModal("onboarding");
+    }
+  }, [userInfo]);
 
   if (loading) {
     return null;

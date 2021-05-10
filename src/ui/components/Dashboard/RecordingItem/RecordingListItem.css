@@ -64,7 +64,6 @@
   background-color: white;
   position: sticky;
   top: 0px;
-  z-index: 1;
 }
 
 .recording-list.list thead.dashboard-viewer-content-header th.length,

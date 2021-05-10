@@ -36,6 +36,11 @@ export function useGetUserInfo() {
           invitations {
             pending
           }
+          recordings_aggregate {
+            aggregate {
+              count
+            }
+          }
           internal
         }
       }
@@ -54,6 +59,7 @@ export function useGetUserInfo() {
   const email: string = data?.users_by_pk.email;
   const invitations: Invitation[] = data?.users_by_pk.invitations;
   const internal: boolean = data?.users_by_pk.internal;
+  const authoredRecordingCount: number = data?.users_by_pk.recordings_aggregate.aggregate.count;
 
-  return { invitations, invited, email, internal, loading };
+  return { invitations, invited, email, internal, loading, authoredRecordingCount };
 }
