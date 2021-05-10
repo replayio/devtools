@@ -57,7 +57,8 @@ function DevTools({
   );
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
   const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
-  const { title, user } = recording || {};
+  const { title } = recording || {};
+  const { userId: cachedUserId } = hooks.useGetUserId();
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -85,14 +86,14 @@ function DevTools({
   }, [recording]);
 
   useEffect(() => {
-    const isAuthor = userId && userId == recording?.userId;
+    const isAuthor = cachedUserId && cachedUserId === recording?.userId;
 
     // Force switch to viewer mode if the recording is being initialized
     // by the author.
     if (isAuthor && !recording?.isInitialized && !isTest()) {
       setViewMode("non-dev");
     }
-  }, [recording]);
+  }, [recording, cachedUserId]);
 
   let loaderResult: ReactElement | undefined;
   let expectedError: ExpectedError | undefined;
