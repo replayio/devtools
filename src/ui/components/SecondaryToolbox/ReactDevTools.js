@@ -46,7 +46,13 @@ function InitReactDevTools() {
   wall = {
     emit() {},
     listen(listener) {
-      wall._listener = listener;
+      wall._listener = msg => {
+        try {
+          listener(msg);
+        } catch (err) {
+          console.warn("Error in ReactDevTools frontend", err);
+        }
+      };
     },
     async send(event, payload) {
       if (event == "inspectElement") {
