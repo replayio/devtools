@@ -26,6 +26,7 @@ async function ensureIsSetup() {
     }
   });
 
+  onPaused();
   ThreadFront.on("paused", onPaused);
 }
 
