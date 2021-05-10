@@ -57,7 +57,7 @@ function InitReactDevTools() {
     },
     async send(event, payload) {
       if (event == "inspectElement") {
-        if (inspected.has(payload.id)) {
+        if (inspected.has(payload.id) && !payload.path) {
           wall._listener({
             event: "inspectedElement",
             payload: {
@@ -67,7 +67,9 @@ function InitReactDevTools() {
             },
           });
         } else {
-          inspected.add(payload.id);
+          if (!payload.path) {
+            inspected.add(payload.id);
+          }
           sendRequest(event, payload);
         }
       }
