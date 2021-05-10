@@ -9,6 +9,30 @@ function isTest() {
   return new URL(window.location.href).searchParams.get("test");
 }
 
+export const GET_RECORDING = gql`
+  query GetRecording($recordingId: UUID!) {
+    recording(uuid: $recordingId) {
+      uuid
+      url
+      title
+      duration
+      createdAt
+      private
+      isInitialized
+      owner {
+        id
+        name
+        picture
+        internal
+      }
+      workspace {
+        id
+        name
+      }
+    }
+  }
+`;
+
 const GET_WORKSPACE_RECORDINGS = gql`
   query GetWorkspaceRecordings($workspaceId: ID!) {
     node(id: $workspaceId) {
@@ -65,35 +89,10 @@ const GET_MY_RECORDINGS = gql`
 export function useGetRecording(
   recordingId: RecordingId | null
 ): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {
-  const { data, error, loading } = useQuery(
-    gql`
-      query GetRecording($recordingId: UUID!) {
-        recording(uuid: $recordingId) {
-          uuid
-          url
-          title
-          duration
-          createdAt
-          private
-          isInitialized
-          owner {
-            id
-            name
-            picture
-            internal
-          }
-          workspace {
-            id
-            name
-          }
-        }
-      }
-    `,
-    {
-      variables: { recordingId },
-      skip: !recordingId,
-    }
-  );
+  const { data, error, loading } = useQuery(GET_RECORDING, {
+    variables: { recordingId },
+    skip: !recordingId,
+  });
 
   if (error) {
     console.error("Apollo error while getting the recording", error);
