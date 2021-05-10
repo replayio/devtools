@@ -1,4 +1,5 @@
 import React from "react";
+import { compareNumericStrings } from "protocol/utils";
 
 import {
   createBridge,
@@ -25,6 +26,7 @@ async function ensureIsSetup() {
       messages.push({ point, time, message });
     }
   });
+  messages.sort((m1, m2) => compareNumericStrings(m1.point, m2.point));
 
   onPaused();
   ThreadFront.on("paused", onPaused);
