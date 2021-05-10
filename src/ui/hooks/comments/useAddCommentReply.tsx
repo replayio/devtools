@@ -4,6 +4,11 @@ import useAuth0 from "ui/utils/useAuth0";
 import { GET_COMMENTS } from "./comments";
 import { GET_USER_ID } from "../users";
 
+interface NewReplyVariable {
+  content: string;
+  commentId: string;
+}
+
 export default function useAddCommentReply() {
   const { user } = useAuth0();
 
@@ -24,7 +29,7 @@ export default function useAddCommentReply() {
     console.error("Apollo error while adding a comment:", error);
   }
 
-  return (reply: any, recordingId: RecordingId) => {
+  return (reply: NewReplyVariable, recordingId: RecordingId) => {
     addCommentReply({
       variables: { input: reply },
       optimisticResponse: {

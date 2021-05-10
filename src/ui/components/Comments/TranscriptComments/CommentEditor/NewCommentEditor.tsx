@@ -64,10 +64,12 @@ function NewCommentEditor({
       hasFrames,
       sourceLocation,
       recordingId,
-      position: {
-        x: comment.position?.x,
-        y: comment.position?.y,
-      },
+      position: comment.position
+        ? {
+            x: comment.position?.x,
+            y: comment.position?.y,
+          }
+        : null,
     };
 
     addComment(newComment, recordingId!);

@@ -2,6 +2,13 @@ import { RecordingId } from "@recordreplay/protocol";
 import { gql, useMutation } from "@apollo/client";
 import useAuth0 from "ui/utils/useAuth0";
 import { GET_COMMENTS } from "./comments";
+import { CommentPosition, PendingNewComment } from "ui/state/comments";
+import { GET_USER_ID } from "../users";
+
+interface NewCommentVariable extends Omit<PendingNewComment, "content"> {
+  content: string;
+  position: CommentPosition | null;
+}
 
 export default function useAddComment() {
   const { user } = useAuth0();
@@ -23,7 +30,7 @@ export default function useAddComment() {
     console.error("Apollo error while adding a comment:", error);
   }
 
-  return (comment: any, recordingId: RecordingId) => {
+  return (comment: NewCommentVariable, recordingId: RecordingId) => {
     addComment({
       variables: { input: comment },
       optimisticResponse: {
@@ -44,6 +51,13 @@ export default function useAddComment() {
           query: GET_COMMENTS,
           variables: { recordingId },
         });
+        const {
+          viewer: {
+            user: { id: userId },
+          },
+        }: any = cache.readQuery({
+          query: GET_USER_ID,
+        });
 
         const newComment = {
           ...comment,
@@ -52,7 +66,7 @@ export default function useAddComment() {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           user: {
-            id: "fake-user-id=",
+            id: userId,
             name: user.name,
             picture: user.picture,
             __typename: "User",
