@@ -13,26 +13,14 @@ import { isTest } from "ui/utils/environment";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
-import { ExpectedError, UploadInfo } from "ui/state/app";
+import { ExpectedError } from "ui/state/app";
 import { RecordingId } from "@recordreplay/protocol";
-import mixpanel from "mixpanel-browser";
+import BlankScreen from "./shared/BlankScreen";
+import UploadScreen from "./UploadScreen";
 
 type DevToolsProps = PropsFromRedux & {
   recordingId: RecordingId;
 };
-
-function getUploadingMessage(uploading: UploadInfo) {
-  if (!uploading) {
-    return "";
-  }
-
-  const { total, amount } = uploading;
-  if (total) {
-    return `Waiting for upload… ${amount} / ${total} MB`;
-  }
-
-  return `Waiting for upload… ${amount} MB`;
-}
 
 function DevTools({
   loading,
@@ -59,6 +47,7 @@ function DevTools({
   const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
   const { title } = recording || {};
   const { userId: cachedUserId } = hooks.useGetUserId();
+  const isAuthor = cachedUserId && recording && cachedUserId === recording.userId;
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -86,8 +75,6 @@ function DevTools({
   }, [recording]);
 
   useEffect(() => {
-    const isAuthor = cachedUserId && cachedUserId === recording?.userId;
-
     // Force switch to viewer mode if the recording is being initialized
     // by the author.
     if (isAuthor && !recording?.isInitialized && !isTest()) {
@@ -99,12 +86,11 @@ function DevTools({
   let expectedError: ExpectedError | undefined;
 
   if (queriesAreLoading) {
-    loaderResult = <SkeletonLoader content={"Fetching the replay information."} />;
+    loaderResult = <BlankScreen />;
   } else if (recordingDuration === null) {
-    loaderResult = <SkeletonLoader content={"Fetching the replay description."} />;
+    loaderResult = <BlankScreen />;
   } else if (uploading) {
-    const message = getUploadingMessage(uploading);
-    loaderResult = <SkeletonLoader content={message} />;
+    loaderResult = <BlankScreen />;
   }
 
   if (!loaderResult) {
@@ -131,6 +117,11 @@ function DevTools({
   });
   if (loaderResult || expectedError) {
     return loaderResult || null;
+  }
+
+  // Skip showing the upload screen in the case of tests.
+  if (recording && !recording.isInitialized && isAuthor && !isTest()) {
+    return <UploadScreen recording={recording} />;
   }
 
   if (!finishedLoading) {

@@ -46,7 +46,7 @@ const DropdownPanel = ({
   isPrivate,
   setModal,
 }: DropdownPanelProps) => {
-  const deleteRecording = hooks.useDeleteRecording();
+  const deleteRecording = hooks.useDeleteRecordingFromLibrary();
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
   const recordingId = recording.id;

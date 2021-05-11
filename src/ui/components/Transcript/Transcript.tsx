@@ -3,11 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import sortBy from "lodash/sortBy";
 import hooks from "ui/hooks";
-import { isTest } from "ui/utils/environment";
-
 import "./Transcript.css";
-import UploadScreen from "../UploadScreen";
-
 import { UIState } from "ui/state";
 import { Comment, PendingNewComment } from "ui/state/comments";
 import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
@@ -20,12 +16,6 @@ function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
 
   if (loading) {
     return null;
-  }
-
-  // Only show the initialization screen if the replay is not being opened
-  // for testing purposes.
-  if (isAuthor && !recording?.isInitialized && !isTest()) {
-    return <UploadScreen />;
   }
 
   const displayedComments: (Comment | PendingNewComment)[] = [...comments];

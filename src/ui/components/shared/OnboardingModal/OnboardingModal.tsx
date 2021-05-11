@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
+import Modal from "../NewModal";
 
 const slides = [
   {
@@ -68,18 +69,6 @@ const slides = [
     ),
   },
 ];
-
-function Modal({ children }: { children: React.ReactElement | React.ReactElement[] }) {
-  return (
-    <div
-      className="fixed w-full h-full grid justify-center items-center z-50"
-      style={{ backdropFilter: "blur(5px)" }}
-    >
-      <div className="bg-black opacity-5 w-full h-full absolute" />
-      <div className="z-10">{children}</div>
-    </div>
-  );
-}
 
 function SlideContent({
   headerText,
