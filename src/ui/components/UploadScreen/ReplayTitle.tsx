@@ -14,7 +14,7 @@ export default function ReplayTitle({
 
   return (
     <div>
-      <label htmlFor="replay-title" className="block text-md font-medium text-gray-700">
+      <label htmlFor="replay-title" className="block text-2xl font-medium text-gray-700">
         Title
       </label>
       <div className="mt-1">
