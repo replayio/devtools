@@ -37,7 +37,7 @@
     "bufferutil": "^4.0.3",
     "classnames": "^2.2.6",
     "codemirror": "^5.58.2",
-    "css-loader": "^3.5.3",
+    "css-loader": "^5.2.4",
     "date-fns": "^2.19.0",
     "debug": "^4.2.0",
     "devtools-sprintf-js": "^1.0.3",
