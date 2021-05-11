@@ -129,7 +129,7 @@ function CommentTool({
       style={{ top: y * canvas!.scale, left: x * canvas!.scale }}
     >
       <ChatIcon className="h-6 w-6" aria-hidden="true" />
-      <span>{isInvalidNewComment ? "Commenting disabled" : "Add Comment"}</span>
+      <span>{isInvalidNewComment ? "A comment already exists here" : "Add Comment"}</span>
     </div>
   );
 }

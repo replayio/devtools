@@ -58,14 +58,14 @@ function CommentActions({ comment, editItem, isRoot, recordingId }: CommentActio
         position="bottom-right"
       >
         <div
-          className="comments-dropdown-item edit-comment"
+          className="comments-dropdown-item edit-comment text-lg"
           title="Edit Comment"
           onClick={editComment}
         >
           Edit comment
         </div>
         <div
-          className="comments-dropdown-item delete-comment"
+          className="comments-dropdown-item delete-comment text-lg"
           title="Delete Comment"
           onClick={handleDelete}
         >

@@ -1,5 +1,5 @@
 .view-toggle {
-  font-family: "Open Sans", sans-serif;
+  font-family: system-ui, Arial, sans-serif;
   display: flex;
   padding: 2px 0;
   cursor: pointer;
@@ -8,7 +8,7 @@
   width: auto;
   appearance: none;
   border: none;
-  outline: 0;
+  outline: none !important;
   border-radius: 8px;
 }
 
