@@ -44,6 +44,7 @@ export function useGetComments(
 ): { comments: Comment[]; loading: boolean; error?: ApolloError } {
   const { data, loading, error } = useQuery(GET_COMMENTS, {
     variables: { recordingId },
+    pollInterval: 5000,
   });
 
   if (error) {
