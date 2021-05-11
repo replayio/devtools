@@ -25,16 +25,15 @@ function DashboardNavigation({
   currentWorkspaceId,
   nonPendingWorkspaces,
   setModal,
-  userSettings,
 }: DashboardNavigationProps) {
-  const { enableTeams } = userSettings;
+  const { userSettings } = hooks.useGetUserSettings();
 
   const isPersonal = currentWorkspaceId == null;
   const onSettingsClick = () => {
     setModal("workspace-settings");
   };
 
-  if (!enableTeams) {
+  if (!userSettings?.enableTeams) {
     return <nav className="left-sidebar"></nav>;
   }
 
@@ -54,7 +53,6 @@ function DashboardNavigation({
 const connector = connect(
   (state: UIState) => ({
     currentWorkspaceId: selectors.getWorkspaceId(state),
-    userSettings: selectors.getUserSettings(state),
   }),
   { setModal: actions.setModal }
 );

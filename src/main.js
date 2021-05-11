@@ -85,6 +85,7 @@ async function initialize() {
 
   const theme = selectors.getTheme(store.getState());
   document.body.parentElement.className = theme || "";
+  const settings = await getUserSettings();
 
   if (recordingId) {
     setupApp(recordingId, store);
@@ -98,7 +99,4 @@ async function initialize() {
   }
 
   bootstrapApp({}, { recordingId }, store);
-
-  const settings = await getUserSettings();
-  store.dispatch({ type: "update_user_settings", settings });
 })();

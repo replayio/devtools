@@ -15,13 +15,18 @@ import { client } from "./socket";
 import { actions, UIStore, UIThunkAction } from "ui/actions";
 import { Canvas } from "ui/state/app";
 import { selectors } from "ui/reducers";
-import { getUserSettings } from "ui/reducers/app";
+import { UserSettings } from "ui/types";
 
 export const screenshotCache = new ScreenshotCache();
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
+let settings: UserSettings;
 
 interface Timed {
   time: number;
+}
+
+export function updateEnableRepaint(enableRepaint: boolean) {
+  settings.enableRepaint = enableRepaint;
 }
 
 // Given a sorted array of items with "time" properties, find the index of
@@ -127,7 +132,8 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
 let onRefreshGraphics: (canvas: Canvas) => void;
 let paintPointsWaiter: Promise<findPaintsResult>;
 
-export function setupGraphics(store: UIStore) {
+export function setupGraphics(store: UIStore, userSettings: UserSettings) {
+  settings = userSettings;
   onRefreshGraphics = (canvas: Canvas) => {
     store.dispatch(actions.setCanvas(canvas));
   };
@@ -145,7 +151,7 @@ export function setupGraphics(store: UIStore) {
   });
 
   ThreadFront.on("paused", async () => {
-    if (!getUserSettings(store.getState()).enableRepaint) {
+    if (!settings.enableRepaint) {
       return;
     }
 
@@ -239,6 +245,10 @@ export async function getGraphicsAtTime(
   time: number,
   forPlayback = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
+  if (settings.enableRepaint) {
+    return {};
+  }
+
   const paintIndex = mostRecentIndex(gPaintPoints, time);
   if (paintIndex === undefined) {
     // There are no graphics to paint here.

@@ -55,7 +55,10 @@ function DevTools({
   const { recording, isAuthorized, loading: recordingQueryLoading } = hooks.useGetRecording(
     recordingId
   );
-  const { title, user } = recording || {};
+
+  const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
+  const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
+  const { title } = recording || {};
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -95,7 +98,7 @@ function DevTools({
   let loaderResult: ReactElement | undefined;
   let expectedError: ExpectedError | undefined;
 
-  if (recordingQueryLoading) {
+  if (queriesAreLoading) {
     loaderResult = <SkeletonLoader content={"Fetching the replay information."} />;
   } else if (recordingDuration === null) {
     loaderResult = <SkeletonLoader content={"Fetching the replay description."} />;

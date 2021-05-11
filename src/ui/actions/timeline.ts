@@ -135,13 +135,11 @@ function onPaused({ time }: PauseEventArgs): UIThunkAction {
     dispatch(setTimelineState({ currentTime: time, playback: null }));
 
     try {
-      if (!selectors.getUserSettings(getState()).enableRepaint) {
-        const { screen, mouse } = await getGraphicsAtTime(time);
+      const { screen, mouse } = await getGraphicsAtTime(time);
 
-        if (screen && selectors.getCurrentTime(getState()) == time) {
-          dispatch(setTimelineState({ screenShot: screen, mouse }));
-          paintGraphics(screen, mouse);
-        }
+      if (screen && selectors.getCurrentTime(getState()) == time) {
+        dispatch(setTimelineState({ screenShot: screen, mouse }));
+        paintGraphics(screen, mouse);
       }
 
       dispatch(precacheScreenshots(time));

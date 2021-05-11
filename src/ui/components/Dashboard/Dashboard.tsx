@@ -62,9 +62,9 @@ function WorkspaceDashboard({ currentWorkspaceId }: PropsFromRedux) {
 }
 
 function DashboardRouter(props: PropsFromRedux) {
-  const { userSettings } = props;
+  const { userSettings } = hooks.useGetUserSettings();
 
-  if (!userSettings.enableTeams) {
+  if (!userSettings?.enableTeams) {
     return <OldDashboard />;
   }
 
@@ -77,7 +77,6 @@ function DashboardRouter(props: PropsFromRedux) {
 
 const connector = connect((state: UIState) => ({
   currentWorkspaceId: selectors.getWorkspaceId(state),
-  userSettings: selectors.getUserSettings(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(DashboardRouter);

@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
 import { query, mutate } from "ui/utils/apolloClient";
 import { anonymousSettings } from "ui/reducers/app";
+import type { UserSettings } from "../types";
 
-export async function getUserSettings() {
+export async function getUserSettings(): Promise<UserSettings> {
   const result = await query({
     query: gql`
       query GetUserSettings {
