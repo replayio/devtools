@@ -55,13 +55,6 @@ function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
     </div>
   );
 }
-
-/*
-<div>
-  {showButton ? <button>Hello</button> : null}
-  </div>
-*/
-
 const connector = connect((state: UIState) => ({
   recordingId: selectors.getRecordingId(state),
   pendingComment: selectors.getPendingComment(state),
