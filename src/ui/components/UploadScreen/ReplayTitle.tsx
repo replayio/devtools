@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, SetStateAction } from "react";
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect } from "react";
 import { TextInput } from "ui/components/shared/Forms";
 
 export default function ReplayTitle({
@@ -14,7 +14,7 @@ export default function ReplayTitle({
 
   return (
     <div>
-      <label htmlFor="replay-title" className="block text-2xl font-medium text-gray-700">
+      <label htmlFor="replay-title" className="block text-sm uppercase font-semibold text-gray-700">
         Title
       </label>
       <div className="mt-1">

@@ -20,7 +20,7 @@ function BatchActionDropdown({
 }: BatchActionDropdownProps) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
-  const deleteRecording = hooks.useDeleteRecording();
+  const deleteRecording = hooks.useDeleteRecordingFromLibrary();
 
   if (loading) {
     return null;

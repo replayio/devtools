@@ -554,7 +554,24 @@ export function useGetMyRecordings() {
   return useGetPersonalRecordings();
 }
 
-export function useDeleteRecording() {
+export function useDeleteRecording(onCompleted: () => void) {
+  const [deleteRecording] = useMutation(
+    gql`
+      mutation DeleteRecording($recordingId: ID!) {
+        deleteRecording(input: { id: $recordingId }) {
+          success
+        }
+      }
+    `,
+    {
+      onCompleted,
+    }
+  );
+
+  return deleteRecording;
+}
+
+export function useDeleteRecordingFromLibrary() {
   const [deleteRecording] = useMutation(
     gql`
       mutation DeleteRecording($recordingId: ID!) {

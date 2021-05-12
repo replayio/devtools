@@ -14,10 +14,10 @@ import tokenManager from "ui/utils/tokenManager";
 import useToken from "ui/utils/useToken";
 import { createApolloClient } from "ui/utils/apolloClient";
 import { ApolloProvider } from "@apollo/client";
-const SkeletonLoader = require("ui/components/SkeletonLoader").default;
 
 import { skipTelemetry } from "../environment";
 import { UIStore } from "ui/actions";
+import BlankScreen from "ui/components/shared/BlankScreen";
 
 export function setupTelemetry(context: Record<string, any>) {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
@@ -60,7 +60,7 @@ function ApolloWrapper({
   const { loading, token, error } = useToken();
 
   if (loading) {
-    return <SkeletonLoader content={"Initializing"} />;
+    return <BlankScreen />;
   }
 
   if (error) {
