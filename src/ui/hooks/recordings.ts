@@ -29,6 +29,18 @@ export const GET_RECORDING = gql`
         id
         name
       }
+      collaborators {
+        edges {
+          node {
+            ... on RecordingUserCollaborator {
+              id
+              user {
+                id
+              }
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -110,6 +122,8 @@ function convertRecording(rec: any): Recording | undefined {
     return undefined;
   }
 
+  const collaborators = rec.collaborators?.edges?.map((e: any) => e.node.user.id);
+
   return {
     id: rec.uuid,
     user: rec.owner,
@@ -121,6 +135,7 @@ function convertRecording(rec: any): Recording | undefined {
     isInitialized: rec.isInitialized,
     date: rec.createdAt,
     workspace: rec.workspace,
+    collaborators,
   };
 }
 

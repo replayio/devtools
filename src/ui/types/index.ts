@@ -16,6 +16,7 @@ export interface Recording {
   userId?: string;
   isInitialized: boolean;
   workspace?: Workspace;
+  collaborators?: string[];
 }
 
 export interface Workspace {
