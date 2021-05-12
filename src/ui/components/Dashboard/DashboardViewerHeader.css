@@ -71,33 +71,3 @@
   color: white;
   background-color: var(--dark-blue);
 }
-
-.dashboard-viewer-header-views {
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: 4px;
-}
-
-.dashboard-viewer-header-views button {
-  padding: 4px 6px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  line-height: 16px;
-  border: 1px solid var(--theme-splitter-color);
-}
-
-.dashboard-viewer-header-views button.selected {
-  border: 1px solid var(--theme-icon-color);
-}
-
-.dashboard-viewer-header-views button .img {
-  width: 20px;
-  height: 20px;
-  background: var(--theme-icon-dimmed-color);
-}
-
-.dashboard-viewer-header-views button.selected .img {
-  background: var(--theme-icon-color);
-}

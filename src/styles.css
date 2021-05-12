@@ -1,5 +1,6 @@
 #app {
   display: flex;
+  position: relative;
   flex-direction: column;
   height: 100%;
   font-family: system-ui, Arial, sans-serif;

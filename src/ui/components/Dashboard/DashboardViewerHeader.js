@@ -1,27 +1,15 @@
 import React from "react";
-import classnames from "classnames";
-import Invitations from "./Navigation/Invitations";
 import "./DashboardViewerHeader.css";
 import BatchActionDropdown from "./BatchActionDropdown";
+import "./DashboardViewerHeader.css";
 
-function HeaderActions({
-  selectedIds,
-  setSelectedIds,
-  editing,
-  toggleEditing,
-  viewType,
-  toggleViewType,
-}) {
+function HeaderActions({ selectedIds, setSelectedIds, editing, toggleEditing }) {
   return (
     <div className="dashboard-viewer-header-actions">
       {editing ? (
         <BatchActionDropdown setSelectedIds={setSelectedIds} selectedIds={selectedIds} />
       ) : null}
-      <button
-        className="toggle-editing"
-        onClick={toggleEditing}
-        style={{ visibility: viewType == "list" ? "visible" : "hidden" }}
-      >
+      <button className="toggle-editing" onClick={toggleEditing}>
         {editing ? "Done" : "Edit"}
       </button>
     </div>
@@ -29,14 +17,11 @@ function HeaderActions({
 }
 
 export default function DashboardViewerHeader({
-  filter,
   selectedIds,
   setSelectedIds,
   editing,
   toggleEditing,
-  viewType,
-  toggleViewType,
-  recordings,
+  filters,
 }) {
   return (
     <header className="dashboard-viewer-header">
@@ -45,10 +30,8 @@ export default function DashboardViewerHeader({
         setSelectedIds={setSelectedIds}
         editing={editing}
         toggleEditing={toggleEditing}
-        viewType={viewType}
-        toggleViewType={toggleViewType}
       />
-      <Invitations />
+      <div className="flex flex-row space-x-8">{filters}</div>
     </header>
   );
 }
