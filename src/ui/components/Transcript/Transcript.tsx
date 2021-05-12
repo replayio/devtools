@@ -30,16 +30,21 @@ function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
         <div className="right-sidebar-toolbar-item">Comments</div>
       </div>
       <div className="transcript-panel">
-        <div className="transcript-list space-y-4">
-          {sortBy(displayedComments, ["time"]).map(comment => {
-            return <CommentCard comment={comment} key={"id" in comment ? comment.id : 0} />;
-          })}
-        </div>
+        {displayedComments.length > 0 ? (
+          <div className="transcript-list space-y-4">
+            {sortBy(displayedComments, ["time"]).map(comment => {
+              return <CommentCard comment={comment} key={"id" in comment ? comment.id : 0} />;
+            })}
+          </div>
+        ) : (
+          <div className="transcript-list space-y-4 text-lg text-gray-500">
+            None yet! Please click on the video to place the first comment.
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
 const connector = connect((state: UIState) => ({
   recordingId: selectors.getRecordingId(state),
   pendingComment: selectors.getPendingComment(state),
