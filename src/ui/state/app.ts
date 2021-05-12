@@ -13,7 +13,13 @@ import { Workspace } from "ui/types";
 export type PanelName = "console" | "debugger" | "inspector";
 export type PrimaryPanelName = "explorer" | "debug" | "comments";
 export type ViewMode = "dev" | "non-dev";
-export type ModalType = "sharing" | "login" | "settings" | "new-workspace" | "workspace-settings";
+export type ModalType =
+  | "sharing"
+  | "login"
+  | "settings"
+  | "new-workspace"
+  | "workspace-settings"
+  | "onboarding";
 export type WorkspaceId = string;
 export type SettingsTabTitle = "Experimental" | "Invitations" | "Support" | "Personal";
 

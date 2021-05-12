@@ -61,9 +61,8 @@ export function makeBreakpointLocation(state, location) {
   };
   if (source.url) {
     breakpointLocation.sourceUrl = source.url;
-  } else {
-    breakpointLocation.sourceId = getSourceActorsForSource(state, source.id)[0].id;
   }
+  breakpointLocation.sourceId = getSourceActorsForSource(state, source.id)[0].id;
   return breakpointLocation;
 }
 

@@ -103,7 +103,7 @@
 
 .initialization-panel .actions .submit {
   color: var(--theme-body-background);
-  background: var(--new-blue-500);
+  background: var(--primary-accent);
   border: none;
   font-size: 14px;
   border-radius: 4px;
@@ -111,7 +111,7 @@
 }
 
 .initialization-panel .actions .submit:hover {
-  background: var(--new-blue-600);
+  background: var(--primary-accent-light);
 }
 
 .initialization-panel .actions .cancel {

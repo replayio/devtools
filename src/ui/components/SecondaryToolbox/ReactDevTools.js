@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import {
   createBridge,
@@ -8,11 +8,31 @@ import {
 import { ThreadFront } from "protocol/thread";
 
 let bridge, store, wall, DevTools;
-let currentTime = null;
 let rerenderComponentsTab;
 const messages = [];
-let inspected = new Set();
-InitReactDevTools();
+const inspected = new Set();
+
+(async () => {
+  // TODO: re-enable with a feature flag
+  return;
+  await ThreadFront.getAnnotations(({ annotations }) => {
+    for (const { point, time, kind, contents } of annotations) {
+      const message = JSON.parse(contents);
+      messages.push({ point, time, message });
+    }
+  });
+
+  ThreadFront.on("paused", onPaused);
+})();
+
+function onPaused() {
+  InitReactDevTools();
+
+  // HACK TODO This should use a subscription
+  if (typeof rerenderComponentsTab === "function") {
+    rerenderComponentsTab();
+  }
+}
 
 function InitReactDevTools() {
   const target = {
@@ -25,75 +45,57 @@ function InitReactDevTools() {
       wall._listener = listener;
     },
     async send(event, payload) {
-      if (event == "inspectElement" && !inspected.has(payload.id)) {
-        inspected.add(payload.id);
-        console.log(event, payload);
-        let safePayload = {
-          ...payload,
-          path: payload.path || [],
-        };
-        window.response = await ThreadFront.evaluate(
-          0,
-          0,
-          ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
-            safePayload
-          )})`
-        );
-
-        const inspectedElement = await response.returned.getJSON();
-        wall._listener({ event: "inspectedElement", payload: inspectedElement.data });
+      if (event == "inspectElement") {
+        if (inspected.has(payload.id)) {
+          wall._listener({
+            event: "inspectedElement",
+            payload: {
+              responseID: payload.requestID,
+              id: payload.id,
+              type: "no-change",
+            },
+          });
+        } else {
+          inspected.add(payload.id);
+          sendRequest(event, payload);
+        }
       }
-
-      wall._listener({ event, payload });
+      if (event == "getBridgeProtocol") {
+        sendRequest(event, payload);
+      }
     },
   };
 
   bridge = createBridge(target, wall);
   store = createStore(bridge);
   DevTools = createDevTools(target, { bridge, store });
-}
-
-const onPaused = data => {
-  if (currentTime === data.time) {
-    return;
-  }
-
-  InitReactDevTools();
+  inspected.clear();
 
   // TODO Use point AND time eventually
-  messages
-    .filter(({ time }) => time <= data.time)
-    .forEach(({ message }) => {
-      if (message.event === "operations" || message.event === "getBridgeProtocol") {
-        wall.send(message.event, message.payload);
-      }
-    });
-
-  // HACK TODO This should use a subscription
-  if (typeof rerenderComponentsTab === "function") {
-    rerenderComponentsTab();
+  for (const { message, time } of messages) {
+    if (message.event === "operations" && time <= ThreadFront.currentTime) {
+      wall._listener(message);
+    }
   }
-};
+}
+
+async function sendRequest(event, payload) {
+  const response = await ThreadFront.evaluate(
+    0,
+    0,
+    ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(payload)})`
+  );
+  if (response.returned) {
+    const result = await response.returned.getJSON();
+    wall._listener({ event: result.event, payload: result.data });
+    return { event: result.event, payload: result.data };
+  }
+}
 
 // TODO Pass custom bridge
 // TODO Use portal containers for Profiler & Components
 export function ReactDevtoolsPanel() {
   const [count, setCount] = React.useState(0);
-
-  React.useLayoutEffect(() => () => {
-    rerenderComponentsTab = null;
-  });
-
-  useEffect(() => {
-    ThreadFront.on("paused", onPaused);
-
-    ThreadFront.getAnnotations(({ annotations }) => {
-      for (const { point, time, kind, contents } of annotations) {
-        const message = JSON.parse(contents);
-        messages.push({ point, time, message });
-      }
-    });
-  }, []);
 
   // HACK TODO This hack handles the fact that DevTools wasn't writen
   // with the expectation that a new Bridge or Store prop would be pasesd
@@ -101,6 +103,10 @@ export function ReactDevtoolsPanel() {
   rerenderComponentsTab = () => {
     setCount(count + 1);
   };
+
+  if (!DevTools) {
+    return null;
+  }
 
   return (
     <DevTools

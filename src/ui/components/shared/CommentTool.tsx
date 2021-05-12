@@ -7,6 +7,7 @@ const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pau
 import "./CommentTool.css";
 import { Comment, Reply } from "ui/state/comments";
 import { ChatIcon } from "@heroicons/react/solid";
+import classNames from "classnames";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
@@ -110,7 +111,7 @@ function CommentTool({
     return () => removeListeners();
   }, [currentTime, executionPoint, pendingComment, comments]);
 
-  if (!showHelper || !mousePosition || pendingComment || isInvalidNewComment) {
+  if (!showHelper || !mousePosition || pendingComment) {
     return null;
   }
 
@@ -118,11 +119,17 @@ function CommentTool({
 
   return (
     <div
-      className="px-4 py-2 absolute bg-blue-500 text-white ml-2 mt-2 rounded-xl w-max space-x-2 flex items-center"
+      className={classNames(
+        "px-4 py-2 absolute text-white ml-2 mt-2 rounded-xl w-max space-x-2 flex items-center",
+        {
+          "bg-blue-500": !isInvalidNewComment,
+          "bg-gray-500": isInvalidNewComment,
+        }
+      )}
       style={{ top: y * canvas!.scale, left: x * canvas!.scale }}
     >
       <ChatIcon className="h-6 w-6" aria-hidden="true" />
-      <span>Add Comment</span>
+      <span>{isInvalidNewComment ? "A comment already exists here" : "Add Comment"}</span>
     </div>
   );
 }

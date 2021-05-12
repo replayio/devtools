@@ -72,7 +72,7 @@ function CommentEditor({
         <button
           onClick={clearPendingComment}
           className={classNames(
-            "justify-center py-2 px-4 rounded-md shadow-sm text-lg font-medium text-blue-700 bg-blue-50"
+            "justify-center py-2 px-4 text-lg font-medium text-black underline"
           )}
         >
           Cancel
@@ -81,8 +81,8 @@ function CommentEditor({
           onClick={onSubmit}
           disabled={!submitEnabled}
           className={classNames(
-            "justify-center py-2 px-4 rounded-md shadow-sm text-lg font-medium text-white",
-            submitEnabled ? "bg-blue-500" : "bg-gray-300"
+            "justify-center py-2 px-4 rounded-md shadow-sm text-lg font-medium text-gray-600",
+            submitEnabled ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-gray-300"
           )}
         >
           Post

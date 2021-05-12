@@ -5,7 +5,6 @@ import sortBy from "lodash/sortBy";
 
 export default function DashboardViewerContent({
   recordings,
-  viewType,
   selectedIds,
   setSelectedIds,
   editing,
@@ -18,32 +17,15 @@ export default function DashboardViewerContent({
 
   return (
     <section className="dashboard-viewer-content">
-      <div className={classnames("recording-list", viewType)}>
-        {viewType == "list" ? (
-          <RecordingsList
-            recordings={sortedRecordings}
-            viewType={viewType}
-            selectedIds={selectedIds}
-            setSelectedIds={setSelectedIds}
-            editing={editing}
-            ascOrder={ascOrder}
-            setAscOrder={setAscOrder}
-          />
-        ) : (
-          <ul>
-            {sortedRecordings &&
-              sortedRecordings.map((recording, i) => (
-                <Recording
-                  data={recording}
-                  key={i}
-                  viewType={viewType}
-                  selectedIds={selectedIds}
-                  setSelectedIds={setSelectedIds}
-                  editing={editing}
-                />
-              ))}
-          </ul>
-        )}
+      <div className={classnames("recording-list")}>
+        <RecordingsList
+          recordings={sortedRecordings}
+          selectedIds={selectedIds}
+          setSelectedIds={setSelectedIds}
+          editing={editing}
+          ascOrder={ascOrder}
+          setAscOrder={setAscOrder}
+        />
       </div>
     </section>
   );
@@ -51,7 +33,6 @@ export default function DashboardViewerContent({
 
 function RecordingsList({
   recordings,
-  viewType,
   selectedIds,
   setSelectedIds,
   editing,
@@ -74,8 +55,7 @@ function RecordingsList({
           recordings.map((recording, i) => (
             <Recording
               data={recording}
-              key={i}
-              viewType={viewType}
+              key={recording.id}
               selectedIds={selectedIds}
               setSelectedIds={setSelectedIds}
               editing={editing}

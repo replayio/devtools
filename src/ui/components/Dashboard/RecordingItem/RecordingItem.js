@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import hooks from "ui/hooks";
-import RecordingGridItem from "./RecordingGridItem";
 import RecordingListItem from "./RecordingListItem";
 import RecordingItemDropdown from "./RecordingItemDropdown";
 
@@ -37,30 +36,17 @@ export default function RecordingItem({ data, viewType, selectedIds, setSelected
     />
   );
 
-  if (viewType == "list") {
-    return (
-      <RecordingListItem
-        data={data}
-        Panel={Panel}
-        onNavigate={onNavigate}
-        editingTitle={editingTitle}
-        setEditingTitle={setEditingTitle}
-        toggleIsPrivate={toggleIsPrivate}
-        selectedIds={selectedIds}
-        setSelectedIds={setSelectedIds}
-        editing={editing}
-      />
-    );
-  }
-
   return (
-    <RecordingGridItem
+    <RecordingListItem
       data={data}
       Panel={Panel}
       onNavigate={onNavigate}
       editingTitle={editingTitle}
       setEditingTitle={setEditingTitle}
       toggleIsPrivate={toggleIsPrivate}
+      selectedIds={selectedIds}
+      setSelectedIds={setSelectedIds}
+      editing={editing}
     />
   );
 }

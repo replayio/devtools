@@ -11,11 +11,12 @@ type ExistingCommentEditorProps = PropsFromRedux & {
 };
 
 function ExistingCommentEditor({ comment, type, clearPendingComment }: ExistingCommentEditorProps) {
-  const updateComment = hooks.useUpdateComment(clearPendingComment);
-  const updateCommentReply = hooks.useUpdateCommentReply(clearPendingComment);
+  const updateComment = hooks.useUpdateComment();
+  const updateCommentReply = hooks.useUpdateCommentReply();
 
   const handleSubmit = (inputValue: string) => {
     handleExistingSave(comment, inputValue);
+    clearPendingComment();
   };
   const handleExistingSave = (
     pendingComment: PendingEditComment | PendingEditReply,
