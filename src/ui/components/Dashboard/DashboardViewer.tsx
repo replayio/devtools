@@ -5,6 +5,7 @@ const DashboardViewerContent = require("./DashboardViewerContent").default;
 import { SelectMenu, TextInput } from "ui/components/shared/Forms";
 import { getUserId } from "ui/utils/useToken";
 import { Recording } from "ui/types";
+import hooks from "ui/hooks";
 
 const TIME_IN_MS = {
   day: 86400000,
@@ -13,18 +14,37 @@ const TIME_IN_MS = {
 };
 
 type TimeFilter = "all" | "month" | "week" | "day";
+type AssociationFilter = "all" | "collaborator" | "comment" | "author";
 
 const subStringInString = (subString: string, string: string) => {
   return string.toLowerCase().includes(subString.toLowerCase());
 };
 
-function filterRecordings(recordings: Recording[], timeFilter: TimeFilter, searchString: string) {
+function filterRecordings(
+  recordings: Recording[],
+  timeFilter: TimeFilter,
+  associationFilter: AssociationFilter,
+  searchString: string
+) {
   let filteredRecordings = recordings;
+  const { userId } = hooks.useGetUserId();
 
   if (timeFilter !== "all") {
     filteredRecordings = filteredRecordings.filter(
       r => new Date().getTime() - new Date(r.date).getTime() < TIME_IN_MS[timeFilter]
     );
+  }
+
+  if (associationFilter === "collaborator") {
+    filteredRecordings = filteredRecordings.filter(
+      r => r.collaborators && r.collaborators.some(c => c === userId)
+    );
+  } else if (associationFilter === "comment") {
+    filteredRecordings = filteredRecordings.filter(
+      r => r.comments && r.comments.some((c: any) => c.user.id === userId)
+    );
+  } else if (associationFilter === "author") {
+    filteredRecordings = filteredRecordings.filter(r => r.userId === userId);
   }
 
   filteredRecordings = filteredRecordings.filter(
@@ -39,6 +59,7 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchString, setSearchString] = useState<string>("");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
+  const [associationFilter, setAssociationFilter] = useState<AssociationFilter>("all");
 
   const toggleEditing = () => {
     if (editing) {
@@ -47,7 +68,12 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
     setEditing(!editing);
   };
 
-  const filteredRecordings = filterRecordings(recordings, timeFilter, searchString);
+  const filteredRecordings = filterRecordings(
+    recordings,
+    timeFilter,
+    associationFilter,
+    searchString
+  );
 
   return (
     <div className={classnames("dashboard-viewer flex-grow", { editing })}>
@@ -60,6 +86,17 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
         setSearchString={setSearchString}
         filters={
           <>
+            <SelectMenu
+              selected={associationFilter}
+              setSelected={value => setAssociationFilter(value as AssociationFilter)}
+              options={[
+                { id: "all", name: "All Replays" },
+                { id: "comment", name: "Replays I've commented on" },
+                { id: "collaborator", name: "Replays shared with me" },
+                { id: "author", name: "Replays I've authored" },
+              ]}
+              className="w-72"
+            />
             <SelectMenu
               selected={timeFilter}
               setSelected={value => setTimeFilter(value as TimeFilter)}

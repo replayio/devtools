@@ -17,6 +17,7 @@ export interface Recording {
   isInitialized: boolean;
   workspace?: Workspace;
   collaborators?: string[];
+  comments?: any;
 }
 
 export interface Workspace {
