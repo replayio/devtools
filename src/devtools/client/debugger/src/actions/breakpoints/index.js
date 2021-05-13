@@ -32,6 +32,7 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import remapLocations from "./remapLocations";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
+import { ThreadFront } from "protocol/thread";
 
 // this will need to be changed so that addCLientBreakpoint is removed
 
@@ -198,7 +199,25 @@ export function updateHoveredLineNumber(line) {
     // Set the initial location here as a placeholder to be checked after any async activity.
     dispatch(actions.setHoveredLineNumberLocation(initialLocation));
 
-    await dispatch(setBreakpointPositions({ sourceId: source.id, line }));
+    const promises = [];
+    promises.push(dispatch(setBreakpointPositions({ sourceId: source.id, line })));
+    if (source.url) {
+      // there may be multiple identical sources for the same URL (due to navigations),
+      // in this case we need to request breakpoint positions for all of them so that
+      // we can set logpoints in all of them later on
+      const sourceIds = ThreadFront.getSourceIdsForURL(source.url);
+      // sourceIds will only contain "preferred" sources, check if the current source
+      // is one of them (otherwise it's not identical to them)
+      if (sourceIds.contains(source.id)) {
+        for (sourceId of sourceIds) {
+          if (sourceId !== source.id) {
+            promises.push(dispatch(setBreakpointPositions({ sourceId, line })));
+          }
+        }
+      }
+    }
+    await Promise.all(promises);
+
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
     // It's possible that after the `await` above the user is either 1) hovered off of the
