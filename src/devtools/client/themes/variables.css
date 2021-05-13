@@ -384,16 +384,16 @@ certain that you **have** to use a z-index (e.g. element with position: absolute
 custom variable for it below so we can keep track of everything in one place. */
 
 #app {
-  --z-index-1: 100;
-  --z-index-2: 200;
-  --z-index-3: 300;
-  --z-index-4: 400;
-  --z-index-5: 500;
-  --z-index-6: 600;
-  --z-index-7: 700;
-  --z-index-8: 800;
-  --z-index-9: 900;
-  --z-index-10: 1000;
+  --z-index-1: 10;
+  --z-index-2: 20;
+  --z-index-3: 30;
+  --z-index-4: 40;
+  --z-index-5: 50;
+  --z-index-6: 60;
+  --z-index-7: 70;
+  --z-index-8: 80;
+  --z-index-9: 90;
+  --z-index-10: 100;
 }
 
 #app {
@@ -416,12 +416,6 @@ custom variable for it below so we can keep track of everything in one place. */
 
   --z-index-7--mask: var(--z-index-7);
 
-  --z-index-8--expected-error: var(--z-index-8);
   --z-index-8--modal: var(--z-index-8);
   --z-index-8--dropdown: var(--z-index-8);
-
-  --z-index-9--modal-error: var(--z-index-9);
-  --z-index-9--dropdown-error: var(--z-index-9);
-
-  --z-index-10--unexpected-error: var(--z-index-10);
 }

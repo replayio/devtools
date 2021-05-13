@@ -9,7 +9,7 @@ import {
   CommandParams,
   CommandResult,
 } from "@recordreplay/protocol";
-import { setExpectedError } from "ui/actions/session";
+import { setUnexpectedError } from "ui/actions/session";
 import { UIStore } from "ui/actions";
 import { Action, Dispatch } from "redux";
 
@@ -142,9 +142,10 @@ function onSocketClose() {
 
     if (!willClose) {
       dispatch(
-        setExpectedError({
-          type: "timeout",
-          message: "Replays disconnect after 5 minutes to reduce server load. Ready when you are!",
+        setUnexpectedError({
+          message: "Are you still there?",
+          content: "Replays disconnect after 5 minutes to reduce server load. Ready when you are!",
+          action: "refresh",
         })
       );
     }
@@ -159,8 +160,11 @@ function onSocketError(evt: Event) {
   return ({ dispatch }: { dispatch: Dispatch<Action> }) => {
     log("Socket Error");
     dispatch(
-      setExpectedError({
-        message: "Session has closed due to an error, please refresh the page.",
+      setUnexpectedError({
+        message: "Unexpected socket error",
+        content: "The socket has closed due to an error. Please refresh the page.",
+        action: "refresh",
+        ...evt,
       })
     );
   };
