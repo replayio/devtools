@@ -95,6 +95,7 @@ function DashboardViewerContentHeader({
       </th>
       <th className="privacy">PRIVACY</th>
       <th className="owner">OWNER</th>
+      <th>ACTIVITY</th>
       <th></th>
     </tr>
   );

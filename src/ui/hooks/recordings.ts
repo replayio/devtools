@@ -65,6 +65,11 @@ const GET_WORKSPACE_RECORDINGS = gql`
                 name
                 picture
               }
+              comments {
+                user {
+                  id
+                }
+              }
             }
           }
         }
@@ -90,6 +95,11 @@ const GET_MY_RECORDINGS = gql`
               id
               name
               picture
+            }
+            comments {
+              user {
+                id
+              }
             }
           }
         }
@@ -135,6 +145,7 @@ function convertRecording(rec: any): Recording | undefined {
     isInitialized: rec.isInitialized,
     date: rec.createdAt,
     workspace: rec.workspace,
+    comments: rec.comments,
     collaborators,
   };
 }
