@@ -110,7 +110,7 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
                 { id: "week", name: "This week" },
                 { id: "day", name: "Today" },
               ]}
-              className="w-64"
+              className="w-48"
             />
             <TextInput
               placeholder="Search..."
