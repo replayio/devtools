@@ -60,6 +60,11 @@ const GET_WORKSPACE_RECORDINGS = gql`
               createdAt
               private
               isInitialized
+              comments {
+                user {
+                  id
+                }
+              }
               owner {
                 id
                 name
@@ -99,6 +104,18 @@ const GET_MY_RECORDINGS = gql`
             comments {
               user {
                 id
+              }
+            }
+            collaborators {
+              edges {
+                node {
+                  ... on RecordingUserCollaborator {
+                    id
+                    user {
+                      id
+                    }
+                  }
+                }
               }
             }
           }
