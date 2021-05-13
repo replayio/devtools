@@ -31,7 +31,7 @@ export default function DashboardViewerHeader({
         editing={editing}
         toggleEditing={toggleEditing}
       />
-      <div className="flex flex-row space-x-8">{filters}</div>
+      <div className="flex flex-row space-x-8 items-center">{filters}</div>
     </header>
   );
 }
