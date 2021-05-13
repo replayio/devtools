@@ -134,12 +134,7 @@ function CommentTool({
     return () => removeListeners();
   }, [currentTime, executionPoint, pendingComment, comments]);
 
-  if (
-    !showHelper ||
-    !mousePosition ||
-    pendingComment?.type === "edit_reply" ||
-    pendingComment?.type === "edit_comment"
-  ) {
+  if (!showHelper || !mousePosition || pendingComment?.type === "edit_reply") {
     return null;
   }
 
@@ -155,7 +150,7 @@ function CommentTool({
         style={childStyle}
         ref={captionNode}
       >
-        {pendingComment?.type === "new_comment" ? (
+        {pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment" ? (
           <span>{"Move the marker"}</span>
         ) : (
           <span>{"Add Comment"}</span>

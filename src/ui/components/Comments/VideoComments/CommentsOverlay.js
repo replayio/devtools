@@ -56,12 +56,12 @@ function CommentsOverlay({
       }}
     >
       <div className="canvas-comments">
-        {comments.map((comment, i) => (
+        {comments.map(comment => (
           <VideoComment
             comment={comment}
             scale={scale}
             setHoveredComment={setHoveredComment}
-            key={i}
+            key={"id" in comment ? comment.id : "pendingCommentId"}
           />
         ))}
       </div>

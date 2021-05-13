@@ -12,7 +12,6 @@
 .canvas-overlay .canvas-comment {
   position: absolute;
   display: flex;
-  transition-duration: 100ms;
 }
 
 .canvas-overlay .canvas-comment-marker {
