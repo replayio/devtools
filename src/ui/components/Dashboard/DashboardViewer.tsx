@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import classnames from "classnames";
 const DashboardViewerHeader = require("./DashboardViewerHeader").default;
 const DashboardViewerContent = require("./DashboardViewerContent").default;
-import { SelectMenu } from "ui/components/shared/Forms";
+import { SelectMenu, TextInput } from "ui/components/shared/Forms";
 import { getUserId } from "ui/utils/useToken";
 import { Recording } from "ui/types";
 
@@ -14,7 +14,11 @@ const TIME_IN_MS = {
 
 type TimeFilter = "all" | "month" | "week" | "day";
 
-function filterRecordings(recordings: Recording[], timeFilter: TimeFilter) {
+const subStringInString = (subString: string, string: string) => {
+  return string.toLowerCase().includes(subString.toLowerCase());
+};
+
+function filterRecordings(recordings: Recording[], timeFilter: TimeFilter, searchString: string) {
   let filteredRecordings = recordings;
 
   if (timeFilter !== "all") {
@@ -23,12 +27,17 @@ function filterRecordings(recordings: Recording[], timeFilter: TimeFilter) {
     );
   }
 
+  filteredRecordings = filteredRecordings.filter(
+    r => subStringInString(searchString, r.url) || subStringInString(searchString, r.title)
+  );
+
   return filteredRecordings;
 }
 
 export default function DashboardViewer({ recordings }: { recordings: Recording[] }) {
   const [editing, setEditing] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [searchString, setSearchString] = useState<string>("");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
 
   const toggleEditing = () => {
@@ -38,7 +47,7 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
     setEditing(!editing);
   };
 
-  const filteredRecordings = filterRecordings(recordings, timeFilter);
+  const filteredRecordings = filterRecordings(recordings, timeFilter, searchString);
 
   return (
     <div className={classnames("dashboard-viewer flex-grow", { editing })}>
@@ -47,18 +56,27 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
         setSelectedIds={setSelectedIds}
         editing={editing}
         toggleEditing={toggleEditing}
+        searchString={searchString}
+        setSearchString={setSearchString}
         filters={
-          <SelectMenu
-            selected={timeFilter}
-            setSelected={value => setTimeFilter(value as TimeFilter)}
-            options={[
-              { id: "all", name: "All Time" },
-              { id: "month", name: "This month" },
-              { id: "week", name: "This week" },
-              { id: "day", name: "Today" },
-            ]}
-            className="w-48"
-          />
+          <>
+            <SelectMenu
+              selected={timeFilter}
+              setSelected={value => setTimeFilter(value as TimeFilter)}
+              options={[
+                { id: "all", name: "All Time" },
+                { id: "month", name: "This month" },
+                { id: "week", name: "This week" },
+                { id: "day", name: "Today" },
+              ]}
+              className="w-48"
+            />
+            <TextInput
+              placeholder="Search..."
+              value={searchString}
+              onChange={e => setSearchString(e.target.value)}
+            />
+          </>
         }
       />
       <DashboardViewerContent
