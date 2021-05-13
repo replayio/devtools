@@ -6,6 +6,7 @@ import { AuthAvatar } from "ui/components/Avatar";
 import formatDate from "date-fns/format";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import hooks from "ui/hooks";
+import { ChatAltIcon } from "@heroicons/react/outline";
 import "./RecordingListItem.css";
 
 function getDurationString(durationMs) {
@@ -183,6 +184,14 @@ export default function RecordingListItem({
       </td>
       <td>
         <div className="owner">{data.user && <AuthAvatar user={data.user} />}</div>
+      </td>
+      <td>
+        {data.comments.length ? (
+          <div className="flex flex-row space-x-1 items-center">
+            <ChatAltIcon className="w-6 h-6 text-gray-500" />
+            <span>{data.comments.length}</span>
+          </div>
+        ) : null}
       </td>
       <td>{isOwner && <ItemOptions Panel={Panel} />}</td>
     </tr>
