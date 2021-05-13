@@ -4,7 +4,7 @@ import useAuth0 from "ui/utils/useAuth0";
 
 import DevTools from "./DevTools";
 const Account = require("./Account").default;
-import { AppErrors } from "./shared/Error";
+import AppErrors from "./shared/Error";
 const LoginModal = require("./shared/LoginModal").default;
 const SkeletonLoader = require("ui/components/SkeletonLoader").default;
 import SharingModal from "./shared/SharingModal";

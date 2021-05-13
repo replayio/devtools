@@ -158,7 +158,7 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
   const { header, content } = slides[current - 1];
 
   return (
-    <Modal>
+    <Modal options={{ maskTransparency: "translucent" }}>
       <div
         className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-20 relative flex flex-col justify-between"
         style={{ width: "520px", height: "360px" }}
