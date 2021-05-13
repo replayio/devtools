@@ -17,7 +17,6 @@ import CommentActions from "./CommentActions";
 import CommentSource from "./CommentSource";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import useAuth0 from "ui/utils/useAuth0";
-import { setModal } from "ui/actions/app";
 import useDraftJS from "./CommentEditor/use-draftjs";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
@@ -62,6 +61,40 @@ function CommentItem({
         </div>
       </div>
       <div className="space-y-6 px-4 pt-4 pb-4 text-lg">{comment.content}</div>
+    </div>
+  );
+}
+
+function CommentCardEditor({
+  comment,
+  pendingComment,
+  onReply,
+}: {
+  comment: PendingNewComment | Comment;
+  pendingComment: PendingComment | null;
+  onReply: (e: React.MouseEvent) => void;
+}) {
+  if (
+    pendingComment &&
+    (pendingComment.type === "new_comment" || pendingComment.type === "new_reply") &&
+    (pendingComment.comment === comment ||
+      ("parentId" in pendingComment.comment &&
+        "id" in comment &&
+        pendingComment.comment.parentId === comment.id))
+  ) {
+    return (
+      <div className="border-t border-gray-200">
+        <NewCommentEditor comment={pendingComment.comment} type={pendingComment.type} />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="mt-6 border-t border-gray-200 px-4 py-4 text-lg text-gray-400"
+      onClick={onReply}
+    >
+      Write a reply...
     </div>
   );
 }
@@ -141,21 +174,7 @@ function CommentCard({
           </div>
         ))}
         {isPaused && !isEditing ? (
-          pendingComment && pendingComment.type.includes("new") ? (
-            <div className="border-t border-gray-200">
-              <NewCommentEditor
-                comment={pendingComment.comment as PendingNewReply}
-                type={"new_reply"}
-              />
-            </div>
-          ) : (
-            <div
-              className="mt-6 border-t border-gray-200 px-4 py-4 text-lg text-gray-400"
-              onClick={onReply}
-            >
-              Write a reply...
-            </div>
-          )
+          <CommentCardEditor comment={comment} onReply={onReply} pendingComment={pendingComment} />
         ) : null}
       </div>
     </div>

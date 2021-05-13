@@ -12,6 +12,7 @@
 .canvas-overlay .canvas-comment {
   position: absolute;
   display: flex;
+  transition-duration: 100ms;
 }
 
 .canvas-overlay .canvas-comment-marker {
@@ -27,7 +28,6 @@
 .canvas-overlay .canvas-comment-marker.highlighted {
   background: var(--primary-accent);
   transition: background 200ms;
-  z-index: var(--z-index-3--hovered-comment-primary);
 }
 
 .canvas-overlay .canvas-comment .img.location-marker {

@@ -19,12 +19,12 @@ function findComment({ hasuraComments, pendingComment, hoveredComment, currentTi
   }
 
   // Find the comment that matches the hoveredComment ID
-  if (hoveredComment) {
-    return comments.find(comment => comment.id == hoveredComment);
-  }
+  // if (hoveredComment) {
+  //   return comments.find(comment => comment.id == hoveredComment);
+  // }
 
   // Find the comment at the current position
-  return comments.find(comment => comment && comment.position && comment.time == currentTime);
+  return comments.filter(comment => comment && comment.position && comment.time == currentTime);
 }
 
 function CommentsOverlay({
@@ -43,7 +43,7 @@ function CommentsOverlay({
   }
 
   const { top, left, width, height, scale } = canvas;
-  const comment = findComment({ hasuraComments, pendingComment, currentTime, hoveredComment });
+  const comments = findComment({ hasuraComments, pendingComment, currentTime, hoveredComment });
 
   return (
     <div
@@ -56,9 +56,16 @@ function CommentsOverlay({
       }}
     >
       <div className="canvas-comments">
-        <VideoComment comment={comment} scale={scale} setHoveredComment={setHoveredComment} />
-        {children}
+        {comments.map((comment, i) => (
+          <VideoComment
+            comment={comment}
+            scale={scale}
+            setHoveredComment={setHoveredComment}
+            key={i}
+          />
+        ))}
       </div>
+      {children}
     </div>
   );
 }
