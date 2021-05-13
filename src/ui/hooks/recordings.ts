@@ -155,7 +155,8 @@ function convertRecording(rec: any): Recording | undefined {
     id: rec.uuid,
     user: rec.owner,
     userId: rec.owner?.id,
-    url: rec.url,
+    // NOTE: URLs are nullable in the database
+    url: rec.url || "",
     title: rec.title,
     duration: rec.duration,
     private: rec.private,
