@@ -60,15 +60,7 @@ function DeletedScreen({ url }: { url: string }) {
   );
 }
 
-function Actions({
-  onSubmit,
-  onDiscard,
-  status,
-}: {
-  onSubmit: () => void;
-  onDiscard: () => void;
-  status: Status;
-}) {
+function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status }) {
   const isSaving = status === "saving";
   const isDeleting = status === "deleting";
 
@@ -85,17 +77,15 @@ function Actions({
       >
         {isDeleting ? `Discarding…` : `Discard`}
       </button>
-      <button
-        type="button"
-        onClick={onSubmit}
+      <input
+        type="submit"
         disabled={isSaving || isDeleting}
+        value={isSaving ? `Uploading…` : `Save & Upload`}
         className={classNames(
-          "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 justify-center",
+          "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 justify-center cursor-pointer",
           "text-white bg-blue-600 hover:bg-blue-700"
         )}
-      >
-        {isSaving ? `Uploading…` : `Save & Upload`}
-      </button>
+      ></input>
     </div>
   );
 }
@@ -106,7 +96,6 @@ function Form({
   setInputValue,
   selectedWorkspaceId,
   setSelectedWorkspaceId,
-  onSubmit,
   isPublic,
   setIsPublic,
 }: {
@@ -115,12 +104,11 @@ function Form({
   setInputValue: Dispatch<SetStateAction<string>>;
   selectedWorkspaceId: string | null;
   setSelectedWorkspaceId: Dispatch<SetStateAction<string | null>>;
-  onSubmit: () => void;
   isPublic: boolean;
   setIsPublic: Dispatch<SetStateAction<boolean>>;
 }) {
   return (
-    <form className="space-y-6" onSubmit={onSubmit}>
+    <>
       <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
       <div className="text-gray-700">
         <label className="block text-sm uppercase font-semibold ">Team</label>
@@ -161,7 +149,7 @@ function Form({
           </div>
         </div>
       </div>
-    </form>
+    </>
   );
 }
 
@@ -181,7 +169,9 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
   const updateIsPrivate = hooks.useUpdateIsPrivate();
   const deleteRecording = hooks.useDeleteRecording(() => setStatus("deleted"));
 
-  const onSubmit = async () => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     setStatus("saving");
     const workspaceId = selectedWorkspaceId == "" ? null : selectedWorkspaceId;
 
@@ -231,17 +221,18 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
               {getFormattedTime(recording!.duration)}
             </div>
           </div>
-          <Form
-            workspaces={workspaces}
-            inputValue={inputValue}
-            setInputValue={setInputValue}
-            selectedWorkspaceId={selectedWorkspaceId}
-            setSelectedWorkspaceId={setSelectedWorkspaceId}
-            isPublic={isPublic}
-            setIsPublic={setIsPublic}
-            onSubmit={onSubmit}
-          />
-          <Actions onSubmit={onSubmit} onDiscard={onDiscard} status={status} />
+          <form className="space-y-6" onSubmit={e => onSubmit(e)}>
+            <Form
+              workspaces={workspaces}
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+              selectedWorkspaceId={selectedWorkspaceId}
+              setSelectedWorkspaceId={setSelectedWorkspaceId}
+              isPublic={isPublic}
+              setIsPublic={setIsPublic}
+            />
+            <Actions onDiscard={onDiscard} status={status} />
+          </form>
         </div>
       </Modal>
     </div>

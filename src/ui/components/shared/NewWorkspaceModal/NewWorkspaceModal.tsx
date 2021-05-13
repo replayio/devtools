@@ -14,7 +14,9 @@ const content2 = `You can do this by creating a team for your company, team or g
 function NewWorkspaceModal({ hideModal }: PropsFromRedux) {
   const [inputValue, setInputValue] = useState("");
   const createNewWorkspace = hooks.useCreateNewWorkspace();
-  const handleSave = () => {
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+
     createNewWorkspace({
       variables: { name: inputValue, userId },
     });
