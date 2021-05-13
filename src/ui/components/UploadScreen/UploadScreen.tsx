@@ -10,7 +10,7 @@ import { selectors } from "ui/reducers";
 import classNames from "classnames";
 import Modal from "ui/components/shared/NewModal";
 import { Recording, Workspace } from "ui/types";
-import BlankScreen from "../shared/BlankScreen";
+import { BlankLoadingScreen } from "../shared/BlankScreen";
 
 type UploadScreenProps = PropsFromRedux & { recording: Recording };
 type Status = "saving" | "deleting" | "deleted" | null;
@@ -165,7 +165,7 @@ function Form({
   );
 }
 
-function UploadScreen({ recordingId, currentWorkspaceId, recording }: UploadScreenProps) {
+function UploadScreen({ recordingId, recording }: UploadScreenProps) {
   const { userSettings, loading: loading1 } = hooks.useGetUserSettings();
   const { screenData, loading: loading2 } = hooks.useGetRecordingPhoto(recordingId!);
   const { workspaces, loading: loading3 } = hooks.useGetNonPendingWorkspaces();
@@ -196,7 +196,7 @@ function UploadScreen({ recordingId, currentWorkspaceId, recording }: UploadScre
   };
 
   if (loading1 || loading2 || loading3) {
-    return <BlankScreen />;
+    return <BlankLoadingScreen />;
   }
 
   if (status === "deleted") {
@@ -250,7 +250,6 @@ function UploadScreen({ recordingId, currentWorkspaceId, recording }: UploadScre
 
 const connector = connect((state: UIState) => ({
   recordingId: getRecordingId(state),
-  currentWorkspaceId: selectors.getWorkspaceId(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(UploadScreen);

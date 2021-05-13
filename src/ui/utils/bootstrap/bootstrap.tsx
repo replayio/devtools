@@ -17,7 +17,7 @@ import { ApolloProvider } from "@apollo/client";
 
 import { skipTelemetry } from "../environment";
 import { UIStore } from "ui/actions";
-import BlankScreen from "ui/components/shared/BlankScreen";
+import { BlankLoadingScreen } from "ui/components/shared/BlankScreen";
 
 export function setupTelemetry(context: Record<string, any>) {
   const ignoreList = ["Current thread has paused or resumed", "Current thread has changed"];
@@ -60,7 +60,7 @@ function ApolloWrapper({
   const { loading, token, error } = useToken();
 
   if (loading) {
-    return <BlankScreen />;
+    return <BlankLoadingScreen />;
   }
 
   if (error) {

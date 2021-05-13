@@ -15,7 +15,7 @@ import { selectors } from "../reducers";
 import { UIState } from "ui/state";
 import { ExpectedError } from "ui/state/app";
 import { RecordingId } from "@recordreplay/protocol";
-import BlankScreen from "./shared/BlankScreen";
+import { BlankLoadingScreen } from "./shared/BlankScreen";
 import UploadScreen from "./UploadScreen";
 
 type DevToolsProps = PropsFromRedux & {
@@ -86,11 +86,11 @@ function DevTools({
   let expectedError: ExpectedError | undefined;
 
   if (queriesAreLoading) {
-    loaderResult = <BlankScreen />;
+    loaderResult = <BlankLoadingScreen />;
   } else if (recordingDuration === null) {
-    loaderResult = <BlankScreen />;
+    loaderResult = <BlankLoadingScreen />;
   } else if (uploading) {
-    loaderResult = <BlankScreen />;
+    loaderResult = <BlankLoadingScreen />;
   }
 
   if (!loaderResult) {
