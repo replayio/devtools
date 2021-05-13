@@ -16,7 +16,11 @@ const TIME_IN_MS = {
 type TimeFilter = "all" | "month" | "week" | "day";
 type AssociationFilter = "all" | "collaborator" | "comment" | "author";
 
-const subStringInString = (subString: string, string: string) => {
+const subStringInString = (subString: string, string: string | null) => {
+  if (!string) {
+    return false;
+  }
+
   return string.toLowerCase().includes(subString.toLowerCase());
 };
 
