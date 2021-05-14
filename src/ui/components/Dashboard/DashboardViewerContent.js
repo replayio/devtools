@@ -39,6 +39,10 @@ function RecordingsList({
   ascOrder,
   setAscOrder,
 }) {
+  const addSelectedId = recordingId => setSelectedIds([...selectedIds, recordingId]);
+  const removeSelectedId = recordingId =>
+    setSelectedIds(selectedIds.filter(id => id !== recordingId));
+
   return (
     <table className="dashboard-viewer-content-table">
       <thead className="dashboard-viewer-content-header">
@@ -52,12 +56,13 @@ function RecordingsList({
       </thead>
       <tbody className="dashboard-viewer-content-body">
         {recordings &&
-          recordings.map((recording, i) => (
+          recordings.map(recording => (
             <Recording
               data={recording}
               key={recording.id}
-              selectedIds={selectedIds}
-              setSelectedIds={setSelectedIds}
+              selected={selectedIds.includes(recording.id)}
+              addSelectedId={addSelectedId}
+              removeSelectedId={removeSelectedId}
               editing={editing}
             />
           ))}
