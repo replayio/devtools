@@ -3,6 +3,8 @@ import hooks from "ui/hooks";
 import "./ReplayInvitations.css";
 import { TextInput } from "ui/components/shared/Forms";
 
+const USE_AVAILABLE_INVITATIONS = false;
+
 export default function ReplayInvitations() {
   const [inputValue, setInputValue] = useState("");
   const { invitations, loading: inviteLoading } = hooks.useGetInvitations();
@@ -42,9 +44,9 @@ export default function ReplayInvitations() {
     availableInvitations = Infinity;
   }
 
-  const label = `You have ${availableInvitations} invite${
-    availableInvitations == 1 ? "" : "s"
-  } left`;
+  const label = USE_AVAILABLE_INVITATIONS
+    ? `You have ${availableInvitations} invite${availableInvitations == 1 ? "" : "s"} left`
+    : "";
 
   return (
     <li className="replay-invitations">
@@ -55,7 +57,7 @@ export default function ReplayInvitations() {
           their own replays.
         </div>
       </label>
-      {availableInvitations > 0 && (
+      {(!USE_AVAILABLE_INVITATIONS || availableInvitations > 0) && (
         <form onSubmit={onSubmit} className="space-x-2">
           <TextInput
             placeholder="Email Address"
