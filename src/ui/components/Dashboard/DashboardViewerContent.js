@@ -8,6 +8,7 @@ export default function DashboardViewerContent({
   selectedIds,
   setSelectedIds,
   editing,
+  limit,
 }) {
   const [ascOrder, setAscOrder] = useState(false);
   let sortedRecordings = sortBy(recordings, recording => {
@@ -15,11 +16,14 @@ export default function DashboardViewerContent({
     return order * new Date(recording.date);
   });
 
+  const displayedRecordings =
+    limit === "all" ? sortedRecordings : sortedRecordings.slice(0, +limit);
+
   return (
     <section className="dashboard-viewer-content">
       <div className={classnames("recording-list")}>
         <RecordingsList
-          recordings={sortedRecordings}
+          recordings={displayedRecordings}
           selectedIds={selectedIds}
           setSelectedIds={setSelectedIds}
           editing={editing}

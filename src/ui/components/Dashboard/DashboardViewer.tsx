@@ -15,6 +15,7 @@ const TIME_IN_MS = {
 
 type TimeFilter = "all" | "month" | "week" | "day";
 type AssociationFilter = "all" | "collaborator" | "comment" | "author";
+type Limit = "all" | "100" | "50" | "20";
 
 const subStringInString = (subString: string, string: string | null) => {
   if (!string) {
@@ -64,6 +65,7 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
   const [searchString, setSearchString] = useState<string>("");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
   const [associationFilter, setAssociationFilter] = useState<AssociationFilter>("all");
+  const [limit, setLimit] = useState<Limit>("20");
 
   const toggleEditing = () => {
     if (editing) {
@@ -117,11 +119,23 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
               value={searchString}
               onChange={e => setSearchString(e.target.value)}
             />
+            <SelectMenu
+              selected={limit}
+              setSelected={value => setLimit(value as Limit)}
+              options={[
+                { id: "all", name: "Show all" },
+                { id: "20", name: "20" },
+                { id: "50", name: "50" },
+                { id: "100", name: "100" },
+              ]}
+              className="w-32"
+            />
           </>
         }
       />
       <DashboardViewerContent
         recordings={filteredRecordings}
+        limit={limit}
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
         editing={editing}
