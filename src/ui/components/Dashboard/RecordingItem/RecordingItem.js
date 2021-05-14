@@ -3,7 +3,13 @@ import hooks from "ui/hooks";
 import RecordingListItem from "./RecordingListItem";
 import RecordingItemDropdown from "./RecordingItemDropdown";
 
-export default function RecordingItem({ data, viewType, selectedIds, setSelectedIds, editing }) {
+export default function RecordingItem({
+  data,
+  selected,
+  addSelectedId,
+  removeSelectedId,
+  editing,
+}) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [isPrivate, setIsPrivate] = useState(data.private);
   const updateIsPrivate = hooks.useUpdateIsPrivate();
@@ -44,8 +50,9 @@ export default function RecordingItem({ data, viewType, selectedIds, setSelected
       editingTitle={editingTitle}
       setEditingTitle={setEditingTitle}
       toggleIsPrivate={toggleIsPrivate}
-      selectedIds={selectedIds}
-      setSelectedIds={setSelectedIds}
+      selected={selected}
+      addSelectedId={addSelectedId}
+      removeSelectedId={removeSelectedId}
       editing={editing}
     />
   );

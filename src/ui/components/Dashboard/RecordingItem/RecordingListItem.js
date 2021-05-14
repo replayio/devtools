@@ -121,8 +121,9 @@ export default function RecordingListItem({
   editingTitle,
   setEditingTitle,
   toggleIsPrivate,
-  setSelectedIds,
-  selectedIds,
+  addSelectedId,
+  removeSelectedId,
+  selected,
   editing,
 }) {
   const { userId, loading } = hooks.useGetUserId();
@@ -131,15 +132,13 @@ export default function RecordingListItem({
   }
 
   const { id: recordingId } = data;
-  const selected = selectedIds.includes(recordingId);
-
   const isOwner = userId == data.user?.id;
 
   const toggleChecked = () => {
     if (selected) {
-      setSelectedIds(selectedIds.filter(id => id !== recordingId));
+      removeSelectedId(recordingId);
     } else {
-      setSelectedIds([...selectedIds, recordingId]);
+      addSelectedId(recordingId);
     }
   };
 
