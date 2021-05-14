@@ -4,13 +4,6 @@ import classnames from "classnames";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { connect, ConnectedProps } from "react-redux";
-import { Canvas } from "ui/state/app";
-import { Comment } from "ui/state/comments";
-
-function inCenter(canvas: Canvas, { position }: Comment) {
-  if (!position) return true;
-  return position.x / canvas.width == 0.5 && position.y / canvas.height;
-}
 
 function VideoComment({
   comment,
@@ -29,11 +22,6 @@ function VideoComment({
 
   // Hide pins while the user is hovering in the timeline
   if (!hoveredComment && hoverTime && hoverTime != currentTime) {
-    return null;
-  }
-
-  // Hide pins that were never moved
-  if (comment.content != "" && inCenter(canvas, comment)) {
     return null;
   }
 

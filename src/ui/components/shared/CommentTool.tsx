@@ -134,7 +134,12 @@ function CommentTool({
     return () => removeListeners();
   }, [currentTime, executionPoint, pendingComment, comments]);
 
-  if (!showHelper || !mousePosition || pendingComment?.type === "edit_reply") {
+  if (
+    !showHelper ||
+    !mousePosition ||
+    pendingComment?.type === "edit_reply" ||
+    pendingComment?.type === "new_reply"
+  ) {
     return null;
   }
 
