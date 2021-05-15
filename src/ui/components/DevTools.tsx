@@ -82,29 +82,21 @@ function DevTools({
     }
   }, [recording, cachedUserId]);
 
-  let loaderResult: ReactElement | undefined;
   let expectedError: ExpectedError | undefined;
-
-  if (queriesAreLoading) {
-    loaderResult = <BlankLoadingScreen />;
-  }
-
-  if (!loaderResult) {
-    if (!isAuthorized) {
-      if (userId) {
-        expectedError = {
-          message: "You don't have permission to view this replay",
-          content:
-            "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
-        };
-      } else {
-        expectedError = {
-          message: "You need to sign in to view this replay",
-          content:
-            "You're trying to view a private replay. To proceed, we're going to need to you to sign in.",
-          action: "sign-in",
-        };
-      }
+  if (!queriesAreLoading && !isAuthorized) {
+    if (userId) {
+      expectedError = {
+        message: "You don't have permission to view this replay",
+        content:
+          "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
+      };
+    } else {
+      expectedError = {
+        message: "You need to sign in to view this replay",
+        content:
+          "You're trying to view a private replay. To proceed, we're going to need to you to sign in.",
+        action: "sign-in",
+      };
     }
   }
 
@@ -113,8 +105,12 @@ function DevTools({
       setExpectedError(expectedError);
     }
   });
-  if (loaderResult || expectedError) {
-    return loaderResult || null;
+  if (expectedError) {
+    return null;
+  }
+
+  if (queriesAreLoading) {
+    return <BlankLoadingScreen />;
   }
 
   // Skip showing the upload screen in the case of tests.
@@ -122,10 +118,8 @@ function DevTools({
     return <UploadScreen recording={recording} />;
   }
 
-  if (recordingDuration === null) {
-    loaderResult = <BlankLoadingScreen />;
-  } else if (uploading) {
-    loaderResult = <BlankLoadingScreen />;
+  if (recordingDuration === null || uploading) {
+    return <BlankLoadingScreen />;
   }
 
   if (!finishedLoading) {
