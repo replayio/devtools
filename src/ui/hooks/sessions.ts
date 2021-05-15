@@ -62,20 +62,3 @@ export function useGetActiveSessions(recordingId: RecordingId) {
 
   return { users, loading };
 }
-
-export function useAddSessionUser() {
-  const [AddSessionUser, { error }] = useMutation(gql`
-    mutation AddSessionUser($id: String!, $user_id: uuid!) {
-      update_sessions_by_pk(pk_columns: { id: $id }, _set: { user_id: $user_id }) {
-        id
-        user_id
-      }
-    }
-  `);
-
-  if (error) {
-    console.error("Apollo error while adding a session user", error);
-  }
-
-  return AddSessionUser;
-}

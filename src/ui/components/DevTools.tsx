@@ -29,7 +29,6 @@ function DevTools({
   recordingId,
   setExpectedError,
   selectedPanel,
-  sessionId,
   viewMode,
   recordingTarget,
   setViewMode,
@@ -39,7 +38,6 @@ function DevTools({
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
 
-  const AddSessionUser = hooks.useAddSessionUser();
   const { recording, isAuthorized, loading: recordingQueryLoading } = hooks.useGetRecording(
     recordingId
   );
@@ -58,12 +56,6 @@ function DevTools({
       gToolbox.init(selectedPanel);
     }
   }, [loading]);
-
-  useEffect(() => {
-    if (loading == 100 && userId && sessionId) {
-      AddSessionUser({ variables: { id: sessionId, user_id: userId } });
-    }
-  }, [loading, userId, sessionId]);
 
   useEffect(() => {
     if (title) {
@@ -149,7 +141,6 @@ const connector = connect(
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
     recordingDuration: selectors.getRecordingDuration(state),
-    sessionId: selectors.getSessionId(state),
     selectedPanel: selectors.getSelectedPanel(state),
     viewMode: selectors.getViewMode(state),
     narrowMode: selectors.getNarrowMode(state),
