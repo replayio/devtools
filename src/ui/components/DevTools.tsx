@@ -87,10 +87,6 @@ function DevTools({
 
   if (queriesAreLoading) {
     loaderResult = <BlankLoadingScreen />;
-  } else if (recordingDuration === null) {
-    loaderResult = <BlankLoadingScreen />;
-  } else if (uploading) {
-    loaderResult = <BlankLoadingScreen />;
   }
 
   if (!loaderResult) {
@@ -124,6 +120,12 @@ function DevTools({
   // Skip showing the upload screen in the case of tests.
   if (recording && !recording.isInitialized && isAuthor && !isTest()) {
     return <UploadScreen recording={recording} />;
+  }
+
+  if (recordingDuration === null) {
+    loaderResult = <BlankLoadingScreen />;
+  } else if (uploading) {
+    loaderResult = <BlankLoadingScreen />;
   }
 
   if (!finishedLoading) {
