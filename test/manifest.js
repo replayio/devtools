@@ -87,6 +87,11 @@ module.exports = [
     script: "stepping-06.js",
     targets: ["gecko", "chromium"],
   },
+  {
+    example: "node/async.js",
+    script: "node_stepping-01.js",
+    targets: ["node"],
+  },
 
   //////////////////////////////////////////////////////////////////////////////
   // Console
@@ -164,6 +169,11 @@ module.exports = [
   {
     example: "node/basic.js",
     script: "node_logpoint-01.js",
+    targets: ["node"],
+  },
+  {
+    example: "node/exceptions.js",
+    script: "node_logpoint-02.js",
     targets: ["node"],
   },
 
