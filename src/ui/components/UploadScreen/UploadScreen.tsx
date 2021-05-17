@@ -169,6 +169,17 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
   const updateIsPrivate = hooks.useUpdateIsPrivate();
   const deleteRecording = hooks.useDeleteRecording(() => setStatus("deleted"));
 
+  useEffect(() => {
+    // Show a prompt making sure the user doesn't accidentally navigate away from the page.
+    window.onbeforeunload = () => {
+      return true;
+    };
+
+    return () => {
+      window.onbeforeunload = null;
+    };
+  }, []);
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -182,6 +193,7 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
   };
   const onDiscard = () => {
     setStatus("deleting");
+    window.onbeforeunload = null;
     deleteRecording({ variables: { recordingId } });
   };
 
