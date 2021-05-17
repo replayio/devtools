@@ -11,7 +11,7 @@ export default function TeamSelect({
   selectedWorkspaceId: string | null;
   setSelectedWorkspaceId: Dispatch<SetStateAction<string | null>>;
 }) {
-  const displayedWorkspaces = [{ id: null, name: "---" }, ...workspaces].sort();
+  const displayedWorkspaces = [{ id: null, name: "My Library" }, ...workspaces].sort();
 
   return (
     <SelectMenu
