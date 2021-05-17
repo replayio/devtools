@@ -17,6 +17,7 @@ const {
   setExceptionLogpoint,
   removeLogpoint,
 } = require("protocol/logpoint");
+const { assert } = require("protocol/utils");
 
 let currentThreadFront;
 let currentTarget;
@@ -160,6 +161,15 @@ function runAnalysis(location, options) {
   } else {
     setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition, showInConsole);
   }
+}
+
+function runMultiSourceAnalysis(locations, options) {
+  options = maybeGenerateLogGroupId(options);
+  const { condition, logValue, logGroupId } = options;
+  assert(locations.every(loc => loc.sourceId));
+  const showInConsole = false;
+
+  setLogpoint(logGroupId, locations, logValue, condition, showInConsole);
 }
 
 async function evaluateExpressions(sources, options) {
@@ -382,6 +392,7 @@ const clientCommands = {
   removeWatchpoint,
   removeBreakpoint,
   runAnalysis,
+  runMultiSourceAnalysis,
   evaluate,
   evaluateExpressions,
   navigate,

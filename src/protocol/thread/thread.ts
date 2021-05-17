@@ -990,6 +990,23 @@ class _ThreadFront {
 
     return description;
   }
+
+  // Given the sourceId of a preferred or alternate source,
+  // get all sourceIds of preferred/alternate sources with the same URL.
+  async getCorrespondingSourceIds(sourceId: SourceId) {
+    const url = await this.getSourceURL(sourceId);
+    if (!url) {
+      return [sourceId];
+    }
+
+    const groups = this._chooseSourceIdList(this.getSourceIdsForURL(url));
+    const isPreferred = groups.some(group => group.sourceId === sourceId);
+    if (!isPreferred) {
+      assert(groups.some(group => group.alternateId === sourceId));
+    }
+
+    return groups.map(group => (isPreferred ? group.sourceId : group.alternateId!));
+  }
 }
 
 export const ThreadFront = new _ThreadFront();
