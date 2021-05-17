@@ -99,7 +99,7 @@ function Error({ error }: { error: ExpectedError | UnexpectedError }) {
 
 function ExpectedErrorScreen({ error }: { error: ExpectedError }) {
   return (
-    <BlankScreen className="absolute">
+    <BlankScreen className="absolute z-10">
       <Modal>
         <Error error={error} />
       </Modal>
