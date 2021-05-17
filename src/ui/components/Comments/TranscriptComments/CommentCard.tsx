@@ -5,21 +5,17 @@ import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import NewCommentEditor from "./CommentEditor/NewCommentEditor";
-import {
-  Comment,
-  PendingComment,
-  PendingNewComment,
-  PendingNewReply,
-  Reply,
-} from "ui/state/comments";
+import { Comment, PendingComment, PendingNewComment, Reply } from "ui/state/comments";
 import ExistingCommentEditor from "./CommentEditor/ExistingCommentEditor";
 import CommentActions from "./CommentActions";
 import CommentSource from "./CommentSource";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import useAuth0 from "ui/utils/useAuth0";
-import { setModal } from "ui/actions/app";
 import useDraftJS from "./CommentEditor/use-draftjs";
+import CommentCardFooter from "./CommentCardFooter";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
+
+const hoveredStyles = "shadow-xl border-blue-600 hover:border-blue-600";
 
 function CommentItem({
   pendingComment,
@@ -78,6 +74,8 @@ function CommentCard({
   seekToComment,
   setModal,
   replyToComment,
+  hoveredComment,
+  setHoveredComment,
   pendingComment,
 }: CommentCardProps) {
   const { isAuthenticated } = useAuth0();
@@ -116,8 +114,16 @@ function CommentCard({
   // comment for a pending new comment.
   if (!("id" in comment)) {
     return (
-      <div className={`mx-auto w-full group`}>
-        <div className={classNames("bg-white rounded-xl border border-blue-400 shadow-lg")}>
+      <div
+        className={`mx-auto w-full group`}
+        onMouseEnter={() => setHoveredComment("pendingCommentId")}
+        onMouseLeave={() => setHoveredComment(null)}
+      >
+        <div
+          className={classNames("bg-white rounded-xl border border-blue-400 shadow-lg", {
+            [hoveredStyles]: hoveredComment == "pendingCommentId" && isPaused,
+          })}
+        >
           {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
           <NewCommentEditor comment={comment} type={"new_comment"} />
         </div>
@@ -126,11 +132,17 @@ function CommentCard({
   }
 
   return (
-    <div className={`mx-auto w-full group`} onClick={() => seekToComment(comment)}>
+    <div
+      className={`mx-auto w-full group`}
+      onClick={() => seekToComment(comment)}
+      onMouseEnter={() => setHoveredComment(comment.id)}
+      onMouseLeave={() => setHoveredComment(null)}
+    >
       <div
         className={classNames("bg-white rounded-xl border border-gray-300 hover:border-blue-400", {
           "border-blue-400 shadow-lg": isPaused,
           "cursor-pointer": !isPaused,
+          [hoveredStyles]: hoveredComment == comment.id && isPaused,
         })}
       >
         {comment.sourceLocation ? <CommentSource comment={comment} /> : null}
@@ -140,23 +152,7 @@ function CommentCard({
             <CommentItem comment={reply} pendingComment={pendingComment} />
           </div>
         ))}
-        {isPaused && !isEditing ? (
-          pendingComment && pendingComment.type.includes("new") ? (
-            <div className="border-t border-gray-200">
-              <NewCommentEditor
-                comment={pendingComment.comment as PendingNewReply}
-                type={"new_reply"}
-              />
-            </div>
-          ) : (
-            <div
-              className="mt-6 border-t border-gray-200 px-4 py-4 text-lg text-gray-400"
-              onClick={onReply}
-            >
-              Write a reply...
-            </div>
-          )
-        ) : null}
+        {isPaused && !isEditing ? <CommentCardFooter comment={comment} onReply={onReply} /> : null}
       </div>
     </div>
   );
@@ -167,12 +163,14 @@ const connector = connect(
     pendingComment: selectors.getPendingComment(state),
     currentTime: selectors.getCurrentTime(state),
     executionPoint: getExecutionPoint(state),
+    hoveredComment: selectors.getHoveredComment(state),
   }),
   {
     replyToComment: actions.replyToComment,
     setModal: actions.setModal,
     seekToComment: actions.seekToComment,
     editItem: actions.editItem,
+    setHoveredComment: actions.setHoveredComment,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
