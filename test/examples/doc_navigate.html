@@ -1,0 +1,15 @@
+<script src="mapped_minified.js"></script>
+<script>
+function navigate() {
+  window.location.href = `doc_navigate.html?navigated=true`;
+}
+function recordingFinished() {
+  dump(`RecReplaySendAsyncMessage Example__Finished`);
+}
+const navigated = new URL(window.location.href).searchParams.get("navigated");
+if (!navigated) {
+  setTimeout(navigate, 100);
+} else {
+  setTimeout(recordingFinished, 100);
+}
+</script>

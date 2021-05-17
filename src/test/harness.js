@@ -90,6 +90,15 @@ function waitForSource(url) {
   return waitUntil(() => findSource(url));
 }
 
+function countSources(url) {
+  const sources = dbgSelectors.getSourceList();
+  return sources.filter(s => (s.url || "").includes(url)).length;
+}
+
+function waitForSourceCount(url, count) {
+  return waitUntil(() => countSources(url) === count);
+}
+
 async function selectSource(url) {
   const source = await waitForSource(url);
   await dbg.actions.selectLocation(getContext(), { sourceId: source.id }, { keepContext: false });
@@ -728,6 +737,7 @@ const testCommands = {
   checkHighlighterVisible,
   checkHighlighterShape,
   getRecordingTarget,
+  waitForSourceCount,
 };
 
 const commands = mapValues(testCommands, (command, name) => {

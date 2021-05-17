@@ -46,6 +46,11 @@ module.exports = [
     targets: ["gecko"],
   },
   {
+    example: "doc_navigate.html",
+    script: "breakpoints-07.js",
+    targets: ["gecko", "chromium"],
+  },
+  {
     example: "node/control_flow.js",
     script: "node_control_flow.js",
     targets: ["node"],
