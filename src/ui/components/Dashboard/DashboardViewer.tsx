@@ -3,7 +3,7 @@ import classnames from "classnames";
 const DashboardViewerHeader = require("./DashboardViewerHeader").default;
 const DashboardViewerContent = require("./DashboardViewerContent").default;
 import { SelectMenu, TextInput } from "ui/components/shared/Forms";
-import { getUserId } from "ui/utils/useToken";
+const { prefs } = require("ui/utils/prefs");
 import { Recording } from "ui/types";
 import hooks from "ui/hooks";
 
@@ -62,8 +62,10 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
   const [editing, setEditing] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchString, setSearchString] = useState<string>("");
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
-  const [associationFilter, setAssociationFilter] = useState<AssociationFilter>("all");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>(prefs.libraryFilterTime);
+  const [associationFilter, setAssociationFilter] = useState<AssociationFilter>(
+    prefs.libraryFilterAssociation
+  );
 
   const toggleEditing = () => {
     if (editing) {
@@ -71,7 +73,14 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
     }
     setEditing(!editing);
   };
-
+  const setAssociation = (association: AssociationFilter) => {
+    setAssociationFilter(association);
+    prefs.libraryFilterAssociation = association;
+  };
+  const setTime = (time: TimeFilter) => {
+    setTimeFilter(time);
+    prefs.libraryFilterTime = time;
+  };
   const filteredRecordings = filterRecordings(
     recordings,
     timeFilter,
@@ -92,7 +101,7 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
           <>
             <SelectMenu
               selected={associationFilter}
-              setSelected={value => setAssociationFilter(value as AssociationFilter)}
+              setSelected={value => setAssociation(value as AssociationFilter)}
               options={[
                 { id: "all", name: "All Replays" },
                 { id: "comment", name: "Replays I've commented on" },
@@ -103,7 +112,7 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
             />
             <SelectMenu
               selected={timeFilter}
-              setSelected={value => setTimeFilter(value as TimeFilter)}
+              setSelected={value => setTime(value as TimeFilter)}
               options={[
                 { id: "all", name: "All Time" },
                 { id: "month", name: "This month" },

@@ -31,6 +31,8 @@ pref("devtools.video", !!urlPrefs.video);
 pref("devtools.maxHitsDisplayed", 500);
 pref("devtools.maxHitsEditable", 200);
 pref("devtools.defaultLibraryTeam", "null");
+pref("devtools.libraryFilterTime", "all");
+pref("devtools.libraryFilterAssociation", "all");
 
 // app features
 pref("devtools.features.comments", true);
@@ -59,6 +61,8 @@ export const prefs = new PrefsHelper("devtools", {
   maxHitsDisplayed: ["Int", "maxHitsDisplayed"],
   maxHitsEditable: ["Int", "maxHitsEditable"],
   defaultLibraryTeam: ["String", "defaultLibraryTeam"],
+  libraryFilterTime: ["String", "libraryFilterTime"],
+  libraryFilterAssociation: ["String", "libraryFilterAssociation"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
