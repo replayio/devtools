@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
@@ -49,18 +49,15 @@ function Links({ recordingId, sessionId, recordingTarget }) {
   );
 }
 
-function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
-  const { recording, loading } = hooks.useGetRecording(recordingId);
+// This is a workaround for getting an automatically-resizing horizontal text input
+// so that switching between the editing and non-editing states is smoonth.
+// https://stackoverflow.com/questions/45306325/react-contenteditable-and-cursor-position
+function HeaderTitle({ recording, recordingId }) {
+  const [inputValue, setInputValue] = useState(recording.title);
+  const inputNode = useRef(null);
   const { userId } = hooks.useGetUserId();
+  const updateRecordingTitle = hooks.useUpdateRecordingTitle();
   const isAuthor = userId && userId == recording.userId;
-
-  if (!recordingId) {
-    return <div className="title">Recordings</div>;
-  }
-
-  if (loading) {
-    return null;
-  }
 
   if (isAuthor && !recording.isInitialized && !isTest()) {
     return (
@@ -70,32 +67,49 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
     );
   }
 
-  const { title } = recording || {};
+  const onKeyPress = e => {
+    if (e.code == "Enter" || e.code == "Escape") {
+      e.preventDefault();
+      inputNode.current.blur();
+    }
+  };
+  const onBlur = () => {
+    const currentValue = inputNode.current.innerHTML;
+
+    updateRecordingTitle({ variables: { recordingId, title: currentValue } });
+    setInputValue(currentValue);
+  };
 
   return (
-    <div className="title-container">
-      <Title
-        defaultTitle={title}
-        setEditingTitle={setEditingTitle}
-        editingTitle={editingTitle}
-        recordingId={recordingId}
-        allowEditOnTitleClick={true}
-      />
-    </div>
+    <span
+      className="input focus:ring-blue-500 ml-2 focus:border-blue-500 text-2xl font-semibold p-1 bg-transparent w-full border-black"
+      role="textbox"
+      spellCheck="false"
+      contentEditable
+      onBlur={onBlur}
+      onKeyPress={onKeyPress}
+      onKeyDown={onKeyPress}
+      dangerouslySetInnerHTML={{ __html: inputValue }}
+      ref={inputNode}
+    />
   );
 }
 
 function Header({ recordingId, sessionId, recordingTarget }) {
-  const [editingTitle, setEditingTitle] = useState(false);
+  const { recording, loading } = hooks.useGetRecording(recordingId);
+
+  if (loading) {
+    return <div id="header"></div>;
+  }
 
   return (
     <div id="header">
       <div className="header-left">
-        <HeaderTitle
-          recordingId={recordingId}
-          setEditingTitle={setEditingTitle}
-          editingTitle={editingTitle}
-        />
+        {recordingId ? (
+          <HeaderTitle recording={recording} recordingId={recordingId} />
+        ) : (
+          <div className="title">Recordings</div>
+        )}
       </div>
       <Links recordingId={recordingId} sessionId={sessionId} recordingTarget={recordingTarget} />
     </div>
