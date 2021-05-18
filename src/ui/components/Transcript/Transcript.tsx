@@ -7,23 +7,31 @@ import "./Transcript.css";
 import { UIState } from "ui/state";
 import { Comment, PendingNewComment } from "ui/state/comments";
 import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
+import useAuth0 from "ui/utils/useAuth0";
 
 function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
   const { comments } = hooks.useGetComments(recordingId!);
   const { recording, loading } = hooks.useGetRecording(recordingId!);
   const { userId } = hooks.useGetUserId();
   const isAuthor = userId && userId == recording?.userId;
+  
 
   if (loading) {
     return null;
   }
 
   const displayedComments: (Comment | PendingNewComment)[] = [...comments];
-
   if (pendingComment?.type == "new_comment") {
     displayedComments.push(pendingComment.comment);
   }
-
+  
+  const { isAuthenticated } = useAuth0();  
+  function emptyStateText() {
+    return (isAuthenticated ? 
+      'None yet! Please click the video to add a comment.' : 
+      'Please log in to add a comment to this replay.');
+  }
+  
   return (
     <div className="right-sidebar">
       <div className="right-sidebar-toolbar">
@@ -38,7 +46,7 @@ function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
           </div>
         ) : (
           <div className="transcript-list space-y-4 text-lg text-gray-500">
-            None yet! Please click on the video to place the first comment.
+            {emptyStateText()}
           </div>
         )}
       </div>
