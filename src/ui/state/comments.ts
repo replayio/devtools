@@ -4,7 +4,6 @@ export interface CommentsState {
   pendingComment: PendingComment | null;
   hoveredComment: any;
   shouldShowLoneEvents: boolean;
-  floatingItem: FloatingItem | null;
 }
 
 export interface SourceLocation {
@@ -23,14 +22,6 @@ interface User {
   picture: string;
   name: string;
   id: string;
-}
-
-export interface FloatingItem {
-  itemType: "pause";
-  time: number;
-  point: string;
-  hasFrames: boolean;
-  location?: SourceLocation;
 }
 
 export interface Comment {
