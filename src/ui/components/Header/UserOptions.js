@@ -60,19 +60,7 @@ function UserOptions({ recordingId, setModal }) {
         setExpanded={setExpanded}
         expanded={expanded}
         orientation="bottom"
-      >
-        {recordingId ? (
-          <button className="row" onClick={onLibraryClick}>
-            <MaterialIcon>home</MaterialIcon>
-            <span>Library</span>
-          </button>
-        ) : null}
-        {showShare && (
-          <button className="row" onClick={onShareClick}>
-            <MaterialIcon>share</MaterialIcon>
-            <span>Share</span>
-          </button>
-        )}
+      >                
         <button className="row" onClick={onLaunchClick}>
           <MaterialIcon>download</MaterialIcon>
           <span>Download Replay</span>
