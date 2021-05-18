@@ -28,12 +28,12 @@ function NewWorkspaceModal({ hideModal }: PropsFromRedux) {
       <Modal>
         <main>
           <h1>
-            <MaterialIcon>add_circle</MaterialIcon>
-            <span>Create a new team</span>
+            <MaterialIcon>group_add</MaterialIcon>
+            <span>Name your team</span>
           </h1>         
           <form onSubmit={handleSave} className="flex flex-col space-y-4">
             <TextInput
-              placeholder="Your new team name"
+              placeholder="Your team name"
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
             />
