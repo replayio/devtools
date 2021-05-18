@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Setting, UserSettings } from "./types";
+import { Setting } from "./types";
+import { UserSettings } from "ui/types";
 import ReplayInvitations from "./ReplayInvitations";
 import "./SettingsBody.css";
 import SettingsBodyItem from "./SettingsBodyItem";
