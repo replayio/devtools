@@ -60,7 +60,7 @@ const settings: Settings = [
         label: "Enable repainting",
         type: "checkbox",
         key: "enableRepaint",
-        description: "Repaint the DOM whenever we jump in time",
+        description: "Repaint the DOM on demand",
         disabled: false,
         needsRefresh: false,
       },
