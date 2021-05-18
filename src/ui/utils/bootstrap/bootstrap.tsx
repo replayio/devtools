@@ -60,7 +60,7 @@ function ApolloWrapper({
   const { loading, token, error } = useToken();
 
   if (loading) {
-    return <BlankLoadingScreen />;
+    return recordingId ? <BlankLoadingScreen /> : null;
   }
 
   if (error) {
