@@ -12,6 +12,7 @@ import hooks from "ui/hooks";
 import { isTest } from "ui/utils/environment";
 import ShareButton from "./ShareButton";
 import useAuth0 from "ui/utils/useAuth0";
+import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 
 import "./Header.css";
 
@@ -87,10 +88,24 @@ function HeaderTitle({ recordingId, editingTitle, setEditingTitle }) {
 
 function Header({ recordingId, sessionId, recordingTarget }) {
   const [editingTitle, setEditingTitle] = useState(false);
+  const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
+   const dashboardUrl = `${window.location.origin}/view`;
 
+   const onNavigateBack = event => {
+     if (event.metaKey) {
+       return window.open(dashboardUrl);
+     }
+     window.location = dashboardUrl;
+   };
+  
   return (
-    <div id="header">
+    <div id="header">    
       <div className="header-left">
+      <IconWithTooltip
+       icon={backIcon}
+       content={"Back to Library"}
+       handleClick={e => onNavigateBack(e)}
+     />
         <HeaderTitle
           recordingId={recordingId}
           setEditingTitle={setEditingTitle}
