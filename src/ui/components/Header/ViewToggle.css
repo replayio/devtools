@@ -39,7 +39,7 @@
 }
 .view-toggle .active {
   color: #000;
-  font-weight: bold;
+  font-weight: 400;
 }
 
 .view-toggle .handle {

@@ -12,6 +12,7 @@ import hooks from "ui/hooks";
 import { isTest } from "ui/utils/environment";
 import ShareButton from "./ShareButton";
 import useAuth0 from "ui/utils/useAuth0";
+import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 
 import "./Header.css";
 
@@ -82,7 +83,7 @@ function HeaderTitle({ recording, recordingId }) {
 
   return (
     <span
-      className="input focus:ring-blue-500 ml-2 focus:border-blue-500 text-2xl font-semibold p-1 bg-transparent w-full border-black"
+      className="input focus:ring-blue-500 ml-2 focus:border-blue-500 text-2xl p-1 bg-transparent w-full border-black"
       role="textbox"
       spellCheck="false"
       contentEditable
@@ -97,7 +98,16 @@ function HeaderTitle({ recording, recordingId }) {
 
 function Header({ recordingId, sessionId, recordingTarget }) {
   const { recording, loading } = hooks.useGetRecording(recordingId);
+  const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
+  const dashboardUrl = `${window.location.origin}/view`;
 
+  const onNavigateBack = event => {
+    if (event.metaKey) {
+      return window.open(dashboardUrl);
+    }
+    window.location = dashboardUrl;
+  };
+  
   if (loading) {
     return <div id="header"></div>;
   }
@@ -105,6 +115,11 @@ function Header({ recordingId, sessionId, recordingTarget }) {
   return (
     <div id="header">
       <div className="header-left">
+      <IconWithTooltip
+      icon={backIcon}
+      content={"Back to Library"}
+      handleClick={e => onNavigateBack(e)}
+    />
         {recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />
         ) : (
