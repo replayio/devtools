@@ -107,7 +107,7 @@ function Header({ recordingId, sessionId, recordingTarget }) {
     }
     window.location = dashboardUrl;
   };
-  
+
   if (loading) {
     return <div id="header"></div>;
   }
@@ -115,11 +115,11 @@ function Header({ recordingId, sessionId, recordingTarget }) {
   return (
     <div id="header">
       <div className="header-left">
-      <IconWithTooltip
-      icon={backIcon}
-      content={"Back to Library"}
-      handleClick={e => onNavigateBack(e)}
-    />
+        <IconWithTooltip
+          icon={backIcon}
+          content={"Back to Library"}
+          handleClick={e => onNavigateBack(e)}
+        />
         {recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />
         ) : (
