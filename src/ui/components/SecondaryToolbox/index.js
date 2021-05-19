@@ -17,6 +17,7 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode, isNode }) {
   const { userSettings } = hooks.useGetUserSettings();
 
   const showElements = userSettings.showElements || isTest();
+  const showReact = userSettings.showReact || isTest();
   const onClick = panel => {
     setSelectedPanel(panel);
 
@@ -54,7 +55,7 @@ function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode, isNode }) {
           <div className="label">Viewer</div>
         </button>
       ) : null}
-      {userSettings.showReact && !isNode && (
+      {showReact && !isNode && (
         <button
           className={classnames("components-panel-button", {
             expanded: selectedPanel === "react-components",
@@ -87,9 +88,8 @@ function InspectorPanel() {
 }
 
 function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode, recordingTarget }) {
-  const {
-    userSettings: { showReact },
-  } = hooks.useGetUserSettings();
+  const { userSettings } = hooks.useGetUserSettings();
+  const showReact = userSettings.showReact || isTest();
   const isNode = recordingTarget === "node";
   return (
     <div className={classnames(`secondary-toolbox`, { node: isNode })}>
