@@ -97,6 +97,7 @@ function HeaderTitle({ recording, recordingId }) {
 }
 
 function Header({ recordingId, sessionId, recordingTarget }) {
+  const { isAuthenticated } = useAuth0();
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const backIcon = <div className="img arrowhead-right" style={{ transform: "rotate(180deg)" }} />;
   const dashboardUrl = `${window.location.origin}/view`;
@@ -115,11 +116,13 @@ function Header({ recordingId, sessionId, recordingTarget }) {
   return (
     <div id="header">
       <div className="header-left">
-        <IconWithTooltip
-          icon={backIcon}
-          content={"Back to Library"}
-          handleClick={e => onNavigateBack(e)}
-        />
+        {isAuthenticated && (
+          <IconWithTooltip
+            icon={backIcon}
+            content={"Back to Library"}
+            handleClick={e => onNavigateBack(e)}
+          />
+        )}{" "}
         {recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />
         ) : (
