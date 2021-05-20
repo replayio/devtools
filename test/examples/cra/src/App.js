@@ -11,7 +11,7 @@ function App() {
   useEffect(() => {
     async function update() {
       setList([{ key: "1", text: "Foo" }]);
-      await waitForTime(500);
+      await waitForTime(2000);
       console.log("Initial list");
 
       setList([
