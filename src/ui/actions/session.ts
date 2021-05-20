@@ -10,10 +10,12 @@ const { prefs } = require("ui/utils/prefs");
 import { getTest, isTest, isDevelopment } from "ui/utils/environment";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
-import { ExpectedError } from "ui/state/app";
-import { getExpectedError } from "ui/reducers/app";
+import { ExpectedError, UnexpectedError } from "ui/state/app";
+import { getUnexpectedError } from "ui/reducers/app";
 
-export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & { error: sessionError };
+export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
+  error: UnexpectedError;
+};
 export type SetExpectedErrorAction = Action<"set_expected_error"> & { error: ExpectedError };
 export type SessionActions = SetExpectedErrorAction | SetUnexpectedErrorAction;
 
@@ -28,9 +30,17 @@ export async function createSession(store: UIStore, recordingId: string) {
   addEventListener("Recording.uploadedData", (data: uploadedData) =>
     store.dispatch(onUploadedData(data))
   );
-  addEventListener("Recording.sessionError", (err: sessionError) =>
-    store.dispatch(onSessionError(err))
+  addEventListener("Recording.sessionError", (error: sessionError) =>
+    store.dispatch(
+      setUnexpectedError({
+        ...error,
+        message: "Unexpected session error",
+        content: "The session has closed due to an error. Please refresh the page.",
+        action: "refresh",
+      })
+    )
   );
+
   try {
     ThreadFront.setTest(getTest() || undefined);
     ThreadFront.recordingId = recordingId;
@@ -56,11 +66,18 @@ export async function createSession(store: UIStore, recordingId: string) {
     prefs.recordingId = recordingId;
   } catch (e) {
     if (e.code == 9 || e.code == 31) {
-      const currentExpectedError = getExpectedError(store.getState());
+      const currentError = getUnexpectedError(store.getState());
 
       // Don't overwrite an existing error.
-      if (!currentExpectedError) {
-        store.dispatch(setExpectedError(e));
+      if (!currentError) {
+        store.dispatch(
+          setUnexpectedError({
+            message: "Unexpected session error",
+            content: "The session has closed due to an error. Please refresh the page.",
+            action: "refresh",
+            ...e,
+          })
+        );
       }
     } else {
       throw e;
@@ -76,37 +93,33 @@ function onUploadedData({ uploaded, length }: uploadedData): UIThunkAction {
   };
 }
 
-function onSessionError(error: sessionError): UIThunkAction {
-  return ({ dispatch }) => {
-    dispatch(setUnexpectedError(error));
-  };
-}
-
 export function setExpectedError(error: ExpectedError): UIThunkAction {
   return ({ getState, dispatch }) => {
     const state = getState();
+
     sendTelemetryEvent("DevtoolsExpectedError", {
       message: error.message,
       action: error.action,
-      type: error.type,
-      stack: error.stack,
       recordingId: selectors.getRecordingId(state),
       sessionId: selectors.getSessionId(state),
       environment: isDevelopment() ? "dev" : "prod",
     });
+
     dispatch({ type: "set_expected_error", error });
   };
 }
 
-export function setUnexpectedError(error: sessionError): UIThunkAction {
+export function setUnexpectedError(error: UnexpectedError): UIThunkAction {
   return ({ getState, dispatch }) => {
     const state = getState();
+
     sendTelemetryEvent("DevtoolsUnexpectedError", {
       ...error,
       recordingId: selectors.getRecordingId(state),
       sessionId: selectors.getSessionId(state),
       environment: isDevelopment() ? "dev" : "prod",
     });
+
     dispatch({ type: "set_unexpected_error", error });
   };
 }

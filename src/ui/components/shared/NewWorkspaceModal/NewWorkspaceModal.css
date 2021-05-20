@@ -19,6 +19,7 @@
   width: 400px;
   padding: 0px;
   min-width: auto;
+  min-height: none;
   display: flex;
   flex-direction: row;
   justify-content: stretch;

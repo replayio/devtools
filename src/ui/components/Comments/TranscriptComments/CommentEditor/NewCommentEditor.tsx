@@ -17,7 +17,6 @@ function NewCommentEditor({
   type,
   clearPendingComment,
   recordingId,
-  canvas,
 }: NewCommentEditorProps) {
   const addComment = hooks.useAddComment();
   const addCommentReply = hooks.useAddCommentReply();
@@ -81,7 +80,6 @@ function NewCommentEditor({
 const connector = connect(
   (state: UIState) => ({
     recordingId: selectors.getRecordingId(state),
-    canvas: selectors.getCanvas(state),
   }),
   { clearPendingComment: actions.clearPendingComment }
 );

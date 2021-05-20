@@ -59,7 +59,7 @@ export default function SelectMenu({
   const selectedName = options.find(option => option.id === selected)!.name;
 
   return (
-    <div className={className}>
+    <div>
       <Listbox value={selected} onChange={setSelected}>
         {({ open }) => (
           <>
@@ -68,7 +68,7 @@ export default function SelectMenu({
                 label
               </Listbox.Label>
             ) : null}
-            <div className="mt-1 relative z-10">
+            <div className={`mt-1 relative z-10 ${className}`}>
               <Listbox.Button className="bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-lg">
                 <span className="block truncate">{selectedName}</span>
                 <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">

@@ -4,7 +4,7 @@ import useAuth0 from "ui/utils/useAuth0";
 
 import DevTools from "./DevTools";
 const Account = require("./Account").default;
-import { AppErrors } from "./shared/Error";
+import AppErrors from "./shared/Error";
 const LoginModal = require("./shared/LoginModal").default;
 const SkeletonLoader = require("ui/components/SkeletonLoader").default;
 import SharingModal from "./shared/SharingModal";
@@ -26,6 +26,7 @@ import { useGetUserInfo } from "ui/hooks/users";
 import { useGetRecording } from "ui/hooks/recordings";
 
 import "styles.css";
+import UploadingScreen from "./UploadingScreen";
 var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
@@ -103,11 +104,7 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
   }, [auth, userInfo, recordingInfo]);
 
   if (hasLoadingParam()) {
-    return <SkeletonLoader content={"Uploading resources"} />;
-  }
-
-  if (false /* loading */) {
-    return <SkeletonLoader content={"Loading"} />;
+    return <UploadingScreen />;
   }
 
   if (!isDeployPreview() && auth.isLoading) {

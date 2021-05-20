@@ -34,9 +34,13 @@ html {
   height: 100%;
 }
 
-#graphics {
-  position: relative;
+#graphics, #graphicsVideo {
+  position: absolute;
   transform-origin: top left;
+}
+
+#graphicsVideo {
+  max-width: unset;
 }
 
 .collapsed-toolbox #graphics {

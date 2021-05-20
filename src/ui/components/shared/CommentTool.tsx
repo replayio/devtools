@@ -1,13 +1,13 @@
 import { connect, ConnectedProps } from "react-redux";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 import "./CommentTool.css";
 import { Comment, Reply } from "ui/state/comments";
-import { ChatIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
+import { Canvas } from "ui/state/app";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
@@ -19,6 +19,39 @@ const mouseEventCanvasPosition = (e: MouseEvent) => {
     x: (e.clientX - bounds.left) / scale,
     y: (e.clientY - bounds.top) / scale,
   };
+};
+
+const getStyles = (
+  mousePosition: Coordinates,
+  canvas: Canvas,
+  captionNode: HTMLDivElement | null
+) => {
+  const margin = 6;
+  const { x, y } = mousePosition;
+  const mouseTop = y * canvas.scale;
+  const mouseLeft = x * canvas.scale;
+
+  const parentStyle = { left: mouseLeft, top: mouseTop };
+  const childStyle = { marginTop: margin, marginLeft: margin, transitionDuration: "100ms" };
+
+  // On the first render of CommentTool, the node ref won't be available yet.
+  if (!captionNode) {
+    return { parentStyle, childStyle };
+  }
+
+  const canvasNode = document.getElementById("graphics");
+  const bounds = canvasNode!.getBoundingClientRect();
+  const { width, height } = captionNode.getBoundingClientRect();
+
+  if (bounds.left + mouseLeft + width + margin > bounds.right) {
+    childStyle.marginLeft = -(width + margin);
+  }
+
+  if (bounds.top + mouseTop + height + margin > bounds.bottom) {
+    childStyle.marginTop = -(height + margin);
+  }
+
+  return { parentStyle, childStyle };
 };
 
 type CommentToolProps = PropsFromRedux & {
@@ -41,9 +74,7 @@ function CommentTool({
 }: CommentToolProps) {
   const [showHelper, setShowHelper] = useState(false);
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
-  const isInvalidNewComment = comments.find(
-    comment => comment.point == executionPoint && comment.time == currentTime
-  );
+  const captionNode = useRef<HTMLDivElement | null>(null);
 
   const addListeners = () => {
     const videoNode = document.getElementById("graphics");
@@ -75,14 +106,6 @@ function CommentTool({
     // If there's no pending comment at that point and time, create one
     // with the mouse click as its position.
     if (!pendingComment) {
-      const isInvalidNewComment = comments.find(
-        comment => comment.point == executionPoint && comment.time == currentTime
-      );
-
-      if (isInvalidNewComment) {
-        return;
-      }
-
       createComment(currentTime, executionPoint, mouseEventCanvasPosition(e));
       return;
     }
@@ -111,25 +134,33 @@ function CommentTool({
     return () => removeListeners();
   }, [currentTime, executionPoint, pendingComment, comments]);
 
-  if (!showHelper || !mousePosition || pendingComment) {
+  if (
+    !showHelper ||
+    !mousePosition ||
+    pendingComment?.type === "edit_reply" ||
+    pendingComment?.type === "new_reply"
+  ) {
     return null;
   }
 
-  const { x, y } = mousePosition;
+  const { parentStyle, childStyle } = getStyles(mousePosition, canvas!, captionNode.current);
 
   return (
-    <div
-      className={classNames(
-        "px-4 py-2 absolute text-white ml-2 mt-2 rounded-xl w-max space-x-2 flex items-center",
-        {
-          "bg-blue-500": !isInvalidNewComment,
-          "bg-gray-500": isInvalidNewComment,
-        }
-      )}
-      style={{ top: y * canvas!.scale, left: x * canvas!.scale }}
-    >
-      <ChatIcon className="h-6 w-6" aria-hidden="true" />
-      <span>{isInvalidNewComment ? "A comment already exists here" : "Add Comment"}</span>
+    <div style={parentStyle} className="absolute">
+      <div
+        className={classNames(
+          "px-3 py-1 absolute text-base text-white rounded-2xl w-max space-x-2 flex items-center bg-black bg-opacity-70",
+          !captionNode.current ? "invisible" : ""
+        )}
+        style={childStyle}
+        ref={captionNode}
+      >
+        {pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment" ? (
+          <span>{"Move the marker"}</span>
+        ) : (
+          <span>{"Add Comment"}</span>
+        )}
+      </div>
     </div>
   );
 }

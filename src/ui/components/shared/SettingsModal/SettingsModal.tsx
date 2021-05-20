@@ -56,6 +56,14 @@ const settings: Settings = [
         disabled: false,
         needsRefresh: false,
       },
+      {
+        label: "Enable repainting",
+        type: "checkbox",
+        key: "enableRepaint",
+        description: "Repaint the DOM on demand",
+        disabled: false,
+        needsRefresh: false,
+      },
     ],
   },
   {

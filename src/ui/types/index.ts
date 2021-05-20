@@ -5,6 +5,14 @@ export interface User {
   internal: boolean;
 }
 
+export interface UserSettings {
+  showElements: boolean;
+  showReact: boolean;
+  enableTeams: boolean;
+  enableRepaint: boolean;
+  defaultWorkspaceId: null | string;
+}
+
 export interface Recording {
   id: string;
   url: string;
@@ -16,6 +24,8 @@ export interface Recording {
   userId?: string;
   isInitialized: boolean;
   workspace?: Workspace;
+  collaborators?: string[];
+  comments?: any;
 }
 
 export interface Workspace {

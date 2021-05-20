@@ -4,13 +4,10 @@ import classnames from "classnames";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { connect, ConnectedProps } from "react-redux";
-import { Canvas } from "ui/state/app";
-import { Comment } from "ui/state/comments";
+import { ChatAltIcon } from "@heroicons/react/solid";
 
-function inCenter(canvas: Canvas, { position }: Comment) {
-  if (!position) return true;
-  return position.x / canvas.width == 0.5 && position.y / canvas.height;
-}
+const MARKER_DIAMETER = 28;
+const MARKER_RADIUS = 14;
 
 function VideoComment({
   comment,
@@ -32,28 +29,31 @@ function VideoComment({
     return null;
   }
 
-  // Hide pins that were never moved
-  if (comment.content != "" && inCenter(canvas, comment)) {
-    return null;
-  }
+  const isHighlighted = hoveredComment === comment.id;
 
   return (
     <div
       className={`canvas-comment`}
       style={{
-        top: position.y * scale,
-        left: position.x * scale,
+        top: position.y * scale - MARKER_RADIUS,
+        left: position.x * scale - MARKER_RADIUS,
       }}
     >
-      <div className="animate-pulse absolute w-12 h-12 bg-blue-500 rounded-full transform -translate-y-1/2 -ml-2" />
       <div
-        className={classnames("canvas-comment-marker", {
-          highlighted: hoveredComment == comment.id,
-        })}
-        onMouseEnter={() => setHoveredComment(comment.id)}
-        onMouseLeave={() => setHoveredComment(null)}
+        className="flex items-center justify-center"
+        style={{ width: `${MARKER_DIAMETER}px`, height: `${MARKER_DIAMETER}px` }}
       >
-        <div className="img comment-marker" />
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 pointer-events-none" />
+        <span
+          className={classnames(
+            "rounded-full relative inline-flex transition duration-300 ease-in-out bg-blue-500 cursor-pointer",
+            isHighlighted ? "bg-blue-700" : ""
+          )}
+          onMouseEnter={() => setHoveredComment(comment.id)}
+          onMouseLeave={() => setHoveredComment(null)}
+          style={{ width: `${MARKER_DIAMETER}px`, height: `${MARKER_DIAMETER}px` }}
+        />
+        <ChatAltIcon className="w-5 h-5 absolute text-white pointer-events-none	" />
       </div>
     </div>
   );

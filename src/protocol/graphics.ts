@@ -11,15 +11,24 @@ import {
   ScreenShot,
   findPaintsResult,
 } from "@recordreplay/protocol";
+import { decode } from "base64-arraybuffer";
 import { client } from "./socket";
 import { actions, UIStore, UIThunkAction } from "ui/actions";
 import { Canvas } from "ui/state/app";
 import { selectors } from "ui/reducers";
 
+const { features } = require("ui/utils/prefs");
+
 export const screenshotCache = new ScreenshotCache();
+const repaintedScreenshots: Map<string, ScreenShot> = new Map();
+let enableRepaint = false;
 
 interface Timed {
   time: number;
+}
+
+export function updateEnableRepaint(_enableRepaint: boolean) {
+  enableRepaint = _enableRepaint;
 }
 
 // Given a sorted array of items with "time" properties, find the index of
@@ -122,6 +131,72 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
   store.dispatch(actions.setEventsForType(gMouseClickEvents, "mousedown"));
 }
 
+class VideoPlayer {
+  video: HTMLVideoElement | null = null;
+  all = new Uint8Array();
+  blob?: Blob;
+  videoReadyCallback?: (video: HTMLVideoElement) => any;
+  commands?: Promise<HTMLVideoElement>;
+
+  init() {
+    this.video = document.querySelector("#graphicsVideo");
+    this.setSrc();
+  }
+
+  setSrc() {
+    if (!this.commands) {
+      this.commands = new Promise(resolve => {
+        this.videoReadyCallback = resolve;
+      });
+    }
+
+    if (this.video && this.blob && !this.video.src) {
+      this.video.src = URL.createObjectURL(this.blob);
+      if (this.videoReadyCallback) {
+        this.videoReadyCallback(this.video);
+      }
+    }
+  }
+
+  async append(fragment: string) {
+    if (!fragment) {
+      if (this.all) {
+        this.blob = new Blob([this.all], { type: 'video/webm; codecs="vp9"' });
+        this.setSrc();
+      }
+    } else {
+      const buffer = decode(fragment);
+
+      var tmp = new Uint8Array(this.all.byteLength + buffer.byteLength);
+      tmp.set(new Uint8Array(this.all), 0);
+      tmp.set(new Uint8Array(buffer), this.all.byteLength);
+      this.all = tmp;
+    }
+  }
+
+  seek(timeMs: number) {
+    this.commands =
+      this.commands &&
+      this.commands.then(async video => {
+        await video.pause();
+        video.currentTime = timeMs / 1000;
+
+        return video;
+      });
+  }
+
+  play() {
+    this.commands =
+      this.commands &&
+      this.commands?.then(async video => {
+        await video.play();
+        return video;
+      });
+  }
+}
+
+export const Video = new VideoPlayer();
+
 let onRefreshGraphics: (canvas: Canvas) => void;
 let paintPointsWaiter: Promise<findPaintsResult>;
 
@@ -137,9 +212,40 @@ export function setupGraphics(store: UIStore) {
     client.Session.findMouseEvents({}, sessionId);
     client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events, store));
 
+    if (features.videoPlayback) {
+      client.Graphics.getPlaybackVideo({}, sessionId);
+      client.Graphics.addPlaybackVideoFragmentListener(param => Video.append(param.fragment));
+    }
+
     client.Graphics.getDevicePixelRatio({}, sessionId).then(({ ratio }) => {
       gDevicePixelRatio = ratio;
     });
+  });
+
+  ThreadFront.on("paused", async () => {
+    if (!enableRepaint) {
+      return;
+    }
+
+    ThreadFront.ensureCurrentPause();
+    const pause = ThreadFront.currentPause;
+    assert(pause);
+
+    const rv = await pause.repaintGraphics();
+    if (pause === ThreadFront.currentPause && rv) {
+      const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
+      let { description, screenShot } = rv;
+      if (screenShot) {
+        repaintedScreenshots.set(description.hash, screenShot);
+      } else {
+        screenShot = repaintedScreenshots.get(description.hash);
+        if (!screenShot) {
+          console.error("Missing repainted screenshot", description);
+          return;
+        }
+      }
+      paintGraphics(screenShot, mouse);
+    }
   });
 }
 
@@ -211,6 +317,10 @@ export async function getGraphicsAtTime(
   time: number,
   forPlayback = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
+  if (enableRepaint) {
+    return {};
+  }
+
   const paintIndex = mostRecentIndex(gPaintPoints, time);
   if (paintIndex === undefined) {
     // There are no graphics to paint here.
@@ -256,19 +366,23 @@ let gLastImage: HTMLImageElement | null = null;
 // Mouse information to draw.
 let gDrawMouse: MouseAndClickPosition | null = null;
 
-export function paintGraphics(screenShot?: ScreenShot, mouse?: MouseAndClickPosition) {
-  if (!screenShot) {
+export function paintGraphics(
+  screenShot?: ScreenShot,
+  mouse?: MouseAndClickPosition,
+  playing?: boolean
+) {
+  if (!screenShot || (playing && features.videoPlayback)) {
     clearGraphics();
-    return;
+  } else {
+    assert(screenShot.data);
+    addScreenShot(screenShot);
+    if (gDrawImage && gDrawImage.width && gDrawImage.height) {
+      gLastImage = gDrawImage;
+    }
+    gDrawImage = new Image();
+    gDrawImage.onload = refreshGraphics;
+    gDrawImage.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
   }
-  assert(screenShot.data);
-  addScreenShot(screenShot);
-  if (gDrawImage && gDrawImage.width && gDrawImage.height) {
-    gLastImage = gDrawImage;
-  }
-  gDrawImage = new Image();
-  gDrawImage.onload = refreshGraphics;
-  gDrawImage.src = `data:${screenShot.mimeType};base64,${screenShot.data}`;
   gDrawMouse = mouse || null;
   refreshGraphics();
 }
@@ -316,6 +430,7 @@ export function refreshGraphics() {
 
   const bounds = video.getBoundingClientRect();
   const canvas = document.getElementById("graphics") as HTMLCanvasElement;
+  const graphicsVideo = document.getElementById("graphicsVideo") as HTMLCanvasElement;
 
   // Find an image to draw.
   let image;
@@ -327,30 +442,12 @@ export function refreshGraphics() {
     }
   }
 
-  if (!image) {
-    return;
-  }
+  Video.init();
 
   canvas.style.visibility = "visible";
-
-  const maxScale = 1 / (gDevicePixelRatio || 1);
-  const scale = Math.min(bounds.width / image.width, bounds.height / image.height, maxScale);
-
-  canvas.width = image.width;
-  canvas.height = image.height;
-  canvas.style.transform = `scale(${scale})`;
-
-  const drawWidth = image.width * scale;
-  const drawHeight = image.height * scale;
-  const offsetLeft = (bounds.width - drawWidth) / 2;
-  const offsetTop = (bounds.height - drawHeight) / 2;
-
-  canvas.style.left = String(offsetLeft);
-  canvas.style.top = String(offsetTop);
-
   const cx = canvas.getContext("2d")!;
-  cx.drawImage(image, 0, 0);
 
+  cx.clearRect(0, 0, canvas.width, canvas.height);
   if (gDrawMouse) {
     const { x, y, clickX, clickY } = gDrawMouse;
     drawCursor(cx, x, y);
@@ -358,6 +455,27 @@ export function refreshGraphics() {
       drawClick(cx, x, y);
     }
   }
+
+  if (!image) return;
+
+  const maxScale = 1 / (gDevicePixelRatio || 1);
+  const scale = Math.min(bounds.width / image.width, bounds.height / image.height, maxScale);
+
+  const drawWidth = image.width * scale;
+  const drawHeight = image.height * scale;
+  const offsetLeft = (bounds.width - drawWidth) / 2;
+  const offsetTop = (bounds.height - drawHeight) / 2;
+
+  canvas.width = image.width;
+  canvas.height = image.height;
+  graphicsVideo.style.width = image.width + "px";
+  graphicsVideo.style.height = image.height + "px";
+
+  canvas.style.transform = graphicsVideo.style.transform = `scale(${scale})`;
+  canvas.style.left = graphicsVideo.style.left = String(offsetLeft);
+  canvas.style.top = graphicsVideo.style.top = String(offsetTop);
+
+  cx.drawImage(image, 0, 0);
 
   onRefreshGraphics({
     scale,

@@ -38,6 +38,7 @@ function Video({ recordingId, playback, isNodePickerActive, pendingComment, reco
 
   return (
     <div id="video">
+      <video id="graphicsVideo" />
       <canvas id="graphics" onMouseDown={onMouseDown} />
       <CommentsOverlay>
         {isPaused && !isNodeTarget && isAuthenticated ? (

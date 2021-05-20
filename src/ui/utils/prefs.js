@@ -31,6 +31,8 @@ pref("devtools.video", !!urlPrefs.video);
 pref("devtools.maxHitsDisplayed", 500);
 pref("devtools.maxHitsEditable", 200);
 pref("devtools.defaultLibraryTeam", "null");
+pref("devtools.libraryFilterTime", "all");
+pref("devtools.libraryFilterAssociation", "all");
 
 // app features
 pref("devtools.features.comments", true);
@@ -43,6 +45,7 @@ pref("devtools.features.transcriptHover", false);
 pref("devtools.features.widgetHover", false);
 pref("devtools.features.reactDevtools", false);
 pref("devtools.features.smoothPlayback", true);
+pref("devtools.features.videoPlayback", false);
 
 export const prefs = new PrefsHelper("devtools", {
   splitConsole: ["Bool", "split-console"],
@@ -58,6 +61,8 @@ export const prefs = new PrefsHelper("devtools", {
   maxHitsDisplayed: ["Int", "maxHitsDisplayed"],
   maxHitsEditable: ["Int", "maxHitsEditable"],
   defaultLibraryTeam: ["String", "defaultLibraryTeam"],
+  libraryFilterTime: ["String", "libraryFilterTime"],
+  libraryFilterAssociation: ["String", "libraryFilterAssociation"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
@@ -72,6 +77,7 @@ export const features = new PrefsHelper("devtools.features", {
   widgetHover: ["Bool", "widgetHover"],
   reactDevtools: ["Bool", "reactDevtools"],
   smoothPlayback: ["Bool", "smoothPlayback"],
+  videoPlayback: ["Bool", "videoPlayback"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

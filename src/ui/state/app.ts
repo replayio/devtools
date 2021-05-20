@@ -25,11 +25,15 @@ export type SettingsTabTitle = "Experimental" | "Invitations" | "Support" | "Per
 
 export interface ExpectedError {
   message: string;
-  content?: string | ReactElement | ReactElement[];
-  action?: string;
-  type?: "timeout";
-  stack?: string;
+  content: string;
+  action?: "sign-in" | "refresh";
 }
+
+export type UnexpectedError = {
+  message: string;
+  content: string;
+  action?: "refresh";
+};
 
 export interface UploadInfo {
   amount: string;
@@ -45,7 +49,7 @@ export interface AppState {
   loading: number;
   uploading: UploadInfo | null;
   expectedError: ExpectedError | null;
-  unexpectedError: sessionError | null;
+  unexpectedError: UnexpectedError | null;
   modal: ModalType | null;
   modalOptions: { recordingId: string } | null;
   selectedPanel: PanelName;

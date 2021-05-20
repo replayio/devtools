@@ -46,6 +46,11 @@ module.exports = [
     targets: ["gecko"],
   },
   {
+    example: "doc_navigate.html",
+    script: "breakpoints-07.js",
+    targets: ["gecko", "chromium"],
+  },
+  {
     example: "node/control_flow.js",
     script: "node_control_flow.js",
     targets: ["node"],
@@ -86,6 +91,11 @@ module.exports = [
     example: "doc_async.html",
     script: "stepping-06.js",
     targets: ["gecko", "chromium"],
+  },
+  {
+    example: "node/async.js",
+    script: "node_stepping-01.js",
+    targets: ["node"],
   },
 
   //////////////////////////////////////////////////////////////////////////////
@@ -164,6 +174,11 @@ module.exports = [
   {
     example: "node/basic.js",
     script: "node_logpoint-01.js",
+    targets: ["node"],
+  },
+  {
+    example: "node/exceptions.js",
+    script: "node_logpoint-02.js",
     targets: ["node"],
   },
 

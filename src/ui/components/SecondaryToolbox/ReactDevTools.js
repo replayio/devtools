@@ -1,4 +1,5 @@
 import React from "react";
+import { compareNumericStrings } from "protocol/utils";
 
 import {
   createBridge,
@@ -12,18 +13,24 @@ let rerenderComponentsTab;
 const messages = [];
 const inspected = new Set();
 
-(async () => {
-  // TODO: re-enable with a feature flag
-  return;
+let isSetup = false;
+async function ensureIsSetup() {
+  if (isSetup) {
+    return;
+  }
+  isSetup = true;
+
   await ThreadFront.getAnnotations(({ annotations }) => {
     for (const { point, time, kind, contents } of annotations) {
       const message = JSON.parse(contents);
       messages.push({ point, time, message });
     }
   });
+  messages.sort((m1, m2) => compareNumericStrings(m1.point, m2.point));
 
+  onPaused();
   ThreadFront.on("paused", onPaused);
-})();
+}
 
 function onPaused() {
   InitReactDevTools();
@@ -42,11 +49,17 @@ function InitReactDevTools() {
   wall = {
     emit() {},
     listen(listener) {
-      wall._listener = listener;
+      wall._listener = msg => {
+        try {
+          listener(msg);
+        } catch (err) {
+          console.warn("Error in ReactDevTools frontend", err);
+        }
+      };
     },
     async send(event, payload) {
       if (event == "inspectElement") {
-        if (inspected.has(payload.id)) {
+        if (inspected.has(payload.id) && !payload.path) {
           wall._listener({
             event: "inspectedElement",
             payload: {
@@ -56,7 +69,9 @@ function InitReactDevTools() {
             },
           });
         } else {
-          inspected.add(payload.id);
+          if (!payload.path) {
+            inspected.add(payload.id);
+          }
           sendRequest(event, payload);
         }
       }
@@ -71,9 +86,11 @@ function InitReactDevTools() {
   DevTools = createDevTools(target, { bridge, store });
   inspected.clear();
 
-  // TODO Use point AND time eventually
-  for (const { message, time } of messages) {
-    if (message.event === "operations" && time <= ThreadFront.currentTime) {
+  for (const { message, point } of messages) {
+    if (
+      message.event === "operations" &&
+      compareNumericStrings(point, ThreadFront.currentPoint) <= 0
+    ) {
       wall._listener(message);
     }
   }
@@ -96,6 +113,7 @@ async function sendRequest(event, payload) {
 // TODO Use portal containers for Profiler & Components
 export function ReactDevtoolsPanel() {
   const [count, setCount] = React.useState(0);
+  ensureIsSetup();
 
   // HACK TODO This hack handles the fact that DevTools wasn't writen
   // with the expectation that a new Bridge or Store prop would be pasesd

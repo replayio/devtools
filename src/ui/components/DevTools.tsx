@@ -13,26 +13,14 @@ import { isTest } from "ui/utils/environment";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
-import { ExpectedError, UploadInfo } from "ui/state/app";
+import { ExpectedError } from "ui/state/app";
 import { RecordingId } from "@recordreplay/protocol";
-import mixpanel from "mixpanel-browser";
+import { BlankLoadingScreen } from "./shared/BlankScreen";
+import UploadScreen from "./UploadScreen";
 
 type DevToolsProps = PropsFromRedux & {
   recordingId: RecordingId;
 };
-
-function getUploadingMessage(uploading: UploadInfo) {
-  if (!uploading) {
-    return "";
-  }
-
-  const { total, amount } = uploading;
-  if (total) {
-    return `Waiting for upload… ${amount} / ${total} MB`;
-  }
-
-  return `Waiting for upload… ${amount} MB`;
-}
 
 function DevTools({
   loading,
@@ -41,7 +29,6 @@ function DevTools({
   recordingId,
   setExpectedError,
   selectedPanel,
-  sessionId,
   viewMode,
   recordingTarget,
   setViewMode,
@@ -51,7 +38,6 @@ function DevTools({
   const { claims } = useToken();
   const userId = claims?.hasura.userId;
 
-  const AddSessionUser = hooks.useAddSessionUser();
   const { recording, isAuthorized, loading: recordingQueryLoading } = hooks.useGetRecording(
     recordingId
   );
@@ -59,6 +45,7 @@ function DevTools({
   const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
   const { title } = recording || {};
   const { userId: cachedUserId } = hooks.useGetUserId();
+  const isAuthor = cachedUserId && recording && cachedUserId === recording.userId;
 
   useEffect(() => {
     // This shouldn't hit when the selectedPanel is "comments"
@@ -71,12 +58,6 @@ function DevTools({
   }, [loading]);
 
   useEffect(() => {
-    if (loading == 100 && userId && sessionId) {
-      AddSessionUser({ variables: { id: sessionId, user_id: userId } });
-    }
-  }, [loading, userId, sessionId]);
-
-  useEffect(() => {
     if (title) {
       document.title = `${title} - Replay`;
     }
@@ -86,8 +67,6 @@ function DevTools({
   }, [recording]);
 
   useEffect(() => {
-    const isAuthor = cachedUserId && cachedUserId === recording?.userId;
-
     // Force switch to viewer mode if the recording is being initialized
     // by the author.
     if (isAuthor && !recording?.isInitialized && !isTest()) {
@@ -95,32 +74,21 @@ function DevTools({
     }
   }, [recording, cachedUserId]);
 
-  let loaderResult: ReactElement | undefined;
   let expectedError: ExpectedError | undefined;
-
-  if (queriesAreLoading) {
-    loaderResult = <SkeletonLoader content={"Fetching the replay information."} />;
-  } else if (recordingDuration === null) {
-    loaderResult = <SkeletonLoader content={"Fetching the replay description."} />;
-  } else if (uploading) {
-    const message = getUploadingMessage(uploading);
-    loaderResult = <SkeletonLoader content={message} />;
-  }
-
-  if (!loaderResult) {
-    if (!isAuthorized) {
-      if (userId) {
-        expectedError = {
-          message: "You don't have permission to view this replay.",
-          content:
-            "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
-        };
-      } else {
-        expectedError = {
-          message: "You need to sign in to view this replay.",
-          action: "sign-in",
-        };
-      }
+  if (!queriesAreLoading && !isAuthorized) {
+    if (userId) {
+      expectedError = {
+        message: "You don't have permission to view this replay",
+        content:
+          "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
+      };
+    } else {
+      expectedError = {
+        message: "You need to sign in to view this replay",
+        content:
+          "You're trying to view a private replay. To proceed, we're going to need to you to sign in.",
+        action: "sign-in",
+      };
     }
   }
 
@@ -129,8 +97,21 @@ function DevTools({
       setExpectedError(expectedError);
     }
   });
-  if (loaderResult || expectedError) {
-    return loaderResult || null;
+  if (expectedError) {
+    return null;
+  }
+
+  if (queriesAreLoading) {
+    return <BlankLoadingScreen />;
+  }
+
+  // Skip showing the upload screen in the case of tests.
+  if (recording && !recording.isInitialized && isAuthor && !isTest()) {
+    return <UploadScreen recording={recording} />;
+  }
+
+  if (recordingDuration === null || uploading) {
+    return <BlankLoadingScreen />;
   }
 
   if (!finishedLoading) {
@@ -160,7 +141,6 @@ const connector = connect(
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
     recordingDuration: selectors.getRecordingDuration(state),
-    sessionId: selectors.getSessionId(state),
     selectedPanel: selectors.getSelectedPanel(state),
     viewMode: selectors.getViewMode(state),
     narrowMode: selectors.getNarrowMode(state),

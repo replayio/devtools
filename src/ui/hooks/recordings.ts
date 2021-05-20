@@ -29,6 +29,18 @@ export const GET_RECORDING = gql`
         id
         name
       }
+      collaborators {
+        edges {
+          node {
+            ... on RecordingUserCollaborator {
+              id
+              user {
+                id
+              }
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -48,10 +60,20 @@ const GET_WORKSPACE_RECORDINGS = gql`
               createdAt
               private
               isInitialized
+              comments {
+                user {
+                  id
+                }
+              }
               owner {
                 id
                 name
                 picture
+              }
+              comments {
+                user {
+                  id
+                }
               }
             }
           }
@@ -78,6 +100,23 @@ const GET_MY_RECORDINGS = gql`
               id
               name
               picture
+            }
+            comments {
+              user {
+                id
+              }
+            }
+            collaborators {
+              edges {
+                node {
+                  ... on RecordingUserCollaborator {
+                    id
+                    user {
+                      id
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -110,17 +149,22 @@ function convertRecording(rec: any): Recording | undefined {
     return undefined;
   }
 
+  const collaborators = rec.collaborators?.edges?.map((e: any) => e.node.user.id);
+
   return {
     id: rec.uuid,
     user: rec.owner,
     userId: rec.owner?.id,
-    url: rec.url,
+    // NOTE: URLs are nullable in the database
+    url: rec.url || "",
     title: rec.title,
     duration: rec.duration,
     private: rec.private,
     isInitialized: rec.isInitialized,
     date: rec.createdAt,
     workspace: rec.workspace,
+    comments: rec.comments,
+    collaborators,
   };
 }
 
@@ -539,7 +583,24 @@ export function useGetMyRecordings() {
   return useGetPersonalRecordings();
 }
 
-export function useDeleteRecording() {
+export function useDeleteRecording(onCompleted: () => void) {
+  const [deleteRecording] = useMutation(
+    gql`
+      mutation DeleteRecording($recordingId: ID!) {
+        deleteRecording(input: { id: $recordingId }) {
+          success
+        }
+      }
+    `,
+    {
+      onCompleted,
+    }
+  );
+
+  return deleteRecording;
+}
+
+export function useDeleteRecordingFromLibrary() {
   const [deleteRecording] = useMutation(
     gql`
       mutation DeleteRecording($recordingId: ID!) {

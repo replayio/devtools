@@ -24,7 +24,6 @@
   height: max-content;
   width: max-content;
   min-width: 480px;
-  min-height: 480px;
   border-radius: 8px;
   padding: 20px;
   background: var(--theme-toolbar-background);

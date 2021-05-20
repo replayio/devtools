@@ -1,5 +1,5 @@
 .canvas-overlay {
-  z-index: 100;
+  z-index: 10;
   position: absolute;
   pointer-events: none;
 }
@@ -27,7 +27,6 @@
 .canvas-overlay .canvas-comment-marker.highlighted {
   background: var(--primary-accent);
   transition: background 200ms;
-  z-index: var(--z-index-3--hovered-comment-primary);
 }
 
 .canvas-overlay .canvas-comment .img.location-marker {

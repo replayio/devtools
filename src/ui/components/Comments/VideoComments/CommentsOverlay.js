@@ -6,7 +6,7 @@ import hooks from "ui/hooks";
 import VideoComment from "./VideoComment";
 import "./CommentsOverlay.css";
 
-function findComment({ hasuraComments, pendingComment, hoveredComment, currentTime }) {
+function findComment({ hasuraComments, pendingComment, currentTime }) {
   let comments = [...hasuraComments];
 
   // We replace the hasuraComment that's currently being edited with our own
@@ -18,20 +18,14 @@ function findComment({ hasuraComments, pendingComment, hoveredComment, currentTi
     comments.push(pendingComment.comment);
   }
 
-  // Find the comment that matches the hoveredComment ID
-  if (hoveredComment) {
-    return comments.find(comment => comment.id == hoveredComment);
-  }
-
   // Find the comment at the current position
-  return comments.find(comment => comment && comment.position && comment.time == currentTime);
+  return comments.filter(comment => comment && comment.position && comment.time == currentTime);
 }
 
 function CommentsOverlay({
   pendingComment,
   canvas,
   recordingId,
-  hoveredComment,
   currentTime,
   setHoveredComment,
   children,
@@ -43,7 +37,7 @@ function CommentsOverlay({
   }
 
   const { top, left, width, height, scale } = canvas;
-  const comment = findComment({ hasuraComments, pendingComment, currentTime, hoveredComment });
+  const comments = findComment({ hasuraComments, pendingComment, currentTime });
 
   return (
     <div
@@ -56,16 +50,22 @@ function CommentsOverlay({
       }}
     >
       <div className="canvas-comments">
-        <VideoComment comment={comment} scale={scale} setHoveredComment={setHoveredComment} />
-        {children}
+        {comments.map(comment => (
+          <VideoComment
+            comment={comment}
+            scale={scale}
+            setHoveredComment={setHoveredComment}
+            key={"id" in comment ? comment.id : "pendingCommentId"}
+          />
+        ))}
       </div>
+      {children}
     </div>
   );
 }
 
 export default connect(
   state => ({
-    hoveredComment: selectors.getHoveredComment(state),
     currentTime: selectors.getCurrentTime(state),
     pendingComment: selectors.getPendingComment(state),
     recordingId: selectors.getRecordingId(state),
