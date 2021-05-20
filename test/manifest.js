@@ -277,6 +277,11 @@ module.exports = [
     targets: ["gecko", "chromium"],
   },
   {
+    example: "cra/dist/index.html",
+    script: "react_devtools.js",
+    targets: ["gecko", "chromium"],
+  },
+  {
     example: "node/spawn.js",
     script: "node_spawn-01.js",
     targets: ["node"],

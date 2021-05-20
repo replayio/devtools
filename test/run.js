@@ -259,10 +259,9 @@ async function runTestViewer(path, local, timeout, env) {
     }
     if (match && match[2].startsWith("http://localhost:8080/test/examples/")) {
       const exampleRecordingId = match[1];
-      const path = url.parse(match[2]).pathname.slice(1);
-      const filename = path.split("/")[path.split("/").length - 1];
+      const relativePath = url.parse(match[2]).pathname.slice("/test/examples/".length);
 
-      const newExampleRecordings = { ...ExampleRecordings, [filename]: exampleRecordingId };
+      const newExampleRecordings = { ...ExampleRecordings, [relativePath]: exampleRecordingId };
       fs.writeFileSync(
         "./test/example-recordings.json",
         JSON.stringify(newExampleRecordings, null, 2)

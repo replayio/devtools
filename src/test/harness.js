@@ -66,6 +66,10 @@ async function selectInspector() {
   return clickElement("button.inspector-panel-button");
 }
 
+async function selectReactDevTools() {
+  return clickElement("button.components-panel-button");
+}
+
 function getContext() {
   return dbgSelectors.getContext();
 }
@@ -674,6 +678,7 @@ const testCommands = {
   selectConsole,
   selectDebugger,
   selectInspector,
+  selectReactDevTools,
   assert,
   waitForTime,
   waitForElapsedTime,
