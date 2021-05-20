@@ -9,7 +9,7 @@ import { CogIcon } from "@heroicons/react/solid";
 import { ModalType } from "ui/state/app";
 import { UIState } from "ui/state";
 import { selectors } from "ui/reducers";
-import { useGetUserInfo } from "ui/hooks/users";
+import { Nag, useGetUserInfo } from "ui/hooks/users";
 const UserOptions = require("ui/components/Header/UserOptions").default;
 
 function Header({
@@ -57,7 +57,12 @@ function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedu
   }, [workspaces, loading]);
 
   useEffect(() => {
-    if (userInfo && userInfo.authoredRecordingCount === 0) {
+    if (
+      userInfo &&
+      userInfo.authoredRecordingCount === 0 &&
+      userInfo.nags &&
+      !userInfo.nags.includes(Nag.FIRST_REPLAY)
+    ) {
       setModal("onboarding");
     }
   }, [userInfo]);

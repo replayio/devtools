@@ -2,6 +2,8 @@ import classNames from "classnames";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
+import hooks from "ui/hooks";
+import { Nag } from "ui/hooks/users";
 import Modal from "../NewModal";
 
 const slides = [
@@ -96,6 +98,17 @@ function Navigation({
   setCurrent: Dispatch<SetStateAction<number>>;
   hideModal: typeof actions.hideModal;
 }) {
+  const userInfo = hooks.useGetUserInfo();
+  const updateUserNags = hooks.useUpdateUserNags();
+
+  const onSkipOrDone = () => {
+    hideModal();
+    const newNags = [...userInfo.nags, Nag.FIRST_REPLAY];
+    updateUserNags({
+      variables: { newNags },
+    });
+  };
+
   return (
     <div className="flex flex-row justify-between text-lg items-center">
       {/* <div className="flex flex-row items-center space-x-2">
@@ -141,7 +154,7 @@ function Navigation({
       </div>
       <div>
         <button
-          onClick={() => hideModal()}
+          onClick={onSkipOrDone}
           type="button"
           className="inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >

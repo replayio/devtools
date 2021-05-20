@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { getUserId } from "ui/utils/useToken";
 import { Invitation } from "./invitations";
 
@@ -23,7 +23,12 @@ export type UserInfo = {
   email: string;
   internal: boolean;
   loading: boolean;
+  nags: Nag[];
 };
+
+export enum Nag {
+  FIRST_REPLAY = "first_replay",
+}
 
 export function useGetUserInfo() {
   const userId = getUserId();
@@ -42,6 +47,7 @@ export function useGetUserInfo() {
             }
           }
           internal
+          nags
         }
       }
     `,
@@ -60,6 +66,26 @@ export function useGetUserInfo() {
   const invitations: Invitation[] = data?.users_by_pk.invitations;
   const internal: boolean = data?.users_by_pk.internal;
   const authoredRecordingCount: number = data?.users_by_pk.recordings_aggregate.aggregate.count;
+  const nags: Nag[] = data?.users_by_pk.nags;
 
-  return { invitations, invited, email, internal, loading, authoredRecordingCount };
+  return { invitations, invited, email, internal, loading, authoredRecordingCount, nags };
+}
+
+export function useUpdateUserNags() {
+  const [updateUserNags, { error }] = useMutation(
+    gql`
+      mutation UpdateUserNags($newNags: [String!]!) {
+        updateUserNags(input: { nags: $newNags }) {
+          success
+        }
+      }
+    `,
+    { refetchQueries: ["GetUser"] }
+  );
+
+  if (error) {
+    console.error("Apollo error while updating the user's nags:", error);
+  }
+
+  return updateUserNags;
 }
