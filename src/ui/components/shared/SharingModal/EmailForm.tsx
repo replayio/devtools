@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { Recording } from "ui/types";
-import Autocomplete from "./Autocomplete";
-import { CollaboratorDbData } from "./CollaboratorsList";
+import { RecordingId } from "@recordreplay/protocol";
+import React, { Dispatch, SetStateAction, useState } from "react";
+import hooks from "ui/hooks";
+import Spinner from "../Spinner";
+import { CheckCircleIcon, PaperAirplaneIcon, ExclamationCircleIcon } from "@heroicons/react/solid";
 import "./EmailForm.css";
 
 function validateEmail(email: string) {
@@ -9,22 +10,122 @@ function validateEmail(email: string) {
   return re.test(String(email).toLowerCase());
 }
 
-export default function WorkspaceForm({
-  recording,
-  collaborators,
+const STATES: Array<Status> = ["pending", "loading", "error", "completed"];
+
+type Status = "pending" | "loading" | "error" | "completed";
+
+function AutocompleteAction({
+  email,
+  recordingId,
+  setShowAutocomplete,
 }: {
-  recording: Recording;
-  collaborators: CollaboratorDbData[];
+  email: string;
+  recordingId: RecordingId;
+  setShowAutocomplete: Dispatch<SetStateAction<boolean>>;
 }) {
+  const [status, setStatus] = useState<Status>("pending");
+  const { addNewCollaborator } = hooks.useAddNewCollaborator(
+    function onCompleted() {
+      setStatus("completed");
+      setTimeout(() => {
+        setStatus("pending");
+        setShowAutocomplete(false);
+      }, 2000);
+    },
+    function onError() {
+      setStatus("error");
+      setTimeout(() => {
+        setStatus("pending");
+        setShowAutocomplete(false);
+      }, 2000);
+    }
+  );
+
+  const onClick = () => {
+    addNewCollaborator({
+      variables: { recordingId, email },
+    });
+    setStatus("loading");
+  };
+
+  if (status === "loading") {
+    return (
+      <button
+        className="inline-flex items-center px-3 py-2 space-x-2 border border-transparent font-medium rounded-md focus:outline-none text-white bg-blue-700"
+        onClick={onClick}
+      >
+        <Spinner className="animate-spin h-6 w-6 text-white" />
+        <span>Inviting</span>
+      </button>
+    );
+  } else if (status === "completed") {
+    return (
+      <button
+        className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-green-600"
+        onClick={onClick}
+      >
+        <CheckCircleIcon className="h-6 w-6 text-white" />
+        <span>Invited</span>
+      </button>
+    );
+  } else if (status === "error") {
+    return (
+      <button
+        className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-red-600"
+        onClick={onClick}
+      >
+        <ExclamationCircleIcon className="h-6 w-6 text-white" />
+        <span>Unknown User</span>
+      </button>
+    );
+  }
+
+  return (
+    <button
+      className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-blue-600 hover:bg-blue-700"
+      onClick={onClick}
+    >
+      <PaperAirplaneIcon className="h-6 w-6 text-white transform rotate-90" />
+      <span>Add</span>
+    </button>
+  );
+}
+
+function Autocomplete({
+  email,
+  recordingId,
+  setShowAutocomplete,
+}: {
+  email: string;
+  recordingId: RecordingId;
+  setShowAutocomplete: Dispatch<SetStateAction<boolean>>;
+}) {
+  return (
+    <div className="autocomplete bg-white">
+      <div className="content">{`${email}`}</div>
+      <AutocompleteAction
+        email={email}
+        recordingId={recordingId}
+        setShowAutocomplete={setShowAutocomplete}
+      />
+    </div>
+  );
+}
+
+export default function EmailForm({ recordingId }: { recordingId: RecordingId }) {
   const [inputValue, setInputValue] = useState("");
-  const [isValidEmail, setIsValidEmail] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
 
   const onChange = (e: React.FormEvent<HTMLInputElement>) => {
     const newValue = e.currentTarget.value;
 
     setInputValue(newValue);
-    setIsValidEmail(validateEmail(newValue));
+
+    if (validateEmail(newValue)) {
+      setShowAutocomplete(true);
+    } else {
+      setShowAutocomplete(false);
+    }
   };
 
   return (
@@ -34,11 +135,13 @@ export default function WorkspaceForm({
         placeholder="Search emails here"
         value={inputValue}
         onChange={onChange}
-        onFocus={() => setTimeout(() => setIsFocused(true), 200)}
-        onBlur={() => setTimeout(() => setIsFocused(false), 200)}
       />
-      {isValidEmail && isFocused ? (
-        <Autocomplete inputValue={inputValue} recording={recording} collaborators={collaborators} />
+      {showAutocomplete ? (
+        <Autocomplete
+          email={inputValue}
+          recordingId={recordingId}
+          setShowAutocomplete={setShowAutocomplete}
+        />
       ) : null}
     </div>
   );
