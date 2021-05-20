@@ -42,9 +42,10 @@ function DevTools({
     recordingId
   );
   const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
-  const queriesAreLoading = recordingQueryLoading || settingsQueryLoading;
+  const { userId: cachedUserId, loading: userIdQueryLoading } = hooks.useGetUserId();
+  const queriesAreLoading = recordingQueryLoading || settingsQueryLoading || userIdQueryLoading;
+
   const { title } = recording || {};
-  const { userId: cachedUserId } = hooks.useGetUserId();
   const isAuthor = cachedUserId && recording && cachedUserId === recording.userId;
 
   useEffect(() => {
