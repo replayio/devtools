@@ -10,9 +10,7 @@ function validateEmail(email: string) {
   return re.test(String(email).toLowerCase());
 }
 
-const STATES: Array<Status> = ["pending", "loading", "error", "completed"];
-
-type Status = "pending" | "loading" | "error" | "completed";
+type ActionStatus = "pending" | "loading" | "error" | "completed";
 
 function AutocompleteAction({
   email,
@@ -23,7 +21,7 @@ function AutocompleteAction({
   recordingId: RecordingId;
   setShowAutocomplete: Dispatch<SetStateAction<boolean>>;
 }) {
-  const [status, setStatus] = useState<Status>("pending");
+  const [status, setStatus] = useState<ActionStatus>("pending");
   const { addNewCollaborator } = hooks.useAddNewCollaborator(
     function onCompleted() {
       setStatus("completed");
@@ -52,7 +50,7 @@ function AutocompleteAction({
     return (
       <button
         className="inline-flex items-center px-3 py-2 space-x-2 border border-transparent font-medium rounded-md focus:outline-none text-white bg-blue-700"
-        onClick={onClick}
+        disabled
       >
         <Spinner className="animate-spin h-6 w-6 text-white" />
         <span>Inviting</span>
@@ -62,7 +60,7 @@ function AutocompleteAction({
     return (
       <button
         className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-green-600"
-        onClick={onClick}
+        disabled
       >
         <CheckCircleIcon className="h-6 w-6 text-white" />
         <span>Invited</span>
@@ -72,7 +70,7 @@ function AutocompleteAction({
     return (
       <button
         className="inline-flex items-center px-3 py-2 space-x-1 border border-transparent font-medium rounded-md focus:outline-none text-white bg-red-600"
-        onClick={onClick}
+        disabled
       >
         <ExclamationCircleIcon className="h-6 w-6 text-white" />
         <span>Unknown User</span>
