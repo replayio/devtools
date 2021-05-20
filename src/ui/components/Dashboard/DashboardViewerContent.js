@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import classnames from "classnames";
 import Recording from "./RecordingItem/index";
 import sortBy from "lodash/sortBy";
+import { isReplayBrowser } from "ui/utils/environment";
 
 export default function DashboardViewerContent({
   recordings,
@@ -14,6 +15,18 @@ export default function DashboardViewerContent({
     const order = ascOrder ? 1 : -1;
     return order * new Date(recording.date);
   });
+
+  if (!recordings.length) {
+    return (
+      <section className="dashboard-viewer-content grid items-center justify-center">
+        <span className="text-xl text-gray-500">
+          {isReplayBrowser()
+            ? "Please open a new tab and press the red record button to record a Replay"
+            : "Please open the Replay browser and press the red record button to get started."}
+        </span>
+      </section>
+    );
+  }
 
   return (
     <section className="dashboard-viewer-content">
