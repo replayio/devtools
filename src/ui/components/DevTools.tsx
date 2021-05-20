@@ -1,7 +1,5 @@
-import React, { useState, useEffect, ReactElement } from "react";
+import React, { useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import useToken from "ui/utils/useToken";
-import hooks from "../hooks";
 
 const Header = require("./Header/index").default;
 const SkeletonLoader = require("./SkeletonLoader").default;
@@ -10,104 +8,38 @@ const DevView = require("./Views/DevView").default;
 const { prefs } = require("ui/utils/prefs");
 import { isTest } from "ui/utils/environment";
 
-import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
-import { ExpectedError } from "ui/state/app";
-import { RecordingId } from "@recordreplay/protocol";
 import { BlankLoadingScreen } from "./shared/BlankScreen";
 import UploadScreen from "./UploadScreen";
+import { Recording } from "ui/types";
 
 type DevToolsProps = PropsFromRedux & {
-  recordingId: RecordingId;
+  userId: string;
+  recording: Recording;
 };
 
 function DevTools({
+  userId,
+  recording,
   loading,
   uploading,
   recordingDuration,
-  recordingId,
-  setExpectedError,
   selectedPanel,
   viewMode,
   recordingTarget,
-  setViewMode,
-  setRecordingWorkspace,
 }: DevToolsProps) {
   const [finishedLoading, setFinishedLoading] = useState(false);
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
-
-  const { recording, isAuthorized, loading: recordingQueryLoading } = hooks.useGetRecording(
-    recordingId
-  );
-  const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
-  const { userId: cachedUserId, loading: userIdQueryLoading } = hooks.useGetUserId();
-  const queriesAreLoading = recordingQueryLoading || settingsQueryLoading || userIdQueryLoading;
-
-  const { title } = recording || {};
-  const isAuthor = cachedUserId && recording && cachedUserId === recording.userId;
+  const isAuthor = userId === recording.userId;
+  const showUploadScreen = !recording.isInitialized && isAuthor && !isTest();
 
   useEffect(() => {
-    // This shouldn't hit when the selectedPanel is "comments"
-    // as that's not dealt with in toolbox, however we still
-    // need to init the toolbox so we're not checking for
-    // that in the if statement here.
     if (loading == 100) {
       gToolbox.init(selectedPanel);
     }
   }, [loading]);
 
-  useEffect(() => {
-    if (title) {
-      document.title = `${title} - Replay`;
-    }
-    if (recording?.workspace) {
-      setRecordingWorkspace(recording?.workspace);
-    }
-  }, [recording]);
-
-  useEffect(() => {
-    // Force switch to viewer mode if the recording is being initialized
-    // by the author.
-    if (isAuthor && !recording?.isInitialized && !isTest()) {
-      setViewMode("non-dev");
-    }
-  }, [recording, cachedUserId]);
-
-  let expectedError: ExpectedError | undefined;
-  if (!queriesAreLoading && !isAuthorized) {
-    if (userId) {
-      expectedError = {
-        message: "You don't have permission to view this replay",
-        content:
-          "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
-      };
-    } else {
-      expectedError = {
-        message: "You need to sign in to view this replay",
-        content:
-          "You're trying to view a private replay. To proceed, we're going to need to you to sign in.",
-        action: "sign-in",
-      };
-    }
-  }
-
-  useEffect(() => {
-    if (expectedError) {
-      setExpectedError(expectedError);
-    }
-  });
-  if (expectedError) {
-    return null;
-  }
-
-  if (queriesAreLoading) {
-    return <BlankLoadingScreen />;
-  }
-
-  // Skip showing the upload screen in the case of tests.
-  if (recording && !recording.isInitialized && isAuthor && !isTest()) {
+  if (showUploadScreen) {
     return <UploadScreen recording={recording} />;
   }
 
@@ -137,22 +69,13 @@ function DevTools({
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    loading: selectors.getLoading(state),
-    uploading: selectors.getUploading(state),
-    recordingDuration: selectors.getRecordingDuration(state),
-    selectedPanel: selectors.getSelectedPanel(state),
-    viewMode: selectors.getViewMode(state),
-    narrowMode: selectors.getNarrowMode(state),
-    recordingTarget: selectors.getRecordingTarget(state),
-  }),
-  {
-    updateTimelineDimensions: actions.updateTimelineDimensions,
-    setExpectedError: actions.setExpectedError,
-    setViewMode: actions.setViewMode,
-    setRecordingWorkspace: actions.setRecordingWorkspace,
-  }
-);
+const connector = connect((state: UIState) => ({
+  loading: selectors.getLoading(state),
+  uploading: selectors.getUploading(state),
+  recordingDuration: selectors.getRecordingDuration(state),
+  selectedPanel: selectors.getSelectedPanel(state),
+  viewMode: selectors.getViewMode(state),
+  recordingTarget: selectors.getRecordingTarget(state),
+}));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(DevTools);
