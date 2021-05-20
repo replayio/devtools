@@ -21,8 +21,8 @@ export default function DashboardViewerContent({
       <section className="dashboard-viewer-content grid items-center justify-center">
         <span className="text-xl text-gray-500">
           {isReplayBrowser()
-            ? "Please open a new tab and press the red record button to record a Replay"
-            : "Please open the Replay browser and press the red record button to get started."}
+            ? "Please open a new tab and press the blue record button to record a Replay"
+            : "Please open the Replay browser and press the blue record button to get started."}
         </span>
       </section>
     );
