@@ -49,10 +49,7 @@ async function initialize() {
 
   // Initialize the socket so we can communicate with the server
   initSocket(store, dispatch);
-
-  if (recordingId) {
-    createSession(store, recordingId);
-  }
+  createSession(store, recordingId);
 
   document.body.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -78,7 +75,8 @@ async function initialize() {
   window.gToolbox = new DevToolsToolbox();
   store = await bootstrapStore();
 
-  if (!initialized) {
+  // Don't initialize the socket when opening the Library.
+  if (!initialized && recordingId) {
     initialized = true;
     await initialize();
   }
