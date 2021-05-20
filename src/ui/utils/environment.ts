@@ -1,3 +1,7 @@
+declare global {
+  var __IS_RECORD_REPLAY_RUNTIME__: boolean;
+}
+
 const url = new URL(window.location.href);
 
 export function isDevelopment() {
@@ -6,6 +10,10 @@ export function isDevelopment() {
 
 export function isFirefox() {
   return /firefox/i.test(navigator.userAgent);
+}
+
+export function isReplayBrowser() {
+  return window.__IS_RECORD_REPLAY_RUNTIME__;
 }
 
 export function getTest() {
