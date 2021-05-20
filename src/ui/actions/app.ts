@@ -7,6 +7,7 @@ import {
   PointDescription,
   Location,
   MouseEvent,
+  loadedRegions,
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
 import { selectors } from "ui/reducers";
@@ -70,6 +71,9 @@ export type SetFontLoading = Action<"set_material_icons_loaded"> & {
 export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
   workspace: Workspace;
 };
+export type SetLoadedRegions = Action<"set_loaded_regions"> & {
+  parameters: loadedRegions;
+};
 
 export type AppActions =
   | SetupAppAction
@@ -94,7 +98,8 @@ export type AppActions =
   | SetDefaultSettingsTab
   | SetRecordingTargetAction
   | SetFontLoading
-  | SetRecordingWorkspaceAction;
+  | SetRecordingWorkspaceAction
+  | SetLoadedRegions;
 
 const NARROW_MODE_WIDTH = 800;
 
@@ -116,7 +121,9 @@ export function setupApp(recordingId: RecordingId, store: UIStore) {
     store.dispatch({ type: "indexed" });
   });
 
-  ThreadFront.listenForLoadChanges();
+  ThreadFront.listenForLoadChanges((parameters: loadedRegions) =>
+    store.dispatch({ type: "set_loaded_regions", parameters })
+  );
 }
 
 function onUnprocessedRegions({ regions }: unprocessedRegions): UIThunkAction {

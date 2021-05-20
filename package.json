@@ -60,6 +60,7 @@
     "properties-parser": "^0.3.1",
     "raw-loader": "^4.0.1",
     "react": "0.0.0-experimental-79740da4c",
+    "react-circular-progressbar": "^2.0.4",
     "react-devtools-inline": "^4.13.0",
     "react-dom": "0.0.0-experimental-79740da4c",
     "react-dom-factories": "^1.0.2",

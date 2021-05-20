@@ -34,6 +34,7 @@ function initialAppState(): AppState {
     recordingTarget: null,
     fontLoading: true,
     recordingWorkspace: null,
+    loadedRegions: null,
   };
 }
 
@@ -48,6 +49,10 @@ export default function update(
 
     case "set_uploading": {
       return { ...state, uploading: action.uploading };
+    }
+
+    case "set_loaded_regions": {
+      return { ...state, loadedRegions: action.parameters };
     }
 
     case "set_expected_error": {
@@ -183,6 +188,7 @@ export const getSelectedPrimaryPanel = (state: UIState) => state.app.selectedPri
 export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
 export const getIndexed = (state: UIState) => state.app.indexed;
 export const getLoading = (state: UIState) => state.app.loading;
+export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 export const getUploading = (state: UIState) => state.app.uploading;
 export const getRecordingId = (state: UIState) => state.app.recordingId;
 export const getSessionId = (state: UIState) => state.app.sessionId;

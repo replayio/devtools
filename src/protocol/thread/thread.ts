@@ -234,12 +234,13 @@ class _ThreadFront {
     await client.Session.ensureProcessed({ level }, sessionId);
   }
 
-  async listenForLoadChanges() {
+  async listenForLoadChanges(listenerCallback: (params: loadedRegions) => void) {
     // This is a placeholder which logs loading changes to the console.
     const sessionId = await this.waitForSession();
 
     client.Session.addLoadedRegionsListener((parameters: loadedRegions) => {
       console.log("LoadedRegions", parameters);
+      listenerCallback(parameters);
     });
 
     await client.Session.listenForLoadChanges({}, sessionId);

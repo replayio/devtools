@@ -3,14 +3,35 @@ import classnames from "classnames";
 import { connect } from "react-redux";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
-
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
+
+function IndexingLoader({ loadedRegions }) {
+  const { loaded, loading } = loadedRegions;
+  const progressPercentage = (loaded[0].end - loaded[0].begin) / loading[0].end;
+
+  if (!loadedRegions) {
+    return;
+  }
+
+  return (
+    <div className="w-8 h-8" title={`Indexing (${(progressPercentage * 100).toFixed()}%)`}>
+      <CircularProgressbar
+        value={progressPercentage * 100}
+        strokeWidth={12}
+        styles={buildStyles({ pathColor: `#353535`, trailColor: `#ECECED` })}
+      />
+    </div>
+  );
+}
 
 function Toolbar({
   selectedPrimaryPanel,
   setSelectedPrimaryPanel,
   togglePaneCollapse,
   panelCollapsed,
+  loadedRegions,
   isPaused,
 }) {
   const onClick = panel => {
@@ -24,7 +45,7 @@ function Toolbar({
   };
 
   return (
-    <div className="toolbox-toolbar-container">
+    <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-6">
       <div id="toolbox-toolbar">
         <div
           className={classnames("toolbar-panel-button", {
@@ -66,6 +87,7 @@ function Toolbar({
           />
         </div>
       </div>
+      <IndexingLoader {...{ loadedRegions }} />
     </div>
   );
 }
@@ -76,6 +98,7 @@ export default connect(
     panelCollapsed: selectors.getPaneCollapse(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
     selectedPanel: selectors.getSelectedPanel(state),
+    loadedRegions: selectors.getLoadedRegions(state),
     isPaused: selectors.getFrames(state)?.length > 0,
   }),
   {
