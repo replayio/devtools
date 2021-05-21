@@ -102,7 +102,7 @@ export function useDeleteUserFromWorkspace() {
   return deleteUserFromWorkspace;
 }
 
-export function useAcceptPendingInvitation() {
+export function useAcceptPendingInvitation(onCompleted: () => void) {
   const [acceptPendingInvitation] = useMutation(
     gql`
       mutation AcceptPendingInvitation($workspaceId: ID!) {
@@ -113,13 +113,14 @@ export function useAcceptPendingInvitation() {
     `,
     {
       refetchQueries: ["GetNonPendingWorkspaces", "GetPendingWorkspaces"],
+      onCompleted,
     }
   );
 
   return acceptPendingInvitation;
 }
 
-export function useRejectPendingInvitation() {
+export function useRejectPendingInvitation(onCompleted: () => void) {
   const [rejectPendingInvitation] = useMutation(
     gql`
       mutation RejectPendingInvitation($workspaceId: ID!) {
@@ -130,6 +131,7 @@ export function useRejectPendingInvitation() {
     `,
     {
       refetchQueries: ["GetNonPendingWorkspaces", "GetPendingWorkspaces"],
+      onCompleted,
     }
   );
 
