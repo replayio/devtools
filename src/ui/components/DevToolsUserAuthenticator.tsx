@@ -7,23 +7,24 @@ import useAuth0 from "ui/utils/useAuth0";
 import { Recording } from "ui/types";
 import DevTools from "./DevTools";
 
-type DevToolsProps = PropsFromRedux & {
+type DevToolsAuthenticatorProps = PropsFromRedux & {
   userId: string;
   recording: Recording;
   isAuthorized: boolean;
 };
 
+// This component is responsible for taking the loaded query data and handling
+// unauthorized user access.
 function DevToolsUserAuthenticator({
   userId,
   recording,
   isAuthorized,
   setExpectedError,
   setRecordingWorkspace,
-}: DevToolsProps) {
+}: DevToolsAuthenticatorProps) {
   const { isAuthenticated } = useAuth0();
 
-  useEffect(() => {
-    // Handle unauthorized access error after the component mounts
+  useEffect(function handleUnauthorizedAccess() {
     if (!isAuthorized) {
       let error: ExpectedError | undefined;
 
@@ -43,16 +44,20 @@ function DevToolsUserAuthenticator({
       }
 
       setExpectedError(error);
-      return;
     }
-
+  }, []);
+  useEffect(function handleAuthorizedAccess() {
     document.title = `${recording.title} - Replay`;
 
+    // This sets the replay's workspace in state for mixpanel to reference.
     if (recording.workspace) {
       setRecordingWorkspace(recording.workspace);
     }
   }, []);
 
+  // If the user is not authorized, show a blank loading screen. After the first render cycle,
+  // the useEffect will handle setting the state so that we render the corresponding
+  // authentication error to be displayed to the user.
   if (!isAuthorized) {
     return <BlankLoadingScreen />;
   }

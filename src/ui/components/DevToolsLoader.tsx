@@ -4,6 +4,8 @@ import hooks from "ui/hooks";
 import DevToolsUserAuthenticator from "./DevToolsUserAuthenticator";
 import { BlankLoadingScreen } from "./shared/BlankScreen";
 
+// This component is responsible for making all of the database queries and handling
+// their loading states.
 export default function DevToolsLoader({ recordingId }: { recordingId: RecordingId }) {
   const { recording, isAuthorized, loading: recordingQueryLoading } = hooks.useGetRecording(
     recordingId
