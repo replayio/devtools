@@ -1,62 +1,168 @@
-import React, { useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import hooks from "ui/hooks";
 import "./Invitations.css";
 import { Workspace } from "ui/types";
+import { connect, ConnectedProps } from "react-redux";
+import { actions } from "ui/actions";
+import classNames from "classnames";
 
-function Invitation({ workspace }: { workspace: Workspace }) {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const acceptPendingInvitation = hooks.useAcceptPendingInvitation();
-  const rejectPendingInvitation = hooks.useRejectPendingInvitation();
-
-  const handleAccept = (workspaceId: string) => {
-    acceptPendingInvitation({ variables: { workspaceId } });
-    setIsLoading(true);
-  };
-  const handleRefuse = (workspaceId: string) => {
-    rejectPendingInvitation({ variables: { workspaceId } });
-    setIsLoading(true);
-  };
-
+function InvitationCard({
+  actions,
+  teamName,
+  borderStyles,
+}: {
+  actions: ReactElement[] | ReactElement;
+  teamName: string;
+  borderStyles: string;
+}) {
   return (
-    <div className="relative rounded-lg border border-gray-300 bg-white px-6 py-2 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+    <div
+      className={classNames(
+        borderStyles,
+        "relative rounded-lg border bg-white px-6 py-2 shadow-sm flex items-center space-x-3 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+      )}
+    >
       <div className="flex-1 min-w-0 select-none">
-        <p className="text-lg font-medium text-gray-900">{workspace.name}</p>
-        <div className="text-lg text-gray-500 truncate space-x-2">
-          {isLoading ? (
-            "Loading..."
-          ) : (
-            <>
-              <button onClick={() => handleRefuse(workspace.id)}>Refuse</button>
-              <span>/</span>
-              <button onClick={() => handleAccept(workspace.id)}> Accept</button>
-            </>
-          )}
-        </div>
+        <p className="text-lg font-medium text-gray-900">{teamName}</p>
+        <div className="text-lg text-gray-500 truncate space-x-2">{actions}</div>
       </div>
     </div>
   );
 }
 
-export default function Invitations() {
-  const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
+function Invitation({ workspace, onAccept }: { workspace: Workspace; onAccept: () => void }) {
+  const [isLoading, setIsLoading] = useState(false);
 
-  if (loading || pendingWorkspaces?.length == 0) {
+  const acceptPendingInvitation = hooks.useAcceptPendingInvitation(onAccept);
+  const rejectPendingInvitation = hooks.useRejectPendingInvitation(onAccept);
+
+  const handleAccept = () => {
+    acceptPendingInvitation({ variables: { workspaceId: workspace.id } });
+    setIsLoading(true);
+  };
+  const handleRefuse = () => {
+    rejectPendingInvitation({ variables: { workspaceId: workspace.id } });
+    setIsLoading(true);
+  };
+
+  const actions = isLoading ? (
+    <div>Loading...</div>
+  ) : (
+    <>
+      <button onClick={handleRefuse}>Refuse</button>
+      <span>/</span>
+      <button onClick={handleAccept}>Accept</button>
+    </>
+  );
+
+  return (
+    <InvitationCard
+      teamName={workspace.name}
+      actions={actions}
+      borderStyles={"border-gray-300 hover:border-gray-400 "}
+    />
+  );
+}
+
+function AcceptedInvitation({
+  workspace,
+  setWorkspaceId,
+  hideAcceptedInvitation,
+}: {
+  workspace: Workspace;
+  setWorkspaceId: (id: string) => void;
+  hideAcceptedInvitation: (team: Workspace) => void;
+}) {
+  const [shouldHide, setShouldHide] = useState(false);
+
+  const onHide = () => {
+    setShouldHide(true);
+  };
+  const onGo = () => {
+    setShouldHide(true);
+    setWorkspaceId(workspace.id);
+  };
+
+  useEffect(() => {
+    if (shouldHide) {
+      hideAcceptedInvitation(workspace);
+    }
+  }, [shouldHide]);
+
+  const actions = (
+    <>
+      <button onClick={onHide}>Hide</button>
+      <span>/</span>
+      <button onClick={onGo}>Go to team</button>
+    </>
+  );
+
+  return (
+    <InvitationCard
+      teamName={workspace.name}
+      actions={actions}
+      borderStyles={"border-blue-300 hover:border-blue-400 "}
+    />
+  );
+}
+
+function Invitations({ setWorkspaceId }: PropsFromRedux) {
+  const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
+  const [acceptedInvitations, setAcceptedInvitations] = useState<Array<Workspace>>([]);
+
+  if (loading) {
     return null;
   }
 
-  const displayedWorkspaces = [...pendingWorkspaces!].sort((a, b) =>
-    a.name > b.name ? 1 : a.name < b.name ? -1 : 0
+  const displayedAcceptedInvitations = acceptedInvitations.filter(
+    workspace => pendingWorkspaces && !pendingWorkspaces.includes(workspace)
   );
+  const displayedWorkspaces = [
+    ...pendingWorkspaces!,
+    ...displayedAcceptedInvitations,
+  ].sort((a, b) => (a.name > b.name ? 1 : a.name < b.name ? -1 : 0));
+
+  if (displayedWorkspaces.length === 0) {
+    return null;
+  }
+
+  const hideAcceptedInvitation = (team: Workspace) => {
+    const invitationIndex = acceptedInvitations.indexOf(team);
+
+    if (invitationIndex < 0) {
+      console.error("Can't find the index for that accepted invitation");
+      return;
+    }
+
+    const newAcceptedInvitations = [...acceptedInvitations].slice();
+    newAcceptedInvitations.splice(invitationIndex, 1);
+
+    setAcceptedInvitations(newAcceptedInvitations);
+  };
 
   return (
     <div className="workspace-invites flex flex-col space-y-4 p-8 items-start">
       <h2 className="text-gray-500 font-medium uppercase tracking-wide">{`PENDING INVITATIONS`}</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {displayedWorkspaces.map(workspace => (
-          <Invitation workspace={workspace} key={workspace.id} />
-        ))}
+        {displayedWorkspaces.map(workspace =>
+          acceptedInvitations.includes(workspace) ? (
+            <AcceptedInvitation
+              {...{ workspace, setWorkspaceId, hideAcceptedInvitation }}
+              key={workspace.id}
+            />
+          ) : (
+            <Invitation
+              workspace={workspace}
+              key={workspace.id}
+              onAccept={() => setAcceptedInvitations([...acceptedInvitations, workspace])}
+            />
+          )
+        )}
       </div>
     </div>
   );
 }
+
+const connector = connect(() => ({}), { setWorkspaceId: actions.setWorkspaceId });
+type PropsFromRedux = ConnectedProps<typeof connector>;
+export default connector(Invitations);
