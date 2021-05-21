@@ -418,7 +418,7 @@ async function createExampleBrowserRecording(url, target) {
     // When recording with chromium the recording process detects when the recording
     // has finished, but we need to kill the browser outselves.
     if (target == "chromium" && data.toString().includes("Finished sending recording data")) {
-      spawnSync("pkill", ["-f", "Chromium"]);
+      spawnSync("pkill", ["-f", process.platform == "darwin" ? "Chromium" : "chrome"]);
       resolve();
     }
   }
