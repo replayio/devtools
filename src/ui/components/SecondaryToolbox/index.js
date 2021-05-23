@@ -11,13 +11,13 @@ import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
 import { actions } from "../../actions";
 import { ReactDevtoolsPanel } from "./ReactDevTools";
-import { isTest } from "ui/utils/environment";
 
 function PanelButtons({ selectedPanel, setSelectedPanel, narrowMode, isNode }) {
   const { userSettings } = hooks.useGetUserSettings();
 
-  const showElements = userSettings.showElements || isTest();
-  const showReact = userSettings.showReact || isTest();
+  const showReact = userSettings.showReact;
+  const showElements = userSettings.showElements;
+
   const onClick = panel => {
     setSelectedPanel(panel);
 
@@ -89,7 +89,7 @@ function InspectorPanel() {
 
 function SecondaryToolbox({ selectedPanel, setSelectedPanel, narrowMode, recordingTarget }) {
   const { userSettings } = hooks.useGetUserSettings();
-  const showReact = userSettings.showReact || isTest();
+  const showReact = userSettings.showReact;
   const isNode = recordingTarget === "node";
   return (
     <div className={classnames(`secondary-toolbox`, { node: isNode })}>

@@ -1,7 +1,8 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
-import { Recording, User } from "ui/types";
-import { WorkspaceId } from "ui/state/app";
+import { Recording } from "ui/types";
+import { ExpectedError, WorkspaceId } from "ui/state/app";
+import useToken from "ui/utils/useToken";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
 
@@ -361,6 +362,7 @@ export function useIsOwner(recordingId: RecordingId) {
 
   if (error) {
     console.error("Apollo error while getting isOwner", error);
+    return false;
   }
 
   const recording = data.recording;
@@ -715,4 +717,35 @@ export function useUpdateRecordingTitle() {
   );
 
   return updateRecordingTitle;
+}
+
+export function useHasExpectedError(recordingId: RecordingId): ExpectedError | undefined {
+  const { claims } = useToken();
+  const userId = claims?.hasura.userId;
+
+  const { recording, isAuthorized, loading } = useGetRecording(recordingId);
+
+  // Recordings are only unavailable when the graphql api is down
+  if (!recording) {
+    return undefined;
+  }
+
+  if (loading || isAuthorized) {
+    return undefined;
+  }
+
+  if (userId) {
+    return {
+      message: "You don't have permission to view this replay",
+      content:
+        "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
+    };
+  }
+
+  return {
+    message: "You need to sign in to view this replay",
+    content:
+      "You're trying to view a private replay. To proceed, we're going to need to you to sign in.",
+    action: "sign-in",
+  };
 }
