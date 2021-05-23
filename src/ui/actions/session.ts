@@ -65,7 +65,7 @@ export async function createSession(store: UIStore, recordingId: string) {
     store.dispatch(actions.setUploading(null));
     prefs.recordingId = recordingId;
   } catch (e) {
-    if (e.code == 9 || e.code == 31) {
+    if (e.code == 31) {
       const currentError = getUnexpectedError(store.getState());
 
       // Don't overwrite an existing error.

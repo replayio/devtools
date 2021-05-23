@@ -35,7 +35,7 @@ export function useDeleteCollaborator() {
   return { deleteCollaborator, error };
 }
 
-export function useAddNewCollaborator() {
+export function useAddNewCollaborator(onCompleted: () => void, onError: () => void) {
   const [addNewCollaborator, { loading, error }] = useMutation(
     gql`
       mutation AddCollaborator($email: String!, $recordingId: ID!) {
@@ -46,6 +46,8 @@ export function useAddNewCollaborator() {
     `,
     {
       refetchQueries: ["GetOwnerAndCollaborators"],
+      onCompleted,
+      onError,
     }
   );
 

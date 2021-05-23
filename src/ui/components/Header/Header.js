@@ -16,10 +16,10 @@ import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 
 import "./Header.css";
 
-function Avatars({ recordingId, sessionId }) {
-  const { users, loading } = useGetActiveSessions(recordingId);
+function Avatars({ recordingId }) {
+  const { users, loading, error } = useGetActiveSessions(recordingId);
 
-  if (loading) {
+  if (loading || error) {
     return null;
   }
 
@@ -109,7 +109,8 @@ function Header({ recordingId, sessionId, recordingTarget }) {
     window.location = dashboardUrl;
   };
 
-  if (loading) {
+  // Recordings are unavailable when the graphql api is down
+  if (!recording || loading) {
     return <div id="header"></div>;
   }
 
