@@ -5,6 +5,7 @@ import {
   PointDescription,
   Location,
   MouseEvent,
+  loadedRegions,
 } from "@recordreplay/protocol";
 import { RecordingTarget } from "protocol/thread/thread";
 import { ReactElement } from "react";
@@ -67,6 +68,7 @@ export interface AppState {
   recordingTarget: RecordingTarget | null;
   fontLoading: boolean;
   recordingWorkspace: Workspace | null;
+  loadedRegions: loadedRegions | null;
 }
 
 export interface AnalysisPoints {
