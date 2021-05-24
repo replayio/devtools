@@ -2,11 +2,9 @@ import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 
-import DevTools from "./DevTools";
 const Account = require("./Account").default;
 import AppErrors from "./shared/Error";
 const LoginModal = require("./shared/LoginModal").default;
-const SkeletonLoader = require("ui/components/SkeletonLoader").default;
 import SharingModal from "./shared/SharingModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
@@ -27,6 +25,7 @@ import { useGetRecording } from "ui/hooks/recordings";
 
 import "styles.css";
 import UploadingScreen from "./UploadingScreen";
+import DevToolsLoader from "./DevToolsLoader";
 var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
@@ -113,7 +112,7 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
 
   return (
     <>
-      {recordingId ? <DevTools recordingId={recordingId} /> : <Account />}
+      {recordingId ? <DevToolsLoader recordingId={recordingId} /> : <Account />}
       {modal ? <AppModal modal={modal} /> : null}
       <AppErrors />
     </>

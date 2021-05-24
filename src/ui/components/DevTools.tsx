@@ -1,6 +1,5 @@
-import React, { useState, useEffect, ReactElement } from "react";
+import React, { useState, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import hooks from "../hooks";
 
 const Header = require("./Header/index").default;
 const SkeletonLoader = require("./SkeletonLoader").default;
@@ -12,49 +11,34 @@ import { isTest } from "ui/utils/environment";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
-import { RecordingId } from "@recordreplay/protocol";
 import { BlankLoadingScreen } from "./shared/BlankScreen";
 import UploadScreen from "./UploadScreen";
+import { Recording } from "ui/types";
 
 type DevToolsProps = PropsFromRedux & {
-  recordingId: RecordingId;
+  recording: Recording;
+  userId?: string;
 };
 
 function DevTools({
+  recording,
+  userId,
   loading,
   uploading,
   recordingDuration,
-  recordingId,
-  setExpectedError,
   selectedPanel,
   viewMode,
   recordingTarget,
-  setViewMode,
   setRecordingWorkspace,
 }: DevToolsProps) {
   const [finishedLoading, setFinishedLoading] = useState(false);
-  const { recording, loading: recordingQueryLoading } = hooks.useGetRecording(recordingId);
-  const expectedError = hooks.useHasExpectedError(recordingId);
-  const { loading: settingsQueryLoading } = hooks.useGetUserSettings();
-  const { userId: cachedUserId, loading: userIdQueryLoading } = hooks.useGetUserId();
-
-  const queriesAreLoading = recordingQueryLoading || settingsQueryLoading || userIdQueryLoading;
-  const isAuthor = cachedUserId && recording && cachedUserId === recording.userId;
 
   useEffect(() => {
-    // This shouldn't hit when the selectedPanel is "comments"
-    // as that's not dealt with in toolbox, however we still
-    // need to init the toolbox so we're not checking for
-    // that in the if statement here.
     if (loading == 100) {
       gToolbox.init(selectedPanel);
     }
   }, [loading]);
-
   useEffect(() => {
-    if (!recording) {
-      return;
-    }
     if (recording.title) {
       document.title = `${recording.title} - Replay`;
     }
@@ -63,35 +47,17 @@ function DevTools({
     }
   }, [recording]);
 
-  useEffect(() => {
-    // Force switch to viewer mode if the recording is being initialized
-    // by the author.
-    if (!isTest() && isAuthor && !recording?.isInitialized) {
-      setViewMode("non-dev");
+  // Skip showing these screens if we're in a test.
+  if (!isTest()) {
+    const isAuthor = userId === recording.userId;
+
+    if (!recording.isInitialized && isAuthor) {
+      return <UploadScreen recording={recording} />;
     }
-  }, [recording, cachedUserId]);
 
-  useEffect(() => {
-    if (expectedError) {
-      setExpectedError(expectedError);
+    if (recordingDuration === null || uploading) {
+      return <BlankLoadingScreen />;
     }
-  }, [expectedError]);
-
-  if (expectedError) {
-    return null;
-  }
-
-  // Skip loading screens when running tests
-  if (!isTest() && queriesAreLoading) {
-    return <BlankLoadingScreen />;
-  }
-
-  if (!isTest() && recording && !recording.isInitialized && isAuthor) {
-    return <UploadScreen recording={recording} />;
-  }
-
-  if (!isTest() && (recordingDuration === null || uploading)) {
-    return <BlankLoadingScreen />;
   }
 
   if (!finishedLoading) {
@@ -129,7 +95,6 @@ const connector = connect(
   {
     updateTimelineDimensions: actions.updateTimelineDimensions,
     setExpectedError: actions.setExpectedError,
-    setViewMode: actions.setViewMode,
     setRecordingWorkspace: actions.setRecordingWorkspace,
   }
 );

@@ -5,6 +5,7 @@ import { ExpectedError, WorkspaceId } from "ui/state/app";
 import useToken from "ui/utils/useToken";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
+import useAuth0 from "ui/utils/useAuth0";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -126,9 +127,8 @@ const GET_MY_RECORDINGS = gql`
   }
 `;
 
-export function useGetRecording(
-  recordingId: RecordingId | null
-): { recording: Recording | undefined; isAuthorized: boolean; loading: boolean } {
+export function useGetRecording(recordingId: RecordingId | null) {
+  const { isAuthenticated } = useAuth0();
   const { data, error, loading } = useQuery(GET_RECORDING, {
     variables: { recordingId },
     skip: !recordingId,
@@ -138,11 +138,33 @@ export function useGetRecording(
     console.error("Apollo error while getting the recording", error);
   }
 
-  const recording = convertRecording(data?.recording);
-  // Tests don't have an associated user so we just let it bypass the check here.
-  const isAuthorized = isTest() || recording;
+  if (loading) {
+    return { recording: null, loading, expectedError: null };
+  }
 
-  return { recording, isAuthorized: !!isAuthorized, loading };
+  const recording = convertRecording(data?.recording);
+
+  let expectedError: ExpectedError | null = null;
+
+  // We only check for errors if we're not in a test.
+  if (!recording && !isTest()) {
+    if (isAuthenticated) {
+      expectedError = {
+        message: "You don't have permission to view this replay",
+        content:
+          "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
+      };
+    } else {
+      expectedError = {
+        message: "You need to sign in to view this replay",
+        content:
+          "You're trying to view a private replay. To proceed, we're going to need to you to sign in.",
+        action: "sign-in",
+      };
+    }
+  }
+
+  return { recording, expectedError, loading };
 }
 
 function convertRecording(rec: any): Recording | undefined {
@@ -717,35 +739,4 @@ export function useUpdateRecordingTitle() {
   );
 
   return updateRecordingTitle;
-}
-
-export function useHasExpectedError(recordingId: RecordingId): ExpectedError | undefined {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
-
-  const { recording, isAuthorized, loading } = useGetRecording(recordingId);
-
-  // Recordings are only unavailable when the graphql api is down
-  if (!recording) {
-    return undefined;
-  }
-
-  if (loading || isAuthorized) {
-    return undefined;
-  }
-
-  if (userId) {
-    return {
-      message: "You don't have permission to view this replay",
-      content:
-        "Sorry, you can't access this Replay. If you were given this URL, make sure you were invited.",
-    };
-  }
-
-  return {
-    message: "You need to sign in to view this replay",
-    content:
-      "You're trying to view a private replay. To proceed, we're going to need to you to sign in.",
-    action: "sign-in",
-  };
 }
