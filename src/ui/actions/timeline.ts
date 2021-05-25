@@ -22,7 +22,7 @@ import { TimelineState, Tooltip, ZoomRegion, HoveredItem } from "ui/state/timeli
 import { getPausePointParams, getTest } from "ui/utils/environment";
 import { waitForTime } from "protocol/utils";
 const { features } = require("ui/utils/prefs");
-import KeyShortcuts from "ui/utils/key-shortcuts";
+import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
@@ -79,8 +79,16 @@ export async function setupTimeline(recordingId: RecordingId, store: UIStore) {
   ThreadFront.initializedWaiter.resolve();
 
   const shortcuts = new KeyShortcuts({
-    Left: () => store.dispatch(goToPrevPaint()),
-    Right: () => store.dispatch(goToNextPaint()),
+    Left: ev => {
+      if (!ev.target || !isEditableElement(ev.target)) {
+        store.dispatch(goToPrevPaint());
+      }
+    },
+    Right: ev => {
+      if (!ev.target || !isEditableElement(ev.target)) {
+        store.dispatch(goToNextPaint());
+      }
+    },
   });
   shortcuts.attach(window.document);
 }

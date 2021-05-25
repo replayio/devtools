@@ -73,6 +73,15 @@ export function cancelBubbling(listener: KeyboardEventListener): KeyboardEventLi
   };
 }
 
+export function isEditableElement(target: EventTarget) {
+  if (target instanceof HTMLElement) {
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export default class KeyShortcuts {
   private keys = new Map<string, Shortcut>();
   private eventEmitter = new EventEmitter();
