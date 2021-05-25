@@ -1,5 +1,4 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { useGetUserInfo } from "./users";
 
 export interface Invitation {
   createdAt: string;
@@ -77,45 +76,4 @@ export function useAddInvitation() {
   );
 
   return addInvitation;
-}
-
-export function useMaybeClaimInvite() {
-  const userInfo = useGetUserInfo();
-  const claimInvitation = useClaimInvitation();
-
-  if (userInfo?.loading) {
-    return { loading: userInfo.loading };
-  }
-
-  // If the user is invited/activated already, bail.
-  if (userInfo?.invited) {
-    return { loading: false };
-  }
-
-  // Claim the existing invitations for that user's email, if they exist. This
-  // also updated the user record to be invited/activated.
-  if (userInfo?.invitations) {
-    claimInvitation({ variables: { email: userInfo?.email } });
-    return { loading: false };
-  }
-
-  return { loading: false };
-}
-
-export function useClaimInvitation() {
-  const [claimInvitation] = useMutation(
-    gql`
-      mutation ClaimInvitation($email: String) {
-        update_invitations(where: { invited_email: { _eq: $email } }, _set: { pending: false }) {
-          affected_rows
-        }
-        update_users(where: { email: { _eq: $email } }, _set: { invited: true }) {
-          affected_rows
-        }
-      }
-    `,
-    { refetchQueries: ["GetRecording"] }
-  );
-
-  return claimInvitation;
 }
