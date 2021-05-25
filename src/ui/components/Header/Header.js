@@ -109,8 +109,7 @@ function Header({ recordingId, sessionId, recordingTarget }) {
     window.location = dashboardUrl;
   };
 
-  // Recordings are unavailable when the graphql api is down
-  if (!recording || loading) {
+  if (loading) {
     return <div id="header"></div>;
   }
 
@@ -124,7 +123,7 @@ function Header({ recordingId, sessionId, recordingTarget }) {
             handleClick={e => onNavigateBack(e)}
           />
         )}{" "}
-        {recordingId ? (
+        {recording && recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />
         ) : (
           <div className="title">Recordings</div>
