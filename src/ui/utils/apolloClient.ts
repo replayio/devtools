@@ -70,9 +70,6 @@ function createHttpLink(token: string | undefined, recordingId: string | undefin
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
-  if (recordingId) {
-    headers["x-hasura-recording-id"] = recordingId;
-  }
 
   return new HttpLink({
     uri: "https://graphql.replay.io/v1/graphql",
