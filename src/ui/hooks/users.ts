@@ -41,11 +41,6 @@ export function useGetUserInfo() {
           invitations {
             pending
           }
-          recordings_aggregate {
-            aggregate {
-              count
-            }
-          }
           internal
           nags
         }
@@ -65,10 +60,9 @@ export function useGetUserInfo() {
   const email: string = data?.users_by_pk.email;
   const invitations: Invitation[] = data?.users_by_pk.invitations;
   const internal: boolean = data?.users_by_pk.internal;
-  const authoredRecordingCount: number = data?.users_by_pk.recordings_aggregate.aggregate.count;
   const nags: Nag[] = data?.users_by_pk.nags;
 
-  return { invitations, invited, email, internal, loading, authoredRecordingCount, nags };
+  return { invitations, invited, email, internal, loading, nags };
 }
 
 export function useUpdateUserNags() {
