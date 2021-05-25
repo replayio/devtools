@@ -18,8 +18,6 @@ export function useGetUserId() {
 }
 
 export type UserInfo = {
-  invitations: Invitation[];
-  invited: boolean;
   email: string;
   internal: boolean;
   loading: boolean;
@@ -31,38 +29,27 @@ export enum Nag {
 }
 
 export function useGetUserInfo() {
-  const userId = getUserId();
   const { data, loading, error } = useQuery(
     gql`
-      query GetUser($userId: uuid!) {
-        users_by_pk(id: $userId) {
-          invited
+      query GetUser {
+        viewer {
           email
-          invitations {
-            pending
-          }
           internal
           nags
         }
       }
-    `,
-    {
-      variables: { userId },
-      skip: !userId,
-    }
+    `
   );
 
   if (error) {
     console.error("Apollo error while fetching user:", error);
   }
 
-  const invited: boolean = data?.users_by_pk.invited;
-  const email: string = data?.users_by_pk.email;
-  const invitations: Invitation[] = data?.users_by_pk.invitations;
-  const internal: boolean = data?.users_by_pk.internal;
-  const nags: Nag[] = data?.users_by_pk.nags;
+  const email: string = data?.viewer?.email;
+  const internal: boolean = data?.viewer?.internal;
+  const nags: Nag[] = data?.viewer?.nags;
 
-  return { invitations, invited, email, internal, loading, nags };
+  return { loading, email, internal, nags };
 }
 
 export function useUpdateUserNags() {
