@@ -447,53 +447,54 @@ export function refreshGraphics() {
   canvas.style.visibility = "visible";
   const cx = canvas.getContext("2d")!;
 
-  cx.clearRect(0, 0, canvas.width, canvas.height);
+  if (image) {
+    const maxScale = 1 / (gDevicePixelRatio || 1);
+    const scale = Math.min(bounds.width / image.width, bounds.height / image.height, maxScale);
+
+    const drawWidth = image.width * scale;
+    const drawHeight = image.height * scale;
+    const offsetLeft = (bounds.width - drawWidth) / 2;
+    const offsetTop = (bounds.height - drawHeight) / 2;
+
+    canvas.width = image.width;
+    canvas.height = image.height;
+    graphicsVideo.style.width = image.width + "px";
+    graphicsVideo.style.height = image.height + "px";
+
+    canvas.style.transform = graphicsVideo.style.transform = `scale(${scale})`;
+    canvas.style.left = graphicsVideo.style.left = String(offsetLeft);
+    canvas.style.top = graphicsVideo.style.top = String(offsetTop);
+
+    cx.drawImage(image, 0, 0);
+
+    onRefreshGraphics({
+      scale,
+      gDevicePixelRatio,
+      width: image.width,
+      height: image.height,
+      left: offsetLeft,
+      top: offsetTop,
+    });
+
+    // Apply the same transforms to any displayed highlighter.
+    const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;
+    if (highlighterContainer && gDevicePixelRatio) {
+      highlighterContainer.style.transform = `scale(${scale * gDevicePixelRatio})`;
+      highlighterContainer.style.left = String(offsetLeft);
+      highlighterContainer.style.top = String(offsetTop);
+      highlighterContainer.style.width = String(image.width);
+      highlighterContainer.style.height = String(image.height);
+    }
+  } else {
+    cx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
   if (gDrawMouse) {
     const { x, y, clickX, clickY } = gDrawMouse;
     drawCursor(cx, x, y);
     if (clickX !== undefined) {
       drawClick(cx, x, y);
     }
-  }
-
-  if (!image) return;
-
-  const maxScale = 1 / (gDevicePixelRatio || 1);
-  const scale = Math.min(bounds.width / image.width, bounds.height / image.height, maxScale);
-
-  const drawWidth = image.width * scale;
-  const drawHeight = image.height * scale;
-  const offsetLeft = (bounds.width - drawWidth) / 2;
-  const offsetTop = (bounds.height - drawHeight) / 2;
-
-  canvas.width = image.width;
-  canvas.height = image.height;
-  graphicsVideo.style.width = image.width + "px";
-  graphicsVideo.style.height = image.height + "px";
-
-  canvas.style.transform = graphicsVideo.style.transform = `scale(${scale})`;
-  canvas.style.left = graphicsVideo.style.left = String(offsetLeft);
-  canvas.style.top = graphicsVideo.style.top = String(offsetTop);
-
-  cx.drawImage(image, 0, 0);
-
-  onRefreshGraphics({
-    scale,
-    gDevicePixelRatio,
-    width: image.width,
-    height: image.height,
-    left: offsetLeft,
-    top: offsetTop,
-  });
-
-  // Apply the same transforms to any displayed highlighter.
-  const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;
-  if (highlighterContainer && gDevicePixelRatio) {
-    highlighterContainer.style.transform = `scale(${scale * gDevicePixelRatio})`;
-    highlighterContainer.style.left = String(offsetLeft);
-    highlighterContainer.style.top = String(offsetTop);
-    highlighterContainer.style.width = String(image.width);
-    highlighterContainer.style.height = String(image.height);
   }
 }
 
