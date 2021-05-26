@@ -333,7 +333,9 @@ export async function getGraphicsAtTime(
   }
 
   const screenPromise = forPlayback
-    ? screenshotCache.getScreenshotForPlayback(point, paintHash)
+    ? features.videoPlayback
+      ? Promise.resolve(undefined)
+      : screenshotCache.getScreenshotForPlayback(point, paintHash)
     : screenshotCache.getScreenshotForPreview(point, paintHash);
 
   const screen = await screenPromise;
