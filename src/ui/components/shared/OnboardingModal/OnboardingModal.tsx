@@ -8,65 +8,13 @@ import Modal from "../NewModal";
 
 const slides = [
   {
-    header: "Welcome to your Library 👋",
-    content: (
-      <div className="text-xl">{`There's nothing here yet, so let's record your first replay.`}</div>
-    ),
-  },
-  {
-    header: "Open the Replay browser",
+    header: "Welcome to Replay! 👋",
     content: (
       <>
-        <div className="text-xl space-y-4">
-          <div>
-            {`First, download and install the browser by following the instructions `}
-            <a
-              href="https://replay.io/welcome"
-              target="_blank"
-              rel="noreferrer"
-              className="text-blue-600 underline"
-            >
-              here
-            </a>
-            .
-          </div>
-          <div>
-            {`Once it's installed, go ahead and open that browser and sign in. We'll wait for you there!`}
-          </div>
-        </div>
-      </>
-    ),
-  },
-  {
-    header: "The record button",
-    content: (
-      <>
-        <div className="text-xl space-y-4">
-          <div>{`The Replay browser should look familiar with one exception: the big blue Record button on the top right.`}</div>
-          <div>{`Found it? Good. It's your new best friend from here on out.`}</div>
-        </div>
-      </>
-    ),
-  },
-  {
-    header: "Starting your first recording",
-    content: (
-      <>
-        <div className="text-xl space-y-4">
-          <div>{`To record a website, you first have to open a new separate tab and go to that URL.`}</div>
-          <div>{`Once the website is open, click the record button to refresh and start recording.`}</div>
-        </div>
-      </>
-    ),
-  },
-  {
-    header: "Saving your first recording",
-    content: (
-      <>
-        <div className="text-xl space-y-4">
-          <div>{`Once you're finished recording, simply hit the stop button.`}</div>
-          <div>{`Doing so will go ahead and save your recording and give you a shareable link. That's it!`}</div>
-        </div>
+        <div className="text-xl pb-8">{`We're glad you're here! This is how to get started:`}</div>
+        <li className="text-xl pb-2">{`In the Replay browser, open a website in a new tab`}</li>
+        <li className="text-xl pb-2">{`Press the blue record button to record, press again to stop`}</li>
+        <li className="text-xl pb-2">{`And with that, you'll have recorded your first replay :)`}</li>
       </>
     ),
   },
@@ -110,7 +58,7 @@ function Navigation({
   };
 
   return (
-    <div className="flex flex-row justify-between text-lg items-center">
+    <div className="text-lg items-right">
       {/* <div className="flex flex-row items-center space-x-2">
         <input
           type="checkbox"
@@ -122,43 +70,13 @@ function Navigation({
           Show this on startup
         </label>
       </div> */}
-      <div className="space-x-4 ">
-        <button
-          type="button"
-          disabled={current === 1}
-          onClick={() => setCurrent(current - 1)}
-          className={classNames(
-            "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
-            {
-              "text-blue-700 bg-blue-100 hover:bg-blue-200": current > 1,
-              "text-gray-500 bg-gray-100": current == 1,
-            }
-          )}
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => setCurrent(current + 1)}
-          disabled={current == total}
-          type="button"
-          className={classNames(
-            "inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
-            {
-              "text-white bg-blue-600 hover:bg-blue-700": current < total,
-              "text-gray-500 bg-gray-100": current == total,
-            }
-          )}
-        >
-          Next
-        </button>
-      </div>
       <div>
         <button
           onClick={onSkipOrDone}
           type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="float-right inline-flex items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          {current == total ? "Done" : "Skip"}
+          {current == total ? "Got it!" : "Skip"}
         </button>
       </div>
     </div>
@@ -173,8 +91,8 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
       <div
-        className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-20 relative flex flex-col justify-between"
-        style={{ width: "520px", height: "360px" }}
+        className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
+        style={{ width: "520px" }}
       >
         <SlideContent headerText={header}>{content}</SlideContent>
         <Navigation
@@ -184,7 +102,7 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
           hideModal={hideModal}
         />
         <div
-          className="h-2 bg-blue-500 absolute bottom-0 left-0"
+          className="h-2 bg-white absolute bottom-0 left-0 rounded-md"
           style={{ width: `${(current / slides.length) * 100}%` }}
         />
       </div>
