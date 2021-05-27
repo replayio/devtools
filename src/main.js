@@ -26,7 +26,7 @@ const { initSocket } = require("protocol/socket");
 const { setupLogpoints } = require("./protocol/logpoint");
 const { bootstrapApp } = require("ui/utils/bootstrap/bootstrap");
 const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
-const { setupTimeline, setupApp } = require("ui/actions").actions;
+const { setupTimeline, setupApp, setModal } = require("ui/actions").actions;
 const { setupGraphics, updateEnableRepaint } = require("protocol/graphics");
 const { setupMessages } = require("devtools/client/webconsole/actions/messages");
 
@@ -83,6 +83,10 @@ async function initialize() {
 
   const theme = selectors.getTheme(store.getState());
   document.body.parentElement.className = theme || "";
+
+  if (url.searchParams.has("settings")) {
+    store.dispatch(setModal("settings"));
+  }
 
   if (recordingId) {
     setupApp(recordingId, store);
