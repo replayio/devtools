@@ -9,6 +9,9 @@ export default function DashboardViewerContent({
   selectedIds,
   setSelectedIds,
   editing,
+  timeFilter,
+  associationFilter,
+  searchString,
 }) {
   const [ascOrder, setAscOrder] = useState(false);
   let sortedRecordings = sortBy(recordings, recording => {
@@ -17,13 +20,18 @@ export default function DashboardViewerContent({
   });
 
   if (!recordings.length) {
+    let errorText;
+    if (timeFilter != "all" || associationFilter != "all" || searchString) {
+      errorText = "No replays found, please expand your search";
+    } else {
+      errorText = isReplayBrowser()
+        ? "Please open a new tab and press the blue record button to record a Replay"
+        : "Please open the Replay browser and press the blue record button to get started.";
+    }
+
     return (
       <section className="dashboard-viewer-content grid items-center justify-center">
-        <span className="text-xl text-gray-500">
-          {isReplayBrowser()
-            ? "Please open a new tab and press the blue record button to record a Replay"
-            : "Please open the Replay browser and press the blue record button to get started."}
-        </span>
+        <span className="text-xl text-gray-500">{errorText}</span>
       </section>
     );
   }
