@@ -27,17 +27,18 @@ function Header({
 
   return (
     <div id="header">
-      <div className="header-left space-x-4">
-        <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />
+      <div className="header-left space-x-0">
         {currentWorkspaceId == null ? null : (
           <a
             href="#"
             onClick={onSettingsClick}
-            className="flex flex-row space-x-3 ml-9 items-center text-gray-400 hover:text-gray-800"
+            className="flex flex-row ml-4 items-center text-gray-400 hover:text-gray-800"
           >
             <CogIcon className="h-8 w-8" />
           </a>
         )}
+
+        <WorkspaceDropdown nonPendingWorkspaces={nonPendingWorkspaces} />
       </div>
       <UserOptions mode="account" />
     </div>
