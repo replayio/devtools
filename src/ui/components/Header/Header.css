@@ -43,7 +43,6 @@
 #header .links {
   display: flex;
   align-items: center;
-  margin-right: 4px;
 }
 
 #header .avatar:not(.authenticated) {
@@ -94,7 +93,7 @@
 }
 
 #header .sharebutton {
-  font-size: 16px;
+  height: 28px;
 }
 
 button.login {
