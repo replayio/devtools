@@ -205,6 +205,10 @@ async function runTest(test, example, target) {
     RECORD_REPLAY_DRIVER: exampleRecordingId ? undefined : process.env.RECORD_REPLAY_DRIVER,
   };
 
+  if (exampleRecordingId) {
+    console.log(`Found recording ID ${exampleRecordingId}, loading devtools...`);
+  }
+
   await runTestViewer("test/harness.js", test, testTimeout, env);
 }
 

@@ -19,7 +19,7 @@ function IndexingLoader({ loadedRegions }) {
     <div className="w-8 h-8" title={`Indexing (${(progressPercentage * 100).toFixed()}%)`}>
       <CircularProgressbar
         value={progressPercentage * 100}
-        strokeWidth={12}
+        strokeWidth={8}
         styles={buildStyles({ pathColor: `#353535`, trailColor: `#ECECED` })}
       />
     </div>

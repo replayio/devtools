@@ -143,7 +143,7 @@ function Invitations({ setWorkspaceId }: PropsFromRedux) {
   return (
     <div className="workspace-invites flex flex-col space-y-4 p-8 items-start">
       <h2 className="text-gray-500 font-medium uppercase tracking-wide">{`PENDING INVITATIONS`}</h2>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         {displayedWorkspaces.map(workspace =>
           acceptedInvitations.includes(workspace) ? (
             <AcceptedInvitation
