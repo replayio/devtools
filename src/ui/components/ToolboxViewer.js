@@ -4,7 +4,7 @@ import "./Transcript/Transcript.css";
 
 export default function ToolboxViewer() {
   return (
-    <div id="a-toolbox">
+    <div id="toolbox">
       <Transcript />
     </div>
   );
