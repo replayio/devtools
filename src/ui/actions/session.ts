@@ -3,15 +3,15 @@ import { sessionError, uploadedData } from "@recordreplay/protocol";
 import { Action } from "redux";
 
 import tokenManager from "ui/utils/tokenManager";
-import { UIStore, actions, UIThunkAction } from "ui/actions";
-import { selectors } from "ui/reducers";
+import { UIStore, UIThunkAction } from "ui/actions";
+import * as actions from "ui/actions/app";
+import * as selectors from "ui/reducers/app";
 import { ThreadFront } from "protocol/thread";
 const { prefs } = require("ui/utils/prefs");
 import { getTest, isTest, isDevelopment } from "ui/utils/environment";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import { ExpectedError, UnexpectedError } from "ui/state/app";
-import { getUnexpectedError } from "ui/reducers/app";
 
 export type SetUnexpectedErrorAction = Action<"set_unexpected_error"> & {
   error: UnexpectedError;
@@ -66,7 +66,7 @@ export async function createSession(store: UIStore, recordingId: string) {
     prefs.recordingId = recordingId;
   } catch (e) {
     if (e.code == 31) {
-      const currentError = getUnexpectedError(store.getState());
+      const currentError = selectors.getUnexpectedError(store.getState());
 
       // Don't overwrite an existing error.
       if (!currentError) {

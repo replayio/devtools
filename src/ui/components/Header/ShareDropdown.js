@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import useToken from "ui/utils/useToken";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
+import * as selectors from "ui/reducers/app";
+import * as actions from "ui/actions/app";
 import Dropdown from "ui/components/shared/Dropdown";
 import "./ShareDropdown.css";
 

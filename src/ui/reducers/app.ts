@@ -4,7 +4,7 @@ import { UIState } from "ui/state";
 import { SessionActions } from "ui/actions/session";
 const { prefs } = require("../utils/prefs");
 import { Location } from "@recordreplay/protocol";
-import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
+// import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 function initialAppState(): AppState {
   return {
@@ -100,7 +100,7 @@ export default function update(
     }
 
     case "set_analysis_points": {
-      const id = getLocationAndConditionKey(action.location, action.condition);
+      const id = ""; //getLocationAndConditionKey(action.location, action.condition);
 
       return {
         ...state,
@@ -203,7 +203,7 @@ export const getAnalysisPointsForLocation = (
   condition = ""
 ) => {
   if (!location) return;
-  return state.app.analysisPoints[getLocationAndConditionKey(location, condition)];
+  return state.app.analysisPoints["" /* getLocationAndConditionKey(location, condition) */];
 };
 export const getViewMode = (state: UIState) => state.app.viewMode;
 export const getNarrowMode = (state: UIState) => state.app.narrowMode;

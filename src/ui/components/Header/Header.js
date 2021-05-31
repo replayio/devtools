@@ -1,10 +1,9 @@
 import React, { useRef, useState } from "react";
 
 import { connect } from "react-redux";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import Avatar from "ui/components/Avatar";
 import { useGetActiveSessions } from "ui/hooks/sessions";
-import Title from "ui/components/shared/Title";
 import ViewToggle from "ui/components/Header/ViewToggle";
 import UserOptions from "ui/components/Header/UserOptions";
 import { prefs } from "ui/utils/prefs";

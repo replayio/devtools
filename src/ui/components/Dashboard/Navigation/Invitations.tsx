@@ -3,7 +3,7 @@ import hooks from "ui/hooks";
 import "./Invitations.css";
 import { Workspace } from "ui/types";
 import { connect, ConnectedProps } from "react-redux";
-import { actions } from "ui/actions";
+import * as actions from "ui/actions/app";
 import classNames from "classnames";
 
 function InvitationCard({

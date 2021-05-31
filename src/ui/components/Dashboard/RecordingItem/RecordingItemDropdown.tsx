@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
+import * as actions from "ui/actions/app";
+import * as selectors from "ui/reducers/app";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
 import { RecordingId } from "@recordreplay/protocol";
