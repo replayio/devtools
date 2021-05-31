@@ -36,7 +36,7 @@ function DevView({ updateTimelineDimensions, narrowMode, recordingTarget }) {
           onMove={handleMove}
           startPanel={
             <div className="horizontal-panels">
-              <Toolbar />
+              <Toolbar toolbarView="dev" />
               <Toolbox />
             </div>
           }
