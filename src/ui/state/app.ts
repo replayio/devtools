@@ -1,14 +1,12 @@
 import {
   RecordingId,
-  sessionError,
   SessionId,
   PointDescription,
   Location,
   MouseEvent,
   loadedRegions,
 } from "@recordreplay/protocol";
-import { RecordingTarget } from "protocol/thread/thread";
-import { ReactElement } from "react";
+import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 
 export type PanelName = "console" | "debugger" | "inspector";

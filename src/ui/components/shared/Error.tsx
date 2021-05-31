@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import Modal from "ui/components/shared/NewModal";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import BlankScreen from "./BlankScreen";
 import classNames from "classnames";

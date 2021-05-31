@@ -10,7 +10,7 @@ import {
   loadedRegions,
 } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import {
   PanelName,
   PrimaryPanelName,

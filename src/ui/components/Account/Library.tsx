@@ -2,13 +2,13 @@ import React, { useEffect } from "react";
 import Dashboard from "../Dashboard/index";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
-import { actions } from "ui/actions";
+import * as actions from "ui/actions/app";
 import WorkspaceDropdown from "../Dashboard/Navigation/WorkspaceDropdown";
 import { Workspace } from "ui/types";
 import { CogIcon } from "@heroicons/react/solid";
 import { ModalType } from "ui/state/app";
 import { UIState } from "ui/state";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 const UserOptions = require("ui/components/Header/UserOptions").default;
 

@@ -1,7 +1,7 @@
 import classnames from "classnames";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import "./MaterialIcon.css";
 

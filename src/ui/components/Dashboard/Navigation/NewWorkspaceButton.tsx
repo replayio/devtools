@@ -1,7 +1,7 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { Menu } from "@headlessui/react";
-import { actions } from "ui/actions";
+import * as actions from "ui/actions/app";
 import { PlusIcon } from "@heroicons/react/solid";
 import classnames from "classnames";
 

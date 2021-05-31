@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
+import * as actions from "ui/actions/app";
+import * as selectors from "ui/reducers/app";
 import hooks from "ui/hooks";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";

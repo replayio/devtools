@@ -1,10 +1,48 @@
-import { ApolloClient, InMemoryCache, NormalizedCacheObject, from, HttpLink } from "@apollo/client";
+import React, { ReactNode } from "react";
 import { DocumentNode } from "graphql";
 import { defer } from "protocol/utils";
+import {
+  ApolloClient,
+  ApolloProvider,
+  InMemoryCache,
+  NormalizedCacheObject,
+  from,
+  HttpLink,
+} from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
+import { isTest } from "ui/utils/environment";
+import useToken from "ui/utils/useToken";
+import { PopupBlockedError } from "ui/components/shared/Error";
+import { BlankLoadingScreen } from "ui/components/shared/BlankScreen";
 
 const clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
+
+export function ApolloWrapper({
+  children,
+  recordingId,
+}: {
+  recordingId: string | undefined;
+  children: ReactNode;
+}) {
+  const { loading, token, error } = useToken();
+
+  if (!isTest() && loading) {
+    return recordingId ? <BlankLoadingScreen /> : null;
+  }
+
+  if (error) {
+    if (error.message === "Could not open popup") {
+      return <PopupBlockedError />;
+    } else {
+      return null;
+    }
+  }
+
+  return (
+    <ApolloProvider client={createApolloClient(token, recordingId)}>{children}</ApolloProvider>
+  );
+}
 
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
   const apolloClient = await clientWaiter.promise;

@@ -1,6 +1,4 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { getUserId } from "ui/utils/useToken";
-import { Invitation } from "./invitations";
 
 export const GET_USER_ID = gql`
   query GetUserId {

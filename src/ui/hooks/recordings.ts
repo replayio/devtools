@@ -1,6 +1,6 @@
 import { RecordingId } from "@recordreplay/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
-import { Recording } from "ui/types";
+import { Recording, User } from "ui/types";
 import { ExpectedError, WorkspaceId } from "ui/state/app";
 import useToken from "ui/utils/useToken";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
