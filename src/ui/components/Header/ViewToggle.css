@@ -14,7 +14,7 @@
 
 .view-toggle .inner {
   background: var(--cool-gray-200);
-  border: 4px solid var(--cool-gray-200);
+  border: 2px solid var(--cool-gray-200);
   display: flex;
   align-items: stretch;
   border-radius: 8px;

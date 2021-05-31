@@ -19,7 +19,7 @@ const LoginButton = () => {
     <button
       onClick={() => loginWithRedirect({ appState: { returnTo: window.location.href } })}
       type="button"
-      className="inline-flex items-center px-6 py-2 border-2 border-bg-blue-100 text-xl rounded-xl text-black-700 bg-white hover:bg-blue-100 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 h-11 mr-0 defaultfont sharebutton"
+      className="inline-flex items-center px-6 py-2 border-2 border-bg-blue-100 text-xl rounded-xl text-black-700 bg-white hover:bg-blue-100 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-0 defaultfont sharebutton"
     >
       Sign In
     </button>

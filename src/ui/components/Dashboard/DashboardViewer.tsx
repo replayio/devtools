@@ -134,6 +134,9 @@ export default function DashboardViewer({ recordings }: { recordings: Recording[
         selectedIds={selectedIds}
         setSelectedIds={setSelectedIds}
         editing={editing}
+        timeFilter={timeFilter}
+        associationFilter={associationFilter}
+        searchString={searchString}
       />
     </div>
   );
