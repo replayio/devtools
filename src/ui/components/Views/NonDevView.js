@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import Timeline from "../Timeline";
 import Video from "../Video";
 import Toolbar from "../Toolbar";
-import ToolboxViewer from "../ToolboxViewer";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import Transcript from "ui/components/Transcript";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
@@ -61,7 +60,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
           maxSize="80%"
           vert={false}
           startPanel={<Video />}
-          endPanel={<ToolboxViewer />}
+          endPanel={<Transcript />}
           endPanelControl={false}
         />
         <div id="timeline-container">
@@ -83,7 +82,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
       startPanel={
         <div className="horizontal-panels">
           <Toolbar toolbarView="nondev" />
-          <ToolboxViewer />
+          <Transcript />
         </div>
       }
       endPanel={viewer}
