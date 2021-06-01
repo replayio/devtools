@@ -87,9 +87,7 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle, handleClickUr
           </div>
         ) : null}
       </div>
-      <div className="page-url" onClick={handleClickUrl}>
-        {data.url}
-      </div>
+      <div className="page-url">{data.url}</div>
     </div>
   );
 }
@@ -163,7 +161,7 @@ export default function RecordingListItem({
       <td>
         <ItemScreenshot recordingId={recordingId} />
       </td>
-      <td>
+      <td className="itemTitle">
         <ItemTitle
           data={data}
           editing={editing}
