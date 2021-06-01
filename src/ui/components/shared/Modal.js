@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import classnames from "classnames";
-import { actions } from "ui/actions";
+import * as actions from "ui/actions/app";
 import "./Modal.css";
 
 function Modal({ hideModal, children, showClose = true }) {

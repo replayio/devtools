@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { actions } from "ui/actions";
+import * as actions from "ui/actions/app";
 const Modal = require("ui/components/shared/Modal").default;
 import hooks from "ui/hooks";
 import useToken from "ui/utils/useToken";
@@ -30,7 +30,7 @@ function NewWorkspaceModal({ hideModal }: PropsFromRedux) {
           <h1>
             <MaterialIcon>group_add</MaterialIcon>
             <span>Name your team</span>
-          </h1>         
+          </h1>
           <form onSubmit={handleSave} className="flex flex-col space-y-4">
             <TextInput
               placeholder="Your team name"

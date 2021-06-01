@@ -30,6 +30,7 @@ const { BrowserRouter: Router } = require("react-router-dom");
 const tokenManager = require("ui/utils/tokenManager").default;
 const { setupTelemetry } = require("ui/utils/telemetry");
 const { ApolloWrapper } = require("ui/utils/apolloClient");
+const App = require("ui/components/App").default;
 
 require("image/image.css");
 
@@ -56,7 +57,9 @@ function PageSwitch() {
   const { Page, store } = pageWithStore;
   return (
     <Provider store={store}>
-      <Page />
+      <App>
+        <Page />
+      </App>
     </Provider>
   );
 }

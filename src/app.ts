@@ -3,7 +3,8 @@ import { setupLogpoints } from "./protocol/logpoint";
 const { bootstrapStore } = require("ui/utils/bootstrap/bootstrapStore");
 import { actions } from "ui/actions";
 const { setupTimeline, setupApp, setModal } = actions;
-import { setupGraphics, updateEnableRepaint } from "protocol/graphics";
+import { setupGraphics } from "protocol/graphics";
+import { updateEnableRepaint } from "protocol/enable-repaint";
 const { setupMessages } = require("devtools/client/webconsole/actions/messages");
 
 const { LocalizationHelper } = require("devtools/shared/l10n");
@@ -16,7 +17,7 @@ const {
 const { setupExceptions } = require("devtools/client/debugger/src/actions/logExceptions");
 import { selectors } from "ui/reducers";
 import { getUserSettings } from "ui/hooks/settings";
-import App from "ui/components/App";
+import DevTools from "ui/components/DevTools";
 
 const url = new URL(window.location.href);
 const recordingId = url.searchParams.get("id")!;
@@ -84,5 +85,5 @@ export async function initialize() {
   const settings = await getUserSettings();
   updateEnableRepaint(settings.enableRepaint);
 
-  return { store, Page: App };
+  return { store, Page: DevTools };
 }

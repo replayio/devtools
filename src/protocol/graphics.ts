@@ -16,19 +16,15 @@ import { client } from "./socket";
 import { actions, UIStore, UIThunkAction } from "ui/actions";
 import { Canvas } from "ui/state/app";
 import { selectors } from "ui/reducers";
+import { isRepaintEnabled } from "./enable-repaint";
 
 const { features } = require("ui/utils/prefs");
 
 export const screenshotCache = new ScreenshotCache();
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
-let enableRepaint = false;
 
 interface Timed {
   time: number;
-}
-
-export function updateEnableRepaint(_enableRepaint: boolean) {
-  enableRepaint = _enableRepaint;
 }
 
 // Given a sorted array of items with "time" properties, find the index of
@@ -223,7 +219,7 @@ export function setupGraphics(store: UIStore) {
   });
 
   ThreadFront.on("paused", async () => {
-    if (!enableRepaint) {
+    if (!isRepaintEnabled()) {
       return;
     }
 
@@ -317,7 +313,7 @@ export async function getGraphicsAtTime(
   time: number,
   forPlayback = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
-  if (enableRepaint) {
+  if (isRepaintEnabled()) {
     return {};
   }
 

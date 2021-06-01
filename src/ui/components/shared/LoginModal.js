@@ -1,8 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
+import * as selectors from "ui/reducers/app";
+import * as actions from "ui/actions/app";
 import Modal from "ui/components/shared/Modal";
 
 import "./LoginModal.css";
