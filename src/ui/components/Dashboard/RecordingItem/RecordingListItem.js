@@ -161,7 +161,7 @@ export default function RecordingListItem({
       <td>
         <ItemScreenshot recordingId={recordingId} />
       </td>
-      <td className="itemTitle">
+      <td>
         <ItemTitle
           data={data}
           editing={editing}

@@ -137,11 +137,6 @@
   gap: 8px;
 }
 
-.itemTitle {
-  display: block;
-  width: 100%;
-}
-
 .recording-list .recording-item .page > *,
 .recording-list .recording-item .item-title > * {
   overflow: hidden;
