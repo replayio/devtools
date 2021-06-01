@@ -4,6 +4,8 @@ import { setUserInBrowserPrefs } from "../../utils/browser";
 import Library from "./Library";
 
 import "./Account.css";
+import "../Header/Header.css";
+import "devtools/client/debugger/src/components/shared/AccessibleImage.css";
 
 function WelcomePage() {
   const { loginWithRedirect } = useAuth0();

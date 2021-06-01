@@ -1,7 +1,7 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 
 function AutocompleteAction({ workspaceId, email }: { workspaceId: string; email: string }) {

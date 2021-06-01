@@ -3,7 +3,7 @@ import { UserSettings } from "ui/types";
 import { SettingItem } from "./types";
 import hooks from "ui/hooks";
 import { SelectMenu } from "ui/components/shared/Forms";
-import { updateEnableRepaint } from "protocol/graphics";
+import { updateEnableRepaint } from "protocol/enable-repaint";
 import "./SettingsBodyItem.css";
 
 interface SettingsBodyItemProps {

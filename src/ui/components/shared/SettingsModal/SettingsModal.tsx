@@ -9,9 +9,9 @@ import { Settings } from "./types";
 import "./SettingsModal.css";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { SettingsTabTitle } from "ui/state/app";
-import { actions } from "ui/actions";
+import * as actions from "ui/actions/app";
 
 const settings: Settings = [
   {

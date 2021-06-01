@@ -5,7 +5,7 @@ import ReplayLink from "./ReplayLink";
 import hooks from "ui/hooks";
 
 import "./SharingModal.css";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import PrivateSettings from "./PrivateSettings";
 

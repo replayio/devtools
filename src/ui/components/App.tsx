@@ -1,20 +1,17 @@
-import React, { useEffect } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 
-import DevTools from "./DevTools";
-const Account = require("./Account").default;
 import AppErrors from "./shared/Error";
 const LoginModal = require("./shared/LoginModal").default;
-const SkeletonLoader = require("ui/components/SkeletonLoader").default;
 import SharingModal from "./shared/SharingModal";
 import NewWorkspaceModal from "./shared/NewWorkspaceModal";
 import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
 import SettingsModal from "./shared/SettingsModal/index";
 import OnboardingModal from "./shared/OnboardingModal/index";
 import { isDeployPreview, isTest, hasLoadingParam } from "ui/utils/environment";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
+import * as selectors from "ui/reducers/app";
+import * as actions from "ui/actions/app";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 import LogRocket from "ui/utils/logrocket";
 import { setTelemetryContext } from "ui/utils/telemetry";
@@ -66,7 +63,7 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
   observer.observe(viewport!);
 }
 
-function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: AppProps) {
+function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading, children }: AppProps) {
   const auth = useAuth0();
   const { claims } = useToken();
   const userInfo = useGetUserInfo();
@@ -113,7 +110,7 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading }: Ap
 
   return (
     <>
-      {recordingId ? <DevTools recordingId={recordingId} /> : <Account />}
+      {children}
       {modal ? <AppModal modal={modal} /> : null}
       <AppErrors />
     </>
@@ -132,6 +129,6 @@ const connector = connect(
     setFontLoading: actions.setFontLoading,
   }
 );
-export type AppProps = ConnectedProps<typeof connector>;
+export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };
 
 export default connector(App);

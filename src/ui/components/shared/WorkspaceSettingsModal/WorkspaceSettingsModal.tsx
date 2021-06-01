@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { actions } from "ui/actions";
+import * as actions from "ui/actions/app";
 const Modal = require("ui/components/shared/Modal").default;
 import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
+import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import MaterialIcon from "../MaterialIcon";
 import WorkspaceForm from "./WorkspaceForm";

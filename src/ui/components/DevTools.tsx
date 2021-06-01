@@ -12,13 +12,8 @@ import { isTest } from "ui/utils/environment";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 import { UIState } from "ui/state";
-import { RecordingId } from "@recordreplay/protocol";
 import { BlankLoadingScreen } from "./shared/BlankScreen";
 import UploadScreen from "./UploadScreen";
-
-type DevToolsProps = PropsFromRedux & {
-  recordingId: RecordingId;
-};
 
 function DevTools({
   loading,
@@ -118,6 +113,7 @@ function DevTools({
 
 const connector = connect(
   (state: UIState) => ({
+    recordingId: selectors.getRecordingId(state)!,
     loading: selectors.getLoading(state),
     uploading: selectors.getUploading(state),
     recordingDuration: selectors.getRecordingDuration(state),
@@ -133,5 +129,5 @@ const connector = connect(
     setRecordingWorkspace: actions.setRecordingWorkspace,
   }
 );
-type PropsFromRedux = ConnectedProps<typeof connector>;
+type DevToolsProps = ConnectedProps<typeof connector>;
 export default connector(DevTools);
