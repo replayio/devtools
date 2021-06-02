@@ -87,9 +87,7 @@ function ItemTitle({ data, editing, editingTitle, setEditingTitle, handleClickUr
           </div>
         ) : null}
       </div>
-      <div className="page-url" onClick={handleClickUrl}>
-        {data.url}
-      </div>
+      <div className="page-url">{data.url}</div>
     </div>
   );
 }
