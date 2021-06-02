@@ -49,14 +49,6 @@ const settings: Settings = [
         needsRefresh: false,
       },
       {
-        label: "Enable teams",
-        type: "checkbox",
-        key: "enableTeams",
-        description: "Add teams to your Replay library",
-        disabled: false,
-        needsRefresh: false,
-      },
-      {
         label: "Enable repainting",
         type: "checkbox",
         key: "enableRepaint",
