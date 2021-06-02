@@ -33,7 +33,7 @@ function Toolbar({
   panelCollapsed,
   loadedRegions,
   isPaused,
-  toolbarView,
+  viewMode,
 }) {
   const onClick = panel => {
     if (panelCollapsed || (selectedPrimaryPanel == panel && !panelCollapsed)) {
@@ -45,73 +45,57 @@ function Toolbar({
     }
   };
 
-  if (toolbarView == "nondev") {
-    return (
-      <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-6">
-        <div id="toolbox-toolbar">
-          <div
-            className={classnames("toolbar-panel-button", {
-              active: selectedPrimaryPanel == "comments",
-            })}
-          >
-            <IconWithTooltip
-              icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
-              content={"Comments"}
-              handleClick={() => onClick("comments")}
-            />
-          </div>
+  return (
+    <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-6">
+      <div id="toolbox-toolbar">
+        <div
+          className={classnames("toolbar-panel-button", {
+            active: selectedPrimaryPanel == "comments",
+          })}
+        >
+          <IconWithTooltip
+            icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
+            content={"Comments"}
+            handleClick={() => onClick("comments")}
+          />
         </div>
-        <IndexingLoader {...{ loadedRegions }} />
+
+        {viewMode == "dev" ? (
+          <>
+            <div
+              className={classnames("toolbar-panel-button", {
+                active: selectedPrimaryPanel == "explorer",
+              })}
+            >
+              <IconWithTooltip
+                icon={<div className="img explorer-panel toolbar-panel-icon" />}
+                content={"Source Explorer"}
+                handleClick={() => onClick("explorer")}
+              />
+            </div>
+            <div
+              className={classnames("toolbar-panel-button", {
+                active: selectedPrimaryPanel == "debug",
+              })}
+            >
+              <IconWithTooltip
+                icon={
+                  <div
+                    className={classnames("img debugger-panel toolbar-panel-icon", {
+                      paused: isPaused,
+                    })}
+                  />
+                }
+                content={"Pause Information"}
+                handleClick={() => onClick("debug")}
+              />
+            </div>
+          </>
+        ) : null}
       </div>
-    );
-  } else {
-    return (
-      <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-6">
-        <div id="toolbox-toolbar">
-          <div
-            className={classnames("toolbar-panel-button", {
-              active: selectedPrimaryPanel == "comments",
-            })}
-          >
-            <IconWithTooltip
-              icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
-              content={"Comments"}
-              handleClick={() => onClick("comments")}
-            />
-          </div>
-          <div
-            className={classnames("toolbar-panel-button", {
-              active: selectedPrimaryPanel == "explorer",
-            })}
-          >
-            <IconWithTooltip
-              icon={<div className="img explorer-panel toolbar-panel-icon" />}
-              content={"Source Explorer"}
-              handleClick={() => onClick("explorer")}
-            />
-          </div>
-          <div
-            className={classnames("toolbar-panel-button", {
-              active: selectedPrimaryPanel == "debug",
-            })}
-          >
-            <IconWithTooltip
-              icon={
-                <div
-                  className={classnames("img debugger-panel toolbar-panel-icon", {
-                    paused: isPaused,
-                  })}
-                />
-              }
-              content={"Pause Information"}
-              handleClick={() => onClick("debug")}
-            />
-          </div>
-        </div>
-        <IndexingLoader {...{ loadedRegions }} />
-      </div>
-    );
-  }
+      <IndexingLoader {...{ loadedRegions }} />
+    </div>
+  );
 }
 
 export default connect(
@@ -122,6 +106,7 @@ export default connect(
     selectedPanel: selectors.getSelectedPanel(state),
     loadedRegions: selectors.getLoadedRegions(state),
     isPaused: selectors.getFrames(state)?.length > 0,
+    viewMode: selectors.getViewMode(state),
   }),
   {
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
