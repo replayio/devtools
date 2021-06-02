@@ -64,7 +64,7 @@
 .transcript-list .responsive-textarea {
   overflow-y: hidden;
   resize: none;
-  font-family: sans-serif;
+  font-family: system-ui, Arial, sans-serif;
   line-height: 18px;
   border: none;
 }
