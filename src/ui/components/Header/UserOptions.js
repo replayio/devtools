@@ -61,12 +61,6 @@ function UserOptions({ recordingId, setModal }) {
         expanded={expanded}
         orientation="bottom"
       >
-        {showShare && (
-          <button className="row" onClick={onShareClick}>
-            <MaterialIcon>share</MaterialIcon>
-            <span>Share</span>
-          </button>
-        )}
         <button className="row" onClick={onLaunchClick}>
           <MaterialIcon>download</MaterialIcon>
           <span>Download Replay</span>
