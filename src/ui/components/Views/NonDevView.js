@@ -81,7 +81,7 @@ function NonDevView({ updateTimelineDimensions, narrowMode }) {
       vert={true}
       startPanel={
         <div className="horizontal-panels">
-          <Toolbar />
+          <Toolbar toolbarView="nondev" />
           <Transcript />
         </div>
       }

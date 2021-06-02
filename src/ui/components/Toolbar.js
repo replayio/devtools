@@ -33,6 +33,7 @@ function Toolbar({
   panelCollapsed,
   loadedRegions,
   isPaused,
+  toolbarView,
 }) {
   const onClick = panel => {
     if (panelCollapsed || (selectedPrimaryPanel == panel && !panelCollapsed)) {
@@ -44,52 +45,73 @@ function Toolbar({
     }
   };
 
-  return (
-    <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-6">
-      <div id="toolbox-toolbar">
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPrimaryPanel == "comments",
-          })}
-        >
-          <IconWithTooltip
-            icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
-            content={"Transcript and Comments"}
-            handleClick={() => onClick("comments")}
-          />
+  if (toolbarView == "nondev") {
+    return (
+      <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-6">
+        <div id="toolbox-toolbar">
+          <div
+            className={classnames("toolbar-panel-button", {
+              active: selectedPrimaryPanel == "comments",
+            })}
+          >
+            <IconWithTooltip
+              icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
+              content={"Comments"}
+              handleClick={() => onClick("comments")}
+            />
+          </div>
         </div>
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPrimaryPanel == "explorer",
-          })}
-        >
-          <IconWithTooltip
-            icon={<div className="img explorer-panel toolbar-panel-icon" />}
-            content={"Source Explorer"}
-            handleClick={() => onClick("explorer")}
-          />
-        </div>
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPrimaryPanel == "debug",
-          })}
-        >
-          <IconWithTooltip
-            icon={
-              <div
-                className={classnames("img debugger-panel toolbar-panel-icon", {
-                  paused: isPaused,
-                })}
-              />
-            }
-            content={"Pause Information"}
-            handleClick={() => onClick("debug")}
-          />
-        </div>
+        <IndexingLoader {...{ loadedRegions }} />
       </div>
-      <IndexingLoader {...{ loadedRegions }} />
-    </div>
-  );
+    );
+  } else {
+    return (
+      <div className="toolbox-toolbar-container flex flex-col items-center justify-between p-2 pb-6">
+        <div id="toolbox-toolbar">
+          <div
+            className={classnames("toolbar-panel-button", {
+              active: selectedPrimaryPanel == "comments",
+            })}
+          >
+            <IconWithTooltip
+              icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
+              content={"Comments"}
+              handleClick={() => onClick("comments")}
+            />
+          </div>
+          <div
+            className={classnames("toolbar-panel-button", {
+              active: selectedPrimaryPanel == "explorer",
+            })}
+          >
+            <IconWithTooltip
+              icon={<div className="img explorer-panel toolbar-panel-icon" />}
+              content={"Source Explorer"}
+              handleClick={() => onClick("explorer")}
+            />
+          </div>
+          <div
+            className={classnames("toolbar-panel-button", {
+              active: selectedPrimaryPanel == "debug",
+            })}
+          >
+            <IconWithTooltip
+              icon={
+                <div
+                  className={classnames("img debugger-panel toolbar-panel-icon", {
+                    paused: isPaused,
+                  })}
+                />
+              }
+              content={"Pause Information"}
+              handleClick={() => onClick("debug")}
+            />
+          </div>
+        </div>
+        <IndexingLoader {...{ loadedRegions }} />
+      </div>
+    );
+  }
 }
 
 export default connect(
