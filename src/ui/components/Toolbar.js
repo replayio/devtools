@@ -33,6 +33,7 @@ function Toolbar({
   panelCollapsed,
   loadedRegions,
   isPaused,
+  viewMode,
 }) {
   const onClick = panel => {
     if (panelCollapsed || (selectedPrimaryPanel == panel && !panelCollapsed)) {
@@ -54,38 +55,43 @@ function Toolbar({
         >
           <IconWithTooltip
             icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
-            content={"Transcript and Comments"}
+            content={"Comments"}
             handleClick={() => onClick("comments")}
           />
         </div>
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPrimaryPanel == "explorer",
-          })}
-        >
-          <IconWithTooltip
-            icon={<div className="img explorer-panel toolbar-panel-icon" />}
-            content={"Source Explorer"}
-            handleClick={() => onClick("explorer")}
-          />
-        </div>
-        <div
-          className={classnames("toolbar-panel-button", {
-            active: selectedPrimaryPanel == "debug",
-          })}
-        >
-          <IconWithTooltip
-            icon={
-              <div
-                className={classnames("img debugger-panel toolbar-panel-icon", {
-                  paused: isPaused,
-                })}
+
+        {viewMode == "dev" ? (
+          <>
+            <div
+              className={classnames("toolbar-panel-button", {
+                active: selectedPrimaryPanel == "explorer",
+              })}
+            >
+              <IconWithTooltip
+                icon={<div className="img explorer-panel toolbar-panel-icon" />}
+                content={"Source Explorer"}
+                handleClick={() => onClick("explorer")}
               />
-            }
-            content={"Pause Information"}
-            handleClick={() => onClick("debug")}
-          />
-        </div>
+            </div>
+            <div
+              className={classnames("toolbar-panel-button", {
+                active: selectedPrimaryPanel == "debug",
+              })}
+            >
+              <IconWithTooltip
+                icon={
+                  <div
+                    className={classnames("img debugger-panel toolbar-panel-icon", {
+                      paused: isPaused,
+                    })}
+                  />
+                }
+                content={"Pause Information"}
+                handleClick={() => onClick("debug")}
+              />
+            </div>
+          </>
+        ) : null}
       </div>
       <IndexingLoader {...{ loadedRegions }} />
     </div>
@@ -100,6 +106,7 @@ export default connect(
     selectedPanel: selectors.getSelectedPanel(state),
     loadedRegions: selectors.getLoadedRegions(state),
     isPaused: selectors.getFrames(state)?.length > 0,
+    viewMode: selectors.getViewMode(state),
   }),
   {
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
