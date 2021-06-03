@@ -20,6 +20,7 @@ export interface Recording {
   duration: number;
   date: string;
   private: boolean;
+  ownerNeedsInvite: boolean;
   user?: User;
   userId?: string;
   isInitialized: boolean;
