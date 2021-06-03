@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { connect } from "react-redux";
+import { ThreadFront } from "protocol/thread";
 import { prefs } from "../utils/prefs";
 import { selectors } from "../reducers";
 
@@ -18,7 +19,10 @@ function SkeletonLoader({ setFinishedLoading, progress = 1, content, viewMode })
     if (displayedProgress == 100) {
       // This gives the Loader component some time (300ms) to bring the progress
       // bar to 100% before unmounting this loader and showing the application.
-      setTimeout(() => setFinishedLoading(true), 300);
+      setTimeout(async () => {
+        await ThreadFront.initializedWaiter.promise;
+        setFinishedLoading(true);
+      }, 300);
     }
 
     // This handles the artificial progress bump. It has a randomized increment
