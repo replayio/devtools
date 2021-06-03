@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classNames from "classnames";
 import { UIState } from "ui/state";
@@ -11,7 +11,6 @@ import CommentActions from "./CommentActions";
 import CommentSource from "./CommentSource";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import useAuth0 from "ui/utils/useAuth0";
-import useDraftJS from "./CommentEditor/use-draftjs";
 import CommentCardFooter from "./CommentCardFooter";
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
@@ -79,23 +78,12 @@ function CommentCard({
   pendingComment,
 }: CommentCardProps) {
   const { isAuthenticated } = useAuth0();
-  const load = useDraftJS();
   const isPaused = comment.time === currentTime && executionPoint === comment.point;
   const isEditing =
     pendingComment &&
     ["edit_comment", "edit_reply"].includes(pendingComment.type) &&
     pendingComment?.comment.time === currentTime &&
     pendingComment?.comment.point === executionPoint;
-
-  useEffect(() => {
-    let idle: NodeJS.Timeout | undefined = setTimeout(() => {
-      load().then(() => {
-        idle = undefined;
-      });
-    }, 1000);
-
-    return () => idle && clearTimeout(idle);
-  }, []);
 
   const onReply = (e: React.MouseEvent) => {
     e.stopPropagation();
