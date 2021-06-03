@@ -14,10 +14,6 @@ module.exports = {
   },
   devServer: {
     before: app => {
-      app.get("/view", (req, res) => {
-        res.sendFile("index.html", { root: "." });
-      });
-
       app.get("/test", (req, res) => {
         const testFile = req.url.substring(6);
         res.sendFile(testFile, { root: "./test/scripts" });
@@ -27,6 +23,16 @@ module.exports = {
     index: "index.html",
     liveReload: false,
     disableHostCheck: true,
+    historyApiFallback: {
+      rewrites: [
+        {
+          from: /\/(dist|images)\//,
+          to: function (context) {
+            return context.parsedUrl.pathname.replace(/.*(\/(dist|images)\/.*)/, "$1");
+          },
+        },
+      ],
+    },
   },
   plugins: [
     new MiniCssExtractPlugin(),
