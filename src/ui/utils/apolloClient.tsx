@@ -110,7 +110,7 @@ function createHttpLink(token: string | undefined, recordingId: string | undefin
   }
 
   return new HttpLink({
-    uri: "https://graphql.replay.io/v1/graphql",
+    uri: "https://api.replay.io/v1/graphql",
     headers,
     fetch,
   });

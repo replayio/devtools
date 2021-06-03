@@ -7,7 +7,7 @@ import { assert, defer, Deferred } from "protocol/utils";
 import { isTest } from "./environment";
 
 const domain = "webreplay.us.auth0.com";
-const audience = "hasura-api";
+const audience = "https://api.replay.io";
 
 const tokenRefreshSecondsBeforeExpiry = 60;
 
