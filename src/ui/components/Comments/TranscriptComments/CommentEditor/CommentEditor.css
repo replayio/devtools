@@ -64,7 +64,6 @@
 .transcript-list .responsive-textarea {
   overflow-y: hidden;
   resize: none;
-  
   line-height: 18px;
   border: none;
 }
