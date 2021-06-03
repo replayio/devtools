@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import sortBy from "lodash/sortBy";
@@ -8,12 +8,24 @@ import { UIState } from "ui/state";
 import { Comment, PendingNewComment } from "ui/state/comments";
 import CommentCard from "ui/components/Comments/TranscriptComments/CommentCard";
 import useAuth0 from "ui/utils/useAuth0";
+import useDraftJS from "ui/components/Comments/TranscriptComments/CommentEditor/use-draftjs";
 
 function Transcript({ recordingId, pendingComment }: PropsFromRedux) {
   const { comments } = hooks.useGetComments(recordingId!);
   const { recording, loading } = hooks.useGetRecording(recordingId!);
   const { userId } = hooks.useGetUserId();
+  const load = useDraftJS();
   const isAuthor = userId && userId == recording?.userId;
+
+  useEffect(() => {
+    let idle: NodeJS.Timeout | undefined = setTimeout(() => {
+      load().then(() => {
+        idle = undefined;
+      });
+    }, 1000);
+
+    return () => idle && clearTimeout(idle);
+  }, []);
 
   if (loading) {
     return null;
