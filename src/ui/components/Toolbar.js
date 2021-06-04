@@ -6,6 +6,7 @@ import { selectors } from "../reducers";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 function IndexingLoader({ loadedRegions }) {
   const { loaded, loading } = loadedRegions;
@@ -19,7 +20,7 @@ function IndexingLoader({ loadedRegions }) {
     <div className="w-8 h-8" title={`Indexing (${(progressPercentage * 100).toFixed()}%)`}>
       <CircularProgressbar
         value={progressPercentage * 100}
-        strokeWidth={8}
+        strokeWidth={10}
         styles={buildStyles({ pathColor: `#353535`, trailColor: `#ECECED` })}
       />
     </div>
@@ -54,7 +55,7 @@ function Toolbar({
           })}
         >
           <IconWithTooltip
-            icon={<div className="img comments-panel-icon toolbar-panel-icon" />}
+            icon={<MaterialIcon className="forum toolbar-panel-icon">forum</MaterialIcon>}
             content={"Comments"}
             handleClick={() => onClick("comments")}
           />
@@ -68,7 +69,11 @@ function Toolbar({
               })}
             >
               <IconWithTooltip
-                icon={<div className="img explorer-panel toolbar-panel-icon" />}
+                icon={
+                  <MaterialIcon className="description toolbar-panel-icon">
+                    description
+                  </MaterialIcon>
+                }
                 content={"Source Explorer"}
                 handleClick={() => onClick("explorer")}
               />
@@ -80,11 +85,9 @@ function Toolbar({
             >
               <IconWithTooltip
                 icon={
-                  <div
-                    className={classnames("img debugger-panel toolbar-panel-icon", {
-                      paused: isPaused,
-                    })}
-                  />
+                  <MaterialIcon className="pest_control toolbar-panel-icon">
+                    pest_control
+                  </MaterialIcon>
                 }
                 content={"Pause Information"}
                 handleClick={() => onClick("debug")}

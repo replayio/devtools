@@ -7,7 +7,7 @@
   border-top: 1px solid var(--theme-splitter-color);
   --progressbar-transition: 200ms;
   display: flex;
-  padding: 8px 24px 12px 20px;
+  padding: 10px 24px 12px 12px;
   align-items: center;
 }
 
@@ -29,8 +29,12 @@
   --tick-recording-background: #d0021b;
 }
 
+.pause_play_circle {
+  font-size: 29px;
+}
+
 .timeline > *:not(:last-child) {
-  margin-right: 20px;
+  margin-right: 8px;
 }
 
 .timeline .commands :focus:not(:focus-visible) {
