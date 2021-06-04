@@ -40,7 +40,7 @@ function WelcomePage() {
           <a
             href="#"
             onClick={loginWithRedirect}
-            className="w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-2xl font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+            className="w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-2xl font-medium rounded-md text-white bg-primaryAccent hover:bg-primaryAccentHover"
           >
             Sign in to Replay
           </a>

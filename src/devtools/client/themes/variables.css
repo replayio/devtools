@@ -44,7 +44,9 @@
    */
 
   --primary-accent: #1b7fe3;
+  --primary-accent-hover: #2569ad;
   --primary-accent-light: #86bff9;
+
   --secondary-accent: #8330f4;
   --secondary-accent-stroke: #f9f5ff;
 
@@ -59,15 +61,15 @@
   --new-blue-800: #2569ad;
   --new-blue-900: #215487;
 
-  --cool-gray-50: #F9FAFB;
-  --cool-gray-100: #F3F4F6;
-  --cool-gray-200: #E5E7EB;
-  --cool-gray-300: #D1D5DB;
-  --cool-gray-400: #9CA3AF;
-  --cool-gray-500: #6B7280;
-  --cool-gray-600: #4B5563;
+  --cool-gray-50: #f9fafb;
+  --cool-gray-100: #f3f4f6;
+  --cool-gray-200: #e5e7eb;
+  --cool-gray-300: #d1d5db;
+  --cool-gray-400: #9ca3af;
+  --cool-gray-500: #6b7280;
+  --cool-gray-600: #4b5563;
   --cool-gray-700: #374151;
-  --cool-gray-800: #1F2937;
+  --cool-gray-800: #1f2937;
   --cool-gray-900: #111827;
 
   --magenta-50: #ff1ad9;
@@ -217,7 +219,7 @@
   /* Common popup styles(used by HTMLTooltip and autocomplete) */
   --theme-popup-background: white;
   --theme-popup-color: var(--grey-70);
-  --theme-errant-popup-color: #991B1B;
+  --theme-errant-popup-color: #991b1b;
   --theme-popup-border-color: ThreeDShadow;
   --theme-popup-dimmed: hsla(0, 0%, 80%, 0.3);
 

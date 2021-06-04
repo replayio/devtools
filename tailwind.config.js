@@ -5,7 +5,13 @@ module.exports = {
   },
   darkMode: false, // or 'media' or 'class'
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primaryAccent: "var(--primary-accent)",
+        primaryAccentHover: "var(--primary-accent-hover)",
+        secondaryAccent: "var(--secondary-accent)",
+      },
+    },
   },
   variants: {},
   plugins: [require("@tailwindcss/forms")],
