@@ -62,7 +62,7 @@ function SharingModal({ modalOptions }: PropsFromRedux) {
           {!isPrivate && (
             <div className="privacy-warning text-sm">
               <strong>Note:</strong> Replay records everything that happens in the browser,
-              including passwords you’ve typed and everything visible on the screen.{" "}
+              including passwords you’ve typed and everything visible on the screen.
               <a
                 target="_blank"
                 rel="noreferrer"

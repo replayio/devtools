@@ -2,41 +2,66 @@ import React, { useState } from "react";
 import { Recording, User } from "ui/types";
 import hooks from "ui/hooks";
 import "./CollaboratorsList.css";
+import MaterialIcon from "../MaterialIcon";
 
 export interface CollaboratorDbData {
   collaborationId: string;
   user: User;
+  email?: string;
 }
 
-type Role = "owner" | "collaborator";
-
-function Permission({
-  user,
-  role,
+function Collaborator({
+  collaborator,
   collaborationId,
 }: {
-  user: User;
-  role: Role;
+  collaborator: CollaboratorDbData;
   collaborationId?: string;
 }) {
   const { deleteCollaborator } = hooks.useDeleteCollaborator();
-
   const handleDeleteClick = () => {
     deleteCollaborator({ variables: { collaborationId } });
   };
+  let iconAndName;
+
+  if (collaborator.email) {
+    iconAndName = (
+      <>
+        <MaterialIcon>mail_outline</MaterialIcon>
+        <div className="main">
+          <div className="name">{collaborator.email}</div>
+        </div>
+      </>
+    );
+  } else {
+    iconAndName = (
+      <>
+        <div className="icon" style={{ backgroundImage: `url(${collaborator.user.picture})` }} />
+        <div className="main">
+          <div className="name">{collaborator.user.name}</div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="permission">
-      <div className="icon" style={{ backgroundImage: `url(${user.picture})` }} />
+      {iconAndName}
+      <div className="role">Collaborator</div>
+      <button className="delete" onClick={handleDeleteClick}>
+        <div className="img close" />
+      </button>
+    </div>
+  );
+}
+
+function Author({ picture, name }: { picture: string; name: string }) {
+  return (
+    <div className="permission">
+      <div className="icon" style={{ backgroundImage: `url(${picture})` }} />
       <div className="main">
-        <div className="name">{user.name}</div>
+        <div className="name">{name}</div>
       </div>
-      <div className="role">{role}</div>
-      {role === "collaborator" ? (
-        <button className="delete" onClick={handleDeleteClick}>
-          <div className="img close" />
-        </button>
-      ) : null}
+      <div className="role">Author</div>
     </div>
   );
 }
@@ -44,22 +69,19 @@ function Permission({
 export default function CollaboratorsList({
   recording,
   collaborators,
-  recordingId,
 }: {
   recording: Recording;
   collaborators: CollaboratorDbData[] | null;
-  recordingId: string;
 }) {
   return (
     <div className="permissions-list">
-      <Permission user={recording.user!} role={"owner"} />
+      <Author picture={recording.user!.picture} name={recording.user!.name} />
       {collaborators
         ? collaborators.map((collaborator, i) => (
-            <Permission
-              user={collaborator.user}
-              role={"collaborator"}
-              key={i}
+            <Collaborator
+              collaborator={collaborator}
               collaborationId={collaborator.collaborationId}
+              key={i}
             />
           ))
         : null}

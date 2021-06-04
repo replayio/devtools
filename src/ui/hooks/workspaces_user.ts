@@ -57,7 +57,7 @@ export function useGetWorkspaceMembers(workspaceId: string) {
         return {
           membershipId: node.id,
           pending: true,
-          invitedEmail: node.email,
+          email: node.email,
         };
       } else {
         return {
