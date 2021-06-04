@@ -47,6 +47,10 @@ export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
   location: Location;
   condition: string;
 };
+export type SetAnalysisErrorAction = Action<"set_analysis_error"> & {
+  location: Location;
+  condition: string;
+};
 export type SetEventsForType = Action<"set_events"> & {
   events: MouseEvent[];
   eventType: Event;
@@ -88,6 +92,7 @@ export type AppActions =
   | SetUploadingAction
   | SetModalAction
   | SetAnalysisPointsAction
+  | SetAnalysisErrorAction
   | SetEventsForType
   | SetViewMode
   | SetNarrowMode
@@ -196,6 +201,14 @@ export function setAnalysisPoints(
   return {
     type: "set_analysis_points",
     analysisPoints: points,
+    location,
+    condition,
+  };
+}
+
+export function setAnalysisError(location: Location, condition = ""): SetAnalysisErrorAction {
+  return {
+    type: "set_analysis_error",
     location,
     condition,
   };

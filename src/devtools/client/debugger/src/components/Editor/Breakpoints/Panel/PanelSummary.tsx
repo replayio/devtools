@@ -29,10 +29,6 @@ function PanelSummary({
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
-  const pausedOnHit = analysisPoints?.find(
-    point => point.point == executionPoint && point.time == currentTime
-  );
-
   const isHot = analysisPoints && analysisPoints.length > prefs.maxHitsDisplayed;
   const isEditable = analysisPoints && analysisPoints.length < prefs.maxHitsEditable;
 
@@ -61,6 +57,14 @@ function PanelSummary({
     );
   }
 
+  if (analysisPoints === "error") {
+    return (
+      <div className="summary">
+        <div className="invisible">Failed</div>
+      </div>
+    );
+  }
+
   if (isHot) {
     return (
       <div className="summary">
@@ -71,6 +75,10 @@ function PanelSummary({
       </div>
     );
   }
+
+  const pausedOnHit = analysisPoints.find(
+    point => point.point == executionPoint && point.time == currentTime
+  );
 
   return (
     <div className="summary" onClick={e => handleClick(e, "logValue")}>

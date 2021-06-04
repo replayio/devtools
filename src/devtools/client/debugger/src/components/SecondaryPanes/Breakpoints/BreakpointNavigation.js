@@ -23,11 +23,11 @@ function BreakpointNavigation({
       seek(point.point, point.time, true);
     }
   };
-  const isEmpty = analysisPoints && analysisPoints?.length == 0;
+  const isEmpty = analysisPoints && (analysisPoints === "error" || analysisPoints?.length == 0);
 
   let prev, next;
 
-  if (executionPoint && analysisPoints?.length > 0) {
+  if (executionPoint && analysisPoints !== "error" && analysisPoints?.length > 0) {
     prev = findLast(analysisPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
     next = find(analysisPoints, p => compareNumericStrings(p.point, executionPoint) > 0);
   }
@@ -37,7 +37,7 @@ function BreakpointNavigation({
       {!isEmpty ? (
         <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
       ) : null}
-      {analysisPoints?.length ? (
+      {analysisPoints !== "error" && analysisPoints?.length ? (
         <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
       ) : null}
       {executionPoint ? (
@@ -82,6 +82,8 @@ function BreakpointNavigationStatus({ executionPoint, analysisPoints, indexed })
     status = "Indexing";
   } else if (!analysisPoints) {
     status = "Loading";
+  } else if (analysisPoints === "error") {
+    status = "Failed";
   } else if (analysisPoints.length == 0) {
     status = "No hits";
   } else {

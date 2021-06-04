@@ -70,7 +70,7 @@ export interface AppState {
 }
 
 export interface AnalysisPoints {
-  [key: string]: PointDescription[];
+  [key: string]: PointDescription[] | "error";
 }
 
 interface Events {
