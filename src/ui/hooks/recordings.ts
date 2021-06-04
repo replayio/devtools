@@ -267,6 +267,7 @@ export function useGetOwnersAndCollaborators(
     collaborators = data.recording.collaborators.edges.map(({ node }: any) => ({
       collaborationId: node.id,
       user: node.user,
+      email: node.email,
     }));
   }
   const recording = convertRecording(data.recording);
