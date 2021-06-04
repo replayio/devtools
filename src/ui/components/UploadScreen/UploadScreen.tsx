@@ -37,12 +37,9 @@ function DeletedScreen({ url }: { url: string }) {
         >
           <h2 className="font-bold text-3xl text-gray-900">{`Redirecting...`}</h2>
           <div className="text-gray-500 space-y-6 text-xl">
-            <div>{`Sit tight! We'll bring you back to that website in a few seconds.`}</div>
+            <div>{`Sit tight! We'll take you back to the library in a few seconds.`}</div>
           </div>
           <div className="space-y-1">
-            <div className="overflow-hidden overflow-ellipsis whitespace-pre text-base text-gray-500">
-              {url}
-            </div>
             <button
               type="button"
               onClick={navigateToUrl}
@@ -202,7 +199,7 @@ function UploadScreen({ recordingId, recording }: UploadScreenProps) {
   }
 
   if (status === "deleted") {
-    return <DeletedScreen url={recording.url} />;
+    return <DeletedScreen url="/view" />;
   }
 
   return (
