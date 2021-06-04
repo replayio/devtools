@@ -37,7 +37,7 @@ export interface Workspace {
 export interface WorkspaceUser {
   membershipId: string;
   pending: boolean;
-  invitedEmail?: string;
+  email?: string;
   user?: User;
   userId?: string;
 }

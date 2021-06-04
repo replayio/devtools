@@ -10,10 +10,6 @@ export interface InvitedUser {
   invited: boolean;
 }
 
-export interface NonRegisteredTeamMember {
-  invitedEmail: string;
-}
-
 export function useGetInvitations() {
   const { data, loading, error } = useQuery(
     gql`

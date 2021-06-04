@@ -150,7 +150,9 @@ function convertRecording(rec: any): Recording | undefined {
     return undefined;
   }
 
-  const collaborators = rec.collaborators?.edges?.map((e: any) => e.node.user.id);
+  const collaborators = rec.collaborators?.edges
+    ?.filter((e: any) => e.node.user)
+    .map((e: any) => e.node.user.id);
 
   return {
     id: rec.uuid,
@@ -221,6 +223,10 @@ export function useGetOwnersAndCollaborators(
           collaborators {
             edges {
               node {
+                ... on RecordingPendingEmailCollaborator {
+                  id
+                  email
+                }
                 ... on RecordingPendingUserCollaborator {
                   id
                   user {

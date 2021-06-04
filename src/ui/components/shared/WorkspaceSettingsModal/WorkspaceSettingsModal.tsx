@@ -32,14 +32,14 @@ function WorkspaceSettingsModal({ workspaceId }: PropsFromRedux) {
             <ul className="workspace-members">
               {members &&
                 !loading &&
-                members.map((member, i) =>
-                  member.userId ? (
-                    <WorkspaceMember member={member} key={`registered-${member.userId}`} />
-                  ) : (
+                members.map(member =>
+                  member.email ? (
                     <NonRegisteredWorkspaceMember
-                      member={member as any}
-                      key={`non-registered-${(member as any).invitedEmail}`}
+                      member={member}
+                      key={`non-registered-${member.email}`}
                     />
+                  ) : (
+                    <WorkspaceMember member={member} key={`registered-${member.userId}`} />
                   )
                 )}
             </ul>
