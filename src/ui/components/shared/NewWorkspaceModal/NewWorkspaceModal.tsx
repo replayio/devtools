@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 const Modal = require("ui/components/shared/Modal").default;
 import hooks from "ui/hooks";
-import useToken from "ui/utils/useToken";
+import { useGetUserInfo } from "ui/hooks/users";
 import { TextInput } from "../Forms";
 import MaterialIcon from "../MaterialIcon";
 import "./NewWorkspaceModal.css";
@@ -20,8 +20,7 @@ function NewWorkspaceModal({ hideModal }: PropsFromRedux) {
     hideModal();
   };
 
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
+  const { id: userId } = useGetUserInfo();
 
   return (
     <div className="new-workspace-modal">

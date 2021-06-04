@@ -18,7 +18,6 @@ import { setTelemetryContext } from "ui/utils/telemetry";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
-import useToken from "ui/utils/useToken";
 import { useGetUserInfo } from "ui/hooks/users";
 import { useGetRecording } from "ui/hooks/recordings";
 
@@ -65,7 +64,6 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
 
 function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading, children }: AppProps) {
   const auth = useAuth0();
-  const { claims } = useToken();
   const userInfo = useGetUserInfo();
   const recordingInfo = useGetRecording(recordingId);
 
@@ -81,7 +79,7 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading, chil
 
   useEffect(() => {
     if (!userInfo.loading) {
-      setTelemetryContext(claims?.hasura.userId, userInfo.email, userInfo.internal);
+      setTelemetryContext(userInfo.id, userInfo.email, userInfo.internal);
     }
   }, [userInfo]);
 

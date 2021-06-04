@@ -24,11 +24,6 @@ const {
 export interface TokenState {
   loading?: boolean;
   token?: string;
-  claims?: {
-    hasura: {
-      userId: string;
-    };
-  };
   error?: any;
 }
 
@@ -47,11 +42,6 @@ class TokenManager {
     //   this.currentState = {
     //     loading: false,
     //     token: "E2E-TEST-TOKEN",
-    //     claims: {
-    //       hasura: {
-    //         userId: "e51d8408-edba-4b64-9d29-cb1b9fbf34db",
-    //       },
-    //     },
     //   };
     //   this.deferredState.resolve(this.currentState);
     // }
@@ -157,10 +147,7 @@ class TokenManager {
       try {
         const token = await this.fetchToken(refresh);
 
-        const decodedToken = jwt_decode<any>(token);
-        const userId = decodedToken?.["https://hasura.io/jwt/claims"]?.["x-hasura-user-id"];
-
-        this.setState({ token, claims: { hasura: { userId } } }, deferredState);
+        this.setState({ token }, deferredState);
         if (deferredState === this.deferredState) {
           this.setupTokenRefresh(token);
         }
