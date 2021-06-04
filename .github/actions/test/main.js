@@ -73,7 +73,7 @@ const devServerProcess = spawn("node_modules/.bin/webpack-dev-server", {
   // the risk of timing out if the build itself is slow.
   spawnChecked(
     "curl",
-    ["--max-time", "360", "--range", "0-50", "http://localhost:8080/dist/main.js"],
+    ["--max-time", "600", "--range", "0-50", "http://localhost:8080/dist/main.js"],
     {
       stdio: "inherit",
     }
