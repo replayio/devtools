@@ -52,7 +52,7 @@ const devServerProcess = spawn("node_modules/.bin/webpack-dev-server", {
 });
 
 (async function () {
-  console.log("Waiting for Webpack");
+  console.log("Waiting for Webpack server start");
   await Promise.race([
     new Promise(r => {
       devServerProcess.stdout.on("data", chunk => {
@@ -66,12 +66,19 @@ const devServerProcess = spawn("node_modules/.bin/webpack-dev-server", {
       throw new Error("Failed to start dev server");
     }),
   ]);
+  console.log("Waiting for Webpack build");
 
   // Wait for the initial Webpack build to complete before
   // trying to run the tests so the tests don't run
   // the risk of timing out if the build itself is slow.
-  spawnChecked("curl", ["http://localhost:8080/dist/main.js"]);
-  console.log("Waiting for Webpack");
+  spawnChecked(
+    "curl",
+    ["--max-time", "360", "--range", "0-50", "http://localhost:8080/dist/main.js"],
+    {
+      stdio: "inherit",
+    }
+  );
+  console.log("Done Initial Webpack build");
 
   require("../../../test/run");
 })().catch(err => {
