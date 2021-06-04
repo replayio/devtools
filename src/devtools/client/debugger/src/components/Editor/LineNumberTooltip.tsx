@@ -95,6 +95,10 @@ function LineNumberTooltip({
     return <StaticTooltip targetNode={lineNumberNode}>...</StaticTooltip>;
   }
 
+  if (analysisPoints === "error") {
+    return <StaticTooltip targetNode={lineNumberNode}>Failed</StaticTooltip>;
+  }
+
   const points = analysisPoints.length;
   const isHot = points > prefs.maxHitsDisplayed;
 

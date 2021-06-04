@@ -111,6 +111,18 @@ export default function update(
       };
     }
 
+    case "set_analysis_error": {
+      const id = getLocationAndConditionKey(action.location, action.condition);
+
+      return {
+        ...state,
+        analysisPoints: {
+          ...state.analysisPoints,
+          [id]: "error",
+        },
+      };
+    }
+
     case "set_events": {
       return {
         ...state,
