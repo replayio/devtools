@@ -7,6 +7,7 @@ build:
     COPY src src
     RUN mkdir -p ./dist
     COPY postcss.config.js .
+    COPY tailwind.config.js .
     COPY webpack.config.js .
     ARG GIT_SHA
     RUN REPLAY_BUILD_VISUALIZE=1 ./node_modules/.bin/webpack --mode=production --env REPLAY_RELEASE=$GIT_SHA
