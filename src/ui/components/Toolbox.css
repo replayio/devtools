@@ -58,6 +58,7 @@
   mask-repeat: no-repeat;
   mask-size: cover;
   margin: 4px;
+  color: ;
 }
 
 .toolbar-panel-button.active {
@@ -65,13 +66,13 @@
 }
 
 .toolbar-panel-icon {
-  background: var(--theme-toolbar-color);
+  color: #bcbcbc;
 }
 
 .toolbar-panel-button.active .toolbar-panel-icon {
-  background: var(--primary-accent);
+  color: var(--primary-accent);
 }
 
 .debugger-panel.toolbar-panel-icon.paused {
-  background-color: var(--secondary-accent);
+  /* background-color: var(--secondary-accent); */
 }

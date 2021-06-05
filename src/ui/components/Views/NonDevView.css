@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 24px;
+  padding: 12px 24px;
   justify-content: space-between;
 }
 
@@ -47,8 +47,8 @@
 }
 
 .right-sidebar .event-listeners .event-listeners-content {
-    height: 300px;
-    overflow-y: auto;
+  height: 300px;
+  overflow-y: auto;
 }
 
 .right-sidebar .comments-panel {

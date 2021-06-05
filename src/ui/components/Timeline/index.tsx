@@ -32,13 +32,16 @@ import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import "./Timeline.css";
 import { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
+import MaterialIcon from "../shared/MaterialIcon";
 
 const { prefs } = require("ui/utils/prefs");
 
 function ReplayButton({ onClick }: { onClick: MouseEventHandler }) {
   return (
     <button onClick={onClick}>
-      <div className="img replay-lg" style={{ transform: "scaleX(-1)" }} />
+      <MaterialIcon className="refresh pause_play_circle material-icons-round">
+        refresh
+      </MaterialIcon>
     </button>
   );
 }
@@ -164,9 +167,13 @@ class Timeline extends Component<PropsFromRedux> {
       <div className="commands">
         <button onClick={togglePlayback}>
           {playback ? (
-            <div className="img pause-circle-lg" />
+            <MaterialIcon className="pause_play_circle material-icons-round">
+              pause_circle_outline
+            </MaterialIcon>
           ) : (
-            <div className="img play-circle-lg" />
+            <MaterialIcon className="pause_play_circle material-icons-round">
+              play_circle_outline
+            </MaterialIcon>
           )}
         </button>
       </div>

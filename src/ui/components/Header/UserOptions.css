@@ -46,7 +46,6 @@
 .user-options .user.row {
   margin-bottom: 12px;
   overflow: hidden;
-  background-color: inherit;
 }
 
 .user-options .user-avatar {
@@ -95,7 +94,7 @@
 
 .user-options .dropdown-wrapper button {
   width: 100%;
-  color: var(--theme-toolbar-color);
+  color: var(--theme-icon-color);
   background: transparent;
   line-height: 16px;
 }
