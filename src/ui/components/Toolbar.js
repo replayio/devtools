@@ -85,8 +85,8 @@ function Toolbar({
             >
               <IconWithTooltip
                 icon={
-                  <MaterialIcon className="pest_control toolbar-panel-icon">
-                    pest_control
+                  <MaterialIcon className="motion_photos_paused toolbar-panel-icon">
+                    motion_photos_paused
                   </MaterialIcon>
                 }
                 content={"Pause Information"}
