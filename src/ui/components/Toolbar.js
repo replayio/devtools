@@ -10,11 +10,13 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 function IndexingLoader({ loadedRegions }) {
   const { loaded, loading } = loadedRegions;
-  const progressPercentage = (loaded[0].end - loaded[0].begin) / loading[0].end;
 
-  if (!loadedRegions) {
-    return;
+  if (!loaded[0] || !loading[0]) {
+    return null;
   }
+
+  const progressPercentage =
+    (loaded[0].end - loaded[0].begin) / (loading[0].end - loading[0].begin);
 
   return (
     <div className="w-8 h-8" title={`Indexing (${(progressPercentage * 100).toFixed()}%)`}>
