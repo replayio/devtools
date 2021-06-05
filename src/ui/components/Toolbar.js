@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import classnames from "classnames";
 import { connect } from "react-redux";
 import { actions } from "../actions";
@@ -8,15 +8,30 @@ import "react-circular-progressbar/dist/styles.css";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-function IndexingLoader({ loadedRegions }) {
+function getLoadingPercentage(loadedRegions) {
   const { loaded, loading } = loadedRegions;
-
   if (!loaded[0] || !loading[0]) {
     return null;
   }
+  return (loaded[0].end - loaded[0].begin) / (loading[0].end - loading[0].begin);
+}
 
-  const progressPercentage =
-    (loaded[0].end - loaded[0].begin) / (loading[0].end - loading[0].begin);
+function IndexingLoader({ loadedRegions }) {
+  const [isDone, setDone] = useState(false);
+  const progressPercentage = getLoadingPercentage(loadedRegions);
+
+  useEffect(() => {
+    let timeout;
+    if (!isDone && progressPercentage == 1) {
+      timeout = setTimeout(() => setDone(true), 2000);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [loadedRegions]);
+
+  if (isDone || progressPercentage === null) {
+    return null;
+  }
 
   return (
     <div className="w-8 h-8" title={`Indexing (${(progressPercentage * 100).toFixed()}%)`}>
