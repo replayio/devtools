@@ -5,6 +5,7 @@ import { ExpectedError, WorkspaceId } from "ui/state/app";
 import useToken from "ui/utils/useToken";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
+import useAuth0 from "ui/utils/useAuth0";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -20,6 +21,7 @@ export const GET_RECORDING = gql`
       createdAt
       private
       isInitialized
+      ownerNeedsInvite
       owner {
         id
         name
@@ -168,6 +170,7 @@ function convertRecording(rec: any): Recording | undefined {
     workspace: rec.workspace,
     comments: rec.comments,
     collaborators,
+    ownerNeedsInvite: rec.ownerNeedsInvite,
   };
 }
 
@@ -736,21 +739,41 @@ export function useUpdateRecordingTitle() {
 }
 
 export function useHasExpectedError(recordingId: RecordingId): ExpectedError | undefined {
-  const { claims } = useToken();
-  const userId = claims?.hasura.userId;
-
+  const { isAuthenticated } = useAuth0();
   const { recording, isAuthorized, loading } = useGetRecording(recordingId);
+  const { userId } = useGetUserId();
 
   // Recordings are only unavailable when the graphql api is down
   if (!recording) {
     return undefined;
   }
 
-  if (loading || isAuthorized) {
+  if (loading) {
     return undefined;
   }
 
-  if (userId) {
+  if (recording.ownerNeedsInvite) {
+    const isAuthor = userId && userId == recording.userId;
+
+    if (isAuthor) {
+      return {
+        message: "Your replay can not be viewed",
+        content:
+          "Your Replay account is currently unactivated because you have not been invited to Replay by an existing user. Until you are invited, your authored Replays will be unviewable.",
+      };
+    } else {
+      return {
+        message: "This replay can not be viewed",
+        content: "The author for this replay is currently using an unactivated account.",
+      };
+    }
+  }
+
+  if (isAuthorized) {
+    return undefined;
+  }
+
+  if (isAuthenticated) {
     return {
       message: "You don't have permission to view this replay",
       content:
