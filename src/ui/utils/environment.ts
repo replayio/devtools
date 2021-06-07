@@ -20,6 +20,10 @@ export function getTest() {
   return url.searchParams.get("test");
 }
 
+export function isOpenedFromEmail() {
+  return url.searchParams.get("emailinvite");
+}
+
 export function isTest() {
   return getTest() != null;
 }

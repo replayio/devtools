@@ -20,6 +20,7 @@ function initialAppState(): AppState {
     loading: 4,
     uploading: null,
     sessionId: null,
+    // modal: "team-member-onboarding",
     modal: null,
     modalOptions: null,
     analysisPoints: {},

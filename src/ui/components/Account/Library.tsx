@@ -10,6 +10,7 @@ import { ModalType } from "ui/state/app";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
+import { isOpenedFromEmail } from "ui/utils/environment";
 const UserOptions = require("ui/components/Header/UserOptions").default;
 
 function Header({
@@ -47,23 +48,36 @@ function Header({
 
 function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedux) {
   const userInfo = useGetUserInfo();
-  const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
+  const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
+  const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
 
   useEffect(() => {
     // After rendering null, update the workspaceId to display the user's library
     // instead of the non-existent team.
-    if (!loading && ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
+    if (!loading2 && ![{ id: null }, ...workspaces].find(ws => ws.id === currentWorkspaceId)) {
       setWorkspaceId(null);
     }
-  }, [workspaces, loading]);
+  }, [workspaces, loading2]);
 
   useEffect(() => {
-    if (!loading && userInfo?.nags && !userInfo.nags.includes(Nag.FIRST_REPLAY)) {
+    // Wait for both queries to finish loading
+    if (loading1 || loading2) {
+      return;
+    }
+
+    // Only show the team member onboarding modal if there's only one outstanding pending team.
+    if (isOpenedFromEmail() && pendingWorkspaces?.length === 1) {
+      setModal("team-member-onboarding");
+      // Skip showing the regular onboarding to make sure the new user lands in the right team first.
+      return;
+    }
+
+    if (!isOpenedFromEmail() && userInfo?.nags && !userInfo.nags.includes(Nag.FIRST_REPLAY)) {
       setModal("onboarding");
     }
-  }, [userInfo]);
+  }, [userInfo, loading1, loading2]);
 
-  if (loading) {
+  if (loading1 || loading2) {
     return null;
   }
 
