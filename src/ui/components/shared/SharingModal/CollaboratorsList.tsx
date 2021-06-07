@@ -8,6 +8,7 @@ export interface CollaboratorDbData {
   collaborationId: string;
   user: User;
   email?: string;
+  createdAt: string;
 }
 
 function Collaborator({
