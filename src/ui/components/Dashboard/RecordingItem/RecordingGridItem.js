@@ -2,7 +2,7 @@ import React from "react";
 import Title from "../../shared/Title";
 import formatDate from "date-fns/format";
 import Dropdown from "devtools/client/debugger/src/components/shared/Dropdown";
-import useToken from "ui/utils/useToken";
+import { useGetUserInfo } from "ui/utils/users";
 import hooks from "ui/hooks";
 
 import "./RecordingGridItem.css";
@@ -15,10 +15,9 @@ export default function RecordingGridItem({
   setEditingTitle,
   toggleIsPrivate,
 }) {
-  const { claims } = useToken();
+  const { id: userId } = useGetUserInfo();
   const { screenData } = hooks.useGetRecordingPhoto(data.id);
 
-  const userId = claims?.hasura.userId;
   const isOwner = userId == data.user.id;
 
   return (

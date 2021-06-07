@@ -16,6 +16,7 @@ export function useGetUserId() {
 }
 
 export type UserInfo = {
+  id: string;
   email: string;
   internal: boolean;
   loading: boolean;
@@ -31,6 +32,9 @@ export function useGetUserInfo() {
     gql`
       query GetUser {
         viewer {
+          user {
+            id
+          }
           email
           internal
           nags
@@ -43,11 +47,12 @@ export function useGetUserInfo() {
     console.error("Apollo error while fetching user:", error);
   }
 
+  const id: string = data?.viewer?.user.id;
   const email: string = data?.viewer?.email;
   const internal: boolean = data?.viewer?.internal;
   const nags: Nag[] = data?.viewer?.nags;
 
-  return { loading, email, internal, nags };
+  return { loading, id, email, internal, nags };
 }
 
 export function useUpdateUserNags() {
