@@ -139,6 +139,26 @@ function setBreakpoint(location, options) {
   return Promise.all(promises);
 }
 
+function setMultiSourceBreakpoint(locations, options) {
+  assert(locations.every(loc => loc.sourceId));
+  options = maybeGenerateLogGroupId(options);
+  for (const location of locations) {
+    maybeClearLogpoint(location);
+    breakpoints[locationKey(location)] = { location, options };
+  }
+
+  const { condition, logValue, logGroupId } = options;
+  const promises = [];
+  for (const location of locations) {
+    const { sourceId, line, column } = location;
+    promises.push(ThreadFront.setBreakpoint(sourceId, line, column, condition));
+  }
+  if (logValue) {
+    promises.push(setLogpoint(logGroupId, locations, logValue, condition));
+  }
+  return Promise.all(promises);
+}
+
 function removeBreakpoint(location) {
   maybeClearLogpoint(location);
   delete breakpoints[locationKey(location)];
@@ -386,6 +406,7 @@ const clientCommands = {
   getSourceActorBreakableLines,
   hasBreakpoint,
   setBreakpoint,
+  setMultiSourceBreakpoint,
   setXHRBreakpoint,
   removeXHRBreakpoint,
   addWatchpoint,
