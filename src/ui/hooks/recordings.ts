@@ -226,9 +226,11 @@ export function useGetOwnersAndCollaborators(
                 ... on RecordingPendingEmailCollaborator {
                   id
                   email
+                  createdAt
                 }
                 ... on RecordingPendingUserCollaborator {
                   id
+                  createdAt
                   user {
                     id
                     name
@@ -237,6 +239,7 @@ export function useGetOwnersAndCollaborators(
                 }
                 ... on RecordingUserCollaborator {
                   id
+                  createdAt
                   user {
                     id
                     name
@@ -264,11 +267,17 @@ export function useGetOwnersAndCollaborators(
 
   let collaborators: CollaboratorDbData[] = [];
   if (data?.recording?.collaborators) {
-    collaborators = data.recording.collaborators.edges.map(({ node }: any) => ({
-      collaborationId: node.id,
-      user: node.user,
-      email: node.email,
-    }));
+    collaborators = data.recording.collaborators.edges
+      .map(({ node }: any) => ({
+        collaborationId: node.id,
+        user: node.user,
+        email: node.email,
+        createdAt: node.createdAt,
+      }))
+      .sort(
+        (a: CollaboratorDbData, b: CollaboratorDbData) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
   }
   const recording = convertRecording(data.recording);
   return { collaborators, recording, loading, error };
