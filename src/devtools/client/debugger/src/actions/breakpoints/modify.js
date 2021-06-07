@@ -58,7 +58,7 @@ import { getTextAtPosition } from "../../utils/source";
 
 async function clientSetBreakpoint(client, dispatch, breakpoint) {
   const locations = await getCorrespondingLocations(breakpoint.location, dispatch);
-  await Promise.all(locations.map(loc => client.setBreakpoint(loc, breakpoint.options)));
+  await client.setMultiSourceBreakpoint(locations, breakpoint.options);
 }
 
 async function clientRemoveBreakpoint(client, dispatch, location) {
