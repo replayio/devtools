@@ -9,6 +9,7 @@
   display: flex;
   padding: 10px 24px 12px 12px;
   align-items: center;
+  user-select: none;
 }
 
 .theme-light .timeline {
