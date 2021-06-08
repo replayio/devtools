@@ -130,3 +130,4 @@ const connector = connect((state: UIState) => ({
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(_AppErrors);
+export { ExpectedErrorScreen, UnexpectedErrorScreen };

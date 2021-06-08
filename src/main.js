@@ -26,17 +26,20 @@ const React = require("react");
 const { useEffect, useState } = React;
 const ReactDOM = require("react-dom");
 const { Provider } = require("react-redux");
-const { BrowserRouter: Router } = require("react-router-dom");
+const { BrowserRouter: Router, Route, Switch } = require("react-router-dom");
 const tokenManager = require("ui/utils/tokenManager").default;
 const { setupTelemetry } = require("ui/utils/telemetry");
 const { ApolloWrapper } = require("ui/utils/apolloClient");
 const App = require("ui/components/App").default;
+const BlankLoadingScreen = require("ui/components/shared/BlankScreen").BlankLoadingScreen;
 
 require("image/image.css");
 
 document.body.addEventListener("contextmenu", e => e.preventDefault());
 
 setupTelemetry({ recordingId });
+
+const BrowserError = React.lazy(() => import("views/browser/error"));
 
 function PageSwitch() {
   const [pageWithStore, setPageWithStore] = useState(null);
@@ -65,12 +68,19 @@ function PageSwitch() {
 }
 
 ReactDOM.render(
-  <Router>
-    <tokenManager.Auth0Provider>
-      <ApolloWrapper recordingId={recordingId}>
-        <PageSwitch />
-      </ApolloWrapper>
-    </tokenManager.Auth0Provider>
-  </Router>,
+  <React.Suspense fallback={() => <div>Loading</div>}>
+    <Router>
+      <Switch>
+        <Route exact path="/browser/error" component={BrowserError} />
+        <Route>
+          <tokenManager.Auth0Provider>
+            <ApolloWrapper recordingId={recordingId}>
+              <PageSwitch />
+            </ApolloWrapper>
+          </tokenManager.Auth0Provider>
+        </Route>
+      </Switch>
+    </Router>
+  </React.Suspense>,
   document.querySelector("#app")
 );
