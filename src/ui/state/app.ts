@@ -19,7 +19,8 @@ export type ModalType =
   | "new-workspace"
   | "workspace-settings"
   | "onboarding"
-  | "team-member-onboarding";
+  | "team-member-onboarding"
+  | "team-leader-onboarding";
 export type WorkspaceId = string;
 export type SettingsTabTitle = "Experimental" | "Invitations" | "Support" | "Personal";
 

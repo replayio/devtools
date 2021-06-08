@@ -24,6 +24,7 @@ import { useGetRecording } from "ui/hooks/recordings";
 import "styles.css";
 import UploadingScreen from "./UploadingScreen";
 import TeamMemberOnboardingModal from "./shared/OnboardingModal/TeamMemberOnboardingModal";
+import TeamLeaderOnboardingModal from "./shared/TeamLeaderOnboardingModal";
 var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
@@ -48,6 +49,9 @@ function AppModal({ modal }: { modal: ModalType }) {
     }
     case "team-member-onboarding": {
       return <TeamMemberOnboardingModal />;
+    }
+    case "team-leader-onboarding": {
+      return <TeamLeaderOnboardingModal />;
     }
     default: {
       return null;

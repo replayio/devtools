@@ -20,8 +20,12 @@ export function getTest() {
   return url.searchParams.get("test");
 }
 
-export function isOpenedFromEmail() {
-  return url.searchParams.get("emailinvite");
+export function isTeamMemberInvite() {
+  return new URL(window.location.href).searchParams.get("teaminvite");
+}
+
+export function isTeamLeaderInvite() {
+  return new URL(window.location.href).searchParams.get("replayinvite");
 }
 
 export function isTest() {

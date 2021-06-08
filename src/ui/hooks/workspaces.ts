@@ -3,17 +3,23 @@ import { Workspace } from "ui/types";
 
 const NO_WORKSPACES: Workspace[] = [];
 
-export function useCreateNewWorkspace() {
+export function useCreateNewWorkspace(onCompleted: (data: any) => void) {
   const [createNewWorkspace, { error }] = useMutation(
     gql`
       mutation CreateNewWorkspace($name: String!) {
         createWorkspace(input: { name: $name }) {
           success
+          workspace {
+            id
+          }
         }
       }
     `,
     {
       refetchQueries: ["GetNonPendingWorkspaces"],
+      onCompleted: data => {
+        onCompleted(data.createWorkspace.workspace);
+      },
     }
   );
 
