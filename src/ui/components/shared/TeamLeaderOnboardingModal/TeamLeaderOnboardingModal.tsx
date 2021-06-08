@@ -99,10 +99,6 @@ function SlideBody1({ hideModal, setCurrent, total, current }: SlideBodyProps) {
     });
   }, []);
 
-  const onSkip = () => {
-    window.history.pushState({}, document.title, window.location.pathname);
-    hideModal();
-  };
   const content = (
     <div className="text-xl">{`We're excited to have you! Next, we'll guide you through creating your own team and inviting your team members to Replay.`}</div>
   );
@@ -110,13 +106,7 @@ function SlideBody1({ hideModal, setCurrent, total, current }: SlideBodyProps) {
   return (
     <>
       <SlideContent headerText="Welcome to Replay">{content}</SlideContent>
-      <div className="grid grid-cols-2 gap-4">
-        <button
-          onClick={onSkip}
-          className="items-center px-4 py-2 border border-gray-200 text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-        >
-          Skip
-        </button>
+      <div className="grid">
         <NextButton allowNext={true} {...{ current, total, setCurrent, hideModal }} />
       </div>
     </>
@@ -143,6 +133,10 @@ function SlideBody2({ hideModal, setNewWorkspace, setCurrent, total, current }: 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
+  const onSkip = () => {
+    window.history.pushState({}, document.title, window.location.pathname);
+    hideModal();
+  };
   const handleSave = () => createNewWorkspace({ variables: { name: inputValue, userId } });
 
   return (
@@ -160,7 +154,13 @@ function SlideBody2({ hideModal, setNewWorkspace, setCurrent, total, current }: 
         </div>
         {/* </form> */}
       </SlideContent>
-      <div className="grid">
+      <div className="grid grid-cols-2 gap-4">
+        <button
+          onClick={onSkip}
+          className="items-center px-4 py-2 border border-gray-200 text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+        >
+          Skip
+        </button>
         <NextButton onNext={handleSave} {...{ current, total, setCurrent, hideModal, allowNext }} />
       </div>
     </>
