@@ -28,6 +28,7 @@ import {
   unprocessedRegions,
   loadedRegions,
   annotations,
+  SameLineSourceLocations,
 } from "@recordreplay/protocol";
 import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
@@ -139,6 +140,9 @@ class _ThreadFront {
   // Source IDs for generated sources which should be preferred over any
   // original source.
   preferredGeneratedSources = new Set<SourceId>();
+
+  // Map sourceId to breakpoint positions.
+  breakpointPositions = new Map<string, SameLineSourceLocations[]>();
 
   onSource: ((source: newSource) => void) | undefined;
 
@@ -362,12 +366,22 @@ class _ThreadFront {
     range?: { start: SourceLocation; end: SourceLocation }
   ) {
     assert(this.sessionId);
+
+    if (this.breakpointPositions.has(sourceId)) {
+      return this.breakpointPositions.get(sourceId);
+    }
+
     const begin = range ? range.start : undefined;
     const end = range ? range.end : undefined;
     const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
       { sourceId, begin, end },
       this.sessionId
     );
+
+    if (!range) {
+      this.breakpointPositions.set(sourceId, lineLocations);
+    }
+
     return lineLocations;
   }
 
