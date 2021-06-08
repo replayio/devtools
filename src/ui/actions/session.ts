@@ -65,11 +65,13 @@ export async function createSession(store: UIStore, recordingId: string) {
     store.dispatch(actions.setUploading(null));
     prefs.recordingId = recordingId;
   } catch (e) {
-    if (e.code == 31) {
-      const currentError = selectors.getUnexpectedError(store.getState());
+    const currentError = selectors.getUnexpectedError(store.getState());
 
-      // Don't overwrite an existing error.
-      if (!currentError) {
+    // Don't overwrite an existing error.
+    if (currentError) {
+      console.error(e);
+    } else {
+      if (e.code == 31) {
         store.dispatch(
           setUnexpectedError({
             message: "Unexpected session error",
@@ -78,9 +80,26 @@ export async function createSession(store: UIStore, recordingId: string) {
             ...e,
           })
         );
+      } else if (e.code == 9) {
+        store.dispatch(
+          setUnexpectedError({
+            message: "Invalid recording ID",
+            content:
+              "The requested recording either does not exist or you do not have access to it.",
+            ...e,
+          })
+        );
+      } else {
+        store.dispatch(
+          setUnexpectedError({
+            message: "Unexpected session error",
+            content:
+              "We're having a problem creating a session for this recording. Please refresh the page.",
+            action: "refresh",
+            ...e,
+          })
+        );
       }
-    } else {
-      throw e;
     }
   }
 }

@@ -77,7 +77,7 @@ function DevTools({
   }
 
   // Skip loading screens when running tests
-  if (!isTest() && queriesAreLoading) {
+  if (!isTest() && (queriesAreLoading || !recording)) {
     return <BlankLoadingScreen />;
   }
 
