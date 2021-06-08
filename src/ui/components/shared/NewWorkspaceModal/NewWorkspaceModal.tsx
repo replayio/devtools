@@ -10,7 +10,7 @@ import "./NewWorkspaceModal.css";
 
 function NewWorkspaceModal({ hideModal }: PropsFromRedux) {
   const [inputValue, setInputValue] = useState("");
-  const createNewWorkspace = hooks.useCreateNewWorkspace();
+  const createNewWorkspace = hooks.useCreateNewWorkspace(() => {});
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
 

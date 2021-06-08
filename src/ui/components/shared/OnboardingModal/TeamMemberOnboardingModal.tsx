@@ -3,6 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+import BlankScreen from "../BlankScreen";
 import Modal from "../NewModal";
 import Spinner from "../Spinner";
 const { prefs } = require("ui/utils/prefs");
@@ -113,17 +114,20 @@ function TeamMemberOnboardingModal({
   }
 
   return (
-    <Modal options={{ maskTransparency: "translucent" }}>
-      <div
-        className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
-        style={{ width: "520px" }}
-      >
-        <div className="space-y-8 flex flex-col items-center">
-          <h2 className="font-bold text-3xl text-gray-900">{`You're invited to join the ${workspaceTarget.name} team`}</h2>
-          {callToAction}
+    <>
+      <BlankScreen className="fixed" />
+      <Modal options={{ maskTransparency: "transparent" }}>
+        <div
+          className="p-12 bg-white rounded-lg shadow-xl text-xl space-y-8 relative flex flex-col justify-between"
+          style={{ width: "520px" }}
+        >
+          <div className="space-y-8 flex flex-col items-center">
+            <h2 className="font-bold text-3xl text-gray-900">{`You're invited to join the ${workspaceTarget.name} team`}</h2>
+            {callToAction}
+          </div>
         </div>
-      </div>
-    </Modal>
+      </Modal>
+    </>
   );
 }
 

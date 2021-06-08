@@ -10,7 +10,7 @@ import { ModalType } from "ui/state/app";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
-import { isOpenedFromEmail } from "ui/utils/environment";
+import { isTeamLeaderInvite, isTeamMemberInvite } from "ui/utils/environment";
 const UserOptions = require("ui/components/Header/UserOptions").default;
 
 function Header({
@@ -65,14 +65,19 @@ function Library({ setWorkspaceId, setModal, currentWorkspaceId }: PropsFromRedu
       return;
     }
 
+    const isLinkedFromEmail = isTeamMemberInvite() || isTeamLeaderInvite();
+
     // Only show the team member onboarding modal if there's only one outstanding pending team.
-    if (isOpenedFromEmail() && pendingWorkspaces?.length === 1) {
+    if (isTeamMemberInvite() && pendingWorkspaces?.length === 1) {
       setModal("team-member-onboarding");
       // Skip showing the regular onboarding to make sure the new user lands in the right team first.
       return;
+    } else if (isTeamLeaderInvite()) {
+      setModal("team-leader-onboarding");
+      return;
     }
 
-    if (!isOpenedFromEmail() && userInfo?.nags && !userInfo.nags.includes(Nag.FIRST_REPLAY)) {
+    if (!isLinkedFromEmail && userInfo?.nags && !userInfo.nags.includes(Nag.FIRST_REPLAY)) {
       setModal("onboarding");
     }
   }, [userInfo, loading1, loading2]);
