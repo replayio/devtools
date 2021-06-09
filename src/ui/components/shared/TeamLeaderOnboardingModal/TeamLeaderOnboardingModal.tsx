@@ -1,27 +1,62 @@
 import classNames from "classnames";
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  Dispatch,
+  MouseEventHandler,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { Workspace } from "ui/types";
-import useToken from "ui/utils/useToken";
+import { Workspace, WorkspaceUser } from "ui/types";
 import BlankScreen from "../BlankScreen";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
+import { validateEmail } from "../WorkspaceSettingsModal/WorkspaceForm";
 const { prefs } = require("ui/utils/prefs");
+
+function ModalButton({
+  children,
+  onClick = () => {},
+  className,
+  disabled = false,
+}: {
+  children: React.ReactElement | string;
+  className?: string;
+  onClick?: MouseEventHandler;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={classNames(
+        className,
+        "max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-white bg-blue-600 hover:bg-blue-700"
+      )}
+    >
+      {children}
+    </button>
+  );
+}
 
 function SlideContent({
   headerText,
   children,
 }: {
   headerText: string;
-  children: React.ReactElement | React.ReactElement[];
+  children: React.ReactElement | (React.ReactElement | null)[];
 }) {
   return (
-    <div className="space-y-12 flex flex-col flex-grow">
+    <div className="space-y-12 flex flex-col flex-grow overflow-hidden">
       <h2 className="font-bold text-3xl text-gray-900">{headerText}</h2>
-      <div className="text-gray-500 flex flex-col flex-grow space-y-4">{children}</div>
+      <div className="text-gray-500 flex flex-col flex-grow space-y-4 overflow-hidden">
+        {children}
+      </div>
     </div>
   );
 }
@@ -145,12 +180,7 @@ function SlideBody2({ hideModal, setNewWorkspace, setCurrent, total, current }: 
         <div className="text-xl">{`To start, what would you like your team's name to be?`}</div>
         {/* <form onSubmit={handleSave} className="flex flex-col space-y-4"> */}
         <div className="py-4 flex flex-col">
-          <TextInput
-            placeholder="Team name"
-            value={inputValue}
-            onChange={onChange}
-            id="replay-title"
-          />
+          <TextInput placeholder="Team name" value={inputValue} onChange={onChange} />
         </div>
         {/* </form> */}
       </SlideContent>
@@ -167,7 +197,74 @@ function SlideBody2({ hideModal, setNewWorkspace, setCurrent, total, current }: 
   );
 }
 
-type SlideBody3Props = PropsFromRedux & {
+function SlideBody3({ hideModal, setCurrent, newWorkspace, total, current }: SlideBodyProps) {
+  const [inputValue, setInputValue] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [invalidInput, setInvalidInput] = useState<boolean>(false);
+  const { members, loading } = hooks.useGetWorkspaceMembers(newWorkspace!.id);
+  const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(() => {
+    setInputValue("");
+    setIsLoading(false);
+  });
+
+  // This is hacky. A member entry will only have an e-mail if it was pending. If
+  // they had already accepted, we don't expose that member's e-mail. This is not
+  // a concern for now, since this will only run right as the team is created. It's
+  // unlikely that while this slide is up that a pending member would accept the invite
+  // immediately.
+  const pendingMembers = members?.filter(m => m.email) || [];
+  const sortedMembers = pendingMembers.sort(
+    (a: WorkspaceUser, b: WorkspaceUser) =>
+      new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+  );
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+  const handleAddMember = (e: React.FormEvent | React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!validateEmail(inputValue)) {
+      setInvalidInput(true);
+      return;
+    }
+
+    setInvalidInput(false);
+    setIsLoading(true);
+    inviteNewWorkspaceMember({ variables: { workspaceId: newWorkspace!.id, email: inputValue } });
+  };
+
+  return (
+    <>
+      <SlideContent headerText="Your team members">
+        <div className="text-xl">{`Next, we need to add your team members to your team.`}</div>
+        <form className="flex flex-col" onSubmit={handleAddMember}>
+          <div className="flex-grow flex flex-row space-x-4">
+            <TextInput placeholder="Team name" value={inputValue} onChange={onChange} />
+            <ModalButton onClick={handleAddMember} disabled={isLoading}>
+              {isLoading ? "Loading" : "Invite"}
+            </ModalButton>
+          </div>
+          {invalidInput ? <div>Invalid email address</div> : null}
+        </form>
+        {!loading && pendingMembers ? (
+          <div className="overflow-auto flex-grow">
+            <div className="flex flex-col space-y-2">
+              {pendingMembers.map(m => (
+                <div key={m.email}>{m.email}</div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </SlideContent>
+      <div className="grid">
+        <NextButton allowNext={true} {...{ current, total, setCurrent, hideModal }} />
+      </div>
+    </>
+  );
+}
+
+type SlideBody4Props = PropsFromRedux & {
   setCurrent: Dispatch<SetStateAction<number>>;
   setNewWorkspace: Dispatch<SetStateAction<Workspace | null>>;
   newWorkspace: Workspace;
@@ -175,7 +272,7 @@ type SlideBody3Props = PropsFromRedux & {
   current: number;
 };
 
-function SlideBody3({ setWorkspaceId, hideModal, newWorkspace }: SlideBody3Props) {
+function SlideBody4({ setWorkspaceId, hideModal, newWorkspace }: SlideBody4Props) {
   const onClick = () => {
     prefs.defaultLibraryTeam = JSON.stringify(newWorkspace.id);
     window.history.pushState({}, document.title, window.location.pathname);
@@ -201,15 +298,7 @@ function SlideBody3({ setWorkspaceId, hideModal, newWorkspace }: SlideBody3Props
           {`.`}
         </div>
         <div className="flex flex-col flex-grow justify-end">
-          <button
-            type="button"
-            onClick={onClick}
-            className={classNames(
-              "max-w-max items-center px-4 py-2 border border-transparent text-lg font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-white bg-blue-600 hover:bg-blue-700"
-            )}
-          >
-            {`Take me to my team`}
-          </button>
+          <ModalButton onClick={onClick}>{`Take me to my team`}</ModalButton>
         </div>
       </SlideContent>
     </>
@@ -227,15 +316,17 @@ function OnboardingModal(props: PropsFromRedux) {
     setNewWorkspace,
     newWorkspace,
     current,
-    total: 3,
+    total: 4,
   };
 
   if (current === 1) {
     slide = <SlideBody1 {...newProps} />;
   } else if (current === 2) {
     slide = <SlideBody2 {...newProps} />;
+  } else if (current === 3) {
+    slide = <SlideBody3 {...newProps} />;
   } else {
-    slide = <SlideBody3 {...{ ...newProps, newWorkspace: newWorkspace! }} />;
+    slide = <SlideBody4 {...{ ...newProps, newWorkspace: newWorkspace! }} />;
   }
 
   return (

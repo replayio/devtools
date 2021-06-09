@@ -41,4 +41,5 @@ export interface WorkspaceUser {
   email?: string;
   user?: User;
   userId?: string;
+  createdAt?: string;
 }

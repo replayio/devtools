@@ -15,6 +15,7 @@ export function useGetWorkspaceMembers(workspaceId: string) {
                     __typename
                     id
                     email
+                    createdAt
                   }
                   ... on WorkspacePendingUserMember {
                     __typename
@@ -58,6 +59,7 @@ export function useGetWorkspaceMembers(workspaceId: string) {
           membershipId: node.id,
           pending: true,
           email: node.email,
+          createdAt: node.createdAt,
         };
       } else {
         return {
@@ -72,7 +74,7 @@ export function useGetWorkspaceMembers(workspaceId: string) {
   return { members: workspaceUsers, loading };
 }
 
-export function useInviteNewWorkspaceMember() {
+export function useInviteNewWorkspaceMember(onCompleted: () => void) {
   const [inviteNewWorkspaceMember] = useMutation(
     gql`
       mutation InviteNewWorkspaceMember($email: String!, $workspaceId: ID!) {
@@ -81,7 +83,7 @@ export function useInviteNewWorkspaceMember() {
         }
       }
     `,
-    { refetchQueries: ["GetWorkspaceMembers"] }
+    { refetchQueries: ["GetWorkspaceMembers"], onCompleted }
   );
 
   return inviteNewWorkspaceMember;

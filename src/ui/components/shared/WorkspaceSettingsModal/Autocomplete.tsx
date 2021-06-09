@@ -5,7 +5,7 @@ import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 
 function AutocompleteAction({ workspaceId, email }: { workspaceId: string; email: string }) {
-  const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember();
+  const inviteNewWorkspaceMember = hooks.useInviteNewWorkspaceMember(() => {});
 
   const handleInvite = () => {
     inviteNewWorkspaceMember({ variables: { workspaceId, email } });
