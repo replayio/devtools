@@ -742,16 +742,11 @@ export function useHasExpectedError(recordingId: RecordingId): ExpectedError | u
   const { recording, isAuthorized, loading } = useGetRecording(recordingId);
   const { userId } = useGetUserId();
 
-  // Recordings are only unavailable when the graphql api is down
-  if (!recording) {
-    return undefined;
-  }
-
   if (loading) {
     return undefined;
   }
 
-  if (recording.ownerNeedsInvite) {
+  if (recording?.ownerNeedsInvite) {
     const isAuthor = userId && userId == recording.userId;
 
     if (isAuthor) {

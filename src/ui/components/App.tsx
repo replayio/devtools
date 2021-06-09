@@ -17,7 +17,7 @@ import LogRocket from "ui/utils/logrocket";
 import { setTelemetryContext } from "ui/utils/telemetry";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { UIState } from "ui/state";
-import { ModalType } from "ui/state/app";
+import { ModalType, UnexpectedError } from "ui/state/app";
 import { useGetUserInfo } from "ui/hooks/users";
 import { useGetRecording } from "ui/hooks/recordings";
 
@@ -25,6 +25,9 @@ import "styles.css";
 import UploadingScreen from "./UploadingScreen";
 import TeamMemberOnboardingModal from "./shared/OnboardingModal/TeamMemberOnboardingModal";
 import TeamLeaderOnboardingModal from "./shared/TeamLeaderOnboardingModal";
+import { useApolloClient } from "@apollo/client";
+import BlankScreen from "./shared/BlankScreen";
+import { setUnexpectedError } from "ui/actions/session";
 var FontFaceObserver = require("fontfaceobserver");
 
 function AppModal({ modal }: { modal: ModalType }) {
@@ -70,10 +73,42 @@ function installViewportObserver({ updateNarrowMode }: Pick<AppProps, "updateNar
   observer.observe(viewport!);
 }
 
-function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading, children }: AppProps) {
+function useCheckForApolloError() {
+  const client = useApolloClient();
+
+  if (!client) {
+    const error: UnexpectedError = {
+      message: "Database error",
+      content:
+        "We seem to be having problems connecting to the database. Please refresh this page and try again.",
+      action: "refresh",
+    };
+
+    return error;
+  }
+
+  return null;
+}
+
+function App({
+  theme,
+  recordingId,
+  modal,
+  updateNarrowMode,
+  setFontLoading,
+  setUnexpectedError,
+  children,
+}: AppProps) {
   const auth = useAuth0();
   const userInfo = useGetUserInfo();
   const recordingInfo = useGetRecording(recordingId);
+  const apolloError = useCheckForApolloError();
+
+  useEffect(() => {
+    if (apolloError) {
+      setUnexpectedError(apolloError);
+    }
+  }, [apolloError]);
 
   useEffect(() => {
     var font = new FontFaceObserver("Material Icons");
@@ -106,6 +141,10 @@ function App({ theme, recordingId, modal, updateNarrowMode, setFontLoading, chil
     }
   }, [auth, userInfo, recordingInfo]);
 
+  if (apolloError) {
+    return <BlankScreen />;
+  }
+
   if (hasLoadingParam()) {
     return <UploadingScreen />;
   }
@@ -133,6 +172,7 @@ const connector = connect(
   {
     updateNarrowMode: actions.updateNarrowMode,
     setFontLoading: actions.setFontLoading,
+    setUnexpectedError,
   }
 );
 export type AppProps = ConnectedProps<typeof connector> & { children: ReactNode };
