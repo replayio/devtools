@@ -10,7 +10,7 @@ build:
     COPY tailwind.config.js .
     COPY webpack.config.js .
     ARG GIT_SHA
-    RUN REPLAY_BUILD_VISUALIZE=1 ./node_modules/.bin/webpack --mode=production --env REPLAY_RELEASE=$GIT_SHA
+    RUN REPLAY_BUILD_VISUALIZE=1 NODE_ENV=production ./node_modules/.bin/webpack --env REPLAY_RELEASE=$GIT_SHA
     SAVE ARTIFACT dist /dist AS LOCAL ./dist
 
 dist:
