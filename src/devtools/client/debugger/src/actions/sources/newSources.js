@@ -80,6 +80,12 @@ function checkPendingBreakpoints(cx, sourceId) {
       return;
     }
 
+    await ThreadFront.ensureAllSources();
+    const pickedSourceId = ThreadFront.pickCorrespondingSourceId(sourceId, source.url);
+    if (sourceId !== pickedSourceId) {
+      return;
+    }
+
     // load the source text if there is a pending breakpoint for it
     await dispatch(loadSourceText({ cx, source }));
 

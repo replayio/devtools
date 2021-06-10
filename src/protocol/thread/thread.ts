@@ -131,6 +131,9 @@ class _ThreadFront {
   // Resolve hooks for promises waiting on a source ID to be known.
   sourceWaiters = new ArrayMap<string, () => void>();
 
+  // Waiter which resolves when all sources have been loaded.
+  allSourcesWaiter = defer<void>();
+
   // Map URL to sourceId[].
   urlSources = new ArrayMap<string, SourceId>();
 
@@ -300,7 +303,7 @@ class _ThreadFront {
     const sessionId = await this.waitForSession();
     this.onSource = onSource;
 
-    client.Debugger.findSources({}, sessionId);
+    client.Debugger.findSources({}, sessionId).then(() => this.allSourcesWaiter.resolve());
     client.Debugger.addNewSourceListener(source => {
       let { sourceId, kind, url, generatedSourceIds } = source;
       this.sources.set(sourceId, { kind, url, generatedSourceIds });
@@ -329,6 +332,10 @@ class _ThreadFront {
       await promise;
     }
     return this.sources.get(sourceId)!;
+  }
+
+  async ensureAllSources() {
+    await this.allSourcesWaiter.promise;
   }
 
   getSourceURLRaw(sourceId: SourceId) {
@@ -1010,21 +1017,33 @@ class _ThreadFront {
     return description;
   }
 
-  // Given the sourceId of a preferred or alternate source,
+  // Get the chosen (i.e. preferred and alternate) sources for the given URL.
+  getChosenSourceIdsForUrl(url: string) {
+    return this._chooseSourceIdList(this.getSourceIdsForURL(url));
+  }
+
+  // Given the sourceId of a preferred or alternate source and its URL,
   // get all sourceIds of preferred/alternate sources with the same URL.
-  async getCorrespondingSourceIds(sourceId: SourceId) {
-    const url = await this.getSourceURL(sourceId);
+  getCorrespondingSourceIds(sourceId: SourceId, url: string | undefined) {
     if (!url) {
       return [sourceId];
     }
 
-    const groups = this._chooseSourceIdList(this.getSourceIdsForURL(url));
+    const groups = this.getChosenSourceIdsForUrl(url);
     const isPreferred = groups.some(group => group.sourceId === sourceId);
     if (!isPreferred) {
       assert(groups.some(group => group.alternateId === sourceId));
     }
 
     return groups.map(group => (isPreferred ? group.sourceId : group.alternateId!));
+  }
+
+  pickCorrespondingSourceId(sourceId: SourceId, url: string | undefined) {
+    return this.getCorrespondingSourceIds(sourceId, url)[0];
+  }
+
+  pickSourceIdForUrl(url: string) {
+    return this.getChosenSourceIdsForUrl(url)[0]?.sourceId;
   }
 }
 
