@@ -10,7 +10,7 @@ import flattenDeep from "lodash/flattenDeep";
 function findSourceItem(sourceTree, source) {
   function _traverse(subtree) {
     if (subtree.type === "source") {
-      if (subtree.contents.id === source.id) {
+      if (subtree.contents.url === source.url) {
         return subtree;
       }
 

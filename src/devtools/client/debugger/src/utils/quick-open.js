@@ -132,12 +132,14 @@ export function formatShortcutResults() {
 
 export function formatSources(sources, tabUrls) {
   const formattedSources = [];
+  const sourceURLs = new Set();
 
   for (let i = 0; i < sources.length; ++i) {
     const source = sources[i];
 
-    if (!!source.relativeUrl && !isPretty(source)) {
+    if (!!source.relativeUrl && !isPretty(source) && !sourceURLs.has(source.url)) {
       formattedSources.push(formatSourcesForList(source, tabUrls));
+      sourceURLs.add(source.url);
     }
   }
 
